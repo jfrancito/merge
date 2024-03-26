@@ -1,0 +1,227 @@
+.izquierda{
+	text-align: right;
+}
+
+.menu{
+    overflow:hidden;
+    width 	: 730px;
+    display : table;
+    /*border 	: 1px solid black;*/
+}
+
+.menu .left{
+    width   :   25%
+    float   :   left;
+    display :   table-cell; 
+    text-align: center;     
+}
+
+
+.menu .centro{
+    width	: 	45%
+    float	:	left;
+    display : 	table-cell; 
+    text-align: center;     
+}
+
+
+.menu .right{
+    width	: 	30%
+    float	:	left;
+    border  :	0px solid black; 
+    display : 	table-cell; 
+    text-align: center; 
+    border-radius: 4px ;    
+}
+
+
+.menu  h1{
+	font-size:  1.2em;
+    padding: 0px;
+    margin: 0px;
+	/*border   :  1px solid red;*/
+}
+.menu  h3{
+	font-size:  0.9em;
+	font-weight: bold;
+    padding: 0px;
+    margin: 0px;
+	/*border   :  1px solid red;*/
+}
+.menu  h4{
+	font-size:  0.6em;
+	font-weight: normal;
+    padding: 0px;
+    margin: 0px;
+	/*border: 1px solid blue;*/
+}
+
+.top .det1{
+	width: 718px;
+	font-size: 0.8em;
+	margin-top: 5px;
+	/*border: 1px solid #000;
+	border-radius: 4px;*/
+	padding: 5px;
+
+}
+.top .det1 p{
+	margin-top: 13px;
+	margin-bottom: 13px;
+}
+
+.det2{
+	margin-top: 5px;
+    overflow:hidden;
+    width 	: 730px;
+    display : table;
+	border: 1px solid #000;
+	border-radius: 4px;
+    font-size: 0.8em;
+    padding: 5px;
+}
+
+.det2 .d1,.det2 .d2,.det2 .d3{
+    width	: 	32%
+    float	:	left;
+    display : 	table-cell;     
+}
+
+table {
+    width 	: 730px;
+	margin-top: 15px;
+    font-size: 0.7em;    
+}
+
+th, td {
+    padding: 14px;
+    text-align: left;
+}
+
+
+
+.titulo{
+	text-align: center;
+}
+
+
+
+.codigo{
+	width: 30px;
+}
+.descripcion{
+	width: 100px;
+}
+.unidad{
+	width: 40px;
+}
+.cantidad{
+	width: 40px;
+}
+.precio{
+	width: 80px;
+}
+.importe{
+	width: 100px;
+}
+
+.thpie{
+    height: 110px;
+}
+
+.thfooter{
+    padding-top: -30px;
+    text-align: left;
+    height: 80px;
+    padding-bottom: 0px;
+}
+
+.thfooterobser{
+    padding-top: 0px;
+    text-align: left;
+    height: 120px;
+}
+
+.totales{
+	margin-top: 10px;
+    overflow:hidden;
+    width 	: 730px;
+    display : table;
+    /*border 	: 1px solid black;*/
+}
+
+.totales .left{
+    width	: 	65%
+    float	:	left;
+    display : 	table-cell;  
+   	/*border      : 1px solid red;  */ 
+}
+
+
+.totales .right{
+    width	: 	35%
+    float	:	left;
+    /*border  :	1px solid black; */
+    display : 	table-cell; 
+      
+}
+
+.totales .right p{
+	font-size 	: 0.75em;
+	margin-top	: 0px;
+	margin-bottom 	: 1px;	
+
+}
+
+.totales .right .descripcion{
+	display 	: inline-block;
+	width 		: 55%;
+
+}
+.totales .right .monto{
+	display 	: inline-block;
+	width 		: 40%;
+
+}
+
+.totales .left .uno{
+    display     : inline-block;
+    width       : 25%;
+}
+.totales .left .dos{
+    /*border: 1px solid blue;   */ 
+    display     : inline-block;
+    width       : 70%;
+    font-size   : 0.75em;
+
+}
+.totales .left .dos p{
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+.totales .left .derecha{
+    margin-top: 55px;
+}
+.totales .left .uno img{
+    /*border: 1px solid red;*/
+    width: 100px;
+    position: absolute;
+    top: -87px;
+
+}
+footer .observacion{
+    border-top: 1px solid #000;
+    border-bottom:  1px solid #000;
+}
+footer .observacion h3 {
+    /*border: 1px solid red;*/
+    margin-top: 2px;
+    margin-bottom: 2px;
+    font-size: 0.9em;
+}
+footer .observacion p {
+    /*border: 1px solid red;*/
+    margin-top: 0px;
+    margin-bottom: 2px;    
+    font-size: 0.8em;
+}

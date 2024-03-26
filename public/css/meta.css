@@ -1,0 +1,249 @@
+
+.bienvenidocontenedor {
+
+  background-image: url("../img/fondonyr.png");
+
+  /* Full height */
+  height: 100%;
+
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+
+.pintar_sel{
+  background: #a2beed !important;
+}
+.widget-chart-container{
+  margin-top: 15px;
+}
+.chart-legend-horizontal li span{
+  border: 2px solid #ddd;
+}
+.chart-legend-horizontal li .main-chart-color2{
+  border: inherit !important;
+  background: #f9a39d;
+}
+
+.fila-desactivada{
+  background-color : #f9a39d !important;
+}
+
+.navbar-header{
+  padding-top: 20px;
+  padding-left: 19px;
+  font-size: 18px;
+  font-style: italic;
+}
+.color-iin{
+    background-color: #bc8f8f !important;
+    border-bottom-color: #bc8f8f !important;
+}
+.color-ico{
+    background-color: #8FBC8F !important;
+    border-bottom-color: #8FBC8F !important;
+}
+.color-itr{
+    background-color: #DCDCDC !important;
+    border-bottom-color: #DCDCDC !important;
+}
+.color-ich{
+    background-color: #ADD8E6 !important;
+    border-bottom-color: #ADD8E6 !important;
+}
+.color-iaa{
+    background-color: #b0c4de !important;
+    border-bottom-color: #b0c4de !important;
+}
+.main-content {
+    padding: 8px;
+}
+
+.dt-buttons{
+    margin-left: 20px;
+}
+.dataTables_filter{
+    margin-right: 21px;
+}
+.dataTables_info{
+    margin-left: 20px;
+}
+.dataTables_paginate{
+    margin-right: 21px !important;
+}
+tbody .mdi-check{
+color: #34a853;
+}
+tbody .mdi-close{
+color: #ea4335;
+}
+.splash-acceso-container{
+  max-width: 600px; 
+  margin: 60px auto;
+}
+.splash-acceso-container .empresa-centro{
+  cursor: pointer;
+}
+
+.alertaw_error{
+width: 50%;
+z-index: 1;
+float: right;
+margin-bottom: 0px ;
+}
+
+.alertaw{
+    width: 50%;
+    z-index: 1;
+    /* float: right; */
+    margin-bottom: 0px;
+    position: absolute;
+    right: 22px;
+    top: 69px;
+}
+.msg-close{
+    position: inherit !important;
+    right: 23px !important;
+}
+
+.panel-ajax-alert{
+  position: fixed;
+  top: 2px;
+  right: 4px;
+  width: 40%;
+  z-index: 1205;
+}
+
+.panel-ajax-alert-mobil{
+  position: fixed;
+  bottom: 38px;
+  z-index: 1205;
+  padding: 0px !important;
+  width: 100%;
+}
+.panel-ajax-alert-mobil .alert{
+  margin-bottom: 1px !important;
+}
+.panel-ajax-alert-mobil .alert{
+  padding: 14px !important;
+  border-radius: 0px !important;
+}
+.filtrotabla {
+    
+    padding-bottom: 20px;
+    border-bottom: 1px solid #2572f2;
+}
+.contenido .dt-buttons{
+  margin-top: 9px;
+}
+.td-color-borde td {
+  border-top: 1px solid #fff  !important;
+}
+
+.td-padding-8 td {
+  padding: 8px 10px !important;
+}
+.td-padding-7 td {
+  padding: 7px 10px !important;
+}
+.td-padding-6 td {
+  padding: 6px 10px !important;
+}
+
+#WindowLoad
+{
+    position:fixed;
+    top:0px;
+    left:0px;
+    z-index:3200;
+    filter:alpha(opacity=65);
+   -moz-opacity:65;
+    opacity:0.65;
+    background:#fff;
+}
+.msjcargando{
+  color: #eee;
+}
+
+.msjcargando .texto{
+  font-size: 1.2em;
+  display: inline-block;
+  background: red;
+  padding: 10px;
+  border-radius: 5px;
+  font-weight: bold;
+  font-style: italic;
+}
+.seleccionar{
+  cursor: pointer;
+}
+.negrita{
+  font-weight: bold;
+}
+.titulo-contenedor-modal{
+  font-size: 1.1em;
+  font-weight: bold;
+  font-style: italic;
+
+
+}
+.select2-selection__rendered {
+    line-height: 31px !important;
+}
+.select2-container .select2-selection--single {
+    height: 35px !important;
+}
+
+
+.select2-selection__arrow {
+    height: 34px !important;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow b{
+  top: -5px !important;
+}
+
+/******************** tooltip *******************/
+.tooltiptop{
+  font-size: 1em !important;
+}
+.tooltipcss {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltipcss .tooltiptext {
+    visibility: hidden;
+    width: 100px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 3000;
+    bottom: 125%;
+    left: 95%;
+    margin-left: -60px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 0.7em;
+}
+
+
+.tooltipcss .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+.tooltipcss:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}

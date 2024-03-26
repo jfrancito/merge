@@ -1,0 +1,22 @@
+<html>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+      <table>
+                  <thead>
+                    <tr>
+                      <td>CODIGO_MODULAR</td>
+                      <td>CODIGO_LOCAL</td>
+                      <td>NOMBRE_IIEE</td>
+                      <td>DIRECTOR</td>
+                      <td>DIRECTOR_DNI</td>
+                      <td>TELEFONO</td>
+                      <td>CORREO_ELECTRONICO</td>
+                      <td>DIRECCION_IIEE</td>
+                      <td>LOCALIDAD</td>
+                      <td>CENTRO_POBLADO</td>
+                      <td>DEPARTAMENTO</td>
+                      <td>PROVINCIA</td>
+                      <td>DISTRITO</td>
+                    </tr>
+                  </thead>    
+      </table>
+</html>
