@@ -29,6 +29,8 @@ use Keygen;
 
 trait GeneralesTraits
 {
+
+
 	public function ge_validarArchivoDuplicado($nombrearchivo,$registrodestino_id)
 	{
 		$valor = true;
@@ -153,6 +155,29 @@ trait GeneralesTraits
 		
 		$array 							= 	DB::table($tabla)
         									->where('activo','=',1)
+        									->where('tipoestado','=',$tipoestado)
+
+		        							->pluck($atributo2,$atributo1)
+											->toArray();
+		if($titulo==''){
+			$combo  					= 	$array;
+		}else{
+			if($todo=='TODO'){
+				$combo  				= 	array('' => $titulo , $todo => $todo) + $array;
+			}else{
+				$combo  				= 	array('' => $titulo) + $array;
+			}
+		}
+
+	 	return  $combo;					 			
+	}
+
+
+	private function gn_generacion_combo_tabla_not_array($tabla,$atributo1,$atributo2,$titulo,$todo,$tipoestado,$array) {
+		
+		$array 							= 	DB::table($tabla)
+        									->where('activo','=',1)
+        									->whereNotIn('id',$array)
         									->where('tipoestado','=',$tipoestado)
 		        							->pluck($atributo2,$atributo1)
 											->toArray();

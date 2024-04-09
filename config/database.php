@@ -77,6 +77,18 @@ return [
             'prefix' => '',
         ],
 
+
+        'sqlsrv_w' => [
+            'driver' => 'sqlsrv',
+            'host' => '10.1.0.12',
+            'database' => 'BDEOSCH',
+            'username' => 'sa',
+            'password' => 'Bup8A=Um',
+            'charset' => 'utf8',
+            'prefix' => '',
+        ],
+        
+
     ],
 
     /*

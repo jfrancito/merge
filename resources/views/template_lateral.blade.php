@@ -26,11 +26,21 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('public/css/style.css?v='.$version) }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/css/meta.css?v='.$version) }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/css/ugel.css?v='.$version) }} " />
+
+    <style type="text/css">
+        
+        .libre-baskerville-regular { font-family: "Libre Baskerville", serif; peso de fuente: 400; estilo de fuente: normal; } 
+        .libre-baskerville-bold { font-family: "Libre Baskerville", serif; peso de fuente: 700; estilo de fuente: normal; } 
+        .libre-baskerville-regular-italic { font-family: "Libre Baskerville", serif; peso de fuente: 400; estilo de fuente: cursiva; }
+
+    </style>
+
+
   </head>
-  <body class='fuente-muktabold'>
+  <body class='fuente-muktabold libre-baskerville-regular'>
 
 
-    <div class="be-wrapper be-fixed-sidebar">
+    <div class="be-wrapper  be-fixed-sidebar libre-baskerville-regular">
 
         @include('success.ajax-alert')
         @include('success.bienhecho', ['bien' => Session::get('bienhecho')])

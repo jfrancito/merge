@@ -2,7 +2,7 @@
 <nav class="navbar navbar-default navbar-fixed-top be-top-header {{Session::get('color_meta')}}">
   <div class="container-fluid">
     <div class="navbar-header"> 
-      <div class="color_amarillo"><b>MERGE</b></div>
+      <div class="color_amarillo"><b>MERGE</b> <span> ({{Session::get('usuario')->name}})</span></div>
     </div>
 
     <div class="be-right-navbar {{Session::get('color_meta')}}">

@@ -1,6 +1,67 @@
+.fileinput-upload-button{
+  display: none;
+}
+.msjexitoso{
+  color: #34a853;
+}
+.msjerror{
+  color: #ea4335;
+}
+
+
+.user-progress-small{
+  margin-bottom: 10px;
+}
+.editar_datos_proveedor{
+  cursor: pointer;
+}
+.editar_datos_contacto{
+  cursor: pointer;
+}
+
+
 .color_amarillo{
   color: #FFCC00 !important;
 }
+
+.titulomerge{
+  margin: 0px;
+  font-weight: bold;
+  font-size: 17px;
+}
+.subtitulomerge{
+  margin: 0px;
+  padding-left: 15px;
+}
+
+.formulariomatch .mdi-check {
+    color: #fff;
+    font-size: 12px;
+}
+
+.formulariomatch .mdi-close {
+    color: #fff;
+    font-size: 12px;
+}
+
+.iconocheck{
+  display: inline-block;
+  height: 17px;
+  border-radius: 8px;
+  text-align: center;
+  width: 17px;
+  background: #34a853;
+}
+
+.iconocheckrojo{
+  display: inline-block;
+  height: 17px;
+  border-radius: 8px;
+  text-align: center;
+  width: 17px;
+  background: #ea4335;
+}
+
 
 .scroll_text{
   height:300px;
@@ -70,13 +131,13 @@
 
 fieldset {
     margin-top: 12px !important;
-    border: 1px solid #4285f4 !important;
+    border: 2px solid #34a853 !important;
     padding: 12px !important;
     -moz-border-radius: 8px !important;
     border-radius: 8px !important;
 }
 legend {
-    color: #4285f4 !important;
+    color: #34a853 !important;
     font-style: italic !important;
     padding-left: 12px !important;
     padding-right: 12px !important;

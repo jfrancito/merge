@@ -17,18 +17,30 @@
 // header('Access-Control-Allow-Headers: *');
 
 Route::group(['middleware' => ['guestaw']], function () {
-
 	Route::any('/', 'UserController@actionLogin');
 	Route::any('/login', 'UserController@actionLogin');
 	Route::any('/acceso', 'UserController@actionAcceso');
-
 });
 
+Route::any('/registrate', 'UserController@actionRegistrate');
+Route::any('/ajax-buscar-proveedor', 'UserController@actionAjaxBuscarProveedor');
 Route::get('/cerrarsession', 'UserController@actionCerrarSesion');
+Route::any('/enviocorreoconfirmaciones', 'UserController@actionCorreoConfirmacion');
+Route::any('/activar-registro/{token}', 'UserController@actionActivarRegistro');
+
 
 Route::group(['middleware' => ['authaw']], function () {
 
 	Route::get('/bienvenido', 'UserController@actionBienvenido');
+	Route::any('/ajax-modal-configuracion-datos-proveedor-detalle', 'UserController@actionAjaxModalConfiguracionDatosProveedor');
+	Route::any('/configurar-datos-proveedor/{idusuario}', 'UserController@actionConfigurarDatosProveedor');
+	Route::any('/ajax-modal-configuracion-datos-contacto-detalle', 'UserController@actionAjaxModalConfiguracionDatosContacto');
+	Route::any('/configurar-datos-contacto/{idusuario}', 'UserController@actionConfigurarDatosContacto');
+	Route::any('/ajax-modal-configuracion-cuenta-bancaria', 'UserController@actionAjaxModalConfiguracionCuentaBancaria');
+	Route::any('/configurar-datos-cuenta-bancaria/{idusuario}', 'UserController@actionConfigurarDatosCuentaBancaria');
+	Route::any('/ajax-eliminar-cb', 'UserController@actionEliminarCuentaBancaria');
+
+
 	//GESTION DE USUARIOS
 	Route::any('/gestion-de-usuarios/{idopcion}', 'UserController@actionListarUsuarios');
 	Route::any('/agregar-usuario/{idopcion}', 'UserController@actionAgregarUsuario');
@@ -43,59 +55,77 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-listado-de-opciones', 'UserController@actionAjaxListarOpciones');
 	Route::any('/ajax-activar-permisos', 'UserController@actionAjaxActivarPermisos');
 
-   	Route::get('buscarcliente', function (Illuminate\Http\Request  $request) {
-        $term = $request->term ?: '';
-        $tags = DB::table('STD.EMPRESA')
-        		->leftJoin('users', 'STD.EMPRESA.COD_EMPR', '=', 'users.usuarioosiris_id')
-        		->where('NOM_EMPR', 'like', '%'.$term.'%')
-				->where('STD.EMPRESA.IND_PROVEEDOR','=',1)
-				->where('STD.EMPRESA.COD_ESTADO','=',1)
-				->whereNull('users.usuarioosiris_id')
-				->take(100)
-				->select(DB::raw("
-				  STD.EMPRESA.NRO_DOCUMENTO + ' - '+ STD.EMPRESA.NOM_EMPR AS NOMBRE")
-				)
-        		->pluck('NOMBRE', 'NOMBRE');
-        $valid_tags = [];
-        foreach ($tags as $id => $tag) {
-            $valid_tags[] = ['id' => $id, 'text' => $tag];
-        }
-        return \Response::json($valid_tags);
-    });
+	Route::any('/gestion-de-oc-proveedores/{idopcion}', 'GestionOCController@actionListarOC');
+	Route::any('/detalle-comprobante-oc/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionDetalleComprobanteOC');
+	Route::any('/subir-xml-cargar-datos/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionCargarXML');
+	Route::any('/validar-xml-oc/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionValidarXML');
 
 
-   	Route::get('buscarclientey', function (Illuminate\Http\Request  $request) {
+	Route::any('/gestion-de-oc-validado-proveedores/{idopcion}', 'GestionOCValidadoController@actionListarOCValidado');
+	Route::any('/detalle-comprobante-oc-validado/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidado');
 
+	Route::any('/descargar-archivo-requerimiento-xml/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDescargarXML');
+	Route::any('/descargar-archivo-requerimiento-cdr/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDescargarCDR');
+	Route::any('/descargar-archivo-requerimiento-pdf/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDescargarPDF');
 
-        $term = $request->term ?: '';
-
-    	print_r("1");
-
-		$tags 				= 	DB::table('STD.EMPRESA')
-    									->leftJoin('users', 'STD.EMPRESA.COD_EMPR', '=', 'users.usuarioosiris_id')
-    									->whereNull('users.usuarioosiris_id')
-    									->where('STD.EMPRESA.IND_PROVEEDOR','=',1)
-    									->where('STD.EMPRESA.NOM_EMPR', 'like', '%'.$term.'%')
-    									->where('STD.EMPRESA.COD_ESTADO','=',1)
-    									->select('STD.EMPRESA.COD_EMPR','STD.EMPRESA.NOM_EMPR')
-										->select(DB::raw("
-										  STD.EMPRESA.COD_EMPR,
-										  STD.EMPRESA.NRO_DOCUMENTO + ' - '+ STD.EMPRESA.NOM_EMPR AS NOMBRE")
-										)
-    									->take(10)
-    									->pluck('NOMBRE', 'NOMBRE');	
-        $valid_tags = [];
-        foreach ($tags as $id => $tag) {
-
-            $valid_tags[] = ['id' => $id, 'text' => $tag];
-        }
-
-
-        return \Response::json($valid_tags);
-    });
 
 
 
 });
 
 Route::get('/pruebaemail/{emailfrom}/{nombreusuario}', 'PruebasController@actionPruebaEmail');
+
+
+Route::get('buscarcliente', function (Illuminate\Http\Request  $request) {
+    $term = $request->term ?: '';
+    $tags = DB::table('STD.EMPRESA')
+    		->leftJoin('users', 'STD.EMPRESA.COD_EMPR', '=', 'users.usuarioosiris_id')
+    		->where('NOM_EMPR', 'like', '%'.$term.'%')
+			->where('STD.EMPRESA.IND_PROVEEDOR','=',1)
+			->where('STD.EMPRESA.COD_ESTADO','=',1)
+			->whereNull('users.usuarioosiris_id')
+			->take(100)
+			->select(DB::raw("
+			  STD.EMPRESA.NRO_DOCUMENTO + ' - '+ STD.EMPRESA.NOM_EMPR AS NOMBRE")
+			)
+    		->pluck('NOMBRE', 'NOMBRE');
+    $valid_tags = [];
+    foreach ($tags as $id => $tag) {
+        $valid_tags[] = ['id' => $id, 'text' => $tag];
+    }
+    return \Response::json($valid_tags);
+});
+
+
+Route::get('buscarclientey', function (Illuminate\Http\Request  $request) {
+
+
+    $term = $request->term ?: '';
+
+	print_r("1");
+
+	$tags 				= 	DB::table('STD.EMPRESA')
+									->leftJoin('users', 'STD.EMPRESA.COD_EMPR', '=', 'users.usuarioosiris_id')
+									->whereNull('users.usuarioosiris_id')
+									->where('STD.EMPRESA.IND_PROVEEDOR','=',1)
+									->where('STD.EMPRESA.NOM_EMPR', 'like', '%'.$term.'%')
+									->where('STD.EMPRESA.COD_ESTADO','=',1)
+									->select('STD.EMPRESA.COD_EMPR','STD.EMPRESA.NOM_EMPR')
+									->select(DB::raw("
+									  STD.EMPRESA.COD_EMPR,
+									  STD.EMPRESA.NRO_DOCUMENTO + ' - '+ STD.EMPRESA.NOM_EMPR AS NOMBRE")
+									)
+									->take(10)
+									->pluck('NOMBRE', 'NOMBRE');	
+    $valid_tags = [];
+    foreach ($tags as $id => $tag) {
+
+        $valid_tags[] = ['id' => $id, 'text' => $tag];
+    }
+
+
+    return \Response::json($valid_tags);
+});
+
+
+

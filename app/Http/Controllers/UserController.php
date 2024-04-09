@@ -6,6 +6,10 @@ use App\Modelos\WEBGrupoopcion;
 use App\Modelos\WEBOpcion;
 use App\Modelos\WEBRol;
 use App\Modelos\WEBRolOpcion;
+use App\Modelos\STDEmpresaDireccion;
+use App\Modelos\TESCuentaBancaria;
+use App\Modelos\CMPCategoria;
+use App\Modelos\STDEmpresa;
 use App\User;
 
 use Illuminate\Http\Request;
@@ -15,8 +19,359 @@ use Illuminate\Support\Facades\Redirect;
 use Session;
 use View;
 use Stdclass;
+use App\Traits\UserTraits;
+use App\Traits\GeneralesTraits;
 
 class UserController extends Controller {
+
+    use UserTraits;
+    use GeneralesTraits;
+
+
+
+	public function actionEliminarCuentaBancaria(Request $request)
+	{
+
+		$banco_id 	 		 	 					= 	$request['data_COD_EMPR_BANCO'];
+		$tipocuenta_id 	 		 					= 	$request['data_TXT_TIPO_REFERENCIA'];
+		$moneda_id 	 		 						= 	$request['data_COD_CATEGORIA_MONEDA'];
+		$numerocuenta 	 		 					= 	$request['data_TXT_NRO_CUENTA_BANCARIA'];
+		$numerocuentacci 	 		 				= 	$request['data_TXT_NRO_CUENTA_BANCARIA'];
+		$banco 										=	CMPCategoria::where('COD_CATEGORIA','=',$banco_id)->first();
+		$tipocuenta 								=	CMPCategoria::where('COD_CATEGORIA','=',$tipocuenta_id)->first();
+		$moneda 									=	CMPCategoria::where('COD_CATEGORIA','=',$moneda_id)->first();
+		$empresa 									=	STDEmpresa::where('COD_EMPR','=',Session::get('usuario')->usuarioosiris_id)->first();
+
+
+		$tescuentabb    							=   TESCuentaBancaria::where('COD_EMPR_TITULAR','=',$empresa->COD_EMPR)
+														->where('COD_EMPR_BANCO','=',$banco->COD_CATEGORIA)
+														->where('COD_CATEGORIA_MONEDA','=',$moneda->COD_CATEGORIA)
+														->where('TXT_TIPO_REFERENCIA','=',$tipocuenta->COD_CATEGORIA)
+														->where('TXT_NRO_CUENTA_BANCARIA','=',$numerocuenta)
+														->where('COD_ESTADO','=',1)
+														->first();
+
+
+
+		$tescuentabb->COD_USUARIO_MODIF_AUD 		=   Session::get('usuario')->id;
+		$tescuentabb->FEC_USUARIO_MODIF_AUD 		=   $this->fechaactual;
+		$tescuentabb->COD_ESTADO 					=   0;
+		$tescuentabb->save();
+
+		print_r('Elimincion exitosa');
+
+	}
+
+
+
+
+	public function actionConfigurarDatosCuentaBancaria($idusuario,Request $request)
+	{
+
+	    $idusuario = $this->funciones->decodificarmaestra($idusuario);
+
+		$banco_id 	 		 	 					= 	$request['banco_id'];
+		$tipocuenta_id 	 		 					= 	$request['tipocuenta_id'];
+		$moneda_id 	 		 						= 	$request['moneda_id'];
+		$numerocuenta 	 		 					= 	$request['numerocuenta'];
+		$numerocuentacci 	 		 				= 	$request['numerocuentacci'];
+		$usuario 									= 	User::where('id', $idusuario)->first();
+		$banco 										=	CMPCategoria::where('COD_CATEGORIA','=',$banco_id)->first();
+		$tipocuenta 								=	CMPCategoria::where('COD_CATEGORIA','=',$tipocuenta_id)->first();
+		$moneda 									=	CMPCategoria::where('COD_CATEGORIA','=',$moneda_id)->first();
+		$empresa 									=	STDEmpresa::where('COD_EMPR','=',Session::get('usuario')->usuarioosiris_id)->first();
+
+
+		$tescuentabb    							=   TESCuentaBancaria::where('COD_EMPR_TITULAR','=',$empresa->COD_EMPR)
+														->where('COD_EMPR_BANCO','=',$banco->COD_CATEGORIA)
+														->where('COD_CATEGORIA_MONEDA','=',$moneda->COD_CATEGORIA)
+														->where('TXT_TIPO_REFERENCIA','=',$tipocuenta->COD_CATEGORIA)
+														->where('TXT_NRO_CUENTA_BANCARIA','=',$numerocuenta)
+														->where('COD_ESTADO','=',1)
+														->first();
+
+		if(count($tescuentabb) > 0){
+				return Redirect::back()->withInput()->with('errorurl', 'La cuenta ya se cuenta registrado');
+		}
+
+
+		$cuentabancaria 							=	New TESCuentaBancaria();
+		$cuentabancaria->COD_EMPR_TITULAR 			=   $empresa->COD_EMPR;
+		$cuentabancaria->COD_EMPR_BANCO 			=   $banco->COD_CATEGORIA;
+		$cuentabancaria->TXT_NRO_CUENTA_BANCARIA	=   $numerocuenta;
+		$cuentabancaria->TXT_EMPR_TITULAR 			=   $empresa->NOM_EMPR;
+		$cuentabancaria->TXT_EMPR_BANCO 			=   $banco->NOM_CATEGORIA;
+		$cuentabancaria->COD_CATEGORIA_MONEDA 		=   $moneda->COD_CATEGORIA;
+		$cuentabancaria->TXT_CATEGORIA_MONEDA 		=   $moneda->NOM_CATEGORIA;
+		$cuentabancaria->TXT_NRO_CCI 				=   $numerocuentacci;
+		$cuentabancaria->TXT_GLOSA 					=   '';
+		$cuentabancaria->TXT_TIPO_REFERENCIA 		=   $tipocuenta->COD_CATEGORIA;
+		$cuentabancaria->TXT_REFERENCIA 			=   $tipocuenta->NOM_CATEGORIA;
+		$cuentabancaria->COD_USUARIO_CREA_AUD 		=   Session::get('usuario')->id;
+		$cuentabancaria->FEC_USUARIO_CREA_AUD 		=   $this->fechaactual;
+		$cuentabancaria->COD_ESTADO 				=   1;
+		$cuentabancaria->COD_CUENTA_CONTABLE 		=   '';
+		$cuentabancaria->TXT_CUENTA_CONTABLE 		=   '';
+		$cuentabancaria->save();
+
+ 		return Redirect::to('/bienvenido')->with('bienhecho', 'Cuenta Bancaria '.$numerocuenta.' registrada con éxito');
+
+	}
+
+
+
+
+	public function actionConfigurarDatosProveedor($idusuario,Request $request)
+	{
+
+	    $idusuario = $this->funciones->decodificarmaestra($idusuario);
+		$direccion 	 		 	 			= 	$request['direccion'];
+		$cuenta_detraccion 	 		 		= 	$request['cuenta_detraccion'];
+
+		$usuario 							= 	User::where('id', $idusuario)->first();
+		$usuario->direccion_fiscal 	   		=   $direccion;
+		$usuario->cuenta_detraccion 		=   $cuenta_detraccion;
+		$usuario->fecha_mod 	 			=   $this->fechaactual;
+		$usuario->save();
+ 		return Redirect::to('/bienvenido')->with('bienhecho', 'Usuario '.$usuario->nombre.' modificado con éxito');
+
+	}
+
+
+	public function actionConfigurarDatosContacto($idusuario,Request $request)
+	{
+
+	    $idusuario = $this->funciones->decodificarmaestra($idusuario);
+		$nombre 	 		 	 			= 	$request['nombre'];
+		$lblcelular 	 		 			= 	$request['lblcelular'];
+		$lblemail 	 		 				= 	$request['lblemail'];
+
+		$usuario 							= 	User::where('id', $idusuario)->first();
+		$usuario->nombre_contacto 	   		=   $nombre;
+		$usuario->celular_contacto 			=   $lblcelular;
+		$usuario->email 					=   $lblemail;
+		$usuario->fecha_mod 	 			=   $this->fechaactual;
+		$usuario->save();
+ 		return Redirect::to('/bienvenido')->with('bienhecho', 'Usuario '.$usuario->nombre.' modificado con éxito');
+
+	}
+
+
+
+
+	public function actionAjaxModalConfiguracionDatosProveedor(Request $request)
+	{
+		$usuario    =   User::where('id','=',Session::get('usuario')->id)->first();
+
+		return View::make('usuario/modal/ajax/mdatospersonales',
+						 [		 	
+						 	'usuario' 				=> $usuario,
+						 	'ajax' 					=> true,						 	
+						 ]);
+	}
+
+	public function actionAjaxModalConfiguracionDatosContacto(Request $request)
+	{
+		$usuario    =   User::where('id','=',Session::get('usuario')->id)->first();
+
+		return View::make('usuario/modal/ajax/mdatoscontacto',
+						 [		 	
+						 	'usuario' 				=> $usuario,
+						 	'ajax' 					=> true,						 	
+						 ]);
+	}
+
+
+	public function actionAjaxModalConfiguracionCuentaBancaria(Request $request)
+	{
+
+		$usuario    			=   User::where('id','=',Session::get('usuario')->id)->first();
+		$combo_banco 			= 	$this->gn_generacion_combo_categoria('BANCOS_MERGE','Seleccione banco','');
+		$defecto_banco			= 	'';
+		$combo_tipocuenta 		= 	$this->gn_generacion_combo_categoria('CUENTA_MERGE','Seleccione tipo cuenta','');
+		$defecto_tipocuenta		= 	'';
+		$combo_moneda 			= 	$this->gn_generacion_combo_categoria('MONEDA_MERGE','Seleccione moneda','');
+		$defecto_moneda			= 	'';
+
+		return View::make('usuario/modal/ajax/mdatoscuentabancaria',
+						 [		 	
+						 	'usuario' 						=> $usuario,
+						 	'combo_banco' 					=> $combo_banco,
+						 	'defecto_banco' 				=> $defecto_banco,
+						 	'combo_tipocuenta' 				=> $combo_tipocuenta,
+						 	'defecto_tipocuenta' 			=> $defecto_tipocuenta,
+						 	'combo_moneda' 					=> $combo_moneda,
+						 	'defecto_moneda' 				=> $defecto_moneda,						 	
+						 	'ajax' 							=> true,						 	
+						 ]);
+	}
+
+
+
+
+
+    public function actionActivarRegistro($token)
+	{
+		$idusuario  =   $this->funciones->decodificarmaestra($token);
+		$usuario    =   User::where('id','=',$idusuario)->first();
+
+
+		$mensaje    =   'Cuenta Activada Satisfactoriamente';
+		if(count($usuario)>0){
+			
+			$usuario->ind_confirmacion = 1;
+			$usuario->save();
+
+			$mensaje    =   'Cuenta Activada Satisfactoriamente';
+		}else{
+			$mensaje    =   'Link de activacion no encontrada';
+		}
+
+		return View::make('usuario.activar',
+						 [
+						 	'usuario' => $usuario,
+						 	'mensaje' => $mensaje,
+						 ]);
+	}
+
+
+    public function actionCorreoConfirmacion()
+	{
+		$this->envio_correo_confirmacion();
+	}
+
+
+    public function actionRegistrate(Request $request)
+	{
+
+
+		if($_POST)
+		{
+
+			$ruc 	 		 			= 	$request['ruc'];
+			$razonsocial 	 		 	= 	$request['razonsocial'];
+
+			$direccion 	 		 		= 	$request['direccion'];
+			$cuenta_detraccion 	 		= 	$request['cuenta_detraccion'];
+
+			$lblcontrasena 	 		 	= 	$request['lblcontrasena'];
+			$lblcontrasenaconfirmar 	= 	$request['lblcontrasenaconfirmar'];
+			$nombre 	 		 		= 	$request['nombre'];
+			$lblcelular 	 			= 	$request['lblcelular'];
+			$lblemail 	 		 		= 	$request['lblemail'];
+			$lblconfirmaremail 			= 	$request['lblconfirmaremail'];
+			$cod_empresa 				= 	$request['cod_empresa'];
+
+			$usuario    				=   User::where('usuarioosiris_id','=',$cod_empresa)->first();
+
+			if(count($usuario) > 0){
+					return Redirect::back()->withInput()->with('errorurl', 'El usuario ya se cuenta registrado');
+			}
+
+			$idusers 				 	=   $this->funciones->getCreateIdMaestra('users');
+			$cabecera            	 	=	new User;
+			$cabecera->id 	     	 	=   $idusers;
+			$cabecera->nombre 	     	=   $razonsocial;
+			$cabecera->name  		 	=	$ruc;
+			$cabecera->passwordmobil  	=	$lblcontrasena;
+			$cabecera->fecha_crea 	   	=  	$this->fechaactual;
+			$cabecera->password 	 	= 	Crypt::encrypt($lblcontrasena);
+			$cabecera->rol_id 	 		= 	'1CIX00000019';
+			$cabecera->usuarioosiris_id	= 	$cod_empresa;
+			$cabecera->email			= 	$lblemail;
+			$cabecera->direccion_fiscal		= 	$direccion;
+			$cabecera->cuenta_detraccion	= 	$cuenta_detraccion;
+			$cabecera->nombre_contacto		= 	$nombre;
+			$cabecera->celular_contacto		= 	$lblcelular;
+			$cabecera->email_confirmacion	= 	0;
+			$cabecera->ind_confirmacion		= 	0;
+			$cabecera->save();
+ 
+			Session::forget('usuario');
+			Session::forget('listamenu');
+			Session::forget('listaopciones');
+
+ 			return Redirect::to('/login')->with('bienhecho', 'Proveedor '.$razonsocial.' registrado con exito');
+
+		}else{
+
+
+			$listapersonal 				= 	DB::table('STD.EMPRESA')
+	    									->leftJoin('users', 'STD.EMPRESA.COD_EMPR', '=', 'users.usuarioosiris_id')
+	    									->whereNull('users.usuarioosiris_id')
+	    									->where('STD.EMPRESA.IND_PROVEEDOR','=',1)
+	    									->where('STD.EMPRESA.COD_ESTADO','=',1)
+	    									->select('STD.EMPRESA.COD_EMPR','STD.EMPRESA.NOM_EMPR')
+											->select(DB::raw("
+											  STD.EMPRESA.COD_EMPR,
+											  STD.EMPRESA.NRO_DOCUMENTO + ' - '+ STD.EMPRESA.NOM_EMPR AS NOMBRE")
+											)
+											->pluck('NOMBRE','NOMBRE')
+											->take(10)
+											->toArray();
+			$combolistaclientes  		= 	array('' => "Seleccione clientes") + $listapersonal;
+			$mensaje    = '';
+			$idactivo   = 1;
+
+			return View::make('usuario.registrate',
+							 [
+							 	'combolistaclientes' => $combolistaclientes,
+							 	'mensaje' => $mensaje,
+							 	'idactivo' => $idactivo,
+							 ]);
+		}	
+
+	}
+
+	public function actionAjaxBuscarProveedor(Request $request) {
+
+		$ruc 						=   $request['ruc'];
+		$empresa 					= 	DB::table('STD.EMPRESA')
+    									->where('STD.EMPRESA.IND_PROVEEDOR','=',1)
+    									->where('STD.EMPRESA.COD_ESTADO','=',1)
+    									->where('NRO_DOCUMENTO','=',$ruc)
+										->first();
+		$direccion  = '';	
+		$mensaje    = 'Proveedor encontrado';
+		$idactivo   = 1;
+
+		if(count($empresa)>0){
+			$tdireccion 				=	STDEmpresaDireccion::where('COD_EMPR','=',$empresa->COD_EMPR)
+											->where('IND_DIRECCION_FISCAL','=',1)
+											->where('COD_ESTADO','=',1)
+											->first();
+			if(count($tdireccion)>0){
+				$direccion = $tdireccion->NOM_DIRECCION;
+			}	
+			$usuario    =   User::where('usuarioosiris_id','=',$empresa->COD_EMPR)->first();
+			if(count($usuario)>0){
+				if($usuario->ind_confirmacion==0){
+					$idactivo   = 0;
+					$mensaje = 'Proveedor ya cuenta con un registro (pero aun no confirma su registro)';
+				}
+				if($usuario->ind_confirmacion==1){
+					$idactivo   = 0;
+					$mensaje = 'Proveedor ya cuenta con un registro';
+				}
+			}
+		}else{
+			$idactivo   = 0;
+			$mensaje = 'Proveedor no encontrado';
+		}
+
+		return View::make('usuario/form/formproveedor',
+			[
+				'empresa' => $empresa,
+				'idactivo' => $idactivo,
+				'mensaje' => $mensaje,
+				'direccion' => $direccion,
+			]);
+	}
+
+
+		
+
+
 
     public function actionAcceso()
 	{
@@ -56,8 +411,10 @@ class UserController extends Controller {
 
 			if (count($tusuario) > 0) {
 
+				if($tusuario->ind_confirmacion == 0){
+					return Redirect::back()->withInput()->with('errorbd', 'El usuario aun no confirmo su registro');
+				}
 				$clavedesifrada = strtoupper(Crypt::decrypt($tusuario->password));
-
 				if ($clavedesifrada == $clave) {
 
 					$listamenu    		 = 	WEBGrupoopcion::join('web.opciones', 'web.opciones.grupoopcion_id', '=', 'web.grupoopciones.id')
@@ -112,7 +469,18 @@ class UserController extends Controller {
 
 		View::share('titulo','Bienvenido Sistema Administrativo MERGE');
 		$fecha = date('Y-m-d');
-		return View::make('bienvenido');
+		$usuario = User::where('id','=',Session::get('usuario')->id)->first();
+		$cuentabancarias = 	TESCuentaBancaria::where('COD_EMPR_TITULAR','=',Session::get('usuario')->usuarioosiris_id)
+							->where('COD_ESTADO','=',1)
+						  	->get();
+
+
+		return View::make('bienvenido',
+						 [
+						 	'usuario' 			=> $usuario,
+						 	'cuentabancarias' 	=> $cuentabancarias,
+						 	'fecha' 			=> $fecha,
+						 ]);
 
 	}
 
@@ -429,11 +797,10 @@ class UserController extends Controller {
 		$idrolopcion = $request['idrolopcion'];
 		$idrolopcion = $this->funciones->decodificarmaestra($idrolopcion);
 
-		$cabecera = RolOpcion::find($idrolopcion);
+		$cabecera = WEBRolOpcion::find($idrolopcion);
 		$cabecera->ver = $request['ver'];
 		$cabecera->anadir = $request['anadir'];
 		$cabecera->fecha_mod = $this->fechaactual;
-		$cabecera->usuario_mod = Session::get('usuario')->id;
 		$cabecera->modificar = $request['modificar'];
 		$cabecera->todas = $request['todas'];
 		$cabecera->save();

@@ -49,6 +49,7 @@ class Funcion {
 
 		//decodificar variable
 		$iddeco = Hashids::decode($id);
+
 		//ver si viene con letras la cadena codificada
 		if (count($iddeco) == 0) {
 			return '';
@@ -66,6 +67,28 @@ class Funcion {
 		return $idopcioncompleta;
 
 	}
+
+	public function decodificarmaestraprefijo($id,$prefijo) {
+
+		//decodificar variable
+		$iddeco = Hashids::decode($id);
+		//ver si viene con letras la cadena codificada
+		if (count($iddeco) == 0) {
+			return '';
+		}
+		//concatenar con ceros
+		$idopcioncompleta = str_pad($iddeco[0], 10, "0", STR_PAD_LEFT);
+		//concatenar prefijo
+
+		//$prefijo = Local::where('activo', '=', 1)->first();
+		// apunta ahi en tu cuaderno porque esto solo va a permitir decodifcar  cuando sea el contrato del locl en donde estas del resto no
+		//¿cuando sea el contrato del local?
+		$idopcioncompleta = $prefijo . $idopcioncompleta;
+		return $idopcioncompleta;
+
+	}
+
+
 
 	public function getUrl($idopcion, $accion) {
 

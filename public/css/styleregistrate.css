@@ -95,9 +95,7 @@ html {
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
 }
-body {
-  margin: 0;
-}
+
 article,
 aside,
 details,
@@ -348,14 +346,7 @@ th {
 }
 
 .login-top{
-
-/*  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  background: url(../img/fondomerge.jpg) no-repeat;
-  background-size: cover;*/
-  
-  background-image: url("../img/fondomerge.jpg");
+  background-image: url("../img/process-buyer-2.jpg");
   background-color: rgba(255, 255, 255, 0.1);  
   /* Full height */
   height: 100%;
@@ -1177,13 +1168,7 @@ html {
   font-size: 10px;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
-body {
-  font-family: 'Roboto', Arial, sans-serif;
-  font-size: 13px;
-  line-height: 1.42857143;
-  color: #404040;
-  background-color: #EEEEEE;
-}
+
 input,
 button,
 select,
@@ -8061,11 +8046,7 @@ html {
   height: 100%;
   overflow-x: hidden;
 }
-body {
-  padding: 0;
-  background-color: #EEEEEE;
-  height: 100%;
-}
+
 a:hover,
 a:focus {
   text-decoration: none;
@@ -18689,7 +18670,7 @@ form.dropzone .note {
   margin: 0;
 }
 .select2-container--default .select2-selection--single .select2-selection__arrow b:after {
-  content: "\f2f9";
+  content: "";
   font-family: 'Material Icons';
   font-size: 25px;
   font-weight: normal;
