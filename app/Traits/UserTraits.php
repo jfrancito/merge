@@ -224,6 +224,8 @@ trait UserTraits
                                         ->get();
 
 
+
+
         foreach($listaproveedoress as $item){
 
             $token                  =   substr($item->id, -8);
@@ -231,9 +233,12 @@ trait UserTraits
             $emailfrom          =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
             // correos principales y  copias
             $email              =   $item->email;
+            $url                =   "http://localhost:8080/merge/activar-registro/".Hashids::encode($token);
+
             $array      =  Array(
                 'PR'                =>  $item,
                 'token'             =>  $token,
+                'url'               =>  $url,
             );
             Mail::send('emails.confirmacion', $array, function($message) use ($emailfrom,$email)
             {
