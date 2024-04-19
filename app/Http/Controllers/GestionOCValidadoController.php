@@ -40,7 +40,7 @@ class GestionOCValidadoController extends Controller
         $validarurl = $this->funciones->getUrl($idopcion,'Ver');
         if($validarurl <> 'true'){return $validarurl;}
         /******************************************************/
-        View::share('titulo','Lista Ordenes de Compra Validados');
+        View::share('titulo','Lista Ordenes de Compra');
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
         $listadatos     =   $this->con_lista_cabecera_comprobante_total($cod_empresa);
         $funcion        =   $this;

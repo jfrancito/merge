@@ -235,9 +235,30 @@ class UserController extends Controller {
 	}
 
 
+
     public function actionCorreoConfirmacion()
 	{
 		$this->envio_correo_confirmacion();
+	}
+
+
+    public function actionCorreoUC()
+	{
+		$this->envio_correo_uc();
+	}
+    public function actionCorreoCO()
+	{
+		$this->envio_correo_co();
+	}
+    public function actionCorreoADM()
+	{
+		$this->envio_correo_adm();
+	}
+
+
+    public function actionCorreoAPCLI()
+	{
+		$this->envio_correo_apcli();
 	}
 
 

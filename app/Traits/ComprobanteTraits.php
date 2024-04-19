@@ -22,6 +22,101 @@ trait ComprobanteTraits
 {
 
 
+	private function con_lista_cabecera_comprobante_provisionar($cliente_id) {
+
+		$listadatos 	= 	VMergeOC::leftJoin('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
+							->whereIn('COD_ESTADO', ['ETM0000000000005'])
+							->select(DB::raw('	COD_ORDEN,
+												FEC_ORDEN,
+												TXT_CATEGORIA_MONEDA,
+												TXT_EMPR_CLIENTE,
+												MAX(CAN_TOTAL) CAN_TOTAL,
+												MAX(ID_DOCUMENTO) AS ID_DOCUMENTO,
+												MAX(COD_ESTADO) AS COD_ESTADO,
+												MAX(TXT_ESTADO) AS TXT_ESTADO
+											'))
+							->groupBy('COD_ORDEN')
+							->groupBy('FEC_ORDEN')
+							->groupBy('TXT_CATEGORIA_MONEDA')
+							->groupBy('TXT_EMPR_CLIENTE')
+							->get();
+
+	 	return  $listadatos;
+	}
+
+
+	private function con_lista_cabecera_comprobante_total_uc($cliente_id) {
+
+		$listadatos 	= 	VMergeOC::leftJoin('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
+							//->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+							->where('COD_ESTADO','=','ETM0000000000002')
+							->select(DB::raw('	COD_ORDEN,
+												FEC_ORDEN,
+												TXT_CATEGORIA_MONEDA,
+												TXT_EMPR_CLIENTE,
+												MAX(CAN_TOTAL) CAN_TOTAL,
+												MAX(ID_DOCUMENTO) AS ID_DOCUMENTO,
+												MAX(COD_ESTADO) AS COD_ESTADO,
+												MAX(TXT_ESTADO) AS TXT_ESTADO
+											'))
+							->groupBy('COD_ORDEN')
+							->groupBy('FEC_ORDEN')
+							->groupBy('TXT_CATEGORIA_MONEDA')
+							->groupBy('TXT_EMPR_CLIENTE')
+							->get();
+
+	 	return  $listadatos;
+	}
+
+
+	private function con_lista_cabecera_comprobante_total_cont($cliente_id) {
+
+		$listadatos 	= 	VMergeOC::leftJoin('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
+							->where('COD_ESTADO','=','ETM0000000000003')
+							->select(DB::raw('	COD_ORDEN,
+												FEC_ORDEN,
+												TXT_CATEGORIA_MONEDA,
+												TXT_EMPR_CLIENTE,
+												MAX(CAN_TOTAL) CAN_TOTAL,
+												MAX(ID_DOCUMENTO) AS ID_DOCUMENTO,
+												MAX(COD_ESTADO) AS COD_ESTADO,
+												MAX(TXT_ESTADO) AS TXT_ESTADO
+											'))
+							->groupBy('COD_ORDEN')
+							->groupBy('FEC_ORDEN')
+							->groupBy('TXT_CATEGORIA_MONEDA')
+							->groupBy('TXT_EMPR_CLIENTE')
+							->get();
+
+	 	return  $listadatos;
+	}
+
+
+	private function con_lista_cabecera_comprobante_total_adm($cliente_id) {
+
+		$listadatos 	= 	VMergeOC::leftJoin('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
+							->where('COD_ESTADO','=','ETM0000000000004')
+							->select(DB::raw('	COD_ORDEN,
+												FEC_ORDEN,
+												TXT_CATEGORIA_MONEDA,
+												TXT_EMPR_CLIENTE,
+												MAX(CAN_TOTAL) CAN_TOTAL,
+												MAX(ID_DOCUMENTO) AS ID_DOCUMENTO,
+												MAX(COD_ESTADO) AS COD_ESTADO,
+												MAX(TXT_ESTADO) AS TXT_ESTADO
+											'))
+							->groupBy('COD_ORDEN')
+							->groupBy('FEC_ORDEN')
+							->groupBy('TXT_CATEGORIA_MONEDA')
+							->groupBy('TXT_EMPR_CLIENTE')
+							->get();
+
+	 	return  $listadatos;
+	}
+
+
+
+
 	private function con_validar_documento($ordencompra,$fedocumento,$detalleordencompra,$detallefedocumento){
 
 		$ind_ruc 			=	0;
@@ -91,7 +186,8 @@ trait ComprobanteTraits
 	private function con_lista_cabecera_comprobante_total($cliente_id) {
 
 		$listadatos 	= 	VMergeOC::leftJoin('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
-							->where('COD_ESTADO','=','ETM0000000000002')
+							//->where('COD_ESTADO','=','ETM0000000000002')
+							->whereIn('COD_ESTADO', ['ETM0000000000001', 'ETM0000000000002', 'ETM0000000000003', 'ETM0000000000004', 'ETM0000000000005', 'ETM0000000000006'])
 							->select(DB::raw('	COD_ORDEN,
 												FEC_ORDEN,
 												TXT_CATEGORIA_MONEDA,

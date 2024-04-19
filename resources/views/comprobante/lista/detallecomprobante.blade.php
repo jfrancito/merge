@@ -12,7 +12,7 @@
                                         <input name="inputxml" id='inputxml' class="form-control inputxml" type="file" accept="text/xml" />
                                     </div>
                                     <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 negrita" align="center">
-                                        <button  type="submit" style="height:48px;" class="btn btn-space btn-success btn-lg cargardatosliq" id='cargardatosliq' title="Cargar Datos"><i class="icon icon-left mdi mdi-upload"></i></button>
+                                        <button  type="submit" style="height:48px;" class="btn btn-space btn-success btn-lg cargardatosliq" id='cargardatosliq' title="Cargar Datos"><i class="icon icon-left mdi mdi-upload"></i> Subir</button>
                                     </div>
                                     
                                 </div>
@@ -51,7 +51,7 @@
 
 
     <div class="formulariomatch">  
-        <form method="POST" action="{{ url('validar-xml-oc/'.$idopcion.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" name="formcargardatos" id="formcargardatos" enctype="multipart/form-data" >
+        <form method="POST" action="{{ url('validar-xml-oc/'.$idopcion.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" name="formguardardatos" id="formguardardatos" enctype="multipart/form-data" >
            {{ csrf_field() }}
             <div class="container">
                 <div class="row justify-content-md-center">

@@ -28,6 +28,11 @@ Route::get('/cerrarsession', 'UserController@actionCerrarSesion');
 Route::any('/enviocorreoconfirmaciones', 'UserController@actionCorreoConfirmacion');
 Route::any('/activar-registro/{token}', 'UserController@actionActivarRegistro');
 
+Route::any('/enviocorreouc', 'UserController@actionCorreoUC');//correo para usuario contacto
+Route::any('/enviocorreoconta', 'UserController@actionCorreoCO');//correo para contabilidad
+Route::any('/enviocorreoadmin', 'UserController@actionCorreoADM');//correo para administracion
+Route::any('/enviocorreoapcli', 'UserController@actionCorreoAPCLI');//correo para cliente cuando se aprueba
+
 
 Route::group(['middleware' => ['authaw']], function () {
 
@@ -64,9 +69,30 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/gestion-de-oc-validado-proveedores/{idopcion}', 'GestionOCValidadoController@actionListarOCValidado');
 	Route::any('/detalle-comprobante-oc-validado/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidado');
 
+	Route::any('/gestion-de-comprobante-us/{idopcion}', 'GestionUsuarioContactoController@actionListarComprobanteUsuarioContacto');
+	Route::any('/pre-aprobar-documentos/{idopcion}', 'GestionUsuarioContactoController@actionListarPreAprobarUsuarioContacto');
+	Route::any('/extornar-pre-aprobar-comprobante/{idopcion}/{prefijo}/{idordencompra}', 'GestionUsuarioContactoController@actionExtornarPreAprobar');
+
+
+	Route::any('/gestion-de-contabilidad-aprobar/{idopcion}', 'GestionOCContabilidadController@actionListarComprobanteContabilidad');
+	Route::any('/aprobar-documentos/{idopcion}', 'GestionOCContabilidadController@actionListarAprobarUsuarioContacto');
+	Route::any('/extornar-aprobar-comprobante/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionExtornarAprobar');
+
+
+	Route::any('/gestion-de-administracion-aprobar/{idopcion}', 'GestionOCAdministracionController@actionListarComprobanteAdministracion');
+	Route::any('/aprobar-documentos-administracion/{idopcion}', 'GestionOCAdministracionController@actionListarAprobarAdministracion');
+	Route::any('/extornar-aprobar-comprobante-administrador/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCAdministracionController@actionExtornarAprobar');
+
+
+	Route::any('/gestion-de-provision-comprobante/{idopcion}', 'GestionOCProvisionController@actionListarComprobanteProvision');
+	Route::any('/provisionar-documentos/{idopcion}', 'GestionOCProvisionController@actionListarProvisionarComprobante');
+
+
+
 	Route::any('/descargar-archivo-requerimiento-xml/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDescargarXML');
 	Route::any('/descargar-archivo-requerimiento-cdr/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDescargarCDR');
 	Route::any('/descargar-archivo-requerimiento-pdf/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDescargarPDF');
+
 
 
 

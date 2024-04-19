@@ -50,60 +50,75 @@ class GestionOCController extends Controller
 
         if($_POST)
         {
-            $contacto_id       =   $request['contacto_id'];
-            $filescdm          =   $request['cdm'];
-            if(!is_null($filescdm)){
-                //CDR
-                foreach($filescdm as $file){
 
-                    $nombre          =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                    /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
-                    $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
-                    $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
-                    $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                    $valor           =      $this->versicarpetanoexiste($rutafile);
-                    $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
-                    copy($file->getRealPath(),$rutacompleta);
-                    $path            =      $rutacompleta;
-                    //dd($nombre);
+            try{    
+                
+                DB::beginTransaction();
+                $contacto_id       =   $request['contacto_id'];
+                $filescdm          =   $request['cdm'];
+                if(!is_null($filescdm)){
+                    //CDR
+                    foreach($filescdm as $file){
+
+                        $nombre          =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
+                        /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
+                        $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
+                        $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
+                        $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
+                        $valor           =      $this->versicarpetanoexiste($rutafile);
+                        $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
+                        copy($file->getRealPath(),$rutacompleta);
+                        $path            =      $rutacompleta;
+                        //dd($nombre);
+                    }
+                }else{
+                    return Redirect::to('detalle-comprobante-oc/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Seleccione Archivo XML a Importar ');
                 }
-            }else{
-                return Redirect::to('detalle-comprobante-oc/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Seleccione Archivo XML a Importar ');
-            }
 
-            $filespdf          =   $request['pdf'];
-            if(!is_null($filespdf)){
-                //CDR
-                foreach($filespdf as $file){
+                $filespdf          =   $request['pdf'];
+                if(!is_null($filespdf)){
+                    //CDR
+                    foreach($filespdf as $file){
 
-                    $nombre          =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                    /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
-                    $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
-                    $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
-                    $nombrefilepdf   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                    $valor           =      $this->versicarpetanoexiste($rutafile);
-                    $rutacompleta    =      $rutafile.'\\'.$nombrefilepdf;
-                    copy($file->getRealPath(),$rutacompleta);
-                    $path            =      $rutacompleta;
-                    //dd($nombre);
+                        $nombre          =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
+                        /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
+                        $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
+                        $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
+                        $nombrefilepdf   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
+                        $valor           =      $this->versicarpetanoexiste($rutafile);
+                        $rutacompleta    =      $rutafile.'\\'.$nombrefilepdf;
+                        copy($file->getRealPath(),$rutacompleta);
+                        $path            =      $rutacompleta;
+                        //dd($nombre);
+                    }
+                }else{
+                    return Redirect::to('detalle-comprobante-oc/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Seleccione Archivo XML a Importar ');
                 }
-            }else{
-                return Redirect::to('detalle-comprobante-oc/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Seleccione Archivo XML a Importar ');
+
+                $contacto                             =   User::where('id','=',$contacto_id)->first();
+                $fedocumento                          =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->first();
+
+                $fedocumento->ARCHIVO_CDR             =   $nombrefilecdr;
+                $fedocumento->ARCHIVO_PDF             =   $nombrefilepdf;
+                $fedocumento->COD_ESTADO              =   'ETM0000000000002';
+                $fedocumento->TXT_ESTADO              =   'PENDIENTE DE APROBAR';
+                $fedocumento->COD_CONTACTO            =   $contacto->id;
+                $fedocumento->ind_email_uc            =   0;
+                $fedocumento->TXT_CONTACTO            =   $contacto->nombre;
+                $fedocumento->fecha_pa                =   $this->fechaactual;
+                $fedocumento->usuario_pa              =   Session::get('usuario')->id;
+                $fedocumento->save();
+
+                //LE LLEGA AL USUARIO DE CONTACTO
+                $mensaje            =   'COMPROBANTE : '.$fedocumento->ID_DOCUMENTO.'%0D%0A'.'Proveedor : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'.'Estado : '.$fedocumento->TXT_ESTADO.'%0D%0A';
+                $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+
+                DB::commit();
+
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                return Redirect::to('detalle-comprobante-oc/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
-
-            $contacto                             =   User::where('id','=',$contacto_id)->first();
-            $fedocumento                          =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->first();
-
-            $fedocumento->ARCHIVO_CDR             =   $nombrefilecdr;
-            $fedocumento->ARCHIVO_PDF             =   $nombrefilepdf;
-            $fedocumento->COD_ESTADO              =   'ETM0000000000002';
-            $fedocumento->TXT_ESTADO              =   'VALIDADO';
-            $fedocumento->COD_CONTACTO            =   $contacto->id;
-            $fedocumento->TXT_CONTACTO            =   $contacto->nombre;
-            $fedocumento->save();
-
-            $mensaje            =   'COMPROBANTE : '.$fedocumento->SERIE.'-'.$fedocumento->NUMERO.'%0D%0A'.'Proveedor : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A';
-            $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
 
             return Redirect::to('gestion-de-oc-proveedores/'.$idopcion)->with('bienhecho', 'Se valido el xml correctamente');
 
@@ -244,6 +259,12 @@ class GestionOCController extends Controller
                         $documento->ARCHIVO_PDF             =   '';
                         $documento->COD_CONTACTO            =   '';
                         $documento->TXT_CONTACTO            =   '';
+
+                        $documento->ind_email_uc            =   -1;
+                        $documento->ind_email_ap            =   -1;
+                        $documento->ind_email_adm           =   -1;
+                        $documento->ind_email_ba            =   -1;
+                        $documento->ind_email_clap          =   -1;
 
                         $documento->save();
 

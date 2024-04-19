@@ -18,21 +18,7 @@
         <td>{{$item->TXT_CATEGORIA_MONEDA}}</td>
         <td>{{$item->TXT_EMPR_CLIENTE}}</td>
         <td>{{$item->CAN_TOTAL}}</td>
-        <td>
-          @if($item->COD_ESTADO == 'ETM0000000000001') 
-              <span class="badge badge-default">{{$item->TXT_ESTADO}}</span> 
-          @else
-            @if(is_null($item->COD_ESTADO)) 
-                <span class="badge badge-default">GENERADO</span>
-            @else
-              @if($item->COD_ESTADO == 'ETM0000000000002') 
-                  <span class="badge badge-success">{{$item->TXT_ESTADO}}</span>
-              @else
-                  <span class="badge badge-danger">{{$item->TXT_ESTADO}}</span>
-              @endif
-            @endif
-          @endif
-        </td>
+        @include('comprobante.ajax.estados')
         <td class="rigth">
           <div class="btn-group btn-hspace">
             <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>

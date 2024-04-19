@@ -109,6 +109,34 @@
                 <div class="row justify-content-md-center">
 
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" >
+
+
+                        <fieldset style="border: 2px solid #5885d1 !important;">
+                            <legend style="color: #5885d1 !important;">Datos de la factura</legend>
+
+                                <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+                                    <p class='titulomerge'>Serie : </p>
+                                    <p class='subtitulomerge'>{{$fedocumento->SERIE}}</p>
+                                </div>
+
+                                <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+                                    <p class='titulomerge'>Numero : </p>
+                                    <p class='subtitulomerge'>{{$fedocumento->NUMERO}}</p>
+                                </div>
+
+                                <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+                                    <p class='titulomerge'>Fecha Emision : </p>
+                                    <p class='subtitulomerge'>{{$fedocumento->FEC_VENTA}}</p>
+                                </div>
+
+                                <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+                                    <p class='titulomerge'>Forma Pago : </p>
+                                    <p class='subtitulomerge'>{{$fedocumento->FORMA_PAGO}}</p>
+                                </div>
+                        
+                        </fieldset>
+
+
                         <fieldset style="border: 2px solid #5885d1 !important;">
                             <legend style="color: #5885d1 !important;">Comparar (XML - Orden Compra)</legend>
 
