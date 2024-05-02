@@ -38,24 +38,43 @@
   font-style: italic;
 }
 .color-iin{
-    background-color: #bc8f8f !important;
-    border-bottom-color: #bc8f8f !important;
+    background-color: #8d2424 !important;
+    border-bottom-color: #8d2424 !important;
+    color: #FFF;
+    text-align: center;
+    font-style: oblique;
+
 }
 .color-ico{
-    background-color: #8FBC8F !important;
-    border-bottom-color: #8FBC8F !important;
+    background-color: #045204 !important;
+    border-bottom-color: #045204 !important;
+    color: #FFF;
+    text-align: center;
+    font-style: oblique;
 }
 .color-itr{
     background-color: #DCDCDC !important;
     border-bottom-color: #DCDCDC !important;
+    color: #FFF;
+    text-align: center;
+    font-style: oblique;
+
 }
 .color-ich{
     background-color: #ADD8E6 !important;
     border-bottom-color: #ADD8E6 !important;
+    color: #FFF;
+    text-align: center;
+    font-style: oblique;
+
 }
 .color-iaa{
     background-color: #b0c4de !important;
     border-bottom-color: #b0c4de !important;
+    color: #FFF;
+    text-align: center;
+    font-style: oblique;
+    
 }
 .main-content {
     padding: 8px;

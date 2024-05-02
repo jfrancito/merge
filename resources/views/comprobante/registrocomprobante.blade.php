@@ -18,7 +18,7 @@
                       </div>
                     </div>
                     <div class="panel-body">
-                      @include('comprobante.lista.detallecomprobante')
+                      @include('comprobante.lista.detallecomprobantenuevo')
                     </div>
                 </div>
             </div>
@@ -30,7 +30,7 @@
 @stop
 
 @section('script')
-    {{-- <link rel="stylesheet" type="text/css" href="{{ asset('public/css/portal/calendario.css?v='.$version) }} "/> --}}
+
 
     <script src="{{ asset('public/lib/jquery-ui/jquery-ui.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/lib/jquery.nestable/jquery.nestable.js') }}" type="text/javascript"></script>
@@ -56,18 +56,14 @@
       });
     </script> 
 
-    <script type="text/javascript">    
-           $('#file-cdr').fileinput({
+    <script type="text/javascript">
+        @foreach($tarchivos as $index => $item) 
+           $('#file-{{$item->COD_CATEGORIA_DOCUMENTO}}').fileinput({
               theme: 'fa5',
               language: 'es',
-              allowedFileExtensions: ['xml','zip','ZIP'],
+              allowedFileExtensions: ['{{$item->TXT_FORMATO}}'],
             });
-
-           $('#file-pdf').fileinput({
-              theme: 'fa5',
-              language: 'es',
-              allowedFileExtensions: ['pdf'],
-            });
+        @endforeach
     </script>
   <script src="{{ asset('public/js/comprobante/registro.js?v='.$version) }}" type="text/javascript"></script>
 

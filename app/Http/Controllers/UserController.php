@@ -10,6 +10,8 @@ use App\Modelos\STDEmpresaDireccion;
 use App\Modelos\TESCuentaBancaria;
 use App\Modelos\CMPCategoria;
 use App\Modelos\STDEmpresa;
+use App\Modelos\WEBUserEmpresaCentro;
+
 use App\User;
 
 use Illuminate\Http\Request;
@@ -308,6 +310,26 @@ class UserController extends Controller {
 			$cabecera->ind_confirmacion		= 	0;
 			$cabecera->save();
  
+
+			$id 						= 	$this->funciones->getCreateIdMaestra('WEB.userempresacentros');
+		    $detalle            		=	new WEBUserEmpresaCentro;
+		    $detalle->id 	    		=  	$id;
+			$detalle->empresa_id 		= 	'IACHEM0000010394';
+			$detalle->centro_id    		=  	'CEN0000000000001';
+			$detalle->fecha_crea 	 	= 	$this->fechaactual;
+			$detalle->usuario_id    	=  	$idusers;
+			$detalle->save();
+
+			$id 						= 	$this->funciones->getCreateIdMaestra('WEB.userempresacentros');
+		    $detalle            		=	new WEBUserEmpresaCentro;
+		    $detalle->id 	    		=  	$id;
+			$detalle->empresa_id 		= 	'IACHEM0000007086';
+			$detalle->centro_id    		=  	'CEN0000000000001';
+			$detalle->fecha_crea 	 	= 	$this->fechaactual;
+			$detalle->usuario_id    	=  	$idusers;
+			$detalle->save();
+
+
 			Session::forget('usuario');
 			Session::forget('listamenu');
 			Session::forget('listaopciones');
@@ -391,21 +413,25 @@ class UserController extends Controller {
 
 
 		
-
-
-
-    public function actionAcceso()
+	public function actionCambiarPerfil()
 	{
-
-		$accesos  	= 	Permisouserempresa::where('activo','=',1)
-						->where('user_id','=',Session::get('usuario')->id)->get();
-
-
-		return View::make('acceso',
-						 [
-						 	'accesos' => $accesos,
-						 ]);
+		Session::forget('empresas');
+		return Redirect::to('/acceso');
 	}
+
+
+    // public function actionAcceso()
+	// {
+
+	// 	$accesos  	= 	Permisouserempresa::where('activo','=',1)
+	// 					->where('user_id','=',Session::get('usuario')->id)->get();
+
+
+	// 	return View::make('acceso',
+	// 					 [
+	// 					 	'accesos' => $accesos,
+	// 					 ]);
+	// }
 	
 	public function actionLogin(Request $request) {
 
@@ -464,7 +490,10 @@ class UserController extends Controller {
 					Session::put('listamenu', $listamenu);
 					Session::put('listaopciones', $listaopciones);
 
-					return Redirect::to('bienvenido');
+					//return Redirect::to('bienvenido');
+					return Redirect::to('acceso');
+
+
 
 				} else {
 					return Redirect::back()->withInput()->with('errorbd', 'Usuario o clave incorrecto');
@@ -478,12 +507,47 @@ class UserController extends Controller {
 		}
 	}
 
+	public function actionAcceso()
+	{
+
+		$accesos  	= 	WEBUserEmpresaCentro::where('activo','=',1)
+						->where('usuario_id','=',Session::get('usuario')->id)
+						->select(DB::raw('empresa_id'))
+						->groupBy('empresa_id')
+						->get();
+
+		$funcion 	=   $this;
+
+		return View::make('acceso',
+						 [
+						 	'accesos' => $accesos,
+						 	'funcion' => $funcion,
+						 ]);
+
+	}
+
+	public function actionAccesoBienvenido($idempresa)
+	{
+		
+		$empresas 	= 	STDEmpresa::where('COD_EMPR','=',$idempresa)
+						->where('COD_ESTADO','=','1')->where('IND_SISTEMA','=','1')->first(); 
+		$color 		=   $this->funciones->color_empresa($empresas->COD_EMPR);
+
+		Session::put('color', $color);
+		Session::put('empresas', $empresas);
+
+
+		$funcion 	=   $this;
+		return Redirect::to('bienvenido');
+
+	}
+
 	public function actionCerrarSesion() {
 		Session::forget('usuario');
 		Session::forget('listamenu');
 		Session::forget('listaopciones');
+		Session::forget('empresas');
 		return Redirect::to('/login');	
-
 	}
 
 	public function actionBienvenido() {

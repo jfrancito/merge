@@ -27,6 +27,30 @@ class Funcion {
 		$usuario = User::where('id', '=', $usuario_id)->first();
 		return $usuario;
 	}
+	public function color_empresa($empresa_id) {
+
+		$color 		= '';
+		if($empresa_id == 'IACHEM0000010394'){
+			$color 		= 'color-iin';
+		}
+
+		if($empresa_id == 'IACHEM0000007086'){
+			$color 		= 'color-ico';
+		}
+		if($empresa_id == 'EMP0000000000007'){
+			$color 		= 'color-itr';
+		}
+
+		if($empresa_id == 'IACHEM0000001339'){
+			$color 		= 'color-ich';
+		}
+
+		if($empresa_id == 'EMP0000000000001'){
+			$color 		= 'color-iaa';
+		}
+		return $color;
+	}
+	
 
 	public function generar_codigo($basedatos, $cantidad) {
 
@@ -120,6 +144,25 @@ class Funcion {
 		return 'true';
 
 	}
+
+	public function getCreateIdArchivo($tabla) {
+
+		$id = "";
+		// maximo valor de la tabla referente
+		$id = DB::table($tabla)
+			->select(DB::raw('max(SUBSTRING(id,5,8)) as id'))
+			->first();
+		//conversion a string y suma uno para el siguiente id
+		$idsuma = (int) $id->id + 1;
+		//concatenar con ceros
+		$idopcioncompleta = str_pad($idsuma, 8, "0", STR_PAD_LEFT);
+		//concatenar prefijo
+		$prefijo = $this->prefijomaestra();
+		$idopcioncompleta = $prefijo . $idopcioncompleta;
+		return $idopcioncompleta;
+
+	}
+
 
 	public function getCreateIdMaestra($tabla) {
 

@@ -14,10 +14,23 @@ class Guestaw {
      * @return mixed
      */
     public function handle($request, Closure $next) {
-        if (!Session::has('usuario')) {
+
+        if(!Session::has('usuario')){
             return $next($request);
-        } else {
-            return Redirect()->to('/bienvenido');
+        }else{
+            if(!Session::has('empresas')){
+                return $next($request);
+            }else{
+                return Redirect()->to('/bienvenido');
+            }
+
         }
+
+        
+        // if (!Session::has('usuario')) {
+        //     return $next($request);
+        // } else {
+        //     return Redirect()->to('/bienvenido');
+        // }
     }
 }

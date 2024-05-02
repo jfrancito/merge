@@ -2,13 +2,30 @@ $(document).ready(function(){
 
     var carpeta = $("#carpeta").val();
 
+    $('.btnguardarcliente').on('click', function(event){
+        event.preventDefault();
+        $.confirm({
+            title: '¿Confirma la Aprobacion?',
+            content: 'Aprobar el Comprobante',
+            buttons: {
+                confirmar: function () {
+                    $( "#formpedido" ).submit();
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo Aprobacion');
+                }
+            }
+        });
+
+    });
+
+
     $('#preaprobar').on('click', function(event){
         event.preventDefault();
         data = dataenviar();
         if(data.length<=0){alerterrorajax("Seleccione por lo menos un Comprobante");return false;}
         var datastring = JSON.stringify(data);
         $('#pedido').val(datastring);
-
         $.confirm({
             title: '¿Confirma la Pre Aprobacion?',
             content: 'Pre Aprobar los Comprobantes',
@@ -24,6 +41,7 @@ $(document).ready(function(){
         });
 
     });
+
 
     function dataenviar(){
             var data = [];

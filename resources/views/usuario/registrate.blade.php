@@ -67,13 +67,12 @@
 
 
                               <div class='inputr'>
-                                <div class="control-label">Cuenta Detracción <span class='requerido'>*</span>:</div>
+                                <div class="control-label">Cuenta Detracción :</div>
                                 <div class="abajocaja">
 
                                   <input  type="text"
                                           id="cuenta_detraccion" name='cuenta_detraccion' value="{{ old('cuenta_detraccion') }}" 
                                           placeholder="Cuenta Detracción"
-                                          required = ""
                                           autocomplete="off" class="form-control input-sm" data-aw="4"/>
 
                                 </div>

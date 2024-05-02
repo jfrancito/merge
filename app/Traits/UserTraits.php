@@ -11,6 +11,8 @@ use App\User;
 use App\WEBMaestro;
 use App\Modelos\FeDocumento;
 use App\Modelos\VMergeOC;
+use App\Modelos\STDTrabajador;
+
 
 use View;
 use Session;
@@ -85,9 +87,7 @@ trait UserTraits
         foreach($listadocumentos as $item){
 
             $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
-
             $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00029')->first();
-            //dd($email);
 
             $oc                     =   VMergeOC::where('COD_ORDEN','=',$item->ID_DOCUMENTO)
                                         ->select(DB::raw('COD_ORDEN,COD_EMPR,TXT_CATEGORIA_MONEDA,NRO_DOCUMENTO,FEC_ORDEN,TXT_CATEGORIA_MONEDA,TXT_EMPR_CLIENTE,NRO_DOCUMENTO_CLIENTE,MAX(CAN_TOTAL) CAN_TOTAL'))
@@ -180,7 +180,9 @@ trait UserTraits
         foreach($listadocumentos as $item){
 
             $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
-            $usuario                =   User::where('id','=',$item->COD_CONTACTO)->first();
+
+            //$usuario                =   User::where('id','=',$item->COD_CONTACTO)->first();
+            $usuario                =   STDTrabajador::where('COD_TRAB','=',$item->COD_CONTACTO)->first();
 
             //dd($usuario);
 
@@ -205,7 +207,7 @@ trait UserTraits
             Mail::send('emails.uc', $array, function($message) use ($emailfrom,$item,$usuario)
             {
                 $message->from($emailfrom->correoprincipal, 'MERGE - Orden de Compra '.$item->ID_DOCUMENTO .'('.$item->TXT_ESTADO.')');
-                $message->to($usuario->email);
+                $message->to($usuario->TXT_CORREO_ELECTRONICO);
                 $message->subject('Orden de Compra '.$item->TXT_ESTADO);
             });
 

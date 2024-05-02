@@ -16,14 +16,14 @@
               <div class="panel panel-default panel-border-color panel-border-color-success">
                 <div class="panel-heading">{{ $titulo }}
                   <div class="tools tooltiptop">
-                    <form method="POST" id='formpedido' class='opciones' action="{{ url('/pre-aprobar-documentos/'.$idopcion) }}" style="display: inline-block;" >
+<!--                     <form method="POST" id='formpedido' class='opciones' action="{{ url('/pre-aprobar-documentos/'.$idopcion) }}" style="display: inline-block;" >
                       {{ csrf_field() }}
                       <input type="hidden" id='pedido' name='pedido' >
                       <a href="#" class="tooltipcss" id='preaprobar' >
                         <span class="tooltiptext">Pendiente de Aprobar</span>
                         <span class="icon mdi mdi-mail-send"></span>
                       </a>
-                    </form>
+                    </form> -->
                   </div>
 
                 </div>

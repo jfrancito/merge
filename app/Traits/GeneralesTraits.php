@@ -12,7 +12,7 @@ use App\Modelos\ALMProducto;
 use App\Modelos\Categoria;
 use App\Modelos\Estado;
 use App\Modelos\Conei;
-
+use App\Modelos\FeDocumento;
 
 use App\Modelos\Requerimiento;
 use App\Modelos\Archivo;
@@ -29,6 +29,20 @@ use Keygen;
 
 trait GeneralesTraits
 {
+
+
+	public function ge_linea_documento($orden_id)
+	{
+		$item = 1;
+
+		$fedocumento = FeDocumento::where('ID_DOCUMENTO','=',$orden_id)->first();
+
+		if(count($fedocumento)>0){
+			$item = count($fedocumento)+1;
+		}
+
+		return $item;
+	}
 
 
 	public function ge_validarArchivoDuplicado($nombrearchivo,$registrodestino_id)

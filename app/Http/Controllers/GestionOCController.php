@@ -12,8 +12,13 @@ use App\Modelos\FeFormaPago;
 use App\Modelos\FeDetalleDocumento;
 use App\Modelos\FeDocumento;
 use App\Modelos\Estado;
-
-
+use App\Modelos\CMPCategoria;
+use App\Modelos\FeDocumentoHistorial;
+use App\Modelos\SGDUsuario;
+use App\Modelos\STDEmpresa;
+use App\Modelos\STDTrabajador;
+use App\Modelos\Archivo;
+use App\Modelos\CMPDocAsociarCompra;
 
 use Greenter\Parser\DocumentParserInterface;
 use Greenter\Xml\Parser\InvoiceParser;
@@ -30,7 +35,7 @@ use App\Traits\GeneralesTraits;
 use App\Traits\ComprobanteTraits;
 use App\Traits\WhatsappTraits;
 
-
+use ZipArchive;
 use Hashids;
 use SplFileInfo;
 
@@ -55,63 +60,112 @@ class GestionOCController extends Controller
                 
                 DB::beginTransaction();
                 $contacto_id       =   $request['contacto_id'];
-                $filescdm          =   $request['cdm'];
-                if(!is_null($filescdm)){
-                    //CDR
-                    foreach($filescdm as $file){
+                $fedocumento       =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->first();
 
-                        $nombre          =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                        /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
-                        $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
-                        $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
-                        $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                        $valor           =      $this->versicarpetanoexiste($rutafile);
-                        $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
-                        copy($file->getRealPath(),$rutacompleta);
-                        $path            =      $rutacompleta;
-                        //dd($nombre);
+
+                $tarchivos         =    CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                                        ->where('IND_OBLIGATORIO','=',1)
+                                        ->where('TXT_ASIGNADO','=','PROVEEDOR')
+                                        ->where('COD_CATEGORIA_DOCUMENTO','<>','DCC0000000000003')
+                                        ->get();
+
+                foreach($tarchivos as $index => $item){
+
+                    $filescdm          =   $request[$item->COD_CATEGORIA_DOCUMENTO];
+                    if(!is_null($filescdm)){
+                        //CDR
+                        foreach($filescdm as $file){
+
+
+                            $larchivos       =      Archivo::get();
+                            $nombre          =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
+                            /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
+                            $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
+                            $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
+                            // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
+                            $nombrefilecdr   =      count($larchivos).'-'.$file->getClientOriginalName();
+                            $valor           =      $this->versicarpetanoexiste($rutafile);
+                            $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
+                            copy($file->getRealPath(),$rutacompleta);
+                            $path            =      $rutacompleta;
+
+                            $nombreoriginal             =   $file->getClientOriginalName();
+                            $info                       =   new SplFileInfo($nombreoriginal);
+                            $extension                  =   $info->getExtension();
+
+                            $dcontrol                       =   new Archivo;
+                            $dcontrol->ID_DOCUMENTO         =   $ordencompra->COD_ORDEN;
+                            $dcontrol->DOCUMENTO_ITEM       =   $fedocumento->DOCUMENTO_ITEM;
+                            $dcontrol->TIPO_ARCHIVO         =   $item->COD_CATEGORIA_DOCUMENTO;
+                            $dcontrol->NOMBRE_ARCHIVO       =   $nombrefilecdr;
+                            $dcontrol->DESCRIPCION_ARCHIVO  =   $item->NOM_CATEGORIA_DOCUMENTO;
+
+
+                            $dcontrol->URL_ARCHIVO      =   $path;
+                            $dcontrol->SIZE             =   filesize($file);
+                            $dcontrol->EXTENSION        =   $extension;
+                            $dcontrol->ACTIVO           =   1;
+                            $dcontrol->FECHA_CREA       =   $this->fechaactual;
+                            $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
+                            $dcontrol->save();
+                        }
+                    }else{
+                        return Redirect::to('detalle-comprobante-oc/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Seleccione Archivo .ZIP a Importar ');
                     }
-                }else{
-                    return Redirect::to('detalle-comprobante-oc/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Seleccione Archivo XML a Importar ');
                 }
 
-                $filespdf          =   $request['pdf'];
-                if(!is_null($filespdf)){
-                    //CDR
-                    foreach($filespdf as $file){
+                $contacto                               =   SGDUsuario::where('COD_TRABAJADOR','=',$contacto_id)->first();
+                $trabajador                             =   STDTrabajador::where('COD_TRAB','=',$contacto->COD_TRABAJADOR)->first();
+                //$contacto                               =   User::where('id','=',$contacto_id)->first();
 
-                        $nombre          =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                        /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
-                        $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
-                        $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
-                        $nombrefilepdf   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                        $valor           =      $this->versicarpetanoexiste($rutafile);
-                        $rutacompleta    =      $rutafile.'\\'.$nombrefilepdf;
-                        copy($file->getRealPath(),$rutacompleta);
-                        $path            =      $rutacompleta;
-                        //dd($nombre);
-                    }
-                }else{
-                    return Redirect::to('detalle-comprobante-oc/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Seleccione Archivo XML a Importar ');
-                }
 
-                $contacto                             =   User::where('id','=',$contacto_id)->first();
-                $fedocumento                          =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->first();
 
-                $fedocumento->ARCHIVO_CDR             =   $nombrefilecdr;
-                $fedocumento->ARCHIVO_PDF             =   $nombrefilepdf;
-                $fedocumento->COD_ESTADO              =   'ETM0000000000002';
-                $fedocumento->TXT_ESTADO              =   'PENDIENTE DE APROBAR';
-                $fedocumento->COD_CONTACTO            =   $contacto->id;
-                $fedocumento->ind_email_uc            =   0;
-                $fedocumento->TXT_CONTACTO            =   $contacto->nombre;
-                $fedocumento->fecha_pa                =   $this->fechaactual;
-                $fedocumento->usuario_pa              =   Session::get('usuario')->id;
+                $fedocumento->ARCHIVO_CDR               =   '';
+                $fedocumento->ARCHIVO_PDF               =   '';
+                $fedocumento->COD_ESTADO                =   'ETM0000000000002';
+                $fedocumento->TXT_ESTADO                =   'POR APROBAR USUARIO CONTACTO';
+
+                $fedocumento->dni_usuariocontacto       =   $trabajador->NRO_DOCUMENTO;
+                $fedocumento->COD_CONTACTO              =   $contacto->COD_TRABAJADOR;
+                $fedocumento->ind_email_uc              =   0;
+                $fedocumento->TXT_CONTACTO              =   $contacto->NOM_TRABAJADOR;
+                $fedocumento->fecha_pa                  =   $this->fechaactual;
+                $fedocumento->usuario_pa                =   Session::get('usuario')->id;
                 $fedocumento->save();
 
+
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento                              =   new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $ordencompra->COD_ORDEN;
+                $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+
+                $documento->FECHA                       =   $this->fechaactual;
+                $documento->USUARIO_ID                  =   $contacto->COD_TRABAJADOR;
+                $documento->USUARIO_NOMBRE              =   $contacto->NOM_TRABAJADOR;
+                $documento->TIPO                        =   'CREADO';
+                $documento->MENSAJE                     =   '';
+                $documento->save();
+
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento                              =   new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $ordencompra->COD_ORDEN;
+                $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA                       =   $this->fechaactual;
+                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                $documento->TIPO                        =   'VALIDADO POR PROVEEDOR';
+                $documento->MENSAJE                     =   '';
+                $documento->save();
+
+
                 //LE LLEGA AL USUARIO DE CONTACTO
-                $mensaje            =   'COMPROBANTE : '.$fedocumento->ID_DOCUMENTO.'%0D%0A'.'Proveedor : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'.'Estado : '.$fedocumento->TXT_ESTADO.'%0D%0A';
-                $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                $trabajador         =   STDTrabajador::where('COD_TRAB','=',$fedocumento->COD_CONTACTO)->first();
+                $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                $mensaje            =   'COMPROBANTE : '.$fedocumento->ID_DOCUMENTO
+                                        .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                                        .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
+                                        .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A';
+                $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
 
                 DB::commit();
 
@@ -161,10 +215,16 @@ class GestionOCController extends Controller
         $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->get();
         $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);
         $xmlarchivo             =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE.'xml';
-
-
+        $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
+        //dd($tp);
         $contacto               =   DB::table('users')->where('ind_contacto','=',1)->pluck('nombre','id')->toArray();
         $combocontacto          =   array('' => "Seleccione Contacto") + $contacto;
+        $usuario                =   SGDUsuario::where('COD_USUARIO','=',$ordencompra->COD_USUARIO_CREA_AUD)->first();
+
+        $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                                    ->where('IND_OBLIGATORIO','=',1)
+                                    ->where('TXT_ASIGNADO','=','PROVEEDOR')
+                                    ->get();
 
         $funcion                =   $this;
 
@@ -175,7 +235,10 @@ class GestionOCController extends Controller
                             'fedocumento'           =>  $fedocumento,
                             'detallefedocumento'    =>  $detallefedocumento,
                             'combocontacto'         =>  $combocontacto,
+                            'tp'                    =>  $tp,
                             'xmlarchivo'            =>  $xmlarchivo,
+                            'tarchivos'             =>  $tarchivos,
+                            'usuario'               =>  $usuario,
                             'funcion'               =>  $funcion,
                             'idopcion'              =>  $idopcion,
                          ]);
@@ -195,34 +258,91 @@ class GestionOCController extends Controller
             if (!empty($file)) 
             {
                 try{    
+
                         DB::beginTransaction();
+                        DB::table('FE_DOCUMENTO')->where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->delete();
+                        DB::table('FE_DETALLE_DOCUMENTO')->where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->delete();
+                        DB::table('FE_FORMAPAGO')->where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->delete();
+                        DB::table('ARCHIVOS')->where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->delete();
+
+
+                        // /****************************************  COPIAR EL XML .ZIP EN LA CARPETA COMPARTIDA  *********************************/
+                        // $extension = $file->getClientOriginalExtension();
+                        // if(strtoupper($extension) == 'ZIP'){
+                        //     // Crea una instancia de ZipArchive
+
+                        //     $larchivos       =      Archivo::get();
+
+                        //     $zip = new ZipArchive;
+                        //     $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
+                        //     $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
+                        //     $nombrefile      =      count($larchivos).'-'.$file->getClientOriginalName();
+                        //     $valor           =      $this->versicarpetanoexiste($rutafile);
+                        //     $rutacompleta    =      $rutafile.'\\'.$nombrefile;
+                        //     // Copia el archivo .zip a la carpeta compartida
+                        //     copy($file->getRealPath(),$rutacompleta);
+                        //     $rutacompletaxml =      $rutafile.'\\';
+                        //     // Abre el archivo .zip
+                        //     if ($zip->open($file->getPathname()) === TRUE) {
+                        //         // Extrae cada archivo del .zip
+                        //         for ($i = 0; $i < $zip->numFiles; $i++) {
+                        //             $filename = $zip->getNameIndex($i);
+                        //             $fileInfo = pathinfo($filename);
+
+                        //             // Verifica si el archivo es un archivo regular
+                        //             if ($fileInfo['filename'] != '.' && $fileInfo['filename'] != '..') {
+                        //                 // Extrae el archivo a la carpeta compartida
+                        //                 $extractedFile = $rutacompletaxml.$fileInfo['basename'];
+                        //                 copy("zip://" . $file->getPathname() . "#$filename", $extractedFile);
+                        //             }
+                        //         }
+                        //         // Cierra el archivo .zip
+                        //         $zip->close();
+                        //     } else {
+                        //         DB::rollback(); 
+                        //         return Redirect::to('detalle-comprobante-oc/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', 'No se pudo abrir el archivo .zip');
+                        //     }
+
+                        //     $nombreoriginal             =   $file->getClientOriginalName();
+                        //     $info                       =   new SplFileInfo($nombreoriginal);
+                        //     $extension                  =   $info->getExtension();
+
+                        // }
 
                         /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
+                        $larchivos       =      Archivo::get();
                         $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
                         $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
-                        $nombrefile      =      $file->getClientOriginalName();
+                        $nombrefile      =      count($larchivos).'-'.$file->getClientOriginalName();
                         $valor           =      $this->versicarpetanoexiste($rutafile);
                         $rutacompleta    =      $rutafile.'\\'.$nombrefile;
+
+                        $nombreoriginal             =   $file->getClientOriginalName();
+                        $info                       =   new SplFileInfo($nombreoriginal);
+                        $extension                  =   $info->getExtension();
+
                         copy($file->getRealPath(),$rutacompleta);
+                        //dd($extractedFile);
                         $path            =   $rutacompleta;
-
-
                         /****************************************  LEER EL XML Y GUARDAR   *********************************/
                         $parser = new InvoiceParser();
                         $xml = file_get_contents($path);
                         $factura = $parser->parse($xml);
 
+                        //DD($factura);
 
-                        DB::table('FE_DOCUMENTO')->where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->delete();
-                        DB::table('FE_DETALLE_DOCUMENTO')->where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->delete();
-                        DB::table('FE_FORMAPAGO')->where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->delete();
-
-
+                        $documentolinea                     =   $this->ge_linea_documento($ordencompra->COD_ORDEN);
                         //REGISTRO DEL XML LEIDO
                         $documento                          =   new FeDocumento;
                         $documento->ID_DOCUMENTO            =   $ordencompra->COD_ORDEN;
+                        $documento->DOCUMENTO_ITEM          =   $documentolinea;
+
+                        $documento->COD_EMPR                =   $ordencompra->COD_EMPR;
+                        $documento->TXT_EMPR                =   $ordencompra->NOM_EMPR;
+
                         $documento->ESTADO                  =   'A';
                         $documento->RUC_PROVEEDOR           =   $factura->getcompany()->getruc();
+                        $documento->RZ_PROVEEDOR            =   $factura->getcompany()->getrazonSocial();
 
                         $documento->TIPO_CLIENTE            =   $factura->getClient()->gettipoDoc();
                         $documento->ID_CLIENTE              =   $factura->getClient()->getnumDoc();
@@ -269,6 +389,23 @@ class GestionOCController extends Controller
                         $documento->save();
 
 
+                        //ARCHIVO
+                        $dcontrol                   =   new Archivo;
+                        $dcontrol->ID_DOCUMENTO     =   $ordencompra->COD_ORDEN;
+                        $dcontrol->DOCUMENTO_ITEM   =   $documentolinea;
+                        $dcontrol->TIPO_ARCHIVO     =   'DCC0000000000003';
+                        $dcontrol->NOMBRE_ARCHIVO   =   $nombrefile;
+                        $dcontrol->DESCRIPCION_ARCHIVO  =   'XML DEL COMPROBANTE DE COMPRA';
+                        $dcontrol->URL_ARCHIVO      =   $path;
+                        $dcontrol->SIZE             =   filesize($file);
+                        $dcontrol->EXTENSION        =   $extension;
+                        $dcontrol->ACTIVO           =   1;
+                        $dcontrol->FECHA_CREA       =   $this->fechaactual;
+                        $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
+                        $dcontrol->save();
+
+
+
                         /**********DETALLE*********/
                         foreach ($factura->getdetails() as $indexdet => $itemdet) {
 
@@ -279,6 +416,8 @@ class GestionOCController extends Controller
                                 $linea = str_pad($indexdet+1, 3, "0", STR_PAD_LEFT); 
                                 $detalle                        =   new FeDetalleDocumento;
                                 $detalle->ID_DOCUMENTO          =   $ordencompra->COD_ORDEN;
+                                $detalle->DOCUMENTO_ITEM        =   $documentolinea;
+
                                 $detalle->LINEID                =   $linea;
                                 $detalle->CODPROD               =   $itemdet->getcodProducto();
                                 $detalle->PRODUCTO              =   $producto;
@@ -303,6 +442,7 @@ class GestionOCController extends Controller
 
                                 $forma                          =   new FeFormaPago;
                                 $forma->ID_DOCUMENTO            =   $ordencompra->COD_ORDEN;
+                                $forma->DOCUMENTO_ITEM          =   $documentolinea;
                                 $forma->ID_CUOTA                =   $itemfor->getnumCuota();
                                 $forma->ID_MONEDA               =   $itemfor->getmoneda();
                                 $forma->MONTO_CUOTA             =   (float)$itemfor->getmonto();

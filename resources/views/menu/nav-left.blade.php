@@ -30,6 +30,11 @@
         </div>
       </div>
     </div>
+
+    <div class="progress-widget {{Session::get('color')}}">
+      {{Session::get('empresas')->NOM_EMPR}}
+    </div>
+
   </div>
 </div>
 

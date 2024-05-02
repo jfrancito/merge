@@ -12,7 +12,15 @@
 </div>
 
 <div class="form-group">
-  <label class="col-sm-3 control-label">Descripcion de Extorno<span class="obligatorio">(*)</span> :</label>
+  <label class="col-sm-3 control-label">Documento:</label>
+  <div class="col-sm-6">
+  <input type="text" disabled class="form-control control input-sm" value="{{ $fedocumento->SERIE }}-{{ $fedocumento->NUMERO }}">
+  </div>
+</div>
+
+
+<div class="form-group">
+  <label class="col-sm-3 control-label">Descripcion de Rechazo<span class="obligatorio">(*)</span> :</label>
   <div class="col-sm-6">
         <textarea 
         name="descripcion"

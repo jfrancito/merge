@@ -12,6 +12,10 @@ use App\Modelos\FeFormaPago;
 use App\Modelos\FeDetalleDocumento;
 use App\Modelos\FeDocumento;
 use App\Modelos\Estado;
+use App\Modelos\CMPCategoria;
+use App\Modelos\FeDocumentoHistorial;
+use App\Modelos\Archivo;
+
 
 use Greenter\Parser\DocumentParserInterface;
 use Greenter\Xml\Parser\InvoiceParser;
@@ -42,7 +46,7 @@ class GestionOCValidadoController extends Controller
         /******************************************************/
         View::share('titulo','Lista Ordenes de Compra');
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
-        $listadatos     =   $this->con_lista_cabecera_comprobante_total($cod_empresa);
+        $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion($cod_empresa);
         $funcion        =   $this;
         return View::make('comprobante/listaocvalidado',
                          [
@@ -51,6 +55,28 @@ class GestionOCValidadoController extends Controller
                             'idopcion'          =>  $idopcion,
                          ]);
     }
+
+
+    public function actionListarOCHistorial($idopcion)
+    {
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Ver');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        View::share('titulo','Historial Ordenes de Compra');
+        $cod_empresa    =   Session::get('usuario')->id;
+        $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_historial($cod_empresa);
+        $funcion        =   $this;
+        return View::make('comprobante/listaocvalidado',
+                         [
+                            'listadatos'        =>  $listadatos,
+                            'funcion'           =>  $funcion,
+                            'idopcion'          =>  $idopcion,
+                         ]);
+    }
+
+
+
 
     public function actionDetalleComprobanteOCValidado($idopcion, $prefijo, $idordencompra, Request $request) {
 
@@ -65,7 +91,11 @@ class GestionOCValidadoController extends Controller
         $xmlarchivo             =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE.'\\'.$fedocumento->ARCHIVO_XML;
         $cdrarchivo             =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE.'\\'.$fedocumento->ARCHIVO_CDR;
         $pdfarchivo             =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE.'\\'.$fedocumento->ARCHIVO_PDF;
-
+        $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
+        $documentohistorial     =   FeDocumentoHistorial::where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)
+                                    ->orderBy('FECHA','DESC')
+                                    ->get();
+        $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
         $funcion                =   $this;
 
         return View::make('comprobante/registrocomprobantevalidado',
@@ -74,11 +104,46 @@ class GestionOCValidadoController extends Controller
                             'detalleordencompra'    =>  $detalleordencompra,
                             'fedocumento'           =>  $fedocumento,
                             'detallefedocumento'    =>  $detallefedocumento,
+                            'documentohistorial'    =>  $documentohistorial,
+                            'archivos'              =>  $archivos,
                             'xmlarchivo'            =>  $xmlarchivo,
+                            'tp'                    =>  $tp,
                             'funcion'               =>  $funcion,
                             'idopcion'              =>  $idopcion,
                          ]);
     }
+
+    public function actionDescargar($tipo,$idopcion, $prefijo, $idordencompra, Request $request)
+    {
+
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo($idordencompra,$prefijo);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_idoc($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc($idoc);
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->first();
+        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->get();
+        $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);
+
+
+        $archivo                =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('TIPO_ARCHIVO','=',$tipo)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->first();
+        $nombrearchivo          =   trim($archivo->NOMBRE_ARCHIVO);
+        $nombrefile             =   basename($nombrearchivo);
+        $file                   =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE.'\\'.basename($archivo->NOMBRE_ARCHIVO);
+
+
+        if(file_exists($file)){
+            header("Cache-Control: public");
+            header("Content-Description: File Transfer");
+            header("Content-Disposition: attachment; filename=$nombrefile");
+            header("Content-Type: application/xml");
+            header("Content-Transfer-Encoding: binary");
+            readfile($file);
+            exit;
+        }else{
+            dd('Documento no encontrado');
+        }
+
+    }
+
 
 
 

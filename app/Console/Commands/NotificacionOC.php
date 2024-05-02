@@ -46,9 +46,16 @@ class NotificacionOC extends Command
         set_time_limit(0);
         /****************************************************************************/
         $this->envio_correo_confirmacion();
+
+        //USUARIO CONTACTO
         $this->envio_correo_uc();
+        //CONTABILIDAD
         $this->envio_correo_co();
+        //ADMINISTRACION
         $this->envio_correo_adm();
+
+        
+        //PROVISIONAR
         $this->envio_correo_apcli();
 
     }

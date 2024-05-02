@@ -20,7 +20,11 @@
                 <div class="user-position online">disponible</div>
               </div>
             </li>
+            <li><a href="{{ url('/cambiarperfil/') }}"><span class="icon mdi mdi-settings"></span> Cambiar de perfil</a></li>
+            
             <li><a href="{{ url('/cerrarsession') }}"><span class="icon mdi mdi-power"></span>Cerrar sesión</a></li>
+
+
           </ul>
         </li>
       </ul>
