@@ -71,7 +71,9 @@
                                     <th>
                                         ORDEN COMPRA
                                     </th>
-
+                                    <th>
+                                        DOCUMENTO
+                                    </th>
                                     <th>
                                         FECHA ORDEN
                                     </th>
@@ -87,6 +89,9 @@
                                 </tr>
                                 <tr>
                                     <td>{{$item->ID_DOCUMENTO}}</td>
+
+                                    <td>{{$item->SERIE}} - {{$item->NUMERO}}</td>
+                                    
                                     <td>{{date_format(date_create($oc->FEC_ORDEN), 'd-m-Y H:i')}}</td>
                                     <td>{{$oc->TXT_CATEGORIA_MONEDA}}</td>
                                     <td>{{$oc->TXT_EMPR_CLIENTE}}</td>

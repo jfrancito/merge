@@ -20,6 +20,27 @@ $(document).ready(function(){
     });
 
 
+    $('.btnextornar').on('click', function(event){
+        event.preventDefault();
+        $.confirm({
+            title: '¿Confirma el Extorno?',
+            content: 'Extorno el Comprobante',
+            buttons: {
+                confirmar: function () {
+                    $( "#formpedido" ).submit();
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo el Extorno');
+                }
+            }
+        });
+
+    });
+
+
+
+
+
     $('#preaprobar').on('click', function(event){
         event.preventDefault();
         data = dataenviar();

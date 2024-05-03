@@ -196,6 +196,9 @@ class GestionUsuarioContactoController extends Controller
                                 'TXT_ESTADO'=>'GENERADO',
                                 'ind_email_ba'=>0,
                                 'mensaje_exuc'=>$descripcion,
+                                'mensaje_exap'=>'',
+                                'mensaje_exadm'=>'',
+
                                 'fecha_ex'=>$this->fechaactual,
                                 'usuario_ex'=>Session::get('usuario')->id
                             ]

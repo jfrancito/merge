@@ -35,6 +35,8 @@ Route::any('/enviocorreoconta', 'UserController@actionCorreoCO');//correo para c
 Route::any('/enviocorreoadmin', 'UserController@actionCorreoADM');//correo para administracion
 Route::any('/enviocorreoapcli', 'UserController@actionCorreoAPCLI');//correo para cliente cuando se aprueba
 Route::get('/cambiarperfil', 'UserController@actionCambiarPerfil');
+Route::any('/enviocorreobaja', 'UserController@actionCorreoBaja');//correo para cliente cuando se aprueba
+
 
 Route::group(['middleware' => ['authaw']], function () {
 

@@ -181,19 +181,25 @@ class GestionOCContabilidadController extends Controller
 
         if($_POST)
         {
-            $descripcion     =   $request['descripcion'];                
+            $descripcion     =   $request['descripcion'];
+
             FeDocumento::where('ID_DOCUMENTO',$idoc)
                         ->update(
                             [
                                 'COD_ESTADO'=>'ETM0000000000001',
                                 'TXT_ESTADO'=>'GENERADO',
                                 'ind_email_ba'=>0,
-                                
                                 'mensaje_exap'=>$descripcion,
+                                'mensaje_exuc'=>'',
+                                'mensaje_exadm'=>'',
                                 'fecha_ex'=>$this->fechaactual,
                                 'usuario_ex'=>Session::get('usuario')->id
                             ]
                         );
+
+            DB::table('FE_DOCUMENTO_HISTORIAL')->where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->delete();
+            DB::table('ARCHIVOS')->where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->delete();
+
 
             return Redirect::to('/gestion-de-contabilidad-aprobar/'.$idopcion)->with('bienhecho', 'Comprobantes Lote: '.$ordencompra->COD_ORDEN.' EXTORNADA con EXITO');
         

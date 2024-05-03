@@ -54,9 +54,12 @@ class NotificacionOC extends Command
         //ADMINISTRACION
         $this->envio_correo_adm();
 
-        
         //PROVISIONAR
         $this->envio_correo_apcli();
+
+        //BAJA COMPROBANTE
+        $this->envio_correo_baja();
+
 
     }
 }

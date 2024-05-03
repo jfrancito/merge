@@ -252,6 +252,12 @@ class UserController extends Controller {
 	{
 		$this->envio_correo_co();
 	}
+    public function actionCorreoBaja()
+	{
+		$this->envio_correo_baja();
+	}
+
+
     public function actionCorreoADM()
 	{
 		$this->envio_correo_adm();

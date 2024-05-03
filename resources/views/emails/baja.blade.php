@@ -56,13 +56,13 @@
 
     </head>
 
-
     <body>
         <section>
             <div class='panelcontainer'>
                 <div class="panel">
                     <div class='panelbodycodigo'>
-                            <h3>Orden de Compra  ({{$item->TXT_ESTADO}}) </h3>
+                            <h3>Orden de Compra  (Rechazado) </h3>
+                            <h5>Motivo : {{$item->mensaje_exuc}} {{$item->mensaje_exap}} {{$item->mensaje_exadm}}</h5>
                     </div>
                     <div class="panelhead">ORDEN COMPRA</div>
                     <div class='panelbody'>
@@ -90,7 +90,6 @@
                                 <tr>
                                     <td>{{$item->ID_DOCUMENTO}}</td>
                                     <td>{{$item->SERIE}} - {{$item->NUMERO}}</td>
-                                    
                                     <td>{{date_format(date_create($oc->FEC_ORDEN), 'd-m-Y H:i')}}</td>
                                     <td>{{$oc->TXT_CATEGORIA_MONEDA}}</td>
                                     <td>{{$oc->TXT_EMPR_CLIENTE}}</td>

@@ -124,6 +124,55 @@ trait UserTraits
     }
 
 
+
+    private function envio_correo_baja() {
+
+        $listadocumentos          =   FeDocumento::where('ind_email_ba','=',0)
+                                      ->get();
+
+
+        foreach($listadocumentos as $item){
+
+            $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
+            $usuario                =   User::where('id','=',$item->usuario_pa)->first();
+        //dd($usuario);
+
+            $oc                     =   VMergeOC::where('COD_ORDEN','=',$item->ID_DOCUMENTO)
+                                        ->select(DB::raw('COD_ORDEN,COD_EMPR,TXT_CATEGORIA_MONEDA,NRO_DOCUMENTO,FEC_ORDEN,TXT_CATEGORIA_MONEDA,TXT_EMPR_CLIENTE,NRO_DOCUMENTO_CLIENTE,MAX(CAN_TOTAL) CAN_TOTAL'))
+                                        ->groupBy('COD_ORDEN')
+                                        ->groupBy('FEC_ORDEN')
+                                        ->groupBy('TXT_CATEGORIA_MONEDA')
+                                        ->groupBy('TXT_EMPR_CLIENTE')
+                                        ->groupBy('NRO_DOCUMENTO_CLIENTE')
+                                        ->groupBy('NRO_DOCUMENTO')
+                                        ->groupBy('COD_EMPR')
+                                        ->groupBy('TXT_CATEGORIA_MONEDA')->first();
+
+            // correos principales y  copias
+            //$email                  =   $item->email;
+            $array                  =   Array(
+                'item'                =>  $item,
+                'oc'                  =>  $oc,
+            );
+
+
+            Mail::send('emails.baja', $array, function($message) use ($emailfrom,$item,$usuario)
+            {
+                $message->from($emailfrom->correoprincipal, 'MERGE - Orden de Compra '.$item->ID_DOCUMENTO .'(RECHAZO)');
+                $message->to($usuario->email);
+                $message->subject('Orden de Compra Rechazado');
+            });
+
+            $pedido                             =   FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)->first();
+            $pedido->ind_email_ba               =   0;
+            $pedido->save();
+
+        }
+        print("Se envio correctamente de BAJA");
+    }
+
+
+
     private function envio_correo_adm() {
 
         $listadocumentos          =   FeDocumento::where('ind_email_adm','=',0)
