@@ -11,6 +11,8 @@ use App\Modelos\VMergeOC;
 use App\Modelos\FeDocumento;
 use App\Modelos\CMPCategoria;
 use App\Modelos\CMPOrden;
+use App\Modelos\STDTrabajador;
+
 
 
 use View;
@@ -48,13 +50,19 @@ trait ComprobanteTraits
 
 	private function con_lista_cabecera_comprobante_total_uc($cliente_id) {
 
-
-		$listadatos 	= 	FeDocumento::leftJoin('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
-							//->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
-							->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
-							->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-							->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000002')
-							->get();
+		//HACER UNA UNION DE TODAS LOS ID DE TRABAJADORES QUE TIENE ESTE USUARIO
+		$trabajador 		 = 		STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+		$array_trabajadores  =		STDTrabajador::where('NRO_DOCUMENTO','=',$trabajador->NRO_DOCUMENTO)
+									->pluck('COD_TRAB')
+									->toArray();
+	
+		$listadatos 		= 		FeDocumento::leftJoin('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+									//->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+									->whereIn('FE_DOCUMENTO.COD_CONTACTO',$array_trabajadores)
+									->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+									->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+									->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000002')
+									->get();
 
 	 	return  $listadatos;
 	}

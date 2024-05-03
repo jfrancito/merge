@@ -235,7 +235,8 @@ trait UserTraits
             $emailfrom          =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
             // correos principales y  copias
             $email              =   $item->email;
-            $url                =   "http://localhost:8080/merge/activar-registro/".Hashids::encode($token);
+            //$url                =   "http://localhost:8080/merge/activar-registro/".Hashids::encode($token);
+            $url                =   "http://10.1.50.2:8080/merge/activar-registro/".Hashids::encode($token);
 
             $array      =  Array(
                 'PR'                =>  $item,
