@@ -21,9 +21,6 @@ use App\Modelos\CMPCategoria;
 use App\Modelos\CMPDocAsociarCompra;
 use App\Modelos\Archivo;
 
-
-
-
 use Greenter\Parser\DocumentParserInterface;
 use Greenter\Xml\Parser\InvoiceParser;
 use Greenter\Xml\Parser\NoteParser;
@@ -119,8 +116,11 @@ class GestionOCContabilidadController extends Controller
                                             .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
                                             .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
                                             .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
+
                     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                    //$this->insertar_whatsaap('51971575452','GISELA',$mensaje,'');
+                    $this->insertar_whatsaap('51971575452','GISELA',$mensaje,'');
+                    $this->insertar_whatsaap('51920721827','JESSICA DEL PILAR',$mensaje,'');
+                    $this->insertar_whatsaap('51948634244','ELSA ANA BELEN',$mensaje,'');
 
                     $msjarray[]                             =   array(  "data_0" => $fedocumento->ID_DOCUMENTO, 
                                                                         "data_1" => 'COMPROBANTE APROBADO POR CONTABILIDAD', 

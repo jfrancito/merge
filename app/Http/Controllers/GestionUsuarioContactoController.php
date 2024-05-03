@@ -122,7 +122,10 @@ class GestionUsuarioContactoController extends Controller
                                             .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
 
                     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                    //$this->insertar_whatsaap('51979659002','HAMILTON',$mensaje,'');
+                    $this->insertar_whatsaap('51959266298','INGRID JHOSELIT',$mensaje,'');
+                    $this->insertar_whatsaap('51988650421','LUCELY YESMITH',$mensaje,'');
+                    $this->insertar_whatsaap('51944132248','JAIRO ALONSO',$mensaje,'');
+                    $this->insertar_whatsaap('51979659002','HAMILTON',$mensaje,'');
 
 
                     $msjarray[]                             =   array(  "data_0" => $fedocumento->ID_DOCUMENTO, 

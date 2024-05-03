@@ -87,7 +87,7 @@ trait UserTraits
         foreach($listadocumentos as $item){
 
             $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
-            $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00029')->first();
+            $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00030')->first();
 
             $oc                     =   VMergeOC::where('COD_ORDEN','=',$item->ID_DOCUMENTO)
                                         ->select(DB::raw('COD_ORDEN,COD_EMPR,TXT_CATEGORIA_MONEDA,NRO_DOCUMENTO,FEC_ORDEN,TXT_CATEGORIA_MONEDA,TXT_EMPR_CLIENTE,NRO_DOCUMENTO_CLIENTE,MAX(CAN_TOTAL) CAN_TOTAL'))
@@ -133,7 +133,7 @@ trait UserTraits
 
             $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
 
-            $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00030')->first();
+            $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00031')->first();
             //dd($email);
 
             $oc                     =   VMergeOC::where('COD_ORDEN','=',$item->ID_DOCUMENTO)

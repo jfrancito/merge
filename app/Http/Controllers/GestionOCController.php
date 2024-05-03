@@ -166,6 +166,8 @@ class GestionOCController extends Controller
                                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
                                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A';
                 $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                
+                $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
 
                 DB::commit();
 
