@@ -26,8 +26,9 @@
             <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>
             <ul role="menu" class="dropdown-menu pull-right">
               <li>
+
                 @if(is_null($item->COD_ESTADO)) 
-                    <a href="{{ url('/detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.substr($item->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($item->COD_ORDEN, -10))) }}">
+                    <a href="{{ url('/detalle-comprobante-oc/'.$idopcion.'/'.substr($item->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($item->COD_ORDEN, -10))) }}">
                       Registro XML
                     </a>
                 @else

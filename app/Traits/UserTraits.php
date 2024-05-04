@@ -36,9 +36,17 @@ trait UserTraits
 
             $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
             $usuario                =   User::where('id','=',$item->usuario_pa)->first();
+            $correocc               =   $usuario->email;
 
+            if($item->TXT_PROCEDENCIA = 'ADM'){
+                $trabajador         =   STDTrabajador::where('COD_TRAB','=',$usuario->usuarioosiris_id)->first();
+                if($trabajador->TXT_CORREO_ELECTRONICO == ''){
+                    $correocc               =   'jose.neciosup@induamerica.com.pe';
+                }else{
+                    $correocc               =   $trabajador->TXT_CORREO_ELECTRONICO;
+                }
+            }
             //dd($usuario);
-
             $oc                     =   VMergeOC::where('COD_ORDEN','=',$item->ID_DOCUMENTO)
                                         ->select(DB::raw('COD_ORDEN,COD_EMPR,TXT_CATEGORIA_MONEDA,NRO_DOCUMENTO,FEC_ORDEN,TXT_CATEGORIA_MONEDA,TXT_EMPR_CLIENTE,NRO_DOCUMENTO_CLIENTE,MAX(CAN_TOTAL) CAN_TOTAL'))
                                         ->groupBy('COD_ORDEN')
@@ -61,10 +69,10 @@ trait UserTraits
             //$mensaje            =   'COMPROBANTE : '.$item->ID_DOCUMENTO.'%0D%0A'.'Estado : '.$item->TXT_ESTADO.'%0D%0A';
             //$this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
 
-            Mail::send('emails.cli', $array, function($message) use ($emailfrom,$item,$usuario)
+            Mail::send('emails.cli', $array, function($message) use ($emailfrom,$item,$correocc)
             {
                 $message->from($emailfrom->correoprincipal, 'Induamerica estado de la orden de compra '.$item->ID_DOCUMENTO .'('.$item->TXT_ESTADO.')');
-                $message->to($usuario->email);
+                $message->to($correocc);
                 $message->subject('Orden de Compra '.$item->TXT_ESTADO);
             });
 

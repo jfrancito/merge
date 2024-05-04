@@ -14,6 +14,7 @@
                                     <div class="col-xs-6 col-sm-6 col-md-6 col-lg-10 negrita" align="left">
                                         <input name="inputxml" id='inputxml' class="form-control inputxml" type="file" accept="text/xml" />
                                     </div>
+                                    <input type="hidden" name="procedencia" id='procedencia' value = '{{$procedencia}}'>
                                     <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 negrita" align="center">
                                         <button  type="submit" style="height:48px;" class="btn btn-space btn-success btn-lg cargardatosliq" id='cargardatosliq' title="Cargar Datos"><i class="icon icon-left mdi mdi-upload"></i> Subir</button>
                                     </div>

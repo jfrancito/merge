@@ -209,6 +209,37 @@ trait ComprobanteTraits
 	 	return  $listadatos;
 	}
 
+
+
+	private function con_lista_cabecera_comprobante_administrativo($cliente_id) {
+
+		$listadatos 	= 	VMergeOC::leftJoin('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
+							//->where('COD_EMPR_CLIENTE','=',$cliente_id)
+							->where('VMERGEOC.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+							->where(function ($query) {
+							    $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
+							    	  ->orWhereNull('FE_DOCUMENTO.COD_ESTADO');
+							})
+							->select(DB::raw('	COD_ORDEN,
+												FEC_ORDEN,
+												TXT_CATEGORIA_MONEDA,
+												TXT_EMPR_CLIENTE,
+												MAX(CAN_TOTAL) CAN_TOTAL,
+												MAX(ID_DOCUMENTO) AS ID_DOCUMENTO,
+												MAX(COD_ESTADO) AS COD_ESTADO,
+												MAX(TXT_ESTADO) AS TXT_ESTADO
+											'))
+							->groupBy('COD_ORDEN')
+							->groupBy('FEC_ORDEN')
+							->groupBy('TXT_CATEGORIA_MONEDA')
+							->groupBy('TXT_EMPR_CLIENTE')
+							->get();
+
+	 	return  $listadatos;
+	}
+
+
+
 	private function con_lista_cabecera_comprobante_total($cliente_id) {
 
 		$listadatos 	= 	VMergeOC::leftJoin('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')

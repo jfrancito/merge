@@ -76,7 +76,6 @@ class GestionOCController extends Controller
                         //CDR
                         foreach($filescdm as $file){
 
-
                             $larchivos       =      Archivo::get();
                             $nombre          =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
                             /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
@@ -117,8 +116,6 @@ class GestionOCController extends Controller
                 $contacto                               =   SGDUsuario::where('COD_TRABAJADOR','=',$contacto_id)->first();
                 $trabajador                             =   STDTrabajador::where('COD_TRAB','=',$contacto->COD_TRABAJADOR)->first();
                 //$contacto                               =   User::where('id','=',$contacto_id)->first();
-
-
 
                 $fedocumento->ARCHIVO_CDR               =   '';
                 $fedocumento->ARCHIVO_PDF               =   '';
@@ -165,9 +162,14 @@ class GestionOCController extends Controller
                                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
                                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
                                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A';
-                $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                
-                $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+
+
+                if($_ENV['APP_PRODUCCION']==0){
+                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                }else{
+                    $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');          
+                }                       
 
                 DB::commit();
 
@@ -195,19 +197,51 @@ class GestionOCController extends Controller
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
         $listadatos     =   $this->con_lista_cabecera_comprobante($cod_empresa);
         $funcion        =   $this;
-
+        $procedencia    =   'PRO';
         //dd($listadatos);
 
         return View::make('comprobante/listaoc',
                          [
                             'listadatos'        =>  $listadatos,
+                            'procedencia'       =>  $procedencia,
+
                             'funcion'           =>  $funcion,
                             'idopcion'          =>  $idopcion,
                          ]);
     }
 
 
-    public function actionDetalleComprobanteOC($idopcion, $prefijo, $idordencompra, Request $request) {
+    public function actionListarOCAdmin($idopcion)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Ver');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        View::share('titulo','Gestion Ordenes de Compra');
+
+        $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
+        $listadatos     =   $this->con_lista_cabecera_comprobante_administrativo($cod_empresa);
+        $funcion        =   $this;
+        $procedencia    =   'ADM';
+
+        //dd($listadatos);
+
+        //dd($_ENV['APP_PRODUCCION']);
+
+        return View::make('comprobante/listaoc',
+                         [
+                            'listadatos'        =>  $listadatos,
+                            'procedencia'       =>  $procedencia,
+                            'funcion'           =>  $funcion,
+                            'idopcion'          =>  $idopcion,
+                         ]);
+    }
+
+
+
+
+    public function actionDetalleComprobanteOC($procedencia,$idopcion, $prefijo, $idordencompra, Request $request) {
 
         View::share('titulo','REGISTRO DE COMPROBANTE');
         $idoc                   =   $this->funciones->decodificarmaestraprefijo($idordencompra,$prefijo);
@@ -237,6 +271,8 @@ class GestionOCController extends Controller
                             'fedocumento'           =>  $fedocumento,
                             'detallefedocumento'    =>  $detallefedocumento,
                             'combocontacto'         =>  $combocontacto,
+                            'procedencia'           =>  $procedencia,
+
                             'tp'                    =>  $tp,
                             'xmlarchivo'            =>  $xmlarchivo,
                             'tarchivos'             =>  $tarchivos,
@@ -255,11 +291,15 @@ class GestionOCController extends Controller
         $ordencompra            =   $this->con_lista_cabecera_comprobante_idoc($idoc);
         $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc($idoc);
 
+        $procedencia            =   $request['procedencia'];
+
         if($_POST)
         {
             if (!empty($file)) 
             {
                 try{    
+
+
 
                         DB::beginTransaction();
                         DB::table('FE_DOCUMENTO')->where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->delete();
@@ -341,7 +381,7 @@ class GestionOCController extends Controller
 
                         $documento->COD_EMPR                =   $ordencompra->COD_EMPR;
                         $documento->TXT_EMPR                =   $ordencompra->NOM_EMPR;
-
+                        $documento->TXT_PROCEDENCIA         =   $procedencia;
                         $documento->ESTADO                  =   'A';
                         $documento->RUC_PROVEEDOR           =   $factura->getcompany()->getruc();
                         $documento->RZ_PROVEEDOR            =   $factura->getcompany()->getrazonSocial();
@@ -530,11 +570,11 @@ class GestionOCController extends Controller
 
                 }catch(\Exception $ex){
                     DB::rollback(); 
-                    return Redirect::to('detalle-comprobante-oc/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', $ex.' Ocurrio un error inesperado');
+                    return Redirect::to('detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', $ex.' Ocurrio un error inesperado');
                 }
-                return Redirect::to('detalle-comprobante-oc/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('bienhecho', 'Se valido el xml');
+                return Redirect::to('detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('bienhecho', 'Se valido el xml');
             }else{
-                return Redirect::to('detalle-comprobante-oc/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Seleccione Archivo XML a Importar ');
+                return Redirect::to('detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Seleccione Archivo XML a Importar ');
             }
 
         }
