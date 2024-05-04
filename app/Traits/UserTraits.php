@@ -143,6 +143,18 @@ trait UserTraits
 
             $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
             $usuario                =   User::where('id','=',$item->usuario_pa)->first();
+
+            $correocc               =   $usuario->email;
+
+            if($item->TXT_PROCEDENCIA = 'ADM'){
+                $trabajador         =   STDTrabajador::where('COD_TRAB','=',$usuario->usuarioosiris_id)->first();
+                if($trabajador->TXT_CORREO_ELECTRONICO == ''){
+                    $correocc               =   'jose.neciosup@induamerica.com.pe';
+                }else{
+                    $correocc               =   $trabajador->TXT_CORREO_ELECTRONICO;
+                }
+            }
+            
         //dd($usuario);
 
             $oc                     =   VMergeOC::where('COD_ORDEN','=',$item->ID_DOCUMENTO)
@@ -164,10 +176,10 @@ trait UserTraits
             );
 
 
-            Mail::send('emails.baja', $array, function($message) use ($emailfrom,$item,$usuario)
+            Mail::send('emails.baja', $array, function($message) use ($emailfrom,$item,$correocc)
             {
                 $message->from($emailfrom->correoprincipal, 'MERGE - Orden de Compra '.$item->ID_DOCUMENTO .'(RECHAZO)');
-                $message->to($usuario->email);
+                $message->to($correocc);
                 $message->subject('Orden de Compra Rechazado');
             });
 
