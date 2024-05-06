@@ -184,7 +184,7 @@ trait UserTraits
             });
 
             $pedido                             =   FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)->first();
-            $pedido->ind_email_ba               =   0;
+            $pedido->ind_email_ba               =   1;
             $pedido->save();
 
         }
