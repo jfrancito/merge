@@ -55,7 +55,7 @@
           @if(count($fedocumento)>0)
             <form method="POST" action="{{ url('validar-xml-oc/'.$idopcion.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" name="formguardardatos" id="formguardardatos" enctype="multipart/form-data" >
              {{ csrf_field() }}
-
+              <input type="hidden" name="procedencia" id='procedencia' value = '{{$procedencia}}'>
 
               <div class="row">
 
@@ -121,7 +121,11 @@
                               <td><b>Forma Pago</b></td>
                               <td><p class='subtitulomerge'>{{$tp->NOM_CATEGORIA}}</p></td>
                               <td>
-                                <div class='subtitulomerge @if($fedocumento->ind_cantidaditem == 1) msjexitoso @else msjerror @endif'>{{$fedocumento->FORMA_PAGO}} 
+                                <div class='subtitulomerge @if($fedocumento->ind_cantidaditem == 1) msjexitoso @else msjerror @endif'>
+                                  {{$fedocumento->FORMA_PAGO}}
+                                  @if($tp->CODIGO_SUNAT == 'CRE')
+                                    A {{$fedocumento->FORMA_PAGO_DIAS}} DIAS
+                                  @endif
                                 </div>
                               </td>
                             </tr>

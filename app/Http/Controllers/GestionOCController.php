@@ -60,7 +60,83 @@ class GestionOCController extends Controller
                 
                 DB::beginTransaction();
                 $contacto_id       =   $request['contacto_id'];
+                $procedencia       =   $request['procedencia'];
+                
                 $fedocumento       =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->first();
+
+
+                /**************************** VALIDAR CDR Y LEER RESPUESTA ******************************/
+                $filescdr          =   $request['DCC0000000000004'];
+                if(!is_null($filescdr)){
+                    //CDR
+                    foreach($filescdr as $file){
+
+                        $larchivos       =      Archivo::get();
+                        $zip = new ZipArchive;
+                        $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
+                        $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
+                        $nombrefile      =      $file->getClientOriginalName();
+                        $valor           =      $this->versicarpetanoexiste($rutafile);
+                        $rutacompleta    =      $rutafile.'\\'.$nombrefile;
+                        // Copia el archivo .zip a la carpeta compartida
+                        copy($file->getRealPath(),$rutacompleta);
+                        $rutacompletaxml =      $rutafile.'\\';
+                        // Abre el archivo .zip
+                        if ($zip->open($file->getPathname()) === TRUE) {
+                            // Extrae cada archivo del .zip
+                            for ($i = 0; $i < $zip->numFiles; $i++) {
+                                $filename = $zip->getNameIndex($i);
+                                $fileInfo = pathinfo($filename);
+
+                                // Verifica si el archivo es un archivo regular
+                                if ($fileInfo['filename'] != '.' && $fileInfo['filename'] != '..') {
+                                    // Extrae el archivo a la carpeta compartida
+                                    $extractedFile = $rutacompletaxml.$fileInfo['basename'];
+                                    copy("zip://" . $file->getPathname() . "#$filename", $extractedFile);
+                                }
+                            }
+                            // Cierra el archivo .zip
+                            $zip->close();
+                        } else {
+                            DB::rollback(); 
+                            return Redirect::to('detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', 'No se pudo abrir el archivo .zip');
+                        }
+                        $nombreoriginal             =   $file->getClientOriginalName();
+                        $info                       =   new SplFileInfo($nombreoriginal);
+                        $extension                  =   $info->getExtension();
+                    }
+                }
+                $codigocdr = '';
+                $respuestacdr = '';
+                $factura_cdr_id = '';
+                if (file_exists($extractedFile)) {
+                    $xml = simplexml_load_file($extractedFile);
+                    foreach($xml->xpath('//cbc:ResponseCode') as $ResponseCode)
+                    {
+                        $codigocdr  = $ResponseCode;
+                    }
+                    foreach($xml->xpath('//cbc:Description') as $Description)
+                    {
+                        $respuestacdr  = $Description;
+                    }
+                    foreach($xml->xpath('//cbc:ID') as $ID)
+                    {
+                        $factura_cdr_id  = $ID;
+                    }
+
+                    //DD($codigocdr);
+                } else {
+                    return Redirect::to('detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Error al intentar descomprimir el CDR');
+                }
+                $nombre_doc = $fedocumento->SERIE.'-'.$fedocumento->NUMERO;
+                if($factura_cdr_id != $nombre_doc){
+                    return Redirect::to('detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'El CDR ('.$factura_cdr_id.') no coincide con la factura ('.$nombre_doc.')');
+                }
+
+                /************************************************************************/
+
+                //dd("descomprimir");
+
 
 
                 $tarchivos         =    CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
@@ -109,7 +185,7 @@ class GestionOCController extends Controller
                             $dcontrol->save();
                         }
                     }else{
-                        return Redirect::to('detalle-comprobante-oc/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Seleccione Archivo .ZIP a Importar ');
+                        return Redirect::to('detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Seleccione Archivo .ZIP a Importar ');
                     }
                 }
 
@@ -124,6 +200,12 @@ class GestionOCController extends Controller
 
                 $fedocumento->dni_usuariocontacto       =   $trabajador->NRO_DOCUMENTO;
                 $fedocumento->COD_CONTACTO              =   $contacto->COD_TRABAJADOR;
+
+                $fedocumento->CODIGO_CDR                =   $codigocdr;
+                $fedocumento->RESPUESTA_CDR             =   $respuestacdr;
+
+
+
                 $fedocumento->ind_email_uc              =   0;
                 $fedocumento->TXT_CONTACTO              =   $contacto->NOM_TRABAJADOR;
                 $fedocumento->fecha_pa                  =   $this->fechaactual;
@@ -175,7 +257,9 @@ class GestionOCController extends Controller
 
             }catch(\Exception $ex){
                 DB::rollback(); 
-                return Redirect::to('detalle-comprobante-oc/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', $ex.' Ocurrio un error inesperado');
+
+                dd($ex);
+                return Redirect::to('detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
             return Redirect::to('gestion-de-oc-proveedores/'.$idopcion)->with('bienhecho', 'Se valido el xml correctamente');
@@ -371,6 +455,18 @@ class GestionOCController extends Controller
                         $xml = file_get_contents($path);
                         $factura = $parser->parse($xml);
 
+
+                        /****************************************  DIAS DE CREDITO *****************************************/
+                        $diasdefactura = 0;
+                        $tp = CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
+                        if( $tp->CODIGO_SUNAT == 'CRE' ){
+                            $datetime1 = date_create($factura->getfechaEmision()->format('Ymd'));
+                            $datetime2 = date_create($factura->getfecVencimiento()->format('Ymd'));
+                            $contador = date_diff($datetime1, $datetime2);
+                            $differenceFormat = '%a';
+                            $diasdefactura = $contador->format($differenceFormat);
+                        }
+
                         //DD($factura);
 
                         $documentolinea                     =   $this->ge_linea_documento($ordencompra->COD_ORDEN);
@@ -396,6 +492,8 @@ class GestionOCController extends Controller
                         $documento->FEC_VENTA               =   $factura->getfechaEmision()->format('Ymd');
                         $documento->FEC_VENCI_PAGO          =   $factura->getfecVencimiento()->format('Ymd');
                         $documento->FORMA_PAGO              =   $factura->getcondicionPago();
+                        $documento->FORMA_PAGO_DIAS          =   $diasdefactura;
+
                         $documento->MONEDA                  =   $factura->gettipoMoneda();
                         $documento->VALOR_IGV_ORIG          =   $factura->getmtoIGV();
                         $documento->VALOR_IGV_SOLES         =   $factura->getmtoIGV();

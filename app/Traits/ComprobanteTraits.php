@@ -162,7 +162,15 @@ trait ComprobanteTraits
 		$tp = CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
 
 		if($tp->CODIGO_SUNAT == substr(strtoupper($fedocumento->FORMA_PAGO), 0, 3)){
-			$ind_formapago 			=	1;	
+
+			if( $tp->CODIGO_SUNAT == 'CRE' ){
+				$ind_formapago 			=	1;	
+				$diasdeorden = $tp->COD_CTBLE;
+				if($fedocumento->FORMA_PAGO_DIAS != $diasdeorden){
+					$ind_formapago 			=	0;
+					$ind_errototal 			=	0; 
+				}
+			}
 		}else{ 	$ind_errototal 		=	0;  }
 
 
