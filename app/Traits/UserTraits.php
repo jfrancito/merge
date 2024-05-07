@@ -291,7 +291,7 @@ trait UserTraits
 	private function envio_correo_confirmacion() {
 
         $listaproveedoress          =   User::where('email_confirmacion','=',0)
-        								->where('rol_id','=','1CIX00000019')
+        								->where('rol_id','=','1CIX00000024')
                                         ->get();
 
 

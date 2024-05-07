@@ -305,7 +305,7 @@ class UserController extends Controller {
 			$cabecera->passwordmobil  	=	$lblcontrasena;
 			$cabecera->fecha_crea 	   	=  	$this->fechaactual;
 			$cabecera->password 	 	= 	Crypt::encrypt($lblcontrasena);
-			$cabecera->rol_id 	 		= 	'1CIX00000019';
+			$cabecera->rol_id 	 		= 	'1CIX00000024';
 			$cabecera->usuarioosiris_id	= 	$cod_empresa;
 			$cabecera->email			= 	$lblemail;
 			$cabecera->direccion_fiscal		= 	$direccion;

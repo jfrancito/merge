@@ -72,7 +72,7 @@
 
                 <label class="col-sm-3 control-label">Rol</label>
                 <div class="col-sm-5">
-                  {!! Form::select( 'rol_id', $comborol, array('1CIX00000019'),
+                  {!! Form::select( 'rol_id', $comborol, array('1CIX00000024'),
                                     [
                                       'class'       => 'form-control control input-sm' ,
                                       'id'          => 'rol_id',
