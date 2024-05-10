@@ -2,7 +2,7 @@
   <thead>
     <tr>
       <th></th>
-      <th>ORDEN VENTA</th>
+      <th>ORDEN COMPRA</th>
       <th>FACTURA</th>
       <th>ESTADO</th>
       <th>OPCION</th>
@@ -46,20 +46,20 @@
             <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>
             <ul role="menu" class="dropdown-menu pull-right">
               <li>
-                <a href="{{ url('/detalle-comprobante-oc-validado/'.$idopcion.'/'.substr($item->ID_DOCUMENTO, 0,6).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -10))) }}">
+                <a href="{{ url('/detalle-comprobante-oc-validado/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,6).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -10))) }}">
                     Detalle de Registro
                 </a>
               </li>
 
               <li>
-                <a href="{{ url('/aprobar-comprobante-contabilidad/'.$idopcion.'/'.substr($item->ID_DOCUMENTO, 0,6).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -10))) }}">
+                <a href="{{ url('/aprobar-comprobante-contabilidad/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,6).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -10))) }}">
                   Aprobar Comprobante
                 </a>  
               </li>
 
 
               <li>
-                <a href="{{ url('/extornar-aprobar-comprobante/'.$idopcion.'/'.substr($item->ID_DOCUMENTO, 0,6).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -10))) }}">
+                <a href="{{ url('/extornar-aprobar-comprobante/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,6).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -10))) }}">
                   Rechazar Comprobante
                 </a>  
               </li>

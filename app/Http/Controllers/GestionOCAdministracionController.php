@@ -90,35 +90,11 @@ class GestionOCAdministracionController extends Controller
 
 
                     $orden                      =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();
-                    $detalleproducto            =   CMPDetalleProducto::where('CMP.DETALLE_PRODUCTO.COD_ESTADO','=',1)
-                                                    ->where('CMP.DETALLE_PRODUCTO.COD_TABLA','=',$pedido_id)
-                                                    ->orderBy('NRO_LINEA','ASC')
-                                                    ->get();
-                    //  INSERTAR ORDEN DE INGRESO
-                    //almacen lote                                
-                    $this->insert_almacen_lote($orden,$detalleproducto);
-                    $orden_id = $this->insert_orden($orden,$detalleproducto);                 
-                    $this->insert_referencia_asoc($orden,$detalleproducto,$orden_id[0]);
-                    $this->insert_detalle_producto($orden,$detalleproducto,$orden_id[0]);
-                    //UPDATE DE ORDEN DE COMPRA
-                    //$this->update_orden($orden,$detalleproducto);
-                    $this->update_detalle_producto($orden,$detalleproducto);
                     CMPOrden::where('COD_ORDEN','=',$orden->COD_ORDEN)
                                 ->update(
                                         [
                                             'COD_OPERACION'=>1
                                         ]);
-
-                    FeDocumento::where('ID_DOCUMENTO',$pedido_id)
-                                ->update(
-                                    [
-                                        'COD_ESTADO'=>'ETM0000000000005',
-                                        'TXT_ESTADO'=>'APROBADO',
-                                        'ind_email_clap'=>0,
-                                        'fecha_ap'=>$this->fechaactual,
-                                        'usuario_ap'=>Session::get('usuario')->id
-                                    ]
-                                );
 
 
                     //HISTORIAL DE DOCUMENTO APROBADO
@@ -132,16 +108,16 @@ class GestionOCAdministracionController extends Controller
                     $documento->MENSAJE                     =   '';
                     $documento->save();
 
-                    //HISTORIAL DE DOCUMENTO APROBADO
-                    $documento                              =   new FeDocumentoHistorial;
-                    $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
-                    $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
-                    $documento->FECHA                       =   $this->fechaactual;
-                    $documento->USUARIO_ID                  =   Session::get('usuario')->id;
-                    $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
-                    $documento->TIPO                        =   'PROVISIONADO';
-                    $documento->MENSAJE                     =   '';
-                    $documento->save();
+                    // //HISTORIAL DE DOCUMENTO APROBADO
+                    // $documento                              =   new FeDocumentoHistorial;
+                    // $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                    // $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                    // $documento->FECHA                       =   $this->fechaactual;
+                    // $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                    // $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                    // $documento->TIPO                        =   'PROVISIONADO';
+                    // $documento->MENSAJE                     =   '';
+                    // $documento->save();
 
                     //whatsaap para administracion
                     $trabajador         =   STDTrabajador::where('COD_TRAB','=',$fedocumento->COD_CONTACTO)->first();
@@ -198,7 +174,7 @@ class GestionOCAdministracionController extends Controller
     }
 
 
-     public function actionExtornarAprobar($idopcion, $prefijo, $idordencompra,Request $request)
+     public function actionExtornarAprobar($idopcion, $linea,$prefijo, $idordencompra,Request $request)
     {
 
         /******************* validar url **********************/
@@ -208,30 +184,41 @@ class GestionOCAdministracionController extends Controller
         $idoc                   =   $this->funciones->decodificarmaestraprefijo($idordencompra,$prefijo);
         $ordencompra            =   $this->con_lista_cabecera_comprobante_idoc($idoc);
         $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc($idoc);
-        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->first();
-        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->get();
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
+        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
         View::share('titulo','Extornar  Comprobante');
 
 
         if($_POST)
         {
-            $descripcion     =   $request['descripcion'];                
-            FeDocumento::where('ID_DOCUMENTO',$idoc)
+            $descripcion     =   $request['descripcion'];
+
+
+            FeDocumento::where('ID_DOCUMENTO',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')
                         ->update(
                             [
-                                'COD_ESTADO'=>'ETM0000000000001',
-                                'TXT_ESTADO'=>'GENERADO',
+                                'COD_ESTADO'=>'ETM0000000000006',
+                                'TXT_ESTADO'=>'RECHAZADO',
                                 'ind_email_ba'=>0,
-                                'mensaje_exadm'=>$descripcion,
-                                'mensaje_exuc'=>'',
+                                'mensaje_exuc'=>$descripcion,
                                 'mensaje_exap'=>'',
+                                'mensaje_exadm'=>'',
                                 'fecha_ex'=>$this->fechaactual,
                                 'usuario_ex'=>Session::get('usuario')->id
                             ]
                         );
 
-            DB::table('FE_DOCUMENTO_HISTORIAL')->where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->delete();
-            DB::table('ARCHIVOS')->where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->delete();
+            $ordencompra_t                          =   CMPOrden::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->first();
+            //HISTORIAL DE DOCUMENTO APROBADO
+            $documento                              =   new FeDocumentoHistorial;
+            $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+            $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+            $documento->FECHA                       =   $this->fechaactual;
+            $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+            $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+            $documento->TIPO                        =   'RECHAZADO POR ADMINISTRACION';
+            $documento->MENSAJE                     =   '';
+            $documento->save();
 
             return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobantes Lote: '.$ordencompra->COD_ORDEN.' EXTORNADA con EXITO');
         
@@ -243,6 +230,7 @@ class GestionOCAdministracionController extends Controller
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
+                                'linea'                 =>  $linea,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
                             ]);
@@ -254,7 +242,7 @@ class GestionOCAdministracionController extends Controller
 
 
 
-    public function actionAprobarAdministracion($idopcion, $prefijo, $idordencompra,Request $request)
+    public function actionAprobarAdministracion($idopcion, $linea,$prefijo, $idordencompra,Request $request)
     {
 
         /******************* validar url **********************/
@@ -264,127 +252,121 @@ class GestionOCAdministracionController extends Controller
         $idoc                   =   $this->funciones->decodificarmaestraprefijo($idordencompra,$prefijo);
         $ordencompra            =   $this->con_lista_cabecera_comprobante_idoc($idoc);
         $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc($idoc);
-        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->first();
-        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->get();
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
+        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
         View::share('titulo','Aprobar  Comprobante');
 
         if($_POST)
         {
-            $pedido_id          =   $idoc;
-            $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->first();
+
+            try{    
+                
+                DB::beginTransaction();
 
 
-            $filespdf          =   $request['otros'];
-            if(!is_null($filespdf)){
-                //PDF
-                foreach($filespdf as $file){
-
-                        $larchivos       =      Archivo::get();
+                $pedido_id          =   $idoc;
+                $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
 
 
-                    $nombre          =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                    /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
-                    $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
-                    $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
-                    //$nombrefilepdf   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                    $nombrefilepdf   =      count($larchivos).'-'.$file->getClientOriginalName();
-                    $valor           =      $this->versicarpetanoexiste($rutafile);
-                    $rutacompleta    =      $rutafile.'\\'.$nombrefilepdf;
-                    copy($file->getRealPath(),$rutacompleta);
-                    $path            =      $rutacompleta;
+                $filespdf          =   $request['otros'];
+                if(!is_null($filespdf)){
+                    //PDF
+                    foreach($filespdf as $file){
 
-                    $nombreoriginal             =   $file->getClientOriginalName();
-                    $info                       =   new SplFileInfo($nombreoriginal);
-                    $extension                  =   $info->getExtension();
+                            $larchivos       =      Archivo::get();
 
-                    $dcontrol                   =   new Archivo;
-                    $dcontrol->ID_DOCUMENTO     =   $ordencompra->COD_ORDEN;
-                    $dcontrol->DOCUMENTO_ITEM   =   $fedocumento->DOCUMENTO_ITEM;
-                    $dcontrol->TIPO_ARCHIVO     =   'OTROS_UC';
-                    $dcontrol->NOMBRE_ARCHIVO   =   $nombrefilepdf;
-                    $dcontrol->DESCRIPCION_ARCHIVO  =   'OTROS ADMINISTRACION';
-                    $dcontrol->URL_ARCHIVO      =   $path;
-                    $dcontrol->SIZE             =   filesize($file);
-                    $dcontrol->EXTENSION        =   $extension;
-                    $dcontrol->ACTIVO           =   1;
-                    $dcontrol->FECHA_CREA       =   $this->fechaactual;
-                    $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
-                    $dcontrol->save();
-                    //dd($nombre);
+
+                        $nombre          =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
+                        /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
+                        $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
+                        $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
+                        //$nombrefilepdf   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
+                        $nombrefilepdf   =      count($larchivos).'-'.$file->getClientOriginalName();
+                        $valor           =      $this->versicarpetanoexiste($rutafile);
+                        $rutacompleta    =      $rutafile.'\\'.$nombrefilepdf;
+                        copy($file->getRealPath(),$rutacompleta);
+                        $path            =      $rutacompleta;
+
+                        $nombreoriginal             =   $file->getClientOriginalName();
+                        $info                       =   new SplFileInfo($nombreoriginal);
+                        $extension                  =   $info->getExtension();
+
+                        $dcontrol                   =   new Archivo;
+                        $dcontrol->ID_DOCUMENTO     =   $ordencompra->COD_ORDEN;
+                        $dcontrol->DOCUMENTO_ITEM   =   $fedocumento->DOCUMENTO_ITEM;
+                        $dcontrol->TIPO_ARCHIVO     =   'OTROS_UC';
+                        $dcontrol->NOMBRE_ARCHIVO   =   $nombrefilepdf;
+                        $dcontrol->DESCRIPCION_ARCHIVO  =   'OTROS ADMINISTRACION';
+                        $dcontrol->URL_ARCHIVO      =   $path;
+                        $dcontrol->SIZE             =   filesize($file);
+                        $dcontrol->EXTENSION        =   $extension;
+                        $dcontrol->ACTIVO           =   1;
+                        $dcontrol->FECHA_CREA       =   $this->fechaactual;
+                        $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
+                        $dcontrol->save();
+                        //dd($nombre);
+                    }
                 }
-            }else{
-                return Redirect::to('gestion-de-administracion-aprobar/'.$idopcion)->with('errorurl', 'Seleccione Archivo PDF a Importar ');
+
+                $orden                      =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();
+                $detalleproducto            =   CMPDetalleProducto::where('CMP.DETALLE_PRODUCTO.COD_ESTADO','=',1)
+                                                ->where('CMP.DETALLE_PRODUCTO.COD_TABLA','=',$pedido_id)
+                                                ->orderBy('NRO_LINEA','ASC')
+                                                ->get();
+
+                CMPOrden::where('COD_ORDEN','=',$orden->COD_ORDEN)
+                            ->update(
+                                    [
+                                        'COD_OPERACION'=>1
+                                    ]);
+
+                FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
+                            ->update(
+                                [
+                                    'COD_ESTADO'=>'ETM0000000000005',
+                                    'TXT_ESTADO'=>'APROBADO',
+                                    'ind_email_clap'=>0,
+                                    'fecha_ap'=>$this->fechaactual,
+                                    'usuario_ap'=>Session::get('usuario')->id
+                                ]
+                            );
+
+
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento                              =   new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA                       =   $this->fechaactual;
+                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                $documento->TIPO                        =   'APROBADO POR ADMINISTRACION';
+                $documento->MENSAJE                     =   '';
+                $documento->save();
+
+                //whatsaap para administracion
+                $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
+                $ordencompra        =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();            
+                $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO.'%0D%0A'.'Proveedor : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'.'Estado : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
+                $trabajador         =   STDTrabajador::where('COD_TRAB','=',$fedocumento_w->COD_CONTACTO)->first();
+                if($_ENV['APP_PRODUCCION']==0){
+                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                }else{
+                    $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');          
+                }    
+
+                DB::commit();
+                return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' APROBADO CON EXITO');
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                return Redirect::to('gestion-de-administracion-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
-
-            $orden                      =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();
-            $detalleproducto            =   CMPDetalleProducto::where('CMP.DETALLE_PRODUCTO.COD_ESTADO','=',1)
-                                            ->where('CMP.DETALLE_PRODUCTO.COD_TABLA','=',$pedido_id)
-                                            ->orderBy('NRO_LINEA','ASC')
-                                            ->get();
-            //  INSERTAR ORDEN DE INGRESO
-            //almacen lote                                
-            $this->insert_almacen_lote($orden,$detalleproducto);
-            $orden_id = $this->insert_orden($orden,$detalleproducto);                 
-            $this->insert_referencia_asoc($orden,$detalleproducto,$orden_id[0]);
-            $this->insert_detalle_producto($orden,$detalleproducto,$orden_id[0]);
-            //UPDATE DE ORDEN DE COMPRA
-            //$this->update_orden($orden,$detalleproducto);
-            $this->update_detalle_producto($orden,$detalleproducto);
-            CMPOrden::where('COD_ORDEN','=',$orden->COD_ORDEN)
-                        ->update(
-                                [
-                                    'COD_OPERACION'=>1
-                                ]);
-
-            FeDocumento::where('ID_DOCUMENTO',$pedido_id)
-                        ->update(
-                            [
-                                'COD_ESTADO'=>'ETM0000000000005',
-                                'TXT_ESTADO'=>'APROBADO',
-                                'ind_email_clap'=>0,
-                                'fecha_ap'=>$this->fechaactual,
-                                'usuario_ap'=>Session::get('usuario')->id
-                            ]
-                        );
-
-
-            //HISTORIAL DE DOCUMENTO APROBADO
-            $documento                              =   new FeDocumentoHistorial;
-            $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
-            $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
-            $documento->FECHA                       =   $this->fechaactual;
-            $documento->USUARIO_ID                  =   Session::get('usuario')->id;
-            $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
-            $documento->TIPO                        =   'APROBADO POR ADMINISTRACION';
-            $documento->MENSAJE                     =   '';
-            $documento->save();
-
-            //HISTORIAL DE DOCUMENTO APROBADO
-            $documento                              =   new FeDocumentoHistorial;
-            $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
-            $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
-            $documento->FECHA                       =   $this->fechaactual;
-            $documento->USUARIO_ID                  =   Session::get('usuario')->id;
-            $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
-            $documento->TIPO                        =   'PROVISIONADO';
-            $documento->MENSAJE                     =   '';
-            $documento->save();
-
-            //whatsaap para administracion
-            $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->first();
-            $ordencompra        =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();            
-            $mensaje            =   'COMPROBANTE : '.$fedocumento->ID_DOCUMENTO.'%0D%0A'.'Proveedor : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'.'Estado : '.$fedocumento->TXT_ESTADO.'%0D%0A';
-            $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-
-
-            return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' APROBADO CON EXITO');
-        
         }
         else{
 
             $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc($idoc);
-            $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->get();
+            $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
             $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
             $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
@@ -392,10 +374,22 @@ class GestionOCAdministracionController extends Controller
                                         ->where('TXT_ASIGNADO','=','CONTACTO')
                                         ->get();
 
+            $documentohistorial     =   FeDocumentoHistorial::where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                        ->orderBy('FECHA','DESC')
+                                        ->get();
+
+            $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+
+
             return View::make('comprobante/aprobaradm', 
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
+
+                                'linea'                 =>  $linea,
+                                'archivos'              =>  $archivos,
+                                'documentohistorial'    =>  $documentohistorial,
+
                                 'detalleordencompra'    =>  $detalleordencompra,
                                 'detallefedocumento'    =>  $detallefedocumento,
                                 'tarchivos'             =>  $tarchivos,

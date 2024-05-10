@@ -29,7 +29,7 @@ trait UserTraits
 
     private function envio_correo_apcli() {
 
-        $listadocumentos          =   FeDocumento::where('ind_email_clap','=',0)
+        $listadocumentos          =   FeDocumento::where('ind_email_clap','=',0)->where('COD_ESTADO','<>','ETM0000000000006')
                                       ->get();
 
         foreach($listadocumentos as $item){
@@ -76,7 +76,7 @@ trait UserTraits
                 $message->subject('Orden de Compra '.$item->TXT_ESTADO);
             });
 
-            $pedido                             =   FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)->first();
+            $pedido                             =   FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$item->DOCUMENTO_ITEM)->first();
             $pedido->ind_email_clap               =   1;
             $pedido->save();
 
@@ -89,7 +89,7 @@ trait UserTraits
 
     private function envio_correo_co() {
 
-        $listadocumentos          =   FeDocumento::where('ind_email_ap','=',0)
+        $listadocumentos          =   FeDocumento::where('ind_email_ap','=',0)->where('COD_ESTADO','<>','ETM0000000000006')
                                       ->get();
 
         foreach($listadocumentos as $item){
@@ -123,7 +123,7 @@ trait UserTraits
                 $message->subject('Orden de Compra '.$item->TXT_ESTADO);
             });
 
-            $pedido                             =   FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)->first();
+            $pedido                             =   FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$item->DOCUMENTO_ITEM)->first();
             $pedido->ind_email_ap               =   1;
             $pedido->save();
 
@@ -135,7 +135,7 @@ trait UserTraits
 
     private function envio_correo_baja() {
 
-        $listadocumentos          =   FeDocumento::where('ind_email_ba','=',0)
+        $listadocumentos          =   FeDocumento::where('ind_email_ba','=',0)->where('COD_ESTADO','=','ETM0000000000006')
                                       ->get();
 
 
@@ -183,7 +183,7 @@ trait UserTraits
                 $message->subject('Orden de Compra Rechazado');
             });
 
-            $pedido                             =   FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)->first();
+            $pedido                             =   FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$item->DOCUMENTO_ITEM)->first();
             $pedido->ind_email_ba               =   1;
             $pedido->save();
 
@@ -195,7 +195,7 @@ trait UserTraits
 
     private function envio_correo_adm() {
 
-        $listadocumentos          =   FeDocumento::where('ind_email_adm','=',0)
+        $listadocumentos          =   FeDocumento::where('ind_email_adm','=',0)->where('COD_ESTADO','<>','ETM0000000000006')
                                       ->get();
 
         foreach($listadocumentos as $item){
@@ -231,7 +231,7 @@ trait UserTraits
                 $message->subject('Orden de Compra '.$item->TXT_ESTADO);
             });
 
-            $pedido                             =   FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)->first();
+            $pedido                             =   FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$item->DOCUMENTO_ITEM)->first();
             $pedido->ind_email_adm              =   1;
             $pedido->save();
 
@@ -243,7 +243,7 @@ trait UserTraits
 
     private function envio_correo_uc() {
 
-        $listadocumentos          =   FeDocumento::where('ind_email_uc','=',0)
+        $listadocumentos          =   FeDocumento::where('ind_email_uc','=',0)->where('COD_ESTADO','<>','ETM0000000000006')
                                       ->get();
 
         foreach($listadocumentos as $item){
@@ -280,7 +280,7 @@ trait UserTraits
                 $message->subject('Orden de Compra '.$item->TXT_ESTADO);
             });
 
-            $pedido                             =   FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)->first();
+            $pedido                             =   FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$item->DOCUMENTO_ITEM)->first();
             $pedido->ind_email_uc               =   1;
             $pedido->save();
 

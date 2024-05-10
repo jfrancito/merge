@@ -236,14 +236,10 @@ class UserController extends Controller {
 						 ]);
 	}
 
-
-
     public function actionCorreoConfirmacion()
 	{
 		$this->envio_correo_confirmacion();
 	}
-
-
     public function actionCorreoUC()
 	{
 		$this->envio_correo_uc();
@@ -252,18 +248,16 @@ class UserController extends Controller {
 	{
 		$this->envio_correo_co();
 	}
-    public function actionCorreoBaja()
-	{
-		$this->envio_correo_baja();
-	}
-
-
     public function actionCorreoADM()
 	{
 		$this->envio_correo_adm();
 	}
 
 
+    public function actionCorreoBaja()
+	{
+		$this->envio_correo_baja();
+	}
     public function actionCorreoAPCLI()
 	{
 		$this->envio_correo_apcli();

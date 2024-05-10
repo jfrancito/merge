@@ -19,7 +19,7 @@ use App\Modelos\STDEmpresa;
 use App\Modelos\STDTrabajador;
 use App\Modelos\Archivo;
 use App\Modelos\CMPDocAsociarCompra;
-
+use App\Modelos\CMPOrden;
 use Greenter\Parser\DocumentParserInterface;
 use Greenter\Xml\Parser\InvoiceParser;
 use Greenter\Xml\Parser\NoteParser;
@@ -58,11 +58,13 @@ class GestionOCController extends Controller
 
             try{    
                 
+
+
                 DB::beginTransaction();
                 $contacto_id       =   $request['contacto_id'];
                 $procedencia       =   $request['procedencia'];
                 
-                $fedocumento       =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->first();
+                $fedocumento       =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
 
 
                 /**************************** VALIDAR CDR Y LEER RESPUESTA ******************************/
@@ -135,15 +137,13 @@ class GestionOCController extends Controller
 
                 /************************************************************************/
 
-                //dd("descomprimir");
-
-
 
                 $tarchivos         =    CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
                                         ->where('IND_OBLIGATORIO','=',1)
                                         ->where('TXT_ASIGNADO','=','PROVEEDOR')
                                         ->where('COD_CATEGORIA_DOCUMENTO','<>','DCC0000000000003')
                                         ->get();
+
 
                 foreach($tarchivos as $index => $item){
 
@@ -189,39 +189,38 @@ class GestionOCController extends Controller
                     }
                 }
 
-                $contacto                               =   SGDUsuario::where('COD_TRABAJADOR','=',$contacto_id)->first();
-                $trabajador                             =   STDTrabajador::where('COD_TRAB','=',$contacto->COD_TRABAJADOR)->first();
+                $contacto                                 =   SGDUsuario::where('COD_TRABAJADOR','=',$contacto_id)->first();
+                $trabajador                               =   STDTrabajador::where('COD_TRAB','=',$contacto->COD_TRABAJADOR)->first();
                 //$contacto                               =   User::where('id','=',$contacto_id)->first();
 
-                $fedocumento->ARCHIVO_CDR               =   '';
-                $fedocumento->ARCHIVO_PDF               =   '';
-                $fedocumento->COD_ESTADO                =   'ETM0000000000002';
-                $fedocumento->TXT_ESTADO                =   'POR APROBAR USUARIO CONTACTO';
+                FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                            ->update(
+                                [
+                                    'ARCHIVO_CDR'=>'',
+                                    'ARCHIVO_PDF'=>'',
+                                    'COD_ESTADO'=>'ETM0000000000002',
+                                    'TXT_ESTADO'=>'POR APROBAR USUARIO CONTACTO',
+                                    'dni_usuariocontacto'=>$trabajador->NRO_DOCUMENTO,
+                                    'COD_CONTACTO'=>$contacto->COD_TRABAJADOR,
+                                    'CODIGO_CDR'=>$codigocdr,
+                                    'RESPUESTA_CDR'=>$respuestacdr,
+                                    'ind_email_uc'=>0,
+                                    'TXT_CONTACTO'=>$contacto->NOM_TRABAJADOR,
+                                    'fecha_pa'=>$this->fechaactual,
+                                    'usuario_pa'=>Session::get('usuario')->id,
 
-                $fedocumento->dni_usuariocontacto       =   $trabajador->NRO_DOCUMENTO;
-                $fedocumento->COD_CONTACTO              =   $contacto->COD_TRABAJADOR;
+                                ]
+                            );
 
-                $fedocumento->CODIGO_CDR                =   $codigocdr;
-                $fedocumento->RESPUESTA_CDR             =   $respuestacdr;
-
-
-
-                $fedocumento->ind_email_uc              =   0;
-                $fedocumento->TXT_CONTACTO              =   $contacto->NOM_TRABAJADOR;
-                $fedocumento->fecha_pa                  =   $this->fechaactual;
-                $fedocumento->usuario_pa                =   Session::get('usuario')->id;
-                $fedocumento->save();
-
-
+                $ordencompra_t                          =   CMPOrden::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->first();
                 //HISTORIAL DE DOCUMENTO APROBADO
                 $documento                              =   new FeDocumentoHistorial;
                 $documento->ID_DOCUMENTO                =   $ordencompra->COD_ORDEN;
                 $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
-
-                $documento->FECHA                       =   $this->fechaactual;
+                $documento->FECHA                       =   date_format(date_create($ordencompra_t->FEC_USUARIO_CREA_AUD), 'Ymd h:i:s');
                 $documento->USUARIO_ID                  =   $contacto->COD_TRABAJADOR;
                 $documento->USUARIO_NOMBRE              =   $contacto->NOM_TRABAJADOR;
-                $documento->TIPO                        =   'CREADO';
+                $documento->TIPO                        =   'CREO ORDEN COMPRA';
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
@@ -232,7 +231,7 @@ class GestionOCController extends Controller
                 $documento->FECHA                       =   $this->fechaactual;
                 $documento->USUARIO_ID                  =   Session::get('usuario')->id;
                 $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
-                $documento->TIPO                        =   'VALIDADO POR PROVEEDOR';
+                $documento->TIPO                        =   'SUBIO DOCUMENTOS';
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
@@ -258,7 +257,7 @@ class GestionOCController extends Controller
             }catch(\Exception $ex){
                 DB::rollback(); 
 
-                dd($ex);
+                //dd($ex);
                 return Redirect::to('detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
@@ -267,7 +266,6 @@ class GestionOCController extends Controller
         }
     }
    
-
 
     public function actionListarOC($idopcion)
     {
@@ -283,7 +281,7 @@ class GestionOCController extends Controller
         $funcion        =   $this;
         $procedencia    =   'PRO';
         //dd($listadatos);
-
+        //dd($listadatos);
         return View::make('comprobante/listaoc',
                          [
                             'listadatos'        =>  $listadatos,
@@ -331,8 +329,17 @@ class GestionOCController extends Controller
         $idoc                   =   $this->funciones->decodificarmaestraprefijo($idordencompra,$prefijo);
         $ordencompra            =   $this->con_lista_cabecera_comprobante_idoc($idoc);
         $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc($idoc);
-        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->first();
-        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->get();
+
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
+
+        if(count($fedocumento)>0){
+            $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+        }else{
+            $detallefedocumento     =   array();
+        }
+
+        //dd($detallefedocumento);
+
         $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);
         $xmlarchivo             =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE.'xml';
         $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
@@ -343,6 +350,7 @@ class GestionOCController extends Controller
 
         $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
                                     ->where('IND_OBLIGATORIO','=',1)
+                                    ->where('COD_CATEGORIA_DOCUMENTO','<>','DCC0000000000003')
                                     ->where('TXT_ASIGNADO','=','PROVEEDOR')
                                     ->get();
 
@@ -383,13 +391,22 @@ class GestionOCController extends Controller
             {
                 try{    
 
-
-
                         DB::beginTransaction();
-                        DB::table('FE_DOCUMENTO')->where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->delete();
-                        DB::table('FE_DETALLE_DOCUMENTO')->where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->delete();
-                        DB::table('FE_FORMAPAGO')->where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->delete();
-                        DB::table('ARCHIVOS')->where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->delete();
+                        $ordencompra_t        =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
+                        $fedocumento_t          =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
+
+                        //dd($fedocumento_t);
+
+                        if(count($fedocumento_t)>0){
+                            DB::table('FE_DOCUMENTO')->where('ID_DOCUMENTO','=',$fedocumento_t->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$fedocumento_t->DOCUMENTO_ITEM)->delete();
+                            DB::table('FE_DETALLE_DOCUMENTO')->where('ID_DOCUMENTO','=',$fedocumento_t->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$fedocumento_t->DOCUMENTO_ITEM)->delete();
+                            DB::table('FE_FORMAPAGO')->where('ID_DOCUMENTO','=',$fedocumento_t->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$fedocumento_t->DOCUMENTO_ITEM)->delete();
+                            DB::table('ARCHIVOS')->where('ID_DOCUMENTO','=',$fedocumento_t->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$fedocumento_t->DOCUMENTO_ITEM)->delete();
+                            DB::table('FE_DOCUMENTO_HISTORIAL')->where('ID_DOCUMENTO','=',$fedocumento_t->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$fedocumento_t->DOCUMENTO_ITEM)->delete();
+                        }
+
+
+
 
 
                         // /****************************************  COPIAR EL XML .ZIP EN LA CARPETA COMPARTIDA  *********************************/
@@ -455,7 +472,7 @@ class GestionOCController extends Controller
                         $xml = file_get_contents($path);
                         $factura = $parser->parse($xml);
 
-
+                        //dd($factura);
                         /****************************************  DIAS DE CREDITO *****************************************/
                         $diasdefactura = 0;
                         $tp = CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
@@ -470,6 +487,9 @@ class GestionOCController extends Controller
                         //DD($factura);
 
                         $documentolinea                     =   $this->ge_linea_documento($ordencompra->COD_ORDEN);
+
+                        //dd($documentolinea);
+
                         //REGISTRO DEL XML LEIDO
                         $documento                          =   new FeDocumento;
                         $documento->ID_DOCUMENTO            =   $ordencompra->COD_ORDEN;
@@ -519,6 +539,9 @@ class GestionOCController extends Controller
                         $documento->ARCHIVO_PDF             =   '';
                         $documento->COD_CONTACTO            =   '';
                         $documento->TXT_CONTACTO            =   '';
+
+                        $documento->COD_ESTADO              =   '';
+                        $documento->TXT_ESTADO              =   '';
 
                         $documento->ind_email_uc            =   -1;
                         $documento->ind_email_ap            =   -1;
@@ -599,9 +622,9 @@ class GestionOCController extends Controller
                             $token           =      $this->generartoken_is();
                         }
 
-                        $fedocumento         =      FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->first();
+                        $fedocumento         =      FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','<>','ETM0000000000006')->first();
                         $fechaemision        =      date_format(date_create($fedocumento->FEC_VENTA), 'd/m/Y');
-                        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->get();
+                        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
                         //VALIDAR QUE ALGUNOS CAMPOS SEAN IGUALES
                         $this->con_validar_documento($ordencompra,$fedocumento,$detalleordencompra,$detallefedocumento);

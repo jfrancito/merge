@@ -13,7 +13,7 @@
   </div>
 </div>
 <div class='inputr'>
-  <div class="control-label">Dirección Fiscal <span class='requerido'>*</span>:</div>
+  <div class="control-label">Local de Establecimiento <span class='requerido'>*</span>:</div>
   <div class="abajocaja">
 
     <input  type="text"

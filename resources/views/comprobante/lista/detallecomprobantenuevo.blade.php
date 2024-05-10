@@ -44,6 +44,10 @@
                             <p style="margin:0px;"><b>Estado Ruc</b> : {{$fedocumento->nestadoRuc}}</p>
                             <p style="margin:0px;"><b>Estado Domicilio</b> : {{$fedocumento->ncondDomiRuc}}</p>
 
+
+                            <p style="margin:0px;"><b>Respuesta CDR</b> : {{$fedocumento->RESPUESTA_CDR}}</p>
+
+
                         </div>
                     @endif
                 </div>
@@ -123,9 +127,9 @@
                               <td>
                                 <div class='subtitulomerge @if($fedocumento->ind_cantidaditem == 1) msjexitoso @else msjerror @endif'>
                                   {{$fedocumento->FORMA_PAGO}}
-                                  @if($tp->CODIGO_SUNAT == 'CRE')
+<!--                                   @if($tp->CODIGO_SUNAT == 'CRE')
                                     A {{$fedocumento->FORMA_PAGO_DIAS}} DIAS
-                                  @endif
+                                  @endif -->
                                 </div>
                               </td>
                             </tr>
@@ -282,7 +286,7 @@
                                   @foreach($tarchivos as $index => $item)  
                                     <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
                                       <div class="form-group sectioncargarimagen">
-                                          <label class="col-sm-12 control-label"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}}</b></label>
+                                          <label class="col-sm-12 control-label"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}} ({{$item->TXT_FORMATO}})</b></label>
                                           <div class="col-sm-12">
                                               <div class="file-loading">
                                                   <input 

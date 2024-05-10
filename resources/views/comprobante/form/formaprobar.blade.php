@@ -73,6 +73,110 @@
       </div>
     </div>
   </div>
+  <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+
+    <div class="panel panel-default panel-contrast">
+      <div class="panel-heading" style="background: #177bbb;color: #fff;">CONSULTA API SUNAT
+      </div>
+      <div class="panel-body panel-body-contrast">
+          @if(count($fedocumento)<=0)
+              <div class="col-sm-12">
+                  <b>CARGAR XML</b>
+              </div>
+          @else
+              <div class="col-sm-12">
+                  <p style="margin:0px;"><b>Respuesta Sunat</b> : {{$fedocumento->message}}</p>
+                  <p style="margin:0px;" class='@if($fedocumento->estadoCp == 1) msjexitoso @else msjerror @endif'><b>Estado Comprobante</b> : 
+                      {{$fedocumento->nestadoCp}}
+                  </p>
+                  <p style="margin:0px;"><b>Estado Ruc</b> : {{$fedocumento->nestadoRuc}}</p>
+                  <p style="margin:0px;"><b>Estado Domicilio</b> : {{$fedocumento->ncondDomiRuc}}</p>
+                  <p style="margin:0px;"><b>Respuesta CDR</b> : {{$fedocumento->RESPUESTA_CDR}}</p>
+
+
+              </div>
+          @endif
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+    <div class="panel panel-default panel-contrast">
+      <div class="panel-heading" style="background: #177bbb;color: #fff;">SEGUIMIENTO DE DOCUMENTO
+      </div>
+      <div class="panel-body panel-body-contrast">
+        <table class="table table-condensed table-striped">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Usuario</th>      
+              <th>Tipo</th>
+            </tr>
+          </thead>
+          <tbody>
+
+              @foreach($documentohistorial as $index => $item)  
+                <tr>
+                  <td>{{date_format(date_create($item->FECHA), 'd-m-Y H:i:s')}}</td>
+                  <td>{{$item->USUARIO_NOMBRE}}</td>
+                  <td><b>{{$item->TIPO}}</</b><td>
+                </tr>
+              @endforeach
+
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div> 
+
+</div>
+
+
+
+<div class="row">
+
+
+  <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+    <div class="panel panel-default panel-contrast">
+      <div class="panel-heading" style="background: #177bbb;color: #fff;">ARCHIVOS
+      </div>
+      <div class="panel-body panel-body-contrast">
+        <table class="table table-condensed table-striped">
+          <thead>
+            <tr>
+              <th>Nro</th>
+              <th>Nombre</th>      
+              <th>Archivo</th>       
+              <th>Opciones</th>
+            </tr>
+          </thead>
+          <tbody>
+              @foreach($archivos as $index => $item)  
+                <tr>
+                  <td>{{$index + 1}}</td>
+                  <td>{{$item->DESCRIPCION_ARCHIVO}}</td>
+                  <td>{{$item->NOMBRE_ARCHIVO}}</td>
+
+                  <td class="rigth">
+                    <div class="btn-group btn-hspace">
+                      <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>
+                      <ul role="menu" class="dropdown-menu pull-right">
+                        <li>
+                          <a href="{{ url('/descargar-archivo-requerimiento/'.$item->TIPO_ARCHIVO.'/'.$idopcion.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}">
+                            Descargar
+                          </a>  
+                        </li>
+                      </ul>
+                    </div>
+                  </td>
+                </tr>
+              @endforeach
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <div class="col-xs-12 col-sm-6 col-md-8 col-lg-8">
     <div class="panel panel-default panel-contrast">
       <div class="panel-heading" style="background: #177bbb;color: #fff;">INFORMACION DEL DOCUMENTO
@@ -190,10 +294,15 @@
 
                             </div>
                           </div>
+
+
       </div>
     </div>
   </div>
+
+
 </div>
+
 
 <div class="row">
   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
@@ -205,7 +314,7 @@
                 @foreach($tarchivos as $index => $item)  
                   <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
                     <div class="form-group sectioncargarimagen">
-                        <label class="col-sm-12 control-label" style="text-align: left;"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}}</b> 
+                        <label class="col-sm-12 control-label" style="text-align: left;"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}} ({{$item->TXT_FORMATO}})</b> 
                           @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000005') <b>(Descargue el pdf de este enlace <a href="https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaWeb.jsp" target="_blank">Sunat</a> y subalo para que pueda aprobar</b>) @else <br><br> @endif
                         </label>
                         <div class="col-sm-12">
@@ -233,7 +342,7 @@
                               class="file-es"  
                               type="file" 
                               multiple data-max-file-count="1"
-                              required>
+                              >
                           </div>
                       </div>
                   </div>

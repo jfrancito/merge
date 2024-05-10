@@ -28,16 +28,16 @@
               <li>
 
                 @if(is_null($item->COD_ESTADO)) 
-                    <a href="{{ url('/detalle-comprobante-oc/'.$idopcion.'/'.substr($item->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($item->COD_ORDEN, -10))) }}">
+                    <a href="{{ url('/detalle-comprobante-oc/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($item->COD_ORDEN, -10))) }}">
                       Registro XML
                     </a>
                 @else
                   @if($item->COD_ESTADO != 'ETM0000000000001') 
-                      <a href="{{ url('/detalle-comprobante-oc-validado/'.$idopcion.'/'.substr($item->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($item->COD_ORDEN, -10))) }}">
+                      <a href="{{ url('/detalle-comprobante-oc-validado/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($item->COD_ORDEN, -10))) }}">
                         Detalle de Registro
                       </a>
                   @else
-                      <a href="{{ url('/detalle-comprobante-oc/'.$idopcion.'/'.substr($item->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($item->COD_ORDEN, -10))) }}">
+                      <a href="{{ url('/detalle-comprobante-oc/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($item->COD_ORDEN, -10))) }}">
                         Registro XML
                       </a>
                   @endif

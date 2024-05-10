@@ -12,6 +12,8 @@ use App\Modelos\FeDocumento;
 use App\Modelos\CMPCategoria;
 use App\Modelos\CMPOrden;
 use App\Modelos\STDTrabajador;
+use App\Modelos\SGDUsuario;
+
 
 
 
@@ -161,17 +163,17 @@ trait ComprobanteTraits
 
 		$tp = CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
 
-		if($tp->CODIGO_SUNAT == substr(strtoupper($fedocumento->FORMA_PAGO), 0, 3)){
+		// if($tp->CODIGO_SUNAT == substr(strtoupper($fedocumento->FORMA_PAGO), 0, 3)){
 
-			if( $tp->CODIGO_SUNAT == 'CRE' ){
-				$ind_formapago 			=	1;	
-				$diasdeorden = $tp->COD_CTBLE;
-				if($fedocumento->FORMA_PAGO_DIAS != $diasdeorden){
-					$ind_formapago 			=	0;
-					$ind_errototal 			=	0; 
-				}
-			}
-		}else{ 	$ind_errototal 		=	0;  }
+		// 	if( $tp->CODIGO_SUNAT == 'CRE' ){
+		// 		$ind_formapago 			=	1;	
+		// 		$diasdeorden = $tp->COD_CTBLE;
+		// 		if($fedocumento->FORMA_PAGO_DIAS != $diasdeorden){
+		// 			$ind_formapago 			=	0;
+		// 			$ind_errototal 			=	0; 
+		// 		}
+		// 	}
+		// }else{ 	$ind_errototal 		=	0;  }
 
 
         FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)
@@ -192,11 +194,17 @@ trait ComprobanteTraits
 
 	private function con_lista_cabecera_comprobante($cliente_id) {
 
-		$listadatos 	= 	VMergeOC::leftJoin('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
+		$estado_no      =   'ETM0000000000006';
+
+		$listadatos 	= 	VMergeOC:://leftJoin('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
+						    leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+								        $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
+								            ->where('COD_ESTADO', '<>', 'ETM0000000000006');
+								    })
 							->where('COD_EMPR_CLIENTE','=',$cliente_id)
 							->where('VMERGEOC.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
 							->where(function ($query) {
-							    $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
+							    $query->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000001')
 							    	  ->orWhereNull('FE_DOCUMENTO.COD_ESTADO');
 							})
 							->select(DB::raw('	COD_ORDEN,
@@ -212,6 +220,7 @@ trait ComprobanteTraits
 							->groupBy('FEC_ORDEN')
 							->groupBy('TXT_CATEGORIA_MONEDA')
 							->groupBy('TXT_EMPR_CLIENTE')
+							//->havingRaw("MAX(COD_ESTADO) <> 'ETM0000000000006'")
 							->get();
 
 	 	return  $listadatos;
@@ -221,8 +230,26 @@ trait ComprobanteTraits
 
 	private function con_lista_cabecera_comprobante_administrativo($cliente_id) {
 
-		$listadatos 	= 	VMergeOC::leftJoin('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
+		$trabajador 		 = 		STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+		$array_trabajadores  =		STDTrabajador::where('NRO_DOCUMENTO','=',$trabajador->NRO_DOCUMENTO)
+									->pluck('COD_TRAB')
+									->toArray();
+
+		$array_usuarios  	 =		SGDUsuario::whereIn('COD_TRABAJADOR',$array_trabajadores)
+									->pluck('COD_USUARIO')
+									->toArray();
+									
+
+
+
+		$estado_no      =   'ETM0000000000006';
+		$listadatos 	= 	VMergeOC:://leftJoin('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
 							//->where('COD_EMPR_CLIENTE','=',$cliente_id)
+						    leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+								        $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
+								            ->where('COD_ESTADO', '<>', 'ETM0000000000006');
+								    })
+						    ->whereIn('VMERGEOC.COD_USUARIO_CREA_AUD',$array_usuarios)
 							->where('VMERGEOC.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
 							->where(function ($query) {
 							    $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
@@ -232,6 +259,7 @@ trait ComprobanteTraits
 												FEC_ORDEN,
 												TXT_CATEGORIA_MONEDA,
 												TXT_EMPR_CLIENTE,
+												COD_USUARIO_CREA_AUD,
 												MAX(CAN_TOTAL) CAN_TOTAL,
 												MAX(ID_DOCUMENTO) AS ID_DOCUMENTO,
 												MAX(COD_ESTADO) AS COD_ESTADO,
@@ -241,6 +269,7 @@ trait ComprobanteTraits
 							->groupBy('FEC_ORDEN')
 							->groupBy('TXT_CATEGORIA_MONEDA')
 							->groupBy('TXT_EMPR_CLIENTE')
+							->groupBy('COD_USUARIO_CREA_AUD')
 							->get();
 
 	 	return  $listadatos;

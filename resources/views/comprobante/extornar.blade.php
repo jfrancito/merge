@@ -15,7 +15,7 @@
         <div class="panel panel-default panel-border-color panel-border-color-primary">
           <div class="panel-heading panel-heading-divider">Extornar Comprobante<span class="panel-subtitle">Extornar un Comprobante</span></div>
           <div class="panel-body">
-            <form method="POST" id='formpedido' action="{{ url('/extornar-pre-aprobar-comprobante/'.$idopcion.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
+            <form method="POST" id='formpedido' action="{{ url('/extornar-pre-aprobar-comprobante/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                   {{ csrf_field() }}
               @include('comprobante.form.formextornar')
             </form>

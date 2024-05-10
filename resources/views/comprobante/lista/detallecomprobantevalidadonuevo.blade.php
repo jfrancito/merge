@@ -104,6 +104,8 @@
                             </p>
                             <p style="margin:0px;"><b>Estado Ruc</b> : {{$fedocumento->nestadoRuc}}</p>
                             <p style="margin:0px;"><b>Estado Domicilio</b> : {{$fedocumento->ncondDomiRuc}}</p>
+                            <p style="margin:0px;"><b>Respuesta CDR</b> : {{$fedocumento->RESPUESTA_CDR}}</p>
+
 
                         </div>
                     @endif
@@ -111,6 +113,46 @@
               </div>
             </div>
  
+            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+              <div class="panel panel-default panel-contrast">
+                <div class="panel-heading" style="background: #177bbb;color: #fff;">SEGUIMIENTO DE DOCUMENTO
+                </div>
+                <div class="panel-body panel-body-contrast">
+                  <table class="table table-condensed table-striped">
+                    <thead>
+                      <tr>
+                        <th>Fecha</th>
+                        <th>Usuario</th>      
+                        <th>Tipo</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+
+                        @foreach($documentohistorial as $index => $item)  
+                          <tr>
+                            <td>{{date_format(date_create($item->FECHA), 'd-m-Y H:i:s')}}</td>
+                            <td>{{$item->USUARIO_NOMBRE}}</td>
+                            <td><b>{{$item->TIPO}}</</b><td>
+                          </tr>
+                        @endforeach
+
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div> 
+
+
+
+
+ 
+          </div>
+
+
+
+          <div class="row">
+
+
             <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
               <div class="panel panel-default panel-contrast">
                 <div class="panel-heading" style="background: #177bbb;color: #fff;">ARCHIVOS
@@ -151,42 +193,6 @@
                 </div>
               </div>
             </div>
-
- 
-          </div>
-
-
-
-          <div class="row">
-            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-
-              <div class="panel panel-default panel-contrast">
-                <div class="panel-heading" style="background: #177bbb;color: #fff;">SEGUIMIENTO DE DOCUMENTO
-                </div>
-                <div class="panel-body panel-body-contrast">
-                  <table class="table table-condensed table-striped">
-                    <thead>
-                      <tr>
-                        <th>Fecha</th>
-                        <th>Usuario</th>      
-                        <th>Tipo</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-
-                        @foreach($documentohistorial as $index => $item)  
-                          <tr>
-                            <td>{{$item->FECHA}}</td>
-                            <td>{{$item->USUARIO_NOMBRE}}</td>
-                            <td><b>{{$item->TIPO}}</</b><td>
-                          </tr>
-                        @endforeach
-
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div> 
 
             <div class="col-xs-12 col-sm-6 col-md-8 col-lg-8">
               <div class="panel panel-default panel-contrast">
@@ -310,6 +316,8 @@
                 </div>
               </div>
             </div>
+
+
           </div>
         </div>
 </div>

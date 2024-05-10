@@ -35,7 +35,7 @@ trait GeneralesTraits
 	{
 		$item = 1;
 
-		$fedocumento = FeDocumento::where('ID_DOCUMENTO','=',$orden_id)->first();
+		$fedocumento = FeDocumento::where('ID_DOCUMENTO','=',$orden_id)->get();
 
 		if(count($fedocumento)>0){
 			$item = count($fedocumento)+1;

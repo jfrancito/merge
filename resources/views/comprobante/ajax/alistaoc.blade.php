@@ -6,6 +6,8 @@
       <th>MONEDA</th>
       <th>PROVEEDOR</th>
       <th>TOTAL</th>
+      <th>USUARIO CREACION</th>
+
       <th>ESTADO</th>
       <th>OPCION</th>
     </tr>
@@ -19,6 +21,8 @@
         <td>{{$item->TXT_EMPR_CLIENTE}}</td>
         <td>{{$item->CAN_TOTAL}}</td>
 
+        <td>{{$item->COD_USUARIO_CREA_AUD}}</td>
+
         @include('comprobante.ajax.estados')
 
         <td class="rigth">
@@ -31,12 +35,18 @@
                       Registro XML
                     </a>
                 @else
-                  @if($item->COD_ESTADO != 'ETM0000000000001') 
+                  @if($item->COD_ESTADO != 'ETM0000000000001')
+                    @if($item->COD_ESTADO != 'ETM0000000000006')
                       <a href="{{ url('/detalle-comprobante-oc-validado/'.$idopcion.'/'.substr($item->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($item->COD_ORDEN, -10))) }}">
                         Detalle de Registro
                       </a>
+                    @else
+                      <a href="{{ url('/detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.substr($item->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($item->COD_ORDEN, -10))) }}">
+                        Registro XML
+                      </a>
+                    @endif
                   @else
-                      <a href="{{ url('/detalle-comprobante-oc/'.$idopcion.'/'.substr($item->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($item->COD_ORDEN, -10))) }}">
+                      <a href="{{ url('/detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.substr($item->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($item->COD_ORDEN, -10))) }}">
                         Registro XML
                       </a>
                   @endif

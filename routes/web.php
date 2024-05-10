@@ -73,7 +73,7 @@ Route::group(['middleware' => ['authaw']], function () {
 
 
 	Route::any('/gestion-de-oc-validado-proveedores/{idopcion}', 'GestionOCValidadoController@actionListarOCValidado');
-	Route::any('/detalle-comprobante-oc-validado/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidado');
+	Route::any('/detalle-comprobante-oc-validado/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidado');
 	Route::any('/gestion-de-historial-comprobantes/{idopcion}', 'GestionOCValidadoController@actionListarOCHistorial');
 
 
@@ -81,21 +81,21 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/gestion-de-comprobante-us/{idopcion}', 'GestionUsuarioContactoController@actionListarComprobanteUsuarioContacto');
 	Route::any('/pre-aprobar-documentos/{idopcion}', 'GestionUsuarioContactoController@actionListarPreAprobarUsuarioContacto');
-	Route::any('/extornar-pre-aprobar-comprobante/{idopcion}/{prefijo}/{idordencompra}', 'GestionUsuarioContactoController@actionExtornarPreAprobar');
-	Route::any('/aprobar-comprobante-uc/{idopcion}/{prefijo}/{idordencompra}', 'GestionUsuarioContactoController@actionAprobarUC');
+	Route::any('/extornar-pre-aprobar-comprobante/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionUsuarioContactoController@actionExtornarPreAprobar');
+	Route::any('/aprobar-comprobante-uc/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionUsuarioContactoController@actionAprobarUC');
 
 
 	Route::any('/gestion-de-contabilidad-aprobar/{idopcion}', 'GestionOCContabilidadController@actionListarComprobanteContabilidad');
 	Route::any('/aprobar-documentos/{idopcion}', 'GestionOCContabilidadController@actionListarAprobarUsuarioContacto');
-	Route::any('/extornar-aprobar-comprobante/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionExtornarAprobar');
-	Route::any('/aprobar-comprobante-contabilidad/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAprobarContabilidad');
+	Route::any('/extornar-aprobar-comprobante/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionExtornarAprobar');
+	Route::any('/aprobar-comprobante-contabilidad/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAprobarContabilidad');
 
 
 
 	Route::any('/gestion-de-administracion-aprobar/{idopcion}', 'GestionOCAdministracionController@actionListarComprobanteAdministracion');
 	Route::any('/aprobar-documentos-administracion/{idopcion}', 'GestionOCAdministracionController@actionListarAprobarAdministracion');
-	Route::any('/extornar-aprobar-comprobante-administrador/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCAdministracionController@actionExtornarAprobar');
-	Route::any('/aprobar-comprobante-administracion/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCAdministracionController@actionAprobarAdministracion');
+	Route::any('/extornar-aprobar-comprobante-administrador/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCAdministracionController@actionExtornarAprobar');
+	Route::any('/aprobar-comprobante-administracion/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCAdministracionController@actionAprobarAdministracion');
 
 
 

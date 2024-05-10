@@ -1,7 +1,7 @@
 <table id="nso" class="table table-striped table-borderless table-hover td-color-borde td-padding-7 listatabla">
   <thead>
     <tr>
-      <th>ORDEN VENTA</th>
+      <th>ORDEN COMPRA</th>
       <th>FACTURA</th>
       <th>ESTADO</th>
       <th>OPCION</th>
@@ -15,6 +15,8 @@
           <span><b>FECHA  : {{$item->FEC_ORDEN}}</b></span>
           <span><b>PROVEEDOR : </b> {{$item->TXT_EMPR_CLIENTE}}</span>
           <span><b>TOTAL : </b> {{$item->CAN_TOTAL}}</span>
+          <span><b>LINEA : </b> {{$item->DOCUMENTO_ITEM}}</span>
+
         </td>
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>SERIE : {{$item->SERIE}} </b> </span>
@@ -29,7 +31,7 @@
             <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>
             <ul role="menu" class="dropdown-menu pull-right">
               <li>
-                <a href="{{ url('/detalle-comprobante-oc-validado/'.$idopcion.'/'.substr($item->ID_DOCUMENTO, 0,6).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -10))) }}">
+                <a href="{{ url('/detalle-comprobante-oc-validado/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,6).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -10))) }}">
                     Detalle de Registro
                 </a>
               </li>
