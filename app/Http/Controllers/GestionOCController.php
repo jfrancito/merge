@@ -406,7 +406,7 @@ class GestionOCController extends Controller
                         $ordencompra_t        =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
                         $fedocumento_t          =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
 
-                        dd($fedocumento_t);
+                        //dd($fedocumento_t);
 
                         if(count($fedocumento_t)>0){
                             DB::table('FE_DOCUMENTO')->where('ID_DOCUMENTO','=',$fedocumento_t->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$fedocumento_t->DOCUMENTO_ITEM)->delete();
