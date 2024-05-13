@@ -57,6 +57,9 @@ class GestionOCContabilidadController extends Controller
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
         //falta usuario contacto
         $listadatos     =   $this->con_lista_cabecera_comprobante_total_cont($cod_empresa);
+
+
+        //dd($listadatos);
         $funcion        =   $this;
         return View::make('comprobante/listacontabilidad',
                          [
@@ -172,8 +175,8 @@ class GestionOCContabilidadController extends Controller
         if($validarurl <> 'true'){return $validarurl;}
         /******************************************************/
         $idoc                   =   $this->funciones->decodificarmaestraprefijo($idordencompra,$prefijo);
-        $ordencompra            =   $this->con_lista_cabecera_comprobante_idoc($idoc);
-        $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc($idoc);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_idoc_actual($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc_actual($idoc);
         $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
         $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
         View::share('titulo','Extornar  Comprobante');
@@ -240,8 +243,8 @@ class GestionOCContabilidadController extends Controller
         if($validarurl <> 'true'){return $validarurl;}
         /******************************************************/
         $idoc                   =   $this->funciones->decodificarmaestraprefijo($idordencompra,$prefijo);
-        $ordencompra            =   $this->con_lista_cabecera_comprobante_idoc($idoc);
-        $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc($idoc);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_idoc_actual($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc_actual($idoc);
         $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
         $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
         View::share('titulo','Aprobar Comprobante');

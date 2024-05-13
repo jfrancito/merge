@@ -84,13 +84,18 @@ class GestionOCValidadoController extends Controller
         View::share('titulo','Detalle de Comprobante');
 
         $idoc                   =   $this->funciones->decodificarmaestraprefijo($idordencompra,$prefijo);
-        $ordencompra            =   $this->con_lista_cabecera_comprobante_idoc($idoc);
-        $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc($idoc);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_idoc_actual($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc_actual($idoc);
 
         $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
 
         $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+
+
         $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);
+
+
+
         $xmlarchivo             =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE.'\\'.$fedocumento->ARCHIVO_XML;
         $cdrarchivo             =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE.'\\'.$fedocumento->ARCHIVO_CDR;
         $pdfarchivo             =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE.'\\'.$fedocumento->ARCHIVO_PDF;
@@ -101,7 +106,7 @@ class GestionOCValidadoController extends Controller
         //dd($documentohistorial);
         $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
         $funcion                =   $this;
-
+        //dd($archivos);
         return View::make('comprobante/registrocomprobantevalidado',
                          [
                             'ordencompra'           =>  $ordencompra,
@@ -110,6 +115,8 @@ class GestionOCValidadoController extends Controller
                             'detallefedocumento'    =>  $detallefedocumento,
                             'documentohistorial'    =>  $documentohistorial,
                             'archivos'              =>  $archivos,
+                            'linea'            =>  $linea,
+                            
                             'xmlarchivo'            =>  $xmlarchivo,
                             'tp'                    =>  $tp,
                             'funcion'               =>  $funcion,
@@ -117,12 +124,12 @@ class GestionOCValidadoController extends Controller
                          ]);
     }
 
-    public function actionDescargar($tipo,$idopcion, $prefijo, $idordencompra, Request $request)
+    public function actionDescargar($tipo,$idopcion,$linea, $prefijo, $idordencompra, Request $request)
     {
 
         $idoc                   =   $this->funciones->decodificarmaestraprefijo($idordencompra,$prefijo);
-        $ordencompra            =   $this->con_lista_cabecera_comprobante_idoc($idoc);
-        $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc($idoc);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_idoc_actual($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc_actual($idoc);
         $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
         $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
         $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);

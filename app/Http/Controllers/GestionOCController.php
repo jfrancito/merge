@@ -111,29 +111,29 @@ class GestionOCController extends Controller
                 $codigocdr = '';
                 $respuestacdr = '';
                 $factura_cdr_id = '';
-                if (file_exists($extractedFile)) {
-                    $xml = simplexml_load_file($extractedFile);
-                    foreach($xml->xpath('//cbc:ResponseCode') as $ResponseCode)
-                    {
-                        $codigocdr  = $ResponseCode;
-                    }
-                    foreach($xml->xpath('//cbc:Description') as $Description)
-                    {
-                        $respuestacdr  = $Description;
-                    }
-                    foreach($xml->xpath('//cbc:ID') as $ID)
-                    {
-                        $factura_cdr_id  = $ID;
-                    }
+                // if (file_exists($extractedFile)) {
+                //     $xml = simplexml_load_file($extractedFile);
+                //     foreach($xml->xpath('//cbc:ResponseCode') as $ResponseCode)
+                //     {
+                //         $codigocdr  = $ResponseCode;
+                //     }
+                //     foreach($xml->xpath('//cbc:Description') as $Description)
+                //     {
+                //         $respuestacdr  = $Description;
+                //     }
+                //     foreach($xml->xpath('//cbc:ID') as $ID)
+                //     {
+                //         $factura_cdr_id  = $ID;
+                //     }
 
-                    //DD($codigocdr);
-                } else {
-                    return Redirect::to('detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Error al intentar descomprimir el CDR');
-                }
-                $nombre_doc = $fedocumento->SERIE.'-'.$fedocumento->NUMERO;
-                if($factura_cdr_id != $nombre_doc){
-                    return Redirect::to('detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'El CDR ('.$factura_cdr_id.') no coincide con la factura ('.$nombre_doc.')');
-                }
+                //     //DD($codigocdr);
+                // } else {
+                //     return Redirect::to('detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Error al intentar descomprimir el CDR');
+                // }
+                // $nombre_doc = $fedocumento->SERIE.'-'.$fedocumento->NUMERO;
+                // if($factura_cdr_id != $nombre_doc){
+                //     return Redirect::to('detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'El CDR ('.$factura_cdr_id.') no coincide con la factura ('.$nombre_doc.')');
+                // }
 
                 /************************************************************************/
 
@@ -243,14 +243,14 @@ class GestionOCController extends Controller
                                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
                                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
                                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A';
+                $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
 
-
-                if($_ENV['APP_PRODUCCION']==0){
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                }else{
-                    $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');          
-                }                       
+                // if($_ENV['APP_PRODUCCION']==0){
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                // }else{
+                //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');          
+                // }                       
 
                 DB::commit();
 

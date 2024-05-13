@@ -13,7 +13,7 @@ use App\Modelos\CMPCategoria;
 use App\Modelos\CMPOrden;
 use App\Modelos\STDTrabajador;
 use App\Modelos\SGDUsuario;
-
+use App\Modelos\VMergeActual;
 
 
 
@@ -163,6 +163,11 @@ trait ComprobanteTraits
 
 		$tp = CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
 
+		if($tp->CODIGO_SUNAT == substr(strtoupper(ltrim(rtrim($fedocumento->FORMA_PAGO))), 0, 3)){
+			$ind_formapago 			=	1;	
+		}else{ 	$ind_errototal 		=	0;  }
+
+
 		// if($tp->CODIGO_SUNAT == substr(strtoupper($fedocumento->FORMA_PAGO), 0, 3)){
 
 		// 	if( $tp->CODIGO_SUNAT == 'CRE' ){
@@ -301,6 +306,28 @@ trait ComprobanteTraits
 	}
 
 
+	private function con_lista_cabecera_comprobante_idoc_actual($idoc) {
+
+		$oc 	= 	VMergeActual::where('COD_ORDEN','=',$idoc)
+							->select(DB::raw('COD_ORDEN,COD_EMPR,NOM_EMPR,TXT_CATEGORIA_MONEDA,NRO_DOCUMENTO,FEC_ORDEN,
+												TXT_CATEGORIA_MONEDA,TXT_EMPR_CLIENTE,NRO_DOCUMENTO_CLIENTE,MAX(CAN_TOTAL) CAN_TOTAL,COD_CATEGORIA_TIPO_PAGO
+												,COD_USUARIO_CREA_AUD'))
+							->groupBy('COD_ORDEN')
+							->groupBy('FEC_ORDEN')
+							->groupBy('TXT_CATEGORIA_MONEDA')
+							->groupBy('TXT_EMPR_CLIENTE')
+							->groupBy('NRO_DOCUMENTO_CLIENTE')
+							->groupBy('NRO_DOCUMENTO')
+							->groupBy('COD_EMPR')
+							->groupBy('NOM_EMPR')
+							->groupBy('TXT_CATEGORIA_MONEDA')
+							->groupBy('COD_CATEGORIA_TIPO_PAGO')
+							->groupBy('COD_USUARIO_CREA_AUD')
+							->first();
+
+	 	return  $oc;
+	}
+
 
 	private function con_lista_cabecera_comprobante_idoc($idoc) {
 
@@ -327,6 +354,17 @@ trait ComprobanteTraits
 	private function con_lista_detalle_comprobante_idoc($idoc) {
 
 		$doc 	= 	VMergeOC::where('COD_ORDEN','=',$idoc)
+
+							->get();
+
+	 	return  $doc;
+
+	}
+
+	private function con_lista_detalle_comprobante_idoc_actual($idoc) {
+
+		$doc 	= 	VMergeOC::where('COD_ORDEN','=',$idoc)
+
 							->get();
 
 	 	return  $doc;
