@@ -111,29 +111,38 @@ class GestionOCController extends Controller
                 $codigocdr = '';
                 $respuestacdr = '';
                 $factura_cdr_id = '';
-                // if (file_exists($extractedFile)) {
-                //     $xml = simplexml_load_file($extractedFile);
-                //     foreach($xml->xpath('//cbc:ResponseCode') as $ResponseCode)
-                //     {
-                //         $codigocdr  = $ResponseCode;
-                //     }
-                //     foreach($xml->xpath('//cbc:Description') as $Description)
-                //     {
-                //         $respuestacdr  = $Description;
-                //     }
-                //     foreach($xml->xpath('//cbc:ID') as $ID)
-                //     {
-                //         $factura_cdr_id  = $ID;
-                //     }
+                $sw = 0;
+                $nombre_doc = $fedocumento->SERIE.'-'.$fedocumento->NUMERO;
 
-                //     //DD($codigocdr);
-                // } else {
-                //     return Redirect::to('detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Error al intentar descomprimir el CDR');
-                // }
-                // $nombre_doc = $fedocumento->SERIE.'-'.$fedocumento->NUMERO;
-                // if($factura_cdr_id != $nombre_doc){
-                //     return Redirect::to('detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'El CDR ('.$factura_cdr_id.') no coincide con la factura ('.$nombre_doc.')');
-                // }
+
+                if (file_exists($extractedFile)) {
+                    $xml = simplexml_load_file($extractedFile);
+                    foreach($xml->xpath('//cbc:ResponseCode') as $ResponseCode)
+                    {
+                        $codigocdr  = $ResponseCode;
+                    }
+                    foreach($xml->xpath('//cbc:Description') as $Description)
+                    {
+                        $respuestacdr  = $Description;
+                    }
+                    foreach($xml->xpath('//cbc:ID') as $ID)
+                    {
+                        $factura_cdr_id  = $ID;
+                        if($factura_cdr_id == $nombre_doc){
+                            $sw = 1;
+                        }
+                    }
+                    //DD($codigocdr);
+                } else {
+                    return Redirect::to('detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Error al intentar descomprimir el CDR');
+                }
+
+                if($sw == 0){
+                    return Redirect::to('detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'El CDR ('.$factura_cdr_id.') no coincide con la factura ('.$nombre_doc.')');
+                }
+
+                //dd("si conicide");
+
 
                 /************************************************************************/
 
@@ -237,20 +246,19 @@ class GestionOCController extends Controller
 
 
                 //LE LLEGA AL USUARIO DE CONTACTO
-                $trabajador         =   STDTrabajador::where('COD_TRAB','=',$fedocumento->COD_CONTACTO)->first();
+                $trabajador         =   STDTrabajador::where('COD_TRAB','=',$contacto->COD_TRABAJADOR)->first();
                 $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
                 $mensaje            =   'COMPROBANTE : '.$fedocumento->ID_DOCUMENTO
                                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
                                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
                                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A';
-                $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-
-                // if($_ENV['APP_PRODUCCION']==0){
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                // }else{
-                //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');          
-                // }                       
+                //dd($trabajador);                        
+                if($_ENV['APP_PRODUCCION']==0){
+                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                }else{
+                    $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');          
+                }                       
 
                 DB::commit();
 
@@ -385,6 +393,9 @@ class GestionOCController extends Controller
 
         $procedencia            =   $request['procedencia'];
 
+        //dd("hola");
+
+
         if($_POST)
         {
             if (!empty($file)) 
@@ -395,7 +406,7 @@ class GestionOCController extends Controller
                         $ordencompra_t        =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
                         $fedocumento_t          =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
 
-                        //dd($fedocumento_t);
+                        dd($fedocumento_t);
 
                         if(count($fedocumento_t)>0){
                             DB::table('FE_DOCUMENTO')->where('ID_DOCUMENTO','=',$fedocumento_t->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$fedocumento_t->DOCUMENTO_ITEM)->delete();

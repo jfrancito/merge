@@ -15,7 +15,7 @@
             <div class="col-sm-12">
               <div class="panel panel-default panel-border-color panel-border-color-success">
                 <div class="panel-heading">{{ $titulo }}
-                  <div class="tools tooltiptop">
+<!--                   <div class="tools tooltiptop">
                     <form method="POST" id='formpedido' class='opciones' action="{{ url('/aprobar-documentos-administracion/'.$idopcion) }}" style="display: inline-block;" >
                       {{ csrf_field() }}
                       <input type="hidden" id='pedido' name='pedido' >
@@ -24,7 +24,7 @@
                         <span class="icon mdi mdi-mail-send"></span>
                       </a>
                     </form>
-                  </div>
+                  </div> -->
 
                 </div>
                 <div class="panel-body">

@@ -13,7 +13,7 @@
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>CODIGO : {{$item->COD_ORDEN}} </b> </span>
           <span><b>FECHA  : {{$item->FEC_ORDEN}}</b></span>
-          <span><b>PROVEEDOR : </b> {{$item->TXT_EMPR_CLIENTE}}</span>
+          <span><b>PROVEEDOR : </b>({{$item->RUC_PROVEEDOR}}) {{$item->TXT_EMPR_CLIENTE}} </span>
           <span><b>TOTAL : </b> {{$item->CAN_TOTAL}}</span>
           <span><b>LINEA : </b> {{$item->DOCUMENTO_ITEM}}</span>
 

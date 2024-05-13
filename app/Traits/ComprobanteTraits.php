@@ -103,6 +103,7 @@ trait ComprobanteTraits
 		$listadatos 	= 	FeDocumento::leftJoin('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
 							//->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
 							->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+							->where('FE_DOCUMENTO.COD_ESTADO','<>','')
 							->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
 							->get();
 
@@ -258,7 +259,8 @@ trait ComprobanteTraits
 							->where('VMERGEOC.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
 							->where(function ($query) {
 							    $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
-							    	  ->orWhereNull('FE_DOCUMENTO.COD_ESTADO');
+							    	  ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
+							    	  ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
 							})
 							->select(DB::raw('	COD_ORDEN,
 												FEC_ORDEN,
