@@ -69,6 +69,13 @@ class GestionOCController extends Controller
 
                 /**************************** VALIDAR CDR Y LEER RESPUESTA ******************************/
                 $filescdr          =   $request['DCC0000000000004'];
+
+                $codigocdr = '';
+                $respuestacdr = '';
+                $factura_cdr_id = '';
+                $sw = 0;
+                $nombre_doc = $fedocumento->SERIE.'-'.$fedocumento->NUMERO;
+
                 if(!is_null($filescdr)){
                     //CDR
                     foreach($filescdr as $file){
@@ -107,51 +114,53 @@ class GestionOCController extends Controller
                         $info                       =   new SplFileInfo($nombreoriginal);
                         $extension                  =   $info->getExtension();
                     }
-                }
-                $codigocdr = '';
-                $respuestacdr = '';
-                $factura_cdr_id = '';
-                $sw = 0;
-                $nombre_doc = $fedocumento->SERIE.'-'.$fedocumento->NUMERO;
 
 
-                if (file_exists($extractedFile)) {
-                    $xml = simplexml_load_file($extractedFile);
-                    foreach($xml->xpath('//cbc:ResponseCode') as $ResponseCode)
-                    {
-                        $codigocdr  = $ResponseCode;
-                    }
-                    foreach($xml->xpath('//cbc:Description') as $Description)
-                    {
-                        $respuestacdr  = $Description;
-                    }
-                    foreach($xml->xpath('//cbc:ID') as $ID)
-                    {
-                        $factura_cdr_id  = $ID;
-                        if($factura_cdr_id == $nombre_doc){
-                            $sw = 1;
+                    if (file_exists($extractedFile)) {
+                        $xml = simplexml_load_file($extractedFile);
+                        foreach($xml->xpath('//cbc:ResponseCode') as $ResponseCode)
+                        {
+                            $codigocdr  = $ResponseCode;
                         }
+                        foreach($xml->xpath('//cbc:Description') as $Description)
+                        {
+                            $respuestacdr  = $Description;
+                        }
+                        foreach($xml->xpath('//cbc:ID') as $ID)
+                        {
+                            $factura_cdr_id  = $ID;
+                            if($factura_cdr_id == $nombre_doc){
+                                $sw = 1;
+                            }
+                        }
+                        //DD($codigocdr);
+                    } else {
+                        return Redirect::to('detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Error al intentar descomprimir el CDR');
                     }
-                    //DD($codigocdr);
-                } else {
-                    return Redirect::to('detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Error al intentar descomprimir el CDR');
-                }
 
-                if($sw == 0){
-                    return Redirect::to('detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'El CDR ('.$factura_cdr_id.') no coincide con la factura ('.$nombre_doc.')');
+                    if($sw == 0){
+                        return Redirect::to('detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'El CDR ('.$factura_cdr_id.') no coincide con la factura ('.$nombre_doc.')');
+                    }
+
                 }
 
                 //dd("si conicide");
-
-
                 /************************************************************************/
+                $tiposerie              =   substr($fedocumento->SERIE, 0, 1);
 
-
-                $tarchivos         =    CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
-                                        ->where('IND_OBLIGATORIO','=',1)
-                                        ->where('TXT_ASIGNADO','=','PROVEEDOR')
-                                        ->where('COD_CATEGORIA_DOCUMENTO','<>','DCC0000000000003')
-                                        ->get();
+                if($tiposerie == 'E'){
+                    $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                                                ->where('IND_OBLIGATORIO','=',1)
+                                                ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000004'])
+                                                ->where('TXT_ASIGNADO','=','PROVEEDOR')
+                                                ->get();
+                }else{
+                    $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                                                ->where('IND_OBLIGATORIO','=',1)
+                                                ->where('COD_CATEGORIA_DOCUMENTO','<>','DCC0000000000003')
+                                                ->where('TXT_ASIGNADO','=','PROVEEDOR')
+                                                ->get();
+                }
 
 
                 foreach($tarchivos as $index => $item){
@@ -356,11 +365,24 @@ class GestionOCController extends Controller
         $combocontacto          =   array('' => "Seleccione Contacto") + $contacto;
         $usuario                =   SGDUsuario::where('COD_USUARIO','=',$ordencompra->COD_USUARIO_CREA_AUD)->first();
 
-        $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
-                                    ->where('IND_OBLIGATORIO','=',1)
-                                    ->where('COD_CATEGORIA_DOCUMENTO','<>','DCC0000000000003')
-                                    ->where('TXT_ASIGNADO','=','PROVEEDOR')
-                                    ->get();
+        $tiposerie              =   substr($fedocumento->SERIE, 0, 1);
+
+        if($tiposerie == 'E'){
+            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                                        ->where('IND_OBLIGATORIO','=',1)
+                                        ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000004'])
+                                        ->where('TXT_ASIGNADO','=','PROVEEDOR')
+                                        ->get();
+        }else{
+            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                                        ->where('IND_OBLIGATORIO','=',1)
+                                        ->where('COD_CATEGORIA_DOCUMENTO','<>','DCC0000000000003')
+                                        ->where('TXT_ASIGNADO','=','PROVEEDOR')
+                                        ->get();
+        }
+
+
+
 
         $funcion                =   $this;
 
