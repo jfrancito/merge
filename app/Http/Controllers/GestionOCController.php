@@ -24,6 +24,8 @@ use Greenter\Parser\DocumentParserInterface;
 use Greenter\Xml\Parser\InvoiceParser;
 use Greenter\Xml\Parser\NoteParser;
 use Greenter\Xml\Parser\PerceptionParser;
+use Greenter\Xml\Parser\RHParser;
+
 
 use App\User;
 use Illuminate\Support\Facades\Crypt;
@@ -44,6 +46,40 @@ class GestionOCController extends Controller
     use GeneralesTraits;
     use ComprobanteTraits;
     use WhatsappTraits;
+
+
+
+
+
+    public function actionApiLeerXmlSap(Request $request)
+    {
+
+        header('Content-Type: text/html; charset=UTF-8');
+        $path = storage_path() . "/exports/20509076945-01-F083-00003191.xml";
+        //$path = storage_path() . "/exports/20454823916-01-FH04-00000026.xml";
+
+        $parser = new InvoiceParser();
+        $xml = file_get_contents($path);
+        $factura = $parser->parse($xml);
+        dd($factura);
+
+    }
+
+
+    public function actionApiLeerRHSap(Request $request)
+    {
+
+        header('Content-Type: text/html; charset=UTF-8');
+        $path = storage_path() . "/exports/RHE1044061449953.xml";
+        //$path = storage_path() . "/exports/20454823916-01-FH04-00000026.xml";
+
+        $parser = new RHParser();
+        $xml = file_get_contents($path);
+        $factura = $parser->parse($xml);
+        dd($factura);
+
+    }
+
 
    public function actionValidarXML($idopcion, $prefijo, $idordencompra,Request $request)
     {
@@ -117,22 +153,62 @@ class GestionOCController extends Controller
 
 
                     if (file_exists($extractedFile)) {
+
+                        //cbc
                         $xml = simplexml_load_file($extractedFile);
-                        foreach($xml->xpath('//cbc:ResponseCode') as $ResponseCode)
-                        {
-                            $codigocdr  = $ResponseCode;
-                        }
-                        foreach($xml->xpath('//cbc:Description') as $Description)
-                        {
-                            $respuestacdr  = $Description;
-                        }
-                        foreach($xml->xpath('//cbc:ID') as $ID)
-                        {
-                            $factura_cdr_id  = $ID;
-                            if($factura_cdr_id == $nombre_doc){
-                                $sw = 1;
+                        $cbc = 0;
+                        $namespaces = $xml->getNamespaces(true);
+                        foreach ($namespaces as $prefix => $namespace) {
+                            if('cbc'==$prefix){
+                                $cbc = 1;  
                             }
                         }
+                        
+                        if($cbc>=1){
+                            foreach($xml->xpath('//cbc:ResponseCode') as $ResponseCode)
+                            {
+                                $codigocdr  = $ResponseCode;
+                            }
+                            foreach($xml->xpath('//cbc:Description') as $Description)
+                            {
+                                $respuestacdr  = $Description;
+                            }
+                            foreach($xml->xpath('//cbc:ID') as $ID)
+                            {
+                                $factura_cdr_id  = $ID;
+                                if($factura_cdr_id == $nombre_doc){
+                                    $sw = 1;
+                                }
+                            }  
+                        }else{
+
+                            $xml_ns = simplexml_load_file($extractedFile);
+
+                            // Namespace definitions
+                            $ns4 = "urn:oasis:names:specification:ubl:schema:xsd:ApplicationResponse-2";
+                            $ns3 = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
+                            // Register namespaces
+                            $xml_ns->registerXPathNamespace('ns4', $ns4);
+                            $xml_ns->registerXPathNamespace('ns3', $ns3);
+                            // Querying XML
+                            foreach($xml_ns->xpath('//ns3:DocumentResponse/ns3:Response') as $ResponseCodes)
+                            {
+                                $codigocdr  = $ResponseCodes->ResponseCode;
+                            }
+                            foreach($xml_ns->xpath('//ns3:DocumentResponse/ns3:Response') as $Description)
+                            {
+                                $respuestacdr  = $Description->Description;
+                            }
+                            foreach($xml_ns->xpath('//ns3:DocumentReference') as $ID)
+                            {
+                                $factura_cdr_id  = $ID->ID;
+                                if($factura_cdr_id == $nombre_doc){
+                                    $sw = 1;
+                                }
+                            }
+
+                        }
+
                         //DD($codigocdr);
                     } else {
                         return Redirect::to('detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Error al intentar descomprimir el CDR');
@@ -612,7 +688,7 @@ class GestionOCController extends Controller
 
                                 $producto                           = str_replace("<![CDATA[","",$itemdet->getdescripcion());
                                 $producto                           = str_replace("]]>","",$producto);
-
+                                $producto                           = preg_replace('/[^A-Za-z0-9\s]/', '', $producto);
 
                                 $linea = str_pad($indexdet+1, 3, "0", STR_PAD_LEFT); 
                                 $detalle                        =   new FeDetalleDocumento;
@@ -739,5 +815,82 @@ class GestionOCController extends Controller
         }
     }
     
+
+
+    public function actionApiLeerCDR(Request $request)
+    {
+
+
+        
+        $extractedFile = '\\\\10.1.50.2\comprobantes\II\20418453177\R-20418453177-01-F151-0047165.xml';
+        $xml = simplexml_load_file($extractedFile);
+
+        $namespaces = $xml->getNamespaces(true);
+        foreach ($namespaces as $prefix => $namespace) {
+            print_r($prefix);
+        }
+
+
+        // Namespace definitions
+        $ns4 = "urn:oasis:names:specification:ubl:schema:xsd:ApplicationResponse-2";
+        $ns3 = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
+        // Register namespaces
+        $xml->registerXPathNamespace('ns4', $ns4);
+        $xml->registerXPathNamespace('ns3', $ns3);
+        // Querying XML
+        $UBLVersionID = $xml->UBLVersionID;
+        foreach($xml->xpath('//ns3:DocumentResponse/ns3:Response') as $ResponseCodes)
+        {
+            $codigocdr  = $ResponseCodes->ResponseCode;
+        }
+        foreach($xml->xpath('//ns3:DocumentResponse/ns3:Response') as $Description)
+        {
+            $respuestacdr  = $Description->Description;
+        }
+        foreach($xml->xpath('//ns3:DocumentReference') as $ID)
+        {
+            $factura_cdr_id  = $ID->ID;
+
+            // if($factura_cdr_id == $nombre_doc){
+            //     $sw = 1;
+            // }
+        }
+        print_r($codigocdr);
+        print_r($respuestacdr);
+        print_r($factura_cdr_id);
+
+        $extractedFile = '\\\\10.1.50.2\comprobantes\II\20418453177\R-20270453679-01-F002-64833.xml';
+        $xml = simplexml_load_file($extractedFile);
+
+        $namespaces = $xml->getNamespaces(true);
+        foreach ($namespaces as $prefix => $namespace) {
+            print_r($prefix);
+
+            //$xml->registerXPathNamespace($prefix, $namespace);
+        }
+
+        foreach($xml->xpath('//cbc:ResponseCode') as $ResponseCode)
+        {
+            $codigocdr  = $ResponseCode;
+        }
+        foreach($xml->xpath('//cbc:Description') as $Description)
+        {
+            $respuestacdr  = $Description;
+        }
+        foreach($xml->xpath('//cbc:ID') as $ID)
+        {
+            $factura_cdr_id  = $ID;
+            // if($factura_cdr_id == $nombre_doc){
+            //     $sw = 1;
+            // }
+        }
+        print_r($codigocdr);
+        print_r($respuestacdr);
+        print_r($factura_cdr_id);
+
+
+    }
+
+
 
 }
