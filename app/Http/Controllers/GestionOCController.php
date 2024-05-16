@@ -349,8 +349,12 @@ class GestionOCController extends Controller
 
         $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
 
+        $tiposerie              =   '';
+
+        
         if(count($fedocumento)>0){
             $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+            $tiposerie              =   substr($fedocumento->SERIE, 0, 1);
         }else{
             $detallefedocumento     =   array();
         }
@@ -365,7 +369,8 @@ class GestionOCController extends Controller
         $combocontacto          =   array('' => "Seleccione Contacto") + $contacto;
         $usuario                =   SGDUsuario::where('COD_USUARIO','=',$ordencompra->COD_USUARIO_CREA_AUD)->first();
 
-        $tiposerie              =   substr($fedocumento->SERIE, 0, 1);
+
+
 
         if($tiposerie == 'E'){
             $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)

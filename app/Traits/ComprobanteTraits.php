@@ -163,10 +163,14 @@ trait ComprobanteTraits
 		}else{ 	$ind_errototal 		=	0;  }
 
 		$tp = CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
+		//print($tp->CODIGO_SUNAT);
+		//dd(substr(strtoupper(ltrim(rtrim($fedocumento->FORMA_PAGO))), 0, 3));
 
 		if($tp->CODIGO_SUNAT == substr(strtoupper(ltrim(rtrim($fedocumento->FORMA_PAGO))), 0, 3)){
 			$ind_formapago 			=	1;	
 		}else{ 	$ind_errototal 		=	0;  }
+
+
 
 
 		// if($tp->CODIGO_SUNAT == substr(strtoupper($fedocumento->FORMA_PAGO), 0, 3)){
@@ -356,7 +360,6 @@ trait ComprobanteTraits
 	private function con_lista_detalle_comprobante_idoc($idoc) {
 
 		$doc 	= 	VMergeOC::where('COD_ORDEN','=',$idoc)
-
 							->get();
 
 	 	return  $doc;
@@ -365,7 +368,7 @@ trait ComprobanteTraits
 
 	private function con_lista_detalle_comprobante_idoc_actual($idoc) {
 
-		$doc 	= 	VMergeOC::where('COD_ORDEN','=',$idoc)
+		$doc 	= 	VMergeActual::where('COD_ORDEN','=',$idoc)
 
 							->get();
 

@@ -125,7 +125,7 @@
                               <td><b>Forma Pago</b></td>
                               <td><p class='subtitulomerge'>{{$tp->NOM_CATEGORIA}}</p></td>
                               <td>
-                                <div class='subtitulomerge @if($fedocumento->ind_cantidaditem == 1) msjexitoso @else msjerror @endif'>
+                                <div class='subtitulomerge @if($fedocumento->ind_formapago == 1) msjexitoso @else msjerror @endif'>
                                   {{$fedocumento->FORMA_PAGO}}
 <!--                                   @if($tp->CODIGO_SUNAT == 'CRE')
                                     A {{$fedocumento->FORMA_PAGO_DIAS}} DIAS
