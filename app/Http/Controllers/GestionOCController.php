@@ -418,12 +418,14 @@ class GestionOCController extends Controller
 
     public function actionDetalleComprobanteOC($procedencia,$idopcion, $prefijo, $idordencompra, Request $request) {
 
-        View::share('titulo','REGISTRO DE COMPROBANTE');
+
         $idoc                   =   $this->funciones->decodificarmaestraprefijo($idordencompra,$prefijo);
         $ordencompra            =   $this->con_lista_cabecera_comprobante_idoc($idoc);
         $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc($idoc);
-
         $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
+        $ordencompra            =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
+        View::share('titulo','REGISTRO DE COMPROBANTE OC: '.$idoc);
+
 
         $tiposerie              =   '';
 
@@ -446,14 +448,27 @@ class GestionOCController extends Controller
         $usuario                =   SGDUsuario::where('COD_USUARIO','=',$ordencompra->COD_USUARIO_CREA_AUD)->first();
 
 
+        $xmlfactura             =   'FACTURA';
+        $rhxml                  =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                                    ->where('IND_OBLIGATORIO','=',1)
+                                    ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000013'])
+                                    ->where('TXT_ASIGNADO','=','PROVEEDOR')
+                                    ->first();
+
+        if(count($rhxml)>0){
+            $xmlfactura             =   $rhxml->NOM_CATEGORIA_DOCUMENTO;
+        }
+
 
 
         if($tiposerie == 'E'){
+
             $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
                                         ->where('IND_OBLIGATORIO','=',1)
                                         ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000004'])
                                         ->where('TXT_ASIGNADO','=','PROVEEDOR')
                                         ->get();
+
         }else{
             $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
                                         ->where('IND_OBLIGATORIO','=',1)
@@ -475,6 +490,7 @@ class GestionOCController extends Controller
                             'detallefedocumento'    =>  $detallefedocumento,
                             'combocontacto'         =>  $combocontacto,
                             'procedencia'           =>  $procedencia,
+                            'xmlfactura'            =>  $xmlfactura,
 
                             'tp'                    =>  $tp,
                             'xmlarchivo'            =>  $xmlarchivo,
@@ -506,10 +522,9 @@ class GestionOCController extends Controller
                 try{    
 
                         DB::beginTransaction();
-                        $ordencompra_t        =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
+                        $ordencompra_t          =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
                         $fedocumento_t          =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
 
-                        //dd($fedocumento_t);
 
                         if(count($fedocumento_t)>0){
                             DB::table('FE_DOCUMENTO')->where('ID_DOCUMENTO','=',$fedocumento_t->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$fedocumento_t->DOCUMENTO_ITEM)->delete();
@@ -581,10 +596,32 @@ class GestionOCController extends Controller
                         copy($file->getRealPath(),$rutacompleta);
                         //dd($extractedFile);
                         $path            =   $rutacompleta;
-                        /****************************************  LEER EL XML Y GUARDAR   *********************************/
-                        $parser = new InvoiceParser();
-                        $xml = file_get_contents($path);
-                        $factura = $parser->parse($xml);
+
+
+                        $rh              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                                                    ->where('COD_ESTADO','=',1)
+                                                    ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000013'])
+                                                    ->get();
+
+
+                        if(count($rh)<=0){
+                            //FACTURA
+                            /****************************************  LEER EL XML Y GUARDAR   *********************************/
+                            $parser = new InvoiceParser();
+                            $xml = file_get_contents($path);
+                            $factura = $parser->parse($xml);
+                            $tipo_documento_le = $factura->gettipoDoc();
+                            $moneda_le = $factura->gettipoMoneda();
+                        }else{
+                            //RECIBO POR HONORARIO
+                            $parser = new RHParser();
+                            $xml = file_get_contents($path);
+                            $factura = $parser->parse($xml);  
+
+                            $tipo_documento_le = 'R1';
+                            $moneda_le = 'PEN';
+                        }
+
 
                         //dd($factura);
                         /****************************************  DIAS DE CREDITO *****************************************/
@@ -622,13 +659,13 @@ class GestionOCController extends Controller
                         $documento->DIRECCION_CLIENTE       =   '';
                         $documento->SERIE                   =   $factura->getserie();
                         $documento->NUMERO                  =   $factura->getcorrelativo();
-                        $documento->ID_TIPO_DOC             =   $factura->gettipoDoc();
+                        $documento->ID_TIPO_DOC             =   $tipo_documento_le;
                         $documento->FEC_VENTA               =   $factura->getfechaEmision()->format('Ymd');
                         $documento->FEC_VENCI_PAGO          =   $factura->getfecVencimiento()->format('Ymd');
                         $documento->FORMA_PAGO              =   $factura->getcondicionPago();
                         $documento->FORMA_PAGO_DIAS          =   $diasdefactura;
 
-                        $documento->MONEDA                  =   $factura->gettipoMoneda();
+                        $documento->MONEDA                  =   $moneda_le;
                         $documento->VALOR_IGV_ORIG          =   $factura->getmtoIGV();
                         $documento->VALOR_IGV_SOLES         =   $factura->getmtoIGV();
 
@@ -743,7 +780,8 @@ class GestionOCController extends Controller
                         //VALIDAR QUE ALGUNOS CAMPOS SEAN IGUALES
                         $this->con_validar_documento($ordencompra,$fedocumento,$detalleordencompra,$detallefedocumento);
 
-                        //dd($fechaemision);
+
+
                         $rvalidar = $this->validar_xml( $token,
                                                         $fedocumento->ID_CLIENTE,
                                                         $fedocumento->RUC_PROVEEDOR,
@@ -752,6 +790,13 @@ class GestionOCController extends Controller
                                                         $fedocumento->NUMERO,
                                                         $fechaemision,
                                                         $fedocumento->TOTAL_VENTA_ORIG);
+
+
+
+
+
+
+
                         $arvalidar = json_decode($rvalidar, true);
 
                         if(isset($arvalidar['success'])){

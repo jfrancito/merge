@@ -1,10 +1,10 @@
 <div class="listadatos">  
         <div class="container">
-
           <div class="row">
+
             <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
               <div class="panel panel-default panel-contrast">
-                <div class="panel-heading" style="background: #177bbb;color: #fff;">CARGAR DOCUMENTO XML
+                <div class="panel-heading" style="background: #177bbb;color: #fff;">CARGAR DOCUMENTO XML ({{$xmlfactura}})
                 </div>
                 <div class="panel-body panel-body-contrast">
                   <form method="POST" action="{{ url('subir-xml-cargar-datos/'.$idopcion.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" name="formcargardatos" id="formcargardatos" enctype="multipart/form-data" >
