@@ -226,13 +226,13 @@ class GestionOCController extends Controller
 
                 if($tiposerie == 'E'){
                     $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
-                                                ->where('IND_OBLIGATORIO','=',1)
+                                                //->where('IND_OBLIGATORIO','=',1)
                                                 ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000004'])
                                                 ->where('TXT_ASIGNADO','=','PROVEEDOR')
                                                 ->get();
                 }else{
                     $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
-                                                ->where('IND_OBLIGATORIO','=',1)
+                                                //->where('IND_OBLIGATORIO','=',1)
                                                 ->where('COD_CATEGORIA_DOCUMENTO','<>','DCC0000000000003')
                                                 ->where('TXT_ASIGNADO','=','PROVEEDOR')
                                                 ->get();
@@ -342,7 +342,9 @@ class GestionOCController extends Controller
                     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
                 }else{
                     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');          
+                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
+                    $this->insertar_whatsaap('51914693880','JOSE CHERO',$mensaje,'');
+
                 }                       
 
                 DB::commit();

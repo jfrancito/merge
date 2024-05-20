@@ -111,6 +111,8 @@
               <th>Fecha</th>
               <th>Usuario</th>      
               <th>Tipo</th>
+              <th>Mensaje</th>
+
             </tr>
           </thead>
           <tbody>
@@ -119,12 +121,15 @@
                 <tr>
                   <td>{{date_format(date_create($item->FECHA), 'd-m-Y H:i:s')}}</td>
                   <td>{{$item->USUARIO_NOMBRE}}</td>
-                  <td><b>{{$item->TIPO}}</</b><td>
+                  <td><b>{{$item->TIPO}}</</b></td>
+                  <td>{{$item->MENSAJE}}</td>
+
                 </tr>
               @endforeach
 
           </tbody>
         </table>
+
       </div>
     </div>
   </div> 

@@ -29,6 +29,21 @@
           <span><b>FECHA  : {{$item->FEC_ORDEN}}</b></span>
           <span><b>PROVEEDOR : </b> {{$item->TXT_EMPR_CLIENTE}}</span>
           <span><b>TOTAL : </b> {{$item->CAN_TOTAL}}</span>
+          <span><b>ORSERVACION : </b>               
+              @if($item->ind_observacion == 1) 
+                  <span class="badge badge-danger" style="display: inline-block;">EN PROCESO</span>
+              @else
+                @if($item->ind_observacion == 0) 
+                    <span class="badge badge-default" style="display: inline-block;">SIN OBSERVACIONES</span>
+                @else
+                    <span class="badge badge-default" style="display: inline-block;">SIN OBSERVACIONES</span>
+                @endif
+              @endif
+          </span>
+
+
+
+
         </td>
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>SERIE : {{$item->SERIE}} </b> </span>
@@ -57,6 +72,12 @@
                 </a>  
               </li>
 
+
+              <li>
+                <a href="{{ url('/agregar-observacion-contabilidad/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,6).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -10))) }}">
+                  Agregar Observacion
+                </a>  
+              </li>
 
               <li>
                 <a href="{{ url('/extornar-aprobar-comprobante/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,6).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -10))) }}">

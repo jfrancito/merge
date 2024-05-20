@@ -335,22 +335,6 @@
                     </div>
                   </div>
                 @endforeach
-                <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
-                  <div class="form-group sectioncargarimagen">
-                      <label class="col-sm-12 control-label" style="text-align: left;"><b>OTROS DOCUMENTOS</b> <br><br></label>
-                      <div class="col-sm-12">
-                          <div class="file-loading">
-                              <input 
-                              id="file-otros" 
-                              name="otros[]" 
-                              class="file-es"  
-                              type="file" 
-                              multiple data-max-file-count="1"
-                              >
-                          </div>
-                      </div>
-                  </div>
-                </div>
               </div>
       </div>
     </div>

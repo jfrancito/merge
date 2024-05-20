@@ -16,7 +16,17 @@
           <span><b>PROVEEDOR : </b>({{$item->RUC_PROVEEDOR}}) {{$item->TXT_EMPR_CLIENTE}} </span>
           <span><b>TOTAL : </b> {{$item->CAN_TOTAL}}</span>
           <span><b>LINEA : </b> {{$item->DOCUMENTO_ITEM}}</span>
-
+          <span><b>ORSERVACION : </b>               
+              @if($item->ind_observacion == 1) 
+                  <span class="badge badge-danger" style="display: inline-block;">EN PROCESO</span>
+              @else
+                @if($item->ind_observacion == 0) 
+                    <span class="badge badge-default" style="display: inline-block;">SIN OBSERVACIONES</span>
+                @else
+                    <span class="badge badge-default" style="display: inline-block;">SIN OBSERVACIONES</span>
+                @endif
+              @endif
+          </span>
         </td>
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>SERIE : {{$item->SERIE}} </b> </span>

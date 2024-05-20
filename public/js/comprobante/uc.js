@@ -38,6 +38,24 @@ $(document).ready(function(){
     });
 
 
+    $('.btnobservar').on('click', function(event){
+        event.preventDefault();
+        $.confirm({
+            title: '¿Confirma la Observacion?',
+            content: 'Observacion el Comprobante',
+            buttons: {
+                confirmar: function () {
+                    $( "#formpedido" ).submit();
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo la Observacion');
+                }
+            }
+        });
+
+    });
+
+
 
 
 

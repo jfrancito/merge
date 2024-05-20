@@ -38,6 +38,10 @@ class GestionOCValidadoController extends Controller
     use GeneralesTraits;
     use ComprobanteTraits;
 
+
+
+
+
     public function actionListarOCValidado($idopcion)
     {
         /******************* validar url **********************/
@@ -47,7 +51,6 @@ class GestionOCValidadoController extends Controller
         View::share('titulo','Lista Ordenes de Compra');
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
         $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion($cod_empresa);
-
         $funcion        =   $this;
         return View::make('comprobante/listaocvalidado',
                          [
