@@ -80,8 +80,8 @@ class GestionUsuarioContactoController extends Controller
         if($validarurl <> 'true'){return $validarurl;}
         /******************************************************/
         $idoc                   =   $this->funciones->decodificarmaestraprefijo($idordencompra,$prefijo);
-        $ordencompra            =   $this->con_lista_cabecera_comprobante_idoc($idoc);
-        $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc($idoc);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_idoc_actual($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc_actual($idoc);
         $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('ind_observacion','=',1)->where('DOCUMENTO_ITEM','=',$linea)->first();
         $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
         View::share('titulo','Comprobante Observado');
@@ -217,7 +217,7 @@ class GestionUsuarioContactoController extends Controller
 
             $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc($idoc);
             $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
-            $ordencompra            =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();  
+            //$ordencompra            =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();  
 
 
             $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
