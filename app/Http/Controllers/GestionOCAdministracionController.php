@@ -177,7 +177,7 @@ class GestionOCAdministracionController extends Controller
             $trabajador             =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
 
             $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
-                                        ->where('IND_OBLIGATORIO','=',1)
+                                        //->where('IND_OBLIGATORIO','=',1)
                                         ->where('TXT_ASIGNADO','=','CONTACTO')
                                         ->get();
 
@@ -523,7 +523,7 @@ class GestionOCAdministracionController extends Controller
 
             $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
             $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
-                                        ->where('IND_OBLIGATORIO','=',1)
+                                        //->where('IND_OBLIGATORIO','=',1)
                                         ->where('TXT_ASIGNADO','=','CONTACTO')
                                         ->get();
 

@@ -217,12 +217,16 @@ class GestionUsuarioContactoController extends Controller
 
             $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc($idoc);
             $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+            $ordencompra            =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();  
+
 
             $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
 
             $arrayarchivos          =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                                         ->pluck('TIPO_ARCHIVO')
                                         ->toArray();
+
+ 
 
             $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
                                         ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
@@ -236,7 +240,7 @@ class GestionUsuarioContactoController extends Controller
 
             $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
-            //dd( $tarchivos);
+
 
             return View::make('comprobante/observaruc', 
                             [
