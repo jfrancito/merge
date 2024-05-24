@@ -235,7 +235,7 @@ class GestionUsuarioContactoController extends Controller
         }
         else{
 
-            $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc($idoc);
+            $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc_actual($idoc);
             $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
             //$ordencompra            =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();  
 

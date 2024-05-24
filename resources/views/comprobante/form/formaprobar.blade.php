@@ -366,7 +366,9 @@
   <div class="col-xs-6">
     <p class="text-right">
       <a href="{{ url('/gestion-de-comprobante-us/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
-      <button type="submit" class="btn btn-space btn-primary btnguardarcliente">Guardar</button>
+      @if($fedocumento->COD_ESTADO != 'ETM0000000000007')
+            <button type="submit" class="btn btn-space btn-primary btnguardarcliente">Guardar</button>
+      @endif
     </p>
   </div>
 </div>

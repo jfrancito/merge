@@ -671,6 +671,7 @@ class UserController extends Controller {
 											->take(10)
 											->toArray();
 
+
 			$combolistaclientes  		= 	array('' => "Seleccione clientes") + $listapersonal;
 
 

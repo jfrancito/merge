@@ -63,7 +63,8 @@ trait ComprobanteTraits
 									->whereIn('FE_DOCUMENTO.COD_CONTACTO',$array_trabajadores)
 									->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
 									->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-									->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000002')
+									->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000002','ETM0000000000007'])
+									//->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000002')
 									->get();
 
 	 	return  $listadatos;
@@ -172,10 +173,19 @@ trait ComprobanteTraits
 		if(number_format($ordencompra->CAN_TOTAL, 4, '.', '') == number_format($fedocumento->TOTAL_VENTA_ORIG, 4, '.', '')){
 			$ind_total 			=	1;	
 		}else{ 	$ind_errototal 		=	0;  }
-		//numero_items
-		if(count($detalleordencompra) == count($detallefedocumento)){
+
+
+        $ordencompra_t          =   CMPOrden::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->first();
+
+		if($ordencompra_t->IND_MATERIAL_SERVICIO == 'S'){
 			$ind_cantidaditem 			=	1;	
-		}else{ 	$ind_errototal 		=	0;  }
+		}else{
+			//numero_items
+			if(count($detalleordencompra) == count($detallefedocumento)){
+				$ind_cantidaditem 			=	1;	
+			}else{ 	$ind_errototal 		=	0;  }
+
+		}
 
 		$tp = CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
 		//print($tp->CODIGO_SUNAT);
@@ -216,6 +226,75 @@ trait ComprobanteTraits
 
 	}
 
+	private function con_validar_documento_proveedor($ordencompra,$fedocumento,$detalleordencompra,$detallefedocumento){
+
+		$ind_ruc 			=	0;
+		$ind_rz 			=	0;
+		$ind_moneda 		=	0;
+		$ind_total 			=	0;
+		$ind_cantidaditem 	=	0;
+		$ind_formapago 		=	0;
+		$ind_errototal 		=	1;
+		//ruc
+		if($ordencompra->NRO_DOCUMENTO_CLIENTE == $fedocumento->RUC_PROVEEDOR){
+			$ind_ruc 			=	1;	
+		}else{ 	$ind_errototal 		=	0;  }
+
+		if(ltrim(rtrim(strtoupper($ordencompra->TXT_EMPR_CLIENTE))) == ltrim(rtrim(strtoupper($fedocumento->RZ_PROVEEDOR)))){
+			$ind_rz 			=	1;	
+		}else{ 	$ind_errototal 		=	0;  }
+
+
+		//moneda
+		$txtmoneda 			=	'';
+		if($fedocumento->MONEDA == 'PEN'){
+			$txtmoneda 			=	'SOLES';	
+		}else{
+			$txtmoneda 			=	'DOLARES';
+		}
+		if($ordencompra->TXT_CATEGORIA_MONEDA == $txtmoneda){
+			$ind_moneda 			=	1;	
+		}else{ 	$ind_errototal 		=	0;  }
+		//total
+		if(number_format($ordencompra->CAN_TOTAL, 4, '.', '') == number_format($fedocumento->TOTAL_VENTA_ORIG, 4, '.', '')){
+			$ind_total 			=	1;	
+		}else{ 	$ind_errototal 		=	0;  }
+
+
+        $ordencompra_t          =   CMPOrden::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->first();
+
+		if($ordencompra_t->IND_MATERIAL_SERVICIO == 'S'){
+			$ind_cantidaditem 			=	1;	
+		}else{
+			//numero_items
+			if(count($detalleordencompra) == count($detallefedocumento)){
+				$ind_cantidaditem 			=	1;	
+			}else{ 	$ind_errototal 		=	0;  }
+
+		}
+
+		$tp = CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
+		if($tp->CODIGO_SUNAT == substr(strtoupper(ltrim(rtrim($fedocumento->FORMA_PAGO))), 0, 3)){
+			$ind_formapago 			=	1;	
+		}else{ 	$ind_errototal 		=	0;  }
+
+
+
+        FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)
+                    ->update(
+                            [
+                                'ind_ruc'=>$ind_ruc,
+                                'ind_rz'=>$ind_rz,
+                                
+                                'ind_moneda'=>$ind_moneda,
+                                'ind_total'=>$ind_total,
+                                'ind_cantidaditem'=>$ind_cantidaditem,
+                                'ind_formapago'=>$ind_formapago,
+                                'ind_errototal'=>$ind_errototal,
+                            ]);
+
+	}
+
 
 	private function con_lista_cabecera_comprobante($cliente_id) {
 
@@ -228,9 +307,12 @@ trait ComprobanteTraits
 								    })
 							->where('COD_EMPR_CLIENTE','=',$cliente_id)
 							->where('VMERGEOC.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+							//->where('VMERGEOC.COD_ORDEN','=','IICHCT0000002218')
+
 							->where(function ($query) {
 							    $query->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000001')
-							    	  ->orWhereNull('FE_DOCUMENTO.COD_ESTADO');
+							    	  ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
+							    	  ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
 							})
 							->select(DB::raw('	COD_ORDEN,
 												FEC_ORDEN,
