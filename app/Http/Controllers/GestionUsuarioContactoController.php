@@ -104,6 +104,26 @@ class GestionUsuarioContactoController extends Controller
                                             //->where('TXT_ASIGNADO','=','CONTACTO')
                                             ->get();
 
+                $tiposerie              =   substr($fedocumento->SERIE, 0, 1);
+
+                if($tiposerie == 'E'){
+
+                    $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                                                ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
+                                                ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000004'])
+                                                //->where('TXT_ASIGNADO','=','CONTACTO')
+                                                ->get();
+
+
+
+                }else{
+                    $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                                                ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
+                                                //->where('TXT_ASIGNADO','=','CONTACTO')
+                                                ->get();
+                }
+
+
 
                 foreach($tarchivos as $index => $item){
 
@@ -228,10 +248,33 @@ class GestionUsuarioContactoController extends Controller
 
  
 
-            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
-                                        ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
-                                        //->where('TXT_ASIGNADO','=','CONTACTO')
-                                        ->get();
+
+
+            $tiposerie              =   substr($fedocumento->SERIE, 0, 1);
+
+            if($tiposerie == 'E'){
+
+
+
+                $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                                            ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000004'])
+                                            ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
+                                            //->where('TXT_ASIGNADO','=','CONTACTO')
+                                            ->get();
+
+
+
+
+            }else{
+
+                $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                                            ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
+                                            //->where('TXT_ASIGNADO','=','CONTACTO')
+                                            ->get();
+
+            }
+
+
 
 
             $documentohistorial     =   FeDocumentoHistorial::where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
