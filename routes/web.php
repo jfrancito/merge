@@ -38,7 +38,7 @@ Route::get('/cambiarperfil', 'UserController@actionCambiarPerfil');
 Route::any('/enviocorreobaja', 'UserController@actionCorreoBaja');//correo para cliente cuando se aprueba
 
 
-Route::any('/validarsunatcdr', 'UserController@actionSunatCDR');//vALIDAR CDR Y SUNAT
+Route::any('/validarsunatcdr', 'GestionOCController@actionSunatCDR');//vALIDAR CDR Y SUNAT
 
 
 Route::group(['middleware' => ['authaw']], function () {
@@ -71,7 +71,6 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/leerrhsinvoice', 'GestionOCController@actionApiLeerRHSap');
 
 	Route::any('/leercdr', 'GestionOCController@actionApiLeerCDR');
-
 
 
 	Route::any('/gestion-de-oc-proveedores/{idopcion}', 'GestionOCController@actionListarOC');

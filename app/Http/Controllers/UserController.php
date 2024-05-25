@@ -11,8 +11,25 @@ use App\Modelos\TESCuentaBancaria;
 use App\Modelos\CMPCategoria;
 use App\Modelos\STDEmpresa;
 use App\Modelos\WEBUserEmpresaCentro;
-
 use App\User;
+
+
+use App\Modelos\VMergeOC;
+use App\Modelos\FeFormaPago;
+use App\Modelos\FeDetalleDocumento;
+use App\Modelos\FeDocumento;
+use App\Modelos\Estado;
+use App\Modelos\CMPOrden;
+
+
+use App\Modelos\FeDocumentoHistorial;
+use App\Modelos\SGDUsuario;
+
+use App\Modelos\STDTrabajador;
+use App\Modelos\Archivo;
+use App\Modelos\CMPDocAsociarCompra;
+use App\Modelos\CMPDetalleProducto;
+
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -23,11 +40,17 @@ use View;
 use Stdclass;
 use App\Traits\UserTraits;
 use App\Traits\GeneralesTraits;
+use App\Traits\ComprobanteProvisionTraits;
+use App\Traits\ComprobanteTraits;
+
 
 class UserController extends Controller {
 
     use UserTraits;
     use GeneralesTraits;
+    use ComprobanteProvisionTraits;
+    use ComprobanteTraits;
+
 
 
 
@@ -334,7 +357,7 @@ class UserController extends Controller {
 			Session::forget('listamenu');
 			Session::forget('listaopciones');
 
- 			return Redirect::to('/login')->with('bienhecho', 'Proveedor '.$razonsocial.' registrado con exito');
+ 			return Redirect::to('/login')->with('bienhecho', 'Proveedor '.$razonsocial.' registrado con exito (Se le a enviado un email para que pueda confirmar su acceso al sitema)');
 
 		}else{
 

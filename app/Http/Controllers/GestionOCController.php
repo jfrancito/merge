@@ -54,6 +54,213 @@ class GestionOCController extends Controller
     use WhatsappTraits;
     use ComprobanteProvisionTraits;
 
+    public function actionSunatCDR(Request $request)
+    {
+
+        $listafedocumentos      =   FeDocumento::where('COD_ESTADO','=','ETM0000000000007')->get();
+        //dd($listafedocumentos);
+
+        $COD_ORDEN_COMPRA = '';
+
+        foreach($listafedocumentos as $index=>$item){
+
+                $COD_ORDEN_COMPRA = '';
+                $sw_opecion             =   0;
+
+                //LECTURA A SUNAT
+                $ordencompra_t          =   CMPOrden::where('COD_ORDEN','=',$item->ID_DOCUMENTO)->first();
+                $prefijocarperta        =   $this->prefijo_empresa($item->ID_DOCUMENTO);
+                $fechaemision        =      date_format(date_create($item->FEC_VENTA), 'd/m/Y');
+                $token = '';
+                if($prefijocarperta =='II'){
+                    $token           =      $this->generartoken_ii();
+                }else{
+                    $token           =      $this->generartoken_is();
+                }
+                $rvalidar = $this->validar_xml( $token,
+                                                $item->ID_CLIENTE,
+                                                $item->RUC_PROVEEDOR,
+                                                $item->ID_TIPO_DOC,
+                                                $item->SERIE,
+                                                $item->NUMERO,
+                                                $fechaemision,
+                                                $item->TOTAL_VENTA_ORIG);
+                $arvalidar = json_decode($rvalidar, true);
+                if(isset($arvalidar['success'])){
+
+                    if($arvalidar['success']){
+
+                        $datares              = $arvalidar['data'];
+                        $estadoCp             = $datares['estadoCp'];
+                        $tablaestacp          = Estado::where('tipo','=','estadoCp')->where('codigo','=',$estadoCp)->first();
+
+                        $estadoRuc            = '';
+                        $txtestadoRuc         = '';
+                        $estadoDomiRuc        = '';
+                        $txtestadoDomiRuc     = '';
+
+                        if(isset($datares['estadoRuc'])){
+                            $tablaestaruc          = Estado::where('tipo','=','estadoRuc')->where('codigo','=',$datares['estadoRuc'])->first();
+                            $estadoRuc             = $tablaestaruc->codigo;
+                            $txtestadoRuc          = $tablaestaruc->nombre;
+                        }
+                        if(isset($datares['condDomiRuc'])){
+                            $tablaestaDomiRuc       = Estado::where('tipo','=','condDomiRuc')->where('codigo','=',$datares['condDomiRuc'])->first();
+                            $estadoDomiRuc          = $tablaestaDomiRuc->codigo;
+                            $txtestadoDomiRuc       = $tablaestaDomiRuc->nombre;
+                        }
+
+                        FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
+                                    ->update(
+                                            [
+                                                'success'=>$arvalidar['success'],
+                                                'message'=>$arvalidar['message'],
+                                                'estadoCp'=>$tablaestacp->codigo,
+                                                'nestadoCp'=>$tablaestacp->nombre,
+                                                'estadoRuc'=>$estadoRuc,
+                                                'nestadoRuc'=>$txtestadoRuc,
+                                                'condDomiRuc'=>$estadoDomiRuc,
+                                                'ncondDomiRuc'=>$txtestadoDomiRuc,
+                                            ]);
+                    }else{
+                        FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
+                                    ->update(
+                                            [
+                                                'success'=>$arvalidar['success'],
+                                                'message'=>$arvalidar['message']
+                                            ]);
+                    }
+                }
+
+                //PASAR PARA EL USUARIO DE CONTACTO REALIZE SU APLICACION
+                
+                FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$item->DOCUMENTO_ITEM)
+                            ->update(
+                                [
+                                    'COD_ESTADO'=>'ETM0000000000002',
+                                    'TXT_ESTADO'=>'POR APROBAR USUARIO CONTACTO',
+                                    //'CODIGO_CDR'=>$codigocdr,
+                                    //'RESPUESTA_CDR'=>$respuestacdr
+                                ]
+                            );
+
+
+
+                //LECTURA DE CDR
+
+
+                // if(!is_null($filescdr)){
+                //     //CDR
+                //     foreach($filescdr as $file){
+
+                //         $larchivos       =      Archivo::get();
+                //         $zip = new ZipArchive;
+                //         $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
+                //         $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
+                //         $nombrefile      =      $file->getClientOriginalName();
+                //         $valor           =      $this->versicarpetanoexiste($rutafile);
+                //         $rutacompleta    =      $rutafile.'\\'.$nombrefile;
+                //         // Copia el archivo .zip a la carpeta compartida
+                //         copy($file->getRealPath(),$rutacompleta);
+                //         $rutacompletaxml =      $rutafile.'\\';
+                //         // Abre el archivo .zip
+                //         if ($zip->open($file->getPathname()) === TRUE) {
+                //             // Extrae cada archivo del .zip
+                //             for ($i = 0; $i < $zip->numFiles; $i++) {
+                //                 $filename = $zip->getNameIndex($i);
+                //                 $fileInfo = pathinfo($filename);
+
+                //                 // Verifica si el archivo es un archivo regular
+                //                 if ($fileInfo['filename'] != '.' && $fileInfo['filename'] != '..') {
+                //                     // Extrae el archivo a la carpeta compartida
+                //                     $extractedFile = $rutacompletaxml.$fileInfo['basename'];
+                //                     copy("zip://" . $file->getPathname() . "#$filename", $extractedFile);
+                //                 }
+                //             }
+                //             // Cierra el archivo .zip
+                //             $zip->close();
+                //         } else {
+                //             DB::rollback(); 
+                //             return Redirect::to('detalle-comprobante-oc-proveedor/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', 'No se pudo abrir el archivo .zip');
+                //         }
+                //         $nombreoriginal             =   $file->getClientOriginalName();
+                //         $info                       =   new SplFileInfo($nombreoriginal);
+                //         $extension                  =   $info->getExtension();
+                //     }
+
+
+                //     if (file_exists($extractedFile)) {
+
+                //         //cbc
+                //         $xml = simplexml_load_file($extractedFile);
+                //         $cbc = 0;
+                //         $namespaces = $xml->getNamespaces(true);
+                //         foreach ($namespaces as $prefix => $namespace) {
+                //             if('cbc'==$prefix){
+                //                 $cbc = 1;  
+                //             }
+                //         }
+                        
+                //         if($cbc>=1){
+                //             foreach($xml->xpath('//cbc:ResponseCode') as $ResponseCode)
+                //             {
+                //                 $codigocdr  = $ResponseCode;
+                //             }
+                //             foreach($xml->xpath('//cbc:Description') as $Description)
+                //             {
+                //                 $respuestacdr  = $Description;
+                //             }
+                //             foreach($xml->xpath('//cbc:ID') as $ID)
+                //             {
+                //                 $factura_cdr_id  = $ID;
+                //                 if($factura_cdr_id == $nombre_doc){
+                //                     $sw = 1;
+                //                 }
+                //             }  
+                //         }else{
+
+                //             $xml_ns = simplexml_load_file($extractedFile);
+
+                //             // Namespace definitions
+                //             $ns4 = "urn:oasis:names:specification:ubl:schema:xsd:ApplicationResponse-2";
+                //             $ns3 = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
+                //             // Register namespaces
+                //             $xml_ns->registerXPathNamespace('ns4', $ns4);
+                //             $xml_ns->registerXPathNamespace('ns3', $ns3);
+                //             // Querying XML
+                //             foreach($xml_ns->xpath('//ns3:DocumentResponse/ns3:Response') as $ResponseCodes)
+                //             {
+                //                 $codigocdr  = $ResponseCodes->ResponseCode;
+                //             }
+                //             foreach($xml_ns->xpath('//ns3:DocumentResponse/ns3:Response') as $Description)
+                //             {
+                //                 $respuestacdr  = $Description->Description;
+                //             }
+                //             foreach($xml_ns->xpath('//ns3:DocumentReference') as $ID)
+                //             {
+                //                 $factura_cdr_id  = $ID->ID;
+                //                 if($factura_cdr_id == $nombre_doc){
+                //                     $sw = 1;
+                //                 }
+                //             }
+                //         }
+                //     } else {
+                //         return Redirect::to('detalle-comprobante-oc-proveedor/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Error al intentar descomprimir el CDR');
+                //     }
+                //     if($sw == 0){
+                //         return Redirect::to('detalle-comprobante-oc-proveedor/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'El CDR ('.$factura_cdr_id.') no coincide con la factura ('.$nombre_doc.')');
+                //     }
+                // }
+
+
+
+
+        }
+
+        print_r('Exitoso '. $COD_ORDEN_COMPRA);
+
+    }
+
 
 
 
@@ -1592,7 +1799,7 @@ class GestionOCController extends Controller
             $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
                                         //->where('IND_OBLIGATORIO','=',1)
                                         ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000004'])
-                                        ->where('TXT_ASIGNADO','=','PROVEEDOR')
+                                        ->whereIn('TXT_ASIGNADO', ['PROVEEDOR','CONTACTO'])
                                         ->get();
 
         }else{
@@ -2083,7 +2290,7 @@ class GestionOCController extends Controller
                     $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
                                                 //->where('IND_OBLIGATORIO','=',1)
                                                 ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000004'])
-                                                ->where('TXT_ASIGNADO','=','PROVEEDOR')
+                                                ->whereIn('TXT_ASIGNADO', ['PROVEEDOR','CONTACTO'])
                                                 ->get();
                 //dd($tarchivos);
 
@@ -2091,7 +2298,7 @@ class GestionOCController extends Controller
                     $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
                                                 //->where('IND_OBLIGATORIO','=',1)
                                                 ->where('COD_CATEGORIA_DOCUMENTO','<>','DCC0000000000003')
-                                                ->where('TXT_ASIGNADO','=','PROVEEDOR')
+                                                ->whereIn('TXT_ASIGNADO', ['PROVEEDOR','CONTACTO'])
                                                 ->get();
                 }
 

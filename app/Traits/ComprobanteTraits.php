@@ -411,6 +411,7 @@ trait ComprobanteTraits
 
 	private function con_lista_cabecera_comprobante_idoc_actual($idoc) {
 
+
 		$oc 	= 	VMergeActual::where('COD_ORDEN','=',$idoc)
 							->select(DB::raw('COD_ORDEN,COD_EMPR,NOM_EMPR,TXT_CATEGORIA_MONEDA,NRO_DOCUMENTO,FEC_ORDEN,
 												TXT_CATEGORIA_MONEDA,TXT_EMPR_CLIENTE,NRO_DOCUMENTO_CLIENTE,MAX(CAN_TOTAL) CAN_TOTAL,COD_CATEGORIA_TIPO_PAGO
