@@ -582,12 +582,53 @@ class UserController extends Controller {
 							->where('COD_ESTADO','=',1)
 						  	->get();
 
+		$count_x_aprobar 	= 0;
+        $cod_empresa    	=   Session::get('usuario')->usuarioosiris_id;
+        $url 				=	'';
+
+
+        $url_obs 			=	'';
+		$count_observados 	= 0;
+        //falta usuario contacto
+
+		//1CIX00000019 COMPRAS
+        //1CIX00000015 1CIX00000016 //Contabilidad
+		if(Session::get('usuario')->rol_id == '1CIX00000019'){
+			$listadatos      =   $this->con_lista_cabecera_comprobante_total_uc($cod_empresa);
+			$count_x_aprobar = 	 count($listadatos);
+        	$url 			 =	'/gestion-de-comprobante-us/wjR';
+        	$listadatosob    =   $this->con_lista_cabecera_comprobante_total_gestion_observados($cod_empresa);
+			$count_observados = 	 count($listadatosob);
+        	$url_obs 		 =	'/gestion-de-comprobantes-observados/lO6';
+
+
+		}
+		else{
+			if(Session::get('usuario')->rol_id == '1CIX00000015' || Session::get('usuario')->rol_id == '1CIX00000016'){
+        		$listadatos     =   $this->con_lista_cabecera_comprobante_total_cont($cod_empresa);
+				$count_x_aprobar = 	 count($listadatos);
+        		$url 			 =	'/gestion-de-contabilidad-aprobar/g56';
+
+			}
+			else{
+				if(Session::get('usuario')->rol_id == '1CIX00000020'){
+        			$listadatos     =   $this->con_lista_cabecera_comprobante_total_adm($cod_empresa);
+					$count_x_aprobar = 	 count($listadatos);
+        			$url 			 =	'/gestion-de-administracion-aprobar/j25';
+
+				}
+			}
+		}
 
 		return View::make('bienvenido',
 						 [
 						 	'usuario' 			=> $usuario,
 						 	'cuentabancarias' 	=> $cuentabancarias,
 						 	'fecha' 			=> $fecha,
+						 	'count_x_aprobar' 	=> $count_x_aprobar,
+						 	'url' 				=> $url,
+						 	'count_observados' 	=> $count_observados,
+						 	'url_obs' 			=> $url_obs,
 						 ]);
 
 	}

@@ -347,6 +347,43 @@ th {
   src: url('../lib/bootstrap/dist/fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('../lib/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2') format('woff2'), url('../lib/bootstrap/dist/fonts/glyphicons-halflings-regular.woff') format('woff'), url('../lib/bootstrap/dist/fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('../lib/bootstrap/dist/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
 }
 
+.color-azul-indu{
+  background-color: #1d3a6d !important;
+}
+.color-blanco{
+  color: #ffffff !important;
+}
+
+.background-amarillo{
+  background-color: #ffcc00 !important;
+}
+.border-color-amarillo{
+  border-color : #ffcc00 !important;
+}
+
+.color-negro{
+  color: #000 !important;
+}
+
+.background-rojo{
+  background-color: #cc0000 !important;
+}
+.border-color-rojo{
+  border-color : #cc0000 !important;
+}
+
+.be-login .nav-tabs > li a{
+  color: #fff;
+}
+
+.be-login .nav-tabs > li.active a{
+    border-bottom: 2px solid #fff;
+}
+
+
+.be-login .panel-border-color{
+  border-top: 3px solid #ffffff;
+}
 .login-top{
 
 /*  min-height: 100vh;
@@ -355,7 +392,21 @@ th {
   background: url(../img/fondomerge.jpg) no-repeat;
   background-size: cover;*/
   
-  background-image: url("../img/fondomerge.jpg");
+  background-image: url("../img/fondomerge01.jpg");
+  background-color: rgba(255, 255, 255, 0.1);  
+  /* Full height */
+  height: 100%;
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+
+}
+
+
+.acceso-top{
+
+  background-image: url("../img/fondomerge02.jpg");
   background-color: rgba(255, 255, 255, 0.1);  
   /* Full height */
   height: 100%;

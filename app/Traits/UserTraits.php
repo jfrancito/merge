@@ -308,7 +308,7 @@ trait UserTraits
             if($_ENV['APP_PRODUCCION']==0){
                 $url                =   "http://localhost:8080/merge/activar-registro/".Hashids::encode($token);
             }else{
-                $url                =   "http://10.1.50.2:8080/merge/activar-registro/".Hashids::encode($token);
+                $url                =   "https://merge.grupoinduamerica.com/merge/activar-registro/".Hashids::encode($token);
             }  
 
             $array      =  Array(
