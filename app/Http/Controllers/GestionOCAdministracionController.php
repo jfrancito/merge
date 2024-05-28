@@ -102,19 +102,40 @@ class GestionOCAdministracionController extends Controller
 
                 foreach($archivoob as $index=>$item){
 
-                    $categoria                               =   CMPCategoria::where('COD_CATEGORIA','=',$item)->first();
-                    $docasociar                              =   New CMPDocAsociarCompra;
-                    $docasociar->COD_ORDEN                   =   $idoc;
-                    $docasociar->COD_CATEGORIA_DOCUMENTO     =   $categoria->COD_CATEGORIA;
-                    $docasociar->NOM_CATEGORIA_DOCUMENTO     =   $categoria->NOM_CATEGORIA;
-                    $docasociar->IND_OBLIGATORIO             =   0;
-                    $docasociar->TXT_FORMATO                 =   $categoria->COD_CTBLE;
-                    $docasociar->TXT_ASIGNADO                =   $categoria->TXT_ABREVIATURA;
-                    $docasociar->COD_USUARIO_CREA_AUD        =   Session::get('usuario')->id;
-                    $docasociar->FEC_USUARIO_CREA_AUD        =   $this->fechaactual;
-                    $docasociar->COD_ESTADO                  =   1;
-                    $docasociar->TIP_DOC                     =   $categoria->CODIGO_SUNAT;
-                    $docasociar->save();
+
+                    $docu_asoci                             =    CMPDocAsociarCompra::where('COD_ORDEN','=',$idoc)
+                                                                ->where('COD_CATEGORIA_DOCUMENTO','=',$item)->first();
+                    if(count($docu_asoci)>0){
+
+                        Archivo::where('ID_DOCUMENTO','=',$idoc)
+                                ->where('ACTIVO','=','1')
+                                ->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                ->where('TIPO_ARCHIVO','=',$item)
+                                    ->update(
+                                        [
+                                            'ACTIVO'=>0,
+                                            'FECHA_MOD'=>$this->fechaactual,
+                                            'USUARIO_MOD'=>Session::get('usuario')->id
+                                        ]
+                                    );
+
+                    }else{
+
+                        $categoria                               =   CMPCategoria::where('COD_CATEGORIA','=',$item)->first();
+                        $docasociar                              =   New CMPDocAsociarCompra;
+                        $docasociar->COD_ORDEN                   =   $idoc;
+                        $docasociar->COD_CATEGORIA_DOCUMENTO     =   $categoria->COD_CATEGORIA;
+                        $docasociar->NOM_CATEGORIA_DOCUMENTO     =   $categoria->NOM_CATEGORIA;
+                        $docasociar->IND_OBLIGATORIO             =   0;
+                        $docasociar->TXT_FORMATO                 =   $categoria->COD_CTBLE;
+                        $docasociar->TXT_ASIGNADO                =   $categoria->TXT_ABREVIATURA;
+                        $docasociar->COD_USUARIO_CREA_AUD        =   Session::get('usuario')->id;
+                        $docasociar->FEC_USUARIO_CREA_AUD        =   $this->fechaactual;
+                        $docasociar->COD_ESTADO                  =   1;
+                        $docasociar->TIP_DOC                     =   $categoria->CODIGO_SUNAT;
+                        $docasociar->save();
+
+                    }
 
                 }
 
@@ -185,7 +206,7 @@ class GestionOCAdministracionController extends Controller
             $documentohistorial     =   FeDocumentoHistorial::where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                                         ->orderBy('FECHA','DESC')
                                         ->get();
-            $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+            $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','1')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
             $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                         ->where('COD_ESTADO','=',1)
@@ -531,7 +552,7 @@ class GestionOCAdministracionController extends Controller
                                         ->orderBy('FECHA','DESC')
                                         ->get();
 
-            $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+            $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','1')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
 
             return View::make('comprobante/aprobaradm', 

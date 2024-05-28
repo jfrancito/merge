@@ -27,7 +27,6 @@
 </div>  
 
 
-
 @stop
 
 @section('script')

@@ -32,8 +32,8 @@
 
     @foreach($documentoscompra as $index => $item)
       <div class="be-checkbox">
-        <input id="{{$item->COD_CATEGORIA}}" value="{{$item->COD_CATEGORIA}}"  type="checkbox" name="archivoob[]"  @if(in_array($item->COD_CATEGORIA, $totalarchivos)) checked  disabled @endif >
-        <label for="{{$item->COD_CATEGORIA}}">{{$item->NOM_CATEGORIA}} ({{$item->COD_CTBLE}})</label>
+        <input id="{{$item->COD_CATEGORIA}}" value="{{$item->COD_CATEGORIA}}"  type="checkbox" name="archivoob[]" >
+        <label for="{{$item->COD_CATEGORIA}}">{{$item->NOM_CATEGORIA}} ({{$item->COD_CTBLE}}) @if(in_array($item->COD_CATEGORIA, $totalarchivos)) <span class="label label-success">registrado</span> @endif </label>
       </div>
     @endforeach
 

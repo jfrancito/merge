@@ -95,7 +95,9 @@ class GestionUsuarioContactoController extends Controller
                 $pedido_id              =   $idoc;
                 $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
 
-                $arrayarchivos          =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                $arrayarchivos          =   Archivo::where('ID_DOCUMENTO','=',$idoc)
+                                            ->where('ACTIVO','=','1')
+                                            ->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                                             ->pluck('TIPO_ARCHIVO')
                                             ->toArray();
 
@@ -242,14 +244,13 @@ class GestionUsuarioContactoController extends Controller
 
             $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
 
-            $arrayarchivos          =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+            $arrayarchivos          =   Archivo::where('ID_DOCUMENTO','=',$idoc)
+                                        ->where('ACTIVO','=','1')
+                                        ->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                                         ->pluck('TIPO_ARCHIVO')
                                         ->toArray();
 
  
-
-
-
             $tiposerie              =   substr($fedocumento->SERIE, 0, 1);
 
             if($tiposerie == 'E'){
@@ -281,7 +282,7 @@ class GestionUsuarioContactoController extends Controller
                                         ->orderBy('FECHA','DESC')
                                         ->get();
 
-            $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+            $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','1')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
 
 

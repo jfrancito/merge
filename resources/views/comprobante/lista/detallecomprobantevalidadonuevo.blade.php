@@ -5,7 +5,7 @@
 
             <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
               <div class="panel panel-default panel-contrast">
-                <div class="panel-heading" style="background: #177bbb;color: #fff;">COMPARAR (XML - ORDEN COMPRA)
+                <div class="panel-heading" style="background: #1d3a6d;color: #fff;">COMPARAR (XML - ORDEN COMPRA)
                 </div>
                 <div class="panel-body panel-body-contrast">
                   <table class="table table-condensed table-striped">
@@ -89,7 +89,7 @@
             <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
 
               <div class="panel panel-default panel-contrast">
-                <div class="panel-heading" style="background: #177bbb;color: #fff;">CONSULTA API SUNAT
+                <div class="panel-heading" style="background: #1d3a6d;color: #fff;">CONSULTA API SUNAT
                 </div>
                 <div class="panel-body panel-body-contrast">
                     @if(count($fedocumento)<=0)
@@ -115,7 +115,7 @@
  
             <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
               <div class="panel panel-default panel-contrast">
-                <div class="panel-heading" style="background: #177bbb;color: #fff;">SEGUIMIENTO DE DOCUMENTO
+                <div class="panel-heading" style="background: #1d3a6d;color: #fff;">SEGUIMIENTO DE DOCUMENTO
                 </div>
                 <div class="panel-body panel-body-contrast">
                   <table class="table table-condensed table-striped">
@@ -160,7 +160,7 @@
 
             <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
               <div class="panel panel-default panel-contrast">
-                <div class="panel-heading" style="background: #177bbb;color: #fff;">ARCHIVOS
+                <div class="panel-heading" style="background: #1d3a6d;color: #fff;">ARCHIVOS
                 </div>
                 <div class="panel-body panel-body-contrast">
                   <table class="table table-condensed table-striped">
@@ -201,7 +201,7 @@
 
             <div class="col-xs-12 col-sm-6 col-md-8 col-lg-8">
               <div class="panel panel-default panel-contrast">
-                <div class="panel-heading" style="background: #177bbb;color: #fff;">INFORMACION DEL DOCUMENTO
+                <div class="panel-heading" style="background: #1d3a6d;color: #fff;">INFORMACION DEL DOCUMENTO
                 </div>
                 <div class="panel-body panel-body-contrast">
 

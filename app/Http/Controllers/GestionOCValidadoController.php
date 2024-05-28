@@ -107,7 +107,7 @@ class GestionOCValidadoController extends Controller
                                     ->orderBy('FECHA','DESC')
                                     ->get();
         //dd($documentohistorial);
-        $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+        $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','1')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
         $funcion                =   $this;
         //dd($archivos);
         return View::make('comprobante/registrocomprobantevalidado',
