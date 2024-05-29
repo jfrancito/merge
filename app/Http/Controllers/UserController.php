@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Response;
+
 use App\Modelos\WEBGrupoopcion;
 use App\Modelos\WEBOpcion;
 use App\Modelos\WEBRol;
@@ -51,7 +53,19 @@ class UserController extends Controller {
     use ComprobanteProvisionTraits;
     use ComprobanteTraits;
 
+	public function actionDescargarManual(Request $request)
+	{
 
+	    $filePath = public_path('manual-proveedor.pdf');
+	    return Response::download($filePath);
+
+	}
+
+
+
+	public function actionManualProveedor() {
+		return View::make('revistadigital/revistadigital');
+	}
 
 
 	public function actionEliminarCuentaBancaria(Request $request)
@@ -142,6 +156,7 @@ class UserController extends Controller {
  		return Redirect::to('/bienvenido')->with('bienhecho', 'Cuenta Bancaria '.$numerocuenta.' registrada con éxito');
 
 	}
+
 
 
 

@@ -94,10 +94,17 @@
                             <li><a href="https://www.linkedin.com/company/induamerica-servicios-logisticos/" target="_blank"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
                             <li><a href="https://www.instagram.com/induamerica.peru?igsh=bGg0YzdrbnJxdWM=" target="_blank"><i class="fa fa-instagram" aria-hidden="true"></i></a></li>
                         </ul>
-
                         <strong style="color: #FFCC00 !important;">MERGE</strong>
-
                     </span>
+
+                    <div class="row">
+                      <div class="col-md-6">
+                        <!-- ¿Olvidates tu contraseña? -->
+                      </div>
+                      <div class="col-md-6">
+                        <a href="{{ url('/descargar-manual/') }}" class="color-blanco" target="_blank">DESCARGAR MANUAL</a>
+                      </div>
+                    </div>
 
 
                   </div>

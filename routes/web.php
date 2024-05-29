@@ -36,10 +36,10 @@ Route::any('/enviocorreoadmin', 'UserController@actionCorreoADM');//correo para 
 Route::any('/enviocorreoapcli', 'UserController@actionCorreoAPCLI');//correo para cliente cuando se aprueba
 Route::get('/cambiarperfil', 'UserController@actionCambiarPerfil');
 Route::any('/enviocorreobaja', 'UserController@actionCorreoBaja');//correo para cliente cuando se aprueba
-
-
 Route::any('/validarsunatcdr', 'GestionOCController@actionSunatCDR');//vALIDAR CDR Y SUNAT
 
+Route::any('/manual-proveedor', 'UserController@actionManualProveedor');//vALIDAR CDR Y SUNAT
+Route::any('/descargar-manual', 'UserController@actionDescargarManual');//vALIDAR CDR Y SUNAT
 
 Route::group(['middleware' => ['authaw']], function () {
 
