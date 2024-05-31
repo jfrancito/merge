@@ -42,7 +42,7 @@ use App\Traits\WhatsappTraits;
 use App\Traits\ComprobanteProvisionTraits;
 
 
-
+use Storage;
 use ZipArchive;
 use Hashids;
 use SplFileInfo;
@@ -1612,6 +1612,54 @@ class GestionOCController extends Controller
 
 
 
+        //encontrar la orden de compra
+        $fileordencompra            =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                                        ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000001')
+                                        ->where('COD_ESTADO','=','1')
+                                        ->first();
+        $rutafila                  =   "";
+        $rutaorden                  =   "";
+
+        if(count($fileordencompra)>0){
+            $directorio = '\\\\10.1.0.201\cpe\Orden_Compra';
+            // Nombre del archivo que estás buscando
+            $nombreArchivoBuscado = $ordencompra->COD_ORDEN.'.pdf';
+            // Escanea el directorio
+            $archivos = scandir($directorio);
+            // Inicializa una variable para almacenar el resultado
+            $archivoEncontrado = false;
+            // Recorre la lista de archivos
+            foreach ($archivos as $archivo) {
+                // Omite los elementos '.' y '..'
+                if ($archivo != '.' && $archivo != '..') {
+                    // Verifica si el nombre del archivo coincide con el archivo buscado
+                    if ($archivo == $nombreArchivoBuscado) {
+                        $archivoEncontrado = true;
+                        break;
+                    }
+                }
+            }
+            // Muestra el resultado
+            if ($archivoEncontrado) {
+                $rutafila         =   $directorio.'\\'.$nombreArchivoBuscado;
+                // $fileContents = file_get_contents($rutafila);
+                // // Usa el facade Storage para almacenar el archivo en el storage de Laravel
+                // //Storage::disk('local')->put($destinationPath, $fileContents);
+                // $ruta                   =   storage_path('app/oc/');
+                // //dd($ruta);
+                // copy($rutafila,$ruta.$nombreArchivoBuscado);
+
+
+
+                // $rutaorden           =   asset('storage/app/oc/'.$nombreArchivoBuscado);
+                $rutaorden           =  $rutafila;
+            } 
+        }
+
+
+        //dd($rutaorden);
+
+
         $funcion                =   $this;
 
         return View::make('comprobante/registrocomprobanteadministrator',
@@ -1623,11 +1671,11 @@ class GestionOCController extends Controller
                             'combocontacto'         =>  $combocontacto,
                             'procedencia'           =>  $procedencia,
                             'xmlfactura'            =>  $xmlfactura,
-
                             'tp'                    =>  $tp,
                             'xmlarchivo'            =>  $xmlarchivo,
                             'tarchivos'             =>  $tarchivos,
                             'usuario'               =>  $usuario,
+                            'rutaorden'             =>  $rutaorden,
                             'funcion'               =>  $funcion,
                             'idopcion'              =>  $idopcion,
                          ]);
@@ -1953,8 +2001,6 @@ class GestionOCController extends Controller
 
             try{    
                 
-
-
                 DB::beginTransaction();
                 $contacto_id       =   $request['contacto_id'];
                 $procedencia       =   $request['procedencia'];
@@ -1969,6 +2015,7 @@ class GestionOCController extends Controller
                 $sw = 0;
                 $nombre_doc = $fedocumento->SERIE.'-'.$fedocumento->NUMERO;
 
+                //LECTURA DEL CDR
                 if(!is_null($filescdr)){
                     //CDR
                     foreach($filescdr as $file){
@@ -2078,11 +2125,41 @@ class GestionOCController extends Controller
                 }
 
 
-                //dd("si conicide");
-                /************************************************************************/
+                //guardar orden de compra precargada
+                $rutaorden       =   $request['rutaorden'];
+                if($rutaorden!=''){
+
+                    $aoc                            =       CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                                                            ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000001'])
+                                                            ->first();
+                    $larchivos                      =       Archivo::get();
+                    $nombrefilecdr                  =       count($larchivos).'-'.$ordencompra->COD_ORDEN.'.pdf';
+                    $prefijocarperta                =       $this->prefijo_empresa($ordencompra->COD_EMPR);
+                    $rutafile                       =       $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
+                    $rutacompleta                   =       $rutafile.'\\'.$nombrefilecdr;
+                    $valor                          =       $this->versicarpetanoexiste($rutafile);
+                    $path                           =       $rutacompleta;
+                    //$directorio                     =       '\\\\10.1.0.201\cpe\Orden_Compra';
+                    //$rutafila                       =       $directorio.'\\'.$nombreArchivoBuscado;
+                    copy($rutaorden,$rutacompleta);
+                    $dcontrol                       =       new Archivo;
+                    $dcontrol->ID_DOCUMENTO         =       $ordencompra->COD_ORDEN;
+                    $dcontrol->DOCUMENTO_ITEM       =       $fedocumento->DOCUMENTO_ITEM;
+                    $dcontrol->TIPO_ARCHIVO         =       $aoc->COD_CATEGORIA_DOCUMENTO;
+                    $dcontrol->NOMBRE_ARCHIVO       =       $nombrefilecdr;
+                    $dcontrol->DESCRIPCION_ARCHIVO  =       $aoc->NOM_CATEGORIA_DOCUMENTO;
+                    $dcontrol->URL_ARCHIVO          =       $path;
+                    $dcontrol->SIZE                 =       100;
+                    $dcontrol->EXTENSION            =       '.pdf';
+                    $dcontrol->ACTIVO               =       1;
+                    $dcontrol->FECHA_CREA           =       $this->fechaactual;
+                    $dcontrol->USUARIO_CREA         =       Session::get('usuario')->id;
+                    $dcontrol->save();
+
+                }
+
+
                 $tiposerie              =   substr($fedocumento->SERIE, 0, 1);
-
-
 
                 if($tiposerie == 'E'){
                     $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
@@ -2105,7 +2182,7 @@ class GestionOCController extends Controller
 
                     $filescdm          =   $request[$item->COD_CATEGORIA_DOCUMENTO];
                     if(!is_null($filescdm)){
-                        //CDR
+
                         foreach($filescdm as $file){
 
                             $larchivos       =      Archivo::get();
@@ -2140,8 +2217,6 @@ class GestionOCController extends Controller
                             $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
                             $dcontrol->save();
                         }
-                    }else{
-                        return Redirect::to('detalle-comprobante-oc-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Seleccione Archivo .ZIP a Importar ');
                     }
                 }
 
@@ -2258,6 +2333,8 @@ class GestionOCController extends Controller
                     $this->insertar_whatsaap('51944132248','JAIRO ALONSO',$mensaje,'');
                     $this->insertar_whatsaap('51977624444','DINO CRISTOPHER',$mensaje,'');
                     $this->insertar_whatsaap('51959266298','INGRID JHOSELIT',$mensaje,'');
+                    $this->insertar_whatsaap('51965991360','ANGHIE',$mensaje,'');
+                    $this->insertar_whatsaap('51950638955','MIGUEL',$mensaje,'');
                 }                        
                 DB::commit();
             }catch(\Exception $ex){

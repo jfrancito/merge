@@ -213,6 +213,9 @@ class GestionUsuarioContactoController extends Controller
                         $this->insertar_whatsaap('51944132248','JAIRO ALONSO',$mensaje,'');
                         $this->insertar_whatsaap('51977624444','DINO CRISTOPHER',$mensaje,'');
                         $this->insertar_whatsaap('51959266298','INGRID JHOSELIT',$mensaje,'');
+                        $this->insertar_whatsaap('51965991360','ANGHIE',$mensaje,'');
+                        $this->insertar_whatsaap('51950638955','MIGUEL',$mensaje,'');
+
                     }  
                 }else{
                     if($_ENV['APP_PRODUCCION']==0){
@@ -402,6 +405,9 @@ class GestionUsuarioContactoController extends Controller
                     $this->insertar_whatsaap('51988650421','LUCELY YESMITH',$mensaje,'');
                     $this->insertar_whatsaap('51944132248','JAIRO ALONSO',$mensaje,'');
                     $this->insertar_whatsaap('51979659002','HAMILTON',$mensaje,'');
+                    $this->insertar_whatsaap('51965991360','ANGHIE',$mensaje,'');
+                    $this->insertar_whatsaap('51950638955','MIGUEL',$mensaje,'');
+
 
 
                     $msjarray[]                             =   array(  "data_0" => $fedocumento->ID_DOCUMENTO, 
@@ -539,10 +545,10 @@ class GestionUsuarioContactoController extends Controller
                 $pedido_id          =   $idoc;
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
 
-                $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                $tarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
                                             //->where('IND_OBLIGATORIO','=',1)
-                                            ->where('TXT_ASIGNADO','=','CONTACTO')
-                                            ->get();
+                                        ->where('TXT_ASIGNADO','=','CONTACTO')
+                                        ->get();
 
                 $orden                      =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();
 
@@ -563,6 +569,42 @@ class GestionUsuarioContactoController extends Controller
                     $this->update_detalle_producto($orden,$detalleproducto);
                     
                 }
+
+
+                //guardar orden de compra precargada
+                $rutaorden       =   $request['rutaorden'];
+                if($rutaorden!=''){
+
+                    $aoc                            =       CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                                                            ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000001'])
+                                                            ->first();
+                    $larchivos                      =       Archivo::get();
+                    $nombrefilecdr                  =       count($larchivos).'-'.$ordencompra->COD_ORDEN.'.pdf';
+                    $prefijocarperta                =       $this->prefijo_empresa($ordencompra->COD_EMPR);
+                    $rutafile                       =       $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
+                    $rutacompleta                   =       $rutafile.'\\'.$nombrefilecdr;
+                    $valor                          =       $this->versicarpetanoexiste($rutafile);
+                    $path                           =       $rutacompleta;
+                    //$directorio                     =       '\\\\10.1.0.201\cpe\Orden_Compra';
+                    //$rutafila                       =       $directorio.'\\'.$nombreArchivoBuscado;
+                    copy($rutaorden,$rutacompleta);
+                    $dcontrol                       =       new Archivo;
+                    $dcontrol->ID_DOCUMENTO         =       $ordencompra->COD_ORDEN;
+                    $dcontrol->DOCUMENTO_ITEM       =       $fedocumento->DOCUMENTO_ITEM;
+                    $dcontrol->TIPO_ARCHIVO         =       $aoc->COD_CATEGORIA_DOCUMENTO;
+                    $dcontrol->NOMBRE_ARCHIVO       =       $nombrefilecdr;
+                    $dcontrol->DESCRIPCION_ARCHIVO  =       $aoc->NOM_CATEGORIA_DOCUMENTO;
+                    $dcontrol->URL_ARCHIVO          =       $path;
+                    $dcontrol->SIZE                 =       100;
+                    $dcontrol->EXTENSION            =       '.pdf';
+                    $dcontrol->ACTIVO               =       1;
+                    $dcontrol->FECHA_CREA           =       $this->fechaactual;
+                    $dcontrol->USUARIO_CREA         =       Session::get('usuario')->id;
+                    $dcontrol->save();
+
+                }
+
+
 
 
 
@@ -605,8 +647,6 @@ class GestionUsuarioContactoController extends Controller
                             $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
                             $dcontrol->save();
                         }
-                    }else{
-                        return Redirect::to('detalle-comprobante-oc/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Seleccione Archivo a Importar ');
                     }
                 }
 
@@ -696,7 +736,8 @@ class GestionUsuarioContactoController extends Controller
                     $this->insertar_whatsaap('51944132248','JAIRO ALONSO',$mensaje,'');
                     $this->insertar_whatsaap('51977624444','DINO CRISTOPHER',$mensaje,'');
                     $this->insertar_whatsaap('51959266298','INGRID JHOSELIT',$mensaje,'');
-
+                    $this->insertar_whatsaap('51965991360','ANGHIE',$mensaje,'');
+                    $this->insertar_whatsaap('51950638955','MIGUEL',$mensaje,'');
                 }    
 
                 DB::commit();
@@ -723,6 +764,43 @@ class GestionUsuarioContactoController extends Controller
 
             $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
+
+            //encontrar la orden de compra
+            $fileordencompra            =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                                            ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000001')
+                                            ->where('COD_ESTADO','=','1')
+                                            ->first();
+            $rutafila                   =   "";
+            $rutaorden                  =   "";
+
+            if(count($fileordencompra)>0){
+                $directorio = '\\\\10.1.0.201\cpe\Orden_Compra';
+                // Nombre del archivo que estás buscando
+                $nombreArchivoBuscado = $ordencompra->COD_ORDEN.'.pdf';
+                // Escanea el directorio
+                $archivose = scandir($directorio);
+                // Inicializa una variable para almacenar el resultado
+                $archivoEncontrado = false;
+                // Recorre la lista de archivos
+                foreach ($archivose as $archivo) {
+                    // Omite los elementos '.' y '..'
+                    if ($archivo != '.' && $archivo != '..') {
+                        // Verifica si el nombre del archivo coincide con el archivo buscado
+                        if ($archivo == $nombreArchivoBuscado) {
+                            $archivoEncontrado = true;
+                            break;
+                        }
+                    }
+                }
+                // Muestra el resultado
+                if ($archivoEncontrado) {
+                    $rutafila         =   $directorio.'\\'.$nombreArchivoBuscado;
+                    $rutaorden           =  $rutafila;
+                } 
+            }
+
+
+
             return View::make('comprobante/aprobaruc', 
                             [
                                 'fedocumento'           =>  $fedocumento,
@@ -731,6 +809,8 @@ class GestionUsuarioContactoController extends Controller
                                 'detalleordencompra'    =>  $detalleordencompra,
                                 'detallefedocumento'    =>  $detallefedocumento,
                                 'documentohistorial'    =>  $documentohistorial,
+                                'rutaorden'             =>  $rutaorden,
+
                                 'archivos'              =>  $archivos,
                                 'tarchivos'             =>  $tarchivos,
                                 'tp'                    =>  $tp,

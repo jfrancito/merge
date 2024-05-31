@@ -1,4 +1,4 @@
-
+<input type="hidden" name="rutaorden" id='rutaorden' value = '{{$rutaorden}}'>
 <div class="row">
   <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
     <div class="panel panel-default panel-contrast">
@@ -315,25 +315,53 @@
       </div>
       <div class="panel-body panel-body-contrast">
               <div class="row">
-                @foreach($tarchivos as $index => $item)  
-                  <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
-                    <div class="form-group sectioncargarimagen">
-                        <label class="col-sm-12 control-label" style="text-align: left;"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}} ({{$item->TXT_FORMATO}})</b> 
-                          @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000005') <b>(Descargue el pdf de este enlace <a href="https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaWeb.jsp" target="_blank">Sunat</a> y subalo para que pueda aprobar</b>) @else <br><br> @endif
-                        </label>
-                        <div class="col-sm-12">
-                            <div class="file-loading">
-                                <input 
-                                id="file-{{$item->COD_CATEGORIA_DOCUMENTO}}" 
-                                name="{{$item->COD_CATEGORIA_DOCUMENTO}}[]" 
-                                class="file-es"  
-                                type="file" 
-                                multiple data-max-file-count="1"
-                                required>
+                @foreach($tarchivos as $index => $item) 
+
+
+                    @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000001')
+                      @if($rutaorden != '')
+                        <div><b>LA ORDEN DE COMPRA SE CARGARA DESPUES DE GUARDAR</b></div>
+                      @else
+                        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+                          <div class="form-group sectioncargarimagen">
+                              <label class="col-sm-12 control-label" style="text-align: left;"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}} ({{$item->TXT_FORMATO}})</b> 
+                                @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000005') <b>(Descargue el pdf de este enlace <a href="https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaWeb.jsp" target="_blank">Sunat</a> y subalo para que pueda aprobar</b>) @else <br><br> @endif
+                              </label>
+                              <div class="col-sm-12">
+                                  <div class="file-loading">
+                                      <input 
+                                      id="file-{{$item->COD_CATEGORIA_DOCUMENTO}}" 
+                                      name="{{$item->COD_CATEGORIA_DOCUMENTO}}[]" 
+                                      class="file-es"  
+                                      type="file" 
+                                      multiple data-max-file-count="1"
+                                      required>
+                                  </div>
+                              </div>
+                          </div>
+                        </div>
+                      @endif
+                    @else
+                      <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+                        <div class="form-group sectioncargarimagen">
+                            <label class="col-sm-12 control-label" style="text-align: left;"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}} ({{$item->TXT_FORMATO}})</b> 
+                              @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000005') <b>(Descargue el pdf de este enlace <a href="https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaWeb.jsp" target="_blank">Sunat</a> y subalo para que pueda aprobar</b>) @else <br><br> @endif
+                            </label>
+                            <div class="col-sm-12">
+                                <div class="file-loading">
+                                    <input 
+                                    id="file-{{$item->COD_CATEGORIA_DOCUMENTO}}" 
+                                    name="{{$item->COD_CATEGORIA_DOCUMENTO}}[]" 
+                                    class="file-es"  
+                                    type="file" 
+                                    multiple data-max-file-count="1"
+                                    required>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                  </div>
+                      </div>
+                    @endif
+
                 @endforeach
                 <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
                   <div class="form-group sectioncargarimagen">

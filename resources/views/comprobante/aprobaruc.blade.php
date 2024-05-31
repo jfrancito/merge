@@ -16,8 +16,12 @@
           <div class="panel-heading panel-heading-divider">Aprobar Comprobante Contacto<span class="panel-subtitle">Aprobar un Comprobante Usuario Contacto</span></div>
           <div class="panel-body">
             <form method="POST" id='formpedido' action="{{ url('/aprobar-comprobante-uc/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
+
                   {{ csrf_field() }}
               @include('comprobante.form.formaprobar')
+
+
+
             </form>
           </div>
         </div>
