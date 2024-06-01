@@ -606,15 +606,31 @@ class UserController extends Controller {
 		$count_observados 	= 0;
         //falta usuario contacto
 
+		$count_x_aprobar_gestion 	= 0;
+        $url_gestion 				=	'';
+
+
+        //$listadatos     	=   $this->con_lista_cabecera_comprobante_administrativo($cod_empresa);
+
+		$trol 				=	WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
+
 		//1CIX00000019 COMPRAS
         //1CIX00000015 1CIX00000016 //Contabilidad
-		if(Session::get('usuario')->rol_id == '1CIX00000019'){
+		if($trol->ind_uc == 1){
+
+
 			$listadatos      =   $this->con_lista_cabecera_comprobante_total_uc($cod_empresa);
 			$count_x_aprobar = 	 count($listadatos);
         	$url 			 =	'/gestion-de-comprobante-us/wjR';
+
         	$listadatosob    =   $this->con_lista_cabecera_comprobante_total_gestion_observados($cod_empresa);
 			$count_observados = 	 count($listadatosob);
         	$url_obs 		 =	'/gestion-de-comprobantes-observados/lO6';
+
+
+			$listadatosg      =   $this->con_lista_cabecera_comprobante_administrativo($cod_empresa);
+			$count_x_aprobar_gestion  = 	 count($listadatosg);
+        	$url_gestion 	  =	'/gestion-de-orden-compra/k5X';
 
 
 		}
@@ -644,6 +660,9 @@ class UserController extends Controller {
 						 	'url' 				=> $url,
 						 	'count_observados' 	=> $count_observados,
 						 	'url_obs' 			=> $url_obs,
+						 	'count_x_aprobar_gestion' 	=> $count_x_aprobar_gestion,
+						 	'url_gestion' 			=> $url_gestion,
+						 	'trol' 				=> $trol,
 						 ]);
 
 	}
