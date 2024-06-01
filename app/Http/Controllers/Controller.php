@@ -47,6 +47,17 @@ class Controller extends BaseController {
 		$this->fechaactual 		= date('Ymd H:i:s');
 		$this->hoy 				= date_format(date_create(date('Ymd h:i:s')), 'Ymd h:i:s');
 		$this->fecha_sin_hora 	= date('d-m-Y');
+
+
+		//fecha actual 10 dias
+		$fechatreinta 	= date('Y-m-j');
+		$nuevafecha 	= strtotime ( '-10 day' , strtotime($fechatreinta));
+		$nuevafecha 	= date ('Y-m-j' , $nuevafecha);
+		$this->fecha_menos_diez_dias = date_format(date_create($nuevafecha), 'd-m-Y');
+
+
+
+
 	}
 
 

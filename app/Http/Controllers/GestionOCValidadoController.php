@@ -39,9 +39,6 @@ class GestionOCValidadoController extends Controller
     use ComprobanteTraits;
 
 
-
-
-
     public function actionListarOCValidado($idopcion)
     {
         /******************* validar url **********************/
@@ -50,15 +47,66 @@ class GestionOCValidadoController extends Controller
         /******************************************************/
         View::share('titulo','Lista Ordenes de Compra');
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
-        $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion($cod_empresa);
+
+        $fecha_inicio   =   $this->fecha_menos_diez_dias;
+        $fecha_fin      =   $this->fecha_sin_hora;
+        $proveedor_id   =   'TODO';
+        $combo_proveedor=   $this->gn_combo_proveedor_fe_documento($proveedor_id);
+
+        $estado_id      =   'TODO';
+        $combo_estado   =   $this->gn_combo_estado_fe_documento($estado_id);
+
+        //dd($combo_estado);
+
+        $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id);
         $funcion        =   $this;
         return View::make('comprobante/listaocvalidado',
                          [
                             'listadatos'        =>  $listadatos,
                             'funcion'           =>  $funcion,
                             'idopcion'          =>  $idopcion,
+                            'fecha_inicio'      =>  $fecha_inicio,
+                            'fecha_fin'         =>  $fecha_fin,
+                            'proveedor_id'      =>  $proveedor_id,
+                            'combo_proveedor'   =>  $combo_proveedor,
+                            'estado_id'         =>  $estado_id,
+                            'combo_estado'      =>  $combo_estado,
+
                          ]);
     }
+
+
+
+    public function actionListarAjaxBuscarDocumento(Request $request) {
+
+        $fecha_inicio   =   $request['fecha_inicio'];
+        $fecha_fin      =   $request['fecha_fin'];
+        $proveedor_id   =   $request['proveedor_id'];  
+        $estado_id      =   $request['estado_id'];
+        $idopcion       =   $request['idopcion'];
+
+        $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
+        $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id);
+        $funcion        =   $this;
+
+        return View::make('comprobante/ajax/alistaocvalidado',
+                         [
+                            'fecha_inicio'          =>  $fecha_inicio,
+                            'fecha_fin'             =>  $fecha_fin,
+                            'proveedor_id'          =>  $proveedor_id,
+                            'estado_id'             =>  $estado_id,
+                            'idopcion'              =>  $idopcion,
+                            'cod_empresa'           =>  $cod_empresa,
+                            'listadatos'            =>  $listadatos,
+                            'ajax'                  =>  true,
+
+                            'funcion'               =>  $funcion
+                         ]);
+    }
+
+
+
+
 
 
     public function actionListarOCHistorial($idopcion)

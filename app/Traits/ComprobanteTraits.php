@@ -298,17 +298,60 @@ trait ComprobanteTraits
 	}
 
 
-	private function con_lista_cabecera_comprobante_total_gestion($cliente_id) {
+	private function con_lista_cabecera_comprobante_total_gestion($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id) {
 
-		$listadatos 	= 	FeDocumento::leftJoin('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+
+		$listadatos 	= 	CMPOrden::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+							->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
 							//->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
 							->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+							->Proveedor($proveedor_id)
+							->Estado($estado_id)
 							->where('FE_DOCUMENTO.COD_ESTADO','<>','')
 							->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+							->orderBy('fecha_pa', 'desc')
 							->get();
 
 	 	return  $listadatos;
+
+
 	}
+
+    private function gn_combo_proveedor_fe_documento($todo) {
+
+		$array 						= 	FeDocumento::join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+										->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+										->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+										->select(DB::raw('COD_EMPR_CLIENTE,TXT_EMPR_CLIENTE'))
+										->groupBy('COD_EMPR_CLIENTE')
+										->groupBy('TXT_EMPR_CLIENTE')
+                                        ->pluck('TXT_EMPR_CLIENTE','COD_EMPR_CLIENTE')
+                                        ->toArray();
+                                        
+        if($todo=='TODO'){
+            $combo                  =   array($todo => $todo) + $array;
+        }else{
+            $combo                  =   $array;
+        }
+        return  $combo;                             
+    }
+
+
+    private function gn_combo_estado_fe_documento($todo) {
+
+		$array 							= 	DB::table('CMP.CATEGORIA')
+        									->where('COD_ESTADO','=',1)
+        									->where('TXT_GRUPO','=','ESTADO_MERGE')
+		        							->pluck('NOM_CATEGORIA','COD_CATEGORIA')
+											->toArray();
+		if($todo=='TODO'){
+			$combo  				= 	array($todo => $todo) + $array;
+		}else{
+			$combo  				= 	$array;
+		}
+	 	return  $combo;	                   
+    }
+
 
 
 	private function con_lista_cabecera_comprobante_total_gestion_observados($cliente_id) {
