@@ -103,7 +103,7 @@ class GestionOCAdministracionController extends Controller
                 foreach($archivoob as $index=>$item){
 
 
-                    $docu_asoci                             =    CMPDocAsociarCompra::where('COD_ORDEN','=',$idoc)
+                    $docu_asoci                             =    CMPDocAsociarCompra::where('COD_ORDEN','=',$idoc)->where('COD_ESTADO','=',1)
                                                                 ->where('COD_CATEGORIA_DOCUMENTO','=',$item)->first();
                     if(count($docu_asoci)>0){
 
@@ -197,7 +197,7 @@ class GestionOCAdministracionController extends Controller
 
             $trabajador             =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
 
-            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                         //->where('IND_OBLIGATORIO','=',1)
                                         ->where('TXT_ASIGNADO','=','CONTACTO')
                                         ->get();
@@ -212,7 +212,7 @@ class GestionOCAdministracionController extends Controller
                                         ->where('COD_ESTADO','=',1)
                                         ->get();
 
-            $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+            $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                         ->pluck('COD_CATEGORIA_DOCUMENTO')
                                         ->toArray();
 
@@ -543,7 +543,7 @@ class GestionOCAdministracionController extends Controller
             $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
             $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
-            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                         //->where('IND_OBLIGATORIO','=',1)
                                         ->where('TXT_ASIGNADO','=','CONTACTO')
                                         ->get();

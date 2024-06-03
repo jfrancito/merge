@@ -238,7 +238,7 @@ class GestionOCController extends Controller
 
 
                 if($tiposerie == 'E'){
-                    $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                    $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                                 //->where('IND_OBLIGATORIO','=',1)
                                                 ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000004'])
                                                 ->where('TXT_ASIGNADO','=','PROVEEDOR')
@@ -246,7 +246,7 @@ class GestionOCController extends Controller
                 //dd($tarchivos);
 
                 }else{
-                    $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                    $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                                 //->where('IND_OBLIGATORIO','=',1)
                                                 ->where('COD_CATEGORIA_DOCUMENTO','<>','DCC0000000000003')
                                                 ->where('TXT_ASIGNADO','=','PROVEEDOR')
@@ -463,7 +463,7 @@ class GestionOCController extends Controller
 
 
         $xmlfactura             =   'FACTURA';
-        $rhxml                  =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+        $rhxml                  =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                     //->where('IND_OBLIGATORIO','=',1)
                                     ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000013'])
                                     ->where('TXT_ASIGNADO','=','PROVEEDOR')
@@ -477,14 +477,14 @@ class GestionOCController extends Controller
 
         if($tiposerie == 'E'){
 
-            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                         //->where('IND_OBLIGATORIO','=',1)
                                         ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000004'])
                                         ->where('TXT_ASIGNADO','=','PROVEEDOR')
                                         ->get();
 
         }else{
-            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                         //->where('IND_OBLIGATORIO','=',1)
                                         ->where('COD_CATEGORIA_DOCUMENTO','<>','DCC0000000000003')
                                         ->where('TXT_ASIGNADO','=','PROVEEDOR')
@@ -909,7 +909,7 @@ class GestionOCController extends Controller
 
 
         $xmlfactura             =   'FACTURA';
-        $rhxml                  =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+        $rhxml                  =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                     //->where('IND_OBLIGATORIO','=',1)
                                     ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000013'])
                                     ->where('TXT_ASIGNADO','=','PROVEEDOR')
@@ -923,14 +923,14 @@ class GestionOCController extends Controller
 
         if($tiposerie == 'E'){
 
-            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                         //->where('IND_OBLIGATORIO','=',1)
                                         ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000004'])
                                         ->where('TXT_ASIGNADO','=','PROVEEDOR')
                                         ->get();
 
         }else{
-            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                         //->where('IND_OBLIGATORIO','=',1)
                                         ->where('COD_CATEGORIA_DOCUMENTO','<>','DCC0000000000003')
                                         ->where('TXT_ASIGNADO','=','PROVEEDOR')
@@ -1406,7 +1406,7 @@ class GestionOCController extends Controller
                 /************************************************************************/
                 $tiposerie              =   substr($fedocumento->SERIE, 0, 1);
                 if($tiposerie == 'E'){
-                    $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                    $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                                 //->where('IND_OBLIGATORIO','=',1)
                                                 ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000004'])
                                                 ->where('TXT_ASIGNADO','=','PROVEEDOR')
@@ -1414,7 +1414,7 @@ class GestionOCController extends Controller
                 //dd($tarchivos);
 
                 }else{
-                    $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                    $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                                 //->where('IND_OBLIGATORIO','=',1)
                                                 ->where('COD_CATEGORIA_DOCUMENTO','<>','DCC0000000000003')
                                                 ->where('TXT_ASIGNADO','=','PROVEEDOR')
@@ -1576,7 +1576,7 @@ class GestionOCController extends Controller
 
 
         $xmlfactura             =   'FACTURA';
-        $rhxml                  =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+        $rhxml                  =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                     //->where('IND_OBLIGATORIO','=',1)
                                     ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000013'])
                                     ->where('TXT_ASIGNADO','=','PROVEEDOR')
@@ -1590,14 +1590,14 @@ class GestionOCController extends Controller
 
         if($tiposerie == 'E'){
 
-            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                         //->where('IND_OBLIGATORIO','=',1)
                                         ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000004'])
                                         ->whereIn('TXT_ASIGNADO', ['PROVEEDOR','CONTACTO'])
                                         ->get();
 
         }else{
-            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                         //->where('IND_OBLIGATORIO','=',1)
                                         ->where('COD_CATEGORIA_DOCUMENTO','<>','DCC0000000000003')
                                         //->where('TXT_ASIGNADO','=','PROVEEDOR')
@@ -2125,7 +2125,7 @@ class GestionOCController extends Controller
                 $rutaorden       =   $request['rutaorden'];
                 if($rutaorden!=''){
 
-                    $aoc                            =       CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                    $aoc                            =       CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                                             ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000001'])
                                                             ->first();
                     $larchivos                      =       Archivo::get();
@@ -2158,7 +2158,7 @@ class GestionOCController extends Controller
                 $tiposerie              =   substr($fedocumento->SERIE, 0, 1);
 
                 if($tiposerie == 'E'){
-                    $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                    $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                                 //->where('IND_OBLIGATORIO','=',1)
                                                 ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000004'])
                                                 ->whereIn('TXT_ASIGNADO', ['PROVEEDOR','CONTACTO'])
@@ -2166,7 +2166,7 @@ class GestionOCController extends Controller
                 //dd($tarchivos);
 
                 }else{
-                    $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                    $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                                 //->where('IND_OBLIGATORIO','=',1)
                                                 ->where('COD_CATEGORIA_DOCUMENTO','<>','DCC0000000000003')
                                                 ->whereIn('TXT_ASIGNADO', ['PROVEEDOR','CONTACTO'])

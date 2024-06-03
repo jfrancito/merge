@@ -101,7 +101,7 @@ class GestionUsuarioContactoController extends Controller
                                             ->pluck('TIPO_ARCHIVO')
                                             ->toArray();
 
-                $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                             ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
                                             //->where('TXT_ASIGNADO','=','CONTACTO')
                                             ->get();
@@ -110,7 +110,7 @@ class GestionUsuarioContactoController extends Controller
 
                 if($tiposerie == 'E'){
 
-                    $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                    $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                                 ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
                                                 ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000004'])
                                                 //->where('TXT_ASIGNADO','=','CONTACTO')
@@ -119,7 +119,7 @@ class GestionUsuarioContactoController extends Controller
 
 
                 }else{
-                    $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                    $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                                 ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
                                                 //->where('TXT_ASIGNADO','=','CONTACTO')
                                                 ->get();
@@ -265,7 +265,7 @@ class GestionUsuarioContactoController extends Controller
 
 
 
-                $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                             ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000004'])
                                             ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
                                             //->where('TXT_ASIGNADO','=','CONTACTO')
@@ -276,7 +276,7 @@ class GestionUsuarioContactoController extends Controller
 
             }else{
 
-                $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                             ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
                                             //->where('TXT_ASIGNADO','=','CONTACTO')
                                             ->get();
@@ -558,7 +558,7 @@ class GestionUsuarioContactoController extends Controller
                 $pedido_id          =   $idoc;
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
 
-                $tarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                $tarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                             //->where('IND_OBLIGATORIO','=',1)
                                         ->where('TXT_ASIGNADO','=','CONTACTO')
                                         ->get();
@@ -588,7 +588,7 @@ class GestionUsuarioContactoController extends Controller
                 $rutaorden       =   $request['rutaorden'];
                 if($rutaorden!=''){
 
-                    $aoc                            =       CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                    $aoc                            =       CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                                             ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000001'])
                                                             ->first();
                     $larchivos                      =       Archivo::get();
@@ -773,7 +773,7 @@ class GestionUsuarioContactoController extends Controller
             $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
             $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
-            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                         //->where('IND_OBLIGATORIO','=',1)
                                         ->where('TXT_ASIGNADO','=','CONTACTO')
                                         ->get();
