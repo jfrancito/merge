@@ -66,7 +66,7 @@ class GestionOCController extends Controller
     {
 
         header('Content-Type: text/html; charset=UTF-8');
-        $path = storage_path() . "/exports/20509076945-01-F083-00003191.xml";
+        $path = storage_path() . "/exports/doc_prueba.xml";
         //$path = storage_path() . "/exports/20454823916-01-FH04-00000026.xml";
 
         $parser = new InvoiceParser();
@@ -1738,6 +1738,9 @@ class GestionOCController extends Controller
                             $parser = new InvoiceParser();
                             $xml = file_get_contents($path);
                             $factura = $parser->parse($xml);
+
+
+
                             $tipo_documento_le = $factura->gettipoDoc();
                             $moneda_le = $factura->gettipoMoneda();
                         }else{
@@ -1751,7 +1754,7 @@ class GestionOCController extends Controller
                         }
 
 
-                        //dd($factura);
+
                         /****************************************  DIAS DE CREDITO *****************************************/
                         $diasdefactura = 0;
                         $tp = CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
@@ -1767,7 +1770,8 @@ class GestionOCController extends Controller
 
                         $documentolinea                     =   $this->ge_linea_documento($ordencompra->COD_ORDEN);
 
-                        //dd($documentolinea);
+
+                        //dd($factura->getobservacion());
 
                         //REGISTRO DEL XML LEIDO
                         $documento                          =   new FeDocumento;
@@ -1780,6 +1784,8 @@ class GestionOCController extends Controller
                         $documento->ESTADO                  =   'A';
                         $documento->RUC_PROVEEDOR           =   $factura->getcompany()->getruc();
                         $documento->RZ_PROVEEDOR            =   $factura->getcompany()->getrazonSocial();
+
+
 
                         $documento->TIPO_CLIENTE            =   $factura->getClient()->gettipoDoc();
                         $documento->ID_CLIENTE              =   $factura->getClient()->getnumDoc();
@@ -1809,9 +1815,11 @@ class GestionOCController extends Controller
                         $documento->PORC_DETRACCION         =   $factura->getdetraccion()->getporcDet();
                         $documento->MONTO_DETRACCION        =   $factura->getdetraccion()->getbaseDetr();
                         $documento->MONTO_ANTICIPO          =   $factura->getdestotalAnticipos();
-                        $documento->OBSERVACION             =   $factura->getobservacion();
+                        //$documento->OBSERVACION             =   $factura->getobservacion();
                         $documento->NRO_ORDEN_COMP          =   $factura->getcompra();              
                         $documento->NUM_GUIA                =   $factura->getguiaEmbebida();
+
+
                         $documento->estadoCp                =   0;
                         $documento->ARCHIVO_XML             =   $nombrefile;
                         $documento->ARCHIVO_CDR             =   '';
@@ -1829,6 +1837,8 @@ class GestionOCController extends Controller
                         $documento->ind_email_clap          =   -1;
 
                         $documento->save();
+
+
 
 
                         //ARCHIVO

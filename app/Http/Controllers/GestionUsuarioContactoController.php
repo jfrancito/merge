@@ -230,7 +230,7 @@ class GestionUsuarioContactoController extends Controller
                         //CONTABILIDAD
                         $this->insertar_whatsaap('51971575452','GISELA',$mensaje,'');
                         $this->insertar_whatsaap('51920721827','JESSICA DEL PILAR',$mensaje,'');
-                        $this->insertar_whatsaap('51948634244','ELSA ANA BELEN',$mensaje,'');
+                        //$this->insertar_whatsaap('51948634244','ELSA ANA BELEN',$mensaje,'');
                     }   
                 }
 

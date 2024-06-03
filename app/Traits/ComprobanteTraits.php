@@ -30,7 +30,7 @@ trait ComprobanteTraits
 {
 
 
-	private function sunat_cdr() {
+    private function sunat_cdr() {
 
         $listafedocumentos      =   FeDocumento::where('COD_ESTADO','=','ETM0000000000007')->get();
         //dd($listafedocumentos);
@@ -41,6 +41,10 @@ trait ComprobanteTraits
 
                 $COD_ORDEN_COMPRA       = '';
                 $sw_opecion             =   0;
+                $sw                     = 0;
+                $codigocdr              = '';
+                $respuestacdr              = '';
+
 
                 $ordencompra            =   $this->con_lista_cabecera_comprobante_idoc_actual($item->ID_DOCUMENTO);
                 $ordencompra_t          =   CMPOrden::where('COD_ORDEN','=',$item->ID_DOCUMENTO)->first();
@@ -51,6 +55,8 @@ trait ComprobanteTraits
                 $archivo                =   Archivo::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
                                             ->where('TIPO_ARCHIVO','=','DCC0000000000004')
                                             ->first();
+
+
 
                 if(count($archivo)>0){
 
@@ -134,10 +140,13 @@ trait ComprobanteTraits
                         }
                     } 
 
+                }else{
+                    $sw = 1;
                 }
 
                 //LECTURA A SUNAT
                 $token = '';
+                $estadoCp = '';
                 $swlectur = 0;
                 if($prefijocarperta =='II'){
                     $token           =      $this->generartoken_ii();
@@ -201,6 +210,7 @@ trait ComprobanteTraits
                 }
                 //PASAR PARA EL USUARIO DE CONTACTO REALIZE SU APLICACION
                 //el cdr es el de la factura
+
                 if($sw==1 and $swlectur==1){
                     FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$item->DOCUMENTO_ITEM)
                                 ->update(
@@ -218,7 +228,7 @@ trait ComprobanteTraits
 
 
 
-	}
+    }
 
 
 

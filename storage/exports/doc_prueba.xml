@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2">
+  <ext:UBLExtensions>
+    <ext:UBLExtension>
+      <ext:ExtensionContent><ds:Signature Id="signatureFACTURALOPERU">
+  <ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+    <ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+  <ds:Reference URI=""><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><ds:DigestValue>YTRd2TmhBPTlEcmay1OaXu+K6EM=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>B1IGdh44bLzgYrC6CGkqq1IaGr0hs1PZ8djAOLwML9wAwCfpBfpOEi3+EYzzA/7qLM0emdRMC6bqOyV5gkByH27pKpR6vagHE+MEA/9jw8MY5Qd8KhEXQQwiu5apBnv6F0SJte6UO5OkQeNADtjMr7SVVjtoRwfbww1TksbpaSEhzgFHoATDukvgN95eu6cX1YOkMoKx1m+Eh5LQ0DVEGGhPIaHFTf3xhZINdM2H5piySUB9epNWL85oeTtb1gjrOzpONa0YbLn89+B1QK/PY2VUNQmVTWJ69jD6jw7qQq0DMaLTxZMaEHoo1uOAEC9Z4z8Jvs+Iuetkd2bnpV7RyQ==</ds:SignatureValue>
+<ds:KeyInfo><ds:X509Data><ds:X509Certificate>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</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature></ext:ExtensionContent>
+    </ext:UBLExtension>
+  </ext:UBLExtensions>
+  <cbc:UBLVersionID>2.1</cbc:UBLVersionID>
+  <cbc:CustomizationID>2.0</cbc:CustomizationID>
+  <cbc:ID>FPP1-587</cbc:ID>
+  <cbc:IssueDate>2024-05-30</cbc:IssueDate>
+  <cbc:IssueTime>15:57:47</cbc:IssueTime>
+  <cbc:DueDate>2024-06-03</cbc:DueDate>
+  <cbc:InvoiceTypeCode listID="1001">01</cbc:InvoiceTypeCode>
+  <cbc:Note languageLocaleID="2006"><![CDATA[Operación sujeta a detracción]]></cbc:Note>
+  <cbc:Note languageLocaleID="1000"><![CDATA[Dos mil doscientos cuarenta y dos  con 00/100 ]]></cbc:Note>
+  <cbc:DocumentCurrencyCode>PEN</cbc:DocumentCurrencyCode>
+  <cac:Signature>
+    <cbc:ID>signatureFACTURALOPERU</cbc:ID>
+    <cbc:Note>FACTURALO</cbc:Note>
+    <cac:SignatoryParty>
+      <cac:PartyIdentification>
+        <cbc:ID>20602521240</cbc:ID>
+      </cac:PartyIdentification>
+      <cac:PartyName>
+        <cbc:Name><![CDATA[AVIZOR LEGAL S.A.C.]]></cbc:Name>
+      </cac:PartyName>
+    </cac:SignatoryParty>
+    <cac:DigitalSignatureAttachment>
+      <cac:ExternalReference>
+        <cbc:URI>#signatureFACTURALOPERU</cbc:URI>
+      </cac:ExternalReference>
+    </cac:DigitalSignatureAttachment>
+  </cac:Signature>
+  <cac:AccountingSupplierParty>
+    <cac:Party>
+      <cac:PartyIdentification>
+        <cbc:ID schemeID="6">20602521240</cbc:ID>
+      </cac:PartyIdentification>
+      <cac:PartyName>
+        <cbc:Name><![CDATA[AVIZOR LEGAL S.A.C.]]></cbc:Name>
+      </cac:PartyName>
+      <cac:PartyLegalEntity>
+        <cbc:RegistrationName><![CDATA[AVIZOR LEGAL S.A.C.]]></cbc:RegistrationName>
+        <cac:RegistrationAddress>
+          <cbc:ID>130111</cbc:ID>
+          <cbc:AddressTypeCode>0000</cbc:AddressTypeCode>
+          <cbc:CityName>Trujillo</cbc:CityName>
+          <cbc:CountrySubentity>LA LIBERTAD</cbc:CountrySubentity>
+          <cbc:District>Victor Larco Herrera</cbc:District>
+          <cac:AddressLine>
+            <cbc:Line><![CDATA[CAL.LOS NOGALES. MZA. K LOTE. 3C URB. EL GOLF. LA LIBERTAD - TRUJILLO - VICTOR LARCO HERRERA]]></cbc:Line>
+          </cac:AddressLine>
+          <cac:Country>
+            <cbc:IdentificationCode>PE</cbc:IdentificationCode>
+          </cac:Country>
+        </cac:RegistrationAddress>
+      </cac:PartyLegalEntity>
+      <cac:Contact>
+        <cbc:Telephone>044 408054</cbc:Telephone>
+        <cbc:ElectronicMail>finanzas@avizor.pe</cbc:ElectronicMail>
+      </cac:Contact>
+    </cac:Party>
+  </cac:AccountingSupplierParty>
+  <cac:AccountingCustomerParty>
+    <cac:Party>
+      <cac:PartyIdentification>
+        <cbc:ID schemeID="6">20602740278</cbc:ID>
+      </cac:PartyIdentification>
+      <cac:PartyLegalEntity>
+        <cbc:RegistrationName><![CDATA[INDUAMERICA INTERNACIONAL S.A.C.]]></cbc:RegistrationName>
+        <cac:RegistrationAddress>
+          <cbc:ID>150131</cbc:ID>
+          <cac:AddressLine>
+            <cbc:Line><![CDATA[AV. CAMINO REAL NRO. 931 DPTO. 201]]></cbc:Line>
+          </cac:AddressLine>
+          <cac:Country>
+            <cbc:IdentificationCode>PE</cbc:IdentificationCode>
+          </cac:Country>
+        </cac:RegistrationAddress>
+      </cac:PartyLegalEntity>
+    </cac:Party>
+  </cac:AccountingCustomerParty>
+  <cac:PaymentMeans>
+    <cbc:ID>Detraccion</cbc:ID>
+    <cbc:PaymentMeansCode>001</cbc:PaymentMeansCode>
+    <cac:PayeeFinancialAccount>
+      <cbc:ID>741549395</cbc:ID>
+    </cac:PayeeFinancialAccount>
+  </cac:PaymentMeans>
+  <cac:PaymentTerms>
+    <cbc:ID>Detraccion</cbc:ID>
+    <cbc:PaymentMeansID>022</cbc:PaymentMeansID>
+    <cbc:PaymentPercent>12.00</cbc:PaymentPercent>
+    <cbc:Amount currencyID="PEN">269.04</cbc:Amount>
+  </cac:PaymentTerms>
+  <cac:PaymentTerms>
+    <cbc:ID>FormaPago</cbc:ID>
+    <cbc:PaymentMeansID>Credito</cbc:PaymentMeansID>
+    <cbc:Amount currencyID="PEN">1972.96</cbc:Amount>
+  </cac:PaymentTerms>
+  <cac:PaymentTerms>
+    <cbc:ID>FormaPago</cbc:ID>
+    <cbc:PaymentMeansID>Cuota001</cbc:PaymentMeansID>
+    <cbc:Amount currencyID="PEN">1972.96</cbc:Amount>
+    <cbc:PaymentDueDate>2024-06-03</cbc:PaymentDueDate>
+  </cac:PaymentTerms>
+  <cac:TaxTotal>
+    <cbc:TaxAmount currencyID="PEN">342.00</cbc:TaxAmount>
+    <cac:TaxSubtotal>
+      <cbc:TaxableAmount currencyID="PEN">1900.00</cbc:TaxableAmount>
+      <cbc:TaxAmount currencyID="PEN">342.00</cbc:TaxAmount>
+      <cac:TaxCategory>
+        <cac:TaxScheme>
+          <cbc:ID>1000</cbc:ID>
+          <cbc:Name>IGV</cbc:Name>
+          <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>
+        </cac:TaxScheme>
+      </cac:TaxCategory>
+    </cac:TaxSubtotal>
+  </cac:TaxTotal>
+  <cac:LegalMonetaryTotal>
+    <cbc:LineExtensionAmount currencyID="PEN">1900.00</cbc:LineExtensionAmount>
+    <cbc:TaxInclusiveAmount currencyID="PEN">2242.00</cbc:TaxInclusiveAmount>
+    <cbc:PayableAmount currencyID="PEN">2242</cbc:PayableAmount>
+  </cac:LegalMonetaryTotal>
+  <cac:InvoiceLine>
+    <cbc:ID>1</cbc:ID>
+    <cbc:InvoicedQuantity unitCode="NIU">1.0000</cbc:InvoicedQuantity>
+    <cbc:LineExtensionAmount currencyID="PEN">1900.00</cbc:LineExtensionAmount>
+    <cac:PricingReference>
+      <cac:AlternativeConditionPrice>
+        <cbc:PriceAmount currencyID="PEN">2242.000000</cbc:PriceAmount>
+        <cbc:PriceTypeCode>01</cbc:PriceTypeCode>
+      </cac:AlternativeConditionPrice>
+    </cac:PricingReference>
+    <cac:TaxTotal>
+      <cbc:TaxAmount currencyID="PEN">342.00</cbc:TaxAmount>
+      <cac:TaxSubtotal>
+        <cbc:TaxableAmount currencyID="PEN">1900.00</cbc:TaxableAmount>
+        <cbc:TaxAmount currencyID="PEN">342.00</cbc:TaxAmount>
+        <cac:TaxCategory>
+          <cbc:Percent>18.00</cbc:Percent>
+          <cbc:TaxExemptionReasonCode>10</cbc:TaxExemptionReasonCode>
+          <cac:TaxScheme>
+            <cbc:ID>1000</cbc:ID>
+            <cbc:Name>IGV</cbc:Name>
+            <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>
+          </cac:TaxScheme>
+        </cac:TaxCategory>
+      </cac:TaxSubtotal>
+    </cac:TaxTotal>
+    <cac:Item>
+      <cbc:Description><![CDATA[ASESORIA LEGAL EXTERNA]]></cbc:Description>
+      <cac:SellersItemIdentification>
+        <cbc:ID>01</cbc:ID>
+      </cac:SellersItemIdentification>
+    </cac:Item>
+    <cac:Price>
+      <cbc:PriceAmount currencyID="PEN">1900.000000</cbc:PriceAmount>
+    </cac:Price>
+  </cac:InvoiceLine>
+</Invoice>

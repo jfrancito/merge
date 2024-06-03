@@ -9,9 +9,14 @@ use DB;
 use DateTime;
 use App\Traits\UserTraits;
 
+use App\Traits\ComprobanteTraits;
+
+
 class NotificacionOC extends Command
 {
     use UserTraits;
+    use ComprobanteTraits;
+    
     /**
      * The name and signature of the console command.
      *
@@ -47,15 +52,15 @@ class NotificacionOC extends Command
         /****************************************************************************/
         $this->envio_correo_confirmacion();
         //USUARIO CONTACTO
-        $this->envio_correo_uc();
-        //CONTABILIDAD
-        $this->envio_correo_co();
-        //ADMINISTRACION
-        $this->envio_correo_adm();
-        //PROVISIONAR
-        $this->envio_correo_apcli();
-        //BAJA COMPROBANTE
-        $this->envio_correo_baja();
+        // $this->envio_correo_uc();
+        // //CONTABILIDAD
+        // $this->envio_correo_co();
+        // //ADMINISTRACION
+        // $this->envio_correo_adm();
+        // //PROVISIONAR
+        // $this->envio_correo_apcli();
+        // //BAJA COMPROBANTE
+        // $this->envio_correo_baja();
 
         //LECTURA DE CDR Y API SUNAT
         $this->sunat_cdr();

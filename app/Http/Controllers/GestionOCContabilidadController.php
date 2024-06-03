@@ -130,7 +130,7 @@ class GestionOCContabilidadController extends Controller
                         $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
                         $this->insertar_whatsaap('51971575452','GISELA',$mensaje,'');
                         $this->insertar_whatsaap('51920721827','JESSICA DEL PILAR',$mensaje,'');
-                        $this->insertar_whatsaap('51948634244','ELSA ANA BELEN',$mensaje,'');
+                        //$this->insertar_whatsaap('51948634244','ELSA ANA BELEN',$mensaje,'');
                     }    
 
                     $msjarray[]                             =   array(  "data_0" => $fedocumento->ID_DOCUMENTO, 
@@ -351,7 +351,7 @@ class GestionOCContabilidadController extends Controller
                     //CONTABILIDAD
                     $this->insertar_whatsaap('51971575452','GISELA',$mensaje,'');
                     $this->insertar_whatsaap('51920721827','JESSICA DEL PILAR',$mensaje,'');
-                    $this->insertar_whatsaap('51948634244','ELSA ANA BELEN',$mensaje,'');
+                    //$this->insertar_whatsaap('51948634244','ELSA ANA BELEN',$mensaje,'');
 
                 }   
 
