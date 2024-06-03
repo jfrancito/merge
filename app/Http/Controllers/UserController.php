@@ -618,7 +618,6 @@ class UserController extends Controller {
         //1CIX00000015 1CIX00000016 //Contabilidad
 		if($trol->ind_uc == 1){
 
-
 			$listadatos      =   $this->con_lista_cabecera_comprobante_total_uc($cod_empresa);
 			$count_x_aprobar = 	 count($listadatos);
         	$url 			 =	'/gestion-de-comprobante-us/wjR';
@@ -651,6 +650,21 @@ class UserController extends Controller {
 			}
 		}
 
+		$listaocpendientes  =	array();
+		$listadocestados    =	array();
+		$listaobservados    =	array();
+
+		if(Session::get('usuario')->rol_id != '1CIX00000024'){
+
+			$listaocpendientes     =   $this->con_lista_cabecera_comprobante_administrativo_total();
+        	$listadocestados       =   $this->con_lista_cabecera_comprobante_total_gestion_agrupado($cod_empresa);
+        	$listaobservados       =   FeDocumento::where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)->where('ind_observacion','=','1')->first();
+		}
+
+
+
+		//dd($listaocpendientes);
+
 		return View::make('bienvenido',
 						 [
 						 	'usuario' 			=> $usuario,
@@ -663,6 +677,9 @@ class UserController extends Controller {
 						 	'count_x_aprobar_gestion' 	=> $count_x_aprobar_gestion,
 						 	'url_gestion' 			=> $url_gestion,
 						 	'trol' 				=> $trol,
+						 	'listaocpendientes' => $listaocpendientes,
+						 	'listadocestados'   => $listadocestados,
+						 	'listaobservados'   => $listaobservados,
 						 ]);
 
 	}

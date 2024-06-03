@@ -415,11 +415,7 @@ class GestionOCController extends Controller
         $funcion        =   $this;
         $procedencia    =   'ADM';
 
-        //dd($listadatos);
 
-        //dd($_ENV['APP_PRODUCCION']);
-
-        //return View::make('comprobante/listaoc',
 
         return View::make('comprobante/listaocadministrador',
                          [

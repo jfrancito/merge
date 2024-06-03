@@ -317,6 +317,23 @@ trait ComprobanteTraits
 
 	}
 
+    private function con_lista_cabecera_comprobante_total_gestion_agrupado($cliente_id) {
+
+
+        $listadatos     =   FeDocumento::where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                            ->select(DB::raw('TXT_ESTADO,COUNT(TXT_ESTADO) AS CANT'))
+                            ->groupBy('TXT_ESTADO')
+                            ->get();
+
+        return  $listadatos;
+
+
+    }
+
+
+
+
     private function gn_combo_proveedor_fe_documento($todo) {
 
 		$array 						= 	FeDocumento::join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
@@ -588,9 +605,6 @@ trait ComprobanteTraits
 									->pluck('COD_USUARIO')
 									->toArray();
 									
-
-
-
 		$estado_no      =   'ETM0000000000006';
 		$listadatos 	= 	VMergeOC:://leftJoin('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
 							//->where('COD_EMPR_CLIENTE','=',$cliente_id)
@@ -626,6 +640,60 @@ trait ComprobanteTraits
 	}
 
 
+
+    private function con_lista_cabecera_comprobante_administrativo_total() {
+
+        $estado_no          =   'ETM0000000000006';
+        $toarray            =   VMergeOC::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                            $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
+                                                ->where('COD_ESTADO', '<>', 'ETM0000000000006');
+                                        })
+                                ->leftJoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'VMERGEOC.COD_USUARIO_CREA_AUD')
+                                ->where('VMERGEOC.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                ->where(function ($query) {
+                                    $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
+                                          ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
+                                          ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
+                                })
+                                ->select(DB::raw('  COD_ORDEN,
+                                                    SGD.USUARIO.NOM_TRABAJADOR
+                                                '))
+                                ->groupBy('COD_ORDEN')
+                                ->groupBy('SGD.USUARIO.NOM_TRABAJADOR')
+                                //->pluck('NOM_TRABAJADOR','COD_ORDEN')
+                                ->get()->toArray();
+
+
+        $groupbyarray       =   $this->groupBy($toarray, 'NOM_TRABAJADOR');
+
+
+        $togroupbyarray       =   $this->sortGroupsBySize($groupbyarray);
+        //dd($togroupbyarray);
+
+
+        return  $groupbyarray;
+    }
+
+
+    // Función para agrupar un array por una clave
+    function groupBy(array $array, $key) {
+        return array_reduce($array, function($result, $item) use ($key) {
+            $result[$item[$key]][] = $item;
+            return $result;
+        }, []);
+    }
+
+    function sortGroupsBySize(array &$groups) {
+
+        uasort($groups, function($a, $b) {
+            return count($b) - count($a);
+        });
+
+        return $groups;
+
+        //dd($groups);
+
+    }
 
 	private function con_lista_cabecera_comprobante_total($cliente_id) {
 
