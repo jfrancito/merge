@@ -119,7 +119,10 @@ class GestionOCValidadoController extends Controller
         $cod_empresa    =   Session::get('usuario')->id;
         $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_historial($cod_empresa);
         $funcion        =   $this;
-        return View::make('comprobante/listaocvalidado',
+
+        //dd($listadatos);
+
+        return View::make('comprobante/listaocvalidadohistorial',
                          [
                             'listadatos'        =>  $listadatos,
                             'funcion'           =>  $funcion,

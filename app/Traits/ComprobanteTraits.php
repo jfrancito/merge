@@ -394,6 +394,8 @@ trait ComprobanteTraits
 							->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
 							->get();
 
+
+
 	 	return  $listadatos;
 	}
 

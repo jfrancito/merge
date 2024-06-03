@@ -72,10 +72,12 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/leercdr', 'GestionOCController@actionApiLeerCDR');
 
+	Route::any('/gestion-de-mis-documentos-contrato/{idopcion}', 'GestionDocumentoController@actionListarDOC');
+	Route::any('/detalle-documentos/{procedencia}/{idopcion}', 'GestionDocumentoController@actionDetalleDocumentos');
+
 
 	Route::any('/gestion-de-oc-proveedores/{idopcion}', 'GestionOCController@actionListarOC');
 	Route::any('/gestion-de-orden-compra/{idopcion}', 'GestionOCController@actionListarOCAdmin');
-
 	Route::any('/detalle-comprobante-oc/{procedencia}/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionDetalleComprobanteOC');
 	Route::any('/subir-xml-cargar-datos/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionCargarXML');
 	Route::any('/validar-xml-oc/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionValidarXML');
