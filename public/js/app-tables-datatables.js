@@ -24,6 +24,13 @@ var App = (function () {
     });
 
 
+    $("#despacholocen").dataTable({
+        "lengthMenu": [[50, 100, -1], [50, 100, "All"]],
+        order : [[ 5, "desc" ]],
+        "bPaginate": false
+    });
+
+
     $("#table1").dataTable({
         dom: 'Bfrtip',
         buttons: [

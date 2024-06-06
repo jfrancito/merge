@@ -73,7 +73,25 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/leercdr', 'GestionOCController@actionApiLeerCDR');
 
 	Route::any('/gestion-de-mis-documentos-contrato/{idopcion}', 'GestionDocumentoController@actionListarDOC');
-	Route::any('/detalle-documentos/{procedencia}/{idopcion}', 'GestionDocumentoController@actionDetalleDocumentos');
+	Route::any('/detalle-documentos/{procedencia}/{idopcion}/{prefijo}/{idordencompra}', 'GestionDocumentoController@actionDetalleDocumentos');
+	Route::any('/subir-xml-cargar-datos-documento/{idopcion}/{prefijo}/{idordencompra}', 'GestionDocumentoController@actionCargarXMLDocumento');
+	Route::any('/validar-xml-documento/{idopcion}/{prefijo}/{idordencompra}', 'GestionDocumentoController@actionValidarXMLDocumento');
+	Route::any('/detalle-documentos-subidos/{idopcion}/{prefijo}/{idordencompra}', 'GestionDocumentoController@actionDetalleDocumentoSubidos');
+
+
+	Route::any('/gestion-de-mis-canjes-documentos/{idopcion}', 'GestionDocumentoCanjesController@actionListarCanjesDOC');
+	Route::any('/canjear-documentos/{procedencia}/{idopcion}/{prefijo}/{idordencompra}', 'GestionDocumentoCanjesController@actionCanjearDocumentos');
+	Route::any('/ajax-modal-lista-documento-osiris', 'GestionDocumentoCanjesController@actionAjaxModalListaDocumentoOsiris');
+	Route::any('/ajax-modal-agregar-documento-osiris', 'GestionDocumentoCanjesController@actionAjaxModalAgregarDocumentoOsiris');
+
+	Route::any('/ajax-modal-lista-documento-merge', 'GestionDocumentoCanjesController@actionAjaxModalListaDocumentoMerge');
+	Route::any('/ajax-modal-agregar-documento-merge', 'GestionDocumentoCanjesController@actionAjaxModalAgregarDocumentoMerge');
+
+
+
+	// Route::any('/subir-xml-cargar-datos-documento/{idopcion}/{prefijo}/{idordencompra}', 'GestionDocumentoController@actionCargarXMLDocumento');
+	// Route::any('/validar-xml-documento/{idopcion}/{prefijo}/{idordencompra}', 'GestionDocumentoController@actionValidarXMLDocumento');
+	// Route::any('/detalle-documentos-subidos/{idopcion}/{prefijo}/{idordencompra}', 'GestionDocumentoController@actionDetalleDocumentoSubidos');
 
 
 	Route::any('/gestion-de-oc-proveedores/{idopcion}', 'GestionOCController@actionListarOC');
@@ -168,6 +186,29 @@ Route::get('buscarcliente', function (Illuminate\Http\Request  $request) {
     }
     return \Response::json($valid_tags);
 });
+
+
+Route::get('buscarempresa', function (Illuminate\Http\Request  $request) {
+    $term = $request->term ?: '';
+    $tags = DB::table('STD.EMPRESA')
+    		->where('NOM_EMPR', 'like', '%'.$term.'%')
+			//->where('STD.EMPRESA.IND_PROVEEDOR','=',1)
+			->where('STD.EMPRESA.COD_ESTADO','=',1)
+			->take(100)
+			->select(DB::raw("
+			  STD.EMPRESA.NRO_DOCUMENTO + ' - '+ STD.EMPRESA.NOM_EMPR AS NOMBRE")
+			)
+    		->pluck('NOMBRE', 'NOMBRE');
+    $valid_tags = [];
+    foreach ($tags as $id => $tag) {
+        $valid_tags[] = ['id' => $id, 'text' => $tag];
+    }
+    return \Response::json($valid_tags);
+});
+
+
+
+
 
 
 Route::get('buscarclientey', function (Illuminate\Http\Request  $request) {

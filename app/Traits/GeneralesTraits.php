@@ -23,12 +23,39 @@ use Hashids;
 Use Nexmo;
 use Keygen;
 
-
-
-
-
 trait GeneralesTraits
 {
+
+
+	private function gn_combo_categoria_array($titulo,$todo,$array) {
+
+		$array_t 					= 	DB::table('CMP.CATEGORIA')
+        								->whereIn('COD_CATEGORIA', $array)
+		        						->pluck('NOM_CATEGORIA','COD_CATEGORIA')
+										->toArray();
+		if($todo=='TODO'){
+			$combo  				= 	array('' => $titulo , $todo => $todo) + $array_t;
+		}else{
+			$combo  				= 	array('' => $titulo) + $array_t;
+		}
+	 	return  $combo;					 			
+	}
+
+
+	private function gn_combo_centro($titulo,$todo) {
+
+		$array_t 					= 	DB::table('ALM.CENTRO')
+										->where('COD_ESTADO','=','1')
+		        						->pluck('NOM_CENTRO','COD_CENTRO')
+										->toArray();
+		if($todo=='TODO'){
+			$combo  				= 	array('' => $titulo , $todo => $todo) + $array_t;
+		}else{
+			$combo  				= 	array('' => $titulo) + $array_t;
+		}
+	 	return  $combo;					 			
+	}
+
 
 
 	public function ge_linea_documento($orden_id)

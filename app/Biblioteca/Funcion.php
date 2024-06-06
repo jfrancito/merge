@@ -96,12 +96,36 @@ class Funcion {
 
 		//decodificar variable
 		$iddeco = Hashids::decode($id);
+
+
 		//ver si viene con letras la cadena codificada
 		if (count($iddeco) == 0) {
 			return '';
 		}
 		//concatenar con ceros
 		$idopcioncompleta = str_pad($iddeco[0], 10, "0", STR_PAD_LEFT);
+		//concatenar prefijo
+
+		//$prefijo = Local::where('activo', '=', 1)->first();
+		// apunta ahi en tu cuaderno porque esto solo va a permitir decodifcar  cuando sea el contrato del locl en donde estas del resto no
+		//¿cuando sea el contrato del local?
+		$idopcioncompleta = $prefijo . $idopcioncompleta;
+		return $idopcioncompleta;
+
+	}
+
+	public function decodificarmaestraprefijodoc($id,$prefijo) {
+
+		//decodificar variable
+		$iddeco = Hashids::decode($id);
+
+
+		//ver si viene con letras la cadena codificada
+		if (count($iddeco) == 0) {
+			return '';
+		}
+		//concatenar con ceros
+		$idopcioncompleta = str_pad($iddeco[0], 8, "0", STR_PAD_LEFT);
 		//concatenar prefijo
 
 		//$prefijo = Local::where('activo', '=', 1)->first();
@@ -181,6 +205,27 @@ class Funcion {
 		return $idopcioncompleta;
 
 	}
+
+
+	public function getCreateIdMaestradoc($tabla) {
+
+		$id = "";
+		// maximo valor de la tabla referente
+		$id = DB::table($tabla)
+			->where('TXT_PROCEDENCIA','=','SUE')
+			->select(DB::raw('max(SUBSTRING(ID_DOCUMENTO,5,8)) as id'))
+			->first();
+		//conversion a string y suma uno para el siguiente id
+		$idsuma = (int) $id->id + 1;
+		//concatenar con ceros
+		$idopcioncompleta = str_pad($idsuma, 8, "0", STR_PAD_LEFT);
+		//concatenar prefijo
+		$prefijo = $this->prefijomaestra();
+		$idopcioncompleta = $prefijo . $idopcioncompleta;
+		return $idopcioncompleta;
+
+	}
+
 
 	public function prefijomaestra() {
 

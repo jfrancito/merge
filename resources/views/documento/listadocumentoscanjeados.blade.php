@@ -16,16 +16,11 @@
                     <div class="panel-heading">
                       <div class="tools tooltiptop">                          
                           <a 
-                              title="Crear Trabajador"                                   
+                              title="Canjear Documentos"                                   
                               class="btn btn-secondary botoncabecera" 
-                              href="{{ url('/detalle-documentos/'.$procedencia.'/'.$idopcion.'/NUE/NUE')}}" >
+                              href="{{ url('/canjear-documentos/'.$procedencia.'/'.$idopcion.'/NUE/NUE')}}" >
                               <i class="icon mdi mdi-plus-circle-o"></i>
                           </a>
-
-                          <button type="button" title="Buscar Documentos" class="btn btn-secondary botoncabecera" id='buscarAjax' data_opcion='{{$idopcion}}'>
-                            <span class="icon mdi mdi-search"></span>
-                          </button>
-
                       </div>
                     </div>
                 </div>
@@ -36,7 +31,7 @@
                     </div>
                   </div>
                   <div class='listajax'>
-                    @include('documento.ajax.alistadocumentos')
+                    @include('documento.ajax.alistadocumentoscanjeados')
                   </div>
                 </div>
               </div>

@@ -80,7 +80,7 @@ class GestionOCAdministracionController extends Controller
         $idoc                   =   $this->funciones->decodificarmaestraprefijo($idordencompra,$prefijo);
         $ordencompra            =   $this->con_lista_cabecera_comprobante_idoc_actual($idoc);
         $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc_actual($idoc);
-        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->where('TXT_PROCEDENCIA','<>','SUE')->first();
         $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
         View::share('titulo','Observar Comprobante');
 
@@ -91,7 +91,7 @@ class GestionOCAdministracionController extends Controller
                 
                 DB::beginTransaction();
                 $pedido_id          =   $idoc;
-                $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
+                $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->where('TXT_PROCEDENCIA','<>','SUE')->first();
                 $descripcion        =   $request['descripcion'];
                 $archivoob          =   $request['archivoob'];
 

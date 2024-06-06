@@ -121,7 +121,15 @@ class GestionOCController extends Controller
                 $respuestacdr = '';
                 $factura_cdr_id = '';
                 $sw = 0;
-                $nombre_doc = $fedocumento->SERIE.'-'.$fedocumento->NUMERO;
+
+
+                $nombre_doc      = $fedocumento->SERIE.'-'.$fedocumento->NUMERO;
+
+
+                $numerototal     = $fedocumento->NUMERO;
+                $numerototalsc    = ltrim($numerototal, '0');
+                $nombre_doc_sinceros = $fedocumento->SERIE.'-'.$numerototalsc;
+
 
                 if(!is_null($filescdr)){
                     //CDR
@@ -187,7 +195,7 @@ class GestionOCController extends Controller
                             foreach($xml->xpath('//cbc:ID') as $ID)
                             {
                                 $factura_cdr_id  = $ID;
-                                if($factura_cdr_id == $nombre_doc){
+                                if($factura_cdr_id == $nombre_doc || $factura_cdr_id == $nombre_doc_sinceros){
                                     $sw = 1;
                                 }
                             }  
@@ -213,7 +221,7 @@ class GestionOCController extends Controller
                             foreach($xml_ns->xpath('//ns3:DocumentReference') as $ID)
                             {
                                 $factura_cdr_id  = $ID->ID;
-                                if($factura_cdr_id == $nombre_doc){
+                                if($factura_cdr_id == $nombre_doc || $factura_cdr_id == $nombre_doc_sinceros){
                                     $sw = 1;
                                 }
                             }
@@ -2021,6 +2029,12 @@ class GestionOCController extends Controller
                 $sw = 0;
                 $nombre_doc = $fedocumento->SERIE.'-'.$fedocumento->NUMERO;
 
+                $numerototal     = $fedocumento->NUMERO;
+                $numerototalsc    = ltrim($numerototal, '0');
+                $nombre_doc_sinceros = $fedocumento->SERIE.'-'.$numerototalsc;
+
+
+
                 //LECTURA DEL CDR
                 if(!is_null($filescdr)){
                     //CDR
@@ -2086,7 +2100,7 @@ class GestionOCController extends Controller
                             foreach($xml->xpath('//cbc:ID') as $ID)
                             {
                                 $factura_cdr_id  = $ID;
-                                if($factura_cdr_id == $nombre_doc){
+                                if($factura_cdr_id == $nombre_doc || $factura_cdr_id == $nombre_doc_sinceros){
                                     $sw = 1;
                                 }
                             }  
@@ -2112,7 +2126,7 @@ class GestionOCController extends Controller
                             foreach($xml_ns->xpath('//ns3:DocumentReference') as $ID)
                             {
                                 $factura_cdr_id  = $ID->ID;
-                                if($factura_cdr_id == $nombre_doc){
+                                if($factura_cdr_id == $nombre_doc || $factura_cdr_id == $nombre_doc_sinceros){
                                     $sw = 1;
                                 }
                             }

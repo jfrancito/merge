@@ -658,7 +658,7 @@ class UserController extends Controller {
 
 			$listaocpendientes     =   $this->con_lista_cabecera_comprobante_administrativo_total();
         	$listadocestados       =   $this->con_lista_cabecera_comprobante_total_gestion_agrupado($cod_empresa);
-        	$listaobservados       =   FeDocumento::where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)->where('ind_observacion','=','1')->first();
+        	$listaobservados       =   FeDocumento::where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)->where('TXT_PROCEDENCIA','<>','SUE')->where('ind_observacion','=','1')->first();
 		}
 
 
