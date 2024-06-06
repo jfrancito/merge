@@ -240,7 +240,7 @@ trait ComprobanteTraits
 
 		$listadatos 	= 	VMergeOC::leftJoin('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
 							->whereIn('COD_ESTADO', ['ETM0000000000005'])
-                            ->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                            //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
 							->select(DB::raw('	COD_ORDEN,
 												FEC_ORDEN,
 												TXT_CATEGORIA_MONEDA,
@@ -271,7 +271,7 @@ trait ComprobanteTraits
 		$listadatos 		= 		FeDocumento::leftJoin('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
 									//->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
 									->whereIn('FE_DOCUMENTO.COD_CONTACTO',$array_trabajadores)
-                                    ->where('TXT_PROCEDENCIA','<>','SUE')
+                                    //->where('TXT_PROCEDENCIA','<>','SUE')
 									->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
 									->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
 									->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000002','ETM0000000000007'])
@@ -287,7 +287,7 @@ trait ComprobanteTraits
 		$listadatos 	= 	FeDocumento::leftJoin('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
 							//->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
 							->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
-                            ->where('TXT_PROCEDENCIA','<>','SUE')
+                            //->where('TXT_PROCEDENCIA','<>','SUE')
 							->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
 
 							->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
@@ -303,7 +303,7 @@ trait ComprobanteTraits
 							//->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
 							->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
 							->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-							->where('TXT_PROCEDENCIA','<>','SUE')
+							//->where('TXT_PROCEDENCIA','<>','SUE')
 							->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
 							->get();
 
@@ -315,7 +315,7 @@ trait ComprobanteTraits
 
 
 		$listadatos 	= 	CMPOrden::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
-                            ->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                            //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
 							->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
 							//->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
 							->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
@@ -336,7 +336,7 @@ trait ComprobanteTraits
 
         $listadatos     =   FeDocumento::where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                            ->where('TXT_PROCEDENCIA','<>','SUE')
+                            //->where('TXT_PROCEDENCIA','<>','SUE')
                             ->select(DB::raw('TXT_ESTADO,COUNT(TXT_ESTADO) AS CANT'))
                             ->groupBy('TXT_ESTADO')
                             ->get();
@@ -354,7 +354,7 @@ trait ComprobanteTraits
 		$array 						= 	FeDocumento::join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
 										->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
 										->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                        ->where('TXT_PROCEDENCIA','<>','SUE')
+                                        //->where('TXT_PROCEDENCIA','<>','SUE')
 										->select(DB::raw('COD_EMPR_CLIENTE,TXT_EMPR_CLIENTE'))
 										->groupBy('COD_EMPR_CLIENTE')
 										->groupBy('TXT_EMPR_CLIENTE')
@@ -394,7 +394,7 @@ trait ComprobanteTraits
 							->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
 							->where('FE_DOCUMENTO.COD_ESTADO','<>','')
 							->where('FE_DOCUMENTO.ind_observacion','=','1')
-                            ->where('TXT_PROCEDENCIA','<>','SUE')
+                            //->where('TXT_PROCEDENCIA','<>','SUE')
 							->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
 							->get();
 
@@ -407,7 +407,7 @@ trait ComprobanteTraits
 
 		$listadatos 	= 	FeDocumento::leftJoin('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
 							->where('FE_DOCUMENTO.usuario_pa','=',$cliente_id)
-                            ->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                            //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
 							->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
 							->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
 							->get();
@@ -593,7 +593,7 @@ trait ComprobanteTraits
 							    	  ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
 							    	  ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
 							})
-                            ->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                            //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
 							->select(DB::raw('	COD_ORDEN,
 												FEC_ORDEN,
 												TXT_CATEGORIA_MONEDA,
@@ -640,7 +640,7 @@ trait ComprobanteTraits
 							    	  ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
 							    	  ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
 							})
-                            ->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                            //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
 							->select(DB::raw('	COD_ORDEN,
 												FEC_ORDEN,
 												TXT_CATEGORIA_MONEDA,
@@ -677,7 +677,7 @@ trait ComprobanteTraits
                                           ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
                                           ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
                                 })
-                                ->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                                //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
                                 ->select(DB::raw('  COD_ORDEN,
                                                     SGD.USUARIO.NOM_TRABAJADOR
                                                 '))
@@ -723,7 +723,7 @@ trait ComprobanteTraits
 		$listadatos 	= 	VMergeOC::leftJoin('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
 							//->where('COD_ESTADO','=','ETM0000000000002')
 							->whereIn('COD_ESTADO', ['ETM0000000000001', 'ETM0000000000002', 'ETM0000000000003', 'ETM0000000000004', 'ETM0000000000005', 'ETM0000000000006'])
-                            ->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                            //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
 							->select(DB::raw('	COD_ORDEN,
 												FEC_ORDEN,
 												TXT_CATEGORIA_MONEDA,
