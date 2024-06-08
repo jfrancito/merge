@@ -66,7 +66,7 @@ class GestionOCController extends Controller
     {
 
         header('Content-Type: text/html; charset=UTF-8');
-        $path = storage_path() . "/exports/doc_prueba.xml";
+        $path = storage_path() . "/exports/20536089226-01-F001-737.XML";
         //$path = storage_path() . "/exports/20454823916-01-FH04-00000026.xml";
 
         $parser = new InvoiceParser();
@@ -1777,6 +1777,7 @@ class GestionOCController extends Controller
                         //DD($factura);
 
                         $documentolinea                     =   $this->ge_linea_documento($ordencompra->COD_ORDEN);
+                        $cant_rentencion                    =   $ordencompra_t->CAN_RETENCION;
 
 
                         //dd($factura->getobservacion());
@@ -1814,8 +1815,8 @@ class GestionOCController extends Controller
                         $documento->SUB_TOTAL_VENTA_ORIG    =   $factura->getmtoOperGravadas();
                         $documento->SUB_TOTAL_VENTA_SOLES   =   $factura->getmtoOperGravadas();
 
-                        $documento->TOTAL_VENTA_ORIG        =   $factura->getmtoImpVenta();
-                        $documento->TOTAL_VENTA_SOLES       =   $factura->getmtoImpVenta();
+                        $documento->TOTAL_VENTA_ORIG        =   $factura->getmtoImpVenta()+$cant_rentencion;
+                        $documento->TOTAL_VENTA_SOLES       =   $factura->getmtoImpVenta()+$cant_rentencion;
 
                         $documento->HORA_EMISION            =   $factura->gethoraEmision();
                         $documento->IMPUESTO_2              =   $factura->getmtoOtrosTributos();
@@ -2078,8 +2079,14 @@ class GestionOCController extends Controller
 
                     if (file_exists($extractedFile)) {
 
+
+
+
                         //cbc
                         $xml = simplexml_load_file($extractedFile);
+
+                        dd($xml);
+
                         $cbc = 0;
                         $namespaces = $xml->getNamespaces(true);
                         foreach ($namespaces as $prefix => $namespace) {
