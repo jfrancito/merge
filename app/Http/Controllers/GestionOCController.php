@@ -2085,7 +2085,7 @@ class GestionOCController extends Controller
                         //cbc
                         $xml = simplexml_load_file($extractedFile);
 
-                        dd($xml);
+                        //dd($xml);
 
                         $cbc = 0;
                         $namespaces = $xml->getNamespaces(true);
