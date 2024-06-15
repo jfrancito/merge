@@ -9,32 +9,45 @@
 
 @stop
 @section('section')
-  <div class="be-content contenido asientomodelo">
+  <div class="be-content contenido asientomodelo areacontabilidad">
     <div class="main-content container-fluid">
           <div class="row">
             <div class="col-sm-12">
               <div class="panel panel-default panel-border-color panel-border-color-success">
                 <div class="panel-heading">{{ $titulo }}
-<!--                   <div class="tools tooltiptop">
-                    <form method="POST" id='formpedido' class='opciones' action="{{ url('/aprobar-documentos/'.$idopcion) }}" style="display: inline-block;" >
-                      {{ csrf_field() }}
-                      <input type="hidden" id='pedido' name='pedido' >
-                      <a href="#" class="tooltipcss" id='aprobar' >
-                        <span class="tooltiptext">Aprobar</span>
-                        <span class="icon mdi mdi-mail-send"></span>
+                  <div class="tools tooltiptop">
+                    <div class="tools tooltiptop">
+                      <a href="#" class="tooltipcss opciones buscardocumento">
+                        <span class="tooltiptext">Buscar Documento</span>
+                        <span class="icon mdi mdi-search"></span>
                       </a>
-                    </form>
-                  </div> -->
-
+                    </div>
+                  </div>
                 </div>
                 <div class="panel-body">
+
                   <div class='filtrotabla row'>
+                      <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
+                          <div class="form-group">
+                            <label class="col-sm-12 control-label labelleft" >Operacion :</label>
+                            <div class="col-sm-12 abajocaja" >
+                              {!! Form::select( 'operacion_id', $combo_operacion, array($operacion_id),
+                                                [
+                                                  'class'       => 'select2 form-control control input-sm' ,
+                                                  'id'          => 'operacion_id',
+                                                  'required'    => '',
+                                                  'data-aw'     => '1',
+                                                ]) !!}
+                            </div>
+                          </div>
+                      </div> 
                     <div class="col-xs-12">
                       <input type="hidden" name="idopcion" id='idopcion' value='{{$idopcion}}'>
                     </div>
                   </div>
+
                   <div class='listajax'>
-                    @include('comprobante.ajax.alistacontabilidad')
+                    @include('comprobante.ajax.mergelistacontabilidad')
                   </div>
                 </div>
               </div>

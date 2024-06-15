@@ -21,7 +21,7 @@ use App\Modelos\STDTrabajador;
 use App\Modelos\CMPDocAsociarCompra;
 use App\Modelos\Archivo;
 use App\Modelos\CMPCategoria;
-
+use App\Modelos\CMPDocumentoCtble;
 
 use Greenter\Parser\DocumentParserInterface;
 use Greenter\Xml\Parser\InvoiceParser;
@@ -59,15 +59,62 @@ class GestionOCAdministracionController extends Controller
         View::share('titulo','Lista comprobantes por aprobar administracion');
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
         //falta usuario contacto
-        $listadatos     =   $this->con_lista_cabecera_comprobante_total_adm($cod_empresa);
+
+        $operacion_id       =   'ORDEN_COMPRA';
+        $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO');
+
+        if($operacion_id=='ORDEN_COMPRA'){
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm($cod_empresa);
+        }else{
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_contrato($cod_empresa);
+        }
+
+        //dd($listadatos);
+
+
         $funcion        =   $this;
         return View::make('comprobante/listaadministracion',
                          [
                             'listadatos'        =>  $listadatos,
                             'funcion'           =>  $funcion,
+
+                            'operacion_id'      =>  $operacion_id,
+                            'combo_operacion'   =>  $combo_operacion,
+
                             'idopcion'          =>  $idopcion,
                          ]);
     }
+
+    public function actionListarAjaxBuscarDocumentoAdministracion(Request $request) {
+
+        $operacion_id   =   $request['operacion_id'];
+        $idopcion       =   $request['idopcion'];
+        $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
+        if($operacion_id=='ORDEN_COMPRA'){
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm($cod_empresa);
+        }else{
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_contrato($cod_empresa);
+        }
+
+        //dd($listadatos);
+
+        $procedencia        =   'ADM';
+        $funcion                =   $this;
+        return View::make('comprobante/ajax/mergelistaareaadministracion',
+                         [
+                            'operacion_id'          =>  $operacion_id,
+
+                            'idopcion'              =>  $idopcion,
+                            'cod_empresa'           =>  $cod_empresa,
+                            'listadatos'            =>  $listadatos,
+                            'procedencia'           =>  $procedencia,
+                            'ajax'                  =>  true,
+
+                            'funcion'               =>  $funcion
+                         ]);
+    }
+
+
 
 
     public function actionAgregarObservacionAdministracion($idopcion, $linea, $prefijo, $idordencompra,Request $request)
@@ -208,8 +255,16 @@ class GestionOCAdministracionController extends Controller
                                         ->get();
             $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','1')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
+            $ordencompra_t          =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
+
+            $codigo_sunat           =   'I';
+            if($ordencompra_t->IND_VARIAS_ENTREGAS==0){
+                $codigo_sunat           =   'N';
+            }
+
             $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                         ->where('COD_ESTADO','=',1)
+                                        ->where('CODIGO_SUNAT','=',$codigo_sunat)
                                         ->get();
 
             $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
@@ -218,7 +273,7 @@ class GestionOCAdministracionController extends Controller
 
             //dd($totalarchivos);
             //dd($documentoscompra);
-
+                                        
             return View::make('comprobante/observaradministracion', 
                             [
                                 'fedocumento'           =>  $fedocumento,
@@ -556,6 +611,171 @@ class GestionOCAdministracionController extends Controller
 
 
             return View::make('comprobante/aprobaradm', 
+                            [
+                                'fedocumento'           =>  $fedocumento,
+                                'ordencompra'           =>  $ordencompra,
+
+                                'linea'                 =>  $linea,
+                                'archivos'              =>  $archivos,
+                                'documentohistorial'    =>  $documentohistorial,
+
+                                'detalleordencompra'    =>  $detalleordencompra,
+                                'detallefedocumento'    =>  $detallefedocumento,
+                                'tarchivos'             =>  $tarchivos,
+                                'tp'                    =>  $tp,
+                                'idopcion'              =>  $idopcion,
+                                'idoc'                  =>  $idoc,
+                            ]);
+
+
+        }
+    }
+
+
+
+    public function actionAprobarAdministracionContrato($idopcion, $linea,$prefijo, $idordencompra,Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo_contrato($idordencompra,$prefijo);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_contrato_idoc($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
+        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+        View::share('titulo','Aprobar  Comprobante');
+
+        if($_POST)
+        {
+
+            try{    
+                
+                DB::beginTransaction();
+
+
+                $pedido_id          =   $idoc;
+                $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
+
+
+                $filespdf          =   $request['otros'];
+                if(!is_null($filespdf)){
+                    //PDF
+                    foreach($filespdf as $file){
+
+                            $larchivos       =      Archivo::get();
+
+
+                        $nombre          =      $ordencompra->COD_DOCUMENTO_CTBLE.'-'.$file->getClientOriginalName();
+                        /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
+                        $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
+                        $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
+                        //$nombrefilepdf   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
+                        $nombrefilepdf   =      count($larchivos).'-'.$file->getClientOriginalName();
+                        $valor           =      $this->versicarpetanoexiste($rutafile);
+                        $rutacompleta    =      $rutafile.'\\'.$nombrefilepdf;
+                        copy($file->getRealPath(),$rutacompleta);
+                        $path            =      $rutacompleta;
+
+                        $nombreoriginal             =   $file->getClientOriginalName();
+                        $info                       =   new SplFileInfo($nombreoriginal);
+                        $extension                  =   $info->getExtension();
+
+                        $dcontrol                   =   new Archivo;
+                        $dcontrol->ID_DOCUMENTO     =   $ordencompra->COD_DOCUMENTO_CTBLE;
+                        $dcontrol->DOCUMENTO_ITEM   =   $fedocumento->DOCUMENTO_ITEM;
+                        $dcontrol->TIPO_ARCHIVO     =   'OTROS_UC';
+                        $dcontrol->NOMBRE_ARCHIVO   =   $nombrefilepdf;
+                        $dcontrol->DESCRIPCION_ARCHIVO  =   'OTROS ADMINISTRACION';
+                        $dcontrol->URL_ARCHIVO      =   $path;
+                        $dcontrol->SIZE             =   filesize($file);
+                        $dcontrol->EXTENSION        =   $extension;
+                        $dcontrol->ACTIVO           =   1;
+                        $dcontrol->FECHA_CREA       =   $this->fechaactual;
+                        $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
+                        $dcontrol->save();
+                        //dd($nombre);
+                    }
+                }
+
+                //$orden                      =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();
+
+
+                $detalleproducto            =   CMPDetalleProducto::where('CMP.DETALLE_PRODUCTO.COD_ESTADO','=',1)
+                                                ->where('CMP.DETALLE_PRODUCTO.COD_TABLA','=',$pedido_id)
+                                                ->orderBy('NRO_LINEA','ASC')
+                                                ->get();
+
+                CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$pedido_id)
+                            ->update(
+                                    [
+                                        'IND_NOTIFICACION_CLIENTE'=>1
+                                    ]);
+
+                FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
+                            ->update(
+                                [
+                                    'COD_ESTADO'=>'ETM0000000000005',
+                                    'TXT_ESTADO'=>'APROBADO',
+                                    'ind_email_clap'=>0,
+                                    'fecha_ap'=>$this->fechaactual,
+                                    'usuario_ap'=>Session::get('usuario')->id
+                                ]
+                            );
+
+
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento                              =   new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA                       =   $this->fechaactual;
+                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                $documento->TIPO                        =   'APROBADO POR ADMINISTRACION';
+                $documento->MENSAJE                     =   '';
+                $documento->save();
+
+                //whatsaap para administracion
+                $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
+                $ordencompra        =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$pedido_id)->first();
+
+                //$ordencompra        =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();            
+                $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO.'%0D%0A'.'Proveedor : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'.'Estado : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
+                $trabajador         =   STDTrabajador::where('COD_TRAB','=',$fedocumento_w->COD_CONTACTO)->first();
+                if($_ENV['APP_PRODUCCION']==0){
+                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                }else{
+                    $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');          
+                }    
+
+                DB::commit();
+                return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_DOCUMENTO_CTBLE.' APROBADO CON EXITO');
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                return Redirect::to('gestion-de-administracion-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+
+        }
+        else{
+
+            $detalleordencompra     =   $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
+            $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+
+            $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
+            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
+                                        //->where('IND_OBLIGATORIO','=',1)
+                                        ->where('TXT_ASIGNADO','=','CONTACTO')
+                                        ->get();
+
+            $documentohistorial     =   FeDocumentoHistorial::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                        ->orderBy('FECHA','DESC')
+                                        ->get();
+
+            $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','1')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+
+            return View::make('comprobante/aprobaradmcontrato', 
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,

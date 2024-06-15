@@ -56,9 +56,18 @@ class GestionOCValidadoController extends Controller
         $estado_id      =   'TODO';
         $combo_estado   =   $this->gn_combo_estado_fe_documento($estado_id);
 
-        //dd($combo_estado);
 
-        $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id);
+        //falta usuario contacto
+        $operacion_id       =   'ORDEN_COMPRA';
+        $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO');
+
+        if($operacion_id=='ORDEN_COMPRA'){
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id);
+        }else{
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id);
+        }
+
+
         $funcion        =   $this;
         return View::make('comprobante/listaocvalidado',
                          [
@@ -71,7 +80,8 @@ class GestionOCValidadoController extends Controller
                             'combo_proveedor'   =>  $combo_proveedor,
                             'estado_id'         =>  $estado_id,
                             'combo_estado'      =>  $combo_estado,
-
+                            'operacion_id'         =>  $operacion_id,
+                            'combo_operacion'      =>  $combo_operacion,
                          ]);
     }
 
@@ -84,12 +94,19 @@ class GestionOCValidadoController extends Controller
         $proveedor_id   =   $request['proveedor_id'];  
         $estado_id      =   $request['estado_id'];
         $idopcion       =   $request['idopcion'];
+        $operacion_id   =   $request['operacion_id'];
 
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
-        $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id);
+
+        if($operacion_id=='ORDEN_COMPRA'){
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id);
+        }else{
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id);
+        }
+
         $funcion        =   $this;
 
-        return View::make('comprobante/ajax/alistaocvalidado',
+        return View::make('comprobante/ajax/mergelistaocvalidado',
                          [
                             'fecha_inicio'          =>  $fecha_inicio,
                             'fecha_fin'             =>  $fecha_fin,
@@ -99,7 +116,7 @@ class GestionOCValidadoController extends Controller
                             'cod_empresa'           =>  $cod_empresa,
                             'listadatos'            =>  $listadatos,
                             'ajax'                  =>  true,
-
+                            'operacion_id'            =>  $operacion_id,
                             'funcion'               =>  $funcion
                          ]);
     }
@@ -131,6 +148,50 @@ class GestionOCValidadoController extends Controller
     }
 
 
+    public function actionDetalleComprobanteOCValidadoContrato($idopcion,$linea, $prefijo, $idordencompra, Request $request) {
+
+        View::share('titulo','Detalle de Comprobante');
+
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo_contrato($idordencompra,$prefijo);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_contrato_idoc($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
+
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
+
+        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+
+
+        $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);
+
+
+
+        $xmlarchivo             =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE.'\\'.$fedocumento->ARCHIVO_XML;
+        $cdrarchivo             =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE.'\\'.$fedocumento->ARCHIVO_CDR;
+        $pdfarchivo             =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE.'\\'.$fedocumento->ARCHIVO_PDF;
+        $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
+        $documentohistorial     =   FeDocumentoHistorial::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                    ->orderBy('FECHA','DESC')
+                                    ->get();
+        //dd($documentohistorial);
+        $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','1')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+        $funcion                =   $this;
+        //dd($archivos);
+        return View::make('comprobante/registrocomprobantevalidadocontrato',
+                         [
+                            'ordencompra'           =>  $ordencompra,
+                            'detalleordencompra'    =>  $detalleordencompra,
+                            'fedocumento'           =>  $fedocumento,
+                            'detallefedocumento'    =>  $detallefedocumento,
+                            'documentohistorial'    =>  $documentohistorial,
+                            'archivos'              =>  $archivos,
+                            'linea'            =>  $linea,
+                            
+                            'xmlarchivo'            =>  $xmlarchivo,
+                            'tp'                    =>  $tp,
+                            'funcion'               =>  $funcion,
+                            'idopcion'              =>  $idopcion,
+                         ]);
+    }
 
 
     public function actionDetalleComprobanteOCValidado($idopcion,$linea, $prefijo, $idordencompra, Request $request) {
@@ -209,7 +270,36 @@ class GestionOCValidadoController extends Controller
 
     }
 
+    public function actionDescargarContrato($tipo,$idopcion,$linea, $prefijo, $idordencompra, Request $request)
+    {
 
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo_contrato($idordencompra,$prefijo);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_contrato_idoc($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
+        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+        $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);
+
+
+        $archivo                =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('TIPO_ARCHIVO','=',$tipo)->where('ACTIVO','=',1)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->first();
+        $nombrearchivo          =   trim($archivo->NOMBRE_ARCHIVO);
+        $nombrefile             =   basename($nombrearchivo);
+        $file                   =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE.'\\'.basename($archivo->NOMBRE_ARCHIVO);
+
+
+        if(file_exists($file)){
+            header("Cache-Control: public");
+            header("Content-Description: File Transfer");
+            header("Content-Disposition: attachment; filename=$nombrefile");
+            header("Content-Type: application/xml");
+            header("Content-Transfer-Encoding: binary");
+            readfile($file);
+            exit;
+        }else{
+            dd('Documento no encontrado');
+        }
+
+    }
 
 
 

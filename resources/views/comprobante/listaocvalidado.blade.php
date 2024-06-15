@@ -26,6 +26,23 @@
                   <div class='filtrotabla row'>
 
                           <div class="col-xs-12">
+
+                            <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
+                                <div class="form-group">
+                                  <label class="col-sm-12 control-label labelleft" >Operacion :</label>
+                                  <div class="col-sm-12 abajocaja" >
+                                    {!! Form::select( 'operacion_id', $combo_operacion, array($operacion_id),
+                                                      [
+                                                        'class'       => 'select2 form-control control input-sm' ,
+                                                        'id'          => 'operacion_id',
+                                                        'required'    => '',
+                                                        'data-aw'     => '1',
+                                                      ]) !!}
+                                  </div>
+                                </div>
+                            </div> 
+
+
                             <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
                                 <div class="form-group ">
                                   <label class="col-sm-12 control-label labelleft" >Fecha Inicio:</label>
@@ -101,6 +118,8 @@
 
 
 
+
+
                           </div>
 
 
@@ -109,7 +128,7 @@
                     </div>
                   </div>
                   <div class='listajax'>
-                    @include('comprobante.ajax.alistaocvalidado')
+                    @include('comprobante.ajax.mergelistaocvalidado')
                   </div>
                 </div>
               </div>

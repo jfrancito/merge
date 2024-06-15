@@ -57,7 +57,7 @@
 
                         <div class="form-group">
 
-                          <input id="name" name='name' type="text" required = "" value="{{ old('name') }}"  placeholder="Usuario" autocomplete="off" class="form-control" data-aw="1"/>
+                          <input id="name" name='name' type="text" required = "" value="{{ old('name') }}"  placeholder="RUC" autocomplete="off" class="form-control" data-aw="1"/>
 
                           @include('error.erroresvalidate', [ 'id' => $errors->has('name')  , 
                                                               'error' => $errors->first('name', ':message') , 
