@@ -11,6 +11,8 @@ use App\Modelos\VMergeOC;
 use App\Modelos\FeDocumento;
 use App\Modelos\STDEmpresa;
 use App\Modelos\CMPCategoria;
+use App\Modelos\STDTipoDocumento;
+
 
 
 use View;
@@ -716,7 +718,29 @@ trait ComprobanteProvisionTraits
 		$COD_CENTRO            		=       $orden->COD_CENTRO;
 		$idusuario 					=		Session::get('usuario')->name;
 
+
 		foreach($detalleproducto as $index => $item){
+
+
+			//DOLARES
+			$CANPRECIOUNITIGV 			=	$item->CAN_PRECIO_UNIT_IGV;
+			$CANPRECIOUNIT 				=	$item->CAN_PRECIO_UNIT;
+			$CANPRECIOCOSTO 			=	$item->CAN_PRECIO_COSTO;
+			$CANVALORVTA 				=	$item->CAN_VALOR_VTA;
+			$CANVALORVENTAIGV 			=	$item->CAN_VALOR_VENTA_IGV;
+
+
+			if($orden->COD_CATEGORIA_MONEDA=='MON0000000000002'){
+
+				$CANPRECIOUNITIGV 		=	$item->CAN_PRECIO_UNIT_IGV*$orden->CAN_TIPO_CAMBIO;
+				$CANPRECIOUNIT 			=	$item->CAN_PRECIO_UNIT*$orden->CAN_TIPO_CAMBIO;
+				$CANPRECIOCOSTO 		=	$item->CAN_PRECIO_COSTO*$orden->CAN_TIPO_CAMBIO;
+				$CANVALORVTA 			=	$item->CAN_VALOR_VTA*$orden->CAN_TIPO_CAMBIO;
+				$CANVALORVENTAIGV 		=	$item->CAN_VALOR_VENTA_IGV*$orden->CAN_TIPO_CAMBIO;
+
+			}
+
+
 
 			$IND_TIPO_OPERACION='I';
 			$COD_TABLA=$orden->COD_ORDEN;
@@ -739,17 +763,17 @@ trait ComprobanteProvisionTraits
 			$CAM_PESO_TARA=$item->CAM_PESO_TARA;
 			$CAN_PESO_NETO=$item->CAN_PESO_NETO;
 			$CAN_TASA_IGV=$item->CAN_TASA_IGV;
-			$CAN_PRECIO_UNIT_IGV=$item->CAN_PRECIO_UNIT_IGV;
-			$CAN_PRECIO_UNIT=$item->CAN_PRECIO_UNIT;
+			$CAN_PRECIO_UNIT_IGV=$CANPRECIOUNITIGV;
+			$CAN_PRECIO_UNIT=$CANPRECIOUNIT;
 
 			$CAN_PRECIO_ORIGEN=$item->CAN_PRECIO_ORIGEN;
-			$CAN_PRECIO_COSTO=$item->CAN_PRECIO_COSTO;
+			$CAN_PRECIO_COSTO=$CANPRECIOCOSTO;
 			$CAN_PRECIO_BRUTO=$item->CAN_PRECIO_BRUTO;
 			$CAN_PRECIO_KILOS=$item->CAN_PRECIO_KILOS;
 			$CAN_PRECIO_SACOS=$item->CAN_PRECIO_SACOS;
 
-			$CAN_VALOR_VTA=$item->CAN_VALOR_VTA;
-			$CAN_VALOR_VENTA_IGV=$item->CAN_VALOR_VENTA_IGV;
+			$CAN_VALOR_VTA=$CANVALORVTA;
+			$CAN_VALOR_VENTA_IGV=$CANVALORVENTAIGV;
 			$CAN_KILOS=$item->CAN_KILOS;
 			$CAN_SACOS=$item->CAN_SACOS;
 			$CAN_PENDIENTE=0;
@@ -1518,7 +1542,30 @@ trait ComprobanteProvisionTraits
 		$COD_CENTRO            		=       $orden->COD_CENTRO;
 		$idusuario 					=		Session::get('usuario')->name;
 
+
+
+
 		foreach($detalleproducto as $index => $item){
+
+
+			//DOLARES
+			$CANPRECIOUNITIGV 			=	$item->CAN_PRECIO_UNIT_IGV;
+			$CANPRECIOUNIT 				=	$item->CAN_PRECIO_UNIT;
+			$CANPRECIOCOSTO 			=	$item->CAN_PRECIO_COSTO;
+			$CANVALORVTA 				=	$item->CAN_VALOR_VTA;
+			$CANVALORVENTAIGV 			=	$item->CAN_VALOR_VENTA_IGV;
+
+
+			if($orden->COD_CATEGORIA_MONEDA=='MON0000000000002'){
+
+				$CANPRECIOUNITIGV 		=	$item->CAN_PRECIO_UNIT_IGV*$orden->CAN_TIPO_CAMBIO;
+				$CANPRECIOUNIT 			=	$item->CAN_PRECIO_UNIT*$orden->CAN_TIPO_CAMBIO;
+				$CANPRECIOCOSTO 		=	$item->CAN_PRECIO_COSTO*$orden->CAN_TIPO_CAMBIO;
+				$CANVALORVTA 			=	$item->CAN_VALOR_VTA*$orden->CAN_TIPO_CAMBIO;
+				$CANVALORVENTAIGV 		=	$item->CAN_VALOR_VENTA_IGV*$orden->CAN_TIPO_CAMBIO;
+
+			}
+
 
 			$IND_TIPO_OPERACION='I';
 			$COD_TABLA=$ordeningreso_id;
@@ -1541,17 +1588,17 @@ trait ComprobanteProvisionTraits
 			$CAM_PESO_TARA=$item->CAM_PESO_TARA;
 			$CAN_PESO_NETO=$item->CAN_PESO_NETO;
 			$CAN_TASA_IGV=0;
-			$CAN_PRECIO_UNIT_IGV=$item->CAN_PRECIO_UNIT_IGV;
-			$CAN_PRECIO_UNIT=$item->CAN_PRECIO_UNIT;
+			$CAN_PRECIO_UNIT_IGV=$CANPRECIOUNITIGV;
+			$CAN_PRECIO_UNIT=$CANPRECIOUNIT;
 
 			$CAN_PRECIO_ORIGEN=$item->CAN_PRECIO_ORIGEN;
-			$CAN_PRECIO_COSTO=$item->CAN_PRECIO_UNIT;
+			$CAN_PRECIO_COSTO=$CANPRECIOCOSTO;
 			$CAN_PRECIO_BRUTO=$item->CAN_PRECIO_BRUTO;
 			$CAN_PRECIO_KILOS=$item->CAN_PRECIO_KILOS;
 			$CAN_PRECIO_SACOS=$item->CAN_PRECIO_SACOS;
 
-			$CAN_VALOR_VTA=$item->CAN_VALOR_VTA;
-			$CAN_VALOR_VENTA_IGV=$item->CAN_VALOR_VENTA_IGV;
+			$CAN_VALOR_VTA=$CANVALORVTA;
+			$CAN_VALOR_VENTA_IGV=$CANVALORVENTAIGV;
 			$CAN_KILOS=$item->CAN_KILOS;
 			$CAN_SACOS=$item->CAN_SACOS;
 			$CAN_PENDIENTE=0;
@@ -1719,6 +1766,9 @@ trait ComprobanteProvisionTraits
 
 												');
 
+
+
+
 	        $stmt->bindParam(1, $IND_TIPO_OPERACION ,PDO::PARAM_STR);                   
 	        $stmt->bindParam(2, $COD_TABLA  ,PDO::PARAM_STR);
 	        $stmt->bindParam(3, $COD_PRODUCTO  ,PDO::PARAM_STR);
@@ -1885,6 +1935,17 @@ trait ComprobanteProvisionTraits
 	}
 	private function insert_orden($orden,$detalleproducto) {
 
+		$CANSUBTOTAL 	=	$orden->CAN_SUB_TOTAL;
+		$CANIMPUESTOVTA =	$orden->CAN_IMPUESTO_VTA;
+		$CANTOTAL 		=	$orden->CAN_TOTAL;
+		if($orden->COD_CATEGORIA_MONEDA=='MON0000000000002'){
+
+			$CANSUBTOTAL 	=	$orden->CAN_SUB_TOTAL*$orden->CAN_TIPO_CAMBIO;
+			$CANIMPUESTOVTA =	$orden->CAN_IMPUESTO_VTA*$orden->CAN_TIPO_CAMBIO;
+			$CANTOTAL 		=	$orden->CAN_TOTAL*$orden->CAN_TIPO_CAMBIO;
+
+		}
+
 
 		$COD_EMPR            	=       $orden->COD_EMPR;
 		$COD_CENTRO            	=       $orden->COD_CENTRO;
@@ -1939,8 +2000,8 @@ trait ComprobanteProvisionTraits
 		$TXT_CATEGORIA_TIPO_ORDEN='INGRESO';
 		$COD_CATEGORIA_TIPO_PAGO=$orden->COD_CATEGORIA_TIPO_PAGO;
 
-		$COD_CATEGORIA_MONEDA=$orden->COD_CATEGORIA_MONEDA;
-		$TXT_CATEGORIA_MONEDA=$orden->TXT_CATEGORIA_MONEDA;
+		$COD_CATEGORIA_MONEDA='MON0000000000001';
+		$TXT_CATEGORIA_MONEDA='SOLES';
 		$COD_CATEGORIA_ESTADO_ORDEN='EOR0000000000001';
 		$TXT_CATEGORIA_ESTADO_ORDEN='GENERADA';
 		$COD_CATEGORIA_MOVIMIENTO_INVENTARIO='MIN0000000000007';
@@ -1985,11 +2046,11 @@ trait ComprobanteProvisionTraits
 		$COD_ZONA_COMERCIAL='';
 		$TXT_ZONA_COMERCIAL='';
 		$COD_LOTE_CC='';
-		$CAN_SUB_TOTAL=$orden->CAN_SUB_TOTAL;
+		$CAN_SUB_TOTAL=$CANSUBTOTAL;
 
 		$CAN_IMPUESTO_VTA=$orden->CAN_IMPUESTO_VTA;
-		$CAN_IMPUESTO_RENTA=$orden->CAN_IMPUESTO_RENTA;
-		$CAN_TOTAL=$orden->CAN_TOTAL;
+		$CAN_IMPUESTO_RENTA=$CANIMPUESTOVTA;
+		$CAN_TOTAL=$CANTOTAL;
 		$CAN_DSCTO=$orden->CAN_DSCTO;
 		$CAN_TIPO_CAMBIO=$orden->CAN_TIPO_CAMBIO;
 
