@@ -597,7 +597,7 @@ trait ComprobanteTraits
 			$ind_moneda 			=	1;	
 		}else{ 	$ind_errototal 		=	0;  }
 		//total
-		if(number_format($ordencompra->CAN_TOTAL, 4, '.', '') == number_format($fedocumento->TOTAL_VENTA_ORIG, 4, '.', '')){
+		if(number_format($ordencompra->CAN_TOTAL, 4, '.', '') == number_format($fedocumento->TOTAL_VENTA_ORIG+$fedocumento->PERCEPCION+$fedocumento->MONTO_RETENCION, 4, '.', '')){
 			$ind_total 			=	1;	
 		}else{ 	$ind_errototal 		=	0;  }
 

@@ -2031,8 +2031,12 @@ class GestionOCController extends Controller
                         $documento->SUB_TOTAL_VENTA_ORIG    =   $factura->getmtoOperGravadas();
                         $documento->SUB_TOTAL_VENTA_SOLES   =   $factura->getmtoOperGravadas();
 
-                        $documento->TOTAL_VENTA_ORIG        =   $factura->getmtoImpVenta()+$cant_rentencion+$cant_perception;
-                        $documento->TOTAL_VENTA_SOLES       =   $factura->getmtoImpVenta()+$cant_rentencion+$cant_perception;
+                        $documento->TOTAL_VENTA_ORIG        =   $factura->getmtoImpVenta();
+                        $documento->TOTAL_VENTA_SOLES       =   $factura->getmtoImpVenta();
+
+                        $documento->PERCEPCION              =   $cant_perception;
+                        $documento->MONTO_RETENCION         =   $cant_rentencion;
+
 
                         $documento->HORA_EMISION            =   $factura->gethoraEmision();
                         $documento->IMPUESTO_2              =   $factura->getmtoOtrosTributos();
@@ -2329,8 +2333,12 @@ class GestionOCController extends Controller
                         $documento->VALOR_IGV_SOLES         =   $factura->getmtoIGV();
                         $documento->SUB_TOTAL_VENTA_ORIG    =   $factura->getmtoOperGravadas();
                         $documento->SUB_TOTAL_VENTA_SOLES   =   $factura->getmtoOperGravadas();
-                        $documento->TOTAL_VENTA_ORIG        =   $factura->getmtoImpVenta()+$cant_rentencion+$cant_perception;
-                        $documento->TOTAL_VENTA_SOLES       =   $factura->getmtoImpVenta()+$cant_rentencion+$cant_perception;
+                        $documento->TOTAL_VENTA_ORIG        =   $factura->getmtoImpVenta();
+                        $documento->TOTAL_VENTA_SOLES       =   $factura->getmtoImpVenta();
+
+                        $documento->PERCEPCION              =   $cant_perception;
+                        $documento->MONTO_RETENCION         =   $cant_rentencion;
+
                         $documento->HORA_EMISION            =   $factura->gethoraEmision();
                         $documento->IMPUESTO_2              =   $factura->getmtoOtrosTributos();
                         $documento->TIPO_DETRACCION         =   $factura->getdetraccion()->gettipoDet();
