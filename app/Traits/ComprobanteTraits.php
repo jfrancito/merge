@@ -41,6 +41,7 @@ trait ComprobanteTraits
         //dd($listafedocumentos);
 
         $COD_ORDEN_COMPRA = '';
+        $pathFiles='\\\\10.1.50.2';
 
         foreach($listafedocumentos as $index=>$item){
 
@@ -66,7 +67,7 @@ trait ComprobanteTraits
                 if(count($archivo)>0){
 
 
-                    $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
+                    $rutafile        =      $pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
                     $nombrefile      =      $archivo->NOMBRE_ARCHIVO;
                     $valor           =      $this->versicarpetanoexiste($rutafile);
                     $rutacompleta    =      $rutafile.'\\'.$nombrefile;
@@ -581,10 +582,10 @@ trait ComprobanteTraits
 			$ind_ruc 			=	1;	
 		}else{ 	$ind_errototal 		=	0;  }
 
-		if(ltrim(rtrim(strtoupper($ordencompra->TXT_EMPR_CLIENTE))) == ltrim(rtrim(strtoupper($fedocumento->RZ_PROVEEDOR)))){
+        $fe_rz =str_replace('  ', ' ', $fedocumento->RZ_PROVEEDOR);
+		if(ltrim(rtrim(strtoupper($ordencompra->TXT_EMPR_CLIENTE))) == ltrim(rtrim(strtoupper($fe_rz)))){
 			$ind_rz 			=	1;	
 		}else{ 	$ind_errototal 		=	0;  }
-
 
 		//moneda
 		$txtmoneda 			=	'';
