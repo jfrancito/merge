@@ -57,6 +57,13 @@ trait ComprobanteTraits
                 $prefijocarperta        =   $this->prefijo_empresa($item->ID_DOCUMENTO);
                 $fechaemision           =   date_format(date_create($item->FEC_VENTA), 'd/m/Y');
                 $nombre_doc             =   $item->SERIE.'-'.$item->NUMERO;
+
+
+                $numerototal     = $item->NUMERO;
+                $numerototalsc    = ltrim($numerototal, '0');
+                $nombre_doc_sinceros = $item->SERIE.'-'.$numerototalsc;
+
+
                 //LECTURA DE CDR
                 $archivo                =   Archivo::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
                                             ->where('TIPO_ARCHIVO','=','DCC0000000000004')
@@ -114,7 +121,7 @@ trait ComprobanteTraits
                             foreach($xml->xpath('//cbc:ID') as $ID)
                             {
                                 $factura_cdr_id  = $ID;
-                                if($factura_cdr_id == $nombre_doc){
+                                if($factura_cdr_id == $nombre_doc || $factura_cdr_id == $nombre_doc_sinceros){
                                     $sw = 1;
                                 }
                             }  
@@ -139,7 +146,7 @@ trait ComprobanteTraits
                             foreach($xml_ns->xpath('//ns3:DocumentReference') as $ID)
                             {
                                 $factura_cdr_id  = $ID->ID;
-                                if($factura_cdr_id == $nombre_doc){
+                                if($factura_cdr_id == $nombre_doc || $factura_cdr_id == $nombre_doc_sinceros){
                                     $sw = 1;
                                 }
                             }

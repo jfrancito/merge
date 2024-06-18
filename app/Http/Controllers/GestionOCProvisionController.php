@@ -40,93 +40,93 @@ class GestionOCProvisionController extends Controller
     use ComprobanteTraits;
     use ComprobanteProvisionTraits;
 
-    public function actionListarProvisionarComprobante($idopcion,Request $request)
-    {
+    // public function actionListarProvisionarComprobante($idopcion,Request $request)
+    // {
 
-        if($_POST)
-        {
+    //     if($_POST)
+    //     {
 
-            try{    
+    //         try{    
                 
-                DB::beginTransaction();
+    //             DB::beginTransaction();
 
 
-                $msjarray           = array();
-                $respuesta          = json_decode($request['pedido'], true);
-                $conts              = 0;
-                $contw              = 0;
-                $contd              = 0;
+    //             $msjarray           = array();
+    //             $respuesta          = json_decode($request['pedido'], true);
+    //             $conts              = 0;
+    //             $contw              = 0;
+    //             $contd              = 0;
 
-                //dd("hola");
-                foreach($respuesta as $obj){
+    //             //dd("hola");
+    //             foreach($respuesta as $obj){
 
-                    $pedido_id                  =   $obj['id'];
-                    $orden                      =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();
-                    $detalleproducto            =   CMPDetalleProducto::where('CMP.DETALLE_PRODUCTO.COD_ESTADO','=',1)
-                                                    ->where('CMP.DETALLE_PRODUCTO.COD_TABLA','=',$pedido_id)
-                                                    ->orderBy('NRO_LINEA','ASC')
-                                                    ->get();
-                    //  INSERTAR ORDEN DE INGRESO
-                    //almacen lote                                
-                    $this->insert_almacen_lote($orden,$detalleproducto);
-                    $orden_id = $this->insert_orden($orden,$detalleproducto);                 
-                    $this->insert_referencia_asoc($orden,$detalleproducto,$orden_id[0]);
-                    $this->insert_detalle_producto($orden,$detalleproducto,$orden_id[0]);
-                    //UPDATE DE ORDEN DE COMPRA
-                    //$this->update_orden($orden,$detalleproducto);
-                    $this->update_detalle_producto($orden,$detalleproducto);
-                    CMPOrden::where('COD_ORDEN','=',$orden->COD_ORDEN)
-                                ->update(
-                                        [
-                                            'COD_OPERACION'=>1
-                                        ]);
+    //                 $pedido_id                  =   $obj['id'];
+    //                 $orden                      =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();
+    //                 $detalleproducto            =   CMPDetalleProducto::where('CMP.DETALLE_PRODUCTO.COD_ESTADO','=',1)
+    //                                                 ->where('CMP.DETALLE_PRODUCTO.COD_TABLA','=',$pedido_id)
+    //                                                 ->orderBy('NRO_LINEA','ASC')
+    //                                                 ->get();
+    //                 //  INSERTAR ORDEN DE INGRESO
+    //                 //almacen lote                                
+    //                 $this->insert_almacen_lote($orden,$detalleproducto);
+    //                 $orden_id = $this->insert_orden($orden,$detalleproducto);                 
+    //                 $this->insert_referencia_asoc($orden,$detalleproducto,$orden_id[0]);
+    //                 $this->insert_detalle_producto($orden,$detalleproducto,$orden_id[0]);
+    //                 //UPDATE DE ORDEN DE COMPRA
+    //                 //$this->update_orden($orden,$detalleproducto);
+    //                 //$this->update_detalle_producto($orden,$detalleproducto);
+    //                 CMPOrden::where('COD_ORDEN','=',$orden->COD_ORDEN)
+    //                             ->update(
+    //                                     [
+    //                                         'COD_OPERACION'=>1
+    //                                     ]);
 
-                    FeDocumento::where('ID_DOCUMENTO',$pedido_id)
-                                ->update(
-                                    [
-                                        'COD_ESTADO'=>'ETM0000000000006',
-                                        'TXT_ESTADO'=>'PROVISIONADO',
-                                        'fecha_pr'=>$this->fechaactual,
-                                        'usuario_pr'=>Session::get('usuario')->id
-                                    ]
-                                );
+    //                 FeDocumento::where('ID_DOCUMENTO',$pedido_id)
+    //                             ->update(
+    //                                 [
+    //                                     'COD_ESTADO'=>'ETM0000000000006',
+    //                                     'TXT_ESTADO'=>'PROVISIONADO',
+    //                                     'fecha_pr'=>$this->fechaactual,
+    //                                     'usuario_pr'=>Session::get('usuario')->id
+    //                                 ]
+    //                             );
 
 
-                    $msjarray[]                 =   array(  "data_0" => $pedido_id, 
-                                                                        "data_1" => 'Comprobante Provisionado', 
-                                                                        "tipo" => 'S');
-                    $conts                      =   $conts + 1;
+    //                 $msjarray[]                 =   array(  "data_0" => $pedido_id, 
+    //                                                                     "data_1" => 'Comprobante Provisionado', 
+    //                                                                     "tipo" => 'S');
+    //                 $conts                      =   $conts + 1;
 
-                }
+    //             }
 
-                /************** MENSAJES DEL DETALLE PEDIDO  ******************/
-                $msjarray[] = array("data_0" => $conts, 
-                                    "data_1" => 'Comprobantes Provisionado', 
-                                    "tipo" => 'TS');
+    //             /************** MENSAJES DEL DETALLE PEDIDO  ******************/
+    //             $msjarray[] = array("data_0" => $conts, 
+    //                                 "data_1" => 'Comprobantes Provisionado', 
+    //                                 "tipo" => 'TS');
 
-                $msjarray[] = array("data_0" => $contw, 
-                                    "data_1" => 'Comprobantes Provisionado', 
-                                    "tipo" => 'TW');     
+    //             $msjarray[] = array("data_0" => $contw, 
+    //                                 "data_1" => 'Comprobantes Provisionado', 
+    //                                 "tipo" => 'TW');     
 
-                $msjarray[] = array("data_0" => $contd, 
-                                    "data_1" => 'Comprobantes errados', 
-                                    "tipo" => 'TD');
+    //             $msjarray[] = array("data_0" => $contd, 
+    //                                 "data_1" => 'Comprobantes errados', 
+    //                                 "tipo" => 'TD');
 
-                $msjjson = json_encode($msjarray);
+    //             $msjjson = json_encode($msjarray);
 
-                DB::commit();
-                return Redirect::to('/gestion-de-provision-comprobante/'.$idopcion)->with('xmlmsj', $msjjson);
-            }catch(\Exception $ex){
-                DB::rollback(); 
-                return Redirect::to('gestion-de-provision-comprobante/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
-            }
+    //             DB::commit();
+    //             return Redirect::to('/gestion-de-provision-comprobante/'.$idopcion)->with('xmlmsj', $msjjson);
+    //         }catch(\Exception $ex){
+    //             DB::rollback(); 
+    //             return Redirect::to('gestion-de-provision-comprobante/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+    //         }
 
 
 
 
         
-        }
-    }
+    //     }
+    // }
 
 
     public function actionListarComprobanteProvision($idopcion)

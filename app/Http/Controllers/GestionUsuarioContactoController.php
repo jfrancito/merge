@@ -579,7 +579,15 @@ class GestionUsuarioContactoController extends Controller
                     $this->insert_detalle_producto($orden,$detalleproducto,$orden_id[0]);
                     //UPDATE DE ORDEN DE COMPRA
                     //$this->update_orden($orden,$detalleproducto);
-                    $this->update_detalle_producto($orden,$detalleproducto);
+                    //$this->update_detalle_producto($orden,$detalleproducto);
+
+                    CMPDetalleProducto::where('COD_TABLA',$pedido_id)
+                                ->update(
+                                    [
+                                        'CAN_PENDIENTE'=>0
+                                    ]
+                                );
+                    
                     
                 }
 

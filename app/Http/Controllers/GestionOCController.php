@@ -2276,7 +2276,7 @@ class GestionOCController extends Controller
                             $moneda_le = $factura->gettipoMoneda();
 
                             $archivosdelfe          =      CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                            ->whereIn('COD_CATEGORIA', ['DCC0000000000026','DCC0000000000002','DCC0000000000003','DCC0000000000004','DCC0000000000005'])
+                                                            ->whereIn('COD_CATEGORIA', ['DCC0000000000026','DCC0000000000002','DCC0000000000003','DCC0000000000004'])
                                                             ->get();
 
 
@@ -2291,7 +2291,7 @@ class GestionOCController extends Controller
                             $moneda_le = 'PEN';
 
                             $archivosdelfe          =      CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                            ->whereIn('COD_CATEGORIA', ['DCC0000000000026','DCC0000000000013','DCC0000000000003','DCC0000000000005'])->get();
+                                                            ->whereIn('COD_CATEGORIA', ['DCC0000000000026','DCC0000000000013','DCC0000000000003'])->get();
 
                         }
 
@@ -2849,6 +2849,16 @@ class GestionOCController extends Controller
                     //UPDATE DE ORDEN DE COMPRA
                     //$this->update_orden($orden,$detalleproducto);
                     //$this->update_detalle_producto($orden,$detalleproducto);
+
+
+                    CMPDetalleProducto::where('COD_TABLA',$idoc)
+                                ->update(
+                                    [
+                                        'CAN_PENDIENTE'=>0
+                                    ]
+                                );
+
+
                     
                 }
 
