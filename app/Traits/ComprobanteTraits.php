@@ -475,9 +475,12 @@ trait ComprobanteTraits
 
 	private function con_lista_cabecera_comprobante_total_gestion_historial($cliente_id) {
 
+
+
 		$listadatos 	= 	FeDocumento::leftJoin('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
-							->where('FE_DOCUMENTO.usuario_pa','=',$cliente_id)
+							->where('FE_DOCUMENTO.RUC_PROVEEDOR','=',$cliente_id)
                             //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                            ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
 							->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
 							->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
 							->get();

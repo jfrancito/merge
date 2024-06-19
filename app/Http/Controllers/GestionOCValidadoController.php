@@ -133,7 +133,7 @@ class GestionOCValidadoController extends Controller
         if($validarurl <> 'true'){return $validarurl;}
         /******************************************************/
         View::share('titulo','Historial Ordenes de Compra');
-        $cod_empresa    =   Session::get('usuario')->id;
+        $cod_empresa    =   Session::get('usuario')->name;
         $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_historial($cod_empresa);
         $funcion        =   $this;
 
