@@ -1656,11 +1656,13 @@ class GestionOCController extends Controller
 
         //encontrar la orden de compra
         $fileordencompra            =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
-                                        ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000026')
+                                        ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000001')
                                         ->where('COD_ESTADO','=','1')
                                         ->first();
         $rutafila                  =   "";
         $rutaorden                  =   "";
+
+        //dd($fileordencompra);
 
         if(count($fileordencompra)>0){
             $directorio = '\\\\10.1.0.201\cpe\Orden_Compra';
@@ -1699,7 +1701,7 @@ class GestionOCController extends Controller
         }
 
 
-        //dd($rutaorden);
+
 
 
         $funcion                =   $this;
