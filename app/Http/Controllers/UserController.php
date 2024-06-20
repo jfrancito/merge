@@ -94,6 +94,8 @@ class UserController extends Controller {
 
 		$tescuentabb->COD_USUARIO_MODIF_AUD 		=   Session::get('usuario')->id;
 		$tescuentabb->FEC_USUARIO_MODIF_AUD 		=   $this->fechaactual;
+		$tescuentabb->TXT_NRO_CUENTA_BANCARIA 		=   $tescuentabb->TXT_NRO_CUENTA_BANCARIA.'-E';
+
 		$tescuentabb->COD_ESTADO 					=   0;
 		$tescuentabb->save();
 
