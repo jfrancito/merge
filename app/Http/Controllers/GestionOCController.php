@@ -2147,17 +2147,30 @@ class GestionOCController extends Controller
                         }else{
                             $token           =      $this->generartoken_is();
                         }
-                        $rvalidar = $this->validar_xml( $token,
-                                                        $fedocumento->ID_CLIENTE,
-                                                        $fedocumento->RUC_PROVEEDOR,
-                                                        $fedocumento->ID_TIPO_DOC,
-                                                        $fedocumento->SERIE,
-                                                        $fedocumento->NUMERO,
-                                                        $fechaemision,
-                                                        $fedocumento->TOTAL_VENTA_ORIG);
+
+                        if(count($rh)<=0){
+                            //FACTURA
+                            $rvalidar = $this->validar_xml( $token,
+                                                            $fedocumento->ID_CLIENTE,
+                                                            $fedocumento->RUC_PROVEEDOR,
+                                                            $fedocumento->ID_TIPO_DOC,
+                                                            $fedocumento->SERIE,
+                                                            $fedocumento->NUMERO,
+                                                            $fechaemision,
+                                                            $fedocumento->TOTAL_VENTA_ORIG);
+                        }else{
+                            //RECIBO POR HONORARIO
+                            $rvalidar = $this->validar_xml( $token,
+                                                            $fedocumento->ID_CLIENTE,
+                                                            $fedocumento->RUC_PROVEEDOR,
+                                                            $fedocumento->ID_TIPO_DOC,
+                                                            $fedocumento->SERIE,
+                                                            $fedocumento->NUMERO,
+                                                            $fechaemision,
+                                                            $fedocumento->TOTAL_VENTA_ORIG+$fedocumento->MONTO_RETENCION);
+                        }
 
                         $arvalidar = json_decode($rvalidar, true);
-
                         if(isset($arvalidar['success'])){
 
                             if($arvalidar['success']){
@@ -2278,7 +2291,7 @@ class GestionOCController extends Controller
                             $moneda_le = $factura->gettipoMoneda();
 
                             $archivosdelfe          =      CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                            ->whereIn('COD_CATEGORIA', ['DCC0000000000026','DCC0000000000002','DCC0000000000003','DCC0000000000004'])
+                                                            ->whereIn('COD_CATEGORIA', ['DCC0000000000026','DCC0000000000002','DCC0000000000003','DCC0000000000004','DCC0000000000008'])
                                                             ->get();
 
 
@@ -2293,7 +2306,7 @@ class GestionOCController extends Controller
                             $moneda_le = 'PEN';
 
                             $archivosdelfe          =      CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                            ->whereIn('COD_CATEGORIA', ['DCC0000000000026','DCC0000000000013','DCC0000000000003'])->get();
+                                                            ->whereIn('COD_CATEGORIA', ['DCC0000000000026','DCC0000000000013','DCC0000000000003','DCC0000000000008'])->get();
 
                         }
 
