@@ -53,60 +53,14 @@
 	      	   <td class="center"><b>INTEGRANTES </b></td>
 	      	   <td class="center"><b>DNI </b></td>
 	      	</tr> 
-	      	<tr>
-	      	   <td>DIRECTOR</td>
-	      	   <td>{{$i_nombre_director}}</td>
-	      	   <td>{{$i_dni_director}}</td>
-	      	</tr>
 
-	      	<tr>
-	      	   <td>SUBDIRECTOR </td>
-	      	   <td>{{$i_nombre_subdirector}}</td>
-	      	   <td>{{$i_dni_subdirector}}</td>
-	      	</tr> 
-
-	      	<tr>
-	      	   <td>REPRESENTANTE DE DOCENTE </td>
-	      	   <td>{{$i_nombre_representantedocente}}</td>
-	      	   <td>{{$i_dni_representantedocente}}</td>
-	      	</tr> 
-	  
-	      	<tr>
-	      	   <td>REPRESENTANTE DE APAFA </td>
-	      	   <td>{{$i_nombre_representanteapafa}}</td>
-	      	   <td>{{$i_dni_representanteapafa}}</td>
-	      	</tr>
-
-	      	<tr>
-	      	   <td>OTRO REPRESENTANTE DE LA COMUNIDAD </td>
-	      	   <td>{{$i_nombre_otrorepresentatecomunidad}}</td>
-	      	   <td>{{$i_dni_otrorepresentatecomunidad}}</td>
-	      	</tr>
-
-	      	@if($i_nombre_representanteadministrativo != '')
-	      	<tr>
-	      	   <td>REPRESENTANTE DE ADMINISTRATIVO </td>
-	      	   <td>{{$i_nombre_representanteadministrativo}}</td>
-	      	   <td>{{$i_dni_representanteadministrativo}}</td>
-	      	</tr>
-	      	@endif
-
-
-	      	@if($i_nombre_representanteestudiante != '')
-	      	<tr>
-	      	   <td>REPRESENTANTE DE ADMINISTRATIVO </td>
-	      	   <td>{{$i_nombre_representanteestudiante}}</td>
-	      	   <td>{{$i_dni_representanteestudiante}}</td>
-	      	</tr>
-	      	@endif
-
-	      	@if($i_nombre_representanteexalumno != '')
-	      	<tr>
-	      	   <td>REPRESENTANTE DE ADMINISTRATIVO </td>
-	      	   <td>{{$i_nombre_representanteexalumno}}</td>
-	      	   <td>{{$i_dni_representanteexalumno}}</td>
-	      	</tr>
-	      	@endif
+          @foreach($data_o as $index => $item)
+            <tr>
+            	<td>{{$item['_i_tipodocumento_id']}}</td>
+            	<td>{{$item['_i_documento']}}</td>
+              <td>{{$item['_i_nombres']}}</td>
+            </tr>
+          @endforeach
 
 
           @foreach($array_detalle_producto as $index => $item)

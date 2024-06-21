@@ -64,98 +64,108 @@ trait ComprobanteTraits
                 $nombre_doc_sinceros = $item->SERIE.'-'.$numerototalsc;
 
 
-                //LECTURA DE CDR
-                $archivo                =   Archivo::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
-                                            ->where('TIPO_ARCHIVO','=','DCC0000000000004')
-                                            ->first();
 
 
+                if($item->ID_TIPO_DOC == 'R1'){
 
-                if(count($archivo)>0){
+                    //LECTURA DE CDR
+                    $archivo                =   Archivo::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
+                                                ->where('TIPO_ARCHIVO','=','DCC0000000000004')
+                                                ->first();
+
+                    if(count($archivo)>0){
 
 
-                    $rutafile        =      $pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
-                    $nombrefile      =      $archivo->NOMBRE_ARCHIVO;
-                    $valor           =      $this->versicarpetanoexiste($rutafile);
-                    $rutacompleta    =      $rutafile.'\\'.$nombrefile;
+                        $rutafile        =      $pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
+                        $nombrefile      =      $archivo->NOMBRE_ARCHIVO;
+                        $valor           =      $this->versicarpetanoexiste($rutafile);
+                        $rutacompleta    =      $rutafile.'\\'.$nombrefile;
 
-                    $zipFilePath = $archivo->URL_ARCHIVO;
-                    $extractPath = $rutafile;
+                        $zipFilePath = $archivo->URL_ARCHIVO;
+                        $extractPath = $rutafile;
 
-                    $zip = new ZipArchive;
-                    $fileNames = '';
-                    if ($zip->open($zipFilePath) === TRUE) {
-                        if ($zip->extractTo($extractPath)) {
-                            for ($i = 0; $i < $zip->numFiles; $i++) {
-                                $fileNames = $zip->getNameIndex($i);
+                        $zip = new ZipArchive;
+                        $fileNames = '';
+                        if ($zip->open($zipFilePath) === TRUE) {
+                            if ($zip->extractTo($extractPath)) {
+                                for ($i = 0; $i < $zip->numFiles; $i++) {
+                                    $fileNames = $zip->getNameIndex($i);
+                                }
+                            } else {
+                                echo 'Hubo un error al descomprimir el archivo.';
                             }
+                            $zip->close();
                         } else {
-                            echo 'Hubo un error al descomprimir el archivo.';
+                            echo 'No se pudo abrir el archivo zip.';
                         }
-                        $zip->close();
-                    } else {
-                        echo 'No se pudo abrir el archivo zip.';
+
+                        $extractedFile = $extractPath.'\\'.$fileNames;
+                        if (file_exists($extractedFile)) {
+
+                            //cbc
+                            $xml = simplexml_load_file($extractedFile);
+                            $cbc = 0;
+                            $namespaces = $xml->getNamespaces(true);
+                            foreach ($namespaces as $prefix => $namespace) {
+                                if('cbc'==$prefix){
+                                    $cbc = 1;  
+                                }
+                            }
+                            if($cbc>=1){
+                                foreach($xml->xpath('//cbc:ResponseCode') as $ResponseCode)
+                                {
+                                    $codigocdr  = $ResponseCode;
+                                }
+                                foreach($xml->xpath('//cbc:Description') as $Description)
+                                {
+                                    $respuestacdr  = $Description;
+                                }
+                                foreach($xml->xpath('//cbc:ID') as $ID)
+                                {
+                                    $factura_cdr_id  = $ID;
+                                    if($factura_cdr_id == $nombre_doc || $factura_cdr_id == $nombre_doc_sinceros){
+                                        $sw = 1;
+                                    }
+                                }  
+                            }else{
+                                $xml_ns = simplexml_load_file($extractedFile);
+
+                                // Namespace definitions
+                                $ns4 = "urn:oasis:names:specification:ubl:schema:xsd:ApplicationResponse-2";
+                                $ns3 = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
+                                // Register namespaces
+                                $xml_ns->registerXPathNamespace('ns4', $ns4);
+                                $xml_ns->registerXPathNamespace('ns3', $ns3);
+                                // Querying XML
+                                foreach($xml_ns->xpath('//ns3:DocumentResponse/ns3:Response') as $ResponseCodes)
+                                {
+                                    $codigocdr  = $ResponseCodes->ResponseCode;
+                                }
+                                foreach($xml_ns->xpath('//ns3:DocumentResponse/ns3:Response') as $Description)
+                                {
+                                    $respuestacdr  = $Description->Description;
+                                }
+                                foreach($xml_ns->xpath('//ns3:DocumentReference') as $ID)
+                                {
+                                    $factura_cdr_id  = $ID->ID;
+                                    if($factura_cdr_id == $nombre_doc || $factura_cdr_id == $nombre_doc_sinceros){
+                                        $sw = 1;
+                                    }
+                                }
+                            }
+                        } 
+
+                    }else{
+                        $sw = 1;
                     }
 
-                    $extractedFile = $extractPath.'\\'.$fileNames;
-                    if (file_exists($extractedFile)) {
-
-                        //cbc
-                        $xml = simplexml_load_file($extractedFile);
-                        $cbc = 0;
-                        $namespaces = $xml->getNamespaces(true);
-                        foreach ($namespaces as $prefix => $namespace) {
-                            if('cbc'==$prefix){
-                                $cbc = 1;  
-                            }
-                        }
-                        if($cbc>=1){
-                            foreach($xml->xpath('//cbc:ResponseCode') as $ResponseCode)
-                            {
-                                $codigocdr  = $ResponseCode;
-                            }
-                            foreach($xml->xpath('//cbc:Description') as $Description)
-                            {
-                                $respuestacdr  = $Description;
-                            }
-                            foreach($xml->xpath('//cbc:ID') as $ID)
-                            {
-                                $factura_cdr_id  = $ID;
-                                if($factura_cdr_id == $nombre_doc || $factura_cdr_id == $nombre_doc_sinceros){
-                                    $sw = 1;
-                                }
-                            }  
-                        }else{
-                            $xml_ns = simplexml_load_file($extractedFile);
-
-                            // Namespace definitions
-                            $ns4 = "urn:oasis:names:specification:ubl:schema:xsd:ApplicationResponse-2";
-                            $ns3 = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
-                            // Register namespaces
-                            $xml_ns->registerXPathNamespace('ns4', $ns4);
-                            $xml_ns->registerXPathNamespace('ns3', $ns3);
-                            // Querying XML
-                            foreach($xml_ns->xpath('//ns3:DocumentResponse/ns3:Response') as $ResponseCodes)
-                            {
-                                $codigocdr  = $ResponseCodes->ResponseCode;
-                            }
-                            foreach($xml_ns->xpath('//ns3:DocumentResponse/ns3:Response') as $Description)
-                            {
-                                $respuestacdr  = $Description->Description;
-                            }
-                            foreach($xml_ns->xpath('//ns3:DocumentReference') as $ID)
-                            {
-                                $factura_cdr_id  = $ID->ID;
-                                if($factura_cdr_id == $nombre_doc || $factura_cdr_id == $nombre_doc_sinceros){
-                                    $sw = 1;
-                                }
-                            }
-                        }
-                    } 
-
                 }else{
-                    $sw = 1;
+                        $sw = 1;
                 }
+
+
+
+
 
                 //LECTURA A SUNAT
                 $token = '';
