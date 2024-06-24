@@ -2927,7 +2927,7 @@ class GestionOCController extends Controller
                         $this->insertar_whatsaap('51965991360','ANGHIE',$mensaje,'');           //INTERNACIONAL
                     }else{
                         $this->insertar_whatsaap('51950638955','MIGUEL',$mensaje,'');           //COMERCIAL
-                        $this->insertar_whatsaap('51944132248','JAIRO ALONSO',$mensaje,'');     //COMERCIAL
+                        //$this->insertar_whatsaap('51944132248','JAIRO ALONSO',$mensaje,'');     //COMERCIAL
                         $this->insertar_whatsaap('51977624444','DINO CRISTOPHER',$mensaje,'');  //COMERCIAL
                     }
 
@@ -3404,7 +3404,7 @@ class GestionOCController extends Controller
                         $this->insertar_whatsaap('51965991360','ANGHIE',$mensaje,'');           //INTERNACIONAL
                     }else{
                         $this->insertar_whatsaap('51950638955','MIGUEL',$mensaje,'');           //COMERCIAL
-                        $this->insertar_whatsaap('51944132248','JAIRO ALONSO',$mensaje,'');     //COMERCIAL
+                        //$this->insertar_whatsaap('51944132248','JAIRO ALONSO',$mensaje,'');     //COMERCIAL
                         $this->insertar_whatsaap('51977624444','DINO CRISTOPHER',$mensaje,'');  //COMERCIAL
                     }
                 }

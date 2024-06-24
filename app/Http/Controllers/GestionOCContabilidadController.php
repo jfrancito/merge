@@ -417,12 +417,17 @@ class GestionOCContabilidadController extends Controller
                                         //->where('IND_OBLIGATORIO','=',1)
                                         ->where('TXT_ASIGNADO','=','CONTACTO')
                                         ->get();
-
             $documentohistorial     =   FeDocumentoHistorial::where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                                         ->orderBy('FECHA','DESC')
                                         ->get();
-
             $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','1')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+
+            $archivospdf            =   Archivo::where('ID_DOCUMENTO','=',$idoc)
+                                        ->where('ACTIVO','=','1')
+                                        ->where('EXTENSION', 'like', '%'.'pdf'.'%')
+                                        ->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                        ->get();
+
 
 
             return View::make('comprobante/aprobarcon', 
@@ -430,10 +435,10 @@ class GestionOCContabilidadController extends Controller
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
                                 'linea'                 =>  $linea,
-
                                 'detalleordencompra'    =>  $detalleordencompra,
                                 'documentohistorial'    =>  $documentohistorial,
                                 'archivos'              =>  $archivos,
+                                'archivospdf'           =>  $archivospdf,
                                 'detallefedocumento'    =>  $detallefedocumento,
                                 'tarchivos'             =>  $tarchivos,
                                 'tp'                    =>  $tp,

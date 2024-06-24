@@ -129,7 +129,7 @@ margin-bottom: 0px ;
 
 .panel-ajax-alert{
   position: fixed;
-  top: 2px;
+  bottom: 38px;
   right: 4px;
   width: 40%;
   z-index: 1205;

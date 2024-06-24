@@ -1,5 +1,6 @@
 <?php
 
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -23,6 +24,8 @@ Route::group(['middleware' => ['guestaw']], function () {
 	Route::any('/accesobienvenido/{idempresa}', 'UserController@actionAccesoBienvenido');
 	
 });
+
+Route::get('/serve-file', 'FileController@serveFile')->name('serve-file');
 
 Route::any('/registrate', 'UserController@actionRegistrate');
 Route::any('/ajax-buscar-proveedor', 'UserController@actionAjaxBuscarProveedor');

@@ -609,6 +609,13 @@ class GestionOCAdministracionController extends Controller
 
             $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','1')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
+            $archivospdf            =   Archivo::where('ID_DOCUMENTO','=',$idoc)
+                                        ->where('ACTIVO','=','1')
+                                        ->where('EXTENSION', 'like', '%'.'pdf'.'%')
+                                        ->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                        ->get();
+
+
 
             return View::make('comprobante/aprobaradm', 
                             [
@@ -618,7 +625,7 @@ class GestionOCAdministracionController extends Controller
                                 'linea'                 =>  $linea,
                                 'archivos'              =>  $archivos,
                                 'documentohistorial'    =>  $documentohistorial,
-
+                                'archivospdf'           =>  $archivospdf,
                                 'detalleordencompra'    =>  $detalleordencompra,
                                 'detallefedocumento'    =>  $detallefedocumento,
                                 'tarchivos'             =>  $tarchivos,
