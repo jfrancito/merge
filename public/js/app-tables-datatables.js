@@ -20,7 +20,7 @@ var App = (function () {
         columnDefs:[{
             targets: "_all",
             sortable: false
-        },{ width: 350, targets: 1 }]
+        }]
     });
 
 
