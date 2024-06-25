@@ -312,8 +312,8 @@ trait ComprobanteTraits
 							->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                             ->where('OPERACION','=','ORDEN_COMPRA')
 							->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-
 							->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
+                            ->orderBy('fecha_uc','asc')
 							->get();
 
 	 	return  $listadatos;
@@ -344,6 +344,7 @@ trait ComprobanteTraits
 							->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
 							//->where('TXT_PROCEDENCIA','<>','SUE')
 							->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
+                            ->orderBy('fecha_uc','asc')
 							->get();
 
 	 	return  $listadatos;
@@ -379,7 +380,7 @@ trait ComprobanteTraits
 							->Estado($estado_id)
 							->where('FE_DOCUMENTO.COD_ESTADO','<>','')
 							->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
-							->orderBy('fecha_pa', 'desc')
+                            ->orderBy('fecha_uc','asc')
 							->get();
 
 	 	return  $listadatos;

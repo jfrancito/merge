@@ -22,6 +22,8 @@ use App\Modelos\CMPDocAsociarCompra;
 use App\Modelos\Archivo;
 use App\Modelos\CMPCategoria;
 use App\Modelos\CMPDocumentoCtble;
+use App\Modelos\CMPReferecenciaAsoc;
+
 
 use Greenter\Parser\DocumentParserInterface;
 use Greenter\Xml\Parser\InvoiceParser;
@@ -616,12 +618,20 @@ class GestionOCAdministracionController extends Controller
                                         ->get();
 
 
+            //orden de ingreso
+            $referencia             =   CMPReferecenciaAsoc::where('COD_TABLA','=',$ordencompra->COD_ORDEN)
+                                        ->where('COD_TABLA_ASOC','like','%OI%')->first();
+            $ordeningreso           =   array();
+            if(count($referencia)>0){
+                $ordeningreso       =   CMPOrden::where('COD_ORDEN','=',$referencia->COD_TABLA_ASOC)->first();   
+            }                          
+
 
             return View::make('comprobante/aprobaradm', 
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
-
+                                'ordeningreso'          =>  $ordeningreso,
                                 'linea'                 =>  $linea,
                                 'archivos'              =>  $archivos,
                                 'documentohistorial'    =>  $documentohistorial,

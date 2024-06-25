@@ -4,6 +4,7 @@
       <th>ITEM</th>
       <th>ORDEN COMPRA</th>
       <th>FACTURA</th>
+      <th>REGISTRO</th>
       <th>ESTADO</th>
       <th>OPCION</th>
     </tr>
@@ -39,6 +40,13 @@
           <span><b>FORMA PAGO : </b> {{$item->FORMA_PAGO}}</span>
           <span><b>TOTAL : </b> {{number_format($item->TOTAL_VENTA_ORIG, 4, '.', ',')}}</span>
         </td>
+        <td class="cell-detail sorting_1" style="position: relative;">
+          <span><b>PROVEEDOR : </b>  {{date_format(date_create($item->fecha_pa), 'd-m-Y h:i:s')}}</span>
+          <span><b>U. CONTACTO: </b>{{date_format(date_create($item->fecha_uc), 'd-m-Y h:i:s')}}</span>
+          <span><b>CONTABILIDAD : </b> {{date_format(date_create($item->fecha_pr), 'd-m-Y h:i:s')}}</span>
+          <span><b>ADMINISTRACION : </b> {{date_format(date_create($item->fecha_ap), 'd-m-Y h:i:s')}}</span>
+        </td>
+
         @include('comprobante.ajax.estados')
         <td class="rigth">
           <div class="btn-group btn-hspace">

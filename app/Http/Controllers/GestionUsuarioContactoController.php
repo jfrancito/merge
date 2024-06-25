@@ -671,45 +671,45 @@ class GestionUsuarioContactoController extends Controller
                     }
                 }
 
-                $filespdf          =   $request['otros'];
-                if(!is_null($filespdf)){
-                    //PDF
-                    foreach($filespdf as $file){
+                // $filespdf          =   $request['otros'];
+                // if(!is_null($filespdf)){
+                //     //PDF
+                //     foreach($filespdf as $file){
 
-                            $larchivos       =      Archivo::get();
+                //             $larchivos       =      Archivo::get();
 
 
-                        $nombre          =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                        /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
-                        $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
-                        $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
-                        //$nombrefilepdf   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                        $nombrefilepdf   =      count($larchivos).'-'.$file->getClientOriginalName();
-                        $valor           =      $this->versicarpetanoexiste($rutafile);
-                        $rutacompleta    =      $rutafile.'\\'.$nombrefilepdf;
-                        copy($file->getRealPath(),$rutacompleta);
-                        $path            =      $rutacompleta;
+                //         $nombre          =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
+                //         /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
+                //         $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
+                //         $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
+                //         //$nombrefilepdf   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
+                //         $nombrefilepdf   =      count($larchivos).'-'.$file->getClientOriginalName();
+                //         $valor           =      $this->versicarpetanoexiste($rutafile);
+                //         $rutacompleta    =      $rutafile.'\\'.$nombrefilepdf;
+                //         copy($file->getRealPath(),$rutacompleta);
+                //         $path            =      $rutacompleta;
 
-                        $nombreoriginal             =   $file->getClientOriginalName();
-                        $info                       =   new SplFileInfo($nombreoriginal);
-                        $extension                  =   $info->getExtension();
+                //         $nombreoriginal             =   $file->getClientOriginalName();
+                //         $info                       =   new SplFileInfo($nombreoriginal);
+                //         $extension                  =   $info->getExtension();
 
-                        $dcontrol                   =   new Archivo;
-                        $dcontrol->ID_DOCUMENTO     =   $ordencompra->COD_ORDEN;
-                        $dcontrol->DOCUMENTO_ITEM   =   $fedocumento->DOCUMENTO_ITEM;
-                        $dcontrol->TIPO_ARCHIVO     =   'OTROS_UC';
-                        $dcontrol->NOMBRE_ARCHIVO   =   $nombrefilepdf;
-                        $dcontrol->DESCRIPCION_ARCHIVO  =   'OTROS USUARIO DE CONTACTOS';
-                        $dcontrol->URL_ARCHIVO      =   $path;
-                        $dcontrol->SIZE             =   filesize($file);
-                        $dcontrol->EXTENSION        =   $extension;
-                        $dcontrol->ACTIVO           =   1;
-                        $dcontrol->FECHA_CREA       =   $this->fechaactual;
-                        $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
-                        $dcontrol->save();
-                        //dd($nombre);
-                    }
-                }
+                //         $dcontrol                   =   new Archivo;
+                //         $dcontrol->ID_DOCUMENTO     =   $ordencompra->COD_ORDEN;
+                //         $dcontrol->DOCUMENTO_ITEM   =   $fedocumento->DOCUMENTO_ITEM;
+                //         $dcontrol->TIPO_ARCHIVO     =   'OTROS_UC';
+                //         $dcontrol->NOMBRE_ARCHIVO   =   $nombrefilepdf;
+                //         $dcontrol->DESCRIPCION_ARCHIVO  =   'OTROS USUARIO DE CONTACTOS';
+                //         $dcontrol->URL_ARCHIVO      =   $path;
+                //         $dcontrol->SIZE             =   filesize($file);
+                //         $dcontrol->EXTENSION        =   $extension;
+                //         $dcontrol->ACTIVO           =   1;
+                //         $dcontrol->FECHA_CREA       =   $this->fechaactual;
+                //         $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
+                //         $dcontrol->save();
+                //         //dd($nombre);
+                //     }
+                // }
 
                 FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
@@ -826,6 +826,12 @@ class GestionUsuarioContactoController extends Controller
                 } 
             }
 
+                    
+            $archivospdf            =   Archivo::where('ID_DOCUMENTO','=',$idoc)
+                                        ->where('ACTIVO','=','1')
+                                        ->where('EXTENSION', 'like', '%'.'pdf'.'%')
+                                        ->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                        ->get();
 
 
             return View::make('comprobante/aprobaruc', 
@@ -837,7 +843,7 @@ class GestionUsuarioContactoController extends Controller
                                 'detallefedocumento'    =>  $detallefedocumento,
                                 'documentohistorial'    =>  $documentohistorial,
                                 'rutaorden'             =>  $rutaorden,
-
+                                'archivospdf'           =>  $archivospdf,
                                 'archivos'              =>  $archivos,
                                 'tarchivos'             =>  $tarchivos,
                                 'tp'                    =>  $tp,

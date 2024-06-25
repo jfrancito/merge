@@ -1,138 +1,14 @@
 <input type="hidden" name="rutaorden" id='rutaorden' value = '{{$rutaorden}}'>
 <div class="row">
   <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-    <div class="panel panel-default panel-contrast">
-      <div class="panel-heading" style="background: #1d3a6d;color: #fff;">COMPARAR (XML - ORDEN COMPRA)
-      </div>
-      <div class="panel-body panel-body-contrast">
-        <table class="table table-condensed table-striped">
-          <thead>
-            <tr>
-              <th>Valor</th>
-              <th>Orden de Compra</th>      
-              <th>XML</th>       
-            </tr>
-          </thead>
-          <tbody>
-              <tr>
-                <td><b>RUC</b></td>
-                <td><p class='subtitulomerge'>{{$ordencompra->NRO_DOCUMENTO_CLIENTE}}</p></td>
-                <td>
-                  <div class='subtitulomerge @if($fedocumento->ind_ruc == 1) msjexitoso @else msjerror @endif'><b>{{$fedocumento->RUC_PROVEEDOR}}</b>
-                  </div>
-                </td>
-              </tr>
-
-              <tr>
-                <td><b>Moneda</b></td>
-                <td><p class='subtitulomerge'>{{$ordencompra->TXT_CATEGORIA_MONEDA}}</p></td>
-                <td>
-                  <div class='subtitulomerge @if($fedocumento->ind_moneda == 1) msjexitoso @else msjerror @endif'> <b>
-                      @if($fedocumento->MONEDA == 'PEN')
-                          SOLES
-                      @else
-                          {{$fedocumento->MONEDA}}
-                      @endif</b>
-                  </div>
-                </td>
-              </tr>
-
-              <tr>
-                <td><b>Total</b></td>
-                <td><p class='subtitulomerge'>{{number_format($ordencompra->CAN_TOTAL, 4, '.', ',')}}</p></td>
-                <td>
-                  <div class='subtitulomerge @if($fedocumento->ind_total == 1) msjexitoso @else msjerror @endif'>
-                      <b>{{number_format($fedocumento->TOTAL_VENTA_ORIG, 4, '.', ',')}}</b>
-                  </div>
-                </td>
-              </tr>
-
-              <tr>
-                <td><b>Forma Pago</b></td>
-                <td><p class='subtitulomerge'>{{$tp->NOM_CATEGORIA}}</p></td>
-                <td>
-                  <div class='subtitulomerge @if($fedocumento->ind_cantidaditem == 1) msjexitoso @else msjerror @endif'>{{$fedocumento->FORMA_PAGO}} 
-                  </div>
-                </td>
-              </tr>
-
-              <tr>
-                <td><b>Cantidad item</b></td>
-                <td><p class='subtitulomerge'>{{count($detalleordencompra)}}</p></td>
-                <td>
-                   <div class='subtitulomerge @if($fedocumento->ind_cantidaditem == 1) msjexitoso @else msjerror @endif'><b>{{count($detallefedocumento)}}</b>
-                   </div>
-                </td>
-              </tr>
-
-
-
-
-          </tbody>
-        </table>
-      </div>
-    </div>
+    @include('comprobante.form.ordencompra.comparar')
   </div>
   <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-
-    <div class="panel panel-default panel-contrast">
-      <div class="panel-heading" style="background: #1d3a6d;color: #fff;">CONSULTA API SUNAT
-      </div>
-      <div class="panel-body panel-body-contrast">
-          @if(count($fedocumento)<=0)
-              <div class="col-sm-12">
-                  <b>CARGAR XML</b>
-              </div>
-          @else
-              <div class="col-sm-12">
-                  <p style="margin:0px;"><b>Respuesta Sunat</b> : {{$fedocumento->message}}</p>
-                  <p style="margin:0px;" class='@if($fedocumento->estadoCp == 1) msjexitoso @else msjerror @endif'><b>Estado Comprobante</b> : 
-                      {{$fedocumento->nestadoCp}}
-                  </p>
-                  <p style="margin:0px;"><b>Estado Ruc</b> : {{$fedocumento->nestadoRuc}}</p>
-                  <p style="margin:0px;"><b>Estado Domicilio</b> : {{$fedocumento->ncondDomiRuc}}</p>
-                  <p style="margin:0px;"><b>Respuesta CDR</b> : {{$fedocumento->RESPUESTA_CDR}}</p>
-
-
-              </div>
-          @endif
-      </div>
-    </div>
+    @include('comprobante.form.ordencompra.sunat')
   </div>
-
   <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-    <div class="panel panel-default panel-contrast">
-      <div class="panel-heading" style="background: #1d3a6d;color: #fff;">SEGUIMIENTO DE DOCUMENTO
-      </div>
-      <div class="panel-body panel-body-contrast">
-        <table class="table table-condensed table-striped">
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Usuario</th>      
-              <th>Tipo</th>
-              <th>Mensaje</th>
-
-            </tr>
-          </thead>
-          <tbody>
-
-              @foreach($documentohistorial as $index => $item)  
-                <tr>
-                  <td>{{date_format(date_create($item->FECHA), 'd-m-Y H:i:s')}}</td>
-                  <td>{{$item->USUARIO_NOMBRE}}</td>
-                  <td><b>{{$item->TIPO}}</</b></td>
-                  <td>{{$item->MENSAJE}}</td>
-
-                </tr>
-              @endforeach
-
-          </tbody>
-        </table>
-      </div>
-    </div>
+    @include('comprobante.form.ordencompra.seguimiento')
   </div> 
-
 </div>
 
 
@@ -307,6 +183,11 @@
 
 </div>
 
+<div class="row">
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    @include('comprobante.form.ordencompra.verarchivopdf')
+  </div>
+</div>
 
 <div class="row">
   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
@@ -363,7 +244,7 @@
                     @endif
 
                 @endforeach
-                <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+<!--                 <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
                   <div class="form-group sectioncargarimagen">
                       <label class="col-sm-12 control-label" style="text-align: left;"><b>OTROS DOCUMENTOS</b> <br><br></label>
                       <div class="col-sm-12">
@@ -378,7 +259,7 @@
                           </div>
                       </div>
                   </div>
-                </div>
+                </div> -->
               </div>
       </div>
     </div>

@@ -21,7 +21,7 @@ use App\Modelos\CMPCategoria;
 use App\Modelos\CMPDocAsociarCompra;
 use App\Modelos\Archivo;
 use App\Modelos\CMPDocumentoCtble;
-
+use App\Modelos\CMPReferecenciaAsoc;
 
 use Greenter\Parser\DocumentParserInterface;
 use Greenter\Xml\Parser\InvoiceParser;
@@ -136,8 +136,8 @@ class GestionOCContabilidadController extends Controller
                                         'COD_ESTADO'=>'ETM0000000000004',
                                         'TXT_ESTADO'=>'POR APROBAR ADMINISTRACION',
                                         'ind_email_adm'=>0,
-                                        'fecha_ap'=>$this->fechaactual,
-                                        'usuario_ap'=>Session::get('usuario')->id
+                                        'fecha_pr'=>$this->fechaactual,
+                                        'usuario_pr'=>Session::get('usuario')->id
                                     ]
                                 );
 
@@ -360,8 +360,8 @@ class GestionOCContabilidadController extends Controller
                                     'COD_ESTADO'=>'ETM0000000000004',
                                     'TXT_ESTADO'=>'POR APROBAR ADMINISTRACION',
                                     'ind_email_adm'=>0,
-                                    'fecha_ap'=>$this->fechaactual,
-                                    'usuario_ap'=>Session::get('usuario')->id
+                                    'fecha_pr'=>$this->fechaactual,
+                                    'usuario_pr'=>Session::get('usuario')->id
                                 ]
                             );
 
@@ -429,11 +429,21 @@ class GestionOCContabilidadController extends Controller
                                         ->get();
 
 
+            //orden de ingreso
+            $referencia             =   CMPReferecenciaAsoc::where('COD_TABLA','=',$ordencompra->COD_ORDEN)
+                                        ->where('COD_TABLA_ASOC','like','%OI%')->first();
+            $ordeningreso           =   array();
+            if(count($referencia)>0){
+                $ordeningreso       =   CMPOrden::where('COD_ORDEN','=',$referencia->COD_TABLA_ASOC)->first();   
+            }     
+
 
             return View::make('comprobante/aprobarcon', 
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
+                                'ordeningreso'          =>  $ordeningreso,
+
                                 'linea'                 =>  $linea,
                                 'detalleordencompra'    =>  $detalleordencompra,
                                 'documentohistorial'    =>  $documentohistorial,
@@ -526,8 +536,8 @@ class GestionOCContabilidadController extends Controller
                                     'COD_ESTADO'=>'ETM0000000000004',
                                     'TXT_ESTADO'=>'POR APROBAR ADMINISTRACION',
                                     'ind_email_adm'=>0,
-                                    'fecha_ap'=>$this->fechaactual,
-                                    'usuario_ap'=>Session::get('usuario')->id
+                                    'fecha_pr'=>$this->fechaactual,
+                                    'usuario_pr'=>Session::get('usuario')->id
                                 ]
                             );
 

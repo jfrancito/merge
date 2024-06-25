@@ -41,7 +41,7 @@
     <script src="{{ asset('public/js/app-form-elements.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/lib/parsley/parsley.js') }}" type="text/javascript"></script>
 
-    <script src="{{ asset('public/js/file/bootstrap.bundle.min.js') }}" crossorigin="anonymous"></script>
+
     <script src="{{ asset('public/js/file/fileinput.js?v='.$version) }}" type="text/javascript"></script>
     <script src="{{ asset('public/js/file/locales/es.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/js/general/general.js') }}" type="text/javascript"></script>
@@ -68,6 +68,21 @@
               language: 'es',
               allowedFileExtensions: ['pdf'],
             });
+
+      @foreach($archivospdf as $index => $item)
+        var nombre_archivo = '{{$item->NOMBRE_ARCHIVO}}';
+        $('#file-'+{{$index}}).fileinput({
+          theme: 'fa5',
+          language: 'es',
+          initialPreview: ["{{ route('serve-file', ['file' => '']) }}" + nombre_archivo],
+          initialPreviewAsData: true,
+          initialPreviewFileType: 'pdf',
+          initialPreviewConfig: [
+              {type: "pdf", caption: nombre_archivo, downloadUrl: "{{ route('serve-file', ['file' => '']) }}" + nombre_archivo} // Para mostrar el botón de descarga
+          ]
+        });
+      @endforeach
+           
     </script>
   <script src="{{ asset('public/js/comprobante/registro.js?v='.$version) }}" type="text/javascript"></script>
 

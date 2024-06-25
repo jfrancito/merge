@@ -15,6 +15,8 @@ use App\Modelos\Estado;
 use App\Modelos\CMPCategoria;
 use App\Modelos\FeDocumentoHistorial;
 use App\Modelos\Archivo;
+use App\Modelos\CMPReferecenciaAsoc;
+
 
 
 use Greenter\Parser\DocumentParserInterface;
@@ -221,10 +223,30 @@ class GestionOCValidadoController extends Controller
         //dd($documentohistorial);
         $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','1')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
         $funcion                =   $this;
+
+
+
+        $archivospdf            =   Archivo::where('ID_DOCUMENTO','=',$idoc)
+                                    ->where('ACTIVO','=','1')
+                                    ->where('EXTENSION', 'like', '%'.'pdf'.'%')
+                                    ->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                    ->get();
+
+
+        //orden de ingreso
+        $referencia             =   CMPReferecenciaAsoc::where('COD_TABLA','=',$ordencompra->COD_ORDEN)
+                                    ->where('COD_TABLA_ASOC','like','%OI%')->first();
+        $ordeningreso           =   array();
+        if(count($referencia)>0){
+            $ordeningreso       =   CMPOrden::where('COD_ORDEN','=',$referencia->COD_TABLA_ASOC)->first();   
+        }    
+
         //dd($archivos);
         return View::make('comprobante/registrocomprobantevalidado',
                          [
                             'ordencompra'           =>  $ordencompra,
+                            'archivospdf'           =>  $archivospdf,
+                            'ordeningreso'           =>  $ordeningreso,
                             'detalleordencompra'    =>  $detalleordencompra,
                             'fedocumento'           =>  $fedocumento,
                             'detallefedocumento'    =>  $detallefedocumento,
