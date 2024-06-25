@@ -16,7 +16,7 @@ use App\Modelos\CMPCategoria;
 use App\Modelos\FeDocumentoHistorial;
 use App\Modelos\Archivo;
 use App\Modelos\CMPReferecenciaAsoc;
-
+use App\Modelos\CMPOrden;
 
 
 use Greenter\Parser\DocumentParserInterface;
