@@ -72,7 +72,7 @@ class GestionOCController extends Controller
 
         header('Content-Type: text/html; charset=UTF-8');
         //$path = storage_path() . "/exports/FC26-00002985.XML";
-        $path = storage_path() . "/exports/20536089226-01-F001-737.xml";
+        $path = storage_path() . "/exports/20507312277-01-FC26-00003065.xml";
 
         $parser = new InvoiceParser();
         $xml = file_get_contents($path);
@@ -86,8 +86,8 @@ class GestionOCController extends Controller
     {
 
         header('Content-Type: text/html; charset=UTF-8');
-        $path = storage_path() . "/exports/RHE1044061449953.xml";
-        //$path = storage_path() . "/exports/20454823916-01-FH04-00000026.xml";
+        $path = storage_path() . "/exports/RH E001-297.xml";
+        //$path = storage_path() . "/exports/RHE1044061449953.xml";
 
         $parser = new RHParser();
         $xml = file_get_contents($path);
@@ -1098,6 +1098,11 @@ class GestionOCController extends Controller
 
                         //dd($documentolinea);
 
+
+                        $documentolinea                     =   $this->ge_linea_documento($ordencompra->COD_ORDEN);
+                        $cant_rentencion                    =   $ordencompra_t->CAN_RETENCION;
+                        $cant_perception                    =   $factura->getperception();
+
                         //REGISTRO DEL XML LEIDO
                         $documento                          =   new FeDocumento;
                         $documento->ID_DOCUMENTO            =   $ordencompra->COD_ORDEN;
@@ -1128,6 +1133,9 @@ class GestionOCController extends Controller
 
                         $documento->SUB_TOTAL_VENTA_ORIG    =   $factura->getmtoOperGravadas();
                         $documento->SUB_TOTAL_VENTA_SOLES   =   $factura->getmtoOperGravadas();
+
+                        $documento->PERCEPCION              =   $cant_perception;
+                        $documento->MONTO_RETENCION         =   $cant_rentencion;
 
                         $documento->TOTAL_VENTA_ORIG        =   $factura->getmtoImpVenta();
                         $documento->TOTAL_VENTA_SOLES       =   $factura->getmtoImpVenta();
