@@ -71,9 +71,6 @@ class GestionOCAdministracionController extends Controller
             $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_contrato($cod_empresa);
         }
 
-        //dd($listadatos);
-
-
         $funcion        =   $this;
         return View::make('comprobante/listaadministracion',
                          [
