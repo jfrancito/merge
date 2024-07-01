@@ -446,7 +446,7 @@ trait ComprobanteTraits
 
         $listadatos     =   FeDocumento::where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                            //->where('TXT_PROCEDENCIA','<>','SUE')
+                            ->where('OPERACION','=','ORDEN_COMPRA')
                             ->select(DB::raw('TXT_ESTADO,COUNT(TXT_ESTADO) AS CANT'))
                             ->groupBy('TXT_ESTADO')
                             ->get();
@@ -455,6 +455,22 @@ trait ComprobanteTraits
 
 
     }
+
+    private function con_lista_cabecera_comprobante_total_gestion_agrupado_con($cliente_id) {
+
+
+        $listadatos     =   FeDocumento::where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                            ->where('OPERACION','=','CONTRATO')
+                            ->select(DB::raw('TXT_ESTADO,COUNT(TXT_ESTADO) AS CANT'))
+                            ->groupBy('TXT_ESTADO')
+                            ->get();
+
+        return  $listadatos;
+
+
+    }
+
 
 
 
@@ -939,6 +955,51 @@ trait ComprobanteTraits
 
         return  $groupbyarray;
     }
+
+
+
+    private function con_lista_cabecera_comprobante_administrativo_total_contrato() {
+
+
+        $estado_no          =       'ETM0000000000006';
+        $centro_id          =       'CEN0000000000001';
+        $tipodoc_id         =       'TDO0000000000014';
+
+        $toarray         =          VMergeDocumento::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                        $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
+                                            ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                                    })
+                                    ->leftJoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'VMERGEDOCUMENTOS.COD_USUARIO_CREA_AUD')
+                                    ->where('VMERGEDOCUMENTOS.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                    ->where(function ($query) {
+                                        $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
+                                              ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
+                                              ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
+                                    })
+                                    ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
+                                    ->where('COD_CENTRO','=',$centro_id)
+                                    ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
+                                    ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
+                                                        SGD.USUARIO.NOM_TRABAJADOR
+                                                    '))
+                                    ->groupBy('COD_DOCUMENTO_CTBLE')
+                                    ->groupBy('SGD.USUARIO.NOM_TRABAJADOR')
+                                    ->get()->toArray();
+
+
+
+        $groupbyarray       =   $this->groupBy($toarray, 'NOM_TRABAJADOR');
+
+
+        $togroupbyarray       =   $this->sortGroupsBySize($groupbyarray);
+        //dd($togroupbyarray);
+
+
+        return  $groupbyarray;
+    }
+
+
+
 
 
     // Función para agrupar un array por una clave

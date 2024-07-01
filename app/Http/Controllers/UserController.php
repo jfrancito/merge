@@ -675,8 +675,13 @@ class UserController extends Controller {
 
 		if(Session::get('usuario')->rol_id != '1CIX00000024'){
 
-			$listaocpendientes     =   $this->con_lista_cabecera_comprobante_administrativo_total();
-        	$listadocestados       =   $this->con_lista_cabecera_comprobante_total_gestion_agrupado($cod_empresa);
+			$listaocpendientes     	   =   $this->con_lista_cabecera_comprobante_administrativo_total();
+			$listaocpendientes_con     =   $this->con_lista_cabecera_comprobante_administrativo_total_contrato();
+
+        	$listadocestados       	   =   $this->con_lista_cabecera_comprobante_total_gestion_agrupado($cod_empresa);
+        	$listadocestados_con       =   $this->con_lista_cabecera_comprobante_total_gestion_agrupado_con($cod_empresa);
+
+
         	$listaobservados       =   FeDocumento::where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)->where('TXT_PROCEDENCIA','<>','SUE')->where('ind_observacion','=','1')->first();
 		}
 
@@ -695,11 +700,15 @@ class UserController extends Controller {
 						 	'url_obs' 			=> $url_obs,
 						 	'count_x_aprobar_gestion' 	=> $count_x_aprobar_gestion,
 						 	'url_gestion' 			=> $url_gestion,
-						 	'trol' 				=> $trol,
+						 	'trol' 					=> $trol,
 
 
-						 	'listaocpendientes' => $listaocpendientes,
-						 	'listadocestados'   => $listadocestados,
+						 	'listaocpendientes' 	=> $listaocpendientes,
+						 	'listaocpendientes_con' => $listaocpendientes_con,
+
+						 	'listadocestados'   	=> $listadocestados,
+						 	'listadocestados_con'   => $listadocestados_con,
+
 						 	'listaobservados'   => $listaobservados,
 
 						 	'count_x_aprobar_con' => $count_x_aprobar_con,
