@@ -16,19 +16,14 @@
   <tbody>
     @foreach($listadatos as $index => $item)
       <tr data_requerimiento_id = "{{$item->id}}">
-
-        <td><b>CONTRATO</b></td>
-
+        <td><b>ORDER DE COMPRA</b></td>
         <td>{{$item->COD_ORDEN}}</td>
         <td>{{$item->FEC_ORDEN}}</td>
         <td>{{$item->TXT_CATEGORIA_MONEDA}}</td>
         <td>{{$item->TXT_EMPR_CLIENTE}}</td>
         <td>{{$item->CAN_TOTAL}}</td>
-
         <td>{{$item->COD_USUARIO_CREA_AUD}}</td>
-
         @include('comprobante.ajax.estados')
-
         <td class="rigth">
           <div class="btn-group btn-hspace">
             <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>

@@ -1,0 +1,47 @@
+<div class="col-md-12">
+  <div class="panel panel-contrast">
+    <div class="panel-heading panel-heading-contrast"><b>CONTRATO</b></div>
+    <div class="panel-body">
+    <div class="row">
+      <div class="col-xs-12 col-md-4">
+        <div class="panel panel-default panel-contrast">
+          <div class="panel-heading" style="background: #1d3a6d;color: #fff;">PENDIENTES
+            <span class="panel-subtitle" style="color: #fff;">Documentos por aprobar</span>
+            <div class="chart-legend">
+              <a href="{{ url($url) }}" class="btn btn-rounded btn-space btn-primary dasboark">Ir Aprobar</a>
+            </div>
+            <span class="count-das">{{$count_x_aprobar_con}}</span>
+          </div>
+        </div>
+      </div>
+
+      @if($trol->ind_uc == 1)
+      <div class="col-xs-12 col-md-4">
+        <div class="panel panel-default panel-contrast">
+          <div class="panel-heading" style="background: #1d3a6d;color: #fff;">INTEGRACION
+            <span class="panel-subtitle" style="color: #fff;">Documentos por integrar</span>
+            <div class="chart-legend">
+              <a href="{{ url($url_gestion) }}" class="btn btn-rounded btn-space btn-primary dasboark">Ir a Integrar</a>
+            </div>
+            <span class="count-das">{{$count_x_aprobar_gestion_con}}</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-12 col-md-4">
+        <div class="panel panel-default panel-contrast">
+          <div class="panel-heading" style="background: #1d3a6d;color: #fff;">OBSERVADOS
+            <span class="panel-subtitle" style="color: #fff;">Documentos observados</span>
+            <div class="chart-legend">
+              <a href="{{ url($url_obs) }}" class="btn btn-rounded btn-space btn-primary dasboark">Ir Observados</a>
+            </div>
+            <span class="count-das">{{$count_observados_con}}</span>
+          </div>
+        </div>
+      </div>
+      @endif
+    </div>
+    </div>
+  </div>
+</div>
+
+

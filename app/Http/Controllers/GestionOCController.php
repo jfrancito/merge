@@ -422,13 +422,16 @@ class GestionOCController extends Controller
         if($validarurl <> 'true'){return $validarurl;}
         /******************************************************/
         View::share('titulo','Gestion Ordenes de Compra');
-
-
         $operacion_id       =   'ORDEN_COMPRA';
+        $array_contrato     =   $this->array_rol_contrato();
+        if (in_array(Session::get('usuario')->rol_id, $array_contrato)) {
+            $operacion_id       =   'CONTRATO';
+        }
         $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO');
         $cod_empresa        =   Session::get('usuario')->usuarioosiris_id;
         $procedencia        =   'ADM';
         $funcion            =   $this;
+
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_administrativo($cod_empresa);
         }else{

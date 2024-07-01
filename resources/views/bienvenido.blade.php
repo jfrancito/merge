@@ -15,105 +15,19 @@
 	<div class="be-content  contenido proveedor" style="height: 100vh;">
 		<div class="main-content container-fluid">
 			<div class='container'>
-
-
-          <!-- PANEL DE PENDIENTES -->
           <div class="row">
-            <div class="col-md-12">
-              <div class="panel panel-contrast">
-                <div class="panel-heading panel-heading-contrast"><b>PENDIENTES</b></div>
-                <div class="panel-body">
-
-                    @if(Session::get('usuario')->rol_id == '1CIX00000024')
-                      @include('usuario.proveedores')
-                    @else
-                      <div class="row">
-                        <div class="col-xs-12 col-md-4">
-                          <div class="widget be-loading" style="background-color: #f5f5f5;">
-                            <div class="panel-heading panel-heading-divider xs-pb-15" style="padding-top: 0px;">Documentos Pendientes por aprobar (Proveedor)</div>
-                            <div class="widget-chart-container" >
-                              <div id="top-sales" style="height: 100px;"></div>
-                              <div class="chart-pie-counter">
-                                    {{$count_x_aprobar}}<br>
-                              </div>
-                            </div>
-                            <div class="chart-legend">
-                              <a href="{{ url($url) }}" class="btn btn-rounded btn-space btn-primary">Ir Aprobar</a>
-                            </div>
-                            <div class="be-spinner">
-                              <svg width="40px" height="40px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
-                                <circle fill="none" stroke-width="4" stroke-linecap="round" cx="33" cy="33" r="30" class="circle"></circle>
-                              </svg>
-                            </div>
-                          </div>
-                        </div>
-                        @if($trol->ind_uc == 1)
-                          <div class="col-xs-12 col-md-4">
-                            <div class="widget be-loading" style="background-color: #f5f5f5;">
-                              <div class="panel-heading panel-heading-divider xs-pb-15" style="padding-top: 0px;">Orden de Compra Pendientes por integrar</div>
-                              <div class="widget-chart-container" >
-                                <div id="top-sales" style="height: 100px;"></div>
-                                <div class="chart-pie-counter">
-                                      {{$count_x_aprobar_gestion}}<br>
-                                </div>
-                              </div>
-                              <div class="chart-legend">
-                                <a href="{{ url($url_gestion) }}" class="btn btn-rounded btn-space btn-primary">Ir a Integrar</a>
-                              </div>
-                              <div class="be-spinner">
-                                <svg width="40px" height="40px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
-                                  <circle fill="none" stroke-width="4" stroke-linecap="round" cx="33" cy="33" r="30" class="circle"></circle>
-                                </svg>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="col-xs-12 col-md-4">
-                            <div class="widget be-loading" style="background-color: #f5f5f5;">
-                              <div class="panel-heading panel-heading-divider xs-pb-15" style="padding-top: 0px;">Documentos Observados</div>
-                              <div class="widget-chart-container" >
-                                <div id="top-sales" style="height: 100px;"></div>
-                                <div class="chart-pie-counter">
-                                      {{$count_observados}}<br>
-                                </div>
-                              </div>
-                              <div class="chart-legend">
-                                <a href="{{ url($url_obs) }}" class="btn btn-rounded btn-space btn-primary">Ir Observados</a>
-                              </div>
-                              <div class="be-spinner">
-                                <svg width="40px" height="40px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
-                                  <circle fill="none" stroke-width="4" stroke-linecap="round" cx="33" cy="33" r="30" class="circle"></circle>
-                                </svg>
-                              </div>
-                            </div>
-                          </div>
-                        @endif
-                      </div>
-                    @endif
-
-                </div>
-              </div>
-            </div>
+              @if(Session::get('usuario')->rol_id == '1CIX00000024')
+                @include('usuario.proveedores')
+              @else
+                @include('usuario.administrativo')
+              @endif
           </div>
-
-
-          <!-- PANEL DE ESTADISTICOS -->
-          @include('usuario.dashboard.estadistico')
-
-
-
-
-
-
 			</div>
 		</div>
   	@include('usuario.modal.musuario')
-
 	</div>
 @stop 
-
-
 @section('script')
-
 
   <script src="{{ asset('public/js/general/inputmask/inputmask.js') }}" type="text/javascript"></script> 
   <script src="{{ asset('public/js/general/inputmask/inputmask.extensions.js') }}" type="text/javascript"></script> 

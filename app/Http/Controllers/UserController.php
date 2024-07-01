@@ -595,57 +595,74 @@ class UserController extends Controller {
 		View::share('titulo','Bienvenido Sistema Administrativo MERGE');
 		$fecha = date('Y-m-d');
 		$usuario = User::where('id','=',Session::get('usuario')->id)->first();
+
 		$cuentabancarias = 	TESCuentaBancaria::where('COD_EMPR_TITULAR','=',Session::get('usuario')->usuarioosiris_id)
 							->where('COD_ESTADO','=',1)
 						  	->get();
 
-		$count_x_aprobar 	= 0;
-        $cod_empresa    	=   Session::get('usuario')->usuarioosiris_id;
-        $url 				=	'';
+		$count_x_aprobar 			= 	0;
+        $cod_empresa    			=   Session::get('usuario')->usuarioosiris_id;
+        $url 						=	'';
 
+        $url_obs 					=	'';
+		$count_observados 			= 	0;
 
-        $url_obs 			=	'';
-		$count_observados 	= 0;
-        //falta usuario contacto
-
-		$count_x_aprobar_gestion 	= 0;
+		$count_x_aprobar_gestion 	= 	0;
         $url_gestion 				=	'';
 
+		$trol 						=	WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 
-        //$listadatos     	=   $this->con_lista_cabecera_comprobante_administrativo($cod_empresa);
-
-		$trol 				=	WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
-
+		$count_x_aprobar_con 		= 	0;
+		$count_observados_con 		= 	0;
+		$count_x_aprobar_gestion_con 		= 	0;
+		
 		//1CIX00000019 COMPRAS
         //1CIX00000015 1CIX00000016 //Contabilidad
 		if($trol->ind_uc == 1){
 
-			$listadatos      =   $this->con_lista_cabecera_comprobante_total_uc($cod_empresa);
-			$count_x_aprobar = 	 count($listadatos);
-        	$url 			 =	'/gestion-de-comprobante-us/wjR';
+			$listadatos      		=   $this->con_lista_cabecera_comprobante_total_uc($cod_empresa);
+			$count_x_aprobar 		= 	 count($listadatos);
+        	$url 			 		=	'/gestion-de-comprobante-us/wjR';
+        	//contrato
+			$count_x_aprobar_con 	= 	 count($listadatos);
 
-        	$listadatosob    =   $this->con_lista_cabecera_comprobante_total_gestion_observados($cod_empresa);
-			$count_observados = 	 count($listadatosob);
-        	$url_obs 		 =	'/gestion-de-comprobantes-observados/lO6';
+        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_gestion_observados($cod_empresa);
+			$count_observados 		= 	 count($listadatosob);
+        	$url_obs 		 		=	'/gestion-de-comprobantes-observados/lO6';
 
+			$count_observados_con 	= 	 0;
 
-			$listadatosg      =   $this->con_lista_cabecera_comprobante_administrativo($cod_empresa);
-			$count_x_aprobar_gestion  = 	 count($listadatosg);
-        	$url_gestion 	  =	'/gestion-de-orden-compra/k5X';
+			$listadatosg      		=   $this->con_lista_cabecera_comprobante_administrativo($cod_empresa);
+			$count_x_aprobar_gestion= 	 count($listadatosg);
+        	$url_gestion 	  		=	'/gestion-de-orden-compra/k5X';
 
+        	//contrato
+			$listadatosg      		=   $this->con_lista_cabecera_contrato_administrativo($cod_empresa);
+			$count_x_aprobar_gestion_con= 	 count($listadatosg);
 
 		}
 		else{
+			//CONTABILIDAD
 			if(Session::get('usuario')->rol_id == '1CIX00000015' || Session::get('usuario')->rol_id == '1CIX00000016'){
         		$listadatos     =   $this->con_lista_cabecera_comprobante_total_cont($cod_empresa);
 				$count_x_aprobar = 	 count($listadatos);
         		$url 			 =	'/gestion-de-contabilidad-aprobar/g56';
 
+        		$listadatos     =   $this->con_lista_cabecera_comprobante_total_cont_contrato($cod_empresa);
+				$count_x_aprobar_con 	= 	 count($listadatos);
+
+
+
 			}
+			//ADMINISTRACION
 			else{
 				if(Session::get('usuario')->rol_id == '1CIX00000020'){
         			$listadatos     =   $this->con_lista_cabecera_comprobante_total_adm($cod_empresa);
 					$count_x_aprobar = 	 count($listadatos);
+
+	        		$listadatos     =   $this->con_lista_cabecera_comprobante_total_adm_contrato($cod_empresa);
+					$count_x_aprobar_con 	= 	 count($listadatos);
+
         			$url 			 =	'/gestion-de-administracion-aprobar/j25';
 
 				}
@@ -679,9 +696,17 @@ class UserController extends Controller {
 						 	'count_x_aprobar_gestion' 	=> $count_x_aprobar_gestion,
 						 	'url_gestion' 			=> $url_gestion,
 						 	'trol' 				=> $trol,
+
+
 						 	'listaocpendientes' => $listaocpendientes,
 						 	'listadocestados'   => $listadocestados,
 						 	'listaobservados'   => $listaobservados,
+
+						 	'count_x_aprobar_con' => $count_x_aprobar_con,
+						 	'count_observados_con'   => $count_observados_con,
+						 	'count_x_aprobar_gestion_con'   => $count_x_aprobar_gestion_con,
+
+
 						 ]);
 
 	}

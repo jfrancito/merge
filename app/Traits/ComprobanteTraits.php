@@ -758,8 +758,10 @@ trait ComprobanteTraits
     }
 
 
-
-
+    private function array_rol_contrato() {
+        $array = ['1CIX00000003'];
+        return $array;
+    }
 
 	private function con_lista_cabecera_comprobante($cliente_id) {
 
