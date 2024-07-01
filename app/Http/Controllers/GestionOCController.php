@@ -2933,13 +2933,13 @@ class GestionOCController extends Controller
                     $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
                     //CONTABILIDAD
                     if($prefijocarperta=='II'){
-                        $this->insertar_whatsaap('51988650421','LUCELY YESMITH',$mensaje,'');   //INTERNACIONAL
-                        $this->insertar_whatsaap('51959266298','INGRID JHOSELIT',$mensaje,'');  //INTERNACIONAL
+                        //$this->insertar_whatsaap('51988650421','LUCELY YESMITH',$mensaje,'');   //INTERNACIONAL
+                        //$this->insertar_whatsaap('51959266298','INGRID JHOSELIT',$mensaje,'');  //INTERNACIONAL
                         $this->insertar_whatsaap('51965991360','ANGHIE',$mensaje,'');           //INTERNACIONAL
                     }else{
                         $this->insertar_whatsaap('51950638955','MIGUEL',$mensaje,'');           //COMERCIAL
                         //$this->insertar_whatsaap('51944132248','JAIRO ALONSO',$mensaje,'');     //COMERCIAL
-                        $this->insertar_whatsaap('51977624444','DINO CRISTOPHER',$mensaje,'');  //COMERCIAL
+                        //$this->insertar_whatsaap('51977624444','DINO CRISTOPHER',$mensaje,'');  //COMERCIAL
                     }
 
                     
@@ -3410,13 +3410,13 @@ class GestionOCController extends Controller
                     $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
                     //CONTABILIDAD
                     if($prefijocarperta=='II'){
-                        $this->insertar_whatsaap('51988650421','LUCELY YESMITH',$mensaje,'');   //INTERNACIONAL
-                        $this->insertar_whatsaap('51959266298','INGRID JHOSELIT',$mensaje,'');  //INTERNACIONAL
+                        //$this->insertar_whatsaap('51988650421','LUCELY YESMITH',$mensaje,'');   //INTERNACIONAL
+                        //$this->insertar_whatsaap('51959266298','INGRID JHOSELIT',$mensaje,'');  //INTERNACIONAL
                         $this->insertar_whatsaap('51965991360','ANGHIE',$mensaje,'');           //INTERNACIONAL
                     }else{
                         $this->insertar_whatsaap('51950638955','MIGUEL',$mensaje,'');           //COMERCIAL
                         //$this->insertar_whatsaap('51944132248','JAIRO ALONSO',$mensaje,'');     //COMERCIAL
-                        $this->insertar_whatsaap('51977624444','DINO CRISTOPHER',$mensaje,'');  //COMERCIAL
+                        //$this->insertar_whatsaap('51977624444','DINO CRISTOPHER',$mensaje,'');  //COMERCIAL
                     }
                 }
 

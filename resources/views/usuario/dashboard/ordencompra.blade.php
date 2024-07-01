@@ -42,6 +42,7 @@
       <div class="col-xs-12 col-md-4">
         <div class="panel panel-default panel-table">
           <div class="panel-heading" style="background: #1d3a6d;color: #fff;"><b>POR USUARIO</b>
+            <span class="panel-subtitle" style="color: #fff;">Documentos sin integrar</span>
           </div>
           <div class="panel-body">
             <table class="table table-striped table-borderless">
@@ -55,7 +56,7 @@
                 @foreach($listaocpendientes as $index => $item)
                   <tr>
                     <td>{{$index}}</td>
-                    <td class="text-center"> <span class="badge badge-success">{{count($item)}}</span></td>
+                    <td class="text-center"> <span class="badge badge-success" style="font-size: 16px;">{{count($item)}}</span></td>
                   </tr>
                 @endforeach
               </tbody>
@@ -68,6 +69,7 @@
       <div class="col-xs-12 col-md-4">
         <div class="panel panel-default panel-table">
           <div class="panel-heading" style="background: #1d3a6d;color: #fff;"><b>POR ESTADOS</b>
+            <span class="panel-subtitle" style="color: #fff;">Documentos integrados</span>
           </div>
           <div class="panel-body">
             <table class="table table-striped table-borderless">
@@ -81,7 +83,7 @@
                 @foreach($listadocestados as $index => $item)
                   <tr>
                     <td>{{$item->TXT_ESTADO}}</td>
-                    <td class="text-center"> <span class="badge badge-success">{{$item->CANT}}</span></td>
+                    <td class="text-center"> <span class="badge badge-success" style="font-size: 16px;">{{$item->CANT}}</span></td>
                   </tr>
                 @endforeach
 

@@ -63,12 +63,20 @@ class GestionOCTesoreriaController extends Controller
         //falta usuario contacto
 
         $operacion_id       =   'ORDEN_COMPRA';
-        $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO');
+        $estadopago_id      =   'PAGADO';
+
+        //$combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO');
+        $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA');
+        $combo_estado       =   array('PAGADO' => 'PAGADO','SIN_PAGAR' => 'SIN PAGAR');
 
         if($operacion_id=='ORDEN_COMPRA'){
-            $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes($cod_empresa);
+            if($estadopago_id == 'PAGADO'){
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes($cod_empresa);
+            }else{
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_sp($cod_empresa);
+            }
         }else{
-            $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_contrato($cod_empresa);
+            $listadatos             =   $this->con_lista_cabecera_comprobante_total_tes_contrato($cod_empresa);
         }
         $funcion        =   $this;
 
@@ -80,10 +88,49 @@ class GestionOCTesoreriaController extends Controller
                             'operacion_id'      =>  $operacion_id,
                             'combo_operacion'   =>  $combo_operacion,
 
+                            'estadopago_id'      =>  $estadopago_id,
+                            'combo_estado'      =>  $combo_estado,
+
                             'idopcion'          =>  $idopcion,
                          ]);
 
     }
+
+
+    public function actionListarAjaxBuscarDocumentoTesoreria(Request $request) {
+
+        $operacion_id   =   $request['operacion_id'];
+        $estadopago_id  =   $request['estadopago_id'];
+        $idopcion       =   $request['idopcion'];
+        $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
+
+        if($operacion_id=='ORDEN_COMPRA'){
+            if($estadopago_id == 'PAGADO'){
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes($cod_empresa);
+            }else{
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_sp($cod_empresa);
+            }
+        }else{
+            $listadatos             =   $this->con_lista_cabecera_comprobante_total_tes_contrato($cod_empresa);
+        }
+
+        //dd($listadatos);
+        $procedencia        =   'ADM';
+        $funcion                =   $this;
+        return View::make('comprobante/ajax/mergelistaareaadministracion',
+                         [
+                            'operacion_id'          =>  $operacion_id,
+
+                            'idopcion'              =>  $idopcion,
+                            'cod_empresa'           =>  $cod_empresa,
+                            'listadatos'            =>  $listadatos,
+                            'procedencia'           =>  $procedencia,
+                            'ajax'                  =>  true,
+
+                            'funcion'               =>  $funcion
+                         ]);
+    }
+
 
 
 

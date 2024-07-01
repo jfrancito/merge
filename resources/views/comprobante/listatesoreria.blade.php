@@ -9,7 +9,7 @@
 
 @stop
 @section('section')
-  <div class="be-content contenido asientomodelo areaadministracion">
+  <div class="be-content contenido asientomodelo areatesoreria">
     <div class="main-content container-fluid">
           <div class="row">
             <div class="col-sm-12">
@@ -17,10 +17,10 @@
                 <div class="panel-heading">{{ $titulo }}
                   <div class="tools tooltiptop">
                     <div class="tools tooltiptop">
-<!--                       <a href="#" class="tooltipcss opciones buscardocumento">
+                      <a href="#" class="tooltipcss opciones buscardocumento">
                         <span class="tooltiptext">Buscar Documento</span>
                         <span class="icon mdi mdi-search"></span>
-                      </a> -->
+                      </a>
                     </div>
                   </div>
 
@@ -41,6 +41,23 @@
                             </div>
                           </div>
                       </div> 
+
+                      <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
+                          <div class="form-group">
+                            <label class="col-sm-12 control-label labelleft" >Estado Pago :</label>
+                            <div class="col-sm-12 abajocaja" >
+                              {!! Form::select( 'estadopago_id', $combo_estado, array($estadopago_id),
+                                                [
+                                                  'class'       => 'select2 form-control control input-sm' ,
+                                                  'id'          => 'estadopago_id',
+                                                  'required'    => '',
+                                                  'data-aw'     => '1',
+                                                ]) !!}
+                            </div>
+                          </div>
+                      </div>
+
+
                     <div class="col-xs-12">
                       <input type="hidden" name="idopcion" id='idopcion' value='{{$idopcion}}'>
                     </div>
@@ -98,6 +115,6 @@
 
     });
   </script>
-  <script src="{{ asset('public/js/comprobante/administracion.js?v='.$version) }}" type="text/javascript"></script>
+  <script src="{{ asset('public/js/comprobante/tesoreria.js?v='.$version) }}" type="text/javascript"></script>
 
 @stop
