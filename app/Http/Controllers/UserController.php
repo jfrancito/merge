@@ -672,6 +672,8 @@ class UserController extends Controller {
 		$listaocpendientes  =	array();
 		$listadocestados    =	array();
 		$listaobservados    =	array();
+		$listaocpendientes_con    =	array();
+		$listadocestados_con    =	array();	
 
 		if(Session::get('usuario')->rol_id != '1CIX00000024'){
 
