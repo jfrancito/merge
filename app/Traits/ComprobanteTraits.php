@@ -20,10 +20,11 @@ use App\Modelos\Estado;
 use App\Modelos\CMPDetalleProducto;
 use App\Modelos\CMPDocumentoCtble;
 use App\Modelos\ViewDPagar;
-
-
-
-
+use App\Modelos\FeDocumentoHistorial;
+use App\Modelos\STDEmpresa;
+use App\Modelos\CMPReferecenciaAsoc;
+use App\Modelos\Whatsapp;
+use App\User;
 
 
 use ZipArchive;
@@ -37,6 +38,93 @@ use Keygen;
 trait ComprobanteTraits
 {
 
+
+    private function orden_ingreso_ejecutada() {
+
+        $listafedocumentos      =   FeDocumento::where('COD_ESTADO','=','ETM0000000000009')->get();
+        $COD_ORDEN_COMPRA = '';
+        $pathFiles='\\\\10.1.50.2';
+        foreach($listafedocumentos as $index=>$item){
+            $fechaactual      = date('Ymd H:i:s');
+
+            //VER EN QUE ESTADO ESTA LA ORDEN DE INGRESO
+
+            $referenciaasoc = CMPReferecenciaAsoc::Join('CMP.ORDEN', 'CMP.ORDEN.COD_ORDEN', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+                              ->where('CMP.REFERENCIA_ASOC.COD_TABLA','=',$item->ID_DOCUMENTO)
+                              ->where('CMP.REFERENCIA_ASOC.COD_ESTADO','=','1')
+                              ->where('CMP.REFERENCIA_ASOC.COD_TABLA_ASOC','like','%'.'OI'.'%')
+                              ->where('CMP.ORDEN.COD_CATEGORIA_ESTADO_ORDEN','=','EOR0000000000003')
+                              ->first();
+
+            if(count($referenciaasoc)>0){
+
+                //SI ES MATERIAL
+                FeDocumento::where('ID_DOCUMENTO',$item->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$item->DOCUMENTO_ITEM)
+                            ->update(
+                                [
+                                    'COD_ESTADO'=>'ETM0000000000003',
+                                    'TXT_ESTADO'=>'POR APROBAR CONTABILIDAD',
+                                    'ind_email_ap'=>0,
+                                    'fecha_uc'=>$fechaactual,
+                                    'usuario_uc'=>$item->usuario_uc
+                                ]
+                            );
+
+                $usuario        = User::where('id','=',$item->usuario_uc)->first();
+
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento                              =   new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $item->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM              =   $item->DOCUMENTO_ITEM;
+                $documento->FECHA                       =   $fechaactual;
+                $documento->USUARIO_ID                  =   $usuario->id;
+                $documento->USUARIO_NOMBRE              =   $usuario->nombre;
+                $documento->TIPO                        =   'APROBADO POR USUARIO CONTACTO';
+                $documento->MENSAJE                     =   '';
+                $documento->save();
+
+                //whatsaap para contabilidad
+                $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$item->DOCUMENTO_ITEM)->first();
+                $ordencompra        =   CMPOrden::where('COD_ORDEN','=',$item->ID_DOCUMENTO)->first();            
+                $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO
+                                        .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                                        .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
+                                        .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
+
+                if($_ENV['APP_PRODUCCION']==0){
+                    $this->insertar_whatsaap_sp('51979820173','JORGE FRANCELLI',$mensaje,'');
+                }else{
+                    $this->insertar_whatsaap_sp('51979820173','JORGE FRANCELLI',$mensaje,'');
+                    $this->insertar_whatsaap_sp('51979659002','HAMILTON',$mensaje,'');
+                    $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
+                    //CONTABILIDAD
+                    if($prefijocarperta=='II'){
+                        $this->insertar_whatsaap_sp('51965991360','ANGHIE',$mensaje,'');//INTERNACIONAL
+                    }else{
+                        $this->insertar_whatsaap_sp('51950638955','MIGUEL',$mensaje,'');//COMERCIAL
+                    }
+                } 
+
+            }
+            print_r("EJECUTO ORDEN DE INGRESO");
+ 
+        }
+
+    }
+
+    public function insertar_whatsaap_sp($numero,$nombre,$mensaje,$rutaimagen){
+            $cabecera                   =   new Whatsapp;
+            $cabecera->numero_contacto  =   $numero;
+            $cabecera->nombre_contacto  =   $nombre;
+            $cabecera->mensaje          =   $mensaje;
+            $cabecera->ruta_imagen      =   $rutaimagen;
+            $cabecera->ind_envio        =   0;
+            $cabecera->nombre_proyecto  =   'MERGE';
+            $cabecera->fecha_crea       =   date('d-m-Y H:i:s');
+            $cabecera->activo           =   1;
+            $cabecera->save();
+    }
 
     private function sunat_cdr() {
 
@@ -252,15 +340,7 @@ trait ComprobanteTraits
 
         print_r('Exitoso '. $COD_ORDEN_COMPRA);
 
-
-
     }
-
-
-
-
-
-
 
 	private function con_lista_cabecera_comprobante_provisionar($cliente_id) {
 

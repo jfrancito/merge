@@ -367,8 +367,8 @@ class GestionUsuarioContactoController extends Controller
                                         'COD_ESTADO'=>'ETM0000000000005',
                                         'TXT_ESTADO'=>'APROBADO',
                                         'ind_email_clap'=>0,
-                                        'fecha_ap'=>$this->fechaactual,
-                                        'usuario_ap'=>Session::get('usuario')->id
+                                        'fecha_uc'=>$this->fechaactual,
+                                        'usuario_uc'=>Session::get('usuario')->id
                                     ]
                                 );
 
@@ -711,61 +711,77 @@ class GestionUsuarioContactoController extends Controller
                 //     }
                 // }
 
-                FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
-                            ->update(
-                                [
-                                    'COD_ESTADO'=>'ETM0000000000003',
-                                    'TXT_ESTADO'=>'POR APROBAR CONTABILIDAD',
-                                    'ind_email_ap'=>0,
-                                    'fecha_uc'=>$this->fechaactual,
-                                    'usuario_uc'=>Session::get('usuario')->id
-                                ]
-                            );
-
-                //HISTORIAL DE DOCUMENTO APROBADO
-                $documento                              =   new FeDocumentoHistorial;
-                $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
-                $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
-                $documento->FECHA                       =   $this->fechaactual;
-                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
-                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
-                $documento->TIPO                        =   'APROBADO POR USUARIO CONTACTO';
-                $documento->MENSAJE                     =   '';
-                $documento->save();
 
 
-                //whatsaap para contabilidad
-                $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
-                $ordencompra        =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();            
+                if($orden->IND_MATERIAL_SERVICIO=='M'){
 
-                $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO
-                                        .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-                                        .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
-                                        .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
+                    FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                ->update(
+                                    [
+                                        'COD_ESTADO'=>'ETM0000000000009',
+                                        'TXT_ESTADO'=>'POR EJECUTAR ORDEN DE INGRESO',
+                                        'fecha_uc'=>$this->fechaactual,
+                                        'usuario_uc'=>Session::get('usuario')->id
+                                    ]
+                                );
 
-
-
-                if($_ENV['APP_PRODUCCION']==0){
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
                 }else{
 
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                    $this->insertar_whatsaap('51979659002','HAMILTON',$mensaje,'');
-                    $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
-                    //CONTABILIDAD
-                    if($prefijocarperta=='II'){
-                        //$this->insertar_whatsaap('51988650421','LUCELY YESMITH',$mensaje,'');   //INTERNACIONAL
-                        //$this->insertar_whatsaap('51959266298','INGRID JHOSELIT',$mensaje,'');  //INTERNACIONAL
-                        $this->insertar_whatsaap('51965991360','ANGHIE',$mensaje,'');           //INTERNACIONAL
-                    }else{
-                        $this->insertar_whatsaap('51950638955','MIGUEL',$mensaje,'');           //COMERCIAL
-                        //$this->insertar_whatsaap('51944132248','JAIRO ALONSO',$mensaje,'');     //COMERCIAL
-                        //$this->insertar_whatsaap('51977624444','DINO CRISTOPHER',$mensaje,'');  //COMERCIAL
-                    }
+                  
+                    FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
+                                ->update(
+                                    [
+                                        'COD_ESTADO'=>'ETM0000000000003',
+                                        'TXT_ESTADO'=>'POR APROBAR CONTABILIDAD',
+                                        'ind_email_ap'=>0,
+                                        'fecha_uc'=>$this->fechaactual,
+                                        'usuario_uc'=>Session::get('usuario')->id
+                                    ]
+                                );
 
-                    
-                }    
+                    //HISTORIAL DE DOCUMENTO APROBADO
+                    $documento                              =   new FeDocumentoHistorial;
+                    $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                    $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                    $documento->FECHA                       =   $this->fechaactual;
+                    $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                    $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                    $documento->TIPO                        =   'APROBADO POR USUARIO CONTACTO';
+                    $documento->MENSAJE                     =   '';
+                    $documento->save();
+
+
+                    //whatsaap para contabilidad
+                    $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
+                    $ordencompra        =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();            
+
+                    $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                    $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO
+                                            .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                                            .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
+                                            .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
+
+                    if($_ENV['APP_PRODUCCION']==0){
+                        $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                    }else{
+
+                        $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                        $this->insertar_whatsaap('51979659002','HAMILTON',$mensaje,'');
+                        $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
+                        //CONTABILIDAD
+                        if($prefijocarperta=='II'){
+                            $this->insertar_whatsaap('51965991360','ANGHIE',$mensaje,'');           //INTERNACIONAL
+                        }else{
+                            $this->insertar_whatsaap('51950638955','MIGUEL',$mensaje,'');           //COMERCIAL
+                        }
+                    }    
+
+                }
+
+
+
+
+
 
                 DB::commit();
                 return Redirect::to('/gestion-de-comprobante-us/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' APROBADO CON EXITO');

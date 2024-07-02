@@ -26,7 +26,11 @@
                   @if($item->COD_ESTADO_FE == 'ETM0000000000008') 
                       <span class="badge badge-success">{{$item->TXT_ESTADO}}</span>
                   @else
-                      <span class="badge badge-default">{{$item->TXT_ESTADO}}</span>
+                    @if($item->COD_ESTADO_FE == 'ETM0000000000009') 
+                        <span class="badge badge-warning">{{$item->TXT_ESTADO}}</span>
+                    @else
+                        <span class="badge badge-default">{{$item->TXT_ESTADO}}</span>
+                    @endif
                   @endif
                 @endif
               @endif
