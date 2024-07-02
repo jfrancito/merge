@@ -50,7 +50,7 @@ class NotificacionOC extends Command
     {
         set_time_limit(0);
         /****************************************************************************/
-        //$this->envio_correo_confirmacion();
+        $this->envio_correo_confirmacion();
         //USUARIO CONTACTO
         $this->orden_ingreso_ejecutada();
 
@@ -65,7 +65,7 @@ class NotificacionOC extends Command
         // $this->envio_correo_baja();
 
         //LECTURA DE CDR Y API SUNAT
-        //$this->sunat_cdr();
+        $this->sunat_cdr();
 
 
 
