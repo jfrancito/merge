@@ -11,7 +11,10 @@
   </thead>
   <tbody>
     @foreach($listadatos as $index => $item)
-      <tr data_requerimiento_id = "{{$item->ID_DOCUMENTO}}">
+      <tr data_requerimiento_id = "{{$item->ID_DOCUMENTO}}"
+          data_linea = "{{$item->DOCUMENTO_ITEM}}"
+          class='dobleclickpc seleccionar'
+        >
         <td>{{$index+1}}</td>
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>CODIGO : {{$item->COD_ORDEN}} </b> </span>

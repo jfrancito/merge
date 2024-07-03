@@ -84,13 +84,10 @@ class GestionOCTesoreriaController extends Controller
                          [
                             'listadatos'        =>  $listadatos,
                             'funcion'           =>  $funcion,
-
                             'operacion_id'      =>  $operacion_id,
                             'combo_operacion'   =>  $combo_operacion,
-
-                            'estadopago_id'      =>  $estadopago_id,
+                            'estadopago_id'     =>  $estadopago_id,
                             'combo_estado'      =>  $combo_estado,
-
                             'idopcion'          =>  $idopcion,
                          ]);
 
@@ -115,9 +112,9 @@ class GestionOCTesoreriaController extends Controller
         }
 
         //dd($listadatos);
-        $procedencia        =   'ADM';
+        $procedencia            =   'ADM';
         $funcion                =   $this;
-        return View::make('comprobante/ajax/mergelistaareaadministracion',
+        return View::make('comprobante/ajax/mergelistatesoreria',
                          [
                             'operacion_id'          =>  $operacion_id,
 
@@ -126,10 +123,65 @@ class GestionOCTesoreriaController extends Controller
                             'listadatos'            =>  $listadatos,
                             'procedencia'           =>  $procedencia,
                             'ajax'                  =>  true,
-
+                            'estadopago_id'         =>  $estadopago_id,
                             'funcion'               =>  $funcion
                          ]);
     }
+
+
+
+    public function actionListarAjaxModalTesoreriaPago(Request $request)
+    {
+        
+        $cod_orden              =   $request['data_requerimiento_id'];
+        $linea                  =   $request['data_linea'];
+        $idopcion               =   $request['idopcion'];
+
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$cod_orden)->where('DOCUMENTO_ITEM','=',$linea)->first();
+        $ordencompra            =   CMPOrden::where('COD_ORDEN','=',$cod_orden)->first();
+
+        //ARCHIVOS
+
+        $archivosdelfe          =      CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                        ->whereIn('COD_CATEGORIA', ['DCC0000000000028'])
+                                        ->get();
+
+        DB::table('CMP.DOC_ASOCIAR_COMPRA')->where('COD_ORDEN','=',$cod_orden)
+                                           ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000028')->delete();
+
+        foreach($archivosdelfe as $index=>$item){
+                $categoria                               =   CMPCategoria::where('COD_CATEGORIA','=',$item->COD_CATEGORIA)->first();
+                $docasociar                              =   New CMPDocAsociarCompra;
+                $docasociar->COD_ORDEN                   =   $ordencompra->COD_ORDEN;
+                $docasociar->COD_CATEGORIA_DOCUMENTO     =   $categoria->COD_CATEGORIA;
+                $docasociar->NOM_CATEGORIA_DOCUMENTO     =   $categoria->NOM_CATEGORIA;
+                $docasociar->IND_OBLIGATORIO             =   $categoria->IND_DOCUMENTO_VAL;
+                $docasociar->TXT_FORMATO                 =   $categoria->COD_CTBLE;
+                $docasociar->TXT_ASIGNADO                =   $categoria->TXT_ABREVIATURA;
+                $docasociar->COD_USUARIO_CREA_AUD        =   Session::get('usuario')->id;
+                $docasociar->FEC_USUARIO_CREA_AUD        =   $this->fechaactual;
+                $docasociar->COD_ESTADO                  =   1;
+                $docasociar->TIP_DOC                     =   $categoria->CODIGO_SUNAT;
+                $docasociar->save();
+        }
+
+        $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+                                    ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000028'])
+                                    ->get();
+
+
+        return View::make('comprobante/modal/ajax/magregarpagotesoreria',
+                         [          
+                            'cod_orden'             => $cod_orden,
+                            'linea'                 => $linea,
+                            'idopcion'              => $idopcion,
+                            'fedocumento'           => $fedocumento,
+                            'ordencompra'           => $ordencompra,
+                            'tarchivos'             => $tarchivos,
+                            'ajax'                  => true,                            
+                         ]);
+    }
+
 
 
 
