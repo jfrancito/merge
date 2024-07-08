@@ -36,6 +36,7 @@ class Controller extends BaseController {
 
 	public function __construct() {
 		$this->funciones 		= new Funcion();
+
 		$this->unidadmb 		= 2;
 		$this->maxsize 			= pow(1024,$this->unidadmb)*20;
 		$fecha 					= new DateTime();

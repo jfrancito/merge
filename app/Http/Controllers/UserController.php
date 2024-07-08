@@ -53,19 +53,19 @@ class UserController extends Controller {
     use ComprobanteProvisionTraits;
     use ComprobanteTraits;
 
+
 	public function actionDescargarManual(Request $request)
 	{
-
 	    $filePath = public_path('manual-proveedor.pdf');
 	    return Response::download($filePath);
-
 	}
-
-
-
 	public function actionManualProveedor() {
 		return View::make('revistadigital/revistadigital');
 	}
+
+
+
+
 
 
 	public function actionEliminarCuentaBancaria(Request $request)
@@ -555,6 +555,8 @@ class UserController extends Controller {
 						->select(DB::raw('empresa_id'))
 						->groupBy('empresa_id')
 						->get();
+
+		//dd($this->funciones->prefijomaestra());
 
 		$funcion 	=   $this;
 

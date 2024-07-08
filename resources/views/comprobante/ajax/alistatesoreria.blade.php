@@ -2,6 +2,8 @@
   <thead>
     <tr>
       <th>ITEM</th>
+      <th></th>
+
       <th>ORDEN COMPRA</th>
       <th>FACTURA</th>
       <th>REGISTRO</th>
@@ -16,6 +18,20 @@
           class='dobleclickpc seleccionar'
         >
         <td>{{$index+1}}</td>
+        <td>  
+          <div class="text-center be-checkbox be-checkbox-sm" >
+            <input  type="checkbox"
+                    class="{{$item->ID_DOCUMENTO}} input_check_pe_ln check{{$item->ID_DOCUMENTO}}" 
+                    id="{{$item->ID_DOCUMENTO}}">
+            <label  for="{{$item->ID_DOCUMENTO}}"
+                  data-atr = "ver"
+                  class = "checkbox"                    
+                  name="{{$item->ID_DOCUMENTO}}"
+            ></label>
+          </div>
+        </td>
+
+  
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>CODIGO : {{$item->COD_ORDEN}} </b> </span>
           <span><b>FECHA  : {{$item->FEC_ORDEN}}</b></span>

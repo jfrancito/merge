@@ -34,5 +34,11 @@ return [
         'key' => env('STRIPE_KEY'),
         'secret' => env('STRIPE_SECRET'),
     ],
+    'guzzle' => [
+        'timeout'  => 10,
+        'connect_timeout' => 5,
+        'verify' => false // Deshabilitar verificación SSL (No recomendado para producción)
+    ],
+    
 
 ];

@@ -77,6 +77,23 @@ $(document).ready(function(){
     });
 
 
+    $('.btnrecomendar').on('click', function(event){
+        event.preventDefault();
+        $.confirm({
+            title: '¿Confirma la Recomendacion?',
+            content: 'Recomendacion del Comprobante',
+            buttons: {
+                confirmar: function () {
+                    $( "#formpedido" ).submit();
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo la Recomendacion');
+                }
+            }
+        });
+
+    });
+
 
 
 
