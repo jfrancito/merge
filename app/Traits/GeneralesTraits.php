@@ -50,20 +50,24 @@ trait GeneralesTraits
 		curl_close($curl);
 		$response_array = json_decode($response, true);
 
-        $fileName = $response_array['nomArchivo'];
-        $base64File = $response_array['valArchivo'];
-
-		$array_nombre_archivo = [
-			'cod_error' => 0,
-			'nombre_archivo' => $response_array['nomArchivo'],
-			'mensaje' => 'encontrado con exito'
-		];
-
-        $fileData = base64_decode($base64File);
-
-
-        $filePath = storage_path('app/sunat/' . $fileName); // Reemplaza 'app/public/' con tu ruta deseada dentro del almacenamiento
-		File::put($filePath, $fileData);
+		if (!isset($response_array['nomArchivo'])) {
+			$array_nombre_archivo = [
+				'cod_error' => 1,
+				'nombre_archivo' => '',
+				'mensaje' => 'Hubo un problema de sunat buscar nuevamente'
+			];
+		}else{
+	        $fileName = $response_array['nomArchivo'];
+	        $base64File = $response_array['valArchivo'];
+			$array_nombre_archivo = [
+				'cod_error' => 0,
+				'nombre_archivo' => $response_array['nomArchivo'],
+				'mensaje' => 'encontrado con exito'
+			];
+	        $fileData = base64_decode($base64File);
+	        $filePath = storage_path('app/sunat/' . $fileName); // Reemplaza 'app/public/' con tu ruta deseada dentro del almacenamiento
+			File::put($filePath, $fileData);
+		}
 
 	 	return  $array_nombre_archivo;
 

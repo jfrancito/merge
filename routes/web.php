@@ -60,7 +60,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-eliminar-cb', 'UserController@actionEliminarCuentaBancaria');
 
 	Route::any('/gestion-de-cpe/{idopcion}', 'CpeController@actionGestionCpe');
-
+	Route::any('/descargar-archivo/{archivonombre}', 'CpeController@actionDescargarArchivo');
 
 	//GESTION DE USUARIOS
 	Route::any('/gestion-de-usuarios/{idopcion}', 'UserController@actionListarUsuarios');

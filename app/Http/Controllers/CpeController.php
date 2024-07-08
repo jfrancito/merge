@@ -57,7 +57,7 @@ class CpeController extends Controller {
 		$validarurl = $this->funciones->getUrl($idopcion,'Anadir');
 	    if($validarurl <> 'true'){return $validarurl;}
 	    /******************************************************/
-
+        View::share('titulo','Descargar CPE');
 		if($_POST)
 		{
 
@@ -70,17 +70,18 @@ class CpeController extends Controller {
 			$urlxml 					= 	'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/02';
 			$respuetaxml 				=	$this->buscar_archivo_sunat($urlxml,$fetoken);
 			$urlxml 					= 	'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/01';
-			$respuetacdr 				=	$this->buscar_archivo_sunat($urlxml,$fetoken);
+			$respuetapdf 				=	$this->buscar_archivo_sunat($urlxml,$fetoken);
 
+			Session::flash('respuetaxml', $respuetaxml);
+			Session::flash('respuetapdf', $respuetapdf);
 
- 			return Redirect::to('/gestion-de-cpe/'.$idopcion)->with('bienhecho', 'Archivo '.$ruc.' encontrado con exito');
+			//return Redirect::back()->withInput()->with('bienhecho', 'Se encontraron los Archivos');
+ 			return Redirect::to('/gestion-de-cpe/'.$idopcion)->withInput()->with('bienhecho', 'Archivo '.$ruc.' encontrado con exito');
 
 		}else{
 
-
 			$combotd  					= 	array('01' => 'FACTURA','03' => 'BOLETA','07' => 'NOTA DE CREDITO','08' => 'NOTA DE DEBITO');
 
-		
 			return View::make('cpe/buscarcpe',
 						[
 							'combotd'  		=> $combotd,			
@@ -88,6 +89,34 @@ class CpeController extends Controller {
 						]);
 		}
 	}
+
+
+    public function actionDescargarArchivo($archivonombre)
+    {
+
+        View::share('titulo','DESCARGAR ARCHIVO');
+        try{
+            // DB::beginTransaction();
+
+            $storagePath            =   storage_path('app\\sunat\\'.$archivonombre);
+
+
+            if(is_file($storagePath))
+            {       
+                    // return Response::download($rutaArchivo);
+                    return response()->download($storagePath);
+            }
+            
+            // DB::commit();
+        }catch(\Exception $ex){
+            // DB::rollback(); 
+            $sw =   1;
+            $mensaje  = $this->ge_getMensajeError($ex);
+            dd('archivo no encontrado');
+
+        }
+        
+    }
 
 
 }

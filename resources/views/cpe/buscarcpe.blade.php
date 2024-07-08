@@ -10,7 +10,7 @@
 @section('section')
 
 
-<div class="be-content fusuario">
+<div class="be-content containercpe">
   <div class="main-content container-fluid">
 
     <!--Basic forms-->
@@ -19,7 +19,7 @@
         <div class="panel panel-default panel-border-color panel-border-color-primary">
           <div class="panel-heading panel-heading-divider" >CPE<span class="panel-subtitle">Buscar en sunat</span></div>
           <div class="panel-body">
-            <form method="POST" action="{{ url('/gestion-de-cpe/'.$idopcion) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
+            <form method="POST" action="{{ url('/gestion-de-cpe/'.$idopcion) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed frmbuscar">
                   {{ csrf_field() }}
 
               <div class="form-group">
@@ -38,7 +38,7 @@
                 <div class="col-sm-5">
                   {!! Form::select( 'td', $combotd, array('01'),
                                     [
-                                      'class'       => 'form-control control input-sm' ,
+                                      'class'       => 'form-control control input-sm select2' ,
                                       'id'          => 'td',
                                       'required'    => '',
                                       'data-aw'     => '7'
@@ -61,7 +61,7 @@
                 </div>
               </div>
 
-                <div class="form-group">
+              <div class="form-group">
                 <label class="col-sm-3 control-label">NRO. DOCUMENTO</label>
                 <div class="col-sm-5">
 
@@ -77,6 +77,27 @@
                 </div>
               </div>
 
+              <div class="form-group" style="text-align: center;">
+                <div class="col-sm-12">
+                @if(Session::has('respuetaxml'))
+                    @if(Session::get('respuetaxml')['cod_error'] == 1)
+                      <span class="label label-danger">{{Session::get('respuetaxml')['mensaje']}}</span>
+                    @else
+                      <a class="btn btn-space btn-success" href="{{ url('descargar-archivo/'.Session::get('respuetaxml')['nombre_archivo']) }}">Descargar XML Y CDR</a>
+
+                    @endif
+                @endif
+                @if(Session::has('respuetapdf'))
+                    @if(Session::get('respuetapdf')['cod_error'] == 1)
+                      <span class="label label-danger">{{Session::get('respuetaxml')['mensaje']}}</span>
+                    @else
+                      <a class="btn btn-space btn-success" href="{{ url('descargar-archivo/'.Session::get('respuetapdf')['nombre_archivo']) }}">Descargar PDF</a>
+
+                    @endif
+                @endif
+                </div>
+              </div>
+
               <div class="row xs-pt-15">
                 <div class="col-xs-6">
                     <div class="be-checkbox">
@@ -85,7 +106,7 @@
                 </div>
                 <div class="col-xs-6">
                   <p class="text-right">
-                    <button type="submit" class="btn btn-space btn-primary">Buscar</button>
+                    <button type="submit" class="btn btn-space btn-primary btn_cargando">Buscar</button>
                   </p>
                 </div>
               </div>
@@ -100,7 +121,11 @@
 </div>  
 
 @stop
+
 @section('script')
+
+
+
     <script src="{{ asset('public/lib/jquery-ui/jquery-ui.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/lib/jquery.nestable/jquery.nestable.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/lib/moment.js/min/moment.min.js') }}" type="text/javascript"></script>
@@ -109,13 +134,16 @@
     <script src="{{ asset('public/lib/bootstrap-slider/js/bootstrap-slider.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/js/app-form-elements.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/lib/parsley/parsley.js') }}" type="text/javascript"></script>
+
     <script type="text/javascript">
       $(document).ready(function(){
         //initialize the javascript
         App.init();
         App.formElements();
-
+        $('form').parsley();
       });
     </script> 
+
+
     <script src="{{ asset('public/js/cpe/cpe.js?v='.$version) }}" type="text/javascript"></script>
 @stop
