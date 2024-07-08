@@ -22,9 +22,52 @@ use Session;
 use Hashids;
 Use Nexmo;
 use Keygen;
+use Storage;
+use File;
 
 trait GeneralesTraits
 {
+
+
+	private function buscar_archivo_sunat($urlxml,$fetoken) {
+
+		$array_nombre_archivo = array();
+		$curl = curl_init();
+		curl_setopt_array($curl, array(
+		  CURLOPT_URL => $urlxml,
+		  CURLOPT_RETURNTRANSFER => true,
+		  CURLOPT_ENCODING => '',
+		  CURLOPT_MAXREDIRS => 10,
+		  CURLOPT_TIMEOUT => 0,
+		  CURLOPT_FOLLOWLOCATION => true,
+		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		  CURLOPT_CUSTOMREQUEST => 'GET',
+		  CURLOPT_HTTPHEADER => array(
+		    'Authorization: Bearer '.$fetoken->TOKEN
+		  ),
+		));
+		$response = curl_exec($curl);
+		curl_close($curl);
+		$response_array = json_decode($response, true);
+
+        $fileName = $response_array['nomArchivo'];
+        $base64File = $response_array['valArchivo'];
+
+		$array_nombre_archivo = [
+			'cod_error' => 0,
+			'nombre_archivo' => $response_array['nomArchivo'],
+			'mensaje' => 'encontrado con exito'
+		];
+
+        $fileData = base64_decode($base64File);
+
+
+        $filePath = storage_path('app/sunat/' . $fileName); // Reemplaza 'app/public/' con tu ruta deseada dentro del almacenamiento
+		File::put($filePath, $fileData);
+
+	 	return  $array_nombre_archivo;
+
+	}
 
 
 	private function gn_combo_categoria_array($titulo,$todo,$array) {
