@@ -927,38 +927,72 @@ trait ComprobanteTraits
 		$array_usuarios  	 =		SGDUsuario::whereIn('COD_TRABAJADOR',$array_trabajadores)
 									->pluck('COD_USUARIO')
 									->toArray();
-									
 		$estado_no      =   'ETM0000000000006';
-		$listadatos 	= 	VMergeOC:://leftJoin('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
-							//->where('COD_EMPR_CLIENTE','=',$cliente_id)
-						    leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
-								        $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
-								            ->where('COD_ESTADO', '<>', 'ETM0000000000006');
-								    })
-						    ->whereIn('VMERGEOC.COD_USUARIO_CREA_AUD',$array_usuarios)
-							->where('VMERGEOC.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-							->where(function ($query) {
-							    $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
-							    	  ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
-							    	  ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
-							})
-                            //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
-							->select(DB::raw('	COD_ORDEN,
-												FEC_ORDEN,
-												TXT_CATEGORIA_MONEDA,
-												TXT_EMPR_CLIENTE,
-												COD_USUARIO_CREA_AUD,
-												MAX(CAN_TOTAL) CAN_TOTAL,
-												MAX(ID_DOCUMENTO) AS ID_DOCUMENTO,
-												MAX(COD_ESTADO) AS COD_ESTADO,
-												MAX(TXT_ESTADO) AS TXT_ESTADO
-											'))
-							->groupBy('COD_ORDEN')
-							->groupBy('FEC_ORDEN')
-							->groupBy('TXT_CATEGORIA_MONEDA')
-							->groupBy('TXT_EMPR_CLIENTE')
-							->groupBy('COD_USUARIO_CREA_AUD')
-							->get();
+
+        if(Session::get('usuario')->id== '1CIX00000001'){
+
+            $listadatos     =   VMergeOC::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                            $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
+                                                ->where('COD_ESTADO', '<>', 'ETM0000000000006');
+                                        })
+                                //->whereIn('VMERGEOC.COD_USUARIO_CREA_AUD',$array_usuarios)
+                                ->where('VMERGEOC.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                ->where(function ($query) {
+                                    $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
+                                          ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
+                                          ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
+                                })
+                                //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                                ->select(DB::raw('  COD_ORDEN,
+                                                    FEC_ORDEN,
+                                                    TXT_CATEGORIA_MONEDA,
+                                                    TXT_EMPR_CLIENTE,
+                                                    COD_USUARIO_CREA_AUD,
+                                                    MAX(CAN_TOTAL) CAN_TOTAL,
+                                                    MAX(ID_DOCUMENTO) AS ID_DOCUMENTO,
+                                                    MAX(COD_ESTADO) AS COD_ESTADO,
+                                                    MAX(TXT_ESTADO) AS TXT_ESTADO
+                                                '))
+                                ->groupBy('COD_ORDEN')
+                                ->groupBy('FEC_ORDEN')
+                                ->groupBy('TXT_CATEGORIA_MONEDA')
+                                ->groupBy('TXT_EMPR_CLIENTE')
+                                ->groupBy('COD_USUARIO_CREA_AUD')
+                                ->get();
+
+        }else{
+
+            $listadatos     =   VMergeOC::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                            $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
+                                                ->where('COD_ESTADO', '<>', 'ETM0000000000006');
+                                        })
+                                ->whereIn('VMERGEOC.COD_USUARIO_CREA_AUD',$array_usuarios)
+                                ->where('VMERGEOC.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                ->where(function ($query) {
+                                    $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
+                                          ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
+                                          ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
+                                })
+                                //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                                ->select(DB::raw('  COD_ORDEN,
+                                                    FEC_ORDEN,
+                                                    TXT_CATEGORIA_MONEDA,
+                                                    TXT_EMPR_CLIENTE,
+                                                    COD_USUARIO_CREA_AUD,
+                                                    MAX(CAN_TOTAL) CAN_TOTAL,
+                                                    MAX(ID_DOCUMENTO) AS ID_DOCUMENTO,
+                                                    MAX(COD_ESTADO) AS COD_ESTADO,
+                                                    MAX(TXT_ESTADO) AS TXT_ESTADO
+                                                '))
+                                ->groupBy('COD_ORDEN')
+                                ->groupBy('FEC_ORDEN')
+                                ->groupBy('TXT_CATEGORIA_MONEDA')
+                                ->groupBy('TXT_EMPR_CLIENTE')
+                                ->groupBy('COD_USUARIO_CREA_AUD')
+                                ->get();
+
+        }
+
 
 	 	return  $listadatos;
 	}

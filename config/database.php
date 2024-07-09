@@ -78,6 +78,28 @@ return [
         ],
 
 
+        'sqlsrv_b' => [
+            'driver' => 'sqlsrv',
+            'host' => '10.1.9.43',
+            'database' => 'pOSBE2024',
+            'username' => 'sa',
+            'password' => 'ia.ziz.+1+6',
+            'charset' => 'utf8',
+            'prefix' => '',
+        ],
+
+        'sqlsrv_r' => [
+            'driver' => 'sqlsrv',
+            'host' => '10.1.7.200',
+            'database' => 'pOSRJ2024',
+            'username' => 'sa',
+            'password' => 'ia.ziz.+1+6',
+            'charset' => 'utf8',
+            'prefix' => '',
+        ], 
+
+
+
         'sqlsrv_w' => [
             'driver' => 'sqlsrv',
             'host' => '10.1.0.12',

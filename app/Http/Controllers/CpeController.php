@@ -80,7 +80,7 @@ class CpeController extends Controller {
 
 		}else{
 
-			$combotd  					= 	array('01' => 'FACTURA','03' => 'BOLETA','07' => 'NOTA DE CREDITO','08' => 'NOTA DE DEBITO');
+			$combotd  					= 	array('01' => 'FACTURA','03' => 'BOLETA','07' => 'NOTA DE CREDITO','08' => 'NOTA DE DEBITO','02' => 'RECIBO POR HONORARIO');
 
 			return View::make('cpe/buscarcpe',
 						[

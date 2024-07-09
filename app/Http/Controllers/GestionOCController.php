@@ -421,7 +421,7 @@ class GestionOCController extends Controller
         $validarurl = $this->funciones->getUrl($idopcion,'Ver');
         if($validarurl <> 'true'){return $validarurl;}
         /******************************************************/
-        View::share('titulo','Gestion Ordenes de Compra');
+        View::share('titulo','Integracion de Comprobante');
         $operacion_id       =   'ORDEN_COMPRA';
         $array_contrato     =   $this->array_rol_contrato();
         if (in_array(Session::get('usuario')->rol_id, $array_contrato)) {
