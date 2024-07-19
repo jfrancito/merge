@@ -605,6 +605,7 @@ class UserController extends Controller {
 		$count_x_aprobar 			= 	0;
         $cod_empresa    			=   Session::get('usuario')->usuarioosiris_id;
         $url 						=	'';
+        $urlcontrato 				=	'';
 
         $url_obs 					=	'';
 		$count_observados 			= 	0;
@@ -648,7 +649,9 @@ class UserController extends Controller {
 			if(Session::get('usuario')->rol_id == '1CIX00000015' || Session::get('usuario')->rol_id == '1CIX00000016'){
         		$listadatos     =   $this->con_lista_cabecera_comprobante_total_cont($cod_empresa);
 				$count_x_aprobar = 	 count($listadatos);
-        		$url 			 =	'/gestion-de-contabilidad-aprobar/g56';
+
+    			$url 					=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=ORDEN_COMPRA';
+    			$urlcontrato 			=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=CONTRATO';
 
         		$listadatos     =   $this->con_lista_cabecera_comprobante_total_cont_contrato($cod_empresa);
 				$count_x_aprobar_con 	= 	 count($listadatos);
@@ -664,8 +667,8 @@ class UserController extends Controller {
 
 	        		$listadatos     =   $this->con_lista_cabecera_comprobante_total_adm_contrato($cod_empresa);
 					$count_x_aprobar_con 	= 	 count($listadatos);
-
-        			$url 			 =	'/gestion-de-administracion-aprobar/j25';
+        			$url 					=	'/gestion-de-administracion-aprobar/j25?operacion_id=ORDEN_COMPRA';
+        			$urlcontrato 			=	'/gestion-de-administracion-aprobar/j25?operacion_id=CONTRATO';
 
 				}
 			}
@@ -699,7 +702,11 @@ class UserController extends Controller {
 						 	'cuentabancarias' 	=> $cuentabancarias,
 						 	'fecha' 			=> $fecha,
 						 	'count_x_aprobar' 	=> $count_x_aprobar,
+
 						 	'url' 				=> $url,
+						 	'urlcontrato' 		=> $urlcontrato,
+
+
 						 	'count_observados' 	=> $count_observados,
 						 	'url_obs' 			=> $url_obs,
 						 	'count_x_aprobar_gestion' 	=> $count_x_aprobar_gestion,

@@ -72,7 +72,7 @@ class GestionOCController extends Controller
 
         header('Content-Type: text/html; charset=UTF-8');
         //$path = storage_path() . "/exports/FC26-00002985.XML";
-        $path = storage_path() . "/exports/20507312277-01-FC26-00003065.xml";
+        $path = storage_path() . "/exports/20612526754-01-F001-00000046.xml";
 
         $parser = new InvoiceParser();
         $xml = file_get_contents($path);
@@ -432,11 +432,13 @@ class GestionOCController extends Controller
         $procedencia        =   'ADM';
         $funcion            =   $this;
 
+
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_administrativo($cod_empresa);
         }else{
             $listadatos         =   $this->con_lista_cabecera_contrato_administrativo($cod_empresa);
         }
+
         //dd($listadatos);
         return View::make('comprobante/listaocadministrador',
                          [
@@ -1032,6 +1034,8 @@ class GestionOCController extends Controller
                         $fedocumento_t          =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
 
 
+
+
                         if(count($fedocumento_t)>0){
                             DB::table('FE_DOCUMENTO')->where('ID_DOCUMENTO','=',$fedocumento_t->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$fedocumento_t->DOCUMENTO_ITEM)->delete();
                             DB::table('FE_DETALLE_DOCUMENTO')->where('ID_DOCUMENTO','=',$fedocumento_t->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$fedocumento_t->DOCUMENTO_ITEM)->delete();
@@ -1095,7 +1099,7 @@ class GestionOCController extends Controller
                             $diasdefactura = $contador->format($differenceFormat);
                         }
 
-                        //DD($factura);
+
 
                         $documentolinea                     =   $this->ge_linea_documento($ordencompra->COD_ORDEN);
 
@@ -1144,14 +1148,17 @@ class GestionOCController extends Controller
                         $documento->TOTAL_VENTA_SOLES       =   $factura->getmtoImpVenta();
 
                         $documento->HORA_EMISION            =   $factura->gethoraEmision();
+
                         $documento->IMPUESTO_2              =   $factura->getmtoOtrosTributos();
                         $documento->TIPO_DETRACCION         =   $factura->getdetraccion()->gettipoDet();
                         $documento->PORC_DETRACCION         =   $factura->getdetraccion()->getporcDet();
                         $documento->MONTO_DETRACCION        =   $factura->getdetraccion()->getbaseDetr();
                         $documento->MONTO_ANTICIPO          =   $factura->getdestotalAnticipos();
-                        $documento->OBSERVACION             =   $factura->getobservacion();
+                        // $documento->OBSERVACION             =   $factura->getobservacion();
                         $documento->NRO_ORDEN_COMP          =   $factura->getcompra();              
                         $documento->NUM_GUIA                =   $factura->getguiaEmbebida();
+
+
                         $documento->estadoCp                =   0;
                         $documento->ARCHIVO_XML             =   $nombrefile;
                         $documento->ARCHIVO_CDR             =   '';
@@ -1170,6 +1177,7 @@ class GestionOCController extends Controller
                         $documento->OPERACION               =   'ORDEN_COMPRA';
                         $documento->save();
 
+                        //DD("hola");
 
                         //ARCHIVO
                         $dcontrol                   =   new Archivo;
@@ -1601,15 +1609,179 @@ class GestionOCController extends Controller
 
         }
     }
+
+
+
+    public function actionDetalleComprobanteOCAdministratorSinXML($procedencia,$idopcion, $prefijo, $idordencompra, Request $request) {
+
+
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo($idordencompra,$prefijo);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_idoc($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc($idoc);
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
+        $ordencompra_n          =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
+
+
+        View::share('titulo','REGISTRO DE COMPROBANTE OC XML: '.$idoc);
+        $tiposerie              =   '';
+
+        
+        if(count($fedocumento)>0){
+            $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+            $tiposerie              =   substr($fedocumento->SERIE, 0, 1);
+        }else{
+            $detallefedocumento     =   array();
+        }
+
+        //dd($detallefedocumento);
+
+        $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);
+        $xmlarchivo             =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE.'xml';
+        $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
+        //dd($tp);
+        $contacto               =   DB::table('users')->where('ind_contacto','=',1)->pluck('nombre','id')->toArray();
+        $combocontacto          =   array('' => "Seleccione Contacto") + $contacto;
+        $usuario                =   SGDUsuario::where('COD_USUARIO','=',$ordencompra->COD_USUARIO_CREA_AUD)->first();
+
+
+        $xmlfactura             =   'FACTURA';
+        $rhxml                  =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+                                    //->where('IND_OBLIGATORIO','=',1)
+                                    ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000013'])
+                                    ->where('TXT_ASIGNADO','=','PROVEEDOR')
+                                    ->first();
+
+        if(count($rhxml)>0){
+            $xmlfactura             =   $rhxml->NOM_CATEGORIA_DOCUMENTO;
+        }
+
+
+
+        if($tiposerie == 'E'){
+
+            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+                                        //->where('IND_OBLIGATORIO','=',1)
+                                        ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000004'])
+                                        ->whereIn('TXT_ASIGNADO', ['PROVEEDOR','CONTACTO'])
+                                        ->get();
+
+        }else{
+            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+                                        //->where('IND_OBLIGATORIO','=',1)
+                                        ->where('COD_CATEGORIA_DOCUMENTO','<>','DCC0000000000003')
+                                        //->where('TXT_ASIGNADO','=','PROVEEDOR')
+                                        ->whereIn('TXT_ASIGNADO', ['PROVEEDOR','CONTACTO'])
+                                        ->get();
+        }
+
+        //si es de bellavista y rioja copir la orden de compra
+        $ordencompra_f            =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
+
+
+        $sourceFile = '\\\\10.1.0.201\cpe\Orden_Compra';
+
+
+        if($ordencompra_f->COD_CENTRO == 'CEN0000000000004' or $ordencompra_f->COD_CENTRO == 'CEN0000000000006'){
+            if($ordencompra_f->COD_CENTRO == 'CEN0000000000004'){
+                $sourceFile = '\\\\10.1.7.200\\cpe\\Orden_Compra\\'.$ordencompra->COD_ORDEN.'.pdf';
+            }
+            if($ordencompra_f->COD_CENTRO == 'CEN0000000000006'){
+                $sourceFile = '\\\\10.1.9.43\\cpe\\Orden_Compra\\'.$ordencompra->COD_ORDEN.'.pdf';
+            }
+            $destinationFile = '\\\\10.1.0.201\\cpe\\Orden_Compra\\'.$ordencompra->COD_ORDEN.'.pdf';
+
+            //dd($sourceFile);
+
+            // Intenta copiar el archivo
+            if (file_exists($sourceFile)){
+
+
+                copy($sourceFile, $destinationFile);
+            }
+        }
+
+        //encontrar la orden de compra
+        $fileordencompra            =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                                        ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000001')
+                                        ->where('COD_ESTADO','=','1')
+                                        ->first();
+        $rutafila                   =   "";
+        $rutaorden                  =   "";
+        //dd($fileordencompra);
+        if(count($fileordencompra)>0){
+            $directorio = '\\\\10.1.0.201\cpe\Orden_Compra';
+            // Nombre del archivo que estás buscando
+            $nombreArchivoBuscado = $ordencompra->COD_ORDEN.'.pdf';
+            // Escanea el directorio
+            $archivos = scandir($directorio);
+            // Inicializa una variable para almacenar el resultado
+            $archivoEncontrado = false;
+            // Recorre la lista de archivos
+            foreach ($archivos as $archivo) {
+                // Omite los elementos '.' y '..'
+                if ($archivo != '.' && $archivo != '..') {
+                    // Verifica si el nombre del archivo coincide con el archivo buscado
+                    if ($archivo == $nombreArchivoBuscado) {
+                        $archivoEncontrado = true;
+                        break;
+                    }
+                }
+            }
+            // Muestra el resultado
+            if ($archivoEncontrado) {
+                $rutafila         =   $directorio.'\\'.$nombreArchivoBuscado;
+                // $fileContents = file_get_contents($rutafila);
+                // // Usa el facade Storage para almacenar el archivo en el storage de Laravel
+                // //Storage::disk('local')->put($destinationPath, $fileContents);
+                // $ruta                   =   storage_path('app/oc/');
+                // //dd($ruta);
+                // copy($rutafila,$ruta.$nombreArchivoBuscado);
+
+
+
+                // $rutaorden           =   asset('storage/app/oc/'.$nombreArchivoBuscado);
+                $rutaorden           =  $rutafila;
+            } 
+        }
+
+        $funcion                =   $this;
+
+        return View::make('comprobante/registrocomprobanteadministrator',
+                         [
+                            'ordencompra'           =>  $ordencompra,
+                            'detalleordencompra'    =>  $detalleordencompra,
+                            'fedocumento'           =>  $fedocumento,
+                            'detallefedocumento'    =>  $detallefedocumento,
+                            'combocontacto'         =>  $combocontacto,
+                            'procedencia'           =>  $procedencia,
+                            'xmlfactura'            =>  $xmlfactura,
+                            'tp'                    =>  $tp,
+                            'xmlarchivo'            =>  $xmlarchivo,
+                            'tarchivos'             =>  $tarchivos,
+                            'usuario'               =>  $usuario,
+                            'rutaorden'             =>  $rutaorden,
+                            'funcion'               =>  $funcion,
+                            'idopcion'              =>  $idopcion,
+                         ]);
+    }
+
+
+
     public function actionDetalleComprobanteOCAdministrator($procedencia,$idopcion, $prefijo, $idordencompra, Request $request) {
 
 
         $idoc                   =   $this->funciones->decodificarmaestraprefijo($idordencompra,$prefijo);
         $ordencompra            =   $this->con_lista_cabecera_comprobante_idoc($idoc);
         $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc($idoc);
-
         $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
-        //$ordencompra            =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
+        $ordencompra_n          =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
+
+        //SIN XML REDIRECCIONAR O OTRA VISTA
+        if($ordencompra_n->IND_VARIAS_ENTREGAS == 1){
+            return Redirect::to('detalle-comprobante-oc-administrator-sin-xml/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra);
+        }
+
+
         View::share('titulo','REGISTRO DE COMPROBANTE OC: '.$idoc);
         $tiposerie              =   '';
 
@@ -1662,19 +1834,40 @@ class GestionOCController extends Controller
                                         ->get();
         }
 
+        //si es de bellavista y rioja copir la orden de compra
+        $ordencompra_f            =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
 
 
+        $sourceFile = '\\\\10.1.0.201\cpe\Orden_Compra';
+
+
+        if($ordencompra_f->COD_CENTRO == 'CEN0000000000004' or $ordencompra_f->COD_CENTRO == 'CEN0000000000006'){
+            if($ordencompra_f->COD_CENTRO == 'CEN0000000000004'){
+                $sourceFile = '\\\\10.1.7.200\\cpe\\Orden_Compra\\'.$ordencompra->COD_ORDEN.'.pdf';
+            }
+            if($ordencompra_f->COD_CENTRO == 'CEN0000000000006'){
+                $sourceFile = '\\\\10.1.9.43\\cpe\\Orden_Compra\\'.$ordencompra->COD_ORDEN.'.pdf';
+            }
+            $destinationFile = '\\\\10.1.0.201\\cpe\\Orden_Compra\\'.$ordencompra->COD_ORDEN.'.pdf';
+
+            //dd($sourceFile);
+
+            // Intenta copiar el archivo
+            if (file_exists($sourceFile)){
+
+
+                copy($sourceFile, $destinationFile);
+            }
+        }
 
         //encontrar la orden de compra
         $fileordencompra            =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
                                         ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000001')
                                         ->where('COD_ESTADO','=','1')
                                         ->first();
-        $rutafila                  =   "";
+        $rutafila                   =   "";
         $rutaorden                  =   "";
-
         //dd($fileordencompra);
-
         if(count($fileordencompra)>0){
             $directorio = '\\\\10.1.0.201\cpe\Orden_Compra';
             // Nombre del archivo que estás buscando
@@ -1710,10 +1903,6 @@ class GestionOCController extends Controller
                 $rutaorden           =  $rutafila;
             } 
         }
-
-
-
-
 
         $funcion                =   $this;
 
@@ -2228,7 +2417,7 @@ class GestionOCController extends Controller
                             }
                         }
                         
-
+                        //dd("hola");
                         DB::commit();
 
                 }catch(\Exception $ex){
@@ -2865,23 +3054,25 @@ class GestionOCController extends Controller
 
 
 
-
-                    //  INSERTAR ORDEN DE INGRESO
                     //almacen lote                                
                     $this->insert_almacen_lote($orden,$detalleproducto);
                     $orden_id = $this->insert_orden($orden,$detalleproducto);           
                     $this->insert_referencia_asoc($orden,$detalleproducto,$orden_id[0]);
                     $this->insert_detalle_producto($orden,$detalleproducto,$orden_id[0]);
-                    //UPDATE DE ORDEN DE COMPRA
-                    //$this->update_orden($orden,$detalleproducto);
-                    //$this->update_detalle_producto($orden,$detalleproducto);
 
-                    CMPDetalleProducto::where('COD_TABLA',$idoc)
-                                ->update(
-                                    [
-                                        'CAN_PENDIENTE'=>0
-                                    ]
-                                );
+                    //DETALLE PRODUCTO ACTUALIZAR
+                    $conexionbd         = 'sqlsrv';
+                    if($orden->COD_CENTRO == 'CEN0000000000004'){ //rioja
+                        $conexionbd         = 'sqlsrv_r';
+                    }else{
+                        if($orden->COD_CENTRO == 'CEN0000000000006'){ //bellavista
+                            $conexionbd         = 'sqlsrv_b';
+                        }
+                    }
+
+                    DB::connection($conexionbd)->table('CMP.DETALLE_PRODUCTO')
+                        ->where('COD_TABLA', $idoc)
+                        ->update(['CAN_PENDIENTE' => 0,'FEC_USUARIO_MODIF_AUD'=>$this->hoy]);
 
                     FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                                 ->update(
@@ -2892,6 +3083,8 @@ class GestionOCController extends Controller
                                         'usuario_uc'=>Session::get('usuario')->id
                                     ]
                                 );
+
+
 
                 }else{
 
@@ -3198,6 +3391,8 @@ class GestionOCController extends Controller
                 }
 
 
+
+
                 /////////////////////////////////////////////GUARDAR GUIAS REMITENTE /////////////////////////////////////////
 
                 //guardar las guias que ya existen
@@ -3247,7 +3442,10 @@ class GestionOCController extends Controller
                         $rutacompleta                   =       $rutafile.'\\'.$nombrefilecdr;
                         $valor                          =       $this->versicarpetanoexiste($rutafile);
                         $path                           =       $rutacompleta;
-                        copy($rutaorden,$rutacompleta);
+
+                        //dd($rutacompleta);
+
+                        copy($rutaordenguia,$rutacompleta);
                         $dcontrol                       =       new Archivo;
                         $dcontrol->ID_DOCUMENTO         =       $ordencompra->COD_DOCUMENTO_CTBLE;
                         $dcontrol->DOCUMENTO_ITEM       =       $fedocumento->DOCUMENTO_ITEM;

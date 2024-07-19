@@ -8,7 +8,7 @@
           <div class="panel-heading" style="background: #1d3a6d;color: #fff;">PENDIENTES
             <span class="panel-subtitle" style="color: #fff;">Documentos por aprobar</span>
             <div class="chart-legend">
-              <a href="{{ url($url) }}" class="btn btn-rounded btn-space btn-primary dasboark">Ir Aprobar</a>
+              <a href="{{ url($urlcontrato) }}" class="btn btn-rounded btn-space btn-primary dasboark">Ir Aprobar</a>
             </div>
             <span class="count-das">{{$count_x_aprobar_con}}</span>
           </div>

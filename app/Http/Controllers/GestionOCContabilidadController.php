@@ -430,11 +430,20 @@ class GestionOCContabilidadController extends Controller
 
 
             //orden de ingreso
-            $referencia             =   CMPReferecenciaAsoc::where('COD_TABLA','=',$ordencompra->COD_ORDEN)
+            $orden_f                =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();   
+            $conexionbd         = 'sqlsrv';
+            if($orden_f->COD_CENTRO == 'CEN0000000000004'){ //rioja
+                $conexionbd         = 'sqlsrv_r';
+            }else{
+                if($orden_f->COD_CENTRO == 'CEN0000000000006'){ //bellavista
+                    $conexionbd         = 'sqlsrv_b';
+                }
+            }
+            $referencia             =   DB::connection($conexionbd)->table('CMP.REFERENCIA_ASOC')->where('COD_TABLA','=',$ordencompra->COD_ORDEN)
                                         ->where('COD_TABLA_ASOC','like','%OI%')->first();
             $ordeningreso           =   array();
             if(count($referencia)>0){
-                $ordeningreso       =   CMPOrden::where('COD_ORDEN','=',$referencia->COD_TABLA_ASOC)->first();   
+                $ordeningreso       =   DB::connection($conexionbd)->table('CMP.ORDEN')->where('COD_ORDEN','=',$referencia->COD_TABLA_ASOC)->first();   
             }     
 
 
@@ -470,7 +479,7 @@ class GestionOCContabilidadController extends Controller
         if($validarurl <> 'true'){return $validarurl;}
         /******************************************************/
         $idoc                   =   $this->funciones->decodificarmaestraprefijo_contrato($idordencompra,$prefijo);
-        $ordencompra            =   $this->con_lista_cabecera_comprobante_contrato_idoc($idoc);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_contrato_idoc_actual($idoc);
         $detalleordencompra     =   $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
         $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
         $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
@@ -602,6 +611,13 @@ class GestionOCContabilidadController extends Controller
             $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','1')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
 
+            $archivospdf            =   Archivo::where('ID_DOCUMENTO','=',$idoc)
+                                        ->where('ACTIVO','=','1')
+                                        ->where('EXTENSION', 'like', '%'.'pdf'.'%')
+                                        ->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                        ->get();
+
+
             return View::make('comprobante/aprobarconcontrato', 
                             [
                                 'fedocumento'           =>  $fedocumento,
@@ -609,6 +625,9 @@ class GestionOCContabilidadController extends Controller
                                 'linea'                 =>  $linea,
 
                                 'detalleordencompra'    =>  $detalleordencompra,
+                                'archivospdf'           =>  $archivospdf,
+
+
                                 'documentohistorial'    =>  $documentohistorial,
                                 'archivos'              =>  $archivos,
                                 'detallefedocumento'    =>  $detallefedocumento,
@@ -770,10 +789,17 @@ class GestionOCContabilidadController extends Controller
                                         ->where('ACTIVO','=','1')
                                         ->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
+            $ordencompra_t          =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
+
+            $codigo_sunat           =   'I';
+            if($ordencompra_t->IND_VARIAS_ENTREGAS==0){
+                $codigo_sunat           =   'N';
+            }
+
             $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                         ->where('COD_ESTADO','=',1)
+                                        ->where('CODIGO_SUNAT','=',$codigo_sunat)
                                         ->get();
-
             $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                         ->pluck('COD_CATEGORIA_DOCUMENTO')
                                         ->toArray();
@@ -804,6 +830,194 @@ class GestionOCContabilidadController extends Controller
         }
     }
 
+
+    public function actionAgregarObservacionContabilidadContrato($idopcion, $linea, $prefijo, $idordencompra,Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo_contrato($idordencompra,$prefijo);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_contrato_idoc_actual($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
+        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+        View::share('titulo','Observar Comprobante');
+
+        if($_POST)
+        {
+
+            try{    
+                
+                DB::beginTransaction();
+                $pedido_id          =   $idoc;
+                $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
+                $descripcion        =   $request['descripcion'];
+                $archivoob          =   $request['archivoob'];
+
+                if(count($archivoob)<=0){
+                    DB::rollback(); 
+                    return Redirect::to('agregar-observacion-contabilidad-contrato/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', 'Tiene que seleccionar almenos un item');
+                }
+
+
+                foreach($archivoob as $index=>$item){
+
+                    $docu_asoci                             =    CMPDocAsociarCompra::where('COD_ORDEN','=',$idoc)->where('COD_ESTADO','=',1)
+                                                                ->where('COD_CATEGORIA_DOCUMENTO','=',$item)->first();
+                    if(count($docu_asoci)>0){
+
+                        Archivo::where('ID_DOCUMENTO','=',$idoc)
+                                ->where('ACTIVO','=','1')
+                                ->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                ->where('TIPO_ARCHIVO','=',$item)
+                                    ->update(
+                                        [
+                                            'ACTIVO'=>0,
+                                            'FECHA_MOD'=>$this->fechaactual,
+                                            'USUARIO_MOD'=>Session::get('usuario')->id
+                                        ]
+                                    );
+
+                    }else{
+
+                        $categoria                               =   CMPCategoria::where('COD_CATEGORIA','=',$item)->first();
+                        $docasociar                              =   New CMPDocAsociarCompra;
+                        $docasociar->COD_ORDEN                   =   $idoc;
+                        $docasociar->COD_CATEGORIA_DOCUMENTO     =   $categoria->COD_CATEGORIA;
+                        $docasociar->NOM_CATEGORIA_DOCUMENTO     =   $categoria->NOM_CATEGORIA;
+                        $docasociar->IND_OBLIGATORIO             =   0;
+                        $docasociar->TXT_FORMATO                 =   $categoria->COD_CTBLE;
+                        $docasociar->TXT_ASIGNADO                =   $categoria->TXT_ABREVIATURA;
+                        $docasociar->COD_USUARIO_CREA_AUD        =   Session::get('usuario')->id;
+                        $docasociar->FEC_USUARIO_CREA_AUD        =   $this->fechaactual;
+                        $docasociar->COD_ESTADO                  =   1;
+                        $docasociar->TIP_DOC                     =   $categoria->CODIGO_SUNAT;
+                        $docasociar->save();
+
+                    }
+
+
+
+
+
+                }
+
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento                              =   new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA                       =   $this->fechaactual;
+                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                $documento->TIPO                        =   'OBSERVADO POR CONTABILIDAD';
+                $documento->MENSAJE                     =   $descripcion;
+                $documento->save();
+
+                FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$linea)
+                            ->update(
+                                [
+                                    'ind_observacion'=>1,
+                                    'area_observacion'=>'CONT'
+                                ]
+                            );
+
+                //LE LLEGA AL USUARIO DE CONTACTO
+                $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+                $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                $mensaje            =   'COMPROBANTE OBSERVADO: '.$fedocumento->ID_DOCUMENTO
+                                        .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                                        .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
+                                        .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
+                                        .'MENSAJE : '.$descripcion.'%0D%0A';
+
+                //dd($trabajador);                        
+                if($_ENV['APP_PRODUCCION']==0){
+                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                }else{
+                    $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
+                }  
+
+                DB::commit();
+                return Redirect::to('/gestion-de-contabilidad-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_DOCUMENTO_CTBLE.' OBSERVADO CON EXITO');
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                return Redirect::to('gestion-de-contabilidad-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+
+        
+        }
+        else{
+
+            $detalleordencompra     =   $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
+            $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+            $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
+
+            if($fedocumento->ind_observacion == 1){
+                return Redirect::to('gestion-de-contabilidad-aprobar/'.$idopcion)->with('errorbd', 'Existen Observaciones pendientes por atender');
+            }
+
+            $trabajador             =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+
+            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
+                                        //->where('IND_OBLIGATORIO','=',1)
+                                        ->where('TXT_ASIGNADO','=','CONTACTO')
+                                        ->get();
+
+
+            $documentohistorial     =   FeDocumentoHistorial::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                        ->orderBy('FECHA','DESC')
+                                        ->get();
+
+
+            $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)
+                                        ->where('ACTIVO','=','1')
+                                        ->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+
+            $codigo_sunat           =   'N';
+
+            $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                        ->where('COD_ESTADO','=',1)
+                                        ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->get();
+
+            $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
+                                        ->pluck('COD_CATEGORIA_DOCUMENTO')
+                                        ->toArray();
+
+            //dd($totalarchivos);
+            //dd($documentoscompra);
+
+            return View::make('comprobante/observarcontabilidadcontrato', 
+                            [
+                                'fedocumento'           =>  $fedocumento,
+                                'ordencompra'           =>  $ordencompra,
+                                'linea'                 =>  $linea,
+                                'documentoscompra'      =>  $documentoscompra,
+                                'detalleordencompra'    =>  $detalleordencompra,
+                                'documentohistorial'    =>  $documentohistorial,
+                                'archivos'              =>  $archivos,
+                                'detallefedocumento'    =>  $detallefedocumento,
+                                'tarchivos'             =>  $tarchivos,
+                                'totalarchivos'         =>  $totalarchivos,
+                                'trabajador'            =>  $trabajador,
+
+                                'tp'                    =>  $tp,
+                                'idopcion'              =>  $idopcion,
+                                'idoc'                  =>  $idoc,
+                            ]);
+
+
+        }
+    }
+
+
+
+
+
+
     public function actionAgregarRecomendacionContabilidad($idopcion, $linea, $prefijo, $idordencompra,Request $request)
     {
 
@@ -816,7 +1030,7 @@ class GestionOCContabilidadController extends Controller
         $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc_actual($idoc);
         $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
         $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
-        View::share('titulo','Observar Comprobante');
+        View::share('titulo','Recomendar Comprobante');
 
         if($_POST)
         {
@@ -926,6 +1140,129 @@ class GestionOCContabilidadController extends Controller
 
         }
     }
+
+
+
+    public function actionAgregarRecomendacionContabilidadContrato($idopcion, $linea, $prefijo, $idordencompra,Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo_contrato($idordencompra,$prefijo);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_contrato_idoc_actual($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
+
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
+        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+        View::share('titulo','Recomendar Comprobante');
+
+        if($_POST)
+        {
+
+            try{    
+                
+                DB::beginTransaction();
+                $pedido_id          =   $idoc;
+                $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
+                $descripcion        =   $request['descripcion'];
+
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento                              =   new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA                       =   $this->fechaactual;
+                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                $documento->TIPO                        =   'RECOMENDACION POR CONTABILIDAD';
+                $documento->MENSAJE                     =   $descripcion;
+                $documento->save();
+
+                //LE LLEGA AL USUARIO DE CONTACTO
+                $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+                $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                $mensaje            =   'COMPROBANTE: '.$fedocumento->ID_DOCUMENTO
+                                        .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                                        .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
+                                        .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
+                                        .'RECOMENDACION : '.$descripcion.'%0D%0A';
+
+                //dd($trabajador);                        
+                if($_ENV['APP_PRODUCCION']==0){
+                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                }else{
+                    $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
+                }  
+
+                DB::commit();
+                return Redirect::to('/gestion-de-contabilidad-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' RECOMENDACION CON EXITO');
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                return Redirect::to('gestion-de-contabilidad-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+
+        
+        }
+        else{
+
+            $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc_actual($idoc);
+            $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+            $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
+
+            $trabajador             =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+
+            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+                                        //->where('IND_OBLIGATORIO','=',1)
+                                        ->where('TXT_ASIGNADO','=','CONTACTO')
+                                        ->get();
+
+
+            $documentohistorial     =   FeDocumentoHistorial::where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                        ->orderBy('FECHA','DESC')
+                                        ->get();
+
+
+            $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)
+                                        ->where('ACTIVO','=','1')
+                                        ->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+
+            $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                        ->where('COD_ESTADO','=',1)
+                                        ->get();
+
+            $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+                                        ->pluck('COD_CATEGORIA_DOCUMENTO')
+                                        ->toArray();
+
+            //dd($totalarchivos);
+            //dd($documentoscompra);
+
+            return View::make('comprobante/recomendacioncontabilidadcontrato', 
+                            [
+                                'fedocumento'           =>  $fedocumento,
+                                'ordencompra'           =>  $ordencompra,
+                                'linea'                 =>  $linea,
+                                'documentoscompra'      =>  $documentoscompra,
+                                'detalleordencompra'    =>  $detalleordencompra,
+                                'documentohistorial'    =>  $documentohistorial,
+                                'archivos'              =>  $archivos,
+                                'detallefedocumento'    =>  $detallefedocumento,
+                                'tarchivos'             =>  $tarchivos,
+                                'totalarchivos'         =>  $totalarchivos,
+                                'trabajador'            =>  $trabajador,
+
+                                'tp'                    =>  $tp,
+                                'idopcion'              =>  $idopcion,
+                                'idoc'                  =>  $idoc,
+                            ]);
+
+
+        }
+    }
+
+
 
 
 

@@ -155,17 +155,12 @@ class GestionOCValidadoController extends Controller
         View::share('titulo','Detalle de Comprobante');
 
         $idoc                   =   $this->funciones->decodificarmaestraprefijo_contrato($idordencompra,$prefijo);
-        $ordencompra            =   $this->con_lista_cabecera_comprobante_contrato_idoc($idoc);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_contrato_idoc_actual($idoc);
         $detalleordencompra     =   $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
-
         $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
-
         $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
-
         $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);
-
-
 
         $xmlarchivo             =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE.'\\'.$fedocumento->ARCHIVO_XML;
         $cdrarchivo             =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE.'\\'.$fedocumento->ARCHIVO_CDR;
@@ -177,6 +172,13 @@ class GestionOCValidadoController extends Controller
         //dd($documentohistorial);
         $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','1')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
         $funcion                =   $this;
+
+        $archivospdf            =   Archivo::where('ID_DOCUMENTO','=',$idoc)
+                                    ->where('ACTIVO','=','1')
+                                    ->where('EXTENSION', 'like', '%'.'pdf'.'%')
+                                    ->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                    ->get();
+
         //dd($archivos);
         return View::make('comprobante/registrocomprobantevalidadocontrato',
                          [
@@ -186,8 +188,8 @@ class GestionOCValidadoController extends Controller
                             'detallefedocumento'    =>  $detallefedocumento,
                             'documentohistorial'    =>  $documentohistorial,
                             'archivos'              =>  $archivos,
-                            'linea'            =>  $linea,
-                            
+                            'linea'                 =>  $linea,
+                            'archivospdf'           =>  $archivospdf,                         
                             'xmlarchivo'            =>  $xmlarchivo,
                             'tp'                    =>  $tp,
                             'funcion'               =>  $funcion,

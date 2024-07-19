@@ -53,6 +53,11 @@ class NotificacionOC extends Command
         $this->envio_correo_confirmacion();
         //USUARIO CONTACTO
         $this->orden_ingreso_ejecutada();
+        //LECTURA DE CDR Y API SUNAT
+        $this->sunat_cdr();
+
+
+
 
         // $this->envio_correo_uc();
         // //CONTABILIDAD
@@ -63,11 +68,6 @@ class NotificacionOC extends Command
         // $this->envio_correo_apcli();
         // //BAJA COMPROBANTE
         // $this->envio_correo_baja();
-
-        //LECTURA DE CDR Y API SUNAT
-        $this->sunat_cdr();
-
-
 
 
     }

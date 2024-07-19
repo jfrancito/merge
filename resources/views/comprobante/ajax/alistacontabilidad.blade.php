@@ -37,7 +37,9 @@
           <span><b>NUMERO  : {{$item->NUMERO}}</b></span>
           <span><b>FECCHA : </b> {{$item->FEC_VENTA}}</span>
           <span><b>FORMA PAGO : </b> {{$item->FORMA_PAGO}}</span>
-          <span><b>TOTAL : </b> {{number_format($item->TOTAL_VENTA_ORIG, 4, '.', ',')}}</span>
+          <span><b>TOTAL : </b> {{number_format($item->TOTAL_VENTA_ORIG+$item->PERCEPCION+$item->MONTO_RETENCION, 4, '.', ',')}}</span>
+          <span><b>PERCEPCION : </b> {{$item->PERCEPCION}}</span>
+          <span><b>RETENCION : </b> {{$item->MONTO_RETENCION}}</span>
         </td>
 
         <td class="cell-detail sorting_1" style="position: relative;">

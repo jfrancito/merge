@@ -16,6 +16,9 @@ use App\Modelos\SGDUsuario;
 use App\Modelos\VMergeActual;
 use App\Modelos\Archivo;
 use App\Modelos\VMergeDocumento;
+use App\Modelos\VMergeDocumentoActual;
+
+
 use App\Modelos\Estado;
 use App\Modelos\CMPDetalleProducto;
 use App\Modelos\CMPDocumentoCtble;
@@ -45,17 +48,23 @@ trait ComprobanteTraits
         $COD_ORDEN_COMPRA = '';
         $pathFiles='\\\\10.1.50.2';
         foreach($listafedocumentos as $index=>$item){
-            $fechaactual      = date('Ymd H:i:s');
 
-            //VER EN QUE ESTADO ESTA LA ORDEN DE INGRESO
-
-            $referenciaasoc = CMPReferecenciaAsoc::Join('CMP.ORDEN', 'CMP.ORDEN.COD_ORDEN', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+            $orden                  =   CMPOrden::where('COD_ORDEN','=',$item->ID_DOCUMENTO)->first();
+            $fechaactual            = date('Ymd H:i:s');
+            $conexionbd         = 'sqlsrv';
+            if($orden->COD_CENTRO == 'CEN0000000000004'){ //rioja
+                $conexionbd         = 'sqlsrv_r';
+            }else{
+                if($orden->COD_CENTRO == 'CEN0000000000006'){ //bellavista
+                    $conexionbd         = 'sqlsrv_b';
+                }
+            }
+            $referenciaasoc = DB::connection($conexionbd)->table('CMP.REFERENCIA_ASOC')->Join('CMP.ORDEN', 'CMP.ORDEN.COD_ORDEN', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
                               ->where('CMP.REFERENCIA_ASOC.COD_TABLA','=',$item->ID_DOCUMENTO)
                               ->where('CMP.REFERENCIA_ASOC.COD_ESTADO','=','1')
                               ->where('CMP.REFERENCIA_ASOC.COD_TABLA_ASOC','like','%'.'OI'.'%')
                               ->where('CMP.ORDEN.COD_CATEGORIA_ESTADO_ORDEN','=','EOR0000000000003')
                               ->first();
-
             if(count($referenciaasoc)>0){
 
                 //SI ES MATERIAL
@@ -613,19 +622,29 @@ trait ComprobanteTraits
 
 	private function con_lista_cabecera_comprobante_total_gestion_observados($cliente_id) {
 
-		$listadatos 	= 	FeDocumento::leftJoin('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+		$listadatos 	= 	FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
 							->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
 							->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
 							->where('FE_DOCUMENTO.COD_ESTADO','<>','')
 							->where('FE_DOCUMENTO.ind_observacion','=','1')
-                            //->where('TXT_PROCEDENCIA','<>','SUE')
 							->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
 							->get();
 
 	 	return  $listadatos;
 	}
 
+    private function con_lista_cabecera_comprobante_total_gestion_observados_contrato($cliente_id) {
 
+        $listadatos     =   FeDocumento::Join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                            //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                            ->where('FE_DOCUMENTO.ind_observacion','=','1')
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                            ->get();
+
+        return  $listadatos;
+    }
 
 	private function con_lista_cabecera_comprobante_total_gestion_historial($cliente_id) {
 
@@ -1229,14 +1248,22 @@ trait ComprobanteTraits
     private function con_lista_cabecera_comprobante_contrato_idoc($idoc) {
 
 
-        $contrato                =   VMergeDocumento::where('COD_ESTADO','=','1')
+        $contrato                =      VMergeDocumento::where('COD_ESTADO','=','1')
                                             ->where('COD_DOCUMENTO_CTBLE','=',$idoc)
                                             ->first();
 
         return  $contrato;
     }
 
+    private function con_lista_cabecera_comprobante_contrato_idoc_actual($idoc) {
 
+
+        $contrato                =      VMergeDocumentoActual::where('COD_ESTADO','=','1')
+                                            ->where('COD_DOCUMENTO_CTBLE','=',$idoc)
+                                            ->first();
+
+        return  $contrato;
+    }
 
     private function con_lista_detalle_contrato_comprobante_idoc($idoc) {
 

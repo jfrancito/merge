@@ -1,5 +1,6 @@
 @extends('template_lateral')
 @section('style')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.min.css" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/datetimepicker/css/bootstrap-datetimepicker.min.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/select2/css/select2.min.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/bootstrap-slider/css/bootstrap-slider.css') }} "/>
@@ -39,7 +40,7 @@
     <script src="{{ asset('public/js/app-form-elements.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/lib/parsley/parsley.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/lib/jquery.niftymodals/dist/jquery.niftymodals.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('public/js/file/bootstrap.bundle.min.js') }}" crossorigin="anonymous"></script>
+
     <script src="{{ asset('public/js/file/fileinput.js?v='.$version) }}" type="text/javascript"></script>
     <script src="{{ asset('public/js/file/locales/es.js') }}" type="text/javascript"></script>
 
@@ -59,6 +60,28 @@
               theme: 'fa5',
               language: 'es',
             });
+
+
+           $('#file-pdf').fileinput({
+              theme: 'fa5',
+              language: 'es',
+              allowedFileExtensions: ['pdf'],
+            });
+          @foreach($archivospdf as $index => $item)
+            var nombre_archivo = '{{$item->NOMBRE_ARCHIVO}}';
+            $('#file-'+{{$index}}).fileinput({
+              theme: 'fa5',
+              language: 'es',
+              initialPreview: ["{{ route('serve-filecontrato', ['file' => '']) }}" + nombre_archivo],
+              initialPreviewAsData: true,
+              initialPreviewFileType: 'pdf',
+              initialPreviewConfig: [
+                  {type: "pdf", caption: nombre_archivo, downloadUrl: "{{ route('serve-filecontrato', ['file' => '']) }}" + nombre_archivo} // Para mostrar el botón de descarga
+              ]
+            });
+          @endforeach
+
+           
     </script>
 
 

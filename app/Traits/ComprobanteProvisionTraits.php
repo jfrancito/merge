@@ -1538,6 +1538,16 @@ trait ComprobanteProvisionTraits
 	private function insert_detalle_producto($orden,$detalleproducto,$ordeningreso_id) {
 
 
+        $conexionbd         = 'sqlsrv';
+        if($orden->COD_CENTRO == 'CEN0000000000004'){ //rioja
+            $conexionbd         = 'sqlsrv_r';
+        }else{
+            if($orden->COD_CENTRO == 'CEN0000000000006'){ //bellavista
+                $conexionbd         = 'sqlsrv_b';
+            }
+        }
+
+
 		$COD_EMPR            		=       $orden->COD_EMPR;
 		$COD_CENTRO            		=       $orden->COD_CENTRO;
 		$idusuario 					=		Session::get('usuario')->name;
@@ -1665,7 +1675,7 @@ trait ComprobanteProvisionTraits
 
 
 
-			$stmt 					= 		DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.DETALLE_PRODUCTO_IUD 
+			$stmt 					= 		DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.DETALLE_PRODUCTO_IUD 
 												@IND_TIPO_OPERACION = ?,
 												@COD_TABLA = ?,
 												@COD_PRODUCTO = ?,
@@ -1873,6 +1883,17 @@ trait ComprobanteProvisionTraits
 	private function insert_referencia_asoc($orden,$detalleproducto,$ordeningreso_id) {
 
 
+
+
+        $conexionbd         = 'sqlsrv';
+        if($orden->COD_CENTRO == 'CEN0000000000004'){ //rioja
+            $conexionbd         = 'sqlsrv_r';
+        }else{
+            if($orden->COD_CENTRO == 'CEN0000000000006'){ //bellavista
+                $conexionbd         = 'sqlsrv_b';
+            }
+        }
+
 		$COD_EMPR            		=       $orden->COD_EMPR;
 		$COD_CENTRO            		=       $orden->COD_CENTRO;
 		$idusuario 					=		Session::get('usuario')->name;
@@ -1894,7 +1915,7 @@ trait ComprobanteProvisionTraits
 
 
 
-		$stmt 					= 		DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.REFERENCIA_ASOC_IUD 
+		$stmt 					= 		DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.REFERENCIA_ASOC_IUD 
 											@IND_TIPO_OPERACION = ?,
 											@COD_TABLA = ?,
 											@COD_TABLA_ASOC = ?,
@@ -1934,6 +1955,18 @@ trait ComprobanteProvisionTraits
         $stmt->execute();
 	}
 	private function insert_orden($orden,$detalleproducto) {
+
+
+
+        $conexionbd         = 'sqlsrv';
+        if($orden->COD_CENTRO == 'CEN0000000000004'){ //rioja
+            $conexionbd         = 'sqlsrv_r';
+        }else{
+            if($orden->COD_CENTRO == 'CEN0000000000006'){ //bellavista
+                $conexionbd         = 'sqlsrv_b';
+            }
+        }
+
 
 		$CANSUBTOTAL 	=	$orden->CAN_SUB_TOTAL;
 		$CANIMPUESTOVTA =	$orden->CAN_IMPUESTO_VTA;
@@ -2122,7 +2155,7 @@ trait ComprobanteProvisionTraits
 
 
 
-		$stmt 					= 		DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.ORDEN_IUD 
+		$stmt 					= 		DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.ORDEN_IUD 
 											@IND_TIPO_OPERACION = ?,
 											@COD_ORDEN = ?,
 											@COD_EMPR = ?,
@@ -2446,6 +2479,17 @@ trait ComprobanteProvisionTraits
 	private function insert_almacen_lote($orden,$detalleproducto) {
 
 
+        $conexionbd         = 'sqlsrv';
+        if($orden->COD_CENTRO == 'CEN0000000000004'){ //rioja
+            $conexionbd         = 'sqlsrv_r';
+        }else{
+            if($orden->COD_CENTRO == 'CEN0000000000006'){ //bellavista
+                $conexionbd         = 'sqlsrv_b';
+            }
+        }
+
+
+
 		$COD_EMPR            		=       $orden->COD_EMPR;
 		$COD_CENTRO            		=       $orden->COD_CENTRO;
 
@@ -2460,7 +2504,7 @@ trait ComprobanteProvisionTraits
 			$COD_LOTE            	=       $item->COD_LOTE;
 
 
-			$stmt 					= 		DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC ALM.ALMACEN_LOTE_IUD 
+			$stmt 					= 		DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC ALM.ALMACEN_LOTE_IUD 
 												@IND_TIPO_OPERACION = ?,
 												@COD_ALMACEN = ?,
 												@COD_LOTE = ?,
