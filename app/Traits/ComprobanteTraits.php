@@ -17,6 +17,8 @@ use App\Modelos\VMergeActual;
 use App\Modelos\Archivo;
 use App\Modelos\VMergeDocumento;
 use App\Modelos\VMergeDocumentoActual;
+use App\Modelos\CMPDocAsociarCompra;
+
 
 
 use App\Modelos\Estado;
@@ -276,14 +278,36 @@ trait ComprobanteTraits
                 }else{
                     $token           =      $this->generartoken_is();
                 }
-                $rvalidar = $this->validar_xml( $token,
-                                                $item->ID_CLIENTE,
-                                                $item->RUC_PROVEEDOR,
-                                                $item->ID_TIPO_DOC,
-                                                $item->SERIE,
-                                                $item->NUMERO,
-                                                $fechaemision,
-                                                $item->TOTAL_VENTA_ORIG);
+
+
+                $rh              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                                            ->where('COD_ESTADO','=',1)
+                                            ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000013'])
+                                            ->get();
+
+                if(count($rh)<=0){
+                    //FACTURA
+                    $rvalidar = $this->validar_xml( $token,
+                                                    $fedocumento->ID_CLIENTE,
+                                                    $fedocumento->RUC_PROVEEDOR,
+                                                    $fedocumento->ID_TIPO_DOC,
+                                                    $fedocumento->SERIE,
+                                                    $fedocumento->NUMERO,
+                                                    $fechaemision,
+                                                    $fedocumento->TOTAL_VENTA_ORIG);
+                }else{
+                    //RECIBO POR HONORARIO
+                    $rvalidar = $this->validar_xml( $token,
+                                                    $fedocumento->ID_CLIENTE,
+                                                    $fedocumento->RUC_PROVEEDOR,
+                                                    $fedocumento->ID_TIPO_DOC,
+                                                    $fedocumento->SERIE,
+                                                    $fedocumento->NUMERO,
+                                                    $fechaemision,
+                                                    $fedocumento->TOTAL_VENTA_ORIG+$fedocumento->MONTO_RETENCION);
+                }
+
+
                 $arvalidar = json_decode($rvalidar, true);
                 if(isset($arvalidar['success'])){
 
