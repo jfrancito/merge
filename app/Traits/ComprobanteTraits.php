@@ -288,23 +288,23 @@ trait ComprobanteTraits
                 if(count($rh)<=0){
                     //FACTURA
                     $rvalidar = $this->validar_xml( $token,
-                                                    $fedocumento->ID_CLIENTE,
-                                                    $fedocumento->RUC_PROVEEDOR,
-                                                    $fedocumento->ID_TIPO_DOC,
-                                                    $fedocumento->SERIE,
-                                                    $fedocumento->NUMERO,
+                                                    $item->ID_CLIENTE,
+                                                    $item->RUC_PROVEEDOR,
+                                                    $item->ID_TIPO_DOC,
+                                                    $item->SERIE,
+                                                    $item->NUMERO,
                                                     $fechaemision,
-                                                    $fedocumento->TOTAL_VENTA_ORIG);
+                                                    $item->TOTAL_VENTA_ORIG);
                 }else{
                     //RECIBO POR HONORARIO
                     $rvalidar = $this->validar_xml( $token,
-                                                    $fedocumento->ID_CLIENTE,
-                                                    $fedocumento->RUC_PROVEEDOR,
-                                                    $fedocumento->ID_TIPO_DOC,
-                                                    $fedocumento->SERIE,
-                                                    $fedocumento->NUMERO,
+                                                    $item->ID_CLIENTE,
+                                                    $item->RUC_PROVEEDOR,
+                                                    $item->ID_TIPO_DOC,
+                                                    $item->SERIE,
+                                                    $item->NUMERO,
                                                     $fechaemision,
-                                                    $fedocumento->TOTAL_VENTA_ORIG+$fedocumento->MONTO_RETENCION);
+                                                    $item->TOTAL_VENTA_ORIG+$item->MONTO_RETENCION);
                 }
 
 
@@ -815,10 +815,16 @@ trait ComprobanteTraits
 		if($ordencompra_t->IND_MATERIAL_SERVICIO == 'S'){
 			$ind_cantidaditem 			=	1;	
 		}else{
-			//numero_items
-			if(count($detalleordencompra) == count($detallefedocumento)){
-				$ind_cantidaditem 			=	1;	
-			}else{ 	$ind_errototal 		=	0;  }
+
+            if($ordencompra_t->TXT_CONFORMIDAD != ''){
+                $ind_cantidaditem           =   1;  
+            }else{
+                //numero_items
+                if(count($detalleordencompra) == count($detallefedocumento)){
+                    $ind_cantidaditem           =   1;  
+                }else{  $ind_errototal      =   0;  }
+
+            }
 
 		}
 
@@ -1041,6 +1047,53 @@ trait ComprobanteTraits
 	}
 
 
+    private function con_lista_cabecera_comprobante_administrativo_filtro($cliente_id) {
+
+        $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+        $array_trabajadores  =      STDTrabajador::where('NRO_DOCUMENTO','=',$trabajador->NRO_DOCUMENTO)
+                                    ->pluck('COD_TRAB')
+                                    ->toArray();
+
+        $array_usuarios      =      SGDUsuario::whereIn('COD_TRABAJADOR',$array_trabajadores)
+                                    ->pluck('COD_USUARIO')
+                                    ->toArray();
+        $estado_no          =       'ETM0000000000006';
+
+
+        $listadatos         =   VMergeOC::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                        $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
+                                            ->where('COD_ESTADO', '<>', 'ETM0000000000006');
+                                    })
+                                //->whereIn('VMERGEOC.COD_USUARIO_CREA_AUD',$array_usuarios)
+                                ->where('VMERGEOC.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                ->where(function ($query) {
+                                    $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
+                                          ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
+                                          ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
+                                })
+                                //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                                ->select(DB::raw('  COD_ORDEN,
+                                                    FEC_ORDEN,
+                                                    TXT_CATEGORIA_MONEDA,
+                                                    TXT_EMPR_CLIENTE,
+                                                    COD_USUARIO_CREA_AUD,
+                                                    MAX(CAN_TOTAL) CAN_TOTAL,
+                                                    MAX(ID_DOCUMENTO) AS ID_DOCUMENTO,
+                                                    MAX(COD_ESTADO) AS COD_ESTADO,
+                                                    MAX(TXT_ESTADO) AS TXT_ESTADO,
+                                                    MAX(TXT_CONFORMIDAD) AS TXT_CONFORMIDAD
+                                                '))
+                                ->groupBy('COD_ORDEN')
+                                ->groupBy('FEC_ORDEN')
+                                ->groupBy('TXT_CATEGORIA_MONEDA')
+                                ->groupBy('TXT_EMPR_CLIENTE')
+                                ->groupBy('COD_USUARIO_CREA_AUD')
+                                ->get();
+
+
+
+        return  $listadatos;
+    }
 
 
     private function con_lista_cabecera_contrato_administrativo($cliente_id) {

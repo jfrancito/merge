@@ -15,6 +15,13 @@
     @foreach($listadatos as $index => $item)
       <tr data_requerimiento_id = "{{$item->ID_DOCUMENTO}}"
           data_linea = "{{$item->DOCUMENTO_ITEM}}"
+          data_orden_compra = "{{$item->COD_ORDEN}}"
+          data_proveedor = "{{$item->TXT_EMPR_CLIENTE}}"
+          data_serie = "{{$item->SERIE}}"
+          data_numero = "{{$item->NUMERO}}"
+          data_total = "{{$item->CAN_TOTAL}}"
+
+
           class='dobleclickpc seleccionar'
         >
         <td>{{$index+1}}</td>

@@ -182,7 +182,161 @@ class GestionOCTesoreriaController extends Controller
                          ]);
     }
 
+    public function actionListarAjaxModalTesoreriaPagoMasivo(Request $request)
+    {
+        
 
+        $idopcion               =   $request['idopcion'];
+        $datastring_n           =   $request['datastring'];
+        $datastring             =   json_decode($request['datastring'], false);
+
+        $archivosdelfe          =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000028'])
+                                    ->get();
+
+        foreach ($datastring as $index_asiento => $item1) {
+
+            DB::table('CMP.DOC_ASOCIAR_COMPRA')->where('COD_ORDEN','=',$item1->id)
+                                               ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000028')->delete();
+
+            foreach($archivosdelfe as $index=>$item){
+                    $categoria                               =   CMPCategoria::where('COD_CATEGORIA','=',$item->COD_CATEGORIA)->first();
+                    $docasociar                              =   New CMPDocAsociarCompra;
+                    $docasociar->COD_ORDEN                   =   $item1->id;
+                    $docasociar->COD_CATEGORIA_DOCUMENTO     =   $categoria->COD_CATEGORIA;
+                    $docasociar->NOM_CATEGORIA_DOCUMENTO     =   $categoria->NOM_CATEGORIA;
+                    $docasociar->IND_OBLIGATORIO             =   $categoria->IND_DOCUMENTO_VAL;
+                    $docasociar->TXT_FORMATO                 =   $categoria->COD_CTBLE;
+                    $docasociar->TXT_ASIGNADO                =   $categoria->TXT_ABREVIATURA;
+                    $docasociar->COD_USUARIO_CREA_AUD        =   Session::get('usuario')->id;
+                    $docasociar->FEC_USUARIO_CREA_AUD        =   $this->fechaactual;
+                    $docasociar->COD_ESTADO                  =   1;
+                    $docasociar->TIP_DOC                     =   $categoria->CODIGO_SUNAT;
+                    $docasociar->save();
+            }
+
+            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$item1->id)->where('COD_ESTADO','=',1)
+                                        ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000028'])
+                                        ->get();
+
+        }
+
+
+        return View::make('comprobante/modal/ajax/magregarpagotesoreriamasivo',
+                         [          
+                            'datastring_n'          => $datastring_n,
+                            'datastring'            => $datastring,
+                            'idopcion'              => $idopcion,
+                            'tarchivos'             => $tarchivos,
+                            'ajax'                  => true,                            
+                         ]);
+    }
+
+
+    public function actionAprobarTesoreriaMasivo($idopcion,Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+
+        View::share('titulo','Aprobar  Comprobante');
+
+        if($_POST)
+        {
+
+            try{    
+                
+                DB::beginTransaction();
+                $datastring         =   json_decode($request['datastring'], false);
+
+                foreach ($datastring as $index_asiento => $itemc) {
+
+
+                $pedido_id          =   $itemc->id;
+                $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('COD_ESTADO','=','ETM0000000000005')->first();
+                $orden              =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();
+                $tarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$pedido_id)->where('COD_ESTADO','=',1)
+                                        ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000028')
+                                        ->get();
+                $ordencompra        =   $this->con_lista_cabecera_comprobante_idoc_actual($pedido_id);
+                foreach($tarchivos as $index => $item){
+
+                    $filescdm          =   $request[$item->COD_CATEGORIA_DOCUMENTO];
+                    if(!is_null($filescdm)){
+
+                        foreach($filescdm as $file){
+
+                            $larchivos       =      Archivo::get();
+                            $nombre          =      $pedido_id.'-'.$file->getClientOriginalName();
+                            /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
+                            $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
+                            $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
+                            // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
+                            $nombrefilecdr   =      count($larchivos).'-'.$file->getClientOriginalName();
+                            $valor           =      $this->versicarpetanoexiste($rutafile);
+                            $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
+                            copy($file->getRealPath(),$rutacompleta);
+                            $path            =      $rutacompleta;
+
+                            $nombreoriginal             =   $file->getClientOriginalName();
+                            $info                       =   new SplFileInfo($nombreoriginal);
+                            $extension                  =   $info->getExtension();
+
+                            $dcontrol                       =   new Archivo;
+                            $dcontrol->ID_DOCUMENTO         =   $ordencompra->COD_ORDEN;
+                            $dcontrol->DOCUMENTO_ITEM       =   $fedocumento->DOCUMENTO_ITEM;
+                            $dcontrol->TIPO_ARCHIVO         =   $item->COD_CATEGORIA_DOCUMENTO;
+                            $dcontrol->NOMBRE_ARCHIVO       =   $nombrefilecdr;
+                            $dcontrol->DESCRIPCION_ARCHIVO  =   $item->NOM_CATEGORIA_DOCUMENTO;
+
+
+                            $dcontrol->URL_ARCHIVO      =   $path;
+                            $dcontrol->SIZE             =   filesize($file);
+                            $dcontrol->EXTENSION        =   $extension;
+                            $dcontrol->ACTIVO           =   1;
+                            $dcontrol->FECHA_CREA       =   $this->fechaactual;
+                            $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
+                            $dcontrol->save();
+                        }
+                    }
+                }
+
+                FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('COD_ESTADO','=','ETM0000000000005')
+                            ->update(
+                                [
+                                    'COD_ESTADO'=>'ETM0000000000008',
+                                    'TXT_ESTADO'=>'TERMINADA',
+                                    'fecha_tes'=>$this->fechaactual,
+                                    'usuario_tes'=>Session::get('usuario')->id
+                                ]
+                            );
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento                              =   new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA                       =   $this->fechaactual;
+                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                $documento->TIPO                        =   'SUBIO COMPROBANTE DE PAGO';
+                $documento->MENSAJE                     =   '';
+                $documento->save();
+
+
+                }
+
+
+                DB::commit();
+                return Redirect::to('/gestion-de-tesoreria-aprobar/'.$idopcion)->with('bienhecho', 'Comprobantes Masivo Aprobado con exito');
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                return Redirect::to('gestion-de-tesoreria-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+
+        }
+ 
+    }
 
 
 

@@ -67,6 +67,62 @@ $(document).ready(function(){
     });
 
 
+    $(".areatesoreria").on('click','.asignarmasivo', function() {
+
+        var _token                  =   $('#token').val();
+        var idopcion                =   $('#idopcion').val();
+
+
+        var array_item              =   datamasivo();
+        if(array_item.length<=0){alerterrorajax('No existe ningun registro'); return false;}
+        datastring = JSON.stringify(array_item);
+
+        data                        =   {
+                                            _token                  : _token,
+                                            datastring              : datastring,
+                                            idopcion                : idopcion
+                                        };
+
+        ajax_modal(data,"/ajax-modal-tesoreria-pago-masivo",
+                  "modal-detalle-requerimiento-masivo","modal-detalle-requerimiento-masivo-container");
+
+    });
+
+
+    function datamasivo(){
+        var data = [];
+
+        $(".listatabla tr").each(function(){
+
+            check                       = $(this).find('input');
+            data_requerimiento_id       = $(this).attr('data_requerimiento_id');
+
+            data_orden_compra           = $(this).attr('data_orden_compra');
+            data_proveedor              = $(this).attr('data_proveedor');
+            data_serie                  = $(this).attr('data_serie');            
+            data_numero                 = $(this).attr('data_numero');
+            data_total                  = $(this).attr('data_total');
+
+            if($(check).is(':checked')){
+                data.push({
+                    id: data_requerimiento_id,
+                    data_orden_compra: data_orden_compra,
+                    data_proveedor: data_proveedor,
+                    data_serie: data_serie,
+                    data_numero: data_numero,
+                    data_total: data_total,
+
+                });
+
+
+
+            } 
+
+        });
+
+        return data;
+    }
+
 
     function dataenviar(){
             var data = [];

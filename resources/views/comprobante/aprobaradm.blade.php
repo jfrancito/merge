@@ -77,6 +77,38 @@
       @endforeach
 
 
+      @foreach($archivospdf as $index => $item)
+        $('#file-'+{{$index}}).on('filezoomshown', function(event, params) {
+            // Ajustar el modal de zoom para que se maximice
+            var modal = params.modal;
+            modal.find('.modal-dialog').css({
+                'max-width': '100%',
+                'width': '100%',
+                'height': '100%',
+                'max-height': '100%',
+            });
+            modal.find('.modal-content').css({
+                'height': '100%',
+            });
+            modal.find('.modal-body').css({
+                'height': 'calc(100% - 55px)', // Ajusta la altura del cuerpo del modal
+                'overflow': 'auto',
+            });
+            modal.find('img').css({
+                'width': '100%',
+                'height': 'auto',
+            });
+
+            // Activar el modo de pantalla completa
+            setTimeout(function() {
+                modal.find('.btn-kv-fullscreen').trigger('click');
+            }, 100); // Retraso para asegurar que el modal está completamente cargado
+        });
+      @endforeach
+
+
+
+
     </script>
 
 

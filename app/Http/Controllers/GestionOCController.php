@@ -72,7 +72,8 @@ class GestionOCController extends Controller
 
         header('Content-Type: text/html; charset=UTF-8');
         //$path = storage_path() . "/exports/FC26-00002985.XML";
-        $path = storage_path() . "/exports/20612526754-01-F001-00000046.xml";
+        $path = storage_path() . "/exports/20608931156-01-FB06-00006770.xml";
+
 
         $parser = new InvoiceParser();
         $xml = file_get_contents($path);
@@ -454,6 +455,64 @@ class GestionOCController extends Controller
 
 
     }
+
+
+
+    public function actionListarOCFiltro($idopcion)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Ver');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        View::share('titulo','Filtro de Comprobante');
+        $operacion_id       =   'ORDEN_COMPRA';
+        $array_contrato     =   $this->array_rol_contrato();
+        if (in_array(Session::get('usuario')->rol_id, $array_contrato)) {
+            $operacion_id       =   'CONTRATO';
+        }
+        $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO');
+        $cod_empresa        =   Session::get('usuario')->usuarioosiris_id;
+        $procedencia        =   'ADM';
+        $funcion            =   $this;
+
+        $listadatos         =   $this->con_lista_cabecera_comprobante_administrativo_filtro($cod_empresa);
+
+        return View::make('comprobante/listaocfiltro',
+                         [
+                            'listadatos'        =>  $listadatos,
+                            'procedencia'       =>  $procedencia,
+                            'operacion_id'      =>  $operacion_id,
+                            'combo_operacion'   =>  $combo_operacion,
+                            'funcion'           =>  $funcion,
+                            'idopcion'          =>  $idopcion,
+                         ]);
+
+
+
+
+    }
+
+
+    public function actionGuardarOCFiltro(Request $request)
+    {
+
+        $ind_mobil                          =   $request['ind_mobil'];
+        $producto_id                        =   $request['producto_id'];
+        $txt_confirma                       =   '';
+
+        if($ind_mobil=='1'){
+            $txt_confirma                   =   Session::get('usuario')->nombre;;
+        }
+
+        $producto                           =   CMPOrden::where('COD_ORDEN','=',$producto_id)->first();
+        $producto->TXT_CONFORMIDAD          =   $txt_confirma;
+        $producto->save();
+
+    }
+
+
+
 
 
     public function actionListarAjaxBuscarDocumentoAdmin(Request $request) {

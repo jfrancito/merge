@@ -2,6 +2,57 @@ $(document).ready(function(){
 
     var carpeta = $("#carpeta").val();
 
+
+    $(".agestioncomprobante").on('click','.input_check_pe_ln', function() {
+        producto_id  = $(this).attr('data_producto');
+        check = $(this).is(':checked');
+        debugger;
+
+        $.confirm({
+            title: '¿Confirma la Aprobacion?',
+            content: 'Filtro los Comprobantes',
+            buttons: {
+                confirmar: function () {
+                    if(check){
+                        ajax_ind_mobil(1,producto_id);
+                    }else{
+                        ajax_ind_mobil(0,producto_id);
+                    } 
+
+
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo Filtro');
+                    window.location.reload();
+                }
+            }
+        });
+
+
+
+
+    });
+
+
+
+    function ajax_ind_mobil(ind_mobil,producto_id){
+
+        var _token      = $('#token').val();
+        debugger;
+
+        data            =   {
+                                _token                  : _token,
+                                ind_mobil               : ind_mobil,
+                                producto_id             : producto_id
+                            };
+
+        ajax_normal(data,"/ajax-filtro-guardar");
+        alertajax("Filtro asignado exitosa");
+
+    }
+
+
+
     $(".cfedocumento").on('click','.buscardocumento', function() {
 
         event.preventDefault();
