@@ -1891,7 +1891,7 @@ class GestionOCController extends Controller
                                     ->first();
 
 
-        dd($rhxml);
+        //dd($rhxml);
 
         if(count($rhxml)>0){
             $xmlfactura             =   $rhxml->NOM_CATEGORIA_DOCUMENTO;
