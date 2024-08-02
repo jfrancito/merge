@@ -1760,13 +1760,19 @@ class GestionOCController extends Controller
         $sourceFile = '\\\\10.1.0.201\cpe\Orden_Compra';
 
 
-        if($ordencompra_f->COD_CENTRO == 'CEN0000000000004' or $ordencompra_f->COD_CENTRO == 'CEN0000000000006'){
+        if($ordencompra_f->COD_CENTRO == 'CEN0000000000004' or $ordencompra_f->COD_CENTRO == 'CEN0000000000006' or $ordencompra_f->COD_CENTRO == 'CEN0000000000002'){
             if($ordencompra_f->COD_CENTRO == 'CEN0000000000004'){
                 $sourceFile = '\\\\10.1.7.200\\cpe\\Orden_Compra\\'.$ordencompra->COD_ORDEN.'.pdf';
             }
             if($ordencompra_f->COD_CENTRO == 'CEN0000000000006'){
                 $sourceFile = '\\\\10.1.9.43\\cpe\\Orden_Compra\\'.$ordencompra->COD_ORDEN.'.pdf';
             }
+
+            if($ordencompra_f->COD_CENTRO == 'CEN0000000000002'){
+                $sourceFile = '\\\\10.1.4.201\\cpe\\Orden_Compra\\'.$ordencompra->COD_ORDEN.'.pdf';
+            }
+
+            
             $destinationFile = '\\\\10.1.0.201\\cpe\\Orden_Compra\\'.$ordencompra->COD_ORDEN.'.pdf';
 
             //dd($sourceFile);
