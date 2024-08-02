@@ -13,14 +13,30 @@
             <div class="col-sm-12">
               <div class="panel panel-default panel-border-color panel-border-color-success">
                 <div class="panel-heading">{{ $titulo }}
+
                   <div class="tools tooltiptop">
-                    <div class="tools tooltiptop">
-                      <a href="#" class="tooltipcss opciones buscardocumentoadmin">
-                        <span class="tooltiptext">Buscar Documento</span>
-                        <span class="icon mdi mdi-search"></span>
-                      </a>
-                    </div>
+
+                    <a href="{{ url('/migracion-rioja/k5X') }}" class="btn btn-secondary botoncabecera tooltipcss opciones btn_rb">
+                      <span class="tooltiptext">Migraion Rioja</span>
+                      M.R.
+                    </a>
+
+                    <a href="{{ url('/migracion-bellavista/k5X') }}" class="btn btn-secondary botoncabecera tooltipcss opciones btn_rb">
+                      <span class="tooltiptext">Migraion Bellavista</span>
+                      M.B.
+                    </a>
+
+                    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscardocumentoadmin">
+                      <span class="tooltiptext">Buscar Documento</span>
+                      <span class="icon mdi mdi-search"></span>
+                    </a>
+
+
                   </div>
+
+
+
+
                 </div>
 
 

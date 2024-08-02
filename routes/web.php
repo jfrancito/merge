@@ -112,6 +112,10 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/validar-xml-oc/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionValidarXML');
 
 	Route::any('/ajax-buscar-documento-gestion-admin', 'GestionOCController@actionListarAjaxBuscarDocumentoAdmin');
+	Route::any('/migracion-rioja/{idopcion}', 'GestionOCController@actionListarOCAdminMR');
+	Route::any('/migracion-bellavista/{idopcion}', 'GestionOCController@actionListarOCAdminMB');
+
+
 
 
 	Route::any('/gestion-de-filtro-comprobante/{idopcion}', 'GestionOCController@actionListarOCFiltro');

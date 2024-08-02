@@ -967,6 +967,8 @@ class GestionOCAdministracionController extends Controller
                     $referenciaAsocQuery = FeDocumento::select('*')
                         ->where('ID_DOCUMENTO', '=', $orden->COD_ORDEN)
                         ->get();
+
+                        
                     //dd($referenciaAsocQuery);
                     // Convertir el resultado en un array para poder insertarlo más adelante
                     $dataToInsert = $referenciaAsocQuery->toArray();

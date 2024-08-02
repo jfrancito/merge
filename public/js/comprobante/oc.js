@@ -2,6 +2,10 @@ $(document).ready(function(){
 
     var carpeta = $("#carpeta").val();
 
+    $(".agestioncomprobante").on('click','.btn_rb', function() {
+       abrircargando();
+    });
+
 
     $(".agestioncomprobante").on('click','.input_check_pe_ln', function() {
         producto_id  = $(this).attr('data_producto');

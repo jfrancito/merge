@@ -45,7 +45,7 @@ use App\Traits\GeneralesTraits;
 use App\Traits\ComprobanteTraits;
 use App\Traits\WhatsappTraits;
 use App\Traits\ComprobanteProvisionTraits;
-
+use PDO;
 
 use Storage;
 use ZipArchive;
@@ -72,7 +72,7 @@ class GestionOCController extends Controller
 
         header('Content-Type: text/html; charset=UTF-8');
         //$path = storage_path() . "/exports/FC26-00002985.XML";
-        $path = storage_path() . "/exports/20608931156-01-FB06-00006770.xml";
+        $path = storage_path() . "/exports/20137868955-01-F001-61130 GS1.xml";
 
 
         $parser = new InvoiceParser();
@@ -415,6 +415,31 @@ class GestionOCController extends Controller
                             'idopcion'          =>  $idopcion,
                          ]);
     }
+
+
+
+
+    public function actionListarOCAdminMR($idopcion)
+    {
+
+        $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC SCS_MERGE_PORTAL_RJ');
+        $stmt->execute();
+
+        return Redirect::to('gestion-de-orden-compra/'.$idopcion);
+
+    }
+
+
+    public function actionListarOCAdminMB($idopcion)
+    {
+
+        $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC SCS_MERGE_PORTAL_BE');
+        $stmt->execute();
+        return Redirect::to('gestion-de-orden-compra/'.$idopcion);
+
+    }
+
+
     public function actionListarOCAdmin($idopcion)
     {
 
@@ -451,12 +476,7 @@ class GestionOCController extends Controller
                             'idopcion'          =>  $idopcion,
                          ]);
 
-
-
-
     }
-
-
 
     public function actionListarOCFiltro($idopcion)
     {
@@ -1870,9 +1890,13 @@ class GestionOCController extends Controller
                                     ->where('TXT_ASIGNADO','=','PROVEEDOR')
                                     ->first();
 
+
+        dd($rhxml);
+
         if(count($rhxml)>0){
             $xmlfactura             =   $rhxml->NOM_CATEGORIA_DOCUMENTO;
         }
+
 
 
 
