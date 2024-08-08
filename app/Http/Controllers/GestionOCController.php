@@ -72,7 +72,7 @@ class GestionOCController extends Controller
 
         header('Content-Type: text/html; charset=UTF-8');
         //$path = storage_path() . "/exports/FC26-00002985.XML";
-        $path = storage_path() . "/exports/20137868955-01-F001-61130 GS1.xml";
+        $path = storage_path() . "/exports/F005-00020519.xml";
 
 
         $parser = new InvoiceParser();

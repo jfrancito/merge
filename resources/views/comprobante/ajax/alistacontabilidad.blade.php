@@ -30,6 +30,15 @@
                 @endif
               @endif
           </span>
+
+          <span><b>CAJA CHICA : </b>  
+              @if($item->TXT_A_TIEMPO == 'CAJA_SI') 
+                <span class="badge badge-success" style="display: inline-block;">{{$item->TXT_A_TIEMPO}}</span>
+              @else
+                <span class="badge badge-default" style="display: inline-block;">{{$item->TXT_A_TIEMPO}}</span>
+              @endif
+          </span>          
+
         </td>
 
         <td class="cell-detail sorting_1" style="position: relative;">
