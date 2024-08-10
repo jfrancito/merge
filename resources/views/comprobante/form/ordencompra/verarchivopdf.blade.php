@@ -1,5 +1,6 @@
 <div class="panel panel-default panel-contrast ver-archivos">
-  <div class="panel-heading" style="background: #1d3a6d;color: #fff;">VER ARCHIVOS PDF
+  <div class="panel-heading" style="background: #1d3a6d;color: #fff;">VER ARCHIVOS PDF  
+    <a href="{{ url('/modificar-pdf-guias/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -9))) }}" class="btn btn-rounded btn-space btn-primary">GUIAS REMITENTE</a>
   </div>
   <div class="panel-body panel-body-contrast">
         @foreach($archivospdf as $index => $item)  

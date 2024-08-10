@@ -479,6 +479,70 @@ class GestionOCAdministracionController extends Controller
 
 
 
+    public function actionModificarContratos($idopcion, $linea, $prefijo, $idordencompra,Request $request)
+    {
+
+            try{    
+                
+                DB::beginTransaction();
+                $idoc                   =   $this->funciones->decodificarmaestraprefijo_contrato($idordencompra,$prefijo);
+                $ordencompra            =   $this->con_lista_cabecera_comprobante_contrato_idoc_actual($idoc);
+                $detalleordencompra     =   $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
+                $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->where('TXT_PROCEDENCIA','<>','SUE')->first();
+                $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+
+
+                $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                            ->where('TIPO_ARCHIVO','like','%GRR%')
+                                            ->get();
+
+                //dd($archivos);
+
+                $sourceFile             =   '\\\\10.1.0.201\\cpe\\Contratos';
+
+                foreach ($archivos as $item) {
+                    $filePath = $sourceFile . '\\' . $item->TIPO_ARCHIVO.'.pdf';  // Asumiendo que tienes un campo NOMBRE_ARCHIVO
+
+                    // Verificar si el archivo existe en la ruta original
+                    if (file_exists($filePath)) {
+                        // Mover el archivo a la nueva ruta
+                        $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);
+                        $newFilePath            =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
+                        $newFilePath            =   $newFilePath.'\\'.$item->NOMBRE_ARCHIVO;
+
+                        //dd($newFilePath);
+                        if (copy($filePath, $newFilePath)) {
+                            print_r("e movio correctaente");
+                        } else {
+                            // Manejo de errores si la operación de renombrar/mover falla
+                            dd("Error al mover el archivo: " . $item->NOMBRE_ARCHIVO);
+                        }
+                    } else {
+                        // El archivo no existe en la ruta original
+                        dd("Archivo no encontrado: " . $filePath);
+                    }
+                }
+
+                FeDocumento::where('ID_DOCUMENTO','=',$idoc)
+                            ->update(
+                                    [
+                                        'ind_observacion'=>0,
+                                    ]);
+
+                DB::commit();
+                return Redirect::to('/detalle-comprobante-oc-validado-contrato/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('bienhecho', 'PDF ACTUALIZADO');
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                return Redirect::to('/detalle-comprobante-oc-validado-contrato/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+
+        
+        
+
+    }
+
+
+
 
 
     public function actionAgregarRecomendacionAdministracion($idopcion, $linea, $prefijo, $idordencompra,Request $request)

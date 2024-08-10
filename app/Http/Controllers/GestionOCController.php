@@ -2280,6 +2280,11 @@ class GestionOCController extends Controller
 
                         //DD($factura);
 
+
+
+                        $rz_p                               =   str_replace(["![CDATA[", "]]"], "", $factura->getcompany()->getrazonSocial());
+                        $rz_p                               =   str_replace("?", "Ñ", $rz_p);
+
                         $documentolinea                     =   $this->ge_linea_documento($ordencompra->COD_ORDEN);
                         $cant_rentencion                    =   $ordencompra_t->CAN_RETENCION;
                         $cant_perception                    =   $factura->getperception();
@@ -2294,7 +2299,7 @@ class GestionOCController extends Controller
                         $documento->TXT_PROCEDENCIA         =   $procedencia;
                         $documento->ESTADO                  =   'A';
                         $documento->RUC_PROVEEDOR           =   $factura->getcompany()->getruc();
-                        $documento->RZ_PROVEEDOR            =   $factura->getcompany()->getrazonSocial();
+                        $documento->RZ_PROVEEDOR            =   $rz_p;
 
 
 
@@ -2599,6 +2604,8 @@ class GestionOCController extends Controller
 
                         }
 
+                        $rz_p                               =   str_replace(["![CDATA[", "]]"], "", $factura->getcompany()->getrazonSocial());
+                        $rz_p                               =   str_replace("?", "Ñ", $rz_p);
 
                         $documentolinea                     =   $this->ge_linea_documento($ordencompra->COD_DOCUMENTO_CTBLE);
                         $cant_rentencion                    =   $ordencompra_t->CAN_RETENCION;
@@ -2614,7 +2621,7 @@ class GestionOCController extends Controller
                         $documento->TXT_PROCEDENCIA         =   $procedencia;
                         $documento->ESTADO                  =   'A';
                         $documento->RUC_PROVEEDOR           =   $factura->getcompany()->getruc();
-                        $documento->RZ_PROVEEDOR            =   $factura->getcompany()->getrazonSocial();
+                        $documento->RZ_PROVEEDOR            =   $rz_p;
 
                         $documento->TIPO_CLIENTE            =   $factura->getClient()->gettipoDoc();
                         $documento->ID_CLIENTE              =   $factura->getClient()->getnumDoc();
