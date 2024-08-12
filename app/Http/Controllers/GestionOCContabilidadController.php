@@ -586,9 +586,14 @@ class GestionOCContabilidadController extends Controller
                 }   
 
                 DB::commit();
+                Session::flash('operacion_id', 'CONTRATO');
+
                 return Redirect::to('/gestion-de-contabilidad-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_DOCUMENTO_CTBLE.' APROBADO CON EXITO');
             }catch(\Exception $ex){
                 DB::rollback(); 
+
+                Session::flash('operacion_id', 'CONTRATO');
+
                 return Redirect::to('gestion-de-contabilidad-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
@@ -941,9 +946,13 @@ class GestionOCContabilidadController extends Controller
                 }  
 
                 DB::commit();
+                Session::flash('operacion_id', 'CONTRATO');
+
                 return Redirect::to('/gestion-de-contabilidad-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_DOCUMENTO_CTBLE.' OBSERVADO CON EXITO');
             }catch(\Exception $ex){
                 DB::rollback(); 
+                Session::flash('operacion_id', 'CONTRATO');
+
                 return Redirect::to('gestion-de-contabilidad-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
@@ -1197,9 +1206,14 @@ class GestionOCContabilidadController extends Controller
                 }  
 
                 DB::commit();
+
+                Session::flash('operacion_id', 'CONTRATO');
+
                 return Redirect::to('/gestion-de-contabilidad-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' RECOMENDACION CON EXITO');
             }catch(\Exception $ex){
                 DB::rollback(); 
+                Session::flash('operacion_id', 'CONTRATO');
+                
                 return Redirect::to('gestion-de-contabilidad-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 

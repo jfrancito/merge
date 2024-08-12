@@ -506,6 +506,8 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             //->where('TXT_PROCEDENCIA','<>','SUE')
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
+                            ->orderBy('fecha_pr','asc')
+                            
                             ->get();
 
         return  $listadatos;

@@ -68,6 +68,9 @@ class GestionOCAdministracionController extends Controller
         if(isset($request['operacion_id'])){
             $operacion_id       =   $request['operacion_id'];
         }
+        if(Session::has('operacion_id')){
+            $operacion_id           =   Session::get('periodo_id_confirmar');
+        }
 
         $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO');
 
@@ -410,9 +413,15 @@ class GestionOCAdministracionController extends Controller
                 }  
 
                 DB::commit();
+
+                Session::flash('operacion_id', 'CONTRATO');
+
                 return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' OBSERVADO CON EXITO');
             }catch(\Exception $ex){
                 DB::rollback(); 
+
+                Session::flash('operacion_id', 'CONTRATO');
+
                 return Redirect::to('gestion-de-administracion-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
@@ -705,9 +714,13 @@ class GestionOCAdministracionController extends Controller
                     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
                 }  
                 DB::commit();
+                Session::flash('operacion_id', 'CONTRATO');
+
                 return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' RECOMENDACION CON EXITO');
             }catch(\Exception $ex){
                 DB::rollback(); 
+                Session::flash('operacion_id', 'CONTRATO');
+                
                 return Redirect::to('gestion-de-administracion-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
         }
@@ -1371,9 +1384,12 @@ class GestionOCAdministracionController extends Controller
                 }    
 
                 DB::commit();
+
+                Session::flash('operacion_id', 'CONTRATO');
                 return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_DOCUMENTO_CTBLE.' APROBADO CON EXITO');
             }catch(\Exception $ex){
                 DB::rollback(); 
+                Session::flash('operacion_id', 'CONTRATO');
                 return Redirect::to('gestion-de-administracion-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
