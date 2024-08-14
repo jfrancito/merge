@@ -134,9 +134,19 @@ class GestionOCValidadoController extends Controller
         $validarurl = $this->funciones->getUrl($idopcion,'Ver');
         if($validarurl <> 'true'){return $validarurl;}
         /******************************************************/
-        View::share('titulo','Historial Ordenes de Compra');
+        View::share('titulo','Historial Comprobante');
         $cod_empresa    =   Session::get('usuario')->name;
-        $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_historial($cod_empresa);
+
+        //falta usuario contacto
+        $operacion_id       =   'ORDEN_COMPRA';
+        $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO TRANSPORTE CARGA');
+
+        if($operacion_id=='ORDEN_COMPRA'){
+            $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_historial($cod_empresa);
+        }else{
+            $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_historial_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id);
+        }
+
         $funcion        =   $this;
 
         //dd($listadatos);
@@ -146,6 +156,41 @@ class GestionOCValidadoController extends Controller
                             'listadatos'        =>  $listadatos,
                             'funcion'           =>  $funcion,
                             'idopcion'          =>  $idopcion,
+                            'operacion_id'           =>  $operacion_id,
+                            'combo_operacion'          =>  $combo_operacion,
+
+
+                         ]);
+    }
+
+
+
+    public function actionListarAjaxBuscarDocumentoHistorial(Request $request) {
+
+
+        $idopcion       =   $request['idopcion'];
+        $operacion_id   =   $request['operacion_id'];
+        $cod_empresa    =   Session::get('usuario')->name;
+
+        if($operacion_id=='ORDEN_COMPRA'){
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_historial($cod_empresa);
+        }else{
+
+
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_historial_contrato($cod_empresa);
+        }
+
+        $funcion        =   $this;
+
+        return View::make('comprobante/ajax/mergelistaocvalidadohistorial',
+                         [
+
+                            'idopcion'              =>  $idopcion,
+                            'cod_empresa'           =>  $cod_empresa,
+                            'listadatos'            =>  $listadatos,
+                            'ajax'                  =>  true,
+                            'operacion_id'            =>  $operacion_id,
+                            'funcion'               =>  $funcion
                          ]);
     }
 

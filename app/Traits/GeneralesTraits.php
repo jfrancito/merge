@@ -50,6 +50,9 @@ trait GeneralesTraits
 		curl_close($curl);
 		$response_array = json_decode($response, true);
 
+
+
+
 		if (!isset($response_array['nomArchivo'])) {
 			$array_nombre_archivo = [
 				'cod_error' => 1,
@@ -72,6 +75,35 @@ trait GeneralesTraits
 	 	return  $array_nombre_archivo;
 
 	}
+
+
+
+	private function buscar_archivo_sunat_compra($urlxml,$fetoken) {
+
+		$array_nombre_archivo = array();
+		$curl = curl_init();
+		curl_setopt_array($curl, array(
+		  CURLOPT_URL => $urlxml,
+		  CURLOPT_RETURNTRANSFER => true,
+		  CURLOPT_ENCODING => '',
+		  CURLOPT_MAXREDIRS => 10,
+		  CURLOPT_TIMEOUT => 0,
+		  CURLOPT_FOLLOWLOCATION => true,
+		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		  CURLOPT_CUSTOMREQUEST => 'GET',
+		  CURLOPT_HTTPHEADER => array(
+		    'Authorization: Bearer '.$fetoken->TOKEN
+		  ),
+		));
+		$response = curl_exec($curl);
+		curl_close($curl);
+		$response_array = json_decode($response, true);
+
+
+	 	return  $response_array;
+
+	}
+
 
 
 	private function gn_combo_categoria_array($titulo,$todo,$array) {

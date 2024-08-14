@@ -51,7 +51,7 @@ use Storage;
 use ZipArchive;
 use Hashids;
 use SplFileInfo;
-
+use Carbon\Carbon;
 class GestionOCController extends Controller
 {
     use GeneralesTraits;
@@ -70,6 +70,13 @@ class GestionOCController extends Controller
     public function actionApiLeerXmlSap(Request $request)
     {
 
+
+$timestamp = hexdec('0x0000000000355486');
+$fecha = Carbon::createFromTimestamp($timestamp);
+dd($fecha->toDateTimeString()); // Formato: 'Y-m-d H:i:s'
+
+
+        dd($decimalValue);
         header('Content-Type: text/html; charset=UTF-8');
         //$path = storage_path() . "/exports/FC26-00002985.XML";
         $path = storage_path() . "/exports/F005-00020519.xml";

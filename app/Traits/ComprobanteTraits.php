@@ -681,6 +681,7 @@ trait ComprobanteTraits
                             //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
                             ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
 							->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('OPERACION','=','ORDEN_COMPRA')
 							->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
 							->get();
 
@@ -688,6 +689,25 @@ trait ComprobanteTraits
 
 	 	return  $listadatos;
 	}
+
+
+    private function con_lista_cabecera_comprobante_total_gestion_historial_contrato($cliente_id) {
+
+
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                            ->where('FE_DOCUMENTO.RUC_PROVEEDOR','=',$cliente_id)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('OPERACION','=','CONTRATO')
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                            ->get();
+
+                            //dd($listadatos);
+
+        return  $listadatos;
+    }
+
+
 
 
 
@@ -807,7 +827,12 @@ trait ComprobanteTraits
 			$ind_moneda 			=	1;	
 		}else{ 	$ind_errototal 		=	0;  }
 		//total
-		if(number_format($ordencompra->CAN_TOTAL, 4, '.', '') == number_format($fedocumento->TOTAL_VENTA_ORIG+$fedocumento->PERCEPCION+$fedocumento->MONTO_RETENCION, 4, '.', '')){
+
+        $total_1 = $ordencompra->CAN_TOTAL;
+        $total_2 = $fedocumento->TOTAL_VENTA_ORIG+$fedocumento->PERCEPCION+$fedocumento->MONTO_RETENCION;
+        $tt_totales = abs($total_1 - $total_2);
+        //0.02
+		if($tt_totales <= 0.01){
 			$ind_total 			=	1;	
 		}else{ 	$ind_errototal 		=	0;  }
 
@@ -965,6 +990,54 @@ trait ComprobanteTraits
         //dd($listadatos);
 	 	return  $listadatos;
 	}
+
+
+
+
+    private function con_lista_cabecera_comprobante_contrato($cliente_id) {
+
+        $estado_no          =   'ETM0000000000006';
+
+                                    
+        $estado_no          =       'ETM0000000000006';
+        $centro_id          =       'CEN0000000000001';
+        $tipodoc_id         =       'TDO0000000000014';
+
+        $listadatos         =       VMergeDocumento::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                        $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
+                                            ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                                    })
+                                    ->where('COD_EMPR_EMISOR','=',$cliente_id)
+                                    ->where('VMERGEDOCUMENTOS.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                    ->where(function ($query) {
+                                        $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
+                                              ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
+                                              ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
+                                    })
+                                    ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
+                                    ->where('COD_CENTRO','=',$centro_id)
+                                    ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
+                                    ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
+                                                        FEC_EMISION,
+                                                        TXT_CATEGORIA_MONEDA,
+                                                        TXT_EMPR_EMISOR,
+                                                        COD_USUARIO_CREA_AUD,
+                                                        CAN_TOTAL,
+                                                        NRO_SERIE,
+                                                        NRO_DOC,
+                                                        
+                                                        FE_DOCUMENTO.ID_DOCUMENTO,
+                                                        FE_DOCUMENTO.COD_ESTADO,
+                                                        FE_DOCUMENTO.TXT_ESTADO
+                                                    '))
+                                    ->get();
+
+        //dd($listadatos);
+        return  $listadatos;
+    }
+
+
+
 
 
 
