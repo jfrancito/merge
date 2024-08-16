@@ -375,6 +375,247 @@ trait ComprobanteTraits
 
     }
 
+
+
+    private function sunat_cdr_contrato() {
+
+        $listafedocumentos      =   FeDocumento::where('COD_ESTADO','=','ETM0000000000007')->where('OPERACION','=','CONTRATO')->get();
+        //dd($listafedocumentos);
+
+        $COD_ORDEN_COMPRA = '';
+        $pathFiles='\\\\10.1.50.2';
+
+        foreach($listafedocumentos as $index=>$item){
+
+                $COD_ORDEN_COMPRA       = '';
+                $sw_opecion             =   0;
+                $sw                     = 0;
+                $codigocdr              = '';
+                $respuestacdr              = '';
+
+
+                $ordencompra            =   $this->con_lista_cabecera_comprobante_contrato_idoc($item->ID_DOCUMENTO);
+                $ordencompra_t          =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$item->ID_DOCUMENTO)->first();
+
+
+                $prefijocarperta        =   $this->prefijo_empresa($item->ID_DOCUMENTO);
+                $fechaemision           =   date_format(date_create($item->FEC_VENTA), 'd/m/Y');
+                $nombre_doc             =   $item->SERIE.'-'.$item->NUMERO;
+
+
+                $numerototal     = $item->NUMERO;
+                $numerototalsc    = ltrim($numerototal, '0');
+                $nombre_doc_sinceros = $item->SERIE.'-'.$numerototalsc;
+
+
+
+
+                if($item->ID_TIPO_DOC == 'R1'){
+
+                    //LECTURA DE CDR
+                    $archivo                =   Archivo::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
+                                                ->where('TIPO_ARCHIVO','=','DCC0000000000004')
+                                                ->first();
+
+                    if(count($archivo)>0){
+
+
+                        $rutafile        =      $pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
+                        $nombrefile      =      $archivo->NOMBRE_ARCHIVO;
+                        $valor           =      $this->versicarpetanoexiste($rutafile);
+                        $rutacompleta    =      $rutafile.'\\'.$nombrefile;
+
+                        $zipFilePath = $archivo->URL_ARCHIVO;
+                        $extractPath = $rutafile;
+
+                        $zip = new ZipArchive;
+                        $fileNames = '';
+                        if ($zip->open($zipFilePath) === TRUE) {
+                            if ($zip->extractTo($extractPath)) {
+                                for ($i = 0; $i < $zip->numFiles; $i++) {
+                                    $fileNames = $zip->getNameIndex($i);
+                                }
+                            } else {
+                                echo 'Hubo un error al descomprimir el archivo.';
+                            }
+                            $zip->close();
+                        } else {
+                            echo 'No se pudo abrir el archivo zip.';
+                        }
+
+                        $extractedFile = $extractPath.'\\'.$fileNames;
+                        if (file_exists($extractedFile)) {
+
+                            //cbc
+                            $xml = simplexml_load_file($extractedFile);
+                            $cbc = 0;
+                            $namespaces = $xml->getNamespaces(true);
+                            foreach ($namespaces as $prefix => $namespace) {
+                                if('cbc'==$prefix){
+                                    $cbc = 1;  
+                                }
+                            }
+                            if($cbc>=1){
+                                foreach($xml->xpath('//cbc:ResponseCode') as $ResponseCode)
+                                {
+                                    $codigocdr  = $ResponseCode;
+                                }
+                                foreach($xml->xpath('//cbc:Description') as $Description)
+                                {
+                                    $respuestacdr  = $Description;
+                                }
+                                foreach($xml->xpath('//cbc:ID') as $ID)
+                                {
+                                    $factura_cdr_id  = $ID;
+                                    if($factura_cdr_id == $nombre_doc || $factura_cdr_id == $nombre_doc_sinceros){
+                                        $sw = 1;
+                                    }
+                                }  
+                            }else{
+                                $xml_ns = simplexml_load_file($extractedFile);
+
+                                // Namespace definitions
+                                $ns4 = "urn:oasis:names:specification:ubl:schema:xsd:ApplicationResponse-2";
+                                $ns3 = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
+                                // Register namespaces
+                                $xml_ns->registerXPathNamespace('ns4', $ns4);
+                                $xml_ns->registerXPathNamespace('ns3', $ns3);
+                                // Querying XML
+                                foreach($xml_ns->xpath('//ns3:DocumentResponse/ns3:Response') as $ResponseCodes)
+                                {
+                                    $codigocdr  = $ResponseCodes->ResponseCode;
+                                }
+                                foreach($xml_ns->xpath('//ns3:DocumentResponse/ns3:Response') as $Description)
+                                {
+                                    $respuestacdr  = $Description->Description;
+                                }
+                                foreach($xml_ns->xpath('//ns3:DocumentReference') as $ID)
+                                {
+                                    $factura_cdr_id  = $ID->ID;
+                                    if($factura_cdr_id == $nombre_doc || $factura_cdr_id == $nombre_doc_sinceros){
+                                        $sw = 1;
+                                    }
+                                }
+                            }
+                        } 
+
+                    }else{
+                        $sw = 1;
+                    }
+
+                }else{
+                        $sw = 1;
+                }
+
+                //LECTURA A SUNAT
+                $token = '';
+                $estadoCp = '';
+                $swlectur = 0;
+                if($prefijocarperta =='II'){
+                    $token           =      $this->generartoken_ii();
+                }else{
+                    $token           =      $this->generartoken_is();
+                }
+
+
+                $rh              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLEod)
+                                            ->where('COD_ESTADO','=',1)
+                                            ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000013'])
+                                            ->get();
+
+                if(count($rh)<=0){
+                    //FACTURA
+                    $rvalidar = $this->validar_xml( $token,
+                                                    $item->ID_CLIENTE,
+                                                    $item->RUC_PROVEEDOR,
+                                                    $item->ID_TIPO_DOC,
+                                                    $item->SERIE,
+                                                    $item->NUMERO,
+                                                    $fechaemision,
+                                                    $item->TOTAL_VENTA_ORIG);
+                }else{
+                    //RECIBO POR HONORARIO
+                    $rvalidar = $this->validar_xml( $token,
+                                                    $item->ID_CLIENTE,
+                                                    $item->RUC_PROVEEDOR,
+                                                    $item->ID_TIPO_DOC,
+                                                    $item->SERIE,
+                                                    $item->NUMERO,
+                                                    $fechaemision,
+                                                    $item->TOTAL_VENTA_ORIG+$item->MONTO_RETENCION);
+                }
+
+
+                $arvalidar = json_decode($rvalidar, true);
+                if(isset($arvalidar['success'])){
+
+                    if($arvalidar['success']){
+
+                        $datares              = $arvalidar['data'];
+                        $estadoCp             = $datares['estadoCp'];
+                        $tablaestacp          = Estado::where('tipo','=','estadoCp')->where('codigo','=',$estadoCp)->first();
+
+                        $estadoRuc            = '';
+                        $txtestadoRuc         = '';
+                        $estadoDomiRuc        = '';
+                        $txtestadoDomiRuc     = '';
+
+                        if(isset($datares['estadoRuc'])){
+                            $tablaestaruc          = Estado::where('tipo','=','estadoRuc')->where('codigo','=',$datares['estadoRuc'])->first();
+                            $estadoRuc             = $tablaestaruc->codigo;
+                            $txtestadoRuc          = $tablaestaruc->nombre;
+                        }
+                        if(isset($datares['condDomiRuc'])){
+                            $tablaestaDomiRuc       = Estado::where('tipo','=','condDomiRuc')->where('codigo','=',$datares['condDomiRuc'])->first();
+                            $estadoDomiRuc          = $tablaestaDomiRuc->codigo;
+                            $txtestadoDomiRuc       = $tablaestaDomiRuc->nombre;
+                        }
+
+                        FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
+                                    ->update(
+                                            [
+                                                'success'=>$arvalidar['success'],
+                                                'message'=>$arvalidar['message'],
+                                                'estadoCp'=>$tablaestacp->codigo,
+                                                'nestadoCp'=>$tablaestacp->nombre,
+                                                'estadoRuc'=>$estadoRuc,
+                                                'nestadoRuc'=>$txtestadoRuc,
+                                                'condDomiRuc'=>$estadoDomiRuc,
+                                                'ncondDomiRuc'=>$txtestadoDomiRuc,
+                                            ]);
+                        $swlectur = 1;
+                    }else{
+                        FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
+                                    ->update(
+                                            [
+                                                'success'=>$arvalidar['success'],
+                                                'message'=>$arvalidar['message']
+                                            ]);
+                    }
+                }
+                //PASAR PARA EL USUARIO DE CONTACTO REALIZE SU APLICACION
+                //el cdr es el de la factura
+
+                if($sw==1 and $swlectur==1){
+                    FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$item->DOCUMENTO_ITEM)
+                                ->update(
+                                    [
+                                        'COD_ESTADO'=>'ETM0000000000002',
+                                        'TXT_ESTADO'=>'POR APROBAR USUARIO CONTACTO',
+                                        'CODIGO_CDR'=>$codigocdr,
+                                        'RESPUESTA_CDR'=>$respuestacdr
+                                    ]
+                                );
+                }
+        }
+
+        print_r('Exitoso '. $COD_ORDEN_COMPRA);
+
+    }
+
+
+
+
 	private function con_lista_cabecera_comprobante_provisionar($cliente_id) {
 
 		$listadatos 	= 	VMergeOC::leftJoin('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')

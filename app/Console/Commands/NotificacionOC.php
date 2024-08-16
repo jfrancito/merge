@@ -55,8 +55,8 @@ class NotificacionOC extends Command
         $this->orden_ingreso_ejecutada();
         //LECTURA DE CDR Y API SUNAT
         $this->sunat_cdr();
-
-
+        //LECTURA DE CDR Y API SUNAT CONTRATO
+        $this->sunat_cdr_contrato();
 
 
         // $this->envio_correo_uc();
