@@ -139,7 +139,7 @@ trait ComprobanteTraits
 
     private function sunat_cdr() {
 
-        $listafedocumentos      =   FeDocumento::where('COD_ESTADO','=','ETM0000000000007')->get();
+        $listafedocumentos      =   FeDocumento::where('COD_ESTADO','=','ETM0000000000007')->where('OPERACION','=','ORDEN_COMPRA')->get();
         //dd($listafedocumentos);
 
         $COD_ORDEN_COMPRA = '';

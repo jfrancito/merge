@@ -51,11 +51,11 @@
                   Aprobar Comprobante
                 </a>  
               </li>
-              <li>
+ <!--              <li>
                 <a href="{{ url('/extornar-pre-aprobar-comprobante/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,6).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -10))) }}">
                   Rechazar Comprobante
                 </a>  
-              </li>
+              </li> -->
             </ul>
           </div>
         </td>

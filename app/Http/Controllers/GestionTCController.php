@@ -86,9 +86,6 @@ class GestionTCController extends Controller
     }
 
 
-
-
-
     public function actionDetalleComprobanteOCProveedor($procedencia,$idopcion, $prefijo, $idordencompra, Request $request) {
 
 
