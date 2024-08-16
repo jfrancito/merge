@@ -652,6 +652,7 @@ trait ComprobanteTraits
 									//->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
 									->whereIn('FE_DOCUMENTO.COD_CONTACTO',$array_trabajadores)
                                     //->where('TXT_PROCEDENCIA','<>','SUE')
+                                    ->where('OPERACION','=','ORDEN_COMPRA')
 									->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
 									->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
 									->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000002','ETM0000000000007'])
@@ -660,6 +661,26 @@ trait ComprobanteTraits
 
 	 	return  $listadatos;
 	}
+
+
+    private function con_lista_cabecera_comprobante_total_contrato_uc($cliente_id) {
+
+        //HACER UNA UNION DE TODAS LOS ID DE TRABAJADORES QUE TIENE ESTE USUARIO
+        $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+        $array_trabajadores  =      STDTrabajador::where('NRO_DOCUMENTO','=',$trabajador->NRO_DOCUMENTO)
+                                    ->pluck('COD_TRAB')
+                                    ->toArray();
+    
+        $listadatos         =       FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                                    //->whereIn('FE_DOCUMENTO.COD_CONTACTO',$array_trabajadores)
+                                    ->where('OPERACION','=','CONTRATO')
+                                    ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                    ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                    ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000002','ETM0000000000007'])
+                                    ->get();
+
+        return  $listadatos;
+    }
 
 
 	private function con_lista_cabecera_comprobante_total_cont($cliente_id) {
