@@ -1,13 +1,13 @@
 
     <div class="panel panel-default panel-contrast">
-      <div class="panel-heading" style="background: #1d3a6d;color: #fff;">COMPARAR (XML - ORDEN COMPRA)
+      <div class="panel-heading" style="background: #1d3a6d;color: #fff;">COMPARAR (XML - CONTRATO)
       </div>
       <div class="panel-body panel-body-contrast">
         <table class="table table-condensed table-striped">
           <thead>
             <tr>
               <th>Valor</th>
-              <th>Orden de Compra</th>      
+              <th>Contrato</th>      
               <th>XML</th>       
             </tr>
           </thead>

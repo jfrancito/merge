@@ -5,7 +5,7 @@
 
                           <div class="tab-container">
                             <ul class="nav nav-tabs">
-                              <li class="active"><a href="#oc" data-toggle="tab">ORDEN COMPRA</a></li>
+                              <li class="active"><a href="#oc" data-toggle="tab">CONTRATO</a></li>
                               <li><a href="#xml" data-toggle="tab">XML</a></li>
                             </ul>
                                           <div class="tab-content">
@@ -14,7 +14,7 @@
                                                   <table class="table table-condensed table-striped">
                                                     <thead>
                                                       <tr>
-                                                        <th>Codigo Orden</th>
+                                                        <th>Contrato</th>
                                                         <th>Fecha Orden</th>      
                                                         <th>Proveedor</th>       
                                                         <th>Total</th>
