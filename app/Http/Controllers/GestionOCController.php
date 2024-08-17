@@ -2168,7 +2168,6 @@ dd($fecha->toDateTimeString()); // Formato: 'Y-m-d H:i:s'
 
         //dd($array_guias);
 
-
         $combodocumento             =   array('DCC0000000000002' => 'FACTURA ELECTRONICA' , 'DCC0000000000013' => 'RECIBO POR HONORARIO');
         $documento_id               =   'DCC0000000000002';
         $funcion                    =   $this;

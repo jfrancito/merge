@@ -1211,7 +1211,7 @@ trait ComprobanteTraits
 
 
     private function array_rol_contrato() {
-        $array = ['1CIX00000003'];
+        $array = ['1CIX00000003','1CIX00000008'];
         return $array;
     }
 
@@ -1445,7 +1445,10 @@ trait ComprobanteTraits
                                     ->toArray();
                                     
         $estado_no          =       'ETM0000000000006';
-        $centro_id          =       'CEN0000000000001';
+
+
+
+        $centro_id          =       $trabajador->COD_ZONA_TIPO;
         $tipodoc_id         =       'TDO0000000000014';
 
         $listadatos         =       VMergeDocumento::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){

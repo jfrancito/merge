@@ -22,6 +22,7 @@ use App\Modelos\CMPDocAsociarCompra;
 use App\Modelos\CMPCategoria;
 use App\Modelos\CMPDetalleProducto;
 use App\Modelos\CMPDocumentoCtble;
+use App\Modelos\CMPReferecenciaAsoc;
 
 
 
@@ -603,10 +604,7 @@ class GestionUsuarioContactoController extends Controller
             $listadatos     =   $this->con_lista_cabecera_comprobante_total_contrato_uc($cod_empresa);
         }
 
-        $listadatos     =   $this->con_lista_cabecera_comprobante_total_contrato_uc($cod_empresa);
-
-
-        $funcion        =   $this;
+        $funcion            =   $this;
         return View::make('comprobante/listausuariocontacto',
                          [
                             'listadatos'        =>  $listadatos,
@@ -1162,9 +1160,9 @@ class GestionUsuarioContactoController extends Controller
         $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
         if($validarurl <> 'true'){return $validarurl;}
         /******************************************************/
-        $idoc                   =   $this->funciones->decodificarmaestraprefijo($idordencompra,$prefijo);
-        $ordencompra            =   $this->con_lista_cabecera_comprobante_idoc($idoc);
-        $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc($idoc);
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo_contrato($idordencompra,$prefijo);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_contrato_idoc_actual($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
         $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
         $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
         View::share('titulo','Aprobar  Comprobante');
@@ -1394,24 +1392,26 @@ class GestionUsuarioContactoController extends Controller
             $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
 
+
             //encontrar la orden de compra
-            $fileordencompra            =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
-                                            ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000001')
+            $fileordencompra            =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)
+                                            ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000026')
                                             ->where('COD_ESTADO','=','1')
                                             ->first();
+
             $rutafila                   =   "";
             $rutaorden                  =   "";
-
             if(count($fileordencompra)>0){
-                $directorio = '\\\\10.1.0.201\cpe\Orden_Compra';
+                $directorio = '\\\\10.1.0.201\cpe\Contratos';
                 // Nombre del archivo que estás buscando
-                $nombreArchivoBuscado = $ordencompra->COD_ORDEN.'.pdf';
+                $nombreArchivoBuscado = $ordencompra->COD_DOCUMENTO_CTBLE.'.pdf';
                 // Escanea el directorio
-                $archivose = scandir($directorio);
+                $archivos = scandir($directorio);
+                //dd($ordencompra);
                 // Inicializa una variable para almacenar el resultado
                 $archivoEncontrado = false;
                 // Recorre la lista de archivos
-                foreach ($archivose as $archivo) {
+                foreach ($archivos as $archivo) {
                     // Omite los elementos '.' y '..'
                     if ($archivo != '.' && $archivo != '..') {
                         // Verifica si el nombre del archivo coincide con el archivo buscado
@@ -1423,20 +1423,76 @@ class GestionUsuarioContactoController extends Controller
                 }
                 // Muestra el resultado
                 if ($archivoEncontrado) {
-                    $rutafila         =   $directorio.'\\'.$nombreArchivoBuscado;
-                    $rutaorden           =  $rutafila;
+
+                    $rutafila            =   $directorio.'\\'.$nombreArchivoBuscado;
+                    $rutaorden           =   $rutafila;
                 } 
             }
 
-                    
+
+
+            //todas las guias relacionadas
+            $arrayreferencia_guia       =   CMPReferecenciaAsoc::where('COD_TABLA','=',$ordencompra->COD_DOCUMENTO_CTBLE)
+                                            ->where('COD_TABLA_ASOC', 'like', '%GRR%')
+                                            ->where('COD_ESTADO','=',1)
+                                            ->pluck('COD_TABLA_ASOC')
+                                            ->toArray();
+            $lista_guias                 =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$arrayreferencia_guia)
+                                            ->where('COD_ESTADO','=',1)
+                                            ->get();
+            $array_guias                 =   array();                               
+            $rutaordenguia               =   "";
+            foreach ($lista_guias as $index=>$item) {
+                $array_nuevo            =   array(); 
+
+                $directorio = '\\\\10.1.0.201\cpe\Contratos';
+                // Nombre del archivo que estás buscando
+                $nombreArchivoBuscado = $item->COD_DOCUMENTO_CTBLE.'.pdf';
+                // Escanea el directorio
+                $archivos = scandir($directorio);
+                // Inicializa una variable para almacenar el resultado
+                $archivoEncontrado = false;
+                // Recorre la lista de archivos
+                foreach ($archivos as $archivo) {
+                    // Omite los elementos '.' y '..'
+                    if ($archivo != '.' && $archivo != '..') {
+                        // Verifica si el nombre del archivo coincide con el archivo buscado
+                        if ($archivo == $nombreArchivoBuscado) {
+                            $archivoEncontrado = true;
+                            break;
+                        }
+                    }
+                }
+                // Muestra el resultado
+                if ($archivoEncontrado) {
+                    $rutaordenguia           =   $directorio.'\\'.$nombreArchivoBuscado;
+                    $array_nuevo             =  array(
+                                                    "COD_DOCUMENTO_CTBLE"       => $item->COD_DOCUMENTO_CTBLE,
+                                                    "NRO_SERIE"                 => $item->NRO_SERIE,
+                                                    "NRO_DOC"                   => $item->NRO_DOC,
+                                                    "rutaordenguia"             => $rutaordenguia,
+                                                );
+                    array_push($array_guias,$array_nuevo);
+                }else{
+                    $rutaordenguia           =  '';
+                    $array_nuevo             =  array(
+                                                    "COD_DOCUMENTO_CTBLE"       => $item->COD_DOCUMENTO_CTBLE,
+                                                    "NRO_SERIE"                 => $item->NRO_SERIE,
+                                                    "NRO_DOC"                   => $item->NRO_DOC,
+                                                    "rutaordenguia"             => $rutaordenguia,
+                                                );
+                    array_push($array_guias,$array_nuevo);            }
+            }
+
             $archivospdf            =   Archivo::where('ID_DOCUMENTO','=',$idoc)
                                         ->where('ACTIVO','=','1')
                                         ->where('EXTENSION', 'like', '%'.'pdf'.'%')
                                         ->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                                         ->get();
 
+            $procedencia ='ADM';
 
-            return View::make('comprobante/aprobaruc', 
+            return View::make('comprobante/aprobaruccontrato', 
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
@@ -1451,6 +1507,9 @@ class GestionUsuarioContactoController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'lista_guias'           =>  $lista_guias,
+                                'array_guias'           =>  $array_guias,
+                                'procedencia'           =>  $procedencia,                                
                             ]);
 
 
