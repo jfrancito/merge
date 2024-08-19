@@ -18,7 +18,7 @@ use App\Modelos\Archivo;
 use App\Modelos\VMergeDocumento;
 use App\Modelos\VMergeDocumentoActual;
 use App\Modelos\CMPDocAsociarCompra;
-
+use App\Modelos\WEBRol;
 
 
 use App\Modelos\Estado;
@@ -791,26 +791,6 @@ trait ComprobanteTraits
     }
 
 
-	private function con_lista_cabecera_comprobante_total_gestion($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id) {
-
-
-		$listadatos 	= 	CMPOrden::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
-                            //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
-							->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
-							//->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
-							->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                            ->where('OPERACION','=','ORDEN_COMPRA')
-							->Proveedor($proveedor_id)
-							->Estado($estado_id)
-							->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-							->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
-                            ->orderBy('fecha_uc','asc')
-							->get();
-
-	 	return  $listadatos;
-
-
-	}
 
     private function con_lista_cabecera_comprobante_total_gestion_contrato($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id) {
 
@@ -1300,6 +1280,60 @@ trait ComprobanteTraits
 
 
 
+    private function con_lista_cabecera_comprobante_total_gestion($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id) {
+
+
+        $rol                    =   WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
+
+        $trabajador             =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+        $array_trabajadores     =      STDTrabajador::where('NRO_DOCUMENTO','=',$trabajador->NRO_DOCUMENTO)
+                                        ->pluck('COD_TRAB')
+                                        ->toArray();
+        $array_usuarios         =      SGDUsuario::whereIn('COD_TRABAJADOR',$array_trabajadores)
+                                        ->pluck('COD_USUARIO')
+                                        ->toArray();
+
+
+        if($rol->ind_uc == 1){
+
+
+            $listadatos     =   CMPOrden::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+                                //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                                ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                                ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                ->where('OPERACION','=','ORDEN_COMPRA')
+                                ->Proveedor($proveedor_id)
+                                ->Estado($estado_id)
+                                ->whereIn('CMP.Orden.COD_USUARIO_CREA_AUD',$array_usuarios)
+                                ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                ->orderBy('fecha_uc','asc')
+                                ->get();
+
+        }else{
+
+            $listadatos     =   CMPOrden::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+                                //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                                ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                                ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                ->where('OPERACION','=','ORDEN_COMPRA')
+                                ->Proveedor($proveedor_id)
+                                ->Estado($estado_id)
+                                ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                ->orderBy('fecha_uc','asc')
+                                ->get();
+
+        }
+
+
+
+        return  $listadatos;
+
+
+    }
 
 
 

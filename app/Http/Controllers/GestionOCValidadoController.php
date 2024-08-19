@@ -270,7 +270,7 @@ class GestionOCValidadoController extends Controller
         //dd($documentohistorial);
         $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','1')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
         $funcion                =   $this;
-
+        $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
 
         $archivospdf            =   Archivo::where('ID_DOCUMENTO','=',$idoc)
@@ -299,7 +299,9 @@ class GestionOCValidadoController extends Controller
                             'detallefedocumento'    =>  $detallefedocumento,
                             'documentohistorial'    =>  $documentohistorial,
                             'archivos'              =>  $archivos,
-                            'linea'            =>  $linea,
+                            'archivosanulados'      =>  $archivosanulados,
+
+                            'linea'                 =>  $linea,
                             
                             'xmlarchivo'            =>  $xmlarchivo,
                             'tp'                    =>  $tp,
@@ -319,7 +321,7 @@ class GestionOCValidadoController extends Controller
         $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);
 
 
-        $archivo                =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('TIPO_ARCHIVO','=',$tipo)->where('ACTIVO','=',1)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->first();
+        $archivo                =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('TIPO_ARCHIVO','=',$tipo)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->first();
         
 
         $nombrearchivo          =   trim($archivo->NOMBRE_ARCHIVO);
