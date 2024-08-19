@@ -86,6 +86,64 @@ class GestionTCController extends Controller
     }
 
 
+
+
+    public function actionDescargarComprobanteOCProveedor($procedencia,$idopcion, $prefijo, $idordencompra, Request $request) {
+
+
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo_contrato($idordencompra,$prefijo);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_contrato_idoc($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
+
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
+
+        $ordencompra_f            =      CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$idoc)->first();
+
+        $sourceFile = '\\\\10.1.0.201\cpe\Contratos';
+        if($ordencompra_f->COD_CENTRO == 'CEN0000000000004' or $ordencompra_f->COD_CENTRO == 'CEN0000000000006'or $ordencompra_f->COD_CENTRO == 'CEN0000000000002'){
+            if($ordencompra_f->COD_CENTRO == 'CEN0000000000004'){
+                $sourceFile = '\\\\10.1.7.200\\cpe\\Contratos\\'.$ordencompra->COD_DOCUMENTO_CTBLE.'.pdf';
+            }
+            if($ordencompra_f->COD_CENTRO == 'CEN0000000000006'){
+                $sourceFile = '\\\\10.1.9.43\\cpe\\Contratos\\'.$ordencompra->COD_DOCUMENTO_CTBLE.'.pdf';
+            }
+            if($ordencompra_f->COD_CENTRO == 'CEN0000000000002'){
+                $sourceFile = '\\\\10.1.4.201\\cpe\\Contratos\\'.$ordencompra->COD_DOCUMENTO_CTBLE.'.pdf';
+            }
+
+            $destinationFile = '\\\\10.1.0.201\\cpe\\Contratos\\'.$ordencompra->COD_DOCUMENTO_CTBLE.'.pdf';
+            // Intenta copiar el archivo
+            //dd($sourceFile);
+            if (file_exists($sourceFile)){
+                copy($sourceFile, $destinationFile);
+            }
+        }
+
+        $sourceFile = '\\\\10.1.0.201\cpe\Contratos';
+
+        $nombrearchivo          =   trim($idoc);
+        $nombrefile             =   basename($nombrearchivo.'.pdf');
+        $file                   =   $sourceFile.'\\'.basename($nombrearchivo.'.pdf');
+        //dd($file);
+
+        if(file_exists($file)){
+            header("Cache-Control: public");
+            header("Content-Description: File Transfer");
+            header("Content-Disposition: attachment; filename=$nombrefile");
+            header("Content-Type: application/xml");
+            header("Content-Transfer-Encoding: binary");
+            readfile($file);
+            exit;
+        }else{
+            dd('Documento no encontrado');
+        }
+
+
+
+    }
+
+
+
     public function actionDetalleComprobanteOCProveedor($procedencia,$idopcion, $prefijo, $idordencompra, Request $request) {
 
 

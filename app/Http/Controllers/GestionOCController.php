@@ -1857,6 +1857,231 @@ dd($fecha->toDateTimeString()); // Formato: 'Y-m-d H:i:s'
                          ]);
     }
 
+    public function actionDetalleComprobantecontratoAdministrator($procedencia,$idopcion, $prefijo, $idordencompra, Request $request) {
+
+
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo_contrato($idordencompra,$prefijo);
+
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_contrato_idoc($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
+
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
+        //$ordencompra            =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
+        View::share('titulo','REGISTRO DE COMPROBANTE CONTRATO: '.$idoc);
+        $tiposerie              =   '';
+
+        if(count($fedocumento)>0){
+            $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+            $tiposerie              =   substr($fedocumento->SERIE, 0, 1);
+        }else{
+            $detallefedocumento     =   array();
+        }
+
+        //dd($detallefedocumento);
+
+        $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);
+        $xmlarchivo             =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE.'xml';
+        $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
+        //dd($tp);
+        $contacto               =   DB::table('users')->where('ind_contacto','=',1)->pluck('nombre','id')->toArray();
+        $combocontacto          =   array('' => "Seleccione Contacto") + $contacto;
+        $usuario                =   SGDUsuario::where('COD_USUARIO','=',$ordencompra->COD_USUARIO_CREA_AUD)->first();
+
+
+
+        $xmlfactura             =   'FACTURA';
+        // $rhxml                  =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+        //                             //->where('IND_OBLIGATORIO','=',1)
+        //                             ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000013'])
+        //                             ->where('TXT_ASIGNADO','=','PROVEEDOR')
+        //                             ->first();
+
+        // if(count($rhxml)>0){
+        //     $xmlfactura             =   $rhxml->NOM_CATEGORIA_DOCUMENTO;
+        // }
+
+        if($tiposerie == 'E'){
+
+            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
+                                        ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000004'])
+                                        ->get();
+
+        }else{
+            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
+                                        ->where('COD_CATEGORIA_DOCUMENTO','<>','DCC0000000000003')
+                                        ->whereIn('TXT_ASIGNADO', ['PROVEEDOR','CONTACTO'])
+                                        ->get();
+        }
+
+
+        //encontrar la orden de compra
+        $fileordencompra            =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)
+                                        ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000026')
+                                        ->where('COD_ESTADO','=','1')
+                                        ->first();
+
+
+        $ordencompra_f            =      CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$idoc)->first();
+
+        $sourceFile = '\\\\10.1.0.201\cpe\Contratos';
+        if($ordencompra_f->COD_CENTRO == 'CEN0000000000004' or $ordencompra_f->COD_CENTRO == 'CEN0000000000006'or $ordencompra_f->COD_CENTRO == 'CEN0000000000002'){
+            if($ordencompra_f->COD_CENTRO == 'CEN0000000000004'){
+                $sourceFile = '\\\\10.1.7.200\\cpe\\Contratos\\'.$ordencompra->COD_DOCUMENTO_CTBLE.'.pdf';
+            }
+            if($ordencompra_f->COD_CENTRO == 'CEN0000000000006'){
+                $sourceFile = '\\\\10.1.9.43\\cpe\\Contratos\\'.$ordencompra->COD_DOCUMENTO_CTBLE.'.pdf';
+            }
+            if($ordencompra_f->COD_CENTRO == 'CEN0000000000002'){
+                $sourceFile = '\\\\10.1.4.201\\cpe\\Contratos\\'.$ordencompra->COD_DOCUMENTO_CTBLE.'.pdf';
+            }
+
+            $destinationFile = '\\\\10.1.0.201\\cpe\\Contratos\\'.$ordencompra->COD_DOCUMENTO_CTBLE.'.pdf';
+            // Intenta copiar el archivo
+            //dd($sourceFile);
+            if (file_exists($sourceFile)){
+                copy($sourceFile, $destinationFile);
+            }
+        }
+
+        $rutafila                   =   "";
+        $rutaorden                  =   "";
+        if(count($fileordencompra)>0){
+            $directorio = '\\\\10.1.0.201\cpe\Contratos';
+            // Nombre del archivo que estás buscando
+            $nombreArchivoBuscado = $ordencompra->COD_DOCUMENTO_CTBLE.'.pdf';
+            // Escanea el directorio
+            $archivos = scandir($directorio);
+            // Inicializa una variable para almacenar el resultado
+            $archivoEncontrado = false;
+            // Recorre la lista de archivos
+            foreach ($archivos as $archivo) {
+                // Omite los elementos '.' y '..'
+                if ($archivo != '.' && $archivo != '..') {
+                    // Verifica si el nombre del archivo coincide con el archivo buscado
+                    if ($archivo == $nombreArchivoBuscado) {
+                        $archivoEncontrado = true;
+                        break;
+                    }
+                }
+            }
+            // Muestra el resultado
+            if ($archivoEncontrado) {
+
+                $rutafila            =   $directorio.'\\'.$nombreArchivoBuscado;
+                $rutaorden           =   $rutafila;
+            } 
+        }
+
+
+
+
+        //todas las guias relacionadas
+        $arrayreferencia_guia       =   CMPReferecenciaAsoc::where('COD_TABLA','=',$ordencompra->COD_DOCUMENTO_CTBLE)
+                                        ->where('COD_TABLA_ASOC', 'like', '%GRR%')
+                                        ->where('COD_ESTADO','=',1)
+                                        ->pluck('COD_TABLA_ASOC')
+                                        ->toArray();
+        $lista_guias                 =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$arrayreferencia_guia)
+                                        ->where('COD_ESTADO','=',1)
+                                        ->get();
+
+
+        //dd($lista_guias);
+
+        foreach ($lista_guias as $index=>$item) {
+            $sourceFile = '\\\\10.1.0.201\cpe\Contratos';
+            if($ordencompra_f->COD_CENTRO == 'CEN0000000000004' or $ordencompra_f->COD_CENTRO == 'CEN0000000000006'or $ordencompra_f->COD_CENTRO == 'CEN0000000000002'){
+                if($ordencompra_f->COD_CENTRO == 'CEN0000000000004'){
+                    $sourceFile = '\\\\10.1.7.200\\cpe\\Contratos\\'.$item->COD_DOCUMENTO_CTBLE.'.pdf';
+                }
+                if($ordencompra_f->COD_CENTRO == 'CEN0000000000006'){
+                    $sourceFile = '\\\\10.1.9.43\\cpe\\Contratos\\'.$item->COD_DOCUMENTO_CTBLE.'.pdf';
+                }
+                if($ordencompra_f->COD_CENTRO == 'CEN0000000000002'){
+                    $sourceFile = '\\\\10.1.4.201\\cpe\\Contratos\\'.$item->COD_DOCUMENTO_CTBLE.'.pdf';
+                }
+
+                $destinationFile = '\\\\10.1.0.201\\cpe\\Contratos\\'.$item->COD_DOCUMENTO_CTBLE.'.pdf';
+                // Intenta copiar el archivo
+                //dd($sourceFile);
+                if (file_exists($sourceFile)){
+                    copy($sourceFile, $destinationFile);
+                }
+            }
+        }
+
+        $array_guias                 =   array();                               
+        $rutaordenguia               =   "";
+        foreach ($lista_guias as $index=>$item) {
+            $array_nuevo            =   array(); 
+
+            $directorio = '\\\\10.1.0.201\cpe\Contratos';
+            // Nombre del archivo que estás buscando
+            $nombreArchivoBuscado = $item->COD_DOCUMENTO_CTBLE.'.pdf';
+            // Escanea el directorio
+            $archivos = scandir($directorio);
+            // Inicializa una variable para almacenar el resultado
+            $archivoEncontrado = false;
+            // Recorre la lista de archivos
+            foreach ($archivos as $archivo) {
+                // Omite los elementos '.' y '..'
+                if ($archivo != '.' && $archivo != '..') {
+                    // Verifica si el nombre del archivo coincide con el archivo buscado
+                    if ($archivo == $nombreArchivoBuscado) {
+                        $archivoEncontrado = true;
+                        break;
+                    }
+                }
+            }
+            // Muestra el resultado
+            if ($archivoEncontrado) {
+                $rutaordenguia           =   $directorio.'\\'.$nombreArchivoBuscado;
+                $array_nuevo             =  array(
+                                                "COD_DOCUMENTO_CTBLE"       => $item->COD_DOCUMENTO_CTBLE,
+                                                "NRO_SERIE"                 => $item->NRO_SERIE,
+                                                "NRO_DOC"                   => $item->NRO_DOC,
+                                                "rutaordenguia"             => $rutaordenguia,
+                                            );
+                array_push($array_guias,$array_nuevo);
+            }else{
+                $rutaordenguia           =  '';
+                $array_nuevo             =  array(
+                                                "COD_DOCUMENTO_CTBLE"       => $item->COD_DOCUMENTO_CTBLE,
+                                                "NRO_SERIE"                 => $item->NRO_SERIE,
+                                                "NRO_DOC"                   => $item->NRO_DOC,
+                                                "rutaordenguia"             => $rutaordenguia,
+                                            );
+                array_push($array_guias,$array_nuevo);            }
+        }
+
+        $combodocumento             =   array('DCC0000000000002' => 'FACTURA ELECTRONICA' , 'DCC0000000000013' => 'RECIBO POR HONORARIO');
+        $documento_id               =   'DCC0000000000002';
+        $funcion                    =   $this;
+
+        return View::make('comprobante/registrocomprobantecontratoadministrator',
+                         [
+                            'ordencompra'           =>  $ordencompra,
+                            'detalleordencompra'    =>  $detalleordencompra,
+                            'fedocumento'           =>  $fedocumento,
+                            'detallefedocumento'    =>  $detallefedocumento,
+                            'combocontacto'         =>  $combocontacto,
+                            'procedencia'           =>  $procedencia,
+                            'xmlfactura'            =>  $xmlfactura,
+                            'tp'                    =>  $tp,
+                            'xmlarchivo'            =>  $xmlarchivo,
+                            'tarchivos'             =>  $tarchivos,
+                            'usuario'               =>  $usuario,
+                            'rutaorden'             =>  $rutaorden,
+                            'combodocumento'        =>  $combodocumento,
+                            'documento_id'          =>  $documento_id,
+                            'lista_guias'           =>  $lista_guias,
+                            'array_guias'           =>  $array_guias,
+
+
+                            'funcion'               =>  $funcion,
+                            'idopcion'              =>  $idopcion,
+                         ]);
+    }
 
 
     public function actionDetalleComprobanteOCAdministrator($procedencia,$idopcion, $prefijo, $idordencompra, Request $request) {
@@ -1935,8 +2160,6 @@ dd($fecha->toDateTimeString()); // Formato: 'Y-m-d H:i:s'
 
 
         $sourceFile = '\\\\10.1.0.201\cpe\Orden_Compra';
-
-
         if($ordencompra_f->COD_CENTRO == 'CEN0000000000004' or $ordencompra_f->COD_CENTRO == 'CEN0000000000006'){
             if($ordencompra_f->COD_CENTRO == 'CEN0000000000004'){
                 $sourceFile = '\\\\10.1.7.200\\cpe\\Orden_Compra\\'.$ordencompra->COD_ORDEN.'.pdf';
@@ -1950,8 +2173,6 @@ dd($fecha->toDateTimeString()); // Formato: 'Y-m-d H:i:s'
 
             // Intenta copiar el archivo
             if (file_exists($sourceFile)){
-
-
                 copy($sourceFile, $destinationFile);
             }
         }
@@ -2020,182 +2241,8 @@ dd($fecha->toDateTimeString()); // Formato: 'Y-m-d H:i:s'
                             'idopcion'              =>  $idopcion,
                          ]);
     }
-    public function actionDetalleComprobantecontratoAdministrator($procedencia,$idopcion, $prefijo, $idordencompra, Request $request) {
 
 
-        $idoc                   =   $this->funciones->decodificarmaestraprefijo_contrato($idordencompra,$prefijo);
-
-        $ordencompra            =   $this->con_lista_cabecera_comprobante_contrato_idoc($idoc);
-        $detalleordencompra     =   $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
-
-        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
-        //$ordencompra            =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
-        View::share('titulo','REGISTRO DE COMPROBANTE CONTRATO: '.$idoc);
-        $tiposerie              =   '';
-
-        if(count($fedocumento)>0){
-            $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
-            $tiposerie              =   substr($fedocumento->SERIE, 0, 1);
-        }else{
-            $detallefedocumento     =   array();
-        }
-
-        //dd($detallefedocumento);
-
-        $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);
-        $xmlarchivo             =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE.'xml';
-        $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
-        //dd($tp);
-        $contacto               =   DB::table('users')->where('ind_contacto','=',1)->pluck('nombre','id')->toArray();
-        $combocontacto          =   array('' => "Seleccione Contacto") + $contacto;
-        $usuario                =   SGDUsuario::where('COD_USUARIO','=',$ordencompra->COD_USUARIO_CREA_AUD)->first();
-
-
-
-        $xmlfactura             =   'FACTURA';
-        // $rhxml                  =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
-        //                             //->where('IND_OBLIGATORIO','=',1)
-        //                             ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000013'])
-        //                             ->where('TXT_ASIGNADO','=','PROVEEDOR')
-        //                             ->first();
-
-        // if(count($rhxml)>0){
-        //     $xmlfactura             =   $rhxml->NOM_CATEGORIA_DOCUMENTO;
-        // }
-
-        if($tiposerie == 'E'){
-
-            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
-                                        ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000004'])
-                                        ->get();
-
-        }else{
-            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
-                                        ->where('COD_CATEGORIA_DOCUMENTO','<>','DCC0000000000003')
-                                        ->whereIn('TXT_ASIGNADO', ['PROVEEDOR','CONTACTO'])
-                                        ->get();
-        }
-
-
-        //encontrar la orden de compra
-        $fileordencompra            =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)
-                                        ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000026')
-                                        ->where('COD_ESTADO','=','1')
-                                        ->first();
-
-        $rutafila                   =   "";
-        $rutaorden                  =   "";
-        if(count($fileordencompra)>0){
-            $directorio = '\\\\10.1.0.201\cpe\Contratos';
-            // Nombre del archivo que estás buscando
-            $nombreArchivoBuscado = $ordencompra->COD_DOCUMENTO_CTBLE.'.pdf';
-            // Escanea el directorio
-            $archivos = scandir($directorio);
-            // Inicializa una variable para almacenar el resultado
-            $archivoEncontrado = false;
-            // Recorre la lista de archivos
-            foreach ($archivos as $archivo) {
-                // Omite los elementos '.' y '..'
-                if ($archivo != '.' && $archivo != '..') {
-                    // Verifica si el nombre del archivo coincide con el archivo buscado
-                    if ($archivo == $nombreArchivoBuscado) {
-                        $archivoEncontrado = true;
-                        break;
-                    }
-                }
-            }
-            // Muestra el resultado
-            if ($archivoEncontrado) {
-
-                $rutafila            =   $directorio.'\\'.$nombreArchivoBuscado;
-                $rutaorden           =   $rutafila;
-            } 
-        }
-
-
-        //todas las guias relacionadas
-        $arrayreferencia_guia       =   CMPReferecenciaAsoc::where('COD_TABLA','=',$ordencompra->COD_DOCUMENTO_CTBLE)
-                                        ->where('COD_TABLA_ASOC', 'like', '%GRR%')
-                                        ->where('COD_ESTADO','=',1)
-                                        ->pluck('COD_TABLA_ASOC')
-                                        ->toArray();
-        $lista_guias                 =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$arrayreferencia_guia)
-                                        ->where('COD_ESTADO','=',1)
-                                        ->get();
-        $array_guias                 =   array();                               
-        $rutaordenguia               =   "";
-        foreach ($lista_guias as $index=>$item) {
-            $array_nuevo            =   array(); 
-
-            $directorio = '\\\\10.1.0.201\cpe\Contratos';
-            // Nombre del archivo que estás buscando
-            $nombreArchivoBuscado = $item->COD_DOCUMENTO_CTBLE.'.pdf';
-            // Escanea el directorio
-            $archivos = scandir($directorio);
-            // Inicializa una variable para almacenar el resultado
-            $archivoEncontrado = false;
-            // Recorre la lista de archivos
-            foreach ($archivos as $archivo) {
-                // Omite los elementos '.' y '..'
-                if ($archivo != '.' && $archivo != '..') {
-                    // Verifica si el nombre del archivo coincide con el archivo buscado
-                    if ($archivo == $nombreArchivoBuscado) {
-                        $archivoEncontrado = true;
-                        break;
-                    }
-                }
-            }
-            // Muestra el resultado
-            if ($archivoEncontrado) {
-                $rutaordenguia           =   $directorio.'\\'.$nombreArchivoBuscado;
-                $array_nuevo             =  array(
-                                                "COD_DOCUMENTO_CTBLE"       => $item->COD_DOCUMENTO_CTBLE,
-                                                "NRO_SERIE"                 => $item->NRO_SERIE,
-                                                "NRO_DOC"                   => $item->NRO_DOC,
-                                                "rutaordenguia"             => $rutaordenguia,
-                                            );
-                array_push($array_guias,$array_nuevo);
-            }else{
-                $rutaordenguia           =  '';
-                $array_nuevo             =  array(
-                                                "COD_DOCUMENTO_CTBLE"       => $item->COD_DOCUMENTO_CTBLE,
-                                                "NRO_SERIE"                 => $item->NRO_SERIE,
-                                                "NRO_DOC"                   => $item->NRO_DOC,
-                                                "rutaordenguia"             => $rutaordenguia,
-                                            );
-                array_push($array_guias,$array_nuevo);            }
-        }
-
-        //dd($array_guias);
-
-        $combodocumento             =   array('DCC0000000000002' => 'FACTURA ELECTRONICA' , 'DCC0000000000013' => 'RECIBO POR HONORARIO');
-        $documento_id               =   'DCC0000000000002';
-        $funcion                    =   $this;
-
-        return View::make('comprobante/registrocomprobantecontratoadministrator',
-                         [
-                            'ordencompra'           =>  $ordencompra,
-                            'detalleordencompra'    =>  $detalleordencompra,
-                            'fedocumento'           =>  $fedocumento,
-                            'detallefedocumento'    =>  $detallefedocumento,
-                            'combocontacto'         =>  $combocontacto,
-                            'procedencia'           =>  $procedencia,
-                            'xmlfactura'            =>  $xmlfactura,
-                            'tp'                    =>  $tp,
-                            'xmlarchivo'            =>  $xmlarchivo,
-                            'tarchivos'             =>  $tarchivos,
-                            'usuario'               =>  $usuario,
-                            'rutaorden'             =>  $rutaorden,
-                            'combodocumento'        =>  $combodocumento,
-                            'documento_id'          =>  $documento_id,
-                            'lista_guias'           =>  $lista_guias,
-                            'array_guias'           =>  $array_guias,
-
-
-                            'funcion'               =>  $funcion,
-                            'idopcion'              =>  $idopcion,
-                         ]);
-    }
     public function actionCargarXMLAdministrator($idopcion, $prefijo, $idordencompra,Request $request)
     {
 

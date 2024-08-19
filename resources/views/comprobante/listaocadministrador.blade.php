@@ -16,7 +16,7 @@
 
                   <div class="tools tooltiptop">
 
-                    <a href="{{ url('/migracion-rioja/k5X') }}" class="btn btn-secondary botoncabecera tooltipcss opciones btn_rb">
+<!--                     <a href="{{ url('/migracion-rioja/k5X') }}" class="btn btn-secondary botoncabecera tooltipcss opciones btn_rb">
                       <span class="tooltiptext">Migraion Rioja</span>
                       M.R.
                     </a>
@@ -24,7 +24,7 @@
                     <a href="{{ url('/migracion-bellavista/k5X') }}" class="btn btn-secondary botoncabecera tooltipcss opciones btn_rb">
                       <span class="tooltiptext">Migraion Bellavista</span>
                       M.B.
-                    </a>
+                    </a> -->
 
                     <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscardocumentoadmin">
                       <span class="tooltiptext">Buscar Documento</span>

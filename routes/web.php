@@ -123,6 +123,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/detalle-comprobante-contrato-proveedor/{procedencia}/{idopcion}/{prefijo}/{idordencompra}', 'GestionTCController@actionDetalleComprobanteOCProveedor');
 	Route::any('/subir-xml-cargar-datos-contrato-proveedor/{idopcion}/{prefijo}/{idordencompra}', 'GestionTCController@actionCargarXMLProveedor');
 	Route::any('/validar-xml-contrato-proveedor/{idopcion}/{prefijo}/{idordencompra}', 'GestionTCController@actionValidarXMLProveedor');
+	Route::any('/descargar-comprobante-contrato-proveedor/{procedencia}/{idopcion}/{prefijo}/{idordencompra}', 'GestionTCController@actionDescargarComprobanteOCProveedor');
 
 
 

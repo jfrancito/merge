@@ -60,7 +60,9 @@
                     @endif
                   @endif
                 @endif
-
+                <a href="{{ url('/descargar-comprobante-contrato-proveedor/'.$procedencia.'/'.$idopcion.'/'.substr($item->COD_DOCUMENTO_CTBLE, 0,7).'/'.Hashids::encode(substr($item->COD_DOCUMENTO_CTBLE, -9))) }}">
+                  Descargar Contrato
+                </a>
 
               </li>
             </ul>
