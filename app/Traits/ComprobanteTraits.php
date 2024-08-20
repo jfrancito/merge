@@ -665,19 +665,24 @@ trait ComprobanteTraits
 
     private function con_lista_cabecera_comprobante_total_contrato_uc($cliente_id) {
 
+
         //HACER UNA UNION DE TODAS LOS ID DE TRABAJADORES QUE TIENE ESTE USUARIO
-        $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
-        $array_trabajadores  =      STDTrabajador::where('NRO_DOCUMENTO','=',$trabajador->NRO_DOCUMENTO)
-                                    ->pluck('COD_TRAB')
-                                    ->toArray();
+        $trabajador             =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+
+        $centro_id              =       $trabajador->COD_ZONA_TIPO;
+
+        $array_trabajadores     =      STDTrabajador::where('NRO_DOCUMENTO','=',$trabajador->NRO_DOCUMENTO)
+                                        ->pluck('COD_TRAB')
+                                        ->toArray();
     
-        $listadatos         =       FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
-                                    //->whereIn('FE_DOCUMENTO.COD_CONTACTO',$array_trabajadores)
-                                    ->where('OPERACION','=','CONTRATO')
-                                    ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
-                                    ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                                    ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000002','ETM0000000000007'])
-                                    ->get();
+        $listadatos             =       FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                                        //->whereIn('FE_DOCUMENTO.COD_CONTACTO',$array_trabajadores)
+                                        ->where('OPERACION','=','CONTRATO')
+                                        ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
+                                        ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                        ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                        ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000002','ETM0000000000007'])
+                                        ->get();
 
         return  $listadatos;
     }
@@ -1640,6 +1645,40 @@ trait ComprobanteTraits
         $centro_id          =       $trabajador->COD_ZONA_TIPO;
         $tipodoc_id         =       'TDO0000000000014';
 
+
+        if(Session::get('usuario')->id== '1CIX00000001'){
+
+            $listadatos         =       VMergeDocumento::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                            $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
+                                                ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                                        })
+                                        //->whereIn('VMERGEDOCUMENTOS.COD_USUARIO_CREA_AUD',$array_usuarios)
+                                        ->where('VMERGEDOCUMENTOS.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                        ->where(function ($query) {
+                                            $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
+                                                  ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
+                                                  ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
+                                        })
+                                        ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
+                                        //->where('COD_CENTRO','=',$centro_id)
+                                        ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
+                                        ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
+                                                            FEC_EMISION,
+                                                            TXT_CATEGORIA_MONEDA,
+                                                            TXT_EMPR_EMISOR,
+                                                            COD_USUARIO_CREA_AUD,
+                                                            CAN_TOTAL,
+                                                            NRO_SERIE,
+                                                            NRO_DOC,
+                                                            
+                                                            FE_DOCUMENTO.ID_DOCUMENTO,
+                                                            FE_DOCUMENTO.COD_ESTADO,
+                                                            FE_DOCUMENTO.TXT_ESTADO
+                                                        '))
+                                        ->get();
+
+        }else{
+
         $listadatos         =       VMergeDocumento::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
                                         $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
                                             ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
@@ -1668,6 +1707,11 @@ trait ComprobanteTraits
                                                         FE_DOCUMENTO.TXT_ESTADO
                                                     '))
                                     ->get();
+
+        }
+
+
+
 
         return  $listadatos;
     }

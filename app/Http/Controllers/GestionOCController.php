@@ -1923,6 +1923,8 @@ dd($fecha->toDateTimeString()); // Formato: 'Y-m-d H:i:s'
 
         $ordencompra_f            =      CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$idoc)->first();
 
+
+
         $sourceFile = '\\\\10.1.0.201\cpe\Contratos';
         if($ordencompra_f->COD_CENTRO == 'CEN0000000000004' or $ordencompra_f->COD_CENTRO == 'CEN0000000000006'or $ordencompra_f->COD_CENTRO == 'CEN0000000000002'){
             if($ordencompra_f->COD_CENTRO == 'CEN0000000000004'){
@@ -1934,7 +1936,7 @@ dd($fecha->toDateTimeString()); // Formato: 'Y-m-d H:i:s'
             if($ordencompra_f->COD_CENTRO == 'CEN0000000000002'){
                 $sourceFile = '\\\\10.1.4.201\\cpe\\Contratos\\'.$ordencompra->COD_DOCUMENTO_CTBLE.'.pdf';
             }
-
+        //dd($sourceFile);
             $destinationFile = '\\\\10.1.0.201\\cpe\\Contratos\\'.$ordencompra->COD_DOCUMENTO_CTBLE.'.pdf';
             // Intenta copiar el archivo
             //dd($sourceFile);

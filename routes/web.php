@@ -146,11 +146,6 @@ Route::group(['middleware' => ['authaw']], function () {
 
 
 
-
-
-
-
-
 	//ADMINISTRATOR CONTRATO
 	Route::any('/detalle-comprobante-contrato-administrator/{procedencia}/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionDetalleComprobantecontratoAdministrator');
 	Route::any('/subir-xml-cargar-datos-contrato-administrator/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionCargarXMLContratoAdministrator');

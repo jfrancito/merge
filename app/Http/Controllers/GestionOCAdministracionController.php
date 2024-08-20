@@ -1332,19 +1332,157 @@ class GestionOCAdministracionController extends Controller
                     }
                 }
 
-                //$orden                      =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();
+                $orden                      =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$pedido_id)->first();
 
 
-                $detalleproducto            =   CMPDetalleProducto::where('CMP.DETALLE_PRODUCTO.COD_ESTADO','=',1)
-                                                ->where('CMP.DETALLE_PRODUCTO.COD_TABLA','=',$pedido_id)
-                                                ->orderBy('NRO_LINEA','ASC')
-                                                ->get();
+                $conexionbd         = 'sqlsrv';
+                if($orden->COD_CENTRO == 'CEN0000000000004'){ //rioja
+                    $conexionbd         = 'sqlsrv_r';
+                }else{
+                    if($orden->COD_CENTRO == 'CEN0000000000006'){ //bellavista
+                        $conexionbd         = 'sqlsrv_b';
+                    }
+                }
 
-                CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$pedido_id)
+                DB::connection($conexionbd)->table('CMP.CMP.DOCUMENTO_CTBLE')
+                ->where('COD_DOCUMENTO_CTBLE','=',$pedido_id)
                             ->update(
                                     [
                                         'IND_NOTIFICACION_CLIENTE'=>1
                                     ]);
+
+                //enviar tablas de fe_documento y fe_detalledocuemto
+                if($orden->COD_CENTRO == 'CEN0000000000004' || $orden->COD_CENTRO == 'CEN0000000000006'){ //rioja
+                    //dd($conexionbd);
+                    //FE_DOCUENTO
+                    $referenciaAsocQuery = FeDocumento::select('ID_DOCUMENTO'
+                                              ,'DOCUMENTO_ITEM'
+                                              ,'RUC_PROVEEDOR'
+                                              ,'RZ_PROVEEDOR'
+                                              ,'TIPO_CLIENTE'
+                                              ,'ID_CLIENTE'
+                                              ,'NOMBRE_CLIENTE'
+                                              ,'DIRECCION_CLIENTE'
+                                              ,'NUM_DOC_VENTA'
+                                              ,'SERIE'
+                                              ,'NUMERO'
+                                              ,'ID_TIPO_DOC'
+                                              ,'FEC_VENTA'
+                                              ,'FEC_VENCI_PAGO'
+                                              ,'FORMA_PAGO'
+                                              ,'FORMA_PAGO_DIAS'
+                                              ,'MONEDA'
+                                              ,'VALOR_TIPO_CAMBIO'
+                                              ,'VALOR_IGV_ORIG'
+                                              ,'VALOR_IGV_SOLES'
+                                              ,'SUB_TOTAL_VENTA_ORIG'
+                                              ,'SUB_TOTAL_VENTA_SOLES'
+                                              ,'TOTAL_VENTA_ORIG'
+                                              ,'TOTAL_VENTA_SOLES'
+                                              ,'V_EXONERADO'
+                                              ,'ESTADO'
+                                              ,'NUM_DOC_ELECT'
+                                              ,'ES_TRANS_GRATUITA'
+                                              ,'DES_COM'
+                                              ,'ES_ANULADO'
+                                              ,'ENVIADO_EMAIL'
+                                              ,'ENVIADO_EXTERNO'
+                                              ,'NRO_ORDEN_COMP'
+                                              ,'NUM_GUIA'
+                                              ,'TIPO_DOC_REL'
+                                              ,'CON_DETRACCION'
+                                              ,'OBSERVACION'
+                                              ,'HORA_EMISION'
+                                              ,'ES_TURISTICO'
+                                              ,'ES_EXONERADO'
+                                              ,'GUIA_CLIENTE'
+                                              ,'GLOSA_DETALE'
+                                              ,'VALIDACION_SUNAT'
+                                              ,'ID_MOTIVO_EMISION'
+                                              ,'MOTIVO_EMISION'
+                                              ,'MONTO_IMP_BOLSA'
+                                              ,'MONTO_DETRACCION'
+                                              ,'MONTO_RETENCION'
+                                              ,'MONTO_NETO_PAGO'
+                                              ,'DESCUENTO_I'
+                                              ,'DESCUENTO'
+                                              ,'IMPUESTO_2'
+                                              ,'TIPO_DETRACCION'
+                                              ,'PORC_DETRACCION'
+                                              ,'MONTO_ANTICIPO'
+                                              ,'COD_ESTADO'
+                                              ,'TXT_ESTADO'
+                                              ,'COD_EMPR'
+                                              ,'TXT_EMPR'
+                                              ,'COD_CONTACTO'
+                                              ,'TXT_CONTACTO'
+                                              ,'TXT_PROCEDENCIA'
+                                              ,'ARCHIVO_XML'
+                                              ,'ARCHIVO_CDR'
+                                              ,'ARCHIVO_PDF'
+                                              ,'success'
+                                              ,'message'
+                                              ,'estadoCp'
+                                              ,'nestadoCp'
+                                              ,'estadoRuc'
+                                              ,'nestadoRuc'
+                                              ,'condDomiRuc'
+                                              ,'ncondDomiRuc'
+                                              ,'CODIGO_CDR'
+                                              ,'RESPUESTA_CDR'
+                                              ,'ind_ruc'
+                                              ,'ind_rz'
+                                              ,'ind_moneda'
+                                              ,'ind_total'
+                                              ,'ind_cantidaditem'
+                                              ,'ind_formapago'
+                                              ,'ind_errototal'
+                                              ,'dni_usuariocontacto'
+                                              ,'usuario_pa'
+                                              ,'usuario_uc'
+                                              ,'usuario_ap'
+                                              ,'usuario_pr'
+                                              ,'usuario_ex'
+                                              ,'mensaje_exuc'
+                                              ,'mensaje_exap'
+                                              ,'mensaje_exadm'
+                                              ,'ind_email_uc'
+                                              ,'ind_email_ap'
+                                              ,'ind_email_adm'
+                                              ,'ind_email_clap'
+                                              ,'ind_email_ba'
+                                              ,'ind_observacion'
+                                              ,'area_observacion'
+                                              ,'OPERACION'
+                                              ,'PERCEPCION'
+                                              ,'usuario_tes')
+                        ->where('ID_DOCUMENTO', '=', $orden->COD_ORDEN)
+                        ->get();
+
+                        
+                    //dd($referenciaAsocQuery);
+                    // Convertir el resultado en un array para poder insertarlo más adelante
+                    $dataToInsert = $referenciaAsocQuery->toArray();
+                    //dd($dataToInsert);
+
+                    // Paso 2: Insertar los datos en la segunda base de datos
+                    DB::connection($conexionbd)->table('FE_DOCUMENTO')->insert($dataToInsert);
+
+                    //FE_DETALLE_DOCUENTO
+                    $referenciaAsocQueryd = FeDetalleDocumento::select('*')
+                        ->where('ID_DOCUMENTO', '=', $orden->COD_ORDEN)
+                        ->get();
+                    // Convertir el resultado en un array para poder insertarlo más adelante
+                    $dataToInsertd = $referenciaAsocQueryd->toArray();
+
+                    // Paso 2: Insertar los datos en la segunda base de datos
+                    DB::connection($conexionbd)->table('FE_DETALLE_DOCUMENTO')->insert($dataToInsertd);
+
+                }
+                $detalleproducto            =   CMPDetalleProducto::where('CMP.DETALLE_PRODUCTO.COD_ESTADO','=',1)
+                                                ->where('CMP.DETALLE_PRODUCTO.COD_TABLA','=',$pedido_id)
+                                                ->orderBy('NRO_LINEA','ASC')
+                                                ->get();
 
                 FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
