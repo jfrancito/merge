@@ -1488,6 +1488,32 @@ class GestionUsuarioContactoController extends Controller
 
             $rutafila                   =   "";
             $rutaorden                  =   "";
+
+
+
+            $ordencompra_f            =      CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$ordencompra->COD_DOCUMENTO_CTBLE)->first();
+
+            $sourceFile = '\\\\10.1.0.201\cpe\Contratos';
+            if($ordencompra_f->COD_CENTRO == 'CEN0000000000004' or $ordencompra_f->COD_CENTRO == 'CEN0000000000006'or $ordencompra_f->COD_CENTRO == 'CEN0000000000002'){
+                if($ordencompra_f->COD_CENTRO == 'CEN0000000000004'){
+                    $sourceFile = '\\\\10.1.7.200\\cpe\\Contratos\\'.$ordencompra->COD_DOCUMENTO_CTBLE.'.pdf';
+                }
+                if($ordencompra_f->COD_CENTRO == 'CEN0000000000006'){
+                    $sourceFile = '\\\\10.1.9.43\\cpe\\Contratos\\'.$ordencompra->COD_DOCUMENTO_CTBLE.'.pdf';
+                }
+                if($ordencompra_f->COD_CENTRO == 'CEN0000000000002'){
+                    $sourceFile = '\\\\10.1.4.201\\cpe\\Contratos\\'.$ordencompra->COD_DOCUMENTO_CTBLE.'.pdf';
+                }
+            //dd($sourceFile);
+                $destinationFile = '\\\\10.1.0.201\\cpe\\Contratos\\'.$ordencompra->COD_DOCUMENTO_CTBLE.'.pdf';
+                // Intenta copiar el archivo
+                //dd($sourceFile);
+                if (file_exists($sourceFile)){
+                    copy($sourceFile, $destinationFile);
+                }
+            }
+
+
             if(count($fileordencompra)>0){
                 $directorio = '\\\\10.1.0.201\cpe\Contratos';
                 // Nombre del archivo que estás buscando
@@ -1529,6 +1555,33 @@ class GestionUsuarioContactoController extends Controller
                                             ->get();
             $array_guias                 =   array();                               
             $rutaordenguia               =   "";
+
+
+
+            foreach ($lista_guias as $index=>$item) {
+                $sourceFile = '\\\\10.1.0.201\cpe\Contratos';
+                if($ordencompra_f->COD_CENTRO == 'CEN0000000000004' or $ordencompra_f->COD_CENTRO == 'CEN0000000000006'or $ordencompra_f->COD_CENTRO == 'CEN0000000000002'){
+                    if($ordencompra_f->COD_CENTRO == 'CEN0000000000004'){
+                        $sourceFile = '\\\\10.1.7.200\\cpe\\Contratos\\'.$item->COD_DOCUMENTO_CTBLE.'.pdf';
+                    }
+                    if($ordencompra_f->COD_CENTRO == 'CEN0000000000006'){
+                        $sourceFile = '\\\\10.1.9.43\\cpe\\Contratos\\'.$item->COD_DOCUMENTO_CTBLE.'.pdf';
+                    }
+                    if($ordencompra_f->COD_CENTRO == 'CEN0000000000002'){
+                        $sourceFile = '\\\\10.1.4.201\\cpe\\Contratos\\'.$item->COD_DOCUMENTO_CTBLE.'.pdf';
+                    }
+
+                    $destinationFile = '\\\\10.1.0.201\\cpe\\Contratos\\'.$item->COD_DOCUMENTO_CTBLE.'.pdf';
+                    // Intenta copiar el archivo
+                    //dd($sourceFile);
+                    if (file_exists($sourceFile)){
+                        copy($sourceFile, $destinationFile);
+                    }
+                }
+            }
+
+
+            
             foreach ($lista_guias as $index=>$item) {
                 $array_nuevo            =   array(); 
 
