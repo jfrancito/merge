@@ -795,11 +795,16 @@ trait ComprobanteTraits
     private function con_lista_cabecera_comprobante_total_gestion_contrato($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id) {
 
 
+        $trabajador     =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+
+        $centro_id      =       $trabajador->COD_ZONA_TIPO;
+
         $listadatos     =   CMPDocumentoCtble::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                             //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
                             ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                             //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
                             ->where('OPERACION','=','CONTRATO')
                             ->Proveedor($proveedor_id)
                             ->Estado($estado_id)
@@ -949,9 +954,14 @@ trait ComprobanteTraits
 
     private function con_lista_cabecera_comprobante_total_gestion_observados_contrato($cliente_id) {
 
+
+        $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+
+        $centro_id          =       $trabajador->COD_ZONA_TIPO;
         $listadatos     =   FeDocumento::Join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                             //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
                             ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
                             ->where('FE_DOCUMENTO.ind_observacion','=','1')
                             ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
