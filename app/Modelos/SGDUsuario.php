@@ -12,4 +12,11 @@ class SGDUsuario extends Model
 	public $incrementing = false;
     public $keyType = 'string';
     
+
+    public function scopeArea($query,$area_id){
+        if(trim($area_id) != 'TODO'){
+            $query->where('COD_CATEGORIA_AREA','=',$area_id);
+        }
+    }
+
 }

@@ -2337,6 +2337,8 @@ dd($fecha->toDateTimeString()); // Formato: 'Y-m-d H:i:s'
 
                         $rz_p                               =   str_replace(["![CDATA[", "]]"], "", $factura->getcompany()->getrazonSocial());
                         $rz_p                               =   str_replace("?", "Ñ", $rz_p);
+                        $rz_p                               =   str_replace("ï¿½", "Ñ", $rz_p);
+
 
                         $documentolinea                     =   $this->ge_linea_documento($ordencompra->COD_ORDEN);
                         $cant_rentencion                    =   $ordencompra_t->CAN_RETENCION;
@@ -2659,6 +2661,8 @@ dd($fecha->toDateTimeString()); // Formato: 'Y-m-d H:i:s'
 
                         $rz_p                               =   str_replace(["![CDATA[", "]]"], "", $factura->getcompany()->getrazonSocial());
                         $rz_p                               =    str_replace("?", "Ñ", $rz_p);
+                        $rz_p                               =   str_replace("ï¿½", "Ñ", $rz_p);
+
 
                         $documentolinea                     =   $this->ge_linea_documento($ordencompra->COD_DOCUMENTO_CTBLE);
                         $cant_rentencion                    =   $ordencompra_t->CAN_RETENCION;

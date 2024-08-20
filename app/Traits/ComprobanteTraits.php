@@ -887,6 +887,52 @@ trait ComprobanteTraits
     }
 
 
+    private function gn_combo_area_usuario($todo) {
+
+        $array                          =   DB::table('CMP.CATEGORIA')
+                                            ->where('COD_ESTADO','=',1)
+                                            ->where('TXT_GRUPO','=','AREA_EMPRESA')
+                                            ->pluck('NOM_CATEGORIA','COD_CATEGORIA')
+                                            ->toArray();
+        if($todo=='TODO'){
+            $combo                  =   array($todo => $todo) + $array;
+        }else{
+            $combo                  =   $array;
+        }
+        return  $combo;                    
+    }
+
+    private function gn_combo_empresa($todo) {
+
+        $array                          =   DB::table('STD.EMPRESA')
+                                            ->whereIn('COD_EMPR',['IACHEM0000010394','IACHEM0000007086'])
+                                            ->pluck('NOM_EMPR','COD_EMPR')
+                                            ->toArray();
+        if($todo=='TODO'){
+            $combo                  =   array($todo => $todo) + $array;
+        }else{
+            $combo                  =   $array;
+        }
+        return  $combo;                    
+    }
+
+    private function gn_combo_centro_r($todo) {
+
+        $array                          =   DB::table('ALM.CENTRO')
+                                            ->whereIn('COD_CENTRO',['CEN0000000000001','CEN0000000000002','CEN0000000000004','CEN0000000000006'])
+                                            ->pluck('NOM_CENTRO','COD_CENTRO')
+                                            ->toArray();
+
+
+
+        if($todo=='TODO'){
+            $combo                  =   array($todo => $todo) + $array;
+        }else{
+            $combo                  =   $array;
+        }
+        return  $combo;                    
+    }
+
 
 	private function con_lista_cabecera_comprobante_total_gestion_observados($cliente_id) {
 
@@ -1331,9 +1377,108 @@ trait ComprobanteTraits
 
 
         return  $listadatos;
+    }
+
+    private function con_lista_cabecera_comprobante_entregable($cliente_id,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id) {
+
+
+        $rol                    =   WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
+
+        $trabajador             =   STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+        $array_trabajadores     =   STDTrabajador::where('NRO_DOCUMENTO','=',$trabajador->NRO_DOCUMENTO)
+                                    ->pluck('COD_TRAB')
+                                    ->toArray();
+
+        $array_usuarios         =   SGDUsuario::Area($area_id)
+                                    ->whereNotNull('COD_CATEGORIA_AREA')
+                                    ->pluck('COD_USUARIO')
+                                    ->toArray();
+
+
+        $documento              =   DB::table('CMP.DOCUMENTO_CTBLE')
+                                    ->join('CMP.REFERENCIA_ASOC', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+                                    ->select(DB::raw('CMP.DOCUMENTO_CTBLE.*,REFERENCIA_ASOC.COD_TABLA,REFERENCIA_ASOC.COD_TABLA_ASOC'))
+                                    ->whereIn('COD_CATEGORIA_TIPO_DOC', [
+                                        'TDO0000000000001',
+                                        'TDO0000000000003',
+                                        'TDO0000000000002'
+                                    ]);
+
+
+        $oi                     =   DB::table('CMP.ORDEN')
+                                    ->join('CMP.REFERENCIA_ASOC', 'CMP.ORDEN.COD_ORDEN', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+                                    ->select(DB::raw('REFERENCIA_ASOC.*'))
+                                    ->whereIn('COD_CATEGORIA_TIPO_ORDEN', ['TOR0000000000002']);
+
+        //dd($documento);
+
+        $listadatos             =   CMPOrden::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+
+                                    ->leftJoin(DB::raw("({$documento->toSql()}) as documentos"), function ($join) use ($documento) {
+                                            $join->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'documentos.COD_TABLA')
+                                                 ->addBinding($documento->getBindings());
+                                        })
+                                    ->leftJoin(DB::raw("({$oi->toSql()}) as oi"), function ($join) use ($oi) {
+                                            $join->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'oi.COD_TABLA')
+                                                 ->addBinding($oi->getBindings());
+                                        })
+                                    ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                    ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                    ->where('FE_DOCUMENTO.OPERACION','=','ORDEN_COMPRA')
+                                    ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
+                                    ->where('CMP.Orden.COD_EMPR','=',$empresa_id)
+                                    ->where('CMP.Orden.COD_CENTRO','=',$centro_id)
+                                    ->whereIn('CMP.Orden.COD_USUARIO_CREA_AUD',$array_usuarios)
+                                    ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                    ->select(DB::raw('CMP.Orden.* ,FE_DOCUMENTO.*,documentos.NRO_SERIE,documentos.FEC_VENCIMIENTO,documentos.NRO_DOC,oi.COD_TABLA_ASOC'))
+                                    ->orderBy('fecha_uc','asc')
+                                    ->get();
+
+        return  $listadatos;
 
 
     }
+
+
+    private function con_lista_cabecera_comprobante_entregable_contrato($cliente_id,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id) {
+
+
+        $array_usuarios         =   SGDUsuario::Area($area_id)
+                                    ->whereNotNull('COD_CATEGORIA_AREA')
+                                    ->pluck('COD_USUARIO')
+                                    ->toArray();
+
+        $documento              =   DB::table('CMP.DOCUMENTO_CTBLE')
+                                    ->join('CMP.REFERENCIA_ASOC', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+                                    ->select(DB::raw('CMP.DOCUMENTO_CTBLE.*,REFERENCIA_ASOC.COD_TABLA,REFERENCIA_ASOC.COD_TABLA_ASOC'))
+                                    ->whereIn('COD_CATEGORIA_TIPO_DOC', [
+                                        'TDO0000000000001',
+                                        'TDO0000000000003',
+                                        'TDO0000000000002'
+                                    ]);
+
+        $listadatos             =   CMPDocumentoCtble::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                                    ->leftJoin(DB::raw("({$documento->toSql()}) as documentos"), function ($join) use ($documento) {
+                                            $join->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'documentos.COD_TABLA')
+                                                 ->addBinding($documento->getBindings());
+                                        })
+                                    ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                    ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                    ->where('OPERACION','=','CONTRATO')
+                                    ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
+                                    ->where('CMP.DOCUMENTO_CTBLE.COD_EMPR','=',$empresa_id)
+                                    ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
+                                    ->whereIn('CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD',$array_usuarios)
+                                    ->select(DB::raw('CMP.DOCUMENTO_CTBLE.* ,FE_DOCUMENTO.*,documentos.NRO_SERIE,documentos.FEC_VENCIMIENTO,documentos.NRO_DOC'))
+                                    ->orderBy('fecha_pa', 'desc')
+                                    ->get();
+
+        return  $listadatos;
+
+
+    }
+
+
 
 
 
