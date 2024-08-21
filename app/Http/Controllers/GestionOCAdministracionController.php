@@ -1344,7 +1344,7 @@ class GestionOCAdministracionController extends Controller
                     }
                 }
 
-                DB::connection($conexionbd)->table('CMP.CMP.DOCUMENTO_CTBLE')
+                DB::connection($conexionbd)->table('CMP.DOCUMENTO_CTBLE')
                 ->where('COD_DOCUMENTO_CTBLE','=',$pedido_id)
                             ->update(
                                     [
