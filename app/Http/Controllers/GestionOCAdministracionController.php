@@ -1332,6 +1332,18 @@ class GestionOCAdministracionController extends Controller
                     }
                 }
 
+
+                FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
+                            ->update(
+                                [
+                                    'COD_ESTADO'=>'ETM0000000000005',
+                                    'TXT_ESTADO'=>'APROBADO',
+                                    'ind_email_clap'=>0,
+                                    'fecha_ap'=>$this->fechaactual,
+                                    'usuario_ap'=>Session::get('usuario')->id
+                                ]
+                            );
+
                 $orden                      =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$pedido_id)->first();
 
 
@@ -1456,7 +1468,7 @@ class GestionOCAdministracionController extends Controller
                                               ,'OPERACION'
                                               ,'PERCEPCION'
                                               ,'usuario_tes')
-                        ->where('ID_DOCUMENTO', '=', $orden->COD_ORDEN)
+                        ->where('ID_DOCUMENTO', '=', $orden->COD_DOCUMENTO_CTBLE)
                         ->get();
 
                         
@@ -1470,7 +1482,7 @@ class GestionOCAdministracionController extends Controller
 
                     //FE_DETALLE_DOCUENTO
                     $referenciaAsocQueryd = FeDetalleDocumento::select('*')
-                        ->where('ID_DOCUMENTO', '=', $orden->COD_ORDEN)
+                        ->where('ID_DOCUMENTO', '=', $orden->COD_DOCUMENTO_CTBLE)
                         ->get();
                     // Convertir el resultado en un array para poder insertarlo más adelante
                     $dataToInsertd = $referenciaAsocQueryd->toArray();
@@ -1479,21 +1491,14 @@ class GestionOCAdministracionController extends Controller
                     DB::connection($conexionbd)->table('FE_DETALLE_DOCUMENTO')->insert($dataToInsertd);
 
                 }
+
+                
                 $detalleproducto            =   CMPDetalleProducto::where('CMP.DETALLE_PRODUCTO.COD_ESTADO','=',1)
                                                 ->where('CMP.DETALLE_PRODUCTO.COD_TABLA','=',$pedido_id)
                                                 ->orderBy('NRO_LINEA','ASC')
                                                 ->get();
 
-                FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
-                            ->update(
-                                [
-                                    'COD_ESTADO'=>'ETM0000000000005',
-                                    'TXT_ESTADO'=>'APROBADO',
-                                    'ind_email_clap'=>0,
-                                    'fecha_ap'=>$this->fechaactual,
-                                    'usuario_ap'=>Session::get('usuario')->id
-                                ]
-                            );
+
 
 
                 //HISTORIAL DE DOCUMENTO APROBADO
