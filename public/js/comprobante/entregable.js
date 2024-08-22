@@ -75,7 +75,19 @@ $(document).ready(function(){
                                 idopcion                : idopcion
                             };
 
-        ajax_normal(data,"/ajax-guardar-masivo-entregable");
+
+        $.confirm({
+            title: '¿Confirma la Aprobacion?',
+            content: '¿Confirma los Comprobantes',
+            buttons: {
+                confirmar: function () {
+                    ajax_normal(data,"/ajax-guardar-masivo-entregable");
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo Aprobacion');
+                }
+            }
+        });
 
 
     });
