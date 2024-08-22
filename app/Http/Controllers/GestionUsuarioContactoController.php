@@ -1542,6 +1542,8 @@ class GestionUsuarioContactoController extends Controller
                 } 
             }
 
+            //por ahora que le pida el cotrato
+            $rutaorden                  =   "";
 
 
             //todas las guias relacionadas

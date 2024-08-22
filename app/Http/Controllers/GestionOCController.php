@@ -1974,7 +1974,8 @@ dd($fecha->toDateTimeString()); // Formato: 'Y-m-d H:i:s'
             } 
         }
 
-
+        //no encontro la orden de contrato
+        $rutaorden                  =   "";
 
 
         //todas las guias relacionadas
