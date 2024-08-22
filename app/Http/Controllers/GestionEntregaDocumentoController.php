@@ -175,6 +175,13 @@ class GestionEntregaDocumentoController extends Controller
         try{    
 
             DB::beginTransaction();
+            foreach($respuesta as $obj){
+                $ID_DOCUMENTO_ENCONTRO             =   $obj['data_requerimiento_id'];
+            }
+
+
+            $fedocumento_encontro                   =   FeDocumento::where('ID_DOCUMENTO',$ID_DOCUMENTO_ENCONTRO)->first();
+
             $codigo                                 =   $this->funciones->generar_folio('FE_DOCUMENTO_ENTREGABLE',8);
             $documento                              =   new FeDocumentoEntregable;
             $documento->FOLIO                       =   $codigo;
@@ -182,6 +189,7 @@ class GestionEntregaDocumentoController extends Controller
             $documento->COD_ESTADO                  =   1;
             $documento->USUARIO_CREA                =   Session::get('usuario')->id;
             $documento->FECHA_CREA                  =   $this->fechaactual;
+            $documento->OPERACION                   =   $fedocumento_encontro->OPERACION;
             $documento->save();
             foreach($respuesta as $obj){
                 $ID_DOCUMENTO                       =   $obj['data_requerimiento_id'];
@@ -227,6 +235,57 @@ class GestionEntregaDocumentoController extends Controller
 
 
     
+
+
+    public function actionListarEntregaDocumentoFolio($idopcion)
+    {
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Ver');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        View::share('titulo','Lista de Folio de Documentos');
+        $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
+        $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')->get();
+
+        $funcion        =   $this;
+        return View::make('entregadocumento/listaentregadocumentofolio',
+                         [
+                            'listadatos'        =>  $listadatos,
+                            'funcion'           =>  $funcion,
+                            'idopcion'          =>  $idopcion,
+                         ]);
+    }
+
+
+
+    public function actionModalEntregaDocumentoFolio(Request $request)
+    {
+
+        $data_requerimiento_id  =   $request['data_requerimiento_id'];
+        $idopcion               =   $request['idopcion'];
+        $folio                  =   FeDocumentoEntregable::where('FOLIO','=',$data_requerimiento_id)->first();
+
+        //dd($data_requerimiento_id);
+
+        if($folio->OPERACION=='ORDEN_COMPRA'){
+            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_modal($folio->FOLIO);
+        }else{
+            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato_modal($folio->FOLIO);
+        }
+
+
+        $funcion        =   $this;
+        return View::make('entregadocumento/modal/ajax/mafoliodetalle',
+                         [
+                            'listadatos'        =>  $listadatos,
+                            'folio'             =>  $folio,
+                            'funcion'           =>  $funcion,
+                            'idopcion'          =>  $idopcion,
+                            'operacion_id'      =>  $folio->OPERACION,
+                            'ajax'                  =>  true,
+
+                         ]);
+    }
 
 
 

@@ -1241,7 +1241,7 @@ class GestionOCAdministracionController extends Controller
             if(count($referencia)>0){
                 $ordeningreso       =   DB::connection($conexionbd)->table('CMP.ORDEN')->where('COD_ORDEN','=',$referencia->COD_TABLA_ASOC)->first();   
             }                        
-
+            $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
             return View::make('comprobante/aprobaradm', 
                             [
@@ -1255,6 +1255,9 @@ class GestionOCAdministracionController extends Controller
                                 'detalleordencompra'    =>  $detalleordencompra,
                                 'detallefedocumento'    =>  $detallefedocumento,
                                 'tarchivos'             =>  $tarchivos,
+
+                                'archivosanulados'      =>  $archivosanulados,
+
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,

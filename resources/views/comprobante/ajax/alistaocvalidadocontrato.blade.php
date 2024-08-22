@@ -26,6 +26,7 @@
                 @endif
               @endif
           </span>
+          <span><b>FOLIO : </b> {{$item->FOLIO}}</span>
 
 
         </td>

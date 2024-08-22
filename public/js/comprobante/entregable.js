@@ -3,6 +3,26 @@ $(document).ready(function(){
     var carpeta = $("#carpeta").val();
 
 
+    $(".cfedocumento").on('dblclick','.dobleclickpc', function(e) {
+
+        var _token                  =   $('#token').val();
+        var data_requerimiento_id   =   $(this).attr('data_requerimiento_id');
+
+    //debugger;
+
+        var idopcion                =   $('#idopcion').val();
+
+        data                        =   {
+                                            _token                  : _token,
+                                            data_requerimiento_id              : data_requerimiento_id,
+                                            idopcion                : idopcion,
+                                        };
+
+        ajax_modal(data,"/ajax-modal-detalle-entregable",
+                  "modal-detalle-entregable","modal-detalle-entregable-container");
+
+    });
+
 
 
     $(".cfedocumento").on('click','.buscardocumento', function() {

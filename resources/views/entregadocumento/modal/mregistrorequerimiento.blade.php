@@ -6,7 +6,6 @@
   </div>
 </div>
 
-
 <div id="modal-detalle-requerimiento-masivo" class="modal-container full-width colored-header colored-header-primary modal-effect-8">
   <div class="modal-content ">
 	<div class='modal-detalle-requerimiento-masivo-container'>
@@ -14,6 +13,16 @@
   </div>
 </div>
 
+
+<div id="modal-detalle-entregable" class="modal-container full-width colored-header colored-header-primary modal-effect-8">
+  <div class="modal-content ">
+
+	<div class='modal-detalle-entregable-container'>
+
+	</div>
+
+  </div>
+</div>
 
 
 <div class="modal-overlay"></div>

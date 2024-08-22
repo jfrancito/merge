@@ -1,4 +1,4 @@
-<table id="nso" class="table table-striped table-borderless table-hover td-color-borde td-padding-7 listatabla">
+<table id="nso_f" class="table table-striped table-borderless table-hover td-color-borde td-padding-7 listatabla">
   <thead>
     <tr>
       <th>ITEM</th>
@@ -8,29 +8,14 @@
       <th>FECHA VENCIMIENTO DOC</th>
       <th>FECHA APROBACION ADMIN</th>
       <th>TIPO</th>
-
       <th>SUBIO VOUCHER</th>
-
+      
       <th>ORDEN INGRESO</th>
       <th>OBLIGACION</th>
       <th>DESCUENTO</th>
       <th>TOTAL DESCUENTO</th>
       <th>IMPORTE</th>
       <th>NETO A PAGAR</th>
-      <th>
-        <div class="text-center be-checkbox be-checkbox-sm has-primary">
-          <input  type="checkbox"
-                  class="todo_asignar input_asignar"
-                  id="todo_asignar"
-          >
-          <label  for="todo_asignar"
-                  data-atr = "todas_asignar"
-                  class = "checkbox_asignar"                    
-                  name="todo_asignar"
-            ></label>
-        </div>
-      </th>
-
     </tr>
   </thead>
   <tbody>
@@ -46,7 +31,6 @@
         <td>{{date_format(date_create($item->fecha_ap), 'd-m-Y h:i:s')}}</td>
 
         <td>{{$item->IND_MATERIAL_SERVICIO}}</td>
-
         <td>
             @IF($item->COD_ESTADO_VOUCHER == 'ETM0000000000008')
               SI
@@ -54,7 +38,6 @@
               NO
             @ENDIF
         </td>
-
 
         <td>{{$item->COD_TABLA_ASOC}}</td>
         <td>
@@ -92,24 +75,6 @@
             @ENDIF
           @ENDIF</b>
         </td>
-
-        <td>
-
-            <div class="text-center be-checkbox be-checkbox-sm has-primary">
-              <input  type="checkbox"
-                class="{{$item->COD_ORDEN}} input_asignar"
-                id="{{$item->COD_ORDEN}}" >
-
-              <label  for="{{$item->COD_ORDEN}}"
-                    data-atr = "ver"
-                    class = "checkbox checkbox_asignar"                    
-                    name="{{$item->COD_ORDEN}}"
-              ></label>
-            </div>
-
-        </td>
-
-
       </tr>                    
     @endforeach
   </tbody>
@@ -118,14 +83,23 @@
 @if(isset($ajax))
   <script type="text/javascript">
     $(document).ready(function(){
-       App.dataTables();
+
+
+      $("#nso_f").dataTable({
+          dom: 'Bfrtip',
+          buttons: [
+              'csv', 'excel', 'pdf'
+          ],
+          "lengthMenu": [[500, 1000, -1], [500, 1000, "All"]],
+          columnDefs:[{
+              targets: "_all",
+              sortable: false
+          }]
+      });
+
+
+
     });
   </script> 
 @endif
 
-
-@if(isset($mensaje))
-  <script type="text/javascript">
-    alertajax("{{$mensaje}}");
-  </script> 
-@endif

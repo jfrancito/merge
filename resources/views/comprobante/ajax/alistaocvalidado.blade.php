@@ -32,6 +32,8 @@
                 @endif
               @endif
           </span>
+          <span><b>FOLIO : </b> {{$item->FOLIO}}</span>
+
         </td>
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>SERIE : {{$item->SERIE}} </b> </span>
