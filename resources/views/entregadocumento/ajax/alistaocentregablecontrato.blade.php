@@ -18,7 +18,7 @@
   <tbody>
 
     @foreach($listadatos as $index => $item)
-      <tr data_requerimiento_id = "{{$item->id}}">
+      <tr data_requerimiento_id = "{{$item->COD_DOCUMENTO_CTBLE}}">
         <td>{{$index + 1}}</td>
         <td>{{$item->COD_DOCUMENTO_CTBLE}}</td>
         <td>{{$item->TXT_EMPR_EMISOR}}</td>

@@ -1428,7 +1428,6 @@ trait ComprobanteTraits
         //dd($documento);
 
         $listadatos             =   CMPOrden::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
-
                                     ->leftJoin(DB::raw("({$documento->toSql()}) as documentos"), function ($join) use ($documento) {
                                             $join->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'documentos.COD_TABLA')
                                                  ->addBinding($documento->getBindings());
@@ -1437,7 +1436,7 @@ trait ComprobanteTraits
                                             $join->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'oi.COD_TABLA')
                                                  ->addBinding($oi->getBindings());
                                         })
-                                    ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                    ->whereRaw("CAST(documentos.FEC_VENCIMIENTO AS DATE) >= ? and CAST(documentos.FEC_VENCIMIENTO AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                     ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                     ->where('FE_DOCUMENTO.OPERACION','=','ORDEN_COMPRA')
                                     ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
@@ -1446,7 +1445,7 @@ trait ComprobanteTraits
                                     ->whereIn('CMP.Orden.COD_USUARIO_CREA_AUD',$array_usuarios)
                                     ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
                                     ->select(DB::raw('CMP.Orden.* ,FE_DOCUMENTO.*,documentos.NRO_SERIE,documentos.FEC_VENCIMIENTO,documentos.NRO_DOC,oi.COD_TABLA_ASOC'))
-                                    ->orderBy('fecha_uc','asc')
+                                    ->orderBy('documentos.FEC_VENCIMIENTO','asc')
                                     ->get();
 
         return  $listadatos;
@@ -1477,7 +1476,7 @@ trait ComprobanteTraits
                                             $join->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'documentos.COD_TABLA')
                                                  ->addBinding($documento->getBindings());
                                         })
-                                    ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                    ->whereRaw("CAST(documentos.FEC_VENCIMIENTO  AS DATE) >= ? and CAST(documentos.FEC_VENCIMIENTO  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                     ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                     ->where('OPERACION','=','CONTRATO')
                                     ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
@@ -1485,7 +1484,7 @@ trait ComprobanteTraits
                                     ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
                                     ->whereIn('CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD',$array_usuarios)
                                     ->select(DB::raw('CMP.DOCUMENTO_CTBLE.* ,FE_DOCUMENTO.*,documentos.NRO_SERIE,documentos.FEC_VENCIMIENTO,documentos.NRO_DOC'))
-                                    ->orderBy('fecha_pa', 'desc')
+                                    ->orderBy('documentos.FEC_VENCIMIENTO ', 'asc')
                                     ->get();
 
         return  $listadatos;
