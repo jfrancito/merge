@@ -161,9 +161,14 @@ Route::group(['middleware' => ['authaw']], function () {
 
 
 	//ENTREGA DE DOCUMENTOS
-
 	Route::any('/gestion-de-entrega-documentos/{idopcion}', 'GestionEntregaDocumentoController@actionListarEntregaDocumento');
 	Route::any('/ajax-buscar-documento-fe-entregable', 'GestionEntregaDocumentoController@actionListarAjaxBuscarDocumentoEntregable');
+	Route::any('/ajax-modal-masivo-entregable', 'GestionEntregaDocumentoController@actionListarAjaxModalMasivoEntregable');
+	Route::any('/ajax-guardar-masivo-entregable', 'GestionEntregaDocumentoController@actionGuardarMavisoEntregable');
+
+
+
+
 
 	Route::any('/detalle-comprobante-oc-validado-contrato/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoContrato');
 	Route::any('/gestion-de-comprobantes-observados/{idopcion}', 'GestionUsuarioContactoController@actionListarComprobantesObservados');

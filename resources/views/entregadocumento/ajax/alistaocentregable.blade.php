@@ -7,13 +7,13 @@
       <th>COMPROBANTE ASOCIADO</th>
       <th>FECHA VENCIMIENTO DOC</th>
       <th>FECHA APROBACION ADMIN</th>
-      <th>IMPORTE</th>
       <th>TIPO</th>
       <th>ORDEN INGRESO</th>
       <th>OBLIGACION</th>
       <th>DESCUENTO</th>
+      <th>TOTAL DESCUENTO</th>
+      <th>IMPORTE</th>
       <th>NETO A PAGAR</th>
-
       <th>
         <div class="text-center be-checkbox be-checkbox-sm has-primary">
           <input  type="checkbox"
@@ -41,7 +41,7 @@
         <td>{{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</td>
         <td>{{date_format(date_create($item->FEC_VENCIMIENTO), 'd-m-Y h:i:s')}}</td>
         <td>{{date_format(date_create($item->fecha_ap), 'd-m-Y h:i:s')}}</td>
-        <td>{{$item->CAN_TOTAL}}</td>
+
         <td>{{$item->IND_MATERIAL_SERVICIO}}</td>
         <td>{{$item->COD_TABLA_ASOC}}</td>
         <td>
@@ -65,6 +65,19 @@
               0.00                
             @ENDIF
           @ENDIF
+        </td>
+        <td>{{$item->CAN_TOTAL}}</td>
+
+        <td><b>
+          @IF($item->CAN_DETRACCION>0)
+            {{$item->CAN_TOTAL - $item->CAN_DETRACCION}}
+          @ELSE
+            @IF($item->CAN_RETENCION>0)
+              {{$item->CAN_TOTAL - $item->CAN_RETENCION}}
+            @ELSE
+              {{$item->CAN_TOTAL}}               
+            @ENDIF
+          @ENDIF</b>
         </td>
 
         <td>
@@ -94,5 +107,12 @@
     $(document).ready(function(){
        App.dataTables();
     });
+  </script> 
+@endif
+
+
+@if(isset($mensaje))
+  <script type="text/javascript">
+    alertajax("{{$mensaje}}");
   </script> 
 @endif

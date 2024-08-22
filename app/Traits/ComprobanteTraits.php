@@ -1439,6 +1439,10 @@ trait ComprobanteTraits
                                     ->whereRaw("CAST(documentos.FEC_VENCIMIENTO AS DATE) >= ? and CAST(documentos.FEC_VENCIMIENTO AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                     ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                     ->where('FE_DOCUMENTO.OPERACION','=','ORDEN_COMPRA')
+                                    ->where(function ($query) {
+                                        $query->where('FOLIO', '=', '');
+                                        $query->orWhereNull('FOLIO');
+                                    })
                                     ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
                                     ->where('CMP.Orden.COD_EMPR','=',$empresa_id)
                                     ->where('CMP.Orden.COD_CENTRO','=',$centro_id)

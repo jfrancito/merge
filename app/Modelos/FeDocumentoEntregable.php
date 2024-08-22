@@ -8,7 +8,7 @@ class FeDocumentoEntregable extends Model
 {
     protected $table = 'FE_DOCUMENTO_ENTREGABLE';
     public $timestamps=false;
-    protected $primaryKey   =   'ID_DOCUMENTO';
+    protected $primaryKey   =   'FOLIO';
     public $incrementing = false;
     public $keyType = 'string';
 

@@ -44,3 +44,9 @@
     });
   </script> 
 @endif
+
+@if(isset($mensaje))
+  <script type="text/javascript">
+    alertajax("{{$mensaje}}");
+  </script> 
+@endif

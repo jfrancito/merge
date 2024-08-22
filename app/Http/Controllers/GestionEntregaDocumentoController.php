@@ -137,6 +137,102 @@ class GestionEntregaDocumentoController extends Controller
 
 
 
+    public function actionListarAjaxModalMasivoEntregable(Request $request) {
+
+        $datastring     =   $request['datastring'];
+        $funcion        =   $this;
+
+        return View::make('entregadocumento/modal',
+                         [
+                            'fecha_inicio'          =>  $fecha_inicio,
+                            'fecha_fin'             =>  $fecha_fin,
+                            'empresa_id'            =>  $empresa_id,
+                            'centro_id'             =>  $centro_id,
+                            'idopcion'              =>  $idopcion,
+                            'cod_empresa'           =>  $cod_empresa,
+                            'listadatos'            =>  $listadatos,
+                            'ajax'                  =>  true,
+                            'operacion_id'            =>  $operacion_id,
+                            'funcion'               =>  $funcion
+                         ]);
+    }
+
+
+
+    public function actionGuardarMavisoEntregable(Request $request) {
+
+
+        $fecha_inicio       =   $request['fecha_inicio'];
+        $fecha_fin          =   $request['fecha_fin'];  
+        $area_id            =   $request['area_id'];
+        $empresa_id         =   $request['empresa_id'];
+        $centro_id          =   $request['centro_id'];
+        $operacion_id       =   $request['operacion_id'];
+        $idopcion           =   $request['idopcion'];
+        $cod_empresa        =   Session::get('usuario')->usuarioosiris_id;
+        $respuesta          =   json_decode($request['datastring'], true);
+
+        try{    
+
+            DB::beginTransaction();
+            $codigo                                 =   $this->funciones->generar_folio('FE_DOCUMENTO_ENTREGABLE',8);
+            $documento                              =   new FeDocumentoEntregable;
+            $documento->FOLIO                       =   $codigo;
+            $documento->CAN_FOLIO                   =   count($respuesta);
+            $documento->COD_ESTADO                  =   1;
+            $documento->USUARIO_CREA                =   Session::get('usuario')->id;
+            $documento->FECHA_CREA                  =   $this->fechaactual;
+            $documento->save();
+            foreach($respuesta as $obj){
+                $ID_DOCUMENTO                       =   $obj['data_requerimiento_id'];
+                FeDocumento::where('ID_DOCUMENTO',$ID_DOCUMENTO)
+                            ->update(
+                                [
+                                    'FOLIO'=>$codigo
+                                ]
+                            );
+            }
+
+            DB::commit();
+        }catch(\Exception $ex){
+            DB::rollback(); 
+            return Redirect::to('gestion-de-entrega-documentos/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+        }
+
+        if($operacion_id=='ORDEN_COMPRA'){
+            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id);
+        }else{
+            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id);
+        }
+
+        $funcion        =   $this;
+        $mensaje        =   'Se realizo la integracion en el folio : '.$codigo; 
+
+        return View::make('entregadocumento/ajax/mergelistaentregable',
+                         [
+                            'fecha_inicio'          =>  $fecha_inicio,
+                            'fecha_fin'             =>  $fecha_fin,
+                            'empresa_id'            =>  $empresa_id,
+                            'centro_id'             =>  $centro_id,
+                            'idopcion'              =>  $idopcion,
+                            'cod_empresa'           =>  $cod_empresa,
+                            'listadatos'            =>  $listadatos,
+                            'ajax'                  =>  true,
+                            'operacion_id'          =>  $operacion_id,
+                            'mensaje'               =>  $mensaje,
+                            'funcion'               =>  $funcion
+                         ]);
+    }
+
+
+
+    
+
+
+
+
+
+
 
 
 
