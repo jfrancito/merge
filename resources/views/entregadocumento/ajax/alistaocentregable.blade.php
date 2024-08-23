@@ -18,7 +18,7 @@
       <th>IMPORTE</th>
       <th>NETO A PAGAR</th>
       <th>
-        <div class="text-center be-checkbox be-checkbox-sm has-primary">
+<!--         <div class="text-center be-checkbox be-checkbox-sm has-primary">
           <input  type="checkbox"
                   class="todo_asignar input_asignar"
                   id="todo_asignar"
@@ -28,7 +28,7 @@
                   class = "checkbox_asignar"                    
                   name="todo_asignar"
             ></label>
-        </div>
+        </div> -->
       </th>
 
     </tr>

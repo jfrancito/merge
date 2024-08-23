@@ -12,6 +12,7 @@
       <tr data_requerimiento_id = "{{$item->ID_DOCUMENTO}}">
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>CODIGO : {{$item->COD_DOCUMENTO_CTBLE}} </b> </span>
+          <span><b>NUMERO : {{$item->NRO_SERIE}} - {{$item->NRO_DOC}} </b> </span>
           <span><b>FECHA  : {{$item->FEC_EMISION}}</b></span>
           <span><b>PROVEEDOR : </b> {{$item->TXT_EMPR_EMISOR}}</span>
           <span><b>TOTAL : </b> {{$item->CAN_TOTAL}}</span>
@@ -27,8 +28,6 @@
               @endif
           </span>
           <span><b>FOLIO : </b> {{$item->FOLIO}}</span>
-
-
         </td>
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>SERIE : {{$item->SERIE}} </b> </span>
