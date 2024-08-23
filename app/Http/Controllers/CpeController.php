@@ -152,10 +152,13 @@ class CpeController extends Controller {
 			$respuetaxml 				=	$this->buscar_archivo_sunat($urlxml,$fetoken);
 			$urlxml 					= 	'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/01';
 			$respuetapdf 				=	$this->buscar_archivo_sunat($urlxml,$fetoken);
+			$urlxml 					= 	'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/03';
+			$respuetacdr 				=	$this->buscar_archivo_sunat($urlxml,$fetoken);
+
 
 			Session::flash('respuetaxml', $respuetaxml);
 			Session::flash('respuetapdf', $respuetapdf);
-
+			Session::flash('respuetacdr', $respuetacdr);
 			//return Redirect::back()->withInput()->with('bienhecho', 'Se encontraron los Archivos');
  			return Redirect::to('/gestion-de-cpe/'.$idopcion)->withInput()->with('bienhecho', 'Archivo '.$ruc.' encontrado con exito');
 

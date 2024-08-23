@@ -79,6 +79,16 @@
 
               <div class="form-group" style="text-align: center;">
                 <div class="col-sm-12">
+
+                @if(Session::has('respuetacdr'))
+                    @if(Session::get('respuetacdr')['cod_error'] == 1)
+                      <span class="label label-danger">{{Session::get('respuetacdr')['mensaje']}}</span>
+                    @else
+                      <a class="btn btn-space btn-success" href="{{ url('descargar-archivo/'.Session::get('respuetacdr')['nombre_archivo']) }}">Descargar CDR</a>
+
+                    @endif
+                @endif
+
                 @if(Session::has('respuetaxml'))
                     @if(Session::get('respuetaxml')['cod_error'] == 1)
                       <span class="label label-danger">{{Session::get('respuetaxml')['mensaje']}}</span>
