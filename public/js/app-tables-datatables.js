@@ -23,6 +23,19 @@ var App = (function () {
         }]
     });
 
+    $("#nso_check").dataTable({
+        dom: 'Bfrtip',
+        buttons: [
+            'csv', 'excel', 'pdf'
+        ],
+        "lengthMenu": [[2000, 3000, -1], [2000, 3000, "All"]],
+        columnDefs:[{
+            targets: "_all",
+            sortable: false
+        }]
+    });
+
+
 
     $("#despacholocen").dataTable({
         "lengthMenu": [[50, 100, -1], [50, 100, "All"]],
