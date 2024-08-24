@@ -1159,7 +1159,10 @@ trait ComprobanteTraits
 
         $total_1 = $ordencompra->CAN_TOTAL;
         $total_2 = $fedocumento->TOTAL_VENTA_ORIG+$fedocumento->PERCEPCION+$fedocumento->MONTO_RETENCION;
-        $tt_totales = abs($total_1 - $total_2);
+        $tt_totales = round(abs($total_1 - $total_2), 2);
+
+        //dd($tt_totales);
+
         //0.02
 		if($tt_totales <= 0.01){
 			$ind_total 			=	1;	
