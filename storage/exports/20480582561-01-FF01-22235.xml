@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Invoice xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:ccts="urn:un:unece:uncefact:documentation:2" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2" xmlns:qdt="urn:oasis:names:specification:ubl:schema:xsd:QualifiedDatatypes-2" xmlns:udt="urn:un:unece:uncefact:data:specification:UnqualifiedDataTypesSchemaModule:2" xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2">
+  <!-- GENERADO DESDE WWW.NUBEFACT.COM -->
+  <ext:UBLExtensions>
+    <ext:UBLExtension>
+      <ext:ExtensionContent>
+        <ds:Signature Id="NubeFacTSign">
+          <ds:SignedInfo>
+            <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+            <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+            <ds:Reference URI="">
+              <ds:Transforms>
+                <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+              </ds:Transforms>
+              <ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+              <ds:DigestValue>wtAz6Ni8cjF3GH7/ZmJgSjQiiZYxD9soqn7fXzHkNXY=</ds:DigestValue>
+            </ds:Reference>
+          </ds:SignedInfo>
+          <ds:SignatureValue>0He6GRBXODEIhDhC+ScfktW7mZJd6pQ4nPUCfKxINhEILIPi+JT7lrasTLtkP8wtAMrImd4o6WqHJakTY64BDNN+QrykqQg1wM4Xew8mVVHS46U5yGlg+58sOdLgjJtl4RaU6Mfjkk+VqSeHzV+IM/jrijJUqgO1Un1SJQvrPDBB4xuBSEzTSgG6ZE3zlF8feY319RJshzQ4PiQXTcegHEzIXN+RBxO8bsXy891fp0D1k45sWJPRJp8X9/2f/K2/o4j0gc4p81ZlWkSfmaL76t5WdWk+0WdeEodouCtqhAkO+u5RHsBaorjvdCdreGaWj2kbTYV/YOsVQvmiiu9ngQ==</ds:SignatureValue>
+          <ds:KeyInfo>
+            <ds:X509Data>
+              <ds:X509SubjectName>street=CAL. LIBERTAD NRO. 176 INT. 211,emailAddress=sistemas@nubefact.com,CN=NUBEFACT WEB,OU=20600695771,OU=Validado por Llama.pe ER,O=NUBEFACT S.A.,L=LIMA,C=PE</ds:X509SubjectName>
+              <ds:X509Certificate>MIIFLzCCBBegAwIBAgIIMqph96CwToswDQYJKoZIhvcNAQELBQAwRjEkMCIGA1UEAwwbTGxhbWEucGUgU0hBMjU2IFN0YW5kYXJkIENBMREwDwYDVQQKDAhMTEFNQS5QRTELMAkGA1UEBhMCUEUwHhcNMjMwMzE3MjIxNTIwWhcNMjYwMzE2MjIxNTAwWjCB1DEoMCYGA1UECQwfQ0FMLiBMSUJFUlRBRCBOUk8uIDE3NiBJTlQuIDIxMTEkMCIGCSqGSIb3DQEJARYVc2lzdGVtYXNAbnViZWZhY3QuY29tMRUwEwYDVQQDDAxOVUJFRkFDVCBXRUIxFDASBgNVBAsMCzIwNjAwNjk1NzcxMSEwHwYDVQQLDBhWYWxpZGFkbyBwb3IgTGxhbWEucGUgRVIxFjAUBgNVBAoMDU5VQkVGQUNUIFMuQS4xDTALBgNVBAcMBExJTUExCzAJBgNVBAYTAlBFMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA3Fl/ENI/WGgfA8csLczoJD1DxxP92/1bbj4rpRK9S6psyaVzLnyJ1YsQTjij32KQvYWo3R689YGp4OtPOWqq1gEdaqNgAsPrI3yhNhVeEe/47s7+dl9iA02N/qVPAQr/msPVtbO+TSy9+JQ3mnJeAarkQtYfJps8OX4kqZvzWvpvEZFaxyOMoYcUD0Wfp0J/dOOjIjOgao8nQqchGJc7JbvWE5hVtaCAbIur+3E1pEqGUYtIiK6FvJT658stZFuXnlHJFAnIQniE3FF3VCp6gsadWfdwODHsTfS8gR4G89u7oM8jGvP4Cs0GBDp60lX1TFn/U17kUzFC8jA7BPqg+QIDAQABo4IBkDCCAYwwDAYDVR0TAQH/BAIwADAfBgNVHSMEGDAWgBRdiFut62X7/mii5NlvPVdyou8rmTBnBggrBgEFBQcBAQRbMFkwNQYIKwYBBQUHMAKGKWh0dHA6Ly9jcnQubGxhbWEucGUvbGxhbWFwZXN0YW5kYXJkY2EuY2VyMCAGCCsGAQUFBzABhhRodHRwOi8vb2NzcC5sbGFtYS5wZTAgBgNVHREEGTAXgRVzaXN0ZW1hc0BudWJlZmFjdC5jb20wRgYDVR0gBD8wPTA7Bg0rBgEEAYOXdwABAAMBMCowKAYIKwYBBQUHAgEWHGh0dHBzOi8vbGxhbWEucGUvcmVwb3NpdG9yeS8wHQYDVR0lBBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMEMDoGA1UdHwQzMDEwL6AtoCuGKWh0dHA6Ly9jcmwubGxhbWEucGUvbGxhbWFwZXN0YW5kYXJkY2EuY3JsMB0GA1UdDgQWBBS1FwtYL704ccYYxstXSSV4Wq9avDAOBgNVHQ8BAf8EBAMCBsAwDQYJKoZIhvcNAQELBQADggEBAGA2TmvVU6yp+RwxsciZlbExxrO57PIpXvA4HtCmk0e/l8hshua0lQEY1khZMDFRKrXe/17rQNquWEZV3JcGH13jneCf88Sji1Z7myvt/ah2IIcDJB6lgP76WDwQaNVvAMSygUF6bqRfiZDiigHhV0qzsa/++pjPKu12NfQrT7c93eVVEtboKo5BJ5n+JwO/AbNroZqg9kQK7iDUa9cmp8cIZLviwGeKHmjYA02j8rQh2qGcvP6tGfPyeL01YzRtld3MwDHidfiI2CoWDALrxLHowuK7kvUamo5VUdAFy+iJrg6mGB6JAqah244OvJZdHkNgFd9apjVfBNBW7kMt/Ms=</ds:X509Certificate>
+            </ds:X509Data>
+          </ds:KeyInfo>
+        </ds:Signature>
+      </ext:ExtensionContent>
+    </ext:UBLExtension>
+  </ext:UBLExtensions>
+  <!-- GENERADO DESDE WWW.NUBEFACT.COM -->
+  <cbc:UBLVersionID>2.1</cbc:UBLVersionID>
+  <cbc:CustomizationID>2.0</cbc:CustomizationID>
+  <cbc:ID>FF01-22235</cbc:ID>
+  <cbc:IssueDate>2024-08-22</cbc:IssueDate>
+  <cbc:IssueTime>14:36:53</cbc:IssueTime>
+  <cbc:DueDate>2024-09-06</cbc:DueDate>
+  <cbc:InvoiceTypeCode listID="1004" listAgencyName="PE:SUNAT" listName="Tipo de Documento" listURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo01" name="Tipo de Operacion" listSchemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo51">01</cbc:InvoiceTypeCode>
+  <cbc:Note languageLocaleID="1000">CINCO MIL CUATROCIENTOS TREINTA Y OCHO CON 40/100 SOLES</cbc:Note>
+  <cbc:Note languageLocaleID="2006">Operación Sujeta a Detracción - Servicios de Transporte - Carga</cbc:Note>
+  <cbc:DocumentCurrencyCode listID="ISO 4217 Alpha" listAgencyName="United Nations Economic Commission for Europe" listName="Currency">PEN</cbc:DocumentCurrencyCode>
+  <cac:Signature>
+    <cbc:ID>20480582561</cbc:ID>
+    <cbc:Note>WWW.NUBEFACT.COM</cbc:Note>
+    <cac:SignatoryParty>
+      <cac:PartyIdentification>
+        <cbc:ID>20480582561</cbc:ID>
+      </cac:PartyIdentification>
+      <cac:PartyName>
+        <cbc:Name>TRANSPORTES PAKATNAMU SAC.</cbc:Name>
+      </cac:PartyName>
+    </cac:SignatoryParty>
+    <cac:DigitalSignatureAttachment>
+      <cac:ExternalReference>
+        <cbc:URI>20480582561</cbc:URI>
+      </cac:ExternalReference>
+    </cac:DigitalSignatureAttachment>
+  </cac:Signature>
+  <cac:AccountingSupplierParty>
+    <cac:Party>
+      <cac:PartyIdentification>
+        <cbc:ID schemeID="6" schemeName="Documento de Identidad" schemeAgencyName="PE:SUNAT" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06">20480582561</cbc:ID>
+      </cac:PartyIdentification>
+      <cac:PartyName>
+        <cbc:Name>TRANSPORTES PAKATNAMU SAC</cbc:Name>
+      </cac:PartyName>
+      <cac:PartyLegalEntity>
+        <cbc:RegistrationName>TRANSPORTES PAKATNAMU SAC.</cbc:RegistrationName>
+        <cac:RegistrationAddress>
+          <cbc:ID schemeName="Ubigeos" schemeAgencyName="PE:INEI">140301</cbc:ID>
+          <cbc:AddressTypeCode listAgencyName="PE:SUNAT" listName="Establecimientos anexos">0000</cbc:AddressTypeCode>
+          <cbc:CityName>LAMBAYEQUE</cbc:CityName>
+          <cbc:CountrySubentity>LAMBAYEQUE</cbc:CountrySubentity>
+          <cbc:District>LAMBAYEQUE</cbc:District>
+          <cac:AddressLine>
+            <cbc:Line>CAR. CARRETERA A LAMBAYEQUE LT. 6 MZ. A</cbc:Line>
+          </cac:AddressLine>
+          <cac:Country>
+            <cbc:IdentificationCode listID="ISO 3166-1" listAgencyName="United Nations Economic Commission for Europe" listName="Country">PE</cbc:IdentificationCode>
+          </cac:Country>
+        </cac:RegistrationAddress>
+      </cac:PartyLegalEntity>
+    </cac:Party>
+  </cac:AccountingSupplierParty>
+  <cac:AccountingCustomerParty>
+    <cac:Party>
+      <cac:PartyIdentification>
+        <cbc:ID schemeID="6" schemeName="Documento de Identidad" schemeAgencyName="PE:SUNAT" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06">20602740278</cbc:ID>
+      </cac:PartyIdentification>
+      <cac:PartyLegalEntity>
+        <cbc:RegistrationName>INDUAMERICA INTERNACIONAL S.A.C.</cbc:RegistrationName>
+        <cac:RegistrationAddress>
+          <cac:AddressLine>
+            <cbc:Line>AV. CAMINO REAL NRO. 931 DPTO. 201 LIMA - LIMA - SAN ISIDRO</cbc:Line>
+          </cac:AddressLine>
+        </cac:RegistrationAddress>
+      </cac:PartyLegalEntity>
+    </cac:Party>
+  </cac:AccountingCustomerParty>
+  <cac:PaymentMeans>
+    <cbc:ID>Detraccion</cbc:ID>
+    <cbc:PaymentMeansCode listName="Medio de pago" listAgencyName="PE:SUNAT" listURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo59">001</cbc:PaymentMeansCode>
+    <cac:PayeeFinancialAccount>
+      <cbc:ID>00231124012</cbc:ID>
+    </cac:PayeeFinancialAccount>
+  </cac:PaymentMeans>
+  <cac:PaymentTerms>
+    <cbc:ID>Detraccion</cbc:ID>
+    <cbc:PaymentMeansID schemeName="Codigo de detraccion" schemeAgencyName="PE:SUNAT" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo54">027</cbc:PaymentMeansID>
+    <cbc:Amount currencyID="PEN">218.00</cbc:Amount>
+  </cac:PaymentTerms>
+  <cac:PaymentTerms>
+    <cbc:ID>FormaPago</cbc:ID>
+    <cbc:PaymentMeansID>Credito</cbc:PaymentMeansID>
+    <cbc:Amount currencyID="PEN">5220.40</cbc:Amount>
+  </cac:PaymentTerms>
+  <cac:PaymentTerms>
+    <cbc:ID>FormaPago</cbc:ID>
+    <cbc:PaymentMeansID>Cuota001</cbc:PaymentMeansID>
+    <cbc:Amount currencyID="PEN">5220.40</cbc:Amount>
+    <cbc:PaymentDueDate>2024-09-06</cbc:PaymentDueDate>
+  </cac:PaymentTerms>
+  <cac:TaxTotal>
+    <cbc:TaxAmount currencyID="PEN">829.59</cbc:TaxAmount>
+    <cac:TaxSubtotal>
+      <cbc:TaxableAmount currencyID="PEN">4608.81</cbc:TaxableAmount>
+      <cbc:TaxAmount currencyID="PEN">829.59</cbc:TaxAmount>
+      <cac:TaxCategory>
+        <cac:TaxScheme>
+          <cbc:ID schemeName="Codigo de tributos" schemeAgencyName="PE:SUNAT" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo05">1000</cbc:ID>
+          <cbc:Name>IGV</cbc:Name>
+          <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>
+        </cac:TaxScheme>
+      </cac:TaxCategory>
+    </cac:TaxSubtotal>
+  </cac:TaxTotal>
+  <cac:LegalMonetaryTotal>
+    <cbc:LineExtensionAmount currencyID="PEN">4608.81</cbc:LineExtensionAmount>
+    <cbc:TaxInclusiveAmount currencyID="PEN">5438.40</cbc:TaxInclusiveAmount>
+    <cbc:AllowanceTotalAmount currencyID="PEN">0.00</cbc:AllowanceTotalAmount>
+    <cbc:ChargeTotalAmount currencyID="PEN">0.00</cbc:ChargeTotalAmount>
+    <cbc:PrepaidAmount currencyID="PEN">0.00</cbc:PrepaidAmount>
+    <cbc:PayableAmount currencyID="PEN">5438.40</cbc:PayableAmount>
+  </cac:LegalMonetaryTotal>
+  <!-- GENERADO DESDE WWW.NUBEFACT.COM -->
+  <cac:InvoiceLine>
+    <cbc:ID>1</cbc:ID>
+    <cbc:InvoicedQuantity unitCode="ZZ" unitCodeListID="UN/ECE rec 20" unitCodeListAgencyName="United Nations Economic Commission for Europe">1.0</cbc:InvoicedQuantity>
+    <cbc:LineExtensionAmount currencyID="PEN">4608.81</cbc:LineExtensionAmount>
+    <cac:PricingReference>
+      <cac:AlternativeConditionPrice>
+        <cbc:PriceAmount currencyID="PEN">5438.4</cbc:PriceAmount>
+        <cbc:PriceTypeCode listAgencyName="PE:SUNAT" listName="Tipo de Precio" listURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo16">01</cbc:PriceTypeCode>
+      </cac:AlternativeConditionPrice>
+    </cac:PricingReference>
+    <cac:Delivery>
+      <cac:Despatch>
+        <cbc:Instructions>CARGA PESADA</cbc:Instructions>
+        <cac:DespatchAddress>
+          <cbc:ID schemeAgencyName="PE:INEI" schemeName="Ubigeos">220801</cbc:ID>
+          <cac:AddressLine>
+            <cbc:Line>RIOJA</cbc:Line>
+          </cac:AddressLine>
+        </cac:DespatchAddress>
+      </cac:Despatch>
+    </cac:Delivery>
+    <cac:Delivery>
+      <cac:DeliveryTerms>
+        <cbc:ID>01</cbc:ID>
+        <cbc:Amount currencyID="PEN">5438.40</cbc:Amount>
+      </cac:DeliveryTerms>
+    </cac:Delivery>
+    <cac:Delivery>
+      <cac:DeliveryTerms>
+        <cbc:ID>02</cbc:ID>
+        <cbc:Amount currencyID="PEN">33.99</cbc:Amount>
+      </cac:DeliveryTerms>
+    </cac:Delivery>
+    <cac:Delivery>
+      <cac:DeliveryTerms>
+        <cbc:ID>03</cbc:ID>
+        <cbc:Amount currencyID="PEN">30.00</cbc:Amount>
+      </cac:DeliveryTerms>
+    </cac:Delivery>
+    <cac:Delivery>
+      <cac:DeliveryLocation>
+        <cac:Address>
+          <cbc:ID schemeAgencyName="PE:INEI" schemeName="Ubigeos">150101</cbc:ID>
+          <cac:AddressLine>
+            <cbc:Line>LIMA</cbc:Line>
+          </cac:AddressLine>
+        </cac:Address>
+      </cac:DeliveryLocation>
+    </cac:Delivery>
+    <cac:TaxTotal>
+      <cbc:TaxAmount currencyID="PEN">829.59</cbc:TaxAmount>
+      <cac:TaxSubtotal>
+        <cbc:TaxableAmount currencyID="PEN">4608.81</cbc:TaxableAmount>
+        <cbc:TaxAmount currencyID="PEN">829.59</cbc:TaxAmount>
+        <cac:TaxCategory>
+          <cbc:Percent>18.00</cbc:Percent>
+          <cbc:TaxExemptionReasonCode listAgencyName="PE:SUNAT" listName="Afectacion del IGV" listURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo07">10</cbc:TaxExemptionReasonCode>
+          <cac:TaxScheme>
+            <cbc:ID schemeName="Codigo de tributos" schemeAgencyName="PE:SUNAT" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo05">1000</cbc:ID>
+            <cbc:Name>IGV</cbc:Name>
+            <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>
+          </cac:TaxScheme>
+        </cac:TaxCategory>
+      </cac:TaxSubtotal>
+    </cac:TaxTotal>
+    <cac:Item>
+      <cbc:Description>POR EL SERVICIO DE TRANSPORTE DE, PRODUCTO: POLVILLO, RUTA: RIOJA (SAN MARTIN) A LIMA</cbc:Description>
+      <cac:SellersItemIdentification>
+        <cbc:ID>0000</cbc:ID>
+      </cac:SellersItemIdentification>
+    </cac:Item>
+    <cac:Price>
+      <cbc:PriceAmount currencyID="PEN">4608.8136</cbc:PriceAmount>
+    </cac:Price>
+  </cac:InvoiceLine>
+  <!-- GENERADO DESDE WWW.NUBEFACT.COM -->
+</Invoice>

@@ -71,15 +71,14 @@ class GestionOCController extends Controller
     {
 
 
-$timestamp = hexdec('0x0000000000355486');
-$fecha = Carbon::createFromTimestamp($timestamp);
-dd($fecha->toDateTimeString()); // Formato: 'Y-m-d H:i:s'
+// $timestamp = hexdec('0x0000000000355486');
+// $fecha = Carbon::createFromTimestamp($timestamp);
+// dd($fecha->toDateTimeString()); // Formato: 'Y-m-d H:i:s'
 
 
-        dd($decimalValue);
         header('Content-Type: text/html; charset=UTF-8');
         //$path = storage_path() . "/exports/FC26-00002985.XML";
-        $path = storage_path() . "/exports/F005-00020519.xml";
+        $path = storage_path() . "/exports/20480582561-01-FF01-22235.xml";
 
 
         $parser = new InvoiceParser();
@@ -2671,6 +2670,9 @@ dd($fecha->toDateTimeString()); // Formato: 'Y-m-d H:i:s'
                         $cant_rentencion                    =   $ordencompra_t->CAN_RETENCION;
                         $cant_perception                    =   $factura->getperception();
 
+
+
+
                         //REGISTRO DEL XML LEIDO
                         $documento                          =   new FeDocumento;
                         $documento->ID_DOCUMENTO            =   $ordencompra->COD_DOCUMENTO_CTBLE;
@@ -2682,7 +2684,6 @@ dd($fecha->toDateTimeString()); // Formato: 'Y-m-d H:i:s'
                         $documento->ESTADO                  =   'A';
                         $documento->RUC_PROVEEDOR           =   $factura->getcompany()->getruc();
                         $documento->RZ_PROVEEDOR            =   $rz_p;
-
                         $documento->TIPO_CLIENTE            =   $factura->getClient()->gettipoDoc();
                         $documento->ID_CLIENTE              =   $factura->getClient()->getnumDoc();
                         $documento->NOMBRE_CLIENTE          =   $factura->getClient()->getrznSocial();
@@ -2695,6 +2696,7 @@ dd($fecha->toDateTimeString()); // Formato: 'Y-m-d H:i:s'
                         $documento->FORMA_PAGO              =   $factura->getcondicionPago();
                         $documento->FORMA_PAGO_DIAS          =  0;
                         $documento->MONEDA                  =   $moneda_le;
+
                         $documento->VALOR_IGV_ORIG          =   $factura->getmtoIGV();
                         $documento->VALOR_IGV_SOLES         =   $factura->getmtoIGV();
                         $documento->SUB_TOTAL_VENTA_ORIG    =   $factura->getmtoOperGravadas();
@@ -2702,18 +2704,22 @@ dd($fecha->toDateTimeString()); // Formato: 'Y-m-d H:i:s'
                         $documento->TOTAL_VENTA_ORIG        =   $factura->getmtoImpVenta();
                         $documento->TOTAL_VENTA_SOLES       =   $factura->getmtoImpVenta();
 
+
+
                         $documento->PERCEPCION              =   $cant_perception;
                         $documento->MONTO_RETENCION         =   $cant_rentencion;
 
                         $documento->HORA_EMISION            =   $factura->gethoraEmision();
                         $documento->IMPUESTO_2              =   $factura->getmtoOtrosTributos();
                         $documento->TIPO_DETRACCION         =   $factura->getdetraccion()->gettipoDet();
-                        $documento->PORC_DETRACCION         =   $factura->getdetraccion()->getporcDet();
+                        $documento->PORC_DETRACCION         =   floatval($factura->getdetraccion()->getporcDet());
                         $documento->MONTO_DETRACCION        =   $factura->getdetraccion()->getbaseDetr();
                         $documento->MONTO_ANTICIPO          =   $factura->getdestotalAnticipos();
                         //$documento->OBSERVACION             =   $factura->getobservacion();
                         $documento->NRO_ORDEN_COMP          =   $factura->getcompra();              
                         $documento->NUM_GUIA                =   $factura->getguiaEmbebida();
+
+
                         $documento->estadoCp                =   0;
                         $documento->ARCHIVO_XML             =   $nombrefile;
                         $documento->ARCHIVO_CDR             =   '';
@@ -2731,7 +2737,7 @@ dd($fecha->toDateTimeString()); // Formato: 'Y-m-d H:i:s'
                         $documento->save();
 
 
-
+                        //dd("entro");
                         //ARCHIVO
                         $dcontrol                   =   new Archivo;
                         $dcontrol->ID_DOCUMENTO     =   $ordencompra->COD_DOCUMENTO_CTBLE;
