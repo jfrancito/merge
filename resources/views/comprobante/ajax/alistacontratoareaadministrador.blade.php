@@ -1,6 +1,8 @@
 <table id="nso" class="table table-striped table-borderless table-hover td-color-borde td-padding-7 listatabla">
   <thead>
     <tr>
+      <th>ITEM</th>
+
       <th>CONTRATO</th>
       <th>FACTURA</th>
       <th>REGISTRO</th>
@@ -12,6 +14,8 @@
   <tbody>
     @foreach($listadatos as $index => $item)
       <tr data_requerimiento_id = "{{$item->ID_DOCUMENTO}}">
+        <td>{{$index+1}}</td>
+
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>CODIGO : {{$item->COD_DOCUMENTO_CTBLE}} </b> </span>
           <span><b>FECHA  : {{$item->FEC_EMISION}}</b></span>
@@ -42,8 +46,8 @@
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>PROVEEDOR : </b>  {{date_format(date_create($item->fecha_pa), 'd-m-Y h:i:s')}}</span>
           <span><b>U. CONTACTO: </b>{{date_format(date_create($item->fecha_uc), 'd-m-Y h:i:s')}}</span>
-          <span><b>CONTABILIDAD : </b> {{date_format(date_create($item->fecha_pr), 'd-m-Y h:i:s')}}</span>
-          <span><b>ADMINISTRACION : </b> {{date_format(date_create($item->fecha_ap), 'd-m-Y h:i:s')}}</span>
+          <span style="font-size: 18px;"><b>CONTABILIDAD : </b> {{date_format(date_create($item->fecha_pr), 'd-m-Y h:i:s')}}</span>
+
         </td>
 
         @include('comprobante.ajax.estados')

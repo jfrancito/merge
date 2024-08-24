@@ -774,7 +774,6 @@ trait ComprobanteTraits
                             //->where('TXT_PROCEDENCIA','<>','SUE')
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
                             ->orderBy('fecha_pr','asc')
-                            
                             ->get();
 
         return  $listadatos;
