@@ -3224,8 +3224,6 @@ class GestionOCController extends Controller
                     // ejecutable en segundo plano que tod orden de ingreso que este genrado desde el merge siemplemente jale ese boton
                     $ejecutarwfc = $this->insert_detalle_producto($orden,$detalleproducto,$orden_id[0]);
 
-                    if($ejecutarwfc)
-
                     //DETALLE PRODUCTO ACTUALIZAR
                     $conexionbd         = 'sqlsrv';
                     if($orden->COD_CENTRO == 'CEN0000000000004'){ //rioja
