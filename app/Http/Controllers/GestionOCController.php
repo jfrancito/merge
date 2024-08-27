@@ -3222,7 +3222,10 @@ class GestionOCController extends Controller
                     $this->insert_referencia_asoc($orden,$detalleproducto,$orden_id[0]);//crea la referencia
                     $this->insert_detalle_producto($orden,$detalleproducto,$orden_id[0]);//crea detalle de la orden de ingresa
                     // ejecutable en segundo plano que tod orden de ingreso que este genrado desde el merge siemplemente jale ese boton
-                    $ejecutarwfc = $this->actionGuardarOrdenWcf($orden_id[0],$orden);
+                    $ejecutarwfc = $this->insert_detalle_producto($orden,$detalleproducto,$orden_id[0]);
+
+                    if($ejecutarwfc)
+
                     //DETALLE PRODUCTO ACTUALIZAR
                     $conexionbd         = 'sqlsrv';
                     if($orden->COD_CENTRO == 'CEN0000000000004'){ //rioja
@@ -3232,7 +3235,6 @@ class GestionOCController extends Controller
                             $conexionbd         = 'sqlsrv_b';
                         }
                     }
-
 
                     DB::connection($conexionbd)->table('CMP.DETALLE_PRODUCTO')
                         ->where('COD_TABLA', $idoc)
@@ -3250,55 +3252,55 @@ class GestionOCController extends Controller
 
 
 
-                }else{
-
-                    //SI ES SERVICIO PASA NORMAL
-                    FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
-                                ->update(
-                                    [
-                                        'COD_ESTADO'=>'ETM0000000000003',
-                                        'TXT_ESTADO'=>'POR APROBAR CONTABILIDAD',
-                                        'ind_email_ap'=>0,
-                                        'fecha_uc'=>$this->fechaactual,
-                                        'usuario_uc'=>Session::get('usuario')->id
-                                    ]
-                                );
-
-                    //HISTORIAL DE DOCUMENTO APROBADO
-                    $documento                              =   new FeDocumentoHistorial;
-                    $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
-                    $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
-                    $documento->FECHA                       =   $this->fechaactual;
-                    $documento->USUARIO_ID                  =   Session::get('usuario')->id;
-                    $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
-                    $documento->TIPO                        =   'APROBADO POR USUARIO CONTACTO';
-                    $documento->MENSAJE                     =   '';
-                    $documento->save();
-
-                    //whatsaap para contabilidad
-                    $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->first();
-                    $ordencompra        =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();            
-                    $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                    $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO
-                                            .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-                                            .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
-                                            .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
-
-                    if($_ENV['APP_PRODUCCION']==0){
-                        $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                    }else{
-                        $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                        $this->insertar_whatsaap('51979659002','HAMILTON',$mensaje,'');
-                        $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
-                        //CONTABILIDAD
-                        if($prefijocarperta=='II'){
-                            $this->insertar_whatsaap('51965991360','ANGHIE',$mensaje,'');           //INTERNACIONAL
-                        }else{
-                            $this->insertar_whatsaap('51950638955','MIGUEL',$mensaje,'');           //COMERCIAL
-                        }
-                    }    
-
                 }
+
+                //SI ES SERVICIO PASA NORMAL
+                FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                            ->update(
+                                [
+                                    'COD_ESTADO'=>'ETM0000000000003',
+                                    'TXT_ESTADO'=>'POR APROBAR CONTABILIDAD',
+                                    'ind_email_ap'=>0,
+                                    'fecha_uc'=>$this->fechaactual,
+                                    'usuario_uc'=>Session::get('usuario')->id
+                                ]
+                            );
+
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento                              =   new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA                       =   $this->fechaactual;
+                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                $documento->TIPO                        =   'APROBADO POR USUARIO CONTACTO';
+                $documento->MENSAJE                     =   '';
+                $documento->save();
+
+                //whatsaap para contabilidad
+                $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->first();
+                $ordencompra        =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();            
+                $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO
+                                        .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                                        .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
+                                        .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
+
+                if($_ENV['APP_PRODUCCION']==0){
+                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                }else{
+                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                    $this->insertar_whatsaap('51979659002','HAMILTON',$mensaje,'');
+                    $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
+                    //CONTABILIDAD
+                    if($prefijocarperta=='II'){
+                        $this->insertar_whatsaap('51965991360','ANGHIE',$mensaje,'');           //INTERNACIONAL
+                    }else{
+                        $this->insertar_whatsaap('51950638955','MIGUEL',$mensaje,'');           //COMERCIAL
+                    }
+                }    
+
+                
 
                 DB::commit();
             }catch(\Exception $ex){
