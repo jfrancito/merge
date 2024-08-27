@@ -1287,9 +1287,26 @@ trait ComprobanteTraits
             $ind_moneda             =   1;  
         }else{  $ind_errototal      =   0;  }
         //total
-        if(number_format($ordencompra->CAN_TOTAL, 4, '.', '') == number_format($fedocumento->TOTAL_VENTA_ORIG, 4, '.', '')){
+
+
+
+        $total_1 = $ordencompra->CAN_TOTAL;
+        $total_2 = $fedocumento->TOTAL_VENTA_ORIG;
+        $tt_totales = round(abs($total_1 - $total_2), 2);
+
+        //dd($tt_totales);
+
+        //0.02
+        if($tt_totales <= 0.01){
             $ind_total          =   1;  
         }else{  $ind_errototal      =   0;  }
+
+
+        // if(number_format($ordencompra->CAN_TOTAL, 4, '.', '') == number_format($fedocumento->TOTAL_VENTA_ORIG, 4, '.', '')){
+        //     $ind_total          =   1;  
+        // }else{  $ind_errototal      =   0;  }
+
+
 
         $ordencompra_t          =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$ordencompra->COD_DOCUMENTO_CTBLE)->first();
 
