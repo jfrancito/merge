@@ -449,6 +449,7 @@ class GestionOCContabilidadController extends Controller
             if(count($referencia)>0){
                 $ordeningreso       =   DB::connection($conexionbd)->table('CMP.ORDEN')->where('COD_ORDEN','=',$referencia->COD_TABLA_ASOC)->first();   
             }     
+            $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
 
             return View::make('comprobante/aprobarcon', 
@@ -461,6 +462,8 @@ class GestionOCContabilidadController extends Controller
                                 'detalleordencompra'    =>  $detalleordencompra,
                                 'documentohistorial'    =>  $documentohistorial,
                                 'archivos'              =>  $archivos,
+                                'archivosanulados'      =>  $archivosanulados,
+
                                 'archivospdf'           =>  $archivospdf,
                                 'detallefedocumento'    =>  $detallefedocumento,
                                 'tarchivos'             =>  $tarchivos,
@@ -630,7 +633,7 @@ class GestionOCContabilidadController extends Controller
                                         ->where('EXTENSION', 'like', '%'.'pdf'.'%')
                                         ->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                                         ->get();
-
+            $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
             return View::make('comprobante/aprobarconcontrato', 
                             [
@@ -644,6 +647,7 @@ class GestionOCContabilidadController extends Controller
 
                                 'documentohistorial'    =>  $documentohistorial,
                                 'archivos'              =>  $archivos,
+                                'archivosanulados'      =>  $archivosanulados,
                                 'detallefedocumento'    =>  $detallefedocumento,
                                 'tarchivos'             =>  $tarchivos,
                                 'tp'                    =>  $tp,

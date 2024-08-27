@@ -1,8 +1,11 @@
 <table id="nso" class="table table-striped table-borderless table-hover td-color-borde td-padding-7 listatabla">
   <thead>
     <tr>
+      <th>ITEM</th>
+
       <th>CONTRATO</th>
       <th>FACTURA</th>
+      <th>REGISTRO</th>
       <th>ESTADO</th>
       <th>OPCION</th>
     </tr>
@@ -10,9 +13,10 @@
   <tbody>
     @foreach($listadatos as $index => $item)
       <tr data_requerimiento_id = "{{$item->ID_DOCUMENTO}}">
+        <td>{{$index+1}}</td>
+
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>CODIGO : {{$item->COD_DOCUMENTO_CTBLE}} </b> </span>
-          <span><b>NUMERO : {{$item->NRO_SERIE}} - {{$item->NRO_DOC}} </b> </span>
           <span><b>FECHA  : {{$item->FEC_EMISION}}</b></span>
           <span><b>PROVEEDOR : </b> {{$item->TXT_EMPR_EMISOR}}</span>
           <span><b>TOTAL : </b> {{$item->CAN_TOTAL}}</span>
@@ -27,7 +31,8 @@
                 @endif
               @endif
           </span>
-          <span><b>FOLIO : </b> {{$item->FOLIO}}</span>
+
+
         </td>
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>SERIE : {{$item->SERIE}} </b> </span>
@@ -35,6 +40,14 @@
           <span><b>FECCHA : </b> {{$item->FEC_VENTA}}</span>
           <span><b>FORMA PAGO : </b> {{$item->FORMA_PAGO}}</span>
           <span><b>TOTAL : </b> {{number_format($item->TOTAL_VENTA_ORIG, 4, '.', ',')}}</span>
+        </td>
+
+        <td class="cell-detail sorting_1" style="position: relative;">
+          <span><b>PROVEEDOR : </b>  {{date_format(date_create($item->fecha_pa), 'd-m-Y h:i:s')}}</span>
+          <span><b>U. CONTACTO: </b>{{date_format(date_create($item->fecha_uc), 'd-m-Y h:i:s')}}</span>
+          <span><b>CONTABILIDAD : </b> {{date_format(date_create($item->fecha_pr), 'd-m-Y h:i:s')}}</span>
+          <span><b>ADMINISTRACION : </b> {{date_format(date_create($item->fecha_ap), 'd-m-Y h:i:s')}}</span>
+
         </td>
         @include('comprobante.ajax.estados')
         <td class="rigth">

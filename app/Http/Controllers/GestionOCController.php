@@ -3222,8 +3222,7 @@ class GestionOCController extends Controller
                     $this->insert_referencia_asoc($orden,$detalleproducto,$orden_id[0]);//crea la referencia
                     $this->insert_detalle_producto($orden,$detalleproducto,$orden_id[0]);//crea detalle de la orden de ingresa
                     // ejecutable en segundo plano que tod orden de ingreso que este genrado desde el merge siemplemente jale ese boton
-
-
+                    $ejecutarwfc = $this->actionGuardarOrdenWcf($orden_id[0],$orden);
                     //DETALLE PRODUCTO ACTUALIZAR
                     $conexionbd         = 'sqlsrv';
                     if($orden->COD_CENTRO == 'CEN0000000000004'){ //rioja
@@ -3233,8 +3232,6 @@ class GestionOCController extends Controller
                             $conexionbd         = 'sqlsrv_b';
                         }
                     }
-
-
 
 
                     DB::connection($conexionbd)->table('CMP.DETALLE_PRODUCTO')

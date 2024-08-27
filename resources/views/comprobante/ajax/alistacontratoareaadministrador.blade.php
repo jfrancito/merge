@@ -2,11 +2,9 @@
   <thead>
     <tr>
       <th>ITEM</th>
-
       <th>CONTRATO</th>
       <th>FACTURA</th>
       <th>REGISTRO</th>
-      
       <th>ESTADO</th>
       <th>OPCION</th>
     </tr>

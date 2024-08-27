@@ -224,6 +224,9 @@ class GestionOCValidadoController extends Controller
                                     ->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                                     ->get();
 
+        $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+
+
         //dd($archivos);
         return View::make('comprobante/registrocomprobantevalidadocontrato',
                          [
@@ -233,6 +236,7 @@ class GestionOCValidadoController extends Controller
                             'detallefedocumento'    =>  $detallefedocumento,
                             'documentohistorial'    =>  $documentohistorial,
                             'archivos'              =>  $archivos,
+                            'archivosanulados'              =>  $archivosanulados,
                             'linea'                 =>  $linea,
                             'archivospdf'           =>  $archivospdf,                         
                             'xmlarchivo'            =>  $xmlarchivo,
@@ -403,9 +407,9 @@ class GestionOCValidadoController extends Controller
         $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);
 
 
+        //dd($idoc);
 
-
-        $archivo                =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('TIPO_ARCHIVO','=',$tipo)->where('ACTIVO','=',1)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->first();
+        $archivo                =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('TIPO_ARCHIVO','=',$tipo)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->first();
         $nombrearchivo          =   trim($archivo->NOMBRE_ARCHIVO);
         $nombrefile             =   basename($nombrearchivo);
         $file                   =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE.'\\'.basename($archivo->NOMBRE_ARCHIVO);

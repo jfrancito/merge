@@ -1569,6 +1569,7 @@ class GestionOCAdministracionController extends Controller
                                         ->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                                         ->get();
 
+            $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
             return View::make('comprobante/aprobaradmcontrato', 
                             [
@@ -1577,6 +1578,8 @@ class GestionOCAdministracionController extends Controller
 
                                 'linea'                 =>  $linea,
                                 'archivos'              =>  $archivos,
+                                'archivosanulados'      =>  $archivosanulados,
+
                                 'documentohistorial'    =>  $documentohistorial,
                                 'archivospdf'           =>  $archivospdf,
                                 'detalleordencompra'    =>  $detalleordencompra,
