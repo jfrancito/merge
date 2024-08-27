@@ -963,7 +963,9 @@ class GestionOCAdministracionController extends Controller
 
                 $pedido_id          =   $idoc;
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
-
+                if($fedocumento->ind_observacion==1){
+                    return Redirect::back()->with('errorurl', 'El documento esta observado no se puede aprobar');
+                }
 
                 $filespdf          =   $request['otros'];
                 if(!is_null($filespdf)){
@@ -1293,6 +1295,10 @@ class GestionOCAdministracionController extends Controller
 
                 $pedido_id          =   $idoc;
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
+
+                if($fedocumento->ind_observacion==1){
+                    return Redirect::back()->with('errorurl', 'El documento esta observado no se puede aprobar');
+                }
 
 
                 $filespdf          =   $request['otros'];

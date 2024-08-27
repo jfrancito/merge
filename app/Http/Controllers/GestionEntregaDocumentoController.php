@@ -162,6 +162,9 @@ class GestionEntregaDocumentoController extends Controller
     public function actionGuardarMavisoEntregable(Request $request) {
 
 
+
+
+
         $fecha_inicio       =   $request['fecha_inicio'];
         $fecha_fin          =   $request['fecha_fin'];  
         $area_id            =   $request['area_id'];
@@ -171,6 +174,9 @@ class GestionEntregaDocumentoController extends Controller
         $idopcion           =   $request['idopcion'];
         $cod_empresa        =   Session::get('usuario')->usuarioosiris_id;
         $respuesta          =   json_decode($request['datastring'], true);
+
+
+        //dd($respuesta);
 
         try{    
 

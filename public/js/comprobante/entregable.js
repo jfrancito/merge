@@ -68,7 +68,10 @@ $(document).ready(function(){
 
         event.preventDefault();
         $('input[type=search]').val('').change();
-        $("#nso").DataTable().search("").draw();
+        $("#nso_check").DataTable().search("").draw();
+
+        debugger;
+
         data = dataenviar();
         if(data.length<=0){alerterrorajax('Seleccione por lo menos una fila'); return false;}
         var datastring = JSON.stringify(data);
@@ -82,6 +85,8 @@ $(document).ready(function(){
         var centro_id            =   $('#centro_id').val();
         var operacion_id         =   $('#operacion_id').val();
 
+        
+
         data            =   {
                                 _token                  : _token,
                                 datastring              : datastring,
@@ -94,6 +99,8 @@ $(document).ready(function(){
                                 operacion_id            : operacion_id,
                                 idopcion                : idopcion
                             };
+
+        //console.log(data);
 
 
         $.confirm({
