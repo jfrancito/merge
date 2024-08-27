@@ -373,7 +373,7 @@ class GestionOCController extends Controller
                                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
                                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A';
                 //dd($trabajador);                        
-                if($_ENV['APP_PRODUCCION']==0){
+                if(1==0){
                     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
                 }else{
                     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
@@ -1673,7 +1673,7 @@ class GestionOCController extends Controller
                                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
                                         .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
                 //dd($trabajador);                        
-                if($_ENV['APP_PRODUCCION']==0){
+                if(1==0){
                     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
                 }else{
                     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
@@ -3281,7 +3281,7 @@ class GestionOCController extends Controller
                                             .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
                                             .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
 
-                    if($_ENV['APP_PRODUCCION']==0){
+                    if(1==0){
                         $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
                     }else{
                         $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
@@ -3757,7 +3757,7 @@ class GestionOCController extends Controller
                                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'
                                         .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
 
-                if($_ENV['APP_PRODUCCION']==0){
+                if(1==0){
                     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
                 }else{
 

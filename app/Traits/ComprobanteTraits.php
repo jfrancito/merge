@@ -150,7 +150,7 @@ trait ComprobanteTraits
                                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
                                         .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
 
-                if($_ENV['APP_PRODUCCION']==0){
+                if(1==0){
                     $this->insertar_whatsaap_sp('51979820173','JORGE FRANCELLI',$mensaje,'');
                 }else{
                     $this->insertar_whatsaap_sp('51979820173','JORGE FRANCELLI',$mensaje,'');

@@ -244,7 +244,7 @@ class GestionUsuarioContactoController extends Controller
                 //dd($fedocumento_w);
                 // CUANDO EL WHATSAAP ES PARA EL USUARIO DEL CONTACTO
                 if($fedocumento_w->area_observacion == 'CONT'){
-                    if($_ENV['APP_PRODUCCION']==0){
+                    if(1==0){
                         $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
                     }else{
 
@@ -264,7 +264,7 @@ class GestionUsuarioContactoController extends Controller
 
                     }  
                 }else{
-                    if($_ENV['APP_PRODUCCION']==0){
+                    if(1==0){
                         $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
                     }else{
                         $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
@@ -482,7 +482,7 @@ class GestionUsuarioContactoController extends Controller
 
                 // CUANDO EL WHATSAAP ES PARA EL USUARIO DEL CONTACTO
                 if($fedocumento_w->area_observacion == 'CONT'){
-                    if($_ENV['APP_PRODUCCION']==0){
+                    if(1==0){
                         $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
                     }else{
 
@@ -498,7 +498,7 @@ class GestionUsuarioContactoController extends Controller
 
                     }  
                 }else{
-                    if($_ENV['APP_PRODUCCION']==0){
+                    if(1==0){
                         $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
                     }else{
                         $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
@@ -1041,7 +1041,7 @@ class GestionUsuarioContactoController extends Controller
                                             .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
                                             .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
 
-                    if($_ENV['APP_PRODUCCION']==0){
+                    if(1==0){
                         $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
                     }else{
 
@@ -1421,7 +1421,7 @@ class GestionUsuarioContactoController extends Controller
                                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'
                                         .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
 
-                if($_ENV['APP_PRODUCCION']==0){
+                if(1==0){
                     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
                 }else{
 

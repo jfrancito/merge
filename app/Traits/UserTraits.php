@@ -305,7 +305,7 @@ trait UserTraits
             // correos principales y  copias
             $email              =   $item->email;
 
-            if($_ENV['APP_PRODUCCION']==0){
+            if(1==0){
                 $url                =   "http://localhost:8080/merge/activar-registro/".Hashids::encode($token);
             }else{
                 $url                =   "https://merge.grupoinduamerica.com/merge/activar-registro/".Hashids::encode($token);

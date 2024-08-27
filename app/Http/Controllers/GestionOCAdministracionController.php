@@ -223,7 +223,7 @@ class GestionOCAdministracionController extends Controller
                                         .'MENSAJE : '.$descripcion.'%0D%0A';
 
                 //dd($trabajador);                        
-                if($_ENV['APP_PRODUCCION']==0){
+                if(1==0){
                     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
                 }else{
                     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
@@ -405,7 +405,7 @@ class GestionOCAdministracionController extends Controller
                                         .'MENSAJE : '.$descripcion.'%0D%0A';
 
                 //dd($trabajador);                        
-                if($_ENV['APP_PRODUCCION']==0){
+                if(1==0){
                     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
                 }else{
                     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
@@ -599,7 +599,7 @@ class GestionOCAdministracionController extends Controller
                                         .'RECOMENDACION : '.$descripcion.'%0D%0A';
 
                 //dd($trabajador);                        
-                if($_ENV['APP_PRODUCCION']==0){
+                if(1==0){
                     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
                 }else{
                     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
@@ -707,7 +707,7 @@ class GestionOCAdministracionController extends Controller
                                         .'RECOMENDACION : '.$descripcion.'%0D%0A';
 
                 //dd($trabajador);                        
-                if($_ENV['APP_PRODUCCION']==0){
+                if(1==0){
                     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
                 }else{
                     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
@@ -1187,7 +1187,7 @@ class GestionOCAdministracionController extends Controller
                 $ordencompra        =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();            
                 $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO.'%0D%0A'.'Proveedor : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'.'Estado : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
                 $trabajador         =   STDTrabajador::where('COD_TRAB','=',$fedocumento_w->COD_CONTACTO)->first();
-                if($_ENV['APP_PRODUCCION']==0){
+                if(1==0){
                     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
                 }else{
                     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
@@ -1528,7 +1528,7 @@ class GestionOCAdministracionController extends Controller
                 //$ordencompra        =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();            
                 $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO.'%0D%0A'.'Proveedor : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'.'Estado : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
                 $trabajador         =   STDTrabajador::where('COD_TRAB','=',$fedocumento_w->COD_CONTACTO)->first();
-                if($_ENV['APP_PRODUCCION']==0){
+                if(1==0){
                     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
                 }else{
                     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
