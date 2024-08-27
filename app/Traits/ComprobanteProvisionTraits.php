@@ -26,8 +26,6 @@ trait ComprobanteProvisionTraits
 {
 
 
-
-
 	private function actionGuardarOrdenWcf($codOrdenIngreso,$orden) {
 
 

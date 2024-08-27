@@ -43,6 +43,53 @@ use Keygen;
 trait ComprobanteTraits
 {
 
+    private function ejecutar_orden_ingreso() {
+
+
+        $listafedocumentos      =   FeDocumento::where('COD_ESTADO','=','ETM0000000000009')->where('OPERACION','=','ORDEN_COMPRA')->get();
+
+        foreach($listafedocumentos as $index=>$item){
+
+            if($orden->COD_CENTRO == 'CEN0000000000001'){ //chiclayo
+                $wsdl = 'http://10.1.0.201/WCF_Orden.svc?wsdl';
+                // URL del WSDL del servicio WCF 
+                if($orden->COD_CENTRO == 'CEN0000000000004'){ //rioja
+                     $wsdl = 'http://10.1.0.201/WCF_Orden.svc?wsdl';
+                }else{
+                    if($orden->COD_CENTRO == 'CEN0000000000006'){ //bellavista
+                        $wsdl = 'http://10.1.0.201/WCF_Orden.svc?wsdl';
+                    }
+                }
+                $mode = array (
+                    'soap_version'  => 'SOAP_1_2', // use soap 1.2 client
+                    'keep_alive'    => true,
+                    'trace'         => 1,
+                    'encoding'      => 'utf-8',
+                    'compression'   => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP | SOAP_COMPRESSION_DEFLATE,
+                    'Content-Encoding'=> 'UTF-8',
+                    'exceptions'    => true,
+                    'cache_wsdl'    => WSDL_CACHE_NONE,
+                );
+                $params = [
+                    'ls_Tipo' => 'I', 
+                    'codOrdenI' => $codOrdenIngreso
+                ];
+                $client     = new SoapClient($wsdl, $mode); 
+                $res        = $client->EjecutarOIMerge($params);
+                $json       = response()->json($res);
+                $jsonData   = $json->getContent();
+                $dataArray  = json_decode($jsonData, true);
+                $message    = $dataArray['EjecutarOIMergeResult'];
+
+                return $mensaje; 
+            }
+
+        }
+
+    }
+
+
+
 
     private function orden_ingreso_ejecutada() {
 

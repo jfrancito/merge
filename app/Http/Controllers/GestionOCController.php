@@ -3214,15 +3214,13 @@ class GestionOCController extends Controller
                                                     ->orderBy('NRO_LINEA','ASC')
                                                     ->get();
 
-
-
                     //almacen lote                                
                     $this->insert_almacen_lote($orden,$detalleproducto);//insertar en almacen
                     $orden_id = $this->insert_orden($orden,$detalleproducto);//crea la orden de ingreso        
                     $this->insert_referencia_asoc($orden,$detalleproducto,$orden_id[0]);//crea la referencia
                     $this->insert_detalle_producto($orden,$detalleproducto,$orden_id[0]);//crea detalle de la orden de ingresa
                     // ejecutable en segundo plano que tod orden de ingreso que este genrado desde el merge siemplemente jale ese boton
-                    //$ejecutarwfc = $this->insert_detalle_producto($orden,$detalleproducto,$orden_id[0]);
+                    $ejecutarwfc = $this->actionGuardarOrdenWcf($orden,$detalleproducto,$orden_id[0]);
 
                     //DETALLE PRODUCTO ACTUALIZAR
                     $conexionbd         = 'sqlsrv';
@@ -3296,10 +3294,7 @@ class GestionOCController extends Controller
                             $this->insertar_whatsaap('51950638955','MIGUEL',$mensaje,'');           //COMERCIAL
                         }
                     } 
-
-
                 }
-
 
                 DB::commit();
             }catch(\Exception $ex){
