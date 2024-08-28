@@ -65,7 +65,7 @@ class GestionOCContabilidadController extends Controller
             $operacion_id       =   $request['operacion_id'];
         }
         if(Session::has('operacion_id')){
-            $operacion_id           =   Session::get('periodo_id_confirmar');
+            $operacion_id           =   Session::get('operacion_id');
         }
 
         if($operacion_id=='ORDEN_COMPRA'){
