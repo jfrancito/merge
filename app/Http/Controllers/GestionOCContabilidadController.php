@@ -49,7 +49,7 @@ class GestionOCContabilidadController extends Controller
     use WhatsappTraits;
     
 
-    public function actionListarComprobanteContabilidad($idopcion)
+    public function actionListarComprobanteContabilidad($idopcion,Request $request)
     {
         /******************* validar url **********************/
         $validarurl = $this->funciones->getUrl($idopcion,'Ver');
@@ -60,6 +60,13 @@ class GestionOCContabilidadController extends Controller
         //falta usuario contacto
         $operacion_id       =   'ORDEN_COMPRA';
         $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO');
+
+        if(isset($request['operacion_id'])){
+            $operacion_id       =   $request['operacion_id'];
+        }
+        if(Session::has('operacion_id')){
+            $operacion_id           =   Session::get('periodo_id_confirmar');
+        }
 
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_total_cont($cod_empresa);

@@ -743,6 +743,7 @@ trait ComprobanteTraits
                             ->where('OPERACION','=','ORDEN_COMPRA')
 							->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
 							->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
+                            ->orderBy('ind_observacion','asc')
                             ->orderBy('fecha_uc','asc')
 							->get();
 
@@ -757,6 +758,9 @@ trait ComprobanteTraits
                             ->where('OPERACION','=','CONTRATO')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
+                            ->orderBy('ind_observacion','asc')
+                            ->orderBy('fecha_uc','asc')
+
                             ->get();
 
         return  $listadatos;
