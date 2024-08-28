@@ -39,7 +39,7 @@
                   <div class="panel panel-default panel-border-color panel-border-color-primary">
                     <div class="panel-heading panel-heading-divider">Observar Comprobante<span class="panel-subtitle">Observar un Comprobante</span></div>
                     <div class="panel-body">
-                      <form method="POST" id='formpedido' action="{{ url('/agregar-observacion-contabilidad-contrato/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -9))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
+                      <form method="POST" id='formpedidoobservar' action="{{ url('/agregar-observacion-contabilidad-contrato/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -9))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                             {{ csrf_field() }}
                         @include('comprobante.form.formobservarcontrato')
                       </form>
@@ -50,7 +50,7 @@
                     <div class="panel panel-default panel-border-color panel-border-color-primary">
                       <div class="panel-heading panel-heading-divider">Recomendar un Comprobante<span class="panel-subtitle">Recomendar un Comprobante</span></div>
                       <div class="panel-body">
-                        <form method="POST" id='formpedido' action="{{ url('/agregar-recomendacion-contabilidad-contrato/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -9))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
+                        <form method="POST" id='formpedidorecomendar' action="{{ url('/agregar-recomendacion-contabilidad-contrato/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -9))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                               {{ csrf_field() }}
                           @include('comprobante.form.formrecomendarcontrato')
                         </form>

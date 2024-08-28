@@ -69,7 +69,7 @@
   <div class="col-xs-6">
     <p class="text-right">
       <a href="{{ url('/gestion-de-comprobante-contabilidad/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
-      <button type="submit" class="btn btn-space btn-primary btnguardarcliente">Guardar</button>
+      <button type="button"  class="btn btn-space btn-primary btnaprobarcomporbatnte">Guardar</button>
     </p>
   </div>
 </div>

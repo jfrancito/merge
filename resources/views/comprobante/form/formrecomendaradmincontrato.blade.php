@@ -49,7 +49,7 @@
   <div class="col-xs-6">
     <p class="text-right">
       <a href="{{ url('/gestion-de-administracion-aprobar/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
-      <button type="submit" class="btn btn-space btn-primary btnrecomendar">Guardar</button>
+      <button type="button"  class="btn btn-space btn-primary btnrecomendarcomprobante">Guardar</button>
     </p>
   </div>
 </div>
