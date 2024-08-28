@@ -26,10 +26,27 @@
                       <div class="panel panel-default panel-border-color panel-border-color-primary">
                         <div class="panel-heading panel-heading-divider">Aprobar Comprobante Contabilidad<span class="panel-subtitle">Aprobar un Comprobante Contabilidad</span></div>
                         <div class="panel-body">
+
                           <form method="POST" id='formpedido' action="{{ url('/aprobar-comprobante-contabilidad/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
                                 {{ csrf_field() }}
                             @include('comprobante.form.formaprobarcont')
+
+                            <div class="row xs-pt-15">
+                              <div class="col-xs-6">
+                                  <div class="be-checkbox">
+
+                                  </div>
+                              </div>
+                              <div class="col-xs-6">
+                                <p class="text-right">
+                                  <a href="{{ url('/gestion-de-comprobante-contabilidad/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
+                                  <button type="button"  class="btn btn-space btn-primary btnaprobarcomporbatnte">Guardar</button>
+                                </p>
+                              </div>
+                            </div>
+
                           </form>
+
                         </div>
                       </div>
                 </div>
@@ -37,10 +54,27 @@
                   <div class="panel panel-default panel-border-color panel-border-color-primary">
                     <div class="panel-heading panel-heading-divider">Observar Comprobante<span class="panel-subtitle">Observar un Comprobante</span></div>
                     <div class="panel-body">
-                      <form method="POST" id='formpedido' action="{{ url('/agregar-observacion-contabilidad/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
-                            {{ csrf_field() }}
-                        @include('comprobante.form.formobservar')
-                      </form>
+
+                        <form method="POST" id='formpedidoobservar' action="{{ url('/agregar-observacion-contabilidad/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
+                              {{ csrf_field() }}
+                          @include('comprobante.form.formobservar')
+
+                          <div class="row xs-pt-15">
+                            <div class="col-xs-6">
+                                <div class="be-checkbox">
+
+                                </div>
+                            </div>
+                            <div class="col-xs-6">
+                              <p class="text-right">
+                                <a href="{{ url('/gestion-de-contabilidad-aprobar/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
+                                    <button type="button"  class="btn btn-space btn-primary btnobservarcomporbatnte">Guardar</button>
+                              </p>
+                            </div>
+                          </div>
+
+                        </form>
+
                     </div>
                   </div>
                 </div>
@@ -49,10 +83,30 @@
                   <div class="panel panel-default panel-border-color panel-border-color-primary">
                     <div class="panel-heading panel-heading-divider">Recomendar un Comprobante<span class="panel-subtitle">Recomendar un Comprobante</span></div>
                     <div class="panel-body">
-                      <form method="POST" id='formpedido' action="{{ url('/agregar-recomendacion-contabilidad/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
-                            {{ csrf_field() }}
-                        @include('comprobante.form.formrecomendar')
-                      </form>
+
+                        <form method="POST" id='formpedidorecomendar' action="{{ url('/agregar-recomendacion-contabilidad/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
+                              {{ csrf_field() }}
+                          @include('comprobante.form.formrecomendar')
+
+
+                          <div class="row xs-pt-15">
+                            <div class="col-xs-6">
+                                <div class="be-checkbox">
+
+                                </div>
+                            </div>
+                            <div class="col-xs-6">
+                              <p class="text-right">
+                                <a href="{{ url('/gestion-de-contabilidad-aprobar/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
+                                <button type="button"  class="btn btn-space btn-primary btnrecomendarcomprobante">Guardar</button>
+                              </p>
+                            </div>
+                          </div>
+
+
+                        </form>
+
+
                     </div>
                   </div>
 

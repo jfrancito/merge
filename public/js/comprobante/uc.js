@@ -21,6 +21,62 @@ $(document).ready(function(){
     var carpeta = $("#carpeta").val();
 
 
+    $('.btnaprobarcomporbatnte').on('click', function(event){
+        event.preventDefault();
+        $.confirm({
+            title: '¿Confirma la Aprobacion?',
+            content: 'Aprobar el Comprobante',
+            buttons: {
+                confirmar: function () {
+                    $( "#formpedido" ).submit();
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo Aprobacion');
+                }
+            }
+        });
+
+    });
+
+    $('.btnobservarcomporbatnte').on('click', function(event){
+        event.preventDefault();
+        $.confirm({
+            title: '¿Confirma la Observacion?',
+            content: 'Observacion el Comprobante',
+            buttons: {
+                confirmar: function () {
+                    $( "#formpedidoobservar" ).submit();
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo la Observacion');
+                }
+            }
+        });
+
+    });
+
+
+    $('.btnrecomendarcomprobante').on('click', function(event){
+        event.preventDefault();
+        $.confirm({
+            title: '¿Confirma la Recomendacion?',
+            content: 'Recomendacion del Comprobante',
+            buttons: {
+                confirmar: function () {
+                    $( "#formpedidorecomendar" ).submit();
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo la Recomendacion');
+                }
+            }
+        });
+
+    });
+
+
+
+
+
 
 
     $('.btnguardarcliente').on('click', function(event){

@@ -31,7 +31,6 @@ use App\Modelos\CMPReferecenciaAsoc;
 use App\Modelos\Whatsapp;
 use App\User;
 
-
 use ZipArchive;
 use SplFileInfo;
 use View;
@@ -39,6 +38,7 @@ use Session;
 use Hashids;
 Use Nexmo;
 use Keygen;
+use SoapClient;
 
 trait ComprobanteTraits
 {
@@ -50,14 +50,18 @@ trait ComprobanteTraits
 
         foreach($listafedocumentos as $index=>$item){
 
-            if($orden->COD_CENTRO == 'CEN0000000000001'){ //chiclayo
+            $orden              =   CMPOrden::where('COD_ORDEN','=',$item->ID_DOCUMENTO)->first();
+            $referenciaasoc     =   CMPReferecenciaAsoc::where('COD_TABLA','=',$item->ID_DOCUMENTO)
+                                    ->where('COD_TABLA_ASOC','LIKE','%OI%')->first();
+
+            if(count($referenciaasoc)>0){
                 $wsdl = 'http://10.1.0.201/WCF_Orden.svc?wsdl';
                 // URL del WSDL del servicio WCF 
                 if($orden->COD_CENTRO == 'CEN0000000000004'){ //rioja
-                     $wsdl = 'http://10.1.0.201/WCF_Orden.svc?wsdl';
+                     $wsdl = 'http://10.1.7.200:83/WCF_Orden.svc?wsdl';
                 }else{
                     if($orden->COD_CENTRO == 'CEN0000000000006'){ //bellavista
-                        $wsdl = 'http://10.1.0.201/WCF_Orden.svc?wsdl';
+                        $wsdl = 'http://10.1.9.43:81/WCF_Orden.svc?wsdl';
                     }
                 }
                 $mode = array (
@@ -72,7 +76,7 @@ trait ComprobanteTraits
                 );
                 $params = [
                     'ls_Tipo' => 'I', 
-                    'codOrdenI' => $codOrdenIngreso
+                    'codOrdenI' => $referenciaasoc->COD_TABLA_ASOC
                 ];
                 $client     = new SoapClient($wsdl, $mode); 
                 $res        = $client->EjecutarOIMerge($params);
@@ -80,12 +84,9 @@ trait ComprobanteTraits
                 $jsonData   = $json->getContent();
                 $dataArray  = json_decode($jsonData, true);
                 $message    = $dataArray['EjecutarOIMergeResult'];
-
-                return $mensaje; 
             }
 
         }
-
     }
 
 
