@@ -13,15 +13,56 @@
     <!--Basic forms-->
     <div class="row">
       <div class="col-md-12">
-        <div class="panel panel-default panel-border-color panel-border-color-primary">
-          <div class="panel-heading panel-heading-divider">Aprobar Comprobante Contabilidad<span class="panel-subtitle">Aprobar un Comprobante Contabilidad</span></div>
-          <div class="panel-body">
-            <form method="POST" id='formpedido' action="{{ url('/aprobar-comprobante-contabilidad-contrato/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -9))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
-                  {{ csrf_field() }}
-              @include('comprobante.form.formaprobarcontcontratto')
-            </form>
+
+
+          <div class="panel panel-default">
+            <div class="panel-heading">Revision de Comporbante ({{$ordencompra->COD_DOCUMENTO_CTBLE}})</div>
+            <div class="tab-container">
+              <ul class="nav nav-tabs">
+                <li class="active"><a href="#aprobar" data-toggle="tab"><b>APROBAR</b></a></li>
+                <li><a href="#observar" data-toggle="tab"><b>OBSERVAR</b></a></li>
+                <li><a href="#recomendar" data-toggle="tab"><b>RECOMENDAR</b></a></li>
+              </ul>
+              <div class="tab-content">
+                <div id="aprobar" class="tab-pane active cont">
+                  <div class="panel panel-default panel-border-color panel-border-color-primary">
+                    <div class="panel-heading panel-heading-divider">Aprobar Comprobante Contabilidad<span class="panel-subtitle">Aprobar un Comprobante Contabilidad</span></div>
+                    <div class="panel-body">
+                      <form method="POST" id='formpedido' action="{{ url('/aprobar-comprobante-contabilidad-contrato/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -9))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
+                            {{ csrf_field() }}
+                        @include('comprobante.form.formaprobarcontcontratto')
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                <div id="observar" class="tab-pane cont">
+                  <div class="panel panel-default panel-border-color panel-border-color-primary">
+                    <div class="panel-heading panel-heading-divider">Observar Comprobante<span class="panel-subtitle">Observar un Comprobante</span></div>
+                    <div class="panel-body">
+                      <form method="POST" id='formpedido' action="{{ url('/agregar-observacion-contabilidad-contrato/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -9))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
+                            {{ csrf_field() }}
+                        @include('comprobante.form.formobservarcontrato')
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                <div id="recomendar" class="tab-pane">
+                    <div class="panel panel-default panel-border-color panel-border-color-primary">
+                      <div class="panel-heading panel-heading-divider">Recomendar un Comprobante<span class="panel-subtitle">Recomendar un Comprobante</span></div>
+                      <div class="panel-body">
+                        <form method="POST" id='formpedido' action="{{ url('/agregar-recomendacion-contabilidad-contrato/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -9))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
+                              {{ csrf_field() }}
+                          @include('comprobante.form.formrecomendarcontrato')
+                        </form>
+                      </div>
+                    </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+
+
+
       </div>
     </div>
   </div>

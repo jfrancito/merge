@@ -1,6 +1,8 @@
 <table id="nso" class="table table-striped table-borderless table-hover td-color-borde td-padding-7 listatabla">
   <thead>
     <tr>
+      <th>ITEM</th>
+
       <th>CONTRATO</th>
       <th>FACTURA</th>
       <th>REGISTRO</th>
@@ -11,6 +13,8 @@
   <tbody>
     @foreach($listadatos as $index => $item)
       <tr data_requerimiento_id = "{{$item->ID_DOCUMENTO}}">
+
+        <td>{{$index+1}}</td>
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>CODIGO : {{$item->COD_DOCUMENTO_CTBLE}} </b> </span>
           <span><b>FECHA  : {{$item->FEC_EMISION}}</b></span>
@@ -27,8 +31,6 @@
                 @endif
               @endif
           </span>
-
-
         </td>
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>SERIE : {{$item->SERIE}} </b> </span>
@@ -51,11 +53,11 @@
             <ul role="menu" class="dropdown-menu pull-right">
               <li>
                 <a href="{{ url('/aprobar-comprobante-contabilidad-contrato/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,7).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -9))) }}">
-                  Aprobar Comprobante
+                  Revision Comprobante
                 </a>  
               </li>
 
-              <li>
+<!--               <li>
                 <a href="{{ url('/agregar-observacion-contabilidad-contrato/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,7).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -9))) }}">
                   Agregar Observacion
                 </a>  
@@ -66,7 +68,7 @@
                 <a href="{{ url('/agregar-recomendacion-contabilidad-contrato/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,7).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -9))) }}">
                   Agregar Recomendacion
                 </a>  
-              </li>
+              </li> -->
 
 <!--               <li>
                 <a href="{{ url('/agregar-observacion-contabilidad-contrato/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,7).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -9))) }}">

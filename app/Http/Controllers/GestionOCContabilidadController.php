@@ -450,6 +450,23 @@ class GestionOCContabilidadController extends Controller
                 $ordeningreso       =   DB::connection($conexionbd)->table('CMP.ORDEN')->where('COD_ORDEN','=',$referencia->COD_TABLA_ASOC)->first();   
             }     
             $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+            
+
+            $ordencompra_t          =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
+            $codigo_sunat           =   'I';
+            if($ordencompra_t->IND_VARIAS_ENTREGAS==0){
+                $codigo_sunat           =   'N';
+            }
+            $trabajador             =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+
+            $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                        ->where('COD_ESTADO','=',1)
+                                        ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->get();
+            $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+                                        ->pluck('COD_CATEGORIA_DOCUMENTO')
+                                        ->toArray();
+
 
 
             return View::make('comprobante/aprobarcon', 
@@ -457,6 +474,13 @@ class GestionOCContabilidadController extends Controller
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
                                 'ordeningreso'          =>  $ordeningreso,
+
+                                'trabajador'            =>  $trabajador,
+                                'documentoscompra'      =>  $documentoscompra,
+                                'totalarchivos'         =>  $totalarchivos,
+                                'ordencompra_t'         =>  $ordencompra_t,
+
+
 
                                 'linea'                 =>  $linea,
                                 'detalleordencompra'    =>  $detalleordencompra,
@@ -635,6 +659,22 @@ class GestionOCContabilidadController extends Controller
                                         ->get();
             $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
+
+
+
+            $trabajador             =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+            $codigo_sunat           =   'N';
+
+            $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                        ->where('COD_ESTADO','=',1)
+                                        ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->get();
+
+            $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
+                                        ->pluck('COD_CATEGORIA_DOCUMENTO')
+                                        ->toArray();
+
+
             return View::make('comprobante/aprobarconcontrato', 
                             [
                                 'fedocumento'           =>  $fedocumento,
@@ -643,6 +683,11 @@ class GestionOCContabilidadController extends Controller
 
                                 'detalleordencompra'    =>  $detalleordencompra,
                                 'archivospdf'           =>  $archivospdf,
+
+                                'trabajador'    =>  $trabajador,
+                                'documentoscompra'           =>  $documentoscompra,
+                                'totalarchivos'           =>  $totalarchivos,
+
 
 
                                 'documentohistorial'    =>  $documentohistorial,
@@ -1220,14 +1265,12 @@ class GestionOCContabilidadController extends Controller
 
                 DB::commit();
 
-                Session::flash('operacion_id', 'CONTRATO');
-
-                return Redirect::to('/gestion-de-contabilidad-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' RECOMENDACION CON EXITO');
+                //Session::flash('operacion_id', 'CONTRATO');
+                return Redirect::to('/aprobar-comprobante-contabilidad-contrato/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' RECOMENDACION CON EXITO');
             }catch(\Exception $ex){
                 DB::rollback(); 
-                Session::flash('operacion_id', 'CONTRATO');
-                
-                return Redirect::to('gestion-de-contabilidad-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+                //Session::flash('operacion_id', 'CONTRATO');
+                return Redirect::to('aprobar-comprobante-contabilidad-contrato/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
         

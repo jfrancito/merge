@@ -5,14 +5,11 @@
   <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
     @include('comprobante.form.ordencompra.sunat')
     @include('comprobante.form.ordencompra.ordeningreso')
-
-
   </div>
   <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
     @include('comprobante.form.ordencompra.seguimiento')
   </div> 
 </div>
-
 <div class="row">
   <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
     <div class="panel panel-default panel-contrast">
@@ -178,7 +175,6 @@
     </div>
   </div>
 </div>
-
 <div class="row">
   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
     @include('comprobante.form.ordencompra.verarchivopdf')
@@ -189,7 +185,6 @@
     @include('comprobante.form.ordencompra.archivosobservados')
   </div>
 </div>
-
 <div class="row">
   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
     <div class="panel panel-default panel-contrast">
@@ -218,7 +213,6 @@
     </div>
   </div>
 </div>
-
 <div class="row xs-pt-15">
   <div class="col-xs-6">
       <div class="be-checkbox">
