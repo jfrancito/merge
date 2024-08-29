@@ -851,17 +851,15 @@ trait ComprobanteTraits
     private function con_lista_cabecera_comprobante_total_gestion_contrato($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id) {
 
 
-        $trabajador     =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
-
+        $trabajador     =       STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
         $centro_id      =       $trabajador->COD_ZONA_TIPO;
+        $rol            =       WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 
-        $rol                    =   WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 
-
-        if($rol->ind_uc == 1){
-
+        if($rol->ind_uc == 1 && Session::get('usuario')->id != '1CIX00000142'){
 
             $listadatos     =   CMPDocumentoCtble::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                                ->join('ALM.CENTRO', 'ALM.CENTRO.COD_CENTRO', '=', 'CMP.DOCUMENTO_CTBLE.COD_CENTRO')
                                 //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
                                 ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                 //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
@@ -878,6 +876,7 @@ trait ComprobanteTraits
         }else{
 
             $listadatos     =   CMPDocumentoCtble::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                                ->join('ALM.CENTRO', 'ALM.CENTRO.COD_CENTRO', '=', 'CMP.DOCUMENTO_CTBLE.COD_CENTRO')
                                 //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
                                 ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                 //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)

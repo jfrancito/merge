@@ -42,11 +42,6 @@
   </div>
 </div>
 
-
-
-
-
-
 <div class="form-group">
   <label class="col-sm-3 control-label">Descripcion de Observacion<span class="obligatorio">(*)</span> :</label>
   <div class="col-sm-6">
@@ -69,8 +64,8 @@
   </div>
   <div class="col-xs-6">
     <p class="text-right">
-      <a href="{{ url('/gestion-de-contabilidad-aprobar/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
-      <button type="submit" class="btn btn-space btn-primary btnobservar">Guardar</button>
+      <a href="{{ url('/gestion-de-administracion-aprobar/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
+      <button type="submit" class="btn btn-space btn-primary btnobservarcomporbatnte">Guardar</button>
     </p>
   </div>
 </div>

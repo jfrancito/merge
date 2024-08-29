@@ -31,7 +31,7 @@
                 @endif
               @endif
           </span>
-
+          <span><b>CENTRO : </b> {{$item->NOM_CENTRO}}</span>
 
         </td>
         <td class="cell-detail sorting_1" style="position: relative;">

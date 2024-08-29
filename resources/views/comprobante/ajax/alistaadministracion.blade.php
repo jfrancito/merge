@@ -72,11 +72,11 @@
               </li> -->
               <li>
                 <a href="{{ url('/aprobar-comprobante-administracion/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,6).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -10))) }}">
-                  Aprobar Comprobante
+                  Revisar Comprobante
                 </a>  
               </li>
 
-
+<!-- 
               <li>
                 <a href="{{ url('/agregar-observacion-administracion/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,6).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -10))) }}">
                   Agregar Observacion
@@ -88,7 +88,7 @@
                 <a href="{{ url('/agregar-recomendacion-administracion/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,6).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -10))) }}">
                   Agregar Recomendacion
                 </a>  
-              </li>
+              </li> -->
 
 
 

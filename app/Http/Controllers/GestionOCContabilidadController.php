@@ -319,9 +319,40 @@ class GestionOCContabilidadController extends Controller
                 $pedido_id          =   $idoc;
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
 
-
                 if($fedocumento->ind_observacion==1){
                     return Redirect::back()->with('errorurl', 'El documento esta observado no se puede aprobar');
+                }
+
+                $descripcion        =   $request['descripcion'];
+
+                if(rtrim(ltrim($descripcion)) != ''){
+                    //HISTORIAL DE DOCUMENTO APROBADO
+                    $documento                              =   new FeDocumentoHistorial;
+                    $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                    $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                    $documento->FECHA                       =   $this->fechaactual;
+                    $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                    $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                    $documento->TIPO                        =   'RECOMENDACION POR CONTABILIDAD';
+                    $documento->MENSAJE                     =   $descripcion;
+                    $documento->save();
+
+                    //LE LLEGA AL USUARIO DE CONTACTO
+                    $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+                    $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                    $mensaje            =   'COMPROBANTE: '.$fedocumento->ID_DOCUMENTO
+                                            .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                                            .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
+                                            .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
+                                            .'RECOMENDACION : '.$descripcion.'%0D%0A';
+                    //dd($trabajador);                        
+                    if(1==0){
+                        $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                    }else{
+                        $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                        $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
+                    }  
+
                 }
 
                 $filespdf          =   $request['otros'];
@@ -539,6 +570,35 @@ class GestionOCContabilidadController extends Controller
                     return Redirect::back()->with('errorurl', 'El documento esta observado no se puede aprobar');
                 }
 
+                $descripcion        =   $request['descripcion'];
+                if(rtrim(ltrim($descripcion)) != ''){
+                    //HISTORIAL DE DOCUMENTO APROBADO
+                    $documento                              =   new FeDocumentoHistorial;
+                    $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                    $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                    $documento->FECHA                       =   $this->fechaactual;
+                    $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                    $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                    $documento->TIPO                        =   'RECOMENDACION POR CONTABILIDAD';
+                    $documento->MENSAJE                     =   $descripcion;
+                    $documento->save();
+                    //LE LLEGA AL USUARIO DE CONTACTO
+                    $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+                    $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                    $mensaje            =   'COMPROBANTE: '.$fedocumento->ID_DOCUMENTO
+                                            .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                                            .'PROVEEDOR : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'
+                                            .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
+                                            .'RECOMENDACION : '.$descripcion.'%0D%0A';
+                    //dd($trabajador);                        
+                    if(1==0){
+                        $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                    }else{
+                        $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                        $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
+                    }  
+                }
+
 
 
                 $filespdf          =   $request['otros'];
@@ -738,6 +798,12 @@ class GestionOCContabilidadController extends Controller
                 $descripcion        =   $request['descripcion'];
                 $archivoob          =   $request['archivoob'];
 
+
+                if($fedocumento->ind_observacion==1){
+                    DB::rollback(); 
+                    return Redirect::back()->with('errorurl', 'El documento esta observado no se puede observar');
+                }
+
                 if(count($archivoob)<=0){
                     DB::rollback(); 
                     return Redirect::to('agregar-observacion-contabilidad/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', 'Tiene que seleccionar almenos un item');
@@ -925,6 +991,13 @@ class GestionOCContabilidadController extends Controller
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
                 $descripcion        =   $request['descripcion'];
                 $archivoob          =   $request['archivoob'];
+
+
+                if($fedocumento->ind_observacion==1){
+                    DB::rollback(); 
+                    return Redirect::back()->with('errorurl', 'El documento esta observado no se puede observar');
+                }
+
 
                 if(count($archivoob)<=0){
                     DB::rollback(); 
@@ -1114,6 +1187,10 @@ class GestionOCContabilidadController extends Controller
                 DB::beginTransaction();
                 $pedido_id          =   $idoc;
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
+
+
+
+
                 $descripcion        =   $request['descripcion'];
 
                 //HISTORIAL DE DOCUMENTO APROBADO

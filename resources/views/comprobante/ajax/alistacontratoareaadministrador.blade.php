@@ -55,11 +55,11 @@
             <ul role="menu" class="dropdown-menu pull-right">
               <li>
                 <a href="{{ url('/aprobar-comprobante-administracion-contrato/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,7).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -9))) }}">
-                  Aprobar Comprobante
+                  Revision Comprobante
                 </a>  
               </li>
 
-
+<!-- 
               <li>
                 <a href="{{ url('/agregar-observacion-administracion-contrato/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,7).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -9))) }}">
                   Agregar Observacion
@@ -71,7 +71,7 @@
                 <a href="{{ url('/agregar-recomendacion-administracion-contrato/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,7).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -9))) }}">
                   Agregar Recomendacion
                 </a>  
-              </li>
+              </li> -->
 
 
             </ul>

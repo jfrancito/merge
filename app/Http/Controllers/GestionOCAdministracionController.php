@@ -150,6 +150,12 @@ class GestionOCAdministracionController extends Controller
                 $descripcion        =   $request['descripcion'];
                 $archivoob          =   $request['archivoob'];
 
+
+                if($fedocumento->ind_observacion==1){
+                    DB::rollback(); 
+                    return Redirect::back()->with('errorurl', 'El documento esta observado no se puede observar');
+                }
+
                 if(count($archivoob)<=0){
                     DB::rollback(); 
                     return Redirect::to('aprobar-comprobante-administracion/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', 'Tiene que seleccionar almenos un item');
@@ -331,6 +337,13 @@ class GestionOCAdministracionController extends Controller
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->where('TXT_PROCEDENCIA','<>','SUE')->first();
                 $descripcion        =   $request['descripcion'];
                 $archivoob          =   $request['archivoob'];
+
+
+
+                if($fedocumento->ind_observacion==1){
+                    DB::rollback(); 
+                    return Redirect::back()->with('errorurl', 'El documento esta observado no se puede observar');
+                }
 
                 if(count($archivoob)<=0){
                     DB::rollback(); 
@@ -960,11 +973,40 @@ class GestionOCAdministracionController extends Controller
                 
                 DB::beginTransaction();
 
-
                 $pedido_id          =   $idoc;
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
                 if($fedocumento->ind_observacion==1){
                     return Redirect::back()->with('errorurl', 'El documento esta observado no se puede aprobar');
+                }
+
+                $descripcion        =   $request['descripcion'];
+                if(rtrim(ltrim($descripcion)) != ''){
+                    //HISTORIAL DE DOCUMENTO APROBADO
+                    $documento                              =   new FeDocumentoHistorial;
+                    $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                    $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                    $documento->FECHA                       =   $this->fechaactual;
+                    $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                    $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                    $documento->TIPO                        =   'RECOMENDACION POR CONTABILIDAD';
+                    $documento->MENSAJE                     =   $descripcion;
+                    $documento->save();
+                    //LE LLEGA AL USUARIO DE CONTACTO
+                    $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+                    $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                    $mensaje            =   'COMPROBANTE: '.$fedocumento->ID_DOCUMENTO
+                                            .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                                            .'PROVEEDOR : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'
+                                            .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
+                                            .'RECOMENDACION : '.$descripcion.'%0D%0A';
+                    //dd($trabajador);                        
+                    if(1==0){
+                        $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                    }else{
+                        $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                        $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
+                    }  
+
                 }
 
                 $filespdf          =   $request['otros'];
@@ -1245,6 +1287,22 @@ class GestionOCAdministracionController extends Controller
             }                        
             $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
+            $ordencompra_t          =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
+            $codigo_sunat           =   'I';
+            if($ordencompra_t->IND_VARIAS_ENTREGAS==0){
+                $codigo_sunat           =   'N';
+            }
+            $trabajador             =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+
+            $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                        ->where('COD_ESTADO','=',1)
+                                        ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->get();
+            $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+                                        ->pluck('COD_CATEGORIA_DOCUMENTO')
+                                        ->toArray();
+
+
             return View::make('comprobante/aprobaradm', 
                             [
                                 'fedocumento'           =>  $fedocumento,
@@ -1252,6 +1310,13 @@ class GestionOCAdministracionController extends Controller
                                 'ordeningreso'          =>  $ordeningreso,
                                 'linea'                 =>  $linea,
                                 'archivos'              =>  $archivos,
+
+                                'trabajador'            =>  $trabajador,
+                                'documentoscompra'      =>  $documentoscompra,
+                                'totalarchivos'         =>  $totalarchivos,
+                                'ordencompra_t'         =>  $ordencompra_t,
+
+
                                 'documentohistorial'    =>  $documentohistorial,
                                 'archivospdf'           =>  $archivospdf,
                                 'detalleordencompra'    =>  $detalleordencompra,
@@ -1299,6 +1364,38 @@ class GestionOCAdministracionController extends Controller
                 if($fedocumento->ind_observacion==1){
                     return Redirect::back()->with('errorurl', 'El documento esta observado no se puede aprobar');
                 }
+
+
+                $descripcion        =   $request['descripcion'];
+                if(rtrim(ltrim($descripcion)) != ''){
+                    //HISTORIAL DE DOCUMENTO APROBADO
+                    $documento                              =   new FeDocumentoHistorial;
+                    $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                    $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                    $documento->FECHA                       =   $this->fechaactual;
+                    $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                    $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                    $documento->TIPO                        =   'RECOMENDACION POR CONTABILIDAD';
+                    $documento->MENSAJE                     =   $descripcion;
+                    $documento->save();
+                    //LE LLEGA AL USUARIO DE CONTACTO
+                    $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+                    $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                    $mensaje            =   'COMPROBANTE: '.$fedocumento->ID_DOCUMENTO
+                                            .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                                            .'PROVEEDOR : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'
+                                            .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
+                                            .'RECOMENDACION : '.$descripcion.'%0D%0A';
+                    //dd($trabajador);                        
+                    if(1==0){
+                        $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                    }else{
+                        $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                        $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
+                    }  
+                }
+
+
 
 
                 $filespdf          =   $request['otros'];
@@ -1571,6 +1668,21 @@ class GestionOCAdministracionController extends Controller
 
             $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
+
+
+            $trabajador             =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+            $codigo_sunat           =   'N';
+
+            $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                        ->where('COD_ESTADO','=',1)
+                                        ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->get();
+
+            $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
+                                        ->pluck('COD_CATEGORIA_DOCUMENTO')
+                                        ->toArray();
+
+
             return View::make('comprobante/aprobaradmcontrato', 
                             [
                                 'fedocumento'           =>  $fedocumento,
@@ -1579,6 +1691,11 @@ class GestionOCAdministracionController extends Controller
                                 'linea'                 =>  $linea,
                                 'archivos'              =>  $archivos,
                                 'archivosanulados'      =>  $archivosanulados,
+
+                                'trabajador'    =>  $trabajador,
+                                'documentoscompra'           =>  $documentoscompra,
+                                'totalarchivos'           =>  $totalarchivos,
+
 
                                 'documentohistorial'    =>  $documentohistorial,
                                 'archivospdf'           =>  $archivospdf,

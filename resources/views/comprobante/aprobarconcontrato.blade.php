@@ -19,9 +19,9 @@
             <div class="panel-heading">Revision de Comporbante ({{$ordencompra->COD_DOCUMENTO_CTBLE}})</div>
             <div class="tab-container">
               <ul class="nav nav-tabs">
-                <li class="active"><a href="#aprobar" data-toggle="tab"><b>APROBAR</b></a></li>
+                <li class="active"><a href="#aprobar" data-toggle="tab"><b>APROBAR y RECOMENDAR</b></a></li>
                 <li><a href="#observar" data-toggle="tab"><b>OBSERVAR</b></a></li>
-                <li><a href="#recomendar" data-toggle="tab"><b>RECOMENDAR</b></a></li>
+                <!-- <li><a href="#recomendar" data-toggle="tab"><b>RECOMENDAR</b></a></li> -->
               </ul>
               <div class="tab-content">
                 <div id="aprobar" class="tab-pane active cont">

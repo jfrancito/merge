@@ -61,6 +61,12 @@ class GestionOCValidadoController extends Controller
 
         //falta usuario contacto
         $operacion_id       =   'ORDEN_COMPRA';
+        $array_contrato     =   $this->array_rol_contrato();
+        if (in_array(Session::get('usuario')->rol_id, $array_contrato)) {
+            $operacion_id       =   'CONTRATO';
+        }
+
+        
         $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO');
 
         if($operacion_id=='ORDEN_COMPRA'){

@@ -17,9 +17,9 @@
             <div class="panel-heading">Revision de Comporbante ({{$ordencompra->COD_ORDEN}})</div>
             <div class="tab-container">
               <ul class="nav nav-tabs">
-                <li class="active"><a href="#aprobar" data-toggle="tab"><b>APROBAR</b></a></li>
+                <li class="active"><a href="#aprobar" data-toggle="tab"><b>APROBAR y RECOMENDAR</b></a></li>
                 <li><a href="#observar" data-toggle="tab"><b>OBSERVAR</b></a></li>
-                <li><a href="#recomendar" data-toggle="tab"><b>RECOMENDAR</b></a></li>
+                <!-- <li><a href="#recomendar" data-toggle="tab"><b>RECOMENDAR</b></a></li> -->
               </ul>
               <div class="tab-content">
                 <div id="aprobar" class="tab-pane active cont">
@@ -30,7 +30,6 @@
                           <form method="POST" id='formpedido' action="{{ url('/aprobar-comprobante-contabilidad/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
                                 {{ csrf_field() }}
                             @include('comprobante.form.formaprobarcont')
-
                             <div class="row xs-pt-15">
                               <div class="col-xs-6">
                                   <div class="be-checkbox">
@@ -39,14 +38,12 @@
                               </div>
                               <div class="col-xs-6">
                                 <p class="text-right">
-                                  <a href="{{ url('/gestion-de-comprobante-contabilidad/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
+                                  <a href="{{ url('/gestion-de-contabilidad-aprobar/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
                                   <button type="button"  class="btn btn-space btn-primary btnaprobarcomporbatnte">Guardar</button>
                                 </p>
                               </div>
                             </div>
-
                           </form>
-
                         </div>
                       </div>
                 </div>
