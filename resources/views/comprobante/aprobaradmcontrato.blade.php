@@ -29,9 +29,9 @@
 
 
                   <div class="panel panel-default panel-border-color panel-border-color-primary">
-                    <div class="panel-heading panel-heading-divider">Aprobar Comprobante Contabilidad<span class="panel-subtitle">Aprobar un Comprobante Contabilidad</span></div>
+                    <div class="panel-heading panel-heading-divider">Aprobar Comprobante Administracion<span class="panel-subtitle">Aprobar un Comprobante Administracion</span></div>
                     <div class="panel-body">
-                      <form method="POST" id='formpedido' action="{{ url('/aprobar-comprobante-contabilidad-contrato/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -9))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
+                      <form method="POST" id='formpedido' action="{{ url('/aprobar-comprobante-administracion-contrato/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -9))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
                             {{ csrf_field() }}
                         @include('comprobante.form.formaprobarcontcontratto')
                       </form>
