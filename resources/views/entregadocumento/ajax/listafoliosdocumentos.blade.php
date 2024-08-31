@@ -7,6 +7,9 @@
 
       <th>USUARIO CREA</th>
       <th>FECHA CREA</th>
+      <th>OPCION</th>
+
+
   </thead>
   <tbody>
     @foreach($listadatos as $index => $item)
@@ -18,6 +21,18 @@
         <td>{{$item->CAN_FOLIO}}</td>
         <td>{{$item->nombre}}</td>
         <td>{{date_format(date_create($item->FECHA_CREA), 'd-m-Y h:i:s')}}</td>
+        <td class="rigth">
+          <div class="btn-group btn-hspace">
+            <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>
+            <ul role="menu" class="dropdown-menu pull-right">
+              <li>
+                <a href="{{ url('/descargar-folio-excel/'.$item->FOLIO) }}">
+                  Descargar Resumen
+                </a>  
+              </li>
+            </ul>
+          </div>
+        </td>
       </tr>                    
     @endforeach
   </tbody>

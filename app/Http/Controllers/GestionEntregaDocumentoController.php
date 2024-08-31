@@ -18,6 +18,8 @@ use App\Modelos\Archivo;
 use App\Modelos\CMPReferecenciaAsoc;
 use App\Modelos\CMPOrden;
 use App\Modelos\FeDocumentoEntregable;
+use App\Modelos\STDEmpresa;
+
 
 
 use Greenter\Parser\DocumentParserInterface;
@@ -35,6 +37,7 @@ use App\Traits\GeneralesTraits;
 use App\Traits\ComprobanteTraits;
 use Hashids;
 use SplFileInfo;
+use Excel;
 
 class GestionEntregaDocumentoController extends Controller
 {
@@ -58,7 +61,8 @@ class GestionEntregaDocumentoController extends Controller
         $estado_id      =   'TODO';
         $combo_estado   =   $this->gn_combo_estado_fe_documento($estado_id);
         $empresa_id     =   Session::get('empresas')->COD_EMPR;
-        $combo_empresa  =   $this->gn_combo_empresa('');
+
+        $combo_empresa  =   $this->gn_combo_empresa_empresa($empresa_id);
         $centro_id      =   'CEN0000000000001';
         $combo_centro   =   $this->gn_combo_centro_r('');
         $area_id      =   'TODO';
@@ -185,7 +189,7 @@ class GestionEntregaDocumentoController extends Controller
                 $ID_DOCUMENTO_ENCONTRO             =   $obj['data_requerimiento_id'];
             }
 
-
+            $empresa_id     =   Session::get('empresas')->COD_EMPR;
             $fedocumento_encontro                   =   FeDocumento::where('ID_DOCUMENTO',$ID_DOCUMENTO_ENCONTRO)->first();
 
             $codigo                                 =   $this->funciones->generar_folio('FE_DOCUMENTO_ENTREGABLE',8);
@@ -196,6 +200,8 @@ class GestionEntregaDocumentoController extends Controller
             $documento->USUARIO_CREA                =   Session::get('usuario')->id;
             $documento->FECHA_CREA                  =   $this->fechaactual;
             $documento->OPERACION                   =   $fedocumento_encontro->OPERACION;
+            $documento->COD_EMPRESA                 =   $empresa_id;
+
             $documento->save();
             foreach($respuesta as $obj){
                 $ID_DOCUMENTO                       =   $obj['data_requerimiento_id'];
@@ -251,7 +257,12 @@ class GestionEntregaDocumentoController extends Controller
         /******************************************************/
         View::share('titulo','Lista de Folio de Documentos');
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
-        $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')->get();
+
+        $empresa_id     =   Session::get('empresas')->COD_EMPR;
+
+        $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
+                            ->where('COD_EMPRESA','=',$empresa_id)
+                            ->get();
 
         $funcion        =   $this;
         return View::make('entregadocumento/listaentregadocumentofolio',
@@ -261,6 +272,44 @@ class GestionEntregaDocumentoController extends Controller
                             'idopcion'          =>  $idopcion,
                          ]);
     }
+
+
+    public function actionDescargarDocumentoFolio($folio_codigo)
+    {
+
+        $folio                  =   FeDocumentoEntregable::where('FOLIO','=',$folio_codigo)->first();
+        if($folio->OPERACION=='ORDEN_COMPRA'){
+            $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda($folio->FOLIO,'MON0000000000001');
+            $listadatosdolar    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda($folio->FOLIO,'MON0000000000002');
+        }else{
+            $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_contrato_modal_moneda($folio->FOLIO,'MON0000000000001');
+            $listadatosdolar    =   $this->con_lista_cabecera_comprobante_entregable_contrato_modal_moneda($folio->FOLIO,'MON0000000000002');
+
+        }
+
+        $operacion_id           =   $folio->OPERACION;
+        $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
+        $titulo                 =   'FOLIO('.$folio_codigo.') '.$empresa->NOM_EMPR;
+
+        Excel::create($titulo, function($excel) use ($listadatossoles,$listadatosdolar,$operacion_id) {
+
+            $excel->sheet('Soles', function($sheet) use ($listadatossoles,$operacion_id){
+                $sheet->loadView('entregadocumento/excel/eentregable')->with('listadatos',$listadatossoles)
+                                                                      ->with('operacion_id',$operacion_id);         
+            });
+
+            $excel->sheet('Dolares', function($sheet) use ($listadatosdolar,$operacion_id){
+                $sheet->loadView('entregadocumento/excel/eentregable')->with('listadatos',$listadatosdolar)
+                                                                      ->with('operacion_id',$operacion_id);       
+            });
+
+        })->export('xls');
+
+
+    }
+
+
+
 
 
 
