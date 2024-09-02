@@ -66,7 +66,7 @@
             <td><b>FORMA PAGO</b></td>
             <td><p class='subtitulomerge'>{{$tp->NOM_CATEGORIA}}</p></td>
             <td>
-              <div class='subtitulomerge @if($fedocumento->ind_cantidaditem == 1) msjexitoso @else msjerror @endif'>{{$fedocumento->FORMA_PAGO}} 
+              <div class='subtitulomerge @if($fedocumento->ind_formapago == 1) msjexitoso @else msjerror @endif'>{{$fedocumento->FORMA_PAGO}} 
               </div>
             </td>
           </tr>
