@@ -63,6 +63,15 @@
                   @endif
                 @endif
               </li>
+
+
+              <li>
+                <a href="{{ url('/agregar-archivo-uc-contrato/'.$procedencia.'/'.$idopcion.'/'.substr($item->COD_DOCUMENTO_CTBLE, 0,7).'/'.Hashids::encode(substr($item->COD_DOCUMENTO_CTBLE, -9))) }}">
+                  Agregar Archivos
+                </a>  
+              </li>
+              
+
             </ul>
           </div>
         </td>

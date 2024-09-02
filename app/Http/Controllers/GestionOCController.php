@@ -3889,6 +3889,98 @@ class GestionOCController extends Controller
 
 
 
+    public function actionAgregarArchivoUCContrato($procedencia,$idopcion, $prefijo, $idordencompra, Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo_contrato($idordencompra,$prefijo);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_contrato_idoc($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
+
+        View::share('titulo','Agregar Comprobante');
+
+        if($_POST)
+        {
+
+            try{    
+                
+                DB::beginTransaction();
+                $pedido_id          =   $idoc;
+                $archivoob          =   $request['archivoob'];
+
+                if(count($archivoob)<=0){
+                    DB::rollback(); 
+                    return Redirect::to('agregar-archivo-uc-contrato/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', 'Tiene que seleccionar almenos un item');
+                }
+
+                foreach($archivoob as $index=>$item){
+
+                    $categoria                               =   CMPCategoria::where('COD_CATEGORIA','=',$item)->first();
+                    $docasociar                              =   New CMPDocAsociarCompra;
+                    $docasociar->COD_ORDEN                   =   $idoc;
+                    $docasociar->COD_CATEGORIA_DOCUMENTO     =   $categoria->COD_CATEGORIA;
+                    $docasociar->NOM_CATEGORIA_DOCUMENTO     =   $categoria->NOM_CATEGORIA;
+                    $docasociar->IND_OBLIGATORIO             =   0;
+                    $docasociar->TXT_FORMATO                 =   $categoria->COD_CTBLE;
+                    $docasociar->TXT_ASIGNADO                =   $categoria->TXT_ABREVIATURA;
+                    $docasociar->COD_USUARIO_CREA_AUD        =   Session::get('usuario')->id;
+                    $docasociar->FEC_USUARIO_CREA_AUD        =   $this->fechaactual;
+                    $docasociar->COD_ESTADO                  =   1;
+                    $docasociar->TIP_DOC                     =   $categoria->CODIGO_SUNAT;
+                    $docasociar->save();
+
+                }
+
+                DB::commit();
+                return Redirect::to('/gestion-de-orden-compra/'.$idopcion)->with('bienhecho', 'Archivo aosicado a la orden : '.$ordencompra->COD_ORDEN.' registrado con exito');
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                return Redirect::to('gestion-de-orden-compra/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+
+        }
+        else{
+
+
+            $detalleordencompra     =   $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
+            $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
+            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+                                        ->where('TXT_ASIGNADO','=','CONTACTO')
+                                        ->get();
+            $codigo_sunat           =   'N';
+            $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                        ->where('COD_CATEGORIA','=','DCC0000000000029')
+                                        ->where('COD_ESTADO','=',1)
+                                        ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->get();
+
+            $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+                                        ->pluck('COD_CATEGORIA_DOCUMENTO')
+                                        ->toArray();
+
+            return View::make('comprobante/agregararchivocontrato', 
+                            [
+
+                                'ordencompra'           =>  $ordencompra,
+                                'procedencia'           =>  $procedencia,
+
+                                'documentoscompra'      =>  $documentoscompra,
+                                'detalleordencompra'    =>  $detalleordencompra,
+                                'tarchivos'             =>  $tarchivos,
+                                'totalarchivos'         =>  $totalarchivos,
+                                'tp'                    =>  $tp,
+                                'idopcion'              =>  $idopcion,
+                                'idoc'                  =>  $idoc,
+                            ]);
+
+
+        }
+    }
+
+
 
 
 
