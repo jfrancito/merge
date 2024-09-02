@@ -19,6 +19,7 @@
               </div>
             </td>
           </tr>
+
           <tr>
             <td><b>RAZON SOCIAL</b></td>
             <td><p class='subtitulomerge'>{{$ordencompra->TXT_EMPR_CLIENTE}}</p></td>
@@ -27,8 +28,18 @@
               </div>
             </td>
           </tr>
+
           <tr>
-            <td><b>Moneda</b></td>
+            <td><b>FECHA EMISION</b></td>
+            <td><p class='subtitulomerge'>{{date_format(date_create($ordencompra->FEC_ORDEN), 'd/m/Y')}}</p></td>
+            <td>
+              <div class='subtitulomerge @if($fedocumento->ind_fecha == 1) msjexitoso @else msjerror @endif'><b>{{date_format(date_create($fedocumento->FEC_VENTA), 'd/m/Y')}}</b>
+              </div>
+            </td>
+          </tr>
+
+          <tr>
+            <td><b>MONEDA</b></td>
             <td><p class='subtitulomerge'>{{$ordencompra->TXT_CATEGORIA_MONEDA}}</p></td>
             <td>
               <div class='subtitulomerge @if($fedocumento->ind_moneda == 1) msjexitoso @else msjerror @endif'> <b>
@@ -42,7 +53,7 @@
           </tr>
 
           <tr>
-            <td><b>Total</b></td>
+            <td><b>TOTAL</b></td>
             <td><p class='subtitulomerge'>{{number_format($ordencompra->CAN_TOTAL, 4, '.', ',')}}</p></td>
             <td>
               <div class='subtitulomerge @if($fedocumento->ind_total == 1) msjexitoso @else msjerror @endif'>
@@ -52,7 +63,7 @@
           </tr>
 
           <tr>
-            <td><b>Forma Pago</b></td>
+            <td><b>FORMA PAGO</b></td>
             <td><p class='subtitulomerge'>{{$tp->NOM_CATEGORIA}}</p></td>
             <td>
               <div class='subtitulomerge @if($fedocumento->ind_cantidaditem == 1) msjexitoso @else msjerror @endif'>{{$fedocumento->FORMA_PAGO}} 
@@ -61,7 +72,7 @@
           </tr>
 
           <tr>
-            <td><b>Cantidad item</b></td>
+            <td><b>CANTIDAD ITEM</b></td>
             <td><p class='subtitulomerge'>{{count($detalleordencompra)}}</p></td>
             <td>
                <div class='subtitulomerge @if($fedocumento->ind_cantidaditem == 1) msjexitoso @else msjerror @endif'><b>{{count($detallefedocumento)}}</b>
@@ -78,8 +89,6 @@
             <td><b>RETENCION</b></td>
             <td  colspan="2" class=""><b>{{$fedocumento->MONTO_RETENCION}}</b></td>
           </tr>
-
-
 
       </tbody>
     </table>

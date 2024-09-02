@@ -2490,8 +2490,6 @@ class GestionOCController extends Controller
                         //VALIDAR QUE ALGUNOS CAMPOS SEAN IGUALES
                         $this->con_validar_documento_proveedor($ordencompra,$fedocumento,$detalleordencompra,$detallefedocumento);
 
-
-                        
                         $token = '';
                         if($prefijocarperta =='II'){
                             $token           =      $this->generartoken_ii();

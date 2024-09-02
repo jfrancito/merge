@@ -462,13 +462,11 @@ class GestionOCContabilidadController extends Controller
             $documentohistorial     =   FeDocumentoHistorial::where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                                         ->orderBy('FECHA','DESC')
                                         ->get();
-            $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','1')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
-            $archivospdf            =   Archivo::where('ID_DOCUMENTO','=',$idoc)
-                                        ->where('ACTIVO','=','1')
-                                        ->where('EXTENSION', 'like', '%'.'pdf'.'%')
-                                        ->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
-                                        ->get();
+
+            $archivos               =   $this->lista_archivos_total($idoc,$fedocumento->DOCUMENTO_ITEM);
+            $archivospdf            =   $this->lista_archivos_total_pdf($idoc,$fedocumento->DOCUMENTO_ITEM);
+
 
 
             //orden de ingreso
@@ -716,14 +714,11 @@ class GestionOCContabilidadController extends Controller
                                         ->orderBy('FECHA','DESC')
                                         ->get();
 
-            $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','1')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+
+            $archivos               =   $this->lista_archivos_total($idoc,$fedocumento->DOCUMENTO_ITEM);
+            $archivospdf            =   $this->lista_archivos_total_pdf($idoc,$fedocumento->DOCUMENTO_ITEM);
 
 
-            $archivospdf            =   Archivo::where('ID_DOCUMENTO','=',$idoc)
-                                        ->where('ACTIVO','=','1')
-                                        ->where('EXTENSION', 'like', '%'.'pdf'.'%')
-                                        ->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
-                                        ->get();
             $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
 

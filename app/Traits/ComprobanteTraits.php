@@ -39,9 +39,89 @@ use Hashids;
 Use Nexmo;
 use Keygen;
 use SoapClient;
+use Carbon\Carbon;
 
 trait ComprobanteTraits
 {
+
+    private function lista_archivos_total_sin_voucher($idoc,$DOCUMENTO_ITEM) {
+
+        $archivos               =   Archivo::leftJoin('CMP.CATEGORIA','TIPO_ARCHIVO','=','COD_CATEGORIA')
+                                    ->where('ID_DOCUMENTO','=',$idoc)
+                                    ->where('ACTIVO','=','1')
+                                    ->where('DOCUMENTO_ITEM','=',$DOCUMENTO_ITEM)
+                                    ->where('TIPO_ARCHIVO','<>','DCC0000000000028')
+                                    ->select(DB::raw("
+                                      ARCHIVOS.*,
+                                      COALESCE(COD_TIPO_DOCUMENTO,20) AS ORDEN_ITEM")
+                                    )
+                                    ->orderBy('ORDEN_ITEM','asc')
+                                    ->get();
+
+        return  $archivos;
+
+    }
+
+    private function lista_archivos_total_pdf_sin_voucher($idoc,$DOCUMENTO_ITEM) {
+
+        $archivos               =   Archivo::leftJoin('CMP.CATEGORIA','TIPO_ARCHIVO','=','COD_CATEGORIA')
+                                    ->where('ID_DOCUMENTO','=',$idoc)
+                                    ->where('ACTIVO','=','1')
+                                    ->where('DOCUMENTO_ITEM','=',$DOCUMENTO_ITEM)
+                                    ->where('TIPO_ARCHIVO','<>','DCC0000000000028')
+                                    ->where('EXTENSION', 'like', '%'.'pdf'.'%')
+                                    ->select(DB::raw("
+                                      ARCHIVOS.*,
+                                      COALESCE(COD_TIPO_DOCUMENTO,20) AS ORDEN_ITEM")
+                                    )
+                                    ->orderBy('ORDEN_ITEM','asc')
+                                    ->get();
+
+        return  $archivos;
+
+    }
+
+
+
+
+    private function lista_archivos_total($idoc,$DOCUMENTO_ITEM) {
+
+        $archivos               =   Archivo::leftJoin('CMP.CATEGORIA','TIPO_ARCHIVO','=','COD_CATEGORIA')
+                                    ->where('ID_DOCUMENTO','=',$idoc)
+                                    ->where('ACTIVO','=','1')
+                                    ->where('DOCUMENTO_ITEM','=',$DOCUMENTO_ITEM)
+                                    ->select(DB::raw("
+                                      ARCHIVOS.*,
+                                      COALESCE(COD_TIPO_DOCUMENTO,20) AS ORDEN_ITEM")
+                                    )
+                                    ->orderBy('ORDEN_ITEM','asc')
+                                    ->get();
+
+        return  $archivos;
+
+    }
+
+    private function lista_archivos_total_pdf($idoc,$DOCUMENTO_ITEM) {
+
+        $archivospdf            =   Archivo::leftJoin('CMP.CATEGORIA','TIPO_ARCHIVO','=','COD_CATEGORIA')
+                                    ->where('ID_DOCUMENTO','=',$idoc)
+                                    ->where('ACTIVO','=','1')
+                                    ->where('EXTENSION', 'like', '%'.'pdf'.'%')
+                                    ->where('DOCUMENTO_ITEM','=',$DOCUMENTO_ITEM)
+                                    ->select(DB::raw("
+                                      ARCHIVOS.*,
+                                      COALESCE(COD_TIPO_DOCUMENTO,20) AS ORDEN_ITEM")
+                                    )
+                                    ->orderBy('ORDEN_ITEM','asc')
+                                    ->get();
+
+        return  $archivospdf;
+
+    }
+
+
+
+
 
     private function ejecutar_orden_ingreso() {
 
@@ -1199,6 +1279,19 @@ trait ComprobanteTraits
 		$ind_cantidaditem 	=	0;
 		$ind_formapago 		=	0;
 		$ind_errototal 		=	1;
+        $ind_fecha          =   0;
+
+
+        //validar orden de compra que sea mayor a un dia
+
+        $fecha1 = Carbon::parse($ordencompra->FEC_ORDEN); // Primera fecha
+        $fecha2 = Carbon::parse($fedocumento->FEC_VENTA); // Segunda fecha
+        $diferenciaEnDias = $fecha1->diffInDays($fecha2);
+
+        if($diferenciaEnDias<-1){
+            $ind_fecha             =   1;  
+        }else{  $ind_errototal      =   0;  }
+
 		//ruc
 		if($ordencompra->NRO_DOCUMENTO_CLIENTE == $fedocumento->RUC_PROVEEDOR){
 			$ind_ruc 			=	1;	
@@ -1263,7 +1356,7 @@ trait ComprobanteTraits
                             [
                                 'ind_ruc'=>$ind_ruc,
                                 'ind_rz'=>$ind_rz,
-                                
+                                'ind_fecha'=>$ind_fecha,                         
                                 'ind_moneda'=>$ind_moneda,
                                 'ind_total'=>$ind_total,
                                 'ind_cantidaditem'=>$ind_cantidaditem,
