@@ -1543,7 +1543,7 @@ class GestionUsuarioContactoController extends Controller
             }
 
             //por ahora que le pida el cotrato
-            $rutaorden                  =   "";
+            //$rutaorden                  =   "";
 
 
             //todas las guias relacionadas
