@@ -13,9 +13,6 @@
     <!--Basic forms-->
     <div class="row">
       <div class="col-md-12">
-
-
-
           <div class="panel panel-default">
             <div class="panel-heading">Revision de Comporbante ({{$ordencompra->COD_DOCUMENTO_CTBLE}})</div>
             <div class="tab-container">

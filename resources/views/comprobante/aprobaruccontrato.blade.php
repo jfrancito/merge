@@ -13,19 +13,42 @@
     <!--Basic forms-->
     <div class="row">
       <div class="col-md-12">
-        <div class="panel panel-default panel-border-color panel-border-color-primary">
-          <div class="panel-heading panel-heading-divider">Aprobar Comprobante Contacto<span class="panel-subtitle">Aprobar un Comprobante Usuario Contacto</span></div>
-          <div class="panel-body">
-            <form method="POST" id='formpedido' action="{{ url('/aprobar-comprobante-uc-contrato/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -9))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
 
-                  {{ csrf_field() }}
-              @include('comprobante.form.formaprobarcontrato')
+          <div class="panel panel-default">
+            <div class="panel-heading">Revision de Comporbante ({{$ordencompra->COD_DOCUMENTO_CTBLE}})</div>
+            <div class="tab-container">
+              <ul class="nav nav-tabs">
+                <li class="active"><a href="#aprobar" data-toggle="tab"><b>APROBAR y RECOMENDAR</b></a></li>
+                <li><a href="#observar" data-toggle="tab"><b>OBSERVAR</b></a></li>
+              </ul>
+              <div class="tab-content">
+                <div id="aprobar" class="tab-pane active cont">
+                  <div class="panel panel-default panel-border-color panel-border-color-primary">
+                    <div class="panel-heading panel-heading-divider">Aprobar Comprobante Contacto<span class="panel-subtitle">Aprobar un Comprobante Usuario Contacto</span></div>
+                    <div class="panel-body">
+                      <form method="POST" id='formpedido' action="{{ url('/aprobar-comprobante-uc-contrato/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -9))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
+                            {{ csrf_field() }}
+                        @include('comprobante.form.formaprobarcontrato')
 
-
-
-            </form>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                <div id="observar" class="tab-pane cont">
+                  <div class="panel panel-default panel-border-color panel-border-color-primary">
+                    <div class="panel-heading panel-heading-divider">Observar Comprobante<span class="panel-subtitle">Observar un Comprobante</span></div>
+                    <div class="panel-body">
+                      <form method="POST" id='formpedidoobservar' action="{{ url('/agregar-observacion-uc-contrato/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -9))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
+                            {{ csrf_field() }}
+                        @include('comprobante.form.formobservaruccontrato')
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+
       </div>
     </div>
   </div>
@@ -61,57 +84,90 @@
 
     <script type="text/javascript">    
 
-           $('#file-otros').fileinput({
-              theme: 'fa5',
-              language: 'es',
-            });
+         $('#file-otros').fileinput({
+            theme: 'fa5',
+            language: 'es',
+          });
 
 
-           $('#file-pdf').fileinput({
+         $('#file-pdf').fileinput({
+            theme: 'fa5',
+            language: 'es',
+            allowedFileExtensions: ['pdf'],
+          });
+
+
+
+        @foreach($archivospdf as $index => $item)
+          var nombre_archivo = '{{$item->NOMBRE_ARCHIVO}}';
+          $('#file-'+{{$index}}).fileinput({
+            theme: 'fa5',
+            language: 'es',
+            initialPreview: ["{{ route('serve-filecontrato', ['file' => '']) }}" + nombre_archivo],
+            initialPreviewAsData: true,
+            initialPreviewFileType: 'pdf',
+            initialPreviewConfig: [
+                {type: "pdf", caption: nombre_archivo, downloadUrl: "{{ route('serve-filecontrato', ['file' => '']) }}" + nombre_archivo} // Para mostrar el botón de descarga
+            ]
+          });
+        @endforeach
+
+
+        @foreach($array_guias as $index => $item)
+          var nombre_archivo = '{{$item['COD_DOCUMENTO_CTBLE']}}';
+          $('#file-'+nombre_archivo).fileinput({
+            theme: 'fa5',
+            language: 'es',
+            initialPreview: ["{{ route('serve-filecontrato-sg', ['file' => '']) }}" + nombre_archivo],
+            initialPreviewAsData: true,
+            initialPreviewFileType: 'pdf',
+            initialPreviewConfig: [
+                {type: "pdf", caption: nombre_archivo, downloadUrl: "{{ route('serve-filecontrato-sg', ['file' => '']) }}" + nombre_archivo} // Para mostrar el botón de descarga
+            ]
+          });
+        @endforeach
+
+        @foreach($array_guias_no as $index => $item)
+          var nombre_archivo = '{{$item['COD_DOCUMENTO_CTBLE']}}';
+           $('#file-'+nombre_archivo).fileinput({
               theme: 'fa5',
               language: 'es',
               allowedFileExtensions: ['pdf'],
             });
-          @foreach($archivospdf as $index => $item)
-            var nombre_archivo = '{{$item->NOMBRE_ARCHIVO}}';
-            $('#file-'+{{$index}}).fileinput({
-              theme: 'fa5',
-              language: 'es',
-              initialPreview: ["{{ route('serve-filecontrato', ['file' => '']) }}" + nombre_archivo],
-              initialPreviewAsData: true,
-              initialPreviewFileType: 'pdf',
-              initialPreviewConfig: [
-                  {type: "pdf", caption: nombre_archivo, downloadUrl: "{{ route('serve-filecontrato', ['file' => '']) }}" + nombre_archivo} // Para mostrar el botón de descarga
-              ]
-            });
-          @endforeach
-
-
-        @foreach($tarchivos_g as $index => $item) 
-
-            $('#file-{{$item->COD_CATEGORIA_DOCUMENTO}}').fileinput({
-              theme: 'fa5',
-              language: 'es',
-              allowedFileExtensions: ['{{$item->TXT_FORMATO}}'],
-            });
-
         @endforeach
 
-        @foreach($array_guias as $index => $item) 
-
-            $("#file-{{$item['COD_DOCUMENTO_CTBLE']}}").fileinput({
+        var rutaoc = '{{$rutaorden}}';
+        if(rutaoc==''){
+          var nombre_archivo = '{{$ordencompra->COD_DOCUMENTO_CTBLE}}';
+           $('#file-'+nombre_archivo).fileinput({
               theme: 'fa5',
               language: 'es',
               allowedFileExtensions: ['pdf'],
             });
+        }
 
+        @foreach($tarchivos_g as $index => $item)
+          var nombre_archivo = '{{$item->COD_ORDEN}}';
+          $('#file-'+nombre_archivo).fileinput({
+            theme: 'fa5',
+            language: 'es',
+            initialPreview: ["{{ route('serve-filecontrato-sg', ['file' => '']) }}" + nombre_archivo],
+            initialPreviewAsData: true,
+            initialPreviewFileType: 'pdf',
+            initialPreviewConfig: [
+                {type: "pdf", caption: nombre_archivo, downloadUrl: "{{ route('serve-filecontrato-sg', ['file' => '']) }}" + nombre_archivo} // Para mostrar el botón de descarga
+            ]
+          });
         @endforeach
+
+
+
+
 
 
            
     </script>
     <script src="{{ asset('public/js/comprobante/registro.js?v='.$version) }}" type="text/javascript"></script>
-
-    
+    <script src="{{ asset('public/js/comprobante/uc.js?v='.$version) }}" type="text/javascript"></script>
 @stop
 

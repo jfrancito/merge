@@ -1113,6 +1113,21 @@ trait ComprobanteTraits
         return  $combo;                    
     }
 
+    private function con_lista_cabecera_comprobante_total_gestion_observados_oc_proveedor($cliente_id) {
+
+        $listadatos     =   FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+                            //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                            ->where('FE_DOCUMENTO.ind_observacion','=','1')
+                            ->where('COD_EMPR_CLIENTE','=',$cliente_id)
+                            ->where('FE_DOCUMENTO.area_observacion','=','UCO')
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                            ->get();
+
+        return  $listadatos;
+    }
+
 
 	private function con_lista_cabecera_comprobante_total_gestion_observados($cliente_id) {
 
@@ -1121,6 +1136,7 @@ trait ComprobanteTraits
 							->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
 							->where('FE_DOCUMENTO.COD_ESTADO','<>','')
 							->where('FE_DOCUMENTO.ind_observacion','=','1')
+                            ->where('FE_DOCUMENTO.area_observacion','<>','UCO')
 							->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
 							->get();
 
@@ -1129,18 +1145,34 @@ trait ComprobanteTraits
 
     private function con_lista_cabecera_comprobante_total_gestion_observados_contrato($cliente_id) {
 
-
         $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+        $centro_id           =      $trabajador->COD_ZONA_TIPO;
+        $listadatos          =      FeDocumento::Join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                                    //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                                    ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                    ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
+                                    ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                    ->where('FE_DOCUMENTO.area_observacion','<>','UCO')
+                                    ->where('FE_DOCUMENTO.ind_observacion','=','1')
+                                    ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                    ->get();
 
-        $centro_id          =       $trabajador->COD_ZONA_TIPO;
-        $listadatos     =   FeDocumento::Join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
-                            //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
-                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                            ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
-                            ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                            ->where('FE_DOCUMENTO.ind_observacion','=','1')
-                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
-                            ->get();
+        return  $listadatos;
+    }
+
+
+
+    private function con_lista_cabecera_comprobante_total_gestion_observados_contrato_proveedores($cliente_id) {
+
+        $listadatos          =      FeDocumento::Join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                                    //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                                    ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                    ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                    ->where('COD_EMPR_EMISOR','=',$cliente_id)
+                                    ->where('FE_DOCUMENTO.area_observacion','=','UCO')
+                                    ->where('FE_DOCUMENTO.ind_observacion','=','1')
+                                    ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                    ->get();
 
         return  $listadatos;
     }

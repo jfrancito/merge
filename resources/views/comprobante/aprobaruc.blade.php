@@ -13,21 +13,49 @@
   <div class="main-content container-fluid">
     <!--Basic forms-->
     <div class="row">
+
+
       <div class="col-md-12">
-        <div class="panel panel-default panel-border-color panel-border-color-primary">
-          <div class="panel-heading panel-heading-divider">Aprobar Comprobante Contacto<span class="panel-subtitle">Aprobar un Comprobante Usuario Contacto</span></div>
-          <div class="panel-body">
-            <form method="POST" id='formpedido' action="{{ url('/aprobar-comprobante-uc/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
+          <div class="panel panel-default">
+            <div class="panel-heading">Revision de Comporbante ({{$ordencompra->COD_ORDEN}})</div>
+            <div class="tab-container">
+              <ul class="nav nav-tabs">
+                <li class="active"><a href="#aprobar" data-toggle="tab"><b>APROBAR y RECOMENDAR</b></a></li>
+                <li><a href="#observar" data-toggle="tab"><b>OBSERVAR</b></a></li>
+              </ul>
+              <div class="tab-content">
+                <div id="aprobar" class="tab-pane active cont">
 
-                  {{ csrf_field() }}
-              @include('comprobante.form.formaprobar')
 
+                      <div class="panel panel-default panel-border-color panel-border-color-primary">
+                        <div class="panel-heading panel-heading-divider">Aprobar Comprobante Contacto<span class="panel-subtitle">Aprobar un Comprobante Usuario Contacto</span></div>
+                        <div class="panel-body">
+                          <form method="POST" id='formpedido' action="{{ url('/aprobar-comprobante-uc/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
+                                {{ csrf_field() }}
+                            @include('comprobante.form.formaprobar')
+                          </form>
+                        </div>
+                      </div>
 
+                </div>
+                <div id="observar" class="tab-pane cont">
+                    <div class="panel panel-default panel-border-color panel-border-color-primary">
+                      <div class="panel-heading panel-heading-divider">Observar Comprobante<span class="panel-subtitle">Observar un Comprobante</span></div>
+                      <div class="panel-body">
 
-            </form>
+                              <form method="POST" id='formpedidoobservar' action="{{ url('/agregar-observacion-uc/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
+                                    {{ csrf_field() }}
+                                @include('comprobante.form.formobservaruc')
+                              </form>
+                      </div>
+                    </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
       </div>
+
+
     </div>
   </div>
 </div>  

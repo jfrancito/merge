@@ -501,9 +501,6 @@ class GestionOCAdministracionController extends Controller
         }
     }
 
-
-
-
     public function actionModificarContratos($idopcion, $linea, $prefijo, $idordencompra,Request $request)
     {
 
@@ -1660,9 +1657,7 @@ class GestionOCAdministracionController extends Controller
             $archivospdf            =   $this->lista_archivos_total_pdf($idoc,$fedocumento->DOCUMENTO_ITEM);
 
 
-
             $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
-
 
 
             $trabajador             =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
