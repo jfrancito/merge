@@ -2384,7 +2384,11 @@ class GestionUsuarioContactoController extends Controller
 
             $ordencompra_f            =      CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$ordencompra->COD_DOCUMENTO_CTBLE)->first();
 
+
+
             $sourceFile = '\\\\10.1.0.201\cpe\Contratos';
+
+
             if($ordencompra_f->COD_CENTRO == 'CEN0000000000004' or $ordencompra_f->COD_CENTRO == 'CEN0000000000006'or $ordencompra_f->COD_CENTRO == 'CEN0000000000002'){
                 if($ordencompra_f->COD_CENTRO == 'CEN0000000000004'){
                     $sourceFile = '\\\\10.1.7.200\\cpe\\Contratos\\'.$ordencompra->COD_DOCUMENTO_CTBLE.'.pdf';
@@ -2395,10 +2399,10 @@ class GestionUsuarioContactoController extends Controller
                 if($ordencompra_f->COD_CENTRO == 'CEN0000000000002'){
                     $sourceFile = '\\\\10.1.4.201\\cpe\\Contratos\\'.$ordencompra->COD_DOCUMENTO_CTBLE.'.pdf';
                 }
-            //dd($sourceFile);
+
                 $destinationFile = '\\\\10.1.0.201\\cpe\\Contratos\\'.$ordencompra->COD_DOCUMENTO_CTBLE.'.pdf';
                 // Intenta copiar el archivo
-                //dd($sourceFile);
+
                 if (file_exists($sourceFile)){
                     copy($sourceFile, $destinationFile);
                 }
@@ -2432,7 +2436,7 @@ class GestionUsuarioContactoController extends Controller
                     $rutaorden           =   $rutafila;
                 } 
             }
-
+                //dd($rutaorden);
             //por ahora que le pida el cotrato
             //$rutaorden                  =   "";
 
