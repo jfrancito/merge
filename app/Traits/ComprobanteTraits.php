@@ -1320,7 +1320,11 @@ trait ComprobanteTraits
         $fecha2 = Carbon::parse($fedocumento->FEC_VENTA); // Segunda fecha
         $diferenciaEnDias = $fecha1->diffInDays($fecha2);
 
-        if($diferenciaEnDias>-1 || $diferenciaEnDias==0){
+        if($diferenciaEnDias==-1){
+            $diferenciaEnDias = 0;
+        }
+
+        if($diferenciaEnDias>=0){
             $ind_fecha             =   1;  
         }else{  $ind_errototal      =   0;  }
 
