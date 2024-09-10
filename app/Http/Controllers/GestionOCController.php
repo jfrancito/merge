@@ -198,7 +198,7 @@ class GestionOCController extends Controller
                         if($cbc>=1){
                             foreach($xml->xpath('//cbc:ResponseCode') as $ResponseCode)
                             {
-                                $codigocdr  = $ResponseCode;
+                                $codigocdr  = (string)$ResponseCode;
                             }
                             foreach($xml->xpath('//cbc:Description') as $Description)
                             {
@@ -224,7 +224,7 @@ class GestionOCController extends Controller
                             // Querying XML
                             foreach($xml_ns->xpath('//ns3:DocumentResponse/ns3:Response') as $ResponseCodes)
                             {
-                                $codigocdr  = $ResponseCodes->ResponseCode;
+                                $codigocdr  = (string)$ResponseCodes->ResponseCode;
                             }
                             foreach($xml_ns->xpath('//ns3:DocumentResponse/ns3:Response') as $Description)
                             {
@@ -240,6 +240,9 @@ class GestionOCController extends Controller
 
                         }
 
+                        if($codigocdr!="0"){
+                            return Redirect::to('detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Error de CDR');
+                        }
                         //DD($codigocdr);
                     } else {
                         return Redirect::to('detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Error al intentar descomprimir el CDR');
@@ -378,7 +381,7 @@ class GestionOCController extends Controller
                 }else{
                     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
                     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                    $this->insertar_whatsaap('51914693880','JOSE CHERO',$mensaje,'');
+                    //$this->insertar_whatsaap('51914693880','JOSE CHERO',$mensaje,'');
 
                 }                       
 
@@ -1678,7 +1681,7 @@ class GestionOCController extends Controller
                 }else{
                     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
                     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                    $this->insertar_whatsaap('51914693880','JOSE CHERO',$mensaje,'');
+                    //$this->insertar_whatsaap('51914693880','JOSE CHERO',$mensaje,'');
 
                 }                       
 
@@ -2096,9 +2099,9 @@ class GestionOCController extends Controller
         $ordencompra_n          =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
 
         //SIN XML REDIRECCIONAR O OTRA VISTA
-        if($ordencompra_n->IND_VARIAS_ENTREGAS == 1){
-            return Redirect::to('detalle-comprobante-oc-administrator-sin-xml/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra);
-        }
+        // if($ordencompra_n->IND_VARIAS_ENTREGAS == 1){
+        //     return Redirect::to('detalle-comprobante-oc-administrator-sin-xml/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra);
+        // }
 
 
         View::share('titulo','REGISTRO DE COMPROBANTE OC: '.$idoc);
@@ -3002,11 +3005,11 @@ class GestionOCController extends Controller
                                 $cbc = 1;  
                             }
                         }
-                        
+                        $codigocdr = '';  
                         if($cbc>=1){
                             foreach($xml->xpath('//cbc:ResponseCode') as $ResponseCode)
                             {
-                                $codigocdr  = $ResponseCode;
+                                $codigocdr  = (string)$ResponseCode;
                             }
                             foreach($xml->xpath('//cbc:Description') as $Description)
                             {
@@ -3014,7 +3017,7 @@ class GestionOCController extends Controller
                             }
                             foreach($xml->xpath('//cbc:ID') as $ID)
                             {
-                                $factura_cdr_id  = $ID;
+                                $factura_cdr_id  = (string)$ID;
                                 if($factura_cdr_id == $nombre_doc || $factura_cdr_id == $nombre_doc_sinceros){
                                     $sw = 1;
                                 }
@@ -3032,7 +3035,7 @@ class GestionOCController extends Controller
                             // Querying XML
                             foreach($xml_ns->xpath('//ns3:DocumentResponse/ns3:Response') as $ResponseCodes)
                             {
-                                $codigocdr  = $ResponseCodes->ResponseCode;
+                                $codigocdr  = (string)$ResponseCodes->ResponseCode;
                             }
                             foreach($xml_ns->xpath('//ns3:DocumentResponse/ns3:Response') as $Description)
                             {
@@ -3040,7 +3043,7 @@ class GestionOCController extends Controller
                             }
                             foreach($xml_ns->xpath('//ns3:DocumentReference') as $ID)
                             {
-                                $factura_cdr_id  = $ID->ID;
+                                $factura_cdr_id  = (string)$ID->ID;
                                 if($factura_cdr_id == $nombre_doc || $factura_cdr_id == $nombre_doc_sinceros){
                                     $sw = 1;
                                 }
@@ -3048,7 +3051,13 @@ class GestionOCController extends Controller
 
                         }
 
-                        //DD($codigocdr);
+                        if($codigocdr!="0"){
+                            //dd($codigocdr);
+
+                            return Redirect::to('detalle-comprobante-oc-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Error de CDR');
+                        }
+  
+
                     } else {
                         return Redirect::to('detalle-comprobante-oc-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Error al intentar descomprimir el CDR');
                     }

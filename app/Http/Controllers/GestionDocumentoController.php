@@ -580,7 +580,7 @@ class GestionDocumentoController extends Controller
                         if($cbc>=1){
                             foreach($xml->xpath('//cbc:ResponseCode') as $ResponseCode)
                             {
-                                $codigocdr  = $ResponseCode;
+                                $codigocdr  = (string)$ResponseCode;
                             }
                             foreach($xml->xpath('//cbc:Description') as $Description)
                             {
@@ -606,7 +606,7 @@ class GestionDocumentoController extends Controller
                             // Querying XML
                             foreach($xml_ns->xpath('//ns3:DocumentResponse/ns3:Response') as $ResponseCodes)
                             {
-                                $codigocdr  = $ResponseCodes->ResponseCode;
+                                $codigocdr  = (string)$ResponseCodes->ResponseCode;
                             }
                             foreach($xml_ns->xpath('//ns3:DocumentResponse/ns3:Response') as $Description)
                             {
@@ -620,6 +620,12 @@ class GestionDocumentoController extends Controller
                                 }
                             }
                         }
+
+                        if($codigocdr!="0"){
+                            return Redirect::to('detalle-documentos/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Error de CDR');
+                        }
+
+
                         //DD($codigocdr);
                     } else {
                         return Redirect::to('detalle-documentos/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Error al intentar descomprimir el CDR');

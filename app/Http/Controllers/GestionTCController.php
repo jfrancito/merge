@@ -651,7 +651,7 @@ class GestionTCController extends Controller
                 }else{
                     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
                     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                    $this->insertar_whatsaap('51914693880','JOSE CHERO',$mensaje,'');
+                    //$this->insertar_whatsaap('51914693880','JOSE CHERO',$mensaje,'');
 
                 }                       
 

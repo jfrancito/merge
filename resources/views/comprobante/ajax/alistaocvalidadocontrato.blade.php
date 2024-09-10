@@ -50,6 +50,10 @@
           <span><b>CONTABILIDAD : </b> {{date_format(date_create($item->fecha_pr), 'd-m-Y h:i:s')}}</span>
           <span><b>ADMINISTRACION : </b> {{date_format(date_create($item->fecha_ap), 'd-m-Y h:i:s')}}</span>
 
+
+          <span><b>USUARIO CONTACTO : </b> {{$item->TXT_CONTACTO}}</span>
+          <span><b>AREA : </b> {{$item->AREA}}</span>
+
         </td>
         @include('comprobante.ajax.estados')
         <td class="rigth">
