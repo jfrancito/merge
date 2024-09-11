@@ -1423,17 +1423,19 @@ class GestionUsuarioContactoController extends Controller
                 $documento->save();
 
                 //whatsaap para contabilidad
-                $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
-                $ordencompra        =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$pedido_id)->first();            
 
-                $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                $fedocumento_w          =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
+                $ordencompra            =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$pedido_id)->first();          
+                $empresa                =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                $usuario                =   SGDUsuario::where('COD_USUARIO','=',$ordencompra->COD_USUARIO_CREA_AUD)->first();
+                $trabajador             =   STDTrabajador::where('COD_TRAB','=',$usuario->COD_TRABAJADOR)->first();
+
                 $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO
                                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
                                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'
                                         .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A'
                                         .'MENSAJE : '.'RESOLVIO LAS OBSERVACIONES'.'%0D%0A';
-                $users              =   User::where('id','=',$fedocumento_w->usuario_uc)->first();
-                $trabajador         =   STDTrabajador::where('COD_TRAB','=',$users->usuarioosiris_id)->first();
+
 
                 if(1==0){
                     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');

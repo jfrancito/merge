@@ -997,6 +997,114 @@ class GestionOCContabilidadController extends Controller
         }
     }
 
+
+    public function actionAgregarReparableContabilidad($idopcion, $linea, $prefijo, $idordencompra,Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo($idordencompra,$prefijo);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_idoc_actual($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc_actual($idoc);
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
+        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+        View::share('titulo','Extornar Comprobante');
+
+        if($_POST)
+        {
+
+            try{    
+                
+                DB::beginTransaction();
+                $pedido_id          =   $idoc;
+                $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
+                $descripcion        =   $request['descripcionextorno'];
+
+                //GUARDAR LA REFENCIA ORIGINAL DEL EXTORNO
+                FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$linea)
+                            ->update(
+                                [
+                                    'TXT_REFERENCIA'=>$idoc
+                                ]
+                            );
+
+                //GUARDAR EN EL HISTORIAL QUE SE EXTORNO UN VEZ
+                $documento                              =   new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA                       =   $this->fechaactual;
+                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                $documento->TIPO                        =   'DOCUMENTO EXTORNADO';
+                $documento->MENSAJE                     =   $descripcion;
+                $documento->save();
+
+
+                //ANULAR TODA LA OPERACION
+                FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$linea)
+                            ->update(
+                                [
+                                    'ID_DOCUMENTO'=>$idoc.'X',
+                                    'COD_ESTADO'=>'ETM0000000000006',
+                                    'TXT_ESTADO'=>'RECHAZADO',
+                                    'ind_observacion'=>0
+                                ]
+                            );
+                FeDetalleDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$linea)
+                            ->update(
+                                [
+                                    'ID_DOCUMENTO'=>$idoc.'X'
+                                ]
+                            );
+
+                FeDocumentoHistorial::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$linea)
+                            ->update(
+                                [
+                                    'ID_DOCUMENTO'=>$idoc.'X'
+                                ]
+                            );
+                FeFormaPago::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$linea)
+                            ->update(
+                                [
+                                    'ID_DOCUMENTO'=>$idoc.'X'
+                                ]
+                            );
+                Archivo::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$linea)
+                            ->update(
+                                [
+                                    'ID_DOCUMENTO'=>$idoc.'X'
+                                ]
+                            );
+
+                //LE LLEGA AL USUARIO DE CONTACTO
+                $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+                $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                $mensaje            =   'COMPROBANTE REPARABLE: '.$fedocumento->ID_DOCUMENTO
+                                        .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                                        .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
+                                        .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
+                                        .'MENSAJE : '.$descripcion.'%0D%0A';                       
+                if(1==0){
+                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                }else{
+                    $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
+                }  
+
+                DB::commit();
+                return Redirect::to('aprobar-comprobante-contabilidad/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' REPARABLE CON EXITO');
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                return Redirect::to('aprobar-comprobante-contabilidad/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+        }
+ 
+    }
+
+
+
     public function actionAgregarReparableContabilidad($idopcion, $linea, $prefijo, $idordencompra,Request $request)
     {
 
@@ -1082,7 +1190,7 @@ class GestionOCContabilidadController extends Controller
                 if(1==0){
                     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
                 }else{
-                    //$this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                    $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
                     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
                 }  
 
