@@ -20,29 +20,15 @@
           <span><b>PROVEEDOR : </b> {{$item->TXT_EMPR_EMISOR}}</span>
           <span><b>TOTAL : </b> {{$item->CAN_TOTAL}}</span>
           <span><b>DOCUMENTO : </b> {{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</span>
-          <span><b>ORSERVACION : </b>               
-              @if($item->ind_observacion == 1) 
-                  <span class="badge badge-danger" style="display: inline-block;">EN PROCESO</span>
-              @else
-                @if($item->ind_observacion == 0) 
-                    <span class="badge badge-default" style="display: inline-block;">SIN OBSERVACIONES</span>
-                @else
-                    <span class="badge badge-default" style="display: inline-block;">SIN OBSERVACIONES</span>
-                @endif
-              @endif
-          </span>
-          <span><b>REPARABLE : </b>               
-              @if($item->IND_REPARABLE == 1) 
-                  <span class="badge badge-warning" style="display: inline-block;">EN PROCESO</span>
-              @else
-                @if($item->IND_REPARABLE == 0) 
-                    <span class="badge badge-default" style="display: inline-block;">-</span>
-                @else
-                    <span class="badge badge-default" style="display: inline-block;">-</span>
-                @endif
-              @endif
-          </span>
           <span><b>CENTRO : </b> {{$item->NOM_CENTRO}}</span>
+
+          <span><b>USUARIO CONTACTO : </b> {{$item->TXT_CONTACTO}}</span>
+          <span><b>AREA : </b> {{$item->AREA}}</span>
+          <span><b>FOLIO : </b> {{$item->FOLIO}}</span>
+          <span><b>H. OBSERVACION : </b> {{$item->TXT_OBSERVADO}}</span>
+          <span><b>H. REPARABLE : </b> {{$item->TXT_REPARABLE}}</span>
+
+
         </td>
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>SERIE : {{$item->SERIE}} </b> </span>
@@ -57,13 +43,8 @@
           <span><b>U. CONTACTO: </b>{{date_format(date_create($item->fecha_uc), 'd-m-Y h:i:s')}}</span>
           <span><b>CONTABILIDAD : </b> {{date_format(date_create($item->fecha_pr), 'd-m-Y h:i:s')}}</span>
           <span><b>ADMINISTRACION : </b> {{date_format(date_create($item->fecha_ap), 'd-m-Y h:i:s')}}</span>
-
-
-          <span><b>USUARIO CONTACTO : </b> {{$item->TXT_CONTACTO}}</span>
-          <span><b>AREA : </b> {{$item->AREA}}</span>
-
         </td>
-        @include('comprobante.ajax.estados')
+        @include('comprobante.ajax.estadosgestion')
         <td class="rigth">
           <div class="btn-group btn-hspace">
             <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>

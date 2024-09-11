@@ -40,5 +40,28 @@
       @endif
     @endif
   @endif
-
+  <br>
+  <span><b>ORSERVACION : </b>               
+      @if($item->ind_observacion == 1) 
+          <span class="badge badge-danger" style="display: inline-block;">EN PROCESO</span>
+      @else
+        @if($item->ind_observacion == 0) 
+            <span class="badge badge-default" style="display: inline-block;">SIN OBSERVACIONES</span>
+        @else
+            <span class="badge badge-default" style="display: inline-block;">SIN OBSERVACIONES</span>
+        @endif
+      @endif
+  </span>
+  <br>
+  <span><b>REPARABLE : </b>               
+      @if($item->IND_REPARABLE == 1) 
+          <span class="badge badge-warning" style="display: inline-block;">EN PROCESO</span>
+      @else
+        @if($item->IND_REPARABLE == 0) 
+            <span class="badge badge-default" style="display: inline-block;">SIN REPARABLE</span>
+        @else
+            <span class="badge badge-default" style="display: inline-block;">SIN REPARABLE</span>
+        @endif
+      @endif
+  </span>
 </td>
