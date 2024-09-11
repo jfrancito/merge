@@ -17,6 +17,8 @@
           <span><b>FECHA  : {{$item->FEC_EMISION}}</b></span>
           <span><b>PROVEEDOR : </b> {{$item->TXT_EMPR_EMISOR}}</span>
           <span><b>TOTAL : </b> {{$item->CAN_TOTAL}}</span>
+          <span><b>DOCUMENTO : </b> {{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</span>
+          
           <span><b>ORSERVACION : </b>               
               @if($item->ind_observacion == 1) 
                   <span class="badge badge-danger" style="display: inline-block;">EN PROCESO</span>
