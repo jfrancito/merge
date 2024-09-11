@@ -22,6 +22,9 @@
                 <li class="active"><a href="#aprobar" data-toggle="tab"><b>APROBAR y RECOMENDAR</b></a></li>
                 <li><a href="#observar" data-toggle="tab"><b>OBSERVAR</b></a></li>
                 <li><a href="#reparable" data-toggle="tab"><b>REPARABLE</b></a></li>
+                <li><a href="#rechazar" data-toggle="tab"><b>EXTORNAR</b></a></li>
+
+
               </ul>
               <div class="tab-content">
 
@@ -60,9 +63,22 @@
                         </form>
                     </div>
                   </div>
-
-                  
                 </div>
+
+
+                <div id="rechazar" class="tab-pane">
+                  <div class="panel panel-default panel-border-color panel-border-color-primary">
+                    <div class="panel-heading panel-heading-divider">Extornar<span class="panel-subtitle">Extornar un Comprobante</span></div>
+                    <div class="panel-body">
+                        <form method="POST" id='formpedidorechazar' action="{{ url('/agregar-extorno-contrato-contabilidad/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -9))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
+                              {{ csrf_field() }}
+                          @include('comprobante.form.formrechazocontrato')
+                        </form>
+                    </div>
+                  </div>
+                </div>
+
+
 
               </div>
             </div>
