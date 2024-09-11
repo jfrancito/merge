@@ -19,6 +19,7 @@
           <span><b>FECHA  : {{$item->FEC_ORDEN}}</b></span>
           <span><b>PROVEEDOR : </b> {{$item->TXT_EMPR_CLIENTE}}</span>
           <span><b>TOTAL : </b> {{$item->CAN_TOTAL}}</span>
+          <span><b>UC : </b> {{$item->TXT_CONTACTO_UC}}</span>
           <span><b>ORSERVACION : </b>               
               @if($item->ind_observacion == 1) 
                   <span class="badge badge-danger" style="display: inline-block;">EN PROCESO</span>
@@ -31,6 +32,18 @@
               @endif
           </span>
 
+          <span><b>REPARABLE : </b>               
+              @if($item->IND_REPARABLE == 1) 
+                  <span class="badge badge-primary" style="display: inline-block;">EN PROCESO</span>
+              @else
+                @if($item->IND_REPARABLE == 0) 
+                    <span class="badge badge-default" style="display: inline-block;">-</span>
+                @else
+                    <span class="badge badge-default" style="display: inline-block;">-</span>
+                @endif
+              @endif
+          </span>
+          
           <span><b>CAJA CHICA : </b>  
               @if($item->TXT_A_TIEMPO == 'CAJA_SI') 
                 <span class="badge badge-success" style="display: inline-block;">{{$item->TXT_A_TIEMPO}}</span>
@@ -38,7 +51,6 @@
                 <span class="badge badge-default" style="display: inline-block;">{{$item->TXT_A_TIEMPO}}</span>
               @endif
           </span>          
-
         </td>
 
         <td class="cell-detail sorting_1" style="position: relative;">

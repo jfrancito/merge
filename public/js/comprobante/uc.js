@@ -55,6 +55,24 @@ $(document).ready(function(){
 
     });
 
+    $('.btnreparablecomporbatnte').on('click', function(event){
+        event.preventDefault();
+        $.confirm({
+            title: '¿Confirma la Observacion?',
+            content: 'Observacion el Comprobante',
+            buttons: {
+                confirmar: function () {
+                    $( "#formpedidoreparable" ).submit();
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo la Observacion');
+                }
+            }
+        });
+
+    });
+
+
 
     $('.btnrecomendarcomprobante').on('click', function(event){
         event.preventDefault();

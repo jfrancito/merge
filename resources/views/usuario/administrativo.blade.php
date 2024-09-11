@@ -1,2 +1,7 @@
-@include('usuario.dashboard.ordencompra')
-@include('usuario.dashboard.contrato')
+@if($trol->UC=='OC' || $trol->UC==NULL)
+	@include('usuario.dashboard.ordencompra')
+@endif
+
+@if($trol->UC=='CT' || $trol->UC==NULL)
+	@include('usuario.dashboard.contrato')
+@endif

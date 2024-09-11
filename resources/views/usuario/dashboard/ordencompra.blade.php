@@ -15,89 +15,102 @@
         </div>
       </div>
       @if($trol->ind_uc == 1)
-      <div class="col-xs-12 col-md-4">
-        <div class="panel panel-default panel-contrast">
-          <div class="panel-heading" style="background: #1d3a6d;color: #fff;">INTEGRACION
-            <span class="panel-subtitle" style="color: #fff;">Documentos por integrar</span>
-            <div class="chart-legend">
-              <a href="{{ url($url_gestion) }}" class="btn btn-rounded btn-space btn-primary dasboark">Ir a Integrar</a>
+        <div class="col-xs-12 col-md-4">
+          <div class="panel panel-default panel-contrast">
+            <div class="panel-heading" style="background: #1d3a6d;color: #fff;">INTEGRACION
+              <span class="panel-subtitle" style="color: #fff;">Documentos por integrar</span>
+              <div class="chart-legend">
+                <a href="{{ url($url_gestion) }}" class="btn btn-rounded btn-space btn-primary dasboark">Ir a Integrar</a>
+              </div>
+              <span class="count-das">{{$count_x_aprobar_gestion}}</span>
             </div>
-            <span class="count-das">{{$count_x_aprobar_gestion}}</span>
           </div>
         </div>
-      </div>
-      <div class="col-xs-12 col-md-4">
-        <div class="panel panel-default panel-contrast">
-          <div class="panel-heading" style="background: #1d3a6d;color: #fff;">OBSERVADOS
-            <span class="panel-subtitle" style="color: #fff;">Documentos observados</span>
-            <div class="chart-legend">
-              <a href="{{ url($url_obs) }}" class="btn btn-rounded btn-space btn-primary dasboark">Ir Observados</a>
+
+
+        <div class="col-xs-12 col-md-4">
+          <div class="panel panel-default panel-contrast">
+            <div class="panel-heading" style="background: #1d3a6d;color: #fff;">OBSERVADOS
+              <span class="panel-subtitle" style="color: #fff;">Documentos observados</span>
+              <div class="chart-legend">
+                <a href="{{ url($url_obs) }}" class="btn btn-rounded btn-space btn-primary dasboark">Ir Observados</a>
+              </div>
+              <span class="count-das">{{$count_observados}}</span>
             </div>
-            <span class="count-das">{{$count_observados}}</span>
           </div>
         </div>
-      </div>
+
+        <div class="col-xs-12 col-md-4">
+          <div class="panel panel-default panel-contrast">
+            <div class="panel-heading" style="background: #1d3a6d;color: #fff;">REPARABLE
+              <span class="panel-subtitle" style="color: #fff;">Documentos reparables</span>
+              <div class="chart-legend">
+                <a href="{{ url($url_rep) }}" class="btn btn-rounded btn-space btn-primary dasboark">Ir Reparable</a>
+              </div>
+              <span class="count-das">{{$count_reparables}}</span>
+            </div>
+          </div>
+        </div>
+
       @endif
-
-      <div class="col-xs-12 col-md-4">
-        <div class="panel panel-default panel-table">
-          <div class="panel-heading" style="background: #1d3a6d;color: #fff;"><b>POR USUARIO</b>
-            <span class="panel-subtitle" style="color: #fff;">Documentos sin integrar</span>
-          </div>
-          <div class="panel-body">
-            <table class="table table-striped table-borderless">
-              <thead>
-                <tr>
-                  <th>USUARIO CONTACTO</th>
-                  <th>CANTIDAD</th>
-                </tr>
-              </thead>
-              <tbody class="no-border-x">
-                @foreach($listaocpendientes as $index => $item)
+      @if($trol->ind_uc != 1)
+        <div class="col-xs-12 col-md-4">
+          <div class="panel panel-default panel-table">
+            <div class="panel-heading" style="background: #1d3a6d;color: #fff;"><b>POR USUARIO</b>
+              <span class="panel-subtitle" style="color: #fff;">Documentos sin integrar</span>
+            </div>
+            <div class="panel-body">
+              <table class="table table-striped table-borderless">
+                <thead>
                   <tr>
-                    <td>{{$index}}</td>
-                    <td class="text-center"> <span class="badge badge-success" style="font-size: 16px;">{{count($item)}}</span></td>
+                    <th>USUARIO CONTACTO</th>
+                    <th>CANTIDAD</th>
                   </tr>
-                @endforeach
-              </tbody>
-            </table>
+                </thead>
+                <tbody class="no-border-x">
+                  @foreach($listaocpendientes as $index => $item)
+                    <tr>
+                      <td>{{$index}}</td>
+                      <td class="text-center"> <span class="badge badge-success" style="font-size: 16px;">{{count($item)}}</span></td>
+                    </tr>
+                  @endforeach
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
-
-
-      <div class="col-xs-12 col-md-4">
-        <div class="panel panel-default panel-table">
-          <div class="panel-heading" style="background: #1d3a6d;color: #fff;"><b>POR ESTADOS</b>
-            <span class="panel-subtitle" style="color: #fff;">Documentos integrados</span>
-          </div>
-          <div class="panel-body">
-            <table class="table table-striped table-borderless">
-              <thead>
-                <tr>
-                  <th>ESTADOS</th>
-                  <th>CANTIDAD</th>
-                </tr>
-              </thead>
-              <tbody class="no-border-x">
-                @foreach($listadocestados as $index => $item)
+        <div class="col-xs-12 col-md-4">
+          <div class="panel panel-default panel-table">
+            <div class="panel-heading" style="background: #1d3a6d;color: #fff;"><b>POR ESTADOS</b>
+              <span class="panel-subtitle" style="color: #fff;">Documentos integrados</span>
+            </div>
+            <div class="panel-body">
+              <table class="table table-striped table-borderless">
+                <thead>
                   <tr>
-                    <td>{{$item->TXT_ESTADO}}</td>
-                    <td class="text-center"> <span class="badge badge-success" style="font-size: 16px;">{{$item->CANT}}</span></td>
+                    <th>ESTADOS</th>
+                    <th>CANTIDAD</th>
                   </tr>
-                @endforeach
+                </thead>
+                <tbody class="no-border-x">
+                  @foreach($listadocestados as $index => $item)
+                    <tr>
+                      <td>{{$item->TXT_ESTADO}}</td>
+                      <td class="text-center"> <span class="badge badge-success" style="font-size: 16px;">{{$item->CANT}}</span></td>
+                    </tr>
+                  @endforeach
 
-                  <tr>
-                    <td>OBSERVADOS</td>
-                    <td class="text-center"> <span class="badge badge-success">{{count($listaobservados)}}</span></td>
-                  </tr>
+                    <tr>
+                      <td>OBSERVADOS</td>
+                      <td class="text-center"> <span class="badge badge-success">{{count($listaobservados)}}</span></td>
+                    </tr>
 
-              </tbody>
-            </table>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
-
+      @endif
 
 
 

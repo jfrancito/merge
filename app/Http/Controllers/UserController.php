@@ -610,13 +610,22 @@ class UserController extends Controller {
         $url_obs 					=	'';
 		$count_observados 			= 	0;
 
+        $url_rep 					=	'';
+		$count_reparables 			= 	0;
+
 		$count_x_aprobar_gestion 	= 	0;
         $url_gestion 				=	'';
 
+		$count_observados_con 		= 	0;
+        $url_obs_con 				=	'';
+		$count_reparables_con 			= 	0;
+        
+
+
 		$trol 						=	WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 
-		$count_x_aprobar_con 		= 	0;
-		$count_observados_con 		= 	0;
+		$count_x_aprobar_con 				= 	0;
+
 		$count_x_aprobar_gestion_con 		= 	0;
 		
 		//1CIX00000019 COMPRAS
@@ -629,11 +638,22 @@ class UserController extends Controller {
         	//contrato
 			$count_x_aprobar_con 	= 	 count($listadatos);
 
+        	$listadatosre    		=   $this->con_lista_cabecera_comprobante_total_gestion_reparable($cod_empresa);
+			$count_reparables 		= 	 count($listadatosre);
+        	$url_rep 		 		=	'/gestion-de-comprobantes-reparable/Elk';
+
+        	$listadatosre_con    	=   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cod_empresa);
+			$count_reparables_con 	= 	 count($listadatosre_con);
+
         	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_gestion_observados($cod_empresa);
-			$count_observados 		= 	 count($listadatosob);
+			$count_observados 		= 	count($listadatosob);
         	$url_obs 		 		=	'/gestion-de-comprobantes-observados/lO6';
 
-			$count_observados_con 	= 	 0;
+
+        	$listadatosobcon    	=   $this->con_lista_cabecera_comprobante_total_gestion_observados_contrato($cod_empresa);
+			$count_observados_con 	= 	count($listadatosobcon);
+        	$url_obs_con 		 	=	'/gestion-de-comprobantes-observados/lO6';
+
 
 			$listadatosg      		=   $this->con_lista_cabecera_comprobante_administrativo($cod_empresa);
 			$count_x_aprobar_gestion= 	 count($listadatosg);
@@ -709,6 +729,13 @@ class UserController extends Controller {
 
 						 	'count_observados' 	=> $count_observados,
 						 	'url_obs' 			=> $url_obs,
+
+						 	'count_reparables' 	=> $count_reparables,
+						 	'url_rep' 			=> $url_rep,
+
+						 	'count_reparables_con' 	=> $count_reparables_con,
+
+
 						 	'count_x_aprobar_gestion' 	=> $count_x_aprobar_gestion,
 						 	'url_gestion' 			=> $url_gestion,
 						 	'trol' 					=> $trol,
@@ -724,6 +751,10 @@ class UserController extends Controller {
 
 						 	'count_x_aprobar_con' => $count_x_aprobar_con,
 						 	'count_observados_con'   => $count_observados_con,
+						 	'url_obs_con'   => $url_obs_con,
+
+
+
 						 	'count_x_aprobar_gestion_con'   => $count_x_aprobar_gestion_con,
 
 
