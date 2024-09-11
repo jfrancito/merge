@@ -971,7 +971,6 @@ class GestionUsuarioContactoController extends Controller
                         }
                     }
 
-
                     //whatsaap para contabilidad
                     $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
                     $ordencompra        =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$pedido_id)->first();            
@@ -980,7 +979,7 @@ class GestionUsuarioContactoController extends Controller
                                             .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
                                             .'PROVEEDOR : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'
                                             .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A'
-                                            .'MENSAJE : '.'RESOLVIO LAS OBSERVACIONES'.'%0D%0A';
+                                            .'MENSAJE : '.'RESOLVIO LOS REPARABLES'.'%0D%0A';
 
                     if(1==0){
                         $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
@@ -2226,6 +2225,7 @@ class GestionUsuarioContactoController extends Controller
                             ->update(
                                 [
                                     'ind_observacion'=>1,
+                                    'TXT_OBSERVADO'=>'OBSERVADO',
                                     'area_observacion'=>'UCO'
                                 ]
                             );
@@ -2274,6 +2274,7 @@ class GestionUsuarioContactoController extends Controller
             $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                         ->where('COD_ESTADO','=',1)
                                         ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->whereNotIn('COD_CATEGORIA',['DCC0000000000003','DCC0000000000004'])
                                         ->get();
 
             $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
@@ -2398,6 +2399,7 @@ class GestionUsuarioContactoController extends Controller
                             ->update(
                                 [
                                     'ind_observacion'=>1,
+                                    'TXT_OBSERVADO'=>'OBSERVADO',
                                     'area_observacion'=>'UCO'
                                 ]
                             );
@@ -2445,6 +2447,7 @@ class GestionUsuarioContactoController extends Controller
             $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                         ->where('COD_ESTADO','=',1)
                                         ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->whereNotIn('COD_CATEGORIA',['DCC0000000000003','DCC0000000000004'])
                                         ->get();
 
             $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)

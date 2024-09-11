@@ -496,6 +496,7 @@ class GestionOCContabilidadController extends Controller
             $trabajador             =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
 
             $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                        ->whereNotIn('COD_CATEGORIA',['DCC0000000000003','DCC0000000000004'])
                                         ->where('COD_ESTADO','=',1)
                                         ->where('CODIGO_SUNAT','=',$codigo_sunat)
                                         ->get();
@@ -745,6 +746,7 @@ class GestionOCContabilidadController extends Controller
             $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                         ->where('COD_ESTADO','=',1)
                                         ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->whereNotIn('COD_CATEGORIA',['DCC0000000000003','DCC0000000000004'])
                                         ->get();
 
             $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
@@ -894,6 +896,7 @@ class GestionOCContabilidadController extends Controller
                             ->update(
                                 [
                                     'ind_observacion'=>1,
+                                    'TXT_OBSERVADO'=>'OBSERVADO',
                                     'area_observacion'=>'CONT'
                                 ]
                             );
@@ -962,6 +965,7 @@ class GestionOCContabilidadController extends Controller
             $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                         ->where('COD_ESTADO','=',1)
                                         ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->whereNotIn('COD_CATEGORIA',['DCC0000000000003','DCC0000000000004'])
                                         ->get();
             $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                         ->pluck('COD_CATEGORIA_DOCUMENTO')
@@ -1068,7 +1072,7 @@ class GestionOCContabilidadController extends Controller
                 //LE LLEGA AL USUARIO DE CONTACTO
                 $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
                 $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                $mensaje            =   'COMPROBANTE OBSERVADO: '.$fedocumento->ID_DOCUMENTO
+                $mensaje            =   'COMPROBANTE REPARABLE: '.$fedocumento->ID_DOCUMENTO
                                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
                                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
                                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
@@ -1127,6 +1131,7 @@ class GestionOCContabilidadController extends Controller
             $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                         ->where('COD_ESTADO','=',1)
                                         ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->whereNotIn('COD_CATEGORIA',['DCC0000000000003','DCC0000000000004'])
                                         ->get();
             $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                         ->pluck('COD_CATEGORIA_DOCUMENTO')
@@ -1253,6 +1258,7 @@ class GestionOCContabilidadController extends Controller
                             ->update(
                                 [
                                     'ind_observacion'=>1,
+                                    'TXT_OBSERVADO'=>'OBSERVADO',
                                     'area_observacion'=>'CONT'
                                 ]
                             );
@@ -1319,6 +1325,7 @@ class GestionOCContabilidadController extends Controller
             $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                         ->where('COD_ESTADO','=',1)
                                         ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->whereNotIn('COD_CATEGORIA',['DCC0000000000003','DCC0000000000004'])
                                         ->get();
 
             $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
@@ -1426,7 +1433,7 @@ class GestionOCContabilidadController extends Controller
                 //LE LLEGA AL USUARIO DE CONTACTO
                 $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
                 $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                $mensaje            =   'COMPROBANTE OBSERVADO: '.$fedocumento->ID_DOCUMENTO
+                $mensaje            =   'COMPROBANTE REPARABLE: '.$fedocumento->ID_DOCUMENTO
                                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
                                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
                                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'

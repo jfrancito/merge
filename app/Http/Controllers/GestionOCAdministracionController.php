@@ -215,6 +215,7 @@ class GestionOCAdministracionController extends Controller
                             ->update(
                                 [
                                     'ind_observacion'=>1,
+                                    'TXT_OBSERVADO'=>'OBSERVADO',
                                     'area_observacion'=>'ADM'
                                 ]
                             );
@@ -279,6 +280,7 @@ class GestionOCAdministracionController extends Controller
             $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                         ->where('COD_ESTADO','=',1)
                                         ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->whereNotIn('COD_CATEGORIA',['DCC0000000000003','DCC0000000000004'])
                                         ->get();
 
             $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
@@ -404,6 +406,7 @@ class GestionOCAdministracionController extends Controller
                             ->update(
                                 [
                                     'ind_observacion'=>1,
+                                    'TXT_OBSERVADO'=>'OBSERVADO',
                                     'area_observacion'=>'ADM'
                                 ]
                             );
@@ -471,6 +474,7 @@ class GestionOCAdministracionController extends Controller
             $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                         ->where('COD_ESTADO','=',1)
                                         ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->whereNotIn('COD_CATEGORIA',['DCC0000000000003','DCC0000000000004'])
                                         ->get();
 
             $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
@@ -647,6 +651,7 @@ class GestionOCAdministracionController extends Controller
             $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                         ->where('COD_ESTADO','=',1)
                                         ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->whereNotIn('COD_CATEGORIA',['DCC0000000000003','DCC0000000000004'])
                                         ->get();
             $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                         ->pluck('COD_CATEGORIA_DOCUMENTO')
@@ -1292,6 +1297,7 @@ class GestionOCAdministracionController extends Controller
             $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                         ->where('COD_ESTADO','=',1)
                                         ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->whereNotIn('COD_CATEGORIA',['DCC0000000000003','DCC0000000000004'])
                                         ->get();
             $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                         ->pluck('COD_CATEGORIA_DOCUMENTO')
@@ -1666,6 +1672,7 @@ class GestionOCAdministracionController extends Controller
             $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                         ->where('COD_ESTADO','=',1)
                                         ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->whereNotIn('COD_CATEGORIA',['DCC0000000000003','DCC0000000000004'])
                                         ->get();
 
             $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)

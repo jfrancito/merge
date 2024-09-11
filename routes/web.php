@@ -195,8 +195,6 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-buscar-documento-gestion-reparable', 'GestionUsuarioContactoController@actionListarAjaxBuscarDocumentoReparable');
 
 
-
-
 	Route::any('/gestion-observados-contrato-provedores/{idopcion}', 'GestionUsuarioContactoController@actionListarComprobantesObservadosProveedores');
 	Route::any('/gestion-observados-oc-provedores/{idopcion}', 'GestionUsuarioContactoController@actionListarComprobantesObservadosOCProveedores');
 
@@ -205,7 +203,6 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/reparable-comprobante-uc/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionUsuarioContactoController@actionReparableUC');
 	Route::any('/reparable-comprobante-uc-contrato/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionUsuarioContactoController@actionReparableUCContrato');
-
 
 
 	Route::any('/observacion-comprobante-uc-contrato/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionUsuarioContactoController@actionObservarUCContrato');
