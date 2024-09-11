@@ -998,7 +998,7 @@ class GestionOCContabilidadController extends Controller
     }
 
 
-    public function actionAgregarReparableContabilidad($idopcion, $linea, $prefijo, $idordencompra,Request $request)
+    public function actionAgregarExtornoContabilidad($idopcion, $linea, $prefijo, $idordencompra,Request $request)
     {
 
         /******************* validar url **********************/
