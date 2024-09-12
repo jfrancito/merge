@@ -454,6 +454,8 @@ class GestionOCContabilidadController extends Controller
             $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);
             $lecturacdr             =   $this->lectura_cdr_archivo($idoc,$this->pathFiles,$prefijocarperta,$ordencompra->NRO_DOCUMENTO_CLIENTE);
 
+
+
             $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc_actual($idoc);
             $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
@@ -521,7 +523,7 @@ class GestionOCContabilidadController extends Controller
                                         ->get();
 
             $comboreparable         =   array('ARCHIVO_VIRTUAL' => 'ARCHIVO_VIRTUAL','ARCHIVO_FISICO' => 'ARCHIVO_FISICO');
-
+            $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
 
             return View::make('comprobante/aprobarcon', 
                             [
@@ -773,7 +775,7 @@ class GestionOCContabilidadController extends Controller
 
             $comboreparable         =   array('ARCHIVO_VIRTUAL' => 'ARCHIVO_VIRTUAL','ARCHIVO_FISICO' => 'ARCHIVO_FISICO');
 
-
+            $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
 
             return View::make('comprobante/aprobarconcontrato', 
                             [
