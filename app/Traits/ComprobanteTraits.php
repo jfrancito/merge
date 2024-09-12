@@ -239,9 +239,11 @@ trait ComprobanteTraits
                     $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
                     //CONTABILIDAD
                     if($prefijocarperta=='II'){
-                        $this->insertar_whatsaap_sp('51965991360','ANGHIE',$mensaje,'');//INTERNACIONAL
+                        $this->insertar_whatsaap('51965991360','ANGHIE',$mensaje,'');           //INTERNACIONAL
+                        $this->insertar_whatsaap('51988650421','LUCELY',$mensaje,'');           //INTERNACIONAL
                     }else{
-                        $this->insertar_whatsaap_sp('51950638955','MIGUEL',$mensaje,'');//COMERCIAL
+                        $this->insertar_whatsaap('51950638955','MIGUEL',$mensaje,'');           //COMERCIAL
+                        $this->insertar_whatsaap('51935387084','VASQUEZ',$mensaje,'');          //COMERCIAL
                     }
                 } 
 
