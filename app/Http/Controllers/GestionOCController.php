@@ -2665,13 +2665,11 @@ class GestionOCController extends Controller
                         $rz_p                               =   str_replace(["![CDATA[", "]]"], "", $factura->getcompany()->getrazonSocial());
                         $rz_p                               =    str_replace("?", "Ñ", $rz_p);
                         $rz_p                               =   str_replace("ï¿½", "Ñ", $rz_p);
-
+                        $rz_p                               =   str_replace("MARILÑ", "MARILÚ", $rz_p);
 
                         $documentolinea                     =   $this->ge_linea_documento($ordencompra->COD_DOCUMENTO_CTBLE);
                         $cant_rentencion                    =   $ordencompra_t->CAN_RETENCION;
                         $cant_perception                    =   $factura->getperception();
-
-
 
 
                         //REGISTRO DEL XML LEIDO
