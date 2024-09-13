@@ -454,8 +454,6 @@ class GestionOCContabilidadController extends Controller
             $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);
             $lecturacdr             =   $this->lectura_cdr_archivo($idoc,$this->pathFiles,$prefijocarperta,$ordencompra->NRO_DOCUMENTO_CLIENTE);
 
-
-
             $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc_actual($idoc);
             $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
@@ -519,7 +517,8 @@ class GestionOCContabilidadController extends Controller
             $documentoscomprarepable=   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                         ->where('COD_ESTADO','=',1)
                                         ->where('CODIGO_SUNAT','=',$codigo_sunat)
-                                        ->whereNotIn('COD_CATEGORIA',$archivosselect)
+                                        ->whereNotIn('COD_CATEGORIA',['DCC0000000000003','DCC0000000000004'])
+                                        //->whereNotIn('COD_CATEGORIA',$archivosselect)
                                         ->get();
 
             $comboreparable         =   array('ARCHIVO_VIRTUAL' => 'ARCHIVO_VIRTUAL','ARCHIVO_FISICO' => 'ARCHIVO_FISICO');
@@ -770,7 +769,8 @@ class GestionOCContabilidadController extends Controller
             $documentoscomprarepable=   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                         ->where('COD_ESTADO','=',1)
                                         ->where('CODIGO_SUNAT','=',$codigo_sunat)
-                                        ->whereNotIn('COD_CATEGORIA',$archivosselect)
+                                        ->whereNotIn('COD_CATEGORIA',['DCC0000000000003','DCC0000000000004'])
+                                        //->whereNotIn('COD_CATEGORIA',$archivosselect)
                                         ->get();
 
             $comboreparable         =   array('ARCHIVO_VIRTUAL' => 'ARCHIVO_VIRTUAL','ARCHIVO_FISICO' => 'ARCHIVO_FISICO');

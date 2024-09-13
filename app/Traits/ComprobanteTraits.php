@@ -60,7 +60,6 @@ trait ComprobanteTraits
             $rutafile           =   $path.'\\comprobantes\\'.$prefijocarperta.'\\'.$NRO_DOCUMENTO_CLIENTE;
             $zipFilePath        =   $rutafile.'\\'.$archivo->NOMBRE_ARCHIVO;
 
-
             // Obtener el nombre del archivo ZIP sin la extensión
             $zipFileName = pathinfo($zipFilePath, PATHINFO_FILENAME);
             $zip = new ZipArchive();
@@ -108,6 +107,10 @@ trait ComprobanteTraits
                         $cbc = 1;  
                     }
                 }
+
+                $codigocdr = '';
+                $respuestacdr = '';
+
 
                 if($cbc>=1){
 
@@ -157,14 +160,20 @@ trait ComprobanteTraits
                     //dd($respuestacdr);
                 }
 
+                if($codigocdr!=''){
 
-                FeDocumento::where('ID_DOCUMENTO','=',$idoc)
-                            ->update(
-                                [
-                                    'CODIGO_CDR'=>$codigocdr,
-                                    'RESPUESTA_CDR'=>$respuestacdr
-                                ]
-                            );
+                    FeDocumento::where('ID_DOCUMENTO','=',$idoc)
+                                ->update(
+                                    [
+                                        'CODIGO_CDR'=>$codigocdr,
+                                        'RESPUESTA_CDR'=>$respuestacdr
+                                    ]
+                                );
+
+                }
+
+
+
 
                 
             } 
