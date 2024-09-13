@@ -19,7 +19,7 @@
     <input  type="text"
             id="direccion" name='direccion' 
             value="@if(isset($empresa)){{old('direccion' ,$direccion)}}@else{{old('direccion')}}@endif"
-             placeholder="Dirección Fiscal"
+            placeholder="Dirección Fiscal"
             required = ""
             autocomplete="off" class="form-control input-sm" data-aw="4"/>
 

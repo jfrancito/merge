@@ -59,13 +59,9 @@
                                       </div>
                                 </div>
                               </div>
-
                               <div class='encontro_proveedor'>
                                 @include('usuario.form.formproveedor')
                               </div>
-
-
-
                               <div class='inputr'>
                                 <div class="control-label">Cuenta Detracción :</div>
                                 <div class="abajocaja">
@@ -80,13 +76,14 @@
 
 
                               <div class='inputr'>
-                                <div class="control-label">Contraseña <span class='requerido'>*</span>:</div>
+                                <div class="control-label">Contraseña : (entre 8 a 20 caracteres) <span class='requerido'>*</span>:</div>
                                 <div class="abajocaja">
 
                                   <input  type="password"
                                           id="lblcontrasena" name='lblcontrasena' value="{{ old('lblcontrasena') }}" placeholder="Ingresa una contraseña"
                                           required = ""
                                           data-parsley-minlength="8"
+                                          data-parsley-maxlength="20"
                                           autocomplete="off" 
                                           data-parsley-equalto="#lblcontrasenaconfirmar"
                                           class="form-control textpucanegro fuente-recoleta-regular input-sm"

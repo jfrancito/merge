@@ -311,12 +311,17 @@ class UserController extends Controller {
 		if($_POST)
 		{
 
+            try{    
+                
+
+
+            DB::beginTransaction();
+
+
 			$ruc 	 		 			= 	$request['ruc'];
 			$razonsocial 	 		 	= 	$request['razonsocial'];
-
 			$direccion 	 		 		= 	$request['direccion'];
 			$cuenta_detraccion 	 		= 	$request['cuenta_detraccion'];
-
 			$lblcontrasena 	 		 	= 	$request['lblcontrasena'];
 			$lblcontrasenaconfirmar 	= 	$request['lblcontrasenaconfirmar'];
 			$nombre 	 		 		= 	$request['nombre'];
@@ -324,7 +329,6 @@ class UserController extends Controller {
 			$lblemail 	 		 		= 	$request['lblemail'];
 			$lblconfirmaremail 			= 	$request['lblconfirmaremail'];
 			$cod_empresa 				= 	$request['cod_empresa'];
-
 			$usuario    				=   User::where('usuarioosiris_id','=',$cod_empresa)->first();
 
 			if(count($usuario) > 0){
@@ -369,12 +373,19 @@ class UserController extends Controller {
 			$detalle->usuario_id    	=  	$idusers;
 			$detalle->save();
 
-
 			Session::forget('usuario');
 			Session::forget('listamenu');
 			Session::forget('listaopciones');
+            DB::commit();
+
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                return Redirect::to('registrate')->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
 
  			return Redirect::to('/login')->with('bienhecho', 'Proveedor '.$razonsocial.' registrado con exito (Se le a enviado un email para que pueda confirmar su acceso al sitema)');
+
+
 
 		}else{
 
