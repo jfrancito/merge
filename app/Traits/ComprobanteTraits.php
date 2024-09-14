@@ -1617,7 +1617,7 @@ trait ComprobanteTraits
         $fe_rz =str_replace('  ', ' ', $fedocumento->RZ_PROVEEDOR);
 		if(ltrim(rtrim(strtoupper($ordencompra->TXT_EMPR_CLIENTE))) == ltrim(rtrim(strtoupper($fe_rz)))){
 			$ind_rz 			=	1;	
-		}else{ 	$ind_errototal 		=	0;  }
+		}//else{ 	$ind_errototal 		=	0;  }
 
 		//moneda
 		$txtmoneda 			=	'';
@@ -1700,7 +1700,7 @@ trait ComprobanteTraits
 
         if(ltrim(rtrim(strtoupper($ordencompra->TXT_EMPR_EMISOR))) == ltrim(rtrim(strtoupper($fedocumento->RZ_PROVEEDOR)))){
             $ind_rz             =   1;  
-        }else{  $ind_errototal      =   0;  }
+        }//else{  $ind_errototal      =   0;  }
 
 
         //moneda
