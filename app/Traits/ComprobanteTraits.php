@@ -1090,17 +1090,16 @@ trait ComprobanteTraits
         if($rol->ind_uc == 1){
 
 
-            $listadatos     =   CMPOrden::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+            $listadatos     =   FeDocumento::join('CMP.ORDEN', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.Orden.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
-
                                 //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
                                 ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                 //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 ->where('OPERACION','=','ORDEN_COMPRA')
-                                ->Proveedor($proveedor_id)
-                                ->Estado($estado_id)
+                                ->ProveedorFE($proveedor_id)
+                                ->EstadoFE($estado_id)
                                 ->whereIn('CMP.Orden.COD_USUARIO_CREA_AUD',$array_usuarios)
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
                                 ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA'))
@@ -1109,17 +1108,16 @@ trait ComprobanteTraits
 
         }else{
 
-            $listadatos     =   CMPOrden::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+            $listadatos     =   FeDocumento::join('CMP.ORDEN', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.Orden.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
-            
                                 //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
                                 ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                 //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 ->where('OPERACION','=','ORDEN_COMPRA')
-                                ->Proveedor($proveedor_id)
-                                ->Estado($estado_id)
+                                ->ProveedorFE($proveedor_id)
+                                ->EstadoFE($estado_id)
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
                                 ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA'))
                                 ->orderBy('fecha_uc','asc')
@@ -1143,7 +1141,7 @@ trait ComprobanteTraits
 
         if($rol->ind_uc == 1 && Session::get('usuario')->id != '1CIX00000142'){
 
-            $listadatos     =   CMPDocumentoCtble::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+            $listadatos     =   FeDocumento::join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                                 ->join('ALM.CENTRO', 'ALM.CENTRO.COD_CENTRO', '=', 'CMP.DOCUMENTO_CTBLE.COD_CENTRO')
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
@@ -1154,8 +1152,8 @@ trait ComprobanteTraits
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
                                 ->where('OPERACION','=','CONTRATO')
-                                ->Proveedor($proveedor_id)
-                                ->Estado($estado_id)
+                                ->ProveedorFE($proveedor_id)
+                                ->EstadoFE($estado_id)
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
                                 ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA'))
                                 ->orderBy('fecha_pa', 'desc')
@@ -1163,7 +1161,7 @@ trait ComprobanteTraits
 
         }else{
 
-            $listadatos     =   CMPDocumentoCtble::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+            $listadatos     =   FeDocumento::join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                                 ->join('ALM.CENTRO', 'ALM.CENTRO.COD_CENTRO', '=', 'CMP.DOCUMENTO_CTBLE.COD_CENTRO')
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
@@ -1174,8 +1172,8 @@ trait ComprobanteTraits
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 //->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
                                 ->where('OPERACION','=','CONTRATO')
-                                ->Proveedor($proveedor_id)
-                                ->Estado($estado_id)
+                                ->ProveedorFE($proveedor_id)
+                                ->EstadoFE($estado_id)
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
                                 ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA'))
                                 ->orderBy('fecha_pa', 'desc')
@@ -1230,16 +1228,24 @@ trait ComprobanteTraits
 
     private function gn_combo_proveedor_fe_documento($todo) {
 
-		$array 						= 	FeDocumento::join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
-										->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-										->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                        //->where('TXT_PROCEDENCIA','<>','SUE')
-										->select(DB::raw('COD_EMPR_CLIENTE,TXT_EMPR_CLIENTE'))
-										->groupBy('COD_EMPR_CLIENTE')
-										->groupBy('TXT_EMPR_CLIENTE')
-                                        ->pluck('TXT_EMPR_CLIENTE','COD_EMPR_CLIENTE')
+		// $array 						= 	FeDocumento::join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+		// 								->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+		// 								->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+        //                                 //->where('TXT_PROCEDENCIA','<>','SUE')
+		// 								->select(DB::raw('COD_EMPR_CLIENTE,TXT_EMPR_CLIENTE'))
+		// 								->groupBy('COD_EMPR_CLIENTE')
+		// 								->groupBy('TXT_EMPR_CLIENTE')
+        //                                 ->pluck('TXT_EMPR_CLIENTE','COD_EMPR_CLIENTE')
+        //                                 ->toArray();
+                   
+        $array                      =   FeDocumento::where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                        ->select(DB::raw('RUC_PROVEEDOR,RZ_PROVEEDOR'))
+                                        ->groupBy('RUC_PROVEEDOR')
+                                        ->groupBy('RZ_PROVEEDOR')
+                                        ->pluck('RZ_PROVEEDOR','RUC_PROVEEDOR')
                                         ->toArray();
-                                        
+
+
         if($todo=='TODO'){
             $combo                  =   array($todo => $todo) + $array;
         }else{
