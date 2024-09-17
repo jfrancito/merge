@@ -19,6 +19,8 @@ use App\Modelos\CMPReferecenciaAsoc;
 use App\Modelos\CMPOrden;
 use App\Modelos\FeDocumentoEntregable;
 use App\Modelos\STDEmpresa;
+use App\Modelos\SGDUsuario;
+use App\Modelos\WEBRol;
 
 
 
@@ -65,11 +67,25 @@ class GestionEntregaDocumentoController extends Controller
         $combo_empresa  =   $this->gn_combo_empresa_empresa($empresa_id);
         $centro_id      =   'CEN0000000000001';
         $combo_centro   =   $this->gn_combo_centro_r('');
-        $area_id      =   'TODO';
-        $combo_area   =   $this->gn_combo_area_usuario($estado_id);
+
+
+        $area_id        =   'TODO';
+        $combo_area     =   $this->gn_combo_area_usuario($estado_id);
+        $rol            =    WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
+        if($rol->ind_uc == 1){
+            $usuario    =   SGDUsuario::where('COD_USUARIO','=',Session::get('usuario')->name)->first();
+            if(count($usuario)>0){
+                $tp_area        =   CMPCategoria::where('COD_CATEGORIA','=',$usuario->COD_CATEGORIA_AREA)->first();
+                $area_id        =   $tp_area->COD_CATEGORIA;
+                $combo_area     =   array($tp_area->COD_CATEGORIA => $tp_area->NOM_CATEGORIA);
+            }
+        }
+
+
         //falta usuario contacto
         $operacion_id       =   'ORDEN_COMPRA';
         $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO');
+        $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA');
 
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_entregable($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id);
@@ -257,12 +273,19 @@ class GestionEntregaDocumentoController extends Controller
         /******************************************************/
         View::share('titulo','Lista de Folio de Documentos');
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
-
         $empresa_id     =   Session::get('empresas')->COD_EMPR;
 
-        $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
-                            ->where('COD_EMPRESA','=',$empresa_id)
-                            ->get();
+        $rol            =   WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
+        if($rol->ind_uc == 1){
+            $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
+                                ->where('COD_EMPRESA','=',$empresa_id)
+                                ->where('USUARIO_CREA','=',Session::get('usuario')->id)
+                                ->get();
+        }else{
+            $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
+                                ->where('COD_EMPRESA','=',$empresa_id)
+                                ->get();
+        }
 
         $funcion        =   $this;
         return View::make('entregadocumento/listaentregadocumentofolio',

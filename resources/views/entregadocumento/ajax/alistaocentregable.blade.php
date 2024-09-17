@@ -2,15 +2,14 @@
   <thead>
     <tr>
       <th>ITEM</th>
+      <th>UC</th>
       <th>NRO OC</th>
       <th>PROVEEDOR</th>
       <th>COMPROBANTE ASOCIADO</th>
       <th>FECHA VENCIMIENTO DOC</th>
       <th>FECHA APROBACION ADMIN</th>
       <th>TIPO</th>
-
       <th>SUBIO VOUCHER</th>
-
       <th>ORDEN INGRESO</th>
       <th>OBLIGACION</th>
       <th>DESCUENTO</th>
@@ -18,17 +17,7 @@
       <th>IMPORTE</th>
       <th>NETO A PAGAR</th>
       <th>
-<!--         <div class="text-center be-checkbox be-checkbox-sm has-primary">
-          <input  type="checkbox"
-                  class="todo_asignar input_asignar"
-                  id="todo_asignar"
-          >
-          <label  for="todo_asignar"
-                  data-atr = "todas_asignar"
-                  class = "checkbox_asignar"                    
-                  name="todo_asignar"
-            ></label>
-        </div> -->
+
       </th>
 
     </tr>
@@ -39,6 +28,8 @@
       <tr data_requerimiento_id = "{{$item->COD_ORDEN}}"
         >
         <td>{{$index + 1}}</td>
+        <td>{{$item->TXT_CONTACTO}}</td>
+
         <td>{{$item->COD_ORDEN}}</td>
         <td>{{$item->TXT_EMPR_CLIENTE}}</td>
         <td>{{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</td>

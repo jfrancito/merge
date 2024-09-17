@@ -14,11 +14,17 @@
               <div class="panel panel-default panel-border-color panel-border-color-success">
                 <div class="panel-heading">{{ $titulo }}
 
-<!--                   <div class="tools tooltiptop">
+                  <div class="tools tooltiptop">
 
-                    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones asignarmasivo">
-                      <span class="tooltiptext">Integracion Masiva</span>
-                      <span class="icon mdi mdi-plus-circle-o"></span>
+
+                    <a href="{{url('/comprobante-masivo-excel')}}" 
+                       class='tn btn-secondary botoncabecera tooltipcss opciones'
+                       target="_blank"
+                       id="descargarcomprobantemasivoexcel" 
+                       data-href="{{url('/comprobante-masivo-excel')}}"
+                       title="Descargar excel">
+                       <span class="tooltiptext">Descargar excel </span>
+                       <i class="fa fa-file-excel-o"></i>
                     </a>
 
                     <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscardocumento">
@@ -26,26 +32,7 @@
                       <span class="icon mdi mdi-search"></span>
                     </a>
 
-                    <a href="#" class="tooltipcss opciones buscardocumento">
-                      <span class="tooltiptext">Buscar Documento</span>
-                      <span class="icon mdi mdi-search"></span>
-                    </a>
-
-
-
-                  </div> -->
-
-
-                  <div class="tools tooltiptop">
-                    <a href="#" class="tooltipcss opciones buscardocumento">
-                      <span class="tooltiptext">Buscar Documento</span>
-                      <span class="icon mdi mdi-search"></span>
-                    </a>
                   </div>
-
-
-
-
                 </div>
 
                 <div class="panel-body">

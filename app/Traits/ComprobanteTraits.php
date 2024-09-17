@@ -1131,6 +1131,128 @@ trait ComprobanteTraits
     }
 
 
+
+    private function con_lista_cabecera_comprobante_total_gestion_excel($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id) {
+
+        $rol                    =       WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
+        $trabajador             =       STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+        $array_trabajadores     =       STDTrabajador::where('NRO_DOCUMENTO','=',$trabajador->NRO_DOCUMENTO)
+                                        ->pluck('COD_TRAB')
+                                        ->toArray();
+        $array_usuarios         =       SGDUsuario::whereIn('COD_TRABAJADOR',$array_trabajadores)
+                                        ->pluck('COD_USUARIO')
+                                        ->toArray();
+
+        if($rol->ind_uc == 1){
+
+
+            $listadatos     =   FeDocumento::join('CMP.ORDEN', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+                                ->join('CMP.DETALLE_PRODUCTO', 'CMP.DETALLE_PRODUCTO.COD_TABLA', '=', 'CMP.Orden.COD_ORDEN')
+                                ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.Orden.COD_USUARIO_CREA_AUD')
+                                ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
+                                //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                                ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                                ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                ->where('OPERACION','=','ORDEN_COMPRA')
+                                ->where('CMP.DETALLE_PRODUCTO.COD_ESTADO','=','1')
+                                ->ProveedorFE($proveedor_id)
+                                ->EstadoFE($estado_id)
+                                ->whereIn('CMP.Orden.COD_USUARIO_CREA_AUD',$array_usuarios)
+                                ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA'))
+                                ->orderBy('FEC_VENTA','asc')
+                                ->get();
+
+        }else{
+
+            $listadatos     =   FeDocumento::join('CMP.ORDEN', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+                                ->join('CMP.DETALLE_PRODUCTO', 'CMP.DETALLE_PRODUCTO.COD_TABLA', '=', 'CMP.Orden.COD_ORDEN')
+                                ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.Orden.COD_USUARIO_CREA_AUD')
+                                ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
+                                //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                                ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                                ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                ->where('OPERACION','=','ORDEN_COMPRA')
+                                ->where('CMP.DETALLE_PRODUCTO.COD_ESTADO','=','1')
+                                ->ProveedorFE($proveedor_id)
+                                ->EstadoFE($estado_id)
+                                ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA'))
+                                ->orderBy('FEC_VENTA','asc')
+                                ->get();
+
+        }
+
+
+
+        return  $listadatos;
+    }
+
+    private function con_lista_cabecera_comprobante_total_gestion_contrato_excel($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id) {
+
+
+        $trabajador     =       STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+        $centro_id      =       $trabajador->COD_ZONA_TIPO;
+        $rol            =       WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
+
+
+        if($rol->ind_uc == 1 && Session::get('usuario')->id != '1CIX00000142'){
+
+            $listadatos     =   FeDocumento::join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                                ->join('CMP.DETALLE_PRODUCTO', 'CMP.DETALLE_PRODUCTO.COD_TABLA', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                                ->join('ALM.CENTRO', 'ALM.CENTRO.COD_CENTRO', '=', 'CMP.DOCUMENTO_CTBLE.COD_CENTRO')
+                                ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD')
+                                ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
+
+                                //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                                ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                                ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
+                                ->where('OPERACION','=','CONTRATO')
+                                ->where('CMP.DETALLE_PRODUCTO.COD_ESTADO','=','1')
+                                ->where('CMP.DETALLE_PRODUCTO.IND_MATERIAL_SERVICIO','=','S')
+                                ->ProveedorFE($proveedor_id)
+                                ->EstadoFE($estado_id)
+                                ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA'))
+                                ->orderBy('FEC_VENTA', 'desc')
+                                ->get();
+
+        }else{
+
+            $listadatos     =   FeDocumento::join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                                ->join('CMP.DETALLE_PRODUCTO', 'CMP.DETALLE_PRODUCTO.COD_TABLA', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                                ->join('ALM.CENTRO', 'ALM.CENTRO.COD_CENTRO', '=', 'CMP.DOCUMENTO_CTBLE.COD_CENTRO')
+                                ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD')
+                                ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
+                                ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                ->where('CMP.DETALLE_PRODUCTO.COD_ESTADO','=','1')
+                                ->where('CMP.DETALLE_PRODUCTO.IND_MATERIAL_SERVICIO','=','S')
+                                ->where('OPERACION','=','CONTRATO')
+                                ->ProveedorFE($proveedor_id)
+                                ->EstadoFE($estado_id)
+                                ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA'))
+                                ->orderBy('FEC_VENTA', 'desc')
+                                ->get();
+        }
+
+
+
+
+
+        return  $listadatos;
+
+
+    }
+
+
+
+
     private function con_lista_cabecera_comprobante_total_gestion_contrato($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id) {
 
 
@@ -1893,7 +2015,6 @@ trait ComprobanteTraits
                                         'TDO0000000000002'
                                     ]);
 
-
         $oi                     =   DB::table('CMP.ORDEN')
                                     ->join('CMP.REFERENCIA_ASOC', 'CMP.ORDEN.COD_ORDEN', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
                                     ->select(DB::raw('REFERENCIA_ASOC.*'))
@@ -1901,6 +2022,7 @@ trait ComprobanteTraits
 
 
         $listadatos             =   CMPOrden::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+                                    ->Join('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'LISTA_DOCUMENTOS_PAGAR_PROGRAMACION.COD_ORDEN')
                                     ->leftJoin(DB::raw("({$documento->toSql()}) as documentos"), function ($join) use ($documento) {
                                             $join->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'documentos.COD_TABLA')
                                                  ->addBinding($documento->getBindings());
@@ -2039,6 +2161,7 @@ trait ComprobanteTraits
                                     ]);
 
         $listadatos             =   CMPDocumentoCtble::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                                    ->Join('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'LISTA_DOCUMENTOS_PAGAR_PROGRAMACION.COD_ORDEN')
                                     ->leftJoin(DB::raw("({$documento->toSql()}) as documentos"), function ($join) use ($documento) {
                                             $join->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'documentos.COD_TABLA')
                                                  ->addBinding($documento->getBindings());
