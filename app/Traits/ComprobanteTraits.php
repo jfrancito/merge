@@ -54,7 +54,6 @@ trait ComprobanteTraits
         $nombre_doc_sinceros = $fedocumento->SERIE.'-'.$numerototalsc;
 
 
-
         if(count($fedocumento)>0){
             $archivo            =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('TIPO_ARCHIVO','=','DCC0000000000004')->where('ACTIVO','=','1')->first();
             //dd($archivo);
@@ -92,88 +91,91 @@ trait ComprobanteTraits
                     $zip->close();
                 } 
                 $extractedFile = $rutafile.'\\'.$fileInfo['name'];
+                $extension = pathinfo($fileInfo['name'], PATHINFO_EXTENSION);
+                // Verificar si es un archivo XML
+                //dd($extension);
+                if ($extension === 'xml') {
+                    if (file_exists($extractedFile)) {
+                        //dd($extractedFile);
+                        //cbc
+                        $xml = simplexml_load_file($extractedFile);
 
 
-                if (file_exists($extractedFile)) {
-                    //dd($extractedFile);
-                    //cbc
-                    $xml = simplexml_load_file($extractedFile);
 
-
-
-                    $cbc = 0;
-                    $namespaces = $xml->getNamespaces(true);
-                    foreach ($namespaces as $prefix => $namespace) {
-                        if('cbc'==$prefix){
-                            $cbc = 1;  
-                        }
-                    }
-
-                    $codigocdr = '';
-                    $respuestacdr = '';
-
-
-                    if($cbc>=1){
-
-                        foreach($xml->xpath('//cbc:ResponseCode') as $ResponseCode)
-                        {
-                            $codigocdr  = (string)$ResponseCode;
-                        }
-
-                        foreach($xml->xpath('//cbc:Description') as $Description)
-                        {
-                            $respuestacdr  = $Description;
-                        }
-                        foreach($xml->xpath('//cbc:ID') as $ID)
-                        {
-                            $factura_cdr_id  = $ID;
-                            if($factura_cdr_id == $nombre_doc || $factura_cdr_id == $nombre_doc_sinceros){
-                                $sw = 1;
-                            }
-                        }  
-                    }else{
-
-                        $xml_ns = simplexml_load_file($extractedFile);
-
-                        // Namespace definitions
-                        $ns4 = "urn:oasis:names:specification:ubl:schema:xsd:ApplicationResponse-2";
-                        $ns3 = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
-                        // Register namespaces
-                        $xml_ns->registerXPathNamespace('ns4', $ns4);
-                        $xml_ns->registerXPathNamespace('ns3', $ns3);
-                        // Querying XML
-                        foreach($xml_ns->xpath('//ns3:DocumentResponse/ns3:Response') as $ResponseCodes)
-                        {
-                            $codigocdr  = (string)$ResponseCodes->ResponseCode;
-                        }
-                        foreach($xml_ns->xpath('//ns3:DocumentResponse/ns3:Response') as $Description)
-                        {
-                            $respuestacdr  = $Description->Description;
-                        }
-                        foreach($xml_ns->xpath('//ns3:DocumentReference') as $ID)
-                        {
-                            $factura_cdr_id  = $ID->ID;
-                            if($factura_cdr_id == $nombre_doc || $factura_cdr_id == $nombre_doc_sinceros){
-                                $sw = 1;
+                        $cbc = 0;
+                        $namespaces = $xml->getNamespaces(true);
+                        foreach ($namespaces as $prefix => $namespace) {
+                            if('cbc'==$prefix){
+                                $cbc = 1;  
                             }
                         }
 
-                        //dd($respuestacdr);
-                    }
+                        $codigocdr = '';
+                        $respuestacdr = '';
 
-                    if($codigocdr!=''){
 
-                        FeDocumento::where('ID_DOCUMENTO','=',$idoc)
-                                    ->update(
-                                        [
-                                            'CODIGO_CDR'=>$codigocdr,
-                                            'RESPUESTA_CDR'=>$respuestacdr
-                                        ]
-                                    );
+                        if($cbc>=1){
 
-                    }
-                    
+                            foreach($xml->xpath('//cbc:ResponseCode') as $ResponseCode)
+                            {
+                                $codigocdr  = (string)$ResponseCode;
+                            }
+
+                            foreach($xml->xpath('//cbc:Description') as $Description)
+                            {
+                                $respuestacdr  = $Description;
+                            }
+                            foreach($xml->xpath('//cbc:ID') as $ID)
+                            {
+                                $factura_cdr_id  = $ID;
+                                if($factura_cdr_id == $nombre_doc || $factura_cdr_id == $nombre_doc_sinceros){
+                                    $sw = 1;
+                                }
+                            }  
+                        }else{
+
+                            $xml_ns = simplexml_load_file($extractedFile);
+
+                            // Namespace definitions
+                            $ns4 = "urn:oasis:names:specification:ubl:schema:xsd:ApplicationResponse-2";
+                            $ns3 = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
+                            // Register namespaces
+                            $xml_ns->registerXPathNamespace('ns4', $ns4);
+                            $xml_ns->registerXPathNamespace('ns3', $ns3);
+                            // Querying XML
+                            foreach($xml_ns->xpath('//ns3:DocumentResponse/ns3:Response') as $ResponseCodes)
+                            {
+                                $codigocdr  = (string)$ResponseCodes->ResponseCode;
+                            }
+                            foreach($xml_ns->xpath('//ns3:DocumentResponse/ns3:Response') as $Description)
+                            {
+                                $respuestacdr  = $Description->Description;
+                            }
+                            foreach($xml_ns->xpath('//ns3:DocumentReference') as $ID)
+                            {
+                                $factura_cdr_id  = $ID->ID;
+                                if($factura_cdr_id == $nombre_doc || $factura_cdr_id == $nombre_doc_sinceros){
+                                    $sw = 1;
+                                }
+                            }
+
+                            //dd($respuestacdr);
+                        }
+
+                        if($codigocdr!=''){
+
+                            FeDocumento::where('ID_DOCUMENTO','=',$idoc)
+                                        ->update(
+                                            [
+                                                'CODIGO_CDR'=>$codigocdr,
+                                                'RESPUESTA_CDR'=>$respuestacdr
+                                            ]
+                                        );
+
+                        }                        
+                    } 
                 } 
+
             }
         }
 
