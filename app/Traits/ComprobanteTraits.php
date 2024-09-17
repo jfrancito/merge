@@ -57,7 +57,7 @@ trait ComprobanteTraits
 
         if(count($fedocumento)>0){
             $archivo            =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('TIPO_ARCHIVO','=','DCC0000000000004')->where('ACTIVO','=','1')->first();
-
+            //dd($archivo);
             if(count($archivo)>0){
                 $rutafile           =   $path.'\\comprobantes\\'.$prefijocarperta.'\\'.$NRO_DOCUMENTO_CLIENTE;
                 $zipFilePath        =   $rutafile.'\\'.$archivo->NOMBRE_ARCHIVO;
@@ -2022,7 +2022,7 @@ trait ComprobanteTraits
 
 
         $listadatos             =   CMPOrden::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
-                                    ->Join('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'LISTA_DOCUMENTOS_PAGAR_PROGRAMACION.COD_ORDEN')
+                                    //->Join('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'LISTA_DOCUMENTOS_PAGAR_PROGRAMACION.COD_ORDEN')
                                     ->leftJoin(DB::raw("({$documento->toSql()}) as documentos"), function ($join) use ($documento) {
                                             $join->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'documentos.COD_TABLA')
                                                  ->addBinding($documento->getBindings());
