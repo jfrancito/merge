@@ -2040,6 +2040,7 @@ trait ComprobanteTraits
                                         $query->where('FOLIO', '=', '');
                                         $query->orWhereNull('FOLIO');
                                     })
+                                    //->where('CMP.Orden.COD_ORDEN','=','ISCHCL0000005886')
                                     ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005'])
                                     ->where('CMP.Orden.COD_EMPR','=',$empresa_id)
                                     ->where('CMP.Orden.COD_CENTRO','=',$centro_id)
@@ -2049,6 +2050,8 @@ trait ComprobanteTraits
                                         FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_VOUCHER'))
                                     ->orderBy('documentos.FEC_VENCIMIENTO','asc')
                                     ->get();
+
+        //dd($listadatos);
 
         return  $listadatos;
 

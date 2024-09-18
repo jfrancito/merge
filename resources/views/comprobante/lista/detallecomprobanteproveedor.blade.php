@@ -2,7 +2,7 @@
         <div class="container">
           <div class="row">
 
-            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4">
               <div class="panel panel-default panel-contrast">
                 <div class="panel-heading" style="background: #1d3a6d;color: #fff;">CARGAR DOCUMENTO XML ({{$xmlfactura}})
                 </div>
@@ -59,10 +59,12 @@
 
               <div class="row">
 
-                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4">
                   @include('comprobante.form.ordencompra.comparar')
                 </div>
-                <div class="col-xs-12 col-sm-6 col-md-8 col-lg-8">
+
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8">
                   <div class="panel panel-default panel-contrast">
                     <div class="panel-heading" style="background: #1d3a6d;color: #fff;">INFORMACION DEL DOCUMENTO
                     </div>
@@ -195,7 +197,7 @@
                             <div class="row">
                         
                                   @foreach($tarchivos as $index => $item)  
-                                    <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
+                                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
                                       <div class="form-group sectioncargarimagen">
                                           <label class="col-sm-12 control-label"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}} ({{$item->TXT_FORMATO}})</b></label>
                                           <div class="col-sm-12">
