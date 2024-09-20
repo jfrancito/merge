@@ -1912,47 +1912,6 @@ class GestionUsuarioContactoController extends Controller
                     }
                 }
 
-                // $filespdf          =   $request['otros'];
-                // if(!is_null($filespdf)){
-                //     //PDF
-                //     foreach($filespdf as $file){
-
-                //             $larchivos       =      Archivo::get();
-
-
-                //         $nombre          =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                //         /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
-                //         $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
-                //         $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
-                //         //$nombrefilepdf   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                //         $nombrefilepdf   =      count($larchivos).'-'.$file->getClientOriginalName();
-                //         $valor           =      $this->versicarpetanoexiste($rutafile);
-                //         $rutacompleta    =      $rutafile.'\\'.$nombrefilepdf;
-                //         copy($file->getRealPath(),$rutacompleta);
-                //         $path            =      $rutacompleta;
-
-                //         $nombreoriginal             =   $file->getClientOriginalName();
-                //         $info                       =   new SplFileInfo($nombreoriginal);
-                //         $extension                  =   $info->getExtension();
-
-                //         $dcontrol                   =   new Archivo;
-                //         $dcontrol->ID_DOCUMENTO     =   $ordencompra->COD_ORDEN;
-                //         $dcontrol->DOCUMENTO_ITEM   =   $fedocumento->DOCUMENTO_ITEM;
-                //         $dcontrol->TIPO_ARCHIVO     =   'OTROS_UC';
-                //         $dcontrol->NOMBRE_ARCHIVO   =   $nombrefilepdf;
-                //         $dcontrol->DESCRIPCION_ARCHIVO  =   'OTROS USUARIO DE CONTACTOS';
-                //         $dcontrol->URL_ARCHIVO      =   $path;
-                //         $dcontrol->SIZE             =   filesize($file);
-                //         $dcontrol->EXTENSION        =   $extension;
-                //         $dcontrol->ACTIVO           =   1;
-                //         $dcontrol->FECHA_CREA       =   $this->fechaactual;
-                //         $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
-                //         $dcontrol->save();
-                //         //dd($nombre);
-                //     }
-                // }
-
-
 
                 if($orden->IND_MATERIAL_SERVICIO=='M'){
 
@@ -2020,11 +1979,6 @@ class GestionUsuarioContactoController extends Controller
                     }    
 
                 }
-
-
-
-
-
 
                 DB::commit();
                 return Redirect::to('/gestion-de-comprobante-us/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' APROBADO CON EXITO');

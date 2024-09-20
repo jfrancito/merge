@@ -3005,6 +3005,9 @@ class GestionOCController extends Controller
                         }
                         $codigocdr = '';  
                         if($cbc>=1){
+
+
+
                             foreach($xml->xpath('//cbc:ResponseCode') as $ResponseCode)
                             {
                                 $codigocdr  = (string)$ResponseCode;
@@ -3021,7 +3024,7 @@ class GestionOCController extends Controller
                                 }
                             }  
                         }else{
-
+                            //dd("hola2");
                             $xml_ns = simplexml_load_file($extractedFile);
 
                             // Namespace definitions
@@ -3208,9 +3211,7 @@ class GestionOCController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
-
-
-                $orden                      =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
+                $orden                                  =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
 
                 if($orden->IND_MATERIAL_SERVICIO=='M'){
 

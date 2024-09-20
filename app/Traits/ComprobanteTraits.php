@@ -273,9 +273,12 @@ trait ComprobanteTraits
         foreach($listafedocumentos as $index=>$item){
 
             $orden              =   CMPOrden::where('COD_ORDEN','=',$item->ID_DOCUMENTO)->first();
-            $referenciaasoc     =   CMPReferecenciaAsoc::where('COD_TABLA','=',$item->ID_DOCUMENTO)
-                                    ->where('COD_TABLA_ASOC','LIKE','%OI%')->first();
-
+            $referenciaasoc     =   CMPReferecenciaAsoc::join('CMP.ORDEN','CMP.ORDEN.COD_ORDEN','=','CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+                                    ->where('CMP.REFERENCIA_ASOC.COD_TABLA','=',$item->ID_DOCUMENTO)
+                                    ->where('CMP.REFERENCIA_ASOC.COD_TABLA_ASOC','LIKE','%OI%')
+                                    ->where('CMP.ORDEN.COD_CATEGORIA_ESTADO_ORDEN','=','EOR0000000000001')
+                                    ->first();
+            //dd($referenciaasoc->COD_TABLA_ASOC);
             if(count($referenciaasoc)>0){
                 $wsdl = 'http://10.1.0.201/WCF_Orden.svc?wsdl';
                 // URL del WSDL del servicio WCF 
@@ -337,6 +340,7 @@ trait ComprobanteTraits
                               ->where('CMP.REFERENCIA_ASOC.COD_TABLA_ASOC','like','%'.'OI'.'%')
                               ->where('CMP.ORDEN.COD_CATEGORIA_ESTADO_ORDEN','=','EOR0000000000003')
                               ->first();
+
             if(count($referenciaasoc)>0){
 
                 //SI ES MATERIAL
