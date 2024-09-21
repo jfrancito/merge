@@ -1542,6 +1542,8 @@ trait ComprobanteTraits
 
 	private function con_lista_cabecera_comprobante_total_gestion_observados($cliente_id) {
 
+
+        
 		$listadatos 	= 	FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
 							->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
 							->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
