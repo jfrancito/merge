@@ -483,7 +483,9 @@ class GestionOCContabilidadController extends Controller
                 }
             }
             $referencia             =   DB::connection($conexionbd)->table('CMP.REFERENCIA_ASOC')->where('COD_TABLA','=',$ordencompra->COD_ORDEN)
-                                        ->where('COD_TABLA_ASOC','like','%OI%')->first();
+                                        ->where('COD_TABLA_ASOC','like','%OI%')
+                                        ->orderBy('COD_TABLA_ASOC','desc')
+                                        ->first();
             $ordeningreso           =   array();
             if(count($referencia)>0){
                 $ordeningreso       =   DB::connection($conexionbd)->table('CMP.ORDEN')->where('COD_ORDEN','=',$referencia->COD_TABLA_ASOC)->first();   
