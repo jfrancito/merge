@@ -199,7 +199,7 @@
                                   @foreach($tarchivos as $index => $item)  
                                     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
                                       <div class="form-group sectioncargarimagen">
-                                          <label class="col-sm-12 control-label"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}} ({{$item->TXT_FORMATO}})</b></label>
+                                          <label class="col-sm-12 control-label"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}} (@if($item->TXT_FORMATO == 'ZIP') XML @else {{$item->TXT_FORMATO}} @endif)</b></label>
                                           <div class="col-sm-12">
                                               <div class="file-loading">
                                                   <input 

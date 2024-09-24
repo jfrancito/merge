@@ -198,6 +198,9 @@
                             <div class="row">
                                   @foreach($tarchivos as $index => $item) 
 
+
+                                    
+
                                   
                                     @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000001')
                                       @if($rutaorden != '')
@@ -205,7 +208,7 @@
                                       @else
                                         <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
                                           <div class="form-group sectioncargarimagen">
-                                            <label class="col-sm-12 control-label" style="text-align: left;"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}} ({{$item->TXT_FORMATO}})</b> 
+                                            <label class="col-sm-12 control-label" style="text-align: left;"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}} (@if($item->TXT_FORMATO == 'ZIP') XML @else {{$item->TXT_FORMATO}} @endif)</b> 
                                               @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000005') <b>(Descargue el pdf de este enlace <a href="https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaWeb.jsp" target="_blank">Sunat</a> y subalo para que pueda aprobar</b>) @else <br><br> @endif
                                               <div class="col-sm-12">
                                                   <div class="file-loading">
@@ -224,7 +227,7 @@
                                     @else
                                         <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
                                           <div class="form-group sectioncargarimagen">
-                                            <label class="col-sm-12 control-label" style="text-align: left;"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}} ({{$item->TXT_FORMATO}})</b> 
+                                            <label class="col-sm-12 control-label" style="text-align: left;"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}} (@if($item->TXT_FORMATO == 'ZIP') XML @else {{$item->TXT_FORMATO}} @endif)</b> 
                                               @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000005') <b>(Descargue el pdf de este enlace <a href="https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaWeb.jsp" target="_blank">Sunat</a> y subalo para que pueda aprobar</b>) @else <br><br> @endif
                                               <div class="col-sm-12">
                                                   <div class="file-loading">

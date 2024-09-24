@@ -59,46 +59,18 @@
     <script type="text/javascript">
         @foreach($tarchivos as $index => $item) 
 
+            var extension = '{{$item->TXT_FORMATO}}';
+            if(extension=='ZIP'){
+                extension = 'XML';
+            }
+
+
             $('#file-{{$item->COD_CATEGORIA_DOCUMENTO}}').fileinput({
               theme: 'fa5',
               language: 'es',
-              allowedFileExtensions: ['{{$item->TXT_FORMATO}}'],
+              allowedFileExtensions: [extension],
             });
 
-            // if('{{$item->COD_CATEGORIA_DOCUMENTO}}' == 'DCC0000000000001') {
-            //     if('{{$rutaorden}}' == '') {
-            //         $('#file-{{$item->COD_CATEGORIA_DOCUMENTO}}').fileinput({
-            //           theme: 'fa5',
-            //           language: 'es',
-            //           allowedFileExtensions: ['{{$item->TXT_FORMATO}}'],
-            //         });
-            //     }else{
-
-
-            //         $('#file-{{$item->COD_CATEGORIA_DOCUMENTO}}').fileinput({
-            //           theme: 'fa5',
-            //           language: 'es',
-            //           allowedFileExtensions: ['{{$item->TXT_FORMATO}}'],
-            //           initialPreviewAsData: true,
-            //           initialPreview: [
-            //               '{{$rutaorden}}'
-            //             ],
-            //             initialPreviewConfig: [
-            //               {type: "pdf", description: "<h5>PDF File</h5> This is a representative description number ten for this file.", size: 8000, caption: "About.pdf", url: "/file-upload-batch/2", key: 10, downloadUrl: false},
-            //             ]
-            //         });
-
-
-            //         }
-            // } else {
-
-            //     $('#file-{{$item->COD_CATEGORIA_DOCUMENTO}}').fileinput({
-            //       theme: 'fa5',
-            //       language: 'es',
-            //       allowedFileExtensions: ['{{$item->TXT_FORMATO}}'],
-            //     });
-
-            // }
 
         @endforeach
     </script>

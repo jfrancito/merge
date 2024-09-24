@@ -58,10 +58,17 @@
 
     <script type="text/javascript">
         @foreach($tarchivos as $index => $item) 
+
+            var extension = '{{$item->TXT_FORMATO}}';
+            if(extension=='ZIP'){
+                extension = 'XML';
+            }
+
+        
            $('#file-{{$item->COD_CATEGORIA_DOCUMENTO}}').fileinput({
               theme: 'fa5',
               language: 'es',
-              allowedFileExtensions: ['{{$item->TXT_FORMATO}}'],
+              allowedFileExtensions: [extension],
             });
         @endforeach
     </script>

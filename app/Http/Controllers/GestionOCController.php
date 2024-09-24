@@ -1451,109 +1451,121 @@ class GestionOCController extends Controller
                 $nombre_doc = $fedocumento->SERIE.'-'.$fedocumento->NUMERO;
 
 
+                //LECTURA DEL CDR
+                if(!is_null($filescdr)){
 
-                // if(!is_null($filescdr)){
-                //     //CDR
-                //     foreach($filescdr as $file){
+                    foreach($filescdr as $file){
 
-                //         $larchivos       =      Archivo::get();
-                //         $zip = new ZipArchive;
-                //         $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
-                //         $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
-                //         $nombrefile      =      $file->getClientOriginalName();
-                //         $valor           =      $this->versicarpetanoexiste($rutafile);
-                //         $rutacompleta    =      $rutafile.'\\'.$nombrefile;
-                //         // Copia el archivo .zip a la carpeta compartida
-                //         copy($file->getRealPath(),$rutacompleta);
-                //         $rutacompletaxml =      $rutafile.'\\';
-                //         // Abre el archivo .zip
-                //         if ($zip->open($file->getPathname()) === TRUE) {
-                //             // Extrae cada archivo del .zip
-                //             for ($i = 0; $i < $zip->numFiles; $i++) {
-                //                 $filename = $zip->getNameIndex($i);
-                //                 $fileInfo = pathinfo($filename);
+                        $larchivos       =      Archivo::get();
+                        $nombre          =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
+                        /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
+                        $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
+                        $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
+                        // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
+                        $nombrefilecdr   =      count($larchivos).'-'.$file->getClientOriginalName();
+                        $valor           =      $this->versicarpetanoexiste($rutafile);
+                        $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
+                        copy($file->getRealPath(),$rutacompleta);
+                        $path            =      $rutacompleta;
 
-                //                 // Verifica si el archivo es un archivo regular
-                //                 if ($fileInfo['filename'] != '.' && $fileInfo['filename'] != '..') {
-                //                     // Extrae el archivo a la carpeta compartida
-                //                     $extractedFile = $rutacompletaxml.$fileInfo['basename'];
-                //                     copy("zip://" . $file->getPathname() . "#$filename", $extractedFile);
-                //                 }
-                //             }
-                //             // Cierra el archivo .zip
-                //             $zip->close();
-                //         } else {
-                //             DB::rollback(); 
-                //             return Redirect::to('detalle-comprobante-oc-proveedor/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', 'No se pudo abrir el archivo .zip');
-                //         }
-                //         $nombreoriginal             =   $file->getClientOriginalName();
-                //         $info                       =   new SplFileInfo($nombreoriginal);
-                //         $extension                  =   $info->getExtension();
-                //     }
+                        $nombreoriginal             =   $file->getClientOriginalName();
+                        $info                       =   new SplFileInfo($nombreoriginal);
+                        $extension                  =   $info->getExtension();
+
+                        $dcontrol                       =   new Archivo;
+                        $dcontrol->ID_DOCUMENTO         =   $ordencompra->COD_ORDEN;
+                        $dcontrol->DOCUMENTO_ITEM       =   $fedocumento->DOCUMENTO_ITEM;
+                        $dcontrol->TIPO_ARCHIVO         =   'DCC0000000000004';
+                        $dcontrol->NOMBRE_ARCHIVO       =   $nombrefilecdr;
+                        $dcontrol->DESCRIPCION_ARCHIVO  =   'CDR';
 
 
-                //     if (file_exists($extractedFile)) {
+                        $dcontrol->URL_ARCHIVO      =   $path;
+                        $dcontrol->SIZE             =   filesize($file);
+                        $dcontrol->EXTENSION        =   $extension;
+                        $dcontrol->ACTIVO           =   1;
+                        $dcontrol->FECHA_CREA       =   $this->fechaactual;
+                        $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
+                        $dcontrol->save();
+                    }
 
-                //         //cbc
-                //         $xml = simplexml_load_file($extractedFile);
-                //         $cbc = 0;
-                //         $namespaces = $xml->getNamespaces(true);
-                //         foreach ($namespaces as $prefix => $namespace) {
-                //             if('cbc'==$prefix){
-                //                 $cbc = 1;  
-                //             }
-                //         }
-                        
-                //         if($cbc>=1){
-                //             foreach($xml->xpath('//cbc:ResponseCode') as $ResponseCode)
-                //             {
-                //                 $codigocdr  = $ResponseCode;
-                //             }
-                //             foreach($xml->xpath('//cbc:Description') as $Description)
-                //             {
-                //                 $respuestacdr  = $Description;
-                //             }
-                //             foreach($xml->xpath('//cbc:ID') as $ID)
-                //             {
-                //                 $factura_cdr_id  = $ID;
-                //                 if($factura_cdr_id == $nombre_doc){
-                //                     $sw = 1;
-                //                 }
-                //             }  
-                //         }else{
 
-                //             $xml_ns = simplexml_load_file($extractedFile);
+                    $extractedFile = $rutacompleta;
 
-                //             // Namespace definitions
-                //             $ns4 = "urn:oasis:names:specification:ubl:schema:xsd:ApplicationResponse-2";
-                //             $ns3 = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
-                //             // Register namespaces
-                //             $xml_ns->registerXPathNamespace('ns4', $ns4);
-                //             $xml_ns->registerXPathNamespace('ns3', $ns3);
-                //             // Querying XML
-                //             foreach($xml_ns->xpath('//ns3:DocumentResponse/ns3:Response') as $ResponseCodes)
-                //             {
-                //                 $codigocdr  = $ResponseCodes->ResponseCode;
-                //             }
-                //             foreach($xml_ns->xpath('//ns3:DocumentResponse/ns3:Response') as $Description)
-                //             {
-                //                 $respuestacdr  = $Description->Description;
-                //             }
-                //             foreach($xml_ns->xpath('//ns3:DocumentReference') as $ID)
-                //             {
-                //                 $factura_cdr_id  = $ID->ID;
-                //                 if($factura_cdr_id == $nombre_doc){
-                //                     $sw = 1;
-                //                 }
-                //             }
-                //         }
-                //     } else {
-                //         return Redirect::to('detalle-comprobante-oc-proveedor/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Error al intentar descomprimir el CDR');
-                //     }
-                //     if($sw == 0){
-                //         return Redirect::to('detalle-comprobante-oc-proveedor/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'El CDR ('.$factura_cdr_id.') no coincide con la factura ('.$nombre_doc.')');
-                //     }
-                // }
+                    if (file_exists($extractedFile)) {
+
+                        //cbc
+                        $xml = simplexml_load_file($extractedFile);
+
+                        //dd($xml);
+
+                        $cbc = 0;
+                        $namespaces = $xml->getNamespaces(true);
+                        foreach ($namespaces as $prefix => $namespace) {
+                            if('cbc'==$prefix){
+                                $cbc = 1;  
+                            }
+                        }
+                        $codigocdr = '';  
+                        if($cbc>=1){
+                            foreach($xml->xpath('//cbc:ResponseCode') as $ResponseCode)
+                            {
+                                $codigocdr  = (string)$ResponseCode;
+                            }
+                            foreach($xml->xpath('//cbc:Description') as $Description)
+                            {
+                                $respuestacdr  = $Description;
+                            }
+                            foreach($xml->xpath('//cbc:ID') as $ID)
+                            {
+                                $factura_cdr_id  = (string)$ID;
+                                if($factura_cdr_id == $nombre_doc || $factura_cdr_id == $nombre_doc_sinceros){
+                                    $sw = 1;
+                                }
+                            }  
+                        }else{
+                            //dd("hola2");
+                            $xml_ns = simplexml_load_file($extractedFile);
+
+                            // Namespace definitions
+                            $ns4 = "urn:oasis:names:specification:ubl:schema:xsd:ApplicationResponse-2";
+                            $ns3 = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
+                            // Register namespaces
+                            $xml_ns->registerXPathNamespace('ns4', $ns4);
+                            $xml_ns->registerXPathNamespace('ns3', $ns3);
+                            // Querying XML
+                            foreach($xml_ns->xpath('//ns3:DocumentResponse/ns3:Response') as $ResponseCodes)
+                            {
+                                $codigocdr  = (string)$ResponseCodes->ResponseCode;
+                            }
+                            foreach($xml_ns->xpath('//ns3:DocumentResponse/ns3:Response') as $Description)
+                            {
+                                $respuestacdr  = $Description->Description;
+                            }
+                            foreach($xml_ns->xpath('//ns3:DocumentReference') as $ID)
+                            {
+                                $factura_cdr_id  = (string)$ID->ID;
+                                if($factura_cdr_id == $nombre_doc || $factura_cdr_id == $nombre_doc_sinceros){
+                                    $sw = 1;
+                                }
+                            }
+
+                        }
+                        if($codigocdr!="0"){
+                            return Redirect::to('detalle-comprobante-oc-proveedor/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Error en la lectura CDR');
+                        }
+                    } else {
+                        return Redirect::to('detalle-comprobante-oc-proveedor/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Error en el CDR');
+                    }
+
+                    if($sw == 0){
+                        return Redirect::to('detalle-comprobante-oc-proveedor/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'El CDR ('.$factura_cdr_id.') no coincide con la factura ('.$nombre_doc.')');
+                    }
+                }
+
+
+
+
 
 
 
@@ -1571,7 +1583,7 @@ class GestionOCController extends Controller
                 }else{
                     $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                                 //->where('IND_OBLIGATORIO','=',1)
-                                                ->where('COD_CATEGORIA_DOCUMENTO','<>','DCC0000000000003')
+                                                ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000004'])
                                                 ->where('TXT_ASIGNADO','=','PROVEEDOR')
                                                 ->get();
                 }
@@ -2944,52 +2956,48 @@ class GestionOCController extends Controller
                 $nombre_doc_sinceros = $fedocumento->SERIE.'-'.$numerototalsc;
 
 
-
                 //LECTURA DEL CDR
                 if(!is_null($filescdr)){
-                    //CDR
+
                     foreach($filescdr as $file){
 
                         $larchivos       =      Archivo::get();
-                        $zip = new ZipArchive;
+                        $nombre          =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
+                        /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
                         $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
                         $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
-                        $nombrefile      =      $file->getClientOriginalName();
+                        // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
+                        $nombrefilecdr   =      count($larchivos).'-'.$file->getClientOriginalName();
                         $valor           =      $this->versicarpetanoexiste($rutafile);
-                        $rutacompleta    =      $rutafile.'\\'.$nombrefile;
-                        // Copia el archivo .zip a la carpeta compartida
+                        $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
                         copy($file->getRealPath(),$rutacompleta);
-                        $rutacompletaxml =      $rutafile.'\\';
-                        // Abre el archivo .zip
-                        if ($zip->open($file->getPathname()) === TRUE) {
-                            // Extrae cada archivo del .zip
-                            for ($i = 0; $i < $zip->numFiles; $i++) {
-                                $filename = $zip->getNameIndex($i);
-                                $fileInfo = pathinfo($filename);
+                        $path            =      $rutacompleta;
 
-                                // Verifica si el archivo es un archivo regular
-                                if ($fileInfo['filename'] != '.' && $fileInfo['filename'] != '..') {
-                                    // Extrae el archivo a la carpeta compartida
-                                    $extractedFile = $rutacompletaxml.$fileInfo['basename'];
-                                    copy("zip://" . $file->getPathname() . "#$filename", $extractedFile);
-                                }
-                            }
-                            // Cierra el archivo .zip
-                            $zip->close();
-                        } else {
-                            DB::rollback(); 
-                            return Redirect::to('detalle-comprobante-oc-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', 'No se pudo abrir el archivo .zip');
-                        }
                         $nombreoriginal             =   $file->getClientOriginalName();
                         $info                       =   new SplFileInfo($nombreoriginal);
                         $extension                  =   $info->getExtension();
+
+                        $dcontrol                       =   new Archivo;
+                        $dcontrol->ID_DOCUMENTO         =   $ordencompra->COD_ORDEN;
+                        $dcontrol->DOCUMENTO_ITEM       =   $fedocumento->DOCUMENTO_ITEM;
+                        $dcontrol->TIPO_ARCHIVO         =   'DCC0000000000004';
+                        $dcontrol->NOMBRE_ARCHIVO       =   $nombrefilecdr;
+                        $dcontrol->DESCRIPCION_ARCHIVO  =   'CDR';
+
+
+                        $dcontrol->URL_ARCHIVO      =   $path;
+                        $dcontrol->SIZE             =   filesize($file);
+                        $dcontrol->EXTENSION        =   $extension;
+                        $dcontrol->ACTIVO           =   1;
+                        $dcontrol->FECHA_CREA       =   $this->fechaactual;
+                        $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
+                        $dcontrol->save();
                     }
 
 
+                    $extractedFile = $rutacompleta;
+
                     if (file_exists($extractedFile)) {
-
-
-
 
                         //cbc
                         $xml = simplexml_load_file($extractedFile);
@@ -3005,9 +3013,6 @@ class GestionOCController extends Controller
                         }
                         $codigocdr = '';  
                         if($cbc>=1){
-
-
-
                             foreach($xml->xpath('//cbc:ResponseCode') as $ResponseCode)
                             {
                                 $codigocdr  = (string)$ResponseCode;
@@ -3051,24 +3056,17 @@ class GestionOCController extends Controller
                             }
 
                         }
-
                         if($codigocdr!="0"){
-                            //dd($codigocdr);
-
-                            return Redirect::to('detalle-comprobante-oc-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Error de CDR');
+                            return Redirect::to('detalle-comprobante-oc-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Error en la lectura CDR');
                         }
-  
-
                     } else {
-                        return Redirect::to('detalle-comprobante-oc-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Error al intentar descomprimir el CDR');
+                        return Redirect::to('detalle-comprobante-oc-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Error en el CDR');
                     }
 
                     if($sw == 0){
                         return Redirect::to('detalle-comprobante-oc-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'El CDR ('.$factura_cdr_id.') no coincide con la factura ('.$nombre_doc.')');
                     }
-
                 }
-
 
                 //guardar orden de compra precargada
                 $rutaorden       =   $request['rutaorden'];
@@ -3117,12 +3115,12 @@ class GestionOCController extends Controller
                 }else{
                     $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                                 //->where('IND_OBLIGATORIO','=',1)
-                                                ->where('COD_CATEGORIA_DOCUMENTO','<>','DCC0000000000003')
+                                                ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000004'])
                                                 ->whereIn('TXT_ASIGNADO', ['PROVEEDOR','CONTACTO'])
                                                 ->get();
                 }
 
-
+                //dd($tarchivos);
                 foreach($tarchivos as $index => $item){
 
                     $filescdm          =   $request[$item->COD_CATEGORIA_DOCUMENTO];
