@@ -1175,6 +1175,31 @@ class GestionOCController extends Controller
                         }
 
 
+
+
+                        $fedocumento_e          =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->whereNotIn('COD_ESTADO',['','ETM0000000000006'])
+                                                    ->where('RUC_PROVEEDOR','=',$factura->getcompany()->getruc())
+                                                    ->where('SERIE','=',$factura->getserie())
+                                                    ->where('NUMERO','=',$factura->getcorrelativo())
+                                                    ->where('ID_TIPO_DOC','=',$tipo_documento_le)
+                                                    ->first();
+                        if(count($fedocumento_e)>0){
+                            return Redirect::back()->with('errorurl', 'Este XML ya fue integrado en otra orden de compra');
+                        }
+
+
+                        $fedocumento_e          =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->whereNotIn('COD_ESTADO',['','ETM0000000000006'])
+                                                    ->where('RUC_PROVEEDOR','=',$factura->getcompany()->getruc())
+                                                    ->where('SERIE','=',$factura->getserie())
+                                                    ->where('NUMERO','=',$factura->getcorrelativo())
+                                                    ->where('ID_TIPO_DOC','=',$tipo_documento_le)
+                                                    ->first();
+                        if(count($fedocumento_e)>0){
+                            return Redirect::back()->with('errorurl', 'Este XML ya fue integrado en otra orden de compra');
+                        }
+
+
+
                         //dd($factura);
                         /****************************************  DIAS DE CREDITO *****************************************/
                         $diasdefactura = 0;
@@ -2336,6 +2361,20 @@ class GestionOCController extends Controller
                         }
 
 
+                        //VALIDAR QUE YA EXISTE ESTE XML
+
+                        $fedocumento_e          =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->whereNotIn('COD_ESTADO',['','ETM0000000000006'])
+                                                    ->where('RUC_PROVEEDOR','=',$factura->getcompany()->getruc())
+                                                    ->where('SERIE','=',$factura->getserie())
+                                                    ->where('NUMERO','=',$factura->getcorrelativo())
+                                                    ->where('ID_TIPO_DOC','=',$tipo_documento_le)
+                                                    ->first();
+                        if(count($fedocumento_e)>0){
+                            return Redirect::back()->with('errorurl', 'Este XML ya fue integrado en otra orden de compra');
+                        }
+
+
+
 
                         /****************************************  DIAS DE CREDITO *****************************************/
                         $diasdefactura = 0;
@@ -2673,6 +2712,24 @@ class GestionOCController extends Controller
                                                             ->whereIn('COD_CATEGORIA', ['DCC0000000000026','DCC0000000000013','DCC0000000000003','DCC0000000000008'])->get();
 
                         }
+
+
+
+
+
+                        //VALIDAR QUE YA EXISTE ESTE XML
+
+                        $fedocumento_e          =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->whereNotIn('COD_ESTADO',['','ETM0000000000006'])
+                                                    ->where('RUC_PROVEEDOR','=',$factura->getcompany()->getruc())
+                                                    ->where('SERIE','=',$factura->getserie())
+                                                    ->where('NUMERO','=',$factura->getcorrelativo())
+                                                    ->where('ID_TIPO_DOC','=',$tipo_documento_le)
+                                                    ->first();
+                        if(count($fedocumento_e)>0){
+                            return Redirect::back()->with('errorurl', 'Este XML ya fue integrado en otra orden de compra');
+                        }
+
+
 
                         $rz_p                               =   str_replace(["![CDATA[", "]]"], "", $factura->getcompany()->getrazonSocial());
                         $rz_p                               =    str_replace("?", "Ñ", $rz_p);
