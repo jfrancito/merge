@@ -37,6 +37,17 @@ var App = (function () {
 
 
 
+    $("#nso_obs").dataTable({
+        dom: 'Bfrtip',
+        buttons: [
+            'csv', 'excel', 'pdf'
+        ],
+        "lengthMenu": [[500, 1000, -1], [500, 1000, "All"]],
+        columnDefs:[{
+            targets: "_all",
+            sortable: false
+        }]
+    });
     $("#despacholocen").dataTable({
         "lengthMenu": [[50, 100, -1], [50, 100, "All"]],
         order : [[ 5, "desc" ]],

@@ -76,14 +76,20 @@ class GestionOCAdministracionController extends Controller
 
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm($cod_empresa);
+            $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_obs($cod_empresa);
+
         }else{
             $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_contrato($cod_empresa);
+            $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_contrato_obs($cod_empresa);
+
         }
 
         $funcion        =   $this;
         return View::make('comprobante/listaadministracion',
                          [
                             'listadatos'        =>  $listadatos,
+                            'listadatos_obs'    =>  $listadatos_obs,
+
                             'funcion'           =>  $funcion,
 
                             'operacion_id'      =>  $operacion_id,
@@ -100,10 +106,13 @@ class GestionOCAdministracionController extends Controller
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm($cod_empresa);
+            $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_obs($cod_empresa);
+
         }else{
             $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_contrato($cod_empresa);
-        }
+            $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_contrato_obs($cod_empresa);
 
+        }
         //dd($listadatos);
 
         $procedencia        =   'ADM';
@@ -115,6 +124,8 @@ class GestionOCAdministracionController extends Controller
                             'idopcion'              =>  $idopcion,
                             'cod_empresa'           =>  $cod_empresa,
                             'listadatos'            =>  $listadatos,
+                            'listadatos_obs'    =>  $listadatos_obs,
+                            
                             'procedencia'           =>  $procedencia,
                             'ajax'                  =>  true,
 
