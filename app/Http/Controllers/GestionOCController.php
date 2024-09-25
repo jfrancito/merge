@@ -1475,6 +1475,9 @@ class GestionOCController extends Controller
                 $sw = 0;
                 $nombre_doc = $fedocumento->SERIE.'-'.$fedocumento->NUMERO;
 
+                $numerototal     = $fedocumento->NUMERO;
+                $numerototalsc    = ltrim($numerototal, '0');
+                $nombre_doc_sinceros = $fedocumento->SERIE.'-'.$numerototalsc;
 
                 //LECTURA DEL CDR
                 if(!is_null($filescdr)){
