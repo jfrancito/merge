@@ -1061,7 +1061,10 @@ trait ComprobanteTraits
                             ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                             ->where('OPERACION','=','ORDEN_COMPRA')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                            ->where('ind_observacion','<>',1)
+                            ->where(function ($query) {
+                                $query->where('ind_observacion', '<>', 1)
+                                      ->orWhereNull('ind_observacion');
+                            })
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
                             ->orderBy('fecha_pr','asc')
                             ->get();
@@ -1078,7 +1081,10 @@ trait ComprobanteTraits
                             ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                             ->where('OPERACION','=','CONTRATO')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                            ->where('ind_observacion','<>',1)
+                            ->where(function ($query) {
+                                $query->where('ind_observacion', '<>', 1)
+                                      ->orWhereNull('ind_observacion');
+                            })
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
                             ->orderBy('fecha_pr','asc')
                             ->get();
@@ -1145,9 +1151,13 @@ trait ComprobanteTraits
                                 ->EstadoFE($estado_id)
                                 ->whereIn('CMP.Orden.COD_USUARIO_CREA_AUD',$array_usuarios)
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+
                                 ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA'))
                                 ->orderBy('fecha_uc','asc')
                                 ->get();
+
+
+
 
         }else{
 
@@ -1635,7 +1645,7 @@ trait ComprobanteTraits
 
 
 
-		$listadatos 	= 	FeDocumento::leftJoin('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+		$listadatos 	= 	FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
 							->where('FE_DOCUMENTO.RUC_PROVEEDOR','=',$cliente_id)
                             //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
                             ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
