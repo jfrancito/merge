@@ -188,11 +188,20 @@ trait ComprobanteTraits
 
     private function lista_archivos_total_sin_voucher($idoc,$DOCUMENTO_ITEM) {
 
+
+
+
         $archivos               =   Archivo::leftJoin('CMP.CATEGORIA','TIPO_ARCHIVO','=','COD_CATEGORIA')
                                     ->where('ID_DOCUMENTO','=',$idoc)
                                     ->where('ACTIVO','=','1')
                                     ->where('DOCUMENTO_ITEM','=',$DOCUMENTO_ITEM)
-                                    ->where('TIPO_ARCHIVO','<>','DCC0000000000028')
+                                    ->where(function ($query) {
+                                        $query->where('TIPO_ARCHIVO', '<>', 'DCC0000000000028')
+                                              ->orWhere(function ($query) {
+                                                  $query->where('USUARIO_CREA', '=', '1CIX00000001')
+                                                        ->where('TIPO_ARCHIVO', '=', 'DCC0000000000028');
+                                              });
+                                    })
                                     ->select(DB::raw("
                                       ARCHIVOS.*,
                                       COALESCE(COD_TIPO_DOCUMENTO,20) AS ORDEN_ITEM")
@@ -210,7 +219,13 @@ trait ComprobanteTraits
                                     ->where('ID_DOCUMENTO','=',$idoc)
                                     ->where('ACTIVO','=','1')
                                     ->where('DOCUMENTO_ITEM','=',$DOCUMENTO_ITEM)
-                                    ->where('TIPO_ARCHIVO','<>','DCC0000000000028')
+                                    ->where(function ($query) {
+                                        $query->where('TIPO_ARCHIVO', '<>', 'DCC0000000000028')
+                                              ->orWhere(function ($query) {
+                                                  $query->where('USUARIO_CREA', '=', '1CIX00000001')
+                                                        ->where('TIPO_ARCHIVO', '=', 'DCC0000000000028');
+                                              });
+                                    })
                                     ->where('EXTENSION', 'like', '%'.'pdf'.'%')
                                     ->select(DB::raw("
                                       ARCHIVOS.*,
@@ -1627,6 +1642,7 @@ trait ComprobanteTraits
 							->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('OPERACION','=','ORDEN_COMPRA')
 							->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                            ->orderBy('CMP.Orden.FEC_ORDEN','desc')
 							->get();
 
 
@@ -1644,6 +1660,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('OPERACION','=','CONTRATO')
                             ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                            ->orderBy('CMP.DOCUMENTO_CTBLE.FEC_EMISION','desc')
                             ->get();
 
                             //dd($listadatos);
