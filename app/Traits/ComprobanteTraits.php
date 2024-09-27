@@ -94,7 +94,7 @@ trait ComprobanteTraits
                 $extension = pathinfo($fileInfo['name'], PATHINFO_EXTENSION);
                 // Verificar si es un archivo XML
                 //dd($extension);
-                if ($extension === 'xml') {
+                if ($extension === 'xml' or $extension === 'XML') {
                     if (file_exists($extractedFile)) {
                         //dd($extractedFile);
                         //cbc
@@ -161,6 +161,8 @@ trait ComprobanteTraits
 
                             //dd($respuestacdr);
                         }
+
+
 
                         if($codigocdr!=''){
 

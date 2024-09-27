@@ -272,16 +272,38 @@
                           name="descripcion"
                           id = "descripcion"
                           class="form-control input-sm validarmayusculas"
-                          rows="15" 
+                          rows="12" 
                           cols="200"    
                           data-aw="2"></textarea>
                       </div>
                   </div>
                 </div>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                      <div class="form-group">
+                        <label class="col-sm-12 control-label labelleft" style="text-align: left;">Entidad Bancaria que se le va a pagar al proveedor :</label>
+                        <div class="col-sm-12 abajocaja" >
+                          {!! Form::select( 'entidadbanco_id', $combobancos, array(),
+                                            [
+                                              'class'       => 'select2 form-control control input-xs' ,
+                                              'id'          => 'entidadbanco_id',
+                                              'required'    => '',
+                                              'data-aw'     => '1',
+                                            ]) !!}
+                        </div>
+                      </div>
+                </div>
+
               </div>
       </div>
     </div>
+
+
+
   </div>
+
+
+
+
 </div>
 
 
