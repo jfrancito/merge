@@ -3311,7 +3311,7 @@ class GestionOCController extends Controller
                     }
                     DB::connection($conexionbd)->table('CMP.ORDEN')
                         ->where('COD_ORDEN', $idoc)
-                        ->update(['COD_CATEGORIA_ESTADO_ORDEN' => 'EOR0000000000012','TXT_CATEGORIA_ESTADO_ORDEN'=>'APROBADO']);
+                        ->update(['COD_CATEGORIA_ESTADO_ORDEN' => 'EOR0000000000012','TXT_CATEGORIA_ESTADO_ORDEN'=>'ATENDIDO PARCIALMENTE']);
                 }
 
                 
