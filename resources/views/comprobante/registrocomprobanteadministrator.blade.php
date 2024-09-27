@@ -8,14 +8,13 @@
 @stop
 
 @section('section')
-<div class="be-content registrocomprobante">
+<div class="be-content registrocomprobante hextorno">
     <div class="main-content container-fluid">
         <div class="row">
             <div class="col-sm-12">
                 <div class="panel panel-default panel-border-color panel-border-color-success">
-                    <div class="panel-heading">{{ $titulo }}
-                      <div class="tools tooltiptop">
-                      </div>
+                    <div class="panel-heading">{{ $titulo }} 
+                            @include('comprobante.hextorno')
                     </div>
                     <div class="panel-body">
                       @include('comprobante.lista.detallecomprobanteadministradornuevo')
@@ -24,6 +23,8 @@
             </div>
         </div>
     </div>
+    @include('comprobante.modal.mregistrorequerimiento')
+
 </div>
 
 
@@ -45,15 +46,22 @@
     <script src="{{ asset('public/js/file/fileinput.js?v='.$version) }}" type="text/javascript"></script>
     <script src="{{ asset('public/js/file/locales/es.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/js/general/general.js') }}" type="text/javascript"></script>
-
+    <script src="{{ asset('public/lib/jquery.niftymodals/dist/jquery.niftymodals.js') }}" type="text/javascript"></script>
  
     <script type="text/javascript">
-      $(document).ready(function(){
-        //initialize the javascript
-        App.init();
-        App.formElements();
-        $('form').parsley();
-      });
+
+        $.fn.niftyModal('setDefaults',{
+          overlaySelector: '.modal-overlay',
+          closeSelector: '.modal-close',
+          classAddAfterOpen: 'modal-show',
+        });
+
+        $(document).ready(function(){
+            //initialize the javascript
+            App.init();
+            App.formElements();
+            $('form').parsley();
+        });
     </script> 
 
     <script type="text/javascript">
@@ -75,7 +83,7 @@
         @endforeach
     </script>
   <script src="{{ asset('public/js/comprobante/registro.js?v='.$version) }}" type="text/javascript"></script>
-
+  <script src="{{ asset('public/js/comprobante/hextorno.js?v='.$version) }}" type="text/javascript"></script>
     
 @stop
 

@@ -2,8 +2,8 @@
   <thead>
     <tr>
       <th>OPERACION</th>
-      
       <th>CODIGO</th>
+      <th>EXTORNO</th>
       <th>FECHA </th>
       <th>MONEDA</th>
       <th>PROVEEDOR</th>
@@ -18,6 +18,7 @@
       <tr data_requerimiento_id = "{{$item->id}}">
         <td><b>ORDER DE COMPRA</b></td>
         <td>{{$item->COD_ORDEN}}</td>
+        <td>{{$funcion->funciones->estorno_referencia($item->COD_ORDEN)}}</td>
         <td>{{$item->FEC_ORDEN}}</td>
         <td>{{$item->TXT_CATEGORIA_MONEDA}}</td>
         <td>{{$item->TXT_EMPR_CLIENTE}}</td>

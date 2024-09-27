@@ -67,6 +67,29 @@ class GestionOCController extends Controller
 
 
 
+
+
+    public function actionModalHistorialExtorno(Request $request)
+    {
+
+        $data_cod_extorno       =   $request['data_cod_extorno'];
+        $idopcion               =   $request['idopcion'];
+        $documentohistorial     =   FeDocumentoHistorial::where('ID_DOCUMENTO','=',$data_cod_extorno)
+                                    ->orderBy('FECHA','DESC')
+                                    ->get();
+
+        $funcion        =   $this;
+        return View::make('comprobante/modal/ajax/mhextorno',
+                         [
+                            'documentohistorial'        =>  $documentohistorial,
+                            'data_cod_extorno'          =>  $data_cod_extorno,
+                            'idopcion'                  =>  $idopcion,
+                            'ajax'                      =>  true,
+                         ]);
+    }
+
+
+
     public function actionApiLeerXmlSap(Request $request)
     {
 
@@ -2266,11 +2289,13 @@ class GestionOCController extends Controller
             } 
         }
 
+        $fedocumento_x          =   FeDocumento::where('TXT_REFERENCIA','=',$idoc)->first();
         $funcion                =   $this;
 
         return View::make('comprobante/registrocomprobanteadministrator',
                          [
                             'ordencompra'           =>  $ordencompra,
+                            'fedocumento_x'         =>  $fedocumento_x,
                             'detalleordencompra'    =>  $detalleordencompra,
                             'fedocumento'           =>  $fedocumento,
                             'detallefedocumento'    =>  $detallefedocumento,
@@ -3271,12 +3296,31 @@ class GestionOCController extends Controller
 
                 $orden                                  =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
 
-                if($orden->IND_MATERIAL_SERVICIO=='M'){
 
-                    $detalleproducto            =   CMPDetalleProducto::where('CMP.DETALLE_PRODUCTO.COD_ESTADO','=',1)
-                                                    ->where('CMP.DETALLE_PRODUCTO.COD_TABLA','=',$idoc)
-                                                    ->orderBy('NRO_LINEA','ASC')
-                                                    ->get();
+                $fedocumento_x                          =   FeDocumento::where('TXT_REFERENCIA','=',$idoc)->first();
+                //cambiar el estado cuando es material y si tiene extonro
+                if($orden->IND_MATERIAL_SERVICIO=='M' && count($fedocumento_x)>0){
+                    //DETALLE PRODUCTO ACTUALIZAR
+                    $conexionbd         = 'sqlsrv';
+                    if($orden->COD_CENTRO == 'CEN0000000000004'){ //rioja
+                        $conexionbd         = 'sqlsrv_r';
+                    }else{
+                        if($orden->COD_CENTRO == 'CEN0000000000006'){ //bellavista
+                            $conexionbd         = 'sqlsrv_b';
+                        }
+                    }
+                    DB::connection($conexionbd)->table('CMP.ORDEN')
+                        ->where('COD_ORDEN', $idoc)
+                        ->update(['COD_CATEGORIA_ESTADO_ORDEN' => 'EOR0000000000012','TXT_CATEGORIA_ESTADO_ORDEN'=>'APROBADO']);
+                }
+
+                
+                if($orden->IND_MATERIAL_SERVICIO=='M' && count($fedocumento_x)<=0){
+
+                    $detalleproducto                    =   CMPDetalleProducto::where('CMP.DETALLE_PRODUCTO.COD_ESTADO','=',1)
+                                                            ->where('CMP.DETALLE_PRODUCTO.COD_TABLA','=',$idoc)
+                                                            ->orderBy('NRO_LINEA','ASC')
+                                                            ->get();
 
                     //almacen lote                                
                     $this->insert_almacen_lote($orden,$detalleproducto);//insertar en almacen

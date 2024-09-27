@@ -2326,7 +2326,7 @@ trait ComprobanteTraits
 		$array_usuarios  	 =		SGDUsuario::whereIn('COD_TRABAJADOR',$array_trabajadores)
 									->pluck('COD_USUARIO')
 									->toArray();
-		$estado_no      =   'ETM0000000000006';
+		$estado_no           =      'ETM0000000000006';
 
         if(Session::get('usuario')->id== '1CIX00000001'){
 
@@ -2348,9 +2348,9 @@ trait ComprobanteTraits
                                                     TXT_EMPR_CLIENTE,
                                                     COD_USUARIO_CREA_AUD,
                                                     MAX(CAN_TOTAL) CAN_TOTAL,
-                                                    MAX(ID_DOCUMENTO) AS ID_DOCUMENTO,
-                                                    MAX(COD_ESTADO) AS COD_ESTADO,
-                                                    MAX(TXT_ESTADO) AS TXT_ESTADO
+                                                    MAX(FE_DOCUMENTO.ID_DOCUMENTO) AS ID_DOCUMENTO,
+                                                    MAX(FE_DOCUMENTO.COD_ESTADO) AS COD_ESTADO,
+                                                    MAX(FE_DOCUMENTO.TXT_ESTADO) AS TXT_ESTADO
                                                 '))
                                 ->groupBy('COD_ORDEN')
                                 ->groupBy('FEC_ORDEN')
@@ -2379,9 +2379,9 @@ trait ComprobanteTraits
                                                     TXT_EMPR_CLIENTE,
                                                     COD_USUARIO_CREA_AUD,
                                                     MAX(CAN_TOTAL) CAN_TOTAL,
-                                                    MAX(ID_DOCUMENTO) AS ID_DOCUMENTO,
-                                                    MAX(COD_ESTADO) AS COD_ESTADO,
-                                                    MAX(TXT_ESTADO) AS TXT_ESTADO
+                                                    MAX(FE_DOCUMENTO.ID_DOCUMENTO) AS ID_DOCUMENTO,
+                                                    MAX(FE_DOCUMENTO.COD_ESTADO) AS COD_ESTADO,
+                                                    MAX(FE_DOCUMENTO.TXT_ESTADO) AS TXT_ESTADO
                                                 '))
                                 ->groupBy('COD_ORDEN')
                                 ->groupBy('FEC_ORDEN')

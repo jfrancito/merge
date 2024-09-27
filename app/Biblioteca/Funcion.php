@@ -5,6 +5,8 @@ namespace App\Biblioteca;
 use App\User;
 use App\Modelos\WEBRolopcion;
 use App\Modelos\Estado;
+use App\Modelos\FeDocumento;
+
 use Hashids;
 use Illuminate\Support\Facades\DB;
 use Redirect;
@@ -12,6 +14,18 @@ use Session;
 use table;
 
 class Funcion {
+
+
+	public function estorno_referencia($cod_orden) {
+		$TXT_VALOR = '';
+		$fe = FeDocumento::where('TXT_REFERENCIA', '=', $cod_orden)->first();
+		if(count($fe)>0){
+			$TXT_VALOR = 'SI';
+		}
+		return $TXT_VALOR;
+	}
+
+
 
 	public function estado_nombre($id) {
 		$nombre = '';

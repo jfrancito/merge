@@ -1801,7 +1801,24 @@ class GestionUsuarioContactoController extends Controller
 
                 $orden                      =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();
 
-                if($orden->IND_MATERIAL_SERVICIO=='M'){
+                $fedocumento_x                          =   FeDocumento::where('TXT_REFERENCIA','=',$idoc)->first();
+                //cambiar el estado cuando es material y si tiene extonro
+                if($orden->IND_MATERIAL_SERVICIO=='M' && count($fedocumento_x)>0){
+                    //DETALLE PRODUCTO ACTUALIZAR
+                    $conexionbd         = 'sqlsrv';
+                    if($orden->COD_CENTRO == 'CEN0000000000004'){ //rioja
+                        $conexionbd         = 'sqlsrv_r';
+                    }else{
+                        if($orden->COD_CENTRO == 'CEN0000000000006'){ //bellavista
+                            $conexionbd         = 'sqlsrv_b';
+                        }
+                    }
+                    DB::connection($conexionbd)->table('CMP.ORDEN')
+                        ->where('COD_ORDEN', $idoc)
+                        ->update(['COD_CATEGORIA_ESTADO_ORDEN' => 'EOR0000000000012','TXT_CATEGORIA_ESTADO_ORDEN'=>'APROBADO']);
+                }
+
+                if($orden->IND_MATERIAL_SERVICIO=='M' && count($fedocumento_x)<=0){
 
                     $detalleproducto            =   CMPDetalleProducto::where('CMP.DETALLE_PRODUCTO.COD_ESTADO','=',1)
                                                     ->where('CMP.DETALLE_PRODUCTO.COD_TABLA','=',$pedido_id)
@@ -1913,7 +1930,7 @@ class GestionUsuarioContactoController extends Controller
                 }
 
 
-                if($orden->IND_MATERIAL_SERVICIO=='M'){
+                if($orden->IND_MATERIAL_SERVICIO=='M' && count($fedocumento_x)<=0){
 
                     FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                                 ->update(

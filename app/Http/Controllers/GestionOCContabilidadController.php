@@ -1139,17 +1139,21 @@ class GestionOCContabilidadController extends Controller
                 $pedido_id          =   $idoc;
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
                 $descripcion        =   $request['descripcionextorno'];
+                $ordencompra_t      =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
 
-                $ordencompra_t          =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
+                // if($ordencompra_t->IND_MATERIAL_SERVICIO=='M'){
+                //     DB::rollback(); 
+                //     return Redirect::back()->with('errorurl', 'El comprobante no puede ser extornado porque tiene una Orden de Ingreso Ejecutada');
+                // }
 
+                //cambiar de estado aprobado la orden
                 if($ordencompra_t->IND_MATERIAL_SERVICIO=='M'){
-                    DB::rollback(); 
-                    return Redirect::back()->with('errorurl', 'El comprobante no puede ser extornado porque tiene una Orden de Ingreso Ejecutada');
+                    $ordencompra_t->COD_CATEGORIA_ESTADO_ORDEN  = 'EOR0000000000016';
+                    $ordencompra_t->TXT_CATEGORIA_ESTADO_ORDEN  = 'APROBADO';
+                    $ordencompra_t->save();
                 }
 
-
                 //dd($ordencompra_t->IND_MATERIAL_SERVICIO);
-
                 //GUARDAR LA REFENCIA ORIGINAL DEL EXTORNO
                 FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
