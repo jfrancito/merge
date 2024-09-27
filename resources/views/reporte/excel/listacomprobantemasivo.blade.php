@@ -86,6 +86,8 @@
             <th class= 'tabladp'>IMPORTE DETRACCIÓN</th>
             <th class= 'tabladp'>CONSTANCIA DETRACCIÓN</th>
             <th class= 'tabladp'>NUMERO DE CONSTANCIA</th>
+            <th class= 'tabladp'>OBSERVACION</th>
+
         </tr>
         @foreach($listadatos as $index => $item) 
         <tr>
@@ -109,20 +111,15 @@
 
             <td>{{$item->RZ_PROVEEDOR}}</td>
             <td>{{$item->RUC_PROVEEDOR}}</td>
-            <td>{{$item->TXT_NOMBRE_PRODUCTO}}</td>
+            <td>{{$item->PRODUCTO}}</td>
             <td>{{$item->IND_MATERIAL_SERVICIO}}</td>
             <td>{{$item->TXT_CATEGORIA_MONEDA}}</td>
+
             <td>{{$item->CAN_TIPO_CAMBIO}}</td>
-            <td>{{$item->CAN_PRODUCTO}}</td>
-            <td>{{$item->CAN_VALOR_VENTA}}</td>
-            <td>
-                @if($item->IND_IGV == 1)
-                    {{$item->CAN_VALOR_VENTA_IGV - $item->CAN_VALOR_VENTA}}
-                @else
-                    0.00
-                @endif
-            </td>
-            <td>{{$item->CAN_VALOR_VENTA_IGV}}</td>
+            <td>{{$item->CANTIDAD}}</td>
+            <td>{{$item->VAL_SUBTOTAL_ORIG}}</td>
+            <td>{{$item->VAL_IGV_ORIG}}</td>
+            <td>{{$item->VAL_VENTA_ORIG}}</td>
             <td>          
                 @IF($item->CAN_DETRACCION>0)
                     SI
@@ -134,6 +131,8 @@
             <td>{{$item->CAN_DETRACCION}}</td>
             <td>-</td>
             <td>-</td>
+            <td>{{$item->TXT_GLOSA_ORDEN}}</td>
+
         </tr>
         @endforeach
     </table>

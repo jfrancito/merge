@@ -1202,7 +1202,7 @@ trait ComprobanteTraits
 
 
             $listadatos     =   FeDocumento::join('CMP.ORDEN', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
-                                ->join('CMP.DETALLE_PRODUCTO', 'CMP.DETALLE_PRODUCTO.COD_TABLA', '=', 'CMP.Orden.COD_ORDEN')
+                                ->join('FE_DETALLE_DOCUMENTO', 'FE_DETALLE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.Orden.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
                                 //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
@@ -1210,19 +1210,21 @@ trait ComprobanteTraits
                                 //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 ->where('OPERACION','=','ORDEN_COMPRA')
-                                ->where('CMP.DETALLE_PRODUCTO.COD_ESTADO','=','1')
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
                                 ->whereIn('CMP.Orden.COD_USUARIO_CREA_AUD',$array_usuarios)
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA'))
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.Orden.TXT_GLOSA TXT_GLOSA_ORDEN,CMP.CATEGORIA.NOM_CATEGORIA AS AREA'))
                                 ->orderBy('FEC_VENTA','asc')
                                 ->get();
+
+
+
 
         }else{
 
             $listadatos     =   FeDocumento::join('CMP.ORDEN', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
-                                ->join('CMP.DETALLE_PRODUCTO', 'CMP.DETALLE_PRODUCTO.COD_TABLA', '=', 'CMP.Orden.COD_ORDEN')
+                                ->join('FE_DETALLE_DOCUMENTO', 'FE_DETALLE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.Orden.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
                                 //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
@@ -1230,13 +1232,15 @@ trait ComprobanteTraits
                                 //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 ->where('OPERACION','=','ORDEN_COMPRA')
-                                ->where('CMP.DETALLE_PRODUCTO.COD_ESTADO','=','1')
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
+                                //->where('FE_DOCUMENTO.ID_DOCUMENTO','=','IICHCL0000008694')
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA'))
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.Orden.TXT_GLOSA TXT_GLOSA_ORDEN,CMP.CATEGORIA.NOM_CATEGORIA AS AREA'))
                                 ->orderBy('FEC_VENTA','asc')
                                 ->get();
+
+
 
         }
 
