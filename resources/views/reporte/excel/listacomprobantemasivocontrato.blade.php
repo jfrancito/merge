@@ -88,6 +88,8 @@
             <th class= 'tabladp'>IMPORTE DETRACCIÓN</th>
             <th class= 'tabladp'>CONSTANCIA DETRACCIÓN</th>
             <th class= 'tabladp'>NUMERO DE CONSTANCIA</th>
+            <th class= 'tabladp'>NUMERO DE CUENTA CONTABLE</th>
+
         </tr>
         @foreach($listadatos as $index => $item) 
         <tr>
@@ -114,7 +116,7 @@
             <td>{{$item->PRODUCTO}}</td>
             <td>{{$item->productos_cabecera2}}</td>
 
-            
+
             <td>{{$item->IND_MATERIAL_SERVICIO}}</td>
             <td>{{$item->TXT_CATEGORIA_MONEDA}}</td>
             <td>{{$item->CAN_TIPO_CAMBIO}}</td>
@@ -160,6 +162,8 @@
             <td>{{$item->CAN_DETRACCION}}</td>
             <td>-</td>
             <td>-</td>
+            <td>{{$item->NRO_CUENTA}}</td>
+            
         </tr>
         @endforeach
     </table>
