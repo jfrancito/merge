@@ -129,7 +129,6 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/descargar-comprobante-contrato-proveedor/{procedencia}/{idopcion}/{prefijo}/{idordencompra}', 'GestionTCController@actionDescargarComprobanteOCProveedor');
 
 
-
 	Route::any('/gestion-de-filtro-comprobante/{idopcion}', 'GestionOCController@actionListarOCFiltro');
 	Route::any('/ajax-filtro-guardar', 'GestionOCController@actionGuardarOCFiltro');
 

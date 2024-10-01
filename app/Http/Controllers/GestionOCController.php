@@ -270,9 +270,13 @@ class GestionOCController extends Controller
                     } else {
                         return Redirect::to('detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Error al intentar descomprimir el CDR');
                     }
-
+                    
                     if($sw == 0){
                         return Redirect::to('detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'El CDR ('.$factura_cdr_id.') no coincide con la factura ('.$nombre_doc.')');
+                    }
+
+                    if (strpos($respuestacdr, 'observaciones') !== false) {
+                        return Redirect::to('detalle-comprobante-oc/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'El CDR ('.$factura_cdr_id.') tiene observaciones');
                     }
 
                 }
@@ -1612,6 +1616,12 @@ class GestionOCController extends Controller
                     if($sw == 0){
                         return Redirect::to('detalle-comprobante-oc-proveedor/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'El CDR ('.$factura_cdr_id.') no coincide con la factura ('.$nombre_doc.')');
                     }
+
+                    if (strpos($respuestacdr, 'observaciones') !== false) {
+                        return Redirect::to('detalle-comprobante-oc-proveedor/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'El CDR ('.$factura_cdr_id.') tiene observaciones');
+                    }
+
+
                 }
 
 
@@ -3161,6 +3171,13 @@ class GestionOCController extends Controller
                     if($sw == 0){
                         return Redirect::to('detalle-comprobante-oc-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'El CDR ('.$factura_cdr_id.') no coincide con la factura ('.$nombre_doc.')');
                     }
+
+
+                    if (strpos($respuestacdr, 'observaciones') !== false) {
+                        return Redirect::to('detalle-comprobante-oc-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'El CDR ('.$factura_cdr_id.') tiene observaciones');
+                    }
+
+
                 }
 
                 //guardar orden de compra precargada
@@ -3578,6 +3595,12 @@ class GestionOCController extends Controller
                     if($sw == 0){
                         return Redirect::to('detalle-comprobante-contrato-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'El CDR ('.$factura_cdr_id.') no coincide con la factura ('.$nombre_doc.')');
                     }
+
+                    if (strpos($respuestacdr, 'observaciones') !== false) {
+                        return Redirect::to('detalle-comprobante-contrato-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'El CDR ('.$factura_cdr_id.') tiene observaciones');
+                    }
+
+
 
                 }
 

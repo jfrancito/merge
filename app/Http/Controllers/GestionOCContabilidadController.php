@@ -396,11 +396,15 @@ class GestionOCContabilidadController extends Controller
                 }
 
 
+
+                $nro_cuenta_contable=   $request['nro_cuenta_contable'];
+
                 FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
                                 [
                                     'COD_ESTADO'=>'ETM0000000000004',
                                     'TXT_ESTADO'=>'POR APROBAR ADMINISTRACION',
+                                    'NRO_CUENTA'=>$nro_cuenta_contable,
                                     'ind_email_adm'=>0,
                                     'fecha_pr'=>$this->fechaactual,
                                     'usuario_pr'=>Session::get('usuario')->id
@@ -662,11 +666,16 @@ class GestionOCContabilidadController extends Controller
                 }
 
 
+                $nro_cuenta_contable=   $request['nro_cuenta_contable'];
+
+
                 FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
                                 [
                                     'COD_ESTADO'=>'ETM0000000000004',
                                     'TXT_ESTADO'=>'POR APROBAR ADMINISTRACION',
+                                    'NRO_CUENTA'=>$nro_cuenta_contable,
+                                    
                                     'ind_email_adm'=>0,
                                     'fecha_pr'=>$this->fechaactual,
                                     'usuario_pr'=>Session::get('usuario')->id
