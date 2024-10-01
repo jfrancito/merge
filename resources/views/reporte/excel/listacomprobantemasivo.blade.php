@@ -70,6 +70,8 @@
             <th class= 'tabladp'>PROVEEDOR</th>
             <th class= 'tabladp'>RUC</th>
             <th class= 'tabladp'>DESCRIPCION DE BIEN O SERVICIO SEGÚN FACTURA</th>
+            <th class= 'tabladp'>DESCRIPCION DE BIEN O SERVICIO SEGÚN ORDEN DE COMPRA</th>
+
             <th class= 'tabladp'>BIEN / SERVICIO</th>
             <th class= 'tabladp'>MONEDA</th>
 
@@ -86,6 +88,8 @@
             <th class= 'tabladp'>IMPORTE DETRACCIÓN</th>
             <th class= 'tabladp'>CONSTANCIA DETRACCIÓN</th>
             <th class= 'tabladp'>NUMERO DE CONSTANCIA</th>
+            <th class= 'tabladp'>NUMERO DE CUENTA CONTABLE</th>
+
             <th class= 'tabladp'>OBSERVACION</th>
 
         </tr>
@@ -112,14 +116,41 @@
             <td>{{$item->RZ_PROVEEDOR}}</td>
             <td>{{$item->RUC_PROVEEDOR}}</td>
             <td>{{$item->PRODUCTO}}</td>
+            <td>{{$item->productos_cabecera2}}</td>
+
             <td>{{$item->IND_MATERIAL_SERVICIO}}</td>
             <td>{{$item->TXT_CATEGORIA_MONEDA}}</td>
-
             <td>{{$item->CAN_TIPO_CAMBIO}}</td>
-            <td>{{$item->CANTIDAD}}</td>
-            <td>{{$item->VAL_SUBTOTAL_ORIG}}</td>
-            <td>{{$item->VAL_IGV_ORIG}}</td>
-            <td>{{$item->VAL_VENTA_ORIG}}</td>
+            
+            <td>
+                @if($item->ID_TIPO_DOC == '01')
+                    {{$item->CANTIDAD}}
+                @else
+                    1
+                @endif
+            </td>
+            <td>
+                @if($item->ID_TIPO_DOC == '01')
+                    {{$item->VAL_SUBTOTAL_ORIG}}
+                @else
+                    {{$item->SUB_TOTAL_VENTA_ORIG}}
+                @endif
+            </td>
+            <td>
+                @if($item->ID_TIPO_DOC == '01')
+                    {{$item->VAL_IGV_ORIG}}
+                @else
+                    {{$item->VALOR_IGV_ORIG}}
+                @endif
+            <td>
+                @if($item->ID_TIPO_DOC == '01')
+                    {{$item->VAL_VENTA_ORIG}}
+                @else
+                    {{$item->TOTAL_VENTA_ORIG}}
+                @endif
+            </td>
+
+
             <td>          
                 @IF($item->CAN_DETRACCION>0)
                     SI
@@ -131,6 +162,7 @@
             <td>{{$item->CAN_DETRACCION}}</td>
             <td>-</td>
             <td>-</td>
+            <td>{{$item->NRO_CUENTA}}</td>
             <td>{{$item->TXT_GLOSA_ORDEN}}</td>
 
         </tr>

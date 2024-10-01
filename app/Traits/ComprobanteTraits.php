@@ -1205,20 +1205,34 @@ trait ComprobanteTraits
                                 ->join('FE_DETALLE_DOCUMENTO', 'FE_DETALLE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.Orden.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
-                                //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
                                 ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
-                                //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 ->where('OPERACION','=','ORDEN_COMPRA')
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
                                 ->whereIn('CMP.Orden.COD_USUARIO_CREA_AUD',$array_usuarios)
+
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.Orden.TXT_GLOSA TXT_GLOSA_ORDEN,CMP.CATEGORIA.NOM_CATEGORIA AS AREA'))
+                                ->select(DB::raw("
+                                    FE_DOCUMENTO.*, 
+                                    CMP.ORDEN.*,
+                                    FE_DETALLE_DOCUMENTO.*,
+                                    FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_FE, 
+                                    CMP.Orden.TXT_GLOSA AS TXT_GLOSA_ORDEN, 
+                                    CMP.CATEGORIA.NOM_CATEGORIA AS AREA, 
+                                    (
+                                        SELECT STUFF(
+                                            (
+                                                SELECT '// ' + d2_interno.TXT_NOMBRE_PRODUCTO
+                                                FROM CMP.DETALLE_PRODUCTO d2_interno
+                                                WHERE d2_interno.COD_TABLA = FE_DOCUMENTO.ID_DOCUMENTO
+                                                FOR XML PATH('')
+                                            ), 1, 2, ''
+                                        )
+                                    ) AS productos_cabecera2
+                                "))
                                 ->orderBy('FEC_VENTA','asc')
                                 ->get();
-
-
 
 
         }else{
@@ -1227,19 +1241,35 @@ trait ComprobanteTraits
                                 ->join('FE_DETALLE_DOCUMENTO', 'FE_DETALLE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.Orden.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
-                                //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
                                 ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
-                                //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 ->where('OPERACION','=','ORDEN_COMPRA')
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
-                                //->where('FE_DOCUMENTO.ID_DOCUMENTO','=','IICHCL0000008694')
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.Orden.TXT_GLOSA TXT_GLOSA_ORDEN,CMP.CATEGORIA.NOM_CATEGORIA AS AREA'))
+                                ->select(DB::raw("
+                                    FE_DOCUMENTO.*, 
+                                    CMP.ORDEN.*,
+                                    FE_DETALLE_DOCUMENTO.*,
+                                    FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_FE, 
+                                    CMP.Orden.TXT_GLOSA AS TXT_GLOSA_ORDEN, 
+                                    CMP.CATEGORIA.NOM_CATEGORIA AS AREA, 
+                                    (
+                                        SELECT STUFF(
+                                            (
+                                                SELECT '// ' + d2_interno.TXT_NOMBRE_PRODUCTO
+                                                FROM CMP.DETALLE_PRODUCTO d2_interno
+                                                WHERE d2_interno.COD_TABLA = FE_DOCUMENTO.ID_DOCUMENTO
+                                                FOR XML PATH('')
+                                            ), 1, 2, ''
+                                        )
+                                    ) AS productos_cabecera2
+                                "))
                                 ->orderBy('FEC_VENTA','asc')
                                 ->get();
 
+
+            //dd($listadatos);
 
 
         }
@@ -1259,45 +1289,76 @@ trait ComprobanteTraits
 
         if($rol->ind_uc == 1 && Session::get('usuario')->id != '1CIX00000142'){
 
+
             $listadatos     =   FeDocumento::join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
-                                ->join('CMP.DETALLE_PRODUCTO', 'CMP.DETALLE_PRODUCTO.COD_TABLA', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                                ->join('FE_DETALLE_DOCUMENTO', 'FE_DETALLE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
                                 ->join('ALM.CENTRO', 'ALM.CENTRO.COD_CENTRO', '=', 'CMP.DOCUMENTO_CTBLE.COD_CENTRO')
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
-
-                                //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
                                 ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
-                                //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                                ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
                                 ->where('OPERACION','=','CONTRATO')
-                                ->where('CMP.DETALLE_PRODUCTO.COD_ESTADO','=','1')
-                                ->where('CMP.DETALLE_PRODUCTO.IND_MATERIAL_SERVICIO','=','S')
+                                ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
+
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA'))
+                                ->select(DB::raw("
+                                    FE_DOCUMENTO.*, 
+                                    CMP.DOCUMENTO_CTBLE.*, 
+                                    FE_DETALLE_DOCUMENTO.*, 
+                                    FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_FE, 
+                                    CMP.CATEGORIA.NOM_CATEGORIA AS AREA,
+                                    (
+                                        SELECT STUFF((
+                                            SELECT '// ' + DOC_INTERNO.NRO_SERIE + '-' + DOC_INTERNO.NRO_DOC + ' ' + DOC_INTERNO.TXT_CATEGORIA_MOTIVO_TRASLADO
+                                            FROM CMP.REFERENCIA_ASOC AS REF_INTERNO
+                                            INNER JOIN CMP.DOCUMENTO_CTBLE AS DOC_INTERNO ON REF_INTERNO.COD_TABLA_ASOC = DOC_INTERNO.COD_DOCUMENTO_CTBLE
+                                            WHERE REF_INTERNO.COD_TABLA = FE_DOCUMENTO.ID_DOCUMENTO
+                                            AND DOC_INTERNO.COD_CATEGORIA_TIPO_DOC = 'TDO0000000000009'
+                                            FOR XML PATH('')
+                                        ), 1, 2, '')
+                                    ) AS productos_cabecera2
+                                "))
                                 ->orderBy('FEC_VENTA', 'desc')
                                 ->get();
+
 
         }else{
 
             $listadatos     =   FeDocumento::join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
-                                ->join('CMP.DETALLE_PRODUCTO', 'CMP.DETALLE_PRODUCTO.COD_TABLA', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                                ->join('FE_DETALLE_DOCUMENTO', 'FE_DETALLE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
                                 ->join('ALM.CENTRO', 'ALM.CENTRO.COD_CENTRO', '=', 'CMP.DOCUMENTO_CTBLE.COD_CENTRO')
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
                                 ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                                ->where('CMP.DETALLE_PRODUCTO.COD_ESTADO','=','1')
-                                ->where('CMP.DETALLE_PRODUCTO.IND_MATERIAL_SERVICIO','=','S')
                                 ->where('OPERACION','=','CONTRATO')
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA'))
+                                ->select(DB::raw("
+                                    FE_DOCUMENTO.*, 
+                                    CMP.DOCUMENTO_CTBLE.*, 
+                                    FE_DETALLE_DOCUMENTO.*, 
+                                    FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_FE, 
+                                    CMP.CATEGORIA.NOM_CATEGORIA AS AREA,
+                                    (
+                                        SELECT STUFF((
+                                            SELECT '// ' + DOC_INTERNO.NRO_SERIE + '-' + DOC_INTERNO.NRO_DOC + ' ' + DOC_INTERNO.TXT_CATEGORIA_MOTIVO_TRASLADO
+                                            FROM CMP.REFERENCIA_ASOC AS REF_INTERNO
+                                            INNER JOIN CMP.DOCUMENTO_CTBLE AS DOC_INTERNO ON REF_INTERNO.COD_TABLA_ASOC = DOC_INTERNO.COD_DOCUMENTO_CTBLE
+                                            WHERE REF_INTERNO.COD_TABLA = FE_DOCUMENTO.ID_DOCUMENTO
+                                            AND DOC_INTERNO.COD_CATEGORIA_TIPO_DOC = 'TDO0000000000009'
+                                            FOR XML PATH('')
+                                        ), 1, 2, '')
+                                    ) AS productos_cabecera2
+                                "))
                                 ->orderBy('FEC_VENTA', 'desc')
                                 ->get();
+
+
+
         }
 
 
