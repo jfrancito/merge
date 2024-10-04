@@ -89,6 +89,11 @@
             <th class= 'tabladp'>CONSTANCIA DETRACCIÓN</th>
             <th class= 'tabladp'>NUMERO DE CONSTANCIA</th>
             <th class= 'tabladp'>NUMERO DE CUENTA CONTABLE</th>
+            <th class= 'tabladp'>USUARIO CONTACTO</th>
+            <th class= 'tabladp'>REPARABLE</th>
+            <th class= 'tabladp'>MENSAJE REPARABLE</th>
+
+
 
         </tr>
         @foreach($listadatos as $index => $item) 
@@ -163,7 +168,15 @@
             <td>-</td>
             <td>-</td>
             <td>{{$item->NRO_CUENTA}}</td>
-            
+            <td>{{$item->TXT_CONTACTO_N}}</td>
+            <td>          
+                @IF($item->TXT_REPARABLE_SN == 'REPARABLE')
+                    SI
+                @ELSE
+                    NO
+                @ENDIF
+            </td>
+            <td>{{$item->productos_reparable}}</td>
         </tr>
         @endforeach
     </table>

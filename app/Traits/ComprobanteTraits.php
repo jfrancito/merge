@@ -53,7 +53,7 @@ trait ComprobanteTraits
         $numerototalsc    = ltrim($numerototal, '0');
         $nombre_doc_sinceros = $fedocumento->SERIE.'-'.$numerototalsc;
 
-
+        //dd($fedocumento);
         if(count($fedocumento)>0){
             $archivo            =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('TIPO_ARCHIVO','=','DCC0000000000004')->where('ACTIVO','=','1')->first();
             //dd($archivo);
@@ -1217,8 +1217,12 @@ trait ComprobanteTraits
                                     FE_DOCUMENTO.*, 
                                     CMP.ORDEN.*,
                                     FE_DETALLE_DOCUMENTO.*,
+
                                     FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_FE, 
-                                    CMP.Orden.TXT_GLOSA AS TXT_GLOSA_ORDEN, 
+                                    CMP.Orden.TXT_GLOSA AS TXT_GLOSA_ORDEN,
+                                    FE_DOCUMENTO.TXT_REPARABLE AS TXT_REPARABLE_SN, 
+                                    FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_N,
+
                                     CMP.CATEGORIA.NOM_CATEGORIA AS AREA, 
                                     (
                                         SELECT STUFF(
@@ -1229,7 +1233,21 @@ trait ComprobanteTraits
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
                                         )
-                                    ) AS productos_cabecera2
+                                    ) AS productos_cabecera2,
+
+                                    CMP.CATEGORIA.NOM_CATEGORIA AS AREA, 
+                                    (
+                                        SELECT STUFF(
+                                            (
+                                                SELECT '// ' + d2_interno.MENSAJE
+                                                FROM FE_DOCUMENTO_HISTORIAL d2_interno
+                                                WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                                                AND TIPO LIKE 'DOCUMENTO ARCHIVO_%'
+                                                FOR XML PATH('')
+                                            ), 1, 2, ''
+                                        )
+                                    ) AS productos_reparable
+
                                 "))
                                 ->orderBy('FEC_VENTA','asc')
                                 ->get();
@@ -1252,7 +1270,9 @@ trait ComprobanteTraits
                                     CMP.ORDEN.*,
                                     FE_DETALLE_DOCUMENTO.*,
                                     FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_FE, 
-                                    CMP.Orden.TXT_GLOSA AS TXT_GLOSA_ORDEN, 
+                                    CMP.Orden.TXT_GLOSA AS TXT_GLOSA_ORDEN,
+                                    FE_DOCUMENTO.TXT_REPARABLE AS TXT_REPARABLE_SN, 
+                                    FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_N,
                                     CMP.CATEGORIA.NOM_CATEGORIA AS AREA, 
                                     (
                                         SELECT STUFF(
@@ -1263,7 +1283,21 @@ trait ComprobanteTraits
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
                                         )
-                                    ) AS productos_cabecera2
+                                    ) AS productos_cabecera2,
+
+                                    CMP.CATEGORIA.NOM_CATEGORIA AS AREA, 
+                                    (
+                                        SELECT STUFF(
+                                            (
+                                                SELECT '// ' + d2_interno.MENSAJE
+                                                FROM FE_DOCUMENTO_HISTORIAL d2_interno
+                                                WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                                                AND TIPO LIKE 'DOCUMENTO ARCHIVO_%'
+                                                FOR XML PATH('')
+                                            ), 1, 2, ''
+                                        )
+                                    ) AS productos_reparable
+
                                 "))
                                 ->orderBy('FEC_VENTA','asc')
                                 ->get();
@@ -1309,6 +1343,10 @@ trait ComprobanteTraits
                                     FE_DETALLE_DOCUMENTO.*, 
                                     FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_FE, 
                                     CMP.CATEGORIA.NOM_CATEGORIA AS AREA,
+                                    FE_DOCUMENTO.TXT_REPARABLE AS TXT_REPARABLE_SN, 
+                                    FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_N,
+
+
                                     (
                                         SELECT STUFF((
                                             SELECT '// ' + DOC_INTERNO.NRO_SERIE + '-' + DOC_INTERNO.NRO_DOC + ' ' + DOC_INTERNO.TXT_CATEGORIA_MOTIVO_TRASLADO
@@ -1318,7 +1356,25 @@ trait ComprobanteTraits
                                             AND DOC_INTERNO.COD_CATEGORIA_TIPO_DOC = 'TDO0000000000009'
                                             FOR XML PATH('')
                                         ), 1, 2, '')
-                                    ) AS productos_cabecera2
+                                    ) AS productos_cabecera2,
+
+                                    CMP.CATEGORIA.NOM_CATEGORIA AS AREA, 
+                                    (
+                                        SELECT STUFF(
+                                            (
+                                                SELECT '// ' + d2_interno.MENSAJE
+                                                FROM FE_DOCUMENTO_HISTORIAL d2_interno
+                                                WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                                                AND TIPO LIKE 'DOCUMENTO ARCHIVO_%'
+                                                FOR XML PATH('')
+                                            ), 1, 2, ''
+                                        )
+                                    ) AS productos_reparable
+
+
+
+
+
                                 "))
                                 ->orderBy('FEC_VENTA', 'desc')
                                 ->get();
@@ -1343,6 +1399,9 @@ trait ComprobanteTraits
                                     FE_DETALLE_DOCUMENTO.*, 
                                     FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_FE, 
                                     CMP.CATEGORIA.NOM_CATEGORIA AS AREA,
+                                    FE_DOCUMENTO.TXT_REPARABLE AS TXT_REPARABLE_SN, 
+                                    FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_N,
+
                                     (
                                         SELECT STUFF((
                                             SELECT '// ' + DOC_INTERNO.NRO_SERIE + '-' + DOC_INTERNO.NRO_DOC + ' ' + DOC_INTERNO.TXT_CATEGORIA_MOTIVO_TRASLADO
@@ -1352,7 +1411,20 @@ trait ComprobanteTraits
                                             AND DOC_INTERNO.COD_CATEGORIA_TIPO_DOC = 'TDO0000000000009'
                                             FOR XML PATH('')
                                         ), 1, 2, '')
-                                    ) AS productos_cabecera2
+                                    ) AS productos_cabecera2,
+                                    CMP.CATEGORIA.NOM_CATEGORIA AS AREA, 
+                                    (
+                                        SELECT STUFF(
+                                            (
+                                                SELECT '// ' + d2_interno.MENSAJE
+                                                FROM FE_DOCUMENTO_HISTORIAL d2_interno
+                                                WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                                                AND TIPO LIKE 'DOCUMENTO ARCHIVO_%'
+                                                FOR XML PATH('')
+                                            ), 1, 2, ''
+                                        )
+                                    ) AS productos_reparable
+                                    
                                 "))
                                 ->orderBy('FEC_VENTA', 'desc')
                                 ->get();
