@@ -40,6 +40,102 @@ class GestionOCValidadoController extends Controller
     use GeneralesTraits;
     use ComprobanteTraits;
 
+    public function actionEliminarItemContrato($tipo,$nombrearchivo,$idopcion,$linea, $prefijo, $idordencompra, Request $request)
+    {
+
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo_contrato($idordencompra,$prefijo);
+
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_contrato_idoc_actual($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
+
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
+        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+        //dd($ordencompra);
+
+        $archivo                =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('NOMBRE_ARCHIVO','=',$nombrearchivo)
+                                    ->where('TIPO_ARCHIVO','=',$tipo)
+                                    ->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                    ->first();
+        
+
+        Archivo::where('ID_DOCUMENTO','=',$idoc)
+                ->where('ACTIVO','=','1')
+                ->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                ->where('NOMBRE_ARCHIVO','=',$nombrearchivo)
+                ->where('TIPO_ARCHIVO','=',$tipo)
+                    ->update(
+                        [
+                            'ACTIVO'=>0,
+                            'FECHA_MOD'=>$this->fechaactual,
+                            'USUARIO_MOD'=>Session::get('usuario')->id
+                        ]
+                    );
+
+        $ordencompra_t                          =   CMPOrden::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->first();
+        $documento                              =   new FeDocumentoHistorial;
+        $documento->ID_DOCUMENTO                =   $ordencompra->COD_DOCUMENTO_CTBLE;
+        $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+        $documento->FECHA                       =   $this->fechaactual;
+        $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+        $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+        $documento->TIPO                        =   'ELIMINO ITEM '.$archivo->DESCRIPCION_ARCHIVO;
+        $documento->MENSAJE                     =   '';
+        $documento->save();
+
+        return Redirect::to('aprobar-comprobante-contabilidad-contrato/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('bienhecho', 'Item : '.$archivo->DESCRIPCION_ARCHIVO.' Elimino CON EXITO');;
+
+
+    }
+
+
+
+
+    public function actionEliminarItem($tipo,$nombrearchivo,$idopcion,$linea, $prefijo, $idordencompra, Request $request)
+    {
+
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo($idordencompra,$prefijo);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_idoc_actual($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc_actual($idoc);
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
+        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+        $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);
+
+        $archivo                =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('NOMBRE_ARCHIVO','=',$nombrearchivo)
+                                    ->where('TIPO_ARCHIVO','=',$tipo)
+                                    ->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                    ->first();
+        
+        Archivo::where('ID_DOCUMENTO','=',$idoc)
+                ->where('ACTIVO','=','1')
+                ->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                ->where('NOMBRE_ARCHIVO','=',$nombrearchivo)
+                ->where('TIPO_ARCHIVO','=',$tipo)
+                    ->update(
+                        [
+                            'ACTIVO'=>0,
+                            'FECHA_MOD'=>$this->fechaactual,
+                            'USUARIO_MOD'=>Session::get('usuario')->id
+                        ]
+                    );
+
+        $ordencompra_t                          =   CMPOrden::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->first();
+        $documento                              =   new FeDocumentoHistorial;
+        $documento->ID_DOCUMENTO                =   $ordencompra->COD_ORDEN;
+        $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+        $documento->FECHA                       =   $this->fechaactual;
+        $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+        $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+        $documento->TIPO                        =   'ELIMINO ITEM '.$archivo->DESCRIPCION_ARCHIVO;
+        $documento->MENSAJE                     =   '';
+        $documento->save();
+
+        return Redirect::to('aprobar-comprobante-contabilidad/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('bienhecho', 'Item : '.$archivo->DESCRIPCION_ARCHIVO.' Elimino CON EXITO');;
+
+
+    }
+
+
+
     public function actionDetalleComprobanteOCValidadoContratoHistorial($idopcion,$linea, $prefijo, $idordencompra, Request $request) {
 
         View::share('titulo','Detalle de Comprobante Historial');
@@ -504,6 +600,11 @@ class GestionOCValidadoController extends Controller
         }
 
     }
+
+
+
+
+
 
     public function actionDescargarContrato($tipo,$idopcion,$linea, $prefijo, $idordencompra, Request $request)
     {

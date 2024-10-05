@@ -41,6 +41,13 @@
                             Descargar
                           </a>  
                         </li>
+                        @if(Session::get('usuario')->id == '1CIX00000001' or Session::get('usuario')->id == '1CIX00000049')
+                          <li>
+                            <a href="{{ url('/eliminar-archivo-item/'.$item->TIPO_ARCHIVO.'/'.$item->NOMBRE_ARCHIVO.'/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}">
+                              Eliminar Item
+                            </a>
+                          </li>
+                        @endif
                       </ul>
                     </div>
                   </td>

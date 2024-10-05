@@ -13,7 +13,54 @@
 
 <div class="row">
   <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-    @include('comprobante.form.contrato.archivos')
+    <div class="panel panel-default panel-contrast">
+      <div class="panel-heading" style="background: #1d3a6d;color: #fff;">ARCHIVOS
+      </div>
+      <div class="panel-body panel-body-contrast">
+        <table class="table table-condensed table-striped">
+          <thead>
+            <tr>
+              <th>Nro</th>
+              <th>Nombre</th>      
+              <th>Archivo</th>       
+              <th>Opciones</th>
+            </tr>
+          </thead>
+          <tbody>
+              @foreach($archivos as $index => $item)  
+                <tr>
+                  <td>{{$index + 1}}</td>
+                  <td>{{$item->DESCRIPCION_ARCHIVO}}</td>
+                  <td>{{$item->NOMBRE_ARCHIVO}}</td>
+
+                  <td class="rigth">
+                    <div class="btn-group btn-hspace">
+                      <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>
+                      <ul role="menu" class="dropdown-menu pull-right">
+                        
+                        <li>
+                          <a href="{{ url('/descargar-archivo-requerimiento-contrato/'.$item->TIPO_ARCHIVO.'/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -9))) }}">
+                            Descargar
+                          </a>  
+                        </li>
+
+                        @if(Session::get('usuario')->id == '1CIX00000001' or Session::get('usuario')->id == '1CIX00000049')
+                          <li>
+                            <a href="{{ url('/eliminar-archivo-item-contrato/'.$item->TIPO_ARCHIVO.'/'.$item->NOMBRE_ARCHIVO.'/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -9))) }}">
+                              Eliminar Item
+                            </a>
+                          </li>
+                        @endif
+
+                      </ul>
+                    </div>
+                  </td>
+                </tr>
+              @endforeach
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
   <div class="col-xs-12 col-sm-6 col-md-8 col-lg-8">
     @include('comprobante.form.contrato.informacion')
