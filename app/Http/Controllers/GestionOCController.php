@@ -822,7 +822,7 @@ class GestionOCController extends Controller
 
 
                         //VALIDAR QUE EL XML SEA DE LA EMPRESA
-                        if($fedocumento_t->ID_CLIENTE != Session::get('empresas')->NRO_DOCUMENTO){
+                        if($factura->getClient()->getnumDoc()!= Session::get('empresas')->NRO_DOCUMENTO){
                             return Redirect::back()->with('errorurl', 'El xml no corresponde a la empresa '.Session::get('NOM_EMPR')->NRO_DOCUMENTO);
                         }
 
@@ -1239,7 +1239,7 @@ class GestionOCController extends Controller
 
 
                         //VALIDAR QUE EL XML SEA DE LA EMPRESA
-                        if($fedocumento_t->ID_CLIENTE != Session::get('empresas')->NRO_DOCUMENTO){
+                        if($factura->getClient()->getnumDoc()!= Session::get('empresas')->NRO_DOCUMENTO){
                             return Redirect::back()->with('errorurl', 'El xml no corresponde a la empresa '.Session::get('NOM_EMPR')->NRO_DOCUMENTO);
                         }
 
@@ -2441,9 +2441,10 @@ class GestionOCController extends Controller
 
 
                         //VALIDAR QUE EL XML SEA DE LA EMPRESA
-                        if($fedocumento_t->ID_CLIENTE != Session::get('empresas')->NRO_DOCUMENTO){
+                        if($factura->getClient()->getnumDoc()!= Session::get('empresas')->NRO_DOCUMENTO){
                             return Redirect::back()->with('errorurl', 'El xml no corresponde a la empresa '.Session::get('NOM_EMPR')->NRO_DOCUMENTO);
                         }
+
 
 
                         /****************************************  DIAS DE CREDITO *****************************************/
@@ -2800,7 +2801,7 @@ class GestionOCController extends Controller
                         }
 
                         //VALIDAR QUE EL XML SEA DE LA EMPRESA
-                        if($fedocumento_t->ID_CLIENTE != Session::get('empresas')->NRO_DOCUMENTO){
+                        if($factura->getClient()->getnumDoc()!= Session::get('empresas')->NRO_DOCUMENTO){
                             return Redirect::back()->with('errorurl', 'El xml no corresponde a la empresa '.Session::get('NOM_EMPR')->NRO_DOCUMENTO);
                         }
 
