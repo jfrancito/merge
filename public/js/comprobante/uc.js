@@ -21,6 +21,26 @@ $(document).ready(function(){
     var carpeta = $("#carpeta").val();
 
 
+
+    $('.elimnaritem').on('click', function(event){
+        event.preventDefault();
+        var href = $(this).attr('href');
+
+        $.confirm({
+            title: '¿Confirma la Eliminacion?',
+            content: 'Eliminar item del Comprobante',
+            buttons: {
+                confirmar: function () {
+                    window.location.href = href;
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo Eliminacion');
+                }
+            }
+        });
+
+    });
+
     $('.btnaprobarcomporbatnte').on('click', function(event){
         event.preventDefault();
         $.confirm({

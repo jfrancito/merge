@@ -809,6 +809,29 @@ class GestionOCController extends Controller
                         }
 
 
+
+                        $fedocumento_e          =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->whereNotIn('COD_ESTADO',['','ETM0000000000006'])
+                                                    ->where('RUC_PROVEEDOR','=',$factura->getcompany()->getruc())
+                                                    ->where('SERIE','=',$factura->getserie())
+                                                    ->where('NUMERO','=',$factura->getcorrelativo())
+                                                    ->where('ID_TIPO_DOC','=',$tipo_documento_le)
+                                                    ->first();
+                        if(count($fedocumento_e)>0){
+                            return Redirect::back()->with('errorurl', 'Este XML ya fue integrado en otra orden de compra');
+                        }
+
+
+                        //VALIDAR QUE EL XML SEA DE LA EMPRESA
+                        if($fedocumento_t->ID_CLIENTE != Session::get('empresas')->NRO_DOCUMENTO){
+                            return Redirect::back()->with('errorurl', 'El xml no corresponde a la empresa '.Session::get('NOM_EMPR')->NRO_DOCUMENTO);
+                        }
+
+
+
+
+
+
+
                         //dd($factura);
                         /****************************************  DIAS DE CREDITO *****************************************/
                         $diasdefactura = 0;
@@ -1215,15 +1238,11 @@ class GestionOCController extends Controller
                         }
 
 
-                        $fedocumento_e          =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->whereNotIn('COD_ESTADO',['','ETM0000000000006'])
-                                                    ->where('RUC_PROVEEDOR','=',$factura->getcompany()->getruc())
-                                                    ->where('SERIE','=',$factura->getserie())
-                                                    ->where('NUMERO','=',$factura->getcorrelativo())
-                                                    ->where('ID_TIPO_DOC','=',$tipo_documento_le)
-                                                    ->first();
-                        if(count($fedocumento_e)>0){
-                            return Redirect::back()->with('errorurl', 'Este XML ya fue integrado en otra orden de compra');
+                        //VALIDAR QUE EL XML SEA DE LA EMPRESA
+                        if($fedocumento_t->ID_CLIENTE != Session::get('empresas')->NRO_DOCUMENTO){
+                            return Redirect::back()->with('errorurl', 'El xml no corresponde a la empresa '.Session::get('NOM_EMPR')->NRO_DOCUMENTO);
                         }
+
 
 
 
@@ -2415,11 +2434,16 @@ class GestionOCController extends Controller
                                                     ->where('NUMERO','=',$factura->getcorrelativo())
                                                     ->where('ID_TIPO_DOC','=',$tipo_documento_le)
                                                     ->first();
+
                         if(count($fedocumento_e)>0){
                             return Redirect::back()->with('errorurl', 'Este XML ya fue integrado en otra orden de compra');
                         }
 
 
+                        //VALIDAR QUE EL XML SEA DE LA EMPRESA
+                        if($fedocumento_t->ID_CLIENTE != Session::get('empresas')->NRO_DOCUMENTO){
+                            return Redirect::back()->with('errorurl', 'El xml no corresponde a la empresa '.Session::get('NOM_EMPR')->NRO_DOCUMENTO);
+                        }
 
 
                         /****************************************  DIAS DE CREDITO *****************************************/
@@ -2775,7 +2799,10 @@ class GestionOCController extends Controller
                             return Redirect::back()->with('errorurl', 'Este XML ya fue integrado en otra orden de compra');
                         }
 
-
+                        //VALIDAR QUE EL XML SEA DE LA EMPRESA
+                        if($fedocumento_t->ID_CLIENTE != Session::get('empresas')->NRO_DOCUMENTO){
+                            return Redirect::back()->with('errorurl', 'El xml no corresponde a la empresa '.Session::get('NOM_EMPR')->NRO_DOCUMENTO);
+                        }
 
                         $rz_p                               =   str_replace(["![CDATA[", "]]"], "", $factura->getcompany()->getrazonSocial());
                         $rz_p                               =    str_replace("?", "Ñ", $rz_p);
