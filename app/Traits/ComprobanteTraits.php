@@ -2237,7 +2237,7 @@ trait ComprobanteTraits
                                     //->where('CMP.Orden.COD_ORDEN','=','ISCHCL0000005886')
                                     ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005'])
                                     ->where('CMP.Orden.COD_EMPR','=',$empresa_id)
-                                    ->where('CMP.Orden.COD_CENTRO','=',$centro_id)
+                                    //->where('CMP.Orden.COD_CENTRO','=',$centro_id)
                                     ->whereIn('CMP.Orden.COD_USUARIO_CREA_AUD',$array_usuarios)
                                     ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
                                     ->select(DB::raw('CMP.Orden.* ,FE_DOCUMENTO.*,documentos.NRO_SERIE,documentos.FEC_VENCIMIENTO,documentos.NRO_DOC,oi.COD_TABLA_ASOC,

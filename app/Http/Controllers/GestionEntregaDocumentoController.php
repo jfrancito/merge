@@ -65,14 +65,15 @@ class GestionEntregaDocumentoController extends Controller
         $empresa_id     =   Session::get('empresas')->COD_EMPR;
 
         $combo_empresa  =   $this->gn_combo_empresa_empresa($empresa_id);
-        $centro_id      =   'CEN0000000000001';
-        $combo_centro   =   $this->gn_combo_centro_r('');
+        $centro_id      =   'TODO';
+        $combo_centro   =   $this->gn_combo_centro_r('TODO');
 
 
         $area_id        =   'TODO';
         $combo_area     =   $this->gn_combo_area_usuario($estado_id);
         $rol            =    WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
-        if($rol->ind_uc == 1){
+
+        if($rol->ind_uc == 1 && Session::get('usuario')->id != '1CIX00000075'){
             $usuario    =   SGDUsuario::where('COD_USUARIO','=',Session::get('usuario')->name)->first();
             if(count($usuario)>0){
                 $tp_area        =   CMPCategoria::where('COD_CATEGORIA','=',$usuario->COD_CATEGORIA_AREA)->first();
@@ -81,13 +82,14 @@ class GestionEntregaDocumentoController extends Controller
             }
         }
 
-
         //falta usuario contacto
         $operacion_id       =   'ORDEN_COMPRA';
         $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO');
         $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA');
 
         if($operacion_id=='ORDEN_COMPRA'){
+
+
             $listadatos         =   $this->con_lista_cabecera_comprobante_entregable($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id);
         }else{
             $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id);
