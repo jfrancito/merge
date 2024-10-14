@@ -129,6 +129,21 @@
                             </div> 
 
 
+                            <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
+
+                                <div class="form-group">
+                                  <label class="col-sm-12 control-label labelleft" >Filtro Fecha :</label>
+                                  <div class="col-sm-12 abajocaja" >
+                                    {!! Form::select( 'filtrofecha_id', $combo_filtrofecha, array(),
+                                                      [
+                                                        'class'       => 'select2 form-control control input-sm' ,
+                                                        'id'          => 'filtrofecha_id',
+                                                        'required'    => '',
+                                                        'data-aw'     => '1',
+                                                      ]) !!}
+                                  </div>
+                                </div>
+                            </div> 
 
 
 

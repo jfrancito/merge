@@ -110,6 +110,9 @@ $(document).ready(function(){
         var proveedor_id         =   $('#proveedor_id').val();
         var estado_id            =   $('#estado_id').val();
         var operacion_id         =   $('#operacion_id').val();
+        var filtrofecha_id       =   $('#filtrofecha_id').val();
+
+
         debugger;
 
         var idopcion                =   $('#idopcion').val();
@@ -125,8 +128,8 @@ $(document).ready(function(){
                                 fecha_fin               : fecha_fin,
                                 proveedor_id            : proveedor_id,
                                 estado_id               : estado_id,
-                                operacion_id               : operacion_id,
-
+                                operacion_id            : operacion_id,
+                                filtrofecha_id          : filtrofecha_id,
                                 idopcion                : idopcion
                             };
         ajax_normal(data,"/ajax-buscar-documento-fe");

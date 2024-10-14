@@ -1124,7 +1124,7 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
-    private function con_lista_cabecera_comprobante_total_gestion($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id) {
+    private function con_lista_cabecera_comprobante_total_gestion($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id) {
 
 
         $rol                    =   WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
@@ -1145,7 +1145,9 @@ trait ComprobanteTraits
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.Orden.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
                                 //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
-                                ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                ->Fecha($filtrofecha_id,$fecha_inicio,$fecha_fin)
+                                //->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+
                                 //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 ->where('OPERACION','=','ORDEN_COMPRA')
@@ -1153,7 +1155,6 @@ trait ComprobanteTraits
                                 ->EstadoFE($estado_id)
                                 ->whereIn('CMP.Orden.COD_USUARIO_CREA_AUD',$array_usuarios)
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-
                                 ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA'))
                                 ->orderBy('fecha_uc','asc')
                                 ->get();
@@ -1167,7 +1168,8 @@ trait ComprobanteTraits
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.Orden.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
                                 //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
-                                ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                ->Fecha($filtrofecha_id,$fecha_inicio,$fecha_fin)
+                                //->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                 //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 ->where('OPERACION','=','ORDEN_COMPRA')
@@ -1242,7 +1244,8 @@ trait ComprobanteTraits
                                                 SELECT '// ' + d2_interno.MENSAJE
                                                 FROM FE_DOCUMENTO_HISTORIAL d2_interno
                                                 WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
-                                                AND TIPO LIKE 'DOCUMENTO ARCHIVO_%'
+                                                AND FE_DOCUMENTO.IND_REPARABLE = 1
+                                                AND TIPO LIKE 'DOCUMENTO ARCHIVO_%' 
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
                                         )
@@ -1265,6 +1268,7 @@ trait ComprobanteTraits
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                //->where('FE_DOCUMENTO.ID_DOCUMENTO','=','IICHCR0000131258')
                                 ->select(DB::raw("
                                     FE_DOCUMENTO.*, 
                                     CMP.ORDEN.*,
@@ -1292,6 +1296,7 @@ trait ComprobanteTraits
                                                 SELECT '// ' + d2_interno.MENSAJE
                                                 FROM FE_DOCUMENTO_HISTORIAL d2_interno
                                                 WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                                                AND FE_DOCUMENTO.IND_REPARABLE = 1
                                                 AND TIPO LIKE 'DOCUMENTO ARCHIVO_%'
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
@@ -1365,6 +1370,7 @@ trait ComprobanteTraits
                                                 SELECT '// ' + d2_interno.MENSAJE
                                                 FROM FE_DOCUMENTO_HISTORIAL d2_interno
                                                 WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                                                AND FE_DOCUMENTO.IND_REPARABLE = 1
                                                 AND TIPO LIKE 'DOCUMENTO ARCHIVO_%'
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
@@ -1419,6 +1425,7 @@ trait ComprobanteTraits
                                                 SELECT '// ' + d2_interno.MENSAJE
                                                 FROM FE_DOCUMENTO_HISTORIAL d2_interno
                                                 WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                                                AND FE_DOCUMENTO.IND_REPARABLE = 1
                                                 AND TIPO LIKE 'DOCUMENTO ARCHIVO_%'
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
@@ -1445,7 +1452,7 @@ trait ComprobanteTraits
 
 
 
-    private function con_lista_cabecera_comprobante_total_gestion_contrato($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id) {
+    private function con_lista_cabecera_comprobante_total_gestion_contrato($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id) {
 
 
         $trabajador     =       STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
@@ -1461,7 +1468,8 @@ trait ComprobanteTraits
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
 
                                 //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
-                                ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                //->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                ->Fecha($filtrofecha_id,$fecha_inicio,$fecha_fin)
                                 //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
@@ -1481,7 +1489,8 @@ trait ComprobanteTraits
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
 
                                 //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
-                                ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                //->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                ->Fecha($filtrofecha_id,$fecha_inicio,$fecha_fin)
                                 //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 //->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)

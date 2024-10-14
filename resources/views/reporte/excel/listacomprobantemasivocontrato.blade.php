@@ -170,7 +170,7 @@
             <td>{{$item->NRO_CUENTA}}</td>
             <td>{{$item->TXT_CONTACTO_N}}</td>
             <td>          
-                @IF($item->TXT_REPARABLE_SN == 'REPARABLE')
+                @IF(count($item->productos_reparable)>0)
                     SI
                 @ELSE
                     NO

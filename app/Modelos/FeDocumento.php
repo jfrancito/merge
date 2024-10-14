@@ -28,4 +28,13 @@ class FeDocumento extends Model
     }
 
 
+    public function scopeFecha($query,$filtrofecha_id,$fecha_inicio,$fecha_fin){
+        if(trim($filtrofecha_id) == 'RE'){
+            $query->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin]);
+        }else{
+            $query->whereRaw("CAST(fecha_ap AS DATE) >= ? and CAST(fecha_ap AS DATE) <= ?", [$fecha_inicio,$fecha_fin]);
+        }
+    }
+
+
 }

@@ -275,13 +275,15 @@ class GestionOCValidadoController extends Controller
             $operacion_id       =   'CONTRATO';
         }
 
-        
         $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO');
+        $filtrofecha_id     =   'RE';
+        $combo_filtrofecha  =   array('RE' => 'REGISTRO','REA' => 'APROBACION');
+
 
         if($operacion_id=='ORDEN_COMPRA'){
-            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id);
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
         }else{
-            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id);
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
         }
 
 
@@ -299,6 +301,9 @@ class GestionOCValidadoController extends Controller
                             'combo_estado'      =>  $combo_estado,
                             'operacion_id'         =>  $operacion_id,
                             'combo_operacion'      =>  $combo_operacion,
+                            'filtrofecha_id'         =>  $filtrofecha_id,
+                            'combo_filtrofecha'      =>  $combo_filtrofecha,
+
                          ]);
     }
 
@@ -312,11 +317,14 @@ class GestionOCValidadoController extends Controller
         $estado_id      =   $request['estado_id'];
         $idopcion       =   $request['idopcion'];
         $operacion_id   =   $request['operacion_id'];
+        $filtrofecha_id =   $request['filtrofecha_id'];
+
+
 
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
 
         if($operacion_id=='ORDEN_COMPRA'){
-            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id);
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
         }else{
             $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id);
         }
