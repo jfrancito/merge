@@ -45,6 +45,27 @@ $(document).ready(function(){
 
     });
 
+    $(".areatesoreria").on('dblclick','.dobleclickpccontrato', function(e) {
+
+        var _token                  =   $('#token').val();
+        var data_requerimiento_id   =   $(this).attr('data_requerimiento_id');
+        var data_linea              =   $(this).attr('data_linea');
+
+
+        var idopcion                =   $('#idopcion').val();
+
+        data                        =   {
+                                            _token                  : _token,
+                                            data_requerimiento_id   : data_requerimiento_id,
+                                            data_linea              : data_linea,
+                                            idopcion                : idopcion,
+                                        };
+        ajax_modal(data,"/ajax-modal-tesoreria-pago-contrato",
+                  "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+
+    });
+
+
 
     $(".areatesoreria").on('dblclick','.dobleclickpc', function(e) {
 

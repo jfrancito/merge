@@ -269,6 +269,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-modal-tesoreria-pago-masivo', 'GestionOCTesoreriaController@actionListarAjaxModalTesoreriaPagoMasivo');
 	Route::any('/pago-comprobante-tesoreria-masivo/{idopcion}', 'GestionOCTesoreriaController@actionAprobarTesoreriaMasivo');
 
+	Route::any('/ajax-modal-tesoreria-pago-contrato', 'GestionOCTesoreriaController@actionListarAjaxModalTesoreriaPagoContrato');
+	Route::any('/pago-comprobante-tesoreria-contrato/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCTesoreriaController@actionAprobarTesoreriaContrato');
+
 
 	Route::any('/gestion-de-provision-comprobante/{idopcion}', 'GestionOCProvisionController@actionListarComprobanteProvision');
 	Route::any('/provisionar-documentos/{idopcion}', 'GestionOCProvisionController@actionListarProvisionarComprobante');

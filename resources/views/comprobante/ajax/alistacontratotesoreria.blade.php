@@ -1,6 +1,9 @@
 <table id="nso" class="table table-striped table-borderless table-hover td-color-borde td-padding-7 listatabla">
   <thead>
     <tr>
+      <th>ITEM</th>
+      <th></th>
+
       <th>CONTRATO</th>
       <th>FACTURA</th>
       <th>ESTADO</th>
@@ -9,12 +12,39 @@
   </thead>
   <tbody>
     @foreach($listadatos as $index => $item)
-      <tr data_requerimiento_id = "{{$item->ID_DOCUMENTO}}">
+      <tr data_requerimiento_id = "{{$item->ID_DOCUMENTO}}"
+          data_linea = "{{$item->DOCUMENTO_ITEM}}"
+          data_orden_compra = "{{$item->ID_DOCUMENTO}}"
+          data_proveedor = "{{$item->TXT_EMPR_CLIENTE}}"
+          data_serie = "{{$item->SERIE}}"
+          data_numero = "{{$item->NUMERO}}"
+          data_total = "{{$item->CAN_TOTAL}}"
+          class='dobleclickpccontrato seleccionar'
+        >
+
+        <td>{{$index+1}}</td>
+        <td>  
+          <div class="text-center be-checkbox be-checkbox-sm" >
+            <input  type="checkbox"
+                    class="{{$item->ID_DOCUMENTO}} input_check_pe_ln check{{$item->ID_DOCUMENTO}}" 
+                    id="{{$item->ID_DOCUMENTO}}">
+            <label  for="{{$item->ID_DOCUMENTO}}"
+                  data-atr = "ver"
+                  class = "checkbox"                    
+                  name="{{$item->ID_DOCUMENTO}}"
+            ></label>
+          </div>
+        </td>
+
         <td class="cell-detail sorting_1" style="position: relative;">
+
+
+
           <span><b>CODIGO : {{$item->COD_DOCUMENTO_CTBLE}} </b> </span>
           <span><b>FECHA  : {{$item->FEC_EMISION}}</b></span>
           <span><b>PROVEEDOR : </b> {{$item->TXT_EMPR_EMISOR}}</span>
           <span><b>TOTAL : </b> {{$item->CAN_TOTAL}}</span>
+          <span><b>DOCUMENTO : </b> {{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</span>
           <span><b>ORSERVACION : </b>               
               @if($item->ind_observacion == 1) 
                   <span class="badge badge-danger" style="display: inline-block;">EN PROCESO</span>

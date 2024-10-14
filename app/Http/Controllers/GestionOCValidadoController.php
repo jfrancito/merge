@@ -326,7 +326,7 @@ class GestionOCValidadoController extends Controller
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
         }else{
-            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id);
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
         }
 
         $funcion        =   $this;
