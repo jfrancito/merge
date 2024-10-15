@@ -40,6 +40,24 @@ class GestionOCValidadoController extends Controller
     use GeneralesTraits;
     use ComprobanteTraits;
 
+
+    public function actionModelosComprobantes($idopcion,Request $request) {
+
+        View::share('titulo','Modelos de Comprobante');
+        $funcion                =   $this;
+        $archivospdf            =   Archivo::where('ID_DOCUMENTO','=','MODELOS000000001')->where('ACTIVO','=','1')->get();
+
+        //dd($archivos);
+        return View::make('comprobante/modelocomprobantevalidado',
+                         [
+                            'archivospdf'           =>  $archivospdf,
+                            'funcion'               =>  $funcion,
+                            'idopcion'              =>  $idopcion,
+                         ]);
+    }
+
+
+
     public function actionEliminarItemContrato($tipo,$nombrearchivo,$idopcion,$linea, $prefijo, $idordencompra, Request $request)
     {
 

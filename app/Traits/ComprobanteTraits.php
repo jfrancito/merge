@@ -2226,6 +2226,10 @@ trait ComprobanteTraits
                                     ->pluck('COD_USUARIO')
                                     ->toArray();
 
+        $fecha_corte            =   date('Ymd');
+
+
+
 
         $documento              =   DB::table('CMP.DOCUMENTO_CTBLE')
                                     ->join('CMP.REFERENCIA_ASOC', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
@@ -2265,8 +2269,11 @@ trait ComprobanteTraits
                                     //->where('CMP.Orden.COD_CENTRO','=',$centro_id)
                                     ->whereIn('CMP.Orden.COD_USUARIO_CREA_AUD',$array_usuarios)
                                     ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                    ->select(DB::raw('CMP.Orden.* ,FE_DOCUMENTO.*,documentos.NRO_SERIE,documentos.FEC_VENCIMIENTO,documentos.NRO_DOC,oi.COD_TABLA_ASOC,
-                                        FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_VOUCHER'))
+                                    ->select(
+                                        DB::raw('CMP.Orden.*, FE_DOCUMENTO.*, documentos.NRO_SERIE, documentos.FEC_VENCIMIENTO, documentos.NRO_DOC, oi.COD_TABLA_ASOC, FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_VOUCHER, FE_DOCUMENTO.TXT_CATEGORIA_BANCO AS TXT_BANCO'),
+                                        // Aquí usamos los campos de la tabla CMP.Orden para los parámetros de la función
+                                        DB::raw("CMP.OBTENER_ADELANTOS_PROVEEDOR(CMP.Orden.COD_EMPR, CMP.Orden.COD_CENTRO, '{$fecha_corte}', CMP.Orden.COD_CONTRATO, CMP.Orden.COD_CATEGORIA_MONEDA) AS ADELANTOS_PROVEEDOR")
+                                    )
                                     ->orderBy('documentos.FEC_VENCIMIENTO','asc')
                                     ->get();
 

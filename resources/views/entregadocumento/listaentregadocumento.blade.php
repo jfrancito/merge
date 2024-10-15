@@ -137,7 +137,20 @@
                               </div>
                             </div> 
 
+                            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 cajareporte">
+                              <div class="form-group ">
+                                <label class="col-sm-12 control-label labelleft" >Glosa:</label>
+                                <div class="col-sm-12 abajocaja" >
+                                    <input  type="text"
+                                            id="glosa" name='glosa' value="" placeholder="Ingrese Glosa"
+                                            required = ""
+                                            autocomplete="off" class="form-control input-sm"/>
+                                </div>
+                              </div>
+                            </div> 
+
  
+
 
 
 

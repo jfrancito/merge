@@ -3,6 +3,8 @@
     <tr>
       <th>ITEM</th>
       <th>FOLIO</th>
+      <th>GLOSA</th>
+
       <th>CANTIDAD DOCUMENTOS</th>
 
       <th>USUARIO CREA</th>
@@ -18,6 +20,7 @@
         >
         <td>{{$index + 1}}</td>
         <td>{{$item->FOLIO}}</td>
+        <td>{{$item->TXT_GLOSA}}</td>
         <td>{{$item->CAN_FOLIO}}</td>
         <td>{{$item->nombre}}</td>
         <td>{{date_format(date_create($item->FECHA_CREA), 'd-m-Y h:i:s')}}</td>

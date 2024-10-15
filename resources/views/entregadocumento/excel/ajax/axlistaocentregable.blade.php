@@ -8,6 +8,7 @@
 	      <th>ITEM</th>
 	      <th>NRO OC</th>
 	      <th>PROVEEDOR</th>
+	      <th>BANCO</th>
 	      <th>COMPROBANTE ASOCIADO</th>
 	      <th>FECHA VENCIMIENTO DOC</th>
 	      <th>FECHA APROBACION ADMIN</th>
@@ -31,6 +32,7 @@
 	        <td>{{$index + 1}}</td>
 	        <td>{{$item->COD_ORDEN}}</td>
 	        <td>{{$item->TXT_EMPR_CLIENTE}}</td>
+	        <td>{{$item->TXT_CATEGORIA_BANCO}}</td>
 	        <td>{{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</td>
 	        <td>{{date_format(date_create($item->FEC_VENCIMIENTO), 'd-m-Y h:i:s')}}</td>
 	        <td>{{date_format(date_create($item->fecha_ap), 'd-m-Y h:i:s')}}</td>

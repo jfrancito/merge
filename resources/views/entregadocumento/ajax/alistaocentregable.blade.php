@@ -2,24 +2,25 @@
   <thead>
     <tr>
       <th>ITEM</th>
-      <th>UC</th>
-      <th>NRO OC</th>
-      <th>PROVEEDOR</th>
-      <th>COMPROBANTE ASOCIADO</th>
-      <th>FECHA VENCIMIENTO DOC</th>
-      <th>FECHA APROBACION ADMIN</th>
-      <th>TIPO</th>
-      <th>SUBIO VOUCHER</th>
-      <th>ORDEN INGRESO</th>
-      <th>OBLIGACION</th>
-      <th>DESCUENTO</th>
-      <th>TOTAL DESCUENTO</th>
+      <th>DOCUMENTO</th>
+
+      <th>ADICIONAL</th>
       <th>IMPORTE</th>
+      <th>DESCUENTO</th>
       <th>NETO A PAGAR</th>
       <th>
-
+        <div class="text-center be-checkbox be-checkbox-sm has-primary">
+          <input  type="checkbox"
+                  class="todo_asignar input_asignar"
+                  id="todo_asignar"
+          >
+          <label  for="todo_asignar"
+                  data-atr = "todas_asignar"
+                  class = "checkbox_asignar"                    
+                  name="todo_asignar"
+            ></label>
+        </div>
       </th>
-
     </tr>
   </thead>
   <tbody>
@@ -28,49 +29,65 @@
       <tr data_requerimiento_id = "{{$item->COD_ORDEN}}"
         >
         <td>{{$index + 1}}</td>
-        <td>{{$item->TXT_CONTACTO}}</td>
 
-        <td>{{$item->COD_ORDEN}}</td>
-        <td>{{$item->TXT_EMPR_CLIENTE}}</td>
-        <td>{{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</td>
-        <td>{{date_format(date_create($item->FEC_VENCIMIENTO), 'd-m-Y h:i:s')}}</td>
-        <td>{{date_format(date_create($item->fecha_ap), 'd-m-Y h:i:s')}}</td>
+        <td class="cell-detail sorting_1" style="position: relative;">
+          <span><b>NRO OC : </b> {{$item->COD_ORDEN}}  </span>
+          <span><b>PROVEEDOR  :</b> {{$item->TXT_EMPR_CLIENTE}}</span>
+          <span><b>COMPROBANTE ASOCIADO : </b> {{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</span>
+          <span><b>USUARIO CONTACTO : </b> {{$item->TXT_CONTACTO}}</span>
+          <span><b>FECHA VENCIMIENTO DOC: </b> {{date_format(date_create($item->FEC_VENCIMIENTO), 'd-m-Y h:i:s')}}  </span>
+          <span><b>FECHA APROBACION ADMIN  :</b>{{date_format(date_create($item->fecha_ap), 'd-m-Y h:i:s')}}</span>
 
-        <td>{{$item->IND_MATERIAL_SERVICIO}}</td>
+        </td>
 
-        <td>
+        <td class="cell-detail sorting_1" style="position: relative;">
+          <span><b>TIPO: </b> {{$item->IND_MATERIAL_SERVICIO}}  </span>
+          <span><b>BANCO  :</b>{{$item->TXT_BANCO}}</span>
+          <span><b>SUBIO VOUCHER  :</b>
             @IF($item->COD_ESTADO_VOUCHER == 'ETM0000000000008')
               SI
             @ELSE
               NO
             @ENDIF
+          </span>
+          <span><b>ORDEN INGRESO  :</b>{{$item->COD_TABLA_ASOC}}</span>
         </td>
 
 
-        <td>{{$item->COD_TABLA_ASOC}}</td>
-        <td>
-          @IF($item->CAN_DETRACCION>0)
-            DETRACION
-          @ELSE
-            @IF($item->CAN_RETENCION>0)
-              RETENCION              
-            @ENDIF
-          @ENDIF
+        <td class="cell-detail sorting_1" style="position: relative;">
+          <span><b>IMPORTE: </b> {{$item->CAN_TOTAL}}  </span>
+          <span><b>ANTICIPO  :</b>{{$item->ADELANTOS_PROVEEDOR}}</span>
         </td>
-        <td>{{$item->CAN_DSCTO}}</td>
 
-        <td>
-          @IF($item->CAN_DETRACCION>0)
-            {{$item->CAN_DETRACCION}}
-          @ELSE
-            @IF($item->CAN_RETENCION>0)
-              {{$item->CAN_RETENCION}}
+        <td class="cell-detail sorting_1" style="position: relative;">
+          <span><b>OBLIGACION: </b>           
+            @IF($item->CAN_DETRACCION>0)
+              DETRACION
             @ELSE
-              0.00                
+              @IF($item->CAN_RETENCION>0)
+                RETENCION              
+              @ENDIF
+            @ENDIF  
+          </span>
+          <span><b>DESCUENTO: </b> {{$item->CAN_DSCTO}}</span>
+          <span><b>TOTAL DESCUENTO: </b>           
+            @IF($item->CAN_DETRACCION>0)
+              {{$item->CAN_DETRACCION}}
+            @ELSE
+              @IF($item->CAN_RETENCION>0)
+                {{$item->CAN_RETENCION}}
+              @ELSE
+                0.00                
+              @ENDIF
             @ENDIF
-          @ENDIF
+          </span>
         </td>
-        <td>{{$item->CAN_TOTAL}}</td>
+
+
+
+
+
+
 
         <td><b>
           @IF($item->CAN_DETRACCION>0)

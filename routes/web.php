@@ -29,7 +29,7 @@ Route::get('/serve-file', 'FileController@serveFile')->name('serve-file');
 Route::get('/serve-filecontrato', 'FileController@serveFileContrato')->name('serve-filecontrato');
 Route::get('/serve-filecontrato-sg', 'FileController@serveFileContratoSG')->name('serve-filecontrato-sg');
 
-
+Route::get('/serve-file-modelo', 'FileController@serveFileModelo')->name('serve-file-modelo');
 
 Route::any('/registrate', 'UserController@actionRegistrate');
 Route::any('/ajax-buscar-proveedor', 'UserController@actionAjaxBuscarProveedor');
@@ -286,6 +286,9 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/eliminar-archivo-item/{tipo}/{nombrearchivo}/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionEliminarItem');
 	Route::any('/eliminar-archivo-item-contrato/{tipo}/{nombrearchivo}/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionEliminarItemContrato');
+
+
+	Route::any('/gestion-de-modelos-comprobantes/{idopcion}', 'GestionOCValidadoController@actionModelosComprobantes');
 
 
 });

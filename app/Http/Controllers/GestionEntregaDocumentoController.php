@@ -88,8 +88,6 @@ class GestionEntregaDocumentoController extends Controller
         $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA');
 
         if($operacion_id=='ORDEN_COMPRA'){
-
-
             $listadatos         =   $this->con_lista_cabecera_comprobante_entregable($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id);
         }else{
             $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id);
@@ -194,6 +192,8 @@ class GestionEntregaDocumentoController extends Controller
         $centro_id          =   $request['centro_id'];
         $operacion_id       =   $request['operacion_id'];
         $idopcion           =   $request['idopcion'];
+        $glosa              =   $request['glosa'];
+
         $cod_empresa        =   Session::get('usuario')->usuarioosiris_id;
         $respuesta          =   json_decode($request['datastring'], true);
 
@@ -219,7 +219,7 @@ class GestionEntregaDocumentoController extends Controller
             $documento->FECHA_CREA                  =   $this->fechaactual;
             $documento->OPERACION                   =   $fedocumento_encontro->OPERACION;
             $documento->COD_EMPRESA                 =   $empresa_id;
-
+            $documento->TXT_GLOSA                   =   $glosa;
             $documento->save();
             foreach($respuesta as $obj){
                 $ID_DOCUMENTO                       =   $obj['data_requerimiento_id'];
@@ -282,10 +282,12 @@ class GestionEntregaDocumentoController extends Controller
             $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
                                 ->where('COD_EMPRESA','=',$empresa_id)
                                 ->where('USUARIO_CREA','=',Session::get('usuario')->id)
+                                ->orderBy('FE_DOCUMENTO_ENTREGABLE.FECHA_CREA','DESC')
                                 ->get();
         }else{
             $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
                                 ->where('COD_EMPRESA','=',$empresa_id)
+                                ->orderBy('FE_DOCUMENTO_ENTREGABLE.FECHA_CREA','DESC')
                                 ->get();
         }
 

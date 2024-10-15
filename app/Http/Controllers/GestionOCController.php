@@ -3073,7 +3073,7 @@ class GestionOCController extends Controller
                 $procedencia       =   $request['procedencia'];
                 $fedocumento       =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
 
-
+                //dd("hola");
 
                 /**************************** VALIDAR CDR Y LEER RESPUESTA ******************************/
                 $filescdr          =   $request['DCC0000000000004'];

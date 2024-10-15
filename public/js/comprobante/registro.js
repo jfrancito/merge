@@ -32,7 +32,7 @@ $(document).ready(function(){
             content: 'Merge de Comprobante',
             buttons: {
                 confirmar: function () {
-                    //abrircargando();
+                    abrircargando();
                     $( "#formguardardatos" ).submit();
                 },
                 cancelar: function () {

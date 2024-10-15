@@ -1,5 +1,5 @@
 <div class="panel panel-default panel-contrast ver-archivos">
-  <div class="panel-heading" style="background: #1d3a6d;color: #fff;">VER ARCHIVOS PDF  
+  <div class="panel-heading" style="background: #1d3a6d;color: #fff;">MODELOS DE COMPROBANTES
   </div>
   <div class="panel-body panel-body-contrast">
         @foreach($archivospdf as $index => $item)  

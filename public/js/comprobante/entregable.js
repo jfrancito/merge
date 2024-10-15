@@ -61,19 +61,17 @@ $(document).ready(function(){
     });
 
 
-
-
-
     $(".cfedocumento").on('click','.asignarmasivo', function() {
 
         event.preventDefault();
         $('input[type=search]').val('').change();
         $("#nso_check").DataTable().search("").draw();
-
-        debugger;
+        var glosa   =   $('#glosa').val();
+        if(glosa ==''){ alerterrorajax("Ingrese una glosa."); return false;}
 
         data = dataenviar();
         if(data.length<=0){alerterrorajax('Seleccione por lo menos una fila'); return false;}
+
         var datastring = JSON.stringify(data);
         var idopcion   =   $('#idopcion').val();
         var _token                  =   $('#token').val();
@@ -97,6 +95,8 @@ $(document).ready(function(){
                                 empresa_id              : empresa_id,
                                 centro_id               : centro_id,
                                 operacion_id            : operacion_id,
+                                glosa                   : glosa,
+
                                 idopcion                : idopcion
                             };
 
