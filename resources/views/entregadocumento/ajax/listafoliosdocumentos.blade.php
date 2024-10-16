@@ -2,16 +2,14 @@
   <thead>
     <tr>
       <th>ITEM</th>
+      <th>OPERACION</th>
+
       <th>FOLIO</th>
       <th>GLOSA</th>
-
       <th>CANTIDAD DOCUMENTOS</th>
-
       <th>USUARIO CREA</th>
       <th>FECHA CREA</th>
       <th>OPCION</th>
-
-
   </thead>
   <tbody>
     @foreach($listadatos as $index => $item)
@@ -19,6 +17,7 @@
         class='dobleclickpc seleccionar'
         >
         <td>{{$index + 1}}</td>
+        <td>{{$item->OPERACION}}</td>
         <td>{{$item->FOLIO}}</td>
         <td>{{$item->TXT_GLOSA}}</td>
         <td>{{$item->CAN_FOLIO}}</td>

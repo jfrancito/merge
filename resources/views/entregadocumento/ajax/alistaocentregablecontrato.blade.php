@@ -2,24 +2,11 @@
   <thead>
     <tr>
       <th>ITEM</th>
-      <th>UC</th>
 
-      <th>NRO OC</th>
-
-
-      <th>PROVEEDOR</th>
-      <th>COMPROBANTE ASOCIADO</th>
-      <th>FECHA VENCIMIENTO DOC</th>
-      <th>FECHA APROBACION ADMIN</th>
-
-      <th>TIPO</th>
-      <th>SUBIO VOUCHER</th>
-
-      <th>ORDEN INGRESO</th>
-      <th>OBLIGACION</th>
-      <th>DESCUENTO</th>
-      <th>TOTAL DESCUENTO</th>
+      <th>DOCUMENTO</th>
+      <th>ADICIONAL</th>
       <th>IMPORTE</th>
+
       <th>NETO A PAGAR</th>
       <th>
 
@@ -32,29 +19,31 @@
     @foreach($listadatos as $index => $item)
       <tr data_requerimiento_id = "{{$item->COD_DOCUMENTO_CTBLE}}">
         <td>{{$index + 1}}</td>
-        <td>{{$item->TXT_CONTACTO}}</td>
+        <td class="cell-detail sorting_1" style="position: relative;">
+          <span><b>NRO OC : </b> {{$item->COD_DOCUMENTO_CTBLE}}  </span>
+          <span><b>PROVEEDOR  :</b> {{$item->TXT_EMPR_EMISOR}}</span>
+          <span><b>COMPROBANTE ASOCIADO : </b> {{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</span>
+          <span><b>USUARIO CONTACTO : </b> {{$item->TXT_CONTACTO}}</span>
+          <span><b>FECHA VENCIMIENTO DOC: </b> {{date_format(date_create($item->FEC_VENCIMIENTO), 'd-m-Y h:i:s')}}  </span>
+          <span><b>FECHA APROBACION ADMIN  :</b>{{date_format(date_create($item->fecha_ap), 'd-m-Y h:i:s')}}</span>
+        </td>
 
-        <td>{{$item->COD_DOCUMENTO_CTBLE}}</td>
-        <td>{{$item->TXT_EMPR_EMISOR}}</td>
-        <td>{{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</td>
-        <td>{{date_format(date_create($item->FEC_VENCIMIENTO), 'd-m-Y h:i:s')}}</td>
-        <td>{{date_format(date_create($item->fecha_ap), 'd-m-Y h:i:s')}}</td>
-
-        <td>{{$item->IND_MATERIAL_SERVICIO}}</td>
-
-        <td>
+        <td class="cell-detail sorting_1" style="position: relative;">
+          <span><b>TIPO: </b> {{$item->IND_MATERIAL_SERVICIO}}  </span>
+          <span><b>BANCO  :</b>{{$item->TXT_BANCO}}</span>
+          <span><b>SUBIO VOUCHER  :</b>
             @IF($item->COD_ESTADO_VOUCHER == 'ETM0000000000008')
               SI
             @ELSE
               NO
             @ENDIF
+          </span>
         </td>
-        
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td>{{$item->CAN_TOTAL}}</td>
+
+        <td class="cell-detail sorting_1" style="position: relative;">
+          <span><b>IMPORTE: </b> {{$item->CAN_TOTAL}}  </span>
+        </td>
+
         <td><b>{{$item->CAN_TOTAL}}</b></td>
         <td>
 

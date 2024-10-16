@@ -81,9 +81,14 @@ class GestionEntregaDocumentoController extends Controller
                 $combo_area     =   array($tp_area->COD_CATEGORIA => $tp_area->NOM_CATEGORIA);
             }
         }
-
+        $operacion_id       =   'ORDEN_COMPRA';
         //falta usuario contacto
-        $operacion_id       =   'CONTRATO';
+        $array_contrato     =   $this->array_rol_contrato();
+        if (in_array(Session::get('usuario')->rol_id, $array_contrato)) {
+            $operacion_id       =   'CONTRATO';
+        }
+        
+
         $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO');
         //$combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA');
 
