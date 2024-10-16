@@ -1694,6 +1694,7 @@ class GestionOCAdministracionController extends Controller
 
 
             //transferencia   
+            $resultado = '';
             // Verificar si la cadena contiene 'TPS' o 'TPL'
             if (strpos($ordencompra->NRO_ITT, 'TPS') !== false || strpos($ordencompra->NRO_ITT, 'TPL') !== false) {
                 $partes = explode(' / ', $ordencompra->NRO_ITT);

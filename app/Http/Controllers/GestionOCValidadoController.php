@@ -467,6 +467,8 @@ class GestionOCValidadoController extends Controller
         $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
         //transferencia   
         // Verificar si la cadena contiene 'TPS' o 'TPL'
+
+        $resultado = '';
         if (strpos($ordencompra->NRO_ITT, 'TPS') !== false || strpos($ordencompra->NRO_ITT, 'TPL') !== false) {
             $partes = explode(' / ', $ordencompra->NRO_ITT);
             $resultado = $partes[0];
