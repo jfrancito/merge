@@ -1693,6 +1693,14 @@ class GestionOCAdministracionController extends Controller
                                         ->toArray();
 
 
+            //transferencia   
+            // Verificar si la cadena contiene 'TPS' o 'TPL'
+            if (strpos($ordencompra->NRO_ITT, 'TPS') !== false || strpos($ordencompra->NRO_ITT, 'TPL') !== false) {
+                $partes = explode(' / ', $ordencompra->NRO_ITT);
+                $resultado = $partes[0];
+            }
+            $transferencia        =   CMPOrden::where('COD_ORDEN','=',$resultado)->first();    
+
             return View::make('comprobante/aprobaradmcontrato', 
                             [
                                 'fedocumento'           =>  $fedocumento,
@@ -1701,10 +1709,12 @@ class GestionOCAdministracionController extends Controller
                                 'linea'                 =>  $linea,
                                 'archivos'              =>  $archivos,
                                 'archivosanulados'      =>  $archivosanulados,
+                                'transferencia'         =>  $transferencia,
 
-                                'trabajador'    =>  $trabajador,
-                                'documentoscompra'           =>  $documentoscompra,
-                                'totalarchivos'           =>  $totalarchivos,
+
+                                'trabajador'            =>  $trabajador,
+                                'documentoscompra'      =>  $documentoscompra,
+                                'totalarchivos'         =>  $totalarchivos,
 
 
                                 'documentohistorial'    =>  $documentohistorial,
