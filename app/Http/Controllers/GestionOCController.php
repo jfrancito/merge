@@ -101,9 +101,7 @@ class GestionOCController extends Controller
 
         header('Content-Type: text/html; charset=UTF-8');
         //$path = storage_path() . "/exports/FC26-00002985.XML";
-        $path = storage_path() . "/exports/20480582561-01-FF01-22235.xml";
-
-
+        $path = storage_path() . "/exports/FACTURAE001-31920612220647.xml";
         $parser = new InvoiceParser();
         $xml = file_get_contents($path);
         $factura = $parser->parse($xml);
@@ -1006,6 +1004,12 @@ class GestionOCController extends Controller
                         if(isset($arvalidar['success'])){
 
                             if($arvalidar['success']){
+
+
+                                if (!isset($datares['estadoCp'])){
+                                    return Redirect::back()->with('errorurl', 'Hay fallas en sunat para consultar el XML');
+                                }
+
 
                                 $datares              = $arvalidar['data'];
                                 $estadoCp             = $datares['estadoCp'];
@@ -2649,6 +2653,11 @@ class GestionOCController extends Controller
 
                             if($arvalidar['success']){
 
+
+                                if (!isset($datares['estadoCp'])){
+                                    return Redirect::back()->with('errorurl', 'Hay fallas en sunat para consultar el XML');
+                                }
+
                                 $datares              = $arvalidar['data'];
                                 $estadoCp             = $datares['estadoCp'];
                                 $tablaestacp          = Estado::where('tipo','=','estadoCp')->where('codigo','=',$estadoCp)->first();
@@ -2960,6 +2969,9 @@ class GestionOCController extends Controller
                         }else{
                             $token           =      $this->generartoken_is();
                         }
+
+                        //dd($token);
+
                         $rvalidar = $this->validar_xml( $token,
                                                         $fedocumento->ID_CLIENTE,
                                                         $fedocumento->RUC_PROVEEDOR,
@@ -2971,9 +2983,15 @@ class GestionOCController extends Controller
 
                         $arvalidar = json_decode($rvalidar, true);
 
+                        //dd($arvalidar);
+
                         if(isset($arvalidar['success'])){
 
                             if($arvalidar['success']){
+
+                                if (!isset($datares['estadoCp'])){
+                                    return Redirect::back()->with('errorurl', 'Hay fallas en sunat para consultar el XML');
+                                }
 
                                 $datares              = $arvalidar['data'];
                                 $estadoCp             = $datares['estadoCp'];

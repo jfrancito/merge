@@ -428,6 +428,12 @@ class GestionDocumentoController extends Controller
 
                             if($arvalidar['success']){
 
+
+                                if (!isset($datares['estadoCp'])){
+                                    return Redirect::back()->with('errorurl', 'Hay fallas en sunat para consultar el XML');
+                                }
+
+
                                 $datares              = $arvalidar['data'];
                                 $estadoCp             = $datares['estadoCp'];
                                 $tablaestacp          = Estado::where('tipo','=','estadoCp')->where('codigo','=',$estadoCp)->first();
