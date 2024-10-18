@@ -6,8 +6,11 @@
 	  <thead>
 	    <tr>
 	      <th>ITEM</th>
-	      <th>NRO OC</th>
+	      <th>NRO CONTRATO</th>
+	      <th>DOCUMENTO</th>
+
 	      <th>PROVEEDOR</th>
+	      <th>BANCO</th>
 	      <th>COMPROBANTE ASOCIADO</th>
 	      <th>FECHA VENCIMIENTO DOC</th>
 	      <th>FECHA APROBACION ADMIN</th>
@@ -23,11 +26,16 @@
 	  </thead>
 	  <tbody>
 	  	@php $monto_total =  0; @endphp
-	    @foreach($listasaldoinicial as $index => $item)
+	    @foreach($listadatos as $index => $item)
+
+
+
 	      <tr>
 	        <td>{{$index + 1}}</td>
 	        <td>{{$item->COD_DOCUMENTO_CTBLE}}</td>
+	        <td>{{$item->NRO_SERIE}} - {{$item->NRO_DOC}}<</td>
 	        <td>{{$item->TXT_EMPR_EMISOR}}</td>
+	        <td>{{$item->TXT_CATEGORIA_BANCO}}</td>
 	        <td>{{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</td>
 	        <td>{{date_format(date_create($item->FEC_VENCIMIENTO), 'd-m-Y h:i:s')}}</td>
 	        <td>{{date_format(date_create($item->fecha_ap), 'd-m-Y h:i:s')}}</td>
@@ -39,13 +47,45 @@
 	              NO
 	            @ENDIF
 	        </td>
-	        <td></td>
-	        <td></td>
-	        <td></td>
-	        <td></td>
+	        <td>{{$item->COD_TABLA_ASOC}}</td>
+	        <td>
+	          @IF($item->CAN_DETRACCION>0)
+	            DETRACION
+	          @ELSE
+	            @IF($item->CAN_RETENCION>0)
+	              RETENCION              
+	            @ENDIF
+	          @ENDIF
+	        </td>
+	        <td>{{$item->CAN_DSCTO}}</td>
+
+	        <td>
+	          @IF($item->CAN_DETRACCION>0)
+	            {{$item->CAN_DETRACCION}}
+	          @ELSE
+	            @IF($item->CAN_RETENCION>0)
+	              {{$item->CAN_RETENCION}}
+	            @ELSE
+	              0.00                
+	            @ENDIF
+	          @ENDIF
+	        </td>
 	        <td>{{$item->CAN_TOTAL}}</td>
-	        <td><b>{{$item->CAN_TOTAL}}</b></td>
-@php $monto_total  = $monto_total + ($item->CAN_TOTAL); @endphp
+
+	        <td>
+	          @IF($item->CAN_DETRACCION>0)
+	            {{$item->CAN_TOTAL - $item->CAN_DETRACCION}}
+	            @php $monto_total  = $monto_total + ($item->CAN_TOTAL - $item->CAN_DETRACCION); @endphp
+	          @ELSE
+	            @IF($item->CAN_RETENCION>0)
+	              	{{$item->CAN_TOTAL - $item->CAN_RETENCION}}
+	            	@php $monto_total  = $monto_total + ($item->CAN_TOTAL - $item->CAN_RETENCION); @endphp
+	            @ELSE
+	              	{{$item->CAN_TOTAL}} 
+	            	@php $monto_total  = $monto_total + ($item->CAN_TOTAL); @endphp
+	            @ENDIF
+	          @ENDIF
+	        </td>
 	      </tr>                    
 	    @endforeach
 	  </tbody>
