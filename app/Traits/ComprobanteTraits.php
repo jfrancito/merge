@@ -1156,7 +1156,7 @@ trait ComprobanteTraits
 
 
     private function array_usuario_jefes() {
-        $array = ['1CIX00000072'];
+        $array = ['1CIX00000072','1CIX00000075','1CIX00000073','1CIX00000188'];
         return $array;
     }
 
