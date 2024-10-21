@@ -2439,7 +2439,7 @@ trait ComprobanteTraits
                                         ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
                                         ->where('CMP.DOCUMENTO_CTBLE.COD_EMPR','=',$empresa_id)
                                         ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
-                                        ->whereIn('CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD',$array_usuarios)
+                                        //->whereIn('CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD',$array_usuarios)
                                         ->select(
                                                     DB::raw('CMP.DOCUMENTO_CTBLE.* ,FE_DOCUMENTO.*,documentos.NRO_SERIE,documentos.FEC_VENCIMIENTO,documentos.NRO_DOC,FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_VOUCHER, FE_DOCUMENTO.TXT_CATEGORIA_BANCO AS TXT_BANCO')
                                                     //DB::raw("CMP.OBTENER_ADELANTOS_PROVEEDOR(CMP.DOCUMENTO_CTBLE.COD_EMPR, CMP.DOCUMENTO_CTBLE.COD_CENTRO, '{$fecha_corte}', CMP.DOCUMENTO_CTBLE.COD_CONTRATO, CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA) AS ADELANTOS_PROVEEDOR,FE_DOCUMENTO.TXT_CATEGORIA_BANCO AS TXT_BANCO")
