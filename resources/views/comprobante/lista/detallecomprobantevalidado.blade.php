@@ -165,7 +165,7 @@
                                     <div class='subtitulomerge @if($fedocumento->ind_total == 1) msjexitoso @else msjerror @endif'>
                                         <!-- <b>xml =></b> {{number_format($fedocumento->TOTAL_VENTA_ORIG+$fedocumento->PERCEPCION+$fedocumento->MONTO_RETENCION, 4, '.', ',')}} -->
 
-                                        <b>xml =></b> {{number_format($fedocumento->TOTAL_VENTA_ORIG, 4, '.', ',')}}
+                                        <b>xml =></b> {{number_format($fedocumento->TOTAL_VENTA_ORIG+$fedocumento->PERCEPCION, 4, '.', ',')}}
 
                                     </div>
                                 </div>
