@@ -2020,7 +2020,7 @@ trait ComprobanteTraits
 		//total
 
         $total_1 = $ordencompra->CAN_TOTAL;
-        $total_2 = $fedocumento->TOTAL_VENTA_ORIG+$fedocumento->PERCEPCION+$fedocumento->MONTO_RETENCION;
+        $total_2 = $fedocumento->TOTAL_VENTA_ORIG;//+$fedocumento->PERCEPCION+$fedocumento->MONTO_RETENCION;
         $tt_totales = round(abs($total_1 - $total_2), 2);
 
         //dd($tt_totales);

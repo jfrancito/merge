@@ -2157,6 +2157,10 @@ class GestionOCController extends Controller
                 array_push($array_guias,$array_nuevo);            }
         }
 
+        $arraybancos            =   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
+        $combobancos            =   array('' => "Seleccione Entidad Bancaria") + $arraybancos;
+
+
         $combodocumento             =   array('DCC0000000000002' => 'FACTURA ELECTRONICA' , 'DCC0000000000013' => 'RECIBO POR HONORARIO');
         $documento_id               =   'DCC0000000000002';
         $funcion                    =   $this;
@@ -2164,6 +2168,8 @@ class GestionOCController extends Controller
         return View::make('comprobante/registrocomprobantecontratoadministrator',
                          [
                             'ordencompra'           =>  $ordencompra,
+
+                            'combobancos'           =>  $combobancos,
                             'detalleordencompra'    =>  $detalleordencompra,
                             'fedocumento'           =>  $fedocumento,
                             'detallefedocumento'    =>  $detallefedocumento,
