@@ -1776,16 +1776,32 @@ trait ComprobanteTraits
 
 	private function con_lista_cabecera_comprobante_total_gestion_observados($cliente_id) {
 
+        $rol            =       WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
+        if($rol->ind_uc == 1){
+
+        $listadatos     =   FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+                            ->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                            ->where('FE_DOCUMENTO.ind_observacion','=','1')
+                            ->where('FE_DOCUMENTO.area_observacion','<>','UCO')
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                            ->get();
+
+        }else{
+
+        $listadatos     =   FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+                            //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                            ->where('FE_DOCUMENTO.ind_observacion','=','1')
+                            ->where('FE_DOCUMENTO.area_observacion','<>','UCO')
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                            ->get();
+        }
 
         
-		$listadatos 	= 	FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
-							->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
-							->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-							->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-							->where('FE_DOCUMENTO.ind_observacion','=','1')
-                            ->where('FE_DOCUMENTO.area_observacion','<>','UCO')
-							->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
-							->get();
+
 
 	 	return  $listadatos;
 	}
@@ -2383,7 +2399,7 @@ trait ComprobanteTraits
                                     ->select(
                                         DB::raw('CMP.Orden.*, FE_DOCUMENTO.*, documentos.NRO_SERIE, documentos.FEC_VENCIMIENTO, documentos.NRO_DOC, oi.COD_TABLA_ASOC, FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_VOUCHER, FE_DOCUMENTO.TXT_CATEGORIA_BANCO AS TXT_BANCO'),
                                         // Aquí usamos los campos de la tabla CMP.Orden para los parámetros de la función
-                                        DB::raw("CMP.OBTENER_ADELANTOS_PROVEEDOR(CMP.Orden.COD_EMPR, CMP.Orden.COD_CENTRO, '{$fecha_corte}', CMP.Orden.COD_CONTRATO, CMP.Orden.COD_CATEGORIA_MONEDA) AS ADELANTOS_PROVEEDOR")
+                                        DB::raw("CMP.OBTENER_ADELANTOS_PROVEEDOR(CMP.Orden.COD_EMPR, '', '{$fecha_corte}', CMP.Orden.COD_CONTRATO, CMP.Orden.COD_CATEGORIA_MONEDA) AS ADELANTOS_PROVEEDOR")
                                     )
                                     ->orderBy('documentos.FEC_VENCIMIENTO','asc')
                                     ->get();

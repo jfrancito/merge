@@ -655,7 +655,8 @@ class GestionUsuarioContactoController extends Controller
 
             $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','1')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
-
+            $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+       
 
             return View::make('comprobante/observaruc', 
                             [
@@ -666,6 +667,7 @@ class GestionUsuarioContactoController extends Controller
                                 'detallefedocumento'    =>  $detallefedocumento,
                                 'documentohistorial'    =>  $documentohistorial,
                                 'archivos'              =>  $archivos,
+                                'archivosanulados'      =>  $archivosanulados,
                                 'tarchivos'             =>  $tarchivos,
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
