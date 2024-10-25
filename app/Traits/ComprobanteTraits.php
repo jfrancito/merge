@@ -1194,11 +1194,9 @@ trait ComprobanteTraits
                                 ->EstadoFE($estado_id)
                                 ->whereIn('CMP.Orden.COD_USUARIO_CREA_AUD',$array_usuarios)
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA'))
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA,FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_UC'))
                                 ->orderBy('fecha_uc','asc')
                                 ->get();
-
-
 
 
         }else{
@@ -1215,7 +1213,7 @@ trait ComprobanteTraits
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA'))
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA,FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_UC'))
                                 ->orderBy('fecha_uc','asc')
                                 ->get();
 

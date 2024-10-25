@@ -922,7 +922,10 @@ class GestionOCContabilidadController extends Controller
                             );
 
                 //LE LLEGA AL USUARIO DE CONTACTO
-                $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+                $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)
+                                        ->where('TXT_TELEFONO','<>','')
+                                        ->first();
+
                 $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
                 $mensaje            =   'COMPROBANTE OBSERVADO: '.$fedocumento->ID_DOCUMENTO
                                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
@@ -934,7 +937,9 @@ class GestionOCContabilidadController extends Controller
                 if(1==0){
                     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
                 }else{
-                    $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                    if(count($trabajador)>0){
+                        $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,''); 
+                    }
                     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
                 }  
 

@@ -19,7 +19,7 @@
           <span><b>DOCUMENTO : </b>{{$item->RUC_PROVEEDOR}}</span>
           <span><b>PROVEEDOR : </b>{{$item->TXT_EMPR_CLIENTE}} </span>
           <span><b>TOTAL : </b> {{$item->CAN_TOTAL}}</span>
-          <span><b>USUARIO CONTACTO : </b> {{$item->TXT_CONTACTO}}</span>
+          <span><b>USUARIO CONTACTO : </b> {{$item->TXT_CONTACTO_UC}}</span>
           <span><b>AREA : </b> {{$item->AREA}}</span>
           <span><b>FOLIO : </b> {{$item->FOLIO}}</span>
           <span><b>H. OBSERVACION : </b> {{$item->TXT_OBSERVADO}}</span>
