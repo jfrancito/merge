@@ -1220,12 +1220,21 @@ class GestionOCAdministracionController extends Controller
                         ->get();
                     // Convertir el resultado en un array para poder insertarlo más adelante
                     $dataToInsertd = $referenciaAsocQueryd->toArray();
-
-
-
-
                     // Paso 2: Insertar los datos en la segunda base de datos
                     DB::connection($conexionbd)->table('FE_DETALLE_DOCUMENTO')->insert($dataToInsertd);
+
+
+                    //FE_FORMAPAGO
+                    $referenciaAsocQueryfp = FeFormaPago::select('*')
+                        ->where('ID_DOCUMENTO', '=', $orden->COD_ORDEN)
+                        ->get();
+                    // Convertir el resultado en un array para poder insertarlo más adelante
+                    $dataToInsertfp = $referenciaAsocQueryfp->toArray();
+
+                    // Paso 2: Insertar los datos en la segunda base de datos
+                    DB::connection($conexionbd)->table('FE_FORMAPAGO')->insert($dataToInsertfp);
+
+
 
                 }
 

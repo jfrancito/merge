@@ -50,7 +50,95 @@ trait ComprobanteTraits
 
 
                 //ORDEN DE COMPRA CREDITO
-                DB::table('CMP.DOCUMENTO_CTBLE')
+                    DB::table('CMP.DOCUMENTO_CTBLE')
+                    ->join('CMP.REFERENCIA_ASOC', function($join) {
+                        $join->on('CMP.REFERENCIA_ASOC.COD_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE');
+                    })
+                    ->join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA')
+                    ->join('FE_FORMAPAGO', function($join) {
+                        $join->on('FE_FORMAPAGO.ID_DOCUMENTO', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
+                             ->on('FE_FORMAPAGO.DOCUMENTO_ITEM', '=', 'FE_DOCUMENTO.DOCUMENTO_ITEM');
+                    })
+                    ->join('CMP.CATEGORIA', 'CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_PAGO', '=', 'CMP.CATEGORIA.COD_CATEGORIA')
+                    ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000005', 'ETM0000000000008'])
+                    ->where('FE_DOCUMENTO.OPERACION', 'ORDEN_COMPRA')
+                    ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', 'CMP.DOCUMENTO_CTBLE')
+                    ->whereRaw('DATEDIFF(DAY, FE_DOCUMENTO.FEC_VENTA, FE_FORMAPAGO.FECHA_PAGO) <> DATEDIFF(DAY, CMP.DOCUMENTO_CTBLE.FEC_VENTA, CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO)')
+                    ->where('FE_DOCUMENTO.FORMA_PAGO', 'Credito')
+                    ->where('FE_FORMAPAGO.ID_CUOTA', 'like', '%Cuota%')
+                    ->update([
+                        'CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO' => DB::raw('FE_FORMAPAGO.FECHA_PAGO'),
+                        'CMP.DOCUMENTO_CTBLE.FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
+                    ]);
+
+                    //ORDEN DE COMPRA CONTADO
+                    DB::table('CMP.DOCUMENTO_CTBLE')
+                    ->join('CMP.REFERENCIA_ASOC', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                    ->join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA')
+                    ->join('CMP.CATEGORIA', 'CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_PAGO', '=', 'CMP.CATEGORIA.COD_CATEGORIA')
+                    ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000005', 'ETM0000000000008'])
+                    ->where('FE_DOCUMENTO.OPERACION', 'ORDEN_COMPRA')
+                    ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', 'CMP.DOCUMENTO_CTBLE')
+                    ->where('FE_DOCUMENTO.FORMA_PAGO', 'Contado')
+                    ->whereRaw('CMP.CATEGORIA.COD_CTBLE <> DATEDIFF(DAY, CMP.DOCUMENTO_CTBLE.FEC_EMISION, CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO)')
+                    ->update([
+                        'CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO' => DB::raw('CMP.DOCUMENTO_CTBLE.FEC_EMISION'),
+                        'CMP.DOCUMENTO_CTBLE.FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
+                    ]);
+
+
+                    //////////////////////////CONTRATO
+
+                    $lista = DB::table('CMP.DOCUMENTO_CTBLE')
+                    ->join('CMP.REFERENCIA_ASOC', function($join) {
+                        $join->on('CMP.REFERENCIA_ASOC.COD_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE');
+                    })
+                    ->join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA')
+                    ->join('FE_FORMAPAGO', function($join) {
+                        $join->on('FE_FORMAPAGO.ID_DOCUMENTO', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
+                             ->on('FE_FORMAPAGO.DOCUMENTO_ITEM', '=', 'FE_DOCUMENTO.DOCUMENTO_ITEM');
+                    })
+                    ->join('CMP.CATEGORIA', 'CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_PAGO', '=', 'CMP.CATEGORIA.COD_CATEGORIA')
+                    ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000005', 'ETM0000000000008'])
+                    ->where('FE_DOCUMENTO.OPERACION', 'CONTRATO')
+                    ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', 'CMP.DOCUMENTO_CTBLE')
+                    ->whereRaw('DATEDIFF(DAY, FE_DOCUMENTO.FEC_VENTA, FE_FORMAPAGO.FECHA_PAGO) <> DATEDIFF(DAY, CMP.DOCUMENTO_CTBLE.FEC_VENTA, CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO)')
+                    ->where('FE_DOCUMENTO.FORMA_PAGO', 'Credito')
+                    ->where('FE_FORMAPAGO.ID_CUOTA', 'like', '%Cuota%')->get();
+
+                    dd($lista);
+
+
+                    // ->update([
+                    //     'CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO' => DB::raw('FE_FORMAPAGO.FECHA_PAGO'),
+                    //     'CMP.DOCUMENTO_CTBLE.FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
+                    // ]);
+
+                    //ORDEN DE COMPRA CONTADO
+                    DB::table('CMP.DOCUMENTO_CTBLE')
+                    ->join('CMP.REFERENCIA_ASOC', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                    ->join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA')
+                    ->join('CMP.CATEGORIA', 'CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_PAGO', '=', 'CMP.CATEGORIA.COD_CATEGORIA')
+                    ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000005', 'ETM0000000000008'])
+                    ->where('FE_DOCUMENTO.OPERACION', 'CONTRATO')
+                    ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', 'CMP.DOCUMENTO_CTBLE')
+                    ->where('FE_DOCUMENTO.FORMA_PAGO', 'Contado')
+                    ->whereRaw('CMP.CATEGORIA.COD_CTBLE <> DATEDIFF(DAY, CMP.DOCUMENTO_CTBLE.FEC_EMISION, CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO)')
+                    ->update([
+                        'CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO' => DB::raw('CMP.DOCUMENTO_CTBLE.FEC_EMISION'),
+                        'CMP.DOCUMENTO_CTBLE.FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
+                    ]);
+
+
+
+
+
+
+
+                    //BELLAVISTA
+
+
+                    DB::connection('sqlsrv_b')->table('CMP.DOCUMENTO_CTBLE')
                     ->join('CMP.REFERENCIA_ASOC', function($join) {
                         $join->on('CMP.REFERENCIA_ASOC.COD_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE');
                     })
@@ -72,30 +160,62 @@ trait ComprobanteTraits
                     ]);
 
                     //ORDEN DE COMPRA CONTADO
-                    DB::table('CMP.DOCUMENTO_CTBLE')
-                        ->join('CMP.REFERENCIA_ASOC', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
-                        ->join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA')
-                        ->join('CMP.CATEGORIA', 'CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_PAGO', '=', 'CMP.CATEGORIA.COD_CATEGORIA')
-                        ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000005', 'ETM0000000000008'])
-                        ->where('FE_DOCUMENTO.OPERACION', 'ORDEN_COMPRA')
-                        ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', 'CMP.DOCUMENTO_CTBLE')
-                        ->where('FE_DOCUMENTO.FORMA_PAGO', 'Contado')
-                        ->whereRaw('CMP.CATEGORIA.COD_CTBLE <> DATEDIFF(DAY, CMP.DOCUMENTO_CTBLE.FEC_EMISION, CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO)')
-                        ->update([
-                            'CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO' => DB::raw('CMP.DOCUMENTO_CTBLE.FEC_EMISION'),
-                            'CMP.DOCUMENTO_CTBLE.FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
-                        ]);
+                    DB::connection('sqlsrv_b')->table('CMP.DOCUMENTO_CTBLE')
+                    ->join('CMP.REFERENCIA_ASOC', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                    ->join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA')
+                    ->join('CMP.CATEGORIA', 'CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_PAGO', '=', 'CMP.CATEGORIA.COD_CATEGORIA')
+                    ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000005', 'ETM0000000000008'])
+                    ->where('FE_DOCUMENTO.OPERACION', 'ORDEN_COMPRA')
+                    ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', 'CMP.DOCUMENTO_CTBLE')
+                    ->where('FE_DOCUMENTO.FORMA_PAGO', 'Contado')
+                    ->whereRaw('CMP.CATEGORIA.COD_CTBLE <> DATEDIFF(DAY, CMP.DOCUMENTO_CTBLE.FEC_EMISION, CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO)')
+                    ->update([
+                        'CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO' => DB::raw('CMP.DOCUMENTO_CTBLE.FEC_EMISION'),
+                        'CMP.DOCUMENTO_CTBLE.FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
+                    ]);
 
 
 
-                dd("SE REALIZO NORMAL");
+                    //RIOJA
 
 
-                // ->update([
-                //     'CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO' => DB::raw('FE_FORMAPAGO.FECHA_PAGO')
-                // ]);
+                    DB::connection('sqlsrv_r')->table('CMP.DOCUMENTO_CTBLE')
+                    ->join('CMP.REFERENCIA_ASOC', function($join) {
+                        $join->on('CMP.REFERENCIA_ASOC.COD_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE');
+                    })
+                    ->join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA')
+                    ->join('FE_FORMAPAGO', function($join) {
+                        $join->on('FE_FORMAPAGO.ID_DOCUMENTO', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
+                             ->on('FE_FORMAPAGO.DOCUMENTO_ITEM', '=', 'FE_DOCUMENTO.DOCUMENTO_ITEM');
+                    })
+                    ->join('CMP.CATEGORIA', 'CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_PAGO', '=', 'CMP.CATEGORIA.COD_CATEGORIA')
+                    ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000005', 'ETM0000000000008'])
+                    ->where('FE_DOCUMENTO.OPERACION', 'ORDEN_COMPRA')
+                    ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', 'CMP.DOCUMENTO_CTBLE')
+                    ->whereRaw('DATEDIFF(DAY, FE_DOCUMENTO.FEC_VENTA, FE_FORMAPAGO.FECHA_PAGO) <> DATEDIFF(DAY, CMP.DOCUMENTO_CTBLE.FEC_EMISION, CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO)')
+                    ->where('FE_DOCUMENTO.FORMA_PAGO', 'Credito')
+                    ->where('FE_FORMAPAGO.ID_CUOTA', 'like', '%Cuota%')
+                    ->update([
+                        'CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO' => DB::raw('FE_FORMAPAGO.FECHA_PAGO'),
+                        'CMP.DOCUMENTO_CTBLE.FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
+                    ]);
 
-        //print_r('Exitoso');
+                    //ORDEN DE COMPRA CONTADO
+                    DB::connection('sqlsrv_r')->table('CMP.DOCUMENTO_CTBLE')
+                    ->join('CMP.REFERENCIA_ASOC', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                    ->join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA')
+                    ->join('CMP.CATEGORIA', 'CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_PAGO', '=', 'CMP.CATEGORIA.COD_CATEGORIA')
+                    ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000005', 'ETM0000000000008'])
+                    ->where('FE_DOCUMENTO.OPERACION', 'ORDEN_COMPRA')
+                    ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', 'CMP.DOCUMENTO_CTBLE')
+                    ->where('FE_DOCUMENTO.FORMA_PAGO', 'Contado')
+                    ->whereRaw('CMP.CATEGORIA.COD_CTBLE <> DATEDIFF(DAY, CMP.DOCUMENTO_CTBLE.FEC_EMISION, CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO)')
+                    ->update([
+                        'CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO' => DB::raw('CMP.DOCUMENTO_CTBLE.FEC_EMISION'),
+                        'CMP.DOCUMENTO_CTBLE.FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
+                    ]);
+
+                    dd("SE REALIZO TODA LA OPERACION");
 
     }
 

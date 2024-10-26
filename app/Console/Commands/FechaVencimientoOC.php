@@ -12,7 +12,7 @@ use App\Traits\UserTraits;
 use App\Traits\ComprobanteTraits;
 
 
-class NotificacionOC extends Command
+class FechaVencimientoOC extends Command
 {
     use UserTraits;
     use ComprobanteTraits;
@@ -22,14 +22,14 @@ class NotificacionOC extends Command
      *
      * @var string
      */
-    protected $signature = 'notificacion:oc';
+    protected $signature = 'fechavencimiento:oc';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Notificacion OC';
+    protected $description = 'Fecha Vencimineto OC';
 
     /**
      * Create a new command instance.
@@ -50,23 +50,6 @@ class NotificacionOC extends Command
     {
         set_time_limit(0);
         /****************************************************************************/
-        $this->envio_correo_confirmacion();
-        $this->orden_ingreso_ejecutada();
-        $this->sunat_cdr();
-        $this->ejecutar_orden_ingreso();
-        $this->sunat_cdr_contrato();
-
-        // COMENTANDO NO VALE
-        // $this->envio_correo_uc();
-        // //CONTABILIDAD
-        // $this->envio_correo_co();
-        // //ADMINISTRACION
-        // $this->envio_correo_adm();
-        // //PROVISIONAR
-        // $this->envio_correo_apcli();
-        // //BAJA COMPROBANTE
-        // $this->envio_correo_baja();
-
-
+        //$this->cambiar_fecha_vencimiento();
     }
 }

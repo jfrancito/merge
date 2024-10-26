@@ -101,7 +101,7 @@ class GestionOCController extends Controller
 
         header('Content-Type: text/html; charset=UTF-8');
         //$path = storage_path() . "/exports/FC26-00002985.XML";
-        $path = storage_path() . "/exports/FACTURAE001-31920612220647.xml";
+        $path = storage_path() . "/exports/FACTURAE001-105120561239381.xml";
         $parser = new InvoiceParser();
         $xml = file_get_contents($path);
         $factura = $parser->parse($xml);
@@ -2452,13 +2452,13 @@ class GestionOCController extends Controller
                         }
 
 
+                        //dd($factura->getClient()->getnumDoc());
+                        //dd(Session::get('empresas')->NRO_DOCUMENTO);
                         //VALIDAR QUE EL XML SEA DE LA EMPRESA
-                        if($factura->getClient()->getnumDoc()!= Session::get('empresas')->NRO_DOCUMENTO){
-                            return Redirect::back()->with('errorurl', 'El xml no corresponde a la empresa '.Session::get('NOM_EMPR')->NRO_DOCUMENTO);
+                        if(strval($factura->getClient()->getnumDoc()) != strval(Session::get('empresas')->NRO_DOCUMENTO)){
+                            return Redirect::back()->with('errorurl', 'El xml no corresponde a la empresa '.Session::get('empresas')->NRO_DOCUMENTO);
                         }
-
-
-
+                        //dd($factura);
                         /****************************************  DIAS DE CREDITO *****************************************/
                         $diasdefactura = 0;
                         $tp = CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
