@@ -45,6 +45,62 @@ trait ComprobanteTraits
 {
 
 
+
+    private function cambiar_fecha_vencimiento() {
+
+
+                //ORDEN DE COMPRA CREDITO
+                DB::table('CMP.DOCUMENTO_CTBLE')
+                    ->join('CMP.REFERENCIA_ASOC', function($join) {
+                        $join->on('CMP.REFERENCIA_ASOC.COD_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE');
+                    })
+                    ->join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA')
+                    ->join('FE_FORMAPAGO', function($join) {
+                        $join->on('FE_FORMAPAGO.ID_DOCUMENTO', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
+                             ->on('FE_FORMAPAGO.DOCUMENTO_ITEM', '=', 'FE_DOCUMENTO.DOCUMENTO_ITEM');
+                    })
+                    ->join('CMP.CATEGORIA', 'CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_PAGO', '=', 'CMP.CATEGORIA.COD_CATEGORIA')
+                    ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000005', 'ETM0000000000008'])
+                    ->where('FE_DOCUMENTO.OPERACION', 'ORDEN_COMPRA')
+                    ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', 'CMP.DOCUMENTO_CTBLE')
+                    ->whereRaw('DATEDIFF(DAY, FE_DOCUMENTO.FEC_VENTA, FE_FORMAPAGO.FECHA_PAGO) <> DATEDIFF(DAY, CMP.DOCUMENTO_CTBLE.FEC_EMISION, CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO)')
+                    ->where('FE_DOCUMENTO.FORMA_PAGO', 'Credito')
+                    ->where('FE_FORMAPAGO.ID_CUOTA', 'like', '%Cuota%')
+                    ->update([
+                        'CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO' => DB::raw('FE_FORMAPAGO.FECHA_PAGO'),
+                        'CMP.DOCUMENTO_CTBLE.FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
+                    ]);
+
+                    //ORDEN DE COMPRA CONTADO
+                    DB::table('CMP.DOCUMENTO_CTBLE')
+                        ->join('CMP.REFERENCIA_ASOC', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                        ->join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA')
+                        ->join('CMP.CATEGORIA', 'CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_PAGO', '=', 'CMP.CATEGORIA.COD_CATEGORIA')
+                        ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000005', 'ETM0000000000008'])
+                        ->where('FE_DOCUMENTO.OPERACION', 'ORDEN_COMPRA')
+                        ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', 'CMP.DOCUMENTO_CTBLE')
+                        ->where('FE_DOCUMENTO.FORMA_PAGO', 'Contado')
+                        ->whereRaw('CMP.CATEGORIA.COD_CTBLE <> DATEDIFF(DAY, CMP.DOCUMENTO_CTBLE.FEC_EMISION, CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO)')
+                        ->update([
+                            'CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO' => DB::raw('CMP.DOCUMENTO_CTBLE.FEC_EMISION'),
+                            'CMP.DOCUMENTO_CTBLE.FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
+                        ]);
+
+
+
+                dd("SE REALIZO NORMAL");
+
+
+                // ->update([
+                //     'CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO' => DB::raw('FE_FORMAPAGO.FECHA_PAGO')
+                // ]);
+
+        //print_r('Exitoso');
+
+    }
+
+
+
     private function lectura_cdr_archivo($idoc,$path,$prefijocarperta,$NRO_DOCUMENTO_CLIENTE) {
 
         $fedocumento      =   FeDocumento::where('SERIE','like','F%')->where('CODIGO_CDR','=','')->first();
@@ -1692,15 +1748,33 @@ trait ComprobanteTraits
 
     private function con_lista_cabecera_comprobante_total_gestion_observados_oc_proveedor($cliente_id) {
 
-        $listadatos     =   FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
-                            //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
-                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                            ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                            ->where('FE_DOCUMENTO.ind_observacion','=','1')
-                            ->where('COD_EMPR_CLIENTE','=',$cliente_id)
-                            ->where('FE_DOCUMENTO.area_observacion','=','UCO')
-                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
-                            ->get();
+        if(Session::get('usuario')->id== '1CIX00000001'){
+
+            $listadatos     =   FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+                                //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                                ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                ->where('FE_DOCUMENTO.ind_observacion','=','1')
+                                //->where('COD_EMPR_CLIENTE','=',$cliente_id)
+                                ->where('FE_DOCUMENTO.area_observacion','=','UCO')
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                ->get();
+
+        }else{
+
+            $listadatos     =   FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+                                //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                                ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                ->where('FE_DOCUMENTO.ind_observacion','=','1')
+                                ->where('COD_EMPR_CLIENTE','=',$cliente_id)
+                                ->where('FE_DOCUMENTO.area_observacion','=','UCO')
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                ->get();
+
+        }
+
+
 
         return  $listadatos;
     }

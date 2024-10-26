@@ -412,12 +412,14 @@ class GestionUsuarioContactoController extends Controller
                                         ->get();
 
             $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','1')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
-
+            $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
 
             return View::make('comprobante/observarucprovedor', 
                             [
                                 'fedocumento'           =>  $fedocumento,
+                                'archivosanulados'           =>  $archivosanulados,
+                                
                                 'ordencompra'           =>  $ordencompra,
                                 'linea'                 =>  $linea,
                                 'detalleordencompra'    =>  $detalleordencompra,
