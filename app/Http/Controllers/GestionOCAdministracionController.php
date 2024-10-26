@@ -1225,11 +1225,19 @@ class GestionOCAdministracionController extends Controller
 
 
                     //FE_FORMAPAGO
-                    $referenciaAsocQueryfp = FeFormaPago::select('*')
+                    $referenciaAsocQueryfp = FeFormaPago::select('ID_DOCUMENTO','DOCUMENTO_ITEM','ID_CUOTA','ID_MONEDA','MONTO_CUOTA','FECHA_PAGO')
                         ->where('ID_DOCUMENTO', '=', $orden->COD_ORDEN)
                         ->get();
                     // Convertir el resultado en un array para poder insertarlo más adelante
-                    $dataToInsertfp = $referenciaAsocQueryfp->toArray();
+                    //$dataToInsertfp = $referenciaAsocQueryfp->toArray();
+
+
+                    $dataToInsertfp = $referenciaAsocQueryfp->map(function ($item) {
+                        if ($item['FECHA_PAGO']) {
+                            $item['FECHA_PAGO'] = date('Ymd', strtotime($item['FECHA_PAGO']));
+                        }
+                        return $item;
+                    })->toArray();
 
                     // Paso 2: Insertar los datos en la segunda base de datos
                     DB::connection($conexionbd)->table('FE_FORMAPAGO')->insert($dataToInsertfp);
