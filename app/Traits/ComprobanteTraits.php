@@ -863,51 +863,45 @@ trait ComprobanteTraits
 
                 $arvalidar = json_decode($rvalidar, true);
                 if(isset($arvalidar['success'])){
-
                     if($arvalidar['success']){
-
-
-
-
 
                         $datares              = $arvalidar['data'];
 
-                        if (!isset($datares['estadoCp'])){
-                            return Redirect::back()->with('errorurl', 'Hay fallas en sunat para consultar el XML');
-                        }
-                        
-                        $estadoCp             = $datares['estadoCp'];
-                        $tablaestacp          = Estado::where('tipo','=','estadoCp')->where('codigo','=',$estadoCp)->first();
+                        if (isset($datares['estadoCp'])){
+                            $estadoCp             = $datares['estadoCp'];
+                            $tablaestacp          = Estado::where('tipo','=','estadoCp')->where('codigo','=',$estadoCp)->first();
 
-                        $estadoRuc            = '';
-                        $txtestadoRuc         = '';
-                        $estadoDomiRuc        = '';
-                        $txtestadoDomiRuc     = '';
+                            $estadoRuc            = '';
+                            $txtestadoRuc         = '';
+                            $estadoDomiRuc        = '';
+                            $txtestadoDomiRuc     = '';
 
-                        if(isset($datares['estadoRuc'])){
-                            $tablaestaruc          = Estado::where('tipo','=','estadoRuc')->where('codigo','=',$datares['estadoRuc'])->first();
-                            $estadoRuc             = $tablaestaruc->codigo;
-                            $txtestadoRuc          = $tablaestaruc->nombre;
-                        }
-                        if(isset($datares['condDomiRuc'])){
-                            $tablaestaDomiRuc       = Estado::where('tipo','=','condDomiRuc')->where('codigo','=',$datares['condDomiRuc'])->first();
-                            $estadoDomiRuc          = $tablaestaDomiRuc->codigo;
-                            $txtestadoDomiRuc       = $tablaestaDomiRuc->nombre;
+                            if(isset($datares['estadoRuc'])){
+                                $tablaestaruc          = Estado::where('tipo','=','estadoRuc')->where('codigo','=',$datares['estadoRuc'])->first();
+                                $estadoRuc             = $tablaestaruc->codigo;
+                                $txtestadoRuc          = $tablaestaruc->nombre;
+                            }
+                            if(isset($datares['condDomiRuc'])){
+                                $tablaestaDomiRuc       = Estado::where('tipo','=','condDomiRuc')->where('codigo','=',$datares['condDomiRuc'])->first();
+                                $estadoDomiRuc          = $tablaestaDomiRuc->codigo;
+                                $txtestadoDomiRuc       = $tablaestaDomiRuc->nombre;
+                            }
+
+                            FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
+                                        ->update(
+                                                [
+                                                    'success'=>$arvalidar['success'],
+                                                    'message'=>$arvalidar['message'],
+                                                    'estadoCp'=>$tablaestacp->codigo,
+                                                    'nestadoCp'=>$tablaestacp->nombre,
+                                                    'estadoRuc'=>$estadoRuc,
+                                                    'nestadoRuc'=>$txtestadoRuc,
+                                                    'condDomiRuc'=>$estadoDomiRuc,
+                                                    'ncondDomiRuc'=>$txtestadoDomiRuc,
+                                                ]);
+                            $swlectur = 1;
                         }
 
-                        FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
-                                    ->update(
-                                            [
-                                                'success'=>$arvalidar['success'],
-                                                'message'=>$arvalidar['message'],
-                                                'estadoCp'=>$tablaestacp->codigo,
-                                                'nestadoCp'=>$tablaestacp->nombre,
-                                                'estadoRuc'=>$estadoRuc,
-                                                'nestadoRuc'=>$txtestadoRuc,
-                                                'condDomiRuc'=>$estadoDomiRuc,
-                                                'ncondDomiRuc'=>$txtestadoDomiRuc,
-                                            ]);
-                        $swlectur = 1;
                     }else{
                         FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
                                     ->update(
@@ -920,7 +914,7 @@ trait ComprobanteTraits
                 //PASAR PARA EL USUARIO DE CONTACTO REALIZE SU APLICACION
                 //el cdr es el de la factura
 
-                if($sw==1 and $swlectur==1){
+                if($sw==1 && $swlectur==1){
                     FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$item->DOCUMENTO_ITEM)
                                 ->update(
                                     [
@@ -1215,16 +1209,36 @@ trait ComprobanteTraits
 									->pluck('COD_TRAB')
 									->toArray();
 	
-		$listadatos 		= 		FeDocumento::leftJoin('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
-									//->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
-									->whereIn('FE_DOCUMENTO.COD_CONTACTO',$array_trabajadores)
-                                    //->where('TXT_PROCEDENCIA','<>','SUE')
-                                    ->where('OPERACION','=','ORDEN_COMPRA')
-									->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
-									->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-									->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000002','ETM0000000000007'])
-									//->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000002')
-									->get();
+        if(Session::get('usuario')->id== '1CIX00000001'){
+
+            $listadatos         =       FeDocumento::leftJoin('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+                                        //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                                        //->whereIn('FE_DOCUMENTO.COD_CONTACTO',$array_trabajadores)
+                                        //->where('TXT_PROCEDENCIA','<>','SUE')
+                                        ->where('OPERACION','=','ORDEN_COMPRA')
+                                        ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                        ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                        ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000002','ETM0000000000007'])
+                                        //->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000002')
+                                        ->get();
+
+        }else{
+
+            $listadatos         =       FeDocumento::leftJoin('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+                                        //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                                        ->whereIn('FE_DOCUMENTO.COD_CONTACTO',$array_trabajadores)
+                                        //->where('TXT_PROCEDENCIA','<>','SUE')
+                                        ->where('OPERACION','=','ORDEN_COMPRA')
+                                        ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                        ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                        ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000002','ETM0000000000007'])
+                                        //->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000002')
+                                        ->get();
+
+        }
+
+
+
 
 	 	return  $listadatos;
 	}
@@ -2305,7 +2319,7 @@ trait ComprobanteTraits
         //dd($tt_totales);
 
         //0.02
-		if($tt_totales <= 0.01){
+		if($tt_totales <= 0.04){
 			$ind_total 			=	1;	
 		}else{ 	$ind_errototal 		=	0;  }
 
@@ -2389,7 +2403,7 @@ trait ComprobanteTraits
         //dd($tt_totales);
 
         //0.02
-        if($tt_totales <= 0.01){
+        if($tt_totales <= 0.04){
             $ind_total          =   1;  
         }else{  $ind_errototal      =   0;  }
 
@@ -2445,36 +2459,80 @@ trait ComprobanteTraits
 
 		$estado_no      =   'ETM0000000000006';
 
-		$listadatos 	= 	VMergeOC:://leftJoin('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
-						    leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
-								        $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
-								            ->where('COD_ESTADO', '<>', 'ETM0000000000006');
-								    })
-							->where('COD_EMPR_CLIENTE','=',$cliente_id)
-							->where('VMERGEOC.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-							//->where('VMERGEOC.COD_ORDEN','=','IICHCT0000002218')
+        if(Session::get('usuario')->id== '1CIX00000001'){
 
-							->where(function ($query) {
-							    $query->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000001')
-							    	  ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
-							    	  ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
-							})
-                            //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
-							->select(DB::raw('	COD_ORDEN,
-												FEC_ORDEN,
-												TXT_CATEGORIA_MONEDA,
-												TXT_EMPR_CLIENTE,
-												MAX(CAN_TOTAL) CAN_TOTAL,
-												MAX(ID_DOCUMENTO) AS ID_DOCUMENTO,
-												MAX(COD_ESTADO) AS COD_ESTADO,
-												MAX(TXT_ESTADO) AS TXT_ESTADO
-											'))
-							->groupBy('COD_ORDEN')
-							->groupBy('FEC_ORDEN')
-							->groupBy('TXT_CATEGORIA_MONEDA')
-							->groupBy('TXT_EMPR_CLIENTE')
-							//->havingRaw("MAX(COD_ESTADO) <> 'ETM0000000000006'")
-							->get();
+            $listadatos     =   VMergeOC:://leftJoin('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
+                                leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                            $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
+                                                ->where('COD_ESTADO', '<>', 'ETM0000000000006');
+                                        })
+                                //->where('COD_EMPR_CLIENTE','=',$cliente_id)
+                                ->where('VMERGEOC.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                //->where('VMERGEOC.COD_ORDEN','=','IICHCT0000002218')
+
+                                ->where(function ($query) {
+                                    $query->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000001')
+                                          ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
+                                          ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
+                                })
+                                //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                                ->select(DB::raw('  COD_ORDEN,
+                                                    FEC_ORDEN,
+                                                    TXT_CATEGORIA_MONEDA,
+                                                    TXT_EMPR_CLIENTE,
+                                                    MAX(CAN_TOTAL) CAN_TOTAL,
+                                                    MAX(ID_DOCUMENTO) AS ID_DOCUMENTO,
+                                                    MAX(COD_ESTADO) AS COD_ESTADO,
+                                                    MAX(TXT_ESTADO) AS TXT_ESTADO
+                                                '))
+                                ->groupBy('COD_ORDEN')
+                                ->groupBy('FEC_ORDEN')
+                                ->groupBy('TXT_CATEGORIA_MONEDA')
+                                ->groupBy('TXT_EMPR_CLIENTE')
+                                //->havingRaw("MAX(COD_ESTADO) <> 'ETM0000000000006'")
+                                ->get();
+
+
+        }else{
+
+
+            $listadatos     =   VMergeOC:://leftJoin('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
+                                leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                            $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
+                                                ->where('COD_ESTADO', '<>', 'ETM0000000000006');
+                                        })
+                                ->where('COD_EMPR_CLIENTE','=',$cliente_id)
+                                ->where('VMERGEOC.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                //->where('VMERGEOC.COD_ORDEN','=','IICHCT0000002218')
+
+                                ->where(function ($query) {
+                                    $query->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000001')
+                                          ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
+                                          ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
+                                })
+                                //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                                ->select(DB::raw('  COD_ORDEN,
+                                                    FEC_ORDEN,
+                                                    TXT_CATEGORIA_MONEDA,
+                                                    TXT_EMPR_CLIENTE,
+                                                    MAX(CAN_TOTAL) CAN_TOTAL,
+                                                    MAX(ID_DOCUMENTO) AS ID_DOCUMENTO,
+                                                    MAX(COD_ESTADO) AS COD_ESTADO,
+                                                    MAX(TXT_ESTADO) AS TXT_ESTADO
+                                                '))
+                                ->groupBy('COD_ORDEN')
+                                ->groupBy('FEC_ORDEN')
+                                ->groupBy('TXT_CATEGORIA_MONEDA')
+                                ->groupBy('TXT_EMPR_CLIENTE')
+                                //->havingRaw("MAX(COD_ESTADO) <> 'ETM0000000000006'")
+                                ->get();
+
+
+        }
+
+
+
+
         //dd($listadatos);
 	 	return  $listadatos;
 	}
