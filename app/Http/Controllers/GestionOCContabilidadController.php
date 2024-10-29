@@ -457,7 +457,7 @@ class GestionOCContabilidadController extends Controller
 
             $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);
             //$lecturacdr             =   $this->lectura_cdr_archivo($idoc,$this->pathFiles,$prefijocarperta,$ordencompra->NRO_DOCUMENTO_CLIENTE);
-
+            //$lecturacdr             =   $this->lectu($idoc,$this->pathFiles,$prefijocarperta,$ordencompra->NRO_DOCUMENTO_CLIENTE);
             $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc_actual($idoc);
             $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
