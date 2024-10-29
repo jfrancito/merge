@@ -50,6 +50,6 @@ class FechaVencimientoOC extends Command
     {
         set_time_limit(0);
         /****************************************************************************/
-        //$this->cambiar_fecha_vencimiento();
+        $this->cambiar_fecha_vencimiento();
     }
 }

@@ -1262,7 +1262,7 @@ class GestionOCContabilidadController extends Controller
         $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc_actual($idoc);
         $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
         $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
-        View::share('titulo','Observar Comprobante');
+        View::share('titulo','Reparar Comprobante');
 
         if($_POST)
         {
@@ -1273,7 +1273,7 @@ class GestionOCContabilidadController extends Controller
                 $pedido_id          =   $idoc;
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
                 $descripcion        =   $request['descripcion'];
-                $archivoob          =   $request['archivore'];
+                $archivore          =   $request['archivore'];
                 $reparable          =   $request['reparable'];
 
 
@@ -1283,12 +1283,12 @@ class GestionOCContabilidadController extends Controller
                 }
 
 
-                if(count($archivoob)<=0){
+                if(count($archivore)<=0){
                     DB::rollback(); 
                     return Redirect::to('aprobar-comprobante-contabilidad/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', 'Tiene que seleccionar almenos un item');
                 }
 
-                foreach($archivoob as $index=>$item){
+                foreach($archivore as $index=>$item){
                         //dd($item);
                         $categoria                               =   CMPCategoria::where('COD_CATEGORIA','=',$item)->first();
                         $docasociar                              =   New CMPDocAsociarCompra;
@@ -1304,6 +1304,8 @@ class GestionOCContabilidadController extends Controller
                         $docasociar->TIP_DOC                     =   $categoria->CODIGO_SUNAT;
                         $docasociar->save();
                 }
+
+
                 //HISTORIAL DE DOCUMENTO APROBADO
                 $documento                              =   new FeDocumentoHistorial;
                 $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;

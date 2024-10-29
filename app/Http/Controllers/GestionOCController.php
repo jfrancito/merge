@@ -2202,6 +2202,13 @@ class GestionOCController extends Controller
         $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
         $ordencompra_n          =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
 
+        $archivosdetalledoca    =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                                    ->first();
+
+        if(count($archivosdetalledoca)<=0){
+            return Redirect::back()->with('errorbd', 'No tiene documentos asociados realize la migracion');
+        }
+
         //SIN XML REDIRECCIONAR O OTRA VISTA
         // if($ordencompra_n->IND_VARIAS_ENTREGAS == 1){
         //     return Redirect::to('detalle-comprobante-oc-administrator-sin-xml/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra);
@@ -2336,14 +2343,23 @@ class GestionOCController extends Controller
         $combobancos            =   array('' => "Seleccione Entidad Bancaria") + $arraybancos;
 
 
+        $eliminadodoc           =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                                        ->where('TIP_DOC','=','E')
+                                        ->where('COD_ESTADO','=','0')
+                                        ->first();
+
+        if(count($eliminadodoc)>0){
+                $rutaorden           =  '';
+        }
 
         $funcion                =   $this;
 
         return View::make('comprobante/registrocomprobanteadministrator',
                          [
                             'ordencompra'           =>  $ordencompra,
+                            'eliminadodoc'          =>  $eliminadodoc,
                             'combobancos'           =>  $combobancos,
-
+                            'rutaorden'             =>  $rutaorden,
                             'fedocumento_x'         =>  $fedocumento_x,
                             'detalleordencompra'    =>  $detalleordencompra,
                             'fedocumento'           =>  $fedocumento,
@@ -4087,6 +4103,107 @@ class GestionOCController extends Controller
                                         ->toArray();
 
             return View::make('comprobante/agregararchivo', 
+                            [
+
+                                'ordencompra'           =>  $ordencompra,
+                                'procedencia'           =>  $procedencia,
+
+                                'documentoscompra'      =>  $documentoscompra,
+                                'detalleordencompra'    =>  $detalleordencompra,
+                                'tarchivos'             =>  $tarchivos,
+                                'totalarchivos'         =>  $totalarchivos,
+                                'tp'                    =>  $tp,
+                                'idopcion'              =>  $idopcion,
+                                'idoc'                  =>  $idoc,
+                            ]);
+
+
+        }
+    }
+
+
+
+    public function actionQuitarArchivoUC($procedencia,$idopcion, $prefijo, $idordencompra, Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo($idordencompra,$prefijo);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_idoc_actual($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc_actual($idoc);
+
+        View::share('titulo','Quitar Comprobante');
+
+        if($_POST)
+        {
+
+            try{    
+                
+                DB::beginTransaction();
+                $pedido_id          =   $idoc;
+                $archivoob          =   $request['archivoob'];
+
+                if(count($archivoob)<=0){
+                    DB::rollback(); 
+                    return Redirect::to('quitar-archivo-uc/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', 'Tiene que seleccionar almenos un item');
+                }
+
+                foreach($archivoob as $index=>$item){
+
+                    $categoria                               =   CMPCategoria::where('COD_CATEGORIA','=',$item)->first();
+                    $docasociar                              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$idoc)->where('COD_CATEGORIA_DOCUMENTO','=',$item)->first();
+
+                    CMPDocAsociarCompra::where('COD_ORDEN','=',$idoc)
+                            ->where('COD_CATEGORIA_DOCUMENTO','=',$item)
+                                ->update(
+                                    [
+                                        'COD_ESTADO'=>0,
+                                        'TIP_DOC'=>'E',
+                                        'FEC_USUARIO_MODIF_AUD'=>$this->fechaactual,
+                                        'COD_USUARIO_MODIF_AUD'=>Session::get('usuario')->id
+                                    ]
+                                );
+
+                }
+
+                DB::commit();
+                return Redirect::to('/gestion-de-orden-compra/'.$idopcion)->with('bienhecho', 'Archivo aSosicado a la orden : '.$ordencompra->COD_ORDEN.' eliminado con exito');
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                return Redirect::to('gestion-de-orden-compra/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+
+        }
+        else{
+
+            $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc_actual($idoc);
+            $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
+            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+                                        //->where('IND_OBLIGATORIO','=',1)
+                                        ->where('TXT_ASIGNADO','=','CONTACTO')
+                                        ->get();
+
+
+            $ordencompra_t          =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
+
+            $codigo_sunat           =   'I';
+            if($ordencompra_t->IND_VARIAS_ENTREGAS==0){
+                $codigo_sunat           =   'N';
+            }
+
+            $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                        ->where('COD_ESTADO','=',1)
+                                        ->where('COD_CTBLE','=','PDF')
+                                        ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->get();
+
+            $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+                                        ->pluck('COD_CATEGORIA_DOCUMENTO')
+                                        ->toArray();
+
+            return View::make('comprobante/quitararchivo', 
                             [
 
                                 'ordencompra'           =>  $ordencompra,

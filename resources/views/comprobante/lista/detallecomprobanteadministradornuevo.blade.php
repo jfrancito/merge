@@ -192,6 +192,9 @@
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                   <div class="panel panel-default panel-contrast">
                     <div class="panel-heading" style="background: #1d3a6d;color: #fff;">SUBIR ARCHIVOS
+                        @if(count($eliminadodoc) > 0)
+                          <small style="color:#fff;font-size: 18px;font-weight: bold;">(Tiene que cargar la orden de compra porque elimino un item de ella)</small>
+                        @endif
                     </div>
                     <div class="panel-body panel-body-contrast">
 

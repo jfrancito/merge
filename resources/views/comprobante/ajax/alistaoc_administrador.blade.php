@@ -68,6 +68,13 @@
                 </a>  
               </li>
               
+              <li>
+                <a href="{{ url('/quitar-archivo-uc/'.$procedencia.'/'.$idopcion.'/'.substr($item->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($item->COD_ORDEN, -10))) }}">
+                  Quitar Archivos
+                </a>  
+              </li>
+
+
             </ul>
           </div>
         </td>
