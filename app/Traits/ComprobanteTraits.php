@@ -45,6 +45,67 @@ trait ComprobanteTraits
 {
 
 
+    private function cambiar_parcialmente() {
+
+        DB::table('CMP.ORDEN')
+            ->join('CMP.REFERENCIA_ASOC', function($join) {
+                $join->on('CMP.ORDEN.COD_ORDEN', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA')
+                     ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE');
+            })
+            ->join('CMP.DOCUMENTO_CTBLE', function($join) {
+                $join->on('CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+                     ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_ESTADO_DOC_CTBLE', '=', 'EDC0000000000009');
+            })
+            ->where('CMP.ORDEN.COD_CATEGORIA_TIPO_ORDEN', '=', 'TOR0000000000001')
+            ->whereIn('CMP.ORDEN.COD_CATEGORIA_ESTADO_ORDEN', ['EOR0000000000012'])
+            ->update([
+                'CMP.ORDEN.COD_CATEGORIA_ESTADO_ORDEN' => 'EOR0000000000003',
+                'CMP.ORDEN.TXT_CATEGORIA_ESTADO_ORDEN' => 'TERMINADA',
+                'CMP.ORDEN.COD_USUARIO_CREA_AUD' => 'MERGE',
+                'CMP.ORDEN.FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
+            ]);
+
+        DB::connection('sqlsrv_b')->table('CMP.ORDEN')
+            ->join('CMP.REFERENCIA_ASOC', function($join) {
+                $join->on('CMP.ORDEN.COD_ORDEN', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA')
+                     ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE');
+            })
+            ->join('CMP.DOCUMENTO_CTBLE', function($join) {
+                $join->on('CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+                     ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_ESTADO_DOC_CTBLE', '=', 'EDC0000000000009');
+            })
+            ->where('CMP.ORDEN.COD_CATEGORIA_TIPO_ORDEN', '=', 'TOR0000000000001')
+            ->whereIn('CMP.ORDEN.COD_CATEGORIA_ESTADO_ORDEN', ['EOR0000000000012'])
+            ->update([
+                'CMP.ORDEN.COD_CATEGORIA_ESTADO_ORDEN' => 'EOR0000000000003',
+                'CMP.ORDEN.TXT_CATEGORIA_ESTADO_ORDEN' => 'TERMINADA',
+                'CMP.ORDEN.COD_USUARIO_CREA_AUD' => 'MERGE',
+                'CMP.ORDEN.FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
+            ]);
+
+        DB::connection('sqlsrv_r')->table('CMP.ORDEN')
+            ->join('CMP.REFERENCIA_ASOC', function($join) {
+                $join->on('CMP.ORDEN.COD_ORDEN', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA')
+                     ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE');
+            })
+            ->join('CMP.DOCUMENTO_CTBLE', function($join) {
+                $join->on('CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+                     ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_ESTADO_DOC_CTBLE', '=', 'EDC0000000000009');
+            })
+            ->where('CMP.ORDEN.COD_CATEGORIA_TIPO_ORDEN', '=', 'TOR0000000000001')
+            ->whereIn('CMP.ORDEN.COD_CATEGORIA_ESTADO_ORDEN', ['EOR0000000000012'])
+            ->update([
+                'CMP.ORDEN.COD_CATEGORIA_ESTADO_ORDEN' => 'EOR0000000000003',
+                'CMP.ORDEN.TXT_CATEGORIA_ESTADO_ORDEN' => 'TERMINADA',
+                'CMP.ORDEN.COD_USUARIO_CREA_AUD' => 'MERGE',
+                'CMP.ORDEN.FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
+            ]);
+
+
+        dd("SE REALIZO TODA LA OPERACION");
+
+    }
+
 
     private function cambiar_fecha_vencimiento() {
 

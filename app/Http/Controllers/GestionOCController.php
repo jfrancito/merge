@@ -3541,6 +3541,9 @@ class GestionOCController extends Controller
                 DB::beginTransaction();
                 $contacto_id       =   $request['contacto_id'];
                 $procedencia       =   $request['procedencia'];
+                $entidadbanco_id   =   $request['entidadbanco_id'];
+                $bancocategoria    =   CMPCategoria::where('COD_CATEGORIA','=',$entidadbanco_id)->first();
+
                 $fedocumento       =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
 
                 /**************************** VALIDAR CDR Y LEER RESPUESTA ******************************/
@@ -3904,6 +3907,8 @@ class GestionOCController extends Controller
                 FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(
                                 [
+                                    'COD_CATEGORIA_BANCO'=>$bancocategoria->COD_CATEGORIA,
+                                    'TXT_CATEGORIA_BANCO'=>$bancocategoria->NOM_CATEGORIA,
                                     'ARCHIVO_CDR'=>'',
                                     'ARCHIVO_PDF'=>'',
                                     'COD_ESTADO'=>'ETM0000000000002',
@@ -3916,7 +3921,6 @@ class GestionOCController extends Controller
                                     'TXT_CONTACTO'=>$contacto->NOM_TRABAJADOR,
                                     'fecha_pa'=>$this->fechaactual,
                                     'usuario_pa'=>Session::get('usuario')->id,
-
                                 ]
                             );
 

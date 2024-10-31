@@ -2742,9 +2742,14 @@ class GestionUsuarioContactoController extends Controller
                     }
                 }
 
+                $entidadbanco_id   =   $request['entidadbanco_id'];
+                $bancocategoria    =   CMPCategoria::where('COD_CATEGORIA','=',$entidadbanco_id)->first();
+
                 FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(
                                 [
+                                    'COD_CATEGORIA_BANCO'=>$bancocategoria->COD_CATEGORIA,
+                                    'TXT_CATEGORIA_BANCO'=>$bancocategoria->NOM_CATEGORIA,
                                     'COD_ESTADO'=>'ETM0000000000003',
                                     'TXT_ESTADO'=>'POR APROBAR CONTABILIDAD',
                                     'ind_email_ap'=>0,
@@ -3014,11 +3019,19 @@ class GestionUsuarioContactoController extends Controller
             $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
 
+            $arraybancos            =   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
+            $combobancos            =   array('' => "Seleccione Entidad Bancaria") + $arraybancos;
+
+
+
             return View::make('comprobante/aprobaruccontrato', 
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
                                 'linea'                 =>  $linea,
+                                'arraybancos'           =>  $arraybancos,
+                                'combobancos'           =>  $combobancos,
+
 
                                 'archivosanulados'      =>  $archivosanulados,
                                 'trabajador'            =>  $trabajador,
