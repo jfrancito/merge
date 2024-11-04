@@ -102,7 +102,7 @@ trait ComprobanteTraits
             ]);
 
 
-        dd("SE REALIZO TODA LA OPERACION");
+        print_r("SE REALIZO TODA LA OPERACION");
 
     }
 
@@ -363,7 +363,7 @@ trait ComprobanteTraits
                     ]);
 
 
-                    dd("SE REALIZO TODA LA OPERACION");
+                    print_r("SE REALIZO TODA LA OPERACION");
 
     }
 
@@ -1494,10 +1494,14 @@ trait ComprobanteTraits
 
 
     private function array_usuario_jefes() {
-        $array = ['1CIX00000072','1CIX00000075','1CIX00000073','1CIX00000188'];
+        $array = ['1CIX00000072','1CIX00000075','1CIX00000073','1CIX00000188','1CIX00000217'];
         return $array;
     }
 
+    private function array_usuario_jefes_folio() {
+        $array = ['1CIX00000072','1CIX00000075','1CIX00000073','1CIX00000188'];
+        return $array;
+    }
 
     private function con_lista_cabecera_comprobante_total_gestion($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id) {
 

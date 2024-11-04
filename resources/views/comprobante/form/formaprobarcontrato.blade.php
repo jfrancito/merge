@@ -148,7 +148,7 @@
                   </div>
                 </div>
 
-                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+<!--                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                       <div class="form-group">
                         <label class="col-sm-12 control-label labelleft" style="text-align: left;">Entidad Bancaria que se le va a pagar al proveedor :</label>
                         <div class="col-sm-12 abajocaja" >
@@ -161,7 +161,7 @@
                                             ]) !!}
                         </div>
                       </div>
-                </div>
+                </div> -->
 
 
               </div>

@@ -21,7 +21,7 @@ use App\Modelos\Archivo;
 use App\Modelos\CMPDocAsociarCompra;
 use App\Modelos\CMPDetalleProducto;
 use App\Modelos\CMPDocumentoCtble;
-
+use App\Modelos\TESCuentaBancaria;
 use App\Modelos\CMPReferecenciaAsoc;
 
 
@@ -64,6 +64,69 @@ class GestionOCController extends Controller
         $this->sunat_cdr();
     }
 
+
+    public function actionAjaxBuscarCuentaBancariaOC(Request $request)
+    {
+
+
+        $entidadbanco_id        =   $request['entidadbanco_id'];
+        $prefijo_id             =   $request['prefijo_id'];
+        $orden_id               =   $request['orden_id'];
+
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo($orden_id,$prefijo_id);
+            $ordencompra          =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
+        $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc($idoc);
+
+
+        $tescuentabb            =   TESCuentaBancaria::where('COD_EMPR_TITULAR','=',$ordencompra->COD_EMPR_CLIENTE)
+                                    ->where('COD_EMPR_BANCO','=',$entidadbanco_id)
+                                    ->where('COD_ESTADO','=',1)
+                                    ->select(DB::raw("
+                                          TXT_NRO_CUENTA_BANCARIA,
+                                          TXT_REFERENCIA + ' - '+ TXT_NRO_CUENTA_BANCARIA AS nombre")
+                                        )
+                                    ->pluck('nombre','TXT_NRO_CUENTA_BANCARIA')
+                                    ->toArray();
+        $combocb                =   array('' => "Seleccione Cuenta Bancaria") + $tescuentabb;
+        $funcion                =   $this;
+
+        return View::make('comprobante/combo/combo_cuenta_bancaria',
+                         [
+                            'combocb'                   =>  $combocb,
+                            'ajax'                      =>  true,
+                         ]);
+    }
+
+
+
+    public function actionAjaxBuscarCuentaBancariaContrato(Request $request)
+    {
+
+
+        $entidadbanco_id        =   $request['entidadbanco_id'];
+        $prefijo_id             =   $request['prefijo_id'];
+        $orden_id               =   $request['orden_id'];
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo_contrato($orden_id,$prefijo_id);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_contrato_idoc($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
+        $tescuentabb            =   TESCuentaBancaria::where('COD_EMPR_TITULAR','=',$ordencompra->COD_EMPR_EMISOR)
+                                    ->where('COD_EMPR_BANCO','=',$entidadbanco_id)
+                                    ->where('COD_ESTADO','=',1)
+                                    ->select(DB::raw("
+                                          TXT_NRO_CUENTA_BANCARIA,
+                                          TXT_REFERENCIA + ' - '+ TXT_NRO_CUENTA_BANCARIA AS nombre")
+                                        )
+                                    ->pluck('nombre','TXT_NRO_CUENTA_BANCARIA')
+                                    ->toArray();
+        $combocb                =   array('' => "Seleccione Cuenta Bancaria") + $tescuentabb;
+        $funcion                =   $this;
+
+        return View::make('comprobante/combo/combo_cuenta_bancaria',
+                         [
+                            'combocb'                   =>  $combocb,
+                            'ajax'                      =>  true,
+                         ]);
+    }
 
 
 
@@ -1136,9 +1199,24 @@ class GestionOCController extends Controller
 
         $funcion                =   $this;
 
+        $arraybancos            =   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
+        $combobancos            =   array('' => "Seleccione Entidad Bancaria") + $arraybancos;
+
+        $cb_id                  =   '';
+        $combocb                =   array('' => "Seleccione Cuenta Bancaria");
+
+
         return View::make('comprobante/registrocomprobanteproveedor',
                          [
                             'ordencompra'           =>  $ordencompra,
+
+                            'combobancos'           =>  $combobancos,
+                            'cb_id'                 =>  $cb_id,
+                            'combocb'               =>  $combocb,
+
+
+
+
                             'detalleordencompra'    =>  $detalleordencompra,
                             'fedocumento'           =>  $fedocumento,
                             'detallefedocumento'    =>  $detallefedocumento,
@@ -1723,9 +1801,20 @@ class GestionOCController extends Controller
                 $trabajador                               =   STDTrabajador::where('COD_TRAB','=',$contacto->COD_TRABAJADOR)->first();
                 //$contacto                               =   User::where('id','=',$contacto_id)->first();
 
+
+                $entidadbanco_id                          =   $request['entidadbanco_id'];
+                $bancocategoria                           =   CMPCategoria::where('COD_CATEGORIA','=',$entidadbanco_id)->first();
+                $cb_id                                    =   $request['cb_id'];
+
+
                 FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(
                                 [
+
+                                    'COD_CATEGORIA_BANCO'=>$bancocategoria->COD_CATEGORIA,
+                                    'TXT_CATEGORIA_BANCO'=>$bancocategoria->NOM_CATEGORIA,
+                                    'TXT_NRO_CUENTA_BANCARIA'=>$cb_id,
+                                    
                                     'ARCHIVO_CDR'=>'',
                                     'ARCHIVO_PDF'=>'',
                                     'COD_ESTADO'=>'ETM0000000000007',
@@ -2160,6 +2249,9 @@ class GestionOCController extends Controller
         $arraybancos            =   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
         $combobancos            =   array('' => "Seleccione Entidad Bancaria") + $arraybancos;
 
+        $cb_id                  =   '';
+        $combocb                =   array('' => "Seleccione Cuenta Bancaria");
+
 
         $combodocumento             =   array('DCC0000000000002' => 'FACTURA ELECTRONICA' , 'DCC0000000000013' => 'RECIBO POR HONORARIO');
         $documento_id               =   'DCC0000000000002';
@@ -2171,6 +2263,10 @@ class GestionOCController extends Controller
 
                             'combobancos'           =>  $combobancos,
                             'detalleordencompra'    =>  $detalleordencompra,
+
+                            'cb_id'                 =>  $cb_id,
+                            'combocb'               =>  $combocb,
+
                             'fedocumento'           =>  $fedocumento,
                             'detallefedocumento'    =>  $detallefedocumento,
                             'combocontacto'         =>  $combocontacto,
@@ -2354,11 +2450,19 @@ class GestionOCController extends Controller
 
         $funcion                =   $this;
 
+
+        $cb_id                  =   '';
+        $combocb                =   array('' => "Seleccione Cuenta Bancaria");
+
+
+
         return View::make('comprobante/registrocomprobanteadministrator',
                          [
                             'ordencompra'           =>  $ordencompra,
                             'eliminadodoc'          =>  $eliminadodoc,
                             'combobancos'           =>  $combobancos,
+                            'cb_id'                 =>  $cb_id,
+                            'combocb'               =>  $combocb,
                             'rutaorden'             =>  $rutaorden,
                             'fedocumento_x'         =>  $fedocumento_x,
                             'detalleordencompra'    =>  $detalleordencompra,
@@ -3358,11 +3462,16 @@ class GestionOCController extends Controller
                 $bancocategoria    =   CMPCategoria::where('COD_CATEGORIA','=',$entidadbanco_id)->first();
 
 
+                $cb_id                                    =   $request['cb_id'];
+
+
+
                 FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(
                                 [
                                     'COD_CATEGORIA_BANCO'=>$bancocategoria->COD_CATEGORIA,
                                     'TXT_CATEGORIA_BANCO'=>$bancocategoria->NOM_CATEGORIA,
+                                    'TXT_NRO_CUENTA_BANCARIA'=>$cb_id,
                                     'ARCHIVO_CDR'=>'',
                                     'ARCHIVO_PDF'=>'',
 
@@ -3904,11 +4013,14 @@ class GestionOCController extends Controller
                 $trabajador                               =   STDTrabajador::where('COD_TRAB','=',$contacto->COD_TRABAJADOR)->first();
                 //$contacto                               =   User::where('id','=',$contacto_id)->first();
 
+                $cb_id                                    =   $request['cb_id'];
+
                 FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(
                                 [
                                     'COD_CATEGORIA_BANCO'=>$bancocategoria->COD_CATEGORIA,
                                     'TXT_CATEGORIA_BANCO'=>$bancocategoria->NOM_CATEGORIA,
+                                    'TXT_NRO_CUENTA_BANCARIA'=>$cb_id,
                                     'ARCHIVO_CDR'=>'',
                                     'ARCHIVO_PDF'=>'',
                                     'COD_ESTADO'=>'ETM0000000000002',

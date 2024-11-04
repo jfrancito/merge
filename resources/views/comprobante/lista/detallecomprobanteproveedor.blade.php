@@ -186,6 +186,45 @@
                 </div>
               </div>
 
+              <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                  <div class="panel panel-default panel-contrast">
+                    <div class="panel-heading" style="background: #1d3a6d;color: #fff;">DATOS PARA PAGOS
+
+                      <div class="tools ver_cuenta_bancaria_oc select" style="cursor: pointer;padding-left: 12px;"> <span class="label label-success">Ver Cuenta</span></div>
+                      <div class="tools agregar_cuenta_bancaria_oc select" style="cursor: pointer;"> <span class="label label-success">Agregar Cuenta</span></div>
+
+                    </div>
+                    <div class="panel-body panel-body-contrast">
+                            <div class="row">
+
+                                  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px;">
+                                      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 cajareporte">
+                                          <div class="form-group">
+                                            <label class="col-sm-12 control-label labelleft" ><b>Entidad Bancaria que se le va a pagar al proveedor :</b></label>
+                                            <div class="col-sm-12 abajocaja" >
+                                              {!! Form::select( 'entidadbanco_id', $combobancos, array(),
+                                                                [
+                                                                  'class'       => 'select2 form-control control input-xs entidadbancooc' ,
+                                                                  'id'          => 'entidadbanco_id',
+                                                                  'required'    => '',
+                                                                  'data-aw'     => '1',
+                                                                ]) !!}
+                                            </div>
+                                          </div>
+                                      </div>
+                                      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 cajareporte ajax_cb">
+                                        @include('comprobante.combo.combo_cuenta_bancaria')
+                                      </div>
+                                  </div>
+
+
+                            </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
 
               <div class="row">
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
@@ -238,6 +277,11 @@
                                       </div>
                                       <div class="col-xs-6">
                                         <p class="text-right">
+
+                                          <input type="hidden" name="idopcion" id='idopcion' value = '{{$idopcion}}'>
+                                          <input type="hidden" name="prefijo_id" id='prefijo_id' value = '{{substr($ordencompra->COD_ORDEN, 0,6)}}'>
+                                          <input type="hidden" name="orden_id" id='orden_id' value = '{{Hashids::encode(substr($ordencompra->COD_ORDEN, -10))}}'>
+                                          
                                           <input type="hidden" name="te" id='te' value = '{{$fedocumento->ind_errototal}}'>
                                           <input type="hidden" name="contacto_id" id='contacto_id' value = '{{$usuario->COD_TRABAJADOR}}'>
                                           <button type="submit" class="btn btn-space btn-success btn-guardar-xml">Guardar</button>

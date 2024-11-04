@@ -1934,8 +1934,8 @@ class GestionUsuarioContactoController extends Controller
                 }
 
 
-                $entidadbanco_id   =   $request['entidadbanco_id'];
-                $bancocategoria    =   CMPCategoria::where('COD_CATEGORIA','=',$entidadbanco_id)->first();
+                // $entidadbanco_id   =   $request['entidadbanco_id'];
+                // $bancocategoria    =   CMPCategoria::where('COD_CATEGORIA','=',$entidadbanco_id)->first();
 
 
                 if($orden->IND_MATERIAL_SERVICIO=='M' && count($fedocumento_x)<=0){
@@ -1943,8 +1943,8 @@ class GestionUsuarioContactoController extends Controller
                     FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                                 ->update(
                                     [
-                                        'COD_CATEGORIA_BANCO'=>$bancocategoria->COD_CATEGORIA,
-                                        'TXT_CATEGORIA_BANCO'=>$bancocategoria->NOM_CATEGORIA,
+                                        // 'COD_CATEGORIA_BANCO'=>$bancocategoria->COD_CATEGORIA,
+                                        // 'TXT_CATEGORIA_BANCO'=>$bancocategoria->NOM_CATEGORIA,
                                         'COD_ESTADO'=>'ETM0000000000009',
                                         'TXT_ESTADO'=>'POR EJECUTAR ORDEN DE INGRESO',
                                         'fecha_uc'=>$this->fechaactual,
@@ -1958,8 +1958,8 @@ class GestionUsuarioContactoController extends Controller
                     FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
                                 ->update(
                                     [
-                                        'COD_CATEGORIA_BANCO'=>$bancocategoria->COD_CATEGORIA,
-                                        'TXT_CATEGORIA_BANCO'=>$bancocategoria->NOM_CATEGORIA,
+                                        // 'COD_CATEGORIA_BANCO'=>$bancocategoria->COD_CATEGORIA,
+                                        // 'TXT_CATEGORIA_BANCO'=>$bancocategoria->NOM_CATEGORIA,
                                         'COD_ESTADO'=>'ETM0000000000003',
                                         'TXT_ESTADO'=>'POR APROBAR CONTABILIDAD',
                                         'ind_email_ap'=>0,
@@ -2742,14 +2742,14 @@ class GestionUsuarioContactoController extends Controller
                     }
                 }
 
-                $entidadbanco_id   =   $request['entidadbanco_id'];
-                $bancocategoria    =   CMPCategoria::where('COD_CATEGORIA','=',$entidadbanco_id)->first();
+                //$entidadbanco_id   =   $request['entidadbanco_id'];
+                //$bancocategoria    =   CMPCategoria::where('COD_CATEGORIA','=',$entidadbanco_id)->first();
 
                 FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(
                                 [
-                                    'COD_CATEGORIA_BANCO'=>$bancocategoria->COD_CATEGORIA,
-                                    'TXT_CATEGORIA_BANCO'=>$bancocategoria->NOM_CATEGORIA,
+                                    // 'COD_CATEGORIA_BANCO'=>$bancocategoria->COD_CATEGORIA,
+                                    // 'TXT_CATEGORIA_BANCO'=>$bancocategoria->NOM_CATEGORIA,
                                     'COD_ESTADO'=>'ETM0000000000003',
                                     'TXT_ESTADO'=>'POR APROBAR CONTABILIDAD',
                                     'ind_email_ap'=>0,

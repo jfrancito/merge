@@ -75,10 +75,8 @@ class GestionEntregaDocumentoController extends Controller
 
 
 
-        if($rol->ind_uc == 1 && Session::get('usuario')->id != '1CIX00000075'){
+        if($rol->ind_uc == 1 && (Session::get('usuario')->id != '1CIX00000075') ){
             $usuario    =   SGDUsuario::where('COD_USUARIO','=',Session::get('usuario')->name)->first();
-
-
             if(count($usuario)>0){
                 $tp_area        =   CMPCategoria::where('COD_CATEGORIA','=',$usuario->COD_CATEGORIA_AREA)->first();
 
@@ -88,6 +86,13 @@ class GestionEntregaDocumentoController extends Controller
                 $combo_area     =   array($tp_area->COD_CATEGORIA => $tp_area->NOM_CATEGORIA);
             }
         }
+
+        if(Session::get('usuario')->id == '1CIX00000217'){
+            $area_id        =   'TODO';
+            $combo_area     =   $this->gn_combo_area_usuario($estado_id);
+
+        }
+
         $operacion_id       =   'ORDEN_COMPRA';
 
         //falta usuario contacto
@@ -290,6 +295,9 @@ class GestionEntregaDocumentoController extends Controller
         $empresa_id     =   Session::get('empresas')->COD_EMPR;
 
         $rol            =   WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
+
+
+
         if($rol->ind_uc == 1){
             $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
                                 ->where('COD_EMPRESA','=',$empresa_id)
@@ -302,6 +310,20 @@ class GestionEntregaDocumentoController extends Controller
                                 ->orderBy('FE_DOCUMENTO_ENTREGABLE.FECHA_CREA','DESC')
                                 ->get();
         }
+
+        $usuario_id     =   Session::get('usuario')->id;
+        $array_jefes    =   $this->array_usuario_jefes_folio();
+
+        if(in_array($usuario_id, $array_jefes)){
+            $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
+                                ->where('COD_EMPRESA','=',$empresa_id)
+                                //->where('USUARIO_CREA','=',Session::get('usuario')->id)
+                                ->where('OPERACION','=','ORDEN_COMPRA')
+                                ->orderBy('FE_DOCUMENTO_ENTREGABLE.FECHA_CREA','DESC')
+                                ->get();
+        }
+
+
 
         $funcion        =   $this;
         return View::make('entregadocumento/listaentregadocumentofolio',

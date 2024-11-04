@@ -206,9 +206,21 @@ class GestionTCController extends Controller
         $documento_id               =   'DCC0000000000002';
         $funcion                    =   $this;
 
+        $arraybancos            =   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
+        $combobancos            =   array('' => "Seleccione Entidad Bancaria") + $arraybancos;
+
+        $cb_id                  =   '';
+        $combocb                =   array('' => "Seleccione Cuenta Bancaria");
+
+
         return View::make('comprobante/registrocomprobantecontratoproveedor',
                          [
                             'ordencompra'           =>  $ordencompra,
+
+                            'combobancos'           =>  $combobancos,
+                            'cb_id'                 =>  $cb_id,
+                            'combocb'               =>  $combocb,
+
                             'detalleordencompra'    =>  $detalleordencompra,
                             'fedocumento'           =>  $fedocumento,
                             'detallefedocumento'    =>  $detallefedocumento,
@@ -611,10 +623,16 @@ class GestionTCController extends Controller
                 $contacto                                 =   SGDUsuario::where('COD_TRABAJADOR','=',$contacto_id)->first();
                 $trabajador                               =   STDTrabajador::where('COD_TRAB','=',$contacto->COD_TRABAJADOR)->first();
                 //$contacto                               =   User::where('id','=',$contacto_id)->first();
+                $entidadbanco_id                          =   $request['entidadbanco_id'];
+                $bancocategoria                           =   CMPCategoria::where('COD_CATEGORIA','=',$entidadbanco_id)->first();
+                $cb_id                                    =   $request['cb_id'];
 
                 FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(
                                 [
+                                    'COD_CATEGORIA_BANCO'=>$bancocategoria->COD_CATEGORIA,
+                                    'TXT_CATEGORIA_BANCO'=>$bancocategoria->NOM_CATEGORIA,
+                                    'TXT_NRO_CUENTA_BANCARIA'=>$cb_id,
                                     'ARCHIVO_CDR'=>'',
                                     'ARCHIVO_PDF'=>'',
                                     'COD_ESTADO'=>'ETM0000000000007',

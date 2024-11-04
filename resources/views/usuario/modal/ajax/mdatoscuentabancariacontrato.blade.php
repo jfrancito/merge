@@ -1,5 +1,5 @@
 
-<form method="POST" action="{{ url('/configurar-datos-cuenta-bancaria/'.Hashids::encode(substr($usuario->id, -8))) }}">
+<form method="POST" action="{{ url('/configurar-datos-cuenta-bancaria-contrato/'.$prefijo_id.'/'.$orden_id.'/'.$idopcion) }}">
       {{ csrf_field() }}
 	<div class="modal-header">
 		<button type="button" data-dismiss="modal" aria-hidden="true" class="close modal-close"><span class="mdi mdi-close"></span></button>
