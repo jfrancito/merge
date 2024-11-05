@@ -2558,6 +2558,9 @@ class GestionOCController extends Controller
                         }
 
 
+                        //dd($factura);
+
+
                         //VALIDAR QUE YA EXISTE ESTE XML
 
                         $fedocumento_e          =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->whereNotIn('COD_ESTADO',['','ETM0000000000006'])
@@ -2646,8 +2649,8 @@ class GestionOCController extends Controller
                         $documento->HORA_EMISION            =   $factura->gethoraEmision();
                         $documento->IMPUESTO_2              =   $factura->getmtoOtrosTributos();
                         $documento->TIPO_DETRACCION         =   $factura->getdetraccion()->gettipoDet();
-                        $documento->PORC_DETRACCION         =   $factura->getdetraccion()->getporcDet();
-                        $documento->MONTO_DETRACCION        =   $factura->getdetraccion()->getbaseDetr();
+                        $documento->PORC_DETRACCION         =   (float)$factura->getdetraccion()->getporcDet();
+                        $documento->MONTO_DETRACCION        =   (float)$factura->getdetraccion()->getbaseDetr();
                         $documento->MONTO_ANTICIPO          =   $factura->getdestotalAnticipos();
                         //$documento->OBSERVACION             =   $factura->getobservacion();
                         $documento->NRO_ORDEN_COMP          =   $factura->getcompra();              
@@ -2673,8 +2676,6 @@ class GestionOCController extends Controller
                         $documento->save();
 
 
-
-
                         //ARCHIVO
                         $dcontrol                   =   new Archivo;
                         $dcontrol->ID_DOCUMENTO     =   $ordencompra->COD_ORDEN;
@@ -2690,6 +2691,8 @@ class GestionOCController extends Controller
                         $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
                         $dcontrol->save();
 
+
+                        //dd($factura->getdetails());
 
 
                         /**********DETALLE*********/
@@ -2780,9 +2783,6 @@ class GestionOCController extends Controller
                         if(isset($arvalidar['success'])){
 
                             if($arvalidar['success']){
-
-
-
 
                                 $datares              = $arvalidar['data'];
                                 if (!isset($datares['estadoCp'])){
