@@ -4042,6 +4042,18 @@ class GestionOCController extends Controller
                     $COD_PAGO_DETRACCION = $empresa_sel->COD_EMPR;
                     $TXT_PAGO_DETRACCION = $empresa_sel->NOM_EMPR;
                 }
+
+
+                if($ctadetraccion!=''){
+                    User::where('usuarioosiris_id',$ordencompra->COD_EMPR_EMISOR)
+                                ->update(
+                                    [
+                                        'cuenta_detraccion'=>$ctadetraccion
+                                    ]
+                                );
+                }
+
+
                 
                 FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(

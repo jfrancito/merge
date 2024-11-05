@@ -652,6 +652,15 @@ class GestionTCController extends Controller
                 }
                 
 
+                if($ctadetraccion!=''){
+                    User::where('usuarioosiris_id',$ordencompra->COD_EMPR_EMISOR)
+                                ->update(
+                                    [
+                                        'cuenta_detraccion'=>$ctadetraccion
+                                    ]
+                                );
+                }
+
 
                 FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(
