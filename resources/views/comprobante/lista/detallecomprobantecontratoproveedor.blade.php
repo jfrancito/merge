@@ -329,7 +329,7 @@
                                         <div class="form-group">
                                           <label class="col-sm-12 control-label labelleft" ><b>Cuenta Detracción (*):</b></label>
                                           <div class="col-sm-12 abajocaja" >
-                                              <input type="text" name="ctadetraccion" id='ctadetraccion' class="form-control control input-sm" value = '{{$user_orden->cuenta_detraccion}}'>
+                                              <input type="text" name="ctadetraccion" id='ctadetraccion' class="form-control control input-sm" value = '{{$empresa->TXT_DETRACCION}}'>
                                           </div>
                                         </div>
                                       </div>

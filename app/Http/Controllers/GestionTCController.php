@@ -213,6 +213,7 @@ class GestionTCController extends Controller
         $combocb                =   array('' => "Seleccione Cuenta Bancaria");
 
         $user_orden             =   User::where('usuarioosiris_id','=',$ordencompra->COD_EMPR_EMISOR)->first();
+        $empresa                =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR_EMISOR)->first();
 
 
         $combotipodetraccion    =   array('' => "Seleccione Tipo Detraccion",'MONTO_REFERENCIAL' => 'MONTO REFERENCIAL' , 'MONTO_FACTURACION' => 'MONTO FACTURACION');
@@ -224,6 +225,7 @@ class GestionTCController extends Controller
                          [
                             'ordencompra'           =>  $ordencompra,
                             'user_orden'            =>  $user_orden,
+                            'empresa'               =>  $empresa,
                             'combotipodetraccion'   =>  $combotipodetraccion,
                             'combopagodetraccion'   =>  $combopagodetraccion,
 
@@ -653,10 +655,10 @@ class GestionTCController extends Controller
                 
 
                 if($ctadetraccion!=''){
-                    User::where('usuarioosiris_id',$ordencompra->COD_EMPR_EMISOR)
+                    STDEmpresa::where('COD_EMPR',$ordencompra->COD_EMPR_EMISOR)
                                 ->update(
                                     [
-                                        'cuenta_detraccion'=>$ctadetraccion
+                                        'TXT_DETRACCION'=>$ctadetraccion
                                     ]
                                 );
                 }

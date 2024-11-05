@@ -2257,20 +2257,24 @@ class GestionOCController extends Controller
         $documento_id           =   'DCC0000000000002';
         $funcion                =   $this;
 
-        $user_orden             =   User::where('usuarioosiris_id','=',$ordencompra->COD_EMPR_EMISOR)->first();
 
+
+        $user_orden             =   User::where('usuarioosiris_id','=',$ordencompra->COD_EMPR_EMISOR)->first();
+        $empresa                =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR_EMISOR)->first();
 
         $combotipodetraccion    =   array('' => "Seleccione Tipo Detraccion",'MONTO_REFERENCIAL' => 'MONTO REFERENCIAL' , 'MONTO_FACTURACION' => 'MONTO FACTURACION');
         $combopagodetraccion    =   array('' => "Seleccione Pago Detraccion",$ordencompra->COD_EMPR_EMISOR => $ordencompra->TXT_EMPR_EMISOR , $ordencompra->COD_EMPR_RECEPTOR => $ordencompra->TXT_EMPR_RECEPTOR);
 
 
-        //dd($user_orden);
+        //dd($ordencompra);
 
 
         return View::make('comprobante/registrocomprobantecontratoadministrator',
                          [
                             'ordencompra'           =>  $ordencompra,
                             'user_orden'            =>  $user_orden,
+                            'empresa'               =>  $empresa,
+
                             'combotipodetraccion'   =>  $combotipodetraccion,
                             'combopagodetraccion'   =>  $combopagodetraccion,
 
@@ -4045,10 +4049,10 @@ class GestionOCController extends Controller
 
 
                 if($ctadetraccion!=''){
-                    User::where('usuarioosiris_id',$ordencompra->COD_EMPR_EMISOR)
+                    STDEmpresa::where('COD_EMPR',$ordencompra->COD_EMPR_EMISOR)
                                 ->update(
                                     [
-                                        'cuenta_detraccion'=>$ctadetraccion
+                                        'TXT_DETRACCION'=>$ctadetraccion
                                     ]
                                 );
                 }
