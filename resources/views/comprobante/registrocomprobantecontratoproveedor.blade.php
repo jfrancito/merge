@@ -89,6 +89,14 @@
         App.init();
         App.formElements();
         $('form').parsley();
+
+
+        $('.importe').inputmask({ 'alias': 'numeric', 
+        'groupSeparator': ',', 'autoGroup': true, 'digits': 2, 
+        'digitsOptional': false, 
+        'prefix': '', 
+        'placeholder': '0'});
+        
       });
     </script> 
 

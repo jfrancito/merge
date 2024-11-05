@@ -166,6 +166,62 @@ $(document).ready(function(){
 
 
 
+    $(".registrocomprobante").on('click','.btn-guardar-xml-contrato', function(e) {
+
+        event.preventDefault();
+        var _token                  =   $('#token').val();
+        var te                      =   $('#te').val();
+        var entidadbanco_id         =   $('#entidadbanco_id').val();
+        var monto_total             =   parseFloat($('#monto_total').val());
+
+        var ctadetraccion           =   $('#ctadetraccion').val();
+        var tipo_detraccion_id      =   $('#tipo_detraccion_id').val();
+        var monto_detraccion        =   $('#monto_detraccion').val();
+        var pago_detraccion         =   $('#pago_detraccion').val();
+
+
+
+        if(monto_total > 401){ 
+            if(ctadetraccion.trim() ==''){ alerterrorajax("Ingrese una Cuenta de Detraccion."); return false;}
+            if(tipo_detraccion_id ==''){ alerterrorajax("Seleeccione un valor de detraccion"); return false;}
+            if(monto_detraccion =='0'){ alerterrorajax("Ingrese Monto de Detraccion."); return false;}
+            if(pago_detraccion =='0'){ alerterrorajax("Seleeccione un pago de detraccion"); return false;}
+        }
+
+
+        var cb_id                   =   $('#cb_id').val();
+        var valores = ['BAM0000000000007', 'BAM0000000000008'];
+
+        if(!valores.includes(entidadbanco_id)){
+            if(cb_id==''){
+                alerterrorajax("Seleccione una Cuenta Bancaria."); return false;
+            }
+        }
+
+        if(te =='0'){ alerterrorajax("Hay errores en la validacion del XML."); return false;}
+
+        $.confirm({
+            title: '¿Confirmar la validación?',
+            content: 'Merge de Comprobante',
+            buttons: {
+                confirmar: function () {
+                    abrircargando();
+                    $( "#formguardardatos" ).submit();
+
+                    setTimeout(function() {
+                       cerrarcargando();
+                    }, 6000);
+ 
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo la validación');
+                }
+            }
+        });
+
+
+    });
+
 
     $(".registrocomprobante").on('click','.btn-guardar-xml', function(e) {
 

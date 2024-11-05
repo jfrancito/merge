@@ -212,10 +212,21 @@ class GestionTCController extends Controller
         $cb_id                  =   '';
         $combocb                =   array('' => "Seleccione Cuenta Bancaria");
 
+        $user_orden             =   User::where('usuarioosiris_id','=',$ordencompra->COD_EMPR_EMISOR)->first();
+
+
+        $combotipodetraccion    =   array('' => "Seleccione Tipo Detraccion",'MONTO_REFERENCIAL' => 'MONTO REFERENCIAL' , 'MONTO_FACTURACION' => 'MONTO FACTURACION');
+        $combopagodetraccion    =   array('' => "Seleccione Pago Detraccion",$ordencompra->COD_EMPR_EMISOR => $ordencompra->TXT_EMPR_EMISOR , $ordencompra->COD_EMPR_RECEPTOR => $ordencompra->TXT_EMPR_RECEPTOR);
+
+
 
         return View::make('comprobante/registrocomprobantecontratoproveedor',
                          [
                             'ordencompra'           =>  $ordencompra,
+                            'user_orden'            =>  $user_orden,
+                            'combotipodetraccion'   =>  $combotipodetraccion,
+                            'combopagodetraccion'   =>  $combopagodetraccion,
+
 
                             'combobancos'           =>  $combobancos,
                             'cb_id'                 =>  $cb_id,
@@ -627,9 +638,32 @@ class GestionTCController extends Controller
                 $bancocategoria                           =   CMPCategoria::where('COD_CATEGORIA','=',$entidadbanco_id)->first();
                 $cb_id                                    =   $request['cb_id'];
 
+                $ctadetraccion                            =   $request['ctadetraccion'];
+                $tipo_detraccion_id                       =   $request['tipo_detraccion_id'];
+                $monto_detraccion                         =   $request['monto_detraccion'];
+                $pago_detraccion                          =   $request['pago_detraccion'];
+
+                $empresa_sel                              =   STDEmpresa::where('COD_EMPR','=',$pago_detraccion)->first();
+                $COD_PAGO_DETRACCION = '';
+                $TXT_PAGO_DETRACCION = '';
+                if(count($empresa_sel)>0){
+                    $COD_PAGO_DETRACCION = $empresa_sel->COD_EMPR;
+                    $TXT_PAGO_DETRACCION = $empresa_sel->NOM_EMPR;
+                }
+                
+
+
                 FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(
                                 [
+                                    'CTA_DETRACCION'=>$ctadetraccion,
+                                    'VALOR_DETRACCION'=>$tipo_detraccion_id,
+                                    'MONTO_DETRACCION_XML'=>$monto_detraccion,
+                                    'MONTO_DETRACCION_RED'=>round($monto_detraccion),
+                                    'COD_PAGO_DETRACCION'=>$COD_PAGO_DETRACCION,
+                                    'TXT_PAGO_DETRACCION'=>$TXT_PAGO_DETRACCION,
+
+                                    
                                     'COD_CATEGORIA_BANCO'=>$bancocategoria->COD_CATEGORIA,
                                     'TXT_CATEGORIA_BANCO'=>$bancocategoria->NOM_CATEGORIA,
                                     'TXT_NRO_CUENTA_BANCARIA'=>$cb_id,
