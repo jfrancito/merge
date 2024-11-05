@@ -164,7 +164,7 @@ class GestionOCController extends Controller
 
         header('Content-Type: text/html; charset=UTF-8');
         //$path = storage_path() . "/exports/FC26-00002985.XML";
-        $path = storage_path() . "/exports/FACTURAE001-105120561239381.xml";
+        $path = storage_path() . "/exports/21791-20479729141-01-F003-00003667.xml";
         $parser = new InvoiceParser();
         $xml = file_get_contents($path);
         $factura = $parser->parse($xml);
