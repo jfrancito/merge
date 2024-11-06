@@ -32,6 +32,13 @@
                   Descargar Resumen
                 </a>  
               </li>
+              @if($item->OPERACION=='CONTRATO')
+                <li>
+                  <a href="{{ url('/descargar-pago-proveedor-bcp-excel/'.$item->FOLIO) }}">
+                    Pago Proveedor BCP
+                  </a>  
+                </li>
+              @endif
             </ul>
           </div>
         </td>

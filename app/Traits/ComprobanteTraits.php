@@ -45,6 +45,26 @@ trait ComprobanteTraits
 {
 
 
+    private function con_lista_proveedores_folio($folio) {
+
+
+        $listadatos             =   CMPDocumentoCtble::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                                    ->where('FOLIO','=',$folio)
+                                    ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
+                                    ->select(DB::raw('CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR,CMP.DOCUMENTO_CTBLE.TXT_EMPR_EMISOR'))
+                                    ->groupBy('CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR')
+                                    ->groupBy('CMP.DOCUMENTO_CTBLE.TXT_EMPR_EMISOR')
+                                    ->get();
+
+        return  $listadatos;
+
+
+    }
+
+
+
+
+
     private function cambiar_parcialmente() {
 
         DB::table('CMP.ORDEN')

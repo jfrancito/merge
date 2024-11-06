@@ -191,6 +191,10 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/descargar-folio-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarDocumentoFolio');
 
 
+	Route::any('/descargar-pago-proveedor-bcp-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoFolioBcp');
+
+
+
 	Route::any('/ajax-modal-historial-extorno', 'GestionOCController@actionModalHistorialExtorno');
 
 

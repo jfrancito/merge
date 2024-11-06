@@ -369,7 +369,49 @@ class GestionEntregaDocumentoController extends Controller
 
     }
 
+    public function actionDescargarPagoFolioBcp($folio_codigo)
+    {
 
+        $folio                  =   FeDocumentoEntregable::where('FOLIO','=',$folio_codigo)->first();
+        $lista_proveedores      =   $this->con_lista_proveedores_folio($folio->FOLIO);
+        $operacion_id           =   $folio->OPERACION;
+        $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
+        $titulo                 =   'FOLIO('.$folio_codigo.') '.$empresa->NOM_EMPR;
+
+        Excel::create($titulo, function($excel) use ($lista_proveedores,$operacion_id,$folio,$empresa) {
+
+            foreach($lista_proveedores as $index => $item){
+                $npestania = substr($item->TXT_EMPR_EMISOR, 0, 30);
+                $excel->sheet($npestania, function($sheet) use ($lista_proveedores,$operacion_id,$folio,$empresa){
+
+                    $sheet->mergeCells('C2:F2');
+                    $sheet->mergeCells('C3:F3');
+                    $sheet->mergeCells('C4:F4');
+
+                    $sheet->setWidth('A', 5);
+                    $sheet->setWidth('B', 17);
+                    $sheet->setWidth('C', 17);
+                    $sheet->setWidth('D', 17);
+                    $sheet->setWidth('E', 17);
+                    $sheet->setWidth('F', 17);
+                    $sheet->setWidth('G', 17);
+                    $sheet->setWidth('H', 17);
+                    $sheet->setWidth('I', 17);
+                    $sheet->setWidth('J', 17);
+                    $sheet->setWidth('K', 17);
+
+
+                    $sheet->loadView('entregadocumento/excel/contratopagosbcp')->with('lista_proveedores',$lista_proveedores)
+                                                                               ->with('folio',$folio)
+                                                                               ->with('empresa',$empresa)
+                                                                               ->with('operacion_id',$operacion_id);         
+                });
+            }
+
+        })->export('xls');
+
+
+    }
 
 
 

@@ -1,5 +1,6 @@
     <div class="panel panel-default panel-contrast">
-      <div class="panel-heading" style="background: #1d3a6d;color: #fff;">TRANSFERENCIA
+      <div class="panel-heading"  style="background: @if($transferencia->TXT_CATEGORIA_ESTADO_ORDEN == 'TERMINADA') #cc0000 @else #1d3a6d @endif;color: #fff;"
+      >TRANSFERENCIA
       </div>
       <div class="panel-body panel-body-contrast">
           @if(count($transferencia)<=0)
