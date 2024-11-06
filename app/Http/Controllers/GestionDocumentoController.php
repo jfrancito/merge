@@ -296,8 +296,8 @@ class GestionDocumentoController extends Controller
                         $documento->HORA_EMISION            =   $factura->gethoraEmision();
                         $documento->IMPUESTO_2              =   $factura->getmtoOtrosTributos();
                         $documento->TIPO_DETRACCION         =   $factura->getdetraccion()->gettipoDet();
-                        $documento->PORC_DETRACCION         =   $factura->getdetraccion()->getporcDet();
-                        $documento->MONTO_DETRACCION        =   $factura->getdetraccion()->getbaseDetr();
+                        $documento->PORC_DETRACCION         =   (float)$factura->getdetraccion()->getporcDet();
+                        $documento->MONTO_DETRACCION        =   (float)$factura->getdetraccion()->getbaseDetr();
                         $documento->MONTO_ANTICIPO          =   $factura->getdestotalAnticipos();
                         $documento->OBSERVACION             =   $factura->getobservacion();
                         $documento->NRO_ORDEN_COMP          =   $factura->getcompra();              
