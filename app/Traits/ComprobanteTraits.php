@@ -2523,12 +2523,18 @@ trait ComprobanteTraits
         $total_2 = $fedocumento->TOTAL_VENTA_ORIG+$fedocumento->PERCEPCION;//+$fedocumento->PERCEPCION+$fedocumento->MONTO_RETENCION;
         $tt_totales = round(abs($total_1 - $total_2), 2);
 
-        //dd($tt_totales);
-
         //0.02
 		if($tt_totales <= 0.04){
 			$ind_total 			=	1;	
 		}else{ 	$ind_errototal 		=	0;  }
+
+
+        //dd($fe_rz);
+
+        if($fedocumento->RUC_PROVEEDOR == '20100007348'){
+            $ind_total          =   1; 
+            $ind_errototal      =   1;
+        }
 
 
 		if($ordencompra_t->IND_MATERIAL_SERVICIO == 'S'){
