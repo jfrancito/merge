@@ -2615,10 +2615,10 @@ trait ComprobanteTraits
 
         //dd($fe_rz);
 
-        if($fedocumento->RUC_PROVEEDOR == '20100007348'){
-            $ind_total          =   1; 
-            $ind_errototal      =   1;
-        }
+        // if($fedocumento->RUC_PROVEEDOR == '20100007348'){
+        //     $ind_total          =   1; 
+        //     $ind_errototal      =   1;
+        // }
 
 
 		if($ordencompra_t->IND_MATERIAL_SERVICIO == 'S'){
