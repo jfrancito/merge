@@ -345,6 +345,7 @@ trait ComprobanteTraits
                     ->where('FE_FORMAPAGO.ID_CUOTA', 'like', '%Cuota001%')
                     ->update([
                         'CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO' => DB::raw('FE_FORMAPAGO.FECHA_PAGO'),
+                        'CMP.DOCUMENTO_CTBLE.FEC_GRACIA' => DB::raw('FE_FORMAPAGO.FECHA_PAGO'),
                         'CMP.DOCUMENTO_CTBLE.FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
                     ]);
 
@@ -360,6 +361,7 @@ trait ComprobanteTraits
                     ->whereRaw('CMP.CATEGORIA.COD_CTBLE <> DATEDIFF(DAY, CMP.DOCUMENTO_CTBLE.FEC_EMISION, CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO)')
                     ->update([
                         'CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO' => DB::raw('CMP.DOCUMENTO_CTBLE.FEC_EMISION'),
+                        'CMP.DOCUMENTO_CTBLE.FEC_GRACIA' => DB::raw('FE_FORMAPAGO.FECHA_PAGO'),
                         'CMP.DOCUMENTO_CTBLE.FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
                     ]);
 
@@ -387,6 +389,7 @@ trait ComprobanteTraits
                     ->where('FE_FORMAPAGO.ID_CUOTA', 'like', '%Cuota001%')
                     ->update([
                         'CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO' => DB::raw('FE_FORMAPAGO.FECHA_PAGO'),
+                        'CMP.DOCUMENTO_CTBLE.FEC_GRACIA' => DB::raw('FE_FORMAPAGO.FECHA_PAGO'),
                         'CMP.DOCUMENTO_CTBLE.FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
                     ]);
 
@@ -405,6 +408,7 @@ trait ComprobanteTraits
                     ->whereRaw('CMP.CATEGORIA.COD_CTBLE <> DATEDIFF(DAY, CMP.DOCUMENTO_CTBLE.FEC_EMISION, CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO)')
                     ->update([
                         'CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO' => DB::raw('CMP.DOCUMENTO_CTBLE.FEC_EMISION'),
+                        'CMP.DOCUMENTO_CTBLE.FEC_GRACIA' => DB::raw('FE_FORMAPAGO.FECHA_PAGO'),
                         'CMP.DOCUMENTO_CTBLE.FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
                     ]);
 
@@ -430,6 +434,7 @@ trait ComprobanteTraits
                     ->where('FE_FORMAPAGO.ID_CUOTA', 'like', '%Cuota001%')
                     ->update([
                         'CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO' => DB::raw('FE_FORMAPAGO.FECHA_PAGO'),
+                        'CMP.DOCUMENTO_CTBLE.FEC_GRACIA' => DB::raw('FE_FORMAPAGO.FECHA_PAGO'),
                         'CMP.DOCUMENTO_CTBLE.FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
                     ]);
 
@@ -447,6 +452,7 @@ trait ComprobanteTraits
                     ->whereRaw('CMP.CATEGORIA.COD_CTBLE <> DATEDIFF(DAY, CMP.DOCUMENTO_CTBLE.FEC_EMISION, CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO)')
                     ->update([
                         'CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO' => DB::raw('CMP.DOCUMENTO_CTBLE.FEC_EMISION'),
+                        'CMP.DOCUMENTO_CTBLE.FEC_GRACIA' => DB::raw('FE_FORMAPAGO.FECHA_PAGO'),
                         'CMP.DOCUMENTO_CTBLE.FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
                     ]);
 
@@ -471,6 +477,7 @@ trait ComprobanteTraits
                     ->where('FE_FORMAPAGO.ID_CUOTA', 'like', '%Cuota001%')
                     ->update([
                         'CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO' => DB::raw('FE_FORMAPAGO.FECHA_PAGO'),
+                        'CMP.DOCUMENTO_CTBLE.FEC_GRACIA' => DB::raw('FE_FORMAPAGO.FECHA_PAGO'),
                         'CMP.DOCUMENTO_CTBLE.FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
                     ]);
 
@@ -489,6 +496,7 @@ trait ComprobanteTraits
                     ->whereRaw('CMP.CATEGORIA.COD_CTBLE <> DATEDIFF(DAY, CMP.DOCUMENTO_CTBLE.FEC_EMISION, CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO)')
                     ->update([
                         'CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO' => DB::raw('CMP.DOCUMENTO_CTBLE.FEC_EMISION'),
+                        'CMP.DOCUMENTO_CTBLE.FEC_GRACIA' => DB::raw('FE_FORMAPAGO.FECHA_PAGO'),
                         'CMP.DOCUMENTO_CTBLE.FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
                     ]);
 
@@ -516,6 +524,7 @@ trait ComprobanteTraits
                     ->where('FE_FORMAPAGO.ID_CUOTA', 'like', '%Cuota001%')
                     ->update([
                         'CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO' => DB::raw('FE_FORMAPAGO.FECHA_PAGO'),
+                        'CMP.DOCUMENTO_CTBLE.FEC_GRACIA' => DB::raw('FE_FORMAPAGO.FECHA_PAGO'),
                         'CMP.DOCUMENTO_CTBLE.FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
                     ]);
 
@@ -531,6 +540,7 @@ trait ComprobanteTraits
                     ->whereRaw('CMP.CATEGORIA.COD_CTBLE <> DATEDIFF(DAY, CMP.DOCUMENTO_CTBLE.FEC_EMISION, CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO)')
                     ->update([
                         'CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO' => DB::raw('CMP.DOCUMENTO_CTBLE.FEC_EMISION'),
+                        'CMP.DOCUMENTO_CTBLE.FEC_GRACIA' => DB::raw('FE_FORMAPAGO.FECHA_PAGO'),
                         'CMP.DOCUMENTO_CTBLE.FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
                     ]);
 
@@ -555,6 +565,7 @@ trait ComprobanteTraits
                     ->where('FE_FORMAPAGO.ID_CUOTA', 'like', '%Cuota001%')
                     ->update([
                         'CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO' => DB::raw('FE_FORMAPAGO.FECHA_PAGO'),
+                        'CMP.DOCUMENTO_CTBLE.FEC_GRACIA' => DB::raw('FE_FORMAPAGO.FECHA_PAGO'),
                         'CMP.DOCUMENTO_CTBLE.FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
                     ]);
 
@@ -573,6 +584,7 @@ trait ComprobanteTraits
                     ->whereRaw('CMP.CATEGORIA.COD_CTBLE <> DATEDIFF(DAY, CMP.DOCUMENTO_CTBLE.FEC_EMISION, CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO)')
                     ->update([
                         'CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO' => DB::raw('CMP.DOCUMENTO_CTBLE.FEC_EMISION'),
+                        'CMP.DOCUMENTO_CTBLE.FEC_GRACIA' => DB::raw('FE_FORMAPAGO.FECHA_PAGO'),
                         'CMP.DOCUMENTO_CTBLE.FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
                     ]);
 
