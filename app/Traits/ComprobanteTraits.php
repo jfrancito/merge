@@ -166,6 +166,61 @@ trait ComprobanteTraits
     }
 
 
+    private function con_lista_doc_proveedor_banco_folio($folio,$banco_txt) {
+
+
+        $listadatos             =   CMPDocumentoCtble::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                                    ->leftJoin('TES.CUENTA_BANCARIA', function ($join) {
+                                        $join->on('CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR', '=', 'TES.CUENTA_BANCARIA.COD_EMPR_TITULAR')
+                                             ->on('FE_DOCUMENTO.COD_CATEGORIA_BANCO', '=', 'TES.CUENTA_BANCARIA.COD_EMPR_BANCO')
+                                             ->on('FE_DOCUMENTO.TXT_NRO_CUENTA_BANCARIA', '=', 'TES.CUENTA_BANCARIA.TXT_NRO_CUENTA_BANCARIA');
+                                    })
+                                    ->leftjoin('CMP.CATEGORIA as CAT_CUENTA ', 'CAT_CUENTA.COD_CATEGORIA', '=', 'TES.CUENTA_BANCARIA.TXT_TIPO_REFERENCIA')
+                                    ->leftjoin('STD.EMPRESA', 'STD.EMPRESA.COD_EMPR', '=', 'CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR')
+                                    ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'STD.EMPRESA.COD_TIPO_DOCUMENTO')
+                                    ->where('FOLIO','=',$folio)
+                                    ->where('TXT_CATEGORIA_BANCO','=',$banco_txt)
+                                    ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
+                                    ->select(DB::raw('FE_DOCUMENTO.TXT_NRO_CUENTA_BANCARIA,
+                                                    CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR,
+                                                    CMP.DOCUMENTO_CTBLE.TXT_EMPR_EMISOR,
+                                                    STD.EMPRESA.NRO_DOCUMENTO,
+                                                    CMP.CATEGORIA.CODIGO_SUNAT,
+                                                    CAT_CUENTA.TXT_ABREVIATURA,
+                                                    SUM(TOTAL_VENTA_ORIG) TOTAL,
+                                                    SUM(MONTO_DETRACCION_RED) DETRACCION'))
+                                    ->groupBy('CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR')
+                                    ->groupBy('CMP.DOCUMENTO_CTBLE.TXT_EMPR_EMISOR')
+                                    ->groupBy('FE_DOCUMENTO.TXT_NRO_CUENTA_BANCARIA')
+                                    ->groupBy('STD.EMPRESA.NRO_DOCUMENTO')
+                                    ->groupBy('CMP.CATEGORIA.CODIGO_SUNAT')
+                                    ->groupBy('CAT_CUENTA.TXT_ABREVIATURA')
+                                    ->get();
+
+        return  $listadatos;
+
+
+    }
+
+
+
+    private function con_lista_proveedores_banco_folio($folio,$banco_txt) {
+
+
+        $listadatos             =   CMPDocumentoCtble::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                                    ->where('FOLIO','=',$folio)
+                                    ->where('TXT_CATEGORIA_BANCO','=',$banco_txt)
+                                    ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
+                                    ->select(DB::raw('CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR,CMP.DOCUMENTO_CTBLE.TXT_EMPR_EMISOR'))
+                                    ->groupBy('CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR')
+                                    ->groupBy('CMP.DOCUMENTO_CTBLE.TXT_EMPR_EMISOR')
+                                    ->get();
+
+        return  $listadatos;
+
+
+    }
+
 
     private function con_lista_proveedores_folio($folio) {
 
@@ -183,6 +238,23 @@ trait ComprobanteTraits
 
     }
 
+
+
+    private function con_lista_bancos_folio($folio) {
+
+
+        $listadatos             =   CMPDocumentoCtble::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                                    ->where('FOLIO','=',$folio)
+                                    ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
+                                    ->select(DB::raw('FE_DOCUMENTO.COD_CATEGORIA_BANCO,FE_DOCUMENTO.TXT_CATEGORIA_BANCO'))
+                                    ->groupBy('FE_DOCUMENTO.COD_CATEGORIA_BANCO')
+                                    ->groupBy('FE_DOCUMENTO.TXT_CATEGORIA_BANCO')
+                                    ->get();
+
+        return  $listadatos;
+
+
+    }
 
 
 

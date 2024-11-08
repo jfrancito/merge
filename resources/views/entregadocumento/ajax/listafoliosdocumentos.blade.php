@@ -35,7 +35,12 @@
               @if($item->OPERACION=='CONTRATO')
                 <li>
                   <a href="{{ url('/descargar-pago-proveedor-bcp-excel/'.$item->FOLIO) }}">
-                    Pago Proveedor BCP
+                    Detalle Informativo
+                  </a>  
+                </li>
+                <li>
+                  <a href="{{ url('/descargar-pago-proveedor-macro-excel/'.$item->FOLIO) }}">
+                    Macro de Pagos
                   </a>  
                 </li>
               @endif

@@ -376,7 +376,7 @@ class GestionEntregaDocumentoController extends Controller
         $lista_proveedores      =   $this->con_lista_proveedores_folio($folio->FOLIO);
         $operacion_id           =   $folio->OPERACION;
         $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
-        $titulo                 =   'FOLIO('.$folio_codigo.') '.$empresa->NOM_EMPR;
+        $titulo                 =   'DETALLE FOLIO ('.$folio_codigo.') '.$empresa->NOM_EMPR;
 
         Excel::create($titulo, function($excel) use ($lista_proveedores,$operacion_id,$folio,$empresa) {
 
@@ -424,8 +424,73 @@ class GestionEntregaDocumentoController extends Controller
             }
 
         })->export('xls');
+    }
 
 
+    public function actionDescargarPagoFolioMacro($folio_codigo)
+    {
+
+        $folio                  =   FeDocumentoEntregable::where('FOLIO','=',$folio_codigo)->first();
+        $lista_bancos           =   $this->con_lista_bancos_folio($folio->FOLIO);
+        $operacion_id           =   $folio->OPERACION;
+        $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
+        $titulo                 =   'MACRO FOLIO ('.$folio_codigo.') '.$empresa->NOM_EMPR;
+
+        Excel::create($titulo, function($excel) use ($lista_bancos,$operacion_id,$folio,$empresa) {
+
+            foreach($lista_bancos as $index => $item){
+
+                $txt_banco = 'SIN BANCO';
+                if (is_null($item->TXT_CATEGORIA_BANCO) or $item->TXT_CATEGORIA_BANCO == '') {
+                    $txt_banco = 'SIN BANCO';
+                }else{
+                    $txt_banco = $item->TXT_CATEGORIA_BANCO;
+                }
+                $fedocumento    =    FeDocumento::where('FOLIO','=',$folio->FOLIO)->where('TXT_CATEGORIA_BANCO','=',$item->TXT_CATEGORIA_BANCO)->first();
+                
+                $listafedocu    =   $this->con_lista_proveedores_banco_folio($folio->FOLIO,$item->TXT_CATEGORIA_BANCO);
+                $countfedocu    =    str_pad(count($listafedocu), 6, '0', STR_PAD_LEFT);
+                $listadocumento =   $this->con_lista_doc_proveedor_banco_folio($folio->FOLIO,$item->TXT_CATEGORIA_BANCO);
+
+
+                //dd($listadocumento->sum('TOTAL'));
+
+
+                $npestania = substr($txt_banco, 0, 30);
+
+                $excel->sheet($npestania, function($sheet) use ($item,$operacion_id,$folio,$empresa,$fedocumento,$listadocumento,$txt_banco,$countfedocu){
+
+                    $sheet->setWidth('A', 20);
+                    $sheet->setWidth('B', 20);
+                    $sheet->setWidth('C', 20);
+                    $sheet->setWidth('D', 20);
+                    $sheet->setWidth('E', 20);
+                    $sheet->setWidth('F', 20);
+                    $sheet->setWidth('G', 20);
+                    $sheet->setWidth('H', 20);
+                    $sheet->setWidth('I', 20);
+                    $sheet->setWidth('J', 20);
+                    $sheet->setWidth('K', 20);
+
+                    $sheet->setCellValueExplicit('E8', $empresa->NRO_CUENTA_BANCARIA, \PHPExcel_Cell_DataType::TYPE_STRING);
+
+
+                    $sheet->cell('A1', function($cell) {
+                                $cell->setFontColor('#FFFFFF');   // Texto blanco
+                            });
+
+                    $sheet->loadView('entregadocumento/excel/contratopagosmacro')->with('banco',$item)
+                                                                               ->with('folio',$folio)
+                                                                               ->with('empresa',$empresa)
+                                                                               ->with('txt_banco',$txt_banco)
+                                                                               ->with('countfedocu',$countfedocu)
+                                                                               ->with('fedocumento',$fedocumento)
+                                                                               ->with('listadocumento',$listadocumento)
+                                                                               ->with('operacion_id',$operacion_id);         
+                });
+            }
+
+        })->export('xls');
     }
 
 

@@ -134,7 +134,7 @@
 	        <td>{{$item->MONTO_DETRACCION_XML}}</td>
 	        <td>{{$item->MONTO_DETRACCION_RED}}</td>
 			<td>0.00</td>
-	        <td>{{$item->TOTAL_VENTA_ORIG + $item->MONTO_DETRACCION_RED}}</td>
+	        <td>{{$item->TOTAL_VENTA_ORIG - $item->MONTO_DETRACCION_RED}}</td>
 	      </tr>                    
 	    @endforeach
 	  </tbody>
@@ -149,7 +149,7 @@
 	        <th>{{number_format($listadocumento->SUM('MONTO_DETRACCION_XML'), 2, '.', '')}}</th>
 	        <th>{{number_format($listadocumento->SUM('MONTO_DETRACCION_RED'), 2, '.', '')}}</th>
 	        <th>0.00</th>
-	        <th>{{number_format($listadocumento->SUM('TOTAL_VENTA_ORIG') + $listadocumento->SUM('MONTO_DETRACCION_RED'), 2, '.', '')}}</th>
+	        <th>{{number_format($listadocumento->SUM('TOTAL_VENTA_ORIG') - $listadocumento->SUM('MONTO_DETRACCION_RED'), 2, '.', '')}}</th>
 	      </tr>                    
 	  </tfoot>
 
