@@ -1587,7 +1587,7 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
-    private function con_lista_cabecera_comprobante_total_tes_contrato($cliente_id) {
+    private function con_lista_cabecera_comprobante_total_tes_contrato($cliente_id,$proveedor_id) {
 
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                             ->leftJoin('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'LISTA_DOCUMENTOS_PAGAR_PROGRAMACION.COD_ORDEN')
@@ -1595,15 +1595,33 @@ trait ComprobanteTraits
                             ->select(DB::raw('CMP.DOCUMENTO_CTBLE.* ,FE_DOCUMENTO.* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                             ->where('OPERACION','=','CONTRATO')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->ProveedorFE($proveedor_id)
                             //->where('TXT_PROCEDENCIA','<>','SUE')
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000005')
+                            ->orderBy('fecha_uc','desc')
                             ->get();
 
         return  $listadatos;
     }
 
 
-    private function con_lista_cabecera_comprobante_total_tes($cliente_id) {
+    private function con_lista_cabecera_comprobante_total_tes_contrato_pagado($cliente_id,$proveedor_id,$fecha_inicio,$fecha_fin) {
+
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                            ->select(DB::raw('CMP.DOCUMENTO_CTBLE.* ,FE_DOCUMENTO.* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                            ->where('OPERACION','=','CONTRATO')
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->ProveedorFE($proveedor_id)
+                            ->Fecha('RE',$fecha_inicio,$fecha_fin)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000008')
+                            ->orderBy('fecha_uc','desc')
+                            ->get();
+
+        return  $listadatos;
+    }
+
+
+    private function con_lista_cabecera_comprobante_total_tes($cliente_id,$proveedor_id) {
 
         $listadatos     =   FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
                             ->leftJoin('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'LISTA_DOCUMENTOS_PAGAR_PROGRAMACION.COD_ORDEN')
@@ -1612,14 +1630,31 @@ trait ComprobanteTraits
                             ->where('OPERACION','=','ORDEN_COMPRA')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000005')
-                            ->orderBy('fecha_uc','asc')
+                            ->ProveedorFE($proveedor_id)
+                            ->orderBy('fecha_uc','desc')
+                            ->get();
+
+        return  $listadatos;
+    }
+
+    private function con_lista_cabecera_comprobante_total_tes_pagado($cliente_id,$proveedor_id,$fecha_inicio,$fecha_fin) {
+
+        $listadatos     =   FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+                            ->select(DB::raw('FE_DOCUMENTO.*,CMP.Orden.* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                            ->where('OPERACION','=','ORDEN_COMPRA')
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000008')
+                            ->Fecha('RE',$fecha_inicio,$fecha_fin)
+                            ->ProveedorFE($proveedor_id)
+                            ->orderBy('fecha_uc','desc')
                             ->get();
 
         return  $listadatos;
     }
 
 
-    private function con_lista_cabecera_comprobante_total_tes_sp($cliente_id) {
+
+    private function con_lista_cabecera_comprobante_total_tes_sp($cliente_id,$proveedor_id) {
 
         $listadatos     =   FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
                             ->Join('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'LISTA_DOCUMENTOS_PAGAR_PROGRAMACION.COD_ORDEN')
@@ -1627,14 +1662,15 @@ trait ComprobanteTraits
                             ->where('OPERACION','=','ORDEN_COMPRA')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000005')
-                            ->orderBy('fecha_uc','asc')
+                            ->ProveedorFE($proveedor_id)
+                            ->orderBy('fecha_uc','desc')
                             ->get();
 
         return  $listadatos;
     }
 
 
-    private function con_lista_cabecera_comprobante_total_tes_contrato_sp($cliente_id) {
+    private function con_lista_cabecera_comprobante_total_tes_contrato_sp($cliente_id,$proveedor_id) {
 
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                             ->leftJoin('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'LISTA_DOCUMENTOS_PAGAR_PROGRAMACION.COD_ORDEN')
@@ -1642,7 +1678,9 @@ trait ComprobanteTraits
                             ->where('OPERACION','=','CONTRATO')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             //->where('TXT_PROCEDENCIA','<>','SUE')
+                            ->ProveedorFE($proveedor_id)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000005')
+                            ->orderBy('fecha_uc','desc')
                             ->get();
 
         return  $listadatos;
@@ -2151,21 +2189,27 @@ trait ComprobanteTraits
     }
 
 
+    private function gn_combo_proveedor_fe_documento_xestado($todo,$estado_id) {
+            
+        $array                      =   FeDocumento::where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                        ->select(DB::raw('RUC_PROVEEDOR,RZ_PROVEEDOR'))
+                                        ->groupBy('RUC_PROVEEDOR')
+                                        ->groupBy('RZ_PROVEEDOR')
+                                        ->pluck('RZ_PROVEEDOR','RUC_PROVEEDOR')
+                                        ->toArray();
+
+        if($todo=='TODO'){
+            $combo                  =   array($todo => $todo) + $array;
+        }else{
+            $combo                  =   $array;
+        }
+        return  $combo;                             
+    }
 
 
 
     private function gn_combo_proveedor_fe_documento($todo) {
-
-		// $array 						= 	FeDocumento::join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
-		// 								->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-		// 								->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-        //                                 //->where('TXT_PROCEDENCIA','<>','SUE')
-		// 								->select(DB::raw('COD_EMPR_CLIENTE,TXT_EMPR_CLIENTE'))
-		// 								->groupBy('COD_EMPR_CLIENTE')
-		// 								->groupBy('TXT_EMPR_CLIENTE')
-        //                                 ->pluck('TXT_EMPR_CLIENTE','COD_EMPR_CLIENTE')
-        //                                 ->toArray();
-                   
+            
         $array                      =   FeDocumento::where('FE_DOCUMENTO.COD_ESTADO','<>','')
                                         ->select(DB::raw('RUC_PROVEEDOR,RZ_PROVEEDOR'))
                                         ->groupBy('RUC_PROVEEDOR')
@@ -2430,17 +2474,34 @@ trait ComprobanteTraits
 
 	private function con_lista_cabecera_comprobante_total_gestion_historial($cliente_id) {
 
+        if(Session::get('usuario')->id== '1CIX00000001'){
+
+            $listadatos     =   FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+                                ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                ->where('OPERACION','=','ORDEN_COMPRA')
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                ->orderBy('CMP.Orden.FEC_ORDEN','desc')
+                                ->get();
+
+        }else{
+
+            $listadatos     =   FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+                                ->where('FE_DOCUMENTO.RUC_PROVEEDOR','=',$cliente_id)
+                                //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                                ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                ->where('OPERACION','=','ORDEN_COMPRA')
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                ->orderBy('CMP.Orden.FEC_ORDEN','desc')
+                                ->get();
+
+        } 
 
 
-		$listadatos 	= 	FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
-							->where('FE_DOCUMENTO.RUC_PROVEEDOR','=',$cliente_id)
-                            //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
-                            ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-							->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                            ->where('OPERACION','=','ORDEN_COMPRA')
-							->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
-                            ->orderBy('CMP.Orden.FEC_ORDEN','desc')
-							->get();
+
+
+
 
 
 

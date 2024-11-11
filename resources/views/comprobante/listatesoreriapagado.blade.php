@@ -9,6 +9,9 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/bootstrap-slider/css/bootstrap-slider.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/css/confirm/jquery-confirm.min.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/css/file/fileinput.css') }} "/>
+    <style type="text/css">
+      .kv-file-zoom{display: none !important;}
+    </style>
 @stop
 @section('section')
   <div class="be-content contenido asientomodelo areatesoreria">
@@ -20,12 +23,8 @@
 
                   <div class="tools tooltiptop">
 
-                    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones asignarmasivo">
-                      <span class="tooltiptext">Integracion Masiva</span>
-                      <span class="icon mdi mdi-plus-circle-o"></span>
-                    </a>
 
-                    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscardocumento">
+                    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscardocumentopagado">
                       <span class="tooltiptext">Buscar Documento</span>
                       <span class="icon mdi mdi-search"></span>
                     </a>
@@ -53,19 +52,44 @@
                       </div> 
 
                       <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
-                          <div class="form-group">
-                            <label class="col-sm-12 control-label labelleft" >Estado Pago :</label>
+                          <div class="form-group ">
+                            <label class="col-sm-12 control-label labelleft" >Fecha Inicio:</label>
                             <div class="col-sm-12 abajocaja" >
-                              {!! Form::select( 'estadopago_id', $combo_estado, array($estadopago_id),
-                                                [
-                                                  'class'       => 'select2 form-control control input-sm' ,
-                                                  'id'          => 'estadopago_id',
-                                                  'required'    => '',
-                                                  'data-aw'     => '1',
-                                                ]) !!}
+                              <div data-min-view="2" 
+                                     data-date-format="dd-mm-yyyy"  
+                                     class="input-group date datetimepicker pickerfecha" style = 'padding: 0px 0;margin-top: -3px;'>
+                                     <input size="16" type="text" 
+                                            value="{{$fecha_inicio}}" 
+                                            placeholder="Fecha Inicio"
+                                            id='fecha_inicio' 
+                                            name='fecha_inicio' 
+                                            required = ""
+                                            class="form-control input-sm"/>
+                                      <span class="input-group-addon btn btn-primary"><i class="icon-th mdi mdi-calendar"></i></span>
+                                </div>
                             </div>
                           </div>
-                      </div>
+                      </div> 
+
+                      <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
+                        <div class="form-group ">
+                          <label class="col-sm-12 control-label labelleft" >Fecha Fin:</label>
+                          <div class="col-sm-12 abajocaja" >
+                            <div data-min-view="2" 
+                                   data-date-format="dd-mm-yyyy"  
+                                   class="input-group date datetimepicker pickerfecha" style = 'padding: 0px 0;margin-top: -3px;'>
+                                   <input size="16" type="text" 
+                                          value="{{$fecha_fin}}" 
+                                          placeholder="Fecha Fin"
+                                          id='fecha_fin' 
+                                          name='fecha_fin' 
+                                          required = ""
+                                          class="form-control input-sm"/>
+                                    <span class="input-group-addon btn btn-primary"><i class="icon-th mdi mdi-calendar"></i></span>
+                              </div>
+                          </div>
+                        </div>
+                      </div> 
 
                       <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
 
@@ -87,7 +111,7 @@
                     </div>
                   </div>
                   <div class='listajax'>
-                    @include('comprobante.ajax.mergelistatesoreria')
+                    @include('comprobante.ajax.mergelistatesoreriapagado')
 
                   </div>
                 </div>

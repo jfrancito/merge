@@ -112,7 +112,7 @@ class GestionOCTesoreriaController extends Controller
         $validarurl = $this->funciones->getUrl($idopcion,'Ver');
         if($validarurl <> 'true'){return $validarurl;}
         /******************************************************/
-        View::share('titulo','Lista comprobantes por aprobar tesoreria');
+        View::share('titulo','Lista comprobantes por integrar pago tesoreria');
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
         //falta usuario contacto
 
@@ -121,26 +121,25 @@ class GestionOCTesoreriaController extends Controller
         if(Session::has('operacion_id')){
             $operacion_id           =   Session::get('operacion_id');
         }
-
         $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO');
         //$combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA');
         $combo_estado       =   array('PAGADO' => 'PAGADO','SIN_PAGAR' => 'SIN PAGAR');
+        $proveedor_id       =   'TODO';
+        $combo_proveedor    =   $this->gn_combo_proveedor_fe_documento_xestado($proveedor_id,'ETM0000000000005');
 
         if($operacion_id=='ORDEN_COMPRA'){
             if($estadopago_id == 'PAGADO'){
-                $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes($cod_empresa);
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes($cod_empresa,$proveedor_id);
             }else{
-                $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_sp($cod_empresa);
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_sp($cod_empresa,$proveedor_id);
             }
         }else{
 
             if($estadopago_id == 'PAGADO'){
-                $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_contrato($cod_empresa);
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_contrato($cod_empresa,$proveedor_id);
             }else{
-                $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_contrato_sp($cod_empresa);
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_contrato_sp($cod_empresa,$proveedor_id);
             }
-
-
         }
         $funcion        =   $this;
 
@@ -148,6 +147,8 @@ class GestionOCTesoreriaController extends Controller
                          [
                             'listadatos'        =>  $listadatos,
                             'funcion'           =>  $funcion,
+                            'proveedor_id'      =>  $proveedor_id,
+                            'combo_proveedor'   =>  $combo_proveedor,
                             'operacion_id'      =>  $operacion_id,
                             'combo_operacion'   =>  $combo_operacion,
                             'estadopago_id'     =>  $estadopago_id,
@@ -157,29 +158,31 @@ class GestionOCTesoreriaController extends Controller
 
     }
 
-
     public function actionListarAjaxBuscarDocumentoTesoreria(Request $request) {
 
         $operacion_id   =   $request['operacion_id'];
         $estadopago_id  =   $request['estadopago_id'];
+        $proveedor_id   =   $request['proveedor_id'];
+
         $idopcion       =   $request['idopcion'];
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
+        $proveedor_id   =   $request['proveedor_id'];
 
         if($operacion_id=='ORDEN_COMPRA'){
             if($estadopago_id == 'PAGADO'){
-                $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes($cod_empresa);
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes($cod_empresa,$proveedor_id);
             }else{
-                $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_sp($cod_empresa);
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_sp($cod_empresa,$proveedor_id);
             }
         }else{
             if($estadopago_id == 'PAGADO'){
-                $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_contrato($cod_empresa);
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_contrato($cod_empresa,$proveedor_id);
             }else{
-                $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_contrato_sp($cod_empresa);
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_contrato_sp($cod_empresa,$proveedor_id);
             }
         }
 
-        //dd($listadatos);
+
         $procedencia            =   'ADM';
         $funcion                =   $this;
         return View::make('comprobante/ajax/mergelistatesoreria',
@@ -195,6 +198,138 @@ class GestionOCTesoreriaController extends Controller
                             'funcion'               =>  $funcion
                          ]);
     }
+
+
+    public function actionListarComprobanteTesoreriaPago($idopcion)
+    {
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Ver');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        View::share('titulo','Lista comprobantes con pagos asociados');
+        $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
+        //falta usuario contacto
+        $operacion_id       =   'ORDEN_COMPRA';
+        if(Session::has('operacion_id')){
+            $operacion_id           =   Session::get('operacion_id');
+        }
+        $fecha_inicio       =   $this->fecha_menos_diez_dias;
+        $fecha_fin          =   $this->fecha_sin_hora;
+        $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO');
+        //$combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA');
+        $proveedor_id       =   'TODO';
+        $combo_proveedor    =   $this->gn_combo_proveedor_fe_documento_xestado($proveedor_id,'ETM0000000000008');
+        if($operacion_id=='ORDEN_COMPRA'){
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_pagado($cod_empresa,$proveedor_id,$fecha_inicio,$fecha_fin);
+        }else{
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_contrato_pagado($cod_empresa,$proveedor_id,$fecha_inicio,$fecha_fin);
+        }
+        $funcion        =   $this;
+
+        return View::make('comprobante/listatesoreriapagado',
+                         [
+                            'listadatos'        =>  $listadatos,
+                            'funcion'           =>  $funcion,
+
+                            'fecha_inicio'      =>  $fecha_inicio,
+                            'fecha_fin'         =>  $fecha_fin,
+
+                            'proveedor_id'      =>  $proveedor_id,
+                            'combo_proveedor'   =>  $combo_proveedor,
+                            'operacion_id'      =>  $operacion_id,
+                            'combo_operacion'   =>  $combo_operacion,
+                            'idopcion'          =>  $idopcion,
+                         ]);
+
+    }
+
+
+    public function actionListarAjaxBuscarDocumentoTesoreriaPago(Request $request) {
+
+        $operacion_id   =   $request['operacion_id'];
+        $fecha_inicio   =   $request['fecha_inicio'];
+        $fecha_fin      =   $request['fecha_fin'];
+        $proveedor_id   =   $request['proveedor_id'];
+        $idopcion       =   $request['idopcion'];
+        $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
+        $proveedor_id   =   $request['proveedor_id'];
+        if($operacion_id=='ORDEN_COMPRA'){
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_pagado($cod_empresa,$proveedor_id,$fecha_inicio,$fecha_fin);
+        }else{
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_contrato_pagado($cod_empresa,$proveedor_id,$fecha_inicio,$fecha_fin);
+        }
+        $procedencia            =   'ADM';
+        $funcion                =   $this;
+        return View::make('comprobante/ajax/mergelistatesoreria',
+                         [
+                            'operacion_id'          =>  $operacion_id,
+
+                            'idopcion'              =>  $idopcion,
+                            'cod_empresa'           =>  $cod_empresa,
+                            'listadatos'            =>  $listadatos,
+                            'procedencia'           =>  $procedencia,
+                            'ajax'                  =>  true,
+                            'funcion'               =>  $funcion
+                         ]);
+    }
+
+
+    public function actionListarAjaxModalTesoreriaPagoPagado(Request $request)
+    {
+        
+        $cod_orden              =   $request['data_requerimiento_id'];
+        $linea                  =   $request['data_linea'];
+        $idopcion               =   $request['idopcion'];
+
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$cod_orden)->where('DOCUMENTO_ITEM','=',$linea)->first();
+        $ordencompra            =   CMPOrden::where('COD_ORDEN','=',$cod_orden)->first();
+
+        //ARCHIVOS
+        $archivosdelfe          =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                        ->whereIn('COD_CATEGORIA', ['DCC0000000000028'])
+                                        ->get();
+
+        $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+                                        ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000028'])
+                                        ->get();
+        if(count($tarchivos)<=0){
+            foreach($archivosdelfe as $index=>$item){
+                    $categoria                               =   CMPCategoria::where('COD_CATEGORIA','=',$item->COD_CATEGORIA)->first();
+                    $docasociar                              =   New CMPDocAsociarCompra;
+                    $docasociar->COD_ORDEN                   =   $ordencompra->COD_ORDEN;
+                    $docasociar->COD_CATEGORIA_DOCUMENTO     =   $categoria->COD_CATEGORIA;
+                    $docasociar->NOM_CATEGORIA_DOCUMENTO     =   $categoria->NOM_CATEGORIA;
+                    $docasociar->IND_OBLIGATORIO             =   $categoria->IND_DOCUMENTO_VAL;
+                    $docasociar->TXT_FORMATO                 =   $categoria->COD_CTBLE;
+                    $docasociar->TXT_ASIGNADO                =   $categoria->TXT_ABREVIATURA;
+                    $docasociar->COD_USUARIO_CREA_AUD        =   Session::get('usuario')->id;
+                    $docasociar->FEC_USUARIO_CREA_AUD        =   $this->fechaactual;
+                    $docasociar->COD_ESTADO                  =   1;
+                    $docasociar->TIP_DOC                     =   $categoria->CODIGO_SUNAT;
+                    $docasociar->save();
+            }
+        }
+
+        $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+                                        ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000028'])
+                                        ->get();
+
+        $archivo                =   Archivo::where('ID_DOCUMENTO','=',$cod_orden)->where('TIPO_ARCHIVO','=','DCC0000000000028')->first();
+
+
+        return View::make('comprobante/modal/ajax/magregarpagotesoreriapagado',
+                         [          
+                            'cod_orden'             => $cod_orden,
+                            'linea'                 => $linea,
+                            'idopcion'              => $idopcion,
+                            'fedocumento'           => $fedocumento,
+                            'ordencompra'           => $ordencompra,
+                            'tarchivos'             => $tarchivos,
+                            'archivo'               => $archivo,
+                            'ajax'                  => true,                            
+                         ]);
+    }
+
 
 
 
@@ -457,6 +592,85 @@ class GestionOCTesoreriaController extends Controller
 
         }
  
+    }
+
+
+    public function actionAprobarTesoreriaPagado($idopcion, $linea,$prefijo, $idordencompra,Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo($idordencompra,$prefijo);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_idoc_actual($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc_actual($idoc);
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
+        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+        View::share('titulo','Modificar Comprobante Pago');
+
+        if($_POST)
+        {
+
+            try{    
+                
+                DB::beginTransaction();
+                $pedido_id          =   $idoc;
+                $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
+                $tarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+                                        ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000028')
+                                        ->get();
+
+                foreach($tarchivos as $index => $item){
+
+                    $filescdm          =   $request[$item->COD_CATEGORIA_DOCUMENTO];
+
+                    //dd($filescdm);
+
+                    if(!is_null($filescdm)){
+
+                        foreach($filescdm as $file){
+
+                            $larchivos                      =      Archivo::get();
+                            $nombre                         =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
+
+                            $prefijocarperta                =      $this->prefijo_empresa($ordencompra->COD_EMPR);
+                            $rutafile                       =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
+                            $nombrefilecdr                  =      count($larchivos).'-'.$file->getClientOriginalName();
+                            $valor                          =      $this->versicarpetanoexiste($rutafile);
+                            $rutacompleta                   =      $rutafile.'\\'.$nombrefilecdr;
+                            copy($file->getRealPath(),$rutacompleta);
+                            $path                           =      $rutacompleta;
+
+                            $nombreoriginal                 =       $file->getClientOriginalName();
+                            $info                           =       new SplFileInfo($nombreoriginal);
+                            $extension                      =       $info->getExtension();
+
+                            $dcontrol                       =       Archivo::where('ID_DOCUMENTO','=',$fedocumento->ID_DOCUMENTO)->where('TIPO_ARCHIVO','=','DCC0000000000028')->first();
+                            $dcontrol->NOMBRE_ARCHIVO       =       $nombrefilecdr;
+                            $dcontrol->URL_ARCHIVO          =       $path;
+                            $dcontrol->SIZE                 =       filesize($file);
+                            $dcontrol->EXTENSION            =       $extension;
+                            $dcontrol->ACTIVO               =       1;
+                            $dcontrol->FECHA_MOD            =       $this->fechaactual;
+                            $dcontrol->USUARIO_MOD         =        Session::get('usuario')->id;
+                            $dcontrol->save();
+
+
+                        }
+                    }
+                }
+
+                DB::commit();
+                return Redirect::to('/gestion-de-comprobante-pago-tesoreria/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' Modificado CON EXITO');
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                return Redirect::to('gestion-de-comprobante-pago-tesoreria/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+
+        }
+
+
     }
 
 

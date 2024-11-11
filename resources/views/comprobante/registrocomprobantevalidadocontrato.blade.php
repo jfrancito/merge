@@ -68,6 +68,8 @@
               language: 'es',
               allowedFileExtensions: ['pdf'],
             });
+
+           
           @foreach($archivospdf as $index => $item)
             var nombre_archivo = '{{$item->NOMBRE_ARCHIVO}}';
             $('#file-'+{{$index}}).fileinput({

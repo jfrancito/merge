@@ -31,7 +31,7 @@ $(document).ready(function(){
 
         var operacion_id            =   $('#operacion_id').val();
         var estadopago_id           =   $('#estadopago_id').val();
-
+        var proveedor_id            =   $('#proveedor_id').val();
         var idopcion                =   $('#idopcion').val();
         var _token                  =   $('#token').val();
 
@@ -39,11 +39,38 @@ $(document).ready(function(){
                                 _token                  : _token,
                                 operacion_id            : operacion_id,
                                 estadopago_id           : estadopago_id,
+                                proveedor_id            : proveedor_id,
                                 idopcion                : idopcion
                             };
         ajax_normal(data,"/ajax-buscar-documento-gestion-tesoreria");
 
     });
+
+    $(".areatesoreria").on('click','.buscardocumentopagado', function() {
+
+        event.preventDefault();
+
+        var operacion_id            =   $('#operacion_id').val();
+        var fecha_inicio            =   $('#fecha_inicio').val();
+        var fecha_fin               =   $('#fecha_fin').val();
+
+        var proveedor_id            =   $('#proveedor_id').val();
+        var idopcion                =   $('#idopcion').val();
+        var _token                  =   $('#token').val();
+
+        data            =   {
+                                _token                  : _token,
+                                operacion_id            : operacion_id,
+                                fecha_inicio            : fecha_inicio,
+                                fecha_fin               : fecha_fin,
+                                proveedor_id            : proveedor_id,
+                                idopcion                : idopcion
+                            };
+        ajax_normal(data,"/ajax-buscar-documento-gestion-tesoreria-pagado");
+
+    });
+
+
 
     $(".areatesoreria").on('dblclick','.dobleclickpccontrato', function(e) {
 
@@ -86,6 +113,25 @@ $(document).ready(function(){
                   "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
 
     });
+
+    $(".areatesoreria").on('dblclick','.dobleclickpcpagado', function(e) {
+
+        var _token                  =   $('#token').val();
+        var data_requerimiento_id   =   $(this).attr('data_requerimiento_id');
+        var data_linea              =   $(this).attr('data_linea');
+        var idopcion                =   $('#idopcion').val();
+
+        data                        =   {
+                                            _token                  : _token,
+                                            data_requerimiento_id   : data_requerimiento_id,
+                                            data_linea              : data_linea,
+                                            idopcion                : idopcion,
+                                        };
+        ajax_modal(data,"/ajax-modal-tesoreria-pago-pagado",
+                  "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+
+    });
+
 
 
     $(".areatesoreria").on('click','.asignarmasivo', function() {

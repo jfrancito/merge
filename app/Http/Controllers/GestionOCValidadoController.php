@@ -227,11 +227,9 @@ class GestionOCValidadoController extends Controller
         $documentohistorial     =   FeDocumentoHistorial::where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                                     ->orderBy('FECHA','DESC')
                                     ->get();
-        //dd($documentohistorial);
 
         $funcion                =   $this;
         $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
-
 
         $archivos               =   $this->lista_archivos_total_sin_voucher($idoc,$fedocumento->DOCUMENTO_ITEM);
         $archivospdf            =   $this->lista_archivos_total_pdf_sin_voucher($idoc,$fedocumento->DOCUMENTO_ITEM);
