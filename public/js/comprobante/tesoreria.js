@@ -25,6 +25,27 @@ $(document).ready(function(){
 
     });
 
+    $('.extornarapago').on('click', function(event){
+        event.preventDefault();
+        var href = $(this).attr('href');
+
+        $.confirm({
+            title: '¿Confirma el Extorno?',
+            content: 'Extorno de pago del Comprobante',
+            buttons: {
+                confirmar: function () {
+                    window.location.href = href;
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo el extorno');
+                }
+            }
+        });
+
+    });
+
+
+
     $(".areatesoreria").on('click','.buscardocumento', function() {
 
         event.preventDefault();

@@ -177,12 +177,16 @@ $(document).ready(function(){
         event.preventDefault();
 
         var operacion_id            =   $('#operacion_id').val();
+        var tipoarchivo_id          =   $('#tipoarchivo_id').val();
+
+
         var idopcion                =   $('#idopcion').val();
         var _token                  =   $('#token').val();
 
         data            =   {
                                 _token                  : _token,
                                 operacion_id            : operacion_id,
+                                tipoarchivo_id          : tipoarchivo_id,
                                 idopcion                : idopcion
                             };
         ajax_normal(data,"/ajax-buscar-documento-gestion-reparable");

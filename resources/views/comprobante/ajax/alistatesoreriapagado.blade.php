@@ -6,6 +6,8 @@
       <th>FACTURA</th>
       <th>REGISTRO</th>
       <th>ESTADO</th>
+      <th>OPCION</th>
+
     </tr>
   </thead>
   <tbody>
@@ -54,6 +56,20 @@
         </td>
 
         @include('comprobante.ajax.estados')
+
+        <td class="rigth">
+          <div class="btn-group btn-hspace">
+            <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>
+            <ul role="menu" class="dropdown-menu pull-right">
+                <li>
+                  <a class="extornarapago" href="{{ url('/extornar-pago-item/'.$item->ID_DOCUMENTO.'/'.$idopcion) }}">
+                    Extornar Pago
+                  </a>
+                </li>
+            </ul>
+          </div>
+        </td>
+
 
       </tr>                    
     @endforeach

@@ -2340,7 +2340,7 @@ trait ComprobanteTraits
     }
 
 
-    private function con_lista_cabecera_comprobante_total_gestion_reparable($cliente_id) {
+    private function con_lista_cabecera_comprobante_total_gestion_reparable($cliente_id,$tipoarchivo_id) {
 
 
         $rol            =       WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
@@ -2350,6 +2350,7 @@ trait ComprobanteTraits
                                 ->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                ->where('FE_DOCUMENTO.MODO_REPARABLE','=',$tipoarchivo_id)
                                 ->where('FE_DOCUMENTO.IND_REPARABLE','=','1')
                                 ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                                 ->get();
@@ -2362,6 +2363,8 @@ trait ComprobanteTraits
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
                                 ->where('FE_DOCUMENTO.IND_REPARABLE','=','1')
+                                ->where('FE_DOCUMENTO.MODO_REPARABLE','=',$tipoarchivo_id)
+
                                 ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                                 ->get();
 
@@ -2371,29 +2374,28 @@ trait ComprobanteTraits
 
         return  $listadatos;
     }
-    private function con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cliente_id) {
+    private function con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cliente_id,$tipoarchivo_id) {
 
         $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
         $centro_id           =      $trabajador->COD_ZONA_TIPO;
+        $rol                 =       WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 
-        $rol            =       WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
         if($rol->ind_uc == 1){
 
             $listadatos          =      FeDocumento::Join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
-                                        //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
                                         ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                         ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
                                         ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
                                         ->where('FE_DOCUMENTO.IND_REPARABLE','=','1')
+                                        ->where('FE_DOCUMENTO.MODO_REPARABLE','=',$tipoarchivo_id)
                                         ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                                         ->get();
 
         }else{
 
             $listadatos          =      FeDocumento::Join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
-                                        //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
                                         ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                                        //->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
+                                        ->where('FE_DOCUMENTO.MODO_REPARABLE','=',$tipoarchivo_id)
                                         ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
                                         ->where('FE_DOCUMENTO.IND_REPARABLE','=','1')
                                         ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))

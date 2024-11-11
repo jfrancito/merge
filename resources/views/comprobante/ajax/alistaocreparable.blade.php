@@ -16,17 +16,6 @@
           <span><b>PROVEEDOR : </b>({{$item->RUC_PROVEEDOR}}) {{$item->TXT_EMPR_CLIENTE}} </span>
           <span><b>TOTAL : </b> {{$item->CAN_TOTAL}}</span>
           <span><b>LINEA : </b> {{$item->DOCUMENTO_ITEM}}</span>
-          <span><b>ORSERVACION : </b>               
-              @if($item->ind_observacion == 1) 
-                  <span class="badge badge-danger" style="display: inline-block;">EN PROCESO</span>
-              @else
-                @if($item->ind_observacion == 0) 
-                    <span class="badge badge-default" style="display: inline-block;">SIN OBSERVACIONES</span>
-                @else
-                    <span class="badge badge-default" style="display: inline-block;">SIN OBSERVACIONES</span>
-                @endif
-              @endif
-          </span>
           <span><b>REPARABLE : </b>               
               @if($item->IND_REPARABLE == 1) 
                   <span class="badge badge-primary" style="display: inline-block;">EN PROCESO</span>

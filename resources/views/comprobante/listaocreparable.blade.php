@@ -37,6 +37,23 @@
                             </div>
                           </div>
                       </div> 
+
+                      <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
+                          <div class="form-group">
+                            <label class="col-sm-12 control-label labelleft" >Tipo :</label>
+                            <div class="col-sm-12 abajocaja" >
+                              {!! Form::select( 'tipoarchivo_id', $combo_tipoarchivo, array($tipoarchivo_id),
+                                                [
+                                                  'class'       => 'select2 form-control control input-sm' ,
+                                                  'id'          => 'tipoarchivo_id',
+                                                  'required'    => '',
+                                                  'data-aw'     => '1',
+                                                ]) !!}
+                            </div>
+                          </div>
+                      </div> 
+
+
                     
                     <div class="col-xs-12">
                       <input type="hidden" name="idopcion" id='idopcion' value='{{$idopcion}}'>

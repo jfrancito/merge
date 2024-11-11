@@ -597,6 +597,62 @@ class GestionOCTesoreriaController extends Controller
     }
 
 
+    public function actionExtornoTesoreriaPagado($idordencompra,$idopcion,Request $request)
+    {
+
+        $idoc                   =   $idordencompra;
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_idoc_actual($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc_actual($idoc);
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->first();
+        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->get();
+        try{    
+            
+            DB::beginTransaction();
+
+
+
+            $pedido_id          =   $idoc;
+            $tarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+                                    ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000028')
+                                    ->get();
+
+            FeDocumento::where('ID_DOCUMENTO',$pedido_id)
+                        ->update(
+                            [
+                                'COD_ESTADO'=>'ETM0000000000005',
+                                'TXT_ESTADO'=>'APROBADO'
+                            ]
+                        );
+
+            Archivo::where('ID_DOCUMENTO',$pedido_id)->where('TIPO_ARCHIVO','=','DCC0000000000028')
+                        ->update(
+                            [
+                                'ACTIVO'=>'0'
+                            ]
+                        );
+
+            $documento                              =   new FeDocumentoHistorial;
+            $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+            $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+            $documento->FECHA                       =   $this->fechaactual;
+            $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+            $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+            $documento->TIPO                        =   'EXTORNO COMPROBANTE DE PAGO';
+            $documento->MENSAJE                     =   '';
+            $documento->save();
+
+            DB::commit();
+            return Redirect::to('/gestion-de-comprobante-pago-tesoreria/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' Extornado con exito');
+        }catch(\Exception $ex){
+            DB::rollback(); 
+            return Redirect::to('gestion-de-comprobante-pago-tesoreria/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+        }
+
+
+
+    }
+
+
     public function actionAprobarTesoreriaPagado($idopcion, $linea,$prefijo, $idordencompra,Request $request)
     {
 

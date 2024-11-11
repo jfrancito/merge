@@ -100,15 +100,18 @@ class GestionUsuarioContactoController extends Controller
         $operacion_id       =   'ORDEN_COMPRA';
         $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO');
 
+        $tipoarchivo_id     =   'ARCHIVO_FISICO';
+        $combo_tipoarchivo  =   array('ARCHIVO_FISICO' => 'ARCHIVO FISICO','ARCHIVO_VIRTUAL' => 'ARCHIVO VIRTUAL');
+
         $array_contrato     =   $this->array_rol_contrato();
         if (in_array(Session::get('usuario')->rol_id, $array_contrato)) {
             $operacion_id       =   'CONTRATO';
         }
 
         if($operacion_id=='ORDEN_COMPRA'){
-            $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable($cod_empresa);
+            $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable($cod_empresa,$tipoarchivo_id);
         }else{
-            $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cod_empresa);
+            $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cod_empresa,$tipoarchivo_id);
         }
 
         $funcion        =   $this;
@@ -117,6 +120,11 @@ class GestionUsuarioContactoController extends Controller
                             'listadatos'        =>  $listadatos,
                             'operacion_id'      =>  $operacion_id,
                             'combo_operacion'   =>  $combo_operacion,
+
+                            'tipoarchivo_id'      =>  $tipoarchivo_id,
+                            'combo_tipoarchivo'   =>  $combo_tipoarchivo,
+
+
                             'funcion'           =>  $funcion,
                             'idopcion'          =>  $idopcion,
                          ]);
@@ -125,13 +133,16 @@ class GestionUsuarioContactoController extends Controller
 
     public function actionListarAjaxBuscarDocumentoReparable(Request $request) {
 
-        $operacion_id   =   $request['operacion_id'];
-        $idopcion       =   $request['idopcion'];
-        $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
+        $operacion_id       =   $request['operacion_id'];
+        $tipoarchivo_id     =   $request['tipoarchivo_id'];
+
+
+        $idopcion           =   $request['idopcion'];
+        $cod_empresa        =   Session::get('usuario')->usuarioosiris_id;
         if($operacion_id=='ORDEN_COMPRA'){
-            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_reparable($cod_empresa);
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_reparable($cod_empresa,$tipoarchivo_id);
         }else{
-            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cod_empresa);
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cod_empresa,$tipoarchivo_id);
         }
         $funcion                =   $this;
         return View::make('comprobante/ajax/mergelistareparable',
