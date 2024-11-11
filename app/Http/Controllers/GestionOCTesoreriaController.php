@@ -262,7 +262,7 @@ class GestionOCTesoreriaController extends Controller
         }
         $procedencia            =   'ADM';
         $funcion                =   $this;
-        return View::make('comprobante/ajax/mergelistatesoreria',
+        return View::make('comprobante/ajax/mergelistatesoreriapagado',
                          [
                             'operacion_id'          =>  $operacion_id,
 
