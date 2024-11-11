@@ -216,6 +216,8 @@ class GestionOCTesoreriaController extends Controller
         $fecha_inicio       =   $this->fecha_menos_diez_dias;
         $fecha_fin          =   $this->fecha_sin_hora;
         $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO');
+        $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA');
+
         //$combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA');
         $proveedor_id       =   'TODO';
         $combo_proveedor    =   $this->gn_combo_proveedor_fe_documento_xestado($proveedor_id,'ETM0000000000008');

@@ -1640,8 +1640,12 @@ trait ComprobanteTraits
     private function con_lista_cabecera_comprobante_total_tes_pagado($cliente_id,$proveedor_id,$fecha_inicio,$fecha_fin) {
 
         $listadatos     =   FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+                            ->Join('ARCHIVOS', 'ARCHIVOS.ID_DOCUMENTO', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
                             ->select(DB::raw('FE_DOCUMENTO.*,CMP.Orden.* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                             ->where('OPERACION','=','ORDEN_COMPRA')
+                            ->where('ARCHIVOS.TIPO_ARCHIVO','=','DCC0000000000028')
+                            ->where('ARCHIVOS.ACTIVO','=','1')
+                            ->where('ARCHIVOS.USUARIO_CREA','<>','1CIX00000001')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000008')
                             ->Fecha('RE',$fecha_inicio,$fecha_fin)
