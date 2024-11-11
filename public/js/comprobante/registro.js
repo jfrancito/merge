@@ -231,7 +231,7 @@ $(document).ready(function(){
         var entidadbanco_id         =   $('#entidadbanco_id').val();
         var cb_id                   =   $('#cb_id').val();
 
-        var valores = ['BAM0000000000007', 'BAM0000000000008'];
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009'];
 
         if(!valores.includes(entidadbanco_id)){
             if(cb_id==''){
