@@ -2350,7 +2350,8 @@ trait ComprobanteTraits
                                 ->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                ->where('FE_DOCUMENTO.MODO_REPARABLE','=',$tipoarchivo_id)
+                                ->TipoArchivo($tipoarchivo_id)
+                                //->where('FE_DOCUMENTO.MODO_REPARABLE','=',$tipoarchivo_id)
                                 ->where('FE_DOCUMENTO.IND_REPARABLE','=','1')
                                 ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                                 ->get();
@@ -2363,8 +2364,8 @@ trait ComprobanteTraits
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
                                 ->where('FE_DOCUMENTO.IND_REPARABLE','=','1')
-                                ->where('FE_DOCUMENTO.MODO_REPARABLE','=',$tipoarchivo_id)
-
+                                ->TipoArchivo($tipoarchivo_id)
+                                //->where('FE_DOCUMENTO.MODO_REPARABLE','=',)
                                 ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                                 ->get();
 
@@ -2387,7 +2388,8 @@ trait ComprobanteTraits
                                         ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
                                         ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
                                         ->where('FE_DOCUMENTO.IND_REPARABLE','=','1')
-                                        ->where('FE_DOCUMENTO.MODO_REPARABLE','=',$tipoarchivo_id)
+                                        ->TipoArchivo($tipoarchivo_id)
+                                        //->where('FE_DOCUMENTO.MODO_REPARABLE','=',$tipoarchivo_id)
                                         ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                                         ->get();
 
@@ -2395,7 +2397,8 @@ trait ComprobanteTraits
 
             $listadatos          =      FeDocumento::Join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                                         ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                                        ->where('FE_DOCUMENTO.MODO_REPARABLE','=',$tipoarchivo_id)
+                                        ->TipoArchivo($tipoarchivo_id)
+                                        //->where('FE_DOCUMENTO.MODO_REPARABLE','=',$tipoarchivo_id)
                                         ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
                                         ->where('FE_DOCUMENTO.IND_REPARABLE','=','1')
                                         ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))

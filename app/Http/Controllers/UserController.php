@@ -863,6 +863,9 @@ class UserController extends Controller {
 		$count_observados 			= 	0;
 
         $url_rep 					=	'';
+        $url_rep_contrato 			=	'';
+
+
 		$count_reparables 			= 	0;
 
 		$count_x_aprobar_gestion 	= 	0;
@@ -890,11 +893,11 @@ class UserController extends Controller {
         	//contrato
 			$count_x_aprobar_con 	= 	 count($listadatos);
 
-        	$listadatosre    		=   $this->con_lista_cabecera_comprobante_total_gestion_reparable($cod_empresa);
+        	$listadatosre    		=   $this->con_lista_cabecera_comprobante_total_gestion_reparable($cod_empresa,'TODO');
 			$count_reparables 		= 	 count($listadatosre);
         	$url_rep 		 		=	'/gestion-de-comprobantes-reparable/Elk';
 
-        	$listadatosre_con    	=   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cod_empresa);
+        	$listadatosre_con    	=   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cod_empresa,'TODO');
 			$count_reparables_con 	= 	 count($listadatosre_con);
 
         	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_gestion_observados($cod_empresa);
@@ -924,11 +927,17 @@ class UserController extends Controller {
 
     			$url 					=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=ORDEN_COMPRA';
     			$urlcontrato 			=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=CONTRATO';
+        		$url_rep 		 		=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=ORDEN_COMPRA';
+        		$url_rep_contrato 		=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=CONTRATO';
 
         		$listadatos     =   $this->con_lista_cabecera_comprobante_total_cont_contrato($cod_empresa);
 				$count_x_aprobar_con 	= 	 count($listadatos);
 
+	        	$listadatosre    		=   $this->con_lista_cabecera_comprobante_total_gestion_reparable($cod_empresa,'TODO');
+				$count_reparables 		= 	 count($listadatosre);
 
+	        	$listadatosre_con    	=   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cod_empresa,'TODO');
+				$count_reparables_con 	= 	 count($listadatosre_con);
 
 			}
 			//ADMINISTRACION
@@ -984,6 +993,8 @@ class UserController extends Controller {
 
 						 	'count_reparables' 	=> $count_reparables,
 						 	'url_rep' 			=> $url_rep,
+						 	'url_rep_contrato' 	=> $url_rep_contrato,
+
 
 						 	'count_reparables_con' 	=> $count_reparables_con,
 
