@@ -866,14 +866,24 @@ class UserController extends Controller {
         $url_rep_contrato 			=	'';
 
 
+        $url_rep_revisar 			=	'';
+        $url_rep_contrato_revisar 	=	'';
+
+
 		$count_reparables 			= 	0;
+		$count_reparables_con 		= 	0;
+
+		$count_reparables_rev 		= 	0;
+		$count_reparables__revcon 	= 	0;
+
+
 
 		$count_x_aprobar_gestion 	= 	0;
         $url_gestion 				=	'';
 
 		$count_observados_con 		= 	0;
         $url_obs_con 				=	'';
-		$count_reparables_con 			= 	0;
+
         
 
 
@@ -893,11 +903,11 @@ class UserController extends Controller {
         	//contrato
 			$count_x_aprobar_con 	= 	 count($listadatos);
 
-        	$listadatosre    		=   $this->con_lista_cabecera_comprobante_total_gestion_reparable($cod_empresa,'TODO');
+        	$listadatosre    		=   $this->con_lista_cabecera_comprobante_total_gestion_reparable($cod_empresa,'TODO','TODO');
 			$count_reparables 		= 	 count($listadatosre);
         	$url_rep 		 		=	'/gestion-de-comprobantes-reparable/Elk';
 
-        	$listadatosre_con    	=   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cod_empresa,'TODO');
+        	$listadatosre_con    	=   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cod_empresa,'TODO','TODO');
 			$count_reparables_con 	= 	 count($listadatosre_con);
 
         	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_gestion_observados($cod_empresa);
@@ -927,17 +937,33 @@ class UserController extends Controller {
 
     			$url 					=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=ORDEN_COMPRA';
     			$urlcontrato 			=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=CONTRATO';
+
+
         		$url_rep 		 		=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=ORDEN_COMPRA';
         		$url_rep_contrato 		=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=CONTRATO';
+
+        		$url_rep_revisar 		 		=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=ORDEN_COMPRA&estado_id=2';
+        		$url_rep_contrato_revisar 		=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=CONTRATO&estado_id=2';
+
+
 
         		$listadatos     =   $this->con_lista_cabecera_comprobante_total_cont_contrato($cod_empresa);
 				$count_x_aprobar_con 	= 	 count($listadatos);
 
-	        	$listadatosre    		=   $this->con_lista_cabecera_comprobante_total_gestion_reparable($cod_empresa,'TODO');
+	        	$listadatosre    		=   $this->con_lista_cabecera_comprobante_total_gestion_reparable($cod_empresa,'TODO','TODO');
 				$count_reparables 		= 	 count($listadatosre);
 
-	        	$listadatosre_con    	=   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cod_empresa,'TODO');
+	        	$listadatosre_con    	=   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cod_empresa,'TODO','TODO');
 				$count_reparables_con 	= 	 count($listadatosre_con);
+
+
+	        	$listadatosrerev    		=   $this->con_lista_cabecera_comprobante_total_gestion_reparable($cod_empresa,'TODO','2');
+				$count_reparables_rev 		= 	 count($listadatosrerev);
+
+	        	$listadatosre_con_rev    	=   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cod_empresa,'TODO','2');
+				$count_reparables__revcon 	= 	 count($listadatosre_con_rev);
+
+
 
 			}
 			//ADMINISTRACION
@@ -992,11 +1018,17 @@ class UserController extends Controller {
 						 	'url_obs' 			=> $url_obs,
 
 						 	'count_reparables' 	=> $count_reparables,
+						 	'count_reparables_con' 	=> $count_reparables_con,
 						 	'url_rep' 			=> $url_rep,
 						 	'url_rep_contrato' 	=> $url_rep_contrato,
 
+						 	'url_rep_revisar' 	=> $url_rep_revisar,
+						 	'url_rep_contrato_revisar' 	=> $url_rep_contrato_revisar,
+						 	'count_reparables_rev' 			=> $count_reparables_rev,
+						 	'count_reparables__revcon' 	=> $count_reparables__revcon,
 
-						 	'count_reparables_con' 	=> $count_reparables_con,
+
+
 
 
 						 	'count_x_aprobar_gestion' 	=> $count_x_aprobar_gestion,

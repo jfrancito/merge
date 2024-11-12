@@ -32,7 +32,13 @@ class FeDocumento extends Model
             $query->where('FE_DOCUMENTO.MODO_REPARABLE','=',$tipoarchivo_id);
         }
     }
-
+    public function scopeEstadoReparable($query,$estado_id){
+        if(trim($estado_id) != 'TODO'){
+            $query->where('FE_DOCUMENTO.IND_REPARABLE','=',$estado_id);
+        }else{
+            $query->whereIn('FE_DOCUMENTO.IND_REPARABLE',['1','2']);
+        }
+    }
 
 
     public function scopeFecha($query,$filtrofecha_id,$fecha_inicio,$fecha_fin){

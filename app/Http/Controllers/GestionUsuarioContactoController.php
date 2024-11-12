@@ -88,7 +88,7 @@ class GestionUsuarioContactoController extends Controller
     }
 
 
-    public function actionListarComprobantesReparable($idopcion)
+    public function actionListarComprobantesReparable($idopcion,Request $request)
     {
         /******************* validar url **********************/
         $validarurl = $this->funciones->getUrl($idopcion,'Ver');
@@ -100,18 +100,29 @@ class GestionUsuarioContactoController extends Controller
         $operacion_id       =   'ORDEN_COMPRA';
         $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO');
 
-        $tipoarchivo_id     =   'ARCHIVO_FISICO';
-        $combo_tipoarchivo  =   array('ARCHIVO_FISICO' => 'ARCHIVO FISICO','ARCHIVO_VIRTUAL' => 'ARCHIVO VIRTUAL');
+        $tipoarchivo_id     =   'TODO';
+        $combo_tipoarchivo  =   array('TODO' => 'TODO','ARCHIVO_FISICO' => 'ARCHIVO FISICO','ARCHIVO_VIRTUAL' => 'ARCHIVO VIRTUAL');
 
+        $estado_id          =   'TODO';
+        $combo_estdo        =   array('TODO' => 'TODO','1' => 'EN PROCESO','2' => 'EN REVISION');
         $array_contrato     =   $this->array_rol_contrato();
         if (in_array(Session::get('usuario')->rol_id, $array_contrato)) {
             $operacion_id       =   'CONTRATO';
         }
+        if(Session::has('operacion_id')){
+            $operacion_id           =   Session::get('operacion_id');
+        }
+        if(isset($request['operacion_id'])){
+            $operacion_id       =   $request['operacion_id'];
+        }
+        if(isset($request['estado_id'])){
+            $estado_id       =   $request['estado_id'];
+        }
 
         if($operacion_id=='ORDEN_COMPRA'){
-            $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable($cod_empresa,$tipoarchivo_id);
+            $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable($cod_empresa,$tipoarchivo_id,$estado_id);
         }else{
-            $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cod_empresa,$tipoarchivo_id);
+            $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cod_empresa,$tipoarchivo_id,$estado_id);
         }
 
         $funcion        =   $this;
@@ -121,8 +132,11 @@ class GestionUsuarioContactoController extends Controller
                             'operacion_id'      =>  $operacion_id,
                             'combo_operacion'   =>  $combo_operacion,
 
-                            'tipoarchivo_id'      =>  $tipoarchivo_id,
-                            'combo_tipoarchivo'   =>  $combo_tipoarchivo,
+                            'tipoarchivo_id'    =>  $tipoarchivo_id,
+                            'combo_tipoarchivo' =>  $combo_tipoarchivo,
+
+                            'estado_id'         =>  $estado_id,
+                            'combo_estdo'       =>  $combo_estdo,
 
 
                             'funcion'           =>  $funcion,
@@ -135,14 +149,14 @@ class GestionUsuarioContactoController extends Controller
 
         $operacion_id       =   $request['operacion_id'];
         $tipoarchivo_id     =   $request['tipoarchivo_id'];
-
+        $estado_id          =   $request['estado_id'];
 
         $idopcion           =   $request['idopcion'];
         $cod_empresa        =   Session::get('usuario')->usuarioosiris_id;
         if($operacion_id=='ORDEN_COMPRA'){
-            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_reparable($cod_empresa,$tipoarchivo_id);
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_reparable($cod_empresa,$tipoarchivo_id,$estado_id);
         }else{
-            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cod_empresa,$tipoarchivo_id);
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cod_empresa,$tipoarchivo_id,$estado_id);
         }
         $funcion                =   $this;
         return View::make('comprobante/ajax/mergelistareparable',
@@ -819,7 +833,7 @@ class GestionUsuarioContactoController extends Controller
                 FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
                                 [
-                                    'IND_REPARABLE'=>'0'
+                                    'IND_REPARABLE'=>'2'
                                 ]
                             );
                 //HISTORIAL DE DOCUMENTO APROBADO
@@ -875,9 +889,16 @@ class GestionUsuarioContactoController extends Controller
 
             $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','1')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
             $rol                    =   WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
+            $archivospdf            =   $this->lista_archivos_total_pdf($idoc,$fedocumento->DOCUMENTO_ITEM);
+            $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+            $trabajador             =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+
             return View::make('comprobante/reparableuc', 
                             [
                                 'fedocumento'           =>  $fedocumento,
+                                'trabajador'            =>  $trabajador,
+                                'archivospdf'           =>  $archivospdf,
+                                'archivosanulados'      =>  $archivosanulados,
                                 'rol'                   =>  $rol,
                                 'ordencompra'           =>  $ordencompra,
                                 'linea'                 =>  $linea,

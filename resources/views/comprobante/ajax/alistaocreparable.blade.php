@@ -16,17 +16,7 @@
           <span><b>PROVEEDOR : </b>({{$item->RUC_PROVEEDOR}}) {{$item->TXT_EMPR_CLIENTE}} </span>
           <span><b>TOTAL : </b> {{$item->CAN_TOTAL}}</span>
           <span><b>LINEA : </b> {{$item->DOCUMENTO_ITEM}}</span>
-          <span><b>REPARABLE : </b>               
-              @if($item->IND_REPARABLE == 1) 
-                  <span class="badge badge-primary" style="display: inline-block;">EN PROCESO</span>
-              @else
-                @if($item->IND_REPARABLE == 0) 
-                    <span class="badge badge-default" style="display: inline-block;">-</span>
-                @else
-                    <span class="badge badge-default" style="display: inline-block;">-</span>
-                @endif
-              @endif
-          </span>
+          @include('comprobante.ajax.areparable')
           <span><b>TIPO ARCHIVO : </b> {{$item->MODO_REPARABLE}}</span>
 
         </td>

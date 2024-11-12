@@ -53,15 +53,5 @@
       @endif
   </span>
   <br>
-  <span><b>REPARABLE : </b>               
-      @if($item->IND_REPARABLE == 1) 
-          <span class="badge badge-warning" style="display: inline-block;">EN PROCESO</span>
-      @else
-        @if($item->IND_REPARABLE == 0) 
-            <span class="badge badge-default" style="display: inline-block;">SIN REPARABLE</span>
-        @else
-            <span class="badge badge-default" style="display: inline-block;">SIN REPARABLE</span>
-        @endif
-      @endif
-  </span>
+  @include('comprobante.ajax.areparable')
 </td>
