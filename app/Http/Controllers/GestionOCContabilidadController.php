@@ -1123,7 +1123,7 @@ class GestionOCContabilidadController extends Controller
                 $documento->TIPO                        =   'OBSERVADO POR CONTABILIDAD REPARABLE';
                 $documento->MENSAJE                     =   $descripcion;
                 $documento->save();
-                
+
                 FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
                                 [
@@ -1136,7 +1136,7 @@ class GestionOCContabilidadController extends Controller
                 Archivo::where('ID_DOCUMENTO',$ordencompra->COD_ORDEN)->where('DOCUMENTO_ITEM','=',$linea)->where('TIPO_ARCHIVO','=',$docasociados->COD_CATEGORIA_DOCUMENTO)
                             ->update(
                                 [
-                                    'COD_ESTADO'=>'0'
+                                    'ACTIVO'=>'0'
                                 ]
                             );
 
