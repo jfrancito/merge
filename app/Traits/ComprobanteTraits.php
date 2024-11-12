@@ -2349,12 +2349,13 @@ trait ComprobanteTraits
             $listadatos     =   FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
                                 ->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                                ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                ->whereNotIn('FE_DOCUMENTO.COD_ESTADO',['','ETM0000000000006'])
                                 ->TipoArchivo($tipoarchivo_id)
                                 ->EstadoReparable($estado_id)
                                 //->where('FE_DOCUMENTO.MODO_REPARABLE','=',$tipoarchivo_id)
                                 //->where('FE_DOCUMENTO.IND_REPARABLE','=','1')
                                 ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                ->orderBy('IND_OBSERVACION_REPARABLE','asc')
                                 ->get();
 
         }else{
@@ -2362,6 +2363,7 @@ trait ComprobanteTraits
            
             $listadatos     =   FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
                                 //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                                ->whereNotIn('FE_DOCUMENTO.COD_ESTADO',['','ETM0000000000006'])
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
                                 //->where('FE_DOCUMENTO.IND_REPARABLE','=','1')
@@ -2369,6 +2371,7 @@ trait ComprobanteTraits
                                 ->EstadoReparable($estado_id)
                                 //->where('FE_DOCUMENTO.MODO_REPARABLE','=',)
                                 ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                ->orderBy('IND_OBSERVACION_REPARABLE','asc')
                                 ->get();
 
         }
@@ -2388,12 +2391,13 @@ trait ComprobanteTraits
             $listadatos          =      FeDocumento::Join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                                         ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                         ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
-                                        ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                        ->whereNotIn('FE_DOCUMENTO.COD_ESTADO',['','ETM0000000000006'])
                                         //->where('FE_DOCUMENTO.IND_REPARABLE','=','1')
                                         ->TipoArchivo($tipoarchivo_id)
                                         ->EstadoReparable($estado_id)
                                         //->where('FE_DOCUMENTO.MODO_REPARABLE','=',$tipoarchivo_id)
                                         ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                        ->orderBy('IND_OBSERVACION_REPARABLE','asc')
                                         ->get();
 
         }else{
@@ -2403,9 +2407,10 @@ trait ComprobanteTraits
                                         ->TipoArchivo($tipoarchivo_id)
                                         ->EstadoReparable($estado_id)
                                         //->where('FE_DOCUMENTO.MODO_REPARABLE','=',$tipoarchivo_id)
-                                        ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                        ->whereNotIn('FE_DOCUMENTO.COD_ESTADO',['','ETM0000000000006'])
                                         //->where('FE_DOCUMENTO.IND_REPARABLE','=','1')
                                         ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                        ->orderBy('IND_OBSERVACION_REPARABLE','asc')
                                         ->get();
 
         }

@@ -833,7 +833,8 @@ class GestionUsuarioContactoController extends Controller
                 FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
                                 [
-                                    'IND_REPARABLE'=>'2'
+                                    'IND_REPARABLE'=>'2',
+                                    'IND_OBSERVACION_REPARABLE' =>0
                                 ]
                             );
                 //HISTORIAL DE DOCUMENTO APROBADO

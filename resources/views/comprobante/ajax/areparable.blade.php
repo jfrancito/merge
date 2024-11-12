@@ -13,3 +13,9 @@
       @endif
     @endif
 </span>
+
+<span><b>OBSERVADO REPARABLE : </b>               
+    @if($item->IND_OBSERVACION_REPARABLE == 1) 
+        <span class="badge badge-danger" style="display: inline-block;">OBSERVADO</span>
+    @endif
+</span>

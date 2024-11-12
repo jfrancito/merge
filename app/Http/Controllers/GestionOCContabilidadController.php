@@ -1127,7 +1127,8 @@ class GestionOCContabilidadController extends Controller
                 FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
                                 [
-                                    'IND_REPARABLE'=>1
+                                    'IND_REPARABLE'=>1,
+                                    'IND_OBSERVACION_REPARABLE' =>1
                                 ]
                             );
                 $docasociados       =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)

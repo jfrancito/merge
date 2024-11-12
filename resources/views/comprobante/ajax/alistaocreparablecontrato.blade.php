@@ -1,6 +1,8 @@
 <table id="nso" class="table table-striped table-borderless table-hover td-color-borde td-padding-7 listatabla">
   <thead>
     <tr>
+      <th>ITEM</th>
+
       <th>CONTRATO</th>
       <th>FACTURA</th>
       <th>REGISTRO</th>
@@ -11,6 +13,7 @@
   <tbody>
     @foreach($listadatos as $index => $item)
       <tr data_requerimiento_id = "{{$item->id}}">
+        <td>{{$index + 1}}</td>
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>CODIGO : {{$item->COD_DOCUMENTO_CTBLE}} </b> </span>
           <span><b>FECHA  : {{$item->FEC_EMISION}}</b></span>
