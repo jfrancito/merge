@@ -3019,6 +3019,7 @@ trait ComprobanteTraits
                                     ->join('CMP.REFERENCIA_ASOC', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
                                     ->select(DB::raw('CMP.DOCUMENTO_CTBLE.*,REFERENCIA_ASOC.COD_TABLA,REFERENCIA_ASOC.COD_TABLA_ASOC'))
                                     ->where('CMP.DOCUMENTO_CTBLE.COD_ESTADO','=','1')
+                                    ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_ESTADO_DOC_CTBLE','=','EDC0000000000009')
                                     ->whereIn('COD_CATEGORIA_TIPO_DOC', [
                                         'TDO0000000000001',
                                         'TDO0000000000003',
@@ -3174,6 +3175,8 @@ trait ComprobanteTraits
                                     ->join('CMP.REFERENCIA_ASOC', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
                                     ->select(DB::raw('CMP.DOCUMENTO_CTBLE.*,REFERENCIA_ASOC.COD_TABLA,REFERENCIA_ASOC.COD_TABLA_ASOC'))
                                     ->where('CMP.DOCUMENTO_CTBLE.COD_ESTADO','=','1')
+                                    ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_ESTADO_DOC_CTBLE','=','EDC0000000000009')
+                                    
                                     ->whereIn('COD_CATEGORIA_TIPO_DOC', [
                                         'TDO0000000000001',
                                         'TDO0000000000003',
