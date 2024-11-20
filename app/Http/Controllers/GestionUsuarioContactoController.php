@@ -1146,6 +1146,7 @@ class GestionUsuarioContactoController extends Controller
 
             try{    
                 
+
                 DB::beginTransaction();
                 $pedido_id              =   $idoc;
                 $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
@@ -1166,17 +1167,15 @@ class GestionUsuarioContactoController extends Controller
 
                     $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
                                                 ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
-                                                ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000004'])
+                                                ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000004','DCC0000000000032'])
                                                 ->get();
-
-
 
                 }else{
                     $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
                                                 ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
+                                                ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000032'])
                                                 ->get();
                 }
-
 
 
                 foreach($tarchivos as $index => $item){
@@ -1223,9 +1222,40 @@ class GestionUsuarioContactoController extends Controller
                     }
                 }
 
+
+
+                $ctadetraccion                            =   $request['ctadetraccion'];
+                $tipo_detraccion_id                       =   $request['tipo_detraccion_id'];
+                $monto_detraccion                         =   $request['monto_detraccion'];
+                $pago_detraccion                          =   $request['pago_detraccion'];
+
+                $empresa_sel                              =   STDEmpresa::where('COD_EMPR','=',$pago_detraccion)->first();
+                $COD_PAGO_DETRACCION = '';
+                $TXT_PAGO_DETRACCION = '';
+                if(count($empresa_sel)>0){
+                    $COD_PAGO_DETRACCION = $empresa_sel->COD_EMPR;
+                    $TXT_PAGO_DETRACCION = $empresa_sel->NOM_EMPR;
+                }
+
+                if($ctadetraccion!=''){
+                    STDEmpresa::where('COD_EMPR',$ordencompra->COD_EMPR_EMISOR)
+                                ->update(
+                                    [
+                                        'TXT_DETRACCION'=>$ctadetraccion
+                                    ]
+                                );
+                }
+
+
                 FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
                                 [
+                                    'CTA_DETRACCION'=>$ctadetraccion,
+                                    'VALOR_DETRACCION'=>$tipo_detraccion_id,
+                                    'MONTO_DETRACCION_XML'=>$monto_detraccion,
+                                    'MONTO_DETRACCION_RED'=>round($monto_detraccion),
+                                    'COD_PAGO_DETRACCION'=>$COD_PAGO_DETRACCION,
+                                    'TXT_PAGO_DETRACCION'=>$TXT_PAGO_DETRACCION,
                                     'ind_observacion'=>'0'
                                 ]
                             );
@@ -1309,15 +1339,16 @@ class GestionUsuarioContactoController extends Controller
 
             if($tiposerie == 'E'){
 
-                $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
-                                            ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000004'])
+                $tarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
+                                            ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000004','DCC0000000000032'])
                                             ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
                                             //->where('TXT_ASIGNADO','=','CONTACTO')
                                             ->get();
 
             }else{
 
-                $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
+                $tarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
+                                            ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000032'])
                                             ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
                                             //->where('TXT_ASIGNADO','=','CONTACTO')
                                             ->get();
@@ -1330,9 +1361,27 @@ class GestionUsuarioContactoController extends Controller
 
             $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','1')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
+            $user_orden             =   User::where('usuarioosiris_id','=',$ordencompra->COD_EMPR_EMISOR)->first();
+            $empresa                =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR_EMISOR)->first();
+
+            $combotipodetraccion    =   array('' => "Seleccione Tipo Detraccion",'MONTO_REFERENCIAL' => 'MONTO REFERENCIAL' , 'MONTO_FACTURACION' => 'MONTO FACTURACION');
+            $combopagodetraccion    =   array('' => "Seleccione Pago Detraccion",$ordencompra->COD_EMPR_EMISOR => $ordencompra->TXT_EMPR_EMISOR , $ordencompra->COD_EMPR_RECEPTOR => $ordencompra->TXT_EMPR_RECEPTOR);
+            $arraybancos            =   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
+            $combobancos            =   array('' => "Seleccione Entidad Bancaria") + $arraybancos;
+
+
+
             return View::make('comprobante/observaruccontrato', 
                             [
                                 'fedocumento'           =>  $fedocumento,
+                                'empresa'               =>  $empresa,
+
+                                'combotipodetraccion'   =>  $combotipodetraccion,
+                                'combopagodetraccion'   =>  $combopagodetraccion,
+                                'combobancos'           =>  $combobancos,
+                                'combotipodetraccion'   =>  $combotipodetraccion,
+
+
                                 'ordencompra'           =>  $ordencompra,
                                 'linea'                 =>  $linea,
                                 'detalleordencompra'    =>  $detalleordencompra,

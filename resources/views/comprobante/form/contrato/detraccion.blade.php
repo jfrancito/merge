@@ -15,7 +15,7 @@
                           <div class="form-group">
                             <label class="col-sm-12 control-label labelleft" style="text-align: left;"><b>Cuenta Detracción (*):</b></label>
                             <div class="col-sm-12 abajocaja" >
-                                                              <input type="text"  class="form-control control input-sm" value = '{{$fedocumento->CTA_DETRACCION}}' readonly>
+                                <input type="text"  class="form-control control input-sm" value = '{{$fedocumento->CTA_DETRACCION}}' readonly>
                             </div>
                           </div>
                         </div>
