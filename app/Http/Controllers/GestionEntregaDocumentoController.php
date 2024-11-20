@@ -105,8 +105,6 @@ class GestionEntregaDocumentoController extends Controller
         $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO');
         //$combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA');
 
-
-
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_entregable($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id);
         }else{

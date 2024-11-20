@@ -20,12 +20,22 @@
       <tr data_requerimiento_id = "{{$item->COD_DOCUMENTO_CTBLE}}">
         <td>{{$index + 1}}</td>
         <td class="cell-detail sorting_1" style="position: relative;">
-          <span><b>NRO OC : </b> {{$item->COD_DOCUMENTO_CTBLE}}  </span>
+          <span><b>NRO CONTRATO : </b> {{$item->COD_DOCUMENTO_CTBLE}}  </span>
+          <span><b>DOCUMENTO : </b> {{$item->NRO_SERIE}} - {{$item->NRO_DOC}}  </span>
           <span><b>PROVEEDOR  :</b> {{$item->TXT_EMPR_EMISOR}}</span>
-          <span><b>COMPROBANTE ASOCIADO : </b> {{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</span>
+          <span><b>COMPROBANTE ASOCIADO : </b> {{$item->NRO_SERIE_DOC}} - {{$item->NRO_DOC_DOC}}</span>
           <span><b>USUARIO CONTACTO : </b> {{$item->TXT_CONTACTO}}</span>
           <span><b>FECHA VENCIMIENTO DOC: </b> {{date_format(date_create($item->FEC_VENCIMIENTO), 'd-m-Y h:i:s')}}  </span>
           <span><b>FECHA APROBACION ADMIN  :</b>{{date_format(date_create($item->fecha_ap), 'd-m-Y h:i:s')}}</span>
+
+          <span><b>ESTADO CANJE  :</b>
+            @IF($item->NRO_SERIE_DOC == '')
+              <span class="badge badge-danger" style="width: 100px;">SIN CANJEAR</span>
+            @ELSE
+              <span class="badge badge-success" style="width: 100px;">CANJEADO</span>
+            @ENDIF
+          </span>
+
         </td>
 
         <td class="cell-detail sorting_1" style="position: relative;">
@@ -46,7 +56,7 @@
 
         <td><b>{{$item->CAN_TOTAL}}</b></td>
         <td>
-
+            @IF($item->NRO_SERIE_DOC != '')
             <div class="text-center be-checkbox be-checkbox-sm has-primary">
               <input  type="checkbox"
                 class="{{$item->COD_DOCUMENTO_CTBLE}} input_asignar"
@@ -58,7 +68,7 @@
                     name="{{$item->COD_DOCUMENTO_CTBLE}}"
               ></label>
             </div>
-
+            @ENDIF
         </td>
 
       </tr>                    

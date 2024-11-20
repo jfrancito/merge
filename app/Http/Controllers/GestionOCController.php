@@ -177,7 +177,7 @@ class GestionOCController extends Controller
     {
 
         header('Content-Type: text/html; charset=UTF-8');
-        $path = storage_path() . "/exports/RHE10421240189E00135.xml";
+        $path = storage_path() . "/exports/RHE1075394716299.xml";
         //$path = storage_path() . "/exports/RHE1044061449953.xml";
 
         $parser = new RHParser();

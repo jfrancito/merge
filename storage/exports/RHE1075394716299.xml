@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:ccts="urn:oasis:names:specification:ubl:schema:xsd:CoreComponentParameters-2" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2" xmlns:qdt="urn:oasis:names:specification:ubl:schema:xsd:QualifiedDatatypes-2" xmlns:stat="urn:oasis:names:specification:ubl:schema:xsd:DocumentStatusCode-1.0" xmlns:udt="urn:un:unece:uncefact:data:draft:UnqualifiedDataTypesSchemaModule:2">
+	<ext:UBLExtensions>
+		<ext:UBLExtension>
+			<ext:ExtensionContent><ds:Signature>
+<ds:SignedInfo>
+<ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+<ds:Reference URI="">
+<ds:Transforms>
+<ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+</ds:Transforms>
+<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+<ds:DigestValue>OBWExMZ6gYJISBEb7/nATLmlnr+kyutR7hZZBABaMK8=</ds:DigestValue>
+</ds:Reference>
+</ds:SignedInfo>
+<ds:SignatureValue>
+Pf5iL+9gLXynzvrizw20fOwKfy7WaQClg6KE15jjKVO++s3HnIMy6VJwsX+ugiZ7NUdb451KNbbS
+HhZidJ8zWz20PxibUKPEw8s8oAIMjp8Rj4PyzXD8FSNSZ4U5wKz3HznBHUNRUkvnSzpC8RJeTl7+
+YpI2d5ib6RgeWi3W3WT7lTeo583ucRUjHHbzwDJpT6y2erRLtXJVe16rts7jDFJVv3f2eE1O+iFB
+0xUiK1eKypYUV61J5+2QfQyz+NI2YdbIIUaDU4khm/JAn0AGu8Pvg0HJQLOd0JzeMSiMjTIc4+81
+N3r7Mlva3UMP3hmS8FYC8lXNEYHE2WN66yWuHg==
+</ds:SignatureValue>
+<ds:KeyInfo>
+<ds:X509Data>
+<ds:X509Certificate>
+MIIFrjCCBJagAwIBAgIIf9Td7Evg0UswDQYJKoZIhvcNAQELBQAwRjEkMCIGA1UEAwwbTGxhbWEu
+cGUgU0hBMjU2IFN0YW5kYXJkIENBMREwDwYDVQQKDAhMTEFNQS5QRTELMAkGA1UEBhMCUEUwHhcN
+MjQwODA5MTYxNTM5WhcNMjcwODA5MTYxNTAwWjCCAVQxKzApBgNVBAkMIkFWLiBHQVJDSUxBU08g
+REUgTEEgVkVHQSBOUk8uIDE0NzIxIjAgBgkqhkiG9w0BCQEWE3JtZXphZ0BzdW5hdC5nb2IucGUx
+QTA/BgNVBAMMOFNVUEVSSU5ULiBOQUMuIERFIEFEVUFOQVMgWSBERSBBRE1JTklTVFJBQ0lPTiBU
+UklCVVRBUklBMRwwGgYDVQQLDBNBR0VOVEUgQVVUT01BVElaQURPMS4wLAYDVQQLDCVWYWxpZGFk
+byBwb3IgQUJDIElERU5USURBRCBESUdJVEFMIEVSMVQwUgYDVQQKDEtTVVBFUklOVEVOREVOQ0lB
+IE5BQ0lPTkFMIERFIEFEVUFOQVMgWSBERSBBRE1JTklTVFJBQ0lPTiBUUklCVVRBUklBIC0gU1VO
+QVQxDTALBgNVBAcMBExJTUExCzAJBgNVBAYTAlBFMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIB
+CgKCAQEA1apapJOwMj9tBpgKAgjRwIloUk+xwvQZxc0s/4yl4mDSrc/F/PKZ3QBmKb43fFwivqPU
+vsr68fQTfyLKM14B+xXwlbQ/yh3+87sMyulLhOPmtSOU0PE8Rw0PsmGVxf1L0HPAPc3Gvuhq4Z9D
+x5ByED6s+VppDmncvctlJ/NrzYZCk9H91OinTTPVZrDtbmqnOYra8PaTRoCI9Fmndeo9Oo7esM7K
+VX9f53NEd/mNQqzAOrgSXthFuBZN7zOsGxJ4ZGrVzHSlCH/jFLgObEizHrqisgL1cxKj8QvbGLUj
+NtUuTvR5IY6hwRLCxbliTa84BN10E0jC7hhAnnuEIAFJiwIDAQABo4IBjjCCAYowDAYDVR0TAQH/
+BAIwADAfBgNVHSMEGDAWgBRdiFut62X7/mii5NlvPVdyou8rmTBnBggrBgEFBQcBAQRbMFkwNQYI
+KwYBBQUHMAKGKWh0dHA6Ly9jcnQubGxhbWEucGUvbGxhbWFwZXN0YW5kYXJkY2EuY2VyMCAGCCsG
+AQUFBzABhhRodHRwOi8vb2NzcC5sbGFtYS5wZTAeBgNVHREEFzAVgRNybWV6YWdAc3VuYXQuZ29i
+LnBlMEYGA1UdIAQ/MD0wOwYNKwYBBAGDl3cAAQADATAqMCgGCCsGAQUFBwIBFhxodHRwczovL2xs
+YW1hLnBlL3JlcG9zaXRvcnkvMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDA6BgNVHR8E
+MzAxMC+gLaArhilodHRwOi8vY3JsLmxsYW1hLnBlL2xsYW1hcGVzdGFuZGFyZGNhLmNybDAdBgNV
+HQ4EFgQUuRkPCyM25gAu5se9GraC/UO07X8wDgYDVR0PAQH/BAQDAgbAMA0GCSqGSIb3DQEBCwUA
+A4IBAQBC8+YM7moZ7bKYCS+VzJ8wzydSboWeNuAs2CfkhI8hRMQr1r5WZg8pDlroCslF/r6Sjbkr
+juDHcGKJTM2riGEjlOD4CLU9VjOP7Td6CIZyJRLaz63pZYOwE0H0weG/PvYpopDZzJ6AXYzZxwYk
+J03/x/vwaCss9ZvmsEn2E1xtGbnMe9MEsg8oF0ul3uRn8Qy5gF37fM7YKuF/r4iBS5uSvBcA5J2F
+bI/PQls7OgICDyb3W16GeluaT9krY5wQxilJSpGVU++nv5NzmRHkquH3ic2It/KP6MZ9X2tfg6Fh
+pF6JaUz7MSY+J0KnDDcfJlhxgnkgoT5tV3Sr6z5PpQH6
+</ds:X509Certificate>
+</ds:X509Data>
+<ds:KeyValue>
+<ds:RSAKeyValue>
+<ds:Modulus>
+1apapJOwMj9tBpgKAgjRwIloUk+xwvQZxc0s/4yl4mDSrc/F/PKZ3QBmKb43fFwivqPUvsr68fQT
+fyLKM14B+xXwlbQ/yh3+87sMyulLhOPmtSOU0PE8Rw0PsmGVxf1L0HPAPc3Gvuhq4Z9Dx5ByED6s
++VppDmncvctlJ/NrzYZCk9H91OinTTPVZrDtbmqnOYra8PaTRoCI9Fmndeo9Oo7esM7KVX9f53NE
+d/mNQqzAOrgSXthFuBZN7zOsGxJ4ZGrVzHSlCH/jFLgObEizHrqisgL1cxKj8QvbGLUjNtUuTvR5
+IY6hwRLCxbliTa84BN10E0jC7hhAnnuEIAFJiw==
+</ds:Modulus>
+<ds:Exponent>AQAB</ds:Exponent>
+</ds:RSAKeyValue>
+</ds:KeyValue>
+</ds:KeyInfo>
+<ds:Proposito>El certificado SUPERINT. NAC. DE ADUANAS Y DE ADMINISTRACION TRIBUTARIA cumple con el proposito de firma digital</ds:Proposito>
+<ds:Revocacion>El certificado SUPERINT. NAC. DE ADUANAS Y DE ADMINISTRACION TRIBUTARIA no se encuentra revocado</ds:Revocacion>
+<ds:TSL>El certificado raiz o intermedio Llama.pe SHA256 Standard CA se encuentra en la TSL de Indecopi</ds:TSL>
+<ds:Expiracion>El certificado SUPERINT. NAC. DE ADUANAS Y DE ADMINISTRACION TRIBUTARIA no se encuentra expirado</ds:Expiracion>
+<ds:Object><QualifyingProperties xmlns:xad="http://uri.etsi.org/01903/v1.3.2#" Target="#"><SignedProperties id="SignedProperties-9211232876779379019"><SignedSignatureProperties><SigningTime>2024-11-18T10:47:06</SigningTime><SigningCertificate><Cert><CertDigest><DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><DigestValue>jZetzML62qX2+prDwUNbinOiGPA=</DigestValue></CertDigest><IssuerSerial><ds:X509IssuerName>C=PE, O=LLAMA.PE, CN=Llama.pe SHA256 Standard CA</ds:X509IssuerName><ds:X509SerialNumber>9211231144834552139</ds:X509SerialNumber></IssuerSerial></Cert></SigningCertificate></SignedSignatureProperties></SignedProperties><UnsignedProperties id="SignedProperties-9211232876779379019"><UnsignedSignatureProperties/></UnsignedProperties></QualifyingProperties></ds:Object>
+</ds:Signature></ext:ExtensionContent>
+		</ext:UBLExtension>
+	</ext:UBLExtensions>
+	<cbc:ID>E001-99</cbc:ID>
+	<cbc:IssueDate>2024-11-18</cbc:IssueDate>
+	<cbc:IssueTime>10:47:03</cbc:IssueTime>
+	
+	
+	<cbc:ExpiryDate/>
+	
+	
+	<cbc:InvoiceTypeCode>01</cbc:InvoiceTypeCode>
+	<cbc:Note> CIENTO QUINCE Y 00/100 SOLES</cbc:Note>
+       <cac:OrderReference>
+		<cbc:ID>E001-99</cbc:ID>
+		<cac:DocumentReference>			
+				<cbc:ID>0</cbc:ID>
+				<cbc:IssueDate>2024-11-18</cbc:IssueDate>
+				<cbc:DocumentTypeCode>0</cbc:DocumentTypeCode>
+				<cbc:DocumentType>-</cbc:DocumentType>
+											
+		</cac:DocumentReference>
+	</cac:OrderReference>
+
+	<cac:Signature>
+		<cbc:ID>0001-0001</cbc:ID>
+		<cac:SignatoryParty>
+			<cac:PartyName>
+				<cbc:Name>-</cbc:Name>
+			</cac:PartyName>
+		</cac:SignatoryParty>
+		<cac:DigitalSignatureAttachment>
+			<cac:ExternalReference>
+				<cbc:URI>sunatSign</cbc:URI>
+			</cac:ExternalReference>
+		</cac:DigitalSignatureAttachment>
+	</cac:Signature>
+
+
+
+
+	<cac:AccountingSupplierParty>
+		<cbc:CustomerAssignedAccountID>10753947162</cbc:CustomerAssignedAccountID>
+		<cac:Party>
+			<cac:PartyName>
+				<cbc:Name>DIAZ SEDAMANO DAVIS PATRICK ANDRIUW</cbc:Name>
+			</cac:PartyName>
+			<cac:PostalAddress>
+				<cbc:StreetName>CAL. ORTIZ VELEZ NRO. 153A P.J. SAN ANTONIO LAMBAYEQUE - CHICLAYO - CHICLAYO</cbc:StreetName>
+				<cbc:BuildingNumber/>
+				<cbc:CityName/>
+				<cbc:CountrySubentity/>
+				<cac:Country>
+					<cbc:IdentificationCode>PE</cbc:IdentificationCode>
+				</cac:Country>
+			</cac:PostalAddress>
+                  <cac:Contact>
+				<cbc:Telephone>632553    </cbc:Telephone>				
+			</cac:Contact>
+		</cac:Party>
+	</cac:AccountingSupplierParty>
+	<cac:AccountingCustomerParty>
+		<cbc:CustomerAssignedAccountID>20602740278</cbc:CustomerAssignedAccountID>
+		<cbc:AdditionalAccountID>6</cbc:AdditionalAccountID>
+	
+	
+	<cac:Party>
+			<cac:PartyName>
+				<cbc:Name>INDUAMERICA INTERNACIONAL S.A.C.</cbc:Name>
+			</cac:PartyName>
+			<cac:PostalAddress>
+				<cbc:StreetName>AV. CAMINO REAL NRO. 931 DPTO. 201 LIMA - LIMA - SAN ISIDRO</cbc:StreetName>
+				<cbc:BuildingNumber/>
+				<cbc:CityName/>
+				<cbc:CountrySubentity/>
+				<cac:Country>
+					<cbc:IdentificationCode/>
+				</cac:Country>
+			</cac:PostalAddress>
+                  <cac:Contact>
+				<cbc:Telephone/>				
+			</cac:Contact>
+		</cac:Party>
+	
+	
+	
+				
+	</cac:AccountingCustomerParty>
+
+	<cac:BuyerCustomerParty>
+		<cac:Party>
+			<cac:PartyLegalEntity>
+				<cac:RegistrationAddress>				    
+					<cbc:CityName/>
+				    <cbc:CountrySubentity/>
+					<cbc:CountrySubentityCode/>	                             
+					 <cbc:District/>
+					<cac:AddressLine>
+						<cbc:Line/>
+					</cac:AddressLine>
+					<cac:Country>
+					  <cbc:IdentificationCode/>
+					</cac:Country>
+				</cac:RegistrationAddress>
+			</cac:PartyLegalEntity>
+		</cac:Party>
+	</cac:BuyerCustomerParty>
+
+	<cac:PaymentTerms>
+		<cbc:ID>FormaPago</cbc:ID> 
+		<cbc:PaymentMeansID>Contado</cbc:PaymentMeansID>
+		<cbc:Amount currencyID=""/>
+		<cbc:PaymentDueDate/> 
+	</cac:PaymentTerms>
+	
+	<cac:TaxTotal>
+		<cbc:TaxAmount currencyID="PEN">0.00</cbc:TaxAmount>
+		<cac:TaxSubtotal>
+			<cbc:TaxableAmount currencyID="PEN">115.00</cbc:TaxableAmount>
+			<cbc:TaxAmount currencyID="PEN">0.00</cbc:TaxAmount>
+			<cac:TaxCategory>
+				<cbc:ID>A</cbc:ID>
+				<cac:TaxScheme/>
+			</cac:TaxCategory>
+		</cac:TaxSubtotal>
+	</cac:TaxTotal>
+	<cac:LegalMonetaryTotal>
+		<cbc:LineExtensionAmount currencyID="PEN">0.00</cbc:LineExtensionAmount>
+		<cbc:TaxExclusiveAmount currencyID="PEN">0.00</cbc:TaxExclusiveAmount>
+		<cbc:PayableAmount currencyID="PEN">115.00</cbc:PayableAmount>
+	</cac:LegalMonetaryTotal>
+	<cac:InvoiceLine>
+		<cbc:ID>0001</cbc:ID>
+		<cbc:Note>-  </cbc:Note>
+		<cbc:InvoicedQuantity unitCode="ZZ">0.00</cbc:InvoicedQuantity>
+		<cbc:LineExtensionAmount currencyID="PEN">0.00</cbc:LineExtensionAmount>
+		<cac:OrderLineReference>
+			<cbc:LineID>1</cbc:LineID>
+		</cac:OrderLineReference>
+		<cac:TaxTotal>
+			<cbc:TaxAmount currencyID="PEN">0.00</cbc:TaxAmount>
+			<cac:TaxSubtotal>
+				<cbc:TaxAmount currencyID="PEN">0.00</cbc:TaxAmount>
+				<cbc:Percent>8.00</cbc:Percent>
+				<cac:TaxCategory>
+					<cbc:ID>RET 4TA</cbc:ID>
+					<cbc:Name/>
+					<cac:TaxScheme/>
+				</cac:TaxCategory>
+			</cac:TaxSubtotal>
+		</cac:TaxTotal>
+		<cac:Item>
+			<cbc:Description>SERVICIO DE ESTIBA Y DESESTIBA DE SUMINISTROS DE LOGISTICA  </cbc:Description>
+		</cac:Item>
+		<cac:Price>
+			<cbc:PriceAmount currencyID="PEN">115.00</cbc:PriceAmount>
+		</cac:Price>
+	</cac:InvoiceLine>
+
+
+     
+
+</Invoice>
