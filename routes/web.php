@@ -196,6 +196,13 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/descargar-pago-proveedor-bcp-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoFolioBcp');
 	Route::any('/descargar-pago-proveedor-macro-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoFolioMacro');
+	Route::any('/descargar-pago-proveedor-macro-bbva-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoMacroBbva');
+	Route::any('/descargar-pago-proveedor-macro-sbk-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoMacroSBK');
+	Route::any('/descargar-pago-proveedor-macro-interbank-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoMacrosInterbank');
+
+
+
+
 
 	Route::any('/ajax-modal-historial-extorno', 'GestionOCController@actionModalHistorialExtorno');
 	Route::any('/detalle-comprobante-oc-validado-contrato/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoContrato');

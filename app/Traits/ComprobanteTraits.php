@@ -44,6 +44,65 @@ use Carbon\Carbon;
 trait ComprobanteTraits
 {
 
+    private function con_lista_documentos_contrato_folio($folio) {
+
+        $documento              =   DB::table('CMP.DOCUMENTO_CTBLE')
+                                    ->join('CMP.REFERENCIA_ASOC', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+                                    ->select(DB::raw('CMP.DOCUMENTO_CTBLE.*,REFERENCIA_ASOC.COD_TABLA,REFERENCIA_ASOC.COD_TABLA_ASOC'))
+                                    ->where('CMP.DOCUMENTO_CTBLE.COD_ESTADO','=','1')
+                                    ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_ESTADO_DOC_CTBLE','=','EDC0000000000009')
+                                    ->whereIn('COD_CATEGORIA_TIPO_DOC', [
+                                        'TDO0000000000001',
+                                        'TDO0000000000003',
+                                        'TDO0000000000002'
+                                    ]);
+
+
+
+        $listadatos             =   CMPDocumentoCtble::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                                    ->leftJoin(DB::raw("({$documento->toSql()}) as documentos"), function ($join) use ($documento) {
+                                            $join->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'documentos.COD_TABLA')
+                                                 ->addBinding($documento->getBindings());
+                                        })
+
+                                    ->leftJoin('TES.CUENTA_BANCARIA', function ($join) {
+                                        $join->on('CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR', '=', 'TES.CUENTA_BANCARIA.COD_EMPR_TITULAR')
+                                             ->on('FE_DOCUMENTO.COD_CATEGORIA_BANCO', '=', 'TES.CUENTA_BANCARIA.COD_EMPR_BANCO')
+                                             ->on('FE_DOCUMENTO.TXT_NRO_CUENTA_BANCARIA', '=', 'TES.CUENTA_BANCARIA.TXT_NRO_CUENTA_BANCARIA');
+                                    })
+                                    ->leftjoin('CMP.CATEGORIA as CAT_CUENTA', 'CAT_CUENTA.COD_CATEGORIA', '=', 'TES.CUENTA_BANCARIA.TXT_TIPO_REFERENCIA')
+                                    ->leftjoin('CMP.CATEGORIA as CAT_MONEDA', 'CAT_MONEDA.COD_CATEGORIA', '=', 'TES.CUENTA_BANCARIA.COD_CATEGORIA_MONEDA')
+                                    ->leftjoin('CMP.CATEGORIA as CAT_MONEDA_ABONO', 'CAT_MONEDA_ABONO.COD_CATEGORIA', '=', 'CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA')
+                                    ->leftjoin('STD.EMPRESA', 'STD.EMPRESA.COD_EMPR', '=', 'CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR')
+                                    ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'STD.EMPRESA.COD_TIPO_DOCUMENTO')
+                                    ->where('FOLIO','=',$folio)
+                                    ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
+                                    ->select(
+                                        DB::raw('   CMP.DOCUMENTO_CTBLE.*, 
+                                                    FE_DOCUMENTO.*, 
+                                                    documentos.NRO_SERIE,
+                                                    CMP.CATEGORIA.TXT_TIPO_REFERENCIA,
+                                                    CMP.CATEGORIA.TXT_GLOSA AS TXT_GLOSA_INTER,
+                                                    STD.EMPRESA.NRO_DOCUMENTO, 
+                                                    documentos.FEC_EMISION, 
+                                                    documentos.FEC_VENCIMIENTO, 
+                                                    documentos.NRO_DOC, 
+                                                    documentos.TXT_CATEGORIA_TIPO_DOC, 
+                                                    CAT_CUENTA.CODIGO_SUNAT AS TIPO_CUENTA,
+                                                    CAT_MONEDA.CODIGO_SUNAT AS TIPO_MONEDA, 
+                                                    CAT_MONEDA_ABONO.TXT_ABREVIATURA AS TIPO_MONEDA_ABONO,
+                                                    FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_VOUCHER, 
+                                                    FE_DOCUMENTO.TXT_CATEGORIA_BANCO AS TXT_BANCO')
+                                    )
+                                    ->get();
+
+        return  $listadatos;
+
+
+    }
+
+
+
     private function con_lista_documentos_proveedores_folio($folio,$empresa_id) {
 
         $documento              =   DB::table('CMP.DOCUMENTO_CTBLE')

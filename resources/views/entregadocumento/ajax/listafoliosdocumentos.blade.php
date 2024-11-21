@@ -38,11 +38,31 @@
                     Detalle Informativo
                   </a>  
                 </li>
+
                 <li>
                   <a href="{{ url('/descargar-pago-proveedor-macro-excel/'.$item->FOLIO) }}">
-                    Macro de Pagos
+                    Macro de BCP
                   </a>  
                 </li>
+
+                <li>
+                  <a href="{{ url('/descargar-pago-proveedor-macro-bbva-excel/'.$item->FOLIO) }}">
+                    Macro de BBVA
+                  </a>  
+                </li>
+                <li>
+                  <a href="{{ url('/descargar-pago-proveedor-macro-sbk-excel/'.$item->FOLIO) }}">
+                    Macro de SBK
+                  </a>  
+                </li>
+                <li>
+                  <a href="{{ url('/descargar-pago-proveedor-macro-interbank-excel/'.$item->FOLIO) }}">
+                    Macro de INTERBANK
+                  </a>  
+                </li>
+
+
+
               @endif
             </ul>
           </div>

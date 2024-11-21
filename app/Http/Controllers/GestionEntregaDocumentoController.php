@@ -424,6 +424,129 @@ class GestionEntregaDocumentoController extends Controller
         })->export('xls');
     }
 
+    public function actionDescargarPagoMacroBbva($folio_codigo)
+    {
+
+        $folio                  =   FeDocumentoEntregable::where('FOLIO','=',$folio_codigo)->first();
+        $listadocumento         =    $this->con_lista_documentos_contrato_folio($folio->FOLIO);
+
+
+        $operacion_id           =   $folio->OPERACION;
+        $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
+        $titulo                 =   'MACRO BBVA ('.$folio_codigo.') '.$empresa->NOM_EMPR;
+
+        Excel::create($titulo, function($excel) use ($listadocumento,$operacion_id,$folio,$empresa) {
+
+            $excel->sheet('bbva', function($sheet) use ($operacion_id,$folio,$empresa,$listadocumento){
+                $sheet->setWidth('A', 20);
+                $sheet->setWidth('B', 20);
+                $sheet->setWidth('C', 20);
+                $sheet->setWidth('D', 20);
+                $sheet->setWidth('E', 20);
+                $sheet->setWidth('F', 20);
+                $sheet->setWidth('G', 20);
+                $sheet->setWidth('H', 20);
+                $sheet->setWidth('I', 20);
+                $sheet->setWidth('J', 20);
+                $sheet->setWidth('K', 20);
+                $sheet->setWidth('L', 20);
+                $sheet->setWidth('M', 20);
+                $sheet->setWidth('N', 20);
+
+                $sheet->cell('A1', function($cell) {
+                            $cell->setFontColor('#FFFFFF');   // Texto blanco
+                        });
+                $sheet->loadView('entregadocumento/excel/contratopagosbbvamacro')->with('folio',$folio)
+                                                                                ->with('empresa',$empresa)
+                                                                                ->with('listadocumento',$listadocumento)
+                                                                                ->with('operacion_id',$operacion_id);         
+            });
+
+        })->export('xls');
+    }
+
+    public function actionDescargarPagoMacroSBK($folio_codigo)
+    {
+
+        $folio                  =   FeDocumentoEntregable::where('FOLIO','=',$folio_codigo)->first();
+        $listadocumento         =    $this->con_lista_documentos_contrato_folio($folio->FOLIO);
+
+        $operacion_id           =   $folio->OPERACION;
+        $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
+        $titulo                 =   'MACRO SBK ('.$folio_codigo.') '.$empresa->NOM_EMPR;
+
+        Excel::create($titulo, function($excel) use ($listadocumento,$operacion_id,$folio,$empresa) {
+
+            $excel->sheet('bbva', function($sheet) use ($operacion_id,$folio,$empresa,$listadocumento){
+                $sheet->setWidth('A', 20);
+                $sheet->setWidth('B', 20);
+                $sheet->setWidth('C', 20);
+                $sheet->setWidth('D', 20);
+                $sheet->setWidth('E', 20);
+                $sheet->setWidth('F', 20);
+                $sheet->setWidth('G', 20);
+                $sheet->setWidth('H', 20);
+                $sheet->setWidth('I', 20);
+                $sheet->setWidth('J', 20);
+                $sheet->setWidth('K', 20);
+                $sheet->setWidth('L', 20);
+                $sheet->setWidth('M', 20);
+                $sheet->setWidth('N', 20);
+
+                $sheet->cell('A1', function($cell) {
+                            $cell->setFontColor('#FFFFFF');   // Texto blanco
+                        });
+                $sheet->loadView('entregadocumento/excel/contratopagossbkmacro')->with('folio',$folio)
+                                                                                ->with('empresa',$empresa)
+                                                                                ->with('listadocumento',$listadocumento)
+                                                                                ->with('operacion_id',$operacion_id);         
+            });
+
+        })->export('xls');
+    }
+
+    public function actionDescargarPagoMacrosInterbank($folio_codigo)
+    {
+
+        $folio                  =   FeDocumentoEntregable::where('FOLIO','=',$folio_codigo)->first();
+        $listadocumento         =    $this->con_lista_documentos_contrato_folio($folio->FOLIO);
+
+        $operacion_id           =   $folio->OPERACION;
+        $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
+        $titulo                 =   'MACRO INTERBANK ('.$folio_codigo.') '.$empresa->NOM_EMPR;
+
+        Excel::create($titulo, function($excel) use ($listadocumento,$operacion_id,$folio,$empresa) {
+
+            $excel->sheet('bbva', function($sheet) use ($operacion_id,$folio,$empresa,$listadocumento){
+                $sheet->setWidth('A', 20);
+                $sheet->setWidth('B', 20);
+                $sheet->setWidth('C', 20);
+                $sheet->setWidth('D', 20);
+                $sheet->setWidth('E', 20);
+                $sheet->setWidth('F', 20);
+                $sheet->setWidth('G', 20);
+                $sheet->setWidth('H', 20);
+                $sheet->setWidth('I', 20);
+                $sheet->setWidth('J', 20);
+                $sheet->setWidth('K', 20);
+                $sheet->setWidth('L', 20);
+                $sheet->setWidth('M', 20);
+                $sheet->setWidth('N', 20);
+
+                $sheet->cell('A1', function($cell) {
+                            $cell->setFontColor('#FFFFFF');   // Texto blanco
+                        });
+                $sheet->loadView('entregadocumento/excel/contratopagosinterbankmacro')->with('folio',$folio)
+                                                                                ->with('empresa',$empresa)
+                                                                                ->with('listadocumento',$listadocumento)
+                                                                                ->with('operacion_id',$operacion_id);         
+            });
+
+        })->export('xls');
+    }
+
+
+
 
     public function actionDescargarPagoFolioMacro($folio_codigo)
     {
