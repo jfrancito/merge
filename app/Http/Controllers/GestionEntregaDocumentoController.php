@@ -69,6 +69,10 @@ class GestionEntregaDocumentoController extends Controller
         $combo_centro   =   $this->gn_combo_centro_r('TODO');
 
 
+        $banco_id       =   'BAM0000000000001';
+        $arraybancos    =   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
+        $combobancos    =   array('' => "Seleccione Entidad Bancaria") + $arraybancos;
+
         $area_id        =   'TODO';
         $combo_area     =   $this->gn_combo_area_usuario($estado_id);
         $rol            =    WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
@@ -106,9 +110,9 @@ class GestionEntregaDocumentoController extends Controller
         //$combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA');
 
         if($operacion_id=='ORDEN_COMPRA'){
-            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id);
+            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id);
         }else{
-            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id);
+            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id);
         }
         $funcion        =   $this;
         return View::make('entregadocumento/listaentregadocumento',
@@ -128,6 +132,10 @@ class GestionEntregaDocumentoController extends Controller
                             'combo_empresa'     =>  $combo_empresa,
                             'centro_id'         =>  $centro_id,
                             'combo_centro'      =>  $combo_centro,
+
+                            'banco_id'          =>  $banco_id,
+                            'combobancos'       =>  $combobancos,
+
                             'area_id'           =>  $area_id,
                             'combo_area'        =>  $combo_area
                          ]);
@@ -142,15 +150,18 @@ class GestionEntregaDocumentoController extends Controller
         $empresa_id     =   $request['empresa_id'];  
         $centro_id      =   $request['centro_id'];
         $idopcion       =   $request['idopcion'];
+
         $operacion_id   =   $request['operacion_id'];
         $area_id        =   $request['area_id'];
+        $banco_id        =   $request['banco_id'];
+
 
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
 
         if($operacion_id=='ORDEN_COMPRA'){
-            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id);
+            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id);
         }else{
-            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id);
+            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id);
         }
 
         $funcion        =   $this;
@@ -234,6 +245,8 @@ class GestionEntregaDocumentoController extends Controller
             $documento->FECHA_CREA                  =   $this->fechaactual;
             $documento->OPERACION                   =   $fedocumento_encontro->OPERACION;
             $documento->COD_EMPRESA                 =   $empresa_id;
+            $documento->COD_CATEGORIA_BANCO         =   $fedocumento_encontro->COD_CATEGORIA_BANCO;
+            $documento->TXT_CATEGORIA_BANCO         =   $fedocumento_encontro->TXT_CATEGORIA_BANCO;
             $documento->TXT_GLOSA                   =   $glosa;
             $documento->save();
             foreach($respuesta as $obj){

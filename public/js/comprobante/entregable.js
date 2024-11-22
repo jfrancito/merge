@@ -36,7 +36,9 @@ $(document).ready(function(){
         var empresa_id           =   $('#empresa_id').val();
         var centro_id            =   $('#centro_id').val();
         var operacion_id         =   $('#operacion_id').val();
+        var banco_id         =   $('#banco_id').val();
 
+        
         var idopcion                =   $('#idopcion').val();
         var _token                  =   $('#token').val();
 
@@ -50,7 +52,7 @@ $(document).ready(function(){
                                 fecha_fin               : fecha_fin,
                                 empresa_id              : empresa_id,
                                 area_id                 : area_id,
-
+                                banco_id                 : banco_id,
                                 centro_id               : centro_id,
                                 operacion_id               : operacion_id,
 

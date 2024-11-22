@@ -97,6 +97,22 @@
                                 </div>
                             </div> 
 
+                           <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
+                                <div class="form-group">
+                                  <label class="col-sm-12 control-label labelleft" >Banco :</label>
+                                  <div class="col-sm-12 abajocaja" >
+                                    {!! Form::select( 'banco_id', $combobancos, array($banco_id),
+                                                      [
+                                                        'class'       => 'select2 form-control control input-sm' ,
+                                                        'id'          => 'banco_id',
+                                                        'required'    => '',
+                                                        'data-aw'     => '1',
+                                                      ]) !!}
+                                  </div>
+                                </div>
+                            </div> 
+
+
                             <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
                                 <div class="form-group ">
                                   <label class="col-sm-12 control-label labelleft" >Fecha Inicio:</label>
@@ -137,7 +153,10 @@
                               </div>
                             </div> 
 
-                            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 cajareporte">
+
+
+
+                            <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
                               <div class="form-group ">
                                 <label class="col-sm-12 control-label labelleft" >Glosa:</label>
                                 <div class="col-sm-12 abajocaja" >
@@ -150,9 +169,6 @@
                             </div> 
 
  
-
-
-
 
 
                           </div>
