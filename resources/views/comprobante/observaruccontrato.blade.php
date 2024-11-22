@@ -50,6 +50,25 @@
         App.init();
         App.formElements();
         $('form').parsley();
+
+        $('.cuentanumero').on('keypress', function (e) {
+            // Permitir solo números (0-9)
+            var charCode = e.which ? e.which : e.keyCode;
+            if (charCode < 48 || charCode > 57) {
+                e.preventDefault(); // Evita que se inserten caracteres no válidos
+            }
+        });
+
+        // Opcional: evitar pegar texto que no sea numérico
+        $('.cuentanumero').on('paste', function (e) {
+            var pasteData = e.originalEvent.clipboardData.getData('text');
+            if (!/^\d+$/.test(pasteData)) {
+                e.preventDefault(); // Evita que se peguen caracteres no válidos
+            }
+        });
+
+
+        
       });
     </script> 
 

@@ -58,28 +58,25 @@
 
 		        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
 		              <div class="form-group">
-		                <label class="col-sm-12 control-label labelleft negrita" >Nro. Cuenta  (*):</label>
+		                <label class="col-sm-12 control-label labelleft negrita" >Nro. Cuenta  (*): solo numero</label>
 		                <div class="col-sm-12 abajocaja" >
 
                         <input  type="text"
                                 id="numerocuenta" name='numerocuenta' value="" placeholder="Nro. Cuenta"
                                 required = ""
-                                autocomplete="off" class="form-control input-sm" data-aw="4"/>
+                                autocomplete="off" class="form-control input-sm cuentanumero" data-aw="4"/>
 		                </div>
 		              </div>
 		        </div>
 
-
-
 		        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
 		              <div class="form-group">
-		                <label class="col-sm-12 control-label labelleft negrita" >Nro. Cuenta (CCI) :</label>
+		                <label class="col-sm-12 control-label labelleft negrita" >Nro. Cuenta (CCI) : solo numero</label>
 		                <div class="col-sm-12 abajocaja" >
 
                         <input  type="text"
                                 id="numerocuentacci" name='numerocuentacci' value="" placeholder="Nro. Cuenta (CCI)"
-                                
-                                autocomplete="off" class="form-control input-sm" data-aw="4"/>
+                                autocomplete="off" class="form-control input-sm cuentanumero" data-aw="4"/>
 		                </div>
 		              </div>
 		        </div>
@@ -106,6 +103,22 @@
       'digitsOptional': false, 
       'prefix': '', 
       'placeholder': '0'});
+
+	    $('.cuentanumero').on('keypress', function (e) {
+	        // Permitir solo números (0-9)
+	        var charCode = e.which ? e.which : e.keyCode;
+	        if (charCode < 48 || charCode > 57) {
+	            e.preventDefault(); // Evita que se inserten caracteres no válidos
+	        }
+	    });
+
+	    // Opcional: evitar pegar texto que no sea numérico
+	    $('.cuentanumero').on('paste', function (e) {
+	        var pasteData = e.originalEvent.clipboardData.getData('text');
+	        if (!/^\d+$/.test(pasteData)) {
+	            e.preventDefault(); // Evita que se peguen caracteres no válidos
+	        }
+	    });
 
     });
   </script>

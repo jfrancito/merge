@@ -6,7 +6,7 @@
       <th>DOCUMENTO</th>
       <th>ADICIONAL</th>
       <th>IMPORTE</th>
-
+      <th>DETRACION</th>
       <th>NETO A PAGAR</th>
       <th>
 
@@ -53,8 +53,11 @@
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>IMPORTE: </b> {{$item->CAN_TOTAL}}  </span>
         </td>
+        <td><b>{{$item->MONTO_DETRACCION_RED}}</b></td>
 
-        <td><b>{{$item->CAN_TOTAL}}</b></td>
+
+
+        <td><b>{{$item->CAN_TOTAL - $item->MONTO_DETRACCION_RED}}</b></td>
         <td>
             @IF($item->NRO_SERIE_DOC != '')
             <div class="text-center be-checkbox be-checkbox-sm has-primary">

@@ -327,9 +327,9 @@
 
                                       <div class="col-xs-12 col-sm-4 col-md-4 col-lg-3">
                                         <div class="form-group">
-                                          <label class="col-sm-12 control-label labelleft" ><b>Cuenta Detracción (*):</b></label>
+                                          <label class="col-sm-12 control-label labelleft" ><b>Cuenta Detracción (*): solo numero</b></label>
                                           <div class="col-sm-12 abajocaja" >
-                                              <input type="text" name="ctadetraccion" id='ctadetraccion' class="form-control control input-sm" value = '{{$empresa->TXT_DETRACCION}}'>
+                                              <input type="text" name="ctadetraccion" id='ctadetraccion' class="form-control control input-sm cuentanumero" value = '{{$empresa->TXT_DETRACCION}}'>
                                           </div>
                                         </div>
                                       </div>
