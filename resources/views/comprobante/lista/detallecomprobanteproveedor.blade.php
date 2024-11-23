@@ -226,6 +226,72 @@
               </div>
 
 
+              <div class="row @if((float)$ordencompra_f->CAN_DETRACCION<=0) ocultar @endif" >
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                  <div class="panel panel-default panel-contrast">
+                    <div class="panel-heading" style="background: #1d3a6d;color: #fff;">
+                      <div><h4>DETRACION DE LA FACTURACION : {{round($fedocumento->TOTAL_VENTA_ORIG,2)}} x 4% = {{$ordencompra_f->CAN_DETRACCION}}</h4></div>
+                    </div>
+                    <div class="panel-body panel-body-contrast">
+                            <div class="row">
+
+                                  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px;">
+
+                                      <div class="col-xs-12 col-sm-4 col-md-4 col-lg-3">
+                                        <div class="form-group">
+                                          <label class="col-sm-12 control-label labelleft" >
+                                              <div class="tooltipfr"><b>Cuenta Detracción (*)</b>
+                                                <span class="tooltiptext">Solo numeros</span>
+                                              </div>
+                                          </label>
+                                          <div class="col-sm-12 abajocaja" >
+                                              <input type="text" name="ctadetraccion" id='ctadetraccion' class="form-control control input-sm cuentanumero" value = '{{$empresa->TXT_DETRACCION}}'>
+                                          </div>
+                                        </div>
+                                      </div>
+
+
+                                      <div class="col-xs-12 col-sm-4 col-md-4 col-lg-3">
+                                        <div class="form-group">
+                                          <label class="col-sm-12 control-label labelleft" ><b>Monto de Detracion (*):</b></label>
+                                          <div class="col-sm-12 abajocaja" >
+                                              <input type="text" name="monto_detraccion" id='monto_detraccion' class="form-control control input-sm importe" 
+                                              value = '{{$ordencompra_f->CAN_DETRACCION}}' readonly>
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 cajareporte">
+                                          <div class="form-group">
+                                            <label class="col-sm-12 control-label labelleft" >
+                                              <div class="tooltipfr"><b>Pago Detraccion (*)</b>
+                                                <span class="tooltiptext">Seleccione quien va hacer el pago de la detraccion</span>
+                                              </div>
+                                            </label>
+                                            <div class="col-sm-12 abajocaja" >
+                                              {!! Form::select( 'pago_detraccion', $combopagodetraccion, array(),
+                                                                [
+                                                                  'class'       => 'select2 form-control control input-xs' ,
+                                                                  'id'          => 'pago_detraccion',
+                                                                  'data-aw'     => '1',
+                                                                ]) !!}
+                                            </div>
+                                          </div>
+                                      </div>
+
+
+
+                                  </div>
+
+
+                            </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+
               <div class="row">
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                   <div class="panel panel-default panel-contrast">
@@ -236,22 +302,52 @@
                             <div class="row">
                         
                                   @foreach($tarchivos as $index => $item)  
-                                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
-                                      <div class="form-group sectioncargarimagen">
-                                          <label class="col-sm-12 control-label"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}} (@if($item->TXT_FORMATO == 'ZIP') XML @else {{$item->TXT_FORMATO}} @endif)</b></label>
-                                          <div class="col-sm-12">
-                                              <div class="file-loading">
-                                                  <input 
-                                                  id="file-{{$item->COD_CATEGORIA_DOCUMENTO}}" 
-                                                  name="{{$item->COD_CATEGORIA_DOCUMENTO}}[]" 
-                                                  class="file-es"  
-                                                  type="file" 
-                                                  multiple data-max-file-count="1"
-                                                  required>
+
+                                      @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000009')
+
+                                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 autodetraccion">
+                                          <div class="form-group sectioncargarimagen">
+                                            <label class="col-sm-12 control-label" style="text-align: left;">
+                                              <div class="tooltipfr"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}} {{$item->TXT_FORMATO}}</b>
+                                                <span class="tooltiptext">Solo subir si selecciono que usted pagara la detracion</span>
                                               </div>
-                                          </div>
+                                            <div class="col-sm-12">
+                                                <div class="file-loading">
+                                                    <input 
+                                                    id="file-{{$item->COD_CATEGORIA_DOCUMENTO}}" 
+                                                    name="{{$item->COD_CATEGORIA_DOCUMENTO}}[]" 
+                                                    class="file-es"  
+                                                    type="file" 
+                                                    multiple data-max-file-count="1"
+                                                    required>
+                                                </div>
+                                            </div>
+                                        </div>
                                       </div>
-                                    </div>
+
+                                      @ELSE
+
+                                      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
+                                        <div class="form-group sectioncargarimagen">
+                                            <label class="col-sm-12 control-label"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}} (@if($item->TXT_FORMATO == 'ZIP') XML @else {{$item->TXT_FORMATO}} @endif)</b></label>
+                                            <div class="col-sm-12">
+                                                <div class="file-loading">
+                                                    <input 
+                                                    id="file-{{$item->COD_CATEGORIA_DOCUMENTO}}" 
+                                                    name="{{$item->COD_CATEGORIA_DOCUMENTO}}[]" 
+                                                    class="file-es"  
+                                                    type="file" 
+                                                    multiple data-max-file-count="1"
+                                                    required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                      </div>
+
+                                      @ENDIF
+
+
+
                                   @endforeach
                                   
                             </div>
@@ -281,6 +377,9 @@
                                           <input type="hidden" name="idopcion" id='idopcion' value = '{{$idopcion}}'>
                                           <input type="hidden" name="prefijo_id" id='prefijo_id' value = '{{substr($ordencompra->COD_ORDEN, 0,6)}}'>
                                           <input type="hidden" name="orden_id" id='orden_id' value = '{{Hashids::encode(substr($ordencompra->COD_ORDEN, -10))}}'>
+                                          
+                                          <input type="hidden" name="empresa_id" id='empresa_id' value = '{{$ordencompra_f->COD_EMPR}}'>
+                                          <input type="hidden" name="detraccion" id='detraccion' value = '{{(float)$ordencompra_f->CAN_DETRACCION}}'>
                                           
                                           <input type="hidden" name="te" id='te' value = '{{$fedocumento->ind_errototal}}'>
                                           <input type="hidden" name="contacto_id" id='contacto_id' value = '{{$usuario->COD_TRABAJADOR}}'>

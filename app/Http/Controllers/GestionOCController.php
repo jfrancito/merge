@@ -1205,6 +1205,13 @@ class GestionOCController extends Controller
         $cb_id                  =   '';
         $combocb                =   array('' => "Seleccione Cuenta Bancaria");
 
+        $ordencompra_f          =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
+        $empresa                =   STDEmpresa::where('COD_EMPR','=',$ordencompra_f->COD_EMPR_CLIENTE)->first();
+        $combocb                =   array('' => "Seleccione Cuenta Bancaria");
+        $combopagodetraccion    =   array('' => "Seleccione Pago Detraccion", $ordencompra_f->COD_EMPR_CLIENTE => $ordencompra_f->TXT_EMPR_CLIENTE , $ordencompra_f->COD_EMPR => Session::get('empresas')->NOM_EMPR);
+
+
+
 
         return View::make('comprobante/registrocomprobanteproveedor',
                          [
@@ -1214,8 +1221,10 @@ class GestionOCController extends Controller
                             'cb_id'                 =>  $cb_id,
                             'combocb'               =>  $combocb,
 
-
-
+                            'ordencompra_f'         =>  $ordencompra_f,
+                            'combocb'               =>  $combocb,
+                            'empresa'               =>  $empresa,
+                            'combopagodetraccion'   =>  $combopagodetraccion,
 
                             'detalleordencompra'    =>  $detalleordencompra,
                             'fedocumento'           =>  $fedocumento,
@@ -1282,6 +1291,24 @@ class GestionOCController extends Controller
                         copy($file->getRealPath(),$rutacompleta);
                         //dd($extractedFile);
                         $path            =   $rutacompleta;
+
+
+                        //SI TIENE DETRACCION ASIGNAR EL PDF
+                        if($ordencompra_t->CAN_DETRACCION>0){
+                            $docasociar                              =   New CMPDocAsociarCompra;
+                            $docasociar->COD_ORDEN                   =   $ordencompra_t->COD_ORDEN;
+                            $docasociar->COD_CATEGORIA_DOCUMENTO     =   'DCC0000000000009';
+                            $docasociar->NOM_CATEGORIA_DOCUMENTO     =   'CONSTANCIA DE AUTODETRACCIÓN';
+                            $docasociar->IND_OBLIGATORIO             =   1;
+                            $docasociar->TXT_FORMATO                 =   'PDF';
+                            $docasociar->TXT_ASIGNADO                =   'PROVEEDOR';
+                            $docasociar->COD_USUARIO_CREA_AUD        =   Session::get('usuario')->id;
+                            $docasociar->FEC_USUARIO_CREA_AUD        =   $this->fechaactual;
+                            $docasociar->COD_ESTADO                  =   1;
+                            $docasociar->TIP_DOC                     =   'N';
+                            $docasociar->save();
+                        }
+
 
 
                         $rh              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
@@ -1801,10 +1828,33 @@ class GestionOCController extends Controller
                 $trabajador                               =   STDTrabajador::where('COD_TRAB','=',$contacto->COD_TRABAJADOR)->first();
                 //$contacto                               =   User::where('id','=',$contacto_id)->first();
 
+                $ordencompra_t                          =   CMPOrden::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->first();
 
                 $entidadbanco_id                          =   $request['entidadbanco_id'];
                 $bancocategoria                           =   CMPCategoria::where('COD_CATEGORIA','=',$entidadbanco_id)->first();
                 $cb_id                                    =   $request['cb_id'];
+
+
+                $ctadetraccion                            =   $request['ctadetraccion'];
+                $monto_detraccion                         =   $request['monto_detraccion'];
+                $pago_detraccion                          =   $request['pago_detraccion'];
+
+                $empresa_sel                              =   STDEmpresa::where('COD_EMPR','=',$pago_detraccion)->first();
+                $COD_PAGO_DETRACCION = '';
+                $TXT_PAGO_DETRACCION = '';
+                if(count($empresa_sel)>0){
+                    $COD_PAGO_DETRACCION = $empresa_sel->COD_EMPR;
+                    $TXT_PAGO_DETRACCION = $empresa_sel->NOM_EMPR;
+                }
+
+                if($ctadetraccion!=''){
+                    STDEmpresa::where('COD_EMPR',$ordencompra_t->COD_EMPR_CLIENTE)
+                                ->update(
+                                    [
+                                        'TXT_DETRACCION'=>$ctadetraccion
+                                    ]
+                                );
+                }
 
 
                 FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
@@ -1815,6 +1865,13 @@ class GestionOCController extends Controller
                                     'TXT_CATEGORIA_BANCO'=>$bancocategoria->NOM_CATEGORIA,
                                     'TXT_NRO_CUENTA_BANCARIA'=>$cb_id,
                                     
+                                    'CTA_DETRACCION'=>$ctadetraccion,
+                                    'MONTO_DETRACCION_XML'=>$monto_detraccion,
+                                    'MONTO_DETRACCION_RED'=>round($monto_detraccion),
+                                    'COD_PAGO_DETRACCION'=>$COD_PAGO_DETRACCION,
+                                    'TXT_PAGO_DETRACCION'=>$TXT_PAGO_DETRACCION,
+
+
                                     'ARCHIVO_CDR'=>'',
                                     'ARCHIVO_PDF'=>'',
                                     'COD_ESTADO'=>'ETM0000000000007',
@@ -1831,7 +1888,6 @@ class GestionOCController extends Controller
                                 ]
                             );
 
-                $ordencompra_t                          =   CMPOrden::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->first();
                 //HISTORIAL DE DOCUMENTO APROBADO
                 $documento                              =   new FeDocumentoHistorial;
                 $documento->ID_DOCUMENTO                =   $ordencompra->COD_ORDEN;
@@ -2277,7 +2333,7 @@ class GestionOCController extends Controller
 
                             'combotipodetraccion'   =>  $combotipodetraccion,
                             'combopagodetraccion'   =>  $combopagodetraccion,
-
+                            'ordencompra_f'         =>  $ordencompra_f,
 
 
                             'combobancos'           =>  $combobancos,
@@ -2472,17 +2528,25 @@ class GestionOCController extends Controller
 
 
         $cb_id                  =   '';
+
+
+        $empresa                =   STDEmpresa::where('COD_EMPR','=',$ordencompra_f->COD_EMPR_CLIENTE)->first();
         $combocb                =   array('' => "Seleccione Cuenta Bancaria");
+        $combopagodetraccion    =   array('' => "Seleccione Pago Detraccion", $ordencompra_f->COD_EMPR_CLIENTE => $ordencompra_f->TXT_EMPR_CLIENTE , $ordencompra_f->COD_EMPR => Session::get('empresas')->NOM_EMPR);
 
 
+        //dd($ordencompra_f->CAN_DETRACCION);
 
         return View::make('comprobante/registrocomprobanteadministrator',
                          [
                             'ordencompra'           =>  $ordencompra,
                             'eliminadodoc'          =>  $eliminadodoc,
                             'combobancos'           =>  $combobancos,
+                            'ordencompra_f'         =>  $ordencompra_f,
                             'cb_id'                 =>  $cb_id,
                             'combocb'               =>  $combocb,
+                            'empresa'               =>  $empresa,
+                            'combopagodetraccion'   =>  $combopagodetraccion,
                             'rutaorden'             =>  $rutaorden,
                             'fedocumento_x'         =>  $fedocumento_x,
                             'detalleordencompra'    =>  $detalleordencompra,
@@ -2548,6 +2612,23 @@ class GestionOCController extends Controller
                         copy($file->getRealPath(),$rutacompleta);
                         //dd($extractedFile);
                         $path            =   $rutacompleta;
+
+
+                        //SI TIENE DETRACCION ASIGNAR EL PDF
+                        if($ordencompra_t->CAN_DETRACCION>0){
+                            $docasociar                              =   New CMPDocAsociarCompra;
+                            $docasociar->COD_ORDEN                   =   $ordencompra_t->COD_ORDEN;
+                            $docasociar->COD_CATEGORIA_DOCUMENTO     =   'DCC0000000000009';
+                            $docasociar->NOM_CATEGORIA_DOCUMENTO     =   'CONSTANCIA DE AUTODETRACCIÓN';
+                            $docasociar->IND_OBLIGATORIO             =   1;
+                            $docasociar->TXT_FORMATO                 =   'PDF';
+                            $docasociar->TXT_ASIGNADO                =   'PROVEEDOR';
+                            $docasociar->COD_USUARIO_CREA_AUD        =   Session::get('usuario')->id;
+                            $docasociar->FEC_USUARIO_CREA_AUD        =   $this->fechaactual;
+                            $docasociar->COD_ESTADO                  =   1;
+                            $docasociar->TIP_DOC                     =   'N';
+                            $docasociar->save();
+                        }
 
 
                         $rh              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
@@ -2924,7 +3005,7 @@ class GestionOCController extends Controller
                             $moneda_le = $factura->gettipoMoneda();
 
                             $archivosdelfe          =      CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                            ->whereIn('COD_CATEGORIA', ['DCC0000000000026','DCC0000000000002','DCC0000000000003','DCC0000000000004','DCC0000000000008'])
+                                                            ->whereIn('COD_CATEGORIA', ['DCC0000000000026','DCC0000000000002','DCC0000000000003','DCC0000000000004','DCC0000000000008','DCC0000000000009'])
                                                             ->get();
 
 
@@ -2939,7 +3020,7 @@ class GestionOCController extends Controller
                             $moneda_le = 'PEN';
 
                             $archivosdelfe          =      CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                            ->whereIn('COD_CATEGORIA', ['DCC0000000000026','DCC0000000000013','DCC0000000000003','DCC0000000000008'])->get();
+                                                            ->whereIn('COD_CATEGORIA', ['DCC0000000000026','DCC0000000000013','DCC0000000000003','DCC0000000000008','DCC0000000000009'])->get();
 
                         }
 
@@ -3189,7 +3270,6 @@ class GestionOCController extends Controller
                         }
                         
 
-
                         //ARCHIVOS
                         DB::table('CMP.DOC_ASOCIAR_COMPRA')->where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->delete();
 
@@ -3258,7 +3338,6 @@ class GestionOCController extends Controller
                 $numerototal     = $fedocumento->NUMERO;
                 $numerototalsc    = ltrim($numerototal, '0');
                 $nombre_doc_sinceros = $fedocumento->SERIE.'-'.$numerototalsc;
-
 
                 //LECTURA DEL CDR
                 if(!is_null($filescdr)){
@@ -3430,10 +3509,8 @@ class GestionOCController extends Controller
                                                 ->whereIn('TXT_ASIGNADO', ['PROVEEDOR','CONTACTO'])
                                                 ->get();
                 }
-
                 //dd($tarchivos);
                 foreach($tarchivos as $index => $item){
-
                     $filescdm          =   $request[$item->COD_CATEGORIA_DOCUMENTO];
                     if(!is_null($filescdm)){
 
@@ -3478,13 +3555,33 @@ class GestionOCController extends Controller
                 $trabajador                               =   STDTrabajador::where('COD_TRAB','=',$contacto->COD_TRABAJADOR)->first();
                 //$contacto                               =   User::where('id','=',$contacto_id)->first();
 
+                $ordencompra_t                            =   CMPOrden::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->first();
+
                 $entidadbanco_id   =   $request['entidadbanco_id'];
                 $bancocategoria    =   CMPCategoria::where('COD_CATEGORIA','=',$entidadbanco_id)->first();
+                $cb_id             =   $request['cb_id'];
 
 
-                $cb_id                                    =   $request['cb_id'];
+                $ctadetraccion                            =   $request['ctadetraccion'];
+                $monto_detraccion                         =   $request['monto_detraccion'];
+                $pago_detraccion                          =   $request['pago_detraccion'];
 
+                $empresa_sel                              =   STDEmpresa::where('COD_EMPR','=',$pago_detraccion)->first();
+                $COD_PAGO_DETRACCION = '';
+                $TXT_PAGO_DETRACCION = '';
+                if(count($empresa_sel)>0){
+                    $COD_PAGO_DETRACCION = $empresa_sel->COD_EMPR;
+                    $TXT_PAGO_DETRACCION = $empresa_sel->NOM_EMPR;
+                }
 
+                if($ctadetraccion!=''){
+                    STDEmpresa::where('COD_EMPR',$ordencompra_t->COD_EMPR_CLIENTE)
+                                ->update(
+                                    [
+                                        'TXT_DETRACCION'=>$ctadetraccion
+                                    ]
+                                );
+                }
 
                 FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(
@@ -3494,6 +3591,12 @@ class GestionOCController extends Controller
                                     'TXT_NRO_CUENTA_BANCARIA'=>$cb_id,
                                     'ARCHIVO_CDR'=>'',
                                     'ARCHIVO_PDF'=>'',
+
+                                    'CTA_DETRACCION'=>$ctadetraccion,
+                                    'MONTO_DETRACCION_XML'=>$monto_detraccion,
+                                    'MONTO_DETRACCION_RED'=>round($monto_detraccion),
+                                    'COD_PAGO_DETRACCION'=>$COD_PAGO_DETRACCION,
+                                    'TXT_PAGO_DETRACCION'=>$TXT_PAGO_DETRACCION,
 
                                     'COD_ESTADO'=>'ETM0000000000002',
                                     'TXT_ESTADO'=>'POR APROBAR USUARIO CONTACTO',
@@ -3509,7 +3612,6 @@ class GestionOCController extends Controller
                                 ]
                             );
 
-                $ordencompra_t                          =   CMPOrden::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->first();
                 //HISTORIAL DE DOCUMENTO APROBADO
                 $documento                              =   new FeDocumentoHistorial;
                 $documento->ID_DOCUMENTO                =   $ordencompra->COD_ORDEN;

@@ -3,9 +3,12 @@
     <tr>
       <th>ITEM</th>
       <th>OPERACION</th>
-
       <th>FOLIO</th>
+      <th>BANCO</th>
+      
       <th>GLOSA</th>
+
+
       <th>CANTIDAD DOCUMENTOS</th>
       <th>USUARIO CREA</th>
       <th>FECHA CREA</th>
@@ -19,6 +22,8 @@
         <td>{{$index + 1}}</td>
         <td>{{$item->OPERACION}}</td>
         <td>{{$item->FOLIO}}</td>
+        <td>{{$item->TXT_CATEGORIA_BANCO}}</td>
+
         <td>{{$item->TXT_GLOSA}}</td>
         <td>{{$item->CAN_FOLIO}}</td>
         <td>{{$item->nombre}}</td>

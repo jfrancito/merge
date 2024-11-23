@@ -215,7 +215,7 @@ class GestionTCController extends Controller
         $user_orden             =   User::where('usuarioosiris_id','=',$ordencompra->COD_EMPR_EMISOR)->first();
         $empresa                =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR_EMISOR)->first();
 
-
+        $ordencompra_f          =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$idoc)->first();
         $combotipodetraccion    =   array('' => "Seleccione Tipo Detraccion",'MONTO_REFERENCIAL' => 'MONTO REFERENCIAL' , 'MONTO_FACTURACION' => 'MONTO FACTURACION');
         $combopagodetraccion    =   array('' => "Seleccione Pago Detraccion",$ordencompra->COD_EMPR_EMISOR => $ordencompra->TXT_EMPR_EMISOR , $ordencompra->COD_EMPR_RECEPTOR => $ordencompra->TXT_EMPR_RECEPTOR);
 
@@ -229,6 +229,7 @@ class GestionTCController extends Controller
                             'combotipodetraccion'   =>  $combotipodetraccion,
                             'combopagodetraccion'   =>  $combopagodetraccion,
 
+                            'ordencompra_f'         =>  $ordencompra_f,
 
                             'combobancos'           =>  $combobancos,
                             'cb_id'                 =>  $cb_id,
@@ -318,7 +319,7 @@ class GestionTCController extends Controller
 
 
                             $archivosdelfe          =      CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                            ->whereIn('COD_CATEGORIA', ['DCC0000000000026','DCC0000000000002','DCC0000000000003','DCC0000000000004','DCC0000000000008'])
+                                                            ->whereIn('COD_CATEGORIA', ['DCC0000000000026','DCC0000000000002','DCC0000000000003','DCC0000000000004','DCC0000000000008','DCC0000000000009'])
                                                             ->get();
 
 
@@ -332,7 +333,7 @@ class GestionTCController extends Controller
                             $moneda_le = 'PEN';
 
                             $archivosdelfe          =      CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                            ->whereIn('COD_CATEGORIA', ['DCC0000000000026','DCC0000000000013','DCC0000000000003','DCC0000000000008'])->get();
+                                                            ->whereIn('COD_CATEGORIA', ['DCC0000000000026','DCC0000000000013','DCC0000000000003','DCC0000000000008','DCC0000000000009'])->get();
                         }
 
 

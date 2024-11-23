@@ -7,6 +7,7 @@
 	    <tr>
 	      <th>ITEM</th>
 	      <th>NRO OC</th>
+	      <th>RUC</th>
 	      <th>PROVEEDOR</th>
 	      <th>BANCO</th>
 	      <th>COMPROBANTE ASOCIADO</th>
@@ -25,12 +26,10 @@
 	  <tbody>
 	  	@php $monto_total =  0; @endphp
 	    @foreach($listadatos as $index => $item)
-
-
-
 	      <tr>
 	        <td>{{$index + 1}}</td>
 	        <td>{{$item->COD_ORDEN}}</td>
+	        <td>{{$item->RUC_PROVEEDOR}}</td>
 	        <td>{{$item->TXT_EMPR_CLIENTE}}</td>
 	        <td>{{$item->TXT_CATEGORIA_BANCO}}</td>
 	        <td>{{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</td>
@@ -68,7 +67,6 @@
 	          @ENDIF
 	        </td>
 	        <td>{{$item->CAN_TOTAL}}</td>
-
 	        <td>
 	          @IF($item->CAN_DETRACCION>0)
 	            {{$item->CAN_TOTAL - $item->CAN_DETRACCION}}
@@ -83,6 +81,8 @@
 	            @ENDIF
 	          @ENDIF
 	        </td>
+
+
 	      </tr>                    
 	    @endforeach
 	  </tbody>

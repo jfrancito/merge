@@ -104,6 +104,18 @@ $(document).ready(function(){
     });
 
 
+    function setSelect2Readonly(selector, readonly) {
+        if (readonly) {
+            $(selector).attr('readonly', true);
+            $(selector).on('select4:opening select4:closing', function(e) {
+                e.preventDefault();
+            });
+        } else {
+            $(selector).removeAttr('readonly');
+            $(selector).off('select4:opening select4:closing');
+        }
+    }
+
     $(".registrocomprobante").on('change','.entidadbancooc', function() {
 
         debugger;
@@ -112,6 +124,14 @@ $(document).ready(function(){
         var entidadbanco_id     =   $(this).val();
         var prefijo_id          =   $('#prefijo_id').val();
         var orden_id            =   $('#orden_id').val();
+
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009'];
+
+        if(valores.includes(entidadbanco_id)){
+            $('.ajax_cb').addClass('ocultar');
+        }else{
+            $('.ajax_cb').removeClass('ocultar');
+        }
 
         debugger;
 
@@ -132,6 +152,28 @@ $(document).ready(function(){
                 }
         });
     });
+
+
+    $(".registrocomprobante").on('change','#pago_detraccion', function() {
+
+        debugger;
+
+        var _token              =   $('#token').val();
+        var pago_detraccion     =   $(this).val();
+        var empresa_id          =   $('#empresa_id').val();
+
+        if(empresa_id == pago_detraccion){
+            $('#file-DCC0000000000009').removeAttr('required');
+            $('.autodetraccion').addClass('ocultar');
+        }else{
+            $('#file-DCC0000000000009').prop('required', true);
+            $('.autodetraccion').removeClass('ocultar');
+        }
+
+    });
+
+
+
 
 
 
@@ -166,6 +208,7 @@ $(document).ready(function(){
 
 
 
+
     $(".registrocomprobante").on('click','.btn-guardar-xml-contrato', function(e) {
 
         event.preventDefault();
@@ -185,7 +228,7 @@ $(document).ready(function(){
             if(ctadetraccion.trim() ==''){ alerterrorajax("Ingrese una Cuenta de Detraccion."); return false;}
             if(tipo_detraccion_id ==''){ alerterrorajax("Seleeccione un valor de detraccion"); return false;}
             if(monto_detraccion =='0'){ alerterrorajax("Ingrese Monto de Detraccion."); return false;}
-            if(pago_detraccion =='0'){ alerterrorajax("Seleeccione un pago de detraccion"); return false;}
+            if(pago_detraccion ==''){ alerterrorajax("Seleeccione un pago de detraccion"); return false;}
         }
 
 
@@ -230,6 +273,19 @@ $(document).ready(function(){
         var te                      =   $('#te').val();
         var entidadbanco_id         =   $('#entidadbanco_id').val();
         var cb_id                   =   $('#cb_id').val();
+        var detraccion              =   $('#detraccion').val();
+
+
+        var ctadetraccion           =   $('#ctadetraccion').val();
+        var monto_detraccion        =   $('#monto_detraccion').val();
+        var pago_detraccion         =   $('#pago_detraccion').val();
+
+        debugger;
+        if(detraccion>0){
+            if(ctadetraccion.trim() ==''){ alerterrorajax("Ingrese una Cuenta de Detraccion."); return false;}
+            if(monto_detraccion =='0'){ alerterrorajax("Ingrese Monto de Detraccion."); return false;}
+            if(pago_detraccion ==''){ alerterrorajax("Seleeccione un pago de detraccion"); return false;}            
+        }
 
         var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009'];
 

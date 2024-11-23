@@ -316,7 +316,7 @@
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                   <div class="panel panel-default panel-contrast">
                     <div class="panel-heading" style="background: #1d3a6d;color: #fff;">
-                      <div><h4>DETRACION DE LA FACTURACION : {{$fedocumento->TOTAL_VENTA_ORIG}} x 4% = {{$fedocumento->TOTAL_VENTA_ORIG * 0.04}}</h4> </div>
+                      <div><h4>DETRACION DE LA FACTURACION : {{round($fedocumento->TOTAL_VENTA_ORIG,2)}} x 4% = {{$fedocumento->TOTAL_VENTA_ORIG * 0.04}}</h4> </div>
                       <div><h6>* Solo llenar para montos mayores a 401</h6> </div>
                     </div>
                     <div class="panel-body panel-body-contrast">
@@ -327,7 +327,13 @@
 
                                       <div class="col-xs-12 col-sm-4 col-md-4 col-lg-3">
                                         <div class="form-group">
-                                          <label class="col-sm-12 control-label labelleft" ><b>Cuenta Detracción (*): solo numero</b></label>
+                                          <label class="col-sm-12 control-label labelleft" >
+                                              <div class="tooltipfr"><b>Cuenta Detracción (*)</b>
+                                                <span class="tooltiptext">Solo numeros</span>
+                                              </div>
+
+
+                                          </label>
                                           <div class="col-sm-12 abajocaja" >
                                               <input type="text" name="ctadetraccion" id='ctadetraccion' class="form-control control input-sm cuentanumero" value = '{{$empresa->TXT_DETRACCION}}'>
                                           </div>
@@ -337,7 +343,11 @@
 
                                       <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 cajareporte">
                                           <div class="form-group">
-                                            <label class="col-sm-12 control-label labelleft" ><b>Valor Detraccion (*):</b></label>
+                                            <label class="col-sm-12 control-label labelleft" >
+                                              <div class="tooltipfr"><b>Valor Detraccion (*)</b>
+                                                <span class="tooltiptext">Si la detraccion corresponde a la factura o aun monto referencial</span>
+                                              </div>
+                                            </label>
                                             <div class="col-sm-12 abajocaja" >
                                               {!! Form::select( 'tipo_detraccion_id', $combotipodetraccion, array(),
                                                                 [
@@ -362,7 +372,12 @@
 
                                       <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 cajareporte">
                                           <div class="form-group">
-                                            <label class="col-sm-12 control-label labelleft" ><b>Pago Detraccion (*):</b></label>
+                                            <label class="col-sm-12 control-label labelleft" >
+                                              
+                                              <div class="tooltipfr"><b>Pago Detraccion (*)</b>
+                                                <span class="tooltiptext">Seleccione quien va hacer el pago de la detraccion</span>
+                                              </div>
+                                            </label>
                                             <div class="col-sm-12 abajocaja" >
                                               {!! Form::select( 'pago_detraccion', $combopagodetraccion, array(),
                                                                 [
@@ -398,6 +413,30 @@
                             <div class="row">
                         
                                   @foreach($tarchivos as $index => $item)  
+
+                                    @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000009')
+
+                                      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 autodetraccion" >
+                                        <div class="form-group sectioncargarimagen">
+                                          <label class="col-sm-12 control-label" >
+                                            <div class="tooltipfr"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}} {{$item->TXT_FORMATO}}</b>
+                                              <span class="tooltiptext">Solo subir si selecciono que usted pagara la detracion</span>
+                                            </div>
+                                            </label>
+                                            <div class="col-sm-12">
+                                                <div class="file-loading">
+                                                    <input 
+                                                    id="file-{{$item->COD_CATEGORIA_DOCUMENTO}}" 
+                                                    name="{{$item->COD_CATEGORIA_DOCUMENTO}}[]" 
+                                                    class="file-es"  
+                                                    type="file" 
+                                                    multiple data-max-file-count="1">
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                    @ELSE
                                     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
                                       <div class="form-group sectioncargarimagen">
                                           <label class="col-sm-12 control-label"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}} ({{$item->TXT_FORMATO}})</b></label>
@@ -414,6 +453,10 @@
                                           </div>
                                       </div>
                                     </div>
+
+                                    @ENDIF
+
+
                                   @endforeach
                                   
                             </div>
@@ -444,7 +487,7 @@
                                           <input type="hidden" name="prefijo_id" id='prefijo_id' value = '{{substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7)}}'>
                                           <input type="hidden" name="orden_id" id='orden_id' value = '{{Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -9))}}'>
                                           <input type="hidden" name="monto_total" id='monto_total' value = '{{$fedocumento->TOTAL_VENTA_ORIG}}'>
-
+                                          <input type="hidden" name="empresa_id" id='empresa_id' value = '{{$ordencompra_f->COD_EMPR}}'>
                                           <input type="hidden" name="te" id='te' value = '{{$fedocumento->ind_errototal}}'>
                                           <input type="hidden" name="contacto_id" id='contacto_id' value = '{{$usuario->COD_TRABAJADOR}}'>
                                           <button type="submit" class="btn btn-space btn-success btn-guardar-xml-contrato">Guardar</button>
