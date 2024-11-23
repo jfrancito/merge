@@ -535,20 +535,22 @@ class GestionOCValidadoController extends Controller
         if(count($referencia)>0){
             $ordeningreso       =   CMPOrden::where('COD_ORDEN','=',$referencia->COD_TABLA_ASOC)->first();   
         }    
+        $ordencompra_f          =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
+
 
         //dd($archivos);
         return View::make('comprobante/registrocomprobantevalidado',
                          [
                             'ordencompra'           =>  $ordencompra,
                             'archivospdf'           =>  $archivospdf,
-                            'ordeningreso'           =>  $ordeningreso,
+                            'ordeningreso'          =>  $ordeningreso,
                             'detalleordencompra'    =>  $detalleordencompra,
                             'fedocumento'           =>  $fedocumento,
                             'detallefedocumento'    =>  $detallefedocumento,
                             'documentohistorial'    =>  $documentohistorial,
                             'archivos'              =>  $archivos,
                             'archivosanulados'      =>  $archivosanulados,
-
+                            'ordencompra_f'         =>  $ordencompra_f,
                             'linea'                 =>  $linea,
                             
                             'xmlarchivo'            =>  $xmlarchivo,
