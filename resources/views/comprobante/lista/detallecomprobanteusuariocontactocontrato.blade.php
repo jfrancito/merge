@@ -65,7 +65,7 @@
 
                             <tr>
                               <td><b>Total</b></td>
-                              <td><p class='subtitulomerge'>{{number_format($ordencompra->CAN_TOTAL, 4, '.', ',')}}</p></td>
+                              <td><p class='subtitulomerge'>{{number_format($ordencompra->CAN_TOTAL+$ordencompra->CAN_PERCEPCION, 4, '.', ',')}}</p></td>
                               <td>
                                 <div class='subtitulomerge @if($fedocumento->ind_total == 1) msjexitoso @else msjerror @endif'>
                                     <b>{{number_format($fedocumento->TOTAL_VENTA_ORIG, 4, '.', ',')}}</b>

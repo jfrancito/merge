@@ -112,7 +112,7 @@
                         
                                 <div class="col-xs-12 col-sm-3 col-md-3 col-lg-2">
                                     <p class='titulomerge'>Total : </p>
-                                    <p class='subtitulomerge'><b>oc&nbsp;&nbsp; =></b> {{number_format($ordencompra->CAN_TOTAL, 4, '.', ',')}}</p>
+                                    <p class='subtitulomerge'><b>oc&nbsp;&nbsp; =></b> {{number_format($ordencompra->CAN_TOTAL+$ordencompra->CAN_PERCEPCION, 4, '.', ',')}}</p>
                                     <div class='subtitulomerge @if($fedocumento->ind_total == 1) msjexitoso @else msjerror @endif'>
                                         <!-- <b>xml =></b> {{number_format($fedocumento->TOTAL_VENTA_ORIG+$fedocumento->PERCEPCION+$fedocumento->MONTO_RETENCION, 4, '.', ',')}} -->
 
