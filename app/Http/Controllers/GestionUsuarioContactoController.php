@@ -2179,7 +2179,7 @@ class GestionUsuarioContactoController extends Controller
 
             $arraybancos            =   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
             $combobancos            =   array('' => "Seleccione Entidad Bancaria") + $arraybancos;
-
+            $ordencompra_f          =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
 
 
             return View::make('comprobante/aprobaruc', 
@@ -2187,7 +2187,7 @@ class GestionUsuarioContactoController extends Controller
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
                                 'combobancos'           =>  $combobancos,
-
+                                'ordencompra_f'         =>  $ordencompra_f,
                                 'linea'                 =>  $linea,
                                 'detalleordencompra'    =>  $detalleordencompra,
                                 'detallefedocumento'    =>  $detallefedocumento,

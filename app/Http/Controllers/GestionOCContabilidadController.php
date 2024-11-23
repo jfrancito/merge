@@ -529,6 +529,9 @@ class GestionOCContabilidadController extends Controller
 
             $comboreparable         =   array('ARCHIVO_VIRTUAL' => 'ARCHIVO_VIRTUAL','ARCHIVO_FISICO' => 'ARCHIVO_FISICO');
             $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
+            $ordencompra_f          =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
+
+
 
             return View::make('comprobante/aprobarcon', 
                             [
@@ -537,7 +540,7 @@ class GestionOCContabilidadController extends Controller
                                 'ordeningreso'          =>  $ordeningreso,
                                 'trabajador'            =>  $trabajador,
                                 'documentoscompra'      =>  $documentoscompra,
-
+                                'ordencompra_f'      =>  $ordencompra_f,
 
                                 'documentoscomprarepable'   =>  $documentoscomprarepable,
                                 'comboreparable'            =>  $comboreparable,

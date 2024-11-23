@@ -1333,6 +1333,7 @@ class GestionOCAdministracionController extends Controller
                                         ->pluck('COD_CATEGORIA_DOCUMENTO')
                                         ->toArray();
 
+            $ordencompra_f          =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
 
             return View::make('comprobante/aprobaradm', 
                             [
@@ -1341,6 +1342,7 @@ class GestionOCAdministracionController extends Controller
                                 'ordeningreso'          =>  $ordeningreso,
                                 'linea'                 =>  $linea,
                                 'archivos'              =>  $archivos,
+                                'ordencompra_f'         =>  $ordencompra_f,
 
                                 'trabajador'            =>  $trabajador,
                                 'documentoscompra'      =>  $documentoscompra,
