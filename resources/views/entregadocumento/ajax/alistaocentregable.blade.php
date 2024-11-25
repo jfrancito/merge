@@ -3,10 +3,11 @@
     <tr>
       <th>ITEM</th>
       <th>DOCUMENTO</th>
-
       <th>ADICIONAL</th>
       <th>IMPORTE</th>
       <th>DESCUENTO</th>
+      <th>PERCEPCCION</th>
+
       <th>NETO A PAGAR</th>
       <th>
         <div class="text-center be-checkbox be-checkbox-sm has-primary">
@@ -82,23 +83,15 @@
             @ENDIF
           </span>
         </td>
-
-
-
-
-
-
-
-        <td><b>
-          @IF($item->CAN_DETRACCION>0)
-            {{$item->CAN_TOTAL - $item->CAN_DETRACCION}}
-          @ELSE
-            @IF($item->CAN_RETENCION>0)
-              {{$item->CAN_TOTAL - $item->CAN_RETENCION}}
-            @ELSE
-              {{$item->CAN_TOTAL}}               
-            @ENDIF
-          @ENDIF</b>
+        <td>
+          <b>
+            {{round($item->PERCEPCION,2)}}
+          </b>
+        </td>
+        <td>
+          <b>
+            {{$funcion->funciones->neto_pagar_oc($item)}}
+          </b>
         </td>
 
         <td>

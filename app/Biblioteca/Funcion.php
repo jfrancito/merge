@@ -15,6 +15,16 @@ use table;
 
 class Funcion {
 
+	public function neto_pagar_oc($oc){
+
+		$valor_detraccion = 0;
+		$neto_pagar 	  = 0;
+        $neto_pagar 	  = $oc->CAN_TOTAL - $oc->CAN_DETRACCION - $oc->CAN_RETENCION + $oc->PERCEPCION;
+        return $neto_pagar;
+	}
+
+
+
 
 	public function se_paga_detraccion_contrato($id_documento){
 

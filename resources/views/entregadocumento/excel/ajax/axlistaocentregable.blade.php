@@ -19,6 +19,8 @@
 	      <th>OBLIGACION</th>
 	      <th>DESCUENTO</th>
 	      <th>TOTAL DESCUENTO</th>
+	      <th>PERCEPCION</th>
+
 	      <th>IMPORTE</th>
 	      <th>NETO A PAGAR</th>
 	    </tr>
@@ -66,23 +68,12 @@
 	            @ENDIF
 	          @ENDIF
 	        </td>
+	        <td>{{round($item->PERCEPCION,2)}}</td>
 	        <td>{{$item->CAN_TOTAL}}</td>
 	        <td>
-	          @IF($item->CAN_DETRACCION>0)
-	            {{$item->CAN_TOTAL - $item->CAN_DETRACCION}}
-	            @php $monto_total  = $monto_total + ($item->CAN_TOTAL - $item->CAN_DETRACCION); @endphp
-	          @ELSE
-	            @IF($item->CAN_RETENCION>0)
-	              	{{$item->CAN_TOTAL - $item->CAN_RETENCION}}
-	            	@php $monto_total  = $monto_total + ($item->CAN_TOTAL - $item->CAN_RETENCION); @endphp
-	            @ELSE
-	              	{{$item->CAN_TOTAL}} 
-	            	@php $monto_total  = $monto_total + ($item->CAN_TOTAL); @endphp
-	            @ENDIF
-	          @ENDIF
+	        	{{$funcion->funciones->neto_pagar_oc($item)}}
+		        @php $monto_total  = $monto_total + $funcion->funciones->neto_pagar_oc($item); @endphp
 	        </td>
-
-
 	      </tr>                    
 	    @endforeach
 	  </tbody>
@@ -100,7 +91,11 @@
 	        <td></td>
 	        <td></td>
 	        <td></td>
+	       	<td></td>
 	        <td></td>
+	        <td></td>
+	        <td></td>
+
 	        <td>{{number_format($monto_total, 2, '.', '')}}</td>
 	      </tr>                    
 	  </tfoot>

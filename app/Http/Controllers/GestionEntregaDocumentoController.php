@@ -363,15 +363,19 @@ class GestionEntregaDocumentoController extends Controller
         $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
         $titulo                 =   'FOLIO('.$folio_codigo.') '.$empresa->NOM_EMPR;
 
-        Excel::create($titulo, function($excel) use ($listadatossoles,$listadatosdolar,$operacion_id) {
+        $funcion                =   $this;
 
-            $excel->sheet('Soles', function($sheet) use ($listadatossoles,$operacion_id){
+        Excel::create($titulo, function($excel) use ($listadatossoles,$listadatosdolar,$operacion_id,$funcion) {
+
+            $excel->sheet('Soles', function($sheet) use ($listadatossoles,$operacion_id,$funcion){
                 $sheet->loadView('entregadocumento/excel/eentregable')->with('listadatos',$listadatossoles)
+                                                                      ->with('funcion',$funcion)
                                                                       ->with('operacion_id',$operacion_id);         
             });
 
-            $excel->sheet('Dolares', function($sheet) use ($listadatosdolar,$operacion_id){
+            $excel->sheet('Dolares', function($sheet) use ($listadatosdolar,$operacion_id,$funcion){
                 $sheet->loadView('entregadocumento/excel/eentregable')->with('listadatos',$listadatosdolar)
+                                                                      ->with('funcion',$funcion)
                                                                       ->with('operacion_id',$operacion_id);       
             });
 

@@ -1955,10 +1955,9 @@ trait ComprobanteTraits
             $listadatos     =   FeDocumento::join('CMP.ORDEN', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.Orden.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
-                                //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                                //->where('FE_DOCUMENTO.ID_DOCUMENTO','=','IICHCL0000009227')
                                 ->Fecha($filtrofecha_id,$fecha_inicio,$fecha_fin)
-                                //->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
-                                //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 ->where('OPERACION','=','ORDEN_COMPRA')
                                 ->ProveedorFE($proveedor_id)
