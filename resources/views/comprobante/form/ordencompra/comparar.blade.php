@@ -83,13 +83,18 @@
           </tr>
 
           <tr>
+            <td><b>DETRACCION</b></td>
+            <td  colspan="2" class=""><b>{{$ordencompra_f->PERCEPCION}}</b></td>
+          </tr>
+
+          <tr>
             <td><b>PERCEPCION</b></td>
-            <td  colspan="2" class=""><b>{{$fedocumento->PERCEPCION}}</b></td>
+            <td  colspan="2" class=""><b>{{$ordencompra_f->CAN_PERCEPCION}}</b></td>
           </tr>
 
           <tr>
             <td><b>RETENCION</b></td>
-            <td  colspan="2" class=""><b>{{$fedocumento->MONTO_RETENCION}}</b></td>
+            <td  colspan="2" class=""><b>{{$ordencompra_f->CAN_RETENCION}}</b></td>
           </tr>
 
       </tbody>

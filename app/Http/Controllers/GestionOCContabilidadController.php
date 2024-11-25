@@ -70,8 +70,13 @@ class GestionOCContabilidadController extends Controller
 
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_total_cont($cod_empresa);
+            //dd($listadatos);
+
+            $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_cont_obs($cod_empresa);
+
         }else{
             $listadatos         =   $this->con_lista_cabecera_comprobante_total_cont_contrato($cod_empresa);
+            $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_cont_contrato_obs($cod_empresa);
         }
 
         //dd($listadatos);
@@ -79,10 +84,10 @@ class GestionOCContabilidadController extends Controller
         return View::make('comprobante/listacontabilidad',
                          [
                             'listadatos'        =>  $listadatos,
+                            'listadatos_obs'    =>  $listadatos_obs,
                             'funcion'           =>  $funcion,
                             'operacion_id'      =>  $operacion_id,
                             'combo_operacion'   =>  $combo_operacion,
-
                             'idopcion'          =>  $idopcion,
                          ]);
     }
@@ -97,8 +102,13 @@ class GestionOCContabilidadController extends Controller
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_total_cont($cod_empresa);
+            //dd($listadatos);
+
+            $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_cont_obs($cod_empresa);
+
         }else{
             $listadatos         =   $this->con_lista_cabecera_comprobante_total_cont_contrato($cod_empresa);
+            $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_cont_contrato_obs($cod_empresa);
         }
         $procedencia        =   'ADM';
         $funcion                =   $this;
@@ -109,6 +119,7 @@ class GestionOCContabilidadController extends Controller
                             'idopcion'              =>  $idopcion,
                             'cod_empresa'           =>  $cod_empresa,
                             'listadatos'            =>  $listadatos,
+                            'listadatos_obs'            =>  $listadatos_obs,
                             'procedencia'           =>  $procedencia,
                             'ajax'                  =>  true,
 

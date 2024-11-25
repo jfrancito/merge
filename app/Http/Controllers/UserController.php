@@ -865,10 +865,8 @@ class UserController extends Controller {
         $url_rep 					=	'';
         $url_rep_contrato 			=	'';
 
-
         $url_rep_revisar 			=	'';
         $url_rep_contrato_revisar 	=	'';
-
 
 		$count_reparables 			= 	0;
 		$count_reparables_con 		= 	0;
@@ -876,17 +874,13 @@ class UserController extends Controller {
 		$count_reparables_rev 		= 	0;
 		$count_reparables__revcon 	= 	0;
 
-
-
 		$count_x_aprobar_gestion 	= 	0;
         $url_gestion 				=	'';
 
 		$count_observados_con 		= 	0;
         $url_obs_con 				=	'';
 
-        
-
-
+       
 		$trol 						=	WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 
 		$count_x_aprobar_con 				= 	0;
@@ -932,8 +926,14 @@ class UserController extends Controller {
 		else{
 			//CONTABILIDAD
 			if(Session::get('usuario')->rol_id == '1CIX00000015' || Session::get('usuario')->rol_id == '1CIX00000016'){
-        		$listadatos     =   $this->con_lista_cabecera_comprobante_total_cont($cod_empresa);
-				$count_x_aprobar = 	 count($listadatos);
+
+
+        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_cont($cod_empresa);
+				$count_x_aprobar 		= 	 count($listadatos);
+
+	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_obs($cod_empresa);
+				$count_observados 		= 	count($listadatosob);
+
 
     			$url 					=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=ORDEN_COMPRA';
     			$urlcontrato 			=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=CONTRATO';
@@ -946,9 +946,13 @@ class UserController extends Controller {
         		$url_rep_contrato_revisar 		=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=CONTRATO&estado_id=2';
 
 
-
-        		$listadatos     =   $this->con_lista_cabecera_comprobante_total_cont_contrato($cod_empresa);
+        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_cont_contrato($cod_empresa);
 				$count_x_aprobar_con 	= 	 count($listadatos);
+
+	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_contrato_obs($cod_empresa);
+				$count_observados_con 	= 	count($listadatosob);
+
+
 
 	        	$listadatosre    		=   $this->con_lista_cabecera_comprobante_total_gestion_reparable($cod_empresa,'TODO','TODO');
 				$count_reparables 		= 	 count($listadatosre);
@@ -972,8 +976,19 @@ class UserController extends Controller {
         			$listadatos     =   $this->con_lista_cabecera_comprobante_total_adm($cod_empresa);
 					$count_x_aprobar = 	 count($listadatos);
 
+
+		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_obs($cod_empresa);
+					$count_observados 		= 	count($listadatosob);
+
+
 	        		$listadatos     =   $this->con_lista_cabecera_comprobante_total_adm_contrato($cod_empresa);
 					$count_x_aprobar_con 	= 	 count($listadatos);
+
+
+		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_contrato_obs($cod_empresa);
+					$count_observados_con 	= 	count($listadatosob);
+
+
         			$url 					=	'/gestion-de-administracion-aprobar/j25?operacion_id=ORDEN_COMPRA';
         			$urlcontrato 			=	'/gestion-de-administracion-aprobar/j25?operacion_id=CONTRATO';
 
