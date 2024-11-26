@@ -35,7 +35,17 @@ var App = (function () {
         }]
     });
 
-
+    $("#nso_obs_le").dataTable({
+        dom: 'Bfrtip',
+        buttons: [
+            'csv', 'excel', 'pdf'
+        ],
+        "lengthMenu": [[500, 1000, -1], [500, 1000, "All"]],
+        columnDefs:[{
+            targets: "_all",
+            sortable: false
+        }]
+    });
 
     $("#nso_obs").dataTable({
         dom: 'Bfrtip',

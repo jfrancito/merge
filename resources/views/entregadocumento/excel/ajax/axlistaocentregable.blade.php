@@ -1,8 +1,4 @@
-
-<html>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-
-	<table id="" class="table table-striped table-borderless table-hover td-color-borde td-padding-7">
+<table id="" class="table table-striped table-borderless table-hover td-color-borde td-padding-7" >
 	  <thead>
 	    <tr>
 	      <th>ITEM</th>
@@ -101,5 +97,3 @@
 	  </tfoot>
 	</table>
 
-
-</html>

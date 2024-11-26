@@ -69,14 +69,16 @@ class GestionOCContabilidadController extends Controller
         }
 
         if($operacion_id=='ORDEN_COMPRA'){
-            $listadatos         =   $this->con_lista_cabecera_comprobante_total_cont($cod_empresa);
-            //dd($listadatos);
 
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_cont($cod_empresa);
             $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_cont_obs($cod_empresa);
+            $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_cont_obs_levantadas($cod_empresa);
 
         }else{
             $listadatos         =   $this->con_lista_cabecera_comprobante_total_cont_contrato($cod_empresa);
             $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_cont_contrato_obs($cod_empresa);
+            $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_cont_contrato_levantadas($cod_empresa);
+
         }
 
         //dd($listadatos);
@@ -85,6 +87,7 @@ class GestionOCContabilidadController extends Controller
                          [
                             'listadatos'        =>  $listadatos,
                             'listadatos_obs'    =>  $listadatos_obs,
+                            'listadatos_obs_le' =>  $listadatos_obs_le,
                             'funcion'           =>  $funcion,
                             'operacion_id'      =>  $operacion_id,
                             'combo_operacion'   =>  $combo_operacion,
@@ -101,15 +104,18 @@ class GestionOCContabilidadController extends Controller
         $idopcion       =   $request['idopcion'];
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
         if($operacion_id=='ORDEN_COMPRA'){
-            $listadatos         =   $this->con_lista_cabecera_comprobante_total_cont($cod_empresa);
-            //dd($listadatos);
 
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_cont($cod_empresa);
             $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_cont_obs($cod_empresa);
+            $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_cont_obs_levantadas($cod_empresa);
 
         }else{
             $listadatos         =   $this->con_lista_cabecera_comprobante_total_cont_contrato($cod_empresa);
             $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_cont_contrato_obs($cod_empresa);
+            $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_cont_contrato_levantadas($cod_empresa);
+
         }
+
         $procedencia        =   'ADM';
         $funcion                =   $this;
         return View::make('comprobante/ajax/mergelistacontabilidad',
@@ -120,6 +126,7 @@ class GestionOCContabilidadController extends Controller
                             'cod_empresa'           =>  $cod_empresa,
                             'listadatos'            =>  $listadatos,
                             'listadatos_obs'            =>  $listadatos_obs,
+                            'listadatos_obs_le'            =>  $listadatos_obs_le,
                             'procedencia'           =>  $procedencia,
                             'ajax'                  =>  true,
 
