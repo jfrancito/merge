@@ -880,6 +880,10 @@ class UserController extends Controller {
 		$count_observados_con 		= 	0;
         $url_obs_con 				=	'';
 
+
+		$count_observadosoc_le 		= 	0;
+		$count_observadosct_le 		= 	0;
+
        
 		$trol 						=	WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 
@@ -934,6 +938,10 @@ class UserController extends Controller {
 	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_obs($cod_empresa);
 				$count_observados 		= 	count($listadatosob);
 
+	        	$listadatosoble    		=   $this->con_lista_cabecera_comprobante_total_cont_obs_levantadas($cod_empresa);
+				$count_observadosoc_le 	= 	count($listadatosoble);
+
+
 
     			$url 					=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=ORDEN_COMPRA';
     			$urlcontrato 			=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=CONTRATO';
@@ -952,6 +960,8 @@ class UserController extends Controller {
 	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_contrato_obs($cod_empresa);
 				$count_observados_con 	= 	count($listadatosob);
 
+	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_contrato_levantadas($cod_empresa);
+				$count_observadosct_le 	= 	count($listadatosob);
 
 
 	        	$listadatosre    		=   $this->con_lista_cabecera_comprobante_total_gestion_reparable($cod_empresa,'TODO','TODO');
@@ -1016,6 +1026,7 @@ class UserController extends Controller {
 
 
 
+
 		//dd($listaocpendientes);
 
 		return View::make('bienvenido',
@@ -1028,9 +1039,11 @@ class UserController extends Controller {
 						 	'url' 				=> $url,
 						 	'urlcontrato' 		=> $urlcontrato,
 
-
 						 	'count_observados' 	=> $count_observados,
 						 	'url_obs' 			=> $url_obs,
+
+						 	'count_observadosoc_le' 	=> $count_observadosoc_le,
+						 	'count_observadosct_le' 	=> $count_observadosct_le,
 
 						 	'count_reparables' 	=> $count_reparables,
 						 	'count_reparables_con' 	=> $count_reparables_con,

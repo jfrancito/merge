@@ -96,7 +96,7 @@
             <th>Moneda</th>
             <th>Nro. Cuenta</th>
             <th>Nro. CCI</th>
-            <th></th>
+            <!-- <th></th> -->
           </tr>
         </thead>
         <tbody class="no-border-x">
@@ -108,7 +108,7 @@
                 <td>{{$item->TXT_CATEGORIA_MONEDA}}</td>
                 <td>{{$item->TXT_NRO_CUENTA_BANCARIA}}</td>
                 <td>{{$item->TXT_NRO_CCI}}</td>
-                <td>
+<!--                 <td>
                 	<span style="cursor:pointer;" 
                 		data_COD_EMPR_TITULAR = '{{$item->COD_EMPR_TITULAR}}'
                 		data_COD_EMPR_BANCO = '{{$item->COD_EMPR_BANCO}}'
@@ -119,7 +119,7 @@
                 		class="badge badge-danger btn-eliminar-cb">
                 		<a href="#" class="icon"><i class="mdi mdi-close" style="color: #fff;"></i></a>
                 	</span>
-                </td>
+                </td> -->
               </tr>
 
           @endforeach
