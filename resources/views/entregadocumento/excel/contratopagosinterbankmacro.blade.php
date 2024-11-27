@@ -48,9 +48,9 @@
 	        <td>09</td>
 	        <td>{{$item->TIPO_CUENTA}}</td>
 	        <td>{{$item->TIPO_MONEDA}}</td>
-	        <td><div>{{$item->TXT_NRO_CUENTA_BANCARIA}}</div></td>
+	        <td><b>{{$item->TXT_NRO_CUENTA_BANCARIA}}</b></td>
 	        <td>{{$item->TIPO_MONEDA_ABONO}}</td>
-	        <td>{{number_format($item->TOTAL_VENTA_ORIG - $item->MONTO_DETRACCION_RED, 2, '.', '')}}</td>
+	        <td>{{number_format($item->TOTAL_VENTA_ORIG - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO), 2, '.', '')}}</td>
 	      </tr>                    
 	    @endforeach
 	  </tbody>

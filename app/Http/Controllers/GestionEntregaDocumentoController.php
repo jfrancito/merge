@@ -682,10 +682,12 @@ class GestionEntregaDocumentoController extends Controller
         $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
         $titulo                 =   'MACRO INTERBANK ('.$folio_codigo.') '.$empresa->NOM_EMPR;
 
-        Excel::create($titulo, function($excel) use ($listadocumento,$operacion_id,$folio,$empresa) {
+        $funcion                =   $this;
 
-            $excel->sheet('interbank', function($sheet) use ($operacion_id,$folio,$empresa,$listadocumento){
-                
+        Excel::create($titulo, function($excel) use ($listadocumento,$operacion_id,$folio,$empresa,$funcion) {
+
+            $excel->sheet('interbank', function($sheet) use ($operacion_id,$folio,$empresa,$listadocumento,$funcion){
+
                 $sheet->mergeCells('B2:C2');
                 $sheet->mergeCells('B3:C3');
                 $sheet->mergeCells('B4:C4');
@@ -713,6 +715,7 @@ class GestionEntregaDocumentoController extends Controller
                         });
                 $sheet->loadView('entregadocumento/excel/contratopagosinterbankmacro')->with('folio',$folio)
                                                                                 ->with('empresa',$empresa)
+                                                                                ->with('funcion',$funcion)
                                                                                 ->with('listadocumento',$listadocumento)
                                                                                 ->with('operacion_id',$operacion_id);         
             });

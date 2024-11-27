@@ -20,6 +20,7 @@ class Funcion {
 		$valor_detraccion = 0;
 		$neto_pagar 	  = 0;
         $neto_pagar 	  = $oc->CAN_TOTAL - $oc->CAN_DETRACCION - $oc->CAN_RETENCION + $oc->PERCEPCION;
+        $neto_pagar 	  = ROUND($neto_pagar,2);
         return $neto_pagar;
 	}
 
