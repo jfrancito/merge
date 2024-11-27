@@ -252,6 +252,11 @@ trait ComprobanteTraits
                                                     CMP.CATEGORIA.CODIGO_SUNAT,
                                                     CAT_CUENTA.TXT_ABREVIATURA,
                                                     SUM(TOTAL_VENTA_ORIG) TOTAL,
+                                                    SUM(CASE 
+                                                            WHEN FE_DOCUMENTO.COD_PAGO_DETRACCION = CMP.DOCUMENTO_CTBLE.COD_EMPR 
+                                                            THEN TOTAL_VENTA_ORIG - MONTO_DETRACCION_RED
+                                                            ELSE TOTAL_VENTA_ORIG
+                                                        END) AS TOTAL_PAGAR,
                                                     SUM(MONTO_DETRACCION_RED) DETRACCION'))
                                     ->groupBy('CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR')
                                     ->groupBy('CMP.DOCUMENTO_CTBLE.TXT_EMPR_EMISOR')
@@ -2872,7 +2877,7 @@ trait ComprobanteTraits
 		//total
         $ordencompra_t          =   CMPOrden::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->first();
         $total_1 = $ordencompra->CAN_TOTAL-$ordencompra_t->CAN_RETENCION+$ordencompra_t->CAN_PERCEPCION;
-        $total_2 = $fedocumento->TOTAL_VENTA_ORIG+$fedocumento->PERCEPCION;//+$fedocumento->PERCEPCION+$fedocumento->MONTO_RETENCION;
+        $total_2 = $fedocumento->TOTAL_VENTA_ORIG+$ordencompra_t->PERCEPCION;//+$fedocumento->PERCEPCION+$fedocumento->MONTO_RETENCION;
         $tt_totales = round(abs($total_1 - $total_2), 2);
 
         //dd($total_1);

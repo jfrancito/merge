@@ -14,11 +14,9 @@
 			background-color: #eeeeee;
 		}
 	</style>
-
+	@include('entregadocumento.excel.ajax.cabecera')
 	<table class="tabladet">
 	  <thead>
-	  	<tr><th></th><tr>
-	  	<tr><th>MACRO DE INTERBANK</th><tr>
 	    <tr>
 	      <th>Tipo de Documento</th>
 	      <th>Número de Documento</th>

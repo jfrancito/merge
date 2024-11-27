@@ -29,10 +29,7 @@ class Funcion {
 	public function se_paga_detraccion_contrato($id_documento){
 
 		$valor_detraccion = 0;
-
-
 		$fedocumento = FeDocumento::where('ID_DOCUMENTO','=',$id_documento)->first();
-
 		if($fedocumento->COD_PAGO_DETRACCION == Session::get('empresas')->COD_EMPR){
 			$valor_detraccion = $fedocumento->MONTO_DETRACCION_RED;
 		}

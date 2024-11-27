@@ -2,6 +2,23 @@
 <html>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
+  	<style type="text/css">
+		.tabladet tr th{
+			border: 1px solid;
+		}	
+		.tabladet tr td{
+			border: 1px solid;
+		}	
+		.border{
+			border: 1px solid;
+		}
+		.cplomo{
+			background-color: #eeeeee;
+		}
+	</style>
+	@include('entregadocumento.excel.ajax.cabecera')
+
+
 	<table id="" class="table table-striped table-borderless table-hover td-color-borde td-padding-7">
 	  <thead>
 	    <tr>
@@ -17,10 +34,10 @@
 	      <th>TIPO</th>
 	      <th>SUBIO VOUCHER</th>
 	      <th>ORDEN INGRESO</th>
-	      <th>OBLIGACION</th>
-	      <th>DESCUENTO</th>
-	      <th>TOTAL DESCUENTO</th>
+	      <th>PAGO DETRACCION</th>
+
 	      <th>IMPORTE</th>
+	      <th>DETRACCION</th>
 	      <th>NETO A PAGAR</th>
 	    </tr>
 	  </thead>
@@ -48,50 +65,22 @@
 	            @ENDIF
 	        </td>
 	        <td>{{$item->COD_TABLA_ASOC}}</td>
-	        <td>
-	          @IF($item->CAN_DETRACCION>0)
-	            DETRACION
-	          @ELSE
-	            @IF($item->CAN_RETENCION>0)
-	              RETENCION              
-	            @ENDIF
-	          @ENDIF
-	        </td>
-	        <td>{{$item->CAN_DSCTO}}</td>
 
-	        <td>
-	          @IF($item->CAN_DETRACCION>0)
-	            {{$item->CAN_DETRACCION}}
-	          @ELSE
-	            @IF($item->CAN_RETENCION>0)
-	              {{$item->CAN_RETENCION}}
-	            @ELSE
-	              0.00                
-	            @ENDIF
-	          @ENDIF
-	        </td>
+	        <td>{{$item->TXT_PAGO_DETRACCION}}</td>
+
 	        <td>{{$item->CAN_TOTAL}}</td>
-
 	        <td>
-	          @IF($item->CAN_DETRACCION>0)
-	            {{$item->CAN_TOTAL - $item->CAN_DETRACCION}}
-	            @php $monto_total  = $monto_total + ($item->CAN_TOTAL - $item->CAN_DETRACCION); @endphp
-	          @ELSE
-	            @IF($item->CAN_RETENCION>0)
-	              	{{$item->CAN_TOTAL - $item->CAN_RETENCION}}
-	            	@php $monto_total  = $monto_total + ($item->CAN_TOTAL - $item->CAN_RETENCION); @endphp
-	            @ELSE
-	              	{{$item->CAN_TOTAL}} 
-	            	@php $monto_total  = $monto_total + ($item->CAN_TOTAL); @endphp
-	            @ENDIF
-	          @ENDIF
+	          {{$funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)}}
+	        </td>
+	        <td>
+				{{$item->CAN_TOTAL - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)}}
+				@php $monto_total  = $monto_total + ($item->CAN_TOTAL - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)); @endphp
 	        </td>
 	      </tr>                    
 	    @endforeach
 	  </tbody>
 	  <tfoot>
 	      <tr>
-	        <td></td>
 	        <td></td>
 	        <td></td>
 	        <td></td>

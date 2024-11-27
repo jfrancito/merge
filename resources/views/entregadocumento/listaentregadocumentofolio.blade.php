@@ -14,17 +14,40 @@
               <div class="panel panel-default panel-border-color panel-border-color-success">
                 <div class="panel-heading">{{ $titulo }}
                   <div class="tools tooltiptop">
-                    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones asignarmasivo">
-                      <span class="tooltiptext">Integrar Entregable</span>
-                      <span class="icon mdi mdi-plus-circle-o"></span>
-                    </a>
-                    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscardocumento">
+
+                    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscardocumentofolio">
                       <span class="tooltiptext">Buscar Documento</span>
                       <span class="icon mdi mdi-search"></span>
                     </a>
                   </div>
                 </div>
                 <div class="panel-body">
+                  <div class='filtrotabla row'>
+
+                           <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
+                                <div class="form-group">
+                                  <label class="col-sm-12 control-label labelleft" >Operacion :</label>
+                                  <div class="col-sm-12 abajocaja" >
+                                    {!! Form::select( 'operacion_id', $combo_operacion, array($operacion_id),
+                                                      [
+                                                        'class'       => 'select2 form-control control input-sm' ,
+                                                        'id'          => 'operacion_id',
+                                                        'required'    => '',
+                                                        'data-aw'     => '1',
+                                                      ]) !!}
+                                  </div>
+                                </div>
+                            </div> 
+
+                          </div>
+
+
+                    <div class="col-xs-12">
+                      <input type="hidden" name="idopcion" id='idopcion' value='{{$idopcion}}'>
+                    </div>
+                  </div>
+
+
                   <div class='listajax'>
                     @include('entregadocumento.ajax.listafoliosdocumentos')
                   </div>

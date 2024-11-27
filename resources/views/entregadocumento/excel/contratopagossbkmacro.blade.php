@@ -14,12 +14,10 @@
 			background-color: #eeeeee;
 		}
 	</style>
+	@include('entregadocumento.excel.ajax.cabecera')
 
 	<table class="tabladet">
 	  <thead>
-	  	<tr><th></th><tr>
-
-	  	<tr><th>MACRO DE SCOTIABANK</th><tr>
 	    <tr>
 	      <th>RUC PROVEEDOR</th>
 	      <th>RAZON SOCIAL</th>
@@ -40,9 +38,9 @@
 	        <td>{{$item->NRO_DOCUMENTO}}</td>
 	        <td>{{$item->TXT_EMPR_EMISOR}}</td>
 	        <td>{{$item->TXT_CATEGORIA_BANCO}}</td>
-	        <td><div>{{$item->TXT_NRO_CUENTA_BANCARIA}}</div></td>
+	        <td><b>{{$item->TXT_NRO_CUENTA_BANCARIA}}</b></td>
 	        <td></td>
-	        <td>{{number_format($item->TOTAL_VENTA_ORIG - $item->MONTO_DETRACCION_RED, 2, '.', '')}}</td>
+	        <td>{{number_format($item->TOTAL_VENTA_ORIG - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO), 2, '.', '')}}</td>
 	        <td>NO</td>
 	        <td>{{$item->TXT_CATEGORIA_TIPO_DOC}}</td>
 	        <td>{{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</td>

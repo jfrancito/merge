@@ -77,7 +77,7 @@
 	      	<th class="border cplomo">BANCO:</th>
 	      	<th class="border cplomo">{{$fedocumento->TXT_CATEGORIA_BANCO}}</th>
 	      	<th class="border cplomo">CUENTA:</th>
-	      	<th class="border cplomo">{{$fedocumento->TXT_NRO_CUENTA_BANCARIA}}</th>
+	      	<th class="border cplomo"><b>{{$fedocumento->TXT_NRO_CUENTA_BANCARIA}}</b></th>
 	      	<th></th>
 	      	<th></th>
 	      	<th></th>
@@ -88,7 +88,7 @@
 
 	  	<tr>
 	      	<th class="border cplomo">CUENTA DE DETRACCION:</th>
-	      	<th class="border cplomo">{{$fedocumento->CTA_DETRACCION}}</th>
+	      	<th class="border cplomo"><b>{{$empresa_item->TXT_DETRACCION}}</b></th>
 	      	<th></th>
 	      	<th></th>
 	      	<th></th>
@@ -101,9 +101,6 @@
 	  	<tr>
 	      	<th>POR SERVICIO DE TRANSPORTE DE CARGA, UNIDAD DE MEDIDA: SACOS, SEGÚN: GR-R N°</th>
 	  	</tr>
-
-
-
 
 	  </thead>
 	</table>
@@ -124,6 +121,7 @@
 	    </tr>
 	  </thead>
 	  <tbody>
+		@php $monto_total  = 0; @endphp
 	    @foreach($listadocumento as $index => $item)
 	      <tr>
 	        <td>{{number_format($item->TOTAL_CAN_SACOS, 2, '.', '')}}</td>
@@ -134,11 +132,13 @@
 	        <td>{{$item->MONTO_DETRACCION_XML}}</td>
 	        <td>{{$item->MONTO_DETRACCION_RED}}</td>
 			<td>0.00</td>
-	        <td>{{$item->TOTAL_VENTA_ORIG - $item->MONTO_DETRACCION_RED}}</td>
+	        <td>
+	        	{{$item->TOTAL_VENTA_ORIG - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)}}
+				@php $monto_total  = $monto_total + ($item->TOTAL_VENTA_ORIG - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)); @endphp
+	        </td>
 	      </tr>                    
 	    @endforeach
 	  </tbody>
-
 	  <tfoot>
 	      <tr>
 	        <th>TOTAL</th>
@@ -149,7 +149,7 @@
 	        <th>{{number_format($listadocumento->SUM('MONTO_DETRACCION_XML'), 2, '.', '')}}</th>
 	        <th>{{number_format($listadocumento->SUM('MONTO_DETRACCION_RED'), 2, '.', '')}}</th>
 	        <th>0.00</th>
-	        <th>{{number_format($listadocumento->SUM('TOTAL_VENTA_ORIG') - $listadocumento->SUM('MONTO_DETRACCION_RED'), 2, '.', '')}}</th>
+	        <th>{{$monto_total}}</th>
 	      </tr>                    
 	  </tfoot>
 

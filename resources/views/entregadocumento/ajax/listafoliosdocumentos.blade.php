@@ -5,10 +5,7 @@
       <th>OPERACION</th>
       <th>FOLIO</th>
       <th>BANCO</th>
-      
       <th>GLOSA</th>
-
-
       <th>CANTIDAD DOCUMENTOS</th>
       <th>USUARIO CREA</th>
       <th>FECHA CREA</th>
@@ -38,36 +35,7 @@
                 </a>  
               </li>
               @if($item->OPERACION=='CONTRATO')
-                <li>
-                  <a href="{{ url('/descargar-pago-proveedor-bcp-excel/'.$item->FOLIO) }}">
-                    Detalle Informativo
-                  </a>  
-                </li>
-
-                <li>
-                  <a href="{{ url('/descargar-pago-proveedor-macro-excel/'.$item->FOLIO) }}">
-                    Macro de BCP
-                  </a>  
-                </li>
-
-                <li>
-                  <a href="{{ url('/descargar-pago-proveedor-macro-bbva-excel/'.$item->FOLIO) }}">
-                    Macro de BBVA
-                  </a>  
-                </li>
-                <li>
-                  <a href="{{ url('/descargar-pago-proveedor-macro-sbk-excel/'.$item->FOLIO) }}">
-                    Macro de SBK
-                  </a>  
-                </li>
-                <li>
-                  <a href="{{ url('/descargar-pago-proveedor-macro-interbank-excel/'.$item->FOLIO) }}">
-                    Macro de INTERBANK
-                  </a>  
-                </li>
-
-
-
+                @include('entregadocumento.excel.opcionct')
               @endif
             </ul>
           </div>

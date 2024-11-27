@@ -307,17 +307,24 @@ class GestionEntregaDocumentoController extends Controller
 
         $rol            =   WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 
-
+        $operacion_id       =   'ORDEN_COMPRA';
+        //falta usuario contacto
+        $array_contrato     =   $this->array_rol_contrato();
+        if (in_array(Session::get('usuario')->rol_id, $array_contrato)) {
+            $operacion_id       =   'CONTRATO';
+        }
 
         if($rol->ind_uc == 1){
             $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
                                 ->where('COD_EMPRESA','=',$empresa_id)
+                                ->where('OPERACION','=',$operacion_id)
                                 ->where('USUARIO_CREA','=',Session::get('usuario')->id)
                                 ->orderBy('FE_DOCUMENTO_ENTREGABLE.FECHA_CREA','DESC')
                                 ->get();
         }else{
             $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
                                 ->where('COD_EMPRESA','=',$empresa_id)
+                                ->where('OPERACION','=',$operacion_id)
                                 ->orderBy('FE_DOCUMENTO_ENTREGABLE.FECHA_CREA','DESC')
                                 ->get();
         }
@@ -336,20 +343,69 @@ class GestionEntregaDocumentoController extends Controller
 
 
 
+        $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO');
+
         $funcion        =   $this;
         return View::make('entregadocumento/listaentregadocumentofolio',
                          [
                             'listadatos'        =>  $listadatos,
+                            'operacion_id'      =>  $operacion_id,
+                            'combo_operacion'   =>  $combo_operacion,
                             'funcion'           =>  $funcion,
                             'idopcion'          =>  $idopcion,
                          ]);
     }
 
 
+
+    public function actionListarAjaxBuscarDocumentoEntregableFolio(Request $request) {
+
+        $idopcion       =   $request['idopcion'];
+        $operacion_id   =   $request['operacion_id'];
+        $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
+        $empresa_id     =   Session::get('empresas')->COD_EMPR;
+
+        $rol            =   WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
+
+
+
+        if($rol->ind_uc == 1){
+            $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
+                                ->where('COD_EMPRESA','=',$empresa_id)
+                                ->where('OPERACION','=',$operacion_id)
+                                ->where('USUARIO_CREA','=',Session::get('usuario')->id)
+                                ->orderBy('FE_DOCUMENTO_ENTREGABLE.FECHA_CREA','DESC')
+                                ->get();
+        }else{
+            $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
+                                ->where('COD_EMPRESA','=',$empresa_id)
+                                ->where('OPERACION','=',$operacion_id)
+                                ->orderBy('FE_DOCUMENTO_ENTREGABLE.FECHA_CREA','DESC')
+                                ->get();
+        }
+        $funcion        =   $this;
+
+        return View::make('entregadocumento/ajax/listafoliosdocumentos',
+                         [
+
+                            'empresa_id'            =>  $empresa_id,
+                            'idopcion'              =>  $idopcion,
+                            'cod_empresa'           =>  $cod_empresa,
+                            'listadatos'            =>  $listadatos,
+                            'ajax'                  =>  true,
+                            'operacion_id'            =>  $operacion_id,
+                            'funcion'               =>  $funcion
+                         ]);
+    }
+
+
+
     public function actionDescargarDocumentoFolio($folio_codigo)
     {
 
-        $folio                  =   FeDocumentoEntregable::where('FOLIO','=',$folio_codigo)->first();
+        $folio                  =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
+                                    ->where('FOLIO','=',$folio_codigo)->first();
+
         if($folio->OPERACION=='ORDEN_COMPRA'){
             $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda($folio->FOLIO,'MON0000000000001');
             $listadatosdolar    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda($folio->FOLIO,'MON0000000000002');
@@ -365,17 +421,83 @@ class GestionEntregaDocumentoController extends Controller
 
         $funcion                =   $this;
 
-        Excel::create($titulo, function($excel) use ($listadatossoles,$listadatosdolar,$operacion_id,$funcion) {
+        Excel::create($titulo, function($excel) use ($listadatossoles,$listadatosdolar,$operacion_id,$funcion,$folio,$empresa) {
 
-            $excel->sheet('Soles', function($sheet) use ($listadatossoles,$operacion_id,$funcion){
+            $excel->sheet('Soles', function($sheet) use ($listadatossoles,$operacion_id,$funcion,$folio,$empresa){
+
+
+
+                $sheet->setWidth('A', 20);
+                $sheet->setWidth('B', 20);
+                $sheet->setWidth('C', 20);
+                $sheet->setWidth('D', 40);
+                $sheet->setWidth('E', 40);
+                $sheet->setWidth('F', 30);
+                $sheet->setWidth('G', 30);
+                $sheet->setWidth('H', 30);
+                $sheet->setWidth('I', 20);
+                $sheet->setWidth('J', 20);
+                $sheet->setWidth('K', 20);
+                $sheet->setWidth('L', 30);
+                $sheet->setWidth('M', 20);
+                $sheet->setWidth('N', 20);
+                $sheet->setWidth('O', 20);
+
+
+                $sheet->mergeCells('B2:C2');
+                $sheet->mergeCells('B3:C3');
+                $sheet->mergeCells('B4:C4');
+                $sheet->mergeCells('B5:C5');
+                $sheet->mergeCells('B6:C6');
+                $sheet->mergeCells('B7:C7');
+
+                $sheet->cell('A1', function($cell) {
+                            $cell->setFontColor('#FFFFFF');   // Texto blanco
+                        });
+
                 $sheet->loadView('entregadocumento/excel/eentregable')->with('listadatos',$listadatossoles)
                                                                       ->with('funcion',$funcion)
+                                                                      ->with('folio',$folio)
+                                                                      ->with('empresa',$empresa)
                                                                       ->with('operacion_id',$operacion_id);         
             });
 
-            $excel->sheet('Dolares', function($sheet) use ($listadatosdolar,$operacion_id,$funcion){
+
+
+
+            $excel->sheet('Dolares', function($sheet) use ($listadatosdolar,$operacion_id,$funcion,$folio,$empresa){
+
+                $sheet->setWidth('A', 20);
+                $sheet->setWidth('B', 20);
+                $sheet->setWidth('C', 20);
+                $sheet->setWidth('D', 40);
+                $sheet->setWidth('E', 40);
+                $sheet->setWidth('F', 30);
+                $sheet->setWidth('G', 30);
+                $sheet->setWidth('H', 30);
+                $sheet->setWidth('I', 20);
+                $sheet->setWidth('J', 20);
+                $sheet->setWidth('K', 20);
+                $sheet->setWidth('L', 30);
+                $sheet->setWidth('M', 20);
+                $sheet->setWidth('N', 20);
+                $sheet->setWidth('O', 20);
+
+                $sheet->mergeCells('B2:C2');
+                $sheet->mergeCells('B3:C3');
+                $sheet->mergeCells('B4:C4');
+                $sheet->mergeCells('B5:C5');
+                $sheet->mergeCells('B6:C6');
+                $sheet->mergeCells('B7:C7');
+
+                $sheet->cell('A1', function($cell) {
+                            $cell->setFontColor('#FFFFFF');   // Texto blanco
+                        });
+
                 $sheet->loadView('entregadocumento/excel/eentregable')->with('listadatos',$listadatosdolar)
                                                                       ->with('funcion',$funcion)
+                                                                       ->with('folio',$folio)
+                                                                       ->with('empresa',$empresa)
                                                                       ->with('operacion_id',$operacion_id);       
             });
 
@@ -392,8 +514,10 @@ class GestionEntregaDocumentoController extends Controller
         $operacion_id           =   $folio->OPERACION;
         $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
         $titulo                 =   'DETALLE FOLIO ('.$folio_codigo.') '.$empresa->NOM_EMPR;
+        $funcion                =   $this;
 
-        Excel::create($titulo, function($excel) use ($lista_proveedores,$operacion_id,$folio,$empresa) {
+
+        Excel::create($titulo, function($excel) use ($lista_proveedores,$operacion_id,$folio,$empresa,$funcion) {
 
             foreach($lista_proveedores as $index => $item){
 
@@ -403,7 +527,7 @@ class GestionEntregaDocumentoController extends Controller
 
                 $listadocumento =    $this->con_lista_documentos_proveedores_folio($folio->FOLIO,$empresa_item->NRO_DOCUMENTO);
                 $npestania = substr($item->TXT_EMPR_EMISOR, 0, 30);
-                $excel->sheet($npestania, function($sheet) use ($item,$operacion_id,$folio,$empresa,$empresa_item,$fedocumento,$listadocumento){
+                $excel->sheet($npestania, function($sheet) use ($item,$operacion_id,$folio,$empresa,$empresa_item,$fedocumento,$listadocumento,$funcion){
 
                     $sheet->mergeCells('B2:D2');
                     $sheet->mergeCells('B3:D3');
@@ -430,6 +554,7 @@ class GestionEntregaDocumentoController extends Controller
 
                     $sheet->loadView('entregadocumento/excel/contratopagosbcp')->with('proveedor',$item)
                                                                                ->with('folio',$folio)
+                                                                               ->with('funcion',$funcion)
                                                                                ->with('empresa',$empresa)
                                                                                ->with('empresa_item',$empresa_item)
                                                                                ->with('fedocumento',$fedocumento)
@@ -444,17 +569,28 @@ class GestionEntregaDocumentoController extends Controller
     public function actionDescargarPagoMacroBbva($folio_codigo)
     {
 
-        $folio                  =   FeDocumentoEntregable::where('FOLIO','=',$folio_codigo)->first();
+        $folio                  =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
+                                    ->where('FOLIO','=',$folio_codigo)->first();
         $listadocumento         =    $this->con_lista_documentos_contrato_folio($folio->FOLIO);
-
 
         $operacion_id           =   $folio->OPERACION;
         $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
         $titulo                 =   'MACRO BBVA ('.$folio_codigo.') '.$empresa->NOM_EMPR;
+        $funcion                =   $this;
 
-        Excel::create($titulo, function($excel) use ($listadocumento,$operacion_id,$folio,$empresa) {
 
-            $excel->sheet('bbva', function($sheet) use ($operacion_id,$folio,$empresa,$listadocumento){
+        Excel::create($titulo, function($excel) use ($listadocumento,$operacion_id,$folio,$empresa,$funcion) {
+
+            $excel->sheet('bbva', function($sheet) use ($operacion_id,$folio,$empresa,$listadocumento,$funcion){
+
+
+                $sheet->mergeCells('B2:C2');
+                $sheet->mergeCells('B3:C3');
+                $sheet->mergeCells('B4:C4');
+                $sheet->mergeCells('B5:C5');
+                $sheet->mergeCells('B6:C6');
+                $sheet->mergeCells('B7:C7');
+
                 $sheet->setWidth('A', 20);
                 $sheet->setWidth('B', 20);
                 $sheet->setWidth('C', 20);
@@ -475,6 +611,7 @@ class GestionEntregaDocumentoController extends Controller
                         });
                 $sheet->loadView('entregadocumento/excel/contratopagosbbvamacro')->with('folio',$folio)
                                                                                 ->with('empresa',$empresa)
+                                                                                ->with('funcion',$funcion)
                                                                                 ->with('listadocumento',$listadocumento)
                                                                                 ->with('operacion_id',$operacion_id);         
             });
@@ -485,16 +622,27 @@ class GestionEntregaDocumentoController extends Controller
     public function actionDescargarPagoMacroSBK($folio_codigo)
     {
 
-        $folio                  =   FeDocumentoEntregable::where('FOLIO','=',$folio_codigo)->first();
+        $folio                  =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
+                                    ->where('FOLIO','=',$folio_codigo)->first();
         $listadocumento         =    $this->con_lista_documentos_contrato_folio($folio->FOLIO);
 
         $operacion_id           =   $folio->OPERACION;
         $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
         $titulo                 =   'MACRO SBK ('.$folio_codigo.') '.$empresa->NOM_EMPR;
+        $funcion                =   $this;
 
-        Excel::create($titulo, function($excel) use ($listadocumento,$operacion_id,$folio,$empresa) {
 
-            $excel->sheet('bbva', function($sheet) use ($operacion_id,$folio,$empresa,$listadocumento){
+        Excel::create($titulo, function($excel) use ($listadocumento,$operacion_id,$folio,$empresa,$funcion) {
+
+            $excel->sheet('bbva', function($sheet) use ($operacion_id,$folio,$empresa,$listadocumento,$funcion){
+
+                $sheet->mergeCells('B2:C2');
+                $sheet->mergeCells('B3:C3');
+                $sheet->mergeCells('B4:C4');
+                $sheet->mergeCells('B5:C5');
+                $sheet->mergeCells('B6:C6');
+                $sheet->mergeCells('B7:C7');
+
                 $sheet->setWidth('A', 20);
                 $sheet->setWidth('B', 20);
                 $sheet->setWidth('C', 20);
@@ -515,6 +663,7 @@ class GestionEntregaDocumentoController extends Controller
                         });
                 $sheet->loadView('entregadocumento/excel/contratopagossbkmacro')->with('folio',$folio)
                                                                                 ->with('empresa',$empresa)
+                                                                                ->with('funcion',$funcion)
                                                                                 ->with('listadocumento',$listadocumento)
                                                                                 ->with('operacion_id',$operacion_id);         
             });
@@ -525,7 +674,8 @@ class GestionEntregaDocumentoController extends Controller
     public function actionDescargarPagoMacrosInterbank($folio_codigo)
     {
 
-        $folio                  =   FeDocumentoEntregable::where('FOLIO','=',$folio_codigo)->first();
+        $folio                  =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
+                                    ->where('FOLIO','=',$folio_codigo)->first();
         $listadocumento         =    $this->con_lista_documentos_contrato_folio($folio->FOLIO);
 
         $operacion_id           =   $folio->OPERACION;
@@ -534,7 +684,15 @@ class GestionEntregaDocumentoController extends Controller
 
         Excel::create($titulo, function($excel) use ($listadocumento,$operacion_id,$folio,$empresa) {
 
-            $excel->sheet('bbva', function($sheet) use ($operacion_id,$folio,$empresa,$listadocumento){
+            $excel->sheet('interbank', function($sheet) use ($operacion_id,$folio,$empresa,$listadocumento){
+                
+                $sheet->mergeCells('B2:C2');
+                $sheet->mergeCells('B3:C3');
+                $sheet->mergeCells('B4:C4');
+                $sheet->mergeCells('B5:C5');
+                $sheet->mergeCells('B6:C6');
+                $sheet->mergeCells('B7:C7');
+
                 $sheet->setWidth('A', 20);
                 $sheet->setWidth('B', 20);
                 $sheet->setWidth('C', 20);

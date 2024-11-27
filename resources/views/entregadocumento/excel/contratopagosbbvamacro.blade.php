@@ -15,11 +15,11 @@
 		}
 	</style>
 
+	@include('entregadocumento.excel.ajax.cabecera')
+
+
 	<table class="tabladet">
 	  <thead>
-	  	<tr><th></th><tr>
-
-	  	<tr><th>MACRO DE BBVA</th><tr>
 	    <tr>
 	      <th>DOI Tipo</th>
 	      <th>DOI Número</th>
@@ -44,7 +44,7 @@
 	        <td>P</td>
 	        <td><div>{{$item->TXT_NRO_CUENTA_BANCARIA}}</div></td>
 	        <td>{{$item->TXT_EMPR_EMISOR}}</td>
-	        <td>{{number_format($item->TOTAL_VENTA_ORIG - $item->MONTO_DETRACCION_RED, 2, '.', '')}}</td>
+	        <td>{{number_format($item->TOTAL_VENTA_ORIG - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO), 2, '.', '')}}</td>
 	        <td>{{substr($item->NRO_SERIE,0,1)}}</td>
 	        <td>{{substr($item->NRO_SERIE,1)}} - {{$item->NRO_DOC}}</td>
 	        <td>N</td>

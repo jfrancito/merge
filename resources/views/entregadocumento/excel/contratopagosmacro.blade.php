@@ -60,7 +60,7 @@
 	      	<th>{{date_format(date_create($folio->FECHA_CREA), 'Ymd')}}</th>
 	      	<th>C</th>
 	      	<th></th>
-	     	<th>{{$listadocumento->sum('TOTAL') - $listadocumento->sum('DETRACCION')}}</th>
+	     	<th>{{$listadocumento->sum('TOTAL_PAGAR')}}</th>
 	     	<th>FLETES</th>
 	  	</tr>
 
@@ -89,14 +89,14 @@
 	    @foreach($listadocumento as $index => $item)
 	      <tr>
 	      	<td>A</td>
-	        <td>{{$item->TXT_NRO_CUENTA_BANCARIA}}</td>
+	        <td><b>{{$item->TXT_NRO_CUENTA_BANCARIA}}</b></td>
 	        <td>{{$item->TXT_ABREVIATURA}}</td>
 	        <td>{{$item->CODIGO_SUNAT}}</td>
 	        <td>{{$item->NRO_DOCUMENTO}}</td>
 		    <td></td>	        
 	        <td>{{$item->TXT_EMPR_EMISOR}}</td>
 	        <td>S</td>
-	        <td>{{number_format($item->TOTAL-$item->DETRACCION, 2, '.', '')}}</td>
+	        <td>{{number_format($item->TOTAL_PAGAR, 2, '.', '')}}</td>
 	        <td>S</td>
 	        <td>0000</td>
 	      </tr>                    
