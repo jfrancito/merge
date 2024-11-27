@@ -1,3 +1,24 @@
+<html>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+  	<style type="text/css">
+		.tabladet tr th{
+			border: 1px solid;
+		}	
+		.tabladet tr td{
+			border: 1px solid;
+		}	
+		.border{
+			border: 1px solid;
+		}
+		.cplomo{
+			background-color: #eeeeee;
+		}
+	</style>
+	@include('entregadocumento.excel.ajax.cabecera')
+
+
+
 <table id="" class="table table-striped table-borderless table-hover td-color-borde td-padding-7" >
 	  <thead>
 	    <tr>
@@ -97,3 +118,4 @@
 	  </tfoot>
 	</table>
 
+</html>

@@ -19,7 +19,16 @@ class Funcion {
 
 		$valor_detraccion = 0;
 		$neto_pagar 	  = 0;
-        $neto_pagar 	  = $oc->CAN_TOTAL - $oc->CAN_DETRACCION - $oc->CAN_RETENCION + $oc->PERCEPCION;
+
+		$fedocumento = FeDocumento::where('ID_DOCUMENTO','=',$oc->COD_ORDEN)->first();
+
+		if($fedocumento->COD_PAGO_DETRACCION == Session::get('empresas')->COD_EMPR){
+			$neto_pagar 	  = $oc->CAN_TOTAL - $oc->CAN_DETRACCION - $oc->CAN_RETENCION + $oc->CAN_PERCEPCION;
+		}else{
+			$neto_pagar 	  = $oc->CAN_TOTAL - $oc->CAN_RETENCION + $oc->CAN_PERCEPCION;
+		}
+
+
         $neto_pagar 	  = ROUND($neto_pagar,2);
         return $neto_pagar;
 	}

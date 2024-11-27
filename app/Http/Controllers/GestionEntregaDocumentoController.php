@@ -619,6 +619,60 @@ class GestionEntregaDocumentoController extends Controller
         })->export('xls');
     }
 
+    public function actionDescargarPagoMacroBbvaOC($folio_codigo)
+    {
+
+        $folio                  =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
+                                    ->where('FOLIO','=',$folio_codigo)->first();
+        $listadocumento         =    $this->con_lista_documentos_contrato_folio_oc($folio->FOLIO);
+
+        $operacion_id           =   $folio->OPERACION;
+        $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
+        $titulo                 =   'MACRO BBVA ('.$folio_codigo.') '.$empresa->NOM_EMPR;
+        $funcion                =   $this;
+
+
+        Excel::create($titulo, function($excel) use ($listadocumento,$operacion_id,$folio,$empresa,$funcion) {
+
+            $excel->sheet('bbva', function($sheet) use ($operacion_id,$folio,$empresa,$listadocumento,$funcion){
+
+
+                $sheet->mergeCells('B2:C2');
+                $sheet->mergeCells('B3:C3');
+                $sheet->mergeCells('B4:C4');
+                $sheet->mergeCells('B5:C5');
+                $sheet->mergeCells('B6:C6');
+                $sheet->mergeCells('B7:C7');
+
+                $sheet->setWidth('A', 20);
+                $sheet->setWidth('B', 20);
+                $sheet->setWidth('C', 20);
+                $sheet->setWidth('D', 20);
+                $sheet->setWidth('E', 20);
+                $sheet->setWidth('F', 20);
+                $sheet->setWidth('G', 20);
+                $sheet->setWidth('H', 20);
+                $sheet->setWidth('I', 20);
+                $sheet->setWidth('J', 20);
+                $sheet->setWidth('K', 20);
+                $sheet->setWidth('L', 20);
+                $sheet->setWidth('M', 20);
+                $sheet->setWidth('N', 20);
+
+                $sheet->cell('A1', function($cell) {
+                            $cell->setFontColor('#FFFFFF');   // Texto blanco
+                        });
+                $sheet->loadView('entregadocumento/excel/contratopagosbbvamacrooc')->with('folio',$folio)
+                                                                                ->with('empresa',$empresa)
+                                                                                ->with('funcion',$funcion)
+                                                                                ->with('listadocumento',$listadocumento)
+                                                                                ->with('operacion_id',$operacion_id);         
+            });
+
+        })->export('xls');
+    }
+
+
     public function actionDescargarPagoMacroSBK($folio_codigo)
     {
 
@@ -670,6 +724,60 @@ class GestionEntregaDocumentoController extends Controller
 
         })->export('xls');
     }
+
+
+    public function actionDescargarPagoMacroSBKOC($folio_codigo)
+    {
+
+        $folio                  =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
+                                    ->where('FOLIO','=',$folio_codigo)->first();
+        $listadocumento         =    $this->con_lista_documentos_contrato_folio_oc($folio->FOLIO);
+
+        $operacion_id           =   $folio->OPERACION;
+        $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
+        $titulo                 =   'MACRO SBK ('.$folio_codigo.') '.$empresa->NOM_EMPR;
+        $funcion                =   $this;
+
+
+        Excel::create($titulo, function($excel) use ($listadocumento,$operacion_id,$folio,$empresa,$funcion) {
+
+            $excel->sheet('skb', function($sheet) use ($operacion_id,$folio,$empresa,$listadocumento,$funcion){
+
+                $sheet->mergeCells('B2:C2');
+                $sheet->mergeCells('B3:C3');
+                $sheet->mergeCells('B4:C4');
+                $sheet->mergeCells('B5:C5');
+                $sheet->mergeCells('B6:C6');
+                $sheet->mergeCells('B7:C7');
+
+                $sheet->setWidth('A', 20);
+                $sheet->setWidth('B', 20);
+                $sheet->setWidth('C', 20);
+                $sheet->setWidth('D', 20);
+                $sheet->setWidth('E', 20);
+                $sheet->setWidth('F', 20);
+                $sheet->setWidth('G', 20);
+                $sheet->setWidth('H', 20);
+                $sheet->setWidth('I', 20);
+                $sheet->setWidth('J', 20);
+                $sheet->setWidth('K', 20);
+                $sheet->setWidth('L', 20);
+                $sheet->setWidth('M', 20);
+                $sheet->setWidth('N', 20);
+
+                $sheet->cell('A1', function($cell) {
+                            $cell->setFontColor('#FFFFFF');   // Texto blanco
+                        });
+                $sheet->loadView('entregadocumento/excel/contratopagossbkmacrooc')->with('folio',$folio)
+                                                                                ->with('empresa',$empresa)
+                                                                                ->with('funcion',$funcion)
+                                                                                ->with('listadocumento',$listadocumento)
+                                                                                ->with('operacion_id',$operacion_id);         
+            });
+
+        })->export('xls');
+    }
+
 
     public function actionDescargarPagoMacrosInterbank($folio_codigo)
     {
@@ -723,6 +831,59 @@ class GestionEntregaDocumentoController extends Controller
         })->export('xls');
     }
 
+
+
+    public function actionDescargarPagoMacrosInterbankOC($folio_codigo)
+    {
+
+        $folio                  =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
+                                    ->where('FOLIO','=',$folio_codigo)->first();
+        $listadocumento         =    $this->con_lista_documentos_contrato_folio_oc($folio->FOLIO);
+
+        $operacion_id           =   $folio->OPERACION;
+        $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
+        $titulo                 =   'MACRO INTERBANK ('.$folio_codigo.') '.$empresa->NOM_EMPR;
+
+        $funcion                =   $this;
+
+        Excel::create($titulo, function($excel) use ($listadocumento,$operacion_id,$folio,$empresa,$funcion) {
+
+            $excel->sheet('interbank', function($sheet) use ($operacion_id,$folio,$empresa,$listadocumento,$funcion){
+
+                $sheet->mergeCells('B2:C2');
+                $sheet->mergeCells('B3:C3');
+                $sheet->mergeCells('B4:C4');
+                $sheet->mergeCells('B5:C5');
+                $sheet->mergeCells('B6:C6');
+                $sheet->mergeCells('B7:C7');
+
+                $sheet->setWidth('A', 20);
+                $sheet->setWidth('B', 20);
+                $sheet->setWidth('C', 20);
+                $sheet->setWidth('D', 20);
+                $sheet->setWidth('E', 20);
+                $sheet->setWidth('F', 20);
+                $sheet->setWidth('G', 20);
+                $sheet->setWidth('H', 20);
+                $sheet->setWidth('I', 20);
+                $sheet->setWidth('J', 20);
+                $sheet->setWidth('K', 20);
+                $sheet->setWidth('L', 20);
+                $sheet->setWidth('M', 20);
+                $sheet->setWidth('N', 20);
+
+                $sheet->cell('A1', function($cell) {
+                            $cell->setFontColor('#FFFFFF');   // Texto blanco
+                        });
+                $sheet->loadView('entregadocumento/excel/contratopagosinterbankmacrooc')->with('folio',$folio)
+                                                                                ->with('empresa',$empresa)
+                                                                                ->with('funcion',$funcion)
+                                                                                ->with('listadocumento',$listadocumento)
+                                                                                ->with('operacion_id',$operacion_id);         
+            });
+
+        })->export('xls');
+    }
 
 
 
@@ -781,6 +942,76 @@ class GestionEntregaDocumentoController extends Controller
                     $sheet->loadView('entregadocumento/excel/contratopagosmacro')->with('banco',$item)
                                                                                ->with('folio',$folio)
                                                                                ->with('empresa',$empresa)
+                                                                               ->with('txt_banco',$txt_banco)
+                                                                               ->with('countfedocu',$countfedocu)
+                                                                               ->with('fedocumento',$fedocumento)
+                                                                               ->with('listadocumento',$listadocumento)
+                                                                               ->with('operacion_id',$operacion_id);         
+                });
+            }
+
+        })->export('xls');
+    }
+
+
+
+    public function actionDescargarPagoFolioMacroOC($folio_codigo)
+    {
+
+        $folio                  =   FeDocumentoEntregable::where('FOLIO','=',$folio_codigo)->first();
+        $lista_bancos           =   $this->con_lista_bancos_folio_oc($folio->FOLIO);
+
+        $operacion_id           =   $folio->OPERACION;
+        $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
+        $titulo                 =   'MACRO FOLIO ('.$folio_codigo.') '.$empresa->NOM_EMPR;
+
+        $funcion                =   $this;
+
+
+        Excel::create($titulo, function($excel) use ($lista_bancos,$operacion_id,$folio,$empresa,$funcion) {
+
+            foreach($lista_bancos as $index => $item){
+
+                $txt_banco = 'SIN BANCO';
+                if (is_null($item->TXT_CATEGORIA_BANCO) or $item->TXT_CATEGORIA_BANCO == '') {
+                    $txt_banco = 'SIN BANCO';
+                }else{
+                    $txt_banco = $item->TXT_CATEGORIA_BANCO;
+                }
+                $fedocumento    =    FeDocumento::where('FOLIO','=',$folio->FOLIO)->where('TXT_CATEGORIA_BANCO','=',$item->TXT_CATEGORIA_BANCO)->first();
+                
+                $listafedocu    =   $this->con_lista_proveedores_banco_folio_oc($folio->FOLIO,$item->TXT_CATEGORIA_BANCO);
+                $countfedocu    =    str_pad(count($listafedocu), 6, '0', STR_PAD_LEFT);
+                $listadocumento =   $this->con_lista_doc_proveedor_banco_folio_oc($folio->FOLIO,$item->TXT_CATEGORIA_BANCO);
+                $npestania = substr($txt_banco, 0, 30);
+
+
+
+                $excel->sheet($npestania, function($sheet) use ($item,$operacion_id,$folio,$empresa,$fedocumento,$listadocumento,$txt_banco,$countfedocu,$funcion){
+
+                    $sheet->setWidth('A', 20);
+                    $sheet->setWidth('B', 20);
+                    $sheet->setWidth('C', 20);
+                    $sheet->setWidth('D', 20);
+                    $sheet->setWidth('E', 20);
+                    $sheet->setWidth('F', 20);
+                    $sheet->setWidth('G', 20);
+                    $sheet->setWidth('H', 20);
+                    $sheet->setWidth('I', 20);
+                    $sheet->setWidth('J', 20);
+                    $sheet->setWidth('K', 20);
+
+                    $sheet->setCellValueExplicit('E8', $empresa->NRO_CUENTA_BANCARIA, \PHPExcel_Cell_DataType::TYPE_STRING);
+
+
+                    $sheet->cell('A1', function($cell) {
+                                $cell->setFontColor('#FFFFFF');   // Texto blanco
+                            });
+
+                    $sheet->loadView('entregadocumento/excel/contratopagosmacrooc')->with('banco',$item)
+                                                                               ->with('folio',$folio)
+                                                                               ->with('empresa',$empresa)
+                                                                               ->with('funcion',$funcion)
                                                                                ->with('txt_banco',$txt_banco)
                                                                                ->with('countfedocu',$countfedocu)
                                                                                ->with('fedocumento',$fedocumento)

@@ -36,6 +36,8 @@
               </li>
               @if($item->OPERACION=='CONTRATO')
                 @include('entregadocumento.excel.opcionct')
+              @else
+                @include('entregadocumento.excel.opcionoc')
               @endif
             </ul>
           </div>

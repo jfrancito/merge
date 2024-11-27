@@ -203,7 +203,10 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/descargar-pago-proveedor-macro-interbank-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoMacrosInterbank');
 
 
-
+	Route::any('/descargar-pago-proveedor-macro-excel-oc/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoFolioMacroOC');
+	Route::any('/descargar-pago-proveedor-macro-bbva-excel-oc/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoMacroBbvaOC');
+	Route::any('/descargar-pago-proveedor-macro-sbk-excel-oc/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoMacroSBKOC');
+	Route::any('/descargar-pago-proveedor-macro-interbank-excel-oc/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoMacrosInterbankOC');
 
 
 	Route::any('/ajax-modal-historial-extorno', 'GestionOCController@actionModalHistorialExtorno');
