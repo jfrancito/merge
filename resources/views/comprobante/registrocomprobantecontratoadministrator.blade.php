@@ -11,14 +11,13 @@
 @stop
 
 @section('section')
-<div class="be-content registrocomprobante">
+<div class="be-content registrocomprobante hextorno">
     <div class="main-content container-fluid">
         <div class="row">
             <div class="col-sm-12">
                 <div class="panel panel-default panel-border-color panel-border-color-success">
-                    <div class="panel-heading">{{ $titulo }}
-                      <div class="tools tooltiptop">
-                      </div>
+                    <div class="panel-heading">{{ $titulo }} 
+                            @include('comprobante.hextorno')
                     </div>
                     <div class="panel-body">
                       @include('comprobante.lista.detallecomprobanteadministradorcontrato')
@@ -27,6 +26,8 @@
             </div>
         </div>
     </div>
+    @include('comprobante.modal.mregistrorequerimiento')
+
     @include('usuario.modal.musuario')
 
 </div>
@@ -145,7 +146,8 @@
 
     </script>
     <script src="{{ asset('public/js/comprobante/registro.js?v='.$version) }}" type="text/javascript"></script>
-
+    <script src="{{ asset('public/js/comprobante/hextorno.js?v='.$version) }}" type="text/javascript"></script>
+    
     
 @stop
 

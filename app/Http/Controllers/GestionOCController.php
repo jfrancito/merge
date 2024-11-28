@@ -2321,7 +2321,7 @@ class GestionOCController extends Controller
         $combotipodetraccion    =   array('' => "Seleccione Tipo Detraccion",'MONTO_REFERENCIAL' => 'MONTO REFERENCIAL' , 'MONTO_FACTURACION' => 'MONTO FACTURACION');
         $combopagodetraccion    =   array('' => "Seleccione Pago Detraccion",$ordencompra->COD_EMPR_EMISOR => $ordencompra->TXT_EMPR_EMISOR , $ordencompra->COD_EMPR_RECEPTOR => $ordencompra->TXT_EMPR_RECEPTOR);
 
-
+        $fedocumento_x          =   FeDocumento::where('TXT_REFERENCIA','=',$idoc)->first();
         //dd($ordencompra);
 
 
@@ -2334,6 +2334,7 @@ class GestionOCController extends Controller
                             'combotipodetraccion'   =>  $combotipodetraccion,
                             'combopagodetraccion'   =>  $combopagodetraccion,
                             'ordencompra_f'         =>  $ordencompra_f,
+                            'fedocumento_x'         =>  $fedocumento_x,
 
 
                             'combobancos'           =>  $combobancos,

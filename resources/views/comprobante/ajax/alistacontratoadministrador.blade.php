@@ -5,7 +5,8 @@
 
       <th>CODIGO</th>
       <th>DOCUMENTO</th>
-
+      
+      <th>EXTORNO</th>
       <th>FECHA </th>
       <th>MONEDA</th>
       <th>PROVEEDOR</th>
@@ -23,7 +24,7 @@
         <td>{{$item->COD_DOCUMENTO_CTBLE}}</td>
 
         <td>{{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</td>
-
+        <td>{{$funcion->funciones->estorno_referencia($item->COD_DOCUMENTO_CTBLE)}}</td>
         <td>{{$item->FEC_EMISION}}</td>
         <td>{{$item->TXT_CATEGORIA_MONEDA}}</td>
         <td>{{$item->TXT_EMPR_EMISOR}}</td>
