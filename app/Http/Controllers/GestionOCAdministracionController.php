@@ -62,7 +62,7 @@ class GestionOCAdministracionController extends Controller
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
         //falta usuario contacto
         $operacion_id       =   'ORDEN_COMPRA';
-
+        $tab_id             =   'oc';
         //dd($request['operacion_id']);
 
         if(isset($request['operacion_id'])){
@@ -71,17 +71,23 @@ class GestionOCAdministracionController extends Controller
         if(Session::has('operacion_id')){
             $operacion_id           =   Session::get('periodo_id_confirmar');
         }
+        if(isset($request['tab_id'])){
+            $tab_id             =   $request['tab_id'];
+        }
+
 
         $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO');
 
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm($cod_empresa);
             $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_obs($cod_empresa);
+            $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_obs_levantadas($cod_empresa);
+
 
         }else{
             $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_contrato($cod_empresa);
             $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_contrato_obs($cod_empresa);
-
+            $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_contrato_obs_levantadas($cod_empresa);
         }
 
         $funcion        =   $this;
@@ -89,6 +95,8 @@ class GestionOCAdministracionController extends Controller
                          [
                             'listadatos'        =>  $listadatos,
                             'listadatos_obs'    =>  $listadatos_obs,
+                            'listadatos_obs_le' =>  $listadatos_obs_le,
+                            'tab_id'            =>  $tab_id,
 
                             'funcion'           =>  $funcion,
 
@@ -103,15 +111,20 @@ class GestionOCAdministracionController extends Controller
 
         $operacion_id   =   $request['operacion_id'];
         $idopcion       =   $request['idopcion'];
+
+        $tab_id             =   'oc';
+
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm($cod_empresa);
             $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_obs($cod_empresa);
+            $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_obs_levantadas($cod_empresa);
+
 
         }else{
             $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_contrato($cod_empresa);
             $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_contrato_obs($cod_empresa);
-
+            $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_contrato_obs_levantadas($cod_empresa);
         }
         //dd($listadatos);
 
@@ -120,11 +133,13 @@ class GestionOCAdministracionController extends Controller
         return View::make('comprobante/ajax/mergelistaareaadministracion',
                          [
                             'operacion_id'          =>  $operacion_id,
+                            'tab_id'          =>  $tab_id,
 
                             'idopcion'              =>  $idopcion,
                             'cod_empresa'           =>  $cod_empresa,
                             'listadatos'            =>  $listadatos,
                             'listadatos_obs'    =>  $listadatos_obs,
+                            'listadatos_obs_le'    =>  $listadatos_obs_le,
                             
                             'procedencia'           =>  $procedencia,
                             'ajax'                  =>  true,

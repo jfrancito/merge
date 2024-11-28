@@ -59,6 +59,8 @@ class GestionOCContabilidadController extends Controller
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
         //falta usuario contacto
         $operacion_id       =   'ORDEN_COMPRA';
+        $tab_id             =   'oc';
+
         $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO');
 
         if(isset($request['operacion_id'])){
@@ -67,6 +69,11 @@ class GestionOCContabilidadController extends Controller
         if(Session::has('operacion_id')){
             $operacion_id           =   Session::get('operacion_id');
         }
+        if(isset($request['tab_id'])){
+            $tab_id             =   $request['tab_id'];
+        }
+
+
 
         if($operacion_id=='ORDEN_COMPRA'){
 
@@ -88,6 +95,7 @@ class GestionOCContabilidadController extends Controller
                             'listadatos'        =>  $listadatos,
                             'listadatos_obs'    =>  $listadatos_obs,
                             'listadatos_obs_le' =>  $listadatos_obs_le,
+                            'tab_id'            =>  $tab_id,
                             'funcion'           =>  $funcion,
                             'operacion_id'      =>  $operacion_id,
                             'combo_operacion'   =>  $combo_operacion,
@@ -102,6 +110,9 @@ class GestionOCContabilidadController extends Controller
 
         $operacion_id   =   $request['operacion_id'];
         $idopcion       =   $request['idopcion'];
+
+        $tab_id             =   'oc';
+
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
         if($operacion_id=='ORDEN_COMPRA'){
 
@@ -123,6 +134,7 @@ class GestionOCContabilidadController extends Controller
                             'operacion_id'          =>  $operacion_id,
 
                             'idopcion'              =>  $idopcion,
+                            'tab_id'           =>  $tab_id,
                             'cod_empresa'           =>  $cod_empresa,
                             'listadatos'            =>  $listadatos,
                             'listadatos_obs'            =>  $listadatos_obs,
