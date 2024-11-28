@@ -266,9 +266,9 @@ class GestionEntregaDocumentoController extends Controller
         }
 
         if($operacion_id=='ORDEN_COMPRA'){
-            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id);
+            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$fedocumento_encontro->COD_CATEGORIA_BANCO);
         }else{
-            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id);
+            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$fedocumento_encontro->COD_CATEGORIA_BANCO);
         }
 
         $funcion        =   $this;
