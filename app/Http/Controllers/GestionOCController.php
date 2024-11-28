@@ -4557,7 +4557,7 @@ class GestionOCController extends Controller
                                         ->get();
             $codigo_sunat           =   'N';
             $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                        ->where('COD_CATEGORIA','=','DCC0000000000029')
+                                        ->whereIn('COD_CATEGORIA',['DCC0000000000029','DCC0000000000033'])
                                         ->where('COD_ESTADO','=',1)
                                         ->where('CODIGO_SUNAT','=',$codigo_sunat)
                                         ->get();

@@ -571,7 +571,7 @@ class GestionOCValidadoController extends Controller
         $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);
 
 
-        $archivo                =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('TIPO_ARCHIVO','=',$tipo)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->first();
+        $archivo                =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','=','1')->where('TIPO_ARCHIVO','=',$tipo)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->first();
         
 
         $nombrearchivo          =   trim($archivo->NOMBRE_ARCHIVO);
