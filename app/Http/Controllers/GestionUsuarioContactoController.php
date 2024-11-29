@@ -898,6 +898,8 @@ class GestionUsuarioContactoController extends Controller
             $archivospdf            =   $this->lista_archivos_total_pdf($idoc,$fedocumento->DOCUMENTO_ITEM);
             $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
             $trabajador             =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+            $ordencompra_f          =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
+
 
             return View::make('comprobante/reparableuc', 
                             [
@@ -907,6 +909,7 @@ class GestionUsuarioContactoController extends Controller
                                 'archivosanulados'      =>  $archivosanulados,
                                 'rol'                   =>  $rol,
                                 'ordencompra'           =>  $ordencompra,
+                                'ordencompra_f'         =>  $ordencompra_f,
                                 'linea'                 =>  $linea,
                                 'detalleordencompra'    =>  $detalleordencompra,
                                 'detallefedocumento'    =>  $detallefedocumento,
