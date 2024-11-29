@@ -2322,8 +2322,22 @@ class GestionOCController extends Controller
         $combopagodetraccion    =   array('' => "Seleccione Pago Detraccion",$ordencompra->COD_EMPR_EMISOR => $ordencompra->TXT_EMPR_EMISOR , $ordencompra->COD_EMPR_RECEPTOR => $ordencompra->TXT_EMPR_RECEPTOR);
 
         $fedocumento_x          =   FeDocumento::where('TXT_REFERENCIA','=',$idoc)->first();
-        //dd($ordencompra);
 
+        //ANTICIPO
+        $monto_anticipo         =   0.00;
+        $anticipo               =   DB::select("
+                                    SELECT CMP.OBTENER_ADELANTOS_PROVEEDOR(
+                                        ?, 
+                                        '', 
+                                        ?, 
+                                        ?, 
+                                        ?
+                                    ) AS resultado
+                                    ", [Session::get('empresas')->COD_EMPR,$this->hoy_sh,$ordencompra->COD_EMPR_EMISOR,$ordencompra_f->COD_CATEGORIA_MONEDA]);
+        if (!empty($anticipo)) {
+            $monto_anticipo = $anticipo[0]->resultado; 
+        } 
+        $comboant               =   array('0.00' => "Seleccione Anticipo",$monto_anticipo => $monto_anticipo);
 
         return View::make('comprobante/registrocomprobantecontratoadministrator',
                          [
@@ -2335,6 +2349,11 @@ class GestionOCController extends Controller
                             'combopagodetraccion'   =>  $combopagodetraccion,
                             'ordencompra_f'         =>  $ordencompra_f,
                             'fedocumento_x'         =>  $fedocumento_x,
+
+
+                            'comboant'              =>  $comboant,
+                            'monto_anticipo'        =>  $monto_anticipo,
+
 
 
                             'combobancos'           =>  $combobancos,
@@ -4160,7 +4179,7 @@ class GestionOCController extends Controller
                                 );
                 }
 
-
+                $monto_anticipo                          =   (float)$request['monto_anticipo'];
                 
                 FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(
@@ -4172,6 +4191,8 @@ class GestionOCController extends Controller
                                     'MONTO_DETRACCION_RED'=>round($monto_detraccion),
                                     'COD_PAGO_DETRACCION'=>$COD_PAGO_DETRACCION,
                                     'TXT_PAGO_DETRACCION'=>$TXT_PAGO_DETRACCION,
+                                    'MONTO_ANTICIPO_DESC'=>$monto_anticipo,
+
 
                                     'COD_CATEGORIA_BANCO'=>$bancocategoria->COD_CATEGORIA,
                                     'TXT_CATEGORIA_BANCO'=>$bancocategoria->NOM_CATEGORIA,

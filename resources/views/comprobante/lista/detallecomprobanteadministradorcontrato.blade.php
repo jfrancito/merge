@@ -530,6 +530,26 @@
                                           </div>
                                         </div>
                                       </div>
+
+
+                                      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 cajareporte @if((float)$monto_anticipo<=0) ocultar @endif">
+                                          <div class="form-group">
+                                            <label class="col-sm-12 control-label labelleft" >
+                                              <div class="tooltipfr"><b>Aplicar Anticipo </b>
+                                                <span class="tooltiptext">¿Se le aplicara el anticipo a esta factura?</span>
+                                              </div>
+                                            :</label>
+                                            <div class="col-sm-12 abajocaja" >
+                                              {!! Form::select( 'monto_anticipo', $comboant, array(),
+                                                                [
+                                                                  'class'       => 'select2 form-control control input-sm' ,
+                                                                  'id'          => 'monto_anticipo',
+                                                                  'data-aw'     => '1',
+                                                                ]) !!}
+                                            </div>
+                                          </div>
+                                      </div>
+
                                   </div>
 
                                   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px;">

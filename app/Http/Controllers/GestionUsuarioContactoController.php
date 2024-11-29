@@ -2832,17 +2832,14 @@ class GestionUsuarioContactoController extends Controller
                     }
                 }
 
-                //$entidadbanco_id   =   $request['entidadbanco_id'];
-                //$bancocategoria    =   CMPCategoria::where('COD_CATEGORIA','=',$entidadbanco_id)->first();
-
+                $monto_anticipo                          =   (float)$request['monto_anticipo'];
                 FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(
                                 [
-                                    // 'COD_CATEGORIA_BANCO'=>$bancocategoria->COD_CATEGORIA,
-                                    // 'TXT_CATEGORIA_BANCO'=>$bancocategoria->NOM_CATEGORIA,
                                     'COD_ESTADO'=>'ETM0000000000003',
                                     'TXT_ESTADO'=>'POR APROBAR CONTABILIDAD',
                                     'ind_email_ap'=>0,
+                                    'MONTO_ANTICIPO_DESC'=>$monto_anticipo,
                                     'fecha_uc'=>$this->fechaactual,
                                     'usuario_uc'=>Session::get('usuario')->id
                                 ]
@@ -3114,6 +3111,23 @@ class GestionUsuarioContactoController extends Controller
 
 
 
+
+            $monto_anticipo         =   0.00;
+            $anticipo               =   DB::select("
+                                        SELECT CMP.OBTENER_ADELANTOS_PROVEEDOR(
+                                            ?, 
+                                            '', 
+                                            ?, 
+                                            ?, 
+                                            ?
+                                        ) AS resultado
+                                        ", [Session::get('empresas')->COD_EMPR,$this->hoy_sh,$ordencompra->COD_EMPR_EMISOR,$ordencompra_f->COD_CATEGORIA_MONEDA]);
+            if (!empty($anticipo)) {
+                $monto_anticipo = $anticipo[0]->resultado; 
+            } 
+            $comboant               =   array('0.00' => "Seleccione Anticipo",$monto_anticipo => $monto_anticipo);
+
+
             return View::make('comprobante/aprobaruccontrato', 
                             [
                                 'fedocumento'           =>  $fedocumento,
@@ -3122,6 +3136,8 @@ class GestionUsuarioContactoController extends Controller
                                 'arraybancos'           =>  $arraybancos,
                                 'combobancos'           =>  $combobancos,
 
+                                'comboant'              =>  $comboant,
+                                'monto_anticipo'        =>  $monto_anticipo,
 
                                 'archivosanulados'      =>  $archivosanulados,
                                 'trabajador'            =>  $trabajador,

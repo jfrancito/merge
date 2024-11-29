@@ -33,6 +33,8 @@ class Controller extends BaseController {
 	public $emitido;
 	public $evaluado;
 	public $pathFiles='\\\\10.1.50.2';
+	public $hoy_sh;
+
 
 	public function __construct() {
 		$this->funciones 		= new Funcion();
@@ -47,6 +49,7 @@ class Controller extends BaseController {
 		$this->prefijomaestro 	= $this->funciones->prefijomaestra();
 		$this->fechaactual 		= date('Ymd H:i:s');
 		$this->hoy 				= date_format(date_create(date('Ymd h:i:s')), 'Ymd h:i:s');
+		$this->hoy_sh 			= date_format(date_create(date('Ymd h:i:s')), 'Ymd');
 		$this->fecha_sin_hora 	= date('d-m-Y');
 
 

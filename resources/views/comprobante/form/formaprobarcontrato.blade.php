@@ -158,20 +158,23 @@
                   </div>
                 </div>
 
-<!--                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                      <div class="form-group">
-                        <label class="col-sm-12 control-label labelleft" style="text-align: left;">Entidad Bancaria que se le va a pagar al proveedor :</label>
-                        <div class="col-sm-12 abajocaja" >
-                          {!! Form::select( 'entidadbanco_id', $combobancos, array(),
-                                            [
-                                              'class'       => 'select2 form-control control input-xs' ,
-                                              'id'          => 'entidadbanco_id',
-                                              'required'    => '',
-                                              'data-aw'     => '1',
-                                            ]) !!}
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 cajareporte @if((float)$monto_anticipo<=0) ocultar @endif">
+                    <div class="form-group">
+                      <label class="col-sm-12 control-label labelleft" style="text-align: left;">
+                        <div class="tooltipfr" style="text-align: left;"><b>Aplicar Anticipo </b>
+                          <span class="tooltiptext">¿Se le aplicara el anticipo a esta factura?</span>
                         </div>
+                      :</label>
+                      <div class="col-sm-12 abajocaja" >
+                        {!! Form::select( 'monto_anticipo', $comboant, array(),
+                                          [
+                                            'class'       => 'select2 form-control control input-sm' ,
+                                            'id'          => 'monto_anticipo',
+                                            'data-aw'     => '1',
+                                          ]) !!}
                       </div>
-                </div> -->
+                    </div>
+                </div>
 
 
               </div>
