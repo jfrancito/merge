@@ -505,7 +505,7 @@ class GestionUsuarioContactoController extends Controller
 
                     $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                                 ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
-                                                ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000004'])
+                                                ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000004','DCC0000000000009'])
                                                 ->whereNotIn('TXT_ASIGNADO', ['ARCHIVO_VIRTUAL','ARCHIVO_FISICO'])
 
                                                 //->where('TXT_ASIGNADO','=','CONTACTO')
@@ -517,7 +517,7 @@ class GestionUsuarioContactoController extends Controller
                     $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                                 ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
                                                 ->whereNotIn('TXT_ASIGNADO', ['ARCHIVO_VIRTUAL','ARCHIVO_FISICO'])
-
+                                                ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000009'])
                                                 //->where('TXT_ASIGNADO','=','CONTACTO')
                                                 ->get();
                 }
@@ -659,7 +659,7 @@ class GestionUsuarioContactoController extends Controller
             if($tiposerie == 'E'){
 
                 $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
-                                            ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000004'])
+                                            ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000004','DCC0000000000009'])
                                             ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
                                             ->whereNotIn('TXT_ASIGNADO', ['ARCHIVO_VIRTUAL','ARCHIVO_FISICO'])
                                             //->where('TXT_ASIGNADO','=','CONTACTO')
@@ -670,7 +670,7 @@ class GestionUsuarioContactoController extends Controller
                 $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                             ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
                                             ->whereNotIn('TXT_ASIGNADO', ['ARCHIVO_VIRTUAL','ARCHIVO_FISICO'])
-
+                                            ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000009'])
                                             //->where('TXT_ASIGNADO','=','CONTACTO')
                                             ->get();
 
