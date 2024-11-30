@@ -313,8 +313,8 @@ trait ComprobanteTraits
                                                     SUM(TOTAL_VENTA_ORIG) TOTAL,
                                                     SUM(CASE 
                                                             WHEN FE_DOCUMENTO.COD_PAGO_DETRACCION = CMP.DOCUMENTO_CTBLE.COD_EMPR 
-                                                            THEN TOTAL_VENTA_ORIG - MONTO_DETRACCION_RED
-                                                            ELSE TOTAL_VENTA_ORIG
+                                                            THEN TOTAL_VENTA_ORIG - ISNULL(MONTO_ANTICIPO_DESC,0) - MONTO_DETRACCION_RED
+                                                            ELSE TOTAL_VENTA_ORIG - ISNULL(MONTO_ANTICIPO_DESC,0)
                                                         END) AS TOTAL_PAGAR,
                                                     SUM(MONTO_DETRACCION_RED) DETRACCION'))
                                     ->groupBy('CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR')

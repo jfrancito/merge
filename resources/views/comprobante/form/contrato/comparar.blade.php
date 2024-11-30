@@ -73,8 +73,10 @@
                 </td>
               </tr>
 
-
-
+              <tr>
+                <td><b>Anticipo</b></td>
+                <td><p class='subtitulomerge'>{{$fedocumento->MONTO_ANTICIPO_DESC}}</p></td>
+              </tr>
 
           </tbody>
         </table>

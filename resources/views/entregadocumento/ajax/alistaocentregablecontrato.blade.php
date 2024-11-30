@@ -6,6 +6,8 @@
       <th>ADICIONAL</th>
       <th>IMPORTE</th>
       <th>DETRACION</th>
+      <th>ANTICIPO</th>
+
       <th>NETO A PAGAR</th>
       <th>
       </th>
@@ -50,13 +52,17 @@
           <span><b>VALOR DETRACCION  :</b>{{$item->VALOR_DETRACCION}}</span>
           <span><b>PAGO DETRACCION: </b> {{$item->TXT_PAGO_DETRACCION}}  </span>
         </td>
-        <td class="cell-detail sorting_1" style="position: relative;">
-          <span><b>{{$item->CAN_TOTAL}}  </b></span>
+        <td class="cell-detail sorting_1 center" style="position: relative;">
+          <span><b>{{round($item->TOTAL_VENTA_ORIG,2)}}  </b></span>
         </td>
-        <td class="cell-detail sorting_1" style="position: relative;">
+        <td class="cell-detail sorting_1 center" style="position: relative;">
           <b>{{$item->MONTO_DETRACCION_RED}}</b>
         </td>
-        <td><b>{{$item->CAN_TOTAL - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)}}</b></td>
+        <td class="cell-detail sorting_1 center" style="position: relative;">
+          <b>{{round(ISNULL($item->MONTO_ANTICIPO_DESC,0),2)}}</b>
+        </td>
+
+        <td class="center"><b>{{$item->TOTAL_VENTA_ORIG - ISNULL($item->MONTO_ANTICIPO_DESC,0) - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)}}</b></td>
         <td>
             @IF($item->NRO_SERIE_DOC != '')
             <div class="text-center be-checkbox be-checkbox-sm has-primary">

@@ -38,6 +38,8 @@
 
 	      <th>IMPORTE</th>
 	      <th>DETRACCION</th>
+	      <th>ANTICIPO</th>
+
 	      <th>NETO A PAGAR</th>
 	    </tr>
 	  </thead>
@@ -68,13 +70,15 @@
 
 	        <td>{{$item->TXT_PAGO_DETRACCION}}</td>
 
-	        <td>{{$item->CAN_TOTAL}}</td>
+	        <td>{{$item->TOTAL_VENTA_ORIG}}</td>
 	        <td>
 	          {{$funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)}}
 	        </td>
+	        <td>{{ISNULL($item->MONTO_ANTICIPO_DESC,0)}}</td>
+
 	        <td>
-				{{$item->CAN_TOTAL - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)}}
-				@php $monto_total  = $monto_total + ($item->CAN_TOTAL - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)); @endphp
+				{{$item->TOTAL_VENTA_ORIG - ISNULL($item->MONTO_ANTICIPO_DESC,0) - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)}}
+				@php $monto_total  = $monto_total + ($item->TOTAL_VENTA_ORIG - ISNULL($item->MONTO_ANTICIPO_DESC,0) - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)); @endphp
 	        </td>
 	      </tr>                    
 	    @endforeach
@@ -95,6 +99,7 @@
 	        <td></td>
 	        <td></td>
 	        <td></td>
+	       	<td></td>
 	        <td>{{number_format($monto_total, 2, '.', '')}}</td>
 	      </tr>                    
 	  </tfoot>

@@ -117,6 +117,7 @@
 	      <th>DETRACCIÓN (S/)</th>
 	      <th>DETRACCIÓN (S/)</th>
 	      <th>OTROS DESCUENTOS (S/)</th>
+	      <th>ANTICIPO</th>
 	      <th>IMPORTE A CANCELAR (S/)</th>
 	    </tr>
 	  </thead>
@@ -132,9 +133,11 @@
 	        <td>{{$item->MONTO_DETRACCION_XML}}</td>
 	        <td>{{$item->MONTO_DETRACCION_RED}}</td>
 			<td>0.00</td>
+	        <td>{{ISNULL($item->MONTO_ANTICIPO_DESC,0)}}</td>
+
 	        <td>
-	        	{{$item->TOTAL_VENTA_ORIG - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)}}
-				@php $monto_total  = $monto_total + ($item->TOTAL_VENTA_ORIG - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)); @endphp
+	        	{{$item->TOTAL_VENTA_ORIG - ISNULL($item->MONTO_ANTICIPO_DESC,0) - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)}}
+				@php $monto_total  = $monto_total + ($item->TOTAL_VENTA_ORIG - ISNULL($item->MONTO_ANTICIPO_DESC,0) - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)); @endphp
 	        </td>
 	      </tr>                    
 	    @endforeach
@@ -148,6 +151,7 @@
 	        <th>{{number_format($listadocumento->SUM('TOTAL_VENTA_ORIG'), 2, '.', '')}}</th>
 	        <th>{{number_format($listadocumento->SUM('MONTO_DETRACCION_XML'), 2, '.', '')}}</th>
 	        <th>{{number_format($listadocumento->SUM('MONTO_DETRACCION_RED'), 2, '.', '')}}</th>
+	        <th>0.00</th>
 	        <th>0.00</th>
 	        <th>{{$monto_total}}</th>
 	      </tr>                    
