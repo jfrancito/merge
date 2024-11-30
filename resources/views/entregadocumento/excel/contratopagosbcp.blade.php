@@ -133,11 +133,11 @@
 	        <td>{{$item->MONTO_DETRACCION_XML}}</td>
 	        <td>{{$item->MONTO_DETRACCION_RED}}</td>
 			<td>0.00</td>
-	        <td>{{ISNULL($item->MONTO_ANTICIPO_DESC,0)}}</td>
+	        <td>{{$item->MONTO_ANTICIPO_DESC}}</td>
 
 	        <td>
-	        	{{$item->TOTAL_VENTA_ORIG - ISNULL($item->MONTO_ANTICIPO_DESC,0) - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)}}
-				@php $monto_total  = $monto_total + ($item->TOTAL_VENTA_ORIG - ISNULL($item->MONTO_ANTICIPO_DESC,0) - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)); @endphp
+	        	{{$item->TOTAL_VENTA_ORIG - $item->MONTO_ANTICIPO_DESC - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)}}
+				@php $monto_total  = $monto_total + ($item->TOTAL_VENTA_ORIG - $item->MONTO_ANTICIPO_DESC - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)); @endphp
 	        </td>
 	      </tr>                    
 	    @endforeach

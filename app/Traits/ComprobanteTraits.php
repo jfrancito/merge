@@ -242,8 +242,8 @@ trait ComprobanteTraits
                                         ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO','=',$banco_id)
                                         //->whereIn('CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD',$array_usuarios)
                                         ->select(
-                                                    DB::raw('CMP.DOCUMENTO_CTBLE.* ,FE_DOCUMENTO.*,documentos.NRO_SERIE NRO_SERIE_DOC,documentos.FEC_VENCIMIENTO,documentos.NRO_DOC NRO_DOC_DOC,FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_VOUCHER, FE_DOCUMENTO.TXT_CATEGORIA_BANCO AS TXT_BANCO')
-                                                    //DB::raw("CMP.OBTENER_ADELANTOS_PROVEEDOR(CMP.DOCUMENTO_CTBLE.COD_EMPR, CMP.DOCUMENTO_CTBLE.COD_CENTRO, '{$fecha_corte}', CMP.DOCUMENTO_CTBLE.COD_CONTRATO, CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA) AS ADELANTOS_PROVEEDOR,FE_DOCUMENTO.TXT_CATEGORIA_BANCO AS TXT_BANCO")
+                                                    DB::raw('CMP.DOCUMENTO_CTBLE.* ,FE_DOCUMENTO.*,documentos.NRO_SERIE NRO_SERIE_DOC,documentos.FEC_VENCIMIENTO,documentos.NRO_DOC NRO_DOC_DOC,FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_VOUCHER, FE_DOCUMENTO.TXT_CATEGORIA_BANCO AS TXT_BANCO'),
+                                                    DB::raw("CMP.OBTENER_NC_PROVEEDOR(CMP.DOCUMENTO_CTBLE.COD_EMPR, CMP.DOCUMENTO_CTBLE.COD_CENTRO, '{$fecha_corte}', CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR, CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA) AS NC_PROVEEDOR")
                                                 )
                                         ->orderBy('documentos.FEC_VENCIMIENTO ', 'asc')
                                         ->get();
@@ -269,8 +269,8 @@ trait ComprobanteTraits
                                     ->whereIn('CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD',$array_usuarios)
                                     ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO','=',$banco_id)
                                     ->select(
-                                                DB::raw('CMP.DOCUMENTO_CTBLE.* ,FE_DOCUMENTO.*,documentos.NRO_SERIE NRO_SERIE_DOC,documentos.FEC_VENCIMIENTO,documentos.NRO_DOC NRO_DOC_DOC,FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_VOUCHER, FE_DOCUMENTO.TXT_CATEGORIA_BANCO AS TXT_BANCO')
-                                                //DB::raw("CMP.OBTENER_ADELANTOS_PROVEEDOR(CMP.DOCUMENTO_CTBLE.COD_EMPR, CMP.DOCUMENTO_CTBLE.COD_CENTRO, '{$fecha_corte}', CMP.DOCUMENTO_CTBLE.COD_CONTRATO, CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA) AS ADELANTOS_PROVEEDOR,FE_DOCUMENTO.TXT_CATEGORIA_BANCO AS TXT_BANCO")
+                                                DB::raw('CMP.DOCUMENTO_CTBLE.* ,FE_DOCUMENTO.*,documentos.NRO_SERIE NRO_SERIE_DOC,documentos.FEC_VENCIMIENTO,documentos.NRO_DOC NRO_DOC_DOC,FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_VOUCHER, FE_DOCUMENTO.TXT_CATEGORIA_BANCO AS TXT_BANCO'),
+                                                DB::raw("CMP.OBTENER_NC_PROVEEDOR(CMP.DOCUMENTO_CTBLE.COD_EMPR, CMP.DOCUMENTO_CTBLE.COD_CENTRO, '{$fecha_corte}', CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR, CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA) AS NC_PROVEEDOR")
                                             )
                                     ->orderBy('documentos.FEC_VENCIMIENTO ', 'asc')
                                     ->get();

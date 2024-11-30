@@ -40,7 +40,7 @@
 	        <td>{{$item->TXT_CATEGORIA_BANCO}}</td>
 	        <td><b>{{$item->TXT_NRO_CUENTA_BANCARIA}}</b></td>
 	        <td></td>
-	        <td>{{number_format($item->TOTAL_VENTA_ORIG - ISNULL($item->MONTO_ANTICIPO_DESC,0) - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO), 2, '.', '')}}</td>
+	        <td>{{number_format($item->TOTAL_VENTA_ORIG - $item->MONTO_ANTICIPO_DESC - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO), 2, '.', '')}}</td>
 	        <td>NO</td>
 	        <td>{{$item->TXT_CATEGORIA_TIPO_DOC}}</td>
 	        <td>{{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</td>
