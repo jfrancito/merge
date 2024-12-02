@@ -990,7 +990,6 @@ class UserController extends Controller {
 		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_obs($cod_empresa);
 					$count_observados 		= 	count($listadatosob);
 
-
 	        		$listadatos     =   $this->con_lista_cabecera_comprobante_total_adm_contrato($cod_empresa);
 					$count_x_aprobar_con 	= 	 count($listadatos);
 
@@ -998,6 +997,8 @@ class UserController extends Controller {
 		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_contrato_obs($cod_empresa);
 					$count_observados_con 	= 	count($listadatosob);
 
+		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_contrato_obs_levantadas($cod_empresa);
+					$count_observadosct_le 	= 	count($listadatosob);
 
         			$url 					=	'/gestion-de-administracion-aprobar/j25?operacion_id=ORDEN_COMPRA';
         			$urlcontrato 			=	'/gestion-de-administracion-aprobar/j25?operacion_id=CONTRATO';

@@ -1922,10 +1922,9 @@ trait ComprobanteTraits
                             ->where('ind_observacion','=',0)
                             ->where('area_observacion','=','ADM')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
                             ->orderBy('ind_observacion','asc')
                             ->orderBy('fecha_uc','asc')
-
                             ->get();
 
         return  $listadatos;
@@ -3058,6 +3057,9 @@ trait ComprobanteTraits
 		}else{ 	$ind_errototal 		=	0;  }
 		//total
         $ordencompra_t          =   CMPOrden::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->first();
+
+
+        
         $total_1 = $ordencompra->CAN_TOTAL-$ordencompra_t->CAN_RETENCION+$ordencompra_t->CAN_PERCEPCION;
         $total_2 = $fedocumento->TOTAL_VENTA_ORIG+$ordencompra_t->CAN_PERCEPCION;//+$fedocumento->PERCEPCION+$fedocumento->MONTO_RETENCION;
         $tt_totales = round(abs($total_1 - $total_2), 2);
