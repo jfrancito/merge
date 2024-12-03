@@ -56,6 +56,20 @@ class NotificacionOC extends Command
         $this->ejecutar_orden_ingreso();
         $this->sunat_cdr_contrato();
 
+
+
+        $horaActual = date("H:i");
+
+        if($horaActual == '07:00' || 
+            $horaActual == '10:00' || 
+            $horaActual == '12:00' || 
+            $horaActual == '14:00' || 
+            $horaActual == '17:00' ||
+            $horaActual == '20:00'){
+            $this->cambiar_fecha_vencimiento();
+            $this->cambiar_parcialmente();
+        }
+
         // COMENTANDO NO VALE
         // $this->envio_correo_uc();
         // //CONTABILIDAD
