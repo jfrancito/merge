@@ -2836,7 +2836,7 @@ class GestionUsuarioContactoController extends Controller
 
 
 
-                $monto_anticipo_txt     =   (float)$request['monto_anticipo'];
+                $monto_anticipo_txt     =   $request['monto_anticipo'];
                 $MONTO_ANTICIPO_DESC    =   0.00;
                 $COD_ANTICIPO           =   '';
                 $SERIE_ANTICIPO         =   '';
@@ -2851,6 +2851,8 @@ class GestionUsuarioContactoController extends Controller
                     $CLIENTE                =   $ordencompra_f->COD_EMPR_EMISOR;
                     $COD_MONEDA             =   $ordencompra_f->COD_CATEGORIA_MONEDA;
                     $monto_anticipo         =   0.00;
+                    //print_r("entro");
+
                     $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.OBTENER_ADELANTOS_PROVEEDOR_DETALLADO 
                                                                             @COD_EMPR = ?,
                                                                             @COD_CENTRO = ?,
@@ -2866,8 +2868,10 @@ class GestionUsuarioContactoController extends Controller
                     $stmt->execute();
                     $listaanticipo = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     $arrayitem      = array();
+
+
                     foreach ($listaanticipo as $index => $item) {
-                        if($COD_ANTICIPO == $monto_anticipo_txt){
+                        if($item['COD_HABILITACION'] == $monto_anticipo_txt){
                             $MONTO_ANTICIPO_DESC = (float)$item['CAN_SALDO'];
                             $COD_ANTICIPO = $item['COD_HABILITACION'];
                             $SERIE_ANTICIPO = $item['NRO_SERIE'];
@@ -2875,8 +2879,6 @@ class GestionUsuarioContactoController extends Controller
                         }
                     }
                 }
-
-
 
 
                 FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
@@ -2893,7 +2895,7 @@ class GestionUsuarioContactoController extends Controller
                                     'NRO_ANTICIPO'=>$NRO_ANTICIPO,
 
 
-                                    
+
                                     'fecha_uc'=>$this->fechaactual,
                                     'usuario_uc'=>Session::get('usuario')->id
                                 ]

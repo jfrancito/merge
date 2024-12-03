@@ -4200,11 +4200,12 @@ class GestionOCController extends Controller
                 }
 
 
-                $monto_anticipo_txt     =   (float)$request['monto_anticipo'];
+                $monto_anticipo_txt     =   $request['monto_anticipo'];
                 $MONTO_ANTICIPO_DESC    =   0.00;
                 $COD_ANTICIPO           =   '';
                 $SERIE_ANTICIPO         =   '';
                 $NRO_ANTICIPO           =   '';
+
 
                 if($monto_anticipo_txt!=''){
 
@@ -4212,9 +4213,11 @@ class GestionOCController extends Controller
                     $COD_EMPR               =   Session::get('empresas')->COD_EMPR;
                     $COD_CENTRO             =   '';
                     $FEC_CORTE              =   $this->hoy_sh;
-                    $CLIENTE                =   $ordencompra_f->COD_EMPR_EMISOR;
+                    $CLIENTE                =   $ordencompra->COD_EMPR_EMISOR;
                     $COD_MONEDA             =   $ordencompra_f->COD_CATEGORIA_MONEDA;
                     $monto_anticipo         =   0.00;
+                    //print_r("entro");
+
                     $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.OBTENER_ADELANTOS_PROVEEDOR_DETALLADO 
                                                                             @COD_EMPR = ?,
                                                                             @COD_CENTRO = ?,
@@ -4230,8 +4233,10 @@ class GestionOCController extends Controller
                     $stmt->execute();
                     $listaanticipo = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     $arrayitem      = array();
+
+
                     foreach ($listaanticipo as $index => $item) {
-                        if($COD_ANTICIPO == $monto_anticipo_txt){
+                        if($item['COD_HABILITACION'] == $monto_anticipo_txt){
                             $MONTO_ANTICIPO_DESC = (float)$item['CAN_SALDO'];
                             $COD_ANTICIPO = $item['COD_HABILITACION'];
                             $SERIE_ANTICIPO = $item['NRO_SERIE'];
@@ -4242,6 +4247,7 @@ class GestionOCController extends Controller
 
 
 
+                //dd($MONTO_ANTICIPO_DESC);
                 
                 FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(
