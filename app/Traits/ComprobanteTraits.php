@@ -1800,6 +1800,7 @@ trait ComprobanteTraits
                             })
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
+                                      ->orwhere('area_observacion', '=', 'UCO')
                                       ->orWhereNull('area_observacion');
                             })
                      		->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
