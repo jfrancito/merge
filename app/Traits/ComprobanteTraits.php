@@ -1723,6 +1723,7 @@ trait ComprobanteTraits
 
 		//HACER UNA UNION DE TODAS LOS ID DE TRABAJADORES QUE TIENE ESTE USUARIO
 		$trabajador 		 = 		STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+
 		$array_trabajadores  =		STDTrabajador::where('NRO_DOCUMENTO','=',$trabajador->NRO_DOCUMENTO)
 									->pluck('COD_TRAB')
 									->toArray();
@@ -3491,7 +3492,7 @@ trait ComprobanteTraits
                                         $query->where('FOLIO', '=', '');
                                         $query->orWhereNull('FOLIO');
                                     })
-                                    //->where('CMP.Orden.COD_ORDEN','=','ISCHCL0000005886')
+                                 //   ->where('CMP.Orden.COD_ORDEN','=','IICHCR0000133599')
                                     ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005'])
                                     ->where('CMP.Orden.COD_EMPR','=',$empresa_id)
                                     //->where('CMP.Orden.COD_CENTRO','=',$centro_id)

@@ -893,9 +893,13 @@ class UserController extends Controller {
 		
 		//1CIX00000019 COMPRAS
         //1CIX00000015 1CIX00000016 //Contabilidad
+
+
 		if($trol->ind_uc == 1){
 
 			$listadatos      		=   $this->con_lista_cabecera_comprobante_total_uc($cod_empresa);
+
+			
 			$count_x_aprobar 		= 	 count($listadatos);
         	$url 			 		=	'/gestion-de-comprobante-us/wjR';
         	//contrato
@@ -1028,7 +1032,7 @@ class UserController extends Controller {
 
 
 
-		//dd($listaocpendientes);
+
 
 		return View::make('bienvenido',
 						 [

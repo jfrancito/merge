@@ -52,6 +52,8 @@
             @ENDIF
           </span>
           <span><b>ORDEN INGRESO  :</b>{{$item->COD_TABLA_ASOC}}</span>
+          <span><b>PAGO DETRACCION  :</b>{{$item->TXT_PAGO_DETRACCION}}</span>
+
         </td>
 
 

@@ -22,12 +22,16 @@ class Funcion {
 
 		$fedocumento = FeDocumento::where('ID_DOCUMENTO','=',$oc->COD_ORDEN)->first();
 
-		if($fedocumento->COD_PAGO_DETRACCION == Session::get('empresas')->COD_EMPR){
-			$neto_pagar 	  = $oc->CAN_TOTAL - $oc->CAN_DETRACCION - $oc->CAN_RETENCION + $oc->CAN_PERCEPCION;
-		}else{
-			$neto_pagar 	  = $oc->CAN_TOTAL - $oc->CAN_RETENCION + $oc->CAN_PERCEPCION;
+		$COD_PAGO_DETRACCION = $fedocumento->COD_PAGO_DETRACCION;
+		if($COD_PAGO_DETRACCION == '' || is_null($COD_PAGO_DETRACCION)){
+			$COD_PAGO_DETRACCION = Session::get('empresas')->COD_EMPR;
 		}
 
+		if($COD_PAGO_DETRACCION == Session::get('empresas')->COD_EMPR){
+			$neto_pagar 	  = (float)$oc->CAN_TOTAL - (float)$oc->CAN_DETRACCION - (float)$oc->CAN_RETENCION + (float)$oc->CAN_PERCEPCION;
+		}else{
+			$neto_pagar 	  = (float)$oc->CAN_TOTAL - (float)$oc->CAN_RETENCION + (float)$oc->CAN_PERCEPCION;
+		}
 
         $neto_pagar 	  = ROUND($neto_pagar,2);
         return $neto_pagar;
