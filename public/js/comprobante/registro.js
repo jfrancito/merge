@@ -221,16 +221,16 @@ $(document).ready(function(){
         var tipo_detraccion_id      =   $('#tipo_detraccion_id').val();
         var monto_detraccion        =   $('#monto_detraccion').val();
         var pago_detraccion         =   $('#pago_detraccion').val();
+        var valor_igv               =   $('#valor_igv').val();
 
-
-
-        if(monto_total > 401){ 
-            if(ctadetraccion.trim() ==''){ alerterrorajax("Ingrese una Cuenta de Detraccion."); return false;}
-            if(tipo_detraccion_id ==''){ alerterrorajax("Seleeccione un valor de detraccion"); return false;}
-            if(monto_detraccion =='0'){ alerterrorajax("Ingrese Monto de Detraccion."); return false;}
-            if(pago_detraccion ==''){ alerterrorajax("Seleeccione un pago de detraccion"); return false;}
+        if(valor_igv>0){
+            if(monto_total > 401){ 
+                if(ctadetraccion.trim() ==''){ alerterrorajax("Ingrese una Cuenta de Detraccion."); return false;}
+                if(tipo_detraccion_id ==''){ alerterrorajax("Seleeccione un valor de detraccion"); return false;}
+                if(monto_detraccion =='0'){ alerterrorajax("Ingrese Monto de Detraccion."); return false;}
+                if(pago_detraccion ==''){ alerterrorajax("Seleeccione un pago de detraccion"); return false;}
+            }
         }
-
 
         var cb_id                   =   $('#cb_id').val();
         var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009'];
