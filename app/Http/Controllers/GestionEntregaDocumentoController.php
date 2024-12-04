@@ -21,6 +21,8 @@ use App\Modelos\FeDocumentoEntregable;
 use App\Modelos\STDEmpresa;
 use App\Modelos\SGDUsuario;
 use App\Modelos\WEBRol;
+use App\Modelos\DeudaTotalMerge;
+
 
 
 
@@ -1055,6 +1057,41 @@ class GestionEntregaDocumentoController extends Controller
                          ]);
     }
 
+
+
+    public function actionModaDetalleDeudaContrato(Request $request)
+    {
+
+        $data_id_doc            =   $request['data_id_doc'];
+        $idopcion               =   $request['idopcion'];
+
+        $empresa                =   STDEmpresa::where('COD_EMPR','=',$data_id_doc)->first();
+
+        $listadatos = DB::table(DB::raw('(SELECT * FROM DEUDA_TOTAL_MERGE WHERE COD_EMPR_CLIENTE = ?) AS X'))
+            ->select(
+                'X.NOM_CLIENTE',
+                'X.NRO_CONTRATO',
+                'X.TIPO_CONTRATO',
+                DB::raw('MIN(X.Centro) AS Centro'),
+                DB::raw('MIN(X.TipoDocumento) AS TipoDocumento'),
+                DB::raw('MIN(X.NroDocumento) AS NroDocumento'),
+                DB::raw('MIN(X.JEFE_VENTA) AS JEFE_VENTA'),
+                DB::raw('SUM(CAN_CAPITAL_SALDO + CAN_INTERES_SALDO) AS SALDO')
+            )
+            ->groupBy('X.NOM_CLIENTE', 'X.NRO_CONTRATO', 'X.TIPO_CONTRATO')
+            ->setBindings([$data_id_doc]) // Para pasar el parámetro de manera segura
+            ->get();
+
+        $funcion        =   $this;
+        return View::make('entregadocumento/modal/ajax/madeudadetalle',
+                         [
+                            'listadatos'        =>  $listadatos,
+                            'empresa'           =>  $empresa,
+                            'funcion'           =>  $funcion,
+                            'idopcion'          =>  $idopcion,
+                            'ajax'                  =>  true,
+                         ]);
+    }
 
 
 

@@ -229,6 +229,11 @@ trait ComprobanteTraits
                                                 $join->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'documentos.COD_TABLA')
                                                      ->addBinding($documento->getBindings());
                                             })
+                                        ->leftJoin(DB::raw('(SELECT COD_EMPR_CLIENTE, SUM(CAN_SALDO) AS CAN_DEUDA 
+                                                             FROM DEUDA_TOTAL_MERGE_SUM 
+                                                             GROUP BY COD_EMPR_CLIENTE) AS deuda'), 
+                                            'CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR', '=', 'deuda.COD_EMPR_CLIENTE')
+
                                         ->whereRaw("CAST(FE_DOCUMENTO.fecha_pa  AS DATE) >= ? and CAST(FE_DOCUMENTO.fecha_pa  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                         ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                         ->where('OPERACION','=','CONTRATO')
@@ -243,37 +248,45 @@ trait ComprobanteTraits
                                         //->whereIn('CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD',$array_usuarios)
                                         ->select(
                                                     DB::raw('CMP.DOCUMENTO_CTBLE.* ,FE_DOCUMENTO.*,documentos.NRO_SERIE NRO_SERIE_DOC,documentos.FEC_VENCIMIENTO,documentos.NRO_DOC NRO_DOC_DOC,FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_VOUCHER, FE_DOCUMENTO.TXT_CATEGORIA_BANCO AS TXT_BANCO'),
-                                                    DB::raw("CMP.OBTENER_NC_PROVEEDOR(CMP.DOCUMENTO_CTBLE.COD_EMPR, CMP.DOCUMENTO_CTBLE.COD_CENTRO, '{$fecha_corte}', CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR, CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA) AS NC_PROVEEDOR")
+                                                    DB::raw("CMP.OBTENER_NC_PROVEEDOR(CMP.DOCUMENTO_CTBLE.COD_EMPR, CMP.DOCUMENTO_CTBLE.COD_CENTRO, '{$fecha_corte}', CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR, CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA) AS NC_PROVEEDOR"),
+                                                    DB::raw("deuda.CAN_DEUDA AS CAN_DEUDA")
                                                 )
                                         ->orderBy('documentos.FEC_VENCIMIENTO ', 'asc')
                                         ->get();
 
         }else{
 
-          $listadatos             =   CMPDocumentoCtble::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
-                                    //->Join('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'LISTA_DOCUMENTOS_PAGAR_PROGRAMACION.COD_ORDEN')
-                                    ->leftJoin(DB::raw("({$documento->toSql()}) as documentos"), function ($join) use ($documento) {
+          $listadatos             =     CMPDocumentoCtble::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                                        //->Join('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'LISTA_DOCUMENTOS_PAGAR_PROGRAMACION.COD_ORDEN')
+                                        ->leftJoin(DB::raw("({$documento->toSql()}) as documentos"), function ($join) use ($documento) {
                                             $join->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'documentos.COD_TABLA')
                                                  ->addBinding($documento->getBindings());
                                         })
-                                    ->whereRaw("CAST(FE_DOCUMENTO.fecha_pa  AS DATE) >= ? and CAST(FE_DOCUMENTO.fecha_pa  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
-                                    ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                                    ->where('OPERACION','=','CONTRATO')
-                                    ->where(function ($query) {
-                                        $query->where('FOLIO', '=', '');
-                                        $query->orWhereNull('FOLIO');
-                                    })
-                                    ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
-                                    ->where('CMP.DOCUMENTO_CTBLE.COD_EMPR','=',$empresa_id)
-                                    //->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
-                                    ->whereIn('CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD',$array_usuarios)
-                                    ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO','=',$banco_id)
-                                    ->select(
-                                                DB::raw('CMP.DOCUMENTO_CTBLE.* ,FE_DOCUMENTO.*,documentos.NRO_SERIE NRO_SERIE_DOC,documentos.FEC_VENCIMIENTO,documentos.NRO_DOC NRO_DOC_DOC,FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_VOUCHER, FE_DOCUMENTO.TXT_CATEGORIA_BANCO AS TXT_BANCO'),
-                                                DB::raw("CMP.OBTENER_NC_PROVEEDOR(CMP.DOCUMENTO_CTBLE.COD_EMPR, CMP.DOCUMENTO_CTBLE.COD_CENTRO, '{$fecha_corte}', CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR, CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA) AS NC_PROVEEDOR")
-                                            )
-                                    ->orderBy('documentos.FEC_VENCIMIENTO ', 'asc')
-                                    ->get();
+
+                                        ->leftJoin(DB::raw('(SELECT COD_EMPR_CLIENTE, SUM(CAN_SALDO) AS CAN_DEUDA 
+                                                         FROM DEUDA_TOTAL_MERGE_SUM 
+                                                         GROUP BY COD_EMPR_CLIENTE) AS deuda'), 
+                                        'CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR', '=', 'deuda.COD_EMPR_CLIENTE')
+
+                                        ->whereRaw("CAST(FE_DOCUMENTO.fecha_pa  AS DATE) >= ? and CAST(FE_DOCUMENTO.fecha_pa  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                        ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                        ->where('OPERACION','=','CONTRATO')
+                                        ->where(function ($query) {
+                                            $query->where('FOLIO', '=', '');
+                                            $query->orWhereNull('FOLIO');
+                                        })
+                                        ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
+                                        ->where('CMP.DOCUMENTO_CTBLE.COD_EMPR','=',$empresa_id)
+                                        //->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
+                                        ->whereIn('CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD',$array_usuarios)
+                                        ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO','=',$banco_id)
+                                        ->select(
+                                                    DB::raw('CMP.DOCUMENTO_CTBLE.* ,FE_DOCUMENTO.*,documentos.NRO_SERIE NRO_SERIE_DOC,documentos.FEC_VENCIMIENTO,documentos.NRO_DOC NRO_DOC_DOC,FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_VOUCHER, FE_DOCUMENTO.TXT_CATEGORIA_BANCO AS TXT_BANCO'),
+                                                    DB::raw("CMP.OBTENER_NC_PROVEEDOR(CMP.DOCUMENTO_CTBLE.COD_EMPR, CMP.DOCUMENTO_CTBLE.COD_CENTRO, '{$fecha_corte}', CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR, CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA) AS NC_PROVEEDOR"),
+                                                    DB::raw("deuda.CAN_DEUDA AS CAN_DEUDA")
+                                                )
+                                        ->orderBy('documentos.FEC_VENCIMIENTO ', 'asc')
+                                        ->get();
 
         }
 

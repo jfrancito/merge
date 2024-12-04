@@ -50,13 +50,22 @@
           <span><b>CUENTA DETRACCION: </b> {{$item->CTA_DETRACCION}}  </span>
           <span><b>VALOR DETRACCION  :</b>{{$item->VALOR_DETRACCION}}</span>
           <span><b>PAGO DETRACCION: </b> {{$item->TXT_PAGO_DETRACCION}}  </span>
-
           <span><b>NOTA CREDITO  :
             @IF($item->NC_PROVEEDOR > 0)
               {{$item->NC_PROVEEDOR}}
             @ELSE
               0
             @ENDIF</b>
+          </span>
+
+          <span>
+            <b>DEUDA:
+              @IF($item->CAN_DEUDA > 0)
+               <span data_id_doc = '{{$item->COD_EMPR_EMISOR}}' class="badge badge-danger btn_detalle_deuda" style="width: 100px;cursor: pointer;">DEUDA</span>
+              @ELSE
+                <span class="badge badge-default" style="width: 100px;">SIN DEUDA</span>
+              @ENDIF
+            </b>
           </span>
 
 
