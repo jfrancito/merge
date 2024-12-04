@@ -38,6 +38,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Session;
 use View;
+use PDO;
 use App\Traits\GeneralesTraits;
 use App\Traits\ComprobanteTraits;
 use App\Traits\WhatsappTraits;
