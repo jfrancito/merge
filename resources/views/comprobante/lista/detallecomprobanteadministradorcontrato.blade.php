@@ -327,7 +327,7 @@
                   <div class="panel panel-default panel-contrast">
                     <div class="panel-heading" style="background: #1d3a6d;color: #fff;">
                       <div><h4>DETRACION DE LA FACTURACION : {{round($fedocumento->TOTAL_VENTA_ORIG,2)}} x 4% = {{$fedocumento->TOTAL_VENTA_ORIG * 0.04}}</h4> </div>
-                      <div><h6>* Solo llenar para montos mayores a 401</h6> </div>
+                      <div><h6>* Solo llenar para montos mayores a 401 o cuando sea traslado de la selva</h6> </div>
                     </div>
                     <div class="panel-body panel-body-contrast">
                             <div class="row">

@@ -2100,7 +2100,7 @@ trait ComprobanteTraits
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
                                       ->orWhereNull('area_observacion')
-                                      ->orWhere('area_observacion','=','CONT');
+                                      ->orWhereIn('area_observacion',['CONT','UCO']);
                             })
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
                             ->orderBy('fecha_pr','asc')
@@ -2126,7 +2126,7 @@ trait ComprobanteTraits
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
                                       ->orWhereNull('area_observacion')
-                                      ->orWhere('area_observacion','=','CONT');
+                                      ->orWhereIn('area_observacion',['CONT','UCO']);
                             })
 
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
