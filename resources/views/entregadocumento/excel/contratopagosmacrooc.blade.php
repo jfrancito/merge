@@ -92,7 +92,7 @@
 	        <td>{{$item->NRO_DOCUMENTO}}</td>
 		    <td></td>	        
 	        <td>{{$item->TXT_EMPR_CLIENTE}}</td>
-	        <td>S</td>
+	        <td>{{$item->TIPO_MONEDA}}</td>
 	        <td>{{number_format($item->TOTAL_PAGAR, 2, '.', '')}}</td>
 	        <td>S</td>
 	        <td>0000</td>

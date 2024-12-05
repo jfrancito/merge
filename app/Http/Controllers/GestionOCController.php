@@ -2325,9 +2325,6 @@ class GestionOCController extends Controller
 
 
 
-
-
-
         //ANTICIPO
         $COD_EMPR               =   Session::get('empresas')->COD_EMPR;
         $COD_CENTRO             =   '';
@@ -2573,6 +2570,35 @@ class GestionOCController extends Controller
         $empresa                =   STDEmpresa::where('COD_EMPR','=',$ordencompra_f->COD_EMPR_CLIENTE)->first();
         $combocb                =   array('' => "Seleccione Cuenta Bancaria");
         $combopagodetraccion    =   array('' => "Seleccione Pago Detraccion", $ordencompra_f->COD_EMPR_CLIENTE => $ordencompra_f->TXT_EMPR_CLIENTE , $ordencompra_f->COD_EMPR => Session::get('empresas')->NOM_EMPR);
+        //ANTICIPO
+        $COD_EMPR               =   Session::get('empresas')->COD_EMPR;
+        $COD_CENTRO             =   '';
+        $FEC_CORTE              =   $this->hoy_sh;
+        $CLIENTE                =   $ordencompra_f->COD_EMPR_CLIENTE;
+        $COD_MONEDA             =   $ordencompra_f->COD_CATEGORIA_MONEDA;
+        $monto_anticipo         =   0.00;
+        $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.OBTENER_ADELANTOS_PROVEEDOR_DETALLADO 
+                                                                @COD_EMPR = ?,
+                                                                @COD_CENTRO = ?,
+                                                                @FEC_CORTE = ?,
+                                                                @CLIENTE = ?,
+                                                                @COD_MONEDA = ?'
+                                                            );
+        $stmt->bindParam(1, $COD_EMPR, PDO::PARAM_STR);
+        $stmt->bindParam(2, $COD_CENTRO, PDO::PARAM_STR);
+        $stmt->bindParam(3, $FEC_CORTE, PDO::PARAM_STR);
+        $stmt->bindParam(4, $CLIENTE, PDO::PARAM_STR);
+        $stmt->bindParam(5, $COD_MONEDA, PDO::PARAM_STR);
+        $stmt->execute();
+        $listaanticipo = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $arrayitem      = array();
+
+        foreach ($listaanticipo as $index => $item) {
+            $arrayitem               =   $arrayitem + array($item['COD_HABILITACION'] => $item['NRO_SERIE'].'-'.$item['NRO_DOC'].' // '.$item['CAN_SALDO']);
+            $monto_anticipo          =   $monto_anticipo + (float)$item['CAN_SALDO'];
+        }
+        $comboant               =   array('' => "Seleccione Anticipo")+$arrayitem;
+
 
 
         //dd($ordencompra_f->CAN_DETRACCION);
@@ -2580,6 +2606,10 @@ class GestionOCController extends Controller
         return View::make('comprobante/registrocomprobanteadministrator',
                          [
                             'ordencompra'           =>  $ordencompra,
+
+                            'monto_anticipo'        =>  $monto_anticipo,
+                            'comboant'              =>  $comboant,
+
                             'eliminadodoc'          =>  $eliminadodoc,
                             'combobancos'           =>  $combobancos,
                             'ordencompra_f'         =>  $ordencompra_f,
@@ -3623,6 +3653,57 @@ class GestionOCController extends Controller
                                 );
                 }
 
+
+                $monto_anticipo_txt     =   $request['monto_anticipo'];
+                $MONTO_ANTICIPO_DESC    =   0.00;
+                $COD_ANTICIPO           =   '';
+                $SERIE_ANTICIPO         =   '';
+                $NRO_ANTICIPO           =   '';
+
+
+                if($monto_anticipo_txt!=''){
+
+                    $COD_EMPR               =   Session::get('empresas')->COD_EMPR;
+                    $COD_CENTRO             =   '';
+                    $FEC_CORTE              =   $this->hoy_sh;
+                    $CLIENTE                =   $ordencompra_t->COD_EMPR_CLIENTE;
+                    $COD_MONEDA             =   $ordencompra_t->COD_CATEGORIA_MONEDA;
+                    $monto_anticipo         =   0.00;
+                    //print_r("entro");
+
+                    $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.OBTENER_ADELANTOS_PROVEEDOR_DETALLADO 
+                                                                            @COD_EMPR = ?,
+                                                                            @COD_CENTRO = ?,
+                                                                            @FEC_CORTE = ?,
+                                                                            @CLIENTE = ?,
+                                                                            @COD_MONEDA = ?'
+                                                                        );
+                    $stmt->bindParam(1, $COD_EMPR, PDO::PARAM_STR);
+                    $stmt->bindParam(2, $COD_CENTRO, PDO::PARAM_STR);
+                    $stmt->bindParam(3, $FEC_CORTE, PDO::PARAM_STR);
+                    $stmt->bindParam(4, $CLIENTE, PDO::PARAM_STR);
+                    $stmt->bindParam(5, $COD_MONEDA, PDO::PARAM_STR);
+                    $stmt->execute();
+                    $listaanticipo = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    $arrayitem      = array();
+
+
+                    foreach ($listaanticipo as $index => $item) {
+                        if($item['COD_HABILITACION'] == $monto_anticipo_txt){
+                            $MONTO_ANTICIPO_DESC = (float)$item['CAN_SALDO'];
+                            $COD_ANTICIPO = $item['COD_HABILITACION'];
+                            $SERIE_ANTICIPO = $item['NRO_SERIE'];
+                            $NRO_ANTICIPO = $item['NRO_DOC'];
+                        }
+                    }
+                }
+
+
+
+
+
+
+
                 FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(
                                 [
@@ -3631,6 +3712,12 @@ class GestionOCController extends Controller
                                     'TXT_NRO_CUENTA_BANCARIA'=>$cb_id,
                                     'ARCHIVO_CDR'=>'',
                                     'ARCHIVO_PDF'=>'',
+
+                                    'MONTO_ANTICIPO_DESC'=>$MONTO_ANTICIPO_DESC,
+                                    'COD_ANTICIPO'=>$COD_ANTICIPO,
+                                    'SERIE_ANTICIPO'=>$SERIE_ANTICIPO,
+                                    'NRO_ANTICIPO'=>$NRO_ANTICIPO,
+
 
                                     'CTA_DETRACCION'=>$ctadetraccion,
                                     'MONTO_DETRACCION_XML'=>$monto_detraccion,

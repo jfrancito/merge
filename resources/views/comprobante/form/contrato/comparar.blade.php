@@ -75,7 +75,7 @@
 
               <tr>
                 <td><b>Anticipo</b></td>
-                <td><p class='subtitulomerge'>{{$fedocumento->MONTO_ANTICIPO_DESC}}</p></td>
+                <td><p class='subtitulomerge'>{{$fedocumento->SERIE_ANTICIPO}}-{{$fedocumento->NRO_ANTICIPO}}//{{$fedocumento->MONTO_ANTICIPO_DESC}}</p></td>
               </tr>
 
           </tbody>

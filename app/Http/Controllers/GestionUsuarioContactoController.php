@@ -2025,6 +2025,55 @@ class GestionUsuarioContactoController extends Controller
                 }
 
 
+
+                $monto_anticipo_txt                     =   $request['monto_anticipo'];
+                $MONTO_ANTICIPO_DESC                    =   0.00;
+                $COD_ANTICIPO                           =   '';
+                $SERIE_ANTICIPO                         =   '';
+                $NRO_ANTICIPO                           =   '';
+
+
+                if($monto_anticipo_txt!=''){
+
+                    $ordencompra_t          =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$idoc)->first();
+                    $COD_EMPR               =   Session::get('empresas')->COD_EMPR;
+                    $COD_CENTRO             =   '';
+                    $FEC_CORTE              =   $this->hoy_sh;
+                    $CLIENTE                =   $ordencompra_t->COD_EMPR_CLIENTE;
+                    $COD_MONEDA             =   $ordencompra_t->COD_CATEGORIA_MONEDA;
+                    $monto_anticipo         =   0.00;
+                    //print_r("entro");
+
+                    $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.OBTENER_ADELANTOS_PROVEEDOR_DETALLADO 
+                                                                            @COD_EMPR = ?,
+                                                                            @COD_CENTRO = ?,
+                                                                            @FEC_CORTE = ?,
+                                                                            @CLIENTE = ?,
+                                                                            @COD_MONEDA = ?'
+                                                                        );
+                    $stmt->bindParam(1, $COD_EMPR, PDO::PARAM_STR);
+                    $stmt->bindParam(2, $COD_CENTRO, PDO::PARAM_STR);
+                    $stmt->bindParam(3, $FEC_CORTE, PDO::PARAM_STR);
+                    $stmt->bindParam(4, $CLIENTE, PDO::PARAM_STR);
+                    $stmt->bindParam(5, $COD_MONEDA, PDO::PARAM_STR);
+                    $stmt->execute();
+                    $listaanticipo = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    $arrayitem      = array();
+
+
+                    foreach ($listaanticipo as $index => $item) {
+                        if($item['COD_HABILITACION'] == $monto_anticipo_txt){
+                            $MONTO_ANTICIPO_DESC = (float)$item['CAN_SALDO'];
+                            $COD_ANTICIPO = $item['COD_HABILITACION'];
+                            $SERIE_ANTICIPO = $item['NRO_SERIE'];
+                            $NRO_ANTICIPO = $item['NRO_DOC'];
+                        }
+                    }
+                }
+
+
+
+
                 // $entidadbanco_id   =   $request['entidadbanco_id'];
                 // $bancocategoria    =   CMPCategoria::where('COD_CATEGORIA','=',$entidadbanco_id)->first();
 
@@ -2036,6 +2085,13 @@ class GestionUsuarioContactoController extends Controller
                                     [
                                         // 'COD_CATEGORIA_BANCO'=>$bancocategoria->COD_CATEGORIA,
                                         // 'TXT_CATEGORIA_BANCO'=>$bancocategoria->NOM_CATEGORIA,
+
+
+                                        'MONTO_ANTICIPO_DESC'=>$MONTO_ANTICIPO_DESC,
+                                        'COD_ANTICIPO'=>$COD_ANTICIPO,
+                                        'SERIE_ANTICIPO'=>$SERIE_ANTICIPO,
+                                        'NRO_ANTICIPO'=>$NRO_ANTICIPO,
+
                                         'COD_ESTADO'=>'ETM0000000000009',
                                         'TXT_ESTADO'=>'POR EJECUTAR ORDEN DE INGRESO',
                                         'fecha_uc'=>$this->fechaactual,
@@ -2051,6 +2107,13 @@ class GestionUsuarioContactoController extends Controller
                                     [
                                         // 'COD_CATEGORIA_BANCO'=>$bancocategoria->COD_CATEGORIA,
                                         // 'TXT_CATEGORIA_BANCO'=>$bancocategoria->NOM_CATEGORIA,
+
+
+                                        'MONTO_ANTICIPO_DESC'=>$MONTO_ANTICIPO_DESC,
+                                        'COD_ANTICIPO'=>$COD_ANTICIPO,
+                                        'SERIE_ANTICIPO'=>$SERIE_ANTICIPO,
+                                        'NRO_ANTICIPO'=>$NRO_ANTICIPO,
+                                        
                                         'COD_ESTADO'=>'ETM0000000000003',
                                         'TXT_ESTADO'=>'POR APROBAR CONTABILIDAD',
                                         'ind_email_ap'=>0,
@@ -2191,9 +2254,46 @@ class GestionUsuarioContactoController extends Controller
             $ordencompra_f          =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
 
 
+            //ANTICIPO
+            $COD_EMPR               =   Session::get('empresas')->COD_EMPR;
+            $COD_CENTRO             =   '';
+            $FEC_CORTE              =   $this->hoy_sh;
+            $CLIENTE                =   $ordencompra_f->COD_EMPR_CLIENTE;
+            $COD_MONEDA             =   $ordencompra_f->COD_CATEGORIA_MONEDA;
+            $monto_anticipo         =   0.00;
+            $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.OBTENER_ADELANTOS_PROVEEDOR_DETALLADO 
+                                                                    @COD_EMPR = ?,
+                                                                    @COD_CENTRO = ?,
+                                                                    @FEC_CORTE = ?,
+                                                                    @CLIENTE = ?,
+                                                                    @COD_MONEDA = ?'
+                                                                );
+            $stmt->bindParam(1, $COD_EMPR, PDO::PARAM_STR);
+            $stmt->bindParam(2, $COD_CENTRO, PDO::PARAM_STR);
+            $stmt->bindParam(3, $FEC_CORTE, PDO::PARAM_STR);
+            $stmt->bindParam(4, $CLIENTE, PDO::PARAM_STR);
+            $stmt->bindParam(5, $COD_MONEDA, PDO::PARAM_STR);
+            $stmt->execute();
+            $listaanticipo = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $arrayitem      = array();
+
+            foreach ($listaanticipo as $index => $item) {
+                $arrayitem               =   $arrayitem + array($item['COD_HABILITACION'] => $item['NRO_SERIE'].'-'.$item['NRO_DOC'].' // '.$item['CAN_SALDO']);
+                $monto_anticipo          =   $monto_anticipo + (float)$item['CAN_SALDO'];
+            }
+            $comboant               =   array('' => "Seleccione Anticipo")+$arrayitem;
+
+
+
+
+
             return View::make('comprobante/aprobaruc', 
                             [
                                 'fedocumento'           =>  $fedocumento,
+                                'monto_anticipo'        =>  $monto_anticipo,
+                                'comboant'              =>  $comboant,
+
+
                                 'ordencompra'           =>  $ordencompra,
                                 'combobancos'           =>  $combobancos,
                                 'ordencompra_f'         =>  $ordencompra_f,

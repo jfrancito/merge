@@ -97,6 +97,11 @@
             <td  colspan="2" class=""><b>{{$ordencompra_f->CAN_RETENCION}}</b></td>
           </tr>
 
+          <tr>
+            <td><b>Anticipo</b></td>
+            <td><p class='subtitulomerge'>{{$fedocumento->SERIE_ANTICIPO}}-{{$fedocumento->NRO_ANTICIPO}}//{{$fedocumento->MONTO_ANTICIPO_DESC}}</p></td>
+          </tr>
+
       </tbody>
     </table>
   </div>

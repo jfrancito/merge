@@ -24,6 +24,23 @@ $(document).ready(function(){
         });
 
     });
+    $(".areaadministracion").on('dblclick','.btn_detalle_deuda', function(e) {
+
+        var _token                  =   $('#token').val();
+        var data_id_doc             =   $(this).attr('data_id_doc');
+        var idopcion                =   $('#idopcion').val();
+
+        data                        =   {
+                                            _token                  : _token,
+                                            data_id_doc             : data_id_doc,
+                                            idopcion                : idopcion,
+                                        };
+
+        ajax_modal(data,"/ajax-modal-detalle-deuda-contrato",
+                  "modal-detalle-entregable","modal-detalle-entregable-container");
+
+    });
+    
 
     $(".areaadministracion").on('click','.buscardocumento', function() {
 

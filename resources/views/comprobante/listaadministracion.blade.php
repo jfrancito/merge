@@ -53,6 +53,8 @@
             </div>
           </div>
     </div>
+    @include('entregadocumento.modal.mregistrorequerimiento')
+    
   </div>
 @stop
 @section('script')

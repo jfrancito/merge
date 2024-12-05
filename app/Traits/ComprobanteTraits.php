@@ -352,6 +352,7 @@ trait ComprobanteTraits
                                              ->on('FE_DOCUMENTO.TXT_NRO_CUENTA_BANCARIA', '=', 'TES.CUENTA_BANCARIA.TXT_NRO_CUENTA_BANCARIA');
                                     })
                                     ->leftjoin('CMP.CATEGORIA as CAT_CUENTA ', 'CAT_CUENTA.COD_CATEGORIA', '=', 'TES.CUENTA_BANCARIA.TXT_TIPO_REFERENCIA')
+                                    ->leftjoin('CMP.CATEGORIA as CAT_MONEDA', 'CAT_MONEDA.COD_CATEGORIA', '=', 'TES.CUENTA_BANCARIA.COD_CATEGORIA_MONEDA')
                                     ->leftjoin('STD.EMPRESA', 'STD.EMPRESA.COD_EMPR', '=', 'CMP.ORDEN.COD_EMPR_CLIENTE')
                                     ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'STD.EMPRESA.COD_TIPO_DOCUMENTO')
                                     ->where('FOLIO','=',$folio)
@@ -361,13 +362,14 @@ trait ComprobanteTraits
                                                     CMP.ORDEN.COD_EMPR_CLIENTE,
                                                     CMP.ORDEN.TXT_EMPR_CLIENTE,
                                                     STD.EMPRESA.NRO_DOCUMENTO,
+                                                    CAT_MONEDA.TXT_REFERENCIA AS TIPO_MONEDA, 
                                                     CMP.CATEGORIA.CODIGO_SUNAT,
                                                     CAT_CUENTA.TXT_ABREVIATURA,
                                                     SUM(CAN_TOTAL) TOTAL,
                                                     SUM(CASE 
                                                             WHEN FE_DOCUMENTO.COD_PAGO_DETRACCION = CMP.ORDEN.COD_EMPR 
-                                                            THEN CMP.ORDEN.CAN_TOTAL - CMP.ORDEN.CAN_DETRACCION - CMP.ORDEN.CAN_RETENCION + CMP.ORDEN.CAN_PERCEPCION
-                                                            ELSE CMP.ORDEN.CAN_TOTAL - CMP.ORDEN.CAN_RETENCION + CMP.ORDEN.CAN_PERCEPCION
+                                                            THEN CMP.ORDEN.CAN_TOTAL - CMP.ORDEN.CAN_DETRACCION - CMP.ORDEN.CAN_RETENCION - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC,0) + CMP.ORDEN.CAN_PERCEPCION
+                                                            ELSE CMP.ORDEN.CAN_TOTAL - CMP.ORDEN.CAN_RETENCION - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC,0) + CMP.ORDEN.CAN_PERCEPCION
                                                         END) AS TOTAL_PAGAR,
                                                     SUM(CAN_DETRACCION) DETRACCION'))
                                     ->groupBy('CMP.ORDEN.COD_EMPR_CLIENTE')
@@ -375,6 +377,7 @@ trait ComprobanteTraits
                                     ->groupBy('FE_DOCUMENTO.TXT_NRO_CUENTA_BANCARIA')
                                     ->groupBy('STD.EMPRESA.NRO_DOCUMENTO')
                                     ->groupBy('CMP.CATEGORIA.CODIGO_SUNAT')
+                                    ->groupBy('CAT_MONEDA.TXT_REFERENCIA')
                                     ->groupBy('CAT_CUENTA.TXT_ABREVIATURA')
                                     ->get();
 
@@ -1931,8 +1934,11 @@ trait ComprobanteTraits
     private function con_lista_cabecera_comprobante_total_adm_contrato_obs_levantadas($cliente_id) {
 
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
-                            //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
-                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC'))
+                            ->leftJoin(DB::raw('(SELECT COD_EMPR_CLIENTE, SUM(CAN_SALDO) AS CAN_DEUDA 
+                                                 FROM DEUDA_TOTAL_MERGE_SUM 
+                                                 GROUP BY COD_EMPR_CLIENTE) AS deuda'), 
+                                'CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR', '=', 'deuda.COD_EMPR_CLIENTE')
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC,deuda.CAN_DEUDA AS CAN_DEUDA'))
                             ->where('OPERACION','=','CONTRATO')
                             ->where('ind_observacion','=',0)
                             ->where('area_observacion','=','ADM')
@@ -2114,8 +2120,14 @@ trait ComprobanteTraits
     private function con_lista_cabecera_comprobante_total_adm_contrato($cliente_id) {
 
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
-                            //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
-                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+
+                            ->leftJoin(DB::raw('(SELECT COD_EMPR_CLIENTE, SUM(CAN_SALDO) AS CAN_DEUDA 
+                                                 FROM DEUDA_TOTAL_MERGE_SUM 
+                                                 GROUP BY COD_EMPR_CLIENTE) AS deuda'), 
+                                'CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR', '=', 'deuda.COD_EMPR_CLIENTE')
+
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,deuda.CAN_DEUDA AS CAN_DEUDA'))
+
                             ->where('OPERACION','=','CONTRATO')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where(function ($query) {
@@ -2139,8 +2151,13 @@ trait ComprobanteTraits
     private function con_lista_cabecera_comprobante_total_adm_contrato_obs($cliente_id) {
 
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
-                            //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
-                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+
+                            ->leftJoin(DB::raw('(SELECT COD_EMPR_CLIENTE, SUM(CAN_SALDO) AS CAN_DEUDA 
+                                                 FROM DEUDA_TOTAL_MERGE_SUM 
+                                                 GROUP BY COD_EMPR_CLIENTE) AS deuda'), 
+                                'CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR', '=', 'deuda.COD_EMPR_CLIENTE')
+
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,deuda.CAN_DEUDA AS CAN_DEUDA'))
                             ->where('OPERACION','=','CONTRATO')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('ind_observacion','=',1)
@@ -3456,6 +3473,9 @@ trait ComprobanteTraits
     private function con_lista_cabecera_comprobante_entregable($cliente_id,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id) {
 
 
+        $fecha_corte            =   date('Ymd');
+
+
         $rol                    =   WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 
         $trabajador             =   STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
@@ -3511,13 +3531,11 @@ trait ComprobanteTraits
                                     //->where('CMP.Orden.COD_CENTRO','=',$centro_id)
                                     ->whereIn('CMP.Orden.COD_USUARIO_CREA_AUD',$array_usuarios)
                                     ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-
                                     ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO','=',$banco_id)
-
                                     ->select(
                                         DB::raw('CMP.Orden.*, FE_DOCUMENTO.*, documentos.NRO_SERIE, documentos.FEC_VENCIMIENTO, documentos.NRO_DOC, oi.COD_TABLA_ASOC, FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_VOUCHER, FE_DOCUMENTO.TXT_CATEGORIA_BANCO AS TXT_BANCO'),
-                                        // Aquí usamos los campos de la tabla CMP.Orden para los parámetros de la función
-                                        DB::raw("CMP.OBTENER_ADELANTOS_PROVEEDOR(CMP.Orden.COD_EMPR, '', '{$fecha_corte}', CMP.Orden.COD_CONTRATO, CMP.Orden.COD_CATEGORIA_MONEDA) AS ADELANTOS_PROVEEDOR")
+                                        DB::raw("CMP.OBTENER_NC_PROVEEDOR(CMP.Orden.COD_EMPR, '', '{$fecha_corte}', CMP.Orden.COD_CONTRATO, CMP.Orden.COD_CATEGORIA_MONEDA) AS NC_PROVEEDOR")
+                                        //DB::raw("CMP.OBTENER_ADELANTOS_PROVEEDOR(CMP.Orden.COD_EMPR, '', '{$fecha_corte}', CMP.Orden.COD_CONTRATO, CMP.Orden.COD_CATEGORIA_MONEDA) AS ADELANTOS_PROVEEDOR")
                                     )
                                     ->orderBy('documentos.FEC_VENCIMIENTO','asc')
                                     ->get();

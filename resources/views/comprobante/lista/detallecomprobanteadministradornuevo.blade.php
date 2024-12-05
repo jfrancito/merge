@@ -1,7 +1,6 @@
 <div class="listadatos">  
         <div class="container">
           <div class="row">
-
             <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
               <div class="panel panel-default panel-contrast">
                 <div class="panel-heading" style="background: #1d3a6d;color: #fff;">CARGAR DOCUMENTO XML ({{$xmlfactura}})
@@ -18,7 +17,6 @@
                                     <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 negrita" align="center">
                                         <button  type="submit" style="height:48px;" class="btn btn-space btn-success btn-lg cargardatosliq" id='cargardatosliq' title="Cargar Datos"><i class="icon icon-left mdi mdi-upload"></i> Subir</button>
                                     </div>
-                                    
                                 </div>
                             </div>
                   </form>
@@ -26,7 +24,6 @@
               </div>
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4 col-lg-8">
-
               <div class="panel panel-default panel-contrast">
                 <div class="panel-heading" style="background: #1d3a6d;color: #fff;">CONSULTA API SUNAT
                 </div>
@@ -388,6 +385,26 @@
                                           </div>
                                         </div>
                                       </div>
+
+
+                                      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 cajareporte @if((float)$monto_anticipo<=0) ocultar @endif">
+                                          <div class="form-group">
+                                            <label class="col-sm-12 control-label labelleft" >
+                                              <div class="tooltipfr"><b>Aplicar Anticipo </b>
+                                                <span class="tooltiptext">¿Se le aplicara el anticipo a esta factura?</span>
+                                              </div>
+                                            :</label>
+                                            <div class="col-sm-12 abajocaja" >
+                                              {!! Form::select( 'monto_anticipo', $comboant, array(),
+                                                                [
+                                                                  'class'       => 'select2 form-control control input-sm' ,
+                                                                  'id'          => 'monto_anticipo',
+                                                                  'data-aw'     => '1',
+                                                                ]) !!}
+                                            </div>
+                                          </div>
+                                      </div>
+                                      
                                   </div>
 
                                   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px;">
@@ -408,28 +425,13 @@
                                         </p>
                                       </div>
                                   </div>
-
-
-
                             </div>
                     </div>
                   </div>
                 </div>
               </div>
-
-
-
-
-
-
-
-
-
-
             </form>
           @endif
-
-
         </div>
 </div>
 

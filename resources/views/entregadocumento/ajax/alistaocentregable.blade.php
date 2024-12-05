@@ -53,13 +53,19 @@
           </span>
           <span><b>ORDEN INGRESO  :</b>{{$item->COD_TABLA_ASOC}}</span>
           <span><b>PAGO DETRACCION  :</b>{{$item->TXT_PAGO_DETRACCION}}</span>
-
+          <span><b>NOTA CREDITO  :
+            @IF($item->NC_PROVEEDOR > 0)
+              {{$item->NC_PROVEEDOR}}
+            @ELSE
+              0
+            @ENDIF</b>
+          </span>
         </td>
 
 
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>IMPORTE: </b> {{$item->CAN_TOTAL}}  </span>
-          <span><b>ANTICIPO  :</b>{{$item->ADELANTOS_PROVEEDOR}}</span>
+          <span><b>ANTICIPO  :</b>{{round($item->MONTO_ANTICIPO_DESC,2)}}</span>
         </td>
 
         <td class="cell-detail sorting_1" style="position: relative;">
@@ -95,9 +101,8 @@
             {{$funcion->funciones->neto_pagar_oc($item)}}
           </b>
         </td>
-
         <td>
-
+            @IF($item->NC_PROVEEDOR<=0)
             <div class="text-center be-checkbox be-checkbox-sm has-primary">
               <input  type="checkbox"
                 class="{{$item->COD_ORDEN}} input_asignar"
@@ -109,10 +114,8 @@
                     name="{{$item->COD_ORDEN}}"
               ></label>
             </div>
-
+            @ENDIF
         </td>
-
-
       </tr>                    
     @endforeach
   </tbody>

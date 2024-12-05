@@ -27,18 +27,23 @@
 	      <th>RUC</th>
 	      <th>PROVEEDOR</th>
 	      <th>BANCO</th>
+	      <th>CUENTA ABONO</th>
+
+
 	      <th>COMPROBANTE ASOCIADO</th>
 	      <th>FECHA VENCIMIENTO DOC</th>
 	      <th>FECHA APROBACION ADMIN</th>
 	      <th>TIPO</th>
 	      <th>SUBIO VOUCHER</th>
 	      <th>ORDEN INGRESO</th>
+	      <th>IMPORTE</th>
+
 	      <th>OBLIGACION</th>
 	      <th>DESCUENTO</th>
 	      <th>TOTAL DESCUENTO</th>
 	      <th>PERCEPCION</th>
+	      <th>ANTICIPO</th>
 
-	      <th>IMPORTE</th>
 	      <th>NETO A PAGAR</th>
 	    </tr>
 	  </thead>
@@ -51,6 +56,9 @@
 	        <td>{{$item->RUC_PROVEEDOR}}</td>
 	        <td>{{$item->TXT_EMPR_CLIENTE}}</td>
 	        <td>{{$item->TXT_CATEGORIA_BANCO}}</td>
+	        <td><b>{{$item->TXT_NRO_CUENTA_BANCARIA}}</b></td>
+
+
 	        <td>{{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</td>
 	        <td>{{date_format(date_create($item->FEC_VENCIMIENTO), 'd-m-Y h:i:s')}}</td>
 	        <td>{{date_format(date_create($item->fecha_ap), 'd-m-Y h:i:s')}}</td>
@@ -63,6 +71,8 @@
 	            @ENDIF
 	        </td>
 	        <td>{{$item->COD_TABLA_ASOC}}</td>
+
+	        <td>{{$item->CAN_TOTAL}}</td>
 	        <td>
 	          @IF($item->CAN_DETRACCION>0)
 	            DETRACION
@@ -86,7 +96,9 @@
 	          @ENDIF
 	        </td>
 	        <td>{{round($item->PERCEPCION,2)}}</td>
-	        <td>{{$item->CAN_TOTAL}}</td>
+	        <td>{{round($item->MONTO_ANTICIPO_DESC,2)}}</td>
+
+
 	        <td>
 	        	{{$funcion->funciones->neto_pagar_oc($item)}}
 		        @php $monto_total  = $monto_total + $funcion->funciones->neto_pagar_oc($item); @endphp
@@ -109,6 +121,8 @@
 	        <td></td>
 	        <td></td>
 	       	<td></td>
+	        <td></td>
+	        <td></td>
 	        <td></td>
 	        <td></td>
 	        <td></td>

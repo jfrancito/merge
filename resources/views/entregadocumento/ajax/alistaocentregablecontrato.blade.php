@@ -61,9 +61,9 @@
           <span>
             <b>DEUDA:
               @IF($item->CAN_DEUDA > 0)
-               <span data_id_doc = '{{$item->COD_EMPR_EMISOR}}' class="badge badge-danger btn_detalle_deuda" style="width: 100px;cursor: pointer;">DEUDA</span>
+               <span data_id_doc = '{{$item->COD_EMPR_EMISOR}}' class="badge badge-danger btn_detalle_deuda" style="width: 100px;cursor: pointer;display: inline-block;">DEUDA</span>
               @ELSE
-                <span class="badge badge-default" style="width: 100px;">SIN DEUDA</span>
+                <span class="badge badge-default" style="width: 100px;display: inline-block;">SIN DEUDA</span>
               @ENDIF
             </b>
           </span>
@@ -96,13 +96,7 @@
                     name="{{$item->COD_DOCUMENTO_CTBLE}}"
               ></label>
             </div>
-
-
             @ENDIF
-
-
-
-
 
         </td>
 
