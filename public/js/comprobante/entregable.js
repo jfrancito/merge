@@ -24,6 +24,22 @@ $(document).ready(function(){
     });
 
 
+    $(".cfedocumento").on('click','#descargarcomprobantemasivoexcel', function() {
+
+
+        var operacion_id         =   $('#operacion_id').val();
+        var idopcion             =   $('#idopcion').val();
+        var _token               =   $('#token').val();
+
+        debugger;
+
+        href = $(this).attr('data-href')+'/'+operacion_id+'/'+idopcion;
+        $(this).prop('href', href);
+        return true;
+
+
+    });
+
 
     $(".cfedocumento").on('dblclick','.btn_detalle_deuda', function(e) {
 

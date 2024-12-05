@@ -49,6 +49,60 @@ class GestionEntregaDocumentoController extends Controller
     use ComprobanteTraits;
 
 
+    public function actionEntregableMasivoExcel($operacion_id,$idopcion)
+    {
+        set_time_limit(0);
+        $cod_empresa            =   Session::get('usuario')->usuarioosiris_id;
+        $fechadia               =   date_format(date_create(date('d-m-Y')), 'd-m-Y');
+        $fecha_actual           =   date("Y-m-d");
+        $titulo                 =   'Comprobantes-sin-folio-'.$operacion_id;
+        $funcion                =   $this;
+        $empresa_id             =   Session::get('empresas')->COD_EMPR;
+        $area_id                =   'TODO';
+        $rol                    =    WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
+        if($rol->ind_uc == 1 && (Session::get('usuario')->id != '1CIX00000075') ){
+            $usuario    =   SGDUsuario::where('COD_USUARIO','=',Session::get('usuario')->name)->first();
+            if(count($usuario)>0){
+                $tp_area        =   CMPCategoria::where('COD_CATEGORIA','=',$usuario->COD_CATEGORIA_AREA)->first();
+                $area_id        =   $tp_area->COD_CATEGORIA;
+            }
+        }
+        if(Session::get('usuario')->id == '1CIX00000217'){
+            $area_id        =   'TODO';
+        }
+        if($operacion_id=='ORDEN_COMPRA'){
+
+            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_sinfolio($empresa_id,$area_id);
+            Excel::create($titulo.'-('.$fecha_actual.')', function($excel) use ($listadatos,$titulo,$funcion) {
+                $excel->sheet('ORDEN COMPRA', function($sheet) use ($listadatos,$titulo,$funcion) {
+
+                    $sheet->loadView('reporte/excel/entregable/listaentregablemasivo')->with('listadatos',$listadatos)
+                                                                       ->with('titulo',$titulo)
+                                                                       ->with('funcion',$funcion);                                               
+                });
+            })->export('xls');
+
+        }else{
+
+            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato_sinfolio($cod_empresa,$empresa_id);
+            Excel::create($titulo.'-('.$fecha_actual.')', function($excel) use ($listadatos,$titulo,$funcion) {
+                $excel->sheet('CONTRATO', function($sheet) use ($listadatos,$titulo,$funcion) {
+                    $sheet->loadView('reporte/excel/entregable/listaentregablemasivocontrato')->with('listadatos',$listadatos)
+                                                                       ->with('titulo',$titulo)
+                                                                       ->with('funcion',$funcion);                                               
+                });
+            })->export('xls');
+
+        }
+
+
+
+
+
+    }
+
+
+
     public function actionListarEntregaDocumento($idopcion)
     {
         /******************* validar url **********************/

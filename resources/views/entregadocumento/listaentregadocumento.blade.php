@@ -13,9 +13,20 @@
             <div class="col-sm-12">
               <div class="panel panel-default panel-border-color panel-border-color-success">
                 <div class="panel-heading">{{ $titulo }}
-
-
                   <div class="tools tooltiptop">
+
+
+
+                    <a href="{{url('/entrega-masivo-excel')}}" 
+                       class='tn btn-secondary botoncabecera tooltipcss opciones'
+                       target="_blank"
+                       id="descargarcomprobantemasivoexcel" 
+                       data-href="{{url('/entrega-masivo-excel')}}"
+                       title="Documentos sin folios total">
+                       <span class="tooltiptext">Documentos sin folios</span>
+                       <i class="fa fa-file-excel-o"></i>
+                    </a>
+
 
                     <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones asignarmasivo">
                       <span class="tooltiptext">Integrar Entregable</span>
