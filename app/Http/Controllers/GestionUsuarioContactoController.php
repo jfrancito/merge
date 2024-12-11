@@ -2278,14 +2278,15 @@ class GestionUsuarioContactoController extends Controller
             $arrayitem      = array();
 
             foreach ($listaanticipo as $index => $item) {
-                $arrayitem               =   $arrayitem + array($item['COD_HABILITACION'] => $item['NRO_SERIE'].'-'.$item['NRO_DOC'].' // '.$item['CAN_SALDO']);
-                $monto_anticipo          =   $monto_anticipo + (float)$item['CAN_SALDO'];
+                $existeanticipo          =   FeDocumento::where('COD_ANTICIPO','=',$item['COD_HABILITACION'])
+                                             ->whereIn('COD_ESTADO',['ETM0000000000002','ETM0000000000003','ETM0000000000004','ETM0000000000005','ETM0000000000008'])
+                                             ->first();
+                if(count($existeanticipo)<=0){
+                    $arrayitem               =   $arrayitem + array($item['COD_HABILITACION'] => $item['NRO_SERIE'].'-'.$item['NRO_DOC'].' // '.$item['CAN_SALDO']);
+                    $monto_anticipo          =   $monto_anticipo + (float)$item['CAN_SALDO'];
+                }
             }
             $comboant               =   array('' => "Seleccione Anticipo")+$arrayitem;
-
-
-
-
 
             return View::make('comprobante/aprobaruc', 
                             [
@@ -3294,8 +3295,17 @@ class GestionUsuarioContactoController extends Controller
             $arrayitem      = array();
 
             foreach ($listaanticipo as $index => $item) {
-                $arrayitem               =   $arrayitem + array($item['COD_HABILITACION'] => $item['NRO_SERIE'].'-'.$item['NRO_DOC'].' // '.$item['CAN_SALDO']);
-                $monto_anticipo          =   $monto_anticipo + (float)$item['CAN_SALDO'];
+
+                $existeanticipo          =   FeDocumento::where('COD_ANTICIPO','=',$item['COD_HABILITACION'])
+                                             ->whereIn('COD_ESTADO',['ETM0000000000002','ETM0000000000003','ETM0000000000004','ETM0000000000005','ETM0000000000008'])
+                                             ->first();
+                                             
+                if(count($existeanticipo)<=0){
+
+                    $arrayitem               =   $arrayitem + array($item['COD_HABILITACION'] => $item['NRO_SERIE'].'-'.$item['NRO_DOC'].' // '.$item['CAN_SALDO']);
+                    $monto_anticipo          =   $monto_anticipo + (float)$item['CAN_SALDO'];
+
+                }
             }
             $comboant               =   array('' => "Seleccione Anticipo")+$arrayitem;
 
