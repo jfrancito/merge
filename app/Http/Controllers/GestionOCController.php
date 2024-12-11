@@ -1293,21 +1293,31 @@ class GestionOCController extends Controller
                         $path            =   $rutacompleta;
 
 
+
+
+
                         //SI TIENE DETRACCION ASIGNAR EL PDF
                         if($ordencompra_t->CAN_DETRACCION>0){
-                            $docasociar                              =   New CMPDocAsociarCompra;
-                            $docasociar->COD_ORDEN                   =   $ordencompra_t->COD_ORDEN;
-                            $docasociar->COD_CATEGORIA_DOCUMENTO     =   'DCC0000000000009';
-                            $docasociar->NOM_CATEGORIA_DOCUMENTO     =   'CONSTANCIA DE AUTODETRACCIÓN';
-                            $docasociar->IND_OBLIGATORIO             =   1;
-                            $docasociar->TXT_FORMATO                 =   'PDF';
-                            $docasociar->TXT_ASIGNADO                =   'PROVEEDOR';
-                            $docasociar->COD_USUARIO_CREA_AUD        =   Session::get('usuario')->id;
-                            $docasociar->FEC_USUARIO_CREA_AUD        =   $this->fechaactual;
-                            $docasociar->COD_ESTADO                  =   1;
-                            $docasociar->TIP_DOC                     =   'N';
-                            $docasociar->save();
+
+                            $autodetraccion             =       CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                                                                ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000009'])
+                                                                ->first();
+                            if(count($autodetraccion)<=0){
+                                $docasociar                              =   New CMPDocAsociarCompra;
+                                $docasociar->COD_ORDEN                   =   $ordencompra_t->COD_ORDEN;
+                                $docasociar->COD_CATEGORIA_DOCUMENTO     =   'DCC0000000000009';
+                                $docasociar->NOM_CATEGORIA_DOCUMENTO     =   'CONSTANCIA DE AUTODETRACCIÓN';
+                                $docasociar->IND_OBLIGATORIO             =   1;
+                                $docasociar->TXT_FORMATO                 =   'PDF';
+                                $docasociar->TXT_ASIGNADO                =   'PROVEEDOR';
+                                $docasociar->COD_USUARIO_CREA_AUD        =   Session::get('usuario')->id;
+                                $docasociar->FEC_USUARIO_CREA_AUD        =   $this->fechaactual;
+                                $docasociar->COD_ESTADO                  =   1;
+                                $docasociar->TIP_DOC                     =   'N';
+                                $docasociar->save();
+                            }
                         }
+
 
 
 
@@ -1819,9 +1829,10 @@ class GestionOCController extends Controller
                             $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
                             $dcontrol->save();
                         }
-                    }else{
-                        return Redirect::to('detalle-comprobante-oc-proveedor/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Seleccione Archivo .ZIP a Importar ');
                     }
+                    // else{
+                    //     return Redirect::to('detalle-comprobante-oc-proveedor/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Seleccione Archivo .ZIP a Importar ');
+                    // }
                 }
 
                 $contacto                                 =   SGDUsuario::where('COD_TRABAJADOR','=',$contacto_id)->first();
