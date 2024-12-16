@@ -3586,6 +3586,7 @@ trait ComprobanteTraits
                                             $join->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'oi.COD_TABLA')
                                                  ->addBinding($oi->getBindings());
                                         })
+
                                     ->whereRaw("CAST(documentos.FEC_VENCIMIENTO AS DATE) >= ? and CAST(documentos.FEC_VENCIMIENTO AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                     ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                     ->where('FE_DOCUMENTO.OPERACION','=','ORDEN_COMPRA')
@@ -3593,7 +3594,9 @@ trait ComprobanteTraits
                                         $query->where('FOLIO', '=', '');
                                         $query->orWhereNull('FOLIO');
                                     })
-                                 //   ->where('CMP.Orden.COD_ORDEN','=','IICHCR0000133599')
+
+                                    //->where('CMP.Orden.COD_ORDEN','=','ISRJCL0000001507')
+
                                     ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005'])
                                     ->where('CMP.Orden.COD_EMPR','=',$empresa_id)
                                     //->where('CMP.Orden.COD_CENTRO','=',$centro_id)

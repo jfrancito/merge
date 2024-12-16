@@ -1350,10 +1350,33 @@ class GestionOCAdministracionController extends Controller
 
             $ordencompra_f          =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
 
+
+            //Archivo multiple
+
+
+            // Construir el array de URLs
+            $initialPreview = [];
+            foreach ($archivospdf as $archivo) {
+                $initialPreview[] = route('serve-file', ['file' => $archivo->NOMBRE_ARCHIVO]);
+            }
+            $initialPreviewConfig = [];
+            foreach ($archivospdf as $key => $archivo) {
+                $initialPreviewConfig[] = [
+                    'type'          => "pdf",
+                    'caption' => $archivo->NOMBRE_ARCHIVO,
+                    'downloadUrl' => route('serve-file', ['file' => $archivo->NOMBRE_ARCHIVO])
+                ];
+            }
+
+            //dd($initialPreviewConfig);
+
             return View::make('comprobante/aprobaradm', 
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
+                                'initialPreview'        => json_encode($initialPreview),
+                                'initialPreviewConfig'  => json_encode($initialPreviewConfig),
+
                                 'ordeningreso'          =>  $ordeningreso,
                                 'linea'                 =>  $linea,
                                 'archivos'              =>  $archivos,
@@ -1736,10 +1759,33 @@ class GestionOCAdministracionController extends Controller
             }
             $transferencia        =   CMPOrden::where('COD_ORDEN','=',$resultado)->first();    
 
+            //Archivo multiple
+
+
+            // Construir el array de URLs
+            $initialPreview = [];
+            foreach ($archivospdf as $archivo) {
+                $initialPreview[] = route('serve-filecontrato', ['file' => $archivo->NOMBRE_ARCHIVO]);
+            }
+            $initialPreviewConfig = [];
+            foreach ($archivospdf as $key => $archivo) {
+                $initialPreviewConfig[] = [
+                    'type'          => "pdf",
+                    'caption' => $archivo->NOMBRE_ARCHIVO,
+                    'downloadUrl' => route('serve-filecontrato', ['file' => $archivo->NOMBRE_ARCHIVO])
+                ];
+            }
+
+
+
+
             return View::make('comprobante/aprobaradmcontrato', 
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
+                                'initialPreview'        => json_encode($initialPreview),
+                                'initialPreviewConfig'  => json_encode($initialPreviewConfig),
+
 
                                 'linea'                 =>  $linea,
                                 'archivos'              =>  $archivos,
