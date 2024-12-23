@@ -13,4 +13,6 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::resource('users', 'User\UserController', ['only' => ['index', 'show']]);
+Route::get('/resultado-api-precios', 'DocumentoApiController@actionBuscarPrecio');
+
+

@@ -28,19 +28,13 @@ Route::group(['middleware' => ['guestaw']], function () {
 Route::get('/serve-file', 'FileController@serveFile')->name('serve-file');
 Route::get('/serve-filecontrato', 'FileController@serveFileContrato')->name('serve-filecontrato');
 Route::get('/serve-filecontrato-sg', 'FileController@serveFileContratoSG')->name('serve-filecontrato-sg');
-
 Route::get('/serve-filepago', 'FileController@serveFilePago')->name('serve-filepago');
-
-
-
 Route::get('/serve-file-modelo', 'FileController@serveFileModelo')->name('serve-file-modelo');
-
 Route::any('/registrate', 'UserController@actionRegistrate');
 Route::any('/ajax-buscar-proveedor', 'UserController@actionAjaxBuscarProveedor');
 Route::get('/cerrarsession', 'UserController@actionCerrarSesion');
 Route::any('/enviocorreoconfirmaciones', 'UserController@actionCorreoConfirmacion');
 Route::any('/activar-registro/{token}', 'UserController@actionActivarRegistro');
-
 Route::any('/enviocorreouc', 'UserController@actionCorreoUC');//correo para usuario contacto
 Route::any('/enviocorreoconta', 'UserController@actionCorreoCO');//correo para contabilidad
 Route::any('/enviocorreoadmin', 'UserController@actionCorreoADM');//correo para administracion
@@ -48,14 +42,14 @@ Route::any('/enviocorreoapcli', 'UserController@actionCorreoAPCLI');//correo par
 Route::get('/cambiarperfil', 'UserController@actionCambiarPerfil');
 Route::any('/enviocorreobaja', 'UserController@actionCorreoBaja');//correo para cliente cuando se aprueba
 Route::any('/validarsunatcdr', 'GestionOCController@actionSunatCDR');//vALIDAR CDR Y SUNAT
-
 Route::any('/manual-proveedor', 'UserController@actionManualProveedor');//vALIDAR CDR Y SUNAT
 Route::any('/descargar-manual', 'UserController@actionDescargarManual');//vALIDAR CDR Y SUNAT
 Route::any('/generar-token-sunat', 'UserController@actionGenerarTokenSunat');//vALIDAR CDR Y SUNAT
 Route::any('/generar-token-sunat-curl', 'UserController@actionGenerarTokenSunat_cur');//vALIDAR CDR Y SUNAT
-
-
 Route::any('/leerdocumentos-sunat-compras', 'CpeController@actionGestionCpeCompra');//vALIDAR CDR Y SUNAT
+
+Route::any('/leerpreciocompetencia', 'PrecioCompetenciaController@actionScrapearPrecios');//vALIDAR CDR Y SUNAT
+
 
 
 Route::group(['middleware' => ['authaw']], function () {
