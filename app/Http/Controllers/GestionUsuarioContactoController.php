@@ -523,7 +523,14 @@ class GestionUsuarioContactoController extends Controller
                                                 ->get();
                 }
 
-
+                if($fedocumento->OPERACION_DET == 'SIN_XML'){
+                    $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+                                                ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
+                                                ->whereNotIn('TXT_ASIGNADO', ['ARCHIVO_VIRTUAL','ARCHIVO_FISICO'])
+                                                ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000009'])
+                                                ->whereIn('TXT_FORMATO', ['PDF'])
+                                                ->get();
+                }
 
                 foreach($tarchivos as $index => $item){
 
@@ -676,7 +683,15 @@ class GestionUsuarioContactoController extends Controller
                                             ->get();
 
             }
-
+            
+            if($fedocumento->OPERACION_DET == 'SIN_XML'){
+                $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+                                            ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
+                                            ->whereNotIn('TXT_ASIGNADO', ['ARCHIVO_VIRTUAL','ARCHIVO_FISICO'])
+                                            ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000009'])
+                                            ->whereIn('TXT_FORMATO', ['PDF'])
+                                            ->get();
+            }
 
 
 

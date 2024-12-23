@@ -7,14 +7,14 @@
         <tr>
           <th>Valor</th>
           <th>Orden de Compra</th>      
-          <th>XML</th>       
+          <th class="@if($fedocumento->OPERACION_DET == 'SIN_XML') ocultar @endif">XML</th>       
         </tr>
       </thead>
       <tbody>
           <tr>
             <td><b>RUC</b></td>
             <td><p class='subtitulomerge'>{{$ordencompra->NRO_DOCUMENTO_CLIENTE}}</p></td>
-            <td>
+            <td class="@if($fedocumento->OPERACION_DET == 'SIN_XML') ocultar @endif">
               <div class='subtitulomerge @if($fedocumento->ind_ruc == 1) msjexitoso @else msjerror @endif'><b>{{$fedocumento->RUC_PROVEEDOR}}</b>
               </div>
             </td>
@@ -23,7 +23,7 @@
           <tr>
             <td><b>RAZON SOCIAL</b></td>
             <td><p class='subtitulomerge'>{{$ordencompra->TXT_EMPR_CLIENTE}}</p></td>
-            <td>
+            <td class="@if($fedocumento->OPERACION_DET == 'SIN_XML') ocultar @endif">
               <div class='subtitulomerge @if($fedocumento->ind_rz == 1) msjexitoso @else msjerror @endif'><b>{{$fedocumento->RZ_PROVEEDOR}}</b>
               </div>
             </td>
@@ -32,7 +32,7 @@
           <tr>
             <td><b>FECHA EMISION</b></td>
             <td><p class='subtitulomerge'>{{date_format(date_create($ordencompra->FEC_ORDEN), 'd/m/Y')}}</p></td>
-            <td>
+            <td class="@if($fedocumento->OPERACION_DET == 'SIN_XML') ocultar @endif">
               <div class='subtitulomerge @if($fedocumento->ind_fecha == 1) msjexitoso @else msjerror @endif'><b>{{date_format(date_create($fedocumento->FEC_VENTA), 'd/m/Y')}}</b>
               </div>
             </td>
@@ -41,7 +41,7 @@
           <tr>
             <td><b>MONEDA</b></td>
             <td><p class='subtitulomerge'>{{$ordencompra->TXT_CATEGORIA_MONEDA}}</p></td>
-            <td>
+            <td class="@if($fedocumento->OPERACION_DET == 'SIN_XML') ocultar @endif">
               <div class='subtitulomerge @if($fedocumento->ind_moneda == 1) msjexitoso @else msjerror @endif'> <b>
                   @if($fedocumento->MONEDA == 'PEN')
                       SOLES
@@ -55,10 +55,8 @@
           <tr>
             <td><b>TOTAL</b></td>
             <td><p class='subtitulomerge'>{{number_format($ordencompra->CAN_TOTAL+$ordencompra_f->CAN_PERCEPCION, 4, '.', ',')}}</p></td>
-            <td>
+            <td class="@if($fedocumento->OPERACION_DET == 'SIN_XML') ocultar @endif">
               <div class='subtitulomerge @if($fedocumento->ind_total == 1) msjexitoso @else msjerror @endif'>
-                  <!-- <b>{{number_format($fedocumento->TOTAL_VENTA_ORIG+$fedocumento->PERCEPCION+$fedocumento->MONTO_RETENCION, 4, '.', ',')}}</b> -->
-
                   <b>{{number_format($fedocumento->TOTAL_VENTA_ORIG+$fedocumento->PERCEPCION, 4, '.', ',')}}</b>
               </div>
             </td>
@@ -67,7 +65,7 @@
           <tr>
             <td><b>FORMA PAGO</b></td>
             <td><p class='subtitulomerge'>{{$tp->NOM_CATEGORIA}}</p></td>
-            <td>
+            <td class="@if($fedocumento->OPERACION_DET == 'SIN_XML') ocultar @endif">
               <div class='subtitulomerge @if($fedocumento->ind_formapago == 1) msjexitoso @else msjerror @endif'>{{$fedocumento->FORMA_PAGO}} 
               </div>
             </td>
@@ -76,7 +74,7 @@
           <tr>
             <td><b>CANTIDAD ITEM</b></td>
             <td><p class='subtitulomerge'>{{count($detalleordencompra)}}</p></td>
-            <td>
+            <td class="@if($fedocumento->OPERACION_DET == 'SIN_XML') ocultar @endif">
                <div class='subtitulomerge @if($fedocumento->ind_cantidaditem == 1) msjexitoso @else msjerror @endif'><b>{{count($detallefedocumento)}}</b>
                </div>
             </td>

@@ -485,6 +485,7 @@ class GestionOCContabilidadController extends Controller
         }
         else{
 
+
             $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);
             //$lecturacdr             =   $this->lectura_cdr_archivo($idoc,$this->pathFiles,$prefijocarperta,$ordencompra->NRO_DOCUMENTO_CLIENTE);
             //$lecturacdr             =   $this->lectu($idoc,$this->pathFiles,$prefijocarperta,$ordencompra->NRO_DOCUMENTO_CLIENTE);
@@ -500,11 +501,8 @@ class GestionOCContabilidadController extends Controller
                                         ->orderBy('FECHA','DESC')
                                         ->get();
 
-
             $archivos               =   $this->lista_archivos_total($idoc,$fedocumento->DOCUMENTO_ITEM);
             $archivospdf            =   $this->lista_archivos_total_pdf($idoc,$fedocumento->DOCUMENTO_ITEM);
-
-
 
             //orden de ingreso
             $orden_f                =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();   

@@ -3594,9 +3594,7 @@ trait ComprobanteTraits
                                         $query->where('FOLIO', '=', '');
                                         $query->orWhereNull('FOLIO');
                                     })
-
                                     //->where('CMP.Orden.COD_ORDEN','=','ISRJCL0000001507')
-
                                     ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005'])
                                     ->where('CMP.Orden.COD_EMPR','=',$empresa_id)
                                     //->where('CMP.Orden.COD_CENTRO','=',$centro_id)

@@ -4,7 +4,7 @@
     @include('comprobante.form.ordencompra.comparar')
   </div>
   <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-    @include('comprobante.form.ordencompra.sunat')
+    @if($fedocumento->OPERACION_DET != 'SIN_XML') @include('comprobante.form.ordencompra.sunat') @endif 
     @include('comprobante.form.ordencompra.infodetraccion')
     @include('comprobante.form.ordencompra.ordeningreso')
   </div>

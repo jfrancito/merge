@@ -29,14 +29,12 @@
 <div class="form-group">
   <label class="col-sm-3 control-label">Archivos Faltantes:</label>
   <div class="col-sm-6">
-
     @foreach($documentoscompra as $index => $item)
       <div class="be-checkbox">
         <input id="{{$item->COD_CATEGORIA}}" value="{{$item->COD_CATEGORIA}}"  type="checkbox" name="archivoob[]" >
         <label for="{{$item->COD_CATEGORIA}}">{{$item->NOM_CATEGORIA}} ({{$item->COD_CTBLE}}) @if(in_array($item->COD_CATEGORIA, $totalarchivos)) <span class="label label-success">registrado</span> @endif </label>
       </div>
     @endforeach
-
   </div>
 </div>
 
