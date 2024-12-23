@@ -16,7 +16,7 @@
         <div class="panel panel-default panel-border-color panel-border-color-primary">
           <div class="panel-heading panel-heading-divider">Comprobante Reparable<span class="panel-subtitle">Comprobante Reparable</span></div>
           <div class="panel-body">
-            @if($fedocumento->IND_REPARABLE==2 && $rol->ind_uc != 1)
+<!--             @if($fedocumento->IND_REPARABLE==2 && $rol->ind_uc != 1)
               <div class="tab-container">
                 <ul class="nav nav-tabs">
                   <li class="active"><a href="#aprobar" data-toggle="tab"><b>APROBAR</b></a></li>
@@ -80,14 +80,14 @@
 
 
 
-            @else
+            @else -->
 
               <form method="POST" id='formpedido' action="{{ url('/reparable-comprobante-uc/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
                     {{ csrf_field() }}
                 @include('comprobante.form.formmitigarreparable')
               </form>
 
-            @endif
+            <!-- @endif -->
           </div>
         </div>
       </div>
