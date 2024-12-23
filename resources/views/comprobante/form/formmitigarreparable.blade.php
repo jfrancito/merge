@@ -254,7 +254,7 @@
       </div>
     </div>
   </div>
-  @if($rol->ind_uc == 1 && $fedocumento->IND_REPARABLE != 2)
+  @if($rol->ind_uc == 1)
     <div class="row xs-pt-15">
       <div class="col-xs-6">
           <div class="be-checkbox">
