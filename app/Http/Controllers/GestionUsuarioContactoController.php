@@ -1520,12 +1520,45 @@ class GestionUsuarioContactoController extends Controller
                     }
                 }
 
+
+
+
+                $ctadetraccion                            =   $request['ctadetraccion'];
+                $tipo_detraccion_id                       =   $request['tipo_detraccion_id'];
+                $monto_detraccion                         =   $request['monto_detraccion'];
+                $pago_detraccion                          =   $request['pago_detraccion'];
+
+                $empresa_sel                              =   STDEmpresa::where('COD_EMPR','=',$pago_detraccion)->first();
+                $COD_PAGO_DETRACCION = '';
+                $TXT_PAGO_DETRACCION = '';
+                if(count($empresa_sel)>0){
+                    $COD_PAGO_DETRACCION = $empresa_sel->COD_EMPR;
+                    $TXT_PAGO_DETRACCION = $empresa_sel->NOM_EMPR;
+                }
+
+                if($ctadetraccion!=''){
+                    STDEmpresa::where('COD_EMPR',$ordencompra->COD_EMPR_EMISOR)
+                                ->update(
+                                    [
+                                        'TXT_DETRACCION'=>$ctadetraccion
+                                    ]
+                                );
+                }
+
+
                 FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
                                 [
+                                    'CTA_DETRACCION'=>$ctadetraccion,
+                                    'VALOR_DETRACCION'=>$tipo_detraccion_id,
+                                    'MONTO_DETRACCION_XML'=>$monto_detraccion,
+                                    'MONTO_DETRACCION_RED'=>round($monto_detraccion),
+                                    'COD_PAGO_DETRACCION'=>$COD_PAGO_DETRACCION,
+                                    'TXT_PAGO_DETRACCION'=>$TXT_PAGO_DETRACCION,
                                     'ind_observacion'=>'0'
                                 ]
                             );
+
 
                 //HISTORIAL DE DOCUMENTO APROBADO
                 $documento                              =   new FeDocumentoHistorial;
@@ -1610,10 +1643,23 @@ class GestionUsuarioContactoController extends Controller
 
             $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','1')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
+            $empresa                =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR_EMISOR)->first();
+
+            $combotipodetraccion    =   array('' => "Seleccione Tipo Detraccion",'MONTO_REFERENCIAL' => 'MONTO REFERENCIAL' , 'MONTO_FACTURACION' => 'MONTO FACTURACION');
+            $combopagodetraccion    =   array('' => "Seleccione Pago Detraccion",$ordencompra->COD_EMPR_EMISOR => $ordencompra->TXT_EMPR_EMISOR , $ordencompra->COD_EMPR_RECEPTOR => $ordencompra->TXT_EMPR_RECEPTOR);
+            $arraybancos            =   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
+            $combobancos            =   array('' => "Seleccione Entidad Bancaria") + $arraybancos;
+
             return View::make('comprobante/observaruccontratoproveedor', 
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
+                                'empresa'               =>  $empresa,
+
+                                'combotipodetraccion'   =>  $combotipodetraccion,
+                                'combopagodetraccion'   =>  $combopagodetraccion,
+                                'combobancos'   =>  $combobancos,
+
                                 'linea'                 =>  $linea,
                                 'detalleordencompra'    =>  $detalleordencompra,
                                 'detallefedocumento'    =>  $detallefedocumento,
