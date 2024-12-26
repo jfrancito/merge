@@ -18,11 +18,33 @@ use Session;
 use Hashids;
 Use Nexmo;
 use Keygen;
+use DOMDocument;
+use DOMXPath;
 
 trait PrecioCompetenciaTraits
 {
 
 	private function scrapear_plazavea($supermercado) {
+
+		$url = "https://www.plazavea.com.pe/abarrotes/arroz";
+		// Inicializar cURL
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		// Ejecutar la solicitud
+		$html = curl_exec($ch);
+		curl_close($ch);
+		// Cargar el HTML en DOMDocument
+		$dom = new DOMDocument();
+		libxml_use_internal_errors(true); // Evitar mostrar errores de HTML no válido
+		$dom->loadHTML($html);
+		libxml_clear_errors();
+		$xpath = new DOMXPath($dom);
+
+		dd($html);
+
+
 
 		$url 	= 	'https://magicloops.dev/api/loop/90dd3c60-3bfc-4a23-abe2-77352869bf62/run?input=I+love+Magic+Loops%21';
 		$json 	=  	$this->buscar_curl($url);

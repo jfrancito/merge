@@ -52,7 +52,7 @@ class PrecioCompetenciaController extends Controller {
     public function actionScrapearPrecios()
     {
         $this->scrapear_plazavea('PLAZAVEA');
-        $this->scrapear_metro('METRO'); 
+        //$this->scrapear_metro('METRO'); 
     }
 
 
