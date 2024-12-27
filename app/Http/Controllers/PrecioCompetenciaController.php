@@ -51,8 +51,13 @@ class PrecioCompetenciaController extends Controller {
 
     public function actionScrapearPrecios()
     {
-        $this->scrapear_plazavea('PLAZAVEA');
-        //$this->scrapear_metro('METRO'); 
+    	SuperPrecio::whereDate('FECHA',date('Ymd'))->delete();
+        //$this->scrapear_plazavea('PLAZAVEA');
+        //$this->scrapear_metro('METRO');
+        $this->scrapear_tottus('TOTTUS');
+
+
+
     }
 
 
