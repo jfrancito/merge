@@ -24,43 +24,32 @@ use DOMXPath;
 trait PrecioCompetenciaTraits
 {
 
-	private function scrapear_tottus($supermercado) {
 
-// Ruta para almacenar cookies temporalmente
-$cookieFile = __DIR__ . '/cookies.txt';
+	private function scrapear_wong($supermercado) {
 
-$curl = curl_init();
+		$curl = curl_init();
+		curl_setopt_array($curl, array(
+		  CURLOPT_URL => 'https://www.wong.pe/abarrotes/arroz?__pickRuntime=appsEtag%2Cblocks%2CblocksTree%2Ccomponents%2CcontentMap%2Cextensions%2Cmessages%2Cpage%2Cpages%2Cquery%2CqueryData%2Croute%2CruntimeMeta%2Csettings',
+		  CURLOPT_RETURNTRANSFER => true,
+		  CURLOPT_ENCODING => '',
+		  CURLOPT_MAXREDIRS => 10,
+		  CURLOPT_TIMEOUT => 0,
+		  CURLOPT_FOLLOWLOCATION => true,
+		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		  CURLOPT_CUSTOMREQUEST => 'GET',
+		  CURLOPT_HTTPHEADER => array(
+		    'Cookie: VtexWorkspace=master%3A-; janus_sid=63244439-8888-45f4-89ad-fba9a36e7b42'
+		  ),
+		));
 
-curl_setopt_array($curl, array(
-    CURLOPT_URL => 'https://tottus.falabella.com.pe/tottus-pe/category/CATG14739/Arroz',
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_ENCODING => '',
-    CURLOPT_MAXREDIRS => 10,
-    CURLOPT_TIMEOUT => 0,
-    CURLOPT_FOLLOWLOCATION => true,
-    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-    CURLOPT_CUSTOMREQUEST => 'GET',
-    CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
-    CURLOPT_COOKIEFILE => $cookieFile, // Archivo para leer cookies
-    CURLOPT_COOKIEJAR => $cookieFile, // Archivo para guardar cookies
-));
-
-$response = curl_exec($curl);
-
-// if (curl_errno($curl)) {
-//     echo 'Error: ' . curl_error($curl);
-// } else {
-//     echo $response;
-// }
-
-curl_close($curl);
-		// Cargar el HTML en DOMDocument
-		dd($response);
-
-		$array_data 	= json_decode($html,true);
+		$response = curl_exec($curl);
+		$array_data 	= json_decode($response,true);
+		$array_data2 	= json_decode($array_data['queryData'][0]['data'],true);
 		//primera pagina
-		foreach ($array_data['data']['productSearch']['products'] as $product) {
-			if (strpos($product['productName'], 'Pack') === false) {
+		foreach ($array_data2['productSearch']['products'] as $product) {
+
+			//dd($product);
+			if (strpos($product['productName'], 'Carmencita') === false) {
 				// Convertir el resultado en una cadena
 				$marca = strtoupper($product['brand']);
 				if($marca==''){
@@ -92,6 +81,85 @@ curl_close($curl);
 	            $tabla->save();
 
         	}
+		}
+
+	}
+
+
+
+
+	private function scrapear_tottus($supermercado) {
+
+		// Ruta para almacenar cookies temporalmente
+		$cookieFile = __DIR__ . '/cookies.txt';
+		$curl = curl_init();
+		curl_setopt_array($curl, array(
+		    CURLOPT_URL => 'https://tottus.falabella.com.pe/tottus-pe/category/CATG14739/Arroz',
+		    CURLOPT_RETURNTRANSFER => true,
+		    CURLOPT_ENCODING => '',
+		    CURLOPT_MAXREDIRS => 10,
+		    CURLOPT_TIMEOUT => 0,
+		    CURLOPT_FOLLOWLOCATION => true,
+		    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		    CURLOPT_CUSTOMREQUEST => 'GET',
+		    CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
+		    CURLOPT_COOKIEFILE => $cookieFile, // Archivo para leer cookies
+		    CURLOPT_COOKIEJAR => $cookieFile, // Archivo para guardar cookies
+		));
+		$response = curl_exec($curl);
+		curl_close($curl);
+		preg_match('/<script id="__NEXT_DATA__" type="application\/json">(.*?)<\/script>/', $response, $string);
+		$array_data 	= json_decode($string[1],true);
+		// Cargar el HTML en DOMDocument
+		//primera pagina
+		foreach ($array_data['props']['pageProps']['results'] as $product) {
+
+
+
+			if (strpos($product['displayName'], 'Pack') === false) {
+				// Convertir el resultado en una cadena
+
+				//dd($product);
+				$marca = strtoupper($product['brand']);
+				if($marca==''){
+					$marca = 'GENERICO';
+				}
+				$precio = $product['prices'][0]['price'][0];
+				// Dividir la cadena por espacios
+				preg_match('/(\d+)\s*(kg|g|k)/i', $product['displayName'], $matches);
+				//preg_match('/(\d+)(\D+)/', $ump, $matches);
+				// Obtener el valor numérico y el texto
+				$peso = 0; // 5
+				$unidad = ''; // kg
+				if(isset($matches[2])){
+					$unidad = $matches[2]; // kg
+					if($unidad =='k'){
+						$unidad = 'kg';
+					}
+
+				}
+				if(isset($matches[1])){
+					$peso = $matches[1]; // 5
+				}else{
+					if (preg_match('/(\d+)(kg|g)/i', $product['url'], $matches)) {
+					    $peso = (int)$matches[1]; // Extrae el número
+					    $unidad = $matches[2];       // Extrae la unidad (kg o g)
+					}
+				}
+
+        $tabla                       	=   new SuperPrecio;
+        $tabla->MARCA         	 			=   $marca;
+        $tabla->SUPERMERCADO      		=   $supermercado;
+        $tabla->FECHA      	     			=   date('Ymd');
+        $tabla->FECHA_TIME        		=   date('Ymd h:i:s');
+        $tabla->NOMBRE_PRODUCTO   		=   $product['displayName'];
+        $tabla->DESCRIPCION_PRODUCTO 	=   '';
+        $tabla->PRECIO            		=   (float)$precio;
+        $tabla->UNIDAD_MEDIDA     		=   $unidad;
+        $tabla->PESO        		 			=   (float)$peso;
+        $tabla->save();
+
+      }
 		}
 
 	}

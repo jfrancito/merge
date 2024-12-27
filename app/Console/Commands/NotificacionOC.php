@@ -7,16 +7,18 @@ use Illuminate\Support\Facades\Log;
 use Mail;
 use DB;
 use DateTime;
+use App\Modelos\SuperPrecio;
+
 use App\Traits\UserTraits;
-
 use App\Traits\ComprobanteTraits;
-
+use App\Traits\PrecioCompetenciaTraits;
+use Maatwebsite\Excel\Facades\Excel;
 
 class NotificacionOC extends Command
 {
     use UserTraits;
     use ComprobanteTraits;
-    
+    use PrecioCompetenciaTraits;
     /**
      * The name and signature of the console command.
      *
@@ -55,10 +57,8 @@ class NotificacionOC extends Command
         $this->sunat_cdr();
         $this->ejecutar_orden_ingreso();
         $this->sunat_cdr_contrato();
-
-
-
         $horaActual = date("H:i");
+
 
         if($horaActual == '07:00' || 
             $horaActual == '10:00' || 
@@ -70,17 +70,29 @@ class NotificacionOC extends Command
             $this->cambiar_parcialmente();
         }
 
-        // COMENTANDO NO VALE
-        // $this->envio_correo_uc();
-        // //CONTABILIDAD
-        // $this->envio_correo_co();
-        // //ADMINISTRACION
-        // $this->envio_correo_adm();
-        // //PROVISIONAR
-        // $this->envio_correo_apcli();
-        // //BAJA COMPROBANTE
-        // $this->envio_correo_baja();
-
+        //precios de supermercado
+        try{    
+            if($horaActual == '03:00' || 
+                $horaActual == '04:00'){
+                DB::beginTransaction();
+                SuperPrecio::whereDate('FECHA',date('Ymd'))->delete();
+                $this->scrapear_plazavea('PLAZAVEA');
+                $this->scrapear_metro('METRO');
+                $this->scrapear_tottus('TOTTUS');
+                $this->scrapear_wong('WONG');
+                $lista_precios = SuperPrecio::orderby('MARCA','asc')->get();
+                //dd($lista_precios);
+                Excel::create('DATAAUTOMATICA_BD', function($excel) use ($lista_precios) {
+                    $excel->sheet('PRECIOS_SUPER', function($sheet) use ($lista_precios) {
+                        $sheet->loadView('reporte/excel/listapreciossupermercados')->with('lista_precios',$lista_precios);                                               
+                    });
+                })->store('xlsx', 'F:/Data_Drive');
+                DB::commit();
+            }
+        }catch(\Exception $ex){
+            DB::rollback();
+            dd($ex);
+        }
 
     }
 }

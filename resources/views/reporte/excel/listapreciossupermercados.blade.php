@@ -1,0 +1,29 @@
+<html>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <table>
+        <tr>
+            <th>MARCA</th>
+            <th>SUPERMERCADO</th>
+            <th>FECHA</th>
+            <th>FECHA_TIME</th>
+            <th>NOMBRE_PRODUCTO</th>
+            <th>DESCRIPCION_PRODUCTO</th>
+            <th>PRECIO</th>
+            <th>UNIDAD_MEDIDA</th>
+            <th>PESO</th>
+        </tr>
+        @foreach($lista_precios as $index => $item) 
+        <tr>
+            <td>{{$item->MARCA}}</td>
+            <td>{{$item->SUPERMERCADO}}</td>
+            <td>{{$item->FECHA}}</td>
+            <td>{{$item->FECHA_TIME}}</td>
+            <td>{{$item->NOMBRE_PRODUCTO}}</td>
+            <td>{{$item->DESCRIPCION_PRODUCTO}}</td>
+            <td>{{$item->PRECIO}}</td>
+            <td>{{$item->UNIDAD_MEDIDA}}</td>
+            <td>{{$item->PESO}}</td>
+        </tr>
+        @endforeach
+    </table>
+</html>
