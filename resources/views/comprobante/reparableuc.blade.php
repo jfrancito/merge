@@ -16,10 +16,78 @@
         <div class="panel panel-default panel-border-color panel-border-color-primary">
           <div class="panel-heading panel-heading-divider">Comprobante Reparable<span class="panel-subtitle">Comprobante Reparable</span></div>
           <div class="panel-body">
+            @if($fedocumento->IND_REPARABLE==2 && $rol->ind_uc != 1)
+              <div class="tab-container">
+                <ul class="nav nav-tabs">
+                  <li class="active"><a href="#aprobar" data-toggle="tab"><b>APROBAR</b></a></li>
+                  <li><a href="#observar" data-toggle="tab"><b>OBSERVAR</b></a></li>
+                </ul>
+                <div class="tab-content">
+                  <div id="aprobar" class="tab-pane active cont">
+                        <div class="panel panel-default panel-border-color panel-border-color-primary">
+                          <div class="panel-heading panel-heading-divider">Aprobar Comprobante Reparable<span class="panel-subtitle">Aprobar un Comprobante Contabilidad</span></div>
+                          <div class="panel-body">
+                            <form method="POST" id='formpedido' action="{{ url('/aprobar-comprobante-contabilidad-reparable/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
+                                  {{ csrf_field() }}
+                              @include('comprobante.form.formaprobarcontreparable')
+                              <div class="row xs-pt-15">
+                                <div class="col-xs-6">
+                                    <div class="be-checkbox">
+                                    </div>
+                                </div>
+                                <div class="col-xs-6">
+                                  <p class="text-right">
+                                    <a href="{{ url('/gestion-de-comprobantes-reparable/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
+                                    <button type="button"  class="btn btn-space btn-primary btnaprobarcomporbatnte">Guardar</button>
+                                  </p>
+                                </div>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                  </div>
+                  <div id="observar" class="tab-pane cont">
+                    <div class="panel panel-default panel-border-color panel-border-color-primary">
+                      <div class="panel-heading panel-heading-divider">Observar Comprobante<span class="panel-subtitle">Observar un Comprobante Reparable</span></div>
+                      <div class="panel-body">
+
+                          <form method="POST" id='formpedidoobservar' action="{{ url('/agregar-observacion-contabilidad-reparable/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
+                                {{ csrf_field() }}
+                            @include('comprobante.form.formobservarreparable')
+                            <div class="row xs-pt-15">
+                              <div class="col-xs-6">
+                                  <div class="be-checkbox">
+
+                                  </div>
+                              </div>
+                              <div class="col-xs-6">
+                                <p class="text-right">
+                                  <a href="{{ url('/gestion-de-comprobantes-reparable/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
+                                      <button type="button"  class="btn btn-space btn-primary btnobservarcomporbatnte">Guardar</button>
+                                </p>
+                              </div>
+                            </div>
+
+                          </form>
+
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+
+
+
+            @else
+
               <form method="POST" id='formpedido' action="{{ url('/reparable-comprobante-uc/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
                     {{ csrf_field() }}
                 @include('comprobante.form.formmitigarreparable')
               </form>
+
+            @endif
           </div>
         </div>
       </div>
