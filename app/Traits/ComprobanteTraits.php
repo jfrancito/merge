@@ -559,7 +559,7 @@ trait ComprobanteTraits
             ->update([
                 'CMP.ORDEN.COD_CATEGORIA_ESTADO_ORDEN' => 'EOR0000000000003',
                 'CMP.ORDEN.TXT_CATEGORIA_ESTADO_ORDEN' => 'TERMINADA',
-                'CMP.ORDEN.COD_USUARIO_CREA_AUD' => 'MERGE',
+                'CMP.ORDEN.COD_USUARIO_MODIF_AUD' => 'MERGE',
                 'CMP.ORDEN.FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
             ]);
 
@@ -579,7 +579,7 @@ trait ComprobanteTraits
                 ->update([
                     'CMP.ORDEN.COD_CATEGORIA_ESTADO_ORDEN' => 'EOR0000000000003',
                     'CMP.ORDEN.TXT_CATEGORIA_ESTADO_ORDEN' => 'TERMINADA',
-                    'CMP.ORDEN.COD_USUARIO_CREA_AUD' => 'MERGE',
+                    'CMP.ORDEN.COD_USUARIO_MODIF_AUD' => 'MERGE',
                     'CMP.ORDEN.FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
                 ]);
 
@@ -602,7 +602,7 @@ trait ComprobanteTraits
                 ->update([
                     'CMP.ORDEN.COD_CATEGORIA_ESTADO_ORDEN' => 'EOR0000000000003',
                     'CMP.ORDEN.TXT_CATEGORIA_ESTADO_ORDEN' => 'TERMINADA',
-                    'CMP.ORDEN.COD_USUARIO_CREA_AUD' => 'MERGE',
+                    'CMP.ORDEN.COD_USUARIO_MODIF_AUD' => 'MERGE',
                     'CMP.ORDEN.FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
                 ]);
             
