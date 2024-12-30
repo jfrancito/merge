@@ -30,13 +30,12 @@
                             </div>
                         </div>
 
-           
-
+          
                         <div class="col-xs-12 col-sm-4 col-md-4 col-lg-3">
                           <div class="form-group">
                             <label class="col-sm-12 control-label labelleft" style="text-align: left;"><b>Monto de Detracion (*):</b></label>
                             <div class="col-sm-12 abajocaja" >
-                                                              <input type="text"  class="form-control control input-sm" value = '{{$fedocumento->MONTO_DETRACCION_XML}}' readonly>
+                                                              <input type="text"  class="form-control control input-sm" value = '{{$fedocumento->MONTO_DETRACCION_RED}}' readonly>
                             </div>
                           </div>
                         </div>
