@@ -1949,10 +1949,9 @@ trait ComprobanteTraits
                             })
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
+                                      ->orwhere('area_observacion', '=', 'UCO')
                                       ->orWhereNull('area_observacion');
                             })
-
-                            
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
                             ->orderBy('ind_observacion','asc')
