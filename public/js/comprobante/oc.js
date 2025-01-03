@@ -1,10 +1,42 @@
 $(document).ready(function(){
-
     var carpeta = $("#carpeta").val();
 
     $(".agestioncomprobante").on('click','.btn_rb', function() {
        abrircargando();
     });
+
+    $(".agestioncomprobante").on('click','.migrarestibaadmin', function() {
+        event.preventDefault();
+        $('input[type=search]').val('').change();
+        $("#nso").DataTable().search("").draw();
+        data = dataenviar();
+        if(data.length<=0){alerterrorajax('Seleccione por lo menos una fila'); return false;}
+        var datastring = JSON.stringify(data);
+
+        var idopcion                =   $('#idopcion').val();
+        var _token                  =   $('#token').val();
+        $('#jsondocumenos').val(datastring);
+        $('#formre').submit();
+
+    });
+
+    function dataenviar(){
+        var data = [];
+        $(".listatabla tr").each(function(){
+            nombre          = $(this).find('.input_asignar').attr('id');
+            if(nombre != 'todo_asignar'){
+                check                       = $(this).find('.input_asignar');
+                data_requerimiento_id       = $(this).attr('data_requerimiento_id');
+                if($(check).is(':checked')){
+                    data.push({
+                        data_requerimiento_id  : data_requerimiento_id,
+                    });
+                }
+
+            }
+        });
+        return data;
+    }
 
 
     $(".agestioncomprobante").on('click','.input_check_pe_ln', function() {

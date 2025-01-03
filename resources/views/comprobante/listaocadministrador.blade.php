@@ -14,32 +14,22 @@
               <div class="panel panel-default panel-border-color panel-border-color-success">
                 <div class="panel-heading">{{ $titulo }}
 
+                  <form method="POST" id='formre' action="{{ url('/select-xml-estiba/'.$idopcion) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
+                        {{ csrf_field()}}
+                        <input type="hidden" name="jsondocumenos" id = 'jsondocumenos'>
+                  </form>
+
                   <div class="tools tooltiptop">
-
-<!--                     <a href="{{ url('/migracion-rioja/k5X') }}" class="btn btn-secondary botoncabecera tooltipcss opciones btn_rb">
-                      <span class="tooltiptext">Migraion Rioja</span>
-                      M.R.
+                    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones migrarestibaadmin">
+                      <span class="tooltiptext">Registrar Estiba</span>
+                      <span class="icon mdi mdi-collection-image"></span>
                     </a>
-
-                    <a href="{{ url('/migracion-bellavista/k5X') }}" class="btn btn-secondary botoncabecera tooltipcss opciones btn_rb">
-                      <span class="tooltiptext">Migraion Bellavista</span>
-                      M.B.
-                    </a> -->
-
                     <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscardocumentoadmin">
                       <span class="tooltiptext">Buscar Documento</span>
                       <span class="icon mdi mdi-search"></span>
                     </a>
-
-
                   </div>
-
-
-
-
                 </div>
-
-
                 
                   <div class="panel-body">
                     <div class='filtrotabla row'>
