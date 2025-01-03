@@ -539,18 +539,19 @@ class GestionOCController extends Controller
 
     public function actionListarOCAdmin($idopcion)
     {
-
         /******************* validar url **********************/
         $validarurl = $this->funciones->getUrl($idopcion,'Ver');
         if($validarurl <> 'true'){return $validarurl;}
         /******************************************************/
         View::share('titulo','Integracion de Comprobante');
         $operacion_id       =   'ORDEN_COMPRA';
+        $operacion_id       =   'ESTIBA';
+
         $array_contrato     =   $this->array_rol_contrato();
         if (in_array(Session::get('usuario')->rol_id, $array_contrato)) {
             $operacion_id       =   'CONTRATO';
         }
-        $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO');
+        $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO','ESTIBA' => 'ESTIBA');
         $cod_empresa        =   Session::get('usuario')->usuarioosiris_id;
         $procedencia        =   'ADM';
         $funcion            =   $this;
@@ -559,10 +560,12 @@ class GestionOCController extends Controller
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_administrativo($cod_empresa);
         }else{
-            $listadatos         =   $this->con_lista_cabecera_contrato_administrativo($cod_empresa);
+            if($operacion_id=='CONTRATO'){
+                $listadatos         =   $this->con_lista_cabecera_contrato_administrativo($cod_empresa);
+            }else{
+                $listadatos         =   $this->con_lista_cabecera_estibas_administrativo($cod_empresa);
+            }
         }
-
-        //dd($listadatos);
         return View::make('comprobante/listaocadministrador',
                          [
                             'listadatos'        =>  $listadatos,
@@ -572,8 +575,45 @@ class GestionOCController extends Controller
                             'funcion'           =>  $funcion,
                             'idopcion'          =>  $idopcion,
                          ]);
-
     }
+
+
+    public function actionListarAjaxBuscarDocumentoAdmin(Request $request) {
+
+        $operacion_id   =   $request['operacion_id'];
+        $idopcion       =   $request['idopcion'];
+        $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
+
+        if($operacion_id=='ORDEN_COMPRA'){
+            $listadatos         =   $this->con_lista_cabecera_comprobante_administrativo($cod_empresa);
+        }else{
+            if($operacion_id=='CONTRATO'){
+                $listadatos         =   $this->con_lista_cabecera_contrato_administrativo($cod_empresa);
+            }else{
+                $listadatos         =   $this->con_lista_cabecera_estibas_administrativo($cod_empresa);
+            }
+        }
+
+        
+        $procedencia        =   'ADM';
+        $funcion                =   $this;
+        return View::make('comprobante/ajax/mergelistaadministrador',
+                         [
+                            'operacion_id'          =>  $operacion_id,
+
+                            'idopcion'              =>  $idopcion,
+                            'cod_empresa'           =>  $cod_empresa,
+                            'listadatos'            =>  $listadatos,
+                            'procedencia'           =>  $procedencia,
+                            'ajax'                  =>  true,
+
+                            'funcion'               =>  $funcion
+                         ]);
+    }
+
+
+
+
 
     public function actionListarOCFiltro($idopcion)
     {
@@ -619,43 +659,13 @@ class GestionOCController extends Controller
         $txt_confirma                       =   '';
 
         if($ind_mobil=='1'){
-            $txt_confirma                   =   Session::get('usuario')->nombre;;
+            $txt_confirma                   =   Session::get('usuario')->nombre;
         }
 
         $producto                           =   CMPOrden::where('COD_ORDEN','=',$producto_id)->first();
         $producto->TXT_CONFORMIDAD          =   $txt_confirma;
         $producto->save();
 
-    }
-
-
-
-
-
-    public function actionListarAjaxBuscarDocumentoAdmin(Request $request) {
-
-        $operacion_id   =   $request['operacion_id'];
-        $idopcion       =   $request['idopcion'];
-        $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
-        if($operacion_id=='ORDEN_COMPRA'){
-            $listadatos         =   $this->con_lista_cabecera_comprobante_administrativo($cod_empresa);
-        }else{
-            $listadatos         =   $this->con_lista_cabecera_contrato_administrativo($cod_empresa);
-        }
-        $procedencia        =   'ADM';
-        $funcion                =   $this;
-        return View::make('comprobante/ajax/mergelistaadministrador',
-                         [
-                            'operacion_id'          =>  $operacion_id,
-
-                            'idopcion'              =>  $idopcion,
-                            'cod_empresa'           =>  $cod_empresa,
-                            'listadatos'            =>  $listadatos,
-                            'procedencia'           =>  $procedencia,
-                            'ajax'                  =>  true,
-
-                            'funcion'               =>  $funcion
-                         ]);
     }
 
 
@@ -2165,8 +2175,6 @@ class GestionOCController extends Controller
         $combodocumento         =   array('DCC0000000000002' => 'FACTURA ELECTRONICA' , 'DCC0000000000013' => 'RECIBO POR HONORARIO');
         $documento_id           =   'DCC0000000000002';
         $funcion                =   $this;
-
-
 
         $user_orden             =   User::where('usuarioosiris_id','=',$ordencompra->COD_EMPR_EMISOR)->first();
         $empresa                =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR_EMISOR)->first();

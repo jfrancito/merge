@@ -3158,9 +3158,8 @@ trait ComprobanteTraits
         $ordencompra_t          =   CMPOrden::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->first();
 
 
-        
         $total_1 = $ordencompra->CAN_TOTAL-$ordencompra_t->CAN_RETENCION+$ordencompra_t->CAN_PERCEPCION;
-        $total_2 = $fedocumento->TOTAL_VENTA_ORIG+$ordencompra_t->CAN_PERCEPCION;//+$fedocumento->PERCEPCION+$fedocumento->MONTO_RETENCION;
+        $total_2 = $fedocumento->TOTAL_VENTA_ORIG+$ordencompra_t->CAN_PERCEPCION-$ordencompra_t->CAN_RETENCION;//+$fedocumento->PERCEPCION+$fedocumento->MONTO_RETENCION;
         $tt_totales = round(abs($total_1 - $total_2), 2);
 
         //dd($total_1);
@@ -3295,6 +3294,52 @@ trait ComprobanteTraits
                                 'ind_ruc'=>$ind_ruc,
                                 'ind_rz'=>$ind_rz,
                                 
+                                'ind_moneda'=>$ind_moneda,
+                                'ind_total'=>$ind_total,
+                                'ind_cantidaditem'=>$ind_cantidaditem,
+                                'ind_formapago'=>$ind_formapago,
+                                'ind_errototal'=>$ind_errototal,
+                            ]);
+
+    }
+
+    private function con_validar_documento_proveedor_estiba($documento_asociados,$documento_top,$fedocumento,$detallefedocumento,$idoc){
+
+        $ind_ruc            =   0;
+        $ind_rz             =   0;
+        $ind_moneda         =   0;
+        $ind_total          =   0;
+        $ind_cantidaditem   =   0;
+        $ind_formapago      =   0;
+        $ind_errototal      =   1;
+        //ruc
+        $ind_ruc            =   1;  
+        $ind_rz             =   1;  
+        //moneda
+        $txtmoneda          =   '';
+        if($fedocumento->MONEDA == 'PEN'){
+            $txtmoneda          =   'SOLES';    
+        }else{
+            $txtmoneda          =   'DOLARES';
+        }
+        if($documento_top->TXT_CATEGORIA_MONEDA == $txtmoneda){
+            $ind_moneda             =   1;  
+        }else{  $ind_errototal      =   0;  }
+        $total_1 = $documento_asociados->sum('CAN_TOTAL');
+        $total_2 = $fedocumento->TOTAL_VENTA_ORIG;
+        $tt_totales = round(abs($total_1 - $total_2), 2);
+        //0.02
+        if($tt_totales <= 0.04){
+            $ind_total          =   1;  
+        }else{  $ind_errototal      =   0;  }
+        $ind_cantidaditem           =   1;
+        $ind_formapago              =   1; 
+
+        FeDocumento::where('ID_DOCUMENTO','=',$idoc)
+                    ->update(
+                            [
+                                'ind_ruc'=>$ind_ruc,
+                                'ind_rz'=>$ind_rz,
                                 'ind_moneda'=>$ind_moneda,
                                 'ind_total'=>$ind_total,
                                 'ind_cantidaditem'=>$ind_cantidaditem,
@@ -3962,7 +4007,83 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
+    private function con_lista_cabecera_estibas_administrativo($cliente_id) {
 
+        $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+        $array_trabajadores  =      STDTrabajador::where('NRO_DOCUMENTO','=',$trabajador->NRO_DOCUMENTO)
+                                    ->pluck('COD_TRAB')
+                                    ->toArray();
+        $array_usuarios      =      SGDUsuario::whereIn('COD_TRABAJADOR',$array_trabajadores)
+                                    ->pluck('COD_USUARIO')
+                                    ->toArray();
+        $estado_no          =       'ETM0000000000006';
+        $centro_id          =       $trabajador->COD_ZONA_TIPO;
+        $tipodoc_id         =       'TDO0000000000067';
+
+        if(Session::get('usuario')->id== '1CIX00000001'){
+
+            $listadatos         =       VMergeDocumento::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                            $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
+                                                ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                                        })
+                                        ->where('VMERGEDOCUMENTOS.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                        ->where(function ($query) {
+                                            $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
+                                                  ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
+                                                  ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
+                                        })
+                                        ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
+                                        ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
+                                                            FEC_EMISION,
+                                                            TXT_CATEGORIA_MONEDA,
+                                                            TXT_EMPR_EMISOR,
+                                                            COD_USUARIO_CREA_AUD,
+                                                            CAN_TOTAL,
+                                                            NRO_SERIE,
+                                                            NRO_DOC,
+                                                            
+                                                            FE_DOCUMENTO.ID_DOCUMENTO,
+                                                            FE_DOCUMENTO.COD_ESTADO,
+                                                            FE_DOCUMENTO.TXT_ESTADO
+                                                        '))
+                                        ->get();
+
+        }else{
+
+            $listadatos         =       VMergeDocumento::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                            $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
+                                                ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                                        })
+                                        ->where('VMERGEDOCUMENTOS.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                        ->where(function ($query) {
+                                            $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
+                                                  ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
+                                                  ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
+                                        })
+                                        ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
+                                        ->where('COD_CENTRO','=',$centro_id)
+                                        ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
+                                                            FEC_EMISION,
+                                                            TXT_CATEGORIA_MONEDA,
+                                                            TXT_EMPR_EMISOR,
+                                                            COD_USUARIO_CREA_AUD,
+                                                            CAN_TOTAL,
+                                                            NRO_SERIE,
+                                                            NRO_DOC,
+                                                            
+                                                            FE_DOCUMENTO.ID_DOCUMENTO,
+                                                            FE_DOCUMENTO.COD_ESTADO,
+                                                            FE_DOCUMENTO.TXT_ESTADO
+                                                        '))
+                                        ->get();
+
+        }
+
+
+
+
+        return  $listadatos;
+    }
 
 
 
