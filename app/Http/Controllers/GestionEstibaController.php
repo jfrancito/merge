@@ -61,16 +61,33 @@ class GestionEstibaController extends Controller
     {
         $jsondocumenos                          =    json_decode($request['jsondocumenos'],true);
         $lote                                   =    $this->funciones->generar_lote('FE_REF_ASOC',8);
+        $sw                                     =    0;
+        foreach ($jsondocumenos as $key => $item) {
+            $ID_DOCUMENTO = $item['data_requerimiento_id'];
+            $feref = FeRefAsoc::where('ID_DOCUMENTO','=',$ID_DOCUMENTO)->where('COD_ESTADO','=','1')->first();
+            if(count($feref)>0){
+                $sw                             =    1;  
+            }
+        }
+        if($sw==1){
+            return Redirect::to('gestion-de-orden-compra/'.$idopcion)->with('errorbd', 'Has seleccionado Documentos que ya tienen lotes activos');  
+        }
+
+
+
         foreach ($jsondocumenos as $key => $item) {
             $ID_DOCUMENTO = $item['data_requerimiento_id'];
             $docasociar                              =   New FeRefAsoc;
             $docasociar->LOTE                        =   $lote;
             $docasociar->ID_DOCUMENTO                =   $ID_DOCUMENTO;
             $docasociar->FECHA_CREA                  =   $this->fechaactual;
+            $docasociar->COD_ESTADO                  =   1;
             $docasociar->USUARIO_CREA                =   Session::get('usuario')->id;
             $docasociar->save();
 
         }
+
+
         return Redirect::to('detalle-comprobante-estiba-administrator/'.$idopcion.'/'.$lote);
     }
 
@@ -81,11 +98,22 @@ class GestionEstibaController extends Controller
         $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
         View::share('titulo','REGISTRO DE COMPROBANTE ESTIBA :'.$lote);
         $tiposerie              =   '';
+        $empresa                =   array();
+
+        $usuario                =   SGDUsuario::where('COD_TRABAJADOR','=',Session::get('usuario')->usuarioosiris_id)->first();
+
+
+
         if(count($fedocumento)>0){
+
             $detallefedocumento =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
             $tiposerie          =   substr($fedocumento->SERIE, 0, 1);
+            $empresa            =   STDEmpresa::where('NRO_DOCUMENTO','=',$fedocumento->RUC_PROVEEDOR)->first();
+
         }else{
             $detallefedocumento =   array();
+
+
         }
         $contacto               =   DB::table('users')->where('ind_contacto','=',1)->pluck('nombre','id')->toArray();
         $combocontacto          =   array('' => "Seleccione Contacto") + $contacto;
@@ -122,18 +150,58 @@ class GestionEstibaController extends Controller
         $documento_asociados    =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->get();
         $documento_top          =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->first();
 
-        $empresa                =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR_EMISOR)->first();
+
+
+        //ANTICIPO
+        $COD_EMPR               =   Session::get('empresas')->COD_EMPR;
+        $COD_CENTRO             =   '';
+        $FEC_CORTE              =   $this->hoy_sh;
+        $CLIENTE                =   $documento_top->COD_EMPR_EMISOR;
+        $COD_MONEDA             =   $documento_top->COD_CATEGORIA_MONEDA;
+        $monto_anticipo         =   0.00;
+        $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.OBTENER_ADELANTOS_PROVEEDOR_DETALLADO 
+                                                                @COD_EMPR = ?,
+                                                                @COD_CENTRO = ?,
+                                                                @FEC_CORTE = ?,
+                                                                @CLIENTE = ?,
+                                                                @COD_MONEDA = ?'
+                                                            );
+        $stmt->bindParam(1, $COD_EMPR, PDO::PARAM_STR);
+        $stmt->bindParam(2, $COD_CENTRO, PDO::PARAM_STR);
+        $stmt->bindParam(3, $FEC_CORTE, PDO::PARAM_STR);
+        $stmt->bindParam(4, $CLIENTE, PDO::PARAM_STR);
+        $stmt->bindParam(5, $COD_MONEDA, PDO::PARAM_STR);
+        $stmt->execute();
+        $listaanticipo = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $arrayitem      = array();
+        //ver si ya estan registrados algunos anticipos
+        foreach ($listaanticipo as $index => $item) {
+            $existeanticipo          =   FeDocumento::where('COD_ANTICIPO','=',$item['COD_HABILITACION'])
+                                         ->whereIn('COD_ESTADO',['ETM0000000000002','ETM0000000000003','ETM0000000000004','ETM0000000000005','ETM0000000000008'])
+                                         ->first();
+            if(count($existeanticipo)<=0){
+                $arrayitem               =   $arrayitem + array($item['COD_HABILITACION'] => $item['NRO_SERIE'].'-'.$item['NRO_DOC'].' // '.$item['CAN_SALDO']);
+                $monto_anticipo          =   $monto_anticipo + (float)$item['CAN_SALDO'];  
+            }
+
+        }
+        $comboant               =   array('' => "Seleccione Anticipo")+$arrayitem;
+
 
 
 
         return View::make('comprobante/registrocomprobanteestibaadministrator',
                          [
+                            'monto_anticipo'        =>  $monto_anticipo,
+                            'comboant'              =>  $comboant,
                             'combotipodetraccion'   =>  $combotipodetraccion,
                             'combopagodetraccion'   =>  $combopagodetraccion,
                             'fedocumento_x'         =>  $fedocumento_x,
+                            'empresa'               =>  $empresa,
                             'combobancos'           =>  $combobancos,
                             'documento_asociados'   =>  $documento_asociados,
                             'documento_top'         =>  $documento_top,
+                            'usuario'               =>  $usuario,
                             'combotipodetraccion'   =>  $combotipodetraccion,
                             'cb_id'                 =>  $cb_id,
                             'idoc'                  =>  $idoc,
@@ -465,7 +533,25 @@ class GestionEstibaController extends Controller
         }
     }
 
+    public function actionCargarModalDetalleLotes(Request $request) {
 
+        $feasoc         =   FeRefAsoc::where('','','')->get();
+        $funcion        =   $this;
+
+        return View::make('entregadocumento/modal',
+                         [
+                            'fecha_inicio'          =>  $fecha_inicio,
+                            'fecha_fin'             =>  $fecha_fin,
+                            'empresa_id'            =>  $empresa_id,
+                            'centro_id'             =>  $centro_id,
+                            'idopcion'              =>  $idopcion,
+                            'cod_empresa'           =>  $cod_empresa,
+                            'listadatos'            =>  $listadatos,
+                            'ajax'                  =>  true,
+                            'operacion_id'            =>  $operacion_id,
+                            'funcion'               =>  $funcion
+                         ]);
+    }
 
 
 }

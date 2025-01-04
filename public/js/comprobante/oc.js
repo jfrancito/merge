@@ -5,6 +5,20 @@ $(document).ready(function(){
        abrircargando();
     });
 
+    $(".agestioncomprobante").on('click','.lotesestibas', function(e) {
+        var _token                  =   $('#token').val();
+        var idopcion                =   $('#idopcion').val();
+        data                        =   {
+                                            _token                  : _token,
+                                            idopcion                : idopcion,
+                                        };
+
+        ajax_modal(data,"/ajax-modal-detalle-lotes",
+                  "modal-detalle-entregable","modal-detalle-entregable-container");
+
+    });
+
+
     $(".agestioncomprobante").on('click','.migrarestibaadmin', function() {
         event.preventDefault();
         $('input[type=search]').val('').change();

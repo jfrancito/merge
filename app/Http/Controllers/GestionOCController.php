@@ -128,7 +128,35 @@ class GestionOCController extends Controller
                          ]);
     }
 
+   public function actionAjaxBuscarCuentaBancariaEstiba(Request $request)
+    {
 
+
+        $entidadbanco_id        =   $request['entidadbanco_id'];
+        $prefijo_id             =   $request['prefijo_id'];
+        $orden_id               =   $request['orden_id'];
+        $empresa_id             =   $request['empresa_id'];
+
+        $idoc                   =   $orden_id;
+
+        $tescuentabb            =   TESCuentaBancaria::where('COD_EMPR_TITULAR','=',$empresa_id)
+                                    ->where('COD_EMPR_BANCO','=',$entidadbanco_id)
+                                    ->where('COD_ESTADO','=',1)
+                                    ->select(DB::raw("
+                                          TXT_NRO_CUENTA_BANCARIA,
+                                          TXT_REFERENCIA + ' - '+ TXT_NRO_CUENTA_BANCARIA AS nombre")
+                                        )
+                                    ->pluck('nombre','TXT_NRO_CUENTA_BANCARIA')
+                                    ->toArray();
+        $combocb                =   array('' => "Seleccione Cuenta Bancaria") + $tescuentabb;
+        $funcion                =   $this;
+
+        return View::make('comprobante/combo/combo_cuenta_bancaria',
+                         [
+                            'combocb'                   =>  $combocb,
+                            'ajax'                      =>  true,
+                         ]);
+    }
 
 
 
@@ -545,7 +573,7 @@ class GestionOCController extends Controller
         /******************************************************/
         View::share('titulo','Integracion de Comprobante');
         $operacion_id       =   'ORDEN_COMPRA';
-        $operacion_id       =   'ESTIBA';
+        //$operacion_id       =   'ESTIBA';
 
         $array_contrato     =   $this->array_rol_contrato();
         if (in_array(Session::get('usuario')->rol_id, $array_contrato)) {
