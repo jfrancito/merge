@@ -66,7 +66,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-modal-ver-cuenta-bancaria-contrato', 'UserController@actionAjaxModalVerCuentaBancariaContrato');
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-contrato', 'UserController@actionAjaxModalConfiguracionCuentaBancariaContrato');
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-oc', 'UserController@actionAjaxModalConfiguracionCuentaBancariaOC');
-
+	Route::any('/ajax-modal-configuracion-cuenta-bancaria-estiba', 'UserController@actionAjaxModalConfiguracionCuentaBancariaEstiba');
+	Route::any('/configurar-datos-cuenta-bancaria-estiba/{empresa_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaEstiba');
+	Route::any('/ajax-modal-ver-cuenta-bancaria-estiba', 'UserController@actionAjaxModalVerCuentaBancariaEstiba');
 
 	Route::any('/configurar-datos-cuenta-bancaria-contrato/{prefijo_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaContrato');
 	Route::any('/configurar-datos-cuenta-bancaria-oc/{prefijo_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaOC');
@@ -163,7 +165,7 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/ajax-cuenta-bancaria-proveedor-contrato', 'GestionOCController@actionAjaxBuscarCuentaBancariaContrato');
 	Route::any('/ajax-cuenta-bancaria-proveedor-oc', 'GestionOCController@actionAjaxBuscarCuentaBancariaOC');
-
+	Route::any('/ajax-cuenta-bancaria-proveedor-estiba', 'GestionOCController@actionAjaxBuscarCuentaBancariaEstiba');
 
 	//ADMINISTRATOR CONTRATO
 	Route::any('/detalle-comprobante-contrato-administrator/{procedencia}/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionDetalleComprobantecontratoAdministrator');
@@ -176,7 +178,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/detalle-comprobante-estiba-administrator/{idopcion}/{lote}', 'GestionEstibaController@actionDetalleComprobanteestibaAdministrator');
 	Route::any('/subir-xml-cargar-datos-estiba-administrator/{idopcion}/{lote}', 'GestionEstibaController@actionCargarXMLEstibaAdministrator');
 	/*Route::any('/validar-xml-oc-contrato-administrator/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionValidarXMLContratoAdministrator');*/
-
+	Route::any('/ajax-modal-detalle-lotes', 'GestionEstibaController@actionCargarModalDetalleLotes');
 
 
 

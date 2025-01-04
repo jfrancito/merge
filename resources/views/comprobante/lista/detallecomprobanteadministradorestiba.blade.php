@@ -217,8 +217,8 @@
                   <div class="panel panel-default panel-contrast">
                     <div class="panel-heading" style="background: #1d3a6d;color: #fff;">DATOS PARA PAGOS
 
-                      <div class="tools ver_cuenta_bancaria select" style="cursor: pointer;padding-left: 12px;"> <span class="label label-success">Ver Cuenta</span></div>
-                      <div class="tools agregar_cuenta_bancaria select" style="cursor: pointer;"> <span class="label label-success">Agregar Cuenta</span></div>
+                      <div class="tools ver_cuenta_bancaria_estiba select" style="cursor: pointer;padding-left: 12px;"> <span class="label label-success">Ver Cuenta</span></div>
+                      <div class="tools agregar_cuenta_bancaria_estiba select" style="cursor: pointer;"> <span class="label label-success">Agregar Cuenta</span></div>
 
                     </div>
                     <div class="panel-body panel-body-contrast">
@@ -231,7 +231,7 @@
                                             <div class="col-sm-12 abajocaja" >
                                               {!! Form::select( 'entidadbanco_id', $combobancos, array(),
                                                                 [
-                                                                  'class'       => 'select2 form-control control input-xs entidadbanco' ,
+                                                                  'class'       => 'select2 form-control control input-xs entidadbancoestiba' ,
                                                                   'id'          => 'entidadbanco_id',
                                                                   'required'    => '',
                                                                   'data-aw'     => '1',
@@ -252,7 +252,7 @@
               </div>
 
 
-              <div class="row">
+              <div class="row @if($fedocumento->ID_TIPO_DOC =='R1') ocultar @endif">
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                   <div class="panel panel-default panel-contrast">
                     <div class="panel-heading" style="background: #1d3a6d;color: #fff;">
@@ -460,12 +460,12 @@
                                           <input type="hidden" name="idopcion" id='idopcion' value = '{{$idopcion}}'>
                                           <input type="hidden" name="te" id='te' value = '{{$fedocumento->ind_errototal}}'>
                                           <input type="hidden" name="valor_igv" id='valor_igv' value = '{{(float)$fedocumento->VALOR_IGV_ORIG}}'>
-                                          <input type="hidden" name="empresa_id" id='empresa_id' value = '{{$ordencompra_f->COD_EMPR}}'>
+                                          <input type="hidden" name="empresa_id" id='empresa_id' value = '{{$empresa->COD_EMPR}}'>
                                           <input type="hidden" name="monto_total" id='monto_total' value = '{{$fedocumento->TOTAL_VENTA_ORIG}}'>
-                                          <input type="hidden" name="prefijo_id" id='prefijo_id' value = '{{substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7)}}'>
-                                          <input type="hidden" name="orden_id" id='orden_id' value = '{{Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -9))}}'>
+                                          <input type="hidden" name="tipo_documento_id" id='tipo_documento_id' value = '{{$fedocumento->ID_TIPO_DOC}}'>
+                                          <input type="hidden" name="orden_id" id='orden_id' value = '{{$idoc}}'>
                                           <input type="hidden" name="contacto_id" id='contacto_id' value = '{{$usuario->COD_TRABAJADOR}}'>
-                                          <button type="submit" class="btn btn-space btn-success btn-guardar-xml-contrato">Guardar</button>
+                                          <button type="submit" class="btn btn-space btn-success btn-guardar-xml-estiba">Guardar</button>
                                         </p>
                                       </div>
                                   </div>

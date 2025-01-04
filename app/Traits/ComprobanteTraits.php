@@ -4026,6 +4026,11 @@ trait ComprobanteTraits
                                             $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
                                                 ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
                                         })
+                                        ->leftJoin('FE_REF_ASOC', function ($leftJoin){
+                                            $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
+                                                ->where('FE_REF_ASOC.COD_ESTADO', '=', '1');
+                                        })
+                                        //->WHERE('VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE','=','IICHEST000068311')
                                         ->where('VMERGEDOCUMENTOS.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                         ->where(function ($query) {
                                             $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
@@ -4041,6 +4046,7 @@ trait ComprobanteTraits
                                                             CAN_TOTAL,
                                                             NRO_SERIE,
                                                             NRO_DOC,
+                                                            FE_REF_ASOC.LOTE AS LOTE_DOC,
                                                             
                                                             FE_DOCUMENTO.ID_DOCUMENTO,
                                                             FE_DOCUMENTO.COD_ESTADO,
@@ -4048,11 +4054,18 @@ trait ComprobanteTraits
                                                         '))
                                         ->get();
 
+        //DD($listadatos);
+
+
         }else{
 
             $listadatos         =       VMergeDocumento::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
                                             $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
                                                 ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                                        })
+                                        ->leftJoin('FE_REF_ASOC', function ($leftJoin){
+                                            $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
+                                                ->where('FE_REF_ASOC.COD_ESTADO', '=', '1');
                                         })
                                         ->where('VMERGEDOCUMENTOS.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                         ->where(function ($query) {
@@ -4070,6 +4083,7 @@ trait ComprobanteTraits
                                                             CAN_TOTAL,
                                                             NRO_SERIE,
                                                             NRO_DOC,
+                                                            FE_REF_ASOC.LOTE AS LOTE_DOC,
                                                             
                                                             FE_DOCUMENTO.ID_DOCUMENTO,
                                                             FE_DOCUMENTO.COD_ESTADO,

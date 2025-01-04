@@ -14,16 +14,7 @@
               <div class="panel panel-default panel-border-color panel-border-color-success">
                 <div class="panel-heading">{{ $titulo }}
 
-                  <form method="POST" id='formre' action="{{ url('/select-xml-estiba/'.$idopcion) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
-                        {{ csrf_field()}}
-                        <input type="hidden" name="jsondocumenos" id = 'jsondocumenos'>
-                  </form>
-
                   <div class="tools tooltiptop">
-                    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones migrarestibaadmin">
-                      <span class="tooltiptext">Registrar Estiba</span>
-                      <span class="icon mdi mdi-collection-image"></span>
-                    </a>
                     <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscardocumentoadmin">
                       <span class="tooltiptext">Buscar Documento</span>
                       <span class="icon mdi mdi-search"></span>
@@ -62,6 +53,7 @@
             </div>
           </div>
     </div>
+  @include('comprobante.modal.mregistrorequerimiento')
   </div>
 @stop
 @section('script')
