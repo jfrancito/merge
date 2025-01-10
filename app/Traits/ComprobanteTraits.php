@@ -452,10 +452,10 @@ trait ComprobanteTraits
                                                     SUM(CAN_TOTAL) TOTAL,
                                                     SUM(CASE 
                                                             WHEN FE_DOCUMENTO.COD_PAGO_DETRACCION = CMP.ORDEN.COD_EMPR 
-                                                            THEN CMP.ORDEN.CAN_TOTAL - CMP.ORDEN.CAN_DETRACCION - CMP.ORDEN.CAN_RETENCION - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC,0) + CMP.ORDEN.CAN_PERCEPCION
+                                                            THEN CMP.ORDEN.CAN_TOTAL - ROUND(CMP.ORDEN.CAN_DETRACCION, 0) - CMP.ORDEN.CAN_RETENCION - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC,0) + CMP.ORDEN.CAN_PERCEPCION
                                                             ELSE CMP.ORDEN.CAN_TOTAL - CMP.ORDEN.CAN_RETENCION - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC,0) + CMP.ORDEN.CAN_PERCEPCION
                                                         END) AS TOTAL_PAGAR,
-                                                    SUM(CAN_DETRACCION) DETRACCION'))
+                                                    SUM(ROUND(CAN_DETRACCION, 0)) DETRACCION'))
                                     ->groupBy('CMP.ORDEN.COD_EMPR_CLIENTE')
                                     ->groupBy('CMP.ORDEN.TXT_EMPR_CLIENTE')
                                     ->groupBy('FE_DOCUMENTO.TXT_NRO_CUENTA_BANCARIA')

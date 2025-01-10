@@ -28,7 +28,7 @@ class Funcion {
 		}
 
 		if($COD_PAGO_DETRACCION == Session::get('empresas')->COD_EMPR){
-			$neto_pagar 	  = (float)$oc->CAN_TOTAL - (float)$oc->CAN_DETRACCION - (float)$oc->CAN_RETENCION - (float)$fedocumento->MONTO_ANTICIPO_DESC + (float)$oc->CAN_PERCEPCION;
+			$neto_pagar 	  = (float)$oc->CAN_TOTAL - (float)round($oc->CAN_DETRACCION) - (float)$oc->CAN_RETENCION - (float)$fedocumento->MONTO_ANTICIPO_DESC + (float)$oc->CAN_PERCEPCION;
 		}else{
 			$neto_pagar 	  = (float)$oc->CAN_TOTAL - (float)$oc->CAN_RETENCION - (float)$fedocumento->MONTO_ANTICIPO_DESC + (float)$oc->CAN_PERCEPCION;
 		}
