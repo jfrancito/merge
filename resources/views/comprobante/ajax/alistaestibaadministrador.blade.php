@@ -39,7 +39,7 @@
   </thead>
   <tbody>
     @foreach($listadatos as $index => $item)
-      <tr data_requerimiento_id = "{{$item->COD_DOCUMENTO_CTBLE}}">
+      <tr data_requerimiento_id = "{{$item->COD_DOCUMENTO_CTBLE}}" data_lote = "{{$item->LOTE_DOC}}">
         <td><b>{{$index + 1}}</b></td>
         <td><b>ESTIBA</b></td>
         <td>{{$item->COD_DOCUMENTO_CTBLE}}</td>

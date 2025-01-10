@@ -1,33 +1,33 @@
 
 <div class="row">
   <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-    @include('comprobante.form.ordencompra.comparar')
+    @include('comprobante.form.estiba.comparar')
   </div>
   <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-    @if($fedocumento->OPERACION_DET == 'SIN_XML') @include('comprobante.form.ordencompra.datosfactura') @endif    
-    @if($fedocumento->OPERACION_DET != 'SIN_XML') @include('comprobante.form.ordencompra.sunat') @endif 
-    @include('comprobante.form.ordencompra.infodetraccion')
-    @include('comprobante.form.ordencompra.ordeningreso')
+      @include('comprobante.form.contrato.consultaapi')
+      @include('comprobante.form.contrato.infodetraccion')
   </div>
   <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-    @include('comprobante.form.ordencompra.seguimiento')
+    @include('comprobante.form.contrato.seguimiento')
   </div> 
 </div>
 
 <div class="row">
   <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-    @include('comprobante.form.ordencompra.archivos')
+    @include('comprobante.form.estiba.archivos')
   </div>
   <div class="col-xs-12 col-sm-6 col-md-8 col-lg-8">
-    @include('comprobante.form.ordencompra.informacion')
+    @include('comprobante.form.estiba.informacion')
   </div>
 </div>
 
-<!-- <div class="row">
-  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-    @include('comprobante.form.ordencompra.verarchivopdf')
-  </div>
-</div> -->
+<div class="row">
+    @include('comprobante.form.contrato.pagobanco')
+</div>
+
+<div class="row">
+    @include('comprobante.form.contrato.detraccion')
+</div>
 
 <div class="row">
   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
@@ -36,13 +36,11 @@
 </div>
 
 
-
 <div class="row">
   <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-    @include('comprobante.form.ordencompra.archivosobservados')
+    @include('comprobante.form.contrato.archivosobservados')
   </div>
 </div>
-
 
 
 <div class="row">
@@ -75,6 +73,7 @@
 
 
 
+
   <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
     <div class="panel panel-default panel-contrast">
       <div class="panel-heading" style="background: #1d3a6d;color: #fff;">RECOMENDACION
@@ -99,8 +98,10 @@
       </div>
     </div>
   </div>
-</div>
 
+
+  
+</div>
 
 <div class="row xs-pt-15">
   <div class="col-xs-6">
@@ -110,8 +111,8 @@
   </div>
   <div class="col-xs-6">
     <p class="text-right">
-      <a href="{{ url('/gestion-de-administracion-aprobar/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
-      <button type="button" class="btn btn-space btn-primary btnaprobarcomporbatnte">Guardar</button>
+      <a href="{{ url('/gestion-de-comprobante-contabilidad/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
+      <button type="submit" class="btn btn-space btn-primary btnaprobarcomporbatnte">Guardar</button>
     </p>
   </div>
 </div>

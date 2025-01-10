@@ -229,11 +229,11 @@ class GestionOCSXController extends Controller
 
         $cb_id                  =   '';
         $combocb                =   array('' => "Seleccione Cuenta Bancaria");
-        $user_orden             =   User::where('usuarioosiris_id','=',$ordencompra->COD_EMPR_EMISOR)->first();
+        $user_orden             =   User::where('usuarioosiris_id','=',$ordencompra->COD_EMPR_CLIENTE)->first();
         $empresa                =   STDEmpresa::where('COD_EMPR','=',$ordencompra_f->COD_EMPR_CLIENTE)->first();
 
         $combotipodetraccion    =   array('' => "Seleccione Tipo Detraccion",'MONTO_REFERENCIAL' => 'MONTO REFERENCIAL' , 'MONTO_FACTURACION' => 'MONTO FACTURACION');
-        $combopagodetraccion    =   array('' => "Seleccione Pago Detraccion",$ordencompra->COD_EMPR_EMISOR => $ordencompra->TXT_EMPR_EMISOR , $ordencompra->COD_EMPR_RECEPTOR => $ordencompra->TXT_EMPR_RECEPTOR);
+        $combopagodetraccion    =   array('' => "Seleccione Pago Detraccion",$ordencompra->COD_EMPR_CLIENTE => $ordencompra->TXT_EMPR_EMISOR , $ordencompra->COD_EMPR_RECEPTOR => $ordencompra->TXT_EMPR_RECEPTOR);
 
         $fedocumento_x          =   FeDocumento::where('TXT_REFERENCIA','=',$idoc)->first();
 
@@ -243,7 +243,7 @@ class GestionOCSXController extends Controller
         $COD_EMPR               =   Session::get('empresas')->COD_EMPR;
         $COD_CENTRO             =   '';
         $FEC_CORTE              =   $this->hoy_sh;
-        $CLIENTE                =   $ordencompra->COD_EMPR_EMISOR;
+        $CLIENTE                =   $ordencompra_f->COD_EMPR_CLIENTE;
         $COD_MONEDA             =   $ordencompra_f->COD_CATEGORIA_MONEDA;
 
         $monto_anticipo         =   0.00;
@@ -468,6 +468,11 @@ class GestionOCSXController extends Controller
                     }
                 }
 
+                $serie                  =   $request['serie'];
+                $numero                 =   $request['numero'];
+                $fechaventa             =   $request['fechaventa'];
+                $fechavencimiento       =   $request['fechavencimiento'];
+
                 FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(
                                 [
@@ -482,6 +487,10 @@ class GestionOCSXController extends Controller
                                     'SERIE_ANTICIPO'=>$SERIE_ANTICIPO,
                                     'NRO_ANTICIPO'=>$NRO_ANTICIPO,
 
+                                    'SERIE'=>$serie,
+                                    'NUMERO'=>$numero,
+                                    'FEC_VENTA'=>$fechaventa,
+                                    'FEC_VENCI_PAGO'=>$fechavencimiento,
 
                                     'CTA_DETRACCION'=>$ctadetraccion,
                                     'MONTO_DETRACCION_XML'=>$monto_detraccion,
@@ -528,112 +537,112 @@ class GestionOCSXController extends Controller
                 $fedocumento_x                          =   FeDocumento::where('TXT_REFERENCIA','=',$idoc)->first();
                 
                 //cambiar el estado cuando es material y si tiene extonro
-                // if($orden->IND_MATERIAL_SERVICIO=='M' && count($fedocumento_x)>0){
-                //     //DETALLE PRODUCTO ACTUALIZAR
-                //     $conexionbd         = 'sqlsrv';
-                //     if($orden->COD_CENTRO == 'CEN0000000000004'){ //rioja
-                //         $conexionbd         = 'sqlsrv_r';
-                //     }else{
-                //         if($orden->COD_CENTRO == 'CEN0000000000006'){ //bellavista
-                //             $conexionbd         = 'sqlsrv_b';
-                //         }
-                //     }
-                //     DB::connection($conexionbd)->table('CMP.ORDEN')
-                //         ->where('COD_ORDEN', $idoc)
-                //         ->update(['COD_CATEGORIA_ESTADO_ORDEN' => 'EOR0000000000012','TXT_CATEGORIA_ESTADO_ORDEN'=>'ATENDIDO PARCIALMENTE']);
-                // }
-
-                
-                // if($orden->IND_MATERIAL_SERVICIO=='M' && count($fedocumento_x)<=0){
-
-                //     $detalleproducto                    =   CMPDetalleProducto::where('CMP.DETALLE_PRODUCTO.COD_ESTADO','=',1)
-                //                                             ->where('CMP.DETALLE_PRODUCTO.COD_TABLA','=',$idoc)
-                //                                             ->orderBy('NRO_LINEA','ASC')
-                //                                             ->get();
-
-                //     //almacen lote                                
-                //     $this->insert_almacen_lote($orden,$detalleproducto);//insertar en almacen
-                //     $orden_id = $this->insert_orden($orden,$detalleproducto);//crea la orden de ingreso        
-                //     $this->insert_referencia_asoc($orden,$detalleproducto,$orden_id[0]);//crea la referencia
-                //     $this->insert_detalle_producto($orden,$detalleproducto,$orden_id[0]);//crea detalle de la orden de ingresa
-                //     // ejecutable en segundo plano que tod orden de ingreso que este genrado desde el merge siemplemente jale ese boton
-                //     //$ejecutarwfc = $this->actionGuardarOrdenWcf($orden,$detalleproducto,$orden_id[0]);
-
-                //     //DETALLE PRODUCTO ACTUALIZAR
-                //     $conexionbd         = 'sqlsrv';
-                //     if($orden->COD_CENTRO == 'CEN0000000000004'){ //rioja
-                //         $conexionbd         = 'sqlsrv_r';
-                //     }else{
-                //         if($orden->COD_CENTRO == 'CEN0000000000006'){ //bellavista
-                //             $conexionbd         = 'sqlsrv_b';
-                //         }
-                //     }
-
-                //     DB::connection($conexionbd)->table('CMP.DETALLE_PRODUCTO')
-                //         ->where('COD_TABLA', $idoc)
-                //         ->update(['CAN_PENDIENTE' => 0,'FEC_USUARIO_MODIF_AUD'=>$this->hoy]);
-
-                //     FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
-                //                 ->update(
-                //                     [
-                //                         'COD_ESTADO'=>'ETM0000000000009',
-                //                         'TXT_ESTADO'=>'POR EJECUTAR ORDEN DE INGRESO',
-                //                         'fecha_uc'=>$this->fechaactual,
-                //                         'usuario_uc'=>Session::get('usuario')->id
-                //                     ]
-                //                 );
-
-                // }else{
-
-                
-                //SI ES SERVICIO PASA NORMAL
-                FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
-                            ->update(
-                                [
-                                    'COD_ESTADO'=>'ETM0000000000003',
-                                    'TXT_ESTADO'=>'POR APROBAR CONTABILIDAD',
-                                    'ind_email_ap'=>0,
-                                    'fecha_uc'=>$this->fechaactual,
-                                    'usuario_uc'=>Session::get('usuario')->id
-                                ]
-                            );
-
-                //HISTORIAL DE DOCUMENTO APROBADO
-                $documento                              =   new FeDocumentoHistorial;
-                $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
-                $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
-                $documento->FECHA                       =   $this->fechaactual;
-                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
-                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
-                $documento->TIPO                        =   'APROBADO POR USUARIO CONTACTO';
-                $documento->MENSAJE                     =   '';
-                $documento->save();
-
-                //whatsaap para contabilidad
-                $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->first();
-                $ordencompra        =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();            
-                $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO
-                                        .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-                                        .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
-                                        .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
-
-                if(1==0){
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                }else{
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                    $this->insertar_whatsaap('51979659002','HAMILTON',$mensaje,'');
-                    $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
-                    //CONTABILIDAD
-                    if($prefijocarperta=='II'){
-                        $this->insertar_whatsaap('51965991360','ANGHIE',$mensaje,'');           //INTERNACIONAL
-                        $this->insertar_whatsaap('51988650421','LUCELY',$mensaje,'');           //INTERNACIONAL
+                if($orden->IND_MATERIAL_SERVICIO=='M' && count($fedocumento_x)>0){
+                    //DETALLE PRODUCTO ACTUALIZAR
+                    $conexionbd         = 'sqlsrv';
+                    if($orden->COD_CENTRO == 'CEN0000000000004'){ //rioja
+                        $conexionbd         = 'sqlsrv_r';
                     }else{
-                        $this->insertar_whatsaap('51950638955','MIGUEL',$mensaje,'');           //COMERCIAL
-                        $this->insertar_whatsaap('51935387084','VASQUEZ',$mensaje,'');          //COMERCIAL
+                        if($orden->COD_CENTRO == 'CEN0000000000006'){ //bellavista
+                            $conexionbd         = 'sqlsrv_b';
+                        }
                     }
-                } 
-                // }
+                    DB::connection($conexionbd)->table('CMP.ORDEN')
+                        ->where('COD_ORDEN', $idoc)
+                        ->update(['COD_CATEGORIA_ESTADO_ORDEN' => 'EOR0000000000012','TXT_CATEGORIA_ESTADO_ORDEN'=>'ATENDIDO PARCIALMENTE']);
+                }
+
+                
+                if($orden->IND_MATERIAL_SERVICIO=='M' && count($fedocumento_x)<=0){
+
+                    $detalleproducto                    =   CMPDetalleProducto::where('CMP.DETALLE_PRODUCTO.COD_ESTADO','=',1)
+                                                            ->where('CMP.DETALLE_PRODUCTO.COD_TABLA','=',$idoc)
+                                                            ->orderBy('NRO_LINEA','ASC')
+                                                            ->get();
+
+                    //almacen lote                                
+                    $this->insert_almacen_lote($orden,$detalleproducto);//insertar en almacen
+                    $orden_id = $this->insert_orden($orden,$detalleproducto);//crea la orden de ingreso        
+                    $this->insert_referencia_asoc($orden,$detalleproducto,$orden_id[0]);//crea la referencia
+                    $this->insert_detalle_producto($orden,$detalleproducto,$orden_id[0]);//crea detalle de la orden de ingresa
+                    // ejecutable en segundo plano que tod orden de ingreso que este genrado desde el merge siemplemente jale ese boton
+                    //$ejecutarwfc = $this->actionGuardarOrdenWcf($orden,$detalleproducto,$orden_id[0]);
+
+                    //DETALLE PRODUCTO ACTUALIZAR
+                    $conexionbd         = 'sqlsrv';
+                    if($orden->COD_CENTRO == 'CEN0000000000004'){ //rioja
+                        $conexionbd         = 'sqlsrv_r';
+                    }else{
+                        if($orden->COD_CENTRO == 'CEN0000000000006'){ //bellavista
+                            $conexionbd         = 'sqlsrv_b';
+                        }
+                    }
+
+                    DB::connection($conexionbd)->table('CMP.DETALLE_PRODUCTO')
+                        ->where('COD_TABLA', $idoc)
+                        ->update(['CAN_PENDIENTE' => 0,'FEC_USUARIO_MODIF_AUD'=>$this->hoy]);
+
+                    FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                ->update(
+                                    [
+                                        'COD_ESTADO'=>'ETM0000000000009',
+                                        'TXT_ESTADO'=>'POR EJECUTAR ORDEN DE INGRESO',
+                                        'fecha_uc'=>$this->fechaactual,
+                                        'usuario_uc'=>Session::get('usuario')->id
+                                    ]
+                                );
+
+                }else{
+
+                
+                    //SI ES SERVICIO PASA NORMAL
+                    FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                ->update(
+                                    [
+                                        'COD_ESTADO'=>'ETM0000000000003',
+                                        'TXT_ESTADO'=>'POR APROBAR CONTABILIDAD',
+                                        'ind_email_ap'=>0,
+                                        'fecha_uc'=>$this->fechaactual,
+                                        'usuario_uc'=>Session::get('usuario')->id
+                                    ]
+                                );
+
+                    //HISTORIAL DE DOCUMENTO APROBADO
+                    $documento                              =   new FeDocumentoHistorial;
+                    $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                    $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                    $documento->FECHA                       =   $this->fechaactual;
+                    $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                    $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                    $documento->TIPO                        =   'APROBADO POR USUARIO CONTACTO';
+                    $documento->MENSAJE                     =   '';
+                    $documento->save();
+
+                    //whatsaap para contabilidad
+                    $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->first();
+                    $ordencompra        =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();            
+                    $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                    $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO
+                                            .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                                            .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
+                                            .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
+
+                    if(1==0){
+                        $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                    }else{
+                        $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                        $this->insertar_whatsaap('51979659002','HAMILTON',$mensaje,'');
+                        $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
+                        //CONTABILIDAD
+                        if($prefijocarperta=='II'){
+                            $this->insertar_whatsaap('51965991360','ANGHIE',$mensaje,'');           //INTERNACIONAL
+                            $this->insertar_whatsaap('51988650421','LUCELY',$mensaje,'');           //INTERNACIONAL
+                        }else{
+                            $this->insertar_whatsaap('51950638955','MIGUEL',$mensaje,'');           //COMERCIAL
+                            $this->insertar_whatsaap('51935387084','VASQUEZ',$mensaje,'');          //COMERCIAL
+                        }
+                    } 
+                }
 
                 DB::commit();
             }catch(\Exception $ex){

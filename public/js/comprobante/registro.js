@@ -437,6 +437,70 @@ $(document).ready(function(){
 
     });
 
+    $(".registrocomprobante").on('click','.btn-guardar-sin-xml', function(e) {
+
+        event.preventDefault();
+        var _token                  =   $('#token').val();
+        var te                      =   $('#te').val();
+        var entidadbanco_id         =   $('#entidadbanco_id').val();
+        var cb_id                   =   $('#cb_id').val();
+        var detraccion              =   $('#detraccion').val();
+
+        var serie                   =   $('#serie').val();
+        var numero                  =   $('#numero').val();
+        var fechaventa              =   $('#fechaventa').val();
+        var fechavencimiento        =   $('#fechavencimiento').val();
+
+        if(serie ==''){ alerterrorajax("Ingrese Serie Factura"); return false;}
+        if(numero ==''){ alerterrorajax("Ingrese Numero Factura"); return false;}
+        if(fechaventa ==''){ alerterrorajax("Ingrese Fecha Venta Factura"); return false;}
+        if(fechavencimiento ==''){ alerterrorajax("Ingrese Fecha Vencimiento Factura"); return false;}
+
+        var ctadetraccion           =   $('#ctadetraccion').val();
+        var monto_detraccion        =   $('#monto_detraccion').val();
+        var pago_detraccion         =   $('#pago_detraccion').val();
+
+        debugger;
+        if(detraccion>0){
+            if(ctadetraccion.trim() ==''){ alerterrorajax("Ingrese una Cuenta de Detraccion."); return false;}
+            if(monto_detraccion =='0'){ alerterrorajax("Ingrese Monto de Detraccion."); return false;}
+            if(pago_detraccion ==''){ alerterrorajax("Seleeccione un pago de detraccion"); return false;}            
+        }
+
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009'];
+
+        if(!valores.includes(entidadbanco_id)){
+            if(cb_id==''){
+                alerterrorajax("Seleccione una Cuenta Bancaria."); return false;
+            }
+        }
+
+        if(te =='0'){ alerterrorajax("Hay errores en la validacion del XML."); return false;}
+
+        $.confirm({
+            title: '¿Confirmar la validación?',
+            content: 'Merge de Comprobante',
+            buttons: {
+                confirmar: function () {
+                    abrircargando();
+                    $( "#formguardardatos" ).submit();
+
+                    setTimeout(function() {
+                       cerrarcargando();
+                    }, 6000);
+ 
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo la validación');
+                }
+            }
+        });
+
+
+    });
+
+
+
     $(".registrocomprobante").on('click','#cargardatosliq', function(e) {
         abrircargando();
     });

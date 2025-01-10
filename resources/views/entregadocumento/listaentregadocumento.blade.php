@@ -126,7 +126,7 @@
 
                             <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
                                 <div class="form-group ">
-                                  <label class="col-sm-12 control-label labelleft" >Fecha Inicio:</label>
+                                  <label class="col-sm-12 control-label labelleft" >Fecha Inicio (Vencimiento):</label>
                                   <div class="col-sm-12 abajocaja" >
                                     <div data-min-view="2" 
                                            data-date-format="dd-mm-yyyy"  
@@ -146,7 +146,7 @@
 
                             <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
                               <div class="form-group ">
-                                <label class="col-sm-12 control-label labelleft" >Fecha Fin:</label>
+                                <label class="col-sm-12 control-label labelleft" >Fecha Fin (Vencimiento):</label>
                                 <div class="col-sm-12 abajocaja" >
                                   <div data-min-view="2" 
                                          data-date-format="dd-mm-yyyy"  

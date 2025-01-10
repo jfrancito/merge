@@ -3,6 +3,7 @@
       >TRANSFERENCIA
       </div>
       <div class="panel-body panel-body-contrast">
+
           @if(count($transferencia)<=0)
               <div class="col-sm-12">
                   <p style="margin:0px;">SIN TRANSFERENCIA</p>
@@ -19,5 +20,7 @@
                   </p>
               </div>
           @endif
+
+          
       </div>
     </div>

@@ -23,6 +23,8 @@ use App\Modelos\CMPDetalleProducto;
 use App\Modelos\CMPDocumentoCtble;
 use App\Modelos\TESCuentaBancaria;
 use App\Modelos\CMPReferecenciaAsoc;
+use App\Modelos\WEBRol;
+
 
 
 
@@ -33,7 +35,7 @@ use Greenter\Xml\Parser\InvoiceParser;
 use Greenter\Xml\Parser\NoteParser;
 use Greenter\Xml\Parser\PerceptionParser;
 use Greenter\Xml\Parser\RHParser;
-
+use Greenter\Xml\Parser\RetentionParser;
 
 use App\User;
 use Illuminate\Support\Facades\Crypt;
@@ -214,6 +216,22 @@ class GestionOCController extends Controller
         dd($factura);
 
     }
+
+
+        public function actionApiLeerRetencionSap(Request $request)
+    {
+
+        header('Content-Type: text/html; charset=UTF-8');
+        $path = storage_path() . "/exports/20484002216-20-E001-2942.xml";
+        //$path = storage_path() . "/exports/RHE1044061449953.xml";
+
+        $parser = new RetentionParser();
+        $xml = file_get_contents($path);
+        $factura = $parser->parse($xml);
+        dd($factura);
+
+    }
+
 
 
     public function actionValidarXML($idopcion, $prefijo, $idordencompra,Request $request)
@@ -579,10 +597,30 @@ class GestionOCController extends Controller
         if (in_array(Session::get('usuario')->rol_id, $array_contrato)) {
             $operacion_id       =   'CONTRATO';
         }
-        $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO','ESTIBA' => 'ESTIBA');
+
+        //$combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO','ESTIBA' => 'ESTIBA');
+        $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO');
+
+
         $cod_empresa        =   Session::get('usuario')->usuarioosiris_id;
         $procedencia        =   'ADM';
         $funcion            =   $this;
+        //AREA
+
+        $estado_id          =   'TODO';        
+        $area_id            =   'TODO';
+        $combo_area         =   $this->gn_combo_area_usuario($estado_id);
+        $rol                =    WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
+
+        if($rol->ind_uc == 1){
+            $usuario    =   SGDUsuario::where('COD_USUARIO','=',Session::get('usuario')->name)->first();
+            if(count($usuario)>0){
+                $tp_area        =   CMPCategoria::where('COD_CATEGORIA','=',$usuario->COD_CATEGORIA_AREA)->first();
+                $area_id        =   $tp_area->COD_CATEGORIA;
+                $combo_area     =   array($tp_area->COD_CATEGORIA => $tp_area->NOM_CATEGORIA);
+            }
+        }
+
 
 
         if($operacion_id=='ORDEN_COMPRA'){
@@ -591,7 +629,7 @@ class GestionOCController extends Controller
             if($operacion_id=='CONTRATO'){
                 $listadatos         =   $this->con_lista_cabecera_contrato_administrativo($cod_empresa);
             }else{
-                $listadatos         =   $this->con_lista_cabecera_estibas_administrativo($cod_empresa);
+                $listadatos         =   $this->con_lista_cabecera_estibas_administrativo($cod_empresa,$area_id);
             }
         }
         return View::make('comprobante/listaocadministrador',
@@ -602,6 +640,10 @@ class GestionOCController extends Controller
                             'combo_operacion'   =>  $combo_operacion,
                             'funcion'           =>  $funcion,
                             'idopcion'          =>  $idopcion,
+
+                            'area_id'           =>  $area_id,
+                            'combo_area'        =>  $combo_area
+
                          ]);
     }
 
@@ -609,6 +651,8 @@ class GestionOCController extends Controller
     public function actionListarAjaxBuscarDocumentoAdmin(Request $request) {
 
         $operacion_id   =   $request['operacion_id'];
+        $area_id        =   $request['area_id'];
+
         $idopcion       =   $request['idopcion'];
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
 
@@ -618,7 +662,7 @@ class GestionOCController extends Controller
             if($operacion_id=='CONTRATO'){
                 $listadatos         =   $this->con_lista_cabecera_contrato_administrativo($cod_empresa);
             }else{
-                $listadatos         =   $this->con_lista_cabecera_estibas_administrativo($cod_empresa);
+                $listadatos         =   $this->con_lista_cabecera_estibas_administrativo($cod_empresa,$area_id);
             }
         }
 
@@ -2315,10 +2359,23 @@ class GestionOCController extends Controller
             return Redirect::back()->with('errorbd', 'No tiene documentos asociados realize la migracion');
         }
 
+
+
         //SIN XML REDIRECCIONAR O OTRA VISTA
+        //SERVICIO PUBLICO
+        $comprobantesinxml      =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                                    ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000027')
+                                    ->where('COD_ESTADO','=','1')
+                                    ->first();
+        if(count($comprobantesinxml)>0){
+            return Redirect::to('detalle-comprobante-oc-administrator-sin-xml/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra);
+        }
+        //IMPORTACION
         if($ordencompra_n->IND_VARIAS_ENTREGAS == 1){
             return Redirect::to('detalle-comprobante-oc-administrator-sin-xml/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra);
         }
+
+
 
 
         View::share('titulo','REGISTRO DE COMPROBANTE OC: '.$idoc);

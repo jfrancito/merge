@@ -16,8 +16,8 @@
                 <thead>
                   <tr>
                     <th>ITEM</th>
-                    <th>CONTRATO</th>
-                    <th>FACTURA</th>
+                    <th>DOCUMENTO</th>
+                    <th>INFORMACION</th>
                     <th>REGISTRO</th>
                     <th>ESTADO</th>
                     <th>OPCION</th>
@@ -27,14 +27,14 @@
                   @foreach($listadatos as $index => $item)
                     <tr data_requerimiento_id = "{{$item->ID_DOCUMENTO}}">
                       <td>{{$index+1}}</td>
-
                       <td class="cell-detail sorting_1" style="position: relative;">
-                        <span><b>CODIGO : {{$item->COD_DOCUMENTO_CTBLE}} </b> </span>
-                        <span><b>FECHA  : {{$item->FEC_EMISION}}</b></span>
-                        <span><b>PROVEEDOR : </b> {{$item->TXT_EMPR_EMISOR}}</span>
-                        <span><b>TOTAL : </b> {{$item->CAN_TOTAL}}</span>
-                        <span><b>DOCUMENTO : </b> {{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</span>
-                        
+                        <span><b>SERIE : {{$item->SERIE}} </b> </span>
+                        <span><b>NUMERO  : {{$item->NUMERO}}</b></span>
+                        <span><b>FECHA : </b> {{$item->FEC_VENTA}}</span>
+                      </td>
+                      <td class="cell-detail sorting_1" style="position: relative;">
+                        <span><b>FORMA PAGO : </b> {{$item->FORMA_PAGO}}</span>
+                        <span><b>TOTAL : </b> {{number_format($item->TOTAL_VENTA_ORIG, 4, '.', ',')}}</span>
                         <span><b>ORSERVACION : </b>               
                             @if($item->ind_observacion == 1) 
                                 <span class="badge badge-danger" style="display: inline-block;">EN PROCESO</span>
@@ -46,7 +46,6 @@
                               @endif
                             @endif
                         </span>
-                        
                         <span>
                           <b>DEUDA:
                             @IF($item->CAN_DEUDA > 0)
@@ -56,30 +55,6 @@
                             @ENDIF
                           </b>
                         </span>
-
-                        @php
-                          $transferencia    =   $funcion->con_transferencia($item->COD_DOCUMENTO_CTBLE);
-                        @endphp
-                        <span><b>TRANSFERENCIA:
-                          @if(count($transferencia)<=0)
-                              <span class="badge badge-default" style="width: 150px;display: inline-block;">SIN TRANSFERENCIA</span>
-                          @else
-                              @if($transferencia->TXT_CATEGORIA_ESTADO_ORDEN == 'TERMINADA')
-                                <span class="badge badge-danger" style="width: 150px;display: inline-block;">NO RECEPCIONADO</span>
-                              @else
-                                <span class="badge badge-success" style="width: 150px;display: inline-block;">{{$transferencia->TXT_CATEGORIA_ESTADO_ORDEN}}</span>
-                              @endif
-                          @endif
-                            </b>
-                        </span>
-
-                      </td>
-                      <td class="cell-detail sorting_1" style="position: relative;">
-                        <span><b>SERIE : {{$item->SERIE}} </b> </span>
-                        <span><b>NUMERO  : {{$item->NUMERO}}</b></span>
-                        <span><b>FECCHA : </b> {{$item->FEC_VENTA}}</span>
-                        <span><b>FORMA PAGO : </b> {{$item->FORMA_PAGO}}</span>
-                        <span><b>TOTAL : </b> {{number_format($item->TOTAL_VENTA_ORIG, 4, '.', ',')}}</span>
                       </td>
                       <td class="cell-detail sorting_1" style="position: relative;">
                         <span><b>PROVEEDOR : </b>  {{date_format(date_create($item->fecha_pa), 'd-m-Y h:i:s')}}</span>
@@ -87,15 +62,16 @@
                         <span style="font-size: 18px;"><b>CONTABILIDAD : </b> {{date_format(date_create($item->fecha_pr), 'd-m-Y h:i:s')}}</span>
 
                       </td>
+
                       @include('comprobante.ajax.estados')
                       <td class="rigth">
                         <div class="btn-group btn-hspace">
                           <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>
                           <ul role="menu" class="dropdown-menu pull-right">
                             <li>
-                              <a href="{{ url('/aprobar-comprobante-administracion-contrato/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,7).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -9))) }}">
+                              <a href="{{ url('/aprobar-comprobante-administracion-estiba/'.$idopcion.'/'.$item->ID_DOCUMENTO) }}">
                                 Revision Comprobante
-                              </a>  
+                              </a>
                             </li>
 
 
@@ -114,8 +90,8 @@
                 <thead>
                   <tr>
                     <th>ITEM</th>
-                    <th>CONTRATO</th>
-                    <th>FACTURA</th>
+                    <th>DOCUMENTO</th>
+                    <th>INFORMACION</th>
                     <th>REGISTRO</th>
                     <th>ESTADO</th>
                     <th>OPCION</th>
@@ -127,12 +103,13 @@
                       <td>{{$index+1}}</td>
 
                       <td class="cell-detail sorting_1" style="position: relative;">
-                        <span><b>CODIGO : {{$item->COD_DOCUMENTO_CTBLE}} </b> </span>
-                        <span><b>FECHA  : {{$item->FEC_EMISION}}</b></span>
-                        <span><b>PROVEEDOR : </b> {{$item->TXT_EMPR_EMISOR}}</span>
-                        <span><b>TOTAL : </b> {{$item->CAN_TOTAL}}</span>
-                        <span><b>DOCUMENTO : </b> {{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</span>
-                        
+                        <span><b>SERIE : {{$item->SERIE}} </b> </span>
+                        <span><b>NUMERO  : {{$item->NUMERO}}</b></span>
+                        <span><b>FECHA : </b> {{$item->FEC_VENTA}}</span>
+                      </td>
+                      <td class="cell-detail sorting_1" style="position: relative;">
+                        <span><b>FORMA PAGO : </b> {{$item->FORMA_PAGO}}</span>
+                        <span><b>TOTAL : </b> {{number_format($item->TOTAL_VENTA_ORIG, 4, '.', ',')}}</span>
                         <span><b>ORSERVACION : </b>               
                             @if($item->ind_observacion == 1) 
                                 <span class="badge badge-danger" style="display: inline-block;">EN PROCESO</span>
@@ -147,36 +124,12 @@
                         <span>
                           <b>DEUDA:
                             @IF($item->CAN_DEUDA > 0)
-                             <span data_id_doc = '{{$item->COD_EMPR_EMISOR}}' class="badge badge-danger btn_detalle_deuda" style="width: 100px;cursor: pointer;display: inline-block;">DEUDA</span>
+                             <span data_id_doc = '{{$item->COD_EMPR_EMISOR}}' class="badge badge-danger btn_detalle_deuda" style="width: 100px;cursor: pointer;">DEUDA</span>
                             @ELSE
                               <span class="badge badge-default" style="width: 100px;display: inline-block;">SIN DEUDA</span>
                             @ENDIF
                           </b>
                         </span>
-
-                        @php
-                          $transferencia    =   $funcion->con_transferencia($item->COD_DOCUMENTO_CTBLE);
-                        @endphp
-                        <span><b>TRANSFERENCIA:
-                          @if(count($transferencia)<=0)
-                              <span class="badge badge-default" style="width: 150px;display: inline-block;">SIN TRANSFERENCIA</span>
-                          @else
-                              @if($transferencia->TXT_CATEGORIA_ESTADO_ORDEN == 'TERMINADA')
-                                <span class="badge badge-danger" style="width: 150px;display: inline-block;">NO RECEPCIONADO</span>
-                              @else
-                                <span class="badge badge-success" style="width: 150px;display: inline-block;">{{$transferencia->TXT_CATEGORIA_ESTADO_ORDEN}}</span>
-                              @endif
-                          @endif
-                            </b>
-                        </span>
-
-                      </td>
-                      <td class="cell-detail sorting_1" style="position: relative;">
-                        <span><b>SERIE : {{$item->SERIE}} </b> </span>
-                        <span><b>NUMERO  : {{$item->NUMERO}}</b></span>
-                        <span><b>FECCHA : </b> {{$item->FEC_VENTA}}</span>
-                        <span><b>FORMA PAGO : </b> {{$item->FORMA_PAGO}}</span>
-                        <span><b>TOTAL : </b> {{number_format($item->TOTAL_VENTA_ORIG, 4, '.', ',')}}</span>
                       </td>
 
                       <td class="cell-detail sorting_1" style="position: relative;">
@@ -192,9 +145,9 @@
                           <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>
                           <ul role="menu" class="dropdown-menu pull-right">
                             <li>
-                              <a href="{{ url('/aprobar-comprobante-administracion-contrato/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,7).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -9))) }}">
+                              <a href="{{ url('/aprobar-comprobante-administracion-estiba/'.$idopcion.'/'.$item->ID_DOCUMENTO) }}">
                                 Revision Comprobante
-                              </a>  
+                              </a>
                             </li>
 
 
@@ -215,8 +168,8 @@
                 <thead>
                   <tr>
                     <th>ITEM</th>
-                    <th>CONTRATO</th>
-                    <th>FACTURA</th>
+                    <th>DOCUMENTO</th>
+                    <th>INFORMACION</th>
                     <th>REGISTRO</th>
                     <th>ESTADO</th>
                     <th>OPCION</th>
@@ -228,12 +181,13 @@
                       <td>{{$index+1}}</td>
 
                       <td class="cell-detail sorting_1" style="position: relative;">
-                        <span><b>CODIGO : {{$item->COD_DOCUMENTO_CTBLE}} </b> </span>
-                        <span><b>FECHA  : {{$item->FEC_EMISION}}</b></span>
-                        <span><b>PROVEEDOR : </b> {{$item->TXT_EMPR_EMISOR}}</span>
-                        <span><b>TOTAL : </b> {{$item->CAN_TOTAL}}</span>
-                        <span><b>DOCUMENTO : </b> {{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</span>
-                        
+                        <span><b>SERIE : {{$item->SERIE}} </b> </span>
+                        <span><b>NUMERO  : {{$item->NUMERO}}</b></span>
+                        <span><b>FECHA : </b> {{$item->FEC_VENTA}}</span>
+                      </td>
+                      <td class="cell-detail sorting_1" style="position: relative;">
+                        <span><b>FORMA PAGO : </b> {{$item->FORMA_PAGO}}</span>
+                        <span><b>TOTAL : </b> {{number_format($item->TOTAL_VENTA_ORIG, 4, '.', ',')}}</span>
                         <span><b>ORSERVACION : </b>               
                             @if($item->ind_observacion == 1) 
                                 <span class="badge badge-danger" style="display: inline-block;">EN PROCESO</span>
@@ -248,36 +202,12 @@
                         <span>
                           <b>DEUDA:
                             @IF($item->CAN_DEUDA > 0)
-                             <span data_id_doc = '{{$item->COD_EMPR_EMISOR}}' class="badge badge-danger btn_detalle_deuda" style="width: 100px;cursor: pointer;display: inline-block;">DEUDA</span>
+                             <span data_id_doc = '{{$item->COD_EMPR_EMISOR}}' class="badge badge-danger btn_detalle_deuda" style="width: 100px;cursor: pointer;">DEUDA</span>
                             @ELSE
                               <span class="badge badge-default" style="width: 100px;display: inline-block;">SIN DEUDA</span>
                             @ENDIF
                           </b>
                         </span>
-
-                        @php
-                          $transferencia    =   $funcion->con_transferencia($item->COD_DOCUMENTO_CTBLE);
-                        @endphp
-                        <span><b>TRANSFERENCIA:
-                          @if(count($transferencia)<=0)
-                              <span class="badge badge-default" style="width: 150px;display: inline-block;">SIN TRANSFERENCIA</span>
-                          @else
-                              @if($transferencia->TXT_CATEGORIA_ESTADO_ORDEN == 'TERMINADA')
-                                <span class="badge badge-danger" style="width: 150px;display: inline-block;">NO RECEPCIONADO</span>
-                              @else
-                                <span class="badge badge-success" style="width: 150px;display: inline-block;">{{$transferencia->TXT_CATEGORIA_ESTADO_ORDEN}}</span>
-                              @endif
-                          @endif
-                            </b>
-                        </span>
-
-                      </td>
-                      <td class="cell-detail sorting_1" style="position: relative;">
-                        <span><b>SERIE : {{$item->SERIE}} </b> </span>
-                        <span><b>NUMERO  : {{$item->NUMERO}}</b></span>
-                        <span><b>FECCHA : </b> {{$item->FEC_VENTA}}</span>
-                        <span><b>FORMA PAGO : </b> {{$item->FORMA_PAGO}}</span>
-                        <span><b>TOTAL : </b> {{number_format($item->TOTAL_VENTA_ORIG, 4, '.', ',')}}</span>
                       </td>
 
                       <td class="cell-detail sorting_1" style="position: relative;">
@@ -293,7 +223,7 @@
                           <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>
                           <ul role="menu" class="dropdown-menu pull-right">
                             <li>
-                              <a href="{{ url('/aprobar-comprobante-administracion-contrato/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,7).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -9))) }}">
+                              <a href="{{ url('/aprobar-comprobante-administracion-estiba/'.$idopcion.'/'.$item->ID_DOCUMENTO) }}">
                                 Revision Comprobante
                               </a>  
                             </li>

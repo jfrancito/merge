@@ -71,13 +71,13 @@
 
         </td>
         <td class="cell-detail sorting_1 center" style="position: relative;">
-          <span><b>{{round($item->TOTAL_VENTA_ORIG,2)}}  </b></span>
+          <span><b>{{round($item->TOTAL_VENTA_ORIG,4)}}  </b></span>
         </td>
         <td class="cell-detail sorting_1 center" style="position: relative;">
           <b>{{$item->MONTO_DETRACCION_RED}}</b>
         </td>
         <td class="cell-detail sorting_1 center" style="position: relative;">
-          <b>{{round($item->MONTO_ANTICIPO_DESC,2)}}</b>
+          <b>{{round($item->MONTO_ANTICIPO_DESC,4)}}</b>
         </td>
 
         <td class="center"><b>{{$item->TOTAL_VENTA_ORIG - $item->MONTO_ANTICIPO_DESC - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)}}</b></td>

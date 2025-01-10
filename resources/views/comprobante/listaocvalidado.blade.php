@@ -17,13 +17,23 @@
                   <div class="tools tooltiptop">
 
 
+                    <a href="{{url('/comprobante-masivo-tesoreria-excel')}}" 
+                       class='tn btn-secondary botoncabecera tooltipcss opciones'
+                       target="_blank"
+                       id="descargarcomprobantemasivotesoreriraexcel" 
+                       data-href="{{url('/comprobante-masivo-tesoreria-excel')}}"
+                       title="Descargar excel">
+                       <span class="tooltiptext">Descargar excel Tesoreria</span>
+                       <i class="fa fa-file-excel-o"></i>
+                    </a>
+
                     <a href="{{url('/comprobante-masivo-excel')}}" 
                        class='tn btn-secondary botoncabecera tooltipcss opciones'
                        target="_blank"
                        id="descargarcomprobantemasivoexcel" 
                        data-href="{{url('/comprobante-masivo-excel')}}"
                        title="Descargar excel">
-                       <span class="tooltiptext">Descargar excel </span>
+                       <span class="tooltiptext">Descargar excel Contabilidada</span>
                        <i class="fa fa-file-excel-o"></i>
                     </a>
 
