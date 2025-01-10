@@ -1,6 +1,75 @@
 $(document).ready(function(){
     var carpeta = $("#carpeta").val();
 
+
+    $(".agestioncomprobante").on('click','.verlote', function(e) {
+
+        $('input[type=search]').val("").change();
+        $("#nso").DataTable().search("").draw();
+        var _token                  =   $('#token').val();
+        var data_lote               =   $(this).attr('data_lote');
+        quitarcheck(data_lote);
+        agregarcheck(data_lote);
+        $('#modal-detalle-requerimiento').niftyModal('hide');
+
+        $('input[type=search]').val(data_lote).change();
+        $("#nso").DataTable().search(data_lote).draw();
+
+    });
+
+    $(".agestioncomprobante").on('click','.eliminarlote', function(e) {
+
+        var _token                  =   $('#token').val();
+        var data_lote               =   $(this).attr('data_lote');
+
+        $.confirm({
+            title: '¿Confirma la Eliminacion?',
+            content: 'Elimnar los Comprobantes',
+            buttons: {
+                confirmar: function () {
+                    ajax_eliminar_lote_estiba(data_lote);
+                    $('#modal-detalle-requerimiento').niftyModal('hide');
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo Eliminacion');
+                    window.location.reload();
+                }
+            }
+        });
+
+    });
+
+
+    function agregarcheck(lote){
+        var data = [];
+        $(".listatabla tr").each(function(){
+            nombre          = $(this).find('.input_asignar').attr('id');
+            if(nombre != 'todo_asignar'){
+                check                       = $(this).find('.input_asignar');
+                data_requerimiento_id       = $(this).attr('data_requerimiento_id');
+                data_lote                   = $(this).attr('data_lote');
+                if(data_lote == lote){
+                    check.prop('checked', !check.prop('checked'));
+                }
+            }
+        });
+        return data;
+    }
+
+   function quitarcheck(lote){
+        var data = [];
+        $(".listatabla tr").each(function(){
+            nombre          = $(this).find('.input_asignar').attr('id');
+            if(nombre != 'todo_asignar'){
+                check   = $(this).find('.input_asignar');
+                check.prop('checked', false);
+            }
+        });
+        return data;
+    }
+
+
+
     $(".agestioncomprobante").on('click','.btn_rb', function() {
        abrircargando();
     });
@@ -14,9 +83,11 @@ $(document).ready(function(){
                                         };
 
         ajax_modal(data,"/ajax-modal-detalle-lotes",
-                  "modal-detalle-entregable","modal-detalle-entregable-container");
+                  "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
 
     });
+
+
 
 
     $(".agestioncomprobante").on('click','.migrarestibaadmin', function() {
@@ -106,8 +177,55 @@ $(document).ready(function(){
 
     });
 
+    $(".cfedocumento").on('click','#descargarcomprobantemasivotesoreriraexcel', function() {
+
+        var fecha_inicio         =   $('#fecha_inicio').val();
+        var fecha_fin            =   $('#fecha_fin').val();
+        var proveedor_id         =   $('#proveedor_id').val();
+        var estado_id            =   $('#estado_id').val();
+        var operacion_id         =   $('#operacion_id').val();
+        var idopcion             =   $('#idopcion').val();
+        var _token               =   $('#token').val();
+
+        debugger;
+
+        //validacioones
+        if(fecha_inicio ==''){ alerterrorajax("Seleccione una fecha inicio."); return false;}
+        if(fecha_fin ==''){ alerterrorajax("Seleccione una fecha fin."); return false;}
+
+        href = $(this).attr('data-href')+'/'+fecha_inicio+'/'+fecha_fin+'/'+proveedor_id+'/'+estado_id+'/'+operacion_id+'/'+idopcion;
+        $(this).prop('href', href);
+        return true;
 
 
+    });
+
+
+    function ajax_eliminar_lote_estiba(lote){
+
+        var _token      = $('#token').val();
+        data            =   {
+                                _token                  : _token,
+                                lote                    : lote
+                            };
+        abrircargando();
+        $.ajax({
+            type    :   "POST",
+            url     :   carpeta+'/ajax-eliminar-lote-estiba',
+            data    :   data,
+            success: function (data) {
+                cerrarcargando();
+                $('.buscardocumentoadmin').trigger('click');
+                alertajax("Eliminacion asignado exitosa");
+                //$(".listajax").html(data);
+
+            },
+            error: function (data) {
+                cerrarcargando();
+                error500(data);
+            }
+        });
+    }
 
 
     function ajax_ind_mobil(ind_mobil,producto_id){
@@ -188,12 +306,15 @@ $(document).ready(function(){
         event.preventDefault();
 
         var operacion_id            =   $('#operacion_id').val();
+        var area_id                 =   $('#area_id').val();
+
         var idopcion                =   $('#idopcion').val();
         var _token                  =   $('#token').val();
 
         data            =   {
                                 _token                  : _token,
                                 operacion_id            : operacion_id,
+                                area_id                 : area_id,
                                 idopcion                : idopcion
                             };
         ajax_normal(data,"/ajax-buscar-documento-gestion-admin");

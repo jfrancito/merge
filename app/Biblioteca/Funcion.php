@@ -33,7 +33,7 @@ class Funcion {
 			$neto_pagar 	  = (float)$oc->CAN_TOTAL - (float)$oc->CAN_RETENCION - (float)$fedocumento->MONTO_ANTICIPO_DESC + (float)$oc->CAN_PERCEPCION;
 		}
 
-        $neto_pagar 	  = ROUND($neto_pagar,2);
+        $neto_pagar 	  = ROUND($neto_pagar,4);
         return $neto_pagar;
 	}
 

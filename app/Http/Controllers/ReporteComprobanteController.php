@@ -41,6 +41,28 @@ class ReporteComprobanteController extends Controller
     use GeneralesTraits;
     use ComprobanteTraits;
 
+    public function actionComprobanteMasivoTesoreriaExcel($fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$operacion_id,$idopcion)
+    {
+        set_time_limit(0);
+
+        $cod_empresa            =   Session::get('usuario')->usuarioosiris_id;
+        $fechadia               =   date_format(date_create(date('d-m-Y')), 'd-m-Y');
+        $fecha_actual           =   date("Y-m-d");
+        $titulo                 =   'Comprobantes-Merge-'.$operacion_id;
+        $funcion                =   $this;
+
+        $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_tesoreria_excel($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$operacion_id);
+        Excel::create($titulo.'-('.$fecha_actual.')', function($excel) use ($listadatos,$titulo,$funcion) {
+            $excel->sheet('COMPROBANTE', function($sheet) use ($listadatos,$titulo,$funcion) {
+                $sheet->loadView('reporte/excel/listacomprobantemasivotesoreria')->with('listadatos',$listadatos)
+                                                                   ->with('titulo',$titulo)
+                                                                   ->with('funcion',$funcion);                                               
+            });
+        })->export('xls');
+
+
+    }
+
     public function actionComprobanteMasivoExcel($fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$operacion_id,$idopcion)
     {
         set_time_limit(0);
@@ -76,10 +98,6 @@ class ReporteComprobanteController extends Controller
             })->export('xls');
 
         }
-
-
-
-
 
     }
 

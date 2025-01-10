@@ -44,6 +44,22 @@ use Carbon\Carbon;
 trait ComprobanteTraits
 {
 
+    public function con_transferencia($id_orden) {
+
+        $ordencompra = CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$id_orden)->first();  
+        $resultado = '';
+        // Verificar si la cadena contiene 'TPS' o 'TPL'
+        if (strpos($ordencompra->NRO_ITT, 'TPS') !== false || strpos($ordencompra->NRO_ITT, 'TPL') !== false) {
+            $partes = explode(' / ', $ordencompra->NRO_ITT);
+            $resultado = $partes[0];
+        }
+        $transferencia        =   CMPOrden::where('COD_ORDEN','=',$resultado)->first();  
+
+        return $transferencia;
+
+    }    
+
+
 
     private function con_lista_documentos_contrato_folio($folio) {
 
@@ -1934,7 +1950,30 @@ trait ComprobanteTraits
 
 
 
+    private function con_lista_cabecera_comprobante_total_cont_estiba($cliente_id) {
 
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC'))
+                            ->where('OPERACION','=','ESTIBA')
+                            //->where('FE_DOCUMENTO.ID_DOCUMENTO','=','00000004')
+                            ->where(function ($query) {
+                                $query->where('ind_observacion', '<>', 1)
+                                      ->orWhereNull('ind_observacion');
+                            })
+                            ->where(function ($query) {
+                                $query->where('area_observacion', '=', '')
+                                      ->orwhere('area_observacion', '=', 'UCO')
+                                      ->orWhereNull('area_observacion');
+                            })
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
+                            ->orderBy('ind_observacion','asc')
+                            ->orderBy('fecha_uc','asc')
+
+                            ->get();
+
+        return  $listadatos;
+    }
 
     private function con_lista_cabecera_comprobante_total_cont_contrato($cliente_id) {
 
@@ -1961,7 +2000,23 @@ trait ComprobanteTraits
 
         return  $listadatos;
     }
+    private function con_lista_cabecera_comprobante_total_cont_estiba_levantadas($cliente_id) {
 
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                            //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC'))
+                            ->where('OPERACION','=','ESTIBA')
+                            ->where('ind_observacion','=',0)
+                            ->where('area_observacion','=','CONT')
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
+                            ->orderBy('ind_observacion','asc')
+                            ->orderBy('fecha_uc','asc')
+
+                            ->get();
+
+        return  $listadatos;
+    }
     private function con_lista_cabecera_comprobante_total_cont_contrato_levantadas($cliente_id) {
 
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
@@ -1979,7 +2034,22 @@ trait ComprobanteTraits
 
         return  $listadatos;
     }
+    private function con_lista_cabecera_comprobante_total_cont_estiba_obs($cliente_id) {
 
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                            //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC'))
+                            ->where('OPERACION','=','ESTIBA')
+                             ->where('ind_observacion','=',1)
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
+                            ->orderBy('ind_observacion','asc')
+                            ->orderBy('fecha_uc','asc')
+
+                            ->get();
+
+        return  $listadatos;
+    }
 
 
     private function con_lista_cabecera_comprobante_total_cont_contrato_obs($cliente_id) {
@@ -2018,7 +2088,25 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
+    private function con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas($cliente_id) {
 
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                            ->leftJoin(DB::raw('(SELECT COD_EMPR_CLIENTE, SUM(CAN_SALDO) AS CAN_DEUDA 
+                                                 FROM DEUDA_TOTAL_MERGE_SUM 
+                                                 GROUP BY COD_EMPR_CLIENTE) AS deuda'), 
+                                'CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR', '=', 'deuda.COD_EMPR_CLIENTE')
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC,deuda.CAN_DEUDA AS CAN_DEUDA'))
+                            ->where('OPERACION','=','ESTIBA')
+                            ->where('ind_observacion','=',0)
+                            ->where('area_observacion','=','ADM')
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
+                            ->orderBy('ind_observacion','asc')
+                            ->orderBy('fecha_uc','asc')
+                            ->get();
+
+        return  $listadatos;
+    }
 
 
     private function con_lista_cabecera_comprobante_total_tes_contrato($cliente_id,$proveedor_id) {
@@ -2215,6 +2303,33 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
+    private function con_lista_cabecera_comprobante_total_adm_estiba($cliente_id) {
+
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                            ->leftJoin(DB::raw('(SELECT COD_EMPR_CLIENTE, SUM(CAN_SALDO) AS CAN_DEUDA 
+                                                 FROM DEUDA_TOTAL_MERGE_SUM 
+                                                 GROUP BY COD_EMPR_CLIENTE) AS deuda'), 
+                                'CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR', '=', 'deuda.COD_EMPR_CLIENTE')
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,deuda.CAN_DEUDA AS CAN_DEUDA'))
+                            ->where('OPERACION','=','ESTIBA')
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where(function ($query) {
+                                $query->where('ind_observacion', '<>', 1)
+                                      ->orWhereNull('ind_observacion');
+                            })
+                            ->where(function ($query) {
+                                $query->where('area_observacion', '=', '')
+                                      ->orWhereNull('area_observacion')
+                                      ->orWhereIn('area_observacion',['CONT','UCO']);
+                            })
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
+                            ->orderBy('fecha_pr','asc')
+                            ->get();
+
+        return  $listadatos;
+    }
+
+
     private function con_lista_cabecera_comprobante_total_adm_contrato_obs($cliente_id) {
 
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
@@ -2234,7 +2349,25 @@ trait ComprobanteTraits
 
         return  $listadatos;
     }
+    private function con_lista_cabecera_comprobante_total_adm_estiba_obs($cliente_id) {
 
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+
+                            ->leftJoin(DB::raw('(SELECT COD_EMPR_CLIENTE, SUM(CAN_SALDO) AS CAN_DEUDA 
+                                                 FROM DEUDA_TOTAL_MERGE_SUM 
+                                                 GROUP BY COD_EMPR_CLIENTE) AS deuda'), 
+                                'CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR', '=', 'deuda.COD_EMPR_CLIENTE')
+
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,deuda.CAN_DEUDA AS CAN_DEUDA'))
+                            ->where('OPERACION','=','ESTIBA')
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('ind_observacion','=',1)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
+                            ->orderBy('fecha_pr','asc')
+                            ->get();
+
+        return  $listadatos;
+    }
 
     private function array_usuario_jefes() {
         $array = ['1CIX00000072','1CIX00000075','1CIX00000073','1CIX00000188','1CIX00000217'];
@@ -2308,6 +2441,21 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
+    private function con_lista_cabecera_comprobante_total_gestion_tesoreria_excel($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$operacion_id) {
+
+
+        $listadatos             =       FeDocumento::whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                        ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                        ->where('OPERACION','=','ORDEN_COMPRA')
+                                        ->ProveedorFE($proveedor_id)
+                                        ->EstadoFE($estado_id)
+                                        ->where('OPERACION','=',$operacion_id)
+                                        ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                        ->orderBy('FEC_VENTA','asc')
+                                        ->get();
+
+        return  $listadatos;
+    }
 
 
     private function con_lista_cabecera_comprobante_total_gestion_excel($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id) {
@@ -2634,6 +2782,49 @@ trait ComprobanteTraits
     }
 
 
+    private function con_lista_cabecera_comprobante_total_gestion_estiba($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id) {
+
+
+        $trabajador     =       STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+        $centro_id      =       $trabajador->COD_ZONA_TIPO;
+        $rol            =       WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
+
+
+        if($rol->ind_uc == 1 && Session::get('usuario')->id != '1CIX00000142'){
+
+            $listadatos     =   FeDocumento::Fecha($filtrofecha_id,$fecha_inicio,$fecha_fin)
+                                ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                ->where('OPERACION','=','ESTIBA')
+                                ->ProveedorFE($proveedor_id)
+                                ->EstadoFE($estado_id)
+                                ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                ->orderBy('fecha_pa', 'desc')
+                                ->get();
+
+        }else{
+
+            $listadatos     =   FeDocumento::Fecha($filtrofecha_id,$fecha_inicio,$fecha_fin)
+                                ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                ->where('OPERACION','=','ESTIBA')
+                                ->ProveedorFE($proveedor_id)
+                                ->EstadoFE($estado_id)
+                                ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                ->orderBy('fecha_pa', 'desc')
+                                ->get();
+        }
+
+
+
+
+
+        return  $listadatos;
+
+
+    }
+
+
 
 
     private function con_lista_cabecera_comprobante_total_gestion_agrupado($cliente_id) {
@@ -2865,6 +3056,7 @@ trait ComprobanteTraits
             $listadatos          =      FeDocumento::Join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                                         ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                         ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
+                                        ->where('OPERACION','=','CONTRATO')
                                         ->whereNotIn('FE_DOCUMENTO.COD_ESTADO',['','ETM0000000000006'])
                                         //->where('FE_DOCUMENTO.IND_REPARABLE','=','1')
                                         ->TipoArchivo($tipoarchivo_id)
@@ -2878,6 +3070,45 @@ trait ComprobanteTraits
 
             $listadatos          =      FeDocumento::Join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                                         ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                        ->where('OPERACION','=','CONTRATO')
+                                        ->TipoArchivo($tipoarchivo_id)
+                                        ->EstadoReparable($estado_id)
+                                        //->where('FE_DOCUMENTO.MODO_REPARABLE','=',$tipoarchivo_id)
+                                        ->whereNotIn('FE_DOCUMENTO.COD_ESTADO',['','ETM0000000000006'])
+                                        //->where('FE_DOCUMENTO.IND_REPARABLE','=','1')
+                                        ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                        ->orderBy('IND_OBSERVACION_REPARABLE','asc')
+                                        ->get();
+
+        }
+
+
+        return  $listadatos;
+    }
+    private function con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cliente_id,$tipoarchivo_id,$estado_id) {
+
+        $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+        $centro_id           =      $trabajador->COD_ZONA_TIPO;
+        $rol                 =       WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
+
+        if($rol->ind_uc == 1){
+
+            $listadatos          =      FeDocumento::where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                        //->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
+                                        ->where('OPERACION','=','ESTIBA')
+                                        ->whereNotIn('FE_DOCUMENTO.COD_ESTADO',['','ETM0000000000006'])
+                                        //->where('FE_DOCUMENTO.IND_REPARABLE','=','1')
+                                        ->TipoArchivo($tipoarchivo_id)
+                                        ->EstadoReparable($estado_id)
+                                        //->where('FE_DOCUMENTO.MODO_REPARABLE','=',$tipoarchivo_id)
+                                        ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                        ->orderBy('IND_OBSERVACION_REPARABLE','asc')
+                                        ->get();
+
+        }else{
+
+            $listadatos          =      FeDocumento::where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                        ->where('OPERACION','=','ESTIBA')
                                         ->TipoArchivo($tipoarchivo_id)
                                         ->EstadoReparable($estado_id)
                                         //->where('FE_DOCUMENTO.MODO_REPARABLE','=',$tipoarchivo_id)
@@ -2926,7 +3157,22 @@ trait ComprobanteTraits
 	 	return  $listadatos;
 	}
 
+    private function con_lista_cabecera_comprobante_total_gestion_observados_estibas($cliente_id) {
 
+        $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+        $centro_id           =      $trabajador->COD_ZONA_TIPO;
+        
+        $listadatos          =      FeDocumento::where('OPERACION','=','ESTIBA')
+                                    ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                    //->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
+                                    ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                    ->where('FE_DOCUMENTO.area_observacion','<>','UCO')
+                                    ->where('FE_DOCUMENTO.ind_observacion','=','1')
+                                    ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                    ->get();
+
+        return  $listadatos;
+    }
 
 
 
@@ -2936,6 +3182,7 @@ trait ComprobanteTraits
         $centro_id           =      $trabajador->COD_ZONA_TIPO;
         $listadatos          =      FeDocumento::Join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                                     //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                                    ->where('OPERACION','=','CONTRATO')
                                     ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                     ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
                                     ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
@@ -3332,6 +3579,7 @@ trait ComprobanteTraits
         if($tt_totales <= 0.04){
             $ind_total          =   1;  
         }else{  $ind_errototal      =   0;  }
+
         $ind_cantidaditem           =   1;
         $ind_formapago              =   1; 
 
@@ -3951,7 +4199,7 @@ trait ComprobanteTraits
                                                   ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
                                         })
                                         ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
-                                        //->where('COD_CENTRO','=',$centro_id)
+                                        ->whereRaw('YEAR(FEC_EMISION) >= ?', [2024])
                                         ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
                                         ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
                                                             FEC_EMISION,
@@ -3981,6 +4229,7 @@ trait ComprobanteTraits
                                               ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
                                               ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
                                     })
+                                    ->whereRaw('YEAR(FEC_EMISION) >= ?', [2024])
                                     ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
                                     ->where('COD_CENTRO','=',$centro_id)
                                     //->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
@@ -4007,7 +4256,7 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
-    private function con_lista_cabecera_estibas_administrativo($cliente_id) {
+    private function con_lista_cabecera_estibas_administrativo($cliente_id,$area_id) {
 
         $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
         $array_trabajadores  =      STDTrabajador::where('NRO_DOCUMENTO','=',$trabajador->NRO_DOCUMENTO)
@@ -4019,16 +4268,20 @@ trait ComprobanteTraits
         $estado_no          =       'ETM0000000000006';
         $centro_id          =       $trabajador->COD_ZONA_TIPO;
         $tipodoc_id         =       'TDO0000000000067';
+        $array_usuarios     =       SGDUsuario::Area($area_id)
+                                    ->whereNotNull('COD_CATEGORIA_AREA')
+                                    ->pluck('COD_USUARIO')
+                                    ->toArray();
 
         if(Session::get('usuario')->id== '1CIX00000001'){
 
-            $listadatos         =       VMergeDocumento::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
-                                            $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
-                                                ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
-                                        })
-                                        ->leftJoin('FE_REF_ASOC', function ($leftJoin){
+            $listadatos         =       VMergeDocumento::leftJoin('FE_REF_ASOC', function ($leftJoin){
                                             $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
                                                 ->where('FE_REF_ASOC.COD_ESTADO', '=', '1');
+                                        })
+                                        ->leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                            $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                                                ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
                                         })
                                         //->WHERE('VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE','=','IICHEST000068311')
                                         ->where('VMERGEDOCUMENTOS.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
@@ -4037,6 +4290,8 @@ trait ComprobanteTraits
                                                   ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
                                                   ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
                                         })
+                                        ->WHERE('VMERGEDOCUMENTOS.COD_ESTADO','=','1')
+                                        //->whereIn('VMERGEDOCUMENTOS.COD_USUARIO_CREA_AUD',$array_usuarios)
                                         ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
                                         ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
                                                             FEC_EMISION,
@@ -4067,6 +4322,7 @@ trait ComprobanteTraits
                                             $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
                                                 ->where('FE_REF_ASOC.COD_ESTADO', '=', '1');
                                         })
+                                        ->WHERE('VMERGEDOCUMENTOS.COD_ESTADO','=','1')
                                         ->where('VMERGEDOCUMENTOS.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                         ->where(function ($query) {
                                             $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
@@ -4074,6 +4330,7 @@ trait ComprobanteTraits
                                                   ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
                                         })
                                         ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
+                                        ->whereIn('VMERGEDOCUMENTOS.COD_USUARIO_CREA_AUD',$array_usuarios)
                                         ->where('COD_CENTRO','=',$centro_id)
                                         ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
                                                             FEC_EMISION,

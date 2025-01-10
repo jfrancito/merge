@@ -95,8 +95,8 @@
 	            @ENDIF
 	          @ENDIF
 	        </td>
-	        <td>{{round($item->PERCEPCION,2)}}</td>
-	        <td>{{round($item->MONTO_ANTICIPO_DESC,2)}}</td>
+	        <td>{{round($item->PERCEPCION,4)}}</td>
+	        <td>{{round($item->MONTO_ANTICIPO_DESC,4)}}</td>
 
 
 	        <td>

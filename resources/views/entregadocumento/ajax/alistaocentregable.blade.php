@@ -65,7 +65,7 @@
 
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>IMPORTE: </b> {{$item->CAN_TOTAL}}  </span>
-          <span><b>ANTICIPO  :</b>{{round($item->MONTO_ANTICIPO_DESC,2)}}</span>
+          <span><b>ANTICIPO  :</b>{{round($item->MONTO_ANTICIPO_DESC,4)}}</span>
         </td>
 
         <td class="cell-detail sorting_1" style="position: relative;">
@@ -93,7 +93,7 @@
         </td>
         <td>
           <b>
-            {{round($item->PERCEPCION,2)}}
+            {{round($item->PERCEPCION,4)}}
           </b>
         </td>
         <td>

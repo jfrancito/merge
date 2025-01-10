@@ -99,7 +99,7 @@
 
 
           @if(count($fedocumento)>0)
-            <form method="POST" action="{{ url('validar-xml-oc-contrato-administrator/'.$idopcion.'/'.$idoc) }}" name="formguardardatos" id="formguardardatos" enctype="multipart/form-data" >
+            <form method="POST" action="{{ url('validar-xml-oc-estiba-administrator/'.$idopcion.'/'.$idoc) }}" name="formguardardatos" id="formguardardatos" enctype="multipart/form-data" >
              {{ csrf_field() }}
               <input type="hidden" name="rutaorden" id='rutaorden' value = '{{$rutaorden}}'>
               <div class="row">

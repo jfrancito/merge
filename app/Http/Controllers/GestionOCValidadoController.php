@@ -17,6 +17,8 @@ use App\Modelos\FeDocumentoHistorial;
 use App\Modelos\Archivo;
 use App\Modelos\CMPReferecenciaAsoc;
 use App\Modelos\CMPOrden;
+use App\Modelos\FeRefAsoc;
+use App\Modelos\CMPDocumentoCtble;
 
 
 use Greenter\Parser\DocumentParserInterface;
@@ -292,7 +294,7 @@ class GestionOCValidadoController extends Controller
             $operacion_id       =   'CONTRATO';
         }
 
-        $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO');
+        $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO','ESTIBA' => 'ESTIBA');
         $filtrofecha_id     =   'RE';
         $combo_filtrofecha  =   array('RE' => 'REGISTRO','REA' => 'APROBACION');
 
@@ -300,7 +302,13 @@ class GestionOCValidadoController extends Controller
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
         }else{
-            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+            if($operacion_id=='CONTRATO'){
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+            }else{
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+            }
+
+
         }
 
 
@@ -343,7 +351,11 @@ class GestionOCValidadoController extends Controller
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
         }else{
-            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+           if($operacion_id=='CONTRATO'){
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+            }else{
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+            }
         }
 
         $funcion        =   $this;
@@ -489,6 +501,51 @@ class GestionOCValidadoController extends Controller
                             'archivospdf'           =>  $archivospdf,                         
                             'xmlarchivo'            =>  $xmlarchivo,
                             'tp'                    =>  $tp,
+                            'funcion'               =>  $funcion,
+                            'idopcion'              =>  $idopcion,
+                         ]);
+    }
+
+
+    public function actionDetalleComprobanteOCValidadoEstiba($idopcion,$lote, Request $request) {
+
+        View::share('titulo','Detalle de Comprobante');
+
+        $idoc                   =   $lote;
+
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->first();
+        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+
+        $prefijocarperta        =   $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
+
+        $xmlarchivo             =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$lote.'\\'.$fedocumento->ARCHIVO_XML;
+        $cdrarchivo             =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$lote.'\\'.$fedocumento->ARCHIVO_CDR;
+        $pdfarchivo             =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$lote.'\\'.$fedocumento->ARCHIVO_PDF;
+        $documentohistorial     =   FeDocumentoHistorial::where('ID_DOCUMENTO','=',$lote)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                    ->orderBy('FECHA','DESC')
+                                    ->get();
+        $funcion                =   $this;
+        $archivos               =   $this->lista_archivos_total($idoc,$fedocumento->DOCUMENTO_ITEM);
+        $archivospdf            =   $this->lista_archivos_total_pdf($idoc,$fedocumento->DOCUMENTO_ITEM);
+        $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+        $lotes                  =   FeRefAsoc::where('lote','=',$idoc)                                        
+                                    ->pluck('ID_DOCUMENTO')
+                                    ->toArray();
+        $documento_asociados    =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->get();
+        $documento_top          =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->first();
+
+        return View::make('comprobante/registrocomprobantevalidadoestiba',
+                         [
+                            'fedocumento'           =>  $fedocumento,
+                            'detallefedocumento'    =>  $detallefedocumento,
+                            'documento_asociados'   =>  $documento_asociados,
+                            'documento_top'         =>  $documento_top,
+                            'lote'                  =>  $lote,
+                            'documentohistorial'    =>  $documentohistorial,
+                            'archivos'              =>  $archivos,
+                            'archivosanulados'      =>  $archivosanulados,
+                            'archivospdf'           =>  $archivospdf,                         
+                            'xmlarchivo'            =>  $xmlarchivo,
                             'funcion'               =>  $funcion,
                             'idopcion'              =>  $idopcion,
                          ]);
@@ -701,6 +758,36 @@ class GestionOCValidadoController extends Controller
             // readfile($file);
 
 
+            exit;
+        }else{
+            dd('Documento no encontrado');
+        }
+
+    }
+
+   public function actionDescargarEstiba($tipo,$idopcion,$lote, Request $request)
+    {
+
+        $idoc                   =   $lote;
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->first();
+        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->get();
+        $prefijocarperta        =   $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
+        $archivo                =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','1')->where('TIPO_ARCHIVO','=',$tipo)
+                                    ->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->first();
+
+        $nombrearchivo          =   trim($archivo->NOMBRE_ARCHIVO);
+        $nombrefile             =   basename($nombrearchivo);
+        $file                   =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$lote.'\\'.basename($archivo->NOMBRE_ARCHIVO);
+
+        //dd($file);
+
+        if(file_exists($file)){
+            header("Cache-Control: public");
+            header("Content-Description: File Transfer");
+            header("Content-Disposition: attachment; filename=$nombrefile");
+            header("Content-Type: application/xml");
+            header("Content-Transfer-Encoding: binary");
+            readfile($file);
             exit;
         }else{
             dd('Documento no encontrado');
