@@ -1039,6 +1039,9 @@ class GestionEntregaDocumentoController extends Controller
                 $listafedocu    =   $this->con_lista_proveedores_banco_folio_oc($folio->FOLIO,$item->TXT_CATEGORIA_BANCO);
                 $countfedocu    =    str_pad(count($listafedocu), 6, '0', STR_PAD_LEFT);
                 $listadocumento =   $this->con_lista_doc_proveedor_banco_folio_oc($folio->FOLIO,$item->TXT_CATEGORIA_BANCO);
+
+                //dd($listadocumento);
+
                 $npestania = substr($txt_banco, 0, 30);
 
 

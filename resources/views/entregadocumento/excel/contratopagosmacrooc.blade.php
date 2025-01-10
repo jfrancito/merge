@@ -57,7 +57,7 @@
 	      	<th>{{date_format(date_create($folio->FECHA_CREA), 'Ymd')}}</th>
 	      	<th>C</th>
 	      	<th></th>
-	     	<th>{{$listadocumento->sum('TOTAL_PAGAR')}}</th>
+	     	<th>{{number_format($listadocumento->sum('TOTAL_PAGAR'), 2, '.', '')}}</th>
 	     	<th>FLETES</th>
 	  	</tr>
 

@@ -86,7 +86,7 @@
 
 	        <td>
 	          @IF($item->CAN_DETRACCION>0)
-	            {{$item->CAN_DETRACCION}}
+	            {{round($item->CAN_DETRACCION)}}
 	          @ELSE
 	            @IF($item->CAN_RETENCION>0)
 	              {{$item->CAN_RETENCION}}
