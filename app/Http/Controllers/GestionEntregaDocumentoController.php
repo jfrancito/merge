@@ -432,6 +432,7 @@ class GestionEntregaDocumentoController extends Controller
             $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
                                 ->where('COD_EMPRESA','=',$empresa_id)
                                 ->where('OPERACION','=',$operacion_id)
+                                ->where('COD_ESTADO','=','1')
                                 ->where('USUARIO_CREA','=',Session::get('usuario')->id)
                                 ->orderBy('FE_DOCUMENTO_ENTREGABLE.FECHA_CREA','DESC')
                                 ->get();
@@ -439,6 +440,7 @@ class GestionEntregaDocumentoController extends Controller
             $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
                                 ->where('COD_EMPRESA','=',$empresa_id)
                                 ->where('OPERACION','=',$operacion_id)
+                                ->where('COD_ESTADO','=','1')
                                 ->orderBy('FE_DOCUMENTO_ENTREGABLE.FECHA_CREA','DESC')
                                 ->get();
         }
