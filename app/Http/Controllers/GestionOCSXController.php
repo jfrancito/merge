@@ -277,6 +277,8 @@ class GestionOCSXController extends Controller
 
         }
         $comboant               =   array('' => "Seleccione Anticipo")+$arrayitem;
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
+        
 
         return View::make('comprobantesx/registrocomprobanteadministratorsx',
                          [
