@@ -609,13 +609,21 @@ class GestionOCController extends Controller
 
         $estado_id          =   'TODO';        
         $area_id            =   'TODO';
+
+
         $combo_area         =   $this->gn_combo_area_usuario($estado_id);
         $rol                =    WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 
         if($rol->ind_uc == 1){
             $usuario    =   SGDUsuario::where('COD_USUARIO','=',Session::get('usuario')->name)->first();
+
+
             if(count($usuario)>0){
+
+
                 $tp_area        =   CMPCategoria::where('COD_CATEGORIA','=',$usuario->COD_CATEGORIA_AREA)->first();
+                //DD($usuario->COD_CATEGORIA_AREA);
+
                 $area_id        =   $tp_area->COD_CATEGORIA;
                 $combo_area     =   array($tp_area->COD_CATEGORIA => $tp_area->NOM_CATEGORIA);
             }

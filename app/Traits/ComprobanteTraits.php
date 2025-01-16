@@ -4273,6 +4273,10 @@ trait ComprobanteTraits
                                     ->pluck('COD_USUARIO')
                                     ->toArray();
 
+
+
+
+
         if(Session::get('usuario')->id== '1CIX00000001'){
 
             $listadatos         =       VMergeDocumento::leftJoin('FE_REF_ASOC', function ($leftJoin){
@@ -4309,29 +4313,29 @@ trait ComprobanteTraits
                                                         '))
                                         ->get();
 
-        //DD($listadatos);
-
 
         }else{
+            //dd($array_usuarios);
 
-            $listadatos         =       VMergeDocumento::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
-                                            $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
-                                                ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
-                                        })
-                                        ->leftJoin('FE_REF_ASOC', function ($leftJoin){
+
+            $listadatos         =       VMergeDocumento::leftJoin('FE_REF_ASOC', function ($leftJoin){
                                             $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
                                                 ->where('FE_REF_ASOC.COD_ESTADO', '=', '1');
                                         })
-                                        ->WHERE('VMERGEDOCUMENTOS.COD_ESTADO','=','1')
+                                        ->leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                            $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                                                ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                                        })
+                                        //->WHERE('VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE','=','IICHEST000068311')
                                         ->where('VMERGEDOCUMENTOS.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                         ->where(function ($query) {
                                             $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
                                                   ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
                                                   ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
                                         })
-                                        ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
+                                        ->WHERE('VMERGEDOCUMENTOS.COD_ESTADO','=','1')
                                         ->whereIn('VMERGEDOCUMENTOS.COD_USUARIO_CREA_AUD',$array_usuarios)
-                                        ->where('COD_CENTRO','=',$centro_id)
+                                        ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
                                         ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
                                                             FEC_EMISION,
                                                             TXT_CATEGORIA_MONEDA,
