@@ -5,6 +5,10 @@
         <input type="hidden" name="jsondocumenos" id = 'jsondocumenos'>
   </form>
   <div class="tools tooltiptop">
+    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones detalleestibs">
+      <span class="tooltiptext">Detalle de Estibas</span>
+      <span class="icon mdi mdi-assignment"></span>
+    </a>
     <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones lotesestibas">
       <span class="tooltiptext">Lotes Estiba</span>
       <span class="icon mdi mdi-eye"></span>

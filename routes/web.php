@@ -186,9 +186,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/validar-xml-oc-estiba-administrator/{idopcion}/{lote}', 'GestionEstibaController@actionValidarXMLEstibaAdministrator');
 	Route::any('/ajax-modal-detalle-lotes', 'GestionEstibaController@actionCargarModalDetalleLotes');
 	Route::any('/ajax-eliminar-lote-estiba', 'GestionEstibaController@actionEliminacionLoteEstiba');
-
-
-
+	Route::any('/ajax-modal-detalle-estibas', 'GestionEstibaController@actionCargarModalDetalleEstibas');
 
 
 	Route::any('/gestion-de-oc-validado-proveedores/{idopcion}', 'GestionOCValidadoController@actionListarOCValidado');
