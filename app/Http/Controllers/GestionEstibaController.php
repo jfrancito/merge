@@ -1094,6 +1094,22 @@ class GestionEstibaController extends Controller
         }
     }
 
+    public function actionCargarModalDetalleEstibas(Request $request) {
+
+        $jsondocumenos                      =    json_decode($request['datastring'],true);
+        $result = array_map(function($item) {
+            return $item['data_requerimiento_id'];
+        }, $jsondocumenos);
+
+        $feasoc     = CMPDetalleProducto::whereIn('COD_TABLA',$result)->get();
+        $funcion        =   $this;
+        return View::make('comprobante/modal/ajax/mlistalotesestibadetalle',
+                         [
+                            'feasoc'                =>  $feasoc,
+                            'funcion'               =>  $funcion
+                         ]);
+    }
+
     public function actionCargarModalDetalleLotes(Request $request) {
 
         $feasoc         =   FeRefAsoc::where('USUARIO_CREA','=',Session::get('usuario')->id)

@@ -88,6 +88,24 @@ $(document).ready(function(){
     });
 
 
+    $(".agestioncomprobante").on('click','.detalleestibs', function() {
+        event.preventDefault();
+        $('input[type=search]').val('').change();
+        $("#nso").DataTable().search("").draw();
+        data = dataenviar();
+        if(data.length<=0){alerterrorajax('Seleccione por lo menos una fila'); return false;}
+        var datastring = JSON.stringify(data);
+
+        var _token                  =   $('#token').val();
+        var idopcion                =   $('#idopcion').val();
+        data                        =   {
+                                            _token                  : _token,
+                                            idopcion                : idopcion,
+                                            datastring                : datastring,
+                                        };
+        ajax_modal(data,"/ajax-modal-detalle-estibas",
+                  "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+    });
 
 
     $(".agestioncomprobante").on('click','.migrarestibaadmin', function() {
