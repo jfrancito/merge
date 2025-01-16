@@ -3406,7 +3406,7 @@ trait ComprobanteTraits
 
 
         $total_1 = $ordencompra->CAN_TOTAL-$ordencompra_t->CAN_RETENCION+$ordencompra_t->CAN_PERCEPCION;
-        $total_2 = $fedocumento->TOTAL_VENTA_ORIG+$ordencompra_t->CAN_PERCEPCION;//-$ordencompra_t->CAN_RETENCION;//+$fedocumento->PERCEPCION+$fedocumento->MONTO_RETENCION;
+        $total_2 = $fedocumento->TOTAL_VENTA_ORIG+$ordencompra_t->CAN_PERCEPCION-$ordencompra_t->CAN_RETENCION;//+$fedocumento->PERCEPCION+$fedocumento->MONTO_RETENCION;
         $tt_totales = round(abs($total_1 - $total_2), 2);
 
         //dd($total_1);
