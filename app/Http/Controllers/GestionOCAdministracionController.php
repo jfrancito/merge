@@ -1415,7 +1415,8 @@ class GestionOCAdministracionController extends Controller
                                               ,'area_observacion'
                                               ,'OPERACION'
                                               ,'PERCEPCION'
-                                              ,'usuario_tes')
+                                              ,'usuario_tes'
+                                              ,'LOTE')
                         ->where('ID_DOCUMENTO', '=', $orden->COD_ORDEN)
                         ->get();
 
@@ -1843,7 +1844,8 @@ class GestionOCAdministracionController extends Controller
                                               ,'area_observacion'
                                               ,'OPERACION'
                                               ,'PERCEPCION'
-                                              ,'usuario_tes')
+                                              ,'usuario_tes'
+                                              ,'LOTE')
                         ->where('ID_DOCUMENTO', '=', $orden->COD_DOCUMENTO_CTBLE)
                         ->get();
 
@@ -2246,7 +2248,8 @@ class GestionOCAdministracionController extends Controller
                                               ,'area_observacion'
                                               ,'OPERACION'
                                               ,'PERCEPCION'
-                                              ,'usuario_tes')
+                                              ,'usuario_tes'
+                                              ,'LOTE')
                         ->where('ID_DOCUMENTO', '=', $idoc)
                         ->get();
 
