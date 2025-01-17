@@ -2,6 +2,37 @@ $(document).ready(function(){
     var carpeta = $("#carpeta").val();
 
 
+    $(".agestioncomprobante").on('change','.selectoperacion', function() {
+
+
+        var _token              =   $('#token').val();
+        var operacion_id        =   $(this).val();
+        var valores = ['ESTIBA'];
+        if(valores.includes(operacion_id)){
+            $('.sec_estiba').removeClass('ocultar');
+        }else{
+            $('.sec_estiba').addClass('ocultar');
+        }
+
+        $.ajax({
+              type    :     "POST",
+              url     :     carpeta+"/ajax-estiba-proveedor-estiba",
+              data    :     {
+                                _token              : _token,
+                                operacion_id        : operacion_id
+                            },
+                success: function (data) {
+                    $('.ajax_proveedor').html(data);
+                },
+                error: function (data) {
+                    error500(data);
+                }
+        });
+
+
+
+    });
+
     $(".agestioncomprobante").on('click','.verlote', function(e) {
 
         $('input[type=search]').val("").change();
@@ -329,11 +360,19 @@ $(document).ready(function(){
         var idopcion                =   $('#idopcion').val();
         var _token                  =   $('#token').val();
 
+        var fecha_inicio            =   $('#fecha_inicio').val();
+        var fecha_fin               =   $('#fecha_fin').val();
+        var proveedor_id            =   $('#proveedor_id').val();
+
         data            =   {
                                 _token                  : _token,
                                 operacion_id            : operacion_id,
                                 area_id                 : area_id,
-                                idopcion                : idopcion
+                                idopcion                : idopcion,
+                                fecha_inicio            : fecha_inicio,
+                                fecha_fin               : fecha_fin,
+                                proveedor_id            : proveedor_id
+
                             };
         ajax_normal(data,"/ajax-buscar-documento-gestion-admin");
 
