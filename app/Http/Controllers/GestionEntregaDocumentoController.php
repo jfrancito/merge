@@ -155,6 +155,8 @@ class GestionEntregaDocumentoController extends Controller
 
         $operacion_id       =   'ORDEN_COMPRA';
 
+        //$operacion_id       =   'ESTIBA';
+
         //falta usuario contacto
         $array_contrato     =   $this->array_rol_contrato();
         if (in_array(Session::get('usuario')->rol_id, $array_contrato)) {
@@ -162,13 +164,17 @@ class GestionEntregaDocumentoController extends Controller
         }
         
 
-        $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO');
+        $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO','ESTIBA' => 'ESTIBA');
         //$combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA');
 
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_entregable($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id);
         }else{
-            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id);
+            if($operacion_id=='CONTRATO'){
+                $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id);
+            }else{
+                $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id);
+            }
         }
         $funcion        =   $this;
         return View::make('entregadocumento/listaentregadocumento',
@@ -217,7 +223,11 @@ class GestionEntregaDocumentoController extends Controller
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_entregable($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id);
         }else{
-            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id);
+            if($operacion_id=='CONTRATO'){
+                $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id);
+            }else{
+                $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id);
+            }
         }
 
         $funcion        =   $this;
@@ -401,8 +411,7 @@ class GestionEntregaDocumentoController extends Controller
         }
 
 
-
-        $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO');
+        $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO','ESTIBA' => 'ESTIBA');
 
         $funcion        =   $this;
         return View::make('entregadocumento/listaentregadocumentofolio',
