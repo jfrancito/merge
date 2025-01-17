@@ -221,6 +221,9 @@ Route::group(['middleware' => ['authaw']], function () {
 
 
 	Route::any('/descargar-pago-proveedor-bcp-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoFolioBcp');
+	Route::any('/descargar-pago-proveedor-bcp-estiba-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoFolioEstibaBcp');
+
+
 	Route::any('/descargar-pago-proveedor-macro-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoFolioMacro');
 	Route::any('/descargar-pago-proveedor-macro-bbva-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoMacroBbva');
 	Route::any('/descargar-pago-proveedor-macro-sbk-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoMacroSBK');
