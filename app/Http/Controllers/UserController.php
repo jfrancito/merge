@@ -992,22 +992,30 @@ class UserController extends Controller {
 		$trol 						=	WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 
 		$count_x_aprobar_con 				= 	0;
-
 		$count_x_aprobar_gestion_con 		= 	0;
 		
-		//1CIX00000019 COMPRAS
-        //1CIX00000015 1CIX00000016 //Contabilidad
+		//estibas
+		$urlestiba 							=	'';
+		$count_x_aprobar_est 				= 	0;
+		$count_x_aprobar_gestion_est 		= 	0;
+		$count_reparables_est 				= 	0;
+        $url_rep_estiba 					=	'';
+		$count_reparables__revest 			= 	0;
+        $url_rep_estiba_revisar 			=	'';
+
+		$count_observados_est 				= 	0;
+		$count_observadosest_le 		= 	0;
 
 
 		if($trol->ind_uc == 1){
 
 			$listadatos      		=   $this->con_lista_cabecera_comprobante_total_uc($cod_empresa);
-
-			
 			$count_x_aprobar 		= 	 count($listadatos);
         	$url 			 		=	'/gestion-de-comprobante-us/wjR';
         	//contrato
 			$count_x_aprobar_con 	= 	 count($listadatos);
+
+
 
         	$listadatosre    		=   $this->con_lista_cabecera_comprobante_total_gestion_reparable($cod_empresa,'TODO','TODO');
 			$count_reparables 		= 	 count($listadatosre);
@@ -1049,18 +1057,19 @@ class UserController extends Controller {
 	        	$listadatosoble    		=   $this->con_lista_cabecera_comprobante_total_cont_obs_levantadas($cod_empresa);
 				$count_observadosoc_le 	= 	count($listadatosoble);
 
-
-
     			$url 					=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=ORDEN_COMPRA';
     			$urlcontrato 			=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=CONTRATO';
+    			$urlestiba 				=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=ESTIBA';
 
 
         		$url_rep 		 		=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=ORDEN_COMPRA';
         		$url_rep_contrato 		=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=CONTRATO';
+        		$url_rep_estiba 		=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=ESTIBA';
+
 
         		$url_rep_revisar 		 		=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=ORDEN_COMPRA&estado_id=2';
         		$url_rep_contrato_revisar 		=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=CONTRATO&estado_id=2';
-
+        		$url_rep_estiba_revisar 		=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=ESTIBA&estado_id=2';
 
         		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_cont_contrato($cod_empresa);
 				$count_x_aprobar_con 	= 	 count($listadatos);
@@ -1079,13 +1088,27 @@ class UserController extends Controller {
 				$count_reparables_con 	= 	 count($listadatosre_con);
 
 
-	        	$listadatosrerev    		=   $this->con_lista_cabecera_comprobante_total_gestion_reparable($cod_empresa,'TODO','2');
-				$count_reparables_rev 		= 	 count($listadatosrerev);
+	        	$listadatosrerev    	=   $this->con_lista_cabecera_comprobante_total_gestion_reparable($cod_empresa,'TODO','2');
+				$count_reparables_rev 	= 	 count($listadatosrerev);
 
-	        	$listadatosre_con_rev    	=   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cod_empresa,'TODO','2');
-				$count_reparables__revcon 	= 	 count($listadatosre_con_rev);
+	        	$listadatosre_con_rev   =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cod_empresa,'TODO','2');
+				$count_reparables__revcon = 	 count($listadatosre_con_rev);
 
+				//estibas
+        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_cont_estiba($cod_empresa);
+				$count_x_aprobar_est 	= 	 count($listadatos);
 
+	        	$listadatosre_est    	=   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,'TODO','TODO');
+				$count_reparables_est 	= 	 count($listadatosre_est);
+
+	        	$listadatosre_est_rev   =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,'TODO','2');
+				$count_reparables__revest = 	 count($listadatosre_est_rev);
+
+	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_estiba_obs($cod_empresa);
+				$count_observados_est 	= 	count($listadatosob);
+
+	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_estiba_levantadas($cod_empresa);
+				$count_observadosest_le 	= 	count($listadatosob);
 
 			}
 			//ADMINISTRACION
@@ -1120,76 +1143,57 @@ class UserController extends Controller {
 		$listaobservados    =	array();
 		$listaocpendientes_con    =	array();
 		$listadocestados_con    =	array();	
-
 		if(Session::get('usuario')->rol_id != '1CIX00000024'){
-
 			$listaocpendientes     	   =   $this->con_lista_cabecera_comprobante_administrativo_total();
 			$listaocpendientes_con     =   $this->con_lista_cabecera_comprobante_administrativo_total_contrato();
-
         	$listadocestados       	   =   $this->con_lista_cabecera_comprobante_total_gestion_agrupado($cod_empresa);
         	$listadocestados_con       =   $this->con_lista_cabecera_comprobante_total_gestion_agrupado_con($cod_empresa);
-
-
         	$listaobservados       =   FeDocumento::where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)->where('TXT_PROCEDENCIA','<>','SUE')->where('ind_observacion','=','1')->first();
 		}
 
 
-
-
-
-
 		return View::make('bienvenido',
 						 [
-						 	'usuario' 			=> $usuario,
-						 	'cuentabancarias' 	=> $cuentabancarias,
-						 	'fecha' 			=> $fecha,
-						 	'count_x_aprobar' 	=> $count_x_aprobar,
+						 	'usuario' 					=> $usuario,
+						 	'count_x_aprobar_est' 		=> $count_x_aprobar_est,
+						 	'urlestiba' 				=> $urlestiba,
+						 	'count_reparables_est' 		=> $count_reparables_est,
+						 	'url_rep_estiba' 			=> $url_rep_estiba,
+						 	'count_reparables__revest' 	=> $count_reparables__revest,
+						 	'url_rep_estiba_revisar' 	=> $url_rep_estiba_revisar,
+						 	'count_observados_est' 		=> $count_observados_est,
+						 	'count_observadosest_le' 	=> $count_observadosest_le,
 
-						 	'url' 				=> $url,
-						 	'urlcontrato' 		=> $urlcontrato,
 
-						 	'count_observados' 	=> $count_observados,
-						 	'url_obs' 			=> $url_obs,
-
+						 	'cuentabancarias' 			=> $cuentabancarias,
+						 	'fecha' 					=> $fecha,
+						 	'count_x_aprobar' 			=> $count_x_aprobar,
+						 	'url' 						=> $url,
+						 	'urlcontrato' 				=> $urlcontrato,
+						 	'count_observados' 			=> $count_observados,
+						 	'url_obs' 					=> $url_obs,
 						 	'count_observadosoc_le' 	=> $count_observadosoc_le,
 						 	'count_observadosct_le' 	=> $count_observadosct_le,
-
-						 	'count_reparables' 	=> $count_reparables,
-						 	'count_reparables_con' 	=> $count_reparables_con,
-						 	'url_rep' 			=> $url_rep,
-						 	'url_rep_contrato' 	=> $url_rep_contrato,
-
-						 	'url_rep_revisar' 	=> $url_rep_revisar,
+						 	'count_reparables' 			=> $count_reparables,
+						 	'count_reparables_con' 		=> $count_reparables_con,
+						 	'url_rep' 					=> $url_rep,
+						 	'url_rep_contrato' 			=> $url_rep_contrato,
+						 	'url_rep_revisar' 			=> $url_rep_revisar,
 						 	'url_rep_contrato_revisar' 	=> $url_rep_contrato_revisar,
-						 	'count_reparables_rev' 			=> $count_reparables_rev,
+						 	'count_reparables_rev' 		=> $count_reparables_rev,
 						 	'count_reparables__revcon' 	=> $count_reparables__revcon,
-
-
-
-
-
 						 	'count_x_aprobar_gestion' 	=> $count_x_aprobar_gestion,
-						 	'url_gestion' 			=> $url_gestion,
-						 	'trol' 					=> $trol,
-
-
-						 	'listaocpendientes' 	=> $listaocpendientes,
-						 	'listaocpendientes_con' => $listaocpendientes_con,
-
-						 	'listadocestados'   	=> $listadocestados,
-						 	'listadocestados_con'   => $listadocestados_con,
-
-						 	'listaobservados'   => $listaobservados,
-
-						 	'count_x_aprobar_con' => $count_x_aprobar_con,
-						 	'count_observados_con'   => $count_observados_con,
-						 	'url_obs_con'   => $url_obs_con,
-
-
-
-						 	'count_x_aprobar_gestion_con'   => $count_x_aprobar_gestion_con,
-
-
+						 	'url_gestion' 				=> $url_gestion,
+						 	'trol' 						=> $trol,
+						 	'listaocpendientes' 		=> $listaocpendientes,
+						 	'listaocpendientes_con' 	=> $listaocpendientes_con,
+						 	'listadocestados'   		=> $listadocestados,
+						 	'listadocestados_con'   	=> $listadocestados_con,
+						 	'listaobservados'   		=> $listaobservados,
+						 	'count_x_aprobar_con' 		=> $count_x_aprobar_con,
+						 	'count_observados_con'   	=> $count_observados_con,
+						 	'url_obs_con'   			=> $url_obs_con,
+						 	'count_x_aprobar_gestion_con'   => $count_x_aprobar_gestion_con
 						 ]);
 
 	}
