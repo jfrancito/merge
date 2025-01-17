@@ -74,6 +74,7 @@
                 <table class="table table-condensed table-striped">
                     <thead>
                       <tr>
+                        <th>Item</th>
                         <th>Codigo</th>
                         <th>Documento</th>      
                         <th>Proveedor</th>
@@ -83,6 +84,7 @@
                     <tbody>
                        @foreach($documento_asociados as $index => $item)  
                           <tr>
+                            <td>{{$index + 1}}</td>
                             <td>{{$item->COD_DOCUMENTO_CTBLE}}</td>
                             <td>{{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</td>
                             <td>{{$item->TXT_EMPR_EMISOR}}</td>
