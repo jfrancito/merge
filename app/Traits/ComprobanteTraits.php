@@ -3162,14 +3162,33 @@ trait ComprobanteTraits
         $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
         $centro_id           =      $trabajador->COD_ZONA_TIPO;
         
-        $listadatos          =      FeDocumento::where('OPERACION','=','ESTIBA')
-                                    ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                                    //->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
-                                    ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                    ->where('FE_DOCUMENTO.area_observacion','<>','UCO')
-                                    ->where('FE_DOCUMENTO.ind_observacion','=','1')
-                                    ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
-                                    ->get();
+
+
+        if(Session::get('usuario')->id== '1CIX00000001'){
+
+            $listadatos          =      FeDocumento::where('OPERACION','=','ESTIBA')
+                                        ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                        //->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
+                                        ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                        ->where('FE_DOCUMENTO.area_observacion','<>','UCO')
+                                        ->where('FE_DOCUMENTO.ind_observacion','=','1')
+                                        ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                        ->get();
+
+        }else{
+
+            $listadatos          =      FeDocumento::where('OPERACION','=','ESTIBA')
+                                        ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                        ->where('usuario_pa','=',Session::get('usuario')->id)
+                                        ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                        ->where('FE_DOCUMENTO.area_observacion','<>','UCO')
+                                        ->where('FE_DOCUMENTO.ind_observacion','=','1')
+                                        ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                        ->get();
+
+        }
+
+
 
         return  $listadatos;
     }
