@@ -489,9 +489,13 @@ class GestionEntregaDocumentoController extends Controller
             $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda($folio->FOLIO,'MON0000000000001');
             $listadatosdolar    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda($folio->FOLIO,'MON0000000000002');
         }else{
-            $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_contrato_modal_moneda($folio->FOLIO,'MON0000000000001');
-            $listadatosdolar    =   $this->con_lista_cabecera_comprobante_entregable_contrato_modal_moneda($folio->FOLIO,'MON0000000000002');
-
+            if($folio->OPERACION=='CONTRATO'){
+                $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_contrato_modal_moneda($folio->FOLIO,'MON0000000000001');
+                $listadatosdolar    =   $this->con_lista_cabecera_comprobante_entregable_contrato_modal_moneda($folio->FOLIO,'MON0000000000002');
+            }else{
+                $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_estiba_modal_moneda($folio->FOLIO,'MON0000000000001');
+                $listadatosdolar    =   $this->con_lista_cabecera_comprobante_entregable_estiba_modal_moneda($folio->FOLIO,'MON0000000000002');
+            }
         }
 
         $operacion_id           =   $folio->OPERACION;
