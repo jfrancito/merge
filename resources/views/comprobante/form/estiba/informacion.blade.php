@@ -28,6 +28,15 @@
                                                       </tr>
                                                     @endforeach
                                                 </tbody>
+                                                <tfooter>
+                                                  <tr>
+                                                    <th></th>
+                                                    <th></th>      
+                                                    <th></th>
+                                                    <th>{{$documento_asociados->sum('CAN_TOTAL')}}</th>
+                                                  </tr>
+
+                                                </tfooter>
                                               </table>
 
                                             </div>
