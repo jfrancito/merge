@@ -29,6 +29,8 @@
           <div class="btn-group btn-hspace">
             <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>
             <ul role="menu" class="dropdown-menu pull-right">
+
+
               <li>
                 <a href="{{ url('/descargar-folio-excel/'.$item->FOLIO) }}">
                   Descargar Resumen
@@ -37,8 +39,13 @@
               @if($item->OPERACION=='CONTRATO')
                 @include('entregadocumento.excel.opcionct')
               @else
-                @include('entregadocumento.excel.opcionoc')
+                @if($item->OPERACION=='ESTIBA')
+                  @include('entregadocumento.excel.opcionest')
+                @else
+                  @include('entregadocumento.excel.opcionoc')
+                @endif
               @endif
+
             </ul>
           </div>
         </td>
