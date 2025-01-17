@@ -369,6 +369,7 @@ trait ComprobanteTraits
 
         }else{
 
+
             $listadatos                 = DB::table('FE_DOCUMENTO')
                                         ->join('FE_REF_ASOC', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
                                         ->join('CMP.REFERENCIA_ASOC', 'CMP.REFERENCIA_ASOC.COD_TABLA', '=', 'FE_REF_ASOC.ID_DOCUMENTO')
@@ -388,8 +389,6 @@ trait ComprobanteTraits
                                         ->where('OPERACION', 'ESTIBA')
                                         ->selectRaw('DISTINCT FE_DOCUMENTO.*, CMP.DOCUMENTO_CTBLE.*') // DISTINCT aplicado solo a estas columnas
                                         ->get();
-
-            //dd($listadatos);
 
         }
 
@@ -4127,6 +4126,27 @@ trait ComprobanteTraits
                                         FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_VOUCHER'))
                                     ->orderBy('documentos.FEC_VENCIMIENTO ', 'asc')
                                     ->get();
+
+        return  $listadatos;
+
+
+    }
+
+
+    private function con_lista_cabecera_comprobante_entregable_estiba_modal_moneda($folio,$moneda_id) {
+
+        $listadatos         =   DB::table('FE_DOCUMENTO')
+                                ->join('FE_REF_ASOC', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                                ->join('CMP.REFERENCIA_ASOC', 'CMP.REFERENCIA_ASOC.COD_TABLA', '=', 'FE_REF_ASOC.ID_DOCUMENTO')
+                                ->join('CMP.DOCUMENTO_CTBLE', function ($join) {
+                                    $join->on('CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+                                         ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE');
+                                })
+                                ->where('FE_DOCUMENTO.FOLIO', $folio)
+                                ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA','=',$moneda_id)
+                                ->where('OPERACION', 'ESTIBA')
+                                ->selectRaw('DISTINCT FE_DOCUMENTO.*, CMP.DOCUMENTO_CTBLE.*') // DISTINCT aplicado solo a estas columnas
+                                ->get();
 
         return  $listadatos;
 
