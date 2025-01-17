@@ -136,6 +136,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/migracion-rioja/{idopcion}', 'GestionOCController@actionListarOCAdminMR');
 	Route::any('/migracion-bellavista/{idopcion}', 'GestionOCController@actionListarOCAdminMB');
 
+	Route::any('/ajax-estiba-proveedor-estiba', 'GestionOCController@actionEstibaProveedorEstiba');
+
 
 	//PROVEEDOR CONTRATO
 	Route::any('/gestion-de-transporte-carga/{idopcion}', 'GestionTCController@actionListarOC');
