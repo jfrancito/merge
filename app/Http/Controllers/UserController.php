@@ -1114,16 +1114,15 @@ class UserController extends Controller {
 			//ADMINISTRACION
 			else{
 				if(Session::get('usuario')->rol_id == '1CIX00000020'){
-        			$listadatos     =   $this->con_lista_cabecera_comprobante_total_adm($cod_empresa);
-					$count_x_aprobar = 	 count($listadatos);
 
+        			$listadatos     		=   $this->con_lista_cabecera_comprobante_total_adm($cod_empresa);
+					$count_x_aprobar 		= 	count($listadatos);
 
 		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_obs($cod_empresa);
 					$count_observados 		= 	count($listadatosob);
 
-	        		$listadatos     =   $this->con_lista_cabecera_comprobante_total_adm_contrato($cod_empresa);
+	        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_adm_contrato($cod_empresa);
 					$count_x_aprobar_con 	= 	 count($listadatos);
-
 
 		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_contrato_obs($cod_empresa);
 					$count_observados_con 	= 	count($listadatosob);
@@ -1133,6 +1132,27 @@ class UserController extends Controller {
 
         			$url 					=	'/gestion-de-administracion-aprobar/j25?operacion_id=ORDEN_COMPRA';
         			$urlcontrato 			=	'/gestion-de-administracion-aprobar/j25?operacion_id=CONTRATO';
+        			$urlestiba 				=	'/gestion-de-administracion-aprobar/j25?operacion_id=ESTIBA';
+
+
+					//ESTIBA
+	        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_adm_estiba($cod_empresa);
+					$count_x_aprobar_est 	= 	 count($listadatos);
+
+		        	$listadatosre_est    	=   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,'TODO','TODO');
+					$count_reparables_est 	= 	 count($listadatosre_est);
+
+		        	$listadatosre_est_rev   =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,'TODO','2');
+					$count_reparables__revest = 	 count($listadatosre_est_rev);
+
+		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs($cod_empresa);
+					$count_observados_est 	= 	count($listadatosob);
+
+		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas($cod_empresa);
+					$count_observadosest_le 	= 	count($listadatosob);
+
+
+
 
 				}
 			}
@@ -1155,6 +1175,8 @@ class UserController extends Controller {
 		return View::make('bienvenido',
 						 [
 						 	'usuario' 					=> $usuario,
+
+
 						 	'count_x_aprobar_est' 		=> $count_x_aprobar_est,
 						 	'urlestiba' 				=> $urlestiba,
 						 	'count_reparables_est' 		=> $count_reparables_est,
