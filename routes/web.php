@@ -236,6 +236,14 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/descargar-pago-proveedor-macro-interbank-excel-oc/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoMacrosInterbankOC');
 
 
+	Route::any('/descargar-pago-proveedor-macro-estiba-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoFolioMacroEstiba');
+	Route::any('/descargar-pago-proveedor-macro-bbva-estiba-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoMacroEstibaBbva');
+	Route::any('/descargar-pago-proveedor-macro-sbk-estiba-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoMacroEstibaSBK');
+	Route::any('/descargar-pago-proveedor-macro-interbank-estiba-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoMacrosEstibaInterbank');
+
+
+
+
 	Route::any('/ajax-modal-historial-extorno', 'GestionOCController@actionModalHistorialExtorno');
 	Route::any('/detalle-comprobante-oc-validado-contrato/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoContrato');
 	Route::any('/gestion-de-comprobante-us/{idopcion}', 'GestionUsuarioContactoController@actionListarComprobanteUsuarioContacto');
