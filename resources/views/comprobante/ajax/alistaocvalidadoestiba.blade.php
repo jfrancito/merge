@@ -15,6 +15,7 @@
         <td>{{$index+1}}</td>
 
         <td class="cell-detail sorting_1" style="position: relative;">
+          <span><b>LOTE : {{$item->ID_DOCUMENTO}} </b> </span>
           <span><b>SERIE : {{$item->SERIE}} </b> </span>
           <span><b>NUMERO  : {{$item->NUMERO}}</b></span>
           <span><b>FECCHA : </b> {{$item->FEC_VENTA}}</span>
