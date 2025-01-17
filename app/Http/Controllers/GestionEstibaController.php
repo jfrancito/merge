@@ -826,7 +826,7 @@ class GestionEstibaController extends Controller
                             $tipo_documento_le  =   $factura->gettipoDoc();
                             $moneda_le          =   $factura->gettipoMoneda();
                             $archivosdelfe      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000002','DCC0000000000003','DCC0000000000004'])
+                                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000002','DCC0000000000003','DCC0000000000004','DCC0000000000006'])
                                                     ->get();
 
                         }else{
@@ -838,7 +838,7 @@ class GestionEstibaController extends Controller
                             $tipo_documento_le = 'R1';
                             $moneda_le = 'PEN';
                             $archivosdelfe      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000013','DCC0000000000003'])->get();
+                                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000013','DCC0000000000003','DCC0000000000006'])->get();
                         }
                         //VALIDAR QUE YA EXISTE ESTE XML
                         $fedocumento_e          =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->whereNotIn('COD_ESTADO',['','ETM0000000000006'])
