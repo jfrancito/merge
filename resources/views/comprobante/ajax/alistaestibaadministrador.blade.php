@@ -1,9 +1,28 @@
-<div class="panel-heading">{{ $titulo }}
 
+<div class="panel-heading">
+
+  <div class="tools tooltiptop">
+    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones">
+      <span class="tooltiptext">Total Seleccionado</span>
+      <b class='totalseleccion' style="font-size:16px;">0.0000</b>
+    </a>
+    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones">
+      <span class="tooltiptext">Cantidad Seleccionado</span>
+      <b class='cantidaseleccion' style="font-size:16px;">0</b>
+    </a>
+
+  </div>
+
+
+</div>
+<br>
+
+<div class="panel-heading">
   <form method="POST" id='formre' action="{{ url('/select-xml-estiba/'.$idopcion) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
         {{ csrf_field()}}
         <input type="hidden" name="jsondocumenos" id = 'jsondocumenos'>
   </form>
+
   <div class="tools tooltiptop">
     <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones detalleestibs">
       <span class="tooltiptext">Detalle de Estibas</span>
@@ -43,7 +62,7 @@
   </thead>
   <tbody>
     @foreach($listadatos as $index => $item)
-      <tr data_requerimiento_id = "{{$item->COD_DOCUMENTO_CTBLE}}" data_lote = "{{$item->LOTE_DOC}}">
+      <tr data_requerimiento_id = "{{$item->COD_DOCUMENTO_CTBLE}}" data_lote = "{{$item->LOTE_DOC}}" data_total = "{{$item->CAN_TOTAL}}">
         <td><b>{{$index + 1}}</b></td>
         <td><b>ESTIBA</b></td>
         <td>{{$item->COD_DOCUMENTO_CTBLE}}</td>
@@ -61,10 +80,12 @@
           <div class="text-center be-checkbox be-checkbox-sm has-primary">
             <input  type="checkbox"
               class="{{$item->COD_DOCUMENTO_CTBLE}} input_asignar"
+              data_total = "{{$item->CAN_TOTAL}}"   
               id="{{$item->COD_DOCUMENTO_CTBLE}}" >
             <label  for="{{$item->COD_DOCUMENTO_CTBLE}}"
                   data-atr = "ver"
-                  class = "checkbox checkbox_asignar"                    
+                  class = "checkbox checkbox_asignar"
+                  data_total = "{{$item->CAN_TOTAL}}"                
                   name="{{$item->COD_DOCUMENTO_CTBLE}}"
             ></label>
           </div>

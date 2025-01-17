@@ -1,6 +1,10 @@
 $(document).ready(function(){
     var carpeta = $("#carpeta").val();
 
+    $(".agestioncomprobante").on('change','.input_asignar', function() {
+        suma_totales_cantidad();
+    });
+
 
     $(".agestioncomprobante").on('change','.selectoperacion', function() {
 
@@ -171,6 +175,31 @@ $(document).ready(function(){
         });
         return data;
     }
+
+    function suma_totales_cantidad(){
+
+        var data_total = 0;
+        var can_total = 0;
+        $(".listatabla tr").each(function(){
+            nombre          = $(this).find('.input_asignar').attr('id');
+            if(nombre != 'todo_asignar'){
+                check                       = $(this).find('.input_asignar');
+                total                       = parseFloat($(this).attr('data_total'));
+                if($(check).is(':checked')){
+                    data_total = data_total+total;
+                    can_total = can_total+1;
+                }
+            }
+        });
+        let numeroFormateado = data_total.toLocaleString('es-PE', {
+            minimumFractionDigits: 2, // Cantidad mínima de decimales
+            maximumFractionDigits: 4  // Cantidad máxima de decimales
+        });
+
+        $('.totalseleccion').html(numeroFormateado);
+        $('.cantidaseleccion').html(can_total);
+    }
+
 
 
     $(".agestioncomprobante").on('click','.input_check_pe_ln', function() {
