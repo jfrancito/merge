@@ -15,7 +15,7 @@
   <tbody>
 
     @foreach($listadatos as $index => $item)
-      <tr data_requerimiento_id = "{{$item->COD_DOCUMENTO_CTBLE}}">
+      <tr data_requerimiento_id = "{{$item->ID_DOCUMENTO}}">
         <td>{{$index + 1}}</td>
         <td class="cell-detail sorting_1" style="position: relative;">
 

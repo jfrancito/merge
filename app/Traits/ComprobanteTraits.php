@@ -359,6 +359,10 @@ trait ComprobanteTraits
                                         ->where('FE_DOCUMENTO.COD_ESTADO', 'ETM0000000000005')
                                         //->where('FE_DOCUMENTO.ID_DOCUMENTO', '00000019')
                                         ->where('OPERACION', 'ESTIBA')
+                                        ->where(function ($query) {
+                                            $query->where('FOLIO', '=', '');
+                                            $query->orWhereNull('FOLIO');
+                                        })
                                         ->selectRaw('DISTINCT FE_DOCUMENTO.*, CMP.DOCUMENTO_CTBLE.*') // DISTINCT aplicado solo a estas columnas
                                         ->get();
 
@@ -376,6 +380,10 @@ trait ComprobanteTraits
                                         ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO','=',$banco_id)
                                         ->whereIn('CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD',$array_usuarios)
                                         ->where('FE_DOCUMENTO.COD_ESTADO', 'ETM0000000000005')
+                                        ->where(function ($query) {
+                                            $query->where('FOLIO', '=', '');
+                                            $query->orWhereNull('FOLIO');
+                                        })
                                         //->where('FE_DOCUMENTO.ID_DOCUMENTO', '00000019')
                                         ->where('OPERACION', 'ESTIBA')
                                         ->selectRaw('DISTINCT FE_DOCUMENTO.*, CMP.DOCUMENTO_CTBLE.*') // DISTINCT aplicado solo a estas columnas

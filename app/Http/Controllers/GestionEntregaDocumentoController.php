@@ -299,8 +299,13 @@ class GestionEntregaDocumentoController extends Controller
                 $ID_DOCUMENTO_ENCONTRO             =   $obj['data_requerimiento_id'];
             }
 
+            //dd($ID_DOCUMENTO_ENCONTRO);
+
             $empresa_id     =   Session::get('empresas')->COD_EMPR;
             $fedocumento_encontro                   =   FeDocumento::where('ID_DOCUMENTO',$ID_DOCUMENTO_ENCONTRO)->first();
+            if(count($fedocumento_encontro)<=0){
+
+            }
 
             $codigo                                 =   $this->funciones->generar_folio('FE_DOCUMENTO_ENTREGABLE',8);
             $documento                              =   new FeDocumentoEntregable;
@@ -334,7 +339,11 @@ class GestionEntregaDocumentoController extends Controller
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_entregable($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$fedocumento_encontro->COD_CATEGORIA_BANCO);
         }else{
-            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$fedocumento_encontro->COD_CATEGORIA_BANCO);
+            if($operacion_id=='CONTRATO'){
+                $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$fedocumento_encontro->COD_CATEGORIA_BANCO);
+            }else{
+                $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$fedocumento_encontro->COD_CATEGORIA_BANCO);
+            }
         }
 
         $funcion        =   $this;
