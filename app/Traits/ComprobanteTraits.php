@@ -211,6 +211,31 @@ trait ComprobanteTraits
     }
 
 
+    private function con_lista_documentos_proveedores_estiba_folio($folio,$empresa_id) {
+
+
+        $listadatos         =   DB::table('FE_DOCUMENTO')
+                                ->join('FE_REF_ASOC', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                                ->join('CMP.REFERENCIA_ASOC', 'CMP.REFERENCIA_ASOC.COD_TABLA', '=', 'FE_REF_ASOC.ID_DOCUMENTO')
+                                ->join('CMP.DOCUMENTO_CTBLE', function ($join) {
+                                    $join->on('CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+                                         ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE');
+                                })
+                                ->where('FE_DOCUMENTO.FOLIO', $folio)
+                                ->where('FE_DOCUMENTO.RUC_PROVEEDOR','=',$empresa_id)
+                                ->where('OPERACION', 'ESTIBA')
+                                ->select(
+                                    DB::raw('DISTINCT FE_DOCUMENTO.*, CMP.DOCUMENTO_CTBLE.*'),
+                                    DB::raw("(SELECT SUM(CAN_PRODUCTO)  FROM CMP.DETALLE_PRODUCTO WHERE CMP.DETALLE_PRODUCTO.COD_TABLA = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE AND CMP.DETALLE_PRODUCTO.COD_ESTADO = 1 AND CMP.DETALLE_PRODUCTO.IND_MATERIAL_SERVICIO = 'M') AS TOTAL_CAN_SACOS")
+                                )
+                                ->get();
+
+        return  $listadatos;
+
+
+    }
+
+
     private function con_lista_cabecera_comprobante_entregable_contrato($cliente_id,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id) {
 
 
@@ -587,7 +612,6 @@ trait ComprobanteTraits
 
     private function con_lista_proveedores_folio($folio) {
 
-
         $listadatos             =   CMPDocumentoCtble::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                                     ->where('FOLIO','=',$folio)
                                     ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
@@ -598,8 +622,29 @@ trait ComprobanteTraits
 
         return  $listadatos;
 
+    }
+
+    private function con_lista_proveedores_estiba_folio($folio) {
+
+        $listadatos         =   DB::table('FE_DOCUMENTO')
+                                ->join('FE_REF_ASOC', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                                ->join('CMP.REFERENCIA_ASOC', 'CMP.REFERENCIA_ASOC.COD_TABLA', '=', 'FE_REF_ASOC.ID_DOCUMENTO')
+                                ->join('CMP.DOCUMENTO_CTBLE', function ($join) {
+                                    $join->on('CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+                                         ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE');
+                                })
+                                ->where('FE_DOCUMENTO.FOLIO', $folio)
+                                ->where('OPERACION', 'ESTIBA')
+                                ->select(DB::raw('CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR,CMP.DOCUMENTO_CTBLE.TXT_EMPR_EMISOR'))
+                                ->groupBy('CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR')
+                                ->groupBy('CMP.DOCUMENTO_CTBLE.TXT_EMPR_EMISOR')
+                                ->get();
+
+        return  $listadatos;
 
     }
+
+
 
 
 

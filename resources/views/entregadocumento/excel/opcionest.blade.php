@@ -1,5 +1,5 @@
 <li>
-  <a href="{{ url('/descargar-pago-proveedor-bcp-excel/'.$item->FOLIO) }}">
+  <a href="{{ url('/descargar-pago-proveedor-bcp-estiba-excel/'.$item->FOLIO) }}">
     Detalle Informativo
   </a>  
 </li>

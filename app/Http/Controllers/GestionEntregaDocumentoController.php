@@ -649,6 +649,66 @@ class GestionEntregaDocumentoController extends Controller
         })->export('xls');
     }
 
+    public function actionDescargarPagoFolioEstibaBcp($folio_codigo)
+    {
+
+        $folio                  =   FeDocumentoEntregable::where('FOLIO','=',$folio_codigo)->first();
+        $lista_proveedores      =   $this->con_lista_proveedores_estiba_folio($folio->FOLIO);
+        $operacion_id           =   $folio->OPERACION;
+        $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
+        $titulo                 =   'DETALLE FOLIO ('.$folio_codigo.') '.$empresa->NOM_EMPR;
+        $funcion                =   $this;
+
+
+        Excel::create($titulo, function($excel) use ($lista_proveedores,$operacion_id,$folio,$empresa,$funcion) {
+
+            foreach($lista_proveedores as $index => $item){
+
+                $empresa_item   =    STDEmpresa::where('COD_EMPR','=',$item->COD_EMPR_EMISOR)->first();
+                $fedocumento    =    FeDocumento::where('FOLIO','=',$folio->FOLIO)->where('RUC_PROVEEDOR','=',$empresa_item->NRO_DOCUMENTO)->first();
+
+                $listadocumento =    $this->con_lista_documentos_proveedores_estiba_folio($folio->FOLIO,$empresa_item->NRO_DOCUMENTO);
+                $npestania = substr($item->TXT_EMPR_EMISOR, 0, 30);
+                $excel->sheet($npestania, function($sheet) use ($item,$operacion_id,$folio,$empresa,$empresa_item,$fedocumento,$listadocumento,$funcion){
+
+                    $sheet->mergeCells('B2:D2');
+                    $sheet->mergeCells('B3:D3');
+                    $sheet->mergeCells('B4:D4');
+                    $sheet->mergeCells('B6:D6');
+                    $sheet->mergeCells('A9:G9');
+
+                    $sheet->setWidth('A', 20);
+                    $sheet->setWidth('B', 20);
+                    $sheet->setWidth('C', 20);
+                    $sheet->setWidth('D', 20);
+                    $sheet->setWidth('E', 20);
+                    $sheet->setWidth('F', 20);
+                    $sheet->setWidth('G', 20);
+                    $sheet->setWidth('H', 20);
+                    $sheet->setWidth('I', 20);
+                    $sheet->setWidth('J', 20);
+                    $sheet->setWidth('K', 20);
+
+                    $sheet->cell('A1', function($cell) {
+                                $cell->setFontColor('#FFFFFF');   // Texto blanco
+                            });
+
+
+                    $sheet->loadView('entregadocumento/excel/contratopagosestibabcp')->with('proveedor',$item)
+                                                                               ->with('folio',$folio)
+                                                                               ->with('funcion',$funcion)
+                                                                               ->with('empresa',$empresa)
+                                                                               ->with('empresa_item',$empresa_item)
+                                                                               ->with('fedocumento',$fedocumento)
+                                                                               ->with('listadocumento',$listadocumento)
+                                                                               ->with('operacion_id',$operacion_id);         
+                });
+            }
+
+        })->export('xls');
+    }
+
+
     public function actionDescargarPagoMacroBbva($folio_codigo)
     {
 
