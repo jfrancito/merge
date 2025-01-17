@@ -60,6 +60,54 @@ trait ComprobanteTraits
     }    
 
 
+    private function con_lista_documentos_estiba_folio($folio) {
+
+
+        $listadatos         =   DB::table('FE_DOCUMENTO')
+                                ->join('FE_REF_ASOC', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                                ->join('CMP.REFERENCIA_ASOC', 'CMP.REFERENCIA_ASOC.COD_TABLA', '=', 'FE_REF_ASOC.ID_DOCUMENTO')
+                                ->join('CMP.DOCUMENTO_CTBLE', function ($join) {
+                                    $join->on('CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+                                         ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE');
+                                })
+                                ->leftJoin('TES.CUENTA_BANCARIA', function ($join) {
+                                    $join->on('CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR', '=', 'TES.CUENTA_BANCARIA.COD_EMPR_TITULAR')
+                                         ->on('FE_DOCUMENTO.COD_CATEGORIA_BANCO', '=', 'TES.CUENTA_BANCARIA.COD_EMPR_BANCO')
+                                         ->on('FE_DOCUMENTO.TXT_NRO_CUENTA_BANCARIA', '=', 'TES.CUENTA_BANCARIA.TXT_NRO_CUENTA_BANCARIA');
+                                })
+                                ->leftjoin('CMP.CATEGORIA as CAT_CUENTA', 'CAT_CUENTA.COD_CATEGORIA', '=', 'TES.CUENTA_BANCARIA.TXT_TIPO_REFERENCIA')
+                                ->leftjoin('CMP.CATEGORIA as CAT_MONEDA', 'CAT_MONEDA.COD_CATEGORIA', '=', 'TES.CUENTA_BANCARIA.COD_CATEGORIA_MONEDA')
+                                ->leftjoin('CMP.CATEGORIA as CAT_MONEDA_ABONO', 'CAT_MONEDA_ABONO.COD_CATEGORIA', '=', 'CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA')
+                                ->leftjoin('STD.EMPRESA', 'STD.EMPRESA.COD_EMPR', '=', 'CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR')
+                                ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'STD.EMPRESA.COD_TIPO_DOCUMENTO')
+                                ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
+                                ->where('FE_DOCUMENTO.FOLIO', $folio)
+                                ->where('OPERACION', 'ESTIBA')
+                                ->select(
+                                        DB::raw('DISTINCT   CMP.DOCUMENTO_CTBLE.*, 
+                                                    FE_DOCUMENTO.*, 
+                                                    CMP.DOCUMENTO_CTBLE.NRO_SERIE,
+                                                    CMP.CATEGORIA.TXT_TIPO_REFERENCIA,
+                                                    CMP.CATEGORIA.TXT_GLOSA AS TXT_GLOSA_INTER,
+                                                    STD.EMPRESA.NRO_DOCUMENTO, 
+                                                    CMP.DOCUMENTO_CTBLE.FEC_EMISION, 
+                                                    CMP.DOCUMENTO_CTBLE.FEC_VENCIMIENTO, 
+                                                    CMP.DOCUMENTO_CTBLE.NRO_DOC, 
+                                                    CMP.DOCUMENTO_CTBLE.TXT_CATEGORIA_TIPO_DOC, 
+                                                    CAT_CUENTA.CODIGO_SUNAT AS TIPO_CUENTA,
+                                                    CAT_MONEDA.CODIGO_SUNAT AS TIPO_MONEDA, 
+                                                    CAT_MONEDA_ABONO.TXT_ABREVIATURA AS TIPO_MONEDA_ABONO,
+                                                    FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_VOUCHER, 
+                                                    FE_DOCUMENTO.TXT_CATEGORIA_BANCO AS TXT_BANCO'))
+                                ->get();
+
+
+        return  $listadatos;
+
+
+    }
+
+
 
     private function con_lista_documentos_contrato_folio($folio) {
 
@@ -490,6 +538,54 @@ trait ComprobanteTraits
 
 
 
+    private function con_lista_doc_proveedor_banco_estiba_folio($folio,$banco_txt) {
+
+
+        $listadatos             =   DB::table('FE_DOCUMENTO')
+                                    ->join('FE_REF_ASOC', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                                    ->join('CMP.REFERENCIA_ASOC', 'CMP.REFERENCIA_ASOC.COD_TABLA', '=', 'FE_REF_ASOC.ID_DOCUMENTO')
+                                    ->join('CMP.DOCUMENTO_CTBLE', function ($join) {
+                                        $join->on('CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+                                             ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE');
+                                    })
+                                    ->leftJoin('TES.CUENTA_BANCARIA', function ($join) {
+                                        $join->on('CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR', '=', 'TES.CUENTA_BANCARIA.COD_EMPR_TITULAR')
+                                             ->on('FE_DOCUMENTO.COD_CATEGORIA_BANCO', '=', 'TES.CUENTA_BANCARIA.COD_EMPR_BANCO')
+                                             ->on('FE_DOCUMENTO.TXT_NRO_CUENTA_BANCARIA', '=', 'TES.CUENTA_BANCARIA.TXT_NRO_CUENTA_BANCARIA');
+                                    })
+                                    ->leftjoin('CMP.CATEGORIA as CAT_CUENTA ', 'CAT_CUENTA.COD_CATEGORIA', '=', 'TES.CUENTA_BANCARIA.TXT_TIPO_REFERENCIA')
+                                    ->leftjoin('STD.EMPRESA', 'STD.EMPRESA.COD_EMPR', '=', 'CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR')
+                                    ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'STD.EMPRESA.COD_TIPO_DOCUMENTO')
+                                    ->where('FE_DOCUMENTO.FOLIO', $folio)
+                                    ->where('TXT_CATEGORIA_BANCO','=',$banco_txt)
+                                    ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
+                                    ->where('OPERACION', 'ESTIBA')
+                                    ->select(DB::raw('FE_DOCUMENTO.TXT_NRO_CUENTA_BANCARIA,
+                                                    CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR,
+                                                    CMP.DOCUMENTO_CTBLE.TXT_EMPR_EMISOR,
+                                                    STD.EMPRESA.NRO_DOCUMENTO,
+                                                    CMP.CATEGORIA.CODIGO_SUNAT,
+                                                    CAT_CUENTA.TXT_ABREVIATURA,
+                                                    SUM(TOTAL_VENTA_ORIG) TOTAL,
+                                                    SUM(CASE 
+                                                            WHEN FE_DOCUMENTO.COD_PAGO_DETRACCION = CMP.DOCUMENTO_CTBLE.COD_EMPR 
+                                                            THEN TOTAL_VENTA_ORIG - ISNULL(MONTO_ANTICIPO_DESC,0) - MONTO_DETRACCION_RED
+                                                            ELSE TOTAL_VENTA_ORIG - ISNULL(MONTO_ANTICIPO_DESC,0)
+                                                        END) AS TOTAL_PAGAR,
+                                                    SUM(MONTO_DETRACCION_RED) DETRACCION'))
+                                    ->groupBy('CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR')
+                                    ->groupBy('CMP.DOCUMENTO_CTBLE.TXT_EMPR_EMISOR')
+                                    ->groupBy('FE_DOCUMENTO.TXT_NRO_CUENTA_BANCARIA')
+                                    ->groupBy('STD.EMPRESA.NRO_DOCUMENTO')
+                                    ->groupBy('CMP.CATEGORIA.CODIGO_SUNAT')
+                                    ->groupBy('CAT_CUENTA.TXT_ABREVIATURA')
+                                    ->get();
+
+        return  $listadatos;
+
+    }
+
+
     private function con_lista_doc_proveedor_banco_folio($folio,$banco_txt) {
 
 
@@ -528,8 +624,8 @@ trait ComprobanteTraits
 
         return  $listadatos;
 
-
     }
+
 
     private function con_lista_doc_proveedor_banco_folio_oc($folio,$banco_txt) {
 
@@ -568,6 +664,30 @@ trait ComprobanteTraits
                                     ->groupBy('CAT_MONEDA.TXT_REFERENCIA')
                                     ->groupBy('CAT_CUENTA.TXT_ABREVIATURA')
                                     ->get();
+
+        return  $listadatos;
+
+
+    }
+
+    private function con_lista_proveedores_banco_estiba_folio($folio,$banco_txt) {
+
+
+       $listadatos         =    DB::table('FE_DOCUMENTO')
+                                ->join('FE_REF_ASOC', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                                ->join('CMP.REFERENCIA_ASOC', 'CMP.REFERENCIA_ASOC.COD_TABLA', '=', 'FE_REF_ASOC.ID_DOCUMENTO')
+                                ->join('CMP.DOCUMENTO_CTBLE', function ($join) {
+                                    $join->on('CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+                                         ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE');
+                                })
+                                ->where('FE_DOCUMENTO.FOLIO', $folio)
+                                ->where('TXT_CATEGORIA_BANCO','=',$banco_txt)
+                                ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
+                                ->where('OPERACION', 'ESTIBA')
+                                ->select(DB::raw('CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR,CMP.DOCUMENTO_CTBLE.TXT_EMPR_EMISOR'))
+                                ->groupBy('CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR')
+                                ->groupBy('CMP.DOCUMENTO_CTBLE.TXT_EMPR_EMISOR')
+                                ->get();
 
         return  $listadatos;
 
@@ -648,6 +768,27 @@ trait ComprobanteTraits
 
 
 
+    private function con_lista_bancos_estiba_folio($folio) {
+
+       $listadatos         =   DB::table('FE_DOCUMENTO')
+                                ->join('FE_REF_ASOC', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                                ->join('CMP.REFERENCIA_ASOC', 'CMP.REFERENCIA_ASOC.COD_TABLA', '=', 'FE_REF_ASOC.ID_DOCUMENTO')
+                                ->join('CMP.DOCUMENTO_CTBLE', function ($join) {
+                                    $join->on('CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+                                         ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE');
+                                })
+                                ->where('FE_DOCUMENTO.FOLIO', $folio)
+                                ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
+                                ->where('OPERACION', 'ESTIBA')
+                                ->select(DB::raw('FE_DOCUMENTO.COD_CATEGORIA_BANCO,FE_DOCUMENTO.TXT_CATEGORIA_BANCO'))
+                                ->groupBy('FE_DOCUMENTO.COD_CATEGORIA_BANCO')
+                                ->groupBy('FE_DOCUMENTO.TXT_CATEGORIA_BANCO')
+                                ->get();
+
+        return  $listadatos;
+
+
+    }
     private function con_lista_bancos_folio($folio) {
 
 
@@ -663,6 +804,7 @@ trait ComprobanteTraits
 
 
     }
+
 
 
     private function con_lista_bancos_folio_oc($folio) {
