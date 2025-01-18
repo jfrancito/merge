@@ -2276,7 +2276,7 @@ class GestionOCAdministracionController extends Controller
 
 
                     //FE_REFENCIA_DOC
-                    $referenciaAsocQueryr = FeRefAsoc::select('LOTE,ID_DOCUMENTO,ESTATUS,COD_ESTADO')
+                    $referenciaAsocQueryr = FeRefAsoc::select('LOTE','ID_DOCUMENTO','ESTATUS','COD_ESTADO')
                         ->where('LOTE', '=', $idoc)
                         ->get();
                     // Convertir el resultado en un array para poder insertarlo más adelante
