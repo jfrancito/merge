@@ -2262,6 +2262,8 @@ class GestionOCAdministracionController extends Controller
                     // Paso 2: Insertar los datos en la segunda base de datos
                     DB::connection($conexionbd)->table('FE_DOCUMENTO')->insert($dataToInsert);
 
+
+
                     //FE_DETALLE_DOCUENTO
                     $referenciaAsocQueryd = FeDetalleDocumento::select('*')
                         ->where('ID_DOCUMENTO', '=', $idoc)
@@ -2271,6 +2273,17 @@ class GestionOCAdministracionController extends Controller
 
                     // Paso 2: Insertar los datos en la segunda base de datos
                     DB::connection($conexionbd)->table('FE_DETALLE_DOCUMENTO')->insert($dataToInsertd);
+
+
+                    //FE_REFENCIA_DOC
+                    $referenciaAsocQueryr = FeRefAsoc::select('LOTE,ID_DOCUMENTO,ESTATUS,COD_ESTADO')
+                        ->where('LOTE', '=', $idoc)
+                        ->get();
+                    // Convertir el resultado en un array para poder insertarlo más adelante
+                    $dataToInsertr = $referenciaAsocQueryr->toArray();
+                    // Paso 2: Insertar los datos en la segunda base de datos
+                    DB::connection($conexionbd)->table('FE_REF_ASOC')->insert($dataToInsertr);
+
 
                 }
 
