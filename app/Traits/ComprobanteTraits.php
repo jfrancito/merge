@@ -560,25 +560,20 @@ trait ComprobanteTraits
                                     ->where('TXT_CATEGORIA_BANCO','=',$banco_txt)
                                     ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
                                     ->where('OPERACION', 'ESTIBA')
+                                    ->distinct()
                                     ->select(DB::raw('FE_DOCUMENTO.TXT_NRO_CUENTA_BANCARIA,
                                                     CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR,
                                                     CMP.DOCUMENTO_CTBLE.TXT_EMPR_EMISOR,
                                                     STD.EMPRESA.NRO_DOCUMENTO,
                                                     CMP.CATEGORIA.CODIGO_SUNAT,
                                                     CAT_CUENTA.TXT_ABREVIATURA,
-                                                    SUM(TOTAL_VENTA_ORIG) TOTAL,
-                                                    SUM(CASE 
+                                                    CAN_TOTAL TOTAL,
+                                                    CASE 
                                                             WHEN FE_DOCUMENTO.COD_PAGO_DETRACCION = CMP.DOCUMENTO_CTBLE.COD_EMPR 
-                                                            THEN TOTAL_VENTA_ORIG - ISNULL(MONTO_ANTICIPO_DESC,0) - MONTO_DETRACCION_RED
-                                                            ELSE TOTAL_VENTA_ORIG - ISNULL(MONTO_ANTICIPO_DESC,0)
-                                                        END) AS TOTAL_PAGAR,
-                                                    SUM(MONTO_DETRACCION_RED) DETRACCION'))
-                                    ->groupBy('CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR')
-                                    ->groupBy('CMP.DOCUMENTO_CTBLE.TXT_EMPR_EMISOR')
-                                    ->groupBy('FE_DOCUMENTO.TXT_NRO_CUENTA_BANCARIA')
-                                    ->groupBy('STD.EMPRESA.NRO_DOCUMENTO')
-                                    ->groupBy('CMP.CATEGORIA.CODIGO_SUNAT')
-                                    ->groupBy('CAT_CUENTA.TXT_ABREVIATURA')
+                                                            THEN CAN_TOTAL - ISNULL(MONTO_ANTICIPO_DESC,0) - MONTO_DETRACCION_RED
+                                                            ELSE CAN_TOTAL - ISNULL(MONTO_ANTICIPO_DESC,0)
+                                                        END AS TOTAL_PAGAR,
+                                                    MONTO_DETRACCION_RED DETRACCION'))
                                     ->get();
 
         return  $listadatos;

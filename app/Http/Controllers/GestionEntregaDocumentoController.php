@@ -1211,6 +1211,8 @@ class GestionEntregaDocumentoController extends Controller
                 $listadocumento =   $this->con_lista_doc_proveedor_banco_estiba_folio($folio->FOLIO,$item->TXT_CATEGORIA_BANCO);
 
 
+
+
                 $npestania = substr($txt_banco, 0, 30);
 
                 $excel->sheet($npestania, function($sheet) use ($item,$operacion_id,$folio,$empresa,$fedocumento,$listadocumento,$txt_banco,$countfedocu){
