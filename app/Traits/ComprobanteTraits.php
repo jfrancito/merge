@@ -4605,6 +4605,7 @@ trait ComprobanteTraits
                                         ->WHERE('VMERGEDOCUMENTOS.COD_ESTADO','=','1')
                                         //->whereIn('VMERGEDOCUMENTOS.COD_USUARIO_CREA_AUD',$array_usuarios)
                                         ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
+                                        ->orderBy('VMERGEDOCUMENTOS.FEC_EMISION','ASC')
                                         ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
                                                             FEC_EMISION,
                                                             TXT_CATEGORIA_MONEDA,
@@ -4644,6 +4645,7 @@ trait ComprobanteTraits
                                         ->WHERE('VMERGEDOCUMENTOS.COD_ESTADO','=','1')
                                         ->whereIn('VMERGEDOCUMENTOS.COD_USUARIO_CREA_AUD',$array_usuarios)
                                         ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
+                                        ->orderBy('VMERGEDOCUMENTOS.FEC_EMISION','ASC')
                                         ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
                                                             FEC_EMISION,
                                                             TXT_CATEGORIA_MONEDA,

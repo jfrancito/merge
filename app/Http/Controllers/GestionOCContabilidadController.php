@@ -879,6 +879,8 @@ class GestionOCContabilidadController extends Controller
             $documento_asociados    =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->get();
             $documento_top          =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->first();
 
+            $linea                  =   $fedocumento->DOCUMENTO_ITEM;
+
             return View::make('comprobante/aprobarconestiba', 
                             [
                                 'fedocumento'           =>  $fedocumento,
@@ -888,6 +890,7 @@ class GestionOCContabilidadController extends Controller
                                 'lote'                  =>  $lote,
                                 'archivospdf'           =>  $archivospdf,
                                 'trabajador'            =>  $trabajador,
+                                'linea'                 =>  $linea,
                                 'documentoscompra'      =>  $documentoscompra,
                                 'totalarchivos'         =>  $totalarchivos,
                                 'documentoscomprarepable'   =>  $documentoscomprarepable,
