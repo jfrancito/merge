@@ -1868,6 +1868,16 @@ class GestionOCAdministracionController extends Controller
                     // Paso 2: Insertar los datos en la segunda base de datos
                     DB::connection($conexionbd)->table('FE_DETALLE_DOCUMENTO')->insert($dataToInsertd);
 
+                    //CMPDocAsociarCompra
+                    $referenciaAsocQueryac = CMPDocAsociarCompra::select('COD_ORDEN','COD_CATEGORIA_DOCUMENTO','NOM_CATEGORIA_DOCUMENTO','IND_OBLIGATORIO','TXT_FORMATO','TXT_ASIGNADO','COD_USUARIO_CREA_AUD','COD_ESTADO,TIP_DOC')
+                        ->where('LOTE', '=', $idoc)
+                        ->get();
+                    // Convertir el resultado en un array para poder insertarlo más adelante
+                    $dataToInserac = $referenciaAsocQueryac->toArray();
+                    // Paso 2: Insertar los datos en la segunda base de datos
+                    DB::connection($conexionbd)->table('CMP.DOC_ASOCIAR_COMPRA')->insert($dataToInserac);
+                    
+
                 }
 
                 

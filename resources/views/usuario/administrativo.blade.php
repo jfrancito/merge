@@ -6,6 +6,6 @@
 	@include('usuario.dashboard.contrato')
 @endif
 
-@if($trol->UC=='ES' || $trol->UC==NULL)
+@if($trol->UC=='CT' || $trol->UC==NULL || $trol->UC=='OC')
 	@include('usuario.dashboard.estiba')
 @endif
