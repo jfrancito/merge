@@ -19,7 +19,7 @@ use App\Modelos\VMergeDocumento;
 use App\Modelos\VMergeDocumentoActual;
 use App\Modelos\CMPDocAsociarCompra;
 use App\Modelos\WEBRol;
-
+use App\Modelos\FeRefAsoc;
 
 use App\Modelos\Estado;
 use App\Modelos\CMPDetalleProducto;
@@ -43,6 +43,28 @@ use Carbon\Carbon;
 
 trait ComprobanteTraits
 {
+
+    public function con_zona($folio) {
+
+        $folio = FeRefAsoc::where('LOTE','=',$folio)->first();  
+        if (strpos($folio->ID_DOCUMENTO, 'CH') !== false) {
+            return 'CHICLAYO';
+        } else{
+            if (strpos($codigo, 'LM') !== false) {
+                return 'LIMA';
+            } else {
+                if (strpos($codigo, 'RJ') !== false) {
+                    return 'RIOJA';
+                } else {
+                    if (strpos($codigo, 'BE') !== false) {
+                        return 'BELLAVISTA';
+                    } else {
+                        return 'SIN ZONA';
+                    }
+                }
+            }
+        }
+    }    
 
     public function con_transferencia($id_orden) {
 

@@ -15,7 +15,7 @@
                     @if($transferencia->TXT_CATEGORIA_ESTADO_ORDEN == 'TERMINADA')
                       NO RECEPCIONADO
                     @else
-                      {{$transferencia->TXT_CATEGORIA_ESTADO_ORDEN}}
+                      {{$transferencia->TXT_CATEGORIA_ESTADO_ORDEN}} ({{$transferencia->FEC_ORDEN}})
                     @endif
                   </p>
               </div>
