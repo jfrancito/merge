@@ -434,7 +434,7 @@
                                                 </div>
                                             </div>
                                         </div>
-
+                                      </div>  
 
                                     @ELSE
                                     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
