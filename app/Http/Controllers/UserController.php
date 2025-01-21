@@ -974,6 +974,8 @@ class UserController extends Controller {
 
 		$count_reparables 			= 	0;
 		$count_reparables_con 		= 	0;
+		$count_reparables_est 		= 	0;
+
 
 		$count_reparables_rev 		= 	0;
 		$count_reparables__revcon 	= 	0;
@@ -982,6 +984,9 @@ class UserController extends Controller {
         $url_gestion 				=	'';
 
 		$count_observados_con 		= 	0;
+		$count_observados_est 		= 	0;
+
+
         $url_obs_con 				=	'';
 
 
@@ -993,7 +998,9 @@ class UserController extends Controller {
 
 		$count_x_aprobar_con 				= 	0;
 		$count_x_aprobar_gestion_con 		= 	0;
-		
+		$count_x_aprobar_gestion_est 		= 	0;
+
+
 		//estibas
 		$urlestiba 							=	'';
 		$count_x_aprobar_est 				= 	0;
@@ -1004,7 +1011,8 @@ class UserController extends Controller {
         $url_rep_estiba_revisar 			=	'';
 
 		$count_observados_est 				= 	0;
-		$count_observadosest_le 		= 	0;
+		$count_observadosest_le 			= 	0;
+
 
 
 		if($trol->ind_uc == 1){
@@ -1041,6 +1049,14 @@ class UserController extends Controller {
         	//contrato
 			$listadatosg      		=   $this->con_lista_cabecera_contrato_administrativo($cod_empresa);
 			$count_x_aprobar_gestion_con= 	 count($listadatosg);
+
+        	$listadatosobest    	=   $this->con_lista_cabecera_comprobante_total_gestion_observados_estibas($cod_empresa);
+			$count_observados_est 	= 	count($listadatosobest);
+
+        	$listadatosre_est    	=   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,'TODO','TODO');
+			$count_reparables_est 	= 	 count($listadatosre_est);
+
+
 
 		}
 		else{
@@ -1176,7 +1192,7 @@ class UserController extends Controller {
 						 [
 						 	'usuario' 					=> $usuario,
 
-
+						 	'count_observados_est' 		=> $count_observados_est,
 						 	'count_x_aprobar_est' 		=> $count_x_aprobar_est,
 						 	'urlestiba' 				=> $urlestiba,
 						 	'count_reparables_est' 		=> $count_reparables_est,
@@ -1185,6 +1201,8 @@ class UserController extends Controller {
 						 	'url_rep_estiba_revisar' 	=> $url_rep_estiba_revisar,
 						 	'count_observados_est' 		=> $count_observados_est,
 						 	'count_observadosest_le' 	=> $count_observadosest_le,
+						 	'count_reparables_est' 		=> $count_reparables_est,
+
 
 
 						 	'cuentabancarias' 			=> $cuentabancarias,

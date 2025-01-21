@@ -3384,6 +3384,7 @@ trait ComprobanteTraits
                                         //->where('FE_DOCUMENTO.IND_REPARABLE','=','1')
                                         ->TipoArchivo($tipoarchivo_id)
                                         ->EstadoReparable($estado_id)
+                                        ->where('usuario_pa','=',Session::get('usuario')->id)
                                         //->where('FE_DOCUMENTO.MODO_REPARABLE','=',$tipoarchivo_id)
                                         ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                                         ->orderBy('IND_OBSERVACION_REPARABLE','asc')
