@@ -1049,10 +1049,10 @@ class UserController extends Controller {
         	//contrato
 			$listadatosg      		=   $this->con_lista_cabecera_contrato_administrativo($cod_empresa);
 			$count_x_aprobar_gestion_con= 	 count($listadatosg);
-
-        	$listadatosobest    	=   $this->con_lista_cabecera_comprobante_total_gestion_observados_estibas($cod_empresa);
-			$count_observados_est 	= 	count($listadatosobest);
 			$operacion_id 			=	'ESTIBA';
+        	$listadatosobest    	=   $this->con_lista_cabecera_comprobante_total_gestion_observados_estibas($cod_empresa,$operacion_id);
+			$count_observados_est 	= 	count($listadatosobest);
+
         	$listadatosre_est    	=   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,'TODO','TODO',$operacion_id);
 			$count_reparables_est 	= 	 count($listadatosre_est);
 
