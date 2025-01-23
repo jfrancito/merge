@@ -63,10 +63,19 @@ class GestionOCContabilidadController extends Controller
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
         //falta usuario contacto
         $operacion_id       =   'ORDEN_COMPRA';
-        //$operacion_id       =   'ESTIBA';
+        //$operacion_id       =   'DOCUMENTO_INTERNO_PRODUCCION';
 
         $tab_id             =   'oc';
-        $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO','ESTIBA' => 'ESTIBA');
+        //$combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO','ESTIBA' => 'ESTIBA');
+
+        $combo_operacion    =   array(  'ORDEN_COMPRA' => 'ORDEN COMPRA',
+                                        'CONTRATO' => 'CONTRATO',
+                                        'ESTIBA' => 'ESTIBA',
+                                        'DOCUMENTO_INTERNO_PRODUCCION' => 'DOCUMENTO INTERNO PRODUCCION',
+                                        'DOCUMENTO_INTERNO_SECADO' => 'DOCUMENTO INTERNO SECADO',
+                                        'DOCUMENTO_SERVICIO_BALANZA' => 'DOCUMENTO POR SERVICIO DE BALANZA'
+                                    );
+
         if(isset($request['operacion_id'])){
             $operacion_id       =   $request['operacion_id'];
         }
@@ -76,6 +85,9 @@ class GestionOCContabilidadController extends Controller
         if(isset($request['tab_id'])){
             $tab_id             =   $request['tab_id'];
         }
+
+       $array_canjes               =   $this->con_array_canjes();
+
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_total_cont($cod_empresa);
             $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_cont_obs($cod_empresa);
@@ -86,9 +98,14 @@ class GestionOCContabilidadController extends Controller
                 $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_cont_contrato_obs($cod_empresa);
                 $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_cont_contrato_levantadas($cod_empresa);
             }else{
-                $listadatos         =   $this->con_lista_cabecera_comprobante_total_cont_estiba($cod_empresa);
-                $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_cont_estiba_obs($cod_empresa);
-                $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_cont_estiba_levantadas($cod_empresa);
+
+                if (in_array($operacion_id, $array_canjes)) {
+                    $categoria_id       =   $this->con_categoria_canje($operacion_id);
+                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_cont_estiba($cod_empresa,$operacion_id);
+                    $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_cont_estiba_obs($cod_empresa,$operacion_id);
+                    $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_cont_estiba_levantadas($cod_empresa,$operacion_id);
+                }
+
             }
         }
         $funcion        =   $this;
@@ -129,11 +146,13 @@ class GestionOCContabilidadController extends Controller
                 $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_cont_contrato_obs($cod_empresa);
                 $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_cont_contrato_levantadas($cod_empresa);
             }else{
-                $listadatos         =   $this->con_lista_cabecera_comprobante_total_cont_estiba($cod_empresa);
-                $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_cont_estiba_obs($cod_empresa);
-                $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_cont_estiba_levantadas($cod_empresa);
+                $array_canjes       =   $this->con_array_canjes();
+                if (in_array($operacion_id, $array_canjes)) {
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_cont_estiba($cod_empresa,$operacion_id);
+                $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_cont_estiba_obs($cod_empresa,$operacion_id);
+                $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_cont_estiba_levantadas($cod_empresa,$operacion_id);
+                }
             }
-
         }
 
         $procedencia        =   'ADM';
@@ -141,7 +160,6 @@ class GestionOCContabilidadController extends Controller
         return View::make('comprobante/ajax/mergelistacontabilidad',
                          [
                             'operacion_id'          =>  $operacion_id,
-
                             'idopcion'              =>  $idopcion,
                             'tab_id'           =>  $tab_id,
                             'cod_empresa'           =>  $cod_empresa,
@@ -150,7 +168,6 @@ class GestionOCContabilidadController extends Controller
                             'listadatos_obs_le'            =>  $listadatos_obs_le,
                             'procedencia'           =>  $procedencia,
                             'ajax'                  =>  true,
-
                             'funcion'               =>  $funcion
                          ]);
     }
@@ -2258,12 +2275,13 @@ class GestionOCContabilidadController extends Controller
                     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
                 }  
                 DB::commit();
-                Session::flash('operacion_id', 'CONTRATO');
-
+                Session::flash('operacion_id', $request['operacion_id']);
                 return Redirect::to('/gestion-de-contabilidad-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$lote.' OBSERVADO CON EXITO');
+
+
             }catch(\Exception $ex){
                 DB::rollback(); 
-                Session::flash('operacion_id', 'CONTRATO');
+                Session::flash('operacion_id', $request['operacion_id']);
 
                 return Redirect::to('gestion-de-contabilidad-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }

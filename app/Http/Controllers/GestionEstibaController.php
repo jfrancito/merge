@@ -614,6 +614,7 @@ class GestionEstibaController extends Controller
     public function actionDetalleSelectEstiba($idopcion,Request $request)
     {
         $jsondocumenos                          =    json_decode($request['jsondocumenos'],true);
+        $operacion_id                           =    $request['operacion_sel'];
         $lote                                   =    $this->funciones->generar_lote('FE_REF_ASOC',8);
 
         $sw_sel                                 =    0;
@@ -642,6 +643,7 @@ class GestionEstibaController extends Controller
                 $docasociar->FECHA_CREA                  =   $this->fechaactual;
                 $docasociar->COD_ESTADO                  =   1;
                 $docasociar->ESTATUS                     =   'OFF';
+                $docasociar->OPERACION                   =   $operacion_id;
                 $docasociar->USUARIO_CREA                =   Session::get('usuario')->id;
                 $docasociar->save();
             }else{
@@ -656,8 +658,11 @@ class GestionEstibaController extends Controller
 
         $idoc                   =   $lote;
         $ferefeasoc             =   FeRefAsoc::where('lote','=',$lote)->get();
+        $fereftop1              =   FeRefAsoc::where('lote','=',$lote)->first();
+
+
         $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
-        View::share('titulo','REGISTRO DE COMPROBANTE ESTIBA :'.$lote);
+        View::share('titulo','REGISTRO DE COMPROBANTE '.$fereftop1->OPERACION.' : '.$lote);
         $tiposerie              =   '';
         $empresa                =   array();
         $combopagodetraccion    =   array();
@@ -775,6 +780,7 @@ class GestionEstibaController extends Controller
                             'combodocumento'        =>  $combodocumento,
                             'documento_id'          =>  $documento_id,
                             'funcion'               =>  $funcion,
+                            'fereftop1'             =>  $fereftop1,
                             'idopcion'              =>  $idopcion,
                          ]);
     }
@@ -919,7 +925,7 @@ class GestionEstibaController extends Controller
                         $documento->ind_email_adm           =   -1;
                         $documento->ind_email_ba            =   -1;
                         $documento->ind_email_clap          =   -1;
-                        $documento->OPERACION               =   'ESTIBA';
+                        $documento->OPERACION               =   $request['operacion_id'];
                         $documento->save();
 
                         //ARCHIVO
@@ -1112,9 +1118,11 @@ class GestionEstibaController extends Controller
 
     public function actionCargarModalDetalleLotes(Request $request) {
 
+        $operacion_id   =   $request['operacion_sel'];
         $feasoc         =   FeRefAsoc::where('USUARIO_CREA','=',Session::get('usuario')->id)
                             ->where('COD_ESTADO','=','1')
                             ->where('ESTATUS','=','OFF')
+                            ->where('OPERACION','=',$operacion_id)
                             ->select('LOTE','FECHA_CREA')
                             ->groupBy('LOTE')
                             ->groupBy('FECHA_CREA')
@@ -1127,6 +1135,7 @@ class GestionEstibaController extends Controller
         return View::make('comprobante/modal/ajax/mlistalotesestiba',
                          [
                             'feasoc'                =>  $feasoc,
+                            'operacion_id'          =>  $operacion_id,
                             'funcion'               =>  $funcion
                          ]);
     }

@@ -44,6 +44,22 @@ use Carbon\Carbon;
 trait ComprobanteTraits
 {
 
+    public function con_array_canjes() {
+        $array = ['ESTIBA','DOCUMENTO_INTERNO_PRODUCCION','DOCUMENTO_INTERNO_SECADO','DOCUMENTO_SERVICIO_BALANZA'];
+        return $array;
+    }    
+
+    public function con_categoria_canje($valor) {
+        $array = [  'ESTIBA'=>'TDO0000000000067',
+                    'DOCUMENTO_INTERNO_PRODUCCION'=>'TDO0000000000092',
+                    'DOCUMENTO_INTERNO_SECADO'=>'TDO0000000000096',
+                    'DOCUMENTO_SERVICIO_BALANZA'=>'TDO0000000000071'];
+        $id = $array[$valor];
+
+        return $id;
+    }   
+
+
     public function con_zona($folio) {
 
         $folio = FeRefAsoc::where('LOTE','=',$folio)->first();  
@@ -195,6 +211,7 @@ trait ComprobanteTraits
                                     ->join('CMP.REFERENCIA_ASOC', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
                                     ->select(DB::raw('CMP.DOCUMENTO_CTBLE.*,REFERENCIA_ASOC.COD_TABLA,REFERENCIA_ASOC.COD_TABLA_ASOC'))
                                     ->where('CMP.DOCUMENTO_CTBLE.COD_ESTADO','=','1')
+                                    ->where('CMP.REFERENCIA_ASOC.COD_ESTADO','=','1')
                                     ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_ESTADO_DOC_CTBLE','=','EDC0000000000009')
                                     ->whereIn('COD_CATEGORIA_TIPO_DOC', [
                                         'TDO0000000000001',
@@ -2233,11 +2250,11 @@ trait ComprobanteTraits
 
 
 
-    private function con_lista_cabecera_comprobante_total_cont_estiba($cliente_id) {
+    private function con_lista_cabecera_comprobante_total_cont_estiba($cliente_id,$operacion_id) {
 
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                             ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC'))
-                            ->where('OPERACION','=','ESTIBA')
+                            ->where('OPERACION','=',$operacion_id)
                             //->where('FE_DOCUMENTO.ID_DOCUMENTO','=','00000004')
                             ->where(function ($query) {
                                 $query->where('ind_observacion', '<>', 1)
@@ -2283,12 +2300,12 @@ trait ComprobanteTraits
 
         return  $listadatos;
     }
-    private function con_lista_cabecera_comprobante_total_cont_estiba_levantadas($cliente_id) {
+    private function con_lista_cabecera_comprobante_total_cont_estiba_levantadas($cliente_id,$operacion_id) {
 
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                             //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
                             ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC'))
-                            ->where('OPERACION','=','ESTIBA')
+                            ->where('OPERACION','=',$operacion_id)
                             ->where('ind_observacion','=',0)
                             ->where('area_observacion','=','CONT')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
@@ -2317,12 +2334,12 @@ trait ComprobanteTraits
 
         return  $listadatos;
     }
-    private function con_lista_cabecera_comprobante_total_cont_estiba_obs($cliente_id) {
+    private function con_lista_cabecera_comprobante_total_cont_estiba_obs($cliente_id,$operacion_id) {
 
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                             //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
                             ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC'))
-                            ->where('OPERACION','=','ESTIBA')
+                            ->where('OPERACION','=',$operacion_id)
                              ->where('ind_observacion','=',1)
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
@@ -3369,7 +3386,7 @@ trait ComprobanteTraits
 
         return  $listadatos;
     }
-    private function con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cliente_id,$tipoarchivo_id,$estado_id) {
+    private function con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cliente_id,$tipoarchivo_id,$estado_id,$operacion_id) {
 
         $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
         $centro_id           =      $trabajador->COD_ZONA_TIPO;
@@ -3379,7 +3396,7 @@ trait ComprobanteTraits
 
             $listadatos          =      FeDocumento::where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                         //->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
-                                        ->where('OPERACION','=','ESTIBA')
+                                        ->where('OPERACION','=',$operacion_id)
                                         ->whereNotIn('FE_DOCUMENTO.COD_ESTADO',['','ETM0000000000006'])
                                         //->where('FE_DOCUMENTO.IND_REPARABLE','=','1')
                                         ->TipoArchivo($tipoarchivo_id)
@@ -3393,7 +3410,7 @@ trait ComprobanteTraits
         }else{
 
             $listadatos          =      FeDocumento::where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                                        ->where('OPERACION','=','ESTIBA')
+                                        ->where('OPERACION','=',$operacion_id)
                                         ->TipoArchivo($tipoarchivo_id)
                                         ->EstadoReparable($estado_id)
                                         //->where('FE_DOCUMENTO.MODO_REPARABLE','=',$tipoarchivo_id)
@@ -3442,7 +3459,7 @@ trait ComprobanteTraits
 	 	return  $listadatos;
 	}
 
-    private function con_lista_cabecera_comprobante_total_gestion_observados_estibas($cliente_id) {
+    private function con_lista_cabecera_comprobante_total_gestion_observados_estibas($cliente_id,$operacion_id) {
 
         $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
         $centro_id           =      $trabajador->COD_ZONA_TIPO;
@@ -3451,7 +3468,7 @@ trait ComprobanteTraits
 
         if(Session::get('usuario')->id== '1CIX00000001'){
 
-            $listadatos          =      FeDocumento::where('OPERACION','=','ESTIBA')
+            $listadatos          =      FeDocumento::where('OPERACION','=',$operacion_id)
                                         ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                         //->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
                                         ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
@@ -3462,7 +3479,7 @@ trait ComprobanteTraits
 
         }else{
 
-            $listadatos          =      FeDocumento::where('OPERACION','=','ESTIBA')
+            $listadatos          =      FeDocumento::where('OPERACION','=',$operacion_id)
                                         ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                         ->where('usuario_pa','=',Session::get('usuario')->id)
                                         ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
@@ -4091,6 +4108,7 @@ trait ComprobanteTraits
                                     ->join('CMP.REFERENCIA_ASOC', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
                                     ->select(DB::raw('CMP.DOCUMENTO_CTBLE.*,REFERENCIA_ASOC.COD_TABLA,REFERENCIA_ASOC.COD_TABLA_ASOC'))
                                     ->where('CMP.DOCUMENTO_CTBLE.COD_ESTADO','=','1')
+                                    ->where('REFERENCIA_ASOC.COD_ESTADO','=','1')
                                     ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_ESTADO_DOC_CTBLE','<>','EDC0000000000012')
                                     ->whereIn('COD_CATEGORIA_TIPO_DOC', [
                                         'TDO0000000000001',
@@ -4101,6 +4119,7 @@ trait ComprobanteTraits
 
         $oi                     =   DB::table('CMP.ORDEN')
                                     ->join('CMP.REFERENCIA_ASOC', 'CMP.ORDEN.COD_ORDEN', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+                                    ->where('REFERENCIA_ASOC.COD_ESTADO','=','1')
                                     ->select(DB::raw('REFERENCIA_ASOC.*'))
                                     ->whereIn('COD_CATEGORIA_TIPO_ORDEN', ['TOR0000000000002']);
 
@@ -4159,6 +4178,7 @@ trait ComprobanteTraits
 
         $documento              =   DB::table('CMP.DOCUMENTO_CTBLE')
                                     ->join('CMP.REFERENCIA_ASOC', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+                                    ->where('CMP.REFERENCIA_ASOC.COD_ESTADO','=','1')
                                     ->select(DB::raw('CMP.DOCUMENTO_CTBLE.*,REFERENCIA_ASOC.COD_TABLA,REFERENCIA_ASOC.COD_TABLA_ASOC'))
                                     ->whereIn('COD_CATEGORIA_TIPO_DOC', [
                                         'TDO0000000000001',
@@ -4166,8 +4186,11 @@ trait ComprobanteTraits
                                         'TDO0000000000002'
                                     ]);
 
+
+
         $oi                     =   DB::table('CMP.ORDEN')
                                     ->join('CMP.REFERENCIA_ASOC', 'CMP.ORDEN.COD_ORDEN', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+                                    ->where('CMP.REFERENCIA_ASOC.COD_ESTADO','=','1')
                                     ->select(DB::raw('REFERENCIA_ASOC.*'))
                                     ->whereIn('COD_CATEGORIA_TIPO_ORDEN', ['TOR0000000000002']);
 
@@ -4186,11 +4209,12 @@ trait ComprobanteTraits
                                     ->whereRaw("CAST(documentos.FEC_VENCIMIENTO AS DATE) >= ? and CAST(documentos.FEC_VENCIMIENTO AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                     ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                     ->where('FE_DOCUMENTO.OPERACION','=','ORDEN_COMPRA')
+                                    ->where('documentos.COD_ESTADO','=','1')
                                     ->where(function ($query) {
                                         $query->where('FOLIO', '=', '');
                                         $query->orWhereNull('FOLIO');
                                     })
-                                    //->where('CMP.Orden.COD_ORDEN','=','ISRJCL0000001507')
+                                    //->where('CMP.Orden.COD_ORDEN','=','ISBECL0000001705')
                                     ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005'])
                                     ->where('CMP.Orden.COD_EMPR','=',$empresa_id)
                                     //->where('CMP.Orden.COD_CENTRO','=',$centro_id)
@@ -4581,27 +4605,20 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
-    private function con_lista_cabecera_estibas_administrativo($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id) {
+    private function con_lista_cabecera_estibas_administrativo($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id) {
 
-        //$trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
-        // $array_trabajadores  =      STDTrabajador::where('NRO_DOCUMENTO','=',$trabajador->NRO_DOCUMENTO)
-        //                             ->pluck('COD_TRAB')
-        //                             ->toArray();
-        // $array_usuarios      =      SGDUsuario::whereIn('COD_TRABAJADOR',$array_trabajadores)
-        //                             ->pluck('COD_USUARIO')
-        //                             ->toArray();
         $estado_no          =       'ETM0000000000006';
-        //$centro_id          =       $trabajador->COD_ZONA_TIPO;
-        $tipodoc_id         =       'TDO0000000000067';
+        $trabajador         =      STDTrabajador::where('COD_TRAB','=',$cod_empresa)->first();
+        $centro_id          =       $trabajador->COD_ZONA_TIPO;
+
+
+        $tipodoc_id         =       $categoria_id;
         $array_usuarios     =       SGDUsuario::Area($area_id)
                                     ->whereNotNull('COD_CATEGORIA_AREA')
                                     ->pluck('COD_USUARIO')
                                     ->toArray();
 
-
         if(Session::get('usuario')->id== '1CIX00000001'){
-
-
 
             $listadatos         =       VMergeDocumento::leftJoin('FE_REF_ASOC', function ($leftJoin){
                                             $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
@@ -4658,6 +4675,7 @@ trait ComprobanteTraits
                                                   ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
                                                   ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
                                         })
+                                        //->where('COD_CENTRO','=',$centro_id)
                                         ->whereRaw("CAST(VMERGEDOCUMENTOS.FEC_EMISION AS DATE) >= ? and CAST(VMERGEDOCUMENTOS.FEC_EMISION AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                         ->where('COD_EMPR_EMISOR','=',$proveedor_id)
                                         ->WHERE('VMERGEDOCUMENTOS.COD_ESTADO','=','1')
@@ -4688,7 +4706,7 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
-    private function con_combo_cabecera_estibas_administrativo($cliente_id,$area_id) {
+    private function con_combo_cabecera_estibas_administrativo($cliente_id,$area_id,$categoria_id) {
 
         $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
         $array_trabajadores  =      STDTrabajador::where('NRO_DOCUMENTO','=',$trabajador->NRO_DOCUMENTO)
@@ -4699,7 +4717,7 @@ trait ComprobanteTraits
                                     ->toArray();
         $estado_no          =       'ETM0000000000006';
         $centro_id          =       $trabajador->COD_ZONA_TIPO;
-        $tipodoc_id         =       'TDO0000000000067';
+        $tipodoc_id         =       $categoria_id;
         $array_usuarios     =       SGDUsuario::Area($area_id)
                                     ->whereNotNull('COD_CATEGORIA_AREA')
                                     ->pluck('COD_USUARIO')

@@ -63,18 +63,34 @@ class GestionUsuarioContactoController extends Controller
         View::share('titulo','Lista Documentos Observados');
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
         $operacion_id       =   'ORDEN_COMPRA';
-        $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO','ESTIBA' => 'ESTIBA');
+        //$combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO','ESTIBA' => 'ESTIBA');
+        $combo_operacion    =   array(  'ORDEN_COMPRA' => 'ORDEN COMPRA',
+                                        'CONTRATO' => 'CONTRATO',
+                                        'ESTIBA' => 'ESTIBA',
+                                        'DOCUMENTO_INTERNO_PRODUCCION' => 'DOCUMENTO INTERNO PRODUCCION',
+                                        'DOCUMENTO_INTERNO_SECADO' => 'DOCUMENTO INTERNO SECADO',
+                                        'DOCUMENTO_SERVICIO_BALANZA' => 'DOCUMENTO POR SERVICIO DE BALANZA'
+                                    );
+
+
         $array_contrato     =   $this->array_rol_contrato();
         if (in_array(Session::get('usuario')->rol_id, $array_contrato)) {
             $operacion_id       =   'CONTRATO';
         }
+
+       $array_canjes               =   $this->con_array_canjes();
+
+
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_observados($cod_empresa);
         }else{
             if($operacion_id=='CONTRATO'){
                 $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_observados_contrato($cod_empresa);
             }else{
-                $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_observados_estibas($cod_empresa);
+                if (in_array($operacion_id, $array_canjes)) {
+                    $categoria_id       =   $this->con_categoria_canje($operacion_id);
+                    $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_observados_estibas($cod_empresa,$operacion_id);
+                }
             }
         }
         $funcion        =   $this;
@@ -99,7 +115,7 @@ class GestionUsuarioContactoController extends Controller
             if($operacion_id=='CONTRATO'){
                 $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_observados_contrato($cod_empresa);
             }else{
-                $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_observados_estibas($cod_empresa);
+                $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_observados_estibas($cod_empresa,$operacion_id);
             }
         }
         $funcion                =   $this;
@@ -126,6 +142,13 @@ class GestionUsuarioContactoController extends Controller
 
         $operacion_id       =   'ORDEN_COMPRA';
         $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO','ESTIBA' => 'ESTIBA');
+        $combo_operacion    =   array(  'ORDEN_COMPRA' => 'ORDEN COMPRA',
+                                        'CONTRATO' => 'CONTRATO',
+                                        'ESTIBA' => 'ESTIBA',
+                                        'DOCUMENTO_INTERNO_PRODUCCION' => 'DOCUMENTO INTERNO PRODUCCION',
+                                        'DOCUMENTO_INTERNO_SECADO' => 'DOCUMENTO INTERNO SECADO',
+                                        'DOCUMENTO_SERVICIO_BALANZA' => 'DOCUMENTO POR SERVICIO DE BALANZA'
+                                    );
 
         $tipoarchivo_id     =   'TODO';
         $combo_tipoarchivo  =   array('TODO' => 'TODO','ARCHIVO_FISICO' => 'ARCHIVO FISICO','ARCHIVO_VIRTUAL' => 'ARCHIVO VIRTUAL');
@@ -152,7 +175,14 @@ class GestionUsuarioContactoController extends Controller
             if($operacion_id=='CONTRATO'){
                 $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cod_empresa,$tipoarchivo_id,$estado_id);
             }else{
-                $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,$tipoarchivo_id,$estado_id);
+
+               $array_canjes               =   $this->con_array_canjes();
+                if (in_array($operacion_id, $array_canjes)) {
+                    $categoria_id       =   $this->con_categoria_canje($operacion_id);
+                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,$tipoarchivo_id,$estado_id,$operacion_id);
+                }
+
+
             }
         }
 
@@ -190,7 +220,7 @@ class GestionUsuarioContactoController extends Controller
             if($operacion_id=='CONTRATO'){
                 $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cod_empresa,$tipoarchivo_id,$estado_id);
             }else{
-                $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,$tipoarchivo_id,$estado_id);
+                $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,$tipoarchivo_id,$estado_id,$operacion_id);
             }
         }
 

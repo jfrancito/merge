@@ -79,6 +79,11 @@ $(document).ready(function(){
 
 });
 
+function array_canjes() {
+    const array = ['ESTIBA', 'DOCUMENTO_INTERNO_PRODUCCION', 'DOCUMENTO_INTERNO_SECADO', 'DOCUMENTO_SERVICIO_BALANZA'];
+    return array;
+}
+
 
 function error500(data) {
     if(data.status = 500){

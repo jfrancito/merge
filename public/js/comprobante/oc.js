@@ -11,13 +11,12 @@ $(document).ready(function(){
 
         var _token              =   $('#token').val();
         var operacion_id        =   $(this).val();
-        var valores = ['ESTIBA'];
+        var valores = array_canjes();
         if(valores.includes(operacion_id)){
             $('.sec_estiba').removeClass('ocultar');
         }else{
             $('.sec_estiba').addClass('ocultar');
         }
-
         $.ajax({
               type    :     "POST",
               url     :     carpeta+"/ajax-estiba-proveedor-estiba",
@@ -110,11 +109,18 @@ $(document).ready(function(){
     });
 
     $(".agestioncomprobante").on('click','.lotesestibas', function(e) {
+
+
         var _token                  =   $('#token').val();
         var idopcion                =   $('#idopcion').val();
+        var operacion_sel           =   $('#operacion_sel').val();
+
+
+
         data                        =   {
                                             _token                  : _token,
                                             idopcion                : idopcion,
+                                            operacion_sel           : operacion_sel,
                                         };
 
         ajax_modal(data,"/ajax-modal-detalle-lotes",
