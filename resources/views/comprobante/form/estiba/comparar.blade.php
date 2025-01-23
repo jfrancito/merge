@@ -1,6 +1,6 @@
 
     <div class="panel panel-default panel-contrast">
-      <div class="panel-heading" style="background: #1d3a6d;color: #fff;">COMPARAR (XML - CONTRATO)
+      <div class="panel-heading" style="background: #1d3a6d;color: #fff;">{{$fedocumento->OPERACION}}
       </div>
       <div class="panel-body panel-body-contrast">
         <table class="table table-condensed table-striped">

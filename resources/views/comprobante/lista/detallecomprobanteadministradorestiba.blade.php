@@ -25,6 +25,7 @@
                           </div>
                       </div> 
 
+                      <input type="hidden" name="operacion_id" id="operacion_id" value="{{$fereftop1->OPERACION}}">
                       <div class="col-sm-12">
                           <div class="form-group">
                               <label class="col-sm-12 control-label labelleft" >Archivo :</label>
@@ -108,7 +109,7 @@
 
                 <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
                   <div class="panel panel-default panel-contrast">
-                    <div class="panel-heading" style="background: #1d3a6d;color: #fff;">ESTIBA
+                    <div class="panel-heading" style="background: #1d3a6d;color: #fff;">{{$fereftop1->OPERACION}}
                     </div>
                     <div class="panel-body panel-body-contrast">
                       <table class="table table-condensed table-striped">

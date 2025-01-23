@@ -2,7 +2,7 @@
 		<button type="button" data-dismiss="modal" aria-hidden="true" class="close modal-close"><span class="mdi mdi-close"></span></button>
 	  <div class="row">
 			<div class="col-xs-12">
-				LOTES DE ESTIBAS
+				LOTES DE {{$operacion_id}}
 			</div>
 		</div>
 	</div>

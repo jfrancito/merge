@@ -591,7 +591,7 @@ class GestionOCController extends Controller
         /******************************************************/
         View::share('titulo','Integracion de Comprobante');
         $operacion_id       =   'ORDEN_COMPRA';
-        //$operacion_id       =   'ESTIBA';
+        //$operacion_id       =   'DOCUMENTO_INTERNO_PRODUCCION';
 
         $array_contrato     =   $this->array_rol_contrato();
         if (in_array(Session::get('usuario')->rol_id, $array_contrato)) {
@@ -599,8 +599,13 @@ class GestionOCController extends Controller
         }
 
         $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO','ESTIBA' => 'ESTIBA');
-        //$combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO');
-
+        // $combo_operacion    =   array(  'ORDEN_COMPRA' => 'ORDEN COMPRA',
+        //                                 'CONTRATO' => 'CONTRATO',
+        //                                 'ESTIBA' => 'ESTIBA',
+        //                                 'DOCUMENTO_INTERNO_PRODUCCION' => 'DOCUMENTO INTERNO PRODUCCION',
+        //                                 'DOCUMENTO_INTERNO_SECADO' => 'DOCUMENTO INTERNO SECADO',
+        //                                 'DOCUMENTO_SERVICIO_BALANZA' => 'DOCUMENTO POR SERVICIO DE BALANZA'
+        //                             );
 
         $cod_empresa        =   Session::get('usuario')->usuarioosiris_id;
         $procedencia        =   'ADM';
@@ -609,7 +614,7 @@ class GestionOCController extends Controller
         $estado_id          =   'TODO';        
         $area_id            =   'TODO';
 
-        $combo_area         =   $this->gn_combo_area_usuario($estado_id);
+        $combo_area         =    $this->gn_combo_area_usuario($estado_id);
         $rol                =    WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 
         if($rol->ind_uc == 1){
@@ -626,13 +631,19 @@ class GestionOCController extends Controller
         $combo_proveedor            =   array();
         $proveedor_id               =   '';
 
+        $array_canjes               =   $this->con_array_canjes();
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_administrativo($cod_empresa);
         }else{
             if($operacion_id=='CONTRATO'){
                 $listadatos         =   $this->con_lista_cabecera_contrato_administrativo($cod_empresa);
             }else{
-                $listadatos         =   $this->con_lista_cabecera_estibas_administrativo($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id);
+                if (in_array($operacion_id, $array_canjes)) {
+
+                    $categoria_id       =   $this->con_categoria_canje($operacion_id);
+                    $listadatos         =   $this->con_lista_cabecera_estibas_administrativo($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id);
+
+                }
             }
         }
 
@@ -645,13 +656,10 @@ class GestionOCController extends Controller
                             'combo_operacion'   =>  $combo_operacion,
                             'funcion'           =>  $funcion,
                             'idopcion'          =>  $idopcion,
-
                             'fecha_inicio'      =>  $fecha_inicio,
                             'fecha_fin'         =>  $fecha_fin,
-
                             'area_id'           =>  $area_id,
                             'combo_area'        =>  $combo_area,
-
                             'combo_proveedor'   =>  $combo_proveedor,
                             'proveedor_id'      =>  $proveedor_id
 
@@ -677,7 +685,9 @@ class GestionOCController extends Controller
                 $area_id        =   $tp_area->COD_CATEGORIA;
             }
         }
-        $combo_proveedor     =   $this->con_combo_cabecera_estibas_administrativo($cod_empresa,$area_id);
+
+        $categoria_id   =   $this->con_categoria_canje($operacion_id);
+        $combo_proveedor=   $this->con_combo_cabecera_estibas_administrativo($cod_empresa,$area_id,$categoria_id);
         $procedencia    =   'ADM';
         $funcion        =   $this;
         return View::make('comprobante/combo/combo_proveedor',
@@ -706,13 +716,20 @@ class GestionOCController extends Controller
         $idopcion       =   $request['idopcion'];
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
 
+        $array_canjes               =   $this->con_array_canjes();
+
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_administrativo($cod_empresa);
         }else{
             if($operacion_id=='CONTRATO'){
                 $listadatos         =   $this->con_lista_cabecera_contrato_administrativo($cod_empresa);
             }else{
-                $listadatos         =   $this->con_lista_cabecera_estibas_administrativo($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id);
+                if (in_array($operacion_id, $array_canjes)) {
+
+                    $categoria_id       =   $this->con_categoria_canje($operacion_id);
+                    $listadatos         =   $this->con_lista_cabecera_estibas_administrativo($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id);
+
+                }
             }
         }
 

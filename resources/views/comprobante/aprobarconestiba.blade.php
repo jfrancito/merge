@@ -34,6 +34,7 @@
                     <div class="panel-body">
                       <form method="POST" id='formpedido' action="{{ url('/aprobar-comprobante-contabilidad-estiba/'.$idopcion.'/'.$lote) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
                             {{ csrf_field() }}
+                        <input type="hidden" name="operacion_id" id="operacion_id" value = "{{$fedocumento->OPERACION}}">
                         @include('comprobante.form.formaprobarcontestiba')
                       </form>
                     </div>
@@ -46,6 +47,7 @@
                     <div class="panel-body">
                       <form method="POST" id='formpedidoobservar' action="{{ url('/agregar-observacion-contabilidad-estiba/'.$idopcion.'/'.$lote) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                             {{ csrf_field() }}
+                            <input type="hidden" name="operacion_id" id="operacion_id" value = "{{$fedocumento->OPERACION}}">
                         @include('comprobante.form.formobservarestiba')
                       </form>
                     </div>
@@ -60,6 +62,7 @@
                     <div class="panel-body">
                         <form method="POST" id='formpedidoreparable' action="{{ url('/agregar-reparable-contabilidad-estiba/'.$idopcion.'/'.$lote) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                               {{ csrf_field() }}
+                              <input type="hidden" name="operacion_id" id="operacion_id" value = "{{$fedocumento->OPERACION}}">
                           @include('comprobante.form.formreparableestiba')
                         </form>
                     </div>
@@ -73,6 +76,7 @@
                     <div class="panel-body">
                         <form method="POST" id='formpedidorechazar' action="{{ url('/agregar-extorno-estiba-contabilidad/'.$idopcion.'/'.$lote) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                               {{ csrf_field() }}
+                              <input type="hidden" name="operacion_id" id="operacion_id" value = "{{$fedocumento->OPERACION}}">
                           @include('comprobante.form.formrechazoestiba')
                         </form>
                     </div>

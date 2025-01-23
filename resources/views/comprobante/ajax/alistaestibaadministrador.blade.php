@@ -21,19 +21,21 @@
   <form method="POST" id='formre' action="{{ url('/select-xml-estiba/'.$idopcion) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
         {{ csrf_field()}}
         <input type="hidden" name="jsondocumenos" id = 'jsondocumenos'>
+        <input type="hidden" name="operacion_sel" id="operacion_sel" value = '{{$operacion_id}}'>
+
   </form>
 
   <div class="tools tooltiptop">
     <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones detalleestibs">
-      <span class="tooltiptext">Detalle de Estibas</span>
+      <span class="tooltiptext">Detalle</span>
       <span class="icon mdi mdi-assignment"></span>
     </a>
     <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones lotesestibas">
-      <span class="tooltiptext">Lotes Estiba</span>
+      <span class="tooltiptext">Lotes</span>
       <span class="icon mdi mdi-eye"></span>
     </a>
     <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones migrarestibaadmin">
-      <span class="tooltiptext">Registrar Estiba</span>
+      <span class="tooltiptext">Registrar</span>
       <span class="icon mdi mdi-collection-image"></span>
     </a>
   </div>
@@ -64,7 +66,7 @@
     @foreach($listadatos as $index => $item)
       <tr data_requerimiento_id = "{{$item->COD_DOCUMENTO_CTBLE}}" data_lote = "{{$item->LOTE_DOC}}" data_total = "{{$item->CAN_TOTAL}}">
         <td><b>{{$index + 1}}</b></td>
-        <td><b>ESTIBA</b></td>
+        <td><b>{{$operacion_id}}</b></td>
         <td>{{$item->COD_DOCUMENTO_CTBLE}}</td>
         <td>{{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</td>
         <td>{{$funcion->funciones->estorno_referencia($item->COD_DOCUMENTO_CTBLE)}}</td>
