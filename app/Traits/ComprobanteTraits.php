@@ -66,13 +66,13 @@ trait ComprobanteTraits
         if (strpos($folio->ID_DOCUMENTO, 'CH') !== false) {
             return 'CHICLAYO';
         } else{
-            if (strpos($codigo, 'LM') !== false) {
+            if (strpos($folio->ID_DOCUMENTO, 'LM') !== false) {
                 return 'LIMA';
             } else {
-                if (strpos($codigo, 'RJ') !== false) {
+                if (strpos($folio->ID_DOCUMENTO, 'RJ') !== false) {
                     return 'RIOJA';
                 } else {
-                    if (strpos($codigo, 'BE') !== false) {
+                    if (strpos($folio->ID_DOCUMENTO, 'BE') !== false) {
                         return 'BELLAVISTA';
                     } else {
                         return 'SIN ZONA';
