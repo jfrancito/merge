@@ -120,7 +120,7 @@ trait ComprobanteTraits
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'STD.EMPRESA.COD_TIPO_DOCUMENTO')
                                 ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
                                 ->where('FE_DOCUMENTO.FOLIO', $folio)
-                                ->where('OPERACION', 'ESTIBA')
+                                ->where('FE_DOCUMENTO.OPERACION', 'ESTIBA')
                                 ->select(
                                         DB::raw('DISTINCT   CMP.DOCUMENTO_CTBLE.*, 
                                                     FE_DOCUMENTO.*, 
@@ -310,7 +310,7 @@ trait ComprobanteTraits
                                 })
                                 ->where('FE_DOCUMENTO.FOLIO', $folio)
                                 ->where('FE_DOCUMENTO.RUC_PROVEEDOR','=',$empresa_id)
-                                ->where('OPERACION', 'ESTIBA')
+                                ->where('FE_DOCUMENTO.OPERACION', 'ESTIBA')
                                 ->select(
                                     DB::raw('DISTINCT FE_DOCUMENTO.*, CMP.DOCUMENTO_CTBLE.*'),
                                     DB::raw("(SELECT SUM(CAN_PRODUCTO)  FROM CMP.DETALLE_PRODUCTO WHERE CMP.DETALLE_PRODUCTO.COD_TABLA = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE AND CMP.DETALLE_PRODUCTO.COD_ESTADO = 1 AND CMP.DETALLE_PRODUCTO.IND_MATERIAL_SERVICIO = 'M') AS TOTAL_CAN_SACOS")
@@ -429,7 +429,7 @@ trait ComprobanteTraits
 
     }
 
-    private function con_lista_cabecera_comprobante_entregable_estiba($cliente_id,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id) {
+    private function con_lista_cabecera_comprobante_entregable_estiba($cliente_id,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$operacion_id) {
 
 
         $fecha_corte            =   date('Ymd');
@@ -470,7 +470,7 @@ trait ComprobanteTraits
                                         //->whereIn('CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD',$array_usuarios)
                                         ->where('FE_DOCUMENTO.COD_ESTADO', 'ETM0000000000005')
                                         //->where('FE_DOCUMENTO.ID_DOCUMENTO', '00000019')
-                                        ->where('OPERACION', 'ESTIBA')
+                                        ->where('FE_DOCUMENTO.OPERACION', $operacion_id)
                                         ->where(function ($query) {
                                             $query->where('FOLIO', '=', '');
                                             $query->orWhereNull('FOLIO');
@@ -498,7 +498,7 @@ trait ComprobanteTraits
                                             $query->orWhereNull('FOLIO');
                                         })
                                         //->where('FE_DOCUMENTO.ID_DOCUMENTO', '00000019')
-                                        ->where('OPERACION', 'ESTIBA')
+                                        ->where('FE_DOCUMENTO.OPERACION', $operacion_id)
                                         ->selectRaw('DISTINCT FE_DOCUMENTO.*, CMP.DOCUMENTO_CTBLE.*') // DISTINCT aplicado solo a estas columnas
                                         ->get();
 
@@ -598,7 +598,7 @@ trait ComprobanteTraits
                                     ->where('FE_DOCUMENTO.FOLIO', $folio)
                                     ->where('TXT_CATEGORIA_BANCO','=',$banco_txt)
                                     ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
-                                    ->where('OPERACION', 'ESTIBA')
+                                    ->where('FE_DOCUMENTO.OPERACION', 'ESTIBA')
                                     ->distinct()
                                     ->select(DB::raw('FE_DOCUMENTO.TXT_NRO_CUENTA_BANCARIA,
                                                     CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR,
@@ -717,7 +717,7 @@ trait ComprobanteTraits
                                 ->where('FE_DOCUMENTO.FOLIO', $folio)
                                 ->where('TXT_CATEGORIA_BANCO','=',$banco_txt)
                                 ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
-                                ->where('OPERACION', 'ESTIBA')
+                                ->where('FE_DOCUMENTO.OPERACION', 'ESTIBA')
                                 ->select(DB::raw('CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR,CMP.DOCUMENTO_CTBLE.TXT_EMPR_EMISOR'))
                                 ->groupBy('CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR')
                                 ->groupBy('CMP.DOCUMENTO_CTBLE.TXT_EMPR_EMISOR')
@@ -788,12 +788,12 @@ trait ComprobanteTraits
                                          ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE');
                                 })
                                 ->where('FE_DOCUMENTO.FOLIO', $folio)
-                                ->where('OPERACION', 'ESTIBA')
+                                ->where('FE_DOCUMENTO.OPERACION', 'ESTIBA')
                                 ->select(DB::raw('CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR,CMP.DOCUMENTO_CTBLE.TXT_EMPR_EMISOR'))
                                 ->groupBy('CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR')
                                 ->groupBy('CMP.DOCUMENTO_CTBLE.TXT_EMPR_EMISOR')
                                 ->get();
-
+        //dd("hola");
         return  $listadatos;
 
     }
@@ -813,7 +813,7 @@ trait ComprobanteTraits
                                 })
                                 ->where('FE_DOCUMENTO.FOLIO', $folio)
                                 ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
-                                ->where('OPERACION', 'ESTIBA')
+                                ->where('FE_DOCUMENTO.OPERACION', 'ESTIBA')
                                 ->select(DB::raw('FE_DOCUMENTO.COD_CATEGORIA_BANCO,FE_DOCUMENTO.TXT_CATEGORIA_BANCO'))
                                 ->groupBy('FE_DOCUMENTO.COD_CATEGORIA_BANCO')
                                 ->groupBy('FE_DOCUMENTO.TXT_CATEGORIA_BANCO')
@@ -2388,7 +2388,7 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
-    private function con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas($cliente_id) {
+    private function con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas($cliente_id,$operacion_id) {
 
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                             ->leftJoin(DB::raw('(SELECT COD_EMPR_CLIENTE, SUM(CAN_SALDO) AS CAN_DEUDA 
@@ -2396,7 +2396,7 @@ trait ComprobanteTraits
                                                  GROUP BY COD_EMPR_CLIENTE) AS deuda'), 
                                 'CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR', '=', 'deuda.COD_EMPR_CLIENTE')
                             ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC,deuda.CAN_DEUDA AS CAN_DEUDA'))
-                            ->where('OPERACION','=','ESTIBA')
+                            ->where('OPERACION','=',$operacion_id)
                             ->where('ind_observacion','=',0)
                             ->where('area_observacion','=','ADM')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
@@ -2603,7 +2603,7 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
-    private function con_lista_cabecera_comprobante_total_adm_estiba($cliente_id) {
+    private function con_lista_cabecera_comprobante_total_adm_estiba($cliente_id,$operacion_id) {
 
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                             ->leftJoin(DB::raw('(SELECT COD_EMPR_CLIENTE, SUM(CAN_SALDO) AS CAN_DEUDA 
@@ -2611,7 +2611,7 @@ trait ComprobanteTraits
                                                  GROUP BY COD_EMPR_CLIENTE) AS deuda'), 
                                 'CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR', '=', 'deuda.COD_EMPR_CLIENTE')
                             ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,deuda.CAN_DEUDA AS CAN_DEUDA'))
-                            ->where('OPERACION','=','ESTIBA')
+                            ->where('OPERACION','=',$operacion_id)
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where(function ($query) {
                                 $query->where('ind_observacion', '<>', 1)
@@ -2649,7 +2649,7 @@ trait ComprobanteTraits
 
         return  $listadatos;
     }
-    private function con_lista_cabecera_comprobante_total_adm_estiba_obs($cliente_id) {
+    private function con_lista_cabecera_comprobante_total_adm_estiba_obs($cliente_id,$operacion_id) {
 
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
 
@@ -2659,7 +2659,7 @@ trait ComprobanteTraits
                                 'CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR', '=', 'deuda.COD_EMPR_CLIENTE')
 
                             ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,deuda.CAN_DEUDA AS CAN_DEUDA'))
-                            ->where('OPERACION','=','ESTIBA')
+                            ->where('OPERACION','=',$operacion_id)
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('ind_observacion','=',1)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
@@ -3082,7 +3082,7 @@ trait ComprobanteTraits
     }
 
 
-    private function con_lista_cabecera_comprobante_total_gestion_estiba($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id) {
+    private function con_lista_cabecera_comprobante_total_gestion_estiba($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$operacion_id) {
 
 
         $trabajador     =       STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
@@ -3094,7 +3094,7 @@ trait ComprobanteTraits
 
             $listadatos     =   FeDocumento::Fecha($filtrofecha_id,$fecha_inicio,$fecha_fin)
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                                ->where('OPERACION','=','ESTIBA')
+                                ->where('OPERACION','=',$operacion_id)
                                 ->where('usuario_pa','=',Session::get('usuario')->id)
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
@@ -3107,7 +3107,7 @@ trait ComprobanteTraits
 
             $listadatos     =   FeDocumento::Fecha($filtrofecha_id,$fecha_inicio,$fecha_fin)
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                                ->where('OPERACION','=','ESTIBA')
+                                ->where('OPERACION','=',$operacion_id)
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
@@ -4364,6 +4364,7 @@ trait ComprobanteTraits
 
     private function con_lista_cabecera_comprobante_entregable_estiba_modal_moneda($folio,$moneda_id) {
 
+
         $listadatos         =   DB::table('FE_DOCUMENTO')
                                 ->join('FE_REF_ASOC', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
                                 ->join('CMP.REFERENCIA_ASOC', 'CMP.REFERENCIA_ASOC.COD_TABLA', '=', 'FE_REF_ASOC.ID_DOCUMENTO')
@@ -4373,7 +4374,7 @@ trait ComprobanteTraits
                                 })
                                 ->where('FE_DOCUMENTO.FOLIO', $folio)
                                 ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA','=',$moneda_id)
-                                ->where('OPERACION', 'ESTIBA')
+                                ->where('FE_DOCUMENTO.OPERACION', 'ESTIBA')
                                 ->selectRaw('DISTINCT FE_DOCUMENTO.*, CMP.DOCUMENTO_CTBLE.*') // DISTINCT aplicado solo a estas columnas
                                 ->get();
 

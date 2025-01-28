@@ -32,6 +32,7 @@
                           $zona    =   $funcion->con_zona($item->ID_DOCUMENTO);
                         @endphp
                         <span><b>LOTE : {{$item->ID_DOCUMENTO}} </b> </span>
+                        <span><b>PROVEEDOR : </b> {{$item->RZ_PROVEEDOR}}</span>
                         <span><b>SERIE : {{$item->SERIE}} </b> </span>
                         <span><b>NUMERO  : {{$item->NUMERO}}</b></span>
                         <span><b>FECHA : </b> {{$item->FEC_VENTA}}</span>

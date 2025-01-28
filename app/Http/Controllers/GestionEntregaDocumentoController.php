@@ -162,18 +162,28 @@ class GestionEntregaDocumentoController extends Controller
         if (in_array(Session::get('usuario')->rol_id, $array_contrato)) {
             $operacion_id       =   'CONTRATO';
         }
-        
+        //$combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO','ESTIBA' => 'ESTIBA');
+        $combo_operacion    =   array(  'ORDEN_COMPRA' => 'ORDEN COMPRA',
+                                        'CONTRATO' => 'CONTRATO',
+                                        'ESTIBA' => 'ESTIBA',
+                                        'DOCUMENTO_INTERNO_PRODUCCION' => 'DOCUMENTO INTERNO PRODUCCION',
+                                        'DOCUMENTO_INTERNO_SECADO' => 'DOCUMENTO INTERNO SECADO',
+                                        'DOCUMENTO_SERVICIO_BALANZA' => 'DOCUMENTO POR SERVICIO DE BALANZA'
+                                    );
 
-        $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO','ESTIBA' => 'ESTIBA');
+
         //$combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA');
-
+       $array_canjes               =   $this->con_array_canjes();
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_entregable($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id);
         }else{
             if($operacion_id=='CONTRATO'){
                 $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id);
             }else{
-                $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id);
+                if (in_array($operacion_id, $array_canjes)) {
+                    $categoria_id       =   $this->con_categoria_canje($operacion_id);
+                    $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$operacion_id);
+                }
             }
         }
         $funcion        =   $this;
@@ -226,7 +236,7 @@ class GestionEntregaDocumentoController extends Controller
             if($operacion_id=='CONTRATO'){
                 $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id);
             }else{
-                $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id);
+                $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$operacion_id);
             }
         }
 

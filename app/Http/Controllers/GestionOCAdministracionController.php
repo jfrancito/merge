@@ -78,8 +78,17 @@ class GestionOCAdministracionController extends Controller
         }
 
 
-        $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO','ESTIBA' => 'ESTIBA');
+        //$combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO','ESTIBA' => 'ESTIBA');
 
+        $combo_operacion    =   array(  'ORDEN_COMPRA' => 'ORDEN COMPRA',
+                                        'CONTRATO' => 'CONTRATO',
+                                        'ESTIBA' => 'ESTIBA',
+                                        'DOCUMENTO_INTERNO_PRODUCCION' => 'DOCUMENTO INTERNO PRODUCCION',
+                                        'DOCUMENTO_INTERNO_SECADO' => 'DOCUMENTO INTERNO SECADO',
+                                        'DOCUMENTO_SERVICIO_BALANZA' => 'DOCUMENTO POR SERVICIO DE BALANZA'
+                                    );
+
+       $array_canjes               =   $this->con_array_canjes();
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm($cod_empresa);
             $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_obs($cod_empresa);
@@ -92,9 +101,14 @@ class GestionOCAdministracionController extends Controller
                 $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_contrato_obs_levantadas($cod_empresa);
             }else{
                 
-                $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_estiba($cod_empresa);
-                $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs($cod_empresa);
-                $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas($cod_empresa);
+                if (in_array($operacion_id, $array_canjes)) {
+                    $categoria_id       =   $this->con_categoria_canje($operacion_id);
+                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_estiba($cod_empresa,$operacion_id);
+                    $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs($cod_empresa,$operacion_id);
+                    $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas($cod_empresa,$operacion_id);
+                }
+
+
             }
 
         }
@@ -134,9 +148,9 @@ class GestionOCAdministracionController extends Controller
                 $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_contrato_obs_levantadas($cod_empresa);
             }else{
                 
-                $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_estiba($cod_empresa);
-                $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs($cod_empresa);
-                $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas($cod_empresa);
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_estiba($cod_empresa,$operacion_id);
+                $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs($cod_empresa,$operacion_id);
+                $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas($cod_empresa,$operacion_id);
             }
         }
         //dd($listadatos);
@@ -654,13 +668,13 @@ class GestionOCAdministracionController extends Controller
 
                 DB::commit();
 
-                Session::flash('operacion_id', 'ESTIBA');
+                Session::flash('operacion_id', $request['operacion_id']);
 
                 return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$idoc.' OBSERVADO CON EXITO');
             }catch(\Exception $ex){
                 DB::rollback(); 
 
-                Session::flash('operacion_id', 'ESTIBA');
+                Session::flash('operacion_id', $request['operacion_id']);
 
                 return Redirect::to('gestion-de-administracion-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
@@ -2340,11 +2354,11 @@ class GestionOCAdministracionController extends Controller
 
                 DB::commit();
 
-                Session::flash('operacion_id', 'ESTIBA');
+                Session::flash('operacion_id', $request['operacion_id']);
                 return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$pedido_id.' APROBADO CON EXITO');
             }catch(\Exception $ex){
                 DB::rollback(); 
-                Session::flash('operacion_id', 'ESTIBA');
+                Session::flash('operacion_id', $request['operacion_id']);
                 return Redirect::to('gestion-de-administracion-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 

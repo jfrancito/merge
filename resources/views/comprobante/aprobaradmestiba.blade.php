@@ -27,6 +27,7 @@
                     <div class="panel-body">
                       <form method="POST" id='formpedido' action="{{ url('/aprobar-comprobante-administracion-estiba/'.$idopcion.'/'.$lote) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
                             {{ csrf_field() }}
+                            <input type="hidden" name="operacion_id" id="operacion_id" value = "{{$fedocumento->OPERACION}}">
                         @include('comprobante.form.formaprobaradminestiba')
                       </form>
                     </div>
@@ -38,6 +39,7 @@
                     <div class="panel-body">
                       <form method="POST" id='formpedidoobservar' action="{{ url('/agregar-observacion-administracion-estiba/'.$idopcion.'/'.$lote) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                             {{ csrf_field() }}
+                            <input type="hidden" name="operacion_id" id="operacion_id" value = "{{$fedocumento->OPERACION}}">
                         @include('comprobante.form.formobservaradminestiba')
                       </form>
                     </div>
