@@ -1152,7 +1152,7 @@ class UserController extends Controller {
 
 					//ESTIBA
 					$operacion_id 			=	'ESTIBA';
-	        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_adm_estiba($cod_empresa);
+	        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_adm_estiba($cod_empresa,$operacion_id);
 					$count_x_aprobar_est 	= 	 count($listadatos);
 
 		        	$listadatosre_est    	=   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,'TODO','TODO',$operacion_id);
@@ -1161,10 +1161,10 @@ class UserController extends Controller {
 		        	$listadatosre_est_rev   =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,'TODO','2',$operacion_id);
 					$count_reparables__revest = 	 count($listadatosre_est_rev);
 
-		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs($cod_empresa);
+		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs($cod_empresa,$operacion_id);
 					$count_observados_est 	= 	count($listadatosob);
 
-		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas($cod_empresa);
+		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas($cod_empresa,$operacion_id);
 					$count_observadosest_le 	= 	count($listadatosob);
 
 
