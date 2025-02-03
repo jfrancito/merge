@@ -23,7 +23,7 @@ use App\Modelos\SGDUsuario;
 use App\Modelos\WEBRol;
 use App\Modelos\DeudaTotalMerge;
 use App\Modelos\CMPDocumentoCtble;
-
+use App\Modelos\CONRegistroCompras;
 
 
 use Greenter\Parser\DocumentParserInterface;
@@ -1673,24 +1673,40 @@ class GestionEntregaDocumentoController extends Controller
                             ->update(
                                 [
                                     'CAN_RETENCION'=>(float)$documento["RETENCION"],
-                                    'CAN_DSCTO'=>3//,
-                                    //'CAN_NETO_PAGAR'=>'CAN_TOTAL' - (float)$documento["RETENCION"]
+                                    'CAN_DSCTO'=>3,
+                                    'CAN_NETO_PAGAR' => \DB::raw('CAN_TOTAL - ' . (float) $documento["RETENCION"])
                                 ]
                             );
 
-                //FACTURA
-                //REGISTRO COMPRA
-                // CMPDocumentoCtble::where('COD_ORDEN','=',$documento["ID_DOCUMENTO"])
-                //             ->update(
-                //                 [
-                //                     'CAN_RETENCION'=>(float)$documento["RETENCION"],
-                //                     'CAN_DSCTO'=>3,
-                //                     'CAN_NETO_PAGAR'=>'CAN_TOTAL' - (float)$documento["RETENCION"]
-                //                 ]
-                //             );
-                // echo "ID_DOCUMENTO: " . $documento["ID_DOCUMENTO"] . "<br>";
-                // echo "PORCENTAJE_RETENCION: " . $documento["PORCENTAJE_RETENCION"] . "%<br>";
-                // echo "RETENCION: S/. " . $documento["RETENCION"] . "<br><br>";
+                $documento02      =   DB::table('CMP.DOCUMENTO_CTBLE')
+                                    ->join('CMP.REFERENCIA_ASOC', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+                                    ->select(DB::raw('CMP.DOCUMENTO_CTBLE.*'))
+                                    ->where('CMP.DOCUMENTO_CTBLE.COD_ESTADO','=','1')
+                                    ->where('CMP.REFERENCIA_ASOC.COD_ESTADO','=','1')
+                                    ->where('CMP.REFERENCIA_ASOC.COD_TABLA','=',$documento["ID_DOCUMENTO"])
+                                    ->whereIn('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_DOC', [
+                                        'TDO0000000000001',
+                                        'TDO0000000000003',
+                                        'TDO0000000000002'
+                                    ])->first();
+
+                if(count($documento02)>0){
+                    CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$documento02->COD_DOCUMENTO_CTBLE)
+                                ->update(
+                                    [
+                                        'CAN_RETENCION'=>(float)$documento["RETENCION"],
+                                        'CAN_DCTO'=>3
+                                    ]
+                                );
+                    CONRegistroCompras::where('COD_DOCUMENTO_CTBLE','=',$documento02->COD_DOCUMENTO_CTBLE)
+                                ->update(
+                                    [
+                                        'CAN_RETENCION_MONTO'=>(float)$documento["RETENCION"],
+                                        'CAN_RETENCION_PORCENTAJE'=>3
+                                    ]
+                                );
+                }
+
             }
 
 
