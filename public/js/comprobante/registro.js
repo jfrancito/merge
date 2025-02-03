@@ -166,7 +166,7 @@ $(document).ready(function(){
         var prefijo_id          =   $('#prefijo_id').val();
         var orden_id            =   $('#orden_id').val();
 
-        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009'];
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009', 'BAM0000000000011'];
 
         if(valores.includes(entidadbanco_id)){
             $('.ajax_cb').addClass('ocultar');
@@ -302,7 +302,7 @@ $(document).ready(function(){
             }
         }
         var cb_id                   =   $('#cb_id').val();
-        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009'];
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011'];
         if(!valores.includes(entidadbanco_id)){
             if(cb_id==''){
                 alerterrorajax("Seleccione una Cuenta Bancaria."); return false;
@@ -354,7 +354,7 @@ $(document).ready(function(){
         }
 
         var cb_id                   =   $('#cb_id').val();
-        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009'];
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011'];
         if(!valores.includes(entidadbanco_id)){
             if(cb_id==''){
                 alerterrorajax("Seleccione una Cuenta Bancaria."); return false;
@@ -405,7 +405,7 @@ $(document).ready(function(){
             if(pago_detraccion ==''){ alerterrorajax("Seleeccione un pago de detraccion"); return false;}            
         }
 
-        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009'];
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011'];
 
         if(!valores.includes(entidadbanco_id)){
             if(cb_id==''){
@@ -467,7 +467,7 @@ $(document).ready(function(){
             if(pago_detraccion ==''){ alerterrorajax("Seleeccione un pago de detraccion"); return false;}            
         }
 
-        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009'];
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011'];
 
         if(!valores.includes(entidadbanco_id)){
             if(cb_id==''){
