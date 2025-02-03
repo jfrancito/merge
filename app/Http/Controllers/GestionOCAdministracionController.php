@@ -1984,6 +1984,15 @@ class GestionOCAdministracionController extends Controller
             }
             $transferencia        =   CMPOrden::where('COD_ORDEN','=',$resultado)->first();    
 
+            $transferencia_doc      =   DB::table('CMP.REFERENCIA_ASOC')
+                                        ->where('COD_TABLA', $resultado)
+                                        ->where(function ($query) {
+                                            $query->where('COD_TABLA_ASOC', 'like', '%TPS%')
+                                                  ->orWhere('COD_TABLA_ASOC', 'like', '%TPL%');
+                                        })
+                                        ->where('COD_ESTADO', 1)
+                                        ->first();
+
             //Archivo multiple
 
 
@@ -2016,7 +2025,7 @@ class GestionOCAdministracionController extends Controller
                                 'archivos'              =>  $archivos,
                                 'archivosanulados'      =>  $archivosanulados,
                                 'transferencia'         =>  $transferencia,
-
+                                'transferencia_doc'     =>  $transferencia_doc,
 
                                 'trabajador'            =>  $trabajador,
                                 'documentoscompra'      =>  $documentoscompra,

@@ -15,7 +15,7 @@
                     @if($transferencia->TXT_CATEGORIA_ESTADO_ORDEN == 'TERMINADA')
                       NO RECEPCIONADO
                     @else
-                      {{$transferencia->TXT_CATEGORIA_ESTADO_ORDEN}} ({{$transferencia->FEC_ORDEN}})
+                      {{$transferencia->TXT_CATEGORIA_ESTADO_ORDEN}} <b>({{date_format(date_create($transferencia_doc->FEC_USUARIO_CREA_AUD), 'd-m-Y h:i:s')}})</b>
                     @endif
                   </p>
               </div>

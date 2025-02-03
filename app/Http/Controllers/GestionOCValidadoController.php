@@ -494,13 +494,25 @@ class GestionOCValidadoController extends Controller
             $partes = explode(' / ', $ordencompra->NRO_ITT);
             $resultado = $partes[0];
         }
-        $transferencia        =   CMPOrden::where('COD_ORDEN','=',$resultado)->first();    
+        $transferencia          =   CMPOrden::where('COD_ORDEN','=',$resultado)->first();    
+
+        $transferencia_doc      =   DB::table('CMP.REFERENCIA_ASOC')
+                                    ->where('COD_TABLA', $resultado)
+                                    ->where(function ($query) {
+                                        $query->where('COD_TABLA_ASOC', 'like', '%TPS%')
+                                              ->orWhere('COD_TABLA_ASOC', 'like', '%TPL%');
+                                    })
+                                    ->where('COD_ESTADO', 1)
+                                    ->first();
+
+
 
         //dd($archivos);
         return View::make('comprobante/registrocomprobantevalidadocontrato',
                          [
                             'ordencompra'           =>  $ordencompra,
                             'transferencia'         =>  $transferencia,
+                            'transferencia_doc'     =>  $transferencia_doc,
                             'detalleordencompra'    =>  $detalleordencompra,
                             'fedocumento'           =>  $fedocumento,
                             'detallefedocumento'    =>  $detallefedocumento,
