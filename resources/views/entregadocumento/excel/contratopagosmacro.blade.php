@@ -57,11 +57,11 @@
 	  	<tr>
 	      	<th>C</th>
 	      	<th>{{$countfedocu}}</th>
-	      	<th>{{date_format(date_create($folio->FECHA_CREA), 'Ymd')}}</th>
+	      	<th>{{date_format(date_create($folio->FEC_PAGO), 'Ymd')}}</th>
 	      	<th>C</th>
 	      	<th></th>
 	     	<th>{{$listadocumento->sum('TOTAL_PAGAR')}}</th>
-	     	<th>FLETES</th>
+	     	<th></th>
 	  	</tr>
 
 	  	<tr>
@@ -96,7 +96,7 @@
 		    <td></td>	        
 	        <td>{{$item->TXT_EMPR_EMISOR}}</td>
 	        <td>S</td>
-	        <td>{{number_format($item->TOTAL_PAGAR, 2, '.', '')}}</td>
+	        <td><b>{{number_format($item->TOTAL_PAGAR, 4, '.', ',')}}</b></td>
 	        <td>S</td>
 	        <td>0000</td>
 	      </tr>                    

@@ -35,6 +35,8 @@
 	    </tr>
 	  </thead>
 	  <tbody>
+	  	@php $monto_total =  0; @endphp
+	  	
 	    @foreach($listadocumento as $index => $item)
 	      <tr>
 	        <td>{{$item->TXT_GLOSA_INTER}}</td>
@@ -50,11 +52,30 @@
 	        <td>{{$item->TIPO_MONEDA}}</td>
 	        <td><b>{{$item->TXT_NRO_CUENTA_BANCARIA}}</b></td>
 	        <td>{{$item->TIPO_MONEDA_ABONO}}</td>
-	        <td>{{number_format($item->TOTAL_VENTA_ORIG - $item->MONTO_ANTICIPO_DESC - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO), 2, '.', '')}}</td>
+	        <td><b>{{number_format($funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO), 4, '.', ',')}}</b></td>
+	        @php $monto_total  = $monto_total + $funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO); @endphp
 	      </tr>                    
 	    @endforeach
 	  </tbody>
+	 	<tfoot>
+		      <tr>
+		        <td></td>
+		        <td></td>
+		        <td></td>
+		        <td></td>
+		        <td></td>
+		        <td></td>
+		        <td></td>
+		        <td></td>
+		        <td></td>
+		        <td></td>
+		        <td></td>
+		        <td></td>
+		        <td></td>
+		        <td><b>{{number_format($monto_total, 4, '.', ',')}}</b></td>
 
+		      </tr>                    
+		</tfoot>
 
 	</table>
 </html>

@@ -22,7 +22,7 @@ use App\Modelos\STDEmpresa;
 use App\Modelos\SGDUsuario;
 use App\Modelos\WEBRol;
 use App\Modelos\DeudaTotalMerge;
-
+use App\Modelos\CMPDocumentoCtble;
 
 
 
@@ -186,10 +186,19 @@ class GestionEntregaDocumentoController extends Controller
                 }
             }
         }
+
+        $entregable_sel                 =   FeDocumentoEntregable::where('COD_CATEGORIA_ESTADO','=','ETM0000000000001')
+                                            ->where('COD_ESTADO','=','1')
+                                            ->where('SELECCION','=','1')
+                                            ->where('USUARIO_CREA','=',Session::get('usuario')->id)
+                                            ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                                            ->first();
+
         $funcion        =   $this;
         return View::make('entregadocumento/listaentregadocumento',
                          [
                             'listadatos'        =>  $listadatos,
+                            'entregable_sel'    =>  $entregable_sel,
                             'funcion'           =>  $funcion,
                             'idopcion'          =>  $idopcion,
                             'fecha_inicio'      =>  $fecha_inicio,
@@ -242,9 +251,18 @@ class GestionEntregaDocumentoController extends Controller
 
         $funcion        =   $this;
 
+        $entregable_sel                 =   FeDocumentoEntregable::where('COD_CATEGORIA_ESTADO','=','ETM0000000000001')
+                                            ->where('COD_ESTADO','=','1')
+                                            ->where('SELECCION','=','1')
+                                            ->where('USUARIO_CREA','=',Session::get('usuario')->id)
+                                            ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                                            ->first();
+
+
         return View::make('entregadocumento/ajax/mergelistaentregable',
                          [
                             'fecha_inicio'          =>  $fecha_inicio,
+                            'entregable_sel'        =>  $entregable_sel,
                             'fecha_fin'             =>  $fecha_fin,
                             'empresa_id'            =>  $empresa_id,
                             'centro_id'             =>  $centro_id,
@@ -402,16 +420,18 @@ class GestionEntregaDocumentoController extends Controller
         if($rol->ind_uc == 1){
             $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
                                 ->where('COD_EMPRESA','=',$empresa_id)
-                                ->where('OPERACION','=',$operacion_id)
+                                ->where('OPERACION','like','%'.$operacion_id.'%')
                                 ->where('COD_ESTADO','=','1')
+                                ->where('COD_CATEGORIA_ESTADO','=','ETM0000000000005')
                                 ->where('USUARIO_CREA','=',Session::get('usuario')->id)
                                 ->orderBy('FE_DOCUMENTO_ENTREGABLE.FECHA_CREA','DESC')
                                 ->get();
         }else{
             $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
                                 ->where('COD_EMPRESA','=',$empresa_id)
-                                ->where('OPERACION','=',$operacion_id)
+                                ->where('OPERACION','like','%'.$operacion_id.'%')
                                 ->where('COD_ESTADO','=','1')
+                                ->where('COD_CATEGORIA_ESTADO','=','ETM0000000000005')
                                 ->orderBy('FE_DOCUMENTO_ENTREGABLE.FECHA_CREA','DESC')
                                 ->get();
         }
@@ -429,8 +449,15 @@ class GestionEntregaDocumentoController extends Controller
                                 ->get();
         }
 
+        //$combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO','ESTIBA' => 'ESTIBA');
 
-        $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO','ESTIBA' => 'ESTIBA');
+        $combo_operacion    =   array(  'ORDEN_COMPRA' => 'ORDEN COMPRA',
+                                        'CONTRATO' => 'CONTRATO',
+                                        'ESTIBA' => 'ESTIBA',
+                                        'DOCUMENTO_INTERNO_PRODUCCION' => 'DOCUMENTO INTERNO PRODUCCION',
+                                        'DOCUMENTO_INTERNO_SECADO' => 'DOCUMENTO INTERNO SECADO',
+                                        'DOCUMENTO_SERVICIO_BALANZA' => 'DOCUMENTO POR SERVICIO DE BALANZA'
+                                    );
 
         $funcion        =   $this;
         return View::make('entregadocumento/listaentregadocumentofolio',
@@ -459,16 +486,18 @@ class GestionEntregaDocumentoController extends Controller
         if($rol->ind_uc == 1){
             $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
                                 ->where('COD_EMPRESA','=',$empresa_id)
-                                ->where('OPERACION','=',$operacion_id)
+                                ->where('OPERACION','like','%'.$operacion_id.'%')
                                 ->where('COD_ESTADO','=','1')
+                                ->where('COD_CATEGORIA_ESTADO','=','ETM0000000000005')
                                 ->where('USUARIO_CREA','=',Session::get('usuario')->id)
                                 ->orderBy('FE_DOCUMENTO_ENTREGABLE.FECHA_CREA','DESC')
                                 ->get();
         }else{
             $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
                                 ->where('COD_EMPRESA','=',$empresa_id)
-                                ->where('OPERACION','=',$operacion_id)
+                                ->where('OPERACION','like','%'.$operacion_id.'%')
                                 ->where('COD_ESTADO','=','1')
+                                ->where('COD_CATEGORIA_ESTADO','=','ETM0000000000005')
                                 ->orderBy('FE_DOCUMENTO_ENTREGABLE.FECHA_CREA','DESC')
                                 ->get();
         }
@@ -495,28 +524,35 @@ class GestionEntregaDocumentoController extends Controller
         $folio                  =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
                                     ->where('FOLIO','=',$folio_codigo)->first();
 
+        $listadatossolesotro    =   array();
+        $listadatosdolarotro    =   array();
+
         if($folio->OPERACION=='ORDEN_COMPRA'){
             $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda($folio->FOLIO,'MON0000000000001');
+
+            //dd($listadatossoles);
             $listadatosdolar    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda($folio->FOLIO,'MON0000000000002');
+            $listadatossolesotro=   $this->con_lista_cabecera_comprobante_entregable_estiba_modal_moneda_union($folio->FOLIO,'MON0000000000001');
+            $listadatosdolarotro=   $this->con_lista_cabecera_comprobante_entregable_estiba_modal_moneda_union($folio->FOLIO,'MON0000000000002');
         }else{
             if($folio->OPERACION=='CONTRATO'){
                 $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_contrato_modal_moneda($folio->FOLIO,'MON0000000000001');
                 $listadatosdolar    =   $this->con_lista_cabecera_comprobante_entregable_contrato_modal_moneda($folio->FOLIO,'MON0000000000002');
             }else{
-                $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_estiba_modal_moneda($folio->FOLIO,'MON0000000000001');
-                $listadatosdolar    =   $this->con_lista_cabecera_comprobante_entregable_estiba_modal_moneda($folio->FOLIO,'MON0000000000002');
+                $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda($folio->FOLIO,'MON0000000000001');
+                $listadatosdolar    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda($folio->FOLIO,'MON0000000000002');
+                $listadatossolesotro=   $this->con_lista_cabecera_comprobante_entregable_estiba_modal_moneda_union($folio->FOLIO,'MON0000000000001');
+                $listadatosdolarotro=   $this->con_lista_cabecera_comprobante_entregable_estiba_modal_moneda_union($folio->FOLIO,'MON0000000000002');
             }
         }
-
         $operacion_id           =   $folio->OPERACION;
         $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
         $titulo                 =   'FOLIO('.$folio_codigo.') '.$empresa->NOM_EMPR;
-
         $funcion                =   $this;
 
-        Excel::create($titulo, function($excel) use ($listadatossoles,$listadatosdolar,$operacion_id,$funcion,$folio,$empresa) {
+        Excel::create($titulo, function($excel) use ($listadatossoles,$listadatosdolar,$listadatossolesotro,$listadatosdolarotro,$operacion_id,$funcion,$folio,$empresa) {
 
-            $excel->sheet('Soles', function($sheet) use ($listadatossoles,$operacion_id,$funcion,$folio,$empresa){
+            $excel->sheet('Soles', function($sheet) use ($listadatossoles,$listadatossolesotro,$operacion_id,$funcion,$folio,$empresa){
 
 
 
@@ -549,6 +585,7 @@ class GestionEntregaDocumentoController extends Controller
                         });
 
                 $sheet->loadView('entregadocumento/excel/eentregable')->with('listadatos',$listadatossoles)
+                                                                      ->with('listadatosotro',$listadatossolesotro)
                                                                       ->with('funcion',$funcion)
                                                                       ->with('folio',$folio)
                                                                       ->with('empresa',$empresa)
@@ -558,7 +595,7 @@ class GestionEntregaDocumentoController extends Controller
 
 
 
-            $excel->sheet('Dolares', function($sheet) use ($listadatosdolar,$operacion_id,$funcion,$folio,$empresa){
+            $excel->sheet('Dolares', function($sheet) use ($listadatosdolar,$listadatosdolarotro,$operacion_id,$funcion,$folio,$empresa){
 
                 $sheet->setWidth('A', 20);
                 $sheet->setWidth('B', 20);
@@ -575,7 +612,6 @@ class GestionEntregaDocumentoController extends Controller
                 $sheet->setWidth('M', 20);
                 $sheet->setWidth('N', 20);
                 $sheet->setWidth('O', 20);
-
                 $sheet->mergeCells('B2:C2');
                 $sheet->mergeCells('B3:C3');
                 $sheet->mergeCells('B4:C4');
@@ -588,6 +624,7 @@ class GestionEntregaDocumentoController extends Controller
                         });
 
                 $sheet->loadView('entregadocumento/excel/eentregable')->with('listadatos',$listadatosdolar)
+                                                                      ->with('listadatosotro',$listadatosdolarotro)
                                                                       ->with('funcion',$funcion)
                                                                        ->with('folio',$folio)
                                                                        ->with('empresa',$empresa)
@@ -831,16 +868,17 @@ class GestionEntregaDocumentoController extends Controller
         $folio                  =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
                                     ->where('FOLIO','=',$folio_codigo)->first();
         $listadocumento         =    $this->con_lista_documentos_contrato_folio_oc($folio->FOLIO);
+        $listaotros             =    $this->con_lista_documentos_estiba_folio($folio->FOLIO);
 
-        $operacion_id           =   $folio->OPERACION;
+        $operacion_id           =    $folio->OPERACION;
         $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
         $titulo                 =   'MACRO BBVA ('.$folio_codigo.') '.$empresa->NOM_EMPR;
         $funcion                =   $this;
 
 
-        Excel::create($titulo, function($excel) use ($listadocumento,$operacion_id,$folio,$empresa,$funcion) {
+        Excel::create($titulo, function($excel) use ($listadocumento,$listaotros,$operacion_id,$folio,$empresa,$funcion) {
 
-            $excel->sheet('bbva', function($sheet) use ($operacion_id,$folio,$empresa,$listadocumento,$funcion){
+            $excel->sheet('bbva', function($sheet) use ($operacion_id,$folio,$empresa,$listadocumento,$listaotros,$funcion){
 
 
                 $sheet->mergeCells('B2:C2');
@@ -872,6 +910,7 @@ class GestionEntregaDocumentoController extends Controller
                                                                                 ->with('empresa',$empresa)
                                                                                 ->with('funcion',$funcion)
                                                                                 ->with('listadocumento',$listadocumento)
+                                                                                ->with('listaotros',$listaotros)
                                                                                 ->with('operacion_id',$operacion_id);         
             });
 
@@ -990,6 +1029,8 @@ class GestionEntregaDocumentoController extends Controller
         $folio                  =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
                                     ->where('FOLIO','=',$folio_codigo)->first();
         $listadocumento         =    $this->con_lista_documentos_contrato_folio_oc($folio->FOLIO);
+        $listaotros             =    $this->con_lista_documentos_estiba_folio($folio->FOLIO);
+
 
         $operacion_id           =   $folio->OPERACION;
         $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
@@ -997,9 +1038,9 @@ class GestionEntregaDocumentoController extends Controller
         $funcion                =   $this;
 
 
-        Excel::create($titulo, function($excel) use ($listadocumento,$operacion_id,$folio,$empresa,$funcion) {
+        Excel::create($titulo, function($excel) use ($listadocumento,$listaotros,$operacion_id,$folio,$empresa,$funcion) {
 
-            $excel->sheet('skb', function($sheet) use ($operacion_id,$folio,$empresa,$listadocumento,$funcion){
+            $excel->sheet('skb', function($sheet) use ($operacion_id,$folio,$empresa,$listadocumento,$listaotros,$funcion){
 
                 $sheet->mergeCells('B2:C2');
                 $sheet->mergeCells('B3:C3');
@@ -1030,6 +1071,7 @@ class GestionEntregaDocumentoController extends Controller
                                                                                 ->with('empresa',$empresa)
                                                                                 ->with('funcion',$funcion)
                                                                                 ->with('listadocumento',$listadocumento)
+                                                                                ->with('listaotros',$listaotros)
                                                                                 ->with('operacion_id',$operacion_id);         
             });
 
@@ -1146,7 +1188,9 @@ class GestionEntregaDocumentoController extends Controller
 
         $folio                  =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
                                     ->where('FOLIO','=',$folio_codigo)->first();
+
         $listadocumento         =    $this->con_lista_documentos_contrato_folio_oc($folio->FOLIO);
+        $listaotros             =    $this->con_lista_documentos_estiba_folio($folio->FOLIO);
 
         $operacion_id           =   $folio->OPERACION;
         $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
@@ -1154,9 +1198,9 @@ class GestionEntregaDocumentoController extends Controller
 
         $funcion                =   $this;
 
-        Excel::create($titulo, function($excel) use ($listadocumento,$operacion_id,$folio,$empresa,$funcion) {
+        Excel::create($titulo, function($excel) use ($listadocumento,$listaotros,$operacion_id,$folio,$empresa,$funcion) {
 
-            $excel->sheet('interbank', function($sheet) use ($operacion_id,$folio,$empresa,$listadocumento,$funcion){
+            $excel->sheet('interbank', function($sheet) use ($operacion_id,$folio,$empresa,$listadocumento,$listaotros,$funcion){
 
                 $sheet->mergeCells('B2:C2');
                 $sheet->mergeCells('B3:C3');
@@ -1187,6 +1231,7 @@ class GestionEntregaDocumentoController extends Controller
                                                                                 ->with('empresa',$empresa)
                                                                                 ->with('funcion',$funcion)
                                                                                 ->with('listadocumento',$listadocumento)
+                                                                                ->with('listaotros',$listaotros)
                                                                                 ->with('operacion_id',$operacion_id);         
             });
 
@@ -1334,14 +1379,14 @@ class GestionEntregaDocumentoController extends Controller
     {
 
         $folio                  =   FeDocumentoEntregable::where('FOLIO','=',$folio_codigo)->first();
-        $lista_bancos           =   $this->con_lista_bancos_folio_oc($folio->FOLIO);
+        $lista_bancos           =   $this->con_lista_bancos_folio_oc_union($folio->FOLIO);
+
+        //dd($lista_bancos);
 
         $operacion_id           =   $folio->OPERACION;
         $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
         $titulo                 =   'MACRO FOLIO ('.$folio_codigo.') '.$empresa->NOM_EMPR;
-
         $funcion                =   $this;
-
 
         Excel::create($titulo, function($excel) use ($lista_bancos,$operacion_id,$folio,$empresa,$funcion) {
 
@@ -1355,9 +1400,9 @@ class GestionEntregaDocumentoController extends Controller
                 }
                 $fedocumento    =    FeDocumento::where('FOLIO','=',$folio->FOLIO)->where('TXT_CATEGORIA_BANCO','=',$item->TXT_CATEGORIA_BANCO)->first();
                 
-                $listafedocu    =   $this->con_lista_proveedores_banco_folio_oc($folio->FOLIO,$item->TXT_CATEGORIA_BANCO);
+                $listafedocu    =   $this->con_lista_proveedores_banco_folio_oc_union($folio->FOLIO,$item->TXT_CATEGORIA_BANCO);
                 $countfedocu    =    str_pad(count($listafedocu), 6, '0', STR_PAD_LEFT);
-                $listadocumento =   $this->con_lista_doc_proveedor_banco_folio_oc($folio->FOLIO,$item->TXT_CATEGORIA_BANCO);
+                $listadocumento =   $this->con_lista_doc_proveedor_banco_folio_oc_union($folio->FOLIO,$item->TXT_CATEGORIA_BANCO);
 
                 //dd($listadocumento);
 
@@ -1471,6 +1516,370 @@ class GestionEntregaDocumentoController extends Controller
 
 
 
+    public function actionEntregableCrearFolio(Request $request)
+    {
+
+        $check                  =   $request['check'];
+        $id                     =   $request['id'];
+        $folio_sel              =   $request['folio_sel'];
+        $data                   =   array();
+        $mensaje                =   "";
+        $ope_ind                =   "0";
+        $lote_ver               =   "";
+
+        $entregable             =   FeDocumentoEntregable::where('FOLIO','=',$folio_sel)
+                                    ->first();
+        $fedocumento_encontro   =   FeDocumento::where('ID_DOCUMENTO',$id)->first();
+
+        if($check==1){
+
+            //validacion si ya esta en otro folio
+                //SI NO ESTA NULL O VACIO TIENE ALGO
+            if (!empty($fedocumento_encontro->FOLIO_RESERVA)) {
+                $mensaje            =   "Este Documento ya tiene un folio asigando ".$fedocumento_encontro->FOLIO_RESERVA;
+                $ope_ind            =   "1";
+            }
+
+            if($entregable->COD_CATEGORIA_BANCO != $fedocumento_encontro->COD_CATEGORIA_BANCO){
+                $mensaje            =   "Este Documento esta asigando en diferente BANCO";
+                $ope_ind            =   "1";
+            }
+
+
+            //validacion que el folio sea del mismo banco
+            if($entregable->COD_CATEGORIA_BANCO != $fedocumento_encontro->COD_CATEGORIA_BANCO){
+                $mensaje            =   "Este Documento esta asigando en diferente BANCO";
+                $ope_ind            =   "1";
+            }
+            //OPERACION
+            if($entregable->OPERACION != ""){
+                //validacion que el folio sea difenrente contrato con canjes o oc
+                if($fedocumento_encontro->OPERACION == "CONTRATO"){
+                    if($entregable->OPERACION != "CONTRATO"){
+                        $mensaje            =   "Este Documento no es de un contrato";
+                        $ope_ind            =   "1";
+                    }
+                }else{
+                    if($entregable->OPERACION == "CONTRATO"){
+                        $mensaje            =   "Este Documento tiene que ser de un contrato";
+                        $ope_ind            =   "1";
+                    }
+                }
+            }
+
+        }
+
+
+        if($ope_ind=="0"){
+
+            if($check==1){
+
+                FeDocumento::where('ID_DOCUMENTO','=',$fedocumento_encontro->ID_DOCUMENTO)
+                            ->update(
+                                [
+                                    'FOLIO_RESERVA'=>$folio_sel
+                                ]
+                            );
+
+                $operaciones =  DB::table('FE_DOCUMENTO')
+                                ->where('FOLIO_RESERVA','=',$folio_sel)
+                                ->pluck('OPERACION') // Obtiene solo la columna OPERACION como array
+                                ->unique() // Elimina duplicados
+                                ->implode(', ');
+                $fedocumentos =  FeDocumento::where('FOLIO_RESERVA','=',$folio_sel)->get();
+                FeDocumentoEntregable::where('FOLIO','=',$folio_sel)
+                            ->update(
+                                [
+                                    'CAN_FOLIO'=>count($fedocumentos),
+                                    'OPERACION'=>$operaciones
+                                ]
+                            );
+                $lote_ver               =   $entregable->FOLIO . ' ('.count($fedocumentos).')';
+
+            }else{
+
+                FeDocumento::where('ID_DOCUMENTO','=',$fedocumento_encontro->ID_DOCUMENTO)
+                            ->update(
+                                [
+                                    'FOLIO_RESERVA'=>''
+                                ]
+                            );
+
+                $operaciones =  DB::table('FE_DOCUMENTO')
+                                ->where('FOLIO_RESERVA','=',$folio_sel)
+                                ->pluck('OPERACION') // Obtiene solo la columna OPERACION como array
+                                ->unique() // Elimina duplicados
+                                ->implode(', ');
+
+                $fedocumentos =  FeDocumento::where('FOLIO_RESERVA','=',$folio_sel)->get();
+                FeDocumentoEntregable::where('FOLIO','=',$folio_sel)
+                            ->update(
+                                [
+                                    'CAN_FOLIO'=>count($fedocumentos),
+                                    'OPERACION'=>$operaciones
+                                ]
+                            );
+                $lote_ver               =   $entregable->FOLIO . ' ('.count($fedocumentos).')';
+
+            }
+
+            $mensaje                =   "Este Documento tiene que ser de un contrato";    
+            $data                   =   [
+                                            'mensaje'   => $mensaje,
+                                            'lote_ver'  => $lote_ver,
+                                            'check'     => $check,
+                                            'ope_ind'   => $ope_ind
+                                        ];
+
+        }else{
+
+            $data                   =   [
+                                            'mensaje'   => $mensaje, 
+                                            'lote_ver'  => $lote_ver,
+                                            'check'     => $check,
+                                            'ope_ind'   => $ope_ind
+                                        ];
+
+
+        }
+
+        return response()->json($data); // Enviar la respuesta como JSON
+
+
+    }
+
+
+    public function actionEntregableGuardarFolioEntregable($idopcion,Request $request)
+    {
+        try{
+            DB::beginTransaction();
+            $folio                                  =   $request['folio'];
+            $glosa_g                                =   $request['glosa_g'];
+
+            $array_retencion                        =   $this->con_si_hay_retencion_lista($folio);
+            //modificar las retenciones
+
+            foreach ($array_retencion as $documento) {
+
+                //FE_DOCUMENTO
+                FeDocumento::where('ID_DOCUMENTO','=',$documento["ID_DOCUMENTO"])
+                            ->update(
+                                [
+                                    'MONTO_RETENCION'=>(float)$documento["RETENCION"]
+                                ]
+                            );
+                //OC
+                CMPOrden::where('COD_ORDEN','=',$documento["ID_DOCUMENTO"])
+                            ->update(
+                                [
+                                    'CAN_RETENCION'=>(float)$documento["RETENCION"],
+                                    'CAN_DSCTO'=>3//,
+                                    //'CAN_NETO_PAGAR'=>'CAN_TOTAL' - (float)$documento["RETENCION"]
+                                ]
+                            );
+
+                //FACTURA
+                //REGISTRO COMPRA
+                // CMPDocumentoCtble::where('COD_ORDEN','=',$documento["ID_DOCUMENTO"])
+                //             ->update(
+                //                 [
+                //                     'CAN_RETENCION'=>(float)$documento["RETENCION"],
+                //                     'CAN_DSCTO'=>3,
+                //                     'CAN_NETO_PAGAR'=>'CAN_TOTAL' - (float)$documento["RETENCION"]
+                //                 ]
+                //             );
+                // echo "ID_DOCUMENTO: " . $documento["ID_DOCUMENTO"] . "<br>";
+                // echo "PORCENTAJE_RETENCION: " . $documento["PORCENTAJE_RETENCION"] . "%<br>";
+                // echo "RETENCION: S/. " . $documento["RETENCION"] . "<br><br>";
+            }
+
+
+
+
+
+            FeDocumentoEntregable::where('FOLIO','=',$folio)
+                        ->update(
+                            [
+                                'SELECCION'=>0,
+                                'FEC_PAGO'=>$this->fecha_sin_hora,
+                                'TXT_GLOSA'=>$glosa_g,
+                                'COD_CATEGORIA_ESTADO'=>'ETM0000000000005',
+                                'TXT_CATEGORIA_ESTADO'=>'APROBADO',
+                                'USUARIO_MOD'=>Session::get('usuario')->id,
+                                'FECHA_MOD'=>$this->fechaactual
+                            ]
+                        );
+            FeDocumento::where('FOLIO_RESERVA',$folio)
+                        ->update(
+                            [
+                                'FOLIO'=>$folio
+                            ]
+                        );
+
+            DB::commit();
+            return Redirect::to('gestion-de-entrega-documentos/'.$idopcion)->with('bienhecho', 'Folio '.$folio.' aprobado con exito');
+        }catch(\Exception $ex){
+            DB::rollback(); 
+            return Redirect::to('gestion-de-entrega-documentos/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+        }
+    }
+
+
+    public function actionEntregableCrearFolioEntregable($idopcion,Request $request)
+    {
+        try{
+
+            DB::beginTransaction();
+            $banco_id                               =   $request['banco_id'];
+            $glosa                                  =   $request['glosa'];
+            $empresa_id                             =   Session::get('empresas')->COD_EMPR;
+            $banco                                  =   CMPCategoria::where('COD_CATEGORIA','=',$banco_id)->first();
+            $codigo                                 =   $this->funciones->generar_folio('FE_DOCUMENTO_ENTREGABLE',8);
+            $documento                              =   new FeDocumentoEntregable;
+            $documento->FOLIO                       =   $codigo;
+            $documento->CAN_FOLIO                   =   0;
+            $documento->COD_ESTADO                  =   1;
+            $documento->USUARIO_CREA                =   Session::get('usuario')->id;
+            $documento->FECHA_CREA                  =   $this->fechaactual;
+            $documento->OPERACION                   =   '';
+            $documento->COD_EMPRESA                 =   $empresa_id;
+            $documento->COD_CATEGORIA_BANCO         =   $banco->COD_CATEGORIA;
+            $documento->TXT_CATEGORIA_BANCO         =   $banco->NOM_CATEGORIA;
+            $documento->COD_CATEGORIA_ESTADO        =   'ETM0000000000001';
+            $documento->TXT_CATEGORIA_ESTADO        =   'GENERADO';
+            $documento->SELECCION                   =   0;
+            $documento->TXT_GLOSA                   =   $glosa;
+            $documento->save();
+            DB::commit();
+
+            return Redirect::to('gestion-de-entrega-documentos/'.$idopcion)->with('bienhecho', 'Folio '.$codigo.' creado con exito');
+        }catch(\Exception $ex){
+            DB::rollback(); 
+            return Redirect::to('gestion-de-entrega-documentos/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+        }
+
+
+    }
+
+    public function actionEntregableSelectFolioPago(Request $request)
+    {
+
+        $data_folio             =   $request['data_folio'];
+        FeDocumentoEntregable::where('COD_CATEGORIA_ESTADO','=','ETM0000000000001')
+                    ->where('COD_ESTADO','=','1')
+                    ->where('USUARIO_CREA','=',Session::get('usuario')->id)
+                    ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                    ->update(
+                        [
+                            'SELECCION'=>0
+                        ]
+                    );
+
+        $feentregable           =   FeDocumentoEntregable::where('FOLIO','=',$data_folio)
+                                    ->first();
+        $feentregable->SELECCION = 1;
+        $feentregable->save();
+    }
+
+    public function actionEntregableExtornoFolioPago(Request $request)
+    {
+
+        $data_folio             =   $request['data_folio'];
+        FeDocumentoEntregable::where('FOLIO','=',$data_folio)
+                    ->update(
+                        [
+                            'COD_ESTADO'=>0,
+                            'COD_CATEGORIA_ESTADO'=>'ETM0000000000006',
+                            'TXT_CATEGORIA_ESTADO'=>'RECHAZADO'
+                        ]
+                    );
+        FeDocumento::where('FOLIO_RESERVA','=',$data_folio)
+                    ->update(
+                        [
+                            'FOLIO_RESERVA'=>''
+                        ]
+                    );
+    }
+
+    public function actionEntregableDetalleFolioPago(Request $request)
+    {
+        $data_folio             =   $request['data_folio'];
+        $lfedocumento           =   FeDocumento::where('FOLIO_RESERVA','=',$data_folio)->orderby('RZ_PROVEEDOR','asc')->get();
+
+        $mensaje                =   "No hay ningun cambio en sus documentos";
+        //validar si hay que tener que retener
+        $array_retencion        =   $this->con_si_hay_retencion_lista($data_folio);
+        //dd($array_retencion);
+        if(count($array_retencion)>0){
+            $mensaje            =   "Hay documentos que tienen retencion que se van agregar";
+        }
+        $entregagle_a           =   FeDocumentoEntregable::where('FOLIO','=',$data_folio)->first();
+        //dd($entregagle);
+
+        $funcion                =   $this;
+        return View::make('entregadocumento/modal/ajax/mdetallefolio',
+                         [
+                            'lfedocumento'      =>  $lfedocumento,
+                            'array_retencion'   =>  $array_retencion,
+                            'data_folio'        =>  $data_folio,
+                            'entregagle_a'      =>  $entregagle_a,
+                            'mensaje'           =>  $mensaje,
+                            'funcion'           =>  $funcion
+                         ]);
+    }
+
+    public function actionValidarDetalleFolioPago(Request $request)
+    {
+        $data_folio             =   $request['data_folio'];
+        $lfedocumento           =   FeDocumento::where('FOLIO_RESERVA','=',$data_folio)->get();
+        $entregagle             =   FeDocumentoEntregable::where('FOLIO','=',$data_folio)->first();
+
+
+
+
+        $funcion                =   $this;
+        return View::make('entregadocumento/modal/ajax/mdetallefolio',
+                         [
+                            'lfedocumento'      =>  $lfedocumento,
+                            'data_folio'        =>  $data_folio,
+                            'funcion'           =>  $funcion
+                         ]);
+    }
+
+
+
+
+    public function actionEntregableModalDetalleFolio(Request $request)
+    {
+
+        $idopcion               =   $request['idopcion'];
+        $listadatos             =   FeDocumentoEntregable::where('COD_CATEGORIA_ESTADO','=','ETM0000000000001')
+                                    ->where('COD_ESTADO','=','1')
+                                    ->where('USUARIO_CREA','=',Session::get('usuario')->id)
+                                    ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                                    ->get();
+
+        $banco_id               =   'BAM0000000000001';
+        $arraybancos            =   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
+        $combobancos            =   array('' => "Seleccione Entidad Bancaria") + $arraybancos;
+        $lfedocumento           =   array();
+        $array_retencion        =   array();
+        $mensaje                =   "";
+        $funcion                =   $this;
+        return View::make('entregadocumento/modal/ajax/madetallefoliocreacion',
+                         [
+                            'listadatos'        =>  $listadatos,
+                            'lfedocumento'      =>  $lfedocumento,
+                            'array_retencion'   =>  $array_retencion,
+                            'mensaje'           =>  $mensaje,
+                            'funcion'           =>  $funcion,
+                            'idopcion'          =>  $idopcion,
+                            'arraybancos'       =>  $arraybancos,
+                            'combobancos'       =>  $combobancos,
+                            'banco_id'          =>  $banco_id,
+                            'ajax'              =>  true,
+                         ]);
+    }
 
 
 

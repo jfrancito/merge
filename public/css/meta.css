@@ -1,9 +1,33 @@
+.nav-tabs .disabled {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
 .colordeuda{
   background-color: #e3aba9 !important;
 }
 .ocultar{
   display: none;
 }
+.mdisel{
+  color: #5f99f5;
+}
+
+.mdidet{
+  color: #34a853;
+}
+
+.mdiex{
+  color: #cc0000;
+}
+.neto_pagar{
+  font-size: 18px;
+}
+
+.mdisave{
+  color: #1d3a6d;
+}
+
 
 
 /********** tooltip **********/

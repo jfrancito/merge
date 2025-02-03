@@ -14,7 +14,6 @@
 			background-color: #eeeeee;
 		}
 	</style>
-
 	<table id="" class="table table-striped table-borderless table-hover td-color-borde td-padding-7">
 	  <thead>
 	  	<tr>
@@ -49,18 +48,16 @@
 	      	<th class="border cplomo">Cuenta de cargo</th>
 	      	<th class="border cplomo">Monto total de la planilla</th>
 	      	<th class="border cplomo">Referencia de la planilla</th>
-
 	  	</tr>
 	  	<tr>
 	      	<th>C</th>
 	      	<th>{{$countfedocu}}</th>
-	      	<th>{{date_format(date_create($folio->FECHA_CREA), 'Ymd')}}</th>
+	      	<th>{{date_format(date_create($folio->FEC_PAGO), 'Ymd')}}</th>
 	      	<th>C</th>
 	      	<th></th>
-	     	<th>{{number_format($listadocumento->sum('TOTAL_PAGAR'), 2, '.', '')}}</th>
-	     	<th>FLETES</th>
+	     	<th><b>{{number_format($listadocumento->sum('TOTAL_PAGAR'), 4, '.', ',')}}</b></th>
+	     	<th></th>
 	  	</tr>
-
 	  	<tr>
 	      	<th></th>
 	  	</tr>
@@ -93,7 +90,7 @@
 		    <td></td>	        
 	        <td>{{$item->TXT_EMPR_CLIENTE}}</td>
 	        <td>{{$item->TIPO_MONEDA}}</td>
-	        <td>{{number_format($item->TOTAL_PAGAR, 2, '.', '')}}</td>
+	        <td><b>{{number_format($item->TOTAL_PAGAR, 4, '.', ',')}}</b></td>
 	        <td>S</td>
 	        <td>0000</td>
 	      </tr>                    

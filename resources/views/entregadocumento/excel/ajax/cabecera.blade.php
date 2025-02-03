@@ -22,9 +22,10 @@
       	<th class="border cplomo">GLOSA:</th>
       	<th class="border cplomo">{{$folio->TXT_GLOSA}}</th>
   	</tr>
+    
   	<tr>
-      	<th class="border cplomo">FECHA CREACION:</th>
-      	<th class="border cplomo">{{date_format(date_create($folio->FECHA_CREA), 'd-m-Y')}}</th>
+      	<th class="border cplomo">FECHA PAGO:</th>
+      	<th class="border cplomo">{{date_format(date_create($folio->FEC_PAGO), 'd-m-Y')}}</th>
   	</tr>
 
   	<tr>

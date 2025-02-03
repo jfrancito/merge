@@ -33,6 +33,7 @@
 	    </tr>
 	  </thead>
 	  <tbody>
+	  	@php $monto_total =  0; @endphp
 	    @foreach($listadocumento as $index => $item)
 	      <tr>
 	        <td>{{$item->NRO_DOCUMENTO}}</td>
@@ -40,16 +41,53 @@
 	        <td>{{$item->TXT_CATEGORIA_BANCO}}</td>
 	        <td><b>{{$item->TXT_NRO_CUENTA_BANCARIA}}</b></td>
 	        <td></td>
-	        <td>{{$funcion->funciones->neto_pagar_oc($item)}}</td>
+	        <td><b>{{number_format($funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO), 4, '.', ',')}}</b></td>
 	        <td>NO</td>
 	        <td>{{$item->TXT_CATEGORIA_TIPO_DOC}}</td>
 	        <td>{{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</td>
 	        <td>{{date_format(date_create($item->FEC_EMISION), 'd-m-Y')}}</td>
 	        <td></td>
+	        @php $monto_total  = $monto_total + $funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO); @endphp
+
 	      </tr>                    
 	    @endforeach
+
+	    @foreach($listaotros as $index => $item)
+	      <tr>
+	        <td>{{$item->NRO_DOCUMENTO}}</td>
+	        <td>{{$item->TXT_EMPR_EMISOR}}</td>
+	        <td>{{$item->TXT_CATEGORIA_BANCO}}</td>
+	        <td><b>{{$item->TXT_NRO_CUENTA_BANCARIA}}</b></td>
+	        <td></td>
+	        <td><b>{{number_format($funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO), 4, '.', ',')}}</b></td>
+	        <td>NO</td>
+	        <td>{{$item->TXT_CATEGORIA_TIPO_DOC}}</td>
+	        <td>{{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</td>
+	        <td>{{date_format(date_create($item->FEC_EMISION), 'd-m-Y')}}</td>
+	        <td></td>
+	        @php $monto_total  = $monto_total + $funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO); @endphp
+
+	      </tr>                    
+	    @endforeach
+
 	  </tbody>
 
+
+	 	<tfoot>
+		      <tr>
+		        <td></td>
+		        <td></td>
+		        <td></td>
+		        <td></td>
+		        <td></td>
+		        <td><b>{{number_format($monto_total, 4, '.', ',')}}</b></td>
+		        <td></td>
+		        <td></td>
+		        <td></td>
+		        <td></td>
+		        <td></td>
+		      </tr>                    
+		</tfoot>
 
 	</table>
 </html>

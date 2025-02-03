@@ -50,13 +50,13 @@
           <span><b>CUENTA DETRACCION: </b> {{$item->CTA_DETRACCION}}  </span>
           <span><b>VALOR DETRACCION  :</b>{{$item->VALOR_DETRACCION}}</span>
           <span><b>PAGO DETRACCION: </b> {{$item->TXT_PAGO_DETRACCION}}  </span>
-          <span><b>NOTA CREDITO  :
+<!--           <span><b>NOTA CREDITO  :
             @IF($item->NC_PROVEEDOR > 0)
               {{$item->NC_PROVEEDOR}}
             @ELSE
               0
             @ENDIF</b>
-          </span>
+          </span> -->
 
           <span>
             <b>DEUDA:
@@ -71,24 +71,25 @@
 
         </td>
         <td class="cell-detail sorting_1 center" style="position: relative;">
-          <span><b>{{round($item->TOTAL_VENTA_ORIG,4)}}  </b></span>
+          <span><b>{{ number_format(round($item->TOTAL_VENTA_ORIG, 4), 4, '.', ',') }}</b></span>
         </td>
         <td class="cell-detail sorting_1 center" style="position: relative;">
           <b>{{$item->MONTO_DETRACCION_RED}}</b>
         </td>
         <td class="cell-detail sorting_1 center" style="position: relative;">
-          <b>{{round($item->MONTO_ANTICIPO_DESC,4)}}</b>
+          <b>{{ number_format(round($item->MONTO_ANTICIPO_DESC, 4), 4, '.', ',') }}</b>
         </td>
 
-        <td class="center"><b>{{$item->TOTAL_VENTA_ORIG - $item->MONTO_ANTICIPO_DESC - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)}}</b></td>
+        <td class="center neto_pagar"><b> {{number_format($funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO), 4, '.', ',')}}</b></td>
         <td>
 
             @IF($item->NRO_SERIE_DOC != '' && $item->NC_PROVEEDOR<=0)
 
             <div class="text-center be-checkbox be-checkbox-sm has-primary">
               <input  type="checkbox"
-                class="{{$item->COD_DOCUMENTO_CTBLE}} input_asignar"
-                id="{{$item->COD_DOCUMENTO_CTBLE}}" >
+                class="{{$item->COD_DOCUMENTO_CTBLE}} input_asignar selectfolio"
+                id="{{$item->COD_DOCUMENTO_CTBLE}}" 
+                @if(isset($entregable_sel)  && $item->FOLIO_RESERVA==$entregable_sel->FOLIO) checked @endif>
 
               <label  for="{{$item->COD_DOCUMENTO_CTBLE}}"
                     data-atr = "ver"

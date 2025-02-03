@@ -17,10 +17,9 @@ class Funcion {
 
 	public function neto_pagar_oc($oc){
 
-		$valor_detraccion = 0;
-		$neto_pagar 	  = 0;
-
-		$fedocumento = FeDocumento::where('ID_DOCUMENTO','=',$oc->COD_ORDEN)->first();
+		$valor_detraccion 	= 	0;
+		$neto_pagar 	  	= 	0;
+		$fedocumento 		= 	FeDocumento::where('ID_DOCUMENTO','=',$oc->COD_ORDEN)->first();
 
 		$COD_PAGO_DETRACCION = $fedocumento->COD_PAGO_DETRACCION;
 		if($COD_PAGO_DETRACCION == '' || is_null($COD_PAGO_DETRACCION)){
@@ -37,6 +36,26 @@ class Funcion {
         return $neto_pagar;
 	}
 
+
+	public function neto_pagar_documento($id_documento){
+
+		$valor_detraccion 		= 	0;
+		$neto_pagar 	  		= 	0;
+		$fedocumento 			= 	FeDocumento::where('ID_DOCUMENTO','=',$id_documento)->first();
+		$COD_PAGO_DETRACCION = $fedocumento->COD_PAGO_DETRACCION;
+		if($COD_PAGO_DETRACCION == '' || is_null($COD_PAGO_DETRACCION)){
+			$COD_PAGO_DETRACCION = Session::get('empresas')->COD_EMPR;
+		}
+
+		if($COD_PAGO_DETRACCION == Session::get('empresas')->COD_EMPR){
+			$neto_pagar 	  = (float)$fedocumento->TOTAL_VENTA_ORIG - (float)round($fedocumento->MONTO_DETRACCION_RED) - (float)$fedocumento->MONTO_RETENCION - (float)$fedocumento->CAN_IMPUESTO_RENTA - (float)$fedocumento->MONTO_ANTICIPO_DESC + (float)$fedocumento->PERCEPCION;
+		}else{
+			$neto_pagar 	  = (float)$fedocumento->TOTAL_VENTA_ORIG - (float)$fedocumento->MONTO_RETENCION - (float)$fedocumento->CAN_IMPUESTO_RENTA - (float)$fedocumento->MONTO_ANTICIPO_DESC + (float)$fedocumento->PERCEPCION;
+		}
+
+        $neto_pagar 	  = ROUND($neto_pagar,4);
+        return $neto_pagar;
+	}
 
 
 

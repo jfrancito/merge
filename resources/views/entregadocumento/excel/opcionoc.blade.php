@@ -1,4 +1,3 @@
-
 @if($item->COD_CATEGORIA_BANCO == 'BAM0000000000001')
   <li>
     <a href="{{ url('/descargar-pago-proveedor-macro-excel-oc/'.$item->FOLIO) }}">
@@ -6,7 +5,6 @@
     </a>  
   </li>
 @endif
-
 @if($item->COD_CATEGORIA_BANCO == 'BAM0000000000003')
 <li>
   <a href="{{ url('/descargar-pago-proveedor-macro-bbva-excel-oc/'.$item->FOLIO) }}">
@@ -14,7 +12,6 @@
   </a>  
 </li>
 @endif
-
 @if($item->COD_CATEGORIA_BANCO == 'BAM0000000000004')
 <li>
   <a href="{{ url('/descargar-pago-proveedor-macro-sbk-excel-oc/'.$item->FOLIO) }}">

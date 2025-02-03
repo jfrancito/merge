@@ -1,3 +1,10 @@
+.iconoentregable .mdi{
+  font-size: 27px;
+  cursor: pointer;
+  padding-left: 10px;
+}
+
+
 .file-zoom-dialog .btn-navigate{
   width: 4rem !important;
   height: 4rem !important;

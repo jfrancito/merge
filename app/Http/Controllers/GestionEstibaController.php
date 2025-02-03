@@ -868,7 +868,9 @@ class GestionEstibaController extends Controller
                         $rz_p                               =   str_replace("MARILÑ", "MARILÚ", $rz_p);
                         $documentolinea                     =   $this->ge_linea_documento($idoc);
                         $cant_rentencion                    =   0;
-                        $cant_perception                    =   $factura->getperception();
+                        //$cant_perception                    =   $factura->getperception();
+                        $cant_perception                    =   0;
+
                         //REGISTRO DEL XML LEIDO
                         $documento                          =   new FeDocumento;
                         $documento->ID_DOCUMENTO            =   $idoc;

@@ -598,14 +598,14 @@ class GestionOCController extends Controller
             $operacion_id       =   'CONTRATO';
         }
 
-        $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO','ESTIBA' => 'ESTIBA');
-        // $combo_operacion    =   array(  'ORDEN_COMPRA' => 'ORDEN COMPRA',
-        //                                 'CONTRATO' => 'CONTRATO',
-        //                                 'ESTIBA' => 'ESTIBA',
-        //                                 'DOCUMENTO_INTERNO_PRODUCCION' => 'DOCUMENTO INTERNO PRODUCCION',
-        //                                 'DOCUMENTO_INTERNO_SECADO' => 'DOCUMENTO INTERNO SECADO',
-        //                                 'DOCUMENTO_SERVICIO_BALANZA' => 'DOCUMENTO POR SERVICIO DE BALANZA'
-        //                             );
+        //$combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO','ESTIBA' => 'ESTIBA');
+        $combo_operacion    =   array(  'ORDEN_COMPRA' => 'ORDEN COMPRA',
+                                        'CONTRATO' => 'CONTRATO',
+                                        'ESTIBA' => 'ESTIBA',
+                                        'DOCUMENTO_INTERNO_PRODUCCION' => 'DOCUMENTO INTERNO PRODUCCION',
+                                        'DOCUMENTO_INTERNO_SECADO' => 'DOCUMENTO INTERNO SECADO',
+                                        'DOCUMENTO_SERVICIO_BALANZA' => 'DOCUMENTO POR SERVICIO DE BALANZA'
+                                    );
 
         $cod_empresa        =   Session::get('usuario')->usuarioosiris_id;
         $procedencia        =   'ADM';
@@ -2801,7 +2801,8 @@ class GestionOCController extends Controller
 
                         $documentolinea                     =   $this->ge_linea_documento($ordencompra->COD_ORDEN);
                         $cant_rentencion                    =   $ordencompra_t->CAN_RETENCION;
-                        $cant_perception                    =   $factura->getperception();
+                        $cant_rentencion_cuarta             =   $ordencompra_t->CAN_IMPUESTO_RENTA;
+                        $cant_perception                    =   $ordencompra_t->CAN_PERCEPCION;
 
                         //REGISTRO DEL XML LEIDO
                         $documento                          =   new FeDocumento;
@@ -2841,7 +2842,7 @@ class GestionOCController extends Controller
 
                         $documento->PERCEPCION              =   $cant_perception;
                         $documento->MONTO_RETENCION         =   $cant_rentencion;
-
+                        $documento->CAN_IMPUESTO_RENTA      =   $cant_rentencion_cuarta;
 
                         $documento->HORA_EMISION            =   $factura->gethoraEmision();
                         $documento->IMPUESTO_2              =   $factura->getmtoOtrosTributos();
@@ -3147,8 +3148,10 @@ class GestionOCController extends Controller
                         $rz_p                               =   str_replace("MARILÑ", "MARILÚ", $rz_p);
 
                         $documentolinea                     =   $this->ge_linea_documento($ordencompra->COD_DOCUMENTO_CTBLE);
-                        $cant_rentencion                    =   $ordencompra_t->CAN_RETENCION;
-                        $cant_perception                    =   $factura->getperception();
+                        //$cant_rentencion                    =   $ordencompra_t->CAN_RETENCION;
+                        //$cant_perception                    =   $factura->getperception();
+                        $cant_perception                    =   0;
+                        $cant_rentencion                    =   0;
 
 
                         //REGISTRO DEL XML LEIDO

@@ -7,7 +7,6 @@
       <th>IMPORTE</th>
       <th>DESCUENTO</th>
       <th>PERCEPCCION</th>
-
       <th>NETO A PAGAR</th>
       <th>
         <div class="text-center be-checkbox be-checkbox-sm has-primary">
@@ -30,7 +29,6 @@
       <tr data_requerimiento_id = "{{$item->COD_ORDEN}}"
         >
         <td>{{$index + 1}}</td>
-
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>NRO OC : </b> {{$item->COD_ORDEN}}  </span>
           <span><b>PROVEEDOR  :</b> {{$item->TXT_EMPR_CLIENTE}}</span>
@@ -38,7 +36,6 @@
           <span><b>USUARIO CONTACTO : </b> {{$item->TXT_CONTACTO}}</span>
           <span><b>FECHA VENCIMIENTO DOC: </b> {{date_format(date_create($item->FEC_VENCIMIENTO), 'd-m-Y h:i:s')}}  </span>
           <span><b>FECHA APROBACION ADMIN  :</b>{{date_format(date_create($item->fecha_ap), 'd-m-Y h:i:s')}}</span>
-
         </td>
 
         <td class="cell-detail sorting_1" style="position: relative;">
@@ -61,20 +58,21 @@
             @ENDIF</b>
           </span>
         </td>
-
-
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>IMPORTE: </b> {{$item->CAN_TOTAL}}  </span>
           <span><b>ANTICIPO  :</b>{{round($item->MONTO_ANTICIPO_DESC,4)}}</span>
         </td>
-
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>OBLIGACION: </b>           
             @IF($item->CAN_DETRACCION>0)
               DETRACION
             @ELSE
               @IF($item->CAN_RETENCION>0)
-                RETENCION              
+                RETENCION IGV
+              @ELSE
+                @IF($item->CAN_IMPUESTO_RENTA>0)
+                  RETENCION 4TA CATEGORIA
+                @ENDIF
               @ENDIF
             @ENDIF  
           </span>
@@ -86,27 +84,32 @@
               @IF($item->CAN_RETENCION>0)
                 {{$item->CAN_RETENCION}}
               @ELSE
-                0.00                
+                @IF($item->CAN_IMPUESTO_RENTA>0)
+                  {{$item->CAN_IMPUESTO_RENTA}}
+                @ELSE
+                  0.00                
+                @ENDIF
               @ENDIF
             @ENDIF
           </span>
         </td>
         <td>
           <b>
-            {{round($item->PERCEPCION,4)}}
+            {{number_format(round($item->PERCEPCION,4), 4, '.', ',')}}
           </b>
         </td>
-        <td>
+        <td class="center neto_pagar">
           <b>
-            {{$funcion->funciones->neto_pagar_oc($item)}}
+            {{number_format($funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO), 4, '.', ',')}}
           </b>
         </td>
         <td>
             @IF($item->NC_PROVEEDOR<=0)
             <div class="text-center be-checkbox be-checkbox-sm has-primary">
               <input  type="checkbox"
-                class="{{$item->COD_ORDEN}} input_asignar"
-                id="{{$item->COD_ORDEN}}" >
+                class="{{$item->COD_ORDEN}} input_asignar selectfolio"
+                id="{{$item->COD_ORDEN}}"
+                @if(isset($entregable_sel)  && $item->FOLIO_RESERVA==$entregable_sel->FOLIO) checked @endif>
 
               <label  for="{{$item->COD_ORDEN}}"
                     data-atr = "ver"

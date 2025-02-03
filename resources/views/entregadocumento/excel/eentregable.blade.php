@@ -4,10 +4,8 @@
   @if($operacion_id == 'CONTRATO')
     @include('entregadocumento.excel.ajax.axlistaocentregablecontrato')
   @else
-    @include('entregadocumento.excel.ajax.axlistaocentregableestiba')
+    @include('entregadocumento.excel.ajax.axlistaocentregable')
   @endif
-
-
 @endif
 
 

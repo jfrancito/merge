@@ -27,7 +27,7 @@
 	      	<th></th>
 	      	<th></th>
 	      	<th class="border cplomo">FECHA EMISIÓN:</th>
-	      	<th class="border cplomo">{{date_format(date_create($folio->FECHA_CREA), 'd-m-Y')}}</th>
+	      	<th class="border cplomo">{{date_format(date_create($folio->FEC_PAGO), 'd-m-Y')}}</th>
 	      	<th></th>
 	      	<th></th>
 	      	<th></th>
@@ -134,11 +134,8 @@
 	        <td>{{$item->MONTO_DETRACCION_RED}}</td>
 			<td>0.00</td>
 	        <td>{{$item->MONTO_ANTICIPO_DESC}}</td>
-
-	        <td>
-	        	{{$item->TOTAL_VENTA_ORIG - $item->MONTO_ANTICIPO_DESC - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)}}
-				@php $monto_total  = $monto_total + ($item->TOTAL_VENTA_ORIG - $item->MONTO_ANTICIPO_DESC - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)); @endphp
-	        </td>
+	        <td><b>{{number_format($funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO), 4, '.', ',')}}</b></td>
+	        @php $monto_total  = $monto_total + $funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO); @endphp
 	      </tr>                    
 	    @endforeach
 	  </tbody>
@@ -153,10 +150,8 @@
 	        <th>{{number_format($listadocumento->SUM('MONTO_DETRACCION_RED'), 2, '.', '')}}</th>
 	        <th>0.00</th>
 	        <th>0.00</th>
-	        <th>{{$monto_total}}</th>
+		    <th><b>{{number_format($monto_total, 4, '.', ',')}}</b></th>
 	      </tr>                    
 	  </tfoot>
-
-
 	</table>
 </html>

@@ -91,9 +91,14 @@
           </tr>
 
           <tr>
-            <td><b>RETENCION</b></td>
+            <td><b>RETENCION IGV</b></td>
             <td  colspan="2" class=""><b>{{$ordencompra_f->CAN_RETENCION}}</b></td>
           </tr>
+          <tr>
+            <td><b>RETENCION 4TA CATEGORIA</b></td>
+            <td  colspan="2" class=""><b>{{$ordencompra_f->CAN_IMPUESTO_RENTA}}</b></td>
+          </tr>
+
 
           <tr>
             <td><b>Anticipo</b></td>

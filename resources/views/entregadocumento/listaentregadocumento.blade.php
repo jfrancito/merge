@@ -15,8 +15,7 @@
                 <div class="panel-heading">{{ $titulo }}
                   <div class="tools tooltiptop">
 
-
-
+<!-- 
                     <a href="{{url('/entrega-masivo-excel')}}" 
                        class='tn btn-secondary botoncabecera tooltipcss opciones'
                        target="_blank"
@@ -26,14 +25,24 @@
                        <span class="tooltiptext">Documentos sin folios</span>
                        <i class="fa fa-file-excel-o"></i>
                     </a>
-
-
                     <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones asignarmasivo">
                       <span class="tooltiptext">Integrar Entregable</span>
                       <span class="icon mdi mdi-plus-circle-o"></span>
+                    </a> -->
+
+                    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones loteentregable">
+                      <span class="tooltiptext" >Ver Folio</span>
+                      <strong class='folios_hit' data_folio_sel="@if(count($entregable_sel)>0){{$entregable_sel->FOLIO}}@endif" style="font-size:13px; padding: 5px;">
+                        @if(count($entregable_sel)>0)
+                          {{$entregable_sel->FOLIO}} ({{$entregable_sel->CAN_FOLIO}})
+                        @else
+                          Sin Folio
+                        @endif
+                      </strong>
                     </a>
+                    <input type="hidden" name="folio_sel" id="folio_sel" value="@if(count($entregable_sel)>0){{$entregable_sel->FOLIO}}@endif">
 
-
+                      
                     <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscardocumento">
                       <span class="tooltiptext">Buscar Documento</span>
                       <span class="icon mdi mdi-search"></span>
@@ -126,7 +135,7 @@
 
                             <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
                                 <div class="form-group ">
-                                  <label class="col-sm-12 control-label labelleft" >Fecha Inicio (Vencimiento):</label>
+                                  <label class="col-sm-12 control-label labelleft" >Fecha Inicio :</label>
                                   <div class="col-sm-12 abajocaja" >
                                     <div data-min-view="2" 
                                            data-date-format="dd-mm-yyyy"  
@@ -146,7 +155,7 @@
 
                             <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
                               <div class="form-group ">
-                                <label class="col-sm-12 control-label labelleft" >Fecha Fin (Vencimiento):</label>
+                                <label class="col-sm-12 control-label labelleft" >Fecha Fin :</label>
                                 <div class="col-sm-12 abajocaja" >
                                   <div data-min-view="2" 
                                          data-date-format="dd-mm-yyyy"  
