@@ -157,14 +157,14 @@
 
 
             <td>          
-                @IF($item->CAN_DETRACCION>0)
+                @IF($item->MONTO_DETRACCION_RED>0)
                     SI
                 @ELSE
                     NO
                 @ENDIF
             </td>
             <td>-</td>
-            <td>{{$item->CAN_DETRACCION}}</td>
+            <td>{{$item->MONTO_DETRACCION_RED}}</td>
             <td>-</td>
             <td>-</td>
             <td>{{$item->NRO_CUENTA}}</td>
