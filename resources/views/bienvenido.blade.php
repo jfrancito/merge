@@ -8,7 +8,7 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/datetimepicker/css/bootstrap-datetimepicker.min.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/select2/css/select2.min.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/bootstrap-slider/css/bootstrap-slider.css') }} "/>
-
+    <link rel="stylesheet" type="text/css" href="{{ asset('public/css/dashboard.css?v='.$version) }} " />
 @stop
 
 @section('section')
@@ -81,6 +81,21 @@
       'digitsOptional': false, 
       'prefix': '', 
       'placeholder': '0'});
+
+      $('.category-tab').on('click', function() {
+          // Remover clases activas
+          $('.nav-link').removeClass('active');
+          $('.category-content').removeClass('active');
+          
+          // Agregar clases activas a la categoría seleccionada
+          $(this).addClass('active');
+          
+          // Obtener el ID de la categoría
+          var categoryId = $(this).data('category');
+          
+          // Mostrar el contenido de la categoría seleccionada
+          $('#' + categoryId).addClass('active');
+      });
 
 
     });

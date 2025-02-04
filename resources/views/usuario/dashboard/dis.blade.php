@@ -8,9 +8,9 @@
           <div class="panel-heading" style="background: #1d3a6d;color: #fff;">PENDIENTES
             <span class="panel-subtitle" style="color: #fff;">Documentos por aprobar</span>
             <div class="chart-legend">
-              <a href="{{ url($urlestiba) }}" class="btn btn-rounded btn-space btn-primary dasboark">Ir Aprobar</a>
+              <a href="{{ url($urldis) }}" class="btn btn-rounded btn-space btn-primary dasboark">Ir Aprobar</a>
             </div>
-            <span class="count-das">{{$count_x_aprobar_est}}</span>
+            <span class="count-das">{{$count_x_aprobar_dis}}</span>
           </div>
         </div>
       </div>
@@ -22,7 +22,7 @@
             <div class="chart-legend">
               <a href="{{ url($url_obs) }}" class="btn btn-rounded btn-space btn-primary dasboark">Ir Observados</a>
             </div>
-            <span class="count-das">{{$count_observados_est}}</span>
+            <span class="count-das">{{$count_observados_dis}}</span>
           </div>
         </div>
       </div>
@@ -33,7 +33,7 @@
             <div class="chart-legend">
               <a href="{{ url($url_rep) }}" class="btn btn-rounded btn-space btn-primary dasboark">Ir Reparable</a>
             </div>
-            <span class="count-das">{{$count_reparables_est}}</span>
+            <span class="count-das">{{$count_reparables_dis}}</span>
           </div>
         </div>
       </div>
@@ -44,9 +44,9 @@
           <div class="panel-heading" style="background: #1d3a6d;color: #fff;">REPARABLE
             <span class="panel-subtitle" style="color: #fff;">Documentos reparables</span>
             <div class="chart-legend">
-              <a href="{{ url($url_rep_estiba) }}" class="btn btn-rounded btn-space btn-primary dasboark">Ir Reparable</a>
+              <a href="{{ url($url_rep_dis) }}" class="btn btn-rounded btn-space btn-primary dasboark">Ir Reparable</a>
             </div>
-            <span class="count-das">{{$count_reparables_est}}</span>
+            <span class="count-das">{{$count_reparables_dis}}</span>
           </div>
         </div>
       </div>
@@ -55,9 +55,9 @@
           <div class="panel-heading" style="background: #1d3a6d;color: #fff;">REVISAR REPARABLE
             <span class="panel-subtitle" style="color: #fff;">Documentos reparables</span>
             <div class="chart-legend">
-              <a href="{{ url($url_rep_estiba_revisar) }}" class="btn btn-rounded btn-space btn-primary dasboark">Ir Reparable</a>
+              <a href="{{ url($url_rep_dis_revisar) }}" class="btn btn-rounded btn-space btn-primary dasboark">Ir Reparable</a>
             </div>
-            <span class="count-das">{{$count_reparables__revest}}</span>
+            <span class="count-das">{{$count_reparables__revdis}}</span>
           </div>
         </div>
       </div>
@@ -66,9 +66,9 @@
           <div class="panel-heading" style="background: #1d3a6d;color: #fff;">OBSERVADOS
             <span class="panel-subtitle" style="color: #fff;">Documentos observados</span>
             <div class="chart-legend">
-              <a href="{{ url($urlestiba.'&tab_id=observado') }}" class="btn btn-rounded btn-space btn-primary dasboark">Ir Observados</a>
+              <a href="{{ url($urldis.'&tab_id=observado') }}" class="btn btn-rounded btn-space btn-primary dasboark">Ir Observados</a>
             </div>
-            <span class="count-das">{{$count_observados_est}}</span>
+            <span class="count-das">{{$count_observados_dis}}</span>
           </div>
         </div>
       </div>
@@ -77,9 +77,9 @@
           <div class="panel-heading" style="background: #1d3a6d;color: #fff;">OBSERVACIONES LEVANTADAS
             <span class="panel-subtitle" style="color: #fff;">Documentos observados levantadas</span>
             <div class="chart-legend">
-              <a href="{{ url($urlestiba.'&tab_id=observadole') }}" class="btn btn-rounded btn-space btn-primary dasboark">Ir Observados</a>
+              <a href="{{ url($urldis.'&tab_id=observadole') }}" class="btn btn-rounded btn-space btn-primary dasboark">Ir Observados</a>
             </div>
-            <span class="count-das">{{$count_observadosest_le}}</span>
+            <span class="count-das">{{$count_observadosdis_le}}</span>
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 <div class="col-md-12">
   <div class="panel panel-contrast">
-    <div class="panel-heading panel-heading-contrast"><b>CONTRATO</b></div>
+    <!-- <div class="panel-heading panel-heading-contrast"><b>CONTRATO</b></div> -->
     <div class="panel-body">
     <div class="row">
       <div class="col-xs-12 col-md-4">

@@ -985,7 +985,7 @@ class UserController extends Controller {
 
 		$count_observados_con 		= 	0;
 		$count_observados_est 		= 	0;
-
+		$count_observados_dip 		= 	0;
 
         $url_obs_con 				=	'';
 
@@ -1009,9 +1009,41 @@ class UserController extends Controller {
         $url_rep_estiba 					=	'';
 		$count_reparables__revest 			= 	0;
         $url_rep_estiba_revisar 			=	'';
-
 		$count_observados_est 				= 	0;
 		$count_observadosest_le 			= 	0;
+
+		//dip
+		$urldip 							=	'';
+		$count_x_aprobar_dip 				= 	0;
+		// $count_x_aprobar_gestion_est 		= 	0;
+		$count_reparables_dip 				= 	0;
+        $url_rep_dip 						=	'';
+		$count_reparables__revdip 			= 	0;
+        $url_rep_dip_revisar 				=	'';
+		$count_observados_dip 				= 	0;
+		$count_observadosdip_le 			= 	0;
+
+
+		//dis
+		$urldis 							=	'';
+		$count_x_aprobar_dis 				= 	0;
+		$count_reparables_dis 				= 	0;
+        $url_rep_dis 						=	'';
+		$count_reparables__revdis 			= 	0;
+        $url_rep_dis_revisar 				=	'';
+		$count_observados_dis 				= 	0;
+		$count_observadosdis_le 			= 	0;
+
+
+		//dib
+		$urldib 							=	'';
+		$count_x_aprobar_dib 				= 	0;
+		$count_reparables_dib 				= 	0;
+        $url_rep_dib 						=	'';
+		$count_reparables__revdib 			= 	0;
+        $url_rep_dib_revisar 				=	'';
+		$count_observados_dib 				= 	0;
+		$count_observadosdib_le 			= 	0;
 
 
 
@@ -1057,6 +1089,29 @@ class UserController extends Controller {
 			$count_reparables_est 	= 	 count($listadatosre_est);
 
 
+			$operacion_id 			=	'DOCUMENTO_INTERNO_PRODUCCION';
+        	$listadatosre_dip    	=   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,'TODO','TODO',$operacion_id);
+			$count_reparables_dip 	= 	 count($listadatosre_dip);
+
+        	$listadatosobdip    	=   $this->con_lista_cabecera_comprobante_total_gestion_observados_estibas($cod_empresa,$operacion_id);
+			$count_observados_dip 	= 	count($listadatosobdip);
+
+
+			$operacion_id 			=	'DOCUMENTO_INTERNO_SECADO';
+        	$listadatosre_dis    	=   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,'TODO','TODO',$operacion_id);
+			$count_reparables_dis 	= 	 count($listadatosre_dis);
+
+        	$listadatosobdis    	=   $this->con_lista_cabecera_comprobante_total_gestion_observados_estibas($cod_empresa,$operacion_id);
+			$count_observados_dis 	= 	count($listadatosobdis);
+
+
+			$operacion_id 			=	'DOCUMENTO_SERVICIO_BALANZA';
+        	$listadatosre_dib    	=   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,'TODO','TODO',$operacion_id);
+			$count_reparables_dib 	= 	 count($listadatosre_dib);
+
+        	$listadatosobdib    	=   $this->con_lista_cabecera_comprobante_total_gestion_observados_estibas($cod_empresa,$operacion_id);
+			$count_observados_dib 	= 	count($listadatosobdib);
+
 
 		}
 		else{
@@ -1076,16 +1131,27 @@ class UserController extends Controller {
     			$url 					=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=ORDEN_COMPRA';
     			$urlcontrato 			=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=CONTRATO';
     			$urlestiba 				=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=ESTIBA';
+    			$urldip 				=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=DOCUMENTO_INTERNO_PRODUCCION';
+    			$urldis 				=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=DOCUMENTO_INTERNO_SECADO';
+    			$urldib 				=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=DOCUMENTO_SERVICIO_BALANZA';
+
 
 
         		$url_rep 		 		=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=ORDEN_COMPRA';
         		$url_rep_contrato 		=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=CONTRATO';
         		$url_rep_estiba 		=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=ESTIBA';
+        		$url_rep_dip 			=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=DOCUMENTO_INTERNO_PRODUCCION';
+        		$url_rep_dis 			=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=DOCUMENTO_INTERNO_SECADO';
+        		$url_rep_dib 			=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=DOCUMENTO_SERVICIO_BALANZA';
 
 
-        		$url_rep_revisar 		 		=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=ORDEN_COMPRA&estado_id=2';
-        		$url_rep_contrato_revisar 		=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=CONTRATO&estado_id=2';
-        		$url_rep_estiba_revisar 		=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=ESTIBA&estado_id=2';
+
+        		$url_rep_revisar 		 	=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=ORDEN_COMPRA&estado_id=2';
+        		$url_rep_contrato_revisar 	=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=CONTRATO&estado_id=2';
+        		$url_rep_estiba_revisar 	=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=ESTIBA&estado_id=2';
+        		$url_rep_dip_revisar 		=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=DOCUMENTO_INTERNO_PRODUCCION&estado_id=2';
+        		$url_rep_dis_revisar 		=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=DOCUMENTO_INTERNO_SECADO&estado_id=2';
+        		$url_rep_dib_revisar 		=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=DOCUMENTO_SERVICIO_BALANZA&estado_id=2';
 
         		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_cont_contrato($cod_empresa);
 				$count_x_aprobar_con 	= 	 count($listadatos);
@@ -1123,6 +1189,47 @@ class UserController extends Controller {
 	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_estiba_levantadas($cod_empresa,$operacion_id);
 				$count_observadosest_le 	= 	count($listadatosob);
 
+				//DOCUMENTO_INTERNO_PRODUCCION
+				$operacion_id 			=	'DOCUMENTO_INTERNO_PRODUCCION';
+        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_cont_estiba($cod_empresa,$operacion_id);
+				$count_x_aprobar_dip 	= 	 count($listadatos);
+	        	$listadatosre_dip    	=   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,'TODO','TODO',$operacion_id);
+				$count_reparables_dip 	= 	 count($listadatosre_dip);
+	        	$listadatosre_dip_rev   =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,'TODO','2',$operacion_id);
+				$count_reparables__revdip = 	 count($listadatosre_dip_rev);
+	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_estiba_obs($cod_empresa,$operacion_id);
+				$count_observados_dip 	= 	count($listadatosob);
+	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_estiba_levantadas($cod_empresa,$operacion_id);
+				$count_observadosdip_le	= 	count($listadatosob);
+
+
+				//DOCUMENTO_INTERNO_SECADO
+				$operacion_id 			=	'DOCUMENTO_INTERNO_SECADO';
+        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_cont_estiba($cod_empresa,$operacion_id);
+				$count_x_aprobar_dis 	= 	 count($listadatos);
+	        	$listadatosre_dis    	=   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,'TODO','TODO',$operacion_id);
+				$count_reparables_dis 	= 	 count($listadatosre_dis);
+	        	$listadatosre_dis_rev   =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,'TODO','2',$operacion_id);
+				$count_reparables__revdis = 	 count($listadatosre_dis_rev);
+	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_estiba_obs($cod_empresa,$operacion_id);
+				$count_observados_dis 	= 	count($listadatosob);
+	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_estiba_levantadas($cod_empresa,$operacion_id);
+				$count_observadosdis_le	= 	count($listadatosob);
+
+				//DOCUMENTO_INTERNO_SECADO
+				$operacion_id 			=	'DOCUMENTO_SERVICIO_BALANZA';
+        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_cont_estiba($cod_empresa,$operacion_id);
+				$count_x_aprobar_dib 	= 	 count($listadatos);
+	        	$listadatosre_dib    	=   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,'TODO','TODO',$operacion_id);
+				$count_reparables_dib 	= 	 count($listadatosre_dib);
+	        	$listadatosre_dib_rev   =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,'TODO','2',$operacion_id);
+				$count_reparables__revdib = 	 count($listadatosre_dib_rev);
+	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_estiba_obs($cod_empresa,$operacion_id);
+				$count_observados_dib 	= 	count($listadatosob);
+	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_estiba_levantadas($cod_empresa,$operacion_id);
+				$count_observadosdib_le	= 	count($listadatosob);
+
+
 
 
 			}
@@ -1148,7 +1255,9 @@ class UserController extends Controller {
         			$url 					=	'/gestion-de-administracion-aprobar/j25?operacion_id=ORDEN_COMPRA';
         			$urlcontrato 			=	'/gestion-de-administracion-aprobar/j25?operacion_id=CONTRATO';
         			$urlestiba 				=	'/gestion-de-administracion-aprobar/j25?operacion_id=ESTIBA';
-
+    				$urldip 				=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=DOCUMENTO_INTERNO_PRODUCCION';
+    				$urldis 				=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=DOCUMENTO_INTERNO_SECADO';
+    				$urldib 				=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=DOCUMENTO_SERVICIO_BALANZA';
 
 					//ESTIBA
 					$operacion_id 			=	'ESTIBA';
@@ -1167,6 +1276,56 @@ class UserController extends Controller {
 		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas($cod_empresa,$operacion_id);
 					$count_observadosest_le 	= 	count($listadatosob);
 
+
+					$operacion_id 			=	'DOCUMENTO_INTERNO_PRODUCCION';
+	        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_adm_estiba($cod_empresa,$operacion_id);
+					$count_x_aprobar_dip 	= 	 count($listadatos);
+
+		        	$listadatosre_dip    	=   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,'TODO','TODO',$operacion_id);
+					$count_reparables_dip 	= 	 count($listadatosre_dip);
+
+		        	$listadatosre_dip_rev   =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,'TODO','2',$operacion_id);
+					$count_reparables__revdip = 	 count($listadatosre_dip_rev);
+
+		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs($cod_empresa,$operacion_id);
+					$count_observados_dip 	= 	count($listadatosob);
+
+		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas($cod_empresa,$operacion_id);
+					$count_observadosdip_le 	= 	count($listadatosob);
+
+
+					$operacion_id 			=	'DOCUMENTO_INTERNO_SECADO';
+	        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_adm_estiba($cod_empresa,$operacion_id);
+					$count_x_aprobar_dis 	= 	 count($listadatos);
+
+		        	$listadatosre_dis    	=   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,'TODO','TODO',$operacion_id);
+					$count_reparables_dis 	= 	 count($listadatosre_dis);
+
+		        	$listadatosre_dis_rev   =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,'TODO','2',$operacion_id);
+					$count_reparables__revdis = 	 count($listadatosre_dis_rev);
+
+		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs($cod_empresa,$operacion_id);
+					$count_observados_dis 	= 	count($listadatosob);
+
+		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas($cod_empresa,$operacion_id);
+					$count_observadosdis_le 	= 	count($listadatosob);
+
+
+					$operacion_id 			=	'DOCUMENTO_SERVICIO_BALANZA';
+	        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_adm_estiba($cod_empresa,$operacion_id);
+					$count_x_aprobar_dib 	= 	 count($listadatos);
+
+		        	$listadatosre_dib    	=   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,'TODO','TODO',$operacion_id);
+					$count_reparables_dib 	= 	 count($listadatosre_dib);
+
+		        	$listadatosre_dib_rev   =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,'TODO','2',$operacion_id);
+					$count_reparables__revdib = 	 count($listadatosre_dib_rev);
+
+		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs($cod_empresa,$operacion_id);
+					$count_observados_dib 	= 	count($listadatosob);
+
+		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas($cod_empresa,$operacion_id);
+					$count_observadosdib_le 	= 	count($listadatosob);
 
 
 
@@ -1194,6 +1353,8 @@ class UserController extends Controller {
 
 						 	'count_observados_est' 		=> $count_observados_est,
 						 	'count_x_aprobar_est' 		=> $count_x_aprobar_est,
+						 	'count_x_aprobar_dip' 		=> $count_x_aprobar_dip,
+
 						 	'urlestiba' 				=> $urlestiba,
 						 	'count_reparables_est' 		=> $count_reparables_est,
 						 	'url_rep_estiba' 			=> $url_rep_estiba,
@@ -1202,6 +1363,35 @@ class UserController extends Controller {
 						 	'count_observados_est' 		=> $count_observados_est,
 						 	'count_observadosest_le' 	=> $count_observadosest_le,
 						 	'count_reparables_est' 		=> $count_reparables_est,
+
+
+						 	'urldip' 					=> $urldip,
+						 	'count_reparables_dip' 		=> $count_reparables_dip,
+						 	'url_rep_dip' 				=> $url_rep_dip,
+						 	'url_rep_dip_revisar' 		=> $url_rep_dip_revisar,
+						 	'count_reparables__revdip' 	=> $count_reparables__revdip,
+						 	'count_observados_dip' 		=> $count_observados_dip,
+						 	'count_observadosdip_le' 	=> $count_observadosdip_le,
+
+
+
+						 	'urldis' 					=> $urldis,
+						 	'count_reparables_dis' 		=> $count_reparables_dis,
+						 	'url_rep_dis' 				=> $url_rep_dis,
+						 	'url_rep_dis_revisar' 		=> $url_rep_dis_revisar,
+						 	'count_reparables__revdis' 	=> $count_reparables__revdis,
+						 	'count_observados_dis' 		=> $count_observados_dis,
+						 	'count_observadosdis_le' 	=> $count_observadosdis_le,
+						 	'count_x_aprobar_dis' 		=> $count_x_aprobar_dis,
+
+						 	'urldib' 					=> $urldib,
+						 	'count_reparables_dib' 		=> $count_reparables_dib,
+						 	'url_rep_dib' 				=> $url_rep_dib,
+						 	'url_rep_dib_revisar' 		=> $url_rep_dib_revisar,
+						 	'count_reparables__revdib' 	=> $count_reparables__revdib,
+						 	'count_observados_dib' 		=> $count_observados_dib,
+						 	'count_observadosdib_le' 	=> $count_observadosdib_le,
+						 	'count_x_aprobar_dib' 		=> $count_x_aprobar_dib,
 
 
 
