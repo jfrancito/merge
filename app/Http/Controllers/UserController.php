@@ -1255,9 +1255,9 @@ class UserController extends Controller {
         			$url 					=	'/gestion-de-administracion-aprobar/j25?operacion_id=ORDEN_COMPRA';
         			$urlcontrato 			=	'/gestion-de-administracion-aprobar/j25?operacion_id=CONTRATO';
         			$urlestiba 				=	'/gestion-de-administracion-aprobar/j25?operacion_id=ESTIBA';
-    				$urldip 				=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=DOCUMENTO_INTERNO_PRODUCCION';
-    				$urldis 				=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=DOCUMENTO_INTERNO_SECADO';
-    				$urldib 				=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=DOCUMENTO_SERVICIO_BALANZA';
+    				$urldip 				=	'/gestion-de-administracion-aprobar/g56?operacion_id=DOCUMENTO_INTERNO_PRODUCCION';
+    				$urldis 				=	'/gestion-de-administracion-aprobar/g56?operacion_id=DOCUMENTO_INTERNO_SECADO';
+    				$urldib 				=	'/gestion-de-administracion-aprobar/g56?operacion_id=DOCUMENTO_SERVICIO_BALANZA';
 
 					//ESTIBA
 					$operacion_id 			=	'ESTIBA';
