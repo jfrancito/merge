@@ -555,7 +555,7 @@ class GestionEntregaDocumentoController extends Controller
 
             $excel->sheet('Soles', function($sheet) use ($listadatossoles,$listadatossolesotro,$operacion_id,$funcion,$folio,$empresa){
 
-
+                $sheet->setSelectedCells('C1');
 
                 $sheet->setWidth('A', 20);
                 $sheet->setWidth('B', 20);
@@ -593,9 +593,6 @@ class GestionEntregaDocumentoController extends Controller
                                                                       ->with('operacion_id',$operacion_id);         
             });
 
-
-
-
             $excel->sheet('Dolares', function($sheet) use ($listadatosdolar,$listadatosdolarotro,$operacion_id,$funcion,$folio,$empresa){
 
                 $sheet->setWidth('A', 20);
@@ -632,7 +629,7 @@ class GestionEntregaDocumentoController extends Controller
                                                                       ->with('operacion_id',$operacion_id);       
             });
 
-        })->export('xls');
+        })->setActiveSheetIndex(0)->export('xls');
 
 
     }
