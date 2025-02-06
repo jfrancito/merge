@@ -669,7 +669,7 @@ class GestionEstibaController extends Controller
         $usuario                =   SGDUsuario::where('COD_TRABAJADOR','=',Session::get('usuario')->usuarioosiris_id)->first();
 
 
-
+        $banco_id               =   '';
         if(count($fedocumento)>0){
 
             $detallefedocumento =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
@@ -677,10 +677,20 @@ class GestionEstibaController extends Controller
             $empresa            =   STDEmpresa::where('NRO_DOCUMENTO','=',$fedocumento->RUC_PROVEEDOR)->first();
             $combopagodetraccion    =   array('' => "Seleccione Pago Detraccion",Session::get('empresas')->COD_EMPR => Session::get('empresas')->NOM_EMPR , $empresa->COD_EMPR => $empresa->NOM_EMPR);
 
+            //EMPRESA RELACIONADA
+            $empresa_relacionada    =   STDEmpresa::where('NRO_DOCUMENTO','=',$fedocumento->RUC_PROVEEDOR)
+                                        ->where('IND_RELACIONADO','=',1)
+                                        ->first();
 
+            if(count($empresa_relacionada)>0){
+                $banco_id               =   'BAM0000000000011';  
+            }
+
+
+                            
         }else{
-            $detallefedocumento =   array();
-
+            $detallefedocumento     =   array();
+            $empresa_relacionada    =   array();
 
         }
         $contacto               =   DB::table('users')->where('ind_contacto','=',1)->pluck('nombre','id')->toArray();
@@ -756,6 +766,10 @@ class GestionEstibaController extends Controller
         $comboant               =   array('' => "Seleccione Anticipo")+$arrayitem;
 
 
+
+
+
+
         return View::make('comprobante/registrocomprobanteestibaadministrator',
                          [
                             'monto_anticipo'        =>  $monto_anticipo,
@@ -770,6 +784,7 @@ class GestionEstibaController extends Controller
                             'usuario'               =>  $usuario,
                             'combotipodetraccion'   =>  $combotipodetraccion,
                             'cb_id'                 =>  $cb_id,
+                            'banco_id'              =>  $banco_id,
                             'idoc'                  =>  $idoc,
                             'combocb'               =>  $combocb,
                             'fedocumento'           =>  $fedocumento,

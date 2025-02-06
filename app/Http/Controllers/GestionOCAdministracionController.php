@@ -1984,6 +1984,8 @@ class GestionOCAdministracionController extends Controller
             }
             $transferencia        =   CMPOrden::where('COD_ORDEN','=',$resultado)->first();    
 
+
+
             $transferencia_doc      =   DB::table('CMP.REFERENCIA_ASOC')
                                         ->where('COD_TABLA', $resultado)
                                         ->where(function ($query) {
@@ -1992,6 +1994,8 @@ class GestionOCAdministracionController extends Controller
                                         })
                                         ->where('COD_ESTADO', 1)
                                         ->first();
+
+
 
             //Archivo multiple
 

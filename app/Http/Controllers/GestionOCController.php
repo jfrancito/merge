@@ -2352,7 +2352,7 @@ class GestionOCController extends Controller
 
         //ver si ya estan registrados algunos anticipos
         foreach ($listaanticipo as $index => $item) {
-
+            
             $existeanticipo          =   FeDocumento::where('COD_ANTICIPO','=',$item['COD_HABILITACION'])
                                          ->whereIn('COD_ESTADO',['ETM0000000000002','ETM0000000000003','ETM0000000000004','ETM0000000000005','ETM0000000000008'])
                                          ->first();
