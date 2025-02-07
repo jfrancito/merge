@@ -700,7 +700,10 @@ class GestionEstibaController extends Controller
             $detallefedocumento =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
             $tiposerie          =   substr($fedocumento->SERIE, 0, 1);
             $empresa            =   STDEmpresa::where('NRO_DOCUMENTO','=',$fedocumento->RUC_PROVEEDOR)->first();
+            //dd($fedocumento);
+
             $combopagodetraccion    =   array('' => "Seleccione Pago Detraccion",Session::get('empresas')->COD_EMPR => Session::get('empresas')->NOM_EMPR , $empresa->COD_EMPR => $empresa->NOM_EMPR);
+
 
             //EMPRESA RELACIONADA
             $empresa_relacionada    =   STDEmpresa::where('NRO_DOCUMENTO','=',$fedocumento->RUC_PROVEEDOR)
@@ -719,6 +722,8 @@ class GestionEstibaController extends Controller
             $empresa_relacionada    =   array();
 
         }
+
+
         $contacto               =   DB::table('users')->where('ind_contacto','=',1)->pluck('nombre','id')->toArray();
         $combocontacto          =   array('' => "Seleccione Contacto") + $contacto;
         if($tiposerie == 'E'){

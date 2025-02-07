@@ -4362,6 +4362,7 @@ trait ComprobanteTraits
                                     ->whereIn('COD_CATEGORIA_TIPO_DOC', [
                                         'TDO0000000000001',
                                         'TDO0000000000003',
+                                        'TDO0000000000034',
                                         'TDO0000000000002'
                                     ]);
 
