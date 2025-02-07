@@ -682,6 +682,7 @@ class GestionEstibaController extends Controller
                                         ->where('IND_RELACIONADO','=',1)
                                         ->first();
 
+
             if(count($empresa_relacionada)>0){
                 $banco_id               =   'BAM0000000000011';  
             }
