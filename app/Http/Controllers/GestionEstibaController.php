@@ -610,6 +610,31 @@ class GestionEstibaController extends Controller
     }
 
 
+    public function actionAgregarSuspensionEstibas($idopcion,$lote,Request $request)
+    {
+
+        $documentos                             =   CMPDocAsociarCompra::where('COD_ORDEN','=',$lote)
+                                                    ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000034')->first();
+
+        if(count($documentos)<=0){
+            $docasociar                              =   New CMPDocAsociarCompra;
+            $docasociar->COD_ORDEN                   =   $lote;
+            $docasociar->COD_CATEGORIA_DOCUMENTO     =   'DCC0000000000034';
+            $docasociar->NOM_CATEGORIA_DOCUMENTO     =   'SUSPENSION DE 4TA CATEGORIA';
+            $docasociar->IND_OBLIGATORIO             =   1;
+            $docasociar->TXT_FORMATO                 =   'PDF';
+            $docasociar->TXT_ASIGNADO                =   'CONTACTO';
+            $docasociar->COD_USUARIO_CREA_AUD        =   Session::get('usuario')->id;
+            $docasociar->FEC_USUARIO_CREA_AUD        =   $this->fechaactual;
+            $docasociar->COD_ESTADO                  =   1;
+            $docasociar->TIP_DOC                     =   'N';
+            $docasociar->save();
+        }
+
+        return Redirect::to('detalle-comprobante-estiba-administrator/'.$idopcion.'/'.$lote)->with('bienhecho', 'Se registro correctamente');;
+    }
+
+
 
     public function actionDetalleSelectEstiba($idopcion,Request $request)
     {

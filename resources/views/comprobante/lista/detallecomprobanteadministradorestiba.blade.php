@@ -110,6 +110,9 @@
                 <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
                   <div class="panel panel-default panel-contrast">
                     <div class="panel-heading" style="background: #1d3a6d;color: #fff;">{{$fereftop1->OPERACION}}
+
+                      <a href="{{ url('/agregar-suspension/'.$idopcion.'/'.$idoc) }}" class="btn btn-rounded btn-space btn-success">Tiene Suspension</a>
+
                     </div>
                     <div class="panel-body panel-body-contrast">
                       <table class="table table-condensed table-striped">
