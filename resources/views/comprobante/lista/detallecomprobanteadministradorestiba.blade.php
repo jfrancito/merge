@@ -233,7 +233,7 @@
                                   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px;">
                                       <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 cajareporte">
                                           <div class="form-group">
-                                            <label class="col-sm-12 control-label labelleft" ><b>{{count($banco_id)}}Entidad Bancaria que se le va a pagar al proveedor :</b></label>
+                                            <label class="col-sm-12 control-label labelleft" ><b>Entidad Bancaria que se le va a pagar al proveedor :</b></label>
                                             <div class="col-sm-12 abajocaja" >
 
                                               @if($banco_id=='BAM0000000000011')

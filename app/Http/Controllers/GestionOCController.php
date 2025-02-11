@@ -2448,12 +2448,26 @@ class GestionOCController extends Controller
         View::share('titulo','REGISTRO DE COMPROBANTE OC: '.$idoc);
         $tiposerie              =   '';
 
-        
+        $banco_id               =   '';
         if(count($fedocumento)>0){
             $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
             $tiposerie              =   substr($fedocumento->SERIE, 0, 1);
+
+            //EMPRESA RELACIONADA
+            $empresa_relacionada    =   STDEmpresa::where('NRO_DOCUMENTO','=',$fedocumento->RUC_PROVEEDOR)
+                                        ->where('IND_RELACIONADO','=',1)
+                                        ->first();
+
+
+            if(count($empresa_relacionada)>0){
+                $banco_id               =   'BAM0000000000011';  
+            }
+
+
         }else{
             $detallefedocumento     =   array();
+            $empresa_relacionada    =   array();
+            
         }
 
         //dd($detallefedocumento);
@@ -2632,7 +2646,7 @@ class GestionOCController extends Controller
         return View::make('comprobante/registrocomprobanteadministrator',
                          [
                             'ordencompra'           =>  $ordencompra,
-
+                            'banco_id'              =>  $banco_id,
                             'monto_anticipo'        =>  $monto_anticipo,
                             'comboant'              =>  $comboant,
 

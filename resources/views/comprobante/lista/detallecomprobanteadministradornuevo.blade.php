@@ -203,13 +203,26 @@
                                           <div class="form-group">
                                             <label class="col-sm-12 control-label labelleft" ><b>Entidad Bancaria que se le va a pagar al proveedor :</b></label>
                                             <div class="col-sm-12 abajocaja" >
-                                              {!! Form::select( 'entidadbanco_id', $combobancos, array(),
-                                                                [
-                                                                  'class'       => 'select2 form-control control input-xs entidadbancooc' ,
-                                                                  'id'          => 'entidadbanco_id',
-                                                                  'required'    => '',
-                                                                  'data-aw'     => '1'
-                                                                ]) !!}
+
+                                              @if($banco_id=='BAM0000000000011')
+                                                <input type="hidden" name="entidadbanco_id" value ='{{$banco_id}}'>
+                                                {!! Form::select( 'entidadbanco_id', $combobancos, array($banco_id),
+                                                                  [
+                                                                    'class'       => 'select2 form-control control input-xs entidadbancoestiba' ,
+                                                                    'id'          => 'entidadbanco_id',
+                                                                    'required'    => '',
+                                                                    'data-aw'     => '1',
+                                                                    'disabled' => 'disabled'
+                                                                  ]) !!}
+                                              @else
+                                                {!! Form::select( 'entidadbanco_id', $combobancos, array($banco_id),
+                                                                  [
+                                                                    'class'       => 'select2 form-control control input-xs entidadbancoestiba' ,
+                                                                    'id'          => 'entidadbanco_id',
+                                                                    'required'    => '',
+                                                                    'data-aw'     => '1',
+                                                                  ]) !!}
+                                              @endif
                                             </div>
                                           </div>
                                       </div>
