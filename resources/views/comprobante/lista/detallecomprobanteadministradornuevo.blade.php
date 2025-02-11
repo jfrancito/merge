@@ -208,7 +208,7 @@
                                                 <input type="hidden" name="entidadbanco_id" value ='{{$banco_id}}'>
                                                 {!! Form::select( 'entidadbanco_id', $combobancos, array($banco_id),
                                                                   [
-                                                                    'class'       => 'select2 form-control control input-xs entidadbancoestiba' ,
+                                                                    'class'       => 'select2 form-control control input-xs entidadbancooc' ,
                                                                     'id'          => 'entidadbanco_id',
                                                                     'required'    => '',
                                                                     'data-aw'     => '1',
@@ -217,7 +217,7 @@
                                               @else
                                                 {!! Form::select( 'entidadbanco_id', $combobancos, array($banco_id),
                                                                   [
-                                                                    'class'       => 'select2 form-control control input-xs entidadbancoestiba' ,
+                                                                    'class'       => 'select2 form-control control input-xs entidadbancooc' ,
                                                                     'id'          => 'entidadbanco_id',
                                                                     'required'    => '',
                                                                     'data-aw'     => '1',

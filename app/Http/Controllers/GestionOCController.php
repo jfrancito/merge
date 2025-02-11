@@ -76,8 +76,9 @@ class GestionOCController extends Controller
         $orden_id               =   $request['orden_id'];
 
         $idoc                   =   $this->funciones->decodificarmaestraprefijo($orden_id,$prefijo_id);
-            $ordencompra          =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
+        $ordencompra            =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
         $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc($idoc);
+
 
 
         $tescuentabb            =   TESCuentaBancaria::where('COD_EMPR_TITULAR','=',$ordencompra->COD_EMPR_CLIENTE)
@@ -139,6 +140,8 @@ class GestionOCController extends Controller
         $orden_id               =   $request['orden_id'];
         $empresa_id             =   $request['empresa_id'];
 
+        //dd($entidadbanco_id);
+
         $idoc                   =   $orden_id;
 
         $tescuentabb            =   TESCuentaBancaria::where('COD_EMPR_TITULAR','=',$empresa_id)
@@ -150,6 +153,8 @@ class GestionOCController extends Controller
                                         )
                                     ->pluck('nombre','TXT_NRO_CUENTA_BANCARIA')
                                     ->toArray();
+
+
         $combocb                =   array('' => "Seleccione Cuenta Bancaria") + $tescuentabb;
         $funcion                =   $this;
 
