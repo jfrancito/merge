@@ -9,7 +9,7 @@
 @stop
 @section('section')
 
-<div class="be-content">
+<div class="be-content secaprobar">
   <div class="main-content container-fluid">
     <!--Basic forms-->
     <div class="row">
@@ -63,6 +63,8 @@
 
     </div>
   </div>
+    @include('comprobante.modal.mregistrorequerimiento')
+
 </div>  
 
 @stop
@@ -81,9 +83,17 @@
 
     <script src="{{ asset('public/js/file/fileinput.js?v='.$version) }}" type="text/javascript"></script>
     <script src="{{ asset('public/js/file/locales/es.js') }}" type="text/javascript"></script>
+ 
 
 
     <script type="text/javascript">
+
+        $.fn.niftyModal('setDefaults',{
+          overlaySelector: '.modal-overlay',
+          closeSelector: '.modal-close',
+          classAddAfterOpen: 'modal-show',
+        });
+
       $(document).ready(function(){
         //initialize the javascript
         App.init();

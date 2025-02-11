@@ -1194,6 +1194,28 @@ class GestionOCAdministracionController extends Controller
     }
 
 
+    public function actionModalDetalleDocumento(Request $request)
+    {
+
+        $data_doc               =   $request['data_doc'];
+
+        $detalledocumento       =   CMPDetalleProducto::where('COD_TABLA','=',$data_doc)
+                                    ->where('COD_ESTADO','=',1)
+                                    ->get();
+
+        $funcion        =   $this;
+        return View::make('comprobante/modal/ajax/mdetalledocumento',
+                         [
+                            'detalledocumento'          =>  $detalledocumento,
+                            'data_doc'                  =>  $data_doc,
+                            'ajax'                      =>  true,
+                         ]);
+
+
+    }
+
+
+
 
 
     public function actionAprobarAdministracion($idopcion, $linea,$prefijo, $idordencompra,Request $request)
@@ -1543,7 +1565,44 @@ class GestionOCAdministracionController extends Controller
             $ordeningreso           =   array();
             if(count($referencia)>0){
                 $ordeningreso       =   DB::connection($conexionbd)->table('CMP.ORDEN')->where('COD_ORDEN','=',$referencia->COD_TABLA_ASOC)->first();   
-            }                        
+            }                 
+
+
+
+
+            //ORDEN DE SALIDA
+
+            $empresa_relacionada    =   STDEmpresa::where('NRO_DOCUMENTO','=',$fedocumento->RUC_PROVEEDOR)
+                                        ->where('IND_RELACIONADO','=',1)
+                                        ->first();
+            $ordensalida            =   array();
+
+
+            if(count($empresa_relacionada)>0){
+
+                $documento_venta    =   DB::connection($conexionbd)->table('CMP.DOCUMENTO_CTBLE')
+                                        ->where('NRO_SERIE','=',$fedocumento->SERIE)
+                                        ->where('NRO_DOC','=',$fedocumento->NUMERO)
+                                        ->where('COD_EMPR_EMISOR','=',$empresa_relacionada->COD_EMPR)
+                                        ->first();
+
+                if(count($documento_venta)>0){
+
+                    $referencia_venta       =   DB::connection($conexionbd)->table('CMP.REFERENCIA_ASOC')->where('COD_TABLA','=',$documento_venta->COD_DOCUMENTO_CTBLE)
+                                                ->where('COD_TABLA_ASOC','like','%VR%')->first();
+
+                    if(count($referencia_venta)>0){
+                        $referencia_os        =   DB::connection($conexionbd)->table('CMP.REFERENCIA_ASOC')->where('COD_TABLA','=',$referencia_venta->COD_TABLA_ASOC)
+                                                    ->where('COD_TABLA_ASOC','like','%OS%')->first();
+
+                        if(count($referencia_os)>0){
+                            $ordensalida       =   DB::connection($conexionbd)->table('CMP.ORDEN')->where('COD_ORDEN','=',$referencia_os->COD_TABLA_ASOC)->first(); 
+                        }
+                    }
+                }
+            }                 
+
+
             $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
             $ordencompra_t          =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
@@ -1584,10 +1643,18 @@ class GestionOCAdministracionController extends Controller
 
             //dd($initialPreviewConfig);
 
+
+
+
+
             return View::make('comprobante/aprobaradm', 
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
+                                'empresa_relacionada'   =>  $empresa_relacionada,
+                                'ordensalida'           =>  $ordensalida,
+
+
                                 'initialPreview'        => json_encode($initialPreview),
                                 'initialPreviewConfig'  => json_encode($initialPreviewConfig),
 

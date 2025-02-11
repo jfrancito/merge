@@ -9,7 +9,9 @@
           @else
               <div class="col-sm-12">
                   <p style="margin:0px;"><b>Codigo Orden Ingreso</b> : {{$ordeningreso->COD_ORDEN}}</p>
-                  <p style="margin:0px;"><b>Estado Orden Ingreso</b> : {{$ordeningreso->TXT_CATEGORIA_ESTADO_ORDEN}}</p>
+                  <p style="margin:0px;"><b>Estado Orden Ingreso</b> : {{$ordeningreso->TXT_CATEGORIA_ESTADO_ORDEN}}
+                     <span class="mdi mdi-eye mdidetoi" data_doc='{{$ordeningreso->COD_ORDEN}}'></span>
+                  </p>
 
 
               </div>
