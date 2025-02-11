@@ -81,6 +81,11 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/gestion-de-cpe/{idopcion}', 'CpeController@actionGestionCpe');
 	Route::any('/descargar-archivo/{archivonombre}', 'CpeController@actionDescargarArchivo');
 
+
+	Route::any('/gestion-de-sunat-cpe-local/{idopcion}', 'CpeController@actionGestionCpeLocal');
+	Route::any('/descargar-archivo-local/{tipo}', 'CpeController@descargarArchivoLocal');
+
+
 	//GESTION DE USUARIOS
 	Route::any('/gestion-de-usuarios/{idopcion}', 'UserController@actionListarUsuarios');
 	Route::any('/agregar-usuario/{idopcion}', 'UserController@actionAgregarUsuario');

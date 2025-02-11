@@ -43,14 +43,14 @@ use View;
 use Stdclass;
 use App\Traits\UserTraits;
 use App\Traits\GeneralesTraits;
-
+use App\Traits\ComprobanteTraits;
 
 
 class CpeController extends Controller {
 
     use UserTraits;
     use GeneralesTraits;
-
+    use ComprobanteTraits;
 
 
 
@@ -173,6 +173,92 @@ class CpeController extends Controller {
 						]);
 		}
 	}
+
+	public function actionGestionCpeLocal($idopcion,Request $request)
+	{
+		/******************* validar url **********************/
+		$validarurl = $this->funciones->getUrl($idopcion,'Anadir');
+	    if($validarurl <> 'true'){return $validarurl;}
+	    /******************************************************/
+        View::share('titulo','Descargar CPE Local');
+		if($_POST)
+		{
+
+			$ruc 	 		 			= 	$request['ruc'];
+			$td 	 		 			= 	$request['td'];
+			$serie 	 		 			= 	$request['serie'];
+			$correlativo 	 		 	= 	(int)$request['correlativo'];
+			$correlativo 				= 	str_pad($correlativo,8 , "0", STR_PAD_LEFT);
+
+			$fetoken 					=	FeToken::where('COD_EMPR','=',Session::get('empresas')->COD_EMPR)->first();
+            $prefijocarperta 			=   $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
+
+			//buscar xml
+			$urlxml 					= 	'\\\\10.1.0.12\\cpe\\Facturacion\\' . $prefijocarperta . '\\' . 
+									          Session::get('empresas')->NRO_DOCUMENTO . '-01-' . $serie . '-' . 
+									          $correlativo . '.zip';					          
+			$respuetaxml 				=	$this->buscar_archivo_sunat_local($urlxml);
+			$urlxml 					= 	'\\\\10.1.0.201\\cpe\\Facturacion\\Archivos\\'. 
+									          Session::get('empresas')->NRO_DOCUMENTO . '-01-' . $serie . '-' . 
+									          $correlativo . '\\'.Session::get('empresas')->NRO_DOCUMENTO . '-01-' . $serie . '-' . $correlativo.'.pdf';
+			$respuetapdf 				=	$this->buscar_archivo_sunat_local($urlxml);
+			$urlxml 					= 	'\\\\10.1.0.12\\cpe\\Facturacion\\' . $prefijocarperta . '\\R-' . 
+									          Session::get('empresas')->NRO_DOCUMENTO . '-01-' . $serie . '-' . 
+									          $correlativo . '.zip';
+			$respuetacdr 				=	$this->buscar_archivo_sunat_local($urlxml);
+
+			Session::put('respuetaxml', $respuetaxml);
+			Session::put('respuetapdf', $respuetapdf);
+			Session::put('respuetacdr', $respuetacdr);
+			Session::put('documentob', $ruc."-".$serie."-".$correlativo);
+
+			//return Redirect::back()->withInput()->with('bienhecho', 'Se encontraron los Archivos');
+ 			return Redirect::to('/gestion-de-sunat-cpe-local/'.$idopcion)->withInput()->with('bienhecho', 'Archivo '.$ruc.' encontrado con exito');
+
+		}else{
+
+			$combotd  					= 	array('01' => 'FACTURA');
+
+			return View::make('cpe/buscarcpelocal',
+						[
+							'combotd'  		=> $combotd,			
+						  	'idopcion'  	=> $idopcion
+						]);
+		}
+	}
+
+
+    public function descargarArchivoLocal($tipo)
+    {
+
+		$sesiones = [
+	        'cdr' => 'respuetacdr',
+	        'xml' => 'respuetaxml',
+	        'pdf' => 'respuetapdf',
+	    ];
+
+	    if (!isset($sesiones[$tipo])) {
+	        return back()->with('errorbd', 'Tipo de archivo inválido.');
+	    }
+
+	    $archivo = Session::get($sesiones[$tipo]);
+
+
+	    if (!$archivo || $archivo == '') {
+	        return back()->with('errorbd', 'El archivo no existe.');
+	    }
+
+	    $rutaCompleta = $archivo;
+
+	    if (!file_exists($rutaCompleta)) {
+	        return back()->with('errorbd', 'El archivo no se encuentra en el servidor.');
+	    }
+
+	    // Eliminar el archivo de la sesión después de descargarlo
+	    Session::forget($sesiones[$tipo]);
+
+	    return response()->download($rutaCompleta);
+    }
 
 
     public function actionDescargarArchivo($archivonombre)

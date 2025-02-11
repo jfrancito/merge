@@ -28,6 +28,20 @@ use File;
 trait GeneralesTraits
 {
 
+	private function buscar_archivo_sunat_local($urlxml) {
+
+		$url = '';
+		if (file_exists($urlxml)) {
+		    $url = $urlxml;
+		} else {
+		    $url = '';
+		}
+	 	return  $url;
+
+	}
+
+
+
 
 	private function buscar_archivo_sunat($urlxml,$fetoken) {
 
