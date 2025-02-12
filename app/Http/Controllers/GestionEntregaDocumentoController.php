@@ -530,11 +530,11 @@ class GestionEntregaDocumentoController extends Controller
 
         if($folio->OPERACION=='ORDEN_COMPRA'){
             $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda($folio->FOLIO,'MON0000000000001');
-
             //dd($listadatossoles);
             $listadatosdolar    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda($folio->FOLIO,'MON0000000000002');
             $listadatossolesotro=   $this->con_lista_cabecera_comprobante_entregable_estiba_modal_moneda_union($folio->FOLIO,'MON0000000000001');
             $listadatosdolarotro=   $this->con_lista_cabecera_comprobante_entregable_estiba_modal_moneda_union($folio->FOLIO,'MON0000000000002');
+
         }else{
             if($folio->OPERACION=='CONTRATO'){
                 $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_contrato_modal_moneda($folio->FOLIO,'MON0000000000001');
@@ -546,6 +546,9 @@ class GestionEntregaDocumentoController extends Controller
                 $listadatosdolarotro=   $this->con_lista_cabecera_comprobante_entregable_estiba_modal_moneda_union($folio->FOLIO,'MON0000000000002');
             }
         }
+
+            //dd($listadatossolesotro);
+
         $operacion_id           =   $folio->OPERACION;
         $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
         $titulo                 =   'FOLIO('.$folio_codigo.') '.$empresa->NOM_EMPR;

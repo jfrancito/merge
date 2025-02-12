@@ -4550,7 +4550,7 @@ trait ComprobanteTraits
                                 })
                                 ->where('FE_DOCUMENTO.FOLIO', $folio)
                                 ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA','=',$moneda_id)
-                                ->where('FE_DOCUMENTO.OPERACION', 'ESTIBA')
+                                ->whereIn('FE_DOCUMENTO.OPERACION',$this->con_array_canjes())
                                 ->selectRaw('DISTINCT FE_DOCUMENTO.*, CMP.DOCUMENTO_CTBLE.*')
                                 ->get();
 

@@ -17,3 +17,4 @@ Route::get('/resultado-api-precios', 'DocumentoApiController@actionBuscarPrecio'
 
 
 Route::post('/api-openai-lectura-guias', 'DocumentoApiController@actionOpenAILecturaGuias');
+Route::get('/api-deepseek-lectura-guias', 'DocumentoApiController@actionDeepseekLecturaGuias');
