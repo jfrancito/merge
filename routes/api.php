@@ -16,4 +16,4 @@ use Illuminate\Http\Request;
 Route::get('/resultado-api-precios', 'DocumentoApiController@actionBuscarPrecio');
 
 
-//Route::post('/api-openai-lectura-guias', 'DocumentoApiController@actionOpenAILecturaGuias');
+Route::post('/api-openai-lectura-guias', 'DocumentoApiController@actionOpenAILecturaGuias');
