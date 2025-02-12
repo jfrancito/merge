@@ -14,3 +14,4 @@ yarn-error.log
 /resources/assets/js/app.js
 /app/Console/Kernel.php
 /storage/app
+app/Http/Controllers/DocumentoApiController.php
