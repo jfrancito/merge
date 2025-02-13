@@ -974,6 +974,8 @@ class GestionEstibaController extends Controller
                         $documento->ind_email_ba            =   -1;
                         $documento->ind_email_clap          =   -1;
                         $documento->OPERACION               =   $request['operacion_id'];
+                        $documento->MONTO_NC                =   0.00;
+                        
                         $documento->save();
 
                         //ARCHIVO

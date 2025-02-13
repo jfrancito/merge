@@ -316,7 +316,7 @@ class GestionDocumentoController extends Controller
                         $documento->ind_email_ba            =   -1;
                         $documento->ind_email_clap          =   -1;
                         $documento->OPERACION               =   'ORDEN_COMPRA';
-                        
+                        $documento->MONTO_NC                =   0.00;
                         $documento->save();
 
 

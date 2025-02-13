@@ -50,7 +50,7 @@
           </span>
           <span><b>ORDEN INGRESO  :</b>{{$item->COD_TABLA_ASOC}}</span>
           <span><b>PAGO DETRACCION  :</b>{{$item->TXT_PAGO_DETRACCION}}</span>
-          <span><b>NOTA CREDITO  :
+          <span><b>AVISO NOTA CREDITO  :
             @IF($item->NC_PROVEEDOR > 0)
               {{$item->NC_PROVEEDOR}}
             @ELSE
@@ -61,6 +61,8 @@
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>IMPORTE: </b> {{$item->CAN_TOTAL}}  </span>
           <span><b>ANTICIPO  :</b>{{round($item->MONTO_ANTICIPO_DESC,4)}}</span>
+          <span><b>NOTA CREDITO  :</b>{{round($item->MONTO_NC,4)}}</span>
+
         </td>
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>OBLIGACION: </b>           

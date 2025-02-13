@@ -1124,6 +1124,8 @@ class GestionOCController extends Controller
                         $documento->ind_email_ba            =   -1;
                         $documento->ind_email_clap          =   -1;
                         $documento->OPERACION               =   'ORDEN_COMPRA';
+                        $documento->MONTO_NC                =   0.00;
+
                         $documento->save();
 
 
@@ -1609,6 +1611,8 @@ class GestionOCController extends Controller
                         $documento->ind_email_ba            =   -1;
                         $documento->ind_email_clap          =   -1;
                         $documento->OPERACION               =   'ORDEN_COMPRA';
+                        $documento->MONTO_NC                =   0.00;
+
                         $documento->save();
 
                         //DD("hola");
@@ -2890,6 +2894,8 @@ class GestionOCController extends Controller
                         $documento->ind_email_ba            =   -1;
                         $documento->ind_email_clap          =   -1;
                         $documento->OPERACION               =   'ORDEN_COMPRA';
+                        $documento->MONTO_NC                =   0.00;
+
                         $documento->save();
 
 
@@ -3234,6 +3240,8 @@ class GestionOCController extends Controller
                         $documento->ind_email_ba            =   -1;
                         $documento->ind_email_clap          =   -1;
                         $documento->OPERACION               =   'CONTRATO';
+                        $documento->MONTO_NC                =   0.00;
+                        
                         $documento->save();
 
 

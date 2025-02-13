@@ -4337,6 +4337,22 @@ trait ComprobanteTraits
 
         $fecha_corte            =   date('Ymd');
 
+        $affectedRows           =   DB::update("
+                                        UPDATE FE_DOCUMENTO
+                                        SET MONTO_NC = DOC.CAN_TOTAL
+                                        FROM FE_DOCUMENTO
+                                        INNER JOIN CMP.REFERENCIA_ASOC PR ON FE_DOCUMENTO.ID_DOCUMENTO = PR.COD_TABLA 
+                                            AND PR.COD_TABLA_ASOC LIKE '%FC%' 
+                                            AND PR.COD_ESTADO = 1
+                                        INNER JOIN CMP.REFERENCIA_ASOC PR2 ON PR.COD_TABLA_ASOC = PR2.COD_TABLA 
+                                            AND PR2.COD_TABLA_ASOC LIKE '%NC%' 
+                                            AND PR2.COD_ESTADO = 1
+                                        INNER JOIN CMP.DOCUMENTO_CTBLE DOC ON PR2.COD_TABLA_ASOC = DOC.COD_DOCUMENTO_CTBLE 
+                                        WHERE OPERACION = 'ORDEN_COMPRA' 
+                                            AND ISNULL(FOLIO,'') = '' 
+                                            AND FE_DOCUMENTO.COD_ESTADO = 'ETM0000000000005' 
+                                            AND DOC.COD_CATEGORIA_ESTADO_DOC_CTBLE = 'EDC0000000000009'
+                                    ");
 
         $rol                    =   WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 

@@ -136,6 +136,8 @@ class GestionOCSXController extends Controller
         $documento->ind_email_clap          =   -1;
         $documento->OPERACION               =   'ORDEN_COMPRA';
         $documento->OPERACION_DET           =   'SIN_XML';
+        $documento->MONTO_NC                =   0.00;
+
         $documento->save();
 
 
