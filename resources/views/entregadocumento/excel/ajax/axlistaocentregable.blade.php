@@ -162,6 +162,7 @@
 		        <td></td>
 		        <td></td>
 		        <td></td>
+		       	<td></td>
 		        <td><b>{{number_format($monto_total, 4, '.', ',')}}</b></td>
 		      </tr>                    
 		  </tfoot>
