@@ -105,14 +105,22 @@
                 @if($item->ID_TIPO_DOC == '01')
                     FACTURA
                 @else
-                    RECIBO POR HONORARIO
+                    @if($item->ID_TIPO_DOC == 'R1')
+                        RECIBO POR HONORARIO
+                    @else
+                        RECIBO DE SERVICIOS
+                    @endif
                 @endif
             </td>
             <td>
                 @if($item->ID_TIPO_DOC == '01')
                     {{$item->ID_TIPO_DOC}}
                 @else
-                    02
+                    @if($item->ID_TIPO_DOC == 'R1')
+                        02
+                    @else
+                        14
+                    @endif
                 @endif
             </td>
             <td>{{$item->SERIE}} - {{str_pad($item->NUMERO, 7, "0", STR_PAD_LEFT)}}</td>
