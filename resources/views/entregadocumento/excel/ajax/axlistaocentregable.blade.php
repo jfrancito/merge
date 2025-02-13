@@ -37,6 +37,8 @@
 		      <th>TOTAL DESCUENTO</th>
 		      <th>PERCEPCION</th>
 		      <th>ANTICIPO</th>
+		      <th>NOTA CREDITO</th>
+
 		      <th>NETO A PAGAR</th>
 		    </tr>
 		  </thead>
@@ -96,6 +98,7 @@
 		        </td>
 		        <td><b>{{ number_format(round($item->PERCEPCION, 4), 4, '.', ',') }}</b></td>
 		        <td><b>{{ number_format(round($item->MONTO_ANTICIPO_DESC, 4), 4, '.', ',') }}</b></td>
+		        <td><b>{{ number_format(round($item->MONTO_NC, 4), 4, '.', ',') }}</b></td>
 		        <td><b>
 		        	{{number_format($funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO), 4, '.', ',')}}
 			        @php $monto_total  = $monto_total + $funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO); @endphp
