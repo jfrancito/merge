@@ -3016,7 +3016,7 @@ trait ComprobanteTraits
         }else{
 
             $listadatos     =   FeDocumento::join('CMP.ORDEN', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
-                                ->join('FE_DETALLE_DOCUMENTO', 'FE_DETALLE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
+                                ->leftjoin('FE_DETALLE_DOCUMENTO', 'FE_DETALLE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.Orden.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
                                 ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
@@ -3025,7 +3025,7 @@ trait ComprobanteTraits
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                //->where('FE_DOCUMENTO.ID_DOCUMENTO','=','IICHCR0000131258')
+                                //->where('FE_DOCUMENTO.ID_DOCUMENTO','=','IICHCL0000010224')
                                 ->select(DB::raw("
                                     FE_DOCUMENTO.*, 
                                     CMP.ORDEN.*,
@@ -4337,22 +4337,39 @@ trait ComprobanteTraits
 
         $fecha_corte            =   date('Ymd');
 
-        $affectedRows           =   DB::update("
-                                        UPDATE FE_DOCUMENTO
-                                        SET MONTO_NC = DOC.CAN_TOTAL
-                                        FROM FE_DOCUMENTO
-                                        INNER JOIN CMP.REFERENCIA_ASOC PR ON FE_DOCUMENTO.ID_DOCUMENTO = PR.COD_TABLA 
-                                            AND PR.COD_TABLA_ASOC LIKE '%FC%' 
-                                            AND PR.COD_ESTADO = 1
-                                        INNER JOIN CMP.REFERENCIA_ASOC PR2 ON PR.COD_TABLA_ASOC = PR2.COD_TABLA 
-                                            AND PR2.COD_TABLA_ASOC LIKE '%NC%' 
-                                            AND PR2.COD_ESTADO = 1
-                                        INNER JOIN CMP.DOCUMENTO_CTBLE DOC ON PR2.COD_TABLA_ASOC = DOC.COD_DOCUMENTO_CTBLE 
-                                        WHERE OPERACION = 'ORDEN_COMPRA' 
-                                            AND ISNULL(FOLIO,'') = '' 
-                                            AND FE_DOCUMENTO.COD_ESTADO = 'ETM0000000000005' 
-                                            AND DOC.COD_CATEGORIA_ESTADO_DOC_CTBLE = 'EDC0000000000009'
-                                    ");
+        DB::statement("
+            UPDATE FE_DOCUMENTO
+            SET MONTO_NC = (
+                SELECT SUM(DOC.CAN_TOTAL)
+                FROM CMP.REFERENCIA_ASOC PR
+                INNER JOIN CMP.REFERENCIA_ASOC PR2 ON PR.COD_TABLA_ASOC = PR2.COD_TABLA 
+                    AND PR2.COD_TABLA_ASOC LIKE '%NC%' 
+                    AND PR2.COD_ESTADO = 1
+                INNER JOIN CMP.DOCUMENTO_CTBLE DOC ON PR2.COD_TABLA_ASOC = DOC.COD_DOCUMENTO_CTBLE
+                WHERE PR.COD_TABLA = FE_DOCUMENTO.ID_DOCUMENTO 
+                    AND PR.COD_TABLA_ASOC LIKE '%FC%' 
+                    AND PR.COD_ESTADO = 1
+                    AND OPERACION = 'ORDEN_COMPRA'
+                    AND ISNULL(FOLIO, '') = ''
+                    AND FE_DOCUMENTO.COD_ESTADO = 'ETM0000000000005'
+                    AND DOC.COD_CATEGORIA_ESTADO_DOC_CTBLE = 'EDC0000000000009'
+            )
+            WHERE EXISTS (
+                SELECT 1
+                FROM CMP.REFERENCIA_ASOC PR
+                INNER JOIN CMP.REFERENCIA_ASOC PR2 ON PR.COD_TABLA_ASOC = PR2.COD_TABLA 
+                    AND PR2.COD_TABLA_ASOC LIKE '%NC%' 
+                    AND PR2.COD_ESTADO = 1
+                INNER JOIN CMP.DOCUMENTO_CTBLE DOC ON PR2.COD_TABLA_ASOC = DOC.COD_DOCUMENTO_CTBLE
+                WHERE PR.COD_TABLA = FE_DOCUMENTO.ID_DOCUMENTO 
+                    AND PR.COD_TABLA_ASOC LIKE '%FC%' 
+                    AND PR.COD_ESTADO = 1
+                    AND OPERACION = 'ORDEN_COMPRA'
+                    AND ISNULL(FOLIO, '') = ''
+                    AND FE_DOCUMENTO.COD_ESTADO = 'ETM0000000000005'
+                    AND DOC.COD_CATEGORIA_ESTADO_DOC_CTBLE = 'EDC0000000000009'
+            );
+        ");
 
         $rol                    =   WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 
