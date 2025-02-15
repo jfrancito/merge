@@ -783,6 +783,7 @@ trait ComprobanteTraits
                                     ->leftjoin('STD.EMPRESA', 'STD.EMPRESA.COD_EMPR', '=', 'CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR')
                                     ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'STD.EMPRESA.COD_TIPO_DOCUMENTO')
                                     ->where('FE_DOCUMENTO.FOLIO', $folio)
+                                    ->where('CMP.REFERENCIA_ASOC.COD_ESTADO', 1)
                                     ->where('TXT_CATEGORIA_BANCO','=',$banco_txt)
                                     ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
                                     ->distinct()
@@ -4581,6 +4582,7 @@ trait ComprobanteTraits
                                     $join->on('CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
                                          ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE');
                                 })
+                                ->where('CMP.REFERENCIA_ASOC.COD_ESTADO', 1)
                                 ->where('FE_DOCUMENTO.FOLIO', $folio)
                                 ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA','=',$moneda_id)
                                 ->whereIn('FE_DOCUMENTO.OPERACION',$this->con_array_canjes())

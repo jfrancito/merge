@@ -134,6 +134,8 @@
 			        <td><b>{{ number_format(round($MONTO_DETRACCION, 4), 4, '.', ',') }}</b></td>
 			        <td><b>{{ number_format(round($item->PERCEPCION, 4), 4, '.', ',') }}</b></td>
 			        <td><b>{{ number_format(round($item->MONTO_ANTICIPO_DESC, 4), 4, '.', ',') }}</b></td>
+			        <td><b>0.00</b></td>
+
 			        <td><b>{{number_format($funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO), 4, '.', ',')}}</b></td>
 			        @php $monto_total  = $monto_total + $funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO); @endphp
 			    </tr>                     

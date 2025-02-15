@@ -1382,8 +1382,6 @@ class GestionEntregaDocumentoController extends Controller
         $folio                  =   FeDocumentoEntregable::where('FOLIO','=',$folio_codigo)->first();
         $lista_bancos           =   $this->con_lista_bancos_folio_oc_union($folio->FOLIO);
 
-        //dd($lista_bancos);
-
         $operacion_id           =   $folio->OPERACION;
         $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
         $titulo                 =   'MACRO FOLIO ('.$folio_codigo.') '.$empresa->NOM_EMPR;
