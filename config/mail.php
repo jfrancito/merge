@@ -16,8 +16,8 @@ return [
     |
     */
 
-    'driver' => env('MAIL_DRIVER', 'smtp'),
-
+    //'driver' => env('MAIL_DRIVER', 'smtp'),
+    'driver' => 'smtp',
     /*
     |--------------------------------------------------------------------------
     | SMTP Host Address
@@ -29,9 +29,8 @@ return [
     |
     */
 
-    'host' => env('MAIL_HOST', 'mail.induamerica.com.pe'),
-
-    /*
+    //'host' => env('MAIL_HOST', 'mail.induamerica.com.pe'),
+    'host' => 'mail.induamerica.com.pe',    /*
     |--------------------------------------------------------------------------
     | SMTP Host Port
     |--------------------------------------------------------------------------
@@ -42,8 +41,8 @@ return [
     |
     */
 
-    'port' => env('MAIL_PORT', 465),
-
+    //'port' => env('MAIL_PORT', 465),
+    'port' => 465,
     /*
     |--------------------------------------------------------------------------
     | Global "From" Address
@@ -55,8 +54,11 @@ return [
     |
     */
 
+
+
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'systemindu@induamerica.com.pe'),
+        'address' => 'alertassys@induamerica.com.pe',
+        //'address' => env('MAIL_FROM_ADDRESS', 'alertassys@induamerica.com.pe'),
         'name' => env('MAIL_FROM_NAME', 'Administrador'),
     ],
 
@@ -71,8 +73,8 @@ return [
     |
     */
 
-    'encryption' => env('MAIL_ENCRYPTION', 'ssl'),
-
+    //'encryption' => env('MAIL_ENCRYPTION', 'ssl'),
+    'encryption' => 'ssl',
     /*
     |--------------------------------------------------------------------------
     | SMTP Server Username
@@ -84,9 +86,11 @@ return [
     |
     */
 
-    'username' => env('MAIL_USERNAME'),
+    //'username' => env('MAIL_USERNAME'),
+    //'password' => env('MAIL_PASSWORD'),
+    'username' => 'alertassys@induamerica.com.pe',
+    'password' => '_4vWMsjwoY~%',
 
-    'password' => env('MAIL_PASSWORD'),
 
     /*
     |--------------------------------------------------------------------------

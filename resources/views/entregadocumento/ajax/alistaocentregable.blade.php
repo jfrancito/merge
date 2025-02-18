@@ -9,7 +9,7 @@
       <th>PERCEPCCION</th>
       <th>NETO A PAGAR</th>
       <th>
-        <div class="text-center be-checkbox be-checkbox-sm has-primary">
+<!--         <div class="text-center be-checkbox be-checkbox-sm has-primary">
           <input  type="checkbox"
                   class="todo_asignar input_asignar"
                   id="todo_asignar"
@@ -19,7 +19,7 @@
                   class = "checkbox_asignar"                    
                   name="todo_asignar"
             ></label>
-        </div>
+        </div> -->
       </th>
     </tr>
   </thead>
@@ -36,6 +36,8 @@
           <span><b>USUARIO CONTACTO : </b> {{$item->TXT_CONTACTO}}</span>
           <span><b>FECHA VENCIMIENTO DOC: </b> {{date_format(date_create($item->FEC_VENCIMIENTO), 'd-m-Y h:i:s')}}  </span>
           <span><b>FECHA APROBACION ADMIN  :</b>{{date_format(date_create($item->fecha_ap), 'd-m-Y h:i:s')}}</span>
+          <span><b>MONEDA  :</b>{{$item->TXT_CATEGORIA_MONEDA}}</span>
+
         </td>
 
         <td class="cell-detail sorting_1" style="position: relative;">

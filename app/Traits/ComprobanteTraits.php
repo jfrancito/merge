@@ -71,7 +71,7 @@ trait ComprobanteTraits
                                     ->where('FOLIO_RESERVA', $data_folio)
                                     ->where('OPERACION', 'ORDEN_COMPRA')
                                     ->where('CAN_IMPUESTO_VTA', '>', 0)
-                                    ->where('IND_MATERIAL_SERVICIO', 'M')
+                                    //->where('IND_MATERIAL_SERVICIO', 'M')
                                     ->where('MONTO_DETRACCION_RED', '<=', 0)
                                     ->whereNotIn('RUC_PROVEEDOR', function ($query) {
                                         $query->select('RUC')->from('CON.PROVEEDORES_BCRP');
@@ -91,7 +91,7 @@ trait ComprobanteTraits
                                         ->where('RUC_PROVEEDOR', $item->RUC_PROVEEDOR)
                                         ->where('OPERACION', 'ORDEN_COMPRA')
                                         ->where('CAN_IMPUESTO_VTA', '>', 0)
-                                        ->where('IND_MATERIAL_SERVICIO', 'M')
+                                        //->where('IND_MATERIAL_SERVICIO', 'M')
                                         ->where('MONTO_DETRACCION_RED', '<=', 0)
                                         ->get();
             foreach ($ldocumentosretencion as $index02 => $item02) {
@@ -384,7 +384,7 @@ trait ComprobanteTraits
     }
 
 
-    private function con_lista_cabecera_comprobante_entregable_contrato($cliente_id,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id) {
+    private function con_lista_cabecera_comprobante_entregable_contrato($cliente_id,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$moneda_id) {
 
 
         $fecha_corte            =   date('Ymd');
@@ -433,6 +433,7 @@ trait ComprobanteTraits
                                         })
                                         ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005'])
                                         ->where('CMP.DOCUMENTO_CTBLE.COD_EMPR','=',$empresa_id)
+                                        ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA','=',$moneda_id)
                                         ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
                                         ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO','=',$banco_id)
                                         //->whereIn('CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD',$array_usuarios)
@@ -467,6 +468,7 @@ trait ComprobanteTraits
                                         })
                                         ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005'])
                                         ->where('CMP.DOCUMENTO_CTBLE.COD_EMPR','=',$empresa_id)
+                                        ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA','=',$moneda_id)
                                         //->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
                                         ->whereIn('CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD',$array_usuarios)
                                         ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO','=',$banco_id)
@@ -491,7 +493,7 @@ trait ComprobanteTraits
 
     }
 
-    private function con_lista_cabecera_comprobante_entregable_estiba($cliente_id,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$operacion_id) {
+    private function con_lista_cabecera_comprobante_entregable_estiba($cliente_id,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$operacion_id,$moneda_id) {
 
 
         $fecha_corte            =   date('Ymd');
@@ -527,11 +529,12 @@ trait ComprobanteTraits
                                                  ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE');
                                         })
                                         ->where('CMP.DOCUMENTO_CTBLE.COD_EMPR','=',$empresa_id)
+                                        ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA','=',$moneda_id)
                                         ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO','=',$banco_id)
                                         ->where('FE_DOCUMENTO.usuario_pa','=',Session::get('usuario')->id)
                                         //->whereIn('CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD',$array_usuarios)
                                         ->where('FE_DOCUMENTO.COD_ESTADO', 'ETM0000000000005')
-                                        //->where('FE_DOCUMENTO.ID_DOCUMENTO', '00000019')
+                                        //->where('FE_DOCUMENTO.ID_DOCUMENTO', '00000180')
                                         ->where('FE_DOCUMENTO.OPERACION', $operacion_id)
                                         ->where(function ($query) {
                                             $query->where('FOLIO', '=', '');
@@ -539,6 +542,8 @@ trait ComprobanteTraits
                                         })
                                         ->selectRaw('DISTINCT FE_DOCUMENTO.*, CMP.DOCUMENTO_CTBLE.*') // DISTINCT aplicado solo a estas columnas
                                         ->get();
+
+
 
 
         }else{
@@ -552,6 +557,7 @@ trait ComprobanteTraits
                                                  ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE');
                                         })
                                         ->where('CMP.DOCUMENTO_CTBLE.COD_EMPR','=',$empresa_id)
+                                        ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA','=',$moneda_id)
                                         ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO','=',$banco_id)
                                         ->whereIn('CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD',$array_usuarios)
                                         ->where('FE_DOCUMENTO.COD_ESTADO', 'ETM0000000000005')
@@ -559,10 +565,14 @@ trait ComprobanteTraits
                                             $query->where('FOLIO', '=', '');
                                             $query->orWhereNull('FOLIO');
                                         })
-                                        //->where('FE_DOCUMENTO.ID_DOCUMENTO', '00000019')
+                                        //->where('FE_DOCUMENTO.ID_DOCUMENTO', '00000180')
                                         ->where('FE_DOCUMENTO.OPERACION', $operacion_id)
                                         ->selectRaw('DISTINCT FE_DOCUMENTO.*, CMP.DOCUMENTO_CTBLE.*') // DISTINCT aplicado solo a estas columnas
                                         ->get();
+
+
+            //dd($listadatos);
+
 
         }
 
@@ -4333,7 +4343,7 @@ trait ComprobanteTraits
 
 
 
-    private function con_lista_cabecera_comprobante_entregable($cliente_id,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id) {
+    private function con_lista_cabecera_comprobante_entregable($cliente_id,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$moneda_id) {
 
 
         $fecha_corte            =   date('Ymd');
@@ -4387,8 +4397,6 @@ trait ComprobanteTraits
         $fecha_corte            =   date('Ymd');
 
 
-
-
         $documento              =   DB::table('CMP.DOCUMENTO_CTBLE')
                                     ->join('CMP.REFERENCIA_ASOC', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
                                     ->where('CMP.REFERENCIA_ASOC.COD_ESTADO','=','1')
@@ -4400,7 +4408,7 @@ trait ComprobanteTraits
                                         'TDO0000000000002'
                                     ]);
 
-
+        //dd($moneda_id);
 
         $oi                     =   DB::table('CMP.ORDEN')
                                     ->join('CMP.REFERENCIA_ASOC', 'CMP.ORDEN.COD_ORDEN', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
@@ -4431,6 +4439,7 @@ trait ComprobanteTraits
                                     //->where('CMP.Orden.COD_ORDEN','=','ISBECL0000001705')
                                     ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005'])
                                     ->where('CMP.Orden.COD_EMPR','=',$empresa_id)
+                                    ->where('CMP.Orden.COD_CATEGORIA_MONEDA','=',$moneda_id)
                                     //->where('CMP.Orden.COD_CENTRO','=',$centro_id)
                                     ->whereIn('CMP.Orden.COD_USUARIO_CREA_AUD',$array_usuarios)
                                     ->where('FE_DOCUMENTO.COD_ESTADO','<>','')

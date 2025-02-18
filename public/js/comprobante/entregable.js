@@ -286,8 +286,8 @@ $(document).ready(function(){
         var empresa_id           =   $('#empresa_id').val();
         var centro_id            =   $('#centro_id').val();
         var operacion_id         =   $('#operacion_id').val();
-        var banco_id         =   $('#banco_id').val();
-
+        var banco_id             =   $('#banco_id').val();
+        var moneda_id            =   $('#moneda_id').val();
         
         var idopcion                =   $('#idopcion').val();
         var _token                  =   $('#token').val();
@@ -305,7 +305,7 @@ $(document).ready(function(){
                                 banco_id                 : banco_id,
                                 centro_id               : centro_id,
                                 operacion_id               : operacion_id,
-
+                                moneda_id               : moneda_id,
                                 idopcion                : idopcion
                             };
         ajax_normal(data,"/ajax-buscar-documento-fe-entregable");

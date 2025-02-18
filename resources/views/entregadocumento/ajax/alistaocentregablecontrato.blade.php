@@ -27,7 +27,7 @@
           <span><b>USUARIO CONTACTO : </b> {{$item->TXT_CONTACTO}}</span>
           <span><b>FECHA VENCIMIENTO DOC: </b> {{date_format(date_create($item->FEC_VENCIMIENTO), 'd-m-Y h:i:s')}}  </span>
           <span><b>FECHA APROBACION ADMIN  :</b>{{date_format(date_create($item->fecha_ap), 'd-m-Y h:i:s')}}</span>
-
+          <span><b>MONEDA  :</b>{{$item->TXT_CATEGORIA_MONEDA}}</span>
           <span><b>ESTADO CANJE  :</b>
             @IF($item->NRO_SERIE_DOC == '')
               <span class="badge badge-danger" style="width: 100px;">SIN CANJEAR</span>
@@ -35,6 +35,8 @@
               <span class="badge badge-success" style="width: 100px;">CANJEADO</span>
             @ENDIF
           </span>
+
+          
 
         </td>
         <td class="cell-detail sorting_1" style="position: relative;">

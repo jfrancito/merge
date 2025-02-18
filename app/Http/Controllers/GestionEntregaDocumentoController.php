@@ -171,19 +171,22 @@ class GestionEntregaDocumentoController extends Controller
 
 
         //$combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA');
-        $array_canjes               =   $this->con_array_canjes();
+        $array_canjes       =   $this->con_array_canjes();
+        $combo_moneda       =   $this->gn_generacion_combo_categoria('MONEDA','Seleccione moneda','');
+        $moneda_id          =   'MON0000000000001';
+
 
 
 
         if($operacion_id=='ORDEN_COMPRA'){
-            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id);
+            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$moneda_id);
         }else{
             if($operacion_id=='CONTRATO'){
-                $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id);
+                $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$moneda_id);
             }else{
                 if (in_array($operacion_id, $array_canjes)) {
                     $categoria_id       =   $this->con_categoria_canje($operacion_id);
-                    $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$operacion_id);
+                    $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$operacion_id,$moneda_id);
                 }
             }
         }
@@ -203,6 +206,9 @@ class GestionEntregaDocumentoController extends Controller
                             'funcion'           =>  $funcion,
                             'idopcion'          =>  $idopcion,
                             'fecha_inicio'      =>  $fecha_inicio,
+                            'combo_moneda'      =>  $combo_moneda,
+                            'moneda_id'         =>  $moneda_id,
+
                             'fecha_fin'         =>  $fecha_fin,
                             'proveedor_id'      =>  $proveedor_id,
                             'combo_proveedor'   =>  $combo_proveedor,
@@ -232,6 +238,8 @@ class GestionEntregaDocumentoController extends Controller
         $empresa_id     =   $request['empresa_id'];  
         $centro_id      =   $request['centro_id'];
         $idopcion       =   $request['idopcion'];
+        $moneda_id      =   $request['moneda_id'];
+
 
         $operacion_id   =   $request['operacion_id'];
         $area_id        =   $request['area_id'];
@@ -241,12 +249,12 @@ class GestionEntregaDocumentoController extends Controller
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
 
         if($operacion_id=='ORDEN_COMPRA'){
-            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id);
+            $listadatos         =   $this->con_lista_cabecera_comprobante_entregable($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$moneda_id);
         }else{
             if($operacion_id=='CONTRATO'){
-                $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id);
+                $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_contrato($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$moneda_id);
             }else{
-                $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$operacion_id);
+                $listadatos         =   $this->con_lista_cabecera_comprobante_entregable_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$operacion_id,$moneda_id);
             }
         }
 
@@ -547,7 +555,8 @@ class GestionEntregaDocumentoController extends Controller
             }
         }
 
-            //dd($listadatossolesotro);
+        //dd($folio->COD_CATEGORIA_MONEDA);
+        //COD_CATEGORIA_MONEDA
 
         $operacion_id           =   $folio->OPERACION;
         $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
@@ -556,81 +565,88 @@ class GestionEntregaDocumentoController extends Controller
 
         Excel::create($titulo, function($excel) use ($listadatossoles,$listadatosdolar,$listadatossolesotro,$listadatosdolarotro,$operacion_id,$funcion,$folio,$empresa) {
 
-            $excel->sheet('Soles', function($sheet) use ($listadatossoles,$listadatossolesotro,$operacion_id,$funcion,$folio,$empresa){
-
-                $sheet->setSelectedCells('C1');
-
-                $sheet->setWidth('A', 20);
-                $sheet->setWidth('B', 20);
-                $sheet->setWidth('C', 20);
-                $sheet->setWidth('D', 40);
-                $sheet->setWidth('E', 40);
-                $sheet->setWidth('F', 30);
-                $sheet->setWidth('G', 30);
-                $sheet->setWidth('H', 30);
-                $sheet->setWidth('I', 20);
-                $sheet->setWidth('J', 20);
-                $sheet->setWidth('K', 20);
-                $sheet->setWidth('L', 30);
-                $sheet->setWidth('M', 20);
-                $sheet->setWidth('N', 20);
-                $sheet->setWidth('O', 20);
+            if($folio->COD_CATEGORIA_MONEDA=='MON0000000000001' or $folio->COD_CATEGORIA_MONEDA==''){
 
 
-                $sheet->mergeCells('B2:C2');
-                $sheet->mergeCells('B3:C3');
-                $sheet->mergeCells('B4:C4');
-                $sheet->mergeCells('B5:C5');
-                $sheet->mergeCells('B6:C6');
-                $sheet->mergeCells('B7:C7');
+                $excel->sheet('Soles', function($sheet) use ($listadatossoles,$listadatossolesotro,$operacion_id,$funcion,$folio,$empresa){
 
-                $sheet->cell('A1', function($cell) {
-                            $cell->setFontColor('#FFFFFF');   // Texto blanco
-                        });
+                    $sheet->setSelectedCells('C1');
 
-                $sheet->loadView('entregadocumento/excel/eentregable')->with('listadatos',$listadatossoles)
-                                                                      ->with('listadatosotro',$listadatossolesotro)
-                                                                      ->with('funcion',$funcion)
-                                                                      ->with('folio',$folio)
-                                                                      ->with('empresa',$empresa)
-                                                                      ->with('operacion_id',$operacion_id);         
-            });
+                    $sheet->setWidth('A', 20);
+                    $sheet->setWidth('B', 20);
+                    $sheet->setWidth('C', 20);
+                    $sheet->setWidth('D', 40);
+                    $sheet->setWidth('E', 40);
+                    $sheet->setWidth('F', 30);
+                    $sheet->setWidth('G', 30);
+                    $sheet->setWidth('H', 30);
+                    $sheet->setWidth('I', 20);
+                    $sheet->setWidth('J', 20);
+                    $sheet->setWidth('K', 20);
+                    $sheet->setWidth('L', 30);
+                    $sheet->setWidth('M', 20);
+                    $sheet->setWidth('N', 20);
+                    $sheet->setWidth('O', 20);
 
-            $excel->sheet('Dolares', function($sheet) use ($listadatosdolar,$listadatosdolarotro,$operacion_id,$funcion,$folio,$empresa){
 
-                $sheet->setWidth('A', 20);
-                $sheet->setWidth('B', 20);
-                $sheet->setWidth('C', 20);
-                $sheet->setWidth('D', 40);
-                $sheet->setWidth('E', 40);
-                $sheet->setWidth('F', 30);
-                $sheet->setWidth('G', 30);
-                $sheet->setWidth('H', 30);
-                $sheet->setWidth('I', 20);
-                $sheet->setWidth('J', 20);
-                $sheet->setWidth('K', 20);
-                $sheet->setWidth('L', 30);
-                $sheet->setWidth('M', 20);
-                $sheet->setWidth('N', 20);
-                $sheet->setWidth('O', 20);
-                $sheet->mergeCells('B2:C2');
-                $sheet->mergeCells('B3:C3');
-                $sheet->mergeCells('B4:C4');
-                $sheet->mergeCells('B5:C5');
-                $sheet->mergeCells('B6:C6');
-                $sheet->mergeCells('B7:C7');
+                    $sheet->mergeCells('B2:C2');
+                    $sheet->mergeCells('B3:C3');
+                    $sheet->mergeCells('B4:C4');
+                    $sheet->mergeCells('B5:C5');
+                    $sheet->mergeCells('B6:C6');
+                    $sheet->mergeCells('B7:C7');
 
-                $sheet->cell('A1', function($cell) {
-                            $cell->setFontColor('#FFFFFF');   // Texto blanco
-                        });
+                    $sheet->cell('A1', function($cell) {
+                                $cell->setFontColor('#FFFFFF');   // Texto blanco
+                            });
 
-                $sheet->loadView('entregadocumento/excel/eentregable')->with('listadatos',$listadatosdolar)
-                                                                      ->with('listadatosotro',$listadatosdolarotro)
-                                                                      ->with('funcion',$funcion)
-                                                                       ->with('folio',$folio)
-                                                                       ->with('empresa',$empresa)
-                                                                      ->with('operacion_id',$operacion_id);       
-            });
+                    $sheet->loadView('entregadocumento/excel/eentregable')->with('listadatos',$listadatossoles)
+                                                                          ->with('listadatosotro',$listadatossolesotro)
+                                                                          ->with('funcion',$funcion)
+                                                                          ->with('folio',$folio)
+                                                                          ->with('empresa',$empresa)
+                                                                          ->with('simbolo','S/.')
+                                                                          ->with('operacion_id',$operacion_id);         
+                });
+            }
+            if($folio->COD_CATEGORIA_MONEDA=='MON0000000000002' or $folio->COD_CATEGORIA_MONEDA==''){
+                $excel->sheet('Dolares', function($sheet) use ($listadatosdolar,$listadatosdolarotro,$operacion_id,$funcion,$folio,$empresa){
+
+                    $sheet->setWidth('A', 20);
+                    $sheet->setWidth('B', 20);
+                    $sheet->setWidth('C', 20);
+                    $sheet->setWidth('D', 40);
+                    $sheet->setWidth('E', 40);
+                    $sheet->setWidth('F', 30);
+                    $sheet->setWidth('G', 30);
+                    $sheet->setWidth('H', 30);
+                    $sheet->setWidth('I', 20);
+                    $sheet->setWidth('J', 20);
+                    $sheet->setWidth('K', 20);
+                    $sheet->setWidth('L', 30);
+                    $sheet->setWidth('M', 20);
+                    $sheet->setWidth('N', 20);
+                    $sheet->setWidth('O', 20);
+                    $sheet->mergeCells('B2:C2');
+                    $sheet->mergeCells('B3:C3');
+                    $sheet->mergeCells('B4:C4');
+                    $sheet->mergeCells('B5:C5');
+                    $sheet->mergeCells('B6:C6');
+                    $sheet->mergeCells('B7:C7');
+
+                    $sheet->cell('A1', function($cell) {
+                                $cell->setFontColor('#FFFFFF');   // Texto blanco
+                            });
+
+                    $sheet->loadView('entregadocumento/excel/eentregable')->with('listadatos',$listadatosdolar)
+                                                                          ->with('listadatosotro',$listadatosdolarotro)
+                                                                          ->with('funcion',$funcion)
+                                                                           ->with('folio',$folio)
+                                                                           ->with('empresa',$empresa)
+                                                                           ->with('simbolo','$')
+                                                                          ->with('operacion_id',$operacion_id);       
+                });
+            }
 
         })->setActiveSheetIndex(0)->export('xls');
 
@@ -1544,6 +1560,19 @@ class GestionEntregaDocumentoController extends Controller
                 $ope_ind            =   "1";
             }
 
+           //ver que sea del misma moneda
+            $moneda = '';
+            if($fedocumento_encontro->MONEDA == 'PEN'){
+                $moneda = 'MON0000000000001';
+            }
+            if($fedocumento_encontro->MONEDA == 'USD'){
+                $moneda = 'MON0000000000002';
+            }
+
+            if($entregable->COD_CATEGORIA_MONEDA != $moneda){
+                $mensaje            =   "Este Documento esta asiganado a otra MONEDA";
+                $ope_ind            =   "1";
+            }
 
             //validacion que el folio sea del mismo banco
             if($entregable->COD_CATEGORIA_BANCO != $fedocumento_encontro->COD_CATEGORIA_BANCO){
@@ -1746,9 +1775,13 @@ class GestionEntregaDocumentoController extends Controller
 
             DB::beginTransaction();
             $banco_id                               =   $request['banco_id'];
+            $moneda_id                              =   $request['moneda_id'];
+
             $glosa                                  =   $request['glosa'];
             $empresa_id                             =   Session::get('empresas')->COD_EMPR;
             $banco                                  =   CMPCategoria::where('COD_CATEGORIA','=',$banco_id)->first();
+            $moneda                                 =   CMPCategoria::where('COD_CATEGORIA','=',$moneda_id)->first();
+
             $codigo                                 =   $this->funciones->generar_folio('FE_DOCUMENTO_ENTREGABLE',8);
             $documento                              =   new FeDocumentoEntregable;
             $documento->FOLIO                       =   $codigo;
@@ -1760,6 +1793,10 @@ class GestionEntregaDocumentoController extends Controller
             $documento->COD_EMPRESA                 =   $empresa_id;
             $documento->COD_CATEGORIA_BANCO         =   $banco->COD_CATEGORIA;
             $documento->TXT_CATEGORIA_BANCO         =   $banco->NOM_CATEGORIA;
+
+            $documento->COD_CATEGORIA_MONEDA        =   $moneda->COD_CATEGORIA;
+            $documento->TXT_CATEGORIA_MONEDA        =   $moneda->NOM_CATEGORIA;
+
             $documento->COD_CATEGORIA_ESTADO        =   'ETM0000000000001';
             $documento->TXT_CATEGORIA_ESTADO        =   'GENERADO';
             $documento->SELECCION                   =   0;
@@ -1877,6 +1914,10 @@ class GestionEntregaDocumentoController extends Controller
         $banco_id               =   'BAM0000000000001';
         $arraybancos            =   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
         $combobancos            =   array('' => "Seleccione Entidad Bancaria") + $arraybancos;
+
+        $combo_moneda           =   $this->gn_generacion_combo_categoria('MONEDA','Seleccione moneda','');
+        $defecto_moneda         =   'MON0000000000001';
+
         $lfedocumento           =   array();
         $array_retencion        =   array();
         $mensaje                =   "";
@@ -1892,6 +1933,10 @@ class GestionEntregaDocumentoController extends Controller
                             'arraybancos'       =>  $arraybancos,
                             'combobancos'       =>  $combobancos,
                             'banco_id'          =>  $banco_id,
+                            'combo_moneda'                  => $combo_moneda,
+                            'defecto_moneda'                => $defecto_moneda, 
+
+
                             'ajax'              =>  true,
                          ]);
     }

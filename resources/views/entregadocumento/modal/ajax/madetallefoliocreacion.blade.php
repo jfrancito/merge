@@ -35,6 +35,7 @@
                             <span><b>FOLIO: </b> {{$item->FOLIO}}  </span>
                             <span><b>CANTIDAD  :</b> {{$item->CAN_FOLIO}}</span>
                             <span><b>BANCO : </b> {{$item->TXT_CATEGORIA_BANCO}}</span>
+                            <span><b>MONEDA : </b> {{$item->TXT_CATEGORIA_MONEDA}}</span>
                             <span><b>GLOSA : </b> {{$item->TXT_GLOSA}}</span>
                             <span><b>OPERACION : </b> {{$item->OPERACION}}</span>
                           </td>
@@ -70,6 +71,23 @@
                                 </div>
                               </div>
                         </div><br>
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                              <div class="form-group">
+                                <label class="col-sm-12 control-label labelleft negrita" >Moneda (*):</label>
+                                <div class="col-sm-12 abajocaja" >
+                                  {!! Form::select( 'moneda_id', $combo_moneda, $defecto_moneda,
+                                                    [
+                                                      'class'       => 'select3 form-control control input-xs combo' ,
+                                                      'id'          => 'moneda_id',
+                                                      'data-aw'     => '1',
+                                                      'required'    => '',
+                                                    ]) !!}
+                                </div>
+                              </div>
+                        </div>
+
+
+
                         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                           <div class="form-group">
                             <label class="col-sm-12 control-label labelleft negrita" >GLOSA :</label>

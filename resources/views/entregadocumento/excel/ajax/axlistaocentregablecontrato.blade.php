@@ -69,7 +69,7 @@
 				<td><b>{{ number_format(round($item->TOTAL_VENTA_ORIG, 4), 4, '.', ',') }}</b></td>
 				<td><b>{{ number_format(round($MONTO_DETRACCION, 4), 4, '.', ',') }}</b></td>
 				<td><b>{{ number_format(round($item->MONTO_ANTICIPO_DESC, 4), 4, '.', ',') }}</b></td>
-				<td><b>{{number_format($funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO), 4, '.', ',')}}</b></td>
+				<td><b>{{$simbolo}} {{number_format($funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO), 4, '.', ',')}}</b></td>
 				@php $monto_total  = $monto_total + $funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO); @endphp
 		    </tr>                    
 	    @endforeach
@@ -91,7 +91,7 @@
 	        <td></td>
 	        <td></td>
 	       	<td></td>
-		    <td><b>{{number_format($monto_total, 4, '.', ',')}}</b></td>
+		    <td><b>{{$simbolo}} {{number_format($monto_total, 4, '.', ',')}}</b></td>
 	      </tr>                    
 	  </tfoot>
 	</table>

@@ -72,7 +72,7 @@
 	        </td>
 	        <td>{{$item->MONTO_ANTICIPO_DESC}}</td>
 	        <td>
-				{{$item->TOTAL_VENTA_ORIG - $item->MONTO_ANTICIPO_DESC - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)}}
+				{{$simbolo}} {{$item->TOTAL_VENTA_ORIG - $item->MONTO_ANTICIPO_DESC - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)}}
 				@php $monto_total  = $monto_total + ($item->TOTAL_VENTA_ORIG - $item->MONTO_ANTICIPO_DESC - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)); @endphp
 	        </td>
 	      </tr>                    
@@ -95,7 +95,7 @@
 	        <td></td>
 	        <td></td>
 
-	        <td>{{number_format($monto_total, 2, '.', '')}}</td>
+	        <td>{{$simbolo}} {{number_format($monto_total, 2, '.', '')}}</td>
 	      </tr>                    
 	  </tfoot>
 	</table>
