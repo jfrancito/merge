@@ -578,11 +578,11 @@ class GestionEstibaController extends Controller
 
 
                 //whatsaap para contabilidad
-                // $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->first();
-                // $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO
-                //                         .'%0D%0A'.'EMPRESA : '.Session::get('empresas')->NOM_EMPR.'%0D%0A'
-                //                         .'PROVEEDOR : '.$empresa_anti->NOM_EMPR.'%0D%0A'
-                //                         .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
+                $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->first();
+                $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO
+                                        .'%0D%0A'.'EMPRESA : '.Session::get('empresas')->NOM_EMPR.'%0D%0A'
+                                        .'PROVEEDOR : '.$empresa_anti->NOM_EMPR.'%0D%0A'
+                                        .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
                 // if(1==0){
                 //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
                 // }else{
