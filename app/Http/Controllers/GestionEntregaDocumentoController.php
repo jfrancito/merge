@@ -1568,6 +1568,15 @@ class GestionEntregaDocumentoController extends Controller
             if($fedocumento_encontro->MONEDA == 'USD'){
                 $moneda = 'MON0000000000002';
             }
+            if($moneda == ''){
+                $ordencompra            =   CMPOrden::where('COD_ORDEN','=',$fedocumento_encontro->ID_DOCUMENTO)->first();
+                if(count($ordencompra)>0){
+                    $moneda = $ordencompra->COD_CATEGORIA_MONEDA;
+                }
+            }
+
+            
+
 
             if($entregable->COD_CATEGORIA_MONEDA != $moneda){
                 $mensaje            =   "Este Documento esta asiganado a otra MONEDA";
