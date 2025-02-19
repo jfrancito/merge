@@ -217,27 +217,27 @@ class GestionOCContabilidadController extends Controller
 
 
                     //whatsaap para administracion
-                    $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->first();
-                    $ordencompra        =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();
+                    // $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->first();
+                    // $ordencompra        =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();
 
-                    $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                    $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO
-                                            .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-                                            .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
-                                            .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
+                    // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                    // $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO
+                    //                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                    //                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
+                    //                         .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
 
 
-                    if(1==0){
-                        $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                    }else{
+                    // if(1==0){
+                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                    // }else{
 
-                        $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                        //ADMINISTRACION
-                        $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                        $this->insertar_whatsaap('51971575452','GISELA',$mensaje,'');
-                        $this->insertar_whatsaap('51920721827','JESSICA DEL PILAR',$mensaje,'');
-                        //$this->insertar_whatsaap('51948634244','ELSA ANA BELEN',$mensaje,'');
-                    }    
+                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                    //     //ADMINISTRACION
+                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                    //     $this->insertar_whatsaap('51971575452','GISELA',$mensaje,'');
+                    //     $this->insertar_whatsaap('51920721827','JESSICA DEL PILAR',$mensaje,'');
+                    //     //$this->insertar_whatsaap('51948634244','ELSA ANA BELEN',$mensaje,'');
+                    // }    
 
                     $msjarray[]                             =   array(  "data_0" => $fedocumento->ID_DOCUMENTO, 
                                                                         "data_1" => 'COMPROBANTE APROBADO POR CONTABILIDAD', 
@@ -394,20 +394,20 @@ class GestionOCContabilidadController extends Controller
                     $documento->save();
 
                     //LE LLEGA AL USUARIO DE CONTACTO
-                    $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
-                    $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                    $mensaje            =   'COMPROBANTE: '.$fedocumento->ID_DOCUMENTO
-                                            .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-                                            .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
-                                            .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
-                                            .'RECOMENDACION : '.$descripcion.'%0D%0A';
-                    //dd($trabajador);                        
-                    if(1==0){
-                        $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                    }else{
-                        $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                        $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                    }  
+                    // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+                    // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                    // $mensaje            =   'COMPROBANTE: '.$fedocumento->ID_DOCUMENTO
+                    //                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                    //                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
+                    //                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
+                    //                         .'RECOMENDACION : '.$descripcion.'%0D%0A';
+                    // //dd($trabajador);                        
+                    // if(1==0){
+                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                    // }else{
+                    //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
+                    // }  
 
                 }
 
@@ -479,26 +479,26 @@ class GestionOCContabilidadController extends Controller
                 $documento->save();
 
                 //whatsaap para administracion
-                $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
-                $ordencompra        =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();
+                // $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
+                // $ordencompra        =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();
 
-                $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO
-                                        .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-                                        .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
-                                        .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
+                // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                // $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO
+                //                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                //                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
+                //                         .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
 
-                if(1==0){
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                }else{
+                // if(1==0){
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                // }else{
 
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                    //CONTABILIDAD
-                    $this->insertar_whatsaap('51971575452','GISELA',$mensaje,'');
-                    $this->insertar_whatsaap('51920721827','JESSICA DEL PILAR',$mensaje,'');
-                    //$this->insertar_whatsaap('51948634244','ELSA ANA BELEN',$mensaje,'');
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                //     //CONTABILIDAD
+                //     $this->insertar_whatsaap('51971575452','GISELA',$mensaje,'');
+                //     $this->insertar_whatsaap('51920721827','JESSICA DEL PILAR',$mensaje,'');
+                //     //$this->insertar_whatsaap('51948634244','ELSA ANA BELEN',$mensaje,'');
 
-                }   
+                // }   
 
                 DB::commit();
                 return Redirect::to('/gestion-de-contabilidad-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' APROBADO CON EXITO');
@@ -661,19 +661,19 @@ class GestionOCContabilidadController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
-                $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
-                $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                $mensaje            =   'COMPROBANTE: '.$fedocumento->ID_DOCUMENTO
-                                        .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-                                        .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
-                                        .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
-                                        .'APROBACION DEL DOCUMENTO REPARABLE'.'%0D%0A';                     
-                if(1==0){
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                }else{
-                    $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                }  
+                // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+                // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                // $mensaje            =   'COMPROBANTE: '.$fedocumento->ID_DOCUMENTO
+                //                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                //                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
+                //                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
+                //                         .'APROBACION DEL DOCUMENTO REPARABLE'.'%0D%0A';                     
+                // if(1==0){
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                // }else{
+                //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
+                // }  
 
                 DB::commit();
                 return Redirect::to('/gestion-de-comprobantes-reparable/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' APROBADO CON EXITO');
@@ -725,20 +725,20 @@ class GestionOCContabilidadController extends Controller
                     $documento->MENSAJE                     =   $descripcion;
                     $documento->save();
                     //LE LLEGA AL USUARIO DE CONTACTO
-                    $empresa_anti       =   STDEmpresa::where('NRO_DOCUMENTO','=',$fedocumento->RUC_PROVEEDOR)->first();
-                    $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
-                    $mensaje            =   'COMPROBANTE: '.$fedocumento->ID_DOCUMENTO
-                                            .'%0D%0A'.'EMPRESA : '.Session::get('empresas')->NOM_EMPR.'%0D%0A'
-                                            .'PROVEEDOR : '.$empresa_anti->NOM_EMPR.'%0D%0A'
-                                            .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
-                                            .'RECOMENDACION : '.$descripcion.'%0D%0A';
-                    //dd($trabajador);                        
-                    if(1==0){
-                        $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                    }else{
-                        $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                        $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                    }  
+                    // $empresa_anti       =   STDEmpresa::where('NRO_DOCUMENTO','=',$fedocumento->RUC_PROVEEDOR)->first();
+                    // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+                    // $mensaje            =   'COMPROBANTE: '.$fedocumento->ID_DOCUMENTO
+                    //                         .'%0D%0A'.'EMPRESA : '.Session::get('empresas')->NOM_EMPR.'%0D%0A'
+                    //                         .'PROVEEDOR : '.$empresa_anti->NOM_EMPR.'%0D%0A'
+                    //                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
+                    //                         .'RECOMENDACION : '.$descripcion.'%0D%0A';
+                    // //dd($trabajador);                        
+                    // if(1==0){
+                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                    // }else{
+                    //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
+                    // }  
                 }
 
                 $filespdf          =   $request['otros'];
@@ -804,23 +804,23 @@ class GestionOCContabilidadController extends Controller
                 $documento->save();
 
                 //whatsaap para administracion
-                $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->first();
-                $empresa_anti       =   STDEmpresa::where('NRO_DOCUMENTO','=',$fedocumento->RUC_PROVEEDOR)->first();
-                $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO
-                                        .'%0D%0A'.'EMPRESA : '.Session::get('empresas')->NOM_EMPR.'%0D%0A'
-                                        .'PROVEEDOR : '.$empresa_anti->NOM_EMPR.'%0D%0A'
-                                        .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
+                // $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->first();
+                // $empresa_anti       =   STDEmpresa::where('NRO_DOCUMENTO','=',$fedocumento->RUC_PROVEEDOR)->first();
+                // $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO
+                //                         .'%0D%0A'.'EMPRESA : '.Session::get('empresas')->NOM_EMPR.'%0D%0A'
+                //                         .'PROVEEDOR : '.$empresa_anti->NOM_EMPR.'%0D%0A'
+                //                         .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
 
-                if(1==0){
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                }else{
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                    //CONTABILIDAD
-                    $this->insertar_whatsaap('51971575452','GISELA',$mensaje,'');
-                    $this->insertar_whatsaap('51920721827','JESSICA DEL PILAR',$mensaje,'');
-                    //$this->insertar_whatsaap('51948634244','ELSA ANA BELEN',$mensaje,'');
-                }   
-                DB::commit();
+                // if(1==0){
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                // }else{
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                //     //CONTABILIDAD
+                //     $this->insertar_whatsaap('51971575452','GISELA',$mensaje,'');
+                //     $this->insertar_whatsaap('51920721827','JESSICA DEL PILAR',$mensaje,'');
+                //     //$this->insertar_whatsaap('51948634244','ELSA ANA BELEN',$mensaje,'');
+                // }   
+                // DB::commit();
                 Session::flash('operacion_id', 'ESTIBA');
                 return Redirect::to('/gestion-de-contabilidad-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$pedido_id.' APROBADO CON EXITO');
             }catch(\Exception $ex){
@@ -969,20 +969,20 @@ class GestionOCContabilidadController extends Controller
                     $documento->MENSAJE                     =   $descripcion;
                     $documento->save();
                     //LE LLEGA AL USUARIO DE CONTACTO
-                    $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
-                    $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                    $mensaje            =   'COMPROBANTE: '.$fedocumento->ID_DOCUMENTO
-                                            .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-                                            .'PROVEEDOR : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'
-                                            .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
-                                            .'RECOMENDACION : '.$descripcion.'%0D%0A';
-                    //dd($trabajador);                        
-                    if(1==0){
-                        $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                    }else{
-                        $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                        $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                    }  
+                    // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+                    // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                    // $mensaje            =   'COMPROBANTE: '.$fedocumento->ID_DOCUMENTO
+                    //                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                    //                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'
+                    //                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
+                    //                         .'RECOMENDACION : '.$descripcion.'%0D%0A';
+                    // //dd($trabajador);                        
+                    // if(1==0){
+                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                    // }else{
+                    //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
+                    // }  
                 }
 
 
@@ -1056,28 +1056,28 @@ class GestionOCContabilidadController extends Controller
                 $documento->save();
 
                 //whatsaap para administracion
-                $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
+                // $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
                 $ordencompra        =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$pedido_id)->first();
 
-                //$ordencompra        =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();
+                // //$ordencompra        =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();
 
-                $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO
-                                        .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-                                        .'PROVEEDOR : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'
-                                        .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
+                // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                // $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO
+                //                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                //                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'
+                //                         .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
 
-                if(1==0){
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                }else{
+                // if(1==0){
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                // }else{
 
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                    //CONTABILIDAD
-                    $this->insertar_whatsaap('51971575452','GISELA',$mensaje,'');
-                    $this->insertar_whatsaap('51920721827','JESSICA DEL PILAR',$mensaje,'');
-                    //$this->insertar_whatsaap('51948634244','ELSA ANA BELEN',$mensaje,'');
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                //     //CONTABILIDAD
+                //     $this->insertar_whatsaap('51971575452','GISELA',$mensaje,'');
+                //     $this->insertar_whatsaap('51920721827','JESSICA DEL PILAR',$mensaje,'');
+                //     //$this->insertar_whatsaap('51948634244','ELSA ANA BELEN',$mensaje,'');
 
-                }   
+                // }   
 
                 DB::commit();
                 Session::flash('operacion_id', 'CONTRATO');
@@ -1284,26 +1284,26 @@ class GestionOCContabilidadController extends Controller
                             );
 
                 //LE LLEGA AL USUARIO DE CONTACTO
-                $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)
-                                        ->where('TXT_TELEFONO','<>','')
-                                        ->first();
+                // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)
+                //                         ->where('TXT_TELEFONO','<>','')
+                //                         ->first();
 
-                $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                $mensaje            =   'COMPROBANTE OBSERVADO: '.$fedocumento->ID_DOCUMENTO
-                                        .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-                                        .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
-                                        .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
-                                        .'MENSAJE : '.$descripcion.'%0D%0A';
+                // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                // $mensaje            =   'COMPROBANTE OBSERVADO: '.$fedocumento->ID_DOCUMENTO
+                //                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                //                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
+                //                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
+                //                         .'MENSAJE : '.$descripcion.'%0D%0A';
 
-                //dd($trabajador);                        
-                if(1==0){
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                }else{
-                    if(count($trabajador)>0){
-                        $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,''); 
-                    }
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                }  
+                // //dd($trabajador);                        
+                // if(1==0){
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                // }else{
+                //     if(count($trabajador)>0){
+                //         $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,''); 
+                //     }
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
+                // }  
 
                 DB::commit();
                 return Redirect::to('/gestion-de-contabilidad-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' OBSERVADO CON EXITO');
@@ -1436,26 +1436,26 @@ class GestionOCContabilidadController extends Controller
                             );
 
                 //LE LLEGA AL USUARIO DE CONTACTO
-                $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)
-                                        ->where('TXT_TELEFONO','<>','')
-                                        ->first();
+                // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)
+                //                         ->where('TXT_TELEFONO','<>','')
+                //                         ->first();
 
-                $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                $mensaje            =   'COMPROBANTE OBSERVADO REPARABLE: '.$fedocumento->ID_DOCUMENTO
-                                        .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-                                        .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
-                                        .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
-                                        .'MENSAJE : '.$descripcion.'%0D%0A';
+                // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                // $mensaje            =   'COMPROBANTE OBSERVADO REPARABLE: '.$fedocumento->ID_DOCUMENTO
+                //                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                //                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
+                //                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
+                //                         .'MENSAJE : '.$descripcion.'%0D%0A';
 
-                //dd($trabajador);                        
-                if(1==0){
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                }else{
-                    if(count($trabajador)>0){
-                        $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,''); 
-                    }
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                }  
+                // //dd($trabajador);                        
+                // if(1==0){
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                // }else{
+                //     if(count($trabajador)>0){
+                //         $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,''); 
+                //     }
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
+                // }  
 
                 DB::commit();
                 return Redirect::to('/gestion-de-comprobantes-reparable/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' OBSERVADO CON EXITO');
@@ -1550,20 +1550,20 @@ class GestionOCContabilidadController extends Controller
                                 ]
                             );
                 //LE LLEGA AL USUARIO DE CONTACTO
-                $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
-                $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                $mensaje            =   'COMPROBANTE REPARABLE: '.$fedocumento->ID_DOCUMENTO
-                                        .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-                                        .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
-                                        .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
-                                        .'MENSAJE : '.$descripcion.'%0D%0A';
-                //dd($trabajador);                        
-                if(1==0){
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                }else{
-                    $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                }  
+                // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+                // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                // $mensaje            =   'COMPROBANTE REPARABLE: '.$fedocumento->ID_DOCUMENTO
+                //                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                //                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
+                //                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
+                //                         .'MENSAJE : '.$descripcion.'%0D%0A';
+                // //dd($trabajador);                        
+                // if(1==0){
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                // }else{
+                //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
+                // }  
 
                 DB::commit();
                 Session::flash('operacion_id', 'CONTRATO');
@@ -1662,20 +1662,20 @@ class GestionOCContabilidadController extends Controller
                                     ]);
 
                 //LE LLEGA AL USUARIO DE CONTACTO
-                $empresa_anti       =   STDEmpresa::where('NRO_DOCUMENTO','=',$fedocumento->RUC_PROVEEDOR)->first();
-                $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
-                $mensaje            =   'COMPROBANTE REPARABLE: '.$fedocumento->ID_DOCUMENTO
-                                        .'%0D%0A'.'EMPRESA : '.Session::get('empresas')->NOM_EMPR.'%0D%0A'
-                                        .'PROVEEDOR : '.$empresa_anti->NOM_EMPR.'%0D%0A'
-                                        .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
-                                        .'MENSAJE : '.$descripcion.'%0D%0A';
-                //dd($trabajador);                        
-                if(1==0){
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                }else{
-                    $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                }  
+                // $empresa_anti       =   STDEmpresa::where('NRO_DOCUMENTO','=',$fedocumento->RUC_PROVEEDOR)->first();
+                // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+                // $mensaje            =   'COMPROBANTE REPARABLE: '.$fedocumento->ID_DOCUMENTO
+                //                         .'%0D%0A'.'EMPRESA : '.Session::get('empresas')->NOM_EMPR.'%0D%0A'
+                //                         .'PROVEEDOR : '.$empresa_anti->NOM_EMPR.'%0D%0A'
+                //                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
+                //                         .'MENSAJE : '.$descripcion.'%0D%0A';
+                // //dd($trabajador);                        
+                // if(1==0){
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                // }else{
+                //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
+                // }  
 
                 DB::commit();
                 Session::flash('operacion_id', 'CONTRATO');
@@ -1783,19 +1783,19 @@ class GestionOCContabilidadController extends Controller
                             );
 
                 //LE LLEGA AL USUARIO DE CONTACTO
-                $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
-                $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                $mensaje            =   'COMPROBANTE REPARABLE: '.$fedocumento->ID_DOCUMENTO
-                                        .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-                                        .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
-                                        .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
-                                        .'MENSAJE : '.$descripcion.'%0D%0A';                       
-                if(1==0){
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                }else{
-                    $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                }  
+                // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+                // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                // $mensaje            =   'COMPROBANTE REPARABLE: '.$fedocumento->ID_DOCUMENTO
+                //                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                //                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
+                //                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
+                //                         .'MENSAJE : '.$descripcion.'%0D%0A';                       
+                // if(1==0){
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                // }else{
+                //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
+                // }  
 
                 DB::commit();
                 return Redirect::to('gestion-de-contabilidad-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' EXTORNADO CON EXITO');
@@ -1884,21 +1884,21 @@ class GestionOCContabilidadController extends Controller
                                 ]
                             );
                 //LE LLEGA AL USUARIO DE CONTACTO
-                $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
-                $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                $mensaje            =   'COMPROBANTE REPARABLE: '.$fedocumento->ID_DOCUMENTO
-                                        .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-                                        .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
-                                        .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
-                                        .'MENSAJE : '.$descripcion.'%0D%0A';
+                // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+                // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                // $mensaje            =   'COMPROBANTE REPARABLE: '.$fedocumento->ID_DOCUMENTO
+                //                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                //                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
+                //                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
+                //                         .'MENSAJE : '.$descripcion.'%0D%0A';
 
-                //dd($trabajador);                        
-                if(1==0){
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                }else{
-                    $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                }  
+                // //dd($trabajador);                        
+                // if(1==0){
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                // }else{
+                //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
+                // }  
 
                 DB::commit();
                 return Redirect::to('aprobar-comprobante-contabilidad/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' REPARABLE CON EXITO');
@@ -2078,21 +2078,21 @@ class GestionOCContabilidadController extends Controller
                             );
 
                 //LE LLEGA AL USUARIO DE CONTACTO
-                $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
-                $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                $mensaje            =   'COMPROBANTE OBSERVADO: '.$fedocumento->ID_DOCUMENTO
-                                        .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-                                        .'PROVEEDOR : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'
-                                        .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
-                                        .'MENSAJE : '.$descripcion.'%0D%0A';
+                // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+                // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                // $mensaje            =   'COMPROBANTE OBSERVADO: '.$fedocumento->ID_DOCUMENTO
+                //                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                //                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'
+                //                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
+                //                         .'MENSAJE : '.$descripcion.'%0D%0A';
 
-                //dd($trabajador);                        
-                if(1==0){
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                }else{
-                    $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                }  
+                // //dd($trabajador);                        
+                // if(1==0){
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                // }else{
+                //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
+                // }  
 
                 DB::commit();
                 Session::flash('operacion_id', 'CONTRATO');
@@ -2258,22 +2258,22 @@ class GestionOCContabilidadController extends Controller
                                     'area_observacion'=>'CONT'
                                 ]
                             );
-                $empresa_anti       =   STDEmpresa::where('NRO_DOCUMENTO','=',$fedocumento->RUC_PROVEEDOR)->first();
-                $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->first();
-                //LE LLEGA AL USUARIO DE CONTACTO
-                $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
-                $mensaje            =   'COMPROBANTE OBSERVADO: '.$fedocumento->ID_DOCUMENTO
-                                        .'%0D%0A'.'EMPRESA : '.Session::get('empresas')->NOM_EMPR.'%0D%0A'
-                                        .'PROVEEDOR : '.$empresa_anti->NOM_EMPR.'%0D%0A'
-                                        .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
-                                        .'MENSAJE : '.$descripcion.'%0D%0A';
+                // $empresa_anti       =   STDEmpresa::where('NRO_DOCUMENTO','=',$fedocumento->RUC_PROVEEDOR)->first();
+                // $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->first();
+                // //LE LLEGA AL USUARIO DE CONTACTO
+                // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+                // $mensaje            =   'COMPROBANTE OBSERVADO: '.$fedocumento->ID_DOCUMENTO
+                //                         .'%0D%0A'.'EMPRESA : '.Session::get('empresas')->NOM_EMPR.'%0D%0A'
+                //                         .'PROVEEDOR : '.$empresa_anti->NOM_EMPR.'%0D%0A'
+                //                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
+                //                         .'MENSAJE : '.$descripcion.'%0D%0A';
 
-                if(1==0){
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                }else{
-                    $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                }  
+                // if(1==0){
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                // }else{
+                //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
+                // }  
                 DB::commit();
                 Session::flash('operacion_id', $request['operacion_id']);
                 return Redirect::to('/gestion-de-contabilidad-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$lote.' OBSERVADO CON EXITO');
@@ -2423,21 +2423,21 @@ class GestionOCContabilidadController extends Controller
                                 ]
                             );
                 //LE LLEGA AL USUARIO DE CONTACTO
-                $empresa_anti       =   STDEmpresa::where('NRO_DOCUMENTO','=',$fedocumento->RUC_PROVEEDOR)->first();
-                $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
-                $mensaje            =   'COMPROBANTE REPARABLE: '.$fedocumento->ID_DOCUMENTO
-                                        .'%0D%0A'.'EMPRESA : '.Session::get('empresas')->NOM_EMPR.'%0D%0A'
-                                        .'PROVEEDOR : '.$empresa_anti->NOM_EMPR.'%0D%0A'
-                                        .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
-                                        .'MENSAJE : '.$descripcion.'%0D%0A';
+                // $empresa_anti       =   STDEmpresa::where('NRO_DOCUMENTO','=',$fedocumento->RUC_PROVEEDOR)->first();
+                // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+                // $mensaje            =   'COMPROBANTE REPARABLE: '.$fedocumento->ID_DOCUMENTO
+                //                         .'%0D%0A'.'EMPRESA : '.Session::get('empresas')->NOM_EMPR.'%0D%0A'
+                //                         .'PROVEEDOR : '.$empresa_anti->NOM_EMPR.'%0D%0A'
+                //                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
+                //                         .'MENSAJE : '.$descripcion.'%0D%0A';
 
-                //dd($trabajador);                        
-                if(1==0){
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                }else{
-                    $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                }  
+                // //dd($trabajador);                        
+                // if(1==0){
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                // }else{
+                //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
+                // }  
 
                 DB::commit();
                 Session::flash('operacion_id', 'ESTIBA');
@@ -2589,21 +2589,21 @@ class GestionOCContabilidadController extends Controller
                                 ]
                             );
                 //LE LLEGA AL USUARIO DE CONTACTO
-                $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
-                $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                $mensaje            =   'COMPROBANTE REPARABLE: '.$fedocumento->ID_DOCUMENTO
-                                        .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-                                        .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
-                                        .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
-                                        .'MENSAJE : '.$descripcion.'%0D%0A';
+                // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+                // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                // $mensaje            =   'COMPROBANTE REPARABLE: '.$fedocumento->ID_DOCUMENTO
+                //                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                //                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
+                //                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
+                //                         .'MENSAJE : '.$descripcion.'%0D%0A';
 
-                //dd($trabajador);                        
-                if(1==0){
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                }else{
-                    $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                }  
+                // //dd($trabajador);                        
+                // if(1==0){
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                // }else{
+                //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
+                // }  
 
                 DB::commit();
                 Session::flash('operacion_id', 'CONTRATO');
@@ -2725,21 +2725,21 @@ class GestionOCContabilidadController extends Controller
                 $documento->save();
 
                 //LE LLEGA AL USUARIO DE CONTACTO
-                $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
-                $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                $mensaje            =   'COMPROBANTE: '.$fedocumento->ID_DOCUMENTO
-                                        .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-                                        .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
-                                        .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
-                                        .'RECOMENDACION : '.$descripcion.'%0D%0A';
+                // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+                // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                // $mensaje            =   'COMPROBANTE: '.$fedocumento->ID_DOCUMENTO
+                //                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                //                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
+                //                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
+                //                         .'RECOMENDACION : '.$descripcion.'%0D%0A';
 
-                //dd($trabajador);                        
-                if(1==0){
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                }else{
-                    $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                }  
+                // //dd($trabajador);                        
+                // if(1==0){
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                // }else{
+                //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
+                // }  
 
                 DB::commit();
                 return Redirect::to('/gestion-de-contabilidad-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' RECOMENDACION CON EXITO');
@@ -2851,21 +2851,21 @@ class GestionOCContabilidadController extends Controller
                 $documento->save();
 
                 //LE LLEGA AL USUARIO DE CONTACTO
-                $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
-                $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                $mensaje            =   'COMPROBANTE: '.$fedocumento->ID_DOCUMENTO
-                                        .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-                                        .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
-                                        .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
-                                        .'RECOMENDACION : '.$descripcion.'%0D%0A';
+                // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+                // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                // $mensaje            =   'COMPROBANTE: '.$fedocumento->ID_DOCUMENTO
+                //                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                //                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
+                //                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
+                //                         .'RECOMENDACION : '.$descripcion.'%0D%0A';
 
-                //dd($trabajador);                        
-                if(1==0){
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                }else{
-                    $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                    $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                }  
+                // //dd($trabajador);                        
+                // if(1==0){
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                // }else{
+                //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
+                // }  
 
                 DB::commit();
 

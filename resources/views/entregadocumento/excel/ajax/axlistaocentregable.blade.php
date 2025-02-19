@@ -100,7 +100,7 @@
 		        <td><b>{{ number_format(round($item->MONTO_ANTICIPO_DESC, 4), 4, '.', ',') }}</b></td>
 		        <td><b>{{ number_format(round($item->MONTO_NC, 4), 4, '.', ',') }}</b></td>
 		        <td><b>
-		        	{{$simbolo}} {{number_format($funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO), 4, '.', ',')}}
+		        	{{$simbolo}} {{number_format($funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO), 2, '.', ',')}}
 			        @php $monto_total  = $monto_total + $funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO); @endphp
 			        </b>
 		        </td>
@@ -136,7 +136,7 @@
 			        <td><b>{{ number_format(round($item->MONTO_ANTICIPO_DESC, 4), 4, '.', ',') }}</b></td>
 			        <td><b>0.00</b></td>
 
-			        <td><b>{{$simbolo}} {{number_format($funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO), 4, '.', ',')}}</b></td>
+			        <td><b>{{$simbolo}} {{number_format($funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO), 2, '.', ',')}}</b></td>
 			        @php $monto_total  = $monto_total + $funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO); @endphp
 			    </tr>                     
 		    @endforeach
@@ -165,7 +165,7 @@
 		        <td></td>
 		        <td></td>
 		       	<td></td>
-		        <td><b>{{$simbolo}} {{number_format($monto_total, 4, '.', ',')}}</b></td>
+		        <td><b>{{$simbolo}} {{number_format($monto_total, 2, '.', ',')}}</b></td>
 		      </tr>                    
 		  </tfoot>
 		</table>
