@@ -153,7 +153,7 @@ class GestionEntregaDocumentoController extends Controller
 
         $operacion_id       =   'ORDEN_COMPRA';
 
-        $operacion_id       =   'CONTRATO';
+        //$operacion_id       =   'CONTRATO';
 
         //falta usuario contacto
         $array_contrato     =   $this->array_rol_contrato();
