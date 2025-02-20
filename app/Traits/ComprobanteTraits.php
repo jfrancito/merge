@@ -798,9 +798,10 @@ trait ComprobanteTraits
                                     ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
                                     ->distinct()
                                     ->select(DB::raw('FE_DOCUMENTO.TXT_NRO_CUENTA_BANCARIA,
-                                                    CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR,
-                                                    CMP.DOCUMENTO_CTBLE.TXT_EMPR_EMISOR,
+                                                    CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR COD_EMPR_CLIENTE,
+                                                    CMP.DOCUMENTO_CTBLE.TXT_EMPR_EMISOR TXT_EMPR_CLIENTE,
                                                     STD.EMPRESA.NRO_DOCUMENTO,
+                                                    FE_DOCUMENTO.ID_DOCUMENTO,
                                                     CAT_MONEDA.TXT_REFERENCIA AS TIPO_MONEDA,
                                                     CMP.CATEGORIA.CODIGO_SUNAT,
                                                     CAT_CUENTA.TXT_ABREVIATURA,
@@ -817,9 +818,38 @@ trait ComprobanteTraits
                                     ->groupBy('STD.EMPRESA.NRO_DOCUMENTO')
                                     ->groupBy('CMP.CATEGORIA.CODIGO_SUNAT')
                                     ->groupBy('CAT_MONEDA.TXT_REFERENCIA')
-                                    ->groupBy('CAT_CUENTA.TXT_ABREVIATURA');
+                                    ->groupBy('FE_DOCUMENTO.ID_DOCUMENTO')
+                                    ->groupBy('CAT_CUENTA.TXT_ABREVIATURA')
+                                    ->get();
 
-        $listadatos             =   $listadatos01->union($listadatos02)->get();
+
+
+                $listadatos02 = $listadatos02->groupBy(function ($item) {
+                    return $item->TXT_NRO_CUENTA_BANCARIA . '-' . $item->COD_EMPR_CLIENTE;
+                })->map(function ($group) {
+                    return (object) [
+                        'TXT_NRO_CUENTA_BANCARIA' => $group->first()->TXT_NRO_CUENTA_BANCARIA,
+                        'COD_EMPR_CLIENTE' => $group->first()->COD_EMPR_CLIENTE,
+                        'TXT_EMPR_CLIENTE' => $group->first()->TXT_EMPR_CLIENTE,
+                        'NRO_DOCUMENTO' => $group->first()->NRO_DOCUMENTO,
+                        'TIPO_MONEDA' => $group->first()->TIPO_MONEDA,
+                        'CODIGO_SUNAT' => $group->first()->CODIGO_SUNAT,
+                        'TXT_ABREVIATURA' => $group->first()->TXT_ABREVIATURA,
+                        'TOTAL' => $group->sum('TOTAL'),
+                        'TOTAL_PAGAR' => $group->sum('TOTAL_PAGAR'),
+                        'DETRACCION' => $group->sum('DETRACCION'),
+                    ];
+                })->values();
+
+
+        $listadatos01 = collect($listadatos01->get()); // Aseguramos que sea una colección
+        $listadatos02 = collect($listadatos02); // Ya es una colección después de ->groupBy()->map()
+
+        $listadatos = $listadatos01->merge($listadatos02);
+
+        //dd($listadatos);
+
+        //$listadatos             =   $listadatos01->union($listadatos02)->get();
 
         return  $listadatos;
 

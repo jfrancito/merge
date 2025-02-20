@@ -1424,6 +1424,7 @@ class GestionEntregaDocumentoController extends Controller
                 $npestania = substr($txt_banco, 0, 30);
 
 
+                //dd($listadocumento);
 
                 $excel->sheet($npestania, function($sheet) use ($item,$operacion_id,$folio,$empresa,$fedocumento,$listadocumento,$txt_banco,$countfedocu,$funcion){
 
