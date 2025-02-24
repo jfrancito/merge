@@ -88,14 +88,33 @@ class ReporteComprobanteController extends Controller
 
         }else{
 
-            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_contrato_excel($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id);
-            Excel::create($titulo.'-('.$fecha_actual.')', function($excel) use ($listadatos,$titulo,$funcion) {
-                $excel->sheet('CONTRATO', function($sheet) use ($listadatos,$titulo,$funcion) {
-                    $sheet->loadView('reporte/excel/listacomprobantemasivocontrato')->with('listadatos',$listadatos)
-                                                                       ->with('titulo',$titulo)
-                                                                       ->with('funcion',$funcion);                                               
-                });
-            })->export('xls');
+            if($operacion_id=='CONTRATO'){
+
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_contrato_excel($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id);
+                Excel::create($titulo.'-('.$fecha_actual.')', function($excel) use ($listadatos,$titulo,$funcion) {
+                    $excel->sheet('CONTRATO', function($sheet) use ($listadatos,$titulo,$funcion) {
+                        $sheet->loadView('reporte/excel/listacomprobantemasivocontrato')->with('listadatos',$listadatos)
+                                                                           ->with('titulo',$titulo)
+                                                                           ->with('funcion',$funcion);                                               
+                    });
+                })->export('xls');
+
+            }else{
+
+
+
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_estiba_excel($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$operacion_id);
+                Excel::create($titulo.'-('.$fecha_actual.')', function($excel) use ($listadatos,$titulo,$funcion,$operacion_id) {
+                    $excel->sheet($operacion_id, function($sheet) use ($listadatos,$titulo,$funcion,$operacion_id) {
+
+                        $sheet->loadView('reporte/excel/listacomprobantemasivoestiba')->with('listadatos',$listadatos)
+                                                                           ->with('titulo',$titulo)
+                                                                           ->with('funcion',$funcion);                                               
+                    });
+                })->export('xls');
+
+
+            } 
 
         }
 
