@@ -20,6 +20,8 @@ use App\Modelos\VMergeDocumentoActual;
 use App\Modelos\CMPDocAsociarCompra;
 use App\Modelos\WEBRol;
 use App\Modelos\FeRefAsoc;
+use App\Modelos\CONRegistroCompras;
+
 
 use App\Modelos\Estado;
 use App\Modelos\CMPDetalleProducto;
@@ -4386,6 +4388,8 @@ trait ComprobanteTraits
 
         $fecha_corte            =   date('Ymd');
 
+
+        //UPDATE SI TIENE NOTA DE CREDITO
         DB::statement("
             UPDATE FE_DOCUMENTO
             SET MONTO_NC = (
@@ -4419,6 +4423,106 @@ trait ComprobanteTraits
                     AND DOC.COD_CATEGORIA_ESTADO_DOC_CTBLE = 'EDC0000000000009'
             );
         ");
+
+
+        //DESCONTAR LA RETENCION DE IGV 
+        $documentosdetraccion = DB::select("
+                SELECT 
+                    FE.*,
+                    (
+                        SELECT SUM(DOC.CAN_TOTAL)
+                        FROM CMP.REFERENCIA_ASOC PR
+                        INNER JOIN CMP.REFERENCIA_ASOC PR2 
+                            ON PR.COD_TABLA_ASOC = PR2.COD_TABLA
+                            AND PR2.COD_TABLA_ASOC LIKE '%NC%' 
+                            AND PR2.COD_ESTADO = 1
+                        INNER JOIN CMP.DOCUMENTO_CTBLE DOC 
+                            ON PR2.COD_TABLA_ASOC = DOC.COD_DOCUMENTO_CTBLE
+                        WHERE PR.COD_TABLA = FE.ID_DOCUMENTO 
+                            AND PR.COD_TABLA_ASOC LIKE '%FC%' 
+                            AND PR.COD_ESTADO = 1
+                            AND OPERACION = 'ORDEN_COMPRA'
+                            AND ISNULL(FOLIO, '') = ''
+                            AND FE.COD_ESTADO = 'ETM0000000000005'
+                            AND DOC.COD_CATEGORIA_ESTADO_DOC_CTBLE = 'EDC0000000000009'
+                    ) AS MONTO_NC
+                FROM FE_DOCUMENTO FE
+                WHERE EXISTS (
+                    SELECT 1
+                    FROM CMP.REFERENCIA_ASOC PR
+                    INNER JOIN CMP.REFERENCIA_ASOC PR2 
+                        ON PR.COD_TABLA_ASOC = PR2.COD_TABLA
+                        AND PR2.COD_TABLA_ASOC LIKE '%NC%' 
+                        AND PR2.COD_ESTADO = 1
+                    INNER JOIN CMP.DOCUMENTO_CTBLE DOC 
+                        ON PR2.COD_TABLA_ASOC = DOC.COD_DOCUMENTO_CTBLE
+                    WHERE PR.COD_TABLA = FE.ID_DOCUMENTO 
+                        AND PR.COD_TABLA_ASOC LIKE '%FC%' 
+                        AND PR.COD_ESTADO = 1
+                        AND OPERACION = 'ORDEN_COMPRA'
+                        AND ISNULL(FOLIO, '') = ''
+                        AND FE.COD_ESTADO = 'ETM0000000000005'
+                        AND DOC.COD_CATEGORIA_ESTADO_DOC_CTBLE = 'EDC0000000000009'
+                ) AND FE.MONTO_RETENCION > 0;
+            ");
+        //dd($documentosdetraccion);
+        foreach($documentosdetraccion as $index => $item){
+
+            $retencionigv = (float)($item->TOTAL_VENTA_ORIG-$item->MONTO_NC)*(3/100);
+            //FE_DOCUMENTO
+            FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
+                        ->update(
+                            [
+                                'MONTO_RETENCION'=>$retencionigv
+                            ]
+                        );
+            //OC
+            CMPOrden::where('COD_ORDEN','=',$item->ID_DOCUMENTO)
+                        ->update(
+                            [
+                                'CAN_RETENCION'=>$retencionigv,
+                                'CAN_NETO_PAGAR' => \DB::raw('CAN_TOTAL - ' . $retencionigv)
+                            ]
+                        );
+
+
+
+            $documento02      =     DB::table('CMP.DOCUMENTO_CTBLE')
+                                    ->join('CMP.REFERENCIA_ASOC', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+                                    ->select(DB::raw('CMP.DOCUMENTO_CTBLE.*'))
+                                    ->where('CMP.DOCUMENTO_CTBLE.COD_ESTADO','=','1')
+                                    ->where('CMP.REFERENCIA_ASOC.COD_ESTADO','=','1')
+                                    ->where('CMP.REFERENCIA_ASOC.COD_TABLA','=',$item->ID_DOCUMENTO)
+                                    ->whereIn('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_DOC', [
+                                        'TDO0000000000001',
+                                        'TDO0000000000003',
+                                        'TDO0000000000002'
+                                    ])->first();
+
+            if(count($documento02)>0){
+                CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$documento02->COD_DOCUMENTO_CTBLE)
+                            ->update(
+                                [
+                                    'CAN_RETENCION'=>$retencionigv,
+                                    'CAN_DCTO'=>3
+                                ]
+                            );
+                CONRegistroCompras::where('COD_DOCUMENTO_CTBLE','=',$documento02->COD_DOCUMENTO_CTBLE)
+                            ->update(
+                                [
+                                    'CAN_RETENCION_MONTO'=>$retencionigv,
+                                    'CAN_RETENCION_PORCENTAJE'=>3
+                                ]
+                            );
+            }
+        }
+
+        ////////////////////////////////////
+
+
+
+
+
 
         $rol                    =   WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 

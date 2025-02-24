@@ -319,7 +319,7 @@ $(document).ready(function(){
 
                     setTimeout(function() {
                        cerrarcargando();
-                    }, 6000);
+                    }, 8000);
  
                 },
                 cancelar: function () {
@@ -371,7 +371,7 @@ $(document).ready(function(){
 
                     setTimeout(function() {
                        cerrarcargando();
-                    }, 6000);
+                    }, 8000);
  
                 },
                 cancelar: function () {
@@ -425,7 +425,7 @@ $(document).ready(function(){
 
                     setTimeout(function() {
                        cerrarcargando();
-                    }, 6000);
+                    }, 8000);
  
                 },
                 cancelar: function () {

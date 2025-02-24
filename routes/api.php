@@ -17,9 +17,11 @@ Route::get('/resultado-api-precios', 'DocumentoApiController@actionBuscarPrecio'
 
 
 Route::post('/api-openai-lectura-guias', 'DocumentoApiController@actionOpenAILecturaGuias');
+Route::post('/api-regex-guias', 'DocumentoApiController@actionRegexGuias');
+
 Route::get('/api-deepseek-lectura-guias', 'DocumentoApiController@actionDeepseekLecturaGuias');
 Route::get('/api-paddleocr-deepseek-guias', 'DocumentoApiController@actionDeepseekPaddleocrGuias');
 Route::get('/api-paddleocr-huggingface-guias', 'DocumentoApiController@actionDeepseekHuggingfaceGuias');
-Route::get('/api-regex-guias', 'DocumentoApiController@actionRegexGuias');
+
 
 
