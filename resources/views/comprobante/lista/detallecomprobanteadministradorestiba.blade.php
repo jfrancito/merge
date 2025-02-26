@@ -68,7 +68,8 @@
             </div>
             <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
               <div class="panel panel-default panel-contrast">
-                <div class="panel-heading" style="background: #1d3a6d;color: #fff;">DOCUMENTOS ASOCIADOS ({{$documento_asociados->sum('CAN_TOTAL')}})
+                <div class="panel-heading" style="background: #1d3a6d;color: #fff;">DOCUMENTOS ASOCIADOS 
+                  {{number_format($documento_asociados->sum('CAN_TOTAL'), 2, '.', ',')}}
                 </div>
                 <div class="panel-body panel-body-contrast">
 
@@ -89,7 +90,7 @@
                             <td>{{$item->COD_DOCUMENTO_CTBLE}}</td>
                             <td>{{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</td>
                             <td>{{$item->TXT_EMPR_EMISOR}}</td>
-                            <td>{{number_format($item->CAN_TOTAL, 4, '.', ',')}}</td>
+                            <td>{{number_format($item->CAN_TOTAL, 2, '.', ',')}}</td>
                           </tr>
                         @endforeach
                     </tbody>
