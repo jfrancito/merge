@@ -2450,8 +2450,15 @@ class GestionOCController extends Controller
         if($ordencompra_n->IND_VARIAS_ENTREGAS == 1){
             return Redirect::to('detalle-comprobante-oc-administrator-sin-xml/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra);
         }
+        //TICKET
+        $comprobantesinxmlt     =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                                    ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000035')
+                                    ->where('COD_ESTADO','=','1')
+                                    ->first();
 
-
+        if(count($comprobantesinxmlt)>0){
+            return Redirect::to('detalle-comprobante-oc-administrator-sin-xml/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra);
+        }
 
 
         View::share('titulo','REGISTRO DE COMPROBANTE OC: '.$idoc);
