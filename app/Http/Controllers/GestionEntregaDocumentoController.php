@@ -176,8 +176,6 @@ class GestionEntregaDocumentoController extends Controller
         $moneda_id          =   'MON0000000000001';
 
 
-
-
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_entregable($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$moneda_id);
         }else{

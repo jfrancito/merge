@@ -1,30 +1,30 @@
 
 $(document).ready(function(){
 
-$(".be-content").on('click','.checkbox_asignar', function() {
+    $(".be-content").on('click','.checkbox_asignar', function() {
 
-    var input   = $(this).siblings('.input_asignar');
-    var accion  = $(this).attr('data-atr');
+        var input   = $(this).siblings('.input_asignar');
+        var accion  = $(this).attr('data-atr');
 
-    var name    = $(this).attr('name');
-    var check   = -1;
-    var estado  = -1;
-    
-    console.log("check");
+        var name    = $(this).attr('name');
+        var check   = -1;
+        var estado  = -1;
+        
+        console.log("check");
 
-    if($(input).is(':checked')){
+        if($(input).is(':checked')){
 
-        check   = 0;
-        estado  = false;
+            check   = 0;
+            estado  = false;
 
-    }else{
+        }else{
 
-        check   = 1;
-        estado  = true;
+            check   = 1;
+            estado  = true;
 
-    }
-    validarrelleno(accion,name,estado,check);
-});
+        }
+        validarrelleno(accion,name,estado,check);
+    });
 
 });
 

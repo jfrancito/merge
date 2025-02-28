@@ -4618,6 +4618,20 @@ trait ComprobanteTraits
                         AND DOC.COD_CATEGORIA_ESTADO_DOC_CTBLE = 'EDC0000000000009'
                 ) AND FE.MONTO_RETENCION > 0;
             ");
+
+
+        //RENTA DE CUARTA CATEGORIA
+
+        DB::table('FE_DOCUMENTO')
+            ->join('CMP.ORDEN', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.ORDEN.COD_ORDEN')
+            ->where('CMP.ORDEN.CAN_IMPUESTO_RENTA', '>', 0)
+            ->whereColumn('FE_DOCUMENTO.TOTAL_VENTA_ORIG', '<>', 'CMP.ORDEN.CAN_TOTAL')
+            ->update([
+                'FE_DOCUMENTO.TOTAL_VENTA_ORIG' => DB::raw('CMP.ORDEN.CAN_TOTAL')
+            ]);
+
+        
+
         //dd($documentosdetraccion);
         foreach($documentosdetraccion as $index => $item){
 
