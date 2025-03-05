@@ -207,6 +207,13 @@ class CpeController extends Controller {
 									          $correlativo . '.zip';
 			$respuetacdr 				=	$this->buscar_archivo_sunat_local($urlxml);
 
+			if (Session::has('respuetaxml')) {
+			    Session::forget('respuetaxml');
+			    Session::forget('respuetapdf');
+			    Session::forget('respuetacdr');
+			}
+
+
 			Session::put('respuetaxml', $respuetaxml);
 			Session::put('respuetapdf', $respuetapdf);
 			Session::put('respuetacdr', $respuetacdr);

@@ -65,6 +65,9 @@
   <script src="{{ asset('public/js/general/gmeta.js?v='.$version) }}" type="text/javascript"></script> 
   @yield('script')
  
+
+
+ 
 </body>
 
 </html>

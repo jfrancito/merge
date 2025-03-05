@@ -70,6 +70,12 @@
     <script src="{{ asset('public/js/general/gmeta.js?v='.$version) }}" type="text/javascript"></script>
     <script src="{{ asset('public/js/general/jquery-confirm.min.js?v='.$version) }}" type="text/javascript"></script>
     @yield('script')
-
+    <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
+<!--     <script type="module">
+      import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+      createChat({
+        webhookUrl: 'http://localhost:5678/webhook/b716d80a-c305-4b4b-98c1-e61e5f2c77c7/chat'
+      });
+    </script> -->
   </body>
 </html>
