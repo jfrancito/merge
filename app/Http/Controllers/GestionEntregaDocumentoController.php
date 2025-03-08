@@ -24,6 +24,7 @@ use App\Modelos\WEBRol;
 use App\Modelos\DeudaTotalMerge;
 use App\Modelos\CMPDocumentoCtble;
 use App\Modelos\CONRegistroCompras;
+use App\Modelos\CMPDetalleProducto;
 
 
 use Greenter\Parser\DocumentParserInterface;
@@ -196,7 +197,7 @@ class GestionEntregaDocumentoController extends Controller
                                             ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
                                             ->first();
 
-        $funcion        =   $this;
+        $funcion                        =   $this;
         return View::make('entregadocumento/listaentregadocumento',
                          [
                             'listadatos'        =>  $listadatos,
@@ -1950,6 +1951,33 @@ class GestionEntregaDocumentoController extends Controller
     }
 
 
+    public function actionModalDetalleDocumentoPagos(Request $request)
+    {
+
+        $data_doc               =   $request['data_doc'];
+
+        $referencias = DB::table('CMP.REFERENCIA_ASOC')
+            ->where('COD_TABLA', $data_doc)
+            ->where('COD_ESTADO', 1)
+            ->where(function($query) {
+                $query->where('COD_TABLA_ASOC', 'like', '%RH%')
+                      ->orWhere('COD_TABLA_ASOC', 'like', '%FC%');
+            })
+            ->first();
+        $detalledocumento       =   CMPDetalleProducto::where('COD_TABLA','=',$referencias->COD_TABLA_ASOC)
+                                    ->where('COD_ESTADO','=',1)
+                                    ->get();
+
+        $funcion        =   $this;
+        return View::make('comprobante/modal/ajax/mdetalledocumento',
+                         [
+                            'detalledocumento'          =>  $detalledocumento,
+                            'data_doc'                  =>  $data_doc,
+                            'ajax'                      =>  true,
+                         ]);
+
+
+    }
 
 
 

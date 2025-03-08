@@ -32,7 +32,8 @@
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>NRO OC : </b> {{$item->COD_ORDEN}}  </span>
           <span><b>PROVEEDOR  :</b> {{$item->TXT_EMPR_CLIENTE}}</span>
-          <span><b>COMPROBANTE ASOCIADO : </b> {{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</span>
+          <p style="margin-bottom: 1px;"><b>COMPROBANTE ASOCIADO : </b> {{$item->NRO_SERIE}} - {{$item->NRO_DOC}} 
+            <span style="display: inline;color: #34a853;cursor: pointer;font-size: 18px;" class="mdi mdi-eye mdidetdoc" data_doc="{{$item->COD_ORDEN}}"></span> </p>
           <span><b>USUARIO CONTACTO : </b> {{$item->TXT_CONTACTO}}</span>
           <span><b>FECHA VENCIMIENTO DOC: </b> {{date_format(date_create($item->FEC_VENCIMIENTO), 'd-m-Y h:i:s')}}  </span>
           <span><b>FECHA APROBACION ADMIN  :</b>{{date_format(date_create($item->fecha_ap), 'd-m-Y h:i:s')}}</span>

@@ -2,6 +2,22 @@ $(document).ready(function(){
 
     var carpeta = $("#carpeta").val();
 
+    $(".cfedocumento").on('click','.mdidetdoc', function(e) {
+        var _token                  =   $('#token').val();
+        var idopcion                =   $('#idopcion').val();
+        const data_doc              =   $(this).attr('data_doc');
+
+        data                        =   {
+                                            _token                  : _token,
+                                            data_doc                : data_doc
+                                        };
+        ajax_modal(data,"/ajax-detalle-documento-pagos",
+                  "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+
+
+    });
+
+
     $(".cfedocumento").on('click','.mdisel', function(e) {
         var _token                  =   $('#token').val();
         var idopcion                =   $('#idopcion').val();
