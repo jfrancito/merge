@@ -316,16 +316,6 @@
 
 
                             </div>
-
-                                  <div class="row" style="margin-top:15px;margin-left: 27px;">
-                                      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 cajareporte">
-                                          <label for="carnetextranjeriacheck"><b>¿Esta Cuenta esta asociada a un carnet de extranjeria y es SI INGRESE LA CUENTA DE EXTRANJERIA?</b></label>
-                                          <br>
-                                          <input type="text" name="carnetextranjeria" style="width:250px;margin-top: 5px;" id='carnetextranjeria' class="form-control control input-sm cuentanumero">
-                                      </div>
-
-                                    
-                                  </div>
                             
                     </div>
                   </div>

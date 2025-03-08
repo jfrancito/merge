@@ -81,6 +81,19 @@
 		              </div>
 		        </div>
 
+		        <div class="col-lg-12">
+		              <div class="form-group">
+		                <label class="col-sm-12 control-label labelleft negrita" >¿Esta Cuenta esta asociada a un carnet de extranjeria y es SI INGRESE EL CARNET DE EXTRANJERIA?</label>
+		                <div class="col-sm-12 abajocaja" >
+
+                        <input  type="text"
+                                id="carnetextranjeria" name='carnetextranjeria' value="" placeholder="CARNET DE EXTRANJERIA"
+                                autocomplete="off" class="form-control input-sm cuentanumero" data-aw="4"/>
+		                </div>
+		              </div>
+		        </div>
+
+
 		        
 				</div>
 		    </div>

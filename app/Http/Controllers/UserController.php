@@ -364,6 +364,8 @@ class UserController extends Controller {
 		$moneda_id 	 		 						= 	$request['moneda_id'];
 		$numerocuenta 	 		 					= 	$request['numerocuenta'];
 		$numerocuentacci 	 		 				= 	$request['numerocuentacci'];
+		$carnetextranjeria 	 		 				= 	$request['carnetextranjeria'];
+
 		$banco 										=	CMPCategoria::where('COD_CATEGORIA','=',$banco_id)->first();
 		$tipocuenta 								=	CMPCategoria::where('COD_CATEGORIA','=',$tipocuenta_id)->first();
 		$moneda 									=	CMPCategoria::where('COD_CATEGORIA','=',$moneda_id)->first();
@@ -399,6 +401,7 @@ class UserController extends Controller {
 		$cuentabancaria->COD_USUARIO_CREA_AUD 		=   Session::get('usuario')->id;
 		$cuentabancaria->FEC_USUARIO_CREA_AUD 		=   $this->fechaactual;
 		$cuentabancaria->COD_ESTADO 				=   1;
+		$cuentabancaria->CARNET_EXTRANJERIA 		=   $carnetextranjeria;
 		$cuentabancaria->COD_CUENTA_CONTABLE 		=   '';
 		$cuentabancaria->TXT_CUENTA_CONTABLE 		=   '';
 		$cuentabancaria->save();
