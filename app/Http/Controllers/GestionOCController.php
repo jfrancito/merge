@@ -3764,7 +3764,7 @@ class GestionOCController extends Controller
 
 
 
-
+                $carnetextranjeria     =   $request['carnetextranjeria'];
 
 
                 FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
@@ -3780,7 +3780,7 @@ class GestionOCController extends Controller
                                     'COD_ANTICIPO'=>$COD_ANTICIPO,
                                     'SERIE_ANTICIPO'=>$SERIE_ANTICIPO,
                                     'NRO_ANTICIPO'=>$NRO_ANTICIPO,
-
+                                    'CARNET_EXTRANJERIA'=>$carnetextranjeria,
 
                                     'CTA_DETRACCION'=>$ctadetraccion,
                                     'MONTO_DETRACCION_XML'=>$monto_detraccion,
@@ -4395,9 +4395,7 @@ class GestionOCController extends Controller
                     }
                 }
 
-
-
-                //dd($MONTO_ANTICIPO_DESC);
+                $carnetextranjeria     =   $request['carnetextranjeria'];
                 
                 FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(
@@ -4414,7 +4412,7 @@ class GestionOCController extends Controller
                                     'COD_ANTICIPO'=>$COD_ANTICIPO,
                                     'SERIE_ANTICIPO'=>$SERIE_ANTICIPO,
                                     'NRO_ANTICIPO'=>$NRO_ANTICIPO,
-
+                                    'CARNET_EXTRANJERIA'=>$carnetextranjeria,
 
                                     'COD_CATEGORIA_BANCO'=>$bancocategoria->COD_CATEGORIA,
                                     'TXT_CATEGORIA_BANCO'=>$bancocategoria->NOM_CATEGORIA,

@@ -72,7 +72,7 @@
       //initialize the javascript
       App.init();
       App.formElements();
-      App.dataTables();
+
       $('[data-toggle="tooltip"]').tooltip();
       $('form').parsley();
 
