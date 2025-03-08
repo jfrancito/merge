@@ -43,7 +43,7 @@
 
 
 
-<table id="nso" class="table table-striped table-borderless table-hover td-color-borde td-padding-7 listatabla">
+<table id="estiba" class="table table-striped table-borderless table-hover td-color-borde td-padding-7 listatabla">
   <thead>
     <tr>
       <th>ITEM</th>
@@ -59,7 +59,19 @@
       <th>ESTADO</th>
       <th>LOTE</th>
 
-      <th>OPCION</th>
+      <th>
+        <div class="text-center be-checkbox be-checkbox-sm has-primary">
+          <input  type="checkbox"
+                  class="todo_asignar input_asignar"
+                  id="todo_asignar"
+          >
+          <label  for="todo_asignar"
+                  data-atr = "todas_asignar"
+                  class = "checkbox_asignar"
+                  name="todo_asignar"
+            ></label>
+        </div>
+      </th>
     </tr>
   </thead>
   <tbody>

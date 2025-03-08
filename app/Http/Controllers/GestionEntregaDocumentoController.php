@@ -570,7 +570,7 @@ class GestionEntregaDocumentoController extends Controller
 
                     $sheet->setSelectedCells('C1');
 
-                    $sheet->setWidth('A', 20);
+                    $sheet->setWidth('A', 8);
                     $sheet->setWidth('B', 20);
                     $sheet->setWidth('C', 20);
                     $sheet->setWidth('D', 40);
@@ -610,7 +610,7 @@ class GestionEntregaDocumentoController extends Controller
             if($folio->COD_CATEGORIA_MONEDA=='MON0000000000002' or $folio->COD_CATEGORIA_MONEDA==''){
                 $excel->sheet('Dolares', function($sheet) use ($listadatosdolar,$listadatosdolarotro,$operacion_id,$funcion,$folio,$empresa){
 
-                    $sheet->setWidth('A', 20);
+                    $sheet->setWidth('A', 8);
                     $sheet->setWidth('B', 20);
                     $sheet->setWidth('C', 20);
                     $sheet->setWidth('D', 40);

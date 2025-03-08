@@ -81,6 +81,16 @@ var App = (function () {
             "<'row be-datatable-footer'<'col-sm-5'i><'col-sm-7'p>>"
     });
 
+
+    $("#estiba").dataTable({
+        dom: 'Bfrtip',
+        buttons: [
+            'csv', 'excel', 'pdf'
+        ],
+        "lengthMenu": [[500, 1000, -1], [500, 1000, "All"]]
+    });
+
+
     //Enable toolbar button functions
     $("#table3").dataTable({
       buttons: [

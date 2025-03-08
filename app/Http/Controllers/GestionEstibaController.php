@@ -694,15 +694,20 @@ class GestionEstibaController extends Controller
         $usuario                =   SGDUsuario::where('COD_TRABAJADOR','=',Session::get('usuario')->usuarioosiris_id)->first();
 
 
+
+
         $banco_id               =   '';
         if(count($fedocumento)>0){
 
             $detallefedocumento =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
             $tiposerie          =   substr($fedocumento->SERIE, 0, 1);
             $empresa            =   STDEmpresa::where('NRO_DOCUMENTO','=',$fedocumento->RUC_PROVEEDOR)->first();
-            //dd($fedocumento);
-
-            $combopagodetraccion    =   array('' => "Seleccione Pago Detraccion",Session::get('empresas')->COD_EMPR => Session::get('empresas')->NOM_EMPR , $empresa->COD_EMPR => $empresa->NOM_EMPR);
+            
+            if(count($empresa)>0){
+                $combopagodetraccion    =   array('' => "Seleccione Pago Detraccion",Session::get('empresas')->COD_EMPR => Session::get('empresas')->NOM_EMPR , $empresa->COD_EMPR => $empresa->NOM_EMPR);
+            }else{
+                $combopagodetraccion    =   array('' => "Seleccione Pago Detraccion");
+            }
 
 
             //EMPRESA RELACIONADA
@@ -795,12 +800,7 @@ class GestionEstibaController extends Controller
 
         }
         $comboant               =   array('' => "Seleccione Anticipo")+$arrayitem;
-
-
-
-
-
-
+        
         return View::make('comprobante/registrocomprobanteestibaadministrator',
                          [
                             'monto_anticipo'        =>  $monto_anticipo,
