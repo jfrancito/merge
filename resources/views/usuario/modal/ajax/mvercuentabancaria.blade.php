@@ -11,28 +11,35 @@
       <table class="table table-striped table-borderless">
         <thead>
           <tr>
-            <th>Banco</th>
-            <th>Tipo Cuenta</th>
-            <th>Moneda</th>
-            <th>Nro. Cuenta</th>
-            <th>Nro. CCI</th>
+            <th>INFORMACION</th>
+            <th>CUENTA BANCARIA</th>
+            @if (isset($idopcion)) {
+            <th>OPERACION</th> 
+            @endif
           </tr>
         </thead>
         <tbody class="no-border-x">
-
           @foreach($cuentabancarias as $index => $item)
               <tr>
-                <td>{{$item->TXT_EMPR_BANCO}}</td>
-                <td>{{$item->TXT_REFERENCIA}}</td>
-                <td>{{$item->TXT_CATEGORIA_MONEDA}}</td>
-                <td>{{$item->TXT_NRO_CUENTA_BANCARIA}}</td>
-                <td>{{$item->TXT_NRO_CCI}}</td>
+                <td class="cell-detail sorting_1" style="position: relative;">
+                  <span><b>BANCO :  </b> {{$item->TXT_EMPR_BANCO}}</span>
+                  <span><b>TIPO CUENTA  : </b> {{$item->TXT_REFERENCIA}}</span>
+                  <span><b>MONEDA : </b> {{$item->TXT_CATEGORIA_MONEDA}}</span>
+                </td>
+                <td class="cell-detail sorting_1" style="position: relative;">
+                  <span><b>NRO CUENTA BANCARIA :  </b> {{$item->TXT_NRO_CUENTA_BANCARIA}}</span>
+                  <span><b>CCI  : </b> {{$item->TXT_NRO_CCI}}</span>
+                  <span><b>CARNET EXTRANJERIA : </b> {{$item->CARNET_EXTRANJERIA}}</span>
+                </td>
+                @if (isset($idopcion)) {
+                  <td>
+                    <a href="{{ url('/cambiar-cuenta-corriente/'.$item->COD_EMPR_TITULAR.'/'.$item->COD_EMPR_BANCO.'/'.$item->TXT_NRO_CUENTA_BANCARIA.'/'.$item->COD_CATEGORIA_MONEDA.'/'.$idoc.'/'.$idopcion) }}" class="tools select"> <span class="label label-success">CAMBIAR CUENTA</span></a>
+                  </td>
+                @endif
+                
+
               </tr>
-
           @endforeach
-
-
-
         </tbody>
       </table>
 

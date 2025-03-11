@@ -184,6 +184,8 @@ class UserController extends Controller {
 
         $prefijo_id             =   $request['prefijo_id'];
         $orden_id               =   $request['orden_id'];
+        $idopcion               =   $request['idopcion'];
+
         $idoc                   =   $this->funciones->decodificarmaestraprefijo($orden_id,$prefijo_id);
         $ordencompra          	=   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
         $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc($idoc);
@@ -193,13 +195,48 @@ class UserController extends Controller {
 									->orderby('TXT_EMPR_BANCO','ASC')
 								  	->get();
 
+
+
 		return View::make('usuario/modal/ajax/mvercuentabancaria',
 						 [		 	
 
-						 	'cuentabancarias' 				=> $cuentabancarias,					 	
+						 	'cuentabancarias' 				=> $cuentabancarias,
+						 	'idoc' 							=> $idoc,
+						 	'idopcion' 						=> $idopcion,
 						 	'ajax' 							=> true,						 	
 						 ]);
 	}
+
+
+	public function actionCambiarCuentaCorriente($empresa_id,$banco_id,$nro_cuenta,$moneda_id,$idoc,$idopcion)
+	{
+		$cuentabancarias 		= 	TESCuentaBancaria::where('COD_EMPR_TITULAR','=',$empresa_id)
+									->where('COD_EMPR_BANCO','=',$banco_id)
+									->where('TXT_NRO_CUENTA_BANCARIA','=',$nro_cuenta)
+									->where('COD_CATEGORIA_MONEDA','=',$moneda_id)
+								  	->first();
+
+		if(count($cuentabancarias)>0){
+
+                FeDocumento::where('ID_DOCUMENTO',$idoc)
+                            ->update(
+                                [
+                                    'COD_CATEGORIA_BANCO'=>$cuentabancarias->COD_EMPR_BANCO,
+                                    'TXT_CATEGORIA_BANCO'=>$cuentabancarias->TXT_EMPR_BANCO,
+                                    'TXT_NRO_CUENTA_BANCARIA'=>$cuentabancarias->TXT_NRO_CUENTA_BANCARIA,
+                                    'CARNET_EXTRANJERIA'=>$cuentabancarias->CARNET_EXTRANJERIA
+                                ]
+                            );
+
+		}						  	
+
+
+
+		return Redirect::to('gestion-de-entrega-documentos/'.$idopcion)->with('bienhecho', 'Se realizo la modificacion de la cuenta bancaria '.$idoc);
+
+
+	}
+
 
 
 	public function actionAjaxModalVerCuentaBancariaEstiba(Request $request)

@@ -26,7 +26,9 @@
   <tbody>
 
     @foreach($listadatos as $index => $item)
-      <tr data_requerimiento_id = "{{$item->COD_ORDEN}}"
+      <tr 
+        data_requerimiento_id = "{{$item->COD_ORDEN}}"
+        class="toptable" 
         >
         <td>{{$index + 1}}</td>
         <td class="cell-detail sorting_1" style="position: relative;">
@@ -38,12 +40,26 @@
           <span><b>FECHA VENCIMIENTO DOC: </b> {{date_format(date_create($item->FEC_VENCIMIENTO), 'd-m-Y h:i:s')}}  </span>
           <span><b>FECHA APROBACION ADMIN  :</b>{{date_format(date_create($item->fecha_ap), 'd-m-Y h:i:s')}}</span>
           <span><b>MONEDA  :</b>{{$item->TXT_CATEGORIA_MONEDA}}</span>
+          <div class="tools ver_cuenta_bancaria_oc select" 
+            data_prefijo_id = "{{substr($item->COD_ORDEN, 0,6)}}"
+            data_orden_id = "{{Hashids::encode(substr($item->COD_ORDEN, -10))}}"
+            style="cursor: pointer;width: 100px;margin-bottom: 12px;"> 
+            <span class="label label-success">Ver Cuenta</span>
+          </div>
+          <div class="tools agregar_cuenta_bancaria_oc select" 
+            data_prefijo_id = "{{substr($item->COD_ORDEN, 0,6)}}"
+            data_orden_id = "{{Hashids::encode(substr($item->COD_ORDEN, -10))}}"
+            style="cursor: pointer;width: 100px;"> 
+            <span class="label label-success">Agregar Cuenta</span>
+          </div>
 
         </td>
 
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>TIPO: </b> {{$item->IND_MATERIAL_SERVICIO}}  </span>
           <span><b>BANCO  :</b>{{$item->TXT_BANCO}}</span>
+          <span><b>CUENTA  :</b>{{$item->TXT_NRO_CUENTA_BANCARIA}}</span>
+
           <span><b>SUBIO VOUCHER  :</b>
             @IF($item->COD_ESTADO_VOUCHER == 'ETM0000000000008')
               SI

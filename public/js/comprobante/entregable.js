@@ -2,6 +2,65 @@ $(document).ready(function(){
 
     var carpeta = $("#carpeta").val();
 
+    $(".cfedocumento").on('click','.agregar_cuenta_bancaria_oc', function() {
+
+        var _token                  =   $('#token').val();
+        var idopcion                =   $('#idopcion').val();
+        const prefijo_id            =   $(this).attr('data_prefijo_id');
+        const orden_id              =   $(this).attr('data_orden_id');
+        var isChecked = $(this).parents(".toptable").find('.selectfolio').prop('checked');
+
+        if (isChecked) {
+             alerterrorajax("Tiene que liberar del folio"); 
+        } else {
+            data                        =   {
+                                                _token                  : _token,
+                                                prefijo_id              : prefijo_id,
+                                                orden_id                : orden_id,
+                                                idopcion                : idopcion,
+
+                                            };
+
+            ajax_modal(data,"/ajax-modal-configuracion-cuenta-bancaria-oc",
+                      "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+        }
+
+
+
+
+
+    });
+
+    $(".cfedocumento").on('click','.ver_cuenta_bancaria_oc', function() {
+
+        var _token                  =   $('#token').val();
+        const prefijo_id            =   $(this).attr('data_prefijo_id');
+        const orden_id              =   $(this).attr('data_orden_id');
+        var idopcion                =   $('#idopcion').val();
+
+        var isChecked = $(this).parents(".toptable").find('.selectfolio').prop('checked');
+
+        if (isChecked) {
+            alerterrorajax("Tiene que liberar del folio"); 
+        } else {
+            debugger;
+            data                        =   {
+                                                _token                  : _token,
+                                                prefijo_id              : prefijo_id,
+                                                orden_id                : orden_id,
+                                                idopcion                : idopcion,
+                                            };
+
+            ajax_modal(data,"/ajax-modal-ver-cuenta-bancaria-oc",
+                      "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+        }
+
+
+
+    });
+
+
+
     $(".cfedocumento").on('click','.mdidetdoc', function(e) {
         var _token                  =   $('#token').val();
         var idopcion                =   $('#idopcion').val();
