@@ -61,7 +61,16 @@ trait ComprobanteTraits
         return $id;
     }   
 
+    public function con_usuarios_cambio_cuenta() {
+        $sw = 0;
+        $array = ['1CIX00000217','1CIX00000001'];
+        $valor = Session::get('usuario')->id;
 
+        if (in_array($valor, $array)) {
+            $sw = 1;
+        } 
+        return $sw;
+    } 
 
 
 

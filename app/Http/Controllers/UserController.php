@@ -218,6 +218,10 @@ class UserController extends Controller {
 
 		if(count($cuentabancarias)>0){
 
+
+				$fe_documento   =    FeDocumento::where('ID_DOCUMENTO','=',$idoc)->first();
+
+
                 FeDocumento::where('ID_DOCUMENTO',$idoc)
                             ->update(
                                 [
@@ -227,6 +231,17 @@ class UserController extends Controller {
                                     'CARNET_EXTRANJERIA'=>$cuentabancarias->CARNET_EXTRANJERIA
                                 ]
                             );
+
+                $documento                              =   new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $fe_documento->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM              =   $fe_documento->DOCUMENTO_ITEM;
+                $documento->FECHA                       =   $this->fechaactual;
+                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                $documento->TIPO                        =   'CAMBIO DE CUENTA BANCARIA '.$fe_documento->TXT_NRO_CUENTA_BANCARIA.' POR '.$cuentabancarias->TXT_NRO_CUENTA_BANCARIA;
+                $documento->MENSAJE                     =   '';
+                $documento->save();
+
 
 		}						  	
 

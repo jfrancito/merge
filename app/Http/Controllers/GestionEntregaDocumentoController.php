@@ -244,7 +244,7 @@ class GestionEntregaDocumentoController extends Controller
         $area_id        =   $request['area_id'];
         $banco_id        =   $request['banco_id'];
 
-
+        $permiso_editar_cuenta         =   $this->con_usuarios_cambio_cuenta();
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
 
         if($operacion_id=='ORDEN_COMPRA'){
@@ -269,6 +269,7 @@ class GestionEntregaDocumentoController extends Controller
 
         return View::make('entregadocumento/ajax/mergelistaentregable',
                          [
+                            'permiso_editar_cuenta' =>  $permiso_editar_cuenta,
                             'fecha_inicio'          =>  $fecha_inicio,
                             'entregable_sel'        =>  $entregable_sel,
                             'fecha_fin'             =>  $fecha_fin,
@@ -372,6 +373,9 @@ class GestionEntregaDocumentoController extends Controller
             return Redirect::to('gestion-de-entrega-documentos/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
         }
 
+        $permiso_editar_cuenta         =   $this->con_usuarios_cambio_cuenta();
+
+
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_entregable($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$fedocumento_encontro->COD_CATEGORIA_BANCO);
         }else{
@@ -387,6 +391,7 @@ class GestionEntregaDocumentoController extends Controller
 
         return View::make('entregadocumento/ajax/mergelistaentregable',
                          [
+                            'permiso_editar_cuenta' =>  $permiso_editar_cuenta,
                             'fecha_inicio'          =>  $fecha_inicio,
                             'fecha_fin'             =>  $fecha_fin,
                             'empresa_id'            =>  $empresa_id,
