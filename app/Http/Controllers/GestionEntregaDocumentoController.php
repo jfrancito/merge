@@ -175,7 +175,7 @@ class GestionEntregaDocumentoController extends Controller
         $array_canjes       =   $this->con_array_canjes();
         $combo_moneda       =   $this->gn_generacion_combo_categoria('MONEDA','Seleccione moneda','');
         $moneda_id          =   'MON0000000000001';
-
+        $permiso_editar_cuenta         =   $this->con_usuarios_cambio_cuenta();
 
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_entregable($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$moneda_id);
@@ -202,6 +202,8 @@ class GestionEntregaDocumentoController extends Controller
                          [
                             'listadatos'        =>  $listadatos,
                             'entregable_sel'    =>  $entregable_sel,
+                            'permiso_editar_cuenta'    =>  $permiso_editar_cuenta,
+                            
                             'funcion'           =>  $funcion,
                             'idopcion'          =>  $idopcion,
                             'fecha_inicio'      =>  $fecha_inicio,
