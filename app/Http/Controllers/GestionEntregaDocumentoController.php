@@ -259,6 +259,7 @@ class GestionEntregaDocumentoController extends Controller
             }
         }
 
+
         $funcion        =   $this;
 
         $entregable_sel                 =   FeDocumentoEntregable::where('COD_CATEGORIA_ESTADO','=','ETM0000000000001')

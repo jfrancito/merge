@@ -517,6 +517,8 @@ trait ComprobanteTraits
                                     ->pluck('COD_USUARIO')
                                     ->toArray();
 
+
+
         $documento              =   DB::table('CMP.DOCUMENTO_CTBLE')
                                     ->join('CMP.REFERENCIA_ASOC', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
                                     ->select(DB::raw('CMP.DOCUMENTO_CTBLE.*,REFERENCIA_ASOC.COD_TABLA,REFERENCIA_ASOC.COD_TABLA_ASOC'))
@@ -5180,6 +5182,12 @@ trait ComprobanteTraits
                                     ->pluck('COD_USUARIO')
                                     ->toArray();
 
+        //marilu
+        if(Session::get('usuario')->name=='MPACHECU'){
+            array_push($array_usuarios, 'HPEREZAL');
+        }
+   
+
         if(Session::get('usuario')->id== '1CIX00000001'){
 
             $listadatos         =       VMergeDocumento::leftJoin('FE_REF_ASOC', function ($leftJoin){
@@ -5271,19 +5279,30 @@ trait ComprobanteTraits
     private function con_combo_cabecera_estibas_administrativo($cliente_id,$area_id,$categoria_id) {
 
         $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+
         $array_trabajadores  =      STDTrabajador::where('NRO_DOCUMENTO','=',$trabajador->NRO_DOCUMENTO)
                                     ->pluck('COD_TRAB')
                                     ->toArray();
+
         $array_usuarios      =      SGDUsuario::whereIn('COD_TRABAJADOR',$array_trabajadores)
                                     ->pluck('COD_USUARIO')
                                     ->toArray();
         $estado_no          =       'ETM0000000000006';
         $centro_id          =       $trabajador->COD_ZONA_TIPO;
         $tipodoc_id         =       $categoria_id;
+
+
         $array_usuarios     =       SGDUsuario::Area($area_id)
                                     ->whereNotNull('COD_CATEGORIA_AREA')
                                     ->pluck('COD_USUARIO')
                                     ->toArray();
+
+
+        //marilu
+        if(Session::get('usuario')->name=='MPACHECU'){
+            array_push($array_usuarios, 'HPEREZAL');
+        }
+
 
 
         if(Session::get('usuario')->id== '1CIX00000001'){
