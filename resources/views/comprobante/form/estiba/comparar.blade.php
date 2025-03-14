@@ -14,7 +14,12 @@
           <tbody>
               <tr>
                 <td><b>Moneda</b></td>
-                <td><p class='subtitulomerge'>{{$documento_top->TXT_CATEGORIA_MONEDA}}</p></td>
+                <td><p class='subtitulomerge'>
+                  @if(count($documento_top)>0)
+                    {{$documento_top->TXT_CATEGORIA_MONEDA}}
+                  @endif
+                  
+                </p></td>
                 <td>
                   <div class='subtitulomerge @if($fedocumento->ind_moneda == 1) msjexitoso @else msjerror @endif'> <b>
                       @if($fedocumento->MONEDA == 'PEN')
