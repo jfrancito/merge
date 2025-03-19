@@ -2593,8 +2593,9 @@ class GestionUsuarioContactoController extends Controller
 
 
                 if($monto_anticipo_txt!=''){
-
-                    $ordencompra_t          =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$idoc)->first();
+                    $ordencompra_t          =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();
+                    //$ordencompra_t          =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$idoc)->first();
+                    //dd($ordencompra_t);
                     $COD_EMPR               =   Session::get('empresas')->COD_EMPR;
                     $COD_CENTRO             =   '';
                     $FEC_CORTE              =   $this->hoy_sh;
@@ -2621,6 +2622,9 @@ class GestionUsuarioContactoController extends Controller
 
 
                     foreach ($listaanticipo as $index => $item) {
+
+
+
                         if($item['COD_HABILITACION'] == $monto_anticipo_txt){
                             $MONTO_ANTICIPO_DESC = (float)$item['CAN_SALDO'];
                             $COD_ANTICIPO = $item['COD_HABILITACION'];

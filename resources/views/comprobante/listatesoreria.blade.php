@@ -9,6 +9,11 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/bootstrap-slider/css/bootstrap-slider.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/css/confirm/jquery-confirm.min.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/css/file/fileinput.css') }} "/>
+    <style type="text/css">
+      #kvFileinputModal{
+        z-index: 1051 !important;
+      }
+    </style>
 @stop
 @section('section')
   <div class="be-content contenido asientomodelo areatesoreria">

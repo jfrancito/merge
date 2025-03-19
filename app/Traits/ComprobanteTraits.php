@@ -1483,8 +1483,11 @@ trait ComprobanteTraits
             if(count($archivo)>0){
                 $rutafile           =   $path.'\\comprobantes\\'.$prefijocarperta.'\\'.$NRO_DOCUMENTO_CLIENTE;
                 $zipFilePath        =   $rutafile.'\\'.$archivo->NOMBRE_ARCHIVO;
+                //dd($zipFilePath);
                 // Obtener el nombre del archivo ZIP sin la extensión
                 $zipFileName = pathinfo($zipFilePath, PATHINFO_FILENAME);
+                //dd($zipFileName);
+
                 $zip = new ZipArchive();
                 // Intentar abrir el archivo ZIP
                 if ($zip->open($zipFilePath) === TRUE) {
@@ -1496,12 +1499,13 @@ trait ComprobanteTraits
                     // Cerrar el archivo ZIP
                     $zip->close();
                 } 
-
+                //dd("hola");
                 // Directorio base de destino (cámbialo a donde deseas guardar el archivo descomprimido)
                 $extractToDir = $rutafile . DIRECTORY_SEPARATOR . $zipFileName;
-
+                //dd($extractToDir);
                 // Asegúrate de que el directorio de destino exista
                 if (!file_exists($extractToDir)) {
+                    //dd($extractToDir);
                     mkdir($extractToDir, 0777, true);
                 }
 
@@ -2689,14 +2693,18 @@ trait ComprobanteTraits
 
         $listadatos     =   FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
                             ->leftJoin('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'LISTA_DOCUMENTOS_PAGAR_PROGRAMACION.COD_ORDEN')
-                            ->select(DB::raw('FE_DOCUMENTO.*,CMP.Orden.* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                            ->select(DB::raw('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION.COD_ORDEN COD,FE_DOCUMENTO.*,CMP.Orden.* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                             ->whereNull('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION.COD_ORDEN')
                             ->where('OPERACION','=','ORDEN_COMPRA')
+                            //->whereIn('FE_DOCUMENTO.ID_DOCUMENTO',['IICHCT0000002722','IICHCL0000010383'])
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000005')
                             ->ProveedorFE($proveedor_id)
                             ->orderBy('fecha_uc','desc')
                             ->get();
+
+        //dd($listadatos);
+
 
         return  $listadatos;
     }
