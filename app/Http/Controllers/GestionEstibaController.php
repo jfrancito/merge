@@ -693,7 +693,7 @@ class GestionEstibaController extends Controller
         $combopagodetraccion    =   array();
         $usuario                =   SGDUsuario::where('COD_TRABAJADOR','=',Session::get('usuario')->usuarioosiris_id)->first();
 
-
+        //dd($usuario);
 
 
         $banco_id               =   '';

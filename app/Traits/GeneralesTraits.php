@@ -13,9 +13,14 @@ use App\Modelos\Categoria;
 use App\Modelos\Estado;
 use App\Modelos\Conei;
 use App\Modelos\FeDocumento;
-
+use App\Modelos\CONPeriodo;
 use App\Modelos\Requerimiento;
 use App\Modelos\Archivo;
+use App\Modelos\PlaSerie;
+use App\Modelos\PlaMovilidad;
+
+
+
 
 use View;
 use Session;
@@ -27,6 +32,78 @@ use File;
 
 trait GeneralesTraits
 {
+
+    public function gn_numero($serie)
+    {
+
+    	$serie   = '';
+        $dserie  = PlaMovilidad::where('COD_CENTRO', '=', Session::get('usuario')->cod_centro)
+		            ->where('COD_EMPRESA', '=', Session::get('empresas')->COD_EMPR)
+		            ->where('SERIE', '=', $serie)
+		            ->select(DB::raw('max(NUMERO) as numero'))
+		            ->first();
+		//conversion a string y suma uno para el siguiente id
+		$idsuma = (int) $dserie->numero + 1;
+		//concatenar con ceros
+		$idopcioncompleta = str_pad($idsuma, 10, "0", STR_PAD_LEFT);
+		$idopcioncompleta = $idopcioncompleta;
+		return $idopcioncompleta;
+
+    }
+
+
+    public function gn_serie($anio, $mes)
+    {
+
+    	$serie   = '';
+        $dserie  = PlaSerie::where('activo', '=', 1)
+		            ->where('COD_CENTRO', '=', Session::get('usuario')->cod_centro)
+		            ->where('COD_EMPRESA', '=', Session::get('empresas')->COD_EMPR)
+		            ->first();
+		if(count($dserie)>0){
+    		$serie   = $dserie->SERIE;
+		}
+        return $serie;
+    }
+
+
+    public function gn_combo_periodo_xanio_xempresa($anio, $cod_empresa, $todo, $titulo)
+    {
+        $array = CONPeriodo::where('COD_ESTADO', '=', 1)
+            ->where('COD_ANIO', '=', $anio)
+            ->where('COD_EMPR', '=', $cod_empresa)
+            ->orderBy('COD_MES', 'DESC')
+            ->pluck('TXT_NOMBRE', 'COD_PERIODO')
+            ->toArray();
+
+        if ($todo == 'TODO') {
+            $combo = array('' => $titulo, $todo => $todo) + $array;
+        } else {
+            $combo = array('' => $titulo) + $array;
+        }
+
+        return $combo;
+
+
+    }
+
+    public function gn_periodo_actual_xanio_xempresa($anio, $mes, $cod_empresa)
+    {
+
+
+        $periodo = CONPeriodo::where('COD_ESTADO', '=', 1)
+            ->where('COD_ANIO', '=', $anio)
+            ->where('COD_MES', '=', $mes)
+            ->where('COD_EMPR', '=', $cod_empresa)
+            ->first();
+
+
+        return $periodo;
+
+
+    }
+
+
 
 	private function buscar_archivo_sunat_local($urlxml) {
 

@@ -210,6 +210,15 @@ Route::group(['middleware' => ['authaw']], function () {
 
 
 
+	//PLANILLA MOVILIDAD
+
+	Route::any('/gestion-de-planilla-movilidad/{idopcion}', 'GestionPlanillaMovilidadController@actionListarPlanillaMovilidad');
+	Route::any('/agregar-planilla-movilidad/{idopcion}', 'GestionPlanillaMovilidadController@actionAgregarPlanillaMovilidad');
+
+
+
+
+
 	Route::any('/detalle-comprobante-oc-validado-historial/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoHitorial');
 	Route::any('/detalle-comprobante-oc-validado-contrato-historial/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoContratoHistorial');
 	//ENTREGA DE DOCUMENTOS
@@ -223,24 +232,15 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/descargar-folio-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarDocumentoFolio');
 	Route::any('/ajax-modal-detalle-deuda-contrato', 'GestionEntregaDocumentoController@actionModaDetalleDeudaContrato');
 	Route::any('/entrega-masivo-excel/{operacion_id}/{idopcion}', 'GestionEntregaDocumentoController@actionEntregableMasivoExcel');
-
 	Route::any('/ajax-crear-folio-pagos', 'GestionEntregaDocumentoController@actionEntregableCrearFolio');
 	Route::any('/ajax-modal-detalle-folios', 'GestionEntregaDocumentoController@actionEntregableModalDetalleFolio');
-
 	Route::any('/ajax-detalle-documento-pagos', 'GestionEntregaDocumentoController@actionModalDetalleDocumentoPagos');
-
-
-
 	Route::any('/crear-folio-entregable/{idopcion}', 'GestionEntregaDocumentoController@actionEntregableCrearFolioEntregable');
-
 	Route::any('/ajax-select-folio-pagos', 'GestionEntregaDocumentoController@actionEntregableSelectFolioPago');
 	Route::any('/ajax-extornar-folio-pagos', 'GestionEntregaDocumentoController@actionEntregableExtornoFolioPago');
 	Route::any('/ajax-detalle-folio-pagos', 'GestionEntregaDocumentoController@actionEntregableDetalleFolioPago');
-
 	Route::any('/validar-retencion-folio-pagos', 'GestionEntregaDocumentoController@actionValidarDetalleFolioPago');
 	Route::any('/guardar-folio-entregable/{idopcion}', 'GestionEntregaDocumentoController@actionEntregableGuardarFolioEntregable');
-
-
 	Route::any('/descargar-pago-proveedor-bcp-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoFolioBcp');
 	Route::any('/descargar-pago-proveedor-bcp-estiba-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoFolioEstibaBcp');
 

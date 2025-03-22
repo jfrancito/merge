@@ -712,11 +712,13 @@ trait ComprobanteTraits
                                     ->leftJoin('TES.CUENTA_BANCARIA', function ($join) {
                                         $join->on('CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR', '=', 'TES.CUENTA_BANCARIA.COD_EMPR_TITULAR')
                                              ->on('FE_DOCUMENTO.COD_CATEGORIA_BANCO', '=', 'TES.CUENTA_BANCARIA.COD_EMPR_BANCO')
+
                                              ->on('FE_DOCUMENTO.TXT_NRO_CUENTA_BANCARIA', '=', 'TES.CUENTA_BANCARIA.TXT_NRO_CUENTA_BANCARIA');
                                     })
                                     ->leftjoin('CMP.CATEGORIA as CAT_CUENTA ', 'CAT_CUENTA.COD_CATEGORIA', '=', 'TES.CUENTA_BANCARIA.TXT_TIPO_REFERENCIA')
                                     ->leftjoin('STD.EMPRESA', 'STD.EMPRESA.COD_EMPR', '=', 'CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR')
                                     ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'STD.EMPRESA.COD_TIPO_DOCUMENTO')
+                                    ->where('TES.CUENTA_BANCARIA.COD_ESTADO', '=', 1)
                                     ->where('FOLIO','=',$folio)
                                     ->where('TXT_CATEGORIA_BANCO','=',$banco_txt)
                                     ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
