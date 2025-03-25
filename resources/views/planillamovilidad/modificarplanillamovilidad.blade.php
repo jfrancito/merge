@@ -26,7 +26,7 @@
           </div>
           <div class="panel-body">
 
-            <form method="POST" action="{{ url('/agregar-planilla-movilidad/'.$idopcion) }}" style="border-radius: 0px;" id ='frmpmemitir'>
+            <form method="POST" action="{{ url('/emitir-planilla-movilidad/'.$idopcion.'/'.Hashids::encode(substr($planillamovilidad->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" id ='frmpmemitir'>
                   {{ csrf_field() }}
                 <div class='formconsulta'>
                   @include('planillamovilidad.form.faplanillamovilidad')
@@ -34,7 +34,6 @@
                 <div class='detallemovilidad' style="margin-top:15px;">
                   @include('planillamovilidad.ajax.amdetalleplanillamovilidad')
                 </div>
-
                 <div class="row xs-pt-15">
                   <div class="col-xs-6">
                       <div class="be-checkbox">

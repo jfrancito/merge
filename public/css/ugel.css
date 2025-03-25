@@ -3,7 +3,9 @@
   cursor: pointer;
   padding-left: 10px;
 }
-
+.labelleft{
+  text-align: left !important;
+}
 
 .file-zoom-dialog .btn-navigate{
   width: 4rem !important;

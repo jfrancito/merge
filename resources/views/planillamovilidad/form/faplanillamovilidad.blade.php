@@ -19,7 +19,8 @@
         </div>
       </div>
     </div>
-
+    <input type="hidden" name="cod_mes" id="cod_mes" value="{{$periodo->COD_MES}}">
+    <input type="hidden" name="cod_anio" id="cod_anio" value="{{$periodo->COD_ANIO}}">
     <div class="ol-xs-12 col-sm-4 col-md-3 col-lg-3">
       <div class="form-group">
         <label class="col-sm-12 control-label labelleft negrita">SERIE :</label>

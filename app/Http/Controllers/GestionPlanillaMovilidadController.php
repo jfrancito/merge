@@ -66,6 +66,41 @@ class GestionPlanillaMovilidadController extends Controller
     }
 
 
+    public function actionEmitirDetallePlanillaMovilidad($idopcion,$iddocumento,Request $request)
+    {
+        $idcab       = $iddocumento;
+        $iddocumento = $this->funciones->decodificarmaestra($iddocumento);
+
+        if($_POST)
+        {
+
+            try{    
+                DB::beginTransaction();
+                $planillamovilidad      =   PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first(); 
+                $tdetplanillamovilidad  =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
+
+                if(count($tdetplanillamovilidad)<=0){
+                    return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd','Para poder emitir tiene que cargar sus movilidades');
+                }
+
+                PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)
+                            ->update(
+                                    [
+                                        'FECHA_MOD'=> $this->fechaactual,
+                                        'USUARIO_MOD'=> Session::get('usuario')->id,
+                                        'COD_ESTADO'=> 'ETM0000000000004',
+                                        'TXT_ESTADO'=> 'POR APROBAR ADMINISTRACION'
+                                    ]);
+                DB::commit();
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+            return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('bienhecho', 'Planilla Movilidad '.$planillamovilidad->SERIE.'-'.$planillamovilidad->NUMERO.' emitido con exito, ingrese sus comprobantes');
+        }  
+    }
+
+
     public function actionAgregarPlanillaMovilidad($idopcion,Request $request)
     {
 
