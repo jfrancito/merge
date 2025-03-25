@@ -13,6 +13,7 @@
             <div class="col-sm-12">
               <div class="panel panel-default panel-border-color panel-border-color-success">
                 <div class="panel-heading">{{ $titulo }}
+
                   <div class="tools tooltiptop">
 
                     <a href="{{ url('/agregar-planilla-movilidad/'.$idopcion) }}" class="btn btn-secondary botoncabecera tooltipcss opciones">
@@ -25,6 +26,7 @@
                       <span class="icon mdi mdi-search"></span>
                     </a>
                   </div>
+                  
                 </div>
 
                 <div class="panel-body">

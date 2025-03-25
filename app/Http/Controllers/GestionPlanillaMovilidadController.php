@@ -11,7 +11,7 @@ use App\Modelos\PlaMovilidad;
 use App\Modelos\PlaDetMovilidad;
 use App\Modelos\PlaSerie;
 use App\Modelos\STDTrabajador;
-
+use App\Modelos\CMPCategoria;
 
 
 
@@ -43,17 +43,23 @@ class GestionPlanillaMovilidadController extends Controller
         if($validarurl <> 'true'){return $validarurl;}
         /******************************************************/
         View::share('titulo','Lista Planillas de Movilidad');
-        $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
-        $fecha_inicio   =   $this->fecha_menos_diez_dias;
-        $fecha_fin      =   $this->fecha_sin_hora;
+        $cod_empresa        =   Session::get('usuario')->usuarioosiris_id;
+        $fecha_inicio       =   $this->fecha_menos_diez_dias;
+        $fecha_fin          =   $this->fecha_sin_hora;
+
+        $planillamovilidad  =   PlaMovilidad::where('ACTIVO','=','1')
+                                ->whereRaw("CAST(FECHA_CREA  AS DATE) >= ? and CAST(FECHA_CREA  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                ->where('USUARIO_CREA','=',Session::get('usuario')->id)
+                                ->orderby('FECHA_CREA','DESC')->get();
+
         $listadatos     =   array();
         $funcion        =   $this;
-
         return View::make('planillamovilidad/listaplanillamovilidad',
                          [
                             'listadatos'        =>  $listadatos,
                             'funcion'           =>  $funcion,
                             'idopcion'          =>  $idopcion,
+                            'planillamovilidad' =>  $planillamovilidad,
                             'fecha_inicio'      =>  $fecha_inicio,
                             'fecha_fin'         =>  $fecha_fin
                          ]);
@@ -63,83 +69,64 @@ class GestionPlanillaMovilidadController extends Controller
     public function actionAgregarPlanillaMovilidad($idopcion,Request $request)
     {
 
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Anadir');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
 
         if($_POST)
         {
 
-            //try{    
+            try{    
                 
-                // DB::beginTransaction();
-
-                // $ruc                        =   $request['ruc'];
-                // $razonsocial                =   $request['razonsocial'];
-                // $direccion                  =   $request['direccion'];
-                // $cuenta_detraccion          =   $request['cuenta_detraccion'];
-                // $lblcontrasena              =   $request['lblcontrasena'];
-                // $lblcontrasenaconfirmar     =   $request['lblcontrasenaconfirmar'];
-                // $nombre                     =   $request['nombre'];
-                // $lblcelular                 =   $request['lblcelular'];
-                // $lblemail                   =   $request['lblemail'];
-                // $lblconfirmaremail          =   $request['lblconfirmaremail'];
-                // $cod_empresa                =   $request['cod_empresa'];
-                // $usuario                    =   User::where('usuarioosiris_id','=',$cod_empresa)->first();
-
-                // if(count($usuario) > 0){
-                //         return Redirect::back()->withInput()->with('errorurl', 'El usuario ya se cuenta registrado');
-                // }
-
-                // $idusers                    =   $this->funciones->getCreateIdMaestra('users');
-                // $cabecera                   =   new User;
-                // $cabecera->id               =   $idusers;
-                // $cabecera->nombre           =   $razonsocial;
-                // $cabecera->name             =   $ruc;
-                // $cabecera->passwordmobil    =   $lblcontrasena;
-                // $cabecera->fecha_crea       =   $this->fechaactual;
-                // $cabecera->password         =   Crypt::encrypt($lblcontrasena);
-                // $cabecera->rol_id           =   '1CIX00000024';
-                // $cabecera->usuarioosiris_id =   $cod_empresa;
-                // $cabecera->email            =   $lblemail;
-                // $cabecera->direccion_fiscal     =   $direccion;
-                // $cabecera->cuenta_detraccion    =   $cuenta_detraccion;
-                // $cabecera->nombre_contacto      =   $nombre;
-                // $cabecera->celular_contacto     =   $lblcelular;
-                // $cabecera->email_confirmacion   =   0;
-                // $cabecera->ind_confirmacion     =   0;
-                // $cabecera->save();
-     
-
-                // $id                         =   $this->funciones->getCreateIdMaestra('WEB.userempresacentros');
-                // $detalle                    =   new WEBUserEmpresaCentro;
-                // $detalle->id                =   $id;
-                // $detalle->empresa_id        =   'IACHEM0000010394';
-                // $detalle->centro_id         =   'CEN0000000000001';
-                // $detalle->fecha_crea        =   $this->fechaactual;
-                // $detalle->usuario_id        =   $idusers;
-                // $detalle->save();
-
-                // $id                         =   $this->funciones->getCreateIdMaestra('WEB.userempresacentros');
-                // $detalle                    =   new WEBUserEmpresaCentro;
-                // $detalle->id                =   $id;
-                // $detalle->empresa_id        =   'IACHEM0000007086';
-                // $detalle->centro_id         =   'CEN0000000000001';
-                // $detalle->fecha_crea        =   $this->fechaactual;
-                // $detalle->usuario_id        =   $idusers;
-                // $detalle->save();
-
-                // Session::forget('usuario');
-                // Session::forget('listamenu');
-                // Session::forget('listaopciones');
-                // DB::commit();
-
-                // }catch(\Exception $ex){
-                //     DB::rollback(); 
-                //     return Redirect::to('registrate')->with('errorbd', $ex.' Ocurrio un error inesperado');
-                // }
-
-                // return Redirect::to('/login')->with('bienhecho', 'Proveedor '.$razonsocial.' registrado con exito (Se le a enviado un email para que pueda confirmar su acceso al sitema)');
+                DB::beginTransaction();
 
 
+                    $anio           =   $this->anio;
+                    $mes            =   $this->mes;
+                    $periodo        =   $this->gn_periodo_actual_xanio_xempresa($anio, $mes, Session::get('empresas')->COD_EMPR);
+                    $serie          =   $this->gn_serie($anio, $mes);
+                    $numero         =   $this->gn_numero($serie);
+                    $centro         =   Session::get('usuario')->txt_centro;
+                    $txttrabajador  =   '';
+                    $codtrabajador  =   '';
+                    $doctrabajador  =   '';
+                    $fecha_creacion =   $this->hoy;
+                    $dtrabajador    =   STDTrabajador::where('COD_TRAB','=',Session::get('usuario')->usuarioosiris_id)->first();
+                    if(count($dtrabajador)>0){
+                        $txttrabajador  =   $dtrabajador->TXT_APE_PATERNO.' '.$dtrabajador->TXT_APE_MATERNO.' '.$dtrabajador->TXT_NOMBRES;
+                        $doctrabajador  =   $dtrabajador->NRO_DOCUMENTO;
+                        $codtrabajador  =   $dtrabajador->COD_TRAB;;
+                    }
+                    $idcab                              =   $this->funciones->getCreateIdMaestradocpla('PLA_MOVILIDAD');
+                    $cabecera                           =   new PlaMovilidad;
+                    $cabecera->ID_DOCUMENTO             =   $idcab;
+                    $cabecera->SERIE                    =   $serie;
+                    $cabecera->NUMERO                   =   $numero;
+                    $cabecera->COD_TRABAJADOR           =   $codtrabajador;
+                    $cabecera->TXT_TRABAJADOR           =   $txttrabajador;
+                    $cabecera->COD_EMPRESA              =   Session::get('empresas')->COD_EMPR;
+                    $cabecera->TXT_EMPRESA              =   Session::get('empresas')->NOM_EMPR;
+                    $cabecera->DOCUMENTO_TRABAJADOR     =   $doctrabajador;
+                    $cabecera->COD_PERIODO              =   $periodo->COD_PERIODO;
+                    $cabecera->TXT_PERIODO              =   $periodo->TXT_NOMBRE;
+                    $cabecera->COD_ESTADO               =   'ETM0000000000001';
+                    $cabecera->TXT_ESTADO               =   'GENERADO';
+                    $cabecera->COD_CENTRO               =   Session::get('usuario')->cod_centro;
+                    $cabecera->TXT_CENTRO               =   Session::get('usuario')->txt_centro;
+                    $cabecera->TOTAL                    =   0;
+                    $cabecera->FECHA_CREA               =   $this->fechaactual;
+                    $cabecera->USUARIO_CREA             =   Session::get('usuario')->id;
+                    $cabecera->save();
 
+
+                DB::commit();
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+                $iddocumento                            =   Hashids::encode(substr($idcab, -8));
+                return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$iddocumento)->with('bienhecho', 'Planilla Movilidad '.$serie.'-'.$numero.' registrado con exito, ingrese sus comprobantes');
         }else{
 
             $anio           =   $this->anio;
@@ -151,23 +138,277 @@ class GestionPlanillaMovilidadController extends Controller
             $centro         =   Session::get('usuario')->txt_centro;
             $txttrabajador  =   '';
             $doctrabajador  =   '';
+            $fecha_creacion =   $this->hoy;
+
+
             $dtrabajador    =   STDTrabajador::where('COD_TRAB','=',Session::get('usuario')->usuarioosiris_id)->first();
             if(count($dtrabajador)>0){
                 $txttrabajador  =   $dtrabajador->TXT_APE_PATERNO.' '.$dtrabajador->TXT_APE_MATERNO.' '.$dtrabajador->TXT_NOMBRES;
                 $doctrabajador  =   $dtrabajador->NRO_DOCUMENTO;
             }
+
+
             return View::make('planillamovilidad.agregarplanillamovilidad',
                              [
                                 'periodo' => $periodo,
                                 'serie' => $serie,
                                 'numero' => $numero,
-                                'comcentrobolistaclientes' => $combocentrolistaclientes,
+                                'centro' => $centro,
                                 'txttrabajador' => $txttrabajador,
                                 'doctrabajador' => $doctrabajador,
+                                'fecha_creacion' => $fecha_creacion,
                                 'idopcion' => $idopcion
                              ]);
         }   
+    }
 
+
+    public function actionGuardarModificarDetallePlanillaMovilidad($idopcion,$iddocumento,$item,Request $request)
+    {
+
+        $idcab       = $iddocumento;
+        $iddocumento = $this->funciones->decodificarmaestra($iddocumento);
+
+        try{    
+            
+            DB::beginTransaction();
+
+                $fecha_gasto            =   $request['fecha_gasto'];    
+                $motivo_id              =   $request['motivo_id'];   
+                $lugarpartida           =   $request['lugarpartida'];   
+                $lugarllegada           =   $request['lugarllegada'];   
+                $total                  =   $request['total'];
+                $activo                 =   $request['activo'];
+
+
+                $anio                   =   $this->anio;
+                $mes                    =   $this->mes;
+                $periodo                =   $this->gn_periodo_actual_xanio_xempresa($anio, $mes, Session::get('empresas')->COD_EMPR);
+                $serie                  =   $this->gn_serie($anio, $mes);
+                $numero                 =   $this->gn_numero($serie);
+                $centro                 =   Session::get('usuario')->txt_centro;
+                $txttrabajador          =   '';
+                $codtrabajador          =   '';
+                $doctrabajador          =   '';
+                $fecha_creacion         =   $this->hoy;
+                $dtrabajador            =   STDTrabajador::where('COD_TRAB','=',Session::get('usuario')->usuarioosiris_id)->first();
+                if(count($dtrabajador)>0){
+                    $txttrabajador      =   $dtrabajador->TXT_APE_PATERNO.' '.$dtrabajador->TXT_APE_MATERNO.' '.$dtrabajador->TXT_NOMBRES;
+                    $doctrabajador      =   $dtrabajador->NRO_DOCUMENTO;
+                    $codtrabajador      =   $dtrabajador->COD_TRAB;;
+                }
+                $planillamovilidad      =   PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first(); 
+                $detplanillamovilidad   =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->get();
+
+                $motivo                 =   CMPCategoria::where('COD_CATEGORIA','=',$motivo_id)->first();
+
+                PlaDetMovilidad::where('ID_DOCUMENTO','=',$planillamovilidad->ID_DOCUMENTO)
+                                    ->where('ITEM','=',$item)
+                                    ->update(
+                                        [
+                                            'FECHA_GASTO'=> $fecha_gasto,
+                                            'COD_MOTIVO'=> $motivo->COD_CATEGORIA,
+                                            'TXT_MOTIVO'=> $motivo->NOM_CATEGORIA,
+                                            'TXT_LUGARPARTIDA'=> $lugarpartida,
+                                            'TXT_LUGARLLEGADA'=> $lugarllegada,
+                                            'TOTAL'=> $total,
+                                            'ACTIVO'=> $activo,
+                                            'FECHA_MOD'=> $this->fechaactual,
+                                            'USUARIO_MOD'=> Session::get('usuario')->id
+                                        ]);
+
+                $tdetplanillamovilidad  =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
+
+                PlaMovilidad::where('ID_DOCUMENTO','=',$planillamovilidad->ID_DOCUMENTO)
+                            ->update(
+                                    [
+                                        'TOTAL'=> $tdetplanillamovilidad->SUM('TOTAL')
+                                    ]);
+
+
+            DB::commit();
+        }catch(\Exception $ex){
+            DB::rollback(); 
+            return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd', $ex.' Ocurrio un error inesperado');
+        }
+            return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('bienhecho', 'Se Agrego un nuevo item con exito');
+    }
+
+
+    public function actionGuardarDetallePlanillaMovilidad($idopcion,$iddocumento,Request $request)
+    {
+
+        $idcab       = $iddocumento;
+        $iddocumento = $this->funciones->decodificarmaestra($iddocumento);
+
+        try{    
+            
+            DB::beginTransaction();
+
+                $fecha_gasto            =   $request['fecha_gasto'];    
+                $motivo_id              =   $request['motivo_id'];   
+                $lugarpartida           =   $request['lugarpartida'];   
+                $lugarllegada           =   $request['lugarllegada'];   
+                $total                  =   $request['total'];
+                $anio                   =   $this->anio;
+                $mes                    =   $this->mes;
+                $periodo                =   $this->gn_periodo_actual_xanio_xempresa($anio, $mes, Session::get('empresas')->COD_EMPR);
+                $serie                  =   $this->gn_serie($anio, $mes);
+                $numero                 =   $this->gn_numero($serie);
+                $centro                 =   Session::get('usuario')->txt_centro;
+                $txttrabajador          =   '';
+                $codtrabajador          =   '';
+                $doctrabajador          =   '';
+                $fecha_creacion         =   $this->hoy;
+                $dtrabajador            =   STDTrabajador::where('COD_TRAB','=',Session::get('usuario')->usuarioosiris_id)->first();
+                if(count($dtrabajador)>0){
+                    $txttrabajador      =   $dtrabajador->TXT_APE_PATERNO.' '.$dtrabajador->TXT_APE_MATERNO.' '.$dtrabajador->TXT_NOMBRES;
+                    $doctrabajador      =   $dtrabajador->NRO_DOCUMENTO;
+                    $codtrabajador      =   $dtrabajador->COD_TRAB;;
+                }
+                $planillamovilidad      =   PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first(); 
+                $detplanillamovilidad   =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->get();
+                $tdetplanillamovilidad  =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
+                $item                   =   count($detplanillamovilidad) + 1;
+                $motivo                 =   CMPCategoria::where('COD_CATEGORIA','=',$motivo_id)->first();
+                $cabecera                           =   new PlaDetMovilidad;
+                $cabecera->ID_DOCUMENTO             =   $planillamovilidad->ID_DOCUMENTO;
+                $cabecera->ITEM                     =   $item;
+                $cabecera->FECHA_GASTO              =   $fecha_gasto;
+                $cabecera->COD_MOTIVO               =   $motivo->COD_CATEGORIA;
+                $cabecera->TXT_MOTIVO               =   $motivo->NOM_CATEGORIA;
+                $cabecera->TXT_LUGARPARTIDA         =   $lugarpartida;
+                $cabecera->TXT_LUGARLLEGADA         =   $lugarllegada;
+                $cabecera->TOTAL                    =   $doctrabajador;
+                $cabecera->COD_EMPRESA              =   Session::get('empresas')->COD_EMPR;
+                $cabecera->TXT_EMPRESA              =   Session::get('empresas')->NOM_EMPR;
+                $cabecera->COD_CENTRO               =   Session::get('usuario')->cod_centro;
+                $cabecera->TXT_CENTRO               =   Session::get('usuario')->txt_centro;
+                $cabecera->TOTAL                    =   $total;
+                $cabecera->FECHA_CREA               =   $this->fechaactual;
+                $cabecera->USUARIO_CREA             =   Session::get('usuario')->id;
+                $cabecera->save();
+
+                PlaMovilidad::where('ID_DOCUMENTO','=',$planillamovilidad->ID_DOCUMENTO)
+                            ->update(
+                                    [
+                                        'TOTAL'=> $tdetplanillamovilidad->SUM('TOTAL') + $total
+                                    ]);
+            DB::commit();
+        }catch(\Exception $ex){
+            DB::rollback(); 
+            return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd', $ex.' Ocurrio un error inesperado');
+        }
+            return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('bienhecho', 'Se Agrego un nuevo item con exito');
+    }
+
+
+    public function actionModificarPlanillaMovilidad($idopcion,$iddocumento,Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        $iddocumento = $this->funciones->decodificarmaestra($iddocumento);
+        View::share('titulo','Agregar Detalle Planilla Movilidad');
+        $planillamovilidad = PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first();
+
+        if($planillamovilidad->COD_ESTADO!='ETM0000000000001'){
+            return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd', 'Ya no puede modificar esta PLANILLA DE MOVILIDAD');
+        }
+
+        $anio           =   $this->anio;
+        $mes            =   $this->mes;
+        $periodo        =   $this->gn_periodo_actual_xanio_xempresa($anio, $mes, Session::get('empresas')->COD_EMPR);
+        $serie          =   $this->gn_serie($anio, $mes);
+        $numero         =   $this->gn_numero($serie);
+        $centro         =   Session::get('usuario')->txt_centro;
+        $txttrabajador  =   '';
+        $doctrabajador  =   '';
+        $fecha_creacion =   $this->hoy;
+        $dtrabajador    =   STDTrabajador::where('COD_TRAB','=',Session::get('usuario')->usuarioosiris_id)->first();
+        if(count($dtrabajador)>0){
+            $txttrabajador  =   $dtrabajador->TXT_APE_PATERNO.' '.$dtrabajador->TXT_APE_MATERNO.' '.$dtrabajador->TXT_NOMBRES;
+            $doctrabajador  =   $dtrabajador->NRO_DOCUMENTO;
+        }
+        $tdetplanillamovilidad  =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->orderby('FECHA_GASTO','asc')->get();
+
+        return View::make('planillamovilidad.modificarplanillamovilidad',
+                         [
+                            'periodo' => $periodo,
+                            'serie' => $serie,
+                            'numero' => $numero,
+                            'centro' => $centro,
+                            'txttrabajador' => $txttrabajador,
+                            'doctrabajador' => $doctrabajador,
+                            'fecha_creacion' => $fecha_creacion,
+                            'planillamovilidad' => $planillamovilidad,
+                            'tdetplanillamovilidad' => $tdetplanillamovilidad,
+                            'idopcion' => $idopcion
+                         ]);
+
+
+
+    }
+
+    public function actionDetallePlanillaMovilidad(Request $request) {
+
+        $iddocumento        =       $request['data_planilla_movilidad_id'];
+        $idopcion           =       $request['idopcion'];
+
+        $planillamovilidad  =       PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first(); 
+        $funcion            =       $this;
+        $fecha_fin          =       $this->fecha_sin_hora;
+
+        $arraymotivo        =       DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','MOTIVO_MOVILIDAD')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
+        $combomotivo        =       array('' => "SELECCIONE MOTIVO") + $arraymotivo;
+        $motivo_id          =       '';
+
+        return View::make('planillamovilidad/modal/ajax/magregardetalleplanillamovilidad',
+                         [
+                            'iddocumento'           =>  $iddocumento,
+                            'idopcion'              =>  $idopcion,
+                            'planillamovilidad'     =>  $planillamovilidad,
+                            'fecha_fin'             =>  $fecha_fin,
+                            'funcion'               =>  $funcion,
+                            'combomotivo'           =>  $combomotivo,
+                            'motivo_id'             =>  $motivo_id,
+                            'ajax'                  =>  true,
+                         ]);
+    }
+
+    public function actionModificarDetallePlanillaMovilidad(Request $request) {
+
+        $iddocumento        =       $request['data_iddocumento'];
+        $data_item          =       $request['data_item'];
+        $idopcion           =       $request['idopcion'];
+        $planillamovilidad  =       PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first(); 
+        $dplanillamovilidad =       PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->where('ITEM','=',$data_item)->first(); 
+        $motivo_id          =       $dplanillamovilidad->COD_MOTIVO;
+        $funcion            =       $this;
+        $fecha_fin          =       $this->fecha_sin_hora;
+        $arraymotivo        =       DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','MOTIVO_MOVILIDAD')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
+        $combomotivo        =       array('' => "SELECCIONE MOTIVO") + $arraymotivo;
+        $comboestado        =       array('1' => "ACTIVO",'0' => "ELIMINAR");
+        $activo             =       $dplanillamovilidad->ACTIVO;
+
+        return View::make('planillamovilidad/modal/ajax/magregardetalleplanillamovilidad',
+                         [
+                            'iddocumento'           =>  $iddocumento,
+                            'idopcion'              =>  $idopcion,
+                            'planillamovilidad'     =>  $planillamovilidad,
+                            'dplanillamovilidad'    =>  $dplanillamovilidad,
+                            'fecha_fin'             =>  $fecha_fin,
+                            'funcion'               =>  $funcion,
+                            'combomotivo'           =>  $combomotivo,
+                            'motivo_id'             =>  $motivo_id,
+
+                            'comboestado'           =>  $comboestado,
+                            'activo'                =>  $activo,
+
+                            'ajax'                  =>  true,
+                         ]);
     }
 
 

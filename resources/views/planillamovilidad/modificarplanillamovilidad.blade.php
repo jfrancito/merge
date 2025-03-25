@@ -13,28 +13,41 @@
     <div class="row">
       <div class="col-md-12">
         <div class="panel panel-default panel-border-color panel-border-color-primary">
-          <div class="panel-heading panel-heading-divider">PLANILLA DE MOVILIDAD
-
+          <div class="panel-heading panel-heading-divider">PLANILLA DE MOVILIDAD 
+            <div class="tools tooltiptop">
+              <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones agregardetalle"
+                data_planilla_movilidad_id = '{{$planillamovilidad->ID_DOCUMENTO}}'>
+                <span class="tooltiptext">Agregar Detalle</span>
+                <span class="icon mdi mdi-plus-circle-o"></span>              
+              </a>
+            </div>
             <span class="panel-subtitle">Crear un nueva nueva planilla de movilidad</span>
+            <input type="hidden" name="idopcion" id='idopcion' value='{{$idopcion}}'>
           </div>
           <div class="panel-body">
-            <form method="POST" action="{{ url('/agregar-planilla-movilidad/'.$idopcion) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" id ='frmpm'>
+
+            <form method="POST" action="{{ url('/agregar-planilla-movilidad/'.$idopcion) }}" style="border-radius: 0px;" id ='frmpmemitir'>
                   {{ csrf_field() }}
-                  <div class='formconsulta'>
-                    @include('planillamovilidad.form.faplanillamovilidad')
-                    <div class="row xs-pt-15">
-                      <div class="col-xs-6">
-                          <div class="be-checkbox">
-                          </div>
+                <div class='formconsulta'>
+                  @include('planillamovilidad.form.faplanillamovilidad')
+                </div>
+                <div class='detallemovilidad' style="margin-top:15px;">
+                  @include('planillamovilidad.ajax.amdetalleplanillamovilidad')
+                </div>
+
+                <div class="row xs-pt-15">
+                  <div class="col-xs-6">
+                      <div class="be-checkbox">
                       </div>
-                      <div class="col-xs-6">
-                        <p class="text-right">
-                            <button type="submit" class="btn btn-space btn-primary btnguardarplanillamovilidad">Crear Nueva Planilla Movilidad</button>     
-                        </p>
-                      </div>
-                    </div>
                   </div>
+                  <div class="col-xs-6">
+                    <p class="text-right">
+                        <button type="submit" class="btn btn-space btn-primary btnemitirplanillamovilidad">Emitir Planilla de Movilidad</button>     
+                    </p>
+                  </div>
+                </div>
             </form>
+
           </div>
         </div>
       </div>
@@ -83,6 +96,8 @@
         'digitsOptional': false, 
         'prefix': '', 
         'placeholder': '0'});
+
+
         
       });
     </script> 

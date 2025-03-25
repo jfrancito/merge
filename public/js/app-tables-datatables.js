@@ -11,6 +11,11 @@ var App = (function () {
         "<'row be-datatable-footer'<'col-sm-5'i><'col-sm-7'p>>"
     } );
 
+
+    $("#tdpm").dataTable({
+        "lengthMenu": [[500, 1000, -1], [500, 1000, "All"]]
+    });
+
     $("#nso").dataTable({
         dom: 'Bfrtip',
         buttons: [

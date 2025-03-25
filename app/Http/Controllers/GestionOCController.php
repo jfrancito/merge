@@ -1543,8 +1543,14 @@ class GestionOCController extends Controller
 
 
                         $documentolinea                     =   $this->ge_linea_documento($ordencompra->COD_ORDEN);
+                        // $cant_rentencion                    =   $ordencompra_t->CAN_RETENCION;
+                        // $cant_perception                    =   $factura->getperception();
                         $cant_rentencion                    =   $ordencompra_t->CAN_RETENCION;
-                        $cant_perception                    =   $factura->getperception();
+                        $cant_rentencion_cuarta             =   $ordencompra_t->CAN_IMPUESTO_RENTA;
+                        $cant_perception                    =   $ordencompra_t->CAN_PERCEPCION;
+
+
+
 
                         //REGISTRO DEL XML LEIDO
                         $documento                          =   new FeDocumento;
@@ -1579,6 +1585,7 @@ class GestionOCController extends Controller
 
                         $documento->PERCEPCION              =   $cant_perception;
                         $documento->MONTO_RETENCION         =   $cant_rentencion;
+                        $documento->CAN_IMPUESTO_RENTA      =   $cant_rentencion_cuarta;
 
                         $documento->TOTAL_VENTA_ORIG        =   $factura->getmtoImpVenta();
                         $documento->TOTAL_VENTA_SOLES       =   $factura->getmtoImpVenta();
