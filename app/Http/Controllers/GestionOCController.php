@@ -3061,6 +3061,23 @@ class GestionOCController extends Controller
                                                         'ncondDomiRuc'=>$txtestadoDomiRuc,
                                                     ]);
 
+                                if($tablaestacp->codigo =='0' && $fedocumento->ID_TIPO_DOC == 'R1'){
+
+                                    FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)
+                                                ->update(
+                                                        [
+                                                            'success'=>$arvalidar['success'],
+                                                            'message'=>$arvalidar['message'],
+                                                            'estadoCp'=>'1',
+                                                            'nestadoCp'=>'ACEPTADO',
+                                                            'estadoRuc'=>'00',
+                                                            'nestadoRuc'=>'ACTIVO',
+                                                            'condDomiRuc'=>'00',
+                                                            'ncondDomiRuc'=>'HABIDO',
+                                                        ]);
+
+                                }
+
 
 
                             }else{
