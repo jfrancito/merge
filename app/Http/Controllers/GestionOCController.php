@@ -3027,8 +3027,10 @@ class GestionOCController extends Controller
                                 }
                                 
                                 $estadoCp             = $datares['estadoCp'];
-                                $tablaestacp          = Estado::where('tipo','=','estadoCp')->where('codigo','=',$estadoCp)->first();
 
+
+                                $tablaestacp          = Estado::where('tipo','=','estadoCp')->where('codigo','=',$estadoCp)->first();
+                                //dd($tablaestacp);
                                 $estadoRuc            = '';
                                 $txtestadoRuc         = '';
                                 $estadoDomiRuc        = '';
@@ -3045,6 +3047,7 @@ class GestionOCController extends Controller
                                     $txtestadoDomiRuc       = $tablaestaDomiRuc->nombre;
                                 }
 
+
                                 FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)
                                             ->update(
                                                     [
@@ -3057,6 +3060,9 @@ class GestionOCController extends Controller
                                                         'condDomiRuc'=>$estadoDomiRuc,
                                                         'ncondDomiRuc'=>$txtestadoDomiRuc,
                                                     ]);
+
+
+
                             }else{
                                 FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)
                                             ->update(
