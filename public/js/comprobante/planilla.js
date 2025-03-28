@@ -1,55 +1,50 @@
+
+function toggleContent() {
+  var longText = document.getElementById('longText');
+  var button = document.getElementById('toggleButton');
+  if (longText.classList.contains('collapsed')) {
+    longText.classList.remove('collapsed');
+    button.innerHTML = "- Ver Menos";
+  } else {
+    longText.classList.add('collapsed');
+    button.innerHTML = "+ Ver MÃ¡s";
+  }
+}
+// Inicialmente colapsar el contenido adicional
+document.addEventListener("DOMContentLoaded", function() {
+  document.getElementById('longText').classList.add('collapsed');
+});
+
+
 $(document).ready(function(){
     var carpeta = $("#carpeta").val();
 
-    $(".planillamovilidad").on('click','.btnguardarplanillamovilidad', function(e) {
+
+
+
+    $(".planillamovilidad").on('click','.btn-guardar-detalle-planilla', function(e) {
         event.preventDefault();
+        debugger;
+
         var _token                  =   $('#token').val();
-        var data_lote               =   $(this).attr('data_lote');
-        $.confirm({
-            title: '¿Confirma el registro?',
-            content: 'Registro de Planilla de movilidad',
-            buttons: {
-                confirmar: function () {
-                     $( "#frmpm" ).submit();   
-                },
-                cancelar: function () {
-                    $.alert('Se cancelo el registro');
-                    window.location.reload();
-                }
-            }
-        });
 
-    });
-
-
-    $(".planillamovilidad").on('click','.btnemitirplanillamovilidad', function(e) {
-        event.preventDefault();
-        var _token                  =   $('#token').val();
-        var data_lote               =   $(this).attr('data_lote');
-        $.confirm({
-            title: '¿Confirma la emision?',
-            content: 'Registro de emision de movilidad',
-            buttons: {
-                confirmar: function () {
-                     $( "#frmpmemitir" ).submit();   
-                },
-                cancelar: function () {
-                    $.alert('Se cancelo la emision');
-                    window.location.reload();
-                }
-            }
-        });
-
-    });
-
-    $(".planillamovilidad").on('click','.btn-guardar-detalle-compra', function(e) {
-        event.preventDefault();
-        var _token                  =   $('#token').val();
-        var fecha_pago              =   $('#fecha_gasto').val();
         var cod_mes                 =   $('#cod_mes').val();
         var cod_anio                =   $('#cod_anio').val();
-        var fechaString             =   fecha_pago; // "26-03-2025"
-        if (!fechaString) return false; // Evita errores si el campo está vacío
+
+
+        var fecha_gasto             =   $('#fecha_gasto').val();
+        var motivo_id               =   $('#motivo_id').val();
+        var lugarpartida            =   $('#lugarpartida').val();
+        var lugarllegada            =   $('#lugarllegada').val();
+        var total                   =   $('#total').val();       
+        var fechaString             =   fecha_gasto; // "26-03-2025"
+
+        if(fecha_gasto ==''){ alerterrorajax("Seleccione una Fecha de pago."); return false;}
+        if(motivo_id ==''){ alerterrorajax("Seleccione un Motivo."); return false;}
+        if(lugarpartida ==''){ alerterrorajax("Ingrese un lugar de Partida"); return false;}
+        if(lugarllegada ==''){ alerterrorajax("Ingrese un lugar de LLegada"); return false;}
+        if(total ==''){ alerterrorajax("Ingrese un total"); return false;}
+
 
         // Separar día, mes y año
         var partes = fechaString.split('-');
@@ -79,13 +74,8 @@ $(document).ready(function(){
             alerterrorajax('La fecha de pago no pertenece al periodo de la planilla.'); return false;
         }
 
-        return true;
+        $( "#agregarpmd" ).submit();
     });
-
-
-
-
-    var carpeta = $("#carpeta").val();
 
     $(".planillamovilidad").on('click','.agregardetalle', function() {
         // debugger;
@@ -122,7 +112,83 @@ $(document).ready(function(){
 
     });
 
+    $(".planillamovilidad").on('change','#tipo_solicitud', function() {
+        event.preventDefault();
+        var tipo_solicitud     =   $(this).val();
+        debugger;
+        if(tipo_solicitud == 'RENDICION'){
+            $('.cajaautoriza').hide();
+        }else{
+            $('#cajaautoriza').show();
+        }
+    });
 
+    $(".planillamovilidad").on('click','.btnguardarplanillamovilidad', function(e) {
+        event.preventDefault();
+        var _token                  =   $('#token').val();
+        var data_lote               =   $(this).attr('data_lote');
+        $.confirm({
+            title: '¿Confirma el registro?',
+            content: 'Registro de Planilla de movilidad',
+            buttons: {
+                confirmar: function () {
+                     $( "#frmpm" ).submit();   
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo el registro');
+                    window.location.reload();
+                }
+            }
+        });
+
+    });
+
+    $(".planillamovilidad").on('click','.btnemitirplanillamovilidad', function(e) {
+        event.preventDefault();
+        var _token                  =   $('#token').val();
+        var data_lote               =   $(this).attr('data_lote');
+        var tipo_solicitud          =   $("#tipo_solicitud").val();
+        var autoriza_id             =   $("#autoriza_id").val();
+
+        if(tipo_solicitud == 'REEMBOLSO'){
+            if(autoriza_id == ''){
+                alerterrorajax('Seleccione quien autorizara su REEMBOLSO'); return false;
+            }
+        }
+
+        $.confirm({
+            title: '¿Confirma la emision?',
+            content: 'Registro de emision de movilidad',
+            buttons: {
+                confirmar: function () {
+                     $( "#frmpmemitir" ).submit();   
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo la emision');
+                    window.location.reload();
+                }
+            }
+        });
+
+    });
+
+
+    $('.btnaprobarcomporbatnte').on('click', function(event){
+        event.preventDefault();
+        $.confirm({
+            title: '¿Confirma la Aprobacion?',
+            content: 'Aprobar el Comprobante',
+            buttons: {
+                confirmar: function () {
+                    $( "#formpedido" ).submit();
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo Aprobacion');
+                }
+            }
+        });
+
+    });
 
 
 });

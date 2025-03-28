@@ -12,6 +12,10 @@ use App\Modelos\PlaDetMovilidad;
 use App\Modelos\PlaSerie;
 use App\Modelos\STDTrabajador;
 use App\Modelos\CMPCategoria;
+use App\Modelos\PlaDocumentoHistorial;
+
+
+
 
 
 
@@ -27,6 +31,8 @@ use Illuminate\Support\Facades\Redirect;
 use Session;
 use View;
 use App\Traits\GeneralesTraits;
+use App\Traits\PlanillaTraits;
+
 use Hashids;
 use SplFileInfo;
 use Excel;
@@ -34,6 +40,233 @@ use Excel;
 class GestionPlanillaMovilidadController extends Controller
 {
     use GeneralesTraits;
+    use PlanillaTraits;
+
+
+    public function actionAprobarPlanillaMovilidadAdministracion($idopcion,Request $request)
+    {
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Ver');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        View::share('titulo','Lista planillas de movilidad (administracion)');
+        $tab_id             =   'oc';
+        if(isset($request['tab_id'])){
+            $tab_id             =   $request['tab_id'];
+        }
+
+        $listadatos         =   $this->pla_lista_cabecera_comprobante_total_administracion();
+        $listadatos_obs     =   $this->pla_lista_cabecera_comprobante_total_administracion();
+        $listadatos_obs_le  =   $this->pla_lista_cabecera_comprobante_total_administracion();
+
+        $funcion        =   $this;
+        return View::make('planillamovilidad/listaplanillamovilidadadministracion',
+                         [
+                            'listadatos'        =>  $listadatos,
+                            'listadatos_obs'    =>  $listadatos_obs,
+                            'listadatos_obs_le' =>  $listadatos_obs_le,
+                            'tab_id'            =>  $tab_id,
+                            'funcion'           =>  $funcion,
+                            'idopcion'          =>  $idopcion,
+                         ]);
+    }
+
+
+    public function actionAprobarAdministracion($idopcion, $iddocumento,Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        $idcab                  =   $iddocumento;
+        $iddocumento            =   $this->funciones->decodificarmaestra($iddocumento);
+        View::share('titulo','Aprobar Planilla Movilidad Administracion');
+
+        if($_POST)
+        {
+            try{    
+            
+                DB::beginTransaction();
+                $planillamovilidad      =   PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first(); 
+                $tdetplanillamovilidad  =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
+                $documentohistorial     =   PlaDocumentoHistorial::where('ID_DOCUMENTO','=',$iddocumento)->get();
+                $descripcion        =   $request['descripcion'];
+                if(rtrim(ltrim($descripcion)) != ''){
+                    //HISTORIAL DE DOCUMENTO APROBADO
+                    $documento                              =   new PlaDocumentoHistorial;
+                    $documento->ID_DOCUMENTO                =   $planillamovilidad->ID_DOCUMENTO;
+                    $documento->DOCUMENTO_ITEM              =   1;
+                    $documento->FECHA                       =   $this->fechaactual;
+                    $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                    $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                    $documento->TIPO                        =   'ACOTACION POR EL ADMINISTRACION';
+                    $documento->MENSAJE                     =   $descripcion;
+                    $documento->save();
+                }
+                $nro_cuenta_contable=   $request['nro_cuenta_contable'];
+                PlaMovilidad::where('ID_DOCUMENTO',$planillamovilidad->ID_DOCUMENTO)
+                            ->update(
+                                [
+                                    'COD_ESTADO'=>'ETM0000000000005',
+                                    'TXT_ESTADO'=>'APROBADO'
+                                ]
+                            );
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento                              =   new PlaDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $planillamovilidad->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM              =   1;
+                $documento->FECHA                       =   $this->fechaactual;
+                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                $documento->TIPO                        =   'APROBADO POR ADMINISTRACION';
+                $documento->MENSAJE                     =   '';
+                $documento->save();
+                DB::commit();
+                return Redirect::to('/gestion-de-aprobacion-planilla-movilidad-administracion/'.$idopcion)->with('bienhecho', 'Planilla de Movilidad : '.$planillamovilidad->ID_DOCUMENTO.' APROBADO CON EXITO');
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                return Redirect::to('/gestion-de-aprobacion-planilla-movilidad-administracion/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+        }
+        else{
+
+            $planillamovilidad      =   PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first(); 
+            $tdetplanillamovilidad  =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
+            $documentohistorial     =   PlaDocumentoHistorial::where('ID_DOCUMENTO','=',$iddocumento)->get();
+
+
+            return View::make('planillamovilidad/aprobaradministracion', 
+                            [
+                                'planillamovilidad'     =>  $planillamovilidad,
+                                'tdetplanillamovilidad' =>  $tdetplanillamovilidad,
+                                'documentohistorial'    =>  $documentohistorial,
+                                'idopcion'              =>  $idopcion,
+                                'idcab'                 =>  $idcab,
+                                'iddocumento'           =>  $iddocumento,
+                            ]);
+
+
+        }
+    }
+
+
+    public function actionAprobarJefe($idopcion, $iddocumento,Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        $idcab                  =   $iddocumento;
+        $iddocumento            =   $this->funciones->decodificarmaestra($iddocumento);
+        View::share('titulo','Aprobar Planilla Movilidad Jefe');
+
+        if($_POST)
+        {
+            try{    
+            
+                DB::beginTransaction();
+
+                $planillamovilidad      =   PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first(); 
+                $tdetplanillamovilidad  =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
+                $documentohistorial     =   PlaDocumentoHistorial::where('ID_DOCUMENTO','=',$iddocumento)->get();
+                $descripcion        =   $request['descripcion'];
+                if(rtrim(ltrim($descripcion)) != ''){
+                    //HISTORIAL DE DOCUMENTO APROBADO
+                    $documento                              =   new PlaDocumentoHistorial;
+                    $documento->ID_DOCUMENTO                =   $planillamovilidad->ID_DOCUMENTO;
+                    $documento->DOCUMENTO_ITEM              =   1;
+                    $documento->FECHA                       =   $this->fechaactual;
+                    $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                    $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                    $documento->TIPO                        =   'ACOTACION POR EL JEFE';
+                    $documento->MENSAJE                     =   $descripcion;
+                    $documento->save();
+                }
+
+                $nro_cuenta_contable=   $request['nro_cuenta_contable'];
+                PlaMovilidad::where('ID_DOCUMENTO',$planillamovilidad->ID_DOCUMENTO)
+                            ->update(
+                                [
+                                    'COD_ESTADO'=>'ETM0000000000004',
+                                    'TXT_ESTADO'=>'POR APROBAR ADMINISTRACION'
+                                ]
+                            );
+
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento                              =   new PlaDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $planillamovilidad->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM              =   1;
+                $documento->FECHA                       =   $this->fechaactual;
+                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                $documento->TIPO                        =   'APROBADO POR EL JEFE';
+                $documento->MENSAJE                     =   '';
+                $documento->save();
+
+
+                DB::commit();
+                return Redirect::to('/gestion-de-aprobacion-planilla-movilidad-jefe/'.$idopcion)->with('bienhecho', 'Planilla de Movilidad : '.$planillamovilidad->ID_DOCUMENTO.' APROBADO CON EXITO');
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                return Redirect::to('/gestion-de-aprobacion-planilla-movilidad-jefe/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+        }
+        else{
+
+            $planillamovilidad      =   PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first(); 
+            $tdetplanillamovilidad  =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
+            $documentohistorial     =   PlaDocumentoHistorial::where('ID_DOCUMENTO','=',$iddocumento)->get();
+
+
+            return View::make('planillamovilidad/aprobarjefe', 
+                            [
+                                'planillamovilidad'     =>  $planillamovilidad,
+                                'tdetplanillamovilidad' =>  $tdetplanillamovilidad,
+                                'documentohistorial'    =>  $documentohistorial,
+                                'idopcion'              =>  $idopcion,
+                                'idcab'                 =>  $idcab,
+                                'iddocumento'           =>  $iddocumento,
+                            ]);
+
+
+        }
+    }
+
+
+
+    public function actionAprobarPlanillaMovilidadJefe($idopcion,Request $request)
+    {
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Ver');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        View::share('titulo','Lista planillas de movilidad (jefe)');
+        $tab_id             =   'oc';
+        if(isset($request['tab_id'])){
+            $tab_id             =   $request['tab_id'];
+        }
+
+        $listadatos         =   $this->pla_lista_cabecera_comprobante_total_jefe();
+        $listadatos_obs     =   $this->pla_lista_cabecera_comprobante_total_jefe();
+        $listadatos_obs_le  =   $this->pla_lista_cabecera_comprobante_total_jefe();
+
+        $funcion        =   $this;
+        return View::make('planillamovilidad/listaplanillamovilidadjefe',
+                         [
+                            'listadatos'        =>  $listadatos,
+                            'listadatos_obs'    =>  $listadatos_obs,
+                            'listadatos_obs_le' =>  $listadatos_obs_le,
+                            'tab_id'            =>  $tab_id,
+                            'funcion'           =>  $funcion,
+                            'idopcion'          =>  $idopcion,
+                         ]);
+    }
+
+
+
+
 
 
     public function actionListarPlanillaMovilidad($idopcion)
@@ -78,6 +311,9 @@ class GestionPlanillaMovilidadController extends Controller
                 DB::beginTransaction();
                 $planillamovilidad      =   PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first(); 
                 $tdetplanillamovilidad  =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
+                $usuario_id             =   $request['autoriza_id'];
+                $usuario                =   User::where('id','=',$usuario_id)->first();
+
 
                 if(count($tdetplanillamovilidad)<=0){
                     return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd','Para poder emitir tiene que cargar sus movilidades');
@@ -86,11 +322,26 @@ class GestionPlanillaMovilidadController extends Controller
                 PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)
                             ->update(
                                     [
+                                        'COD_USUARIO_AUTORIZA'=> $usuario->id,
+                                        'TXT_USUARIO_AUTORIZA'=> $usuario->nombre,
+                                        'FECHA_EMI'=> $this->fechaactual,
+                                        'TIPO_SUSTENTO'=> $request['tipo_solicitud'],
                                         'FECHA_MOD'=> $this->fechaactual,
                                         'USUARIO_MOD'=> Session::get('usuario')->id,
-                                        'COD_ESTADO'=> 'ETM0000000000004',
-                                        'TXT_ESTADO'=> 'POR APROBAR ADMINISTRACION'
+                                        'COD_ESTADO'=> 'ETM0000000000010',
+                                        'TXT_ESTADO'=> 'POR APROBAR AUTORIZACION'
                                     ]);
+
+                $documento                              =   new PlaDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $iddocumento;
+                $documento->DOCUMENTO_ITEM              =   1;
+                $documento->FECHA                       =   date_format(date_create(date('Ymd h:i:s')), 'Ymd h:i:s');
+                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                $documento->TIPO                        =   'CREO PLANILLA MOVILIDAD';
+                $documento->MENSAJE                     =   '';
+                $documento->save();
+
                 DB::commit();
             }catch(\Exception $ex){
                 DB::rollback(); 
@@ -368,6 +619,8 @@ class GestionPlanillaMovilidadController extends Controller
             $doctrabajador  =   $dtrabajador->NRO_DOCUMENTO;
         }
         $tdetplanillamovilidad  =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->orderby('FECHA_GASTO','asc')->get();
+        $combots                =   array('' => "SELECCIONE TIPO SOLICUTUD",'REEMBOLSO' => "REEMBOLSO",'RENDICION' => "RENDICIÓN");
+        $combousuario           =   $this->gn_combo_usuarios();
 
         return View::make('planillamovilidad.modificarplanillamovilidad',
                          [
@@ -376,6 +629,8 @@ class GestionPlanillaMovilidadController extends Controller
                             'numero' => $numero,
                             'centro' => $centro,
                             'txttrabajador' => $txttrabajador,
+                            'combots'  =>  $combots,
+                            'combousuario' =>  $combousuario,
                             'doctrabajador' => $doctrabajador,
                             'fecha_creacion' => $fecha_creacion,
                             'planillamovilidad' => $planillamovilidad,
@@ -428,6 +683,7 @@ class GestionPlanillaMovilidadController extends Controller
         $comboestado        =       array('1' => "ACTIVO",'0' => "ELIMINAR");
         $activo             =       $dplanillamovilidad->ACTIVO;
 
+
         return View::make('planillamovilidad/modal/ajax/magregardetalleplanillamovilidad',
                          [
                             'iddocumento'           =>  $iddocumento,
@@ -440,6 +696,8 @@ class GestionPlanillaMovilidadController extends Controller
                             'motivo_id'             =>  $motivo_id,
 
                             'comboestado'           =>  $comboestado,
+
+
                             'activo'                =>  $activo,
 
                             'ajax'                  =>  true,

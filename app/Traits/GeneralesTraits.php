@@ -19,7 +19,7 @@ use App\Modelos\Archivo;
 use App\Modelos\PlaSerie;
 use App\Modelos\PlaMovilidad;
 
-
+use App\User;
 
 
 use View;
@@ -86,6 +86,21 @@ trait GeneralesTraits
 
 
     }
+
+    public function gn_combo_usuarios()
+    {
+
+        $array = User::where('activo', '=', 1)
+            ->where('id', '<>', '1CIX00000001')
+            ->where('rol_id', '<>', '1CIX00000024')
+            ->orderBy('nombre', 'asc')
+            ->pluck('nombre', 'id')
+            ->toArray();
+        $combo = array('' => 'Seleccione quien autorizara') + $array;
+        return $combo;
+    }
+
+
 
     public function gn_periodo_actual_xanio_xempresa($anio, $mes, $cod_empresa)
     {

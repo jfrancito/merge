@@ -1,7 +1,7 @@
 @if(isset($dplanillamovilidad))
-	<form method="POST" action="{{ url('/modificar-detalle-planilla-movilidad/'.$idopcion.'/'.Hashids::encode(substr($planillamovilidad->ID_DOCUMENTO, -8)).'/'.$dplanillamovilidad->ITEM ) }}">
+	<form method="POST" id ='agregarpmd' class="form2" action="{{ url('/modificar-detalle-planilla-movilidad/'.$idopcion.'/'.Hashids::encode(substr($planillamovilidad->ID_DOCUMENTO, -8)).'/'.$dplanillamovilidad->ITEM ) }}">
 @else
-	<form method="POST" action="{{ url('/guardar-detalle-planilla-movilidad/'.$idopcion.'/'.Hashids::encode(substr($planillamovilidad->ID_DOCUMENTO, -8))) }}">
+	<form method="POST" id ='agregarpmd' class="form2" action="{{ url('/guardar-detalle-planilla-movilidad/'.$idopcion.'/'.Hashids::encode(substr($planillamovilidad->ID_DOCUMENTO, -8))) }}">
 @endif
 	{{ csrf_field() }}
 	<div class="modal-header">
@@ -19,13 +19,12 @@
 	            <div class="col-sm-12 abajocaja" >
 	              <div data-min-view="2" 
 	                     data-date-format="dd-mm-yyyy"  
-	                     class="input-group date datetimepicker pickerfecha" style = 'padding: 0px 0;margin-top: -3px;'>
+	                     class="input-group date datetimepicker02 pickerfecha" style = 'padding: 0px 0;margin-top: -3px;'>
 	                     <input size="16" type="text" 
-	                            value="@if(isset($dplanillamovilidad)){{old('fecha_gasto' ,$dplanillamovilidad->FECHA_GASTO)}}@else{{old('fecha_gasto')}}@endif" 
+	                            value="@if(isset($dplanillamovilidad)){{old('fecha_gasto' ,date_format(date_create(date($dplanillamovilidad->FECHA_GASTO)), 'd-m-Y'))}}@else{{old('fecha_gasto')}}@endif" 
 	                            placeholder="FECHA DEL GASTO"
 	                            id='fecha_gasto' 
 	                            name='fecha_gasto' 
-	                            required = ""
 	                            class="form-control input-sm"/>
 	                      <span class="input-group-addon btn btn-primary"><i class="icon-th mdi mdi-calendar"></i></span>
 	                </div>
@@ -39,9 +38,8 @@
 				  <div class="col-sm-12">
 				      {!! Form::select( 'motivo_id', $combomotivo, $motivo_id,
 		                              [
-		                                'class'       => 'select2 form-control control input-xs' ,
+		                                'class'       => 'select3 form-control control input-xs' ,
 		                                'id'          => 'motivo_id',        
-		                                'required'    => ''
 		                              ]) !!}
 				  </div>
 				</div>
@@ -55,7 +53,6 @@
 											id="lugarpartida" 
 											name='lugarpartida' 
 											value="@if(isset($dplanillamovilidad)){{old('lugarpartida' ,$dplanillamovilidad->TXT_LUGARPARTIDA)}}@else{{old('lugarpartida')}}@endif" 
-											required = ""
 											placeholder="Lugar de Partida"
 											autocomplete="off" 
 											class="form-control input-sm validarmayusculas"/>
@@ -71,7 +68,6 @@
 											id="lugarllegada" 
 											name='lugarllegada' 
 											value="@if(isset($dplanillamovilidad)){{old('lugarllegada' ,$dplanillamovilidad->TXT_LUGARLLEGADA)}}@else{{old('lugarllegada')}}@endif" 
-											required = ""
 											placeholder="Lugar de Llegada"
 											autocomplete="off" 
 											class="form-control input-sm validarmayusculas"/>
@@ -90,7 +86,6 @@
 											id="total" 
 											name='total'
 											value="@if(isset($dplanillamovilidad)){{old('total' ,$dplanillamovilidad->TOTAL)}}@else{{old('total')}}@endif" 
-											required = ""
 											placeholder="Total"
 											autocomplete="off" 
 											class="form-control input-sm importe"/>
@@ -106,7 +101,7 @@
 				  <div class="col-sm-12">
 				      {!! Form::select( 'activo', $comboestado, $activo,
 		                              [
-		                                'class'       => 'select2 form-control control input-xs' ,
+		                                'class'       => 'select3 form-control control input-xs' ,
 		                                'id'          => 'activo',        
 		                                'required'    => ''
 		                              ]) !!}
@@ -119,14 +114,27 @@
 		</div>
 	</div>
 	<div class="modal-footer">
-		<button type="submit" data-dismiss="modal" class="btn btn-success btn-guardar-detalle-compra">Guardar</button>
+		<button type="submit" data-dismiss="modal" class="btn btn-success btn-guardar-detalle-planilla">Guardar</button>
 	</div>
 </form>
 @if(isset($ajax))
 	<script type="text/javascript">
 		$(document).ready(function(){
-			App.formElements();
-        	$('form').parsley();
+
+		    $(".datetimepicker02").datetimepicker({
+		    	autoclose: true,
+		      	pickerPosition: "bottom-left",
+		    	componentIcon: '.mdi.mdi-calendar',
+		    	navIcons:{
+		    		rightIcon: 'mdi mdi-chevron-right',
+		    		leftIcon: 'mdi mdi-chevron-left'
+		    	}
+		    });
+			$(".select3").select2({
+		      width: '100%'
+		    });
+        	$('.form2').parsley();
+
 			$('.importe').inputmask({ 'alias': 'numeric', 
 			'groupSeparator': ',', 'autoGroup': true, 'digits': 2, 
 			'digitsOptional': false, 

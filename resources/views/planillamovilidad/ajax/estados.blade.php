@@ -29,7 +29,7 @@
                     @if($item->COD_ESTADO == 'ETM0000000000009') 
                         <span class="badge badge-warning" style="display: inline-block;">{{$item->TXT_ESTADO}}</span>
                     @else
-                        <span class="badge badge-default" style="display: inline-block;">{{$item->TXT_ESTADO}}</span>
+                        <span class="badge badge-warning" style="display: inline-block;">{{$item->TXT_ESTADO}}</span>
                     @endif
                   @endif
                 @endif
