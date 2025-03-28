@@ -388,6 +388,10 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/pago-comprobante-tesoreria-contrato/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCTesoreriaController@actionAprobarTesoreriaContrato');
 
 
+	Route::any('/ajax-modal-tesoreria-pago-estiba', 'GestionOCTesoreriaController@actionListarAjaxModalTesoreriaPagoEstiba');
+	Route::any('/pago-comprobante-tesoreria-estiba/{idopcion}/{linea}/{idordencompra}', 'GestionOCTesoreriaController@actionAprobarTesoreriaEstiba');
+
+
 	Route::any('/gestion-de-comprobante-pago-tesoreria/{idopcion}', 'GestionOCTesoreriaController@actionListarComprobanteTesoreriaPago');
 	Route::any('/ajax-buscar-documento-gestion-tesoreria-pagado', 'GestionOCTesoreriaController@actionListarAjaxBuscarDocumentoTesoreriaPago');
 	Route::any('/ajax-modal-tesoreria-pago-pagado', 'GestionOCTesoreriaController@actionListarAjaxModalTesoreriaPagoPagado');

@@ -2666,7 +2666,6 @@ trait ComprobanteTraits
                             ->where('OPERACION','=','CONTRATO')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->ProveedorFE($proveedor_id)
-                            //->where('TXT_PROCEDENCIA','<>','SUE')
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000005')
                             ->orderBy('fecha_uc','desc')
                             ->get();
@@ -2698,18 +2697,28 @@ trait ComprobanteTraits
                             ->select(DB::raw('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION.COD_ORDEN COD,FE_DOCUMENTO.*,CMP.Orden.* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                             ->whereNull('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION.COD_ORDEN')
                             ->where('OPERACION','=','ORDEN_COMPRA')
-                            //->whereIn('FE_DOCUMENTO.ID_DOCUMENTO',['IICHCT0000002722','IICHCL0000010383'])
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000005')
                             ->ProveedorFE($proveedor_id)
                             ->orderBy('fecha_uc','desc')
                             ->get();
-
-        //dd($listadatos);
-
-
         return  $listadatos;
     }
+
+
+    private function con_lista_cabecera_comprobante_total_tes_estiba($cliente_id,$proveedor_id,$operacion_id) {
+
+        $listadatos     =   FeDocumento::where('OPERACION','=',$operacion_id)
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000005')
+                            ->ProveedorFE($proveedor_id)
+                            ->orderBy('fecha_uc','desc')
+                            ->get();
+        return  $listadatos;
+    }
+
+
+
 
     private function con_lista_cabecera_comprobante_total_tes_pagado($cliente_id,$proveedor_id,$fecha_inicio,$fecha_fin) {
 
