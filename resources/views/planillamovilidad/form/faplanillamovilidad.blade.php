@@ -170,20 +170,6 @@
                 </div>
     </div>
 
-
-    <div class="ol-xs-12 col-sm-4 col-md-3 col-lg-3 cajaautoriza">
-                <div class="form-group">
-                  <label class="col-sm-12 control-label labelleft negrita" >AUTORIZA <span class="obligatorio">(*)</span> :</label>
-                  <div class="col-sm-12">
-                      {!! Form::select( 'autoriza_id', $combousuario, array(),
-                                      [
-                                        'class'       => 'select2 form-control control input-xs' ,
-                                        'id'          => 'autoriza_id',        
-                                      ]) !!}
-                  </div>
-                </div>
-    </div>
-
     @endif
 
 

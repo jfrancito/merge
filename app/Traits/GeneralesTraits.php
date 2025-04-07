@@ -33,15 +33,16 @@ use File;
 trait GeneralesTraits
 {
 
-    public function gn_numero($serie)
+    public function gn_numero($serie,$centro_id)
     {
 
-    	$serie   = '';
-        $dserie  = PlaMovilidad::where('COD_CENTRO', '=', Session::get('usuario')->cod_centro)
+        $dserie  = PlaMovilidad::where('COD_CENTRO', '=', $centro_id)
 		            ->where('COD_EMPRESA', '=', Session::get('empresas')->COD_EMPR)
 		            ->where('SERIE', '=', $serie)
 		            ->select(DB::raw('max(NUMERO) as numero'))
+		            ->orderBy('NUMERO','desc')
 		            ->first();
+
 		//conversion a string y suma uno para el siguiente id
 		$idsuma = (int) $dserie->numero + 1;
 		//concatenar con ceros
@@ -52,12 +53,12 @@ trait GeneralesTraits
     }
 
 
-    public function gn_serie($anio, $mes)
+    public function gn_serie($anio, $mes,$centro_id)
     {
 
     	$serie   = '';
         $dserie  = PlaSerie::where('activo', '=', 1)
-		            ->where('COD_CENTRO', '=', Session::get('usuario')->cod_centro)
+		            ->where('COD_CENTRO', '=', $centro_id)
 		            ->where('COD_EMPRESA', '=', Session::get('empresas')->COD_EMPR)
 		            ->first();
 		if(count($dserie)>0){

@@ -173,6 +173,25 @@ class Funcion {
 	}
 
 
+	public function decodificarmaestrapre($id,$prefijo) {
+
+		//decodificar variable
+		$iddeco = Hashids::decode($id);
+
+		//ver si viene con letras la cadena codificada
+		if (count($iddeco) == 0) {
+			return '';
+		}
+		//concatenar con ceros
+		$idopcioncompleta = str_pad($iddeco[0], 8, "0", STR_PAD_LEFT);
+
+		$prefijo = $prefijo;
+		$idopcioncompleta = $prefijo . $idopcioncompleta;
+		return $idopcioncompleta;
+
+	}
+
+
 	public function decodificarmaestra($id) {
 
 		//decodificar variable
@@ -353,7 +372,7 @@ class Funcion {
 	}
 
 
-	public function getCreateIdMaestradocpla($tabla) {
+	public function getCreateIdMaestradocpla($tabla,$prefijo) {
 
 		$id = "";
 		// maximo valor de la tabla referente
@@ -365,13 +384,11 @@ class Funcion {
 		//concatenar con ceros
 		$idopcioncompleta = str_pad($idsuma, 8, "0", STR_PAD_LEFT);
 		//concatenar prefijo
-		$prefijo = $this->prefijomaestra();
+		$prefijo = $prefijo;
 		$idopcioncompleta = $prefijo . $idopcioncompleta;
 		return $idopcioncompleta;
 
 	}
-
-
 
 
 

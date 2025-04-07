@@ -90,12 +90,15 @@ class GestionOCController extends Controller
                                         )
                                     ->pluck('nombre','TXT_NRO_CUENTA_BANCARIA')
                                     ->toArray();
+
         $combocb                =   array('' => "Seleccione Cuenta Bancaria") + $tescuentabb;
         $funcion                =   $this;
 
         return View::make('comprobante/combo/combo_cuenta_bancaria',
                          [
                             'combocb'                   =>  $combocb,
+                            'entidadbanco_id'           =>  $entidadbanco_id,
+                            'empresa_cliente_id'        =>  $ordencompra->COD_EMPR_CLIENTE,
                             'ajax'                      =>  true,
                          ]);
     }
@@ -130,6 +133,30 @@ class GestionOCController extends Controller
                             'ajax'                      =>  true,
                          ]);
     }
+
+
+    public function actionAjaxMonedaAjaxCuenta(Request $request)
+    {
+
+        $txt_moneda                          =   '';
+        $data_entidadbanco_id                =   $request['data_entidadbanco_id'];
+        $data_empresa_cliente_id             =   $request['data_empresa_cliente_id'];
+        $cb_id                               =   $request['cb_id'];
+
+        $tescuentabb                         =   TESCuentaBancaria::where('COD_EMPR_TITULAR','=',$data_empresa_cliente_id)
+                                                ->where('COD_EMPR_BANCO','=',$data_entidadbanco_id)
+                                                ->where('TXT_NRO_CUENTA_BANCARIA','=',$cb_id)
+                                                ->where('COD_ESTADO','=',1)
+                                                ->first();
+        if(count($tescuentabb)>0){
+            $txt_moneda                      =   $tescuentabb->TXT_CATEGORIA_MONEDA;  
+        }
+
+        print_r($txt_moneda);
+
+    }
+
+
 
    public function actionAjaxBuscarCuentaBancariaEstiba(Request $request)
     {

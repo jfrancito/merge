@@ -3631,6 +3631,28 @@ trait ComprobanteTraits
         return  $combo;                    
     }
 
+
+
+    private function gn_combo_empresa_lg($todo) {
+
+        $array                          =   DB::table('STD.EMPRESA')
+                                            ->where('COD_ESTADO','=','1')
+                                            ->pluck('NOM_EMPR','COD_EMPR')
+                                            ->toArray();
+        if($todo=='TODO'){
+            $combo                  =   array($todo => $todo) + $array;
+        }else{
+            $combo                  =   $array;
+        }
+        return  $combo;                    
+    }
+
+
+
+
+
+
+
     private function gn_combo_empresa($todo) {
 
         $array                          =   DB::table('STD.EMPRESA')
@@ -3644,6 +3666,10 @@ trait ComprobanteTraits
         }
         return  $combo;                    
     }
+
+
+
+
 
     private function gn_combo_empresa_empresa($empresa_id) {
 

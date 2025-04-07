@@ -88,6 +88,59 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/descargar-archivo-local/{tipo}', 'CpeController@descargarArchivoLocal');
 
 
+	//LIQUIDACION DE GASTOS
+	Route::any('/gestion-de-liquidacion-gastos/{idopcion}', 'GestionLiquidacionGastosController@actionListarLiquidacionGastos');
+	Route::any('/agregar-liquidacion-gastos/{idopcion}', 'GestionLiquidacionGastosController@actionAgregarLiquidacionGastos');
+	Route::any('/ajax-combo-cuenta', 'GestionLiquidacionGastosController@actionAjaxComboCuenta');
+	Route::any('/modificar-liquidacion-gastos/{idopcion}/{iddocumento}/{valor}', 'GestionLiquidacionGastosController@actionModificarLiquidacionGastos');
+	Route::any('/ajax-combo-subcuenta', 'GestionLiquidacionGastosController@actionAjaxComboSubCuenta');
+	Route::any('/ajax-combo-item', 'GestionLiquidacionGastosController@actionAjaxComboItem');
+
+	Route::any('/guardar-detalle-liquidacion-gastos/{idopcion}/{iddocumento}', 'GestionLiquidacionGastosController@actionGuardarDetalleLiquidacionGastos');
+	Route::any('/ajax-modal-detalle-documento-lg', 'GestionLiquidacionGastosController@actionDetalleDocumentoLG');
+	Route::any('/guardar-detalle-documento-lg/{idopcion}/{iddocumento}/{item}', 'GestionLiquidacionGastosController@actionGuardarDetalleDocumentoLG');
+	Route::any('/ajax-modal-modificar-detalle-documento-lg', 'GestionLiquidacionGastosController@actionModificarDetalleDocumentoLG');
+	Route::any('/modificar-detalle-documento-lg/{idopcion}/{iddocumento}/{item}/{itemdocumento}', 'GestionLiquidacionGastosController@actionGuardarModificarDetalleDocumentoLG');
+	Route::any('/emitir-liquidacion-gastos/{idopcion}/{iddocumento}', 'GestionLiquidacionGastosController@actionEmitirLiquidacionGasto');
+
+
+	Route::any('/gestion-de-aprobacion-liquidacion-gasto-jefe/{idopcion}', 'GestionLiquidacionGastosController@actionAprobarLiquidacionGastoJefe');
+	Route::any('/aprobar-liquidacion-gasto-jefe/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionAprobarJefeLG');
+
+	Route::any('/gestion-de-aprobacion-liquidacion-gastos-administracion/{idopcion}', 'GestionLiquidacionGastosController@actionAprobarLiquidacionGastoAdministracion');
+	Route::any('/aprobar-liquidacion-gasto-administracion/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionAprobarAdministracionLG');
+
+
+	Route::any('/ajax-modal-buscar-planilla-lg', 'GestionLiquidacionGastosController@actionModalBuscarPlanillaLG');
+	Route::any('/ajax-select-documento-planilla', 'GestionLiquidacionGastosController@actionModalSelectDocumentoPlanillaLG');
+
+
+
+
+
+
+	//PLANILLA MOVILIDAD
+	Route::any('/gestion-de-planilla-movilidad/{idopcion}', 'GestionPlanillaMovilidadController@actionListarPlanillaMovilidad');
+	Route::any('/agregar-planilla-movilidad/{idopcion}', 'GestionPlanillaMovilidadController@actionAgregarPlanillaMovilidad');
+	Route::any('/modificar-planilla-movilidad/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadController@actionModificarPlanillaMovilidad');
+	Route::any('/ajax-modal-detalle-planilla-movilidad', 'GestionPlanillaMovilidadController@actionDetallePlanillaMovilidad');
+	Route::any('/guardar-detalle-planilla-movilidad/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadController@actionGuardarDetallePlanillaMovilidad');
+	Route::any('/ajax-modal-modificar-detalle-planilla-movilidad', 'GestionPlanillaMovilidadController@actionModificarDetallePlanillaMovilidad');
+	Route::any('/modificar-detalle-planilla-movilidad/{idopcion}/{iddocumento}/{item}', 'GestionPlanillaMovilidadController@actionGuardarModificarDetallePlanillaMovilidad');
+	Route::any('/emitir-planilla-movilidad/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadController@actionEmitirDetallePlanillaMovilidad');
+
+	Route::any('/gestion-de-aprobacion-planilla-movilidad-jefe/{idopcion}', 'GestionPlanillaMovilidadController@actionAprobarPlanillaMovilidadJefe');
+	Route::any('/aprobar-planilla-movilidad-jefe/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadController@actionAprobarJefe');
+
+	Route::any('/gestion-de-aprobacion-planilla-movilidad-administracion/{idopcion}', 'GestionPlanillaMovilidadController@actionAprobarPlanillaMovilidadAdministracion');
+	Route::any('/aprobar-planilla-movilidad-administracion/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadController@actionAprobarAdministracion');
+
+
+
+
+
+
+
 	//GESTION DE USUARIOS
 	Route::any('/gestion-de-usuarios/{idopcion}', 'UserController@actionListarUsuarios');
 	Route::any('/agregar-usuario/{idopcion}', 'UserController@actionAgregarUsuario');
@@ -184,6 +237,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-cuenta-bancaria-proveedor-oc', 'GestionOCController@actionAjaxBuscarCuentaBancariaOC');
 	Route::any('/ajax-cuenta-bancaria-proveedor-estiba', 'GestionOCController@actionAjaxBuscarCuentaBancariaEstiba');
 
+	Route::any('/ajax-moneda-ajax-cuenta', 'GestionOCController@actionAjaxMonedaAjaxCuenta');
+
+
 	//ADMINISTRATOR CONTRATO
 	Route::any('/detalle-comprobante-contrato-administrator/{procedencia}/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionDetalleComprobantecontratoAdministrator');
 	Route::any('/subir-xml-cargar-datos-contrato-administrator/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionCargarXMLContratoAdministrator');
@@ -207,25 +263,6 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/gestion-de-historial-comprobantes/{idopcion}', 'GestionOCValidadoController@actionListarOCHistorial');
 	Route::any('/ajax-buscar-documento-fe', 'GestionOCValidadoController@actionListarAjaxBuscarDocumento');
 	Route::any('/ajax-buscar-documento-fe-historial', 'GestionOCValidadoController@actionListarAjaxBuscarDocumentoHistorial');
-
-	//PLANILLA MOVILIDAD
-	Route::any('/gestion-de-planilla-movilidad/{idopcion}', 'GestionPlanillaMovilidadController@actionListarPlanillaMovilidad');
-	Route::any('/agregar-planilla-movilidad/{idopcion}', 'GestionPlanillaMovilidadController@actionAgregarPlanillaMovilidad');
-	Route::any('/modificar-planilla-movilidad/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadController@actionModificarPlanillaMovilidad');
-	Route::any('/ajax-modal-detalle-planilla-movilidad', 'GestionPlanillaMovilidadController@actionDetallePlanillaMovilidad');
-	Route::any('/guardar-detalle-planilla-movilidad/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadController@actionGuardarDetallePlanillaMovilidad');
-	Route::any('/ajax-modal-modificar-detalle-planilla-movilidad', 'GestionPlanillaMovilidadController@actionModificarDetallePlanillaMovilidad');
-	Route::any('/modificar-detalle-planilla-movilidad/{idopcion}/{iddocumento}/{item}', 'GestionPlanillaMovilidadController@actionGuardarModificarDetallePlanillaMovilidad');
-	Route::any('/emitir-planilla-movilidad/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadController@actionEmitirDetallePlanillaMovilidad');
-
-	Route::any('/gestion-de-aprobacion-planilla-movilidad-jefe/{idopcion}', 'GestionPlanillaMovilidadController@actionAprobarPlanillaMovilidadJefe');
-	Route::any('/aprobar-planilla-movilidad-jefe/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadController@actionAprobarJefe');
-
-	Route::any('/gestion-de-aprobacion-planilla-movilidad-administracion/{idopcion}', 'GestionPlanillaMovilidadController@actionAprobarPlanillaMovilidadAdministracion');
-	Route::any('/aprobar-planilla-movilidad-administracion/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadController@actionAprobarAdministracion');
-
-
-
 
 
 	Route::any('/detalle-comprobante-oc-validado-historial/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoHitorial');
@@ -461,6 +498,25 @@ Route::get('buscarempresa', function (Illuminate\Http\Request  $request) {
     return \Response::json($valid_tags);
 });
 
+
+Route::get('buscarproducto', function (Illuminate\Http\Request  $request) {
+    $term = $request->term ?: '';
+    $tags = DB::table('ALM.PRODUCTO')
+    		->where('NOM_PRODUCTO', 'like', '%'.$term.'%')
+			->where('ALM.PRODUCTO.COD_ESTADO','=',1)
+			->where('ALM.PRODUCTO.IND_DISPONIBLE','=',1)
+			->where('ALM.PRODUCTO.IND_MATERIAL_SERVICIO','=','S')
+			->take(100)
+			->select(DB::raw("
+			  ALM.PRODUCTO.NOM_PRODUCTO")
+			)
+    		->pluck('NOM_PRODUCTO', 'NOM_PRODUCTO');
+    $valid_tags = [];
+    foreach ($tags as $id => $tag) {
+        $valid_tags[] = ['id' => $id, 'text' => $tag];
+    }
+    return \Response::json($valid_tags);
+});
 
 
 

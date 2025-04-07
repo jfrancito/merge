@@ -80,7 +80,7 @@ class GestionPlanillaMovilidadController extends Controller
         if($validarurl <> 'true'){return $validarurl;}
         /******************************************************/
         $idcab                  =   $iddocumento;
-        $iddocumento            =   $this->funciones->decodificarmaestra($iddocumento);
+        $iddocumento            =   $this->funciones->decodificarmaestrapre($iddocumento,'PLAM');
         View::share('titulo','Aprobar Planilla Movilidad Administracion');
 
         if($_POST)
@@ -159,7 +159,7 @@ class GestionPlanillaMovilidadController extends Controller
         if($validarurl <> 'true'){return $validarurl;}
         /******************************************************/
         $idcab                  =   $iddocumento;
-        $iddocumento            =   $this->funciones->decodificarmaestra($iddocumento);
+        $iddocumento            =   $this->funciones->decodificarmaestrapre($iddocumento,'PLAM');
         View::share('titulo','Aprobar Planilla Movilidad Jefe');
 
         if($_POST)
@@ -302,7 +302,7 @@ class GestionPlanillaMovilidadController extends Controller
     public function actionEmitirDetallePlanillaMovilidad($idopcion,$iddocumento,Request $request)
     {
         $idcab       = $iddocumento;
-        $iddocumento = $this->funciones->decodificarmaestra($iddocumento);
+        $iddocumento = $this->funciones->decodificarmaestrapre($iddocumento,'PLAM');
 
         if($_POST)
         {
@@ -311,9 +311,6 @@ class GestionPlanillaMovilidadController extends Controller
                 DB::beginTransaction();
                 $planillamovilidad      =   PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first(); 
                 $tdetplanillamovilidad  =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
-                $usuario_id             =   $request['autoriza_id'];
-                $usuario                =   User::where('id','=',$usuario_id)->first();
-
 
                 if(count($tdetplanillamovilidad)<=0){
                     return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd','Para poder emitir tiene que cargar sus movilidades');
@@ -322,25 +319,13 @@ class GestionPlanillaMovilidadController extends Controller
                 PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)
                             ->update(
                                     [
-                                        'COD_USUARIO_AUTORIZA'=> $usuario->id,
-                                        'TXT_USUARIO_AUTORIZA'=> $usuario->nombre,
                                         'FECHA_EMI'=> $this->fechaactual,
                                         'TIPO_SUSTENTO'=> $request['tipo_solicitud'],
                                         'FECHA_MOD'=> $this->fechaactual,
                                         'USUARIO_MOD'=> Session::get('usuario')->id,
-                                        'COD_ESTADO'=> 'ETM0000000000010',
-                                        'TXT_ESTADO'=> 'POR APROBAR AUTORIZACION'
+                                        'COD_ESTADO'=> 'ETM0000000000008',
+                                        'TXT_ESTADO'=> 'TERMINADA'
                                     ]);
-
-                $documento                              =   new PlaDocumentoHistorial;
-                $documento->ID_DOCUMENTO                =   $iddocumento;
-                $documento->DOCUMENTO_ITEM              =   1;
-                $documento->FECHA                       =   date_format(date_create(date('Ymd h:i:s')), 'Ymd h:i:s');
-                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
-                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
-                $documento->TIPO                        =   'CREO PLANILLA MOVILIDAD';
-                $documento->MENSAJE                     =   '';
-                $documento->save();
 
                 DB::commit();
             }catch(\Exception $ex){
@@ -371,9 +356,32 @@ class GestionPlanillaMovilidadController extends Controller
                     $anio           =   $this->anio;
                     $mes            =   $this->mes;
                     $periodo        =   $this->gn_periodo_actual_xanio_xempresa($anio, $mes, Session::get('empresas')->COD_EMPR);
-                    $serie          =   $this->gn_serie($anio, $mes);
-                    $numero         =   $this->gn_numero($serie);
-                    $centro         =   Session::get('usuario')->txt_centro;
+
+
+                    $trabajador     =   DB::table('STD.TRABAJADOR')
+                                        ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                                        ->first();
+                    $dni            =       '';
+                    $centro_id      =       '';
+                    if(count($trabajador)>0){
+                        $dni        =       $trabajador->NRO_DOCUMENTO;
+                    }
+                    $trabajadorespla    =   DB::table('WEB.platrabajadores')
+                                            ->where('situacion_id', 'PRMAECEN000000000002')
+                                            ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+                                            ->where('dni', $dni)
+                                            ->first();
+                    if(count($trabajador)>0){
+                        $centro_id      =       $trabajadorespla->centro_osiris_id;
+                    }
+                    $serie          =   $this->gn_serie($anio, $mes,$centro_id);
+                    $numero         =   $this->gn_numero($serie,$centro_id);
+
+
+                    $centrot        =   DB::table('ALM.CENTRO')
+                                        ->where('COD_CENTRO', $centro_id)
+                                        ->first();
+
                     $txttrabajador  =   '';
                     $codtrabajador  =   '';
                     $doctrabajador  =   '';
@@ -384,9 +392,12 @@ class GestionPlanillaMovilidadController extends Controller
                         $doctrabajador  =   $dtrabajador->NRO_DOCUMENTO;
                         $codtrabajador  =   $dtrabajador->COD_TRAB;;
                     }
-                    $idcab                              =   $this->funciones->getCreateIdMaestradocpla('PLA_MOVILIDAD');
+                    $idcab                              =   $this->funciones->getCreateIdMaestradocpla('PLA_MOVILIDAD','PLAM');
+                    $codigo                             =   $this->funciones->generar_codigo('PLA_MOVILIDAD',8);
+
                     $cabecera                           =   new PlaMovilidad;
                     $cabecera->ID_DOCUMENTO             =   $idcab;
+                    $cabecera->CODIGO                   =   $codigo;
                     $cabecera->SERIE                    =   $serie;
                     $cabecera->NUMERO                   =   $numero;
                     $cabecera->COD_TRABAJADOR           =   $codtrabajador;
@@ -398,8 +409,10 @@ class GestionPlanillaMovilidadController extends Controller
                     $cabecera->TXT_PERIODO              =   $periodo->TXT_NOMBRE;
                     $cabecera->COD_ESTADO               =   'ETM0000000000001';
                     $cabecera->TXT_ESTADO               =   'GENERADO';
-                    $cabecera->COD_CENTRO               =   Session::get('usuario')->cod_centro;
-                    $cabecera->TXT_CENTRO               =   Session::get('usuario')->txt_centro;
+                    $cabecera->COD_CENTRO               =   $centrot->COD_CENTRO;
+                    $cabecera->TXT_CENTRO               =   $centrot->NOM_CENTRO;
+                    $cabecera->IGV                      =   0;
+                    $cabecera->SUBTOTAL                 =   0;
                     $cabecera->TOTAL                    =   0;
                     $cabecera->FECHA_CREA               =   $this->fechaactual;
                     $cabecera->USUARIO_CREA             =   Session::get('usuario')->id;
@@ -418,10 +431,32 @@ class GestionPlanillaMovilidadController extends Controller
             $anio           =   $this->anio;
             $mes            =   $this->mes;
 
+            $trabajador     =   DB::table('STD.TRABAJADOR')
+                                ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                                ->first();
+            $dni            =       '';
+            $centro_id      =       '';
+            if(count($trabajador)>0){
+                $dni        =       $trabajador->NRO_DOCUMENTO;
+            }
+            $trabajadorespla    =   DB::table('WEB.platrabajadores')
+                                    ->where('situacion_id', 'PRMAECEN000000000002')
+                                    ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+                                    ->where('dni', $dni)
+                                    ->first();
+            if(count($trabajador)>0){
+                $centro_id      =       $trabajadorespla->centro_osiris_id;
+            }
+
             $periodo        =   $this->gn_periodo_actual_xanio_xempresa($anio, $mes, Session::get('empresas')->COD_EMPR);
-            $serie          =   $this->gn_serie($anio, $mes);
-            $numero         =   $this->gn_numero($serie);
-            $centro         =   Session::get('usuario')->txt_centro;
+            $serie          =   $this->gn_serie($anio, $mes,$centro_id);
+            $numero         =   $this->gn_numero($serie,$centro_id);
+
+
+            $centrot        =   DB::table('ALM.CENTRO')
+                                ->where('COD_CENTRO', $centro_id)
+                                ->first();
+            $centro         =   $centrot->NOM_CENTRO;
             $txttrabajador  =   '';
             $doctrabajador  =   '';
             $fecha_creacion =   $this->hoy;
@@ -453,7 +488,7 @@ class GestionPlanillaMovilidadController extends Controller
     {
 
         $idcab       = $iddocumento;
-        $iddocumento = $this->funciones->decodificarmaestra($iddocumento);
+        $iddocumento = $this->funciones->decodificarmaestrapre($iddocumento,'PLAM');
 
         try{    
             
@@ -467,12 +502,31 @@ class GestionPlanillaMovilidadController extends Controller
                 $activo                 =   $request['activo'];
 
 
+                $trabajador     =   DB::table('STD.TRABAJADOR')
+                                    ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                                    ->first();
+                $dni            =       '';
+                $centro_id      =       '';
+                if(count($trabajador)>0){
+                    $dni        =       $trabajador->NRO_DOCUMENTO;
+                }
+                $trabajadorespla    =   DB::table('WEB.platrabajadores')
+                                        ->where('situacion_id', 'PRMAECEN000000000002')
+                                        ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+                                        ->where('dni', $dni)
+                                        ->first();
+                if(count($trabajador)>0){
+                    $centro_id      =       $trabajadorespla->centro_osiris_id;
+                }
+
+
+
                 $anio                   =   $this->anio;
                 $mes                    =   $this->mes;
                 $periodo                =   $this->gn_periodo_actual_xanio_xempresa($anio, $mes, Session::get('empresas')->COD_EMPR);
-                $serie                  =   $this->gn_serie($anio, $mes);
-                $numero                 =   $this->gn_numero($serie);
-                $centro                 =   Session::get('usuario')->txt_centro;
+                $serie                  =   $this->gn_serie($anio, $mes,$centro_id);
+                $numero                 =   $this->gn_numero($serie,$centro_id);
+
                 $txttrabajador          =   '';
                 $codtrabajador          =   '';
                 $doctrabajador          =   '';
@@ -525,7 +579,7 @@ class GestionPlanillaMovilidadController extends Controller
     {
 
         $idcab       = $iddocumento;
-        $iddocumento = $this->funciones->decodificarmaestra($iddocumento);
+        $iddocumento = $this->funciones->decodificarmaestrapre($iddocumento,'PLAM');
 
         try{    
             
@@ -539,9 +593,32 @@ class GestionPlanillaMovilidadController extends Controller
                 $anio                   =   $this->anio;
                 $mes                    =   $this->mes;
                 $periodo                =   $this->gn_periodo_actual_xanio_xempresa($anio, $mes, Session::get('empresas')->COD_EMPR);
-                $serie                  =   $this->gn_serie($anio, $mes);
-                $numero                 =   $this->gn_numero($serie);
-                $centro                 =   Session::get('usuario')->txt_centro;
+                $trabajador     =   DB::table('STD.TRABAJADOR')
+                                    ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                                    ->first();
+                $dni            =       '';
+                $centro_id      =       '';
+                if(count($trabajador)>0){
+                    $dni        =       $trabajador->NRO_DOCUMENTO;
+                }
+                $trabajadorespla    =   DB::table('WEB.platrabajadores')
+                                        ->where('situacion_id', 'PRMAECEN000000000002')
+                                        ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+                                        ->where('dni', $dni)
+                                        ->first();
+                if(count($trabajador)>0){
+                    $centro_id      =       $trabajadorespla->centro_osiris_id;
+                }
+
+
+                $serie                  =   $this->gn_serie($anio, $mes,$centro_id);
+                $numero                 =   $this->gn_numero($serie,$centro_id);
+
+                $centrot                =   DB::table('ALM.CENTRO')
+                                            ->where('COD_CENTRO', $centro_id)
+                                            ->first();
+                $centro                 =   $centrot->NOM_CENTRO;
+
                 $txttrabajador          =   '';
                 $codtrabajador          =   '';
                 $doctrabajador          =   '';
@@ -565,11 +642,12 @@ class GestionPlanillaMovilidadController extends Controller
                 $cabecera->TXT_MOTIVO               =   $motivo->NOM_CATEGORIA;
                 $cabecera->TXT_LUGARPARTIDA         =   $lugarpartida;
                 $cabecera->TXT_LUGARLLEGADA         =   $lugarllegada;
-                $cabecera->TOTAL                    =   $doctrabajador;
                 $cabecera->COD_EMPRESA              =   Session::get('empresas')->COD_EMPR;
                 $cabecera->TXT_EMPRESA              =   Session::get('empresas')->NOM_EMPR;
-                $cabecera->COD_CENTRO               =   Session::get('usuario')->cod_centro;
-                $cabecera->TXT_CENTRO               =   Session::get('usuario')->txt_centro;
+                $cabecera->COD_CENTRO               =   $centrot->COD_CENTRO;
+                $cabecera->TXT_CENTRO               =   $centrot->NOM_CENTRO;
+                $cabecera->IGV                      =   0;
+                $cabecera->SUBTOTAL                 =   $total;
                 $cabecera->TOTAL                    =   $total;
                 $cabecera->FECHA_CREA               =   $this->fechaactual;
                 $cabecera->USUARIO_CREA             =   Session::get('usuario')->id;
@@ -578,7 +656,8 @@ class GestionPlanillaMovilidadController extends Controller
                 PlaMovilidad::where('ID_DOCUMENTO','=',$planillamovilidad->ID_DOCUMENTO)
                             ->update(
                                     [
-                                        'TOTAL'=> $tdetplanillamovilidad->SUM('TOTAL') + $total
+                                        'TOTAL'=> $tdetplanillamovilidad->SUM('TOTAL') + $total,
+                                        'TOTAL'=> $tdetplanillamovilidad->SUM('SUBTOTAL') + $total
                                     ]);
             DB::commit();
         }catch(\Exception $ex){
@@ -596,7 +675,7 @@ class GestionPlanillaMovilidadController extends Controller
         $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
         if($validarurl <> 'true'){return $validarurl;}
         /******************************************************/
-        $iddocumento = $this->funciones->decodificarmaestra($iddocumento);
+        $iddocumento = $this->funciones->decodificarmaestrapre($iddocumento,'PLAM');
         View::share('titulo','Agregar Detalle Planilla Movilidad');
         $planillamovilidad = PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first();
 
@@ -607,9 +686,32 @@ class GestionPlanillaMovilidadController extends Controller
         $anio           =   $this->anio;
         $mes            =   $this->mes;
         $periodo        =   $this->gn_periodo_actual_xanio_xempresa($anio, $mes, Session::get('empresas')->COD_EMPR);
-        $serie          =   $this->gn_serie($anio, $mes);
-        $numero         =   $this->gn_numero($serie);
-        $centro         =   Session::get('usuario')->txt_centro;
+        $trabajador     =   DB::table('STD.TRABAJADOR')
+                            ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                            ->first();
+        $dni            =       '';
+        $centro_id      =       '';
+        if(count($trabajador)>0){
+            $dni        =       $trabajador->NRO_DOCUMENTO;
+        }
+        $trabajadorespla    =   DB::table('WEB.platrabajadores')
+                                ->where('situacion_id', 'PRMAECEN000000000002')
+                                ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+                                ->where('dni', $dni)
+                                ->first();
+        if(count($trabajador)>0){
+            $centro_id      =       $trabajadorespla->centro_osiris_id;
+        }
+
+
+        $serie          =   $this->gn_serie($anio, $mes,$centro_id);
+        $numero         =   $this->gn_numero($serie,$centro_id);
+
+        $centrot        =   DB::table('ALM.CENTRO')
+                            ->where('COD_CENTRO', $centro_id)
+                            ->first();
+        $centro         =   $centrot->NOM_CENTRO;
+
         $txttrabajador  =   '';
         $doctrabajador  =   '';
         $fecha_creacion =   $this->hoy;
@@ -637,8 +739,6 @@ class GestionPlanillaMovilidadController extends Controller
                             'tdetplanillamovilidad' => $tdetplanillamovilidad,
                             'idopcion' => $idopcion
                          ]);
-
-
 
     }
 
