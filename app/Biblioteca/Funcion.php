@@ -6,6 +6,8 @@ use App\User;
 use App\Modelos\WEBRolopcion;
 use App\Modelos\Estado;
 use App\Modelos\FeDocumento;
+use App\Modelos\WEBUserEmpresaCentro;
+
 
 use Hashids;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +16,22 @@ use Session;
 use table;
 
 class Funcion {
+
+	public function tiene_perfil($empresa_id,$centro_id,$usuario_id) {
+
+		$perfiles 		=   WEBUserEmpresaCentro::where('empresa_id','=',$empresa_id)
+							->where('centro_id','=',$centro_id)
+							->where('usuario_id','=',$usuario_id)
+							->where('activo','=','1')
+							->first();
+
+		if(count($perfiles)>0){
+			return true;
+		}else{
+			return false;
+		}	
+
+	}
 
 	public function neto_pagar_oc($oc){
 

@@ -137,10 +137,6 @@ Route::group(['middleware' => ['authaw']], function () {
 
 
 
-
-
-
-
 	//GESTION DE USUARIOS
 	Route::any('/gestion-de-usuarios/{idopcion}', 'UserController@actionListarUsuarios');
 	Route::any('/agregar-usuario/{idopcion}', 'UserController@actionAgregarUsuario');

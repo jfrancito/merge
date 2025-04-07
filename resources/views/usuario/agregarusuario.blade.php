@@ -25,7 +25,7 @@
 
 
               <div class="form-group">
-                <label class="col-sm-3 control-label labelleft" >Cliente :</label>
+                <label class="col-sm-3 control-label" >Cliente :</label>
                 <div class="col-sm-5 abajocaja" >
 
                   {!! Form::select( 'cliente_select', $combolistaclientes, array(),
@@ -74,7 +74,7 @@
                 <div class="col-sm-5">
                   {!! Form::select( 'rol_id', $comborol, array('1CIX00000024'),
                                     [
-                                      'class'       => 'form-control control input-sm' ,
+                                      'class'       => 'form-control control input-sm select2' ,
                                       'id'          => 'rol_id',
                                       'required'    => '',
                                       'data-aw'     => '7'

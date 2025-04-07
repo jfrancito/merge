@@ -121,6 +121,72 @@
     </div>
 
 
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel panel-default panel-border-color panel-border-color-primary">
+          <div class="panel-heading panel-heading-divider">Perfiles<span class="panel-subtitle">Perfiles del usuario : {{$usuario->nombre}}</span></div>
+          <div class="panel-body">
+
+
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="panel panel-default panel-table">
+                  <div class="panel-body listadoperfiles">
+                    <table id="tableperfiles" class="table table-striped table-hover table-fw-widget">
+                      <thead>
+                        <tr>
+                          <th>Empresa</th>
+                          <th>Acceso</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+
+                        @foreach($empresas as $itemempresa)
+                          @foreach($centros as $itemcentro)
+                            @if($itemcentro->COD_CENTRO=='CEN0000000000001')
+                              <tr>
+                                <td>
+                                  {{$itemempresa->NOM_EMPR}}
+                                </td>
+                                <td>
+                                  <div class="text-center be-checkbox be-checkbox-sm">
+                                    <input  type="checkbox"
+                                            class="{{$itemempresa->COD_EMPR}}{{$itemcentro->COD_CENTRO}}"
+                                            id="1{{$itemempresa->COD_EMPR}}{{$itemcentro->COD_CENTRO}}"
+                                            @if ($funcion->funciones->tiene_perfil($itemempresa->COD_EMPR,$itemcentro->COD_CENTRO,$usuario->id)) checked @endif
+                                    >
+                                    <label  for="1{{$itemempresa->COD_EMPR}}{{$itemcentro->COD_CENTRO}}"
+                                            data-idempresa = "{{$itemempresa->COD_EMPR}}"
+                                            data-idcentro = "{{$itemcentro->COD_CENTRO}}"
+                                            data_idusuario = "{{$usuario->id}}"
+                                            class = "checkbox"                    
+                                            name="{{$itemempresa->COD_EMPR}}{{$itemcentro->COD_CENTRO}}"
+                                      ></label>
+                                  </div>
+
+                                </td>
+                              </tr> 
+                            @endif
+                          @endforeach                   
+                        @endforeach
+
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+
+
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+
 
 
   </div>
