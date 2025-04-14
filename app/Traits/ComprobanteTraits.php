@@ -4601,6 +4601,35 @@ trait ComprobanteTraits
 
         $fecha_corte            =   date('Ymd');
 
+        //UPDATE PARA EL ANTICIPO
+        $datos = DB::table('CMP.ORDEN as T1')
+            ->join('FE_DOCUMENTO as FE', 'T1.COD_ORDEN', '=', 'FE.ID_DOCUMENTO')
+            ->join('CMP.REFERENCIA_ASOC as T2', function ($join) {
+                $join->on('T1.COD_ORDEN', '=', 'T2.COD_TABLA')
+                    ->where('T2.TXT_TABLA', 'CMP.ORDEN')
+                    ->where('T2.TXT_TABLA_ASOC', 'CMP.DOCUMENTO_CTBLE');
+            })
+            ->join('CMP.REFERENCIA_ASOC as T3', function ($join) {
+                $join->on('T2.COD_TABLA_ASOC', '=', 'T3.COD_TABLA')
+                    ->where('T3.TXT_TABLA', 'CMP.DOCUMENTO_CTBLE')
+                    ->where('T3.TXT_TABLA_ASOC', 'CMP.DOCUMENTO_CTBLE');
+            })
+            ->where('T3.TXT_TIPO_REFERENCIA', 'A')
+            ->where('T1.COD_ORDEN', 'like', '%CL%')
+            ->where('T2.COD_ESTADO', 1)
+            ->where('T3.COD_ESTADO', 1)
+            ->select('FE.ID_DOCUMENTO', DB::raw('SUM(T3.CAN_AUX1) as MONTO'))
+            ->groupBy('FE.ID_DOCUMENTO')
+            ->get();
+
+        foreach ($datos as $item) {
+            DB::table('FE_DOCUMENTO')
+                ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
+                ->update(['MONTO_ANTICIPO_DESC' => $item->MONTO]);
+        }
+
+
+
 
         //UPDATE SI TIENE NOTA DE CREDITO
         DB::statement("

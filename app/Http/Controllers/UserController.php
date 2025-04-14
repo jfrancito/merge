@@ -14,6 +14,8 @@ use App\Modelos\CMPCategoria;
 use App\Modelos\STDEmpresa;
 use App\Modelos\WEBUserEmpresaCentro;
 use App\Modelos\ALMCentro;
+use App\Modelos\WEBListaPersonal;
+
 
 
 use App\User;
@@ -1549,20 +1551,15 @@ class UserController extends Controller {
 				return Redirect::back()->withInput()->with('errorbd', 'Este usuario con ese name ya esta registrado');
 			}
 
-			$personal_id 	 		 	= 	$request['cliente_select'];
-			$arraypersonal 				=	explode("-", $personal_id);
-			$ruc 						=	$arraypersonal[0];
+			$personal_id 	 		 	= 	$request['personal'];
+			$personal     				=   WEBListaPersonal::where('id', '=', $personal_id)->first();
+			//dd($personal);
 
-			$personal     				=   DB::table('STD.EMPRESA')
-											->where('NRO_DOCUMENTO', '=', $ruc)
-											->where('COD_ESTADO', '=', 1)
-											->where('IND_PROVEEDOR', '=', 1)
-											->first();
 			$idusers 				 	=   $this->funciones->getCreateIdMaestra('users');
 			
 			$cabecera            	 	=	new User;
 			$cabecera->id 	     	 	=   $idusers;
-			$cabecera->nombre 	     	=   $personal->NOM_EMPR;
+			$cabecera->nombre 	     	=   $personal->nombres;
 			$cabecera->name  		 	=	$request['name'];
 			$cabecera->passwordmobil  	=	$request['password'];
 			$cabecera->fecha_crea 	   	=  	$this->fechaactual;
@@ -1571,7 +1568,7 @@ class UserController extends Controller {
 			$cabecera->ind_contacto 	= 	1;	
 			$cabecera->email_confirmacion 	= 	1;
 			$cabecera->rol_id 	 		= 	$request['rol_id'];
-			$cabecera->usuarioosiris_id	= 	$personal->COD_EMPR;
+			$cabecera->usuarioosiris_id	= 	$personal->id;
 			$cabecera->save();
  
  			return Redirect::to('/gestion-de-usuarios/'.$idopcion)->with('bienhecho', 'Usuario '.$personal->COD_EMPR.' registrado con exito');
@@ -1579,22 +1576,26 @@ class UserController extends Controller {
 		}else{
 
 
-			$listapersonal 				= 	DB::table('STD.EMPRESA')
-	    									->leftJoin('users', 'STD.EMPRESA.COD_EMPR', '=', 'users.usuarioosiris_id')
+			// $listapersonal 				= 	DB::table('STD.EMPRESA')
+	    	// 								->leftJoin('users', 'STD.EMPRESA.COD_EMPR', '=', 'users.usuarioosiris_id')
+	    	// 								->whereNull('users.usuarioosiris_id')
+	    	// 								->where('STD.EMPRESA.IND_PROVEEDOR','=',1)
+	    	// 								->where('STD.EMPRESA.COD_ESTADO','=',1)
+	    	// 								->select('STD.EMPRESA.COD_EMPR','STD.EMPRESA.NOM_EMPR')
+			// 								->select(DB::raw("
+			// 								  STD.EMPRESA.COD_EMPR,
+			// 								  STD.EMPRESA.NRO_DOCUMENTO + ' - '+ STD.EMPRESA.NOM_EMPR AS NOMBRE")
+			// 								)
+			// 								->pluck('NOMBRE','NOMBRE')
+			// 								->take(10)
+			// 								->toArray();
+			$listapersonal 				= 	DB::table('WEB.LISTAPERSONAL')
+	    									->leftJoin('users', 'WEB.LISTAPERSONAL.id', '=', 'users.usuarioosiris_id')
 	    									->whereNull('users.usuarioosiris_id')
-	    									->where('STD.EMPRESA.IND_PROVEEDOR','=',1)
-	    									->where('STD.EMPRESA.COD_ESTADO','=',1)
-	    									->select('STD.EMPRESA.COD_EMPR','STD.EMPRESA.NOM_EMPR')
-											->select(DB::raw("
-											  STD.EMPRESA.COD_EMPR,
-											  STD.EMPRESA.NRO_DOCUMENTO + ' - '+ STD.EMPRESA.NOM_EMPR AS NOMBRE")
-											)
-											->pluck('NOMBRE','NOMBRE')
-											->take(10)
-											->toArray();
+	    									->select('WEB.LISTAPERSONAL.id','WEB.LISTAPERSONAL.nombres')
+	    									->get();
 
-
-			$combolistaclientes  		= 	array('' => "Seleccione clientes") + $listapersonal;
+			//$combolistaclientes  		= 	array('' => "Seleccione clientes") + $listapersonal;
 
 
 			$rol 						= 	DB::table('WEB.Rols')->where('ind_merge','=',1)->where('id','<>',$this->prefijomaestro.'00000001')->pluck('nombre','id')->toArray();
@@ -1604,7 +1605,7 @@ class UserController extends Controller {
 						[
 							'comborol'  		=> $comborol,
 							'listapersonal'  	=> $listapersonal,
-							'combolistaclientes'  	=> $combolistaclientes,				
+							//'combolistaclientes'  	=> $combolistaclientes,				
 						  	'idopcion'  		=> $idopcion
 						]);
 		}

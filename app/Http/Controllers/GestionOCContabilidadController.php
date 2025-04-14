@@ -1428,6 +1428,9 @@ class GestionOCContabilidadController extends Controller
                 $docasociados       =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                         ->whereIn('TXT_ASIGNADO', ['ARCHIVO_VIRTUAL','ARCHIVO_FISICO'])
                                         ->first();
+
+                //dd($ordencompra);
+
                 Archivo::where('ID_DOCUMENTO',$ordencompra->COD_ORDEN)->where('DOCUMENTO_ITEM','=',$linea)->where('TIPO_ARCHIVO','=',$docasociados->COD_CATEGORIA_DOCUMENTO)
                             ->update(
                                 [

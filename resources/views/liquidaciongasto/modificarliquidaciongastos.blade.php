@@ -118,6 +118,22 @@
       });
     </script> 
 
+
+    <script type="text/javascript">
+        @foreach($tarchivos as $index => $item) 
+            var extension = '{{$item->COD_CTBLE}}';
+            if(extension=='ZIP'){
+                extension = 'XML';
+            }
+            $('#file-{{$item->COD_CATEGORIA}}').fileinput({
+              theme: 'fa5',
+              language: 'es',
+              allowedFileExtensions: [extension],
+            });
+        @endforeach
+    </script>
+
+
     <script src="{{ asset('public/js/comprobante/liquidaciongasto.js?v='.$version) }}" type="text/javascript"></script>
 
 @stop

@@ -92,10 +92,9 @@
                     </div>
                   </div>
             </form>
-
           </div>
           <div id="registro" class="tab-pane @if($active=='registro') active @endif cont">
-            <form method="POST" action="{{ url('/guardar-detalle-liquidacion-gastos/'.$idopcion.'/'.Hashids::encode(substr($liquidaciongastos->ID_DOCUMENTO, -8))) }}">
+            <form method="POST" id="frmdetallelg" action="{{ url('/guardar-detalle-liquidacion-gastos/'.$idopcion.'/'.Hashids::encode(substr($liquidaciongastos->ID_DOCUMENTO, -8))) }}" enctype="multipart/form-data">
                   {{ csrf_field() }}
                   @include('liquidaciongasto.form.faliquidaciongastodetalle')
             </form>

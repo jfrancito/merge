@@ -100,6 +100,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-modal-detalle-documento-lg', 'GestionLiquidacionGastosController@actionDetalleDocumentoLG');
 	Route::any('/guardar-detalle-documento-lg/{idopcion}/{iddocumento}/{item}', 'GestionLiquidacionGastosController@actionGuardarDetalleDocumentoLG');
 	Route::any('/ajax-modal-modificar-detalle-documento-lg', 'GestionLiquidacionGastosController@actionModificarDetalleDocumentoLG');
+	Route::any('/ajax-modal-relacionar-detalle-documento-lg', 'GestionLiquidacionGastosController@actionRelacionarDetalleDocumentoLG');
+
 	Route::any('/modificar-detalle-documento-lg/{idopcion}/{iddocumento}/{item}/{itemdocumento}', 'GestionLiquidacionGastosController@actionGuardarModificarDetalleDocumentoLG');
 	Route::any('/emitir-liquidacion-gastos/{idopcion}/{iddocumento}', 'GestionLiquidacionGastosController@actionEmitirLiquidacionGasto');
 
@@ -113,7 +115,7 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/ajax-modal-buscar-planilla-lg', 'GestionLiquidacionGastosController@actionModalBuscarPlanillaLG');
 	Route::any('/ajax-select-documento-planilla', 'GestionLiquidacionGastosController@actionModalSelectDocumentoPlanillaLG');
-
+	Route::any('/ajax-leer-xml-lg', 'GestionLiquidacionGastosController@actionAjaxLeerXmlLG');
 
 
 
@@ -445,6 +447,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/eliminar-archivo-item-contrato/{tipo}/{nombrearchivo}/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionEliminarItemContrato');
 
 	Route::any('/descargar-archivo-requerimiento-estiba/{tipo}/{idopcion}/{lote}', 'GestionOCValidadoController@actionDescargarEstiba');
+
+	Route::any('/descargar-archivo-requerimiento-lg/{tipo}/{idopcion}/{linea}/{idordencompra}', 'GestionOCValidadoController@actionDescargarLG');
 
 
 	Route::any('/gestion-de-modelos-comprobantes/{idopcion}', 'GestionOCValidadoController@actionModelosComprobantes');

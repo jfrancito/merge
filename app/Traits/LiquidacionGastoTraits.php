@@ -731,6 +731,22 @@ trait LiquidacionGastoTraits
     }
 
 
+    private function lg_calcular_total_cabecera($iddocumento) {
+
+        $detdocumentolg                     =   LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
+                                                ->where('ACTIVO','=',1)
+                                                ->get();
+
+        LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
+                    ->update(
+                            [
+                                'TOTAL'=> $detdocumentolg->SUM('TOTAL'),
+                                'SUBTOTAL'=> $detdocumentolg->SUM('SUBTOTAL'),
+                                'IGV'=> $detdocumentolg->SUM('IGV')
+                            ]);                   
+    }
+
+
     private function lg_combo_costo($titulo) {
 
         $array =     DB::table('CON.CENTRO_COSTO')
@@ -859,14 +875,14 @@ trait LiquidacionGastoTraits
     }
 
 
-    private function lg_combo_item($titulo,$cod_contrato) {
+    private function lg_combo_item($titulo,$flujo_id) {
 
 
         $array      =   DB::table('CON.FLUJO_CAJA_ITEM_MOV')
                         ->select('COD_FLUJO_CAJA_ITEM_MOV', 'TXT_ITEM_MOV', '*') // Seleccionar columnas
                         ->where('COD_ESTADO', 1)
                         ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
-                        ->where('COD_FLUJO_CAJA', 'IICHFC0000000009')
+                        ->where('COD_FLUJO_CAJA', $flujo_id)
                         ->pluck('TXT_ITEM_MOV','COD_FLUJO_CAJA_ITEM_MOV')
                         ->toArray();
 
