@@ -97,7 +97,7 @@
 		          </b>
 		        </td>
 		        <td><b>{{ number_format(round($item->PERCEPCION, 4), 4, '.', ',') }}</b></td>
-		        <td><b>{{ number_format(round($item->MONTO_ANTICIPO_DESC, 4), 4, '.', ',') }}</b></td>
+		        <td><b>{{ number_format(round($item->MONTO_ANTICIPO_DESC + $item->MONTO_ANTICIPO_DESC_OTROS, 4), 4, '.', ',') }}</b></td>
 		        <td><b>{{ number_format(round($item->MONTO_NC, 4), 4, '.', ',') }}</b></td>
 		        <td><b>
 		        	{{$simbolo}} {{number_format($funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO), 2, '.', ',')}}
@@ -133,7 +133,7 @@
 			        <td>-</td>
 			        <td><b>{{ number_format(round($MONTO_DETRACCION, 4), 4, '.', ',') }}</b></td>
 			        <td><b>{{ number_format(round($item->PERCEPCION, 4), 4, '.', ',') }}</b></td>
-			        <td><b>{{ number_format(round($item->MONTO_ANTICIPO_DESC, 4), 4, '.', ',') }}</b></td>
+			        <td><b>{{ number_format(round($item->MONTO_ANTICIPO_DESC + $item->MONTO_ANTICIPO_DESC_OTROS, 4), 4, '.', ',') }}</b></td>
 			        <td><b>0.00</b></td>
 
 			        <td><b>{{$simbolo}} {{number_format($funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO), 2, '.', ',')}}</b></td>

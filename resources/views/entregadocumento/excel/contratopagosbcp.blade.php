@@ -133,7 +133,7 @@
 	        <td>{{$item->MONTO_DETRACCION_XML}}</td>
 	        <td>{{$item->MONTO_DETRACCION_RED}}</td>
 			<td>0.00</td>
-	        <td>{{$item->MONTO_ANTICIPO_DESC}}</td>
+	        <td>{{$item->MONTO_ANTICIPO_DESC + $item->MONTO_ANTICIPO_DESC_OTROS}}</td>
 	        <td><b>{{number_format($funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO), 4, '.', ',')}}</b></td>
 	        @php $monto_total  = $monto_total + $funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO); @endphp
 	      </tr>                    
