@@ -81,6 +81,7 @@
                     id="serie" name='serie' 
                     value="@if(count($tdetliquidacionitem)>0){{old('serie' ,$tdetliquidacionitem->SERIE)}}@else{{old('serie')}}@endif"                         
                     placeholder="SERIE"
+                    maxlength="4"
                     required = ""
                     autocomplete="off" class="form-control input-sm"/>
 
@@ -96,6 +97,7 @@
                     id="numero" name='numero' 
                     value="@if(count($tdetliquidacionitem)>0){{old('numero' ,$tdetliquidacionitem->NUMERO)}}@else{{old('numero')}}@endif"                         
                     placeholder="NUMERO"
+                    maxlength="10"
                     required = ""
                     autocomplete="off" class="form-control input-sm"/>
 

@@ -15,7 +15,6 @@
           <span style="display: block;"><b>PERIODO : </b> {{$item->TXT_PERIODO}}</span>
           <span style="display: block;"><b>TRABAJADOR : </b> {{$item->TXT_TRABAJADOR}}</span>
           <span style="display: block;"><b>CENTRO : </b> {{$item->TXT_CENTRO}}</span>
-          <span style="display: block;"><b>AUTORIZA : </b> {{$item->TXT_USUARIO_AUTORIZA}}</span>
           <span><b>ESTADO : </b> @include('planillamovilidad.ajax.estados')</span>
           <a href="{{ url('/modificar-planilla-movilidad/'.$idopcion.'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -8))) }}" style="margin-top: 5px;float: right;" class="btn btn-rounded btn-space btn-success btn-sm">MODIFICAR</a>
 

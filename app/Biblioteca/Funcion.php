@@ -67,9 +67,9 @@ class Funcion {
 
 		if($COD_PAGO_DETRACCION == Session::get('empresas')->COD_EMPR){
 			$neto_pagar 	  = (float)$fedocumento->TOTAL_VENTA_ORIG - (float)round($fedocumento->MONTO_DETRACCION_RED) - 
-								(float)$fedocumento->MONTO_RETENCION - (float)$fedocumento->CAN_IMPUESTO_RENTA - (float)$fedocumento->MONTO_ANTICIPO_DESC - (float)$fedocumento->MONTO_ANTICIPO_DESC_OTROS + (float)$fedocumento->PERCEPCION - (float)$fedocumento->MONTO_NC + (float)$fedocumento->CAN_CENTIMO;
+								(float)$fedocumento->MONTO_RETENCION - (float)$fedocumento->CAN_IMPUESTO_RENTA - (float)$fedocumento->MONTO_ANTICIPO_DESC - (float)$fedocumento->MONTO_ANTICIPO_DESC_OTROS + (float)$fedocumento->PERCEPCION - (float)$fedocumento->MONTO_NC  + (float)$fedocumento->COMPENSACION + (float)$fedocumento->CAN_CENTIMO;
 		}else{
-			$neto_pagar 	  = (float)$fedocumento->TOTAL_VENTA_ORIG - (float)$fedocumento->MONTO_RETENCION - (float)$fedocumento->CAN_IMPUESTO_RENTA - (float)$fedocumento->MONTO_ANTICIPO_DESC - (float)$fedocumento->MONTO_ANTICIPO_DESC_OTROS + (float)$fedocumento->PERCEPCION- (float)$fedocumento->MONTO_NC + (float)$fedocumento->CAN_CENTIMO;
+			$neto_pagar 	  = (float)$fedocumento->TOTAL_VENTA_ORIG - (float)$fedocumento->MONTO_RETENCION - (float)$fedocumento->CAN_IMPUESTO_RENTA - (float)$fedocumento->MONTO_ANTICIPO_DESC - (float)$fedocumento->MONTO_ANTICIPO_DESC_OTROS + (float)$fedocumento->PERCEPCION- (float)$fedocumento->MONTO_NC  + (float)$fedocumento->COMPENSACION + (float)$fedocumento->CAN_CENTIMO;
 		}
 
         $neto_pagar 	  = ROUND($neto_pagar,2);

@@ -2,6 +2,23 @@
 $(document).ready(function(){
     var carpeta = $("#carpeta").val();
 
+
+    $(".liquidaciongasto").on('click','.filalg', function(e) {
+        event.preventDefault();
+        $('.dtlg').hide();
+        $('.file-preview-frame').hide();
+        $('.filalg').removeClass("ocultar");
+        const data_valor    =   $(this).attr('data_valor');
+        $('.'+data_valor).show();
+        $('.filalg').removeClass("activofl");
+        $(this).addClass("activofl");
+
+    });
+
+
+
+
+
     $('.btnaprobarcomporbatnte').on('click', function(event){
         event.preventDefault();
         $.confirm({
@@ -299,11 +316,13 @@ $(document).ready(function(){
         var _token                  =   $('#token').val();
         var tipodoc_id              =   $('#tipodoc_id').val();
         var array_detalle_producto  =   $('#array_detalle_producto').val();
+        abrircargando();
+                
 
         if(tipodoc_id == 'TDO0000000000001'){
             //ver si tienes filas
             if ($('#tdxml tbody tr').length === 0) {
-                alerterrorajax("La factura no tiene detalle"); return false;
+                alerterrorajax("La factura no tiene detalle"); cerrarcargando(); return false;
             }
             //recorrer la tabla y ver si no tiene aprobados
             var sw_asociado = 0;
@@ -315,22 +334,22 @@ $(document).ready(function(){
 
             });
 
-            if(sw_asociado ==1){ alerterrorajax("Hay productos que no estan asociados"); return false;}
+            if(sw_asociado ==1){ alerterrorajax("Hay productos que no estan asociados"); cerrarcargando(); return false;}
             var valor              =   $('#serie').val();
             let primeraLetraSerire = valor.charAt(0); 
             if(primeraLetraSerire=='E'){
                 let comprobante = $('#file-DCC0000000000036')[0].files.length > 0;
                 if (!comprobante) {
-                    alerterrorajax("Debe subir el comprobante electronico."); return false;
+                    alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
                 }
             }else{
                 let xml = $('#file-DCC0000000000004')[0].files.length > 0;
                 if (!xml) {
-                    alerterrorajax("Debe subir el CDR en XML."); return false;
+                    alerterrorajax("Debe subir el CDR en XML."); cerrarcargando(); return false;
                 }
                 let comprobante = $('#file-DCC0000000000036')[0].files.length > 0;
                 if (!comprobante) {
-                    alerterrorajax("Debe subir el comprobante electronico."); return false;
+                    alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
                 }
 
             }
@@ -354,7 +373,7 @@ $(document).ready(function(){
 
             let comprobante = $('#file-DCC0000000000036')[0].files.length > 0;
             if (!comprobante) {
-                alerterrorajax("Debe subir el comprobante electronico."); return false;
+                alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
             }
             
         }

@@ -595,6 +595,23 @@ class GestionLiquidacionGastosController extends Controller
             $tdetliquidaciongastos  =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
             $detdocumentolg         =   LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
             $documentohistorial     =   LqgDocumentoHistorial::where('ID_DOCUMENTO','=',$iddocumento)->get();
+            $archivospdf            =   Archivo::where('ID_DOCUMENTO','=',$iddocumento)->where('EXTENSION', 'like', '%'.'pdf'.'%')->get();
+            $ocultar                =   "";
+            // Construir el array de URLs
+            $initialPreview = [];
+            foreach ($archivospdf as $archivo) {
+                $initialPreview[] = route('serve-filelg', ['file' => $archivo->NOMBRE_ARCHIVO]);
+            }
+            $initialPreviewConfig = [];
+            foreach ($archivospdf as $key => $archivo) {
+                $initialPreviewConfig[] = [
+                    'type'          => "pdf",
+                    'caption'       => $archivo->NOMBRE_ARCHIVO,
+                    'downloadUrl'   => route('serve-filelg', ['file' => $archivo->NOMBRE_ARCHIVO]),
+                    'frameClass'    => $archivo->ID_DOCUMENTO.$archivo->DOCUMENTO_ITEM //
+                ];
+            }
+
 
             return View::make('liquidaciongasto/aprobarjefelg', 
                             [
@@ -605,6 +622,9 @@ class GestionLiquidacionGastosController extends Controller
                                 'idopcion'              =>  $idopcion,
                                 'idcab'                 =>  $idcab,
                                 'iddocumento'           =>  $iddocumento,
+                                'initialPreview'        => json_encode($initialPreview),
+                                'initialPreviewConfig'  => json_encode($initialPreviewConfig),
+
                             ]);
 
 
@@ -1395,7 +1415,7 @@ class GestionLiquidacionGastosController extends Controller
                 DB::rollback();
                 return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/0')->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
-            return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/'.$item)->with('bienhecho', 'Documento '.$serie.'-'.$numero.' registrado con exito');
+            return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/0')->with('bienhecho', 'Documento '.$serie.'-'.$numero.' registrado con exito');
         }
 
     }
@@ -1641,9 +1661,14 @@ class GestionLiquidacionGastosController extends Controller
                                     ->where('dni', $dni)
                                     ->first();
 
-            if(count($trabajador)>0){
+            if(count($trabajadorespla)>0){
                 $centro_id      =       $trabajadorespla->centro_osiris_id;
+            }else{
+                return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd', 'No puede realizar un registro porque no es la empresa a cual pertenece');
             }
+
+
+
             $empresa            =   DB::table('STD.EMPRESA')
                                     ->where('NRO_DOCUMENTO', $dni)
                                     ->first();

@@ -29,6 +29,8 @@ Route::get('/serve-file', 'FileController@serveFile')->name('serve-file');
 Route::get('/serve-filecontrato', 'FileController@serveFileContrato')->name('serve-filecontrato');
 Route::get('/serve-fileestiba', 'FileController@serveFileEstiba')->name('serve-fileestiba');
 
+Route::get('/serve-filelg', 'FileController@serveFileLG')->name('serve-filelg');
+
 
 Route::get('/serve-filecontrato-sg', 'FileController@serveFileContratoSG')->name('serve-filecontrato-sg');
 Route::get('/serve-filepago', 'FileController@serveFilePago')->name('serve-filepago');

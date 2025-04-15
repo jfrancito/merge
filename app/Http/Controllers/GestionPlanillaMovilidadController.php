@@ -444,9 +444,13 @@ class GestionPlanillaMovilidadController extends Controller
                                     ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
                                     ->where('dni', $dni)
                                     ->first();
-            if(count($trabajador)>0){
+                                    
+            if(count($trabajadorespla)>0){
                 $centro_id      =       $trabajadorespla->centro_osiris_id;
+            }else{
+                return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd', 'No puede realizar un registro porque no es la empresa a cual pertenece');
             }
+
 
             $periodo        =   $this->gn_periodo_actual_xanio_xempresa($anio, $mes, Session::get('empresas')->COD_EMPR);
             $serie          =   $this->gn_serie($anio, $mes,$centro_id);

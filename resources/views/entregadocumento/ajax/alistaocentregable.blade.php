@@ -86,7 +86,7 @@
           <span><b>IMPORTE: </b> {{$item->CAN_TOTAL}}  </span>
           <span><b>ANTICIPO  :</b>{{round($item->MONTO_ANTICIPO_DESC,4) + round($item->MONTO_ANTICIPO_DESC_OTROS,4)}}</span>
           <span><b>NOTA CREDITO  :</b>{{round($item->MONTO_NC,4)}}</span>
-
+          <span><b>COMPENSACION  :</b>{{round($item->COMPENSACION,2)}}</span>
         </td>
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>OBLIGACION: </b>           

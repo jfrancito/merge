@@ -15,9 +15,9 @@
           </thead>
           <tbody>
           @foreach($tdetliquidaciongastos as $index => $item)
-              <tr>
+              <tr class="filalg {{$item->ID_DOCUMENTO}}{{$item->ITEM}} @if($index == 0) activofl @endif" data_valor="{{$item->ID_DOCUMENTO}}{{$item->ITEM}}">
                 <td>{{date_format(date_create($item->FECHA_EMISION), 'd/m/Y')}}</td>
-                <td>{{$item->SERIE}} - {{$item->NUMERO}}</td>
+                <td>{{$item->SERIE}} - {{$item->NUMERO}} </td>
                 <td>{{$item->TXT_TIPODOCUMENTO}}</td>
                 <td>{{$item->TXT_EMPRESA_PROVEEDOR}}</td>                    
                 <td>{{$item->TOTAL}}</td>

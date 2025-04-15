@@ -1,3 +1,10 @@
+.filalg{
+  cursor: pointer;
+}
+.activofl{
+  background-color: #78a9ff !important;
+}
+
 .nav-tabs .disabled {
     pointer-events: none;
     opacity: 0.5;
