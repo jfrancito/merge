@@ -17,6 +17,8 @@
           <span style="display: block;"><b>AUTORIZA : </b> {{$item->TXT_USUARIO_AUTORIZA}}</span>
           <span style="display: block;"><b>TOTAL : </b> {{$item->TOTAL}}</span>
           <span><b>ESTADO : </b> @include('planillamovilidad.ajax.estados')</span>
+          <a href="{{ url('/detalle-comprobante-lg-validado/'.$idopcion.'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -8))) }}" style="margin-top: 5px;float: right;" class="btn btn-rounded btn-space btn-primary btn-sm">SEGUIMIENTO</a>
+
           <a href="{{ url('/modificar-liquidacion-gastos/'.$idopcion.'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -8)).'/0') }}" style="margin-top: 5px;float: right;" class="btn btn-rounded btn-space btn-success btn-sm">MODIFICAR</a>
         </td>
       </tr>                    

@@ -2,6 +2,34 @@
 $(document).ready(function(){
     var carpeta = $("#carpeta").val();
 
+    $(".liquidaciongasto").on('click','.buscardocumento', function() {
+
+        event.preventDefault();
+
+        var fecha_inicio         =   $('#fecha_inicio').val();
+        var fecha_fin            =   $('#fecha_fin').val();
+        var proveedor_id         =   $('#proveedor_id').val();
+        var estado_id            =   $('#estado_id').val();
+        var idopcion                =   $('#idopcion').val();
+        var _token                  =   $('#token').val();
+
+        //validacioones
+        if(fecha_inicio ==''){ alerterrorajax("Seleccione una fecha inicio."); return false;}
+        if(fecha_fin ==''){ alerterrorajax("Seleccione una fecha fin."); return false;}
+
+        data            =   {
+                                _token                  : _token,
+                                fecha_inicio            : fecha_inicio,
+                                fecha_fin               : fecha_fin,
+                                proveedor_id            : proveedor_id,
+                                estado_id               : estado_id,
+                                idopcion                : idopcion
+                            };
+        ajax_normal(data,"/ajax-buscar-documento-lg");
+
+    });
+
+
 
     $(".liquidaciongasto").on('click','.filalg', function(e) {
         event.preventDefault();
@@ -37,24 +65,24 @@ $(document).ready(function(){
     });
 
 
-    $('.btnaprobarcomporbatnte').on('click', function(event){
+    $('.btnrechazocomporbatnte').on('click', function(event){
         event.preventDefault();
         $.confirm({
-            title: '¿Confirma la Aprobacion?',
-            content: 'Aprobar el Comprobante',
+            title: '¿Confirma el extorno?',
+            content: 'Extornar el Comprobante',
             buttons: {
                 confirmar: function () {
-                    $( "#formpedido" ).submit();
+                    $( "#formpedidorechazar" ).submit();
                 },
                 cancelar: function () {
-                    $.alert('Se cancelo Aprobacion');
+                    $.alert('Se cancelo el Extorno');
                 }
             }
         });
 
     });
 
-    
+
 
 
     $(".liquidaciongasto").on('click','.mdisel', function(e) {

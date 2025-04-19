@@ -3600,6 +3600,9 @@ trait ComprobanteTraits
     }
 
 
+    
+
+
     private function gn_combo_estado_fe_documento($todo) {
 
 		$array 							= 	DB::table('CMP.CATEGORIA')

@@ -226,7 +226,7 @@ class GestionOCController extends Controller
 
         header('Content-Type: text/html; charset=UTF-8');
         //$path = storage_path() . "/exports/FC26-00002985.XML";
-        $path = storage_path() . "/exports/FACTURAE001-380120489456193.xml";
+        $path = storage_path() . "/exports/FACTURAE001-181520605569162.XML";
         $parser = new InvoiceParser();
         $xml = file_get_contents($path);
         $factura = $parser->parse($xml);
@@ -4459,8 +4459,8 @@ class GestionOCController extends Controller
 
                                     'CTA_DETRACCION'=>$ctadetraccion,
                                     'VALOR_DETRACCION'=>$tipo_detraccion_id,
-                                    'MONTO_DETRACCION_XML'=>$monto_detraccion,
-                                    'MONTO_DETRACCION_RED'=>round($monto_detraccion),
+                                    'MONTO_DETRACCION_XML'=>(float)$monto_detraccion,
+                                    'MONTO_DETRACCION_RED'=>round((float)$monto_detraccion),
                                     'COD_PAGO_DETRACCION'=>$COD_PAGO_DETRACCION,
                                     'TXT_PAGO_DETRACCION'=>$TXT_PAGO_DETRACCION,
 
