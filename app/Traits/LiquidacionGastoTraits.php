@@ -75,7 +75,7 @@ trait LiquidacionGastoTraits
         $nom_categoria_tipo_doc                         =       'LIQUIDACION GASTOS';
         $moneda_id                                      =       'MON0000000000001';
         $moneda_nombre                                  =       'SOLES';
-        $cod_contrato_receptor                          =       (string)$liquidaciongastos->COD_CONTRATO;
+        $cod_contrato_receptor                          =       (string)$liquidaciongastos->COD_CUENTA;
         $cod_cultivo_origen                             =       'CCU0000000000001';
         $fecha_emision                                  =       date_format(date_create(date('Y-m-d')), 'd-m-Y'); //PREGUNTAR POR LA FECHA DE EMISION
         $fecha_vencimiento                              =       date_format(date_create(date('Y-m-d')), 'd-m-Y');
@@ -291,7 +291,7 @@ trait LiquidacionGastoTraits
                 $nom_categoria_tipo_doc                         =       $item->TXT_TIPODOCUMENTO;
                 $moneda_id                                      =       'MON0000000000001';
                 $moneda_nombre                                  =       'SOLES';
-                $cod_contrato_receptor                          =       (string)$item->CON_CUENTA;
+                $cod_contrato_receptor                          =       (string)$item->COD_CUENTA;
                 $cod_cultivo_origen                             =       'CCU0000000000001';
                 $fecha_emision                                  =       date_format(date_create($item->FECHA_EMISION), 'd-m-Y'); //PREGUNTAR POR LA FECHA DE EMISION
                 $fecha_vencimiento                              =       date_format(date_create($item->FECHA_EMISION), 'd-m-Y');
@@ -666,6 +666,37 @@ trait LiquidacionGastoTraits
         return  $coddocumento[0];
     }
 
+    private function lg_combo_trabajador_fe_documento($todo) {
+            
+        $array                      =   LqgLiquidacionGasto::select(DB::raw('COD_EMPRESA_TRABAJADOR,TXT_EMPRESA_TRABAJADOR'))
+                                        ->groupBy('TXT_EMPRESA_TRABAJADOR')
+                                        ->groupBy('COD_EMPRESA_TRABAJADOR')
+                                        ->pluck('TXT_EMPRESA_TRABAJADOR','COD_EMPRESA_TRABAJADOR')
+                                        ->toArray();
+
+
+        if($todo=='TODO'){
+            $combo                  =   array($todo => $todo) + $array;
+        }else{
+            $combo                  =   $array;
+        }
+        return  $combo;                             
+    }
+
+
+    private function lg_lista_cabecera_comprobante_total_validado($fecha_inicio,$fecha_fin,$proveedor_id,$estado_id) {
+
+        $listadatos         =   LqgLiquidacionGasto::where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                                ->whereRaw("CAST(FECHA_EMI AS DATE) >= ? and CAST(FECHA_EMI AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                ->ProveedorLG($proveedor_id)
+                                ->EstadoLG($estado_id)
+                                ->orderby('FECHA_EMI','ASC')
+                                ->get();
+
+        return  $listadatos;
+    }
+
+
 
     private function lg_lista_cabecera_comprobante_total_administracion() {
 
@@ -879,11 +910,11 @@ trait LiquidacionGastoTraits
 
 
         $array      =   DB::table('CON.FLUJO_CAJA_ITEM_MOV')
-                        ->select('COD_FLUJO_CAJA_ITEM_MOV', 'TXT_ITEM_MOV', '*') // Seleccionar columnas
+                        ->select('COD_ITEM_MOV', 'TXT_ITEM_MOV', '*') // Seleccionar columnas
                         ->where('COD_ESTADO', 1)
                         ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
                         ->where('COD_FLUJO_CAJA', $flujo_id)
-                        ->pluck('TXT_ITEM_MOV','COD_FLUJO_CAJA_ITEM_MOV')
+                        ->pluck('TXT_ITEM_MOV','COD_ITEM_MOV')
                         ->toArray();
 
         $combo      =   array('' => $titulo) + $array;

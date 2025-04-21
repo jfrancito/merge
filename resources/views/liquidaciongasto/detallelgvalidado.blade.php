@@ -14,73 +14,20 @@
     <div class="row">
       <div class="col-md-12">
           <div class="panel panel-default">
-            <div class="panel-heading">Revision de Comporbante ({{$liquidaciongastos->ID_DOCUMENTO}})</div>
+            <div class="panel-heading">Revision de Comprobante ({{$liquidaciongastos->ID_DOCUMENTO}})</div>
             <div class="tab-container">
               <ul class="nav nav-tabs">
-                <li class="active"><a href="#aprobar" data-toggle="tab"><b>APROBAR y RECOMENDAR</b></a></li>
-                <li><a href="#observar" data-toggle="tab"><b>OBSERVAR</b></a></li>
-                <li><a href="#rechazar" data-toggle="tab"><b>EXTORNAR</b></a></li>
+                <li class="active"><a href="#aprobar" data-toggle="tab"><b>DETALLE</b></a></li>
               </ul>
               <div class="tab-content">
                 <div id="aprobar" class="tab-pane active cont">
                       <div class="panel panel-default panel-border-color panel-border-color-primary">
-                        <div class="panel-heading panel-heading-divider">Aprobar Liquidacion de Gastos Administracion<span class="panel-subtitle">Aprobar una Liquidacion de Gastos Administracion</span></div>
+                        <div class="panel-heading panel-heading-divider">Detalle Liquidacion de Gasto Jefe<span class="panel-subtitle">Detalle una Liquidacion de Gasto Jefe</span></div>
                         <div class="panel-body">
-                          <form method="POST" id='formpedido' action="{{ url('/aprobar-liquidacion-gasto-administracion/'.$idopcion.'/'.Hashids::encode(substr($liquidaciongastos->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
-                                {{ csrf_field() }}
-                            @include('liquidaciongasto.form.formaprobaradministracionlg')
-                            <div class="row xs-pt-15">
-                              <div class="col-xs-6">
-                                  <div class="be-checkbox">
-                                  </div>
-                              </div>
-                              <div class="col-xs-6">
-                                <p class="text-right">
-                                  <a href="{{ url('/gestion-de-contabilidad-aprobar/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
-                                  <button type="button"  class="btn btn-space btn-primary btnaprobarcomporbatnte">Guardar</button>
-                                </p>
-                              </div>
-                            </div>
-                          </form>
+                            @include('liquidaciongasto.form.formdetallelgvalidado')
                         </div>
                       </div>
                 </div>
-                <div id="observar" class="tab-pane cont">
-                  <div class="panel panel-default panel-border-color panel-border-color-primary">
-                    <div class="panel-heading panel-heading-divider">Observar Comprobante<span class="panel-subtitle">Observar un Comprobante</span></div>
-                    <div class="panel-body">
-                        OBSERVAR
-                    </div>
-                  </div>
-                </div>
-
-                <div id="rechazar" class="tab-pane">
-                  <div class="panel panel-default panel-border-color panel-border-color-primary">
-                    <div class="panel-heading panel-heading-divider">Extornar<span class="panel-subtitle">Extornar un Comprobante</span></div>
-                    <div class="panel-body">
-                        <form method="POST" id='formpedidorechazar' action="{{ url('/agregar-extorno-administracion/'.$idopcion.'/'.Hashids::encode(substr($liquidaciongastos->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
-                              {{ csrf_field() }}
-                          @include('liquidaciongasto.form.formrechazo')
-
-                          <div class="row xs-pt-15">
-                            <div class="col-xs-6">
-                                <div class="be-checkbox">
-                                </div>
-                            </div>
-                            <div class="col-xs-6">
-                              <p class="text-right">
-                                <a href="{{ url('/gestion-de-aprobacion-liquidacion-gastos-administracion/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
-                                <button type="button"  class="btn btn-space btn-primary btnrechazocomporbatnte">Guardar</button>
-                              </p>
-                            </div>
-                          </div>
-                          
-                        </form>
-                    </div>
-                  </div>
-                </div>
-
-
               </div>
             </div>
           </div>
@@ -158,6 +105,8 @@
 
           
     </script>
-     
+
+
+
     <script src="{{ asset('public/js/comprobante/liquidaciongasto.js?v='.$version) }}" type="text/javascript"></script>
 @stop

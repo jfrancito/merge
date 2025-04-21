@@ -29,6 +29,8 @@ Route::get('/serve-file', 'FileController@serveFile')->name('serve-file');
 Route::get('/serve-filecontrato', 'FileController@serveFileContrato')->name('serve-filecontrato');
 Route::get('/serve-fileestiba', 'FileController@serveFileEstiba')->name('serve-fileestiba');
 
+Route::get('/serve-filelg', 'FileController@serveFileLG')->name('serve-filelg');
+
 
 Route::get('/serve-filecontrato-sg', 'FileController@serveFileContratoSG')->name('serve-filecontrato-sg');
 Route::get('/serve-filepago', 'FileController@serveFilePago')->name('serve-filepago');
@@ -116,6 +118,15 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-modal-buscar-planilla-lg', 'GestionLiquidacionGastosController@actionModalBuscarPlanillaLG');
 	Route::any('/ajax-select-documento-planilla', 'GestionLiquidacionGastosController@actionModalSelectDocumentoPlanillaLG');
 	Route::any('/ajax-leer-xml-lg', 'GestionLiquidacionGastosController@actionAjaxLeerXmlLG');
+
+	Route::any('/agregar-extorno-jefe/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionAgregarExtornoJefe');
+	Route::any('/agregar-extorno-administracion/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionAgregarExtornoAdministracion');
+
+	Route::any('/gestion-de-liquidacion-gastos-adm/{idopcion}', 'GestionLiquidacionGastosController@actionListarLGValidado');
+	Route::any('/ajax-buscar-documento-lg', 'GestionLiquidacionGastosController@actionListarAjaxBuscarDocumentoLG');
+
+	Route::any('/detalle-comprobante-lg-validado/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionDetallaComprobanteLGValidado');
+
 
 
 
