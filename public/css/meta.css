@@ -355,3 +355,11 @@ margin-bottom: 0px ;
     visibility: visible;
     opacity: 1;
 }
+
+.background-th-azul{
+    background: #1d3a6d;
+    color: white
+}
+.negrita{
+  font-weight: bold !important;
+}
