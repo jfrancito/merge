@@ -22,7 +22,7 @@ Route::group(['middleware' => ['guestaw']], function () {
 	Route::any('/login', 'UserController@actionLogin');
 	Route::any('/acceso', 'UserController@actionAcceso');
 	Route::any('/accesobienvenido/{idempresa}', 'UserController@actionAccesoBienvenido');
-	
+
 });
 
 Route::get('/serve-file', 'FileController@serveFile')->name('serve-file');
@@ -164,10 +164,25 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-listado-de-opciones', 'UserController@actionAjaxListarOpciones');
 	Route::any('/ajax-activar-permisos', 'UserController@actionAjaxActivarPermisos');
 
+    //REPORTES
+    Route::any('/gestion-saldos-cobrar-pagar/{idopcion}', 'ReporteCuentaSaldoController@actionReporteCuentaSaldo');
+    Route::post('/obtener_tipo_cambio', 'ReporteCuentaSaldoController@actionObtenerTipoCambio');
+    Route::post('/obtener-reporte-cuentas-saldo', 'ReporteCuentaSaldoController@actionAjaxListarReporteCuentasSaldo');
+    Route::post('/obtener-reporte-cuentas-saldo-excel', 'ReporteCuentaSaldoController@actionAjaxListarReporteCuentasSaldoExcel');
+
+    Route::any('/gestion-compras-envases-periodo/{idopcion}', 'ReporteComprasEnvasesSedeController@actionReporteComprasEnvasesSede');
+    Route::post('/obtener-reporte-compras-envases-sede', 'ReporteComprasEnvasesSedeController@actionAjaxListarReporteComprasEnvasesSede');
+    Route::post('/obtener-reporte-compras-envases-sede-excel', 'ReporteComprasEnvasesSedeController@actionAjaxListarReporteComprasEnvasesSedeExcel');
+
+    Route::any('/gestion-ingresos-salidas-envases/{idopcion}', 'IngresosSalidasEnvasesController@actionListarIngresosSalidasEnvases');
+    Route::any('/obtener-combo-subfamilia', 'IngresosSalidasEnvasesController@actionAjaxListarSubFamilia');
+    Route::any('/obtener-combo-producto', 'IngresosSalidasEnvasesController@actionAjaxListarProducto');
+    Route::any('/obtener-ingresos-salidas-envases', 'IngresosSalidasEnvasesController@actionAjaxListarIngresosSalidasEnvases');
+    Route::any('/obtener-reporte-ingresos-salidas-envases-excel', 'IngresosSalidasEnvasesController@actionAjaxListarIngresosSalidasEnvasesExcel');
+
 	Route::any('/leerxmlsinvoice', 'GestionOCController@actionApiLeerXmlSap');
 	Route::any('/leerrhsinvoice', 'GestionOCController@actionApiLeerRHSap');
 	Route::any('/leerrhsinvoicereten', 'GestionOCController@actionApiLeerRetencionSap');
-
 
 	Route::any('/leercdr', 'GestionOCController@actionApiLeerCDR');
 
@@ -360,7 +375,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/aprobar-documentos/{idopcion}', 'GestionOCContabilidadController@actionListarAprobarUsuarioContacto');
 	Route::any('/extornar-aprobar-comprobante/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionExtornarAprobar');
 
-	
+
 	Route::any('/aprobar-comprobante-contabilidad/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAprobarContabilidad');
 	Route::any('/aprobar-comprobante-contabilidad-contrato/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAprobarContabilidadContrato');
 	Route::any('/aprobar-comprobante-contabilidad-estiba/{idopcion}/{lote}', 'GestionOCContabilidadController@actionAprobarContabilidadEstiba');
@@ -397,7 +412,7 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/agregar-recomendacion-contabilidad/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAgregarRecomendacionContabilidad');
 	Route::any('/agregar-recomendacion-contabilidad-contrato/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAgregarRecomendacionContabilidadContrato');
-	
+
 
 	Route::any('/aprobar-comprobante-administracion/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCAdministracionController@actionAprobarAdministracion');
 	Route::any('/agregar-observacion-administracion/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCAdministracionController@actionAgregarObservacionAdministracion');
@@ -552,7 +567,7 @@ Route::get('buscarclientey', function (Illuminate\Http\Request  $request) {
 									  STD.EMPRESA.NRO_DOCUMENTO + ' - '+ STD.EMPRESA.NOM_EMPR AS NOMBRE")
 									)
 									->take(10)
-									->pluck('NOMBRE', 'NOMBRE');	
+									->pluck('NOMBRE', 'NOMBRE');
     $valid_tags = [];
     foreach ($tags as $id => $tag) {
 
