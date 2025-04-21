@@ -162,10 +162,16 @@ Route::group(['middleware' => ['authaw']], function () {
     Route::any('/gestion-compras-envases-periodo/{idopcion}', 'ReporteComprasEnvasesSedeController@actionReporteComprasEnvasesSede');
     Route::post('/obtener-reporte-compras-envases-sede', 'ReporteComprasEnvasesSedeController@actionAjaxListarReporteComprasEnvasesSede');
     Route::post('/obtener-reporte-compras-envases-sede-excel', 'ReporteComprasEnvasesSedeController@actionAjaxListarReporteComprasEnvasesSedeExcel');
+
+    Route::any('/gestion-ingresos-salidas-envases/{idopcion}', 'IngresosSalidasEnvasesController@actionListarIngresosSalidasEnvases');
+    Route::any('/obtener-combo-subfamilia', 'IngresosSalidasEnvasesController@actionAjaxListarSubFamilia');
+    Route::any('/obtener-combo-producto', 'IngresosSalidasEnvasesController@actionAjaxListarProducto');
+    Route::any('/obtener-ingresos-salidas-envases', 'IngresosSalidasEnvasesController@actionAjaxListarIngresosSalidasEnvases');
+    Route::any('/obtener-reporte-ingresos-salidas-envases-excel', 'IngresosSalidasEnvasesController@actionAjaxListarIngresosSalidasEnvasesExcel');
+
 	Route::any('/leerxmlsinvoice', 'GestionOCController@actionApiLeerXmlSap');
 	Route::any('/leerrhsinvoice', 'GestionOCController@actionApiLeerRHSap');
 	Route::any('/leerrhsinvoicereten', 'GestionOCController@actionApiLeerRetencionSap');
-
 
 	Route::any('/leercdr', 'GestionOCController@actionApiLeerCDR');
 

@@ -19,10 +19,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        
-        Schema::defaultStringLength(191);    
-        View::share('capeta', '/merge');  
-        View::share('version', '4.46');
+
+        Schema::defaultStringLength(191);
+        View::share('capeta', '/merge');
+        View::share('version', '4.56');
         View::share('titulo', '');
 
         Validator::extend('unico', function($attribute, $value, $parameters , $validator){
