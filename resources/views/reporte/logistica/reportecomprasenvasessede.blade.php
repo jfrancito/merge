@@ -22,32 +22,21 @@
             -webkit-mask-size: 100% 100%;
             mask-size: 100% 100%;
         }
-        .cabecera {
-            background: #1d3a6d;
-            color: white;
-            text-align: center
-        }
-
-        .pie {
-            background: #4285f4;
-            color: white;
-            text-align: center
-        }
     </style>
 @stop
 @section('section')
 
-    <div class="be-content contenido reporteingresossalidas">
+    <div class="be-content contenido reportecomprasenvases">
         <div class="main-content container-fluid">
             <div class="row">
                 <div class="col-sm-12">
                     <div class="panel panel-default panel-border-color @if(Session::get('empresas')->COD_EMPR == 'IACHEM0000010394') panel-border-color-danger @else @if(Session::get('empresas')->COD_EMPR == 'IACHEM0000007086') panel-border-color-success @else panel-border-color-info @endif @endif">
-                        <div class="panel-heading">INGRESOS / SALIDAS ENVASES, BOBINAS Y MATERIALES
+                        <div class="panel-heading">COMPRAS ENVASES Y EMBALAJES SEDES
                             <div class="tools tooltiptop">
 
                                 <div class="dropdown">
-                                    <a href="#" class="tooltipcss opciones buscarise">
-                                        <span class="tooltiptext">BUSCAR INGRESOS / SALIDAS ENVASES, BOBINAS Y MATERIALES</span>
+                                    <a href="#" class="tooltipcss opciones buscarces">
+                                        <span class="tooltiptext">BUSCAR COMPRAS ENVASES SEDES</span>
                                         <span class="icon mdi mdi-search"></span>
                                     </a>
                                     <a href="#" class="tooltipcss opciones descargararchivo">
@@ -68,64 +57,21 @@
                                     <form method="POST"
                                           id="formdescargar"
                                           target="_blank"
-                                          action="{{ url('/obtener-reporte-ingresos-salidas-envases-excel') }}"
+                                          action="{{ url('/obtener-reporte-compras-envases-sede-excel') }}"
                                           style="border-radius: 0px;"
                                     >
                                         {{ csrf_field() }}
 
                                         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 cajareporte">
                                             <div class="form-group">
-                                                <label class="col-sm-12 control-label labelleft negrita">EMPRESAS
+                                                <label class="col-sm-12 control-label labelleft negrita">EMPRESA
                                                     :</label>
                                                 <div class="col-sm-12 abajocaja">
-                                                    {!! Form::select( 'empresa', $combo_empresa, $empresa_defecto,
+                                                    {!! Form::select( 'empresas', $combo_empresa, $empresa_defecto,
                                                                       [
                                                                         'class'       => 'select2 form-control control input-xs' ,
-                                                                        'id'          => 'empresa',
+                                                                        'id'          => 'empresas',
                                                                         'data-aw'     => '1',
-                                                                      ]) !!}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte">
-                                            <div class="form-group">
-                                                <label class="col-sm-12 control-label labelleft negrita">CENTRO
-                                                    :</label>
-                                                <div class="col-sm-12 abajocaja">
-                                                    {!! Form::select( 'centro', $combo_centro, $centro_defecto,
-                                                                      [
-                                                                        'class'       => 'select2 form-control control input-xs' ,
-                                                                        'id'          => 'centro',
-                                                                        'data-aw'     => '2',
-                                                                      ]) !!}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 cajareporte">
-                                            <div class="form-group">
-                                                <label class="col-sm-12 control-label labelleft negrita">FECHA AL
-                                                    :</label>
-                                                <div class="col-sm-12 abajocaja">
-                                                    <input required id="fechaCorte" name="fechaCorte"
-                                                           class="form-control control input-sm" type="date"
-                                                           value="{{$fecha_corte}}">
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte">
-                                            <div class="form-group">
-                                                <label class="col-sm-12 control-label labelleft negrita">TIPO PRODUCTO
-                                                    :</label>
-                                                <div class="col-sm-12 abajocaja">
-                                                    {!! Form::select( 'tipoProducto', $combo_tipo_producto, $tipo_producto_defecto,
-                                                                      [
-                                                                        'class'       => 'select2 form-control control input-xs' ,
-                                                                        'id'          => 'tipoProducto',
-                                                                        'required'    => '',
-                                                                        'data-aw'     => '3',
                                                                       ]) !!}
                                                 </div>
                                             </div>
@@ -146,12 +92,26 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 cajareporte ajax_categoria_listar">
-                                            @include('general.combo.combosubfamilia')
+                                        <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2 cajareporte">
+                                            <div class="form-group">
+                                                <label class="col-sm-12 control-label labelleft negrita">FECHA DEL
+                                                    :</label>
+                                                <div class="col-sm-12 abajocaja">
+                                                    <input required id="fecha_ini" name="fecha_ini"
+                                                           class="form-control control input-sm" type="date"
+                                                           value="{{$fecha_ini}}">
+                                                </div>
+                                            </div>
                                         </div>
 
-                                        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 cajareporte ajax_producto_listar">
-                                            @include('general.combo.comboproducto')
+                                        <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2 cajareporte">
+                                            <div class="form-group">
+                                                <label class="col-sm-12 control-label labelleft negrita">FECHA AL
+                                                    :</label>
+                                                <input required id="fecha_fin" name="fecha_fin"
+                                                       class="form-control control input-sm" type="date"
+                                                       value="{{$fecha_fin}}">
+                                            </div>
                                         </div>
 
                                         <input type="hidden" name="idopcion" id='idopcion' value='{{$idopcion}}'>
@@ -163,7 +123,7 @@
                             </div>
 
                             <div class='listajax'>
-                                @include('reporte.ajax.alistareporteingresossalidasenvases')
+                                @include('reporte.logistica.ajax.alistareportecomprasenvasessede')
                             </div>
 
                         </div>
@@ -229,8 +189,12 @@
             $('form').parsley();
 
         });
+
+        $(".select3").select2({
+            width: '100%'
+        });
     </script>
-    <script src="{{ asset('public/js/reporte/ingresossalidasenvases.js?v='.$version) }}"
+    <script src="{{ asset('public/js/reporte/reportecomprasenvasessede.js?v='.$version) }}"
             type="text/javascript"></script>
 
 @stop

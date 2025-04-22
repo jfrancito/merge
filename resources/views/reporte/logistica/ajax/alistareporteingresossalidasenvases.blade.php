@@ -13,12 +13,12 @@
         <div class="tab-content">
             @if($empresa_defecto === '' or $empresa_defecto === 'IACHEM0000010394')
                 <div id="cenvasesii" class="tab-pane cont @if($empresa_defecto === '' or $empresa_defecto === 'IACHEM0000010394') active @endif">
-                    @include('reporte.ajax.listaingresossalidasinternacional')
+                    @include('reporte.logistica.ajax.listaingresossalidasinternacional')
                 </div>
             @endif
             @if($empresa_defecto === '' or $empresa_defecto === 'IACHEM0000007086')
                 <div id="cenvasesic" class="tab-pane cont @if($empresa_defecto === 'IACHEM0000007086') active @endif">
-                    @include('reporte.ajax.listaingresossalidascomercial')
+                    @include('reporte.logistica.ajax.listaingresossalidascomercial')
                 </div>
             @endif
         </div>

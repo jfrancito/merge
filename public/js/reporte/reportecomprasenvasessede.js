@@ -62,6 +62,7 @@ $(document).ready(function () {
         let fecha_ini = $('#fecha_ini').val();
         let fecha_fin = $('#fecha_fin').val();
         let cod_empresa = $('#empresas').val();
+        let cod_familia = $('#familia').val();
 
         if (fecha_ini === undefined || fecha_ini === '') {
             alerterrorajax("Seleccione una fecha inicio.");
@@ -78,7 +79,8 @@ $(document).ready(function () {
             idopcion: id_opcion,
             fecha_fin: fecha_fin,
             fecha_ini: fecha_ini,
-            cod_empresa: cod_empresa
+            cod_empresa: cod_empresa,
+            cod_familia: cod_familia
         };
 
         ajax_normal(data, "/obtener-reporte-compras-envases-sede");

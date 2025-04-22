@@ -28,7 +28,8 @@ class IngresosSalidasEnvasesController extends Controller
         $combo_empresa = $this->listaEmpresa('', 'TODOS');
         $combo_centro = $this->listaCentro('', 'TODOS');
         $combo_tipo_producto = $this->listaCategoriaTipo('TIPO_PRODUCTO', '', 'SELECCIONE TIPO PRODUCTO', array('TPR0000000000004', 'TPR0000000000005', 'TPR0000000000001'));
-        $combo_familia = $this->listaCategoria('FAMILIA_MATERIAL', '', 'SELECCIONE FAMILIA');
+        //$combo_familia = $this->listaCategoria('FAMILIA_MATERIAL', '', 'SELECCIONE FAMILIA');
+        $combo_familia = array();
         $combo_subfamilia = array();
         $combo_producto = array();
 
@@ -56,7 +57,7 @@ class IngresosSalidasEnvasesController extends Controller
 
         $funcion = $this;
 
-        return View::make('reporte/reporteingresossalidasenvases',
+        return View::make('reporte/logistica/reporteingresossalidasenvases',
             [
                 'idopcion' => $idopcion,
                 'funcion' => $funcion,
@@ -92,27 +93,40 @@ class IngresosSalidasEnvasesController extends Controller
             ]);
     }
 
-    public function actionAjaxListarSubFamilia(Request $request)
+    public function actionAjaxListarFamilia(Request $request)
     {
-        $producto = $request['producto'];
-        $subfamilia = $request['subfamilia'];
-        $familia = $request['familia'];
         $tipo_producto = $request['tipo_producto'];
         $id_opcion = $request['id_opcion'];
 
-        $combo_subfamilia = $this->listaCodigoCategoria($familia, '', 'SELECCIONE SUBFAMILIA');
-        //$combo_producto = $this->listaProducto($tipo_producto, $familia, $subfamilia, '', 'SELECCIONE PRODUCTO');
+        $combo_familia = $this->listaFamiliaTipo($tipo_producto, '', 'SELECCIONE FAMILIA');
 
-        $subfamilia_defecto = $subfamilia;
-        //$producto_defecto = $producto;
+        $familia_defecto = '';
+
+        $funcion = $this;
+        return View::make('general/combo/combofamilia',
+            [
+                'combo_familia' => $combo_familia,
+                'familia_defecto' => $familia_defecto,
+                'idopcion' => $id_opcion,
+                'funcion' => $funcion,
+                'ajax' => true
+            ]);
+    }
+
+    public function actionAjaxListarSubFamilia(Request $request)
+    {
+        $familia = $request['familia'];
+        $id_opcion = $request['id_opcion'];
+
+        $combo_subfamilia = $this->listaCodigoCategoria($familia, '', 'SELECCIONE SUBFAMILIA');
+
+        $subfamilia_defecto = '';
 
         $funcion = $this;
         return View::make('general/combo/combosubfamilia',
             [
                 'combo_subfamilia' => $combo_subfamilia,
-                //'combo_producto' => $combo_producto,
                 'subfamilia_defecto' => $subfamilia_defecto,
-                //'producto_defecto' => $producto_defecto,
                 'idopcion' => $id_opcion,
                 'funcion' => $funcion,
                 'ajax' => true
@@ -121,24 +135,19 @@ class IngresosSalidasEnvasesController extends Controller
 
     public function actionAjaxListarProducto(Request $request)
     {
-        $producto = $request['producto'];
         $subfamilia = $request['subfamilia'];
         $familia = $request['familia'];
         $tipo_producto = $request['tipo_producto'];
         $id_opcion = $request['id_opcion'];
 
-        //$combo_subfamilia = $this->listaCodigoCategoria($familia, '', 'SELECCIONE SUBFAMILIA');
         $combo_producto = $this->listaProducto($tipo_producto, $familia, $subfamilia, '', 'SELECCIONE PRODUCTO');
 
-        //$subfamilia_defecto = $subfamilia;
-        $producto_defecto = $producto;
+        $producto_defecto = '';
 
         $funcion = $this;
         return View::make('general/combo/comboproducto',
             [
-                //'combo_subfamilia' => $combo_subfamilia,
                 'combo_producto' => $combo_producto,
-                //'subfamilia_defecto' => $subfamilia_defecto,
                 'producto_defecto' => $producto_defecto,
                 'idopcion' => $id_opcion,
                 'funcion' => $funcion,
@@ -222,7 +231,7 @@ class IngresosSalidasEnvasesController extends Controller
 
         $funcion = $this;
 
-        return View::make('reporte/ajax/alistareporteingresossalidasenvases',
+        return View::make('reporte/logistica/ajax/alistareporteingresossalidasenvases',
             [
                 'lista_internacional' => $lista_internacional,
                 'lista_comercial' => $lista_comercial,
@@ -338,7 +347,7 @@ class IngresosSalidasEnvasesController extends Controller
                     $sheet->setColumnFormat(array(
                         'C:H' => '0.0000'
                     ));
-                    $sheet->loadView('reporte/excel/listaingresossalidasinternacional')
+                    $sheet->loadView('reporte/logistica/excel/listaingresossalidasinternacional')
                         ->with('funcion', $funcion)
                         ->with('lista_internacional', $lista_internacional)
                         ->with('stock_anterior_internacional', $stock_anterior_internacional)
@@ -357,7 +366,7 @@ class IngresosSalidasEnvasesController extends Controller
                     $sheet->setColumnFormat(array(
                         'C:H' => '0.0000'
                     ));
-                    $sheet->loadView('reporte/excel/listaingresossalidascomercial')
+                    $sheet->loadView('reporte/logistica/excel/listaingresossalidascomercial')
                         ->with('funcion', $funcion)
                         ->with('lista_comercial', $lista_comercial)
                         ->with('stock_anterior_comercial', $stock_anterior_comercial)

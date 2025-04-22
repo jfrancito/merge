@@ -3,7 +3,7 @@
     <div class="col-sm-12 abajocaja">
         {!! Form::select( 'producto', $combo_producto, $producto_defecto,
                           [
-                            'class'       => 'select2 select4 form-control control input-xs' ,
+                            'class'       => 'select2 select5 form-control control input-xs' ,
                             'id'          => 'producto',
                             'data-aw'     => '6'
                           ]) !!}
@@ -12,7 +12,7 @@
 
 @if(isset($ajax))
     <script type="text/javascript">
-        $(".select4").select2(); //reasignacion de estilos de clase
+        $(".select5").select2(); //reasignacion de estilos de clase
         $(".select2").select2({
             width: '100%'
         });

@@ -175,6 +175,7 @@ Route::group(['middleware' => ['authaw']], function () {
     Route::post('/obtener-reporte-compras-envases-sede-excel', 'ReporteComprasEnvasesSedeController@actionAjaxListarReporteComprasEnvasesSedeExcel');
 
     Route::any('/gestion-ingresos-salidas-envases/{idopcion}', 'IngresosSalidasEnvasesController@actionListarIngresosSalidasEnvases');
+    Route::any('/obtener-combo-familia', 'IngresosSalidasEnvasesController@actionAjaxListarFamilia');
     Route::any('/obtener-combo-subfamilia', 'IngresosSalidasEnvasesController@actionAjaxListarSubFamilia');
     Route::any('/obtener-combo-producto', 'IngresosSalidasEnvasesController@actionAjaxListarProducto');
     Route::any('/obtener-ingresos-salidas-envases', 'IngresosSalidasEnvasesController@actionAjaxListarIngresosSalidasEnvases');
