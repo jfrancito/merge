@@ -18,7 +18,7 @@ class ReporteCuentaSaldoController extends Controller
         $combo_centro = $this->listaCentro('', 'TODOS');
         $tipocambio = $this->getTipoCambio(date('d-m-Y'));
 
-        return View::make('reporte/reportecuentasaldo',
+        return View::make('reporte/administracion/reportecuentasaldo',
             [
                 'combo_tipo_contrato' => $combo_tipo_contrato,
                 'combo_centro' => $combo_centro,
@@ -67,7 +67,7 @@ class ReporteCuentaSaldoController extends Controller
 
         $funcion = $this;
 
-        return View::make('reporte/ajax/alistareportecuentasaldo',
+        return View::make('reporte/administracion/ajax/alistareportecuentasaldo',
             [
                 'cuentas' => $cuentas,
                 'todos' => $tipocuenta,
@@ -107,7 +107,7 @@ class ReporteCuentaSaldoController extends Controller
                     'L:M' => '0.0000',
                     'E' => 'dd/mm/yyyy'
                 ));
-                $sheet->loadView('reporte/excel/listacuentascobrarterceros')
+                $sheet->loadView('reporte/administracion/excel/listacuentascobrarterceros')
                     ->with('funcion', $funcion)
                     ->with('cuentas', $cuentas);
             });
@@ -116,7 +116,7 @@ class ReporteCuentaSaldoController extends Controller
                     'L:M' => '0.0000',
                     'E' => 'dd/mm/yyyy'
                 ));
-                $sheet->loadView('reporte/excel/listacuentascobrarrelacionadas')
+                $sheet->loadView('reporte/administracion/excel/listacuentascobrarrelacionadas')
                     ->with('funcion', $funcion)
                     ->with('cuentas', $cuentas);
             });
@@ -125,7 +125,7 @@ class ReporteCuentaSaldoController extends Controller
                     'L:M' => '0.0000',
                     'E' => 'dd/mm/yyyy'
                 ));
-                $sheet->loadView('reporte/excel/listacuentaspagarterceros')
+                $sheet->loadView('reporte/administracion/excel/listacuentaspagarterceros')
                     ->with('funcion', $funcion)
                     ->with('cuentas', $cuentas);
             });
@@ -134,7 +134,7 @@ class ReporteCuentaSaldoController extends Controller
                     'L:M' => '0.0000',
                     'E' => 'dd/mm/yyyy'
                 ));
-                $sheet->loadView('reporte/excel/listacuentaspagarrelacionadas')
+                $sheet->loadView('reporte/administracion/excel/listacuentaspagarrelacionadas')
                     ->with('funcion', $funcion)
                     ->with('cuentas', $cuentas);
             });

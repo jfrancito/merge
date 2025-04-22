@@ -113,11 +113,12 @@ $(document).ready(function () {
             tipo_producto: tipo_producto
         };
 
+        ajax_normal_combo(data, "/obtener-combo-familia","ajax_familia_listar");
         ajax_normal_combo(data, "/obtener-combo-producto","ajax_producto_listar");
 
     });
 
-    $("#familia").on('change', function () {
+    $(".reporteingresossalidas").on('change', '.select3', function () {
 
         event.preventDefault();
         let id_opcion = $('#idopcion').val();
@@ -141,12 +142,12 @@ $(document).ready(function () {
             tipo_producto: tipo_producto
         };
 
-        ajax_normal_combo(data, "/obtener-combo-subfamilia","ajax_categoria_listar");
+        ajax_normal_combo(data, "/obtener-combo-subfamilia","ajax_subfamilia_listar");
         ajax_normal_combo(data, "/obtener-combo-producto","ajax_producto_listar");
 
     });
 
-    $(".reporteingresossalidas").on('change', '.select3', function () {
+    $(".reporteingresossalidas").on('change', '.select4', function () {
 
         event.preventDefault();
         let id_opcion = $('#idopcion').val();

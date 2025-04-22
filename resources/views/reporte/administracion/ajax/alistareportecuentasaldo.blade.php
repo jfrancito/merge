@@ -14,18 +14,18 @@
         <div class="tab-content">
             @if($todos === '' or $todos === 'C')
                 <div id="ccobrar" class="tab-pane cont active">
-                    @include('reporte.ajax.listacuentascobrarterceros')
+                    @include('reporte.administracion.ajax.listacuentascobrarterceros')
                 </div>
                 <div id="ccobrarrel" class="tab-pane cont">
-                    @include('reporte.ajax.listacuentascobrarrelacionadas')
+                    @include('reporte.administracion.ajax.listacuentascobrarrelacionadas')
                 </div>
             @endif
             @if($todos === '' or $todos === 'P')
                 <div id="cpagar" class="tab-pane cont">
-                    @include('reporte.ajax.listacuentaspagarterceros')
+                    @include('reporte.administracion.ajax.listacuentaspagarterceros')
                 </div>
                 <div id="cpagarrel" class="tab-pane cont">
-                    @include('reporte.ajax.listacuentaspagarrelacionadas')
+                    @include('reporte.administracion.ajax.listacuentaspagarrelacionadas')
                 </div>
             @endif
         </div>

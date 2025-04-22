@@ -93,9 +93,12 @@
                                         <div class="col-xs-12 col-sm-2 col-md-2 col-lg-2 cajareporte">
                                             <div class="form-group">
                                                 <label class="col-sm-12 control-label labelleft negrita">FECHA AL :</label>
-                                                <input required id="endDate" name="endDate"
-                                                       class="form-control control input-sm" type="date"
-                                                       value="{{$fecha_fin}}">
+                                                <div class="col-sm-12 abajocaja">
+                                                    <input required id="endDate" name="endDate"
+                                                           class="form-control control input-sm" type="date"
+                                                           value="{{$fecha_fin}}">
+                                                </div>
+
                                             </div>
                                         </div>
 
@@ -103,7 +106,7 @@
                                             <div class="form-group">
                                                 <label class="col-sm-12 control-label labelleft negrita">TC VENTA
                                                     :</label>
-                                                <div class="col-sm-12">
+                                                <div class="col-sm-12 abajocaja">
                                                     <input type="number"
                                                            step=0.0001
                                                            id="tc_venta" name='tc_venta'
@@ -120,7 +123,7 @@
                                             <div class="form-group">
                                                 <label class="col-sm-12 control-label labelleft negrita">TC COMPRA
                                                     :</label>
-                                                <div class="col-sm-12">
+                                                <div class="col-sm-12 abajocaja">
                                                     <input type="number"
                                                            step=0.0001
                                                            id="tc_compra" name='tc_compra'
@@ -142,7 +145,7 @@
                             </div>
 
                             <div class='listajax'>
-                                @include('reporte.ajax.alistareportecuentasaldo')
+                                @include('reporte.administracion.ajax.alistareportecuentasaldo')
                             </div>
 
                         </div>

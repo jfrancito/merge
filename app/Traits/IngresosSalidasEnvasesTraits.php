@@ -72,6 +72,24 @@ trait IngresosSalidasEnvasesTraits
         return $combo;
     }
 
+    private function listaFamiliaTipo($codigo, $todo, $titulo)
+    {
+        $array = DB::table('CMP.CATEGORIA')
+            ->join('CMP.CATEGORIA_RELACION', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'CMP.CATEGORIA_RELACION.COD_CATEGORIA')
+            ->where('CMP.CATEGORIA.COD_ESTADO', '=', 1)
+            ->where('CMP.CATEGORIA_RELACION.COD_CATEGORIA_SUP', '=', $codigo)
+            ->pluck('CMP.CATEGORIA.NOM_CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA')
+            ->toArray();
+
+        if ($todo == 'TODO') {
+            $combo = array('' => $titulo, $todo => $todo) + $array;
+        } else {
+            $combo = array('' => $titulo) + $array;
+        }
+
+        return $combo;
+    }
+
     private function listaCategoria($txt_grupo, $todo, $titulo){
         $array = DB::table('CMP.CATEGORIA')
             ->where('COD_ESTADO', '=', 1)
