@@ -226,7 +226,7 @@ class GestionOCController extends Controller
 
         header('Content-Type: text/html; charset=UTF-8');
         //$path = storage_path() . "/exports/FC26-00002985.XML";
-        $path = storage_path() . "/exports/FACTURAE001-181520605569162.XML";
+        $path = storage_path() . "/exports/20550213410-01-FF01-28726.xml";
         $parser = new InvoiceParser();
         $xml = file_get_contents($path);
         $factura = $parser->parse($xml);
@@ -2956,7 +2956,7 @@ class GestionOCController extends Controller
                         $dcontrol->save();
 
 
-                        //dd($factura->getdetails());
+
 
 
                         /**********DETALLE*********/
@@ -2965,6 +2965,8 @@ class GestionOCController extends Controller
                                 $producto                           = str_replace("<![CDATA[","",$itemdet->getdescripcion());
                                 $producto                           = str_replace("]]>","",$producto);
                                 $producto                           = preg_replace('/[^A-Za-z0-9\s]/', '', $producto);
+                                $codproducto                        = preg_replace('/[^A-Za-z0-9\s]/', '', $itemdet->getcodProducto());
+
 
                                 $linea = str_pad($indexdet+1, 3, "0", STR_PAD_LEFT); 
                                 $detalle                        =   new FeDetalleDocumento;
@@ -2972,10 +2974,10 @@ class GestionOCController extends Controller
                                 $detalle->DOCUMENTO_ITEM        =   $documentolinea;
 
                                 $detalle->LINEID                =   $linea;
-                                $detalle->CODPROD               =   $itemdet->getcodProducto();
+                                $detalle->CODPROD               =   $codproducto;
                                 $detalle->PRODUCTO              =   $producto;
                                 $detalle->UND_PROD              =   $itemdet->getunidad();
-                                $detalle->CANTIDAD              =   $itemdet->getcantidad();
+                                $detalle->CANTIDAD              =   (float)$itemdet->getcantidad();
                                 $detalle->PRECIO_UNIT           =   (float)$itemdet->getmtoValorUnitario();
                                 $detalle->VAL_IGV_ORIG          =   (float)$itemdet->getigv();
                                 $detalle->VAL_IGV_SOL           =   (float)$itemdet->getigv();
@@ -2987,7 +2989,7 @@ class GestionOCController extends Controller
                                 $detalle->save();
 
                         }
-
+                        //dd($factura->getdetails());
                         /**********FORMA DE PAGO*********/
                         foreach ($factura->getFormaPago() as $indexfor => $itemfor) {
 
@@ -3010,6 +3012,8 @@ class GestionOCController extends Controller
                         $fedocumento         =      FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','<>','ETM0000000000006')->first();
                         $fechaemision        =      date_format(date_create($fedocumento->FEC_VENTA), 'd/m/Y');
                         $detallefedocumento  =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+
+
 
                         //VALIDAR QUE ALGUNOS CAMPOS SEAN IGUALES
                         $this->con_validar_documento_proveedor($ordencompra,$fedocumento,$detalleordencompra,$detallefedocumento);

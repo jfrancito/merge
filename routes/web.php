@@ -28,10 +28,7 @@ Route::group(['middleware' => ['guestaw']], function () {
 Route::get('/serve-file', 'FileController@serveFile')->name('serve-file');
 Route::get('/serve-filecontrato', 'FileController@serveFileContrato')->name('serve-filecontrato');
 Route::get('/serve-fileestiba', 'FileController@serveFileEstiba')->name('serve-fileestiba');
-
 Route::get('/serve-filelg', 'FileController@serveFileLG')->name('serve-filelg');
-
-
 Route::get('/serve-filecontrato-sg', 'FileController@serveFileContratoSG')->name('serve-filecontrato-sg');
 Route::get('/serve-filepago', 'FileController@serveFilePago')->name('serve-filepago');
 Route::get('/serve-file-modelo', 'FileController@serveFileModelo')->name('serve-file-modelo');
@@ -52,8 +49,8 @@ Route::any('/descargar-manual', 'UserController@actionDescargarManual');//vALIDA
 Route::any('/generar-token-sunat', 'UserController@actionGenerarTokenSunat');//vALIDAR CDR Y SUNAT
 Route::any('/generar-token-sunat-curl', 'UserController@actionGenerarTokenSunat_cur');//vALIDAR CDR Y SUNAT
 Route::any('/leerdocumentos-sunat-compras', 'CpeController@actionGestionCpeCompra');//vALIDAR CDR Y SUNAT
-
 Route::any('/leerpreciocompetencia', 'PrecioCompetenciaController@actionScrapearPrecios');//vALIDAR CDR Y SUNAT
+Route::any('/transferirdataventas', 'TransferirDataController@actionTransferirVentasAtendidas');//TRANSFERIR DATA AGENTE IA
 
 
 
