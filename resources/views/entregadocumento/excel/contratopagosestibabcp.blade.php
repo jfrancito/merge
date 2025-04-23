@@ -127,7 +127,7 @@
 
 	        <td>{{date_format(date_create($item->FEC_EMISION), 'd-m-Y')}}</td>
 	        <td>{{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</td>
-	        <td>{{$item->TOTAL_VENTA_ORIG}}</td>
+	        <td>{{$item->TOTAL_VENTA_ORIG+$item->CAN_CENTIMO}}</td>
 	        <td>{{$item->MONTO_DETRACCION_XML}}</td>
 	        <td>{{$item->MONTO_DETRACCION_RED}}</td>
 			<td>0.00</td>

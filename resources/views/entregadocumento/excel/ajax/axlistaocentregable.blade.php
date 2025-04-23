@@ -129,7 +129,7 @@
 			            @ENDIF
 			        </td>
 			        <td></td>
-			        <td><b>{{ number_format(round($item->TOTAL_VENTA_ORIG, 4), 4, '.', ',') }}</b></td>
+			        <td><b>{{ number_format(round($item->TOTAL_VENTA_ORIG+$item->CAN_CENTIMO, 4), 4, '.', ',') }}</b></td>
 			        <td>@IF($MONTO_DETRACCION > 0) DETRACCION @ENDIF</td>
 			        <td>-</td>
 			        <td><b>{{ number_format(round($MONTO_DETRACCION, 4), 4, '.', ',') }}</b></td>
