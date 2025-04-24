@@ -1589,7 +1589,10 @@ class GestionOCAdministracionController extends Controller
                 if(count($documento_venta)>0){
 
                     $referencia_venta       =   DB::connection($conexionbd)->table('CMP.REFERENCIA_ASOC')->where('COD_TABLA','=',$documento_venta->COD_DOCUMENTO_CTBLE)
-                                                ->where('COD_TABLA_ASOC','like','%VR%')->first();
+                                                ->where(function($query) {
+                                                    $query->where('COD_TABLA_ASOC', 'like', '%VR%')
+                                                          ->orWhere('COD_TABLA_ASOC', 'like', '%VL%');
+                                                })->first();
 
                     if(count($referencia_venta)>0){
                         $referencia_os        =   DB::connection($conexionbd)->table('CMP.REFERENCIA_ASOC')->where('COD_TABLA','=',$referencia_venta->COD_TABLA_ASOC)
