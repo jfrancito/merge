@@ -474,12 +474,13 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/descargar-archivo-requerimiento-lg/{tipo}/{idopcion}/{linea}/{idordencompra}', 'GestionOCValidadoController@actionDescargarLG');
 
-
 	Route::any('/gestion-de-modelos-comprobantes/{idopcion}', 'GestionOCValidadoController@actionModelosComprobantes');
 
 	Route::any('/gestion-reporte-inventario/{idopcion}', 'ReporteInventarioController@actionListarReporteInventario');
     Route::any('/ajax-reporte-inventario', 'ReporteInventarioController@actionAjaxListarReporteInventario');
     Route::any('/descargar-archivo-inventario-consolidado', 'ReporteInventarioController@actionAjaxListarReporteInventarioExcel');
+
+
 });
 
 Route::get('/pruebaemail/{emailfrom}/{nombreusuario}', 'PruebasController@actionPruebaEmail');
