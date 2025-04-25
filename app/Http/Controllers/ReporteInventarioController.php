@@ -65,8 +65,8 @@ class ReporteInventarioController extends Controller
         $listapaca  	=   $this->ListarInventario($fecha_hasta, $cod_empr, 'FAM0000000000062', '','',''); 
         $listaenvase  	=   $this->ListarInventario($fecha_hasta, $cod_empr, 'FAM0000000000026', '','',''); 
         $listabobina  	=   $this->ListarInventario($fecha_hasta, $cod_empr, '', '','','TPR0000000000004'); 
-        $listasuministro	=   $this->ListarInventario($fecha_hasta, $cod_empr, 'FAM0000000000002', '','','TPR0000000000005'); 
-        $listamercaderia	=   $this->ListarInventario($fecha_hasta, $cod_empr, 'FAM0000000000002', '','','TPR0000000000001'); 
+        $listasuministro	=   $this->ListarInventario($fecha_hasta, $cod_empr, '', '','','TPR0000000000005'); 
+        $listamercaderia	=   $this->ListarInventario($fecha_hasta, $cod_empr, '', '','','TPR0000000000001'); 
         $listaenvaseprod	=   $this->ListarInventario($fecha_hasta, $cod_empr, 'FAM0000000000026', '','AXI0000000000001',''); 
         $listaenvasedesp	=   $this->ListarInventario($fecha_hasta, $cod_empr, 'FAM0000000000026', '','AXI0000000000002',''); 
         $listaenvasecose	=   $this->ListarInventario($fecha_hasta, $cod_empr, 'FAM0000000000026', '','AXI0000000000003','');
@@ -145,10 +145,12 @@ class ReporteInventarioController extends Controller
             $cod_cen = $item['COD_CENTRO'];
             $data_suministro[$cod_pro][$cod_cen][] = $item;
         }
-		foreach ($listamercaderia as $item) {
-		    $cod_pro = $item['COD_PRODUCTO'];
-		    $cod_cen = $item['COD_CENTRO'];
-		    $data_suministro[$cod_pro][$cod_cen][] = $item;
+		foreach ($listamercaderia as $item) {            
+        	if($item['COD_FAMILIA'] <> 'FAM0000000000036'){ // quitamos los fertilizantes
+                $cod_pro = $item['COD_PRODUCTO'];
+                $cod_cen = $item['COD_CENTRO'];
+                $data_suministro[$cod_pro][$cod_cen][] = $item;
+            }
 		}
         //*************************
 
@@ -325,8 +327,8 @@ class ReporteInventarioController extends Controller
         $listapaca      =   $this->ListarInventario($fecha_hasta, $cod_empr, 'FAM0000000000062', '','',''); 
         $listaenvase    =   $this->ListarInventario($fecha_hasta, $cod_empr, 'FAM0000000000026', '','',''); 
         $listabobina    =   $this->ListarInventario($fecha_hasta, $cod_empr, '', '','','TPR0000000000004'); 
-        $listasuministro    =   $this->ListarInventario($fecha_hasta, $cod_empr, 'FAM0000000000002', '','','TPR0000000000005'); 
-        $listamercaderia    =   $this->ListarInventario($fecha_hasta, $cod_empr, 'FAM0000000000002', '','','TPR0000000000001'); 
+        $listasuministro	=   $this->ListarInventario($fecha_hasta, $cod_empr, '', '','','TPR0000000000005'); 
+        $listamercaderia	=   $this->ListarInventario($fecha_hasta, $cod_empr, '', '','','TPR0000000000001'); 
         $listaenvaseprod    =   $this->ListarInventario($fecha_hasta, $cod_empr, 'FAM0000000000026', '','AXI0000000000001',''); 
         $listaenvasedesp    =   $this->ListarInventario($fecha_hasta, $cod_empr, 'FAM0000000000026', '','AXI0000000000002',''); 
         $listaenvasecose    =   $this->ListarInventario($fecha_hasta, $cod_empr, 'FAM0000000000026', '','AXI0000000000003','');
@@ -406,9 +408,11 @@ class ReporteInventarioController extends Controller
             $data_suministro[$cod_pro][$cod_cen][] = $item;
         }
         foreach ($listamercaderia as $item) {
-            $cod_pro = $item['COD_PRODUCTO'];
-            $cod_cen = $item['COD_CENTRO'];
-            $data_suministro[$cod_pro][$cod_cen][] = $item;
+            if($item['COD_FAMILIA'] <> 'FAM0000000000036'){ // quitamos los fertilizantes
+                $cod_pro = $item['COD_PRODUCTO'];
+                $cod_cen = $item['COD_CENTRO'];
+                $data_suministro[$cod_pro][$cod_cen][] = $item;
+            }
         }
         //*************************
 
@@ -790,6 +794,29 @@ class ReporteInventarioController extends Controller
         })->download('xlsx');
 
     }
+
+
+    public function actionListarReportePiladoTransito()
+    {
+        $fecha_hasta = date('Y-m-d');
+        $combo_empresa          =   array('' => 'Seleccionar' , 'IACHEM0000007086' => 'INDUAMERICA COMERCIAL S.A.C.', 
+                                                                'IACHEM0000010394' => 'INDUAMERICA INTERNACIONAL S.A.C.');   
+        $combo_emp_sel          =   Session::get('empresas')->COD_EMPR;
+
+        View::share('titulo', 'Arroz Pilado Tránsito');
+        
+        return View::make('inventario/listaresumeninventario',
+            [
+                'fecha_hasta'           => $fecha_hasta,
+                'combo_empresa'         => $combo_empresa,
+                'combo_emp_sel'         => $combo_emp_sel,
+                'listadata'             => [],
+                'codempr_filtro'        => '',
+                'tipo'                  => '',
+                'funcion'               => $this,
+                'ajax'                  => true
+            ]);
+    }   
 
 
 }
