@@ -115,15 +115,14 @@ class ReporteInventarioController extends Controller
         		$cod_pro = $item['COD_PRODUCTO'];
 	            $cod_cen = $item['COD_CENTRO'];
 
+                $data_envase[$cod_pro][$cod_cen][] = $item;
+
 	            if($cod_cen == 'CEN0000000000002' ){	
 	            	if($item['NOM_ALMACEN_FISICO']<> "") {	
-	            		$data_envase[$cod_pro][$cod_cen][] = $item;
-
 	            		$item['NOM_CENTRO'] = $item['NOM_ALMACEN_FISICO'];           		
 	            		$data_envase_fisico[$cod_pro][$cod_cen][] = $item;
 	            	}
-	            }else{
-	            	$data_envase[$cod_pro][$cod_cen][] = $item;		            	
+	            }else{	            	
 	            	$data_envase_fisico[$cod_pro][$cod_cen][] = $item;            	
 	            }            
         	}            
