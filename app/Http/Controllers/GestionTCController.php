@@ -292,10 +292,10 @@ class GestionTCController extends Controller
 
 
                         /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
-                        $larchivos       =      Archivo::get();
+                        $contadorArchivos = Archivo::count();
                         $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
                         $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
-                        $nombrefile      =      count($larchivos).'-'.$file->getClientOriginalName();
+                        $nombrefile      =      $contadorArchivos.'-'.$file->getClientOriginalName();
                         $valor           =      $this->versicarpetanoexiste($rutafile);
                         $rutacompleta    =      $rutafile.'\\'.$nombrefile;
 
@@ -601,13 +601,13 @@ class GestionTCController extends Controller
                         //CDR
                         foreach($filescdm as $file){
 
-                            $larchivos       =      Archivo::get();
+                            $contadorArchivos = Archivo::count();
                             $nombre          =      $ordencompra->COD_DOCUMENTO_CTBLE.'-'.$file->getClientOriginalName();
                             /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
                             $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
                             $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
                             // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                            $nombrefilecdr   =      count($larchivos).'-'.$file->getClientOriginalName();
+                            $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
                             $valor           =      $this->versicarpetanoexiste($rutafile);
                             $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
                             copy($file->getRealPath(),$rutacompleta);

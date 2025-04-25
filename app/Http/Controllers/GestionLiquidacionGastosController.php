@@ -282,11 +282,15 @@ class GestionLiquidacionGastosController extends Controller
         if ($request->hasFile('inputxml')) {
             $file            =      $request->file('inputxml');
             $ID_DOCUMENTO    =      $request['ID_DOCUMENTO'];
-            $larchivos       =      Archivo::get();
+
+
+            //
+            $contadorArchivos = Archivo::count();
+
             $prefijocarperta =      $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
 
             $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ID_DOCUMENTO;
-            $nombrefile      =      count($larchivos).'-'.$file->getClientOriginalName();
+            $nombrefile      =      $contadorArchivos.'-'.$file->getClientOriginalName();
             $valor           =      $this->versicarpetanoexiste($rutafile);
             $rutacompleta    =      $rutafile.'\\'.$nombrefile;
             $nombreoriginal  =      $file->getClientOriginalName();
@@ -1484,11 +1488,13 @@ class GestionLiquidacionGastosController extends Controller
                             if(!is_null($filescdm)){
                                 //CDR
                                 foreach($filescdm as $file){
-                                    $larchivos       =      Archivo::get();
+                                    //
+                                    $contadorArchivos = Archivo::count();
+
                                     /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
                                     $prefijocarperta =      $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
                                     $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$iddocumento;
-                                    $nombrefilecdr   =      count($larchivos).'-'.$file->getClientOriginalName();
+                                    $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
                                     $valor           =      $this->versicarpetanoexiste($rutafile);
                                     $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
                                     copy($file->getRealPath(),$rutacompleta);
@@ -1603,11 +1609,13 @@ class GestionLiquidacionGastosController extends Controller
                             if(!is_null($filescdm)){
                                 //CDR
                                 foreach($filescdm as $file){
-                                    $larchivos       =      Archivo::get();
+                                    //
+                                    $contadorArchivos = Archivo::count();
+
                                     /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
                                     $prefijocarperta =      $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
                                     $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$iddocumento;
-                                    $nombrefilecdr   =      count($larchivos).'-'.$file->getClientOriginalName();
+                                    $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
                                     $valor           =      $this->versicarpetanoexiste($rutafile);
                                     $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
                                     copy($file->getRealPath(),$rutacompleta);

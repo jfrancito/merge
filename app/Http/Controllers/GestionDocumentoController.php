@@ -321,10 +321,11 @@ class GestionDocumentoController extends Controller
 
 
                         /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
-                        $larchivos                  =      Archivo::get();
+                        //$contadorArchivos = Archivo::count();
+                        $contadorArchivos           =      Archivo::count();
                         $prefijocarperta            =      $this->prefijo_empresa($COD_EMPR);
                         $rutafile                   =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$factura->getcompany()->getruc();
-                        $nombrefile                 =      count($larchivos).'-'.$file->getClientOriginalName();
+                        $nombrefile                 =      $contadorArchivos.'-'.$file->getClientOriginalName();
                         $valor                      =      $this->versicarpetanoexiste($rutafile);
                         $rutacompleta               =      $rutafile.'\\'.$nombrefile;
                         $nombreoriginal             =      $file->getClientOriginalName();
@@ -555,7 +556,9 @@ class GestionDocumentoController extends Controller
                     //CDR
                     foreach($filescdr as $file){
 
-                        $larchivos       =      Archivo::get();
+                        //
+                        //$contadorArchivos=      Archivo::count();
+
                         $zip = new ZipArchive;
                         $prefijocarperta =      $this->prefijo_empresa($COD_EMPR);
                         $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$fedocumento->RUC_PROVEEDOR;
@@ -690,13 +693,15 @@ class GestionDocumentoController extends Controller
                         //CDR
                         foreach($filescdm as $file){
 
-                            $larchivos       =      Archivo::get();
+                            //
+                            $contadorArchivos = Archivo::count();
+
                             $nombre          =      $fedocumento->ID_DOCUMENTO.'-'.$file->getClientOriginalName();
                             /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
                             $prefijocarperta =      $this->prefijo_empresa($COD_EMPR);
                             $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$fedocumento->RUC_PROVEEDOR;
                             // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                            $nombrefilecdr   =      count($larchivos).'-'.$file->getClientOriginalName();
+                            $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
                             $valor           =      $this->versicarpetanoexiste($rutafile);
                             $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
                             copy($file->getRealPath(),$rutacompleta);
