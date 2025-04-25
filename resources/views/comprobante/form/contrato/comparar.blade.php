@@ -78,6 +78,12 @@
                 <td><p class='subtitulomerge'>{{$fedocumento->SERIE_ANTICIPO}}-{{$fedocumento->NRO_ANTICIPO}}//{{$fedocumento->MONTO_ANTICIPO_DESC}}</p></td>
               </tr>
 
+              <tr>
+                <td><b>Otro anticipo</b></td>
+                <td><p class='subtitulomerge'>{{$fedocumento->MONTO_ANTICIPO_DESC_OTROS}}</p></td>
+              </tr>
+
+
           </tbody>
         </table>
       </div>

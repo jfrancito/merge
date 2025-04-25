@@ -6,6 +6,8 @@ use App\User;
 use App\Modelos\WEBRolopcion;
 use App\Modelos\Estado;
 use App\Modelos\FeDocumento;
+use App\Modelos\WEBUserEmpresaCentro;
+
 
 use Hashids;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +16,22 @@ use Session;
 use table;
 
 class Funcion {
+
+	public function tiene_perfil($empresa_id,$centro_id,$usuario_id) {
+
+		$perfiles 		=   WEBUserEmpresaCentro::where('empresa_id','=',$empresa_id)
+							->where('centro_id','=',$centro_id)
+							->where('usuario_id','=',$usuario_id)
+							->where('activo','=','1')
+							->first();
+
+		if(count($perfiles)>0){
+			return true;
+		}else{
+			return false;
+		}	
+
+	}
 
 	public function neto_pagar_oc($oc){
 
@@ -27,12 +45,12 @@ class Funcion {
 		}
 
 		if($COD_PAGO_DETRACCION == Session::get('empresas')->COD_EMPR){
-			$neto_pagar 	  = (float)$oc->CAN_TOTAL - (float)round($oc->CAN_DETRACCION) - (float)$oc->CAN_RETENCION - (float)$fedocumento->MONTO_ANTICIPO_DESC + (float)$oc->CAN_PERCEPCION+ (float)$fedocumento->CAN_CENTIMO;
+			$neto_pagar 	  = (float)$oc->CAN_TOTAL - (float)round($oc->CAN_DETRACCION) - (float)$oc->CAN_RETENCION - (float)$fedocumento->MONTO_ANTICIPO_DESC - (float)$fedocumento->MONTO_ANTICIPO_DESC_OTROS + (float)$oc->CAN_PERCEPCION+ (float)$fedocumento->CAN_CENTIMO;
 		}else{
-			$neto_pagar 	  = (float)$oc->CAN_TOTAL - (float)$oc->CAN_RETENCION - (float)$fedocumento->MONTO_ANTICIPO_DESC + (float)$oc->CAN_PERCEPCION+ (float)$fedocumento->CAN_CENTIMO;
+			$neto_pagar 	  = (float)$oc->CAN_TOTAL - (float)$oc->CAN_RETENCION - (float)$fedocumento->MONTO_ANTICIPO_DESC - (float)$fedocumento->MONTO_ANTICIPO_DESC_OTROS + (float)$oc->CAN_PERCEPCION+ (float)$fedocumento->CAN_CENTIMO;
 		}
 
-        $neto_pagar 	  = ROUND($neto_pagar,4);
+        $neto_pagar 	  = ROUND($neto_pagar,2);
         return $neto_pagar;
 	}
 
@@ -49,12 +67,12 @@ class Funcion {
 
 		if($COD_PAGO_DETRACCION == Session::get('empresas')->COD_EMPR){
 			$neto_pagar 	  = (float)$fedocumento->TOTAL_VENTA_ORIG - (float)round($fedocumento->MONTO_DETRACCION_RED) - 
-								(float)$fedocumento->MONTO_RETENCION - (float)$fedocumento->CAN_IMPUESTO_RENTA - (float)$fedocumento->MONTO_ANTICIPO_DESC + (float)$fedocumento->PERCEPCION - (float)$fedocumento->MONTO_NC + (float)$fedocumento->CAN_CENTIMO;
+								(float)$fedocumento->MONTO_RETENCION - (float)$fedocumento->CAN_IMPUESTO_RENTA - (float)$fedocumento->MONTO_ANTICIPO_DESC - (float)$fedocumento->MONTO_ANTICIPO_DESC_OTROS + (float)$fedocumento->PERCEPCION - (float)$fedocumento->MONTO_NC  + (float)$fedocumento->COMPENSACION + (float)$fedocumento->CAN_CENTIMO;
 		}else{
-			$neto_pagar 	  = (float)$fedocumento->TOTAL_VENTA_ORIG - (float)$fedocumento->MONTO_RETENCION - (float)$fedocumento->CAN_IMPUESTO_RENTA - (float)$fedocumento->MONTO_ANTICIPO_DESC + (float)$fedocumento->PERCEPCION- (float)$fedocumento->MONTO_NC + (float)$fedocumento->CAN_CENTIMO;
+			$neto_pagar 	  = (float)$fedocumento->TOTAL_VENTA_ORIG - (float)$fedocumento->MONTO_RETENCION - (float)$fedocumento->CAN_IMPUESTO_RENTA - (float)$fedocumento->MONTO_ANTICIPO_DESC - (float)$fedocumento->MONTO_ANTICIPO_DESC_OTROS + (float)$fedocumento->PERCEPCION- (float)$fedocumento->MONTO_NC  + (float)$fedocumento->COMPENSACION + (float)$fedocumento->CAN_CENTIMO;
 		}
 
-        $neto_pagar 	  = ROUND($neto_pagar,4);
+        $neto_pagar 	  = ROUND($neto_pagar,2);
         return $neto_pagar;
 	}
 
@@ -169,6 +187,25 @@ class Funcion {
 		$correlativocompleta = str_pad($idsuma, $cantidad, "0", STR_PAD_LEFT);
 
 		return $correlativocompleta;
+
+	}
+
+
+	public function decodificarmaestrapre($id,$prefijo) {
+
+		//decodificar variable
+		$iddeco = Hashids::decode($id);
+
+		//ver si viene con letras la cadena codificada
+		if (count($iddeco) == 0) {
+			return '';
+		}
+		//concatenar con ceros
+		$idopcioncompleta = str_pad($iddeco[0], 8, "0", STR_PAD_LEFT);
+
+		$prefijo = $prefijo;
+		$idopcioncompleta = $prefijo . $idopcioncompleta;
+		return $idopcioncompleta;
 
 	}
 
@@ -351,6 +388,26 @@ class Funcion {
 		return $idopcioncompleta;
 
 	}
+
+
+	public function getCreateIdMaestradocpla($tabla,$prefijo) {
+
+		$id = "";
+		// maximo valor de la tabla referente
+		$id = DB::table($tabla)
+			->select(DB::raw('max(SUBSTRING(ID_DOCUMENTO,5,8)) as id'))
+			->first();
+		//conversion a string y suma uno para el siguiente id
+		$idsuma = (int) $id->id + 1;
+		//concatenar con ceros
+		$idopcioncompleta = str_pad($idsuma, 8, "0", STR_PAD_LEFT);
+		//concatenar prefijo
+		$prefijo = $prefijo;
+		$idopcioncompleta = $prefijo . $idopcioncompleta;
+		return $idopcioncompleta;
+
+	}
+
 
 
 	public function prefijomaestra() {

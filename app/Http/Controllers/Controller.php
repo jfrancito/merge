@@ -35,6 +35,10 @@ class Controller extends BaseController {
 	public $pathFiles='\\\\10.1.50.2';
 	public $hoy_sh;
 
+	public $anio;
+	public $mes;
+
+
 
 	public function __construct() {
 		$this->funciones 		= new Funcion();
@@ -52,6 +56,11 @@ class Controller extends BaseController {
 		$this->hoy_sh 			= date_format(date_create(date('Ymd h:i:s')), 'Ymd');
 		$this->fecha_sin_hora 	= date('d-m-Y');
 
+		$anio 					= date("Y");	
+		$this->anio 			= $anio;
+
+		$mes 					= date("m");	
+		$this->mes 				= $mes;
 
 		//fecha actual 10 dias
 		$fechatreinta 	= date('Y-m-j');

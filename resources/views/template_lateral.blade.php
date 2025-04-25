@@ -93,8 +93,8 @@
 
         document.querySelector('.chat-input textarea').setAttribute('placeholder', "Escribe tu pregunta...");
       }, 3000); // Asegura que el chat esté completamente cargado
-    </script> -->
-
+    </script>
+ -->
 
   </body>
 </html>

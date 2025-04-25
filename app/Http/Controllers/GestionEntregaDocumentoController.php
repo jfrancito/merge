@@ -1381,7 +1381,7 @@ class GestionEntregaDocumentoController extends Controller
                 $listadocumento =   $this->con_lista_doc_proveedor_banco_folio($folio->FOLIO,$item->TXT_CATEGORIA_BANCO);
 
 
-                //dd($listadocumento->sum('TOTAL'));
+                //dd($listadocumento);
 
 
                 $npestania = substr($txt_banco, 0, 30);

@@ -447,7 +447,8 @@
                                         <div class="form-group">
                                           <label class="col-sm-12 control-label labelleft" ><b>Usuario Contacto :</b></label>
                                           <div class="col-sm-12 abajocaja" >
-                                              <input type="text" name="contacto_nombre" id='contacto_nombre' class="form-control control input-sm" value = '{{$usuario->NOM_TRABAJADOR}}' readonly>
+                                              <input type="text" name="contacto_nombre" id='contacto_nombre' class="form-control control input-sm" 
+                                              value = '{{$usuario->NOM_TRABAJADOR}}' readonly>
                                           </div>
                                         </div>
                                       </div>

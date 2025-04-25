@@ -694,8 +694,8 @@ trait ComprobanteTraits
                                                     CAN_TOTAL TOTAL,
                                                     CASE 
                                                             WHEN FE_DOCUMENTO.COD_PAGO_DETRACCION = CMP.DOCUMENTO_CTBLE.COD_EMPR 
-                                                            THEN CAN_TOTAL - ISNULL(MONTO_ANTICIPO_DESC,0) - MONTO_DETRACCION_RED
-                                                            ELSE CAN_TOTAL - ISNULL(MONTO_ANTICIPO_DESC,0)
+                                                            THEN CAN_TOTAL - ISNULL(MONTO_ANTICIPO_DESC,0) - ISNULL(MONTO_ANTICIPO_DESC_OTROS,0) + ISNULL(COMPENSACION,0) - MONTO_DETRACCION_RED
+                                                            ELSE CAN_TOTAL - ISNULL(MONTO_ANTICIPO_DESC,0) - ISNULL(MONTO_ANTICIPO_DESC_OTROS,0) + ISNULL(COMPENSACION,0)
                                                         END AS TOTAL_PAGAR,
                                                     MONTO_DETRACCION_RED DETRACCION'))
                                     ->get();
@@ -712,11 +712,13 @@ trait ComprobanteTraits
                                     ->leftJoin('TES.CUENTA_BANCARIA', function ($join) {
                                         $join->on('CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR', '=', 'TES.CUENTA_BANCARIA.COD_EMPR_TITULAR')
                                              ->on('FE_DOCUMENTO.COD_CATEGORIA_BANCO', '=', 'TES.CUENTA_BANCARIA.COD_EMPR_BANCO')
+
                                              ->on('FE_DOCUMENTO.TXT_NRO_CUENTA_BANCARIA', '=', 'TES.CUENTA_BANCARIA.TXT_NRO_CUENTA_BANCARIA');
                                     })
                                     ->leftjoin('CMP.CATEGORIA as CAT_CUENTA ', 'CAT_CUENTA.COD_CATEGORIA', '=', 'TES.CUENTA_BANCARIA.TXT_TIPO_REFERENCIA')
                                     ->leftjoin('STD.EMPRESA', 'STD.EMPRESA.COD_EMPR', '=', 'CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR')
                                     ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'STD.EMPRESA.COD_TIPO_DOCUMENTO')
+                                    ->where('TES.CUENTA_BANCARIA.COD_ESTADO', '=', 1)
                                     ->where('FOLIO','=',$folio)
                                     ->where('TXT_CATEGORIA_BANCO','=',$banco_txt)
                                     ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
@@ -730,8 +732,8 @@ trait ComprobanteTraits
                                                     SUM(TOTAL_VENTA_ORIG) TOTAL,
                                                     SUM(CASE 
                                                             WHEN FE_DOCUMENTO.COD_PAGO_DETRACCION = CMP.DOCUMENTO_CTBLE.COD_EMPR 
-                                                            THEN ISNULL(FE_DOCUMENTO.TOTAL_VENTA_ORIG,0) - ROUND(ISNULL(FE_DOCUMENTO.MONTO_DETRACCION_RED,0), 0) - ISNULL(FE_DOCUMENTO.MONTO_RETENCION,0) - ISNULL(FE_DOCUMENTO.CAN_IMPUESTO_RENTA,0) - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC,0) + ISNULL(FE_DOCUMENTO.PERCEPCION,0)
-                                                            ELSE ISNULL(FE_DOCUMENTO.TOTAL_VENTA_ORIG,0) - ISNULL(FE_DOCUMENTO.MONTO_RETENCION,0) - ISNULL(FE_DOCUMENTO.CAN_IMPUESTO_RENTA,0)  - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC,0) + ISNULL(FE_DOCUMENTO.PERCEPCION,0)
+                                                            THEN ISNULL(FE_DOCUMENTO.TOTAL_VENTA_ORIG,0) - ROUND(ISNULL(FE_DOCUMENTO.MONTO_DETRACCION_RED,0), 0) - ISNULL(FE_DOCUMENTO.MONTO_RETENCION,0) - ISNULL(FE_DOCUMENTO.CAN_IMPUESTO_RENTA,0) - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC,0) - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC_OTROS,0) + ISNULL(FE_DOCUMENTO.COMPENSACION,0) + ISNULL(FE_DOCUMENTO.PERCEPCION,0)
+                                                            ELSE ISNULL(FE_DOCUMENTO.TOTAL_VENTA_ORIG,0) - ISNULL(FE_DOCUMENTO.MONTO_RETENCION,0) - ISNULL(FE_DOCUMENTO.CAN_IMPUESTO_RENTA,0)  - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC,0) - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC_OTROS,0) + ISNULL(FE_DOCUMENTO.COMPENSACION,0) + ISNULL(FE_DOCUMENTO.PERCEPCION,0)
                                                         END) AS TOTAL_PAGAR,
                                                     SUM(ROUND(MONTO_DETRACCION_RED, 0)) DETRACCION'))
                                     ->groupBy('CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR')
@@ -773,8 +775,8 @@ trait ComprobanteTraits
                                                     SUM(TOTAL_VENTA_ORIG) TOTAL,
                                                     SUM(CASE 
                                                             WHEN FE_DOCUMENTO.COD_PAGO_DETRACCION = CMP.ORDEN.COD_EMPR 
-                                                            THEN ISNULL(FE_DOCUMENTO.TOTAL_VENTA_ORIG,0) - ROUND(ISNULL(FE_DOCUMENTO.MONTO_DETRACCION_RED,0), 0) - ISNULL(FE_DOCUMENTO.MONTO_RETENCION,0) - ISNULL(FE_DOCUMENTO.CAN_IMPUESTO_RENTA,0) - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC,0) + ISNULL(FE_DOCUMENTO.PERCEPCION,0)
-                                                            ELSE ISNULL(FE_DOCUMENTO.TOTAL_VENTA_ORIG,0) - ISNULL(FE_DOCUMENTO.MONTO_RETENCION,0) - ISNULL(FE_DOCUMENTO.CAN_IMPUESTO_RENTA,0)  - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC,0) + ISNULL(FE_DOCUMENTO.PERCEPCION,0)
+                                                            THEN ISNULL(FE_DOCUMENTO.TOTAL_VENTA_ORIG,0) - ROUND(ISNULL(FE_DOCUMENTO.MONTO_DETRACCION_RED,0), 0) - ISNULL(FE_DOCUMENTO.MONTO_RETENCION,0) - ISNULL(FE_DOCUMENTO.CAN_IMPUESTO_RENTA,0) - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC,0) - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC_OTROS,0) + ISNULL(FE_DOCUMENTO.COMPENSACION,0) + ISNULL(FE_DOCUMENTO.PERCEPCION,0)
+                                                            ELSE ISNULL(FE_DOCUMENTO.TOTAL_VENTA_ORIG,0) - ISNULL(FE_DOCUMENTO.MONTO_RETENCION,0) - ISNULL(FE_DOCUMENTO.CAN_IMPUESTO_RENTA,0)  - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC,0) - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC_OTROS,0) + ISNULL(FE_DOCUMENTO.COMPENSACION,0) + ISNULL(FE_DOCUMENTO.PERCEPCION,0)
                                                         END) AS TOTAL_PAGAR,
                                                     SUM(ROUND(MONTO_DETRACCION_RED, 0)) DETRACCION'))
                                     ->groupBy('CMP.ORDEN.COD_EMPR_CLIENTE')
@@ -821,8 +823,8 @@ trait ComprobanteTraits
                                                     MAX(TOTAL_VENTA_ORIG) TOTAL,
                                                     MAX(CASE
                                                         WHEN FE_DOCUMENTO.COD_PAGO_DETRACCION = CMP.DOCUMENTO_CTBLE.COD_EMPR 
-                                                            THEN ISNULL(FE_DOCUMENTO.TOTAL_VENTA_ORIG,0) - ROUND(ISNULL(FE_DOCUMENTO.MONTO_DETRACCION_RED,0), 0) - ISNULL(FE_DOCUMENTO.MONTO_RETENCION,0) - ISNULL(FE_DOCUMENTO.CAN_IMPUESTO_RENTA,0) - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC,0) + ISNULL(FE_DOCUMENTO.PERCEPCION,0)
-                                                            ELSE ISNULL(FE_DOCUMENTO.TOTAL_VENTA_ORIG,0) - ISNULL(FE_DOCUMENTO.MONTO_RETENCION,0) - ISNULL(FE_DOCUMENTO.CAN_IMPUESTO_RENTA,0)  - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC,0) + ISNULL(FE_DOCUMENTO.PERCEPCION,0)
+                                                            THEN ISNULL(FE_DOCUMENTO.TOTAL_VENTA_ORIG,0) - ROUND(ISNULL(FE_DOCUMENTO.MONTO_DETRACCION_RED,0), 0) - ISNULL(FE_DOCUMENTO.MONTO_RETENCION,0) - ISNULL(FE_DOCUMENTO.CAN_IMPUESTO_RENTA,0) - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC,0) - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC_OTROS,0) + ISNULL(FE_DOCUMENTO.COMPENSACION,0) + ISNULL(FE_DOCUMENTO.PERCEPCION,0)
+                                                            ELSE ISNULL(FE_DOCUMENTO.TOTAL_VENTA_ORIG,0) - ISNULL(FE_DOCUMENTO.MONTO_RETENCION,0) - ISNULL(FE_DOCUMENTO.CAN_IMPUESTO_RENTA,0)  - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC,0) - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC_OTROS,0) + ISNULL(FE_DOCUMENTO.COMPENSACION,0) + ISNULL(FE_DOCUMENTO.PERCEPCION,0)
                                                         END) AS TOTAL_PAGAR,
                                                     MAX(ROUND(MONTO_DETRACCION_RED, 0)) DETRACCION'))
                                     ->groupBy('CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR')
@@ -895,8 +897,8 @@ trait ComprobanteTraits
                                                     SUM(CAN_TOTAL) TOTAL,
                                                     SUM(CASE 
                                                             WHEN FE_DOCUMENTO.COD_PAGO_DETRACCION = CMP.ORDEN.COD_EMPR 
-                                                            THEN CMP.ORDEN.CAN_TOTAL - ROUND(CMP.ORDEN.CAN_DETRACCION, 0) - CMP.ORDEN.CAN_RETENCION - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC,0) + CMP.ORDEN.CAN_PERCEPCION
-                                                            ELSE CMP.ORDEN.CAN_TOTAL - CMP.ORDEN.CAN_RETENCION - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC,0) + CMP.ORDEN.CAN_PERCEPCION
+                                                            THEN CMP.ORDEN.CAN_TOTAL - ROUND(CMP.ORDEN.CAN_DETRACCION, 0) - CMP.ORDEN.CAN_RETENCION - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC,0) - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC_OTROS,0) + ISNULL(FE_DOCUMENTO.COMPENSACION,0) + CMP.ORDEN.CAN_PERCEPCION
+                                                            ELSE CMP.ORDEN.CAN_TOTAL - CMP.ORDEN.CAN_RETENCION - ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC,0)- ISNULL(FE_DOCUMENTO.MONTO_ANTICIPO_DESC_OTROS,0) + ISNULL(FE_DOCUMENTO.COMPENSACION,0) + CMP.ORDEN.CAN_PERCEPCION
                                                         END) AS TOTAL_PAGAR,
                                                     SUM(ROUND(CAN_DETRACCION, 0)) DETRACCION'))
                                     ->groupBy('CMP.ORDEN.COD_EMPR_CLIENTE')
@@ -2664,7 +2666,6 @@ trait ComprobanteTraits
                             ->where('OPERACION','=','CONTRATO')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->ProveedorFE($proveedor_id)
-                            //->where('TXT_PROCEDENCIA','<>','SUE')
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000005')
                             ->orderBy('fecha_uc','desc')
                             ->get();
@@ -2696,18 +2697,28 @@ trait ComprobanteTraits
                             ->select(DB::raw('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION.COD_ORDEN COD,FE_DOCUMENTO.*,CMP.Orden.* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                             ->whereNull('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION.COD_ORDEN')
                             ->where('OPERACION','=','ORDEN_COMPRA')
-                            //->whereIn('FE_DOCUMENTO.ID_DOCUMENTO',['IICHCT0000002722','IICHCL0000010383'])
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000005')
                             ->ProveedorFE($proveedor_id)
                             ->orderBy('fecha_uc','desc')
                             ->get();
-
-        //dd($listadatos);
-
-
         return  $listadatos;
     }
+
+
+    private function con_lista_cabecera_comprobante_total_tes_estiba($cliente_id,$proveedor_id,$operacion_id) {
+
+        $listadatos     =   FeDocumento::where('OPERACION','=',$operacion_id)
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000005')
+                            ->ProveedorFE($proveedor_id)
+                            ->orderBy('fecha_uc','desc')
+                            ->get();
+        return  $listadatos;
+    }
+
+
+
 
     private function con_lista_cabecera_comprobante_total_tes_pagado($cliente_id,$proveedor_id,$fecha_inicio,$fecha_fin) {
 
@@ -3589,6 +3600,9 @@ trait ComprobanteTraits
     }
 
 
+    
+
+
     private function gn_combo_estado_fe_documento($todo) {
 
 		$array 							= 	DB::table('CMP.CATEGORIA')
@@ -3620,6 +3634,28 @@ trait ComprobanteTraits
         return  $combo;                    
     }
 
+
+
+    private function gn_combo_empresa_lg($todo) {
+
+        $array                          =   DB::table('STD.EMPRESA')
+                                            ->where('COD_ESTADO','=','1')
+                                            ->pluck('NOM_EMPR','COD_EMPR')
+                                            ->toArray();
+        if($todo=='TODO'){
+            $combo                  =   array($todo => $todo) + $array;
+        }else{
+            $combo                  =   $array;
+        }
+        return  $combo;                    
+    }
+
+
+
+
+
+
+
     private function gn_combo_empresa($todo) {
 
         $array                          =   DB::table('STD.EMPRESA')
@@ -3633,6 +3669,10 @@ trait ComprobanteTraits
         }
         return  $combo;                    
     }
+
+
+
+
 
     private function gn_combo_empresa_empresa($empresa_id) {
 
@@ -4118,8 +4158,12 @@ trait ComprobanteTraits
         $ordencompra_t          =   CMPOrden::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->first();
 
 
-        $total_1 = $ordencompra->CAN_TOTAL-$ordencompra_t->CAN_RETENCION+$ordencompra_t->CAN_PERCEPCION-$ordencompra_t->CAN_IMPUESTO_RENTA;
-        $total_2 = $fedocumento->TOTAL_VENTA_ORIG+$ordencompra_t->CAN_PERCEPCION-$ordencompra_t->CAN_RETENCION;//+$fedocumento->PERCEPCION+$fedocumento->MONTO_RETENCION;
+        $total_1 = $ordencompra->CAN_TOTAL+$ordencompra_t->CAN_PERCEPCION-$ordencompra_t->CAN_IMPUESTO_RENTA-$ordencompra_t->CAN_RETENCION;
+        $total_2 = $fedocumento->TOTAL_VENTA_ORIG+$ordencompra_t->CAN_PERCEPCION-$ordencompra_t->CAN_RETENCION;//-$ordencompra_t->CAN_IMPUESTO_RENTA;
+
+
+        //dd($total_1);
+
         $tt_totales = round(abs($total_1 - $total_2), 2);
 
 
@@ -4559,6 +4603,35 @@ trait ComprobanteTraits
 
 
         $fecha_corte            =   date('Ymd');
+
+        //UPDATE PARA EL ANTICIPO
+        $datos = DB::table('CMP.ORDEN as T1')
+            ->join('FE_DOCUMENTO as FE', 'T1.COD_ORDEN', '=', 'FE.ID_DOCUMENTO')
+            ->join('CMP.REFERENCIA_ASOC as T2', function ($join) {
+                $join->on('T1.COD_ORDEN', '=', 'T2.COD_TABLA')
+                    ->where('T2.TXT_TABLA', 'CMP.ORDEN')
+                    ->where('T2.TXT_TABLA_ASOC', 'CMP.DOCUMENTO_CTBLE');
+            })
+            ->join('CMP.REFERENCIA_ASOC as T3', function ($join) {
+                $join->on('T2.COD_TABLA_ASOC', '=', 'T3.COD_TABLA')
+                    ->where('T3.TXT_TABLA', 'CMP.DOCUMENTO_CTBLE')
+                    ->where('T3.TXT_TABLA_ASOC', 'CMP.DOCUMENTO_CTBLE');
+            })
+            ->where('T3.TXT_TIPO_REFERENCIA', 'A')
+            ->where('T1.COD_ORDEN', 'like', '%CL%')
+            ->where('T2.COD_ESTADO', 1)
+            ->where('T3.COD_ESTADO', 1)
+            ->select('FE.ID_DOCUMENTO', DB::raw('SUM(T3.CAN_AUX1) as MONTO'))
+            ->groupBy('FE.ID_DOCUMENTO')
+            ->get();
+
+        foreach ($datos as $item) {
+            DB::table('FE_DOCUMENTO')
+                ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
+                ->update(['MONTO_ANTICIPO_DESC_OTROS' => $item->MONTO]);
+        }
+
+
 
 
         //UPDATE SI TIENE NOTA DE CREDITO

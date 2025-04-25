@@ -11,6 +11,11 @@ var App = (function () {
         "<'row be-datatable-footer'<'col-sm-5'i><'col-sm-7'p>>"
     } );
 
+
+    $("#tdpm").dataTable({
+        "lengthMenu": [[500, 1000, -1], [500, 1000, "All"]]
+    });
+
     $("#nso").dataTable({
         dom: 'Bfrtip',
         buttons: [
@@ -101,6 +106,78 @@ var App = (function () {
             "<'row be-datatable-body'<'col-sm-12'tr>>" +
             "<'row be-datatable-footer'<'col-sm-5'i><'col-sm-7'p>>"
     });
+
+      $("#cxct").dataTable({
+          responsive: true,
+          autoWidth: true,
+          lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+          scrollX: true,
+          scrollY: "300px",
+          ordering: false,
+      });
+
+      $("#cxcr").dataTable({
+          responsive: true,
+          autoWidth: true,
+          lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+          scrollX: true,
+          scrollY: "300px",
+          ordering: false,
+      });
+
+      $("#cxpt").dataTable({
+          responsive: true,
+          autoWidth: true,
+          lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+          scrollX: true,
+          scrollY: "300px",
+          ordering: false,
+      });
+
+      $("#cxpr").dataTable({
+          responsive: true,
+          autoWidth: true,
+          lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+          scrollX: true,
+          scrollY: "300px",
+          ordering: false,
+      });
+
+      $("#cesii").dataTable({
+          responsive: true,
+          autoWidth: true,
+          lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+          scrollX: true,
+          scrollY: "300px",
+          ordering: false,
+      });
+
+      $("#cesic").dataTable({
+          responsive: true,
+          autoWidth: true,
+          lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+          scrollX: true,
+          scrollY: "300px",
+          ordering: false,
+      });
+
+      $("#iscomercial").dataTable({
+          responsive: true,
+          autoWidth: true,
+          lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+          scrollX: true,
+          scrollY: "300px",
+          ordering: false,
+      });
+
+      $("#isinternacional").dataTable({
+          responsive: true,
+          autoWidth: true,
+          lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+          scrollX: true,
+          scrollY: "300px",
+          ordering: false,
+      });
 
 
   };

@@ -634,6 +634,73 @@ class GestionOCValidadoController extends Controller
                          ]);
     }
 
+
+    public function actionDescargarLG($tipo,$idopcion,$linea, $idordencompra, Request $request)
+    {
+
+        $prefijocarperta        =   $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
+        $archivo                =   Archivo::where('ID_DOCUMENTO','=',$idordencompra)->where('ACTIVO','=','1')->where('TIPO_ARCHIVO','=',$tipo)->where('DOCUMENTO_ITEM','=',$linea)->first();
+        $nombrearchivo          =   trim($archivo->NOMBRE_ARCHIVO);
+        $nombrefile             =   basename($nombrearchivo);
+        $file                   =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$idordencompra.'\\'.basename($archivo->NOMBRE_ARCHIVO);
+
+
+        if(file_exists($file)){
+
+
+            $remoteFile = str_replace('\\', '/', $file);
+
+            // Obtener el nombre del archivo desde la ruta
+            $fileName = basename($remoteFile);
+
+            // Intentar abrir el archivo remoto
+            if ($remoteHandle = fopen($remoteFile, 'rb')) {
+                // Enviar los encabezados necesarios para la descarga del archivo
+                header('Content-Description: File Transfer');
+                header('Content-Type: application/pdf');
+                header('Content-Disposition: attachment; filename="' . $fileName . '"');
+                header('Expires: 0');
+                header('Cache-Control: must-revalidate');
+                header('Pragma: public');
+                header('Content-Length: ' . filesize($remoteFile));
+                
+                // Limpiar el búfer de salida
+                ob_clean();
+                flush();
+
+                // Leer el archivo remoto y enviarlo al navegador
+                while (!feof($remoteHandle)) {
+                    echo fread($remoteHandle, 8192);
+                }
+
+                // Cerrar el manejador de archivo
+                fclose($remoteHandle);
+                exit;
+            } else {
+                echo 'No se pudo acceder al archivo remoto.';
+            }
+
+
+
+            // dd($file);
+            // header("Cache-Control: public");
+            // header("Content-Description: File Transfer");
+            // header("Content-Disposition: attachment; filename=$nombrefile");
+            // header("Content-Type: application/xml");
+            // header("Content-Transfer-Encoding: binary");
+
+
+            // readfile($file);
+
+
+            exit;
+        }else{
+            dd('Documento no encontrado');
+        }
+
+    }
+
+
     public function actionDescargar($tipo,$idopcion,$linea, $prefijo, $idordencompra, Request $request)
     {
 

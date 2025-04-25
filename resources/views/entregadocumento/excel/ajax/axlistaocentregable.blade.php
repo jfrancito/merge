@@ -38,7 +38,7 @@
 		      <th>PERCEPCION</th>
 		      <th>ANTICIPO</th>
 		      <th>NOTA CREDITO</th>
-
+		      <th>COMPENSACION</th>
 		      <th>NETO A PAGAR</th>
 		    </tr>
 		  </thead>
@@ -97,8 +97,9 @@
 		          </b>
 		        </td>
 		        <td><b>{{ number_format(round($item->PERCEPCION, 4), 4, '.', ',') }}</b></td>
-		        <td><b>{{ number_format(round($item->MONTO_ANTICIPO_DESC, 4), 4, '.', ',') }}</b></td>
+		        <td><b>{{ number_format(round($item->MONTO_ANTICIPO_DESC + $item->MONTO_ANTICIPO_DESC_OTROS, 4), 4, '.', ',') }}</b></td>
 		        <td><b>{{ number_format(round($item->MONTO_NC, 4), 4, '.', ',') }}</b></td>
+		        <td><b>{{ number_format(round($item->COMPENSACION, 4), 4, '.', ',') }}</b></td>
 		        <td><b>
 		        	{{$simbolo}} {{number_format($funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO), 2, '.', ',')}}
 			        @php $monto_total  = $monto_total + $funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO); @endphp
@@ -128,12 +129,13 @@
 			            @ENDIF
 			        </td>
 			        <td></td>
-			        <td><b>{{ number_format(round($item->TOTAL_VENTA_ORIG, 4), 4, '.', ',') }}</b></td>
+			        <td><b>{{ number_format(round($item->TOTAL_VENTA_ORIG+$item->CAN_CENTIMO, 4), 4, '.', ',') }}</b></td>
 			        <td>@IF($MONTO_DETRACCION > 0) DETRACCION @ENDIF</td>
 			        <td>-</td>
 			        <td><b>{{ number_format(round($MONTO_DETRACCION, 4), 4, '.', ',') }}</b></td>
 			        <td><b>{{ number_format(round($item->PERCEPCION, 4), 4, '.', ',') }}</b></td>
-			        <td><b>{{ number_format(round($item->MONTO_ANTICIPO_DESC, 4), 4, '.', ',') }}</b></td>
+			        <td><b>{{ number_format(round($item->MONTO_ANTICIPO_DESC + $item->MONTO_ANTICIPO_DESC_OTROS, 4), 4, '.', ',') }}</b></td>
+			        <td><b>0.00</b></td>
 			        <td><b>0.00</b></td>
 
 			        <td><b>{{$simbolo}} {{number_format($funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO), 2, '.', ',')}}</b></td>
@@ -164,6 +166,7 @@
 		        <td></td>
 		        <td></td>
 		        <td></td>
+		       	<td></td>
 		       	<td></td>
 		        <td><b>{{$simbolo}} {{number_format($monto_total, 2, '.', ',')}}</b></td>
 		      </tr>                    

@@ -1280,15 +1280,15 @@ class GestionOCAdministracionController extends Controller
                     //PDF
                     foreach($filespdf as $file){
 
-                            $larchivos       =      Archivo::get();
-
+                            //
+                            $contadorArchivos = Archivo::count();
 
                         $nombre          =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
                         /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
                         $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
                         $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
                         //$nombrefilepdf   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                        $nombrefilepdf   =      count($larchivos).'-'.$file->getClientOriginalName();
+                        $nombrefilepdf   =      $contadorArchivos.'-'.$file->getClientOriginalName();
                         $valor           =      $this->versicarpetanoexiste($rutafile);
                         $rutacompleta    =      $rutafile.'\\'.$nombrefilepdf;
                         copy($file->getRealPath(),$rutacompleta);
@@ -1588,12 +1588,18 @@ class GestionOCAdministracionController extends Controller
 
                 if(count($documento_venta)>0){
 
+
                     $referencia_venta       =   DB::connection($conexionbd)->table('CMP.REFERENCIA_ASOC')->where('COD_TABLA','=',$documento_venta->COD_DOCUMENTO_CTBLE)
-                                                ->where('COD_TABLA_ASOC','like','%VR%')->first();
+                                                ->where(function($query) {
+                                                    $query->where('COD_TABLA_ASOC', 'like', '%VR%')
+                                                          ->orWhere('COD_TABLA_ASOC', 'like', '%VL%');
+                                                })->first();
 
                     if(count($referencia_venta)>0){
                         $referencia_os        =   DB::connection($conexionbd)->table('CMP.REFERENCIA_ASOC')->where('COD_TABLA','=',$referencia_venta->COD_TABLA_ASOC)
                                                     ->where('COD_TABLA_ASOC','like','%OS%')->first();
+
+
 
                         if(count($referencia_os)>0){
                             $ordensalida       =   DB::connection($conexionbd)->table('CMP.ORDEN')->where('COD_ORDEN','=',$referencia_os->COD_TABLA_ASOC)->first(); 
@@ -1755,15 +1761,15 @@ class GestionOCAdministracionController extends Controller
                     //PDF
                     foreach($filespdf as $file){
 
-                            $larchivos       =      Archivo::get();
-
+                            //
+                            $contadorArchivos = Archivo::count();
 
                         $nombre          =      $ordencompra->COD_DOCUMENTO_CTBLE.'-'.$file->getClientOriginalName();
                         /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
                         $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
                         $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
                         //$nombrefilepdf   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                        $nombrefilepdf   =      count($larchivos).'-'.$file->getClientOriginalName();
+                        $nombrefilepdf   =      $contadorArchivos.'-'.$file->getClientOriginalName();
                         $valor           =      $this->versicarpetanoexiste($rutafile);
                         $rutacompleta    =      $rutafile.'\\'.$nombrefilepdf;
                         copy($file->getRealPath(),$rutacompleta);
@@ -2182,13 +2188,14 @@ class GestionOCAdministracionController extends Controller
                     //PDF
                     foreach($filespdf as $file){
 
-                        $larchivos       =      Archivo::get();
+                        //
+                        $contadorArchivos = Archivo::count();
                         $nombre          =      $idoc.'-'.$file->getClientOriginalName();
                         /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
                         $prefijocarperta =      $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
                         $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$idoc;
                         //$nombrefilepdf   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                        $nombrefilepdf   =      count($larchivos).'-'.$file->getClientOriginalName();
+                        $nombrefilepdf   =      $contadorArchivos.'-'.$file->getClientOriginalName();
                         $valor           =      $this->versicarpetanoexiste($rutafile);
                         $rutacompleta    =      $rutafile.'\\'.$nombrefilepdf;
                         copy($file->getRealPath(),$rutacompleta);

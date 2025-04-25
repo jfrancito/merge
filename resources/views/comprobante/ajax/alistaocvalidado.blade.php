@@ -20,8 +20,9 @@
           <span><b>PROVEEDOR : </b>{{$item->TXT_EMPR_CLIENTE}} </span>
           <span><b>TOTAL : </b> {{$item->CAN_TOTAL}}</span>
           <span><b>USUARIO CONTACTO : </b> {{$item->TXT_CONTACTO_UC}}</span>
-          <span><b>AREA : </b> {{$item->AREA}}</span>
           <span><b>FOLIO : </b> {{$item->FOLIO}}</span>
+          <span><b>BANCO : </b> {{$item->TXT_CATEGORIA_BANCO}}</span>
+
           <span><b>H. OBSERVACION : </b> {{$item->TXT_OBSERVADO}}</span>
           <span><b>H. REPARABLE : </b> {{$item->TXT_REPARABLE}}</span>
         </td>
@@ -29,7 +30,11 @@
           <span><b>SERIE : {{$item->SERIE}} </b> </span>
           <span><b>NUMERO  : {{$item->NUMERO}}</b></span>
           <span><b>FECCHA : </b> {{$item->FEC_VENTA}}</span>
+          <span><b>AREA : </b> {{$item->AREA}}</span>
+
           <span><b>FORMA PAGO : </b> {{$item->FORMA_PAGO}}</span>
+
+
           <!-- <span><b>TOTAL : </b> {{number_format($item->TOTAL_VENTA_ORIG+$item->PERCEPCION+$item->MONTO_RETENCION, 4, '.', ',')}}</span> -->
           <span><b>TOTAL : </b> {{number_format($item->TOTAL_VENTA_ORIG, 4, '.', ',')}}</span>
           <span><b>PERCEPCION : </b> {{$item->PERCEPCION}}</span>

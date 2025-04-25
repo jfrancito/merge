@@ -20,6 +20,8 @@
           <span><b>NUMERO  : {{$item->NUMERO}}</b></span>
           <span><b>FECCHA : </b> {{$item->FEC_VENTA}}</span>
           <span><b>FORMA PAGO : </b> {{$item->FORMA_PAGO}}</span>
+          <span><b>PROVEEDOR : </b>{{$item->RZ_PROVEEDOR}} </span>
+          
           <span><b>TOTAL : </b> {{number_format($item->TOTAL_VENTA_ORIG, 4, '.', ',')}}</span>
         </td>
 

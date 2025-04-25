@@ -127,15 +127,15 @@
 
 	        <td>{{date_format(date_create($item->FEC_EMISION), 'd-m-Y')}}</td>
 	        <td>{{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</td>
-	        <td>{{$item->TOTAL_VENTA_ORIG}}</td>
+	        <td>{{$item->TOTAL_VENTA_ORIG+$item->CAN_CENTIMO}}</td>
 	        <td>{{$item->MONTO_DETRACCION_XML}}</td>
 	        <td>{{$item->MONTO_DETRACCION_RED}}</td>
 			<td>0.00</td>
-	        <td>{{$item->MONTO_ANTICIPO_DESC}}</td>
+	        <td>{{$item->MONTO_ANTICIPO_DESC + $item->MONTO_ANTICIPO_DESC_OTROS}}</td>
 
 	        <td>
-	        	{{$item->TOTAL_VENTA_ORIG - $item->MONTO_ANTICIPO_DESC - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)}}
-				@php $monto_total  = $monto_total + ($item->TOTAL_VENTA_ORIG - $item->MONTO_ANTICIPO_DESC - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)); @endphp
+	        	{{$item->TOTAL_VENTA_ORIG - $item->MONTO_ANTICIPO_DESC - $item->MONTO_ANTICIPO_DESC_OTROS - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)}}
+				@php $monto_total  = $monto_total + ($item->TOTAL_VENTA_ORIG - $item->MONTO_ANTICIPO_DESC - $item->MONTO_ANTICIPO_DESC_OTROS - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)); @endphp
 	        </td>
 	      </tr>                    
 	    @endforeach

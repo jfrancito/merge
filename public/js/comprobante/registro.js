@@ -213,6 +213,35 @@ $(document).ready(function(){
 
     });
 
+    $(".registrocomprobante").on('change','#cb_id', function() {
+
+
+        var _token                          =   $('#token').val();
+
+        var data_entidadbanco_id            =   $(this).attr('data_entidadbanco_id');
+        var data_empresa_cliente_id         =   $(this).attr('data_empresa_cliente_id');
+        var cb_id                           =   $('#cb_id').val();
+
+
+        $.ajax({
+              type    :     "POST",
+              url     :     carpeta+"/ajax-moneda-ajax-cuenta",
+              data    :     {
+                                _token                      : _token,
+                                data_entidadbanco_id        : data_entidadbanco_id,
+                                data_empresa_cliente_id     : data_empresa_cliente_id,
+                                cb_id                       : cb_id
+                            },
+                success: function (data) {
+                    $('.moneda_ajax').html(data);
+                },
+                error: function (data) {
+                    error500(data);
+                }
+        });
+    });
+
+
 
 
 

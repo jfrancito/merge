@@ -23,19 +23,21 @@
                   {{ csrf_field() }}
 
 
-
               <div class="form-group">
-                <label class="col-sm-3 control-label labelleft" >Cliente :</label>
-                <div class="col-sm-5 abajocaja" >
-
-                  {!! Form::select( 'cliente_select', $combolistaclientes, array(),
-                                    [
-                                      'class'       => 'form-control control select2' ,
-                                      'id'          => 'cliente_select',
-                                      'data-aw'     => '1',
-                                    ]) !!}
+                <label class="col-sm-3 control-label">Personal</label>
+                <div class="col-sm-5">
+                  <select class="select2 input-sm" id="personal" name='personal' required = "">
+                    <optgroup label="Usuarios">
+                      <option value="">Seleccione Personal</option>
+                      @foreach($listapersonal as $item)
+                        <option value="{{$item->id}}">{{$item->nombres}}</option>
+                      @endforeach
+                    </optgroup>
+                  </select>
                 </div>
               </div>
+
+
 
 
               <div class="form-group">
@@ -74,7 +76,7 @@
                 <div class="col-sm-5">
                   {!! Form::select( 'rol_id', $comborol, array('1CIX00000024'),
                                     [
-                                      'class'       => 'form-control control input-sm' ,
+                                      'class'       => 'form-control control input-sm select2' ,
                                       'id'          => 'rol_id',
                                       'required'    => '',
                                       'data-aw'     => '7'

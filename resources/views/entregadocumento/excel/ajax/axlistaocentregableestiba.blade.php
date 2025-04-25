@@ -70,10 +70,10 @@
 	        <td>
 	          {{$funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)}}
 	        </td>
-	        <td>{{$item->MONTO_ANTICIPO_DESC}}</td>
+	        <td>{{$item->MONTO_ANTICIPO_DESC + $item->MONTO_ANTICIPO_DESC_OTROS}}</td>
 	        <td>
-				{{$simbolo}} {{$item->TOTAL_VENTA_ORIG - $item->MONTO_ANTICIPO_DESC - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)}}
-				@php $monto_total  = $monto_total + ($item->TOTAL_VENTA_ORIG - $item->MONTO_ANTICIPO_DESC - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)); @endphp
+				{{$simbolo}} {{$item->TOTAL_VENTA_ORIG - $item->MONTO_ANTICIPO_DESC- $item->MONTO_ANTICIPO_DESC_OTROS - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)}}
+				@php $monto_total  = $monto_total + ($item->TOTAL_VENTA_ORIG - $item->MONTO_ANTICIPO_DESC - $item->MONTO_ANTICIPO_DESC_OTROS - $funcion->funciones->se_paga_detraccion_contrato($item->ID_DOCUMENTO)); @endphp
 	        </td>
 	      </tr>                    
 	    @endforeach

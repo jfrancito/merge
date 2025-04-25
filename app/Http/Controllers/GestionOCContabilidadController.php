@@ -416,15 +416,15 @@ class GestionOCContabilidadController extends Controller
                     //PDF
                     foreach($filespdf as $file){
 
-                            $larchivos       =      Archivo::get();
-
+                            //
+                            $contadorArchivos = Archivo::count();
 
                         $nombre          =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
                         /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
                         $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
                         $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
                         //$nombrefilepdf   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                        $nombrefilepdf   =      count($larchivos).'-'.$file->getClientOriginalName();
+                        $nombrefilepdf   =      $contadorArchivos.'-'.$file->getClientOriginalName();
                         $valor           =      $this->versicarpetanoexiste($rutafile);
                         $rutacompleta    =      $rutafile.'\\'.$nombrefilepdf;
                         copy($file->getRealPath(),$rutacompleta);
@@ -746,13 +746,15 @@ class GestionOCContabilidadController extends Controller
                     //PDF
                     foreach($filespdf as $file){
 
-                        $larchivos       =      Archivo::get();
+                        //
+                        $contadorArchivos = Archivo::count();
+
                         $nombre          =      $idoc.'-'.$file->getClientOriginalName();
                         /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
                         $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
                         $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$idoc;
                         //$nombrefilepdf   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                        $nombrefilepdf   =      count($larchivos).'-'.$file->getClientOriginalName();
+                        $nombrefilepdf   =      $contadorArchivos.'-'.$file->getClientOriginalName();
                         $valor           =      $this->versicarpetanoexiste($rutafile);
                         $rutacompleta    =      $rutafile.'\\'.$nombrefilepdf;
                         copy($file->getRealPath(),$rutacompleta);
@@ -992,15 +994,15 @@ class GestionOCContabilidadController extends Controller
                     //PDF
                     foreach($filespdf as $file){
 
-                            $larchivos       =      Archivo::get();
-
+                            //
+                            $contadorArchivos = Archivo::count();
 
                         $nombre          =      $ordencompra->COD_DOCUMENTO_CTBLE.'-'.$file->getClientOriginalName();
                         /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
                         $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
                         $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
                         //$nombrefilepdf   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                        $nombrefilepdf   =      count($larchivos).'-'.$file->getClientOriginalName();
+                        $nombrefilepdf   =      $contadorArchivos.'-'.$file->getClientOriginalName();
                         $valor           =      $this->versicarpetanoexiste($rutafile);
                         $rutacompleta    =      $rutafile.'\\'.$nombrefilepdf;
                         copy($file->getRealPath(),$rutacompleta);
@@ -1428,6 +1430,9 @@ class GestionOCContabilidadController extends Controller
                 $docasociados       =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                         ->whereIn('TXT_ASIGNADO', ['ARCHIVO_VIRTUAL','ARCHIVO_FISICO'])
                                         ->first();
+
+                //dd($ordencompra);
+
                 Archivo::where('ID_DOCUMENTO',$ordencompra->COD_ORDEN)->where('DOCUMENTO_ITEM','=',$linea)->where('TIPO_ARCHIVO','=',$docasociados->COD_CATEGORIA_DOCUMENTO)
                             ->update(
                                 [

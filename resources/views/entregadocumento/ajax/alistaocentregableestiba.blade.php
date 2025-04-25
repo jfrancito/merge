@@ -50,13 +50,13 @@
           <span><b>PAGO DETRACCION: </b> {{$item->TXT_PAGO_DETRACCION}}  </span>
         </td>
         <td class="cell-detail sorting_1 center" style="position: relative;">
-          <span><b>{{ number_format(round($item->TOTAL_VENTA_ORIG, 4), 4, '.', ',') }}  </b></span>
+          <span><b>{{ number_format(round($item->TOTAL_VENTA_ORIG+$item->CAN_CENTIMO, 4), 4, '.', ',') }}  </b></span>
         </td>
         <td class="cell-detail sorting_1 center" style="position: relative;">
           <b>{{$item->MONTO_DETRACCION_RED}}</b>
         </td>
         <td class="cell-detail sorting_1 center" style="position: relative;">
-          <b>{{ number_format(round($item->MONTO_ANTICIPO_DESC, 4), 4, '.', ',') }}</b>
+          <b>{{ number_format(round($item->MONTO_ANTICIPO_DESC + $item->MONTO_ANTICIPO_DESC_OTROS, 4), 4, '.', ',') }}</b>
         </td>
         <td class="center neto_pagar"><b>{{number_format($funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO), 4, '.', ',')}}</b></td>
         <td>
