@@ -337,8 +337,8 @@ class GestionOCSXController extends Controller
                     $aoc                            =       CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                                             ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000001'])
                                                             ->first();
-                    $larchivos                      =       Archivo::get();
-                    $nombrefilecdr                  =       count($larchivos).'-'.$ordencompra->COD_ORDEN.'.pdf';
+                    $contadorArchivos = Archivo::count();
+                    $nombrefilecdr                  =       $contadorArchivos.'-'.$ordencompra->COD_ORDEN.'.pdf';
                     $prefijocarperta                =       $this->prefijo_empresa($ordencompra->COD_EMPR);
                     $rutafile                       =       $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
                     $rutacompleta                   =       $rutafile.'\\'.$nombrefilecdr;
@@ -372,13 +372,13 @@ class GestionOCSXController extends Controller
 
                         foreach($filescdm as $file){
 
-                            $larchivos       =      Archivo::get();
+                            $contadorArchivos = Archivo::count();
                             $nombre          =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
                             /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
                             $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
                             $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
                             // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                            $nombrefilecdr   =      count($larchivos).'-'.$file->getClientOriginalName();
+                            $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
                             $valor           =      $this->versicarpetanoexiste($rutafile);
                             $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
                             copy($file->getRealPath(),$rutacompleta);
