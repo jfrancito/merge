@@ -145,6 +145,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/gestion-de-aprobacion-planilla-movilidad-administracion/{idopcion}', 'GestionPlanillaMovilidadController@actionAprobarPlanillaMovilidadAdministracion');
 	Route::any('/aprobar-planilla-movilidad-administracion/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadController@actionAprobarAdministracion');
 
+	Route::any('/pdf-planilla-movilidad/{iddocumento}', 'GestionPlanillaMovilidadController@actionPDFPlanillaMovilidad');
+
 
 
 	//GESTION DE USUARIOS
@@ -523,6 +525,27 @@ Route::get('buscarempresa', function (Illuminate\Http\Request  $request) {
     }
     return \Response::json($valid_tags);
 });
+
+Route::get('buscarempresalg', function (Illuminate\Http\Request  $request) {
+    $term = $request->term ?: '';
+    $tags = DB::table('STD.EMPRESA')
+		    ->where(function($query) use ($term) {
+		        $query->where('STD.EMPRESA.NOM_EMPR', 'like', '%' . $term . '%')
+		              ->orWhere('STD.EMPRESA.NRO_DOCUMENTO', 'like', '%' . $term . '%');
+		    })
+			->where('STD.EMPRESA.COD_ESTADO','=',1)
+			->take(100)
+			->select(DB::raw("
+			  STD.EMPRESA.NRO_DOCUMENTO + ' - '+ STD.EMPRESA.NOM_EMPR AS NOMBRE")
+			)
+    		->pluck('NOMBRE', 'NOMBRE');
+    $valid_tags = [];
+    foreach ($tags as $id => $tag) {
+        $valid_tags[] = ['id' => $id, 'text' => $tag];
+    }
+    return \Response::json($valid_tags);
+});
+
 
 
 Route::get('buscarproducto', function (Illuminate\Http\Request  $request) {

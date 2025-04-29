@@ -1272,12 +1272,17 @@ class GestionLiquidacionGastosController extends Controller
                         $numero                             =   $planillamovilidad->NUMERO;
                         $fecha_emision                      =   date_format(date_create($planillamovilidad->FECHA_EMI), 'd-m-Y');
                         $empresa_id                         =   $request['empresa_id'];
-                        $flujo_id                           =   $request['flujo_id'];
-                        $gasto_id                           =   $request['gasto_id'];
+
+
+                        $flujo_id                           =   'IICHFC0000000018';
+                        $gasto_id                           =   'IICH000000026203';
+                        $item_id                            =   'IICHIM0000000106';
+
+
                         $costo_id                           =   $request['costo_id'];
                         $cuenta_id                          =   $COD_CUENTA;
                         $subcuenta_id                       =   $COD_SUBCUENTA;
-                        $item_id                            =   $request['item_id'];
+
                         $glosadet                           =   $request['glosadet'];
                         //$empresa_trab                       =   'PLANILLA DE MOVILIDAD SIN COMPROBANTE';
                         $empresa_trab                       =   STDEmpresa::where('NOM_EMPR','=','PLANILLA DE MOVILIDAD SIN COMPROBANTE')->first();
@@ -1289,12 +1294,16 @@ class GestionLiquidacionGastosController extends Controller
                             $numero                             =   $request['numero'];
                             $fecha_emision                      =   $request['fecha_emision'];
                             $empresa_id                         =   $request['EMPRESAID'];
-                            $flujo_id                           =   $request['flujo_id'];
-                            $gasto_id                           =   $request['gasto_id'];
+
+                            $flujo_id                           =   'IICHFC0000000018';
+                            $gasto_id                           =   'IICH000000026203';
+                            $item_id                            =   'IICHIM0000000106';
+
+
                             $costo_id                           =   $request['costo_id'];
                             $cuenta_id                          =   $request['cuenta_id'];
                             $subcuenta_id                       =   $request['subcuenta_id'];
-                            $item_id                            =   $request['item_id'];
+
                             $glosadet                           =   $request['glosadet'];
                             $TOTAL_T                            =   $request['totaldetalle'];
 
@@ -1329,12 +1338,15 @@ class GestionLiquidacionGastosController extends Controller
                             $numero                             =   $request['numero'];
                             $fecha_emision                      =   $request['fecha_emision'];
                             $empresa_id                         =   $request['empresa_id'];
-                            $flujo_id                           =   $request['flujo_id'];
-                            $gasto_id                           =   $request['gasto_id'];
+
+                            $flujo_id                           =   'IICHFC0000000018';
+                            $gasto_id                           =   'IICH000000026203';
+                            $item_id                            =   'IICHIM0000000106';
+
                             $costo_id                           =   $request['costo_id'];
                             $cuenta_id                          =   $request['cuenta_id'];
                             $subcuenta_id                       =   $request['subcuenta_id'];
-                            $item_id                            =   $request['item_id'];
+
                             $glosadet                           =   $request['glosadet'];
                             $cod_planila                        =   '';
 

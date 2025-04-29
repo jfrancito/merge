@@ -180,7 +180,8 @@
 
 
   </div>
-  <div class="row" style="margin-top:10px;">
+  
+<!--   <div class="row" style="margin-top:10px;">
     <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
         <div class="form-group">
           <label class="col-sm-12 control-label labelleft negrita" style="text-align: left;">FLUJO :</label>
@@ -209,7 +210,11 @@
                               ]) !!}
           </div>
         </div>
-    </div>
+    </div> -->
+
+
+
+
     <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
         <div class="form-group">
           <label class="col-sm-12 control-label labelleft negrita" style="text-align: left;">COSTO :</label>

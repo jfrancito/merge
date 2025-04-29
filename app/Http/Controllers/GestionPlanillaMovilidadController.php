@@ -13,7 +13,7 @@ use App\Modelos\PlaSerie;
 use App\Modelos\STDTrabajador;
 use App\Modelos\CMPCategoria;
 use App\Modelos\PlaDocumentoHistorial;
-
+use App\Modelos\STDEmpresa;
 
 
 
@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Session;
 use View;
+use PDF;
 use App\Traits\GeneralesTraits;
 use App\Traits\PlanillaTraits;
 
@@ -297,6 +298,29 @@ class GestionPlanillaMovilidadController extends Controller
                             'fecha_fin'         =>  $fecha_fin
                          ]);
     }
+
+
+    public function actionPDFPlanillaMovilidad($iddocumento,Request $request)
+    {
+        $idcab                  =   $iddocumento;
+        $iddocumento            =   $this->funciones->decodificarmaestrapre($iddocumento,'PLAM');
+        $planillamovilidad      =   PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first(); 
+        $detplanillamovilidad   =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->get();
+        $empresa                =   STDEmpresa::where('COD_EMPR','=',$planillamovilidad->COD_EMPRESA)->first();
+        $ruc                    =   $empresa->NRO_DOCUMENTO;
+
+        $pdf = PDF::loadView('pdffa.planillamovilidad', [ 
+                                                'iddocumento'           => $iddocumento , 
+                                                'planillamovilidad'     => $planillamovilidad,
+                                                'detplanillamovilidad'  => $detplanillamovilidad,
+                                                'ruc'                   => $ruc,
+                                              ]);
+
+        return $pdf->stream('download.pdf');
+
+    }
+
+
 
 
     public function actionEmitirDetallePlanillaMovilidad($idopcion,$iddocumento,Request $request)
@@ -594,9 +618,43 @@ class GestionPlanillaMovilidadController extends Controller
                 $lugarpartida           =   $request['lugarpartida'];   
                 $lugarllegada           =   $request['lugarllegada'];   
                 $total                  =   $request['total'];
+                $total                  =   str_replace(',', '', $total);
                 $anio                   =   $this->anio;
                 $mes                    =   $this->mes;
                 $periodo                =   $this->gn_periodo_actual_xanio_xempresa($anio, $mes, Session::get('empresas')->COD_EMPR);
+
+                //VALIDAR QUE SOLO SEA 45 SOLES DIARIOS
+                $totaldia = DB::table('PLA_MOVILIDAD')
+                    ->join('PLA_DETMOVILIDAD', 'PLA_MOVILIDAD.ID_DOCUMENTO', '=', 'PLA_DETMOVILIDAD.ID_DOCUMENTO')
+                    ->where('PLA_MOVILIDAD.COD_ESTADO', '<>', 'ETM0000000000006')
+                    ->where('PLA_DETMOVILIDAD.ACTIVO', 1)
+                    ->whereDate('FECHA_GASTO', $fecha_gasto)
+                    ->where('PLA_DETMOVILIDAD.USUARIO_CREA', Session::get('usuario')->id)
+                    ->sum('PLA_DETMOVILIDAD.TOTAL');
+                $totaldiario =    (float)$total + $totaldia;
+                if($totaldiario>45){
+                    return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd', 'Supero el maximo saldo de 45 soles al dia');
+                }
+
+                //VALIDAR QUE SOLO MENSUALMENTE SEA 1130
+                $anio_v = date('Y', strtotime($fecha_gasto));
+                $mes_v = date('m', strtotime($fecha_gasto));
+                $totalmensual = DB::table('PLA_MOVILIDAD')
+                    ->join('PLA_DETMOVILIDAD', 'PLA_MOVILIDAD.ID_DOCUMENTO', '=', 'PLA_DETMOVILIDAD.ID_DOCUMENTO')
+                    ->where('PLA_MOVILIDAD.COD_ESTADO', '<>', 'ETM0000000000006')
+                    ->where('PLA_DETMOVILIDAD.ACTIVO', 1)
+                    ->whereYear('FECHA_GASTO', $anio_v)
+                    ->whereMonth('FECHA_GASTO', $mes_v)
+                    ->where('PLA_DETMOVILIDAD.USUARIO_CREA', Session::get('usuario')->id)
+                    ->sum('PLA_DETMOVILIDAD.TOTAL');
+                $total_mensual =    (float)$total + $totalmensual;
+                if($total_mensual>1130){
+                    return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd', 'Supero el maximo saldo de 1130 soles al mes');
+                }
+
+
+
+
                 $trabajador     =   DB::table('STD.TRABAJADOR')
                                     ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
                                     ->first();
