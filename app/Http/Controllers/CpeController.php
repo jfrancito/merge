@@ -82,7 +82,7 @@ class CpeController extends Controller {
 			}
 
 
-			$fetoken 					=	FeToken::where('COD_EMPR','=',$empresa_cod)->first();
+			$fetoken 					=	FeToken::where('COD_EMPR','=',$empresa_cod)->where('TIPO','=','COMPROBANTE_PAGO')->first();
 			//buscar xml
 			$urlxml 					= 	'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2';
 
@@ -146,7 +146,7 @@ class CpeController extends Controller {
 			$td 	 		 			= 	$request['td'];
 			$serie 	 		 			= 	$request['serie'];
 			$correlativo 	 		 	= 	$request['correlativo'];
-			$fetoken 					=	FeToken::where('COD_EMPR','=',Session::get('empresas')->COD_EMPR)->first();
+			$fetoken 					=	FeToken::where('COD_EMPR','=',Session::get('empresas')->COD_EMPR)->where('TIPO','=','COMPROBANTE_PAGO')->first();
 			//buscar xml
 			$urlxml 					= 	'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/02';
 			$respuetaxml 				=	$this->buscar_archivo_sunat($urlxml,$fetoken);
@@ -190,7 +190,7 @@ class CpeController extends Controller {
 			$correlativo 	 		 	= 	(int)$request['correlativo'];
 			$correlativo 				= 	str_pad($correlativo,8 , "0", STR_PAD_LEFT);
 
-			$fetoken 					=	FeToken::where('COD_EMPR','=',Session::get('empresas')->COD_EMPR)->first();
+			$fetoken 					=	FeToken::where('COD_EMPR','=',Session::get('empresas')->COD_EMPR)->where('TIPO','=','COMPROBANTE_PAGO')->first();
             $prefijocarperta 			=   $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
 
 			//buscar xml

@@ -1,6 +1,9 @@
 .izquierda{
 	text-align: right;
 }
+.center{
+    text-align: center;
+}
 
 .menu{
     overflow:hidden;

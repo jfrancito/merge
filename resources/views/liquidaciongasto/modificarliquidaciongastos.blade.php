@@ -89,7 +89,7 @@
             tokenSeparators: [','],
             ajax: {
                 dataType: 'json',
-                url: '{{ url("buscarempresa") }}',
+                url: '{{ url("buscarempresalg") }}',
                 delay: 100,
                 data: function(params) {
                     return {
