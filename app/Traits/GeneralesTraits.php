@@ -67,6 +67,25 @@ trait GeneralesTraits
         return $serie;
     }
 
+    public function gn_combo_periodo_xempresa( $cod_empresa, $todo, $titulo)
+    {
+        $array = CONPeriodo::where('COD_ESTADO', '=', 1)
+            ->where('COD_EMPR', '=', $cod_empresa)
+            ->orderBy('TXT_CODIGO', 'DESC')
+            ->pluck('TXT_CODIGO', 'COD_PERIODO')
+            ->toArray();
+
+        if ($todo == 'TODO') {
+            $combo = array('' => $titulo, $todo => $todo) + $array;
+        } else {
+            $combo = array('' => $titulo) + $array;
+        }
+
+        return $combo;
+
+
+    }
+
 
     public function gn_combo_periodo_xanio_xempresa($anio, $cod_empresa, $todo, $titulo)
     {
@@ -180,6 +199,35 @@ trait GeneralesTraits
 		}
 
 	 	return  $array_nombre_archivo;
+
+	}
+
+
+	private function buscar_archivo_sunat_compra_sire($urlxml,$fetoken) {
+
+		$array_nombre_archivo = array();
+		$curl = curl_init();
+		curl_setopt_array($curl, array(
+		  CURLOPT_URL => $urlxml,
+		  CURLOPT_RETURNTRANSFER => true,
+		  CURLOPT_ENCODING => '',
+		  CURLOPT_MAXREDIRS => 10,
+		  CURLOPT_TIMEOUT => 0,
+		  CURLOPT_FOLLOWLOCATION => true,
+		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		  CURLOPT_CUSTOMREQUEST => 'GET',
+		  CURLOPT_HTTPHEADER => array(
+			   'Authorization: Bearer '.$fetoken->TOKEN,
+			   'Cookie: TS012c881c=019edc9eb884f3c173126afd7e374f7b898ce93149f5bce8305ea2963908fce398ac58444d0515e03eda2d885198343181ec82ed38'
+		  ),
+		));
+
+		$response = curl_exec($curl);
+		curl_close($curl);
+		$response_array = json_decode($response, true);
+
+
+	 	return  $response_array;
 
 	}
 
