@@ -18,6 +18,8 @@ class Controller extends BaseController {
 	public $funciones;
 
 	public $inicio;
+	public $inicioanio;
+	
 	public $fin;
 	public $hoy;
 	public $prefijomaestro;
@@ -47,6 +49,8 @@ class Controller extends BaseController {
 		$this->maxsize 			= pow(1024,$this->unidadmb)*20;
 		$fecha 					= new DateTime();
 		$fecha->modify('first day of this month');
+
+		$this->inicioanio 		= date_format(date_create($fecha->format('Y') . '-01-01'), 'd-m-Y');
 		$this->inicio 			= date_format(date_create($fecha->format('Y-m-d')), 'd-m-Y');
 		$this->fin 				= date_format(date_create(date('Y-m-d')), 'd-m-Y');
 

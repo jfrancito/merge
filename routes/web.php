@@ -288,6 +288,13 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-buscar-documento-fe', 'GestionOCValidadoController@actionListarAjaxBuscarDocumento');
 	Route::any('/ajax-buscar-documento-fe-historial', 'GestionOCValidadoController@actionListarAjaxBuscarDocumentoHistorial');
 
+	Route::any('/gestion-compra-sire/{idopcion}', 'CpeController@actionGestionSireCompra');
+	Route::any('/ajax-buscar-sire-compra', 'CpeController@actionAjaxBuscarSireCompra');
+
+	Route::any('/gestion-vaidar-rr/{idopcion}', 'RRController@actionGestionValidarRR');
+	Route::any('/ajax-modal-vaidar-rr-is', 'RRController@actionAjaxModalValidarRRIs');
+
+
 
 	Route::any('/detalle-comprobante-oc-validado-historial/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoHitorial');
 	Route::any('/detalle-comprobante-oc-validado-contrato-historial/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoContratoHistorial');

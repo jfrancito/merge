@@ -13,6 +13,9 @@ use App\Modelos\TESCuentaBancaria;
 use App\Modelos\CMPCategoria;
 use App\Modelos\STDEmpresa;
 use App\Modelos\WEBUserEmpresaCentro;
+use App\Modelos\CONPeriodo;
+
+
 use App\User;
 
 
@@ -52,6 +55,102 @@ class CpeController extends Controller {
     use GeneralesTraits;
     use ComprobanteTraits;
 
+
+
+    public function actionGestionSireCompra($idopcion)
+    {
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Ver');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        View::share('titulo','Sire Gestion Compra');
+        $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
+        $anio 			= 	$this->anio;
+        $periodo_id    	= 	"";
+        $combo_periodo 	= 	$this->gn_combo_periodo_xempresa(Session::get('empresas')->COD_EMPR, '', 'Seleccione periodo');
+        $empresa_id     =   "";
+        $combo_empresa  =   array();
+        $listadatos     = 	array();
+        $funcion        =   $this;
+
+        return View::make('cpe/listasirecompra',
+                         [
+                            'listadatos'        =>  $listadatos,
+                            'funcion'           =>  $funcion,
+                            'idopcion'          =>  $idopcion,
+                            'periodo_id'        =>  $periodo_id,
+                            'combo_periodo'     =>  $combo_periodo,
+                            'empresa_id'        =>  $empresa_id,
+                            'combo_empresa'     =>  $combo_empresa
+                         ]);
+    }
+
+
+    public function actionAjaxBuscarSireCompra(Request $request) {
+
+        $periodo_id   	=   $request['periodo_id'];
+        $empresa_id   	=   $request['empresa_id'];
+        $cadena 		= 	$empresa_id;
+        $partes 		= 	explode(" - ", $cadena);
+        $nombre 		= 	'';
+        if (count($partes) > 1) {
+            $nombre = trim($partes[1]);
+        }
+        $empresa_trab   =   STDEmpresa::where('NOM_EMPR','=',$nombre)->first();
+
+        $periodo 		= 	CONPeriodo::where('COD_PERIODO', '=', $periodo_id)->first();
+		$fetoken 		=	FeToken::where('COD_EMPR','=',Session::get('empresas')->COD_EMPR)->where('TIPO','=','SIRE')->first();
+		$perido_filtro  =   $periodo->COD_ANIO.str_pad($periodo->COD_MES, 2, '0', STR_PAD_LEFT);
+		//$urlxml 		= 	'https://api-sire.sunat.gob.pe/v1/contribuyente/migeigv/libros/rce/propuesta/web/propuesta/'.$perido_filtro.'/busqueda?codTipoOpe=1&page=1&perPage=20';
+		$urlxml 		= 	'https://api-sire.sunat.gob.pe/v1/contribuyente/migeigv/libros/rce/propuesta/web/propuesta/'.$perido_filtro.'/busqueda?codTipoOpe=2&numDocAdquiriente='.$empresa_trab->NRO_DOCUMENTO.'&page=1&perPage=100';
+		$respuetaxml 	=	$this->buscar_archivo_sunat_compra($urlxml,$fetoken);
+
+		//dd($respuetaxml);
+
+		$totalregistroa =  	$respuetaxml['paginacion']['totalRegistros'];
+		$cantidadrecorrer = (int)ceil($totalregistroa / 20);
+		$valores 		= [1,2,4];
+		$menor = null;
+		$mayor = null;
+		$array_detalle_producto 		=	array();
+		foreach ($valores as $index=>$valor) {
+			$array_nuevo_producto 		=	array();
+			//$urlxml 					= 	'https://api-sire.sunat.gob.pe/v1/contribuyente/migeigv/libros/rce/propuesta/web/propuesta/'.$perido_filtro.'/busqueda?codTipoOpe=1&page='.$valor.'&perPage=20';
+			//$urlxml 					= 	'https://api-sire.sunat.gob.pe/v1/contribuyente/migeigv/libros/rce/propuesta/web/propuesta/202503/busqueda?codTipoOpe=2&fecEmisionIni=2025-03-01&fecEmisionFin=2025-03-31&page='.$valor.'&perPage=20';
+			$urlxml 					= 	'https://api-sire.sunat.gob.pe/v1/contribuyente/migeigv/libros/rce/propuesta/web/propuesta/'.$perido_filtro.'/busqueda?codTipoOpe=2&numDocAdquiriente='.$empresa_trab->NRO_DOCUMENTO.'&page=1&perPage=100';
+			$respuetaxml 				=	$this->buscar_archivo_sunat_compra($urlxml,$fetoken);
+			foreach ($respuetaxml['registros'] as $valorsire) {
+				    $array_nuevo_producto = array(
+				        "id" => $valorsire['id'],
+				        "codTipoCDP" => $valorsire['codTipoCDP'],
+				        "desTipoCDP" => $valorsire['desTipoCDP'],
+				        "numSerieCDP" => $valorsire['numSerieCDP'],
+				        "numCDP" => $valorsire['numCDP'],
+				        "fecEmision" => $valorsire['fecEmision'],
+				        "numDocIdentidadProveedor" => $valorsire['numDocIdentidadProveedor'],
+				        "nomRazonSocialProveedor" => $valorsire['nomRazonSocialProveedor'],
+				        "mtoTotalCp" => $valorsire['montos']['mtoTotalCp'],
+
+				    );
+				    array_push($array_detalle_producto, $array_nuevo_producto);
+			}
+		}
+		$ids_vistos = [];
+		$listadatos = [];
+		foreach ($array_detalle_producto as $item) {
+		    if (!in_array($item['id'], $ids_vistos)) {
+		        $ids_vistos[] = $item['id'];
+		        $listadatos[] = $item;
+		    }
+		}
+        $funcion        =   $this;
+        return View::make('cpe/ajax/alistasirecompras',
+                         [
+                            'listadatos'          =>  $listadatos,
+                            'ajax'                  =>  true,
+                            'funcion'               =>  $funcion
+                         ]);
+    }
 
 
 
