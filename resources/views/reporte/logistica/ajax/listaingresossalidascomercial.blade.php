@@ -3,7 +3,7 @@
        style='width: 100%;'>
     <thead>
     <tr>
-        <th class="cabecera" colspan="8">INDUAMERICA COMERCIAL @if($sede <> 'TODOS')
+        <th class="cabecera" colspan="14">INDUAMERICA COMERCIAL @if($sede <> 'TODOS')
                 - {{$sede}}
             @endif</th>
     </tr>
@@ -13,8 +13,9 @@
         <th class="cabecera" rowspan="1" colspan="2">STOCK ULTIMO MES</th>
         <th class="cabecera" rowspan="1" colspan="2">INGRESO MES ACTUAL REPORTE</th>
         <th class="cabecera" rowspan="1" colspan="2">STOCK CON EL TOTAL DE LA COMPRAS</th>
-        {{--<th class="cabecera" rowspan="1" colspan="2">TRANSFERENCIA LOCAL</th>
-        <th class="cabecera" rowspan="1" colspan="2">STOCK ULTIMO DIA DEL MES</th>--}}
+        <th class="cabecera" rowspan="1" colspan="2">INGRESOS MENSUAL</th>
+        <th class="cabecera" rowspan="1" colspan="2">SALIDAS MENSUAL</th>
+        <th class="cabecera" rowspan="1" colspan="2">STOCK ULTIMO DIA DEL MES</th>
     </tr>
     <tr>
         <th class="cabecera" rowspan="1">CANTIDAD</th>
@@ -23,10 +24,12 @@
         <th class="cabecera" rowspan="1">SOLES</th>
         <th class="cabecera" rowspan="1">CANTIDAD</th>
         <th class="cabecera" rowspan="1">SOLES</th>
-        {{--<th class="cabecera" rowspan="1">CANTIDAD</th>
+        <th class="cabecera" rowspan="1">CANTIDAD</th>
         <th class="cabecera" rowspan="1">SOLES</th>
         <th class="cabecera" rowspan="1">CANTIDAD</th>
-        <th class="cabecera" rowspan="1">SOLES</th>--}}
+        <th class="cabecera" rowspan="1">SOLES</th>
+        <th class="cabecera" rowspan="1">CANTIDAD</th>
+        <th class="cabecera" rowspan="1">SOLES</th>
     </tr>
     </thead>
     <tbody>
@@ -40,6 +43,12 @@
             <td>{{number_format($item['COSTO_TOTAL_COMP'], 4, '.', '')}}</td>
             <td>{{number_format($item['STOCK_FECHA'], 4, '.', '')}}</td>
             <td>{{number_format($item['COSTO_FECHA'], 4, '.', '')}}</td>
+            <td>{{number_format($item['STOCK_ING'], 4, '.', '')}}</td>
+            <td>{{number_format($item['COSTO_TOTAL_ING'], 4, '.', '')}}</td>
+            <td>{{number_format($item['STOCK_SAL'], 4, '.', '')}}</td>
+            <td>{{number_format($item['COSTO_TOTAL_SAL'], 4, '.', '')}}</td>
+            <td>{{number_format($item['STOCK_ULTIMA_FECHA'], 4, '.', '')}}</td>
+            <td>{{number_format($item['COSTO_ULTIMA_FECHA'], 4, '.', '')}}</td>
         </tr>
     @endforeach
     </tbody>
@@ -52,10 +61,12 @@
         <th style="text-align: right">{{number_format($total_compras_comercial, 4, '.', '')}}</th>
         <th style="text-align: right">{{number_format($stock_anterior_compras_comercial, 4, '.', '')}}</th>
         <th style="text-align: right">{{number_format($total_anterior_compras_comercial, 4, '.', '')}}</th>
-        {{--<th style="text-align: right">{{number_format(0.00, 2, '.', '')}}</th>
-        <th style="text-align: right">{{number_format(0.00, 2, '.', '')}}</th>
-        <th style="text-align: right">{{number_format(0.00, 2, '.', '')}}</th>
-        <th style="text-align: right">{{number_format(0.00, 2, '.', '')}}</th>--}}
+        <th style="text-align: right">{{number_format($stock_ingresos_comercial, 4, '.', '')}}</th>
+        <th style="text-align: right">{{number_format($total_ingresos_comercial, 4, '.', '')}}</th>
+        <th style="text-align: right">{{number_format($stock_salidas_comercial, 4, '.', '')}}</th>
+        <th style="text-align: right">{{number_format($total_salidas_comercial, 4, '.', '')}}</th>
+        <th style="text-align: right">{{number_format($stock_ultima_fecha_comercial, 4, '.', '')}}</th>
+        <th style="text-align: right">{{number_format($total_ultima_fecha_comercial, 4, '.', '')}}</th>
     </tr>
     </tfoot>
 </table>
