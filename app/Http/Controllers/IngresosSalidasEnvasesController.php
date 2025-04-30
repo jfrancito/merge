@@ -54,6 +54,18 @@ class IngresosSalidasEnvasesController extends Controller
         $total_compras_comercial = 0.0000;
         $total_anterior_compras_internacional = 0.0000;
         $total_anterior_compras_comercial = 0.0000;
+        $stock_ingresos_internacional = 0.0000;
+        $stock_ingresos_comercial = 0.0000;
+        $stock_salidas_internacional = 0.0000;
+        $stock_salidas_comercial = 0.0000;
+        $stock_ultima_fecha_internacional = 0.0000;
+        $stock_ultima_fecha_comercial = 0.0000;
+        $total_ingresos_internacional = 0.0000;
+        $total_ingresos_comercial = 0.0000;
+        $total_salidas_internacional = 0.0000;
+        $total_salidas_comercial = 0.0000;
+        $total_ultima_fecha_internacional = 0.0000;
+        $total_ultima_fecha_comercial = 0.0000;
 
         $funcion = $this;
 
@@ -89,7 +101,19 @@ class IngresosSalidasEnvasesController extends Controller
                 'total_compras_internacional' => $total_compras_internacional,
                 'total_compras_comercial' => $total_compras_comercial,
                 'total_anterior_compras_internacional' => $total_anterior_compras_internacional,
-                'total_anterior_compras_comercial' => $total_anterior_compras_comercial
+                'total_anterior_compras_comercial' => $total_anterior_compras_comercial,
+                'stock_ingresos_internacional' => $stock_ingresos_internacional,
+                'stock_ingresos_comercial' => $stock_ingresos_comercial,
+                'stock_salidas_internacional' => $stock_salidas_internacional,
+                'stock_salidas_comercial' => $stock_salidas_comercial,
+                'stock_ultima_fecha_internacional' => $stock_ultima_fecha_internacional,
+                'stock_ultima_fecha_comercial' => $stock_ultima_fecha_comercial,
+                'total_ingresos_internacional' => $total_ingresos_internacional,
+                'total_ingresos_comercial' => $total_ingresos_comercial,
+                'total_salidas_internacional' => $total_salidas_internacional,
+                'total_salidas_comercial' => $total_salidas_comercial,
+                'total_ultima_fecha_internacional' => $total_ultima_fecha_internacional,
+                'total_ultima_fecha_comercial' => $total_ultima_fecha_comercial,
             ]);
     }
 
@@ -181,6 +205,19 @@ class IngresosSalidasEnvasesController extends Controller
         $total_anterior_compras_internacional = 0.0000;
         $total_anterior_compras_comercial = 0.0000;
 
+        $stock_ingresos_internacional = 0.0000;
+        $stock_ingresos_comercial = 0.0000;
+        $stock_salidas_internacional = 0.0000;
+        $stock_salidas_comercial = 0.0000;
+        $stock_ultima_fecha_internacional = 0.0000;
+        $stock_ultima_fecha_comercial = 0.0000;
+        $total_ingresos_internacional = 0.0000;
+        $total_ingresos_comercial = 0.0000;
+        $total_salidas_internacional = 0.0000;
+        $total_salidas_comercial = 0.0000;
+        $total_ultima_fecha_internacional = 0.0000;
+        $total_ultima_fecha_comercial = 0.0000;
+
         if ($empresa <> '') {
             if ($empresa === 'IACHEM0000007086') {
                 $lista_comercial = $this->generar_reporte('RES', $empresa, $centro, '', $empresa, $empresa,
@@ -208,6 +245,14 @@ class IngresosSalidasEnvasesController extends Controller
                 $total_anterior_comercial = $total_anterior_comercial + $compra['COSTO_TOTAL_ANT'];
                 $total_compras_comercial = $total_compras_comercial + $compra['COSTO_TOTAL_COMP'];
                 $total_anterior_compras_comercial = $total_anterior_compras_comercial + $compra['COSTO_FECHA'];
+
+                $stock_ingresos_comercial = $stock_ingresos_comercial + $compra['STOCK_ING'];
+                $stock_salidas_comercial = $stock_salidas_comercial + $compra['STOCK_SAL'];
+                $stock_ultima_fecha_comercial = $stock_ultima_fecha_comercial + $compra['STOCK_ULTIMA_FECHA'];
+                $total_ingresos_comercial = $total_ingresos_comercial + $compra['COSTO_TOTAL_ING'];
+                $total_salidas_comercial = $total_salidas_comercial + $compra['COSTO_TOTAL_SAL'];
+                $total_ultima_fecha_comercial = $total_ultima_fecha_comercial + $compra['COSTO_ULTIMA_FECHA'];
+
             }
         }
 
@@ -219,10 +264,18 @@ class IngresosSalidasEnvasesController extends Controller
                 $total_anterior_internacional = $total_anterior_internacional + $compra['COSTO_TOTAL_ANT'];
                 $total_compras_internacional = $total_compras_internacional + $compra['COSTO_TOTAL_COMP'];
                 $total_anterior_compras_internacional = $total_anterior_compras_internacional + $compra['COSTO_FECHA'];
+
+                $stock_ingresos_internacional = $stock_ingresos_internacional + $compra['STOCK_ING'];
+                $stock_salidas_internacional = $stock_salidas_internacional + $compra['STOCK_SAL'];
+                $stock_ultima_fecha_internacional = $stock_ultima_fecha_internacional + $compra['STOCK_ULTIMA_FECHA'];
+                $total_ingresos_internacional = $total_ingresos_internacional + $compra['COSTO_TOTAL_ING'];
+                $total_salidas_internacional = $total_salidas_internacional + $compra['COSTO_TOTAL_SAL'];
+                $total_ultima_fecha_internacional = $total_ultima_fecha_internacional + $compra['COSTO_ULTIMA_FECHA'];
+
             }
         }
 
-        if($centro <> '') {
+        if ($centro <> '') {
             $centro_get = ALMCentro::where('COD_CENTRO', $centro)->first();
             $sede = $centro_get->NOM_CENTRO;
         } else {
@@ -247,6 +300,20 @@ class IngresosSalidasEnvasesController extends Controller
                 'total_compras_comercial' => $total_compras_comercial,
                 'total_anterior_compras_internacional' => $total_anterior_compras_internacional,
                 'total_anterior_compras_comercial' => $total_anterior_compras_comercial,
+
+                'stock_ingresos_internacional' => $stock_ingresos_internacional,
+                'stock_ingresos_comercial' => $stock_ingresos_comercial,
+                'stock_salidas_internacional' => $stock_salidas_internacional,
+                'stock_salidas_comercial' => $stock_salidas_comercial,
+                'stock_ultima_fecha_internacional' => $stock_ultima_fecha_internacional,
+                'stock_ultima_fecha_comercial' => $stock_ultima_fecha_comercial,
+                'total_ingresos_internacional' => $total_ingresos_internacional,
+                'total_ingresos_comercial' => $total_ingresos_comercial,
+                'total_salidas_internacional' => $total_salidas_internacional,
+                'total_salidas_comercial' => $total_salidas_comercial,
+                'total_ultima_fecha_internacional' => $total_ultima_fecha_internacional,
+                'total_ultima_fecha_comercial' => $total_ultima_fecha_comercial,
+
                 'empresa_defecto' => $empresa,
                 'sede' => $sede,
                 'idopcion' => $id_opcion,
@@ -282,6 +349,18 @@ class IngresosSalidasEnvasesController extends Controller
         $total_compras_comercial = 0.0000;
         $total_anterior_compras_internacional = 0.0000;
         $total_anterior_compras_comercial = 0.0000;
+        $stock_ingresos_internacional = 0.0000;
+        $stock_ingresos_comercial = 0.0000;
+        $stock_salidas_internacional = 0.0000;
+        $stock_salidas_comercial = 0.0000;
+        $stock_ultima_fecha_internacional = 0.0000;
+        $stock_ultima_fecha_comercial = 0.0000;
+        $total_ingresos_internacional = 0.0000;
+        $total_ingresos_comercial = 0.0000;
+        $total_salidas_internacional = 0.0000;
+        $total_salidas_comercial = 0.0000;
+        $total_ultima_fecha_internacional = 0.0000;
+        $total_ultima_fecha_comercial = 0.0000;
 
         if ($empresa <> '') {
             if ($empresa === 'IACHEM0000007086') {
@@ -310,6 +389,12 @@ class IngresosSalidasEnvasesController extends Controller
                 $total_anterior_comercial = $total_anterior_comercial + $compra['COSTO_TOTAL_ANT'];
                 $total_compras_comercial = $total_compras_comercial + $compra['COSTO_TOTAL_COMP'];
                 $total_anterior_compras_comercial = $total_anterior_compras_comercial + $compra['COSTO_FECHA'];
+                $stock_ingresos_comercial = $stock_ingresos_comercial + $compra['STOCK_ING'];
+                $stock_salidas_comercial = $stock_salidas_comercial + $compra['STOCK_SAL'];
+                $stock_ultima_fecha_comercial = $stock_ultima_fecha_comercial + $compra['STOCK_ULTIMA_FECHA'];
+                $total_ingresos_comercial = $total_ingresos_comercial + $compra['COSTO_TOTAL_ING'];
+                $total_salidas_comercial = $total_salidas_comercial + $compra['COSTO_TOTAL_SAL'];
+                $total_ultima_fecha_comercial = $total_ultima_fecha_comercial + $compra['COSTO_ULTIMA_FECHA'];
             }
         }
 
@@ -321,10 +406,16 @@ class IngresosSalidasEnvasesController extends Controller
                 $total_anterior_internacional = $total_anterior_internacional + $compra['COSTO_TOTAL_ANT'];
                 $total_compras_internacional = $total_compras_internacional + $compra['COSTO_TOTAL_COMP'];
                 $total_anterior_compras_internacional = $total_anterior_compras_internacional + $compra['COSTO_FECHA'];
+                $stock_ingresos_internacional = $stock_ingresos_internacional + $compra['STOCK_ING'];
+                $stock_salidas_internacional = $stock_salidas_internacional + $compra['STOCK_SAL'];
+                $stock_ultima_fecha_internacional = $stock_ultima_fecha_internacional + $compra['STOCK_ULTIMA_FECHA'];
+                $total_ingresos_internacional = $total_ingresos_internacional + $compra['COSTO_TOTAL_ING'];
+                $total_salidas_internacional = $total_salidas_internacional + $compra['COSTO_TOTAL_SAL'];
+                $total_ultima_fecha_internacional = $total_ultima_fecha_internacional + $compra['COSTO_ULTIMA_FECHA'];
             }
         }
 
-        if($centro <> '') {
+        if ($centro <> '') {
             $centro_get = ALMCentro::where('COD_CENTRO', $centro)->first();
             $sede = $centro_get->NOM_CENTRO;
         } else {
@@ -335,15 +426,26 @@ class IngresosSalidasEnvasesController extends Controller
 
         $titulo = 'Reporte-Ingresos-Salidas-Envases-Materiales';
 
-        Excel::create($titulo, function ($excel) use ($lista_comercial, $stock_anterior_comercial,
+        Excel::create($titulo, function ($excel) use (
+            $lista_comercial, $stock_anterior_comercial,
             $stock_compras_comercial, $stock_anterior_compras_comercial, $total_anterior_comercial,
             $total_compras_comercial, $total_anterior_compras_comercial, $lista_internacional, $stock_anterior_internacional,
             $stock_compras_internacional, $stock_anterior_compras_internacional, $total_anterior_internacional,
-            $total_compras_internacional, $total_anterior_compras_internacional, $sede, $funcion) {
-            if(count($lista_internacional)>0) {
-                $excel->sheet('Ingresos y Salidas II', function ($sheet) use ($lista_internacional, $stock_anterior_internacional,
+            $total_compras_internacional, $total_anterior_compras_internacional, $stock_ingresos_internacional,
+            $stock_ingresos_comercial, $stock_salidas_internacional, $stock_salidas_comercial,
+            $stock_ultima_fecha_internacional, $stock_ultima_fecha_comercial, $total_ingresos_internacional,
+            $total_ingresos_comercial, $total_salidas_internacional, $total_salidas_comercial,
+            $total_ultima_fecha_internacional, $total_ultima_fecha_comercial, $sede, $funcion
+        ) {
+            if (count($lista_internacional) > 0) {
+                $excel->sheet('Ingresos y Salidas II', function ($sheet) use (
+                    $lista_internacional, $stock_anterior_internacional,
                     $stock_compras_internacional, $stock_anterior_compras_internacional, $total_anterior_internacional,
-                    $total_compras_internacional, $total_anterior_compras_internacional, $sede, $funcion) {
+                    $total_compras_internacional, $total_anterior_compras_internacional, $stock_ingresos_internacional,
+                    $stock_ingresos_comercial, $stock_salidas_internacional, $stock_ultima_fecha_internacional,
+                    $total_ingresos_internacional, $total_salidas_internacional, $total_ultima_fecha_internacional,
+                    $sede, $funcion
+                ) {
                     $sheet->setColumnFormat(array(
                         'C:H' => '0.0000'
                     ));
@@ -356,13 +458,24 @@ class IngresosSalidasEnvasesController extends Controller
                         ->with('total_anterior_internacional', $total_anterior_internacional)
                         ->with('total_compras_internacional', $total_compras_internacional)
                         ->with('total_anterior_compras_internacional', $total_anterior_compras_internacional)
+
+                        ->with('stock_ingresos_internacional', $stock_ingresos_internacional)
+                        ->with('stock_salidas_internacional', $stock_salidas_internacional)
+                        ->with('stock_ultima_fecha_internacional', $stock_ultima_fecha_internacional)
+                        ->with('total_ingresos_internacional', $total_ingresos_internacional)
+                        ->with('total_salidas_internacional', $total_salidas_internacional)
+                        ->with('total_ultima_fecha_internacional', $total_ultima_fecha_internacional)
                         ->with('sede', $sede);
                 });
             }
-            if(count($lista_comercial)>0) {
-                $excel->sheet('Ingresos y Salidas IC', function ($sheet) use ($lista_comercial, $stock_anterior_comercial,
+            if (count($lista_comercial) > 0) {
+                $excel->sheet('Ingresos y Salidas IC', function ($sheet) use (
+                    $lista_comercial, $stock_anterior_comercial,
                     $stock_compras_comercial, $stock_anterior_compras_comercial, $total_anterior_comercial,
-                    $total_compras_comercial, $total_anterior_compras_comercial, $sede, $funcion) {
+                    $total_compras_comercial, $total_anterior_compras_comercial,
+                    $stock_ingresos_comercial, $stock_salidas_comercial, $stock_ultima_fecha_comercial,
+                    $total_ingresos_comercial, $total_salidas_comercial, $total_ultima_fecha_comercial, $sede, $funcion
+                ) {
                     $sheet->setColumnFormat(array(
                         'C:H' => '0.0000'
                     ));
@@ -375,6 +488,14 @@ class IngresosSalidasEnvasesController extends Controller
                         ->with('total_anterior_comercial', $total_anterior_comercial)
                         ->with('total_compras_comercial', $total_compras_comercial)
                         ->with('total_anterior_compras_comercial', $total_anterior_compras_comercial)
+
+                        ->with('stock_ingresos_comercial', $stock_ingresos_comercial)
+                        ->with('stock_salidas_comercial', $stock_salidas_comercial)
+                        ->with('stock_ultima_fecha_comercial', $stock_ultima_fecha_comercial)
+                        ->with('total_ingresos_comercial', $total_ingresos_comercial)
+                        ->with('total_salidas_comercial', $total_salidas_comercial)
+                        ->with('total_ultima_fecha_comercial', $total_ultima_fecha_comercial)
+
                         ->with('sede', $sede);
                 });
             }
