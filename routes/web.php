@@ -292,6 +292,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-buscar-sire-compra', 'CpeController@actionAjaxBuscarSireCompra');
 
 	Route::any('/gestion-vaidar-rr/{idopcion}', 'RRController@actionGestionValidarRR');
+	Route::any('/ajax-vaidar-rr', 'RRController@actionAjaxValidarRR');
+
+
 	Route::any('/ajax-modal-vaidar-rr-is', 'RRController@actionAjaxModalValidarRRIs');
 
 
