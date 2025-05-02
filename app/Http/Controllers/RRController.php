@@ -67,66 +67,107 @@ class RRController extends Controller {
         $codEmpr     = Session::get('empresas')->COD_EMPR;
 
         $this->rr_listavalidacion_comercial($fechaInicio,$fechaFin,$anio,$mes,$codCentro,$usuario,$codEmpr);
-		$primerCliente = 'INTERNACIONAL MANUEL GUARNIZ S.A.C.';
+		$primerCliente = $data_cliente;
 		$sql = "
-		SELECT TT.*
-		FROM (
-		    SELECT 'OTROS' AS RESULTADO, *
-		    FROM TempValidacionRR
-		    WHERE ANEXO NOT IN ('R17','R18') AND CLIENTE = :cliente
-		    UNION
-		    SELECT 'RR' AS RESULTADO, *
-		    FROM TempValidacionRR
-		    WHERE ANEXO IN ('R17','R18') AND CLIENTE = :cliente
-		) TT
-		WHERE TT.CLIENTE IN (
-		    SELECT OTROS.CLIENTE
+		    SELECT 
+		        TT.RESULTADO, TT.ANEXO, TT.CENTRO, TT.MES, TT.FECHA, 
+		        TT.CODIGO, TT.TIPO_VENTA, TT.CLIENTE, TT.IMPORTE, TT.CONCEPTO_CENTRO_COSTO 
 		    FROM (
-		        SELECT CLIENTE, SUM(IMPORTE) AS SUMA
+		        SELECT 
+		            'OTROS' AS RESULTADO, ANEXO, CENTRO, MES, FECHA, 
+		            CODIGO, TIPO_VENTA, CLIENTE, IMPORTE, CONCEPTO_CENTRO_COSTO
 		        FROM TempValidacionRR
-		        WHERE ANEXO IN ('R17','R18')
-		        GROUP BY CLIENTE
-		    ) OTROS
-		    INNER JOIN (
-		        SELECT CLIENTE, SUM(IMPORTE) AS SUMA
+		        WHERE ANEXO NOT IN ('R17', 'R18') 
+		        AND CLIENTE = ?
+
+		        UNION ALL
+
+		        SELECT 
+		            'RR' AS RESULTADO, ANEXO, CENTRO, MES, FECHA, 
+		            CODIGO, TIPO_VENTA, CLIENTE, IMPORTE, CONCEPTO_CENTRO_COSTO
 		        FROM TempValidacionRR
-		        WHERE ANEXO NOT IN ('R17','R18')
-		        GROUP BY CLIENTE
-		    ) RR ON RR.CLIENTE = OTROS.CLIENTE
-		    AND ABS(ABS(RR.SUMA) - ABS(OTROS.SUMA)) > 0.0001
-		)
-		ORDER BY TT.CLIENTE, TT.CODIGO
-		";
+		        WHERE ANEXO IN ('R17', 'R18') 
+		        AND CLIENTE = ?
+		    ) TT
+		    WHERE TT.CLIENTE IN (
+		        SELECT t1.CLIENTE
+		        FROM (
+		            SELECT CLIENTE, SUM(IMPORTE) AS SUMA
+		            FROM TempValidacionRR
+		            WHERE ANEXO IN ('R17', 'R18')
+		            GROUP BY CLIENTE
+		        ) t1
+		        INNER JOIN (
+		            SELECT CLIENTE, SUM(IMPORTE) AS SUMA
+		            FROM TempValidacionRR
+		            WHERE ANEXO NOT IN ('R17', 'R18')
+		            GROUP BY CLIENTE
+		        ) t2 ON t1.CLIENTE = t2.CLIENTE
+		        WHERE ABS(ABS(t1.SUMA) - ABS(t2.SUMA)) > 0.0001
+		    )
+		    ORDER BY TT.CLIENTE, TT.CODIGO
+		    ";
 
-		$resultado = DB::select(DB::raw($sql), ['cliente' => $primerCliente]);
+		$resultados = DB::select(DB::raw($sql), [$primerCliente, $primerCliente]);
 
-		dd($resultado);
+
 
 		$sql = "
-		SELECT * FROM (
-		    SELECT 'OTROS' AS RESULTADO, *
-		    FROM TempGastosVentas
-		    WHERE ANEXO NOT IN ('R17','R18') AND CLIENTE = :cliente
-		) OTROS
-		FULL OUTER JOIN (
-		    SELECT 'RR' AS RESULTADO, *
-		    FROM TempGastosVentas
-		    WHERE ANEXO IN ('R17','R18') AND CLIENTE = :cliente
-		) RR
-		ON RR.CODIGO = OTROS.CODIGO AND RR.IMPORTE = OTROS.IMPORTE AND RR.MES = OTROS.MES
-		WHERE RR.CODIGO IS NULL
-		   OR RR.IMPORTE IS NULL
-		   OR RR.MES IS NULL
-		   OR OTROS.CODIGO IS NULL
-		   OR OTROS.IMPORTE IS NULL
-		   OR OTROS.MES IS NULL
-		";
+		    SELECT 
+		        OTROS.RESULTADO AS RESULTADO_O,
+		        OTROS.ANEXO AS ANEXO_O,
+		        OTROS.CENTRO AS CENTRO_O,
+		        OTROS.MES AS MES_O,
+		        OTROS.CODIGO AS CODIGO_O,
+		        OTROS.TIPO_VENTA AS TIPO_VENTA_O,
+		        OTROS.CLIENTE AS CLIENTE_O,
+		        OTROS.IMPORTE AS IMPORTE_O,
+		        OTROS.CONCEPTO_CENTRO_COSTO AS CONCEPTO_CENTRO_COSTO_O, 
+		        RR.RESULTADO,
+		        RR.ANEXO,
+		        RR.CENTRO,
+		        RR.MES,
+		        RR.CODIGO,
+		        RR.TIPO_VENTA,
+		        RR.CLIENTE,
+		        RR.IMPORTE,
+		        RR.CONCEPTO_CENTRO_COSTO 
+		    FROM (
+		        SELECT 
+		            'OTROS' AS RESULTADO,
+		            ANEXO, CENTRO, MES, FECHA, CODIGO, TIPO_VENTA,
+		            CLIENTE, IMPORTE, CONCEPTO_CENTRO_COSTO
+		        FROM TempValidacionRR
+		        WHERE ANEXO NOT IN ('R17','R18') 
+		        AND CLIENTE = ?
+		    ) AS OTROS
+		    FULL OUTER JOIN (
+		        SELECT 
+		            'RR' AS RESULTADO,
+		            ANEXO, CENTRO, MES, FECHA, CODIGO, TIPO_VENTA,
+		            CLIENTE, IMPORTE, CONCEPTO_CENTRO_COSTO
+		        FROM TempValidacionRR
+		        WHERE ANEXO IN ('R17','R18') 
+		        AND CLIENTE = ?
+		    ) AS RR 
+		    ON RR.CODIGO = OTROS.CODIGO 
+		       AND RR.IMPORTE = OTROS.IMPORTE 
+		       AND RR.MES = OTROS.MES
+		    WHERE 
+		        RR.CODIGO IS NULL OR RR.IMPORTE IS NULL OR RR.MES IS NULL
+		        OR OTROS.CODIGO IS NULL OR OTROS.IMPORTE IS NULL OR OTROS.MES IS NULL
+		    ";
 
-		$resultado02 = DB::select(DB::raw($sql), ['cliente' => $primerCliente]);
+		    $resultado02 = DB::select(DB::raw($sql), [$primerCliente, $primerCliente]);
 
+		return View::make('rr/modal/ajax/amdrr',
+						 [
+							'resultados' 			=> $resultados,
+							'resultado02' 			=> $resultado02,
+							'data_cliente' 			=> $data_cliente,
+							'ajax' 					=> true
+						 ]);
 
-
-    	dd($resultado01);
 
 
     }

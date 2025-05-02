@@ -53,7 +53,7 @@ $(document).ready(function(){
                                         };
 
         ajax_modal(data,"/ajax-modal-vaidar-rr-is",
-                  "modal-rr","modal-rr-container");
+                  "modal-detalle-rr","modal-detalle-rr-container");
 
 
 

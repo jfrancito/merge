@@ -103,6 +103,7 @@ class CpeController extends Controller {
 		$perido_filtro  =   $periodo->COD_ANIO.str_pad($periodo->COD_MES, 2, '0', STR_PAD_LEFT);
 		//$urlxml 		= 	'https://api-sire.sunat.gob.pe/v1/contribuyente/migeigv/libros/rce/propuesta/web/propuesta/'.$perido_filtro.'/busqueda?codTipoOpe=1&page=1&perPage=20';
 		$urlxml 		= 	'https://api-sire.sunat.gob.pe/v1/contribuyente/migeigv/libros/rce/propuesta/web/propuesta/'.$perido_filtro.'/busqueda?codTipoOpe=2&numDocAdquiriente='.$empresa_trab->NRO_DOCUMENTO.'&page=1&perPage=100';
+
 		$respuetaxml 	=	$this->buscar_archivo_sunat_compra($urlxml,$fetoken);
 
 		//dd($respuetaxml);
@@ -115,8 +116,6 @@ class CpeController extends Controller {
 		$array_detalle_producto 		=	array();
 		foreach ($valores as $index=>$valor) {
 			$array_nuevo_producto 		=	array();
-			//$urlxml 					= 	'https://api-sire.sunat.gob.pe/v1/contribuyente/migeigv/libros/rce/propuesta/web/propuesta/'.$perido_filtro.'/busqueda?codTipoOpe=1&page='.$valor.'&perPage=20';
-			//$urlxml 					= 	'https://api-sire.sunat.gob.pe/v1/contribuyente/migeigv/libros/rce/propuesta/web/propuesta/202503/busqueda?codTipoOpe=2&fecEmisionIni=2025-03-01&fecEmisionFin=2025-03-31&page='.$valor.'&perPage=20';
 			$urlxml 					= 	'https://api-sire.sunat.gob.pe/v1/contribuyente/migeigv/libros/rce/propuesta/web/propuesta/'.$perido_filtro.'/busqueda?codTipoOpe=2&numDocAdquiriente='.$empresa_trab->NRO_DOCUMENTO.'&page=1&perPage=100';
 			$respuetaxml 				=	$this->buscar_archivo_sunat_compra($urlxml,$fetoken);
 			foreach ($respuetaxml['registros'] as $valorsire) {
