@@ -13,6 +13,27 @@ $(document).ready(function(){
     });
 
 
+    $(".cfedocumento").on('click','.buscardocumentorr', function() {
+
+        event.preventDefault();
+        var fechainicio             =   $('#fechainicio').val();
+        var fechafin                =   $('#fechafin').val();
+        var idopcion                =   $('#idopcion').val();
+        var _token                  =   $('#token').val();
+
+
+        data            =   {
+                                _token                  : _token,
+                                fechainicio             : fechainicio,
+                                fechafin                : fechafin,
+                                idopcion                : idopcion
+                            };
+        ajax_normal(data,"/ajax-vaidar-rr");
+
+    });
+
+
+
     $(".cfedocumento").on('click','.buscardocumento', function() {
 
         event.preventDefault();

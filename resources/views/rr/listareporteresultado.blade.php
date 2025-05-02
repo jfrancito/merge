@@ -16,7 +16,7 @@
 
                   <div class="tools tooltiptop">
 
-                    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscardocumento">
+                    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscardocumentorr">
                       <span class="tooltiptext">Buscas</span>
                       <span class="icon mdi mdi-search"></span>
                     </a>

@@ -55,6 +55,68 @@ class RRController extends Controller {
     use ComprobanteTraits;
     use RRTraits;
 
+    public function actionAjaxValidarRR(Request $request)
+    {
+
+		$fechaInicio = $request['fechainicio'].' 00:00:00';
+		$fechaFin = $request['fechafin'].' 00:00:00';
+        $anio        = 2024;
+        $mes         = 10;
+        $codCentro   = 'CEN0000000000001';
+        $usuario     = 'JSALDANR';
+        $codEmpr     = Session::get('empresas')->COD_EMPR;
+
+
+        $this->rr_listavalidacion_comercial($fechaInicio,$fechaFin,$anio,$mes,$codCentro,$usuario,$codEmpr);
+
+
+        // 4. Comparar RR vs OTROS
+        $diferencias = DB::select("
+            SELECT RR.CLIENTE AS CLIENTERR,RR.SUMA AS SUMARR,RR.TIPO AS TIPORR,OTROS.CLIENTE AS CLIENTEO,OTROS.SUMA AS SUMAO,OTROS.TIPO AS TIPOO, ABS(ABS(OTROS.SUMA)-ABS(RR.SUMA)) AS diferencia FROM (
+                SELECT CLIENTE, SUM(IMPORTE) AS SUMA, 'RR' AS TIPO
+                FROM TempValidacionRR
+                WHERE ANEXO IN ('R17','R18') 
+                GROUP BY CLIENTE
+            ) OTROS
+            INNER JOIN (
+                SELECT CLIENTE, SUM(IMPORTE) AS SUMA, 'OTROS' AS TIPO
+                FROM TempValidacionRR
+                WHERE ANEXO NOT IN ('R17','R18')
+                GROUP BY CLIENTE
+            ) RR ON RR.CLIENTE = OTROS.CLIENTE
+            WHERE ABS(ABS(RR.SUMA) - ABS(OTROS.SUMA)) > 0.0001
+            ORDER BY ABS(ABS(OTROS.SUMA) - ABS(RR.SUMA)) DESC
+        ");
+
+        // 5. Clientes únicos entre RR y OTROS
+        $solo_uno = DB::select("
+            SELECT RR.CLIENTE AS CLIENTERR,RR.SUMA AS SUMARR,RR.TIPO AS TIPORR,OTROS.CLIENTE AS CLIENTEO,OTROS.SUMA AS SUMAO,OTROS.TIPO AS TIPOO FROM (
+                SELECT CLIENTE, SUM(IMPORTE) AS SUMA, 'RR' AS TIPO
+                FROM TempValidacionRR
+                WHERE ANEXO IN ('R17','R18')
+                GROUP BY CLIENTE
+            ) OTROS
+            FULL OUTER JOIN (
+                SELECT CLIENTE, SUM(IMPORTE) AS SUMA, 'OTROS' AS TIPO
+                FROM TempValidacionRR
+                WHERE ANEXO NOT IN ('R17','R18')
+                GROUP BY CLIENTE
+            ) RR ON RR.CLIENTE = OTROS.CLIENTE
+            WHERE RR.CLIENTE IS NULL OR OTROS.CLIENTE IS NULL
+        ");
+
+
+		return View::make('rr/ajax/alistavalidarrr',
+						 [
+							'diferencias' 			=> $diferencias,
+							'solo_uno' 			=> $solo_uno,
+							'ajax' 					=> true
+						 ]);
+
+
+    }
+
+
     public function actionAjaxModalValidarRRIs(Request $request)
     {
     	$data_cliente 	 		= 	$request['data_cliente'];
