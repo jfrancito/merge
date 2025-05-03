@@ -778,6 +778,22 @@ trait LiquidacionGastoTraits
     }
 
 
+    private function lg_combo_costo_xtrabajador($titulo,$txt_referencia) {
+
+        $array =        DB::table('CON.CENTRO_COSTO')
+                        ->where('COD_ESTADO', 1)
+                        ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
+                        ->where('TXT_REFERENCIA_PLANILLA', $txt_referencia)
+                        ->where('IND_MOVIMIENTO', 1)
+                        ->orderBy('TXT_NOMBRE')
+                        ->pluck('TXT_NOMBRE','COD_CENTRO_COSTO')
+                        ->toArray();
+
+        $combo      =       array('' => $titulo) + $array;
+        return  $combo;                    
+    }
+
+
     private function lg_combo_costo($titulo) {
 
         $array =     DB::table('CON.CENTRO_COSTO')

@@ -43,7 +43,7 @@ use App\Traits\GeneralesTraits;
 use App\Traits\PlanillaTraits;
 use App\Traits\LiquidacionGastoTraits;
 use App\Traits\ComprobanteTraits;
-
+use PDF;
 use Hashids;
 use SplFileInfo;
 use Excel;
@@ -507,6 +507,25 @@ class GestionLiquidacionGastosController extends Controller
             $TXT_SUBCUENTA                 =       $subcontrato->TXT_CULTIVO;
         }
 
+        //GUARDAR PDF
+        $iddocumento            =   $documento_planilla;
+        $planillamovilidad      =   PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first(); 
+        $detplanillamovilidad   =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->get();
+        $empresa                =   STDEmpresa::where('COD_EMPR','=',$planillamovilidad->COD_EMPRESA)->first();
+        $ruc                    =   $empresa->NRO_DOCUMENTO;
+        $prefijocarperta        =   $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
+        $rutafile               =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$iddocumento;
+        $valor                  =   $this->versicarpetanoexiste($rutafile);
+        $rutacompleta           =   $rutafile . '\\' . $planillamovilidad->SERIE . '-' . $planillamovilidad->NUMERO . '.pdf';
+        $nombrearchivo          =   $planillamovilidad->SERIE . '-' . $planillamovilidad->NUMERO . '.pdf';
+        $pdf = PDF::loadView('pdffa.planillamovilidad', [ 
+                                                'iddocumento'           => $iddocumento , 
+                                                'planillamovilidad'     => $planillamovilidad,
+                                                'detplanillamovilidad'  => $detplanillamovilidad,
+                                                'ruc'                   => $ruc,
+                                              ]);
+
+        $pdf->save($rutacompleta);
 
         return response()->json([
             'EMPRESA'       => 'PLANILLA DE MOVILIDAD SIN COMPROBANTE',
@@ -514,11 +533,13 @@ class GestionLiquidacionGastosController extends Controller
             'NUMERO'        => $planillamovilidad->NUMERO,
             'COD_CUENTA'    => $COD_CUENTA,
             'TXT_CUENTA'    => $TXT_CUENTA,
-            'COD_SUBCUENTA'    => $COD_SUBCUENTA,
-            'TXT_SUBCUENTA'    => $TXT_SUBCUENTA,
-            'COD_PLANILLA'     => $planillamovilidad->ID_DOCUMENTO,
+            'COD_SUBCUENTA' => $COD_SUBCUENTA,
+            'TXT_SUBCUENTA' => $TXT_SUBCUENTA,
+            'COD_PLANILLA'  => $planillamovilidad->ID_DOCUMENTO,
             'FECHA_EMI'     => date_format(date_create($planillamovilidad->FECHA_EMI), 'd-m-Y'),
-            'TOTAL'         => $planillamovilidad->TOTAL
+            'TOTAL'         => $planillamovilidad->TOTAL,
+            'rutacompleta'  => $rutacompleta,
+            'nombrearchivo' => $nombrearchivo
         ]);
 
 
@@ -1228,11 +1249,13 @@ class GestionLiquidacionGastosController extends Controller
 
                     //CUANDO ES PLANILLA DE MOVILIDAd
                     if(ltrim(rtrim($cod_planila))!=''){
-                        $planillamovilidad              =   DB::table('PLA_MOVILIDAD')
-                                                            ->where('ID_DOCUMENTO', $cod_planila)
-                                                            ->first();
+
+                        $planillamovilidad              =       DB::table('PLA_MOVILIDAD')
+                                                                ->where('ID_DOCUMENTO', $cod_planila)
+                                                                ->first();
                         $COD_CUENTA                     =       '';   
                         $TXT_CUENTA                     =       '';
+
                         $contratos                      =        DB::table('CMP.CONTRATO')
                                                                 ->where('COD_EMPR_CLIENTE', 'IACHEM0000009164')
                                                                 ->where('COD_EMPR', $planillamovilidad->COD_EMPRESA)
@@ -1463,6 +1486,7 @@ class GestionLiquidacionGastosController extends Controller
 
 
                     if($tipodoc_id=='TDO0000000000001'){
+
                         $NOMBREFILE                     =   $request['NOMBREFILE'];
                         $RUTACOMPLETA                   =   $request['RUTACOMPLETA'];
                         //GUARDAR EL XML
@@ -1614,41 +1638,63 @@ class GestionLiquidacionGastosController extends Controller
                                     );
 
                     }else{
-                        $tarchivos                      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                            ->whereIn('COD_CATEGORIA', ['DCC0000000000036'])->get();
-                        foreach($tarchivos as $index => $itema){
-                            $filescdm          =   $request[$itema->COD_CATEGORIA];
-                            if(!is_null($filescdm)){
-                                //CDR
-                                foreach($filescdm as $file){
-                                    //
-                                    $contadorArchivos = Archivo::count();
+                        if($tipodoc_id=='TDO0000000000070'){
 
-                                    /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
-                                    $prefijocarperta =      $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
-                                    $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$iddocumento;
-                                    $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
-                                    $valor           =      $this->versicarpetanoexiste($rutafile);
-                                    $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
-                                    copy($file->getRealPath(),$rutacompleta);
-                                    $path            =      $rutacompleta;
-                                    $nombreoriginal             =   $file->getClientOriginalName();
-                                    $info                       =   new SplFileInfo($nombreoriginal);
-                                    $extension                  =   $info->getExtension();
-                                    $dcontrol                       =   new Archivo;
-                                    $dcontrol->ID_DOCUMENTO         =   $iddocumento;
-                                    $dcontrol->DOCUMENTO_ITEM       =   $item;
+                            $rutacompleta                   =   $request['rutacompleta'];
+                            $nombrearchivo                  =   $request['nombrearchivo'];
+                            $nombrefilecdr                  =   $nombrearchivo;
+                            $dcontrol                       =   new Archivo;
+                            $dcontrol->ID_DOCUMENTO         =   $iddocumento;
+                            $dcontrol->DOCUMENTO_ITEM       =   $item;
+                            $dcontrol->TIPO_ARCHIVO         =   'DCC0000000000036';
+                            $dcontrol->NOMBRE_ARCHIVO       =   $nombrefilecdr;
+                            $dcontrol->DESCRIPCION_ARCHIVO  =   'COMPROBANTE ELECTRONICO';
+                            $dcontrol->URL_ARCHIVO          =   $rutacompleta;
+                            $dcontrol->SIZE                 =   100;
+                            $dcontrol->EXTENSION            =   'pdf';
+                            $dcontrol->ACTIVO               =   1;
+                            $dcontrol->FECHA_CREA           =   $this->fechaactual;
+                            $dcontrol->USUARIO_CREA         =   Session::get('usuario')->id;
+                            $dcontrol->save();
 
-                                    $dcontrol->TIPO_ARCHIVO         =   $itema->COD_CATEGORIA;
-                                    $dcontrol->NOMBRE_ARCHIVO       =   $nombrefilecdr;
-                                    $dcontrol->DESCRIPCION_ARCHIVO  =   $itema->NOM_CATEGORIA;
-                                    $dcontrol->URL_ARCHIVO          =   $path;
-                                    $dcontrol->SIZE                 =   filesize($file);
-                                    $dcontrol->EXTENSION            =   $extension;
-                                    $dcontrol->ACTIVO               =   1;
-                                    $dcontrol->FECHA_CREA           =   $this->fechaactual;
-                                    $dcontrol->USUARIO_CREA         =   Session::get('usuario')->id;
-                                    $dcontrol->save();
+                        }else{
+
+                            $tarchivos                      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                                                ->whereIn('COD_CATEGORIA', ['DCC0000000000036'])->get();
+                            foreach($tarchivos as $index => $itema){
+                                $filescdm          =   $request[$itema->COD_CATEGORIA];
+                                if(!is_null($filescdm)){
+                                    //CDR
+                                    foreach($filescdm as $file){
+                                        //
+                                        $contadorArchivos = Archivo::count();
+
+                                        /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
+                                        $prefijocarperta =      $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
+                                        $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$iddocumento;
+                                        $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                                        $valor           =      $this->versicarpetanoexiste($rutafile);
+                                        $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
+                                        copy($file->getRealPath(),$rutacompleta);
+                                        $path            =      $rutacompleta;
+                                        $nombreoriginal             =   $file->getClientOriginalName();
+                                        $info                       =   new SplFileInfo($nombreoriginal);
+                                        $extension                  =   $info->getExtension();
+                                        $dcontrol                       =   new Archivo;
+                                        $dcontrol->ID_DOCUMENTO         =   $iddocumento;
+                                        $dcontrol->DOCUMENTO_ITEM       =   $item;
+
+                                        $dcontrol->TIPO_ARCHIVO         =   $itema->COD_CATEGORIA;
+                                        $dcontrol->NOMBRE_ARCHIVO       =   $nombrefilecdr;
+                                        $dcontrol->DESCRIPCION_ARCHIVO  =   $itema->NOM_CATEGORIA;
+                                        $dcontrol->URL_ARCHIVO          =   $path;
+                                        $dcontrol->SIZE                 =   filesize($file);
+                                        $dcontrol->EXTENSION            =   $extension;
+                                        $dcontrol->ACTIVO               =   1;
+                                        $dcontrol->FECHA_CREA           =   $this->fechaactual;
+                                        $dcontrol->USUARIO_CREA         =   Session::get('usuario')->id;
+                                        $dcontrol->save();
+                                    }
                                 }
                             }
                         }
@@ -1729,7 +1775,18 @@ class GestionLiquidacionGastosController extends Controller
             $valor_nuevo                =   $valor;
             $valor                      =   '0'; 
         }
-
+        $trabajador                     =   DB::table('STD.TRABAJADOR')
+                                            ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                                            ->first();
+        $dni                            =   '';
+        if(count($trabajador)>0){
+            $dni                        =   $trabajador->NRO_DOCUMENTO;
+        }
+        $trabajadorespla                =   DB::table('WEB.platrabajadores')
+                                            ->where('situacion_id', 'PRMAECEN000000000002')
+                                            ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+                                            ->where('dni', $dni)
+                                            ->first();
         if($valor=='0'){
 
             $active                     =   "documentos";
@@ -1747,11 +1804,20 @@ class GestionLiquidacionGastosController extends Controller
             $combo_item                 =   array();
             $gasto_id                   =   "";
             $combo_gasto                =   $this->lg_combo_gasto("Seleccione Gasto");
+
+            $centrocosto                =   DB::table('CON.CENTRO_COSTO')
+                                            ->where('COD_ESTADO', 1)
+                                            ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
+                                            ->where('TXT_REFERENCIA_PLANILLA', $trabajadorespla->cadarea)
+                                            ->where('IND_MOVIMIENTO', 1)->first();
             $costo_id                   =   "";
-            $combo_costo                =   $this->lg_combo_costo("Seleccione Costo");
+            if(count($centrocosto)>0){
+                $costo_id                   =   $centrocosto->COD_CENTRO_COSTO;
+            }
+            $combo_costo                =   $this->lg_combo_costo_xtrabajador("Seleccione Costo",$trabajadorespla->cadarea);
             $tdetliquidacionitem        =   array();
             $tdetdocliquidacionitem     =   array();
-            $archivos     =   array();
+            $archivos                   =   array();
 
             if($valor_nuevo=='-1'){
                 $active                     =   "registro";   
@@ -1764,8 +1830,6 @@ class GestionLiquidacionGastosController extends Controller
             $active                     =   "registro";
             $tdetliquidacionitem        =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ITEM','=',$valor)->first();
             $tdetdocliquidacionitem     =   LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ITEM','=',$valor)->get();
-
-
 
             $tipodoc_id                 =   $tdetliquidacionitem->COD_TIPODOCUMENTO;
 
@@ -1784,8 +1848,10 @@ class GestionLiquidacionGastosController extends Controller
             $combo_item                 =   $this->lg_combo_item("Seleccione Item",$tdetliquidacionitem->COD_FLUJO);
             $gasto_id                   =   $tdetliquidacionitem->COD_GASTO;
             $combo_gasto                =   $this->lg_combo_gasto("Seleccione Gasto");
+
+
             $costo_id                   =   $tdetliquidacionitem->COD_COSTO;
-            $combo_costo                =   $this->lg_combo_costo("Seleccione Costo");
+            $combo_costo                =   $this->lg_combo_costo_xtrabajador("Seleccione Costo",$trabajadorespla->cadarea);
             $ajax                       =   true;
             $archivos                   =   Archivo::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->where('DOCUMENTO_ITEM','=',$valor)->get();
 
@@ -1797,6 +1863,8 @@ class GestionLiquidacionGastosController extends Controller
         $autoriza_id                    =   '';
         $combo_autoriza                 =   $this->gn_combo_usuarios();
         $array_detalle_producto         =   array();
+
+
 
 
         return View::make('liquidaciongasto.modificarliquidaciongastos',

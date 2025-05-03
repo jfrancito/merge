@@ -2,6 +2,64 @@
 $(document).ready(function(){
     var carpeta = $("#carpeta").val();
 
+    $(".liquidaciongasto").on('click','.mdisel', function(e) {
+
+        var _token                  =   $('#token').val();
+        var idopcion                =   $('#idopcion').val();
+        const documento_planilla    =   $(this).attr('data_documento_planilla'); // Obtener el id del checkbox
+        const link                  =   '/ajax-select-documento-planilla';
+        debugger;
+        data                        =   {
+                                            _token                  : _token,
+                                            documento_planilla      : documento_planilla
+                                        };
+        abrircargando();
+        $.ajax({
+            type    :   "POST",
+            url     :   carpeta+link,
+            data    :   data,
+            success: function (data) {
+                cerrarcargando();
+                $('#modal-detalle-requerimiento').niftyModal('hide');
+
+                $('#serie').val(data.SERIE);
+                $('#numero').val(data.NUMERO);
+                $('#fecha_emision').val(data.FECHA_EMI);
+                $('#totaldetalle').val(data.TOTAL);
+                $('#empresa_id').append(
+                    $('<option>', {
+                        value: data.EMPRESA,
+                        text: data.EMPRESA
+                    })
+                ).val(data.EMPRESA);
+                $('#cuenta_id').append(
+                    $('<option>', {
+                        value: data.COD_CUENTA,
+                        text: data.TXT_CUENTA
+                    })
+                ).val(data.COD_CUENTA);
+                $('#subcuenta_id').append(
+                    $('<option>', {
+                        value: data.COD_SUBCUENTA,
+                        text: data.TXT_SUBCUENTA
+                    })
+                ).val(data.COD_SUBCUENTA);
+
+                $('#cod_planila').val(data.COD_PLANILLA);
+                $('#rutacompleta').val(data.rutacompleta);
+                $('#nombrearchivo').val(data.nombrearchivo);
+
+            },
+            error: function (data) {
+                cerrarcargando();
+                error500(data);
+            }
+        });
+
+    });
+
+
+
     $(".liquidaciongasto").on('click','.buscardocumento', function() {
 
         event.preventDefault();
@@ -85,62 +143,6 @@ $(document).ready(function(){
 
 
 
-    $(".liquidaciongasto").on('click','.mdisel', function(e) {
-
-        var _token                  =   $('#token').val();
-        var idopcion                =   $('#idopcion').val();
-        const documento_planilla    =   $(this).attr('data_documento_planilla'); // Obtener el id del checkbox
-        const link                  =   '/ajax-select-documento-planilla';
-
-        data                        =   {
-                                            _token                  : _token,
-                                            documento_planilla      : documento_planilla
-                                        };
-        abrircargando();
-        $.ajax({
-            type    :   "POST",
-            url     :   carpeta+link,
-            data    :   data,
-            success: function (data) {
-                cerrarcargando();
-                $('#modal-detalle-requerimiento').niftyModal('hide');
-                $('#serie').val(data.SERIE);
-                $('#numero').val(data.NUMERO);
-                $('#fecha_emision').val(data.FECHA_EMI);
-                $('#totaldetalle').val(data.TOTAL);
-
-                $('#empresa_id').append(
-                    $('<option>', {
-                        value: data.EMPRESA,
-                        text: data.EMPRESA
-                    })
-                ).val(data.EMPRESA);
-
-                $('#cuenta_id').append(
-                    $('<option>', {
-                        value: data.COD_CUENTA,
-                        text: data.TXT_CUENTA
-                    })
-                ).val(data.COD_CUENTA);
-
-                $('#subcuenta_id').append(
-                    $('<option>', {
-                        value: data.COD_SUBCUENTA,
-                        text: data.TXT_SUBCUENTA
-                    })
-                ).val(data.COD_SUBCUENTA);
-                $('#cod_planila').val(data.COD_PLANILLA);
-
-
-
-            },
-            error: function (data) {
-                cerrarcargando();
-                error500(data);
-            }
-        });
-
-    });
 
 
     $(".liquidaciongasto").on('change','#tipodoc_id', function(e) {
@@ -162,8 +164,9 @@ $(document).ready(function(){
             $('.sectorplanilla').show();
             $('.sectorxml').hide();
 
-            $('.sectorxmlmodal').show();
-            $('.DCC0000000000036').show();
+            //$('.sectorxmlmodal').show();
+            //$('.DCC0000000000036').show();
+
         }else{
                 if(tipodoc_id == 'TDO0000000000001'){
                     $('#serie, #numero, #fecha_emision').prop('readonly', true);
@@ -380,6 +383,7 @@ $(document).ready(function(){
                     alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
                 }
 
+
             }
             let detalleArray = [];
             $('#tdxml tbody tr').each(function(index) {
@@ -399,9 +403,11 @@ $(document).ready(function(){
             $('#array_detalle_producto').val(JSON.stringify(detalleArray));
         }else{
 
-            let comprobante = $('#file-DCC0000000000036')[0].files.length > 0;
-            if (!comprobante) {
-                alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
+            if(tipodoc_id != 'TDO0000000000070'){
+                let comprobante = $('#file-DCC0000000000036')[0].files.length > 0;
+                if (!comprobante) {
+                    alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
+                }
             }
             
         }

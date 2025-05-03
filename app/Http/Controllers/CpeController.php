@@ -94,9 +94,9 @@ class CpeController extends Controller {
         $partes 		= 	explode(" - ", $cadena);
         $nombre 		= 	'';
         if (count($partes) > 1) {
-            $nombre = trim($partes[1]);
+            $nombre = trim($partes[0]);
         }
-        $empresa_trab   =   STDEmpresa::where('NOM_EMPR','=',$nombre)->first();
+        $empresa_trab   =   STDEmpresa::where('NRO_DOCUMENTO','=',$nombre)->first();
 
         $periodo 		= 	CONPeriodo::where('COD_PERIODO', '=', $periodo_id)->first();
 		$fetoken 		=	FeToken::where('COD_EMPR','=',Session::get('empresas')->COD_EMPR)->where('TIPO','=','SIRE')->first();
@@ -106,7 +106,6 @@ class CpeController extends Controller {
 
 		$respuetaxml 	=	$this->buscar_archivo_sunat_compra($urlxml,$fetoken);
 
-		//dd($respuetaxml);
 
 		$totalregistroa =  	$respuetaxml['paginacion']['totalRegistros'];
 		$cantidadrecorrer = (int)ceil($totalregistroa / 20);

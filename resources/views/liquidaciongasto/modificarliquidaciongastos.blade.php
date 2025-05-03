@@ -30,8 +30,9 @@
         </div>
       </div>
     </div>
+      @include('planillamovilidad.modal.mregistrorequerimiento')
   </div>
-  @include('planillamovilidad.modal.mregistrorequerimiento')
+
 </div>  
 @stop
 @section('script')
