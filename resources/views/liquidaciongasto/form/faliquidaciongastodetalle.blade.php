@@ -23,6 +23,8 @@
               data_iddocumento="{{$liquidaciongastos->ID_DOCUMENTO}}"
               >BUSCAR PLANILLA</button>
               <input type="hidden" name="cod_planila" id ='cod_planila'>
+              <input type="hidden" name="rutacompleta" id ='rutacompleta'>
+              <input type="hidden" name="nombrearchivo" id ='nombrearchivo'>
           </div>
         </div>
     </div>
