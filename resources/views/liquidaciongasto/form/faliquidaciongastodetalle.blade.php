@@ -31,7 +31,7 @@
 
     <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 sectorxml ocultar">
       <div class="form-group">
-          <label class="col-sm-12 control-label labelleft negrita" style="text-align: left;">SUBIR XML : </label>
+          <label class="col-sm-12 control-label labelleft negrita" style="text-align: left;">(01) SUBIR XML : </label>
           <div class="col-sm-12 abajocaja" >
                 <div class="col-xs-6 col-sm-6 col-md-6 col-lg-10 negrita" align="left">
                     <input name="inputxml" id='inputxml' class="form-control inputxml" type="file" accept="text/xml" />
@@ -43,6 +43,33 @@
           </div>
         </div>
     </div>
+
+    <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 sectorxml ocultar">
+      <div class="form-group">
+          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+            <label><b>(02) BUSCAR SUNAT :</b>  </label>
+            <button  type="button" style="height:48px;" class="btn btn-space btn-success btn-md btnsunat"  title="Cargar Datos">BUSCAR SUNAT</button>
+          </div>
+          <input type="hidden" name="RUTAXML" id="RUTAXML" >
+          <input type="hidden" name="RUTAPDF" id="RUTAPDF" >
+          <input type="hidden" name="RUTACDR" id="RUTACDR" >
+
+          <input type="hidden" name="NOMBREXML" id="NOMBREXML" >
+          <input type="hidden" name="NOMBREPDF" id="NOMBREPDF" >
+          <input type="hidden" name="NOMBRECDR" id="NOMBRECDR" >
+
+
+          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+            <label><b>XML:</b> <span class='exml'></span></label><br>
+            <label><b>PDF:</b> <span class='epdf'></span></label><br>
+            <label><b>CDR:</b> <span class='ecdr'></span></label>
+            <button  type="button" class="btn btn-space btn-primary btn-md btncargarsunat">CARGAR DOCUMENTOS</button>
+          </div>
+
+
+      </div>
+    </div>
+
 
     <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 sectorxml ocultar">
       <div class="form-group">
@@ -63,14 +90,14 @@
               <input type="hidden" name="EMPRESAID" id="EMPRESAID" >
               <input type="hidden" name="NOMBREFILE" id="NOMBREFILE" >
               <input type="hidden" name="RUTACOMPLETA" id="RUTACOMPLETA" >
-
               <input type="hidden" name="array_detalle_producto" id='array_detalle_producto' value=''>
-
-
-
           </div>
         </div>
     </div>
+
+
+
+
 
   </div>
 
@@ -183,40 +210,6 @@
 
   </div>
   
-<!--   <div class="row" style="margin-top:10px;">
-    <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
-        <div class="form-group">
-          <label class="col-sm-12 control-label labelleft negrita" style="text-align: left;">FLUJO :</label>
-          <div class="col-sm-12 abajocaja" >
-            {!! Form::select( 'flujo_id', $combo_flujo, array($flujo_id),
-                              [
-                                'class'       => 'select2 form-control control input-sm' ,
-                                'id'          => 'flujo_id',
-                                'required'    => '',
-                              ]) !!}
-          </div>
-        </div>
-    </div>
-    <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 ajax_combo_item">
-        @include('general.ajax.comboitem')
-    </div>
-    <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
-        <div class="form-group">
-          <label class="col-sm-12 control-label labelleft negrita" style="text-align: left;">GASTO :</label>
-          <div class="col-sm-12 abajocaja" >
-            {!! Form::select( 'gasto_id', $combo_gasto, array($gasto_id),
-                              [
-                                'class'       => 'select2 form-control control input-sm' ,
-                                'id'          => 'gasto_id',
-                                'required'    => '',
-                              ]) !!}
-          </div>
-        </div>
-    </div> -->
-
-
-
-
     <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
         <div class="form-group">
           <label class="col-sm-12 control-label labelleft negrita" style="text-align: left;">COSTO :</label>

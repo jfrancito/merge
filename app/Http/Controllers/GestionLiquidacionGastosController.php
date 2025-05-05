@@ -21,7 +21,7 @@ use App\Modelos\CMPContratoCultivo;
 use App\Modelos\ALMCentro;
 use App\Modelos\Estado;
 use App\Modelos\CMPDocAsociarCompra;
-
+use App\Modelos\FeToken;
 
 
 use App\Modelos\LqgLiquidacionGasto;
@@ -56,6 +56,83 @@ class GestionLiquidacionGastosController extends Controller
     use PlanillaTraits;
     use LiquidacionGastoTraits;
     use ComprobanteTraits;
+
+    public function actionBuscarCpeSunatLg(Request $request)
+    {
+            $ruc                        =   $request['ruc'];
+            $td                         =   $request['td'];
+            $serie                      =   $request['serie'];
+            $correlativo                =   $request['correlativo'];
+            $ID_DOCUMENTO               =   $request['ID_DOCUMENTO'];
+
+            $fetoken                    =   FeToken::where('COD_EMPR','=',Session::get('empresas')->COD_EMPR)->where('TIPO','=','COMPROBANTE_PAGO')->first();
+            //buscar xml
+            $primeraLetra               =   substr($serie, 0, 1);
+
+            $prefijocarperta            =   $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
+            $rutafile                   =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ID_DOCUMENTO;
+            $valor                      =   $this->versicarpetanoexiste($rutafile);
+
+            $ruta_xml                   =   "";
+            $ruta_pdf                   =   "";
+            $ruta_cdr                   =   "";
+            $nombre_xml                 =   "";
+            $nombre_pdf                 =   "";
+            $nombre_cdr                 =   "";
+
+            $urlxml                     =   'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/02';
+            $respuetaxml                =   $this->buscar_archivo_sunat_lg($urlxml,$fetoken,$this->pathFiles,$prefijocarperta,$ID_DOCUMENTO);
+            $urlxml                     =   'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/01';
+            $respuetapdf                =   $this->buscar_archivo_sunat_lg($urlxml,$fetoken,$this->pathFiles,$prefijocarperta,$ID_DOCUMENTO);
+            if($primeraLetra == 'F'){
+                $urlxml                     =   'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/03';
+                $respuetacdr                =   $this->buscar_archivo_sunat_lg($urlxml,$fetoken,$this->pathFiles,$prefijocarperta,$ID_DOCUMENTO);
+                if($respuetacdr['cod_error']==0){
+                    $ruta_cdr = $respuetacdr['ruta_completa'];
+                    $nombre_cdr = $respuetacdr['nombre_archivo'];
+                }
+            }
+            if($respuetaxml['cod_error']==0){
+                $ruta_xml = $respuetaxml['ruta_completa'];
+                $nombre_xml = $respuetaxml['nombre_archivo'];
+            }
+            if($respuetapdf['cod_error']==0){
+                $ruta_pdf = $respuetapdf['ruta_completa'];
+                $nombre_pdf = $respuetapdf['nombre_archivo'];
+            }
+
+            return response()->json([
+                'ruta_cdr'      => $ruta_cdr,
+                'ruta_xml'      => $ruta_xml,
+                'ruta_pdf'      => $ruta_pdf,
+                'nombre_xml'    => $nombre_xml,
+                'nombre_pdf'    => $nombre_pdf,
+                'nombre_cdr'    => $nombre_cdr,
+
+            ]);
+
+    }
+
+
+
+    public function actionModalBuscarFacturaSunat(Request $request) {
+
+        $ID_DOCUMENTO           =       $request['ID_DOCUMENTO'];
+        $combotd                =       array('01' => 'FACTURA');
+        $idopcion               =       $request['idopcion'];
+        $funcion                =       $this;
+
+        return View::make('liquidaciongasto/modal/ajax/mbuscardocumentosunat',
+                         [
+                            'ID_DOCUMENTO'          =>  $ID_DOCUMENTO,
+                            'idopcion'              =>  $idopcion,
+                            'combotd'               =>  $combotd,
+                            'funcion'               =>  $funcion,
+                            'ajax'                  =>  true,
+                         ]);
+    }
+
+
 
 
     public function actionDetallaComprobanteLGValidado($idopcion, $iddocumento,Request $request)
@@ -461,7 +538,180 @@ class GestionLiquidacionGastosController extends Controller
 
     }
 
+    public function actionAjaxLeerXmlLGSunat(Request $request) {
 
+        $file            =      $request->file('inputxml');
+        $ID_DOCUMENTO    =      $request['ID_DOCUMENTO'];
+        $RUTAXML         =      $request['RUTAXML'];
+        $RUTAPDF         =      $request['RUTAPDF'];
+        $RUTACDR         =      $request['RUTACDR'];
+        $exml            =      $request['exml'];
+        $epdf            =      $request['epdf'];
+        $ecdr            =      $request['ecdr'];
+
+        $path            =      $RUTAXML;
+
+        $prefijocarperta =      $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
+
+        $parser          =      new InvoiceParser();
+        $xml             =      file_get_contents($path);
+        $factura         =      $parser->parse($xml);
+
+        if($factura->getClient()->getnumDoc()!= Session::get('empresas')->NRO_DOCUMENTO){
+            return response()->json(
+                [
+                    'mensaje' => 'El xml no corresponde a la empresa '.Session::get('empresas')->NRO_DOCUMENTO,
+                    'error' => '1'
+                ]);
+        }
+
+        $COD_EMPRESA            =   '';
+        $TXT_EMPRESA            =   '';
+        $SUCCESS                =   '';
+        $MESSAGE                =   '';
+        $ESTADOCP               =   '';
+        $NESTADOCP              =   '';
+        $ESTADORUC              =   '';
+        $NESTADORUC             =   '';
+        $CONDDOMIRUC            =   '';
+        $NCONDDOMIRUC           =   '';
+        $CODIGO_CDR             =   '';
+        $RESPUESTA_CDR          =   '';    
+
+        $empresa_trab           =   STDEmpresa::where('NRO_DOCUMENTO','=',$factura->getcompany()->getruc())->first();
+        if(count($empresa_trab)>0){
+            $COD_EMPRESA            =   $empresa_trab->COD_EMPR;
+            $TXT_EMPRESA            =   $factura->getcompany()->getruc().' - '.$empresa_trab->NOM_EMPR;    
+        }
+        $NUMERO                 =   (int)$factura->getcorrelativo()+1;
+        $CORRELATIVO            =   str_pad($NUMERO, '10', "0", STR_PAD_LEFT);
+
+
+        $token = '';
+        if($prefijocarperta =='II'){
+            $token           =      $this->generartoken_ii();
+        }else{
+            $token           =      $this->generartoken_is();
+        }
+
+
+        $fechaemision        =      date_format(date_create($factura->getfechaEmision()->format('Ymd')), 'd/m/Y');
+        $rvalidar            =      $this->validar_xml( $token,
+                                        Session::get('empresas')->NRO_DOCUMENTO,
+                                        $factura->getcompany()->getruc(),
+                                        $factura->gettipoDoc(),
+                                        $factura->getserie(),
+                                        $factura->getcorrelativo(),
+                                        $fechaemision,
+                                        $factura->getmtoImpVenta());
+
+        $arvalidar = json_decode($rvalidar, true);
+        if(isset($arvalidar['success'])){
+            if($arvalidar['success']){
+                $datares              = $arvalidar['data'];
+                if (!isset($datares['estadoCp'])){
+                    return response()->json(
+                        [
+                            'mensaje' => 'Hay fallas en sunat para consultar el XML',
+                            'error' => '1'
+                        ]);
+                }
+                $estadoCp             = $datares['estadoCp'];
+                $tablaestacp          = Estado::where('tipo','=','estadoCp')->where('codigo','=',$estadoCp)->first();
+                $estadoRuc            = '';
+                $txtestadoRuc         = '';
+                $estadoDomiRuc        = '';
+                $txtestadoDomiRuc     = '';
+                if(isset($datares['estadoRuc'])){
+                    $tablaestaruc          = Estado::where('tipo','=','estadoRuc')->where('codigo','=',$datares['estadoRuc'])->first();
+                    $estadoRuc             = $tablaestaruc->codigo;
+                    $txtestadoRuc          = $tablaestaruc->nombre;
+                }
+                if(isset($datares['condDomiRuc'])){
+                    $tablaestaDomiRuc       = Estado::where('tipo','=','condDomiRuc')->where('codigo','=',$datares['condDomiRuc'])->first();
+                    $estadoDomiRuc          = $tablaestaDomiRuc->codigo;
+                    $txtestadoDomiRuc       = $tablaestaDomiRuc->nombre;
+                }
+
+                $SUCCESS                =   $arvalidar['success'];
+                $MESSAGE                =   $arvalidar['message'];
+                $ESTADOCP               =   $tablaestacp->codigo;
+                $NESTADOCP              =   $tablaestacp->nombre;
+                $ESTADORUC              =   $estadoRuc;
+                $NESTADORUC             =   $txtestadoRuc;
+                $CONDDOMIRUC            =   $estadoDomiRuc;
+                $NCONDDOMIRUC           =   $txtestadoDomiRuc;
+
+            }else{
+
+                $SUCCESS                =   $arvalidar['success'];
+                $MESSAGE                =   $arvalidar['message'];
+            }
+        }
+
+        $DETALLES = [];
+        foreach ($factura->getdetails() as $indexdet => $itemdet) {
+            $producto = str_replace("<![CDATA[","",$itemdet->getdescripcion());
+            $producto = str_replace("]]>","",$producto);
+            $producto = preg_replace('/[^A-Za-z0-9\s]/', '', $producto);
+            $linea = str_pad($indexdet + 1, 3, "0", STR_PAD_LEFT);
+            $ind_igv = 'NO';
+            if((float) $itemdet->getigv()>0){
+                $ind_igv = 'SI';
+            }
+
+
+            $DETALLES[] = [
+                'LINEID'             => $linea,
+                'CODPROD'            => $itemdet->getcodProducto(),
+                'PRODUCTO'           => $producto,
+                'UND_PROD'           => $itemdet->getunidad(),
+                'CANTIDAD'           => (float) $itemdet->getcantidad(),
+                'PRECIO_UNIT'        => (float) $itemdet->getmtoValorUnitario(),
+                'VAL_IGV_ORIG'       => $ind_igv,
+                'VAL_IGV_SOL'        => (float) $itemdet->getigv(),
+                'VAL_SUBTOTAL_ORIG'  => (float) $itemdet->getmtoValorVenta(),
+                'VAL_SUBTOTAL_SOL'   => (float) $itemdet->getmtoValorVenta(),
+                'VAL_VENTA_ORIG'     => (float) $itemdet->getigv() + (float) $itemdet->getmtoValorVenta(),
+                'VAL_VENTA_SOL'      => (float) $itemdet->getigv() + (float) $itemdet->getmtoValorVenta(),
+                'PRECIO_ORIG'        => (float) $itemdet->getmtoPrecioUnitario(),
+            ];
+        }
+
+
+        // Ejemplo: devolver una parte del XML
+        return response()->json([
+            'mensaje' => 'Archivo recibido correctamente',
+            'error' => '0',
+            'RUC_PROVEEDOR' => $factura->getcompany()->getruc(),
+            'RZ_PROVEEDOR' => $factura->getcompany()->getrazonSocial(),
+            'COD_EMPRESA' => $COD_EMPRESA,
+            'TXT_EMPRESA' => $TXT_EMPRESA,
+            'SERIE' => $factura->getserie(),
+            'NUMERO' => $CORRELATIVO,
+            'FEC_VENTA' => $factura->getfechaEmision()->format('d-m-Y'),
+            'TOTAL_VENTA_ORIG' => $factura->getmtoImpVenta(),
+            'SUCCESS' => $SUCCESS,
+            'MESSAGE' => $MESSAGE,
+            'ESTADOCP' => $ESTADOCP,
+            'NESTADOCP' => $NESTADOCP,
+            'ESTADORUC' => $ESTADORUC,
+            'NESTADORUC' => $NESTADORUC,
+            'CONDDOMIRUC' => $CONDDOMIRUC,
+            'NCONDDOMIRUC' => $NCONDDOMIRUC,
+            'NOMBREFILE' => $exml,
+            'RUTACOMPLETA' => $RUTAXML,
+            'DETALLE' => $DETALLES,
+            'RUTAXML' => $RUTAXML,
+            'RUTAPDF' => $RUTAPDF,
+            'RUTACDR' => $RUTACDR,
+            'exml' => $exml,
+            'epdf' => $epdf,
+            'ecdr' => $ecdr
+        ]);
+
+
+    }
 
 
     public function actionModalSelectDocumentoPlanillaLG(Request $request) {
@@ -1247,6 +1497,42 @@ class GestionLiquidacionGastosController extends Controller
                     $NOMBREFILE                         =   '';
                     $array_detalle_producto             =   '';
 
+
+                    $empresa_id_b                       =   $request['empresa_id'].$request['EMPRESAID'];
+                    $cadena                             =   $empresa_id_b;
+                    $partes                             =   explode(" - ", $cadena);
+                    $ruc_b                              =   '';
+                    if (count($partes) > 1) {
+                        $ruc_b                          =   trim($partes[0]);
+                    }
+                    //VALIDAR QUE DOCUMENTO EMITE EL PROVEEDOR
+                    $urlxml                             =   'https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/jcrS00Alias?accion=consPorRuc&razSoc=null&nroRuc='.$ruc_b.'&nrodoc=null&token=go6mleec9llv1vd4htmikni2ffds38hu9u5ohoez6r5mh53poabe&contexto=ti-it&modo=1&rbtnTipo=1&search1='.$ruc_b.'&tipdoc=1&search2=null&search3=null&codigo=null';
+                    $html                           =   $this->buscar_archivo_sunat_td($urlxml);
+
+                    // 2) Instancia y carga el HTML (silenciamos warnings)
+                    $dom = new \DOMDocument;
+                    @$dom->loadHTML($html, LIBXML_NOWARNING|LIBXML_NOERROR);
+
+                    // 3) Preparamos XPath para buscar los <td> dentro de la tabla tblResultado
+                    $xpath = new \DOMXPath($dom);
+                    $tds = $xpath->query("//table[contains(@class,'tblResultado')]//tbody//tr/td");
+
+                    // 4) Recorremos los nodos y extraemos el texto
+                    $comprobantes = [];
+                    foreach ($tds as $td) {
+                        $texto = trim($td->textContent);
+                        if ($texto !== '') {
+                            $comprobantes[] = $texto;
+                        }
+                    }
+                    $tieneFactura = in_array('FACTURA', $comprobantes);
+                    if($tipodoc_id != 'TDO0000000000001'){
+                        if($tieneFactura == 1){
+                            return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/-1')->with('errorbd','Este proveedor emite FACTURA');
+                        }
+                    }
+
+
                     //CUANDO ES PLANILLA DE MOVILIDAd
                     if(ltrim(rtrim($cod_planila))!=''){
 
@@ -1507,17 +1793,92 @@ class GestionLiquidacionGastosController extends Controller
                         $filescdr           =   $request['DCC0000000000004'];
                         $seriepl            =   substr($serie, 0, 1);
 
-                        if($seriepl=='E'){
-                            $tarchivos                      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                                ->whereIn('COD_CATEGORIA', ['DCC0000000000036'])->get();
+                        $RUTAXML            =   $request['RUTAXML'];
+                        $RUTAPDF            =   $request['RUTAPDF'];
+                        $RUTACDR            =   $request['RUTACDR'];
+                        $NOMBREXML          =   $request['NOMBREXML'];
+                        $NOMBREPDF          =   $request['NOMBREPDF'];
+                        $NOMBRECDR          =   $request['NOMBRECDR'];
 
+                        $extractedFile = '';
+
+                        if($RUTAXML==''){
+                            if($seriepl=='E'){
+                                $tarchivos                      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000036'])->get();
+                            }else{
+                                $tarchivos                      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000036','DCC0000000000004'])->get();
+                            }
                         }else{
 
-                            $tarchivos                      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                                ->whereIn('COD_CATEGORIA', ['DCC0000000000036','DCC0000000000004'])->get();
+                            if($seriepl=='E'){
+                                $array_categorias = array();
+                                if($RUTAPDF==''){
+                                    $array_categorias[] = 'DCC0000000000036';
+                                }else{
+                                    $dcontrol                       =   new Archivo;
+                                    $dcontrol->ID_DOCUMENTO         =   $iddocumento;
+                                    $dcontrol->DOCUMENTO_ITEM       =   $item;
+                                    $dcontrol->TIPO_ARCHIVO         =   'DCC0000000000036';
+                                    $dcontrol->NOMBRE_ARCHIVO       =   $NOMBREPDF;
+                                    $dcontrol->DESCRIPCION_ARCHIVO  =   'COMPROBANTE ELECTRONICO';
+                                    $dcontrol->URL_ARCHIVO          =   $RUTAPDF;
+                                    $dcontrol->SIZE                 =   100;
+                                    $dcontrol->EXTENSION            =   'pdf';
+                                    $dcontrol->ACTIVO               =   1;
+                                    $dcontrol->FECHA_CREA           =   $this->fechaactual;
+                                    $dcontrol->USUARIO_CREA         =   Session::get('usuario')->id;
+                                    $dcontrol->save();
+                                }
+                                $tarchivos                      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                                                    ->whereIn('COD_CATEGORIA', $array_categorias)->get();
+                            }else{
+                                $array_categorias = array();
+                                if($RUTAPDF==''){
+                                    $array_categorias[] = 'DCC0000000000036';
+                                }else{
+                                    $dcontrol                       =   new Archivo;
+                                    $dcontrol->ID_DOCUMENTO         =   $iddocumento;
+                                    $dcontrol->DOCUMENTO_ITEM       =   $item;
+                                    $dcontrol->TIPO_ARCHIVO         =   'DCC0000000000036';
+                                    $dcontrol->NOMBRE_ARCHIVO       =   $NOMBREPDF;
+                                    $dcontrol->DESCRIPCION_ARCHIVO  =   'COMPROBANTE ELECTRONICO';
+                                    $dcontrol->URL_ARCHIVO          =   $RUTAPDF;
+                                    $dcontrol->SIZE                 =   100;
+                                    $dcontrol->EXTENSION            =   'pdf';
+                                    $dcontrol->ACTIVO               =   1;
+                                    $dcontrol->FECHA_CREA           =   $this->fechaactual;
+                                    $dcontrol->USUARIO_CREA         =   Session::get('usuario')->id;
+                                    $dcontrol->save();
+                                }
+                                if($RUTACDR==''){
+                                    $array_categorias[] = 'DCC0000000000004';
+                                }else{
 
+                                 $dcontrol                       =   new Archivo;
+                                    $dcontrol->ID_DOCUMENTO         =   $iddocumento;
+                                    $dcontrol->DOCUMENTO_ITEM       =   $item;
+                                    $dcontrol->TIPO_ARCHIVO         =   'DCC0000000000004';
+                                    $dcontrol->NOMBRE_ARCHIVO       =   $NOMBRECDR;
+                                    $dcontrol->DESCRIPCION_ARCHIVO  =   'CDR';
+                                    $dcontrol->URL_ARCHIVO          =   $RUTACDR;
+                                    $dcontrol->SIZE                 =   100;
+                                    $dcontrol->EXTENSION            =   'xml';
+                                    $dcontrol->ACTIVO               =   1;
+                                    $dcontrol->FECHA_CREA           =   $this->fechaactual;
+                                    $dcontrol->USUARIO_CREA         =   Session::get('usuario')->id;
+                                    $dcontrol->save();
+                                    $extractedFile = $RUTACDR;
+
+                                }
+                                $tarchivos                      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                                                    ->whereIn('COD_CATEGORIA', $array_categorias)->get();
+                            }
                         }
-                        $extractedFile = '';
+
+
+
                         $sw = 0;
                         foreach($tarchivos as $index => $itema){
                             $filescdm          =   $request[$itema->COD_CATEGORIA];
@@ -1560,10 +1921,14 @@ class GestionLiquidacionGastosController extends Controller
                                 }
                             }
                         }
+
+
                         //CDR LECTURA
                         $respuestacdr = '';
                         $codigocdr = '';
+                        $factura_cdr_id='';
 
+                        //dd($extractedFile);
 
                         if (file_exists($extractedFile)) {
                             //cbc
