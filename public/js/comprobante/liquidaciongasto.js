@@ -2,6 +2,219 @@
 $(document).ready(function(){
     var carpeta = $("#carpeta").val();
 
+
+    $(".liquidaciongasto").on('click','.btncargarsunat', function(e) {
+        e.preventDefault(); // Prevenir recarga del formulario
+
+        var RUTAXML                 =   $('#RUTAXML').val();
+        var RUTAPDF                 =   $('#RUTAPDF').val();
+        var RUTACDR                 =   $('#RUTACDR').val();
+        var exml                    =   $('.exml').html();
+        var epdf                    =   $('.epdf').html();
+        var ecdr                    =   $('.ecdr').html();
+
+        var _token                  =   $('#token').val();
+        var ID_DOCUMENTO            =   $('#ID_DOCUMENTO').val();
+        if(RUTAXML ==''){ alerterrorajax("No existe XML para Cargar."); return false;}
+
+        data                                         =   {
+                                                                _token                  : _token,
+                                                                ID_DOCUMENTO            : ID_DOCUMENTO,
+                                                                RUTAXML                 : RUTAXML,
+                                                                RUTAPDF                 : RUTAPDF,
+                                                                RUTACDR                 : RUTACDR,
+                                                                exml                    : exml,
+                                                                epdf                    : epdf,
+                                                                ecdr                    : ecdr,
+
+                                                         };   
+
+        const link          =   '/ajax-leer-xml-lg-sunat';
+        abrircargando();
+        $.ajax({
+            type    :   "POST",
+            url     :   carpeta+link,
+            data    :   data,
+            success: function (data) {
+                cerrarcargando();
+                debugger;
+                if(data.error == 0){
+                    $('#serie').val(data.SERIE);
+                    $('#numero').val(data.NUMERO);
+                    $('#fecha_emision').val(data.FEC_VENTA);
+                    $('#totaldetalle').val(data.TOTAL_VENTA_ORIG);
+
+                    $('.MESSAGE').html(data.MESSAGE);
+                    $('.NESTADOCP').html(data.NESTADOCP);
+                    $('.NESTADORUC').html(data.NESTADORUC);
+                    $('.NCONDDOMIRUC').html(data.NCONDDOMIRUC);
+
+                    $('#SUCCESS').val(data.SUCCESS);
+                    $('#MESSAGE').val(data.MESSAGE);
+                    $('#ESTADOCP').val(data.ESTADOCP);
+                    $('#NESTADOCP').val(data.NESTADOCP);
+                    $('#ESTADORUC').val(data.ESTADORUC);
+                    $('#NESTADORUC').val(data.NESTADORUC);
+                    $('#CONDDOMIRUC').val(data.CONDDOMIRUC);
+                    $('#NCONDDOMIRUC').val(data.NCONDDOMIRUC);
+                    $('#NOMBREFILE').val(data.NOMBREFILE);
+                    $('#RUTACOMPLETA').val(data.RUTACOMPLETA);
+                    $('#empresa_id').append(
+                        $('<option>', {
+                            value: data.TXT_EMPRESA,
+                            text: data.TXT_EMPRESA
+                        })
+                    ).val(data.TXT_EMPRESA);
+                    $('#empresa_id').val(data.TXT_EMPRESA).trigger('change');
+                    $('#EMPRESAID').val(data.TXT_EMPRESA);
+                    //archivos
+                    $('.sectorxmlmodal').show();
+                    $('.DCC0000000000036').hide();
+                    $('.DCC0000000000004').hide();
+
+                    let valor = data.SERIE;
+                    let primeraLetraSerire = valor.charAt(0);   
+                    if(primeraLetraSerire=='E'){
+                        if (data.RUTAPDF){
+                            $('.DCC0000000000036').hide();
+                        }else{
+                            $('.DCC0000000000036').show();
+                        }
+                    }else{
+
+                       if (data.RUTAPDF){
+                            $('.DCC0000000000036').hide();
+                        }else{
+                            $('.DCC0000000000036').show();
+                        }
+                       if (data.RUTACDR){
+                            $('.DCC0000000000004').hide();
+                        }else{
+                            $('.DCC0000000000004').show();
+                        }
+                    }
+
+
+                    //DETALLE DEL PRODUCTO
+
+                    $('#tdxml tbody').empty(); // Limpia la tabla primero
+                    data.DETALLE.forEach(function(item, index) {
+                        const fila = `
+                          <tr>
+                            <td class="cell-detail d${index}" style="position: relative;" >
+                              <span style="display: block;"><b>PRODUCTO OSIRIS : </b> <dlabel class='TXT_PRODUCTO_OSIRIS'></dlabel></span>
+                              <span style="display: block;"><b>PRODUCTO XML : </b> <dlabel class='TXT_PRODUCTO_XML'>${item.PRODUCTO}</dlabel></span>
+                              <span style="display: block;"><b>CANTIDAD : </b> <dlabel class='CANTIDAD'>${item.CANTIDAD}</dlabel></span>
+                              <span style="display: block;"><b>PRECIO : </b> <dlabel class='PRECIO'>${item.PRECIO_UNIT}</dlabel></span>
+                              <span style="display: block;"><b>IND IGV : </b> <dlabel class='INDIGV'>${item.VAL_IGV_ORIG}</dlabel></span>
+                              <span style="display: block;"><b>SUBTOTAL : </b> <dlabel class='SUBTOTAL'>${item.VAL_SUBTOTAL_SOL}</dlabel></span>
+                              <span style="display: block;"><b>IGV : </b> <dlabel class='IGV'>${item.VAL_IGV_SOL}</dlabel></span>
+                              <span style="display: block;"><b>TOTAL : </b> <dlabel class='TOTAL'>${item.VAL_VENTA_SOL}</dlabel></span>
+                              <button type="button" data_item="${index}" data_producto="${item.PRODUCTO}" style="margin-top: 5px; float: right;" class="btn btn-rounded btn-space btn-success btn-sm relacionardetalledocumentolg">RELACIONAR PRODUCTO</button>
+                            </td>
+                          </tr>
+                        `;
+                        $('#tdxml tbody').append(fila);
+                    });
+
+
+                }else{
+                    alerterrorajax(data.mensaje);
+                }
+                console.log(data);
+            },
+            error: function (data) {
+                cerrarcargando();
+                error500(data);
+            }
+        });
+
+
+    });
+
+
+
+    $(".liquidaciongasto").on('click','.btn_buscar_cpe_lg', function() {
+
+        var _token                                   =   $('#token').val();
+        var ID_DOCUMENTO                             =   $('#ID_DOCUMENTO').val();
+        var idopcion                                 =   $('#idopcion').val();
+
+        var ruc                                      =   $('#ruc_sunat').val();
+        var td                                       =   $('#td').val();
+        var serie                                    =   $('#serie_sunat').val();
+        var correlativo                              =   $('#correlativo_sunat').val();
+        const link                                   =   '/buscar-de-cpe-sunat-lg';
+
+
+        if(ruc ==''){ alerterrorajax("Ingrese un ruc."); return false;}
+        if(td ==''){ alerterrorajax("Seleccione un tipo de documento."); return false;}
+        if(serie ==''){ alerterrorajax("Ingrese un serie."); return false;}
+        if(correlativo ==''){ alerterrorajax("Ingrese un correlativo."); return false;}
+
+        data                                         =   {
+                                                                _token                  : _token,
+                                                                ID_DOCUMENTO            : ID_DOCUMENTO,
+                                                                ruc                     : ruc,
+                                                                td                      : td,
+                                                                serie                   : serie,
+                                                                correlativo             : correlativo,
+                                                                idopcion                : idopcion
+                                                         };                                       
+        abrircargando();
+        $.ajax({
+            type    :   "POST",
+            url     :   carpeta+link,
+            data    :   data,
+            success: function (data) {
+                cerrarcargando();
+                debugger;
+                $('#modal-detalle-requerimiento').niftyModal('hide');
+                if (data.nombre_xml) {
+                    $('.exml').html(data.nombre_xml);
+                    $('#NOMBREXML').val(data.nombre_xml);
+                    $('#RUTAXML').val(data.ruta_xml);
+                }
+                if (data.nombre_pdf) {
+                    $('.epdf').html(data.nombre_pdf);
+                    $('#NOMBREPDF').val(data.nombre_pdf);
+                    $('#RUTAPDF').val(data.ruta_pdf);
+                }
+                if (data.nombre_cdr) {
+                    $('.ecdr').html(data.nombre_cdr);
+                    $('#NOMBRECDR').val(data.nombre_cdr);
+                    $('#RUTACDR').val(data.ruta_cdr);
+                }
+            },
+            error: function (data) {
+                cerrarcargando();
+                error500(data);
+            }
+        });
+
+    });
+
+
+    $(".liquidaciongasto").on('click','.btnsunat', function() {
+
+        var _token                                   =   $('#token').val();
+        var ID_DOCUMENTO                             =   $('#ID_DOCUMENTO').val();
+        var idopcion                                 =   $('#idopcion').val();
+
+        data                                         =   {
+                                                                _token                  : _token,
+                                                                ID_DOCUMENTO            : ID_DOCUMENTO,
+                                                                idopcion                : idopcion
+                                                         };
+                                        
+        ajax_modal(data,"/ajax-modal-buscar-factura-sunat",
+                  "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+
+    });
+
+
+
+
     $(".liquidaciongasto").on('click','.mdisel', function(e) {
 
         var _token                  =   $('#token').val();
@@ -232,6 +445,20 @@ $(document).ready(function(){
                 cerrarcargando();
                 debugger;
                 if(data.error == 0){
+
+                    $('#RUTAXML').val("");
+                    $('#RUTAPDF').val("");
+                    $('#RUTACDR').val("");
+                    $('.exml').html("");
+                    $('.epdf').html("");
+                    $('.ecdr').html("");
+                    $('#NOMBREXML').val("");
+                    $('#NOMBREPDF').val("");
+                    $('#NOMBRECDR').val("");
+
+
+
+
                     $('#serie').val(data.SERIE);
                     $('#numero').val(data.NUMERO);
                     $('#fecha_emision').val(data.FEC_VENTA);
@@ -346,6 +573,12 @@ $(document).ready(function(){
         event.preventDefault();
         var _token                  =   $('#token').val();
         var tipodoc_id              =   $('#tipodoc_id').val();
+
+        var RUTAXML                 =   $('#RUTAXML').val();
+        var RUTAPDF                 =   $('#RUTAPDF').val();
+        var RUTACDR                 =   $('#RUTACDR').val();
+
+
         var array_detalle_producto  =   $('#array_detalle_producto').val();
         abrircargando();
                 
@@ -370,19 +603,47 @@ $(document).ready(function(){
             let primeraLetraSerire = valor.charAt(0); 
             if(primeraLetraSerire=='E'){
                 let comprobante = $('#file-DCC0000000000036')[0].files.length > 0;
-                if (!comprobante) {
-                    alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
-                }
-            }else{
-                let xml = $('#file-DCC0000000000004')[0].files.length > 0;
-                if (!xml) {
-                    alerterrorajax("Debe subir el CDR en XML."); cerrarcargando(); return false;
-                }
-                let comprobante = $('#file-DCC0000000000036')[0].files.length > 0;
-                if (!comprobante) {
-                    alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
+
+                if(RUTAXML==''){
+                    if (!comprobante) {
+                        alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
+                    }
+                }else{
+                    if(RUTAPDF==''){
+                        if (!comprobante) {
+                            alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
+                        }
+                    }
                 }
 
+
+            }else{
+                let xml = $('#file-DCC0000000000004')[0].files.length > 0;
+                if(RUTAXML==''){
+                    if (!xml) {
+                        alerterrorajax("Debe subir el CDR en XML."); cerrarcargando(); return false;
+                    }
+                }else{
+                    if(RUTACDR==''){
+                        if (!comprobante) {
+                            alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
+                        }
+                    }
+                }
+
+
+                let comprobante = $('#file-DCC0000000000036')[0].files.length > 0;
+                if(RUTAXML==''){
+                    if (!comprobante) {
+                        alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
+                    }
+                }else{
+                    if(RUTAPDF==''){
+                        if (!comprobante) {
+                            alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
+                        }
+                    }
+                }
 
             }
             let detalleArray = [];

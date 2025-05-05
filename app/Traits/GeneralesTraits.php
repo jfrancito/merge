@@ -29,6 +29,7 @@ Use Nexmo;
 use Keygen;
 use Storage;
 use File;
+use ZipArchive;
 
 trait GeneralesTraits
 {
@@ -152,7 +153,92 @@ trait GeneralesTraits
 
 	}
 
+	private function buscar_archivo_sunat_td($urlxml) {
 
+		$curl = curl_init();
+		curl_setopt_array($curl, array(
+		  CURLOPT_URL => $urlxml,
+		  CURLOPT_RETURNTRANSFER => true,
+		  CURLOPT_ENCODING => '',
+		  CURLOPT_MAXREDIRS => 10,
+		  CURLOPT_TIMEOUT => 0,
+		  CURLOPT_FOLLOWLOCATION => true,
+		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		  CURLOPT_CUSTOMREQUEST => 'POST',
+		  CURLOPT_HTTPHEADER => array(
+		    'Cookie: ITMRCONSRUCSESSION=6kQkyY2K12JgySwpdyFvyvXlQGTb2tGwqv5cmkbbTTD2h8hXQ0nJQypQpxs1QB44WRx0hYknLNTpbRTRm16th1bykQPlPyGhLxMQ4yyKnfwdfv7yqty8J2HzJBzBrydVP6kvGTsNNyNFF2pM1kcXN7X0RF7cBQfLlT1TpDjfM5ncB1FJBdfsBrWrJD1Tpgsfy8G0JydRnyyy5Qp3nPNLrpNSLJ8c2n9QTHpNpXPTCnX4vSQq2yMjG2vNGGVGnWJv!637287358!-336427344; TS01fda901=014dc399cb02c7e99dabe548e899a665fcfab9f294b2d2b8c00d75f74ce28e127857a7d560ff80f24bf801a58569542299cd5ae803ddffbd003798123ef9e33a4f9ede5c78'
+		  ),
+		));
+		$response = curl_exec($curl);
+		curl_close($curl);
+	 	return  $response;
+
+	}
+
+
+
+	private function buscar_archivo_sunat_lg($urlxml,$fetoken,$pathFiles,$prefijocarperta,$ID_DOCUMENTO) {
+
+		$array_nombre_archivo = array();
+		$curl = curl_init();
+		curl_setopt_array($curl, array(
+		  CURLOPT_URL => $urlxml,
+		  CURLOPT_RETURNTRANSFER => true,
+		  CURLOPT_ENCODING => '',
+		  CURLOPT_MAXREDIRS => 10,
+		  CURLOPT_TIMEOUT => 0,
+		  CURLOPT_FOLLOWLOCATION => true,
+		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		  CURLOPT_CUSTOMREQUEST => 'GET',
+		  CURLOPT_HTTPHEADER => array(
+		    'Authorization: Bearer '.$fetoken->TOKEN
+		  ),
+		));
+		$response = curl_exec($curl);
+		curl_close($curl);
+		$response_array = json_decode($response, true);
+		if (!isset($response_array['nomArchivo'])) {
+			$array_nombre_archivo = [
+				'cod_error' => 1,
+				'nombre_archivo' => '',
+				'mensaje' => 'Hubo un problema de sunat buscar nuevamente'
+			];
+		}else{
+	        $fileName = $response_array['nomArchivo'];
+	        $base64File = $response_array['valArchivo'];
+	        $fileData = base64_decode($base64File);
+            $rutafile        =      $pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ID_DOCUMENTO;
+            $rutacompleta    =      $rutafile.'\\'.$fileName;
+			file_put_contents($rutacompleta, $fileData);
+			// Descomprimir el ZIP
+			$zip = new ZipArchive;
+			if ($zip->open($rutacompleta) === TRUE) {
+			    if ($zip->numFiles > 0) {
+			        // Obtener el primer archivo dentro del ZIP (puedes adaptarlo si hay más)
+			        $archivoDescomprimido = $zip->getNameIndex(0); // nombre relativo dentro del zip
+			    }
+			    $zip->extractTo($rutafile); // descomprime todo
+			    $zip->close();
+			    $rutacompleta    =      $rutafile.'\\'.$archivoDescomprimido;
+				$array_nombre_archivo = [
+					'cod_error' => 0,
+					'nombre_archivo' => $response_array['nomArchivo'],
+					'ruta_completa' => $rutacompleta,
+					'nombre_archivo' => $archivoDescomprimido,
+					'mensaje' => 'encontrado con exito'
+				];
+			} else {
+				$array_nombre_archivo = [
+					'cod_error' => 1,
+					'nombre_archivo' => '',
+					'mensaje' => 'Error al abrir el archivo ZIP'
+				];
+			}
+		}
+
+	 	return  $array_nombre_archivo;
+
+	}
 
 
 	private function buscar_archivo_sunat($urlxml,$fetoken) {
@@ -175,9 +261,6 @@ trait GeneralesTraits
 		$response = curl_exec($curl);
 		curl_close($curl);
 		$response_array = json_decode($response, true);
-
-
-
 
 		if (!isset($response_array['nomArchivo'])) {
 			$array_nombre_archivo = [

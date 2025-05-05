@@ -877,6 +877,10 @@ class GestionOCTesoreriaController extends Controller
                 DB::beginTransaction();
 
                 $pedido_id          =   $idoc;
+                $partepago          =   $request['partepago'];
+
+
+
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
                 $tarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                         ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000028')
@@ -888,6 +892,15 @@ class GestionOCTesoreriaController extends Controller
                     if(!is_null($filescdm)){
 
                         foreach($filescdm as $file){
+
+                            $TIPO_ARCHIVO = $item->COD_CATEGORIA_DOCUMENTO;
+                            $DESCRIPCION_ARCHIVO = $item->NOM_CATEGORIA_DOCUMENTO;
+                            if($partepago=='on'){
+                                $TIPO_ARCHIVO = 'DCC0000000000037';
+                                $DESCRIPCION_ARCHIVO = 'PARTE COMPROBANTE DE PAGO';
+                            }
+
+                            //dd($TIPO_ARCHIVO);
 
                             $contadorArchivos = Archivo::count();
                             $nombre          =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
@@ -908,9 +921,9 @@ class GestionOCTesoreriaController extends Controller
                             $dcontrol                       =   new Archivo;
                             $dcontrol->ID_DOCUMENTO         =   $ordencompra->COD_ORDEN;
                             $dcontrol->DOCUMENTO_ITEM       =   $fedocumento->DOCUMENTO_ITEM;
-                            $dcontrol->TIPO_ARCHIVO         =   $item->COD_CATEGORIA_DOCUMENTO;
+                            $dcontrol->TIPO_ARCHIVO         =   $TIPO_ARCHIVO;
                             $dcontrol->NOMBRE_ARCHIVO       =   $nombrefilecdr;
-                            $dcontrol->DESCRIPCION_ARCHIVO  =   $item->NOM_CATEGORIA_DOCUMENTO;
+                            $dcontrol->DESCRIPCION_ARCHIVO  =   $DESCRIPCION_ARCHIVO;
 
 
                             $dcontrol->URL_ARCHIVO      =   $path;
@@ -930,27 +943,49 @@ class GestionOCTesoreriaController extends Controller
                                                 ->orderBy('NRO_LINEA','ASC')
                                                 ->get();
 
-                FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
-                            ->update(
-                                [
-                                    'COD_ESTADO'=>'ETM0000000000008',
-                                    'TXT_ESTADO'=>'TERMINADA',
-                                    'fecha_tes'=>$this->fechaactual,
-                                    'usuario_tes'=>Session::get('usuario')->id
-                                ]
-                            );
+
+                IF($TIPO_ARCHIVO == 'DCC0000000000037'){
+
+                    //HISTORIAL DE DOCUMENTO APROBADO
+                    $documento                              =   new FeDocumentoHistorial;
+                    $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                    $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                    $documento->FECHA                       =   $this->fechaactual;
+                    $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                    $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                    $documento->TIPO                        =   'SUBIO PARTE COMPROBANTE DE PAGO';
+                    $documento->MENSAJE                     =   '';
+                    $documento->save();
 
 
-                //HISTORIAL DE DOCUMENTO APROBADO
-                $documento                              =   new FeDocumentoHistorial;
-                $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
-                $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
-                $documento->FECHA                       =   $this->fechaactual;
-                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
-                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
-                $documento->TIPO                        =   'SUBIO COMPROBANTE DE PAGO';
-                $documento->MENSAJE                     =   '';
-                $documento->save();
+                }ELSE{
+
+                    FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
+                    ->update(
+                        [
+                            'COD_ESTADO'=>'ETM0000000000008',
+                            'TXT_ESTADO'=>'TERMINADA',
+                            'fecha_tes'=>$this->fechaactual,
+                            'usuario_tes'=>Session::get('usuario')->id
+                        ]
+                    );
+
+                    //HISTORIAL DE DOCUMENTO APROBADO
+                    $documento                              =   new FeDocumentoHistorial;
+                    $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                    $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                    $documento->FECHA                       =   $this->fechaactual;
+                    $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                    $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                    $documento->TIPO                        =   'SUBIO COMPROBANTE DE PAGO';
+                    $documento->MENSAJE                     =   '';
+                    $documento->save();
+
+
+                }
+
+
+
 
 
                 DB::commit();
