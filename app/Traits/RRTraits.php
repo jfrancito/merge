@@ -31,55 +31,86 @@ trait RRTraits
 
 		DB::statement("DELETE FROM TempValidacionRR");
 
+		DB::statement("EXEC RPS.InsertarGastosVentasEnTempValidacionRR 
+		    @COD_EMPR = ?, @COD_CENTRO = ?, @FEC_INICIO = ?, @FEC_FIN = ?, 
+		    @NRO_ANIO = ?, @NRO_MES = ?, @EMPRESA = ?, @USUARIO = ?, @BASE = ?", [
+		        $codEmpr,
+		        'CEN0000000000001',
+		        $fechaInicio,
+		        $fechaFin,
+		        2025,
+		        5,
+		        'INDUAMERICA INTERNACIONAL S.A.C.',
+		        'JSALDANR',
+		        'pOSCH2024'
+		    ]);
+
+
+			DB::statement("EXEC RPS.InsertarSalidasLogisticaEnTempGastosVentas02 
+			    @COD_EMPR = ?, @COD_CENTRO = ?, @FEC_INICIO = ?, @FEC_FIN = ?, 
+			    @NRO_ANIO = ?, @NRO_MES = ?, @EMPRESA = ?, @USUARIO = ?, @BASE = ?", [
+			        $codEmpr,
+			        'CEN0000000000001',
+			        $fechaInicio,
+			        $fechaFin,
+			        2025,
+			        5,
+			        'INDUAMERICA INTERNACIONAL S.A.C.',
+			        'JSALDANR',
+			        'pOSCH2024'
+			    ]);
+
+
+
 	    $consultas = [
 
-	        // R17
-	        "
-	        INSERT INTO TempValidacionRR (ANEXO, CENTRO, MES, FECHA, CODIGO, TIPO_VENTA, CLIENTE, IMPORTE, CONCEPTO_CENTRO_COSTO)
-	        SELECT 'R17', CENTRO, MES, FECHA, CODIGO, TIPO_VENTA, CLIENTE, IMPORTE, CONCEPTO_CENTRO_COSTO
-	        FROM OPENQUERY([SVRJIREH\\JIREH], '
-	            EXEC [pOSCH2024].RPS.ARG_GASTOS_VENTAS_DETALLADO_VAL
-	                @IND_TIPO_OPERACION=N''GEN'',
-	                @COD_EMPR=N''{$codEmpr}'',
-	                @COD_CENTRO=N''CEN0000000000001'',
-	                @FEC_INICIO=N''{$fechaInicio}'',
-	                @FEC_FIN=N''{$fechaFin}'',
-	                @COD_TABLA=N'''',
-	                @COD_EMPR_CLIENTE=N'''',
-	                @TXT_EMPR_CLIENTE=N'''',
-	                @TXT_BUSCADO=N'''',
-	                @NRO_ANIO=2024,
-	                @NRO_MES=10,
-	                @TXT_ESTADO=N'''',
-	                @EMPRESA=N''INDUAMERICA INTERNACIONAL S.A.C.'',
-	                @USUARIO=N''JSALDANR'',
-	                @BASE=N''pOSCH2024''
-	        ')
-	        ",
+	        // // R17
+	        // "
+	        // INSERT INTO TempValidacionRR (ANEXO, CENTRO, MES, FECHA, CODIGO, TIPO_VENTA, CLIENTE, IMPORTE, CONCEPTO_CENTRO_COSTO)
+	        // SELECT 'R17', CENTRO, MES, FECHA, CODIGO, TIPO_VENTA, CLIENTE, IMPORTE, CONCEPTO_CENTRO_COSTO
+	        // FROM OPENQUERY([SVRJIREH\\JIREH], '
+	        //     EXEC [pOSCH2024].RPS.ARG_GASTOS_VENTAS_DETALLADO_VAL
+	        //         @IND_TIPO_OPERACION=N''GEN'',
+	        //         @COD_EMPR=N''{$codEmpr}'',
+	        //         @COD_CENTRO=N''CEN0000000000001'',
+	        //         @FEC_INICIO=N''{$fechaInicio}'',
+	        //         @FEC_FIN=N''{$fechaFin}'',
+	        //         @COD_TABLA=N'''',
+	        //         @COD_EMPR_CLIENTE=N'''',
+	        //         @TXT_EMPR_CLIENTE=N'''',
+	        //         @TXT_BUSCADO=N'''',
+	        //         @NRO_ANIO=2024,
+	        //         @NRO_MES=10,
+	        //         @TXT_ESTADO=N'''',
+	        //         @EMPRESA=N''INDUAMERICA INTERNACIONAL S.A.C.'',
+	        //         @USUARIO=N''JSALDANR'',
+	        //         @BASE=N''pOSCH2024''
+	        // ')
+	        // ",
 
-	        // R18
-	        "
-	        INSERT INTO TempValidacionRR (ANEXO, CENTRO, MES, FECHA, CODIGO, TIPO_VENTA, CLIENTE, IMPORTE, CONCEPTO_CENTRO_COSTO)
-	        SELECT 'R18', NOM_CENTRO, MES, FECHA, COD_TIPO, TIPO, CLIENTE, CAN_VALOR_VENTA_IGV, CENTRO_COSTO
-	        FROM OPENQUERY([SVRJIREH\\JIREH], '
-	            EXEC [pOSCH2024].RPS.ARG_SALIDAS_LOGISTICA_DETALLADO_VAL
-	                @IND_TIPO_OPERACION=N''GEN'',
-	                @COD_EMPR=N''{$codEmpr}'',
-	                @COD_CENTRO=N''CEN0000000000001'',
-	                @FEC_INICIO=N''{$fechaInicio}'',
-	                @FEC_FIN=N''{$fechaFin}'',
-	                @COD_TABLA=N'''',
-	                @COD_EMPR_CLIENTE=N'''',
-	                @TXT_EMPR_CLIENTE=N'''',
-	                @TXT_BUSCADO=N'''',
-	                @NRO_ANIO=2024,
-	                @NRO_MES=10,
-	                @TXT_ESTADO=N'''',
-	                @EMPRESA=N''INDUAMERICA INTERNACIONAL S.A.C.'',
-	                @USUARIO=N''JSALDANR'',
-	                @BASE=N''pOSCH2024''
-	        ')
-	        ",
+	        // // R18
+	        // "
+	        // INSERT INTO TempValidacionRR (ANEXO, CENTRO, MES, FECHA, CODIGO, TIPO_VENTA, CLIENTE, IMPORTE, CONCEPTO_CENTRO_COSTO)
+	        // SELECT 'R18', NOM_CENTRO, MES, FECHA, COD_TIPO, TIPO, CLIENTE, CAN_VALOR_VENTA_IGV, CENTRO_COSTO
+	        // FROM OPENQUERY([SVRJIREH\\JIREH], '
+	        //     EXEC [pOSCH2024].RPS.ARG_SALIDAS_LOGISTICA_DETALLADO_VAL
+	        //         @IND_TIPO_OPERACION=N''GEN'',
+	        //         @COD_EMPR=N''{$codEmpr}'',
+	        //         @COD_CENTRO=N''CEN0000000000001'',
+	        //         @FEC_INICIO=N''{$fechaInicio}'',
+	        //         @FEC_FIN=N''{$fechaFin}'',
+	        //         @COD_TABLA=N'''',
+	        //         @COD_EMPR_CLIENTE=N'''',
+	        //         @TXT_EMPR_CLIENTE=N'''',
+	        //         @TXT_BUSCADO=N'''',
+	        //         @NRO_ANIO=2024,
+	        //         @NRO_MES=10,
+	        //         @TXT_ESTADO=N'''',
+	        //         @EMPRESA=N''INDUAMERICA INTERNACIONAL S.A.C.'',
+	        //         @USUARIO=N''JSALDANR'',
+	        //         @BASE=N''pOSCH2024''
+	        // ')
+	        // ",
 
 	        // RC17
 	        "
@@ -129,31 +160,7 @@ trait RRTraits
 	        ')
 	        ",
 
-	        // RS12
-	        "
-	        INSERT INTO TempValidacionRR (ANEXO, CENTRO, MES, FECHA, CODIGO, TIPO_VENTA, CLIENTE, IMPORTE, CONCEPTO_CENTRO_COSTO)
-	        SELECT 'RS12', CENTRO, MES, FECHA, ID, TIPO, CLIENTE, IMPORTE, CENTRO_COSTO
-	        FROM OPENQUERY([SVRJIREH\\JIREH], '
-	            EXEC [pOSCH2024].RPS.ERG_COSTO_VENTAS_DETALLADO_IAIN_RS
-	                @IND_TIPO_OPERACION=N''GEN'',
-	                @COD_EMPR=N''{$codEmpr}'',
-	                @COD_CENTRO=N''CEN0000000000001'',
-	                @FEC_INICIO=N''{$fechaInicio}'',
-	                @FEC_FIN=N''{$fechaFin}'',
-	                @COD_TABLA=N'''',
-	                @COD_EMPR_CLIENTE=N'''',
-	                @TXT_EMPR_CLIENTE=N'''',
-	                @TXT_BUSCADO=N'''',
-	                @NRO_ANIO=2024,
-	                @NRO_MES=10,
-	                @TXT_ESTADO=N'''',
-	                @EMPRESA=N''INDUAMERICA INTERNACIONAL S.A.C.'',
-	                @USUARIO=N''JSALDANR'',
-	                @BASE=N''pOSCH2024''
-	        ') 
-	        WHERE NOM_TIPO_OPER NOT IN ('CONSUMO POR PRODUCCION', 'COMPRAS DE SERVICIOS - MAQUILA')  
-	        AND CENTRO_COSTO NOT IN ('ENERGIA ELECTRICA')
-	        ",
+
 
 	        // RS13
 	        "

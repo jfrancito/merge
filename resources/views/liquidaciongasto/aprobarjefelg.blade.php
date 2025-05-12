@@ -49,7 +49,24 @@
                   <div class="panel panel-default panel-border-color panel-border-color-primary">
                     <div class="panel-heading panel-heading-divider">Observar Comprobante<span class="panel-subtitle">Observar un Comprobante</span></div>
                     <div class="panel-body">
-                        OBSERVAR
+                        <form method="POST" id='formpedidoobservar' action="{{ url('/agregar-observar-jefe/'.$idopcion.'/'.Hashids::encode(substr($liquidaciongastos->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
+                              {{ csrf_field() }}
+                          <input type="hidden" name="data_observacion" id="data_observacion">
+                          @include('liquidaciongasto.form.formobservar')
+                          <div class="row xs-pt-15">
+                            <div class="col-xs-6">
+                                <div class="be-checkbox">
+                                </div>
+                            </div>
+                            <div class="col-xs-6">
+                              <p class="text-right">
+                                <a href="{{ url('/gestion-de-aprobacion-liquidacion-gasto-jefe/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
+                                <button type="button"  class="btn btn-space btn-primary btnobservarcomporbatnte">Guardar</button>
+                              </p>
+                            </div>
+                          </div>
+                          
+                        </form>
                     </div>
                   </div>
                 </div>
@@ -58,6 +75,7 @@
                   <div class="panel panel-default panel-border-color panel-border-color-primary">
                     <div class="panel-heading panel-heading-divider">Extornar<span class="panel-subtitle">Extornar un Comprobante</span></div>
                     <div class="panel-body">
+
                         <form method="POST" id='formpedidorechazar' action="{{ url('/agregar-extorno-jefe/'.$idopcion.'/'.Hashids::encode(substr($liquidaciongastos->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                               {{ csrf_field() }}
                           @include('liquidaciongasto.form.formrechazo')
@@ -76,6 +94,8 @@
                           </div>
                           
                         </form>
+
+
                     </div>
                   </div>
                 </div>

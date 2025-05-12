@@ -344,7 +344,6 @@ class GestionPlanillaMovilidadController extends Controller
                             ->update(
                                     [
                                         'FECHA_EMI'=> $this->fechaactual,
-                                        'TIPO_SUSTENTO'=> $request['tipo_solicitud'],
                                         'FECHA_MOD'=> $this->fechaactual,
                                         'USUARIO_MOD'=> Session::get('usuario')->id,
                                         'COD_ESTADO'=> 'ETM0000000000008',
@@ -651,6 +650,21 @@ class GestionPlanillaMovilidadController extends Controller
                 if($total_mensual>1130){
                     return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd', 'Supero el maximo saldo de 1130 soles al mes');
                 }
+
+                //VALIDAR QUE SOLO MENSUALMENTE SEA 1130
+                $anio_v = date('Y', strtotime($fecha_gasto));
+                $totalanual = DB::table('PLA_MOVILIDAD')
+                    ->join('PLA_DETMOVILIDAD', 'PLA_MOVILIDAD.ID_DOCUMENTO', '=', 'PLA_DETMOVILIDAD.ID_DOCUMENTO')
+                    ->where('PLA_MOVILIDAD.COD_ESTADO', '<>', 'ETM0000000000006')
+                    ->where('PLA_DETMOVILIDAD.ACTIVO', 1)
+                    ->whereYear('FECHA_GASTO', $anio_v)
+                    ->where('PLA_DETMOVILIDAD.USUARIO_CREA', Session::get('usuario')->id)
+                    ->sum('PLA_DETMOVILIDAD.TOTAL');
+                $total_anual =    (float)$total + $totalanual;
+                if($total_anual>16425){
+                    return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd', 'Supero el maximo saldo de 16425 soles al año');
+                }
+
 
 
 

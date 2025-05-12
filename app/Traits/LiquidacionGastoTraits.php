@@ -51,6 +51,247 @@ use PDO;
 trait LiquidacionGastoTraits
 {
 
+    private function lg_enviar_osiris_empresa($centro_id,$empresa_id,$rz,$ruc,$direccion,$departamento_id,$provincia_id,$distrito_id,$zona,$zona02) {
+
+        $conexionbd         = 'sqlsrv';
+        if($centro_id == 'CEN0000000000004'){ //rioja
+            $conexionbd         = 'sqlsrv_r';
+        }else{
+            if($centro_id == 'CEN0000000000006'){ //bellavista
+                $conexionbd         = 'sqlsrv_b';
+            }
+        }
+
+        $accion                                         =       'I';
+        $vacio                                          =       '';
+        $valor_cero                                     =       '0';
+        $cod_estado                                     =       1;
+
+        $cod_usuario_registro                           =       Session::get('usuario')->name;
+
+        $fecha_ilimitada                                =       date_format(date_create('1901-01-01'), 'Y-m-d');
+        $COD_TIPO_DOCUMENTO                             =       'TDI0000000000006';
+        $COD_CATEGORIA_EMPR                             =       'TEM0000000000001';
+        $TXT_TIPO_GARANTIA                              =       'ESPECIFICAR';
+
+        $stmt = DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC STD.EMPRESA_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?');
+        $stmt->bindParam(1, $accion ,PDO::PARAM_STR);                                   //@IND_TIPO_OPERACION='I',
+        $stmt->bindParam(2, $vacio  ,PDO::PARAM_STR);                                   //@COD_EMPR=@p2 output,
+        $stmt->bindParam(3, $empresa_id ,PDO::PARAM_STR);                               //@COD_EMPR_SISTEMA='IACHEM0000010394',
+        $stmt->bindParam(4, $centro_id ,PDO::PARAM_STR);                                //@COD_CENTRO_SISTEMA='CEN0000000000001',
+        $stmt->bindParam(5, $rz ,PDO::PARAM_STR);                                       //@NOM_EMPR='TOMOGRAFIAS CHICLAYO E.I.R.L.',
+        $stmt->bindParam(6, $vacio  ,PDO::PARAM_STR);                                   //@NOM_CORTO='',
+        $stmt->bindParam(7, $vacio  ,PDO::PARAM_STR);                                   //@TXT_ABREVIATURA='',
+        $stmt->bindParam(8, $vacio  ,PDO::PARAM_STR);                                   //@COD_CONTACTO='                ',
+        $stmt->bindParam(9, $vacio  ,PDO::PARAM_STR);                                   //@TXT_TELEFONO='',
+        $stmt->bindParam(10, $vacio  ,PDO::PARAM_STR);                                  //@TXT_IMAGEN='',
+
+        $stmt->bindParam(11, $COD_TIPO_DOCUMENTO  ,PDO::PARAM_STR);                     //@COD_TIPO_DOCUMENTO='TDI0000000000006',
+        $stmt->bindParam(12, $ruc ,PDO::PARAM_STR);                                     //@NRO_DOCUMENTO='20608383957',
+        $stmt->bindParam(13, $vacio  ,PDO::PARAM_STR);                                  //@TXT_FAX='',
+        $stmt->bindParam(14, $vacio  ,PDO::PARAM_STR);                                  //@TXT_EMAIL='',
+        $stmt->bindParam(15, $vacio ,PDO::PARAM_STR);                                   //@TXT_APE_PATERNO='', 
+        $stmt->bindParam(16, $vacio ,PDO::PARAM_STR);                                   //@TXT_APE_MATERNO='', 
+        $stmt->bindParam(17, $vacio ,PDO::PARAM_STR);                                   //@TXT_NOMBRES='',
+        $stmt->bindParam(18, $fecha_ilimitada ,PDO::PARAM_STR);                         //@FEC_NACIMIENTO='1901-01-01 00:00:00',
+        $stmt->bindParam(19, $valor_cero ,PDO::PARAM_STR);                              //@IND_CHOFER=0,
+        $stmt->bindParam(20, $vacio ,PDO::PARAM_STR);                                   //@COD_TIPO_BREVETE='                ',
+
+
+        $stmt->bindParam(21, $vacio ,PDO::PARAM_STR);                                   //@NRO_BREVETE='',
+        $stmt->bindParam(22, $COD_CATEGORIA_EMPR ,PDO::PARAM_STR);                      //@COD_CATEGORIA_EMPR='TEM0000000000001',
+        $stmt->bindParam(23, $vacio ,PDO::PARAM_STR);                                   //@TXT_GLOSA='',
+        $stmt->bindParam(24, $valor_cero ,PDO::PARAM_STR);                              //@IND_SISTEMA=0,
+        $stmt->bindParam(25, $valor_cero ,PDO::PARAM_STR);                              //@IND_CLIENTE=0,
+        $stmt->bindParam(26, $cod_estado ,PDO::PARAM_STR);                              //@IND_PROVEEDOR=1,
+        $stmt->bindParam(27, $valor_cero  ,PDO::PARAM_STR);                             //@IND_SUPERMERCADO=0,
+        $stmt->bindParam(28, $valor_cero ,PDO::PARAM_STR);                              //@IND_TRANSPORTISTA=0,
+        $stmt->bindParam(29, $valor_cero ,PDO::PARAM_STR);                              //@IND_CUADRILLA=0,
+        $stmt->bindParam(30, $valor_cero  ,PDO::PARAM_STR);                             //@IND_ACOPIADOR=0,
+
+
+        $stmt->bindParam(31, $valor_cero ,PDO::PARAM_STR);                              //@IND_GARANTE=0,
+        $stmt->bindParam(32, $valor_cero ,PDO::PARAM_STR);                              //@IND_FORMAL=0,
+        $stmt->bindParam(33, $valor_cero ,PDO::PARAM_STR);                              //@IND_RELACIONADO=0,
+        $stmt->bindParam(34, $valor_cero ,PDO::PARAM_STR);                              //@IND_COMERCIAL_ACOPIO=0,
+        $stmt->bindParam(35, $vacio  ,PDO::PARAM_STR);                                  //@COD_TIPO_GARANTIA='                ',
+        $stmt->bindParam(36, $TXT_TIPO_GARANTIA  ,PDO::PARAM_STR);                      //@TXT_TIPO_GARANTIA='ESPECIFICAR',
+        $stmt->bindParam(37, $vacio  ,PDO::PARAM_STR);                                  //@TXT_DESCRIPCION_GARANTIA='',
+        $stmt->bindParam(38, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_GARANTIA=0,
+        $stmt->bindParam(39, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_LIMITE=0,
+        $stmt->bindParam(40, $cod_estado  ,PDO::PARAM_STR);                             //@COD_ESTADO=1,
+
+        $stmt->bindParam(41, $cod_usuario_registro  ,PDO::PARAM_STR);                   //@COD_USUARIO_REGISTRO='JSALDANR        ',
+        $stmt->bindParam(42, $valor_cero  ,PDO::PARAM_STR);                             //@IND_INAFECTOIGV=0,
+        $stmt->bindParam(43, $valor_cero  ,PDO::PARAM_STR);                             //@IND_GEN_DOC_ELEC=0,
+        $stmt->bindParam(44, $valor_cero  ,PDO::PARAM_STR);                             //@IND_COMERCIAL_SERVICIO=0,
+        $stmt->bindParam(45, $valor_cero  ,PDO::PARAM_STR);                             //@IND_BOLETEO_INTERES=0,
+        $stmt->bindParam(46, $valor_cero  ,PDO::PARAM_STR);                             //@IND_COSTO=0, 
+        $stmt->bindParam(47, $valor_cero  ,PDO::PARAM_STR);                             //@IND_GASTO=0,
+        $stmt->bindParam(48, $vacio  ,PDO::PARAM_STR);                                  //@COD_CATEGORIA_BANCO='',
+        $stmt->bindParam(49, $vacio  ,PDO::PARAM_STR);                                  //@NRO_CUENTA_BANCARIA='',
+        $stmt->bindParam(50, $vacio  ,PDO::PARAM_STR);                                  //@TXT_CLAVE_LLAVE=''
+
+        $stmt->execute();
+        $coddocumento = $stmt->fetch();
+
+        $COD_ESTABLECIMIENTO_SUNAT  = '0001';
+        $stmt = DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC STD.EMPRESA_DIRECCION_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?');
+        $stmt->bindParam(1, $accion ,PDO::PARAM_STR);                                   //@IND_TIPO_OPERACION='I',
+        $stmt->bindParam(2, $vacio  ,PDO::PARAM_STR);                                   //@COD_DIRECCION='                ',
+        $stmt->bindParam(3, $coddocumento[0] ,PDO::PARAM_STR);                          //@COD_EMPR='IICHEM0000009259',
+        $stmt->bindParam(4, $empresa_id ,PDO::PARAM_STR);                               //@COD_EMPR_SISTEMA='IACHEM0000010394',
+        $stmt->bindParam(5, $centro_id ,PDO::PARAM_STR);                                //@COD_CENTRO_SISTEMA='CEN0000000000001',
+        $stmt->bindParam(6, $direccion  ,PDO::PARAM_STR);                               //@NOM_DIRECCION='CAL. CRISTOBAL COLON NRO 222 CERCADO DE CHICLAYO ',
+
+        $stmt->bindParam(7, $departamento_id  ,PDO::PARAM_STR);                         //@COD_DEPARTAMENTO='DEP0000000000014',
+        $stmt->bindParam(8, $provincia_id  ,PDO::PARAM_STR);                            //@COD_PROVINCIA='PRO0000000000125',
+        $stmt->bindParam(9, $distrito_id  ,PDO::PARAM_STR);                             //@COD_DISTRITO='DIS0000000001211',
+
+        $stmt->bindParam(10, $valor_cero  ,PDO::PARAM_STR);                             //@IND_DEFAULT=0,
+        $stmt->bindParam(11, $cod_estado  ,PDO::PARAM_STR);                             //@IND_DIRECCION_FISCAL=1,
+        $stmt->bindParam(12, $cod_estado ,PDO::PARAM_STR);                              //@COD_ESTADO=1,
+        $stmt->bindParam(13, $cod_usuario_registro  ,PDO::PARAM_STR);                   //@COD_USUARIO_REGISTRO='JSALDANR        ',
+        $stmt->bindParam(14, $COD_ESTABLECIMIENTO_SUNAT  ,PDO::PARAM_STR);              //@COD_ESTABLECIMIENTO_SUNAT='0001           '
+        $stmt->execute();
+
+
+
+        //CONTRATO
+        $COD_CATEGORIA_TIPO_CONTRATO                =   'TCO0000000000019';  
+        $TXT_CATEGORIA_TIPO_CONTRATO                =   'PROVEEDOR'; 
+        $COD_CATEGORIA_ESTADO_CONTRATO              =   'ECO0000000000001';
+        $TXT_CATEGORIA_ESTADO_CONTRATO              =   'GENERADO';
+        $COD_CATEGORIA_MONEDA                       =   'MON0000000000001';
+        $TXT_CATEGORIA_MONEDA                       =   'SOLES';
+        $COD_CATEGORIA_CANAL_VENTA                  =   'CVE0000000000028';
+        $TXT_CATEGORIA_CANAL_VENTA                  =   'PROVEEDOR';
+        $COD_CATEGORIA_JEFE_VENTA                   =   'JVE0000000000013';
+        $TXT_CATEGORIA_JEFE_VENTA                   =   'ADMINISTRACION';
+        $COD_CATEGORIA_SUB_CANAL                    =   'SCV0000000000049';
+        $TXT_CATEGORIA_SUB_CANAL                    =   'ADMINISTRACION';
+        $fecha_ilimitada                            =    date_format(date_create('1901-01-01'), 'Y-m-d');
+        $FEC_CONTRATO                               =    date_format(date_create(date('Y-m-d h:i:s')), 'Y-m-d');
+
+
+
+
+        $stmt = DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.CONTRATO_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?');
+        $stmt->bindParam(1, $accion ,PDO::PARAM_STR);                                  //@IND_TIPO_OPERACION='I'
+        $stmt->bindParam(2, $vacio  ,PDO::PARAM_STR);                                  //@COD_CONTRATO='                '
+        $stmt->bindParam(3, $empresa_id ,PDO::PARAM_STR);                              //@COD_EMPR='IACHEM0000010394'
+        $stmt->bindParam(4, $centro_id ,PDO::PARAM_STR);                               //@COD_CENTRO='CEN0000000000001'
+        $stmt->bindParam(5, $coddocumento[0] ,PDO::PARAM_STR);                         //@COD_EMPR_CLIENTE='IICHEM0000009259'
+        $stmt->bindParam(6, $rz  ,PDO::PARAM_STR);                                     //@TXT_EMPR_CLIENTE='TOMOGRAFIAS CHICLAYO E.I.R.L.'
+        $stmt->bindParam(7, $vacio  ,PDO::PARAM_STR);                                  //@COD_EMPR_GARANTE='                '
+        $stmt->bindParam(8, $vacio  ,PDO::PARAM_STR);                                  //@TXT_EMPR_GARANTE=''
+        $stmt->bindParam(9, $vacio  ,PDO::PARAM_STR);                                  //@COD_EMPR_ACOPIADOR='                '
+        $stmt->bindParam(10, $vacio  ,PDO::PARAM_STR);                                 //@TXT_EMPR_ACOPIADOR=''
+
+        $stmt->bindParam(11, $vacio  ,PDO::PARAM_STR);                                 //@COD_DIRECCION=default
+        $stmt->bindParam(12, $vacio ,PDO::PARAM_STR);                                  //@COD_TRABAJADOR_APROBACION='                '
+        $stmt->bindParam(13, $COD_CATEGORIA_TIPO_CONTRATO  ,PDO::PARAM_STR);           //@COD_CATEGORIA_TIPO_CONTRATO='TCO0000000000019'
+        $stmt->bindParam(14, $TXT_CATEGORIA_TIPO_CONTRATO  ,PDO::PARAM_STR);           //@TXT_CATEGORIA_TIPO_CONTRATO='PROVEEDOR'
+        $stmt->bindParam(15, $COD_CATEGORIA_ESTADO_CONTRATO ,PDO::PARAM_STR);          //@COD_CATEGORIA_ESTADO_CONTRATO='ECO0000000000001' 
+        $stmt->bindParam(16, $TXT_CATEGORIA_ESTADO_CONTRATO ,PDO::PARAM_STR);          //@TXT_CATEGORIA_ESTADO_CONTRATO='GENERADO'
+        $stmt->bindParam(17, $COD_CATEGORIA_MONEDA ,PDO::PARAM_STR);                   //@COD_CATEGORIA_MONEDA='MON0000000000001'
+        $stmt->bindParam(18, $TXT_CATEGORIA_MONEDA ,PDO::PARAM_STR);                   //@TXT_CATEGORIA_MONEDA='SOLES'
+        $stmt->bindParam(19, $COD_CATEGORIA_CANAL_VENTA ,PDO::PARAM_STR);              //@COD_CATEGORIA_CANAL_VENTA='CVE0000000000028'
+        $stmt->bindParam(20, $TXT_CATEGORIA_CANAL_VENTA ,PDO::PARAM_STR);              //@TXT_CATEGORIA_CANAL_VENTA='PROVEEDOR'
+
+
+        $stmt->bindParam(21, $COD_CATEGORIA_JEFE_VENTA ,PDO::PARAM_STR);               //@COD_CATEGORIA_JEFE_VENTA='JVE0000000000013'
+        $stmt->bindParam(22, $TXT_CATEGORIA_JEFE_VENTA ,PDO::PARAM_STR);               //@TXT_CATEGORIA_JEFE_VENTA='ADMINISTRACION'
+        $stmt->bindParam(23, $COD_CATEGORIA_SUB_CANAL ,PDO::PARAM_STR);                //@COD_CATEGORIA_SUB_CANAL='SCV0000000000049'
+        $stmt->bindParam(24, $TXT_CATEGORIA_SUB_CANAL ,PDO::PARAM_STR);                //@TXT_CATEGORIA_SUB_CANAL='ADMINISTRACION'
+        $stmt->bindParam(25, $FEC_CONTRATO ,PDO::PARAM_STR);                           //@FEC_CONTRATO='2025-05-06 00:00:00'
+        $stmt->bindParam(26, $fecha_ilimitada ,PDO::PARAM_STR);                        //@FEC_INICIO_CAMPANA='1901-01-01 00:00:00'
+        $stmt->bindParam(27, $fecha_ilimitada  ,PDO::PARAM_STR);                       //@FEC_FIN_CAMPANA='1901-01-01 00:00:00'
+        $stmt->bindParam(28, $valor_cero ,PDO::PARAM_STR);                             //@CAN_LIMITE_CREDITO=0
+        $stmt->bindParam(29, $valor_cero ,PDO::PARAM_STR);                             //@CAN_GARANTIA=0
+        $stmt->bindParam(30, $valor_cero  ,PDO::PARAM_STR);                            //@CAN_HECTAREAS=0
+
+
+        $stmt->bindParam(31, $valor_cero ,PDO::PARAM_STR);                             //@CAN_TEA=0
+        $stmt->bindParam(32, $valor_cero ,PDO::PARAM_STR);                             //@CAN_SALDO_MN=0
+        $stmt->bindParam(33, $valor_cero ,PDO::PARAM_STR);                             //@CAN_SALDO_ME=0
+        $stmt->bindParam(34, $valor_cero ,PDO::PARAM_STR);                             //@CAN_SALDO_INTERES=0
+        $stmt->bindParam(35, $vacio  ,PDO::PARAM_STR);                                 //@TXT_CAMPANA=''
+        $stmt->bindParam(36, $vacio  ,PDO::PARAM_STR);                                 //@TXT_DESCRIPCION_HABILITACION=''
+        $stmt->bindParam(37, $vacio  ,PDO::PARAM_STR);                                 //@TXT_TIPO_GARANTIA=''
+        $stmt->bindParam(38, $vacio  ,PDO::PARAM_STR);                                 //@TXT_GLOSA=''
+        $stmt->bindParam(39, $vacio  ,PDO::PARAM_STR);                                 //@TXT_TIPO_REFERENCIA=''
+        $stmt->bindParam(40, $vacio  ,PDO::PARAM_STR);                                 //@TXT_REFERENCIA=''
+
+        $stmt->bindParam(41, $cod_estado  ,PDO::PARAM_STR);                            //@COD_ESTADO=1
+        $stmt->bindParam(42, $cod_usuario_registro  ,PDO::PARAM_STR);                  //@COD_USUARIO_REGISTRO='JSALDANR        '
+        $stmt->bindParam(43, $valor_cero  ,PDO::PARAM_STR);                            //@CAN_SALDO_SGI=0
+        $stmt->bindParam(44, $valor_cero  ,PDO::PARAM_STR);                            //@CAN_DIFERENCIA_SGI=0
+        $stmt->bindParam(45, $FEC_CONTRATO  ,PDO::PARAM_STR);                          //@FEC_CIERRE_SGI='2025-05-06'
+
+        $stmt->execute();
+
+
+        $codcontrato = $stmt->fetch();
+
+        //dd($codcontrato[0]);
+
+
+        $TXT_DESCRIPCION = 'GENERADO AUTOMATICO';
+        $CAN_LIMITE_CREDITO_INDIVIDUAL = 9999999.0000;
+        $COD_CATEGORIA_ESTADO = 'ECO0000000000001';
+        $TXT_CATEGORIA_ESTADO = 'GENERADO';
+        $COD_ZONA_COMERCIAL = $zona->COD_ZONA; 
+        $TXT_ZONA_COMERCIAL = $zona->TXT_NOMBRE;
+        $COD_ZONA_CULTIVO = $zona02->COD_ZONA;
+        $TXT_ZONA_CULTIVO = $zona02->TXT_NOMBRE;
+
+
+
+
+        $stmt = DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.CONTRATO_CULTIVO_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?');
+        $stmt->bindParam(1, $accion ,PDO::PARAM_STR);                                 //@IND_TIPO_OPERACION='I',
+        $stmt->bindParam(2, $codcontrato[0]  ,PDO::PARAM_STR);                        //@COD_CONTRATO='IICHRC0000012002',
+        $stmt->bindParam(3, $vacio ,PDO::PARAM_STR);                                  //@COD_CULTIVO=default,
+        $stmt->bindParam(4, $COD_ZONA_COMERCIAL ,PDO::PARAM_STR);                     //@COD_ZONA_COMERCIAL='IICHZON000000001',
+        $stmt->bindParam(5, $TXT_ZONA_COMERCIAL ,PDO::PARAM_STR);                     //@TXT_ZONA_COMERCIAL='CHICLAYO',
+        $stmt->bindParam(6, $COD_ZONA_CULTIVO  ,PDO::PARAM_STR);                      //@COD_ZONA_CULTIVO='IICHZON000000002',
+        $stmt->bindParam(7, $TXT_ZONA_CULTIVO  ,PDO::PARAM_STR);                      //@TXT_ZONA_CULTIVO='CHICLAYO',
+        $stmt->bindParam(8, $fecha_ilimitada  ,PDO::PARAM_STR);                       //@FEC_EST_COSECHA='1901-01-01 00:00:00',
+        $stmt->bindParam(9, $fecha_ilimitada  ,PDO::PARAM_STR);                       //@FEC_COSECHA='1901-01-01 00:00:00',
+        $stmt->bindParam(10, $TXT_DESCRIPCION  ,PDO::PARAM_STR);                      //@TXT_DESCRIPCION='GENERADO AUTOMATICO',
+
+        $stmt->bindParam(11, $valor_cero  ,PDO::PARAM_STR);                           //@CAN_HECTAREA=0,
+        $stmt->bindParam(12, $vacio ,PDO::PARAM_STR);                                 //@TXT_DIRECCION='',
+        $stmt->bindParam(13, $vacio  ,PDO::PARAM_STR);                                //@COD_CATEGORIA_DEPARTAMENTO='                ',
+        $stmt->bindParam(14, $vacio  ,PDO::PARAM_STR);                                //@TXT_CATEGORIA_DEPARTAMENTO='',
+        $stmt->bindParam(15, $vacio ,PDO::PARAM_STR);                                 //@COD_CATEGORIA_PROVINCIA='                ',
+        $stmt->bindParam(16, $vacio ,PDO::PARAM_STR);                                 //@TXT_CATEGORIA_PROVINCIA='',
+        $stmt->bindParam(17, $vacio ,PDO::PARAM_STR);                                 //@COD_CATEGORIA_DISTRITO='                ',
+        $stmt->bindParam(18, $vacio ,PDO::PARAM_STR);                                 //@TXT_CATEGORIA_DISTRITO='',
+        $stmt->bindParam(19, $vacio ,PDO::PARAM_STR);                                 //@TXT_SECTOR_CULTIVO='',
+        $stmt->bindParam(20, $vacio ,PDO::PARAM_STR);                                 //@TXT_PARCELA='',
+
+        $stmt->bindParam(21, $vacio ,PDO::PARAM_STR);                                 //@COD_PRODUCTO='                ',
+        $stmt->bindParam(22, $vacio ,PDO::PARAM_STR);                                 //@TXT_PRODUCTO='',
+        $stmt->bindParam(23, $CAN_LIMITE_CREDITO_INDIVIDUAL ,PDO::PARAM_STR);         //@CAN_LIMITE_CREDITO_INDIVIDUAL=9999999.0000,
+        $stmt->bindParam(24, $CAN_LIMITE_CREDITO_INDIVIDUAL ,PDO::PARAM_STR);         //@CAN_LIMITE_CREDITO_MATERIAL=9999999.0000,
+        $stmt->bindParam(25, $CAN_LIMITE_CREDITO_INDIVIDUAL ,PDO::PARAM_STR);         //@CAN_LIMITE_CREDITO_SERVICIO=9999999.0000,
+        $stmt->bindParam(26, $COD_CATEGORIA_ESTADO ,PDO::PARAM_STR);                  //@COD_CATEGORIA_ESTADO='ECO0000000000001',
+        $stmt->bindParam(27, $TXT_CATEGORIA_ESTADO  ,PDO::PARAM_STR);                 //@TXT_CATEGORIA_ESTADO='GENERADO',
+        $stmt->bindParam(28, $cod_estado ,PDO::PARAM_STR);                            //@COD_ESTADO=1,
+        $stmt->bindParam(29, $cod_usuario_registro ,PDO::PARAM_STR);                  //@COD_USUARIO_REGISTRO='                '
+        $stmt->execute();
+
+        return  $coddocumento[0];
+    }
+
+
+
+
+
+
+
     private function lg_enviar_osiris($liquidaciongastos,$tdetliquidaciongastos,$detdocumentolg,$SERIE,$CORRELATIVO,$periodo) {
 
         $conexionbd         = 'sqlsrv';
@@ -697,10 +938,44 @@ trait LiquidacionGastoTraits
     }
 
 
+    private function lg_lista_cabecera_comprobante_total_obs_le_administracion() {
+
+        $listadatos         =   LqgLiquidacionGasto::where('ACTIVO','=','1')
+                                ->where('IND_OBSERVACION','=',0)
+                                ->where('AREA_OBSERVACION','=','ADM')
+                                ->where('COD_ESTADO','=','ETM0000000000004')
+                                ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                                ->orderby('FECHA_EMI','ASC')
+                                ->get();
+
+        return  $listadatos;
+    }
+
+    private function lg_lista_cabecera_comprobante_total_obs_administracion() {
+
+        $listadatos         =   LqgLiquidacionGasto::where('ACTIVO','=','1')
+                                ->where('IND_OBSERVACION','=',1)
+                                ->where('COD_ESTADO','=','ETM0000000000004')
+                                ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                                ->orderby('FECHA_EMI','ASC')
+                                ->get();
+
+        return  $listadatos;
+    }
+
 
     private function lg_lista_cabecera_comprobante_total_administracion() {
 
         $listadatos         =   LqgLiquidacionGasto::where('ACTIVO','=','1')
+                                ->where(function ($query) {
+                                    $query->where('IND_OBSERVACION', '<>', 1)
+                                          ->orWhereNull('IND_OBSERVACION');
+                                })
+                                ->where(function ($query) {
+                                    $query->where('AREA_OBSERVACION', '=', '')
+                                          ->orWhere('AREA_OBSERVACION', '=', 'JEFE')
+                                          ->orWhereNull('AREA_OBSERVACION');
+                                })
                                 ->where('COD_ESTADO','=','ETM0000000000004')
                                 ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
                                 ->orderby('FECHA_EMI','ASC')
@@ -711,15 +986,32 @@ trait LiquidacionGastoTraits
 
     private function lg_lista_cabecera_comprobante_total_jefe() {
         if(Session::get('usuario')->id== '1CIX00000001'){
+
             $listadatos         =   LqgLiquidacionGasto::where('ACTIVO','=','1')
-                                    //->where('COD_USUARIO_AUTORIZA','=',Session::get('usuario')->id)
+                                    ->where(function ($query) {
+                                        $query->where('IND_OBSERVACION', '<>', 1)
+                                              ->orWhereNull('IND_OBSERVACION');
+                                    })
+                                    ->where(function ($query) {
+                                        $query->where('AREA_OBSERVACION', '=', '')
+                                              ->orWhereNull('AREA_OBSERVACION');
+                                    })
                                     ->where('COD_ESTADO','=','ETM0000000000010')
                                     ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
                                     ->orderby('FECHA_EMI','ASC')
                                     ->get();
+
         }else{
 
             $listadatos         =   LqgLiquidacionGasto::where('ACTIVO','=','1')
+                                    ->where(function ($query) {
+                                        $query->where('IND_OBSERVACION', '<>', 1)
+                                              ->orWhereNull('IND_OBSERVACION');
+                                    })
+                                    ->where(function ($query) {
+                                        $query->where('AREA_OBSERVACION', '=', '')
+                                              ->orWhereNull('AREA_OBSERVACION');
+                                    })
                                     ->where('COD_USUARIO_AUTORIZA','=',Session::get('usuario')->id)
                                     ->where('COD_ESTADO','=','ETM0000000000010')
                                     ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
@@ -732,6 +1024,75 @@ trait LiquidacionGastoTraits
     }
 
 
+    private function lg_lista_cabecera_comprobante_total_obs_le_jefe() {
+        if(Session::get('usuario')->id== '1CIX00000001'){
+
+            $listadatos         =   LqgLiquidacionGasto::where('ACTIVO','=','1')
+                                    ->where('IND_OBSERVACION','=',0)
+                                    ->where('AREA_OBSERVACION','=','JEFE')
+                                    ->where('COD_ESTADO','=','ETM0000000000010')
+                                    ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                                    ->orderby('FECHA_EMI','ASC')
+                                    ->get();
+
+        }else{
+
+            $listadatos         =   LqgLiquidacionGasto::where('ACTIVO','=','1')
+                                    ->where('IND_OBSERVACION','=',0)
+                                    ->where('AREA_OBSERVACION','=','JEFE')
+                                    ->where('COD_USUARIO_AUTORIZA','=',Session::get('usuario')->id)
+                                    ->where('COD_ESTADO','=','ETM0000000000010')
+                                    ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                                    ->orderby('FECHA_EMI','ASC')
+                                    ->get();
+
+        }
+
+        return  $listadatos;
+    }
+
+
+    private function lg_lista_cabecera_comprobante_total_obs_jefe() {
+        if(Session::get('usuario')->id== '1CIX00000001'){
+
+            $listadatos         =   LqgLiquidacionGasto::where('ACTIVO','=','1')
+                                    ->where('IND_OBSERVACION','=',1)
+                                    ->where('COD_ESTADO','=','ETM0000000000010')
+                                    ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                                    ->orderby('FECHA_EMI','ASC')
+                                    ->get();
+
+        }else{
+
+            $listadatos         =   LqgLiquidacionGasto::where('ACTIVO','=','1')
+                                    ->where('IND_OBSERVACION','=',1)
+                                    ->where('COD_USUARIO_AUTORIZA','=',Session::get('usuario')->id)
+                                    ->where('COD_ESTADO','=','ETM0000000000010')
+                                    ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                                    ->orderby('FECHA_EMI','ASC')
+                                    ->get();
+
+        }
+
+        return  $listadatos;
+    }
+
+
+
+    private function lg_calcular_total_observar($iddocumento) {
+
+        $detdocumentolg                     =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
+                                                ->where('ACTIVO','=',1)
+                                                ->get();
+
+        LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
+                    ->update(
+                            [
+                                'TOTAL'=> $detdocumentolg->SUM('TOTAL'),
+                                'SUBTOTAL'=> $detdocumentolg->SUM('SUBTOTAL'),
+                                'IGV'=> $detdocumentolg->SUM('IGV')
+                            ]);                   
+    }
 
     private function lg_calcular_total($iddocumento,$item) {
 

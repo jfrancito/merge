@@ -22,6 +22,7 @@ use App\Modelos\ALMCentro;
 use App\Modelos\Estado;
 use App\Modelos\CMPDocAsociarCompra;
 use App\Modelos\FeToken;
+use App\Modelos\CMPZona;
 
 
 use App\Modelos\LqgLiquidacionGasto;
@@ -56,6 +57,176 @@ class GestionLiquidacionGastosController extends Controller
     use PlanillaTraits;
     use LiquidacionGastoTraits;
     use ComprobanteTraits;
+
+
+    public function actionGuardarEmpresaProveedor($idopcion,Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        View::share('titulo','Guardar Empresa');
+        if($_POST)
+        {
+            try{    
+                
+                $ruc                    =   $request['ruc'];
+                $rz                     =   $request['rz'];
+                $direccion              =   $request['direccion'];
+                $departamento           =   $request['departamento'];
+                $provincia              =   $request['provincia'];
+                $distrito               =   $request['distrito'];
+
+                $trabajador             =   DB::table('STD.TRABAJADOR')
+                                            ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                                            ->first();     
+
+                $centro_id              =   '';
+                if(count($trabajador)>0){
+                    $dni                =   $trabajador->NRO_DOCUMENTO;
+                }
+                $trabajadorespla        =   DB::table('WEB.platrabajadores')
+                                            ->where('situacion_id', 'PRMAECEN000000000002')
+                                            ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+                                            ->where('dni', $dni)
+                                            ->first();
+                if(count($trabajador)>0){
+                    $centro_id      =       $trabajadorespla->centro_osiris_id;
+                }
+
+
+  
+                if($centro_id==''){
+                    return Redirect::to('gestion-de-empresa-proveedor/'.$idopcion)->with('errorbd','No tienes un Centro Asignado');
+                }
+
+                $centro                 =   ALMCentro::where('COD_CENTRO', $centro_id)
+                                            ->first();  
+                $zona                   =   CMPZona::where('TXT_NOMBRE', $centro->NOM_CENTRO)->where('COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                            ->where('COD_ESTADO','=','1')
+                                            ->orderBy('COD_ZONA','ASC')
+                                            ->first();
+ 
+                $zona02                 =   CMPZona::where('TXT_NOMBRE', $centro->NOM_CENTRO)->where('COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                            ->where('COD_ESTADO','=','1')
+                                            ->where('COD_ZONA_SUP','<>','')
+                                            ->first();
+
+                if(count($zona)<=0){
+                    return Redirect::to('gestion-de-empresa-proveedor/'.$idopcion)->with('errorbd','No existe Zona en el osiris');
+                }
+                if(count($zona02)<=0){
+                    return Redirect::to('gestion-de-empresa-proveedor/'.$idopcion)->with('errorbd','No existe Zona 02 en el osiris');
+                }
+
+
+                $departamentos   =       CMPCategoria::where('TXT_GRUPO','=','DEPARTAMENTO')->where('NOM_CATEGORIA','=',$departamento)->first();
+                if(count($departamentos)<=0){
+                    return Redirect::to('gestion-de-empresa-proveedor/'.$idopcion)->with('errorbd','No existe Departamento en el osiris');
+                }
+                $provincias   =       CMPCategoria::where('TXT_GRUPO','=','PROVINCIA')->where('NOM_CATEGORIA','=',$provincia)->first();
+                if(count($provincias)<=0){
+                    return Redirect::to('gestion-de-empresa-proveedor/'.$idopcion)->with('errorbd','No existe Provincia en el osiris');
+                }
+
+                $distritos   =       CMPCategoria::where('TXT_GRUPO','=','PROVINCIA')->where('NOM_CATEGORIA','=',$distrito)->first();
+                if(count($distritos)<=0){
+                    return Redirect::to('gestion-de-empresa-proveedor/'.$idopcion)->with('errorbd','No existe Distrito en el osiris');
+                }
+
+                DB::beginTransaction();
+                $empresa_id     =       Session::get('empresas')->COD_EMPR;
+
+                $cod_empresa    =       $this->lg_enviar_osiris_empresa($centro_id,$empresa_id,$rz,$ruc,$direccion,$departamentos->COD_CATEGORIA,$provincias->COD_CATEGORIA,$distritos->COD_CATEGORIA,$zona,$zona02);
+
+                DB::commit();
+                return Redirect::to('gestion-de-empresa-proveedor/'.$idopcion)->with('bienhecho', 'Empresa : '.$rz.' REGISTRO CON EXITO' );
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                return Redirect::to('gestion-de-empresa-proveedor/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+        }
+ 
+    }
+
+
+    public function actionBuscarSunatRuc($idopcion,Request $request)
+    {
+
+        $ruc_buscar           =   $request['ruc_buscar'];
+        $urlxml               =   'https://dniruc.apisperu.com/api/v1/ruc/'.$ruc_buscar.'?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImhlbnJyeWluZHVAZ21haWwuY29tIn0.m3cyXSejlDWl0BLcphHPUTfPNqpa5kXWoBcmQ6WvkII';
+        $respuetaxml          =   $this->buscar_ruc_sunat_lg($urlxml);
+        $empresa              =   STDEmpresa::where('NRO_DOCUMENTO','=',$ruc_buscar)->first();
+
+        if(count($empresa)>0){
+            return Redirect::to('gestion-de-empresa-proveedor/'.$idopcion)->with('errorbd','Empresa '.$empresa->NOM_EMPR.' ya existe');
+        }
+        $response_array = json_decode($respuetaxml, true);
+        if(isset($response_array['success'])){
+            return Redirect::to('gestion-de-empresa-proveedor/'.$idopcion)->with('errorbd','No se encontraron resultados.');  
+        }
+
+        Session::flash('ruc', $response_array['ruc']);
+        Session::flash('rz', $response_array['razonSocial']);
+        Session::flash('direccion', $response_array['direccion']);
+        Session::flash('departamento', $response_array['departamento']);
+        Session::flash('provincia', $response_array['provincia']);
+        Session::flash('distrito', $response_array['distrito']);
+        return Redirect::to('/gestion-de-empresa-proveedor/'.$idopcion)->with('bienhecho', 'Documento Encontrado');
+
+    }
+
+
+
+    public function actionGestionEmpresaProveedor($idopcion,Request $request)
+    {
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Anadir');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        View::share('titulo','Guardar Empresa Proveedor');
+
+        $ruc                        =   "";
+        $rz                         =   "";
+        $direccion                  =   "";
+        $departamento               =   "";
+        $provincia                  =   "";
+        $distrito                   =   "";
+
+        if(Session::has('ruc')){
+            $ruc                    =   Session::get('ruc');
+        }
+        if(Session::has('rz')){
+            $rz                     =   Session::get('rz');
+        }
+        if(Session::has('direccion')){
+            $direccion              =   Session::get('direccion');
+        }
+        if(Session::has('departamento')){
+            $departamento           =   Session::get('departamento');
+        }
+        if(Session::has('provincia')){
+            $provincia              =   Session::get('provincia');
+        }
+        if(Session::has('distrito')){
+            $distrito               =   Session::get('distrito');
+        }
+
+        return View::make('liquidaciongasto/buscarempresaproveedor',
+                    [         
+                        'idopcion'      => $idopcion,
+                        'ruc'           => $ruc,
+                        'rz'            => $rz,
+                        'direccion'     => $direccion,
+                        'departamento'  => $departamento,
+                        'provincia'     => $provincia,
+                        'distrito'      => $distrito
+                    ]);
+
+    }
+
+
 
     public function actionBuscarCpeSunatLg(Request $request)
     {
@@ -148,7 +319,7 @@ class GestionLiquidacionGastosController extends Controller
         $liquidaciongastos      =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
         $tdetliquidaciongastos  =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
         $detdocumentolg         =   LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
-        $documentohistorial     =   LqgDocumentoHistorial::where('ID_DOCUMENTO','=',$iddocumento)->get();
+        $documentohistorial     =   LqgDocumentoHistorial::where('ID_DOCUMENTO','=',$iddocumento)->orderby('FECHA','DESC')->get();
         $archivospdf            =   Archivo::where('ID_DOCUMENTO','=',$iddocumento)->where('EXTENSION', 'like', '%'.'pdf'.'%')->get();
         $ocultar                =   "";
         // Construir el array de URLs
@@ -170,10 +341,19 @@ class GestionLiquidacionGastosController extends Controller
                 'frameClass'    => $archivo->ID_DOCUMENTO.$archivo->DOCUMENTO_ITEM.' '.$valor //
             ];
         }
+
+        $productosagru      =   DB::table('LQG_DETDOCUMENTOLIQUIDACIONGASTO')
+                        ->select('COD_PRODUCTO', 'TXT_PRODUCTO', DB::raw('SUM(CANTIDAD) as CANTIDAD'), DB::raw('SUM(TOTAL) as TOTAL'))
+                        ->where('ID_DOCUMENTO', $iddocumento)
+                        ->where('ACTIVO', 1)
+                        ->groupBy('COD_PRODUCTO', 'TXT_PRODUCTO')
+                        ->get();
+
         return View::make('liquidaciongasto/detallelgvalidado', 
                         [
                             'liquidaciongastos'     =>  $liquidaciongastos,
                             'tdetliquidaciongastos' =>  $tdetliquidaciongastos,
+                            'productosagru' =>  $productosagru,
                             'detdocumentolg'        =>  $detdocumentolg,
                             'documentohistorial'    =>  $documentohistorial,
                             'idopcion'              =>  $idopcion,
@@ -266,7 +446,7 @@ class GestionLiquidacionGastosController extends Controller
                 $liquidaciongastos      =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
                 $tdetliquidaciongastos  =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
                 $detdocumentolg         =   LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
-                $documentohistorial     =   LqgDocumentoHistorial::where('ID_DOCUMENTO','=',$iddocumento)->get();
+                $documentohistorial     =   LqgDocumentoHistorial::where('ID_DOCUMENTO','=',$iddocumento)->orderby('FECHA','DESC')->get();
                 $descripcion            =   $request['descripcionextorno'];
 
                 //GUARDAR EN EL HISTORIAL QUE SE EXTORNO UN VEZ
@@ -320,7 +500,7 @@ class GestionLiquidacionGastosController extends Controller
                 $liquidaciongastos      =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
                 $tdetliquidaciongastos  =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
                 $detdocumentolg         =   LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
-                $documentohistorial     =   LqgDocumentoHistorial::where('ID_DOCUMENTO','=',$iddocumento)->get();
+                $documentohistorial     =   LqgDocumentoHistorial::where('ID_DOCUMENTO','=',$iddocumento)->orderby('FECHA','DESC')->get();
                 $descripcion            =   $request['descripcionextorno'];
 
                 //GUARDAR EN EL HISTORIAL QUE SE EXTORNO UN VEZ
@@ -823,9 +1003,6 @@ class GestionLiquidacionGastosController extends Controller
     }
 
 
-
-
-
     public function actionAprobarAdministracionLG($idopcion, $iddocumento,Request $request)
     {
 
@@ -845,9 +1022,13 @@ class GestionLiquidacionGastosController extends Controller
                 $liquidaciongastos      =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
                 $tdetliquidaciongastos  =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
                 $detdocumentolg         =   LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
-                $documentohistorial     =   LqgDocumentoHistorial::where('ID_DOCUMENTO','=',$iddocumento)->get();
+                $documentohistorial     =   LqgDocumentoHistorial::where('ID_DOCUMENTO','=',$iddocumento)->orderby('FECHA','DESC')->get();
 
 
+                if($liquidaciongastos->IND_OBSERVACION==1){
+                    DB::rollback(); 
+                    return Redirect::back()->with('errorbd', 'El documento esta observado no se puede observar');
+                }
                 //VALIDAR SI TIENE SERIE
                 $COD_TRAB               =   '';
                 $SERIE                  =   '';
@@ -975,8 +1156,8 @@ class GestionLiquidacionGastosController extends Controller
             $liquidaciongastos      =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
             $tdetliquidaciongastos  =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
             $detdocumentolg         =   LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
-            $documentohistorial     =   LqgDocumentoHistorial::where('ID_DOCUMENTO','=',$iddocumento)->get();
-
+            $documentohistorial     =   LqgDocumentoHistorial::where('ID_DOCUMENTO','=',$iddocumento)->orderby('FECHA','DESC')->get();
+            $tdetliquidaciongastosel=   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','0')->get();
             $archivospdf            =   Archivo::where('ID_DOCUMENTO','=',$iddocumento)->where('EXTENSION', 'like', '%'.'pdf'.'%')->get();
             $ocultar                =   "";
             // Construir el array de URLs
@@ -1002,10 +1183,19 @@ class GestionLiquidacionGastosController extends Controller
             }
 
 
+            $productosagru      =   DB::table('LQG_DETDOCUMENTOLIQUIDACIONGASTO')
+                            ->select('COD_PRODUCTO', 'TXT_PRODUCTO', DB::raw('SUM(CANTIDAD) as CANTIDAD'), DB::raw('SUM(TOTAL) as TOTAL'))
+                            ->where('ID_DOCUMENTO', $iddocumento)
+                            ->where('ACTIVO', 1)
+                            ->groupBy('COD_PRODUCTO', 'TXT_PRODUCTO')
+                            ->get();
+
             return View::make('liquidaciongasto/aprobaradministracionlg', 
                             [
                                 'liquidaciongastos'     =>  $liquidaciongastos,
                                 'tdetliquidaciongastos' =>  $tdetliquidaciongastos,
+                                'tdetliquidaciongastosel' =>  $tdetliquidaciongastosel,
+                                'productosagru' =>  $productosagru,
                                 'detdocumentolg'        =>  $detdocumentolg,
                                 'documentohistorial'    =>  $documentohistorial,
                                 'idopcion'              =>  $idopcion,
@@ -1033,8 +1223,8 @@ class GestionLiquidacionGastosController extends Controller
         }
 
         $listadatos         =   $this->lg_lista_cabecera_comprobante_total_administracion();
-        $listadatos_obs     =   array();
-        $listadatos_obs_le  =   array();
+        $listadatos_obs     =   $this->lg_lista_cabecera_comprobante_total_obs_administracion();
+        $listadatos_obs_le  =   $this->lg_lista_cabecera_comprobante_total_obs_le_administracion();
 
         $funcion        =   $this;
         return View::make('liquidaciongasto/listaliquidaciongastoadministracion',
@@ -1049,6 +1239,169 @@ class GestionLiquidacionGastosController extends Controller
     }
 
 
+    public function actionObservarJefeLG($idopcion, $iddocumento,Request $request)
+    {
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        $idcab                  =   $iddocumento;
+        $iddocumento            =   $this->funciones->decodificarmaestrapre($iddocumento,'LIQG');
+        View::share('titulo','Observar Liquidacion de Gastos');
+
+        if($_POST)
+        {
+
+            try{    
+                DB::beginTransaction();
+                $data_archivo                  =   json_decode($request['data_observacion'], true);
+                $descripcion                   =   $request['descripcion'];
+                $liquidaciongastos             =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
+
+                if($liquidaciongastos->IND_OBSERVACION==1){
+                    DB::rollback(); 
+                    return Redirect::back()->with('errorbd', 'El documento esta observado no se puede observar');
+                }
+
+
+                if(count($data_archivo)<=0){
+                    DB::rollback(); 
+                    return Redirect::back()->with('errorbd', 'Tiene que seleccionar almenos un item');
+                }
+                LqgLiquidacionGasto::where('ID_DOCUMENTO',$iddocumento)
+                            ->update(
+                                [
+                                    'IND_OBSERVACION'=>1,
+                                    'TXT_OBSERVACION'=>'OBSERVADO',
+                                    'AREA_OBSERVACION'=>'JEFE'
+                                ]
+                            );
+                foreach($data_archivo as $key => $obj){
+                    $data_id         =   $obj['data_id'];
+                    $data_item       =   $obj['data_item'];
+                    LqgDetLiquidacionGasto::where('ID_DOCUMENTO',$data_id)->where('ITEM','=',$data_item)
+                                ->update(
+                                    [
+                                        'IND_OBSERVACION'=>1,
+                                        'AREA_OBSERVACION'=>'JEFE',
+                                        'ACTIVO'=>0,
+                                    ]
+                                );
+
+                    LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO',$data_id)->where('ITEM','=',$data_item)
+                                ->update(
+                                    [
+                                        'ACTIVO'=>0,
+                                    ]
+                                );
+
+
+                }
+
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento                              =   new LqgDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $liquidaciongastos->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM              =   1;
+                $documento->FECHA                       =   $this->fechaactual;
+                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                $documento->TIPO                        =   'OBSERVADO POR JEFE';
+                $documento->MENSAJE                     =   $descripcion;
+                $documento->save();
+                $this->lg_calcular_total_observar($iddocumento);
+
+                DB::commit();
+
+
+                return Redirect::to('/gestion-de-aprobacion-liquidacion-gasto-jefe/'.$idopcion)->with('bienhecho', 'Liquidacion Gastos : '.$liquidaciongastos->CODIGO.' Observado con Exito');
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                return Redirect::to('/gestion-de-aprobacion-liquidacion-gasto-jefe/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+        }
+    }
+
+    public function actionObservarAdministradorLG($idopcion, $iddocumento,Request $request)
+    {
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        $idcab                  =   $iddocumento;
+        $iddocumento            =   $this->funciones->decodificarmaestrapre($iddocumento,'LIQG');
+        View::share('titulo','Observar Liquidacion de Gastos');
+
+        if($_POST)
+        {
+
+            try{    
+                DB::beginTransaction();
+                $data_archivo                  =   json_decode($request['data_observacion'], true);
+                $descripcion                   =   $request['descripcion'];
+                $liquidaciongastos             =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
+
+                if($liquidaciongastos->IND_OBSERVACION==1){
+                    DB::rollback(); 
+                    return Redirect::back()->with('errorbd', 'El documento esta observado no se puede observar');
+                }
+
+
+                if(count($data_archivo)<=0){
+                    DB::rollback(); 
+                    return Redirect::back()->with('errorbd', 'Tiene que seleccionar almenos un item');
+                }
+                LqgLiquidacionGasto::where('ID_DOCUMENTO',$iddocumento)
+                            ->update(
+                                [
+                                    'IND_OBSERVACION'=>1,
+                                    'TXT_OBSERVACION'=>'OBSERVADO',
+                                    'AREA_OBSERVACION'=>'ADM'
+                                ]
+                            );
+                foreach($data_archivo as $key => $obj){
+                    $data_id         =   $obj['data_id'];
+                    $data_item       =   $obj['data_item'];
+                    LqgDetLiquidacionGasto::where('ID_DOCUMENTO',$data_id)->where('ITEM','=',$data_item)
+                                ->update(
+                                    [
+                                        'IND_OBSERVACION'=>1,
+                                        'AREA_OBSERVACION'=>'ADM',
+                                        'ACTIVO'=>0,
+                                    ]
+                                );
+
+                    LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO',$data_id)->where('ITEM','=',$data_item)
+                                ->update(
+                                    [
+                                        'ACTIVO'=>0,
+                                    ]
+                                );
+
+
+                }
+
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento                              =   new LqgDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $liquidaciongastos->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM              =   1;
+                $documento->FECHA                       =   $this->fechaactual;
+                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                $documento->TIPO                        =   'OBSERVADO POR ADMINISTRACION';
+                $documento->MENSAJE                     =   $descripcion;
+                $documento->save();
+                $this->lg_calcular_total_observar($iddocumento);
+
+                DB::commit();
+
+
+                return Redirect::to('/gestion-de-aprobacion-liquidacion-gastos-administracion/'.$idopcion)->with('bienhecho', 'Liquidacion Gastos : '.$liquidaciongastos->CODIGO.' Observado con Exito');
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                return Redirect::to('/gestion-de-aprobacion-liquidacion-gastos-administracion/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+        }
+    }
 
 
     public function actionAprobarJefeLG($idopcion, $iddocumento,Request $request)
@@ -1071,7 +1424,15 @@ class GestionLiquidacionGastosController extends Controller
                 $liquidaciongastos      =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
                 $tdetliquidaciongastos  =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
                 $detdocumentolg         =   LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
-                $documentohistorial     =   LqgDocumentoHistorial::where('ID_DOCUMENTO','=',$iddocumento)->get();
+                $documentohistorial     =   LqgDocumentoHistorial::where('ID_DOCUMENTO','=',$iddocumento)->orderby('FECHA','DESC')->get();
+
+
+                if($liquidaciongastos->IND_OBSERVACION==1){
+                    DB::rollback(); 
+                    return Redirect::back()->with('errorbd', 'El documento esta observado no se puede observar');
+                }
+
+
 
                 $descripcion        =   $request['descripcion'];
                 if(rtrim(ltrim($descripcion)) != ''){
@@ -1121,8 +1482,12 @@ class GestionLiquidacionGastosController extends Controller
             $liquidaciongastos      =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
             $tdetliquidaciongastos  =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
             $detdocumentolg         =   LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
-            $documentohistorial     =   LqgDocumentoHistorial::where('ID_DOCUMENTO','=',$iddocumento)->get();
+            $documentohistorial     =   LqgDocumentoHistorial::where('ID_DOCUMENTO','=',$iddocumento)->orderby('FECHA','DESC')->get();
             $archivospdf            =   Archivo::where('ID_DOCUMENTO','=',$iddocumento)->where('EXTENSION', 'like', '%'.'pdf'.'%')->get();
+
+            $tdetliquidaciongastosel=   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','0')->get();
+
+
             $ocultar                =   "";
             // Construir el array de URLs
             $initialPreview = [];
@@ -1146,11 +1511,20 @@ class GestionLiquidacionGastosController extends Controller
                 ];
             }
 
+            //dd($tdetliquidaciongastos);
+            $productosagru      =   DB::table('LQG_DETDOCUMENTOLIQUIDACIONGASTO')
+                            ->select('COD_PRODUCTO', 'TXT_PRODUCTO', DB::raw('SUM(CANTIDAD) as CANTIDAD'), DB::raw('SUM(TOTAL) as TOTAL'))
+                            ->where('ID_DOCUMENTO', $iddocumento)
+                            ->where('ACTIVO', 1)
+                            ->groupBy('COD_PRODUCTO', 'TXT_PRODUCTO')
+                            ->get();
 
             return View::make('liquidaciongasto/aprobarjefelg', 
                             [
                                 'liquidaciongastos'     =>  $liquidaciongastos,
                                 'tdetliquidaciongastos' =>  $tdetliquidaciongastos,
+                                'tdetliquidaciongastosel'=>  $tdetliquidaciongastosel,
+                                'productosagru' =>  $productosagru,
                                 'detdocumentolg'        =>  $detdocumentolg,
                                 'documentohistorial'    =>  $documentohistorial,
                                 'idopcion'              =>  $idopcion,
@@ -1158,7 +1532,6 @@ class GestionLiquidacionGastosController extends Controller
                                 'iddocumento'           =>  $iddocumento,
                                 'initialPreview'        => json_encode($initialPreview),
                                 'initialPreviewConfig'  => json_encode($initialPreviewConfig),
-
                             ]);
 
 
@@ -1180,8 +1553,9 @@ class GestionLiquidacionGastosController extends Controller
         }
 
         $listadatos         =   $this->lg_lista_cabecera_comprobante_total_jefe();
-        $listadatos_obs     =   array();
-        $listadatos_obs_le  =   array();
+        $listadatos_obs     =   $this->lg_lista_cabecera_comprobante_total_obs_jefe();
+        $listadatos_obs_le  =   $this->lg_lista_cabecera_comprobante_total_obs_le_jefe();
+
 
         $funcion        =   $this;
         return View::make('liquidaciongasto/listaliquidaciongastojefe',
@@ -1207,36 +1581,63 @@ class GestionLiquidacionGastosController extends Controller
             try{    
                 DB::beginTransaction();
                 $liquidaciongastos      =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
-                $tdetliquidaciongastos  =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
-                $usuario_id             =   $request['autoriza_id'];
-                $usuario                =   User::where('id','=',$usuario_id)->first();
 
-                if(count($tdetliquidaciongastos)<=0){
-                    return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/0')->with('errorbd','Para poder emitir tiene que cargar sus documentos');
+                //CUANDO ESTA OBSEVADOS
+                if($liquidaciongastos->IND_OBSERVACION==1){
+
+                    LqgLiquidacionGasto::where('ID_DOCUMENTO',$iddocumento)
+                                ->update(
+                                    [
+                                        'IND_OBSERVACION'=>0
+                                    ]
+                                );
+
+                    $documento                              =   new LqgDocumentoHistorial;
+                    $documento->ID_DOCUMENTO                =   $iddocumento;
+                    $documento->DOCUMENTO_ITEM              =   1;
+                    $documento->FECHA                       =   date_format(date_create(date('Ymd h:i:s')), 'Ymd h:i:s');
+                    $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                    $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                    $documento->TIPO                        =   'SE LEVANTARON LAS OBSERVACIONE';
+                    $documento->MENSAJE                     =   '';
+                    $documento->save();
+
+                }else{
+                    $tdetliquidaciongastos  =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
+                    $usuario_id             =   $request['autoriza_id'];
+                    $usuario                =   User::where('id','=',$usuario_id)->first();
+
+                    if(count($tdetliquidaciongastos)<=0){
+                        return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/0')->with('errorbd','Para poder emitir tiene que cargar sus documentos');
+                    }
+
+                    LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
+                                ->update(
+                                        [
+                                            'COD_USUARIO_AUTORIZA'=> $usuario->id,
+                                            'TXT_USUARIO_AUTORIZA'=> $usuario->nombre,
+                                            'TXT_GLOSA'=> $request['glosa'],
+                                            'FECHA_EMI'=> $this->fechaactual,
+                                            'FECHA_MOD'=> $this->fechaactual,
+                                            'USUARIO_MOD'=> Session::get('usuario')->id,
+                                            'COD_ESTADO'=> 'ETM0000000000010',
+                                            'TXT_ESTADO'=> 'POR APROBAR AUTORIZACION'
+                                        ]);
+
+                    $documento                              =   new LqgDocumentoHistorial;
+                    $documento->ID_DOCUMENTO                =   $iddocumento;
+                    $documento->DOCUMENTO_ITEM              =   1;
+                    $documento->FECHA                       =   date_format(date_create(date('Ymd h:i:s')), 'Ymd h:i:s');
+                    $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                    $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                    $documento->TIPO                        =   'CREO LIQUIDACION DE GASTO';
+                    $documento->MENSAJE                     =   '';
+                    $documento->save();
                 }
 
-                LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
-                            ->update(
-                                    [
-                                        'COD_USUARIO_AUTORIZA'=> $usuario->id,
-                                        'TXT_USUARIO_AUTORIZA'=> $usuario->nombre,
-                                        'TXT_GLOSA'=> $request['glosa'],
-                                        'FECHA_EMI'=> $this->fechaactual,
-                                        'FECHA_MOD'=> $this->fechaactual,
-                                        'USUARIO_MOD'=> Session::get('usuario')->id,
-                                        'COD_ESTADO'=> 'ETM0000000000010',
-                                        'TXT_ESTADO'=> 'POR APROBAR AUTORIZACION'
-                                    ]);
 
-                $documento                              =   new LqgDocumentoHistorial;
-                $documento->ID_DOCUMENTO                =   $iddocumento;
-                $documento->DOCUMENTO_ITEM              =   1;
-                $documento->FECHA                       =   date_format(date_create(date('Ymd h:i:s')), 'Ymd h:i:s');
-                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
-                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
-                $documento->TIPO                        =   'CREO LIQUIDACION DE GASTO';
-                $documento->MENSAJE                     =   '';
-                $documento->save();
+
+
 
                 DB::commit();
             }catch(\Exception $ex){
@@ -1525,7 +1926,12 @@ class GestionLiquidacionGastosController extends Controller
                             $comprobantes[] = $texto;
                         }
                     }
-                    $tieneFactura = in_array('FACTURA', $comprobantes);
+
+                    $tieneFactura = !empty(array_filter($comprobantes, function($item) {
+                        return stripos($item, 'FACTURA') !== false;
+                    }));
+
+                    //$tieneFactura = in_array('FACTURA', $comprobantes);
                     if($tipodoc_id != 'TDO0000000000001'){
                         if($tieneFactura == 1){
                             return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/-1')->with('errorbd','Este proveedor emite FACTURA');
@@ -1671,7 +2077,7 @@ class GestionLiquidacionGastosController extends Controller
                         }
                     }
 
-
+                    $tdetliquidaciongastos              =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->get();
                     $item                               =   count($tdetliquidaciongastos) + 1;
                     $cuenta                             =   CMPContrato::where('COD_CONTRATO','=',$cuenta_id)->first();
                     $subcuenta                          =   CMPContratoCultivo::where('COD_CONTRATO','=',$subcuenta_id)->first();
@@ -1683,7 +2089,6 @@ class GestionLiquidacionGastosController extends Controller
                     $nombre_doc_sinceros                =   $serie.'-'.$numero;
                     $numero                             =   str_pad($numero, 10, "0", STR_PAD_LEFT); 
                     $nombre_doc                         =   $serie.'-'.$numero;
-
 
                     //dd($empresa_trab);
                     $cabecera                           =   new LqgDetLiquidacionGasto;
@@ -1727,6 +2132,10 @@ class GestionLiquidacionGastosController extends Controller
 
                     $cabecera->COD_PLA_MOVILIDAD        =   $cod_planila;
                     $cabecera->TXT_GLOSA                =   $glosadet;
+
+                    $cabecera->IND_OBSERVACION          =   0;
+                    $cabecera->AREA_OBSERVACION         =   '';
+
 
                     $cabecera->IGV                      =   0;
                     $cabecera->SUBTOTAL                 =   $TOTAL_T;
@@ -2127,10 +2536,12 @@ class GestionLiquidacionGastosController extends Controller
         $iddocumento = $this->funciones->decodificarmaestrapre($iddocumento,'LIQG');
         View::share('titulo','Agregar Detalle Liquidacion de Gastos');
         $liquidaciongastos          =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
-        $tdetliquidaciongastos      =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
+        $tdetliquidaciongastos      =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=',1)->get();
+        $tdetliquidaciongastosobs   =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=',0)->get();
 
 
-        if($liquidaciongastos->COD_ESTADO!='ETM0000000000001'){
+
+        if($liquidaciongastos->COD_ESTADO!='ETM0000000000001' && $liquidaciongastos->IND_OBSERVACION ==0){
             return Redirect::to('gestion-de-liquidacion-gastos/'.$idopcion)->with('errorbd', 'Ya no puede modificar esta LIQUIDACION DE GASTOS');
         }
         $fecha_emision                  =   $this->hoy_sh;
@@ -2228,16 +2639,18 @@ class GestionLiquidacionGastosController extends Controller
         $autoriza_id                    =   '';
         $combo_autoriza                 =   $this->gn_combo_usuarios();
         $array_detalle_producto         =   array();
-
-
+        $documentohistorial             =   LqgDocumentoHistorial::where('ID_DOCUMENTO','=',$iddocumento)->orderby('FECHA','DESC')->get();
+        //dd($tdetliquidaciongastos);
 
 
         return View::make('liquidaciongasto.modificarliquidaciongastos',
                          [
                             'liquidaciongastos'     => $liquidaciongastos,
                             'tdetliquidaciongastos' => $tdetliquidaciongastos,
+                            'tdetliquidaciongastosobs' => $tdetliquidaciongastosobs,
                             'tdetliquidacionitem'   => $tdetliquidacionitem,
                             'tdetdocliquidacionitem'=> $tdetdocliquidacionitem,
+                            'documentohistorial'=> $documentohistorial,
                             'tarchivos'             => $tarchivos,
                             'fecha_emision'         => $fecha_emision,
                             'active'                => $active,
@@ -2311,7 +2724,6 @@ class GestionLiquidacionGastosController extends Controller
                     $centro                             =   ALMCentro::where('NOM_CENTRO','=',$centro_txt)->first();
 
 
-
                     $cod_contrato = $cuenta->COD_CONTRATO; // Ejemplo de contrato
                     $cod_categoria_moneda = $cuenta->COD_CATEGORIA_MONEDA; // Ejemplo de moneda
                     $txt_categoria_tipo_contrato = $cuenta->TXT_CATEGORIA_TIPO_CONTRATO; // Ejemplo de categoría
@@ -2323,8 +2735,6 @@ class GestionLiquidacionGastosController extends Controller
                     $simbolo = ($cod_categoria_moneda === 'MON0000000000001') ? 'S/' : '$';
                     // Concatenar todo
                     $contrato = $parte1 . '-0' . $parte2 . ' -- ' . $simbolo . ' ' . $txt_categoria_tipo_contrato;
-
-
 
 
                     //dd($periodo);
@@ -2348,6 +2758,11 @@ class GestionLiquidacionGastosController extends Controller
                     $cabecera->TXT_ESTADO               =   'GENERADO';
                     $cabecera->COD_CENTRO               =   $centro->COD_CENTRO;
                     $cabecera->TXT_CENTRO               =   $centro->NOM_CENTRO;
+
+                    $cabecera->IND_OBSERVACION          =   0;
+                    $cabecera->AREA_OBSERVACION         =   '';
+                    $cabecera->TXT_OBSERVACION          =   '';
+
                     $cabecera->TOTAL                    =   0;
                     $cabecera->FECHA_CREA               =   $this->fechaactual;
                     $cabecera->USUARIO_CREA             =   Session::get('usuario')->id;
