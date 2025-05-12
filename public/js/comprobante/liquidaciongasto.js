@@ -214,7 +214,6 @@ $(document).ready(function(){
 
 
 
-
     $(".liquidaciongasto").on('click','.mdisel', function(e) {
 
         var _token                  =   $('#token').val();
@@ -315,6 +314,52 @@ $(document).ready(function(){
     });
 
 
+
+    $('.btnobservarcomporbatnte').on('click', function(event){
+        event.preventDefault();
+
+        var array_item     =   dataobservacion();
+        const filas = document.querySelectorAll('.tablaobservacion tbody tr');
+        // El número de filas:
+        const cantidad = filas.length;
+        debugger;
+        if(array_item.length<=0){alerterrorajax('Seleccione por lo menos una fila'); return false;}
+        if(array_item.length==cantidad){alerterrorajax('No se puede observar todas las filas en ese caso deberia extornarlo'); return false;}
+        datastring = JSON.stringify(array_item);
+        $('#data_observacion').val(datastring);
+        $.confirm({
+            title: '¿Confirma la Observacion?',
+            content: 'Observacion el Comprobante',
+            buttons: {
+                confirmar: function () {
+                    $( "#formpedidoobservar" ).submit();
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo la Observacion');
+                }
+            }
+        });
+
+    });
+
+    function dataobservacion(){
+        var data = [];
+        $(".tablaobservacion tbody tr").each(function(){
+            nombre               = $(this).find('.input_asignar').attr('id');
+            if(nombre != 'todo_asignar'){
+                check            = $(this).find('.input_asignar');
+                data_id          = $(this).attr('data_id');
+                data_item        = $(this).attr('data_item')
+                if($(check).is(':checked')){
+                    data.push({
+                        data_id         : data_id,
+                        data_item       : data_item
+                    });
+                }                 
+            }
+        });
+        return data;
+    }
 
 
 
