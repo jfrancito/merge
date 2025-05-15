@@ -11,7 +11,7 @@
               <div class="tools tooltiptop" style="text-align:right;">
                 <a href="{{ url('/modificar-liquidacion-gastos/'.$idopcion.'/'.Hashids::encode(substr($liquidaciongastos->ID_DOCUMENTO, -8)).'/-1') }}" class="btn btn-rounded btn-space btn-success btn-sm"
                   data_planilla_movilidad_id = '{{$liquidaciongastos->ID_DOCUMENTO}}'>
-                  REGISTRO             
+                  AGREGAR DE DOCUMENTO            
                 </a>
               </div>
             </div>
@@ -19,19 +19,6 @@
             <form method="POST" action="{{ url('/emitir-liquidacion-gastos/'.$idopcion.'/'.Hashids::encode(substr($liquidaciongastos->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" id ='frmpmemitir'>
                   {{ csrf_field() }}
                   <div class="row">
-                      <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 cajaautoriza">
-                                  <div class="form-group">
-                                    <label class="col-sm-12 control-label labelleft negrita" >AUTORIZA <span class="obligatorio">(*)</span> :</label>
-                                    <div class="col-sm-12">
-                                        {!! Form::select( 'autoriza_id', $combo_autoriza, array(),
-                                                        [
-                                                          'class'       => 'select2 form-control control input-xs' ,
-                                                          'id'          => 'autoriza_id', 
-                                                          'required'    => '',       
-                                                        ]) !!}
-                                    </div>
-                                  </div>
-                      </div>
                       <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
                         <div class="form-group">
                           <label class="col-sm-12 control-label labelleft negrita">GLOSA :</label>

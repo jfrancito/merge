@@ -51,6 +51,64 @@ use PDO;
 trait LiquidacionGastoTraits
 {
 
+    private function lg_descargar_archivo_sunat_lg() {
+
+        $listasunattareas       =       DB::table('SUNAT_DOCUMENTO')
+                                        ->where('MODULO', 'LIQUIDACION_GASTO')
+                                        ->where('ACTIVO', 1)
+                                        ->where('USUARIO_ID', Session::get('usuario')->id)
+                                        ->get();
+                                        
+        foreach($listasunattareas as $index => $item){
+
+            $primeraLetra               =   substr($item->SERIE, 0, 1);
+            if(Session::get('empresas')->COD_EMPR == 'IACHEM0000010394'){
+                $prefijocarperta = 'II';
+            }else{
+                $prefijocarperta = 'IS';
+            }
+            $rutafile                   =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ID_DOCUMENTO;
+            $valor                      =   $this->versicarpetanoexiste($rutafile);
+
+            $ruta_xml                   =   "";
+            $ruta_pdf                   =   "";
+            $ruta_cdr                   =   "";
+            $nombre_xml                 =   "";
+            $nombre_pdf                 =   "";
+            $nombre_cdr                 =   "";
+
+            $urlxml                     =   'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/02';
+            $respuetaxml                =   $this->buscar_archivo_sunat_lg($urlxml,$fetoken,$this->pathFiles,$prefijocarperta,$ID_DOCUMENTO);
+            $urlxml                     =   'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/01';
+            $respuetapdf                =   $this->buscar_archivo_sunat_lg($urlxml,$fetoken,$this->pathFiles,$prefijocarperta,$ID_DOCUMENTO);
+            
+            if($primeraLetra == 'F'){
+                $urlxml                     =   'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/03';
+                $respuetacdr                =   $this->buscar_archivo_sunat_lg($urlxml,$fetoken,$this->pathFiles,$prefijocarperta,$ID_DOCUMENTO);
+                if($respuetacdr['cod_error']==0){
+                    $ruta_cdr = $respuetacdr['ruta_completa'];
+                    $nombre_cdr = $respuetacdr['nombre_archivo'];
+                }
+            }
+            if($respuetaxml['cod_error']==0){
+                $ruta_xml = $respuetaxml['ruta_completa'];
+                $nombre_xml = $respuetaxml['nombre_archivo'];
+            }
+            if($respuetapdf['cod_error']==0){
+                $ruta_pdf = $respuetapdf['ruta_completa'];
+                $nombre_pdf = $respuetapdf['nombre_archivo'];
+            }
+
+
+
+        }
+
+
+
+                 
+    }
+
+
     private function lg_enviar_osiris_empresa($centro_id,$empresa_id,$rz,$ruc,$direccion,$departamento_id,$provincia_id,$distrito_id,$zona,$zona02) {
 
         $conexionbd         = 'sqlsrv';
@@ -973,7 +1031,7 @@ trait LiquidacionGastoTraits
                                 })
                                 ->where(function ($query) {
                                     $query->where('AREA_OBSERVACION', '=', '')
-                                          ->orWhere('AREA_OBSERVACION', '=', 'JEFE')
+                                          ->orWhere('AREA_OBSERVACION', '=', 'CONT')
                                           ->orWhereNull('AREA_OBSERVACION');
                                 })
                                 ->where('COD_ESTADO','=','ETM0000000000004')
@@ -1024,6 +1082,50 @@ trait LiquidacionGastoTraits
     }
 
 
+    private function lg_lista_cabecera_comprobante_total_contabilidad() {
+
+        if(Session::get('usuario')->id== '1CIX00000001'){
+
+            $listadatos         =   LqgLiquidacionGasto::where('ACTIVO','=','1')
+                                    ->where(function ($query) {
+                                        $query->where('IND_OBSERVACION', '<>', 1)
+                                              ->orWhereNull('IND_OBSERVACION');
+                                    })
+                                    ->where(function ($query) {
+                                        $query->where('AREA_OBSERVACION', '=', '')
+                                              ->orWhere('AREA_OBSERVACION', '=', 'JEFE')
+                                              ->orWhereNull('AREA_OBSERVACION');
+                                    })
+                                    ->where('COD_ESTADO','=','ETM0000000000003')
+                                    ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                                    ->orderby('FECHA_EMI','ASC')
+                                    ->get();
+
+        }else{
+
+            $listadatos         =   LqgLiquidacionGasto::where('ACTIVO','=','1')
+                                    ->where(function ($query) {
+                                        $query->where('IND_OBSERVACION', '<>', 1)
+                                              ->orWhereNull('IND_OBSERVACION');
+                                    })
+                                    ->where(function ($query) {
+                                        $query->where('AREA_OBSERVACION', '=', '')
+                                              ->orWhere('AREA_OBSERVACION', '=', 'JEFE')
+                                              ->orWhereNull('AREA_OBSERVACION');
+                                    })
+                                    ->where('COD_USUARIO_AUTORIZA','=',Session::get('usuario')->id)
+                                    ->where('COD_ESTADO','=','ETM0000000000003')
+                                    ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                                    ->orderby('FECHA_EMI','ASC')
+                                    ->get();
+
+        }
+
+        return  $listadatos;
+    }
+
+
+
     private function lg_lista_cabecera_comprobante_total_obs_le_jefe() {
         if(Session::get('usuario')->id== '1CIX00000001'){
 
@@ -1050,7 +1152,32 @@ trait LiquidacionGastoTraits
 
         return  $listadatos;
     }
+    private function lg_lista_cabecera_comprobante_total_obs_le_contabilidad() {
+        if(Session::get('usuario')->id== '1CIX00000001'){
 
+            $listadatos         =   LqgLiquidacionGasto::where('ACTIVO','=','1')
+                                    ->where('IND_OBSERVACION','=',0)
+                                    ->where('AREA_OBSERVACION','=','CONT')
+                                    ->where('COD_ESTADO','=','ETM0000000000003')
+                                    ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                                    ->orderby('FECHA_EMI','ASC')
+                                    ->get();
+
+        }else{
+
+            $listadatos         =   LqgLiquidacionGasto::where('ACTIVO','=','1')
+                                    ->where('IND_OBSERVACION','=',0)
+                                    ->where('AREA_OBSERVACION','=','CONT')
+                                    ->where('COD_USUARIO_AUTORIZA','=',Session::get('usuario')->id)
+                                    ->where('COD_ESTADO','=','ETM0000000000003')
+                                    ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                                    ->orderby('FECHA_EMI','ASC')
+                                    ->get();
+
+        }
+
+        return  $listadatos;
+    }
 
     private function lg_lista_cabecera_comprobante_total_obs_jefe() {
         if(Session::get('usuario')->id== '1CIX00000001'){
@@ -1068,6 +1195,32 @@ trait LiquidacionGastoTraits
                                     ->where('IND_OBSERVACION','=',1)
                                     ->where('COD_USUARIO_AUTORIZA','=',Session::get('usuario')->id)
                                     ->where('COD_ESTADO','=','ETM0000000000010')
+                                    ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                                    ->orderby('FECHA_EMI','ASC')
+                                    ->get();
+
+        }
+
+        return  $listadatos;
+    }
+
+
+    private function lg_lista_cabecera_comprobante_total_obs_contabilidad() {
+        if(Session::get('usuario')->id== '1CIX00000001'){
+
+            $listadatos         =   LqgLiquidacionGasto::where('ACTIVO','=','1')
+                                    ->where('IND_OBSERVACION','=',1)
+                                    ->where('COD_ESTADO','=','ETM0000000000003')
+                                    ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                                    ->orderby('FECHA_EMI','ASC')
+                                    ->get();
+
+        }else{
+
+            $listadatos         =   LqgLiquidacionGasto::where('ACTIVO','=','1')
+                                    ->where('IND_OBSERVACION','=',1)
+                                    ->where('COD_USUARIO_AUTORIZA','=',Session::get('usuario')->id)
+                                    ->where('COD_ESTADO','=','ETM0000000000003')
                                     ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
                                     ->orderby('FECHA_EMI','ASC')
                                     ->get();

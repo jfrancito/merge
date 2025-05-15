@@ -53,6 +53,48 @@ class GestionOCTesoreriaController extends Controller
     use ComprobanteProvisionTraits;
     
 
+    public function actionEliminarItemPP(Request $request)
+    {
+
+        $tipo                     =   $request['data_tipoarchivo'];
+        $nombrearchivo            =   $request['data_nombrearchivo'];
+        $linea                    =   $request['data_linea'];
+        $idoc                     =   $request['data_iddocumento'];
+
+        $fedocumento              =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
+        $archivo                  =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('NOMBRE_ARCHIVO','=',$nombrearchivo)
+                                      ->where('TIPO_ARCHIVO','=',$tipo)
+                                      ->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                      ->first();
+        
+        Archivo::where('ID_DOCUMENTO','=',$idoc)
+                ->where('ACTIVO','=','1')
+                ->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                ->where('NOMBRE_ARCHIVO','=',$nombrearchivo)
+                ->where('TIPO_ARCHIVO','=',$tipo)
+                ->update(
+                    [
+                        'ACTIVO'=>0,
+                        'FECHA_MOD'=>$this->fechaactual,
+                        'USUARIO_MOD'=>Session::get('usuario')->id
+                    ]
+                );
+
+        $documento                              =   new FeDocumentoHistorial;
+        $documento->ID_DOCUMENTO                =   $idoc;
+        $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+        $documento->FECHA                       =   $this->fechaactual;
+        $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+        $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+        $documento->TIPO                        =   'ELIMINO ITEM '.$archivo->DESCRIPCION_ARCHIVO;
+        $documento->MENSAJE                     =   '';
+        $documento->save();
+
+        print_r("bien");
+
+    }
+
+
     public function actionListarAjaxModalTesoreriaPagoContrato(Request $request)
     {
         
@@ -445,10 +487,17 @@ class GestionOCTesoreriaController extends Controller
                                     ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000028'])
                                     ->get();
 
+        $archivospp             =   DB::table('ARCHIVOS')
+                                    ->where('ID_DOCUMENTO', $cod_orden)
+                                    ->where('ACTIVO', 1)
+                                    ->where('TIPO_ARCHIVO', 'DCC0000000000037')
+                                    ->get();
+
 
         return View::make('comprobante/modal/ajax/magregarpagotesoreria',
                          [          
                             'cod_orden'             => $cod_orden,
+                            'archivospp'            => $archivospp,
                             'linea'                 => $linea,
                             'idopcion'              => $idopcion,
                             'fedocumento'           => $fedocumento,

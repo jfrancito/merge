@@ -151,7 +151,6 @@ class GestionOCValidadoController extends Controller
 
         return Redirect::to('aprobar-comprobante-contabilidad/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('bienhecho', 'Item : '.$archivo->DESCRIPCION_ARCHIVO.' Elimino CON EXITO');;
 
-
     }
 
 

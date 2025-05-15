@@ -35,9 +35,23 @@
               <span class="badge badge-success" style="width: 100px;">CANJEADO</span>
             @ENDIF
           </span>
-
-          
-
+          @php
+            $transferencia    =   $funcion->con_transferencia_itt($item->NRO_ITT);
+            $swtran           =   0;
+          @endphp
+          <span><b>TRANSFERENCIA:
+            @if(count($transferencia)<=0)
+                <span class="badge badge-default" style="width: 150px;display: inline-block;">SIN TRANSFERENCIA</span>
+            @else
+                @if($transferencia->TXT_CATEGORIA_ESTADO_ORDEN == 'TERMINADA')
+                  <span class="badge badge-danger" style="width: 150px;display: inline-block;">NO RECEPCIONADO</span>
+                  @php $swtran           =   1; @endphp
+                @else
+                  <span class="badge badge-success" style="width: 150px;display: inline-block;">{{$transferencia->TXT_CATEGORIA_ESTADO_ORDEN}}</span>
+                @endif
+            @endif
+              </b>
+          </span>
         </td>
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>TIPO: </b> {{$item->IND_MATERIAL_SERVICIO}}  </span>
@@ -85,8 +99,13 @@
         <td class="center neto_pagar"><b> {{number_format($funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO), 4, '.', ',')}}</b></td>
         <td>
 
-            @IF($item->NRO_SERIE_DOC != '' && $item->NC_PROVEEDOR<=0)
+            @if(count($transferencia)>0)
+                @if($transferencia->TXT_CATEGORIA_ESTADO_ORDEN == 'TERMINADA')
+                  <span class="badge badge-danger" style="width: 150px;display: inline-block;">NO RECEPCIONADO</span>
+                @endif
+            @endif
 
+            @IF($item->NRO_SERIE_DOC != '' && $item->NC_PROVEEDOR<=0 && $swtran==0)
             <div class="text-center be-checkbox be-checkbox-sm has-primary">
               <input  type="checkbox"
                 class="{{$item->COD_DOCUMENTO_CTBLE}} input_asignar selectfolio"

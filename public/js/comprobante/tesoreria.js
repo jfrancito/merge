@@ -1,6 +1,39 @@
 $(document).ready(function(){
 
     var carpeta = $("#carpeta").val();
+    $(".areatesoreria").on('click','.elimnaritem', function() {
+        event.preventDefault();
+        var data_tipoarchivo        =   $(this).attr('data_tipoarchivo');
+        var data_nombrearchivo      =   $(this).attr('data_nombrearchivo');
+        var data_linea              =   $(this).attr('data_linea');
+        var data_iddocumento        =   $(this).attr('data_iddocumento');
+        var _token                  =   $('#token').val();
+        debugger;
+
+        data                        =   {
+                                            _token                  : _token,
+                                            data_tipoarchivo        : data_tipoarchivo,
+                                            data_nombrearchivo      : data_nombrearchivo,
+                                            data_linea              : data_linea,
+                                            data_iddocumento        : data_iddocumento,
+                                        };
+
+        $.confirm({
+            title: '¿Confirma la Eliminacion?',
+            content: 'Eliminar item del pago de Comprobante',
+            buttons: {
+                confirmar: function () {
+                    ajax_normal_modal(data,"/ajax-eliminar-archivo-item-pp");
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo Eliminacion');
+                }
+            }
+        });
+
+    });
+
+
 
     $('#aprobar').on('click', function(event){
         event.preventDefault();
@@ -173,6 +206,8 @@ $(document).ready(function(){
                   "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
 
     });
+
+
 
 
 

@@ -121,6 +121,19 @@ trait GeneralesTraits
         return $combo;
     }
 
+    public function gn_combo_arendir()
+    {
+        $array    = 	DB::table('WEB.VALE_RENDIR')->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
+                		->where('COD_USUARIO_CREA_AUD', Session::get('usuario')->id)
+                		->where('COD_CATEGORIA_ESTADO_VALE', 'ETM0000000000007')
+			            ->orderBy('ID', 'asc')
+			            ->pluck('CAN_TOTAL_IMPORTE', 'ID')
+			            ->toArray();
+
+        $combo = $array;
+        return $combo;
+    }
+
 
 
     public function gn_periodo_actual_xanio_xempresa($anio, $mes, $cod_empresa)

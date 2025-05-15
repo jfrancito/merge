@@ -169,6 +169,19 @@ trait ComprobanteTraits
 
     }    
 
+    public function con_transferencia_itt($nroitt) {
+        $resultado = '';
+        // Verificar si la cadena contiene 'TPS' o 'TPL'
+        if (strpos($nroitt, 'TPS') !== false || strpos($nroitt, 'TPL') !== false) {
+            $partes = explode(' / ', $nroitt);
+            $resultado = $partes[0];
+        }
+        $transferencia        =   CMPOrden::where('COD_ORDEN','=',$resultado)->first();  
+        return $transferencia;
+    }    
+
+
+
 
     private function con_lista_documentos_estiba_folio($folio) {
 
