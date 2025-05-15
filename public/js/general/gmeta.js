@@ -90,6 +90,35 @@ function ajax_normal(data,link) {
     });
 }
 
+
+function ajax_normal_modal(data,link) {
+
+    abrircargando();
+    $.ajax({
+        type    :   "POST",
+        url     :   carpeta+link,
+        data    :   data,
+        success: function (data) {
+            cerrarcargando();
+            $('#modal-detalle-requerimiento').niftyModal('hide');
+            alertajax("Eliminacion asignado exitosa");
+        },
+        error: function (data) {
+            cerrarcargando();
+            error500(data);
+        }
+    });
+
+
+}
+
+
+
+
+
+
+
+
 function ajax_normal_cargar(data,link) {
     abrircargando();
     $.ajax({

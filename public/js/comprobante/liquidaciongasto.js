@@ -134,6 +134,36 @@ $(document).ready(function(){
 
 
 
+    $(".liquidaciongasto").on('click','.btn_tarea_cpe_lg', function() {
+
+        var _token                                   =   $('#token').val();
+        var ID_DOCUMENTO                             =   $('#ID_DOCUMENTO').val();
+        var idopcion                                 =   $('#idopcion').val();
+        var ruc                                      =   $('#ruc_sunat').val();
+        var td                                       =   $('#td').val();
+        var serie                                    =   $('#serie_sunat').val();
+        var correlativo                              =   $('#correlativo_sunat').val();
+        if(ruc ==''){ alerterrorajax("Ingrese un ruc."); return false;}
+        if(td ==''){ alerterrorajax("Seleccione un tipo de documento."); return false;}
+        if(serie ==''){ alerterrorajax("Ingrese un serie."); return false;}
+        if(correlativo ==''){ alerterrorajax("Ingrese un correlativo."); return false;}
+
+        data                                         =   {
+                                                                _token                  : _token,
+                                                                ID_DOCUMENTO            : ID_DOCUMENTO,
+                                                                ruc                     : ruc,
+                                                                td                      : td,
+                                                                serie                   : serie,
+                                                                correlativo             : correlativo,
+                                                                idopcion                : idopcion
+                                                         };                                       
+        abrircargando();
+        $('a[href="#tareas"]').click();
+        ajax_normal(data,"/tareas-de-cpe-sunat-lg");
+
+    });
+
+
     $(".liquidaciongasto").on('click','.btn_buscar_cpe_lg', function() {
 
         var _token                                   =   $('#token').val();
@@ -219,11 +249,14 @@ $(document).ready(function(){
         var _token                  =   $('#token').val();
         var idopcion                =   $('#idopcion').val();
         const documento_planilla    =   $(this).attr('data_documento_planilla'); // Obtener el id del checkbox
+        var data_iddocumento        =   $('#ID_DOCUMENTO').val();
+
         const link                  =   '/ajax-select-documento-planilla';
         debugger;
         data                        =   {
                                             _token                  : _token,
-                                            documento_planilla      : documento_planilla
+                                            documento_planilla      : documento_planilla,
+                                            data_iddocumento        : data_iddocumento
                                         };
         abrircargando();
         $.ajax({
@@ -399,8 +432,15 @@ $(document).ready(function(){
     });
 
 
+    $(".liquidaciongasto").on('change','#arendir_id', function(e) {
+        var arendir_id      =   $('#arendir_id').val();
+        if(arendir_id == 'SI'){
+            $('.sectorarendir').show();
 
-
+        }else{
+            $('.sectorarendir').hide();
+        }
+    });
 
 
     $(".liquidaciongasto").on('change','#tipodoc_id', function(e) {

@@ -306,6 +306,21 @@ class GestionPlanillaMovilidadController extends Controller
         $iddocumento            =   $this->funciones->decodificarmaestrapre($iddocumento,'PLAM');
         $planillamovilidad      =   PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first(); 
         $detplanillamovilidad   =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->get();
+        $trabajador             =   STDTrabajador::where('COD_TRAB','=',$planillamovilidad->COD_TRABAJADOR)->first();
+
+        $imgresponsable         =   'firmas/blanco.jpg';
+        $nombre_responsable     =   '';
+        $rutaImagen             =   public_path('firmas/'.$trabajador->NRO_DOCUMENTO.'.jpg');
+        if (file_exists($rutaImagen)){
+            $imgresponsable         =   'firmas/'.$trabajador->NRO_DOCUMENTO.'.jpg';
+            $nombre_responsable     =   $trabajador->TXT_NOMBRES.' '.$trabajador->TXT_APE_PATERNO.' '.$trabajador->TXT_APE_MATERNO;
+        }
+        $imgaprueba             =   'firmas/blanco.jpg';
+        $nombre_aprueba         =   '';
+
+        $existeImagen = file_exists($rutaImagen);
+
+
         $empresa                =   STDEmpresa::where('COD_EMPR','=',$planillamovilidad->COD_EMPRESA)->first();
         $ruc                    =   $empresa->NRO_DOCUMENTO;
 
@@ -314,6 +329,10 @@ class GestionPlanillaMovilidadController extends Controller
                                                 'planillamovilidad'     => $planillamovilidad,
                                                 'detplanillamovilidad'  => $detplanillamovilidad,
                                                 'ruc'                   => $ruc,
+                                                'imgresponsable'        => $imgresponsable , 
+                                                'nombre_responsable'    => $nombre_responsable,
+                                                'imgaprueba'            => $imgaprueba,
+                                                'nombre_aprueba'        => $nombre_aprueba,
                                               ]);
 
         return $pdf->stream('download.pdf');

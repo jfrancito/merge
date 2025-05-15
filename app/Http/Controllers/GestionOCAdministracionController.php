@@ -1198,10 +1198,20 @@ class GestionOCAdministracionController extends Controller
     {
 
         $data_doc               =   $request['data_doc'];
+        $orden                  =   CMPOrden::where('COD_ORDEN','=',$data_doc)->first();
+        $conexionbd             = 'sqlsrv';
+        if($orden->COD_CENTRO == 'CEN0000000000004'){ //rioja
+            $conexionbd         = 'sqlsrv_r';
+        }else{
+            if($orden->COD_CENTRO == 'CEN0000000000006'){ //bellavista
+                $conexionbd         = 'sqlsrv_b';
+            }
+        }
 
-        $detalledocumento       =   CMPDetalleProducto::where('COD_TABLA','=',$data_doc)
-                                    ->where('COD_ESTADO','=',1)
-                                    ->get();
+        $detalledocumento = CMPDetalleProducto::on($conexionbd)
+            ->where('COD_TABLA', '=', $data_doc)
+            ->where('COD_ESTADO', '=', 1)
+            ->get();
 
         $funcion        =   $this;
         return View::make('comprobante/modal/ajax/mdetalledocumento',
