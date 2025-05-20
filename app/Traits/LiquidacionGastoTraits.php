@@ -132,6 +132,8 @@ trait LiquidacionGastoTraits
         $COD_CATEGORIA_EMPR                             =       'TEM0000000000001';
         $TXT_TIPO_GARANTIA                              =       'ESPECIFICAR';
 
+
+
         $stmt = DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC STD.EMPRESA_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?');
         $stmt->bindParam(1, $accion ,PDO::PARAM_STR);                                   //@IND_TIPO_OPERACION='I',
         $stmt->bindParam(2, $vacio  ,PDO::PARAM_STR);                                   //@COD_EMPR=@p2 output,
@@ -193,6 +195,8 @@ trait LiquidacionGastoTraits
         $stmt->execute();
         $coddocumento = $stmt->fetch();
 
+
+
         $COD_ESTABLECIMIENTO_SUNAT  = '0001';
         $stmt = DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC STD.EMPRESA_DIRECCION_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?');
         $stmt->bindParam(1, $accion ,PDO::PARAM_STR);                                   //@IND_TIPO_OPERACION='I',
@@ -229,9 +233,9 @@ trait LiquidacionGastoTraits
         $COD_CATEGORIA_SUB_CANAL                    =   'SCV0000000000049';
         $TXT_CATEGORIA_SUB_CANAL                    =   'ADMINISTRACION';
         $fecha_ilimitada                            =    date_format(date_create('1901-01-01'), 'Y-m-d');
-        $FEC_CONTRATO                               =    date_format(date_create(date('Y-m-d h:i:s')), 'Y-m-d');
+        $FEC_CONTRATO                               =    date_format(date_create(date('Y-m-d h:i:s')), 'Ymd');
 
-
+        //dd($FEC_CONTRATO);
 
 
         $stmt = DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.CONTRATO_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?');
@@ -292,7 +296,7 @@ trait LiquidacionGastoTraits
 
         $codcontrato = $stmt->fetch();
 
-        //dd($codcontrato[0]);
+
 
 
         $TXT_DESCRIPCION = 'GENERADO AUTOMATICO';

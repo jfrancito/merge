@@ -3260,7 +3260,7 @@ class GestionLiquidacionGastosController extends Controller
             $arendir_id          =   "";
             $centro              =   ALMCentro::where('COD_CENTRO','=',$centro_id)->first();
 
-            $autoriza_id         =   '';
+            $autoriza_id         =   '1CIX00000014';
             $combo_autoriza      =   $this->gn_combo_usuarios();
 
             $combo_arendir_sel   =   $this->gn_combo_arendir();
