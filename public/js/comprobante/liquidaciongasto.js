@@ -442,6 +442,24 @@ $(document).ready(function(){
         }
     });
 
+    $(".liquidaciongasto").on('change','#arendir_sel_id', function(e) {
+
+        var arendir_sel_id          =   $('#arendir_sel_id').val();
+        var idopcion                =   $('#idopcion').val();
+        var _token                  =   $('#token').val();
+        var link                    =   "/ajax-combo-autoriza";
+        var contenedor              =   "ajax_combo_autoriza";
+        data                        =   {
+                                            _token                  : _token,
+                                            arendir_sel_id          : arendir_sel_id,
+                                            idopcion                : idopcion
+                                        };
+        ajax_normal_combo(data,link,contenedor);
+
+
+
+    });
+
 
     $(".liquidaciongasto").on('change','#tipodoc_id', function(e) {
 

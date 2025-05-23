@@ -80,31 +80,18 @@
                 <div class="form-group">
                   <label class="col-sm-12 control-label labelleft negrita" >ARENDIR <span class="obligatorio">(*)</span> :</label>
                   <div class="col-sm-12">
-                      {!! Form::select( 'arendir_sel_id', $combo_arendir_sel, array(),
+                      {!! Form::select( 'arendir_sel_id', $combo_arendir_sel, array($arendir_sel_id),
                                       [
                                         'class'       => 'select2 form-control control input-xs' ,
-                                        'id'          => 'arendir_sel_id',      
+                                        'id'          => 'arendir_sel_id',    
                                       ]) !!}
                   </div>
                 </div>
     </div>
 
-    <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 cajaautoriza">
-                <div class="form-group">
-                  <label class="col-sm-12 control-label labelleft negrita" >AUTORIZA <span class="obligatorio">(*)</span> :</label>
-                  <div class="col-sm-12">
-                      {!! Form::select( 'autoriza_id', $combo_autoriza, array($autoriza_id),
-                                      [
-                                        'class'       => 'select2 form-control control input-xs' ,
-                                        'id'          => 'autoriza_id', 
-                                        'required'    => '',       
-                                      ]) !!}
-                  </div>
-                </div>
+    <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 cajaautoriza ajax_combo_autoriza">
+      @include('liquidaciongasto.ajax.comboautoriza')
     </div>
-
-
-
 
 </div>
 

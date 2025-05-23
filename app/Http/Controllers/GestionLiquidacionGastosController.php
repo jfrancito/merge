@@ -3256,17 +3256,30 @@ class GestionLiquidacionGastosController extends Controller
                 $combo_subcuenta    =   $this->lg_combo_subcuenta("Seleccione SubCuenta",$cod_contrato);
             }
             $fecha_creacion      =   $this->hoy;
-            $combo_arendir       =   array('' => "SELECCIONE SI TIENE A RENDIR",'SI' => "SI",'NO' => "NO");
+
+            $vale                =      DB::table('WEB.VALE_RENDIR')
+                                        ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
+                                        ->where('COD_USUARIO_CREA_AUD', Session::get('usuario')->id)
+                                        ->where('COD_CATEGORIA_ESTADO_VALE', 'ETM0000000000007')
+                                        ->get();
+
+
+            if(count($vale)>0){
+                $combo_arendir       =   array('' => "SELECCIONE SI TIENE A RENDIR",'SI' => "SI");
+            }else{
+                $combo_arendir       =   array('' => "SELECCIONE SI TIENE A RENDIR",'NO' => "NO");
+            }
+
+
             $arendir_id          =   "";
             $centro              =   ALMCentro::where('COD_CENTRO','=',$centro_id)->first();
 
-            $autoriza_id         =   '1CIX00000014';
+            $autoriza_id         =   '';
             $combo_autoriza      =   $this->gn_combo_usuarios();
-
+            $arendir_sel_id      =   '';
             $combo_arendir_sel   =   $this->gn_combo_arendir();
 
-
-            //dd($centro);
+            //dd($arendir_id);
             return View::make('liquidaciongasto.agregarliquidaciongastos',
                              [
                                 'combo_empresa' => $combo_empresa,
@@ -3280,8 +3293,10 @@ class GestionLiquidacionGastosController extends Controller
 
                                 'subcuenta_id'  => $subcuenta_id,
                                 'combo_subcuenta'=> $combo_subcuenta,
+
                                 'combo_arendir_sel'  => $combo_arendir_sel,
                                 'arendir_id'    => $arendir_id,
+                                'arendir_sel_id'    => $arendir_sel_id,
                                 'centro'        => $centro,
                                 'fecha_creacion'=> $fecha_creacion,
                                 'anio'          => $anio,
@@ -3355,6 +3370,35 @@ class GestionLiquidacionGastosController extends Controller
                          ]);
 
     }
+
+    public function actionAjaxComboAutoriza(Request $request)
+    {
+
+        $arendir_sel_id         =   $request['arendir_sel_id'];
+        $vale                   =   DB::table('WEB.VALE_RENDIR')
+                                    ->where('ID', $arendir_sel_id)
+                                    ->first();
+        $usuario_id             =   '';
+        if(count($vale)>0){
+            $usuario            =   DB::table('users')
+                                    ->where('usuarioosiris_id', $vale->USUARIO_AUTORIZA)
+                                    ->first();
+            $usuario_id         =   $usuario->id;
+
+        }
+        $autoriza_id         =   $usuario_id;
+        $combo_autoriza      =   $this->gn_combo_usuarios_id($autoriza_id);
+
+        return View::make('liquidaciongasto/ajax/comboautoriza',
+                         [          
+                            'autoriza_id'    => $autoriza_id,
+                            'combo_autoriza' => $combo_autoriza,
+                            'ajax'              => true,                            
+                         ]);
+
+    }
+
+
 
     public function actionAjaxComboItem(Request $request)
     {
