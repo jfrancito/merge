@@ -300,7 +300,8 @@ class GestionOCValidadoController extends Controller
                                         'ESTIBA' => 'ESTIBA',
                                         'DOCUMENTO_INTERNO_PRODUCCION' => 'DOCUMENTO INTERNO PRODUCCION',
                                         'DOCUMENTO_INTERNO_SECADO' => 'DOCUMENTO INTERNO SECADO',
-                                        'DOCUMENTO_SERVICIO_BALANZA' => 'DOCUMENTO POR SERVICIO DE BALANZA'
+                                        'DOCUMENTO_SERVICIO_BALANZA' => 'DOCUMENTO POR SERVICIO DE BALANZA',
+                                        'COMISION' => 'COMISION'
                                     );
 
         $filtrofecha_id     =   'RE';
@@ -556,6 +557,52 @@ class GestionOCValidadoController extends Controller
         $documento_top          =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->first();
 
         return View::make('comprobante/registrocomprobantevalidadoestiba',
+                         [
+                            'fedocumento'           =>  $fedocumento,
+                            'detallefedocumento'    =>  $detallefedocumento,
+                            'documento_asociados'   =>  $documento_asociados,
+                            'documento_top'         =>  $documento_top,
+                            'lote'                  =>  $lote,
+                            'documentohistorial'    =>  $documentohistorial,
+                            'archivos'              =>  $archivos,
+                            'archivosanulados'      =>  $archivosanulados,
+                            'archivospdf'           =>  $archivospdf,                         
+                            'xmlarchivo'            =>  $xmlarchivo,
+                            'funcion'               =>  $funcion,
+                            'idopcion'              =>  $idopcion,
+                         ]);
+    }
+
+
+    public function actionDetalleComprobanteOCValidadoComision($idopcion,$lote, Request $request) {
+
+        View::share('titulo','Detalle de Comprobante');
+
+        $idoc                   =   $lote;
+
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->first();
+        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+
+        $prefijocarperta        =   $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
+
+        $xmlarchivo             =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$lote.'\\'.$fedocumento->ARCHIVO_XML;
+        $cdrarchivo             =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$lote.'\\'.$fedocumento->ARCHIVO_CDR;
+        $pdfarchivo             =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$lote.'\\'.$fedocumento->ARCHIVO_PDF;
+        $documentohistorial     =   FeDocumentoHistorial::where('ID_DOCUMENTO','=',$lote)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                    ->orderBy('FECHA','DESC')
+                                    ->get();
+        $funcion                =   $this;
+        $archivos               =   $this->lista_archivos_total($idoc,$fedocumento->DOCUMENTO_ITEM);
+        $archivospdf            =   $this->lista_archivos_total_pdf($idoc,$fedocumento->DOCUMENTO_ITEM);
+        $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+        $lotes                  =   FeRefAsoc::where('lote','=',$idoc)                                        
+                                    ->pluck('ID_DOCUMENTO')
+                                    ->toArray();
+        $documento_asociados    =   $this->gn_lista_comision_asociados($lotes);
+        $documento_top          =   $this->gn_lista_comision_asociados_top($lotes);
+
+
+        return View::make('comprobante/registrocomprobantevalidadocomision',
                          [
                             'fedocumento'           =>  $fedocumento,
                             'detallefedocumento'    =>  $detallefedocumento,

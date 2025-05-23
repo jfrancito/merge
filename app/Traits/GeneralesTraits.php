@@ -121,18 +121,57 @@ trait GeneralesTraits
         return $combo;
     }
 
-    public function gn_combo_arendir()
+    public function gn_combo_usuarios_id($usuario_id)
     {
-        $array    = 	DB::table('WEB.VALE_RENDIR')->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
-                		->where('COD_USUARIO_CREA_AUD', Session::get('usuario')->id)
-                		->where('COD_CATEGORIA_ESTADO_VALE', 'ETM0000000000007')
-			            ->orderBy('ID', 'asc')
-			            ->pluck('CAN_TOTAL_IMPORTE', 'ID')
-			            ->toArray();
 
-        $combo = $array;
+        $array = User::where('activo', '=', 1)
+            ->where('id', '<>', '1CIX00000001')
+            ->where('id', '=', $usuario_id)
+            ->where('rol_id', '<>', '1CIX00000024')
+            ->orderBy('nombre', 'asc')
+            ->pluck('nombre', 'id')
+            ->toArray();
+        $combo = array('' => 'Seleccione quien autorizara') + $array;
         return $combo;
     }
+
+
+    public function gn_combo_arendir()
+    {
+
+        $array    = 	DB::table('WEB.VALE_RENDIR')
+        				->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
+                		->where('COD_USUARIO_CREA_AUD', Session::get('usuario')->id)
+                		->where('COD_CATEGORIA_ESTADO_VALE', 'ETM0000000000007')
+					    ->select(
+					        'ID',
+					        DB::raw("ID_OSIRIS + ' - ' + CAST(CAN_TOTAL_IMPORTE AS VARCHAR) AS MONTO")
+					    )
+			            ->orderBy('ID', 'asc')
+			            ->pluck('MONTO', 'ID')
+			            ->toArray();
+
+        $combo = array('' => 'Seleccione un arendir') + $array;
+        return $combo;
+    }
+
+    public function gn_arendir_top()
+    {
+
+    	$arendir_id = '';
+        $vale    = 	DB::table('WEB.VALE_RENDIR')
+        				->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
+                		->where('COD_USUARIO_CREA_AUD', Session::get('usuario')->id)
+                		->where('COD_CATEGORIA_ESTADO_VALE', 'ETM0000000000007')
+			            ->first();
+
+		if(count($vale)>0){
+    		$arendir_id = $vale->ID;
+		}
+
+        return $arendir_id;
+    }
+
 
 
 

@@ -93,6 +93,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/modificar-liquidacion-gastos/{idopcion}/{iddocumento}/{valor}', 'GestionLiquidacionGastosController@actionModificarLiquidacionGastos');
 	Route::any('/ajax-combo-subcuenta', 'GestionLiquidacionGastosController@actionAjaxComboSubCuenta');
 	Route::any('/ajax-combo-item', 'GestionLiquidacionGastosController@actionAjaxComboItem');
+	Route::any('/ajax-combo-autoriza', 'GestionLiquidacionGastosController@actionAjaxComboAutoriza');
+
 
 	Route::any('/guardar-detalle-liquidacion-gastos/{idopcion}/{iddocumento}', 'GestionLiquidacionGastosController@actionGuardarDetalleLiquidacionGastos');
 	Route::any('/ajax-modal-detalle-documento-lg', 'GestionLiquidacionGastosController@actionDetalleDocumentoLG');
@@ -233,9 +235,17 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-buscar-documento-gestion-admin', 'GestionOCController@actionListarAjaxBuscarDocumentoAdmin');
 	Route::any('/migracion-rioja/{idopcion}', 'GestionOCController@actionListarOCAdminMR');
 	Route::any('/migracion-bellavista/{idopcion}', 'GestionOCController@actionListarOCAdminMB');
-
 	Route::any('/ajax-estiba-proveedor-estiba', 'GestionOCController@actionEstibaProveedorEstiba');
 
+	Route::any('/gestion-de-integracion-comisiones/{idopcion}', 'GestionOCTesoreriaController@actionListarComisionAdmin');
+	Route::any('/ajax-buscar-documento-comision-admin', 'GestionOCTesoreriaController@actionAjaxListarComisionAdmin');
+	Route::any('/ajax-modal-detalle-comision', 'GestionOCTesoreriaController@actionCargarModalDetalleComision');
+
+	Route::any('/ajax-modal-detalle-lotes-comision', 'GestionOCTesoreriaController@actionCargarModalDetalleLotesComision');
+	Route::any('/select-xml-comision/{idopcion}', 'GestionOCTesoreriaController@actionDetalleSelectComision');
+	Route::any('/detalle-comprobante-comision-administrator/{idopcion}/{lote}', 'GestionOCTesoreriaController@actionDetalleComprobanteComisionAdministrator');
+	Route::any('/subir-xml-cargar-datos-comision-administrator/{idopcion}/{lote}', 'GestionOCTesoreriaController@actionCargarXMLComisionAdministrator');
+	Route::any('/validar-xml-oc-comision-administrator/{idopcion}/{lote}', 'GestionOCTesoreriaController@actionValidarXMLComisionAdministrator');
 
 
 
@@ -369,6 +379,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/aprobar-comprobante-uc-contrato/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionUsuarioContactoController@actionAprobarUCContrato');
 
 	Route::any('/detalle-comprobante-oc-validado-estiba/{idopcion}/{lote}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoEstiba');
+	Route::any('/detalle-comprobante-oc-validado-comision/{idopcion}/{lote}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoComision');
+
+
 
 	Route::any('/gestion-de-comprobantes-observados/{idopcion}', 'GestionUsuarioContactoController@actionListarComprobantesObservados');
 	Route::any('/gestion-de-comprobantes-reparable/{idopcion}', 'GestionUsuarioContactoController@actionListarComprobantesReparable');
