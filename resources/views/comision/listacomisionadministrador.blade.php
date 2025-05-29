@@ -157,6 +157,12 @@
       App.dataTables();
       $('[data-toggle="tooltip"]').tooltip();
       $('form').parsley();
+      $('.importecomision').inputmask({ 'alias': 'numeric', 
+      'groupSeparator': ',', 'autoGroup': true, 'digits': 2, 
+      'digitsOptional': false, 
+      'prefix': '', 
+      'placeholder': '0'});
+      
 
     });
   </script>

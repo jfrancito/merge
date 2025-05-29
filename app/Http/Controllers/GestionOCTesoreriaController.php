@@ -24,6 +24,9 @@ use App\Modelos\CMPCategoria;
 use App\Modelos\CMPDocumentoCtble;
 use App\Modelos\CMPReferecenciaAsoc;
 use App\Modelos\FeRefAsoc;
+use App\Modelos\TESOperacionCaja;
+
+
 
 use Greenter\Parser\DocumentParserInterface;
 use Greenter\Xml\Parser\InvoiceParser;
@@ -56,6 +59,70 @@ class GestionOCTesoreriaController extends Controller
     use ComprobanteTraits;
     use WhatsappTraits;
     use ComprobanteProvisionTraits;
+
+    public function actionEliminacionLoteComision(Request $request) {
+
+        $lote           =   $request['lote'];
+
+        DB::table('TES.OPERACION_CAJA as OC')
+            ->join('FE_REF_ASOC as REF', 'REF.ID_DOCUMENTO', '=', 'OC.COD_OPERACION_CAJA')
+            ->where('REF.LOTE', $lote)
+            ->update([
+                'OC.ATENDIDO' => DB::raw('OC.ATENDIDO - REF.ATENDIDO')
+            ]);
+
+            
+        FeRefAsoc::where('LOTE','=',$lote)
+                    ->update(
+                            [
+                                'FECHA_MOD'=>$this->fechaactual,
+                                'USUARIO_MOD'=>Session::get('usuario')->id,
+                                'COD_ESTADO'=>'0'
+                            ]);
+        FeDocumento::where('ID_DOCUMENTO',$lote)
+                    ->update(
+                        [
+                            'ID_DOCUMENTO'=>$lote.'X',
+                            'COD_ESTADO'=>'ETM0000000000006',
+                            'TXT_ESTADO'=>'RECHAZADO',
+                            'ind_observacion'=>0
+                        ]
+                    );
+        FeDetalleDocumento::where('ID_DOCUMENTO',$lote)
+                    ->update(
+                        [
+                            'ID_DOCUMENTO'=>$lote.'X'
+                        ]
+                    );
+
+        FeDocumentoHistorial::where('ID_DOCUMENTO',$lote)
+                    ->update(
+                        [
+                            'ID_DOCUMENTO'=>$lote.'X'
+                        ]
+                    );
+        FeFormaPago::where('ID_DOCUMENTO',$lote)
+                    ->update(
+                        [
+                            'ID_DOCUMENTO'=>$lote.'X'
+                        ]
+                    );
+
+
+        Archivo::where('ID_DOCUMENTO',$lote)
+                    ->update(
+                        [
+                            'ID_DOCUMENTO'=>$lote.'X'
+                        ]
+                    );
+
+
+
+
+
+        echo("exitoso");
+    }
+
 
     public function actionValidarXMLComisionAdministrator($idopcion, $lote,Request $request)
     {
@@ -264,7 +331,8 @@ class GestionOCTesoreriaController extends Controller
                 FeRefAsoc::where('LOTE','=',$idoc)
                             ->update(
                                     [
-                                        'ESTATUS'=>'ON'
+                                        'ESTATUS'=>'ON',
+                                        'TXT_ESTADO'=>'TERMINADA'
                                     ]);
 
                 $lotes                  =   FeRefAsoc::where('lote','=',$idoc)                                        
@@ -555,8 +623,8 @@ class GestionOCTesoreriaController extends Controller
                                                     ->toArray();
 
 
-                        $documento_asociados    =   $this->gn_lista_comision_asociados($lotes);
-                        $documento_top          =   $this->gn_lista_comision_asociados_top($lotes);
+                        $documento_asociados    =   $this->gn_lista_comision_asociados_atendidos($lotes,$idoc);
+                        $documento_top          =   $this->gn_lista_comision_asociados_top_terminado($lotes,$idoc);
 
                         //VALIDAR QUE ALGUNOS CAMPOS SEAN IGUALES
                         $this->con_validar_documento_proveedor_comision($documento_asociados,$documento_top,$fedocumento,$detallefedocumento,$idoc);
@@ -746,7 +814,7 @@ class GestionOCTesoreriaController extends Controller
                                     ->toArray();
 
 
-        $documento_asociados    =   $this->gn_lista_comision_asociados($lotes);
+        $documento_asociados    =   $this->gn_lista_comision_asociados_atendidos($lotes,$lote);
         $documento_top          =   $this->gn_lista_comision_asociados_top($lotes);
 
 
@@ -789,7 +857,8 @@ class GestionOCTesoreriaController extends Controller
         //si solo hay uno de los seleccionados
         foreach ($jsondocumenos as $key => $item) {
             $ID_DOCUMENTO = $item['data_requerimiento_id'];
-            $feref = FeRefAsoc::where('ID_DOCUMENTO','=',$ID_DOCUMENTO)->where('COD_ESTADO','=','1')->first();
+            $feref = FeRefAsoc::where('ID_DOCUMENTO','=',$ID_DOCUMENTO)
+                     ->where('COD_ESTADO','=','1')->WhereNull('FE_REF_ASOC.TXT_ESTADO')->orwhere('FE_REF_ASOC.TXT_ESTADO', '=', '')->first();
             if(count($feref)>0){
                 $sw_sel                         =    $sw_sel + 1;  
             }else{
@@ -802,7 +871,8 @@ class GestionOCTesoreriaController extends Controller
 
         foreach ($jsondocumenos as $key => $item) {
             $ID_DOCUMENTO = $item['data_requerimiento_id'];
-            $feref = FeRefAsoc::where('ID_DOCUMENTO','=',$ID_DOCUMENTO)->where('COD_ESTADO','=','1')->first();
+            $atender = $item['atender'];
+            $feref = FeRefAsoc::where('ID_DOCUMENTO','=',$ID_DOCUMENTO)->where('COD_ESTADO','=','1')->WhereNull('FE_REF_ASOC.TXT_ESTADO')->orwhere('FE_REF_ASOC.TXT_ESTADO', '=', '')->first();
             if(count($feref)<=0){
                 $docasociar                              =   New FeRefAsoc;
                 $docasociar->LOTE                        =   $lote;
@@ -811,8 +881,13 @@ class GestionOCTesoreriaController extends Controller
                 $docasociar->COD_ESTADO                  =   1;
                 $docasociar->ESTATUS                     =   'OFF';
                 $docasociar->OPERACION                   =   'COMISION';
+                $docasociar->ATENDIDO                    =   $atender;
                 $docasociar->USUARIO_CREA                =   Session::get('usuario')->id;
                 $docasociar->save();
+                TESOperacionCaja::where('COD_OPERACION_CAJA', $ID_DOCUMENTO)
+                    ->update([
+                        'ATENDIDO' => DB::raw("ISNULL(ATENDIDO, 0) + $atender")
+                    ]);
             }else{
                 $lote = $feref->LOTE;
             }

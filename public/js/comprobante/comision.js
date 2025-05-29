@@ -65,6 +65,10 @@ $(document).ready(function(){
         event.preventDefault();
         $('input[type=search]').val('').change();
         $("#nso").DataTable().search("").draw();
+
+        validar =dataenviarvalidar();
+        if(validar.length>0){alerterrorajax(validar); return false;}
+
         data = dataenviar();
         if(data.length<=0){alerterrorajax('Seleccione por lo menos una fila'); return false;}
         var datastring = JSON.stringify(data);
@@ -108,7 +112,7 @@ $(document).ready(function(){
         abrircargando();
         $.ajax({
             type    :   "POST",
-            url     :   carpeta+'/ajax-eliminar-lote-estiba',
+            url     :   carpeta+'/ajax-eliminar-lote-comision',
             data    :   data,
             success: function (data) {
                 cerrarcargando();
@@ -187,16 +191,42 @@ $(document).ready(function(){
     }
 
 
+    function dataenviarvalidar(){
+        var mensaje = '';
+        $(".listatabla tr").each(function(){
+            nombre          = $(this).find('.input_asignar').attr('id');
+            if(nombre != 'todo_asignar'){
+                
+                check                       = $(this).find('.input_asignar');
+                data_requerimiento_id       = $(this).attr('data_requerimiento_id');
+                atender                     = parseFloat($(this).find('.importecomision').val());
+                total                       = parseFloat($(this).attr('data_total'));
+                total_atendido              = parseFloat($(this).attr('data_total_atendido'));
+                if($(check).is(':checked')){
+                    if(atender > (total-total_atendido)){
+                        mensaje = 'Documento ' +data_requerimiento_id + ' supera lo que puede atender';
+                    }
+                }
+
+            }
+        });
+        return mensaje;
+    }
+
+
     function dataenviar(){
         var data = [];
         $(".listatabla tr").each(function(){
             nombre          = $(this).find('.input_asignar').attr('id');
             if(nombre != 'todo_asignar'){
+                
                 check                       = $(this).find('.input_asignar');
                 data_requerimiento_id       = $(this).attr('data_requerimiento_id');
+                atender                     = parseFloat($(this).find('.importecomision').val());
                 if($(check).is(':checked')){
                     data.push({
                         data_requerimiento_id  : data_requerimiento_id,
+                        atender                : atender,
                     });
                 }
 
@@ -214,10 +244,14 @@ $(document).ready(function(){
             if(nombre != 'todo_asignar'){
                 check                       = $(this).find('.input_asignar');
                 total                       = parseFloat($(this).attr('data_total'));
+                total_atendido              = parseFloat($(this).attr('data_total_atendido'));
+                atender                     = parseFloat($(this).find('.importecomision').val());
+
                 if($(check).is(':checked')){
-                    data_total = data_total+total;
+                    data_total = data_total+atender;
                     can_total = can_total+1;
                 }
+
             }
         });
         let numeroFormateado = data_total.toLocaleString('es-PE', {

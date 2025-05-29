@@ -598,7 +598,7 @@ class GestionOCValidadoController extends Controller
         $lotes                  =   FeRefAsoc::where('lote','=',$idoc)                                        
                                     ->pluck('ID_DOCUMENTO')
                                     ->toArray();
-        $documento_asociados    =   $this->gn_lista_comision_asociados($lotes);
+        $documento_asociados    =   $this->gn_lista_comision_asociados_atendidos($lotes,$idoc);
         $documento_top          =   $this->gn_lista_comision_asociados_top($lotes);
 
 

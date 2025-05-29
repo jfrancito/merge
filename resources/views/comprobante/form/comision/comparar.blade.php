@@ -6,12 +6,22 @@
         <table class="table table-condensed table-striped">
           <thead>
             <tr>
-              <th>Valor</th>
+              <th>VALOR</th>
               <th>Documento</th>      
               <th>XML</th>       
             </tr>
           </thead>
           <tbody>
+
+              <tr>
+                <td><b>RUC</b></td>
+                <td><p class='subtitulomerge'>{{$documento_top->RUC}}</p></td>
+                <td class="@if($fedocumento->OPERACION_DET == 'SIN_XML') ocultar @endif">
+                  <div class='subtitulomerge @if($fedocumento->ind_ruc == 1) msjexitoso @else msjerror @endif'><b>{{$fedocumento->RUC_PROVEEDOR}}</b>
+                  </div>
+                </td>
+              </tr>
+
               <tr>
                 <td><b>Moneda</b></td>
                 <td><p class='subtitulomerge'>
@@ -32,7 +42,7 @@
               </tr>
               <tr>
                 <td><b>Total</b></td>
-                <td><p class='subtitulomerge'>{{number_format($documento_asociados->sum('MONTO'), 4, '.', ',')}}</p></td>
+                <td><p class='subtitulomerge'>{{number_format($documento_asociados->sum('MONTOATENDIDOREAL'), 4, '.', ',')}}</p></td>
                 <td>
                   <div class='subtitulomerge @if($fedocumento->ind_total == 1) msjexitoso @else msjerror @endif'>
                       <b>{{number_format($fedocumento->TOTAL_VENTA_ORIG, 4, '.', ',')}}</b>

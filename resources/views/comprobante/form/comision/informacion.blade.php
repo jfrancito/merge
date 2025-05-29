@@ -13,9 +13,12 @@
                                                 <thead>
                                                   <tr>
 
-                                                    <th>Documento</th>      
-                                                    <th>Banco</th>
+                                                    <th>Documento</th>
+                                                    <th>Fecha Emision</th>
+                                                    <th>Fecha Movimiento</th>
+                                                    <th>Banco</th>     
                                                     <th>Cuenta</th>
+                                                    <th>Voucher</th>
                                                     <th>Total</th>
                                                   </tr>
                                                 </thead>
@@ -23,9 +26,12 @@
                                                    @foreach($documento_asociados as $index => $item)  
                                                       <tr>
                                                         <td>{{$item->COD_OPERACION_CAJA}}</td>
+                                                        <td>{{$item->FEC_REGISTRO}}</td>
+                                                        <td>{{$item->FEC_MOVIMIENTO}}</td>
                                                         <td>{{$item->NOMBRE_BANCO_CAJA}}</td>
                                                         <td>{{$item->NRO_CUENTA_BANCARIA}}</td>
-                                                        <td>@if($item->MONEDA=='SOLES') {{$item->MONTO_SOLES}} @else {{$item->MONTO_DOLARES}} @endif</td>
+                                                        <td>{{$item->NRO_VOUCHER}}</td>
+                                                        <td>{{$item->MONTOATENDIDOREAL}}</td>
                                                       </tr>
                                                     @endforeach
                                                 </tbody>
@@ -34,7 +40,7 @@
                                                     <th></th>
                                                     <th></th>      
                                                     <th></th>
-                                                    <th>{{$documento_asociados->sum('MONTO')}}</th>
+                                                    <th>{{$documento_asociados->sum('MONTOATENDIDOREAL')}}</th>
                                                   </tr>
 
                                                 </tfooter>

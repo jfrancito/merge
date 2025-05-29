@@ -109,7 +109,7 @@ trait LiquidacionGastoTraits
     }
 
 
-    private function lg_enviar_osiris_empresa($centro_id,$empresa_id,$rz,$ruc,$direccion,$departamento_id,$provincia_id,$distrito_id,$zona,$zona02) {
+    private function lg_enviar_osiris_empresa($centro_id,$empresa_id,$rz,$ruc,$direccion,$departamento_id,$provincia_id,$distrito_id,$zona,$zona02,$ind_empresa,$ind_contrato) {
 
         $conexionbd         = 'sqlsrv';
         if($centro_id == 'CEN0000000000004'){ //rioja
@@ -133,89 +133,101 @@ trait LiquidacionGastoTraits
         $TXT_TIPO_GARANTIA                              =       'ESPECIFICAR';
 
 
+        if($ind_empresa == 0){
 
-        $stmt = DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC STD.EMPRESA_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?');
-        $stmt->bindParam(1, $accion ,PDO::PARAM_STR);                                   //@IND_TIPO_OPERACION='I',
-        $stmt->bindParam(2, $vacio  ,PDO::PARAM_STR);                                   //@COD_EMPR=@p2 output,
-        $stmt->bindParam(3, $empresa_id ,PDO::PARAM_STR);                               //@COD_EMPR_SISTEMA='IACHEM0000010394',
-        $stmt->bindParam(4, $centro_id ,PDO::PARAM_STR);                                //@COD_CENTRO_SISTEMA='CEN0000000000001',
-        $stmt->bindParam(5, $rz ,PDO::PARAM_STR);                                       //@NOM_EMPR='TOMOGRAFIAS CHICLAYO E.I.R.L.',
-        $stmt->bindParam(6, $vacio  ,PDO::PARAM_STR);                                   //@NOM_CORTO='',
-        $stmt->bindParam(7, $vacio  ,PDO::PARAM_STR);                                   //@TXT_ABREVIATURA='',
-        $stmt->bindParam(8, $vacio  ,PDO::PARAM_STR);                                   //@COD_CONTACTO='                ',
-        $stmt->bindParam(9, $vacio  ,PDO::PARAM_STR);                                   //@TXT_TELEFONO='',
-        $stmt->bindParam(10, $vacio  ,PDO::PARAM_STR);                                  //@TXT_IMAGEN='',
+            $stmt = DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC STD.EMPRESA_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?');
+            $stmt->bindParam(1, $accion ,PDO::PARAM_STR);                                   //@IND_TIPO_OPERACION='I',
+            $stmt->bindParam(2, $vacio  ,PDO::PARAM_STR);                                   //@COD_EMPR=@p2 output,
+            $stmt->bindParam(3, $empresa_id ,PDO::PARAM_STR);                               //@COD_EMPR_SISTEMA='IACHEM0000010394',
+            $stmt->bindParam(4, $centro_id ,PDO::PARAM_STR);                                //@COD_CENTRO_SISTEMA='CEN0000000000001',
+            $stmt->bindParam(5, $rz ,PDO::PARAM_STR);                                       //@NOM_EMPR='TOMOGRAFIAS CHICLAYO E.I.R.L.',
+            $stmt->bindParam(6, $vacio  ,PDO::PARAM_STR);                                   //@NOM_CORTO='',
+            $stmt->bindParam(7, $vacio  ,PDO::PARAM_STR);                                   //@TXT_ABREVIATURA='',
+            $stmt->bindParam(8, $vacio  ,PDO::PARAM_STR);                                   //@COD_CONTACTO='                ',
+            $stmt->bindParam(9, $vacio  ,PDO::PARAM_STR);                                   //@TXT_TELEFONO='',
+            $stmt->bindParam(10, $vacio  ,PDO::PARAM_STR);                                  //@TXT_IMAGEN='',
 
-        $stmt->bindParam(11, $COD_TIPO_DOCUMENTO  ,PDO::PARAM_STR);                     //@COD_TIPO_DOCUMENTO='TDI0000000000006',
-        $stmt->bindParam(12, $ruc ,PDO::PARAM_STR);                                     //@NRO_DOCUMENTO='20608383957',
-        $stmt->bindParam(13, $vacio  ,PDO::PARAM_STR);                                  //@TXT_FAX='',
-        $stmt->bindParam(14, $vacio  ,PDO::PARAM_STR);                                  //@TXT_EMAIL='',
-        $stmt->bindParam(15, $vacio ,PDO::PARAM_STR);                                   //@TXT_APE_PATERNO='', 
-        $stmt->bindParam(16, $vacio ,PDO::PARAM_STR);                                   //@TXT_APE_MATERNO='', 
-        $stmt->bindParam(17, $vacio ,PDO::PARAM_STR);                                   //@TXT_NOMBRES='',
-        $stmt->bindParam(18, $fecha_ilimitada ,PDO::PARAM_STR);                         //@FEC_NACIMIENTO='1901-01-01 00:00:00',
-        $stmt->bindParam(19, $valor_cero ,PDO::PARAM_STR);                              //@IND_CHOFER=0,
-        $stmt->bindParam(20, $vacio ,PDO::PARAM_STR);                                   //@COD_TIPO_BREVETE='                ',
-
-
-        $stmt->bindParam(21, $vacio ,PDO::PARAM_STR);                                   //@NRO_BREVETE='',
-        $stmt->bindParam(22, $COD_CATEGORIA_EMPR ,PDO::PARAM_STR);                      //@COD_CATEGORIA_EMPR='TEM0000000000001',
-        $stmt->bindParam(23, $vacio ,PDO::PARAM_STR);                                   //@TXT_GLOSA='',
-        $stmt->bindParam(24, $valor_cero ,PDO::PARAM_STR);                              //@IND_SISTEMA=0,
-        $stmt->bindParam(25, $valor_cero ,PDO::PARAM_STR);                              //@IND_CLIENTE=0,
-        $stmt->bindParam(26, $cod_estado ,PDO::PARAM_STR);                              //@IND_PROVEEDOR=1,
-        $stmt->bindParam(27, $valor_cero  ,PDO::PARAM_STR);                             //@IND_SUPERMERCADO=0,
-        $stmt->bindParam(28, $valor_cero ,PDO::PARAM_STR);                              //@IND_TRANSPORTISTA=0,
-        $stmt->bindParam(29, $valor_cero ,PDO::PARAM_STR);                              //@IND_CUADRILLA=0,
-        $stmt->bindParam(30, $valor_cero  ,PDO::PARAM_STR);                             //@IND_ACOPIADOR=0,
+            $stmt->bindParam(11, $COD_TIPO_DOCUMENTO  ,PDO::PARAM_STR);                     //@COD_TIPO_DOCUMENTO='TDI0000000000006',
+            $stmt->bindParam(12, $ruc ,PDO::PARAM_STR);                                     //@NRO_DOCUMENTO='20608383957',
+            $stmt->bindParam(13, $vacio  ,PDO::PARAM_STR);                                  //@TXT_FAX='',
+            $stmt->bindParam(14, $vacio  ,PDO::PARAM_STR);                                  //@TXT_EMAIL='',
+            $stmt->bindParam(15, $vacio ,PDO::PARAM_STR);                                   //@TXT_APE_PATERNO='', 
+            $stmt->bindParam(16, $vacio ,PDO::PARAM_STR);                                   //@TXT_APE_MATERNO='', 
+            $stmt->bindParam(17, $vacio ,PDO::PARAM_STR);                                   //@TXT_NOMBRES='',
+            $stmt->bindParam(18, $fecha_ilimitada ,PDO::PARAM_STR);                         //@FEC_NACIMIENTO='1901-01-01 00:00:00',
+            $stmt->bindParam(19, $valor_cero ,PDO::PARAM_STR);                              //@IND_CHOFER=0,
+            $stmt->bindParam(20, $vacio ,PDO::PARAM_STR);                                   //@COD_TIPO_BREVETE='                ',
 
 
-        $stmt->bindParam(31, $valor_cero ,PDO::PARAM_STR);                              //@IND_GARANTE=0,
-        $stmt->bindParam(32, $valor_cero ,PDO::PARAM_STR);                              //@IND_FORMAL=0,
-        $stmt->bindParam(33, $valor_cero ,PDO::PARAM_STR);                              //@IND_RELACIONADO=0,
-        $stmt->bindParam(34, $valor_cero ,PDO::PARAM_STR);                              //@IND_COMERCIAL_ACOPIO=0,
-        $stmt->bindParam(35, $vacio  ,PDO::PARAM_STR);                                  //@COD_TIPO_GARANTIA='                ',
-        $stmt->bindParam(36, $TXT_TIPO_GARANTIA  ,PDO::PARAM_STR);                      //@TXT_TIPO_GARANTIA='ESPECIFICAR',
-        $stmt->bindParam(37, $vacio  ,PDO::PARAM_STR);                                  //@TXT_DESCRIPCION_GARANTIA='',
-        $stmt->bindParam(38, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_GARANTIA=0,
-        $stmt->bindParam(39, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_LIMITE=0,
-        $stmt->bindParam(40, $cod_estado  ,PDO::PARAM_STR);                             //@COD_ESTADO=1,
-
-        $stmt->bindParam(41, $cod_usuario_registro  ,PDO::PARAM_STR);                   //@COD_USUARIO_REGISTRO='JSALDANR        ',
-        $stmt->bindParam(42, $valor_cero  ,PDO::PARAM_STR);                             //@IND_INAFECTOIGV=0,
-        $stmt->bindParam(43, $valor_cero  ,PDO::PARAM_STR);                             //@IND_GEN_DOC_ELEC=0,
-        $stmt->bindParam(44, $valor_cero  ,PDO::PARAM_STR);                             //@IND_COMERCIAL_SERVICIO=0,
-        $stmt->bindParam(45, $valor_cero  ,PDO::PARAM_STR);                             //@IND_BOLETEO_INTERES=0,
-        $stmt->bindParam(46, $valor_cero  ,PDO::PARAM_STR);                             //@IND_COSTO=0, 
-        $stmt->bindParam(47, $valor_cero  ,PDO::PARAM_STR);                             //@IND_GASTO=0,
-        $stmt->bindParam(48, $vacio  ,PDO::PARAM_STR);                                  //@COD_CATEGORIA_BANCO='',
-        $stmt->bindParam(49, $vacio  ,PDO::PARAM_STR);                                  //@NRO_CUENTA_BANCARIA='',
-        $stmt->bindParam(50, $vacio  ,PDO::PARAM_STR);                                  //@TXT_CLAVE_LLAVE=''
-
-        $stmt->execute();
-        $coddocumento = $stmt->fetch();
+            $stmt->bindParam(21, $vacio ,PDO::PARAM_STR);                                   //@NRO_BREVETE='',
+            $stmt->bindParam(22, $COD_CATEGORIA_EMPR ,PDO::PARAM_STR);                      //@COD_CATEGORIA_EMPR='TEM0000000000001',
+            $stmt->bindParam(23, $vacio ,PDO::PARAM_STR);                                   //@TXT_GLOSA='',
+            $stmt->bindParam(24, $valor_cero ,PDO::PARAM_STR);                              //@IND_SISTEMA=0,
+            $stmt->bindParam(25, $valor_cero ,PDO::PARAM_STR);                              //@IND_CLIENTE=0,
+            $stmt->bindParam(26, $cod_estado ,PDO::PARAM_STR);                              //@IND_PROVEEDOR=1,
+            $stmt->bindParam(27, $valor_cero  ,PDO::PARAM_STR);                             //@IND_SUPERMERCADO=0,
+            $stmt->bindParam(28, $valor_cero ,PDO::PARAM_STR);                              //@IND_TRANSPORTISTA=0,
+            $stmt->bindParam(29, $valor_cero ,PDO::PARAM_STR);                              //@IND_CUADRILLA=0,
+            $stmt->bindParam(30, $valor_cero  ,PDO::PARAM_STR);                             //@IND_ACOPIADOR=0,
 
 
+            $stmt->bindParam(31, $valor_cero ,PDO::PARAM_STR);                              //@IND_GARANTE=0,
+            $stmt->bindParam(32, $valor_cero ,PDO::PARAM_STR);                              //@IND_FORMAL=0,
+            $stmt->bindParam(33, $valor_cero ,PDO::PARAM_STR);                              //@IND_RELACIONADO=0,
+            $stmt->bindParam(34, $valor_cero ,PDO::PARAM_STR);                              //@IND_COMERCIAL_ACOPIO=0,
+            $stmt->bindParam(35, $vacio  ,PDO::PARAM_STR);                                  //@COD_TIPO_GARANTIA='                ',
+            $stmt->bindParam(36, $TXT_TIPO_GARANTIA  ,PDO::PARAM_STR);                      //@TXT_TIPO_GARANTIA='ESPECIFICAR',
+            $stmt->bindParam(37, $vacio  ,PDO::PARAM_STR);                                  //@TXT_DESCRIPCION_GARANTIA='',
+            $stmt->bindParam(38, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_GARANTIA=0,
+            $stmt->bindParam(39, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_LIMITE=0,
+            $stmt->bindParam(40, $cod_estado  ,PDO::PARAM_STR);                             //@COD_ESTADO=1,
 
-        $COD_ESTABLECIMIENTO_SUNAT  = '0001';
-        $stmt = DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC STD.EMPRESA_DIRECCION_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?');
-        $stmt->bindParam(1, $accion ,PDO::PARAM_STR);                                   //@IND_TIPO_OPERACION='I',
-        $stmt->bindParam(2, $vacio  ,PDO::PARAM_STR);                                   //@COD_DIRECCION='                ',
-        $stmt->bindParam(3, $coddocumento[0] ,PDO::PARAM_STR);                          //@COD_EMPR='IICHEM0000009259',
-        $stmt->bindParam(4, $empresa_id ,PDO::PARAM_STR);                               //@COD_EMPR_SISTEMA='IACHEM0000010394',
-        $stmt->bindParam(5, $centro_id ,PDO::PARAM_STR);                                //@COD_CENTRO_SISTEMA='CEN0000000000001',
-        $stmt->bindParam(6, $direccion  ,PDO::PARAM_STR);                               //@NOM_DIRECCION='CAL. CRISTOBAL COLON NRO 222 CERCADO DE CHICLAYO ',
+            $stmt->bindParam(41, $cod_usuario_registro  ,PDO::PARAM_STR);                   //@COD_USUARIO_REGISTRO='JSALDANR        ',
+            $stmt->bindParam(42, $valor_cero  ,PDO::PARAM_STR);                             //@IND_INAFECTOIGV=0,
+            $stmt->bindParam(43, $valor_cero  ,PDO::PARAM_STR);                             //@IND_GEN_DOC_ELEC=0,
+            $stmt->bindParam(44, $valor_cero  ,PDO::PARAM_STR);                             //@IND_COMERCIAL_SERVICIO=0,
+            $stmt->bindParam(45, $valor_cero  ,PDO::PARAM_STR);                             //@IND_BOLETEO_INTERES=0,
+            $stmt->bindParam(46, $valor_cero  ,PDO::PARAM_STR);                             //@IND_COSTO=0, 
+            $stmt->bindParam(47, $valor_cero  ,PDO::PARAM_STR);                             //@IND_GASTO=0,
+            $stmt->bindParam(48, $vacio  ,PDO::PARAM_STR);                                  //@COD_CATEGORIA_BANCO='',
+            $stmt->bindParam(49, $vacio  ,PDO::PARAM_STR);                                  //@NRO_CUENTA_BANCARIA='',
+            $stmt->bindParam(50, $vacio  ,PDO::PARAM_STR);                                  //@TXT_CLAVE_LLAVE=''
 
-        $stmt->bindParam(7, $departamento_id  ,PDO::PARAM_STR);                         //@COD_DEPARTAMENTO='DEP0000000000014',
-        $stmt->bindParam(8, $provincia_id  ,PDO::PARAM_STR);                            //@COD_PROVINCIA='PRO0000000000125',
-        $stmt->bindParam(9, $distrito_id  ,PDO::PARAM_STR);                             //@COD_DISTRITO='DIS0000000001211',
+            $stmt->execute();
+            $coddocumento = $stmt->fetch();
 
-        $stmt->bindParam(10, $valor_cero  ,PDO::PARAM_STR);                             //@IND_DEFAULT=0,
-        $stmt->bindParam(11, $cod_estado  ,PDO::PARAM_STR);                             //@IND_DIRECCION_FISCAL=1,
-        $stmt->bindParam(12, $cod_estado ,PDO::PARAM_STR);                              //@COD_ESTADO=1,
-        $stmt->bindParam(13, $cod_usuario_registro  ,PDO::PARAM_STR);                   //@COD_USUARIO_REGISTRO='JSALDANR        ',
-        $stmt->bindParam(14, $COD_ESTABLECIMIENTO_SUNAT  ,PDO::PARAM_STR);              //@COD_ESTABLECIMIENTO_SUNAT='0001           '
-        $stmt->execute();
+            $COD_ESTABLECIMIENTO_SUNAT  = '0001';
+            $stmt = DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC STD.EMPRESA_DIRECCION_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?');
+            $stmt->bindParam(1, $accion ,PDO::PARAM_STR);                                   //@IND_TIPO_OPERACION='I',
+            $stmt->bindParam(2, $vacio  ,PDO::PARAM_STR);                                   //@COD_DIRECCION='                ',
+            $stmt->bindParam(3, $coddocumento[0] ,PDO::PARAM_STR);                          //@COD_EMPR='IICHEM0000009259',
+            $stmt->bindParam(4, $empresa_id ,PDO::PARAM_STR);                               //@COD_EMPR_SISTEMA='IACHEM0000010394',
+            $stmt->bindParam(5, $centro_id ,PDO::PARAM_STR);                                //@COD_CENTRO_SISTEMA='CEN0000000000001',
+            $stmt->bindParam(6, $direccion  ,PDO::PARAM_STR);                               //@NOM_DIRECCION='CAL. CRISTOBAL COLON NRO 222 CERCADO DE CHICLAYO ',
+
+            $stmt->bindParam(7, $departamento_id  ,PDO::PARAM_STR);                         //@COD_DEPARTAMENTO='DEP0000000000014',
+            $stmt->bindParam(8, $provincia_id  ,PDO::PARAM_STR);                            //@COD_PROVINCIA='PRO0000000000125',
+            $stmt->bindParam(9, $distrito_id  ,PDO::PARAM_STR);                             //@COD_DISTRITO='DIS0000000001211',
+
+            $stmt->bindParam(10, $valor_cero  ,PDO::PARAM_STR);                             //@IND_DEFAULT=0,
+            $stmt->bindParam(11, $cod_estado  ,PDO::PARAM_STR);                             //@IND_DIRECCION_FISCAL=1,
+            $stmt->bindParam(12, $cod_estado ,PDO::PARAM_STR);                              //@COD_ESTADO=1,
+            $stmt->bindParam(13, $cod_usuario_registro  ,PDO::PARAM_STR);                   //@COD_USUARIO_REGISTRO='JSALDANR        ',
+            $stmt->bindParam(14, $COD_ESTABLECIMIENTO_SUNAT  ,PDO::PARAM_STR);              //@COD_ESTABLECIMIENTO_SUNAT='0001           '
+            $stmt->execute();
+
+            $cod_id = $coddocumento[0];
+
+
+        }else{
+
+            $empresa              =   STDEmpresa::where('NRO_DOCUMENTO','=',$ruc)->first();
+            $cod_id               =    $empresa->COD_EMPR;
+        }
+
+
+
+
 
 
 
@@ -243,7 +255,7 @@ trait LiquidacionGastoTraits
         $stmt->bindParam(2, $vacio  ,PDO::PARAM_STR);                                  //@COD_CONTRATO='                '
         $stmt->bindParam(3, $empresa_id ,PDO::PARAM_STR);                              //@COD_EMPR='IACHEM0000010394'
         $stmt->bindParam(4, $centro_id ,PDO::PARAM_STR);                               //@COD_CENTRO='CEN0000000000001'
-        $stmt->bindParam(5, $coddocumento[0] ,PDO::PARAM_STR);                         //@COD_EMPR_CLIENTE='IICHEM0000009259'
+        $stmt->bindParam(5, $cod_id ,PDO::PARAM_STR);                                   //@COD_EMPR_CLIENTE='IICHEM0000009259'
         $stmt->bindParam(6, $rz  ,PDO::PARAM_STR);                                     //@TXT_EMPR_CLIENTE='TOMOGRAFIAS CHICLAYO E.I.R.L.'
         $stmt->bindParam(7, $vacio  ,PDO::PARAM_STR);                                  //@COD_EMPR_GARANTE='                '
         $stmt->bindParam(8, $vacio  ,PDO::PARAM_STR);                                  //@TXT_EMPR_GARANTE=''
@@ -345,7 +357,7 @@ trait LiquidacionGastoTraits
         $stmt->bindParam(29, $cod_usuario_registro ,PDO::PARAM_STR);                  //@COD_USUARIO_REGISTRO='                '
         $stmt->execute();
 
-        return  $coddocumento[0];
+        return  $cod_id;
     }
 
 
