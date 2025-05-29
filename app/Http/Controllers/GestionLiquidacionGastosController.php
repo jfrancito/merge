@@ -28,6 +28,8 @@ use App\Modelos\SunatDocumento;
 
 
 
+
+
 use App\Modelos\LqgLiquidacionGasto;
 use App\Modelos\LqgDocumentoHistorial;
 use App\Modelos\LqgDetLiquidacionGasto;
@@ -138,10 +140,14 @@ class GestionLiquidacionGastosController extends Controller
                     return Redirect::to('gestion-de-empresa-proveedor/'.$idopcion)->with('errorbd','No existe Distrito en el osiris');
                 }
 
+
+                $ind_empresa              =   $request['ind_empresa'];
+                $ind_contrato             =   $request['ind_contrato'];
+
                 DB::beginTransaction();
                 $empresa_id     =       Session::get('empresas')->COD_EMPR;
 
-                $cod_empresa    =       $this->lg_enviar_osiris_empresa($centro_id,$empresa_id,$rz,$ruc,$direccion,$departamentos->COD_CATEGORIA,$provincias->COD_CATEGORIA,$distritos->COD_CATEGORIA,$zona,$zona02);
+                $cod_empresa    =       $this->lg_enviar_osiris_empresa($centro_id,$empresa_id,$rz,$ruc,$direccion,$departamentos->COD_CATEGORIA,$provincias->COD_CATEGORIA,$distritos->COD_CATEGORIA,$zona,$zona02,$ind_empresa,$ind_contrato);
 
                 DB::commit();
                 return Redirect::to('gestion-de-empresa-proveedor/'.$idopcion)->with('bienhecho', 'Empresa : '.$rz.' REGISTRO CON EXITO' );
@@ -160,10 +166,38 @@ class GestionLiquidacionGastosController extends Controller
         $ruc_buscar           =   $request['ruc_buscar'];
         $urlxml               =   'https://dniruc.apisperu.com/api/v1/ruc/'.$ruc_buscar.'?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImhlbnJyeWluZHVAZ21haWwuY29tIn0.m3cyXSejlDWl0BLcphHPUTfPNqpa5kXWoBcmQ6WvkII';
         $respuetaxml          =   $this->buscar_ruc_sunat_lg($urlxml);
-        $empresa              =   STDEmpresa::where('NRO_DOCUMENTO','=',$ruc_buscar)->first();
+        $empresa_id           =   '';
 
+
+        $empresa              =   STDEmpresa::where('NRO_DOCUMENTO','=',$ruc_buscar)->first();
         if(count($empresa)>0){
-            return Redirect::to('gestion-de-empresa-proveedor/'.$idopcion)->with('errorbd','Empresa '.$empresa->NOM_EMPR.' ya existe');
+            $empresa_id           =   $empresa->COD_EMPR;
+        }
+        $trabajador           =   DB::table('STD.TRABAJADOR')
+                                    ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                                    ->first();     
+        $centro_id            =   '';
+        if(count($trabajador)>0){
+            $dni                =   $trabajador->NRO_DOCUMENTO;
+        }
+        $trabajadorespla        =   DB::table('WEB.platrabajadores')
+                                    ->where('situacion_id', 'PRMAECEN000000000002')
+                                    ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+                                    ->where('dni', $dni)
+                                    ->first();
+        if(count($trabajador)>0){
+            $centro_id          =       $trabajadorespla->centro_osiris_id;
+        }
+
+        $contratos              =   DB::table('CMP.CONTRATO')
+                                    ->where('TXT_CATEGORIA_TIPO_CONTRATO', 'PROVEEDOR')
+                                    ->where('COD_EMPR_CLIENTE', $empresa_id)
+                                    ->where('COD_ESTADO', 1)
+                                    ->where('COD_CENTRO', $centro_id)
+                                    ->get();
+
+        if(count($contratos)>0){
+            return Redirect::to('gestion-de-empresa-proveedor/'.$idopcion)->with('errorbd','Empresa '.$empresa->NOM_EMPR.' ya existe y tiene contrato');
         }
         $response_array = json_decode($respuetaxml, true);
         if(isset($response_array['success'])){
@@ -176,7 +210,26 @@ class GestionLiquidacionGastosController extends Controller
         Session::flash('departamento', $response_array['departamento']);
         Session::flash('provincia', $response_array['provincia']);
         Session::flash('distrito', $response_array['distrito']);
+        $texto_empresa = 'No cuenta con ningun registro de empresa ';
+        if(count($empresa)>0){
+            $texto_empresa = 'Ya Cuenta con un registro de una empresa';
+            Session::flash('texto_empresa', $texto_empresa);
+            Session::flash('ind_empresa', 1);
+        }else{
+            Session::flash('texto_empresa', $texto_empresa);
+            Session::flash('ind_empresa', 0);
+        }
+        $texto_contrato = 'No cuenta con ningun registro de contrato';
+        if(count($contratos)>0){
+            $texto_contrato = 'Ya Cuenta con un registro de contrato en el centro';
+            Session::flash('texto_contrato', $texto_contrato);
+            Session::flash('ind_contrato', 1);
+        }else{
+            Session::flash('texto_contrato', $texto_contrato);
+            Session::flash('ind_contrato', 0);
+        }
         return Redirect::to('/gestion-de-empresa-proveedor/'.$idopcion)->with('bienhecho', 'Documento Encontrado');
+
 
     }
 
@@ -196,6 +249,14 @@ class GestionLiquidacionGastosController extends Controller
         $departamento               =   "";
         $provincia                  =   "";
         $distrito                   =   "";
+        $texto_empresa              =   "";
+        $texto_contrato             =   "";
+        $ind_empresa                =   0;
+        $ind_contrato               =   0;
+
+
+
+
 
         if(Session::has('ruc')){
             $ruc                    =   Session::get('ruc');
@@ -216,6 +277,21 @@ class GestionLiquidacionGastosController extends Controller
             $distrito               =   Session::get('distrito');
         }
 
+        if(Session::has('texto_empresa')){
+            $texto_empresa          =   Session::get('texto_empresa');
+        }
+        if(Session::has('texto_contrato')){
+            $texto_contrato         =   Session::get('texto_contrato');
+        }
+        if(Session::has('ind_empresa')){
+            $ind_empresa            =   Session::get('ind_empresa');
+        }
+        if(Session::has('ind_contrato')){
+            $ind_contrato           =   Session::get('ind_contrato');
+        }
+
+
+
         return View::make('liquidaciongasto/buscarempresaproveedor',
                     [         
                         'idopcion'      => $idopcion,
@@ -224,7 +300,11 @@ class GestionLiquidacionGastosController extends Controller
                         'direccion'     => $direccion,
                         'departamento'  => $departamento,
                         'provincia'     => $provincia,
-                        'distrito'      => $distrito
+                        'distrito'      => $distrito,
+                        'texto_empresa' => $texto_empresa,
+                        'texto_contrato'=> $texto_contrato,
+                        'ind_empresa' => $ind_empresa,
+                        'ind_contrato'=> $ind_contrato
                     ]);
 
     }
@@ -3130,7 +3210,6 @@ class GestionLiquidacionGastosController extends Controller
                 
                 DB::beginTransaction();
 
-
                     $anio                               =   $this->anio;
                     $mes                                =   $this->mes;
                     $periodo                            =   $this->gn_periodo_actual_xanio_xempresa($anio, $mes, Session::get('empresas')->COD_EMPR);
@@ -3144,9 +3223,18 @@ class GestionLiquidacionGastosController extends Controller
 
                     if($arendir_id=='NO'){
                         $arendir_sel_id = '';
+                    }else{
+                        $vale = DB::table('WEB.VALE_RENDIR')->where('ID', $arendir_sel_id)->first();
+                        $fechavale = $vale->FEC_AUTORIZACION;
+                        list($aniovale, $mesvale, $diavale) = explode('-', $fechavale);
+                        $aniosistemas  = date("Y");    
+                        $messistemas   = date("m");    
+
+                        if($aniovale!=$aniosistemas && $mesvale!=$messistemas){
+                            return Redirect::to('agregar-liquidacion-gastos/'.$idopcion)->with('errorbd', 'La fecha del arendir no corresponde esta dentro del periodo de la Liquidacion de Gasto');
+                        }
+
                     }
-
-
 
                     $codigo                             =   $this->funciones->generar_codigo('LQG_LIQUIDACION_GASTO',8);
                     $idcab                              =   $this->funciones->getCreateIdMaestradocpla('LQG_LIQUIDACION_GASTO','LIQG');
@@ -3279,7 +3367,7 @@ class GestionLiquidacionGastosController extends Controller
             $arendir_sel_id      =   '';
             $combo_arendir_sel   =   $this->gn_combo_arendir();
 
-            //dd($arendir_id);
+            //dd($combo_arendir_sel);
             return View::make('liquidaciongasto.agregarliquidaciongastos',
                              [
                                 'combo_empresa' => $combo_empresa,

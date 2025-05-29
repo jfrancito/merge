@@ -48,6 +48,33 @@
                   {{ csrf_field() }}
 
               <div class="form-group">
+                <label class="col-sm-3 control-label">¿EXISTE EMPRESA?</label>
+                <div class="col-sm-5">
+
+                  <input  type="text"
+                          id="texto_empresa" name='texto_empresa' value="{{$texto_empresa}}"
+                          autocomplete="off" class="form-control input-sm" data-aw="4" readonly = "readonly"/>
+
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="col-sm-3 control-label">¿EXISTE CONTRATO?</label>
+                <div class="col-sm-5">
+
+                  <input  type="text"
+                          id="texto_contrato" name='texto_contrato' value="{{$texto_contrato}}" 
+                          autocomplete="off" class="form-control input-sm" data-aw="4" readonly = "readonly"/>
+
+                </div>
+              </div>
+
+              <input type="hidden" name="ind_empresa" value='{{$ind_empresa}}'>
+              <input type="hidden" name="ind_contrato" value='{{$ind_contrato}}'>
+
+
+
+              <div class="form-group">
                 <label class="col-sm-3 control-label">RUC</label>
                 <div class="col-sm-5">
 

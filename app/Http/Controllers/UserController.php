@@ -1295,7 +1295,7 @@ class UserController extends Controller {
 			}
 			//ADMINISTRACION
 			else{
-				if(Session::get('usuario')->rol_id == '1CIX00000020'){
+				if (in_array(Session::get('usuario')->rol_id, ['1CIX00000020', '1CIX00000033', '1CIX00000035'])) {
 
         			$listadatos     		=   $this->con_lista_cabecera_comprobante_total_adm($cod_empresa);
 					$count_x_aprobar 		= 	count($listadatos);

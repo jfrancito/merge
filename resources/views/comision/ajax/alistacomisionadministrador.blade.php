@@ -46,11 +46,12 @@
       <th>BANCO</th>
       <th>CUENTA</th>
       <th>FECHA REGISTRO</th>
-      <th>FECHA MOVIMIENTO</th>
-      <th>NRO CUENTA</th>    
+      <th>FECHA MOVIMIENTO</th>  
       <th>NRO VOUCHER</th>
       <th>MONEDA</th>
       <th>TOTAL</th>
+      <th>INTEGRADO</th>
+      <th>INTEGRAR</th>
       <th>ESTADO</th>
       <th>LOTE</th>
       <th>
@@ -72,7 +73,10 @@
     @foreach($listadatos as $index => $item)
       <tr data_requerimiento_id = "{{$item->COD_OPERACION_CAJA}}" 
           data_lote = "{{$item->LOTE_DOC}}" 
-          data_total = "@if($item->MONEDA=='SOLES') {{$item->MONTO_SOLES}} @else {{$item->MONTO_DOLARES}} @endif">
+          data_total = "{{$item->MONTO}}"
+          data_total_atendido = "{{$item->MONTOATENDIDO}}"
+          class="itemcomision" 
+          >
         <td><b>{{$index + 1}}</b></td>
         <td>{{$item->COD_OPERACION_CAJA}}</td>
         <td>{{$item->TXT_ITEM_MOVIMIENTO}}</td>
@@ -80,10 +84,18 @@
         <td>{{$item->CUENTA}}</td>
         <td>{{$item->FEC_REGISTRO}}</td>
         <td>{{$item->FEC_MOVIMIENTO}}</td>
-        <td>{{$item->NRO_CUENTA_BANCARIA}}</td>
         <td>{{$item->NRO_VOUCHER}}</td>
         <td>{{$item->MONEDA}}</td>
-        <td>@if($item->MONEDA=='SOLES') {{$item->MONTO_SOLES}} @else {{$item->MONTO_DOLARES}} @endif</td>
+        <td>{{$item->MONTO}}</td>
+        <td>{{$item->MONTOATENDIDO}}</td>
+        <td>
+          <input type="text"  
+                 id="integrar" 
+                 name="integrar"
+                 value="{{$item->MONTO - $item->MONTOATENDIDO}}"
+                 class="form-control input-sm importecomision"
+                 >
+        </td>
         <td>{{$item->ESTADO}}</td>
         <td>{{$item->LOTE_DOC}}</td>
         <td class="rigth">
@@ -109,6 +121,12 @@
   <script type="text/javascript">
     $(document).ready(function(){
        App.dataTables();
+        $('.importecomision').inputmask({ 'alias': 'numeric', 
+        'groupSeparator': ',', 'autoGroup': true, 'digits': 2, 
+        'digitsOptional': false, 
+        'prefix': '', 
+        'placeholder': '0'});
+
     });
   </script> 
 @endif

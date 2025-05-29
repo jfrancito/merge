@@ -305,6 +305,8 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/agregar-suspension/{idopcion}/{lote}', 'GestionEstibaController@actionAgregarSuspensionEstibas');
 
+	Route::any('/ajax-eliminar-lote-comision', 'GestionOCTesoreriaController@actionEliminacionLoteComision');
+
 
 	Route::any('/gestion-de-oc-validado-proveedores/{idopcion}', 'GestionOCValidadoController@actionListarOCValidado');
 	Route::any('/detalle-comprobante-oc-validado/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidado');
