@@ -41,14 +41,8 @@
   <thead>
     <tr>
       <th>ITEM</th>
-      <th>ID</th>
-      <th>MOVIMIENTO</th>
-      <th>BANCO</th>
-      <th>CUENTA</th>
-      <th>FECHA REGISTRO</th>
-      <th>FECHA MOVIMIENTO</th>  
-      <th>NRO VOUCHER</th>
-      <th>MONEDA</th>
+      <th>OPERACION</th>
+      <th>FECHA</th> 
       <th>TOTAL</th>
       <th>INTEGRADO</th>
       <th>INTEGRAR</th>
@@ -78,14 +72,21 @@
           class="itemcomision" 
           >
         <td><b>{{$index + 1}}</b></td>
-        <td>{{$item->COD_OPERACION_CAJA}}</td>
-        <td>{{$item->TXT_ITEM_MOVIMIENTO}}</td>
-        <td>{{$item->NOMBRE_BANCO_CAJA}}</td>
-        <td>{{$item->CUENTA}}</td>
-        <td>{{$item->FEC_REGISTRO}}</td>
-        <td>{{$item->FEC_MOVIMIENTO}}</td>
-        <td>{{$item->NRO_VOUCHER}}</td>
-        <td>{{$item->MONEDA}}</td>
+        <td class="cell-detail sorting_1" style="position: relative;width: 550px;">
+          <span><b>ID :</b>  {{$item->COD_OPERACION_CAJA}}  </span>
+          <span><b>MOVIMIENTO </b>  : {{$item->TXT_ITEM_MOVIMIENTO}}</span>
+          <span><b>BANCO : </b> {{$item->NOMBRE_BANCO_CAJA}}</span>
+          <span><b>CUENTA : </b> {{$item->CUENTA}}</span>
+          <span><b>GLOSA : </b> {{$item->TXT_GLOSA}}</span>
+        </td>
+        <td class="cell-detail sorting_1" style="position: relative;">
+          <span><b>FECHA REGISTRO : </b> {{$item->FEC_REGISTRO}} </span>
+          <span><b>FECHA MOVIMIENTO  :</b>  {{$item->FEC_MOVIMIENTO}}</span>
+          <span><b>NRO VOUCHER  :</b>  {{$item->NRO_VOUCHER}}</span>
+          <span><b>MONEDA  :</b>  {{$item->MONEDA}}</span>
+          <span><b>USUARIO  :</b>  {{$item->NOM_TRABAJADOR}}</span>
+        </td>
+
         <td>{{$item->MONTO}}</td>
         <td>{{$item->MONTOATENDIDO}}</td>
         <td>
