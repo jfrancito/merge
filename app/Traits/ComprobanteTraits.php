@@ -4669,7 +4669,7 @@ trait ComprobanteTraits
 
         $diferencia_total = 0;
         //0.02
-		if($tt_totales <= 0.04){
+		if($tt_totales <= 0.09){
 			$ind_total 			=	1;
             $diferencia_total = round($total_1 - $total_2,2);
 		}else{ 	$ind_errototal 		=	0;  }
@@ -4763,7 +4763,7 @@ trait ComprobanteTraits
         //dd($tt_totales);
         $diferencia_total = 0;
         //0.02
-        if($tt_totales <= 0.04){
+        if($tt_totales <= 0.09){
             $ind_total          =   1;  
             $diferencia_total = round($total_1 - $total_2,2);
 
@@ -4849,7 +4849,7 @@ trait ComprobanteTraits
         $diferencia_total = 0;
 
         //0.02
-        if($tt_totales <= 0.04){
+        if($tt_totales <= 0.09){
             $ind_total          =   1;  
             $diferencia_total = round($total_1 - $total_2,2);
 
@@ -4906,7 +4906,7 @@ trait ComprobanteTraits
         $diferencia_total = 0;
 
         //0.02
-        if($tt_totales <= 0.04){
+        if($tt_totales <= 0.09){
             $ind_total          =   1;  
             $diferencia_total = round($total_1 - $total_2,2);
 
