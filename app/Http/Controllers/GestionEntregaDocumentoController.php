@@ -454,14 +454,33 @@ class GestionEntregaDocumentoController extends Controller
 
             }else{
 
-                $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
-                                    ->where('COD_EMPRESA','=',$empresa_id)
-                                    ->where('OPERACION','like','%'.$operacion_id.'%')
-                                    ->where('COD_ESTADO','=','1')
-                                    ->where('COD_CATEGORIA_ESTADO','=','ETM0000000000005')
-                                    ->where('USUARIO_CREA','=',Session::get('usuario')->id)
-                                    ->orderBy('FE_DOCUMENTO_ENTREGABLE.FECHA_CREA','DESC')
-                                    ->get();
+                if(Session::get('usuario')->id == '1CIX00000003'){
+
+                    $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
+                                        ->where('COD_EMPRESA','=',$empresa_id)
+                                        ->where('OPERACION','like','%'.$operacion_id.'%')
+                                        ->where('COD_ESTADO','=','1')
+                                        ->where('COD_CATEGORIA_ESTADO','=','ETM0000000000005')
+                                        ->whereIn('USUARIO_CREA',[
+                                            Session::get('usuario')->id,
+                                            '1CIX00000086'
+                                        ])
+                                        ->orderBy('FE_DOCUMENTO_ENTREGABLE.FECHA_CREA','DESC')
+                                        ->get();
+
+
+
+                }else{
+                    $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
+                                        ->where('COD_EMPRESA','=',$empresa_id)
+                                        ->where('OPERACION','like','%'.$operacion_id.'%')
+                                        ->where('COD_ESTADO','=','1')
+                                        ->where('COD_CATEGORIA_ESTADO','=','ETM0000000000005')
+                                        ->where('USUARIO_CREA','=',Session::get('usuario')->id)
+                                        ->orderBy('FE_DOCUMENTO_ENTREGABLE.FECHA_CREA','DESC')
+                                        ->get();
+
+                }
 
             }
 
