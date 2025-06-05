@@ -788,7 +788,7 @@ class GestionOCTesoreriaController extends Controller
                                         ->get();
         }else{
             $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$idoc)->where('COD_ESTADO','=',1)
-                                        ->where('COD_CATEGORIA_DOCUMENTO','<>','DCC0000000000003')
+                                        ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000004'])
                                         ->whereIn('TXT_ASIGNADO', ['PROVEEDOR','CONTACTO'])
                                         ->get();
         }
