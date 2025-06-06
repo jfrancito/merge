@@ -37,10 +37,12 @@
             <th class="center tablaho">FECHA DOCUMENTO</th>
             <th class="center tablaho">TIPO DOCUMENTO</th>
             <th class="center tablaho">NUMERO DOCUMENTO</th>
+            <th class="center tablaho">FACTURAS RELACIONADAS</th>
             <th class="center tablaho">DIAS TRANSCURRIDOS</th>
             <th class="center tablaho">MONEDA</th>
             <th class="center tablaho">JEFE VENTA</th>
             <th class="center tablaho">TIPO CONTRATO</th>
+            <th class="center tablaho">IMPORTE ORIGINAL</th>
             <th class="center tablaho">SALDO S/.</th>
             <th class="center tablaho">SALDO $</th>
         </tr>
@@ -52,16 +54,19 @@
                     <td class="border"> {{$item['NOM_CLIENTE']}}</td>
                     <td class="border">{{substr($item['NRO_CONTRATO'],0,6).'-'.strval(intval(substr($item['NRO_CONTRATO'],6,16)))}}</td>
                     <td class="border">{{$item['Centro']}}</td>
-                    <td class="border">{{number_format($item['Tcambio'], 4, '.', '')}}</td>
-                    <td class="border">{{$item['FecDocumento']}}</td>
+                    <td class="border">{{number_format($item['Tcambio'], 2, '.', '')}}</td>
+                    {{--<td class="border">{{$item["FecDocumento_Emis"]}}</td>--}}
+                    <td class="border">{{\PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel(new \DateTime($item["FecDocumento"]))}}</td>
                     <td class="border">{{$item['TipoDocumento']}}</td>
                     <td class="border">{{$item['NroDocumento']}}</td>
+                    <td class="border">{{$item["DOCS"]}}</td>
                     <td class="border">{{$item['diasTranscurridos']}}</td>
                     <td class="border">{{$item['SIM_MONEDA']}}</td>
                     <td class="border">{{$item['JEFE_VENTA']}}</td>
                     <td class="border">{{$item['TIPO_CONTRATO']}}</td>
-                    <td class="border">{{number_format($item['CAN_CAPITAL_SALDO'] + $item['CAN_INTERES_SALDO'], 4, '.', '')}}</td>
-                    <td class="border">{{number_format($item['CAN_CAPITAL_SALDO_ME'] + $item['CAN_INTERES_SALDO'], 4, '.', '')}}</td>
+                    <td class="border">{{number_format($item['TOT_DOC'], 2, '.', '')}}</td>
+                    <td class="border">{{number_format($item['CAN_CAPITAL_SALDO'] + $item['CAN_INTERES_SALDO'], 2, '.', '')}}</td>
+                    <td class="border">{{number_format($item['CAN_CAPITAL_SALDO_ME'] + $item['CAN_INTERES_SALDO'], 2, '.', '')}}</td>
                 </tr>
                 @php
                     $total_mn = $total_mn + ($item['CAN_CAPITAL_SALDO'] + $item['CAN_INTERES_SALDO']);
@@ -73,8 +78,8 @@
         <tfoot>
         <tr>
             <th class="center footerho" colspan="11">Total</th>
-            <th class="center footerho">{{number_format($total_mn, 4, '.', '')}}</th>
-            <th class="center footerho">{{number_format($total_me, 4, '.', '')}}</th>
+            <th class="footerho">{{number_format($total_mn, 2, '.', ',')}}</th>
+            <th class="footerho">{{number_format($total_me, 2, '.', ',')}}</th>
         </tr>
         </tfoot>
     </table>
