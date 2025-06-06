@@ -19,6 +19,7 @@
         "laravelcollective/html": "^5.4",
         "maatwebsite/excel": "~2.1.0",
         "nesbot/carbon": "1.25.0",
+        "phpoffice/phpspreadsheet": "^1.12",
         "torann/hashids": "^2.0"
     },
     "require-dev": {
