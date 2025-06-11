@@ -1101,6 +1101,82 @@ class GestionOCContabilidadController extends Controller
             $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);
             $lecturacdr             =   $this->lectura_cdr_archivo($idoc,$this->pathFiles,$prefijocarperta,$ordencompra->NRO_DOCUMENTO_CLIENTE);
 
+            if($fedocumento->nestadoCp === null){
+
+                $fechaemision           =      date_format(date_create($fedocumento->FEC_VENTA), 'd/m/Y');
+                $token = '';
+                if($prefijocarperta =='II'){
+                    $token           =      $this->generartoken_ii();
+                }else{
+                    $token           =      $this->generartoken_is();
+                }
+                $rvalidar = $this->validar_xml( $token,
+                                                $fedocumento->ID_CLIENTE,
+                                                $fedocumento->RUC_PROVEEDOR,
+                                                $fedocumento->ID_TIPO_DOC,
+                                                $fedocumento->SERIE,
+                                                $fedocumento->NUMERO,
+                                                $fechaemision,
+                                                $fedocumento->TOTAL_VENTA_ORIG);
+                $arvalidar = json_decode($rvalidar, true);
+                if(isset($arvalidar['success'])){
+
+                    if($arvalidar['success']){
+
+
+
+                        $datares              = $arvalidar['data'];
+
+                        if (!isset($datares['estadoCp'])){
+                            return Redirect::back()->with('errorurl', 'Hay fallas en sunat para consultar el XML');
+                        }
+
+                        $estadoCp             = $datares['estadoCp'];
+                        $tablaestacp          = Estado::where('tipo','=','estadoCp')->where('codigo','=',$estadoCp)->first();
+
+                        $estadoRuc            = '';
+                        $txtestadoRuc         = '';
+                        $estadoDomiRuc        = '';
+                        $txtestadoDomiRuc     = '';
+
+                        if(isset($datares['estadoRuc'])){
+                            $tablaestaruc          = Estado::where('tipo','=','estadoRuc')->where('codigo','=',$datares['estadoRuc'])->first();
+                            $estadoRuc             = $tablaestaruc->codigo;
+                            $txtestadoRuc          = $tablaestaruc->nombre;
+                        }
+                        if(isset($datares['condDomiRuc'])){
+                            $tablaestaDomiRuc       = Estado::where('tipo','=','condDomiRuc')->where('codigo','=',$datares['condDomiRuc'])->first();
+                            $estadoDomiRuc          = $tablaestaDomiRuc->codigo;
+                            $txtestadoDomiRuc       = $tablaestaDomiRuc->nombre;
+                        }
+
+                        FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)
+                                    ->update(
+                                            [
+                                                'success'=>$arvalidar['success'],
+                                                'message'=>$arvalidar['message'],
+                                                'estadoCp'=>$tablaestacp->codigo,
+                                                'nestadoCp'=>$tablaestacp->nombre,
+                                                'estadoRuc'=>$estadoRuc,
+                                                'nestadoRuc'=>$txtestadoRuc,
+                                                'condDomiRuc'=>$estadoDomiRuc,
+                                                'ncondDomiRuc'=>$txtestadoDomiRuc,
+                                            ]);
+                    }else{
+                        FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)
+                                    ->update(
+                                            [
+                                                'success'=>$arvalidar['success'],
+                                                'message'=>$arvalidar['message']
+                                            ]);
+                    }
+                }
+
+            }
+
+
+
+
             $detalleordencompra     =   $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
             $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
