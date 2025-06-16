@@ -2885,8 +2885,6 @@ class GestionOCController extends Controller
                         $documento->RUC_PROVEEDOR           =   $factura->getcompany()->getruc();
                         $documento->RZ_PROVEEDOR            =   $rz_p;
 
-
-
                         $documento->TIPO_CLIENTE            =   $factura->getClient()->gettipoDoc();
                         $documento->ID_CLIENTE              =   $factura->getClient()->getnumDoc();
                         $documento->NOMBRE_CLIENTE          =   $factura->getClient()->getrznSocial();
@@ -2906,7 +2904,8 @@ class GestionOCController extends Controller
                         $documento->SUB_TOTAL_VENTA_ORIG    =   $factura->getmtoOperGravadas();
                         $documento->SUB_TOTAL_VENTA_SOLES   =   $factura->getmtoOperGravadas();
 
-                        $documento->TOTAL_VENTA_ORIG        =   $factura->getmtoImpVenta();
+                        $documento->TOTAL_VENTA_XML         =   $factura->getmtoImpVenta();
+                        $documento->TOTAL_VENTA_ORIG        =   $ordencompra->CAN_TOTAL;
                         $documento->TOTAL_VENTA_SOLES       =   $factura->getmtoImpVenta();
 
                         $documento->PERCEPCION              =   $cant_perception;
@@ -3160,9 +3159,6 @@ class GestionOCController extends Controller
                         $ordencompra_t          =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$idoc)->first();
                         $fedocumento_t          =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
 
-
-
-
                         if(count($fedocumento_t)>0){
                             DB::table('FE_DOCUMENTO')->where('ID_DOCUMENTO','=',$fedocumento_t->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$fedocumento_t->DOCUMENTO_ITEM)->delete();
                             DB::table('FE_DETALLE_DOCUMENTO')->where('ID_DOCUMENTO','=',$fedocumento_t->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$fedocumento_t->DOCUMENTO_ITEM)->delete();
@@ -3170,7 +3166,6 @@ class GestionOCController extends Controller
                             DB::table('ARCHIVOS')->where('ID_DOCUMENTO','=',$fedocumento_t->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$fedocumento_t->DOCUMENTO_ITEM)->delete();
                             DB::table('FE_DOCUMENTO_HISTORIAL')->where('ID_DOCUMENTO','=',$fedocumento_t->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$fedocumento_t->DOCUMENTO_ITEM)->delete();
                         }
-
 
                         /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
                         $contadorArchivos = Archivo::count();
@@ -3280,7 +3275,9 @@ class GestionOCController extends Controller
                         $documento->VALOR_IGV_SOLES         =   $factura->getmtoIGV();
                         $documento->SUB_TOTAL_VENTA_ORIG    =   $factura->getmtoOperGravadas();
                         $documento->SUB_TOTAL_VENTA_SOLES   =   $factura->getmtoOperGravadas();
-                        $documento->TOTAL_VENTA_ORIG        =   $factura->getmtoImpVenta();
+                        $documento->TOTAL_VENTA_XML         =   $factura->getmtoImpVenta();
+
+                        $documento->TOTAL_VENTA_ORIG        =   $ordencompra->CAN_TOTAL;
                         $documento->TOTAL_VENTA_SOLES       =   $factura->getmtoImpVenta();
 
 
