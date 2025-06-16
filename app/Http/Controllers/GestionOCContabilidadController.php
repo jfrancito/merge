@@ -401,14 +401,6 @@ class GestionOCContabilidadController extends Controller
                                             .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
                                             .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
                                             .'RECOMENDACION : '.$descripcion.'%0D%0A';
-                    // //dd($trabajador);                        
-                    // if(1==0){
-                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                    // }else{
-                    //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                    // }  
-
                 }
 
                 $filespdf          =   $request['otros'];
@@ -487,18 +479,6 @@ class GestionOCContabilidadController extends Controller
                                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
                                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
                                         .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
-
-                // if(1==0){
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                // }else{
-
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                //     //CONTABILIDAD
-                //     $this->insertar_whatsaap('51971575452','GISELA',$mensaje,'');
-                //     $this->insertar_whatsaap('51920721827','JESSICA DEL PILAR',$mensaje,'');
-                //     //$this->insertar_whatsaap('51948634244','ELSA ANA BELEN',$mensaje,'');
-
-                // }   
 
                 DB::commit();
                 return Redirect::to('/gestion-de-contabilidad-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' APROBADO CON EXITO');
@@ -2082,6 +2062,7 @@ class GestionOCContabilidadController extends Controller
                 $documento->TIPO                        =   'DOCUMENTO '.$reparable;
                 $documento->MENSAJE                     =   $descripcion;
                 $documento->save();
+
                 FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
                                 [
@@ -2090,22 +2071,6 @@ class GestionOCContabilidadController extends Controller
                                     'TXT_REPARABLE'=>'REPARABLE'
                                 ]
                             );
-                //LE LLEGA AL USUARIO DE CONTACTO
-                // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
-                // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                // $mensaje            =   'COMPROBANTE REPARABLE: '.$fedocumento->ID_DOCUMENTO
-                //                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-                //                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
-                //                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
-                //                         .'MENSAJE : '.$descripcion.'%0D%0A';
-
-                // //dd($trabajador);                        
-                // if(1==0){
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                // }else{
-                //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                // }  
 
                 DB::commit();
                 return Redirect::to('aprobar-comprobante-contabilidad/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' REPARABLE CON EXITO');
