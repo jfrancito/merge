@@ -397,7 +397,7 @@ class GestionTCController extends Controller
                         $documento->SUB_TOTAL_VENTA_SOLES   =   $factura->getmtoOperGravadas();
                         $documento->TOTAL_VENTA_ORIG        =   $factura->getmtoImpVenta();
                         $documento->TOTAL_VENTA_SOLES       =   $factura->getmtoImpVenta();
-
+                        $documento->TOTAL_VENTA_XML         =   $factura->getmtoImpVenta();
                         $documento->PERCEPCION              =   $cant_perception;
                         $documento->MONTO_RETENCION         =   $cant_rentencion;
 
