@@ -7,7 +7,8 @@ use App\Modelos\WEBRolopcion;
 use App\Modelos\Estado;
 use App\Modelos\FeDocumento;
 use App\Modelos\WEBUserEmpresaCentro;
-
+use App\Modelos\FeDocumentoHistorial;
+use App\Modelos\CMPDocAsociarCompra;
 
 use Hashids;
 use Illuminate\Support\Facades\DB;
@@ -16,6 +17,9 @@ use Session;
 use table;
 
 class Funcion {
+
+
+
 
 	public function tiene_perfil($empresa_id,$centro_id,$usuario_id) {
 
@@ -32,6 +36,17 @@ class Funcion {
 		}	
 
 	}
+
+	public function cantidad_reparados($id_documento){
+		$fedocumento 		= 	CMPDocAsociarCompra::where('COD_ORDEN','=',$id_documento)
+								->where('COD_USUARIO_CREA_AUD','like','1CIX%')
+								->where('TXT_ASIGNADO','like','ARCHIVO%')->count();
+
+		
+        return $fedocumento;
+	}
+
+	
 
 	public function neto_pagar_oc($oc){
 
