@@ -54,6 +54,153 @@ class GestionUsuarioContactoController extends Controller
     use WhatsappTraits;
     use ComprobanteProvisionTraits;
 
+
+    public function actionAprobarReparableMasivo($idopcion,Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        View::share('titulo','Aprobar  Comprobante');
+
+        if($_POST)
+        {
+
+            try{    
+                
+                DB::beginTransaction();
+                $datastring         =   json_decode($request['datastring'], false);
+
+                foreach ($datastring as $index_asiento => $itemc) {
+
+
+                    $pedido_id              =   $itemc->id;
+                    $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->first();
+                    $arrayarchivos          =   Archivo::where('ID_DOCUMENTO','=',$pedido_id)
+                                                ->where('ACTIVO','=','1')
+                                                ->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                                ->pluck('TIPO_ARCHIVO')
+                                                ->toArray();
+
+                    if($fedocumento->MODO_REPARABLE == 'ARCHIVO_VIRTUAL')
+                    {
+
+                        $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$pedido_id)->where('COD_ESTADO','=',1)
+                                                    ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
+                                                    ->get();
+
+                        $tiposerie              =   substr($fedocumento->SERIE, 0, 1);
+
+                        if($tiposerie == 'E'){
+                            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$pedido_id)->where('COD_ESTADO','=',1)
+                                                        ->whereIn('TXT_ASIGNADO', ['ARCHIVO_VIRTUAL'])
+                                                        ->get();
+
+                        }else{
+                            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$pedido_id)->where('COD_ESTADO','=',1)
+                                                        ->whereIn('TXT_ASIGNADO', ['ARCHIVO_VIRTUAL'])
+                                                        ->get();
+                        }
+
+                        foreach($tarchivos as $index => $item){
+
+                            $filescdm          =   $request['masivo'];
+                            if(!is_null($filescdm)){
+                                //CDR
+                                foreach($filescdm as $file){
+
+                                    $contadorArchivos = Archivo::count();
+
+                                    $nombre          =      $pedido_id.'-'.$file->getClientOriginalName();
+                                    /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
+                                    $prefijocarperta =      $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
+                                    $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$fedocumento->RUC_PROVEEDOR;
+                                    // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
+                                    $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                                    $valor           =      $this->versicarpetanoexiste($rutafile);
+                                    $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
+                                    copy($file->getRealPath(),$rutacompleta);
+                                    $path            =      $rutacompleta;
+
+                                    $nombreoriginal             =   $file->getClientOriginalName();
+                                    $info                       =   new SplFileInfo($nombreoriginal);
+                                    $extension                  =   $info->getExtension();
+
+                                    $dcontrol                   =   new Archivo;
+                                    $dcontrol->ID_DOCUMENTO     =   $pedido_id;
+                                    $dcontrol->DOCUMENTO_ITEM   =   $fedocumento->DOCUMENTO_ITEM;
+                                    $dcontrol->TIPO_ARCHIVO     =   $item->COD_CATEGORIA_DOCUMENTO;
+                                    $dcontrol->NOMBRE_ARCHIVO   =   $nombrefilecdr;
+                                    $dcontrol->DESCRIPCION_ARCHIVO  =   $item->NOM_CATEGORIA_DOCUMENTO;
+
+                                    $dcontrol->URL_ARCHIVO      =   $path;
+                                    $dcontrol->SIZE             =   filesize($file);
+                                    $dcontrol->EXTENSION        =   $extension;
+                                    $dcontrol->ACTIVO           =   1;
+                                    $dcontrol->FECHA_CREA       =   $this->fechaactual;
+                                    $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
+                                    $dcontrol->save();
+                                }
+                            }
+                        }
+
+                        FeDocumento::where('ID_DOCUMENTO',$pedido_id)
+                                    ->update(
+                                        [
+                                            'IND_REPARABLE'=>'2',
+                                            'IND_OBSERVACION_REPARABLE' =>0
+                                        ]
+                                    );
+                        //HISTORIAL DE DOCUMENTO APROBADO
+                        $documento                              =   new FeDocumentoHistorial;
+                        $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                        $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                        $documento->FECHA                       =   $this->fechaactual;
+                        $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                        $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                        $documento->TIPO                        =   'RESOLVIO LOS REPARABLES';
+                        $documento->MENSAJE                     =   '';
+                        $documento->save();
+                    }
+                }
+                DB::commit();
+                return Redirect::to('/gestion-de-tesoreria-aprobar/'.$idopcion)->with('bienhecho', 'Comprobantes Masivo Aprobado con exito');
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                return Redirect::to('gestion-de-tesoreria-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+
+        }
+     }
+
+
+
+    public function actionListarAjaxModalReparableMasivo(Request $request)
+    {
+        
+
+        $idopcion               =   $request['idopcion'];
+        $datastring_n           =   $request['datastring'];
+        $datastring             =   json_decode($request['datastring'], false);
+        $ids                    =   collect($datastring)->pluck('id');
+        $tarchivos              =   FeDocumento::whereIn('ID_DOCUMENTO', $ids)
+                                    ->get();
+
+
+
+        return View::make('comprobante/modal/ajax/magregarreparablemasivo',
+                         [          
+                            'datastring_n'          => $datastring_n,
+                            'datastring'            => $datastring,
+                            'idopcion'              => $idopcion,
+                            'tarchivos'             => $tarchivos,
+                            'ajax'                  => true,                            
+                         ]);
+    }
+
+
+
     public function actionListarComprobantesObservados($idopcion)
     {
         /******************* validar url **********************/
