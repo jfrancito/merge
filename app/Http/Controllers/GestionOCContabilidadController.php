@@ -518,6 +518,132 @@ class GestionOCContabilidadController extends Controller
             $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc_actual($idoc);
             $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
+            if($fedocumento->nestadoCp === null){
+
+                $rh                     =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                                            ->where('COD_ESTADO','=',1)
+                                            ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000013'])
+                                            ->get();
+                $fechaemision            =      date_format(date_create($fedocumento->FEC_VENTA), 'd/m/Y');
+
+                $token = '';
+                if($prefijocarperta =='II'){
+                    $token           =      $this->generartoken_ii();
+                }else{
+                    $token           =      $this->generartoken_is();
+                }
+
+                if(count($rh)<=0){
+                    //FACTURA
+                    $rvalidar = $this->validar_xml( $token,
+                                                    $fedocumento->ID_CLIENTE,
+                                                    $fedocumento->RUC_PROVEEDOR,
+                                                    $fedocumento->ID_TIPO_DOC,
+                                                    $fedocumento->SERIE,
+                                                    $fedocumento->NUMERO,
+                                                    $fechaemision,
+                                                    $fedocumento->TOTAL_VENTA_ORIG);
+                }else{
+                    //RECIBO POR HONORARIO
+                    $rvalidar = $this->validar_xml( $token,
+                                                    $fedocumento->ID_CLIENTE,
+                                                    $fedocumento->RUC_PROVEEDOR,
+                                                    $fedocumento->ID_TIPO_DOC,
+                                                    $fedocumento->SERIE,
+                                                    $fedocumento->NUMERO,
+                                                    $fechaemision,
+                                                    $fedocumento->TOTAL_VENTA_ORIG+$fedocumento->MONTO_RETENCION);
+                }
+
+                $arvalidar = json_decode($rvalidar, true);
+                if(isset($arvalidar['success'])){
+
+                    if($arvalidar['success']){
+
+                        $datares              = $arvalidar['data'];
+                        if (!isset($datares['estadoCp'])){
+                            return Redirect::back()->with('errorurl', 'Hay fallas en sunat para consultar el XML');
+                        }
+                        
+                        $estadoCp             = $datares['estadoCp'];
+
+
+                        $tablaestacp          = Estado::where('tipo','=','estadoCp')->where('codigo','=',$estadoCp)->first();
+                        //dd($tablaestacp);
+                        $estadoRuc            = '';
+                        $txtestadoRuc         = '';
+                        $estadoDomiRuc        = '';
+                        $txtestadoDomiRuc     = '';
+
+                        if(isset($datares['estadoRuc'])){
+                            $tablaestaruc          = Estado::where('tipo','=','estadoRuc')->where('codigo','=',$datares['estadoRuc'])->first();
+                            $estadoRuc             = $tablaestaruc->codigo;
+                            $txtestadoRuc          = $tablaestaruc->nombre;
+                        }
+                        if(isset($datares['condDomiRuc'])){
+                            $tablaestaDomiRuc       = Estado::where('tipo','=','condDomiRuc')->where('codigo','=',$datares['condDomiRuc'])->first();
+                            $estadoDomiRuc          = $tablaestaDomiRuc->codigo;
+                            $txtestadoDomiRuc       = $tablaestaDomiRuc->nombre;
+                        }
+
+
+                        FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)
+                                    ->update(
+                                            [
+                                                'success'=>$arvalidar['success'],
+                                                'message'=>$arvalidar['message'],
+                                                'estadoCp'=>$tablaestacp->codigo,
+                                                'nestadoCp'=>$tablaestacp->nombre,
+                                                'estadoRuc'=>$estadoRuc,
+                                                'nestadoRuc'=>$txtestadoRuc,
+                                                'condDomiRuc'=>$estadoDomiRuc,
+                                                'ncondDomiRuc'=>$txtestadoDomiRuc,
+                                            ]);
+
+                        if($tablaestacp->codigo =='0' && $fedocumento->ID_TIPO_DOC == 'R1'){
+
+                            FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)
+                                        ->update(
+                                                [
+                                                    'success'=>$arvalidar['success'],
+                                                    'message'=>$arvalidar['message'],
+                                                    'estadoCp'=>'1',
+                                                    'nestadoCp'=>'ACEPTADO',
+                                                    'estadoRuc'=>'00',
+                                                    'nestadoRuc'=>'ACTIVO',
+                                                    'condDomiRuc'=>'00',
+                                                    'ncondDomiRuc'=>'HABIDO',
+                                                ]);
+
+                        }
+
+
+
+                    }else{
+                        FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)
+                                    ->update(
+                                            [
+                                                'success'=>$arvalidar['success'],
+                                                'message'=>$arvalidar['message']
+                                            ]);
+                    }
+                }
+
+
+
+
+            }
+
+
+
+
+
+
+
+
+
+
+
             $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
             $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                         //->where('IND_OBLIGATORIO','=',1)
