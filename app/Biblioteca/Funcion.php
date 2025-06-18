@@ -40,6 +40,7 @@ class Funcion {
 	public function cantidad_reparados($id_documento){
 		$fedocumento 		= 	CMPDocAsociarCompra::where('COD_ORDEN','=',$id_documento)
 								->where('COD_USUARIO_CREA_AUD','like','1CIX%')
+								->where('COD_ESTADO','=','1')
 								->where('TXT_ASIGNADO','like','ARCHIVO%')->count();
 
 		
