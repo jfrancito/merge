@@ -86,6 +86,10 @@ $(document).ready(function(){
         var operacion_id            =   $('#operacion_id').val();
         var estadopago_id           =   $('#estadopago_id').val();
         var proveedor_id            =   $('#proveedor_id').val();
+
+        var fecha_inicio            =   $('#fecha_inicio').val();
+        var fecha_fin               =   $('#fecha_fin').val();
+
         var idopcion                =   $('#idopcion').val();
         var _token                  =   $('#token').val();
 
@@ -94,6 +98,9 @@ $(document).ready(function(){
                                 operacion_id            : operacion_id,
                                 estadopago_id           : estadopago_id,
                                 proveedor_id            : proveedor_id,
+                                fecha_inicio            : fecha_inicio,
+                                fecha_fin               : fecha_fin,
+
                                 idopcion                : idopcion
                             };
         ajax_normal(data,"/ajax-buscar-documento-gestion-tesoreria");

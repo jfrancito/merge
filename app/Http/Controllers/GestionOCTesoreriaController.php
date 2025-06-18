@@ -1095,6 +1095,9 @@ class GestionOCTesoreriaController extends Controller
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
         //falta usuario contacto
 
+        $fecha_inicio       =   $this->fecha_menos_diez_dias;
+        $fecha_fin          =   $this->fecha_sin_hora;
+
         $operacion_id       =   'ORDEN_COMPRA';
         $estadopago_id      =   'PAGADO';
         if(Session::has('operacion_id')){
@@ -1116,20 +1119,20 @@ class GestionOCTesoreriaController extends Controller
 
         if($operacion_id=='ORDEN_COMPRA'){
             if($estadopago_id == 'PAGADO'){
-                $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes($cod_empresa,$proveedor_id);
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes($cod_empresa,$proveedor_id,$fecha_inicio,$fecha_fin);
             }else{
-                $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_sp($cod_empresa,$proveedor_id);
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_sp($cod_empresa,$proveedor_id,$fecha_inicio,$fecha_fin);
             }
         }else{
             if($operacion_id=='CONTRATO'){
                 if($estadopago_id == 'PAGADO'){
-                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_contrato($cod_empresa,$proveedor_id);
+                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_contrato($cod_empresa,$proveedor_id,$fecha_inicio,$fecha_fin);
                 }else{
-                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_contrato_sp($cod_empresa,$proveedor_id);
+                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_contrato_sp($cod_empresa,$proveedor_id,$fecha_inicio,$fecha_fin);
                 }
             }else{
                 if($estadopago_id == 'PAGADO'){
-                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_estiba($cod_empresa,$proveedor_id,$operacion_id);
+                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_estiba($cod_empresa,$proveedor_id,$operacion_id,$fecha_inicio,$fecha_fin);
                 }else{
                     $listadatos         =   array();
                 }
@@ -1147,6 +1150,9 @@ class GestionOCTesoreriaController extends Controller
                             'combo_operacion'   =>  $combo_operacion,
                             'estadopago_id'     =>  $estadopago_id,
                             'combo_estado'      =>  $combo_estado,
+                            'fecha_inicio'      =>  $fecha_inicio,
+                            'fecha_fin'         =>  $fecha_fin,
+
                             'idopcion'          =>  $idopcion,
                          ]);
 
@@ -1157,6 +1163,11 @@ class GestionOCTesoreriaController extends Controller
         $operacion_id   =   $request['operacion_id'];
         $estadopago_id  =   $request['estadopago_id'];
         $proveedor_id   =   $request['proveedor_id'];
+        $fecha_inicio   =   $request['fecha_inicio'];
+        $fecha_fin      =   $request['fecha_fin'];
+
+
+
 
         $idopcion       =   $request['idopcion'];
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
@@ -1164,20 +1175,20 @@ class GestionOCTesoreriaController extends Controller
 
         if($operacion_id=='ORDEN_COMPRA'){
             if($estadopago_id == 'PAGADO'){
-                $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes($cod_empresa,$proveedor_id);
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes($cod_empresa,$proveedor_id,$fecha_inicio,$fecha_fin);
             }else{
-                $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_sp($cod_empresa,$proveedor_id);
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_sp($cod_empresa,$proveedor_id,$fecha_inicio,$fecha_fin);
             }
         }else{
             if($operacion_id=='CONTRATO'){
                 if($estadopago_id == 'PAGADO'){
-                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_contrato($cod_empresa,$proveedor_id);
+                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_contrato($cod_empresa,$proveedor_id,$fecha_inicio,$fecha_fin);
                 }else{
-                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_contrato_sp($cod_empresa,$proveedor_id);
+                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_contrato_sp($cod_empresa,$proveedor_id,$fecha_inicio,$fecha_fin);
                 }
             }else{
                 if($estadopago_id == 'PAGADO'){
-                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_estiba($cod_empresa,$proveedor_id,$operacion_id);
+                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_tes_estiba($cod_empresa,$proveedor_id,$operacion_id,$fecha_inicio,$fecha_fin);
                 }else{
                     $listadatos         =   array();
                 }
