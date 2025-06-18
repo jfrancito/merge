@@ -1034,56 +1034,6 @@ class GestionOCTesoreriaController extends Controller
     }
 
 
-    public function actionListarAjaxModalTesoreriaPagoContrato(Request $request)
-    {
-        
-        $cod_orden              =   $request['data_requerimiento_id'];
-        $linea                  =   $request['data_linea'];
-        $idopcion               =   $request['idopcion'];
-
-        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$cod_orden)->where('DOCUMENTO_ITEM','=',$linea)->first();
-        $ordencompra            =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$cod_orden)->first();
-
-        //ARCHIVOS
-        $archivosdelfe          =      CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                        ->whereIn('COD_CATEGORIA', ['DCC0000000000028'])
-                                        ->get();
-
-        DB::table('CMP.DOC_ASOCIAR_COMPRA')->where('COD_ORDEN','=',$cod_orden)
-                                           ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000028')->delete();
-
-        foreach($archivosdelfe as $index=>$item){
-                $categoria                               =   CMPCategoria::where('COD_CATEGORIA','=',$item->COD_CATEGORIA)->first();
-                $docasociar                              =   New CMPDocAsociarCompra;
-                $docasociar->COD_ORDEN                   =   $ordencompra->COD_DOCUMENTO_CTBLE;
-                $docasociar->COD_CATEGORIA_DOCUMENTO     =   $categoria->COD_CATEGORIA;
-                $docasociar->NOM_CATEGORIA_DOCUMENTO     =   $categoria->NOM_CATEGORIA;
-                $docasociar->IND_OBLIGATORIO             =   $categoria->IND_DOCUMENTO_VAL;
-                $docasociar->TXT_FORMATO                 =   $categoria->COD_CTBLE;
-                $docasociar->TXT_ASIGNADO                =   $categoria->TXT_ABREVIATURA;
-                $docasociar->COD_USUARIO_CREA_AUD        =   Session::get('usuario')->id;
-                $docasociar->FEC_USUARIO_CREA_AUD        =   $this->fechaactual;
-                $docasociar->COD_ESTADO                  =   1;
-                $docasociar->TIP_DOC                     =   $categoria->CODIGO_SUNAT;
-                $docasociar->save();
-        }
-
-        $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
-                                    ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000028'])
-                                    ->get();
-
-
-        return View::make('comprobante/modal/ajax/magregarpagotesoreriacontrato',
-                         [          
-                            'cod_orden'             => $cod_orden,
-                            'linea'                 => $linea,
-                            'idopcion'              => $idopcion,
-                            'fedocumento'           => $fedocumento,
-                            'ordencompra'           => $ordencompra,
-                            'tarchivos'             => $tarchivos,
-                            'ajax'                  => true,                            
-                         ]);
-    }
 
 
     public function actionListarAjaxModalTesoreriaPagoEstiba(Request $request)
@@ -1385,6 +1335,56 @@ class GestionOCTesoreriaController extends Controller
     }
 
 
+    public function actionListarAjaxModalTesoreriaPagoContrato(Request $request)
+    {
+        
+        $cod_orden              =   $request['data_requerimiento_id'];
+        $linea                  =   $request['data_linea'];
+        $idopcion               =   $request['idopcion'];
+
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$cod_orden)->where('DOCUMENTO_ITEM','=',$linea)->first();
+        $ordencompra            =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$cod_orden)->first();
+
+        //ARCHIVOS
+        $archivosdelfe          =      CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                        ->whereIn('COD_CATEGORIA', ['DCC0000000000028'])
+                                        ->get();
+
+        DB::table('CMP.DOC_ASOCIAR_COMPRA')->where('COD_ORDEN','=',$cod_orden)
+                                           ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000028')->delete();
+
+        foreach($archivosdelfe as $index=>$item){
+                $categoria                               =   CMPCategoria::where('COD_CATEGORIA','=',$item->COD_CATEGORIA)->first();
+                $docasociar                              =   New CMPDocAsociarCompra;
+                $docasociar->COD_ORDEN                   =   $ordencompra->COD_DOCUMENTO_CTBLE;
+                $docasociar->COD_CATEGORIA_DOCUMENTO     =   $categoria->COD_CATEGORIA;
+                $docasociar->NOM_CATEGORIA_DOCUMENTO     =   $categoria->NOM_CATEGORIA;
+                $docasociar->IND_OBLIGATORIO             =   $categoria->IND_DOCUMENTO_VAL;
+                $docasociar->TXT_FORMATO                 =   $categoria->COD_CTBLE;
+                $docasociar->TXT_ASIGNADO                =   $categoria->TXT_ABREVIATURA;
+                $docasociar->COD_USUARIO_CREA_AUD        =   Session::get('usuario')->id;
+                $docasociar->FEC_USUARIO_CREA_AUD        =   $this->fechaactual;
+                $docasociar->COD_ESTADO                  =   1;
+                $docasociar->TIP_DOC                     =   $categoria->CODIGO_SUNAT;
+                $docasociar->save();
+        }
+
+        $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
+                                    ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000028'])
+                                    ->get();
+
+
+        return View::make('comprobante/modal/ajax/magregarpagotesoreriacontrato',
+                         [          
+                            'cod_orden'             => $cod_orden,
+                            'linea'                 => $linea,
+                            'idopcion'              => $idopcion,
+                            'fedocumento'           => $fedocumento,
+                            'ordencompra'           => $ordencompra,
+                            'tarchivos'             => $tarchivos,
+                            'ajax'                  => true,                            
+                         ]);
+    }
 
 
     public function actionListarAjaxModalTesoreriaPago(Request $request)
@@ -1842,7 +1842,6 @@ class GestionOCTesoreriaController extends Controller
     }
 
 
-
     public function actionAprobarTesoreria($idopcion, $linea,$prefijo, $idordencompra,Request $request)
     {
 
@@ -2042,9 +2041,12 @@ class GestionOCTesoreriaController extends Controller
             $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                         ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000028'])
                                         ->get();
+ 
 
+            $ordencompra_f          =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
             return View::make('comprobante/aprobartes', 
                             [
+                                'ordencompra_f'         =>  $ordencompra_f,
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
                                 'ordeningreso'          =>  $ordeningreso,
@@ -2063,6 +2065,7 @@ class GestionOCTesoreriaController extends Controller
 
         }
     }
+
 
     public function actionAprobarTesoreriaContrato($idopcion, $linea,$prefijo, $idordencompra,Request $request)
     {
@@ -2086,6 +2089,8 @@ class GestionOCTesoreriaController extends Controller
                 DB::beginTransaction();
 
                 $pedido_id          =   $idoc;
+                $partepago          =   $request['partepago'];
+
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
                 $tarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
                                         ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000028')
@@ -2097,6 +2102,13 @@ class GestionOCTesoreriaController extends Controller
                     if(!is_null($filescdm)){
 
                         foreach($filescdm as $file){
+
+                            $TIPO_ARCHIVO = $item->COD_CATEGORIA_DOCUMENTO;
+                            $DESCRIPCION_ARCHIVO = $item->NOM_CATEGORIA_DOCUMENTO;
+                            if($partepago=='on'){
+                                $TIPO_ARCHIVO = 'DCC0000000000037';
+                                $DESCRIPCION_ARCHIVO = 'PARTE COMPROBANTE DE PAGO';
+                            }
 
                             $contadorArchivos = Archivo::count();
                             $nombre          =      $ordencompra->COD_DOCUMENTO_CTBLE.'-'.$file->getClientOriginalName();
@@ -2117,9 +2129,9 @@ class GestionOCTesoreriaController extends Controller
                             $dcontrol                       =   new Archivo;
                             $dcontrol->ID_DOCUMENTO         =   $ordencompra->COD_DOCUMENTO_CTBLE;
                             $dcontrol->DOCUMENTO_ITEM       =   $fedocumento->DOCUMENTO_ITEM;
-                            $dcontrol->TIPO_ARCHIVO         =   $item->COD_CATEGORIA_DOCUMENTO;
+                            $dcontrol->TIPO_ARCHIVO         =   $TIPO_ARCHIVO;
                             $dcontrol->NOMBRE_ARCHIVO       =   $nombrefilecdr;
-                            $dcontrol->DESCRIPCION_ARCHIVO  =   $item->NOM_CATEGORIA_DOCUMENTO;
+                            $dcontrol->DESCRIPCION_ARCHIVO  =   $DESCRIPCION_ARCHIVO;
 
 
                             $dcontrol->URL_ARCHIVO      =   $path;
@@ -2139,28 +2151,47 @@ class GestionOCTesoreriaController extends Controller
                                                 ->orderBy('NRO_LINEA','ASC')
                                                 ->get();
 
-                FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
-                            ->update(
-                                [
-                                    'COD_ESTADO'=>'ETM0000000000008',
-                                    'TXT_ESTADO'=>'TERMINADA',
-                                    'fecha_tes'=>$this->fechaactual,
-                                    'usuario_tes'=>Session::get('usuario')->id
-                                ]
-                            );
+
+                IF($TIPO_ARCHIVO == 'DCC0000000000037'){
+
+                    //HISTORIAL DE DOCUMENTO APROBADO
+                    $documento                              =   new FeDocumentoHistorial;
+                    $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                    $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                    $documento->FECHA                       =   $this->fechaactual;
+                    $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                    $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                    $documento->TIPO                        =   'SUBIO PARTE COMPROBANTE DE PAGO';
+                    $documento->MENSAJE                     =   '';
+                    $documento->save();
 
 
-                //HISTORIAL DE DOCUMENTO APROBADO
-                $documento                              =   new FeDocumentoHistorial;
-                $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
-                $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
-                $documento->FECHA                       =   $this->fechaactual;
-                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
-                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
-                $documento->TIPO                        =   'SUBIO COMPROBANTE DE PAGO';
-                $documento->MENSAJE                     =   '';
-                $documento->save();
+                }ELSE{
 
+                    FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
+                                ->update(
+                                    [
+                                        'COD_ESTADO'=>'ETM0000000000008',
+                                        'TXT_ESTADO'=>'TERMINADA',
+                                        'fecha_tes'=>$this->fechaactual,
+                                        'usuario_tes'=>Session::get('usuario')->id
+                                    ]
+                                );
+
+
+                    //HISTORIAL DE DOCUMENTO APROBADO
+                    $documento                              =   new FeDocumentoHistorial;
+                    $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                    $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                    $documento->FECHA                       =   $this->fechaactual;
+                    $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                    $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                    $documento->TIPO                        =   'SUBIO COMPROBANTE DE PAGO';
+                    $documento->MENSAJE                     =   '';
+                    $documento->save();
+
+
+                }
 
                 DB::commit();
                 Session::flash('operacion_id', 'CONTRATO');

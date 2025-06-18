@@ -64,6 +64,78 @@ class GestionLiquidacionGastosController extends Controller
     use ComprobanteTraits;
 
 
+
+    public function actionLiquidacionViajePdf($idopcion, $iddocumento,Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        $idcab                  =   $iddocumento;
+        $iddocumento            =   $this->funciones->decodificarmaestrapre($iddocumento,'LIQG');
+
+        $liquidaciongastos      =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
+        $tdetliquidaciongastos  =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
+        $detdocumentolg         =   LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
+        $documentohistorial     =   LqgDocumentoHistorial::where('ID_DOCUMENTO','=',$iddocumento)->orderby('FECHA','DESC')->get();
+        $tdetliquidaciongastosel=   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','0')->get();
+        $archivospdf            =   Archivo::where('ID_DOCUMENTO','=',$iddocumento)->where('EXTENSION', 'like', '%'.'pdf'.'%')->get();
+        $ocultar                =   "";
+        $productosagru          =   DB::table('LQG_DETDOCUMENTOLIQUIDACIONGASTO')
+                                    ->join('LQG_DETLIQUIDACIONGASTO', function($join) {
+                                        $join->on('LQG_DETDOCUMENTOLIQUIDACIONGASTO.ID_DOCUMENTO', '=', 'LQG_DETLIQUIDACIONGASTO.ID_DOCUMENTO')
+                                             ->on('LQG_DETDOCUMENTOLIQUIDACIONGASTO.ITEM', '=', 'LQG_DETLIQUIDACIONGASTO.ITEM'); // Condición adicional
+                                    })
+                                    ->select('*','LQG_DETDOCUMENTOLIQUIDACIONGASTO.TOTAL AS CAN_TOTAL_DETALLE')
+                                    ->join('ALM.PRODUCTO','ALM.PRODUCTO.COD_PRODUCTO','=','LQG_DETDOCUMENTOLIQUIDACIONGASTO.COD_PRODUCTO')
+                                    ->where('LQG_DETDOCUMENTOLIQUIDACIONGASTO.ID_DOCUMENTO', $iddocumento)
+                                    ->where('LQG_DETDOCUMENTOLIQUIDACIONGASTO.ACTIVO', 1)
+                                    ->orderBy('ALM.PRODUCTO.TXT_DESCRIPCION','asc')
+                                    ->get();
+
+        $trabajador             =   STDEmpresa::where('COD_EMPR','=',$liquidaciongastos->COD_EMPRESA_TRABAJADOR)->first();
+        $imgresponsable         =   'firmas/blanco.jpg';
+        $nombre_responsable     =   '';
+        $rutaImagen             =   public_path('firmas/'.$trabajador->NRO_DOCUMENTO.'.jpg');
+        if (file_exists($rutaImagen)){
+            $imgresponsable         =   'firmas/'.$trabajador->NRO_DOCUMENTO.'.jpg';
+            $nombre_responsable     =   $trabajador->NOM_EMPR;
+        }
+
+        $useario_autoriza       =   User::where('id','=',$liquidaciongastos->COD_USUARIO_AUTORIZA)->first();
+        $trabajadorap           =   STDTrabajador::where('COD_TRAB','=',$useario_autoriza->usuarioosiris_id)->first();
+        $imgaprueba             =   'firmas/blanco.jpg';
+        $nombre_aprueba         =   '';
+        $rutaImagen             =   public_path('firmas/'.$trabajadorap->NRO_DOCUMENTO.'.jpg');
+        if (file_exists($rutaImagen)){
+            $imgaprueba         =   'firmas/'.$trabajadorap->NRO_DOCUMENTO.'.jpg';
+            $nombre_aprueba     =   $trabajadorap->TXT_NOMBRES.' '.$trabajadorap->TXT_APE_PATERNO.' '.$trabajadorap->TXT_APE_MATERNO;
+        }
+
+
+        $pdf = PDF::loadView('pdffa.liquidaciongastos', [ 
+                                                'iddocumento'                   => $iddocumento , 
+                                                'liquidaciongastos'             => $liquidaciongastos,
+                                                'tdetliquidaciongastos'         => $tdetliquidaciongastos,
+                                                'detdocumentolg'                => $detdocumentolg,
+                                                'documentohistorial'            => $documentohistorial , 
+                                                'tdetliquidaciongastosel'       => $tdetliquidaciongastosel,
+                                                'productosagru'                 => $productosagru,
+                                                'imgresponsable'        => $imgresponsable , 
+                                                'nombre_responsable'    => $nombre_responsable,
+                                                'imgaprueba'            => $imgaprueba,
+                                                'nombre_aprueba'        => $nombre_aprueba,
+
+                                              ]);
+
+        return $pdf->stream('download.pdf');
+
+
+    }
+
+
+
     public function actionGuardarEmpresaProveedor($idopcion,Request $request)
     {
 
@@ -1198,8 +1270,8 @@ class GestionLiquidacionGastosController extends Controller
         $nombre_aprueba         =   '';
         $rutaImagen             =   public_path('firmas/'.$trabajadorap->NRO_DOCUMENTO.'.jpg');
         if (file_exists($rutaImagen)){
-            $imgaprueba         =   'firmas/'.$trabajador->NRO_DOCUMENTO.'.jpg';
-            $nombre_aprueba     =   $trabajador->TXT_NOMBRES.' '.$trabajador->TXT_APE_PATERNO.' '.$trabajador->TXT_APE_MATERNO;
+            $imgaprueba         =   'firmas/'.$trabajadorap->NRO_DOCUMENTO.'.jpg';
+            $nombre_aprueba     =   $trabajadorap->TXT_NOMBRES.' '.$trabajadorap->TXT_APE_PATERNO.' '.$trabajadorap->TXT_APE_MATERNO;
         }
 
 

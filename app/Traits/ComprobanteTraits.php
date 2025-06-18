@@ -5448,6 +5448,7 @@ trait ComprobanteTraits
                                     })
                                     //->where('CMP.Orden.COD_ORDEN','=','ISBECL0000001705')
                                     ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005'])
+                                    ->where('CMP.Orden.COD_CATEGORIA_ESTADO_ORDEN','=','EOR0000000000003')
                                     ->where('CMP.Orden.COD_EMPR','=',$empresa_id)
                                     ->where('CMP.Orden.COD_CATEGORIA_MONEDA','=',$moneda_id)
                                     //->where('CMP.Orden.COD_CENTRO','=',$centro_id)

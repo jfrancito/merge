@@ -34,6 +34,13 @@
                   Revisar Liquidacion
                 </a>  
               </li>
+
+              <li>
+                <a href="{{ url('/liquidacion-viaje-pdf/'.$idopcion.'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -8))) }}" Target="_blank">
+                  Liquidacion de viaje PDF
+                </a>  
+              </li>
+
             </ul>
           </div>
         </td>

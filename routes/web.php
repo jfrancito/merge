@@ -118,6 +118,10 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/gestion-de-aprobacion-liquidacion-gastos-administracion/{idopcion}', 'GestionLiquidacionGastosController@actionAprobarLiquidacionGastoAdministracion');
 	Route::any('/aprobar-liquidacion-gasto-administracion/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionAprobarAdministracionLG');
 
+	Route::any('/liquidacion-viaje-pdf/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionLiquidacionViajePdf');
+
+
+
 	Route::any('/aprobar-liquidacion-gasto-contabilidad/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionAprobarContabilidadLG');
 
 
@@ -604,6 +608,7 @@ Route::get('buscarproducto', function (Illuminate\Http\Request  $request) {
 			->where('ALM.PRODUCTO.COD_ESTADO','=',1)
 			->where('ALM.PRODUCTO.IND_DISPONIBLE','=',1)
 			->where('ALM.PRODUCTO.IND_MATERIAL_SERVICIO','=','S')
+			->where('COD_CATEGORIA_CLASE','=','1')
 			->take(100)
 			->select(DB::raw("
 			  ALM.PRODUCTO.NOM_PRODUCTO")
