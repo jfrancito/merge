@@ -3285,7 +3285,6 @@ class GestionOCController extends Controller
                         $documento->TOTAL_VENTA_SOLES       =   $factura->getmtoImpVenta();
 
 
-
                         $documento->PERCEPCION              =   $cant_perception;
                         $documento->MONTO_RETENCION         =   $cant_rentencion;
 
