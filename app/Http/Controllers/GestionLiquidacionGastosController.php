@@ -3292,6 +3292,8 @@ class GestionLiquidacionGastosController extends Controller
                     $subcuenta_id                       =   $request['subcuenta_id'];
                     $centro_txt                         =   $request['centro_txt'];
                     $arendir_sel_id                     =   $request['arendir_sel_id'];
+                    $moneda_sel_id                      =   $request['moneda_sel_id'];
+
 
                     if($arendir_id=='NO'){
                         $arendir_sel_id = '';
@@ -3314,7 +3316,7 @@ class GestionLiquidacionGastosController extends Controller
                     $cuenta                             =   CMPContrato::where('COD_CONTRATO','=',$cuenta_id)->first();
                     $subcuenta                          =   CMPContratoCultivo::where('COD_CONTRATO','=',$subcuenta_id)->first();
                     $centro                             =   ALMCentro::where('NOM_CENTRO','=',$centro_txt)->first();
-
+                    $moneda                             =   CMPCategoria::where('COD_CATEGORIA','=',$moneda_sel_id)->first();
 
                     $cod_contrato = $cuenta->COD_CONTRATO; // Ejemplo de contrato
                     $cod_categoria_moneda = $cuenta->COD_CATEGORIA_MONEDA; // Ejemplo de moneda
@@ -3329,6 +3331,37 @@ class GestionLiquidacionGastosController extends Controller
                     $contrato = $parte1 . '-0' . $parte2 . ' -- ' . $simbolo . ' ' . $txt_categoria_tipo_contrato;
                     $usuario_id             =   $request['autoriza_id'];
                     $usuario                =   User::where('id','=',$usuario_id)->first();
+
+
+                    $trabajador             =   DB::table('STD.TRABAJADOR')
+                                                ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                                                ->first();
+                    $dni                    =   '';
+                    $centro_id              =   '';
+                    if(count($trabajador)>0){
+                        $dni            =       $trabajador->NRO_DOCUMENTO;
+                    }
+                    $trabajadorespla            =   DB::table('WEB.platrabajadores')
+                                                    ->where('situacion_id', 'PRMAECEN000000000002')
+                                                    ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+                                                    ->where('dni', $dni)
+                                                    ->first();
+                    $centrocosto                =   DB::table('CON.CENTRO_COSTO')
+                                                    ->where('COD_ESTADO', 1)
+                                                    ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
+                                                    ->where('TXT_REFERENCIA_PLANILLA', $trabajadorespla->cadarea)
+                                                    ->where('IND_MOVIMIENTO', 1)->first();
+                    $area_id                    =   "";
+                    $area_txt                   =   "";
+
+                    if(count($centrocosto)>0){
+                        $area_id                    =   $centrocosto->COD_CENTRO_COSTO;
+                        $area_txt                   =   $centrocosto->TXT_NOMBRE;
+                    }
+
+
+
+
                     //dd($periodo);
                     $cabecera                           =   new LqgLiquidacionGasto;
                     $cabecera->ID_DOCUMENTO             =   $idcab;
@@ -3348,6 +3381,11 @@ class GestionLiquidacionGastosController extends Controller
                     $cabecera->COD_ESTADO               =   'ETM0000000000001';
                     $cabecera->TXT_ESTADO               =   'GENERADO';
                     $cabecera->ARENDIR_ID               =   $arendir_sel_id;
+
+                    $cabecera->COD_CATEGORIA_MONEDA     =   $moneda->COD_CATEGORIA;
+                    $cabecera->TXT_CATEGORIA_MONEDA     =   $moneda->NOM_CATEGORIA;
+                    $cabecera->COD_AREA                 =   $area_id;
+                    $cabecera->TXT_AREA                 =   $area_txt;
 
                     $cabecera->COD_CENTRO               =   $centro->COD_CENTRO;
                     $cabecera->TXT_CENTRO               =   $centro->NOM_CENTRO;
@@ -3397,6 +3435,7 @@ class GestionLiquidacionGastosController extends Controller
             $empresa            =   DB::table('STD.EMPRESA')
                                     ->where('NRO_DOCUMENTO', $dni)
                                     ->first();
+
             $empresa_id         =   "";
             $combo_empresa      =   array();
             $cuenta_id          =   "";
@@ -3407,12 +3446,15 @@ class GestionLiquidacionGastosController extends Controller
             if(count($empresa)>0){
                 $empresa_id     =   $empresa->COD_EMPR;
                 $combo_empresa  =   array($empresa->COD_EMPR=>$empresa->NOM_EMPR);
-                $cuenta_id      =   "";
+
+                $cuenta_id      =   $this->lg_cuenta_top_1("Seleccione una Cuenta","","TCO0000000000069",$centro_id,$empresa_id);
                 $combo_cuenta   =   $this->lg_combo_cuenta("Seleccione una Cuenta","","TCO0000000000069",$centro_id,$empresa_id);
                 $cuenta         =   $this->lg_cuenta("Seleccione una Cuenta","","TCO0000000000069",$centro_id,$empresa_id);
                 if(count($cuenta)>0){
                     $cod_contrato       =   $cuenta->COD_CONTRATO;
                 }
+
+                $subcuenta_id       =   $this->lg_subcuenta_top1("Seleccione SubCuenta",$cod_contrato);
                 $combo_subcuenta    =   $this->lg_combo_subcuenta("Seleccione SubCuenta",$cod_contrato);
             }
             $fecha_creacion      =   $this->hoy;
@@ -3439,6 +3481,10 @@ class GestionLiquidacionGastosController extends Controller
             $arendir_sel_id      =   '';
             $combo_arendir_sel   =   $this->gn_combo_arendir();
 
+            $moneda_sel_id       =   '';
+            $combo_moneda_sel    =   $this->gn_generacion_combo_categoria('MONEDA',"SELECCIONE SI TIENE A RENDIR",'');
+
+
             //dd($combo_arendir_sel);
             return View::make('liquidaciongasto.agregarliquidaciongastos',
                              [
@@ -3447,6 +3493,9 @@ class GestionLiquidacionGastosController extends Controller
                                 'empresa_id'    => $empresa_id,
                                 'cuenta_id'     => $cuenta_id,
                                 'combo_cuenta'  => $combo_cuenta,
+
+                                'moneda_sel_id'   => $moneda_sel_id,
+                                'combo_moneda_sel'=> $combo_moneda_sel,
 
                                 'autoriza_id'   => $autoriza_id,
                                 'combo_autoriza'=> $combo_autoriza,
