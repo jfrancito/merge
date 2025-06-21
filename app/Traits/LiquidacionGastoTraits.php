@@ -1370,7 +1370,7 @@ trait LiquidacionGastoTraits
 
 
     private function lg_combo_tipodocumento($titulo) {
-        $array      =       STDTipoDocumento::whereIn('COD_TIPO_DOCUMENTO',['TDO0000000000001','TDO0000000000003','TDO0000000000010','TDO0000000000070','TDO0000000000002','TDO0000000000030'])
+        $array      =       STDTipoDocumento::whereIn('COD_TIPO_DOCUMENTO',['TDO0000000000001','TDO0000000000003','TDO0000000000010','TDO0000000000070','TDO0000000000002','TDO0000000000030','TDO0000000000106'])
                             ->pluck('TXT_TIPO_DOCUMENTO','COD_TIPO_DOCUMENTO')
                             ->toArray();
         $combo      =       array('' => $titulo) + $array;
@@ -1404,6 +1404,35 @@ trait LiquidacionGastoTraits
         return  $combo;                    
     }
 
+    private function lg_cuenta_top_1($titulo,$todo,$tipocontrato,$centro_id,$empresa_id) {
+
+        $valor                          = '';
+        $array                          = DB::table('CMP.CONTRATO as TBL')
+                                            ->selectRaw("
+                                                TBL.COD_CONTRATO,
+                                                LEFT(TBL.COD_CONTRATO, 6) + '-0' + CAST(CAST(RIGHT(TBL.COD_CONTRATO, 10) AS INT) AS VARCHAR(10)) + ' -- ' 
+                                                + IIF(TBL.COD_CATEGORIA_MONEDA = 'MON0000000000001', 'S/', '$') + ' ' + TBL.TXT_CATEGORIA_TIPO_CONTRATO AS CONTRATO,
+                                                TBL.TXT_EMPR_CLIENTE,
+                                                TBL.COD_CATEGORIA_TIPO_CONTRATO,
+                                                TBL.TXT_CATEGORIA_TIPO_CONTRATO,
+                                                TBL.*
+                                            ")
+                                            ->where('TBL.COD_ESTADO', 1)
+                                            ->where('TBL.COD_CATEGORIA_TIPO_CONTRATO', $tipocontrato)
+                                            ->where('TBL.COD_EMPR', Session::get('empresas')->COD_EMPR)
+                                            ->where('TBL.COD_CENTRO', $centro_id)
+                                            ->where('TBL.COD_EMPR_CLIENTE', $empresa_id)
+                                            ->whereNotIn('TBL.COD_CATEGORIA_ESTADO_CONTRATO', ['ECO0000000000005', 'ECO0000000000006'])
+                                            ->first();
+
+        if(count($array)>0){
+            $valor                          = $array->COD_CONTRATO;
+        }
+
+        return  $valor;                    
+    }
+
+
     private function lg_combo_cuenta_lg($titulo,$todo,$tipocontrato,$centro_id,$empresa_id) {
 
 
@@ -1430,7 +1459,23 @@ trait LiquidacionGastoTraits
 
 
 
+    private function lg_subcuenta_top1($titulo,$cod_contrato) {
 
+        $valor = '';
+        $array      =       DB::table('CMP.CONTRATO_CULTIVO')
+                            ->selectRaw("
+                                COD_CONTRATO,
+                                TXT_ZONA_COMERCIAL+'-'+TXT_ZONA_CULTIVO as TXT_CULTIVO
+                            ")
+                            ->where('COD_CONTRATO', $cod_contrato)
+                            ->first();
+
+        if(count($array)>0){
+            $valor = $array->COD_CONTRATO;
+        }
+
+        return  $valor;                    
+    }
 
 
 

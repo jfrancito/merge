@@ -53,16 +53,14 @@
 		      <th class='titulo'>ITEM</th>
 		      <th class='titulo'>FECHA GASTO</th>
 		      <th class='titulo'>MOTIVO</th>
-		      <th class='titulo'>LUGAR PARTIDA</th>
-		      <th class='titulo'>LUGAR LLEGADA</th>
-		      <th class='titulo'>TOTAL</th>
+		      <th class='titulo'>DESTINO</th>
+		      <th class='titulo'>TOTAL (S/)</th>
 		    </tr>
 		    @foreach($detplanillamovilidad  as $index=>$item)
 			    <tr>			    	
 			      <td class='titulo'>{{$index+1}}</td>
-			      <td class='titulo'>{{date_format(date_create($item->FECHA_GASTO), 'd/m/Y h:i:s')}}</td>
+			      <td class='titulo'>{{date_format(date_create($item->FECHA_GASTO), 'd/m/Y')}}</td>
 			      <td class='titulo'>{{$item->TXT_MOTIVO}}</td>
-			      <td class='titulo'>{{$item->TXT_LUGARPARTIDA}}</td>
 			      <td class='titulo'>{{$item->TXT_LUGARLLEGADA}}</td>
 			      <td class='izquierda'>{{number_format(round($item->TOTAL,2),2,'.',',')}}</td>
 			    </tr>
@@ -71,9 +69,8 @@
 			      <td class='titulo'></td>
 			      <td class='titulo'></td>
 			      <td class='titulo'></td>
-			      <td class='titulo'></td>
-			      <td class='titulo'></td>
-			      <td class='izquierda'>{{number_format(round($detplanillamovilidad->sum('TOTAL'),2),2,'.',',')}}</td>
+			      <td class='titulo'><b>TOTAL S/</b></td>
+			      <td class='izquierda'><b>{{number_format(round($detplanillamovilidad->sum('TOTAL'),2),2,'.',',')}}</b></td>
 			    </tr>
 		  </table>
 
@@ -94,6 +91,22 @@
 		        </td>
 		    </tr>
 		</table>
+
+
+        <article>
+			<div class="leyenda">
+			    <div class="">
+	   				<p>
+	   					Base legal Inciso a 1) del articulo 37 del TUO de la ley del impuesto de la Renta e Inciso v) del articulo 21º del Reglamneto
+	   					de la Ley del Impuesto a la Renta.<br>
+	   					(*) El total diario no debe exceder el 4% del sueldo minimo.<br>
+	   					(**) La falta de consignación de alguno de estos datos inhabilita la planilla para la sustentación del gasto que corresponde a tal 
+	   					desplazamiento.
+	   				</p>  		    		   					   				
+			    </div>
+			</div>
+        </article>
+
 
 
 

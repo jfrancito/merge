@@ -309,7 +309,7 @@ class GestionPlanillaMovilidadController extends Controller
         $trabajador             =   STDTrabajador::where('COD_TRAB','=',$planillamovilidad->COD_TRABAJADOR)->first();
 
         $imgresponsable         =   'firmas/blanco.jpg';
-        $nombre_responsable     =   '';
+        $nombre_responsable     =   $trabajador->TXT_NOMBRES.' '.$trabajador->TXT_APE_PATERNO.' '.$trabajador->TXT_APE_MATERNO;
         $rutaImagen             =   public_path('firmas/'.$trabajador->NRO_DOCUMENTO.'.jpg');
         if (file_exists($rutaImagen)){
             $imgresponsable         =   'firmas/'.$trabajador->NRO_DOCUMENTO.'.jpg';
@@ -317,10 +317,7 @@ class GestionPlanillaMovilidadController extends Controller
         }
         $imgaprueba             =   'firmas/blanco.jpg';
         $nombre_aprueba         =   '';
-
-        $existeImagen = file_exists($rutaImagen);
-
-
+        $existeImagen           =   file_exists($rutaImagen);
         $empresa                =   STDEmpresa::where('COD_EMPR','=',$planillamovilidad->COD_EMPRESA)->first();
         $ruc                    =   $empresa->NRO_DOCUMENTO;
 
