@@ -1198,10 +1198,20 @@ class GestionOCAdministracionController extends Controller
     {
 
         $data_doc               =   $request['data_doc'];
+        $orden                  =   CMPOrden::where('COD_ORDEN','=',$data_doc)->first();
+        $conexionbd             = 'sqlsrv';
+        if($orden->COD_CENTRO == 'CEN0000000000004'){ //rioja
+            $conexionbd         = 'sqlsrv_r';
+        }else{
+            if($orden->COD_CENTRO == 'CEN0000000000006'){ //bellavista
+                $conexionbd         = 'sqlsrv_b';
+            }
+        }
 
-        $detalledocumento       =   CMPDetalleProducto::where('COD_TABLA','=',$data_doc)
-                                    ->where('COD_ESTADO','=',1)
-                                    ->get();
+        $detalledocumento = CMPDetalleProducto::on($conexionbd)
+            ->where('COD_TABLA', '=', $data_doc)
+            ->where('COD_ESTADO', '=', 1)
+            ->get();
 
         $funcion        =   $this;
         return View::make('comprobante/modal/ajax/mdetalledocumento',
@@ -2255,6 +2265,35 @@ class GestionOCAdministracionController extends Controller
                                     [
                                         'IND_NOTIFICACION_CLIENTE'=>1
                                     ]);
+
+                if($documento_top->COD_CENTRO == 'CEN0000000000004' && $fedocumento->usuario_pa =='1CIX00000187'){
+                    $iddocumento_sel = $fedocumento->ID_DOCUMENTO;
+                    DB::connection($conexionbd)->statement("
+                        UPDATE FE_DOCUMENTO 
+                        SET COD_CONTACTO = 'ITTR000000000212'
+                        WHERE usuario_pa = '1CIX00000187' 
+                          AND RUC_PROVEEDOR IN ('20600004027','20602740278') 
+                          AND ID_DOCUMENTO = ?
+                          AND COD_ESTADO = 'ETM0000000000005' 
+                          AND ID_DOCUMENTO NOT IN (
+                              SELECT FE_DOCUMENTO.ID_DOCUMENTO 
+                              FROM FE_DOCUMENTO 
+                              INNER JOIN FE_REF_ASOC ON FE_DOCUMENTO.ID_DOCUMENTO = FE_REF_ASOC.LOTE
+                              INNER JOIN CMP.REFERENCIA_ASOC 
+                                  ON FE_REF_ASOC.ID_DOCUMENTO = CMP.REFERENCIA_ASOC.COD_TABLA 
+                                 AND CMP.REFERENCIA_ASOC.COD_ESTADO = 1
+                              INNER JOIN CMP.DOCUMENTO_CTBLE 
+                                  ON CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE = CMP.REFERENCIA_ASOC.COD_TABLA_ASOC 
+                                 AND CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_DOC IN ('TDO0000000000001','TDO0000000000002')
+                              WHERE usuario_pa = '1CIX00000187' 
+                                AND RUC_PROVEEDOR IN ('20600004027','20602740278')
+                                AND FE_DOCUMENTO.COD_ESTADO = 'ETM0000000000005'
+                                AND FE_REF_ASOC.LOTE = ?
+                              GROUP BY FE_DOCUMENTO.ID_DOCUMENTO, CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE
+                          )
+                    ", [$iddocumento_sel, $iddocumento_sel]);
+                }
+
                 //enviar tablas de fe_documento y fe_detalledocuemto
                 if($documento_top->COD_CENTRO == 'CEN0000000000004' || $documento_top->COD_CENTRO == 'CEN0000000000006'){ //rioja
                     //dd($conexionbd);
@@ -2422,23 +2461,7 @@ class GestionOCAdministracionController extends Controller
                 $documento->TIPO                        =   'APROBADO POR ADMINISTRACION';
                 $documento->MENSAJE                     =   '';
                 $documento->save();
-
-                //whatsaap para administracion
-                // $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->first();
-                // $empresa_anti       =   STDEmpresa::where('NRO_DOCUMENTO','=',$fedocumento->RUC_PROVEEDOR)->first();
-
-                // //$ordencompra        =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();            
-                // $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO
-                //                         .'%0D%0A'.'Proveedor : '.$empresa_anti->NOM_EMPR
-                //                         .'%0D%0A'.'Estado : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
-                // $trabajador         =   STDTrabajador::where('COD_TRAB','=',$fedocumento_w->COD_CONTACTO)->first();
-                // if(1==0){
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                // }else{
-                //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');          
-                // }    
-
+ 
                 DB::commit();
 
                 Session::flash('operacion_id', $request['operacion_id']);

@@ -104,6 +104,11 @@ $(document).ready(function(){
 
 
 
+    $(".agestioncomprobante").on('click','.btn-guardar-configuracion_re', function() {
+       abrircargando();
+    });
+
+
     $(".agestioncomprobante").on('click','.btn_rb', function() {
        abrircargando();
     });
@@ -283,6 +288,47 @@ $(document).ready(function(){
 
 
     });
+
+
+    $(".agestioncomprobante").on('click','.asignarmasivo', function() {
+
+        var _token                  =   $('#token').val();
+        var idopcion                =   $('#idopcion').val();
+
+        var array_item              =   datamasivo();
+        if(array_item.length<=0){alerterrorajax('No existe ningun registro'); return false;}
+        datastring = JSON.stringify(array_item);
+
+        data                        =   {
+                                            _token                  : _token,
+                                            datastring              : datastring,
+                                            idopcion                : idopcion
+                                        };
+
+        ajax_modal(data,"/ajax-modal-reparable-masivo",
+                  "modal-detalle-requerimiento-masivo","modal-detalle-requerimiento-masivo-container");
+
+    });
+
+    function datamasivo(){
+        var data = [];
+
+        $(".listatabla tr").each(function(){
+
+            check                       = $(this).find('input');
+            data_requerimiento_id       = $(this).attr('data_requerimiento_id');
+
+            if($(check).is(':checked')){
+                data.push({
+                    id: data_requerimiento_id
+                });
+
+            } 
+
+        });
+
+        return data;
+    }
 
 
     function ajax_eliminar_lote_estiba(lote){

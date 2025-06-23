@@ -401,14 +401,6 @@ class GestionOCContabilidadController extends Controller
                                             .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
                                             .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
                                             .'RECOMENDACION : '.$descripcion.'%0D%0A';
-                    // //dd($trabajador);                        
-                    // if(1==0){
-                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                    // }else{
-                    //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                    // }  
-
                 }
 
                 $filespdf          =   $request['otros'];
@@ -488,18 +480,6 @@ class GestionOCContabilidadController extends Controller
                                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
                                         .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
 
-                // if(1==0){
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                // }else{
-
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                //     //CONTABILIDAD
-                //     $this->insertar_whatsaap('51971575452','GISELA',$mensaje,'');
-                //     $this->insertar_whatsaap('51920721827','JESSICA DEL PILAR',$mensaje,'');
-                //     //$this->insertar_whatsaap('51948634244','ELSA ANA BELEN',$mensaje,'');
-
-                // }   
-
                 DB::commit();
                 return Redirect::to('/gestion-de-contabilidad-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' APROBADO CON EXITO');
             }catch(\Exception $ex){
@@ -517,6 +497,132 @@ class GestionOCContabilidadController extends Controller
             //$lecturacdr             =   $this->lectu($idoc,$this->pathFiles,$prefijocarperta,$ordencompra->NRO_DOCUMENTO_CLIENTE);
             $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc_actual($idoc);
             $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+
+            if($fedocumento->nestadoCp === null){
+
+                $rh                     =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
+                                            ->where('COD_ESTADO','=',1)
+                                            ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000013'])
+                                            ->get();
+                $fechaemision            =      date_format(date_create($fedocumento->FEC_VENTA), 'd/m/Y');
+
+                $token = '';
+                if($prefijocarperta =='II'){
+                    $token           =      $this->generartoken_ii();
+                }else{
+                    $token           =      $this->generartoken_is();
+                }
+
+                if(count($rh)<=0){
+                    //FACTURA
+                    $rvalidar = $this->validar_xml( $token,
+                                                    $fedocumento->ID_CLIENTE,
+                                                    $fedocumento->RUC_PROVEEDOR,
+                                                    $fedocumento->ID_TIPO_DOC,
+                                                    $fedocumento->SERIE,
+                                                    $fedocumento->NUMERO,
+                                                    $fechaemision,
+                                                    $fedocumento->TOTAL_VENTA_ORIG);
+                }else{
+                    //RECIBO POR HONORARIO
+                    $rvalidar = $this->validar_xml( $token,
+                                                    $fedocumento->ID_CLIENTE,
+                                                    $fedocumento->RUC_PROVEEDOR,
+                                                    $fedocumento->ID_TIPO_DOC,
+                                                    $fedocumento->SERIE,
+                                                    $fedocumento->NUMERO,
+                                                    $fechaemision,
+                                                    $fedocumento->TOTAL_VENTA_ORIG+$fedocumento->MONTO_RETENCION);
+                }
+
+                $arvalidar = json_decode($rvalidar, true);
+                if(isset($arvalidar['success'])){
+
+                    if($arvalidar['success']){
+
+                        $datares              = $arvalidar['data'];
+                        if (!isset($datares['estadoCp'])){
+                            return Redirect::back()->with('errorurl', 'Hay fallas en sunat para consultar el XML');
+                        }
+                        
+                        $estadoCp             = $datares['estadoCp'];
+
+
+                        $tablaestacp          = Estado::where('tipo','=','estadoCp')->where('codigo','=',$estadoCp)->first();
+                        //dd($tablaestacp);
+                        $estadoRuc            = '';
+                        $txtestadoRuc         = '';
+                        $estadoDomiRuc        = '';
+                        $txtestadoDomiRuc     = '';
+
+                        if(isset($datares['estadoRuc'])){
+                            $tablaestaruc          = Estado::where('tipo','=','estadoRuc')->where('codigo','=',$datares['estadoRuc'])->first();
+                            $estadoRuc             = $tablaestaruc->codigo;
+                            $txtestadoRuc          = $tablaestaruc->nombre;
+                        }
+                        if(isset($datares['condDomiRuc'])){
+                            $tablaestaDomiRuc       = Estado::where('tipo','=','condDomiRuc')->where('codigo','=',$datares['condDomiRuc'])->first();
+                            $estadoDomiRuc          = $tablaestaDomiRuc->codigo;
+                            $txtestadoDomiRuc       = $tablaestaDomiRuc->nombre;
+                        }
+
+
+                        FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)
+                                    ->update(
+                                            [
+                                                'success'=>$arvalidar['success'],
+                                                'message'=>$arvalidar['message'],
+                                                'estadoCp'=>$tablaestacp->codigo,
+                                                'nestadoCp'=>$tablaestacp->nombre,
+                                                'estadoRuc'=>$estadoRuc,
+                                                'nestadoRuc'=>$txtestadoRuc,
+                                                'condDomiRuc'=>$estadoDomiRuc,
+                                                'ncondDomiRuc'=>$txtestadoDomiRuc,
+                                            ]);
+
+                        if($tablaestacp->codigo =='0' && $fedocumento->ID_TIPO_DOC == 'R1'){
+
+                            FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)
+                                        ->update(
+                                                [
+                                                    'success'=>$arvalidar['success'],
+                                                    'message'=>$arvalidar['message'],
+                                                    'estadoCp'=>'1',
+                                                    'nestadoCp'=>'ACEPTADO',
+                                                    'estadoRuc'=>'00',
+                                                    'nestadoRuc'=>'ACTIVO',
+                                                    'condDomiRuc'=>'00',
+                                                    'ncondDomiRuc'=>'HABIDO',
+                                                ]);
+
+                        }
+
+
+
+                    }else{
+                        FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)
+                                    ->update(
+                                            [
+                                                'success'=>$arvalidar['success'],
+                                                'message'=>$arvalidar['message']
+                                            ]);
+                    }
+                }
+
+
+
+
+            }
+
+
+
+
+
+
+
+
+
+
 
             $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
             $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
@@ -1100,6 +1206,82 @@ class GestionOCContabilidadController extends Controller
             //lectura del cdr
             $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);
             $lecturacdr             =   $this->lectura_cdr_archivo($idoc,$this->pathFiles,$prefijocarperta,$ordencompra->NRO_DOCUMENTO_CLIENTE);
+
+            if($fedocumento->nestadoCp === null){
+
+                $fechaemision           =      date_format(date_create($fedocumento->FEC_VENTA), 'd/m/Y');
+                $token = '';
+                if($prefijocarperta =='II'){
+                    $token           =      $this->generartoken_ii();
+                }else{
+                    $token           =      $this->generartoken_is();
+                }
+                $rvalidar = $this->validar_xml( $token,
+                                                $fedocumento->ID_CLIENTE,
+                                                $fedocumento->RUC_PROVEEDOR,
+                                                $fedocumento->ID_TIPO_DOC,
+                                                $fedocumento->SERIE,
+                                                $fedocumento->NUMERO,
+                                                $fechaemision,
+                                                $fedocumento->TOTAL_VENTA_ORIG);
+                $arvalidar = json_decode($rvalidar, true);
+                if(isset($arvalidar['success'])){
+
+                    if($arvalidar['success']){
+
+
+
+                        $datares              = $arvalidar['data'];
+
+                        if (!isset($datares['estadoCp'])){
+                            return Redirect::back()->with('errorurl', 'Hay fallas en sunat para consultar el XML');
+                        }
+
+                        $estadoCp             = $datares['estadoCp'];
+                        $tablaestacp          = Estado::where('tipo','=','estadoCp')->where('codigo','=',$estadoCp)->first();
+
+                        $estadoRuc            = '';
+                        $txtestadoRuc         = '';
+                        $estadoDomiRuc        = '';
+                        $txtestadoDomiRuc     = '';
+
+                        if(isset($datares['estadoRuc'])){
+                            $tablaestaruc          = Estado::where('tipo','=','estadoRuc')->where('codigo','=',$datares['estadoRuc'])->first();
+                            $estadoRuc             = $tablaestaruc->codigo;
+                            $txtestadoRuc          = $tablaestaruc->nombre;
+                        }
+                        if(isset($datares['condDomiRuc'])){
+                            $tablaestaDomiRuc       = Estado::where('tipo','=','condDomiRuc')->where('codigo','=',$datares['condDomiRuc'])->first();
+                            $estadoDomiRuc          = $tablaestaDomiRuc->codigo;
+                            $txtestadoDomiRuc       = $tablaestaDomiRuc->nombre;
+                        }
+
+                        FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)
+                                    ->update(
+                                            [
+                                                'success'=>$arvalidar['success'],
+                                                'message'=>$arvalidar['message'],
+                                                'estadoCp'=>$tablaestacp->codigo,
+                                                'nestadoCp'=>$tablaestacp->nombre,
+                                                'estadoRuc'=>$estadoRuc,
+                                                'nestadoRuc'=>$txtestadoRuc,
+                                                'condDomiRuc'=>$estadoDomiRuc,
+                                                'ncondDomiRuc'=>$txtestadoDomiRuc,
+                                            ]);
+                    }else{
+                        FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)
+                                    ->update(
+                                            [
+                                                'success'=>$arvalidar['success'],
+                                                'message'=>$arvalidar['message']
+                                            ]);
+                    }
+                }
+
+            }
+
+
+
 
             $detalleordencompra     =   $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
             $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
@@ -1880,6 +2062,7 @@ class GestionOCContabilidadController extends Controller
                 $documento->TIPO                        =   'DOCUMENTO '.$reparable;
                 $documento->MENSAJE                     =   $descripcion;
                 $documento->save();
+
                 FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
                                 [
@@ -1888,22 +2071,6 @@ class GestionOCContabilidadController extends Controller
                                     'TXT_REPARABLE'=>'REPARABLE'
                                 ]
                             );
-                //LE LLEGA AL USUARIO DE CONTACTO
-                // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
-                // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                // $mensaje            =   'COMPROBANTE REPARABLE: '.$fedocumento->ID_DOCUMENTO
-                //                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-                //                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
-                //                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
-                //                         .'MENSAJE : '.$descripcion.'%0D%0A';
-
-                // //dd($trabajador);                        
-                // if(1==0){
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                // }else{
-                //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                // }  
 
                 DB::commit();
                 return Redirect::to('aprobar-comprobante-contabilidad/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' REPARABLE CON EXITO');

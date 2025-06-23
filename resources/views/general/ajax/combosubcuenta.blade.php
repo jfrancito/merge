@@ -1,5 +1,5 @@
 <div class="form-group">
-  <label class="col-sm-12 control-label labelleft negrita" style="text-align: left;">SUB CUENTA :</label>
+  <label class="col-sm-12 control-label labelleft negrita" style="text-align: left;">SUB CUENTA :<span class="obligatorio">(*)</span></label>
   <div class="col-sm-12 abajocaja" >
     {!! Form::select( 'subcuenta_id', $combo_subcuenta, array($subcuenta_id),
                       [
