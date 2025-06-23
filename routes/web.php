@@ -534,6 +534,68 @@ Route::group(['middleware' => ['authaw']], function () {
     Route::any('/ajax-reporte-inventario', 'ReporteInventarioController@actionAjaxListarReporteInventario');
     Route::any('/descargar-archivo-inventario-consolidado', 'ReporteInventarioController@actionAjaxListarReporteInventarioExcel');
 
+    //VALE A RENDIR 
+    Route::get('/gestionar-vale-rendir/{idopcion}', 'ValeRendirController@actionValeRendir');
+    Route::post('/registrar_vale_rendir', 'ValeRendirController@insertValeRendirAction');
+	Route::post('/data_vale_rendir', 'ValeRendirController@traerdataValeRendirAction');
+	Route::post('/ver_detalle_importe_vale', 'ValeRendirController@actionDetalleImporteVale'); 
+
+
+	Route::get('/gestion-autoriza-rendir/{idopcion}', 'ValeRendirAutorizaController@actionValeRendirAutoriza');
+	Route::post('/autorizar_vale_rendir', 'ValeRendirAutorizaController@actionAutorizarValeRendir');
+	Route::post('/rechazar_vale_rendir', 'ValeRendirAutorizaController@actionRechazarValeRendir');
+	Route::post('/ver_detalle_importe_autoriza', 'ValeRendirAutorizaController@actionDetalleImporte'); 
+
+	Route::get('/gestion-aprueba-rendir/{idopcion}', 'ValeRendirApruebaController@actionValeRendirAprueba');
+	Route::post('/aprobar_vale_rendir', 'ValeRendirApruebaController@actionApruebaValeRendir');
+	Route::post('/rechazar_vale_rendir_aprueba', 'ValeRendirApruebaController@actionRechazarValeRendir');
+	Route::post('/aprobarRegistro_vale_rendir', 'ValeRendirApruebaController@actionApruebaRegistroValeRendir');
+	Route::post('/verRegistro_vale_rendir', 'ValeRendirApruebaController@actionVerRegistroValeRendir');
+	Route::post('/obtener_correlativo', 'ValeRendirApruebaController@actionObtenerCorrelativoValeRendir');
+	Route::post('/insertar-osiris', 'ValeRendirApruebaController@actionInsertValeRendirOsiris');
+	Route::post('/ver_detalle_importe', 'ValeRendirApruebaController@actionVerDetalleImporte');  
+
+	//DETALLE A RENDIR
+	Route::post('/data_vale_rendir_detalle', 'ValeRendirController@traerdataValeRendirActionDetalle');
+	Route::post('/eliminar_vale_rendir', 'ValeRendirController@actionEliminarValeRendir');
+	Route::post('/eliminar_vale_rendir_detalle', 'ValeRendirController@actionEliminarValeRendirDetalle'); 
+
+
+
+	//REGISTRO-IMPORTE-GASTOS
+	Route::get('/gestionar-importe-gastos/{idopcion}', 'RegistroImporteGastosController@actionRegistroImporteGastos');
+	Route::post('/registrar_importe_gastos', 'RegistroImporteGastosController@insertImporteGastosAction');
+	Route::post('/data_importe_gastos', 'RegistroImporteGastosController@traerdataImporteGastosAction');
+	Route::post('/eliminar_importe_gastos', 'RegistroImporteGastosController@actionEliminarRegistroImporteGastos');
+
+	Route::post('/obtener_provincia_por_departamento', 'RegistroImporteGastosController@listarProvinciasPorDepartamento');
+	Route::post('/obtener_distrito_por_provincia', 'RegistroImporteGastosController@listarDistritosPorProvincias');
+
+	Route::post('/validar_destino_distrito', 'RegistroImporteGastosController@validarDestinoPorDistrito');
+
+	//PATANLLA 1
+
+	Route::get('/gestionar-personal-autoriza/{idopcion}', 'RegistroPersonalAutorizaController@actionRegistroPersonalAutoriza');
+	Route::post('/filtro_personal_autoriza', 'RegistroPersonalAutorizaController@actionfiltrarPersonalAutoriza');
+	Route::post('/guardar_personal_autoriza', 'RegistroPersonalAutorizaController@guardarPersonalAutoriza');
+
+
+
+  //PATANLLA  2
+	Route::get('/gestion-de-personal-aprueba-vale/{idopcion}', 'RegistroPersonalApruebaController@actionRegistroPersonalAprueba');
+    Route::post('/registrar_personal_aprueba', 'RegistroPersonalApruebaController@insertPersonalAprueba');
+    Route::post('/obtener_area_cargo', 'RegistroPersonalApruebaController@obtenerAreaYCargo');
+
+    Route::post('/data_personal_aprueba', 'RegistroPersonalApruebaController@traerdataPersonalApruebaAction');
+	Route::post('/eliminar_personal_aprueba', 'RegistroPersonalApruebaController@actionEliminarRegistroPersonalAprueba');
+
+  //CORREO VALE RENDIR
+
+	Route::get('/enviar_correo_autoriza', 'EnviarCorreoValeRendirAutorizaController@actionEnviarCorreoVRAutoriza');
+
+	
+
+
 
 });
 
