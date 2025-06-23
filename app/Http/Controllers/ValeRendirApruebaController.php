@@ -10,11 +10,14 @@ use App\Modelos\WEBTipoMotivoValeRendir;
 use App\Modelos\WEBValeRendir;
 use App\Modelos\WEBValeRendirDetalle;
 use App\Modelos\STDTrabajador;
+use App\Modelos\STDEmpresa;
+
 use App\Modelos\CMPCategoria;
 use Illuminate\Support\Facades\Log;
 
 use Session;
-use App\WEBRegla, App\STDEmpresa, APP\User;
+use App\WEBRegla;
+use APP\User;
 use App\Modelos\CMPContrato;
 use View;
 use Validator;
@@ -234,6 +237,7 @@ class ValeRendirApruebaController extends Controller
         $txtNombreCliente   =   WEBValeRendir::where('id', $id_buscar)->first();
         $nombreCuentaCliente = $txtNombreCliente->TXT_NOM_SOLICITA;
         $glosaCliente = $txtNombreCliente->TXT_GLOSA_AUTORIZADO;
+        $codemprcliente = $txtNombreCliente->COD_EMPR_CLIENTE;
   
         $notacredito            = new NotaCredito();
 
@@ -243,7 +247,8 @@ class ValeRendirApruebaController extends Controller
 
         $contrato_diferente = CMPContrato::where('COD_EMPR', '=', $cod_empr)
             ->where('COD_CATEGORIA_TIPO_CONTRATO', '=', 'TCO0000000000069')
-            ->where('TXT_EMPR_CLIENTE', 'LIKE', '%' . $nombreCuentaCliente . '%')
+          //  ->where('TXT_EMPR_CLIENTE', 'LIKE', '%' . $nombreCuentaCliente . '%')
+            ->where('COD_EMPR_CLIENTE', '=', $codemprcliente)
             ->select(DB::raw("COD_CONTRATO, CONCAT(LEFT(COD_CONTRATO, 6), '-', RIGHT(CONCAT('00000', RIGHT(COD_CONTRATO, 5)), 5), ' - S/', ' ', REPLACE(TXT_CATEGORIA_CANAL_VENTA, 'POR', 'X')) AS CUENTA"))
             ->pluck('CUENTA', 'COD_CONTRATO')
             ->toArray();
@@ -277,7 +282,8 @@ class ValeRendirApruebaController extends Controller
             ->join('CMP.CONTRATO_CULTIVO AS CUL', 'CON.COD_CONTRATO', '=', 'CUL.COD_CONTRATO')
             ->where('CON.COD_EMPR', '=', $cod_empr)
             ->where('CON.COD_CATEGORIA_TIPO_CONTRATO', '=', 'TCO0000000000069')
-            ->where('CON.TXT_EMPR_CLIENTE', '=', $nombreCuentaCliente)
+        //    ->where('CON.TXT_EMPR_CLIENTE', '=', $nombreCuentaCliente)
+               ->where('COD_EMPR_CLIENTE', '=', $codemprcliente)
             ->select(DB::raw("CON.COD_CONTRATO, CONCAT(CUL.TXT_ZONA_COMERCIAL, '-', CUL.TXT_ZONA_CULTIVO) AS SUBCUENTA"))
             ->pluck('SUBCUENTA', 'COD_CONTRATO')
             ->toArray();
@@ -286,12 +292,22 @@ class ValeRendirApruebaController extends Controller
 
 
        
-        $cuentaBancaria = DB::table('TES.CUENTA_BANCARIA AS TCB')
-           ->join('STD.EMPRESA AS EMPR', 'TCB.COD_EMPR_TITULAR', '=', 'EMPR.COD_EMPR')
-            ->where('EMPR.NOM_EMPR', 'LIKE', "%{$nombreCuentaCliente}%") 
-            ->first(); 
-          
-      
+        // $cuentaBancaria = DB::table('TES.CUENTA_BANCARIA AS TCB')
+        //    ->join('STD.EMPRESA AS EMPR', 'TCB.COD_EMPR_TITULAR', '=', 'EMPR.COD_EMPR')
+        //     ->where('EMPR.NOM_EMPR', 'LIKE', "%{$nombreCuentaCliente}%") 
+        //     ->first(); 
+        //     dd($cuentaBancaria);
+
+        $empresatrabjador =   STDEmpresa::where('COD_EMPR','=',$codemprcliente)->first();
+        $nrodocumentotrab = $empresatrabjador->NRO_DOCUMENTO;
+
+        // $values                 =   ['42454192','IACHEM0000007086'];
+        $values                 =   [$nrodocumentotrab,$cod_empr];
+        $datoscuentasueldo      =   DB::select('exec ListaTrabajadorCuentaSueldo ?,?',$values);      
+
+        // log($datoscuentasueldo[0]->trabajador_id);
+
+
         return view('valerendir.ajax.modalosirisvalerendiraprueba', [
             'txtNombreCliente' => $txtNombreCliente->TXT_NOM_SOLICITA,
          // 'contrato_diferente' => $combo_cuenta,
@@ -303,8 +319,10 @@ class ValeRendirApruebaController extends Controller
             'estado' => $txt_categoria_estado_vale,
             'nro_documento_formateado' => $nro_documento_formateado,
             'glosaCliente' => $glosaCliente,
-            'nombreBanco' => $cuentaBancaria->TXT_EMPR_BANCO,
-            'numeroBanco' => $cuentaBancaria->TXT_NRO_CUENTA_BANCARIA,
+            // 'nombreBanco' => $cuentaBancaria->TXT_EMPR_BANCO,
+            // 'numeroBanco' => $cuentaBancaria->TXT_NRO_CUENTA_BANCARIA,
+            'nombreBanco' => $datoscuentasueldo[0]->numcuenta,
+            'numeroBanco' => $datoscuentasueldo[0]->entidad,
             'ajax'=>true,
         ]);                     
     }
