@@ -20,7 +20,7 @@
 					              <label class="col-sm-3 control-label">RUC</label>
 					              <div class="col-sm-8">
 					                <input  type="text"
-					                        id="ruc_sunat" name='ruc_sunat' value="10098767652" placeholder="RUC"
+					                        id="ruc_sunat" name='ruc_sunat' value="" placeholder="RUC"
 					                        required = ""
 					                        autocomplete="off" class="form-control input-sm" data-aw="4"/>
 
@@ -48,7 +48,7 @@
 				              <label class="col-sm-3 control-label">SERIE</label>
 				              <div class="col-sm-8">
 				                <input  type="text"
-				                        id="serie_sunat" name='serie_sunat' value="E001" placeholder="SERIE"
+				                        id="serie_sunat" name='serie_sunat' value="" placeholder="SERIE"
 				                        required = ""
 				                        autocomplete="off" class="form-control input-sm" data-aw="4"/>
 				              </div>
@@ -60,7 +60,7 @@
 				              <div class="col-sm-8">
 
 				                <input  type="text"
-				                        id="correlativo_sunat" name='correlativo_sunat' value="1996" placeholder="NRO. DOCUMENTO"
+				                        id="correlativo_sunat" name='correlativo_sunat' value="" placeholder="NRO. DOCUMENTO"
 				                        required = ""
 				                        autocomplete="off" class="form-control input-sm" data-aw="4"/>
 

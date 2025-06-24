@@ -500,11 +500,12 @@ class GestionOCContabilidadController extends Controller
 
             if($fedocumento->nestadoCp === null){
 
+                //dd("hola");
                 $rh                     =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)
                                             ->where('COD_ESTADO','=',1)
                                             ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000013'])
                                             ->get();
-                $fechaemision            =      date_format(date_create($fedocumento->FEC_VENTA), 'd/m/Y');
+                $fechaemision           =   date_format(date_create($fedocumento->FEC_VENTA), 'd/m/Y');
 
                 $token = '';
                 if($prefijocarperta =='II'){
@@ -513,6 +514,12 @@ class GestionOCContabilidadController extends Controller
                     $token           =      $this->generartoken_is();
                 }
 
+
+                //$numero              =      $fedocumento->NUMERO;
+                $numero              =      ltrim($fedocumento->NUMERO, '0');
+
+                //dd($numero);
+
                 if(count($rh)<=0){
                     //FACTURA
                     $rvalidar = $this->validar_xml( $token,
@@ -520,7 +527,7 @@ class GestionOCContabilidadController extends Controller
                                                     $fedocumento->RUC_PROVEEDOR,
                                                     $fedocumento->ID_TIPO_DOC,
                                                     $fedocumento->SERIE,
-                                                    $fedocumento->NUMERO,
+                                                    $numero,
                                                     $fechaemision,
                                                     $fedocumento->TOTAL_VENTA_ORIG);
                 }else{
@@ -530,7 +537,7 @@ class GestionOCContabilidadController extends Controller
                                                     $fedocumento->RUC_PROVEEDOR,
                                                     $fedocumento->ID_TIPO_DOC,
                                                     $fedocumento->SERIE,
-                                                    $fedocumento->NUMERO,
+                                                    $numero,
                                                     $fechaemision,
                                                     $fedocumento->TOTAL_VENTA_ORIG+$fedocumento->MONTO_RETENCION);
                 }

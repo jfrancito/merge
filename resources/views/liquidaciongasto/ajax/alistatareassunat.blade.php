@@ -22,14 +22,47 @@
             <span><b>TD : </b>{{$item->TIPODOCUMENTO_NOMBRE}}</span>
             <span><b>SERIE : </b>{{$item->SERIE}}</span>
             <span><b>NUMERO : </b>{{$item->NUMERO}}</span>
+            <span><b>FECHA BUSQUEDAD : </b>{{date_format(date_create($item->FECHA_MOD), 'd-m-Y h:i:s')}}</span>
           </td>
           <td class="cell-detail">
-            <span><b>PDF : </b></span>
-            <span><b>XML : </b></span>
-            <span><b>CDR : </b></span>
-            <span><b>TOTAL : </b></span>
+            <span><b>PDF : 
+              @if($item->IND_PDF==1)
+                <span class="mdi mdi-check-circle" style="display: inline-block;color: #34a853;"></span>
+              @else
+                <span class="mdi mdi-close-circle" style="display: inline-block;color: #cc0000;"></span>
+              @endif
+              </b>
+            </span>
+            <span><b>XML : 
+              @if($item->IND_XML==1)
+                <span class="mdi mdi-check-circle" style="display: inline-block;color: #34a853;"></span>
+              @else
+                <span class="mdi mdi-close-circle" style="display: inline-block;color: #cc0000;"></span>
+              @endif
+
+              </b></span>
+            <span><b>CDR : 
+              @if($item->IND_CDR==1)
+                <span class="mdi mdi-check-circle" style="display: inline-block;color: #34a853;"></span>
+              @else
+                <span class="mdi mdi-close-circle" style="display: inline-block;color: #cc0000;"></span>
+              @endif
+              </b></span>
+            <span><b>COMPLETADO : 
+              @if($item->IND_TOTAL==1)
+                <span class="mdi mdi-check-circle" style="display: inline-block;color: #34a853;"></span>
+              @else
+                <span class="mdi mdi-close-circle" style="display: inline-block;color: #cc0000;"></span>
+              @endif
+              </b></span>
           </td>
           <td class="cell-detail user-info">
+            <div class="icon iconoentregable">
+              @if($item->IND_TOTAL==1)
+                <span class="mdi mdi-select-all mdisellq" data_id='{{$item->ID_DOCUMENTO}}' data_ruc='{{$item->RUC}}' data_td='{{$item->TIPODOCUMENTO_ID}}' data_serie='{{$item->SERIE}}' data_numero='{{$item->NUMERO}}' style="color: #4285f4;"></span>
+              @endif
+              <span class="mdi mdi-close-circle mdicloselq" data_id='{{$item->ID_DOCUMENTO}}' data_ruc='{{$item->RUC}}' data_td='{{$item->TIPODOCUMENTO_ID}}' data_serie='{{$item->SERIE}}' data_numero='{{$item->NUMERO}}' style="color: #cc0000;"></span>
+            </div>
           </td>
       </tr>                    
     @endforeach
