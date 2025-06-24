@@ -164,6 +164,117 @@ $(document).ready(function(){
     });
 
 
+    $(".liquidaciongasto").on('click','.mdicloselq', function() {
+
+        var _token                        =   $('#token').val();
+        const data_id                     =   $(this).attr('data_id');
+        const data_ruc                    =   $(this).attr('data_ruc');
+        const data_td                     =   $(this).attr('data_td');
+        const data_serie                  =   $(this).attr('data_serie');
+        const data_numero                 =   $(this).attr('data_numero');
+        var idopcion                      =   $('#idopcion').val();
+        const link                        =   '/eliminar-de-cpe-sunat-lg-personal';
+
+        data                              =   {
+                                                    _token                  : _token,
+                                                    data_id                 : data_id,
+                                                    data_ruc                : data_ruc,
+                                                    data_td                 : data_td,
+                                                    data_serie              : data_serie,
+                                                    data_numero             : data_numero,
+                                                    idopcion                : idopcion
+                                              };   
+
+        $.confirm({
+            title: '¿Confirma la Eliminacion?',
+            content: 'Eliminacion del Comprobante',
+            buttons: {
+                confirmar: function () {
+                abrircargando();
+                $.ajax({
+                    type    :   "POST",
+                    url     :   carpeta+link,
+                    data    :   data,
+                    success: function (data) {
+                        cerrarcargando();
+                        location.reload();
+                    },
+                    error: function (data) {
+                        cerrarcargando();
+                        error500(data);
+                    }
+                });
+
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo la Eliminacion');
+                }
+            }
+        });
+
+
+
+
+    });
+
+
+
+
+    $(".liquidaciongasto").on('click','.mdisellq', function() {
+
+        var _token                        =   $('#token').val();
+        const data_id                     =   $(this).attr('data_id');
+        const data_ruc                    =   $(this).attr('data_ruc');
+        const data_td                     =   $(this).attr('data_td');
+        const data_serie                  =   $(this).attr('data_serie');
+        const data_numero                 =   $(this).attr('data_numero');
+        var idopcion                      =   $('#idopcion').val();
+        const link                        =   '/buscar-de-cpe-sunat-lg-personal';
+
+        debugger;
+        data                              =   {
+                                                    _token                  : _token,
+                                                    data_id                 : data_id,
+                                                    data_ruc                : data_ruc,
+                                                    data_td                 : data_td,
+                                                    data_serie              : data_serie,
+                                                    data_numero             : data_numero,
+                                                    idopcion                : idopcion
+                                              };                                       
+        abrircargando();
+        $.ajax({
+            type    :   "POST",
+            url     :   carpeta+link,
+            data    :   data,
+            success: function (data) {
+                cerrarcargando();
+                debugger;
+                $('#modal-detalle-requerimiento').niftyModal('hide');
+                if (data.nombre_xml) {
+                    $('.exml').html(data.nombre_xml);
+                    $('#NOMBREXML').val(data.nombre_xml);
+                    $('#RUTAXML').val(data.ruta_xml);
+                }
+                if (data.nombre_pdf) {
+                    $('.epdf').html(data.nombre_pdf);
+                    $('#NOMBREPDF').val(data.nombre_pdf);
+                    $('#RUTAPDF').val(data.ruta_pdf);
+                }
+                if (data.nombre_cdr) {
+                    $('.ecdr').html(data.nombre_cdr);
+                    $('#NOMBRECDR').val(data.nombre_cdr);
+                    $('#RUTACDR').val(data.ruta_cdr);
+                }
+            },
+            error: function (data) {
+                cerrarcargando();
+                error500(data);
+            }
+        });
+
+    });
+
+
     $(".liquidaciongasto").on('click','.btn_buscar_cpe_lg', function() {
 
         var _token                                   =   $('#token').val();
@@ -680,6 +791,12 @@ $(document).ready(function(){
         var RUTAXML                 =   $('#RUTAXML').val();
         var RUTAPDF                 =   $('#RUTAPDF').val();
         var RUTACDR                 =   $('#RUTACDR').val();
+
+        var cuenta_id               =   $('#cuenta_id').val();
+        var subcuenta_id            =   $('#subcuenta_id').val();
+
+        if(cuenta_id ==''){ alerterrorajax("Seleccione una Cuenta."); return false;}
+        if(subcuenta_id ==''){ alerterrorajax("Seleccione una Sub Cuenta"); return false;}
 
 
         var array_detalle_producto  =   $('#array_detalle_producto').val();

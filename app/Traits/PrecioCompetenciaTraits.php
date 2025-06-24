@@ -11,6 +11,9 @@ use App\Modelos\Requerimiento;
 use App\Modelos\Conei;
 use App\Modelos\Certificado;
 use App\Modelos\SuperPrecio;
+use App\Modelos\FeToken;
+use App\Modelos\SunatDocumento;
+
 
 
 use View;
@@ -20,9 +23,244 @@ Use Nexmo;
 use Keygen;
 use DOMDocument;
 use DOMXPath;
+use ZipArchive;
 
 trait PrecioCompetenciaTraits
 {
+
+
+
+	private function documentolgautomatico() {
+			
+			$pathFiles='\\\\10.1.50.2';
+      $listasunattareas                   =   DB::table('SUNAT_DOCUMENTO')
+                                              ->where('MODULO', 'LIQUIDACION_GASTO')
+                                              ->where('ACTIVO', 1)
+                                              ->where('IND_TOTAL', 0)
+                                              ->get();
+      //dd($listasunattareas);
+      foreach($listasunattareas as $index=>$item){
+          try{  
+              DB::beginTransaction();
+              set_time_limit(0);
+              $numero              				=   ltrim($item->NUMERO, '0');
+              $ruc                        =   $item->RUC;
+              $td                         =   $item->TIPODOCUMENTO_ID;
+              $serie                      =   $item->SERIE;
+              $correlativo                =   $numero;
+              $ID_DOCUMENTO               =   $item->ID_DOCUMENTO;
+              $fetoken                    =   FeToken::where('COD_EMPR','=',$item->EMPRESA_ID)->where('TIPO','=','COMPROBANTE_PAGO')->first();
+
+              //buscar xml
+              $primeraLetra               =   substr($serie, 0, 1);
+              $prefijocarperta            =   $this->prefijo_empresa_lg($item->EMPRESA_ID);
+              $rutafile                   =   $pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ID_DOCUMENTO;
+              $valor                      =   $this->versicarpetanoexiste_lg($rutafile);
+
+              $ruta_xml                   =   "";
+              $ruta_pdf                   =   "";
+              $ruta_cdr                   =   "";
+              $nombre_xml                 =   "";
+              $nombre_pdf                 =   "";
+              $nombre_cdr                 =   "";
+
+
+
+              if($item->IND_XML==0){
+                  $urlxml                 =   'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/02';
+                  $respuetaxml            =   $this->buscar_archivo_sunat_lg_nuevo($urlxml,$fetoken,$pathFiles,$prefijocarperta,$ID_DOCUMENTO,$item,'IND_XML');
+              }
+              if($item->IND_PDF==0){
+	              $urlxml                   =   'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/01';
+	              $respuetapdf              =   $this->buscar_archivo_sunat_lg_nuevo($urlxml,$fetoken,$pathFiles,$prefijocarperta,$ID_DOCUMENTO,$item,'IND_PDF');
+              }
+
+              if($primeraLetra == 'F'){
+              	  if($item->IND_CDR==0){
+	                  $urlxml                     =   'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/03';
+	                  $respuetacdr                =   $this->buscar_archivo_sunat_lg_nuevo($urlxml,$fetoken,$pathFiles,$prefijocarperta,$ID_DOCUMENTO,$item,'IND_CDR');
+                  }
+									DB::table('SUNAT_DOCUMENTO')
+									    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
+									    ->where('RUC', $item->RUC)
+									    ->where('TIPODOCUMENTO_ID', $item->TIPODOCUMENTO_ID)
+									    ->where('SERIE', $item->SERIE)
+									    ->where('NUMERO', $item->NUMERO)
+									    ->where('CONTADOR','=', '3')
+									    ->update([
+									        'IND_TOTAL'     => '1'
+									    ]);
+              }else{
+									DB::table('SUNAT_DOCUMENTO')
+									    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
+									    ->where('RUC', $item->RUC)
+									    ->where('TIPODOCUMENTO_ID', $item->TIPODOCUMENTO_ID)
+									    ->where('SERIE', $item->SERIE)
+									    ->where('NUMERO', $item->NUMERO)
+									    ->where('CONTADOR','=', '2')
+									    ->update([
+									        'IND_TOTAL'     => '1'
+									    ]);
+              }
+
+              DB::commit();
+
+          }catch(\Exception $ex){
+              DB::rollback();
+              //dd($ex);
+          }
+
+
+      }
+
+
+
+	}	
+
+
+	private function buscar_archivo_sunat_lg_nuevo($urlxml,$fetoken,$pathFiles,$prefijocarperta,$ID_DOCUMENTO,$documento,$IND) {
+
+		$array_nombre_archivo = array();
+		$curl = curl_init();
+		curl_setopt_array($curl, array(
+		  CURLOPT_URL => $urlxml,
+		  CURLOPT_RETURNTRANSFER => true,
+		  CURLOPT_ENCODING => '',
+		  CURLOPT_MAXREDIRS => 10,
+		  CURLOPT_TIMEOUT => 0,
+		  CURLOPT_FOLLOWLOCATION => true,
+		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		  CURLOPT_CUSTOMREQUEST => 'GET',
+		  CURLOPT_HTTPHEADER => array(
+		    'Authorization: Bearer '.$fetoken->TOKEN
+		  ),
+		));
+		$response = curl_exec($curl);
+		curl_close($curl);
+		$response_array = json_decode($response, true);
+		if (!isset($response_array['nomArchivo'])) {
+			print_r("NO HAY");
+		}else{
+	        $fileName = $response_array['nomArchivo'];
+	        $base64File = $response_array['valArchivo'];
+	        $fileData = base64_decode($base64File);
+            $rutafile        =      $pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ID_DOCUMENTO;
+            $rutacompleta    =      $rutafile.'\\'.$fileName;
+			file_put_contents($rutacompleta, $fileData);
+			// Descomprimir el ZIP
+			$zip = new ZipArchive;
+			if ($zip->open($rutacompleta) === TRUE) {
+			    if ($zip->numFiles > 0) {
+			        // Obtener el primer archivo dentro del ZIP (puedes adaptarlo si hay más)
+			        $archivoDescomprimido = $zip->getNameIndex(0); // nombre relativo dentro del zip
+			    }
+			    $zip->extractTo($rutafile); // descomprime todo
+			    $zip->close();
+			    $rutacompleta    =      $rutafile.'\\'.$archivoDescomprimido;
+			    print_r($archivoDescomprimido);
+			    if($IND == 'IND_XML'){
+							DB::table('SUNAT_DOCUMENTO')
+							    ->where('ID_DOCUMENTO', $documento->ID_DOCUMENTO)
+							    ->where('RUC', $documento->RUC)
+							    ->where('TIPODOCUMENTO_ID', $documento->TIPODOCUMENTO_ID)
+							    ->where('SERIE', $documento->SERIE)
+							    ->where('NUMERO', $documento->NUMERO)
+							    ->update([
+							        'IND_XML'     => '1',
+							        'NOMBRE_XML'  => $archivoDescomprimido,
+							        'RUTA_XML'    => $rutacompleta,
+							        'CONTADOR'    => DB::raw('CONTADOR + 1'),
+							    ]);
+			    }
+
+			    if($IND == 'IND_PDF'){
+							DB::table('SUNAT_DOCUMENTO')
+							    ->where('ID_DOCUMENTO', $documento->ID_DOCUMENTO)
+							    ->where('RUC', $documento->RUC)
+							    ->where('TIPODOCUMENTO_ID', $documento->TIPODOCUMENTO_ID)
+							    ->where('SERIE', $documento->SERIE)
+							    ->where('NUMERO', $documento->NUMERO)
+							    ->update([
+							        'IND_PDF'     => '1',
+							        'NOMBRE_PDF'  => $archivoDescomprimido,
+							        'RUTA_PDF'    => $rutacompleta,
+							        'CONTADOR'    => DB::raw('CONTADOR + 1'),
+							    ]);
+			    }
+
+
+			    if($IND == 'IND_CDR'){
+							DB::table('SUNAT_DOCUMENTO')
+							    ->where('ID_DOCUMENTO', $documento->ID_DOCUMENTO)
+							    ->where('RUC', $documento->RUC)
+							    ->where('TIPODOCUMENTO_ID', $documento->TIPODOCUMENTO_ID)
+							    ->where('SERIE', $documento->SERIE)
+							    ->where('NUMERO', $documento->NUMERO)
+							    ->update([
+							        'IND_CDR'     => '1',
+							        'NOMBRE_CDR'  => $archivoDescomprimido,
+							        'RUTA_CDR'    => $rutacompleta,
+							        'CONTADOR'    => DB::raw('CONTADOR + 1'),
+							    ]);
+			    }
+
+					$array_nombre_archivo = [
+						'cod_error' => 0,
+						'nombre_archivo' => $response_array['nomArchivo'],
+						'ruta_completa' => $rutacompleta,
+						'nombre_archivo' => $archivoDescomprimido,
+						'mensaje' => 'encontrado con exito'
+					];
+			} else {
+				$array_nombre_archivo = [
+					'cod_error' => 1,
+					'nombre_archivo' => '',
+					'mensaje' => 'Error al abrir el archivo ZIP'
+				];
+			}
+		}
+
+	 	return  $array_nombre_archivo;
+
+	}
+
+
+
+
+	private function prefijo_empresa_lg($idempresa) {
+		if($idempresa == 'IACHEM0000010394'){
+			$prefijo = 'II';
+		}else{
+			$prefijo = 'IS';
+		}
+	 	return  $prefijo;
+	}
+
+	private function versicarpetanoexiste_lg($ruta) {
+		$valor = false;
+		if (!file_exists($ruta)) {
+		    mkdir($ruta, 0777, true);
+		    $valor=true;
+		}
+		return $valor;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 	private function scrapear_wong($supermercado) {

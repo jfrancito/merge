@@ -460,6 +460,87 @@ class GestionLiquidacionGastosController extends Controller
     }
 
 
+    public function actionElimnarCpeSunatLgPersonal(Request $request)
+    {
+            $ruc                        =   $request['data_ruc'];
+            $td                         =   $request['data_td'];
+            $serie                      =   $request['data_serie'];
+            $correlativo                =   $request['data_numero'];
+            $ID_DOCUMENTO               =   $request['data_id'];
+
+            DB::table('SUNAT_DOCUMENTO')
+                ->where('ID_DOCUMENTO', $ID_DOCUMENTO)
+                ->where('RUC', $ruc)
+                ->where('TIPODOCUMENTO_ID', $td)
+                ->where('SERIE', $serie)
+                ->where('NUMERO', $correlativo)
+                ->update([
+                    'ACTIVO'     => '0'
+                ]);
+            print_r("hola");
+    }
+
+
+    public function actionBuscarCpeSunatLgPersonal(Request $request)
+    {
+            $ruc                        =   $request['data_ruc'];
+            $td                         =   $request['data_td'];
+            $serie                      =   $request['data_serie'];
+            $correlativo                =   $request['data_numero'];
+            $ID_DOCUMENTO               =   $request['data_id'];
+
+            $fetoken                    =   FeToken::where('COD_EMPR','=',Session::get('empresas')->COD_EMPR)->where('TIPO','=','COMPROBANTE_PAGO')->first();
+            //buscar xml
+            $primeraLetra               =   substr($serie, 0, 1);
+
+            $prefijocarperta            =   $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
+            $rutafile                   =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ID_DOCUMENTO;
+            $valor                      =   $this->versicarpetanoexiste($rutafile);
+
+            $ruta_xml                   =   "";
+            $ruta_pdf                   =   "";
+            $ruta_cdr                   =   "";
+            $nombre_xml                 =   "";
+            $nombre_pdf                 =   "";
+            $nombre_cdr                 =   "";
+
+            $sunattareas                =   DB::table('SUNAT_DOCUMENTO')
+                                            ->where('EMPRESA_ID', Session::get('empresas')->COD_EMPR)
+                                            ->where('ID_DOCUMENTO', $ID_DOCUMENTO)
+                                            ->where('RUC', $ruc)
+                                            ->where('TIPODOCUMENTO_ID', $td)
+                                            ->where('SERIE', $serie)
+                                            ->where('NUMERO', $correlativo)
+                                            ->first();
+
+            //dd($ID_DOCUMENTO);
+
+
+            if($sunattareas->IND_CDR==1){
+                $ruta_cdr = $sunattareas->RUTA_CDR;
+                $nombre_cdr = $sunattareas->NOMBRE_CDR;
+            }
+            if($sunattareas->IND_XML==1){
+                $ruta_xml = $sunattareas->RUTA_XML;
+                $nombre_xml = $sunattareas->NOMBRE_XML;
+            }
+            if($sunattareas->IND_PDF==1){
+                $ruta_pdf = $sunattareas->RUTA_PDF;
+                $nombre_pdf = $sunattareas->NOMBRE_PDF;
+            }
+
+            return response()->json([
+                'ruta_cdr'      => $ruta_cdr,
+                'ruta_xml'      => $ruta_xml,
+                'ruta_pdf'      => $ruta_pdf,
+                'nombre_xml'    => $nombre_xml,
+                'nombre_pdf'    => $nombre_pdf,
+                'nombre_cdr'    => $nombre_cdr,
+
+            ]);
+
+    }
+
 
 
     public function actionBuscarCpeSunatLg(Request $request)
@@ -3134,6 +3215,11 @@ class GestionLiquidacionGastosController extends Controller
                                             ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
                                             ->where('dni', $dni)
                                             ->first();
+
+        if(count($trabajadorespla)<=0){
+            return Redirect::to('gestion-de-liquidacion-gastos/'.$idopcion)->with('errorbd', 'No existe registro en planilla');
+        }
+
         if($valor=='0'){
 
             $active                     =   "documentos";
@@ -3151,12 +3237,14 @@ class GestionLiquidacionGastosController extends Controller
             $combo_item                 =   array();
             $gasto_id                   =   "";
             $combo_gasto                =   $this->lg_combo_gasto("Seleccione Gasto");
-
+ 
             $centrocosto                =   DB::table('CON.CENTRO_COSTO')
                                             ->where('COD_ESTADO', 1)
                                             ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
                                             ->where('TXT_REFERENCIA_PLANILLA', $trabajadorespla->cadarea)
                                             ->where('IND_MOVIMIENTO', 1)->first();
+
+
             $costo_id                   =   "";
             if(count($centrocosto)>0){
                 $costo_id                   =   $centrocosto->COD_CENTRO_COSTO;
@@ -3196,7 +3284,7 @@ class GestionLiquidacionGastosController extends Controller
             $gasto_id                   =   $tdetliquidacionitem->COD_GASTO;
             $combo_gasto                =   $this->lg_combo_gasto("Seleccione Gasto");
 
-
+            dd("hola");
             $costo_id                   =   $tdetliquidacionitem->COD_COSTO;
             $combo_costo                =   $this->lg_combo_costo_xtrabajador("Seleccione Costo",$trabajadorespla->cadarea);
             $ajax                       =   true;
@@ -3641,6 +3729,7 @@ class GestionLiquidacionGastosController extends Controller
         $listacabecera      =   LqgLiquidacionGasto::where('ACTIVO','=','1')
                                 ->whereRaw("CAST(FECHA_CREA  AS DATE) >= ? and CAST(FECHA_CREA  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                 ->where('USUARIO_CREA','=',Session::get('usuario')->id)
+                                ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
                                 ->orderby('FECHA_CREA','DESC')->get();
 
         $listadatos         =   array();
