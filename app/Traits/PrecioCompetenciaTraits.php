@@ -165,11 +165,16 @@ trait PrecioCompetenciaTraits
 			    if ($zip->numFiles > 0) {
 			        // Obtener el primer archivo dentro del ZIP (puedes adaptarlo si hay más)
 			        $archivoDescomprimido = $zip->getNameIndex(0); // nombre relativo dentro del zip
+			        if($IND == 'IND_XML'){
+			        	if(substr($archivoDescomprimido, 0, 1) == 'R'){
+			        			$archivoDescomprimido = $zip->getNameIndex(1); // nombre relativo dentro del zip	
+			        	}
+			        }
 			    }
 			    $zip->extractTo($rutafile); // descomprime todo
 			    $zip->close();
 			    $rutacompleta    =      $rutafile.'\\'.$archivoDescomprimido;
-			    print_r($archivoDescomprimido);
+			    print_r($IND);
 			    if($IND == 'IND_XML'){
 							DB::table('SUNAT_DOCUMENTO')
 							    ->where('ID_DOCUMENTO', $documento->ID_DOCUMENTO)
