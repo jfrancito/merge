@@ -179,6 +179,26 @@ var App = (function () {
           ordering: false,
       });
 
+        $("#importegastos").dataTable({
+          responsive: true,
+          autoWidth: true,
+          lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+          scrollX: true,
+          scrollY: "300px",
+          ordering: false,
+      });
+
+      if (!$.fn.DataTable.isDataTable('#vale')) {
+      $('#vale').DataTable({
+        responsive: true,
+        autoWidth: true,
+        lengthMenu: [[10, 20, 50], [10, 20, 50]],
+        scrollX: true,
+        scrollY: "300px",
+        ordering: false
+    });
+}
+
 
   };
 

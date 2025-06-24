@@ -1692,10 +1692,12 @@ class UserController extends Controller {
 			/**** Validaciones laravel ****/
 
 			$this->validate($request, [
-				'nombre' => 'unico:dbo,rols',
+				'nombre' => 'unico:WEB,rols',
 			], [
 				'nombre.unico' => 'Rol ya registrado',
 			]);
+
+
 
 			/******************************/
 			$idrol = $this->funciones->getCreateIdMaestra('WEB.rols');
