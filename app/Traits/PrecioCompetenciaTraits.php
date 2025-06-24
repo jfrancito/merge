@@ -103,6 +103,18 @@ trait PrecioCompetenciaTraits
 									    ]);
               }
 
+
+							DB::table('SUNAT_DOCUMENTO')
+							    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
+							    ->where('RUC', $item->RUC)
+							    ->where('TIPODOCUMENTO_ID', $item->TIPODOCUMENTO_ID)
+							    ->where('SERIE', $item->SERIE)
+							    ->where('NUMERO', $item->NUMERO)
+							    ->update([
+							        'FECHA_MOD'     => date('Ymd H:i:s')
+							    ]);
+
+
               DB::commit();
 
           }catch(\Exception $ex){
