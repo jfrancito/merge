@@ -16,11 +16,16 @@ use Session;
 use Nexmo;
 use PDO;
 
-trait EnviarCorreoVRAutorizaTraits 
+trait EnviarCorreoVRApruebaTraits 
 {
-    public function enviarCorreoValeRendir($valerendir_id)
+    public function enviarCorreoValeRendirAprueba($valerendir_id)
     {
         try {
+
+
+            \Log::error("ingreso al envio ");
+            \Log::info("Celda stop");
+
             $VALE_RENDIR = WEBValeRendir::where("ID", '=', $valerendir_id)->first();
 
             $emailTrabajador = DB::table('WEB.VALE_RENDIR as vr')
@@ -50,23 +55,21 @@ trait EnviarCorreoVRAutorizaTraits
 
             $nombreCompleto = ucwords(strtolower("{$nombreTrabajador->nombres} {$nombreTrabajador->apellidopaterno} {$nombreTrabajador->apellidomaterno}"));
 
-
             if (!$VALE_RENDIR) {
                 \Log::error("No se encontró el vale con ID: " . $valerendir_id);
                 return false;
             }
-      
-             $emailfrom = $emailTrabajador;
 
-            Mail::send('emails.emailvalerendirautoriza',
+            $emailfrom = "adrian.idrogo@induamerica.com.pe";
+
+            Mail::send('emails.emailvalerendiraprueba',
             ['vale' => $VALE_RENDIR],
             function ($message) use ($emailfrom, $emailTrabajador, $emailTrabajadorAutoriza, $emailTrabajadorAprueba, $nombreCompleto) {
                 $message->from($emailfrom, $nombreCompleto)
-                        ->to("marley.sucse@induamerica.com.pe")
-                        ->cc($emailTrabajador, $emailTrabajadorAutoriza) 
+                        ->to("tesoreria.cix@induamerica.com.pe ")
+                        ->cc([$emailTrabajador, 'marley.sucse@induamerica.com.pe']) // copia a estos dos
                         ->subject('VALE RENDIR - INDUAMERICA');
             });
-
 
             return true;
 
@@ -77,3 +80,6 @@ trait EnviarCorreoVRAutorizaTraits
     }
 
 }
+
+//unprg--tesoreria
+/// -marley
