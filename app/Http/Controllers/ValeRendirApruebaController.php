@@ -25,7 +25,7 @@ use App\Biblioteca\NotaCredito;
 
 class ValeRendirApruebaController extends Controller
 {
-    use ValeRendirTraits;  
+    use ValeRendirTraits;
 
    
     public function actionValeRendirAprueba(Request $request)

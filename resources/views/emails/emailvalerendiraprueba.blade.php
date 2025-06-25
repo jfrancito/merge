@@ -20,7 +20,7 @@
             overflow: hidden;
         }
         .header {
-            background-color: #191970;
+            background-color: #002b45;
             color: white;
             padding: 20px;
             text-align: center;
@@ -57,13 +57,13 @@
     </style>
 </head>
 <body>
-   <p style="font-family: 'Times New Roman', Times, serif;">
+    <p style="font-family: 'Times New Roman', Times, serif;">
     Sres.<br>
-    Se adjunta el Vale a Rendir GENERADO/AUTORIZADO por jefatura.
+    Se adjunta el Vale a Rendir GENERADO/APROBADO por administración.
     </p>
 <div class="container">
     <div class="header">
-        VALE A RENDIR - AUTORIZADO POR JEFATURA 
+        VALE A RENDIR - APROBADO POR ADMINISTRACIÓN
     </div>
     <table>
         <tr>
