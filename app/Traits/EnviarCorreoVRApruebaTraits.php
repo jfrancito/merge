@@ -60,7 +60,7 @@ trait EnviarCorreoVRApruebaTraits
                 return false;
             }
 
-            $emailfrom = "adrian.idrogo@induamerica.com.pe";
+            $emailfrom = $emailTrabajador;
 
             Mail::send('emails.emailvalerendiraprueba',
             ['vale' => $VALE_RENDIR],
