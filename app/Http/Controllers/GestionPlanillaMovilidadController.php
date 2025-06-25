@@ -349,6 +349,9 @@ class GestionPlanillaMovilidadController extends Controller
 
             try{    
                 DB::beginTransaction();
+
+                $glosa                  =    $request['glosa'];
+
                 $planillamovilidad      =   PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first(); 
                 $tdetplanillamovilidad  =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
 
@@ -363,6 +366,7 @@ class GestionPlanillaMovilidadController extends Controller
                                         'FECHA_MOD'=> $this->fechaactual,
                                         'USUARIO_MOD'=> Session::get('usuario')->id,
                                         'COD_ESTADO'=> 'ETM0000000000008',
+                                        'TXT_GLOSA'=> $glosa,
                                         'TXT_ESTADO'=> 'TERMINADA'
                                     ]);
 

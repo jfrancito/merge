@@ -155,11 +155,34 @@
     </div>
     @endif
 
+  </div>
 
+
+  <div class="row" style="margin-top: 15px;">
+    @if(isset($planillamovilidad))
+      <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
+        <div class="form-group">
+          <label class="col-sm-12 control-label labelleft negrita">GLOSA :</label>
+            <div class="col-sm-12">
+                <textarea 
+                name="glosa"
+                id = "glosa"
+                required = ""
+                class="form-control input-sm validarmayusculas"
+                rows="2">{{$planillamovilidad->TXT_GLOSA}}</textarea>
+            </div>
+        </div>
+      </div>
+    
+    @endif
 
 
 
   </div>
+
+
+
+
 </div>
 
 
