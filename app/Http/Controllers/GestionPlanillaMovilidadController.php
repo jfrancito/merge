@@ -306,6 +306,18 @@ class GestionPlanillaMovilidadController extends Controller
         $iddocumento            =   $this->funciones->decodificarmaestrapre($iddocumento,'PLAM');
         $planillamovilidad      =   PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first(); 
         $detplanillamovilidad   =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->get();
+        $trabajador             =   STDTrabajador::where('COD_TRAB','=',$planillamovilidad->COD_TRABAJADOR)->first();
+
+        $imgresponsable         =   'firmas/blanco.jpg';
+        $nombre_responsable     =   $trabajador->TXT_NOMBRES.' '.$trabajador->TXT_APE_PATERNO.' '.$trabajador->TXT_APE_MATERNO;
+        $rutaImagen             =   public_path('firmas/'.$trabajador->NRO_DOCUMENTO.'.jpg');
+        if (file_exists($rutaImagen)){
+            $imgresponsable         =   'firmas/'.$trabajador->NRO_DOCUMENTO.'.jpg';
+            $nombre_responsable     =   $trabajador->TXT_NOMBRES.' '.$trabajador->TXT_APE_PATERNO.' '.$trabajador->TXT_APE_MATERNO;
+        }
+        $imgaprueba             =   'firmas/blanco.jpg';
+        $nombre_aprueba         =   '';
+        $existeImagen           =   file_exists($rutaImagen);
         $empresa                =   STDEmpresa::where('COD_EMPR','=',$planillamovilidad->COD_EMPRESA)->first();
         $ruc                    =   $empresa->NRO_DOCUMENTO;
 
@@ -314,6 +326,10 @@ class GestionPlanillaMovilidadController extends Controller
                                                 'planillamovilidad'     => $planillamovilidad,
                                                 'detplanillamovilidad'  => $detplanillamovilidad,
                                                 'ruc'                   => $ruc,
+                                                'imgresponsable'        => $imgresponsable , 
+                                                'nombre_responsable'    => $nombre_responsable,
+                                                'imgaprueba'            => $imgaprueba,
+                                                'nombre_aprueba'        => $nombre_aprueba,
                                               ]);
 
         return $pdf->stream('download.pdf');
@@ -333,6 +349,9 @@ class GestionPlanillaMovilidadController extends Controller
 
             try{    
                 DB::beginTransaction();
+
+                $glosa                  =    $request['glosa'];
+
                 $planillamovilidad      =   PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first(); 
                 $tdetplanillamovilidad  =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
 
@@ -344,10 +363,10 @@ class GestionPlanillaMovilidadController extends Controller
                             ->update(
                                     [
                                         'FECHA_EMI'=> $this->fechaactual,
-                                        'TIPO_SUSTENTO'=> $request['tipo_solicitud'],
                                         'FECHA_MOD'=> $this->fechaactual,
                                         'USUARIO_MOD'=> Session::get('usuario')->id,
                                         'COD_ESTADO'=> 'ETM0000000000008',
+                                        'TXT_GLOSA'=> $glosa,
                                         'TXT_ESTADO'=> 'TERMINADA'
                                     ]);
 
@@ -651,6 +670,21 @@ class GestionPlanillaMovilidadController extends Controller
                 if($total_mensual>1130){
                     return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd', 'Supero el maximo saldo de 1130 soles al mes');
                 }
+
+                //VALIDAR QUE SOLO MENSUALMENTE SEA 1130
+                $anio_v = date('Y', strtotime($fecha_gasto));
+                $totalanual = DB::table('PLA_MOVILIDAD')
+                    ->join('PLA_DETMOVILIDAD', 'PLA_MOVILIDAD.ID_DOCUMENTO', '=', 'PLA_DETMOVILIDAD.ID_DOCUMENTO')
+                    ->where('PLA_MOVILIDAD.COD_ESTADO', '<>', 'ETM0000000000006')
+                    ->where('PLA_DETMOVILIDAD.ACTIVO', 1)
+                    ->whereYear('FECHA_GASTO', $anio_v)
+                    ->where('PLA_DETMOVILIDAD.USUARIO_CREA', Session::get('usuario')->id)
+                    ->sum('PLA_DETMOVILIDAD.TOTAL');
+                $total_anual =    (float)$total + $totalanual;
+                if($total_anual>16425){
+                    return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd', 'Supero el maximo saldo de 16425 soles al año');
+                }
+
 
 
 

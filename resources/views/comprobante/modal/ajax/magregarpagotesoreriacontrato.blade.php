@@ -28,6 +28,14 @@
 		<div class="scroll_text scroll_text_heigth_aler" style = "padding: 0px !important;"> 
 
 				  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+	          <div class="be-checkbox">
+	            <input id="check1" type="checkbox" name='partepago'>
+	            <label for="check1">Parte del pago</label>
+	          </div>
+				  </div>
+
+
+				  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 	            <div class="row">
 	              @foreach($tarchivos as $index => $item) 
 	                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">

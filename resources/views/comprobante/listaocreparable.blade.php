@@ -1,10 +1,19 @@
 @extends('template_lateral')
 @section('style')
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.min.css" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/datatables/css/dataTables.bootstrap.min.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/datatables/css/responsive.dataTables.min.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/datetimepicker/css/bootstrap-datetimepicker.min.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/select2/css/select2.min.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/bootstrap-slider/css/bootstrap-slider.css') }} "/>
+    <link rel="stylesheet" type="text/css" href="{{ asset('public/css/confirm/jquery-confirm.min.css') }} "/>
+    <link rel="stylesheet" type="text/css" href="{{ asset('public/css/file/fileinput.css') }} "/>
+    <style type="text/css">
+      #kvFileinputModal{
+        z-index: 1051 !important;
+      }
+    </style>
 @stop
 @section('section')
   <div class="be-content contenido agestioncomprobante">
@@ -14,10 +23,19 @@
               <div class="panel panel-default panel-border-color panel-border-color-success">
                 <div class="panel-heading">{{ $titulo }}
                   <div class="tools tooltiptop">
-                      <a href="#" class="tooltipcss opciones buscardocumentoreparable">
+
+                      <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones asignarmasivo">
+                        <span class="tooltiptext">Integracion Masiva</span>
+                        <span class="icon mdi mdi-plus-circle-o"></span>
+                      </a>
+
+
+                      <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscardocumentoreparable">
                         <span class="tooltiptext">Buscar Documento</span>
                         <span class="icon mdi mdi-search"></span>
                       </a>
+
+
                   </div>
                 </div>
                 <div class="panel-body">
@@ -84,6 +102,8 @@
             </div>
           </div>
     </div>
+    @include('comprobante.modal.mregistrorequerimiento')
+    
   </div>
 @stop
 @section('script')
@@ -108,6 +128,12 @@
   <script src="{{ asset('public/js/app-form-elements.js') }}" type="text/javascript"></script>
   <script src="{{ asset('public/lib/parsley/parsley.js') }}" type="text/javascript"></script>
   <script src="{{ asset('public/lib/jquery.niftymodals/dist/jquery.niftymodals.js') }}" type="text/javascript"></script>
+  <script src="{{ asset('public/js/confirm/jquery-confirm.min.js') }}" type="text/javascript"></script>
+
+  <script src="{{ asset('public/js/file/fileinput.js?v='.$version) }}" type="text/javascript"></script>
+  <script src="{{ asset('public/js/file/locales/es.js') }}" type="text/javascript"></script>
+
+
   <script type="text/javascript">
 
     $.fn.niftyModal('setDefaults',{

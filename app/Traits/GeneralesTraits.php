@@ -121,6 +121,58 @@ trait GeneralesTraits
         return $combo;
     }
 
+    public function gn_combo_usuarios_id($usuario_id)
+    {
+
+        $array = User::where('activo', '=', 1)
+            ->where('id', '<>', '1CIX00000001')
+            ->where('id', '=', $usuario_id)
+            ->where('rol_id', '<>', '1CIX00000024')
+            ->orderBy('nombre', 'asc')
+            ->pluck('nombre', 'id')
+            ->toArray();
+        $combo = array('' => 'Seleccione quien autorizara') + $array;
+        return $combo;
+    }
+
+
+    public function gn_combo_arendir()
+    {
+
+        $array    = 	DB::table('WEB.VALE_RENDIR')
+        				->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
+                		->where('COD_USUARIO_CREA_AUD', Session::get('usuario')->id)
+                		->where('COD_CATEGORIA_ESTADO_VALE', 'ETM0000000000007')
+					    ->select(
+					        'ID',
+					        DB::raw("ID_OSIRIS + ' - ' + CAST(CAN_TOTAL_IMPORTE AS VARCHAR) AS MONTO")
+					    )
+			            ->orderBy('ID', 'asc')
+			            ->pluck('MONTO', 'ID')
+			            ->toArray();
+
+        $combo = array('' => 'Seleccione un arendir') + $array;
+        return $combo;
+    }
+
+    public function gn_arendir_top()
+    {
+
+    	$arendir_id = '';
+        $vale    = 	DB::table('WEB.VALE_RENDIR')
+        				->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
+                		->where('COD_USUARIO_CREA_AUD', Session::get('usuario')->id)
+                		->where('COD_CATEGORIA_ESTADO_VALE', 'ETM0000000000007')
+			            ->first();
+
+		if(count($vale)>0){
+    		$arendir_id = $vale->ID;
+		}
+
+        return $arendir_id;
+    }
+
+
 
 
     public function gn_periodo_actual_xanio_xempresa($anio, $mes, $cod_empresa)
@@ -168,6 +220,26 @@ trait GeneralesTraits
 		  CURLOPT_HTTPHEADER => array(
 		    'Cookie: ITMRCONSRUCSESSION=6kQkyY2K12JgySwpdyFvyvXlQGTb2tGwqv5cmkbbTTD2h8hXQ0nJQypQpxs1QB44WRx0hYknLNTpbRTRm16th1bykQPlPyGhLxMQ4yyKnfwdfv7yqty8J2HzJBzBrydVP6kvGTsNNyNFF2pM1kcXN7X0RF7cBQfLlT1TpDjfM5ncB1FJBdfsBrWrJD1Tpgsfy8G0JydRnyyy5Qp3nPNLrpNSLJ8c2n9QTHpNpXPTCnX4vSQq2yMjG2vNGGVGnWJv!637287358!-336427344; TS01fda901=014dc399cb02c7e99dabe548e899a665fcfab9f294b2d2b8c00d75f74ce28e127857a7d560ff80f24bf801a58569542299cd5ae803ddffbd003798123ef9e33a4f9ede5c78'
 		  ),
+		));
+		$response = curl_exec($curl);
+		curl_close($curl);
+	 	return  $response;
+
+	}
+
+
+	private function buscar_ruc_sunat_lg($urlxml) {
+		
+		$curl = curl_init();
+		curl_setopt_array($curl, array(
+		  CURLOPT_URL => $urlxml,
+		  CURLOPT_RETURNTRANSFER => true,
+		  CURLOPT_ENCODING => '',
+		  CURLOPT_MAXREDIRS => 10,
+		  CURLOPT_TIMEOUT => 0,
+		  CURLOPT_FOLLOWLOCATION => true,
+		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		  CURLOPT_CUSTOMREQUEST => 'GET'
 		));
 		$response = curl_exec($curl);
 		curl_close($curl);

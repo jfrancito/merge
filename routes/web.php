@@ -52,6 +52,8 @@ Route::any('/leerdocumentos-sunat-compras', 'CpeController@actionGestionCpeCompr
 Route::any('/leerpreciocompetencia', 'PrecioCompetenciaController@actionScrapearPrecios');//vALIDAR CDR Y SUNAT
 Route::any('/transferirdataventas', 'TransferirDataController@actionTransferirVentasAtendidas');//TRANSFERIR DATA AGENTE IA
 
+Route::any('/documentolgautomatico', 'PrecioCompetenciaController@actionDocumentoLGAutomatico');//TRANSFERIR DATA AGENTE IA
+
 
 
 Route::group(['middleware' => ['authaw']], function () {
@@ -77,14 +79,13 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/ajax-modal-ver-cuenta-bancaria-oc', 'UserController@actionAjaxModalVerCuentaBancariaOC');
 	Route::any('/cambiar-cuenta-corriente/{empresa_id}/{banco_id}/{nro_cuenta}/{moneda_id}/{idoc}/{idopcion}', 'UserController@actionCambiarCuentaCorriente');
-
-
 	Route::any('/gestion-de-cpe/{idopcion}', 'CpeController@actionGestionCpe');
 	Route::any('/descargar-archivo/{archivonombre}', 'CpeController@actionDescargarArchivo');
-
-
 	Route::any('/gestion-de-sunat-cpe-local/{idopcion}', 'CpeController@actionGestionCpeLocal');
 	Route::any('/descargar-archivo-local/{tipo}', 'CpeController@descargarArchivoLocal');
+
+
+	Route::any('/descargar-archivos-sunat-lg', 'CpeController@descargarArchivoSunatLG');
 
 
 	//LIQUIDACION DE GASTOS
@@ -94,41 +95,66 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/modificar-liquidacion-gastos/{idopcion}/{iddocumento}/{valor}', 'GestionLiquidacionGastosController@actionModificarLiquidacionGastos');
 	Route::any('/ajax-combo-subcuenta', 'GestionLiquidacionGastosController@actionAjaxComboSubCuenta');
 	Route::any('/ajax-combo-item', 'GestionLiquidacionGastosController@actionAjaxComboItem');
+	Route::any('/ajax-combo-autoriza', 'GestionLiquidacionGastosController@actionAjaxComboAutoriza');
+
 
 	Route::any('/guardar-detalle-liquidacion-gastos/{idopcion}/{iddocumento}', 'GestionLiquidacionGastosController@actionGuardarDetalleLiquidacionGastos');
 	Route::any('/ajax-modal-detalle-documento-lg', 'GestionLiquidacionGastosController@actionDetalleDocumentoLG');
 	Route::any('/guardar-detalle-documento-lg/{idopcion}/{iddocumento}/{item}', 'GestionLiquidacionGastosController@actionGuardarDetalleDocumentoLG');
 	Route::any('/ajax-modal-modificar-detalle-documento-lg', 'GestionLiquidacionGastosController@actionModificarDetalleDocumentoLG');
 	Route::any('/ajax-modal-relacionar-detalle-documento-lg', 'GestionLiquidacionGastosController@actionRelacionarDetalleDocumentoLG');
-
 	Route::any('/modificar-detalle-documento-lg/{idopcion}/{iddocumento}/{item}/{itemdocumento}', 'GestionLiquidacionGastosController@actionGuardarModificarDetalleDocumentoLG');
 	Route::any('/emitir-liquidacion-gastos/{idopcion}/{iddocumento}', 'GestionLiquidacionGastosController@actionEmitirLiquidacionGasto');
 
 
 	Route::any('/gestion-de-aprobacion-liquidacion-gasto-jefe/{idopcion}', 'GestionLiquidacionGastosController@actionAprobarLiquidacionGastoJefe');
 	Route::any('/aprobar-liquidacion-gasto-jefe/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionAprobarJefeLG');
+	Route::any('/agregar-observar-jefe/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionObservarJefeLG');
+
+
+	Route::any('/gestion-de-aprobacion-liquidacion-gastos-contabilidad/{idopcion}', 'GestionLiquidacionGastosController@actionAprobarLiquidacionGastoContabilidad');
+
+
+
 
 	Route::any('/gestion-de-aprobacion-liquidacion-gastos-administracion/{idopcion}', 'GestionLiquidacionGastosController@actionAprobarLiquidacionGastoAdministracion');
 	Route::any('/aprobar-liquidacion-gasto-administracion/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionAprobarAdministracionLG');
 
+	Route::any('/liquidacion-viaje-pdf/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionLiquidacionViajePdf');
+
+
+
+	Route::any('/aprobar-liquidacion-gasto-contabilidad/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionAprobarContabilidadLG');
+
 
 	Route::any('/ajax-modal-buscar-planilla-lg', 'GestionLiquidacionGastosController@actionModalBuscarPlanillaLG');
 	Route::any('/ajax-select-documento-planilla', 'GestionLiquidacionGastosController@actionModalSelectDocumentoPlanillaLG');
-
-
-
 	Route::any('/ajax-leer-xml-lg', 'GestionLiquidacionGastosController@actionAjaxLeerXmlLG');
 	Route::any('/ajax-leer-xml-lg-sunat', 'GestionLiquidacionGastosController@actionAjaxLeerXmlLGSunat');
-
-
-
 	Route::any('/agregar-extorno-jefe/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionAgregarExtornoJefe');
 	Route::any('/agregar-extorno-administracion/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionAgregarExtornoAdministracion');
+	Route::any('/agregar-extorno-contabilidad-lg/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionAgregarExtornoContabilidadLG');
+
+
 	Route::any('/gestion-de-liquidacion-gastos-adm/{idopcion}', 'GestionLiquidacionGastosController@actionListarLGValidado');
 	Route::any('/ajax-buscar-documento-lg', 'GestionLiquidacionGastosController@actionListarAjaxBuscarDocumentoLG');
 	Route::any('/detalle-comprobante-lg-validado/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionDetallaComprobanteLGValidado');
 	Route::any('/ajax-modal-buscar-factura-sunat', 'GestionLiquidacionGastosController@actionModalBuscarFacturaSunat');
 	Route::any('/buscar-de-cpe-sunat-lg', 'GestionLiquidacionGastosController@actionBuscarCpeSunatLg');
+	Route::any('/buscar-de-cpe-sunat-lg-personal', 'GestionLiquidacionGastosController@actionBuscarCpeSunatLgPersonal');
+	Route::any('/eliminar-de-cpe-sunat-lg-personal', 'GestionLiquidacionGastosController@actionElimnarCpeSunatLgPersonal');
+
+
+
+
+	Route::any('/gestion-de-empresa-proveedor/{idopcion}', 'GestionLiquidacionGastosController@actionGestionEmpresaProveedor');
+	Route::any('/buscar-sunat-ruc/{idopcion}', 'GestionLiquidacionGastosController@actionBuscarSunatRuc');
+	Route::any('/agregar-observar-administrador/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionObservarAdministradorLG');
+	Route::any('/agregar-observar-contabilidad/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionObservarContabilidadLG');
+	Route::any('/tareas-de-cpe-sunat-lg', 'GestionLiquidacionGastosController@actionTareasCpeSunatLg');
+
+	Route::any('/guardar-empresa-proveedor/{idopcion}', 'GestionLiquidacionGastosController@actionGuardarEmpresaProveedor');
+
 
 
 	//PLANILLA MOVILIDAD
@@ -221,9 +247,17 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-buscar-documento-gestion-admin', 'GestionOCController@actionListarAjaxBuscarDocumentoAdmin');
 	Route::any('/migracion-rioja/{idopcion}', 'GestionOCController@actionListarOCAdminMR');
 	Route::any('/migracion-bellavista/{idopcion}', 'GestionOCController@actionListarOCAdminMB');
-
 	Route::any('/ajax-estiba-proveedor-estiba', 'GestionOCController@actionEstibaProveedorEstiba');
 
+	Route::any('/gestion-de-integracion-comisiones/{idopcion}', 'GestionOCTesoreriaController@actionListarComisionAdmin');
+	Route::any('/ajax-buscar-documento-comision-admin', 'GestionOCTesoreriaController@actionAjaxListarComisionAdmin');
+	Route::any('/ajax-modal-detalle-comision', 'GestionOCTesoreriaController@actionCargarModalDetalleComision');
+
+	Route::any('/ajax-modal-detalle-lotes-comision', 'GestionOCTesoreriaController@actionCargarModalDetalleLotesComision');
+	Route::any('/select-xml-comision/{idopcion}', 'GestionOCTesoreriaController@actionDetalleSelectComision');
+	Route::any('/detalle-comprobante-comision-administrator/{idopcion}/{lote}', 'GestionOCTesoreriaController@actionDetalleComprobanteComisionAdministrator');
+	Route::any('/subir-xml-cargar-datos-comision-administrator/{idopcion}/{lote}', 'GestionOCTesoreriaController@actionCargarXMLComisionAdministrator');
+	Route::any('/validar-xml-oc-comision-administrator/{idopcion}/{lote}', 'GestionOCTesoreriaController@actionValidarXMLComisionAdministrator');
 
 
 
@@ -282,6 +316,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-modal-detalle-estibas', 'GestionEstibaController@actionCargarModalDetalleEstibas');
 
 	Route::any('/agregar-suspension/{idopcion}/{lote}', 'GestionEstibaController@actionAgregarSuspensionEstibas');
+
+	Route::any('/ajax-eliminar-lote-comision', 'GestionOCTesoreriaController@actionEliminacionLoteComision');
 
 
 	Route::any('/gestion-de-oc-validado-proveedores/{idopcion}', 'GestionOCValidadoController@actionListarOCValidado');
@@ -357,9 +393,15 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/aprobar-comprobante-uc-contrato/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionUsuarioContactoController@actionAprobarUCContrato');
 
 	Route::any('/detalle-comprobante-oc-validado-estiba/{idopcion}/{lote}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoEstiba');
+	Route::any('/detalle-comprobante-oc-validado-comision/{idopcion}/{lote}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoComision');
+
+
 
 	Route::any('/gestion-de-comprobantes-observados/{idopcion}', 'GestionUsuarioContactoController@actionListarComprobantesObservados');
 	Route::any('/gestion-de-comprobantes-reparable/{idopcion}', 'GestionUsuarioContactoController@actionListarComprobantesReparable');
+
+	Route::any('/ajax-modal-reparable-masivo', 'GestionUsuarioContactoController@actionListarAjaxModalReparableMasivo');
+
 
 	Route::any('/ajax-buscar-documento-gestion-observados', 'GestionUsuarioContactoController@actionListarAjaxBuscarDocumentoObservados');
 	Route::any('/ajax-buscar-documento-gestion-reparable', 'GestionUsuarioContactoController@actionListarAjaxBuscarDocumentoReparable');
@@ -374,6 +416,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/reparable-comprobante-uc/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionUsuarioContactoController@actionReparableUC');
 	Route::any('/reparable-comprobante-uc-contrato/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionUsuarioContactoController@actionReparableUCContrato');
 	Route::any('/reparable-comprobante-uc-estiba/{idopcion}/{lote}', 'GestionUsuarioContactoController@actionReparableUCEstiba');
+
+
+	Route::any('/pago-comprobante-reparable-masivo/{idopcion}', 'GestionUsuarioContactoController@actionAprobarReparableMasivo');
 
 
 	Route::any('/observacion-comprobante-uc-contrato/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionUsuarioContactoController@actionObservarUCContrato');
@@ -483,6 +528,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/descargar-archivo-requerimiento-contrato-anulado/{tipo}/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDescargarContratoAnulado');
 	Route::any('/eliminar-archivo-item/{tipo}/{nombrearchivo}/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionEliminarItem');
 	Route::any('/eliminar-archivo-item-contrato/{tipo}/{nombrearchivo}/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionEliminarItemContrato');
+
+	Route::any('/ajax-eliminar-archivo-item-pp', 'GestionOCTesoreriaController@actionEliminarItemPP');
+
 
 	Route::any('/descargar-archivo-requerimiento-estiba/{tipo}/{idopcion}/{lote}', 'GestionOCValidadoController@actionDescargarEstiba');
 
@@ -631,6 +679,7 @@ Route::get('buscarproducto', function (Illuminate\Http\Request  $request) {
 			->where('ALM.PRODUCTO.COD_ESTADO','=',1)
 			->where('ALM.PRODUCTO.IND_DISPONIBLE','=',1)
 			->where('ALM.PRODUCTO.IND_MATERIAL_SERVICIO','=','S')
+			->where('COD_CATEGORIA_CLASE','=','1')
 			->take(100)
 			->select(DB::raw("
 			  ALM.PRODUCTO.NOM_PRODUCTO")

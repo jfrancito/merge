@@ -50,7 +50,7 @@
                 <td><p class='subtitulomerge'>{{number_format($ordencompra->CAN_TOTAL, 4, '.', ',')}}</p></td>
                 <td>
                   <div class='subtitulomerge @if($fedocumento->ind_total == 1) msjexitoso @else msjerror @endif'>
-                      <b>{{number_format($fedocumento->TOTAL_VENTA_ORIG, 4, '.', ',')}}</b>
+                      <b>{{number_format($fedocumento->TOTAL_VENTA_XML, 4, '.', ',')}}</b>
                   </div>
                 </td>
               </tr>

@@ -92,12 +92,63 @@
 
     <div class="ol-xs-12 col-sm-4 col-md-3 col-lg-3">
       <div class="form-group">
+        <label class="col-sm-12 control-label labelleft negrita">AUTORIZA :</label>
+        <div class="col-sm-12">
+            <input  type="text"
+                    id="autorizatxt" name='autorizatxt' 
+                    value="{{$liquidaciongastos->TXT_USUARIO_AUTORIZA}}"                         
+                    placeholder="NUMERO"
+                    readonly = "readonly"
+                    required = ""
+                    autocomplete="off" class="form-control input-sm"/>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="ol-xs-12 col-sm-4 col-md-3 col-lg-3">
+      <div class="form-group">
         <label class="col-sm-12 control-label labelleft negrita">TOTAL :</label>
         <div class="col-sm-12">
             <input  type="text"
                     id="totalcabecera" name='totalcabecera' 
                     value="{{$liquidaciongastos->TOTAL}}"                         
                     placeholder="TOTAL"
+                    readonly = "readonly"
+                    required = ""
+                    autocomplete="off" class="form-control input-sm"/>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+
+  <div class="row" style="margin-top:10px;">
+    <div class="ol-xs-12 col-sm-4 col-md-3 col-lg-3">
+      <div class="form-group">
+        <label class="col-sm-12 control-label labelleft negrita">AREA :</label>
+        <div class="col-sm-12">
+            <input  type="text"
+                    id="area_txt" name='area_txt' 
+                    value="{{$liquidaciongastos->TXT_AREA}}"                         
+                    placeholder="NUMERO"
+                    readonly = "readonly"
+                    required = ""
+                    autocomplete="off" class="form-control input-sm"/>
+        </div>
+      </div>
+    </div>
+
+    <div class="ol-xs-12 col-sm-4 col-md-3 col-lg-3">
+      <div class="form-group">
+        <label class="col-sm-12 control-label labelleft negrita">MONEDA :</label>
+        <div class="col-sm-12">
+            <input  type="text"
+                    id="moneda_txt" name='moneda_txt' 
+                    value="{{$liquidaciongastos->TXT_CATEGORIA_MONEDA}}"                         
+                    placeholder="NUMERO"
                     readonly = "readonly"
                     required = ""
                     autocomplete="off" class="form-control input-sm"/>
