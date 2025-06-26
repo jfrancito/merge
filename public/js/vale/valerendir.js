@@ -483,59 +483,12 @@ $(document).ready(function(){
          let tipo_pago               =   (tipo_pago_raw === 'caja') ? 1 : 0;
          let txt_categoria_banco     =   $('#nomBanco').val();
          let numero_cuenta           =   $('#numBanco').val();
-         let txt_glosa_aprobado      =   $('#glosa').val();
-
-         
-         let vale_rendir_id = $('#vale_rendir_id').val(); 
+         let txt_glosa_aprobado      =   $('#glosa').val();   
+         let vale_rendir_id          = $('#vale_rendir_id').val(); 
 
        
          
-     /*     console.log($('#vale_rendir_id').val());
-
-           data    =   {
-                               _token                                   : _token,
-                                txt_serie                                : txt_serie,
-                                txt_numero                               : txt_numero,
-                                fec_autorizacion                         : fec_autorizacion,
-                                cod_contrato                             : cod_contrato,
-                                sub_cuenta                               : sub_cuenta,
-                                txt_glosa_autorizado                     : txt_glosa_autorizado,
-                                tipo_pago                                : tipo_pago,   
-                                txt_categoria_banco                      : txt_categoria_banco,
-                                numero_cuenta                            : numero_cuenta,
-                                txt_glosa_aprobado                       : txt_glosa_aprobado,
-                                valerendir_id                            : vale_rendir_id,                                             
-                              };
-
-           //ajax_normal_combo(data,"/aprobar_vale_rendir","listadetalleajax")  
-           ajax_modal(data,"/aprobar_vale_rendir",
-                      "modal-detalledocumento-solicitud","modal-detalledocumento-solicitud-container");*/
-
-
-       /*     if (!txt_serie) {
-                alerterrorajax("Debe seleccionar una serie.");
-                return;
-            }
-
-            if (!cod_contrato) {
-                alerterrorajax("Debe seleccionar una cuenta.");
-                return;
-            }
-
-            if (!sub_cuenta || sub_cuenta === "" || sub_cuenta === "Seleccione Sub Cuenta") {
-                 alerterrorajax("Debe seleccionar una sub cuenta.");
-             return;  // Esto previene el envío de datos
-            }
-
-            if (typeof tipo_pago_raw === 'undefined') {
-                alerterrorajax("Debe seleccionar un tipo de pago.");
-                return;
-            }
-
-            if (!txt_glosa_aprobado) {
-                alerterrorajax("Debe ingresar una glosa.");
-                return;
-            }*/
+     
 
 
             $.ajax({
@@ -567,6 +520,22 @@ $(document).ready(function(){
                     }
 
                     alertajax("Vale aprobado correctamente.");
+                    
+                 // Envío del correo tras la aprobación
+                    $.ajax({
+                        type: "GET",
+                        url: carpeta + "/enviar_correo_aprueba",
+                        data: {
+                            valerendir_id: vale_rendir_id
+                        },
+                        success: function () {
+                            console.log('Correo de aprobación enviado correctamente.');
+                        },
+                        error: function () {
+                            console.warn('Error al enviar el correo de aprobación.');
+                        }
+                    });
+
                     location.reload();
                 },
                 error: function (data) {
@@ -1095,3 +1064,6 @@ $(document).ready(function(){
                               };
 
             ajax_normal_combo(data,"/registrar_vale_rendir","listadetalleajax")  */
+
+
+
