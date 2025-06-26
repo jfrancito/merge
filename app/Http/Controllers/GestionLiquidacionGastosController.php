@@ -1336,7 +1336,7 @@ class GestionLiquidacionGastosController extends Controller
         $valor                  =   $this->versicarpetanoexiste($rutafile);
         $rutacompleta           =   $rutafile . '\\' . $planillamovilidad->SERIE . '-' . $planillamovilidad->NUMERO . '.pdf';
         $nombrearchivo          =   $planillamovilidad->SERIE . '-' . $planillamovilidad->NUMERO . '.pdf';
-
+        $glosa                  =   $planillamovilidad->TXT_GLOSA;
 
         $trabajador             =   STDTrabajador::where('COD_TRAB','=',$planillamovilidad->COD_TRABAJADOR)->first();
         $imgresponsable         =   'firmas/blanco.jpg';
@@ -1382,6 +1382,7 @@ class GestionLiquidacionGastosController extends Controller
             'FECHA_EMI'     => date_format(date_create($planillamovilidad->FECHA_EMI), 'd-m-Y'),
             'TOTAL'         => $planillamovilidad->TOTAL,
             'rutacompleta'  => $rutacompleta,
+            'glosa'         => $glosa,
             'nombrearchivo' => $nombrearchivo
         ]);
 
@@ -3220,6 +3221,9 @@ class GestionLiquidacionGastosController extends Controller
             return Redirect::to('gestion-de-liquidacion-gastos/'.$idopcion)->with('errorbd', 'No existe registro en planilla');
         }
 
+
+        //dd($liquidaciongastos);
+
         if($valor=='0'){
 
             $active                     =   "documentos";
@@ -3285,7 +3289,7 @@ class GestionLiquidacionGastosController extends Controller
             $gasto_id                   =   $tdetliquidacionitem->COD_GASTO;
             $combo_gasto                =   $this->lg_combo_gasto("Seleccione Gasto");
 
-            dd("hola");
+            //dd("hola");
             $costo_id                   =   $tdetliquidacionitem->COD_COSTO;
             $combo_costo                =   $this->lg_combo_costo_xtrabajador("Seleccione Costo",$trabajadorespla->cadarea);
             $ajax                       =   true;
@@ -3497,6 +3501,22 @@ class GestionLiquidacionGastosController extends Controller
             return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$iddocumento.'/'.'0')->with('bienhecho', 'Liquidacion de Gastos '.$codigo.' registrado con exito, ingrese sus comprobantes');
         }else{
 
+
+            $trabajador                     =   DB::table('STD.TRABAJADOR')
+                                                ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                                                ->first();
+            $dni                            =   '';
+            if(count($trabajador)>0){
+                $dni                        =   $trabajador->NRO_DOCUMENTO;
+            }
+            $trabajadorespla                =   DB::table('WEB.platrabajadores')
+                                                ->where('situacion_id', 'PRMAECEN000000000002')
+                                                ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+                                                ->where('dni', $dni)
+                                                ->first();
+            //dd($trabajadorespla->cadarea);
+
+
             $anio               =   $this->anio;
             $mes                =   $this->mes;
             $trabajador         =   DB::table('STD.TRABAJADOR')
@@ -3561,7 +3581,7 @@ class GestionLiquidacionGastosController extends Controller
                 $combo_arendir       =   array('' => "SELECCIONE SI TIENE A RENDIR",'NO' => "NO");
             }
 
-
+            //$combo_arendir       =   array('' => "SELECCIONE SI TIENE A RENDIR",'NO' => "NO");
             $arendir_id          =   "";
             $centro              =   ALMCentro::where('COD_CENTRO','=',$centro_id)->first();
 

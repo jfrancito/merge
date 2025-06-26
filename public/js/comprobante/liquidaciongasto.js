@@ -404,6 +404,7 @@ $(document).ready(function(){
                 $('#cod_planila').val(data.COD_PLANILLA);
                 $('#rutacompleta').val(data.rutacompleta);
                 $('#nombrearchivo').val(data.nombrearchivo);
+                $('#glosadet').val(data.glosa);
 
             },
             error: function (data) {
