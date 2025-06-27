@@ -551,8 +551,10 @@ Route::group(['middleware' => ['authaw']], function () {
 
   //CORREO VALE RENDIR
 
+	Route::get('/enviar_correo_generado', 'EnviarCorreoValeRendirGeneradoController@actionEnviarCorreoVRGenerado');
 	Route::get('/enviar_correo_autoriza', 'EnviarCorreoValeRendirAutorizaController@actionEnviarCorreoVRAutoriza');
 	Route::get('/enviar_correo_aprueba', 'EnviarCorreoValeRendirApruebaController@actionEnviarCorreoVRAprueba');
+
 
 	
 
