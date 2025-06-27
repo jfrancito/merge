@@ -1335,7 +1335,7 @@ class GestionLiquidacionGastosController extends Controller
         //GUARDAR PDF
         $iddocumento            =   $documento_planilla;
         $planillamovilidad      =   PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first(); 
-        $detplanillamovilidad   =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->get();
+        $detplanillamovilidad   =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->orderby('FECHA_GASTO','ASC')->get();
         $empresa                =   STDEmpresa::where('COD_EMPR','=',$planillamovilidad->COD_EMPRESA)->first();
         $ruc                    =   $empresa->NRO_DOCUMENTO;
         $prefijocarperta        =   $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);

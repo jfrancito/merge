@@ -284,6 +284,7 @@ class GestionPlanillaMovilidadController extends Controller
         $planillamovilidad  =   PlaMovilidad::where('ACTIVO','=','1')
                                 ->whereRaw("CAST(FECHA_CREA  AS DATE) >= ? and CAST(FECHA_CREA  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                 ->where('USUARIO_CREA','=',Session::get('usuario')->id)
+                                ->where('COD_EMPRESA','=', Session::get('empresas')->COD_EMPR)
                                 ->orderby('FECHA_CREA','DESC')->get();
 
         $listadatos     =   array();
@@ -305,7 +306,7 @@ class GestionPlanillaMovilidadController extends Controller
         $idcab                  =   $iddocumento;
         $iddocumento            =   $this->funciones->decodificarmaestrapre($iddocumento,'PLAM');
         $planillamovilidad      =   PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first(); 
-        $detplanillamovilidad   =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->get();
+        $detplanillamovilidad   =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->orderby('FECHA_GASTO','ASC')->get();
         $trabajador             =   STDTrabajador::where('COD_TRAB','=',$planillamovilidad->COD_TRABAJADOR)->first();
 
         $imgresponsable         =   'firmas/blanco.jpg';
