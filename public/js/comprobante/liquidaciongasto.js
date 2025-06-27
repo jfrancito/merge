@@ -134,6 +134,147 @@ $(document).ready(function(){
 
 
 
+    $(".liquidaciongasto").on('click','.btn_tarea_cpe_lg', function() {
+
+        var _token                                   =   $('#token').val();
+        var ID_DOCUMENTO                             =   $('#ID_DOCUMENTO').val();
+        var idopcion                                 =   $('#idopcion').val();
+        var ruc                                      =   $('#ruc_sunat').val();
+        var td                                       =   $('#td').val();
+        var serie                                    =   $('#serie_sunat').val();
+        var correlativo                              =   $('#correlativo_sunat').val();
+        if(ruc ==''){ alerterrorajax("Ingrese un ruc."); return false;}
+        if(td ==''){ alerterrorajax("Seleccione un tipo de documento."); return false;}
+        if(serie ==''){ alerterrorajax("Ingrese un serie."); return false;}
+        if(correlativo ==''){ alerterrorajax("Ingrese un correlativo."); return false;}
+
+        data                                         =   {
+                                                                _token                  : _token,
+                                                                ID_DOCUMENTO            : ID_DOCUMENTO,
+                                                                ruc                     : ruc,
+                                                                td                      : td,
+                                                                serie                   : serie,
+                                                                correlativo             : correlativo,
+                                                                idopcion                : idopcion
+                                                         };                                       
+        abrircargando();
+        $('a[href="#tareas"]').click();
+        ajax_normal(data,"/tareas-de-cpe-sunat-lg");
+
+    });
+
+
+    $(".liquidaciongasto").on('click','.mdicloselq', function() {
+
+        var _token                        =   $('#token').val();
+        const data_id                     =   $(this).attr('data_id');
+        const data_ruc                    =   $(this).attr('data_ruc');
+        const data_td                     =   $(this).attr('data_td');
+        const data_serie                  =   $(this).attr('data_serie');
+        const data_numero                 =   $(this).attr('data_numero');
+        var idopcion                      =   $('#idopcion').val();
+        const link                        =   '/eliminar-de-cpe-sunat-lg-personal';
+
+        data                              =   {
+                                                    _token                  : _token,
+                                                    data_id                 : data_id,
+                                                    data_ruc                : data_ruc,
+                                                    data_td                 : data_td,
+                                                    data_serie              : data_serie,
+                                                    data_numero             : data_numero,
+                                                    idopcion                : idopcion
+                                              };   
+
+        $.confirm({
+            title: '¿Confirma la Eliminacion?',
+            content: 'Eliminacion del Comprobante',
+            buttons: {
+                confirmar: function () {
+                abrircargando();
+                $.ajax({
+                    type    :   "POST",
+                    url     :   carpeta+link,
+                    data    :   data,
+                    success: function (data) {
+                        cerrarcargando();
+                        location.reload();
+                    },
+                    error: function (data) {
+                        cerrarcargando();
+                        error500(data);
+                    }
+                });
+
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo la Eliminacion');
+                }
+            }
+        });
+
+
+
+
+    });
+
+
+
+
+    $(".liquidaciongasto").on('click','.mdisellq', function() {
+
+        var _token                        =   $('#token').val();
+        const data_id                     =   $(this).attr('data_id');
+        const data_ruc                    =   $(this).attr('data_ruc');
+        const data_td                     =   $(this).attr('data_td');
+        const data_serie                  =   $(this).attr('data_serie');
+        const data_numero                 =   $(this).attr('data_numero');
+        var idopcion                      =   $('#idopcion').val();
+        const link                        =   '/buscar-de-cpe-sunat-lg-personal';
+
+        debugger;
+        data                              =   {
+                                                    _token                  : _token,
+                                                    data_id                 : data_id,
+                                                    data_ruc                : data_ruc,
+                                                    data_td                 : data_td,
+                                                    data_serie              : data_serie,
+                                                    data_numero             : data_numero,
+                                                    idopcion                : idopcion
+                                              };                                       
+        abrircargando();
+        $.ajax({
+            type    :   "POST",
+            url     :   carpeta+link,
+            data    :   data,
+            success: function (data) {
+                cerrarcargando();
+                debugger;
+                $('#modal-detalle-requerimiento').niftyModal('hide');
+                if (data.nombre_xml) {
+                    $('.exml').html(data.nombre_xml);
+                    $('#NOMBREXML').val(data.nombre_xml);
+                    $('#RUTAXML').val(data.ruta_xml);
+                }
+                if (data.nombre_pdf) {
+                    $('.epdf').html(data.nombre_pdf);
+                    $('#NOMBREPDF').val(data.nombre_pdf);
+                    $('#RUTAPDF').val(data.ruta_pdf);
+                }
+                if (data.nombre_cdr) {
+                    $('.ecdr').html(data.nombre_cdr);
+                    $('#NOMBRECDR').val(data.nombre_cdr);
+                    $('#RUTACDR').val(data.ruta_cdr);
+                }
+            },
+            error: function (data) {
+                cerrarcargando();
+                error500(data);
+            }
+        });
+
+    });
+
+
     $(".liquidaciongasto").on('click','.btn_buscar_cpe_lg', function() {
 
         var _token                                   =   $('#token').val();
@@ -214,17 +355,19 @@ $(document).ready(function(){
 
 
 
-
     $(".liquidaciongasto").on('click','.mdisel', function(e) {
 
         var _token                  =   $('#token').val();
         var idopcion                =   $('#idopcion').val();
         const documento_planilla    =   $(this).attr('data_documento_planilla'); // Obtener el id del checkbox
+        var data_iddocumento        =   $('#ID_DOCUMENTO').val();
+
         const link                  =   '/ajax-select-documento-planilla';
         debugger;
         data                        =   {
                                             _token                  : _token,
-                                            documento_planilla      : documento_planilla
+                                            documento_planilla      : documento_planilla,
+                                            data_iddocumento        : data_iddocumento
                                         };
         abrircargando();
         $.ajax({
@@ -261,6 +404,7 @@ $(document).ready(function(){
                 $('#cod_planila').val(data.COD_PLANILLA);
                 $('#rutacompleta').val(data.rutacompleta);
                 $('#nombrearchivo').val(data.nombrearchivo);
+                $('#glosadet').val(data.glosa);
 
             },
             error: function (data) {
@@ -316,6 +460,52 @@ $(document).ready(function(){
 
 
 
+    $('.btnobservarcomporbatnte').on('click', function(event){
+        event.preventDefault();
+
+        var array_item     =   dataobservacion();
+        const filas = document.querySelectorAll('.tablaobservacion tbody tr');
+        // El número de filas:
+        const cantidad = filas.length;
+        debugger;
+        if(array_item.length<=0){alerterrorajax('Seleccione por lo menos una fila'); return false;}
+        if(array_item.length==cantidad){alerterrorajax('No se puede observar todas las filas en ese caso deberia extornarlo'); return false;}
+        datastring = JSON.stringify(array_item);
+        $('#data_observacion').val(datastring);
+        $.confirm({
+            title: '¿Confirma la Observacion?',
+            content: 'Observacion el Comprobante',
+            buttons: {
+                confirmar: function () {
+                    $( "#formpedidoobservar" ).submit();
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo la Observacion');
+                }
+            }
+        });
+
+    });
+
+    function dataobservacion(){
+        var data = [];
+        $(".tablaobservacion tbody tr").each(function(){
+            nombre               = $(this).find('.input_asignar').attr('id');
+            if(nombre != 'todo_asignar'){
+                check            = $(this).find('.input_asignar');
+                data_id          = $(this).attr('data_id');
+                data_item        = $(this).attr('data_item')
+                if($(check).is(':checked')){
+                    data.push({
+                        data_id         : data_id,
+                        data_item       : data_item
+                    });
+                }                 
+            }
+        });
+        return data;
+    }
+
 
 
     $('.btnaprobarcomporbatnte').on('click', function(event){
@@ -354,8 +544,33 @@ $(document).ready(function(){
     });
 
 
+    $(".liquidaciongasto").on('change','#arendir_id', function(e) {
+        var arendir_id      =   $('#arendir_id').val();
+        if(arendir_id == 'SI'){
+            $('.sectorarendir').show();
+
+        }else{
+            $('.sectorarendir').hide();
+        }
+    });
+
+    $(".liquidaciongasto").on('change','#arendir_sel_id', function(e) {
+
+        var arendir_sel_id          =   $('#arendir_sel_id').val();
+        var idopcion                =   $('#idopcion').val();
+        var _token                  =   $('#token').val();
+        var link                    =   "/ajax-combo-autoriza";
+        var contenedor              =   "ajax_combo_autoriza";
+        data                        =   {
+                                            _token                  : _token,
+                                            arendir_sel_id          : arendir_sel_id,
+                                            idopcion                : idopcion
+                                        };
+        ajax_normal_combo(data,link,contenedor);
 
 
+
+    });
 
 
     $(".liquidaciongasto").on('change','#tipodoc_id', function(e) {
@@ -577,6 +792,12 @@ $(document).ready(function(){
         var RUTAXML                 =   $('#RUTAXML').val();
         var RUTAPDF                 =   $('#RUTAPDF').val();
         var RUTACDR                 =   $('#RUTACDR').val();
+
+        var cuenta_id               =   $('#cuenta_id').val();
+        var subcuenta_id            =   $('#subcuenta_id').val();
+
+        if(cuenta_id ==''){ alerterrorajax("Seleccione una Cuenta."); return false;}
+        if(subcuenta_id ==''){ alerterrorajax("Seleccione una Sub Cuenta"); return false;}
 
 
         var array_detalle_producto  =   $('#array_detalle_producto').val();

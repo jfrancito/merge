@@ -47,14 +47,20 @@ use Stdclass;
 use App\Traits\UserTraits;
 use App\Traits\GeneralesTraits;
 use App\Traits\ComprobanteTraits;
-
+use App\Traits\LiquidacionGastoTraits;
 
 class CpeController extends Controller {
 
     use UserTraits;
     use GeneralesTraits;
     use ComprobanteTraits;
+    use LiquidacionGastoTraits;
 
+
+    public function descargarArchivoSunatLG()
+    {
+        $this->lg_descargar_archivo_sunat_lg();
+    }
 
 
     public function actionGestionSireCompra($idopcion)

@@ -148,33 +148,41 @@
                     value="{{$planillamovilidad->TOTAL}}"                         
                     placeholder="TOTAL"
                     readonly = "readonly"
-                    autocomplete="off" class="form-control input-sm" style="font-size: 22px; font-weight: bold;" />
+                    autocomplete="off" class="form-control input-sm" style="font-size: 22px; font-weight: bold;text-align: right;" />
 
         </div>
       </div>
     </div>
     @endif
 
-    @if(isset($planillamovilidad))
-    <div class="ol-xs-12 col-sm-4 col-md-3 col-lg-3">
-                <div class="form-group">
-                  <label class="col-sm-12 control-label labelleft negrita" >TIPO DE SOLICITUD <span class="obligatorio">(*)</span> :</label>
-                  <div class="col-sm-12">
-                      {!! Form::select( 'tipo_solicitud', $combots, array(),
-                                      [
-                                        'class'       => 'select2 form-control control input-xs' ,
-                                        'id'          => 'tipo_solicitud',        
-                                        'required'    => ''
-                                      ]) !!}
-                  </div>
-                </div>
-    </div>
+  </div>
 
+
+  <div class="row" style="margin-top: 15px;">
+    @if(isset($planillamovilidad))
+      <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
+        <div class="form-group">
+          <label class="col-sm-12 control-label labelleft negrita">GLOSA :</label>
+            <div class="col-sm-12">
+                <textarea 
+                name="glosa"
+                id = "glosa"
+                required = ""
+                class="form-control input-sm validarmayusculas"
+                rows="2">{{$planillamovilidad->TXT_GLOSA}}</textarea>
+            </div>
+        </div>
+      </div>
+    
     @endif
 
 
 
   </div>
+
+
+
+
 </div>
 
 

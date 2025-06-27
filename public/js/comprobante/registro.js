@@ -307,6 +307,34 @@ $(document).ready(function(){
     });
 
 
+    $(".registrocomprobante").on('click','.btn-guardar-xml-comision', function(e) {
+
+        event.preventDefault();
+        var _token                  =   $('#token').val();
+        var te                      =   $('#te').val();
+        if(te =='0'){ alerterrorajax("Hay errores en la validacion del XML."); return false;}
+        $.confirm({
+            title: '¿Confirmar la validación?',
+            content: 'Merge de Comprobante',
+            buttons: {
+                confirmar: function () {
+                    abrircargando();
+                    $( "#formguardardatos" ).submit();
+
+                    setTimeout(function() {
+                       cerrarcargando();
+                    }, 8000);
+ 
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo la validación');
+                }
+            }
+        });
+
+
+    });
+
     $(".registrocomprobante").on('click','.btn-guardar-xml-estiba', function(e) {
 
         event.preventDefault();

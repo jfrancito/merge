@@ -68,6 +68,20 @@ return [
         ],
         
 
+        'pgsqla' => [
+            'driver' => 'pgsql',
+            'host' => 'ec2-54-81-26-49.compute-1.amazonaws.com',
+            'port' => '5432',
+            'database' => 'postgres',
+            'username' => 'postgres',
+            'password' => 'sa',
+            'charset' => 'utf8',
+            'prefix' => '',
+            'schema' => 'public',
+            'sslmode' => 'prefer',
+        ],
+
+
 
 
         'sqlsrv' => [
