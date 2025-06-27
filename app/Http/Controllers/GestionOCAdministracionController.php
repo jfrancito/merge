@@ -2266,14 +2266,14 @@ class GestionOCAdministracionController extends Controller
                                         'IND_NOTIFICACION_CLIENTE'=>1
                                     ]);
 
-                if($documento_top->COD_CENTRO == 'CEN0000000000004' && $fedocumento->usuario_pa =='1CIX00000187'){
+                if($documento_top->COD_CENTRO == 'CEN0000000000004'){
+
                     $iddocumento_sel = $fedocumento->ID_DOCUMENTO;
                     DB::connection($conexionbd)->statement("
                         UPDATE FE_DOCUMENTO 
                         SET COD_CONTACTO = 'ITTR000000000212'
                         WHERE usuario_pa = '1CIX00000187' 
                           AND RUC_PROVEEDOR IN ('20600004027','20602740278') 
-                          AND ID_DOCUMENTO = ?
                           AND COD_ESTADO = 'ETM0000000000005' 
                           AND ID_DOCUMENTO NOT IN (
                               SELECT FE_DOCUMENTO.ID_DOCUMENTO 
@@ -2288,10 +2288,12 @@ class GestionOCAdministracionController extends Controller
                               WHERE usuario_pa = '1CIX00000187' 
                                 AND RUC_PROVEEDOR IN ('20600004027','20602740278')
                                 AND FE_DOCUMENTO.COD_ESTADO = 'ETM0000000000005'
-                                AND FE_REF_ASOC.LOTE = ?
                               GROUP BY FE_DOCUMENTO.ID_DOCUMENTO, CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE
                           )
-                    ", [$iddocumento_sel, $iddocumento_sel]);
+                    ");
+
+
+
                 }
 
                 //enviar tablas de fe_documento y fe_detalledocuemto

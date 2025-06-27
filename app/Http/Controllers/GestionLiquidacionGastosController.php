@@ -1034,34 +1034,41 @@ class GestionLiquidacionGastosController extends Controller
             }
 
             $DETALLES = [];
+            $ind_igv = 'NO';
+            $igv = 0;
+            $venta = 0;
+
             foreach ($factura->getdetails() as $indexdet => $itemdet) {
                 $producto = str_replace("<![CDATA[","",$itemdet->getdescripcion());
                 $producto = str_replace("]]>","",$producto);
                 $producto = preg_replace('/[^A-Za-z0-9\s]/', '', $producto);
                 $linea = str_pad($indexdet + 1, 3, "0", STR_PAD_LEFT);
-                $ind_igv = 'NO';
                 if((float) $itemdet->getigv()>0){
                     $ind_igv = 'SI';
                 }
+                $igv = $igv + (float) $itemdet->getigv();
+                $venta = $venta + (float) $itemdet->getmtoValorVenta();
 
-
-                $DETALLES[] = [
-                    'LINEID'             => $linea,
-                    'CODPROD'            => $itemdet->getcodProducto(),
-                    'PRODUCTO'           => $producto,
-                    'UND_PROD'           => $itemdet->getunidad(),
-                    'CANTIDAD'           => (float) $itemdet->getcantidad(),
-                    'PRECIO_UNIT'        => (float) $itemdet->getmtoValorUnitario(),
-                    'VAL_IGV_ORIG'       => $ind_igv,
-                    'VAL_IGV_SOL'        => (float) $itemdet->getigv(),
-                    'VAL_SUBTOTAL_ORIG'  => (float) $itemdet->getmtoValorVenta(),
-                    'VAL_SUBTOTAL_SOL'   => (float) $itemdet->getmtoValorVenta(),
-                    'VAL_VENTA_ORIG'     => (float) $itemdet->getigv() + (float) $itemdet->getmtoValorVenta(),
-                    'VAL_VENTA_SOL'      => (float) $itemdet->getigv() + (float) $itemdet->getmtoValorVenta(),
-                    'PRECIO_ORIG'        => (float) $itemdet->getmtoPrecioUnitario(),
-                ];
             }
 
+
+            $linea = str_pad(1, 3, "0", STR_PAD_LEFT);
+
+            $DETALLES[] = [
+                'LINEID'             => $linea,
+                'CODPROD'            => '0000001',
+                'PRODUCTO'           => 'SERVICIO DE FACTURA',
+                'UND_PROD'           => 'UND',
+                'CANTIDAD'           => 1,
+                'PRECIO_UNIT'        => 1,
+                'VAL_IGV_ORIG'       => $ind_igv,
+                'VAL_IGV_SOL'        => $igv,
+                'VAL_SUBTOTAL_ORIG'  => $venta,
+                'VAL_SUBTOTAL_SOL'   => $venta,
+                'VAL_VENTA_ORIG'     => $igv + $venta,
+                'VAL_VENTA_SOL'      => $igv + $venta,
+                'PRECIO_ORIG'        => $igv + $venta
+            ];
 
             // Ejemplo: devolver una parte del XML
             return response()->json([
@@ -2525,6 +2532,8 @@ class GestionLiquidacionGastosController extends Controller
         $liquidaciongastos          =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
         $tdetliquidaciongastos      =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
 
+
+
         if($_POST)
         {
             try{    
@@ -3447,13 +3456,11 @@ class GestionLiquidacionGastosController extends Controller
                     $area_id                    =   "";
                     $area_txt                   =   "";
 
+                    //hola
                     if(count($centrocosto)>0){
                         $area_id                    =   $centrocosto->COD_CENTRO_COSTO;
                         $area_txt                   =   $centrocosto->TXT_NOMBRE;
                     }
-
-
-
 
                     //dd($periodo);
                     $cabecera                           =   new LqgLiquidacionGasto;
