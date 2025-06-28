@@ -1370,7 +1370,7 @@ trait LiquidacionGastoTraits
 
 
     private function lg_combo_tipodocumento($titulo) {
-        $array      =       STDTipoDocumento::whereIn('COD_TIPO_DOCUMENTO',['TDO0000000000001','TDO0000000000003','TDO0000000000010','TDO0000000000070','TDO0000000000002','TDO0000000000030','TDO0000000000106'])
+        $array      =       STDTipoDocumento::whereIn('COD_TIPO_DOCUMENTO',['TDO0000000000001','TDO0000000000003','TDO0000000000010','TDO0000000000070','TDO0000000000106'])
                             ->pluck('TXT_TIPO_DOCUMENTO','COD_TIPO_DOCUMENTO')
                             ->toArray();
         $combo      =       array('' => $titulo) + $array;

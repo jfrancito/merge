@@ -13,8 +13,8 @@
     <div class="row">
       <div class="col-md-12">
         <div class="panel panel-default panel-border-color panel-border-color-primary">
-          <div class="panel-heading panel-heading-divider">LIQUIDACION DE GASTO
-            <span class="panel-subtitle">Crear una nueva liquidacion de gastos</span>
+          <div class="panel-heading panel-heading-divider">LIQUIDACION DE GASTO 
+            <span class="panel-subtitle">Crear una nueva liquidacion de gastos ({{$area_planilla}})</span>
           </div>
           <div class="panel-body">
             <form method="POST" action="{{ url('/agregar-liquidacion-gastos/'.$idopcion) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" id ='frmpm'>
