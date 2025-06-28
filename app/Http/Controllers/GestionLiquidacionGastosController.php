@@ -1404,8 +1404,10 @@ class GestionLiquidacionGastosController extends Controller
         $detliquidaciongasto=       LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
         $funcion            =       $this;
         $fecha_fin          =       $this->fecha_sin_hora;
+
         $lpmovilidades      =       DB::table('PLA_MOVILIDAD')
                                     ->where('USUARIO_CREA', Session::get('usuario')->id)
+                                    ->where('ACTIVO','=','1')
                                     ->where('COD_EMPRESA', $detliquidaciongasto->COD_EMPRESA)
                                     ->whereNotIn('ID_DOCUMENTO', function($query) {
                                         $query->select(DB::raw('ISNULL(COD_PLA_MOVILIDAD, \'\')'))
@@ -3187,6 +3189,28 @@ class GestionLiquidacionGastosController extends Controller
     }
 
 
+    public function actionExtornarLiquidacionGastos($idopcion,$iddocumento,Request $request)
+    {
+
+
+        $iddocumento = $this->funciones->decodificarmaestrapre($iddocumento,'LIQG');
+        View::share('titulo','Agregar Detalle Liquidacion de Gastos');
+        $liquidaciongastos          =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
+        $tdetliquidaciongastos      =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=',1)->get();
+        $tdetliquidaciongastosobs   =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=',0)->get();
+
+        if($liquidaciongastos->COD_ESTADO!='ETM0000000000001'){
+            return Redirect::to('gestion-de-liquidacion-gastos/'.$idopcion)->with('errorbd', 'Ya no puede extornar esta LIQUIDACION DE GASTOS');
+        }
+        $liquidaciongastos->ACTIVO = 0;
+        $liquidaciongastos->save();
+        return Redirect::to('gestion-de-liquidacion-gastos/'.$idopcion)->with('bienhecho', 'Se extorno la LIQUIDACION DE GASTOS');
+
+
+
+    }
+
+
 
     public function actionModificarLiquidacionGastos($idopcion,$iddocumento,$valor,Request $request)
     {
@@ -3521,8 +3545,22 @@ class GestionLiquidacionGastosController extends Controller
                                                 ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
                                                 ->where('dni', $dni)
                                                 ->first();
-            //dd($trabajadorespla->cadarea);
 
+            $centrocosto                =   DB::table('CON.CENTRO_COSTO')
+                                            ->where('COD_ESTADO', 1)
+                                            ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
+                                            ->where('TXT_REFERENCIA_PLANILLA', $trabajadorespla->cadarea)
+                                            ->where('IND_MOVIMIENTO', 1)->first();
+            $area_id                    =   "";
+            $area_txt                   =   "";
+            //hola
+            if(count($centrocosto)>0){
+                $area_id                    =   $centrocosto->COD_CENTRO_COSTO;
+                $area_txt                   =   $centrocosto->TXT_NOMBRE;
+            }
+
+            //dd($area_txt);
+            //dd($trabajadorespla->cadarea);
 
             $anio               =   $this->anio;
             $mes                =   $this->mes;
@@ -3612,6 +3650,8 @@ class GestionLiquidacionGastosController extends Controller
 
                                 'moneda_sel_id'   => $moneda_sel_id,
                                 'combo_moneda_sel'=> $combo_moneda_sel,
+                                'area_id'         => $area_id,
+                                'area_txt'        => $area_txt,
 
                                 'autoriza_id'   => $autoriza_id,
                                 'combo_autoriza'=> $combo_autoriza,

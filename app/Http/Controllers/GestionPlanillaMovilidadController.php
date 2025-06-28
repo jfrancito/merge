@@ -765,6 +765,21 @@ class GestionPlanillaMovilidadController extends Controller
     }
 
 
+    public function actionExtornarPlanillaMovilidad($idopcion,$iddocumento,Request $request)
+    {
+
+        $iddocumento = $this->funciones->decodificarmaestrapre($iddocumento,'PLAM');
+        View::share('titulo','Extonnar Planilla Movilidad');
+        $planillamovilidad = PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first();
+        if($planillamovilidad->COD_ESTADO!='ETM0000000000001'){
+            return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd', 'Ya no puede extornar esta PLANILLA DE MOVILIDAD');
+        }
+        $planillamovilidad->ACTIVO = 0;
+        $planillamovilidad->save();
+        return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('bienhecho', 'Se extorno la PLANILLA DE MOVILIDAD ');
+
+    }
+
     public function actionModificarPlanillaMovilidad($idopcion,$iddocumento,Request $request)
     {
 

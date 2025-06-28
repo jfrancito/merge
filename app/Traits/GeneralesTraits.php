@@ -766,6 +766,8 @@ trait GeneralesTraits
 	}
 
 
+
+
 	public function gn_background_fila_activo($activo)
 	{
 		$background =	'';

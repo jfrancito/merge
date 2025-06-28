@@ -26,6 +26,14 @@
           </span>
           <a href="{{ url('/detalle-comprobante-lg-validado/'.$idopcion.'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -8))) }}" style="margin-top: 5px;float: right;" class="btn btn-rounded btn-space btn-primary btn-sm">SEGUIMIENTO</a>
           <a href="{{ url('/modificar-liquidacion-gastos/'.$idopcion.'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -8)).'/0') }}" style="margin-top: 5px;float: right;" class="btn btn-rounded btn-space btn-success btn-sm">MODIFICAR</a>
+        
+          @if($item->COD_ESTADO == 'ETM0000000000001')
+            <form method="POST" id='forextornar' action="{{ url('/extonar-liquidacion-gastos/'.$idopcion.'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
+                  {{ csrf_field() }}
+                  <button type= 'button' style="margin-top: 5px;float: right;" class="btn btn-rounded btn-space btn-danger btn-sm btn-extonar-lg">EXTORNAR</button>
+            </form>
+          @endif
+
         </td>
       </tr>                    
     @endforeach
