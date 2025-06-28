@@ -3562,6 +3562,8 @@ class GestionLiquidacionGastosController extends Controller
             //dd($area_txt);
             //dd($trabajadorespla->cadarea);
 
+            $area_planilla      =   $trabajadorespla->cadarea;
+
             $anio               =   $this->anio;
             $mes                =   $this->mes;
             $trabajador         =   DB::table('STD.TRABAJADOR')
@@ -3652,6 +3654,8 @@ class GestionLiquidacionGastosController extends Controller
                                 'combo_moneda_sel'=> $combo_moneda_sel,
                                 'area_id'         => $area_id,
                                 'area_txt'        => $area_txt,
+                                'area_planilla'   => $area_planilla,
+
 
                                 'autoriza_id'   => $autoriza_id,
                                 'combo_autoriza'=> $combo_autoriza,
