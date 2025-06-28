@@ -66,6 +66,8 @@
 
           var initialPreview = {!! $initialPreview !!};
           var initialPreviewConfig = {!! $initialPreviewConfig !!};
+
+          
           $("#input-24").fileinput({
               initialPreview: initialPreview,
               initialPreviewAsData: true,

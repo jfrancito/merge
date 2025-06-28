@@ -655,6 +655,8 @@ class GestionLiquidacionGastosController extends Controller
         foreach ($archivospdf as $archivo) {
             $initialPreview[] = route('serve-filelg', ['file' => $archivo->NOMBRE_ARCHIVO]);
         }
+
+        //dd($initialPreview);
         $initialPreviewConfig = [];
 
         foreach ($archivospdf as $key => $archivo) {
