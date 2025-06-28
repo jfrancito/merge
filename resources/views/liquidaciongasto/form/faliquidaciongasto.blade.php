@@ -113,6 +113,22 @@
       @include('liquidaciongasto.ajax.comboautoriza')
     </div>
 
+    <div class="ol-xs-12 col-sm-4 col-md-3 col-lg-3">
+      <div class="form-group">
+        <label class="col-sm-12 control-label labelleft negrita">AREA <span class="obligatorio">(*)</span>:</label>
+        <div class="col-sm-12">
+            <input  type="text"
+                    id="area_txt" name='area_txt' 
+                    value="{{$area_txt}}"                         
+                    placeholder="AREA"
+                    readonly = "readonly"
+                    required = ""
+                    autocomplete="off" class="form-control input-sm" data-aw="4"/>
+        </div>
+      </div>
+    </div>
+
+
     <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
       <div class="form-group">
         <label class="col-sm-12 control-label labelleft negrita">GLOSA :</label>
