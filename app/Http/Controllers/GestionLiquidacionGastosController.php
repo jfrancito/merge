@@ -3278,7 +3278,8 @@ class GestionLiquidacionGastosController extends Controller
             $centrocosto                =   DB::table('CON.CENTRO_COSTO')
                                             ->where('COD_ESTADO', 1)
                                             ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
-                                            ->where('TXT_REFERENCIA_PLANILLA', $trabajadorespla->cadarea)
+                                            ->where('TXT_REFERENCIA_PLANILLA' ,'LIKE', '%'.$trabajadorespla->cadarea.'%')
+                                            //->where('TXT_REFERENCIA_PLANILLA', $trabajadorespla->cadarea)
                                             ->where('IND_MOVIMIENTO', 1)->first();
 
             //dd($trabajadorespla->cadarea);
@@ -3475,7 +3476,8 @@ class GestionLiquidacionGastosController extends Controller
                     $centrocosto                =   DB::table('CON.CENTRO_COSTO')
                                                     ->where('COD_ESTADO', 1)
                                                     ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
-                                                    ->where('TXT_REFERENCIA_PLANILLA', $trabajadorespla->cadarea)
+                                                    //->where('TXT_REFERENCIA_PLANILLA', $trabajadorespla->cadarea)
+                                                    ->where('TXT_REFERENCIA_PLANILLA' ,'LIKE', '%'.$trabajadorespla->cadarea.'%')
                                                     ->where('IND_MOVIMIENTO', 1)->first();
                     $area_id                    =   "";
                     $area_txt                   =   "";
@@ -3549,7 +3551,7 @@ class GestionLiquidacionGastosController extends Controller
             $centrocosto                =   DB::table('CON.CENTRO_COSTO')
                                             ->where('COD_ESTADO', 1)
                                             ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
-                                            ->where('TXT_REFERENCIA_PLANILLA', $trabajadorespla->cadarea)
+                                            ->where('TXT_REFERENCIA_PLANILLA' ,'LIKE', '%'.$trabajadorespla->cadarea.'%')
                                             ->where('IND_MOVIMIENTO', 1)->first();
             $area_id                    =   "";
             $area_txt                   =   "";
