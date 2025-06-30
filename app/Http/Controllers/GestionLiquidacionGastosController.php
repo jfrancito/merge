@@ -1225,7 +1225,8 @@ class GestionLiquidacionGastosController extends Controller
         $getmtoValorVenta = 0;
         $getigv = 0;  
 
-        $otrostributos       =   (float) $factura->mtoOtrosTributos();
+
+        $otrostributos       =   (float) $factura->getmtoOtrosTributos();
 
         foreach ($factura->getdetails() as $indexdet => $itemdet) {
             $producto = str_replace("<![CDATA[","",$itemdet->getdescripcion());
@@ -1271,7 +1272,7 @@ class GestionLiquidacionGastosController extends Controller
             'SERIE' => $factura->getserie(),
             'NUMERO' => $CORRELATIVO,
             'FEC_VENTA' => $factura->getfechaEmision()->format('d-m-Y'),
-            'TOTAL_VENTA_ORIG' => (float) $getigv + (float) $getmtoValorVenta,
+            'TOTAL_VENTA_ORIG' => (float) $getigv + (float) $getmtoValorVenta + $otrostributos,
             'SUCCESS' => $SUCCESS,
             'MESSAGE' => $MESSAGE,
             'ESTADOCP' => $ESTADOCP,
