@@ -3284,7 +3284,7 @@ class GestionLiquidacionGastosController extends Controller
                                             //->where('TXT_REFERENCIA_PLANILLA', $trabajadorespla->cadarea)
                                             ->where('IND_MOVIMIENTO', 1)->first();
 
-            //dd($trabajadorespla->cadarea);
+            //dd($centrocosto);
 
             $costo_id                   =   "";
             if(count($centrocosto)>0){
