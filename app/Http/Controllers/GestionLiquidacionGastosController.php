@@ -207,7 +207,7 @@ class GestionLiquidacionGastosController extends Controller
                     return Redirect::to('gestion-de-empresa-proveedor/'.$idopcion)->with('errorbd','No existe Provincia en el osiris');
                 }
 
-                $distritos   =       CMPCategoria::where('TXT_GRUPO','=','PROVINCIA')->where('NOM_CATEGORIA','=',$distrito)->first();
+                $distritos   =       CMPCategoria::where('TXT_GRUPO','=','DISTRITO')->where('NOM_CATEGORIA','=',$distrito)->first();
                 if(count($distritos)<=0){
                     return Redirect::to('gestion-de-empresa-proveedor/'.$idopcion)->with('errorbd','No existe Distrito en el osiris');
                 }
@@ -2572,6 +2572,15 @@ class GestionLiquidacionGastosController extends Controller
                     $NOMBREFILE                         =   '';
                     $array_detalle_producto             =   '';
 
+                    if(Session::get('empresas')->COD_EMPR == 'IACHEM0000010394'){
+                        $flujo_txt_id                           =   'IICHFC0000000018';
+                        $gasto_txt_id                           =   'IICH000000026203';
+                        $item_txt_id                            =   'IICHIM0000000106';
+                    }else{
+                        $flujo_txt_id                           =   'ISCHFC0000000018';
+                        $gasto_txt_id                           =   'ISCH000000034709';
+                        $item_txt_id                            =   'ISCHIM0000000038';
+                    }
 
                     $empresa_id_b                       =   $request['empresa_id'].$request['EMPRESAID'];
                     $cadena                             =   $empresa_id_b;
@@ -2663,9 +2672,9 @@ class GestionLiquidacionGastosController extends Controller
                         $empresa_id                         =   $request['empresa_id'];
 
 
-                        $flujo_id                           =   'IICHFC0000000018';
-                        $gasto_id                           =   'IICH000000026203';
-                        $item_id                            =   'IICHIM0000000106';
+                        $flujo_id                           =   $flujo_txt_id;
+                        $gasto_id                           =   $gasto_txt_id;
+                        $item_id                            =   $item_txt_id;
 
 
                         $costo_id                           =   $request['costo_id'];
@@ -2684,9 +2693,9 @@ class GestionLiquidacionGastosController extends Controller
                             $fecha_emision                      =   $request['fecha_emision'];
                             $empresa_id                         =   $request['EMPRESAID'];
 
-                            $flujo_id                           =   'IICHFC0000000018';
-                            $gasto_id                           =   'IICH000000026203';
-                            $item_id                            =   'IICHIM0000000106';
+                            $flujo_id                           =   $flujo_txt_id;
+                            $gasto_id                           =   $gasto_txt_id;
+                            $item_id                            =   $item_txt_id;
 
 
                             $costo_id                           =   $request['costo_id'];
@@ -2728,9 +2737,9 @@ class GestionLiquidacionGastosController extends Controller
                             $fecha_emision                      =   $request['fecha_emision'];
                             $empresa_id                         =   $request['empresa_id'];
 
-                            $flujo_id                           =   'IICHFC0000000018';
-                            $gasto_id                           =   'IICH000000026203';
-                            $item_id                            =   'IICHIM0000000106';
+                            $flujo_id                           =   $flujo_txt_id;
+                            $gasto_id                           =   $gasto_txt_id;
+                            $item_id                            =   $item_txt_id;
 
                             $costo_id                           =   $request['costo_id'];
                             $cuenta_id                          =   $request['cuenta_id'];
