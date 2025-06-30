@@ -13,7 +13,7 @@ trait TransferirDataTraits
 	private function tdventasatendidas() {
 
 		set_time_limit(0);
-		DB::connection('pgsql')->table('ventas')->delete();
+		DB::connection('pgsqla')->table('ventas')->delete();
 	    // 1. Obtener datos desde SQL Server
 	    $datos = DB::table('viewVentaSalidas2024 as vvs')
 	        ->leftJoin(DB::raw("(SELECT ALM.PRODUCTO.*, STD.EMPRESA.NOM_EMPR FROM ALM.PRODUCTO
@@ -38,7 +38,7 @@ trait TransferirDataTraits
 	    		$empresa = 'INDUAMERICA COMERCIAL SOCIEDAD ANONIMA CERRADA';
 	    	}
 
-	        DB::connection('pgsql')->table('ventas')->insert([
+	        DB::connection('pgsqla')->table('ventas')->insert([
 	            'empresa' => $empresa,
 	            'centro' => $dato->Centro,
 	            'fecha'  => $dato->Fecha,
@@ -116,7 +116,7 @@ trait TransferirDataTraits
 
 
         $FeToken = FeToken::get();
-        $results = DB::connection('pgsql')->select('SELECT * FROM ventas');
+        $results = DB::connection('pgsqla')->select('SELECT * FROM ventas');
         dd($results);
         dd($FeToken);
 

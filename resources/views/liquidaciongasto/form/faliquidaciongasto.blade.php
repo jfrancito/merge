@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 ajax_combo_cuenta">
         <div class="form-group">
-          <label class="col-sm-12 control-label labelleft" style="text-align: left;">EMPRESA :</label>
+          <label class="col-sm-12 control-label labelleft" style="text-align: left;">EMPRESA <span class="obligatorio">(*)</span>:</label>
           <div class="col-sm-12 abajocaja" >
             {!! Form::select( 'empresa_id', $combo_empresa, array($empresa_id),
                               [
@@ -24,7 +24,7 @@
 
     <div class="ol-xs-12 col-sm-4 col-md-3 col-lg-3">
       <div class="form-group">
-        <label class="col-sm-12 control-label labelleft negrita">FECHA CREACION :</label>
+        <label class="col-sm-12 control-label labelleft negrita">FECHA CREACION <span class="obligatorio">(*)</span>:</label>
         <div class="col-sm-12">
             <input  type="text"
                     id="fecha_creacion" name='fecha_creacion' 
@@ -46,7 +46,7 @@
 
     <div class="ol-xs-12 col-sm-4 col-md-3 col-lg-3">
       <div class="form-group">
-        <label class="col-sm-12 control-label labelleft negrita">CENTRO :</label>
+        <label class="col-sm-12 control-label labelleft negrita">CENTRO <span class="obligatorio">(*)</span>:</label>
         <div class="col-sm-12">
             <input  type="text"
                     id="centro_txt" name='centro_txt' 
@@ -63,7 +63,7 @@
 
     <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 ajax_combo_cuenta">
         <div class="form-group">
-          <label class="col-sm-12 control-label labelleft" style="text-align: left;">¿TIENE A RENDIR? :</label>
+          <label class="col-sm-12 control-label labelleft" style="text-align: left;">¿TIENE A RENDIR?  <span class="obligatorio">(*)</span>:</label>
           <div class="col-sm-12 abajocaja" >
             {!! Form::select( 'arendir_id', $combo_arendir, array($arendir_id),
                               [
@@ -76,6 +76,57 @@
         </div>
     </div>
 
+    <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 cajaautoriza sectorarendir ocultar">
+                <div class="form-group">
+                  <label class="col-sm-12 control-label labelleft negrita" >ARENDIR <span class="obligatorio">(*)</span> :</label>
+                  <div class="col-sm-12">
+                      {!! Form::select( 'arendir_sel_id', $combo_arendir_sel, array($arendir_sel_id),
+                                      [
+                                        'class'       => 'select2 form-control control input-xs' ,
+                                        'id'          => 'arendir_sel_id',    
+                                      ]) !!}
+                  </div>
+                </div>
+    </div>
+
+    <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
+                <div class="form-group">
+                  <label class="col-sm-12 control-label labelleft negrita" >MONEDA <span class="obligatorio">(*)</span> :</label>
+                  <div class="col-sm-12">
+                      {!! Form::select( 'moneda_sel_id', $combo_moneda_sel, array($moneda_sel_id),
+                                      [
+                                        'class'       => 'select2 form-control control input-xs' ,
+                                        'id'          => 'moneda_sel_id',
+                                        'required'    => '',    
+                                      ]) !!}
+                  </div>
+                </div>
+    </div>
+
+
+
+</div>
+
+<div class="row">
+
+    <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 cajaautoriza ajax_combo_autoriza">
+      @include('liquidaciongasto.ajax.comboautoriza')
+    </div>
+
+    <div class="ol-xs-12 col-sm-4 col-md-3 col-lg-3">
+      <div class="form-group">
+        <label class="col-sm-12 control-label labelleft negrita">AREA <span class="obligatorio">(*)</span>:</label>
+        <div class="col-sm-12">
+            <input  type="text"
+                    id="area_txt" name='area_txt' 
+                    value="{{$area_txt}}"                         
+                    placeholder="AREA"
+                    readonly = "readonly"
+                    required = ""
+                    autocomplete="off" class="form-control input-sm" data-aw="4"/>
+        </div>
+      </div>
+    </div>
 
 
     <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
@@ -92,8 +143,4 @@
     </div>
   </div>
 
-
 </div>
-
-
-

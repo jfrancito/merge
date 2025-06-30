@@ -13,8 +13,8 @@
     <div class="row">
       <div class="col-md-12">
         <div class="panel panel-default panel-border-color panel-border-color-primary">
-          <div class="panel-heading panel-heading-divider">LIQUIDACION DE GASTO
-            <span class="panel-subtitle">Crear una nueva liquidacion de gastos</span>
+          <div class="panel-heading panel-heading-divider">LIQUIDACION DE GASTO 
+            <span class="panel-subtitle">Crear una nueva liquidacion de gastos ({{$area_planilla}})</span>
           </div>
           <div class="panel-body">
             <form method="POST" action="{{ url('/agregar-liquidacion-gastos/'.$idopcion) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" id ='frmpm'>
@@ -51,6 +51,19 @@
     <script src="{{ asset('public/js/general/inputmask/inputmask.date.extensions.js') }}" type="text/javascript"></script> 
     <script src="{{ asset('public/js/general/inputmask/jquery.inputmask.js') }}" type="text/javascript"></script>
 
+
+    <script src="{{ asset('public/lib/datatables/js/jquery.dataTables.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('public/lib/datatables/js/dataTables.bootstrap.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/dataTables.buttons.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/jszipoo.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/pdfmake.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/vfs_fonts.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/buttons.html5.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/buttons.flash.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/buttons.print.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/buttons.colVis.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/buttons.bootstrap.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('public/js/app-tables-datatables.js?v='.$version) }}" type="text/javascript"></script>
     <script src="{{ asset('public/lib/jquery-ui/jquery-ui.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/lib/jquery.nestable/jquery.nestable.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/lib/moment.js/min/moment.min.js') }}" type="text/javascript"></script>
@@ -61,6 +74,9 @@
     <script src="{{ asset('public/lib/parsley/parsley.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/lib/jquery.niftymodals/dist/jquery.niftymodals.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/js/confirm/jquery-confirm.min.js') }}" type="text/javascript"></script>
+
+
+
     <script type="text/javascript">
 
 
@@ -74,17 +90,16 @@
         //initialize the javascript
         App.init();
         App.formElements();
-
-
-        $('form').parsley();
-
-
         $('.importe').inputmask({ 'alias': 'numeric', 
         'groupSeparator': ',', 'autoGroup': true, 'digits': 2, 
         'digitsOptional': false, 
         'prefix': '', 
         'placeholder': '0'});
-        
+        $(".select4").select2({
+            width: '100%'
+        });
+        $('form').parsley();
+
       });
     </script> 
 

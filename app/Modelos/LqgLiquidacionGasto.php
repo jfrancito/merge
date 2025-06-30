@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class LqgLiquidacionGasto extends Model
 {
     protected $table = 'LQG_LIQUIDACION_GASTO';
+    protected $primaryKey = 'ID_DOCUMENTO';
+    
     public $timestamps=false;
     public $incrementing = false;
     public $keyType = 'string';

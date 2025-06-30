@@ -1,3 +1,11 @@
+.importecomision {
+    height: 26px;
+    width: 90px !important;
+    display: block !important;
+    margin: 0 auto;
+}
+
+
 .iconoentregable .mdi{
   font-size: 27px;
   cursor: pointer;

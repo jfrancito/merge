@@ -293,6 +293,8 @@ class GestionDocumentoController extends Controller
                         $documento->SUB_TOTAL_VENTA_SOLES   =   $factura->getmtoOperGravadas();
                         $documento->TOTAL_VENTA_ORIG        =   $factura->getmtoImpVenta();
                         $documento->TOTAL_VENTA_SOLES       =   $factura->getmtoImpVenta();
+                        $documento->TOTAL_VENTA_XML         =   $factura->getmtoImpVenta();
+
                         $documento->HORA_EMISION            =   $factura->gethoraEmision();
                         $documento->IMPUESTO_2              =   $factura->getmtoOtrosTributos();
                         $documento->TIPO_DETRACCION         =   $factura->getdetraccion()->gettipoDet();

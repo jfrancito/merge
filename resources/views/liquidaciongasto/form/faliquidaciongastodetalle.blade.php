@@ -94,13 +94,7 @@
           </div>
         </div>
     </div>
-
-
-
-
-
   </div>
-
   <div class="row" style="margin-top:10px;">
     <div class="ol-xs-12 col-sm-4 col-md-3 col-lg-3">
       <div class="form-group">
@@ -168,7 +162,6 @@
         </div>
       </div>
     </div>
-
   </div>
   <div class="row" style="margin-top:10px;">
 
@@ -206,26 +199,22 @@
           </div>
       </div>
     </div>
-
-
   </div>
-  
-    <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
-        <div class="form-group">
-          <label class="col-sm-12 control-label labelleft negrita" style="text-align: left;">COSTO :</label>
-          <div class="col-sm-12 abajocaja" >
-            {!! Form::select( 'costo_id', $combo_costo, array($costo_id),
-                              [
-                                'class'       => 'select2 form-control control input-sm' ,
-                                'id'          => 'costo_id',
-                                'required'    => '',
-                              ]) !!}
-          </div>
+  <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
+      <div class="form-group">
+        <label class="col-sm-12 control-label labelleft negrita" style="text-align: left;">COSTO :</label>
+        <div class="col-sm-12 abajocaja" >
+          {!! Form::select( 'costo_id', $combo_costo, array($costo_id),
+                            [
+                              'class'       => 'select2 form-control control input-sm' ,
+                              'id'          => 'costo_id',
+                              'required'    => '',
+                            ]) !!}
         </div>
-    </div>
+      </div>
   </div>
-  <div class="row sectorxmlmodal ocultar" style="margin-top:25px;">
-
+</div>
+<div class="row sectorxmlmodal ocultar" style="margin-top:25px;">
   <table id="tdxml" class="table table-striped table-hover" style='width: 100%;'>
     <thead>
       <tr>
@@ -236,82 +225,84 @@
 
     </tbody>
   </table>
-  </div>
-  <div class="row sectorxmlmodal ocultar" style="margin-top:25px;">
-      @foreach($tarchivos as $index => $item) 
-          @php
-              $extension = $item->COD_CTBLE;
-              if ($extension == 'ZIP') {
-                  $extension = 'XML';
-              }
-          @endphp
-          <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 {{$item->COD_CATEGORIA}}">
-            <div class="form-group sectioncargarimagen">
-              <label class="col-sm-12 control-label" style="text-align: left;">
-                <div class="tooltipfr"><b>{{$item->NOM_CATEGORIA}} ({{$extension}})</b>
-                </div>
-              </label>
-                <div class="col-sm-12">
-                    <div class="file-loading">
-                        <input 
-                        id="file-{{$item->COD_CATEGORIA}}" 
-                        name="{{$item->COD_CATEGORIA}}[]" 
-                        class="file-es"  
-                        type="file" 
-                        multiple data-max-file-count="1">
-                    </div>
-                </div>
-            </div>
+</div>
+<div class="row sectorxmlmodal ocultar" style="margin-top:25px;">
+    @foreach($tarchivos as $index => $item) 
+        @php
+            $extension = $item->COD_CTBLE;
+            if ($extension == 'ZIP') {
+                $extension = 'XML';
+            }
+        @endphp
+        <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 {{$item->COD_CATEGORIA}}">
+          <div class="form-group sectioncargarimagen">
+            <label class="col-sm-12 control-label" style="text-align: left;">
+              <div class="tooltipfr"><b>{{$item->NOM_CATEGORIA}} ({{$extension}})</b>
+              </div>
+            </label>
+              <div class="col-sm-12">
+                  <div class="file-loading">
+                      <input 
+                      id="file-{{$item->COD_CATEGORIA}}" 
+                      name="{{$item->COD_CATEGORIA}}[]" 
+                      class="file-es"  
+                      type="file" 
+                      multiple data-max-file-count="1">
+                  </div>
+              </div>
           </div>
-      @endforeach
+        </div>
+    @endforeach
+</div>
+
+@if(count($tdetliquidacionitem)>0) 
+  @if(!in_array($tdetliquidacionitem->COD_TIPODOCUMENTO, ['TDO0000000000070','TDO0000000000001']))
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="text-align: right;margin-top: 13px;margin-bottom: 13px;">
+    <button 
+          type="button" 
+          data-dismiss="modal" 
+          class="btn btn-success btn-agregar-detalle-factura"
+          data_iddocumento="{{$tdetliquidacionitem->ID_DOCUMENTO}}"
+          data_item="{{$tdetliquidacionitem->ITEM}}"
+    >AGREGAR DETALLE</button>
   </div>
-  <br>
-  @if(count($tdetliquidacionitem)>0) 
-    @if(!in_array($tdetliquidacionitem->COD_TIPODOCUMENTO, ['TDO0000000000070','TDO0000000000001']))
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="text-align: right;margin-top: 13px;margin-bottom: 13px;">
-      <button 
-            type="button" 
-            data-dismiss="modal" 
-            class="btn btn-success btn-agregar-detalle-factura"
-            data_iddocumento="{{$tdetliquidacionitem->ID_DOCUMENTO}}"
-            data_item="{{$tdetliquidacionitem->ITEM}}"
-      >AGREGAR DETALLE</button>
-    </div>
-    @endif
-  @else
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="text-align: right;margin-top: 13px;margin-bottom: 13px;">
-      <button type="button" data-dismiss="modal" class="btn btn-success btn-guardar-detalle-factura">GUARDAR PARA AGREGAR DETALLE</button>
-    </div>
   @endif
-  <div class="col-xs-12">
-    <table id="tdpm" class="table table-striped table-striped  nowrap listatabla" style='width: 100%;'>
-      <thead>
-        <tr>
-          <th>DETALLE DEL DOCUMENTO</th> 
-        </tr>
-      </thead>
-      <tbody>
-        @foreach($tdetdocliquidacionitem as $index=>$item)
-          <tr>
-            <td class="cell-detail" style="position: relative;">
-              <span style="display: block;"><b>COD_PRODUCTO : </b> {{$item->COD_PRODUCTO}}</span>
-              <span style="display: block;"><b>PRODUCTO : </b> {{$item->TXT_PRODUCTO}}</span>
-              <span style="display: block;"><b>CANTIDAD : </b> {{$item->CANTIDAD}}</span>
-              <span style="display: block;"><b>PRECIO : </b> {{$item->PRECIO}}</span>
-              <span style="display: block;"><b>IND IGV : </b> @if($item->IND_IGV==1) SI @else NO @endif</span>
-              <span style="display: block;"><b>SUBTOTAL : </b> {{$item->SUBTOTAL}}</span>
-              <span style="display: block;"><b>IGV : </b> {{$item->IGV}}</span>
-              <span style="display: block;"><b>TOTAL : </b> {{$item->TOTAL}}</span>
-              @if(!in_array($tdetliquidacionitem->COD_TIPODOCUMENTO, ['TDO0000000000070','TDO0000000000001']))
-                <button type="button" data_iddocumento = "{{$item->ID_DOCUMENTO}}" data_item = "{{$item->ITEM}}" data_item_documento = "{{$item->ITEMDOCUMENTO}}" style="margin-top: 5px;float: right;" class="btn btn-rounded btn-space btn-success btn-sm modificardetalledocumentolg">MODIFICAR</button>
-              @endif
-            </td>
-          </tr>                    
-        @endforeach
-      </tbody>
-    </table>
+@else
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="text-align: right;margin-top: 13px;margin-bottom: 13px;">
+    <button type="button" data-dismiss="modal" class="btn btn-success btn-guardar-detalle-factura">GUARDAR PARA AGREGAR DETALLE</button>
   </div>
-  @if(count($tdetliquidacionitem)>0)
+@endif
+<div class="col-xs-12">
+  <table id="tdpm" class="table table-striped table-striped  nowrap listatabla" style='width: 100%;'>
+    <thead>
+      <tr>
+        <th>DETALLE DEL DOCUMENTO</th> 
+      </tr>
+    </thead>
+    <tbody>
+      @foreach($tdetdocliquidacionitem as $index=>$item)
+        <tr>
+          <td class="cell-detail" style="position: relative;">
+            <span style="display: block;"><b>COD_PRODUCTO : </b> {{$item->COD_PRODUCTO}}</span>
+            <span style="display: block;"><b>PRODUCTO : </b> {{$item->TXT_PRODUCTO}}</span>
+            <span style="display: block;"><b>CANTIDAD : </b> {{$item->CANTIDAD}}</span>
+            <span style="display: block;"><b>PRECIO : </b> {{$item->PRECIO}}</span>
+            <span style="display: block;"><b>IND IGV : </b> @if($item->IND_IGV==1) SI @else NO @endif</span>
+            <span style="display: block;"><b>SUBTOTAL : </b> {{$item->SUBTOTAL}}</span>
+            <span style="display: block;"><b>IGV : </b> {{$item->IGV}}</span>
+            <span style="display: block;"><b>TOTAL : </b> {{$item->TOTAL}}</span>
+            @if(!in_array($tdetliquidacionitem->COD_TIPODOCUMENTO, ['TDO0000000000070','TDO0000000000001']))
+              <button type="button" data_iddocumento = "{{$item->ID_DOCUMENTO}}" data_item = "{{$item->ITEM}}" data_item_documento = "{{$item->ITEMDOCUMENTO}}" style="margin-top: 5px;float: right;" class="btn btn-rounded btn-space btn-success btn-sm modificardetalledocumentolg">MODIFICAR</button>
+            @endif
+          </td>
+        </tr>                    
+      @endforeach
+    </tbody>
+  </table>
+</div>
+@if(count($tdetliquidacionitem)>0)
+<div class="col-lg-12">
+
   <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
     <div class="panel panel-default panel-contrast">
       <div class="panel-heading" style="background: #1d3a6d;color: #fff;">ARCHIVOS
@@ -351,8 +342,8 @@
       </div>
     </div>
   </div>
-
-  @endif
+</div>
+@endif
 
 
 

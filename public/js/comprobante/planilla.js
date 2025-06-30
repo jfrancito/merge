@@ -143,6 +143,29 @@ $(document).ready(function(){
 
     });
 
+    $(".cfedocumento").on('click','.btn-extonar-pm', function(e) {
+        event.preventDefault();
+        var _token                  =   $('#token').val();
+        $.confirm({
+            title: '¿Confirma el extorno?',
+            content: 'Extorno de Planilla de movilidad',
+            buttons: {
+                confirmar: function () {
+                     $( "#forextornar" ).submit();   
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo el extorno');
+                    window.location.reload();
+                }
+            }
+        });
+    });
+
+
+
+
+
+
     $(".planillamovilidad").on('click','.btnemitirplanillamovilidad', function(e) {
         event.preventDefault();
         var _token                  =   $('#token').val();

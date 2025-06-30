@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Session;
 use View;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
 class ReporteCuentaSaldoController extends Controller
 {
@@ -77,6 +78,8 @@ class ReporteCuentaSaldoController extends Controller
             ]);
     }
 
+
+
     public function actionAjaxListarReporteCuentasSaldoExcel(Request $request)
     {
         set_time_limit(0);
@@ -103,36 +106,64 @@ class ReporteCuentaSaldoController extends Controller
 
         Excel::create($titulo, function ($excel) use ($cuentas, $funcion) {
             $excel->sheet('CxC Terceros', function ($sheet) use ($cuentas, $funcion) {
+                $sheet->setStyle(array(
+                    'font' => array(
+                        'name'      =>  'Calibri',
+                        'size'      =>  9
+                    )
+                ));
                 $sheet->setColumnFormat(array(
-                    'L:M' => '0.0000',
-                    'E' => 'dd/mm/yyyy'
+                    'M:O' => '#,##0.00',
+                    'D' => '#,##0.00',
+                    'E' => NumberFormat::FORMAT_DATE_YYYYMMDD
                 ));
                 $sheet->loadView('reporte/administracion/excel/listacuentascobrarterceros')
                     ->with('funcion', $funcion)
                     ->with('cuentas', $cuentas);
             });
             $excel->sheet('CxC Relacionadas', function ($sheet) use ($cuentas, $funcion) {
+                $sheet->setStyle(array(
+                    'font' => array(
+                        'name'      =>  'Calibri',
+                        'size'      =>  9
+                    )
+                ));
                 $sheet->setColumnFormat(array(
-                    'L:M' => '0.0000',
-                    'E' => 'dd/mm/yyyy'
+                    'M:O' => '#,##0.00',
+                    'D' => '#,##0.00',
+                    'E' => NumberFormat::FORMAT_DATE_YYYYMMDD
                 ));
                 $sheet->loadView('reporte/administracion/excel/listacuentascobrarrelacionadas')
                     ->with('funcion', $funcion)
                     ->with('cuentas', $cuentas);
             });
             $excel->sheet('CxP Terceros', function ($sheet) use ($cuentas, $funcion) {
+                $sheet->setStyle(array(
+                    'font' => array(
+                        'name'      =>  'Calibri',
+                        'size'      =>  9
+                    )
+                ));
                 $sheet->setColumnFormat(array(
-                    'L:M' => '0.0000',
-                    'E' => 'dd/mm/yyyy'
+                    'M:O' => '#,##0.00',
+                    'D' => '#,##0.00',
+                    'E' => NumberFormat::FORMAT_DATE_YYYYMMDD
                 ));
                 $sheet->loadView('reporte/administracion/excel/listacuentaspagarterceros')
                     ->with('funcion', $funcion)
                     ->with('cuentas', $cuentas);
             });
             $excel->sheet('CxP Relacionadas', function ($sheet) use ($cuentas, $funcion) {
+                $sheet->setStyle(array(
+                    'font' => array(
+                        'name'      =>  'Calibri',
+                        'size'      =>  9
+                    )
+                ));
                 $sheet->setColumnFormat(array(
-                    'L:M' => '0.0000',
-                    'E' => 'dd/mm/yyyy'
+                    'M:O' => '#,##0.00',
+                    'D' => '#,##0.00',
+                    'E' => NumberFormat::FORMAT_DATE_YYYYMMDD
                 ));
                 $sheet->loadView('reporte/administracion/excel/listacuentaspagarrelacionadas')
                     ->with('funcion', $funcion)

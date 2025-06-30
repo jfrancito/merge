@@ -207,8 +207,8 @@ class FileController extends Controller
         // Ruta de red del archivo
         $fileName = $request->query('file');
         $newstr = str_replace('"', '', $fileName);
-
-        $archivo                =       Archivo::where('NOMBRE_ARCHIVO','=',$newstr)->first();
+        $prefijocarperta        =       $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
+        $archivo                =       Archivo::where('NOMBRE_ARCHIVO','=',$newstr)->where('URL_ARCHIVO','like','%'.$prefijocarperta.'%')->first();
         $fedocumento            =       LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$archivo->ID_DOCUMENTO)->first();
         //dd($archivo->ID_DOCUMENTO);
 
