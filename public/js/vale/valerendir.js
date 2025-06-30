@@ -782,7 +782,7 @@ $(document).ready(function(){
 
             } else {
                 // Para otras combinaciones
-                tipoImporte = 0;
+               tipoImporte = valor * diffDays;
             }
 
 
