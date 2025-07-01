@@ -785,7 +785,7 @@ $(document).ready(function(){
 
         $.confirm({
             title: '¿Confirma la emision?',
-            content: 'Registro de emision de movilidad',
+            content: 'Registro de emision de liquidacion de gastos',
             buttons: {
                 confirmar: function () {
                      $( "#frmpmemitir" ).submit();   
