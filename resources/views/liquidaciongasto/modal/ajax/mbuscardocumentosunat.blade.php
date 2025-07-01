@@ -88,8 +88,33 @@
 					</div>
 	          </div>
 	          <div id="tareas" class="tab-pane cont">
+	          				<div class="row">
+							    <div class="col-sm-12" style="margin-bottom: 10px;">
+						            <div class="form-group" >
+						              <label class="col-sm-12 control-label">WHATSAPP EJEMPLO : <b>979820173</b></label>
+						              <div class="col-sm-12">
+					          	        <div class="input-group xs-mb-15">
+				                         	<input type="text"
+										       name="whatsapp"
+										       id="whatsapp"
+										       class="form-control"
+										       maxlength="9"
+										       pattern="\d{9}"
+										       value="{{$user->celular_contacto}}" 
+										       title="Ingrese un número de 9 dígitos"
+										       oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+										       >
+				                         	<span class="input-group-btn">
+				                            <button type="button" class="btn btn-primary btn-guardar-whatsapp">GUARDAR</button></span>
+				                        </div>
+						              </div>
+						            </div>
+					          	</div>
+	          				</div>
 
-				<div class="scroll_text scroll_text_heigth_aler" style = "padding: 0px !important;"> 
+
+
+				<div class="scroll_text scroll_text_heigth_aler" style = "padding: 0px !important;"> 					
 					<div class='listajax'>
 	                    @include('liquidaciongasto.ajax.alistatareassunat')
 	                </div>
