@@ -2629,7 +2629,10 @@ class GestionLiquidacionGastosController extends Controller
                     }));
 
                     //$tieneFactura = in_array('FACTURA', $comprobantes);
-                    if($tipodoc_id != 'TDO0000000000001'){
+
+
+
+                    if (!in_array($tipodoc_id, ['TDO0000000000001', 'TDO0000000000010'])) {
                         if($tieneFactura == 1){
                             return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/-1')->with('errorbd','Este proveedor emite FACTURA');
                         }
