@@ -74,7 +74,7 @@ $(document).ready(function(){
         var codmes             =   $('#codmes').val(); 
 
         debugger;
-        if(!(parseInt(cod_mes)===codmes && parseInt(cod_anio)===codanio)){
+        if(!(parseInt(cod_mes)===parseInt(codmes) && parseInt(cod_anio)===parseInt(codanio))){
             alerterrorajax('La fecha de pago no pertenece al periodo de la planilla.'); return false;
         }
 

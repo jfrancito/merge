@@ -609,32 +609,24 @@ class GestionLiquidacionGastosController extends Controller
         $idopcion               =       $request['idopcion'];
         $funcion                =       $this;
 
-        $existen = DB::table('SUNAT_DOCUMENTO')
-            ->select('SERIE', 'NUMERO', 'NRO_DOCUMENTO')
-            ->where('EMPRESA_ID', Session::get('empresas')->COD_EMPR)
-            ->where('MODULO', 'LIQUIDACION_GASTO')
-            ->where('ACTIVO', 1)
-            ->where('USUARIO_ID', Session::get('usuario')->id)
-            ->where('ID_DOCUMENTO', $ID_DOCUMENTO)
-            ->get()
-            ->map(function ($item) {
-                return $item->SERIE . '|' . $item->NUMERO . '|' . $item->NRO_DOCUMENTO;
+        $listasunattareas = DB::table('SUNAT_DOCUMENTO as sd')
+            ->where('sd.EMPRESA_ID', Session::get('empresas')->COD_EMPR)
+            ->where('sd.MODULO', 'LIQUIDACION_GASTO')
+            ->where('sd.ACTIVO', 1)
+            ->where('sd.USUARIO_ID', Session::get('usuario')->id)
+            ->where('sd.ID_DOCUMENTO', $ID_DOCUMENTO)
+            ->whereNotExists(function ($query) use ($ID_DOCUMENTO) {
+                $query->select(DB::raw(1))
+                    ->from('LQG_DETLIQUIDACIONGASTO as lqg')
+                    ->join('STD.EMPRESA as e', 'lqg.COD_EMPRESA_PROVEEDOR', '=', 'e.COD_EMPR')
+                    ->whereRaw('lqg.SERIE = sd.SERIE')
+                    ->whereRaw('CAST(lqg.NUMERO AS INT) = CAST(sd.NUMERO AS INT)')
+                    ->whereRaw('e.NRO_DOCUMENTO = sd.RUC')
+                    ->where('lqg.ID_DOCUMENTO', $ID_DOCUMENTO)
+                    ->where('lqg.ACTIVO', 1)
+                    ->where('lqg.TXT_TIPODOCUMENTO', 'FACTURA');
             })
-            ->toArray();
-
-        $listasunattareas = DB::table('LQG_DETLIQUIDACIONGASTO')
-            ->join('STD.EMPRESA', 'LQG_DETLIQUIDACIONGASTO.COD_EMPRESA_PROVEEDOR', '=', 'STD.EMPRESA.COD_EMPR')
-            ->select('LQG_DETLIQUIDACIONGASTO.SERIE', 'LQG_DETLIQUIDACIONGASTO.NUMERO', 'LQG_DETLIQUIDACIONGASTO.NRO_DOCUMENTO')
-            ->where('LQG_DETLIQUIDACIONGASTO.ID_DOCUMENTO', $ID_DOCUMENTO)
-            ->where('LQG_DETLIQUIDACIONGASTO.ACTIVO', 1)
-            ->where('LQG_DETLIQUIDACIONGASTO.TXT_TIPODOCUMENTO', 'FACTURA')
-            ->get()
-            ->filter(function ($item) use ($existen) {
-                $clave = $item->SERIE . '|' . $item->NUMERO . '|' . $item->NRO_DOCUMENTO;
-                return !in_array($clave, $existen);
-            })
-            ->values(); // para reindexar
-
+            ->get();
 
         $mensaje                =       '';
 
