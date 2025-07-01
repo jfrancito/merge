@@ -542,6 +542,19 @@ class GestionLiquidacionGastosController extends Controller
     }
 
 
+    public function actionGuardarNumeroWhatsapp(Request $request)
+    {
+            $whatsapp                   =   $request['whatsapp'];
+            User::where('id','=',Session::get('usuario')->id)
+                        ->update(
+                            [
+                                'celular_contacto'=>$whatsapp
+                            ]
+                        );
+
+
+    }
+
 
     public function actionBuscarCpeSunatLg(Request $request)
     {
@@ -628,11 +641,15 @@ class GestionLiquidacionGastosController extends Controller
             })
             ->get();
 
+        $user = User::where('id','=',Session::get('usuario')->id)->first();
+
+
         $mensaje                =       '';
 
         return View::make('liquidaciongasto/modal/ajax/mbuscardocumentosunat',
                          [
                             'ID_DOCUMENTO'          =>  $ID_DOCUMENTO,
+                            'user'                  =>  $user,
                             'idopcion'              =>  $idopcion,
                             'listasunattareas'      =>  $listasunattareas,
                             'combotd'               =>  $combotd,

@@ -144,8 +144,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/buscar-de-cpe-sunat-lg', 'GestionLiquidacionGastosController@actionBuscarCpeSunatLg');
 	Route::any('/buscar-de-cpe-sunat-lg-personal', 'GestionLiquidacionGastosController@actionBuscarCpeSunatLgPersonal');
 	Route::any('/eliminar-de-cpe-sunat-lg-personal', 'GestionLiquidacionGastosController@actionElimnarCpeSunatLgPersonal');
-
-
+	Route::any('/guardar-numero-de-whatsapp', 'GestionLiquidacionGastosController@actionGuardarNumeroWhatsapp');
 
 
 	Route::any('/gestion-de-empresa-proveedor/{idopcion}', 'GestionLiquidacionGastosController@actionGestionEmpresaProveedor');
