@@ -69,8 +69,12 @@ $(document).ready(function(){
         ) {
             alerterrorajax('La fecha de pago no puede ser mayor a la fecha actual.'); return false;
         }
+
+        var codanio            =   $('#codanio').val();
+        var codmes             =   $('#codmes').val(); 
+
         debugger;
-        if(!(parseInt(cod_mes)===mes && parseInt(cod_anio)===año)){
+        if(!(parseInt(cod_mes)===codmes && parseInt(cod_anio)===codanio)){
             alerterrorajax('La fecha de pago no pertenece al periodo de la planilla.'); return false;
         }
 

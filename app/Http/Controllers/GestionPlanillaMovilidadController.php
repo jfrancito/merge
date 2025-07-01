@@ -14,8 +14,7 @@ use App\Modelos\STDTrabajador;
 use App\Modelos\CMPCategoria;
 use App\Modelos\PlaDocumentoHistorial;
 use App\Modelos\STDEmpresa;
-
-
+use App\Modelos\CONPeriodo;
 
 
 
@@ -790,6 +789,8 @@ class GestionPlanillaMovilidadController extends Controller
         $iddocumento = $this->funciones->decodificarmaestrapre($iddocumento,'PLAM');
         View::share('titulo','Agregar Detalle Planilla Movilidad');
         $planillamovilidad = PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first();
+        $periodo_pm = CONPeriodo::where('COD_PERIODO','=',$planillamovilidad->COD_PERIODO)->first();
+
 
         if($planillamovilidad->COD_ESTADO!='ETM0000000000001'){
             return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd', 'Ya no puede modificar esta PLANILLA DE MOVILIDAD');
@@ -849,6 +850,7 @@ class GestionPlanillaMovilidadController extends Controller
                             'fecha_creacion' => $fecha_creacion,
                             'planillamovilidad' => $planillamovilidad,
                             'tdetplanillamovilidad' => $tdetplanillamovilidad,
+                            'periodo_pm' => $periodo_pm,
                             'idopcion' => $idopcion
                          ]);
 
