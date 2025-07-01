@@ -2,6 +2,7 @@
     <thead>
         <tr>
             <th>ID</th>
+            <th>Solicita</th>
             <th>Autoriza</th>
             <th>Aprueba</th>
             <th>Motivo</th>
@@ -19,6 +20,7 @@
       
         <tr data_vale_rendir="{{$item['ID']}}">
             <td>{{$item['ID']}}</td>
+            <td>{{$item['USUARIO']}}</td>
             <td>{{$item['USUARIO_AUTORIZA']}}</td>
             <td>{{$item['USUARIO_APRUEBA']}}</td>
             <td>{{$item['TIPO_MOTIVO']}}</td>

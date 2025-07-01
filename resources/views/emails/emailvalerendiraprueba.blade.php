@@ -130,6 +130,16 @@
             </td>
         </tr>
         <tr>
+            <td class="label">Tipo de Pago</td>
+            <td class="value">
+                @if($vale->TIPO_PAGO == 1)
+                    CAJA
+                @else
+                    EFECTIVO
+                @endif
+            </td>
+        </tr>
+        <tr>
             <td class="label">Glosa</td>
             <td class="value">{{ $vale->TXT_GLOSA }}</td>
         </tr>
