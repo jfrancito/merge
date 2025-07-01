@@ -1786,6 +1786,8 @@ class GestionLiquidacionGastosController extends Controller
                             ->groupBy('COD_PRODUCTO', 'TXT_PRODUCTO')
                             ->get();
 
+            //dd($tdetliquidaciongastos);
+
             return View::make('liquidaciongasto/aprobarcontabilidadlg', 
                             [
                                 'liquidaciongastos'     =>  $liquidaciongastos,
@@ -2158,6 +2160,7 @@ class GestionLiquidacionGastosController extends Controller
 
             $liquidaciongastos      =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
             $tdetliquidaciongastos  =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
+
             $detdocumentolg         =   LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
             $documentohistorial     =   LqgDocumentoHistorial::where('ID_DOCUMENTO','=',$iddocumento)->orderby('FECHA','DESC')->get();
             $archivospdf            =   Archivo::where('ID_DOCUMENTO','=',$iddocumento)->where('EXTENSION', 'like', '%'.'pdf'.'%')->get();

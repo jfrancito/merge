@@ -11,6 +11,12 @@
               <th>DOCUMENTO</th>      
               <th>TIPO DOCUMENTO</th>       
               <th>PROVEEDOR</th>
+              
+              <th>RESPUESTA SUNAT</th>
+              <th>ESTADO COMPROBANTE</th>
+              <th>ESTADO RUC</th>
+              <th>ESTADO DOMICILIO</th>
+              <th>RESPUESTA CDR</th>
               <th>TOTAL</th>
             </tr>
           </thead>
@@ -19,41 +25,44 @@
                 <td>{{date_format(date_create($item->FECHA_EMISION), 'd/m/Y')}}</td>
                 <td>{{$item->SERIE}} - {{$item->NUMERO}} </td>
                 <td>{{$item->TXT_TIPODOCUMENTO}}</td>
-                <td>{{$item->TXT_EMPRESA_PROVEEDOR}}</td>                    
+                <td>{{$item->TXT_EMPRESA_PROVEEDOR}}</td>
+                <td>{{$item->MESSAGE}}</td>
+                <td>{{$item->NESTADOCP}}</td>
+                <td>{{$item->NESTADORUC}}</td>
+                <td>{{$item->NCONDDOMIRUC}}</td>
+                <td>{{$item->RESPUESTA_CDR}}</td>
                 <td>{{$item->TOTAL}}</td>
               </tr>
           </tbody>
         </table>
     </div>
   @endforeach
-<table class="table table-condensed table-striped">
-  <thead>
-    <tr>
-      <th>PRODUCTO</th> 
-      <th>PRODUCTO XML</th>     
-      <th>CANTIDAD</th>       
-      <th>PRECIO</th>
-      <th>IGV</th>
-      <th>SU TOTAL</th>
-      <th>TOTAL</th>
-    </tr>
-  </thead>
-  <tbody>
-    @foreach($detdocumentolg as $index => $item)
-                <tr class="dtlg {{$item->ID_DOCUMENTO}}{{$item->ITEM}}  @if($item->ITEM!=1) ocultar @endif">
-                  <td>{{$item->TXT_PRODUCTO}}</td>
-                  <td>{{$item->TXT_PRODUCTO_XML}}</td>                 
-                  <td>{{$item->CANTIDAD}}</td>
-                  <td>{{$item->PRECIO}}</td>
-                  <td>{{$item->IGV}}</td>
-                  <td>{{$item->SUBTOTAL}}</td>
-                  <td>{{$item->TOTAL}}</td>
-                </tr>
-    @endforeach
-  </tbody>
-</table>
-
-    @include('liquidaciongasto.form.liquidaciongasto.verpdfmultiple')
-
+  <table class="table table-condensed table-striped">
+    <thead>
+      <tr>
+        <th>PRODUCTO</th> 
+        <th>PRODUCTO XML</th>     
+        <th>CANTIDAD</th>       
+        <th>PRECIO</th>
+        <th>IGV</th>
+        <th>SU TOTAL</th>
+        <th>TOTAL</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach($detdocumentolg as $index => $item)
+                  <tr class="dtlg {{$item->ID_DOCUMENTO}}{{$item->ITEM}}  @if($item->ITEM!=1) ocultar @endif">
+                    <td>{{$item->TXT_PRODUCTO}}</td>
+                    <td>{{$item->TXT_PRODUCTO_XML}}</td>                 
+                    <td>{{$item->CANTIDAD}}</td>
+                    <td>{{$item->PRECIO}}</td>
+                    <td>{{$item->IGV}}</td>
+                    <td>{{$item->SUBTOTAL}}</td>
+                    <td>{{$item->TOTAL}}</td>
+                  </tr>
+      @endforeach
+    </tbody>
+  </table>
+  @include('liquidaciongasto.form.liquidaciongasto.verpdfmultiple')
   </div>
 </div>

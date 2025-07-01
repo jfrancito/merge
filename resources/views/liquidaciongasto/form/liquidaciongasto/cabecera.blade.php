@@ -43,6 +43,11 @@
             <td><b>AUTORIZA</b></td>
             <td><p class='subtitulomerge'>{{$liquidaciongastos->TXT_USUARIO_AUTORIZA}}</p></td>
           </tr>
+          <tr>
+            <td><b>GLOSA</b></td>
+            <td><p class='subtitulomerge'>{{$liquidaciongastos->TXT_GLOSA}}</p></td>
+          </tr>
+
       </tbody>
     </table>
   </div>
