@@ -153,6 +153,8 @@
         </div>
       </div>
     </div>
+    <input type="hidden" name="codanio" id= 'codanio' value="{{$periodo_pm->COD_ANIO}}">
+    <input type="hidden" name="codmes" id= 'codmes' value="{{$periodo_pm->COD_MES}}">
     @endif
 
   </div>
