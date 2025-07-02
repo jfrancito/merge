@@ -44,10 +44,41 @@
 				  </div>
 				</div>
 			</div>
-
 			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+				<div class="col-sm-12" >
+					<p style="text-align: center;margin-top: 11px;margin-bottom: 11px;background: #5f99f5;color: #fff;"><b>PARTIDA</b></p>
+				</div>
+			</div>
+
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6">
 				<div class="form-group">
-					<label class="col-sm-12 control-label labelleft negrita" >LUGAR DE PARTIDA <span class="obligatorio">(*)</span>: </label>
+				  <label class="col-sm-12 control-label labelleft negrita" >DEPARTAMENTO PARTIDA <span class="obligatorio">(*)</span> :</label>
+				  <div class="col-sm-12">
+				      {!! Form::select( 'departamentopartida_id', $combodepartamento, $departamento_id,
+		                              [
+		                                'class'       => 'select3 form-control control input-xs' ,
+		                                'id'          => 'departamentopartida_id',        
+		                              ]) !!}
+				  </div>
+				</div>
+			</div>
+
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6">
+				<div class="form-group ajax_provincia_partida">
+					@include('general.ajax.comboprovinciapartida')
+				</div>
+			</div>
+
+
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6">
+				<div class="form-group ajax_distrito_partida">
+					@include('general.ajax.combodistritopartida')
+				</div>
+			</div>
+
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6">
+				<div class="form-group">
+					<label class="col-sm-12 control-label labelleft negrita" >DIRECCION PARTIDA<span class="obligatorio">(*)</span>: </label>
 					<div class="col-sm-12">
 							<input  type="text"
 											id="lugarpartida" 
@@ -61,8 +92,39 @@
 			</div>
 
 			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+				<div class="col-sm-12" >
+					<p style="text-align: center;margin-top: 11px;margin-bottom: 11px;background: #5f99f5;color: #fff;"><b>LLEGADA</b></p>
+				</div>
+			</div>
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6">
 				<div class="form-group">
-					<label class="col-sm-12 control-label labelleft negrita" >LUGAR DE LLEGADA <span class="obligatorio">(*)</span>: </label>
+				  <label class="col-sm-12 control-label labelleft negrita" >DEPARTAMENTO LLEGADA <span class="obligatorio">(*)</span> :</label>
+				  <div class="col-sm-12">
+				      {!! Form::select( 'departamentollegada_id', $combodepartamentoll, $departamento_idll,
+		                              [
+		                                'class'       => 'select3 form-control control input-xs' ,
+		                                'id'          => 'departamentollegada_id',        
+		                              ]) !!}
+				  </div>
+				</div>
+			</div>
+
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6">
+				<div class="form-group ajax_provincia_llegada">
+					@include('general.ajax.comboprovinciallegada')
+				</div>
+			</div>
+
+
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6">
+				<div class="form-group ajax_distrito_llegada">
+					@include('general.ajax.combodistritollegada')
+				</div>
+			</div>
+
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6">
+				<div class="form-group">
+					<label class="col-sm-12 control-label labelleft negrita" >DIRECCION DE LLEGADA <span class="obligatorio">(*)</span>: </label>
 					<div class="col-sm-12">
 							<input  type="text"
 											id="lugarllegada" 
@@ -93,22 +155,22 @@
 				</div>
 			</div>	
 
-@if(isset($dplanillamovilidad))
+			@if(isset($dplanillamovilidad))
 
-			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-				<div class="form-group">
-				  <label class="col-sm-12 control-label labelleft negrita" >ACTIVO <span class="obligatorio">(*)</span> :</label>
-				  <div class="col-sm-12">
-				      {!! Form::select( 'activo', $comboestado, $activo,
-		                              [
-		                                'class'       => 'select3 form-control control input-xs' ,
-		                                'id'          => 'activo',        
-		                                'required'    => ''
-		                              ]) !!}
-				  </div>
-				</div>
-			</div>
-@endif
+						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+							<div class="form-group">
+							  <label class="col-sm-12 control-label labelleft negrita" >ACTIVO <span class="obligatorio">(*)</span> :</label>
+							  <div class="col-sm-12">
+							      {!! Form::select( 'activo', $comboestado, $activo,
+					                              [
+					                                'class'       => 'select3 form-control control input-xs' ,
+					                                'id'          => 'activo',        
+					                                'required'    => ''
+					                              ]) !!}
+							  </div>
+							</div>
+						</div>
+			@endif
 
 
 		</div>

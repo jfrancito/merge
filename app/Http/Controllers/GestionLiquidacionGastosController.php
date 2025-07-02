@@ -65,6 +65,10 @@ class GestionLiquidacionGastosController extends Controller
 
 
 
+
+
+
+
     public function actionLiquidacionViajePdf($idopcion, $iddocumento,Request $request)
     {
 
@@ -207,7 +211,7 @@ class GestionLiquidacionGastosController extends Controller
                     return Redirect::to('gestion-de-empresa-proveedor/'.$idopcion)->with('errorbd','No existe Provincia en el osiris');
                 }
 
-                $distritos   =       CMPCategoria::where('TXT_GRUPO','=','PROVINCIA')->where('NOM_CATEGORIA','=',$distrito)->first();
+                $distritos   =       CMPCategoria::where('TXT_GRUPO','=','DISTRITO')->where('NOM_CATEGORIA','=',$distrito)->first();
                 if(count($distritos)<=0){
                     return Redirect::to('gestion-de-empresa-proveedor/'.$idopcion)->with('errorbd','No existe Distrito en el osiris');
                 }
@@ -542,6 +546,19 @@ class GestionLiquidacionGastosController extends Controller
     }
 
 
+    public function actionGuardarNumeroWhatsapp(Request $request)
+    {
+            $whatsapp                   =   $request['whatsapp'];
+            User::where('id','=',Session::get('usuario')->id)
+                        ->update(
+                            [
+                                'celular_contacto'=>$whatsapp
+                            ]
+                        );
+
+
+    }
+
 
     public function actionBuscarCpeSunatLg(Request $request)
     {
@@ -609,19 +626,34 @@ class GestionLiquidacionGastosController extends Controller
         $idopcion               =       $request['idopcion'];
         $funcion                =       $this;
 
-        $listasunattareas       =       DB::table('SUNAT_DOCUMENTO')
-                                        ->where('EMPRESA_ID', Session::get('empresas')->COD_EMPR)
-                                        ->where('ID_DOCUMENTO', $ID_DOCUMENTO)
-                                        ->where('MODULO', 'LIQUIDACION_GASTO')
-                                        ->where('ACTIVO', 1)
-                                        ->where('USUARIO_ID', Session::get('usuario')->id)
-                                        ->get();
+        $listasunattareas = DB::table('SUNAT_DOCUMENTO as sd')
+            ->where('sd.EMPRESA_ID', Session::get('empresas')->COD_EMPR)
+            ->where('sd.MODULO', 'LIQUIDACION_GASTO')
+            ->where('sd.ACTIVO', 1)
+            ->where('sd.USUARIO_ID', Session::get('usuario')->id)
+            ->where('sd.ID_DOCUMENTO', $ID_DOCUMENTO)
+            ->whereNotExists(function ($query) use ($ID_DOCUMENTO) {
+                $query->select(DB::raw(1))
+                    ->from('LQG_DETLIQUIDACIONGASTO as lqg')
+                    ->join('STD.EMPRESA as e', 'lqg.COD_EMPRESA_PROVEEDOR', '=', 'e.COD_EMPR')
+                    ->whereRaw('lqg.SERIE = sd.SERIE')
+                    ->whereRaw('CAST(lqg.NUMERO AS INT) = CAST(sd.NUMERO AS INT)')
+                    ->whereRaw('e.NRO_DOCUMENTO = sd.RUC')
+                    ->where('lqg.ID_DOCUMENTO', $ID_DOCUMENTO)
+                    ->where('lqg.ACTIVO', 1)
+                    ->where('lqg.TXT_TIPODOCUMENTO', 'FACTURA');
+            })
+            ->get();
+
+        $user = User::where('id','=',Session::get('usuario')->id)->first();
+
 
         $mensaje                =       '';
 
         return View::make('liquidaciongasto/modal/ajax/mbuscardocumentosunat',
                          [
                             'ID_DOCUMENTO'          =>  $ID_DOCUMENTO,
+                            'user'                  =>  $user,
                             'idopcion'              =>  $idopcion,
                             'listasunattareas'      =>  $listasunattareas,
                             'combotd'               =>  $combotd,
@@ -969,7 +1001,7 @@ class GestionLiquidacionGastosController extends Controller
                 $COD_EMPRESA            =   $empresa_trab->COD_EMPR;
                 $TXT_EMPRESA            =   $factura->getcompany()->getruc().' - '.$empresa_trab->NOM_EMPR;    
             }
-            $NUMERO                 =   (int)$factura->getcorrelativo()+1;
+            $NUMERO                 =   (int)$factura->getcorrelativo();
             $CORRELATIVO            =   str_pad($NUMERO, '10', "0", STR_PAD_LEFT);
 
 
@@ -1053,6 +1085,9 @@ class GestionLiquidacionGastosController extends Controller
 
             }
 
+            if($venta == 0){
+                $venta = $factura->getmtoImpVenta();
+            }
 
             $linea = str_pad(1, 3, "0", STR_PAD_LEFT);
 
@@ -1221,6 +1256,13 @@ class GestionLiquidacionGastosController extends Controller
         }
 
         $DETALLES = [];
+        $UNIDAD = "";
+        $getmtoValorVenta = 0;
+        $getigv = 0;  
+
+
+        $otrostributos       =   (float) $factura->getmtoOtrosTributos();
+
         foreach ($factura->getdetails() as $indexdet => $itemdet) {
             $producto = str_replace("<![CDATA[","",$itemdet->getdescripcion());
             $producto = str_replace("]]>","",$producto);
@@ -1230,24 +1272,28 @@ class GestionLiquidacionGastosController extends Controller
             if((float) $itemdet->getigv()>0){
                 $ind_igv = 'SI';
             }
+            $UNIDAD = $itemdet->getunidad();
+            $getmtoValorVenta = $getmtoValorVenta + $itemdet->getmtoValorVenta();
+            $getigv = $getigv + $itemdet->getigv();
 
-
-            $DETALLES[] = [
-                'LINEID'             => $linea,
-                'CODPROD'            => $itemdet->getcodProducto(),
-                'PRODUCTO'           => $producto,
-                'UND_PROD'           => $itemdet->getunidad(),
-                'CANTIDAD'           => (float) $itemdet->getcantidad(),
-                'PRECIO_UNIT'        => (float) $itemdet->getmtoValorUnitario(),
-                'VAL_IGV_ORIG'       => $ind_igv,
-                'VAL_IGV_SOL'        => (float) $itemdet->getigv(),
-                'VAL_SUBTOTAL_ORIG'  => (float) $itemdet->getmtoValorVenta(),
-                'VAL_SUBTOTAL_SOL'   => (float) $itemdet->getmtoValorVenta(),
-                'VAL_VENTA_ORIG'     => (float) $itemdet->getigv() + (float) $itemdet->getmtoValorVenta(),
-                'VAL_VENTA_SOL'      => (float) $itemdet->getigv() + (float) $itemdet->getmtoValorVenta(),
-                'PRECIO_ORIG'        => (float) $itemdet->getmtoPrecioUnitario(),
-            ];
         }
+
+        $DETALLES[] = [
+            'LINEID'             => '001',
+            'CODPROD'            => "PRD000000000001",
+            'PRODUCTO'           => "DETALLE DE LA FACTURA",
+            'UND_PROD'           => $UNIDAD,
+            'CANTIDAD'           => 1,
+            'PRECIO_UNIT'        => (float) $getmtoValorVenta,
+            'VAL_IGV_ORIG'       => $ind_igv,
+            'VAL_IGV_SOL'        => (float) $getigv,
+            'VAL_SUBTOTAL_ORIG'  => (float) $getmtoValorVenta,
+            'VAL_SUBTOTAL_SOL'   => (float) $getmtoValorVenta,
+            'VAL_VENTA_ORIG'     => (float) $getigv + (float) $getmtoValorVenta + $otrostributos,
+            'VAL_VENTA_SOL'      => (float) $getigv + (float) $getmtoValorVenta + $otrostributos,
+            'PRECIO_ORIG'        => (float) $getmtoValorVenta
+        ];
+
 
 
         // Ejemplo: devolver una parte del XML
@@ -1261,7 +1307,7 @@ class GestionLiquidacionGastosController extends Controller
             'SERIE' => $factura->getserie(),
             'NUMERO' => $CORRELATIVO,
             'FEC_VENTA' => $factura->getfechaEmision()->format('d-m-Y'),
-            'TOTAL_VENTA_ORIG' => $factura->getmtoImpVenta(),
+            'TOTAL_VENTA_ORIG' => (float) $getigv + (float) $getmtoValorVenta + $otrostributos,
             'SUCCESS' => $SUCCESS,
             'MESSAGE' => $MESSAGE,
             'ESTADOCP' => $ESTADOCP,
@@ -1579,7 +1625,17 @@ class GestionLiquidacionGastosController extends Controller
 
 
             $liquidaciongastos      =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
-            $tdetliquidaciongastos  =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
+            //$tdetliquidaciongastos  =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
+
+            $tdetliquidaciongastos  =   DB::table('LQG_DETLIQUIDACIONGASTO')
+                                        ->join('CMP.CONTRATO', 'LQG_DETLIQUIDACIONGASTO.COD_CUENTA', '=', 'CMP.CONTRATO.COD_CONTRATO')
+                                        ->select('CMP.CONTRATO.TXT_CATEGORIA_MONEDA', 'LQG_DETLIQUIDACIONGASTO.*', 'CMP.CONTRATO.COD_CONTRATO')
+                                        ->where('LQG_DETLIQUIDACIONGASTO.ID_DOCUMENTO', '=', $iddocumento)
+                                        ->where('LQG_DETLIQUIDACIONGASTO.ACTIVO', '=', '1')
+                                        ->get();
+
+
+
             $detdocumentolg         =   LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
             $documentohistorial     =   LqgDocumentoHistorial::where('ID_DOCUMENTO','=',$iddocumento)->orderby('FECHA','DESC')->get();
             $tdetliquidaciongastosel=   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','0')->get();
@@ -1746,6 +1802,8 @@ class GestionLiquidacionGastosController extends Controller
                             ->where('ACTIVO', 1)
                             ->groupBy('COD_PRODUCTO', 'TXT_PRODUCTO')
                             ->get();
+
+            //dd($tdetliquidaciongastos);
 
             return View::make('liquidaciongasto/aprobarcontabilidadlg', 
                             [
@@ -2119,6 +2177,7 @@ class GestionLiquidacionGastosController extends Controller
 
             $liquidaciongastos      =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
             $tdetliquidaciongastos  =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
+
             $detdocumentolg         =   LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
             $documentohistorial     =   LqgDocumentoHistorial::where('ID_DOCUMENTO','=',$iddocumento)->orderby('FECHA','DESC')->get();
             $archivospdf            =   Archivo::where('ID_DOCUMENTO','=',$iddocumento)->where('EXTENSION', 'like', '%'.'pdf'.'%')->get();
@@ -2564,6 +2623,15 @@ class GestionLiquidacionGastosController extends Controller
                     $NOMBREFILE                         =   '';
                     $array_detalle_producto             =   '';
 
+                    if(Session::get('empresas')->COD_EMPR == 'IACHEM0000010394'){
+                        $flujo_txt_id                           =   'IICHFC0000000018';
+                        $gasto_txt_id                           =   'IICH000000026203';
+                        $item_txt_id                            =   'IICHIM0000000106';
+                    }else{
+                        $flujo_txt_id                           =   'ISCHFC0000000018';
+                        $gasto_txt_id                           =   'ISCH000000034709';
+                        $item_txt_id                            =   'ISCHIM0000000038';
+                    }
 
                     $empresa_id_b                       =   $request['empresa_id'].$request['EMPRESAID'];
                     $cadena                             =   $empresa_id_b;
@@ -2598,7 +2666,10 @@ class GestionLiquidacionGastosController extends Controller
                     }));
 
                     //$tieneFactura = in_array('FACTURA', $comprobantes);
-                    if($tipodoc_id != 'TDO0000000000001'){
+
+
+
+                    if (!in_array($tipodoc_id, ['TDO0000000000001', 'TDO0000000000010'])) {
                         if($tieneFactura == 1){
                             return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/-1')->with('errorbd','Este proveedor emite FACTURA');
                         }
@@ -2655,9 +2726,9 @@ class GestionLiquidacionGastosController extends Controller
                         $empresa_id                         =   $request['empresa_id'];
 
 
-                        $flujo_id                           =   'IICHFC0000000018';
-                        $gasto_id                           =   'IICH000000026203';
-                        $item_id                            =   'IICHIM0000000106';
+                        $flujo_id                           =   $flujo_txt_id;
+                        $gasto_id                           =   $gasto_txt_id;
+                        $item_id                            =   $item_txt_id;
 
 
                         $costo_id                           =   $request['costo_id'];
@@ -2676,9 +2747,9 @@ class GestionLiquidacionGastosController extends Controller
                             $fecha_emision                      =   $request['fecha_emision'];
                             $empresa_id                         =   $request['EMPRESAID'];
 
-                            $flujo_id                           =   'IICHFC0000000018';
-                            $gasto_id                           =   'IICH000000026203';
-                            $item_id                            =   'IICHIM0000000106';
+                            $flujo_id                           =   $flujo_txt_id;
+                            $gasto_id                           =   $gasto_txt_id;
+                            $item_id                            =   $item_txt_id;
 
 
                             $costo_id                           =   $request['costo_id'];
@@ -2720,9 +2791,9 @@ class GestionLiquidacionGastosController extends Controller
                             $fecha_emision                      =   $request['fecha_emision'];
                             $empresa_id                         =   $request['empresa_id'];
 
-                            $flujo_id                           =   'IICHFC0000000018';
-                            $gasto_id                           =   'IICH000000026203';
-                            $item_id                            =   'IICHIM0000000106';
+                            $flujo_id                           =   $flujo_txt_id;
+                            $gasto_id                           =   $gasto_txt_id;
+                            $item_id                            =   $item_txt_id;
 
                             $costo_id                           =   $request['costo_id'];
                             $cuenta_id                          =   $request['cuenta_id'];

@@ -748,6 +748,24 @@ trait GeneralesTraits
 	 	return  $combo;					 			
 	}
 
+	private function gn_generacion_combo_categoria_xid($txt_grupo,$titulo,$todo,$id) {
+		
+		$array 						= 	DB::table('CMP.CATEGORIA')
+        								->where('COD_ESTADO','=',1)
+        								->where('TXT_GRUPO','=',$txt_grupo)
+        								->where('COD_CATEGORIA_SUP','=',$id)
+		        						->pluck('NOM_CATEGORIA','COD_CATEGORIA')
+										->toArray();
+
+		if($todo=='TODO'){
+			$combo  				= 	array('' => $titulo , $todo => $todo) + $array;
+		}else{
+			$combo  				= 	array('' => $titulo) + $array;
+		}
+
+	 	return  $combo;					 			
+	}
+
 	private function gn_generacion_combo_categoria($txt_grupo,$titulo,$todo) {
 		
 		$array 						= 	DB::table('CMP.CATEGORIA')
@@ -764,6 +782,7 @@ trait GeneralesTraits
 
 	 	return  $combo;					 			
 	}
+
 
 
 

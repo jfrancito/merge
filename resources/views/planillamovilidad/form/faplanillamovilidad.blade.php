@@ -7,7 +7,7 @@
         <div class="col-sm-12">
             <input  type="text"
                     id="periodo" name='periodo' 
-                    value="{{$periodo->TXT_NOMBRE}}"                         
+                    value="@if(isset($planillamovilidad)) {{$planillamovilidad->TXT_PERIODO}} @else {{$periodo->TXT_NOMBRE}} @endif"                         
                     placeholder="PERIODO"
                     readonly = "readonly"
                     required = ""
@@ -19,15 +19,14 @@
         </div>
       </div>
     </div>
-    <input type="hidden" name="cod_mes" id="cod_mes" value="{{$periodo->COD_MES}}">
-    <input type="hidden" name="cod_anio" id="cod_anio" value="{{$periodo->COD_ANIO}}">
+
     <div class="ol-xs-12 col-sm-4 col-md-3 col-lg-3">
       <div class="form-group">
         <label class="col-sm-12 control-label labelleft negrita">SERIE :</label>
         <div class="col-sm-12">
             <input  type="text"
                     id="serie" name='serie' 
-                    value="{{$serie}}"                         
+                    value="@if(isset($planillamovilidad)) {{$planillamovilidad->SERIE}} @else {{$serie}} @endif"                         
                     placeholder="SERIE"
                     readonly = "readonly"
                     required = ""
@@ -46,7 +45,7 @@
         <div class="col-sm-12">
             <input  type="text"
                     id="numero" name='numero' 
-                    value="{{$numero}}"                         
+                    value="@if(isset($planillamovilidad)){{$planillamovilidad->NUMERO}}@else{{$numero}}@endif"                         
                     placeholder="NUMERO"
                     readonly = "readonly"
                     required = ""
@@ -65,7 +64,7 @@
         <div class="col-sm-12">
             <input  type="text"
                     id="fecha_creacion" name='fecha_creacion' 
-                    value="{{date_format(date_create($fecha_creacion), 'd-m-Y h:i:s')}}"                         
+                    value="@if(isset($planillamovilidad)){{date_format(date_create($planillamovilidad->FECHA_CREA), 'd-m-Y h:i:s')}}@else{{date_format(date_create($fecha_creacion), 'd-m-Y h:i:s')}}@endif"                         
                     placeholder="NUMERO"
                     readonly = "readonly"
                     required = ""
@@ -153,6 +152,12 @@
         </div>
       </div>
     </div>
+    <input type="hidden" name="codanio" id= 'codanio' value="{{$periodo_pm->COD_ANIO}}">
+    <input type="hidden" name="codmes" id= 'codmes' value="{{$periodo_pm->COD_MES}}">
+
+    <input type="hidden" name="cod_mes" id="cod_mes" value="{{$periodo_pm->COD_MES}}">
+    <input type="hidden" name="cod_anio" id="cod_anio" value="{{$periodo_pm->COD_ANIO}}">
+    
     @endif
 
   </div>

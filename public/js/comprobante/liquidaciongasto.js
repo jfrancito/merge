@@ -291,6 +291,41 @@ $(document).ready(function(){
     });
 
 
+    $(".liquidaciongasto").on('click','.btn-guardar-whatsapp', function() {
+
+        var _token                                   =   $('#token').val();
+        var whatsapp                                 =   $('#whatsapp').val();
+        if (!/^\d{9}$/.test(whatsapp)) {
+            alerterrorajax("El número de WhatsApp debe tener exactamente 9 dígitos");
+            return false;
+        }
+        const link                                   =   '/guardar-numero-de-whatsapp';
+
+        data                                         =   {
+                                                                _token                  : _token,
+                                                                whatsapp                : whatsapp
+                                                         };                                       
+        abrircargando();
+        $.ajax({
+            type    :   "POST",
+            url     :   carpeta+link,
+            data    :   data,
+            success: function (data) {
+                cerrarcargando();
+                alertajax('Se registro su whatsapp.');
+
+            },
+            error: function (data) {
+                cerrarcargando();
+                error500(data);
+            }
+        });
+
+    });
+
+
+
+
     $(".liquidaciongasto").on('click','.btn_buscar_cpe_lg', function() {
 
         var _token                                   =   $('#token').val();
@@ -785,7 +820,7 @@ $(document).ready(function(){
 
         $.confirm({
             title: '¿Confirma la emision?',
-            content: 'Registro de emision de movilidad',
+            content: 'Registro de emision de liquidacion de gastos',
             buttons: {
                 confirmar: function () {
                      $( "#frmpmemitir" ).submit();   

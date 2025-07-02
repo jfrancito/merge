@@ -14,6 +14,23 @@
             <td><b>DOCUMENTO</b></td>
             <td><p class='subtitulomerge'>{{$liquidaciongastos->CODIGO}}</p></td>
           </tr>
+
+          <tr>
+            <td><b>TRABAJADOR</b></td>
+            <td><p class='subtitulomerge'>{{$liquidaciongastos->TXT_EMPRESA_TRABAJADOR}}</p></td>
+          </tr>
+
+          <tr>
+            <td><b>MONEDA</b></td>
+            <td><p class='subtitulomerge'>{{$liquidaciongastos->TXT_CATEGORIA_MONEDA}}</p></td>
+          </tr>
+
+          <tr>
+            <td><b>CUENTA</b></td>
+            <td><p class='subtitulomerge'>{{$liquidaciongastos->TXT_CUENTA}}</p></td>
+          </tr>
+
+
           <tr>
             <td><b>TOTAL</b></td>
             <td><p class='subtitulomerge'>{{$liquidaciongastos->TOTAL}}</p></td>
@@ -31,10 +48,7 @@
             <td><p class='subtitulomerge'>{{$liquidaciongastos->TXT_PERIODO}}</p></td>
           </tr>
 
-          <tr>
-            <td><b>TRABAJADOR</b></td>
-            <td><p class='subtitulomerge'>{{$liquidaciongastos->TXT_EMPRESA_TRABAJADOR}}</p></td>
-          </tr>
+
           <tr>
             <td><b>CENTRO</b></td>
             <td><p class='subtitulomerge'>{{$liquidaciongastos->TXT_CENTRO}}</p></td>
@@ -43,6 +57,11 @@
             <td><b>AUTORIZA</b></td>
             <td><p class='subtitulomerge'>{{$liquidaciongastos->TXT_USUARIO_AUTORIZA}}</p></td>
           </tr>
+          <tr>
+            <td><b>GLOSA</b></td>
+            <td><p class='subtitulomerge'>{{$liquidaciongastos->TXT_GLOSA}}</p></td>
+          </tr>
+
       </tbody>
     </table>
   </div>

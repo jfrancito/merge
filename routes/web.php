@@ -137,6 +137,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/agregar-extorno-contabilidad-lg/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionAgregarExtornoContabilidadLG');
 
 
+
+
+
 	Route::any('/gestion-de-liquidacion-gastos-adm/{idopcion}', 'GestionLiquidacionGastosController@actionListarLGValidado');
 	Route::any('/ajax-buscar-documento-lg', 'GestionLiquidacionGastosController@actionListarAjaxBuscarDocumentoLG');
 	Route::any('/detalle-comprobante-lg-validado/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionDetallaComprobanteLGValidado');
@@ -144,8 +147,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/buscar-de-cpe-sunat-lg', 'GestionLiquidacionGastosController@actionBuscarCpeSunatLg');
 	Route::any('/buscar-de-cpe-sunat-lg-personal', 'GestionLiquidacionGastosController@actionBuscarCpeSunatLgPersonal');
 	Route::any('/eliminar-de-cpe-sunat-lg-personal', 'GestionLiquidacionGastosController@actionElimnarCpeSunatLgPersonal');
-
-
+	Route::any('/guardar-numero-de-whatsapp', 'GestionLiquidacionGastosController@actionGuardarNumeroWhatsapp');
 
 
 	Route::any('/gestion-de-empresa-proveedor/{idopcion}', 'GestionLiquidacionGastosController@actionGestionEmpresaProveedor');
@@ -179,6 +181,13 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/pdf-planilla-movilidad/{iddocumento}', 'GestionPlanillaMovilidadController@actionPDFPlanillaMovilidad');
 
+
+
+	Route::any('/ajax-select-combo-provincia-partida', 'GestionPlanillaMovilidadController@actionSelectComboProvinciaPartida');
+	Route::any('/ajax-select-combo-distrito-partida', 'GestionPlanillaMovilidadController@actionSelectComboDistritoPartida');
+
+	Route::any('/ajax-select-combo-provincia-llegada', 'GestionPlanillaMovilidadController@actionSelectComboProvinciaLlegada');
+	Route::any('/ajax-select-combo-distrito-llegada', 'GestionPlanillaMovilidadController@actionSelectComboDistritoLlegada');
 
 
 

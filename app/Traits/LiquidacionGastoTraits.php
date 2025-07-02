@@ -388,8 +388,8 @@ trait LiquidacionGastoTraits
         $nom_trabajador                                 =       $liquidaciongastos->TXT_EMPRESA_TRABAJADOR;
         $cod_categoria_tipo_doc                         =       'TDO0000000000028';
         $nom_categoria_tipo_doc                         =       'LIQUIDACION GASTOS';
-        $moneda_id                                      =       'MON0000000000001';
-        $moneda_nombre                                  =       'SOLES';
+        $moneda_id                                      =       $liquidaciongastos->COD_CATEGORIA_MONEDA;
+        $moneda_nombre                                  =       $liquidaciongastos->TXT_CATEGORIA_MONEDA;
         $cod_contrato_receptor                          =       (string)$liquidaciongastos->COD_CUENTA;
         $cod_cultivo_origen                             =       'CCU0000000000001';
         $fecha_emision                                  =       date_format(date_create(date('Y-m-d')), 'd-m-Y'); //PREGUNTAR POR LA FECHA DE EMISION
@@ -604,8 +604,10 @@ trait LiquidacionGastoTraits
                 $nom_trabajador                                 =       $item->TXT_EMPRESA_PROVEEDOR;
                 $cod_categoria_tipo_doc                         =       $item->COD_TIPODOCUMENTO;
                 $nom_categoria_tipo_doc                         =       $item->TXT_TIPODOCUMENTO;
-                $moneda_id                                      =       'MON0000000000001';
-                $moneda_nombre                                  =       'SOLES';
+
+                $moneda_id                                      =       $liquidaciongastos->COD_CATEGORIA_MONEDA;
+                $moneda_nombre                                  =       $liquidaciongastos->TXT_CATEGORIA_MONEDA;
+
                 $cod_contrato_receptor                          =       (string)$item->COD_CUENTA;
                 $cod_cultivo_origen                             =       'CCU0000000000001';
                 $fecha_emision                                  =       date_format(date_create($item->FECHA_EMISION), 'd-m-Y'); //PREGUNTAR POR LA FECHA DE EMISION
@@ -1184,7 +1186,7 @@ trait LiquidacionGastoTraits
             $listadatos         =   LqgLiquidacionGasto::where('ACTIVO','=','1')
                                     ->where('IND_OBSERVACION','=',0)
                                     ->where('AREA_OBSERVACION','=','CONT')
-                                    ->where('COD_USUARIO_AUTORIZA','=',Session::get('usuario')->id)
+                                    //->where('COD_USUARIO_AUTORIZA','=',Session::get('usuario')->id)
                                     ->where('COD_ESTADO','=','ETM0000000000003')
                                     ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
                                     ->orderby('FECHA_EMI','ASC')

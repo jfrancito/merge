@@ -57,7 +57,6 @@ class NotificacionOC extends Command
         $this->sunat_cdr();
         $this->ejecutar_orden_ingreso();
         $this->sunat_cdr_contrato();
-        $this->documentolgautomatico();
 
         $horaActual = date("H:i");
 
