@@ -1625,7 +1625,17 @@ class GestionLiquidacionGastosController extends Controller
 
 
             $liquidaciongastos      =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
-            $tdetliquidaciongastos  =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
+            //$tdetliquidaciongastos  =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
+
+            $tdetliquidaciongastos  =   DB::table('LQG_DETLIQUIDACIONGASTO')
+                                        ->join('CMP.CONTRATO', 'LQG_DETLIQUIDACIONGASTO.COD_CUENTA', '=', 'CMP.CONTRATO.COD_CONTRATO')
+                                        ->select('CMP.CONTRATO.TXT_CATEGORIA_MONEDA', 'LQG_DETLIQUIDACIONGASTO.*', 'CMP.CONTRATO.COD_CONTRATO')
+                                        ->where('LQG_DETLIQUIDACIONGASTO.ID_DOCUMENTO', '=', $iddocumento)
+                                        ->where('LQG_DETLIQUIDACIONGASTO.ACTIVO', '=', '1')
+                                        ->get();
+
+
+
             $detdocumentolg         =   LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
             $documentohistorial     =   LqgDocumentoHistorial::where('ID_DOCUMENTO','=',$iddocumento)->orderby('FECHA','DESC')->get();
             $tdetliquidaciongastosel=   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','0')->get();
