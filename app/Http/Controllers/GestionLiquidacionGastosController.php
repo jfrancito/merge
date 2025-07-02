@@ -65,6 +65,10 @@ class GestionLiquidacionGastosController extends Controller
 
 
 
+
+
+
+
     public function actionLiquidacionViajePdf($idopcion, $iddocumento,Request $request)
     {
 

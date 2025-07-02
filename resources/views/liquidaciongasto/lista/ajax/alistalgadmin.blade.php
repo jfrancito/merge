@@ -3,6 +3,8 @@
     <tr>
       <th>ITEM</th>
       <th>CODIGO</th>
+      <th>CUENTA</th>
+
       <th>FECHA EMISION</th>
       <th>FECHA CREACION</th>
       <th>PERIODO</th>
@@ -20,6 +22,8 @@
       <tr data_requerimiento_id = "{{$item->ID_DOCUMENTO}}">
         <td>{{$index+1}}</td>
         <td>{{$item->CODIGO}}</td>
+        <td>{{$item->TXT_CUENTA}}</td>
+        
         <td>{{date_format(date_create($item->FECHA_EMI), 'd/m/Y')}}</td>
         <td>{{date_format(date_create($item->FECHA_CREA), 'd/m/Y')}}</td>
         <td>{{$item->TXT_PERIODO}}</td>

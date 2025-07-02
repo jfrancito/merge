@@ -19,6 +19,86 @@ document.addEventListener("DOMContentLoaded", function() {
 $(document).ready(function(){
     var carpeta = $("#carpeta").val();
 
+    $(".planillamovilidad").on('change','#departamentopartida_id', function() {
+
+        debugger;
+        var _token                                   =   $('#token').val();
+        var departamentopartida_id                   =   $('#departamentopartida_id').val();
+        var link                                     =   '/ajax-select-combo-provincia-partida';
+        var section                                  =   'ajax_provincia_partida';
+
+
+        data                        =   {
+                                            _token                                   : _token,
+                                            departamentopartida_id                   : departamentopartida_id
+                                        };
+                                        
+        ajax_normal_section(data,link,section);
+
+    });
+
+
+    $(".planillamovilidad").on('change','#provinciapartida_id', function() {
+
+        debugger;
+        var _token                                   =   $('#token').val();
+        var departamentopartida_id                   =   $('#departamentopartida_id').val();
+        var provinciapartida_id                      =   $('#provinciapartida_id').val();
+        var link                                     =   '/ajax-select-combo-distrito-partida';
+        var section                                  =   'ajax_distrito_partida';
+
+        data                        =   {
+                                            _token                                   : _token,
+                                            departamentopartida_id                   : departamentopartida_id,
+                                            provinciapartida_id                      : provinciapartida_id
+                                        };
+                                        
+        ajax_normal_section(data,link,section);
+
+    });
+
+
+
+    $(".planillamovilidad").on('change','#departamentollegada_id', function() {
+
+        debugger;
+        var _token                                   =   $('#token').val();
+        var departamentollegada_id                   =   $('#departamentollegada_id').val();
+        var link                                     =   '/ajax-select-combo-provincia-llegada';
+        var section                                  =   'ajax_provincia_llegada';
+
+
+        data                        =   {
+                                            _token                                   : _token,
+                                            departamentollegada_id                   : departamentollegada_id
+                                        };
+                                        
+        ajax_normal_section(data,link,section);
+
+    });
+
+
+    $(".planillamovilidad").on('change','#provinciallegada_id', function() {
+
+        debugger;
+        var _token                                   =   $('#token').val();
+        var departamentollegada_id                   =   $('#departamentollegada_id').val();
+        var provinciallegada_id                      =   $('#provinciallegada_id').val();
+        var link                                     =   '/ajax-select-combo-distrito-llegada';
+        var section                                  =   'ajax_distrito_llegada';
+
+        data                        =   {
+                                            _token                                   : _token,
+                                            departamentollegada_id                   : departamentollegada_id,
+                                            provinciallegada_id                      : provinciallegada_id
+                                        };
+                                        
+        ajax_normal_section(data,link,section);
+
+    });
+
+
+
 
 
 
@@ -41,8 +121,26 @@ $(document).ready(function(){
 
         if(fecha_gasto ==''){ alerterrorajax("Seleccione una Fecha de pago."); return false;}
         if(motivo_id ==''){ alerterrorajax("Seleccione un Motivo."); return false;}
-        if(lugarpartida ==''){ alerterrorajax("Ingrese un lugar de Partida"); return false;}
-        if(lugarllegada ==''){ alerterrorajax("Ingrese un lugar de LLegada"); return false;}
+        if(lugarpartida ==''){ alerterrorajax("Ingrese un direccion de Partida"); return false;}
+        if(lugarllegada ==''){ alerterrorajax("Ingrese un direccion de LLegada"); return false;}
+
+        var departamentopartida_id               =   $('#departamentopartida_id').val();
+        var provinciapartida_id                  =   $('#provinciapartida_id').val();
+        var distritopartida_id                   =   $('#distritopartida_id').val();
+
+        if(departamentopartida_id ==''){ alerterrorajax("Seleccione un Departamento de Partida."); return false;}
+        if(provinciapartida_id ==''){ alerterrorajax("Seleccione una Provincia de Partida."); return false;}
+        if(distritopartida_id ==''){ alerterrorajax("Seleccione un Distrito de Partida."); return false;}
+
+        var departamentollegada_id               =   $('#departamentollegada_id').val();
+        var provinciallegada_id                  =   $('#provinciallegada_id').val();
+        var distritollegada_id                   =   $('#distritollegada_id').val();
+
+        if(departamentollegada_id ==''){ alerterrorajax("Seleccione un Departamento de Llegada."); return false;}
+        if(provinciallegada_id ==''){ alerterrorajax("Seleccione una Provincia de Llegada."); return false;}
+        if(distritollegada_id ==''){ alerterrorajax("Seleccione un Distrito de Llegada."); return false;}
+
+
         if(total ==''){ alerterrorajax("Ingrese un total"); return false;}
 
 

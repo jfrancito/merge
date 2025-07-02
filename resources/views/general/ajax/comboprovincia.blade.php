@@ -9,13 +9,9 @@
                         'data-aw'     => '5'
                       ]) !!}
 
-      @include('error.erroresvalidate', [ 'id' => $errors->has('provincia_id')  , 
-                                          'error' => $errors->first('provincia_id', ':message') , 
-                                          'data' => '5'])
-
   </div>
 
-  @if(isset($ajax))
+@if(isset($ajax))
   <script type="text/javascript">
     $(document).ready(function(){
     App.formElements();

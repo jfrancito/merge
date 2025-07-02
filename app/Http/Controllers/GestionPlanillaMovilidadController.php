@@ -730,6 +730,24 @@ class GestionPlanillaMovilidadController extends Controller
                 $tdetplanillamovilidad  =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
                 $item                   =   count($detplanillamovilidad) + 1;
                 $motivo                 =   CMPCategoria::where('COD_CATEGORIA','=',$motivo_id)->first();
+
+                $departamentollegada_id =   $request['departamentollegada_id'];
+                $provinciallegada_id    =   $request['provinciallegada_id']; 
+                $distritollegada_id     =   $request['distritollegada_id'];
+
+                $departamentopartida_id =   $request['departamentopartida_id'];
+                $provinciapartida_id    =   $request['provinciapartida_id']; 
+                $distritopartida_id     =   $request['distritopartida_id'];
+
+                $departamentopartida    =   CMPCategoria::where('COD_CATEGORIA','=',$departamentopartida_id)->first();
+                $provinciapartida       =   CMPCategoria::where('COD_CATEGORIA','=',$provinciapartida_id)->first();
+                $distritopartida        =   CMPCategoria::where('COD_CATEGORIA','=',$distritopartida_id)->first();
+
+                $departamentollegada    =   CMPCategoria::where('COD_CATEGORIA','=',$departamentollegada_id)->first();
+                $provinciallegada       =   CMPCategoria::where('COD_CATEGORIA','=',$provinciallegada_id)->first();
+                $distritollegada        =   CMPCategoria::where('COD_CATEGORIA','=',$distritollegada_id)->first();
+
+
                 $cabecera                           =   new PlaDetMovilidad;
                 $cabecera->ID_DOCUMENTO             =   $planillamovilidad->ID_DOCUMENTO;
                 $cabecera->ITEM                     =   $item;
@@ -745,6 +763,22 @@ class GestionPlanillaMovilidadController extends Controller
                 $cabecera->IGV                      =   0;
                 $cabecera->SUBTOTAL                 =   $total;
                 $cabecera->TOTAL                    =   $total;
+
+
+                $cabecera->COD_DEPARTAMENTO_PARTIDA =   $departamentopartida->COD_CATEGORIA;
+                $cabecera->TXT_DEPARTAMENTO_PARTIDA =   $departamentopartida->NOM_CATEGORIA;
+                $cabecera->COD_PROVINCIA_PARTIDA    =   $provinciapartida->COD_CATEGORIA;
+                $cabecera->TXT_PROVINCIA_PARTIDA    =   $provinciapartida->NOM_CATEGORIA;
+                $cabecera->COD_DISTRITO_PARTIDA     =   $distritopartida->COD_CATEGORIA;
+                $cabecera->TXT_DISTRITO_PARTIDA     =   $distritopartida->NOM_CATEGORIA;
+
+                $cabecera->COD_DEPARTAMENTO_LLEGADA =   $departamentollegada->COD_CATEGORIA;
+                $cabecera->TXT_DEPARTAMENTO_LLEGADA =   $departamentollegada->NOM_CATEGORIA;
+                $cabecera->COD_PROVINCIA_LLEGADA    =   $provinciallegada->COD_CATEGORIA;
+                $cabecera->TXT_PROVINCIA_LLEGADA    =   $provinciallegada->NOM_CATEGORIA;
+                $cabecera->COD_DISTRITO_LLEGADA     =   $distritollegada->COD_CATEGORIA;
+                $cabecera->TXT_DISTRITO_LLEGADA     =   $distritollegada->NOM_CATEGORIA;
+
                 $cabecera->FECHA_CREA               =   $this->fechaactual;
                 $cabecera->USUARIO_CREA             =   Session::get('usuario')->id;
                 $cabecera->save();
@@ -856,6 +890,62 @@ class GestionPlanillaMovilidadController extends Controller
 
     }
 
+    public function actionSelectComboProvinciaPartida(Request $request) {
+
+        $departamentopartida_id         =       $request['departamentopartida_id'];
+        $comboprovincia                 =       $this->gn_generacion_combo_categoria_xid('PROVINCIA','Seleccione Provincia','',$departamentopartida_id); 
+        $provincia_id                   =       '';
+        return View::make('general/ajax/comboprovinciapartida',
+                         [
+                            'comboprovincia'           =>  $comboprovincia,
+                            'provincia_id'             =>  $provincia_id,
+                            'ajax'                     =>  true,
+                         ]);
+    }
+
+    public function actionSelectComboDistritoPartida(Request $request) {
+
+        $departamentopartida_id         =       $request['departamentopartida_id'];
+        $provinciapartida_id            =       $request['provinciapartida_id'];
+        $combodistrito                 =       $this->gn_generacion_combo_categoria_xid('DISTRITO','Seleccione Distrito','',$provinciapartida_id); 
+        $distrito_id                   =       '';
+        return View::make('general/ajax/combodistritopartida',
+                         [
+                            'combodistrito'           =>  $combodistrito,
+                            'distrito_id'             =>  $distrito_id,
+                            'ajax'                     =>  true,
+                         ]);
+    }
+
+    public function actionSelectComboProvinciaLlegada(Request $request) {
+
+        $departamentollegada_id         =       $request['departamentollegada_id'];
+        $comboprovinciall                 =       $this->gn_generacion_combo_categoria_xid('PROVINCIA','Seleccione Provincia','',$departamentollegada_id); 
+        $provincia_idll                   =       '';
+        return View::make('general/ajax/comboprovinciallegada',
+                         [
+                            'comboprovinciall'           =>  $comboprovinciall,
+                            'provincia_idll'             =>  $provincia_idll,
+                            'ajax'                     =>  true,
+                         ]);
+    }
+
+    public function actionSelectComboDistritoLlegada(Request $request) {
+
+        $departamentollegada_id         =       $request['departamentollegada_id'];
+        $provinciallegada_id            =       $request['provinciallegada_id'];
+        $combodistritoll                 =       $this->gn_generacion_combo_categoria_xid('DISTRITO','Seleccione Distrito','',$provinciallegada_id); 
+        $distrito_idll                   =       '';
+        return View::make('general/ajax/combodistritollegada',
+                         [
+                            'combodistritoll'           =>  $combodistritoll,
+                            'distrito_idll'             =>  $distrito_idll,
+                            'ajax'                     =>  true,
+                         ]);
+    }
+
+
+
     public function actionDetallePlanillaMovilidad(Request $request) {
 
         $iddocumento        =       $request['data_planilla_movilidad_id'];
@@ -869,11 +959,23 @@ class GestionPlanillaMovilidadController extends Controller
         $combomotivo        =       array('' => "SELECCIONE MOTIVO") + $arraymotivo;
         $motivo_id          =       '';
 
+        $combodepartamento  =       $this->gn_generacion_combo_categoria('DEPARTAMENTO','Seleccione Departamento',''); 
+        $comboprovincia     =       array();
+        $combodistrito      =       array();
 
-
-
-
+        $departamento_id    =       '';
+        $provincia_id       =       '';
+        $distrito_id        =       '';
         
+
+        $combodepartamentoll=       $this->gn_generacion_combo_categoria('DEPARTAMENTO','Seleccione Departamento',''); 
+        $comboprovinciall   =       array();
+        $combodistritoll    =       array();
+
+        $departamento_idll  =       '';
+        $provincia_idll     =       '';
+        $distrito_idll      =       '';
+
 
         return View::make('planillamovilidad/modal/ajax/magregardetalleplanillamovilidad',
                          [
@@ -884,6 +986,21 @@ class GestionPlanillaMovilidadController extends Controller
                             'funcion'               =>  $funcion,
                             'combomotivo'           =>  $combomotivo,
                             'motivo_id'             =>  $motivo_id,
+
+                            'combodepartamento'     =>  $combodepartamento,
+                            'comboprovincia'        =>  $comboprovincia,
+                            'combodistrito'         =>  $combodistrito,
+                            'departamento_id'       =>  $departamento_id,
+                            'provincia_id'          =>  $provincia_id,
+                            'distrito_id'           =>  $distrito_id,
+
+                            'combodepartamentoll'   =>  $combodepartamentoll,
+                            'comboprovinciall'      =>  $comboprovinciall,
+                            'combodistritoll'       =>  $combodistritoll,
+                            'departamento_idll'     =>  $departamento_idll,
+                            'provincia_idll'        =>  $provincia_idll,
+                            'distrito_idll'         =>  $distrito_idll,
+
                             'ajax'                  =>  true,
                          ]);
     }
@@ -903,6 +1020,20 @@ class GestionPlanillaMovilidadController extends Controller
         $comboestado        =       array('1' => "ACTIVO",'0' => "ELIMINAR");
         $activo             =       $dplanillamovilidad->ACTIVO;
 
+        $combodepartamento  =       $this->gn_generacion_combo_categoria('DEPARTAMENTO','Seleccione Departamento',''); 
+        $departamento_id    =       $dplanillamovilidad->COD_DEPARTAMENTO_PARTIDA;
+        $comboprovincia     =       $this->gn_generacion_combo_categoria_xid('PROVINCIA','Seleccione Provincia','',$departamento_id); 
+        $provincia_id       =       $dplanillamovilidad->COD_PROVINCIA_PARTIDA;
+        $combodistrito      =       $this->gn_generacion_combo_categoria_xid('DISTRITO','Seleccione Distrito','',$provincia_id); 
+        $distrito_id        =       $dplanillamovilidad->COD_DISTRITO_PARTIDA;
+
+
+        $combodepartamentoll=       $this->gn_generacion_combo_categoria('DEPARTAMENTO','Seleccione Departamento',''); 
+        $departamento_idll  =       $dplanillamovilidad->COD_DEPARTAMENTO_LLEGADA;
+        $comboprovinciall   =       $this->gn_generacion_combo_categoria_xid('PROVINCIA','Seleccione Provincia','',$departamento_idll); 
+        $provincia_idll     =       $dplanillamovilidad->COD_PROVINCIA_LLEGADA;
+        $combodistritoll    =       $this->gn_generacion_combo_categoria_xid('DISTRITO','Seleccione Distrito','',$provincia_idll); 
+        $distrito_idll      =       $dplanillamovilidad->COD_DISTRITO_LLEGADA;
 
         return View::make('planillamovilidad/modal/ajax/magregardetalleplanillamovilidad',
                          [
@@ -914,12 +1045,26 @@ class GestionPlanillaMovilidadController extends Controller
                             'funcion'               =>  $funcion,
                             'combomotivo'           =>  $combomotivo,
                             'motivo_id'             =>  $motivo_id,
-
                             'comboestado'           =>  $comboestado,
+
+                            'combodepartamento'     =>  $combodepartamento,
+                            'departamento_id'       =>  $departamento_id,
+                            'comboprovincia'        =>  $comboprovincia,
+                            'provincia_id'          =>  $provincia_id,
+                            'combodistrito'         =>  $combodistrito,
+                            'distrito_id'           =>  $distrito_id,
+                            'combodepartamentoll'   =>  $combodepartamentoll,
+                            'departamento_idll'     =>  $departamento_idll,
+                            'comboprovinciall'      =>  $comboprovinciall,
+                            'provincia_idll'        =>  $provincia_idll,
+                            'combodistritoll'       =>  $combodistritoll,
+                            'distrito_idll'         =>  $distrito_idll,
+
+
+
 
 
                             'activo'                =>  $activo,
-
                             'ajax'                  =>  true,
                          ]);
     }
