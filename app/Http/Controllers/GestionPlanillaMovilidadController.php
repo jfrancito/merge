@@ -869,6 +869,12 @@ class GestionPlanillaMovilidadController extends Controller
         $combomotivo        =       array('' => "SELECCIONE MOTIVO") + $arraymotivo;
         $motivo_id          =       '';
 
+
+
+
+
+        
+
         return View::make('planillamovilidad/modal/ajax/magregardetalleplanillamovilidad',
                          [
                             'iddocumento'           =>  $iddocumento,

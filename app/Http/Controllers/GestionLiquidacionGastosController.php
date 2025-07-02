@@ -997,7 +997,7 @@ class GestionLiquidacionGastosController extends Controller
                 $COD_EMPRESA            =   $empresa_trab->COD_EMPR;
                 $TXT_EMPRESA            =   $factura->getcompany()->getruc().' - '.$empresa_trab->NOM_EMPR;    
             }
-            $NUMERO                 =   (int)$factura->getcorrelativo()+1;
+            $NUMERO                 =   (int)$factura->getcorrelativo();
             $CORRELATIVO            =   str_pad($NUMERO, '10', "0", STR_PAD_LEFT);
 
 
