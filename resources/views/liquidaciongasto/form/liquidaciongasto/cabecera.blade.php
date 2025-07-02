@@ -14,6 +14,18 @@
             <td><b>DOCUMENTO</b></td>
             <td><p class='subtitulomerge'>{{$liquidaciongastos->CODIGO}}</p></td>
           </tr>
+
+          <tr>
+            <td><b>MONEDA</b></td>
+            <td><p class='subtitulomerge'>{{$liquidaciongastos->TXT_CATEGORIA_MONEDA}}</p></td>
+          </tr>
+
+          <tr>
+            <td><b>CUENTA</b></td>
+            <td><p class='subtitulomerge'>{{$liquidaciongastos->TXT_CUENTA}}</p></td>
+          </tr>
+
+
           <tr>
             <td><b>TOTAL</b></td>
             <td><p class='subtitulomerge'>{{$liquidaciongastos->TOTAL}}</p></td>

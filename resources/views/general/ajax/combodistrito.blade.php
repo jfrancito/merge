@@ -10,10 +10,6 @@
                         'data-aw'     => '6'
                       ]) !!}
 
-      @include('error.erroresvalidate', [ 'id' => $errors->has('distrito_id')  , 
-                                          'error' => $errors->first('distrito_id', ':message') , 
-                                          'data' => '6'])
-
   </div>
 @if(isset($ajax))
   <script type="text/javascript">
