@@ -52,24 +52,34 @@
 
         <article>
 
-		  <table>
+		  <table class="tpm">
+		    <tr>
+		      <th colspan="2"></th>
+		      <th colspan="3">DESPLAZAMIENTO</th>
+		      <th >MONTO GASTADO POR (**)</th>
+		    </tr>
+
 		    <tr>
 		      <th class='titulo'>ITEM</th>
 		      <th class='titulo'>FECHA GASTO</th>
-		      <th class='titulo'>MOTIVO</th>
-		      <th class='titulo'>DESTINO</th>
-		      <th class='titulo'>TOTAL (S/)</th>
+		      <th class=''>MOTIVO</th>
+		      <th class=''>PUNTO DE PARTIDA</th>
+		      <th class=''>PUNTO DE LLEGADA</th>
+		      <th class='titulo'>DIA(*) (S/)</th>
 		    </tr>
 		    @foreach($detplanillamovilidad  as $index=>$item)
 			    <tr>			    	
 			      <td class='titulo'>{{$index+1}}</td>
 			      <td class='titulo'>{{date_format(date_create($item->FECHA_GASTO), 'd/m/Y')}}</td>
-			      <td class='titulo'>{{$item->TXT_MOTIVO}}</td>
-			      <td class='titulo'>{{$item->TXT_LUGARLLEGADA}}</td>
+			      <td class=''>{{$item->TXT_MOTIVO}}</td>
+			      <td class=''>{{$item->TXT_LUGARPARTIDA}} - {{$item->TXT_DEPARTAMENTO_PARTIDA}} - {{$item->TXT_PROVINCIA_PARTIDA}} - {{$item->TXT_DISTRITO_PARTIDA}}</td>
+			      <td class=''>{{$item->TXT_LUGARLLEGADA}} - {{$item->TXT_DEPARTAMENTO_LLEGADA}} - {{$item->TXT_PROVINCIA_LLEGADA}} - {{$item->TXT_DISTRITO_LLEGADA}}</td>
+
 			      <td class='izquierda'>{{number_format(round($item->TOTAL,2),2,'.',',')}}</td>
 			    </tr>
 		    @endforeach		    
 			    <tr>			    	
+			      <td class='titulo'></td>
 			      <td class='titulo'></td>
 			      <td class='titulo'></td>
 			      <td class='titulo'></td>

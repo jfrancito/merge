@@ -1331,6 +1331,124 @@ class GestionLiquidacionGastosController extends Controller
     }
 
 
+    public function actionAgregarNuevoFormato(Request $request) {
+
+        $resultado = DB::table('LQG_DETLIQUIDACIONGASTO as lqg')
+            ->join('PLA_MOVILIDAD as pla', 'lqg.COD_PLA_MOVILIDAD', '=', 'pla.ID_DOCUMENTO')
+            ->where('lqg.COD_TIPODOCUMENTO', 'TDO0000000000070')
+            ->select('lqg.*') // o select específico si necesitas columnas concretas
+            ->get();
+
+        foreach ($resultado as $index => $item) {
+
+            $documento_planilla        =       $item->COD_PLA_MOVILIDAD;
+            $data_iddocumento          =       $item->ID_DOCUMENTO;
+
+            $detliquidaciongasto       =       LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$data_iddocumento)->first();
+            $useario_autoriza          =       User::where('id','=',$detliquidaciongasto->COD_USUARIO_AUTORIZA)->first();
+            $planillamovilidad         =       DB::table('PLA_MOVILIDAD')
+                                               ->where('ID_DOCUMENTO', $documento_planilla)
+                                               ->first();
+            $COD_CUENTA                 =       '';   
+            $TXT_CUENTA                 =       '';
+
+
+            $contratos                 =        DB::table('CMP.CONTRATO')
+                                                ->where('COD_EMPR_CLIENTE', 'IACHEM0000009164')
+                                                ->where('COD_EMPR', $planillamovilidad->COD_EMPRESA)
+                                                ->where('COD_CENTRO', $planillamovilidad->COD_CENTRO)
+                                                ->first();
+
+
+            if(count($contratos)>0){
+                $cod_contrato = $contratos->COD_CONTRATO; // Ejemplo de contrato
+                $cod_categoria_moneda = $contratos->COD_CATEGORIA_MONEDA; // Ejemplo de moneda
+                $txt_categoria_tipo_contrato = $contratos->TXT_CATEGORIA_TIPO_CONTRATO; // Ejemplo de categoría
+                // Obtener los primeros 6 caracteres
+                $parte1 = substr($cod_contrato, 0, 6);
+                // Obtener los últimos 10 caracteres y convertir a entero
+                $parte2 = intval(substr($cod_contrato, -10));
+                // Determinar el símbolo de la moneda
+                $simbolo = ($cod_categoria_moneda === 'MON0000000000001') ? 'S/' : '$';
+                // Concatenar todo
+                $contrato = $parte1 . '-0' . $parte2 . ' -- ' . $simbolo . ' ' . $txt_categoria_tipo_contrato;
+                $COD_CUENTA                 =       $contratos->COD_CONTRATO;   
+                $TXT_CUENTA                 =       $contrato; 
+                $subcontrato                =       DB::table('CMP.CONTRATO_CULTIVO')
+                                                    ->selectRaw("
+                                                        COD_CONTRATO,
+                                                        TXT_ZONA_COMERCIAL+'-'+TXT_ZONA_CULTIVO as TXT_CULTIVO
+                                                    ")
+                                                    ->where('COD_CONTRATO', $COD_CUENTA)
+                                                    ->first();
+                $COD_SUBCUENTA                 =       $subcontrato->COD_CONTRATO;   
+                $TXT_SUBCUENTA                 =       $subcontrato->TXT_CULTIVO;
+            }
+
+            //GUARDAR PDF
+            $iddocumento            =   $documento_planilla;
+            $planillamovilidad      =   PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first(); 
+            $detplanillamovilidad   =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->orderby('FECHA_GASTO','ASC')->get();
+            $empresa                =   STDEmpresa::where('COD_EMPR','=',$planillamovilidad->COD_EMPRESA)->first();
+            $ruc                    =   $empresa->NRO_DOCUMENTO;
+            $prefijocarperta        =   $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
+            $rutafile               =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$data_iddocumento;
+            $valor                  =   $this->versicarpetanoexiste($rutafile);
+            $rutacompleta           =   $rutafile . '\\' . $planillamovilidad->SERIE . '-' . $planillamovilidad->NUMERO . '.pdf';
+            $nombrearchivo          =   $planillamovilidad->SERIE . '-' . $planillamovilidad->NUMERO . '.pdf';
+            $glosa                  =   $planillamovilidad->TXT_GLOSA;
+
+            $trabajador             =   STDTrabajador::where('COD_TRAB','=',$planillamovilidad->COD_TRABAJADOR)->first();
+            $imgresponsable         =   'firmas/blanco.jpg';
+            $nombre_responsable     =   '';
+            $rutaImagen             =   public_path('firmas/'.$trabajador->NRO_DOCUMENTO.'.jpg');
+            $sw = 0;
+            if (file_exists($rutaImagen)){
+                $imgresponsable         =   'firmas/'.$trabajador->NRO_DOCUMENTO.'.jpg';
+                $nombre_responsable     =   $trabajador->TXT_NOMBRES.' '.$trabajador->TXT_APE_PATERNO.' '.$trabajador->TXT_APE_MATERNO;
+            }else{
+                $sw = 1;
+                print_r('TRABAJADOR : '.$trabajador->TXT_NOMBRES.' '.$trabajador->TXT_APE_PATERNO.' '.$trabajador->TXT_APE_MATERNO.'<br>');
+            }
+
+            $trabajadorap           =   STDTrabajador::where('COD_TRAB','=',$useario_autoriza->usuarioosiris_id)->first();
+            $imgaprueba             =   'firmas/blanco.jpg';
+            $nombre_aprueba         =   '';
+            $rutaImagen             =   public_path('firmas/'.$trabajadorap->NRO_DOCUMENTO.'.jpg');
+            if (file_exists($rutaImagen)){
+                $imgaprueba         =   'firmas/'.$trabajadorap->NRO_DOCUMENTO.'.jpg';
+                $nombre_aprueba     =   $trabajadorap->TXT_NOMBRES.' '.$trabajadorap->TXT_APE_PATERNO.' '.$trabajadorap->TXT_APE_MATERNO;
+            }else{
+                $sw = 1;
+                print_r('JEFE : '.$trabajadorap->TXT_NOMBRES.' '.$trabajadorap->TXT_APE_PATERNO.' '.$trabajadorap->TXT_APE_MATERNO.'<br>');
+
+            }
+
+
+            // $pdf = PDF::loadView('pdffa.planillamovilidad', [ 
+            //                                         'iddocumento'           => $iddocumento , 
+            //                                         'planillamovilidad'     => $planillamovilidad,
+            //                                         'detplanillamovilidad'  => $detplanillamovilidad,
+            //                                         'ruc'                   => $ruc,
+            //                                         'imgresponsable'        => $imgresponsable , 
+            //                                         'nombre_responsable'    => $nombre_responsable,
+            //                                         'imgaprueba'            => $imgaprueba,
+            //                                         'nombre_aprueba'        => $nombre_aprueba,
+
+            //                                       ]);
+
+            // $pdf->save($rutacompleta);
+
+
+
+        }
+
+    }
+
+
+    
+
+
     public function actionModalSelectDocumentoPlanillaLG(Request $request) {
 
         $documento_planilla        =       $request['documento_planilla'];
@@ -2595,8 +2713,6 @@ class GestionLiquidacionGastosController extends Controller
         $liquidaciongastos          =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
         $tdetliquidaciongastos      =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
 
-
-
         if($_POST)
         {
             try{    
@@ -3702,6 +3818,8 @@ class GestionLiquidacionGastosController extends Controller
             }else{
                 $combo_arendir       =   array('' => "SELECCIONE SI TIENE A RENDIR",'NO' => "NO");
             }
+
+            $combo_arendir       =   array('' => "SELECCIONE SI TIENE A RENDIR",'SI' => "SI",'NO' => "NO");
 
             //$combo_arendir       =   array('' => "SELECCIONE SI TIENE A RENDIR",'NO' => "NO");
             $arendir_id          =   "";

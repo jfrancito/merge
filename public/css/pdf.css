@@ -196,3 +196,19 @@ footer .observacion p {
     margin-bottom: 2px;    
     font-size: 0.8em;
 }
+
+
+th {
+    border: 1px solid #000; /* borde negro */
+    padding: 8px;
+    text-align: left;
+}
+
+th td {
+    border: 1px solid #000; /* borde negro */
+    padding: 8px;
+    text-align: left;
+}
+.tpm{
+    font-size: 12px;
+}
