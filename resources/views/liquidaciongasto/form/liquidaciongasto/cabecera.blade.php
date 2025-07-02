@@ -16,6 +16,11 @@
           </tr>
 
           <tr>
+            <td><b>TRABAJADOR</b></td>
+            <td><p class='subtitulomerge'>{{$liquidaciongastos->TXT_EMPRESA_TRABAJADOR}}</p></td>
+          </tr>
+
+          <tr>
             <td><b>MONEDA</b></td>
             <td><p class='subtitulomerge'>{{$liquidaciongastos->TXT_CATEGORIA_MONEDA}}</p></td>
           </tr>
@@ -43,10 +48,7 @@
             <td><p class='subtitulomerge'>{{$liquidaciongastos->TXT_PERIODO}}</p></td>
           </tr>
 
-          <tr>
-            <td><b>TRABAJADOR</b></td>
-            <td><p class='subtitulomerge'>{{$liquidaciongastos->TXT_EMPRESA_TRABAJADOR}}</p></td>
-          </tr>
+
           <tr>
             <td><b>CENTRO</b></td>
             <td><p class='subtitulomerge'>{{$liquidaciongastos->TXT_CENTRO}}</p></td>

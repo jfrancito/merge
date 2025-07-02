@@ -2,6 +2,34 @@
   <div class="panel-heading" style="background: #1d3a6d;color: #fff;">DETALLE DE DOCUMENTOS
   </div>
   <div class="panel-body panel-body-contrast">
+
+  @foreach($tdetliquidaciongastos as $index => $item)
+    <div class="dtlg {{$item->ID_DOCUMENTO}}{{$item->ITEM}} @if($index!=0) ocultar @endif" >
+        <table class="table table-condensed table-striped">
+          <thead>
+            <tr>
+              <th>RESPUESTA SUNAT</th>
+              <th>ESTADO COMPROBANTE</th>
+              <th>ESTADO RUC</th>
+              <th>ESTADO DOMICILIO</th>
+              <th>RESPUESTA CDR</th>
+            </tr>
+          </thead>
+          <tbody>
+              <tr>
+                <td>{{$item->MESSAGE}}</td>
+                <td>{{$item->NESTADOCP}}</td>
+                <td>{{$item->NESTADORUC}}</td>
+                <td>{{$item->NCONDDOMIRUC}}</td>
+                <td>{{$item->RESPUESTA_CDR}}</td>
+              </tr>
+          </tbody>
+        </table>
+    </div>
+  @endforeach
+
+
+
   @foreach($tdetliquidaciongastos as $index => $item)
     <div class="dtlg {{$item->ID_DOCUMENTO}}{{$item->ITEM}} @if($index!=0) ocultar @endif" >
         <table class="table table-condensed table-striped">
@@ -11,12 +39,6 @@
               <th>DOCUMENTO</th>      
               <th>TIPO DOCUMENTO</th>       
               <th>PROVEEDOR</th>
-              
-              <th>RESPUESTA SUNAT</th>
-              <th>ESTADO COMPROBANTE</th>
-              <th>ESTADO RUC</th>
-              <th>ESTADO DOMICILIO</th>
-              <th>RESPUESTA CDR</th>
               <th>TOTAL</th>
             </tr>
           </thead>
@@ -26,17 +48,15 @@
                 <td>{{$item->SERIE}} - {{$item->NUMERO}} </td>
                 <td>{{$item->TXT_TIPODOCUMENTO}}</td>
                 <td>{{$item->TXT_EMPRESA_PROVEEDOR}}</td>
-                <td>{{$item->MESSAGE}}</td>
-                <td>{{$item->NESTADOCP}}</td>
-                <td>{{$item->NESTADORUC}}</td>
-                <td>{{$item->NCONDDOMIRUC}}</td>
-                <td>{{$item->RESPUESTA_CDR}}</td>
                 <td>{{$item->TOTAL}}</td>
               </tr>
           </tbody>
         </table>
     </div>
   @endforeach
+
+
+
   <table class="table table-condensed table-striped">
     <thead>
       <tr>
