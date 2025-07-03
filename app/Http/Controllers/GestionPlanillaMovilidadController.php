@@ -444,10 +444,14 @@ class GestionPlanillaMovilidadController extends Controller
                     if(count($dtrabajador)>0){
                         $txttrabajador  =   $dtrabajador->TXT_APE_PATERNO.' '.$dtrabajador->TXT_APE_MATERNO.' '.$dtrabajador->TXT_NOMBRES;
                         $doctrabajador  =   $dtrabajador->NRO_DOCUMENTO;
-                        $codtrabajador  =   $dtrabajador->COD_TRAB;;
+                        $codtrabajador  =   $dtrabajador->COD_TRAB;
                     }
                     $idcab                              =   $this->funciones->getCreateIdMaestradocpla('PLA_MOVILIDAD','PLAM');
                     $codigo                             =   $this->funciones->generar_codigo('PLA_MOVILIDAD',8);
+
+                    $direcion_id                        =   $request['direccion_id'];
+                    $direccion                          =   $this->gn_generacion_combo_direccion_lg_top($direcion_id);
+
 
                     $cabecera                           =   new PlaMovilidad;
                     $cabecera->ID_DOCUMENTO             =   $idcab;
@@ -465,6 +469,8 @@ class GestionPlanillaMovilidadController extends Controller
                     $cabecera->TXT_ESTADO               =   'GENERADO';
                     $cabecera->COD_CENTRO               =   $centrot->COD_CENTRO;
                     $cabecera->TXT_CENTRO               =   $centrot->NOM_CENTRO;
+                    $cabecera->COD_DIRECCION            =   $direccion->COD_DIRECCION;
+                    $cabecera->TXT_DIRECCION            =   $direccion->DIRECCION;
                     $cabecera->IGV                      =   0;
                     $cabecera->SUBTOTAL                 =   0;
                     $cabecera->TOTAL                    =   0;
@@ -526,6 +532,9 @@ class GestionPlanillaMovilidadController extends Controller
                 $doctrabajador  =   $dtrabajador->NRO_DOCUMENTO;
             }
 
+            $combodireccion                 =       $this->gn_generacion_combo_direccion_lg("Seleccione Direccion",""); 
+            $direccion_id                   =       '';
+
 
             return View::make('planillamovilidad.agregarplanillamovilidad',
                              [
@@ -533,6 +542,10 @@ class GestionPlanillaMovilidadController extends Controller
                                 'serie' => $serie,
                                 'numero' => $numero,
                                 'centro' => $centro,
+
+                                'combodireccion' => $combodireccion,
+                                'direccion_id' => $direccion_id,
+
                                 'txttrabajador' => $txttrabajador,
                                 'doctrabajador' => $doctrabajador,
                                 'fecha_creacion' => $fecha_creacion,

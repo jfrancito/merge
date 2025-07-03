@@ -135,6 +135,21 @@
         </div>
       </div>
     </div>
+    @if(!isset($planillamovilidad))
+      <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
+                  <div class="form-group">
+                    <label class="col-sm-12 control-label labelleft negrita" >LUGAR DE TRABAJO <span class="obligatorio">(*)</span> :</label>
+                    <div class="col-sm-12">
+                        {!! Form::select( 'direccion_id', $combodireccion, array($direccion_id),
+                                        [
+                                          'class'       => 'select2 form-control control input-xs' ,
+                                          'id'          => 'direccion_id',
+                                          'required'    => '',    
+                                        ]) !!}
+                    </div>
+                  </div>
+      </div>
+    @endif
 
 
     @if(isset($planillamovilidad))

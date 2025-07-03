@@ -42,6 +42,10 @@
 	   					<strong>DNI :</strong> {{$planillamovilidad->DOCUMENTO_TRABAJADOR}}
 	   				</p>
 	   				<p>
+	   					<strong>LUGAR DE TRABAJO :</strong> {{$planillamovilidad->TXT_DIRECCION}}
+	   				</p>
+
+	   				<p>
 	   					<strong>GLOSA :</strong> {{$planillamovilidad->TXT_GLOSA}}
 	   				</p>
 

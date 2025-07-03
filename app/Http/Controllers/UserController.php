@@ -15,6 +15,7 @@ use App\Modelos\STDEmpresa;
 use App\Modelos\WEBUserEmpresaCentro;
 use App\Modelos\ALMCentro;
 use App\Modelos\WEBListaPersonal;
+use App\Modelos\LqgLiquidacionGasto;
 
 
 
@@ -49,7 +50,7 @@ use App\Traits\UserTraits;
 use App\Traits\GeneralesTraits;
 use App\Traits\ComprobanteProvisionTraits;
 use App\Traits\ComprobanteTraits;
-
+use App\Traits\LiquidacionGastoTraits;
 
 class UserController extends Controller {
 
@@ -57,7 +58,7 @@ class UserController extends Controller {
     use GeneralesTraits;
     use ComprobanteProvisionTraits;
     use ComprobanteTraits;
-
+    use LiquidacionGastoTraits;
 
 	public function actionDescargarManual(Request $request)
 	{
@@ -1106,6 +1107,14 @@ class UserController extends Controller {
 		$count_observadosdib_le 			= 	0;
 
 
+		//lg
+        $url_obs_lg 					    =	'';
+		$urllg 								=	'';
+		$count_x_aprobar_lg 				= 	0;
+		$count_observados_lg 				= 	0;
+		$count_observadoslg_le 				= 	0;
+
+
 
 		if($trol->ind_uc == 1){
 
@@ -1173,6 +1182,17 @@ class UserController extends Controller {
 			$count_observados_dib 	= 	count($listadatosobdib);
 
 
+			//LIQUIDACION DE GASTOS
+        	$url_obs_lg 		 	=	'/gestion-de-liquidacion-gastos/oQK';
+        	$listadatosoblg    		=    LqgLiquidacionGasto::where('ACTIVO','=','1')
+		                                ->where('USUARIO_CREA','=',Session::get('usuario')->id)
+		                                ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+		                                ->where('IND_OBSERVACION','=',1)
+		                                ->get();
+			$count_observados_lg 	= 	count($listadatosoblg);
+
+
+
 		}
 		else{
 			//CONTABILIDAD
@@ -1212,6 +1232,13 @@ class UserController extends Controller {
         		$url_rep_dip_revisar 		=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=DOCUMENTO_INTERNO_PRODUCCION&estado_id=2';
         		$url_rep_dis_revisar 		=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=DOCUMENTO_INTERNO_SECADO&estado_id=2';
         		$url_rep_dib_revisar 		=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=DOCUMENTO_SERVICIO_BALANZA&estado_id=2';
+
+
+
+    			$urllg 					    =	'/gestion-de-aprobacion-liquidacion-gastos-contabilidad/xvr';
+
+
+
 
         		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_cont_contrato($cod_empresa);
 				$count_x_aprobar_con 	= 	 count($listadatos);
@@ -1290,7 +1317,13 @@ class UserController extends Controller {
 				$count_observadosdib_le	= 	count($listadatosob);
 
 
-
+				//LIQUIDACION DE GASTOS
+        		$listadatos     		=   $this->lg_lista_cabecera_comprobante_total_contabilidad();
+				$count_x_aprobar_lg 	= 	count($listadatos);
+	        	$listadatosob    		=   $this->lg_lista_cabecera_comprobante_total_obs_contabilidad();
+				$count_observados_lg 	= 	count($listadatosob);
+	        	$listadatosob    		=   $this->lg_lista_cabecera_comprobante_total_obs_le_contabilidad();
+				$count_observadoslg_le	= 	count($listadatosob);
 
 			}
 			//ADMINISTRACION
@@ -1318,6 +1351,8 @@ class UserController extends Controller {
     				$urldip 				=	'/gestion-de-administracion-aprobar/j25?operacion_id=DOCUMENTO_INTERNO_PRODUCCION';
     				$urldis 				=	'/gestion-de-administracion-aprobar/j25?operacion_id=DOCUMENTO_INTERNO_SECADO';
     				$urldib 				=	'/gestion-de-administracion-aprobar/j25?operacion_id=DOCUMENTO_SERVICIO_BALANZA';
+    				$urllg 					=	'/gestion-de-aprobacion-liquidacion-gastos-administracion/rR6';
+
 
 					//ESTIBA
 					$operacion_id 			=	'ESTIBA';
@@ -1387,6 +1422,13 @@ class UserController extends Controller {
 		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas($cod_empresa,$operacion_id);
 					$count_observadosdib_le 	= 	count($listadatosob);
 
+					//LIQUIDACION DE GASTOS
+	        		$listadatos     		=   $this->lg_lista_cabecera_comprobante_total_administracion();
+					$count_x_aprobar_lg 	= 	count($listadatos);
+		        	$listadatosob    		=   $this->lg_lista_cabecera_comprobante_total_obs_administracion();
+					$count_observados_lg 	= 	count($listadatosob);
+		        	$listadatosob    		=   $this->lg_lista_cabecera_comprobante_total_obs_le_administracion();
+					$count_observadoslg_le	= 	count($listadatosob);
 
 
 				}
@@ -1424,6 +1466,11 @@ class UserController extends Controller {
 						 	'count_observadosest_le' 	=> $count_observadosest_le,
 						 	'count_reparables_est' 		=> $count_reparables_est,
 
+						 	'url_obs_lg' 				=> $url_obs_lg,
+						 	'urllg' 					=> $urllg,
+						 	'count_x_aprobar_lg' 		=> $count_x_aprobar_lg,
+						 	'count_observados_lg' 		=> $count_observados_lg,
+						 	'count_observadoslg_le' 	=> $count_observadoslg_le,
 
 						 	'urldip' 					=> $urldip,
 						 	'count_reparables_dip' 		=> $count_reparables_dip,
