@@ -52,7 +52,7 @@ trait PrecioCompetenciaTraits
 					    ]);
       	
           try{  
-              DB::beginTransaction();
+              //DB::beginTransaction();
               set_time_limit(0);
               $numero              				=   ltrim($item->NUMERO, '0');
               $ruc                        =   $item->RUC;
@@ -207,10 +207,10 @@ trait PrecioCompetenciaTraits
 							    ]);
 
 
-              DB::commit();
+              //DB::commit();
 
           }catch(\Exception $ex){
-              DB::rollback();
+              //DB::rollback();
               //dd($ex);
           }
 
