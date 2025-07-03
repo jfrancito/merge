@@ -100,10 +100,16 @@ class ValeRendirController extends Controller
             ->get()
             ->toArray();
 
-             $moneda = DB::table('CMP.CATEGORIA')
+           /*  $moneda = DB::table('CMP.CATEGORIA')
             ->where('COD_CATEGORIA', 'MON0000000000001')
             ->pluck('NOM_CATEGORIA', 'COD_CATEGORIA')
             ->toArray();
+*/
+            $moneda = DB::table('CMP.CATEGORIA')
+            ->whereIn('COD_CATEGORIA', ['MON0000000000001', 'MON0000000000002'])
+            ->pluck('NOM_CATEGORIA', 'COD_CATEGORIA')
+            ->toArray();
+
 
             $cod_moneda = key($moneda);
             $nom_moneda = reset($moneda);
@@ -121,6 +127,7 @@ class ValeRendirController extends Controller
         $combo1 = array('' => 'Seleccione Usuario Aprueba') + $usuariosAp;
         $combo2 = array('' => 'Seleccione Tipo o Motivo') + $tipoMotivo;
         $combo3 = array('' => 'Seleccione Destino') + $destino;
+        $combo4 = array('' => 'Seleccione Moneda') + $moneda;
 
         $listarusuarios = $this->listaValeRendir(
     	        "GEN",
@@ -156,13 +163,14 @@ class ValeRendirController extends Controller
             'listausuarios1' => $combo1,
             'listausuarios2' => $combo2,
             'listausuarios3' => $combo3,
+            'listausuarios4' => $combo4,
             'usuario_aprueba_predeterminado' => $usuario_aprueba_predeterminado,
             'usuario_autoriza_predeterminado' => $usuario_autoriza_predeterminado,
             'listarusuarios' => $listarusuarios,      
             'nom_centro' => $nom_centro,
             'importeDestinos' => $importeDestinos,
-            'cod_moneda' => $cod_moneda,
-            'nom_moneda' => $nom_moneda,
+         /*   'cod_moneda' => $cod_moneda,
+            'nom_moneda' => $nom_moneda,*/
             'ajax'=>true,   
         ]);
     }

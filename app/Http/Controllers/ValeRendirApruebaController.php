@@ -238,6 +238,7 @@ class ValeRendirApruebaController extends Controller
         $nombreCuentaCliente = $txtNombreCliente->TXT_NOM_SOLICITA;
         $glosaCliente = $txtNombreCliente->TXT_GLOSA_AUTORIZADO;
         $codemprcliente = $txtNombreCliente->COD_EMPR_CLIENTE;
+        $cod_moneda = $txtNombreCliente->COD_MONEDA;
   
         $notacredito            = new NotaCredito();
 
@@ -249,11 +250,12 @@ class ValeRendirApruebaController extends Controller
             ->where('COD_CATEGORIA_TIPO_CONTRATO', '=', 'TCO0000000000069')
           //  ->where('TXT_EMPR_CLIENTE', 'LIKE', '%' . $nombreCuentaCliente . '%')
             ->where('COD_EMPR_CLIENTE', '=', $codemprcliente)
+             ->where('COD_CATEGORIA_MONEDA', $cod_moneda)
             ->select(DB::raw("COD_CONTRATO, CONCAT(LEFT(COD_CONTRATO, 6), '-', RIGHT(CONCAT('00000', RIGHT(COD_CONTRATO, 5)), 5), ' - S/', ' ', REPLACE(TXT_CATEGORIA_CANAL_VENTA, 'POR', 'X')) AS CUENTA"))
             ->pluck('CUENTA', 'COD_CONTRATO')
             ->toArray();
 
-                //      dd($contrato_diferente);
+         // dd($contrato_diferente);
 
     //  $combo_cuenta = array('' => 'Seleccione Cuenta') + $contrato_diferente;
         $combo_series = $notacredito->combo_series_tipodocumento('TDO0000000000072');
@@ -369,8 +371,12 @@ class ValeRendirApruebaController extends Controller
         $txt_serie = $valeRendirOsiris->TXT_SERIE;
         $txt_numero = $valeRendirOsiris->TXT_NUMERO;
         $nro_cuenta = $valeRendirOsiris->NRO_CUENTA;
-        $cod_categoria_moneda = 'MON0000000000001';
-        $txt_categoria_moneda = 'SOLES';
+        $cod_categoria_moneda = $valeRendirOsiris->COD_MONEDA;
+        if ($cod_categoria_moneda == 'MON0000000000001') {
+            $txt_categoria_moneda = 'SOLES';
+        } else {
+            $txt_categoria_moneda = 'DOLARES';
+        }
         $can_tipo_cambio;
         $can_total = $valeRendirOsiris->CAN_TOTAL_IMPORTE;
         $can_saldo = $valeRendirOsiris->CAN_TOTAL_SALDO;

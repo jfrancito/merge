@@ -113,8 +113,8 @@ $(document).ready(function(){
                     error500(data);
                 }
             });
-
-
+       
+        });
  /* data    =   {
                               _token                                   : _token,
                                 usuario_autoriza                         : usuario_autoriza,
@@ -130,11 +130,6 @@ $(document).ready(function(){
                               };
 
             ajax_normal_combo(data,"/registrar_vale_rendir","listadetalleajax")  */
-
-
-            
-        });
-
 
         $(".valerendirprincipal").on('dblclick', '.dobleclickpc', function (e) {
             let _token = $('#token').val();

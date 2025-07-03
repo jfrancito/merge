@@ -15,3 +15,4 @@ yarn-error.log
 /app/Console/Kernel.php
 /storage/app
 app/Http/Controllers/DocumentoApiController.php
+/public/firmas
