@@ -3617,7 +3617,7 @@ class GestionLiquidacionGastosController extends Controller
                     $subcuenta_id                       =   $request['subcuenta_id'];
                     $centro_txt                         =   $request['centro_txt'];
                     $arendir_sel_id                     =   $request['arendir_sel_id'];
-                    $moneda_sel_id                      =   $request['moneda_sel_id'];
+                    $moneda_sel_id                      =   $request['moneda_sel_c_id'];
 
 
                     if($arendir_id=='NO'){
@@ -3686,7 +3686,7 @@ class GestionLiquidacionGastosController extends Controller
                         $area_txt                   =   $centrocosto->TXT_NOMBRE;
                     }
 
-                    //dd($periodo);
+                    dd($moneda);
                     $cabecera                           =   new LqgLiquidacionGasto;
                     $cabecera->ID_DOCUMENTO             =   $idcab;
                     $cabecera->CODIGO                   =   $codigo;
