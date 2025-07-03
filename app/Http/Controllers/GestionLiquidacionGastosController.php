@@ -1425,19 +1425,19 @@ class GestionLiquidacionGastosController extends Controller
             }
 
 
-            // $pdf = PDF::loadView('pdffa.planillamovilidad', [ 
-            //                                         'iddocumento'           => $iddocumento , 
-            //                                         'planillamovilidad'     => $planillamovilidad,
-            //                                         'detplanillamovilidad'  => $detplanillamovilidad,
-            //                                         'ruc'                   => $ruc,
-            //                                         'imgresponsable'        => $imgresponsable , 
-            //                                         'nombre_responsable'    => $nombre_responsable,
-            //                                         'imgaprueba'            => $imgaprueba,
-            //                                         'nombre_aprueba'        => $nombre_aprueba,
+            $pdf = PDF::loadView('pdffa.planillamovilidad', [ 
+                                                    'iddocumento'           => $iddocumento , 
+                                                    'planillamovilidad'     => $planillamovilidad,
+                                                    'detplanillamovilidad'  => $detplanillamovilidad,
+                                                    'ruc'                   => $ruc,
+                                                    'imgresponsable'        => $imgresponsable , 
+                                                    'nombre_responsable'    => $nombre_responsable,
+                                                    'imgaprueba'            => $imgaprueba,
+                                                    'nombre_aprueba'        => $nombre_aprueba,
 
-            //                                       ]);
+                                                 ])->setPaper('A4', 'landscape');
 
-            // $pdf->save($rutacompleta);
+            $pdf->save($rutacompleta);
 
 
 
@@ -1539,9 +1539,12 @@ class GestionLiquidacionGastosController extends Controller
                                                 'imgaprueba'            => $imgaprueba,
                                                 'nombre_aprueba'        => $nombre_aprueba,
 
-                                              ]);
+                                              ])->setPaper('A4', 'landscape');
 
         $pdf->save($rutacompleta);
+
+
+
 
         return response()->json([
             'EMPRESA'       => 'PLANILLA DE MOVILIDAD SIN COMPROBANTE',
@@ -2425,17 +2428,24 @@ class GestionLiquidacionGastosController extends Controller
             try{    
                 DB::beginTransaction();
                 $liquidaciongastos      =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
-
+                //validar que tenga la firma quien
+                $detliquidaciongasto    =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
+                $useario_autoriza       =   User::where('id','=',$detliquidaciongasto->COD_USUARIO_AUTORIZA)->first();
+                $trabajadorap           =   STDTrabajador::where('COD_TRAB','=',$useario_autoriza->usuarioosiris_id)->first();
+                $imgaprueba             =   'firmas/blanco.jpg';
+                $nombre_aprueba         =   '';
+                $rutaImagen             =   public_path('firmas/'.$trabajadorap->NRO_DOCUMENTO.'.jpg');
+                if (!file_exists($rutaImagen)){
+                    return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/0')->with('errorbd','No se puede emitir ya que el que autoriza no cuenta con firma llamar a sistemas');
+                }
                 //CUANDO ESTA OBSEVADOS
                 if($liquidaciongastos->IND_OBSERVACION==1){
-
                     LqgLiquidacionGasto::where('ID_DOCUMENTO',$iddocumento)
                                 ->update(
                                     [
                                         'IND_OBSERVACION'=>0
                                     ]
                                 );
-
                     $documento                              =   new LqgDocumentoHistorial;
                     $documento->ID_DOCUMENTO                =   $iddocumento;
                     $documento->DOCUMENTO_ITEM              =   1;

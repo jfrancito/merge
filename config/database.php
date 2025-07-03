@@ -128,6 +128,20 @@ return [
         ],
         
 
+        'sqlsrv_isl' => [
+            'driver' => 'sqlsrv',
+            'host' => '10.1.0.20',
+            'port' => '1433',
+            'database' => 'ISLCIX',
+            'username' => 'sqlrepli',
+            'password' => 'sqlrepli',
+            'charset' => 'utf8',
+            'prefix' => '',
+    
+
+        ],
+
+
     ],
 
     /*

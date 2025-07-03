@@ -10,8 +10,8 @@
         <td class="cell-detail" style="position: relative;">
           <span style="display: block;"><b>FECHA GASTO : {{date_format(date_create($item->FECHA_GASTO), 'd/m/Y')}}</b></span>
           <span style="display: block;"><b>MOTIVO : </b> {{$item->TXT_MOTIVO}}</span>
-          <span style="display: block;"><b>LUGAR PARTIDA : </b> {{$item->TXT_LUGARPARTIDA}}</span>
-          <span style="display: block;"><b>LUGAR DE LLEGADA : </b> {{$item->TXT_LUGARLLEGADA}}</span>
+          <span style="display: block;"><b>LUGAR PARTIDA : </b> {{$item->TXT_LUGARPARTIDA}} - {{$item->TXT_DEPARTAMENTO_PARTIDA}} - {{$item->TXT_PROVINCIA_PARTIDA}} - {{$item->TXT_DISTRITO_PARTIDA}}</span>
+          <span style="display: block;"><b>LUGAR DE LLEGADA : </b> {{$item->TXT_LUGARLLEGADA}} - {{$item->TXT_DEPARTAMENTO_LLEGADA}} - {{$item->TXT_PROVINCIA_LLEGADA}} - {{$item->TXT_DISTRITO_LLEGADA}}</span>
           <span style="display: block;"><b>TOTAL : </b > <b style="font-size: 20px;">{{number_format($item->TOTAL, 2, '.', ',')}}</b></span>
           <button type="button" data_iddocumento = "{{$item->ID_DOCUMENTO}}" data_item = "{{$item->ITEM}}" style="margin-top: 5px;float: right;" class="btn btn-rounded btn-space btn-success btn-sm modificardetallepm">MODIFICAR</button>
         </td>
