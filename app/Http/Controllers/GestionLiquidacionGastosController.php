@@ -3421,9 +3421,8 @@ class GestionLiquidacionGastosController extends Controller
         $iddocumento = $this->funciones->decodificarmaestrapre($iddocumento,'LIQG');
         View::share('titulo','Agregar Detalle Liquidacion de Gastos');
         $liquidaciongastos          =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
-        $tdetliquidaciongastos      =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=',1)->get();
+        $tdetliquidaciongastos      =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=',1)->orderby('FECHA_CREA','desc')->get();
         $tdetliquidaciongastosobs   =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=',0)->get();
-
 
 
         if($liquidaciongastos->COD_ESTADO!='ETM0000000000001' && $liquidaciongastos->IND_OBSERVACION ==0){
@@ -3806,6 +3805,9 @@ class GestionLiquidacionGastosController extends Controller
 
                 $cuenta_id      =   $this->lg_cuenta_top_1("Seleccione una Cuenta","","TCO0000000000069",$centro_id,$empresa_id);
                 $combo_cuenta   =   $this->lg_combo_cuenta("Seleccione una Cuenta","","TCO0000000000069",$centro_id,$empresa_id);
+                $cuenta_id          =   "";
+                $combo_cuenta       =   array();
+
                 $cuenta         =   $this->lg_cuenta("Seleccione una Cuenta","","TCO0000000000069",$centro_id,$empresa_id);
                 if(count($cuenta)>0){
                     $cod_contrato       =   $cuenta->COD_CONTRATO;
@@ -3841,7 +3843,7 @@ class GestionLiquidacionGastosController extends Controller
             $combo_arendir_sel   =   $this->gn_combo_arendir();
 
             $moneda_sel_id       =   '';
-            $combo_moneda_sel    =   $this->gn_generacion_combo_categoria('MONEDA',"SELECCIONE SI TIENE A RENDIR",'');
+            $combo_moneda_sel    =   $this->gn_generacion_combo_categoria('MONEDA',"SELECCIONE MONEDA",'');
 
 
             //dd($combo_arendir_sel);
@@ -3878,6 +3880,54 @@ class GestionLiquidacionGastosController extends Controller
         }   
     }
 
+
+    public function actionAjaxComboCuentaXMoneda(Request $request)
+    {
+
+        $empresa_id             =   $request['empresa_id'];
+        $moneda_sel_id          =   $request['moneda_sel_id'];
+
+
+
+        $cuenta_id              =   "";
+        $trabajador             =   DB::table('STD.TRABAJADOR')
+                                    ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                                    ->first();
+
+        $dni                    =   '';
+        $centro_id              =   '';
+        if(count($trabajador)>0){
+            $dni                =   $trabajador->NRO_DOCUMENTO;
+        }
+        $trabajadorespla        =   DB::table('WEB.platrabajadores')
+                                    ->where('situacion_id', 'PRMAECEN000000000002')
+                                    ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+                                    ->where('dni', $dni)
+                                    ->first();
+        if(count($trabajador)>0){
+            $centro_id      =       $trabajadorespla->centro_osiris_id;
+        }
+
+        $cadena = $empresa_id;
+        $partes = explode(" - ", $cadena);
+        $nombre = '';
+        if (count($partes) > 1) {
+            $nombre = trim($partes[1]);
+        }
+
+
+        $combo_cuenta   =   $this->lg_combo_cuenta_moneda("Seleccione una Cuenta","","TCO0000000000069",$centro_id,$empresa_id,$moneda_sel_id);
+        //$combo_cuenta           =   $this->lg_combo_cuenta_lg_moneda('Seleccione una Cuenta','','',$centro_id,$empresa_id,$moneda_sel_id);
+        
+
+        return View::make('general/ajax/combocuenta',
+                         [          
+
+                            'cuenta_id'                     => $cuenta_id,
+                            'combo_cuenta'                  => $combo_cuenta,
+                            'ajax'                          => true,                            
+                         ]);
+    }
 
     public function actionAjaxComboCuenta(Request $request)
     {

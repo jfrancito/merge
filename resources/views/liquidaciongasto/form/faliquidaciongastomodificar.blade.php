@@ -116,7 +116,7 @@
                     placeholder="TOTAL"
                     readonly = "readonly"
                     required = ""
-                    autocomplete="off" class="form-control input-sm"/>
+                    autocomplete="off" class="form-control input-sm" style="font-weight: bold;font-size: 20px;" />
         </div>
       </div>
     </div>

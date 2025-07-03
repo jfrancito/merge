@@ -106,7 +106,7 @@
                     placeholder="SERIE"
                     maxlength="4"
                     required = ""
-                    autocomplete="off" class="form-control input-sm"/>
+                    autocomplete="off" class="form-control input-sm validarmayusculas"/>
 
         </div>
       </div>

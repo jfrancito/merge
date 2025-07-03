@@ -1380,6 +1380,33 @@ trait LiquidacionGastoTraits
         return  $combo;                    
     }
 
+    private function lg_combo_cuenta_moneda($titulo,$todo,$tipocontrato,$centro_id,$empresa_id,$moneda_id) {
+
+        $array                          = DB::table('CMP.CONTRATO as TBL')
+                                            ->selectRaw("
+                                                TBL.COD_CONTRATO,
+                                                LEFT(TBL.COD_CONTRATO, 6) + '-0' + CAST(CAST(RIGHT(TBL.COD_CONTRATO, 10) AS INT) AS VARCHAR(10)) + ' -- ' 
+                                                + IIF(TBL.COD_CATEGORIA_MONEDA = 'MON0000000000001', 'S/', '$') + ' ' + TBL.TXT_CATEGORIA_TIPO_CONTRATO AS CONTRATO,
+                                                TBL.TXT_EMPR_CLIENTE,
+                                                TBL.COD_CATEGORIA_TIPO_CONTRATO,
+                                                TBL.TXT_CATEGORIA_TIPO_CONTRATO,
+                                                TBL.*
+                                            ")
+                                            ->where('TBL.COD_ESTADO', 1)
+                                            ->where('TBL.COD_CATEGORIA_TIPO_CONTRATO', $tipocontrato)
+                                            ->where('TBL.COD_EMPR', Session::get('empresas')->COD_EMPR)
+                                            ->where('TBL.COD_CENTRO', $centro_id)
+                                            ->where('TBL.COD_EMPR_CLIENTE', $empresa_id)
+                                            ->where('TBL.COD_CATEGORIA_MONEDA', $moneda_id)
+                                            ->whereNotIn('TBL.COD_CATEGORIA_ESTADO_CONTRATO', ['ECO0000000000005', 'ECO0000000000006'])
+                                            ->pluck('CONTRATO','COD_CONTRATO')
+                                            ->toArray();
+
+        $combo                  =   array('' => $titulo) + $array;
+
+        return  $combo;                    
+    }
+
 
     private function lg_combo_cuenta($titulo,$todo,$tipocontrato,$centro_id,$empresa_id) {
 
@@ -1459,7 +1486,29 @@ trait LiquidacionGastoTraits
         return  $combo;                    
     }
 
+    private function lg_combo_cuenta_lg_moneda($titulo,$todo,$tipocontrato,$centro_id,$empresa_id,$moneda_id) {
 
+
+        $array                          = DB::table('CMP.CONTRATO as TBL')
+                                            ->selectRaw("
+                                                TBL.COD_CONTRATO,
+                                                LEFT(TBL.COD_CONTRATO, 6) + '-0' + CAST(CAST(RIGHT(TBL.COD_CONTRATO, 10) AS INT) AS VARCHAR(10)) + ' -- ' 
+                                                + IIF(TBL.COD_CATEGORIA_MONEDA = 'MON0000000000001', 'S/', '$') + ' ' + TBL.TXT_CATEGORIA_TIPO_CONTRATO AS CONTRATO
+                                            ")
+                                            ->where('TBL.COD_ESTADO', 1)
+                                            //->where('TBL.COD_CATEGORIA_TIPO_CONTRATO', $tipocontrato)
+                                            ->where('TBL.COD_EMPR', Session::get('empresas')->COD_EMPR)
+                                            ->where('TBL.COD_CENTRO', $centro_id)
+                                            //->where('TBL.COD_CATEGORIA_MONEDA', $moneda_id)
+                                            ->where('TBL.COD_EMPR_CLIENTE', $empresa_id)
+                                            ->whereNotIn('TBL.COD_CATEGORIA_ESTADO_CONTRATO', ['ECO0000000000005', 'ECO0000000000006'])
+                                            ->pluck('CONTRATO','COD_CONTRATO')
+                                            ->toArray();
+
+        $combo                  =   array('' => $titulo) + $array;
+
+        return  $combo;                    
+    }
 
 
     private function lg_subcuenta_top1($titulo,$cod_contrato) {

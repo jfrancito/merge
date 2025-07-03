@@ -3,6 +3,60 @@ $(document).ready(function(){
     var carpeta = $("#carpeta").val();
 
 
+    $(".liquidaciongasto").on('change','#moneda_sel_c_id', function(e) {
+
+        var _token                  =   $('#token').val();
+        var empresa_id              =   $('#empresa_id').val();
+        var moneda_sel_id           =   $('#moneda_sel_c_id').val();
+        var link                    =   "/ajax-combo-cuenta-xmoneda";
+        var contenedor              =   "ajax_combo_cuenta_moneda";
+        debugger;
+
+        data                        =   {
+                                            _token                  : _token,
+                                            empresa_id              : empresa_id,
+                                            moneda_sel_id           : moneda_sel_id
+                                        };
+
+        ajax_normal_combo(data,link,contenedor);
+
+    });
+
+
+
+    $(".liquidaciongasto").on('click','.btn-guardar-whatsapp', function() {
+
+        var _token                                   =   $('#token').val();
+        var whatsapp                                 =   $('#whatsapp').val();
+        if (!/^\d{9}$/.test(whatsapp)) {
+            alerterrorajax("El número de WhatsApp debe tener exactamente 9 dígitos");
+            return false;
+        }
+        const link                                   =   '/guardar-numero-de-whatsapp';
+
+        data                                         =   {
+                                                                _token                  : _token,
+                                                                whatsapp                : whatsapp
+                                                         };                                       
+        abrircargando();
+        $.ajax({
+            type    :   "POST",
+            url     :   carpeta+link,
+            data    :   data,
+            success: function (data) {
+                cerrarcargando();
+                alertajax('Se registro su whatsapp.');
+
+            },
+            error: function (data) {
+                cerrarcargando();
+                error500(data);
+            }
+        });
+
+    });
+
+
     $(".liquidaciongasto").on('click','.btncargarsunat', function(e) {
         e.preventDefault(); // Prevenir recarga del formulario
 
@@ -291,37 +345,6 @@ $(document).ready(function(){
     });
 
 
-    $(".liquidaciongasto").on('click','.btn-guardar-whatsapp', function() {
-
-        var _token                                   =   $('#token').val();
-        var whatsapp                                 =   $('#whatsapp').val();
-        if (!/^\d{9}$/.test(whatsapp)) {
-            alerterrorajax("El número de WhatsApp debe tener exactamente 9 dígitos");
-            return false;
-        }
-        const link                                   =   '/guardar-numero-de-whatsapp';
-
-        data                                         =   {
-                                                                _token                  : _token,
-                                                                whatsapp                : whatsapp
-                                                         };                                       
-        abrircargando();
-        $.ajax({
-            type    :   "POST",
-            url     :   carpeta+link,
-            data    :   data,
-            success: function (data) {
-                cerrarcargando();
-                alertajax('Se registro su whatsapp.');
-
-            },
-            error: function (data) {
-                cerrarcargando();
-                error500(data);
-            }
-        });
-
-    });
 
 
 
@@ -604,6 +627,10 @@ $(document).ready(function(){
             $('.sectorarendir').hide();
         }
     });
+
+
+
+
 
     $(".liquidaciongasto").on('change','#arendir_sel_id', function(e) {
 
