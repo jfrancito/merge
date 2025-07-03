@@ -11,13 +11,17 @@
 <body>
     <header>
 	<div class="center">
-		<h3>PLANILLA POR GASTO DE MOVILIDAD SIN COMPROBANTE</h3>
+		<h3>PLANILLA POR GASTO DE MOVILIDAD SIN COMPROBANTE DE PAGO</h3>
 	</div>
 
 	<div class="menu">
 	    <div class="left">
 				<img src="{{ public_path('img/logonitido.png') }}" style="width: 200px;" alt="Logo">   
 	    </div>
+	    <div class="cent">
+	    		
+	    </div>
+
 	    <div class="right">
 	    		<h3>R.U.C. {{$ruc}}</h3> 
 	    		<h4>{{$planillamovilidad->TXT_EMPRESA}}</h4>
@@ -30,23 +34,23 @@
 			<div class="top">
 			    <div class="det1">
 	   				<p>
-	   					<strong>Periodo:</strong> {{$planillamovilidad->TXT_PERIODO}}
+	   					<strong>PERIODO:</strong> {{ucwords(strtolower($planillamovilidad->TXT_PERIODO))}}
 	   				</p>  		    		   					   				
 	   				<p>
-	   					<strong>Fecha Emision :</strong> {{date_format(date_create($planillamovilidad->FECHA_EMI), 'd/m/Y h:i:s')}}   					
+	   					<strong>FECHA EMISION :</strong> {{date_format(date_create($planillamovilidad->FECHA_EMI), 'd/m/Y h:i:s')}}   					
 	   				</p>
 	   				<p>
-	   					<strong>Nombre y Apellidos :</strong> {{$planillamovilidad->TXT_TRABAJADOR}}
+	   					<strong>NOMBRE Y APELLIDO :</strong> {{ucwords(strtolower($planillamovilidad->TXT_TRABAJADOR))}}
 	   				</p>	
 	   				<p>
 	   					<strong>DNI :</strong> {{$planillamovilidad->DOCUMENTO_TRABAJADOR}}
 	   				</p>
 	   				<p>
-	   					<strong>LUGAR DE TRABAJO :</strong> {{$planillamovilidad->TXT_DIRECCION}}
+	   					<strong>LUGAR DE TRABAJO :</strong> {{ucwords(strtolower($planillamovilidad->TXT_DIRECCION))}}
 	   				</p>
 
 	   				<p>
-	   					<strong>GLOSA :</strong> {{$planillamovilidad->TXT_GLOSA}}
+	   					<strong>GLOSA :</strong> {{ucwords(strtolower($planillamovilidad->TXT_GLOSA))}}
 	   				</p>
 
 			    </div>
@@ -58,16 +62,16 @@
 		  <table class="tpm">
 		    <tr>
 		      <th colspan="2"></th>
-		      <th colspan="3">DESPLAZAMIENTO</th>
-		      <th colspan="2">MONTO GASTADO POR (*)</th>
+		      <th colspan="3" class='titulo'>DESPLAZAMIENTO</th>
+		      <th colspan="2" class='titulo'>MONTO GASTADO (*)</th>
 		    </tr>
 
 		    <tr>
 		      <th class='titulo'>ITEM</th>
 		      <th class='titulo'>FECHA GASTO</th>
-		      <th class=''>MOTIVO</th>
-		      <th class=''>PUNTO DE PARTIDA</th>
-		      <th class=''>PUNTO DE LLEGADA</th>
+		      <th class='titulo'>MOTIVO</th>
+		      <th class='titulo'>PUNTO DE PARTIDA</th>
+		      <th class='titulo'>PUNTO DE LLEGADA</th>
 		      <th class='titulo'>POR VIAJE (S/)</th>
 		      <th class='titulo'>POR DIA (S/)</th>
 		    </tr>
@@ -89,9 +93,9 @@
 			    <tr>
 			        <td class='titulo'>{{ $index + 1 }}</td>
 			        <td class='titulo'>{{ $fecha }}</td>
-			        <td class=''>{{ $item->TXT_MOTIVO }}</td>
-			        <td class=''>{{ $item->TXT_LUGARPARTIDA }} - {{ $item->TXT_DEPARTAMENTO_PARTIDA }} - {{ $item->TXT_PROVINCIA_PARTIDA }} - {{ $item->TXT_DISTRITO_PARTIDA }}</td>
-			        <td class=''>{{ $item->TXT_LUGARLLEGADA }} - {{ $item->TXT_DEPARTAMENTO_LLEGADA }} - {{ $item->TXT_PROVINCIA_LLEGADA }} - {{ $item->TXT_DISTRITO_LLEGADA }}</td>
+			        <td class=''>{{ mb_convert_case(ucwords(strtolower($item->TXT_MOTIVO)), MB_CASE_TITLE, "UTF-8") }}</td>
+			        <td class=''>{{ ucwords(strtolower($item->TXT_LUGARPARTIDA)) }} - {{ ucwords(strtolower($item->TXT_DEPARTAMENTO_PARTIDA)) }} - {{ ucwords(strtolower($item->TXT_PROVINCIA_PARTIDA)) }} - {{ ucwords(strtolower($item->TXT_DISTRITO_PARTIDA)) }}</td>
+			        <td class=''>{{ ucwords(strtolower($item->TXT_LUGARLLEGADA)) }} - {{ ucwords(strtolower($item->TXT_DEPARTAMENTO_LLEGADA)) }} - {{ ucwords(strtolower($item->TXT_PROVINCIA_LLEGADA)) }} - {{ ucwords(strtolower($item->TXT_DISTRITO_LLEGADA)) }}</td>
 			        <td class='izquierda'>{{ number_format(round($item->TOTAL, 2), 2, '.', ',') }}</td>
 			        <td class='izquierda'>
 			            @if ($index === $ultimaFilaPorFecha[$fecha])
