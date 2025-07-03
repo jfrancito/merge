@@ -15,7 +15,7 @@
 }
 
 .menu .left{
-    width	: 	50%
+    width	: 	24%
     float	:	left;
     display : 	table-cell; 
     text-align: center;     
@@ -23,13 +23,24 @@
 
 
 .menu .right{
-    width	: 	50%
+    width	: 	38%
     float	:	left;
+    font-size: 14px;
     border  :	1px solid black; 
     display : 	table-cell; 
     text-align: center; 
     border-radius: 4px ;    
 }
+.menu .cent{
+    width   :   38%
+    float   :   left;
+    font-size: 14px;
+    display :   table-cell; 
+    text-align: center; 
+    border-radius: 4px ;    
+}
+
+
 
 .menu .left h1{
 	font-size:  1.2em;
