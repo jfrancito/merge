@@ -80,6 +80,8 @@ trait PrecioCompetenciaTraits
 	                  $urlxml                     =   'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/03';
 	                  $respuetacdr                =   $this->buscar_archivo_sunat_lg_nuevo($urlxml,$fetoken,$pathFiles,$prefijocarperta,$ID_DOCUMENTO,$item,'IND_CDR');
                   }
+
+
 									DB::table('SUNAT_DOCUMENTO')
 									    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
 									    ->where('RUC', $item->RUC)
@@ -90,6 +92,45 @@ trait PrecioCompetenciaTraits
 									    ->update([
 									        'IND_TOTAL'     => '1'
 									    ]);
+
+									$documentos = DB::table('SUNAT_DOCUMENTO')
+									    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
+									    ->where('RUC', $item->RUC)
+									    ->where('TIPODOCUMENTO_ID', $item->TIPODOCUMENTO_ID)
+									    ->where('SERIE', $item->SERIE)
+									    ->where('NUMERO', $item->NUMERO)
+									    ->where('CONTADOR', 3)
+									    ->get();
+
+									if(count($documentos)>0){
+										$usuario = DB::table('users')
+										    ->select(DB::raw("ISNULL(celular_contacto, '') AS celular_contacto"))
+										    ->where('id', $item->USUARIO_ID)
+										    ->first();
+										if(count($usuario)>0){
+												if($usuario->celular_contacto <> ''){
+
+													DB::connection('sqlsrv_isl')->table('whatsapphub')->insert([
+													    'NumeroContacto'   => $usuario->celular_contacto,
+													    'NombreContacto'   => $item->USUARIO_NOMBRE,
+													    'Mensaje'          => '¡Hola! Buen día %0D%0AEncontrammos tu documento que dejaste rastreando en busquedad de la APP.*%0D%0A* Datos del documento : '.$item->RUC.' // '.$item->SERIE.'-'.$item->NUMERO.'*%0D%0A*',
+													    'IndArchivo'       => 0,
+													    'RutaArchivo'      => '',
+													    'SizeArchivo'      => 0,
+													    'NombreProyecto'   => 'MERGE',
+													    'IndProgramado'    => 0,
+													    'IndManual'        => 0,
+													    'IndEnvio'         => 0,
+													    'FechaCreacion'    => DB::raw('GETDATE()'),
+													    'Activo'           => 1,
+													    'indgrupo'         => 0,
+													]);
+												}
+										}
+									}
+
+
+
               }else{
 									DB::table('SUNAT_DOCUMENTO')
 									    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
@@ -101,6 +142,46 @@ trait PrecioCompetenciaTraits
 									    ->update([
 									        'IND_TOTAL'     => '1'
 									    ]);
+
+										$documentos = DB::table('SUNAT_DOCUMENTO')
+										    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
+										    ->where('RUC', $item->RUC)
+										    ->where('TIPODOCUMENTO_ID', $item->TIPODOCUMENTO_ID)
+										    ->where('SERIE', $item->SERIE)
+										    ->where('NUMERO', $item->NUMERO)
+										    ->where('CONTADOR', 2)
+										    ->get();
+
+										if(count($documentos)>0){
+											$usuario = DB::table('users')
+											    ->select(DB::raw("ISNULL(celular_contacto, '') AS celular_contacto"))
+											    ->where('id', $item->USUARIO_ID)
+											    ->first();
+											if(count($usuario)>0){
+													if($usuario->celular_contacto <> ''){
+
+														DB::connection('sqlsrv_isl')->table('whatsapphub')->insert([
+														    'NumeroContacto'   => $usuario->celular_contacto,
+														    'NombreContacto'   => $item->USUARIO_NOMBRE,
+														    'Mensaje'          => '¡Hola! Buen día %0D%0AEncontrammos tu documento que dejaste rastreando en busquedad de la APP.*%0D%0A* Datos del documento : '.$item->RUC.' // '.$item->SERIE.'-'.$item->NUMERO.'*%0D%0A*',
+														    'IndArchivo'       => 0,
+														    'RutaArchivo'      => '',
+														    'SizeArchivo'      => 0,
+														    'NombreProyecto'   => 'MERGE',
+														    'IndProgramado'    => 0,
+														    'IndManual'        => 0,
+														    'IndEnvio'         => 0,
+														    'FechaCreacion'    => DB::raw('GETDATE()'),
+														    'Activo'           => 1,
+														    'indgrupo'         => 0,
+														]);
+													}
+											}
+										}
+
+
+
+
               }
 
 
@@ -139,7 +220,10 @@ trait PrecioCompetenciaTraits
 		  CURLOPT_RETURNTRANSFER => true,
 		  CURLOPT_ENCODING => '',
 		  CURLOPT_MAXREDIRS => 10,
-		  CURLOPT_TIMEOUT => 0,
+
+			CURLOPT_TIMEOUT => 10, // 👈 máximo 10 segundos para la respuesta
+			CURLOPT_CONNECTTIMEOUT => 5, // 👈 máximo 5 segundos para conectar
+
 		  CURLOPT_FOLLOWLOCATION => true,
 		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 		  CURLOPT_CUSTOMREQUEST => 'GET',
@@ -149,6 +233,18 @@ trait PrecioCompetenciaTraits
 		));
 		$response = curl_exec($curl);
 		curl_close($curl);
+
+		if(curl_errno($curl)) {
+			$error_msg = curl_error($curl);
+			curl_close($curl);
+			return [
+				'cod_error' => 1,
+				'nombre_archivo' => '',
+				'mensaje' => 'Error de conexión: ' . $error_msg
+			];
+		}
+
+
 		$response_array = json_decode($response, true);
 		if (!isset($response_array['nomArchivo'])) {
 			print_r("NO HAY");

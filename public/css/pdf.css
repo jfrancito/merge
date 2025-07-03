@@ -9,7 +9,7 @@
 }
 .menu{
     overflow:hidden;
-    width 	: 730px;
+    width 	: 100%;
     display : table;
     /*border 	: 1px solid black;*/
 }
@@ -47,7 +47,7 @@
 }
 
 .top .det1{
-	width: 718px;
+	width: 100%;
 	font-size: 0.8em;
 	margin-top: 5px;
 	border: 1px solid #000;
@@ -63,7 +63,7 @@
 .det2{
 	margin-top: 5px;
     overflow:hidden;
-    width 	: 730px;
+    width 	: 100%;
     display : table;
 	border: 1px solid #000;
 	border-radius: 4px;
@@ -79,7 +79,7 @@
 
 table {
     border-collapse: collapse;
-    width 	: 730px;
+    width 	: 100%;
 	margin-top: 15px;
     font-size: 0.7em;    
 }

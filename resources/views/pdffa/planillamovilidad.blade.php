@@ -41,7 +41,6 @@
 	   				<p>
 	   					<strong>DNI :</strong> {{$planillamovilidad->DOCUMENTO_TRABAJADOR}}
 	   				</p>
-
 	   				<p>
 	   					<strong>GLOSA :</strong> {{$planillamovilidad->TXT_GLOSA}}
 	   				</p>
@@ -56,7 +55,7 @@
 		    <tr>
 		      <th colspan="2"></th>
 		      <th colspan="3">DESPLAZAMIENTO</th>
-		      <th >MONTO GASTADO POR (**)</th>
+		      <th colspan="2">MONTO GASTADO POR (*)</th>
 		    </tr>
 
 		    <tr>
@@ -65,20 +64,41 @@
 		      <th class=''>MOTIVO</th>
 		      <th class=''>PUNTO DE PARTIDA</th>
 		      <th class=''>PUNTO DE LLEGADA</th>
-		      <th class='titulo'>DIA(*) (S/)</th>
+		      <th class='titulo'>POR VIAJE (S/)</th>
+		      <th class='titulo'>POR DIA (S/)</th>
 		    </tr>
-		    @foreach($detplanillamovilidad  as $index=>$item)
-			    <tr>			    	
-			      <td class='titulo'>{{$index+1}}</td>
-			      <td class='titulo'>{{date_format(date_create($item->FECHA_GASTO), 'd/m/Y')}}</td>
-			      <td class=''>{{$item->TXT_MOTIVO}}</td>
-			      <td class=''>{{$item->TXT_LUGARPARTIDA}} - {{$item->TXT_DEPARTAMENTO_PARTIDA}} - {{$item->TXT_PROVINCIA_PARTIDA}} - {{$item->TXT_DISTRITO_PARTIDA}}</td>
-			      <td class=''>{{$item->TXT_LUGARLLEGADA}} - {{$item->TXT_DEPARTAMENTO_LLEGADA}} - {{$item->TXT_PROVINCIA_LLEGADA}} - {{$item->TXT_DISTRITO_LLEGADA}}</td>
+			@php
+			    $totalesPorFecha = [];
+			    $ultimaFilaPorFecha = [];
 
-			      <td class='izquierda'>{{number_format(round($item->TOTAL,2),2,'.',',')}}</td>
+			    foreach ($detplanillamovilidad as $index => $item) {
+			        $fecha = date('d/m/Y', strtotime($item->FECHA_GASTO));
+			        $totalesPorFecha[$fecha] = ($totalesPorFecha[$fecha] ?? 0) + $item->TOTAL;
+			        $ultimaFilaPorFecha[$fecha] = $index; // Reemplaza con el último índice por fecha
+			    }
+			@endphp
+
+			@foreach($detplanillamovilidad as $index => $item)
+			    @php
+			        $fecha = date('d/m/Y', strtotime($item->FECHA_GASTO));
+			    @endphp
+			    <tr>
+			        <td class='titulo'>{{ $index + 1 }}</td>
+			        <td class='titulo'>{{ $fecha }}</td>
+			        <td class=''>{{ $item->TXT_MOTIVO }}</td>
+			        <td class=''>{{ $item->TXT_LUGARPARTIDA }} - {{ $item->TXT_DEPARTAMENTO_PARTIDA }} - {{ $item->TXT_PROVINCIA_PARTIDA }} - {{ $item->TXT_DISTRITO_PARTIDA }}</td>
+			        <td class=''>{{ $item->TXT_LUGARLLEGADA }} - {{ $item->TXT_DEPARTAMENTO_LLEGADA }} - {{ $item->TXT_PROVINCIA_LLEGADA }} - {{ $item->TXT_DISTRITO_LLEGADA }}</td>
+			        <td class='izquierda'>{{ number_format(round($item->TOTAL, 2), 2, '.', ',') }}</td>
+			        <td class='izquierda'>
+			            @if ($index === $ultimaFilaPorFecha[$fecha])
+			                {{ number_format(round($totalesPorFecha[$fecha], 2), 2, '.', ',') }}
+			            @endif
+			        </td>
 			    </tr>
-		    @endforeach		    
+			@endforeach
+
 			    <tr>			    	
+			      <td class='titulo'></td>
 			      <td class='titulo'></td>
 			      <td class='titulo'></td>
 			      <td class='titulo'></td>
@@ -110,12 +130,10 @@
         <article>
 			<div class="leyenda">
 			    <div class="">
-	   				<p>
-	   					Base legal Inciso a 1) del articulo 37 del TUO de la ley del impuesto de la Renta e Inciso v) del articulo 21º del Reglamneto
+	   				<p>	<b>Base legal</b><br>
+	   					 Inciso a 1) del articulo 37 del TUO de la ley del impuesto de la Renta <br> Inciso v) del articulo 21º del Reglamneto
 	   					de la Ley del Impuesto a la Renta.<br>
-	   					(*) El total diario no debe exceder el 4% del sueldo minimo.<br>
-	   					(**) La falta de consignación de alguno de estos datos inhabilita la planilla para la sustentación del gasto que corresponde a tal 
-	   					desplazamiento.
+	   					(*) El total diario no debe exceder el 4% de la Remuneración minima vital mensual. Siendo a la fecha, RMW: S/.1,130.00, el tope es S/.45.00<br>
 	   				</p>  		    		   					   				
 			    </div>
 			</div>
