@@ -28,6 +28,10 @@
             <span><b>PDF : 
               @if($item->IND_PDF==1)
                 <span class="mdi mdi-check-circle" style="display: inline-block;color: #34a853;"></span>
+                <a href="{{ url('/descargar-archivo-lq/'.$item->ID_DOCUMENTO.'/'.$item->NOMBRE_PDF.'/PDF') }}">
+                  <span class="mdi mdi-save" style="display: inline-block;color: #34a853;cursor: pointer;"></span>
+                </a>  
+
               @else
                 <span class="mdi mdi-close-circle" style="display: inline-block;color: #cc0000;"></span>
               @endif
@@ -36,6 +40,10 @@
             <span><b>XML : 
               @if($item->IND_XML==1)
                 <span class="mdi mdi-check-circle" style="display: inline-block;color: #34a853;"></span>
+                <a href="{{ url('/descargar-archivo-lq/'.$item->ID_DOCUMENTO.'/'.$item->NOMBRE_XML.'/XML') }}">
+                  <span class="mdi mdi-save" style="display: inline-block;color: #34a853;cursor: pointer;"></span>
+                </a>  
+
               @else
                 <span class="mdi mdi-close-circle" style="display: inline-block;color: #cc0000;"></span>
               @endif
@@ -43,6 +51,10 @@
               </b></span>
             <span><b>CDR : 
               @if($item->IND_CDR==1)
+                <a href="{{ url('/descargar-archivo-lq/'.$item->ID_DOCUMENTO.'/'.$item->NOMBRE_CDR.'/CDR') }}">
+                  <span class="mdi mdi-save" style="display: inline-block;color: #34a853;cursor: pointer;"></span>
+                </a>  
+
                 <span class="mdi mdi-check-circle" style="display: inline-block;color: #34a853;"></span>
               @else
                 <span class="mdi mdi-close-circle" style="display: inline-block;color: #cc0000;"></span>

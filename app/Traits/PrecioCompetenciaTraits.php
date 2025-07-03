@@ -40,6 +40,17 @@ trait PrecioCompetenciaTraits
                                               ->get();
       //dd($listasunattareas);
       foreach($listasunattareas as $index=>$item){
+
+					DB::table('SUNAT_DOCUMENTO')
+					    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
+					    ->where('RUC', $item->RUC)
+					    ->where('TIPODOCUMENTO_ID', $item->TIPODOCUMENTO_ID)
+					    ->where('SERIE', $item->SERIE)
+					    ->where('NUMERO', $item->NUMERO)
+					    ->update([
+					        'FECHA_MOD'     => date('Ymd H:i:s')
+					    ]);
+      	
           try{  
               DB::beginTransaction();
               set_time_limit(0);
@@ -221,8 +232,8 @@ trait PrecioCompetenciaTraits
 		  CURLOPT_ENCODING => '',
 		  CURLOPT_MAXREDIRS => 10,
 
-			CURLOPT_TIMEOUT => 10, // 👈 máximo 10 segundos para la respuesta
-			CURLOPT_CONNECTTIMEOUT => 5, // 👈 máximo 5 segundos para conectar
+			CURLOPT_TIMEOUT => 15, // 👈 máximo 10 segundos para la respuesta
+			CURLOPT_CONNECTTIMEOUT => 10, // 👈 máximo 5 segundos para conectar
 
 		  CURLOPT_FOLLOWLOCATION => true,
 		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
@@ -234,15 +245,15 @@ trait PrecioCompetenciaTraits
 		$response = curl_exec($curl);
 		curl_close($curl);
 
-		if(curl_errno($curl)) {
-			$error_msg = curl_error($curl);
-			curl_close($curl);
-			return [
-				'cod_error' => 1,
-				'nombre_archivo' => '',
-				'mensaje' => 'Error de conexión: ' . $error_msg
-			];
-		}
+		// if(curl_errno($curl)) {
+		// 	$error_msg = curl_error($curl);
+		// 	curl_close($curl);
+		// 	return [
+		// 		'cod_error' => 1,
+		// 		'nombre_archivo' => '',
+		// 		'mensaje' => 'Error de conexión: ' . $error_msg
+		// 	];
+		// }
 
 
 		$response_array = json_decode($response, true);

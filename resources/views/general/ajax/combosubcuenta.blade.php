@@ -12,7 +12,7 @@
 @if(isset($ajax))
   <script type="text/javascript">
     $(document).ready(function(){
-        $(".select4").select2({
+        $(".subcuenta_id").select2({
             width: '100%'
         });
     });

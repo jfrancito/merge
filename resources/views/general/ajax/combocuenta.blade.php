@@ -3,7 +3,7 @@
   <div class="col-sm-12 abajocaja" >
     {!! Form::select( 'cuenta_id', $combo_cuenta, array($cuenta_id),
                       [
-                        'class'       => 'select3 form-control control input-sm' ,
+                        'class'       => 'select3 form-control control input-sm cuenta_id' ,
                         'id'          => 'cuenta_id',
                         'required' => ''
                       ]) !!}
@@ -12,7 +12,7 @@
 @if(isset($ajax))
   <script type="text/javascript">
     $(document).ready(function(){
-        $(".select3").select2({
+        $(".cuenta_id").select2({
             width: '100%'
         });
     });
