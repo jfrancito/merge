@@ -46,6 +46,7 @@
                             <tr>
                               <td class="cell-detail" style="position: relative;">
                                 <span style="display: block;"><b>FECHA EMISION : {{date_format(date_create($item->FECHA_EMISION), 'd/m/Y')}}</b></span>
+                                <span style="display: block;"><b>FECHA CREA : {{date_format(date_create($item->FECHA_CREA), 'd/m/Y h:i:s')}}</b></span>
                                 <span style="display: block;"><b>DOCUMENTO : </b> {{$item->SERIE}} - {{$item->NUMERO}}</span>
                                 <span style="display: block;"><b>TIPO DOCUMENTO : </b> {{$item->TXT_TIPODOCUMENTO}}</span>
                                 <span style="display: block;"><b>PROVEEDOR : </b> {{$item->TXT_EMPRESA_PROVEEDOR}}</span>                  
@@ -57,8 +58,7 @@
                                 <span style="display: block;"><b>COSTO : </b> {{$item->TXT_COSTO}}</span>
                                 <span style="display: block;"><b>SUBTOTAL : </b> {{$item->SUBTOTAL}}</span>
                                 <span style="display: block;"><b>IGV : </b> {{$item->IGV}}</span>
-                                <span style="display: block;"><b>TOTAL : </b> {{$item->TOTAL}}</span>
-
+                                <span style="display: block;font-size: 16px;"><b>TOTAL :  {{$item->TOTAL}}</b></span>
                                 <a href="{{ url('/modificar-liquidacion-gastos/'.$idopcion.'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -8)).'/'.$item->ITEM) }}" style="margin-top: 5px;float: right;" class="btn btn-rounded btn-space btn-success btn-sm">MODIFICAR</a>
                               </td>
                             </tr>                 

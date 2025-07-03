@@ -748,6 +748,27 @@ trait GeneralesTraits
 	 	return  $combo;					 			
 	}
 
+
+	private function gn_generacion_combo_direccion($txt_grupo,$titulo,$todo,$id) {
+		
+		$array 						= 	DB::table('CMP.CATEGORIA')
+        								->where('COD_ESTADO','=',1)
+        								->where('TXT_GRUPO','=',$txt_grupo)
+        								->where('COD_CATEGORIA_SUP','=',$id)
+		        						->pluck('NOM_CATEGORIA','COD_CATEGORIA')
+										->toArray();
+
+		if($todo=='TODO'){
+			$combo  				= 	array('' => $titulo , $todo => $todo) + $array;
+		}else{
+			$combo  				= 	array('' => $titulo) + $array;
+		}
+
+	 	return  $combo;					 			
+	}
+
+
+
 	private function gn_generacion_combo_categoria_xid($txt_grupo,$titulo,$todo,$id) {
 		
 		$array 						= 	DB::table('CMP.CATEGORIA')
@@ -765,6 +786,63 @@ trait GeneralesTraits
 
 	 	return  $combo;					 			
 	}
+
+
+	private function gn_generacion_combo_direccion_lg($titulo,$todo) {
+		
+		$array = DB::table('STD.EMPRESA as EMP')
+		    ->join('STD.EMPRESA_DIRECCION as EMD', 'EMP.COD_EMPR', '=', 'EMD.COD_EMPR')
+		    ->leftJoin('CMP.CATEGORIA as DEP', 'EMD.COD_DEPARTAMENTO', '=', 'DEP.COD_CATEGORIA')
+		    ->leftJoin('CMP.CATEGORIA as PRO', 'EMD.COD_PROVINCIA', '=', 'PRO.COD_CATEGORIA')
+		    ->leftJoin('CMP.CATEGORIA as DIS', 'EMD.COD_DISTRITO', '=', 'DIS.COD_CATEGORIA')
+		    ->where('EMP.COD_EMPR', Session::get('empresas')->COD_EMPR)
+		    ->where('EMD.COD_ESTADO', 1)
+		    ->where(function ($query) {
+		        $query->where('EMD.COD_ESTABLECIMIENTO_SUNAT', '<>', '')
+		              ->orWhere('EMD.IND_DIRECCION_FISCAL', 1);
+		    })
+		    ->select(
+		        'EMD.COD_DIRECCION',
+		        DB::raw("EMD.NOM_DIRECCION + ' - ' + DEP.NOM_CATEGORIA + ' - ' + PRO.NOM_CATEGORIA + ' - ' + DIS.NOM_CATEGORIA AS DIRECCION")
+		    )
+			->pluck('DIRECCION','COD_DIRECCION')
+			->toArray();
+
+		if($todo=='TODO'){
+			$combo  				= 	array('' => $titulo , $todo => $todo) + $array;
+		}else{
+			$combo  				= 	array('' => $titulo) + $array;
+		}
+
+	 	return  $combo;					 			
+	}
+
+
+	private function gn_generacion_combo_direccion_lg_top($direcion_id) {
+
+		$direccion = DB::table('STD.EMPRESA as EMP')
+		    ->join('STD.EMPRESA_DIRECCION as EMD', 'EMP.COD_EMPR', '=', 'EMD.COD_EMPR')
+		    ->leftJoin('CMP.CATEGORIA as DEP', 'EMD.COD_DEPARTAMENTO', '=', 'DEP.COD_CATEGORIA')
+		    ->leftJoin('CMP.CATEGORIA as PRO', 'EMD.COD_PROVINCIA', '=', 'PRO.COD_CATEGORIA')
+		    ->leftJoin('CMP.CATEGORIA as DIS', 'EMD.COD_DISTRITO', '=', 'DIS.COD_CATEGORIA')
+		    ->where('EMP.COD_EMPR', Session::get('empresas')->COD_EMPR)
+		    ->where('EMD.COD_DIRECCION', $direcion_id)
+		    ->where('EMD.COD_ESTADO', 1)
+		    ->where(function ($query) {
+		        $query->where('EMD.COD_ESTABLECIMIENTO_SUNAT', '<>', '')
+		              ->orWhere('EMD.IND_DIRECCION_FISCAL', 1);
+		    })
+		    ->select(
+		        'EMD.COD_DIRECCION',
+		        DB::raw("EMD.NOM_DIRECCION + ' - ' + DEP.NOM_CATEGORIA + ' - ' + PRO.NOM_CATEGORIA + ' - ' + DIS.NOM_CATEGORIA AS DIRECCION")
+		    )
+			->first();
+			
+	 	return  $direccion;					 			
+	}
+
+
+
 
 	private function gn_generacion_combo_categoria($txt_grupo,$titulo,$todo) {
 		

@@ -9,13 +9,13 @@
 }
 .menu{
     overflow:hidden;
-    width 	: 730px;
+    width 	: 100%;
     display : table;
     /*border 	: 1px solid black;*/
 }
 
 .menu .left{
-    width	: 	50%
+    width	: 	24%
     float	:	left;
     display : 	table-cell; 
     text-align: center;     
@@ -23,13 +23,24 @@
 
 
 .menu .right{
-    width	: 	50%
+    width	: 	38%
     float	:	left;
+    font-size: 14px;
     border  :	1px solid black; 
     display : 	table-cell; 
     text-align: center; 
     border-radius: 4px ;    
 }
+.menu .cent{
+    width   :   38%
+    float   :   left;
+    font-size: 14px;
+    display :   table-cell; 
+    text-align: center; 
+    border-radius: 4px ;    
+}
+
+
 
 .menu .left h1{
 	font-size:  1.2em;
@@ -47,7 +58,7 @@
 }
 
 .top .det1{
-	width: 718px;
+	width: 100%;
 	font-size: 0.8em;
 	margin-top: 5px;
 	border: 1px solid #000;
@@ -63,7 +74,7 @@
 .det2{
 	margin-top: 5px;
     overflow:hidden;
-    width 	: 730px;
+    width 	: 100%;
     display : table;
 	border: 1px solid #000;
 	border-radius: 4px;
@@ -79,7 +90,7 @@
 
 table {
     border-collapse: collapse;
-    width 	: 730px;
+    width 	: 100%;
 	margin-top: 15px;
     font-size: 0.7em;    
 }

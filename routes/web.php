@@ -83,6 +83,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/descargar-archivo/{archivonombre}', 'CpeController@actionDescargarArchivo');
 	Route::any('/gestion-de-sunat-cpe-local/{idopcion}', 'CpeController@actionGestionCpeLocal');
 	Route::any('/descargar-archivo-local/{tipo}', 'CpeController@descargarArchivoLocal');
+	Route::any('/descargar-archivo-lq/{id}/{nombre_archivo}/{tipo}', 'CpeController@descargarArchivoLocalLQ');
+
+
 
 
 	Route::any('/descargar-archivos-sunat-lg', 'CpeController@descargarArchivoSunatLG');
@@ -99,6 +102,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/extonar-liquidacion-gastos/{idopcion}/{iddocumento}', 'GestionLiquidacionGastosController@actionExtornarLiquidacionGastos');
 
 
+	Route::any('/ajax-combo-cuenta-xmoneda', 'GestionLiquidacionGastosController@actionAjaxComboCuentaXMoneda');
+
+
 	Route::any('/guardar-detalle-liquidacion-gastos/{idopcion}/{iddocumento}', 'GestionLiquidacionGastosController@actionGuardarDetalleLiquidacionGastos');
 	Route::any('/ajax-modal-detalle-documento-lg', 'GestionLiquidacionGastosController@actionDetalleDocumentoLG');
 	Route::any('/guardar-detalle-documento-lg/{idopcion}/{iddocumento}/{item}', 'GestionLiquidacionGastosController@actionGuardarDetalleDocumentoLG');
@@ -111,9 +117,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/gestion-de-aprobacion-liquidacion-gasto-jefe/{idopcion}', 'GestionLiquidacionGastosController@actionAprobarLiquidacionGastoJefe');
 	Route::any('/aprobar-liquidacion-gasto-jefe/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionAprobarJefeLG');
 	Route::any('/agregar-observar-jefe/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionObservarJefeLG');
-
 	Route::any('/agregar-nuevo-formato', 'GestionLiquidacionGastosController@actionAgregarNuevoFormato');
-
 
 
 	Route::any('/gestion-de-aprobacion-liquidacion-gastos-contabilidad/{idopcion}', 'GestionLiquidacionGastosController@actionAprobarLiquidacionGastoContabilidad');

@@ -57,6 +57,42 @@ class CpeController extends Controller {
     use LiquidacionGastoTraits;
 
 
+    public function descargarArchivoLocalLQ($id,$nombrearchivo,$tipo)
+    {
+	    // Ruta UNC del archivo
+	    $ruta = "";
+    	if($tipo=='PDF'){
+			$documentos = DB::table('SUNAT_DOCUMENTO')
+			    ->where('ID_DOCUMENTO', $id)
+			    ->where('NOMBRE_PDF', $nombrearchivo)
+			    ->first();
+			$ruta = $documentos->RUTA_PDF;
+    	}
+    	if($tipo=='XML'){
+			$documentos = DB::table('SUNAT_DOCUMENTO')
+			    ->where('ID_DOCUMENTO', $id)
+			    ->where('NOMBRE_XML', $nombrearchivo)
+			    ->first();
+			$ruta = $documentos->RUTA_XML;
+    	}
+    	if($tipo=='CDR'){
+			$documentos = DB::table('SUNAT_DOCUMENTO')
+			    ->where('ID_DOCUMENTO', $id)
+			    ->where('NOMBRE_CDR', $nombrearchivo)
+			    ->first();
+			$ruta = $documentos->RUTA_CDR;
+    	}
+	    // Nombre para el archivo que se descargará
+	    $nombreDescarga = $nombrearchivo;
+	    // Verifica que el archivo exista
+	    if (!file_exists($ruta)) {
+	        return abort(404, 'Archivo no encontrado');
+	    }
+	    // Devuelve el archivo para descarga
+	    return response()->download($ruta, $nombreDescarga);
+    }
+
+
     public function descargarArchivoSunatLG()
     {
         $this->lg_descargar_archivo_sunat_lg();

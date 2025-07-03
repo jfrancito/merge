@@ -1,4 +1,3 @@
-
 <div class="row" style="font-size: 15px;padding-top: 20px;">
     <div class="col-sm-3">
         <aside class="sidebar">
@@ -11,6 +10,7 @@
                       $countdip   =   $count_x_aprobar_dip+$count_reparables_dip+$count_reparables__revdip+$count_observados_dip+$count_observadosdip_le;
                       $countdis   =   $count_x_aprobar_dis+$count_reparables_dis+$count_reparables__revdis+$count_observados_dis+$count_observadosdis_le;
                       $countdib   =   $count_x_aprobar_dib+$count_reparables_dib+$count_reparables__revdib+$count_observados_dib+$count_observadosdib_le;
+                      $countlg    =   $count_x_aprobar_lg+$count_observados_lg+$count_observadoslg_le;
                       $cantotal   =   $countoc+$countcon+$countest+$countdip+$countdis+$countdib;
                     @endphp
 
@@ -74,6 +74,16 @@
                             </a>
                         </li>
 
+                        <li class="nav-item">
+                            <a class="nav-link category-tab" data-category="dlg">
+                                <span class="nav-text">LIQUIDACIONES DE GASTOS</span>
+                                <div class="notification-container">
+                                    <span class="notification-badge">{{$countlg}}</span>
+                                </div>
+                            </a>
+                        </li>
+
+
 
                     </ul>
                 </nav>
@@ -118,6 +128,11 @@
             <div id="dib" class="category-content">
                 @include('usuario.dashboard.dib')
             </div>
+
+            <div id="dlg" class="category-content">
+                @include('usuario.dashboard.dlg')
+            </div>
+
 
         </main>
     </div>
