@@ -174,6 +174,29 @@ trait GeneralesTraits
 
 
 
+    public function gn_direccion_fiscal()
+    {
+		$direccion = DB::table('STD.EMPRESA as EMP')
+		    ->join('STD.EMPRESA_DIRECCION as EMD', 'EMP.COD_EMPR', '=', 'EMD.COD_EMPR')
+		    ->leftJoin('CMP.CATEGORIA as DEP', 'EMD.COD_DEPARTAMENTO', '=', 'DEP.COD_CATEGORIA')
+		    ->leftJoin('CMP.CATEGORIA as PRO', 'EMD.COD_PROVINCIA', '=', 'PRO.COD_CATEGORIA')
+		    ->leftJoin('CMP.CATEGORIA as DIS', 'EMD.COD_DISTRITO', '=', 'DIS.COD_CATEGORIA')
+		    ->where('EMP.COD_EMPR', '=', Session::get('empresas')->COD_EMPR)
+		    ->where(function($query) {
+		        $query->where('EMD.COD_ESTABLECIMIENTO_SUNAT', '<>', '')
+		              ->orWhere('EMD.IND_DIRECCION_FISCAL', '=', 1);
+		    })
+		    ->where('EMD.IND_DIRECCION_FISCAL', '=', 1)
+		    ->where('EMD.COD_ESTADO', '=', 1)
+		    ->select(
+		        'EMD.COD_DIRECCION',
+		        DB::raw("EMD.NOM_DIRECCION + ' - ' + DEP.NOM_CATEGORIA + ' - ' + PRO.NOM_CATEGORIA + ' - ' + DIS.NOM_CATEGORIA AS DIRECCION"),
+		        'EMD.IND_DIRECCION_FISCAL'
+		    )
+		    ->first();
+        return $direccion;
+    }
+
 
     public function gn_periodo_actual_xanio_xempresa($anio, $mes, $cod_empresa)
     {
