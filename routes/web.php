@@ -101,6 +101,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-combo-autoriza', 'GestionLiquidacionGastosController@actionAjaxComboAutoriza');
 	Route::any('/extonar-liquidacion-gastos/{idopcion}/{iddocumento}', 'GestionLiquidacionGastosController@actionExtornarLiquidacionGastos');
 
+	Route::any('/ajax-buscar-documento-uc-lg', 'GestionLiquidacionGastosController@actionAjaxUCListarLiquidacionGastos');
+
 
 	Route::any('/ajax-combo-cuenta-xmoneda', 'GestionLiquidacionGastosController@actionAjaxComboCuentaXMoneda');
 

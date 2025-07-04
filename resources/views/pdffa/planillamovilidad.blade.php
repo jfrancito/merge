@@ -19,7 +19,7 @@
 				<img src="{{ public_path('img/logonitido.png') }}" style="width: 150px;" alt="Logo">   
 	    </div>
 	    <div class="cent">
-	    		{{$planillamovilidad->TXT_EMPRESA}}
+	    		{{Session::get('empresas')->NOM_CORTO}}
 	    		<p style="font-size:8px;">{{$direccion->DIRECCION}}</p>
 	    </div>
 
