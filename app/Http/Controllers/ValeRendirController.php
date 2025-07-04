@@ -346,7 +346,9 @@ class ValeRendirController extends Controller
                 );
 
          if(count($array_detalle) > 0) {
-                 $id = WEBValeRendir::orderBy('id', 'DESC')->first()->ID;
+            
+                 $cod_empr_aux = Session::get('empresas')->COD_EMPR;
+                 $id = WEBValeRendir::where('COD_EMPR', $cod_empr_aux)->orderBy('id', 'DESC')->first()->ID;
                         
                 foreach ($array_detalle as $array) {
                      
