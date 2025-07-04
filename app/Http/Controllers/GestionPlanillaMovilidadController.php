@@ -320,8 +320,7 @@ class GestionPlanillaMovilidadController extends Controller
         $existeImagen           =   file_exists($rutaImagen);
         $empresa                =   STDEmpresa::where('COD_EMPR','=',$planillamovilidad->COD_EMPRESA)->first();
         $ruc                    =   $empresa->NRO_DOCUMENTO;
-
-
+        $direccion              =   $this->gn_direccion_fiscal();
 
         $pdf = PDF::loadView('pdffa.planillamovilidad', [ 
                 'iddocumento'           => $iddocumento, 
@@ -332,6 +331,7 @@ class GestionPlanillaMovilidadController extends Controller
                 'nombre_responsable'    => $nombre_responsable,
                 'imgaprueba'            => $imgaprueba,
                 'nombre_aprueba'        => $nombre_aprueba,
+                'direccion'             => $direccion,
             ])->setPaper('a4', 'landscape'); // 👈 esta línea pone el PDF en horizontal
 
         return $pdf->stream($planillamovilidad->ID_DOCUMENTO.'.pdf');

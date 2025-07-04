@@ -3686,7 +3686,7 @@ class GestionLiquidacionGastosController extends Controller
                         $area_txt                   =   $centrocosto->TXT_NOMBRE;
                     }
 
-                    dd($moneda);
+                    //dd($moneda);
                     $cabecera                           =   new LqgLiquidacionGasto;
                     $cabecera->ID_DOCUMENTO             =   $idcab;
                     $cabecera->CODIGO                   =   $codigo;

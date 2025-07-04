@@ -10,22 +10,26 @@
 </head>
 <body>
     <header>
-	<div class="center">
-		<h3>PLANILLA POR GASTO DE MOVILIDAD SIN COMPROBANTE DE PAGO</h3>
-	</div>
+<!-- 	<div class="center">
+		<h3>{{$planillamovilidad->TXT_EMPRESA}}</h3>
+	</div> -->
 
 	<div class="menu">
 	    <div class="left">
-				<img src="{{ public_path('img/logonitido.png') }}" style="width: 200px;" alt="Logo">   
+				<img src="{{ public_path('img/logonitido.png') }}" style="width: 150px;" alt="Logo">   
 	    </div>
 	    <div class="cent">
-	    		
+	    		{{$planillamovilidad->TXT_EMPRESA}}
+	    		<p style="font-size:8px;">{{$direccion->DIRECCION}}</p>
+	    </div>
+
+	    <div class="cent2">
 	    </div>
 
 	    <div class="right">
-	    		<h3>R.U.C. {{$ruc}}</h3> 
-	    		<h4>{{$planillamovilidad->TXT_EMPRESA}}</h4>
-	    		<h3>{{$planillamovilidad->SERIE}}-{{$planillamovilidad->NUMERO}}</h3> 
+	    		<h3>RUC N° {{$ruc}}</h3> 
+	    		<h4>PLANILLA DE MOVILIDAD.</h4>
+	    		<h3>N° {{$planillamovilidad->SERIE}}-{{$planillamovilidad->NUMERO}}</h3> 
 	    </div>
 	</div>
     </header>
@@ -33,25 +37,34 @@
         <article>
 			<div class="top">
 			    <div class="det1">
-	   				<p>
-	   					<strong>PERIODO:</strong> {{ucwords(strtolower($planillamovilidad->TXT_PERIODO))}}
-	   				</p>  		    		   					   				
-	   				<p>
-	   					<strong>FECHA EMISION :</strong> {{date_format(date_create($planillamovilidad->FECHA_EMI), 'd/m/Y h:i:s')}}   					
-	   				</p>
-	   				<p>
-	   					<strong>NOMBRE Y APELLIDO :</strong> {{ucwords(strtolower($planillamovilidad->TXT_TRABAJADOR))}}
-	   				</p>	
-	   				<p>
-	   					<strong>DNI :</strong> {{$planillamovilidad->DOCUMENTO_TRABAJADOR}}
-	   				</p>
-	   				<p>
-	   					<strong>LUGAR DE TRABAJO :</strong> {{ucwords(strtolower($planillamovilidad->TXT_DIRECCION))}}
-	   				</p>
 
-	   				<p>
-	   					<strong>GLOSA :</strong> {{ucwords(strtolower($planillamovilidad->TXT_GLOSA))}}
-	   				</p>
+					<table class="tcab">
+					    <tr>
+					      <td class="primertab"><b>PERIODO</b></td>
+					      <td><b> : </b>{{ucwords(strtolower(preg_replace('/^\(\d+\)\s*/', '', $planillamovilidad->TXT_PERIODO)))}}</td>
+					    </tr>
+					    <tr>
+					      <td class="primertab"><b>FECHA EMISION</b></td>
+					      <td><b> : </b>{{date_format(date_create($planillamovilidad->FECHA_EMI), 'd/m/Y h:i:s')}}</td>
+					    </tr>
+					    <tr>
+					      <td class="primertab"><b>NOMBRE Y APELLIDO</b></td>
+					      <td><b> : </b>{{ucwords(strtolower($planillamovilidad->TXT_TRABAJADOR))}}</td>
+					    </tr>
+						<tr>
+					      <td class="primertab"><b>DNI</b></td>
+					      <td><b> : </b>{{$planillamovilidad->DOCUMENTO_TRABAJADOR}}</td>
+					    </tr>	   
+						<tr>
+					      <td class="primertab"><b>LUGAR DE TRABAJO</b></td>
+					      <td><b> : </b>{{ucwords(strtolower($planillamovilidad->TXT_DIRECCION))}}</td>
+					    </tr>
+						<tr>
+					      <td class="primertab"><b>GLOSA</b></td>
+					      <td><b> : </b>{{ucwords(strtolower($planillamovilidad->TXT_GLOSA))}}</td>
+					    </tr>
+
+					</table>
 
 			    </div>
 			</div>
@@ -61,8 +74,8 @@
 
 		  <table class="tpm">
 		    <tr>
-		      <th colspan="2"></th>
-		      <th colspan="3" class='titulo'>DESPLAZAMIENTO</th>
+		      <th colspan="3" style="border: none !important;"></th>
+		      <th colspan="2" class='titulo'>DESPLAZAMIENTO</th>
 		      <th colspan="2" class='titulo'>MONTO GASTADO (*)</th>
 		    </tr>
 
