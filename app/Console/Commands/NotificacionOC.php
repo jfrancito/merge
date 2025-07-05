@@ -52,21 +52,23 @@ class NotificacionOC extends Command
     {
         set_time_limit(0);
         /****************************************************************************/
+
         $this->envio_correo_confirmacion();
-        $this->orden_ingreso_ejecutada();
-        $this->sunat_cdr();
         $this->ejecutar_orden_ingreso();
-        $this->sunat_cdr_contrato();
 
         $horaActual = date("H:i");
 
 
-        if($horaActual == '07:00' || 
-            $horaActual == '10:00' || 
-            $horaActual == '12:00' || 
-            $horaActual == '14:00' || 
-            $horaActual == '17:00' ||
+        if($horaActual == '07:00' || $horaActual == '08:00' || $horaActual == '09:00' ||
+            $horaActual == '10:00' ||  $horaActual == '11:00' ||
+            $horaActual == '12:00' ||  $horaActual == '13:00' || 
+            $horaActual == '14:00' ||  $horaActual == '15:00' ||
+            $horaActual == '16:00' ||  $horaActual == '17:00' ||
             $horaActual == '20:00'){
+
+            $this->orden_ingreso_ejecutada();
+            $this->sunat_cdr();
+            $this->sunat_cdr_contrato();
             $this->cambiar_fecha_vencimiento();
             $this->cambiar_parcialmente();
         }

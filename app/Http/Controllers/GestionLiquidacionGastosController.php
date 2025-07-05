@@ -3286,8 +3286,6 @@ class GestionLiquidacionGastosController extends Controller
                                 }
 
                             }
-
-                            //DD($codigocdr);
                         } else {
                             $respuestacdr  = 'Error al intentar descomprimir el CDR';
                         }
