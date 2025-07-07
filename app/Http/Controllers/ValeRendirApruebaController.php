@@ -92,6 +92,8 @@ class ValeRendirApruebaController extends Controller
                 ""
         );
 
+        //dd($listarusuarios);
+
         return view('valerendir.ajax.modalvalerendiraprueba', [
             'listausuarios' => $combo,
             'listausuarios1' => $combo1,

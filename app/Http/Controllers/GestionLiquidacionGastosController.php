@@ -2463,10 +2463,12 @@ class GestionLiquidacionGastosController extends Controller
                 //validar que tenga la firma quien
                 $detliquidaciongasto    =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
                 $useario_autoriza       =   User::where('id','=',$detliquidaciongasto->COD_USUARIO_AUTORIZA)->first();
+                //dd($useario_autoriza);
                 $trabajadorap           =   STDTrabajador::where('COD_TRAB','=',$useario_autoriza->usuarioosiris_id)->first();
                 $imgaprueba             =   'firmas/blanco.jpg';
                 $nombre_aprueba         =   '';
                 $rutaImagen             =   public_path('firmas/'.$trabajadorap->NRO_DOCUMENTO.'.jpg');
+                //dd($rutaImagen);
                 if (!file_exists($rutaImagen)){
                     return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/0')->with('errorbd','No se puede emitir ya que el que autoriza no cuenta con firma llamar a sistemas');
                 }

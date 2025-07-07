@@ -1050,6 +1050,7 @@ trait LiquidacionGastoTraits
                                 ->where(function ($query) {
                                     $query->where('AREA_OBSERVACION', '=', '')
                                           ->orWhere('AREA_OBSERVACION', '=', 'CONT')
+                                          ->orWhere('AREA_OBSERVACION', '=', 'JEFE')
                                           ->orWhereNull('AREA_OBSERVACION');
                                 })
                                 ->where('COD_ESTADO','=','ETM0000000000004')
