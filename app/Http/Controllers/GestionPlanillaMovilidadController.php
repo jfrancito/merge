@@ -979,7 +979,7 @@ class GestionPlanillaMovilidadController extends Controller
         $funcion            =       $this;
         $fecha_fin          =       $this->fecha_sin_hora;
 
-        $arraymotivo        =       DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','MOTIVO_MOVILIDAD')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
+        $arraymotivo        =       DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','MOTIVO_MOVILIDAD')->where('COD_ESTADO','=','1')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
         $combomotivo        =       array('' => "SELECCIONE MOTIVO") + $arraymotivo;
         $motivo_id          =       '';
 

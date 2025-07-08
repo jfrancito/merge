@@ -1365,8 +1365,11 @@ class GestionLiquidacionGastosController extends Controller
         $resultado = DB::table('LQG_DETLIQUIDACIONGASTO as lqg')
             ->join('PLA_MOVILIDAD as pla', 'lqg.COD_PLA_MOVILIDAD', '=', 'pla.ID_DOCUMENTO')
             ->where('lqg.COD_TIPODOCUMENTO', 'TDO0000000000070')
+            //->where('lqg.ID_DOCUMENTO','=','LIQG00000052')
             ->select('lqg.*') // o select específico si necesitas columnas concretas
             ->get();
+
+        //dd($resultado);    
 
         foreach ($resultado as $index => $item) {
 
@@ -1420,7 +1423,7 @@ class GestionLiquidacionGastosController extends Controller
             $detplanillamovilidad   =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->orderby('FECHA_GASTO','ASC')->get();
             $empresa                =   STDEmpresa::where('COD_EMPR','=',$planillamovilidad->COD_EMPRESA)->first();
             $ruc                    =   $empresa->NRO_DOCUMENTO;
-            $prefijocarperta        =   $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
+            $prefijocarperta        =   $this->prefijo_empresa($item->COD_EMPRESA);
             $rutafile               =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$data_iddocumento;
             $valor                  =   $this->versicarpetanoexiste($rutafile);
             $rutacompleta           =   $rutafile . '\\' . $planillamovilidad->SERIE . '-' . $planillamovilidad->NUMERO . '.pdf';
@@ -1454,7 +1457,7 @@ class GestionLiquidacionGastosController extends Controller
             }
 
             $direccion              =   $this->gn_direccion_fiscal();
-
+            //DD($rutacompleta);
             $pdf = PDF::loadView('pdffa.planillamovilidad', [ 
                                                     'iddocumento'           => $iddocumento , 
                                                     'planillamovilidad'     => $planillamovilidad,

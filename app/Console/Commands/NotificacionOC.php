@@ -55,7 +55,7 @@ class NotificacionOC extends Command
 
         $this->envio_correo_confirmacion();
         $this->ejecutar_orden_ingreso();
-
+        $this->orden_ingreso_ejecutada();
         $horaActual = date("H:i");
 
 
@@ -66,7 +66,7 @@ class NotificacionOC extends Command
             $horaActual == '16:00' ||  $horaActual == '17:00' ||
             $horaActual == '20:00'){
 
-            $this->orden_ingreso_ejecutada();
+
             $this->sunat_cdr();
             $this->sunat_cdr_contrato();
             $this->cambiar_fecha_vencimiento();
