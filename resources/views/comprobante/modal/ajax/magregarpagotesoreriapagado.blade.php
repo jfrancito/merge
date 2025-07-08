@@ -1,4 +1,4 @@
-<form method="POST" id='formpedido' action="{{ url('/pago-comprobante-tesoreria-pagado/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
+<form method="POST" id='formpedido' action="{{ url('/pago-comprobante-tesoreria-pagado/'.$idopcion.'/'.$linea.'/'.substr($fedocumento->ID_DOCUMENTO, 0,6).'/'.Hashids::encode(substr($fedocumento->ID_DOCUMENTO, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
 {{ csrf_field() }}
 
 	<div class="modal-header" style="background: #1d3a6d;">
@@ -6,16 +6,16 @@
 
 	  <div class="row">
 			<div class="col-xs-6">
-				ORDEN COMPRA : {{$ordencompra->COD_ORDEN}}
+				ORDEN COMPRA : {{$fedocumento->ID_DOCUMENTO}}
 			</div>
 			<div class="col-xs-5">
-				FECHA : {{date_format(date_create($ordencompra->FEC_EMISION), 'd-m-Y')}}
+				FECHA : {{date_format(date_create($fedocumento->FEC_VENTA), 'd-m-Y')}}
 			</div>	
 		</div>
 
 	  <div class="row">
 			<div class="col-xs-6">
-				PROVEEDOR : {{$ordencompra->TXT_EMPR_CLIENTE}}
+				PROVEEDOR : {{$fedocumento->RZ_PROVEEDOR}}
 			</div>
 			<div class="col-xs-6">
 				DOCUMENTO : {{$fedocumento->SERIE}} - {{$fedocumento->NUMERO}}
@@ -55,12 +55,10 @@
 
 	</div>
 
-	<div class="modal-footer">
-	  <button type="submit" data-dismiss="modal" class="btn btn-success btn-guardar-configuracion">Guardar</button>
-	</div>
 </form>
 @if(isset($ajax))
   <script type="text/javascript">
+
       @foreach($tarchivos as $index => $item) 
             var nombre_archivo = '{{$archivo->NOMBRE_ARCHIVO}}';
          		$('#file-{{$item->COD_CATEGORIA_DOCUMENTO}}').fileinput({
@@ -75,6 +73,8 @@
             });
 
       @endforeach
+
+      
   </script>
 @endif
 

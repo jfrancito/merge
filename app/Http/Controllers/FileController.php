@@ -258,7 +258,13 @@ class FileController extends Controller
 
         $archivo                =       Archivo::where('NOMBRE_ARCHIVO','=',$newstr)->first();
         $fedocumento            =       FeDocumento::where('ID_DOCUMENTO','=',$archivo->ID_DOCUMENTO)->first();
-        $ordencompra            =       CMPOrden::where('COD_ORDEN','=',$archivo->ID_DOCUMENTO)->first();
+
+        if($fedocumento->OPERACION == 'CONTRATO'){
+            $ordencompra            =       CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$archivo->ID_DOCUMENTO)->first();
+        }else{
+            $ordencompra            =       CMPOrden::where('COD_ORDEN','=',$archivo->ID_DOCUMENTO)->first();
+        }
+
         $prefijocarperta        =       $this->prefijo_empresa($ordencompra->COD_EMPR);
 
         //dd($prefijocarperta);

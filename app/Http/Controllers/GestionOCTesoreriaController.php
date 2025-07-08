@@ -1226,10 +1226,15 @@ class GestionOCTesoreriaController extends Controller
         if(Session::has('operacion_id')){
             $operacion_id           =   Session::get('operacion_id');
         }
+
+
+        if(Session::has('operacion_id')){
+            $operacion_id           =   Session::get('operacion_id');
+        }
         $fecha_inicio       =   $this->fecha_menos_diez_dias;
         $fecha_fin          =   $this->fecha_sin_hora;
         $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO');
-        $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA');
+        //$combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA');
 
         //$combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA');
         $proveedor_id       =   'TODO';
@@ -1297,21 +1302,19 @@ class GestionOCTesoreriaController extends Controller
         $idopcion               =   $request['idopcion'];
 
         $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$cod_orden)->where('DOCUMENTO_ITEM','=',$linea)->first();
-        $ordencompra            =   CMPOrden::where('COD_ORDEN','=',$cod_orden)->first();
-
+        //$ordencompra            =   CMPOrden::where('COD_ORDEN','=',$cod_orden)->first();
         //ARCHIVOS
         $archivosdelfe          =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                         ->whereIn('COD_CATEGORIA', ['DCC0000000000028'])
                                         ->get();
-
-        $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+        $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$cod_orden)->where('COD_ESTADO','=',1)
                                         ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000028'])
                                         ->get();
         if(count($tarchivos)<=0){
             foreach($archivosdelfe as $index=>$item){
                     $categoria                               =   CMPCategoria::where('COD_CATEGORIA','=',$item->COD_CATEGORIA)->first();
                     $docasociar                              =   New CMPDocAsociarCompra;
-                    $docasociar->COD_ORDEN                   =   $ordencompra->COD_ORDEN;
+                    $docasociar->COD_ORDEN                   =   $cod_orden;
                     $docasociar->COD_CATEGORIA_DOCUMENTO     =   $categoria->COD_CATEGORIA;
                     $docasociar->NOM_CATEGORIA_DOCUMENTO     =   $categoria->NOM_CATEGORIA;
                     $docasociar->IND_OBLIGATORIO             =   $categoria->IND_DOCUMENTO_VAL;
@@ -1325,7 +1328,7 @@ class GestionOCTesoreriaController extends Controller
             }
         }
 
-        $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+        $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$cod_orden)->where('COD_ESTADO','=',1)
                                         ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000028'])
                                         ->get();
 
@@ -1338,7 +1341,6 @@ class GestionOCTesoreriaController extends Controller
                             'linea'                 => $linea,
                             'idopcion'              => $idopcion,
                             'fedocumento'           => $fedocumento,
-                            'ordencompra'           => $ordencompra,
                             'tarchivos'             => $tarchivos,
                             'archivo'               => $archivo,
                             'ajax'                  => true,                            
@@ -1718,6 +1720,61 @@ class GestionOCTesoreriaController extends Controller
     }
 
 
+
+    public function actionExtornoTesoreriaPagadoContrato($idordencompra,$idopcion,Request $request)
+    {
+
+        $idoc                   =   $idordencompra;
+        $ordencompra            =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$idoc)->first();
+
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->first();
+        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->get();
+        try{    
+            
+            DB::beginTransaction();
+
+            $pedido_id          =   $idoc;
+            $tarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
+                                    ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000028')
+                                    ->get();
+
+            FeDocumento::where('ID_DOCUMENTO',$pedido_id)
+                        ->update(
+                            [
+                                'COD_ESTADO'=>'ETM0000000000005',
+                                'TXT_ESTADO'=>'APROBADO'
+                            ]
+                        );
+
+            Archivo::where('ID_DOCUMENTO',$pedido_id)->where('TIPO_ARCHIVO','=','DCC0000000000028')
+                        ->update(
+                            [
+                                'ACTIVO'=>'0'
+                            ]
+                        );
+
+            $documento                              =   new FeDocumentoHistorial;
+            $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+            $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+            $documento->FECHA                       =   $this->fechaactual;
+            $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+            $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+            $documento->TIPO                        =   'EXTORNO COMPROBANTE DE PAGO';
+            $documento->MENSAJE                     =   '';
+            $documento->save();
+            Session::flash('operacion_id', 'CONTRATO');
+            DB::commit();
+            return Redirect::to('/gestion-de-comprobante-pago-tesoreria/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_DOCUMENTO_CTBLE.' Extornado con exito');
+        }catch(\Exception $ex){
+            DB::rollback(); 
+            return Redirect::to('gestion-de-comprobante-pago-tesoreria/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+        }
+
+
+
+    }
+
+
     public function actionExtornoTesoreriaPagado($idordencompra,$idopcion,Request $request)
     {
 
@@ -1729,8 +1786,6 @@ class GestionOCTesoreriaController extends Controller
         try{    
             
             DB::beginTransaction();
-
-
 
             $pedido_id          =   $idoc;
             $tarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)

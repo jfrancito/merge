@@ -527,6 +527,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/pago-comprobante-tesoreria-pagado/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCTesoreriaController@actionAprobarTesoreriaPagado');
 	Route::any('/extornar-pago-item/{idordencompra}/{idopcion}', 'GestionOCTesoreriaController@actionExtornoTesoreriaPagado');
 
+	Route::any('/extornar-pago-item-contrato/{idordencompra}/{idopcion}', 'GestionOCTesoreriaController@actionExtornoTesoreriaPagadoContrato');
+
+
 
 	Route::any('/gestion-de-provision-comprobante/{idopcion}', 'GestionOCProvisionController@actionListarComprobanteProvision');
 	Route::any('/provisionar-documentos/{idopcion}', 'GestionOCProvisionController@actionListarProvisionarComprobante');

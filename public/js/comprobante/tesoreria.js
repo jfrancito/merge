@@ -1,6 +1,29 @@
 $(document).ready(function(){
 
     var carpeta = $("#carpeta").val();
+
+    $('.extornarapagocontrato').on('click', function(event){
+
+        debugger;
+        event.preventDefault();
+        var href = $(this).attr('href');
+
+        $.confirm({
+            title: '¿Confirma el Extorno?',
+            content: 'Extorno de pago del Comprobante',
+            buttons: {
+                confirmar: function () {
+                    window.location.href = href;
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo el extorno');
+                }
+            }
+        });
+
+    });
+
+
     $(".areatesoreria").on('click','.elimnaritem', function() {
         event.preventDefault();
         var data_tipoarchivo        =   $(this).attr('data_tipoarchivo');
@@ -59,6 +82,8 @@ $(document).ready(function(){
     });
 
     $('.extornarapago').on('click', function(event){
+
+        debugger;
         event.preventDefault();
         var href = $(this).attr('href');
 

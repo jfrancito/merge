@@ -12,12 +12,12 @@
     @foreach($listadatos as $index => $item)
       <tr data_requerimiento_id = "{{$item->ID_DOCUMENTO}}"
           data_linea = "{{$item->DOCUMENTO_ITEM}}"
-          data_orden_compra = "{{$item->ID_DOCUMENTO}}"
+          data_orden_compra = "{{$item->COD_ORDEN}}"
           data_proveedor = "{{$item->TXT_EMPR_CLIENTE}}"
           data_serie = "{{$item->SERIE}}"
           data_numero = "{{$item->NUMERO}}"
           data_total = "{{$item->CAN_TOTAL}}"
-          class='dobleclickpccontrato seleccionar'
+          class='dobleclickpcpagado seleccionar'
         >
 
         <td>{{$index+1}}</td>
@@ -50,6 +50,21 @@
           <span><b>TOTAL : </b> {{number_format($item->TOTAL_VENTA_ORIG, 4, '.', ',')}}</span>
         </td>
         @include('comprobante.ajax.estados')
+
+        <td class="rigth">
+          <div class="btn-group btn-hspace">
+            <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>
+            <ul role="menu" class="dropdown-menu pull-right">
+                <li>
+                  <a class="extornarapagocontrato" href="{{ url('/extornar-pago-item-contrato/'.$item->ID_DOCUMENTO.'/'.$idopcion) }}">
+                    Extornar Pago
+                  </a>
+                </li>
+            </ul>
+          </div>
+        </td>
+
+
       </tr>                    
     @endforeach
   </tbody>
