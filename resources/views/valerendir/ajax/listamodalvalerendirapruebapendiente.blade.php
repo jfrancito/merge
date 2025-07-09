@@ -1,5 +1,5 @@
 <table class="table table-striped table-borderless" style="font-style: italic;">
-    <thead>
+    <thead style="background-color: #1d3a6d; color: white;">
         <tr>
             <th>ID</th>
             <th>Solicita</th>
@@ -9,10 +9,8 @@
             <th>Importe</th>
             <th>Saldo</th>
             <th>Glosa</th>  
-            <th>Estado</th> 
-            <th>Ver Detalle</th>   
+            <th>Estado y Ver detalle</th>  
             <th>Acción</th>  
-
         </tr>
     </thead>
     <tbody>
@@ -25,10 +23,22 @@
             <td>{{$item['USUARIO_AUTORIZA']}}</td>
             <td>{{$item['USUARIO_APRUEBA']}}</td>
             <td>{{$item['TIPO_MOTIVO']}}</td>
-            <td>S/. {{$item['CAN_TOTAL_IMPORTE']}}</td>
-            <td>S/. {{$item['CAN_TOTAL_SALDO']}}</td>
+            <td>S/.{{$item['CAN_TOTAL_IMPORTE']}}</td>
+            <td>S/.{{$item['CAN_TOTAL_SALDO']}}</td>
             <td class="custom-glosa">{{$item['TXT_GLOSA']}}</td>
-            <td>
+
+            @php
+             $motivosPermitidos = [
+            'GASTOS DE OPERACION',
+            'GASTOS DE REPRESENTACION',
+            'GASTOS DE MARKETING Y PUBLICIDAD',
+            'GASTOS DE CAPACITACION Y FORMACION',
+            'GASTOS DE INVESTIGACION Y DESARROLLO'
+            ];
+            @endphp
+
+            <td class="align-middle text-center">
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
                 @if($item['TXT_CATEGORIA_ESTADO_VALE'] === 'AUTORIZADO')
                     <span class="badge badge-primary">POR APROBAR ADMINISTRACION</span> 
                 @elseif ($item['TXT_CATEGORIA_ESTADO_VALE'] === 'AUTORIZADO')
@@ -41,20 +51,7 @@
                      <span class="badge badge-custom-danger">{{$item['TXT_CATEGORIA_ESTADO_VALE']}}</span>                        
                 @endif
 
-            </td> 
-
-            @php
-             $motivosPermitidos = [
-            'GASTOS DE OPERACION',
-            'GASTOS DE REPRESENTACION',
-            'GASTOS DE MARKETING Y PUBLICIDAD',
-            'GASTOS DE CAPACITACION Y FORMACION',
-            'GASTOS DE INVESTIGACION Y DESARROLLO'
-            ];
-            @endphp
-
-          
-           <td class="custom-glosa1">
+         
 
                 <div class="dropdown">
 
@@ -86,19 +83,20 @@
            </td>
 
              <td>
-                @if($item['TXT_CATEGORIA_ESTADO_VALE'] !== 'APROBADO' && $item['TXT_CATEGORIA_ESTADO_VALE'] !== 'RECHAZADO')
-                  <button class="btn btn-space btn-check btn-social registroaprobar-valerendir" 
-                        data-toggle="tooltip" data-placement="top">
-                        <i class="icon mdi mdi-check-circle"></i> 
-                </button>
-                @endif
-                @if($item['TXT_CATEGORIA_ESTADO_VALE'] !== 'APROBADO' && $item['TXT_CATEGORIA_ESTADO_VALE'] !== 'RECHAZADO')
-                    <button class="btn btn-space btn-close btn-social rechazar-valerendir" 
-                            data-toggle="tooltip" data-placement="top" 
-                            data-valerendir-id="{{ $item['ID'] }}" data-toggle="modal" data-target="#rechazoModal">
-                        <i class="icon mdi mdi-close-circle"></i> 
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                    @if($item['TXT_CATEGORIA_ESTADO_VALE'] !== 'APROBADO' && $item['TXT_CATEGORIA_ESTADO_VALE'] !== 'RECHAZADO')
+                      <button class="btn btn-space btn-check btn-social registroaprobar-valerendir" 
+                            data-toggle="tooltip" data-placement="top"> Aprobar
                     </button>
-                @endif
+                    @endif
+                    @if($item['TXT_CATEGORIA_ESTADO_VALE'] !== 'APROBADO' && $item['TXT_CATEGORIA_ESTADO_VALE'] !== 'RECHAZADO')
+                        <button class="btn btn-space btn-close btn-social rechazar-valerendir" 
+                                data-toggle="tooltip" data-placement="top" 
+                                data-valerendir-id="{{ $item['ID'] }}" data-toggle="modal" data-target="#rechazoModal">
+                                Rechazar
+                        </button>
+                    @endif
+                </div>
             </td>
         </tr>
         @endif
@@ -167,6 +165,7 @@
     max-width: 200px; 
     height: auto; 
     word-break: break-word;
+    }
 </style>
 
 <script>

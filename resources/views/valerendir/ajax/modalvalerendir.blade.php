@@ -74,16 +74,6 @@
                                         </div>
                                     </div>
 
-                          {{--           <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
-                                        <div class="form-group">
-                                            <label class="col-sm-12 control-label labelleft">Moneda :</label>
-                                            <div class="col-sm-12 abajocaja">
-                                              <input type="hidden" id="cod_moneda" name="cod_moneda" value="{{ $cod_moneda }}">
-                                              <input type="text" class="form-control input-custom" value="{{ $nom_moneda }}" readonly>
-
-                                            </div>
-                                        </div>
-                                    </div> --}}
 
                                        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
                                         <div class="form-group">
