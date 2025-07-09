@@ -20,7 +20,7 @@
             overflow: hidden;
         }
         .header {
-            background-color: #002b45;
+            background-color: #191970;
             color: white;
             padding: 20px;
             text-align: center;
@@ -57,13 +57,13 @@
     </style>
 </head>
 <body>
-    <p style="font-family: 'Times New Roman', Times, serif;">
+   <p style="font-family: 'Times New Roman', Times, serif;">
     Sres.<br>
-    Se adjunta el Vale a Rendir GENERADO/APROBADO por administración.
+    Se adjunta el Vale a Rendir GENERADO/ANULADO.
     </p>
 <div class="container">
     <div class="header">
-        VALE A RENDIR - APROBADO POR ADMINISTRACIÓN
+        VALE A RENDIR - ANULADO POR EL SOLICITANTE
     </div>
     <table>
         <tr>
@@ -129,22 +129,6 @@
                 {{ number_format($vale->CAN_TOTAL_IMPORTE, 2) }}
             </td>
         </tr>
-        <tr>
-            <td class="label">Tipo de Pago</td>
-            <td class="value">
-                @if($vale->TIPO_PAGO == 1)
-                    TRANSFERENCIA
-                @else
-                    EFECTIVO
-                @endif
-            </td>
-        </tr>
-         @if($vale->TIPO_PAGO == 1)
-            <tr>
-                <td class="label">Cuenta Bancaria</td>
-                <td class="value">{{ $vale->NRO_CUENTA }} - {{ $vale->TXT_CATEGORIA_BANCO }}</td>
-            </tr>
-        @endif
         <tr>
             <td class="label">Glosa</td>
             <td class="value">{{ $vale->TXT_GLOSA }}</td>

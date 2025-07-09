@@ -100,20 +100,11 @@ class ValeRendirController extends Controller
             ->get()
             ->toArray();
 
-           /*  $moneda = DB::table('CMP.CATEGORIA')
-            ->where('COD_CATEGORIA', 'MON0000000000001')
-            ->pluck('NOM_CATEGORIA', 'COD_CATEGORIA')
-            ->toArray();
-*/
             $moneda = DB::table('CMP.CATEGORIA')
             ->whereIn('COD_CATEGORIA', ['MON0000000000001', 'MON0000000000002'])
             ->pluck('NOM_CATEGORIA', 'COD_CATEGORIA')
             ->toArray();
 
-
-            $cod_moneda = key($moneda);
-            $nom_moneda = reset($moneda);
-             
 
       
             reset($usuariosAu);
@@ -176,233 +167,210 @@ class ValeRendirController extends Controller
     }
 
 
-  public function insertValeRendirAction(Request $request) { 
-    $usuario_autoriza = $request->input('usuario_autoriza');
-    $usuario_aprueba = $request->input('usuario_aprueba');
-    $tipo_motivo = $request->input('tipo_motivo');
-    $txt_glosa = $request->input('txt_glosa');
-    $can_total_importe = $request->input('can_total_importe');
-    $can_total_saldo = $request->input('can_total_saldo');
-    $cod_moneda = $request->input('cod_moneda');
-    $vale_rendir_id = $request->input('vale_rendir_id'); 
-    $opcion = $request->input('opcion'); 
+ public function insertValeRendirAction(Request $request)
+{
+    $usuario_autoriza   = $request->input('usuario_autoriza');
+    $usuario_aprueba    = $request->input('usuario_aprueba');
+    $tipo_motivo        = $request->input('tipo_motivo');
+    $txt_glosa          = $request->input('txt_glosa');
+    $can_total_importe  = $request->input('can_total_importe');
+    $can_total_saldo    = $request->input('can_total_saldo');
+    $cod_moneda         = $request->input('cod_moneda');
+    $vale_rendir_id     = $request->input('vale_rendir_id');
+    $opcion             = $request->input('opcion');
+    $array_detalle      = $request->input('array_detalle');
 
-    //DETALLE
-
-    $array_detalle = $request->input('array_detalle'); 
-    $fec_inicio  = $request->input('fec_inicio');
-    $fec_fin  = $request->input('fec_fin');
-    $destino  = $request->input('destino');
-    $ind_propio = $request->input('$ind_propio');
-    $opcion_detalle = $request->input('opcion_detalle'); 
-
-
-
-    $cod_categoria_estado_vale = 'ETM0000000000001';
+    $cod_categoria_estado_vale = 'ETM0000000000001'; // GENERADO
     $txt_categoria_estado_vale = 'GENERADO';
-    $cod_usuario_registro = Session::get('usuario')->id;
-    $txt_nom_solicita = User::where('id', $cod_usuario_registro)->get();
-  
+    $cod_usuario_registro      = Session::get('usuario')->id;
+    $txt_nom_solicita          = User::where('id', $cod_usuario_registro)->value('nombre');
+
     $registro_autoriza = DB::table('WEB.VALE_PERSONAL_AUTORIZA')
-    ->where('cod_autoriza', $usuario_autoriza)
-    ->first();
-
+        ->where('cod_autoriza', $usuario_autoriza)
+        ->first();
     $registro_aprueba = DB::table('WEB.VALE_PERSONAL_APRUEBA')
-    ->where('cod_aprueba', $usuario_aprueba)
-    ->first();
+        ->where('cod_aprueba', $usuario_aprueba)
+        ->first();
 
-    $txt_nom_aprueba = $registro_aprueba ? $registro_aprueba->TXT_APRUEBA : '';
-    $txt_nom_autoriza = $registro_autoriza ? $registro_autoriza->TXT_AUTORIZA : '';
-
+    $txt_nom_autoriza = $registro_autoriza->TXT_AUTORIZA ?? '';
+    $txt_nom_aprueba  = $registro_aprueba->TXT_APRUEBA ?? '';
 
     $cod_empr_cli = DB::table('users as usu')
-    ->join('SGD.USUARIO as us', 'usu.usuarioosiris_id', '=', 'us.COD_TRABAJADOR')
-    ->join('STD.TRABAJADOR as tra', 'tra.COD_TRAB', '=', 'us.COD_TRABAJADOR')
-    ->join('STD.EMPRESA as emp', 'emp.NRO_DOCUMENTO', '=', 'tra.NRO_DOCUMENTO')
-    ->where('usu.id', $cod_usuario_registro)
-    ->value('emp.COD_EMPR');  
+        ->join('SGD.USUARIO as us', 'usu.usuarioosiris_id', '=', 'us.COD_TRABAJADOR')
+        ->join('STD.TRABAJADOR as tra', 'tra.COD_TRAB', '=', 'us.COD_TRABAJADOR')
+        ->join('STD.EMPRESA as emp', 'emp.NRO_DOCUMENTO', '=', 'tra.NRO_DOCUMENTO')
+        ->where('usu.id', $cod_usuario_registro)
+        ->value('emp.COD_EMPR');
 
-    $estado_vale = WEBValeRendir::where('id', $vale_rendir_id)->value('cod_categoria_estado_vale');
-
+    // ACTUALIZACIÓN
     if ($opcion === 'U') {
-    
-       if ($estado_vale === 'ETM0000000000005') { 
-           return response()->json(['error' => 'Vale de rendir procesado correctamente.']);
+
+        $estado_vale = WEBValeRendir::where('id', $vale_rendir_id)->value('cod_categoria_estado_vale');
+        if ($estado_vale === 'ETM0000000000005') {
+            return response()->json(['error' => 'Vale de rendir procesado correctamente.']);
         }
 
         $this->insertValeRendir(
-            "U", 
-            $vale_rendir_id, 
-            "",
-            "", 
-            "", 
-            "",  
-            "",
+            "U",
+            $vale_rendir_id,
+            "", "", "", "", "",
             $cod_empr_cli,
-            $txt_nom_solicita[0]['nombre'], 
+            $txt_nom_solicita,
             $usuario_autoriza,
             $txt_nom_autoriza,
             $usuario_aprueba,
             $txt_nom_aprueba,
-            "", 
-            "", 
+            "", "",
             $tipo_motivo,
             $cod_moneda,
-            "",   
+            "",
             $txt_glosa,
-            "",
-            "",
-            "",
-            $can_total_importe, 
+            "", "", "",
+            $can_total_importe,
             $can_total_saldo,
-            "",
-            "",
+            "", "",
             $cod_categoria_estado_vale,
             $txt_categoria_estado_vale,
             true,
             ""
         );
-   
-                     $this->insertValeRendirDetalle(
-                                "D",
-                                $vale_rendir_id,
-                                "01/01/1901",
-                                "01/01/1901",
-                                "",
-                                "",
-                                "",
-                                "",
-                                "",
-                                "",
-                                "",
-                                "",
-                                0.0,
-                                "",
-                                "",
-                                false,
-                                $txt_nom_solicita[0]['nombre']
-                                );
- 
-        if(count($array_detalle) > 0) {
-                        
-                foreach ($array_detalle as $array) {
-                     
-                        $this->insertValeRendirDetalle(
-                                "I",
-                                $vale_rendir_id,
-                                $array['fec_inicio'],
-                                $array['fec_fin'],
-                                "",
-                                "",
-                                $array['cod_destino'],
-                                $array['nom_destino'],
-                                $array['nom_tipos'],
-                                $array['dias'],
-                                $array['can_unitario'],
-                                $array['can_unitario_total'],
-                                $array['can_total_importe'],
-                                $array['ind_destino'],
-                                $array['ind_propio'],
-                                true,
-                                ""
-                         );
-                    
-                }
-            }
 
+        // Eliminar y volver a insertar el detalle
+        $this->insertValeRendirDetalle(
+            "D",
+            $vale_rendir_id,
+            "01/01/1901",
+            "01/01/1901",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            0.0,
+            "",
+            "",
+            false,
+            $txt_nom_solicita
+        );
 
-        } else {
-            $this->insertValeRendir(
-                "I", 
-                "",
-                "",
-                "",
-                "", 
-                "", 
-                "", 
-                $cod_empr_cli,
-                $txt_nom_solicita[0]['nombre'],
-                $usuario_autoriza,
-                $txt_nom_autoriza, 
-                $usuario_aprueba,
-                $txt_nom_aprueba,
-                "",
-                "", 
-                $tipo_motivo,
-                $cod_moneda,
-                "",
-                $txt_glosa,
-                "", 
-                "",
-                "",
-                $can_total_importe, 
-                $can_total_saldo,
-                "",
-                "",
-                $cod_categoria_estado_vale,
-                $txt_categoria_estado_vale,
-                true,
-                ""
+        if (count($array_detalle) > 0) {
+            foreach ($array_detalle as $array) {
+                $this->insertValeRendirDetalle(
+                    "I",
+                    $vale_rendir_id,
+                    $array['fec_inicio'],
+                    $array['fec_fin'],
+                    "",
+                    "",
+                    $array['cod_destino'],
+                    $array['nom_destino'],
+                    $array['nom_tipos'],
+                    $array['dias'],
+                    $array['can_unitario'],
+                    $array['can_unitario_total'],
+                    $array['can_total_importe'],
+                    $array['ind_destino'],
+                    $array['ind_propio'],
+                    true,
+                    ""
                 );
+            }
+        }
 
-         if(count($array_detalle) > 0) {
-            
-                 $cod_empr_aux = Session::get('empresas')->COD_EMPR;
-                 $id = WEBValeRendir::where('COD_EMPR', $cod_empr_aux)->orderBy('id', 'DESC')->first()->ID;
-                        
-                foreach ($array_detalle as $array) {
-                     
-                    $opcion_detalle = $array['opcion_detalle'];
+        return response()->json([
+            'success' => 'Vale actualizado correctamente.',
+            'vale_rendir_id' => $vale_rendir_id
+        ]);
+    }
 
-                    if ($opcion_detalle === 'U') {
-                         $detalle_id = $array['detalle_id'] ?? null;
-   
-                                $this->insertValeRendirDetalle(
-                                "U",
-                                $detalle_id,
-                                $array['fec_inicio'],
-                                $array['fec_fin'],
-                                "",
-                                "",
-                                $array['cod_destino'],
-                                "",
-                                "",
-                                "",
-                                "",
-                                "",
-                                $array['can_total_importe'],
-                                $array['ind_destino'],
-                                $array['ind_propio'],
-                                true,
-                                ""
-                                );
-                    }elseif ($opcion_detalle === 'I') {
-                        $this->insertValeRendirDetalle(
-                                "I",
-                                $id,
-                                $array['fec_inicio'],
-                                $array['fec_fin'],
-                                "",
-                                "",
-                                $array['cod_destino'],
-                                $array['nom_destino'],
-                                $array['nom_tipos'],
-                                $array['dias'],
-                                $array['can_unitario'],
-                                $array['can_unitario_total'],
-                                $array['can_total_importe'],
-                                $array['ind_destino'],
-                                $array['ind_propio'],
-                                true,
-                                ""
-                         );
-                    }
+    // INSERCIÓN
+    else {
+
+        $this->insertValeRendir(
+            "I",
+            "", "", "", "", "", "",
+            $cod_empr_cli,
+            $txt_nom_solicita,
+            $usuario_autoriza,
+            $txt_nom_autoriza,
+            $usuario_aprueba,
+            $txt_nom_aprueba,
+            "", "",
+            $tipo_motivo,
+            $cod_moneda,
+            "",
+            $txt_glosa,
+            "", "", "",
+            $can_total_importe,
+            $can_total_saldo,
+            "", "",
+            $cod_categoria_estado_vale,
+            $txt_categoria_estado_vale,
+            true,
+            ""
+        );
+
+        $cod_empr_aux = Session::get('empresas')->COD_EMPR;
+        $ultimoVale = WEBValeRendir::where('COD_EMPR', $cod_empr_aux)
+            ->orderBy('id', 'DESC')
+            ->first();
+
+        if (!$ultimoVale) {
+            return response()->json(['error' => 'Error al recuperar el ID del vale recién insertado.']);
+        }
+
+        $nuevo_vale_id = $ultimoVale->ID;
+
+        if (count($array_detalle) > 0) {
+            foreach ($array_detalle as $array) {
+                $opcion_detalle = $array['opcion_detalle'];
+
+                if ($opcion_detalle === 'U') {
+                    $detalle_id = $array['detalle_id'] ?? null;
+                    $this->insertValeRendirDetalle(
+                        "U",
+                        $detalle_id,
+                        $array['fec_inicio'],
+                        $array['fec_fin'],
+                        "", "", $array['cod_destino'], "", "", "", "", "",
+                        $array['can_total_importe'],
+                        $array['ind_destino'],
+                        $array['ind_propio'],
+                        true,
+                        ""
+                    );
+                } elseif ($opcion_detalle === 'I') {
+                    $this->insertValeRendirDetalle(
+                        "I",
+                        $nuevo_vale_id,
+                        $array['fec_inicio'],
+                        $array['fec_fin'],
+                        "", "", $array['cod_destino'],
+                        $array['nom_destino'],
+                        $array['nom_tipos'],
+                        $array['dias'],
+                        $array['can_unitario'],
+                        $array['can_unitario_total'],
+                        $array['can_total_importe'],
+                        $array['ind_destino'],
+                        $array['ind_propio'],
+                        true,
+                        ""
+                    );
                 }
             }
+        }
 
-         return response()->json(['success' => 'Vale de rendir procesado correctamente.']);
-       }
+        return response()->json([
+            'success' => 'Vale insertado correctamente.',
+            'vale_rendir_id' => $nuevo_vale_id
+        ]);
     }
+}
+
 
 
      public function actionEliminarValeRendir(Request $request)
@@ -489,7 +457,7 @@ class ValeRendirController extends Controller
 	public function traerdataValeRendirAction(Request $request)
     {
         $id_buscar = $request->input('valerendir_id');
-        $usuarios = WEBValeRendir::where('ID', $id_buscar)->get(['ID', 'USUARIO_AUTORIZA', 'USUARIO_APRUEBA', 'TIPO_MOTIVO',  'CAN_TOTAL_IMPORTE', 'CAN_TOTAL_SALDO', 'TXT_GLOSA', 'TXT_CATEGORIA_ESTADO_VALE'])->toJson();
+        $usuarios = WEBValeRendir::where('ID', $id_buscar)->get(['ID', 'USUARIO_AUTORIZA', 'USUARIO_APRUEBA', 'TIPO_MOTIVO',  'CAN_TOTAL_IMPORTE', 'CAN_TOTAL_SALDO', 'TXT_GLOSA', 'TXT_CATEGORIA_ESTADO_VALE', 'COD_MONEDA'])->toJson();
         return $usuarios;
 
     }

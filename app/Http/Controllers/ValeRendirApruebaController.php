@@ -255,14 +255,9 @@ class ValeRendirApruebaController extends Controller
             ->pluck('CUENTA', 'COD_CONTRATO')
             ->toArray();
 
-         // dd($contrato_diferente);
+        //dd($contrato_diferente);
 
-    //  $combo_cuenta = array('' => 'Seleccione Cuenta') + $contrato_diferente;
         $combo_series = $notacredito->combo_series_tipodocumento('TDO0000000000072');
-
-        //AGREGAR NUMEROOOOOOOOOO
-
-
 
 
         $ultimoCorrelativo = DB::table('TES.AUTORIZACION')
@@ -273,9 +268,6 @@ class ValeRendirApruebaController extends Controller
 
         $nro_documento = is_null($ultimoCorrelativo) ? 1:$ultimoCorrelativo + 1;
         $nro_documento_formateado = str_pad($nro_documento, 10, '0', STR_PAD_LEFT);
-
-
-
 
         $fecha_actual = date('Y-m-d');
 
@@ -289,8 +281,8 @@ class ValeRendirApruebaController extends Controller
             ->select(DB::raw("CON.COD_CONTRATO, CONCAT(CUL.TXT_ZONA_COMERCIAL, '-', CUL.TXT_ZONA_CULTIVO) AS SUBCUENTA"))
             ->pluck('SUBCUENTA', 'COD_CONTRATO')
             ->toArray();
-    //   $combo_subcuenta = array('' => 'Seleccione Sub Cuenta') + $subcuentas;
-         //   dd($subcuentas);
+        //$combo_subcuenta = array('' => 'Seleccione Sub Cuenta') + $subcuentas;
+        //   dd($subcuentas);
 
 
        
@@ -307,7 +299,6 @@ class ValeRendirApruebaController extends Controller
         $values                 =   [$nrodocumentotrab,$cod_empr];
         $datoscuentasueldo      =   DB::select('exec ListaTrabajadorCuentaSueldo ?,?',$values);      
 
-        // log($datoscuentasueldo[0]->trabajador_id);
 
 
         return view('valerendir.ajax.modalosirisvalerendiraprueba', [
