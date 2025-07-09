@@ -118,6 +118,9 @@ class GestionLiquidacionGastosController extends Controller
         }
 
 
+        $direccion              =   $this->gn_direccion_fiscal();
+
+
         $pdf = PDF::loadView('pdffa.liquidaciongastos', [ 
                                                 'iddocumento'                   => $iddocumento , 
                                                 'liquidaciongastos'             => $liquidaciongastos,
@@ -126,11 +129,11 @@ class GestionLiquidacionGastosController extends Controller
                                                 'documentohistorial'            => $documentohistorial , 
                                                 'tdetliquidaciongastosel'       => $tdetliquidaciongastosel,
                                                 'productosagru'                 => $productosagru,
-                                                'imgresponsable'        => $imgresponsable , 
-                                                'nombre_responsable'    => $nombre_responsable,
-                                                'imgaprueba'            => $imgaprueba,
-                                                'nombre_aprueba'        => $nombre_aprueba,
-
+                                                'imgresponsable'                => $imgresponsable , 
+                                                'nombre_responsable'            => $nombre_responsable,
+                                                'imgaprueba'                    => $imgaprueba,
+                                                'nombre_aprueba'                => $nombre_aprueba,
+                                                'direccion'                     => $direccion,
                                               ]);
 
         return $pdf->stream('download.pdf');
@@ -727,6 +730,30 @@ class GestionLiquidacionGastosController extends Controller
 
 
     }
+    public function actionAjaxUCListarLiquidacionGastos(Request $request) {
+
+        $fecha_inicio   =   $request['fecha_inicio'];
+        $fecha_fin      =   $request['fecha_fin'];
+        $idopcion       =   $request['idopcion'];
+
+        $listacabecera      =   LqgLiquidacionGasto::where('ACTIVO','=','1')
+                                ->whereRaw("CAST(FECHA_CREA  AS DATE) >= ? and CAST(FECHA_CREA  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                ->where('USUARIO_CREA','=',Session::get('usuario')->id)
+                                ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                                ->orderby('FECHA_CREA','DESC')->get();
+        $funcion        =   $this;
+
+        return View::make('liquidaciongasto/ajax/alistaliquidaciongasto',
+                         [
+                            'fecha_inicio'          =>  $fecha_inicio,
+                            'fecha_fin'             =>  $fecha_fin,
+                            'idopcion'              =>  $idopcion,
+                            'listacabecera'         =>  $listacabecera,
+                            'ajax'                  =>  true,
+                            'funcion'               =>  $funcion
+                         ]);
+    }
+
 
 
     public function actionListarAjaxBuscarDocumentoLG(Request $request) {
@@ -736,6 +763,8 @@ class GestionLiquidacionGastosController extends Controller
         $proveedor_id   =   $request['proveedor_id'];  
         $estado_id      =   $request['estado_id'];
         $idopcion       =   $request['idopcion'];
+
+
         $listadatos     =   $this->lg_lista_cabecera_comprobante_total_validado($fecha_inicio,$fecha_fin,$proveedor_id,$estado_id);
         $funcion        =   $this;
 
@@ -1336,8 +1365,11 @@ class GestionLiquidacionGastosController extends Controller
         $resultado = DB::table('LQG_DETLIQUIDACIONGASTO as lqg')
             ->join('PLA_MOVILIDAD as pla', 'lqg.COD_PLA_MOVILIDAD', '=', 'pla.ID_DOCUMENTO')
             ->where('lqg.COD_TIPODOCUMENTO', 'TDO0000000000070')
+            //->where('lqg.ID_DOCUMENTO','=','LIQG00000052')
             ->select('lqg.*') // o select específico si necesitas columnas concretas
             ->get();
+
+        //dd($resultado);    
 
         foreach ($resultado as $index => $item) {
 
@@ -1391,7 +1423,7 @@ class GestionLiquidacionGastosController extends Controller
             $detplanillamovilidad   =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->orderby('FECHA_GASTO','ASC')->get();
             $empresa                =   STDEmpresa::where('COD_EMPR','=',$planillamovilidad->COD_EMPRESA)->first();
             $ruc                    =   $empresa->NRO_DOCUMENTO;
-            $prefijocarperta        =   $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
+            $prefijocarperta        =   $this->prefijo_empresa($item->COD_EMPRESA);
             $rutafile               =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$data_iddocumento;
             $valor                  =   $this->versicarpetanoexiste($rutafile);
             $rutacompleta           =   $rutafile . '\\' . $planillamovilidad->SERIE . '-' . $planillamovilidad->NUMERO . '.pdf';
@@ -1424,7 +1456,8 @@ class GestionLiquidacionGastosController extends Controller
 
             }
 
-
+            $direccion              =   $this->gn_direccion_fiscal();
+            //DD($rutacompleta);
             $pdf = PDF::loadView('pdffa.planillamovilidad', [ 
                                                     'iddocumento'           => $iddocumento , 
                                                     'planillamovilidad'     => $planillamovilidad,
@@ -1434,6 +1467,7 @@ class GestionLiquidacionGastosController extends Controller
                                                     'nombre_responsable'    => $nombre_responsable,
                                                     'imgaprueba'            => $imgaprueba,
                                                     'nombre_aprueba'        => $nombre_aprueba,
+                                                    'direccion'                     => $direccion,
 
                                                  ])->setPaper('A4', 'landscape');
 
@@ -1527,6 +1561,7 @@ class GestionLiquidacionGastosController extends Controller
             $imgaprueba         =   'firmas/'.$trabajadorap->NRO_DOCUMENTO.'.jpg';
             $nombre_aprueba     =   $trabajadorap->TXT_NOMBRES.' '.$trabajadorap->TXT_APE_PATERNO.' '.$trabajadorap->TXT_APE_MATERNO;
         }
+        $direccion              =   $this->gn_direccion_fiscal();
 
 
         $pdf = PDF::loadView('pdffa.planillamovilidad', [ 
@@ -1538,7 +1573,7 @@ class GestionLiquidacionGastosController extends Controller
                                                 'nombre_responsable'    => $nombre_responsable,
                                                 'imgaprueba'            => $imgaprueba,
                                                 'nombre_aprueba'        => $nombre_aprueba,
-
+                                                'direccion'                     => $direccion,
                                               ])->setPaper('A4', 'landscape');
 
         $pdf->save($rutacompleta);
@@ -2431,10 +2466,12 @@ class GestionLiquidacionGastosController extends Controller
                 //validar que tenga la firma quien
                 $detliquidaciongasto    =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
                 $useario_autoriza       =   User::where('id','=',$detliquidaciongasto->COD_USUARIO_AUTORIZA)->first();
+                //dd($useario_autoriza);
                 $trabajadorap           =   STDTrabajador::where('COD_TRAB','=',$useario_autoriza->usuarioosiris_id)->first();
                 $imgaprueba             =   'firmas/blanco.jpg';
                 $nombre_aprueba         =   '';
                 $rutaImagen             =   public_path('firmas/'.$trabajadorap->NRO_DOCUMENTO.'.jpg');
+                //dd($rutaImagen);
                 if (!file_exists($rutaImagen)){
                     return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/0')->with('errorbd','No se puede emitir ya que el que autoriza no cuenta con firma llamar a sistemas');
                 }
@@ -3254,8 +3291,6 @@ class GestionLiquidacionGastosController extends Controller
                                 }
 
                             }
-
-                            //DD($codigocdr);
                         } else {
                             $respuestacdr  = 'Error al intentar descomprimir el CDR';
                         }

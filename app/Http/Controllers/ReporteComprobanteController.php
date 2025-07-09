@@ -101,17 +101,37 @@ class ReporteComprobanteController extends Controller
 
             }else{
 
+                if($operacion_id=='COMISION'){
+
+                        $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_comision_excel($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$operacion_id);
+                        //dd($listadatos);
+
+                        Excel::create($titulo.'-('.$fecha_actual.')', function($excel) use ($listadatos,$titulo,$funcion,$operacion_id) {
+                            $excel->sheet($operacion_id, function($sheet) use ($listadatos,$titulo,$funcion,$operacion_id) {
+
+                                $sheet->loadView('reporte/excel/listacomprobantemasivocomision')->with('listadatos',$listadatos)
+                                                                                   ->with('titulo',$titulo)
+                                                                                   ->with('funcion',$funcion);                                               
+                            });
+                        })->export('xls');
 
 
-                $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_estiba_excel($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$operacion_id);
-                Excel::create($titulo.'-('.$fecha_actual.')', function($excel) use ($listadatos,$titulo,$funcion,$operacion_id) {
-                    $excel->sheet($operacion_id, function($sheet) use ($listadatos,$titulo,$funcion,$operacion_id) {
+                }else{
 
-                        $sheet->loadView('reporte/excel/listacomprobantemasivoestiba')->with('listadatos',$listadatos)
-                                                                           ->with('titulo',$titulo)
-                                                                           ->with('funcion',$funcion);                                               
-                    });
-                })->export('xls');
+                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_estiba_excel($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$operacion_id);
+                    Excel::create($titulo.'-('.$fecha_actual.')', function($excel) use ($listadatos,$titulo,$funcion,$operacion_id) {
+                        $excel->sheet($operacion_id, function($sheet) use ($listadatos,$titulo,$funcion,$operacion_id) {
+
+                            $sheet->loadView('reporte/excel/listacomprobantemasivoestiba')->with('listadatos',$listadatos)
+                                                                               ->with('titulo',$titulo)
+                                                                               ->with('funcion',$funcion);                                               
+                        });
+                    })->export('xls');
+
+
+                }
+
+
 
 
             } 
