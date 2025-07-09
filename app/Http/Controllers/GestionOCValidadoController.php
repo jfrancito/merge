@@ -354,8 +354,6 @@ class GestionOCValidadoController extends Controller
         $operacion_id   =   $request['operacion_id'];
         $filtrofecha_id =   $request['filtrofecha_id'];
 
-
-
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
 
         if($operacion_id=='ORDEN_COMPRA'){

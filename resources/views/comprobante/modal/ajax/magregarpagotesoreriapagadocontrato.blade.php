@@ -1,4 +1,4 @@
-<form method="POST" id='formpedido' action="{{ url('/pago-comprobante-tesoreria-pagado/'.$idopcion.'/'.$linea.'/'.substr($fedocumento->ID_DOCUMENTO, 0,6).'/'.Hashids::encode(substr($fedocumento->ID_DOCUMENTO, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
+<form method="POST" id='formpedido' action="{{ url('/pago-comprobante-tesoreria-pagado-contrato/'.$idopcion.'/'.$linea.'/'.$fedocumento->ID_DOCUMENTO) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
 {{ csrf_field() }}
 
 	<div class="modal-header" style="background: #1d3a6d;">

@@ -261,21 +261,40 @@ class FileController extends Controller
 
         if($fedocumento->OPERACION == 'CONTRATO'){
             $ordencompra            =       CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$archivo->ID_DOCUMENTO)->first();
+            $COD_EMPR = $ordencompra->COD_EMPR;
+
+            $prefijocarperta        =       $this->prefijo_empresa($COD_EMPR);
+            $rutafile               =       '\\\\10.1.50.2/comprobantes/'.$prefijocarperta.'/'.$fedocumento->RUC_PROVEEDOR.'/';
+
         }else{
-            $ordencompra            =       CMPOrden::where('COD_ORDEN','=',$archivo->ID_DOCUMENTO)->first();
+            if($fedocumento->OPERACION == 'COMISION'){
+                $COD_EMPR            =       Session::get('empresas')->COD_EMPR;
+                $prefijocarperta        =       $this->prefijo_empresa($COD_EMPR);
+                $rutafile               =       '\\\\10.1.50.2/comprobantes/'.$prefijocarperta.'/'.$fedocumento->ID_DOCUMENTO.'/';
+
+            }else{
+                $ordencompra            =       CMPOrden::where('COD_ORDEN','=',$archivo->ID_DOCUMENTO)->first();
+                $COD_EMPR = $ordencompra->COD_EMPR;
+                $prefijocarperta        =       $this->prefijo_empresa($COD_EMPR);
+                $rutafile               =       '\\\\10.1.50.2/comprobantes/'.$prefijocarperta.'/'.$fedocumento->RUC_PROVEEDOR.'/';
+
+            }
         }
 
-        $prefijocarperta        =       $this->prefijo_empresa($ordencompra->COD_EMPR);
+
+
+
+
 
         //dd($prefijocarperta);
 
-        $rutafile               =       '\\\\10.1.50.2/comprobantes/'.$prefijocarperta.'/'.$fedocumento->RUC_PROVEEDOR.'/';
+
 
         $remoteFile             =       $rutafile.$newstr;
 
         // Reemplazar las barras invertidas por barras normales
         $remoteFile = str_replace('\\', '/', $remoteFile);
-
+        //dd($remoteFile);
         // Verificar si el archivo existe
         if (!file_exists($remoteFile)) {
             print_r($remoteFile);
