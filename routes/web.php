@@ -101,6 +101,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-combo-autoriza', 'GestionLiquidacionGastosController@actionAjaxComboAutoriza');
 	Route::any('/extonar-liquidacion-gastos/{idopcion}/{iddocumento}', 'GestionLiquidacionGastosController@actionExtornarLiquidacionGastos');
 
+	Route::any('/ajax-buscar-documento-uc-lg', 'GestionLiquidacionGastosController@actionAjaxUCListarLiquidacionGastos');
+
 
 	Route::any('/ajax-combo-cuenta-xmoneda', 'GestionLiquidacionGastosController@actionAjaxComboCuentaXMoneda');
 
@@ -523,7 +525,19 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-buscar-documento-gestion-tesoreria-pagado', 'GestionOCTesoreriaController@actionListarAjaxBuscarDocumentoTesoreriaPago');
 	Route::any('/ajax-modal-tesoreria-pago-pagado', 'GestionOCTesoreriaController@actionListarAjaxModalTesoreriaPagoPagado');
 	Route::any('/pago-comprobante-tesoreria-pagado/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCTesoreriaController@actionAprobarTesoreriaPagado');
+	Route::any('/pago-comprobante-tesoreria-pagado-contrato/{idopcion}/{linea}/{idordencompra}', 'GestionOCTesoreriaController@actionAprobarTesoreriaPagadoContrato');
+	Route::any('/pago-comprobante-tesoreria-pagado-comision/{idopcion}/{linea}/{idordencompra}', 'GestionOCTesoreriaController@actionAprobarTesoreriaPagadoComision');
+
+
+
 	Route::any('/extornar-pago-item/{idordencompra}/{idopcion}', 'GestionOCTesoreriaController@actionExtornoTesoreriaPagado');
+
+	Route::any('/ajax-modal-tesoreria-pago-pagado-contrato', 'GestionOCTesoreriaController@actionListarAjaxModalTesoreriaPagoPagadoContrato');
+	Route::any('/ajax-modal-tesoreria-pago-pagado-comision', 'GestionOCTesoreriaController@actionListarAjaxModalTesoreriaPagoPagadoComision');
+
+
+	Route::any('/extornar-pago-item-contrato/{idordencompra}/{idopcion}', 'GestionOCTesoreriaController@actionExtornoTesoreriaPagadoContrato');
+
 
 
 	Route::any('/gestion-de-provision-comprobante/{idopcion}', 'GestionOCProvisionController@actionListarComprobanteProvision');

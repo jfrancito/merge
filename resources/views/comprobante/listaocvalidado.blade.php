@@ -13,9 +13,8 @@
             <div class="col-sm-12">
               <div class="panel panel-default panel-border-color panel-border-color-success">
                 <div class="panel-heading">{{ $titulo }}
-
+<!-- 
                   <div class="tools tooltiptop">
-
 
                     <a href="{{url('/comprobante-masivo-tesoreria-excel')}}" 
                        class='tn btn-secondary botoncabecera tooltipcss opciones'
@@ -37,12 +36,56 @@
                        <i class="fa fa-file-excel-o"></i>
                     </a>
 
-                    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscardocumento">
-                      <span class="tooltiptext">Buscar Documento</span>
-                      <span class="icon mdi mdi-search"></span>
-                    </a>
 
+
+                  </div> -->
+
+
+
+                  <div class="tools tooltiptop">
+                      <div class="dropdown">
+
+                          <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscardocumento">
+                            <span class="tooltiptext">Buscar Documento</span>
+                            <span class="icon mdi mdi-search"></span>
+                          </a>
+
+                          <span class="icon mdi mdi-more-vert dropdown-toggle" id="menudespacho"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"></span>
+
+                          <ul class="dropdown-menu" aria-labelledby="menudespacho"
+                              style="margin: 7px -169px 0;">
+                              <li>
+                                  <a href="{{url('/comprobante-masivo-tesoreria-excel')}}" 
+                                     class='tn btn-secondary botoncabecera tooltipcss opciones'
+                                     target="_blank"
+                                     id="descargarcomprobantemasivotesoreriraexcel" 
+                                     data-href="{{url('/comprobante-masivo-tesoreria-excel')}}"
+                                     title="Descargar excel" style="width:100%">
+                                     <span class="tooltiptext">Descargar excel Tesoreria</span>
+                                     Descargar excel Tesoreria
+                                  </a>
+                              </li>
+                              <li>
+                                <a href="{{url('/comprobante-masivo-excel')}}" 
+                                   class='tn btn-secondary botoncabecera tooltipcss opciones'
+                                   target="_blank"
+                                   id="descargarcomprobantemasivoexcel" 
+                                   data-href="{{url('/comprobante-masivo-excel')}}"
+                                   title="Descargar excel" style="width:100%">
+                                   <span class="tooltiptext">Descargar excel Contabilidada</span>
+                                   Descargar excel Contabilidada
+                                </a>
+                              </li>
+                          </ul>
+                      </div>
                   </div>
+
+
+
+
+
+
                 </div>
 
                 <div class="panel-body">

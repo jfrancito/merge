@@ -13,7 +13,10 @@ trait TransferirDataTraits
 	private function tdventasatendidas() {
 
 		set_time_limit(0);
-		DB::connection('pgsqla')->table('ventas')->delete();
+		DB::table('ventas')
+		    ->whereRaw('EXTRACT(YEAR FROM fecha) = ?', [2025])
+		    ->whereRaw('EXTRACT(MONTH FROM fecha) IN (6, 7)')
+		    ->delete();
 	    // 1. Obtener datos desde SQL Server
 	    $datos = DB::table('viewVentaSalidas2024 as vvs')
 	        ->leftJoin(DB::raw("(SELECT ALM.PRODUCTO.*, STD.EMPRESA.NOM_EMPR FROM ALM.PRODUCTO
@@ -25,11 +28,17 @@ trait TransferirDataTraits
 	        ->leftJoin('CMP.CATEGORIA as MARCA', 'MARCA.COD_CATEGORIA', '=', 'p.COD_CATEGORIA_MARCA')
 	        ->leftJoin('CMP.CATEGORIA as TIPOMARCA', 'TIPOMARCA.COD_CATEGORIA', '=', 'p.COD_CATEGORIA_PRODUCTO_SUPERMERCADOS')
 	        ->whereRaw("ISNULL(vvs.NombreProducto, '') <> ''")
+		    ->whereRaw('YEAR(Fecha) = 2025')
+		    ->whereRaw('MONTH(Fecha) IN (6, 7)')
 	        ->select('vvs.*', 
 	                 'MARCA.NOM_CATEGORIA as Marca', 
 	                 'TIPOMARCA.NOM_CATEGORIA as TipoMarca',
 	             	 DB::raw('CantidadProducto2 * PrecioVentaIGV as Venta'))
 	        ->get();
+
+
+	    dd($datos);
+
 
 	    // 2. Insertar en PostgreSQL
 	    foreach ($datos as $dato) {

@@ -1,6 +1,29 @@
 $(document).ready(function(){
 
     var carpeta = $("#carpeta").val();
+
+    $('.extornarapagocontrato').on('click', function(event){
+
+        debugger;
+        event.preventDefault();
+        var href = $(this).attr('href');
+
+        $.confirm({
+            title: '¿Confirma el Extorno?',
+            content: 'Extorno de pago del Comprobante',
+            buttons: {
+                confirmar: function () {
+                    window.location.href = href;
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo el extorno');
+                }
+            }
+        });
+
+    });
+
+
     $(".areatesoreria").on('click','.elimnaritem', function() {
         event.preventDefault();
         var data_tipoarchivo        =   $(this).attr('data_tipoarchivo');
@@ -59,6 +82,8 @@ $(document).ready(function(){
     });
 
     $('.extornarapago').on('click', function(event){
+
+        debugger;
         event.preventDefault();
         var href = $(this).attr('href');
 
@@ -213,6 +238,43 @@ $(document).ready(function(){
                   "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
 
     });
+
+    $(".areatesoreria").on('dblclick','.dobleclickpcpagadocontrato', function(e) {
+
+        var _token                  =   $('#token').val();
+        var data_requerimiento_id   =   $(this).attr('data_requerimiento_id');
+        var data_linea              =   $(this).attr('data_linea');
+        var idopcion                =   $('#idopcion').val();
+
+        data                        =   {
+                                            _token                  : _token,
+                                            data_requerimiento_id   : data_requerimiento_id,
+                                            data_linea              : data_linea,
+                                            idopcion                : idopcion,
+                                        };
+        ajax_modal(data,"/ajax-modal-tesoreria-pago-pagado-contrato",
+                  "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+
+    });
+
+    $(".areatesoreria").on('dblclick','.dobleclickpcpagadocomision', function(e) {
+
+        var _token                  =   $('#token').val();
+        var data_requerimiento_id   =   $(this).attr('data_requerimiento_id');
+        var data_linea              =   $(this).attr('data_linea');
+        var idopcion                =   $('#idopcion').val();
+
+        data                        =   {
+                                            _token                  : _token,
+                                            data_requerimiento_id   : data_requerimiento_id,
+                                            data_linea              : data_linea,
+                                            idopcion                : idopcion,
+                                        };
+        ajax_modal(data,"/ajax-modal-tesoreria-pago-pagado-comision",
+                  "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+
+    });
+
 
 
 
