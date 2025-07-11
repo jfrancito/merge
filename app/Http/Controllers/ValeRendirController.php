@@ -252,6 +252,7 @@ class ValeRendirController extends Controller
             0.0,
             "",
             "",
+            "",
             false,
             $txt_nom_solicita
         );
@@ -274,6 +275,7 @@ class ValeRendirController extends Controller
                     $array['can_total_importe'],
                     $array['ind_destino'],
                     $array['ind_propio'],
+                    $array['ind_aereo'],
                     true,
                     ""
                 );
@@ -339,6 +341,7 @@ class ValeRendirController extends Controller
                         $array['can_total_importe'],
                         $array['ind_destino'],
                         $array['ind_propio'],
+                        $array['ind_aereo'],
                         true,
                         ""
                     );
@@ -357,6 +360,7 @@ class ValeRendirController extends Controller
                         $array['can_total_importe'],
                         $array['ind_destino'],
                         $array['ind_propio'],
+                        $array['ind_aereo'],
                         true,
                         ""
                     );
@@ -445,7 +449,8 @@ class ValeRendirController extends Controller
             "",  
             0.0, 
             "",
-            "",             
+            "",  
+            "",            
             true,
             Session::get('usuario')->id
         );

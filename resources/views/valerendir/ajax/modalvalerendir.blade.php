@@ -5,6 +5,13 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/datetimepicker/css/bootstrap-datetimepicker.min.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/select2/css/select2.min.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/bootstrap-slider/css/bootstrap-slider.css') }} "/>
+
+    <!-- Flatpickr CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+<!-- Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
 @stop
 @section('section')
 
@@ -158,86 +165,74 @@
 
  <div class="panel-heading">Detalle a Rendir</div>
 
-<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
-    <div class="form-group">
-        <label class="col-sm-12 control-label labelleft">Fecha Inicio :</label>
-        <div class="col-sm-12 abajocaja">
-            <input type="date" 
-                   id="fecha_inicio" 
-                   name="fecha_inicio" 
-                   class="form-control control" 
-                   data-aw="1">
-        </div>
+<div class="row" style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+
+    <!-- Fecha Inicio -->
+     <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
+        <label class="control-label labelleft">Fecha Inicio:</label>
+        <input type="date" 
+               id="fecha_inicio" 
+               name="fecha_inicio" 
+               class="form-control control" 
+               data-aw="1">
     </div>
+
+
+    <!-- Fecha Fin -->
+     <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
+
+        <label class="control-label labelleft">Fecha Fin:</label>
+        <input type="date" 
+               id="fecha_fin" 
+               name="fecha_fin" 
+               class="form-control control" 
+               data-aw="1">
+    </div>
+
+    <!-- Destino -->
+    <div class="form-group" style="min-width: 250px;">
+        <label class="control-label labelleft">Destino:</label>
+        {!! Form::select('destino', $listausuarios3, '', [
+            'class'   => 'form-control control select2',
+            'id'      => 'destino',
+            'data-aw' => '1',
+        ]) !!}
+    </div>
+
+    <!-- Movilidad Propia -->
+    <div class="form-group" style="display: flex; flex-direction: column; align-items: center;">
+        <label for="ind_propio" style="font-size: 13px;">Movilidad Propia:</label>
+        <input type="checkbox" id="ind_propio" name="ind_propio" value="1" style="width: 18px; height: 18px;">
+    </div>
+
+    <!-- Movilidad Aérea -->
+    <div class="form-group" style="display: flex; flex-direction: column; align-items: center;">
+        <label for="ind_aereo" style="font-size: 13px;">Pasaje Aéreo:</label>
+        <input type="checkbox" id="ind_aereo" name="ind_aereo" value="1" style="width: 18px; height: 18px;">
+    </div>
+
+    <!-- Botón Agregar -->
+    <div class="form-group" style="margin-left: 30px;">
+        <input type="hidden" id="detalle_id" value="" />
+        <button id="agregarImporteGasto" type="button" class="btn btn-success rounded-circle btn-icon"
+            style="width: 30px; height: 30px;" title="Agregar">
+            <i class="fa fa-plus"></i>
+        </button>
+    </div>
+
+    <!-- Botón Ver Detalle -->
+    <div class="form-group">
+        <button type="button" class="btn btn-primary verdetalleimportegastos-valerendir"
+            title="Ver detalle de importes">
+            <i class="mdi mdi-eye mdi-24px"></i>
+        </button>
+    </div>
+
+    <!-- Hidden Inputs -->
+    <input type="hidden" id="nom_centro" value="{{ $nom_centro }}">
+    <input type="hidden" id="importeDestinos" value="{{ json_encode($importeDestinos) }}">
 </div>
 
-<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
-    <div class="form-group">
-        <label class="col-sm-12 control-label labelleft">Fecha Fin :</label>
-        <div class="col-sm-12 abajocaja">
-            <input type="date" 
-                   id="fecha_fin" 
-                   name="fecha_fin" 
-                   class="form-control control" 
-                   data-aw="1">
-        </div>
-    </div>
-</div>
-
-
-  
-<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
-    <div class="form-group">
-
-        <!-- Fila de etiquetas: Destino y Movilidad Propia -->
-        <div class="col-sm-12" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-            <label class="control-label labelleft" style="margin: 0;">Destino :</label>
-            <label for="ind_propio" style="font-size: 13px; margin: 0;">Movilidad Propia:</label>
-        </div>
-
-        <!-- Contenido: combo destino y checkbox al mismo nivel -->
-        <div class="col-sm-12">
-            <div class="input-group" style="display: flex; align-items: center; gap: 15px;">
-
-                <!-- Combo destino -->
-                <div style="flex: 3; min-width: 250px;">
-                    {!! Form::select('destino', $listausuarios3, '',
-                        [
-                            'class'       => 'form-control control select2',
-                            'id'          => 'destino',
-                            'data-aw'     => '1',
-                        ])
-                    !!}
-                </div>
-
-                <!-- Checkbox -->
-                <div style="display: flex; flex-direction: column; align-items: center; margin-left: 25px;">
-                    <input type="checkbox" id="ind_propio" name="ind_propio" value="1" style="width: 18px; height: 18px;">
-                </div>
-
-
-                <!-- Botón agregar -->
-                <div style="display: flex; align-items: center; margin-left: 50px;">
-                    <input type="hidden" id="detalle_id" value="" />
-                    <button id="agregarImporteGasto" type="button" class="btn btn-success rounded-circle btn-icon"
-                        style="width: 30px; height: 30px;">
-                        <i class="fa fa-plus"></i>
-                    </button>
-                </div>
-
-                <!-- Botón ver detalle -->
-                <button type="button" class="btn btn-primary verdetalleimportegastos-valerendir"
-                    title="Ver detalle de importes">
-                    <i class="mdi mdi-eye mdi-24px"></i>
-                </button>
-
-                <!-- Hidden inputs -->
-                <input type="hidden" id="nom_centro" value="{{ $nom_centro }}">
-                <input type="hidden" id="importeDestinos" value="{{ json_encode($importeDestinos) }}">
-            </div>
-        </div>
-    </div>
-</div>
 
 @include('valerendir.ajax.modalverdetalleimportegastosvalerendir')
 
