@@ -53,6 +53,7 @@ $(document).ready(function(){
                 let totalImporte = parseFloat($(this).find('td').eq(7).text().trim()) || 0; 
                 let ind_destino = parseInt($(this).find('td').eq(8).text().trim()) || 0;
                 let ind_propio = parseInt($(this).find('td').eq(9).text().trim()) || 0;
+                let ind_aereo = parseInt($(this).find('td').eq(10).text().trim()) || 0;
 
                 let detalle_id = $(this).data('id'); 
 
@@ -69,7 +70,8 @@ $(document).ready(function(){
                     can_unitario_total       : importesCalculados,
                     can_total_importe        : totalImporte, 
                     ind_destino              : ind_destino,
-                    ind_propio               : ind_propio,   
+                    ind_propio               : ind_propio,  
+                    ind_aereo                : ind_aereo,   
                     opcion_detalle           : opcion_detalle,
                     detalle_id               : detalle_id 
                 });
@@ -700,6 +702,7 @@ $(document).ready(function(){
             let fechaFin = $('#fecha_fin').val();
             let nomCentro = $('#nom_centro').val();
             let ind_propio = $('#ind_propio').is(':checked') ? 1 : 0;
+            let ind_aereo = $('#ind_aereo').is(':checked') ? 1 : 0;
 
 
             if (!codDestino || !fechaInicio || !fechaFin ) {
@@ -790,7 +793,10 @@ $(document).ready(function(){
             let filasExistentes = $('#tabla_vale_rendir_detalle tbody tr').length;
 
             if (nombre === "PASAJES TERRESTRES") {
-                tipoImporte = filasExistentes === 0 ? valor * 2 : valor;
+            if (ind_aereo === 1) {
+                return; // No agregar PASAJES TERRESTRES si es movilidad aérea
+            }
+            tipoImporte = filasExistentes === 0 ? valor * 2 : valor;
 
            } else if (["HOSPEDAJE", "ALIMENTACION", "PASAJES INTERNOS"].includes(nombre)) {
 
@@ -875,6 +881,7 @@ $(document).ready(function(){
                     <td>${total_Importe.toFixed(2)}</td>   
                     <td style="display:none;">${ind_destino}</td>
                     <td style="display:none;">${ind_propio}</td>
+                    <td style="display:none;">${ind_aereo}</td>
                     <td><button type="button" class="btn btn-danger btn-sm eliminarFila"><i class="fa fa-trash"></i></button></td>
                 </tr>
             `;

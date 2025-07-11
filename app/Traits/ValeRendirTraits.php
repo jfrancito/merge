@@ -295,7 +295,7 @@ trait ValeRendirTraits
     }
 
 
-    public function insertValeRendirDetalle($ind_tipo_operacion, $id, $fec_inicio, $fec_fin, $cod_empr, $cod_centro, $cod_destino, $nom_destino, $nom_tipos, $dias, $can_unitario, $can_unitario_total, $can_total_importe,  $ind_destino, $ind_propio, $cod_estado, $cod_usuario_registro)
+    public function insertValeRendirDetalle($ind_tipo_operacion, $id, $fec_inicio, $fec_fin, $cod_empr, $cod_centro, $cod_destino, $nom_destino, $nom_tipos, $dias, $can_unitario, $can_unitario_total, $can_total_importe,  $ind_destino, $ind_propio , $ind_aereo, $cod_estado, $cod_usuario_registro)
 
     {
          try {
@@ -315,6 +315,7 @@ trait ValeRendirTraits
                                                                         @CAN_TOTAL_IMPORTE = ?,
                                                                         @IND_DESTINO = ?,
                                                                         @IND_PROPIO = ?,
+                                                                        @IND_AEREO = ?,
                                                                         @COD_ESTADO = ?,
                                                                         @COD_USUARIO_REGISTRO = ?');
 
@@ -359,8 +360,9 @@ trait ValeRendirTraits
                  $stmt->bindParam(13, $can_total_importe, PDO::PARAM_STR);
                  $stmt->bindParam(14, $ind_destino, PDO::PARAM_BOOL);
                  $stmt->bindParam(15, $ind_propio, PDO::PARAM_BOOL);
-                 $stmt->bindParam(16, $cod_estado, PDO::PARAM_BOOL);
-                 $stmt->bindParam(17, $cod_usuario_registro, PDO::PARAM_STR);
+                 $stmt->bindParam(16, $ind_aereo, PDO::PARAM_BOOL);
+                 $stmt->bindParam(17, $cod_estado, PDO::PARAM_BOOL);
+                 $stmt->bindParam(18, $cod_usuario_registro, PDO::PARAM_STR);
 
 
                 $stmt->execute();
