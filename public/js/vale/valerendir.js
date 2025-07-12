@@ -22,7 +22,7 @@ $(document).ready(function(){
 
 
 
-            if (!usuario_autoriza || !usuario_aprueba || !txt_glosa || !tipo_motivo || !can_total_importe || !can_total_saldo) {
+            if (!usuario_autoriza || !usuario_aprueba || !txt_glosa || !tipo_motivo || !can_total_importe || !can_total_saldo || !cod_moneda) {
                  alerterrorajax("Todos los campos son obligatorios. Por favor, complete todos los campos.");
             return; 
             }
@@ -53,6 +53,7 @@ $(document).ready(function(){
                 let totalImporte = parseFloat($(this).find('td').eq(7).text().trim()) || 0; 
                 let ind_destino = parseInt($(this).find('td').eq(8).text().trim()) || 0;
                 let ind_propio = parseInt($(this).find('td').eq(9).text().trim()) || 0;
+                let ind_aereo = parseInt($(this).find('td').eq(10).text().trim()) || 0;
 
                 let detalle_id = $(this).data('id'); 
 
@@ -69,7 +70,8 @@ $(document).ready(function(){
                     can_unitario_total       : importesCalculados,
                     can_total_importe        : totalImporte, 
                     ind_destino              : ind_destino,
-                    ind_propio               : ind_propio,   
+                    ind_propio               : ind_propio,  
+                    ind_aereo                : ind_aereo,   
                     opcion_detalle           : opcion_detalle,
                     detalle_id               : detalle_id 
                 });
@@ -105,16 +107,35 @@ $(document).ready(function(){
                         return;
                     }
             
-                    alertajax("Vale a rendir registrado correctamente."); 
-                    location.reload(); 
+                  
+                    let nuevo_vale_id = data.vale_rendir_id || vale_rendir_id;
+
+                    $.ajax({
+                        type: "GET",
+                        url: carpeta + "/enviar_correo_generado",
+                        data: { valerendir_id: nuevo_vale_id },
+                        success: function(response) {
+                            if (response.success) {
+                                alertajax("Vale a rendir registrado y correo enviado correctamente."); 
+                            } else {
+                                alertajax("Vale registrado, pero no se pudo enviar el correo.");
+                            }
+                            location.reload();
+                        },
+                        error: function() {
+                            alertajax("Vale registrado, pero ocurrió un error al enviar el correo.");
+                            location.reload();
+                        }
+                    });
                 },
 
                 error: function (data) {
                     error500(data);
                 }
-            });
-       
+            });   
         });
+
+
  /* data    =   {
                               _token                                   : _token,
                                 usuario_autoriza                         : usuario_autoriza,
@@ -158,6 +179,7 @@ $(document).ready(function(){
                     $('#can_total_importe').val(data_left["0"]["CAN_TOTAL_IMPORTE"]);
                     $('#can_total_saldo').val(data_left["0"]["CAN_TOTAL_SALDO"]);
                     $('#txt_glosa').val(data_left["0"]["TXT_GLOSA"]);
+                    $('#cod_moneda').val(data_left["0"]["COD_MONEDA"]).trigger('change'); 
                     $('#vale_rendir_id').val(valerendir_id);
                     $('#asignarvalerendir').text('Modificar');
 
@@ -202,7 +224,6 @@ $(document).ready(function(){
         });
 
 
-
         $(".valerendirprincipal").on('click', '.delete-valerendir', function(e) {
             e.preventDefault();
             
@@ -213,23 +234,37 @@ $(document).ready(function(){
                 type: "POST",
                 url: carpeta + "/eliminar_vale_rendir",
                 data: {
-                        _token: _token,
-                        valerendir_id: valerendir_id
+                    _token: _token,
+                    valerendir_id: valerendir_id
                 },
-                success: function(response) {    
-                    if (response.success) {       
-                        //$('tr[data_vale_rendir="'+valerendir_id+'"]').remove();        
-                        location.reload();        
+                success: function(response) {
+                    if (response.success) {
+                        $.ajax({
+                            type: "GET",
+                            url: carpeta + "/rechazar_correo_generado",
+                            data: {
+                                valerendir_id: valerendir_id
+                            },
+                            success: function () {
+                                console.log('Correo de eliminación enviado correctamente.');
+                            },
+                            error: function () {
+                                console.warn('Error al enviar el correo de eliminación.');
+                            }
+                        });
 
-                    }else{
+                        location.reload();
+
+                    } else {
                         alerterrorajax('Error al eliminar el vale de rendir.');
                     }
                 },
                 error: function(data) {
-                    alerterrorajax('Error al eliminar el vale de rendir.');           
+                    alerterrorajax('Error al eliminar el vale de rendir.');
                 }
-            });    
+            });
         });
+
 
 
         // DETALLE
@@ -483,8 +518,10 @@ $(document).ready(function(){
 
        
          
-     
-
+         if (!cod_contrato || !sub_cuenta ) {
+                 alerterrorajax("El usuario no cuenta con contrato o sub cuenta.");
+            return; 
+            }
 
             $.ajax({
                   type    :   "POST",
@@ -665,6 +702,7 @@ $(document).ready(function(){
             let fechaFin = $('#fecha_fin').val();
             let nomCentro = $('#nom_centro').val();
             let ind_propio = $('#ind_propio').is(':checked') ? 1 : 0;
+            let ind_aereo = $('#ind_aereo').is(':checked') ? 1 : 0;
 
 
             if (!codDestino || !fechaInicio || !fechaFin ) {
@@ -755,7 +793,10 @@ $(document).ready(function(){
             let filasExistentes = $('#tabla_vale_rendir_detalle tbody tr').length;
 
             if (nombre === "PASAJES TERRESTRES") {
-                tipoImporte = filasExistentes === 0 ? valor * 2 : valor;
+            if (ind_aereo === 1) {
+                return; // No agregar PASAJES TERRESTRES si es movilidad aérea
+            }
+            tipoImporte = filasExistentes === 0 ? valor * 2 : valor;
 
            } else if (["HOSPEDAJE", "ALIMENTACION", "PASAJES INTERNOS"].includes(nombre)) {
 
@@ -840,6 +881,7 @@ $(document).ready(function(){
                     <td>${total_Importe.toFixed(2)}</td>   
                     <td style="display:none;">${ind_destino}</td>
                     <td style="display:none;">${ind_propio}</td>
+                    <td style="display:none;">${ind_aereo}</td>
                     <td><button type="button" class="btn btn-danger btn-sm eliminarFila"><i class="fa fa-trash"></i></button></td>
                 </tr>
             `;

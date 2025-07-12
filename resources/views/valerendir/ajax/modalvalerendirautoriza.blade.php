@@ -45,14 +45,15 @@
                             style="border-radius: 8px; font-size: 1.2rem; background-color: #fff; border: 1px solid #ccc;"></textarea>
                     </div>
                 </div>
-                <div class="modal-footer py-2 d-flex border-0 justify-content-between">
-                    <button type="button" class="btn btn-light shadow-sm" data-dismiss="modal" 
-                            style="border-radius: 20px; padding: 6px 15px; font-weight: 600; font-size: 1.1rem; border: 1px solid #ddd;">
-                            Cerrar
-                    </button>
+            <div class="modal-footer py-2 border-0" style="display: flex; justify-content: flex-end; gap: 10px;">
+
                     <button type="button" class="btn btn-danger shadow-sm" id="confirmRechazo" 
                             style="border-radius: 20px; padding: 6px 15px; font-weight: 600; font-size: 1.1rem; background-color: #dc3545; border-color: #c82333;">
                             <i class="mdi mdi-close"></i> Rechazar
+                    </button>
+                     <button type="button" class="btn btn-light shadow-sm" data-dismiss="modal" 
+                            style="border-radius: 20px; padding: 6px 15px; font-weight: 600; font-size: 1.1rem; border: 1px solid #ddd;">
+                            Cerrar
                     </button>
                 </div>
             </div>
@@ -78,14 +79,15 @@
                             style="border-radius: 8px; font-size: 1.2rem; background-color: #fff; border: 1px solid #ccc;"></textarea>
                     </div>
                 </div>
-                <div class="modal-footer py-2 d-flex border-0 justify-content-between">
-                    <button type="button" class="btn btn-light shadow-sm" data-dismiss="modal" 
-                            style="border-radius: 20px; padding: 6px 15px; font-weight: 600; font-size: 1.1rem; border: 1px solid #ddd;">
-                            Cerrar
-                    </button>
+               <div class="modal-footer py-2 border-0" style="display: flex; justify-content: flex-end; gap: 10px;">
+
                     <button type="button" class="btn btn-success shadow-sm" id="confirmAutoriza" 
                             style="border-radius: 20px; padding: 6px 15px; font-weight: 600; font-size: 1.1rem; background-color: #28a745; border-color: #218838;">
                             <i class="mdi mdi-check-all"></i> Autorizar
+                    </button>
+                    <button type="button" class="btn btn-light shadow-sm" data-dismiss="modal" 
+                            style="border-radius: 20px; padding: 6px 15px; font-weight: 600; font-size: 1.1rem; border: 1px solid #ddd;">
+                            Cerrar
                     </button>
                 </div>
             </div>

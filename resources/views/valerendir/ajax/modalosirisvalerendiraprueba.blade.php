@@ -104,7 +104,7 @@
                 <label style="font-family: 'Times New Roman', serif; color: #1E90FF; font-size: 15px;">* Tipo de Pago</label>
                 <div class="custom-radio-group">
                     <label style="font-family: 'Times New Roman', serif; color: #708090; font-size: 13px;"> <input type="radio" name="tipo_pago" id="radioCaja" value="caja"> Transferencia</label>
-                    <label style="font-family: 'Times New Roman', serif; color: #708090; font-size: 13px;"><input type="radio" name="tipo_pago" id="radioEfectivo" value="efectivo"> Caja</label>
+                    <label style="font-family: 'Times New Roman', serif; color: #708090; font-size: 13px;"><input type="radio" name="tipo_pago" id="radioEfectivo" value="efectivo"> Efectivo</label>
                     
                 </div>
             </div>
