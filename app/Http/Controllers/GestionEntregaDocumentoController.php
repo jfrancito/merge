@@ -972,6 +972,10 @@ class GestionEntregaDocumentoController extends Controller
         $folio                  =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
                                     ->where('FOLIO','=',$folio_codigo)->first();
         $listadocumento         =    $this->con_lista_documentos_contrato_folio_oc($folio->FOLIO);
+
+        //dd($listadocumento);
+
+
         $listaotros             =    $this->con_lista_documentos_estiba_folio($folio->FOLIO);
 
         $operacion_id           =    $folio->OPERACION;

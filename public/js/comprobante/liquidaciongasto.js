@@ -450,6 +450,8 @@ $(document).ready(function(){
             data    :   data,
             success: function (data) {
                 cerrarcargando();
+
+                debugger;
                 $('#modal-detalle-requerimiento').niftyModal('hide');
 
                 $('#serie').val(data.SERIE);

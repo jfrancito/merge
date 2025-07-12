@@ -18,6 +18,9 @@ use App\Modelos\Requerimiento;
 use App\Modelos\Archivo;
 use App\Modelos\PlaSerie;
 use App\Modelos\PlaMovilidad;
+use App\Modelos\FePlanillaEntregable;
+
+
 
 use App\User;
 
@@ -33,6 +36,26 @@ use ZipArchive;
 
 trait GeneralesTraits
 {
+
+    public function gn_numero_pl($serie,$centro_id)
+    {
+
+        $dserie  = FePlanillaEntregable::where('COD_CENTRO', '=', $centro_id)
+		            ->where('COD_EMPRESA', '=', Session::get('empresas')->COD_EMPR)
+		            ->where('SERIE', '=', $serie)
+		            ->select(DB::raw('max(NUMERO) as numero'))
+		            ->orderBy('NUMERO','desc')
+		            ->first();
+
+		//conversion a string y suma uno para el siguiente id
+		$idsuma = (int) $dserie->numero + 1;
+		//concatenar con ceros
+		$idopcioncompleta = str_pad($idsuma, 10, "0", STR_PAD_LEFT);
+		$idopcioncompleta = $idopcioncompleta;
+		return $idopcioncompleta;
+
+    }
+
 
     public function gn_numero($serie,$centro_id)
     {
