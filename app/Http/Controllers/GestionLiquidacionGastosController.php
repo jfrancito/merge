@@ -1507,6 +1507,8 @@ class GestionLiquidacionGastosController extends Controller
                                             ->where('COD_CENTRO', $planillamovilidad->COD_CENTRO)
                                             ->first();
 
+
+
         if(count($contratos)>0){
             $cod_contrato = $contratos->COD_CONTRATO; // Ejemplo de contrato
             $cod_categoria_moneda = $contratos->COD_CATEGORIA_MONEDA; // Ejemplo de moneda
@@ -1562,6 +1564,7 @@ class GestionLiquidacionGastosController extends Controller
             $nombre_aprueba     =   $trabajadorap->TXT_NOMBRES.' '.$trabajadorap->TXT_APE_PATERNO.' '.$trabajadorap->TXT_APE_MATERNO;
         }
         $direccion              =   $this->gn_direccion_fiscal();
+
 
 
         $pdf = PDF::loadView('pdffa.planillamovilidad', [ 
@@ -3573,12 +3576,7 @@ class GestionLiquidacionGastosController extends Controller
         $array_detalle_producto         =   array();
         $documentohistorial             =   LqgDocumentoHistorial::where('ID_DOCUMENTO','=',$iddocumento)->orderby('FECHA','DESC')->get();
 
-
-
-
         //dd($tdetliquidaciongastos);
-
-
         return View::make('liquidaciongasto.modificarliquidaciongastos',
                          [
                             'liquidaciongastos'     => $liquidaciongastos,

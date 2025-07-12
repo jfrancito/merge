@@ -311,7 +311,6 @@ trait ComprobanteTraits
                                             $join->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'documentos.COD_TABLA')
                                                  ->addBinding($documento->getBindings());
                                         })
-
                                     ->leftJoin('TES.CUENTA_BANCARIA', function ($join) {
                                         $join->on('CMP.ORDEN.COD_EMPR_CLIENTE', '=', 'TES.CUENTA_BANCARIA.COD_EMPR_TITULAR')
                                              ->on('FE_DOCUMENTO.COD_CATEGORIA_BANCO', '=', 'TES.CUENTA_BANCARIA.COD_EMPR_BANCO')
@@ -342,7 +341,7 @@ trait ComprobanteTraits
                                                     FE_DOCUMENTO.TXT_CATEGORIA_BANCO AS TXT_BANCO')
                                     )
                                     ->get();
-
+        //dd($listadatos);
         return  $listadatos;
 
 
