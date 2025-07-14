@@ -860,6 +860,61 @@ class GestionEntregaDocumentoController extends Controller
     }
 
 
+    public function actionDescargarPagoMacroBalanzaBbva($folio_codigo)
+    {
+
+        $folio                  =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
+                                    ->where('FOLIO','=',$folio_codigo)->first();
+        $listadocumento         =    $this->con_lista_documentos_balanza_folio($folio->FOLIO);
+
+        $operacion_id           =   $folio->OPERACION;
+        $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
+        $titulo                 =   'MACRO BBVA ('.$folio_codigo.') '.$empresa->NOM_EMPR;
+        $funcion                =   $this;
+
+
+        Excel::create($titulo, function($excel) use ($listadocumento,$operacion_id,$folio,$empresa,$funcion) {
+
+            $excel->sheet('bbva', function($sheet) use ($operacion_id,$folio,$empresa,$listadocumento,$funcion){
+
+
+                $sheet->mergeCells('B2:C2');
+                $sheet->mergeCells('B3:C3');
+                $sheet->mergeCells('B4:C4');
+                $sheet->mergeCells('B5:C5');
+                $sheet->mergeCells('B6:C6');
+                $sheet->mergeCells('B7:C7');
+
+                $sheet->setWidth('A', 20);
+                $sheet->setWidth('B', 20);
+                $sheet->setWidth('C', 20);
+                $sheet->setWidth('D', 20);
+                $sheet->setWidth('E', 20);
+                $sheet->setWidth('F', 20);
+                $sheet->setWidth('G', 20);
+                $sheet->setWidth('H', 20);
+                $sheet->setWidth('I', 20);
+                $sheet->setWidth('J', 20);
+                $sheet->setWidth('K', 20);
+                $sheet->setWidth('L', 20);
+                $sheet->setWidth('M', 20);
+                $sheet->setWidth('N', 20);
+
+                $sheet->cell('A1', function($cell) {
+                            $cell->setFontColor('#FFFFFF');   // Texto blanco
+                        });
+                $sheet->loadView('entregadocumento/excel/contratopagosbbvamacro')->with('folio',$folio)
+                                                                                ->with('empresa',$empresa)
+                                                                                ->with('funcion',$funcion)
+                                                                                ->with('listadocumento',$listadocumento)
+                                                                                ->with('operacion_id',$operacion_id);         
+            });
+
+        })->export('xls');
+    }
+
+
+
     public function actionDescargarPagoMacroEstibaBbva($folio_codigo)
     {
 
