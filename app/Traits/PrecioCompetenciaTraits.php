@@ -33,11 +33,20 @@ trait PrecioCompetenciaTraits
 	private function documentolgautomatico() {
 			
 			$pathFiles='\\\\10.1.50.2';
-      $listasunattareas                   =   DB::table('SUNAT_DOCUMENTO')
-                                              ->where('MODULO', 'LIQUIDACION_GASTO')
-                                              ->where('ACTIVO', 1)
-                                              ->where('IND_TOTAL', 0)
-                                              ->get();
+
+			$listasunattareas = DB::table('LQG_DETLIQUIDACIONGASTO')
+			    ->select('SUNAT_DOCUMENTO.*')
+			    ->distinct()
+			    ->join('LQG_LIQUIDACION_GASTO', 'LQG_DETLIQUIDACIONGASTO.ID_DOCUMENTO', '=', 'LQG_LIQUIDACION_GASTO.ID_DOCUMENTO')
+			    ->join('SUNAT_DOCUMENTO', 'SUNAT_DOCUMENTO.ID_DOCUMENTO', '=', 'LQG_LIQUIDACION_GASTO.ID_DOCUMENTO')
+			    ->where('LQG_DETLIQUIDACIONGASTO.COD_TIPODOCUMENTO', 'TDO0000000000001')
+			    ->where('LQG_DETLIQUIDACIONGASTO.ACTIVO', 1)
+			    ->where('LQG_LIQUIDACION_GASTO.ACTIVO', 1)
+			    ->where('LQG_LIQUIDACION_GASTO.COD_ESTADO', 'ETM0000000000001')
+			    ->where('SUNAT_DOCUMENTO.ACTIVO', 1)
+			    ->where('SUNAT_DOCUMENTO.IND_TOTAL', 0)
+			    ->get();
+
       //dd($listasunattareas);
       foreach($listasunattareas as $index=>$item){
 

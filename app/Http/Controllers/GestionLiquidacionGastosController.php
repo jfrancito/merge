@@ -587,7 +587,7 @@ class GestionLiquidacionGastosController extends Controller
             $nombre_cdr                 =   "";
 
             $urlxml                     =   'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/02';
-            $respuetaxml                =   $this->buscar_archivo_sunat_lg($urlxml,$fetoken,$this->pathFiles,$prefijocarperta,$ID_DOCUMENTO);
+            $respuetaxml                =   $this->buscar_archivo_sunat_lg_indicador($urlxml,$fetoken,$this->pathFiles,$prefijocarperta,$ID_DOCUMENTO,'IND_XML');
             $urlxml                     =   'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/01';
             $respuetapdf                =   $this->buscar_archivo_sunat_lg($urlxml,$fetoken,$this->pathFiles,$prefijocarperta,$ID_DOCUMENTO);
             
@@ -3240,6 +3240,11 @@ class GestionLiquidacionGastosController extends Controller
                         $codigocdr = '';
                         $factura_cdr_id='';
 
+                        $numerototal     = $numero;
+                        $numerototalsc    = ltrim($numerototal, '0');
+                        $nombre_doc_sinceros = $serie.'-'.$numerototalsc;
+
+
                         //dd($extractedFile);
 
                         if (file_exists($extractedFile)) {
@@ -3252,7 +3257,11 @@ class GestionLiquidacionGastosController extends Controller
                                     $cbc = 1;  
                                 }
                             }
+
+
                             if($cbc>=1){
+
+
                                 foreach($xml->xpath('//cbc:ResponseCode') as $ResponseCode)
                                 {
                                     $codigocdr  = $ResponseCode;
@@ -3261,6 +3270,7 @@ class GestionLiquidacionGastosController extends Controller
                                 {
                                     $respuestacdr  = $Description;
                                 }
+
                                 foreach($xml->xpath('//cbc:ID') as $ID)
                                 {
                                     $factura_cdr_id  = $ID;
@@ -3268,6 +3278,7 @@ class GestionLiquidacionGastosController extends Controller
                                         $sw = 1;
                                     }
                                 }  
+
                             }else{
                                 $xml_ns = simplexml_load_file($extractedFile);
                                 // Namespace definitions
@@ -3297,6 +3308,7 @@ class GestionLiquidacionGastosController extends Controller
                         } else {
                             $respuestacdr  = 'Error al intentar descomprimir el CDR';
                         }
+
                         if($sw == 0){
                             $respuestacdr  = 'El CDR ('.$factura_cdr_id.') no coincide con la factura ('.$nombre_doc.')';
                         }
