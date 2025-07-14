@@ -25,7 +25,7 @@ use App\Modelos\CMPDocumentoCtble;
 use App\Modelos\CMPReferecenciaAsoc;
 use App\Modelos\WEBRol;
 use App\Modelos\FeRefAsoc;
-use App\Modelos\DocAsociarCompra;
+
 
 
 
@@ -289,7 +289,7 @@ class GestionUsuarioContactoController extends Controller
         View::share('titulo','Lista Documentos Reparable');
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
 
-        DocAsociarCompra::where('TXT_ASIGNADO', 'LIKE', 'ARCHIVO_%')
+        CMPDocAsociarCompra::where('TXT_ASIGNADO', 'LIKE', 'ARCHIVO_%')
             ->where('COD_ESTADO', 0)
             ->update(['COD_ESTADO' => 1]);
 
