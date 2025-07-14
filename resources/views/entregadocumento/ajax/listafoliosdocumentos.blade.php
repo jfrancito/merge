@@ -41,7 +41,11 @@
                 @if($item->OPERACION=='ORDEN_COMPRA')
                   @include('entregadocumento.excel.opcionoc')
                 @else
-                  @include('entregadocumento.excel.opcionoc')
+                  @if($item->OPERACION=='DOCUMENTO_SERVICIO_BALANZA')
+                    @include('entregadocumento.excel.opcionbal')
+                  @else
+                    @include('entregadocumento.excel.opcionoc')
+                  @endif
                 @endif
               @endif
 

@@ -3539,7 +3539,7 @@ class GestionLiquidacionGastosController extends Controller
 
             $active                     =   "registro";
             $tdetliquidacionitem        =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ITEM','=',$valor)->first();
-            $tdetdocliquidacionitem     =   LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ITEM','=',$valor)->get();
+            $tdetdocliquidacionitem     =   LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->where('ITEM','=',$valor)->get();
 
             $tipodoc_id                 =   $tdetliquidacionitem->COD_TIPODOCUMENTO;
 

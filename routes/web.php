@@ -420,6 +420,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/descargar-pago-proveedor-macro-sbk-estiba-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoMacroEstibaSBK');
 	Route::any('/descargar-pago-proveedor-macro-interbank-estiba-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoMacrosEstibaInterbank');
 
+	Route::any('/descargar-pago-proveedor-macro-bbva-balanza-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoMacroBalanzaBbva');
+
 
 
 
