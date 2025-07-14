@@ -25,6 +25,8 @@ use App\Modelos\CMPDocumentoCtble;
 use App\Modelos\CMPReferecenciaAsoc;
 use App\Modelos\WEBRol;
 use App\Modelos\FeRefAsoc;
+use App\Modelos\DocAsociarCompra;
+
 
 
 use Greenter\Parser\DocumentParserInterface;
