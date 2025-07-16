@@ -40,6 +40,10 @@
                                                     <th></th>
                                                     <th></th>      
                                                     <th></th>
+                                                    <th></th>
+                                                    <th></th>      
+                                                    <th></th>
+                                                    
                                                     <th>{{$documento_asociados->sum('MONTOATENDIDOREAL')}}</th>
                                                   </tr>
 

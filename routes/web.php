@@ -29,6 +29,8 @@ Route::get('/serve-file', 'FileController@serveFile')->name('serve-file');
 Route::get('/serve-filecontrato', 'FileController@serveFileContrato')->name('serve-filecontrato');
 Route::get('/serve-fileestiba', 'FileController@serveFileEstiba')->name('serve-fileestiba');
 Route::get('/serve-filelg', 'FileController@serveFileLG')->name('serve-filelg');
+Route::get('/serve-filepla', 'FileController@serveFilePlaC')->name('serve-filepla');
+
 Route::get('/serve-filecontrato-sg', 'FileController@serveFileContratoSG')->name('serve-filecontrato-sg');
 Route::get('/serve-filepago', 'FileController@serveFilePago')->name('serve-filepago');
 Route::get('/serve-file-modelo', 'FileController@serveFileModelo')->name('serve-file-modelo');
@@ -100,6 +102,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-combo-item', 'GestionLiquidacionGastosController@actionAjaxComboItem');
 	Route::any('/ajax-combo-autoriza', 'GestionLiquidacionGastosController@actionAjaxComboAutoriza');
 	Route::any('/extonar-liquidacion-gastos/{idopcion}/{iddocumento}', 'GestionLiquidacionGastosController@actionExtornarLiquidacionGastos');
+
+	Route::any('/ajax-buscar-documento-uc-lg', 'GestionLiquidacionGastosController@actionAjaxUCListarLiquidacionGastos');
 
 
 	Route::any('/ajax-combo-cuenta-xmoneda', 'GestionLiquidacionGastosController@actionAjaxComboCuentaXMoneda');
@@ -348,6 +352,33 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/detalle-comprobante-oc-validado-historial/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoHitorial');
 	Route::any('/detalle-comprobante-oc-validado-contrato-historial/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoContratoHistorial');
+	
+
+
+
+
+	//CONSOLIDAR DOCUMENTOS DE PLANILLA DE MOVILIDADD
+	Route::any('/gestion-de-consolidar-planilla/{idopcion}', 'GestionPlanillaMovilidadController@actionListarConsolidarPlanilla');
+	Route::any('/ajax-modal-detalle-folios-pla', 'GestionPlanillaMovilidadController@actionEntregableModalDetalleFolioPla');
+	Route::any('/crear-folio-entregable-pla/{idopcion}', 'GestionPlanillaMovilidadController@actionEntregableCrearFolioEntregablePla');
+	Route::any('/ajax-select-folio-pagos-lg', 'GestionPlanillaMovilidadController@actionEntregableSelectFolioPagoLg');
+	Route::any('/ajax-extornar-folio-pagos-lg', 'GestionPlanillaMovilidadController@actionEntregableExtornoFolioPagoPla');
+	Route::any('/ajax-crear-folio-pagos-pla', 'GestionPlanillaMovilidadController@actionEntregableCrearFolioPla');
+	Route::any('/ajax-detalle-folio-pagos-ple', 'GestionPlanillaMovilidadController@actionEntregableDetalleFolioPagoPla');
+	Route::any('/guardar-folio-entregable-pla/{idopcion}', 'GestionPlanillaMovilidadController@actionEntregableGuardarFolioEntregablePla');
+	Route::any('/ajax-buscar-documento-fe-entregable-pla', 'GestionPlanillaMovilidadController@actionListarAjaxBuscarDocumentoEntregablePla');
+
+	Route::any('/gestion-de-planilla-consolidada/{idopcion}', 'GestionPlanillaMovilidadController@actionListarEntregaDocumentoFolioPla');
+	Route::any('/pdf-planilla-movilidad-consolidada/{iddocumento}', 'GestionPlanillaMovilidadController@actionPDFPlanillaMovilidadConsolidada');
+	Route::any('/ajax-modal-planilla-consolidado-subir', 'GestionPlanillaMovilidadController@actionListarAjaxModalPLanillaConsolidadoSubir');
+	Route::any('/guardar-comprobante-consolidado/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadController@actionGuardarComprobanteconsolidado');
+
+
+	Route::any('/gestion-de-aprobar-planilla-consolidada/{idopcion}', 'GestionPlanillaMovilidadController@actionAprobarPlanillaMovilidadContabilidad');
+	Route::any('/aprobar-planilla-movilidad-contabilidad/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadController@actionAprobarContabilidadPLA');
+	Route::any('/agregar-extorno-contabilidad-pla/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadController@actionAgregarExtornoContabilidadPLA');
+
+
 	//ENTREGA DE DOCUMENTOS
 	Route::any('/gestion-de-entrega-documentos/{idopcion}', 'GestionEntregaDocumentoController@actionListarEntregaDocumento');
 	Route::any('/ajax-buscar-documento-fe-entregable', 'GestionEntregaDocumentoController@actionListarAjaxBuscarDocumentoEntregable');
@@ -388,6 +419,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/descargar-pago-proveedor-macro-bbva-estiba-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoMacroEstibaBbva');
 	Route::any('/descargar-pago-proveedor-macro-sbk-estiba-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoMacroEstibaSBK');
 	Route::any('/descargar-pago-proveedor-macro-interbank-estiba-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoMacrosEstibaInterbank');
+
+	Route::any('/descargar-pago-proveedor-macro-bbva-balanza-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarPagoMacroBalanzaBbva');
 
 
 
@@ -523,7 +556,19 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-buscar-documento-gestion-tesoreria-pagado', 'GestionOCTesoreriaController@actionListarAjaxBuscarDocumentoTesoreriaPago');
 	Route::any('/ajax-modal-tesoreria-pago-pagado', 'GestionOCTesoreriaController@actionListarAjaxModalTesoreriaPagoPagado');
 	Route::any('/pago-comprobante-tesoreria-pagado/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCTesoreriaController@actionAprobarTesoreriaPagado');
+	Route::any('/pago-comprobante-tesoreria-pagado-contrato/{idopcion}/{linea}/{idordencompra}', 'GestionOCTesoreriaController@actionAprobarTesoreriaPagadoContrato');
+	Route::any('/pago-comprobante-tesoreria-pagado-comision/{idopcion}/{linea}/{idordencompra}', 'GestionOCTesoreriaController@actionAprobarTesoreriaPagadoComision');
+
+
+
 	Route::any('/extornar-pago-item/{idordencompra}/{idopcion}', 'GestionOCTesoreriaController@actionExtornoTesoreriaPagado');
+
+	Route::any('/ajax-modal-tesoreria-pago-pagado-contrato', 'GestionOCTesoreriaController@actionListarAjaxModalTesoreriaPagoPagadoContrato');
+	Route::any('/ajax-modal-tesoreria-pago-pagado-comision', 'GestionOCTesoreriaController@actionListarAjaxModalTesoreriaPagoPagadoComision');
+
+
+	Route::any('/extornar-pago-item-contrato/{idordencompra}/{idopcion}', 'GestionOCTesoreriaController@actionExtornoTesoreriaPagadoContrato');
+
 
 
 	Route::any('/gestion-de-provision-comprobante/{idopcion}', 'GestionOCProvisionController@actionListarComprobanteProvision');

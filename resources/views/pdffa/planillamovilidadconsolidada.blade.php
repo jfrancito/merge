@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-	<title>Planilla de Movilidad ({{$planillamovilidad->SERIE}}-{{$planillamovilidad->NUMERO}}) </title>
+	<title>Planilla de Movilidad Consolidada ({{$feplanillaentrega->SERIE}}-{{$feplanillaentrega->NUMERO}}) </title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<link rel="icon" type="image/x-icon" href="{{ asset('public/favicon.ico') }}"> 
 	<link rel="stylesheet" type="text/css" href="{{ asset('public/css/pdf.css') }} "/>
@@ -10,10 +10,6 @@
 </head>
 <body>
     <header>
-<!-- 	<div class="center">
-		<h3>{{$planillamovilidad->TXT_EMPRESA}}</h3>
-	</div> -->
-
 	<div class="menu">
 	    <div class="left">
 				<img src="{{ public_path('img/logonitido.png') }}" style="width: 150px;" alt="Logo">   
@@ -28,8 +24,8 @@
 
 	    <div class="right">
 	    		<h3>RUC N° {{$ruc}}</h3> 
-	    		<h4>PLANILLA DE MOVILIDAD.</h4>
-	    		<h3>N° {{$planillamovilidad->SERIE}}-{{$planillamovilidad->NUMERO}}</h3> 
+	    		<h4>PLANILLA DE MOVILIDAD CONSOLIDADA.</h4>
+	    		<h3>N° {{$feplanillaentrega->SERIE}}-{{$feplanillaentrega->NUMERO}}</h3> 
 	    </div>
 	</div>
     </header>
@@ -41,27 +37,30 @@
 					<table class="tcab">
 					    <tr>
 					      <td class="primertab"><b>PERIODO</b></td>
-					      <td><b> : </b>{{ucwords(strtolower(preg_replace('/^\(\d+\)\s*/', '', $planillamovilidad->TXT_PERIODO)))}}</td>
+					      <td><b> : </b>{{ucwords(strtolower(preg_replace('/^\(\d+\)\s*/', '', $feplanillaentrega->TXT_PERIODO)))}}</td>
 					    </tr>
 					    <tr>
 					      <td class="primertab"><b>FECHA EMISION</b></td>
-					      <td><b> : </b>{{date_format(date_create($planillamovilidad->FECHA_EMI), 'd/m/Y h:i:s')}}</td>
-					    </tr>
-					    <tr>
-					      <td class="primertab"><b>NOMBRE Y APELLIDO</b></td>
-					      <td><b> : </b>{{ucwords(strtolower($planillamovilidad->TXT_TRABAJADOR))}}</td>
+					      <td><b> : </b>{{date_format(date_create($feplanillaentrega->FEC_EMISION), 'd/m/Y h:i:s')}}</td>
 					    </tr>
 						<tr>
 					      <td class="primertab"><b>DNI</b></td>
-					      <td><b> : </b>{{$planillamovilidad->DOCUMENTO_TRABAJADOR}}</td>
+					      <td><b> : </b>{{$dni}}</td>
 					    </tr>	   
 						<tr>
 					      <td class="primertab"><b>LUGAR DE TRABAJO</b></td>
-					      <td><b> : </b>{{ucwords(strtolower($planillamovilidad->TXT_DIRECCION))}}</td>
+					      <td><b> : </b>{{ucwords(strtolower($lugares_trabajo->DIRECCIONES_CONCATENADAS))}}</td>
 					    </tr>
 						<tr>
-					      <td class="primertab"><b>GLOSA</b></td>
-					      <td><b> : </b>{{ucwords(strtolower($planillamovilidad->TXT_GLOSA))}}</td>
+					      <td class="primertab" style="vertical-align: top;"><b>GLOSA</b></td>
+					      <td><b> : </b>
+							@foreach($planillamovilidadglosas as $index => $glosa)
+							    {{ucwords(strtolower($glosa->TXT_GLOSA))}}
+							    @unless($loop->last)
+							        <br>&nbsp;
+							    @endunless
+							@endforeach
+					      </td>
 					    </tr>
 
 					</table>
@@ -132,18 +131,13 @@
         </article>
 
 
-		<table style="width: 100%; text-align: center; margin-top: 50px; border-collapse: collapse; border: none;">
+		<table style="width: 100%; text-align: center; margin-top: 80px; border-collapse: collapse; border: none;">
 		    <tr>
 		        <td style="width: 50%; text-align: center; border: none;">
-		            <img src="{{ public_path($imgresponsable) }}" style="width: 150px;" alt="Firma 1">
 		            <p style="margin-top: 10px;">RESPONSABLE</p>
 		            <p style="margin-top: 10px;">{{$nombre_responsable}}</p>
 		        </td>
-		        <td style="width: 50%; text-align: center; border: none;">
-		            <img src="{{ public_path($imgaprueba) }}" style="width: 150px;" alt="Firma 2">
-		            <p style="margin-top: 10px;">APROBADO POR</p>
-		            <p style="margin-top: 10px;">{{$nombre_aprueba}}</p>
-		        </td>
+
 		    </tr>
 		</table>
 

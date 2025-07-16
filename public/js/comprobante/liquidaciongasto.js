@@ -450,6 +450,8 @@ $(document).ready(function(){
             data    :   data,
             success: function (data) {
                 cerrarcargando();
+
+                debugger;
                 $('#modal-detalle-requerimiento').niftyModal('hide');
 
                 $('#serie').val(data.SERIE);
@@ -489,6 +491,29 @@ $(document).ready(function(){
 
     });
 
+
+    $(".cfedocumento").on('click','.buscardocumento', function() {
+
+        event.preventDefault();
+
+        var fecha_inicio         =   $('#fecha_inicio').val();
+        var fecha_fin            =   $('#fecha_fin').val();
+        var idopcion                =   $('#idopcion').val();
+        var _token                  =   $('#token').val();
+
+        //validacioones
+        if(fecha_inicio ==''){ alerterrorajax("Seleccione una fecha inicio."); return false;}
+        if(fecha_fin ==''){ alerterrorajax("Seleccione una fecha fin."); return false;}
+
+        data            =   {
+                                _token                  : _token,
+                                fecha_inicio            : fecha_inicio,
+                                fecha_fin               : fecha_fin,
+                                idopcion                : idopcion
+                            };
+        ajax_normal(data,"/ajax-buscar-documento-uc-lg");
+
+    });
 
 
     $(".liquidaciongasto").on('click','.buscardocumento', function() {
@@ -1079,7 +1104,8 @@ $(document).ready(function(){
             content: 'Registro de Liquidacion de Gastos',
             buttons: {
                 confirmar: function () {
-                     $( "#frmpm" ).submit();   
+                    abrircargando();
+                    $( "#frmpm" ).submit();   
                 },
                 cancelar: function () {
                     $.alert('Se cancelo el registro');
@@ -1153,15 +1179,36 @@ $(document).ready(function(){
         var data_item                                =   $(this).attr('data_item');
         var idopcion                                 =   $('#idopcion').val();
 
-        data                                         =   {
-                                                                _token                  : _token,
-                                                                data_iddocumento        : data_iddocumento,
-                                                                data_item               : data_item,
-                                                                idopcion                : idopcion
-                                                         };
-                                        
-        ajax_modal(data,"/ajax-modal-detalle-documento-lg",
-                  "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+        let existe = false;
+        // Recorrer todas las filas de la tabla
+        let tieneDatos = false;
+        $(".ltabladet tbody tr").each(function() {
+            console.log($(this).text().trim());
+            debugger;
+            if ($(this).text().trim() !== "") { // Verifica que la fila no esté vacía
+                tieneDatos = true;
+            }
+        });
+
+        if(tieneDatos === true){
+            alerterrorajax("Ya tiene un registro en el detalle solo se permite un solo detalle.");
+        }else{
+
+            data                                         =   {
+                                                                    _token                  : _token,
+                                                                    data_iddocumento        : data_iddocumento,
+                                                                    data_item               : data_item,
+                                                                    idopcion                : idopcion
+                                                             };
+                                            
+            ajax_modal(data,"/ajax-modal-detalle-documento-lg",
+                      "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+
+        }
+
+
+
+
 
     });
 

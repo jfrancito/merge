@@ -13,78 +13,26 @@
             <div class="col-sm-12">
               <div class="panel panel-default panel-border-color panel-border-color-success">
                 <div class="panel-heading">{{ $titulo }}
-<!-- 
                   <div class="tools tooltiptop">
 
-                    <a href="{{url('/comprobante-masivo-tesoreria-excel')}}" 
-                       class='tn btn-secondary botoncabecera tooltipcss opciones'
-                       target="_blank"
-                       id="descargarcomprobantemasivotesoreriraexcel" 
-                       data-href="{{url('/comprobante-masivo-tesoreria-excel')}}"
-                       title="Descargar excel">
-                       <span class="tooltiptext">Descargar excel Tesoreria</span>
-                       <i class="fa fa-file-excel-o"></i>
+                    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones loteentregable">
+                      <span class="tooltiptext" >Ver Folio</span>
+                      <strong class='folios_hit' data_folio_sel="@if(count($entregable_sel)>0){{$entregable_sel->FOLIO}}@endif" style="font-size:13px; padding: 5px;">
+                        @if(count($entregable_sel)>0)
+                          {{$entregable_sel->FOLIO}} ({{$entregable_sel->CAN_FOLIO}})
+                        @else
+                          Sin Folio
+                        @endif
+                      </strong>
                     </a>
-
-                    <a href="{{url('/comprobante-masivo-excel')}}" 
-                       class='tn btn-secondary botoncabecera tooltipcss opciones'
-                       target="_blank"
-                       id="descargarcomprobantemasivoexcel" 
-                       data-href="{{url('/comprobante-masivo-excel')}}"
-                       title="Descargar excel">
-                       <span class="tooltiptext">Descargar excel Contabilidada</span>
-                       <i class="fa fa-file-excel-o"></i>
+                    <input type="hidden" name="folio_sel" id="folio_sel" value="@if(count($entregable_sel)>0){{$entregable_sel->FOLIO}}@endif">
+                    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscardocumento">
+                      <span class="tooltiptext">Buscar Documento</span>
+                      <span class="icon mdi mdi-search"></span>
                     </a>
 
 
-
-                  </div> -->
-
-
-
-                  <div class="tools tooltiptop">
-                      <div class="dropdown">
-
-                          <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscardocumento">
-                            <span class="tooltiptext">Buscar Documento</span>
-                            <span class="icon mdi mdi-search"></span>
-                          </a>
-
-                          <span class="icon mdi mdi-more-vert dropdown-toggle" id="menudespacho"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"></span>
-
-                          <ul class="dropdown-menu" aria-labelledby="menudespacho"
-                              style="margin: 7px -169px 0;">
-                              <li>
-                                  <a href="{{url('/comprobante-masivo-tesoreria-excel')}}" 
-                                     class='tn btn-secondary botoncabecera tooltipcss opciones'
-                                     target="_blank"
-                                     id="descargarcomprobantemasivotesoreriraexcel" 
-                                     data-href="{{url('/comprobante-masivo-tesoreria-excel')}}"
-                                     title="Descargar excel" style="width:100%">
-                                     <span class="tooltiptext">Descargar excel Tesoreria</span>
-                                     Descargar excel Tesoreria
-                                  </a>
-                              </li>
-                              <li>
-                                <a href="{{url('/comprobante-masivo-excel')}}" 
-                                   class='tn btn-secondary botoncabecera tooltipcss opciones'
-                                   target="_blank"
-                                   id="descargarcomprobantemasivoexcel" 
-                                   data-href="{{url('/comprobante-masivo-excel')}}"
-                                   title="Descargar excel" style="width:100%">
-                                   <span class="tooltiptext">Descargar excel Contabilidada</span>
-                                   Descargar excel Contabilidada
-                                </a>
-                              </li>
-                          </ul>
-                      </div>
                   </div>
-
-
-
-
-
 
                 </div>
 
@@ -92,26 +40,25 @@
                   <div class='filtrotabla row'>
 
                           <div class="col-xs-12">
-
                             <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
                                 <div class="form-group">
-                                  <label class="col-sm-12 control-label labelleft" >Operacion :</label>
+                                  <label class="col-sm-12 control-label labelleft" >Empresa :</label>
                                   <div class="col-sm-12 abajocaja" >
-                                    {!! Form::select( 'operacion_id', $combo_operacion, array($operacion_id),
+                                    {!! Form::select( 'empresa_id', $combo_empresa, array($empresa_id),
                                                       [
                                                         'class'       => 'select2 form-control control input-sm' ,
-                                                        'id'          => 'operacion_id',
+                                                        'id'          => 'empresa_id',
                                                         'required'    => '',
                                                         'data-aw'     => '1',
                                                       ]) !!}
                                   </div>
                                 </div>
                             </div> 
-
+ 
 
                             <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
                                 <div class="form-group ">
-                                  <label class="col-sm-12 control-label labelleft" >Fecha Inicio:</label>
+                                  <label class="col-sm-12 control-label labelleft" >Fecha Inicio :</label>
                                   <div class="col-sm-12 abajocaja" >
                                     <div data-min-view="2" 
                                            data-date-format="dd-mm-yyyy"  
@@ -131,7 +78,7 @@
 
                             <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
                               <div class="form-group ">
-                                <label class="col-sm-12 control-label labelleft" >Fecha Fin:</label>
+                                <label class="col-sm-12 control-label labelleft" >Fecha Fin :</label>
                                 <div class="col-sm-12 abajocaja" >
                                   <div data-min-view="2" 
                                          data-date-format="dd-mm-yyyy"  
@@ -149,57 +96,6 @@
                               </div>
                             </div> 
 
-                            <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
-
-                                <div class="form-group">
-                                  <label class="col-sm-12 control-label labelleft" >Proveedor :</label>
-                                  <div class="col-sm-12 abajocaja" >
-                                    {!! Form::select( 'proveedor_id', $combo_proveedor, array(),
-                                                      [
-                                                        'class'       => 'select2 form-control control input-sm' ,
-                                                        'id'          => 'proveedor_id',
-                                                        'required'    => '',
-                                                        'data-aw'     => '1',
-                                                      ]) !!}
-                                  </div>
-                                </div>
-                            </div> 
-
-                            <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
-
-                                <div class="form-group">
-                                  <label class="col-sm-12 control-label labelleft" >Estados :</label>
-                                  <div class="col-sm-12 abajocaja" >
-                                    {!! Form::select( 'estado_id', $combo_estado, array(),
-                                                      [
-                                                        'class'       => 'select2 form-control control input-sm' ,
-                                                        'id'          => 'estado_id',
-                                                        'required'    => '',
-                                                        'data-aw'     => '1',
-                                                      ]) !!}
-                                  </div>
-                                </div>
-                            </div> 
-
-
-                            <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
-
-                                <div class="form-group">
-                                  <label class="col-sm-12 control-label labelleft" >Filtro Fecha :</label>
-                                  <div class="col-sm-12 abajocaja" >
-                                    {!! Form::select( 'filtrofecha_id', $combo_filtrofecha, array(),
-                                                      [
-                                                        'class'       => 'select2 form-control control input-sm' ,
-                                                        'id'          => 'filtrofecha_id',
-                                                        'required'    => '',
-                                                        'data-aw'     => '1',
-                                                      ]) !!}
-                                  </div>
-                                </div>
-                            </div> 
-
-
-
 
                           </div>
 
@@ -209,16 +105,26 @@
                     </div>
                   </div>
                   <div class='listajax'>
-                    @include('comprobante.ajax.mergelistaocvalidado')
+                    @include('planillamovilidad.ajax.ajaxlistaplanillaconsolidada')
                   </div>
                 </div>
               </div>
             </div>
           </div>
     </div>
+    @include('planillamovilidad.modal.mregistrorequerimiento')
+    
   </div>
 @stop
 @section('script')
+
+
+  <script src="{{ asset('public/js/general/inputmask/inputmask.js') }}" type="text/javascript"></script> 
+  <script src="{{ asset('public/js/general/inputmask/inputmask.extensions.js') }}" type="text/javascript"></script> 
+  <script src="{{ asset('public/js/general/inputmask/inputmask.numeric.extensions.js') }}" type="text/javascript"></script> 
+  <script src="{{ asset('public/js/general/inputmask/inputmask.date.extensions.js') }}" type="text/javascript"></script> 
+  <script src="{{ asset('public/js/general/inputmask/jquery.inputmask.js') }}" type="text/javascript"></script>
+
   <script src="{{ asset('public/lib/datatables/js/jquery.dataTables.min.js') }}" type="text/javascript"></script>
   <script src="{{ asset('public/lib/datatables/js/dataTables.bootstrap.min.js') }}" type="text/javascript"></script>
   <script src="{{ asset('public/lib/datatables/plugins/buttons/js/dataTables.buttons.js') }}" type="text/javascript"></script>
@@ -231,6 +137,8 @@
   <script src="{{ asset('public/lib/datatables/plugins/buttons/js/buttons.colVis.js') }}" type="text/javascript"></script>
   <script src="{{ asset('public/lib/datatables/plugins/buttons/js/buttons.bootstrap.js') }}" type="text/javascript"></script>
   <script src="{{ asset('public/js/app-tables-datatables.js?v='.$version) }}" type="text/javascript"></script>
+
+
   <script src="{{ asset('public/lib/jquery-ui/jquery-ui.min.js') }}" type="text/javascript"></script>
   <script src="{{ asset('public/lib/jquery.nestable/jquery.nestable.js') }}" type="text/javascript"></script>
   <script src="{{ asset('public/lib/moment.js/min/moment.min.js') }}" type="text/javascript"></script>
@@ -255,9 +163,12 @@
       App.dataTables();
       $('[data-toggle="tooltip"]').tooltip();
       $('form').parsley();
+      $('.select4').select2();
+
+
 
     });
   </script>
-  <script src="{{ asset('public/js/comprobante/oc.js?v='.$version) }}" type="text/javascript"></script>
+  <script src="{{ asset('public/js/comprobante/planilla.js?v='.$version) }}" type="text/javascript"></script>
 
 @stop
