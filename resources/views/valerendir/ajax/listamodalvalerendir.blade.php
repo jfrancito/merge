@@ -126,13 +126,6 @@
         color: white;
     }
 
-   /* td.custom-glosa {
-        white-space: pre-line; 
-        word-wrap: break-word; 
-        max-width: 150px; 
-        height: auto; 
-        word-break: break-word;
-    }*/
     td.custom-glosa1 {
         display: flex;
         align-items: center;

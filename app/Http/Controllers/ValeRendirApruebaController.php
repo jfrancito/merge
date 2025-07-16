@@ -76,6 +76,7 @@ class ValeRendirApruebaController extends Controller
 
     
         $usuario_logueado_id = Session::get('usuario')->usuarioosiris_id;
+        $usuario_merge = session::get('usuario')->id;
 
 
         $listarusuarios = $this->listaValeRendirAprueba(
@@ -98,6 +99,7 @@ class ValeRendirApruebaController extends Controller
             'listausuarios2' => $combo2,
             'listarusuarios' => $listarusuarios,
             'usuario_logueado_id' => $usuario_logueado_id,
+            'usuario_merge' => $usuario_merge,
             'txtNombreCliente'=>'',
             'ajax'=>true,
          
