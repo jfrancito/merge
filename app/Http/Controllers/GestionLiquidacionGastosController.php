@@ -1618,7 +1618,8 @@ class GestionLiquidacionGastosController extends Controller
                                     ->where('COD_EMPRESA', $detliquidaciongasto->COD_EMPRESA)
                                     ->whereNotIn('ID_DOCUMENTO', function($query) {
                                         $query->select(DB::raw('ISNULL(COD_PLA_MOVILIDAD, \'\')'))
-                                              ->from('LQG_DETLIQUIDACIONGASTO');
+                                              ->from('LQG_DETLIQUIDACIONGASTO')
+                                              ->where('ACTIVO', '=', '1'); // Agregar esta condición
                                     })
                                     ->get();
 

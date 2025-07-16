@@ -135,6 +135,9 @@ class GestionPlanillaMovilidadController extends Controller
                 DB::beginTransaction();
                 $feplanillaentrega      =   FePlanillaEntregable::where('ID_DOCUMENTO','=',$iddocumento)->first();
                 $descripcion            =   $request['descripcion'];
+                $nro_cuenta_contable    =   $request['nro_cuenta_contable'];
+
+
                 if(rtrim(ltrim($descripcion)) != ''){
                     //HISTORIAL DE DOCUMENTO APROBADO
                     $documento                              =   new PlaDocumentoHistorial;
@@ -158,6 +161,14 @@ class GestionPlanillaMovilidadController extends Controller
                                     'FECHA_CONTABILIDAD'=>$this->fechaactual
                                 ]
                             );
+
+                PlaMovilidad::where('FOLIO',$feplanillaentrega->FOLIO)
+                            ->update(
+                                [
+                                    'NRO_CUENTA'=>$nro_cuenta_contable
+                                ]
+                            );
+
 
                 //HISTORIAL DE DOCUMENTO APROBADO
                 $documento                              =   new PlaDocumentoHistorial;

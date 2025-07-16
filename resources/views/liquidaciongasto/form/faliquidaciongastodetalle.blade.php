@@ -273,7 +273,7 @@
   </div>
 @endif
 <div class="col-xs-12">
-  <table id="tdpm" class="table table-striped table-striped  nowrap listatabla" style='width: 100%;'>
+  <table id="tdpm" class="table table-striped table-striped  nowrap listatabla ltabladet" style='width: 100%;'>
     <thead>
       <tr>
         <th>DETALLE DEL DOCUMENTO</th> 

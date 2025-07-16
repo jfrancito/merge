@@ -365,7 +365,7 @@ $(document).ready(function(){
         var total                   =   $('#total').val();       
         var fechaString             =   fecha_gasto; // "26-03-2025"
 
-        if(fecha_gasto ==''){ alerterrorajax("Seleccione una Fecha de pago."); return false;}
+        if(fecha_gasto ==''){ alerterrorajax("Seleccione una Fecha de gasto."); return false;}
         if(motivo_id ==''){ alerterrorajax("Seleccione un Motivo."); return false;}
         if(lugarpartida ==''){ alerterrorajax("Ingrese un direccion de Partida"); return false;}
         if(lugarllegada ==''){ alerterrorajax("Ingrese un direccion de LLegada"); return false;}
@@ -421,7 +421,7 @@ $(document).ready(function(){
         if(!(parseInt(cod_mes)===parseInt(codmes) && parseInt(cod_anio)===parseInt(codanio))){
             alerterrorajax('La fecha de pago no pertenece al periodo de la planilla.'); return false;
         }
-
+        abrircargando();
         $( "#agregarpmd" ).submit();
     });
 
