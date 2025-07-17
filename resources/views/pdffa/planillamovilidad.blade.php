@@ -139,11 +139,6 @@
 		            <p style="margin-top: 10px;">RESPONSABLE</p>
 		            <p style="margin-top: 10px;">{{$nombre_responsable}}</p>
 		        </td>
-		        <td style="width: 50%; text-align: center; border: none;">
-		            <img src="{{ public_path($imgaprueba) }}" style="width: 150px;" alt="Firma 2">
-		            <p style="margin-top: 10px;">APROBADO POR</p>
-		            <p style="margin-top: 10px;">{{$nombre_aprueba}}</p>
-		        </td>
 		    </tr>
 		</table>
 

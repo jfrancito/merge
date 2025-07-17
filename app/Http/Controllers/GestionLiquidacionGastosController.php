@@ -1447,14 +1447,7 @@ class GestionLiquidacionGastosController extends Controller
             $imgaprueba             =   'firmas/blanco.jpg';
             $nombre_aprueba         =   '';
             $rutaImagen             =   public_path('firmas/'.$trabajadorap->NRO_DOCUMENTO.'.jpg');
-            if (file_exists($rutaImagen)){
-                $imgaprueba         =   'firmas/'.$trabajadorap->NRO_DOCUMENTO.'.jpg';
-                $nombre_aprueba     =   $trabajadorap->TXT_NOMBRES.' '.$trabajadorap->TXT_APE_PATERNO.' '.$trabajadorap->TXT_APE_MATERNO;
-            }else{
-                $sw = 1;
-                print_r('JEFE : '.$trabajadorap->TXT_NOMBRES.' '.$trabajadorap->TXT_APE_PATERNO.' '.$trabajadorap->TXT_APE_MATERNO.'<br>');
 
-            }
 
             $direccion              =   $this->gn_direccion_fiscal();
             //DD($rutacompleta);
@@ -1615,6 +1608,7 @@ class GestionLiquidacionGastosController extends Controller
         $lpmovilidades      =       DB::table('PLA_MOVILIDAD')
                                     ->where('USUARIO_CREA', Session::get('usuario')->id)
                                     ->where('ACTIVO','=','1')
+                                    ->where('COD_ESTADO','=','ETM0000000000008')
                                     ->where('COD_EMPRESA', $detliquidaciongasto->COD_EMPRESA)
                                     ->whereNotIn('ID_DOCUMENTO', function($query) {
                                         $query->select(DB::raw('ISNULL(COD_PLA_MOVILIDAD, \'\')'))
@@ -2476,9 +2470,9 @@ class GestionLiquidacionGastosController extends Controller
                 $nombre_aprueba         =   '';
                 $rutaImagen             =   public_path('firmas/'.$trabajadorap->NRO_DOCUMENTO.'.jpg');
                 //dd($rutaImagen);
-                if (!file_exists($rutaImagen)){
-                    return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/0')->with('errorbd','No se puede emitir ya que el que autoriza no cuenta con firma llamar a sistemas');
-                }
+                // if (!file_exists($rutaImagen)){
+                //     return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/0')->with('errorbd','No se puede emitir ya que el que autoriza no cuenta con firma llamar a sistemas');
+                // }
                 //CUANDO ESTA OBSEVADOS
                 if($liquidaciongastos->IND_OBSERVACION==1){
                     LqgLiquidacionGasto::where('ID_DOCUMENTO',$iddocumento)

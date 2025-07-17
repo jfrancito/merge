@@ -123,6 +123,8 @@
   <script src="{{ asset('public/js/app-form-elements.js') }}" type="text/javascript"></script>
   <script src="{{ asset('public/lib/parsley/parsley.js') }}" type="text/javascript"></script>
   <script src="{{ asset('public/lib/jquery.niftymodals/dist/jquery.niftymodals.js') }}" type="text/javascript"></script>
+
+  
   <script type="text/javascript">
 
     $.fn.niftyModal('setDefaults',{

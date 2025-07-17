@@ -19,6 +19,21 @@ document.addEventListener("DOMContentLoaded", function() {
 $(document).ready(function(){
     var carpeta = $("#carpeta").val();
 
+    $(".planillamovilidad").on('click','.mdiselp', function(e) {
+        var _token                  =   $('#token').val();
+        var idopcion                =   $('#idopcion').val();
+        const location              =   $(this).attr('location');
+        const department_code       =   $(this).attr('department_code');
+        const province_code         =   $(this).attr('province_code');
+        const district_code         =   $(this).attr('district_code');
+        debugger;
+
+        $('#departamentopartida_id').val(data.TXT_EMPRESA).trigger('change');
+        $('#departamentopartida_id').val(department_code);
+
+
+    });
+
 
     $('.btnrechazocomporbatnte').on('click', function(event){
         event.preventDefault();
