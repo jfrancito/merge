@@ -1099,6 +1099,7 @@ class GestionLiquidacionGastosController extends Controller
             $DETALLES = [];
             $ind_igv = 'NO';
             $igv = 0;
+            $subventa = 0;
             $venta = 0;
 
             foreach ($factura->getdetails() as $indexdet => $itemdet) {
@@ -1110,6 +1111,7 @@ class GestionLiquidacionGastosController extends Controller
                     $ind_igv = 'SI';
                 }
                 $igv = $igv + (float) $itemdet->getigv();
+                $subventa = $subventa + (float) $itemdet->getmtoValorVenta();
                 $venta = $venta + (float) $itemdet->getmtoValorVenta();
 
             }
@@ -1129,8 +1131,8 @@ class GestionLiquidacionGastosController extends Controller
                 'PRECIO_UNIT'        => 1,
                 'VAL_IGV_ORIG'       => $ind_igv,
                 'VAL_IGV_SOL'        => $igv,
-                'VAL_SUBTOTAL_ORIG'  => $venta,
-                'VAL_SUBTOTAL_SOL'   => $venta,
+                'VAL_SUBTOTAL_ORIG'  => $subventa,
+                'VAL_SUBTOTAL_SOL'   => $subventa,
                 'VAL_VENTA_ORIG'     => $igv + $venta,
                 'VAL_VENTA_SOL'      => $igv + $venta,
                 'PRECIO_ORIG'        => $igv + $venta
@@ -1158,10 +1160,7 @@ class GestionLiquidacionGastosController extends Controller
                 'NCONDDOMIRUC' => $NCONDDOMIRUC,
                 'NOMBREFILE' => $nombrefile,
                 'RUTACOMPLETA' => $rutacompleta,
-
-
                 'DETALLE' => $DETALLES
-
             ]);
         }
 
