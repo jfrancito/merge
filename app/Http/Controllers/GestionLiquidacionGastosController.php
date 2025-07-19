@@ -3244,7 +3244,7 @@ class GestionLiquidacionGastosController extends Controller
                         $nombre_doc_sinceros = $serie.'-'.$numerototalsc;
 
 
-                        //dd($extractedFile);
+                        //dd($nombre_doc_sinceros);
 
                         if (file_exists($extractedFile)) {
                             //cbc
@@ -3273,11 +3273,12 @@ class GestionLiquidacionGastosController extends Controller
                                 foreach($xml->xpath('//cbc:ID') as $ID)
                                 {
                                     $factura_cdr_id  = $ID;
+                                    $factura_cdr_id = preg_replace('/-0+/', '-', $factura_cdr_id);
                                     if($factura_cdr_id == $nombre_doc || $factura_cdr_id == $nombre_doc_sinceros){
                                         $sw = 1;
                                     }
                                 }  
-
+                                    
                             }else{
                                 $xml_ns = simplexml_load_file($extractedFile);
                                 // Namespace definitions
@@ -3298,6 +3299,7 @@ class GestionLiquidacionGastosController extends Controller
                                 foreach($xml_ns->xpath('//ns3:DocumentReference') as $ID)
                                 {
                                     $factura_cdr_id  = $ID->ID;
+                                    $factura_cdr_id = preg_replace('/-0+/', '-', $factura_cdr_id);
                                     if($factura_cdr_id == $nombre_doc || $factura_cdr_id == $nombre_doc_sinceros){
                                         $sw = 1;
                                     }
@@ -3316,7 +3318,6 @@ class GestionLiquidacionGastosController extends Controller
                         //     $respuestacdr  = 'El CDR ('.$factura_cdr_id.') tiene observaciones';
                         //     return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/-1')->with('errorbd',$respuestacdr);
                         // }
-
                         LqgDetLiquidacionGasto::where('ID_DOCUMENTO',$iddocumento)->where('ITEM',$item)
                                     ->update(
                                         [
