@@ -3309,11 +3309,15 @@ class GestionLiquidacionGastosController extends Controller
                         } else {
                             $respuestacdr  = 'Error al intentar descomprimir el CDR';
                         }
-
-                        if($sw == 0){
-                            $respuestacdr  = 'El CDR ('.$factura_cdr_id.') no coincide con la factura ('.$nombre_doc.')';
-                            return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/-1')->with('errorbd',$respuestacdr);
+                        if($seriepl=='F'){
+                            if($sw == 0){
+                                $respuestacdr  = 'El CDR ('.$factura_cdr_id.') no coincide con la factura ('.$nombre_doc.')';
+                                return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/-1')->with('errorbd',$respuestacdr);
+                            }    
+                        }else{
+                            $respuestacdr  = '';
                         }
+
                         // if (strpos($respuestacdr, 'observaciones') !== false) {
                         //     $respuestacdr  = 'El CDR ('.$factura_cdr_id.') tiene observaciones';
                         //     return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/-1')->with('errorbd',$respuestacdr);
