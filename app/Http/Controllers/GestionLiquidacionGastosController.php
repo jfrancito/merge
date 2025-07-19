@@ -1119,6 +1119,11 @@ class GestionLiquidacionGastosController extends Controller
             if($venta == 0){
                 $venta = $factura->getmtoImpVenta();
             }
+            $igv = 0;
+            if($ind_igv == 'SI'){
+                $igv = $factura->getmtoImpVenta() - $factura->getmtoIGV();
+            }
+
 
             $linea = str_pad(1, 3, "0", STR_PAD_LEFT);
 
@@ -1129,13 +1134,13 @@ class GestionLiquidacionGastosController extends Controller
                 'UND_PROD'           => 'UND',
                 'CANTIDAD'           => 1,
                 'PRECIO_UNIT'        => 1,
-                'VAL_IGV_ORIG'       => $ind_igv,
-                'VAL_IGV_SOL'        => $igv,
-                'VAL_SUBTOTAL_ORIG'  => $subventa,
-                'VAL_SUBTOTAL_SOL'   => $subventa,
-                'VAL_VENTA_ORIG'     => $igv + $venta,
-                'VAL_VENTA_SOL'      => $igv + $venta,
-                'PRECIO_ORIG'        => $igv + $venta
+                'VAL_IGV_ORIG'       => $factura->getmtoIGV(),
+                'VAL_IGV_SOL'        => $factura->getmtoIGV(),
+                'VAL_SUBTOTAL_ORIG'  => $igv,
+                'VAL_SUBTOTAL_SOL'   => $igv,
+                'VAL_VENTA_ORIG'     => $factura->getmtoImpVenta(),
+                'VAL_VENTA_SOL'      => $factura->getmtoImpVenta(),
+                'PRECIO_ORIG'        => $factura->getmtoImpVenta()
             ];
 
             // Ejemplo: devolver una parte del XML
@@ -3305,9 +3310,11 @@ class GestionLiquidacionGastosController extends Controller
 
                         if($sw == 0){
                             $respuestacdr  = 'El CDR ('.$factura_cdr_id.') no coincide con la factura ('.$nombre_doc.')';
+                            return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/-1')->with('errorbd',$respuestacdr);
                         }
                         if (strpos($respuestacdr, 'observaciones') !== false) {
                             $respuestacdr  = 'El CDR ('.$factura_cdr_id.') tiene observaciones';
+                            return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/-1')->with('errorbd',$respuestacdr);
                         }
 
                         LqgDetLiquidacionGasto::where('ID_DOCUMENTO',$iddocumento)->where('ITEM',$item)
