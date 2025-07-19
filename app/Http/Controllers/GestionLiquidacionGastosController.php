@@ -3312,10 +3312,10 @@ class GestionLiquidacionGastosController extends Controller
                             $respuestacdr  = 'El CDR ('.$factura_cdr_id.') no coincide con la factura ('.$nombre_doc.')';
                             return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/-1')->with('errorbd',$respuestacdr);
                         }
-                        if (strpos($respuestacdr, 'observaciones') !== false) {
-                            $respuestacdr  = 'El CDR ('.$factura_cdr_id.') tiene observaciones';
-                            return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/-1')->with('errorbd',$respuestacdr);
-                        }
+                        // if (strpos($respuestacdr, 'observaciones') !== false) {
+                        //     $respuestacdr  = 'El CDR ('.$factura_cdr_id.') tiene observaciones';
+                        //     return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/-1')->with('errorbd',$respuestacdr);
+                        // }
 
                         LqgDetLiquidacionGasto::where('ID_DOCUMENTO',$iddocumento)->where('ITEM',$item)
                                     ->update(
