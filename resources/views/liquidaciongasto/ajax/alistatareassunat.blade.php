@@ -30,8 +30,7 @@
                 <span class="mdi mdi-check-circle" style="display: inline-block;color: #34a853;"></span>
                 <a href="{{ url('/descargar-archivo-lq/'.$item->ID_DOCUMENTO.'/'.$item->NOMBRE_PDF.'/PDF') }}">
                   <span class="mdi mdi-save" style="display: inline-block;color: #34a853;cursor: pointer;"></span>
-                </a>  
-
+                </a>
               @else
                 <span class="mdi mdi-close-circle" style="display: inline-block;color: #cc0000;"></span>
               @endif
