@@ -3,6 +3,27 @@ $(document).ready(function(){
     var carpeta = $("#carpeta").val();
 
 
+    $(".liquidaciongasto").on('click','#descargarcomprobantemasivoexcel', function() {
+
+        var fecha_inicio         =   $('#fecha_inicio').val();
+        var fecha_fin            =   $('#fecha_fin').val();
+        var proveedor_id         =   $('#proveedor_id').val();
+        var estado_id            =   $('#estado_id').val();
+        var idopcion             =   $('#idopcion').val();
+        var _token               =   $('#token').val();
+
+        //validacioones
+        if(fecha_inicio ==''){ alerterrorajax("Seleccione una fecha inicio."); return false;}
+        if(fecha_fin ==''){ alerterrorajax("Seleccione una fecha fin."); return false;}
+
+        href = $(this).attr('data-href')+'/'+fecha_inicio+'/'+fecha_fin+'/'+proveedor_id+'/'+estado_id+'/'+idopcion;
+        $(this).prop('href', href);
+        return true;
+
+
+    });
+
+
     $(".liquidaciongasto").on('change','#moneda_sel_c_id', function(e) {
 
         var _token                  =   $('#token').val();
