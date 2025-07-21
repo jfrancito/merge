@@ -1149,9 +1149,16 @@ class GestionLiquidacionGastosController extends Controller
             if($ind_igv == 'SI'){
                 $igv = $factura->getmtoImpVenta() - $factura->getmtoIGV();
             }
+            $subtotal = 0;
+            if($ind_igv == 'SI'){
+                $subtotal = $factura->getmtoImpVenta() - $factura->getmtoIGV();
+            }else{
+                $subtotal = $factura->getmtoImpVenta();
+            }
 
 
             $linea = str_pad(1, 3, "0", STR_PAD_LEFT);
+
 
             $DETALLES[] = [
                 'LINEID'             => $linea,
@@ -1160,10 +1167,10 @@ class GestionLiquidacionGastosController extends Controller
                 'UND_PROD'           => 'UND',
                 'CANTIDAD'           => 1,
                 'PRECIO_UNIT'        => 1,
-                'VAL_IGV_ORIG'       => $factura->getmtoIGV(),
-                'VAL_IGV_SOL'        => $factura->getmtoIGV(),
-                'VAL_SUBTOTAL_ORIG'  => $igv,
-                'VAL_SUBTOTAL_SOL'   => $igv,
+                'VAL_IGV_ORIG'       => $ind_igv,
+                'VAL_IGV_SOL'        => $igv,
+                'VAL_SUBTOTAL_ORIG'  => $subtotal,
+                'VAL_SUBTOTAL_SOL'   => $subtotal,
                 'VAL_VENTA_ORIG'     => $factura->getmtoImpVenta(),
                 'VAL_VENTA_SOL'      => $factura->getmtoImpVenta(),
                 'PRECIO_ORIG'        => $factura->getmtoImpVenta()
