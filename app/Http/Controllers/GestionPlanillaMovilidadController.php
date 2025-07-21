@@ -1964,6 +1964,53 @@ class GestionPlanillaMovilidadController extends Controller
         $combodistritoll    =       $this->gn_generacion_combo_categoria_xid('DISTRITO','Seleccione Distrito','',$provincia_idll); 
         $distrito_idll      =       $dplanillamovilidad->COD_DISTRITO_LLEGADA;
 
+
+        $departureQuery = DB::table('PLA_DETMOVILIDAD')
+            ->select(
+                'TXT_LUGARPARTIDA as location',
+                'COD_DEPARTAMENTO_PARTIDA as department_code',
+                'TXT_DEPARTAMENTO_PARTIDA as department_name',
+                'COD_PROVINCIA_PARTIDA as province_code',
+                'TXT_PROVINCIA_PARTIDA as province_name',
+                'COD_DISTRITO_PARTIDA as district_code',
+                'TXT_DISTRITO_PARTIDA as district_name'
+            )
+            ->where('USUARIO_CREA', Session::get('usuario')->id)
+            ->where('ACTIVO', 1)
+            ->groupBy(
+                'TXT_LUGARPARTIDA',
+                'COD_DEPARTAMENTO_PARTIDA',
+                'TXT_DEPARTAMENTO_PARTIDA',
+                'COD_PROVINCIA_PARTIDA',
+                'TXT_PROVINCIA_PARTIDA',
+                'COD_DISTRITO_PARTIDA',
+                'TXT_DISTRITO_PARTIDA'
+            );
+
+        $arrivalQuery = DB::table('PLA_DETMOVILIDAD')
+            ->select(
+                'TXT_LUGARLLEGADA as location',
+                'COD_DEPARTAMENTO_LLEGADA as department_code',
+                'TXT_DEPARTAMENTO_LLEGADA as department_name',
+                'COD_PROVINCIA_LLEGADA as province_code',
+                'TXT_PROVINCIA_LLEGADA as province_name',
+                'COD_DISTRITO_LLEGADA as district_code',
+                'TXT_DISTRITO_LLEGADA as district_name'
+            )
+            ->where('USUARIO_CREA', Session::get('usuario')->id)
+            ->where('ACTIVO', 1)
+            ->groupBy(
+                'TXT_LUGARLLEGADA',
+                'COD_DEPARTAMENTO_LLEGADA',
+                'TXT_DEPARTAMENTO_LLEGADA',
+                'COD_PROVINCIA_LLEGADA',
+                'TXT_PROVINCIA_LLEGADA',
+                'COD_DISTRITO_LLEGADA',
+                'TXT_DISTRITO_LLEGADA'
+            );
+
+        $ldirecciones       = $departureQuery->union($arrivalQuery)->get();
+
         return View::make('planillamovilidad/modal/ajax/magregardetalleplanillamovilidad',
                          [
                             'iddocumento'           =>  $iddocumento,
@@ -1975,6 +2022,7 @@ class GestionPlanillaMovilidadController extends Controller
                             'combomotivo'           =>  $combomotivo,
                             'motivo_id'             =>  $motivo_id,
                             'comboestado'           =>  $comboestado,
+                            'ldirecciones'          =>  $ldirecciones,
 
                             'combodepartamento'     =>  $combodepartamento,
                             'departamento_id'       =>  $departamento_id,

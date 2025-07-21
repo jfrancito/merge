@@ -18,6 +18,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
 $(document).ready(function(){
     var carpeta = $("#carpeta").val();
+    $(".planillamovilidad").on('click','.selpartida', function(e) {
+        $('.nav-tabs a[href="#partida"]').tab('show');
+    });
+    $(".planillamovilidad").on('click','.selllegada', function(e) {
+        $('.nav-tabs a[href="#llegada"]').tab('show');
+    });
+
 
     $(".planillamovilidad").on('click','.mdiselp', function(e) {
         var _token                  =   $('#token').val();
@@ -26,13 +33,47 @@ $(document).ready(function(){
         const department_code       =   $(this).attr('department_code');
         const province_code         =   $(this).attr('province_code');
         const district_code         =   $(this).attr('district_code');
-        debugger;
 
-        $('#departamentopartida_id').val(data.TXT_EMPRESA).trigger('change');
-        $('#departamentopartida_id').val(department_code);
+        $('#departamentopartida_id').val(department_code).trigger('change.select2');
+        $('#departamentopartida_id').val(department_code).trigger('change');
+        setTimeout(function() {
+            $('#provinciapartida_id').val(province_code).trigger('change.select2');
+            $('#provinciapartida_id').val(province_code).trigger('change');
+            // Espera otros 500ms para el distrito
+            setTimeout(function() {
+                $('#distritopartida_id').val(district_code).trigger('change.select2');
+                $('#lugarpartida').val(location);
+                $('.nav-tabs a[href="#registro"]').tab('show');
+            }, 1000);
+        }, 1000);
 
 
     });
+
+    $(".planillamovilidad").on('click','.mdisell', function(e) {
+        var _token                  =   $('#token').val();
+        var idopcion                =   $('#idopcion').val();
+        const location              =   $(this).attr('location');
+        const department_code       =   $(this).attr('department_code');
+        const province_code         =   $(this).attr('province_code');
+        const district_code         =   $(this).attr('district_code');
+
+        $('#departamentollegada_id').val(department_code).trigger('change.select2');
+        $('#departamentollegada_id').val(department_code).trigger('change');
+        setTimeout(function() {
+            $('#provinciallegada_id').val(province_code).trigger('change.select2');
+            $('#provinciallegada_id').val(province_code).trigger('change');
+            // Espera otros 500ms para el distrito
+            setTimeout(function() {
+                $('#distritollegada_id').val(district_code).trigger('change.select2');
+                $('#lugarllegada').val(location);
+                $('.nav-tabs a[href="#registro"]').tab('show');
+            }, 1000);
+        }, 1000);
+
+
+    });
+
 
 
     $('.btnrechazocomporbatnte').on('click', function(event){

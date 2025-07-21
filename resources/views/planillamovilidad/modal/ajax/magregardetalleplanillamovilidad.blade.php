@@ -56,7 +56,7 @@
 								</div>
 								<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 									<div class="col-sm-12" >
-										<p style="text-align: center;margin-top: 11px;margin-bottom: 11px;background: #5f99f5;color: #fff;"><b>PARTIDA</b></p>
+										<p style="text-align: center;margin-top: 11px;margin-bottom: 11px;background: #34a853;color: #fff;cursor: pointer;" class="selpartida"><b>PARTIDA</b></p>
 									</div>
 								</div>
 
@@ -103,7 +103,7 @@
 
 								<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 									<div class="col-sm-12" >
-										<p style="text-align: center;margin-top: 11px;margin-bottom: 11px;background: #5f99f5;color: #fff;"><b>LLEGADA</b></p>
+										<p style="text-align: center;margin-top: 11px;margin-bottom: 11px;background: #cc0000;color: #fff;cursor: pointer;" class="selllegada"><b>LLEGADA</b></p>
 									</div>
 								</div>
 								<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6">
@@ -191,8 +191,8 @@
 				</form>
           	</div>
 	        <div id="partida" class="tab-pane cont">
-				<div class="scroll_text scroll_text_heigth_aler" style = "padding: 0px !important;"> 
-					<table id="nsop" class="table table-striped table-borderless table-hover td-color-borde td-padding-7 listatabla">
+						<div class="scroll_text scroll_text_heigth_aler" style = "padding: 0px !important;"> 
+										<table id="nsop" class="table table-striped table-borderless table-hover td-color-borde td-padding-7 listatabla">
 	                    <thead>
 	                      <tr>
 	                      	<th>DIRECCION</th>
@@ -200,30 +200,60 @@
 	                      </tr>
 	                    </thead>
 	                    <tbody>
-					     @foreach($ldirecciones as $index => $item) 
-	                      <tr >
-							<td class="cell-detail">
-					          <span style="display: block;"><b>{{$item->location}}</b></span>
-					          <span style="display: block;">{{$item->department_name}} - {{$item->province_name}} - {{$item->district_name}}</span>
-					        </td>
-	                        <td>
-	                            <div class="icon iconoentregable">
-	                              <span class="mdi mdi-select-all mdiselp" location='{{$item->location}}'
-	                              	department_code='{{$item->department_code}}'
-	                              	province_code='{{$item->province_code}}'
-	                              	district_code='{{$item->district_code}}'
-	                              	></span>
-	                            </div>
-	                        </td>
+										     @foreach($ldirecciones as $index => $item) 
+						                      <tr >
+																		<td class="cell-detail">
+														          <span style="display: block;"><b>{{$item->location}}</b></span>
+														          <span style="display: block;">{{$item->department_name}} - {{$item->province_name}} - {{$item->district_name}}</span>
+														        </td>
+						                        <td>
+						                            <div class="icon iconoentregable">
+						                              <span class="mdi mdi-select-all mdiselp" location='{{$item->location}}'
+						                              	department_code='{{$item->department_code}}'
+						                              	province_code='{{$item->province_code}}'
+						                              	district_code='{{$item->district_code}}'
+						                              	></span>
+						                            </div>
+						                        </td>
+						                      </tr>
+										    @endforeach
+	                    </tbody>
+	                  </table>
+	            </div>
+	        </div>
+	        <div id="llegada" class="tab-pane cont">
+	        	
+						<div class="scroll_text scroll_text_heigth_aler" style = "padding: 0px !important;"> 
+										<table id="nsol" class="table table-striped table-borderless table-hover td-color-borde td-padding-7 listatabla">
+	                    <thead>
+	                      <tr>
+	                      	<th>DIRECCION</th>
+	                      	<th></th>
 	                      </tr>
-					    @endforeach
+	                    </thead>
+	                    <tbody>
+										     @foreach($ldirecciones as $index => $item) 
+						                      <tr >
+																		<td class="cell-detail">
+														          <span style="display: block;"><b>{{$item->location}}</b></span>
+														          <span style="display: block;">{{$item->department_name}} - {{$item->province_name}} - {{$item->district_name}}</span>
+														        </td>
+						                        <td>
+						                            <div class="icon iconoentregable">
+						                              <span class="mdi mdi-select-all mdisell" location='{{$item->location}}'
+						                              	department_code='{{$item->department_code}}'
+						                              	province_code='{{$item->province_code}}'
+						                              	district_code='{{$item->district_code}}'
+						                              	></span>
+						                            </div>
+						                        </td>
+						                      </tr>
+										    @endforeach
 	                    </tbody>
 	                  </table>
 	            </div>
 
-	        </div>
-	        <div id="llegada" class="tab-pane cont">
-	        	
+
 	        </div>
 
         </div>
@@ -254,6 +284,18 @@
 			'placeholder': '0'});
 
 	        $("#nsop").dataTable({
+	            dom: 'Bfrtip',
+	            buttons: [
+	                'csv', 'excel', 'pdf'
+	            ],
+	            "lengthMenu": [[500, 1000, -1], [500, 1000, "All"]],
+	            columnDefs:[{
+	                targets: "_all",
+	                sortable: false
+	            }]
+	        });
+
+	        $("#nsol").dataTable({
 	            dom: 'Bfrtip',
 	            buttons: [
 	                'csv', 'excel', 'pdf'
