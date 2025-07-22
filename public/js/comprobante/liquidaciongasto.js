@@ -766,6 +766,10 @@ $(document).ready(function(){
 
         $('.DCC0000000000036').hide();
         $('.DCC0000000000004').hide();
+        $('#totaldetalle').prop('readonly', true);
+
+
+
 
         if(tipodoc_id == 'TDO0000000000070'){
             $('#serie, #numero, #fecha_emision').prop('readonly', true);
@@ -780,12 +784,15 @@ $(document).ready(function(){
 
         }else{
                 if(tipodoc_id == 'TDO0000000000001'){
-                    $('#serie, #numero, #fecha_emision').prop('readonly', true);
-                    $('#empresa_id').prop('disabled', true);
+
+                    //$('#serie, #numero, #fecha_emision').prop('readonly', true);
+                    $('#empresa_id').prop('disabled', false);
                     $('.sectorplanilla').hide();
+                    $('#totaldetalle').prop('readonly', false);
                     $('.sectorxml').show();
-                    $('.sectorxmlmodal').hide();
-                    $('.DCC0000000000036').hide();
+                    $('.sectorxmlmodal').show();
+                    $('.DCC0000000000036').show();
+
                 }else{
                     $('#serie, #numero, #fecha_emision').prop('readonly', false);
                     $('#empresa_id').prop('disabled', false);
@@ -936,6 +943,77 @@ $(document).ready(function(){
 
 
     });
+
+
+    $(".liquidaciongasto").on('click','.validarxml', function(e) {
+        e.preventDefault(); // Prevenir recarga del formulario
+
+        var _token                  =   $('#token').val();
+        var serie                   =   $('#serie').val();
+        var numero                  =   $('#numero').val();
+        var fecha_emision           =   $('#fecha_emision').val();
+        var totaldetalle            =   $('#totaldetalle').val();
+        var empresa_id              =   $('#empresa_id').val();
+
+
+        if(serie ==''){ alerterrorajax("Ingrese una serie."); return false;}
+        if(numero ==''){ alerterrorajax("Ingrese una numero."); return false;}
+        if(fecha_emision ==''){ alerterrorajax("Ingrese una fecha de emision."); return false;}
+        if(totaldetalle ==''){ alerterrorajax("Ingrese una total."); return false;}
+        if(empresa_id ==''){ alerterrorajax("Seleccione una empresa."); return false;}
+        data            =   {   
+                                _token                  : _token,
+                                serie                   : serie,
+                                numero                  : numero,
+                                fecha_emision           : fecha_emision,
+                                totaldetalle            : totaldetalle,
+                                empresa_id              : empresa_id
+                            };
+
+        const link                  =   '/ajax-leer-xml-lg-validar';
+        abrircargando();
+        $.ajax({
+            type    :   "POST",
+            url     :   carpeta+link,
+            data    :   data,
+            success: function (data) {
+                cerrarcargando();
+
+                if(data.error == 0){
+
+                    $('.MESSAGE').html(data.MESSAGE);
+                    $('.NESTADOCP').html(data.NESTADOCP);
+                    $('.NESTADORUC').html(data.NESTADORUC);
+                    $('.NCONDDOMIRUC').html(data.NCONDDOMIRUC);
+                    $('#SUCCESS').val(data.SUCCESS);
+                    $('#MESSAGE').val(data.MESSAGE);
+                    $('#ESTADOCP').val(data.ESTADOCP);
+                    $('#NESTADOCP').val(data.NESTADOCP);
+                    $('#ESTADORUC').val(data.ESTADORUC);
+                    $('#NESTADORUC').val(data.NESTADORUC);
+                    $('#CONDDOMIRUC').val(data.CONDDOMIRUC);
+                    $('#NCONDDOMIRUC').val(data.NCONDDOMIRUC);
+                    $('#NOMBREFILE').val(data.NOMBREFILE);
+                    $('#RUTACOMPLETA').val(data.RUTACOMPLETA);
+                    //archivos
+                    $('.sectorxmlmodal').show();
+
+                }else{
+                    alerterrorajax(data.mensaje);
+                }
+                console.log(data);
+            },
+            error: function (data) {
+                cerrarcargando();
+                error500(data);
+            }
+        });
+
+
+    });
+
+
+
     $(".liquidaciongasto").on('click','.btn-relacionar-producto-lg', function(e) {
         event.preventDefault();
         debugger;
@@ -988,84 +1066,96 @@ $(document).ready(function(){
                 
 
         if(tipodoc_id == 'TDO0000000000001'){
-            //ver si tienes filas
-            if ($('#tdxml tbody tr').length === 0) {
-                alerterrorajax("La factura no tiene detalle"); cerrarcargando(); return false;
+
+            let comprobante = $('#file-DCC0000000000036')[0].files.length > 0;
+            if (!comprobante) {
+                alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
             }
-            //recorrer la tabla y ver si no tiene aprobados
-            var sw_asociado = 0;
-            $('#tdxml tbody tr').each(function(index) {
-                const productoOsiris = $(this).find('.TXT_PRODUCTO_OSIRIS').text();
-                if(productoOsiris==''){
-                    sw_asociado = 1;
-                }
+            var producto_id_factura  =   $('#producto_id_factura').val();
+            var igv_id_factura       =   $('#igv_id_factura').val();
 
-            });
-
-            if(sw_asociado ==1){ alerterrorajax("Hay productos que no estan asociados"); cerrarcargando(); return false;}
-            var valor              =   $('#serie').val();
-            let primeraLetraSerire = valor.charAt(0); 
-            if(primeraLetraSerire=='E'){
-                let comprobante = $('#file-DCC0000000000036')[0].files.length > 0;
-
-                if(RUTAXML==''){
-                    if (!comprobante) {
-                        alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
-                    }
-                }else{
-                    if(RUTAPDF==''){
-                        if (!comprobante) {
-                            alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
-                        }
-                    }
-                }
+            if(producto_id_factura ==''){ alerterrorajax("Seleccione un Producto."); return false;}
+            if(igv_id_factura ==''){ alerterrorajax("Seleccione si es Afecto"); return false;}
 
 
-            }else{
-                let xml = $('#file-DCC0000000000004')[0].files.length > 0;
-                if(RUTAXML==''){
-                    if (!xml) {
-                        alerterrorajax("Debe subir el CDR en XML."); cerrarcargando(); return false;
-                    }
-                }else{
-                    if(RUTACDR==''){
-                        if (!comprobante) {
-                            alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
-                        }
-                    }
-                }
+            // //ver si tienes filas
+            // if ($('#tdxml tbody tr').length === 0) {
+            //     alerterrorajax("La factura no tiene detalle"); cerrarcargando(); return false;
+            // }
+            // //recorrer la tabla y ver si no tiene aprobados
+            // var sw_asociado = 0;
+            // $('#tdxml tbody tr').each(function(index) {
+            //     const productoOsiris = $(this).find('.TXT_PRODUCTO_OSIRIS').text();
+            //     if(productoOsiris==''){
+            //         sw_asociado = 1;
+            //     }
+
+            // });
+
+            // if(sw_asociado ==1){ alerterrorajax("Hay productos que no estan asociados"); cerrarcargando(); return false;}
+            // var valor              =   $('#serie').val();
+            // let primeraLetraSerire = valor.charAt(0); 
+            // if(primeraLetraSerire=='E'){
+            //     let comprobante = $('#file-DCC0000000000036')[0].files.length > 0;
+
+            //     if(RUTAXML==''){
+            //         if (!comprobante) {
+            //             alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
+            //         }
+            //     }else{
+            //         if(RUTAPDF==''){
+            //             if (!comprobante) {
+            //                 alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
+            //             }
+            //         }
+            //     }
 
 
-                let comprobante = $('#file-DCC0000000000036')[0].files.length > 0;
-                if(RUTAXML==''){
-                    if (!comprobante) {
-                        alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
-                    }
-                }else{
-                    if(RUTAPDF==''){
-                        if (!comprobante) {
-                            alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
-                        }
-                    }
-                }
+            // }else{
+            //     let xml = $('#file-DCC0000000000004')[0].files.length > 0;
+            //     if(RUTAXML==''){
+            //         if (!xml) {
+            //             alerterrorajax("Debe subir el CDR en XML."); cerrarcargando(); return false;
+            //         }
+            //     }else{
+            //         if(RUTACDR==''){
+            //             if (!comprobante) {
+            //                 alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
+            //             }
+            //         }
+            //     }
 
-            }
-            let detalleArray = [];
-            $('#tdxml tbody tr').each(function(index) {
-                const fila = {
-                    TXT_PRODUCTO_OSIRIS: $(this).find('.TXT_PRODUCTO_OSIRIS').text().trim(),
-                    TXT_PRODUCTO_XML   : $(this).find('.TXT_PRODUCTO_XML').text().trim(),
-                    CANTIDAD           : $(this).find('.CANTIDAD').text().trim(),
-                    PRECIO             : $(this).find('.PRECIO').text().trim(),
-                    INDIGV             : $(this).find('.INDIGV').text().trim(),
-                    SUBTOTAL           : $(this).find('.SUBTOTAL').text().trim(),
-                    IGV                : $(this).find('.IGV').text().trim(),
-                    TOTAL              : $(this).find('.TOTAL').text().trim()
-                };
-                detalleArray.push(fila);
-            });
-            // Guardamos el array convertido a JSON en el input hidden
-            $('#array_detalle_producto').val(JSON.stringify(detalleArray));
+
+            //     let comprobante = $('#file-DCC0000000000036')[0].files.length > 0;
+            //     if(RUTAXML==''){
+            //         if (!comprobante) {
+            //             alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
+            //         }
+            //     }else{
+            //         if(RUTAPDF==''){
+            //             if (!comprobante) {
+            //                 alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
+            //             }
+            //         }
+            //     }
+
+            // }
+            // let detalleArray = [];
+            // $('#tdxml tbody tr').each(function(index) {
+            //     const fila = {
+            //         TXT_PRODUCTO_OSIRIS: $(this).find('.TXT_PRODUCTO_OSIRIS').text().trim(),
+            //         TXT_PRODUCTO_XML   : $(this).find('.TXT_PRODUCTO_XML').text().trim(),
+            //         CANTIDAD           : $(this).find('.CANTIDAD').text().trim(),
+            //         PRECIO             : $(this).find('.PRECIO').text().trim(),
+            //         INDIGV             : $(this).find('.INDIGV').text().trim(),
+            //         SUBTOTAL           : $(this).find('.SUBTOTAL').text().trim(),
+            //         IGV                : $(this).find('.IGV').text().trim(),
+            //         TOTAL              : $(this).find('.TOTAL').text().trim()
+            //     };
+            //     detalleArray.push(fila);
+            // });
+            // // Guardamos el array convertido a JSON en el input hidden
+            // $('#array_detalle_producto').val(JSON.stringify(detalleArray));
         }else{
 
             if(tipodoc_id != 'TDO0000000000070'){

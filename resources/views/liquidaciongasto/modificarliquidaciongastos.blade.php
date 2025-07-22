@@ -105,6 +105,33 @@
                 },
             }
         });
+        $('#producto_id_factura').select2({
+            // Activamos la opcion "Tags" del plugin
+            width: '100%',
+            placeholder: 'Seleccione una empresa',
+            language: "es",
+            tags: true,
+            tokenSeparators: [','],
+            ajax: {
+                dataType: 'json',
+                url: '{{ url("buscarproducto") }}',
+                delay: 100,
+                data: function(params) {
+                    return {
+                        term: params.term
+                    }
+                },
+                processResults: function (data, page) {
+                  return {
+                    results: data
+                  };
+
+                },
+            }
+        });
+
+
+
 
 
         $('form').parsley();

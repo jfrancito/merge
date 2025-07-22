@@ -50,7 +50,7 @@
 				  <div class="col-sm-12">
 				      {!! Form::select( 'igv_id', $combo_igv, array($igv_id),
 		                              [
-		                                'class'       => 'select6 form-control control input-xs' ,
+		                                'class'       => 'select7 form-control control input-xs' ,
 		                                'id'          => 'igv_id',        
 		                              ]) !!}
 				  </div>
@@ -86,7 +86,9 @@
 @if(isset($ajax))
 	<script type="text/javascript">
 		$(document).ready(function(){
-	        $('.select6').select2();
+	        $('.select7').select2();
+
+
 	        $('#producto_id').select2({
 	            // Activamos la opcion "Tags" del plugin
 	            width: '100%',
@@ -111,6 +113,7 @@
 	                },
 	            }
 	        });
+
 
         	$('.form2').parsley();
 			$('.importe').inputmask({ 'alias': 'numeric', 
