@@ -128,8 +128,8 @@ trait PrecioCompetenciaTraits
 										if(count($usuario)>0){
 												if($usuario->celular_contacto <> ''){
 
-													DB::connection('sqlsrv_isl')->table('whatsapphub')->insert([
-													    'NumeroContacto'   => $usuario->celular_contacto,
+													DB::connection('sqlsrv_isl')->table('whatsapp')->insert([
+													    'NumeroContacto'   => '51'.$usuario->celular_contacto,
 													    'NombreContacto'   => $item->USUARIO_NOMBRE,
 													    'Mensaje'          => '¡Hola! Buen día %0D%0AEncontrammos tu documento que dejaste rastreando en busquedad de la APP.*%0D%0A* Datos del documento : '.$item->RUC.' // '.$item->SERIE.'-'.$item->NUMERO.'*%0D%0A*',
 													    'IndArchivo'       => 0,
