@@ -142,7 +142,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/guardar-numero-de-whatsapp', 'GestionLiquidacionGastosController@actionGuardarNumeroWhatsapp');
 	Route::any('/comprobante-masivo-excel-lg/{fecha_inicio}/{fecha_fin}/{proveedor_id}/{estado_id}/{idopcion}', 'GestionLiquidacionGastosController@actionComprobanteMasivoExcelLg');
 
-
+	Route::any('/ajax-modal-buscar-factura-sunat-tareas', 'GestionLiquidacionGastosController@actionModalBuscarFacturaSunatTarea');
 
 	Route::any('/gestion-de-empresa-proveedor/{idopcion}', 'GestionLiquidacionGastosController@actionGestionEmpresaProveedor');
 	Route::any('/buscar-sunat-ruc/{idopcion}', 'GestionLiquidacionGastosController@actionBuscarSunatRuc');

@@ -29,7 +29,6 @@
   @endforeach
 
 
-
   @foreach($tdetliquidaciongastos as $index => $item)
     <div class="dtlg {{$item->ID_DOCUMENTO}}{{$item->ITEM}} @if($index!=0) ocultar @endif" >
         <table class="table table-condensed table-striped">
@@ -54,7 +53,6 @@
         </table>
     </div>
   @endforeach
-
 
 
   <table class="table table-condensed table-striped">
@@ -84,5 +82,56 @@
     </tbody>
   </table>
   @include('liquidaciongasto.form.liquidaciongasto.verpdfmultiple')
+
+
+  @foreach($tdetliquidaciongastos as $index => $item)
+  <div class="dtlg {{$item->ID_DOCUMENTO}}{{$item->ITEM}} @if($index!=0) ocultar @endif">
+    <div class="col-lg-12">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+        <div class="panel panel-default panel-contrast">
+          <div class="panel-heading" style="background: #1d3a6d;color: #fff;">ARCHIVOS
+          </div>
+          <div class="panel-body panel-body-contrast">
+            <table class="table table-condensed table-striped">
+              <thead>
+                <tr>
+                  <th>Nro</th>
+                  <th>Nombre</th>      
+                  <th>Archivo</th>       
+                  <th>Opciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                  @foreach($archivos as $indexa => $itema) 
+                    @if($itema->DOCUMENTO_ITEM == $item->ITEM)
+                    <tr>
+                      <td>{{$indexa + 1}}</td>
+                      <td>{{$itema->DESCRIPCION_ARCHIVO}}</td>
+                      <td>{{$itema->NOMBRE_ARCHIVO}}</td>
+                      <td class="rigth">
+                        <div class="btn-group btn-hspace">
+                          <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>
+                          <ul role="menu" class="dropdown-menu pull-right">
+                            <li>
+                              <a href="{{ url('/descargar-archivo-requerimiento-lg/'.$itema->TIPO_ARCHIVO.'/'.$idopcion.'/'.$itema->DOCUMENTO_ITEM.'/'.$itema->ID_DOCUMENTO) }}">
+                                Descargar
+                              </a>  
+                            </li>                       
+                          </ul>
+                        </div>
+                      </td>
+                    </tr>
+                    @endif
+                  @endforeach
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  @endforeach
+
+
   </div>
 </div>

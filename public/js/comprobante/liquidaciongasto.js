@@ -3,6 +3,24 @@ $(document).ready(function(){
     var carpeta = $("#carpeta").val();
 
 
+
+    $(".cfedocumento").on('click','.buscartareas', function() {
+
+        var _token                                   =   $('#token').val();
+        var idopcion                                 =   $('#idopcion').val();
+
+        data                                         =   {
+                                                                _token                  : _token,
+                                                                idopcion                : idopcion
+                                                         };
+                                        
+        ajax_modal(data,"/ajax-modal-buscar-factura-sunat-tareas",
+                  "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+
+    });
+
+
+
     $(".liquidaciongasto").on('click','#descargarcomprobantemasivoexcel', function() {
 
         var fecha_inicio         =   $('#fecha_inicio').val();
@@ -606,6 +624,8 @@ $(document).ready(function(){
 
     $(".liquidaciongasto").on('click','.filalg', function(e) {
         event.preventDefault();
+        debugger;
+        abrircargando();
         $('.dtlg').hide();
         $('.file-preview-frame').hide();
         $('.filalg').removeClass("ocultar");
@@ -613,6 +633,7 @@ $(document).ready(function(){
         $('.'+data_valor).show();
         $('.filalg').removeClass("activofl");
         $(this).addClass("activofl");
+        cerrarcargando();
 
     });
 

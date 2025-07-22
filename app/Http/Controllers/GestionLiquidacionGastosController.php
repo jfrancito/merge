@@ -668,8 +668,48 @@ class GestionLiquidacionGastosController extends Controller
                             'ajax'                  =>  true,
                          ]);
     }
+    public function actionModalBuscarFacturaSunatTarea(Request $request) {
+
+        $combotd                =       array('01' => 'FACTURA');
+        $idopcion               =       $request['idopcion'];
+        $funcion                =       $this;
+        $usuario                =       Session::get('usuario')->id;
+
+        $listasunattareas = DB::table('SUNAT_DOCUMENTO as sd')
+            ->where('sd.EMPRESA_ID', Session::get('empresas')->COD_EMPR)
+            ->where('sd.MODULO', 'LIQUIDACION_GASTO')
+            ->where('sd.ACTIVO', 1)
+            ->where('sd.USUARIO_ID', Session::get('usuario')->id)
+            ->whereNotExists(function ($query) use ($usuario) {
+                $query->select(DB::raw(1))
+                    ->from('LQG_DETLIQUIDACIONGASTO as lqg')
+                    ->join('STD.EMPRESA as e', 'lqg.COD_EMPRESA_PROVEEDOR', '=', 'e.COD_EMPR')
+                    ->whereRaw('lqg.SERIE = sd.SERIE')
+                    ->whereRaw('CAST(lqg.NUMERO AS INT) = CAST(sd.NUMERO AS INT)')
+                    ->whereRaw('e.NRO_DOCUMENTO = sd.RUC')
+                    ->where('lqg.USUARIO_CREA', $usuario)
+                    ->where('lqg.ACTIVO', 1)
+                    ->where('lqg.TXT_TIPODOCUMENTO', 'FACTURA');
+            })
+            ->orderBy('ID_DOCUMENTO','desc')
+            ->get();
+
+        $user = User::where('id','=',Session::get('usuario')->id)->first();
 
 
+        $mensaje                =       '';
+
+        return View::make('liquidaciongasto/modal/ajax/mbuscardocumentosunattareas',
+                         [
+                            'user'                  =>  $user,
+                            'idopcion'              =>  $idopcion,
+                            'listasunattareas'      =>  $listasunattareas,
+                            'combotd'               =>  $combotd,
+                            'mensaje'               =>  $mensaje,
+                            'funcion'               =>  $funcion,
+                            'ajax'                  =>  true,
+                         ]);
+    }
 
 
     public function actionDetallaComprobanteLGValidado($idopcion, $iddocumento,Request $request)
@@ -711,17 +751,22 @@ class GestionLiquidacionGastosController extends Controller
         }
 
         $productosagru      =   DB::table('LQG_DETDOCUMENTOLIQUIDACIONGASTO')
-                        ->select('COD_PRODUCTO', 'TXT_PRODUCTO', DB::raw('SUM(CANTIDAD) as CANTIDAD'), DB::raw('SUM(TOTAL) as TOTAL'))
-                        ->where('ID_DOCUMENTO', $iddocumento)
-                        ->where('ACTIVO', 1)
-                        ->groupBy('COD_PRODUCTO', 'TXT_PRODUCTO')
-                        ->get();
+                                ->select('COD_PRODUCTO', 'TXT_PRODUCTO', DB::raw('SUM(CANTIDAD) as CANTIDAD'), DB::raw('SUM(TOTAL) as TOTAL'))
+                                ->where('ID_DOCUMENTO', $iddocumento)
+                                ->where('ACTIVO', 1)
+                                ->groupBy('COD_PRODUCTO', 'TXT_PRODUCTO')
+                                ->get();
+
+
+        $archivos           =   Archivo::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
+
 
         return View::make('liquidaciongasto/detallelgvalidado', 
                         [
                             'liquidaciongastos'     =>  $liquidaciongastos,
                             'tdetliquidaciongastos' =>  $tdetliquidaciongastos,
-                            'productosagru' =>  $productosagru,
+                            'productosagru'         =>  $productosagru,
+                            'archivos'              =>  $archivos,
                             'detdocumentolg'        =>  $detdocumentolg,
                             'documentohistorial'    =>  $documentohistorial,
                             'idopcion'              =>  $idopcion,
@@ -1865,12 +1910,16 @@ class GestionLiquidacionGastosController extends Controller
                             ->groupBy('COD_PRODUCTO', 'TXT_PRODUCTO')
                             ->get();
 
+            $archivos           =   Archivo::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
+
+
             return View::make('liquidaciongasto/aprobaradministracionlg', 
                             [
                                 'liquidaciongastos'     =>  $liquidaciongastos,
                                 'tdetliquidaciongastos' =>  $tdetliquidaciongastos,
                                 'tdetliquidaciongastosel' =>  $tdetliquidaciongastosel,
                                 'productosagru' =>  $productosagru,
+                                'archivos' =>  $archivos,
                                 'detdocumentolg'        =>  $detdocumentolg,
                                 'documentohistorial'    =>  $documentohistorial,
                                 'idopcion'              =>  $idopcion,
@@ -1975,8 +2024,6 @@ class GestionLiquidacionGastosController extends Controller
             }
             $initialPreviewConfig = [];
 
-
-
             foreach ($archivospdf as $key => $archivo) {
                 $valor                = '';
                 if($key>0){
@@ -1997,6 +2044,8 @@ class GestionLiquidacionGastosController extends Controller
                             ->groupBy('COD_PRODUCTO', 'TXT_PRODUCTO')
                             ->get();
 
+            $archivos           =   Archivo::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
+
             //dd($tdetliquidaciongastos);
 
             return View::make('liquidaciongasto/aprobarcontabilidadlg', 
@@ -2005,6 +2054,7 @@ class GestionLiquidacionGastosController extends Controller
                                 'tdetliquidaciongastos' =>  $tdetliquidaciongastos,
                                 'tdetliquidaciongastosel' =>  $tdetliquidaciongastosel,
                                 'productosagru' =>  $productosagru,
+                                'archivos' =>  $archivos,
                                 'detdocumentolg'        =>  $detdocumentolg,
                                 'documentohistorial'    =>  $documentohistorial,
                                 'idopcion'              =>  $idopcion,
@@ -2410,12 +2460,15 @@ class GestionLiquidacionGastosController extends Controller
                             ->groupBy('COD_PRODUCTO', 'TXT_PRODUCTO')
                             ->get();
 
+            $archivos           =   Archivo::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
+
             return View::make('liquidaciongasto/aprobarjefelg', 
                             [
                                 'liquidaciongastos'     =>  $liquidaciongastos,
                                 'tdetliquidaciongastos' =>  $tdetliquidaciongastos,
                                 'tdetliquidaciongastosel'=>  $tdetliquidaciongastosel,
                                 'productosagru' =>  $productosagru,
+                                'archivos' =>  $archivos,
                                 'detdocumentolg'        =>  $detdocumentolg,
                                 'documentohistorial'    =>  $documentohistorial,
                                 'idopcion'              =>  $idopcion,
