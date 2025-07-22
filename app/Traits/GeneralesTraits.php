@@ -305,7 +305,10 @@ trait GeneralesTraits
 		  CURLOPT_RETURNTRANSFER => true,
 		  CURLOPT_ENCODING => '',
 		  CURLOPT_MAXREDIRS => 10,
-		  CURLOPT_TIMEOUT => 0,
+
+			CURLOPT_TIMEOUT => 15, // 👈 máximo 10 segundos para la respuesta
+			CURLOPT_CONNECTTIMEOUT => 10, // 👈 máximo 5 segundos para conectar
+
 		  CURLOPT_FOLLOWLOCATION => true,
 		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 		  CURLOPT_CUSTOMREQUEST => 'GET',
@@ -313,6 +316,8 @@ trait GeneralesTraits
 		    'Authorization: Bearer '.$fetoken->TOKEN
 		  ),
 		));
+
+		
 		$response = curl_exec($curl);
 		curl_close($curl);
 		$response_array = json_decode($response, true);
@@ -376,7 +381,8 @@ trait GeneralesTraits
 		  CURLOPT_RETURNTRANSFER => true,
 		  CURLOPT_ENCODING => '',
 		  CURLOPT_MAXREDIRS => 10,
-		  CURLOPT_TIMEOUT => 0,
+			CURLOPT_TIMEOUT => 15, // 👈 máximo 10 segundos para la respuesta
+			CURLOPT_CONNECTTIMEOUT => 10, // 👈 máximo 5 segundos para conectar
 		  CURLOPT_FOLLOWLOCATION => true,
 		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 		  CURLOPT_CUSTOMREQUEST => 'GET',

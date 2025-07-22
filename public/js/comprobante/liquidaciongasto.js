@@ -225,6 +225,27 @@ $(document).ready(function(){
         });
     });
 
+    $(".liquidaciongasto").on('click','.btn-extonar-detalle-lg', function(e) {
+        event.preventDefault();
+        var _token                  =   $('#token').val();
+        var data_item               =   $(this).attr('data_item');
+
+        $.confirm({
+            title: '¿Confirma el extorno?',
+            content: 'Extorno de Detalle Liquidacion de Gastos',
+            buttons: {
+                confirmar: function () {
+                     $("#forextornardetallelq"+data_item).submit();   
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo el extorno');
+                    window.location.reload();
+                }
+            }
+        });
+    });
+
+
     $(".liquidaciongasto").on('click','.btn_tarea_cpe_lg', function() {
 
         var _token                                   =   $('#token').val();
@@ -381,7 +402,7 @@ $(document).ready(function(){
         var serie                                    =   $('#serie_sunat').val();
         var correlativo                              =   $('#correlativo_sunat').val();
         const link                                   =   '/buscar-de-cpe-sunat-lg';
-
+        serie = serie.toUpperCase();
 
         if(ruc ==''){ alerterrorajax("Ingrese un ruc."); return false;}
         if(td ==''){ alerterrorajax("Seleccione un tipo de documento."); return false;}
@@ -405,22 +426,39 @@ $(document).ready(function(){
             success: function (data) {
                 cerrarcargando();
                 debugger;
-                $('#modal-detalle-requerimiento').niftyModal('hide');
+                var sw= 0;
+
+
+
                 if (data.nombre_xml) {
                     $('.exml').html(data.nombre_xml);
                     $('#NOMBREXML').val(data.nombre_xml);
                     $('#RUTAXML').val(data.ruta_xml);
+                    sw= sw +1;
                 }
                 if (data.nombre_pdf) {
                     $('.epdf').html(data.nombre_pdf);
                     $('#NOMBREPDF').val(data.nombre_pdf);
                     $('#RUTAPDF').val(data.ruta_pdf);
+                    sw= sw +1;
                 }
                 if (data.nombre_cdr) {
                     $('.ecdr').html(data.nombre_cdr);
                     $('#NOMBRECDR').val(data.nombre_cdr);
                     $('#RUTACDR').val(data.ruta_cdr);
+                    sw= sw +1;
                 }
+
+                if (!serie.startsWith('F')) {
+                    if (sw==2) {
+                        $('#modal-detalle-requerimiento').niftyModal('hide');
+                    }
+                }else{
+                    if (sw==3) {
+                        $('#modal-detalle-requerimiento').niftyModal('hide');
+                    }
+                }
+
             },
             error: function (data) {
                 cerrarcargando();

@@ -395,7 +395,10 @@ class GestionLiquidacionGastosController extends Controller
             $ruc                                =   $request['ruc'];
             $td                                 =   $request['td'];
             $serie                              =   $request['serie'];
+            $serie                              =   strtoupper($serie);
+
             $correlativo                        =   $request['correlativo'];
+            $correlativo                        =   ltrim($correlativo, '0');
             $ID_DOCUMENTO                       =   $request['ID_DOCUMENTO'];
             $tipodocumento                      =   CMPCategoria::where('TXT_GRUPO','=','TIPO_DOCUMENTO')->where('CODIGO_SUNAT','=',$td)->first();
 
@@ -3480,7 +3483,6 @@ class GestionLiquidacionGastosController extends Controller
     public function actionExtornarLiquidacionGastos($idopcion,$iddocumento,Request $request)
     {
 
-
         $iddocumento = $this->funciones->decodificarmaestrapre($iddocumento,'LIQG');
         View::share('titulo','Agregar Detalle Liquidacion de Gastos');
         $liquidaciongastos          =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
@@ -3494,9 +3496,39 @@ class GestionLiquidacionGastosController extends Controller
         $liquidaciongastos->save();
         return Redirect::to('gestion-de-liquidacion-gastos/'.$idopcion)->with('bienhecho', 'Se extorno la LIQUIDACION DE GASTOS');
 
-
-
     }
+
+
+    public function actionExtornarLiquidacionGastosDetalle($idopcion,$item,$iddocumento,Request $request)
+    {
+        $idcab       = $iddocumento;
+        $iddocumento = $this->funciones->decodificarmaestrapre($iddocumento,'LIQG');
+        View::share('titulo','Extonar Detalle Liquidacion de Gastos');
+        $liquidaciongastos          =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
+        if($liquidaciongastos->COD_ESTADO!='ETM0000000000001'){
+            return Redirect::to('modificar-liquidacion-gastos/'.$idopcion)->with('errorbd', 'Ya no puede extornar esta LIQUIDACION DE GASTOS');
+        }
+        LqgDetLiquidacionGasto::where('ID_DOCUMENTO',$iddocumento)->where('ITEM',$item)
+                    ->update(
+                        [
+                            'ACTIVO'=>0,
+                            'FECHA_MOD'=>$this->fechaactual,
+                            'USUARIO_MOD'=>Session::get('usuario')->id
+                        ]
+                    );
+        LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO',$iddocumento)->where('ITEM',$item)
+                    ->update(
+                        [
+                            'ACTIVO'=>0,
+                            'FECHA_MOD'=>$this->fechaactual,
+                            'USUARIO_MOD'=>Session::get('usuario')->id
+                        ]
+                    );
+        $this->lg_calcular_total_detalle($iddocumento);
+
+        return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/0')->with('bienhecho', 'Documento '.$iddocumento.' extornado con exito');
+    }
+
 
 
 

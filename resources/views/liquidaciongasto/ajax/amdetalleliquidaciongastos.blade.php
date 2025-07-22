@@ -16,23 +16,6 @@
               </div>
             </div>
 
-            <form method="POST" action="{{ url('/emitir-liquidacion-gastos/'.$idopcion.'/'.Hashids::encode(substr($liquidaciongastos->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" id ='frmpmemitir'>
-                  {{ csrf_field() }}
-                  <div class="row">
-                      <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
-                        <div class="form-group">
-                          <label class="col-sm-12 control-label labelleft negrita">GLOSA :</label>
-                            <div class="col-sm-12">
-                                <textarea 
-                                name="glosa"
-                                id = "glosa"
-                                required = ""
-                                class="form-control input-sm validarmayusculas"
-                                rows="2">{{$liquidaciongastos->TXT_GLOSA}}</textarea>
-                            </div>
-                        </div>
-                      </div>
-                  </div>
                   <div class="row" style="margin-top:15px;">
                     <div class="col-xs-12">
                       <table id="tdpm" class="table table-striped table-striped  nowrap listatabla" style='width: 100%;'>
@@ -59,6 +42,11 @@
                                 <span style="display: block;"><b>SUBTOTAL : </b> {{$item->SUBTOTAL}}</span>
                                 <span style="display: block;"><b>IGV : </b> {{$item->IGV}}</span>
                                 <span style="display: block;font-size: 16px;"><b>TOTAL :  {{$item->TOTAL}}</b></span>
+
+                                <form method="POST" id='forextornardetallelq{{$item->ITEM}}' action="{{ url('/extonar-liquidacion-gastos-detalle/'.$idopcion.'/'.$item->ITEM.'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
+                                      {{ csrf_field() }}
+                                      <button type= 'submit' style="margin-top: 5px;float: right;" data_item = '{{$item->ITEM}}' class="btn btn-rounded btn-space btn-danger btn-sm btn-extonar-detalle-lg">EXTORNAR</button>
+                                </form>
                                 <a href="{{ url('/modificar-liquidacion-gastos/'.$idopcion.'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -8)).'/'.$item->ITEM) }}" style="margin-top: 5px;float: right;" class="btn btn-rounded btn-space btn-success btn-sm">MODIFICAR</a>
                               </td>
                             </tr>                 
@@ -68,18 +56,37 @@
                     </div>
                   </div>
 
-                  <div class="row xs-pt-15">
-                    <div class="col-xs-6">
-                        <div class="be-checkbox">
+                <form method="POST" action="{{ url('/emitir-liquidacion-gastos/'.$idopcion.'/'.Hashids::encode(substr($liquidaciongastos->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" id ='frmpmemitir'>
+                      {{ csrf_field() }}
+
+                      <div class="row">
+                          <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
+                            <div class="form-group">
+                              <label class="col-sm-12 control-label labelleft negrita">GLOSA :</label>
+                                <div class="col-sm-12">
+                                    <textarea 
+                                    name="glosa"
+                                    id = "glosa"
+                                    required = ""
+                                    class="form-control input-sm validarmayusculas"
+                                    rows="2">{{$liquidaciongastos->TXT_GLOSA}}</textarea>
+                                </div>
+                            </div>
+                          </div>
+                      </div>
+                      
+                      <div class="row xs-pt-15">
+                        <div class="col-xs-6">
+                            <div class="be-checkbox">
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-xs-6">
-                      <p class="text-right">
-                          <button type="submit" class="btn btn-space btn-primary btnemitirliquidaciongasto">EMITIR LIQUIDACION DE GASTOS</button>     
-                      </p>
-                    </div>
-                  </div>
-            </form>
+                        <div class="col-xs-6">
+                          <p class="text-right">
+                              <button type="submit" class="btn btn-space btn-primary btnemitirliquidaciongasto">EMITIR LIQUIDACION DE GASTOS</button>     
+                          </p>
+                        </div>
+                      </div>
+                </form>
           </div>
 
           <div id="observados" class="tab-pane cont">

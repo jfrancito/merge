@@ -102,13 +102,11 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-combo-item', 'GestionLiquidacionGastosController@actionAjaxComboItem');
 	Route::any('/ajax-combo-autoriza', 'GestionLiquidacionGastosController@actionAjaxComboAutoriza');
 	Route::any('/extonar-liquidacion-gastos/{idopcion}/{iddocumento}', 'GestionLiquidacionGastosController@actionExtornarLiquidacionGastos');
+	Route::any('/extonar-liquidacion-gastos-detalle/{idopcion}/{item}/{iddocumento}', 'GestionLiquidacionGastosController@actionExtornarLiquidacionGastosDetalle');
+
 
 	Route::any('/ajax-buscar-documento-uc-lg', 'GestionLiquidacionGastosController@actionAjaxUCListarLiquidacionGastos');
-
-
 	Route::any('/ajax-combo-cuenta-xmoneda', 'GestionLiquidacionGastosController@actionAjaxComboCuentaXMoneda');
-
-
 	Route::any('/guardar-detalle-liquidacion-gastos/{idopcion}/{iddocumento}', 'GestionLiquidacionGastosController@actionGuardarDetalleLiquidacionGastos');
 	Route::any('/ajax-modal-detalle-documento-lg', 'GestionLiquidacionGastosController@actionDetalleDocumentoLG');
 	Route::any('/guardar-detalle-documento-lg/{idopcion}/{iddocumento}/{item}', 'GestionLiquidacionGastosController@actionGuardarDetalleDocumentoLG');
@@ -116,14 +114,10 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-modal-relacionar-detalle-documento-lg', 'GestionLiquidacionGastosController@actionRelacionarDetalleDocumentoLG');
 	Route::any('/modificar-detalle-documento-lg/{idopcion}/{iddocumento}/{item}/{itemdocumento}', 'GestionLiquidacionGastosController@actionGuardarModificarDetalleDocumentoLG');
 	Route::any('/emitir-liquidacion-gastos/{idopcion}/{iddocumento}', 'GestionLiquidacionGastosController@actionEmitirLiquidacionGasto');
-
-
 	Route::any('/gestion-de-aprobacion-liquidacion-gasto-jefe/{idopcion}', 'GestionLiquidacionGastosController@actionAprobarLiquidacionGastoJefe');
 	Route::any('/aprobar-liquidacion-gasto-jefe/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionAprobarJefeLG');
 	Route::any('/agregar-observar-jefe/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionObservarJefeLG');
 	Route::any('/agregar-nuevo-formato', 'GestionLiquidacionGastosController@actionAgregarNuevoFormato');
-
-
 	Route::any('/gestion-de-aprobacion-liquidacion-gastos-contabilidad/{idopcion}', 'GestionLiquidacionGastosController@actionAprobarLiquidacionGastoContabilidad');
 	Route::any('/gestion-de-aprobacion-liquidacion-gastos-administracion/{idopcion}', 'GestionLiquidacionGastosController@actionAprobarLiquidacionGastoAdministracion');
 	Route::any('/aprobar-liquidacion-gasto-administracion/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionAprobarAdministracionLG');

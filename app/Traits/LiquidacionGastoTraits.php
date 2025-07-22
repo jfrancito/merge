@@ -1309,6 +1309,26 @@ trait LiquidacionGastoTraits
                             ]);                   
     }
 
+
+
+    private function lg_calcular_total_detalle($iddocumento) {
+
+         $detdocumentolg                     =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
+                                                ->where('ACTIVO','=',1)
+                                                ->get();
+
+        LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
+                    ->update(
+                            [
+                                'TOTAL'=> $detdocumentolg->SUM('TOTAL'),
+                                'SUBTOTAL'=> $detdocumentolg->SUM('SUBTOTAL'),
+                                'IGV'=> $detdocumentolg->SUM('IGV')
+                            ]);                   
+    }
+
+
+
+
     private function lg_calcular_total($iddocumento,$item) {
 
          $detdocumentolg                     =   LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
