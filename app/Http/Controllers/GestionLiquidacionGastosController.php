@@ -2905,9 +2905,6 @@ class GestionLiquidacionGastosController extends Controller
     }
 
 
-
-
-
     public function actionDetalleDocumentoLG(Request $request) {
 
         $iddocumento        =       $request['data_iddocumento'];

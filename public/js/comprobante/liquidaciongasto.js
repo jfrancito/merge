@@ -1074,8 +1074,15 @@ $(document).ready(function(){
             var producto_id_factura  =   $('#producto_id_factura').val();
             var igv_id_factura       =   $('#igv_id_factura').val();
 
-            if(producto_id_factura ==''){ alerterrorajax("Seleccione un Producto."); return false;}
-            if(igv_id_factura ==''){ alerterrorajax("Seleccione si es Afecto"); return false;}
+            var ESTADOCP             =   $('#ESTADOCP').val();
+            var ESTADORUC            =   $('#ESTADORUC').val();
+
+
+            if(ESTADOCP !='1'){ alerterrorajax("Debe validar el documento."); cerrarcargando(); return false;}
+            if(ESTADORUC ==''){ alerterrorajax("Debe validar el documento."); cerrarcargando(); return false;}
+
+            if(producto_id_factura ==''){ alerterrorajax("Seleccione un Producto."); cerrarcargando(); return false;}
+            if(igv_id_factura ==''){ alerterrorajax("Seleccione si es Afecto"); cerrarcargando(); return false;}
 
 
             // //ver si tienes filas
