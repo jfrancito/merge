@@ -3715,7 +3715,7 @@ class GestionLiquidacionGastosController extends Controller
         $tdetliquidaciongastos      =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=',1)->get();
         $tdetliquidaciongastosobs   =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=',0)->get();
 
-        if($liquidaciongastos->COD_ESTADO!='ETM0000000000001'){
+        if($liquidaciongastos->COD_ESTADO!='ETM0000000000001' && $liquidaciongastos->IND_OBSERVACION ==0){
             return Redirect::to('gestion-de-liquidacion-gastos/'.$idopcion)->with('errorbd', 'Ya no puede extornar esta LIQUIDACION DE GASTOS');
         }
         $liquidaciongastos->ACTIVO = 0;
@@ -3728,11 +3728,14 @@ class GestionLiquidacionGastosController extends Controller
     public function actionExtornarLiquidacionGastosDetalle($idopcion,$item,$iddocumento,Request $request)
     {
         $idcab       = $iddocumento;
+
+
+
         $iddocumento = $this->funciones->decodificarmaestrapre($iddocumento,'LIQG');
         View::share('titulo','Extonar Detalle Liquidacion de Gastos');
         $liquidaciongastos          =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
-        if($liquidaciongastos->COD_ESTADO!='ETM0000000000001'){
-            return Redirect::to('modificar-liquidacion-gastos/'.$idopcion)->with('errorbd', 'Ya no puede extornar esta LIQUIDACION DE GASTOS');
+        if($liquidaciongastos->COD_ESTADO!='ETM0000000000001' && $liquidaciongastos->IND_OBSERVACION ==0){
+            return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/0')->with('errorbd', 'Ya no puede extornar esta LIQUIDACION DE GASTOS');
         }
         LqgDetLiquidacionGasto::where('ID_DOCUMENTO',$iddocumento)->where('ITEM',$item)
                     ->update(
