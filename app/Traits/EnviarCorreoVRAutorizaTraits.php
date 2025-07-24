@@ -62,7 +62,7 @@ trait EnviarCorreoVRAutorizaTraits
             ['vale' => $VALE_RENDIR],
             function ($message) use ($emailfrom, $emailTrabajador, $emailTrabajadorAutoriza, $emailTrabajadorAprueba, $nombreCompleto) {
                 $message->from($emailfrom, $nombreCompleto)
-                        ->to("marley.sucse@induamerica.com.pe")
+                         ->to(["marley.sucse@induamerica.com.pe", "diana.malca@induamerica.com.pe"])
                         ->cc($emailTrabajador, $emailTrabajadorAutoriza) 
                         ->subject('VALE RENDIR - INDUAMERICA');
             });
