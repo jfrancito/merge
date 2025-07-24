@@ -16,9 +16,9 @@
 
                   <div class="tools tooltiptop">
 
-                    <a href="{{ url('/agregar-planilla-movilidad/'.$idopcion) }}" class="btn btn-secondary botoncabecera tooltipcss opciones">
+                    <a href="{{ url('/agregar-planilla-movilidad/'.$idopcion) }}" class="btn btn-secondary botoncabecera tooltipcss opciones" style="width:140px;">
                       <span class="tooltiptext">Agregar Movilidad</span>
-                      <span class="icon mdi mdi-plus-circle-o"></span>
+                      Agregar Movilidad
                     </a>
 
                     <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscardocumento">

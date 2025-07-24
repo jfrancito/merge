@@ -11,7 +11,7 @@
               <div class="tools tooltiptop" style="text-align:right;">
                 <a href="{{ url('/modificar-liquidacion-gastos/'.$idopcion.'/'.Hashids::encode(substr($liquidaciongastos->ID_DOCUMENTO, -8)).'/-1') }}" class="btn btn-rounded btn-space btn-success btn-sm"
                   data_planilla_movilidad_id = '{{$liquidaciongastos->ID_DOCUMENTO}}'>
-                  AGREGAR DE DOCUMENTO            
+                  AGREGAR DOCUMENTO            
                 </a>
               </div>
             </div>

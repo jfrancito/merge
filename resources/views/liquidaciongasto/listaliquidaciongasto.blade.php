@@ -17,14 +17,14 @@
                   <div class="tools tooltiptop">
 
 
-                    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscartareas">
+<!--                     <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscartareas">
                       <span class="tooltiptext">Tareas</span>
                       <span class="icon mdi mdi-assignment-check"></span>
-                    </a>
+                    </a> -->
 
-                    <a href="{{ url('/agregar-liquidacion-gastos/'.$idopcion) }}" class="btn btn-secondary botoncabecera tooltipcss opciones">
+                    <a href="{{ url('/agregar-liquidacion-gastos/'.$idopcion) }}" class="btn btn-secondary botoncabecera tooltipcss opciones" style="width:140px;">
                       <span class="tooltiptext">Agregar Liquidacion</span>
-                      <span class="icon mdi mdi-plus-circle-o"></span>
+                      Agregar Liquidacion
                     </a>
 
                     <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscardocumento">
