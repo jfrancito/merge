@@ -22,7 +22,7 @@ class LqgLiquidacionGasto extends Model
 
     public function scopeEstadoLG($query,$estado_id){
         if(trim($estado_id) != 'TODO'){
-            $query->where('COD_ESTADO','=',$estado_id);
+            $query->where('LQG_LIQUIDACION_GASTO.COD_ESTADO','=',$estado_id);
         }
     }
 

@@ -842,7 +842,7 @@ class GestionLiquidacionGastosController extends Controller
         $titulo                 =   'Liquidacion-Gastos-Merge';
         $funcion                =   $this;
 
-        $listadatos         =   $this->lg_lista_cabecera_comprobante_total_gestion_excel($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id);
+        $listadatos             =   $this->lg_lista_cabecera_comprobante_total_gestion_excel($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id);
         Excel::create($titulo.'-('.$fecha_actual.')', function($excel) use ($listadatos,$titulo,$funcion) {
             $excel->sheet('ORDEN COMPRA', function($sheet) use ($listadatos,$titulo,$funcion) {
 
@@ -1057,7 +1057,7 @@ class GestionLiquidacionGastosController extends Controller
 
 
         $serie                  =      $request['serie'];
-        $numero                 =      $request['numero'];
+        $numero                 =      ltrim($request['numero'], '0');
         $fecha_emision          =      $request['fecha_emision'];
         $totaldetalle           =      $request['totaldetalle'];
         $empresa_id             =      $request['empresa_id'];
