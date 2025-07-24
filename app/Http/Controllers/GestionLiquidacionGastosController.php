@@ -1663,6 +1663,8 @@ class GestionLiquidacionGastosController extends Controller
         $data_iddocumento          =       $request['data_iddocumento'];
         $detliquidaciongasto       =       LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$data_iddocumento)->first();
 
+
+
         $useario_autoriza          =       User::where('id','=',$detliquidaciongasto->COD_USUARIO_AUTORIZA)->first();
 
 

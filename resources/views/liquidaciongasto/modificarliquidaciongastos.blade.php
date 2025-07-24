@@ -25,6 +25,7 @@
                 </div>
                 <div class='detallemovilidad' style="margin-top:15px;">
                   @include('liquidaciongasto.ajax.amdetalleliquidaciongastos')
+                  <input type="hidden" name="ID_DOCUMENTO" id="ID_DOCUMENTO" value="{{$liquidaciongastos->ID_DOCUMENTO}}">
                 </div>
           </div>
         </div>
