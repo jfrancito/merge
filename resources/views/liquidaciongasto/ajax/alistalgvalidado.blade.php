@@ -13,7 +13,8 @@
       <tr data_requerimiento_id = "{{$item->ID_DOCUMENTO}}">
         <td>{{$index + 1}}</td>
         <td class="cell-detail sorting_1" style="position: relative;">
-          <span><b>CODIGO : {{$item->ID_DOCUMENTO}} </b> </span>
+          <span><b>ID : {{$item->ID_DOCUMENTO}} </b> </span>
+          <span><b>CODIGO : {{$item->CODIGO}} </b> </span>
           <span><b>FECHA  : {{$item->FECHA_EMI}}</b></span>
           <span><b>TRABAJADOR : </b>{{$item->TXT_EMPRESA_TRABAJADOR}} </span>
           <span><b>CUENTA : </b>{{$item->TXT_CUENTA}} </span>

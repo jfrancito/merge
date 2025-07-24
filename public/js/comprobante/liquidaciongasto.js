@@ -3,6 +3,45 @@ $(document).ready(function(){
     var carpeta = $("#carpeta").val();
 
 
+
+    $(".cfedocumento").on('click','.buscartareas', function() {
+
+        var _token                                   =   $('#token').val();
+        var idopcion                                 =   $('#idopcion').val();
+
+        data                                         =   {
+                                                                _token                  : _token,
+                                                                idopcion                : idopcion
+                                                         };
+                                        
+        ajax_modal(data,"/ajax-modal-buscar-factura-sunat-tareas",
+                  "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+
+    });
+
+
+
+    $(".liquidaciongasto").on('click','#descargarcomprobantemasivoexcel', function() {
+
+        var fecha_inicio         =   $('#fecha_inicio').val();
+        var fecha_fin            =   $('#fecha_fin').val();
+        var proveedor_id         =   $('#proveedor_id').val();
+        var estado_id            =   $('#estado_id').val();
+        var idopcion             =   $('#idopcion').val();
+        var _token               =   $('#token').val();
+
+        //validacioones
+        if(fecha_inicio ==''){ alerterrorajax("Seleccione una fecha inicio."); return false;}
+        if(fecha_fin ==''){ alerterrorajax("Seleccione una fecha fin."); return false;}
+
+        href = $(this).attr('data-href')+'/'+fecha_inicio+'/'+fecha_fin+'/'+proveedor_id+'/'+estado_id+'/'+idopcion;
+        $(this).prop('href', href);
+        return true;
+
+
+    });
+
+
     $(".liquidaciongasto").on('change','#moneda_sel_c_id', function(e) {
 
         var _token                  =   $('#token').val();
@@ -204,6 +243,27 @@ $(document).ready(function(){
         });
     });
 
+    $(".liquidaciongasto").on('click','.btn-extonar-detalle-lg', function(e) {
+        event.preventDefault();
+        var _token                  =   $('#token').val();
+        var data_item               =   $(this).attr('data_item');
+
+        $.confirm({
+            title: '¿Confirma el extorno?',
+            content: 'Extorno de Detalle Liquidacion de Gastos',
+            buttons: {
+                confirmar: function () {
+                     $("#forextornardetallelq"+data_item).submit();   
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo el extorno');
+                    window.location.reload();
+                }
+            }
+        });
+    });
+
+
     $(".liquidaciongasto").on('click','.btn_tarea_cpe_lg', function() {
 
         var _token                                   =   $('#token').val();
@@ -360,7 +420,7 @@ $(document).ready(function(){
         var serie                                    =   $('#serie_sunat').val();
         var correlativo                              =   $('#correlativo_sunat').val();
         const link                                   =   '/buscar-de-cpe-sunat-lg';
-
+        serie = serie.toUpperCase();
 
         if(ruc ==''){ alerterrorajax("Ingrese un ruc."); return false;}
         if(td ==''){ alerterrorajax("Seleccione un tipo de documento."); return false;}
@@ -384,22 +444,39 @@ $(document).ready(function(){
             success: function (data) {
                 cerrarcargando();
                 debugger;
-                $('#modal-detalle-requerimiento').niftyModal('hide');
+                var sw= 0;
+
+
+
                 if (data.nombre_xml) {
                     $('.exml').html(data.nombre_xml);
                     $('#NOMBREXML').val(data.nombre_xml);
                     $('#RUTAXML').val(data.ruta_xml);
+                    sw= sw +1;
                 }
                 if (data.nombre_pdf) {
                     $('.epdf').html(data.nombre_pdf);
                     $('#NOMBREPDF').val(data.nombre_pdf);
                     $('#RUTAPDF').val(data.ruta_pdf);
+                    sw= sw +1;
                 }
                 if (data.nombre_cdr) {
                     $('.ecdr').html(data.nombre_cdr);
                     $('#NOMBRECDR').val(data.nombre_cdr);
                     $('#RUTACDR').val(data.ruta_cdr);
+                    sw= sw +1;
                 }
+
+                if (!serie.startsWith('F')) {
+                    if (sw==2) {
+                        $('#modal-detalle-requerimiento').niftyModal('hide');
+                    }
+                }else{
+                    if (sw==3) {
+                        $('#modal-detalle-requerimiento').niftyModal('hide');
+                    }
+                }
+
             },
             error: function (data) {
                 cerrarcargando();
@@ -450,6 +527,8 @@ $(document).ready(function(){
             data    :   data,
             success: function (data) {
                 cerrarcargando();
+
+                debugger;
                 $('#modal-detalle-requerimiento').niftyModal('hide');
 
                 $('#serie').val(data.SERIE);
@@ -490,6 +569,29 @@ $(document).ready(function(){
     });
 
 
+    $(".cfedocumento").on('click','.buscardocumento', function() {
+
+        event.preventDefault();
+
+        var fecha_inicio         =   $('#fecha_inicio').val();
+        var fecha_fin            =   $('#fecha_fin').val();
+        var idopcion                =   $('#idopcion').val();
+        var _token                  =   $('#token').val();
+
+        //validacioones
+        if(fecha_inicio ==''){ alerterrorajax("Seleccione una fecha inicio."); return false;}
+        if(fecha_fin ==''){ alerterrorajax("Seleccione una fecha fin."); return false;}
+
+        data            =   {
+                                _token                  : _token,
+                                fecha_inicio            : fecha_inicio,
+                                fecha_fin               : fecha_fin,
+                                idopcion                : idopcion
+                            };
+        ajax_normal(data,"/ajax-buscar-documento-uc-lg");
+
+    });
+
 
     $(".liquidaciongasto").on('click','.buscardocumento', function() {
 
@@ -522,6 +624,8 @@ $(document).ready(function(){
 
     $(".liquidaciongasto").on('click','.filalg', function(e) {
         event.preventDefault();
+        debugger;
+        abrircargando();
         $('.dtlg').hide();
         $('.file-preview-frame').hide();
         $('.filalg').removeClass("ocultar");
@@ -529,6 +633,7 @@ $(document).ready(function(){
         $('.'+data_valor).show();
         $('.filalg').removeClass("activofl");
         $(this).addClass("activofl");
+        cerrarcargando();
 
     });
 
@@ -661,6 +766,10 @@ $(document).ready(function(){
 
         $('.DCC0000000000036').hide();
         $('.DCC0000000000004').hide();
+        $('#totaldetalle').prop('readonly', true);
+
+
+
 
         if(tipodoc_id == 'TDO0000000000070'){
             $('#serie, #numero, #fecha_emision').prop('readonly', true);
@@ -675,12 +784,15 @@ $(document).ready(function(){
 
         }else{
                 if(tipodoc_id == 'TDO0000000000001'){
-                    $('#serie, #numero, #fecha_emision').prop('readonly', true);
-                    $('#empresa_id').prop('disabled', true);
+
+                    //$('#serie, #numero, #fecha_emision').prop('readonly', true);
+                    $('#empresa_id').prop('disabled', false);
                     $('.sectorplanilla').hide();
+                    $('#totaldetalle').prop('readonly', false);
                     $('.sectorxml').show();
-                    $('.sectorxmlmodal').hide();
-                    $('.DCC0000000000036').hide();
+                    $('.sectorxmlmodal').show();
+                    $('.DCC0000000000036').show();
+
                 }else{
                     $('#serie, #numero, #fecha_emision').prop('readonly', false);
                     $('#empresa_id').prop('disabled', false);
@@ -831,6 +943,77 @@ $(document).ready(function(){
 
 
     });
+
+
+    $(".liquidaciongasto").on('click','.validarxml', function(e) {
+        e.preventDefault(); // Prevenir recarga del formulario
+
+        var _token                  =   $('#token').val();
+        var serie                   =   $('#serie').val();
+        var numero                  =   $('#numero').val();
+        var fecha_emision           =   $('#fecha_emision').val();
+        var totaldetalle            =   $('#totaldetalle').val();
+        var empresa_id              =   $('#empresa_id').val();
+
+
+        if(serie ==''){ alerterrorajax("Ingrese una serie."); return false;}
+        if(numero ==''){ alerterrorajax("Ingrese una numero."); return false;}
+        if(fecha_emision ==''){ alerterrorajax("Ingrese una fecha de emision."); return false;}
+        if(totaldetalle ==''){ alerterrorajax("Ingrese una total."); return false;}
+        if(empresa_id ==''){ alerterrorajax("Seleccione una empresa."); return false;}
+        data            =   {   
+                                _token                  : _token,
+                                serie                   : serie,
+                                numero                  : numero,
+                                fecha_emision           : fecha_emision,
+                                totaldetalle            : totaldetalle,
+                                empresa_id              : empresa_id
+                            };
+
+        const link                  =   '/ajax-leer-xml-lg-validar';
+        abrircargando();
+        $.ajax({
+            type    :   "POST",
+            url     :   carpeta+link,
+            data    :   data,
+            success: function (data) {
+                cerrarcargando();
+
+                if(data.error == 0){
+
+                    $('.MESSAGE').html(data.MESSAGE);
+                    $('.NESTADOCP').html(data.NESTADOCP);
+                    $('.NESTADORUC').html(data.NESTADORUC);
+                    $('.NCONDDOMIRUC').html(data.NCONDDOMIRUC);
+                    $('#SUCCESS').val(data.SUCCESS);
+                    $('#MESSAGE').val(data.MESSAGE);
+                    $('#ESTADOCP').val(data.ESTADOCP);
+                    $('#NESTADOCP').val(data.NESTADOCP);
+                    $('#ESTADORUC').val(data.ESTADORUC);
+                    $('#NESTADORUC').val(data.NESTADORUC);
+                    $('#CONDDOMIRUC').val(data.CONDDOMIRUC);
+                    $('#NCONDDOMIRUC').val(data.NCONDDOMIRUC);
+                    $('#NOMBREFILE').val(data.NOMBREFILE);
+                    $('#RUTACOMPLETA').val(data.RUTACOMPLETA);
+                    //archivos
+                    $('.sectorxmlmodal').show();
+
+                }else{
+                    alerterrorajax(data.mensaje);
+                }
+                console.log(data);
+            },
+            error: function (data) {
+                cerrarcargando();
+                error500(data);
+            }
+        });
+
+
+    });
+
+
+
     $(".liquidaciongasto").on('click','.btn-relacionar-producto-lg', function(e) {
         event.preventDefault();
         debugger;
@@ -883,84 +1066,103 @@ $(document).ready(function(){
                 
 
         if(tipodoc_id == 'TDO0000000000001'){
-            //ver si tienes filas
-            if ($('#tdxml tbody tr').length === 0) {
-                alerterrorajax("La factura no tiene detalle"); cerrarcargando(); return false;
+
+            let comprobante = $('#file-DCC0000000000036')[0].files.length > 0;
+            if (!comprobante) {
+                alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
             }
-            //recorrer la tabla y ver si no tiene aprobados
-            var sw_asociado = 0;
-            $('#tdxml tbody tr').each(function(index) {
-                const productoOsiris = $(this).find('.TXT_PRODUCTO_OSIRIS').text();
-                if(productoOsiris==''){
-                    sw_asociado = 1;
-                }
+            var producto_id_factura  =   $('#producto_id_factura').val();
+            var igv_id_factura       =   $('#igv_id_factura').val();
 
-            });
-
-            if(sw_asociado ==1){ alerterrorajax("Hay productos que no estan asociados"); cerrarcargando(); return false;}
-            var valor              =   $('#serie').val();
-            let primeraLetraSerire = valor.charAt(0); 
-            if(primeraLetraSerire=='E'){
-                let comprobante = $('#file-DCC0000000000036')[0].files.length > 0;
-
-                if(RUTAXML==''){
-                    if (!comprobante) {
-                        alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
-                    }
-                }else{
-                    if(RUTAPDF==''){
-                        if (!comprobante) {
-                            alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
-                        }
-                    }
-                }
+            var ESTADOCP             =   $('#ESTADOCP').val();
+            var ESTADORUC            =   $('#ESTADORUC').val();
 
 
-            }else{
-                let xml = $('#file-DCC0000000000004')[0].files.length > 0;
-                if(RUTAXML==''){
-                    if (!xml) {
-                        alerterrorajax("Debe subir el CDR en XML."); cerrarcargando(); return false;
-                    }
-                }else{
-                    if(RUTACDR==''){
-                        if (!comprobante) {
-                            alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
-                        }
-                    }
-                }
+            if(ESTADOCP !='1'){ alerterrorajax("Debe validar el documento."); cerrarcargando(); return false;}
+            if(ESTADORUC ==''){ alerterrorajax("Debe validar el documento."); cerrarcargando(); return false;}
+
+            if(producto_id_factura ==''){ alerterrorajax("Seleccione un Producto."); cerrarcargando(); return false;}
+            if(igv_id_factura ==''){ alerterrorajax("Seleccione si es Afecto"); cerrarcargando(); return false;}
 
 
-                let comprobante = $('#file-DCC0000000000036')[0].files.length > 0;
-                if(RUTAXML==''){
-                    if (!comprobante) {
-                        alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
-                    }
-                }else{
-                    if(RUTAPDF==''){
-                        if (!comprobante) {
-                            alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
-                        }
-                    }
-                }
+            // //ver si tienes filas
+            // if ($('#tdxml tbody tr').length === 0) {
+            //     alerterrorajax("La factura no tiene detalle"); cerrarcargando(); return false;
+            // }
+            // //recorrer la tabla y ver si no tiene aprobados
+            // var sw_asociado = 0;
+            // $('#tdxml tbody tr').each(function(index) {
+            //     const productoOsiris = $(this).find('.TXT_PRODUCTO_OSIRIS').text();
+            //     if(productoOsiris==''){
+            //         sw_asociado = 1;
+            //     }
 
-            }
-            let detalleArray = [];
-            $('#tdxml tbody tr').each(function(index) {
-                const fila = {
-                    TXT_PRODUCTO_OSIRIS: $(this).find('.TXT_PRODUCTO_OSIRIS').text().trim(),
-                    TXT_PRODUCTO_XML   : $(this).find('.TXT_PRODUCTO_XML').text().trim(),
-                    CANTIDAD           : $(this).find('.CANTIDAD').text().trim(),
-                    PRECIO             : $(this).find('.PRECIO').text().trim(),
-                    INDIGV             : $(this).find('.INDIGV').text().trim(),
-                    SUBTOTAL           : $(this).find('.SUBTOTAL').text().trim(),
-                    IGV                : $(this).find('.IGV').text().trim(),
-                    TOTAL              : $(this).find('.TOTAL').text().trim()
-                };
-                detalleArray.push(fila);
-            });
-            // Guardamos el array convertido a JSON en el input hidden
-            $('#array_detalle_producto').val(JSON.stringify(detalleArray));
+            // });
+
+            // if(sw_asociado ==1){ alerterrorajax("Hay productos que no estan asociados"); cerrarcargando(); return false;}
+            // var valor              =   $('#serie').val();
+            // let primeraLetraSerire = valor.charAt(0); 
+            // if(primeraLetraSerire=='E'){
+            //     let comprobante = $('#file-DCC0000000000036')[0].files.length > 0;
+
+            //     if(RUTAXML==''){
+            //         if (!comprobante) {
+            //             alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
+            //         }
+            //     }else{
+            //         if(RUTAPDF==''){
+            //             if (!comprobante) {
+            //                 alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
+            //             }
+            //         }
+            //     }
+
+
+            // }else{
+            //     let xml = $('#file-DCC0000000000004')[0].files.length > 0;
+            //     if(RUTAXML==''){
+            //         if (!xml) {
+            //             alerterrorajax("Debe subir el CDR en XML."); cerrarcargando(); return false;
+            //         }
+            //     }else{
+            //         if(RUTACDR==''){
+            //             if (!comprobante) {
+            //                 alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
+            //             }
+            //         }
+            //     }
+
+
+            //     let comprobante = $('#file-DCC0000000000036')[0].files.length > 0;
+            //     if(RUTAXML==''){
+            //         if (!comprobante) {
+            //             alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
+            //         }
+            //     }else{
+            //         if(RUTAPDF==''){
+            //             if (!comprobante) {
+            //                 alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
+            //             }
+            //         }
+            //     }
+
+            // }
+            // let detalleArray = [];
+            // $('#tdxml tbody tr').each(function(index) {
+            //     const fila = {
+            //         TXT_PRODUCTO_OSIRIS: $(this).find('.TXT_PRODUCTO_OSIRIS').text().trim(),
+            //         TXT_PRODUCTO_XML   : $(this).find('.TXT_PRODUCTO_XML').text().trim(),
+            //         CANTIDAD           : $(this).find('.CANTIDAD').text().trim(),
+            //         PRECIO             : $(this).find('.PRECIO').text().trim(),
+            //         INDIGV             : $(this).find('.INDIGV').text().trim(),
+            //         SUBTOTAL           : $(this).find('.SUBTOTAL').text().trim(),
+            //         IGV                : $(this).find('.IGV').text().trim(),
+            //         TOTAL              : $(this).find('.TOTAL').text().trim()
+            //     };
+            //     detalleArray.push(fila);
+            // });
+            // // Guardamos el array convertido a JSON en el input hidden
+            // $('#array_detalle_producto').val(JSON.stringify(detalleArray));
         }else{
 
             if(tipodoc_id != 'TDO0000000000070'){
@@ -1079,7 +1281,8 @@ $(document).ready(function(){
             content: 'Registro de Liquidacion de Gastos',
             buttons: {
                 confirmar: function () {
-                     $( "#frmpm" ).submit();   
+                    abrircargando();
+                    $( "#frmpm" ).submit();   
                 },
                 cancelar: function () {
                     $.alert('Se cancelo el registro');
@@ -1153,15 +1356,36 @@ $(document).ready(function(){
         var data_item                                =   $(this).attr('data_item');
         var idopcion                                 =   $('#idopcion').val();
 
-        data                                         =   {
-                                                                _token                  : _token,
-                                                                data_iddocumento        : data_iddocumento,
-                                                                data_item               : data_item,
-                                                                idopcion                : idopcion
-                                                         };
-                                        
-        ajax_modal(data,"/ajax-modal-detalle-documento-lg",
-                  "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+        let existe = false;
+        // Recorrer todas las filas de la tabla
+        let tieneDatos = false;
+        $(".ltabladet tbody tr").each(function() {
+            console.log($(this).text().trim());
+            debugger;
+            if ($(this).text().trim() !== "") { // Verifica que la fila no esté vacía
+                tieneDatos = true;
+            }
+        });
+
+        if(tieneDatos === true){
+            alerterrorajax("Ya tiene un registro en el detalle solo se permite un solo detalle.");
+        }else{
+
+            data                                         =   {
+                                                                    _token                  : _token,
+                                                                    data_iddocumento        : data_iddocumento,
+                                                                    data_item               : data_item,
+                                                                    idopcion                : idopcion
+                                                             };
+                                            
+            ajax_modal(data,"/ajax-modal-detalle-documento-lg",
+                      "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+
+        }
+
+
+
+
 
     });
 

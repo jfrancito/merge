@@ -34,7 +34,7 @@
 												<td>{{$item->TOTAL}}</td>
                         <td>
                             <div class="icon iconoentregable">
-                              <span class="mdi mdi-select-all mdisel" data_documento_planilla='{{$item->ID_DOCUMENTO}}'></span>
+                              <span class="mdi mdi-select-all mdisel" data_documento_planilla='{{$item->ID_DOCUMENTO}}' data_iddocumento='{{$iddocumento}}'></span>
                             </div>
                         </td>
                       </tr>

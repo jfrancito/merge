@@ -33,11 +33,18 @@ trait PrecioCompetenciaTraits
 	private function documentolgautomatico() {
 			
 			$pathFiles='\\\\10.1.50.2';
-      $listasunattareas                   =   DB::table('SUNAT_DOCUMENTO')
-                                              ->where('MODULO', 'LIQUIDACION_GASTO')
-                                              ->where('ACTIVO', 1)
-                                              ->where('IND_TOTAL', 0)
-                                              ->get();
+
+			$listasunattareas = DB::table('LQG_LIQUIDACION_GASTO')
+			    ->select('SUNAT_DOCUMENTO.*')
+			    ->distinct()
+			    ->join('SUNAT_DOCUMENTO', 'SUNAT_DOCUMENTO.ID_DOCUMENTO', '=', 'LQG_LIQUIDACION_GASTO.ID_DOCUMENTO')
+			    ->where('LQG_LIQUIDACION_GASTO.ID_DOCUMENTO', 'LIQG00000105')
+			    ->where('LQG_LIQUIDACION_GASTO.ACTIVO', 1)
+			    ->where('LQG_LIQUIDACION_GASTO.COD_ESTADO', 'ETM0000000000001')
+			    ->where('SUNAT_DOCUMENTO.ACTIVO', 1)
+			    ->where('SUNAT_DOCUMENTO.IND_TOTAL', 0)
+			    ->get();
+
       //dd($listasunattareas);
       foreach($listasunattareas as $index=>$item){
 
@@ -121,8 +128,8 @@ trait PrecioCompetenciaTraits
 										if(count($usuario)>0){
 												if($usuario->celular_contacto <> ''){
 
-													DB::connection('sqlsrv_isl')->table('whatsapphub')->insert([
-													    'NumeroContacto'   => $usuario->celular_contacto,
+													DB::connection('sqlsrv_isl')->table('whatsapp')->insert([
+													    'NumeroContacto'   => '51'.$usuario->celular_contacto,
 													    'NombreContacto'   => $item->USUARIO_NOMBRE,
 													    'Mensaje'          => '¡Hola! Buen día %0D%0AEncontrammos tu documento que dejaste rastreando en busquedad de la APP.*%0D%0A* Datos del documento : '.$item->RUC.' // '.$item->SERIE.'-'.$item->NUMERO.'*%0D%0A*',
 													    'IndArchivo'       => 0,

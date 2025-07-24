@@ -1193,6 +1193,7 @@ class UserController extends Controller {
 
 
 
+
 		}
 		else{
 			//CONTABILIDAD

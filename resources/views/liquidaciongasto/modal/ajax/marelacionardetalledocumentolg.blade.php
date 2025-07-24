@@ -20,6 +20,8 @@
 				  </div>
 				</div>
 			</div>
+
+			
 		</div>
 	</div>
 	<div class="modal-footer">
@@ -30,6 +32,31 @@
 	<script type="text/javascript">
 		$(document).ready(function(){
 	        $('#producto_id').select2({
+	            // Activamos la opcion "Tags" del plugin
+	            width: '100%',
+	            placeholder: 'Seleccione una empresa',
+	            language: "es",
+	            tags: true,
+	            tokenSeparators: [','],
+	            ajax: {
+	                dataType: 'json',
+	                url: '{{ url("buscarproducto") }}',
+	                delay: 100,
+	                data: function(params) {
+	                    return {
+	                        term: params.term
+	                    }
+	                },
+	                processResults: function (data, page) {
+	                  return {
+	                    results: data
+	                  };
+
+	                },
+	            }
+	        });
+
+	        $('#producto_id_factura').select2({
 	            // Activamos la opcion "Tags" del plugin
 	            width: '100%',
 	            placeholder: 'Seleccione una empresa',

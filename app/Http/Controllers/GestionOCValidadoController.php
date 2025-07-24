@@ -354,8 +354,6 @@ class GestionOCValidadoController extends Controller
         $operacion_id   =   $request['operacion_id'];
         $filtrofecha_id =   $request['filtrofecha_id'];
 
-
-
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
 
         if($operacion_id=='ORDEN_COMPRA'){
@@ -638,6 +636,50 @@ class GestionOCValidadoController extends Controller
         $documentohistorial     =   FeDocumentoHistorial::where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                                     ->orderBy('FECHA','DESC')
                                     ->get();
+
+
+
+            //dd($fedocumento->estadoCp);
+        if($fedocumento->estadoCp === null || $fedocumento->estadoCp == 0) {
+
+            $token = '';
+            if($prefijocarperta =='II'){
+                $token           =      $this->generartoken_ii();
+            }else{
+                $token           =      $this->generartoken_is();
+            }
+
+
+            $fechaemision        =      date_format(date_create($fedocumento->FEC_VENTA), 'd/m/Y');
+            $rvalidar            =      $this->validar_xml( $token,
+                                            $fedocumento->ID_CLIENTE,
+                                            $fedocumento->RUC_PROVEEDOR,
+                                            $fedocumento->ID_TIPO_DOC,
+                                            $fedocumento->SERIE,
+                                            $fedocumento->NUMERO,
+                                            $fechaemision,
+                                            $fedocumento->TOTAL_VENTA_ORIG);
+
+            $arvalidar = json_decode($rvalidar, true);
+
+            if($arvalidar['success'] == 1){
+
+                FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)
+                            ->update(
+                                    [
+                                        'success'=>$arvalidar['success'],
+                                        'message'=>$arvalidar['message'],
+                                        'estadoCp'=>'1',
+                                        'nestadoCp'=>'ACEPTADO',
+                                        'estadoRuc'=>'00',
+                                        'nestadoRuc'=>'ACTIVO',
+                                        'condDomiRuc'=>'00',
+                                        'ncondDomiRuc'=>'HABIDO',
+                                    ]);
+
+            }
+        }
+
         //dd($documentohistorial);
 
         $funcion                =   $this;

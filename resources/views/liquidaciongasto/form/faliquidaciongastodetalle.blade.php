@@ -1,6 +1,7 @@
 <div class="control-group">
-  <div class="row">
 
+
+  <div class="row">
     <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
         <div class="form-group">
           <label class="col-sm-12 control-label labelleft negrita" style="text-align: left;">TIPO DOCUMENTO :</label>
@@ -14,7 +15,6 @@
           </div>
         </div>
     </div>
-
     <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 sectorplanilla ocultar">
       <div class="form-group">
           <label class="col-sm-12 control-label labelleft negrita" style="text-align: left;">BUSCAR : </label>
@@ -28,10 +28,11 @@
           </div>
         </div>
     </div>
-
-    <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 sectorxml ocultar">
+<!--     <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 sectorxml ocultar">
       <div class="form-group">
-          <label class="col-sm-12 control-label labelleft negrita" style="text-align: left;">(01) SUBIR XML : </label>
+          <label class="col-sm-12 control-label labelleft negrita" style="text-align: left;">
+            (01) SUBIR XML : 
+          </label>
           <div class="col-sm-12 abajocaja" >
                 <div class="col-xs-6 col-sm-6 col-md-6 col-lg-10 negrita" align="left">
                     <input name="inputxml" id='inputxml' class="form-control inputxml" type="file" accept="text/xml" />
@@ -42,37 +43,40 @@
                 <input type="hidden" name="ID_DOCUMENTO" id="ID_DOCUMENTO" value="{{$liquidaciongastos->ID_DOCUMENTO}}">
           </div>
         </div>
-    </div>
-
+    </div> -->
+<!-- 
     <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 sectorxml ocultar">
-      <div class="form-group">
-          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+
+      <div class="form-group"> -->
+<!--           <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
             <label><b>(02) BUSCAR SUNAT :</b>  </label>
-            <button  type="button" style="height:48px;" class="btn btn-space btn-success btn-md btnsunat"  title="Cargar Datos">BUSCAR SUNAT</button>
+            <button  type="button" style="height:48px;" class="btn btn-space btn-primary btn-md btnsunat"  title="Cargar Datos">BUSCAR SUNAT</button>
           </div>
           <input type="hidden" name="RUTAXML" id="RUTAXML" >
           <input type="hidden" name="RUTAPDF" id="RUTAPDF" >
           <input type="hidden" name="RUTACDR" id="RUTACDR" >
-
           <input type="hidden" name="NOMBREXML" id="NOMBREXML" >
           <input type="hidden" name="NOMBREPDF" id="NOMBREPDF" >
           <input type="hidden" name="NOMBRECDR" id="NOMBRECDR" >
-
-
           <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
             <label><b>XML:</b> <span class='exml'></span></label><br>
             <label><b>PDF:</b> <span class='epdf'></span></label><br>
             <label><b>CDR:</b> <span class='ecdr'></span></label>
-            <button  type="button" class="btn btn-space btn-primary btn-md btncargarsunat">CARGAR DOCUMENTOS</button>
+            <button  type="button" class="btn btn-space btn-primary btn-md btncargarsunat" style="display:none;">CARGAR DOCUMENTOS</button>
+          </div> -->
+
+
+<!--           <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 negrita" align="center">
+              <button  type="button" style="height:48px;" class="btn btn-space btn-success btn-lg cargardatosliq" id='cargardatosliq' title="Cargar Datos"><i class="icon icon-left mdi mdi-upload"></i> Subir</button>
           </div>
 
-
       </div>
-    </div>
+    </div> -->
 
 
     <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 sectorxml ocultar">
       <div class="form-group">
+
           <label class="col-sm-12 control-label labelleft negrita" style="text-align: left;">RESPUESTA XML : </label>
           <div class="col-sm-12 abajocaja" >
               <p style="margin:0px;"><b>Respuesta Sunat</b> : <strong class="MESSAGE"></strong></p>
@@ -92,6 +96,11 @@
               <input type="hidden" name="RUTACOMPLETA" id="RUTACOMPLETA" >
               <input type="hidden" name="array_detalle_producto" id='array_detalle_producto' value=''>
           </div>
+
+          <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 negrita" align="center">
+              <button  type="button" class="btn btn-space btn-success btn-lg validarxml" id='validarxml' title="Cargar Datos">Validar</button>
+          </div>
+
         </div>
     </div>
   </div>
@@ -213,6 +222,34 @@
         </div>
       </div>
   </div>
+
+  <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 sectorxml ocultar">
+    <div class="form-group">
+      <label class="col-sm-12 control-label labelleft negrita" >PRODUCTO <span class="obligatorio">(*)</span> :</label>
+      <div class="col-sm-12">
+          {!! Form::select( 'producto_id_factura', $comboproducto, $producto_id,
+                              [
+                                'class'       => 'form-control control input-xs' ,
+                                'id'          => 'producto_id_factura',        
+                              ]) !!}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 sectorxml ocultar">
+    <div class="form-group">
+      <label class="col-sm-12 control-label labelleft negrita" >¿ESTA AFECTO A IGV?<span class="obligatorio">(*)</span> :</label>
+      <div class="col-sm-12">
+          {!! Form::select( 'igv_id_factura', $combo_igv, array($igv_id),
+                              [
+                                'class'       => 'select6 form-control control input-xs' ,
+                                'id'          => 'igv_id_factura',        
+                              ]) !!}
+      </div>
+    </div>
+  </div>
+
+
 </div>
 <div class="row sectorxmlmodal ocultar" style="margin-top:25px;">
   <table id="tdxml" class="table table-striped table-hover" style='width: 100%;'>
@@ -273,7 +310,7 @@
   </div>
 @endif
 <div class="col-xs-12">
-  <table id="tdpm" class="table table-striped table-striped  nowrap listatabla" style='width: 100%;'>
+  <table id="tdpm" class="table table-striped table-striped  nowrap listatabla ltabladet" style='width: 100%;'>
     <thead>
       <tr>
         <th>DETALLE DEL DOCUMENTO</th> 

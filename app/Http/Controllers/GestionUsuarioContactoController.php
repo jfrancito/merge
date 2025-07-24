@@ -27,6 +27,8 @@ use App\Modelos\WEBRol;
 use App\Modelos\FeRefAsoc;
 
 
+
+
 use Greenter\Parser\DocumentParserInterface;
 use Greenter\Xml\Parser\InvoiceParser;
 use Greenter\Xml\Parser\NoteParser;
@@ -286,6 +288,11 @@ class GestionUsuarioContactoController extends Controller
         /******************************************************/
         View::share('titulo','Lista Documentos Reparable');
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
+
+        CMPDocAsociarCompra::where('TXT_ASIGNADO', 'LIKE', 'ARCHIVO_%')
+            ->where('COD_ESTADO', 0)
+            ->update(['COD_ESTADO' => 1]);
+
 
         $operacion_id       =   'ORDEN_COMPRA';
         $combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO','ESTIBA' => 'ESTIBA');

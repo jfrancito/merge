@@ -2272,24 +2272,10 @@ class GestionOCAdministracionController extends Controller
                     DB::connection($conexionbd)->statement("
                         UPDATE FE_DOCUMENTO 
                         SET COD_CONTACTO = 'ITTR000000000212'
-                        WHERE usuario_pa IN ('1CIX00000187','1CIX00000281')
-                          AND RUC_PROVEEDOR IN ('20600004027','20602740278') 
+                        WHERE usuario_pa IN ('1CIX00000281','1CIX00000187')
                           AND COD_ESTADO = 'ETM0000000000005' 
-                          AND ID_DOCUMENTO NOT IN (
-                              SELECT FE_DOCUMENTO.ID_DOCUMENTO 
-                              FROM FE_DOCUMENTO 
-                              INNER JOIN FE_REF_ASOC ON FE_DOCUMENTO.ID_DOCUMENTO = FE_REF_ASOC.LOTE
-                              INNER JOIN CMP.REFERENCIA_ASOC 
-                                  ON FE_REF_ASOC.ID_DOCUMENTO = CMP.REFERENCIA_ASOC.COD_TABLA 
-                                 AND CMP.REFERENCIA_ASOC.COD_ESTADO = 1
-                              INNER JOIN CMP.DOCUMENTO_CTBLE 
-                                  ON CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE = CMP.REFERENCIA_ASOC.COD_TABLA_ASOC 
-                                 AND CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_DOC IN ('TDO0000000000001','TDO0000000000002')
-                              WHERE usuario_pa IN ('1CIX00000187','1CIX00000281')
-                                AND RUC_PROVEEDOR IN ('20600004027','20602740278')
-                                AND FE_DOCUMENTO.COD_ESTADO = 'ETM0000000000005'
-                              GROUP BY FE_DOCUMENTO.ID_DOCUMENTO, CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE
-                          )
+                          AND COD_CONTACTO <> 'ITTR000000000212'
+                          AND FEC_VENTA >='2025-07-01'
                     ");
 
 

@@ -16,7 +16,9 @@ use App\Modelos\PlaDocumentoHistorial;
 use App\Modelos\STDEmpresa;
 use App\Modelos\CONPeriodo;
 
-
+use App\Modelos\FePlanillaEntregable;
+use App\Modelos\CMPDocAsociarCompra;
+use App\Modelos\Archivo;
 
 use Greenter\Parser\DocumentParserInterface;
 use Greenter\Xml\Parser\InvoiceParser;
@@ -32,6 +34,9 @@ use View;
 use PDF;
 use App\Traits\GeneralesTraits;
 use App\Traits\PlanillaTraits;
+use App\Traits\ComprobanteTraits;
+
+
 
 use Hashids;
 use SplFileInfo;
@@ -41,6 +46,856 @@ class GestionPlanillaMovilidadController extends Controller
 {
     use GeneralesTraits;
     use PlanillaTraits;
+    use ComprobanteTraits;
+
+    public function actionAgregarExtornoContabilidadPLA($idopcion, $idordencompra,Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        $idcab                  =   $idordencompra;
+        $iddocumento            =   $this->funciones->decodificarmaestrapre($idordencompra,'CPLA');
+        View::share('titulo','Extornar Planilla');
+
+        if($_POST)
+        {
+
+            try{    
+                
+                DB::beginTransaction();
+                $feplanillaentrega      =   FePlanillaEntregable::where('ID_DOCUMENTO','=',$iddocumento)->first();
+                $descripcion            =   $request['descripcionextorno'];
+
+
+                //dd($descripcion);
+                //GUARDAR EN EL HISTORIAL QUE SE EXTORNO UN VEZ
+                $documento                              =   new PlaDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $feplanillaentrega->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM              =   1;
+                $documento->FECHA                       =   $this->fechaactual;
+                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                $documento->TIPO                        =   'DOCUMENTO EXTORNADO';
+                $documento->MENSAJE                     =   $descripcion;
+                $documento->save();
+
+                //ANULAR TODA LA OPERACION
+                FePlanillaEntregable::where('ID_DOCUMENTO',$iddocumento)
+                            ->update(
+                                [
+                                    'COD_CATEGORIA_ESTADO'=>'ETM0000000000006',
+                                    'TXT_CATEGORIA_ESTADO'=>'RECHAZADO'
+                                ]
+                            );
+
+
+                DB::table('PLA_MOVILIDAD')
+                    ->where('FOLIO', $feplanillaentrega->FOLIO)
+                    ->update([
+                        'FOLIO_EXTORNO' => DB::raw("FOLIO_EXTORNO + ','")
+                    ]);
+
+                DB::table('PLA_MOVILIDAD')
+                    ->where('FOLIO', $feplanillaentrega->FOLIO)
+                    ->update([
+                        'FOLIO' => '',
+                        'FOLIO_RESERVA' => ''
+                    ]);
+
+                DB::commit();
+                return Redirect::to('gestion-de-aprobar-planilla-consolidada/'.$idopcion)->with('bienhecho', 'Comprobante : '.$feplanillaentrega->ID_DOCUMENTO.' EXTORNADO CON EXITO');
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                return Redirect::to('gestion-de-aprobar-planilla-consolidada/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+        }
+ 
+    }
+
+
+
+
+    public function actionAprobarContabilidadPLA($idopcion, $iddocumento,Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        $idcab                  =   $iddocumento;
+        $iddocumento            =   $this->funciones->decodificarmaestrapre($iddocumento,'CPLA');
+        View::share('titulo','Aprobar Planilla Movilidad Contabilidad');
+
+        if($_POST)
+        {
+            try{    
+            
+                DB::beginTransaction();
+                $feplanillaentrega      =   FePlanillaEntregable::where('ID_DOCUMENTO','=',$iddocumento)->first();
+                $descripcion            =   $request['descripcion'];
+                $nro_cuenta_contable    =   $request['nro_cuenta_contable'];
+
+
+                if(rtrim(ltrim($descripcion)) != ''){
+                    //HISTORIAL DE DOCUMENTO APROBADO
+                    $documento                              =   new PlaDocumentoHistorial;
+                    $documento->ID_DOCUMENTO                =   $feplanillaentrega->ID_DOCUMENTO;
+                    $documento->DOCUMENTO_ITEM              =   1;
+                    $documento->FECHA                       =   $this->fechaactual;
+                    $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                    $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                    $documento->TIPO                        =   'ACOTACION POR CONTABILIDAD';
+                    $documento->MENSAJE                     =   $descripcion;
+                    $documento->save();
+                }
+
+                FePlanillaEntregable::where('ID_DOCUMENTO',$feplanillaentrega->ID_DOCUMENTO)
+                            ->update(
+                                [
+                                    'COD_CATEGORIA_ESTADO'=>'ETM0000000000005',
+                                    'TXT_CATEGORIA_ESTADO'=>'APROBADO',
+                                    'COD_USUARIO_CONTA'=>Session::get('usuario')->id,
+                                    'TXT_USUARIO_CONTA'=>Session::get('usuario')->nombre,
+                                    'FECHA_CONTABILIDAD'=>$this->fechaactual
+                                ]
+                            );
+
+                PlaMovilidad::where('FOLIO',$feplanillaentrega->FOLIO)
+                            ->update(
+                                [
+                                    'NRO_CUENTA'=>$nro_cuenta_contable
+                                ]
+                            );
+
+
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento                              =   new PlaDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $feplanillaentrega->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM              =   1;
+                $documento->FECHA                       =   $this->fechaactual;
+                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                $documento->TIPO                        =   'APROBADO POR CONTABILIDAD';
+                $documento->MENSAJE                     =   '';
+                $documento->save();
+
+                DB::commit();
+                return Redirect::to('/gestion-de-aprobar-planilla-consolidada/'.$idopcion)->with('bienhecho', 'Planilla Movilidad : '.$feplanillaentrega->CODIGO.' APROBADO CON EXITO');
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                return Redirect::to('/gestion-de-aprobar-planilla-consolidada/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+        }
+        else{
+
+
+            $feplanillaentrega      =   FePlanillaEntregable::where('ID_DOCUMENTO','=',$iddocumento)->first();
+
+            $usercre                =   User::where('id','=',$feplanillaentrega->COD_USUARIO_EMITE)->first();
+            $trabajadorcrea         =   STDTrabajador::where('COD_TRAB','=',$usercre->usuarioosiris_id)->first();
+            $dni                    =   $trabajadorcrea->NRO_DOCUMENTO;
+            $planillamovilidad      =   PlaMovilidad::where('FOLIO','=',$feplanillaentrega->FOLIO)
+                                        ->pluck('ID_DOCUMENTO')
+                                        ->toArray();
+            $detplanillamovilidad   =   PlaDetMovilidad::whereIn('ID_DOCUMENTO', $planillamovilidad)
+                                        ->where('ACTIVO','=','1')->orderby('FECHA_GASTO','ASC')->get();
+            $nombre_responsable     =   $trabajadorcrea->TXT_NOMBRES.' '.$trabajadorcrea->TXT_APE_PATERNO.' '.$trabajadorcrea->TXT_APE_MATERNO;
+            $empresa                =   STDEmpresa::where('COD_EMPR','=',$feplanillaentrega->COD_EMPRESA)->first();
+            $ruc                    =   $empresa->NRO_DOCUMENTO;
+            $direccion              =   $this->gn_direccion_fiscal();
+            $lugares_trabajo        =   DB::table('PLA_MOVILIDAD')
+                                        ->selectRaw("STUFF((
+                                            SELECT DISTINCT ' / ' + TXT_DIRECCION
+                                            FROM PLA_MOVILIDAD p2
+                                            WHERE p2.FOLIO = PLA_MOVILIDAD.FOLIO
+                                            FOR XML PATH('')
+                                        ), 1, 3, '') AS DIRECCIONES_CONCATENADAS")
+                                        ->where('FOLIO', $feplanillaentrega->FOLIO)
+                                        ->first();
+
+            $planillamovilidadglosas =   PlaMovilidad::where('FOLIO','=',$feplanillaentrega->FOLIO)
+                                        ->get();
+            $documentohistorial     =   PlaDocumentoHistorial::where('ID_DOCUMENTO','=',$iddocumento)->orderby('FECHA','DESC')->get();
+            $archivospdf            =   Archivo::where('ID_DOCUMENTO','=',$iddocumento)->where('EXTENSION', 'like', '%'.'pdf'.'%')->get();
+            $ocultar                =   "";
+            // Construir el array de URLs
+            $initialPreview = [];
+            foreach ($archivospdf as $archivo) {
+                $initialPreview[] = route('serve-filepla', ['file' => $archivo->NOMBRE_ARCHIVO]);
+            }
+            $initialPreviewConfig = [];
+
+            foreach ($archivospdf as $key => $archivo) {
+                $valor                = '';
+                if($key>0){
+                    $valor            = 'ocultar';
+                }
+                $initialPreviewConfig[] = [
+                    'type'          => "pdf",
+                    'caption'       => $archivo->NOMBRE_ARCHIVO,
+                    'downloadUrl'   => route('serve-filelg', ['file' => $archivo->NOMBRE_ARCHIVO]),
+                    'frameClass'    => $archivo->ID_DOCUMENTO.$archivo->DOCUMENTO_ITEM.' '.$valor //
+                ];
+            }
+
+            //dd($initialPreviewConfig);
+
+            return View::make('planillamovilidad/aprobarcontabilidadpla', 
+                            [
+                                'feplanillaentrega'     =>  $feplanillaentrega,
+                                'documentohistorial'    =>  $documentohistorial,
+                                'idopcion'              =>  $idopcion,
+                                'idcab'                 =>  $idcab,
+                                'iddocumento'           =>  $iddocumento,
+                                'initialPreview'        => json_encode($initialPreview),
+                                'initialPreviewConfig'  => json_encode($initialPreviewConfig),      
+                            ]);
+
+
+        }
+    }
+
+
+
+
+    public function actionAprobarPlanillaMovilidadContabilidad($idopcion,Request $request)
+    {
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Ver');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        View::share('titulo','Lista Planilla de Movilidad Consolidada (contabilidad)');
+        $tab_id             =   'oc';
+        if(isset($request['tab_id'])){
+            $tab_id             =   $request['tab_id'];
+        }
+        $empresa_id     =   Session::get('empresas')->COD_EMPR;
+
+
+        $listadatos         =   $this->pl_lista_cabecera_comprobante_total_contabilidad($empresa_id);
+        $listadatos_obs     =   array();
+        $listadatos_obs_le  =   array();
+
+        // $listadatos_obs     =   $this->lg_lista_cabecera_comprobante_total_obs_contabilidad();
+        // $listadatos_obs_le  =   $this->lg_lista_cabecera_comprobante_total_obs_le_contabilidad();
+        $funcion            =   $this;
+        return View::make('planillamovilidad/listaplanillaconsolidadacontabilidad',
+                         [
+                            'listadatos'        =>  $listadatos,
+                            'listadatos_obs'    =>  $listadatos_obs,
+                            'listadatos_obs_le' =>  $listadatos_obs_le,
+                            'tab_id'            =>  $tab_id,
+                            'funcion'           =>  $funcion,
+                            'idopcion'          =>  $idopcion,
+                         ]);
+    }
+
+
+
+    public function actionGuardarComprobanteconsolidado($idopcion, $idordencompra,Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        $idoc                   =   $idordencompra;
+        $fedocumento            =   FePlanillaEntregable::where('ID_DOCUMENTO','=',$idoc)->first();
+        View::share('titulo','Subir Comprobante Consolidado');
+
+        if($_POST)
+        {
+
+            try{    
+                
+                DB::beginTransaction();
+                $pedido_id          =   $idoc;
+                $fedocumento        =   FePlanillaEntregable::where('ID_DOCUMENTO','=',$pedido_id)->first();
+                $tarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$pedido_id)->where('COD_ESTADO','=',1)
+                                        ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000038')
+                                        ->get();
+                foreach($tarchivos as $index => $item){
+                    $filescdm          =   $request[$item->COD_CATEGORIA_DOCUMENTO];
+                    if(!is_null($filescdm)){
+                        foreach($filescdm as $file){
+                            $TIPO_ARCHIVO = $item->COD_CATEGORIA_DOCUMENTO;
+                            $DESCRIPCION_ARCHIVO = $item->NOM_CATEGORIA_DOCUMENTO;
+                            $contadorArchivos = Archivo::count();
+                            $nombre          =      $pedido_id.'-'.$file->getClientOriginalName();
+                            /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
+                            $prefijocarperta =      $this->prefijo_empresa($fedocumento->COD_EMPRESA);
+                            $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$pedido_id;
+                            // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
+                            $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                            $valor           =      $this->versicarpetanoexiste($rutafile);
+                            $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
+                            copy($file->getRealPath(),$rutacompleta);
+                            $path            =      $rutacompleta;
+
+                            $nombreoriginal             =   $file->getClientOriginalName();
+                            $info                       =   new SplFileInfo($nombreoriginal);
+                            $extension                  =   $info->getExtension();
+                            $dcontrol                       =   new Archivo;
+                            $dcontrol->ID_DOCUMENTO         =   $pedido_id;
+                            $dcontrol->DOCUMENTO_ITEM       =   1;
+                            $dcontrol->TIPO_ARCHIVO         =   $TIPO_ARCHIVO;
+                            $dcontrol->NOMBRE_ARCHIVO       =   $nombrefilecdr;
+                            $dcontrol->DESCRIPCION_ARCHIVO  =   $DESCRIPCION_ARCHIVO;
+                            $dcontrol->URL_ARCHIVO          =   $path;
+                            $dcontrol->SIZE                 =   filesize($file);
+                            $dcontrol->EXTENSION            =   $extension;
+                            $dcontrol->ACTIVO               =   1;
+                            $dcontrol->FECHA_CREA           =   $this->fechaactual;
+                            $dcontrol->USUARIO_CREA         =   Session::get('usuario')->id;
+                            $dcontrol->save();
+                        }
+                    }
+                }
+
+
+                FePlanillaEntregable::where('ID_DOCUMENTO',$pedido_id)
+                ->update(
+                    [
+                        'COD_CATEGORIA_ESTADO'=>'ETM0000000000003',
+                        'TXT_CATEGORIA_ESTADO'=>'POR APROBAR CONTABILIDAD'
+                    ]
+                );
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento                              =   new PlaDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $pedido_id;
+                $documento->DOCUMENTO_ITEM              =   1;
+                $documento->FECHA                       =   $this->fechaactual;
+                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                $documento->TIPO                        =   'PDF CONSOLIDADO ADJUNTADO';
+                $documento->MENSAJE                     =   '';
+                $documento->save();
+
+                DB::commit();
+                return Redirect::to('/gestion-de-planilla-consolidada/'.$idopcion)->with('bienhecho', 'Comprobante : '.$pedido_id.' ADJUNTADO CON EXITO');
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                return Redirect::to('gestion-de-planilla-consolidada/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+
+        }
+
+    }
+
+
+
+
+
+    public function actionListarAjaxModalPLanillaConsolidadoSubir(Request $request)
+    {
+        
+        $cod_orden              =   $request['data_requerimiento_id'];
+        $idopcion               =   $request['idopcion'];
+        $feplanillaentrega      =   FePlanillaEntregable::where('ID_DOCUMENTO','=',$cod_orden)->first();
+        $archivosdelfe          =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000038'])
+                                    ->get();
+
+        DB::table('CMP.DOC_ASOCIAR_COMPRA')->where('COD_ORDEN','=',$cod_orden)
+                                           ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000038')->delete();
+
+        foreach($archivosdelfe as $index=>$item){
+                $categoria                               =   CMPCategoria::where('COD_CATEGORIA','=',$item->COD_CATEGORIA)->first();
+                $docasociar                              =   New CMPDocAsociarCompra;
+                $docasociar->COD_ORDEN                   =   $cod_orden;
+                $docasociar->COD_CATEGORIA_DOCUMENTO     =   $categoria->COD_CATEGORIA;
+                $docasociar->NOM_CATEGORIA_DOCUMENTO     =   $categoria->NOM_CATEGORIA;
+                $docasociar->IND_OBLIGATORIO             =   $categoria->IND_DOCUMENTO_VAL;
+                $docasociar->TXT_FORMATO                 =   $categoria->COD_CTBLE;
+                $docasociar->TXT_ASIGNADO                =   $categoria->TXT_ABREVIATURA;
+                $docasociar->COD_USUARIO_CREA_AUD        =   Session::get('usuario')->id;
+                $docasociar->FEC_USUARIO_CREA_AUD        =   $this->fechaactual;
+                $docasociar->COD_ESTADO                  =   1;
+                $docasociar->TIP_DOC                     =   $categoria->CODIGO_SUNAT;
+                $docasociar->save();
+        }
+
+        $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$cod_orden)->where('COD_ESTADO','=',1)
+                                    ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000038'])
+                                    ->get();
+
+        return View::make('planillamovilidad/modal/ajax/magregarpdfplanillaconsolidado',
+                         [          
+                            'cod_orden'             => $cod_orden,
+                            'idopcion'              => $idopcion,
+                            'feplanillaentrega'     => $feplanillaentrega,
+                            'tarchivos'             => $tarchivos,
+                            'ajax'                  => true,                            
+                         ]);
+    }
+
+
+
+
+
+
+    public function actionListarEntregaDocumentoFolioPla($idopcion)
+    {
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Ver');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        View::share('titulo','Lista de Folio de Planilla Movilidad');
+        $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
+        $empresa_id     =   Session::get('empresas')->COD_EMPR;
+
+        $listadatos     =   $this->pl_lista_planilla_moilidad_consolidado($empresa_id);
+
+        $funcion        =   $this;
+        return View::make('planillamovilidad/listaentregadocumentofoliopla',
+                         [
+                            'listadatos'        =>  $listadatos,
+                            'funcion'           =>  $funcion,
+                            'idopcion'          =>  $idopcion,
+                         ]);
+    }
+
+
+    public function actionPDFPlanillaMovilidadConsolidada($iddocumento,Request $request)
+    {
+        $idcab                  =   $iddocumento;
+        $iddocumento            =   $idcab;
+        $feplanillaentrega      =   FePlanillaEntregable::where('ID_DOCUMENTO','=',$iddocumento)->first();
+        $usercre                =   User::where('id','=',$feplanillaentrega->COD_USUARIO_EMITE)->first();
+        $trabajadorcrea         =   STDTrabajador::where('COD_TRAB','=',$usercre->usuarioosiris_id)->first();
+        $dni                    =   $trabajadorcrea->NRO_DOCUMENTO;
+        $planillamovilidad      =   PlaMovilidad::where('FOLIO','=',$feplanillaentrega->FOLIO)
+                                    ->pluck('ID_DOCUMENTO')
+                                    ->toArray();
+        $detplanillamovilidad   =   PlaDetMovilidad::whereIn('ID_DOCUMENTO', $planillamovilidad)
+                                    ->where('ACTIVO','=','1')->orderby('FECHA_GASTO','ASC')->get();
+        $nombre_responsable     =   $trabajadorcrea->TXT_NOMBRES.' '.$trabajadorcrea->TXT_APE_PATERNO.' '.$trabajadorcrea->TXT_APE_MATERNO;
+        $empresa                =   STDEmpresa::where('COD_EMPR','=',$feplanillaentrega->COD_EMPRESA)->first();
+        $ruc                    =   $empresa->NRO_DOCUMENTO;
+        $direccion              =   $this->gn_direccion_fiscal();
+        $lugares_trabajo        =   DB::table('PLA_MOVILIDAD')
+                                    ->selectRaw("STUFF((
+                                        SELECT DISTINCT ' / ' + TXT_DIRECCION
+                                        FROM PLA_MOVILIDAD p2
+                                        WHERE p2.FOLIO = PLA_MOVILIDAD.FOLIO
+                                        FOR XML PATH('')
+                                    ), 1, 3, '') AS DIRECCIONES_CONCATENADAS")
+                                    ->where('FOLIO', $feplanillaentrega->FOLIO)
+                                    ->first();
+
+        $planillamovilidadglosas =   PlaMovilidad::where('FOLIO','=',$feplanillaentrega->FOLIO)
+                                    ->get();
+
+        
+
+
+        $pdf = PDF::loadView('pdffa.planillamovilidadconsolidada', [ 
+                'iddocumento'           => $iddocumento,
+                'feplanillaentrega'     => $feplanillaentrega, 
+                'dni'                   => $dni, 
+                'planillamovilidad'     => $planillamovilidad,
+                'detplanillamovilidad'  => $detplanillamovilidad,
+                'ruc'                   => $ruc,
+                'nombre_responsable'    => $nombre_responsable,
+                'lugares_trabajo'       => $lugares_trabajo,
+                'planillamovilidadglosas'       => $planillamovilidadglosas,
+                'direccion'             => $direccion,
+            ])->setPaper('a4', 'landscape'); 
+
+        return $pdf->stream($feplanillaentrega->ID_DOCUMENTO.'.pdf');
+
+    }
+
+
+
+
+
+    public function actionEntregableGuardarFolioEntregablePla($idopcion,Request $request)
+    {
+        try{
+            DB::beginTransaction();
+
+            $folio                                  =   $request['folio'];
+            $glosa_g                                =   $request['glosa_g'];
+            $id_documento                           =   $request['ID_DOCUMENTO'];
+
+
+            FePlanillaEntregable::where('FOLIO','=',$folio)
+                        ->update(
+                            [
+                                'SELECCION'=>0,
+                                'FEC_EMISION'=>$this->fecha_sin_hora,
+                                'COD_USUARIO_EMITE'=>Session::get('usuario')->id,
+                                'TXT_USUARIO_EMITE'=>Session::get('usuario')->nombre,
+                                'TXT_GLOSA'=>$glosa_g,
+                                'COD_CATEGORIA_ESTADO'=>'ETM0000000000011',
+                                'TXT_CATEGORIA_ESTADO'=>'POR SUBIR CONSOLIDADO',
+                                'USUARIO_MOD'=>Session::get('usuario')->id,
+                                'FECHA_MOD'=>$this->fechaactual
+                            ]
+                        );
+
+            PlaMovilidad::where('FOLIO_RESERVA',$folio)
+                        ->update(
+                            [
+                                'FOLIO'=>$folio
+                            ]
+                        );
+
+            $documento                              =   new PlaDocumentoHistorial;
+            $documento->ID_DOCUMENTO                =   $id_documento;
+            $documento->DOCUMENTO_ITEM              =   1;
+            $documento->FECHA                       =   $this->fechaactual;
+            $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+            $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+            $documento->TIPO                        =   'EMITIDO POR EL USUARIO';
+            $documento->MENSAJE                     =   '';
+            $documento->save();
+
+            DB::commit();
+            return Redirect::to('gestion-de-consolidar-planilla/'.$idopcion)->with('bienhecho', 'Folio '.$folio.' creado con exito');
+        }catch(\Exception $ex){
+            DB::rollback(); 
+            return Redirect::to('gestion-de-consolidar-planilla/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+        }
+    }
+
+
+
+    public function actionEntregableDetalleFolioPagoPla(Request $request)
+    {
+        $data_folio             =   $request['data_folio'];
+        $lfedocumento           =   PlaMovilidad::where('FOLIO_RESERVA','=',$data_folio)->orderby('TXT_TRABAJADOR','asc')->get();
+
+        $mensaje                =   "";
+        $entregagle_a           =   FePlanillaEntregable::where('FOLIO','=',$data_folio)->first();
+        $funcion                =   $this;
+        return View::make('planillamovilidad/modal/ajax/mdetallefoliopla',
+                         [
+                            'lfedocumento'      =>  $lfedocumento,
+                            'data_folio'        =>  $data_folio,
+                            'entregagle_a'      =>  $entregagle_a,
+                            'mensaje'           =>  $mensaje,
+                            'funcion'           =>  $funcion
+                         ]);
+    }
+
+
+
+    public function actionEntregableCrearFolioPla(Request $request)
+    {
+
+        $check                  =   $request['check'];
+        $id                     =   $request['id'];
+        $folio_sel              =   $request['folio_sel'];
+        $data                   =   array();
+        $mensaje                =   "";
+        $ope_ind                =   "0";
+        $lote_ver               =   "";
+
+        $entregable             =   FePlanillaEntregable::where('FOLIO','=',$folio_sel)
+                                    ->first();
+        $fedocumento_encontro   =   PlaMovilidad::where('ID_DOCUMENTO',$id)->first();
+
+        if($check==1){
+            //validacion si ya esta en otro folio
+                //SI NO ESTA NULL O VACIO TIENE ALGO
+            if (!empty($fedocumento_encontro->FOLIO_RESERVA)) {
+                $mensaje            =   "Este Documento ya tiene un folio asigando ".$fedocumento_encontro->FOLIO_RESERVA;
+                $ope_ind            =   "1";
+            }
+            if($entregable->COD_PERIODO != $fedocumento_encontro->COD_PERIODO){
+                $mensaje            =   "Este Documento esta no pertenece al Periodo del LOTE";
+                $ope_ind            =   "1";
+            }
+        }
+
+        if($ope_ind=="0"){
+
+            if($check==1){
+
+                PlaMovilidad::where('ID_DOCUMENTO','=',$fedocumento_encontro->ID_DOCUMENTO)
+                            ->update(
+                                [
+                                    'FOLIO_RESERVA'=>$folio_sel
+                                ]
+                            );
+                $fedocumentos =  PlaMovilidad::where('FOLIO_RESERVA','=',$folio_sel)->get();
+                FePlanillaEntregable::where('FOLIO','=',$folio_sel)
+                            ->update(
+                                [
+                                    'CAN_FOLIO'=>count($fedocumentos)
+                                ]
+                            );
+                $lote_ver               =   $entregable->FOLIO . ' ('.count($fedocumentos).')';
+
+            }else{
+
+                PlaMovilidad::where('ID_DOCUMENTO','=',$fedocumento_encontro->ID_DOCUMENTO)
+                            ->update(
+                                [
+                                    'FOLIO_RESERVA'=>''
+                                ]
+                            );
+
+                $fedocumentos =  PlaMovilidad::where('FOLIO_RESERVA','=',$folio_sel)->get();
+                FeDocumentoEntregable::where('FOLIO','=',$folio_sel)
+                            ->update(
+                                [
+                                    'CAN_FOLIO'=>count($fedocumentos)
+                                ]
+                            );
+                $lote_ver               =   $entregable->FOLIO . ' ('.count($fedocumentos).')';
+
+            }
+            $mensaje                =   "Este Documento tiene que ser de un contrato";    
+            $data                   =   [
+                                            'mensaje'   => $mensaje,
+                                            'lote_ver'  => $lote_ver,
+                                            'check'     => $check,
+                                            'ope_ind'   => $ope_ind
+                                        ];
+
+        }else{
+
+            $data                   =   [
+                                            'mensaje'   => $mensaje, 
+                                            'lote_ver'  => $lote_ver,
+                                            'check'     => $check,
+                                            'ope_ind'   => $ope_ind
+                                        ];
+
+
+        }
+
+        return response()->json($data); // Enviar la respuesta como JSON
+
+
+    }
+
+
+
+    public function actionEntregableExtornoFolioPagoPla(Request $request)
+    {
+        $data_folio             =   $request['data_folio'];
+        FePlanillaEntregable::where('FOLIO','=',$data_folio)
+                    ->update(
+                        [
+                            'COD_ESTADO'=>0,
+                            'COD_CATEGORIA_ESTADO'=>'ETM0000000000006',
+                            'TXT_CATEGORIA_ESTADO'=>'RECHAZADO'
+                        ]
+                    );
+        PlaMovilidad::where('FOLIO_RESERVA','=',$data_folio)
+                    ->update(
+                        [
+                            'FOLIO_RESERVA'=>''
+                        ]
+                    );
+    }
+
+
+    public function actionEntregableSelectFolioPagoLg(Request $request)
+    {
+
+        $data_folio             =   $request['data_folio'];
+        FePlanillaEntregable::where('COD_CATEGORIA_ESTADO','=','ETM0000000000001')
+                    ->where('COD_ESTADO','=','1')
+                    ->where('USUARIO_CREA','=',Session::get('usuario')->id)
+                    ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                    ->update(
+                        [
+                            'SELECCION'=>0
+                        ]
+                    );
+
+        $feentregable           =   FePlanillaEntregable::where('FOLIO','=',$data_folio)
+                                    ->first();
+        $feentregable->SELECCION = 1;
+        $feentregable->save();
+    }
+
+
+
+    public function actionEntregableCrearFolioEntregablePla($idopcion,Request $request)
+    {
+        try{
+
+            DB::beginTransaction();
+            $periodo_id                             =   $request['periodo_id'];
+            $glosa                                  =   $request['glosa'];
+            $empresa_id                             =   Session::get('empresas')->COD_EMPR;
+            $periodo                                =   CONPeriodo::where('COD_PERIODO','=',$periodo_id)->first();
+
+            $trabajador                             =   DB::table('STD.TRABAJADOR')
+                                                        ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                                                        ->first();
+            $dni                                    =   '';
+            $centro_id                              =   '';
+            $anio                                   =   $this->anio;
+            $mes                                    =   $this->mes;
+            if(count($trabajador)>0){
+                $dni        =       $trabajador->NRO_DOCUMENTO;
+            }
+            $trabajadorespla    =   DB::table('WEB.platrabajadores')
+                                    ->where('situacion_id', 'PRMAECEN000000000002')
+                                    ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+                                    ->where('dni', $dni)
+                                    ->first();
+            if(count($trabajador)>0){
+                $centro_id      =       $trabajadorespla->centro_osiris_id;
+            }
+            $serie          =   $this->gn_serie($anio, $mes,$centro_id);
+            $numero         =   $this->gn_numero_pl($serie,$centro_id);
+
+            $centrot        =   DB::table('ALM.CENTRO')
+                                ->where('COD_CENTRO', $centro_id)
+                                ->first();
+
+            $idcab                                  =   $this->funciones->getCreateIdMaestradocpla('FE_PLANILLA_ENTREGABLE','CPLA');
+            $codigo                                 =   $this->funciones->generar_folio('FE_PLANILLA_ENTREGABLE',8);
+            $documento                              =   new FePlanillaEntregable;
+            $documento->ID_DOCUMENTO                =   $idcab;
+            $documento->FOLIO                       =   $codigo;
+            $documento->CAN_FOLIO                   =   0;
+            $documento->SERIE                       =   $serie;
+            $documento->NUMERO                      =   $numero;
+            $documento->COD_ESTADO                  =   1;
+            $documento->USUARIO_CREA                =   Session::get('usuario')->id;
+            $documento->FECHA_CREA                  =   $this->fechaactual;
+            $documento->COD_CENTRO                  =   $centrot->COD_CENTRO;
+            $documento->TXT_CENTRO                  =   $centrot->NOM_CENTRO;
+            $documento->COD_EMPRESA                 =   $empresa_id;
+            $documento->TXT_EMPRESA                 =   Session::get('empresas')->NOM_EMPR;
+            $documento->COD_PERIODO                 =   $periodo->COD_PERIODO;
+            $documento->TXT_PERIODO                 =   $periodo->TXT_NOMBRE;
+            $documento->COD_USUARIO_EMITE           =   Session::get('usuario')->id;
+            $documento->TXT_USUARIO_EMITE           =   Session::get('usuario')->nombre;
+            $documento->COD_CATEGORIA_ESTADO        =   'ETM0000000000001';
+            $documento->TXT_CATEGORIA_ESTADO        =   'GENERADO';
+            $documento->SELECCION                   =   0;
+            $documento->TXT_GLOSA                   =   $glosa;
+            $documento->save();
+            DB::commit();
+
+            return Redirect::to('gestion-de-consolidar-planilla/'.$idopcion)->with('bienhecho', 'Folio '.$codigo.' creado con exito');
+        }catch(\Exception $ex){
+            DB::rollback(); 
+            return Redirect::to('gestion-de-consolidar-planilla/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+        }
+
+
+    }
+
+
+
+    public function actionEntregableModalDetalleFolioPla(Request $request)
+    {
+
+        $idopcion               =   $request['idopcion'];
+        $listadatos             =   FePlanillaEntregable::where('COD_CATEGORIA_ESTADO','=','ETM0000000000001')
+                                    ->where('COD_ESTADO','=','1')
+                                    ->where('USUARIO_CREA','=',Session::get('usuario')->id)
+                                    ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                                    ->get();
+
+        $periodo_id             =   "";
+        $combo_periodo          =   $this->gn_combo_periodo_xempresa(Session::get('empresas')->COD_EMPR, '', 'Seleccione periodo');
+
+        $lfedocumento           =   array();
+        $array_retencion        =   array();
+        $mensaje                =   "";
+        $funcion                =   $this;
+
+        return View::make('planillamovilidad/modal/ajax/madetallefoliocreacionpla',
+                         [
+                            'listadatos'        =>  $listadatos,
+                            'lfedocumento'      =>  $lfedocumento,
+                            'array_retencion'   =>  $array_retencion,
+                            'periodo_id'        =>  $periodo_id,
+                            'combo_periodo'     =>  $combo_periodo,
+
+                            'mensaje'           =>  $mensaje,
+                            'funcion'           =>  $funcion,
+                            'idopcion'          =>  $idopcion,
+                            'periodo_id'        =>  $periodo_id,
+                            'ajax'              =>  true,
+                         ]);
+
+    }
+    public function actionListarAjaxBuscarDocumentoEntregablePla(Request $request) {
+
+        $fecha_inicio   =   $request['fecha_inicio'];
+        $fecha_fin      =   $request['fecha_fin'];
+        $empresa_id     =   $request['empresa_id'];  
+        $idopcion       =   $request['idopcion'];
+        $listadatos     =   $this->pl_lista_planilla_moilidad_sinconsolidar($fecha_inicio,$fecha_fin,$empresa_id);
+        $funcion        =   $this;
+
+        $entregable_sel =   FePlanillaEntregable::where('COD_CATEGORIA_ESTADO','=','ETM0000000000001')
+                            ->where('COD_ESTADO','=','1')
+                            ->where('SELECCION','=','1')
+                            ->where('USUARIO_CREA','=',Session::get('usuario')->id)
+                            ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                            ->first();
+
+
+        return View::make('planillamovilidad/ajax/ajaxlistaplanillaconsolidada',
+                         [
+                            'fecha_inicio'          =>  $fecha_inicio,
+                            'entregable_sel'        =>  $entregable_sel,
+                            'fecha_fin'             =>  $fecha_fin,
+                            'empresa_id'            =>  $empresa_id,
+                            'idopcion'              =>  $idopcion,
+                            'listadatos'            =>  $listadatos,
+                            'ajax'                  =>  true,
+                            'funcion'               =>  $funcion
+                         ]);
+    }
+
+
+    public function actionListarConsolidarPlanilla($idopcion)
+    {
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Ver');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        View::share('titulo','Consolidar Planillas de Movilidad');
+        $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
+        $fecha_inicio   =   $this->fecha_menos_diez_dias;
+        $fecha_fin      =   $this->fecha_sin_hora;
+        $empresa_id     =   Session::get('empresas')->COD_EMPR;
+        $combo_empresa  =   $this->gn_combo_empresa_empresa($empresa_id);
+        $listadatos     =   $this->pl_lista_planilla_moilidad_sinconsolidar($fecha_inicio,$fecha_fin,$empresa_id);
+        $funcion        =   $this;
+
+        $entregable_sel =   FePlanillaEntregable::where('COD_CATEGORIA_ESTADO','=','ETM0000000000001')
+                            ->where('COD_ESTADO','=','1')
+                            ->where('SELECCION','=','1')
+                            ->where('USUARIO_CREA','=',Session::get('usuario')->id)
+                            ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                            ->first();
+
+        return View::make('planillamovilidad/listaconsolidarplanilla',
+                         [
+                            'listadatos'        =>  $listadatos,
+
+                            'funcion'           =>  $funcion,
+                            'idopcion'          =>  $idopcion,
+                            'fecha_inicio'      =>  $fecha_inicio,
+                            'fecha_fin'         =>  $fecha_fin,
+                            'empresa_id'        =>  $empresa_id,
+                            'combo_empresa'     =>  $combo_empresa,
+                            'entregable_sel'    =>  $entregable_sel,
+
+                         ]);
+    }
+
+
+
+
 
 
     public function actionAprobarPlanillaMovilidadAdministracion($idopcion,Request $request)
@@ -979,7 +1834,7 @@ class GestionPlanillaMovilidadController extends Controller
         $funcion            =       $this;
         $fecha_fin          =       $this->fecha_sin_hora;
 
-        $arraymotivo        =       DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','MOTIVO_MOVILIDAD')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
+        $arraymotivo        =       DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','MOTIVO_MOVILIDAD')->where('COD_ESTADO','=','1')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
         $combomotivo        =       array('' => "SELECCIONE MOTIVO") + $arraymotivo;
         $motivo_id          =       '';
 
@@ -1001,6 +1856,55 @@ class GestionPlanillaMovilidadController extends Controller
         $distrito_idll      =       '';
 
 
+
+        $departureQuery = DB::table('PLA_DETMOVILIDAD')
+            ->select(
+                'TXT_LUGARPARTIDA as location',
+                'COD_DEPARTAMENTO_PARTIDA as department_code',
+                'TXT_DEPARTAMENTO_PARTIDA as department_name',
+                'COD_PROVINCIA_PARTIDA as province_code',
+                'TXT_PROVINCIA_PARTIDA as province_name',
+                'COD_DISTRITO_PARTIDA as district_code',
+                'TXT_DISTRITO_PARTIDA as district_name'
+            )
+            ->where('USUARIO_CREA', Session::get('usuario')->id)
+            ->where('ACTIVO', 1)
+            ->groupBy(
+                'TXT_LUGARPARTIDA',
+                'COD_DEPARTAMENTO_PARTIDA',
+                'TXT_DEPARTAMENTO_PARTIDA',
+                'COD_PROVINCIA_PARTIDA',
+                'TXT_PROVINCIA_PARTIDA',
+                'COD_DISTRITO_PARTIDA',
+                'TXT_DISTRITO_PARTIDA'
+            );
+
+        $arrivalQuery = DB::table('PLA_DETMOVILIDAD')
+            ->select(
+                'TXT_LUGARLLEGADA as location',
+                'COD_DEPARTAMENTO_LLEGADA as department_code',
+                'TXT_DEPARTAMENTO_LLEGADA as department_name',
+                'COD_PROVINCIA_LLEGADA as province_code',
+                'TXT_PROVINCIA_LLEGADA as province_name',
+                'COD_DISTRITO_LLEGADA as district_code',
+                'TXT_DISTRITO_LLEGADA as district_name'
+            )
+            ->where('USUARIO_CREA', Session::get('usuario')->id)
+            ->where('ACTIVO', 1)
+            ->groupBy(
+                'TXT_LUGARLLEGADA',
+                'COD_DEPARTAMENTO_LLEGADA',
+                'TXT_DEPARTAMENTO_LLEGADA',
+                'COD_PROVINCIA_LLEGADA',
+                'TXT_PROVINCIA_LLEGADA',
+                'COD_DISTRITO_LLEGADA',
+                'TXT_DISTRITO_LLEGADA'
+            );
+
+        $ldirecciones = $departureQuery->union($arrivalQuery)->get();
+
+
+        //dd($ldirecciones);
         return View::make('planillamovilidad/modal/ajax/magregardetalleplanillamovilidad',
                          [
                             'iddocumento'           =>  $iddocumento,
@@ -1010,6 +1914,7 @@ class GestionPlanillaMovilidadController extends Controller
                             'funcion'               =>  $funcion,
                             'combomotivo'           =>  $combomotivo,
                             'motivo_id'             =>  $motivo_id,
+                            'ldirecciones'          =>  $ldirecciones,
 
                             'combodepartamento'     =>  $combodepartamento,
                             'comboprovincia'        =>  $comboprovincia,
@@ -1039,7 +1944,7 @@ class GestionPlanillaMovilidadController extends Controller
         $motivo_id          =       $dplanillamovilidad->COD_MOTIVO;
         $funcion            =       $this;
         $fecha_fin          =       $this->fecha_sin_hora;
-        $arraymotivo        =       DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','MOTIVO_MOVILIDAD')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
+        $arraymotivo        =       DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','MOTIVO_MOVILIDAD')->where('COD_ESTADO','=','1')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
         $combomotivo        =       array('' => "SELECCIONE MOTIVO") + $arraymotivo;
         $comboestado        =       array('1' => "ACTIVO",'0' => "ELIMINAR");
         $activo             =       $dplanillamovilidad->ACTIVO;
@@ -1059,6 +1964,53 @@ class GestionPlanillaMovilidadController extends Controller
         $combodistritoll    =       $this->gn_generacion_combo_categoria_xid('DISTRITO','Seleccione Distrito','',$provincia_idll); 
         $distrito_idll      =       $dplanillamovilidad->COD_DISTRITO_LLEGADA;
 
+
+        $departureQuery = DB::table('PLA_DETMOVILIDAD')
+            ->select(
+                'TXT_LUGARPARTIDA as location',
+                'COD_DEPARTAMENTO_PARTIDA as department_code',
+                'TXT_DEPARTAMENTO_PARTIDA as department_name',
+                'COD_PROVINCIA_PARTIDA as province_code',
+                'TXT_PROVINCIA_PARTIDA as province_name',
+                'COD_DISTRITO_PARTIDA as district_code',
+                'TXT_DISTRITO_PARTIDA as district_name'
+            )
+            ->where('USUARIO_CREA', Session::get('usuario')->id)
+            ->where('ACTIVO', 1)
+            ->groupBy(
+                'TXT_LUGARPARTIDA',
+                'COD_DEPARTAMENTO_PARTIDA',
+                'TXT_DEPARTAMENTO_PARTIDA',
+                'COD_PROVINCIA_PARTIDA',
+                'TXT_PROVINCIA_PARTIDA',
+                'COD_DISTRITO_PARTIDA',
+                'TXT_DISTRITO_PARTIDA'
+            );
+
+        $arrivalQuery = DB::table('PLA_DETMOVILIDAD')
+            ->select(
+                'TXT_LUGARLLEGADA as location',
+                'COD_DEPARTAMENTO_LLEGADA as department_code',
+                'TXT_DEPARTAMENTO_LLEGADA as department_name',
+                'COD_PROVINCIA_LLEGADA as province_code',
+                'TXT_PROVINCIA_LLEGADA as province_name',
+                'COD_DISTRITO_LLEGADA as district_code',
+                'TXT_DISTRITO_LLEGADA as district_name'
+            )
+            ->where('USUARIO_CREA', Session::get('usuario')->id)
+            ->where('ACTIVO', 1)
+            ->groupBy(
+                'TXT_LUGARLLEGADA',
+                'COD_DEPARTAMENTO_LLEGADA',
+                'TXT_DEPARTAMENTO_LLEGADA',
+                'COD_PROVINCIA_LLEGADA',
+                'TXT_PROVINCIA_LLEGADA',
+                'COD_DISTRITO_LLEGADA',
+                'TXT_DISTRITO_LLEGADA'
+            );
+
+        $ldirecciones       = $departureQuery->union($arrivalQuery)->get();
+
         return View::make('planillamovilidad/modal/ajax/magregardetalleplanillamovilidad',
                          [
                             'iddocumento'           =>  $iddocumento,
@@ -1070,6 +2022,7 @@ class GestionPlanillaMovilidadController extends Controller
                             'combomotivo'           =>  $combomotivo,
                             'motivo_id'             =>  $motivo_id,
                             'comboestado'           =>  $comboestado,
+                            'ldirecciones'          =>  $ldirecciones,
 
                             'combodepartamento'     =>  $combodepartamento,
                             'departamento_id'       =>  $departamento_id,

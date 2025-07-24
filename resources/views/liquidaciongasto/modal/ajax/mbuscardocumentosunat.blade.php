@@ -91,7 +91,7 @@
 	          				<div class="row">
 							    <div class="col-sm-12" style="margin-bottom: 10px;">
 						            <div class="form-group" >
-						              <label class="col-sm-12 control-label">WHATSAPP EJEMPLO : <b>979820173</b></label>
+						              <label class="col-sm-12 control-label">DEJA TU NUMERO DE WHATSAPP PARA ALERTAS : <b>97XXXXXXX</b></label>
 						              <div class="col-sm-12">
 					          	        <div class="input-group xs-mb-15">
 				                         	<input type="text"

@@ -25,6 +25,7 @@
                 </div>
                 <div class='detallemovilidad' style="margin-top:15px;">
                   @include('liquidaciongasto.ajax.amdetalleliquidaciongastos')
+                  <input type="hidden" name="ID_DOCUMENTO" id="ID_DOCUMENTO" value="{{$liquidaciongastos->ID_DOCUMENTO}}">
                 </div>
           </div>
         </div>
@@ -105,6 +106,33 @@
                 },
             }
         });
+        $('#producto_id_factura').select2({
+            // Activamos la opcion "Tags" del plugin
+            width: '100%',
+            placeholder: 'Seleccione una empresa',
+            language: "es",
+            tags: true,
+            tokenSeparators: [','],
+            ajax: {
+                dataType: 'json',
+                url: '{{ url("buscarproducto") }}',
+                delay: 100,
+                data: function(params) {
+                    return {
+                        term: params.term
+                    }
+                },
+                processResults: function (data, page) {
+                  return {
+                    results: data
+                  };
+
+                },
+            }
+        });
+
+
+
 
 
         $('form').parsley();
