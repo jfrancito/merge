@@ -5,7 +5,7 @@
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
 
-<table table id="tablaValeRendirAutoriza" class="table table-striped table-borderless" style="font-style: italic;">
+<table table id="tablaValeRendirAutorizarechazado" class="table table-striped table-borderless" style="font-style: italic;">
      <thead style="background-color: #1d3a6d; color: white;">
         <tr>
             <th>ID</th>
@@ -22,7 +22,7 @@
     </thead>
     <tbody>
     @foreach($listarusuarios as $index=>$item)
-     @if(($item['TXT_CATEGORIA_ESTADO_VALE'] === 'AUTORIZADO' || $item['TXT_CATEGORIA_ESTADO_VALE'] === 'APROBADO') && $item['USUARIO_AUTORIZA_ID'] === $usuario_logueado_id)
+    @if($item['TXT_CATEGORIA_ESTADO_VALE'] === 'RECHAZADO' && $item['USUARIO_AUTORIZA_ID'] === $usuario_logueado_id)
       
         <tr data_vale_rendir="{{$item['ID']}}">
             <td>{{$item['ID']}}</td>
@@ -181,7 +181,7 @@
     
     @endif
 
-    $('#tablaValeRendirAutoriza').DataTable({
+    $('#tablaValeRendirAutorizarechazado').DataTable({
             pageLength: 10,
             order: [[0, 'desc']],
             language: {

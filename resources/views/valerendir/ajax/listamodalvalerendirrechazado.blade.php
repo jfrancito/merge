@@ -1,4 +1,3 @@
-
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
 
@@ -6,7 +5,7 @@
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
 
-<table table id="tablaValeRendir" class="table table-striped table-borderless" style="font-style: italic;">
+<table table id="tablaValeRendirRechazado" class="table table-striped table-borderless" style="font-style: italic;">
   <thead style="background-color: #1d3a6d; color: white;">
         <tr>
             <th>ID</th>
@@ -22,7 +21,8 @@
     </thead>
     <tbody>
     @foreach($listarusuarios as $index=>$item)
-    @if(($item['TXT_CATEGORIA_ESTADO_VALE'] === 'APROBADO' && $item['USUARIO_APRUEBA_ID'] === $usuario_logueado_id))
+    @if($item['TXT_CATEGORIA_ESTADO_VALE'] === 'RECHAZADO' && strtoupper(trim($item['USUARIO_LOGUEADO'])) === strtoupper(trim($usuario_merge)))
+     
         <tr data_vale_rendir="{{$item['ID']}}">
             <td>{{$item['ID']}}</td>
             <td>{{$item['USUARIO']}}</td>
@@ -169,7 +169,7 @@
     
     @endif
 
-     $('#tablaValeRendir').DataTable({
+     $('#tablaValeRendirRechazado').DataTable({
             pageLength: 10,
             order: [[0, 'desc']],
             language: {

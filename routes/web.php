@@ -654,6 +654,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::get('/enviar_correo_aprueba', 'EnviarCorreoValeRendirApruebaController@actionEnviarCorreoVRAprueba');
 
 	Route::get('/rechazar_correo_generado', 'RechazarCorreoValeRendirGeneradoController@actionRechazarCorreoVRGenerado');
+	Route::get('/rechazar_correo_autoriza', 'RechazarCorreoValeRendirAutorizaController@actionRechazarCorreoVRAutoriza');
 
 
 	
