@@ -3020,10 +3020,23 @@ class GestionUsuarioContactoController extends Controller
 
 
             $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
+
+            $arrayarchivos          =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                        ->pluck('TIPO_ARCHIVO')
+                                        ->toArray();
+
+            $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+                                        ->pluck('COD_CATEGORIA_DOCUMENTO')
+                                        ->toArray();
+
+
             $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
-                                        //->where('IND_OBLIGATORIO','=',1)
+                                        ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
                                         ->where('TXT_ASIGNADO','=','CONTACTO')
                                         ->get();
+
+
+
             $documentohistorial     =   FeDocumentoHistorial::where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                                         ->orderBy('FECHA','DESC')
                                         ->get();
