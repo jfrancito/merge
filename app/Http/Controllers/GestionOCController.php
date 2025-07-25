@@ -1399,9 +1399,6 @@ class GestionOCController extends Controller
         $combocb                =   array('' => "Seleccione Cuenta Bancaria");
         $combopagodetraccion    =   array('' => "Seleccione Pago Detraccion", $ordencompra_f->COD_EMPR_CLIENTE => $ordencompra_f->TXT_EMPR_CLIENTE , $ordencompra_f->COD_EMPR => Session::get('empresas')->NOM_EMPR);
 
-
-
-
         return View::make('comprobante/registrocomprobanteproveedor',
                          [
                             'ordencompra'           =>  $ordencompra,
