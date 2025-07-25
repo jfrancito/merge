@@ -110,6 +110,7 @@ trait PlanillaTraits
                     function($join) {
                         $join->on('PLA_MOVILIDAD.ID_DOCUMENTO', '=', 'fechas.ID_DOCUMENTO');
                     })
+                ->whereRaw("PLA_MOVILIDAD.FOLIO = '' AND PLA_MOVILIDAD.FOLIO IS NULL")
                 ->where('LQG_LIQUIDACION_GASTO.COD_ESTADO', 'ETM0000000000005')
                 ->where('LQG_DETLIQUIDACIONGASTO.COD_TIPODOCUMENTO', 'TDO0000000000070')
                 ->where('LQG_DETLIQUIDACIONGASTO.ACTIVO', 1)
@@ -121,30 +122,31 @@ trait PlanillaTraits
 
         }else{
 
-            $listadatos = DB::table('LQG_LIQUIDACION_GASTO')
-                ->select(
-                    'PLA_MOVILIDAD.*',
-                    'fechas.FECHA_INICIO',
-                    'fechas.FECHA_FIN'
-                )
-                ->join('LQG_DETLIQUIDACIONGASTO', 'LQG_LIQUIDACION_GASTO.ID_DOCUMENTO', '=', 'LQG_DETLIQUIDACIONGASTO.ID_DOCUMENTO')
-                ->join('PLA_MOVILIDAD', 'PLA_MOVILIDAD.ID_DOCUMENTO', '=', 'LQG_DETLIQUIDACIONGASTO.COD_PLA_MOVILIDAD')
-                ->join(DB::raw('(SELECT ID_DOCUMENTO, 
-                                MIN(FECHA_GASTO) AS FECHA_INICIO, 
-                                MAX(FECHA_GASTO) AS FECHA_FIN
-                            FROM PLA_DETMOVILIDAD
-                            GROUP BY ID_DOCUMENTO) fechas'), 
-                    function($join) {
-                        $join->on('PLA_MOVILIDAD.ID_DOCUMENTO', '=', 'fechas.ID_DOCUMENTO');
-                    })
-                ->where('LQG_LIQUIDACION_GASTO.COD_ESTADO', 'ETM0000000000005')
-                ->where('LQG_DETLIQUIDACIONGASTO.COD_TIPODOCUMENTO', 'TDO0000000000070')
-                ->where('LQG_DETLIQUIDACIONGASTO.ACTIVO', 1)
-                ->where('PLA_MOVILIDAD.USUARIO_CREA','=',Session::get('usuario')->id)
-                ->where('PLA_MOVILIDAD.COD_EMPRESA','=',$empresa_id)
-                ->where('fechas.FECHA_INICIO', '>=', $fecha_inicio)
-                ->where('fechas.FECHA_FIN', '<=', $fecha_fin)
-                ->get();
+            $listadatos     =       DB::table('LQG_LIQUIDACION_GASTO')
+                                    ->select(
+                                        'PLA_MOVILIDAD.*',
+                                        'fechas.FECHA_INICIO',
+                                        'fechas.FECHA_FIN'
+                                    )
+                                    ->join('LQG_DETLIQUIDACIONGASTO', 'LQG_LIQUIDACION_GASTO.ID_DOCUMENTO', '=', 'LQG_DETLIQUIDACIONGASTO.ID_DOCUMENTO')
+                                    ->join('PLA_MOVILIDAD', 'PLA_MOVILIDAD.ID_DOCUMENTO', '=', 'LQG_DETLIQUIDACIONGASTO.COD_PLA_MOVILIDAD')
+                                    ->join(DB::raw('(SELECT ID_DOCUMENTO, 
+                                                    MIN(FECHA_GASTO) AS FECHA_INICIO, 
+                                                    MAX(FECHA_GASTO) AS FECHA_FIN
+                                                FROM PLA_DETMOVILIDAD
+                                                GROUP BY ID_DOCUMENTO) fechas'), 
+                                        function($join) {
+                                            $join->on('PLA_MOVILIDAD.ID_DOCUMENTO', '=', 'fechas.ID_DOCUMENTO');
+                                        })
+                                    ->where('LQG_LIQUIDACION_GASTO.COD_ESTADO', 'ETM0000000000005')
+                                    ->where('LQG_DETLIQUIDACIONGASTO.COD_TIPODOCUMENTO', 'TDO0000000000070')
+                                    ->whereRaw("PLA_MOVILIDAD.FOLIO = '' AND PLA_MOVILIDAD.FOLIO IS NULL")
+                                    ->where('LQG_DETLIQUIDACIONGASTO.ACTIVO', 1)
+                                    ->where('PLA_MOVILIDAD.USUARIO_CREA','=',Session::get('usuario')->id)
+                                    ->where('PLA_MOVILIDAD.COD_EMPRESA','=',$empresa_id)
+                                    ->where('fechas.FECHA_INICIO', '>=', $fecha_inicio)
+                                    ->where('fechas.FECHA_FIN', '<=', $fecha_fin)
+                                    ->get();
 
 
         }
