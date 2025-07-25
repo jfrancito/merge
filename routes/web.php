@@ -156,6 +156,8 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	//PLANILLA MOVILIDAD
 	Route::any('/gestion-de-planilla-movilidad/{idopcion}', 'GestionPlanillaMovilidadController@actionListarPlanillaMovilidad');
+	Route::any('/ajax-buscar-documento-fe-entregable-pla-mob', 'GestionPlanillaMovilidadController@actionListarPlanillaMovilidadMobil');
+
 	Route::any('/agregar-planilla-movilidad/{idopcion}', 'GestionPlanillaMovilidadController@actionAgregarPlanillaMovilidad');
 	Route::any('/modificar-planilla-movilidad/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadController@actionModificarPlanillaMovilidad');
 

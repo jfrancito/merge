@@ -4100,7 +4100,7 @@ trait ComprobanteTraits
                                 ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR)
                                 ->whereBetween('TES.FEC_MOVIMIENTO_CAJABANCO', [$fecha_inicio, $fecha_fin]);
 
-                $consulta3 = DB::table('TES.OPERACION_CAJA as TES')
+                    $consulta3 = DB::table('TES.OPERACION_CAJA as TES')
                                 ->leftJoin('FE_REF_ASOC', function ($leftJoin){
                                     $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'TES.COD_OPERACION_CAJA')
                                             ->where('FE_REF_ASOC.COD_ESTADO', '=', '1')

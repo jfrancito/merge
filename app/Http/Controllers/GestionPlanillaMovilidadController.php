@@ -1121,7 +1121,29 @@ class GestionPlanillaMovilidadController extends Controller
 
 
 
+    public function actionListarPlanillaMovilidadMobil(Request $request) {
 
+        $fecha_inicio   =   $request['fecha_inicio'];
+        $fecha_fin      =   $request['fecha_fin'];
+        $idopcion       =   $request['idopcion'];
+        $funcion        =   $this;
+        $planillamovilidad  =   PlaMovilidad::where('ACTIVO','=','1')
+                                ->whereRaw("CAST(FECHA_CREA  AS DATE) >= ? and CAST(FECHA_CREA  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                ->where('USUARIO_CREA','=',Session::get('usuario')->id)
+                                ->where('COD_EMPRESA','=', Session::get('empresas')->COD_EMPR)
+                                ->orderby('FECHA_CREA','DESC')->get();
+
+
+        return View::make('planillamovilidad/ajax/alistaplanillamovilidad',
+                         [
+                            'fecha_inicio'          =>  $fecha_inicio,
+                            'fecha_fin'             =>  $fecha_fin,
+                            'idopcion'              =>  $idopcion,
+                            'planillamovilidad'     =>  $planillamovilidad,
+                            'ajax'                  =>  true,
+                            'funcion'               =>  $funcion
+                         ]);
+    }
 
 
     public function actionListarPlanillaMovilidad($idopcion)

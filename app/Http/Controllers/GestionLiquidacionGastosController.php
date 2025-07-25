@@ -86,17 +86,68 @@ class GestionLiquidacionGastosController extends Controller
         $tdetliquidaciongastosel=   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','0')->get();
         $archivospdf            =   Archivo::where('ID_DOCUMENTO','=',$iddocumento)->where('EXTENSION', 'like', '%'.'pdf'.'%')->get();
         $ocultar                =   "";
-        $productosagru          =   DB::table('LQG_DETDOCUMENTOLIQUIDACIONGASTO')
-                                    ->join('LQG_DETLIQUIDACIONGASTO', function($join) {
-                                        $join->on('LQG_DETDOCUMENTOLIQUIDACIONGASTO.ID_DOCUMENTO', '=', 'LQG_DETLIQUIDACIONGASTO.ID_DOCUMENTO')
-                                             ->on('LQG_DETDOCUMENTOLIQUIDACIONGASTO.ITEM', '=', 'LQG_DETLIQUIDACIONGASTO.ITEM'); // Condición adicional
+
+        $arendir                =   DB::table('WEB.VALE_RENDIR')
+                                    ->where('ID', $liquidaciongastos->ARENDIR_ID)
+                                    ->first(); 
+
+        $productosagru          =   DB::table('LQG_DETDOCUMENTOLIQUIDACIONGASTO AS DLG')
+                                    ->select(
+                                        'P.TXT_DESCRIPCION',
+                                        'DLG.TXT_PRODUCTO',
+                                        'LG.COD_TIPODOCUMENTO',
+                                        'LG.TXT_TIPODOCUMENTO',
+                                        DB::raw('SUM(LG.TOTAL) AS CANTIDAD_TC'),
+                                        DB::raw('SUM(LG.TOTAL) AS TOTAL')
+                                    )
+                                    ->join('LQG_DETLIQUIDACIONGASTO AS LG', function($join) {
+                                        $join->on('DLG.ID_DOCUMENTO', '=', 'LG.ID_DOCUMENTO')
+                                             ->on('DLG.ITEM', '=', 'LG.ITEM');
                                     })
-                                    ->select('*','LQG_DETDOCUMENTOLIQUIDACIONGASTO.TOTAL AS CAN_TOTAL_DETALLE')
-                                    ->join('ALM.PRODUCTO','ALM.PRODUCTO.COD_PRODUCTO','=','LQG_DETDOCUMENTOLIQUIDACIONGASTO.COD_PRODUCTO')
-                                    ->where('LQG_DETDOCUMENTOLIQUIDACIONGASTO.ID_DOCUMENTO', $iddocumento)
-                                    ->where('LQG_DETDOCUMENTOLIQUIDACIONGASTO.ACTIVO', 1)
-                                    ->orderBy('ALM.PRODUCTO.TXT_DESCRIPCION','asc')
+                                    ->join('ALM.PRODUCTO AS P', 'P.COD_PRODUCTO', '=', 'DLG.COD_PRODUCTO')
+                                    ->where('DLG.ID_DOCUMENTO', $iddocumento)
+                                    ->where('DLG.ACTIVO', 1)
+                                    ->groupBy(
+                                        'P.TXT_DESCRIPCION',
+                                        'DLG.TXT_PRODUCTO',
+                                        'LG.COD_TIPODOCUMENTO',
+                                        'LG.TXT_TIPODOCUMENTO'
+                                    )
                                     ->get();
+            $resultado = [];
+            $tiposDocumento = [];
+
+            foreach($productosagru as $item) {
+                if (!in_array($item->TXT_TIPODOCUMENTO, $tiposDocumento)) {
+                    $tiposDocumento[] = $item->TXT_TIPODOCUMENTO;
+                }
+            }
+            
+            // Luego organizar los datos
+            foreach($productosagru as $item) {
+                $desc = $item->TXT_DESCRIPCION;
+                $prod = $item->TXT_PRODUCTO;
+                $tipo = $item->TXT_TIPODOCUMENTO;
+                
+                // Inicializar si no existe
+                if (!isset($resultado[$desc])) {
+                    $resultado[$desc] = [];
+                }
+                if (!isset($resultado[$desc][$prod])) {
+                    $resultado[$desc][$prod] = [];
+                    // Inicializar todos los tipos con 0
+                    foreach($tiposDocumento as $t) {
+                        $resultado[$desc][$prod][$t] = 0;
+                    }
+                    $resultado[$desc][$prod]['TOTAL'] = 0;
+                }
+                
+                // Asignar valores (ASEGURAR QUE SON NÚMEROS, NO ARRAYS)
+                $resultado[$desc][$prod][$tipo] = (int)$item->CANTIDAD_TC;
+                $resultado[$desc][$prod]['TOTAL'] += (float)$item->TOTAL;
+            }
+
+
 
         $trabajador             =   STDEmpresa::where('COD_EMPR','=',$liquidaciongastos->COD_EMPRESA_TRABAJADOR)->first();
         $imgresponsable         =   'firmas/blanco.jpg';
@@ -133,6 +184,9 @@ class GestionLiquidacionGastosController extends Controller
                                                 'nombre_responsable'            => $nombre_responsable,
                                                 'imgaprueba'                    => $imgaprueba,
                                                 'nombre_aprueba'                => $nombre_aprueba,
+                                                'datos'                         => $resultado,
+                                                'tipos_documento'               => $tiposDocumento,
+                                                'arendir'                       => $arendir,
                                                 'direccion'                     => $direccion,
                                               ]);
 
@@ -934,6 +988,14 @@ class GestionLiquidacionGastosController extends Controller
                                 ]
                             );
 
+                LqgDetLiquidacionGasto::where('ID_DOCUMENTO',$iddocumento)
+                            ->update(
+                                [
+                                    'ACTIVO'=>'0'
+                                ]
+                            );
+
+
                 DB::commit();
                 return Redirect::to('gestion-de-aprobacion-liquidacion-gastos-administracion/'.$idopcion)->with('bienhecho', 'Comprobante : '.$liquidaciongastos->ID_DOCUMENTO.' EXTORNADO CON EXITO');
             }catch(\Exception $ex){
@@ -986,6 +1048,15 @@ class GestionLiquidacionGastosController extends Controller
                                     'TXT_ESTADO'=>'RECHAZADO'
                                 ]
                             );
+
+
+                LqgDetLiquidacionGasto::where('ID_DOCUMENTO',$iddocumento)
+                            ->update(
+                                [
+                                    'ACTIVO'=>'0'
+                                ]
+                            );
+
 
                 DB::commit();
                 return Redirect::to('gestion-de-aprobacion-liquidacion-gastos-contabilidad/'.$idopcion)->with('bienhecho', 'Comprobante : '.$liquidaciongastos->ID_DOCUMENTO.' EXTORNADO CON EXITO');
@@ -1041,6 +1112,14 @@ class GestionLiquidacionGastosController extends Controller
                                     'TXT_ESTADO'=>'RECHAZADO'
                                 ]
                             );
+
+                LqgDetLiquidacionGasto::where('ID_DOCUMENTO',$iddocumento)
+                            ->update(
+                                [
+                                    'ACTIVO'=>'0'
+                                ]
+                            );
+
 
                 DB::commit();
                 return Redirect::to('gestion-de-aprobacion-liquidacion-gasto-jefe/'.$idopcion)->with('bienhecho', 'Comprobante : '.$liquidaciongastos->ID_DOCUMENTO.' EXTORNADO CON EXITO');
@@ -3888,12 +3967,18 @@ class GestionLiquidacionGastosController extends Controller
         $array_detalle_producto         =   array();
         $documentohistorial             =   LqgDocumentoHistorial::where('ID_DOCUMENTO','=',$iddocumento)->orderby('FECHA','DESC')->get();
 
-        $producto_id        =       "";
-        $comboproducto      =       array();
+        $producto_id                    =   "";
+        $arrayproducto                  =   DB::table('ALM.PRODUCTO')
+                                            ->where('ALM.PRODUCTO.COD_ESTADO','=',1)
+                                            ->where('ALM.PRODUCTO.IND_DISPONIBLE','=',1)
+                                            ->where('ALM.PRODUCTO.IND_MATERIAL_SERVICIO','=','S')
+                                            ->where('COD_CATEGORIA_CLASE','=','1')
+                                            ->pluck('NOM_PRODUCTO', 'NOM_PRODUCTO')->toArray();
 
-        $igv_id             =       "";
-        $combo_igv          =       array('' => "¿SELECCIONE SI TIENE IGV?",'1' => "SI",'0' => "NO");
+        $comboproducto                  =   array('' => "SELECCIONE PRODUCTO") + $arrayproducto;
 
+        $igv_id                         =   "";
+        $combo_igv                      =   array('' => "¿SELECCIONE SI TIENE IGV?",'1' => "SI",'0' => "NO");
 
         //dd($tdetliquidaciongastos);
         return View::make('liquidaciongasto.modificarliquidaciongastos',

@@ -21,7 +21,7 @@
                       Agregar Movilidad
                     </a>
 
-                    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscardocumento">
+                    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscardocumentomob">
                       <span class="tooltiptext">Buscar Documento</span>
                       <span class="icon mdi mdi-search"></span>
                     </a>
