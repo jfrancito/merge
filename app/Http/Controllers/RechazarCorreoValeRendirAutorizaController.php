@@ -7,7 +7,7 @@ use Illuminate\Mail\Mailable;
 
 
 use Illuminate\Http\Request;
-use App\Traits\EnviarCorreoVRApruebaTraits;
+use App\Traits\RechazarCorreoVRAutorizaTraits;
 use App\Modelos\STDTrabajadorVale;
 use App\Modelos\WEBTipoMotivoValeRendir;
 use App\Modelos\WEBValeRendir;
@@ -22,11 +22,11 @@ use View;
 use Validator;
 
 
-class EnviarCorreoValeRendirApruebaController extends Controller
+class RechazarCorreoValeRendirAutorizaController extends Controller
 {
-    use EnviarCorreoVRApruebaTraits;
+    use RechazarCorreoVRAutorizaTraits;
 
-    public function actionEnviarCorreoVRAprueba(Request $request)
+    public function actionRechazarCorreoVRAutoriza(Request $request)
     {
         $valerendir_id = $request->input('valerendir_id');
 
@@ -39,7 +39,7 @@ class EnviarCorreoValeRendirApruebaController extends Controller
             return response()->json(['success' => false, 'message' => 'Vale no encontrado.']);
         }
 
-       $exito = $this->enviarCorreoValeRendirAprueba($valerendir_id);
+        $exito = $this->RechazarCorreoValeRendirAutoriza($valerendir_id);
         return response()->json(['success' => $exito]);
     }
 

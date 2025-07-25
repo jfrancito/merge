@@ -67,7 +67,7 @@ trait EnviarCorreoVRApruebaTraits
             function ($message) use ($emailfrom, $emailTrabajador, $emailTrabajadorAutoriza, $emailTrabajadorAprueba, $nombreCompleto) {
                 $message->from($emailfrom, $nombreCompleto)
                         ->to("tesoreria.cix@induamerica.com.pe")
-                        ->cc([$emailTrabajador, 'marley.sucse@induamerica.com.pe','franklin.llontop@induamerica.com.pe','karim.ramirez@induamerica.com.pe']) // copia a estos dos
+                        ->cc([$emailTrabajador, 'marley.sucse@induamerica.com.pe','diana.malca@induamerica.com.pe','karim.ramirez@induamerica.com.pe','franklin.llontop@induamerica.com.pe']) 
                         ->subject('VALE RENDIR - INDUAMERICA');
             });
 

@@ -76,7 +76,7 @@ $(document).ready(function(){
                     detalle_id               : detalle_id 
                 });
             });
-           
+           abrircargando();
            $.ajax({
                   type    :   "POST",
                   url     :   carpeta+"/registrar_vale_rendir",
@@ -670,24 +670,49 @@ $(document).ready(function(){
 
 
     //DETALLE
-     
-        $('#tipo_motivo').on('change', function() {
+        $('#tipo_motivo').on('change', function () {
             var valorSeleccionado = $(this).find('option:selected').text().toUpperCase().trim();
 
             if (valorSeleccionado === 'GASTOS DE VIAJE O VIATICOS') {
                 $('#vale_rendir_detalle').show();
 
-             $('#can_total_importe').prop('readonly', true);
-            $('#can_total_saldo').prop('readonly', true);
-                
+                // 🧹 Limpia campos antes de ponerlos como readonly
+                $('#can_total_importe').val('');
+                $('#can_total_saldo').val('');
+
+                // 🔒 Poner campos como solo lectura
+                $('#can_total_importe').prop('readonly', true);
+                $('#can_total_saldo').prop('readonly', true);
+
             } else {
-                $('#vale_rendir_detalle').hide(); 
+                $('#vale_rendir_detalle').hide();
 
+                // Limpia campo detalle motivo
                 $('#detalle_motivo').val('').trigger('change');
-               
 
+                // 🔓 Habilita los campos de importes y limpia valores
+                $('#can_total_importe').prop('readonly', false).val('');
+                $('#can_total_saldo').prop('readonly', false).val('');
+
+                // 🧹 Limpia la tabla de detalles
+                $('#tabla_vale_rendir_detalle tbody').empty();
+
+                // 🧹 Limpia campos del detalle
+                $('#fecha_inicio').val('');
+                $('#fecha_fin').val('');
+                $('#destino').val('').trigger('change');
+                $('#nom_centro').val('');
+
+                // 🔄 Desmarca checkboxes
+                $('#ind_propio').prop('checked', false);
+                $('#ind_aereo').prop('checked', false);
+
+                // 🔄 Recalcula totales
+                actualizarTotalImporte();
             }
         });
+
+
 
         function convertirFecha(fechaStr) {
             const partes = fechaStr.split('/');

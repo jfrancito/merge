@@ -16,9 +16,9 @@ use Session;
 use Nexmo;
 use PDO;
 
-trait EnviarCorreoVRAutorizaTraits 
+trait RechazarCorreoVRAutorizaTraits 
 {
-    public function enviarCorreoValeRendir($valerendir_id)
+    public function RechazarCorreoValeRendirAutoriza($valerendir_id)
     {
         try {
             $VALE_RENDIR = WEBValeRendir::where("ID", '=', $valerendir_id)->first();
@@ -58,15 +58,14 @@ trait EnviarCorreoVRAutorizaTraits
       
              $emailfrom = $emailTrabajador;
 
-            Mail::send('emails.emailvalerendirautoriza',
+            Mail::send('emails.emailvalerendirautorizarechazado',
             ['vale' => $VALE_RENDIR],
             function ($message) use ($emailfrom, $emailTrabajador, $emailTrabajadorAutoriza, $emailTrabajadorAprueba, $nombreCompleto) {
                 $message->from($emailfrom, $nombreCompleto)
-                         ->to(["marley.sucse@induamerica.com.pe", "diana.malca@induamerica.com.pe"])
-                        ->cc($emailTrabajador, $emailTrabajadorAutoriza) 
+                        ->to($emailTrabajadorAutoriza)
+                        ->cc($emailTrabajador) 
                         ->subject('VALE RENDIR - INDUAMERICA');
             });
-
 
             return true;
 
