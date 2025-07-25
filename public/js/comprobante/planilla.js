@@ -115,6 +115,28 @@ $(document).ready(function(){
     });
 
 
+    $(".cfedocumento").on('click','.buscardocumentomob', function() {
+
+        event.preventDefault();
+
+        var fecha_inicio         =   $('#fecha_inicio').val();
+        var fecha_fin            =   $('#fecha_fin').val();
+        var idopcion             =   $('#idopcion').val();
+        var _token               =   $('#token').val();
+        //validacioones
+        if(fecha_inicio ==''){ alerterrorajax("Seleccione una fecha inicio."); return false;}
+        if(fecha_fin ==''){ alerterrorajax("Seleccione una fecha fin."); return false;}
+
+        data            =   {
+                                _token                  : _token,
+                                fecha_inicio            : fecha_inicio,
+                                fecha_fin               : fecha_fin,
+                                idopcion                : idopcion
+                            };
+        ajax_normal(data,"/ajax-buscar-documento-fe-entregable-pla-mob");
+
+    });
+
     $(".cfedocumento").on('click','.buscardocumento', function() {
 
         event.preventDefault();

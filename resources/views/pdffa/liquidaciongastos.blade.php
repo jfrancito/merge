@@ -21,73 +21,87 @@
 	   					<strong>NOMBRE:</strong> {{$liquidaciongastos->TXT_EMPRESA_TRABAJADOR}}
 	   				</p>  		    		   					   				
 	   				<p>
-	   					<strong>AREA :</strong> FALTA   					
-	   				</p>
-	   				<p>
-	   					<strong>MOTIVO DE VIAJE :</strong> FALTA   					
-	   				</p>
-	   				<p>
-	   					<strong>LUGAR DE VIAJE :</strong> FALTA   					
-	   				</p>
-	   				<p>
-	   					<strong>FECHA DE VIAJE :</strong> FALTA   					
-	   				</p>
-	   				<p>
-	   					<strong>FECHA DE RETORNO :</strong> FALTA   					
+	   					<strong>AREA :</strong> {{$liquidaciongastos->TXT_AREA}}   					
 	   				</p>
 			    </div>
 			</div>
         </article>
 
         <article>
-		  <table>
-		    <tr>
-		      <th class='titulo'></th>
-		      <th class='titulo'>TIPO COMPROBANTE</th>
-		      <th class='titulo'>FECHA</th>
-		      <th class='titulo'>COMPROBANTE</th>
-		      <th class='titulo'>CANTIDAD</th>
-		      <th class='titulo'>MONTO</th>
-		      <th class='titulo'>TOTAL</th>
-		    </tr>
-			@php
-			    $prevDescription = null; // Variable para rastrear el valor anterior
-			@endphp
-
-			@foreach($productosagru as $index => $item)
-			    @if($item->TXT_DESCRIPCION != $prevDescription)
-			        {{-- Mostrar fila de agrupación solo si cambia la descripción --}}
-			        <tr style="background-color: #f0f0f0;"> <!-- Estilo opcional para resaltar -->
-			            <td colspan="7" class="derecha">
-			                <strong>{{ $item->TXT_DESCRIPCION }}</strong> <!-- Campo agrupador -->
-			            </td>
+			<table class="tabla-pdf">
+			    <thead>
+			        <tr>
+			            <th style="width: 25%;">DESCRIPCIÓN</th>
+			            <th style="width: 25%;">DETALLE</th>
+			            @foreach($tipos_documento as $tipo)
+			                <th style="width: {{ 40 / count($tipos_documento) }}%;">{{ $tipo }}</th>
+			            @endforeach
+			            <th style="width: 10%;">TOTAL</th>
 			        </tr>
-			        @php
-			            $prevDescription = $item->TXT_DESCRIPCION; // Actualizar el valor anterior
-			        @endphp
-			    @endif
+			    </thead>
+			    <tbody>
 
-			    {{-- Fila normal del registro --}}
-			    <tr>			    	
-			        <td class='titulo'></td>
-			        <td class='derecha'>{{ $item->TXT_TIPODOCUMENTO }}</td>
-			        <td class='titulo'>{{ date_format(date_create($item->FECHA_EMISION), 'd/m/Y') }}</td>
-			        <td class='titulo'>{{ $item->SERIE }}-{{ $item->NUMERO }}</td>
-			        <td class='titulo'>{{ $item->CANTIDAD }}</td>
-			        <td class='titulo'>{{ $item->CAN_TOTAL_DETALLE }}</td>
-			        <td class='izquierda'>{{ number_format(round($item->CAN_TOTAL_DETALLE, 2), 2, '.', ',') }}</td>
-			    </tr>
-			@endforeach	    
-			    <tr>			    	
-			      <td class='titulo'></td>
-			      <td class='titulo'></td>
-			      <td class='titulo'></td>
-			      <td class='titulo'></td>
-			      <td class='titulo'></td>
-			      <td class='titulo'></td>
-			      <td class='izquierda'>{{number_format(round($productosagru->sum('CAN_TOTAL_DETALLE'),2),2,'.',',')}}</td>
-			    </tr>
-		  </table>
+                    @php
+                      $total    =   0;
+                    @endphp
+
+			        @foreach($datos as $descripcion => $productos)
+			            @foreach($productos as $producto => $valores)
+			                <tr>
+			                    <td class="grupo">{{ strtoupper($descripcion) }}</td>
+			                    <td>{{ strtoupper($producto) }}</td>
+			                    
+			                    @foreach($tipos_documento as $tipo)
+			                        <td style="text-align: center;">{{ $valores[$tipo] ?: '' }}</td>
+			                    @endforeach
+			                    
+			                    <td style="text-align: right;">{{ number_format($valores['TOTAL'], 2) }}</td>
+			                </tr>
+
+		                    @php
+		                      $total    =   $total + $valores['TOTAL'];
+		                    @endphp
+
+			            @endforeach
+			        @endforeach
+
+				    <tr>			    	
+				      	<td>TOTAL DE GASTOS</td>
+				      	<td class='titulo'></td>
+			            @foreach($tipos_documento as $tipo)
+			                <td class='titulo'></td>
+			            @endforeach
+				      	<td class='izquierda'><b>{{number_format(round(  $total ,2),2,'.',',')}}</b></td>
+				    </tr>
+
+				    <tr>			    	
+				      	<td>N° DE VALE</td>
+				      	<td class='titulo'></td>
+			            @foreach($tipos_documento as $tipo)
+			                <td class='titulo'></td>
+			            @endforeach
+				      	<td class='izquierda'><b>@if(isset($arendir->CAN_TOTAL_IMPORTE))
+												    {{ number_format(round($arendir->CAN_TOTAL_IMPORTE, 2), 2, '.', ',') }}
+												@else
+												    {{-- Valor por defecto o dejar vacío --}}
+												    0.00
+												@endif</b></td>
+				    </tr>
+
+				    <tr>			    	
+				      	<td>TOTAL</td>
+				      	<td class='titulo'></td>
+			            @foreach($tipos_documento as $tipo)
+			                <td class='titulo'></td>
+			            @endforeach
+				      	<td class='izquierda'><b>@if(isset($arendir->CAN_TOTAL_IMPORTE))
+												    {{ number_format(round($total - $arendir->CAN_TOTAL_IMPORTE, 2), 2, '.', ',') }}
+												@else
+												    {{$total}}
+												@endif</b></td>
+				    </tr>
+			    </tbody>
+			</table>
 
         </article>
 
@@ -98,25 +112,10 @@
 		            <p style="margin-top: 10px;">RESPONSABLE</p>
 		            <p style="margin-top: 10px;">{{$nombre_responsable}}</p>
 		        </td>
-		        <td style="width: 50%; text-align: center; border: none;">
-		            <img src="{{ public_path($imgaprueba) }}" style="width: 150px;" alt="Firma 2">
-		            <p style="margin-top: 10px;">APROBADO POR</p>
-		            <p style="margin-top: 10px;">{{$nombre_aprueba}}</p>
-		        </td>
 		    </tr>
 		</table>
-        
-
-
     </section>  
-
-
-
-
-
 </body>
-
-
 </footer>
 
 </html>

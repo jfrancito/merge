@@ -1057,6 +1057,8 @@ $(document).ready(function(){
         var cuenta_id               =   $('#cuenta_id').val();
         var subcuenta_id            =   $('#subcuenta_id').val();
 
+
+
         if(cuenta_id ==''){ alerterrorajax("Seleccione una Cuenta."); return false;}
         if(subcuenta_id ==''){ alerterrorajax("Seleccione una Sub Cuenta"); return false;}
 
@@ -1073,96 +1075,18 @@ $(document).ready(function(){
             }
             var producto_id_factura  =   $('#producto_id_factura').val();
             var igv_id_factura       =   $('#igv_id_factura').val();
-
             var ESTADOCP             =   $('#ESTADOCP').val();
             var ESTADORUC            =   $('#ESTADORUC').val();
-
-
             if(ESTADOCP !='1'){ alerterrorajax("Debe validar el documento."); cerrarcargando(); return false;}
             if(ESTADORUC ==''){ alerterrorajax("Debe validar el documento."); cerrarcargando(); return false;}
-
             if(producto_id_factura ==''){ alerterrorajax("Seleccione un Producto."); cerrarcargando(); return false;}
             if(igv_id_factura ==''){ alerterrorajax("Seleccione si es Afecto"); cerrarcargando(); return false;}
 
 
-            // //ver si tienes filas
-            // if ($('#tdxml tbody tr').length === 0) {
-            //     alerterrorajax("La factura no tiene detalle"); cerrarcargando(); return false;
-            // }
-            // //recorrer la tabla y ver si no tiene aprobados
-            // var sw_asociado = 0;
-            // $('#tdxml tbody tr').each(function(index) {
-            //     const productoOsiris = $(this).find('.TXT_PRODUCTO_OSIRIS').text();
-            //     if(productoOsiris==''){
-            //         sw_asociado = 1;
-            //     }
-
-            // });
-
-            // if(sw_asociado ==1){ alerterrorajax("Hay productos que no estan asociados"); cerrarcargando(); return false;}
-            // var valor              =   $('#serie').val();
-            // let primeraLetraSerire = valor.charAt(0); 
-            // if(primeraLetraSerire=='E'){
-            //     let comprobante = $('#file-DCC0000000000036')[0].files.length > 0;
-
-            //     if(RUTAXML==''){
-            //         if (!comprobante) {
-            //             alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
-            //         }
-            //     }else{
-            //         if(RUTAPDF==''){
-            //             if (!comprobante) {
-            //                 alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
-            //             }
-            //         }
-            //     }
 
 
-            // }else{
-            //     let xml = $('#file-DCC0000000000004')[0].files.length > 0;
-            //     if(RUTAXML==''){
-            //         if (!xml) {
-            //             alerterrorajax("Debe subir el CDR en XML."); cerrarcargando(); return false;
-            //         }
-            //     }else{
-            //         if(RUTACDR==''){
-            //             if (!comprobante) {
-            //                 alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
-            //             }
-            //         }
-            //     }
 
 
-            //     let comprobante = $('#file-DCC0000000000036')[0].files.length > 0;
-            //     if(RUTAXML==''){
-            //         if (!comprobante) {
-            //             alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
-            //         }
-            //     }else{
-            //         if(RUTAPDF==''){
-            //             if (!comprobante) {
-            //                 alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
-            //             }
-            //         }
-            //     }
-
-            // }
-            // let detalleArray = [];
-            // $('#tdxml tbody tr').each(function(index) {
-            //     const fila = {
-            //         TXT_PRODUCTO_OSIRIS: $(this).find('.TXT_PRODUCTO_OSIRIS').text().trim(),
-            //         TXT_PRODUCTO_XML   : $(this).find('.TXT_PRODUCTO_XML').text().trim(),
-            //         CANTIDAD           : $(this).find('.CANTIDAD').text().trim(),
-            //         PRECIO             : $(this).find('.PRECIO').text().trim(),
-            //         INDIGV             : $(this).find('.INDIGV').text().trim(),
-            //         SUBTOTAL           : $(this).find('.SUBTOTAL').text().trim(),
-            //         IGV                : $(this).find('.IGV').text().trim(),
-            //         TOTAL              : $(this).find('.TOTAL').text().trim()
-            //     };
-            //     detalleArray.push(fila);
-            // });
-            // // Guardamos el array convertido a JSON en el input hidden
-            // $('#array_detalle_producto').val(JSON.stringify(detalleArray));
         }else{
 
             if(tipodoc_id != 'TDO0000000000070'){
