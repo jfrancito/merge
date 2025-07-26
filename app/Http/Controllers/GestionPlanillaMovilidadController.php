@@ -1163,6 +1163,10 @@ class GestionPlanillaMovilidadController extends Controller
                                 ->where('COD_EMPRESA','=', Session::get('empresas')->COD_EMPR)
                                 ->orderby('FECHA_CREA','DESC')->get();
 
+
+        //dd($planillamovilidad);
+
+
         $listadatos     =   array();
         $funcion        =   $this;
         return View::make('planillamovilidad/listaplanillamovilidad',
@@ -1684,12 +1688,15 @@ class GestionPlanillaMovilidadController extends Controller
                 $cabecera->USUARIO_CREA             =   Session::get('usuario')->id;
                 $cabecera->save();
 
-                PlaMovilidad::where('ID_DOCUMENTO','=',$planillamovilidad->ID_DOCUMENTO)
+
+                $tdetplanillamovilidad  =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
+                PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)
                             ->update(
                                     [
-                                        'TOTAL'=> $tdetplanillamovilidad->SUM('TOTAL') + $total,
-                                        'TOTAL'=> $tdetplanillamovilidad->SUM('SUBTOTAL') + $total
+                                        'TOTAL'=> $tdetplanillamovilidad->SUM('TOTAL'),
                                     ]);
+
+
             DB::commit();
         }catch(\Exception $ex){
             DB::rollback(); 
