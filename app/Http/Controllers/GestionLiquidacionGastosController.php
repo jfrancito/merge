@@ -24,7 +24,7 @@ use App\Modelos\CMPDocAsociarCompra;
 use App\Modelos\FeToken;
 use App\Modelos\CMPZona;
 use App\Modelos\SunatDocumento;
-
+use App\Modelos\CMPDocumentoCtble;
 
 
 
@@ -65,6 +65,34 @@ class GestionLiquidacionGastosController extends Controller
 
 
 
+    public function actionLiquidacionValidezComprobantePdf(Request $request)
+    {
+
+        $datos = [
+            'ruc_emisor' => '',
+            'tipo_comprobante' => '',
+            'serie' => '',
+            'numero' => '',
+            'tipo_documento' => '',
+            'documento_receptor' => '',
+            'fecha_emision' => '',
+            'importe_total' => ''
+        ];
+        
+        $pdf = PDF::loadView('pdffa.validezsunat', [
+            'datos' => $datos,
+            'mostrar_resultado' => false
+        ]);
+        
+        $pdf->setPaper('A4', 'portrait');
+        
+        return $pdf->stream('formulario-consulta.pdf');
+        
+        // $pdf = PDF::loadView('pdffa.validezsunat');
+        // return $pdf->stream('download.pdf');
+    }
+
+
 
 
 
@@ -86,6 +114,44 @@ class GestionLiquidacionGastosController extends Controller
         $tdetliquidaciongastosel=   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','0')->get();
         $archivospdf            =   Archivo::where('ID_DOCUMENTO','=',$iddocumento)->where('EXTENSION', 'like', '%'.'pdf'.'%')->get();
         $ocultar                =   "";
+        $codigoosiris           =   "";
+        $documento              =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$liquidaciongastos->COD_OSIRIS)->first();
+        if(count($documento)>0){
+            $codigoosiris           =   $documento->NRO_SERIE."-".$documento->NRO_DOC;
+        }
+
+        $detalleVale            =   DB::table('WEB.VALE_RENDIR_DETALLE')
+                                    ->where('ID', $liquidaciongastos->ARENDIR_ID)
+                                    ->get();
+        $lugarviaje             =   "";
+        $motivoviaje            =   "";
+        $cadenaFechas           =   "";
+
+        if(count($detalleVale)>0){
+
+            $fechas             =   DB::table('WEB.VALE_RENDIR_DETALLE')
+                                    ->select(
+                                        DB::raw("MIN(FEC_INICIO) as fecha_minima"),
+                                        DB::raw("MAX(FEC_FIN) as fecha_maxima")
+                                    )
+                                    ->where('ID', $liquidaciongastos->ARENDIR_ID)
+                                    ->first();
+            $cadenaFechas       =   $fechas->fecha_minima . ' / ' . $fechas->fecha_maxima;
+            $Vale               =   DB::table('WEB.VALE_RENDIR')
+                                    ->where('ID', $liquidaciongastos->ARENDIR_ID)
+                                    ->first();
+
+            $destinos = DB::table('WEB.VALE_RENDIR_DETALLE')
+                        ->where('ID', $liquidaciongastos->ARENDIR_ID)
+                        ->pluck('NOM_DESTINO'); // Obtiene una colección solo con los valores de NOM_DESTINO
+            $lugarviaje = $destinos->implode(' - '); 
+            $motivoviaje = $Vale->TXT_GLOSA; 
+
+
+        }
+
+
+
 
         $arendir                =   DB::table('WEB.VALE_RENDIR')
                                     ->where('ID', $liquidaciongastos->ARENDIR_ID)
@@ -188,11 +254,13 @@ class GestionLiquidacionGastosController extends Controller
                                                 'tipos_documento'               => $tiposDocumento,
                                                 'arendir'                       => $arendir,
                                                 'direccion'                     => $direccion,
+                                                'codigoosiris'                  => $codigoosiris,
+                                                'lugarviaje'                    => $lugarviaje,
+                                                'motivoviaje'                   => $motivoviaje,
+                                                'cadenaFechas'                   => $cadenaFechas,
                                               ]);
 
         return $pdf->stream('download.pdf');
-
-
     }
 
 
@@ -1049,7 +1117,7 @@ class GestionLiquidacionGastosController extends Controller
                                 ]
                             );
 
-
+                //LIBERAR TODOS LOS DOCUMENTO
                 LqgDetLiquidacionGasto::where('ID_DOCUMENTO',$iddocumento)
                             ->update(
                                 [
@@ -3165,7 +3233,7 @@ class GestionLiquidacionGastosController extends Controller
 
                         $glosadet                           =   $request['glosadet'];
                         //$empresa_trab                       =   'PLANILLA DE MOVILIDAD SIN COMPROBANTE';
-                        $empresa_trab                       =   STDEmpresa::where('NOM_EMPR','=','PLANILLA DE MOVILIDAD SIN COMPROBANTE')->first();
+                        $empresa_trab                       =   STDEmpresa::where('NOM_EMPR','=','PLANILLA DE MOVILIDAD SIN COMPROBANTE')->where('COD_ESTADO','=','1')->first();
                     }else{
 
                         if($tipodoc_id=='TDO0000000000001'){
@@ -3208,7 +3276,7 @@ class GestionLiquidacionGastosController extends Controller
                             if (count($partes) > 1) {
                                 $nombre = trim($partes[1]);
                             }
-                            $empresa_trab                       =   STDEmpresa::where('NOM_EMPR','=',$nombre)->first();
+                            $empresa_trab                       =   STDEmpresa::where('NOM_EMPR','=',$nombre)->where('COD_ESTADO','=','1')->first();
 
 
 
@@ -3238,7 +3306,7 @@ class GestionLiquidacionGastosController extends Controller
                             if (count($partes) > 1) {
                                 $nombre = trim($partes[1]);
                             }
-                            $empresa_trab                       =   STDEmpresa::where('NOM_EMPR','=',$nombre)->first();
+                            $empresa_trab                       =   STDEmpresa::where('NOM_EMPR','=',$nombre)->where('COD_ESTADO','=','1')->first();
 
                         }
                     }
@@ -4175,6 +4243,31 @@ class GestionLiquidacionGastosController extends Controller
         }else{
 
 
+
+            $trabajador         =   DB::table('STD.TRABAJADOR')
+                                    ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                                    ->first();
+            $dni                =       '';
+            $centro_id          =       '';
+            if(count($trabajador)>0){
+                $dni            =       $trabajador->NRO_DOCUMENTO;
+            }
+            $trabajadorespla    =   DB::table('WEB.platrabajadores')
+                                    ->where('situacion_id', 'PRMAECEN000000000002')
+                                    ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+                                    ->where('dni', $dni)
+                                    ->first();
+
+
+
+            if(count($trabajadorespla)>0){
+                $centro_id      =       $trabajadorespla->centro_osiris_id;
+            }else{
+                return Redirect::to('gestion-de-liquidacion-gastos/'.$idopcion)->with('errorbd', 'No puede realizar un registro porque no es la empresa a cual pertenece');
+            }
+
+
+
             $trabajador                     =   DB::table('STD.TRABAJADOR')
                                                 ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
                                                 ->first();
@@ -4193,6 +4286,12 @@ class GestionLiquidacionGastosController extends Controller
                                             ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
                                             ->where('TXT_REFERENCIA_PLANILLA' ,'LIKE', '%'.$trabajadorespla->cadarea.'%')
                                             ->where('IND_MOVIMIENTO', 1)->first();
+
+            $area_planilla      =   $trabajadorespla->cadarea;
+            $anio               =   $this->anio;
+            $mes                =   $this->mes;
+
+
             $area_id                    =   "";
             $area_txt                   =   "";
             //hola
@@ -4200,35 +4299,6 @@ class GestionLiquidacionGastosController extends Controller
                 $area_id                    =   $centrocosto->COD_CENTRO_COSTO;
                 $area_txt                   =   $centrocosto->TXT_NOMBRE;
             }
-
-            //dd($area_txt);
-            //dd($trabajadorespla->cadarea);
-
-            $area_planilla      =   $trabajadorespla->cadarea;
-
-            $anio               =   $this->anio;
-            $mes                =   $this->mes;
-            $trabajador         =   DB::table('STD.TRABAJADOR')
-                                    ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
-                                    ->first();
-            $dni                =       '';
-            $centro_id          =       '';
-            if(count($trabajador)>0){
-                $dni            =       $trabajador->NRO_DOCUMENTO;
-            }
-            $trabajadorespla    =   DB::table('WEB.platrabajadores')
-                                    ->where('situacion_id', 'PRMAECEN000000000002')
-                                    ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
-                                    ->where('dni', $dni)
-                                    ->first();
-
-            if(count($trabajadorespla)>0){
-                $centro_id      =       $trabajadorespla->centro_osiris_id;
-            }else{
-                return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd', 'No puede realizar un registro porque no es la empresa a cual pertenece');
-            }
-
-
 
             $empresa            =   DB::table('STD.EMPRESA')
                                     ->where('NRO_DOCUMENTO', $dni)
