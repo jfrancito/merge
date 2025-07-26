@@ -1200,12 +1200,20 @@ $(document).ready(function(){
     $(".liquidaciongasto").on('click','.btnguardarliquidaciongasto', function(e) {
         event.preventDefault();
         var _token                  =   $('#token').val();
+        var arendir_id              =   $('#arendir_id').val();
+        var arendir_sel_id          =   $('#arendir_sel_id').val();
+
+        if(arendir_id =='SI'){ 
+            if(arendir_sel_id ==''){ 
+                alerterrorajax("Seleccione una ARENDIR."); return false;
+            }
+        }
+        
         $.confirm({
             title: '¿Confirma el registro?',
             content: 'Registro de Liquidacion de Gastos',
             buttons: {
                 confirmar: function () {
-                    abrircargando();
                     $( "#frmpm" ).submit();   
                 },
                 cancelar: function () {
