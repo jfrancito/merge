@@ -12,6 +12,9 @@ use App\WEBMaestro;
 use App\Modelos\FeDocumento;
 use App\Modelos\VMergeOC;
 use App\Modelos\STDTrabajador;
+use App\Modelos\LqgLiquidacionGasto;
+
+
 
 
 use View;
@@ -235,6 +238,73 @@ trait UserTraits
             $pedido->ind_email_adm              =   1;
             $pedido->save();
 
+        }
+        print_r("Se envio correctamente el correo Adminstracion");
+    }
+
+    private function envio_correo_tesoreria_lq() {
+
+        $listaliquidaciones          =   LqgLiquidacionGasto::where('COD_ESTADO', 'ETM0000000000005')
+                                        //->where('ID_DOCUMENTO','=','LIQG00000133')
+                                        ->where(function($query) {
+                                            $query->whereNull('IND_CORREO')
+                                                  ->orWhere('IND_CORREO', 0);
+                                        })
+                                        ->where(function($query) {
+                                            $query->whereNotNull('COD_OSIRIS')
+                                                  ->where('COD_OSIRIS', '<>', '');
+                                        })
+                                        ->get();
+
+        foreach($listaliquidaciones as $item){
+
+            $documentoCtble         =   DB::table('CMP.DOCUMENTO_CTBLE')
+                                        ->where('COD_CATEGORIA_ESTADO_DOC_CTBLE','=','EDC0000000000009')
+                                        ->where('COD_DOCUMENTO_CTBLE', $item->COD_OSIRIS)
+                                        ->first();
+                                        
+            if(count($documentoCtble)>0){
+
+                $valeRendir             =   DB::table('WEB.VALE_RENDIR')
+                                            ->where('ID', $item->ARENDIR_ID)
+                                            ->first();
+
+                $vale_doc               =   '';
+                $monto_vale             =   0;
+
+                if(count($valeRendir)>0){
+                    $autorizacion       =   DB::table('TES.AUTORIZACION')
+                                            ->where('COD_AUTORIZACION', $valeRendir->ID_OSIRIS)
+                                            ->first();
+
+                    //dd($autorizacion);
+                    if(count($autorizacion)>0){
+                        $vale_doc               =   $autorizacion->TXT_SERIE.'-'.$autorizacion->TXT_NUMERO;
+                        $monto_vale             =   $autorizacion->CAN_TOTAL;
+                    }
+                }
+
+                $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
+                $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00037')->first();
+                $array                  =   Array(
+                    'item'                =>  $item,
+                    'oc'                  =>  $documentoCtble,
+                    'vale_doc'            =>  $vale_doc,
+                    'monto_vale'          =>  $monto_vale
+                );
+
+                Mail::send('emails.tesorerialg', $array, function($message) use ($emailfrom,$item,$email,$documentoCtble)
+                {
+                    $emailcopias        = explode(",", $email->correocopia);
+                    $message->from($emailfrom->correoprincipal, 'LIQUIDACION '.$item->ID_DOCUMENTO);
+                    $message->to($email->correoprincipal)->cc($emailcopias);
+                    $message->subject('APLICACION DE VALE CON LIQUIDACION '.$documentoCtble->NRO_SERIE.'-'.$documentoCtble->NRO_DOC);
+                });
+
+                $pedido                             =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)->first();
+                $pedido->IND_CORREO                 =   1;
+                $pedido->save();
+            }                            
         }
         print_r("Se envio correctamente el correo Adminstracion");
     }

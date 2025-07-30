@@ -23,8 +23,8 @@
                     </a> -->
 
                     <a href="{{ url('/agregar-liquidacion-gastos/'.$idopcion) }}" class="btn btn-secondary botoncabecera tooltipcss opciones" style="width:140px;">
-                      <span class="tooltiptext">Agregar Liquidacion</span>
-                      Agregar Liquidacion
+                      <span class="tooltiptext">Crear Liquidacion</span>
+                      Crear Liquidacion
                     </a>
 
                     <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscardocumento">
