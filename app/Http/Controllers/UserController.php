@@ -682,6 +682,11 @@ class UserController extends Controller {
 						 ]);
 	}
 
+    public function actionCorreoTesoreriaLg()
+	{
+		$this->envio_correo_tesoreria_lq();
+	}
+
     public function actionCorreoConfirmacion()
 	{
 		$this->envio_correo_confirmacion();

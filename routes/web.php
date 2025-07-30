@@ -55,6 +55,7 @@ Route::any('/leerpreciocompetencia', 'PrecioCompetenciaController@actionScrapear
 Route::any('/transferirdataventas', 'TransferirDataController@actionTransferirVentasAtendidas');//TRANSFERIR DATA AGENTE IA
 
 Route::any('/documentolgautomatico', 'PrecioCompetenciaController@actionDocumentoLGAutomatico');//TRANSFERIR DATA AGENTE IA
+Route::any('/enviocorreotesorerialg', 'UserController@actionCorreoTesoreriaLg');//correo para usuario contacto
 
 
 
