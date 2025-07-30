@@ -768,7 +768,7 @@ $(document).ready(function(){
         $('.DCC0000000000004').hide();
         $('#totaldetalle').prop('readonly', true);
 
-
+        limpiarxml();
 
 
         if(tipodoc_id == 'TDO0000000000070'){
@@ -944,6 +944,37 @@ $(document).ready(function(){
 
     });
 
+    $(".liquidaciongasto").on('click','.limpiarxml', function(e) {
+        limpiarxml();
+    });
+
+
+    function limpiarxml(){
+        $('#serie, #numero, #totaldetalle, #fecha_emision').prop('readonly', false);
+        $('#fecha_emision').css('pointer-events', 'auto').datetimepicker('enable');
+        $('.input-group-addon').css({'pointer-events': 'auto', 'cursor': 'pointer'});
+        $('#empresa_id').prop({
+            'readonly': false,
+            'disabled': false  // Asegurar que no esté deshabilitado
+        }).next('.select2-container').css('pointer-events', 'auto');
+
+        $('.MESSAGE').html("");
+        $('.NESTADOCP').html("");
+        $('.NESTADORUC').html("");
+        $('.NCONDDOMIRUC').html("");
+        $('#SUCCESS').val("");
+        $('#MESSAGE').val("");
+        $('#ESTADOCP').val("");
+        $('#NESTADOCP').val("");
+        $('#ESTADORUC').val("");
+        $('#NESTADORUC').val("");
+        $('#CONDDOMIRUC').val("");
+        $('#NCONDDOMIRUC').val("");
+        $('#NOMBREFILE').val("");
+        $('#RUTACOMPLETA').val("");
+
+    }
+
 
     $(".liquidaciongasto").on('click','.validarxml', function(e) {
         e.preventDefault(); // Prevenir recarga del formulario
@@ -955,12 +986,27 @@ $(document).ready(function(){
         var totaldetalle            =   $('#totaldetalle').val();
         var empresa_id              =   $('#empresa_id').val();
 
+        debugger;
 
         if(serie ==''){ alerterrorajax("Ingrese una serie."); return false;}
         if(numero ==''){ alerterrorajax("Ingrese una numero."); return false;}
         if(fecha_emision ==''){ alerterrorajax("Ingrese una fecha de emision."); return false;}
         if(totaldetalle ==''){ alerterrorajax("Ingrese una total."); return false;}
         if(empresa_id ==''){ alerterrorajax("Seleccione una empresa."); return false;}
+        if (!empresa_id || empresa_id === '') {alerterrorajax("Seleccione una empresa."); return false;}
+
+        $('#serie').prop('readonly', true);
+        $('#numero').prop('readonly', true);
+        $('#fecha_emision').prop('readonly', true).css('pointer-events', 'none');        
+        $('.input-group-addon').css('pointer-events', 'none').css('cursor', 'not-allowed');
+        $('#totaldetalle').prop('readonly', true);
+        //$('#empresa_id').prop('disabled', false).prop('readonly', true);
+        $('#empresa_id').prop('readonly', true)
+                .next('.select2-container').css('pointer-events', 'none');
+
+
+
+
         data            =   {   
                                 _token                  : _token,
                                 serie                   : serie,

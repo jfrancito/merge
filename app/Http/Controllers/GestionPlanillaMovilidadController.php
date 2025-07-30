@@ -1127,12 +1127,8 @@ class GestionPlanillaMovilidadController extends Controller
         $fecha_fin      =   $request['fecha_fin'];
         $idopcion       =   $request['idopcion'];
         $funcion        =   $this;
-        $planillamovilidad  =   PlaMovilidad::where('ACTIVO','=','1')
-                                ->whereRaw("CAST(FECHA_CREA  AS DATE) >= ? and CAST(FECHA_CREA  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
-                                ->where('USUARIO_CREA','=',Session::get('usuario')->id)
-                                ->where('COD_EMPRESA','=', Session::get('empresas')->COD_EMPR)
-                                ->orderby('FECHA_CREA','DESC')->get();
 
+        $planillamovilidad  =   $this->pla_lista_planilla_movilidad_personal($fecha_inicio,$fecha_fin);
 
         return View::make('planillamovilidad/ajax/alistaplanillamovilidad',
                          [
@@ -1157,13 +1153,7 @@ class GestionPlanillaMovilidadController extends Controller
         $fecha_inicio       =   $this->fecha_menos_diez_dias;
         $fecha_fin          =   $this->fecha_sin_hora;
 
-        $planillamovilidad  =   PlaMovilidad::where('ACTIVO','=','1')
-                                ->whereRaw("CAST(FECHA_CREA  AS DATE) >= ? and CAST(FECHA_CREA  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
-                                ->where('USUARIO_CREA','=',Session::get('usuario')->id)
-                                ->where('COD_EMPRESA','=', Session::get('empresas')->COD_EMPR)
-                                ->orderby('FECHA_CREA','DESC')->get();
-
-
+        $planillamovilidad  =   $this->pla_lista_planilla_movilidad_personal($fecha_inicio,$fecha_fin);
         //dd($planillamovilidad);
 
 
@@ -1775,7 +1765,7 @@ class GestionPlanillaMovilidadController extends Controller
             $txttrabajador  =   $dtrabajador->TXT_APE_PATERNO.' '.$dtrabajador->TXT_APE_MATERNO.' '.$dtrabajador->TXT_NOMBRES;
             $doctrabajador  =   $dtrabajador->NRO_DOCUMENTO;
         }
-        $tdetplanillamovilidad  =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->orderby('FECHA_GASTO','asc')->get();
+        $tdetplanillamovilidad  =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->orderby('FECHA_GASTO','asc')->orderby('ITEM','asc')->get();
         $combots                =   array('' => "SELECCIONE TIPO SOLICUTUD",'REEMBOLSO' => "REEMBOLSO",'RENDICION' => "RENDICIÓN");
         $combousuario           =   $this->gn_combo_usuarios();
 

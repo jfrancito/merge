@@ -3324,6 +3324,21 @@ class GestionLiquidacionGastosController extends Controller
                     $numero                             =   str_pad($numero, 10, "0", STR_PAD_LEFT); 
                     $nombre_doc                         =   $serie.'-'.$numero;
 
+
+                    $bliquidacion                       =   DB::table('LQG_DETLIQUIDACIONGASTO')
+                                                            ->where('SERIE', $serie)
+                                                            ->where('NUMERO', $numero)
+                                                            ->where('COD_TIPODOCUMENTO', $tipodocumento->COD_TIPO_DOCUMENTO)
+                                                            ->where('COD_EMPRESA_PROVEEDOR', $empresa_trab->COD_EMPR)
+                                                            ->where('COD_EMPRESA', Session::get('empresas')->COD_EMPR)
+                                                            ->where('ACTIVO', 1)
+                                                            ->first();
+
+                    if(count($bliquidacion)>0){
+                        return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/-1')->with('errorbd','Este documento ya esta registrado en la Liquidacion'. $bliquidacion->ID_DOCUMENTO);
+                    }
+
+
                     //dd($empresa_trab);
                     $cabecera                           =   new LqgDetLiquidacionGasto;
                     $cabecera->ID_DOCUMENTO             =   $iddocumento;

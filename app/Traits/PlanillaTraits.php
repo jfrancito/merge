@@ -48,6 +48,31 @@ use Carbon\Carbon;
 trait PlanillaTraits
 {
 
+
+    private function pla_lista_planilla_movilidad_personal($fecha_inicio,$fecha_fin) {
+        if(Session::get('usuario')->id== '1CIX00000001'){
+
+            $planillamovilidad  =   PlaMovilidad::where('ACTIVO','=','1')
+                                    ->whereRaw("CAST(FECHA_CREA  AS DATE) >= ? and CAST(FECHA_CREA  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                    ->where('COD_EMPRESA','=', Session::get('empresas')->COD_EMPR)
+                                    ->orderby('FECHA_CREA','DESC')->get();
+                                    
+        }else{
+
+            $planillamovilidad  =   PlaMovilidad::where('ACTIVO','=','1')
+                                    ->whereRaw("CAST(FECHA_CREA  AS DATE) >= ? and CAST(FECHA_CREA  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                    ->where('USUARIO_CREA','=',Session::get('usuario')->id)
+                                    ->where('COD_EMPRESA','=', Session::get('empresas')->COD_EMPR)
+                                    ->orderby('FECHA_CREA','DESC')->get();
+
+
+        }
+
+        return  $planillamovilidad;
+    }
+
+
+
     private function pl_lista_cabecera_comprobante_total_contabilidad($empresa_id) {
 
         $listadatos     =   FePlanillaEntregable::join('users','users.id','=','FE_PLANILLA_ENTREGABLE.USUARIO_CREA')
