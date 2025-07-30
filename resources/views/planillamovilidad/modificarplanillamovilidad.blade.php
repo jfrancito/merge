@@ -17,9 +17,9 @@
           <div class="panel-heading panel-heading-divider">PLANILLA DE MOVILIDAD 
             <div class="tools tooltiptop">
               <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones agregardetalle"
-                data_planilla_movilidad_id = '{{$planillamovilidad->ID_DOCUMENTO}}'>
-                <span class="tooltiptext">Agregar Detalle</span>
-                <span class="icon mdi mdi-plus-circle-o"></span>              
+                data_planilla_movilidad_id = '{{$planillamovilidad->ID_DOCUMENTO}}' style="width:140px;">
+                <span class="tooltiptext" >Agregar Detalle</span>
+                Agregar Detalle              
               </a>
             </div>
             <span class="panel-subtitle">Crear un nueva nueva planilla de movilidad</span>

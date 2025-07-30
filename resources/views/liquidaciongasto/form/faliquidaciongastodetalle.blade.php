@@ -55,6 +55,10 @@
               <button  type="button" class="btn btn-space btn-success btn-lg validarxml" id='validarxml' title="Cargar Datos">Validar</button>
           </div>
 
+          <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 negrita" align="center" style="    margin-left: 16px;">
+              <button  type="button" class="btn btn-space btn-primary btn-lg limpiarxml" id='limpiarxml'>Limpiar</button>
+          </div>
+
         </div>
     </div>
   </div>
