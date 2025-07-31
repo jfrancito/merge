@@ -78,8 +78,8 @@
         <tfoot>
         <tr>
             <th class="center footerho" colspan="11">Total</th>
-            <th class="footerho">{{number_format($total_mn, 2, '.', ',')}}</th>
-            <th class="footerho">{{number_format($total_me, 2, '.', ',')}}</th>
+            <th class="footerho">{{number_format($total_mn, 2, '.', '')}}</th>
+            <th class="footerho">{{number_format($total_me, 2, '.', '')}}</th>
         </tr>
         </tfoot>
     </table>
