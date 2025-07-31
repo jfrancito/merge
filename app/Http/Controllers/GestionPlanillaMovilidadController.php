@@ -1707,6 +1707,11 @@ class GestionPlanillaMovilidadController extends Controller
         }
         $planillamovilidad->ACTIVO = 0;
         $planillamovilidad->save();
+
+        DB::table('PLA_DETMOVILIDAD')
+            ->where('ID_DOCUMENTO', $iddocumento) // Reemplaza con el valor real
+            ->update(['ACTIVO' => 0]);
+        
         return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('bienhecho', 'Se extorno la PLANILLA DE MOVILIDAD ');
 
     }
