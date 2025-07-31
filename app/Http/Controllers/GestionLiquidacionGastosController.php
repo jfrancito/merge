@@ -2929,14 +2929,6 @@ class GestionLiquidacionGastosController extends Controller
                         return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/0')->with('errorbd','Para poder emitir tiene que cargar sus documentos');
                     }
 
-                    $entidadbancaria_id     =  $entidadbanco->COD_CATEGORIA;
-                    $entidadbancaria_txt    =  $entidadbanco->NOM_CATEGORIA;
-
-                    $tipocuenta_id          =  $cuentas->TXT_TIPO_REFERENCIA;
-                    $tipocuenta_txt         =  $cuentas->TXT_REFERENCIA;
-
-                    $cuentanro              =  $cuentas->TXT_NRO_CUENTA_BANCARIA;
-                    $cuentanrocci           =  $cuentas->TXT_NRO_CCI;
 
                     LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
                                 ->update(
