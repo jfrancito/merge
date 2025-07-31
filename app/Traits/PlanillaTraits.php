@@ -135,13 +135,13 @@ trait PlanillaTraits
                     function($join) {
                         $join->on('PLA_MOVILIDAD.ID_DOCUMENTO', '=', 'fechas.ID_DOCUMENTO');
                     })
-                ->whereRaw("PLA_MOVILIDAD.FOLIO = '' AND PLA_MOVILIDAD.FOLIO IS NULL")
+                ->whereRaw("ISNULL(PLA_MOVILIDAD.FOLIO,'') = ''")
+                ->whereRaw("CAST(PLA_MOVILIDAD.FECHA_EMI AS DATE) >= CAST(? AS DATE)", [$fecha_inicio])
+                ->whereRaw("CAST(PLA_MOVILIDAD.FECHA_EMI AS DATE) <= CAST(? AS DATE)", [$fecha_fin])
                 ->where('LQG_LIQUIDACION_GASTO.COD_ESTADO', 'ETM0000000000005')
                 ->where('LQG_DETLIQUIDACIONGASTO.COD_TIPODOCUMENTO', 'TDO0000000000070')
                 ->where('LQG_DETLIQUIDACIONGASTO.ACTIVO', 1)
                 ->where('PLA_MOVILIDAD.COD_EMPRESA','=',$empresa_id)
-                ->where('fechas.FECHA_INICIO', '>=', $fecha_inicio)
-                ->where('fechas.FECHA_FIN', '<=', $fecha_fin)
                 ->get();
 
 
@@ -165,12 +165,12 @@ trait PlanillaTraits
                                         })
                                     ->where('LQG_LIQUIDACION_GASTO.COD_ESTADO', 'ETM0000000000005')
                                     ->where('LQG_DETLIQUIDACIONGASTO.COD_TIPODOCUMENTO', 'TDO0000000000070')
-                                    ->whereRaw("PLA_MOVILIDAD.FOLIO = '' AND PLA_MOVILIDAD.FOLIO IS NULL")
+                                    ->whereRaw("ISNULL(PLA_MOVILIDAD.FOLIO,'') = ''")
                                     ->where('LQG_DETLIQUIDACIONGASTO.ACTIVO', 1)
                                     ->where('PLA_MOVILIDAD.USUARIO_CREA','=',Session::get('usuario')->id)
                                     ->where('PLA_MOVILIDAD.COD_EMPRESA','=',$empresa_id)
-                                    ->where('fechas.FECHA_INICIO', '>=', $fecha_inicio)
-                                    ->where('fechas.FECHA_FIN', '<=', $fecha_fin)
+                                    ->whereRaw("CAST(PLA_MOVILIDAD.FECHA_EMI AS DATE) >= CAST(? AS DATE)", [$fecha_inicio])
+                                    ->whereRaw("CAST(PLA_MOVILIDAD.FECHA_EMI AS DATE) <= CAST(? AS DATE)", [$fecha_fin])
                                     ->get();
 
 

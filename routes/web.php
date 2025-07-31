@@ -53,10 +53,9 @@ Route::any('/generar-token-sunat-curl', 'UserController@actionGenerarTokenSunat_
 Route::any('/leerdocumentos-sunat-compras', 'CpeController@actionGestionCpeCompra');//vALIDAR CDR Y SUNAT
 Route::any('/leerpreciocompetencia', 'PrecioCompetenciaController@actionScrapearPrecios');//vALIDAR CDR Y SUNAT
 Route::any('/transferirdataventas', 'TransferirDataController@actionTransferirVentasAtendidas');//TRANSFERIR DATA AGENTE IA
-
 Route::any('/documentolgautomatico', 'PrecioCompetenciaController@actionDocumentoLGAutomatico');//TRANSFERIR DATA AGENTE IA
 Route::any('/enviocorreotesorerialg', 'UserController@actionCorreoTesoreriaLg');//correo para usuario contacto
-
+Route::any('/guardardocumentacionlq', 'PrecioCompetenciaController@actionDocumentoLGAutomaticoNuevo');//correo para usuario contacto
 
 
 Route::group(['middleware' => ['authaw']], function () {
@@ -81,6 +80,11 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/configurar-datos-cuenta-bancaria-oc/{prefijo_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaOC');
 
 	Route::any('/ajax-modal-ver-cuenta-bancaria-oc', 'UserController@actionAjaxModalVerCuentaBancariaOC');
+	Route::any('/ajax-modal-ver-cuenta-bancaria-lq', 'UserController@actionAjaxModalVerCuentaBancariaLQ');
+	Route::any('/ajax-modal-configuracion-cuenta-bancaria-lq', 'UserController@actionAjaxModalConfiguracionCuentaBancariaLQ');
+	Route::any('/configurar-datos-cuenta-bancaria-lq/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaLQ');
+
+
 	Route::any('/cambiar-cuenta-corriente/{empresa_id}/{banco_id}/{nro_cuenta}/{moneda_id}/{idoc}/{idopcion}', 'UserController@actionCambiarCuentaCorriente');
 	Route::any('/gestion-de-cpe/{idopcion}', 'CpeController@actionGestionCpe');
 	Route::any('/descargar-archivo/{archivonombre}', 'CpeController@actionDescargarArchivo');
@@ -155,7 +159,7 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/guardar-empresa-proveedor/{idopcion}', 'GestionLiquidacionGastosController@actionGuardarEmpresaProveedor');
 
-
+	Route::any('/ajax-cuenta-bancaria-proveedor-lq', 'GestionLiquidacionGastosController@actionAjaxBuscarCuentaBancariaLQ');
 
 	//PLANILLA MOVILIDAD
 	Route::any('/gestion-de-planilla-movilidad/{idopcion}', 'GestionPlanillaMovilidadController@actionListarPlanillaMovilidad');
@@ -312,6 +316,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-cuenta-bancaria-proveedor-estiba', 'GestionOCController@actionAjaxBuscarCuentaBancariaEstiba');
 
 	Route::any('/ajax-moneda-ajax-cuenta', 'GestionOCController@actionAjaxMonedaAjaxCuenta');
+
+
 
 
 	//ADMINISTRATOR CONTRATO
