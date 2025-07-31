@@ -25,7 +25,7 @@ use App\Modelos\FeToken;
 use App\Modelos\CMPZona;
 use App\Modelos\SunatDocumento;
 use App\Modelos\CMPDocumentoCtble;
-
+use App\Modelos\TESCuentaBancaria;
 
 
 
@@ -63,6 +63,39 @@ class GestionLiquidacionGastosController extends Controller
     use LiquidacionGastoTraits;
     use ComprobanteTraits;
 
+
+    public function actionAjaxBuscarCuentaBancariaLQ(Request $request)
+    {
+
+
+        $entidadbanco_id        =   $request['entidadbanco_id'];
+        $ID_DOCUMENTO           =   $request['ID_DOCUMENTO'];
+
+        $idoc                   =   $ID_DOCUMENTO;
+        $ordencompra            =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$idoc)->first();
+
+
+        $tescuentabb            =   TESCuentaBancaria::where('COD_EMPR_TITULAR','=',$ordencompra->COD_EMPRESA_TRABAJADOR)
+                                    ->where('COD_EMPR_BANCO','=',$entidadbanco_id)
+                                    ->where('COD_ESTADO','=',1)
+                                    ->select(DB::raw("
+                                          TXT_NRO_CUENTA_BANCARIA,
+                                          TXT_REFERENCIA + ' - '+ TXT_NRO_CUENTA_BANCARIA AS nombre")
+                                        )
+                                    ->pluck('nombre','TXT_NRO_CUENTA_BANCARIA')
+                                    ->toArray();
+
+        $combocb                =   array('' => "Seleccione Cuenta Bancaria") + $tescuentabb;
+        $funcion                =   $this;
+
+        return View::make('liquidaciongasto/combo/combo_cuenta_bancaria',
+                         [
+                            'combocb'                   =>  $combocb,
+                            'entidadbanco_id'           =>  $entidadbanco_id,
+                            'empresa_cliente_id'        =>  $ordencompra->COD_EMPRESA_TRABAJADOR,
+                            'ajax'                      =>  true,
+                         ]);
+    }
 
 
     public function actionLiquidacionValidezComprobantePdf(Request $request)
@@ -390,12 +423,16 @@ class GestionLiquidacionGastosController extends Controller
             $centro_id          =       $trabajadorespla->centro_osiris_id;
         }
 
+
+
         $contratos              =   DB::table('CMP.CONTRATO')
                                     ->where('TXT_CATEGORIA_TIPO_CONTRATO', 'PROVEEDOR')
+                                    ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
                                     ->where('COD_EMPR_CLIENTE', $empresa_id)
                                     ->where('COD_ESTADO', 1)
                                     ->where('COD_CENTRO', $centro_id)
                                     ->get();
+
 
         if(count($contratos)>0){
             return Redirect::to('gestion-de-empresa-proveedor/'.$idopcion)->with('errorbd','Empresa '.$empresa->NOM_EMPR.' ya existe y tiene contrato');
@@ -3335,7 +3372,7 @@ class GestionLiquidacionGastosController extends Controller
                                                             ->first();
 
                     if(count($bliquidacion)>0){
-                        return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/-1')->with('errorbd','Este documento ya esta registrado en la Liquidacion'. $bliquidacion->ID_DOCUMENTO);
+                        return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/-1')->with('errorbd','Este documento ya esta registrado en la Liquidacion '. $bliquidacion->ID_DOCUMENTO);
                     }
 
 
@@ -4063,11 +4100,29 @@ class GestionLiquidacionGastosController extends Controller
         $igv_id                         =   "";
         $combo_igv                      =   array('' => "¿SELECCIONE SI TIENE IGV?",'1' => "SI",'0' => "NO");
 
+        $tipopago_id                    =   "";
+        $combo_tp                       =   array('' => "SELECCIONE TIPO DE PAGO",'MPC0000000000001' => "EFECTIVO",'MPC0000000000002' => "TRANSFERENCIA");
+
+        $banco_id                       =   "";
+        $arraybancos                    =   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->where('COD_ESTADO','=','1')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
+        $combobancos                    =   array('' => "Seleccione Entidad Bancaria") + $arraybancos;
+
+        $cuenta_id                      =   "";
+        $combocb                        =   array('' => "Seleccione Cuenta Bancaria");
+
+
         //dd($tdetliquidaciongastos);
         return View::make('liquidaciongasto.modificarliquidaciongastos',
                          [
                             'liquidaciongastos'     => $liquidaciongastos,
                             'tdetliquidaciongastos' => $tdetliquidaciongastos,
+
+                            'tipopago_id'           => $tipopago_id,
+                            'combo_tp'              => $combo_tp,
+                            'banco_id'              => $banco_id,
+                            'combobancos'           => $combobancos,
+                            'cuenta_id'             => $cuenta_id,
+                            'combocb'               => $combocb,
 
                             'igv_id'                => $igv_id,
                             'combo_igv'             => $combo_igv,

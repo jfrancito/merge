@@ -51,6 +51,13 @@ class PrecioCompetenciaController extends Controller {
     use GeneralesTraits;
     use PrecioCompetenciaTraits;
 
+
+    public function actionDocumentoLGAutomaticoNuevo()
+    {
+        $this->documentolgautomaticonuevo();
+    }
+
+
     public function actionDocumentoLGAutomatico()
     {
         $this->documentolgautomatico();

@@ -59,33 +59,90 @@
                 <form method="POST" action="{{ url('/emitir-liquidacion-gastos/'.$idopcion.'/'.Hashids::encode(substr($liquidaciongastos->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" id ='frmpmemitir'>
                       {{ csrf_field() }}
 
-                      <div class="row">
-                          <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
-                            <div class="form-group">
-                              <label class="col-sm-12 control-label labelleft negrita">GLOSA :</label>
-                                <div class="col-sm-12">
-                                    <textarea 
-                                    name="glosa"
-                                    id = "glosa"
-                                    required = ""
-                                    class="form-control input-sm validarmayusculas"
-                                    rows="2">{{$liquidaciongastos->TXT_GLOSA}}</textarea>
-                                </div>
-                            </div>
+
+                      <input type="hidden" name="ID_DOCUMENTO" id = "ID_DOCUMENTO" value = "{{$liquidaciongastos->ID_DOCUMENTO}}">
+                      <div class="panel panel-default panel-contrast">
+                        <div class="panel-heading" style="background: #1d3a6d;color: #fff;">DATOS PARA EMITIR LA LIQUIDACION
+
+                          <div class="tools ver_cuenta_bancaria select" style="cursor: pointer;padding-left: 12px;"> <span class="label label-success" style="font-size: 13px !important;">Ver Cuenta</span></div>
+                          <div class="tools agregar_cuenta_bancaria select" style="cursor: pointer;"> <span class="label label-success" style="font-size: 13px !important;">Agregar Cuenta</span></div>
+
+                        </div>
+                        <div class="panel-body panel-body-contrast">
+                          <div class="row @if(count($tdetliquidaciongastos)<=0) ocultar @endif" >
+
+                              <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 cajareporte">
+                                  <div class="form-group">
+                                    <label class="col-sm-12 control-label labelleft" ><b>Tipo de Pago:</b></label>
+                                    <div class="col-sm-12 abajocaja" >
+                                      {!! Form::select( 'tipopago_id', $combo_tp, $tipopago_id,
+                                                        [
+                                                          'class'       => 'select2 form-control control input-xs' ,
+                                                          'id'          => 'tipopago_id',
+                                                          'required'    => '',
+                                                          'data-aw'     => '1',
+                                                        ]) !!}
+                                    </div>
+                                  </div>
+                              </div>
+                              <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 cajareporte">
+                                  <div class="form-group">
+                                    <label class="col-sm-12 control-label labelleft" ><b>Entidad Bancaria:</b></label>
+                                    <div class="col-sm-12 abajocaja" >
+                                      {!! Form::select( 'entidadbanco_id', $combobancos, $banco_id,
+                                                        [
+                                                          'class'       => 'select2 form-control control input-xs entidadbanco' ,
+                                                          'id'          => 'entidadbanco_id',
+                                                          'data-aw'     => '1',
+                                                        ]) !!}
+                                    </div>
+                                  </div>
+                              </div>
+                              <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 cajareporte ajax_cb">
+                                @include('liquidaciongasto.combo.combo_cuenta_bancaria')
+                              </div>
                           </div>
+                          <div class="row @if(count($tdetliquidaciongastos)<=0) ocultar @endif" >
+
+                              <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
+                                <div class="form-group">
+                                  <label class="col-sm-12 control-label labelleft negrita">GLOSA :</label>
+                                    <div class="col-sm-12">
+                                        <textarea 
+                                        name="glosa"
+                                        id = "glosa"
+                                        required = ""
+                                        class="form-control input-sm validarmayusculas"
+                                        rows="2">{{$liquidaciongastos->TXT_GLOSA}}</textarea>
+                                    </div>
+                                </div>
+                              </div>
+
+
+
+                          </div>  
+
+                              <div class="row xs-pt-15">
+                                <div class="col-xs-6">
+                                    <div class="be-checkbox">
+                                    </div>
+                                </div>
+                                <div class="col-xs-6">
+                                  <p class="text-right">
+                                      <button type="submit" class="btn btn-space btn-primary btnemitirliquidaciongasto">EMITIR LIQUIDACION DE GASTOS</button>     
+                                  </p>
+                                </div>
+                              </div>
+
+                        </div>
                       </div>
+
+
+
+
+       
                       
-                      <div class="row xs-pt-15">
-                        <div class="col-xs-6">
-                            <div class="be-checkbox">
-                            </div>
-                        </div>
-                        <div class="col-xs-6">
-                          <p class="text-right">
-                              <button type="submit" class="btn btn-space btn-primary btnemitirliquidaciongasto">EMITIR LIQUIDACION DE GASTOS</button>     
-                          </p>
-                        </div>
-                      </div>
+
                 </form>
           </div>
 

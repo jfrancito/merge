@@ -20,6 +20,64 @@ $(document).ready(function(){
     });
 
 
+    $(".liquidaciongasto").on('click','.ver_cuenta_bancaria', function() {
+
+        var _token                  =   $('#token').val();
+        var ID_DOCUMENTO            =   $('#ID_DOCUMENTO').val();
+        var idopcion                =   $('#idopcion').val();
+        data                        =   {
+                                            _token                  : _token,
+                                            ID_DOCUMENTO            : ID_DOCUMENTO,
+                                        };
+
+        ajax_modal(data,"/ajax-modal-ver-cuenta-bancaria-lq",
+                  "modal-configuracion-usuario-detalle","modal-configuracion-usuario-detalle-container");
+
+    });
+
+
+    $(".liquidaciongasto").on('change','.entidadbanco', function() {
+
+
+        var _token              =   $('#token').val();
+        var entidadbanco_id     =   $(this).val();
+        var ID_DOCUMENTO        =   $('#ID_DOCUMENTO').val();
+
+        $.ajax({
+              type    :     "POST",
+              url     :     carpeta+"/ajax-cuenta-bancaria-proveedor-lq",
+              data    :     {
+                                _token              : _token,
+                                entidadbanco_id     : entidadbanco_id,
+                                ID_DOCUMENTO        : ID_DOCUMENTO
+                            },
+                success: function (data) {
+                    $('.ajax_cb').html(data);
+                },
+                error: function (data) {
+                    error500(data);
+                }
+        });
+    });
+
+    $(".liquidaciongasto").on('click','.agregar_cuenta_bancaria', function() {
+
+        var _token                  =   $('#token').val();
+        var idopcion                =   $('#idopcion').val();
+        var ID_DOCUMENTO            =   $('#ID_DOCUMENTO').val();
+
+        data                        =   {
+                                            _token                  : _token,
+                                            ID_DOCUMENTO            : ID_DOCUMENTO,
+                                            idopcion                : idopcion,
+
+                                        };
+
+        ajax_modal(data,"/ajax-modal-configuracion-cuenta-bancaria-lq",
+                  "modal-configuracion-usuario-detalle","modal-configuracion-usuario-detalle-container");
+
+    });
+
 
     $(".liquidaciongasto").on('click','#descargarcomprobantemasivoexcel', function() {
 

@@ -30,6 +30,212 @@ trait PrecioCompetenciaTraits
 
 
 
+	private function documentolgautomaticonuevo() {
+			
+			$pathFiles='\\\\10.1.50.2';
+
+			$listasunattareas 	= 		DB::table('LQG_DETLIQUIDACIONGASTO')
+														    ->select([
+														        'LQG_DETLIQUIDACIONGASTO.*'
+														    ])
+														    ->join('LQG_LIQUIDACION_GASTO', 'LQG_DETLIQUIDACIONGASTO.ID_DOCUMENTO', '=', 'LQG_LIQUIDACION_GASTO.ID_DOCUMENTO')
+														    ->where('LQG_DETLIQUIDACIONGASTO.ACTIVO', 1)
+														    ->where('LQG_DETLIQUIDACIONGASTO.COD_TIPODOCUMENTO', 'TDO0000000000001')
+														    ->whereNotIn('LQG_LIQUIDACION_GASTO.COD_ESTADO', ['ETM0000000000006', 'ETM0000000000001'])
+														    ->whereRaw('ISNULL(LQG_DETLIQUIDACIONGASTO.IND_TOTAL, 0) = 0')
+														    ->whereNotExists(function($query) {
+														        $query->select(DB::raw(1))
+														              ->from('ARCHIVOS')
+														              ->whereRaw('ARCHIVOS.ID_DOCUMENTO = LQG_DETLIQUIDACIONGASTO.ID_DOCUMENTO')
+														              ->whereRaw('ARCHIVOS.DOCUMENTO_ITEM = LQG_DETLIQUIDACIONGASTO.ITEM')
+														              ->where('ARCHIVOS.ACTIVO', 1)
+														              ->where('ARCHIVOS.TIPO_ARCHIVO', 'DCC0000000000003');
+														    })
+														    ->orderBy('FECHA_EMI', 'asc')
+														    ->get();
+
+      foreach($listasunattareas as $index=>$item){
+
+					DB::table('LQG_DETLIQUIDACIONGASTO')
+					    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
+					    ->where('ITEM', $item->ITEM)
+					    ->update([
+					        'FECHA_MOD'     => date('Ymd H:i:s'),
+					        'BUSQUEDAD'     => BUSQUEDAD + 1
+					    ]);
+      	
+          try{  
+
+              set_time_limit(0);
+              $numero              				=   ltrim($item->NUMERO, '0');
+              $ruc                        =   $item->RUC;
+              $td                         =   $item->TIPODOCUMENTO_ID;
+              $serie                      =   $item->SERIE;
+              $correlativo                =   $numero;
+              $ID_DOCUMENTO               =   $item->ID_DOCUMENTO;
+              $fetoken                    =   FeToken::where('COD_EMPR','=',$item->EMPRESA_ID)->where('TIPO','=','COMPROBANTE_PAGO')->first();
+
+              //buscar xml
+              $primeraLetra               =   substr($serie, 0, 1);
+              $prefijocarperta            =   $this->prefijo_empresa_lg($item->EMPRESA_ID);
+              $rutafile                   =   $pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ID_DOCUMENTO;
+              $valor                      =   $this->versicarpetanoexiste_lg($rutafile);
+
+              $ruta_xml                   =   "";
+              $ruta_pdf                   =   "";
+              $ruta_cdr                   =   "";
+              $nombre_xml                 =   "";
+              $nombre_pdf                 =   "";
+              $nombre_cdr                 =   "";
+
+
+
+              if($item->IND_XML==0){
+                  $urlxml                 =   'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/02';
+                  $respuetaxml            =   $this->buscar_archivo_sunat_lg_nuevo($urlxml,$fetoken,$pathFiles,$prefijocarperta,$ID_DOCUMENTO,$item,'IND_XML');
+              }
+              if($item->IND_PDF==0){
+	              $urlxml                   =   'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/01';
+	              $respuetapdf              =   $this->buscar_archivo_sunat_lg_nuevo($urlxml,$fetoken,$pathFiles,$prefijocarperta,$ID_DOCUMENTO,$item,'IND_PDF');
+              }
+
+              if($primeraLetra == 'F'){
+              	  if($item->IND_CDR==0){
+	                  $urlxml                     =   'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/03';
+	                  $respuetacdr                =   $this->buscar_archivo_sunat_lg_nuevo($urlxml,$fetoken,$pathFiles,$prefijocarperta,$ID_DOCUMENTO,$item,'IND_CDR');
+                  }
+
+
+									DB::table('SUNAT_DOCUMENTO')
+									    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
+									    ->where('RUC', $item->RUC)
+									    ->where('TIPODOCUMENTO_ID', $item->TIPODOCUMENTO_ID)
+									    ->where('SERIE', $item->SERIE)
+									    ->where('NUMERO', $item->NUMERO)
+									    ->where('CONTADOR','=', '3')
+									    ->update([
+									        'IND_TOTAL'     => '1'
+									    ]);
+
+									$documentos = DB::table('SUNAT_DOCUMENTO')
+									    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
+									    ->where('RUC', $item->RUC)
+									    ->where('TIPODOCUMENTO_ID', $item->TIPODOCUMENTO_ID)
+									    ->where('SERIE', $item->SERIE)
+									    ->where('NUMERO', $item->NUMERO)
+									    ->where('CONTADOR', 3)
+									    ->get();
+
+									if(count($documentos)>0){
+										$usuario = DB::table('users')
+										    ->select(DB::raw("ISNULL(celular_contacto, '') AS celular_contacto"))
+										    ->where('id', $item->USUARIO_ID)
+										    ->first();
+										if(count($usuario)>0){
+												if($usuario->celular_contacto <> ''){
+
+													DB::connection('sqlsrv_isl')->table('whatsapp')->insert([
+													    'NumeroContacto'   => '51'.$usuario->celular_contacto,
+													    'NombreContacto'   => $item->USUARIO_NOMBRE,
+													    'Mensaje'          => '¡Hola! Buen día %0D%0AEncontrammos tu documento que dejaste rastreando en busquedad de la APP.*%0D%0A* Datos del documento : '.$item->RUC.' // '.$item->SERIE.'-'.$item->NUMERO.'*%0D%0A*',
+													    'IndArchivo'       => 0,
+													    'RutaArchivo'      => '',
+													    'SizeArchivo'      => 0,
+													    'NombreProyecto'   => 'MERGE',
+													    'IndProgramado'    => 0,
+													    'IndManual'        => 0,
+													    'IndEnvio'         => 0,
+													    'FechaCreacion'    => DB::raw('GETDATE()'),
+													    'Activo'           => 1,
+													    'indgrupo'         => 0,
+													]);
+												}
+										}
+									}
+
+
+
+              }else{
+									DB::table('SUNAT_DOCUMENTO')
+									    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
+									    ->where('RUC', $item->RUC)
+									    ->where('TIPODOCUMENTO_ID', $item->TIPODOCUMENTO_ID)
+									    ->where('SERIE', $item->SERIE)
+									    ->where('NUMERO', $item->NUMERO)
+									    ->where('CONTADOR','=', '2')
+									    ->update([
+									        'IND_TOTAL'     => '1'
+									    ]);
+
+										$documentos = DB::table('SUNAT_DOCUMENTO')
+										    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
+										    ->where('RUC', $item->RUC)
+										    ->where('TIPODOCUMENTO_ID', $item->TIPODOCUMENTO_ID)
+										    ->where('SERIE', $item->SERIE)
+										    ->where('NUMERO', $item->NUMERO)
+										    ->where('CONTADOR', 2)
+										    ->get();
+
+										if(count($documentos)>0){
+											$usuario = DB::table('users')
+											    ->select(DB::raw("ISNULL(celular_contacto, '') AS celular_contacto"))
+											    ->where('id', $item->USUARIO_ID)
+											    ->first();
+											if(count($usuario)>0){
+													if($usuario->celular_contacto <> ''){
+
+														DB::connection('sqlsrv_isl')->table('whatsapphub')->insert([
+														    'NumeroContacto'   => $usuario->celular_contacto,
+														    'NombreContacto'   => $item->USUARIO_NOMBRE,
+														    'Mensaje'          => '¡Hola! Buen día %0D%0AEncontrammos tu documento que dejaste rastreando en busquedad de la APP.*%0D%0A* Datos del documento : '.$item->RUC.' // '.$item->SERIE.'-'.$item->NUMERO.'*%0D%0A*',
+														    'IndArchivo'       => 0,
+														    'RutaArchivo'      => '',
+														    'SizeArchivo'      => 0,
+														    'NombreProyecto'   => 'MERGE',
+														    'IndProgramado'    => 0,
+														    'IndManual'        => 0,
+														    'IndEnvio'         => 0,
+														    'FechaCreacion'    => DB::raw('GETDATE()'),
+														    'Activo'           => 1,
+														    'indgrupo'         => 0,
+														]);
+													}
+											}
+										}
+
+
+
+
+              }
+
+
+							DB::table('SUNAT_DOCUMENTO')
+							    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
+							    ->where('RUC', $item->RUC)
+							    ->where('TIPODOCUMENTO_ID', $item->TIPODOCUMENTO_ID)
+							    ->where('SERIE', $item->SERIE)
+							    ->where('NUMERO', $item->NUMERO)
+							    ->update([
+							        'FECHA_MOD'     => date('Ymd H:i:s')
+							    ]);
+
+
+              //DB::commit();
+
+          }catch(\Exception $ex){
+              //DB::rollback();
+              //dd($ex);
+          }
+
+
+      }
+
+
+
+	}	
+
+
+
 	private function documentolgautomatico() {
 			
 			$pathFiles='\\\\10.1.50.2';
