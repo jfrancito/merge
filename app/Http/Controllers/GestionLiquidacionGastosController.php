@@ -87,11 +87,13 @@ class GestionLiquidacionGastosController extends Controller
 
         $combocb                =   array('' => "Seleccione Cuenta Bancaria") + $tescuentabb;
         $funcion                =   $this;
+        $cuentaco_id            =   "";
 
         return View::make('liquidaciongasto/combo/combo_cuenta_bancaria',
                          [
                             'combocb'                   =>  $combocb,
                             'entidadbanco_id'           =>  $entidadbanco_id,
+                            'cuentaco_id'               =>  $cuentaco_id,
                             'empresa_cliente_id'        =>  $ordencompra->COD_EMPRESA_TRABAJADOR,
                             'ajax'                      =>  true,
                          ]);
