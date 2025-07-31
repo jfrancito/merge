@@ -59,6 +59,11 @@
               <button  type="button" class="btn btn-space btn-primary btn-lg limpiarxml" id='limpiarxml'>Limpiar</button>
           </div>
 
+          <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 negrita" align="center" style="    margin-left: 18px;">
+              <button  type="button" class="btn btn-space btn-success btn-lg traerpdf" id='traerpdf'>PDF Sunat</button>
+          </div>
+
+
         </div>
     </div>
   </div>
