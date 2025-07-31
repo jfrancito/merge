@@ -1537,7 +1537,6 @@ trait LiquidacionGastoTraits
                                                 + IIF(TBL.COD_CATEGORIA_MONEDA = 'MON0000000000001', 'S/', '$') + ' ' + TBL.TXT_CATEGORIA_TIPO_CONTRATO AS CONTRATO
                                             ")
                                             ->where('TBL.COD_ESTADO', 1)
-                                            //->where('TBL.COD_CATEGORIA_TIPO_CONTRATO', $tipocontrato)
                                             ->where('TBL.COD_EMPR', Session::get('empresas')->COD_EMPR)
                                             ->where('TBL.COD_CENTRO', $centro_id)
                                             ->where('TBL.TXT_EMPR_CLIENTE', $empresa_id)

@@ -69,39 +69,7 @@
 
                         </div>
                         <div class="panel-body panel-body-contrast">
-                          <div class="row @if(count($tdetliquidaciongastos)<=0) ocultar @endif" >
 
-                              <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 cajareporte">
-                                  <div class="form-group">
-                                    <label class="col-sm-12 control-label labelleft" ><b>Tipo de Pago:</b></label>
-                                    <div class="col-sm-12 abajocaja" >
-                                      {!! Form::select( 'tipopago_id', $combo_tp, $tipopago_id,
-                                                        [
-                                                          'class'       => 'select2 form-control control input-xs' ,
-                                                          'id'          => 'tipopago_id',
-                                                          'required'    => '',
-                                                          'data-aw'     => '1',
-                                                        ]) !!}
-                                    </div>
-                                  </div>
-                              </div>
-                              <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 cajareporte">
-                                  <div class="form-group">
-                                    <label class="col-sm-12 control-label labelleft" ><b>Entidad Bancaria:</b></label>
-                                    <div class="col-sm-12 abajocaja" >
-                                      {!! Form::select( 'entidadbanco_id', $combobancos, $banco_id,
-                                                        [
-                                                          'class'       => 'select2 form-control control input-xs entidadbanco' ,
-                                                          'id'          => 'entidadbanco_id',
-                                                          'data-aw'     => '1',
-                                                        ]) !!}
-                                    </div>
-                                  </div>
-                              </div>
-                              <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 cajareporte ajax_cb">
-                                @include('liquidaciongasto.combo.combo_cuenta_bancaria')
-                              </div>
-                          </div>
                           <div class="row @if(count($tdetliquidaciongastos)<=0) ocultar @endif" >
 
                               <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">

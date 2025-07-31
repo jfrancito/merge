@@ -433,6 +433,7 @@ class GestionLiquidacionGastosController extends Controller
                                     ->where('COD_CENTRO', $centro_id)
                                     ->get();
 
+        //dd($contratos);
 
         if(count($contratos)>0){
             return Redirect::to('gestion-de-empresa-proveedor/'.$idopcion)->with('errorbd','Empresa '.$empresa->NOM_EMPR.' ya existe y tiene contrato');
