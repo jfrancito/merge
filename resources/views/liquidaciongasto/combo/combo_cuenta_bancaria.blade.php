@@ -17,7 +17,7 @@
           $atributos['data_empresa_cliente_id'] = $empresa_cliente_id;
       }
   @endphp
-  {!! Form::select('cb_id', $combocb, null, $atributos) !!}
+  {!! Form::select('cb_id', $combocb, $cuentaco_id, $atributos) !!}
 
   </div>
 </div>

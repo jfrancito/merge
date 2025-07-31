@@ -250,6 +250,7 @@ trait UserTraits
                                             $query->whereNull('IND_CORREO')
                                                   ->orWhere('IND_CORREO', 0);
                                         })
+                                        ->where('ARENDIR_ID','<>','')
                                         ->where(function($query) {
                                             $query->whereNotNull('COD_OSIRIS')
                                                   ->where('COD_OSIRIS', '<>', '');
@@ -269,6 +270,25 @@ trait UserTraits
                                             ->where('ID', $item->ARENDIR_ID)
                                             ->first();
 
+
+                $documentos = DB::table('CMP.DOCUMENTO_CTBLE')
+                    ->select([
+                        'COD_DOCUMENTO_CTBLE',
+                        'NRO_SERIE',
+                        'NRO_DOC',
+                        'FEC_EMISION',
+                        'TXT_EMPR_EMISOR',
+                        'TXT_CATEGORIA_TIPO_DOC',
+                        'CAN_TOTAL'
+                    ])
+                    ->whereIn('COD_DOCUMENTO_CTBLE', function($query) use($documentoCtble) {
+                        $query->select('COD_TABLA_ASOC')
+                              ->from('CMP.REFERENCIA_ASOC')
+                              ->where('COD_TABLA', $documentoCtble->COD_DOCUMENTO_CTBLE);
+                    })
+                    ->where('COD_ESTADO', 1)
+                    ->get();
+
                 $vale_doc               =   '';
                 $monto_vale             =   0;
 
@@ -284,12 +304,26 @@ trait UserTraits
                     }
                 }
 
+                $termino                =   'REEMBOLSO';
+                $montotermino           =   0;
+                $montotermino           =   $autorizacion->CAN_TOTAL-$documentoCtble->CAN_TOTAL;
+                if($autorizacion->CAN_TOTAL >  $documentoCtble->CAN_TOTAL){
+                    $termino                =   'DEVOLUCION';
+                }
+
+
                 $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
                 $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00037')->first();
                 $array                  =   Array(
                     'item'                =>  $item,
                     'oc'                  =>  $documentoCtble,
+                    'documentos'          =>  $documentos,
+
+                    'valeRendir'          =>  $valeRendir,
                     'vale_doc'            =>  $vale_doc,
+                    'autorizacion'        =>  $autorizacion,
+                    'termino'             =>  $termino,
+                    'montotermino'        =>  $montotermino,
                     'monto_vale'          =>  $monto_vale
                 );
 
@@ -297,6 +331,8 @@ trait UserTraits
                 {
                     $emailcopias        = explode(",", $email->correocopia);
                     $message->from($emailfrom->correoprincipal, 'LIQUIDACION '.$item->ID_DOCUMENTO);
+                    //$message->to($email->correoprincipal);
+
                     $message->to($email->correoprincipal)->cc($emailcopias);
                     $message->subject('APLICACION DE VALE CON LIQUIDACION '.$documentoCtble->NRO_SERIE.'-'.$documentoCtble->NRO_DOC);
                 });

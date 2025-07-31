@@ -2836,7 +2836,47 @@ class GestionLiquidacionGastosController extends Controller
 
             try{    
                 DB::beginTransaction();
+
                 $liquidaciongastos      =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
+
+                $tipopago_id        =  $request['tipopago_id'];
+                $entidadbanco_id    =  $request['entidadbanco_id'];
+                $cb_id              =  $request['cb_id'];        
+
+                $tipopago           =  CMPCategoria::where('COD_CATEGORIA','=',$tipopago_id)->first();
+                $entidadbanco       =  CMPCategoria::where('COD_CATEGORIA','=',$entidadbanco_id)->first();
+                $cb                 =  CMPCategoria::where('COD_CATEGORIA','=',$cb_id)->first();
+
+
+                $cuentas            =   DB::table('TES.CUENTA_BANCARIA')
+                                        ->where('COD_EMPR_TITULAR', $liquidaciongastos->COD_EMPRESA_TRABAJADOR)
+                                        ->where('TXT_NRO_CUENTA_BANCARIA', $cb_id)
+                                        ->first(); // Para obtener una colección
+
+
+                $entidadbancaria_id     =  '';
+                $entidadbancaria_txt    =  '';
+
+                $tipocuenta_id          =  '';
+                $tipocuenta_txt         =  '';
+
+                $cuentanro              =  '';
+                $cuentanrocci           =  '';
+
+                if(count($cuentas)>0){
+
+                    $entidadbancaria_id     =  $entidadbanco->COD_CATEGORIA;
+                    $entidadbancaria_txt    =  $entidadbanco->NOM_CATEGORIA;
+
+                    $tipocuenta_id          =  $cuentas->TXT_TIPO_REFERENCIA;
+                    $tipocuenta_txt         =  $cuentas->TXT_REFERENCIA;
+
+                    $cuentanro              =  $cuentas->TXT_NRO_CUENTA_BANCARIA;
+                    $cuentanrocci           =  $cuentas->TXT_NRO_CCI;
+                }
+
+
+
                 //validar que tenga la firma quien
                 $detliquidaciongasto    =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
                 $useario_autoriza       =   User::where('id','=',$detliquidaciongasto->COD_USUARIO_AUTORIZA)->first();
@@ -2849,12 +2889,26 @@ class GestionLiquidacionGastosController extends Controller
                 // if (!file_exists($rutaImagen)){
                 //     return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/0')->with('errorbd','No se puede emitir ya que el que autoriza no cuenta con firma llamar a sistemas');
                 // }
+
+
+
+
+
                 //CUANDO ESTA OBSEVADOS
                 if($liquidaciongastos->IND_OBSERVACION==1){
                     LqgLiquidacionGasto::where('ID_DOCUMENTO',$iddocumento)
                                 ->update(
                                     [
-                                        'IND_OBSERVACION'=>0
+                                        'IND_OBSERVACION'=>0,
+                                        'COD_CATEGORIA_TIPOPAGO'=> $tipopago->COD_CATEGORIA,
+                                        'TXT_CATEGORIA_TIPOPAGO'=> $tipopago->NOM_CATEGORIA,
+                                        'COD_CATEGORIA_BANCARIO'=> $entidadbancaria_id,
+                                        'TXT_CATEGORIA_BANCARIO'=> $entidadbancaria_txt,
+                                        'COD_CATEGORIA_TIPOCUENTA'=> $tipocuenta_id,
+                                        'TXT_CATEGORIA_TIPOCUENTA'=> $tipocuenta_txt,
+                                        'CUENTA_BANCARIA'=> $cuentanro,
+                                        'CCI_CUENTA_BANCARIA'=> $cuentanrocci,
+                                        'TXT_GLOSA'=> $request['glosa'],
                                     ]
                                 );
                     $documento                              =   new LqgDocumentoHistorial;
@@ -2875,12 +2929,32 @@ class GestionLiquidacionGastosController extends Controller
                         return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/0')->with('errorbd','Para poder emitir tiene que cargar sus documentos');
                     }
 
+                    $entidadbancaria_id     =  $entidadbanco->COD_CATEGORIA;
+                    $entidadbancaria_txt    =  $entidadbanco->NOM_CATEGORIA;
+
+                    $tipocuenta_id          =  $cuentas->TXT_TIPO_REFERENCIA;
+                    $tipocuenta_txt         =  $cuentas->TXT_REFERENCIA;
+
+                    $cuentanro              =  $cuentas->TXT_NRO_CUENTA_BANCARIA;
+                    $cuentanrocci           =  $cuentas->TXT_NRO_CCI;
+
                     LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
                                 ->update(
                                         [
                                             'TXT_GLOSA'=> $request['glosa'],
                                             'FECHA_EMI'=> $this->fechaactual,
                                             'FECHA_MOD'=> $this->fechaactual,
+
+                                            'COD_CATEGORIA_TIPOPAGO'=> $tipopago->COD_CATEGORIA,
+                                            'TXT_CATEGORIA_TIPOPAGO'=> $tipopago->NOM_CATEGORIA,
+                                            'COD_CATEGORIA_BANCARIO'=> $entidadbancaria_id,
+                                            'TXT_CATEGORIA_BANCARIO'=> $entidadbancaria_txt,
+                                            'COD_CATEGORIA_TIPOCUENTA'=> $tipocuenta_id,
+                                            'TXT_CATEGORIA_TIPOCUENTA'=> $tipocuenta_txt,
+                                            'CUENTA_BANCARIA'=> $cuentanro,
+                                            'CCI_CUENTA_BANCARIA'=> $cuentanrocci,
+
+
                                             'USUARIO_MOD'=> Session::get('usuario')->id,
                                             'COD_ESTADO'=> 'ETM0000000000010',
                                             'TXT_ESTADO'=> 'POR APROBAR AUTORIZACION'
@@ -4003,7 +4077,10 @@ class GestionLiquidacionGastosController extends Controller
         }
 
 
-        //dd($liquidaciongastos);
+        $tipopago_id                    =   $liquidaciongastos->COD_CATEGORIA_TIPOPAGO;
+        $banco_id                       =   $liquidaciongastos->COD_CATEGORIA_BANCARIO;
+        $cuentaco_id                    =   $liquidaciongastos->CUENTA_BANCARIA;
+
 
         if($valor=='0'){
 
@@ -4071,6 +4148,8 @@ class GestionLiquidacionGastosController extends Controller
             $gasto_id                   =   $tdetliquidacionitem->COD_GASTO;
             $combo_gasto                =   $this->lg_combo_gasto("Seleccione Gasto");
 
+            $tipopago_id                =   $liquidaciongastos->COD_CATEGORIA_TIPOPAGO;
+
             //dd("hola");
             $costo_id                   =   $tdetliquidacionitem->COD_COSTO;
             $combo_costo                =   $this->lg_combo_costo_xtrabajador("Seleccione Costo",$trabajadorespla->cadarea);
@@ -4101,18 +4180,27 @@ class GestionLiquidacionGastosController extends Controller
         $igv_id                         =   "";
         $combo_igv                      =   array('' => "¿SELECCIONE SI TIENE IGV?",'1' => "SI",'0' => "NO");
 
-        $tipopago_id                    =   "";
+
         $combo_tp                       =   array('' => "SELECCIONE TIPO DE PAGO",'MPC0000000000001' => "EFECTIVO",'MPC0000000000002' => "TRANSFERENCIA");
 
-        $banco_id                       =   "";
         $arraybancos                    =   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->where('COD_ESTADO','=','1')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
         $combobancos                    =   array('' => "Seleccione Entidad Bancaria") + $arraybancos;
 
-        $cuenta_id                      =   "";
-        $combocb                        =   array('' => "Seleccione Cuenta Bancaria");
+        if($tipopago_id=='MPC0000000000002'){
+
+            $cuentas            =   DB::table('TES.CUENTA_BANCARIA')
+                                    ->where('COD_EMPR_TITULAR', $liquidaciongastos->COD_EMPRESA_TRABAJADOR)
+                                    ->where('TXT_NRO_CUENTA_BANCARIA', $liquidaciongastos->CUENTA_BANCARIA)
+                                    ->first();
+
+            $combocb                        =   array('' => "Seleccione Cuenta Bancaria",$cuentas->TXT_NRO_CUENTA_BANCARIA => $cuentas->TXT_REFERENCIA .' - '.$cuentas->TXT_NRO_CUENTA_BANCARIA);
+        }else{
+            $combocb                        =   array('' => "Seleccione Cuenta Bancaria");
+        }
 
 
-        //dd($tdetliquidaciongastos);
+
+        //dd($cuentaco_id);
         return View::make('liquidaciongasto.modificarliquidaciongastos',
                          [
                             'liquidaciongastos'     => $liquidaciongastos,
@@ -4124,7 +4212,7 @@ class GestionLiquidacionGastosController extends Controller
                             'combobancos'           => $combobancos,
                             'cuenta_id'             => $cuenta_id,
                             'combocb'               => $combocb,
-
+                            'cuentaco_id'             => $cuentaco_id,
                             'igv_id'                => $igv_id,
                             'combo_igv'             => $combo_igv,
                             'producto_id'           => $producto_id,

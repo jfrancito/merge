@@ -36,6 +36,22 @@ $(document).ready(function(){
     });
 
 
+
+    $(".liquidaciongasto").on('change','#tipopago_id', function() {
+
+        var _token              =   $('#token').val();
+        var tipopago_id     =   $(this).val();
+        var ID_DOCUMENTO        =   $('#ID_DOCUMENTO').val();
+        $('.detallecuenta').hide();
+        if(tipopago_id == 'MPC0000000000002'){
+
+            $('.detallecuenta').show();
+        }
+
+    });
+
+
+
     $(".liquidaciongasto").on('change','.entidadbanco', function() {
 
 
@@ -1131,6 +1147,15 @@ $(document).ready(function(){
     $(".liquidaciongasto").on('click','.btnemitirliquidaciongasto', function(e) {
         event.preventDefault();
         var _token                  =   $('#token').val();
+        var tipopago_id             =   $('#tipopago_id').val();
+        var entidadbanco_id         =   $('#entidadbanco_id').val();
+        var cb_id                   =   $('#cb_id').val();
+
+        if(tipopago_id == 'MPC0000000000002'){
+            if(entidadbanco_id ==''){ alerterrorajax("Seleccione Entidad Bancaria."); return false;}
+            if(cb_id ==''){ alerterrorajax("Seleccione Entidad Bancaria."); return false;}
+        }
+
 
         $.confirm({
             title: '¿Confirma la emision?',
