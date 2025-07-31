@@ -2,6 +2,27 @@ $(document).ready(function(){
 
     var carpeta = $("#carpeta").val();
 
+    $('.control_caracteres').keypress(function (tecla) {
+
+        //Tecla de retroceso para borrar, espacio y punto siempre la permite
+        if (tecla.charCode == 8 || tecla.charCode == 32 || tecla.charCode == 46) {
+            return true;
+        } else if (tecla.charCode >= 48 && tecla.charCode <= 57) {
+            return true;
+        } else if (tecla.charCode >= 65 && tecla.charCode <= 90) {
+            return true;
+        } else if (tecla.charCode >= 97 && tecla.charCode <= 122) {
+            return true;
+        } else {
+            return false;
+        }
+
+    });
+
+    $('#glosa').on('input', function () {
+        $(this).val($(this).val().replace(/[^a-zA-Z0-9 .,!?@#\n\r]/g, ''));
+    });
+
     $(".cfedocumento").on('click','.agregar_cuenta_bancaria_oc', function() {
 
         var _token                  =   $('#token').val();
@@ -11,7 +32,7 @@ $(document).ready(function(){
         var isChecked = $(this).parents(".toptable").find('.selectfolio').prop('checked');
 
         if (isChecked) {
-             alerterrorajax("Tiene que liberar del folio"); 
+             alerterrorajax("Tiene que liberar del folio");
         } else {
             data                        =   {
                                                 _token                  : _token,
@@ -41,7 +62,7 @@ $(document).ready(function(){
         var isChecked = $(this).parents(".toptable").find('.selectfolio').prop('checked');
 
         if (isChecked) {
-            alerterrorajax("Tiene que liberar del folio"); 
+            alerterrorajax("Tiene que liberar del folio");
         } else {
             debugger;
             data                        =   {
@@ -167,7 +188,7 @@ $(document).ready(function(){
         $('#banco').val(data_banco);
         $('#cantidad').val(data_cantidad);
         $('.nav-tabs a[href="' + tabId + '"]').tab('show');
-        
+
 
         // data                        =   {
         //                                     _token                  : _token,
@@ -363,7 +384,7 @@ $(document).ready(function(){
         var operacion_id         =   $('#operacion_id').val();
         var banco_id             =   $('#banco_id').val();
         var moneda_id            =   $('#moneda_id').val();
-        
+
         var idopcion                =   $('#idopcion').val();
         var _token                  =   $('#token').val();
 
@@ -410,7 +431,7 @@ $(document).ready(function(){
         var centro_id            =   $('#centro_id').val();
         var operacion_id         =   $('#operacion_id').val();
 
-        
+
 
         data            =   {
                                 _token                  : _token,
