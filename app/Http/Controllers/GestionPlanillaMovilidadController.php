@@ -1384,6 +1384,9 @@ class GestionPlanillaMovilidadController extends Controller
 
 
             $periodo        =   $this->gn_periodo_actual_xanio_xempresa($anio, $mes, Session::get('empresas')->COD_EMPR);
+
+            //dd($centro_id);
+
             $serie          =   $this->gn_serie($anio, $mes,$centro_id);
             $numero         =   $this->gn_numero($serie,$centro_id);
 

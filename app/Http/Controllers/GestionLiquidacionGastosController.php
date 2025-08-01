@@ -71,14 +71,8 @@ class GestionLiquidacionGastosController extends Controller
     public function actionTutorialLiquidacionGastos($nombreVideo,Request $request)
     {
         
-        // SOLUCIÓN: Usar url() en lugar de asset() para incluir /public/
+        // USAR URL CORRECTA PARA TU CONFIGURACIÓN LOCAL
         $rutaVideo = url('public/firmas/' . $nombreVideo);
-        // O alternativamente:
-        // $rutaVideo = asset('firmas/' . $nombreVideo);
-        // if (strpos($rutaVideo, '/public/') === false) {
-        //     $rutaVideo = str_replace('/merge/', '/merge/public/', $rutaVideo);
-        // }
-        
         $rutaCompleta = public_path('firmas/' . $nombreVideo);
         
         // Información completa de debug

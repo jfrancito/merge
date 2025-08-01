@@ -22,7 +22,7 @@
                       <span class="icon mdi mdi-assignment-check"></span>
                     </a> -->
 
-                    <a href="{{ url('/tutorial/liquidaciongastos.mp4') }}" class="btn btn-secondary botoncabecera tooltipcss opciones" style="width:140px;" Target="_blank">
+                    <a href="{{ url('/tutorial/liquidaciongastos_01.mp4') }}" class="btn btn-secondary botoncabecera tooltipcss opciones" style="width:140px;" Target="_blank">
                       <span class="tooltip-text">Ver Tutorial</span>
                       Tutorial
                     </a>

@@ -395,6 +395,22 @@
             z-index: 1001;
         }
         
+        .autoplay-notice {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 15px 25px;
+            text-align: center;
+            font-weight: 600;
+            border-radius: 10px;
+            margin: 20px;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        
+        .autoplay-notice i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        
         /* Responsive */
         @media (max-width: 768px) {
             .header h1 {
@@ -450,6 +466,11 @@
                 bottom: 10px;
                 left: 10px;
             }
+            
+            .autoplay-notice {
+                margin: 15px;
+                padding: 12px 20px;
+            }
         }
         
         @media (max-width: 480px) {
@@ -494,7 +515,7 @@
 </head>
 <body>
     <!-- Console Toggle -->
-    <button class="console-toggle" onclick="toggleConsole()">
+    <button class="console-toggle" onclick="toggleConsole()" style="display:none">
         <i class="fa fa-terminal"></i> Console
     </button>
     
@@ -505,13 +526,19 @@
     <div class="header">
         <div class="container">
             <h1><i class="fa fa-graduation-cap"></i> Tutorial de Capacitación</h1>
-            <p>Sistema de Liquidación de Gastos - Video Interactivo</p>
+            <p>Sistema de Liquidación de Gastos - Video Interactivo con Autoplay</p>
         </div>
+    </div>
+
+    <!-- Autoplay Notice -->
+    <div class="autoplay-notice">
+        <i class="fa fa-play-circle"></i>
+        El video se reproducirá automáticamente con sonido activado
     </div>
 
     <!-- Debug Info -->
     @if(isset($debug) && config('app.debug'))
-    <div class="debug-info" style="display: none;">
+    <div class="debug-info" style="display:none;">
         <strong>🔍 INFORMACIÓN DE DEBUG DETALLADA:</strong><br><br>
         
         <strong>📁 Estado del Archivo:</strong><br>
@@ -541,8 +568,8 @@
         <div class="video-wrapper">
             <!-- Video Header -->
             <div class="video-header">
-                <h2><i class="fa fa-play-circle"></i> Video Tutorial Interactivo</h2>
-                <p>Proceso completo de liquidación de gastos paso a paso</p>
+                <h2><i class="fa fa-play-circle"></i> Video Tutorial con Autoplay</h2>
+                <p>El video se iniciará automáticamente con sonido activado</p>
             </div>
 
             <!-- Video o Error -->
@@ -554,12 +581,15 @@
                         width="100%" 
                         height="100%" 
                         controls 
-                        preload="none"
-                        muted
+                        preload="auto"
+                        autoplay
                         playsinline
+                        crossorigin="anonymous"
                         data-src="{{ $rutaVideo }}"
                     >
                         <source src="{{ $rutaVideo }}#t=0.1" type="video/mp4">
+                        <source src="{{ $rutaVideo }}" type="video/mp4">
+                        <source src="{{ $rutaVideo }}" type="video/webm">
                         <p>
                             Tu navegador no soporta el elemento video HTML5.<br>
                             <a href="{{ $rutaVideo }}" target="_blank" style="color: #007bff;">👉 Descargar y ver video externamente</a>
@@ -567,13 +597,7 @@
                     </video>
                     
                     <!-- Loading Overlay -->
-                    <div class="loading-overlay" id="loadingOverlay">
-                        <div class="loading-content">
-                            <div class="loading-spinner"></div>
-                            <div class="loading-text">Cargando video...</div>
-                            <div class="loading-progress" id="loadingProgress">Iniciando carga del archivo...</div>
-                        </div>
-                    </div>
+
                     
                     <!-- Error Overlay -->
                     <div class="error-overlay" id="errorOverlay">
@@ -593,7 +617,7 @@
                 </div>
 
                 <!-- Video Info -->
-                <div class="video-info">
+                <div class="video-info" style="display: none;">
                     <h4><i class="fa fa-info-circle"></i> Información Detallada del Video</h4>
                     <div class="info-grid">
                         <div class="info-item">
@@ -619,23 +643,20 @@
                         <div class="info-item">
                             <i class="fa fa-signal"></i>
                             <div class="info-label">Estado</div>
-                            <div class="info-value" id="videoStatus">Listo para cargar</div>
+                            <div class="info-value" id="videoStatus">Autoplay activado</div>
                         </div>
                         <div class="info-item">
-                            <i class="fa fa-download"></i>
-                            <div class="info-label">Descarga</div>
-                            <div class="info-value" id="downloadProgress">0%</div>
+                            <i class="fa fa-volume-up"></i>
+                            <div class="info-label">Audio</div>
+                            <div class="info-value" id="audioStatus">Activado</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Video Controls -->
-                <div class="video-controls">
-                    <button class="btn-custom" onclick="initializeVideo()">
-                        <i class="fa fa-play"></i> Inicializar Video
-                    </button>
+                <div class="video-controls" style="display: none;">
                     <button class="btn-custom" onclick="togglePlayPause()">
-                        <i class="fa fa-play" id="playIcon"></i> <span id="playText">Reproducir</span>
+                        <i class="fa fa-pause" id="playIcon"></i> <span id="playText">Pausar</span>
                     </button>
                     <button class="btn-custom" onclick="toggleMute()">
                         <i class="fa fa-volume-up" id="muteIcon"></i> <span id="muteText">Silenciar</span>
@@ -651,6 +672,9 @@
                     </button>
                     <button class="btn-custom" onclick="openVideoDirectly()">
                         <i class="fa fa-external-link"></i> Abrir Directamente
+                    </button>
+                    <button class="btn-custom" onclick="restartVideo()">
+                        <i class="fa fa-fast-backward"></i> Reiniciar
                     </button>
                 </div>
             @else
@@ -680,6 +704,7 @@
         let errorOverlay = null;
         let consoleLog = null;
         let videoInitialized = false;
+        let autoplayAttempted = false;
         let debugMode = {{ config('app.debug') ? 'true' : 'false' }};
         
         // Función de logging personalizada
@@ -698,7 +723,7 @@
                 logElement.scrollTop = logElement.scrollHeight;
             }
             
-            console.log(`[VIDEO DEBUG] ${message}`);
+            console.log(`[VIDEO AUTOPLAY] ${message}`);
         }
         
         function toggleConsole() {
@@ -718,10 +743,10 @@
             logToConsole(`Estado: ${status}`, 'info');
         }
         
-        function updateDownloadProgress(percent) {
-            const progressElement = document.getElementById('downloadProgress');
-            if (progressElement) {
-                progressElement.textContent = percent + '%';
+        function updateAudioStatus(status) {
+            const audioElement = document.getElementById('audioStatus');
+            if (audioElement) {
+                audioElement.textContent = status;
             }
         }
         
@@ -737,13 +762,81 @@
                 
                 if (response.ok) {
                     logToConsole('🎉 El video es accesible via HTTP!', 'success');
-                    initializeVideo();
                 } else {
                     logToConsole('❌ Error HTTP al acceder al video', 'error');
                 }
             } catch (error) {
                 logToConsole(`❌ Error de red: ${error.message}`, 'error');
             }
+        }
+        
+        function attemptAutoplayWithSound() {
+            if (!video || autoplayAttempted) return;
+            
+            logToConsole('🎬 Intentando autoplay con sonido...', 'info');
+            autoplayAttempted = true;
+            
+            // Asegurar que el video no esté silenciado
+            video.muted = false;
+            updateAudioStatus('Activado');
+            updateMuteButton(false);
+            
+            // Intentar reproducir
+            video.play().then(() => {
+                logToConsole('🎉 ¡AUTOPLAY CON SONIDO EXITOSO!', 'success');
+                updateVideoStatus('Reproduciendo con audio');
+                updatePlayButton(true);
+                
+                // Ocultar loading después de un segundo
+                setTimeout(() => {
+                    if (loadingOverlay) loadingOverlay.style.display = 'none';
+                }, 1000);
+                
+            }).catch(error => {
+                logToConsole(`⚠️ Autoplay bloqueado: ${error.message}`, 'warn');
+                logToConsole('💡 Intentando autoplay silenciado primero...', 'info');
+                
+                // Intentar con muted y luego activar sonido
+                video.muted = true;
+                updateAudioStatus('Silenciado temporalmente');
+                updateMuteButton(true);
+                
+                video.play().then(() => {
+                    logToConsole('✅ Autoplay silenciado exitoso', 'success');
+                    updateVideoStatus('Reproduciendo (silenciado)');
+                    updatePlayButton(true);
+                    
+                    // Intentar activar sonido después de 2 segundos
+                    setTimeout(() => {
+                        if (video && !video.paused) {
+                            video.muted = false;
+                            updateAudioStatus('Activado automáticamente');
+                            updateMuteButton(false);
+                            logToConsole('🔊 Sonido activado automáticamente', 'success');
+                            updateVideoStatus('Reproduciendo con audio');
+                        }
+                    }, 2000);
+                    
+                    if (loadingOverlay) loadingOverlay.style.display = 'none';
+                    
+                }).catch(secondError => {
+                    logToConsole(`❌ Autoplay completamente bloqueado: ${secondError.message}`, 'error');
+                    updateVideoStatus('Autoplay bloqueado - Interacción requerida');
+                    updateAudioStatus('Requiere interacción');
+                    
+                    // Mostrar mensaje al usuario
+                    if (loadingOverlay) {
+                        const loadingProgress = document.getElementById('loadingProgress');
+                        if (loadingProgress) {
+                            loadingProgress.innerHTML = '👆 Haz clic en "Reproducir" para iniciar con sonido';
+                        }
+                        
+                        setTimeout(() => {
+                            loadingOverlay.style.display = 'none';
+                        }, 3000);
+                    }
+                });
+            });
         }
         
         function initializeVideo() {
@@ -761,11 +854,13 @@
                 return;
             }
             
-            logToConsole('🚀 Inicializando video...', 'info');
-            updateVideoStatus('Inicializando...');
+            logToConsole('🚀 Inicializando video con autoplay y sonido...', 'info');
+            updateVideoStatus('Inicializando autoplay...');
             
             // Detectar user agent
-            document.getElementById('userAgent').textContent = navigator.userAgent;
+            if (document.getElementById('userAgent')) {
+                document.getElementById('userAgent').textContent = navigator.userAgent;
+            }
             
             // Mostrar loading
             if (loadingOverlay) loadingOverlay.style.display = 'flex';
@@ -774,23 +869,23 @@
             // Event listeners
             setupVideoEventListeners();
             
-            // Cargar video
-            setTimeout(() => {
-                video.preload = 'metadata';
-                video.load();
-                videoInitialized = true;
-                logToConsole('✅ Video load() ejecutado', 'success');
-            }, 1000);
+            // Configurar video para autoplay
+            video.preload = 'auto';
+            video.autoplay = true;
+            video.muted = false; // Intentar sin silencio desde el inicio
+            
+            videoInitialized = true;
+            logToConsole('✅ Video configurado para autoplay con sonido', 'success');
         }
         
         function setupVideoEventListeners() {
             if (!video) return;
             
             video.addEventListener('loadstart', function() {
-                logToConsole('🎬 Video: Iniciando carga...', 'info');
-                updateVideoStatus('Cargando...');
+                logToConsole('🎬 Video: Iniciando carga para autoplay...', 'info');
+                updateVideoStatus('Cargando para autoplay...');
                 if (loadingOverlay) loadingOverlay.style.display = 'flex';
-                document.getElementById('loadingProgress').textContent = 'Iniciando descarga...';
+                document.getElementById('loadingProgress').textContent = 'Preparando autoplay...';
             });
             
             video.addEventListener('durationchange', function() {
@@ -825,37 +920,31 @@
                 document.getElementById('loadingProgress').textContent = 'Primer frame cargado...';
             });
             
-            video.addEventListener('progress', function() {
-                if (video.buffered.length > 0) {
-                    const bufferedEnd = video.buffered.end(video.buffered.length - 1);
-                    const duration = video.duration;
-                    if (duration > 0) {
-                        const percent = Math.round((bufferedEnd / duration) * 100);
-                        updateDownloadProgress(percent);
-                        document.getElementById('loadingProgress').textContent = `${percent}% descargado`;
-                        logToConsole(`⬇️ Progreso: ${percent}%`, 'info');
-                    }
-                }
-            });
-            
             video.addEventListener('canplay', function() {
-                logToConsole('▶️ Video: Puede reproducirse', 'success');
-                updateVideoStatus('Listo para reproducir');
+                logToConsole('▶️ Video: Puede reproducirse - INICIANDO AUTOPLAY', 'success');
+                updateVideoStatus('Iniciando autoplay...');
+                
+                // Intentar autoplay inmediatamente cuando esté listo
                 setTimeout(() => {
-                    if (loadingOverlay) loadingOverlay.style.display = 'none';
-                }, 1500);
+                    attemptAutoplayWithSound();
+                }, 500);
             });
             
             video.addEventListener('canplaythrough', function() {
                 logToConsole('🎯 Video: Completamente cargado', 'success');
                 updateVideoStatus('Completamente cargado');
-                updateDownloadProgress(100);
-                if (loadingOverlay) loadingOverlay.style.display = 'none';
+                
+                // Segundo intento de autoplay si el primero falló
+                if (!autoplayAttempted) {
+                    setTimeout(() => {
+                        attemptAutoplayWithSound();
+                    }, 1000);
+                }
             });
             
             video.addEventListener('play', function() {
-                logToConsole('▶️ Video: Reproduciendo', 'success');
-                updateVideoStatus('Reproduciendo');
+                logToConsole('▶️ Video: REPRODUCIENDO', 'success');
+                updateVideoStatus(video.muted ? 'Reproduciendo (silenciado)' : 'Reproduciendo con audio');
                 updatePlayButton(true);
                 if (loadingOverlay) loadingOverlay.style.display = 'none';
             });
@@ -877,7 +966,7 @@
             
             video.addEventListener('playing', function() {
                 logToConsole('🎵 Video: Reproduciendo activamente', 'success');
-                updateVideoStatus('En reproducción');
+                updateVideoStatus(video.muted ? 'En reproducción (silenciado)' : 'En reproducción con audio');
                 if (loadingOverlay) loadingOverlay.style.display = 'none';
             });
             
@@ -896,6 +985,13 @@
                 logToConsole('🏁 Video: Reproducción terminada', 'info');
                 updateVideoStatus('Terminado');
                 updatePlayButton(false);
+            });
+            
+            video.addEventListener('volumechange', function() {
+                const muteStatus = video.muted ? 'Silenciado' : 'Con sonido';
+                logToConsole(`🔊 Cambio de volumen: ${muteStatus}`, 'info');
+                updateAudioStatus(video.muted ? 'Silenciado' : 'Activado');
+                updateMuteButton(video.muted);
             });
             
             video.addEventListener('error', function(e) {
@@ -930,6 +1026,7 @@
                 }
                 
                 updateVideoStatus(`Error: ${errorText}`);
+                updateAudioStatus('Error');
                 
                 if (errorOverlay) {
                     document.getElementById('errorMessage').innerHTML = `
@@ -944,7 +1041,7 @@
             video.addEventListener('timeupdate', function() {
                 if (video.currentTime > 0 && video.duration > 0) {
                     const percent = Math.round((video.currentTime / video.duration) * 100);
-                    updateVideoStatus(`Reproduciendo ${percent}%`);
+                    updateVideoStatus(`Reproduciendo ${percent}% ${video.muted ? '(silenciado)' : '(con audio)'}`);
                 }
             });
         }
@@ -957,14 +1054,16 @@
             }
             
             if (video.paused) {
+                video.muted = false; // Asegurar sonido al reproducir manualmente
+                updateAudioStatus('Activado');
                 video.play().then(() => {
-                    logToConsole('✅ Play exitoso', 'success');
+                    logToConsole('✅ Play manual exitoso con sonido', 'success');
                 }).catch(error => {
                     logToConsole(`❌ Error al reproducir: ${error.message}`, 'error');
                 });
             } else {
                 video.pause();
-                logToConsole('⏸️ Video pausado', 'info');
+                logToConsole('⏸️ Video pausado manualmente', 'info');
             }
         }
         
@@ -982,20 +1081,11 @@
             }
         }
         
-        function toggleMute() {
-            if (!video) {
-                logToConsole('⚠️ Video no inicializado para mute', 'warn');
-                return;
-            }
-            
+        function updateMuteButton(isMuted) {
             const icon = document.getElementById('muteIcon');
             const text = document.getElementById('muteText');
-            
-            video.muted = !video.muted;
-            logToConsole(`🔊 Mute: ${video.muted ? 'ON' : 'OFF'}`, 'info');
-            
             if (icon && text) {
-                if (video.muted) {
+                if (isMuted) {
                     icon.className = 'fa fa-volume-off';
                     text.textContent = 'Activar Sonido';
                 } else {
@@ -1003,6 +1093,18 @@
                     text.textContent = 'Silenciar';
                 }
             }
+        }
+        
+        function toggleMute() {
+            if (!video) {
+                logToConsole('⚠️ Video no inicializado para mute', 'warn');
+                return;
+            }
+            
+            video.muted = !video.muted;
+            logToConsole(`🔊 Mute: ${video.muted ? 'ON' : 'OFF'}`, 'info');
+            updateAudioStatus(video.muted ? 'Silenciado' : 'Activado');
+            updateMuteButton(video.muted);
         }
         
         function toggleFullscreen() {
@@ -1021,27 +1123,46 @@
         }
         
         function forceReloadVideo() {
-            logToConsole('🔄 Recargando video forzosamente...', 'info');
+            logToConsole('🔄 Recargando video con autoplay...', 'info');
             
             if (video) {
                 video.pause();
                 video.currentTime = 0;
-                video.load();
+                video.muted = false;
+                video.autoplay = true;
             }
             
             if (loadingOverlay) loadingOverlay.style.display = 'flex';
             if (errorOverlay) errorOverlay.style.display = 'none';
             
-            updateVideoStatus('Recargando...');
-            updateDownloadProgress(0);
+            updateVideoStatus('Recargando para autoplay...');
+            updateAudioStatus('Preparando sonido...');
+            autoplayAttempted = false;
             
             // Reinicializar después de un breve delay
             setTimeout(() => {
                 if (video) {
-                    video.preload = 'auto';
                     video.load();
                 }
-            }, 2000);
+            }, 1000);
+        }
+        
+        function restartVideo() {
+            if (!video) return;
+            
+            logToConsole('⏮️ Reiniciando video desde el inicio', 'info');
+            video.currentTime = 0;
+            video.muted = false;
+            updateAudioStatus('Activado');
+            updateMuteButton(false);
+            
+            if (video.paused) {
+                video.play().then(() => {
+                    logToConsole('✅ Video reiniciado y reproduciendo', 'success');
+                }).catch(error => {
+                    logToConsole(`❌ Error al reiniciar: ${error.message}`, 'error');
+                });
+            }
         }
         
         function openVideoDirectly() {
@@ -1063,21 +1184,18 @@
         
         // Inicialización automática cuando se carga el DOM
         document.addEventListener('DOMContentLoaded', function() {
-            logToConsole('🚀 DOM cargado, inicializando sistema...', 'info');
+            logToConsole('🚀 DOM cargado, inicializando autoplay...', 'success');
             
-            // Auto-inicializar en 2 segundos si no se ha hecho manualmente
+            // Inicializar inmediatamente
             setTimeout(() => {
-                if (!videoInitialized) {
-                    logToConsole('⏰ Auto-inicializando video...', 'info');
-                    initializeVideo();
-                }
-            }, 2000);
+                initializeVideo();
+            }, 1000);
             
             // Test automático de conectividad
             if (debugMode) {
                 setTimeout(() => {
                     testVideoUrl();
-                }, 1000);
+                }, 2000);
             }
         });
         
@@ -1101,6 +1219,8 @@
                     if (e.ctrlKey || e.metaKey) {
                         e.preventDefault();
                         forceReloadVideo();
+                    } else {
+                        restartVideo();
                     }
                     break;
                 case 'KeyI':
@@ -1127,6 +1247,19 @@
                         logToConsole('⏩ Avance 10s', 'info');
                     }
                     break;
+                case 'Digit0':
+                    if (video) {
+                        restartVideo();
+                    }
+                    break;
+            }
+        });
+        
+        // Manejo de eventos de interacción del usuario para activar autoplay
+        document.addEventListener('click', function(e) {
+            if (!autoplayAttempted && video && video.paused) {
+                logToConsole('👆 Interacción detectada - intentando autoplay', 'info');
+                attemptAutoplayWithSound();
             }
         });
         
@@ -1136,8 +1269,9 @@
         });
         
         // Log inicial
-        logToConsole('🎬 Sistema de video tutorial inicializado', 'success');
-        logToConsole('💡 Atajos: Espacio (play/pause), M (mute), F (fullscreen), Ctrl+R (reload), Ctrl+I (init), Ctrl+C (console)', 'info');
+        logToConsole('🎬 Sistema de video tutorial con AUTOPLAY inicializado', 'success');
+        logToConsole('🔊 El video se reproducirá automáticamente CON SONIDO', 'success');
+        logToConsole('💡 Atajos: Espacio (play/pause), M (mute), F (fullscreen), R (restart), 0 (inicio)', 'info');
     </script>
 </body>
 </html>
