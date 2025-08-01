@@ -55,6 +55,7 @@ trait PlanillaTraits
             $planillamovilidad  =   PlaMovilidad::where('ACTIVO','=','1')
                                     ->whereRaw("CAST(FECHA_CREA  AS DATE) >= ? and CAST(FECHA_CREA  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                     ->where('COD_EMPRESA','=', Session::get('empresas')->COD_EMPR)
+                                    ->where('USUARIO_CREA','=',Session::get('usuario')->id)
                                     ->orderby('FECHA_CREA','DESC')->get();
                                     
         }else{
