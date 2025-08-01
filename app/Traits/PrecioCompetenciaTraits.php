@@ -435,6 +435,76 @@ trait PrecioCompetenciaTraits
 	}	
 
 
+	private function buscar_archivo_sunat_lg_nuevo_pdf($urlxml,$fetoken,$pathFiles,$prefijocarperta,$ID_DOCUMENTO) {
+
+		$array_nombre_archivo = array();
+		$curl = curl_init();
+		curl_setopt_array($curl, array(
+		  CURLOPT_URL => $urlxml,
+		  CURLOPT_RETURNTRANSFER => true,
+		  CURLOPT_ENCODING => '',
+		  CURLOPT_MAXREDIRS => 10,
+
+			CURLOPT_TIMEOUT => 15, // 👈 máximo 10 segundos para la respuesta
+			CURLOPT_CONNECTTIMEOUT => 10, // 👈 máximo 5 segundos para conectar
+
+		  CURLOPT_FOLLOWLOCATION => true,
+		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		  CURLOPT_CUSTOMREQUEST => 'GET',
+		  CURLOPT_HTTPHEADER => array(
+		    'Authorization: Bearer '.$fetoken->TOKEN
+		  ),
+		));
+		$response = curl_exec($curl);
+		curl_close($curl);
+
+
+		$response_array = json_decode($response, true);
+		if (!isset($response_array['nomArchivo'])) {
+				$array_nombre_archivo = [
+					'cod_error' => 1,
+					'nombre_archivo' => '',
+					'mensaje' => 'Sunat esta fallando para encontrar el pdf'
+				];
+		}else{
+
+	    $fileName = $response_array['nomArchivo'];
+	    $base64File = $response_array['valArchivo'];
+	    $fileData = base64_decode($base64File);
+      $rutafile        =      $pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ID_DOCUMENTO;
+      $rutacompleta    =      $rutafile.'\\'.$fileName;
+			file_put_contents($rutacompleta, $fileData);
+			// Descomprimir el ZIP
+			$zip = new ZipArchive;
+			if ($zip->open($rutacompleta) === TRUE) {
+			    if ($zip->numFiles > 0) {
+			        $archivoDescomprimido = $zip->getNameIndex(0); // nombre relativo dentro del zip
+			    }
+			    $zip->extractTo($rutafile); // descomprime todo
+			    $zip->close();
+			    $rutacompleta    =      $rutafile.'\\'.$archivoDescomprimido;
+					$array_nombre_archivo = [
+						'cod_error' => 0,
+						'nombre_archivo' => $response_array['nomArchivo'],
+						'ruta_completa' => $rutacompleta,
+						'nombre_archivo' => $archivoDescomprimido,
+						'mensaje' => 'encontrado con exito'
+					];
+			} else {
+				$array_nombre_archivo = [
+					'cod_error' => 1,
+					'nombre_archivo' => '',
+					'mensaje' => 'Error al abrir el archivo ZIP'
+				];
+			}
+		}
+
+	 	return  $array_nombre_archivo;
+
+	}
+
+
+
 	private function buscar_archivo_sunat_lg_nuevo($urlxml,$fetoken,$pathFiles,$prefijocarperta,$ID_DOCUMENTO,$documento,$IND) {
 
 		$array_nombre_archivo = array();

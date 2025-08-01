@@ -421,6 +421,63 @@ $(document).ready(function(){
 
     });
 
+    $(".liquidaciongasto").on('click','.traerpdf', function() {
+
+
+        var _token                        =   $('#token').val();
+        var idopcion                      =   $('#idopcion').val();
+
+        var serie                         =   $('#serie').val();
+        var numero                        =   $('#numero').val();
+        var empresa_id                    =   $('#empresa_id').val();
+        var ID_DOCUMENTO                  =   $('#ID_DOCUMENTO').val();
+        var SUCCESS                       =   $('#SUCCESS').val();
+
+
+        if(SUCCESS==''){ alerterrorajax("Valide el documento"); return false; }
+
+        const link                        =   '/pdf-sunat-personal';
+        data                              =   {
+                                                    _token                  : _token,
+                                                    serie                   : serie,
+                                                    numero                  : numero,
+                                                    empresa_id              : empresa_id,
+                                                    ID_DOCUMENTO            : ID_DOCUMENTO,
+                                                    idopcion                : idopcion
+                                              };                                       
+        abrircargando();
+        $.ajax({
+            type    :   "POST",
+            url     :   carpeta+link,
+            data    :   data,
+            success: function (data) {
+                cerrarcargando();
+                debugger;
+
+                if(data.cod_error == 0){
+                    $('.DCC0000000000036').hide();
+                    $('.PDFSUNAT').html("PDF ENCONTRADO EN SUNAT");
+                    $('#RUTACOMPLETAPDF').val(data.ruta_completa);
+                    $('#NOMBREPDF').val(data.nombre_archivo);
+                    
+                }else{
+                    alerterrorajax(data.mensaje);
+                    $('.PDFSUNAT').html("");
+                    $('.DCC0000000000036').show();
+                }
+
+                console.log(data);
+            },
+            error: function (data) {
+                cerrarcargando();
+                error500(data);
+            }
+        });
+
+
+        
+    });
+
 
 
 
@@ -1046,6 +1103,8 @@ $(document).ready(function(){
         $('#NCONDDOMIRUC').val("");
         $('#NOMBREFILE').val("");
         $('#RUTACOMPLETA').val("");
+        $('.PDFSUNAT').html("");
+        $('#RUTACOMPLETAPDF').val("");
 
     }
 
@@ -1098,7 +1157,7 @@ $(document).ready(function(){
             data    :   data,
             success: function (data) {
                 cerrarcargando();
-
+                debugger;
                 if(data.error == 0){
 
                     $('.MESSAGE').html(data.MESSAGE);
@@ -1185,6 +1244,8 @@ $(document).ready(function(){
 
         var cuenta_id               =   $('#cuenta_id').val();
         var subcuenta_id            =   $('#subcuenta_id').val();
+        var RUTACOMPLETAPDF         =   $('#RUTACOMPLETAPDF').val();
+
 
 
 
@@ -1198,10 +1259,13 @@ $(document).ready(function(){
 
         if(tipodoc_id == 'TDO0000000000001'){
 
-            let comprobante = $('#file-DCC0000000000036')[0].files.length > 0;
-            if (!comprobante) {
-                alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
+            if(RUTACOMPLETAPDF ==""){
+                let comprobante = $('#file-DCC0000000000036')[0].files.length > 0;
+                if (!comprobante) {
+                    alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
+                }
             }
+
             var producto_id_factura  =   $('#producto_id_factura').val();
             var igv_id_factura       =   $('#igv_id_factura').val();
             var ESTADOCP             =   $('#ESTADOCP').val();
@@ -1210,11 +1274,6 @@ $(document).ready(function(){
             if(ESTADORUC ==''){ alerterrorajax("Debe validar el documento."); cerrarcargando(); return false;}
             if(producto_id_factura ==''){ alerterrorajax("Seleccione un Producto."); cerrarcargando(); return false;}
             if(igv_id_factura ==''){ alerterrorajax("Seleccione si es Afecto"); cerrarcargando(); return false;}
-
-
-
-
-
 
         }else{
 
