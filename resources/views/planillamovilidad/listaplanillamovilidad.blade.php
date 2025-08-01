@@ -16,6 +16,12 @@
 
                   <div class="tools tooltiptop">
 
+
+                    <a href="{{ url('/tutorial/planillaovilidad.mp4') }}" class="btn btn-secondary botoncabecera tooltipcss opciones" style="width:140px;" Target="_blank">
+                      <span class="tooltip-text">Ver Tutorial</span>
+                      Tutorial
+                    </a>
+
                     <a href="{{ url('/agregar-planilla-movilidad/'.$idopcion) }}" class="btn btn-secondary botoncabecera tooltipcss opciones" style="width:140px;">
                       <span class="tooltiptext">Crear Movilidad</span>
                       Crear Movilidad

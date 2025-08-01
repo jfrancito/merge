@@ -67,6 +67,45 @@ class GestionLiquidacionGastosController extends Controller
     use PrecioCompetenciaTraits;
 
 
+
+    public function actionTutorialLiquidacionGastos($nombreVideo,Request $request)
+    {
+        
+        // SOLUCIÓN: Usar url() en lugar de asset() para incluir /public/
+        $rutaVideo = url('public/firmas/' . $nombreVideo);
+        // O alternativamente:
+        // $rutaVideo = asset('firmas/' . $nombreVideo);
+        // if (strpos($rutaVideo, '/public/') === false) {
+        //     $rutaVideo = str_replace('/merge/', '/merge/public/', $rutaVideo);
+        // }
+        
+        $rutaCompleta = public_path('firmas/' . $nombreVideo);
+        
+        // Información completa de debug
+        $debug = [
+            'archivo_existe' => file_exists($rutaCompleta),
+            'es_legible' => is_readable($rutaCompleta),
+            'tamaño' => file_exists($rutaCompleta) ? filesize($rutaCompleta) : 0,
+            'ruta_publica' => $rutaVideo,
+            'ruta_fisica' => $rutaCompleta,
+            'permisos' => file_exists($rutaCompleta) ? substr(sprintf('%o', fileperms($rutaCompleta)), -4) : 'N/A',
+            'mime_type' => file_exists($rutaCompleta) ? mime_content_type($rutaCompleta) : 'Desconocido',
+            'es_video' => file_exists($rutaCompleta) ? (strpos(mime_content_type($rutaCompleta), 'video') !== false) : false
+        ];
+        
+        // Información para la vista
+        $infoVideo = [
+            'existe' => file_exists($rutaCompleta) && filesize($rutaCompleta) > 0,
+            'tamaño' => file_exists($rutaCompleta) ? filesize($rutaCompleta) : 0,
+            'url' => $rutaVideo,
+            'nombre' => $nombreVideo
+        ];
+        
+        return view('liquidaciongasto.tutorial', compact('rutaVideo', 'infoVideo', 'debug'));
+
+
+    }
+
     public function actionPdfSunatPersonal(Request $request)
     {
 
@@ -3472,9 +3511,9 @@ class GestionLiquidacionGastosController extends Controller
                                                             ->where('ACTIVO', 1)
                                                             ->first();
 
-                    // if(count($bliquidacion)>0){
-                    //     return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/-1')->with('errorbd','Este documento ya esta registrado en la Liquidacion '. $bliquidacion->ID_DOCUMENTO);
-                    // }
+                    if(count($bliquidacion)>0){
+                        return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/-1')->with('errorbd','Este documento ya esta registrado en la Liquidacion '. $bliquidacion->ID_DOCUMENTO);
+                    }
 
 
                     //dd($empresa_trab);

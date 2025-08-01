@@ -1580,10 +1580,6 @@ class GestionPlanillaMovilidadController extends Controller
                     return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd', 'Supero el maximo saldo de 16425 soles al año');
                 }
 
-
-
-
-
                 $trabajador     =   DB::table('STD.TRABAJADOR')
                                     ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
                                     ->first();
