@@ -3472,9 +3472,9 @@ class GestionLiquidacionGastosController extends Controller
                                                             ->where('ACTIVO', 1)
                                                             ->first();
 
-                    if(count($bliquidacion)>0){
-                        return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/-1')->with('errorbd','Este documento ya esta registrado en la Liquidacion '. $bliquidacion->ID_DOCUMENTO);
-                    }
+                    // if(count($bliquidacion)>0){
+                    //     return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/-1')->with('errorbd','Este documento ya esta registrado en la Liquidacion '. $bliquidacion->ID_DOCUMENTO);
+                    // }
 
 
                     //dd($empresa_trab);
@@ -4007,6 +4007,11 @@ class GestionLiquidacionGastosController extends Controller
         }
         $liquidaciongastos->ACTIVO = 0;
         $liquidaciongastos->save();
+
+        DB::table('LQG_DETLIQUIDACIONGASTO')
+            ->where('ID_DOCUMENTO', $iddocumento) // ID vacío
+            ->update(['ACTIVO' => 0]);
+
         return Redirect::to('gestion-de-liquidacion-gastos/'.$idopcion)->with('bienhecho', 'Se extorno la LIQUIDACION DE GASTOS');
 
     }
