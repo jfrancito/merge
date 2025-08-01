@@ -49,6 +49,8 @@ use App\Traits\GeneralesTraits;
 use App\Traits\PlanillaTraits;
 use App\Traits\LiquidacionGastoTraits;
 use App\Traits\ComprobanteTraits;
+use App\Traits\PrecioCompetenciaTraits;
+
 use PDF;
 use Hashids;
 use SplFileInfo;
@@ -62,6 +64,36 @@ class GestionLiquidacionGastosController extends Controller
     use PlanillaTraits;
     use LiquidacionGastoTraits;
     use ComprobanteTraits;
+    use PrecioCompetenciaTraits;
+
+
+    public function actionPdfSunatPersonal(Request $request)
+    {
+
+        $serie                      =   $request['serie'];
+        $correlativo                =   ltrim($request['numero'], '0');
+        $empresa_id                 =   $request['empresa_id'];
+        $ID_DOCUMENTO               =   $request['ID_DOCUMENTO'];
+        $partes                     =   explode(" - ", $empresa_id);
+        $ruc                        =   '';
+        $td                         =   '01';
+        if (count($partes) > 1) {
+            $ruc                    =   trim($partes[0]);
+        }
+
+        $prefijocarperta            =   $this->prefijo_empresa_lg(Session::get('empresas')->COD_EMPR);
+        $pathFiles                  =   '\\\\10.1.50.2';
+        $rutafile                   =   $pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ID_DOCUMENTO;
+        $fetoken                    =   FeToken::where('COD_EMPR','=',Session::get('empresas')->COD_EMPR)->where('TIPO','=','COMPROBANTE_PAGO')->first();
+
+        $urlxml                     =   'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/01';
+        $respuetapdf                =   $this->buscar_archivo_sunat_lg_nuevo_pdf($urlxml,$fetoken,$pathFiles,$prefijocarperta,$ID_DOCUMENTO);
+
+
+        return response()->json($respuetapdf);
+
+    }
+
 
 
     public function actionAjaxBuscarCuentaBancariaLQ(Request $request)
@@ -3440,9 +3472,9 @@ class GestionLiquidacionGastosController extends Controller
                                                             ->where('ACTIVO', 1)
                                                             ->first();
 
-                    if(count($bliquidacion)>0){
-                        return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/-1')->with('errorbd','Este documento ya esta registrado en la Liquidacion '. $bliquidacion->ID_DOCUMENTO);
-                    }
+                    // if(count($bliquidacion)>0){
+                    //     return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/-1')->with('errorbd','Este documento ya esta registrado en la Liquidacion '. $bliquidacion->ID_DOCUMENTO);
+                    // }
 
 
                     //dd($empresa_trab);
@@ -3500,79 +3532,66 @@ class GestionLiquidacionGastosController extends Controller
                     $cabecera->save();
 
 
-                    //DETALLE SI ES QUE ES FACTURA
-                    // if($tipodoc_id=='TDO0000000000001'){
-                    //     $array_detalle_producto_request     =   json_decode($request['array_detalle_producto'],true);
-                    //     foreach ($array_detalle_producto_request as $key => $itemd) {
-                    //         $producto                               =   DB::table('ALM.PRODUCTO')->where('NOM_PRODUCTO','=',$itemd['TXT_PRODUCTO_OSIRIS'])->first();
-                    //         $IND_IGV = 0;
-                    //         if($itemd['INDIGV']=='SI'){
-                    //             $IND_IGV = 1;
-                    //         }
-                    //         $cabeceradet                           =   new LqgDetDocumentoLiquidacionGasto;
-                    //         $cabeceradet->ID_DOCUMENTO             =   $iddocumento;
-                    //         $cabeceradet->ITEM                     =   $item;
-                    //         $cabeceradet->ITEMDOCUMENTO            =   $key+1;
-                    //         $cabeceradet->COD_PRODUCTO             =   $producto->COD_PRODUCTO;
-                    //         $cabeceradet->TXT_PRODUCTO             =   $producto->NOM_PRODUCTO;
-                    //         $cabeceradet->TXT_PRODUCTO_XML         =   $itemd['TXT_PRODUCTO_XML'];
-                    //         $cabeceradet->CANTIDAD                 =   $itemd['CANTIDAD'];
-                    //         $cabeceradet->PRECIO                   =   $itemd['PRECIO'];
-                    //         $cabeceradet->IND_IGV                  =   $IND_IGV;
-                    //         $cabeceradet->IGV                      =   $itemd['IGV'];   
-                    //         $cabeceradet->SUBTOTAL                 =   $itemd['SUBTOTAL'];
-                    //         $cabeceradet->TOTAL                    =   $itemd['TOTAL'];
-                    //         $cabeceradet->COD_EMPRESA              =   Session::get('empresas')->COD_EMPR;
-                    //         $cabeceradet->TXT_EMPRESA              =   Session::get('empresas')->NOM_EMPR;
-                    //         $cabeceradet->COD_CENTRO               =   $liquidaciongastos->COD_CENTRO;
-                    //         $cabeceradet->TXT_CENTRO               =   $liquidaciongastos->TXT_CENTRO;
-                    //         $cabeceradet->FECHA_CREA               =   $this->fechaactual;
-                    //         $cabeceradet->USUARIO_CREA             =   Session::get('usuario')->id;
-                    //         $cabeceradet->save();
-
-                    //     }
-
-                    // }
-
-
                     if($tipodoc_id=='TDO0000000000001'){
 
-                            $tarchivos                      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                                ->whereIn('COD_CATEGORIA', ['DCC0000000000036'])->get();
-                            foreach($tarchivos as $index => $itema){
-                                $filescdm          =   $request[$itema->COD_CATEGORIA];
-                                if(!is_null($filescdm)){
-                                    //CDR
-                                    foreach($filescdm as $file){
-                                        //
-                                        $contadorArchivos = Archivo::count();
 
-                                        /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
-                                        $prefijocarperta =      $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
-                                        $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$iddocumento;
-                                        $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
-                                        $valor           =      $this->versicarpetanoexiste($rutafile);
-                                        $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
-                                        copy($file->getRealPath(),$rutacompleta);
-                                        $path            =      $rutacompleta;
-                                        $nombreoriginal             =   $file->getClientOriginalName();
-                                        $info                       =   new SplFileInfo($nombreoriginal);
-                                        $extension                  =   $info->getExtension();
-                                        $dcontrol                       =   new Archivo;
-                                        $dcontrol->ID_DOCUMENTO         =   $iddocumento;
-                                        $dcontrol->DOCUMENTO_ITEM       =   $item;
-                                        $dcontrol->TIPO_ARCHIVO         =   $itema->COD_CATEGORIA;
-                                        $dcontrol->NOMBRE_ARCHIVO       =   $nombrefilecdr;
-                                        $dcontrol->DESCRIPCION_ARCHIVO  =   $itema->NOM_CATEGORIA;
-                                        $dcontrol->URL_ARCHIVO          =   $path;
-                                        $dcontrol->SIZE                 =   filesize($file);
-                                        $dcontrol->EXTENSION            =   $extension;
-                                        $dcontrol->ACTIVO               =   1;
-                                        $dcontrol->FECHA_CREA           =   $this->fechaactual;
-                                        $dcontrol->USUARIO_CREA         =   Session::get('usuario')->id;
-                                        $dcontrol->save();
+                            $rutapdfencontrada              =   $request['RUTACOMPLETAPDF'];
+
+
+                            if($rutapdfencontrada==""){
+                                $tarchivos                      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000036'])->get();
+                                foreach($tarchivos as $index => $itema){
+                                    $filescdm          =   $request[$itema->COD_CATEGORIA];
+                                    if(!is_null($filescdm)){
+                                        //CDR
+                                        foreach($filescdm as $file){
+                                            //
+                                            $contadorArchivos = Archivo::count();
+
+                                            /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
+                                            $prefijocarperta =      $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
+                                            $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$iddocumento;
+                                            $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                                            $valor           =      $this->versicarpetanoexiste($rutafile);
+                                            $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
+                                            copy($file->getRealPath(),$rutacompleta);
+                                            $path            =      $rutacompleta;
+                                            $nombreoriginal             =   $file->getClientOriginalName();
+                                            $info                       =   new SplFileInfo($nombreoriginal);
+                                            $extension                  =   $info->getExtension();
+                                            $dcontrol                       =   new Archivo;
+                                            $dcontrol->ID_DOCUMENTO         =   $iddocumento;
+                                            $dcontrol->DOCUMENTO_ITEM       =   $item;
+                                            $dcontrol->TIPO_ARCHIVO         =   $itema->COD_CATEGORIA;
+                                            $dcontrol->NOMBRE_ARCHIVO       =   $nombrefilecdr;
+                                            $dcontrol->DESCRIPCION_ARCHIVO  =   $itema->NOM_CATEGORIA;
+                                            $dcontrol->URL_ARCHIVO          =   $path;
+                                            $dcontrol->SIZE                 =   filesize($file);
+                                            $dcontrol->EXTENSION            =   $extension;
+                                            $dcontrol->ACTIVO               =   1;
+                                            $dcontrol->FECHA_CREA           =   $this->fechaactual;
+                                            $dcontrol->USUARIO_CREA         =   Session::get('usuario')->id;
+                                            $dcontrol->save();
+                                        }
                                     }
                                 }
+                            }else{
+                                
+                                            $dcontrol                       =   new Archivo;
+                                            $dcontrol->ID_DOCUMENTO         =   $iddocumento;
+                                            $dcontrol->DOCUMENTO_ITEM       =   $item;
+                                            $dcontrol->TIPO_ARCHIVO         =   'DCC0000000000036';
+                                            $dcontrol->NOMBRE_ARCHIVO       =   $request['NOMBREPDF'];
+                                            $dcontrol->DESCRIPCION_ARCHIVO  =   'COMPROBANTE ELECTRONICO';
+                                            $dcontrol->URL_ARCHIVO          =   $request['RUTACOMPLETAPDF'];
+                                            $dcontrol->SIZE                 =   1000;
+                                            $dcontrol->EXTENSION            =   'pdf';
+                                            $dcontrol->ACTIVO               =   1;
+                                            $dcontrol->FECHA_CREA           =   $this->fechaactual;
+                                            $dcontrol->USUARIO_CREA         =   Session::get('usuario')->id;
+                                            $dcontrol->save();
+
                             }
 
 
