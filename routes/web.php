@@ -115,6 +115,10 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/extonar-liquidacion-gastos-detalle/{idopcion}/{item}/{iddocumento}', 'GestionLiquidacionGastosController@actionExtornarLiquidacionGastosDetalle');
 
 
+	Route::any('/tutorial/{nombre}', 'GestionLiquidacionGastosController@actionTutorialLiquidacionGastos');
+
+
+
 	Route::any('/ajax-buscar-documento-uc-lg', 'GestionLiquidacionGastosController@actionAjaxUCListarLiquidacionGastos');
 	Route::any('/ajax-combo-cuenta-xmoneda', 'GestionLiquidacionGastosController@actionAjaxComboCuentaXMoneda');
 	Route::any('/guardar-detalle-liquidacion-gastos/{idopcion}/{iddocumento}', 'GestionLiquidacionGastosController@actionGuardarDetalleLiquidacionGastos');

@@ -22,6 +22,12 @@
                       <span class="icon mdi mdi-assignment-check"></span>
                     </a> -->
 
+                    <a href="{{ url('/tutorial/liquidaciongastos.mp4') }}" class="btn btn-secondary botoncabecera tooltipcss opciones" style="width:140px;" Target="_blank">
+                      <span class="tooltip-text">Ver Tutorial</span>
+                      Tutorial
+                    </a>
+
+
                     <a href="{{ url('/agregar-liquidacion-gastos/'.$idopcion) }}" class="btn btn-secondary botoncabecera tooltipcss opciones" style="width:140px;">
                       <span class="tooltiptext">Crear Liquidacion</span>
                       Crear Liquidacion
