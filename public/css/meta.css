@@ -8,8 +8,8 @@
     bottom: 125%; /* Posición arriba del botón */
     left: 50%;
     transform: translateX(-50%);
-    background-color: #333;
-    color: white;
+    background-color: #ffc107;
+    color: black;
     padding: 8px 12px;
     border-radius: 6px;
     font-size: 14px;
@@ -28,7 +28,7 @@
     left: 50%;
     transform: translateX(-50%);
     border: 6px solid transparent;
-    border-top-color: #333;
+    border-top-color: #ffc107;
 }
 
 
