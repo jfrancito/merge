@@ -67,6 +67,53 @@ class GestionLiquidacionGastosController extends Controller
     use PrecioCompetenciaTraits;
 
 
+    public function actionListarLiquidacionGastosFaltante($idopcion)
+    {
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Ver');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        View::share('titulo','Lista Liquidación Gasto - Faltantes');
+        $cod_empresa        =   Session::get('usuario')->usuarioosiris_id;
+        $fecha_inicio       =   $this->fecha_menos_diez_dias;
+        $fecha_fin          =   $this->fecha_sin_hora;
+
+        $listacabecera      =   DB::table('LQG_DETLIQUIDACIONGASTO')
+                                ->select([
+                                    'LQG_DETLIQUIDACIONGASTO.ID_DOCUMENTO',
+                                    'LQG_LIQUIDACION_GASTO.FECHA_EMI',
+                                    'LQG_DETLIQUIDACIONGASTO.SERIE',
+                                    'LQG_DETLIQUIDACIONGASTO.NUMERO',
+                                    'LQG_DETLIQUIDACIONGASTO.FECHA_EMISION as FECHA_EMISIONDOC',
+                                    'LQG_DETLIQUIDACIONGASTO.TXT_EMPRESA_PROVEEDOR',
+                                    'LQG_DETLIQUIDACIONGASTO.TOTAL',
+                                    'LQG_DETLIQUIDACIONGASTO.IND_PDF',
+                                    'LQG_DETLIQUIDACIONGASTO.IND_XML',
+                                    'LQG_DETLIQUIDACIONGASTO.IND_CDR',
+                                    'LQG_DETLIQUIDACIONGASTO.BUSQUEDAD'
+                                ])
+                                ->join('LQG_LIQUIDACION_GASTO', 'LQG_DETLIQUIDACIONGASTO.ID_DOCUMENTO', '=', 'LQG_LIQUIDACION_GASTO.ID_DOCUMENTO')
+                                ->where('LQG_DETLIQUIDACIONGASTO.ACTIVO', 1)
+                                ->where('LQG_DETLIQUIDACIONGASTO.COD_TIPODOCUMENTO', 'TDO0000000000001')
+                                ->where('LQG_DETLIQUIDACIONGASTO.COD_EMPRESA', Session::get('empresas')->COD_EMPR)
+                                ->whereNotIn('LQG_LIQUIDACION_GASTO.COD_ESTADO', ['ETM0000000000006', 'ETM0000000000001'])
+                                ->whereRaw('ISNULL(LQG_DETLIQUIDACIONGASTO.IND_TOTAL, 0) = 0')
+                                ->orderby('LQG_LIQUIDACION_GASTO.FECHA_EMI','ASC')
+                                ->get();
+
+
+        $listadatos         =   array();
+        $funcion            =   $this;
+        return View::make('liquidaciongasto/listaliquidaciongastofaltantes',
+                         [
+                            'listadatos'        =>  $listadatos,
+                            'funcion'           =>  $funcion,
+                            'idopcion'          =>  $idopcion,
+                            'listacabecera'     =>  $listacabecera
+                         ]);
+    }
+
+
 
     public function actionTutorialLiquidacionGastos($nombreVideo,Request $request)
     {

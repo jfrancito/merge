@@ -75,6 +75,16 @@ class NotificacionOC extends Command
             $this->cambiar_parcialmente();
         }
 
+
+
+
+        if($horaActual == '01:00' || $horaActual == '03:00' || $horaActual == '05:00'){
+            $this->documentolgautomaticonuevo();
+        }
+
+
+
+
         // //precios de supermercado
         // try{    
         //     if($horaActual == '03:00' || 
