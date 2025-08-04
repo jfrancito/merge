@@ -73,7 +73,6 @@ trait PlanillaTraits
     }
 
 
-
     private function pl_lista_cabecera_comprobante_total_contabilidad($empresa_id) {
 
         $listadatos     =   FePlanillaEntregable::join('users','users.id','=','FE_PLANILLA_ENTREGABLE.USUARIO_CREA')
@@ -87,6 +86,50 @@ trait PlanillaTraits
     }
 
 
+    private function pl_lista_cabecera_comprobante_total_contabilidad_revisadas($empresa_id) {
+
+        $listadatos     =   FePlanillaEntregable::join('users','users.id','=','FE_PLANILLA_ENTREGABLE.USUARIO_CREA')
+                            ->where('COD_EMPRESA','=',$empresa_id)
+                            ->where('COD_ESTADO','=','1')
+                            ->where('COD_CATEGORIA_ESTADO','=','ETM0000000000005')
+                            ->orderBy('FE_PLANILLA_ENTREGABLE.FECHA_CREA','DESC')
+                            ->get();
+
+        return  $listadatos;
+    }
+
+
+    private function pl_lista_cabecera_comprobante_total_contabilidad_historial($empresa_id) {
+
+        $listadatos     =   DB::table('PLA_MOVILIDAD')
+                            ->select([
+                                'PLA_MOVILIDAD.SERIE',
+                                'PLA_MOVILIDAD.NUMERO',
+                                'PLA_MOVILIDAD.FECHA_EMI',
+                                'PLA_MOVILIDAD.TXT_TRABAJADOR',
+                                'PLA_MOVILIDAD.TXT_PERIODO',
+                                'PLA_MOVILIDAD.TOTAL',
+                                'FE_PLANILLA_ENTREGABLE.SERIE as SERIEFOLIO',
+                                'FE_PLANILLA_ENTREGABLE.NUMERO as NUMEROFOLIO',
+                                'FE_PLANILLA_ENTREGABLE.TXT_GLOSA as GLOSAFOLIO',
+                                'LQG_LIQUIDACION_GASTO.ID_DOCUMENTO', 
+                                'LQG_LIQUIDACION_GASTO.TXT_ESTADO'
+                            ])
+                            ->join('LQG_DETLIQUIDACIONGASTO', 'PLA_MOVILIDAD.ID_DOCUMENTO', '=', 'LQG_DETLIQUIDACIONGASTO.COD_PLA_MOVILIDAD')
+                            ->join('LQG_LIQUIDACION_GASTO', 'LQG_LIQUIDACION_GASTO.ID_DOCUMENTO', '=', 'LQG_DETLIQUIDACIONGASTO.ID_DOCUMENTO')
+                            ->leftJoin('FE_PLANILLA_ENTREGABLE', 'FE_PLANILLA_ENTREGABLE.FOLIO', '=', 'PLA_MOVILIDAD.FOLIO')
+                            ->where('PLA_MOVILIDAD.ACTIVO', 1)
+                            ->where('PLA_MOVILIDAD.COD_EMPRESA','=',$empresa_id)
+                            ->where('PLA_MOVILIDAD.COD_ESTADO', '<>', 'ETM0000000000001')
+                            ->where('LQG_LIQUIDACION_GASTO.COD_ESTADO', '<>', 'ETM0000000000006')
+                            ->where('LQG_DETLIQUIDACIONGASTO.ACTIVO', 1)
+                            ->orderBy('PLA_MOVILIDAD.FECHA_EMI','DESC')
+                            ->get();
+
+        return  $listadatos;
+    }
+
+
     private function pl_lista_planilla_moilidad_consolidado($empresa_id) {
 
         if(Session::get('usuario')->id== '1CIX00000001'){
@@ -94,6 +137,7 @@ trait PlanillaTraits
             $listadatos     =   FePlanillaEntregable::join('users','users.id','=','FE_PLANILLA_ENTREGABLE.USUARIO_CREA')
                                 ->where('COD_EMPRESA','=',$empresa_id)
                                 ->where('COD_ESTADO','=','1')
+                                ->where('COD_CATEGORIA_ESTADO','<>','ETM0000000000001')
                                 ->orderBy('FE_PLANILLA_ENTREGABLE.FECHA_CREA','DESC')
                                 ->get();
 
@@ -103,6 +147,7 @@ trait PlanillaTraits
             $listadatos     =   FePlanillaEntregable::join('users','users.id','=','FE_PLANILLA_ENTREGABLE.USUARIO_CREA')
                                 ->where('COD_EMPRESA','=',$empresa_id)
                                 ->where('COD_ESTADO','=','1')
+                                ->where('COD_CATEGORIA_ESTADO','<>','ETM0000000000001')
                                 ->whereIn('USUARIO_CREA',[
                                     Session::get('usuario')->id
                                 ])
