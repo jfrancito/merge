@@ -27,31 +27,38 @@ class ValeRendirController extends Controller
       public function actionValeRendir(Request $request)
 
     {
-        $trabajador     =   DB::table('STD.TRABAJADOR')
+       $trabajador     =   DB::table('STD.TRABAJADOR')
                             ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
                             ->first();
         $dni            =       '';
         $centro_id      =       '';
 
-        if(count($trabajador)>0){
-            $dni        =       $trabajador->NRO_DOCUMENTO;
+        if ($trabajador) {
+            $dni = $trabajador->NRO_DOCUMENTO;
         }
-        $trabajadorespla    =   DB::table('WEB.platrabajadores')
-                                ->where('situacion_id', 'PRMAECEN000000000002')
-                                ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
-                                ->where('dni', $dni)
-                                ->first();
-        if(count($trabajador)>0){
-            $centro_id      =       $trabajadorespla->centro_osiris_id;
+
+        $trabajadorespla = DB::table('WEB.platrabajadores')
+            ->where('situacion_id', 'PRMAECEN000000000002')
+            ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+            ->where('dni', $dni)
+            ->first();
+
+        if (!$trabajadorespla) {
+            return view('valerendir.modal.modalerrorempresa', [
+                'mensaje' => 'No puede realizar un registro porque no es la empresa a cual pertenece.',
+                'ajax' => true
+            ]);
         }
+
+        $centro_id = $trabajadorespla->centro_osiris_id;
+
         $centrot        =   DB::table('ALM.CENTRO')
                             ->where('COD_CENTRO', $centro_id)
                             ->first();
 
-
-
         $cod_centro = $centrot->COD_CENTRO; 
         $nom_centro = $centrot->NOM_CENTRO; 
+
 
         $usuariosAu = DB::table('WEB.VALE_PERSONAL_AUTORIZA')
             ->where('COD_PERSONAL', Session::get('usuario')->usuarioosiris_id)

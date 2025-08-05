@@ -250,12 +250,20 @@ class ValeRendirApruebaController extends Controller
         $txt_categoria_estado_vale = 'GENERADO'; 
 
 
+        $simbolo_moneda = '';
+        if ($cod_moneda == 'MON0000000000001') {
+            $simbolo_moneda = 'S/';
+        } elseif ($cod_moneda == 'MON0000000000002') {
+            $simbolo_moneda = '$';
+        }
+
         $contrato_diferente = CMPContrato::where('COD_EMPR', '=', $cod_empr)
             ->where('COD_CATEGORIA_TIPO_CONTRATO', '=', 'TCO0000000000069')
           //  ->where('TXT_EMPR_CLIENTE', 'LIKE', '%' . $nombreCuentaCliente . '%')
             ->where('COD_EMPR_CLIENTE', '=', $codemprcliente)
-             ->where('COD_CATEGORIA_MONEDA', $cod_moneda)
-            ->select(DB::raw("COD_CONTRATO, CONCAT(LEFT(COD_CONTRATO, 6), '-', RIGHT(CONCAT('00000', RIGHT(COD_CONTRATO, 5)), 5), ' - S/', ' ', REPLACE(TXT_CATEGORIA_CANAL_VENTA, 'POR', 'X')) AS CUENTA"))
+            ->where('COD_CATEGORIA_MONEDA', $cod_moneda)
+         // ->select(DB::raw("COD_CONTRATO, CONCAT(LEFT(COD_CONTRATO, 6), '-', RIGHT(CONCAT('00000', RIGHT(COD_CONTRATO, 5)), 5), ' - S/', ' ', REPLACE(TXT_CATEGORIA_CANAL_VENTA, 'POR', 'X')) AS CUENTA"))
+            ->select(DB::raw("COD_CONTRATO,CONCAT(LEFT(COD_CONTRATO, 6), '-', RIGHT(CONCAT('00000', RIGHT(COD_CONTRATO, 5)), 5), ' - {$simbolo_moneda} ', REPLACE(TXT_CATEGORIA_CANAL_VENTA, 'POR', 'X')) AS CUENTA"))
             ->pluck('CUENTA', 'COD_CONTRATO')
             ->toArray();
 

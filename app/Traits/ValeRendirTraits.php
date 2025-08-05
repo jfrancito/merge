@@ -57,7 +57,7 @@ trait ValeRendirTraits
                  $cod_usuario_registro = Session::get('usuario')->id;
                  $cod_empr = Session::get('empresas')->COD_EMPR;
                  
-                $trabajador     =   DB::table('STD.TRABAJADOR')
+               $trabajador     =   DB::table('STD.TRABAJADOR')
                             ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
                             ->first();
                 $dni            =       '';
@@ -80,7 +80,6 @@ trait ValeRendirTraits
 
                 $cod_centro = $centrot->COD_CENTRO; 
             
-
 
                  $stmt->bindParam(1, $ind_tipo_operacion, PDO::PARAM_STR);
                  $stmt->bindParam(2, $id, PDO::PARAM_STR);
