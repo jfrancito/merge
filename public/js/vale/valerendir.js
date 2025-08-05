@@ -152,6 +152,7 @@ $(document).ready(function(){
 
             ajax_normal_combo(data,"/registrar_vale_rendir","listadetalleajax")  */
 
+
         $(".valerendirprincipal").on('dblclick', '.dobleclickpc', function (e) {
             let _token = $('#token').val();
             let valerendir_id = $(this).attr('data_vale_rendir');
