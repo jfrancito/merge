@@ -56,6 +56,8 @@ class NotificacionOC extends Command
         $this->envio_correo_confirmacion();
         $this->ejecutar_orden_ingreso();
         $this->orden_ingreso_ejecutada();
+        $this->envio_correo_tesoreria_lq();
+        
         $horaActual = date("H:i");
 
 
@@ -72,6 +74,16 @@ class NotificacionOC extends Command
             $this->cambiar_fecha_vencimiento();
             $this->cambiar_parcialmente();
         }
+
+
+
+
+        if($horaActual == '01:00' || $horaActual == '03:00' || $horaActual == '05:00'){
+            $this->documentolgautomaticonuevo();
+        }
+
+
+
 
         // //precios de supermercado
         // try{    
