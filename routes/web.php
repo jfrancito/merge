@@ -53,9 +53,9 @@ Route::any('/generar-token-sunat-curl', 'UserController@actionGenerarTokenSunat_
 Route::any('/leerdocumentos-sunat-compras', 'CpeController@actionGestionCpeCompra');//vALIDAR CDR Y SUNAT
 Route::any('/leerpreciocompetencia', 'PrecioCompetenciaController@actionScrapearPrecios');//vALIDAR CDR Y SUNAT
 Route::any('/transferirdataventas', 'TransferirDataController@actionTransferirVentasAtendidas');//TRANSFERIR DATA AGENTE IA
-
 Route::any('/documentolgautomatico', 'PrecioCompetenciaController@actionDocumentoLGAutomatico');//TRANSFERIR DATA AGENTE IA
-
+Route::any('/enviocorreotesorerialg', 'UserController@actionCorreoTesoreriaLg');//correo para usuario contacto
+Route::any('/guardardocumentacionlq', 'PrecioCompetenciaController@actionDocumentoLGAutomaticoNuevo');//correo para usuario contacto
 
 
 Route::group(['middleware' => ['authaw']], function () {
@@ -69,6 +69,11 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/configurar-datos-cuenta-bancaria/{idusuario}', 'UserController@actionConfigurarDatosCuentaBancaria');
 	Route::any('/ajax-eliminar-cb', 'UserController@actionEliminarCuentaBancaria');
 
+
+	Route::any('/pdf-sunat-personal', 'GestionLiquidacionGastosController@actionPdfSunatPersonal');
+
+
+
 	Route::any('/ajax-modal-ver-cuenta-bancaria-contrato', 'UserController@actionAjaxModalVerCuentaBancariaContrato');
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-contrato', 'UserController@actionAjaxModalConfiguracionCuentaBancariaContrato');
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-oc', 'UserController@actionAjaxModalConfiguracionCuentaBancariaOC');
@@ -80,16 +85,17 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/configurar-datos-cuenta-bancaria-oc/{prefijo_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaOC');
 
 	Route::any('/ajax-modal-ver-cuenta-bancaria-oc', 'UserController@actionAjaxModalVerCuentaBancariaOC');
+	Route::any('/ajax-modal-ver-cuenta-bancaria-lq', 'UserController@actionAjaxModalVerCuentaBancariaLQ');
+	Route::any('/ajax-modal-configuracion-cuenta-bancaria-lq', 'UserController@actionAjaxModalConfiguracionCuentaBancariaLQ');
+	Route::any('/configurar-datos-cuenta-bancaria-lq/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaLQ');
+
+
 	Route::any('/cambiar-cuenta-corriente/{empresa_id}/{banco_id}/{nro_cuenta}/{moneda_id}/{idoc}/{idopcion}', 'UserController@actionCambiarCuentaCorriente');
 	Route::any('/gestion-de-cpe/{idopcion}', 'CpeController@actionGestionCpe');
 	Route::any('/descargar-archivo/{archivonombre}', 'CpeController@actionDescargarArchivo');
 	Route::any('/gestion-de-sunat-cpe-local/{idopcion}', 'CpeController@actionGestionCpeLocal');
 	Route::any('/descargar-archivo-local/{tipo}', 'CpeController@descargarArchivoLocal');
 	Route::any('/descargar-archivo-lq/{id}/{nombre_archivo}/{tipo}', 'CpeController@descargarArchivoLocalLQ');
-
-
-
-
 	Route::any('/descargar-archivos-sunat-lg', 'CpeController@descargarArchivoSunatLG');
 
 
@@ -103,6 +109,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-combo-autoriza', 'GestionLiquidacionGastosController@actionAjaxComboAutoriza');
 	Route::any('/extonar-liquidacion-gastos/{idopcion}/{iddocumento}', 'GestionLiquidacionGastosController@actionExtornarLiquidacionGastos');
 	Route::any('/extonar-liquidacion-gastos-detalle/{idopcion}/{item}/{iddocumento}', 'GestionLiquidacionGastosController@actionExtornarLiquidacionGastosDetalle');
+	Route::any('/tutorial/{nombre}', 'GestionLiquidacionGastosController@actionTutorialLiquidacionGastos');
+	Route::any('/gestion-de-archivos-liquidacion-faltantes/{idopcion}', 'GestionLiquidacionGastosController@actionListarLiquidacionGastosFaltante');
+
 
 
 	Route::any('/ajax-buscar-documento-uc-lg', 'GestionLiquidacionGastosController@actionAjaxUCListarLiquidacionGastos');
@@ -131,6 +140,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/agregar-extorno-administracion/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionAgregarExtornoAdministracion');
 	Route::any('/agregar-extorno-contabilidad-lg/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionAgregarExtornoContabilidadLG');
 	Route::any('/ajax-leer-xml-lg-validar', 'GestionLiquidacionGastosController@actionAjaxLeerXmlLGValidar');
+	Route::any('/validez-comprobante-pdf', 'GestionLiquidacionGastosController@actionLiquidacionValidezComprobantePdf');
+
 
 	Route::any('/gestion-de-liquidacion-gastos-adm/{idopcion}', 'GestionLiquidacionGastosController@actionListarLGValidado');
 	Route::any('/ajax-buscar-documento-lg', 'GestionLiquidacionGastosController@actionListarAjaxBuscarDocumentoLG');
@@ -152,7 +163,7 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/guardar-empresa-proveedor/{idopcion}', 'GestionLiquidacionGastosController@actionGuardarEmpresaProveedor');
 
-
+	Route::any('/ajax-cuenta-bancaria-proveedor-lq', 'GestionLiquidacionGastosController@actionAjaxBuscarCuentaBancariaLQ');
 
 	//PLANILLA MOVILIDAD
 	Route::any('/gestion-de-planilla-movilidad/{idopcion}', 'GestionPlanillaMovilidadController@actionListarPlanillaMovilidad');
@@ -311,6 +322,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-moneda-ajax-cuenta', 'GestionOCController@actionAjaxMonedaAjaxCuenta');
 
 
+
+
 	//ADMINISTRATOR CONTRATO
 	Route::any('/detalle-comprobante-contrato-administrator/{procedencia}/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionDetalleComprobantecontratoAdministrator');
 	Route::any('/subir-xml-cargar-datos-contrato-administrator/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionCargarXMLContratoAdministrator');
@@ -375,6 +388,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/gestion-de-aprobar-planilla-consolidada/{idopcion}', 'GestionPlanillaMovilidadController@actionAprobarPlanillaMovilidadContabilidad');
 	Route::any('/aprobar-planilla-movilidad-contabilidad/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadController@actionAprobarContabilidadPLA');
 	Route::any('/agregar-extorno-contabilidad-pla/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadController@actionAgregarExtornoContabilidadPLA');
+	Route::any('/aprobar-planilla-movilidad-contabilidad-revisadas/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadController@actionAprobarContabilidadPLARevisada');
+
 
 
 	//ENTREGA DE DOCUMENTOS

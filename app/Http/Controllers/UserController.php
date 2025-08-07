@@ -184,6 +184,66 @@ class UserController extends Controller {
 	}
 
 
+	public function actionAjaxModalConfiguracionCuentaBancariaLQ(Request $request)
+	{
+
+        $ID_DOCUMENTO           =   $request['ID_DOCUMENTO'];
+        $idopcion               =   $request['idopcion'];
+
+        $idoc                   =   $ID_DOCUMENTO;
+        $ordencompra          	=   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$idoc)->first();
+
+
+
+		$usuario    			=   User::where('id','=',Session::get('usuario')->id)->first();
+		$combo_banco 			= 	$this->gn_generacion_combo_categoria('BANCOS_MERGE','Seleccione banco','');
+		$defecto_banco			= 	'';
+		$combo_tipocuenta 		= 	$this->gn_generacion_combo_categoria('CUENTA_MERGE','Seleccione tipo cuenta','');
+		$defecto_tipocuenta		= 	'';
+		$combo_moneda 			= 	$this->gn_generacion_combo_categoria('MONEDA_MERGE','Seleccione moneda','');
+		$defecto_moneda			= 	'';
+
+		return View::make('usuario/modal/ajax/mdatoscuentabancarialg',
+						 [		 	
+						 	'usuario' 						=> $usuario,
+						 	'idoc' 							=> $idoc,
+						 	'idopcion' 						=> $idopcion,
+						 	'combo_banco' 					=> $combo_banco,
+						 	'defecto_banco' 				=> $defecto_banco,
+						 	'combo_tipocuenta' 				=> $combo_tipocuenta,
+						 	'defecto_tipocuenta' 			=> $defecto_tipocuenta,
+						 	'combo_moneda' 					=> $combo_moneda,
+						 	'defecto_moneda' 				=> $defecto_moneda,						 	
+						 	'ajax' 							=> true,						 	
+						 ]);
+	}
+
+
+	public function actionAjaxModalVerCuentaBancariaLQ(Request $request)
+	{
+
+
+        $ID_DOCUMENTO          	=   $request['ID_DOCUMENTO'];
+        $idopcion               =   $request['idopcion'];
+
+        $idoc                   =   $ID_DOCUMENTO;
+        $ordencompra          	=   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$idoc)->first();
+		$cuentabancarias 		= 	TESCuentaBancaria::where('COD_EMPR_TITULAR','=',$ordencompra->COD_EMPRESA_TRABAJADOR)
+									->where('COD_ESTADO','=',1)
+									->orderby('TXT_EMPR_BANCO','ASC')
+								  	->get();
+
+		return View::make('usuario/modal/ajax/mvercuentabancaria',
+						 [		 	
+
+						 	'cuentabancarias' 				=> $cuentabancarias,
+						 	'idoc' 							=> $idoc,
+						 	'idopcion' 						=> $idopcion,
+						 	'ajax' 							=> true,						 	
+						 ]);
+	}
+
+
 
 	public function actionAjaxModalVerCuentaBancariaOC(Request $request)
 	{
@@ -470,6 +530,63 @@ class UserController extends Controller {
 	}
 
 
+	public function actionConfigurarDatosCuentaBancariaLQ($ID_DOCUMENTO,$idopcion,Request $request)
+	{
+
+        $idoc                   					=   $ID_DOCUMENTO;
+        $ordencompra          						=   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$idoc)->first();
+
+		$banco_id 	 		 	 					= 	$request['banco_id'];
+		$tipocuenta_id 	 		 					= 	$request['tipocuenta_id'];
+		$moneda_id 	 		 						= 	$request['moneda_id'];
+		$numerocuenta 	 		 					= 	$request['numerocuenta'];
+		$numerocuentacci 	 		 				= 	$request['numerocuentacci'];
+
+
+		$banco 										=	CMPCategoria::where('COD_CATEGORIA','=',$banco_id)->first();
+		$tipocuenta 								=	CMPCategoria::where('COD_CATEGORIA','=',$tipocuenta_id)->first();
+		$moneda 									=	CMPCategoria::where('COD_CATEGORIA','=',$moneda_id)->first();
+		$empresa 									=	STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPRESA_TRABAJADOR)->first();
+
+
+		$tescuentabb    							=   TESCuentaBancaria::where('COD_EMPR_TITULAR','=',$empresa->COD_EMPR)
+														->where('COD_EMPR_BANCO','=',$banco->COD_CATEGORIA)
+														->where('COD_CATEGORIA_MONEDA','=',$moneda->COD_CATEGORIA)
+														->where('TXT_TIPO_REFERENCIA','=',$tipocuenta->COD_CATEGORIA)
+														->where('TXT_NRO_CUENTA_BANCARIA','=',$numerocuenta)
+														->where('COD_ESTADO','=',1)
+														->first();
+
+		if(count($tescuentabb) > 0){
+				return Redirect::back()->withInput()->with('errorurl', 'La cuenta ya se cuenta registrado');
+		}
+
+
+		$cuentabancaria 							=	New TESCuentaBancaria();
+		$cuentabancaria->COD_EMPR_TITULAR 			=   $empresa->COD_EMPR;
+		$cuentabancaria->COD_EMPR_BANCO 			=   $banco->COD_CATEGORIA;
+		$cuentabancaria->TXT_NRO_CUENTA_BANCARIA	=   $numerocuenta;
+		$cuentabancaria->TXT_EMPR_TITULAR 			=   $empresa->NOM_EMPR;
+		$cuentabancaria->TXT_EMPR_BANCO 			=   $banco->NOM_CATEGORIA;
+		$cuentabancaria->COD_CATEGORIA_MONEDA 		=   $moneda->COD_CATEGORIA;
+		$cuentabancaria->TXT_CATEGORIA_MONEDA 		=   $moneda->NOM_CATEGORIA;
+		$cuentabancaria->TXT_NRO_CCI 				=   $numerocuentacci;
+		$cuentabancaria->TXT_GLOSA 					=   '';
+		$cuentabancaria->TXT_TIPO_REFERENCIA 		=   $tipocuenta->COD_CATEGORIA;
+		$cuentabancaria->TXT_REFERENCIA 			=   $tipocuenta->NOM_CATEGORIA;
+		$cuentabancaria->COD_USUARIO_CREA_AUD 		=   Session::get('usuario')->id;
+		$cuentabancaria->FEC_USUARIO_CREA_AUD 		=   $this->fechaactual;
+		$cuentabancaria->COD_ESTADO 				=   1;
+		$cuentabancaria->COD_CUENTA_CONTABLE 		=   '';
+		$cuentabancaria->TXT_CUENTA_CONTABLE 		=   '';
+		$cuentabancaria->save();
+
+		return Redirect::back()->withInput()->with('bienhecho', 'Cuenta Bancaria '.$numerocuenta.' registrada con éxito');
+
+
+	}
+
+
 
 	public function actionEliminarCuentaBancaria(Request $request)
 	{
@@ -680,6 +797,11 @@ class UserController extends Controller {
 						 	'usuario' => $usuario,
 						 	'mensaje' => $mensaje,
 						 ]);
+	}
+
+    public function actionCorreoTesoreriaLg()
+	{
+		$this->envio_correo_tesoreria_lq();
 	}
 
     public function actionCorreoConfirmacion()

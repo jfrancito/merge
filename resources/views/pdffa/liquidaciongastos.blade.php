@@ -18,11 +18,24 @@
 			<div class="top">
 			    <div class="det1">
 	   				<p>
+	   					<strong>CODIGO:</strong> {{$codigoosiris}}
+	   				</p> 
+	   				<p>
 	   					<strong>NOMBRE:</strong> {{$liquidaciongastos->TXT_EMPRESA_TRABAJADOR}}
 	   				</p>  		    		   					   				
 	   				<p>
 	   					<strong>AREA :</strong> {{$liquidaciongastos->TXT_AREA}}   					
 	   				</p>
+	   				<p>
+	   					<strong>LUGAR DE VIAJE :</strong> {{$lugarviaje}}   					
+	   				</p>
+	   				<p>
+	   					<strong>MOTIVO DEL VIAJE :</strong> {{$motivoviaje}}   					
+	   				</p>
+	   				<p>
+	   					<strong>FECHA DE VIAJE:</strong> {{$cadenaFechas}}   					
+	   				</p>
+
 			    </div>
 			</div>
         </article>
