@@ -66,10 +66,10 @@
 
                 <div class="dropdown">
 
-                         <button class="btn btn-sm btn-outline-dark dropdown-toggle text-left btn-primary" style="margin-top: 7px;"
+                         <button class="btn btn-sm btn-outline-dark dropdown-toggle text-left btn-primary" style="margin-top: 1px;"
                                 type="button" id="dropdownAcciones{{ $item['ID'] }}"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                             <i class="mdi mdi-eye mr-1"></i> Ver Detalle
+                             <i class="mdi mdi-eye mr-4"></i> Ver Detalle
                         </button>
                        <div class="dropdown-menu d-dropdown-menu shadow-sm p-1" aria-labelledby="dropdownAcciones{{ $item['ID'] }}">
                             @if(!empty($item['TXT_GLOSA_RECHAZADO']))

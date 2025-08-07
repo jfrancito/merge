@@ -74,26 +74,6 @@
                         value="{{ reset($subcuentas) }}" readonly>
             </div>
 
-           {{--  <div class="form-group">
-                <label for="cuenta" style="font-family: 'Times New Roman', serif; color: #1E90FF; font-size: 15px;">* Cuenta</label>
-                {!! Form::select('cuenta_id_contrato', $contrato_diferente, [], [
-                    'class' => 'select2 form-control input-custom',
-                    'id' => 'cuenta_id_contrato',
-                    'required' => '',
-                    'data-aw' => '1',
-                ]) !!}
-            </div> --}}
-
-           {{-- <div class="form-group">
-                <label for="subcuenta" style="font-family: 'Times New Roman', serif; color: #1E90FF; font-size: 15px;">* Sub-Cuenta</label>
-                {!! Form::select('cuenta_id_subcuenta', $subcuentas, [], [
-                    'class' => 'select2 form-control input-custom',
-                    'id' => 'cuenta_id_subcuenta',
-                    'required' => '',
-                    'data-aw' => '1',
-                ]) !!}
-            </div> --}}
-
             <div class="form-group">
                 <label for="glosaRegistrada" style="font-family: 'Times New Roman', serif; color: #1E90FF; font-size: 15px;">* Glosa Autoriza</label>
                 <textarea id="glosaRegistrada" name="glosaRegistrada" class="form-control input-custom" 
@@ -103,22 +83,28 @@
             <div class="form-group">
                 <label style="font-family: 'Times New Roman', serif; color: #1E90FF; font-size: 15px;">* Tipo de Pago</label>
                 <div class="custom-radio-group">
-                    <label style="font-family: 'Times New Roman', serif; color: #708090; font-size: 13px;"> <input type="radio" name="tipo_pago" id="radioCaja" value="caja"> Transferencia</label>
                     <label style="font-family: 'Times New Roman', serif; color: #708090; font-size: 13px;"><input type="radio" name="tipo_pago" id="radioEfectivo" value="efectivo"> Efectivo</label>
-                    
+                    <label style="font-family: 'Times New Roman', serif; color: #708090; font-size: 13px;"> <input type="radio" name="tipo_pago" id="radioCaja" value="caja"> Transferencia</label>
+                   
                 </div>
             </div>
 
+            @php
+                $moneda = $cod_moneda === 'MON0000000000001';
+                $valorNomBanco = $moneda ? $nombreBanco : '';
+                $valorNumBanco = $moneda ? $numeroBanco : '';
+            @endphp
+
             <div id="selectContainer" class="form-row" style="display: none;">
                 <div class="form-group col-md-6">
-                    <label for="nomBanco" style="font-family: 'Times New Roman', serif; color: #1E90FF; font-size: 15px;">* Banco</label>
+                    <label for="nomBanco" style="font-family: 'Times New Roman', serif; color: #1E90FF; font-size: 15px;">* Entidad Bancaria</label>
                     <input type="text" id="nomBanco" name="nomBanco" class="form-control input-custom" 
-                        value="{{$nombreBanco}}" readonly data-nombanco="{{$nombreBanco}}" >
+                        value="{{ $valorNomBanco }}"  data-nombanco="{{$valorNomBanco}}" autocomplete="off" @if($moneda) readonly @endif>
                 </div>
                 <div class="form-group col-md-6">
                     <label for="numBanco" style="font-family: 'Times New Roman', serif; color: #1E90FF; font-size: 15px;">* Cuenta Bancaria</label>
                     <input type="text" id="numBanco" name="numBanco" class="form-control input-custom"
-                        value="{{$numeroBanco}}" readonly data-numbanco="{{$numeroBanco}}">
+                         value="{{ $valorNumBanco }}"  maxlength="20"  data-numbanco="{{$valorNumBanco}}" autocomplete="off" @if($moneda) readonly @endif>
                 </div>
             </div> 
 
@@ -178,6 +164,13 @@
     });
 </script>
 
+<script>
+  document.getElementById('numBanco').addEventListener('keypress', function (e) {
+    if (!/[0-9]/.test(e.key)) {
+      e.preventDefault();
+    }
+  });
+</script>
 
 
 

@@ -127,7 +127,7 @@ class ValeRendirApruebaController extends Controller
         $cod_categoria_estado_vale = 'ETM0000000000007';  
         $txt_categoria_estado_vale = 'APROBADO'; 
 
-         $valerendir_id = $request->input('valerendir_id');
+        $valerendir_id = $request->input('valerendir_id');
 
         $registro = DB::table('WEB.VALE_RENDIR')
         ->select('COD_CENTRO')
@@ -326,8 +326,9 @@ class ValeRendirApruebaController extends Controller
             'glosaCliente' => $glosaCliente,
             // 'nombreBanco' => $cuentaBancaria->TXT_EMPR_BANCO,
             // 'numeroBanco' => $cuentaBancaria->TXT_NRO_CUENTA_BANCARIA,
-            'nombreBanco' => $datoscuentasueldo[0]->numcuenta,
-            'numeroBanco' => $datoscuentasueldo[0]->entidad,
+            'numeroBanco' => $datoscuentasueldo[0]->numcuenta,
+            'nombreBanco' => $datoscuentasueldo[0]->entidad, 
+            'cod_moneda' =>$txtNombreCliente->COD_MONEDA,
             'ajax'=>true,
         ]);                     
     }
@@ -459,14 +460,25 @@ class ValeRendirApruebaController extends Controller
         $NomBanco = $valeRendirOsiris->TXT_CATEGORIA_BANCO;
         $NumBanco = $valeRendirOsiris->NRO_CUENTA;
         $txt_glosa_aprobado = $valeRendirOsiris->TXT_GLOSA_APROBADO;
+        $cod_moneda = $valeRendirOsiris->COD_MONEDA;
+        $id_osiris = $valeRendirOsiris->ID_OSIRIS;
 
-        
+        $simbolo = $cod_moneda == 'MON0000000000001' ? 'S/.' : '$';
+
         $contrato_descripcion = CMPContrato::where('COD_CONTRATO', $cod_contrato)
-        ->select(DB::raw("CONCAT(LEFT(COD_CONTRATO, 6), '-', 
-            RIGHT(CONCAT('00000', RIGHT(COD_CONTRATO, 5)), 5), ' - S/', ' ', 
-            REPLACE(TXT_CATEGORIA_CANAL_VENTA, 'POR', 'X')) AS CUENTA"))
-        ->pluck('CUENTA')
-        ->first();
+            ->select(DB::raw("
+                CONCAT(
+                    LEFT(COD_CONTRATO, 6), '-', 
+                    RIGHT(CONCAT('00000', RIGHT(COD_CONTRATO, 5)), 5), 
+                    ' - ', '$simbolo', ' ',
+                    REPLACE(TXT_CATEGORIA_CANAL_VENTA, 'POR', 'X')
+                ) AS CUENTA
+            "))
+            ->pluck('CUENTA')
+            ->first();
+
+
+
 
          return view('valerendir.ajax.modalverdetallevalerendir', [
              'id' => $id,
@@ -483,6 +495,8 @@ class ValeRendirApruebaController extends Controller
              'NomBanco' => $NomBanco,
              'NumBanco' => $NumBanco,
              'txt_glosa_aprobado' => $txt_glosa_aprobado,
+             'cod_moneda' => $cod_moneda,
+             'id_osiris' => $id_osiris,
              'ajax'=>true,
         ]);           
     }

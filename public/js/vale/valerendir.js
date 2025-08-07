@@ -524,6 +524,13 @@ $(document).ready(function(){
             return; 
             }
 
+         if (tipo_pago === 1) {
+            if (!numero_cuenta || !txt_categoria_banco) {
+            alerterrorajax("La cuenta es en Dólares, debe ingresar la entidad bancaria y el número de cuenta.");
+            return; 
+            }
+         }
+
             $.ajax({
                   type    :   "POST",
                   url     :   carpeta+"/aprobar_vale_rendir",

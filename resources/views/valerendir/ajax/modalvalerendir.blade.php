@@ -145,6 +145,18 @@
                                         </div>
                                     </div>
 
+
+                                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
+                                        <div class="form-group">
+                                            <label class="col-sm-12 control-label labelleft"><br></label>
+                                            <div class="col-sm-12 input-group xs-mb-15" style="font-family: 'Times New Roman', serif;">
+                                                <strong>🔔 Importante:</strong> Para rendiciones con factura, el monto no debe exceder los S/ 700.00.<br>
+                                                <strong>⚠️ Evite inconvenientes:</strong> Verifique el monto antes de solicitar la factura.<br>
+                                                <strong>🚫 Facturas</strong> que superen este límite no serán aceptadas.
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
                                 
                                 <div class="listadetalleajax"></div>
