@@ -14,7 +14,7 @@
     <div class="row">
       <div class="col-md-12">
         <div class="panel panel-default panel-border-color panel-border-color-primary">
-          <div class="panel-heading panel-heading-divider">LIQUIDACION DE GASTOS ({{$liquidaciongastos->CODIGO}})
+          <div class="panel-heading panel-heading-divider">LIQUIDACION DE GASTOS ({{$liquidaciongastos->ID_DOCUMENTO}})
 
             <span class="panel-subtitle">Crear un nueva nueva liquidacion de gastos</span>
             <input type="hidden" name="idopcion" id='idopcion' value='{{$idopcion}}'>

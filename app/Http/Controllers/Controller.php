@@ -68,7 +68,7 @@ class Controller extends BaseController {
 
 		//fecha actual 10 dias
 		$fechatreinta 	= date('Y-m-j');
-		$nuevafecha 	= strtotime ( '-15 day' , strtotime($fechatreinta));
+		$nuevafecha 	= strtotime ( '-30 day' , strtotime($fechatreinta));
 		$nuevafecha 	= date ('Y-m-j' , $nuevafecha);
 		$this->fecha_menos_diez_dias = date_format(date_create($nuevafecha), 'd-m-Y');
 

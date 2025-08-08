@@ -57,6 +57,8 @@ class CpeController extends Controller {
     use LiquidacionGastoTraits;
 
 
+
+
     public function descargarArchivoLocalLQ($id,$nombrearchivo,$tipo)
     {
 	    // Ruta UNC del archivo

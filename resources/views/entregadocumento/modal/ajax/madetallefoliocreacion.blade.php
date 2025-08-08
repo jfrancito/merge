@@ -19,7 +19,7 @@
         </ul>
         <div class="tab-content">
           <div id="foliopendiente" class="tab-pane active cont">
-              <div class="scroll_text scroll_text_heigth_aler" style = "padding: 0px !important;"> 
+              <div class="scroll_text scroll_text_heigth_aler" style = "padding: 0px !important;">
                   <table  class="table table-striped table-borderless table-hover td-color-borde td-padding-7 listatabla">
                     <thead>
                       <tr>
@@ -47,7 +47,7 @@
                                 <span class="mdi mdi-delete mdiex" data_folio='{{$item->FOLIO}}'></span>
                               </div>
                           </td>
-                        </tr>                    
+                        </tr>
                       @endforeach
                     </tbody>
                   </table>
@@ -97,7 +97,7 @@
                                         value=""
                                         placeholder="Glosa"
                                         required=""
-                                        autocomplete="off" class="form-control input-sm importe" data-aw="2"/>
+                                        autocomplete="off" class="form-control input-sm importe control_caracteres" data-aw="2"/>
                             </div>
                           </div>
                         </div>

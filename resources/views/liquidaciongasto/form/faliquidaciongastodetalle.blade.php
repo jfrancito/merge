@@ -37,6 +37,8 @@
               <p style="margin:0px;"><b>Estado Comprobante</b> : <strong class="NESTADOCP"></strong></p>
               <p style="margin:0px;"><b>Estado Ruc</b> : <strong class="NESTADORUC"></strong></p>
               <p style="margin:0px;"><b>Estado Domicilio</b> :<strong class="NCONDDOMIRUC"></strong></p>
+              <p style="margin:0px;"><b>Pdf Sunat</b> :<strong class="PDFSUNAT"></strong></p>
+
               <input type="hidden" name="SUCCESS" id="SUCCESS" >
               <input type="hidden" name="MESSAGE" id="MESSAGE" >
               <input type="hidden" name="ESTADOCP" id="ESTADOCP" >
@@ -48,12 +50,24 @@
               <input type="hidden" name="EMPRESAID" id="EMPRESAID" >
               <input type="hidden" name="NOMBREFILE" id="NOMBREFILE" >
               <input type="hidden" name="RUTACOMPLETA" id="RUTACOMPLETA" >
+              <input type="hidden" name="RUTACOMPLETAPDF" id="RUTACOMPLETAPDF" >
+              <input type="hidden" name="NOMBREPDF" id="NOMBREPDF" >
+
               <input type="hidden" name="array_detalle_producto" id='array_detalle_producto' value=''>
           </div>
 
           <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 negrita" align="center">
               <button  type="button" class="btn btn-space btn-success btn-lg validarxml" id='validarxml' title="Cargar Datos">Validar</button>
           </div>
+
+          <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 negrita" align="center" style="    margin-left: 16px;">
+              <button  type="button" class="btn btn-space btn-primary btn-lg limpiarxml" id='limpiarxml'>Limpiar</button>
+          </div>
+
+          <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 negrita" align="center" style="    margin-left: 18px;">
+              <button  type="button" class="btn btn-space btn-success btn-lg traerpdf" id='traerpdf'>PDF Sunat</button>
+          </div>
+
 
         </div>
     </div>
@@ -260,7 +274,7 @@
   @endif
 @else
   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="text-align: right;margin-top: 13px;margin-bottom: 13px;">
-    <button type="button" data-dismiss="modal" class="btn btn-success btn-guardar-detalle-factura">GUARDAR PARA AGREGAR DETALLE</button>
+    <button type="button" data-dismiss="modal" class="btn btn-success btn-guardar-detalle-factura">GUARDAR PARA AGREGAR DOCUMENTO</button>
   </div>
 @endif
 <div class="col-xs-12">

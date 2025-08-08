@@ -20,6 +20,80 @@ $(document).ready(function(){
     });
 
 
+    $(".liquidaciongasto").on('click','.ver_cuenta_bancaria', function() {
+
+        var _token                  =   $('#token').val();
+        var ID_DOCUMENTO            =   $('#ID_DOCUMENTO').val();
+        var idopcion                =   $('#idopcion').val();
+        data                        =   {
+                                            _token                  : _token,
+                                            ID_DOCUMENTO            : ID_DOCUMENTO,
+                                        };
+
+        ajax_modal(data,"/ajax-modal-ver-cuenta-bancaria-lq",
+                  "modal-configuracion-usuario-detalle","modal-configuracion-usuario-detalle-container");
+
+    });
+
+
+
+    $(".liquidaciongasto").on('change','#tipopago_id', function() {
+
+        var _token              =   $('#token').val();
+        var tipopago_id     =   $(this).val();
+        var ID_DOCUMENTO        =   $('#ID_DOCUMENTO').val();
+        $('.detallecuenta').hide();
+        if(tipopago_id == 'MPC0000000000002'){
+
+            $('.detallecuenta').show();
+        }
+
+    });
+
+
+
+    $(".liquidaciongasto").on('change','.entidadbanco', function() {
+
+
+        var _token              =   $('#token').val();
+        var entidadbanco_id     =   $(this).val();
+        var ID_DOCUMENTO        =   $('#ID_DOCUMENTO').val();
+
+        $.ajax({
+              type    :     "POST",
+              url     :     carpeta+"/ajax-cuenta-bancaria-proveedor-lq",
+              data    :     {
+                                _token              : _token,
+                                entidadbanco_id     : entidadbanco_id,
+                                ID_DOCUMENTO        : ID_DOCUMENTO
+                            },
+                success: function (data) {
+                    $('.ajax_cb').html(data);
+                },
+                error: function (data) {
+                    error500(data);
+                }
+        });
+    });
+
+    $(".liquidaciongasto").on('click','.agregar_cuenta_bancaria', function() {
+
+        var _token                  =   $('#token').val();
+        var idopcion                =   $('#idopcion').val();
+        var ID_DOCUMENTO            =   $('#ID_DOCUMENTO').val();
+
+        data                        =   {
+                                            _token                  : _token,
+                                            ID_DOCUMENTO            : ID_DOCUMENTO,
+                                            idopcion                : idopcion,
+
+                                        };
+
+        ajax_modal(data,"/ajax-modal-configuracion-cuenta-bancaria-lq",
+                  "modal-configuracion-usuario-detalle","modal-configuracion-usuario-detalle-container");
+
+    });
+
 
     $(".liquidaciongasto").on('click','#descargarcomprobantemasivoexcel', function() {
 
@@ -345,6 +419,63 @@ $(document).ready(function(){
 
 
 
+    });
+
+    $(".liquidaciongasto").on('click','.traerpdf', function() {
+
+
+        var _token                        =   $('#token').val();
+        var idopcion                      =   $('#idopcion').val();
+
+        var serie                         =   $('#serie').val();
+        var numero                        =   $('#numero').val();
+        var empresa_id                    =   $('#empresa_id').val();
+        var ID_DOCUMENTO                  =   $('#ID_DOCUMENTO').val();
+        var SUCCESS                       =   $('#SUCCESS').val();
+
+
+        if(SUCCESS==''){ alerterrorajax("Valide el documento"); return false; }
+
+        const link                        =   '/pdf-sunat-personal';
+        data                              =   {
+                                                    _token                  : _token,
+                                                    serie                   : serie,
+                                                    numero                  : numero,
+                                                    empresa_id              : empresa_id,
+                                                    ID_DOCUMENTO            : ID_DOCUMENTO,
+                                                    idopcion                : idopcion
+                                              };                                       
+        abrircargando();
+        $.ajax({
+            type    :   "POST",
+            url     :   carpeta+link,
+            data    :   data,
+            success: function (data) {
+                cerrarcargando();
+                debugger;
+
+                if(data.cod_error == 0){
+                    $('.DCC0000000000036').hide();
+                    $('.PDFSUNAT').html("PDF ENCONTRADO EN SUNAT");
+                    $('#RUTACOMPLETAPDF').val(data.ruta_completa);
+                    $('#NOMBREPDF').val(data.nombre_archivo);
+                    
+                }else{
+                    alerterrorajax(data.mensaje);
+                    $('.PDFSUNAT').html("");
+                    $('.DCC0000000000036').show();
+                }
+
+                console.log(data);
+            },
+            error: function (data) {
+                cerrarcargando();
+                error500(data);
+            }
+        });
+
+
+        
     });
 
 
@@ -768,7 +899,7 @@ $(document).ready(function(){
         $('.DCC0000000000004').hide();
         $('#totaldetalle').prop('readonly', true);
 
-
+        limpiarxml();
 
 
         if(tipodoc_id == 'TDO0000000000070'){
@@ -944,6 +1075,39 @@ $(document).ready(function(){
 
     });
 
+    $(".liquidaciongasto").on('click','.limpiarxml', function(e) {
+        limpiarxml();
+    });
+
+
+    function limpiarxml(){
+        $('#serie, #numero, #totaldetalle, #fecha_emision').prop('readonly', false);
+        $('#fecha_emision').css('pointer-events', 'auto').datetimepicker('enable');
+        $('.input-group-addon').css({'pointer-events': 'auto', 'cursor': 'pointer'});
+        $('#empresa_id').prop({
+            'readonly': false,
+            'disabled': false  // Asegurar que no esté deshabilitado
+        }).next('.select2-container').css('pointer-events', 'auto');
+
+        $('.MESSAGE').html("");
+        $('.NESTADOCP').html("");
+        $('.NESTADORUC').html("");
+        $('.NCONDDOMIRUC').html("");
+        $('#SUCCESS').val("");
+        $('#MESSAGE').val("");
+        $('#ESTADOCP').val("");
+        $('#NESTADOCP').val("");
+        $('#ESTADORUC').val("");
+        $('#NESTADORUC').val("");
+        $('#CONDDOMIRUC').val("");
+        $('#NCONDDOMIRUC').val("");
+        $('#NOMBREFILE').val("");
+        $('#RUTACOMPLETA').val("");
+        $('.PDFSUNAT').html("");
+        $('#RUTACOMPLETAPDF').val("");
+
+    }
+
 
     $(".liquidaciongasto").on('click','.validarxml', function(e) {
         e.preventDefault(); // Prevenir recarga del formulario
@@ -955,12 +1119,27 @@ $(document).ready(function(){
         var totaldetalle            =   $('#totaldetalle').val();
         var empresa_id              =   $('#empresa_id').val();
 
+        debugger;
 
         if(serie ==''){ alerterrorajax("Ingrese una serie."); return false;}
         if(numero ==''){ alerterrorajax("Ingrese una numero."); return false;}
         if(fecha_emision ==''){ alerterrorajax("Ingrese una fecha de emision."); return false;}
         if(totaldetalle ==''){ alerterrorajax("Ingrese una total."); return false;}
         if(empresa_id ==''){ alerterrorajax("Seleccione una empresa."); return false;}
+        if (!empresa_id || empresa_id === '') {alerterrorajax("Seleccione una empresa."); return false;}
+
+        $('#serie').prop('readonly', true);
+        $('#numero').prop('readonly', true);
+        $('#fecha_emision').prop('readonly', true).css('pointer-events', 'none');        
+        $('.input-group-addon').css('pointer-events', 'none').css('cursor', 'not-allowed');
+        $('#totaldetalle').prop('readonly', true);
+        //$('#empresa_id').prop('disabled', false).prop('readonly', true);
+        $('#empresa_id').prop('readonly', true)
+                .next('.select2-container').css('pointer-events', 'none');
+
+
+
+
         data            =   {   
                                 _token                  : _token,
                                 serie                   : serie,
@@ -978,7 +1157,7 @@ $(document).ready(function(){
             data    :   data,
             success: function (data) {
                 cerrarcargando();
-
+                debugger;
                 if(data.error == 0){
 
                     $('.MESSAGE').html(data.MESSAGE);
@@ -1027,6 +1206,15 @@ $(document).ready(function(){
     $(".liquidaciongasto").on('click','.btnemitirliquidaciongasto', function(e) {
         event.preventDefault();
         var _token                  =   $('#token').val();
+        var tipopago_id             =   $('#tipopago_id').val();
+        var entidadbanco_id         =   $('#entidadbanco_id').val();
+        var cb_id                   =   $('#cb_id').val();
+
+        if(tipopago_id == 'MPC0000000000002'){
+            if(entidadbanco_id ==''){ alerterrorajax("Seleccione Entidad Bancaria."); return false;}
+            if(cb_id ==''){ alerterrorajax("Seleccione Entidad Bancaria."); return false;}
+        }
+
 
         $.confirm({
             title: '¿Confirma la emision?',
@@ -1056,6 +1244,8 @@ $(document).ready(function(){
 
         var cuenta_id               =   $('#cuenta_id').val();
         var subcuenta_id            =   $('#subcuenta_id').val();
+        var RUTACOMPLETAPDF         =   $('#RUTACOMPLETAPDF').val();
+
 
 
 
@@ -1069,10 +1259,13 @@ $(document).ready(function(){
 
         if(tipodoc_id == 'TDO0000000000001'){
 
-            let comprobante = $('#file-DCC0000000000036')[0].files.length > 0;
-            if (!comprobante) {
-                alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
+            if(RUTACOMPLETAPDF ==""){
+                let comprobante = $('#file-DCC0000000000036')[0].files.length > 0;
+                if (!comprobante) {
+                    alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
+                }
             }
+
             var producto_id_factura  =   $('#producto_id_factura').val();
             var igv_id_factura       =   $('#igv_id_factura').val();
             var ESTADOCP             =   $('#ESTADOCP').val();
@@ -1081,11 +1274,6 @@ $(document).ready(function(){
             if(ESTADORUC ==''){ alerterrorajax("Debe validar el documento."); cerrarcargando(); return false;}
             if(producto_id_factura ==''){ alerterrorajax("Seleccione un Producto."); cerrarcargando(); return false;}
             if(igv_id_factura ==''){ alerterrorajax("Seleccione si es Afecto"); cerrarcargando(); return false;}
-
-
-
-
-
 
         }else{
 
@@ -1200,12 +1388,20 @@ $(document).ready(function(){
     $(".liquidaciongasto").on('click','.btnguardarliquidaciongasto', function(e) {
         event.preventDefault();
         var _token                  =   $('#token').val();
+        var arendir_id              =   $('#arendir_id').val();
+        var arendir_sel_id          =   $('#arendir_sel_id').val();
+
+        if(arendir_id =='SI'){ 
+            if(arendir_sel_id ==''){ 
+                alerterrorajax("Seleccione una ARENDIR."); return false;
+            }
+        }
+        
         $.confirm({
             title: '¿Confirma el registro?',
             content: 'Registro de Liquidacion de Gastos',
             buttons: {
                 confirmar: function () {
-                    abrircargando();
                     $( "#frmpm" ).submit();   
                 },
                 cancelar: function () {

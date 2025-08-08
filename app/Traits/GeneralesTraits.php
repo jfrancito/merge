@@ -159,6 +159,33 @@ trait GeneralesTraits
     }
 
 
+    public function gn_combo_arendir_restante()
+    {
+
+		$liquidaciones = DB::table('LQG_LIQUIDACION_GASTO')
+					    ->where('ACTIVO', 1)
+					    ->where('COD_ESTADO', '<>', 'ETM0000000000006')
+					    ->where('USUARIO_CREA', Session::get('usuario')->id)
+			            ->pluck('ARENDIR_ID')
+			            ->toArray();
+
+        $array    = 	DB::table('WEB.VALE_RENDIR')
+        				->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
+                		->where('COD_USUARIO_CREA_AUD', Session::get('usuario')->id)
+                		->where('COD_CATEGORIA_ESTADO_VALE', 'ETM0000000000007')
+                		->whereNotIn('ID', $liquidaciones)
+					    ->select(
+					        'ID',
+					        DB::raw("ID_OSIRIS + ' - ' + CAST(CAN_TOTAL_IMPORTE AS VARCHAR) AS MONTO")
+					    )
+			            ->orderBy('ID', 'asc')
+			            ->pluck('MONTO', 'ID')
+			            ->toArray();
+
+        $combo = array('' => 'Seleccione un arendir') + $array;
+        return $combo;
+    }
+
     public function gn_combo_arendir()
     {
 
