@@ -38,18 +38,10 @@
                     <div class="col-sm-8">{{ $txt_empresa }}</div>
                 </div>
 
-
-
-
                 <div class="row mb-2">
                     <div class="col-sm-4" style="font-weight: bold;"><strong>CUENTA:</strong></div>
                     <div class="col-sm-8">{{ $contrato_descripcion }}</div>
                 </div>
-
-
-
-
-
 
                 <div class="row mb-2">
                     <div class="col-sm-4" style="font-weight: bold;"><strong>SUB CUENTA:</strong></div>

@@ -599,6 +599,7 @@ Route::group(['middleware' => ['authaw']], function () {
     Route::post('/registrar_vale_rendir', 'ValeRendirController@insertValeRendirAction');
 	Route::post('/data_vale_rendir', 'ValeRendirController@traerdataValeRendirAction');
 	Route::post('/ver_detalle_importe_vale', 'ValeRendirController@actionDetalleImporteVale'); 
+    Route::post('/ver_mensaje_vale_rendir', 'ValeRendirController@actionMensajeValeRendir');
 
 
 	Route::get('/gestion-autoriza-rendir/{idopcion}', 'ValeRendirAutorizaController@actionValeRendirAutoriza');

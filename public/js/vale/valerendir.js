@@ -20,8 +20,6 @@ $(document).ready(function(){
 
             let opcion = vale_rendir_id === null || vale_rendir_id === undefined  || vale_rendir_id === '' ? 'I' : 'U'; 
 
-
-
             if (!usuario_autoriza || !usuario_aprueba || !txt_glosa || !tipo_motivo || !can_total_importe || !can_total_saldo || !cod_moneda) {
                  alerterrorajax("Todos los campos son obligatorios. Por favor, complete todos los campos.");
             return; 
@@ -182,7 +180,7 @@ $(document).ready(function(){
                     $('#txt_glosa').val(data_left["0"]["TXT_GLOSA"]);
                     $('#cod_moneda').val(data_left["0"]["COD_MONEDA"]).trigger('change'); 
                     $('#vale_rendir_id').val(valerendir_id);
-                    $('#asignarvalerendir').text('Modificar');
+                    $('#btntexto').text('Modificar');
 
                     $.ajax({
                         type: "POST",
@@ -659,6 +657,21 @@ $(document).ready(function(){
 
 
 
+         $(".valerendirprincipal").on('click', '.vermensaje-valerendir', function(e) {
+            e.preventDefault(); 
+            //let valerendir_id = $(this).closest('tr').attr('data_vale_rendir'); 
+            //$('#vale_rendir_id').val(valerendir_id); 
+            var _token = $('#token').val();
+           
+            data                        =   {
+                                                _token                  : _token,
+                                                //valerendir_id           : valerendir_id,
+                                            };
+
+            ajax_modal(data,"/ver_mensaje_vale_rendir",
+                      "modal-verdetalledocumentomensajevale-solicitud","modal-verdetalledocumentomensajevale-solicitud-container");
+
+        });
 
 
 
