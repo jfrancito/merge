@@ -6,7 +6,6 @@
 </div>
 
 
-
 <div id="modal-detalledocumento-solicitud" class="modal-container colored-header colored-header-primary modal-effect-8">
   <div class="modal-content ">
 	<div class='modal-detalledocumento-solicitud-container'>
@@ -46,6 +45,12 @@
 </div>
 
 
+<div id="modal-verdetalledocumentomensajevale-solicitud" class="modal-container  colored-header colored-header-danger modal-effect-8">
+  <div class="modal-content ">
+	<div class='modal-verdetalledocumentomensajevale-solicitud-container'>
+	</div>
+  </div>
+</div>
 
 
 <div class="modal-overlay"></div>

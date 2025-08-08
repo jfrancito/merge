@@ -482,7 +482,7 @@ class ValeRendirController extends Controller
 
     }
 
-        public function actionDetalleImporteVale(Request $request)
+    public function actionDetalleImporteVale(Request $request)
     { 
         $id_buscar = $request->input('valerendir_id'); 
     
@@ -494,7 +494,18 @@ class ValeRendirController extends Controller
         'detalles' => $detallesImporte
     ]);  
 
-    }         
+    }   
+
+    public function actionMensajeValeRendir(Request $request)
+    { 
+        $id_buscar = $request->input('valerendir_id'); 
+    
+         return view('valerendir.ajax.modalmensajesolicitudvale', [
+             'ajax'=>true,
+        ]);           
+    }
+
+
 
 }
 

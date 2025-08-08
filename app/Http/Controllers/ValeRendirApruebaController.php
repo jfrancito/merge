@@ -477,9 +477,6 @@ class ValeRendirApruebaController extends Controller
             ->pluck('CUENTA')
             ->first();
 
-
-
-
          return view('valerendir.ajax.modalverdetallevalerendir', [
              'id' => $id,
              'txt_serie' => $txt_serie,
@@ -506,15 +503,12 @@ class ValeRendirApruebaController extends Controller
     { 
         $id_buscar = $request->input('valerendir_id'); 
     
+        $detallesImporte = WEBValeRendirDetalle::where('ID', $id_buscar)->get(); 
    
-    $detallesImporte = WEBValeRendirDetalle::where('ID', $id_buscar)->get(); 
-   
-
-    return view('valerendir.ajax.modaldetalleimporte', [
-        'ajax' => true,
-        'detalles' => $detallesImporte
-    ]);  
-
+        return view('valerendir.ajax.modaldetalleimporte', [
+            'ajax' => true,
+            'detalles' => $detallesImporte
+        ]);  
     }         
 
 }

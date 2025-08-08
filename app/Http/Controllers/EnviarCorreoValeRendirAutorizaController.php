@@ -42,7 +42,6 @@ class EnviarCorreoValeRendirAutorizaController extends Controller
         $exito = $this->enviarCorreoValeRendir($valerendir_id);
         return response()->json(['success' => $exito]);
     }
-
 }
 
 
