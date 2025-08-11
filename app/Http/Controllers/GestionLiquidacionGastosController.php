@@ -517,6 +517,7 @@ class GestionLiquidacionGastosController extends Controller
         $empresa_id           =   '';
 
 
+
         $empresa              =   STDEmpresa::where('NRO_DOCUMENTO','=',$ruc_buscar)->first();
         if(count($empresa)>0){
             $empresa_id           =   $empresa->COD_EMPR;
@@ -547,22 +548,34 @@ class GestionLiquidacionGastosController extends Controller
                                     ->where('COD_CENTRO', $centro_id)
                                     ->get();
 
-        //dd($contratos);
+
 
         if(count($contratos)>0){
             return Redirect::to('gestion-de-empresa-proveedor/'.$idopcion)->with('errorbd','Empresa '.$empresa->NOM_EMPR.' ya existe y tiene contrato');
         }
         $response_array = json_decode($respuetaxml, true);
+
+
+        $departamento = $response_array['departamento'] ?? 'LAMBAYEQUE'; 
+        $provincia = $response_array['departamento'] ?? 'CHICLAYO'; 
+        $distrito = $response_array['departamento'] ?? 'CHICLAYO'; 
+
+        $direccion = $response_array['direccion'] ?? 'CHICLAYO'; 
+
+
         if(isset($response_array['success'])){
             return Redirect::to('gestion-de-empresa-proveedor/'.$idopcion)->with('errorbd','No se encontraron resultados.');  
         }
 
         Session::flash('ruc', $response_array['ruc']);
         Session::flash('rz', $response_array['razonSocial']);
-        Session::flash('direccion', $response_array['direccion']);
-        Session::flash('departamento', $response_array['departamento']);
-        Session::flash('provincia', $response_array['provincia']);
-        Session::flash('distrito', $response_array['distrito']);
+        Session::flash('direccion', $direccion);
+        Session::flash('departamento', $departamento);
+        Session::flash('provincia', $provincia);
+        Session::flash('distrito', $distrito);
+
+
+
         $texto_empresa = 'No cuenta con ningun registro de empresa ';
         if(count($empresa)>0){
             $texto_empresa = 'Ya Cuenta con un registro de una empresa';
@@ -3388,7 +3401,7 @@ class GestionLiquidacionGastosController extends Controller
                             return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/-1')->with('errorbd','Este proveedor emite FACTURA');
                         }
                     }
-
+                    $token = '';
 
                     //CUANDO ES PLANILLA DE MOVILIDAd
                     if(ltrim(rtrim($cod_planila))!=''){
@@ -3456,6 +3469,9 @@ class GestionLiquidacionGastosController extends Controller
 
                         if($tipodoc_id=='TDO0000000000001'){
 
+
+                            $fetoken                            =   FeToken::where('COD_EMPR','=',Session::get('empresas')->COD_EMPR)->where('TIPO','=','COMPROBANTE_PAGO')->first();
+                            $token                              =   $fetoken->TOKEN;
                             $tipodoc_id                         =   $request['tipodoc_id'];
                             $serie                              =   $request['serie'];
                             $numero                             =   $request['numero'];
@@ -3596,17 +3612,17 @@ class GestionLiquidacionGastosController extends Controller
                     $cabecera->CODIGO_CDR               =   $CODIGO_CDR;
                     $cabecera->RESPUESTA_CDR            =   $RESPUESTA_CDR;
 
-
                     $cabecera->COD_PLA_MOVILIDAD        =   $cod_planila;
                     $cabecera->TXT_GLOSA                =   $glosadet;
 
                     $cabecera->IND_OBSERVACION          =   0;
                     $cabecera->AREA_OBSERVACION         =   '';
 
-
                     $cabecera->IGV                      =   0;
                     $cabecera->SUBTOTAL                 =   $TOTAL_T;
                     $cabecera->TOTAL                    =   $TOTAL_T;
+                    $cabecera->TOKEN                    =   $token;
+
                     $cabecera->FECHA_CREA               =   $this->fechaactual;
                     $cabecera->USUARIO_CREA             =   Session::get('usuario')->id;
                     $cabecera->save();
