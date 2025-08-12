@@ -22,7 +22,13 @@
     </thead>
     <tbody>
     @foreach($listarusuarios as $index=>$item)
-    @if(($item['TXT_CATEGORIA_ESTADO_VALE'] === 'APROBADO' && $item['USUARIO_APRUEBA_ID'] === $usuario_logueado_id))
+    @if(
+            $item['COD_CATEGORIA_ESTADO_VALE'] == 'ETM0000000000007' && 
+            (
+                $perfil_administracion == '1CIX00000020' || 
+                $perfil_administracion == '1CIX00000033'
+            )
+        )
         <tr data_vale_rendir="{{$item['ID']}}">
             <td>{{$item['ID']}}</td>
             <td>{{$item['USUARIO']}}</td>
