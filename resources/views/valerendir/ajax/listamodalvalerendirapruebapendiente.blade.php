@@ -4,7 +4,6 @@
             <th>ID</th>
             <th>Solicita</th>
             <th>Autoriza</th>
-            <th>Aprueba</th>
             <th>Motivo</th>
             <th>Importe</th>
             <th>Saldo</th>
@@ -14,14 +13,20 @@
         </tr>
     </thead>
     <tbody>
+  
+
     @foreach($listarusuarios as $index=>$item)
-     @if($item['TXT_CATEGORIA_ESTADO_VALE'] === 'AUTORIZADO'  && $item['USUARIO_APRUEBA_ID'] === $usuario_logueado_id)
-      
+         @if(
+            $item['COD_CATEGORIA_ESTADO_VALE'] == 'ETM0000000000005' && 
+            (
+                $perfil_administracion == '1CIX00000020' || 
+                $perfil_administracion == '1CIX00000033'
+            )
+        )
         <tr data_vale_rendir="{{$item['ID']}}">
             <td>{{$item['ID']}}</td>
             <td>{{$item['USUARIO']}}</td>
             <td>{{$item['USUARIO_AUTORIZA']}}</td>
-            <td>{{$item['USUARIO_APRUEBA']}}</td>
             <td>{{$item['TIPO_MOTIVO']}}</td>
             <td>{{$item['COD_MONEDA'] == 'MON0000000000001' ? 'S/.' : '$' }} {{ $item['CAN_TOTAL_IMPORTE'] }}</td>
             <td>{{$item['COD_MONEDA'] == 'MON0000000000001' ? 'S/.' : '$' }} {{ $item['CAN_TOTAL_SALDO'] }}</td>

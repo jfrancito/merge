@@ -4,134 +4,174 @@ $(document).ready(function(){
     var carpeta = $("#carpeta").val();
 
 
-        $(".valerendirprincipal").on('click','#asignarvalerendir', function(e) {
+    $(".valerendirprincipal").on('click', '#asignarvalerendir', function(e) {
+        let _token = $('#token').val();
+        let usuario_autoriza = $('#cliente_select').val();
+        let usuario_aprueba = $('#cliente_select1').val();
+        let tipo_motivo = $('#tipo_motivo').val();
+        let txt_glosa = $('#txt_glosa').val();
+        let can_total_importe = $('#can_total_importe').val();
+        let can_total_saldo = $('#can_total_saldo').val();
+        let cod_moneda = $('#cod_moneda').val();
+        let vale_rendir_id = $('#vale_rendir_id').val();
 
-            let _token                  =   $('#token').val();
-            let usuario_autoriza        =   $('#cliente_select').val();
-            let usuario_aprueba         =   $('#cliente_select1').val();
-            let tipo_motivo             =   $('#tipo_motivo').val();
-            let txt_glosa               =   $('#txt_glosa').val();
-            let can_total_importe       =   $('#can_total_importe').val();
-            let can_total_saldo         =   $('#can_total_saldo').val();
-            let cod_moneda              =   $('#cod_moneda').val();
+        let opcion = !vale_rendir_id ? 'I' : 'U';
 
+        if (!usuario_autoriza) {
+            alerterrorajax("El campo 'Usuario Autoriza' es obligatorio.");
+            return;
+        }
 
-            let vale_rendir_id = $('#vale_rendir_id').val(); 
+        if (!tipo_motivo) {
+            alerterrorajax("El campo 'Tipo de Motivo' es obligatorio.");
+            return;
+        }
 
-            let opcion = vale_rendir_id === null || vale_rendir_id === undefined  || vale_rendir_id === '' ? 'I' : 'U'; 
+        if (!cod_moneda) {
+            alerterrorajax("El campo 'Moneda' es obligatorio.");
+            return;
+        }
 
-            if (!usuario_autoriza || !usuario_aprueba || !txt_glosa || !tipo_motivo || !can_total_importe || !can_total_saldo || !cod_moneda) {
-                 alerterrorajax("Todos los campos son obligatorios. Por favor, complete todos los campos.");
-            return; 
-            }
+        if (!can_total_importe) {
+            alerterrorajax("El campo 'Total Importe' es obligatorio.");
+            return;
+        }
 
-            if (parseFloat(can_total_importe) <= 0 || isNaN(parseFloat(can_total_importe))) {
-                alerterrorajax("El campo 'importe' debe ser un número positivo mayor a cero.");
-                return;
-            }
+        if (!can_total_saldo) {
+            alerterrorajax("El campo 'Total Saldo' es obligatorio.");
+            return;
+        }
 
-            if (parseFloat(can_total_saldo) <= 0 || isNaN(parseFloat(can_total_saldo))) {
-                 alerterrorajax("El campo 'saldo' debe ser un número positivo mayor a cero.");
-                return;
-            }
+        if (!txt_glosa) {
+            alerterrorajax("El campo 'Glosa' es obligatorio.");
+            return;
+        }
 
+        if (parseFloat(can_total_importe) <= 0 || isNaN(parseFloat(can_total_importe))) {
+            alerterrorajax("El campo 'importe' debe ser un número positivo mayor a cero.");
+            return;
+        }
 
-            //DETALLE
+        if (parseFloat(can_total_saldo) <= 0 || isNaN(parseFloat(can_total_saldo))) {
+            alerterrorajax("El campo 'saldo' debe ser un número positivo mayor a cero.");
+            return;
+        }
 
-            let detalles = [];
-            $('#tabla_vale_rendir_detalle tbody tr').each(function () {
-                let fechaInicio = $(this).find('td').eq(0).text().trim();
-                let fechaFin = $(this).find('td').eq(1).text().trim();
-                let codDestino = $(this).data('cod-destino');
-                let nomDestino = $(this).find('td').eq(2).text().trim();
-                let nombresTipos = $(this).find('td').eq(3).html().split('<br/>').join(',');
-                let diffDays = parseInt($(this).find('td').eq(4).text().trim()) || 0;                
-                let valoresBase = $(this).find('td').eq(5).html().split('<br/>').join(',');
-                let importesCalculados = $(this).find('td').eq(6).html().split('<br/>').join(',');
-                let totalImporte = parseFloat($(this).find('td').eq(7).text().trim()) || 0; 
-                let ind_destino = parseInt($(this).find('td').eq(8).text().trim()) || 0;
-                let ind_propio = parseInt($(this).find('td').eq(9).text().trim()) || 0;
-                let ind_aereo = parseInt($(this).find('td').eq(10).text().trim()) || 0;
-
-                let detalle_id = $(this).data('id'); 
-
-                let opcion_detalle = 'I';
-
-                detalles.push({
-                    fec_inicio               : fechaInicio,
-                    fec_fin                  : fechaFin,
-                    cod_destino              : codDestino,
-                    nom_destino              : nomDestino,
-                    nom_tipos                : nombresTipos,
-                    dias                     : diffDays,
-                    can_unitario             : valoresBase,
-                    can_unitario_total       : importesCalculados,
-                    can_total_importe        : totalImporte, 
-                    ind_destino              : ind_destino,
-                    ind_propio               : ind_propio,  
-                    ind_aereo                : ind_aereo,   
-                    opcion_detalle           : opcion_detalle,
-                    detalle_id               : detalle_id 
-                });
+        let detalles = [];
+        $('#tabla_vale_rendir_detalle tbody tr').each(function () {
+            let fila = $(this);
+            detalles.push({
+                fec_inicio: fila.find('td').eq(0).text().trim(),
+                fec_fin: fila.find('td').eq(1).text().trim(),
+                cod_destino: fila.data('cod-destino'),
+                nom_destino: fila.find('td').eq(2).text().trim(),
+                nom_tipos: fila.find('td').eq(3).html().split('<br/>').join(','),
+                dias: parseInt(fila.find('td').eq(4).text().trim()) || 0,
+                can_unitario: fila.find('td').eq(5).html().split('<br/>').join(','),
+                can_unitario_total: fila.find('td').eq(6).html().split('<br/>').join(','),
+                can_total_importe: parseFloat(fila.find('td').eq(7).text().trim()) || 0,
+                ind_destino: parseInt(fila.find('td').eq(8).text().trim()) || 0,
+                ind_propio: parseInt(fila.find('td').eq(9).text().trim()) || 0,
+                ind_aereo: parseInt(fila.find('td').eq(10).text().trim()) || 0,
+                opcion_detalle: 'I',
+                detalle_id: fila.data('id')
             });
-           abrircargando();
-           $.ajax({
-                  type    :   "POST",
-                  url     :   carpeta+"/registrar_vale_rendir",
-                  data    :   {
-                                _token                                   : _token,
-                                usuario_autoriza                         : usuario_autoriza,
-                                usuario_aprueba                          : usuario_aprueba,
-                                tipo_motivo                              : tipo_motivo,
-                                txt_glosa                                : txt_glosa,
-                                can_total_importe                        : can_total_importe,
-                                can_total_saldo                          : can_total_saldo,
-                                cod_moneda                               : cod_moneda,
-                                vale_rendir_id                           : vale_rendir_id,
-                                opcion                                   : opcion,
-                                array_detalle                            : detalles
-                                                                      
-                              },
-               
-                success: function (data) {
-                    if (data.error) {
-
-                        if (data.error.includes("Vale de rendir procesado correctamente")) {
-                        alerterrorajax("El vale a rendir ya ha sido autorizado y no puede modificarse.");
-
-                        }else {
-                            alerterrorajax(data.error); 
-                        }
-                        return;
-                    }
-            
-                  
-                    let nuevo_vale_id = data.vale_rendir_id || vale_rendir_id;
-
-                    $.ajax({
-                        type: "GET",
-                        url: carpeta + "/enviar_correo_generado",
-                        data: { valerendir_id: nuevo_vale_id },
-                        success: function(response) {
-                            if (response.success) {
-                                alertajax("Vale a rendir registrado y correo enviado correctamente."); 
-                            } else {
-                                alertajax("Vale registrado, pero no se pudo enviar el correo.");
-                            }
-                            location.reload();
-                        },
-                        error: function() {
-                            alertajax("Vale registrado, pero ocurrió un error al enviar el correo.");
-                            location.reload();
-                        }
-                    });
-                },
-
-                error: function (data) {
-                    error500(data);
-                }
-            });   
         });
+
+        abrircargando();
+
+        $.ajax({
+            type: "POST",
+            url: carpeta + "/registrar_vale_rendir",
+            data: {
+                _token: _token,
+                usuario_autoriza: usuario_autoriza,
+                usuario_aprueba: usuario_aprueba,
+                tipo_motivo: tipo_motivo,
+                txt_glosa: txt_glosa,
+                can_total_importe: can_total_importe,
+                can_total_saldo: can_total_saldo,
+                cod_moneda: cod_moneda,
+                vale_rendir_id: vale_rendir_id,
+                opcion: opcion,
+                array_detalle: detalles
+            },
+            success: function (data) {
+                if (data.error) {
+                    if (data.error.includes("Vale de rendir procesado correctamente")) {
+                        alerterrorajax("El vale a rendir ya ha sido autorizado y no puede modificarse.");
+                    } else {
+                        alerterrorajax(data.error);
+                    }
+                    return;
+                }
+
+                let nuevo_vale_id = data.vale_rendir_id || vale_rendir_id;
+                let data_modal = {
+                    _token: _token,
+                    valerendir_id: nuevo_vale_id
+                };
+
+                // Segundo AJAX: enviar correo
+                $.ajax({
+                    type: "GET",
+                    url: carpeta + "/enviar_correo_generado",
+                    data: { valerendir_id: nuevo_vale_id },
+                    success: function(response) {
+                        if (response.success) {
+                            alertajax("Vale a rendir registrado y correo enviado correctamente.");
+                        } else {
+                            alertajax("Vale registrado, pero no se pudo enviar el correo.");
+                        }
+
+                        setTimeout(function () {
+                            ajax_modal(
+                                data_modal,
+                                "/ver_mensaje_vale_rendir",
+                                "modal-verdetalledocumentomensajevale-solicitud",
+                                "modal-verdetalledocumentomensajevale-solicitud-container"
+                            );
+                            // Forzar recarga al cerrar modal, incluso si no es bootstrap puro
+    const modal = $("#modal-verdetalledocumentomensajevale-solicitud");
+    modal.on('hide.bs.modal', function () {
+        location.reload();
+    });
+                        }, 500);
+                    },
+                    error: function() {
+                        alertajax("Vale registrado, pero ocurrió un error al enviar el correo.");
+
+                        setTimeout(function () {
+                            ajax_modal(
+                                data_modal,
+                                "/ver_mensaje_vale_rendir",
+                                "modal-verdetalledocumentomensajevale-solicitud",
+                                "modal-verdetalledocumentomensajevale-solicitud-container"
+                            );
+
+
+                            // Forzar recarga al cerrar modal, incluso si no es bootstrap puro
+    const modal = $("#modal-verdetalledocumentomensajevale-solicitud");
+    modal.on('hide.bs.modal', function () {
+        location.reload();
+    });
+                        }, 500);
+                    }
+                });
+            },
+            error: function (data) {
+                error500(data);
+            }
+        });
+    });
+
+
+        $(document).on('click', '.modal-close-recargar', function () {
+            setTimeout(function () {
+                location.reload();
+            }, 300);
+        });
+
 
 
  /* data    =   {
@@ -505,7 +545,6 @@ $(document).ready(function(){
          let txt_numero              =   $('#nrodoc').val();
          let fec_autorizacion        =   $('#fecha').val();
          let cod_contrato            =   $('#cuenta_id_contrato').val();
-         //let sub_cuenta              =   $('#cuenta_id_subcuenta option:selected').text();
          let sub_cuenta              =   $('#cuenta_id_subcuenta').val();
          let txt_glosa_autorizado    =   $('#glosaRegistrada').val();
          let tipo_pago_raw           =   $('input[name="tipo_pago"]:checked').val(); 
@@ -513,7 +552,7 @@ $(document).ready(function(){
          let txt_categoria_banco     =   $('#nomBanco').val();
          let numero_cuenta           =   $('#numBanco').val();
          let txt_glosa_aprobado      =   $('#glosa').val();   
-         let vale_rendir_id          = $('#vale_rendir_id').val(); 
+         let vale_rendir_id          =   $('#vale_rendir_id').val(); 
 
        
          
@@ -740,6 +779,22 @@ $(document).ready(function(){
             return `${partes[2]}-${partes[1]}-${partes[0]}`;
         }
 
+        $(document).ready(function () {
+            let hoy = new Date();
+            let fechaMin = new Date(hoy);
+            fechaMin.setDate(hoy.getDate() - 7);
+
+            let yyyy = fechaMin.getFullYear();
+            let mm = String(fechaMin.getMonth() + 1).padStart(2, '0');
+            let dd = String(fechaMin.getDate()).padStart(2, '0');
+
+            let minDateStr = `${yyyy}-${mm}-${dd}`;
+
+            $('#fecha_inicio').attr('min', minDateStr);
+            $('#fecha_fin').attr('min', minDateStr);
+        });
+
+
         var importeDestinos = JSON.parse($('#importeDestinos').val());
         $('#agregarImporteGasto').on('click', function () {
             let destino = $('#destino option:selected').text();
@@ -934,9 +989,20 @@ $(document).ready(function(){
 
             $('#tabla_vale_rendir_detalle tbody').append(nuevaFila);
             actualizarTotalImporte();
-        });
 
+           // ✅ Obtener fecha fin del último registro
+            let ultimaFila = $('#tabla_vale_rendir_detalle tbody tr').last();
+            let fechaFinUltima = ultimaFila.find('td').eq(1).text().trim();
 
+            // 🔹 Asignar fecha inicio con la fecha fin del último registro
+            $('#fecha_inicio').val(fechaFinUltima);
+
+            // 🔹 Limpiar los demás campos
+            $('#fecha_fin').val('');
+            $('#destino').val('').trigger('change');
+            $('#ind_propio').prop('checked', false);
+            $('#ind_aereo').prop('checked', false);
+    });
 
         
         $('#tabla_vale_rendir_detalle').on('click', '.eliminarFila', function () {

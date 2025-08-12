@@ -10,7 +10,7 @@
             <li class="negrita">
                 <a href="#autorizados" data-toggle="tab">
                     <span class="badge badge-success" style="margin-right: 8px; font-size: 16px;">&nbsp;&nbsp;</span>
-                    APROBADOS
+                    AUTORIZADOS
                 </a>
             </li>
             <li class="negrita">

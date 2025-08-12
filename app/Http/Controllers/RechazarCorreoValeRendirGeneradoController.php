@@ -26,7 +26,7 @@ class RechazarCorreoValeRendirGeneradoController extends Controller
 {
     use RechazarCorreoVRGeneradoTraits;
 
-    public function actionRechazarCorreoVRGenerado(Request $request)
+    /*public function actionRechazarCorreoVRGenerado(Request $request)
     {
         $valerendir_id = $request->input('valerendir_id');
 
@@ -42,7 +42,7 @@ class RechazarCorreoValeRendirGeneradoController extends Controller
         $exito = $this->RechazarCorreoValeRendirGenerado($valerendir_id);
         return response()->json(['success' => $exito]);
     }
-
+*/
 }
 
 
