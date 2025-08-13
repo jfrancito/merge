@@ -22,21 +22,53 @@
             <div class="col-sm-12">
               <div class="panel panel-default panel-border-color panel-border-color-success">
                 <div class="panel-heading">{{ $titulo }}
+
+
                   <div class="tools tooltiptop">
 
-                      <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones asignarmasivo">
-                        <span class="tooltiptext">Integracion Masiva</span>
-                        <span class="icon mdi mdi-plus-circle-o"></span>
-                      </a>
+                      <div class="dropdown">
 
 
-                      <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscardocumentoreparable">
-                        <span class="tooltiptext">Buscar Documento</span>
-                        <span class="icon mdi mdi-search"></span>
-                      </a>
+                          <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones asignarmasivo">
+                            <span class="tooltiptext">Integracion Masiva</span>
+                            <span class="icon mdi mdi-plus-circle-o"></span>
+                          </a>
+
+
+                          <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscardocumentoreparable">
+                            <span class="tooltiptext">Buscar Documento</span>
+                            <span class="icon mdi mdi-search"></span>
+                          </a>
+
+
+
+                          <span class="icon mdi mdi-more-vert dropdown-toggle" id="menudespacho"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"></span>
+
+                          <ul class="dropdown-menu" aria-labelledby="menudespacho"
+                              style="margin: 7px -169px 0;">
+                              <li>
+                                  <a href="{{url('/comprobante-masivo-reparable-excel')}}" 
+                                     class='tn btn-secondary botoncabecera tooltipcss opciones'
+                                     target="_blank"
+                                     id="descargarcomprobantemasivoreparableexcel" 
+                                     data-href="{{url('/comprobante-masivo-reparable-excel')}}"
+                                     title="Descargar excel" style="width:100%">
+                                     <span class="tooltiptext">Descargar excel</span>
+                                     Descargar excel
+                                  </a>
+                              </li>
+                          </ul>
+                      </div>
+
+
+
 
 
                   </div>
+
+
+
                 </div>
                 <div class="panel-body">
                   <div class='filtrotabla row'>
