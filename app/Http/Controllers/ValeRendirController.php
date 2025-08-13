@@ -82,7 +82,8 @@ class ValeRendirController extends Controller
         ->pluck('NOM_DISTRITO', 'COD_DISTRITO')
         ->toArray();
 
-        $importeDestinos = DB::table('WEB.REGISTRO_IMPORTE_GASTOS as main')
+
+       /* $importeDestinos = DB::table('WEB.REGISTRO_IMPORTE_GASTOS as main')
             ->select(
                 'main.COD_DISTRITO',
                 'main.NOM_DISTRITO',
@@ -105,7 +106,51 @@ class ValeRendirController extends Controller
             ->where('main.COD_ESTADO', 1)
             ->groupBy('main.COD_DISTRITO', 'main.NOM_DISTRITO', 'main.COD_CENTRO', 'main.IND_DESTINO') // también aquí
             ->get()
-            ->toArray();
+            ->toArray();*/
+
+            $importeDestinos = DB::table('WEB.REGISTRO_IMPORTE_GASTOS as main')
+                ->select(
+                    'main.COD_DISTRITO',
+                    'main.NOM_DISTRITO',
+                    'main.COD_CENTRO', 
+                    'main.IND_DESTINO',
+                    // Lista de nombres (para mostrar)
+                    DB::raw("
+                        STUFF((
+                            SELECT ', ' + sub.TXT_NOM_TIPO + ': ' + CAST(sub.CAN_TOTAL_IMPORTE AS VARCHAR)
+                            FROM WEB.REGISTRO_IMPORTE_GASTOS AS sub
+                            WHERE 
+                                sub.COD_DISTRITO = main.COD_DISTRITO
+                                AND sub.COD_CENTRO = main.COD_CENTRO
+                                AND sub.IND_DESTINO = main.IND_DESTINO
+                                AND sub.COD_ESTADO = 1
+                            FOR XML PATH(''), TYPE
+                        ).value('.', 'NVARCHAR(MAX)'), 1, 2, '') AS TXT_NOM_TIPO
+                    "),
+                    // Lista de códigos (para usar en lógica JS)
+                    DB::raw("
+                        STUFF((
+                            SELECT ', ' + sub.COD_TIPO + ':' + CAST(sub.CAN_TOTAL_IMPORTE AS VARCHAR)
+                            FROM WEB.REGISTRO_IMPORTE_GASTOS AS sub
+                            WHERE 
+                                sub.COD_DISTRITO = main.COD_DISTRITO
+                                AND sub.COD_CENTRO = main.COD_CENTRO
+                                AND sub.IND_DESTINO = main.IND_DESTINO
+                                AND sub.COD_ESTADO = 1
+                            FOR XML PATH(''), TYPE
+                        ).value('.', 'NVARCHAR(MAX)'), 1, 2, '') AS COD_TIPO
+                    ")
+                )
+                ->where('main.COD_CENTRO', $cod_centro)
+                ->where('main.COD_ESTADO', 1)
+                ->groupBy(
+                    'main.COD_DISTRITO',
+                    'main.NOM_DISTRITO',
+                    'main.COD_CENTRO',
+                    'main.IND_DESTINO'
+                )
+                ->get()
+                ->toArray();
 
             $moneda = DB::table('CMP.CATEGORIA')
             ->whereIn('COD_CATEGORIA', ['MON0000000000001', 'MON0000000000002'])
