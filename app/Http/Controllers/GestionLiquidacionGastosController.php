@@ -448,7 +448,9 @@ class GestionLiquidacionGastosController extends Controller
                     $centro_id      =       $trabajadorespla->centro_osiris_id;
                 }
 
-
+                if($centro_id == 'CEN0000000000003'){
+                    $centro_id = 'CEN0000000000001';
+                }
   
                 if($centro_id==''){
                     return Redirect::to('gestion-de-empresa-proveedor/'.$idopcion)->with('errorbd','No tienes un Centro Asignado');
@@ -539,6 +541,9 @@ class GestionLiquidacionGastosController extends Controller
         }
 
 
+        if($centro_id == 'CEN0000000000003'){
+            $centro_id = 'CEN0000000000001';
+        }
 
         $contratos              =   DB::table('CMP.CONTRATO')
                                     ->where('TXT_CATEGORIA_TIPO_CONTRATO', 'PROVEEDOR')
@@ -4539,11 +4544,14 @@ class GestionLiquidacionGastosController extends Controller
                 return Redirect::to('gestion-de-liquidacion-gastos/'.$idopcion)->with('errorbd', 'No puede realizar un registro porque no es la empresa a cual pertenece');
             }
 
-
+            if($centro_id == 'CEN0000000000003'){
+                $centro_id = 'CEN0000000000001';
+            }
 
             $trabajador                     =   DB::table('STD.TRABAJADOR')
                                                 ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
                                                 ->first();
+
             $dni                            =   '';
             if(count($trabajador)>0){
                 $dni                        =   $trabajador->NRO_DOCUMENTO;
@@ -4564,6 +4572,7 @@ class GestionLiquidacionGastosController extends Controller
             $anio               =   $this->anio;
             $mes                =   $this->mes;
 
+            //dd($centrocosto);
 
             $area_id                    =   "";
             $area_txt                   =   "";
@@ -4576,6 +4585,9 @@ class GestionLiquidacionGastosController extends Controller
             $empresa            =   DB::table('STD.EMPRESA')
                                     ->where('NRO_DOCUMENTO', $dni)
                                     ->first();
+
+
+
 
             $empresa_id         =   "";
             $combo_empresa      =   array();
@@ -4592,12 +4604,11 @@ class GestionLiquidacionGastosController extends Controller
                 $combo_cuenta   =   $this->lg_combo_cuenta("Seleccione una Cuenta","","TCO0000000000069",$centro_id,$empresa_id);
                 $cuenta_id          =   "";
                 $combo_cuenta       =   array();
-
                 $cuenta         =   $this->lg_cuenta("Seleccione una Cuenta","","TCO0000000000069",$centro_id,$empresa_id);
                 if(count($cuenta)>0){
                     $cod_contrato       =   $cuenta->COD_CONTRATO;
                 }
-
+                //dd($cod_contrato);
                 $subcuenta_id       =   $this->lg_subcuenta_top1("Seleccione SubCuenta",$cod_contrato);
                 $combo_subcuenta    =   $this->lg_combo_subcuenta("Seleccione SubCuenta",$cod_contrato);
             }
@@ -4631,7 +4642,7 @@ class GestionLiquidacionGastosController extends Controller
             $combo_moneda_sel    =   $this->gn_generacion_combo_categoria('MONEDA',"SELECCIONE MONEDA",'');
 
 
-            //dd($combo_arendir_sel);
+
             return View::make('liquidaciongasto.agregarliquidaciongastos',
                              [
                                 'combo_empresa' => $combo_empresa,
@@ -4692,6 +4703,10 @@ class GestionLiquidacionGastosController extends Controller
         if(count($trabajador)>0){
             $centro_id      =       $trabajadorespla->centro_osiris_id;
         }
+        if($centro_id == 'CEN0000000000003'){
+            $centro_id = 'CEN0000000000001';
+        }
+
 
         $cadena = $empresa_id;
         $partes = explode(" - ", $cadena);
@@ -4735,6 +4750,10 @@ class GestionLiquidacionGastosController extends Controller
                                     ->first();
         if(count($trabajador)>0){
             $centro_id      =       $trabajadorespla->centro_osiris_id;
+        }
+
+        if($centro_id == 'CEN0000000000003'){
+            $centro_id = 'CEN0000000000001';
         }
 
         $cadena = $empresa_id;
