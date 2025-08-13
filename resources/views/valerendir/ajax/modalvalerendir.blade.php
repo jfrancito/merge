@@ -19,7 +19,7 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="panel panel-default panel-table">
-                        <div class="panel-heading">Vale a Rendir
+                        <div class="panel-heading">Solicitud de Vale 
                         </div>
                         <div class="panel-body selectfiltro">
 
@@ -46,7 +46,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
+                                {{--    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
                                         <div class="form-group">
                                             <label class="col-sm-12 control-label labelleft">Aprueba :</label>
                                             <div class="col-sm-12 abajocaja">
@@ -62,7 +62,7 @@
 
                                             </div>
                                         </div>
-                                    </div>
+                                    </div>  --}}
 
                                     <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
                                         <div class="form-group">
@@ -139,10 +139,9 @@
                                                           autocomplete="off" class="form-control custom-glosa-height"
                                                           data-aw="4"></textarea>
                                                 <span class="input-group-btn">
-                                                    <button id="btntexto" type="button"
-                                                            class="btn btn-primary vermensaje-valerendir">
+                                                <button id="asignarvalerendir" type="button" class="btn btn-primary ">
                                                       <font style="vertical-align: inherit;"><font
-                                                                  style="vertical-align: inherit;">Asignar</font></font>
+                                                                  style="vertical-align: inherit;">Guardar</font></font>
                                                     </button>
                                                </span>
                                             </div>

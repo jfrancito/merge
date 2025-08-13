@@ -87,7 +87,7 @@
                             </a>
                             @endif
 
-                            @if(!empty($item['TXT_GLOSA_AUTORIZADO']))
+                            @if(!empty($item['TXT_GLOSA_AUTORIZADO']) && $item['TXT_CATEGORIA_ESTADO_VALE'] !== 'APROBADO')
                                <a class="dropdown-item show-glosa d-flex align-items-center" href="#"
                                        data-glosa="{{ $item['TXT_GLOSA_AUTORIZADO'] }}"
                                        data-type="autoriza">

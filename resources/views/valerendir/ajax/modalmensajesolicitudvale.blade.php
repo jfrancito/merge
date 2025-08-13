@@ -1,6 +1,5 @@
 <div class="modal-header" style="padding: 12px 10px; font-family: 'Times New Roman', serif;">
     <button type="button" data-dismiss="modal" aria-hidden="true" class="close modal-close">
-        <span class="mdi mdi-close"></span>
     </button>
     <div class="col-xs-12">
         <h5 class="modal-title" style="font-size: 1.4em; font-family: 'Times New Roman', serif; font-weight: bold; text-align: center;">
@@ -16,6 +15,5 @@
 </div>
 
 <div class="modal-footer" style="font-family: 'Times New Roman', serif;">
-    <input type="hidden" id="vale_rendir_id" value="" />
-    <button id="asignarvalerendir" type="button" data-dismiss="modal" class="btn btn-default btn-space" style="font-family: 'Times New Roman', serif;">Aceptar</button>
+<button type="button" class="btn btn-default btn-space modal-close-recargar" data-dismiss="modal">Cerrar</button>
 </div>
