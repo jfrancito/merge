@@ -46,7 +46,12 @@
 						<tr>
 					      <td class="primertab"><b>DNI</b></td>
 					      <td><b> : </b>{{$dni}}</td>
-					    </tr>	   
+					    </tr>	 
+						<tr>
+					      <td class="primertab"><b>NOMBRE</b></td>
+					      <td><b> : </b>{{$nombre}}</td>
+					    </tr>	
+
 						<tr>
 					      <td class="primertab"><b>LUGAR DE TRABAJO</b></td>
 					      <td><b> : </b>{{ucwords(strtolower($lugares_trabajo->DIRECCIONES_CONCATENADAS))}}</td>

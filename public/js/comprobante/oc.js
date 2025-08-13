@@ -289,6 +289,25 @@ $(document).ready(function(){
 
     });
 
+    $(".agestioncomprobante").on('click','#descargarcomprobantemasivoreparableexcel', function() {
+
+
+        var tipoarchivo_id       =   $('#tipoarchivo_id').val();
+        var estado_id            =   $('#estado_id').val();
+        var operacion_id         =   $('#operacion_id').val();
+        var idopcion             =   $('#idopcion').val();
+        var _token               =   $('#token').val();
+
+        debugger;
+        href = $(this).attr('data-href')+'/'+tipoarchivo_id+'/'+estado_id+'/'+operacion_id+'/'+idopcion;
+        $(this).prop('href', href);
+        return true;
+
+
+    });
+
+
+
 
     $(".agestioncomprobante").on('click','.asignarmasivo', function() {
 

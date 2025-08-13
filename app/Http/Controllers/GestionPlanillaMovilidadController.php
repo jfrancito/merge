@@ -538,6 +538,8 @@ class GestionPlanillaMovilidadController extends Controller
         $usercre                =   User::where('id','=',$feplanillaentrega->COD_USUARIO_EMITE)->first();
         $trabajadorcrea         =   STDTrabajador::where('COD_TRAB','=',$usercre->usuarioosiris_id)->first();
         $dni                    =   $trabajadorcrea->NRO_DOCUMENTO;
+        $nombre                 =   $trabajadorcrea->TXT_NOMBRES.' '.$trabajadorcrea->TXT_APE_PATERNO.' '.$trabajadorcrea->TXT_APE_MATERNO;
+
         $planillamovilidad      =   PlaMovilidad::where('FOLIO','=',$feplanillaentrega->FOLIO)
                                     ->pluck('ID_DOCUMENTO')
                                     ->toArray();
@@ -566,7 +568,8 @@ class GestionPlanillaMovilidadController extends Controller
         $pdf = PDF::loadView('pdffa.planillamovilidadconsolidada', [ 
                 'iddocumento'           => $iddocumento,
                 'feplanillaentrega'     => $feplanillaentrega, 
-                'dni'                   => $dni, 
+                'dni'                   => $dni,
+                'nombre'                => $nombre,
                 'planillamovilidad'     => $planillamovilidad,
                 'detplanillamovilidad'  => $detplanillamovilidad,
                 'ruc'                   => $ruc,
@@ -819,6 +822,11 @@ class GestionPlanillaMovilidadController extends Controller
             if(count($trabajador)>0){
                 $centro_id      =       $trabajadorespla->centro_osiris_id;
             }
+
+            if($centro_id == 'CEN0000000000003'){
+                $centro_id = 'CEN0000000000001';
+            }
+            
             $serie          =   $this->gn_serie($anio, $mes,$centro_id);
             $numero         =   $this->gn_numero_pl($serie,$centro_id);
 
@@ -1371,6 +1379,11 @@ class GestionPlanillaMovilidadController extends Controller
                     if(count($trabajador)>0){
                         $centro_id      =       $trabajadorespla->centro_osiris_id;
                     }
+
+                    if($centro_id == 'CEN0000000000003'){
+                        $centro_id = 'CEN0000000000001';
+                    }
+
                     $serie          =   $this->gn_serie($anio, $mes,$centro_id);
                     $numero         =   $this->gn_numero($serie,$centro_id);
 
@@ -1452,6 +1465,9 @@ class GestionPlanillaMovilidadController extends Controller
                 $centro_id      =       $trabajadorespla->centro_osiris_id;
             }else{
                 return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd', 'No puede realizar un registro porque no es la empresa a cual pertenece');
+            }
+            if($centro_id == 'CEN0000000000003'){
+                $centro_id = 'CEN0000000000001';
             }
 
 
@@ -1536,7 +1552,9 @@ class GestionPlanillaMovilidadController extends Controller
                     $centro_id      =       $trabajadorespla->centro_osiris_id;
                 }
 
-
+                if($centro_id == 'CEN0000000000003'){
+                    $centro_id = 'CEN0000000000001';
+                }
 
                 $anio                   =   $this->anio;
                 $mes                    =   $this->mes;
@@ -1672,7 +1690,9 @@ class GestionPlanillaMovilidadController extends Controller
                     $centro_id      =       $trabajadorespla->centro_osiris_id;
                 }
 
-
+                if($centro_id == 'CEN0000000000003'){
+                    $centro_id = 'CEN0000000000001';
+                }
                 $serie                  =   $this->gn_serie($anio, $mes,$centro_id);
                 $numero                 =   $this->gn_numero($serie,$centro_id);
 
@@ -1823,7 +1843,9 @@ class GestionPlanillaMovilidadController extends Controller
         if(count($trabajador)>0){
             $centro_id      =       $trabajadorespla->centro_osiris_id;
         }
-
+        if($centro_id == 'CEN0000000000003'){
+            $centro_id = 'CEN0000000000001';
+        }
 
         $serie          =   $this->gn_serie($anio, $mes,$centro_id);
         $numero         =   $this->gn_numero($serie,$centro_id);
