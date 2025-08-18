@@ -5,6 +5,24 @@
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
 
+@php
+   $usuario = $listarDocumentoXML_CDR[0]['USUARIO_CREA'] ?? '';
+@endphp
+
+<div class="alert mt-1 p-2" 
+     style="background-color: #f8d7da; border: 1px solid #f5c2c7; color: #333; 
+            margin-left: 15px; font-size: 13px; font-weight: 400; 
+            box-shadow: 0px 2px 6px rgba(0,0,0,0.1); line-height: 1.4;">
+    <span style="font-weight: bold; color: black; font-size:16px; text-transform: uppercase;">
+        {{ $usuario }}
+    </span>  
+    <span style="font-size:14px;">
+        hasta la fecha el sistema no obtiene el XML y CDR de dichos comprobantes.  
+        Por favor gestionar el envío de dicha documentación con el proveedor.
+    </span>
+</div>
+
+
 <table table id="tablaDocumentoxml_cdr" class="table table-striped table-borderless">
   <thead style="background-color: #1d3a6d; color: white;">
         <tr>
@@ -19,7 +37,7 @@
             <th>IND_PDF</th>
             <th>IND_XML</th>
             <th>IND_CDR</th>
-           <th> BUSQUEDAD</th>
+            <th>BUSQUEDAD</th>
         </tr>
   </thead>
       <tbody>
