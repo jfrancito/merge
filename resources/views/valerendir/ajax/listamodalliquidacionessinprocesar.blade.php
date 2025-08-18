@@ -21,6 +21,7 @@
     <tbody>
            @foreach($listarLiquidacionesPendientes as $index=>$item)
            <tr>
+              <td>{{ $index + 1 }}</td>
               <td>{{$item['ID_DOCUMENTO']}}</td>
               <td>{{$item['FECHA_EMI']}}</td>
               <td>{{$item['CODIGO']}}</td>
