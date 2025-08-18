@@ -132,10 +132,10 @@ $(document).ready(function(){
                                 "modal-verdetalledocumentomensajevale-solicitud-container"
                             );
                             // Forzar recarga al cerrar modal, incluso si no es bootstrap puro
-    const modal = $("#modal-verdetalledocumentomensajevale-solicitud");
-    modal.on('hide.bs.modal', function () {
-        location.reload();
-    });
+                            const modal = $("#modal-verdetalledocumentomensajevale-solicitud");
+                            modal.on('hide.bs.modal', function () {
+                                location.reload();
+                            });
                         }, 500);
                     },
                     error: function() {
@@ -151,10 +151,10 @@ $(document).ready(function(){
 
 
                             // Forzar recarga al cerrar modal, incluso si no es bootstrap puro
-    const modal = $("#modal-verdetalledocumentomensajevale-solicitud");
-    modal.on('hide.bs.modal', function () {
-        location.reload();
-    });
+                            const modal = $("#modal-verdetalledocumentomensajevale-solicitud");
+                            modal.on('hide.bs.modal', function () {
+                                location.reload();
+                            });
                         }, 500);
                     }
                 });
@@ -712,7 +712,7 @@ $(document).ready(function(){
 
         });
 
-
+       
 
         $(document).on("click", ".show-glosa", function() {
             var glosaText = $(this).data('glosa');

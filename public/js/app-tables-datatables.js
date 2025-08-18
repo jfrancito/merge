@@ -179,7 +179,7 @@ var App = (function () {
           ordering: false,
       });
 
-        $("#importegastos").dataTable({
+      $("#tablavalespendiente").dataTable({
           responsive: true,
           autoWidth: true,
           lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
@@ -187,6 +187,43 @@ var App = (function () {
           scrollY: "300px",
           ordering: false,
       });
+
+        $("#tablaliquidacionespendientes").dataTable({
+          responsive: true,
+          autoWidth: true,
+          lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+          scrollX: true,
+          scrollY: "300px",
+          ordering: false,
+      });
+
+       $("#tablaDocumentoxml_cdr").dataTable({
+          responsive: true,
+          autoWidth: true,
+          lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+          scrollX: true,
+          scrollY: "300px",
+          ordering: false,
+      });
+
+      $("#tablalistanegraproveedores").dataTable({
+          responsive: true,
+          autoWidth: true,
+          lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+          scrollX: true,
+          scrollY: "300px",
+          ordering: false,
+      });
+
+       
+      $("#importegastos").dataTable({
+          responsive: true,
+          autoWidth: true,
+          lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+          scrollX: true,
+          scrollY: "300px",
+          ordering: false,
+      }); 
 
       if (!$.fn.DataTable.isDataTable('#vale')) {
           $('#vale').DataTable({
