@@ -5,6 +5,7 @@
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
 
+@if(isset($listarDocumentoXML_CDR) && count($listarDocumentoXML_CDR) > 0)
 @php
    $usuario = $listarDocumentoXML_CDR[0]['USUARIO_CREA'] ?? '';
 @endphp
@@ -21,7 +22,7 @@
         Por favor gestionar el envío de dicha documentación con el proveedor.
     </span>
 </div>
-
+@endif
 
 <table table id="tablaDocumentoxml_cdr" class="table table-striped table-borderless">
   <thead style="background-color: #1d3a6d; color: white;">
@@ -77,7 +78,4 @@
         });
     });
     @endif
-
-    
-
 </script>
