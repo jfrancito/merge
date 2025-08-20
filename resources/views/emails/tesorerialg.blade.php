@@ -79,7 +79,11 @@
                                     <td>{{$oc->COD_DOCUMENTO_CTBLE}}</td>
                                     <td>{{$autorizacion->COD_AUTORIZACION}}</td>
                                 </tr>
-
+                                <tr>
+                                    <td><b>DOCUMENTO :</b></td>
+                                    <td>{{$oc->NRO_SERIE}} - {{$oc->NRO_DOC}}</td>
+                                    <td>{{$autorizacion->TXT_SERIE}} - {{$autorizacion->TXT_NUMERO}}</td>
+                                </tr>
                                 <tr>
                                     <td><b>EMPRESA :</b></td>
                                     <td>{{$oc->TXT_EMPR_EMISOR}}</td>
