@@ -42,7 +42,6 @@ class RechazarCorreoValeRendirAutorizaController extends Controller
         $exito = $this->RechazarCorreoValeRendirAutoriza($valerendir_id);
         return response()->json(['success' => $exito]);
     }
-
 }
 
 

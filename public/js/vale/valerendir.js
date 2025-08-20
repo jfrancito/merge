@@ -132,10 +132,10 @@ $(document).ready(function(){
                                 "modal-verdetalledocumentomensajevale-solicitud-container"
                             );
                             // Forzar recarga al cerrar modal, incluso si no es bootstrap puro
-    const modal = $("#modal-verdetalledocumentomensajevale-solicitud");
-    modal.on('hide.bs.modal', function () {
-        location.reload();
-    });
+                            const modal = $("#modal-verdetalledocumentomensajevale-solicitud");
+                            modal.on('hide.bs.modal', function () {
+                                location.reload();
+                            });
                         }, 500);
                     },
                     error: function() {
@@ -151,10 +151,10 @@ $(document).ready(function(){
 
 
                             // Forzar recarga al cerrar modal, incluso si no es bootstrap puro
-    const modal = $("#modal-verdetalledocumentomensajevale-solicitud");
-    modal.on('hide.bs.modal', function () {
-        location.reload();
-    });
+                            const modal = $("#modal-verdetalledocumentomensajevale-solicitud");
+                            modal.on('hide.bs.modal', function () {
+                                location.reload();
+                            });
                         }, 500);
                     }
                 });
@@ -712,7 +712,7 @@ $(document).ready(function(){
 
         });
 
-
+       
 
         $(document).on("click", ".show-glosa", function() {
             var glosaText = $(this).data('glosa');
@@ -796,6 +796,19 @@ $(document).ready(function(){
 
 
         var importeDestinos = JSON.parse($('#importeDestinos').val());
+     
+       // 🔹 Mapeo código -> nombre para mostrar al usuario
+        const codigosNombres = {
+            "TIG0000000000001": "ALIMENTACION",
+            "TIG0000000000002": "ALOJAMIENTO",
+            "TIG0000000000003": "MOVILIDAD LOCAL",
+            "TIG0000000000004": "PASAJES INTERDEPARTAMENTALES",
+            "TIG0000000000005": "PASAJES INTERPROVINCIAL",
+            "TIG0000000000006": "COMBUSTIBLE",
+            "TIG0000000000007": "PEAJES",
+            "TIG0000000000008": "MANTENIMIENTO DE VEHICULOS"
+        };
+
         $('#agregarImporteGasto').on('click', function () {
             let destino = $('#destino option:selected').text();
             let codDestino = $('#destino').val();
@@ -805,8 +818,8 @@ $(document).ready(function(){
             let ind_propio = $('#ind_propio').is(':checked') ? 1 : 0;
             let ind_aereo = $('#ind_aereo').is(':checked') ? 1 : 0;
 
-
-            if (!codDestino || !fechaInicio || !fechaFin ) {
+            // Validaciones de campos obligatorios
+            if (!codDestino || !fechaInicio || !fechaFin) {
                 alerterrorajax('Por favor complete todos los campos antes de agregar.');
                 return;
             }
@@ -816,6 +829,7 @@ $(document).ready(function(){
                 return;
             }
 
+            // Validar fecha contra la última fila
             let filas = $('#tabla_vale_rendir_detalle tbody tr');
             if (filas.length > 0) {
                 let ultimaFila = filas.last();
@@ -842,9 +856,9 @@ $(document).ready(function(){
                 alerterrorajax('Este destino ya ha sido agregado.');
                 return;
             }
+
             let destinoObj = importeDestinos.find(destino => destino.COD_DISTRITO === codDestino);
             let ind_destino = destinoObj?.IND_DESTINO || 0;
-
 
             let fecha1 = new Date(convertirFecha(fechaInicio));
             let fecha2 = new Date(convertirFecha(fechaFin));
@@ -853,14 +867,8 @@ $(document).ready(function(){
             let baseDiffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
             let diffDays = 0;
 
-
             if (ind_propio === 1) {
-                // Siempre contar al menos 1 día
-                if (baseDiffDays <= 1) {
-                    diffDays = 1;
-                } else {
-                    diffDays = baseDiffDays;
-                }
+                diffDays = (baseDiffDays <= 1) ? 1 : baseDiffDays;
             } else {
                 if (destinoObj?.IND_DESTINO == "1") {
                     diffDays = baseDiffDays + 1;
@@ -869,108 +877,104 @@ $(document).ready(function(){
                 }
             }
 
-
             let total_Importe = 0;
             let nombresTipos = [];
             let importesCalculados = [];
             let valoresBase = [];
-        
 
-            if (destinoObj && destinoObj.TXT_NOM_TIPO) {
-            let tipos = destinoObj.TXT_NOM_TIPO.split(',');
-            tipos.forEach(tipoStr => {
-            let [nombre, valorStr] = tipoStr.trim().split(':');
-            let valor = parseFloat(valorStr.trim());
-            let tipoImporte = 0;
+            // Procesar tipos de gasto (ahora por código)
+           if (destinoObj && destinoObj.COD_TIPO) {
+            let tipos = destinoObj.COD_TIPO.split(',');
+                tipos.forEach(tipoStr => {
+                    let [codigoTipo, valorStr] = tipoStr.trim().split(':');
+                    let valor = parseFloat(valorStr.trim());
+                    let tipoImporte = 0;
 
-            if (nombre === "COMBUSTIBLE + PEAJES" && ind_propio !== 1) {
-                return;
-            }
+                    let nombre = codigosNombres[codigoTipo] || codigoTipo;
+                    let filasExistentes = $('#tabla_vale_rendir_detalle tbody tr').length;
 
-             if (ind_propio === 1 && !["HOSPEDAJE", "ALIMENTACION","COMBUSTIBLE + PEAJES"].includes(nombre)) {
-             return; // saltar a la siguiente iteración
-            }
-
-            let filasExistentes = $('#tabla_vale_rendir_detalle tbody tr').length;
-
-            if (nombre === "PASAJES TERRESTRES") {
-            if (ind_aereo === 1) {
-                return; // No agregar PASAJES TERRESTRES si es movilidad aérea
-            }
-            tipoImporte = filasExistentes === 0 ? valor * 2 : valor;
-
-           } else if (["HOSPEDAJE", "ALIMENTACION", "PASAJES INTERNOS"].includes(nombre)) {
-
-            if (nombre === "ALIMENTACION" && ind_propio === 1) {
-                // ✅ ALIMENTACIÓN destino propio: suma 1 día si diffDays >= 2
-                tipoImporte = valor * (diffDays >= 2 ? (diffDays + 1) : 1);
-
-            } else if (nombre === "HOSPEDAJE" && ind_propio === 1) {
-                // ✅ HOSPEDAJE destino propio: solo por los días
-                tipoImporte = valor * diffDays;
-
-            } else if (filasExistentes === 0) {
-                // ✅ Primera fila, lógica completa
-                if (nombre === "HOSPEDAJE" && destinoObj?.IND_DESTINO === "0") {
-                    tipoImporte = valor * diffDays;
-                } else {
-                    tipoImporte = valor * diffDays;
-                }
-
-            } else {
-                // Para otras combinaciones
-               tipoImporte = valor * diffDays;
-            }
-
-
-            } else if (nombre === "PASAJES INTERPROVINCIAL") {
-                // Solo valor base en el primer destino; luego 0
-                tipoImporte = filasExistentes === 0 ? valor : 0;
-
-            } else {
-                tipoImporte = valor;
-            }
-
-            total_Importe += tipoImporte;
-
-            nombresTipos.push(nombre);
-            importesCalculados.push(`S/. ${tipoImporte.toFixed(2)}`);
-            valoresBase.push(`S/. ${valor.toFixed(2)}`);
-        });
-
-
-        
-        let filas = $('#tabla_vale_rendir_detalle tbody tr');
-        if (filas.length >= 1) {
-            let primeraFila = filas.eq(0);
-            let $tds = primeraFila.find('td');
-
-            // Asegurar que hay al menos 7 columnas
-            if ($tds.length >= 7) {
-                let nombres = $tds.eq(3).html().split(/<br\s*\/?>/).map(s => s.trim());
-                let valores = $tds.eq(5).html().split(/<br\s*\/?>/).map(s => s.trim());
-                let importes = $tds.eq(6).html().split(/<br\s*\/?>/).map(s => s.trim());
-                let total = 0;
-
-                let importesActualizados = nombres.map((nombreTipo, i) => {
-                    let base = parseFloat(valores[i].replace('S/.', '').trim()) || 0;
-                    let nuevoImporte = parseFloat(importes[i].replace('S/.', '').trim()) || 0;
-
-                    if (nombreTipo === "PASAJES TERRESTRES") {
-                        nuevoImporte = base; // *1 (en vez de *2)
+                    // COMBUSTIBLE + PEAJES (TIG0006 y TIG0007)
+                    if ((codigoTipo === "TIG0000000000006" || codigoTipo === "TIG0000000000007") && ind_propio !== 1) {
+                        return; 
                     }
 
-                    total += nuevoImporte;
-                    return `S/. ${nuevoImporte.toFixed(2)}`;
+                    // Filtro para destino propio
+                    if (ind_propio === 1 && ![
+                        "TIG0000000000001", // ALIMENTACION
+                        "TIG0000000000002", // ALOJAMIENTO
+                        "TIG0000000000006", // COMBUSTIBLE
+                        "TIG0000000000007"  // PEAJES
+                    ].includes(codigoTipo)) {
+                        return; 
+                    }
+
+                    // PASAJES TERRESTRES (TIG0004)
+                    if (codigoTipo === "TIG0000000000004") {
+                        if (ind_aereo === 1) return; 
+                        tipoImporte = filasExistentes === 0 ? valor * 2 : valor;
+                    }
+
+                    // ALIMENTACION, ALOJAMIENTO, MOVILIDAD LOCAL
+                    else if (["TIG0000000000001", "TIG0000000000002", "TIG0000000000003"].includes(codigoTipo)) {
+                        if (codigoTipo === "TIG0000000000001" && ind_propio === 1) {
+                            tipoImporte = valor * (diffDays >= 2 ? (diffDays + 1) : 1);
+                        } else if (codigoTipo === "TIG0000000000002" && ind_propio === 1) {
+                            tipoImporte = valor * diffDays;
+                        } else if (filasExistentes === 0) {
+                            tipoImporte = valor * diffDays;
+                        } else {
+                            tipoImporte = valor * diffDays;
+                        }
+                    }
+
+                    // PASAJES INTERPROVINCIAL (TIG0005)
+                    else if (codigoTipo === "TIG0000000000005") {
+                        tipoImporte = filasExistentes === 0 ? valor : 0;
+                    }
+
+                    // Otros casos
+                    else {
+                        tipoImporte = valor;
+                    }
+
+                    total_Importe += tipoImporte;
+                    nombresTipos.push(nombre); // usuario ve nombre
+                    importesCalculados.push(`S/. ${tipoImporte.toFixed(2)}`);
+                    valoresBase.push(`S/. ${valor.toFixed(2)}`);
                 });
 
-                $tds.eq(6).html(importesActualizados.join('<br/>'));
-                $tds.eq(7).text(total.toFixed(2));
+                // Ajustar primera fila si corresponde
+                let filasTabla = $('#tabla_vale_rendir_detalle tbody tr');
+                if (filasTabla.length >= 1) {
+                    let primeraFila = filasTabla.eq(0);
+                    let $tds = primeraFila.find('td');
+
+                    if ($tds.length >= 7) {
+                        let nombres = $tds.eq(3).html().split(/<br\s*\/?>/).map(s => s.trim());
+                        let valores = $tds.eq(5).html().split(/<br\s*\/?>/).map(s => s.trim());
+                        let importes = $tds.eq(6).html().split(/<br\s*\/?>/).map(s => s.trim());
+                        let total = 0;
+
+                        let importesActualizados = nombres.map((nombreTipo, i) => {
+                            let base = parseFloat(valores[i].replace('S/.', '').trim()) || 0;
+                            let nuevoImporte = parseFloat(importes[i].replace('S/.', '').trim()) || 0;
+
+                            if (nombreTipo === codigosNombres["TIG0000000000004"]) {
+                                nuevoImporte = base; // *1 en vez de *2
+                            }
+
+                            total += nuevoImporte;
+                            return `S/. ${nuevoImporte.toFixed(2)}`;
+                        });
+
+                        $tds.eq(6).html(importesActualizados.join('<br/>'));
+                        $tds.eq(7).text(total.toFixed(2));
+                    }
+                }
             }
-        }
-    }
-        
-        let nuevaFila = `
+
+            // Agregar nueva fila
+            let nuevaFila = `
                 <tr data-cod-destino="${codDestino}" data-id="">
                     <td>${fechaInicio}</td>
                     <td>${fechaFin}</td>
@@ -990,59 +994,17 @@ $(document).ready(function(){
             $('#tabla_vale_rendir_detalle tbody').append(nuevaFila);
             actualizarTotalImporte();
 
-           // ✅ Obtener fecha fin del último registro
+            // Asignar fecha inicio con fecha fin del último registro
             let ultimaFila = $('#tabla_vale_rendir_detalle tbody tr').last();
             let fechaFinUltima = ultimaFila.find('td').eq(1).text().trim();
-
-            // 🔹 Asignar fecha inicio con la fecha fin del último registro
             $('#fecha_inicio').val(fechaFinUltima);
 
-            // 🔹 Limpiar los demás campos
+            // Limpiar otros campos
             $('#fecha_fin').val('');
             $('#destino').val('').trigger('change');
             $('#ind_propio').prop('checked', false);
             $('#ind_aereo').prop('checked', false);
-    });
-
-        
-        $('#tabla_vale_rendir_detalle').on('click', '.eliminarFila', function () {
-            $(this).closest('tr').remove();
-
-            setTimeout(() => {
-                let filas = $('#tabla_vale_rendir_detalle tbody tr');
-                if (filas.length === 1) {
-                    let primeraFila = filas.eq(0);
-                    let $tds = primeraFila.find('td');
-
-                    if ($tds.length >= 7) {
-                        let nombres = $tds.eq(3).html().split(/<br\s*\/?>/).map(s => s.trim());
-                        let valores = $tds.eq(5).html().split(/<br\s*\/?>/).map(s => s.trim());
-                        let importes = $tds.eq(6).html().split(/<br\s*\/?>/).map(s => s.trim());
-                        let total = 0;
-
-                        let importesActualizados = nombres.map((nombreTipo, i) => {
-                            let base = parseFloat(valores[i].replace('S/.', '').trim()) || 0;
-                            let nuevoImporte = parseFloat(importes[i].replace('S/.', '').trim()) || 0;
-
-                            if (nombreTipo === "PASAJES TERRESTRES") {
-                                nuevoImporte = base * 2;
-                            }
-
-                            total += nuevoImporte;
-                            return `S/. ${nuevoImporte.toFixed(2)}`;
-                        });
-
-                        $tds.eq(6).html(importesActualizados.join('<br/>'));
-                        $tds.eq(7).text(total.toFixed(2));
-                    }
-                }
-
-                actualizarTotalImporte();
-            }, 0);
         });
-
-
-
 
 
          function actualizarTotalImporte() {
