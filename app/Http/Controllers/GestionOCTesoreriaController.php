@@ -817,7 +817,7 @@ class GestionOCTesoreriaController extends Controller
         $documento_asociados    =   $this->gn_lista_comision_asociados_atendidos($lotes,$lote);
         $documento_top          =   $this->gn_lista_comision_asociados_top($lotes);
 
-        dd($documento_asociados);
+        //dd($documento_asociados);
         return View::make('comision/registrocomprobantecomisionadministrator',
                          [
                             'combotipodetraccion'   =>  $combotipodetraccion,
