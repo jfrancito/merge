@@ -4421,12 +4421,16 @@ trait ComprobanteTraits
                 'IICHFC0000000012',
                 'ISCHFC0000000012',
                 'ISCHFC0000000027',
-                'ISCHFC0000000036'
+                'ISCHFC0000000036',
+                'ISCHFC0000000033'
             ])
             ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
             ->where('TES.IND_EXTORNO', 0)
             ->where('TES.COD_ESTADO', 1)
-            ->where('TES.COD_CATEGORIA_OPERACION_ORIGEN', 'OOC0000000000008')
+            ->whereIn('TES.COD_CATEGORIA_OPERACION_ORIGEN', [
+                'OOC0000000000008',
+                'OOC0000000000005'
+            ])
             ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR) // variable pasada desde tu controlador
             ->get();
 
@@ -4536,12 +4540,16 @@ trait ComprobanteTraits
                         'IICHFC0000000012',
                         'ISCHFC0000000012',
                         'ISCHFC0000000027',
-                        'ISCHFC0000000036'
+                        'ISCHFC0000000036',
+                        'ISCHFC0000000033'
                     ])
                     ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
                     ->where('TES.IND_EXTORNO', 0)
                     ->where('TES.COD_ESTADO', 1)
-                    ->where('TES.COD_CATEGORIA_OPERACION_ORIGEN', 'OOC0000000000008')
+                    ->whereIn('TES.COD_CATEGORIA_OPERACION_ORIGEN', [
+                        'OOC0000000000008',
+                        'OOC0000000000005'
+                    ])
                     ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR) // variable pasada desde tu controlador
                     ->first();
 
