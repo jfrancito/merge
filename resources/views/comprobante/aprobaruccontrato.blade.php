@@ -15,7 +15,7 @@
       <div class="col-md-12">
 
           <div class="panel panel-default">
-            <div class="panel-heading">Revision de Comporbante ({{$ordencompra->COD_DOCUMENTO_CTBLE}})</div>
+            <div class="panel-heading">Revision de Comprobante ({{$ordencompra->COD_DOCUMENTO_CTBLE}})</div>
             <div class="tab-container">
               <ul class="nav nav-tabs">
                 <li class="active"><a href="#aprobar" data-toggle="tab"><b>APROBAR y RECOMENDAR</b></a></li>
@@ -52,7 +52,7 @@
       </div>
     </div>
   </div>
-</div>  
+</div>
 
 @stop
 
@@ -80,9 +80,9 @@
         App.formElements();
         $('form').parsley();
       });
-    </script> 
+    </script>
 
-    <script type="text/javascript">    
+    <script type="text/javascript">
 
          $('#file-otros').fileinput({
             theme: 'fa5',
@@ -165,7 +165,7 @@
 
 
 
-           
+
     </script>
     <script src="{{ asset('public/js/comprobante/registro.js?v='.$version) }}" type="text/javascript"></script>
     <script src="{{ asset('public/js/comprobante/uc.js?v='.$version) }}" type="text/javascript"></script>
