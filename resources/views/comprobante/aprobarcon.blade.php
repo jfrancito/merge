@@ -5,6 +5,29 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/select2/css/select2.min.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/bootstrap-slider/css/bootstrap-slider.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/css/file/fileinput.css') }} "/>
+    <style>
+        .editarcuentas{
+            display: none;
+        }
+        .editarcuentasreparable{
+            display: none;
+        }
+        #asientodetalle {
+            width: 100% !important;
+        }
+        #asientodetallereversion {
+            width: 100% !important;
+        }
+        #asientodetallededuccion {
+            width: 100% !important;
+        }
+        #asientodetallepercepcion {
+            width: 100% !important;
+        }
+        #asientodetallereparable {
+            width: 100% !important;
+        }
+    </style>
 @stop
 @section('section')
 
@@ -14,7 +37,7 @@
     <div class="row">
       <div class="col-md-12">
           <div class="panel panel-default">
-            <div class="panel-heading">Revision de Comporbante ({{$ordencompra->COD_ORDEN}})</div>
+            <div class="panel-heading">Revision de Comprobante ({{$ordencompra->COD_ORDEN}})</div>
             <div class="tab-container">
               <ul class="nav nav-tabs">
                 <li class="active"><a href="#aprobar" data-toggle="tab"><b>APROBAR y RECOMENDAR</b></a></li>
@@ -112,7 +135,7 @@
       </div>
     </div>
   </div>
-</div>  
+</div>
 
 @stop
 
@@ -139,9 +162,9 @@
         App.formElements();
         $('form').parsley();
       });
-    </script> 
+    </script>
 
-    <script type="text/javascript">    
+    <script type="text/javascript">
 
       $('#file-otros').fileinput({
           theme: 'fa5',

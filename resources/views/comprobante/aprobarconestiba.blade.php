@@ -16,7 +16,7 @@
 
 
           <div class="panel panel-default">
-            <div class="panel-heading">Revision de Comporbante ({{$fedocumento->ID_DOCUMENTO}})</div>
+            <div class="panel-heading">Revision de Comprobante ({{$fedocumento->ID_DOCUMENTO}})</div>
             <div class="tab-container">
               <ul class="nav nav-tabs">
                 <li class="active"><a href="#aprobar" data-toggle="tab"><b>APROBAR y RECOMENDAR</b></a></li>
@@ -92,7 +92,7 @@
       </div>
     </div>
   </div>
-</div>  
+</div>
 
 @stop
 
@@ -119,9 +119,9 @@
         App.formElements();
         $('form').parsley();
       });
-    </script> 
+    </script>
 
-    <script type="text/javascript">    
+    <script type="text/javascript">
 
            $('#file-otros').fileinput({
               theme: 'fa5',
@@ -149,7 +149,7 @@
             });
           @endforeach
 
-           
+
     </script>
 
 
