@@ -278,6 +278,7 @@ var App = (function () {
             scrollY: "300px",
             ordering: false,
         });
+      }
 
         if (!$.fn.DataTable.isDataTable('#vale')) {
             $('#vale').DataTable({
