@@ -1280,6 +1280,7 @@ class GestionOCContabilidadController extends Controller
 
             $combo_activo = array('1' => 'ACTIVO', '0' => 'ELIMINAR');
 
+            $combo_tipo_asiento = $this->gn_generacion_combo_categoria('TIPO_ASIENTO', 'Seleccione tipo asiento', '');
 
             return View::make('comprobante/aprobarcon',
                 [
@@ -3190,6 +3191,8 @@ class GestionOCContabilidadController extends Controller
 
             $combo_activo = array('1' => 'ACTIVO', '0' => 'ELIMINAR');
 
+            $combo_tipo_asiento = $this->gn_generacion_combo_categoria('TIPO_ASIENTO', 'Seleccione tipo asiento', '');
+
             return View::make('comprobante/aprobarconcontrato',
                 [
                     'fedocumento' => $fedocumento,
@@ -3218,6 +3221,8 @@ class GestionOCContabilidadController extends Controller
 //                    'tipo_doc_fe' => $tipo_doc,
 //                    'empresa_doc_fe' => $empresa_doc,
 //                    'tipo_cambio_asiento' => $tipo_cambio_asiento,
+
+                    'combo_tipo_asiento' => $combo_tipo_asiento,
 
                     'combo_descuento' => $combo_descuento,
 
