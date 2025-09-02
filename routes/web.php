@@ -69,6 +69,11 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/configurar-datos-cuenta-bancaria/{idusuario}', 'UserController@actionConfigurarDatosCuentaBancaria');
 	Route::any('/ajax-eliminar-cb', 'UserController@actionEliminarCuentaBancaria');
 
+
+	Route::any('/pdf-sunat-personal', 'GestionLiquidacionGastosController@actionPdfSunatPersonal');
+
+
+
 	Route::any('/ajax-modal-ver-cuenta-bancaria-contrato', 'UserController@actionAjaxModalVerCuentaBancariaContrato');
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-contrato', 'UserController@actionAjaxModalConfiguracionCuentaBancariaContrato');
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-oc', 'UserController@actionAjaxModalConfiguracionCuentaBancariaOC');
@@ -91,10 +96,6 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/gestion-de-sunat-cpe-local/{idopcion}', 'CpeController@actionGestionCpeLocal');
 	Route::any('/descargar-archivo-local/{tipo}', 'CpeController@descargarArchivoLocal');
 	Route::any('/descargar-archivo-lq/{id}/{nombre_archivo}/{tipo}', 'CpeController@descargarArchivoLocalLQ');
-
-
-
-
 	Route::any('/descargar-archivos-sunat-lg', 'CpeController@descargarArchivoSunatLG');
 
 
@@ -108,6 +109,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-combo-autoriza', 'GestionLiquidacionGastosController@actionAjaxComboAutoriza');
 	Route::any('/extonar-liquidacion-gastos/{idopcion}/{iddocumento}', 'GestionLiquidacionGastosController@actionExtornarLiquidacionGastos');
 	Route::any('/extonar-liquidacion-gastos-detalle/{idopcion}/{item}/{iddocumento}', 'GestionLiquidacionGastosController@actionExtornarLiquidacionGastosDetalle');
+	Route::any('/tutorial/{nombre}', 'GestionLiquidacionGastosController@actionTutorialLiquidacionGastos');
+	Route::any('/gestion-de-archivos-liquidacion-faltantes/{idopcion}', 'GestionLiquidacionGastosController@actionListarLiquidacionGastosFaltante');
+
 
 
 	Route::any('/ajax-buscar-documento-uc-lg', 'GestionLiquidacionGastosController@actionAjaxUCListarLiquidacionGastos');
@@ -246,10 +250,11 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/ajax-modal-lista-documento-merge', 'GestionDocumentoCanjesController@actionAjaxModalListaDocumentoMerge');
 	Route::any('/ajax-modal-agregar-documento-merge', 'GestionDocumentoCanjesController@actionAjaxModalAgregarDocumentoMerge');
-
-
 	Route::any('/comprobante-masivo-excel/{fecha_inicio}/{fecha_fin}/{proveedor_id}/{estado_id}/{operacion_id}/{idopcion}', 'ReporteComprobanteController@actionComprobanteMasivoExcel');
 	Route::any('/comprobante-masivo-tesoreria-excel/{fecha_inicio}/{fecha_fin}/{proveedor_id}/{estado_id}/{operacion_id}/{idopcion}', 'ReporteComprobanteController@actionComprobanteMasivoTesoreriaExcel');
+
+
+	Route::any('/comprobante-masivo-reparable-excel/{tipoarchivo_id}/{estado_id}/{operacion_id}/{idopcion}', 'ReporteComprobanteController@actionComprobanteMasivoReparableExcel');
 
 	// Route::any('/subir-xml-cargar-datos-documento/{idopcion}/{prefijo}/{idordencompra}', 'GestionDocumentoController@actionCargarXMLDocumento');
 	// Route::any('/validar-xml-documento/{idopcion}/{prefijo}/{idordencompra}', 'GestionDocumentoController@actionValidarXMLDocumento');
@@ -384,6 +389,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/gestion-de-aprobar-planilla-consolidada/{idopcion}', 'GestionPlanillaMovilidadController@actionAprobarPlanillaMovilidadContabilidad');
 	Route::any('/aprobar-planilla-movilidad-contabilidad/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadController@actionAprobarContabilidadPLA');
 	Route::any('/agregar-extorno-contabilidad-pla/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadController@actionAgregarExtornoContabilidadPLA');
+	Route::any('/aprobar-planilla-movilidad-contabilidad-revisadas/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadController@actionAprobarContabilidadPLARevisada');
+
 
 
 	//ENTREGA DE DOCUMENTOS
@@ -607,8 +614,8 @@ Route::group(['middleware' => ['authaw']], function () {
     Route::get('/gestionar-vale-rendir/{idopcion}', 'ValeRendirController@actionValeRendir');
     Route::post('/registrar_vale_rendir', 'ValeRendirController@insertValeRendirAction');
 	Route::post('/data_vale_rendir', 'ValeRendirController@traerdataValeRendirAction');
-	Route::post('/ver_detalle_importe_vale', 'ValeRendirController@actionDetalleImporteVale');
-
+Route::post('/ver_detalle_importe_vale', 'ValeRendirController@actionDetalleImporteVale'); 
+    Route::post('/ver_mensaje_vale_rendir', 'ValeRendirController@actionMensajeValeRendir');
 
 	Route::get('/gestion-autoriza-rendir/{idopcion}', 'ValeRendirAutorizaController@actionValeRendirAutoriza');
 	Route::post('/autorizar_vale_rendir', 'ValeRendirAutorizaController@actionAutorizarValeRendir');

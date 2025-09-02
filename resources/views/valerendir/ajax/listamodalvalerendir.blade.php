@@ -9,7 +9,8 @@
             <th class="col">Importe</th>
             <th class="col">Saldo</th>
             <th class="col">Glosa</th>  
-            <th class="col">Estado</th>  
+            <th class="col">Estado Merge</th>  
+            <th class="col">Estado Osiris</th>
             <th class="col">Ver Detalle</th>  
             <th class="col">Anular</th>  
 
@@ -23,8 +24,9 @@
             <td>{{$item['USUARIO_AUTORIZA']}}</td>
             <td>{{$item['USUARIO_APRUEBA']}}</td>
             <td>{{$item['TIPO_MOTIVO']}}</td>
-            <td>S/. {{$item['CAN_TOTAL_IMPORTE']}}</td>
-            <td>S/. {{$item['CAN_TOTAL_SALDO']}}</td>
+            <td>{{$item['COD_MONEDA'] == 'MON0000000000001' ? 'S/.' : '$' }} {{ $item['CAN_TOTAL_IMPORTE'] }}</td>
+            <td>{{$item['COD_MONEDA'] == 'MON0000000000001' ? 'S/.' : '$' }} {{ $item['CAN_TOTAL_SALDO'] }}</td>
+
             <td class="custom-glosa">{{$item['TXT_GLOSA']}}</td>
             <td>
                 @if($item['TXT_CATEGORIA_ESTADO_VALE'] === 'GENERADO')
@@ -38,7 +40,17 @@
                 @else
                      <span class="badge badge-custom-danger">{{$item['TXT_CATEGORIA_ESTADO_VALE']}}</span>                        
                 @endif
+            </td>
 
+            <td>   
+                @if($item['ESTADO_OSIRIS'] === 'GENERADO')
+                    <span class="badge bg-white text-dark">GENERADO</span>
+                @elseif($item['ESTADO_OSIRIS'] === 'COBRADO')
+                    <span class="badge badge-success">COBRADO</span>
+                @elseif($item['ESTADO_OSIRIS'] === 'RECHAZADO')
+                     <span class="badge badge-custom-danger">RECHAZADO</span>
+                @endif
+            </td>
 
             @php
              $motivosPermitidos = [
@@ -54,10 +66,10 @@
 
                 <div class="dropdown">
 
-                         <button class="btn btn-sm btn-outline-dark dropdown-toggle text-left btn-primary" style="margin-top: 7px;"
+                         <button class="btn btn-sm btn-outline-dark dropdown-toggle text-left btn-primary" style="margin-top: 1px;"
                                 type="button" id="dropdownAcciones{{ $item['ID'] }}"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                             <i class="mdi mdi-eye mr-1"></i> Ver Detalle
+                             <i class="mdi mdi-eye mr-4"></i> Ver Detalle
                         </button>
                        <div class="dropdown-menu d-dropdown-menu shadow-sm p-1" aria-labelledby="dropdownAcciones{{ $item['ID'] }}">
                             @if(!empty($item['TXT_GLOSA_RECHAZADO']))
@@ -75,11 +87,17 @@
                             </a>
                             @endif
 
-                            @if(!empty($item['TXT_GLOSA_AUTORIZADO']))
+                            @if(!empty($item['TXT_GLOSA_AUTORIZADO']) && $item['TXT_CATEGORIA_ESTADO_VALE'] !== 'APROBADO')
                                <a class="dropdown-item show-glosa d-flex align-items-center" href="#"
                                        data-glosa="{{ $item['TXT_GLOSA_AUTORIZADO'] }}"
                                        data-type="autoriza">
                                        <i class="mdi mdi-close-circle-outline text-danger mr-2"></i> Glosa de Autorización
+                                </a>
+                            @endif
+
+                             @if($item['TXT_CATEGORIA_ESTADO_VALE'] === 'APROBADO')
+                                <a class="dropdown-item verdetalleaprobar-valerendir d-flex align-items-center" href="#">
+                                    <i class="mdi mdi-check-circle-outline text-success mr-2"></i> Detalle Vale a Rendir
                                 </a>
                             @endif
   

@@ -42,7 +42,6 @@ class EnviarCorreoValeRendirApruebaController extends Controller
        $exito = $this->enviarCorreoValeRendirAprueba($valerendir_id);
         return response()->json(['success' => $exito]);
     }
-
 }
 
 

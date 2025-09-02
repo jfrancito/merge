@@ -27,31 +27,38 @@ class ValeRendirController extends Controller
       public function actionValeRendir(Request $request)
 
     {
-        $trabajador     =   DB::table('STD.TRABAJADOR')
+       $trabajador     =   DB::table('STD.TRABAJADOR')
                             ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
                             ->first();
         $dni            =       '';
         $centro_id      =       '';
 
-        if(count($trabajador)>0){
-            $dni        =       $trabajador->NRO_DOCUMENTO;
+        if ($trabajador) {
+            $dni = $trabajador->NRO_DOCUMENTO;
         }
-        $trabajadorespla    =   DB::table('WEB.platrabajadores')
-                                ->where('situacion_id', 'PRMAECEN000000000002')
-                                ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
-                                ->where('dni', $dni)
-                                ->first();
-        if(count($trabajador)>0){
-            $centro_id      =       $trabajadorespla->centro_osiris_id;
+
+        $trabajadorespla = DB::table('WEB.platrabajadores')
+            ->where('situacion_id', 'PRMAECEN000000000002')
+            ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+            ->where('dni', $dni)
+            ->first();
+
+        if (!$trabajadorespla) {
+            return view('valerendir.modal.modalerrorempresa', [
+                'mensaje' => 'No puede realizar un registro porque no es la empresa a cual pertenece.',
+                'ajax' => true
+            ]);
         }
+
+        $centro_id = $trabajadorespla->centro_osiris_id;
+
         $centrot        =   DB::table('ALM.CENTRO')
                             ->where('COD_CENTRO', $centro_id)
                             ->first();
 
-
-
         $cod_centro = $centrot->COD_CENTRO; 
         $nom_centro = $centrot->NOM_CENTRO; 
+
 
         $usuariosAu = DB::table('WEB.VALE_PERSONAL_AUTORIZA')
             ->where('COD_PERSONAL', Session::get('usuario')->usuarioosiris_id)
@@ -75,37 +82,65 @@ class ValeRendirController extends Controller
         ->pluck('NOM_DISTRITO', 'COD_DISTRITO')
         ->toArray();
 
+
+
         $importeDestinos = DB::table('WEB.REGISTRO_IMPORTE_GASTOS as main')
-            ->select(
-                'main.COD_DISTRITO',
-                'main.NOM_DISTRITO',
-                'main.COD_CENTRO', 
-                'main.IND_DESTINO',
-                DB::raw("
-                    STUFF((
-                        SELECT ', ' + sub.TXT_NOM_TIPO + ': ' + CAST(sub.CAN_TOTAL_IMPORTE AS VARCHAR)
-                        FROM WEB.REGISTRO_IMPORTE_GASTOS AS sub
-                        WHERE 
-                            sub.COD_DISTRITO = main.COD_DISTRITO
-                            AND sub.COD_CENTRO = main.COD_CENTRO
-                            AND sub.IND_DESTINO = main.IND_DESTINO
-                            AND sub.COD_ESTADO = 1
-                        FOR XML PATH(''), TYPE
-                    ).value('.', 'NVARCHAR(MAX)'), 1, 2, '') AS TXT_NOM_TIPO"
+                ->select(
+                    'main.COD_DISTRITO',
+                    'main.NOM_DISTRITO',
+                    'main.COD_CENTRO', 
+                    'main.IND_DESTINO',
+                    // Lista de nombres (para mostrar)
+                    DB::raw("
+                        STUFF((
+                            SELECT ', ' + sub.TXT_NOM_TIPO + ': ' + CAST(sub.CAN_TOTAL_IMPORTE AS VARCHAR)
+                            FROM WEB.REGISTRO_IMPORTE_GASTOS AS sub
+                            WHERE 
+                                sub.COD_DISTRITO = main.COD_DISTRITO
+                                AND sub.COD_CENTRO = main.COD_CENTRO
+                                AND sub.IND_DESTINO = main.IND_DESTINO
+                                AND sub.COD_ESTADO = 1
+                            FOR XML PATH(''), TYPE
+                        ).value('.', 'NVARCHAR(MAX)'), 1, 2, '') AS TXT_NOM_TIPO
+                    "),
+                    // Lista de códigos (para usar en lógica JS)
+                    DB::raw("
+                        STUFF((
+                            SELECT ', ' + sub.COD_TIPO + ':' + CAST(sub.CAN_TOTAL_IMPORTE AS VARCHAR)
+                            FROM WEB.REGISTRO_IMPORTE_GASTOS AS sub
+                            WHERE 
+                                sub.COD_DISTRITO = main.COD_DISTRITO
+                                AND sub.COD_CENTRO = main.COD_CENTRO
+                                AND sub.IND_DESTINO = main.IND_DESTINO
+                                AND sub.COD_ESTADO = 1
+                            FOR XML PATH(''), TYPE
+                        ).value('.', 'NVARCHAR(MAX)'), 1, 2, '') AS COD_TIPO
+                    ")
                 )
-            )
-            ->where('main.COD_CENTRO', $cod_centro)
-            ->where('main.COD_ESTADO', 1)
-            ->groupBy('main.COD_DISTRITO', 'main.NOM_DISTRITO', 'main.COD_CENTRO', 'main.IND_DESTINO') // también aquí
-            ->get()
-            ->toArray();
+                ->where('main.COD_CENTRO', $cod_centro)
+                ->where('main.COD_ESTADO', 1)
+                ->groupBy(
+                    'main.COD_DISTRITO',
+                    'main.NOM_DISTRITO',
+                    'main.COD_CENTRO',
+                    'main.IND_DESTINO'
+                )
+                ->get()
+                ->toArray();
 
             $moneda = DB::table('CMP.CATEGORIA')
             ->whereIn('COD_CATEGORIA', ['MON0000000000001', 'MON0000000000002'])
             ->pluck('NOM_CATEGORIA', 'COD_CATEGORIA')
             ->toArray();
 
+            $listacabecera = DB::table('LQG_DETLIQUIDACIONGASTO')
+                ->where('ID_DOCUMENTO', 'LIQG00000158')
+                ->where('COD_TIPODOCUMENTO', 'TDO0000000000001')
+                ->where('ACTIVO', 1)
+                ->get();
 
+
+        
       
             reset($usuariosAu);
             $usuario_autoriza_predeterminado = key($usuariosAu);
@@ -147,6 +182,25 @@ class ValeRendirController extends Controller
                 "",
                 0.0,
                 ""
+            );  
+
+         $listarValePendientes =  $this->listaValeRendirPendientes(
+                "$cod_usuario_registro"
+               
+            );
+
+         $listarLiquidacionesPendientes =  $this->listaLiquidacionesPendientes(
+                "$cod_usuario_registro"
+               
+            );
+
+         $listarDocumentoXML_CDR =  $this->listaDocumentoXML_CDR(
+                "$cod_empr",
+                "$cod_usuario_registro"
+               
+            );
+         $listarlistanegra =  $this->listaNegraProveedores(
+                "$cod_empr"  
             );
 
         return view('valerendir.ajax.modalvalerendir', [
@@ -160,8 +214,10 @@ class ValeRendirController extends Controller
             'listarusuarios' => $listarusuarios,      
             'nom_centro' => $nom_centro,
             'importeDestinos' => $importeDestinos,
-         /*   'cod_moneda' => $cod_moneda,
-            'nom_moneda' => $nom_moneda,*/
+            'listarValePendientes' => $listarValePendientes,
+            'listarLiquidacionesPendientes' => $listarLiquidacionesPendientes,
+            'listarDocumentoXML_CDR' => $listarDocumentoXML_CDR,
+            'listarlistanegra' => $listarlistanegra,
             'ajax'=>true,   
         ]);
     }
@@ -475,7 +531,7 @@ class ValeRendirController extends Controller
 
     }
 
-        public function actionDetalleImporteVale(Request $request)
+    public function actionDetalleImporteVale(Request $request)
     { 
         $id_buscar = $request->input('valerendir_id'); 
     
@@ -487,9 +543,45 @@ class ValeRendirController extends Controller
         'detalles' => $detallesImporte
     ]);  
 
-    }         
+    }   
+
+    public function actionMensajeValeRendir(Request $request)
+    { 
+        $id_buscar = $request->input('valerendir_id'); 
+    
+         return view('valerendir.ajax.modalmensajesolicitudvale', [
+             'ajax'=>true,
+        ]);           
+    }
+
+    public function actionValePendientes(Request $request)
+    { 
+        $id_buscar = $request->input('valerendir_id'); 
+    
+         return view('valerendir.ajax.modalvalependientes', [
+             'ajax'=>true,
+        ]);           
+    }
+
+    public function actionLiquidacionesSinProcesar(Request $request)
+    { 
+        $id_buscar = $request->input('valerendir_id'); 
+    
+         return view('valerendir.ajax.modalliquidacionessinprocesar', [
+             'ajax'=>true,
+        ]);           
+    }
+
+    public function actionDocumentosSinXmlCdr(Request $request)
+    { 
+        $id_buscar = $request->input('valerendir_id'); 
+    
+         return view('valerendir.ajax.modaldocumentossinxmlcdr', [
+             'ajax'=>true,
+        ]);           
+    }
+
+
 
 }
-
-
 

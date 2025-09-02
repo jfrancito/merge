@@ -13,87 +13,17 @@
             <div class="col-sm-12">
               <div class="panel panel-default panel-border-color panel-border-color-success">
                 <div class="panel-heading">{{ $titulo }}
-
-                  <div class="tools tooltiptop">
-
-
-                    <a href="{{ url('/tutorial/planillaovilidad_03.mp4') }}" class="btn btn-secondary botoncabecera tooltipcss opciones" style="width:140px;" Target="_blank">
-                      <span class="tooltip-text">Ver Tutorial</span>
-                      Tutorial
-                    </a>
-
-                    <a href="{{ url('/agregar-planilla-movilidad/'.$idopcion) }}" class="btn btn-secondary botoncabecera tooltipcss opciones" style="width:140px;">
-                      <span class="tooltiptext">Crear Movilidad</span>
-                      Crear Movilidad
-                    </a>
-
-                    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscardocumentomob">
-                      <span class="tooltiptext">Buscar Documento</span>
-                      <span class="icon mdi mdi-search"></span>
-                    </a>
-                  </div>
-                  
                 </div>
-
                 <div class="panel-body">
-                  <div class='filtrotabla row'>
-
-                            <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
-                                <div class="form-group ">
-                                  <label class="col-sm-12 control-label labelleft" >Fecha Inicio :</label>
-                                  <div class="col-sm-12 abajocaja" >
-                                    <div data-min-view="2" 
-                                           data-date-format="dd-mm-yyyy"  
-                                           class="input-group date datetimepicker pickerfecha" style = 'padding: 0px 0;margin-top: -3px;'>
-                                           <input size="16" type="text" 
-                                                  value="{{$fecha_inicio}}" 
-                                                  placeholder="Fecha Inicio"
-                                                  id='fecha_inicio' 
-                                                  name='fecha_inicio' 
-                                                  required = ""
-                                                  class="form-control input-sm"/>
-                                            <span class="input-group-addon btn btn-primary"><i class="icon-th mdi mdi-calendar"></i></span>
-                                      </div>
-                                  </div>
-                                </div>
-                            </div> 
-
-                            <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
-                              <div class="form-group ">
-                                <label class="col-sm-12 control-label labelleft" >Fecha Fin :</label>
-                                <div class="col-sm-12 abajocaja" >
-                                  <div data-min-view="2" 
-                                         data-date-format="dd-mm-yyyy"  
-                                         class="input-group date datetimepicker pickerfecha" style = 'padding: 0px 0;margin-top: -3px;'>
-                                         <input size="16" type="text" 
-                                                value="{{$fecha_fin}}" 
-                                                placeholder="Fecha Fin"
-                                                id='fecha_fin' 
-                                                name='fecha_fin' 
-                                                required = ""
-                                                class="form-control input-sm"/>
-                                          <span class="input-group-addon btn btn-primary"><i class="icon-th mdi mdi-calendar"></i></span>
-                                    </div>
-                                </div>
-                              </div>
-                            </div> 
-
-                          </div>
-
-
-                    <div class="col-xs-12">
-                      <input type="hidden" name="idopcion" id='idopcion' value='{{$idopcion}}'>
-                    </div>
-                  </div>
                   <div class='listajax'>
-                    @include('planillamovilidad.ajax.alistaplanillamovilidad')
+                    @include('liquidaciongasto.ajax.alistaliquidaciongastofaltantes')
                   </div>
                 </div>
               </div>
             </div>
           </div>
     </div>
-    @include('planillamovilidad.modal.mregistrorequerimiento')
+    @include('liquidaciongasto.modal.mregistrorequerimiento')
     
   </div>
 @stop
@@ -129,8 +59,6 @@
   <script src="{{ asset('public/js/app-form-elements.js') }}" type="text/javascript"></script>
   <script src="{{ asset('public/lib/parsley/parsley.js') }}" type="text/javascript"></script>
   <script src="{{ asset('public/lib/jquery.niftymodals/dist/jquery.niftymodals.js') }}" type="text/javascript"></script>
-
-  
   <script type="text/javascript">
 
     $.fn.niftyModal('setDefaults',{
@@ -149,6 +77,6 @@
 
     });
   </script>
-  <script src="{{ asset('public/js/comprobante/planilla.js?v='.$version) }}" type="text/javascript"></script>
+  <script src="{{ asset('public/js/comprobante/liquidaciongasto.js?v='.$version) }}" type="text/javascript"></script>
 
 @stop

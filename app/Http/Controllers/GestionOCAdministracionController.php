@@ -2272,13 +2272,12 @@ class GestionOCAdministracionController extends Controller
                     DB::connection($conexionbd)->statement("
                         UPDATE FE_DOCUMENTO 
                         SET COD_CONTACTO = 'ITTR000000000212'
-                        WHERE usuario_pa IN ('1CIX00000281','1CIX00000187')
+                        WHERE 1=1
+                          AND RUC_PROVEEDOR IN ('20600004027','20602740278','10451734739')
                           AND COD_ESTADO = 'ETM0000000000005' 
                           AND COD_CONTACTO <> 'ITTR000000000212'
                           AND FEC_VENTA >='2025-07-01'
                     ");
-
-
 
                 }
 

@@ -57,7 +57,7 @@ trait ValeRendirTraits
                  $cod_usuario_registro = Session::get('usuario')->id;
                  $cod_empr = Session::get('empresas')->COD_EMPR;
                  
-                $trabajador     =   DB::table('STD.TRABAJADOR')
+               $trabajador     =   DB::table('STD.TRABAJADOR')
                             ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
                             ->first();
                 $dni            =       '';
@@ -80,7 +80,6 @@ trait ValeRendirTraits
 
                 $cod_centro = $centrot->COD_CENTRO; 
             
-
 
                  $stmt->bindParam(1, $ind_tipo_operacion, PDO::PARAM_STR);
                  $stmt->bindParam(2, $id, PDO::PARAM_STR);
@@ -625,6 +624,117 @@ trait ValeRendirTraits
                     $stmt->bindParam(9, $can_total_importe, PDO::PARAM_STR);
                     $stmt->bindParam(10, $can_total_saldo, PDO::PARAM_STR);
                     $stmt->bindParam(11, $cod_usuario_registro, PDO::PARAM_STR);
+
+                    $stmt->execute();
+                                          
+                    while ($row = $stmt->fetch()){
+                      array_push($array_lista_retail, $row);
+                    }
+
+        return $array_lista_retail;
+    }
+
+      public function listaValeRendirPendientes($cod_usuario_crea)
+    {
+        
+        $array_lista_retail = array();
+        $cod_usuario_registro = "";
+
+        $usuario = User::where('id', Session::get('usuario')->id)->get();
+        $cod_empr = Session::get('empresas')->COD_EMPR;
+        $cod_centro = '';
+
+
+        $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC WEB.VALE_RENDIR_PENDIENTES
+
+                                                             @COD_USUARIO_CREA = ?');
+
+
+                    $stmt->bindParam(1, $cod_usuario_crea, PDO::PARAM_STR);
+
+                    $stmt->execute();
+                                          
+                    while ($row = $stmt->fetch()){
+                      array_push($array_lista_retail, $row);
+                    }
+
+        return $array_lista_retail;
+    }
+
+
+    public function listaLiquidacionesPendientes($cod_usuario_crea)
+        {
+            
+            $array_lista_retail = array();
+            $cod_usuario_registro = "";
+
+            $usuario = User::where('id', Session::get('usuario')->id)->get();
+            $cod_empr = Session::get('empresas')->COD_EMPR;
+            $cod_centro = '';
+
+
+            $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC WEB.LIQUIDACIONES_SIN_PROCESAR
+
+                                                                 @COD_USUARIO_CREA = ?');
+
+
+                        $stmt->bindParam(1, $cod_usuario_crea, PDO::PARAM_STR);
+
+                        $stmt->execute();
+                                              
+                        while ($row = $stmt->fetch()){
+                          array_push($array_lista_retail, $row);
+                        }
+
+            return $array_lista_retail;
+        }
+
+      public function listaDocumentoXML_CDR($cod_empr, $cod_usuario_crea)
+    {
+        
+        $array_lista_retail = array();
+        $cod_usuario_registro = "";
+
+        $usuario = User::where('id', Session::get('usuario')->id)->get();
+        $cod_empr = Session::get('empresas')->COD_EMPR;
+        $cod_centro = '';
+
+
+        $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC WEB.DOCUMENTO_XML_CDR
+
+                                                             @COD_EMPRESA = ?,
+                                                             @COD_USUARIO_CREA = ?');
+
+
+                    $stmt->bindParam(1, $cod_empr, PDO::PARAM_STR);
+                    $stmt->bindParam(2, $cod_usuario_crea, PDO::PARAM_STR);
+
+                    $stmt->execute();
+                                          
+                    while ($row = $stmt->fetch()){
+                      array_push($array_lista_retail, $row);
+                    }
+
+        return $array_lista_retail;
+    }
+
+      public function listaNegraProveedores($cod_empr)
+    {
+        
+        $array_lista_retail = array();
+        $cod_usuario_registro = "";
+
+        $usuario = User::where('id', Session::get('usuario')->id)->get();
+        $cod_empr = Session::get('empresas')->COD_EMPR;
+        $cod_centro = '';
+
+
+        $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC WEB.PROVEEDOR_LISTA_NEGRA
+
+                                                             @COD_EMPRESA = ?');
+
+
+                    $stmt->bindParam(1, $cod_empr, PDO::PARAM_STR);
 
                     $stmt->execute();
                                           

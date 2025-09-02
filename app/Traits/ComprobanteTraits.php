@@ -3511,6 +3511,68 @@ trait ComprobanteTraits
     }
 
 
+    private function con_lista_cabecera_comprobante_total_gestion_reparable_excel($cod_empresa,$tipoarchivo_id,$estado_id) {
+
+
+
+
+        $listadatos             =       FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+                                        ->whereNotIn('FE_DOCUMENTO.COD_ESTADO',['','ETM0000000000006'])
+                                        ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                        ->TipoArchivo($tipoarchivo_id)
+                                        ->EstadoReparable($estado_id)
+                                        ->pluck('ID_DOCUMENTO')
+                                        ->toArray();
+
+        $listadatos             =   FeDocumento::join('CMP.ORDEN', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+                                    ->leftjoin('FE_DETALLE_DOCUMENTO', 'FE_DETALLE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
+                                    ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.Orden.COD_USUARIO_CREA_AUD')
+                                    ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
+                                    ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                    ->where('OPERACION','=','ORDEN_COMPRA')
+                                    ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                    ->whereIn('FE_DOCUMENTO.ID_DOCUMENTO',$listadatos)
+                                    ->select(DB::raw("
+                                        FE_DOCUMENTO.*, 
+                                        CMP.ORDEN.*,
+                                        FE_DETALLE_DOCUMENTO.*,
+                                        FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_FE, 
+                                        CMP.Orden.TXT_GLOSA AS TXT_GLOSA_ORDEN,
+                                        FE_DOCUMENTO.TXT_REPARABLE AS TXT_REPARABLE_SN, 
+                                        FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_N,
+                                        CMP.CATEGORIA.NOM_CATEGORIA AS AREA, 
+                                        (
+                                            SELECT STUFF(
+                                                (
+                                                    SELECT '// ' + d2_interno.TXT_NOMBRE_PRODUCTO
+                                                    FROM CMP.DETALLE_PRODUCTO d2_interno
+                                                    WHERE d2_interno.COD_TABLA = FE_DOCUMENTO.ID_DOCUMENTO
+                                                    FOR XML PATH('')
+                                                ), 1, 2, ''
+                                            )
+                                        ) AS productos_cabecera2,
+
+                                        CMP.CATEGORIA.NOM_CATEGORIA AS AREA, 
+                                        (
+                                            SELECT STUFF(
+                                                (
+                                                    SELECT '// ' + d2_interno.MENSAJE
+                                                    FROM FE_DOCUMENTO_HISTORIAL d2_interno
+                                                    WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                                                    AND FE_DOCUMENTO.IND_REPARABLE = 1
+                                                    AND TIPO LIKE 'DOCUMENTO ARCHIVO_%'
+                                                    FOR XML PATH('')
+                                                ), 1, 2, ''
+                                            )
+                                        ) AS productos_reparable
+
+                                    "))
+                                    ->orderBy('FEC_VENTA','asc')
+                                    ->get();
+
+        return  $listadatos;
+    }
+
 
     private function con_lista_cabecera_comprobante_total_gestion_excel($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id) {
 
@@ -3772,6 +3834,77 @@ trait ComprobanteTraits
 
     }
 
+
+    private function con_lista_cabecera_comprobante_total_gestion_contrato_reparable_excel($cod_empresa,$tipoarchivo_id,$estado_id) {
+
+
+        $listadatos     =       FeDocumento::Join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                                    ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                    ->where('OPERACION','=','CONTRATO')
+                                    ->TipoArchivo($tipoarchivo_id)
+                                    ->EstadoReparable($estado_id)
+                                    ->whereNotIn('FE_DOCUMENTO.COD_ESTADO',['','ETM0000000000006'])
+                                    ->pluck('ID_DOCUMENTO')
+                                    ->toArray();
+
+
+
+        $listadatos     =       FeDocumento::join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                            ->join('FE_DETALLE_DOCUMENTO', 'FE_DETALLE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
+                            ->join('ALM.CENTRO', 'ALM.CENTRO.COD_CENTRO', '=', 'CMP.DOCUMENTO_CTBLE.COD_CENTRO')
+                            ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD')
+                            ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('OPERACION','=','CONTRATO')
+                            ->whereIn('FE_DOCUMENTO.ID_DOCUMENTO',$listadatos)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                            ->select(DB::raw("
+                                FE_DOCUMENTO.*, 
+                                CMP.DOCUMENTO_CTBLE.*, 
+                                FE_DETALLE_DOCUMENTO.*, 
+                                FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_FE, 
+                                CMP.CATEGORIA.NOM_CATEGORIA AS AREA,
+                                FE_DOCUMENTO.TXT_REPARABLE AS TXT_REPARABLE_SN, 
+                                FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_N,
+
+                                (
+                                    SELECT STUFF((
+                                        SELECT '// ' + DOC_INTERNO.NRO_SERIE + '-' + DOC_INTERNO.NRO_DOC + ' ' + DOC_INTERNO.TXT_CATEGORIA_MOTIVO_TRASLADO
+                                        FROM CMP.REFERENCIA_ASOC AS REF_INTERNO
+                                        INNER JOIN CMP.DOCUMENTO_CTBLE AS DOC_INTERNO ON REF_INTERNO.COD_TABLA_ASOC = DOC_INTERNO.COD_DOCUMENTO_CTBLE
+                                        WHERE REF_INTERNO.COD_TABLA = FE_DOCUMENTO.ID_DOCUMENTO
+                                        AND DOC_INTERNO.COD_CATEGORIA_TIPO_DOC = 'TDO0000000000009'
+                                        FOR XML PATH('')
+                                    ), 1, 2, '')
+                                ) AS productos_cabecera2,
+                                CMP.CATEGORIA.NOM_CATEGORIA AS AREA, 
+                                (
+                                    SELECT STUFF(
+                                        (
+                                            SELECT '// ' + d2_interno.MENSAJE
+                                            FROM FE_DOCUMENTO_HISTORIAL d2_interno
+                                            WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                                            AND FE_DOCUMENTO.IND_REPARABLE = 1
+                                            AND TIPO LIKE 'DOCUMENTO ARCHIVO_%'
+                                            FOR XML PATH('')
+                                        ), 1, 2, ''
+                                    )
+                                ) AS productos_reparable
+                                
+                            "))
+                            ->orderBy('FEC_VENTA', 'desc')
+                            ->get();
+
+
+
+
+
+
+
+        return  $listadatos;
+
+
+    }
 
 
 
@@ -4224,12 +4357,16 @@ trait ComprobanteTraits
                         'IICHFC0000000012',
                         'ISCHFC0000000012',
                         'ISCHFC0000000027',
-                        'ISCHFC0000000036'
+                        'ISCHFC0000000036',
+                        'ISCHFC0000000033'
                     ])
                     ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
                     ->where('TES.IND_EXTORNO', 0)
                     ->where('TES.COD_ESTADO', 1)
-                    ->where('TES.COD_CATEGORIA_OPERACION_ORIGEN', 'OOC0000000000008')
+                    ->whereIn('TES.COD_CATEGORIA_OPERACION_ORIGEN', [
+                        'OOC0000000000008',
+                        'OOC0000000000005'
+                    ])
                     ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR) // variable pasada desde tu controlador
                     ->get();
 
@@ -4284,12 +4421,16 @@ trait ComprobanteTraits
                 'IICHFC0000000012',
                 'ISCHFC0000000012',
                 'ISCHFC0000000027',
-                'ISCHFC0000000036'
+                'ISCHFC0000000036',
+                'ISCHFC0000000033'
             ])
             ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
             ->where('TES.IND_EXTORNO', 0)
             ->where('TES.COD_ESTADO', 1)
-            ->where('TES.COD_CATEGORIA_OPERACION_ORIGEN', 'OOC0000000000008')
+            ->whereIn('TES.COD_CATEGORIA_OPERACION_ORIGEN', [
+                'OOC0000000000008',
+                'OOC0000000000005'
+            ])
             ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR) // variable pasada desde tu controlador
             ->get();
 
@@ -4399,12 +4540,16 @@ trait ComprobanteTraits
                         'IICHFC0000000012',
                         'ISCHFC0000000012',
                         'ISCHFC0000000027',
-                        'ISCHFC0000000036'
+                        'ISCHFC0000000036',
+                        'ISCHFC0000000033'
                     ])
                     ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
                     ->where('TES.IND_EXTORNO', 0)
                     ->where('TES.COD_ESTADO', 1)
-                    ->where('TES.COD_CATEGORIA_OPERACION_ORIGEN', 'OOC0000000000008')
+                    ->whereIn('TES.COD_CATEGORIA_OPERACION_ORIGEN', [
+                        'OOC0000000000008',
+                        'OOC0000000000005'
+                    ])
                     ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR) // variable pasada desde tu controlador
                     ->first();
 

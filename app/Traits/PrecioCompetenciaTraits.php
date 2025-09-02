@@ -13,6 +13,8 @@ use App\Modelos\Certificado;
 use App\Modelos\SuperPrecio;
 use App\Modelos\FeToken;
 use App\Modelos\SunatDocumento;
+use App\Modelos\Archivo;
+use App\Modelos\STDEmpresa;
 
 
 
@@ -28,7 +30,155 @@ use ZipArchive;
 trait PrecioCompetenciaTraits
 {
 
+	private function buscar_archivo_sunat_lg_nuevo_lg($urlxml,$fetoken,$pathFiles,$prefijocarperta,$ID_DOCUMENTO,$documento,$IND) {
 
+		$array_nombre_archivo = array();
+		$curl = curl_init();
+		curl_setopt_array($curl, array(
+		  CURLOPT_URL => $urlxml,
+		  CURLOPT_RETURNTRANSFER => true,
+		  CURLOPT_ENCODING => '',
+		  CURLOPT_MAXREDIRS => 10,
+
+			CURLOPT_TIMEOUT => 15, // 👈 máximo 10 segundos para la respuesta
+			CURLOPT_CONNECTTIMEOUT => 10, // 👈 máximo 5 segundos para conectar
+
+		  CURLOPT_FOLLOWLOCATION => true,
+		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		  CURLOPT_CUSTOMREQUEST => 'GET',
+		  CURLOPT_HTTPHEADER => array(
+		    'Authorization: Bearer '.$fetoken->TOKEN
+		  ),
+		));
+		$response = curl_exec($curl);
+		curl_close($curl);
+
+
+		$response_array = json_decode($response, true);
+		if (!isset($response_array['nomArchivo'])) {
+			print_r("NO HAY");
+		}else{
+	        $fileName = $response_array['nomArchivo'];
+	        $base64File = $response_array['valArchivo'];
+	        $fileData = base64_decode($base64File);
+            $rutafile        =      $pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ID_DOCUMENTO;
+            $rutacompleta    =      $rutafile.'\\'.$fileName;
+			file_put_contents($rutacompleta, $fileData);
+			// Descomprimir el ZIP
+			$zip = new ZipArchive;
+			if ($zip->open($rutacompleta) === TRUE) {
+			    if ($zip->numFiles > 0) {
+			        // Obtener el primer archivo dentro del ZIP (puedes adaptarlo si hay más)
+			        $archivoDescomprimido = $zip->getNameIndex(0); // nombre relativo dentro del zip
+			        if($IND == 'IND_XML'){
+			        	if(substr($archivoDescomprimido, 0, 1) == 'R'){
+			        			$archivoDescomprimido = $zip->getNameIndex(1); // nombre relativo dentro del zip	
+			        	}
+			        }
+			    }
+			    $zip->extractTo($rutafile); // descomprime todo
+			    $zip->close();
+			    $rutacompleta    =      $rutafile.'\\'.$archivoDescomprimido;
+			    print_r($IND);
+			    if($IND == 'IND_XML'){
+
+
+									DB::table('LQG_DETLIQUIDACIONGASTO')
+							    ->where('ID_DOCUMENTO', $documento->ID_DOCUMENTO)
+							    ->where('ITEM', $documento->ITEM)
+							    ->update([
+							        'IND_XML'     => '1',
+							        'CONTADOR'    => DB::raw('ISNULL(CONTADOR,0) + 1'),
+							    ]);
+
+                  $dcontrol                       =   new Archivo;
+                  $dcontrol->ID_DOCUMENTO         =   $documento->ID_DOCUMENTO;
+                  $dcontrol->DOCUMENTO_ITEM       =   $documento->ITEM;
+                  $dcontrol->TIPO_ARCHIVO         =   'DCC0000000000003';
+                  $dcontrol->NOMBRE_ARCHIVO       =   $archivoDescomprimido;
+                  $dcontrol->DESCRIPCION_ARCHIVO  =   'XML DEL COMPROBANTE DE COMPRA';
+                  $dcontrol->URL_ARCHIVO          =   $rutacompleta;
+                  $dcontrol->SIZE                 =   1000;
+                  $dcontrol->EXTENSION            =   'pdf';
+                  $dcontrol->ACTIVO               =   1;
+                  $dcontrol->FECHA_CREA           =   date('Ymd H:i:s');
+                  $dcontrol->USUARIO_CREA         =   Session::get('usuario')->id;
+                  $dcontrol->save();
+
+			    }
+
+			    if($IND == 'IND_PDF'){
+
+									DB::table('LQG_DETLIQUIDACIONGASTO')
+							    ->where('ID_DOCUMENTO', $documento->ID_DOCUMENTO)
+							    ->where('ITEM', $documento->ITEM)
+							    ->update([
+							        'IND_PDF'     => '1',
+							        'CONTADOR'    => DB::raw('ISNULL(CONTADOR,0) + 1'),
+							    ]);
+
+                  $dcontrol                       =   new Archivo;
+                  $dcontrol->ID_DOCUMENTO         =   $documento->ID_DOCUMENTO;
+                  $dcontrol->DOCUMENTO_ITEM       =   $documento->ITEM;
+                  $dcontrol->TIPO_ARCHIVO         =   'DCC0000000000036';
+                  $dcontrol->NOMBRE_ARCHIVO       =   $archivoDescomprimido;
+                  $dcontrol->DESCRIPCION_ARCHIVO  =   'COMPROBANTE ELECTRONICO SUNAT API';
+                  $dcontrol->URL_ARCHIVO          =   $rutacompleta;
+                  $dcontrol->SIZE                 =   1000;
+                  $dcontrol->EXTENSION            =   'pdf';
+                  $dcontrol->ACTIVO               =   1;
+                  $dcontrol->FECHA_CREA           =   date('Ymd H:i:s');
+                  $dcontrol->USUARIO_CREA         =   Session::get('usuario')->id;
+                  $dcontrol->save();
+
+			    }
+
+
+			    if($IND == 'IND_CDR'){
+									DB::table('LQG_DETLIQUIDACIONGASTO')
+							    ->where('ID_DOCUMENTO', $documento->ID_DOCUMENTO)
+							    ->where('ITEM', $documento->ITEM)
+							    ->update([
+							        'IND_CDR'     => '1',
+							        'CONTADOR'    => DB::raw('ISNULL(CONTADOR,0) + 1'),
+							    ]);
+
+                  $dcontrol                       =   new Archivo;
+                  $dcontrol->ID_DOCUMENTO         =   $documento->ID_DOCUMENTO;
+                  $dcontrol->DOCUMENTO_ITEM       =   $documento->ITEM;
+                  $dcontrol->TIPO_ARCHIVO         =   'DCC0000000000004';
+                  $dcontrol->NOMBRE_ARCHIVO       =   $archivoDescomprimido;
+                  $dcontrol->DESCRIPCION_ARCHIVO  =   'CDR';
+                  $dcontrol->URL_ARCHIVO          =   $rutacompleta;
+                  $dcontrol->SIZE                 =   1000;
+                  $dcontrol->EXTENSION            =   'pdf';
+                  $dcontrol->ACTIVO               =   1;
+                  $dcontrol->FECHA_CREA           =   date('Ymd H:i:s');
+                  $dcontrol->USUARIO_CREA         =   Session::get('usuario')->id;
+                  $dcontrol->save();
+
+
+			    }
+
+					$array_nombre_archivo = [
+						'cod_error' => 0,
+						'nombre_archivo' => $response_array['nomArchivo'],
+						'ruta_completa' => $rutacompleta,
+						'nombre_archivo' => $archivoDescomprimido,
+						'mensaje' => 'encontrado con exito'
+					];
+			} else {
+				$array_nombre_archivo = [
+					'cod_error' => 1,
+					'nombre_archivo' => '',
+					'mensaje' => 'Error al abrir el archivo ZIP'
+				];
+			}
+		}
+
+	 	return  $array_nombre_archivo;
+
+	}
 
 	private function documentolgautomaticonuevo() {
 			
@@ -43,41 +193,36 @@ trait PrecioCompetenciaTraits
 														    ->where('LQG_DETLIQUIDACIONGASTO.COD_TIPODOCUMENTO', 'TDO0000000000001')
 														    ->whereNotIn('LQG_LIQUIDACION_GASTO.COD_ESTADO', ['ETM0000000000006', 'ETM0000000000001'])
 														    ->whereRaw('ISNULL(LQG_DETLIQUIDACIONGASTO.IND_TOTAL, 0) = 0')
-														    ->whereNotExists(function($query) {
-														        $query->select(DB::raw(1))
-														              ->from('ARCHIVOS')
-														              ->whereRaw('ARCHIVOS.ID_DOCUMENTO = LQG_DETLIQUIDACIONGASTO.ID_DOCUMENTO')
-														              ->whereRaw('ARCHIVOS.DOCUMENTO_ITEM = LQG_DETLIQUIDACIONGASTO.ITEM')
-														              ->where('ARCHIVOS.ACTIVO', 1)
-														              ->where('ARCHIVOS.TIPO_ARCHIVO', 'DCC0000000000003');
-														    })
 														    ->orderBy('FECHA_EMI', 'asc')
 														    ->get();
 
+			//dd($listasunattareas);
+
       foreach($listasunattareas as $index=>$item){
 
-					DB::table('LQG_DETLIQUIDACIONGASTO')
-					    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
-					    ->where('ITEM', $item->ITEM)
-					    ->update([
-					        'FECHA_MOD'     => date('Ymd H:i:s'),
-					        'BUSQUEDAD'     => BUSQUEDAD + 1
-					    ]);
+						DB::table('LQG_DETLIQUIDACIONGASTO')
+						    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
+						    ->where('ITEM', $item->ITEM)
+						    ->update([
+						        'FECHA_MOD' => date('Y-m-d H:i:s'),  // Better date format
+						        'BUSQUEDAD' => DB::raw('ISNULL(BUSQUEDAD,0) + 1')  // Correct way to increment
+						    ]);
       	
           try{  
 
               set_time_limit(0);
               $numero              				=   ltrim($item->NUMERO, '0');
-              $ruc                        =   $item->RUC;
-              $td                         =   $item->TIPODOCUMENTO_ID;
+        			$proveedor             			=   STDEmpresa::where('COD_EMPR','=',$item->COD_EMPRESA_PROVEEDOR)->first();
+              $ruc                        =   $proveedor->NRO_DOCUMENTO;
+              $td                         =   '01';
               $serie                      =   $item->SERIE;
               $correlativo                =   $numero;
               $ID_DOCUMENTO               =   $item->ID_DOCUMENTO;
-              $fetoken                    =   FeToken::where('COD_EMPR','=',$item->EMPRESA_ID)->where('TIPO','=','COMPROBANTE_PAGO')->first();
+              $fetoken                    =   FeToken::where('COD_EMPR','=',$item->COD_EMPRESA)->where('TIPO','=','COMPROBANTE_PAGO')->first();
 
               //buscar xml
               $primeraLetra               =   substr($serie, 0, 1);
-              $prefijocarperta            =   $this->prefijo_empresa_lg($item->EMPRESA_ID);
+              $prefijocarperta            =   $this->prefijo_empresa_lg($item->COD_EMPRESA);
               $rutafile                   =   $pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ID_DOCUMENTO;
               $valor                      =   $this->versicarpetanoexiste_lg($rutafile);
 
@@ -89,138 +234,41 @@ trait PrecioCompetenciaTraits
               $nombre_cdr                 =   "";
 
 
-
               if($item->IND_XML==0){
                   $urlxml                 =   'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/02';
-                  $respuetaxml            =   $this->buscar_archivo_sunat_lg_nuevo($urlxml,$fetoken,$pathFiles,$prefijocarperta,$ID_DOCUMENTO,$item,'IND_XML');
+                  $respuetaxml            =   $this->buscar_archivo_sunat_lg_nuevo_lg($urlxml,$fetoken,$pathFiles,$prefijocarperta,$ID_DOCUMENTO,$item,'IND_XML');
               }
               if($item->IND_PDF==0){
 	              $urlxml                   =   'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/01';
-	              $respuetapdf              =   $this->buscar_archivo_sunat_lg_nuevo($urlxml,$fetoken,$pathFiles,$prefijocarperta,$ID_DOCUMENTO,$item,'IND_PDF');
+	              $respuetapdf              =   $this->buscar_archivo_sunat_lg_nuevo_lg($urlxml,$fetoken,$pathFiles,$prefijocarperta,$ID_DOCUMENTO,$item,'IND_PDF');
               }
 
               if($primeraLetra == 'F'){
+
               	  if($item->IND_CDR==0){
 	                  $urlxml                     =   'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/03';
-	                  $respuetacdr                =   $this->buscar_archivo_sunat_lg_nuevo($urlxml,$fetoken,$pathFiles,$prefijocarperta,$ID_DOCUMENTO,$item,'IND_CDR');
+	                  $respuetacdr                =   $this->buscar_archivo_sunat_lg_nuevo_lg($urlxml,$fetoken,$pathFiles,$prefijocarperta,$ID_DOCUMENTO,$item,'IND_CDR');
                   }
 
-
-									DB::table('SUNAT_DOCUMENTO')
+									DB::table('LQG_DETLIQUIDACIONGASTO')
 									    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
-									    ->where('RUC', $item->RUC)
-									    ->where('TIPODOCUMENTO_ID', $item->TIPODOCUMENTO_ID)
-									    ->where('SERIE', $item->SERIE)
-									    ->where('NUMERO', $item->NUMERO)
+									    ->where('ITEM', $item->ITEM)
 									    ->where('CONTADOR','=', '3')
 									    ->update([
 									        'IND_TOTAL'     => '1'
 									    ]);
 
-									$documentos = DB::table('SUNAT_DOCUMENTO')
-									    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
-									    ->where('RUC', $item->RUC)
-									    ->where('TIPODOCUMENTO_ID', $item->TIPODOCUMENTO_ID)
-									    ->where('SERIE', $item->SERIE)
-									    ->where('NUMERO', $item->NUMERO)
-									    ->where('CONTADOR', 3)
-									    ->get();
-
-									if(count($documentos)>0){
-										$usuario = DB::table('users')
-										    ->select(DB::raw("ISNULL(celular_contacto, '') AS celular_contacto"))
-										    ->where('id', $item->USUARIO_ID)
-										    ->first();
-										if(count($usuario)>0){
-												if($usuario->celular_contacto <> ''){
-
-													DB::connection('sqlsrv_isl')->table('whatsapp')->insert([
-													    'NumeroContacto'   => '51'.$usuario->celular_contacto,
-													    'NombreContacto'   => $item->USUARIO_NOMBRE,
-													    'Mensaje'          => '¡Hola! Buen día %0D%0AEncontrammos tu documento que dejaste rastreando en busquedad de la APP.*%0D%0A* Datos del documento : '.$item->RUC.' // '.$item->SERIE.'-'.$item->NUMERO.'*%0D%0A*',
-													    'IndArchivo'       => 0,
-													    'RutaArchivo'      => '',
-													    'SizeArchivo'      => 0,
-													    'NombreProyecto'   => 'MERGE',
-													    'IndProgramado'    => 0,
-													    'IndManual'        => 0,
-													    'IndEnvio'         => 0,
-													    'FechaCreacion'    => DB::raw('GETDATE()'),
-													    'Activo'           => 1,
-													    'indgrupo'         => 0,
-													]);
-												}
-										}
-									}
-
-
-
               }else{
-									DB::table('SUNAT_DOCUMENTO')
+
+									DB::table('LQG_DETLIQUIDACIONGASTO')
 									    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
-									    ->where('RUC', $item->RUC)
-									    ->where('TIPODOCUMENTO_ID', $item->TIPODOCUMENTO_ID)
-									    ->where('SERIE', $item->SERIE)
-									    ->where('NUMERO', $item->NUMERO)
+									    ->where('ITEM', $item->ITEM)
 									    ->where('CONTADOR','=', '2')
 									    ->update([
 									        'IND_TOTAL'     => '1'
 									    ]);
 
-										$documentos = DB::table('SUNAT_DOCUMENTO')
-										    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
-										    ->where('RUC', $item->RUC)
-										    ->where('TIPODOCUMENTO_ID', $item->TIPODOCUMENTO_ID)
-										    ->where('SERIE', $item->SERIE)
-										    ->where('NUMERO', $item->NUMERO)
-										    ->where('CONTADOR', 2)
-										    ->get();
-
-										if(count($documentos)>0){
-											$usuario = DB::table('users')
-											    ->select(DB::raw("ISNULL(celular_contacto, '') AS celular_contacto"))
-											    ->where('id', $item->USUARIO_ID)
-											    ->first();
-											if(count($usuario)>0){
-													if($usuario->celular_contacto <> ''){
-
-														DB::connection('sqlsrv_isl')->table('whatsapphub')->insert([
-														    'NumeroContacto'   => $usuario->celular_contacto,
-														    'NombreContacto'   => $item->USUARIO_NOMBRE,
-														    'Mensaje'          => '¡Hola! Buen día %0D%0AEncontrammos tu documento que dejaste rastreando en busquedad de la APP.*%0D%0A* Datos del documento : '.$item->RUC.' // '.$item->SERIE.'-'.$item->NUMERO.'*%0D%0A*',
-														    'IndArchivo'       => 0,
-														    'RutaArchivo'      => '',
-														    'SizeArchivo'      => 0,
-														    'NombreProyecto'   => 'MERGE',
-														    'IndProgramado'    => 0,
-														    'IndManual'        => 0,
-														    'IndEnvio'         => 0,
-														    'FechaCreacion'    => DB::raw('GETDATE()'),
-														    'Activo'           => 1,
-														    'indgrupo'         => 0,
-														]);
-													}
-											}
-										}
-
-
-
-
               }
-
-
-							DB::table('SUNAT_DOCUMENTO')
-							    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
-							    ->where('RUC', $item->RUC)
-							    ->where('TIPODOCUMENTO_ID', $item->TIPODOCUMENTO_ID)
-							    ->where('SERIE', $item->SERIE)
-							    ->where('NUMERO', $item->NUMERO)
-							    ->update([
-							        'FECHA_MOD'     => date('Ymd H:i:s')
-							    ]);
-
-
-              //DB::commit();
 
           }catch(\Exception $ex){
               //DB::rollback();
@@ -435,7 +483,7 @@ trait PrecioCompetenciaTraits
 	}	
 
 
-	private function buscar_archivo_sunat_lg_nuevo($urlxml,$fetoken,$pathFiles,$prefijocarperta,$ID_DOCUMENTO,$documento,$IND) {
+	private function buscar_archivo_sunat_lg_nuevo_pdf($urlxml,$fetoken,$pathFiles,$prefijocarperta,$ID_DOCUMENTO) {
 
 		$array_nombre_archivo = array();
 		$curl = curl_init();
@@ -458,15 +506,75 @@ trait PrecioCompetenciaTraits
 		$response = curl_exec($curl);
 		curl_close($curl);
 
-		// if(curl_errno($curl)) {
-		// 	$error_msg = curl_error($curl);
-		// 	curl_close($curl);
-		// 	return [
-		// 		'cod_error' => 1,
-		// 		'nombre_archivo' => '',
-		// 		'mensaje' => 'Error de conexión: ' . $error_msg
-		// 	];
-		// }
+
+		$response_array = json_decode($response, true);
+		if (!isset($response_array['nomArchivo'])) {
+				$array_nombre_archivo = [
+					'cod_error' => 1,
+					'nombre_archivo' => '',
+					'mensaje' => 'Sunat esta fallando para encontrar el pdf'
+				];
+		}else{
+
+	    $fileName = $response_array['nomArchivo'];
+	    $base64File = $response_array['valArchivo'];
+	    $fileData = base64_decode($base64File);
+      $rutafile        =      $pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ID_DOCUMENTO;
+      $rutacompleta    =      $rutafile.'\\'.$fileName;
+			file_put_contents($rutacompleta, $fileData);
+			// Descomprimir el ZIP
+			$zip = new ZipArchive;
+			if ($zip->open($rutacompleta) === TRUE) {
+			    if ($zip->numFiles > 0) {
+			        $archivoDescomprimido = $zip->getNameIndex(0); // nombre relativo dentro del zip
+			    }
+			    $zip->extractTo($rutafile); // descomprime todo
+			    $zip->close();
+			    $rutacompleta    =      $rutafile.'\\'.$archivoDescomprimido;
+					$array_nombre_archivo = [
+						'cod_error' => 0,
+						'nombre_archivo' => $response_array['nomArchivo'],
+						'ruta_completa' => $rutacompleta,
+						'nombre_archivo' => $archivoDescomprimido,
+						'mensaje' => 'encontrado con exito'
+					];
+			} else {
+				$array_nombre_archivo = [
+					'cod_error' => 1,
+					'nombre_archivo' => '',
+					'mensaje' => 'Error al abrir el archivo ZIP'
+				];
+			}
+		}
+
+	 	return  $array_nombre_archivo;
+
+	}
+
+
+
+	private function buscar_archivo_sunat_lg_nuevo($urlxml,$fetoken,$pathFiles,$prefijocarperta,$ID_DOCUMENTO,$documento,$IND) {
+
+		$array_nombre_archivo = array();
+		$curl = curl_init();
+		curl_setopt_array($curl, array(
+		  CURLOPT_URL => $urlxml,
+		  CURLOPT_RETURNTRANSFER => true,
+		  CURLOPT_ENCODING => '',
+		  CURLOPT_MAXREDIRS => 10,
+
+			CURLOPT_TIMEOUT => 15, // 👈 máximo 10 segundos para la respuesta
+			CURLOPT_CONNECTTIMEOUT => 10, // 👈 máximo 5 segundos para conectar
+
+		  CURLOPT_FOLLOWLOCATION => true,
+		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		  CURLOPT_CUSTOMREQUEST => 'GET',
+		  CURLOPT_HTTPHEADER => array(
+		    'Authorization: Bearer '.$fetoken->TOKEN
+		  ),
+		));
+		$response = curl_exec($curl);
+		curl_close($curl);
 
 
 		$response_array = json_decode($response, true);

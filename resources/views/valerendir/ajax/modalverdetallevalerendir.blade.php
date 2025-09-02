@@ -14,8 +14,12 @@
         <form id="aprobarForm">
             <div class="container-fluid">
                 <div class="row mb-2">
-                    <div class="col-sm-4" style="font-weight: bold;"><strong>ID:</strong></div>
+                    <div class="col-sm-4" style="font-weight: bold;"><strong>ID MERGE:</strong></div>
                     <div class="col-sm-8">{{ $id }}</div>
+                </div>
+                 <div class="row mb-2">
+                    <div class="col-sm-4" style="font-weight: bold;"><strong>ID OSIRIS:</strong></div>
+                    <div class="col-sm-8">{{ $id_osiris }}</div>
                 </div>
                 <div class="row mb-2">
                     <div class="col-sm-4" style="font-weight: bold;"><strong>SERIE - NÚMERO:</strong></div>
@@ -33,17 +37,26 @@
                     <div class="col-sm-4" style="font-weight: bold;"><strong>CLIENTE:</strong></div>
                     <div class="col-sm-8">{{ $txt_empresa }}</div>
                 </div>
+
                 <div class="row mb-2">
                     <div class="col-sm-4" style="font-weight: bold;"><strong>CUENTA:</strong></div>
                     <div class="col-sm-8">{{ $contrato_descripcion }}</div>
                 </div>
+
                 <div class="row mb-2">
                     <div class="col-sm-4" style="font-weight: bold;"><strong>SUB CUENTA:</strong></div>
                     <div class="col-sm-8">{{ $sub_cuenta }}</div>
                 </div>
+
                 <div class="row mb-2">
-                    <div class="col-sm-4" style="font-weight: bold;"><strong>GLOSA JEFE AUTORIZA:</strong></div>
-                    <div class="col-sm-8">{{ $txt_glosa_autorizado }}</div>
+                    <div class="col-sm-4" style="font-weight: bold;"><strong>MONEDA:</strong></div>
+                    <div class="col-sm-8">
+                        @if($cod_moneda === 'MON0000000000001')
+                            SOLES
+                        @else
+                            DÓLARES
+                        @endif
+                    </div>
                 </div>
 
                 <div class="row mb-2">
@@ -62,6 +75,12 @@
                     <div class="col-sm-8">{{ $NumBanco }}</div>
                 </div>
                 @endif
+
+                <div class="row mb-2">
+                    <div class="col-sm-4" style="font-weight: bold;"><strong>GLOSA JEFE AUTORIZA:</strong></div>
+                    <div class="col-sm-8">{{ $txt_glosa_autorizado }}</div>
+                </div>
+
                 <div class="row mb-2">
                     <div class="col-sm-4" style="font-weight: bold;"><strong>GLOSA ADMINISTRACIÓN:</strong></div>
                     <div class="col-sm-8">{{ $txt_glosa_aprobado }}</div>

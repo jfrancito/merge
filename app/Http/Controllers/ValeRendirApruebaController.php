@@ -47,36 +47,13 @@ class ValeRendirApruebaController extends Controller
 
         $cod_usuario_registro = Session::get('usuario')->id;
         $cod_empr = Session::get('empresas')->COD_EMPR;
+        $perfil_administracion = Session::get('usuario')->rol_id;
 
-      /*  $trabajador     =   DB::table('STD.TRABAJADOR')
-                            ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
-                            ->first();
-        $dni            =       '';
-        $centro_id      =       '';
-        if(count($trabajador)>0){
-            $dni        =       $trabajador->NRO_DOCUMENTO;
-        }
-        $trabajadorespla    =   DB::table('WEB.platrabajadores')
-                                ->where('situacion_id', 'PRMAECEN000000000002')
-                                ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
-                                ->where('dni', $dni)
-                                ->first();
-        if(count($trabajador)>0){
-            $centro_id      =       $trabajadorespla->centro_osiris_id;
-        }
-        $centrot        =   DB::table('ALM.CENTRO')
-                            ->where('COD_CENTRO', $centro_id)
-                            ->first();
-
-
-
-
-        $cod_centro = $centrot->COD_CENTRO; 
-        $nom_centro = $centrot->NOM_CENTRO; */
-
-    
         $usuario_logueado_id = Session::get('usuario')->usuarioosiris_id;
         $usuario_merge = session::get('usuario')->id;
+
+        $usuario_nombre_logueado_id = Session::get('usuario')->nombre;
+
 
 
         $listarusuarios = $this->listaValeRendirAprueba(
@@ -93,8 +70,6 @@ class ValeRendirApruebaController extends Controller
                 ""
         );
 
-        //dd($listarusuarios);
-
         return view('valerendir.ajax.modalvalerendiraprueba', [
             'listausuarios' => $combo,
             'listausuarios1' => $combo1,
@@ -102,6 +77,7 @@ class ValeRendirApruebaController extends Controller
             'listarusuarios' => $listarusuarios,
             'usuario_logueado_id' => $usuario_logueado_id,
             'usuario_merge' => $usuario_merge,
+            'perfil_administracion' => $perfil_administracion,
             'txtNombreCliente'=>'',
             'ajax'=>true,
          
@@ -123,11 +99,11 @@ class ValeRendirApruebaController extends Controller
         $numero_cuenta = $request->input('numero_cuenta');
         $txt_glosa_aprobado = $request->input('txt_glosa_aprobado');
         
-
+        
         $cod_categoria_estado_vale = 'ETM0000000000007';  
         $txt_categoria_estado_vale = 'APROBADO'; 
 
-         $valerendir_id = $request->input('valerendir_id');
+        $valerendir_id = $request->input('valerendir_id');
 
         $registro = DB::table('WEB.VALE_RENDIR')
         ->select('COD_CENTRO')
@@ -135,6 +111,9 @@ class ValeRendirApruebaController extends Controller
         ->first();
 
         $cod_centro = $registro ? $registro->COD_CENTRO : null;
+
+        $usuario_logueado_id = Session::get('usuario')->usuarioosiris_id;
+        $usuario_nombre_logueado_id = Session::get('usuario')->nombre;
   
 
             $this->insertValeRendirAutoApruebaRechaza(
@@ -170,6 +149,13 @@ class ValeRendirApruebaController extends Controller
                 Session::get('usuario')->id 
             );
 
+            DB::table('WEB.VALE_RENDIR')
+                ->where('ID', $id_buscar)
+                ->update([
+                    'USUARIO_APRUEBA'  => $usuario_logueado_id,
+                    'TXT_NOM_APRUEBA'  => $usuario_nombre_logueado_id,
+                ]);
+
              $this->actionInsertValeRendirOsiris($request);
 
         return response()->json(['success' => 'Vale de rendir aprobado correctamente.']);
@@ -191,6 +177,10 @@ class ValeRendirApruebaController extends Controller
         ->first();
 
         $cod_centro = $registro ? $registro->COD_CENTRO : null;
+
+        $usuario_logueado_id = Session::get('usuario')->usuarioosiris_id;
+        $usuario_nombre_logueado_id = Session::get('usuario')->nombre;
+  
 
            
             $this->insertValeRendirAutoApruebaRechaza(
@@ -226,6 +216,13 @@ class ValeRendirApruebaController extends Controller
                 Session::get('usuario')->id 
             );
 
+            DB::table('WEB.VALE_RENDIR')
+                ->where('ID', $id_buscar)
+                ->update([
+                    'USUARIO_APRUEBA'  => $usuario_logueado_id,
+                    'TXT_NOM_APRUEBA'  => $usuario_nombre_logueado_id,
+                ]);
+
          return response()->json(['success' => 'Vale de rendir rechazado correctamente.']);
     }
     
@@ -250,16 +247,21 @@ class ValeRendirApruebaController extends Controller
         $txt_categoria_estado_vale = 'GENERADO'; 
 
 
+        $simbolo_moneda = '';
+        if ($cod_moneda == 'MON0000000000001') {
+            $simbolo_moneda = 'S/';
+        } elseif ($cod_moneda == 'MON0000000000002') {
+            $simbolo_moneda = '$';
+        }
+
         $contrato_diferente = CMPContrato::where('COD_EMPR', '=', $cod_empr)
             ->where('COD_CATEGORIA_TIPO_CONTRATO', '=', 'TCO0000000000069')
-          //  ->where('TXT_EMPR_CLIENTE', 'LIKE', '%' . $nombreCuentaCliente . '%')
             ->where('COD_EMPR_CLIENTE', '=', $codemprcliente)
-             ->where('COD_CATEGORIA_MONEDA', $cod_moneda)
-            ->select(DB::raw("COD_CONTRATO, CONCAT(LEFT(COD_CONTRATO, 6), '-', RIGHT(CONCAT('00000', RIGHT(COD_CONTRATO, 5)), 5), ' - S/', ' ', REPLACE(TXT_CATEGORIA_CANAL_VENTA, 'POR', 'X')) AS CUENTA"))
+            ->where('COD_CATEGORIA_MONEDA', $cod_moneda)
+            ->select(DB::raw("COD_CONTRATO,CONCAT(LEFT(COD_CONTRATO, 6), '-', RIGHT(CONCAT('00000', RIGHT(COD_CONTRATO, 5)), 5), ' - {$simbolo_moneda} ', REPLACE(TXT_CATEGORIA_CANAL_VENTA, 'POR', 'X')) AS CUENTA"))
             ->pluck('CUENTA', 'COD_CONTRATO')
             ->toArray();
 
-        //dd($contrato_diferente);
 
         $combo_series = $notacredito->combo_series_tipodocumento('TDO0000000000072');
 
@@ -280,26 +282,14 @@ class ValeRendirApruebaController extends Controller
             ->join('CMP.CONTRATO_CULTIVO AS CUL', 'CON.COD_CONTRATO', '=', 'CUL.COD_CONTRATO')
             ->where('CON.COD_EMPR', '=', $cod_empr)
             ->where('CON.COD_CATEGORIA_TIPO_CONTRATO', '=', 'TCO0000000000069')
-        //    ->where('CON.TXT_EMPR_CLIENTE', '=', $nombreCuentaCliente)
-               ->where('COD_EMPR_CLIENTE', '=', $codemprcliente)
+            ->where('COD_EMPR_CLIENTE', '=', $codemprcliente)
             ->select(DB::raw("CON.COD_CONTRATO, CONCAT(CUL.TXT_ZONA_COMERCIAL, '-', CUL.TXT_ZONA_CULTIVO) AS SUBCUENTA"))
             ->pluck('SUBCUENTA', 'COD_CONTRATO')
             ->toArray();
-        //$combo_subcuenta = array('' => 'Seleccione Sub Cuenta') + $subcuentas;
-        //   dd($subcuentas);
-
-
-       
-        // $cuentaBancaria = DB::table('TES.CUENTA_BANCARIA AS TCB')
-        //    ->join('STD.EMPRESA AS EMPR', 'TCB.COD_EMPR_TITULAR', '=', 'EMPR.COD_EMPR')
-        //     ->where('EMPR.NOM_EMPR', 'LIKE', "%{$nombreCuentaCliente}%") 
-        //     ->first(); 
-        //     dd($cuentaBancaria);
 
         $empresatrabjador =   STDEmpresa::where('COD_EMPR','=',$codemprcliente)->first();
         $nrodocumentotrab = $empresatrabjador->NRO_DOCUMENTO;
 
-        // $values                 =   ['42454192','IACHEM0000007086'];
         $values                 =   [$nrodocumentotrab,$cod_empr];
         $datoscuentasueldo      =   DB::select('exec ListaTrabajadorCuentaSueldo ?,?',$values);      
 
@@ -307,49 +297,27 @@ class ValeRendirApruebaController extends Controller
 
         return view('valerendir.ajax.modalosirisvalerendiraprueba', [
             'txtNombreCliente' => $txtNombreCliente->TXT_NOM_SOLICITA,
-         // 'contrato_diferente' => $combo_cuenta,
             'contrato_diferente' => $contrato_diferente,
             'combo_series' =>$combo_series,
             'fecha_actual' => $fecha_actual,
-         // 'subcuentas' => $combo_subcuenta,
             'subcuentas' => $subcuentas,
             'estado' => $txt_categoria_estado_vale,
             'nro_documento_formateado' => $nro_documento_formateado,
             'glosaCliente' => $glosaCliente,
-            // 'nombreBanco' => $cuentaBancaria->TXT_EMPR_BANCO,
-            // 'numeroBanco' => $cuentaBancaria->TXT_NRO_CUENTA_BANCARIA,
-            'nombreBanco' => $datoscuentasueldo[0]->numcuenta,
-            'numeroBanco' => $datoscuentasueldo[0]->entidad,
+            'numeroBanco' => $datoscuentasueldo[0]->numcuenta,
+            'nombreBanco' => $datoscuentasueldo[0]->entidad, 
+            'cod_moneda' =>$txtNombreCliente->COD_MONEDA,
             'ajax'=>true,
         ]);                     
     }
 
- /*   public function actionObtenerCorrelativoValeRendir(Request $request)
-    {
-
-        $serie = $request->input('nro_serie'); 
-      
-
-        $ultimoCorrelativo = DB::table('TES.AUTORIZACION')
-        ->where('TXT_SERIE', $serie)
-        ->where('COD_TIPO_DOCUMENTO', 'TDO0000000000072')
-        ->max('TXT_NUMERO');
-
-
-        $nro_documento = is_null($ultimoCorrelativo) ? 1:$ultimoCorrelativo + 1;
-        $nro_documento_formateado = str_pad($nro_documento, 10, '0', STR_PAD_LEFT);
-
-        return response()->json(['nro_doc' => $nro_documento_formateado]);
-
-    }*/
 
     public function actionInsertValeRendirOsiris(Request $request) { 
-     $id_buscar = $request->input('valerendir_id'); 
-     $can_tipo_cambio = DB::table('cmp.TIPO_CAMBIO')
-                                    ->where('FEC_CAMBIO', DB::raw("(SELECT MAX(FEC_CAMBIO) FROM cmp.TIPO_CAMBIO)"))
-                                    ->value('CAN_COMPRA');
+        $id_buscar = $request->input('valerendir_id'); 
+        $can_tipo_cambio = DB::table('cmp.TIPO_CAMBIO')
+                                        ->where('FEC_CAMBIO', DB::raw("(SELECT MAX(FEC_CAMBIO) FROM cmp.TIPO_CAMBIO)"))
+                                        ->value('CAN_COMPRA');
 
-    
         $valeRendirOsiris       =   WEBValeRendir::where('ID', $id_buscar)->first();
         $id = $valeRendirOsiris->ID;
         $cod_empr= $valeRendirOsiris->COD_EMPR;
@@ -451,14 +419,22 @@ class ValeRendirApruebaController extends Controller
         $NomBanco = $valeRendirOsiris->TXT_CATEGORIA_BANCO;
         $NumBanco = $valeRendirOsiris->NRO_CUENTA;
         $txt_glosa_aprobado = $valeRendirOsiris->TXT_GLOSA_APROBADO;
+        $cod_moneda = $valeRendirOsiris->COD_MONEDA;
+        $id_osiris = $valeRendirOsiris->ID_OSIRIS;
 
-        
+        $simbolo = $cod_moneda == 'MON0000000000001' ? 'S/.' : '$';
+
         $contrato_descripcion = CMPContrato::where('COD_CONTRATO', $cod_contrato)
-        ->select(DB::raw("CONCAT(LEFT(COD_CONTRATO, 6), '-', 
-            RIGHT(CONCAT('00000', RIGHT(COD_CONTRATO, 5)), 5), ' - S/', ' ', 
-            REPLACE(TXT_CATEGORIA_CANAL_VENTA, 'POR', 'X')) AS CUENTA"))
-        ->pluck('CUENTA')
-        ->first();
+            ->select(DB::raw("
+                CONCAT(
+                    LEFT(COD_CONTRATO, 6), '-', 
+                    RIGHT(CONCAT('00000', RIGHT(COD_CONTRATO, 5)), 5), 
+                    ' - ', '$simbolo', ' ',
+                    REPLACE(TXT_CATEGORIA_CANAL_VENTA, 'POR', 'X')
+                ) AS CUENTA
+            "))
+            ->pluck('CUENTA')
+            ->first();
 
          return view('valerendir.ajax.modalverdetallevalerendir', [
              'id' => $id,
@@ -468,13 +444,15 @@ class ValeRendirApruebaController extends Controller
              'txt_estado' => $txt_estado,
              'txt_empresa' => $txt_empresa,
              'cod_contrato' => $cod_contrato,
-              'contrato_descripcion' => $contrato_descripcion,
+             'contrato_descripcion' => $contrato_descripcion,
              'sub_cuenta' => $sub_cuenta,
              'txt_glosa_autorizado' => $txt_glosa_autorizado,
              'tipo_pago' => $tipo_pago,
              'NomBanco' => $NomBanco,
              'NumBanco' => $NumBanco,
              'txt_glosa_aprobado' => $txt_glosa_aprobado,
+             'cod_moneda' => $cod_moneda,
+             'id_osiris' => $id_osiris,
              'ajax'=>true,
         ]);           
     }
@@ -484,15 +462,12 @@ class ValeRendirApruebaController extends Controller
     { 
         $id_buscar = $request->input('valerendir_id'); 
     
+        $detallesImporte = WEBValeRendirDetalle::where('ID', $id_buscar)->get(); 
    
-    $detallesImporte = WEBValeRendirDetalle::where('ID', $id_buscar)->get(); 
-   
-
-    return view('valerendir.ajax.modaldetalleimporte', [
-        'ajax' => true,
-        'detalles' => $detallesImporte
-    ]);  
-
+        return view('valerendir.ajax.modaldetalleimporte', [
+            'ajax' => true,
+            'detalles' => $detallesImporte
+        ]);  
     }         
 
 }

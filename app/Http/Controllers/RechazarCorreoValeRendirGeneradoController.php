@@ -42,7 +42,6 @@ class RechazarCorreoValeRendirGeneradoController extends Controller
         $exito = $this->RechazarCorreoValeRendirGenerado($valerendir_id);
         return response()->json(['success' => $exito]);
     }
-
 }
 
 

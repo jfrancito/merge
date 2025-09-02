@@ -49,6 +49,8 @@ use App\Traits\GeneralesTraits;
 use App\Traits\PlanillaTraits;
 use App\Traits\LiquidacionGastoTraits;
 use App\Traits\ComprobanteTraits;
+use App\Traits\PrecioCompetenciaTraits;
+
 use PDF;
 use Hashids;
 use SplFileInfo;
@@ -62,6 +64,116 @@ class GestionLiquidacionGastosController extends Controller
     use PlanillaTraits;
     use LiquidacionGastoTraits;
     use ComprobanteTraits;
+    use PrecioCompetenciaTraits;
+
+
+    public function actionListarLiquidacionGastosFaltante($idopcion)
+    {
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Ver');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        View::share('titulo','Lista Liquidación Gasto - Faltantes');
+        $cod_empresa        =   Session::get('usuario')->usuarioosiris_id;
+        $fecha_inicio       =   $this->fecha_menos_diez_dias;
+        $fecha_fin          =   $this->fecha_sin_hora;
+
+        $listacabecera      =   DB::table('LQG_DETLIQUIDACIONGASTO')
+                                ->select([
+                                    'LQG_DETLIQUIDACIONGASTO.ID_DOCUMENTO',
+                                    'LQG_LIQUIDACION_GASTO.FECHA_EMI',
+                                    'LQG_DETLIQUIDACIONGASTO.SERIE',
+                                    'LQG_DETLIQUIDACIONGASTO.NUMERO',
+                                    'LQG_DETLIQUIDACIONGASTO.FECHA_EMISION as FECHA_EMISIONDOC',
+                                    'LQG_DETLIQUIDACIONGASTO.TXT_EMPRESA_PROVEEDOR',
+                                    'LQG_DETLIQUIDACIONGASTO.TOTAL',
+                                    'LQG_DETLIQUIDACIONGASTO.IND_PDF',
+                                    'LQG_DETLIQUIDACIONGASTO.IND_XML',
+                                    'LQG_DETLIQUIDACIONGASTO.IND_CDR',
+                                    'LQG_DETLIQUIDACIONGASTO.BUSQUEDAD'
+                                ])
+                                ->join('LQG_LIQUIDACION_GASTO', 'LQG_DETLIQUIDACIONGASTO.ID_DOCUMENTO', '=', 'LQG_LIQUIDACION_GASTO.ID_DOCUMENTO')
+                                ->where('LQG_DETLIQUIDACIONGASTO.ACTIVO', 1)
+                                ->where('LQG_DETLIQUIDACIONGASTO.COD_TIPODOCUMENTO', 'TDO0000000000001')
+                                ->where('LQG_DETLIQUIDACIONGASTO.COD_EMPRESA', Session::get('empresas')->COD_EMPR)
+                                ->whereNotIn('LQG_LIQUIDACION_GASTO.COD_ESTADO', ['ETM0000000000006', 'ETM0000000000001'])
+                                ->whereRaw('ISNULL(LQG_DETLIQUIDACIONGASTO.IND_TOTAL, 0) = 0')
+                                ->orderby('LQG_LIQUIDACION_GASTO.FECHA_EMI','ASC')
+                                ->get();
+
+
+        $listadatos         =   array();
+        $funcion            =   $this;
+        return View::make('liquidaciongasto/listaliquidaciongastofaltantes',
+                         [
+                            'listadatos'        =>  $listadatos,
+                            'funcion'           =>  $funcion,
+                            'idopcion'          =>  $idopcion,
+                            'listacabecera'     =>  $listacabecera
+                         ]);
+    }
+
+
+
+    public function actionTutorialLiquidacionGastos($nombreVideo,Request $request)
+    {
+        
+        // USAR URL CORRECTA PARA TU CONFIGURACIÓN LOCAL
+        $rutaVideo = url('public/firmas/' . $nombreVideo);
+        $rutaCompleta = public_path('firmas/' . $nombreVideo);
+        
+        // Información completa de debug
+        $debug = [
+            'archivo_existe' => file_exists($rutaCompleta),
+            'es_legible' => is_readable($rutaCompleta),
+            'tamaño' => file_exists($rutaCompleta) ? filesize($rutaCompleta) : 0,
+            'ruta_publica' => $rutaVideo,
+            'ruta_fisica' => $rutaCompleta,
+            'permisos' => file_exists($rutaCompleta) ? substr(sprintf('%o', fileperms($rutaCompleta)), -4) : 'N/A',
+            'mime_type' => file_exists($rutaCompleta) ? mime_content_type($rutaCompleta) : 'Desconocido',
+            'es_video' => file_exists($rutaCompleta) ? (strpos(mime_content_type($rutaCompleta), 'video') !== false) : false
+        ];
+        
+        // Información para la vista
+        $infoVideo = [
+            'existe' => file_exists($rutaCompleta) && filesize($rutaCompleta) > 0,
+            'tamaño' => file_exists($rutaCompleta) ? filesize($rutaCompleta) : 0,
+            'url' => $rutaVideo,
+            'nombre' => $nombreVideo
+        ];
+        
+        return view('liquidaciongasto.tutorial', compact('rutaVideo', 'infoVideo', 'debug'));
+
+
+    }
+
+    public function actionPdfSunatPersonal(Request $request)
+    {
+
+        $serie                      =   $request['serie'];
+        $correlativo                =   ltrim($request['numero'], '0');
+        $empresa_id                 =   $request['empresa_id'];
+        $ID_DOCUMENTO               =   $request['ID_DOCUMENTO'];
+        $partes                     =   explode(" - ", $empresa_id);
+        $ruc                        =   '';
+        $td                         =   '01';
+        if (count($partes) > 1) {
+            $ruc                    =   trim($partes[0]);
+        }
+
+        $prefijocarperta            =   $this->prefijo_empresa_lg(Session::get('empresas')->COD_EMPR);
+        $pathFiles                  =   '\\\\10.1.50.2';
+        $rutafile                   =   $pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ID_DOCUMENTO;
+        $fetoken                    =   FeToken::where('COD_EMPR','=',Session::get('empresas')->COD_EMPR)->where('TIPO','=','COMPROBANTE_PAGO')->first();
+
+        $urlxml                     =   'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/01';
+        $respuetapdf                =   $this->buscar_archivo_sunat_lg_nuevo_pdf($urlxml,$fetoken,$pathFiles,$prefijocarperta,$ID_DOCUMENTO);
+
+
+        return response()->json($respuetapdf);
+
+    }
+
 
 
     public function actionAjaxBuscarCuentaBancariaLQ(Request $request)
@@ -87,11 +199,13 @@ class GestionLiquidacionGastosController extends Controller
 
         $combocb                =   array('' => "Seleccione Cuenta Bancaria") + $tescuentabb;
         $funcion                =   $this;
+        $cuentaco_id            =   "";
 
         return View::make('liquidaciongasto/combo/combo_cuenta_bancaria',
                          [
                             'combocb'                   =>  $combocb,
                             'entidadbanco_id'           =>  $entidadbanco_id,
+                            'cuentaco_id'               =>  $cuentaco_id,
                             'empresa_cliente_id'        =>  $ordencompra->COD_EMPRESA_TRABAJADOR,
                             'ajax'                      =>  true,
                          ]);
@@ -334,7 +448,9 @@ class GestionLiquidacionGastosController extends Controller
                     $centro_id      =       $trabajadorespla->centro_osiris_id;
                 }
 
-
+                if($centro_id == 'CEN0000000000003'){
+                    $centro_id = 'CEN0000000000001';
+                }
   
                 if($centro_id==''){
                     return Redirect::to('gestion-de-empresa-proveedor/'.$idopcion)->with('errorbd','No tienes un Centro Asignado');
@@ -403,6 +519,7 @@ class GestionLiquidacionGastosController extends Controller
         $empresa_id           =   '';
 
 
+
         $empresa              =   STDEmpresa::where('NRO_DOCUMENTO','=',$ruc_buscar)->first();
         if(count($empresa)>0){
             $empresa_id           =   $empresa->COD_EMPR;
@@ -424,6 +541,9 @@ class GestionLiquidacionGastosController extends Controller
         }
 
 
+        if($centro_id == 'CEN0000000000003'){
+            $centro_id = 'CEN0000000000001';
+        }
 
         $contratos              =   DB::table('CMP.CONTRATO')
                                     ->where('TXT_CATEGORIA_TIPO_CONTRATO', 'PROVEEDOR')
@@ -433,22 +553,34 @@ class GestionLiquidacionGastosController extends Controller
                                     ->where('COD_CENTRO', $centro_id)
                                     ->get();
 
-        //dd($contratos);
+
 
         if(count($contratos)>0){
             return Redirect::to('gestion-de-empresa-proveedor/'.$idopcion)->with('errorbd','Empresa '.$empresa->NOM_EMPR.' ya existe y tiene contrato');
         }
         $response_array = json_decode($respuetaxml, true);
+
+
+        $departamento = $response_array['departamento'] ?? 'LAMBAYEQUE'; 
+        $provincia = $response_array['departamento'] ?? 'CHICLAYO'; 
+        $distrito = $response_array['departamento'] ?? 'CHICLAYO'; 
+
+        $direccion = $response_array['direccion'] ?? 'CHICLAYO'; 
+
+
         if(isset($response_array['success'])){
             return Redirect::to('gestion-de-empresa-proveedor/'.$idopcion)->with('errorbd','No se encontraron resultados.');  
         }
 
         Session::flash('ruc', $response_array['ruc']);
         Session::flash('rz', $response_array['razonSocial']);
-        Session::flash('direccion', $response_array['direccion']);
-        Session::flash('departamento', $response_array['departamento']);
-        Session::flash('provincia', $response_array['provincia']);
-        Session::flash('distrito', $response_array['distrito']);
+        Session::flash('direccion', $direccion);
+        Session::flash('departamento', $departamento);
+        Session::flash('provincia', $provincia);
+        Session::flash('distrito', $distrito);
+
+
+
         $texto_empresa = 'No cuenta con ningun registro de empresa ';
         if(count($empresa)>0){
             $texto_empresa = 'Ya Cuenta con un registro de una empresa';
@@ -2836,7 +2968,47 @@ class GestionLiquidacionGastosController extends Controller
 
             try{    
                 DB::beginTransaction();
+
                 $liquidaciongastos      =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
+
+                $tipopago_id        =  $request['tipopago_id'];
+                $entidadbanco_id    =  $request['entidadbanco_id'];
+                $cb_id              =  $request['cb_id'];        
+
+                $tipopago           =  CMPCategoria::where('COD_CATEGORIA','=',$tipopago_id)->first();
+                $entidadbanco       =  CMPCategoria::where('COD_CATEGORIA','=',$entidadbanco_id)->first();
+                $cb                 =  CMPCategoria::where('COD_CATEGORIA','=',$cb_id)->first();
+
+
+                $cuentas            =   DB::table('TES.CUENTA_BANCARIA')
+                                        ->where('COD_EMPR_TITULAR', $liquidaciongastos->COD_EMPRESA_TRABAJADOR)
+                                        ->where('TXT_NRO_CUENTA_BANCARIA', $cb_id)
+                                        ->first(); // Para obtener una colección
+
+
+                $entidadbancaria_id     =  '';
+                $entidadbancaria_txt    =  '';
+
+                $tipocuenta_id          =  '';
+                $tipocuenta_txt         =  '';
+
+                $cuentanro              =  '';
+                $cuentanrocci           =  '';
+
+                if(count($cuentas)>0){
+
+                    $entidadbancaria_id     =  $entidadbanco->COD_CATEGORIA;
+                    $entidadbancaria_txt    =  $entidadbanco->NOM_CATEGORIA;
+
+                    $tipocuenta_id          =  $cuentas->TXT_TIPO_REFERENCIA;
+                    $tipocuenta_txt         =  $cuentas->TXT_REFERENCIA;
+
+                    $cuentanro              =  $cuentas->TXT_NRO_CUENTA_BANCARIA;
+                    $cuentanrocci           =  $cuentas->TXT_NRO_CCI;
+                }
+
+
+
                 //validar que tenga la firma quien
                 $detliquidaciongasto    =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->first();
                 $useario_autoriza       =   User::where('id','=',$detliquidaciongasto->COD_USUARIO_AUTORIZA)->first();
@@ -2849,12 +3021,26 @@ class GestionLiquidacionGastosController extends Controller
                 // if (!file_exists($rutaImagen)){
                 //     return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/0')->with('errorbd','No se puede emitir ya que el que autoriza no cuenta con firma llamar a sistemas');
                 // }
+
+
+
+
+
                 //CUANDO ESTA OBSEVADOS
                 if($liquidaciongastos->IND_OBSERVACION==1){
                     LqgLiquidacionGasto::where('ID_DOCUMENTO',$iddocumento)
                                 ->update(
                                     [
-                                        'IND_OBSERVACION'=>0
+                                        'IND_OBSERVACION'=>0,
+                                        'COD_CATEGORIA_TIPOPAGO'=> $tipopago->COD_CATEGORIA,
+                                        'TXT_CATEGORIA_TIPOPAGO'=> $tipopago->NOM_CATEGORIA,
+                                        'COD_CATEGORIA_BANCARIO'=> $entidadbancaria_id,
+                                        'TXT_CATEGORIA_BANCARIO'=> $entidadbancaria_txt,
+                                        'COD_CATEGORIA_TIPOCUENTA'=> $tipocuenta_id,
+                                        'TXT_CATEGORIA_TIPOCUENTA'=> $tipocuenta_txt,
+                                        'CUENTA_BANCARIA'=> $cuentanro,
+                                        'CCI_CUENTA_BANCARIA'=> $cuentanrocci,
+                                        'TXT_GLOSA'=> $request['glosa'],
                                     ]
                                 );
                     $documento                              =   new LqgDocumentoHistorial;
@@ -2875,12 +3061,24 @@ class GestionLiquidacionGastosController extends Controller
                         return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/0')->with('errorbd','Para poder emitir tiene que cargar sus documentos');
                     }
 
+
                     LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
                                 ->update(
                                         [
                                             'TXT_GLOSA'=> $request['glosa'],
                                             'FECHA_EMI'=> $this->fechaactual,
                                             'FECHA_MOD'=> $this->fechaactual,
+
+                                            'COD_CATEGORIA_TIPOPAGO'=> $tipopago->COD_CATEGORIA,
+                                            'TXT_CATEGORIA_TIPOPAGO'=> $tipopago->NOM_CATEGORIA,
+                                            'COD_CATEGORIA_BANCARIO'=> $entidadbancaria_id,
+                                            'TXT_CATEGORIA_BANCARIO'=> $entidadbancaria_txt,
+                                            'COD_CATEGORIA_TIPOCUENTA'=> $tipocuenta_id,
+                                            'TXT_CATEGORIA_TIPOCUENTA'=> $tipocuenta_txt,
+                                            'CUENTA_BANCARIA'=> $cuentanro,
+                                            'CCI_CUENTA_BANCARIA'=> $cuentanrocci,
+
+
                                             'USUARIO_MOD'=> Session::get('usuario')->id,
                                             'COD_ESTADO'=> 'ETM0000000000010',
                                             'TXT_ESTADO'=> 'POR APROBAR AUTORIZACION'
@@ -3208,7 +3406,7 @@ class GestionLiquidacionGastosController extends Controller
                             return Redirect::to('modificar-liquidacion-gastos/'.$idopcion.'/'.$idcab.'/-1')->with('errorbd','Este proveedor emite FACTURA');
                         }
                     }
-
+                    $token = '';
 
                     //CUANDO ES PLANILLA DE MOVILIDAd
                     if(ltrim(rtrim($cod_planila))!=''){
@@ -3276,6 +3474,9 @@ class GestionLiquidacionGastosController extends Controller
 
                         if($tipodoc_id=='TDO0000000000001'){
 
+
+                            $fetoken                            =   FeToken::where('COD_EMPR','=',Session::get('empresas')->COD_EMPR)->where('TIPO','=','COMPROBANTE_PAGO')->first();
+                            $token                              =   $fetoken->TOKEN;
                             $tipodoc_id                         =   $request['tipodoc_id'];
                             $serie                              =   $request['serie'];
                             $numero                             =   $request['numero'];
@@ -3416,95 +3617,82 @@ class GestionLiquidacionGastosController extends Controller
                     $cabecera->CODIGO_CDR               =   $CODIGO_CDR;
                     $cabecera->RESPUESTA_CDR            =   $RESPUESTA_CDR;
 
-
                     $cabecera->COD_PLA_MOVILIDAD        =   $cod_planila;
                     $cabecera->TXT_GLOSA                =   $glosadet;
 
                     $cabecera->IND_OBSERVACION          =   0;
                     $cabecera->AREA_OBSERVACION         =   '';
 
-
                     $cabecera->IGV                      =   0;
                     $cabecera->SUBTOTAL                 =   $TOTAL_T;
                     $cabecera->TOTAL                    =   $TOTAL_T;
+                    $cabecera->TOKEN                    =   $token;
+
                     $cabecera->FECHA_CREA               =   $this->fechaactual;
                     $cabecera->USUARIO_CREA             =   Session::get('usuario')->id;
                     $cabecera->save();
 
 
-                    //DETALLE SI ES QUE ES FACTURA
-                    // if($tipodoc_id=='TDO0000000000001'){
-                    //     $array_detalle_producto_request     =   json_decode($request['array_detalle_producto'],true);
-                    //     foreach ($array_detalle_producto_request as $key => $itemd) {
-                    //         $producto                               =   DB::table('ALM.PRODUCTO')->where('NOM_PRODUCTO','=',$itemd['TXT_PRODUCTO_OSIRIS'])->first();
-                    //         $IND_IGV = 0;
-                    //         if($itemd['INDIGV']=='SI'){
-                    //             $IND_IGV = 1;
-                    //         }
-                    //         $cabeceradet                           =   new LqgDetDocumentoLiquidacionGasto;
-                    //         $cabeceradet->ID_DOCUMENTO             =   $iddocumento;
-                    //         $cabeceradet->ITEM                     =   $item;
-                    //         $cabeceradet->ITEMDOCUMENTO            =   $key+1;
-                    //         $cabeceradet->COD_PRODUCTO             =   $producto->COD_PRODUCTO;
-                    //         $cabeceradet->TXT_PRODUCTO             =   $producto->NOM_PRODUCTO;
-                    //         $cabeceradet->TXT_PRODUCTO_XML         =   $itemd['TXT_PRODUCTO_XML'];
-                    //         $cabeceradet->CANTIDAD                 =   $itemd['CANTIDAD'];
-                    //         $cabeceradet->PRECIO                   =   $itemd['PRECIO'];
-                    //         $cabeceradet->IND_IGV                  =   $IND_IGV;
-                    //         $cabeceradet->IGV                      =   $itemd['IGV'];   
-                    //         $cabeceradet->SUBTOTAL                 =   $itemd['SUBTOTAL'];
-                    //         $cabeceradet->TOTAL                    =   $itemd['TOTAL'];
-                    //         $cabeceradet->COD_EMPRESA              =   Session::get('empresas')->COD_EMPR;
-                    //         $cabeceradet->TXT_EMPRESA              =   Session::get('empresas')->NOM_EMPR;
-                    //         $cabeceradet->COD_CENTRO               =   $liquidaciongastos->COD_CENTRO;
-                    //         $cabeceradet->TXT_CENTRO               =   $liquidaciongastos->TXT_CENTRO;
-                    //         $cabeceradet->FECHA_CREA               =   $this->fechaactual;
-                    //         $cabeceradet->USUARIO_CREA             =   Session::get('usuario')->id;
-                    //         $cabeceradet->save();
-
-                    //     }
-
-                    // }
-
-
                     if($tipodoc_id=='TDO0000000000001'){
 
-                            $tarchivos                      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                                ->whereIn('COD_CATEGORIA', ['DCC0000000000036'])->get();
-                            foreach($tarchivos as $index => $itema){
-                                $filescdm          =   $request[$itema->COD_CATEGORIA];
-                                if(!is_null($filescdm)){
-                                    //CDR
-                                    foreach($filescdm as $file){
-                                        //
-                                        $contadorArchivos = Archivo::count();
 
-                                        /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
-                                        $prefijocarperta =      $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
-                                        $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$iddocumento;
-                                        $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
-                                        $valor           =      $this->versicarpetanoexiste($rutafile);
-                                        $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
-                                        copy($file->getRealPath(),$rutacompleta);
-                                        $path            =      $rutacompleta;
-                                        $nombreoriginal             =   $file->getClientOriginalName();
-                                        $info                       =   new SplFileInfo($nombreoriginal);
-                                        $extension                  =   $info->getExtension();
-                                        $dcontrol                       =   new Archivo;
-                                        $dcontrol->ID_DOCUMENTO         =   $iddocumento;
-                                        $dcontrol->DOCUMENTO_ITEM       =   $item;
-                                        $dcontrol->TIPO_ARCHIVO         =   $itema->COD_CATEGORIA;
-                                        $dcontrol->NOMBRE_ARCHIVO       =   $nombrefilecdr;
-                                        $dcontrol->DESCRIPCION_ARCHIVO  =   $itema->NOM_CATEGORIA;
-                                        $dcontrol->URL_ARCHIVO          =   $path;
-                                        $dcontrol->SIZE                 =   filesize($file);
-                                        $dcontrol->EXTENSION            =   $extension;
-                                        $dcontrol->ACTIVO               =   1;
-                                        $dcontrol->FECHA_CREA           =   $this->fechaactual;
-                                        $dcontrol->USUARIO_CREA         =   Session::get('usuario')->id;
-                                        $dcontrol->save();
+                            $rutapdfencontrada              =   $request['RUTACOMPLETAPDF'];
+
+
+                            if($rutapdfencontrada==""){
+                                $tarchivos                      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000036'])->get();
+                                foreach($tarchivos as $index => $itema){
+                                    $filescdm          =   $request[$itema->COD_CATEGORIA];
+                                    if(!is_null($filescdm)){
+                                        //CDR
+                                        foreach($filescdm as $file){
+                                            //
+                                            $contadorArchivos = Archivo::count();
+
+                                            /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
+                                            $prefijocarperta =      $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
+                                            $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$iddocumento;
+                                            $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                                            $valor           =      $this->versicarpetanoexiste($rutafile);
+                                            $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
+                                            copy($file->getRealPath(),$rutacompleta);
+                                            $path            =      $rutacompleta;
+                                            $nombreoriginal             =   $file->getClientOriginalName();
+                                            $info                       =   new SplFileInfo($nombreoriginal);
+                                            $extension                  =   $info->getExtension();
+                                            $dcontrol                       =   new Archivo;
+                                            $dcontrol->ID_DOCUMENTO         =   $iddocumento;
+                                            $dcontrol->DOCUMENTO_ITEM       =   $item;
+                                            $dcontrol->TIPO_ARCHIVO         =   $itema->COD_CATEGORIA;
+                                            $dcontrol->NOMBRE_ARCHIVO       =   $nombrefilecdr;
+                                            $dcontrol->DESCRIPCION_ARCHIVO  =   $itema->NOM_CATEGORIA;
+                                            $dcontrol->URL_ARCHIVO          =   $path;
+                                            $dcontrol->SIZE                 =   filesize($file);
+                                            $dcontrol->EXTENSION            =   $extension;
+                                            $dcontrol->ACTIVO               =   1;
+                                            $dcontrol->FECHA_CREA           =   $this->fechaactual;
+                                            $dcontrol->USUARIO_CREA         =   Session::get('usuario')->id;
+                                            $dcontrol->save();
+                                        }
                                     }
                                 }
+                            }else{
+                                
+                                            $dcontrol                       =   new Archivo;
+                                            $dcontrol->ID_DOCUMENTO         =   $iddocumento;
+                                            $dcontrol->DOCUMENTO_ITEM       =   $item;
+                                            $dcontrol->TIPO_ARCHIVO         =   'DCC0000000000036';
+                                            $dcontrol->NOMBRE_ARCHIVO       =   $request['NOMBREPDF'];
+                                            $dcontrol->DESCRIPCION_ARCHIVO  =   'COMPROBANTE ELECTRONICO';
+                                            $dcontrol->URL_ARCHIVO          =   $request['RUTACOMPLETAPDF'];
+                                            $dcontrol->SIZE                 =   1000;
+                                            $dcontrol->EXTENSION            =   'pdf';
+                                            $dcontrol->ACTIVO               =   1;
+                                            $dcontrol->FECHA_CREA           =   $this->fechaactual;
+                                            $dcontrol->USUARIO_CREA         =   Session::get('usuario')->id;
+                                            $dcontrol->save();
+
                             }
 
 
@@ -3920,6 +4108,11 @@ class GestionLiquidacionGastosController extends Controller
         }
         $liquidaciongastos->ACTIVO = 0;
         $liquidaciongastos->save();
+
+        DB::table('LQG_DETLIQUIDACIONGASTO')
+            ->where('ID_DOCUMENTO', $iddocumento) // ID vacío
+            ->update(['ACTIVO' => 0]);
+
         return Redirect::to('gestion-de-liquidacion-gastos/'.$idopcion)->with('bienhecho', 'Se extorno la LIQUIDACION DE GASTOS');
 
     }
@@ -4003,7 +4196,10 @@ class GestionLiquidacionGastosController extends Controller
         }
 
 
-        //dd($liquidaciongastos);
+        $tipopago_id                    =   $liquidaciongastos->COD_CATEGORIA_TIPOPAGO;
+        $banco_id                       =   $liquidaciongastos->COD_CATEGORIA_BANCARIO;
+        $cuentaco_id                    =   $liquidaciongastos->CUENTA_BANCARIA;
+
 
         if($valor=='0'){
 
@@ -4071,6 +4267,8 @@ class GestionLiquidacionGastosController extends Controller
             $gasto_id                   =   $tdetliquidacionitem->COD_GASTO;
             $combo_gasto                =   $this->lg_combo_gasto("Seleccione Gasto");
 
+            $tipopago_id                =   $liquidaciongastos->COD_CATEGORIA_TIPOPAGO;
+
             //dd("hola");
             $costo_id                   =   $tdetliquidacionitem->COD_COSTO;
             $combo_costo                =   $this->lg_combo_costo_xtrabajador("Seleccione Costo",$trabajadorespla->cadarea);
@@ -4101,18 +4299,27 @@ class GestionLiquidacionGastosController extends Controller
         $igv_id                         =   "";
         $combo_igv                      =   array('' => "¿SELECCIONE SI TIENE IGV?",'1' => "SI",'0' => "NO");
 
-        $tipopago_id                    =   "";
+
         $combo_tp                       =   array('' => "SELECCIONE TIPO DE PAGO",'MPC0000000000001' => "EFECTIVO",'MPC0000000000002' => "TRANSFERENCIA");
 
-        $banco_id                       =   "";
         $arraybancos                    =   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->where('COD_ESTADO','=','1')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
         $combobancos                    =   array('' => "Seleccione Entidad Bancaria") + $arraybancos;
 
-        $cuenta_id                      =   "";
-        $combocb                        =   array('' => "Seleccione Cuenta Bancaria");
+        if($tipopago_id=='MPC0000000000002'){
+
+            $cuentas            =   DB::table('TES.CUENTA_BANCARIA')
+                                    ->where('COD_EMPR_TITULAR', $liquidaciongastos->COD_EMPRESA_TRABAJADOR)
+                                    ->where('TXT_NRO_CUENTA_BANCARIA', $liquidaciongastos->CUENTA_BANCARIA)
+                                    ->first();
+
+            $combocb                        =   array('' => "Seleccione Cuenta Bancaria",$cuentas->TXT_NRO_CUENTA_BANCARIA => $cuentas->TXT_REFERENCIA .' - '.$cuentas->TXT_NRO_CUENTA_BANCARIA);
+        }else{
+            $combocb                        =   array('' => "Seleccione Cuenta Bancaria");
+        }
 
 
-        //dd($tdetliquidaciongastos);
+
+        //dd($cuentaco_id);
         return View::make('liquidaciongasto.modificarliquidaciongastos',
                          [
                             'liquidaciongastos'     => $liquidaciongastos,
@@ -4124,7 +4331,7 @@ class GestionLiquidacionGastosController extends Controller
                             'combobancos'           => $combobancos,
                             'cuenta_id'             => $cuenta_id,
                             'combocb'               => $combocb,
-
+                            'cuentaco_id'             => $cuentaco_id,
                             'igv_id'                => $igv_id,
                             'combo_igv'             => $combo_igv,
                             'producto_id'           => $producto_id,
@@ -4337,11 +4544,14 @@ class GestionLiquidacionGastosController extends Controller
                 return Redirect::to('gestion-de-liquidacion-gastos/'.$idopcion)->with('errorbd', 'No puede realizar un registro porque no es la empresa a cual pertenece');
             }
 
-
+            if($centro_id == 'CEN0000000000003'){
+                $centro_id = 'CEN0000000000001';
+            }
 
             $trabajador                     =   DB::table('STD.TRABAJADOR')
                                                 ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
                                                 ->first();
+
             $dni                            =   '';
             if(count($trabajador)>0){
                 $dni                        =   $trabajador->NRO_DOCUMENTO;
@@ -4362,6 +4572,7 @@ class GestionLiquidacionGastosController extends Controller
             $anio               =   $this->anio;
             $mes                =   $this->mes;
 
+            //dd($centrocosto);
 
             $area_id                    =   "";
             $area_txt                   =   "";
@@ -4374,6 +4585,9 @@ class GestionLiquidacionGastosController extends Controller
             $empresa            =   DB::table('STD.EMPRESA')
                                     ->where('NRO_DOCUMENTO', $dni)
                                     ->first();
+
+
+
 
             $empresa_id         =   "";
             $combo_empresa      =   array();
@@ -4390,12 +4604,11 @@ class GestionLiquidacionGastosController extends Controller
                 $combo_cuenta   =   $this->lg_combo_cuenta("Seleccione una Cuenta","","TCO0000000000069",$centro_id,$empresa_id);
                 $cuenta_id          =   "";
                 $combo_cuenta       =   array();
-
                 $cuenta         =   $this->lg_cuenta("Seleccione una Cuenta","","TCO0000000000069",$centro_id,$empresa_id);
                 if(count($cuenta)>0){
                     $cod_contrato       =   $cuenta->COD_CONTRATO;
                 }
-
+                //dd($cod_contrato);
                 $subcuenta_id       =   $this->lg_subcuenta_top1("Seleccione SubCuenta",$cod_contrato);
                 $combo_subcuenta    =   $this->lg_combo_subcuenta("Seleccione SubCuenta",$cod_contrato);
             }
@@ -4423,13 +4636,13 @@ class GestionLiquidacionGastosController extends Controller
             $autoriza_id         =   '';
             $combo_autoriza      =   $this->gn_combo_usuarios();
             $arendir_sel_id      =   '';
-            $combo_arendir_sel   =   $this->gn_combo_arendir();
+            $combo_arendir_sel   =   $this->gn_combo_arendir_restante();
 
             $moneda_sel_id       =   '';
             $combo_moneda_sel    =   $this->gn_generacion_combo_categoria('MONEDA',"SELECCIONE MONEDA",'');
 
 
-            //dd($combo_arendir_sel);
+
             return View::make('liquidaciongasto.agregarliquidaciongastos',
                              [
                                 'combo_empresa' => $combo_empresa,
@@ -4490,6 +4703,10 @@ class GestionLiquidacionGastosController extends Controller
         if(count($trabajador)>0){
             $centro_id      =       $trabajadorespla->centro_osiris_id;
         }
+        if($centro_id == 'CEN0000000000003'){
+            $centro_id = 'CEN0000000000001';
+        }
+
 
         $cadena = $empresa_id;
         $partes = explode(" - ", $cadena);
@@ -4533,6 +4750,10 @@ class GestionLiquidacionGastosController extends Controller
                                     ->first();
         if(count($trabajador)>0){
             $centro_id      =       $trabajadorespla->centro_osiris_id;
+        }
+
+        if($centro_id == 'CEN0000000000003'){
+            $centro_id = 'CEN0000000000001';
         }
 
         $cadena = $empresa_id;

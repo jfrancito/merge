@@ -143,6 +143,9 @@ class ValeRendirAutorizaController extends Controller
 
         $cod_centro = $registro ? $registro->COD_CENTRO : null;
 
+        $usuario_logueado_id = Session::get('usuario')->usuarioosiris_id;
+        $usuario_nombre_logueado_id = Session::get('usuario')->nombre;
+
            
             $this->insertValeRendirAutoApruebaRechaza(
                 'D', 
@@ -176,6 +179,14 @@ class ValeRendirAutorizaController extends Controller
                 false,
                 Session::get('usuario')->id 
             );
+            
+            DB::table('WEB.VALE_RENDIR')
+                ->where('ID', $id_buscar)
+                ->update([
+                    'USUARIO_APRUEBA'  => $usuario_logueado_id,
+                    'TXT_NOM_APRUEBA'  => $usuario_nombre_logueado_id,
+                ]);
+
 
              return response()->json(['success' => 'Vale de rendir Rechazado correctamente.']);
     }

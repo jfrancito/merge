@@ -2892,8 +2892,9 @@ class GestionOCContabilidadController extends Controller
         } else {
 
             //lectura del cdr
-            $prefijocarperta = $this->prefijo_empresa($ordencompra->COD_EMPR);
-            $lecturacdr = $this->lectura_cdr_archivo($idoc, $this->pathFiles, $prefijocarperta, $ordencompra->NRO_DOCUMENTO_CLIENTE);
+            $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);
+            //dd($idoc);
+            $lecturacdr             =   $this->lectura_cdr_archivo($idoc,$this->pathFiles,$prefijocarperta,$ordencompra->NRO_DOCUMENTO_CLIENTE);
 
             if ($fedocumento->nestadoCp === null) {
 

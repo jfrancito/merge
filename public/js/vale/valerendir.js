@@ -4,136 +4,174 @@ $(document).ready(function(){
     var carpeta = $("#carpeta").val();
 
 
-        $(".valerendirprincipal").on('click','#asignarvalerendir', function(e) {
+    $(".valerendirprincipal").on('click', '#asignarvalerendir', function(e) {
+        let _token = $('#token').val();
+        let usuario_autoriza = $('#cliente_select').val();
+        let usuario_aprueba = $('#cliente_select1').val();
+        let tipo_motivo = $('#tipo_motivo').val();
+        let txt_glosa = $('#txt_glosa').val();
+        let can_total_importe = $('#can_total_importe').val();
+        let can_total_saldo = $('#can_total_saldo').val();
+        let cod_moneda = $('#cod_moneda').val();
+        let vale_rendir_id = $('#vale_rendir_id').val();
 
-            let _token                  =   $('#token').val();
-            let usuario_autoriza        =   $('#cliente_select').val();
-            let usuario_aprueba         =   $('#cliente_select1').val();
-            let tipo_motivo             =   $('#tipo_motivo').val();
-            let txt_glosa               =   $('#txt_glosa').val();
-            let can_total_importe       =   $('#can_total_importe').val();
-            let can_total_saldo         =   $('#can_total_saldo').val();
-            let cod_moneda              =   $('#cod_moneda').val();
+        let opcion = !vale_rendir_id ? 'I' : 'U';
 
+        if (!usuario_autoriza) {
+            alerterrorajax("El campo 'Usuario Autoriza' es obligatorio.");
+            return;
+        }
 
-            let vale_rendir_id = $('#vale_rendir_id').val(); 
+        if (!tipo_motivo) {
+            alerterrorajax("El campo 'Tipo de Motivo' es obligatorio.");
+            return;
+        }
 
-            let opcion = vale_rendir_id === null || vale_rendir_id === undefined  || vale_rendir_id === '' ? 'I' : 'U'; 
+        if (!cod_moneda) {
+            alerterrorajax("El campo 'Moneda' es obligatorio.");
+            return;
+        }
 
+        if (!can_total_importe) {
+            alerterrorajax("El campo 'Total Importe' es obligatorio.");
+            return;
+        }
 
+        if (!can_total_saldo) {
+            alerterrorajax("El campo 'Total Saldo' es obligatorio.");
+            return;
+        }
 
-            if (!usuario_autoriza || !usuario_aprueba || !txt_glosa || !tipo_motivo || !can_total_importe || !can_total_saldo || !cod_moneda) {
-                 alerterrorajax("Todos los campos son obligatorios. Por favor, complete todos los campos.");
-            return; 
-            }
+        if (!txt_glosa) {
+            alerterrorajax("El campo 'Glosa' es obligatorio.");
+            return;
+        }
 
-            if (parseFloat(can_total_importe) <= 0 || isNaN(parseFloat(can_total_importe))) {
-                alerterrorajax("El campo 'importe' debe ser un número positivo mayor a cero.");
-                return;
-            }
+        if (parseFloat(can_total_importe) <= 0 || isNaN(parseFloat(can_total_importe))) {
+            alerterrorajax("El campo 'importe' debe ser un número positivo mayor a cero.");
+            return;
+        }
 
-            if (parseFloat(can_total_saldo) <= 0 || isNaN(parseFloat(can_total_saldo))) {
-                 alerterrorajax("El campo 'saldo' debe ser un número positivo mayor a cero.");
-                return;
-            }
+        if (parseFloat(can_total_saldo) <= 0 || isNaN(parseFloat(can_total_saldo))) {
+            alerterrorajax("El campo 'saldo' debe ser un número positivo mayor a cero.");
+            return;
+        }
 
-
-            //DETALLE
-
-            let detalles = [];
-            $('#tabla_vale_rendir_detalle tbody tr').each(function () {
-                let fechaInicio = $(this).find('td').eq(0).text().trim();
-                let fechaFin = $(this).find('td').eq(1).text().trim();
-                let codDestino = $(this).data('cod-destino');
-                let nomDestino = $(this).find('td').eq(2).text().trim();
-                let nombresTipos = $(this).find('td').eq(3).html().split('<br/>').join(',');
-                let diffDays = parseInt($(this).find('td').eq(4).text().trim()) || 0;                
-                let valoresBase = $(this).find('td').eq(5).html().split('<br/>').join(',');
-                let importesCalculados = $(this).find('td').eq(6).html().split('<br/>').join(',');
-                let totalImporte = parseFloat($(this).find('td').eq(7).text().trim()) || 0; 
-                let ind_destino = parseInt($(this).find('td').eq(8).text().trim()) || 0;
-                let ind_propio = parseInt($(this).find('td').eq(9).text().trim()) || 0;
-                let ind_aereo = parseInt($(this).find('td').eq(10).text().trim()) || 0;
-
-                let detalle_id = $(this).data('id'); 
-
-                let opcion_detalle = 'I';
-
-                detalles.push({
-                    fec_inicio               : fechaInicio,
-                    fec_fin                  : fechaFin,
-                    cod_destino              : codDestino,
-                    nom_destino              : nomDestino,
-                    nom_tipos                : nombresTipos,
-                    dias                     : diffDays,
-                    can_unitario             : valoresBase,
-                    can_unitario_total       : importesCalculados,
-                    can_total_importe        : totalImporte, 
-                    ind_destino              : ind_destino,
-                    ind_propio               : ind_propio,  
-                    ind_aereo                : ind_aereo,   
-                    opcion_detalle           : opcion_detalle,
-                    detalle_id               : detalle_id 
-                });
+        let detalles = [];
+        $('#tabla_vale_rendir_detalle tbody tr').each(function () {
+            let fila = $(this);
+            detalles.push({
+                fec_inicio: fila.find('td').eq(0).text().trim(),
+                fec_fin: fila.find('td').eq(1).text().trim(),
+                cod_destino: fila.data('cod-destino'),
+                nom_destino: fila.find('td').eq(2).text().trim(),
+                nom_tipos: fila.find('td').eq(3).html().split('<br/>').join(','),
+                dias: parseInt(fila.find('td').eq(4).text().trim()) || 0,
+                can_unitario: fila.find('td').eq(5).html().split('<br/>').join(','),
+                can_unitario_total: fila.find('td').eq(6).html().split('<br/>').join(','),
+                can_total_importe: parseFloat(fila.find('td').eq(7).text().trim()) || 0,
+                ind_destino: parseInt(fila.find('td').eq(8).text().trim()) || 0,
+                ind_propio: parseInt(fila.find('td').eq(9).text().trim()) || 0,
+                ind_aereo: parseInt(fila.find('td').eq(10).text().trim()) || 0,
+                opcion_detalle: 'I',
+                detalle_id: fila.data('id')
             });
-           abrircargando();
-           $.ajax({
-                  type    :   "POST",
-                  url     :   carpeta+"/registrar_vale_rendir",
-                  data    :   {
-                                _token                                   : _token,
-                                usuario_autoriza                         : usuario_autoriza,
-                                usuario_aprueba                          : usuario_aprueba,
-                                tipo_motivo                              : tipo_motivo,
-                                txt_glosa                                : txt_glosa,
-                                can_total_importe                        : can_total_importe,
-                                can_total_saldo                          : can_total_saldo,
-                                cod_moneda                               : cod_moneda,
-                                vale_rendir_id                           : vale_rendir_id,
-                                opcion                                   : opcion,
-                                array_detalle                            : detalles
-                                                                      
-                              },
-               
-                success: function (data) {
-                    if (data.error) {
-
-                        if (data.error.includes("Vale de rendir procesado correctamente")) {
-                        alerterrorajax("El vale a rendir ya ha sido autorizado y no puede modificarse.");
-
-                        }else {
-                            alerterrorajax(data.error); 
-                        }
-                        return;
-                    }
-            
-                  
-                    let nuevo_vale_id = data.vale_rendir_id || vale_rendir_id;
-
-                    $.ajax({
-                        type: "GET",
-                        url: carpeta + "/enviar_correo_generado",
-                        data: { valerendir_id: nuevo_vale_id },
-                        success: function(response) {
-                            if (response.success) {
-                                alertajax("Vale a rendir registrado y correo enviado correctamente."); 
-                            } else {
-                                alertajax("Vale registrado, pero no se pudo enviar el correo.");
-                            }
-                            location.reload();
-                        },
-                        error: function() {
-                            alertajax("Vale registrado, pero ocurrió un error al enviar el correo.");
-                            location.reload();
-                        }
-                    });
-                },
-
-                error: function (data) {
-                    error500(data);
-                }
-            });   
         });
+
+        abrircargando();
+
+        $.ajax({
+            type: "POST",
+            url: carpeta + "/registrar_vale_rendir",
+            data: {
+                _token: _token,
+                usuario_autoriza: usuario_autoriza,
+                usuario_aprueba: usuario_aprueba,
+                tipo_motivo: tipo_motivo,
+                txt_glosa: txt_glosa,
+                can_total_importe: can_total_importe,
+                can_total_saldo: can_total_saldo,
+                cod_moneda: cod_moneda,
+                vale_rendir_id: vale_rendir_id,
+                opcion: opcion,
+                array_detalle: detalles
+            },
+            success: function (data) {
+                if (data.error) {
+                    if (data.error.includes("Vale de rendir procesado correctamente")) {
+                        alerterrorajax("El vale a rendir ya ha sido autorizado y no puede modificarse.");
+                    } else {
+                        alerterrorajax(data.error);
+                    }
+                    return;
+                }
+
+                let nuevo_vale_id = data.vale_rendir_id || vale_rendir_id;
+                let data_modal = {
+                    _token: _token,
+                    valerendir_id: nuevo_vale_id
+                };
+
+                // Segundo AJAX: enviar correo
+                $.ajax({
+                    type: "GET",
+                    url: carpeta + "/enviar_correo_generado",
+                    data: { valerendir_id: nuevo_vale_id },
+                    success: function(response) {
+                        if (response.success) {
+                            alertajax("Vale a rendir registrado y correo enviado correctamente.");
+                        } else {
+                            alertajax("Vale registrado, pero no se pudo enviar el correo.");
+                        }
+
+                        setTimeout(function () {
+                            ajax_modal(
+                                data_modal,
+                                "/ver_mensaje_vale_rendir",
+                                "modal-verdetalledocumentomensajevale-solicitud",
+                                "modal-verdetalledocumentomensajevale-solicitud-container"
+                            );
+                            // Forzar recarga al cerrar modal, incluso si no es bootstrap puro
+                            const modal = $("#modal-verdetalledocumentomensajevale-solicitud");
+                            modal.on('hide.bs.modal', function () {
+                                location.reload();
+                            });
+                        }, 500);
+                    },
+                    error: function() {
+                        alertajax("Vale registrado, pero ocurrió un error al enviar el correo.");
+
+                        setTimeout(function () {
+                            ajax_modal(
+                                data_modal,
+                                "/ver_mensaje_vale_rendir",
+                                "modal-verdetalledocumentomensajevale-solicitud",
+                                "modal-verdetalledocumentomensajevale-solicitud-container"
+                            );
+
+
+                            // Forzar recarga al cerrar modal, incluso si no es bootstrap puro
+                            const modal = $("#modal-verdetalledocumentomensajevale-solicitud");
+                            modal.on('hide.bs.modal', function () {
+                                location.reload();
+                            });
+                        }, 500);
+                    }
+                });
+            },
+            error: function (data) {
+                error500(data);
+            }
+        });
+    });
+
+
+        $(document).on('click', '.modal-close-recargar', function () {
+            setTimeout(function () {
+                location.reload();
+            }, 300);
+        });
+
 
 
  /* data    =   {
@@ -151,6 +189,7 @@ $(document).ready(function(){
                               };
 
             ajax_normal_combo(data,"/registrar_vale_rendir","listadetalleajax")  */
+
 
         $(".valerendirprincipal").on('dblclick', '.dobleclickpc', function (e) {
             let _token = $('#token').val();
@@ -181,7 +220,7 @@ $(document).ready(function(){
                     $('#txt_glosa').val(data_left["0"]["TXT_GLOSA"]);
                     $('#cod_moneda').val(data_left["0"]["COD_MONEDA"]).trigger('change'); 
                     $('#vale_rendir_id').val(valerendir_id);
-                    $('#asignarvalerendir').text('Modificar');
+                    $('#btntexto').text('Modificar');
 
                     $.ajax({
                         type: "POST",
@@ -506,7 +545,6 @@ $(document).ready(function(){
          let txt_numero              =   $('#nrodoc').val();
          let fec_autorizacion        =   $('#fecha').val();
          let cod_contrato            =   $('#cuenta_id_contrato').val();
-         //let sub_cuenta              =   $('#cuenta_id_subcuenta option:selected').text();
          let sub_cuenta              =   $('#cuenta_id_subcuenta').val();
          let txt_glosa_autorizado    =   $('#glosaRegistrada').val();
          let tipo_pago_raw           =   $('input[name="tipo_pago"]:checked').val(); 
@@ -514,7 +552,7 @@ $(document).ready(function(){
          let txt_categoria_banco     =   $('#nomBanco').val();
          let numero_cuenta           =   $('#numBanco').val();
          let txt_glosa_aprobado      =   $('#glosa').val();   
-         let vale_rendir_id          = $('#vale_rendir_id').val(); 
+         let vale_rendir_id          =   $('#vale_rendir_id').val(); 
 
        
          
@@ -522,6 +560,13 @@ $(document).ready(function(){
                  alerterrorajax("El usuario no cuenta con contrato o sub cuenta.");
             return; 
             }
+
+         if (tipo_pago === 1) {
+            if (!numero_cuenta || !txt_categoria_banco) {
+            alerterrorajax("La cuenta es en Dólares, debe ingresar la entidad bancaria y el número de cuenta.");
+            return; 
+            }
+         }
 
             $.ajax({
                   type    :   "POST",
@@ -651,8 +696,23 @@ $(document).ready(function(){
 
 
 
+         $(".valerendirprincipal").on('click', '.vermensaje-valerendir', function(e) {
+            e.preventDefault(); 
+            //let valerendir_id = $(this).closest('tr').attr('data_vale_rendir'); 
+            //$('#vale_rendir_id').val(valerendir_id); 
+            var _token = $('#token').val();
+           
+            data                        =   {
+                                                _token                  : _token,
+                                                //valerendir_id           : valerendir_id,
+                                            };
 
+            ajax_modal(data,"/ver_mensaje_vale_rendir",
+                      "modal-verdetalledocumentomensajevale-solicitud","modal-verdetalledocumentomensajevale-solicitud-container");
 
+        });
+
+       
 
         $(document).on("click", ".show-glosa", function() {
             var glosaText = $(this).data('glosa');
@@ -719,7 +779,36 @@ $(document).ready(function(){
             return `${partes[2]}-${partes[1]}-${partes[0]}`;
         }
 
+        $(document).ready(function () {
+            let hoy = new Date();
+            let fechaMin = new Date(hoy);
+            fechaMin.setDate(hoy.getDate() - 7);
+
+            let yyyy = fechaMin.getFullYear();
+            let mm = String(fechaMin.getMonth() + 1).padStart(2, '0');
+            let dd = String(fechaMin.getDate()).padStart(2, '0');
+
+            let minDateStr = `${yyyy}-${mm}-${dd}`;
+
+            $('#fecha_inicio').attr('min', minDateStr);
+            $('#fecha_fin').attr('min', minDateStr);
+        });
+
+
         var importeDestinos = JSON.parse($('#importeDestinos').val());
+     
+       // 🔹 Mapeo código -> nombre para mostrar al usuario
+        const codigosNombres = {
+            "TIG0000000000001": "ALIMENTACION",
+            "TIG0000000000002": "ALOJAMIENTO",
+            "TIG0000000000003": "MOVILIDAD LOCAL",
+            "TIG0000000000004": "PASAJES INTERDEPARTAMENTALES",
+            "TIG0000000000005": "PASAJES INTERPROVINCIAL",
+            "TIG0000000000006": "COMBUSTIBLE",
+            "TIG0000000000007": "PEAJES",
+            "TIG0000000000008": "MANTENIMIENTO DE VEHICULOS"
+        };
+
         $('#agregarImporteGasto').on('click', function () {
             let destino = $('#destino option:selected').text();
             let codDestino = $('#destino').val();
@@ -729,8 +818,8 @@ $(document).ready(function(){
             let ind_propio = $('#ind_propio').is(':checked') ? 1 : 0;
             let ind_aereo = $('#ind_aereo').is(':checked') ? 1 : 0;
 
-
-            if (!codDestino || !fechaInicio || !fechaFin ) {
+            // Validaciones de campos obligatorios
+            if (!codDestino || !fechaInicio || !fechaFin) {
                 alerterrorajax('Por favor complete todos los campos antes de agregar.');
                 return;
             }
@@ -740,6 +829,7 @@ $(document).ready(function(){
                 return;
             }
 
+            // Validar fecha contra la última fila
             let filas = $('#tabla_vale_rendir_detalle tbody tr');
             if (filas.length > 0) {
                 let ultimaFila = filas.last();
@@ -766,9 +856,9 @@ $(document).ready(function(){
                 alerterrorajax('Este destino ya ha sido agregado.');
                 return;
             }
+
             let destinoObj = importeDestinos.find(destino => destino.COD_DISTRITO === codDestino);
             let ind_destino = destinoObj?.IND_DESTINO || 0;
-
 
             let fecha1 = new Date(convertirFecha(fechaInicio));
             let fecha2 = new Date(convertirFecha(fechaFin));
@@ -777,14 +867,8 @@ $(document).ready(function(){
             let baseDiffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
             let diffDays = 0;
 
-
             if (ind_propio === 1) {
-                // Siempre contar al menos 1 día
-                if (baseDiffDays <= 1) {
-                    diffDays = 1;
-                } else {
-                    diffDays = baseDiffDays;
-                }
+                diffDays = (baseDiffDays <= 1) ? 1 : baseDiffDays;
             } else {
                 if (destinoObj?.IND_DESTINO == "1") {
                     diffDays = baseDiffDays + 1;
@@ -793,108 +877,104 @@ $(document).ready(function(){
                 }
             }
 
-
             let total_Importe = 0;
             let nombresTipos = [];
             let importesCalculados = [];
             let valoresBase = [];
-        
 
-            if (destinoObj && destinoObj.TXT_NOM_TIPO) {
-            let tipos = destinoObj.TXT_NOM_TIPO.split(',');
-            tipos.forEach(tipoStr => {
-            let [nombre, valorStr] = tipoStr.trim().split(':');
-            let valor = parseFloat(valorStr.trim());
-            let tipoImporte = 0;
+            // Procesar tipos de gasto (ahora por código)
+           if (destinoObj && destinoObj.COD_TIPO) {
+            let tipos = destinoObj.COD_TIPO.split(',');
+                tipos.forEach(tipoStr => {
+                    let [codigoTipo, valorStr] = tipoStr.trim().split(':');
+                    let valor = parseFloat(valorStr.trim());
+                    let tipoImporte = 0;
 
-            if (nombre === "COMBUSTIBLE + PEAJES" && ind_propio !== 1) {
-                return;
-            }
+                    let nombre = codigosNombres[codigoTipo] || codigoTipo;
+                    let filasExistentes = $('#tabla_vale_rendir_detalle tbody tr').length;
 
-             if (ind_propio === 1 && !["HOSPEDAJE", "ALIMENTACION","COMBUSTIBLE + PEAJES"].includes(nombre)) {
-             return; // saltar a la siguiente iteración
-            }
-
-            let filasExistentes = $('#tabla_vale_rendir_detalle tbody tr').length;
-
-            if (nombre === "PASAJES TERRESTRES") {
-            if (ind_aereo === 1) {
-                return; // No agregar PASAJES TERRESTRES si es movilidad aérea
-            }
-            tipoImporte = filasExistentes === 0 ? valor * 2 : valor;
-
-           } else if (["HOSPEDAJE", "ALIMENTACION", "PASAJES INTERNOS"].includes(nombre)) {
-
-            if (nombre === "ALIMENTACION" && ind_propio === 1) {
-                // ✅ ALIMENTACIÓN destino propio: suma 1 día si diffDays >= 2
-                tipoImporte = valor * (diffDays >= 2 ? (diffDays + 1) : 1);
-
-            } else if (nombre === "HOSPEDAJE" && ind_propio === 1) {
-                // ✅ HOSPEDAJE destino propio: solo por los días
-                tipoImporte = valor * diffDays;
-
-            } else if (filasExistentes === 0) {
-                // ✅ Primera fila, lógica completa
-                if (nombre === "HOSPEDAJE" && destinoObj?.IND_DESTINO === "0") {
-                    tipoImporte = valor * diffDays;
-                } else {
-                    tipoImporte = valor * diffDays;
-                }
-
-            } else {
-                // Para otras combinaciones
-               tipoImporte = valor * diffDays;
-            }
-
-
-            } else if (nombre === "PASAJES INTERPROVINCIAL") {
-                // Solo valor base en el primer destino; luego 0
-                tipoImporte = filasExistentes === 0 ? valor : 0;
-
-            } else {
-                tipoImporte = valor;
-            }
-
-            total_Importe += tipoImporte;
-
-            nombresTipos.push(nombre);
-            importesCalculados.push(`S/. ${tipoImporte.toFixed(2)}`);
-            valoresBase.push(`S/. ${valor.toFixed(2)}`);
-        });
-
-
-        
-        let filas = $('#tabla_vale_rendir_detalle tbody tr');
-        if (filas.length >= 1) {
-            let primeraFila = filas.eq(0);
-            let $tds = primeraFila.find('td');
-
-            // Asegurar que hay al menos 7 columnas
-            if ($tds.length >= 7) {
-                let nombres = $tds.eq(3).html().split(/<br\s*\/?>/).map(s => s.trim());
-                let valores = $tds.eq(5).html().split(/<br\s*\/?>/).map(s => s.trim());
-                let importes = $tds.eq(6).html().split(/<br\s*\/?>/).map(s => s.trim());
-                let total = 0;
-
-                let importesActualizados = nombres.map((nombreTipo, i) => {
-                    let base = parseFloat(valores[i].replace('S/.', '').trim()) || 0;
-                    let nuevoImporte = parseFloat(importes[i].replace('S/.', '').trim()) || 0;
-
-                    if (nombreTipo === "PASAJES TERRESTRES") {
-                        nuevoImporte = base; // *1 (en vez de *2)
+                    // COMBUSTIBLE + PEAJES (TIG0006 y TIG0007)
+                    if ((codigoTipo === "TIG0000000000006" || codigoTipo === "TIG0000000000007") && ind_propio !== 1) {
+                        return; 
                     }
 
-                    total += nuevoImporte;
-                    return `S/. ${nuevoImporte.toFixed(2)}`;
+                    // Filtro para destino propio
+                    if (ind_propio === 1 && ![
+                        "TIG0000000000001", // ALIMENTACION
+                        "TIG0000000000002", // ALOJAMIENTO
+                        "TIG0000000000006", // COMBUSTIBLE
+                        "TIG0000000000007"  // PEAJES
+                    ].includes(codigoTipo)) {
+                        return; 
+                    }
+
+                    // PASAJES TERRESTRES (TIG0004)
+                    if (codigoTipo === "TIG0000000000004") {
+                        if (ind_aereo === 1) return; 
+                        tipoImporte = filasExistentes === 0 ? valor * 2 : valor;
+                    }
+
+                    // ALIMENTACION, ALOJAMIENTO, MOVILIDAD LOCAL
+                    else if (["TIG0000000000001", "TIG0000000000002", "TIG0000000000003"].includes(codigoTipo)) {
+                        if (codigoTipo === "TIG0000000000001" && ind_propio === 1) {
+                            tipoImporte = valor * (diffDays >= 2 ? (diffDays + 1) : 1);
+                        } else if (codigoTipo === "TIG0000000000002" && ind_propio === 1) {
+                            tipoImporte = valor * diffDays;
+                        } else if (filasExistentes === 0) {
+                            tipoImporte = valor * diffDays;
+                        } else {
+                            tipoImporte = valor * diffDays;
+                        }
+                    }
+
+                    // PASAJES INTERPROVINCIAL (TIG0005)
+                    else if (codigoTipo === "TIG0000000000005") {
+                        tipoImporte = filasExistentes === 0 ? valor : 0;
+                    }
+
+                    // Otros casos
+                    else {
+                        tipoImporte = valor;
+                    }
+
+                    total_Importe += tipoImporte;
+                    nombresTipos.push(nombre); // usuario ve nombre
+                    importesCalculados.push(`S/. ${tipoImporte.toFixed(2)}`);
+                    valoresBase.push(`S/. ${valor.toFixed(2)}`);
                 });
 
-                $tds.eq(6).html(importesActualizados.join('<br/>'));
-                $tds.eq(7).text(total.toFixed(2));
+                // Ajustar primera fila si corresponde
+                let filasTabla = $('#tabla_vale_rendir_detalle tbody tr');
+                if (filasTabla.length >= 1) {
+                    let primeraFila = filasTabla.eq(0);
+                    let $tds = primeraFila.find('td');
+
+                    if ($tds.length >= 7) {
+                        let nombres = $tds.eq(3).html().split(/<br\s*\/?>/).map(s => s.trim());
+                        let valores = $tds.eq(5).html().split(/<br\s*\/?>/).map(s => s.trim());
+                        let importes = $tds.eq(6).html().split(/<br\s*\/?>/).map(s => s.trim());
+                        let total = 0;
+
+                        let importesActualizados = nombres.map((nombreTipo, i) => {
+                            let base = parseFloat(valores[i].replace('S/.', '').trim()) || 0;
+                            let nuevoImporte = parseFloat(importes[i].replace('S/.', '').trim()) || 0;
+
+                            if (nombreTipo === codigosNombres["TIG0000000000004"]) {
+                                nuevoImporte = base; // *1 en vez de *2
+                            }
+
+                            total += nuevoImporte;
+                            return `S/. ${nuevoImporte.toFixed(2)}`;
+                        });
+
+                        $tds.eq(6).html(importesActualizados.join('<br/>'));
+                        $tds.eq(7).text(total.toFixed(2));
+                    }
+                }
             }
-        }
-    }
-        
-        let nuevaFila = `
+
+            // Agregar nueva fila
+            let nuevaFila = `
                 <tr data-cod-destino="${codDestino}" data-id="">
                     <td>${fechaInicio}</td>
                     <td>${fechaFin}</td>
@@ -913,49 +993,18 @@ $(document).ready(function(){
 
             $('#tabla_vale_rendir_detalle tbody').append(nuevaFila);
             actualizarTotalImporte();
+
+            // Asignar fecha inicio con fecha fin del último registro
+            let ultimaFila = $('#tabla_vale_rendir_detalle tbody tr').last();
+            let fechaFinUltima = ultimaFila.find('td').eq(1).text().trim();
+            $('#fecha_inicio').val(fechaFinUltima);
+
+            // Limpiar otros campos
+            $('#fecha_fin').val('');
+            $('#destino').val('').trigger('change');
+            $('#ind_propio').prop('checked', false);
+            $('#ind_aereo').prop('checked', false);
         });
-
-
-
-        
-        $('#tabla_vale_rendir_detalle').on('click', '.eliminarFila', function () {
-            $(this).closest('tr').remove();
-
-            setTimeout(() => {
-                let filas = $('#tabla_vale_rendir_detalle tbody tr');
-                if (filas.length === 1) {
-                    let primeraFila = filas.eq(0);
-                    let $tds = primeraFila.find('td');
-
-                    if ($tds.length >= 7) {
-                        let nombres = $tds.eq(3).html().split(/<br\s*\/?>/).map(s => s.trim());
-                        let valores = $tds.eq(5).html().split(/<br\s*\/?>/).map(s => s.trim());
-                        let importes = $tds.eq(6).html().split(/<br\s*\/?>/).map(s => s.trim());
-                        let total = 0;
-
-                        let importesActualizados = nombres.map((nombreTipo, i) => {
-                            let base = parseFloat(valores[i].replace('S/.', '').trim()) || 0;
-                            let nuevoImporte = parseFloat(importes[i].replace('S/.', '').trim()) || 0;
-
-                            if (nombreTipo === "PASAJES TERRESTRES") {
-                                nuevoImporte = base * 2;
-                            }
-
-                            total += nuevoImporte;
-                            return `S/. ${nuevoImporte.toFixed(2)}`;
-                        });
-
-                        $tds.eq(6).html(importesActualizados.join('<br/>'));
-                        $tds.eq(7).text(total.toFixed(2));
-                    }
-                }
-
-                actualizarTotalImporte();
-            }, 0);
-        });
-
-
-
 
 
          function actualizarTotalImporte() {

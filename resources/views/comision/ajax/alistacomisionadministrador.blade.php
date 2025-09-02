@@ -123,7 +123,7 @@
     $(document).ready(function(){
        App.dataTables();
         $('.importecomision').inputmask({ 'alias': 'numeric', 
-        'groupSeparator': ',', 'autoGroup': true, 'digits': 2, 
+        'groupSeparator': '', 'autoGroup': true, 'digits': 2, 
         'digitsOptional': false, 
         'prefix': '', 
         'placeholder': '0'});

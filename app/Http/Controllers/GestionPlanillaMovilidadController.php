@@ -116,6 +116,81 @@ class GestionPlanillaMovilidadController extends Controller
 
 
 
+    public function actionAprobarContabilidadPLARevisada($idopcion, $iddocumento,Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        $idcab                  =   $iddocumento;
+        $iddocumento            =   $this->funciones->decodificarmaestrapre($iddocumento,'CPLA');
+        View::share('titulo','Revisar Planilla Movilidad Contabilidad');
+
+        $feplanillaentrega      =   FePlanillaEntregable::where('ID_DOCUMENTO','=',$iddocumento)->first();
+
+        $usercre                =   User::where('id','=',$feplanillaentrega->COD_USUARIO_EMITE)->first();
+        $trabajadorcrea         =   STDTrabajador::where('COD_TRAB','=',$usercre->usuarioosiris_id)->first();
+        $dni                    =   $trabajadorcrea->NRO_DOCUMENTO;
+        $planillamovilidad      =   PlaMovilidad::where('FOLIO','=',$feplanillaentrega->FOLIO)
+                                    ->pluck('ID_DOCUMENTO')
+                                    ->toArray();
+        $detplanillamovilidad   =   PlaDetMovilidad::whereIn('ID_DOCUMENTO', $planillamovilidad)
+                                    ->where('ACTIVO','=','1')->orderby('FECHA_GASTO','ASC')->get();
+        $nombre_responsable     =   $trabajadorcrea->TXT_NOMBRES.' '.$trabajadorcrea->TXT_APE_PATERNO.' '.$trabajadorcrea->TXT_APE_MATERNO;
+        $empresa                =   STDEmpresa::where('COD_EMPR','=',$feplanillaentrega->COD_EMPRESA)->first();
+        $ruc                    =   $empresa->NRO_DOCUMENTO;
+        $direccion              =   $this->gn_direccion_fiscal();
+        $lugares_trabajo        =   DB::table('PLA_MOVILIDAD')
+                                    ->selectRaw("STUFF((
+                                        SELECT DISTINCT ' / ' + TXT_DIRECCION
+                                        FROM PLA_MOVILIDAD p2
+                                        WHERE p2.FOLIO = PLA_MOVILIDAD.FOLIO
+                                        FOR XML PATH('')
+                                    ), 1, 3, '') AS DIRECCIONES_CONCATENADAS")
+                                    ->where('FOLIO', $feplanillaentrega->FOLIO)
+                                    ->first();
+
+        $planillamovilidadglosas =   PlaMovilidad::where('FOLIO','=',$feplanillaentrega->FOLIO)
+                                    ->get();
+        $documentohistorial     =   PlaDocumentoHistorial::where('ID_DOCUMENTO','=',$iddocumento)->orderby('FECHA','DESC')->get();
+        $archivospdf            =   Archivo::where('ID_DOCUMENTO','=',$iddocumento)->where('EXTENSION', 'like', '%'.'pdf'.'%')->get();
+        $ocultar                =   "";
+        // Construir el array de URLs
+        $initialPreview = [];
+        foreach ($archivospdf as $archivo) {
+            $initialPreview[] = route('serve-filepla', ['file' => $archivo->NOMBRE_ARCHIVO]);
+        }
+        $initialPreviewConfig = [];
+
+        foreach ($archivospdf as $key => $archivo) {
+            $valor                = '';
+            if($key>0){
+                $valor            = 'ocultar';
+            }
+            $initialPreviewConfig[] = [
+                'type'          => "pdf",
+                'caption'       => $archivo->NOMBRE_ARCHIVO,
+                'downloadUrl'   => route('serve-filelg', ['file' => $archivo->NOMBRE_ARCHIVO]),
+                'frameClass'    => $archivo->ID_DOCUMENTO.$archivo->DOCUMENTO_ITEM.' '.$valor //
+            ];
+        }
+
+
+        return View::make('planillamovilidad/aprobarcontabilidadplarevisar', 
+                        [
+                            'feplanillaentrega'     =>  $feplanillaentrega,
+                            'documentohistorial'    =>  $documentohistorial,
+                            'idopcion'              =>  $idopcion,
+                            'idcab'                 =>  $idcab,
+                            'iddocumento'           =>  $iddocumento,
+                            'initialPreview'        => json_encode($initialPreview),
+                            'initialPreviewConfig'  => json_encode($initialPreviewConfig),      
+                        ]);
+
+
+    }
+
 
     public function actionAprobarContabilidadPLA($idopcion, $iddocumento,Request $request)
     {
@@ -275,11 +350,8 @@ class GestionPlanillaMovilidadController extends Controller
 
 
         $listadatos         =   $this->pl_lista_cabecera_comprobante_total_contabilidad($empresa_id);
-        $listadatos_obs     =   array();
-        $listadatos_obs_le  =   array();
-
-        // $listadatos_obs     =   $this->lg_lista_cabecera_comprobante_total_obs_contabilidad();
-        // $listadatos_obs_le  =   $this->lg_lista_cabecera_comprobante_total_obs_le_contabilidad();
+        $listadatos_obs     =   $this->pl_lista_cabecera_comprobante_total_contabilidad_revisadas($empresa_id);
+        $listadatos_obs_le  =   $this->pl_lista_cabecera_comprobante_total_contabilidad_historial($empresa_id);
         $funcion            =   $this;
         return View::make('planillamovilidad/listaplanillaconsolidadacontabilidad',
                          [
@@ -466,6 +538,8 @@ class GestionPlanillaMovilidadController extends Controller
         $usercre                =   User::where('id','=',$feplanillaentrega->COD_USUARIO_EMITE)->first();
         $trabajadorcrea         =   STDTrabajador::where('COD_TRAB','=',$usercre->usuarioosiris_id)->first();
         $dni                    =   $trabajadorcrea->NRO_DOCUMENTO;
+        $nombre                 =   $trabajadorcrea->TXT_NOMBRES.' '.$trabajadorcrea->TXT_APE_PATERNO.' '.$trabajadorcrea->TXT_APE_MATERNO;
+
         $planillamovilidad      =   PlaMovilidad::where('FOLIO','=',$feplanillaentrega->FOLIO)
                                     ->pluck('ID_DOCUMENTO')
                                     ->toArray();
@@ -494,7 +568,8 @@ class GestionPlanillaMovilidadController extends Controller
         $pdf = PDF::loadView('pdffa.planillamovilidadconsolidada', [ 
                 'iddocumento'           => $iddocumento,
                 'feplanillaentrega'     => $feplanillaentrega, 
-                'dni'                   => $dni, 
+                'dni'                   => $dni,
+                'nombre'                => $nombre,
                 'planillamovilidad'     => $planillamovilidad,
                 'detplanillamovilidad'  => $detplanillamovilidad,
                 'ruc'                   => $ruc,
@@ -641,7 +716,7 @@ class GestionPlanillaMovilidadController extends Controller
                             );
 
                 $fedocumentos =  PlaMovilidad::where('FOLIO_RESERVA','=',$folio_sel)->get();
-                FeDocumentoEntregable::where('FOLIO','=',$folio_sel)
+                FePlanillaEntregable::where('FOLIO','=',$folio_sel)
                             ->update(
                                 [
                                     'CAN_FOLIO'=>count($fedocumentos)
@@ -747,6 +822,11 @@ class GestionPlanillaMovilidadController extends Controller
             if(count($trabajador)>0){
                 $centro_id      =       $trabajadorespla->centro_osiris_id;
             }
+
+            if($centro_id == 'CEN0000000000003'){
+                $centro_id = 'CEN0000000000001';
+            }
+            
             $serie          =   $this->gn_serie($anio, $mes,$centro_id);
             $numero         =   $this->gn_numero_pl($serie,$centro_id);
 
@@ -1299,6 +1379,11 @@ class GestionPlanillaMovilidadController extends Controller
                     if(count($trabajador)>0){
                         $centro_id      =       $trabajadorespla->centro_osiris_id;
                     }
+
+                    if($centro_id == 'CEN0000000000003'){
+                        $centro_id = 'CEN0000000000001';
+                    }
+
                     $serie          =   $this->gn_serie($anio, $mes,$centro_id);
                     $numero         =   $this->gn_numero($serie,$centro_id);
 
@@ -1381,9 +1466,15 @@ class GestionPlanillaMovilidadController extends Controller
             }else{
                 return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd', 'No puede realizar un registro porque no es la empresa a cual pertenece');
             }
+            if($centro_id == 'CEN0000000000003'){
+                $centro_id = 'CEN0000000000001';
+            }
 
 
             $periodo        =   $this->gn_periodo_actual_xanio_xempresa($anio, $mes, Session::get('empresas')->COD_EMPR);
+
+            //dd($centro_id);
+
             $serie          =   $this->gn_serie($anio, $mes,$centro_id);
             $numero         =   $this->gn_numero($serie,$centro_id);
 
@@ -1461,7 +1552,9 @@ class GestionPlanillaMovilidadController extends Controller
                     $centro_id      =       $trabajadorespla->centro_osiris_id;
                 }
 
-
+                if($centro_id == 'CEN0000000000003'){
+                    $centro_id = 'CEN0000000000001';
+                }
 
                 $anio                   =   $this->anio;
                 $mes                    =   $this->mes;
@@ -1580,10 +1673,6 @@ class GestionPlanillaMovilidadController extends Controller
                     return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd', 'Supero el maximo saldo de 16425 soles al año');
                 }
 
-
-
-
-
                 $trabajador     =   DB::table('STD.TRABAJADOR')
                                     ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
                                     ->first();
@@ -1601,7 +1690,9 @@ class GestionPlanillaMovilidadController extends Controller
                     $centro_id      =       $trabajadorespla->centro_osiris_id;
                 }
 
-
+                if($centro_id == 'CEN0000000000003'){
+                    $centro_id = 'CEN0000000000001';
+                }
                 $serie                  =   $this->gn_serie($anio, $mes,$centro_id);
                 $numero                 =   $this->gn_numero($serie,$centro_id);
 
@@ -1707,6 +1798,11 @@ class GestionPlanillaMovilidadController extends Controller
         }
         $planillamovilidad->ACTIVO = 0;
         $planillamovilidad->save();
+
+        DB::table('PLA_DETMOVILIDAD')
+            ->where('ID_DOCUMENTO', $iddocumento) // Reemplaza con el valor real
+            ->update(['ACTIVO' => 0]);
+        
         return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('bienhecho', 'Se extorno la PLANILLA DE MOVILIDAD ');
 
     }
@@ -1747,7 +1843,9 @@ class GestionPlanillaMovilidadController extends Controller
         if(count($trabajador)>0){
             $centro_id      =       $trabajadorespla->centro_osiris_id;
         }
-
+        if($centro_id == 'CEN0000000000003'){
+            $centro_id = 'CEN0000000000001';
+        }
 
         $serie          =   $this->gn_serie($anio, $mes,$centro_id);
         $numero         =   $this->gn_numero($serie,$centro_id);

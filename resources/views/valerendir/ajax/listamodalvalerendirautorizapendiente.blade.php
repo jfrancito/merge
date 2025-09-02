@@ -4,7 +4,6 @@
             <th>ID</th>
             <th>Solicita</th>
             <th>Autoriza</th>
-            <th>Aprueba</th>
             <th>Motivo</th>
             <th>Importe</th>
             <th>Saldo</th>
@@ -21,10 +20,9 @@
             <td>{{$item['ID']}}</td>
             <td>{{$item['USUARIO']}}</td>
             <td>{{$item['USUARIO_AUTORIZA']}}</td>
-            <td>{{$item['USUARIO_APRUEBA']}}</td>
             <td>{{$item['TIPO_MOTIVO']}}</td>
-            <td>S/.{{$item['CAN_TOTAL_IMPORTE']}}</td>
-            <td>S/.{{$item['CAN_TOTAL_SALDO']}}</td>
+            <td>{{$item['COD_MONEDA'] == 'MON0000000000001' ? 'S/.' : '$' }} {{ $item['CAN_TOTAL_IMPORTE'] }}</td>
+            <td>{{$item['COD_MONEDA'] == 'MON0000000000001' ? 'S/.' : '$' }} {{ $item['CAN_TOTAL_SALDO'] }}</td>
             <td class="custom-glosa">{{$item['TXT_GLOSA']}}</td>
 
             @php
