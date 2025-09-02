@@ -144,10 +144,12 @@ $(document).ready(function () {
         // Recorrerlo
         arrayDetalle.forEach(item => {
             if (item.COD_ASIENTO_MOVIMIENTO === data_codigo) {
-                item.COD_ESTADO = 0;
+                item.COD_ESTADO = '0';
                 return; // saltar esta iteración
             }
         });
+
+        document.getElementById("asiento_detalle_reparable").value = JSON.stringify(arrayDetalle);
 
         $(this).closest("tr").remove();
 
@@ -1210,7 +1212,7 @@ $(document).ready(function () {
         // Recorrerlo
         arrayDetalle.forEach(item => {
             if (item.COD_ASIENTO_MOVIMIENTO === data_codigo) {
-                item.COD_ESTADO = 0;
+                item.COD_ESTADO = '0';
             }
             if (parseInt(item.COD_ESTADO) === 1) {
                 switch (item.COD_DOC_CTBLE_REF) {
@@ -1249,6 +1251,8 @@ $(document).ready(function () {
             }
         });
 
+        total = base_imponible + base_imponible_10 + base_ivap + base_inafecto + base_exonerado + total_igv + total_ivap;
+
         switch (data_asiento) {
             case 'C':
                 arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
@@ -1264,7 +1268,7 @@ $(document).ready(function () {
                 });
                 console.log(arrayCabecera);
                 document.getElementById("asiento_cabecera_compra").value = JSON.stringify(arrayCabecera);
-
+                document.getElementById("asiento_detalle_compra").value = JSON.stringify(arrayDetalle);
                 $("#asientototales tbody tr").each(function () {
                     let fila = $(this);
 
@@ -1293,7 +1297,7 @@ $(document).ready(function () {
                     item.TOTAL_IVAP = total_ivap;
                 });
                 document.getElementById("asiento_cabecera_percepcion").value = JSON.stringify(arrayCabecera);
-
+                document.getElementById("asiento_detalle_percepcion").value = JSON.stringify(arrayDetalle);
                 $("#asiento_totales_percepcion tbody tr").each(function () {
                     let fila = $(this);
 

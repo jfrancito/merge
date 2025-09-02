@@ -577,7 +577,7 @@ class GestionOCContabilidadController extends Controller
                         $contador = 0;
 
                         foreach ($asiento_detalle_compra as $asiento_detalle_compra_item) {
-                            if ($asiento_detalle_compra_item['COD_ESTADO'] === "1") {
+                            if (((int) $asiento_detalle_compra_item['COD_ESTADO']) === 1) {
                                 $contador++;
 
                                 $params = array(
@@ -676,7 +676,7 @@ class GestionOCContabilidadController extends Controller
                         $contador_reversion = 0;
 
                         foreach ($asiento_detalle_reparable_reversion as $asiento_detalle_compra_item) {
-                            if ($asiento_detalle_compra_item['COD_ESTADO'] === "1") {
+                            if (((int) $asiento_detalle_compra_item['COD_ESTADO']) === 1) {
                                 $contador_reversion++;
 
                                 $params = array(
@@ -775,7 +775,7 @@ class GestionOCContabilidadController extends Controller
                         $contador_deduccion = 0;
 
                         foreach ($asiento_detalle_deduccion as $asiento_detalle_compra_item) {
-                            if ($asiento_detalle_compra_item['COD_ESTADO'] === "1") {
+                            if (((int) $asiento_detalle_compra_item['COD_ESTADO']) === 1) {
                                 $contador_deduccion++;
 
                                 $params = array(
@@ -874,7 +874,7 @@ class GestionOCContabilidadController extends Controller
                         $contador_percepcion = 0;
 
                         foreach ($asiento_detalle_percepcion as $asiento_detalle_compra_item) {
-                            if ($asiento_detalle_compra_item['COD_ESTADO'] === "1") {
+                            if (((int) $asiento_detalle_compra_item['COD_ESTADO']) === 1) {
                                 $contador_percepcion++;
 
                                 $params = array(
@@ -1648,7 +1648,7 @@ class GestionOCContabilidadController extends Controller
                         $contador = 0;
 
                         foreach ($asiento_detalle_compra as $asiento_detalle_compra_item) {
-                            if ($asiento_detalle_compra_item['COD_ESTADO'] === "1") {
+                            if (((int) $asiento_detalle_compra_item['COD_ESTADO']) === 1) {
                                 $contador++;
 
                                 $params = array(
@@ -1747,7 +1747,7 @@ class GestionOCContabilidadController extends Controller
                         $contador_reversion = 0;
 
                         foreach ($asiento_detalle_reparable_reversion as $asiento_detalle_compra_item) {
-                            if ($asiento_detalle_compra_item['COD_ESTADO'] === "1") {
+                            if (((int) $asiento_detalle_compra_item['COD_ESTADO']) === 1) {
                                 $contador_reversion++;
 
                                 $params = array(
@@ -1846,7 +1846,7 @@ class GestionOCContabilidadController extends Controller
                         $contador_deduccion = 0;
 
                         foreach ($asiento_detalle_deduccion as $asiento_detalle_compra_item) {
-                            if ($asiento_detalle_compra_item['COD_ESTADO'] === "1") {
+                            if (((int) $asiento_detalle_compra_item['COD_ESTADO']) === 1) {
                                 $contador_deduccion++;
 
                                 $params = array(
@@ -1945,7 +1945,7 @@ class GestionOCContabilidadController extends Controller
                         $contador_percepcion = 0;
 
                         foreach ($asiento_detalle_percepcion as $asiento_detalle_compra_item) {
-                            if ($asiento_detalle_compra_item['COD_ESTADO'] === "1") {
+                            if (((int) $asiento_detalle_compra_item['COD_ESTADO']) === 1) {
                                 $contador_percepcion++;
 
                                 $params = array(
@@ -2541,7 +2541,7 @@ class GestionOCContabilidadController extends Controller
                         $contador = 0;
 
                         foreach ($asiento_detalle_compra as $asiento_detalle_compra_item) {
-                            if ($asiento_detalle_compra_item['COD_ESTADO'] === "1") {
+                            if (((int) $asiento_detalle_compra_item['COD_ESTADO']) === 1) {
                                 $contador++;
 
                                 $params = array(
@@ -2640,7 +2640,7 @@ class GestionOCContabilidadController extends Controller
                         $contador_reversion = 0;
 
                         foreach ($asiento_detalle_reparable_reversion as $asiento_detalle_compra_item) {
-                            if ($asiento_detalle_compra_item['COD_ESTADO'] === "1") {
+                            if (((int) $asiento_detalle_compra_item['COD_ESTADO']) === 1) {
                                 $contador_reversion++;
 
                                 $params = array(
@@ -2739,7 +2739,7 @@ class GestionOCContabilidadController extends Controller
                         $contador_deduccion = 0;
 
                         foreach ($asiento_detalle_deduccion as $asiento_detalle_compra_item) {
-                            if ($asiento_detalle_compra_item['COD_ESTADO'] === "1") {
+                            if (((int) $asiento_detalle_compra_item['COD_ESTADO']) === 1) {
                                 $contador_deduccion++;
 
                                 $params = array(
@@ -2838,7 +2838,7 @@ class GestionOCContabilidadController extends Controller
                         $contador_percepcion = 0;
 
                         foreach ($asiento_detalle_percepcion as $asiento_detalle_compra_item) {
-                            if ($asiento_detalle_compra_item['COD_ESTADO'] === "1") {
+                            if (((int) $asiento_detalle_compra_item['COD_ESTADO']) === 1) {
                                 $contador_percepcion++;
 
                                 $params = array(
@@ -4077,7 +4077,7 @@ class GestionOCContabilidadController extends Controller
                         $contador = 0;
 
                         foreach ($asiento_detalle_reparable as $asiento_detalle_compra_item) {
-                            if ($asiento_detalle_compra_item['COD_ESTADO'] === "1") {
+                            if (((int) $asiento_detalle_compra_item['COD_ESTADO']) === 1) {
                                 $contador++;
 
                                 $params = array(
@@ -4743,7 +4743,7 @@ class GestionOCContabilidadController extends Controller
                         $contador = 0;
 
                         foreach ($asiento_detalle_reparable as $asiento_detalle_compra_item) {
-                            if ($asiento_detalle_compra_item['COD_ESTADO'] === "1") {
+                            if (((int) $asiento_detalle_compra_item['COD_ESTADO']) === 1) {
                                 $contador++;
 
                                 $params = array(
@@ -5037,7 +5037,7 @@ class GestionOCContabilidadController extends Controller
                         $contador = 0;
 
                         foreach ($asiento_detalle_reparable as $asiento_detalle_compra_item) {
-                            if ($asiento_detalle_compra_item['COD_ESTADO'] === "1") {
+                            if (((int) $asiento_detalle_compra_item['COD_ESTADO']) === 1) {
                                 $contador++;
 
                                 $params = array(
