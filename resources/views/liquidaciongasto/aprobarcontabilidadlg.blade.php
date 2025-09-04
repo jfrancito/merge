@@ -5,6 +5,29 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/select2/css/select2.min.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/bootstrap-slider/css/bootstrap-slider.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/css/file/fileinput.css') }} "/>
+    <style>
+        .editarcuentas{
+            display: none;
+        }
+        .editarcuentasreparable{
+            display: none;
+        }
+        #asientodetalle {
+            width: 100% !important;
+        }
+        #asientodetallereversion {
+            width: 100% !important;
+        }
+        #asientodetallededuccion {
+            width: 100% !important;
+        }
+        #asientodetallepercepcion {
+            width: 100% !important;
+        }
+        #asientodetallereparable {
+            width: 100% !important;
+        }
+    </style>
 @stop
 @section('section')
 
@@ -65,7 +88,7 @@
                               </p>
                             </div>
                           </div>
-                          
+
                         </form>
                     </div>
                   </div>
@@ -92,7 +115,7 @@
                               </p>
                             </div>
                           </div>
-                          
+
                         </form>
 
 
@@ -107,11 +130,40 @@
       </div>
     </div>
   </div>
-</div>  
+</div>
 
 @stop
 
 @section('script')
+
+    <script src="{{ asset('public/js/general/inputmask/inputmask.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('public/js/general/inputmask/inputmask.extensions.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('public/js/general/inputmask/inputmask.numeric.extensions.js') }}"
+            type="text/javascript"></script>
+    <script src="{{ asset('public/js/general/inputmask/inputmask.date.extensions.js') }}"
+            type="text/javascript"></script>
+    <script src="{{ asset('public/js/general/inputmask/jquery.inputmask.js') }}" type="text/javascript"></script>
+
+    <script src="{{ asset('public/lib/datatables/js/jquery.dataTables.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('public/lib/datatables/js/dataTables.bootstrap.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/dataTables.buttons.js') }}"
+            type="text/javascript"></script>
+    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/jszipoo.min.js') }}"
+            type="text/javascript"></script>
+    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/pdfmake.min.js') }}"
+            type="text/javascript"></script>
+    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/vfs_fonts.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/buttons.html5.js') }}"
+            type="text/javascript"></script>
+    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/buttons.flash.js') }}"
+            type="text/javascript"></script>
+    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/buttons.print.js') }}"
+            type="text/javascript"></script>
+    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/buttons.colVis.js') }}"
+            type="text/javascript"></script>
+    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/buttons.bootstrap.js') }}"
+            type="text/javascript"></script>
+    <script src="{{ asset('public/js/app-tables-datatables.js?v='.$version) }}" type="text/javascript"></script>
 
     <script src="{{ asset('public/lib/jquery-ui/jquery-ui.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/lib/jquery.nestable/jquery.nestable.js') }}" type="text/javascript"></script>
@@ -131,6 +183,7 @@
         //initialize the javascript
         App.init();
         App.formElements();
+        App.dataTables();
         $('form').parsley();
       });
     </script>
@@ -147,6 +200,14 @@
               maxFileSize: 100,
               zoomModalHeight: 'auto', // Ajusta el modal automáticamente al contenido
               zoomModalWidth: 'auto'  // Ajusta el ancho del modal
+          });
+
+          $('.dinero').inputmask({
+              'alias': 'numeric',
+              'groupSeparator': ',', 'autoGroup': true, 'digits': 4,
+              'digitsOptional': false,
+              'prefix': '',
+              'placeholder': '0'
           });
 
         $('#input-24').on('filezoomshown', function(event, params) {
@@ -176,7 +237,7 @@
             }, 100); // Retraso para asegurar que el modal está completamente cargado
         });
 
-          
+
     </script>
 
 

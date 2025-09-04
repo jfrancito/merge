@@ -364,7 +364,7 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/detalle-comprobante-oc-validado-historial/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoHitorial');
 	Route::any('/detalle-comprobante-oc-validado-contrato-historial/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoContratoHistorial');
-	
+
 
 
 
@@ -451,8 +451,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/detalle-comprobante-oc-validado-estiba/{idopcion}/{lote}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoEstiba');
 	Route::any('/detalle-comprobante-oc-validado-comision/{idopcion}/{lote}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoComision');
 
-
-
+    Route::any('/ajax-combo-periodo-xanio-xempresa', 'GestionOCContabilidadController@actionAjaxComboPeriodoAnioEmpresa');
+    Route::any('/ajax-combo-periodo-xanio-xempresareparable', 'GestionOCContabilidadController@actionAjaxComboPeriodoAnioEmpresaReparable');
 	Route::any('/gestion-de-comprobantes-observados/{idopcion}', 'GestionUsuarioContactoController@actionListarComprobantesObservados');
 	Route::any('/gestion-de-comprobantes-reparable/{idopcion}', 'GestionUsuarioContactoController@actionListarComprobantesReparable');
 
@@ -610,18 +610,17 @@ Route::group(['middleware' => ['authaw']], function () {
     Route::any('/ajax-reporte-inventario', 'ReporteInventarioController@actionAjaxListarReporteInventario');
     Route::any('/descargar-archivo-inventario-consolidado', 'ReporteInventarioController@actionAjaxListarReporteInventarioExcel');
 
-    //VALE A RENDIR 
+    //VALE A RENDIR
     Route::get('/gestionar-vale-rendir/{idopcion}', 'ValeRendirController@actionValeRendir');
     Route::post('/registrar_vale_rendir', 'ValeRendirController@insertValeRendirAction');
 	Route::post('/data_vale_rendir', 'ValeRendirController@traerdataValeRendirAction');
-	Route::post('/ver_detalle_importe_vale', 'ValeRendirController@actionDetalleImporteVale'); 
+Route::post('/ver_detalle_importe_vale', 'ValeRendirController@actionDetalleImporteVale'); 
     Route::post('/ver_mensaje_vale_rendir', 'ValeRendirController@actionMensajeValeRendir');
-
 
 	Route::get('/gestion-autoriza-rendir/{idopcion}', 'ValeRendirAutorizaController@actionValeRendirAutoriza');
 	Route::post('/autorizar_vale_rendir', 'ValeRendirAutorizaController@actionAutorizarValeRendir');
 	Route::post('/rechazar_vale_rendir', 'ValeRendirAutorizaController@actionRechazarValeRendir');
-	Route::post('/ver_detalle_importe_autoriza', 'ValeRendirAutorizaController@actionDetalleImporte'); 
+	Route::post('/ver_detalle_importe_autoriza', 'ValeRendirAutorizaController@actionDetalleImporte');
 
 	Route::get('/gestion-aprueba-rendir/{idopcion}', 'ValeRendirApruebaController@actionValeRendirAprueba');
 	Route::post('/aprobar_vale_rendir', 'ValeRendirApruebaController@actionApruebaValeRendir');
@@ -630,12 +629,12 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::post('/verRegistro_vale_rendir', 'ValeRendirApruebaController@actionVerRegistroValeRendir');
 	Route::post('/obtener_correlativo', 'ValeRendirApruebaController@actionObtenerCorrelativoValeRendir');
 	Route::post('/insertar-osiris', 'ValeRendirApruebaController@actionInsertValeRendirOsiris');
-	Route::post('/ver_detalle_importe', 'ValeRendirApruebaController@actionVerDetalleImporte');  
+	Route::post('/ver_detalle_importe', 'ValeRendirApruebaController@actionVerDetalleImporte');
 
 	//DETALLE A RENDIR
 	Route::post('/data_vale_rendir_detalle', 'ValeRendirController@traerdataValeRendirActionDetalle');
 	Route::post('/eliminar_vale_rendir', 'ValeRendirController@actionEliminarValeRendir');
-	Route::post('/eliminar_vale_rendir_detalle', 'ValeRendirController@actionEliminarValeRendirDetalle'); 
+	Route::post('/eliminar_vale_rendir_detalle', 'ValeRendirController@actionEliminarValeRendirDetalle');
 
 
 

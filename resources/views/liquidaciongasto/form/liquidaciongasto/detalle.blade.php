@@ -7,8 +7,8 @@
           <thead>
             <tr>
               <th>FECHA EMISION</th>
-              <th>DOCUMENTO</th>      
-              <th>TIPO DOCUMENTO</th>       
+              <th>DOCUMENTO</th>
+              <th>TIPO DOCUMENTO</th>
               <th>PROVEEDOR</th>
               <th>CONTRATO</th>
               <th>MONEDA CONTRATO</th>
@@ -17,14 +17,14 @@
           </thead>
           <tbody>
           @foreach($tdetliquidaciongastos as $index => $item)
-              <tr class="filalg {{$item->ID_DOCUMENTO}}{{$item->ITEM}} @if($index == 0) activofl @endif" data_valor="{{$item->ID_DOCUMENTO}}{{$item->ITEM}}">
+              <tr class="filalg {{$item->ID_DOCUMENTO}}{{$item->ITEM}} @if($index == 0) activofl @endif" data_valor="{{$item->ID_DOCUMENTO}}{{$item->ITEM}}" data_asiento_cabecera="{{$item->TXT_CENTRO}}" data_asiento_detalle="{{$item->TOKEN}}">
                 <td>{{date_format(date_create($item->FECHA_EMISION), 'd/m/Y')}}</td>
                 <td>{{$item->SERIE}} - {{$item->NUMERO}} </td>
                 <td>{{$item->TXT_TIPODOCUMENTO}}</td>
-                <td>{{$item->TXT_EMPRESA_PROVEEDOR}}</td> 
+                <td>{{$item->TXT_EMPRESA_PROVEEDOR}}</td>
 
                 <td>{{$item->COD_CONTRATO}}</td>
-                <td>{{$item->TXT_CATEGORIA_MONEDA}}</td> 
+                <td>{{$item->TXT_CATEGORIA_MONEDA}}</td>
 
 
 

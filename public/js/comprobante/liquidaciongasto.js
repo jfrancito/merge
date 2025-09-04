@@ -1,49 +1,1021 @@
-
-$(document).ready(function(){
+$(document).ready(function () {
     var carpeta = $("#carpeta").val();
 
+    //nuevo
+    $(".btn-regresar-lista").on('click', function (e) {
+        $('.tablageneral').toggle("slow");
+        $('.editarcuentas').toggle("slow");
+    });
 
+    $("#anio_asiento").on('change', function () {
 
-    $(".cfedocumento").on('click','.buscartareas', function() {
+        event.preventDefault();
+        let anio = $('#anio_asiento').val();
+        let _token = $('#token').val();
+        //validacioones
+        if (anio == '') {
+            alerterrorajax("Seleccione un anio.");
+            return false;
+        }
+        data = {
+            _token: _token,
+            anio: anio
+        };
 
-        var _token                                   =   $('#token').val();
-        var idopcion                                 =   $('#idopcion').val();
+        ajax_normal_combo(data, "/ajax-combo-periodo-xanio-xempresa", "ajax_anio_asiento")
 
-        data                                         =   {
-                                                                _token                  : _token,
-                                                                idopcion                : idopcion
-                                                         };
-                                        
-        ajax_modal(data,"/ajax-modal-buscar-factura-sunat-tareas",
-                  "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+    });
+
+    $('#tipo_asiento').on('change', function () {
+        if ($(this).val() === "TAS0000000000003" || $(this).val() === "TAS0000000000004") {
+            $('#asientototales').show();
+        } else {
+            $('#asientototales').hide();
+        }
+    });
+
+    $("#porcentaje_detraccion").on('keypress keyup keydown change', function (e) {
+
+        let total_documento = $('#total_xml').val().replace(',', '');
+        let porc_descuento = $(this).val().replace(',', '');
+        let total = parseFloat(total_documento) * parseFloat(porc_descuento) / 100;
+        $('#total_detraccion_asiento').val(Math.round(total));
+
+    });
+
+    $("#tipo_descuento_asiento").on('change', function () {
+
+        event.preventDefault();
+        let tipo_descuento = $('#tipo_descuento_asiento').val();
+
+        if (tipo_descuento === 'DCT0000000000002') {
+            $('#porcentaje_detraccion').prop('disabled', false);
+            $('#const_detraccion_asiento').prop('disabled', false);
+            $('#fecha_detraccion_asiento').prop('disabled', false);
+            $('#porcentaje_detraccion').val(1.00);
+        } else {
+            $('#porcentaje_detraccion').prop('disabled', true);
+            $('#const_detraccion_asiento').prop('disabled', true);
+            $('#fecha_detraccion_asiento').prop('disabled', true);
+            $('#porcentaje_detraccion').val(0.00);
+            $('#total_detraccion').val(0.00);
+        }
+
+    });
+
+    $(".btn-registrar-movimiento").on('click', function (e) {
+
+        let cuenta_contable_id = $('#cuenta_contable_id').val();
+        let afecto_igv = $('#tipo_igv_id').val();
+        let porc_afecto_igv = $('#porc_tipo_igv_id').val();
+        let monto = $('#monto').val();
+        monto = monto.replace(",", "");
+        let partida_id = $('#partida_id').val();
+        let activo = $('#activo').val();
+        let texto = $("#cuenta_contable_id option:selected").text();
+        let numero_cuenta = texto.split(" - ")[0];
+        let glosa_cuenta = texto.split(" - ")[1];
+
+        let asiento_id_editar = $('#asiento_id_editar').val();
+        let form_id_editar = $('#form_id_editar').val();
+        let moneda_id_editar = $('#moneda_id_editar').val();
+        let tc_editar = $('#tc_editar').val();
+
+        let arrayDetalle = null;
+        let arrayCabecera = null;
+        let can_debe_mn = 0.0000;
+        let can_haber_mn = 0.0000;
+        let can_debe_me = 0.0000;
+        let can_haber_me = 0.0000;
+        let ind_producto = 0;
+
+        if (monto === '' || monto === '0.0000') {
+            alerterrorajax("Ingrese un monto");
+            return false;
+        }
+        if (cuenta_contable_id === '') {
+            alerterrorajax("Seleccione una cuenta contable.");
+            return false;
+        }
+        if (partida_id === '') {
+            alerterrorajax("Seleccione una partida.");
+            return false;
+        }
+
+        switch (afecto_igv) {
+            case 'CTI0000000000001':
+                afecto_igv = 'AIGV';
+                break;
+            case 'CTI0000000000002':
+                afecto_igv = 'IIGV';
+                break;
+            case 'CTI0000000000003':
+                afecto_igv = 'EIGV';
+                break;
+            default:
+                afecto_igv = '';
+                break;
+        }
+
+        switch (afecto_igv) {
+            case 'AIGV':
+                if (porc_afecto_igv === '' || porc_afecto_igv === '0') {
+                    alerterrorajax("Selecciono Afecto debe tener porcentaje de IGV.");
+                    return false;
+                }
+                break;
+            case 'IIGV':
+                if (porc_afecto_igv === '10' || porc_afecto_igv === '18') {
+                    alerterrorajax("Selecciono Inafecto no puede tener porcentaje de IGV.");
+                    return false;
+                }
+                break;
+            case 'EIGV':
+                if (porc_afecto_igv === '10' || porc_afecto_igv === '18') {
+                    alerterrorajax("Selecciono Exonerado no puede tener porcentaje de IGV.");
+                    return false;
+                }
+                break;
+        }
+
+        switch (form_id_editar) {
+            case 'C':
+                arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_compra").value);
+                break;
+            case 'RV':
+                arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_reparable_reversion").value);
+                break;
+            case 'D':
+                arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_deduccion").value);
+                break;
+            case 'P':
+                arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_percepcion").value);
+                break;
+        }
+
+        if (moneda_id_editar === 'MON0000000000001') {
+            if (partida_id === 'COP0000000000001') {
+                can_debe_mn = monto;
+                can_haber_mn = 0.0000;
+                can_debe_me = redondear4(parseFloat(monto) / tc_editar);
+                can_haber_me = 0.0000;
+            } else {
+                can_debe_mn = 0.0000;
+                can_haber_mn = monto;
+                can_debe_me = 0.0000;
+                can_haber_me = redondear4(parseFloat(monto) / tc_editar);
+            }
+        } else {
+            if (partida_id === 'COP0000000000001') {
+                can_debe_mn = redondear4(parseFloat(monto) * tc_editar);
+                can_haber_mn = 0.0000;
+                can_debe_me = monto;
+                can_haber_me = 0.0000;
+            } else {
+                can_debe_mn = 0.0000;
+                can_haber_mn = redondear4(parseFloat(monto) * tc_editar);
+                can_debe_me = 0.0000;
+                can_haber_me = monto;
+            }
+        }
+
+        if (afecto_igv !== '') {
+            ind_producto = 1;
+        }
+
+        // Nuevo objeto con todos los campos
+        let nuevoMovimiento = {
+            "COD_ASIENTO_MOVIMIENTO": asiento_id_editar,
+            "COD_EMPR": "IACHEM0000010394",
+            "COD_CENTRO": "CEN0000000000002",
+            "COD_ASIENTO": "IIBEAC0000000001",
+            "COD_CUENTA_CONTABLE": cuenta_contable_id,
+            "IND_PRODUCTO": ind_producto,
+            "TXT_CUENTA_CONTABLE": numero_cuenta,
+            "TXT_GLOSA": glosa_cuenta,
+            "CAN_DEBE_MN": can_debe_mn,
+            "CAN_HABER_MN": can_haber_mn,
+            "CAN_DEBE_ME": can_debe_me,
+            "CAN_HABER_ME": can_haber_me,
+            "NRO_LINEA": "4",
+            "COD_CUO": "",
+            "IND_EXTORNO": "0",
+            "TXT_TIPO_REFERENCIA": "",
+            "TXT_REFERENCIA": "",
+            "COD_USUARIO_CREA_AUD": "1CIX00000001",
+            "FEC_USUARIO_CREA_AUD": "2025-08-19 14:30:00",
+            "COD_USUARIO_MODIF_AUD": "",
+            "FEC_USUARIO_MODIF_AUD": "2025-08-19 14:30:00",
+            "COD_ESTADO": activo,
+            "COD_DOC_CTBLE_REF": afecto_igv,
+            "COD_ORDEN_REF": porc_afecto_igv,
+            "COD_PRODUCTO": "",
+            "TXT_NOMBRE_PRODUCTO": "",
+            "COD_LOTE": "",
+            "NRO_LINEA_PRODUCTO": "0",
+            "COD_EMPR_CLI_REF": "",
+            "TXT_EMPR_CLI_REF": "",
+            "DOCUMENTO_REF": "",
+            "CODIGO_CONTABLE": ""
+        };
+
+        arrayDetalle.push(nuevoMovimiento);
+
+        let base_imponible = 0.0000;
+        let base_imponible_10 = 0.0000;
+        let base_ivap = 0.0000;
+        let base_inafecto = 0.0000;
+        let base_exonerado = 0.0000;
+        let total_igv = 0.0000;
+        let total_ivap = 0.0000;
+        let total = 0.0000;
+
+        // Recorrerlo
+        arrayDetalle.forEach(item => {
+            if (parseInt(item.COD_ESTADO) === 1) {
+                switch (item.COD_DOC_CTBLE_REF) {
+                    case 'AIGV':
+                        if (item.COD_ORDEN_REF === '18') {
+                            base_imponible = base_imponible + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                            if (moneda_id_editar !== 'MON0000000000001') {
+                                base_imponible = base_imponible + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                            }
+                        } else if (item.COD_ORDEN_REF === '10') {
+                            base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                            if (moneda_id_editar !== 'MON0000000000001') {
+                                base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                            }
+                        }
+                        break;
+                    case 'IIGV':
+                        base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                        if (moneda_id_editar !== 'MON0000000000001') {
+                            base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                        }
+                        break;
+                    case 'EIGV':
+                        base_exonerado = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                        if (moneda_id_editar !== 'MON0000000000001') {
+                            base_exonerado = base_exonerado + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                        }
+                        break;
+                }
+                if (/^40/.test(item.TXT_CUENTA_CONTABLE)) {
+                    total_igv = total_igv + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                    if (moneda_id_editar !== 'MON0000000000001') {
+                        total_igv = total_igv + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                    }
+                }
+            }
+        });
+
+        total = base_imponible + base_imponible_10 + base_ivap + base_inafecto + base_exonerado + total_igv + total_ivap;
+
+        // Crear la fila con atributos y estilos
+        let nuevaFila = `
+            <tr class="fila" data_codigo="${asiento_id_editar}" data_asiento="${form_id_editar}"
+                data_moneda="${moneda_id_editar}" data_tc="${tc_editar}">
+                <td class="col-codigo">${asiento_id_editar}</td>
+                <td class="col-cuenta">${numero_cuenta}</td>
+                <td class="col-glosa">${glosa_cuenta}</td>
+                <td class="col-debe-mn" style="text-align: right">${number_format(can_debe_mn, 4, ',', '.')}</td>
+                <td class="col-haber-mn" style="text-align: right">${number_format(can_haber_mn, 4, ',', '.')}</td>
+                <td class="col-debe-me" style="text-align: right">${number_format(can_debe_me, 4, ',', '.')}</td>
+                <td class="col-haber-me" style="text-align: right">${number_format(can_haber_me, 4, ',', '.')}</td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-primary editar-cuenta">
+                        ✏ Editar
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger eliminar-cuenta">
+                        🗑 Eliminar
+                    </button>
+                </td>
+            </tr>
+        `;
+
+        let table = $('#asientodetalle').DataTable();
+
+        switch (form_id_editar) {
+            case 'C':
+                arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
+                // Recorrerlo
+                arrayCabecera.forEach(item => {
+                    item.TOTAL_BASE_IMPONIBLE = base_imponible;
+                    item.TOTAL_BASE_IMPONIBLE_10 = base_imponible_10;
+                    item.TOTAL_BASE_INAFECTA = base_inafecto;
+                    item.TOTAL_BASE_EXONERADA = base_exonerado;
+                    item.TOTAL_IGV = total_igv;
+                    item.TOTAL_AFECTO_IVAP = base_ivap;
+                    item.TOTAL_IVAP = total_ivap;
+                });
+                document.getElementById("asiento_cabecera_compra").value = JSON.stringify(arrayCabecera);
+                document.getElementById("asiento_detalle_compra").value = JSON.stringify(arrayDetalle);
+                // Después de actualizar arrayDetalle
+                table = $('#asientodetalle').DataTable();
+                table.row.add($(nuevaFila)).draw(false);
+                //$("#asientodetalle tbody").append(nuevaFila);
+                $("#asientototales tbody tr").each(function () {
+                    let fila = $(this);
+
+                    // Actualizar las celdas visibles de la tabla
+                    fila.find(".col-base-imponible").text(number_format(base_imponible, 4, ',', '.'));
+                    fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4, ',', '.'));
+                    fila.find(".col-base-ivap").text(number_format(base_ivap, 4, ',', '.'));
+                    fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4, ',', '.'));
+                    fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4, ',', '.'));
+                    fila.find(".col-igv").text(number_format(total_igv, 4, ',', '.'));
+                    fila.find(".col-ivap").text(number_format(total_ivap, 4, ',', '.'));
+                    fila.find(".col-total").text(number_format(total, 4, ',', '.'));
+
+                });
+                break;
+            case 'RV':
+                document.getElementById("asiento_detalle_reparable_reversion").value = JSON.stringify(arrayDetalle);
+                // Después de actualizar arrayDetalle
+                table = $('#asientodetallereversion').DataTable();
+                table.row.add($(nuevaFila)).draw(false);
+                //$("#asientodetallereversion tbody").append(nuevaFila);
+                break;
+            case 'D':
+                document.getElementById("asiento_detalle_deduccion").value = JSON.stringify(arrayDetalle);
+                // Después de actualizar arrayDetalle
+                table = $('#asientodetallededuccion').DataTable();
+                table.row.add($(nuevaFila)).draw(false);
+                //$("#asientodetallededuccion tbody").append(nuevaFila);
+                break;
+            case 'P':
+                arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_percepcion").value);
+                // Recorrerlo
+                arrayCabecera.forEach(item => {
+                    item.TOTAL_BASE_IMPONIBLE = base_imponible;
+                    item.TOTAL_BASE_IMPONIBLE_10 = base_imponible_10;
+                    item.TOTAL_BASE_INAFECTA = base_inafecto;
+                    item.TOTAL_BASE_EXONERADA = base_exonerado;
+                    item.TOTAL_IGV = total_igv;
+                    item.TOTAL_AFECTO_IVAP = base_ivap;
+                    item.TOTAL_IVAP = total_ivap;
+                });
+                document.getElementById("asiento_cabecera_percepcion").value = JSON.stringify(arrayCabecera);
+                document.getElementById("asiento_detalle_percepcion").value = JSON.stringify(arrayDetalle);
+                // Después de actualizar arrayDetalle
+                table = $('#asientodetallepercepcion').DataTable();
+                table.row.add($(nuevaFila)).draw(false);
+                //$("#asientodetallepercepcion tbody").append(nuevaFila);
+                $("#asiento_totales_percepcion tbody tr").each(function () {
+                    let fila = $(this);
+
+                    // Actualizar las celdas visibles de la tabla
+                    fila.find(".col-base-imponible").text(number_format(base_imponible, 4, ',', '.'));
+                    fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4, ',', '.'));
+                    fila.find(".col-base-ivap").text(number_format(base_ivap, 4, ',', '.'));
+                    fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4, ',', '.'));
+                    fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4, ',', '.'));
+                    fila.find(".col-igv").text(number_format(total_igv, 4, ',', '.'));
+                    fila.find(".col-ivap").text(number_format(total_ivap, 4, ',', '.'));
+                    fila.find(".col-total").text(number_format(total, 4, ',', '.'));
+
+                });
+                break;
+        }
+        $('.tablageneral').toggle("slow");
+        $('.editarcuentas').toggle("slow");
+    });
+
+    $(".btn-editar-movimiento").on('click', function (e) {
+
+        let cuenta_contable_id = $('#cuenta_contable_id').val();
+        let afecto_igv = $('#tipo_igv_id').val();
+        let porc_afecto_igv = $('#porc_tipo_igv_id').val();
+        let monto = $('#monto').val();
+        monto = monto.replace(",", "");
+        let partida_id = $('#partida_id').val();
+        let activo = $('#activo').val();
+        let texto = $("#cuenta_contable_id option:selected").text();
+        let numero_cuenta = texto.split(" - ")[0];
+        let glosa_cuenta = texto.split(" - ")[1];
+
+        let asiento_id_editar = $('#asiento_id_editar').val();
+        let form_id_editar = $('#form_id_editar').val();
+        let moneda_id_editar = $('#moneda_id_editar').val();
+        let tc_editar = $('#tc_editar').val();
+
+        let arrayDetalle = null;
+        let arrayCabecera = null;
+        let can_debe_mn = 0.0000;
+        let can_haber_mn = 0.0000;
+        let can_debe_me = 0.0000;
+        let can_haber_me = 0.0000;
+
+        if (monto === '' || monto === '0.0000') {
+            alerterrorajax("Ingrese un monto");
+            return false;
+        }
+        if (cuenta_contable_id === '') {
+            alerterrorajax("Seleccione una cuenta contable.");
+            return false;
+        }
+        if (partida_id === '') {
+            alerterrorajax("Seleccione una partida.");
+            return false;
+        }
+
+        switch (afecto_igv) {
+            case 'CTI0000000000001':
+                afecto_igv = 'AIGV';
+                break;
+            case 'CTI0000000000002':
+                afecto_igv = 'IIGV';
+                break;
+            case 'CTI0000000000003':
+                afecto_igv = 'EIGV';
+                break;
+            default:
+                afecto_igv = '';
+                break;
+        }
+
+        switch (afecto_igv) {
+            case 'AIGV':
+                if (porc_afecto_igv === '' || porc_afecto_igv === '0') {
+                    alerterrorajax("Selecciono Afecto debe tener porcentaje de IGV.");
+                    return false;
+                }
+                break;
+            case 'IIGV':
+                if (porc_afecto_igv === '10' || porc_afecto_igv === '18') {
+                    alerterrorajax("Selecciono Inafecto no puede tener porcentaje de IGV.");
+                    return false;
+                }
+                break;
+            case 'EIGV':
+                if (porc_afecto_igv === '10' || porc_afecto_igv === '18') {
+                    alerterrorajax("Selecciono Exonerado no puede tener porcentaje de IGV.");
+                    return false;
+                }
+                break;
+        }
+
+        switch (form_id_editar) {
+            case 'C':
+                arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_compra").value);
+                break;
+            case 'RV':
+                arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_reparable_reversion").value);
+                break;
+            case 'D':
+                arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_deduccion").value);
+                break;
+            case 'P':
+                arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_percepcion").value);
+                break;
+        }
+
+        if (moneda_id_editar === 'MON0000000000001') {
+            if (partida_id === 'COP0000000000001') {
+                can_debe_mn = monto;
+                can_haber_mn = 0.0000;
+                can_debe_me = redondear4(parseFloat(monto) / tc_editar);
+                can_haber_me = 0.0000;
+            } else {
+                can_debe_mn = 0.0000;
+                can_haber_mn = monto;
+                can_debe_me = 0.0000;
+                can_haber_me = redondear4(parseFloat(monto) / tc_editar);
+            }
+        } else {
+            if (partida_id === 'COP0000000000001') {
+                can_debe_mn = redondear4(parseFloat(monto) * tc_editar);
+                can_haber_mn = 0.0000;
+                can_debe_me = monto;
+                can_haber_me = 0.0000;
+            } else {
+                can_debe_mn = 0.0000;
+                can_haber_mn = redondear4(parseFloat(monto) * tc_editar);
+                can_debe_me = 0.0000;
+                can_haber_me = monto;
+            }
+        }
+
+        let base_imponible = 0.0000;
+        let base_imponible_10 = 0.0000;
+        let base_ivap = 0.0000;
+        let base_inafecto = 0.0000;
+        let base_exonerado = 0.0000;
+        let total_igv = 0.0000;
+        let total_ivap = 0.0000;
+        let total = 0.0000;
+
+        // Recorrerlo
+        arrayDetalle.forEach(item => {
+            if (parseInt(item.COD_ESTADO) === 1) {
+                if (item.COD_ASIENTO_MOVIMIENTO === asiento_id_editar) {
+                    item.COD_CUENTA_CONTABLE = cuenta_contable_id;
+                    item.CAN_DEBE_MN = can_debe_mn;
+                    item.CAN_HABER_MN = can_haber_mn;
+                    item.CAN_DEBE_ME = can_debe_me;
+                    item.CAN_HABER_ME = can_haber_me;
+                    item.COD_DOC_CTBLE_REF = afecto_igv;
+                    item.COD_ORDEN_REF = porc_afecto_igv;
+                    item.COD_ESTADO = activo;
+                }
+                switch (item.COD_DOC_CTBLE_REF) {
+                    case 'AIGV':
+                        if (item.COD_ORDEN_REF === '18') {
+                            base_imponible = base_imponible + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                            if (moneda_id_editar !== 'MON0000000000001') {
+                                base_imponible = base_imponible + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                            }
+                        } else if (item.COD_ORDEN_REF === '10') {
+                            base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                            if (moneda_id_editar !== 'MON0000000000001') {
+                                base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                            }
+                        }
+                        break;
+                    case 'IIGV':
+                        base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                        if (moneda_id_editar !== 'MON0000000000001') {
+                            base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                        }
+                        break;
+                    case 'EIGV':
+                        base_exonerado = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                        if (moneda_id_editar !== 'MON0000000000001') {
+                            base_exonerado = base_exonerado + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                        }
+                        break;
+                }
+                if (/^40/.test(item.TXT_CUENTA_CONTABLE)) {
+                    total_igv = total_igv + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                    if (moneda_id_editar !== 'MON0000000000001') {
+                        total_igv = total_igv + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                    }
+                }
+            }
+        });
+
+        total = base_imponible + base_imponible_10 + base_ivap + base_inafecto + base_exonerado + total_igv + total_ivap;
+
+        switch (form_id_editar) {
+            case 'C':
+                arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
+                // Recorrerlo
+                arrayCabecera.forEach(item => {
+                    item.TOTAL_BASE_IMPONIBLE = base_imponible;
+                    item.TOTAL_BASE_IMPONIBLE_10 = base_imponible_10;
+                    item.TOTAL_BASE_INAFECTA = base_inafecto;
+                    item.TOTAL_BASE_EXONERADA = base_exonerado;
+                    item.TOTAL_IGV = total_igv;
+                    item.TOTAL_AFECTO_IVAP = base_ivap;
+                    item.TOTAL_IVAP = total_ivap;
+                });
+                document.getElementById("asiento_cabecera_compra").value = JSON.stringify(arrayCabecera);
+                document.getElementById("asiento_detalle_compra").value = JSON.stringify(arrayDetalle);
+                // Después de actualizar arrayDetalle
+                $("#asientodetalle tbody tr").each(function () {
+                    let fila = $(this);
+
+                    // buscamos en la fila el hidden con el id del asiento
+                    let codAsiento = fila.attr('data_codigo');
+
+                    if (codAsiento === asiento_id_editar) {
+                        // Actualizar las celdas visibles de la tabla
+                        fila.find(".col-cuenta").text(numero_cuenta);
+                        fila.find(".col-glosa").text(glosa_cuenta);
+                        fila.find(".col-debe-mn").text(number_format(can_debe_mn, 4, ',', '.'));
+                        fila.find(".col-haber-mn").text(number_format(can_haber_mn, 4, ',', '.'));
+                        fila.find(".col-debe-me").text(number_format(can_debe_me, 4, ',', '.'));
+                        fila.find(".col-haber-me").text(number_format(can_haber_me, 4, ',', '.'));
+                    }
+                });
+                $("#asientototales tbody tr").each(function () {
+                    let fila = $(this);
+
+                    // Actualizar las celdas visibles de la tabla
+                    fila.find(".col-base-imponible").text(number_format(base_imponible, 4, ',', '.'));
+                    fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4, ',', '.'));
+                    fila.find(".col-base-ivap").text(number_format(base_ivap, 4, ',', '.'));
+                    fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4, ',', '.'));
+                    fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4, ',', '.'));
+                    fila.find(".col-igv").text(number_format(total_igv, 4, ',', '.'));
+                    fila.find(".col-ivap").text(number_format(total_ivap, 4, ',', '.'));
+                    fila.find(".col-total").text(number_format(total, 4, ',', '.'));
+
+                });
+                break;
+            case 'RV':
+                document.getElementById("asiento_detalle_reparable_reversion").value = JSON.stringify(arrayDetalle);
+                // Después de actualizar arrayDetalle
+                $("#asientodetallereversion tbody tr").each(function () {
+                    let fila = $(this);
+
+                    // buscamos en la fila el hidden con el id del asiento
+                    let codAsiento = fila.attr('data_codigo');
+
+                    if (codAsiento === asiento_id_editar) {
+                        // Actualizar las celdas visibles de la tabla
+                        fila.find(".col-cuenta").text(numero_cuenta);
+                        fila.find(".col-glosa").text(glosa_cuenta);
+                        fila.find(".col-debe-mn").text(number_format(can_debe_mn, 4, ',', '.'));
+                        fila.find(".col-haber-mn").text(number_format(can_haber_mn, 4, ',', '.'));
+                        fila.find(".col-debe-me").text(number_format(can_debe_me, 4, ',', '.'));
+                        fila.find(".col-haber-me").text(number_format(can_haber_me, 4, ',', '.'));
+                    }
+                });
+                break;
+            case 'D':
+                document.getElementById("asiento_detalle_deduccion").value = JSON.stringify(arrayDetalle);
+                // Después de actualizar arrayDetalle
+                $("#asientodetallededuccion tbody tr").each(function () {
+                    let fila = $(this);
+
+                    // buscamos en la fila el hidden con el id del asiento
+                    let codAsiento = fila.attr('data_codigo');
+
+                    if (codAsiento === asiento_id_editar) {
+                        // Actualizar las celdas visibles de la tabla
+                        fila.find(".col-cuenta").text(numero_cuenta);
+                        fila.find(".col-glosa").text(glosa_cuenta);
+                        fila.find(".col-debe-mn").text(number_format(can_debe_mn, 4, ',', '.'));
+                        fila.find(".col-haber-mn").text(number_format(can_haber_mn, 4, ',', '.'));
+                        fila.find(".col-debe-me").text(number_format(can_debe_me, 4, ',', '.'));
+                        fila.find(".col-haber-me").text(number_format(can_haber_me, 4, ',', '.'));
+                    }
+                });
+                break;
+            case 'P':
+                arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_percepcion").value);
+                // Recorrerlo
+                arrayCabecera.forEach(item => {
+                    item.TOTAL_BASE_IMPONIBLE = base_imponible;
+                    item.TOTAL_BASE_IMPONIBLE_10 = base_imponible_10;
+                    item.TOTAL_BASE_INAFECTA = base_inafecto;
+                    item.TOTAL_BASE_EXONERADA = base_exonerado;
+                    item.TOTAL_IGV = total_igv;
+                    item.TOTAL_AFECTO_IVAP = base_ivap;
+                    item.TOTAL_IVAP = total_ivap;
+                });
+                document.getElementById("asiento_cabecera_percepcion").value = JSON.stringify(arrayCabecera);
+                document.getElementById("asiento_detalle_percepcion").value = JSON.stringify(arrayDetalle);
+                // Después de actualizar arrayDetalle
+                $("#asientodetallepercepcion tbody tr").each(function () {
+                    let fila = $(this);
+
+                    // buscamos en la fila el hidden con el id del asiento
+                    let codAsiento = fila.attr('data_codigo');
+
+                    if (codAsiento === asiento_id_editar) {
+                        // Actualizar las celdas visibles de la tabla
+                        fila.find(".col-cuenta").text(numero_cuenta);
+                        fila.find(".col-glosa").text(glosa_cuenta);
+                        fila.find(".col-debe-mn").text(number_format(can_debe_mn, 4, ',', '.'));
+                        fila.find(".col-haber-mn").text(number_format(can_haber_mn, 4, ',', '.'));
+                        fila.find(".col-debe-me").text(number_format(can_debe_me, 4, ',', '.'));
+                        fila.find(".col-haber-me").text(number_format(can_haber_me, 4, ',', '.'));
+                    }
+                });
+                $("#asiento_totales_percepcion tbody tr").each(function () {
+                    let fila = $(this);
+
+                    // Actualizar las celdas visibles de la tabla
+                    fila.find(".col-base-imponible").text(number_format(base_imponible, 4, ',', '.'));
+                    fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4, ',', '.'));
+                    fila.find(".col-base-ivap").text(number_format(base_ivap, 4, ',', '.'));
+                    fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4, ',', '.'));
+                    fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4, ',', '.'));
+                    fila.find(".col-igv").text(number_format(total_igv, 4, ',', '.'));
+                    fila.find(".col-ivap").text(number_format(total_ivap, 4, ',', '.'));
+                    fila.find(".col-total").text(number_format(total, 4, ',', '.'));
+
+                });
+                break;
+        }
+        $('.tablageneral').toggle("slow");
+        $('.editarcuentas').toggle("slow");
+    });
+
+    $(".agregar-linea").on('click', function (e) {
+
+        let data_codigo = 'ASTMOV';
+        let data_asiento = $(this).attr("data");
+        let data_moneda = document.getElementById("moneda_asiento").value;
+        let data_tc = document.getElementById("tipo_cambio_asiento").value;
+        let arrayDetalle = null;
+        let data_cuenta_id = '';
+        let data_porc_afecto = '';
+        let afecto = '';
+        let partida = '';
+        let monto = 0.0000;
+
+        switch (data_asiento) {
+            case 'C':
+                arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_compra").value);
+                break;
+            case 'RV':
+                arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_reparable_reversion").value);
+                break;
+            case 'D':
+                arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_deduccion").value);
+                break;
+            case 'P':
+                arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_percepcion").value);
+                break;
+        }
+
+        data_codigo = data_codigo + (arrayDetalle.length + 1).toString();
+
+        $('#cuenta_contable_id').val(data_cuenta_id.trim()).trigger('change');
+        $('#partida_id').val(partida.trim()).trigger('change');
+        $('#tipo_igv_id').val(afecto.trim()).trigger('change');
+        $('#porc_tipo_igv_id').val(data_porc_afecto.trim()).trigger('change');
+        $('#partida_id').val(partida).trigger('change');
+        $('#monto').val(monto);
+
+        $('#asiento_id_editar').val(data_codigo);
+        $('#form_id_editar').val(data_asiento);
+        $('#moneda_id_editar').val(data_moneda);
+        $('#tc_editar').val(data_tc);
+
+        $('.btn-editar-movimiento').hide();
+        $('.btn-registrar-movimiento').show();
+        $('.tablageneral').toggle("slow");
+        $('.editarcuentas').toggle("slow");
+
+    });
+
+    $(document).on('click', ".eliminar-cuenta", function (e) {
+
+        let data_codigo = $(this).parents('.fila').attr('data_codigo');
+        let data_asiento = $(this).parents('.fila').attr('data_asiento');
+        let moneda_id_editar = $(this).parents('.fila').attr('data_moneda');
+        let arrayDetalle = null;
+        let arrayCabecera = null;
+
+        switch (data_asiento) {
+            case 'C':
+                arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_compra").value);
+                break;
+            case 'RV':
+                arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_reparable_reversion").value);
+                break;
+            case 'D':
+                arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_deduccion").value);
+                break;
+            case 'P':
+                arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_percepcion").value);
+                break;
+        }
+
+        let base_imponible = 0.0000;
+        let base_imponible_10 = 0.0000;
+        let base_ivap = 0.0000;
+        let base_inafecto = 0.0000;
+        let base_exonerado = 0.0000;
+        let total_igv = 0.0000;
+        let total_ivap = 0.0000;
+        let total = 0.0000;
+
+        // Recorrerlo
+        arrayDetalle.forEach(item => {
+            if (item.COD_ASIENTO_MOVIMIENTO === data_codigo) {
+                item.COD_ESTADO = '0';
+            }
+            if (parseInt(item.COD_ESTADO) === 1) {
+                switch (item.COD_DOC_CTBLE_REF) {
+                    case 'AIGV':
+                        if (item.COD_ORDEN_REF === '18') {
+                            base_imponible = base_imponible + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                            if (moneda_id_editar !== 'MON0000000000001') {
+                                base_imponible = base_imponible + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                            }
+                        } else if (item.COD_ORDEN_REF === '10') {
+                            base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                            if (moneda_id_editar !== 'MON0000000000001') {
+                                base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                            }
+                        }
+                        break;
+                    case 'IIGV':
+                        base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                        if (moneda_id_editar !== 'MON0000000000001') {
+                            base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                        }
+                        break;
+                    case 'EIGV':
+                        base_exonerado = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                        if (moneda_id_editar !== 'MON0000000000001') {
+                            base_exonerado = base_exonerado + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                        }
+                        break;
+                }
+                if (/^40/.test(item.TXT_CUENTA_CONTABLE)) {
+                    total_igv = total_igv + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                    if (moneda_id_editar !== 'MON0000000000001') {
+                        total_igv = total_igv + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                    }
+                }
+            }
+        });
+
+        total = base_imponible + base_imponible_10 + base_ivap + base_inafecto + base_exonerado + total_igv + total_ivap;
+
+        switch (data_asiento) {
+            case 'C':
+                arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
+                // Recorrerlo
+                arrayCabecera.forEach(item => {
+                    item.TOTAL_BASE_IMPONIBLE = base_imponible;
+                    item.TOTAL_BASE_IMPONIBLE_10 = base_imponible_10;
+                    item.TOTAL_BASE_INAFECTA = base_inafecto;
+                    item.TOTAL_BASE_EXONERADA = base_exonerado;
+                    item.TOTAL_IGV = total_igv;
+                    item.TOTAL_AFECTO_IVAP = base_ivap;
+                    item.TOTAL_IVAP = total_ivap;
+                });
+                console.log(arrayCabecera);
+                document.getElementById("asiento_cabecera_compra").value = JSON.stringify(arrayCabecera);
+                document.getElementById("asiento_detalle_compra").value = JSON.stringify(arrayDetalle);
+                $("#asientototales tbody tr").each(function () {
+                    let fila = $(this);
+
+                    // Actualizar las celdas visibles de la tabla
+                    fila.find(".col-base-imponible").text(number_format(base_imponible, 4, ',', '.'));
+                    fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4, ',', '.'));
+                    fila.find(".col-base-ivap").text(number_format(base_ivap, 4, ',', '.'));
+                    fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4, ',', '.'));
+                    fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4, ',', '.'));
+                    fila.find(".col-igv").text(number_format(total_igv, 4, ',', '.'));
+                    fila.find(".col-ivap").text(number_format(total_ivap, 4, ',', '.'));
+                    fila.find(".col-total").text(number_format(total, 4, ',', '.'));
+
+                });
+                break;
+            case 'P':
+                arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_percepcion").value);
+                // Recorrerlo
+                arrayCabecera.forEach(item => {
+                    item.TOTAL_BASE_IMPONIBLE = base_imponible;
+                    item.TOTAL_BASE_IMPONIBLE_10 = base_imponible_10;
+                    item.TOTAL_BASE_INAFECTA = base_inafecto;
+                    item.TOTAL_BASE_EXONERADA = base_exonerado;
+                    item.TOTAL_IGV = total_igv;
+                    item.TOTAL_AFECTO_IVAP = base_ivap;
+                    item.TOTAL_IVAP = total_ivap;
+                });
+                document.getElementById("asiento_cabecera_percepcion").value = JSON.stringify(arrayCabecera);
+                document.getElementById("asiento_detalle_percepcion").value = JSON.stringify(arrayDetalle);
+                $("#asiento_totales_percepcion tbody tr").each(function () {
+                    let fila = $(this);
+
+                    // Actualizar las celdas visibles de la tabla
+                    fila.find(".col-base-imponible").text(number_format(base_imponible, 4, ',', '.'));
+                    fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4, ',', '.'));
+                    fila.find(".col-base-ivap").text(number_format(base_ivap, 4, ',', '.'));
+                    fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4, ',', '.'));
+                    fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4, ',', '.'));
+                    fila.find(".col-igv").text(number_format(total_igv, 4, ',', '.'));
+                    fila.find(".col-ivap").text(number_format(total_ivap, 4, ',', '.'));
+                    fila.find(".col-total").text(number_format(total, 4, ',', '.'));
+
+                });
+                break;
+        }
+
+        $(this).closest("tr").remove();
+
+    });
+
+    $(document).on('click', ".editar-cuenta", function (e) {
+
+        let data_codigo = $(this).parents('.fila').attr('data_codigo');
+        let data_asiento = $(this).parents('.fila').attr('data_asiento');
+        let data_moneda = $(this).parents('.fila').attr('data_moneda');
+        let data_tc = $(this).parents('.fila').attr('data_tc');
+        let arrayDetalle = null;
+        let data_cuenta_id = '';
+        let data_debe_mn = 0.0000;
+        let data_haber_mn = 0.0000;
+        let data_debe_me = 0.0000;
+        let data_haber_me = 0.0000;
+        let data_afecto = '';
+        let data_porc_afecto = '';
+        let afecto = '';
+        let partida = 'COP0000000000001';
+        let monto = 0.0000;
+
+        switch (data_asiento) {
+            case 'C':
+                arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_compra").value);
+                break;
+            case 'RV':
+                arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_reparable_reversion").value);
+                break;
+            case 'D':
+                arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_deduccion").value);
+                break;
+            case 'P':
+                arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_percepcion").value);
+                break;
+        }
+
+        // Recorrerlo
+        arrayDetalle.forEach(item => {
+            if (item.COD_ASIENTO_MOVIMIENTO === data_codigo) {
+                data_cuenta_id = item.COD_CUENTA_CONTABLE;
+                data_debe_mn = item.CAN_DEBE_MN;
+                data_haber_mn = item.CAN_HABER_MN;
+                data_debe_me = item.CAN_DEBE_ME;
+                data_haber_me = item.CAN_HABER_ME;
+                data_afecto = item.COD_DOC_CTBLE_REF;
+                data_porc_afecto = item.COD_ORDEN_REF;
+                return; // saltar esta iteración
+            }
+        });
+
+        switch (data_afecto) {
+            case 'AIGV':
+                afecto = 'CTI0000000000001';
+                break;
+            case 'IIGV':
+                afecto = 'CTI0000000000002';
+                break;
+            case 'EIGV':
+                afecto = 'CTI0000000000003';
+                break;
+            default:
+                afecto = '';
+                break;
+        }
+
+        if (parseFloat(data_haber_mn) > 0) {
+            partida = 'COP0000000000002';
+        }
+
+        monto = parseFloat(data_debe_me) + parseFloat(data_haber_me);
+
+        if (data_moneda === 'MON0000000000001') {
+            monto = parseFloat(data_debe_mn) + parseFloat(data_haber_mn);
+        }
+
+        $('#cuenta_contable_id').val(data_cuenta_id.trim()).trigger('change');
+        $('#partida_id').val(partida.trim()).trigger('change');
+        $('#tipo_igv_id').val(afecto.trim()).trigger('change');
+        $('#porc_tipo_igv_id').val(data_porc_afecto.trim()).trigger('change');
+        $('#monto').val(monto);
+
+        $('#asiento_id_editar').val(data_codigo);
+        $('#form_id_editar').val(data_asiento);
+        $('#moneda_id_editar').val(data_moneda);
+        $('#tc_editar').val(data_tc);
+
+        $('.btn-registrar-movimiento').hide();
+        $('.btn-editar-movimiento').show();
+        $('.tablageneral').toggle("slow");
+        $('.editarcuentas').toggle("slow");
+
+    });
+
+    //nuevo
+
+    $(".cfedocumento").on('click', '.buscartareas', function () {
+
+        var _token = $('#token').val();
+        var idopcion = $('#idopcion').val();
+
+        data = {
+            _token: _token,
+            idopcion: idopcion
+        };
+
+        ajax_modal(data, "/ajax-modal-buscar-factura-sunat-tareas",
+            "modal-detalle-requerimiento", "modal-detalle-requerimiento-container");
 
     });
 
 
-    $(".liquidaciongasto").on('click','.ver_cuenta_bancaria', function() {
+    $(".liquidaciongasto").on('click', '.ver_cuenta_bancaria', function () {
 
-        var _token                  =   $('#token').val();
-        var ID_DOCUMENTO            =   $('#ID_DOCUMENTO').val();
-        var idopcion                =   $('#idopcion').val();
-        data                        =   {
-                                            _token                  : _token,
-                                            ID_DOCUMENTO            : ID_DOCUMENTO,
-                                        };
+        var _token = $('#token').val();
+        var ID_DOCUMENTO = $('#ID_DOCUMENTO').val();
+        var idopcion = $('#idopcion').val();
+        data = {
+            _token: _token,
+            ID_DOCUMENTO: ID_DOCUMENTO,
+        };
 
-        ajax_modal(data,"/ajax-modal-ver-cuenta-bancaria-lq",
-                  "modal-configuracion-usuario-detalle","modal-configuracion-usuario-detalle-container");
+        ajax_modal(data, "/ajax-modal-ver-cuenta-bancaria-lq",
+            "modal-configuracion-usuario-detalle", "modal-configuracion-usuario-detalle-container");
 
     });
 
 
+    $(".liquidaciongasto").on('change', '#tipopago_id', function () {
 
-    $(".liquidaciongasto").on('change','#tipopago_id', function() {
-
-        var _token              =   $('#token').val();
-        var tipopago_id     =   $(this).val();
-        var ID_DOCUMENTO        =   $('#ID_DOCUMENTO').val();
+        var _token = $('#token').val();
+        var tipopago_id = $(this).val();
+        var ID_DOCUMENTO = $('#ID_DOCUMENTO').val();
         $('.detallecuenta').hide();
-        if(tipopago_id == 'MPC0000000000002'){
+        if (tipopago_id == 'MPC0000000000002') {
 
             $('.detallecuenta').show();
         }
@@ -51,64 +1023,69 @@ $(document).ready(function(){
     });
 
 
+    $(".liquidaciongasto").on('change', '.entidadbanco', function () {
 
-    $(".liquidaciongasto").on('change','.entidadbanco', function() {
 
-
-        var _token              =   $('#token').val();
-        var entidadbanco_id     =   $(this).val();
-        var ID_DOCUMENTO        =   $('#ID_DOCUMENTO').val();
+        var _token = $('#token').val();
+        var entidadbanco_id = $(this).val();
+        var ID_DOCUMENTO = $('#ID_DOCUMENTO').val();
 
         $.ajax({
-              type    :     "POST",
-              url     :     carpeta+"/ajax-cuenta-bancaria-proveedor-lq",
-              data    :     {
-                                _token              : _token,
-                                entidadbanco_id     : entidadbanco_id,
-                                ID_DOCUMENTO        : ID_DOCUMENTO
-                            },
-                success: function (data) {
-                    $('.ajax_cb').html(data);
-                },
-                error: function (data) {
-                    error500(data);
-                }
+            type: "POST",
+            url: carpeta + "/ajax-cuenta-bancaria-proveedor-lq",
+            data: {
+                _token: _token,
+                entidadbanco_id: entidadbanco_id,
+                ID_DOCUMENTO: ID_DOCUMENTO
+            },
+            success: function (data) {
+                $('.ajax_cb').html(data);
+            },
+            error: function (data) {
+                error500(data);
+            }
         });
     });
 
-    $(".liquidaciongasto").on('click','.agregar_cuenta_bancaria', function() {
+    $(".liquidaciongasto").on('click', '.agregar_cuenta_bancaria', function () {
 
-        var _token                  =   $('#token').val();
-        var idopcion                =   $('#idopcion').val();
-        var ID_DOCUMENTO            =   $('#ID_DOCUMENTO').val();
+        var _token = $('#token').val();
+        var idopcion = $('#idopcion').val();
+        var ID_DOCUMENTO = $('#ID_DOCUMENTO').val();
 
-        data                        =   {
-                                            _token                  : _token,
-                                            ID_DOCUMENTO            : ID_DOCUMENTO,
-                                            idopcion                : idopcion,
+        data = {
+            _token: _token,
+            ID_DOCUMENTO: ID_DOCUMENTO,
+            idopcion: idopcion,
 
-                                        };
+        };
 
-        ajax_modal(data,"/ajax-modal-configuracion-cuenta-bancaria-lq",
-                  "modal-configuracion-usuario-detalle","modal-configuracion-usuario-detalle-container");
+        ajax_modal(data, "/ajax-modal-configuracion-cuenta-bancaria-lq",
+            "modal-configuracion-usuario-detalle", "modal-configuracion-usuario-detalle-container");
 
     });
 
 
-    $(".liquidaciongasto").on('click','#descargarcomprobantemasivoexcel', function() {
+    $(".liquidaciongasto").on('click', '#descargarcomprobantemasivoexcel', function () {
 
-        var fecha_inicio         =   $('#fecha_inicio').val();
-        var fecha_fin            =   $('#fecha_fin').val();
-        var proveedor_id         =   $('#proveedor_id').val();
-        var estado_id            =   $('#estado_id').val();
-        var idopcion             =   $('#idopcion').val();
-        var _token               =   $('#token').val();
+        var fecha_inicio = $('#fecha_inicio').val();
+        var fecha_fin = $('#fecha_fin').val();
+        var proveedor_id = $('#proveedor_id').val();
+        var estado_id = $('#estado_id').val();
+        var idopcion = $('#idopcion').val();
+        var _token = $('#token').val();
 
         //validacioones
-        if(fecha_inicio ==''){ alerterrorajax("Seleccione una fecha inicio."); return false;}
-        if(fecha_fin ==''){ alerterrorajax("Seleccione una fecha fin."); return false;}
+        if (fecha_inicio == '') {
+            alerterrorajax("Seleccione una fecha inicio.");
+            return false;
+        }
+        if (fecha_fin == '') {
+            alerterrorajax("Seleccione una fecha fin.");
+            return false;
+        }
 
-        href = $(this).attr('data-href')+'/'+fecha_inicio+'/'+fecha_fin+'/'+proveedor_id+'/'+estado_id+'/'+idopcion;
+        href = $(this).attr('data-href') + '/' + fecha_inicio + '/' + fecha_fin + '/' + proveedor_id + '/' + estado_id + '/' + idopcion;
         $(this).prop('href', href);
         return true;
 
@@ -116,46 +1093,45 @@ $(document).ready(function(){
     });
 
 
-    $(".liquidaciongasto").on('change','#moneda_sel_c_id', function(e) {
+    $(".liquidaciongasto").on('change', '#moneda_sel_c_id', function (e) {
 
-        var _token                  =   $('#token').val();
-        var empresa_id              =   $('#empresa_id').val();
-        var moneda_sel_id           =   $('#moneda_sel_c_id').val();
-        var link                    =   "/ajax-combo-cuenta-xmoneda";
-        var contenedor              =   "ajax_combo_cuenta_moneda";
+        var _token = $('#token').val();
+        var empresa_id = $('#empresa_id').val();
+        var moneda_sel_id = $('#moneda_sel_c_id').val();
+        var link = "/ajax-combo-cuenta-xmoneda";
+        var contenedor = "ajax_combo_cuenta_moneda";
         debugger;
 
-        data                        =   {
-                                            _token                  : _token,
-                                            empresa_id              : empresa_id,
-                                            moneda_sel_id           : moneda_sel_id
-                                        };
+        data = {
+            _token: _token,
+            empresa_id: empresa_id,
+            moneda_sel_id: moneda_sel_id
+        };
 
-        ajax_normal_combo(data,link,contenedor);
+        ajax_normal_combo(data, link, contenedor);
 
     });
 
 
+    $(".liquidaciongasto").on('click', '.btn-guardar-whatsapp', function () {
 
-    $(".liquidaciongasto").on('click','.btn-guardar-whatsapp', function() {
-
-        var _token                                   =   $('#token').val();
-        var whatsapp                                 =   $('#whatsapp').val();
+        var _token = $('#token').val();
+        var whatsapp = $('#whatsapp').val();
         if (!/^\d{9}$/.test(whatsapp)) {
             alerterrorajax("El número de WhatsApp debe tener exactamente 9 dígitos");
             return false;
         }
-        const link                                   =   '/guardar-numero-de-whatsapp';
+        const link = '/guardar-numero-de-whatsapp';
 
-        data                                         =   {
-                                                                _token                  : _token,
-                                                                whatsapp                : whatsapp
-                                                         };                                       
+        data = {
+            _token: _token,
+            whatsapp: whatsapp
+        };
         abrircargando();
         $.ajax({
-            type    :   "POST",
-            url     :   carpeta+link,
-            data    :   data,
+            type: "POST",
+            url: carpeta + link,
+            data: data,
             success: function (data) {
                 cerrarcargando();
                 alertajax('Se registro su whatsapp.');
@@ -170,42 +1146,45 @@ $(document).ready(function(){
     });
 
 
-    $(".liquidaciongasto").on('click','.btncargarsunat', function(e) {
+    $(".liquidaciongasto").on('click', '.btncargarsunat', function (e) {
         e.preventDefault(); // Prevenir recarga del formulario
 
-        var RUTAXML                 =   $('#RUTAXML').val();
-        var RUTAPDF                 =   $('#RUTAPDF').val();
-        var RUTACDR                 =   $('#RUTACDR').val();
-        var exml                    =   $('.exml').html();
-        var epdf                    =   $('.epdf').html();
-        var ecdr                    =   $('.ecdr').html();
+        var RUTAXML = $('#RUTAXML').val();
+        var RUTAPDF = $('#RUTAPDF').val();
+        var RUTACDR = $('#RUTACDR').val();
+        var exml = $('.exml').html();
+        var epdf = $('.epdf').html();
+        var ecdr = $('.ecdr').html();
 
-        var _token                  =   $('#token').val();
-        var ID_DOCUMENTO            =   $('#ID_DOCUMENTO').val();
-        if(RUTAXML ==''){ alerterrorajax("No existe XML para Cargar."); return false;}
+        var _token = $('#token').val();
+        var ID_DOCUMENTO = $('#ID_DOCUMENTO').val();
+        if (RUTAXML == '') {
+            alerterrorajax("No existe XML para Cargar.");
+            return false;
+        }
 
-        data                                         =   {
-                                                                _token                  : _token,
-                                                                ID_DOCUMENTO            : ID_DOCUMENTO,
-                                                                RUTAXML                 : RUTAXML,
-                                                                RUTAPDF                 : RUTAPDF,
-                                                                RUTACDR                 : RUTACDR,
-                                                                exml                    : exml,
-                                                                epdf                    : epdf,
-                                                                ecdr                    : ecdr,
+        data = {
+            _token: _token,
+            ID_DOCUMENTO: ID_DOCUMENTO,
+            RUTAXML: RUTAXML,
+            RUTAPDF: RUTAPDF,
+            RUTACDR: RUTACDR,
+            exml: exml,
+            epdf: epdf,
+            ecdr: ecdr,
 
-                                                         };   
+        };
 
-        const link          =   '/ajax-leer-xml-lg-sunat';
+        const link = '/ajax-leer-xml-lg-sunat';
         abrircargando();
         $.ajax({
-            type    :   "POST",
-            url     :   carpeta+link,
-            data    :   data,
+            type: "POST",
+            url: carpeta + link,
+            data: data,
             success: function (data) {
                 cerrarcargando();
                 debugger;
-                if(data.error == 0){
+                if (data.error == 0) {
                     $('#serie').val(data.SERIE);
                     $('#numero').val(data.NUMERO);
                     $('#fecha_emision').val(data.FEC_VENTA);
@@ -240,23 +1219,23 @@ $(document).ready(function(){
                     $('.DCC0000000000004').hide();
 
                     let valor = data.SERIE;
-                    let primeraLetraSerire = valor.charAt(0);   
-                    if(primeraLetraSerire=='E'){
-                        if (data.RUTAPDF){
+                    let primeraLetraSerire = valor.charAt(0);
+                    if (primeraLetraSerire == 'E') {
+                        if (data.RUTAPDF) {
                             $('.DCC0000000000036').hide();
-                        }else{
+                        } else {
                             $('.DCC0000000000036').show();
                         }
-                    }else{
+                    } else {
 
-                       if (data.RUTAPDF){
+                        if (data.RUTAPDF) {
                             $('.DCC0000000000036').hide();
-                        }else{
+                        } else {
                             $('.DCC0000000000036').show();
                         }
-                       if (data.RUTACDR){
+                        if (data.RUTACDR) {
                             $('.DCC0000000000004').hide();
-                        }else{
+                        } else {
                             $('.DCC0000000000004').show();
                         }
                     }
@@ -265,7 +1244,7 @@ $(document).ready(function(){
                     //DETALLE DEL PRODUCTO
 
                     $('#tdxml tbody').empty(); // Limpia la tabla primero
-                    data.DETALLE.forEach(function(item, index) {
+                    data.DETALLE.forEach(function (item, index) {
                         const fila = `
                           <tr>
                             <td class="cell-detail d${index}" style="position: relative;" >
@@ -285,7 +1264,7 @@ $(document).ready(function(){
                     });
 
 
-                }else{
+                } else {
                     alerterrorajax(data.mensaje);
                 }
                 console.log(data);
@@ -299,15 +1278,15 @@ $(document).ready(function(){
 
     });
 
-    $(".cfedocumento").on('click','.btn-extonar-lg', function(e) {
+    $(".cfedocumento").on('click', '.btn-extonar-lg', function (e) {
         event.preventDefault();
-        var _token                  =   $('#token').val();
+        var _token = $('#token').val();
         $.confirm({
             title: '¿Confirma el extorno?',
             content: 'Extorno de Liquidacion de Gastos',
             buttons: {
                 confirmar: function () {
-                     $( "#forextornar" ).submit();   
+                    $("#forextornar").submit();
                 },
                 cancelar: function () {
                     $.alert('Se cancelo el extorno');
@@ -317,17 +1296,17 @@ $(document).ready(function(){
         });
     });
 
-    $(".liquidaciongasto").on('click','.btn-extonar-detalle-lg', function(e) {
+    $(".liquidaciongasto").on('click', '.btn-extonar-detalle-lg', function (e) {
         event.preventDefault();
-        var _token                  =   $('#token').val();
-        var data_item               =   $(this).attr('data_item');
+        var _token = $('#token').val();
+        var data_item = $(this).attr('data_item');
 
         $.confirm({
             title: '¿Confirma el extorno?',
             content: 'Extorno de Detalle Liquidacion de Gastos',
             buttons: {
                 confirmar: function () {
-                     $("#forextornardetallelq"+data_item).submit();   
+                    $("#forextornardetallelq" + data_item).submit();
                 },
                 cancelar: function () {
                     $.alert('Se cancelo el extorno');
@@ -338,76 +1317,88 @@ $(document).ready(function(){
     });
 
 
-    $(".liquidaciongasto").on('click','.btn_tarea_cpe_lg', function() {
+    $(".liquidaciongasto").on('click', '.btn_tarea_cpe_lg', function () {
 
-        var _token                                   =   $('#token').val();
-        var ID_DOCUMENTO                             =   $('#ID_DOCUMENTO').val();
-        var idopcion                                 =   $('#idopcion').val();
-        var ruc                                      =   $('#ruc_sunat').val();
-        var td                                       =   $('#td').val();
-        var serie                                    =   $('#serie_sunat').val();
-        var correlativo                              =   $('#correlativo_sunat').val();
-        if(ruc ==''){ alerterrorajax("Ingrese un ruc."); return false;}
-        if(td ==''){ alerterrorajax("Seleccione un tipo de documento."); return false;}
-        if(serie ==''){ alerterrorajax("Ingrese un serie."); return false;}
-        if(correlativo ==''){ alerterrorajax("Ingrese un correlativo."); return false;}
+        var _token = $('#token').val();
+        var ID_DOCUMENTO = $('#ID_DOCUMENTO').val();
+        var idopcion = $('#idopcion').val();
+        var ruc = $('#ruc_sunat').val();
+        var td = $('#td').val();
+        var serie = $('#serie_sunat').val();
+        var correlativo = $('#correlativo_sunat').val();
+        if (ruc == '') {
+            alerterrorajax("Ingrese un ruc.");
+            return false;
+        }
+        if (td == '') {
+            alerterrorajax("Seleccione un tipo de documento.");
+            return false;
+        }
+        if (serie == '') {
+            alerterrorajax("Ingrese un serie.");
+            return false;
+        }
+        if (correlativo == '') {
+            alerterrorajax("Ingrese un correlativo.");
+            return false;
+        }
 
-        data                                         =   {
-                                                                _token                  : _token,
-                                                                ID_DOCUMENTO            : ID_DOCUMENTO,
-                                                                ruc                     : ruc,
-                                                                td                      : td,
-                                                                serie                   : serie,
-                                                                correlativo             : correlativo,
-                                                                idopcion                : idopcion
-                                                         };                                       
+        data = {
+            _token: _token,
+            ID_DOCUMENTO: ID_DOCUMENTO,
+            ruc: ruc,
+            td: td,
+            serie: serie,
+            correlativo: correlativo,
+            idopcion: idopcion
+        };
         abrircargando();
         $('a[href="#tareas"]').click();
-        ajax_normal(data,"/tareas-de-cpe-sunat-lg");
+        ajax_normal(data, "/tareas-de-cpe-sunat-lg");
 
     });
 
 
-    $(".liquidaciongasto").on('click','.mdicloselq', function() {
+    $(".liquidaciongasto").on('click', '.mdicloselq', function () {
 
-        var _token                        =   $('#token').val();
-        const data_id                     =   $(this).attr('data_id');
-        const data_ruc                    =   $(this).attr('data_ruc');
-        const data_td                     =   $(this).attr('data_td');
-        const data_serie                  =   $(this).attr('data_serie');
-        const data_numero                 =   $(this).attr('data_numero');
-        var idopcion                      =   $('#idopcion').val();
-        const link                        =   '/eliminar-de-cpe-sunat-lg-personal';
+        var _token = $('#token').val();
+        const data_id = $(this).attr('data_id');
+        const data_ruc = $(this).attr('data_ruc');
+        const data_td = $(this).attr('data_td');
+        const data_serie = $(this).attr('data_serie');
+        const data_numero = $(this).attr('data_numero');
+        var idopcion = $('#idopcion').val();
+        const link = '/eliminar-de-cpe-sunat-lg-personal';
 
-        data                              =   {
-                                                    _token                  : _token,
-                                                    data_id                 : data_id,
-                                                    data_ruc                : data_ruc,
-                                                    data_td                 : data_td,
-                                                    data_serie              : data_serie,
-                                                    data_numero             : data_numero,
-                                                    idopcion                : idopcion
-                                              };   
+        data = {
+            _token: _token,
+            data_id: data_id,
+            data_ruc: data_ruc,
+            data_td: data_td,
+            data_serie: data_serie,
+            data_numero: data_numero,
+            idopcion: idopcion
+        };
 
         $.confirm({
             title: '¿Confirma la Eliminacion?',
             content: 'Eliminacion del Comprobante',
             buttons: {
                 confirmar: function () {
-                abrircargando();
-                $.ajax({
-                    type    :   "POST",
-                    url     :   carpeta+link,
-                    data    :   data,
-                    success: function (data) {
-                        cerrarcargando();
-                        location.reload();
-                    },
-                    error: function (data) {
-                        cerrarcargando();
-                        error500(data);
-                    }
-                });
+                    abrircargando();
+                    $.ajax({
+                        type: "POST",
+                        url: carpeta + link,
+                        data: data,
+                        success: function (data) {
+                            cerrarcargando();
+                            location.reload();
+                        },
+                        error: function (data) {
+                            cerrarcargando();
+                            error500(data);
+                        }
+                    });
 
                 },
                 cancelar: function () {
@@ -417,50 +1408,51 @@ $(document).ready(function(){
         });
 
 
-
-
     });
 
-    $(".liquidaciongasto").on('click','.traerpdf', function() {
+    $(".liquidaciongasto").on('click', '.traerpdf', function () {
 
 
-        var _token                        =   $('#token').val();
-        var idopcion                      =   $('#idopcion').val();
+        var _token = $('#token').val();
+        var idopcion = $('#idopcion').val();
 
-        var serie                         =   $('#serie').val();
-        var numero                        =   $('#numero').val();
-        var empresa_id                    =   $('#empresa_id').val();
-        var ID_DOCUMENTO                  =   $('#ID_DOCUMENTO').val();
-        var SUCCESS                       =   $('#SUCCESS').val();
+        var serie = $('#serie').val();
+        var numero = $('#numero').val();
+        var empresa_id = $('#empresa_id').val();
+        var ID_DOCUMENTO = $('#ID_DOCUMENTO').val();
+        var SUCCESS = $('#SUCCESS').val();
 
 
-        if(SUCCESS==''){ alerterrorajax("Valide el documento"); return false; }
+        if (SUCCESS == '') {
+            alerterrorajax("Valide el documento");
+            return false;
+        }
 
-        const link                        =   '/pdf-sunat-personal';
-        data                              =   {
-                                                    _token                  : _token,
-                                                    serie                   : serie,
-                                                    numero                  : numero,
-                                                    empresa_id              : empresa_id,
-                                                    ID_DOCUMENTO            : ID_DOCUMENTO,
-                                                    idopcion                : idopcion
-                                              };                                       
+        const link = '/pdf-sunat-personal';
+        data = {
+            _token: _token,
+            serie: serie,
+            numero: numero,
+            empresa_id: empresa_id,
+            ID_DOCUMENTO: ID_DOCUMENTO,
+            idopcion: idopcion
+        };
         abrircargando();
         $.ajax({
-            type    :   "POST",
-            url     :   carpeta+link,
-            data    :   data,
+            type: "POST",
+            url: carpeta + link,
+            data: data,
             success: function (data) {
                 cerrarcargando();
                 debugger;
 
-                if(data.cod_error == 0){
+                if (data.cod_error == 0) {
                     $('.DCC0000000000036').hide();
                     $('.PDFSUNAT').html("PDF ENCONTRADO EN SUNAT");
                     $('#RUTACOMPLETAPDF').val(data.ruta_completa);
                     $('#NOMBREPDF').val(data.nombre_archivo);
-                    
-                }else{
+
+                } else {
                     alerterrorajax(data.mensaje);
                     $('.PDFSUNAT').html("");
                     $('.DCC0000000000036').show();
@@ -475,38 +1467,35 @@ $(document).ready(function(){
         });
 
 
-        
     });
 
 
+    $(".liquidaciongasto").on('click', '.mdisellq', function () {
 
-
-    $(".liquidaciongasto").on('click','.mdisellq', function() {
-
-        var _token                        =   $('#token').val();
-        const data_id                     =   $(this).attr('data_id');
-        const data_ruc                    =   $(this).attr('data_ruc');
-        const data_td                     =   $(this).attr('data_td');
-        const data_serie                  =   $(this).attr('data_serie');
-        const data_numero                 =   $(this).attr('data_numero');
-        var idopcion                      =   $('#idopcion').val();
-        const link                        =   '/buscar-de-cpe-sunat-lg-personal';
+        var _token = $('#token').val();
+        const data_id = $(this).attr('data_id');
+        const data_ruc = $(this).attr('data_ruc');
+        const data_td = $(this).attr('data_td');
+        const data_serie = $(this).attr('data_serie');
+        const data_numero = $(this).attr('data_numero');
+        var idopcion = $('#idopcion').val();
+        const link = '/buscar-de-cpe-sunat-lg-personal';
 
         debugger;
-        data                              =   {
-                                                    _token                  : _token,
-                                                    data_id                 : data_id,
-                                                    data_ruc                : data_ruc,
-                                                    data_td                 : data_td,
-                                                    data_serie              : data_serie,
-                                                    data_numero             : data_numero,
-                                                    idopcion                : idopcion
-                                              };                                       
+        data = {
+            _token: _token,
+            data_id: data_id,
+            data_ruc: data_ruc,
+            data_td: data_td,
+            data_serie: data_serie,
+            data_numero: data_numero,
+            idopcion: idopcion
+        };
         abrircargando();
         $.ajax({
-            type    :   "POST",
-            url     :   carpeta+link,
-            data    :   data,
+            type: "POST",
+            url: carpeta + link,
+            data: data,
             success: function (data) {
                 cerrarcargando();
                 debugger;
@@ -536,74 +1525,81 @@ $(document).ready(function(){
     });
 
 
+    $(".liquidaciongasto").on('click', '.btn_buscar_cpe_lg', function () {
 
+        var _token = $('#token').val();
+        var ID_DOCUMENTO = $('#ID_DOCUMENTO').val();
+        var idopcion = $('#idopcion').val();
 
-
-
-    $(".liquidaciongasto").on('click','.btn_buscar_cpe_lg', function() {
-
-        var _token                                   =   $('#token').val();
-        var ID_DOCUMENTO                             =   $('#ID_DOCUMENTO').val();
-        var idopcion                                 =   $('#idopcion').val();
-
-        var ruc                                      =   $('#ruc_sunat').val();
-        var td                                       =   $('#td').val();
-        var serie                                    =   $('#serie_sunat').val();
-        var correlativo                              =   $('#correlativo_sunat').val();
-        const link                                   =   '/buscar-de-cpe-sunat-lg';
+        var ruc = $('#ruc_sunat').val();
+        var td = $('#td').val();
+        var serie = $('#serie_sunat').val();
+        var correlativo = $('#correlativo_sunat').val();
+        const link = '/buscar-de-cpe-sunat-lg';
         serie = serie.toUpperCase();
 
-        if(ruc ==''){ alerterrorajax("Ingrese un ruc."); return false;}
-        if(td ==''){ alerterrorajax("Seleccione un tipo de documento."); return false;}
-        if(serie ==''){ alerterrorajax("Ingrese un serie."); return false;}
-        if(correlativo ==''){ alerterrorajax("Ingrese un correlativo."); return false;}
+        if (ruc == '') {
+            alerterrorajax("Ingrese un ruc.");
+            return false;
+        }
+        if (td == '') {
+            alerterrorajax("Seleccione un tipo de documento.");
+            return false;
+        }
+        if (serie == '') {
+            alerterrorajax("Ingrese un serie.");
+            return false;
+        }
+        if (correlativo == '') {
+            alerterrorajax("Ingrese un correlativo.");
+            return false;
+        }
 
-        data                                         =   {
-                                                                _token                  : _token,
-                                                                ID_DOCUMENTO            : ID_DOCUMENTO,
-                                                                ruc                     : ruc,
-                                                                td                      : td,
-                                                                serie                   : serie,
-                                                                correlativo             : correlativo,
-                                                                idopcion                : idopcion
-                                                         };                                       
+        data = {
+            _token: _token,
+            ID_DOCUMENTO: ID_DOCUMENTO,
+            ruc: ruc,
+            td: td,
+            serie: serie,
+            correlativo: correlativo,
+            idopcion: idopcion
+        };
         abrircargando();
         $.ajax({
-            type    :   "POST",
-            url     :   carpeta+link,
-            data    :   data,
+            type: "POST",
+            url: carpeta + link,
+            data: data,
             success: function (data) {
                 cerrarcargando();
                 debugger;
-                var sw= 0;
-
+                var sw = 0;
 
 
                 if (data.nombre_xml) {
                     $('.exml').html(data.nombre_xml);
                     $('#NOMBREXML').val(data.nombre_xml);
                     $('#RUTAXML').val(data.ruta_xml);
-                    sw= sw +1;
+                    sw = sw + 1;
                 }
                 if (data.nombre_pdf) {
                     $('.epdf').html(data.nombre_pdf);
                     $('#NOMBREPDF').val(data.nombre_pdf);
                     $('#RUTAPDF').val(data.ruta_pdf);
-                    sw= sw +1;
+                    sw = sw + 1;
                 }
                 if (data.nombre_cdr) {
                     $('.ecdr').html(data.nombre_cdr);
                     $('#NOMBRECDR').val(data.nombre_cdr);
                     $('#RUTACDR').val(data.ruta_cdr);
-                    sw= sw +1;
+                    sw = sw + 1;
                 }
 
                 if (!serie.startsWith('F')) {
-                    if (sw==2) {
+                    if (sw == 2) {
                         $('#modal-detalle-requerimiento').niftyModal('hide');
                     }
-                }else{
-                    if (sw==3) {
+                } else {
+                    if (sw == 3) {
                         $('#modal-detalle-requerimiento').niftyModal('hide');
                     }
                 }
@@ -618,44 +1614,43 @@ $(document).ready(function(){
     });
 
 
-    $(".liquidaciongasto").on('click','.btnsunat', function() {
+    $(".liquidaciongasto").on('click', '.btnsunat', function () {
 
-        var _token                                   =   $('#token').val();
-        var ID_DOCUMENTO                             =   $('#ID_DOCUMENTO').val();
-        var idopcion                                 =   $('#idopcion').val();
+        var _token = $('#token').val();
+        var ID_DOCUMENTO = $('#ID_DOCUMENTO').val();
+        var idopcion = $('#idopcion').val();
 
-        data                                         =   {
-                                                                _token                  : _token,
-                                                                ID_DOCUMENTO            : ID_DOCUMENTO,
-                                                                idopcion                : idopcion
-                                                         };
-                                        
-        ajax_modal(data,"/ajax-modal-buscar-factura-sunat",
-                  "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+        data = {
+            _token: _token,
+            ID_DOCUMENTO: ID_DOCUMENTO,
+            idopcion: idopcion
+        };
+
+        ajax_modal(data, "/ajax-modal-buscar-factura-sunat",
+            "modal-detalle-requerimiento", "modal-detalle-requerimiento-container");
 
     });
 
 
+    $(".liquidaciongasto").on('click', '.mdisel', function (e) {
 
-    $(".liquidaciongasto").on('click','.mdisel', function(e) {
+        var _token = $('#token').val();
+        var idopcion = $('#idopcion').val();
+        const documento_planilla = $(this).attr('data_documento_planilla'); // Obtener el id del checkbox
+        var data_iddocumento = $('#ID_DOCUMENTO').val();
 
-        var _token                  =   $('#token').val();
-        var idopcion                =   $('#idopcion').val();
-        const documento_planilla    =   $(this).attr('data_documento_planilla'); // Obtener el id del checkbox
-        var data_iddocumento        =   $('#ID_DOCUMENTO').val();
-
-        const link                  =   '/ajax-select-documento-planilla';
+        const link = '/ajax-select-documento-planilla';
         debugger;
-        data                        =   {
-                                            _token                  : _token,
-                                            documento_planilla      : documento_planilla,
-                                            data_iddocumento        : data_iddocumento
-                                        };
+        data = {
+            _token: _token,
+            documento_planilla: documento_planilla,
+            data_iddocumento: data_iddocumento
+        };
         abrircargando();
         $.ajax({
-            type    :   "POST",
-            url     :   carpeta+link,
-            data    :   data,
+            type: "POST",
+            url: carpeta + link,
+            data: data,
             success: function (data) {
                 cerrarcargando();
 
@@ -700,86 +1695,296 @@ $(document).ready(function(){
     });
 
 
-    $(".cfedocumento").on('click','.buscardocumento', function() {
+    $(".cfedocumento").on('click', '.buscardocumento', function () {
 
         event.preventDefault();
 
-        var fecha_inicio         =   $('#fecha_inicio').val();
-        var fecha_fin            =   $('#fecha_fin').val();
-        var idopcion                =   $('#idopcion').val();
-        var _token                  =   $('#token').val();
+        var fecha_inicio = $('#fecha_inicio').val();
+        var fecha_fin = $('#fecha_fin').val();
+        var idopcion = $('#idopcion').val();
+        var _token = $('#token').val();
 
         //validacioones
-        if(fecha_inicio ==''){ alerterrorajax("Seleccione una fecha inicio."); return false;}
-        if(fecha_fin ==''){ alerterrorajax("Seleccione una fecha fin."); return false;}
+        if (fecha_inicio == '') {
+            alerterrorajax("Seleccione una fecha inicio.");
+            return false;
+        }
+        if (fecha_fin == '') {
+            alerterrorajax("Seleccione una fecha fin.");
+            return false;
+        }
 
-        data            =   {
-                                _token                  : _token,
-                                fecha_inicio            : fecha_inicio,
-                                fecha_fin               : fecha_fin,
-                                idopcion                : idopcion
-                            };
-        ajax_normal(data,"/ajax-buscar-documento-uc-lg");
+        data = {
+            _token: _token,
+            fecha_inicio: fecha_inicio,
+            fecha_fin: fecha_fin,
+            idopcion: idopcion
+        };
+        ajax_normal(data, "/ajax-buscar-documento-uc-lg");
 
     });
 
 
-    $(".liquidaciongasto").on('click','.buscardocumento', function() {
+    $(".liquidaciongasto").on('click', '.buscardocumento', function () {
 
         event.preventDefault();
 
-        var fecha_inicio         =   $('#fecha_inicio').val();
-        var fecha_fin            =   $('#fecha_fin').val();
-        var proveedor_id         =   $('#proveedor_id').val();
-        var estado_id            =   $('#estado_id').val();
-        var idopcion                =   $('#idopcion').val();
-        var _token                  =   $('#token').val();
+        var fecha_inicio = $('#fecha_inicio').val();
+        var fecha_fin = $('#fecha_fin').val();
+        var proveedor_id = $('#proveedor_id').val();
+        var estado_id = $('#estado_id').val();
+        var idopcion = $('#idopcion').val();
+        var _token = $('#token').val();
 
         //validacioones
-        if(fecha_inicio ==''){ alerterrorajax("Seleccione una fecha inicio."); return false;}
-        if(fecha_fin ==''){ alerterrorajax("Seleccione una fecha fin."); return false;}
+        if (fecha_inicio == '') {
+            alerterrorajax("Seleccione una fecha inicio.");
+            return false;
+        }
+        if (fecha_fin == '') {
+            alerterrorajax("Seleccione una fecha fin.");
+            return false;
+        }
 
-        data            =   {
-                                _token                  : _token,
-                                fecha_inicio            : fecha_inicio,
-                                fecha_fin               : fecha_fin,
-                                proveedor_id            : proveedor_id,
-                                estado_id               : estado_id,
-                                idopcion                : idopcion
-                            };
-        ajax_normal(data,"/ajax-buscar-documento-lg");
+        data = {
+            _token: _token,
+            fecha_inicio: fecha_inicio,
+            fecha_fin: fecha_fin,
+            proveedor_id: proveedor_id,
+            estado_id: estado_id,
+            idopcion: idopcion
+        };
+        ajax_normal(data, "/ajax-buscar-documento-lg");
 
     });
 
 
-
-    $(".liquidaciongasto").on('click','.filalg', function(e) {
+    $(".liquidaciongasto").on('click', '.filalg', function (e) {
         event.preventDefault();
         debugger;
         abrircargando();
         $('.dtlg').hide();
         $('.file-preview-frame').hide();
         $('.filalg').removeClass("ocultar");
-        const data_valor    =   $(this).attr('data_valor');
-        $('.'+data_valor).show();
+        const data_valor = $(this).attr('data_valor');
+        $('.' + data_valor).show();
         $('.filalg').removeClass("activofl");
         $(this).addClass("activofl");
+
+        let data_asiento_cabecera = $(this).attr('data_asiento_cabecera');
+        let data_asiento_detalle = $(this).attr('data_asiento_detalle');
+
+        $('#asiento_cabecera_compra').val(data_asiento_cabecera);
+        $('#asiento_detalle_compra').val(data_asiento_detalle);
+
+        let arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
+        let arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_compra").value);
+
+        // Crear la fila con atributos y estilos
+        let nuevaFila = ``;
+
+        let asiento_id_editar = '';
+        let fecha_asiento = new Date();
+        let periodo_asiento = '';
+        let form_id_editar = 'C';
+        let moneda_id_editar = '';
+        let tc_editar = 0.0000;
+        let comprobante_asiento = '';
+        let proveedor_asiento = '';
+        let tipo_asiento = '';
+
+        let numero_cuenta = '';
+        let glosa_cuenta = '';
+        let can_debe_mn = 0.0000;
+        let can_haber_mn = 0.0000;
+        let can_debe_me = 0.0000;
+        let can_haber_me = 0.0000;
+
+        let base_imponible = 0.0000;
+        let base_imponible_10 = 0.0000;
+        let base_ivap = 0.0000;
+        let base_inafecto = 0.0000;
+        let base_exonerado = 0.0000;
+        let total_igv = 0.0000;
+        let total_ivap = 0.0000;
+        let total = 0.0000;
+        let tipo_comprobante = '';
+        let serie_comprobante = '';
+        let numero_comprobante = '';
+        let tipo_comprobante_ref = '';
+        let serie_comprobante_ref = '';
+        let numero_comprobante_ref = '';
+        let glosa_asiento = '';
+        let tipo_descuento = '';
+        let constancia_des = '';
+        let fecha_des = '';
+        let porcentaje_des = '';
+        let total_des = '';
+
+        arrayCabecera.forEach(item => {
+            moneda_id_editar = item.COD_CATEGORIA_MONEDA;
+            tc_editar = parseFloat(item.CAN_TIPO_CAMBIO);
+            fecha_asiento = new Date(item.FEC_ASIENTO);
+            periodo_asiento = item.COD_PERIODO;
+            proveedor_asiento = item.COD_EMPR_CLI;
+            tipo_asiento = item.COD_CATEGORIA_TIPO_ASIENTO;
+            tipo_comprobante = item.COD_CATEGORIA_TIPO_DOCUMENTO;
+            serie_comprobante = item.NRO_SERIE;
+            numero_comprobante = item.NRO_DOC;
+            tipo_comprobante_ref = item.COD_CATEGORIA_TIPO_DOCUMENTO_REF;
+            serie_comprobante_ref = item.NRO_SERIE_REF;
+            numero_comprobante_ref = item.NRO_DOC_REF;
+            glosa_asiento = item.TXT_GLOSA;
+            tipo_descuento = item.COD_CATEGORIA_TIPO_DETRACCION;
+            constancia_des = item.NRO_DETRACCION;
+            fecha_des = item.FEC_DETRACCION;
+            porcentaje_des = item.CAN_DESCUENTO_DETRACCION;
+            total_des = item.CAN_TOTAL_DESCUENTO;
+            comprobante_asiento = item.TXT_REFERENCIA + '-' + item.CODIGO_CONTABLE;
+            base_imponible = parseFloat(item.TOTAL_BASE_IMPONIBLE);
+            base_imponible_10 = parseFloat(item.TOTAL_BASE_IMPONIBLE_10);
+            base_ivap = parseFloat(item.TOTAL_AFECTO_IVAP);
+            base_inafecto = parseFloat(item.TOTAL_BASE_INAFECTA);
+            base_exonerado = parseFloat(item.TOTAL_BASE_EXONERADA);
+            total_igv = parseFloat(item.TOTAL_IGV);
+            total_ivap = parseFloat(item.TOTAL_IVAP);
+            total = parseFloat(item.TOTAL_BASE_IMPONIBLE) + parseFloat(item.TOTAL_BASE_IMPONIBLE_10) + parseFloat(item.TOTAL_AFECTO_IVAP) + parseFloat(item.TOTAL_BASE_INAFECTA) + parseFloat(item.TOTAL_BASE_EXONERADA) + parseFloat(item.TOTAL_IGV) + parseFloat(item.TOTAL_IVAP);
+        });
+
+        $("#asientototales tbody tr").each(function () {
+            let fila = $(this);
+
+            // Actualizar las celdas visibles de la tabla
+            fila.find(".col-base-imponible").text(number_format(base_imponible, 4, ',', '.'));
+            fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4, ',', '.'));
+            fila.find(".col-base-ivap").text(number_format(base_ivap, 4, ',', '.'));
+            fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4, ',', '.'));
+            fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4, ',', '.'));
+            fila.find(".col-igv").text(number_format(total_igv, 4, ',', '.'));
+            fila.find(".col-ivap").text(number_format(total_ivap, 4, ',', '.'));
+            fila.find(".col-total").text(number_format(total, 4, ',', '.'));
+
+        });
+
+        let table = $('#asientodetalle').DataTable();
+
+        table.clear().draw();
+
+        arrayDetalle.forEach(item => {
+            if (parseInt(item.COD_ESTADO) === 1) {
+                asiento_id_editar = item.COD_ASIENTO_MOVIMIENTO;
+                numero_cuenta = item.TXT_CUENTA_CONTABLE;
+                glosa_cuenta = item.TXT_GLOSA;
+                can_debe_mn = parseFloat(item.CAN_DEBE_MN);
+                can_haber_mn = parseFloat(item.CAN_HABER_MN);
+                can_debe_me = parseFloat(item.CAN_DEBE_ME);
+                can_haber_me = parseFloat(item.CAN_HABER_ME);
+                nuevaFila = `
+            <tr class="fila" data_codigo="${asiento_id_editar}" data_asiento="${form_id_editar}"
+                data_moneda="${moneda_id_editar}" data_tc="${tc_editar}">
+                <td class="col-codigo">${asiento_id_editar}</td>
+                <td class="col-cuenta">${numero_cuenta}</td>
+                <td class="col-glosa">${glosa_cuenta}</td>
+                <td class="col-debe-mn" style="text-align: right">${number_format(can_debe_mn, 4, ',', '.')}</td>
+                <td class="col-haber-mn" style="text-align: right">${number_format(can_haber_mn, 4, ',', '.')}</td>
+                <td class="col-debe-me" style="text-align: right">${number_format(can_debe_me, 4, ',', '.')}</td>
+                <td class="col-haber-me" style="text-align: right">${number_format(can_haber_me, 4, ',', '.')}</td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-primary editar-cuenta">
+                        ✏ Editar
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger eliminar-cuenta">
+                        🗑 Eliminar
+                    </button>
+                </td>
+            </tr>
+        `;
+               // $("#asientodetalle tbody").append(nuevaFila);
+
+                /*
+                // Agregamos la fila a DataTable
+                var rowNode = table.row.add([
+                    asiento_id_editar,
+                    numero_cuenta,
+                    glosa_cuenta,
+                    number_format(can_debe_mn, 4, ',', '.'),
+                    number_format(can_haber_mn, 4, ',', '.'),
+                    number_format(can_debe_me, 4, ',', '.'),
+                    number_format(can_haber_me, 4, ',', '.'),
+                    `
+        <button type="button" class="btn btn-sm btn-primary editar-cuenta">✏ Editar</button>
+        <button type="button" class="btn btn-sm btn-danger eliminar-cuenta">🗑 Eliminar</button>
+    `
+                ]).draw().node();
+
+// Añadimos los atributos data-* a la fila
+                $(rowNode)
+                    .attr('data_codigo', asiento_id_editar)
+                    .attr('data_asiento', form_id_editar)
+                    .attr('data_moneda', moneda_id_editar)
+                    .attr('data_tc', tc_editar)
+                    .addClass('fila'); // si quieres mantener tu clase "fila"*/
+
+                table.row.add($(nuevaFila)).draw(false);
+
+            }
+        });
+
+        let anio = fecha_asiento.getFullYear();
+
+        $('#anio_asiento').val(anio).trigger('change');
+        setTimeout(function () {
+            $('#periodo_asiento').val(periodo_asiento).trigger('change');
+        }, 3000); // espera medio segundo o el tiempo necesario
+        $('#comprobante_asiento').val(comprobante_asiento);
+        $('#moneda_asiento').val(moneda_id_editar).trigger('change');
+        $('#tipo_cambio_asiento').val(tc_editar);
+        $('#empresa_asiento').val(proveedor_asiento).trigger('change');
+        $('#tipo_asiento').val(tipo_asiento).trigger('change');
+
+        // Formatear a YYYY-MM-DD
+        let fechaFormateada = fecha_asiento.toISOString().split('T')[0];
+
+        // Pasar valor al input con jQuery
+        $('#fecha_asiento').val(fechaFormateada);
+        $('#tipo_documento_asiento').val(tipo_comprobante).trigger('change');
+        $('#serie_asiento').val(serie_comprobante);
+        $('#numero_asiento').val(numero_comprobante);
+        $('#tipo_documento_ref').val(tipo_comprobante_ref).trigger('change');
+        $('#serie_ref_asiento').val(serie_comprobante_ref);
+        $('#numero_ref_asiento').val(numero_comprobante_ref);
+        $('#glosa_asiento').val(glosa_asiento);
+
+        $('#tipo_descuento_asiento').val(tipo_descuento).trigger('change');
+        $('#const_detraccion_asiento').val(constancia_des);
+        $('#fecha_detraccion_asiento').val(fecha_des);
+        $('#porcentaje_detraccion').val(porcentaje_des);
+        $('#total_detraccion_asiento').val(total_des);
+
+        if(tipo_asiento === 'TAS0000000000007') {
+            $('#asientototales').fadeOut();
+        }
+
         cerrarcargando();
 
     });
 
-
-
-    $('.btnobservarcomporbatnte').on('click', function(event){
+    $('.btnobservarcomporbatnte').on('click', function (event) {
         event.preventDefault();
 
-        var array_item     =   dataobservacion();
+        var array_item = dataobservacion();
         const filas = document.querySelectorAll('.tablaobservacion tbody tr');
         // El número de filas:
         const cantidad = filas.length;
         debugger;
-        if(array_item.length<=0){alerterrorajax('Seleccione por lo menos una fila'); return false;}
-        if(array_item.length==cantidad){alerterrorajax('No se puede observar todas las filas en ese caso deberia extornarlo'); return false;}
+        if (array_item.length <= 0) {
+            alerterrorajax('Seleccione por lo menos una fila');
+            return false;
+        }
+        if (array_item.length == cantidad) {
+            alerterrorajax('No se puede observar todas las filas en ese caso deberia extornarlo');
+            return false;
+        }
         datastring = JSON.stringify(array_item);
         $('#data_observacion').val(datastring);
         $.confirm({
@@ -787,7 +1992,7 @@ $(document).ready(function(){
             content: 'Observacion el Comprobante',
             buttons: {
                 confirmar: function () {
-                    $( "#formpedidoobservar" ).submit();
+                    $("#formpedidoobservar").submit();
                 },
                 cancelar: function () {
                     $.alert('Se cancelo la Observacion');
@@ -797,35 +2002,34 @@ $(document).ready(function(){
 
     });
 
-    function dataobservacion(){
+    function dataobservacion() {
         var data = [];
-        $(".tablaobservacion tbody tr").each(function(){
-            nombre               = $(this).find('.input_asignar').attr('id');
-            if(nombre != 'todo_asignar'){
-                check            = $(this).find('.input_asignar');
-                data_id          = $(this).attr('data_id');
-                data_item        = $(this).attr('data_item')
-                if($(check).is(':checked')){
+        $(".tablaobservacion tbody tr").each(function () {
+            nombre = $(this).find('.input_asignar').attr('id');
+            if (nombre != 'todo_asignar') {
+                check = $(this).find('.input_asignar');
+                data_id = $(this).attr('data_id');
+                data_item = $(this).attr('data_item')
+                if ($(check).is(':checked')) {
                     data.push({
-                        data_id         : data_id,
-                        data_item       : data_item
+                        data_id: data_id,
+                        data_item: data_item
                     });
-                }                 
+                }
             }
         });
         return data;
     }
 
 
-
-    $('.btnaprobarcomporbatnte').on('click', function(event){
+    $('.btnaprobarcomporbatnte').on('click', function (event) {
         event.preventDefault();
         $.confirm({
             title: '¿Confirma la Aprobacion?',
             content: 'Aprobar el Comprobante',
             buttons: {
                 confirmar: function () {
-                    $( "#formpedido" ).submit();
+                    $("#formpedido").submit();
                 },
                 cancelar: function () {
                     $.alert('Se cancelo Aprobacion');
@@ -836,14 +2040,14 @@ $(document).ready(function(){
     });
 
 
-    $('.btnrechazocomporbatnte').on('click', function(event){
+    $('.btnrechazocomporbatnte').on('click', function (event) {
         event.preventDefault();
         $.confirm({
             title: '¿Confirma el extorno?',
             content: 'Extornar el Comprobante',
             buttons: {
                 confirmar: function () {
-                    $( "#formpedidorechazar" ).submit();
+                    $("#formpedidorechazar").submit();
                 },
                 cancelar: function () {
                     $.alert('Se cancelo el Extorno');
@@ -854,42 +2058,38 @@ $(document).ready(function(){
     });
 
 
-    $(".liquidaciongasto").on('change','#arendir_id', function(e) {
-        var arendir_id      =   $('#arendir_id').val();
-        if(arendir_id == 'SI'){
+    $(".liquidaciongasto").on('change', '#arendir_id', function (e) {
+        var arendir_id = $('#arendir_id').val();
+        if (arendir_id == 'SI') {
             $('.sectorarendir').show();
 
-        }else{
+        } else {
             $('.sectorarendir').hide();
         }
     });
 
 
+    $(".liquidaciongasto").on('change', '#arendir_sel_id', function (e) {
 
-
-
-    $(".liquidaciongasto").on('change','#arendir_sel_id', function(e) {
-
-        var arendir_sel_id          =   $('#arendir_sel_id').val();
-        var idopcion                =   $('#idopcion').val();
-        var _token                  =   $('#token').val();
-        var link                    =   "/ajax-combo-autoriza";
-        var contenedor              =   "ajax_combo_autoriza";
-        data                        =   {
-                                            _token                  : _token,
-                                            arendir_sel_id          : arendir_sel_id,
-                                            idopcion                : idopcion
-                                        };
-        ajax_normal_combo(data,link,contenedor);
-
+        var arendir_sel_id = $('#arendir_sel_id').val();
+        var idopcion = $('#idopcion').val();
+        var _token = $('#token').val();
+        var link = "/ajax-combo-autoriza";
+        var contenedor = "ajax_combo_autoriza";
+        data = {
+            _token: _token,
+            arendir_sel_id: arendir_sel_id,
+            idopcion: idopcion
+        };
+        ajax_normal_combo(data, link, contenedor);
 
 
     });
 
 
-    $(".liquidaciongasto").on('change','#tipodoc_id', function(e) {
+    $(".liquidaciongasto").on('change', '#tipodoc_id', function (e) {
 
-        var tipodoc_id      =   $('#tipodoc_id').val();
+        var tipodoc_id = $('#tipodoc_id').val();
         $('#serie, #numero, #fecha_emision, #totaldetalle,#cod_planila').val('');
         $('#empresa_id').empty();
         $('#cuenta_id').empty();
@@ -902,7 +2102,7 @@ $(document).ready(function(){
         limpiarxml();
 
 
-        if(tipodoc_id == 'TDO0000000000070'){
+        if (tipodoc_id == 'TDO0000000000070') {
             $('#serie, #numero, #fecha_emision').prop('readonly', true);
             $('#empresa_id').prop('disabled', true);
             $('#cuenta_id').prop('disabled', true);
@@ -913,27 +2113,27 @@ $(document).ready(function(){
             //$('.sectorxmlmodal').show();
             //$('.DCC0000000000036').show();
 
-        }else{
-                if(tipodoc_id == 'TDO0000000000001'){
+        } else {
+            if (tipodoc_id == 'TDO0000000000001') {
 
-                    //$('#serie, #numero, #fecha_emision').prop('readonly', true);
-                    $('#empresa_id').prop('disabled', false);
-                    $('.sectorplanilla').hide();
-                    $('#totaldetalle').prop('readonly', false);
-                    $('.sectorxml').show();
-                    $('.sectorxmlmodal').show();
-                    $('.DCC0000000000036').show();
+                //$('#serie, #numero, #fecha_emision').prop('readonly', true);
+                $('#empresa_id').prop('disabled', false);
+                $('.sectorplanilla').hide();
+                $('#totaldetalle').prop('readonly', false);
+                $('.sectorxml').show();
+                $('.sectorxmlmodal').show();
+                $('.DCC0000000000036').show();
 
-                }else{
-                    $('#serie, #numero, #fecha_emision').prop('readonly', false);
-                    $('#empresa_id').prop('disabled', false);
-                    $('#cuenta_id').prop('disabled', false);
-                    $('#subcuenta_id').prop('disabled', false);
-                    $('.sectorplanilla').hide();
-                    $('.sectorxml').hide();
-                    $('.sectorxmlmodal').show();
-                    $('.DCC0000000000036').show();
-                }
+            } else {
+                $('#serie, #numero, #fecha_emision').prop('readonly', false);
+                $('#empresa_id').prop('disabled', false);
+                $('#cuenta_id').prop('disabled', false);
+                $('#subcuenta_id').prop('disabled', false);
+                $('.sectorplanilla').hide();
+                $('.sectorxml').hide();
+                $('.sectorxmlmodal').show();
+                $('.DCC0000000000036').show();
+            }
         }
 
         $('#SUCCESS').val('');
@@ -954,11 +2154,11 @@ $(document).ready(function(){
     });
 
 
-    $(".liquidaciongasto").on('click','.cargardatosliq', function(e) {
+    $(".liquidaciongasto").on('click', '.cargardatosliq', function (e) {
         e.preventDefault(); // Prevenir recarga del formulario
         const archivo = $('#inputxml')[0].files[0];
-        var _token                  =   $('#token').val();
-        var ID_DOCUMENTO            =   $('#ID_DOCUMENTO').val();
+        var _token = $('#token').val();
+        var ID_DOCUMENTO = $('#ID_DOCUMENTO').val();
 
         if (!archivo) {
             alert('Por favor selecciona un archivo XML.');
@@ -969,18 +2169,18 @@ $(document).ready(function(){
         formData.append('_token', _token);
         formData.append('ID_DOCUMENTO', ID_DOCUMENTO);
 
-        const link          =   '/ajax-leer-xml-lg';
+        const link = '/ajax-leer-xml-lg';
         abrircargando();
         $.ajax({
-            type    :   "POST",
-            url     :   carpeta+link,
+            type: "POST",
+            url: carpeta + link,
             data: formData,
             processData: false, // IMPORTANTE: no procesar los datos
             contentType: false, // IMPORTANTE: no establecer content-type (jQuery lo hace)
             success: function (data) {
                 cerrarcargando();
                 debugger;
-                if(data.error == 0){
+                if (data.error == 0) {
 
                     $('#RUTAXML').val("");
                     $('#RUTAPDF').val("");
@@ -991,8 +2191,6 @@ $(document).ready(function(){
                     $('#NOMBREXML').val("");
                     $('#NOMBREPDF').val("");
                     $('#NOMBRECDR').val("");
-
-
 
 
                     $('#serie').val(data.SERIE);
@@ -1029,10 +2227,10 @@ $(document).ready(function(){
                     $('.DCC0000000000004').hide();
 
                     let valor = data.SERIE;
-                    let primeraLetraSerire = valor.charAt(0);   
-                    if(primeraLetraSerire=='E'){
+                    let primeraLetraSerire = valor.charAt(0);
+                    if (primeraLetraSerire == 'E') {
                         $('.DCC0000000000036').show();
-                    }else{
+                    } else {
                         $('.DCC0000000000036').show();
                         $('.DCC0000000000004').show();
                     }
@@ -1041,7 +2239,7 @@ $(document).ready(function(){
                     //DETALLE DEL PRODUCTO
 
                     $('#tdxml tbody').empty(); // Limpia la tabla primero
-                    data.DETALLE.forEach(function(item, index) {
+                    data.DETALLE.forEach(function (item, index) {
                         const fila = `
                           <tr>
                             <td class="cell-detail d${index}" style="position: relative;" >
@@ -1061,7 +2259,7 @@ $(document).ready(function(){
                     });
 
 
-                }else{
+                } else {
                     alerterrorajax(data.mensaje);
                 }
                 console.log(data);
@@ -1075,12 +2273,12 @@ $(document).ready(function(){
 
     });
 
-    $(".liquidaciongasto").on('click','.limpiarxml', function(e) {
+    $(".liquidaciongasto").on('click', '.limpiarxml', function (e) {
         limpiarxml();
     });
 
 
-    function limpiarxml(){
+    function limpiarxml() {
         $('#serie, #numero, #totaldetalle, #fecha_emision').prop('readonly', false);
         $('#fecha_emision').css('pointer-events', 'auto').datetimepicker('enable');
         $('.input-group-addon').css({'pointer-events': 'auto', 'cursor': 'pointer'});
@@ -1109,56 +2307,72 @@ $(document).ready(function(){
     }
 
 
-    $(".liquidaciongasto").on('click','.validarxml', function(e) {
+    $(".liquidaciongasto").on('click', '.validarxml', function (e) {
         e.preventDefault(); // Prevenir recarga del formulario
 
-        var _token                  =   $('#token').val();
-        var serie                   =   $('#serie').val();
-        var numero                  =   $('#numero').val();
-        var fecha_emision           =   $('#fecha_emision').val();
-        var totaldetalle            =   $('#totaldetalle').val();
-        var empresa_id              =   $('#empresa_id').val();
+        var _token = $('#token').val();
+        var serie = $('#serie').val();
+        var numero = $('#numero').val();
+        var fecha_emision = $('#fecha_emision').val();
+        var totaldetalle = $('#totaldetalle').val();
+        var empresa_id = $('#empresa_id').val();
 
         debugger;
 
-        if(serie ==''){ alerterrorajax("Ingrese una serie."); return false;}
-        if(numero ==''){ alerterrorajax("Ingrese una numero."); return false;}
-        if(fecha_emision ==''){ alerterrorajax("Ingrese una fecha de emision."); return false;}
-        if(totaldetalle ==''){ alerterrorajax("Ingrese una total."); return false;}
-        if(empresa_id ==''){ alerterrorajax("Seleccione una empresa."); return false;}
-        if (!empresa_id || empresa_id === '') {alerterrorajax("Seleccione una empresa."); return false;}
+        if (serie == '') {
+            alerterrorajax("Ingrese una serie.");
+            return false;
+        }
+        if (numero == '') {
+            alerterrorajax("Ingrese una numero.");
+            return false;
+        }
+        if (fecha_emision == '') {
+            alerterrorajax("Ingrese una fecha de emision.");
+            return false;
+        }
+        if (totaldetalle == '') {
+            alerterrorajax("Ingrese una total.");
+            return false;
+        }
+        if (empresa_id == '') {
+            alerterrorajax("Seleccione una empresa.");
+            return false;
+        }
+        if (!empresa_id || empresa_id === '') {
+            alerterrorajax("Seleccione una empresa.");
+            return false;
+        }
 
         $('#serie').prop('readonly', true);
         $('#numero').prop('readonly', true);
-        $('#fecha_emision').prop('readonly', true).css('pointer-events', 'none');        
+        $('#fecha_emision').prop('readonly', true).css('pointer-events', 'none');
         $('.input-group-addon').css('pointer-events', 'none').css('cursor', 'not-allowed');
         $('#totaldetalle').prop('readonly', true);
         //$('#empresa_id').prop('disabled', false).prop('readonly', true);
         $('#empresa_id').prop('readonly', true)
-                .next('.select2-container').css('pointer-events', 'none');
+            .next('.select2-container').css('pointer-events', 'none');
 
 
+        data = {
+            _token: _token,
+            serie: serie,
+            numero: numero,
+            fecha_emision: fecha_emision,
+            totaldetalle: totaldetalle,
+            empresa_id: empresa_id
+        };
 
-
-        data            =   {   
-                                _token                  : _token,
-                                serie                   : serie,
-                                numero                  : numero,
-                                fecha_emision           : fecha_emision,
-                                totaldetalle            : totaldetalle,
-                                empresa_id              : empresa_id
-                            };
-
-        const link                  =   '/ajax-leer-xml-lg-validar';
+        const link = '/ajax-leer-xml-lg-validar';
         abrircargando();
         $.ajax({
-            type    :   "POST",
-            url     :   carpeta+link,
-            data    :   data,
+            type: "POST",
+            url: carpeta + link,
+            data: data,
             success: function (data) {
                 cerrarcargando();
                 debugger;
-                if(data.error == 0){
+                if (data.error == 0) {
 
                     $('.MESSAGE').html(data.MESSAGE);
                     $('.NESTADOCP').html(data.NESTADOCP);
@@ -1177,7 +2391,7 @@ $(document).ready(function(){
                     //archivos
                     $('.sectorxmlmodal').show();
 
-                }else{
+                } else {
                     alerterrorajax(data.mensaje);
                 }
                 console.log(data);
@@ -1192,27 +2406,32 @@ $(document).ready(function(){
     });
 
 
-
-    $(".liquidaciongasto").on('click','.btn-relacionar-producto-lg', function(e) {
+    $(".liquidaciongasto").on('click', '.btn-relacionar-producto-lg', function (e) {
         event.preventDefault();
         debugger;
-        var producto_id             =   $('#producto_id').val();
-        var data_item        =   $(this).attr('data_item');
-        $('.d'+data_item).find('.TXT_PRODUCTO_OSIRIS').html(producto_id);
+        var producto_id = $('#producto_id').val();
+        var data_item = $(this).attr('data_item');
+        $('.d' + data_item).find('.TXT_PRODUCTO_OSIRIS').html(producto_id);
         $('#modal-detalle-requerimiento').niftyModal('hide');
 
     });
 
-    $(".liquidaciongasto").on('click','.btnemitirliquidaciongasto', function(e) {
+    $(".liquidaciongasto").on('click', '.btnemitirliquidaciongasto', function (e) {
         event.preventDefault();
-        var _token                  =   $('#token').val();
-        var tipopago_id             =   $('#tipopago_id').val();
-        var entidadbanco_id         =   $('#entidadbanco_id').val();
-        var cb_id                   =   $('#cb_id').val();
+        var _token = $('#token').val();
+        var tipopago_id = $('#tipopago_id').val();
+        var entidadbanco_id = $('#entidadbanco_id').val();
+        var cb_id = $('#cb_id').val();
 
-        if(tipopago_id == 'MPC0000000000002'){
-            if(entidadbanco_id ==''){ alerterrorajax("Seleccione Entidad Bancaria."); return false;}
-            if(cb_id ==''){ alerterrorajax("Seleccione Entidad Bancaria."); return false;}
+        if (tipopago_id == 'MPC0000000000002') {
+            if (entidadbanco_id == '') {
+                alerterrorajax("Seleccione Entidad Bancaria.");
+                return false;
+            }
+            if (cb_id == '') {
+                alerterrorajax("Seleccione Entidad Bancaria.");
+                return false;
+            }
         }
 
 
@@ -1221,7 +2440,7 @@ $(document).ready(function(){
             content: 'Registro de emision de liquidacion de gastos',
             buttons: {
                 confirmar: function () {
-                     $( "#frmpmemitir" ).submit();   
+                    $("#frmpmemitir").submit();
                 },
                 cancelar: function () {
                     $.alert('Se cancelo la emision');
@@ -1233,176 +2452,207 @@ $(document).ready(function(){
     });
 
 
-    $(".liquidaciongasto").on('click','.btn-guardar-detalle-factura', function(e) {
+    $(".liquidaciongasto").on('click', '.btn-guardar-detalle-factura', function (e) {
         event.preventDefault();
-        var _token                  =   $('#token').val();
-        var tipodoc_id              =   $('#tipodoc_id').val();
+        var _token = $('#token').val();
+        var tipodoc_id = $('#tipodoc_id').val();
 
-        var RUTAXML                 =   $('#RUTAXML').val();
-        var RUTAPDF                 =   $('#RUTAPDF').val();
-        var RUTACDR                 =   $('#RUTACDR').val();
+        var RUTAXML = $('#RUTAXML').val();
+        var RUTAPDF = $('#RUTAPDF').val();
+        var RUTACDR = $('#RUTACDR').val();
 
-        var cuenta_id               =   $('#cuenta_id').val();
-        var subcuenta_id            =   $('#subcuenta_id').val();
-        var RUTACOMPLETAPDF         =   $('#RUTACOMPLETAPDF').val();
-
-
+        var cuenta_id = $('#cuenta_id').val();
+        var subcuenta_id = $('#subcuenta_id').val();
+        var RUTACOMPLETAPDF = $('#RUTACOMPLETAPDF').val();
 
 
-        if(cuenta_id ==''){ alerterrorajax("Seleccione una Cuenta."); return false;}
-        if(subcuenta_id ==''){ alerterrorajax("Seleccione una Sub Cuenta"); return false;}
+        if (cuenta_id == '') {
+            alerterrorajax("Seleccione una Cuenta.");
+            return false;
+        }
+        if (subcuenta_id == '') {
+            alerterrorajax("Seleccione una Sub Cuenta");
+            return false;
+        }
 
 
-        var array_detalle_producto  =   $('#array_detalle_producto').val();
+        var array_detalle_producto = $('#array_detalle_producto').val();
         abrircargando();
-                
 
-        if(tipodoc_id == 'TDO0000000000001'){
 
-            if(RUTACOMPLETAPDF ==""){
+        if (tipodoc_id == 'TDO0000000000001') {
+
+            if (RUTACOMPLETAPDF == "") {
                 let comprobante = $('#file-DCC0000000000036')[0].files.length > 0;
                 if (!comprobante) {
-                    alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
+                    alerterrorajax("Debe subir el comprobante electronico.");
+                    cerrarcargando();
+                    return false;
                 }
             }
 
-            var producto_id_factura  =   $('#producto_id_factura').val();
-            var igv_id_factura       =   $('#igv_id_factura').val();
-            var ESTADOCP             =   $('#ESTADOCP').val();
-            var ESTADORUC            =   $('#ESTADORUC').val();
-            if(ESTADOCP !='1'){ alerterrorajax("Debe validar el documento."); cerrarcargando(); return false;}
-            if(ESTADORUC ==''){ alerterrorajax("Debe validar el documento."); cerrarcargando(); return false;}
-            if(producto_id_factura ==''){ alerterrorajax("Seleccione un Producto."); cerrarcargando(); return false;}
-            if(igv_id_factura ==''){ alerterrorajax("Seleccione si es Afecto"); cerrarcargando(); return false;}
+            var producto_id_factura = $('#producto_id_factura').val();
+            var igv_id_factura = $('#igv_id_factura').val();
+            var ESTADOCP = $('#ESTADOCP').val();
+            var ESTADORUC = $('#ESTADORUC').val();
+            if (ESTADOCP != '1') {
+                alerterrorajax("Debe validar el documento.");
+                cerrarcargando();
+                return false;
+            }
+            if (ESTADORUC == '') {
+                alerterrorajax("Debe validar el documento.");
+                cerrarcargando();
+                return false;
+            }
+            if (producto_id_factura == '') {
+                alerterrorajax("Seleccione un Producto.");
+                cerrarcargando();
+                return false;
+            }
+            if (igv_id_factura == '') {
+                alerterrorajax("Seleccione si es Afecto");
+                cerrarcargando();
+                return false;
+            }
 
-        }else{
+        } else {
 
-            if(tipodoc_id != 'TDO0000000000070'){
+            if (tipodoc_id != 'TDO0000000000070') {
                 let comprobante = $('#file-DCC0000000000036')[0].files.length > 0;
                 if (!comprobante) {
-                    alerterrorajax("Debe subir el comprobante electronico."); cerrarcargando(); return false;
+                    alerterrorajax("Debe subir el comprobante electronico.");
+                    cerrarcargando();
+                    return false;
                 }
             }
-            
+
         }
-        $( "#frmdetallelg" ).submit();
+        $("#frmdetallelg").submit();
 
     });
 
 
-
-    $(".liquidaciongasto").on('click','.btn-guardar-detalle-documento-lg', function(e) {
+    $(".liquidaciongasto").on('click', '.btn-guardar-detalle-documento-lg', function (e) {
         event.preventDefault();
-        var _token                  =   $('#token').val();
-        var producto_id             =   $('#producto_id').val();
-        var importe                 =   $('#importe').val();
-        var igv_id                  =   $('#igv_id').val();
+        var _token = $('#token').val();
+        var producto_id = $('#producto_id').val();
+        var importe = $('#importe').val();
+        var igv_id = $('#igv_id').val();
 
-        if(producto_id ==''){ alerterrorajax("Seleccione una Producto."); return false;}
-        if(importe ==''){ alerterrorajax("Ingrese un importe"); return false;}
-        if(igv_id ==''){ alerterrorajax("Seleccione un igv."); return false;}
+        if (producto_id == '') {
+            alerterrorajax("Seleccione una Producto.");
+            return false;
+        }
+        if (importe == '') {
+            alerterrorajax("Ingrese un importe");
+            return false;
+        }
+        if (igv_id == '') {
+            alerterrorajax("Seleccione un igv.");
+            return false;
+        }
 
-        $( "#agregarpmd" ).submit();
+        $("#agregarpmd").submit();
     });
 
 
-    $(".liquidaciongasto").on('click','.btn-buscar-planilla', function() {
+    $(".liquidaciongasto").on('click', '.btn-buscar-planilla', function () {
         // debugger;
-        var _token                                   =   $('#token').val();
-        var data_iddocumento                         =   $(this).attr('data_iddocumento');
-        var idopcion                                 =   $('#idopcion').val();
+        var _token = $('#token').val();
+        var data_iddocumento = $(this).attr('data_iddocumento');
+        var idopcion = $('#idopcion').val();
 
-        data                                         =   {
-                                                                _token                  : _token,
-                                                                data_iddocumento        : data_iddocumento,
-                                                                idopcion                : idopcion
-                                                         };
-                                        
-        ajax_modal(data,"/ajax-modal-buscar-planilla-lg",
-                  "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+        data = {
+            _token: _token,
+            data_iddocumento: data_iddocumento,
+            idopcion: idopcion
+        };
+
+        ajax_modal(data, "/ajax-modal-buscar-planilla-lg",
+            "modal-detalle-requerimiento", "modal-detalle-requerimiento-container");
 
     });
 
 
-
-    $(".liquidaciongasto").on('click','.modificardetalledocumentolg', function() {
+    $(".liquidaciongasto").on('click', '.modificardetalledocumentolg', function () {
         // debugger;
-        var _token                                   =   $('#token').val();
-        var data_iddocumento                         =   $(this).attr('data_iddocumento');
-        var data_item                                =   $(this).attr('data_item');
-        var data_item_documento                      =   $(this).attr('data_item_documento');
-        var idopcion                                 =   $('#idopcion').val();
+        var _token = $('#token').val();
+        var data_iddocumento = $(this).attr('data_iddocumento');
+        var data_item = $(this).attr('data_item');
+        var data_item_documento = $(this).attr('data_item_documento');
+        var idopcion = $('#idopcion').val();
 
-        data                        =   {
-                                            _token                  : _token,
-                                            data_iddocumento        : data_iddocumento,
-                                            data_item               : data_item,
-                                            data_item_documento     : data_item_documento,
-                                            idopcion                : idopcion
-                                        };
-                                        
-        ajax_modal(data,"/ajax-modal-modificar-detalle-documento-lg",
-                  "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+        data = {
+            _token: _token,
+            data_iddocumento: data_iddocumento,
+            data_item: data_item,
+            data_item_documento: data_item_documento,
+            idopcion: idopcion
+        };
+
+        ajax_modal(data, "/ajax-modal-modificar-detalle-documento-lg",
+            "modal-detalle-requerimiento", "modal-detalle-requerimiento-container");
 
     });
 
 
-    $(".liquidaciongasto").on('click','.relacionardetalledocumentolg', function() {
+    $(".liquidaciongasto").on('click', '.relacionardetalledocumentolg', function () {
         // debugger;
-        var _token                                   =   $('#token').val();
-        var data_item                                =   $(this).attr('data_item');
-        var data_producto                            =   $(this).attr('data_producto');
-        var idopcion                                 =   $('#idopcion').val();
+        var _token = $('#token').val();
+        var data_item = $(this).attr('data_item');
+        var data_producto = $(this).attr('data_producto');
+        var idopcion = $('#idopcion').val();
 
-        data                        =   {
-                                            _token                  : _token,
-                                            data_item               : data_item,
-                                            data_producto           : data_producto,
-                                            idopcion                : idopcion
-                                        };
-                                        
-        ajax_modal(data,"/ajax-modal-relacionar-detalle-documento-lg",
-                  "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+        data = {
+            _token: _token,
+            data_item: data_item,
+            data_producto: data_producto,
+            idopcion: idopcion
+        };
+
+        ajax_modal(data, "/ajax-modal-relacionar-detalle-documento-lg",
+            "modal-detalle-requerimiento", "modal-detalle-requerimiento-container");
 
     });
 
 
-
-    $(".liquidaciongasto").on('click','#btnempresacuenta', function() {
+    $(".liquidaciongasto").on('click', '#btnempresacuenta', function () {
 
         event.preventDefault();
-        var empresa_id              =   $('#empresa_id').val();
-        var idopcion                =   $('#idopcion').val();
-        var _token                  =   $('#token').val();
-        var link                    =   "/ajax-combo-cuenta";
-        var contenedor              =   "ajax_combo_cuenta";
-        data                        =   {
-                                            _token                  : _token,
-                                            empresa_id              : empresa_id,
-                                            idopcion                : idopcion
-                                        };
-        ajax_normal_combo(data,link,contenedor);
+        var empresa_id = $('#empresa_id').val();
+        var idopcion = $('#idopcion').val();
+        var _token = $('#token').val();
+        var link = "/ajax-combo-cuenta";
+        var contenedor = "ajax_combo_cuenta";
+        data = {
+            _token: _token,
+            empresa_id: empresa_id,
+            idopcion: idopcion
+        };
+        ajax_normal_combo(data, link, contenedor);
     });
 
 
-    $(".liquidaciongasto").on('click','.btnguardarliquidaciongasto', function(e) {
+    $(".liquidaciongasto").on('click', '.btnguardarliquidaciongasto', function (e) {
         event.preventDefault();
-        var _token                  =   $('#token').val();
-        var arendir_id              =   $('#arendir_id').val();
-        var arendir_sel_id          =   $('#arendir_sel_id').val();
+        var _token = $('#token').val();
+        var arendir_id = $('#arendir_id').val();
+        var arendir_sel_id = $('#arendir_sel_id').val();
 
-        if(arendir_id =='SI'){ 
-            if(arendir_sel_id ==''){ 
-                alerterrorajax("Seleccione una ARENDIR."); return false;
+        if (arendir_id == 'SI') {
+            if (arendir_sel_id == '') {
+                alerterrorajax("Seleccione una ARENDIR.");
+                return false;
             }
         }
-        
+
         $.confirm({
             title: '¿Confirma el registro?',
             content: 'Registro de Liquidacion de Gastos',
             buttons: {
                 confirmar: function () {
-                    $( "#frmpm" ).submit();   
+                    $("#frmpm").submit();
                 },
                 cancelar: function () {
                     $.alert('Se cancelo el registro');
@@ -1414,72 +2664,70 @@ $(document).ready(function(){
     });
 
 
-    $(".liquidaciongasto").on('click','.agregardetalle', function(e) {
-        var _token                  =   $('#token').val();
-        var idopcion                =   $('#idopcion').val();
-        const tabId                 =   '#registro';
+    $(".liquidaciongasto").on('click', '.agregardetalle', function (e) {
+        var _token = $('#token').val();
+        var idopcion = $('#idopcion').val();
+        const tabId = '#registro';
         $('.nav-tabs a[href="' + tabId + '"]').tab('show');
 
     });
 
 
-    $(".liquidaciongasto").on('change','#empresa_id', function() {
+    $(".liquidaciongasto").on('change', '#empresa_id', function () {
         var empresa_id = $('#empresa_id').val();
-        var _token      = $('#token').val();
+        var _token = $('#token').val();
         debugger;
 
-        var link                    =   "/ajax-combo-cuenta";
-        var contenedor              =   "ajax_combo_cuenta";
-        data                        =   {
-                                            _token                  : _token,
-                                            empresa_id              : empresa_id
-                                        };
-        ajax_normal_combo(data,link,contenedor);
+        var link = "/ajax-combo-cuenta";
+        var contenedor = "ajax_combo_cuenta";
+        data = {
+            _token: _token,
+            empresa_id: empresa_id
+        };
+        ajax_normal_combo(data, link, contenedor);
 
     });
 
 
-    $(".liquidaciongasto").on('change','#cuenta_id', function() {
+    $(".liquidaciongasto").on('change', '#cuenta_id', function () {
         var cuenta_id = $('#cuenta_id').val();
-        var _token      = $('#token').val();
+        var _token = $('#token').val();
         debugger;
-        var link                    =   "/ajax-combo-subcuenta";
-        var contenedor              =   "ajax_combo_subcuenta";
-        data                        =   {
-                                            _token                  : _token,
-                                            cuenta_id              : cuenta_id
-                                        };
-        ajax_normal_combo(data,link,contenedor);
+        var link = "/ajax-combo-subcuenta";
+        var contenedor = "ajax_combo_subcuenta";
+        data = {
+            _token: _token,
+            cuenta_id: cuenta_id
+        };
+        ajax_normal_combo(data, link, contenedor);
 
     });
-    $(".liquidaciongasto").on('change','#flujo_id', function() {
+    $(".liquidaciongasto").on('change', '#flujo_id', function () {
         var flujo_id = $('#flujo_id').val();
-        var _token      = $('#token').val();
+        var _token = $('#token').val();
         debugger;
-        var link                    =   "/ajax-combo-item";
-        var contenedor              =   "ajax_combo_item";
-        data                        =   {
-                                            _token                  : _token,
-                                            flujo_id                : flujo_id
-                                        };
-        ajax_normal_combo(data,link,contenedor);
+        var link = "/ajax-combo-item";
+        var contenedor = "ajax_combo_item";
+        data = {
+            _token: _token,
+            flujo_id: flujo_id
+        };
+        ajax_normal_combo(data, link, contenedor);
 
     });
 
 
-
-
-    $(".liquidaciongasto").on('click','.btn-agregar-detalle-factura', function() {
+    $(".liquidaciongasto").on('click', '.btn-agregar-detalle-factura', function () {
         // debugger;
-        var _token                                   =   $('#token').val();
-        var data_iddocumento                         =   $(this).attr('data_iddocumento');
-        var data_item                                =   $(this).attr('data_item');
-        var idopcion                                 =   $('#idopcion').val();
+        var _token = $('#token').val();
+        var data_iddocumento = $(this).attr('data_iddocumento');
+        var data_item = $(this).attr('data_item');
+        var idopcion = $('#idopcion').val();
 
         let existe = false;
         // Recorrer todas las filas de la tabla
         let tieneDatos = false;
-        $(".ltabladet tbody tr").each(function() {
+        $(".ltabladet tbody tr").each(function () {
             console.log($(this).text().trim());
             debugger;
             if ($(this).text().trim() !== "") { // Verifica que la fila no esté vacía
@@ -1487,30 +2735,48 @@ $(document).ready(function(){
             }
         });
 
-        if(tieneDatos === true){
+        if (tieneDatos === true) {
             alerterrorajax("Ya tiene un registro en el detalle solo se permite un solo detalle.");
-        }else{
+        } else {
 
-            data                                         =   {
-                                                                    _token                  : _token,
-                                                                    data_iddocumento        : data_iddocumento,
-                                                                    data_item               : data_item,
-                                                                    idopcion                : idopcion
-                                                             };
-                                            
-            ajax_modal(data,"/ajax-modal-detalle-documento-lg",
-                      "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+            data = {
+                _token: _token,
+                data_iddocumento: data_iddocumento,
+                data_item: data_item,
+                idopcion: idopcion
+            };
+
+            ajax_modal(data, "/ajax-modal-detalle-documento-lg",
+                "modal-detalle-requerimiento", "modal-detalle-requerimiento-container");
 
         }
-
-
-
 
 
     });
 
 
+    function redondear4(num) {
+        return Math.round((num + Number.EPSILON) * 10000) / 10000;
+    }
 
+    function number_format(num, decimals = 0, decimal_separator = ".", thousands_separator = ",") {
+        if (isNaN(num) || num === null) return "0";
+
+        // Asegurar número flotante
+        let n = parseFloat(num);
+
+        // Redondear a la cantidad de decimales indicada
+        let fixed = n.toFixed(decimals);
+
+        // Separar parte entera y decimal
+        let parts = fixed.split(".");
+
+        // Insertar separador de miles en la parte entera
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousands_separator);
+
+        // Unir con el separador de decimales
+        return parts.join(decimals > 0 ? decimal_separator : "");
+    }
 
 
 });

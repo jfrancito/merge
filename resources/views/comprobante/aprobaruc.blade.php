@@ -17,7 +17,7 @@
 
       <div class="col-md-12">
           <div class="panel panel-default">
-            <div class="panel-heading">Revision de Comporbante ({{$ordencompra->COD_ORDEN}})</div>
+            <div class="panel-heading">Revision de Comprobante ({{$ordencompra->COD_ORDEN}})</div>
             <div class="tab-container">
               <ul class="nav nav-tabs">
                 <li class="active"><a href="#aprobar" data-toggle="tab"><b>APROBAR y RECOMENDAR</b></a></li>
@@ -58,7 +58,7 @@
 
     </div>
   </div>
-</div>  
+</div>
 
 @stop
 
@@ -85,18 +85,18 @@
         App.formElements();
         $('form').parsley();
       });
-    </script> 
+    </script>
 
-    <script type="text/javascript">    
+    <script type="text/javascript">
 
-            @foreach($tarchivos as $index => $item) 
+            @foreach($tarchivos as $index => $item)
                $('#file-{{$item->COD_CATEGORIA_DOCUMENTO}}').fileinput({
                   theme: 'fa5',
                   language: 'es',
                   allowedFileExtensions: ['{{$item->TXT_FORMATO}}'],
                 });
             @endforeach
-            
+
            $('#file-otros').fileinput({
               theme: 'fa5',
               language: 'es',
@@ -117,7 +117,7 @@
             });
           @endforeach
 
-           
+
     </script>
 
 
