@@ -674,10 +674,16 @@ Route::post('/ver_detalle_importe_vale', 'ValeRendirController@actionDetalleImpo
 	Route::get('/rechazar_correo_generado', 'RechazarCorreoValeRendirGeneradoController@actionRechazarCorreoVRGenerado');
 	Route::get('/rechazar_correo_autoriza', 'RechazarCorreoValeRendirAutorizaController@actionRechazarCorreoVRAutoriza');
 
+   //FIRMA VALE A RENDIR
+
+	Route::get('/firma-de-vale/{idopcion}', 'FirmaValeRendirController@actionRegistroPersonalFirma');
+	Route::get('/exportar_pdf/{id}', 'FirmaValeRendirController@actionexportarpdf')->name('exportar_pdf');
 
 
 
 
+
+ 
 
 });
 
