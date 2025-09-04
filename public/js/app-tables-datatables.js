@@ -215,6 +215,15 @@ var App = (function () {
           ordering: false,
       });
 
+      $("#tablalistafirmavale").dataTable({
+          responsive: true,
+          autoWidth: true,
+          lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+          scrollX: true,
+          scrollY: "300px",
+          ordering: false,
+      });
+
        
       $("#importegastos").dataTable({
           responsive: true,
