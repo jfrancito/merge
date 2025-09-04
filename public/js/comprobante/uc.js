@@ -471,17 +471,19 @@ $(document).ready(function () {
 
         arrayDetalle.push(nuevoMovimiento);
 
+        let table = $('#asientodetallereparable').DataTable();
+
         // Crear la fila con atributos y estilos
         let nuevaFila = `
             <tr class="fila" data_codigo="${asiento_id_editar}"
                 data_moneda="${moneda_id_editar}" data_tc="${tc_editar}">
-                <td>${asiento_id_editar}</td>
-                <td>${numero_cuenta}</td>
-                <td>${glosa_cuenta}</td>
-                <td style="text-align: right">${number_format(can_debe_mn, 4, ',', '.')}</td>
-                <td style="text-align: right">${number_format(can_haber_mn, 4, ',', '.')}</td>
-                <td style="text-align: right">${number_format(can_debe_me, 4, ',', '.')}</td>
-                <td style="text-align: right">${number_format(can_haber_me, 4, ',', '.')}</td>
+                <td class="col-codigo">${asiento_id_editar}</td>
+                <td class="col-cuenta">${numero_cuenta}</td>
+                <td class="col-glosa">${glosa_cuenta}</td>
+                <td class="col-debe-mn" style="text-align: right">${number_format(can_debe_mn, 4, ',', '.')}</td>
+                <td class="col-haber-mn" style="text-align: right">${number_format(can_haber_mn, 4, ',', '.')}</td>
+                <td class="col-debe-me" style="text-align: right">${number_format(can_debe_me, 4, ',', '.')}</td>
+                <td class="col-haber-me" style="text-align: right">${number_format(can_haber_me, 4, ',', '.')}</td>
                 <td>
                     <button type="button" class="btn btn-sm btn-primary editar-cuenta-reparable">
                         ✏ Editar
@@ -495,7 +497,7 @@ $(document).ready(function () {
 
         document.getElementById("asiento_detalle_reparable").value = JSON.stringify(arrayDetalle);
         // Después de actualizar arrayDetalle
-        $("#asientodetallereparable tbody").append(nuevaFila);
+        table.row.add($(nuevaFila)).draw(false);
 
         $('.tablageneralreparable').toggle("slow");
         $('.editarcuentasreparable').toggle("slow");
@@ -719,13 +721,13 @@ $(document).ready(function () {
         let nuevaFila = `
             <tr class="fila" data_codigo="${asiento_id_editar}" data_asiento="${form_id_editar}"
                 data_moneda="${moneda_id_editar}" data_tc="${tc_editar}">
-                <td>${asiento_id_editar}</td>
-                <td>${numero_cuenta}</td>
-                <td>${glosa_cuenta}</td>
-                <td style="text-align: right">${number_format(can_debe_mn, 4, ',', '.')}</td>
-                <td style="text-align: right">${number_format(can_haber_mn, 4, ',', '.')}</td>
-                <td style="text-align: right">${number_format(can_debe_me, 4, ',', '.')}</td>
-                <td style="text-align: right">${number_format(can_haber_me, 4, ',', '.')}</td>
+                <td class="col-codigo">${asiento_id_editar}</td>
+                <td class="col-cuenta">${numero_cuenta}</td>
+                <td class="col-glosa">${glosa_cuenta}</td>
+                <td class="col-debe-mn" style="text-align: right">${number_format(can_debe_mn, 4, ',', '.')}</td>
+                <td class="col-haber-mn" style="text-align: right">${number_format(can_haber_mn, 4, ',', '.')}</td>
+                <td class="col-debe-me" style="text-align: right">${number_format(can_debe_me, 4, ',', '.')}</td>
+                <td class="col-haber-me" style="text-align: right">${number_format(can_haber_me, 4, ',', '.')}</td>
                 <td>
                     <button type="button" class="btn btn-sm btn-primary editar-cuenta">
                         ✏ Editar
@@ -736,6 +738,8 @@ $(document).ready(function () {
                 </td>
             </tr>
         `;
+
+        let table = $('#asientodetalle').DataTable();
 
         switch (form_id_editar) {
             case 'C':
@@ -753,7 +757,9 @@ $(document).ready(function () {
                 document.getElementById("asiento_cabecera_compra").value = JSON.stringify(arrayCabecera);
                 document.getElementById("asiento_detalle_compra").value = JSON.stringify(arrayDetalle);
                 // Después de actualizar arrayDetalle
-                $("#asientodetalle tbody").append(nuevaFila);
+                table = $('#asientodetalle').DataTable();
+                table.row.add($(nuevaFila)).draw(false);
+                //$("#asientodetalle tbody").append(nuevaFila);
                 $("#asientototales tbody tr").each(function () {
                     let fila = $(this);
 
@@ -772,12 +778,16 @@ $(document).ready(function () {
             case 'RV':
                 document.getElementById("asiento_detalle_reparable_reversion").value = JSON.stringify(arrayDetalle);
                 // Después de actualizar arrayDetalle
-                $("#asientodetallereversion tbody").append(nuevaFila);
+                table = $('#asientodetallereversion').DataTable();
+                table.row.add($(nuevaFila)).draw(false);
+                //$("#asientodetallereversion tbody").append(nuevaFila);
                 break;
             case 'D':
                 document.getElementById("asiento_detalle_deduccion").value = JSON.stringify(arrayDetalle);
                 // Después de actualizar arrayDetalle
-                $("#asientodetallededuccion tbody").append(nuevaFila);
+                table = $('#asientodetallededuccion').DataTable();
+                table.row.add($(nuevaFila)).draw(false);
+                //$("#asientodetallededuccion tbody").append(nuevaFila);
                 break;
             case 'P':
                 arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_percepcion").value);
@@ -794,7 +804,9 @@ $(document).ready(function () {
                 document.getElementById("asiento_cabecera_percepcion").value = JSON.stringify(arrayCabecera);
                 document.getElementById("asiento_detalle_percepcion").value = JSON.stringify(arrayDetalle);
                 // Después de actualizar arrayDetalle
-                $("#asientodetallepercepcion tbody").append(nuevaFila);
+                table = $('#asientodetallepercepcion').DataTable();
+                table.row.add($(nuevaFila)).draw(false);
+                //$("#asientodetallepercepcion tbody").append(nuevaFila);
                 $("#asiento_totales_percepcion tbody tr").each(function () {
                     let fila = $(this);
 

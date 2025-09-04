@@ -548,13 +548,17 @@
                                     data_asiento="RV"
                                     data_moneda="{{ $asiento_compra[1][0]['COD_CATEGORIA_MONEDA'] }}"
                                     data_tc="{{ $asiento_compra[1][0]['CAN_TIPO_CAMBIO'] }}">
-                                    <td>{{ $asiento_movimiento['COD_ASIENTO_MOVIMIENTO'] }}</td>
-                                    <td>{{ $asiento_movimiento['TXT_CUENTA_CONTABLE'] }}</td>
-                                    <td>{{ $asiento_movimiento['TXT_GLOSA'] }}</td>
-                                    <td style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_MN'], 4, '.', ',') }}</td>
-                                    <td style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_MN'], 4, '.', ',') }}</td>
-                                    <td style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_ME'], 4, '.', ',') }}</td>
-                                    <td style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_ME'], 4, '.', ',') }}</td>
+                                    <td class="col-codigo">{{ $asiento_movimiento['COD_ASIENTO_MOVIMIENTO'] }}</td>
+                                    <td class="col-cuenta">{{ $asiento_movimiento['TXT_CUENTA_CONTABLE'] }}</td>
+                                    <td class="col-glosa">{{ $asiento_movimiento['TXT_GLOSA'] }}</td>
+                                    <td class="col-debe-mn"
+                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_MN'], 4, '.', ',') }}</td>
+                                    <td class="col-haber-mn"
+                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_MN'], 4, '.', ',') }}</td>
+                                    <td class="col-debe-me"
+                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_ME'], 4, '.', ',') }}</td>
+                                    <td class="col-haber-me"
+                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_ME'], 4, '.', ',') }}</td>
                                     <td>
                                         <button type="button" class="btn btn-sm btn-primary editar-cuenta">
                                             ✏ Editar
@@ -601,13 +605,17 @@
                                     data_asiento="D"
                                     data_moneda="{{ $asiento_compra[1][0]['COD_CATEGORIA_MONEDA'] }}"
                                     data_tc="{{ $asiento_compra[1][0]['CAN_TIPO_CAMBIO'] }}">
-                                    <td>{{ $asiento_movimiento['COD_ASIENTO_MOVIMIENTO'] }}</td>
-                                    <td>{{ $asiento_movimiento['TXT_CUENTA_CONTABLE'] }}</td>
-                                    <td>{{ $asiento_movimiento['TXT_GLOSA'] }}</td>
-                                    <td style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_MN'], 4, '.', ',') }}</td>
-                                    <td style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_MN'], 4, '.', ',') }}</td>
-                                    <td style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_ME'], 4, '.', ',') }}</td>
-                                    <td style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_ME'], 4, '.', ',') }}</td>
+                                    <td class="col-codigo">{{ $asiento_movimiento['COD_ASIENTO_MOVIMIENTO'] }}</td>
+                                    <td class="col-cuenta">{{ $asiento_movimiento['TXT_CUENTA_CONTABLE'] }}</td>
+                                    <td class="col-glosa">{{ $asiento_movimiento['TXT_GLOSA'] }}</td>
+                                    <td class="col-debe-mn"
+                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_MN'], 4, '.', ',') }}</td>
+                                    <td class="col-haber-mn"
+                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_MN'], 4, '.', ',') }}</td>
+                                    <td class="col-debe-me"
+                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_ME'], 4, '.', ',') }}</td>
+                                    <td class="col-haber-me"
+                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_ME'], 4, '.', ',') }}</td>
                                     <td>
                                         <button type="button" class="btn btn-sm btn-primary editar-cuenta">
                                             ✏ Editar
@@ -719,13 +727,17 @@
                                     data_asiento="P"
                                     data_moneda="{{ $asiento_compra[1][0]['COD_CATEGORIA_MONEDA'] }}"
                                     data_tc="{{ $asiento_compra[1][0]['CAN_TIPO_CAMBIO'] }}">
-                                    <td>{{ $asiento_movimiento['COD_ASIENTO_MOVIMIENTO'] }}</td>
-                                    <td>{{ $asiento_movimiento['TXT_CUENTA_CONTABLE'] }}</td>
-                                    <td>{{ $asiento_movimiento['TXT_GLOSA'] }}</td>
-                                    <td style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_MN'], 4, '.', ',') }}</td>
-                                    <td style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_MN'], 4, '.', ',') }}</td>
-                                    <td style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_ME'], 4, '.', ',') }}</td>
-                                    <td style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_ME'], 4, '.', ',') }}</td>
+                                    <td class="col-codigo">{{ $asiento_movimiento['COD_ASIENTO_MOVIMIENTO'] }}</td>
+                                    <td class="col-cuenta">{{ $asiento_movimiento['TXT_CUENTA_CONTABLE'] }}</td>
+                                    <td class="col-glosa">{{ $asiento_movimiento['TXT_GLOSA'] }}</td>
+                                    <td class="col-debe-mn"
+                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_MN'], 4, '.', ',') }}</td>
+                                    <td class="col-haber-mn"
+                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_MN'], 4, '.', ',') }}</td>
+                                    <td class="col-debe-me"
+                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_ME'], 4, '.', ',') }}</td>
+                                    <td class="col-haber-me"
+                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_ME'], 4, '.', ',') }}</td>
                                     <td>
                                         <button type="button" class="btn btn-sm btn-primary editar-cuenta">
                                             ✏ Editar

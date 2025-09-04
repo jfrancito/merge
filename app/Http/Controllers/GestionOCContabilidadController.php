@@ -365,6 +365,7 @@ class GestionOCContabilidadController extends Controller
         View::share('titulo', 'Aprobar Comprobante');
 
         if ($_POST) {
+            /*
             $asiento_cabecera_compra = json_decode($request['asiento_cabecera_compra'], true);
             $asiento_detalle_compra = json_decode($request['asiento_detalle_compra'], true);
             $asiento_cabecera_reparable_reversion = json_decode($request['asiento_cabecera_reparable_reversion'], true);
@@ -405,11 +406,11 @@ class GestionOCContabilidadController extends Controller
             $tipo_doc_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_documento_asiento)->first();
             $tipo_doc_ref_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_documento_ref)->first();
             $tipo_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_asiento)->first();
+            */
 
             try {
 
                 DB::beginTransaction();
-
 
                 $pedido_id = $idoc;
                 $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $pedido_id)->where('DOCUMENTO_ITEM', '=', $linea)->first();
@@ -519,6 +520,7 @@ class GestionOCContabilidadController extends Controller
                     . 'ESTADO : ' . $fedocumento_w->TXT_ESTADO . '%0D%0A';
 
                 //GENERACION ASIENTOS
+                /*
                 if (count($asiento_cabecera_compra) > 0 and count($asiento_detalle_compra) > 0) {
                     $cod_tipo_asiento = $asiento_cabecera_compra[0]['COD_CATEGORIA_TIPO_ASIENTO'];
                     $des_tipo_asiento = $asiento_cabecera_compra[0]['TXT_CATEGORIA_TIPO_ASIENTO'];
@@ -914,7 +916,7 @@ class GestionOCContabilidadController extends Controller
                     }
                 }
 
-
+*/
                 DB::commit();
                 return Redirect::to('/gestion-de-contabilidad-aprobar/' . $idopcion)->with('bienhecho', 'Comprobante : ' . $ordencompra->COD_ORDEN . ' APROBADO CON EXITO');
             } catch (\Exception $ex) {
@@ -1425,48 +1427,48 @@ class GestionOCContabilidadController extends Controller
 
         if ($_POST) {
 
-            $asiento_cabecera_compra = json_decode($request['asiento_cabecera_compra'], true);
-            $asiento_detalle_compra = json_decode($request['asiento_detalle_compra'], true);
-            $asiento_cabecera_reparable_reversion = json_decode($request['asiento_cabecera_reparable_reversion'], true);
-            $asiento_detalle_reparable_reversion = json_decode($request['asiento_detalle_reparable_reversion'], true);
-            $asiento_cabecera_deduccion = json_decode($request['asiento_cabecera_deduccion'], true);
-            $asiento_detalle_deduccion = json_decode($request['asiento_detalle_deduccion'], true);
-            $asiento_cabecera_percepcion = json_decode($request['asiento_cabecera_percepcion'], true);
-            $asiento_detalle_percepcion = json_decode($request['asiento_detalle_percepcion'], true);
-
-            $anio_asiento = $request->input('anio_asiento');
-            $periodo_asiento = $request->input('periodo_asiento');
-            $moneda_asiento = $request->input('moneda_asiento');
-            $tipo_cambio_asiento = $request->input('tipo_cambio_asiento');
-            $empresa_asiento = $request->input('empresa_asiento');
-            $tipo_asiento = $request->input('tipo_asiento');
-
-            $fecha_asiento = $request->input('fecha_asiento');
-            $tipo_documento_asiento = $request->input('tipo_documento_asiento');
-            $serie_asiento = $request->input('serie_asiento');
-            $numero_asiento = $request->input('numero_asiento');
-            $tipo_documento_ref = $request->input('tipo_documento_ref');
-            $serie_ref_asiento = $request->input('serie_ref_asiento');
-            $numero_ref_asiento = $request->input('numero_ref_asiento');
-            $glosa_asiento = $request->input('glosa_asiento');
-            $const_detraccion_asiento = $request->input('const_detraccion_asiento');
-            $fecha_detraccion_asiento = $request->input('fecha_detraccion_asiento');
-            $porcentaje_detraccion = $request->input('porcentaje_detraccion');
-            $total_detraccion_asiento = $request->input('total_detraccion_asiento');
-
-            $moneda_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $moneda_asiento)->first();
-            $moneda_asiento_conversion_aux = CMPCategoria::where('COD_CATEGORIA', '=', $moneda_asiento)->first();
-
-            if ($moneda_asiento_aux->CODIGO_SUNAT !== 'PEN') {
-                $moneda_asiento_aux = CMPCategoria::where('TXT_GRUPO', '=', 'MONEDA')->where('COD_ESTADO', '=', 1)->where('CODIGO_SUNAT', '=', 'PEN')->first();
-                $moneda_asiento_conversion_aux = CMPCategoria::where('TXT_GRUPO', '=', 'MONEDA')->where('COD_ESTADO', '=', 1)->where('CODIGO_SUNAT', '=', 'USD')->first();
-            }
-
-            $empresa_doc_asiento_aux = STDEmpresa::where('COD_ESTADO', '=', 1)->where('COD_EMPR', '=', $empresa_asiento)->first();
-            $tipo_doc_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_documento_asiento)->first();
-            $tipo_doc_ref_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_documento_ref)->first();
-
-            $tipo_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_asiento)->first();
+//            $asiento_cabecera_compra = json_decode($request['asiento_cabecera_compra'], true);
+//            $asiento_detalle_compra = json_decode($request['asiento_detalle_compra'], true);
+//            $asiento_cabecera_reparable_reversion = json_decode($request['asiento_cabecera_reparable_reversion'], true);
+//            $asiento_detalle_reparable_reversion = json_decode($request['asiento_detalle_reparable_reversion'], true);
+//            $asiento_cabecera_deduccion = json_decode($request['asiento_cabecera_deduccion'], true);
+//            $asiento_detalle_deduccion = json_decode($request['asiento_detalle_deduccion'], true);
+//            $asiento_cabecera_percepcion = json_decode($request['asiento_cabecera_percepcion'], true);
+//            $asiento_detalle_percepcion = json_decode($request['asiento_detalle_percepcion'], true);
+//
+//            $anio_asiento = $request->input('anio_asiento');
+//            $periodo_asiento = $request->input('periodo_asiento');
+//            $moneda_asiento = $request->input('moneda_asiento');
+//            $tipo_cambio_asiento = $request->input('tipo_cambio_asiento');
+//            $empresa_asiento = $request->input('empresa_asiento');
+//            $tipo_asiento = $request->input('tipo_asiento');
+//
+//            $fecha_asiento = $request->input('fecha_asiento');
+//            $tipo_documento_asiento = $request->input('tipo_documento_asiento');
+//            $serie_asiento = $request->input('serie_asiento');
+//            $numero_asiento = $request->input('numero_asiento');
+//            $tipo_documento_ref = $request->input('tipo_documento_ref');
+//            $serie_ref_asiento = $request->input('serie_ref_asiento');
+//            $numero_ref_asiento = $request->input('numero_ref_asiento');
+//            $glosa_asiento = $request->input('glosa_asiento');
+//            $const_detraccion_asiento = $request->input('const_detraccion_asiento');
+//            $fecha_detraccion_asiento = $request->input('fecha_detraccion_asiento');
+//            $porcentaje_detraccion = $request->input('porcentaje_detraccion');
+//            $total_detraccion_asiento = $request->input('total_detraccion_asiento');
+//
+//            $moneda_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $moneda_asiento)->first();
+//            $moneda_asiento_conversion_aux = CMPCategoria::where('COD_CATEGORIA', '=', $moneda_asiento)->first();
+//
+//            if ($moneda_asiento_aux->CODIGO_SUNAT !== 'PEN') {
+//                $moneda_asiento_aux = CMPCategoria::where('TXT_GRUPO', '=', 'MONEDA')->where('COD_ESTADO', '=', 1)->where('CODIGO_SUNAT', '=', 'PEN')->first();
+//                $moneda_asiento_conversion_aux = CMPCategoria::where('TXT_GRUPO', '=', 'MONEDA')->where('COD_ESTADO', '=', 1)->where('CODIGO_SUNAT', '=', 'USD')->first();
+//            }
+//
+//            $empresa_doc_asiento_aux = STDEmpresa::where('COD_ESTADO', '=', 1)->where('COD_EMPR', '=', $empresa_asiento)->first();
+//            $tipo_doc_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_documento_asiento)->first();
+//            $tipo_doc_ref_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_documento_ref)->first();
+//
+//            $tipo_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_asiento)->first();
 
             try {
 
@@ -1589,6 +1591,7 @@ class GestionOCContabilidadController extends Controller
                 // }
 
                 //GENERACION ASIENTOS
+                /*
                 if (count($asiento_cabecera_compra) > 0 and count($asiento_detalle_compra) > 0) {
 //                DD($asiento_cabecera_compra[0]['COD_CATEGORIA_TIPO_ASIENTO']);
                     $cod_tipo_asiento = $asiento_cabecera_compra[0]['COD_CATEGORIA_TIPO_ASIENTO'];
@@ -1984,7 +1987,7 @@ class GestionOCContabilidadController extends Controller
                         $this->calcular_totales_compras($codAsientoPercepcion);
                     }
                 }
-
+*/
 
                 DB::commit();
                 Session::flash('operacion_id', 'ESTIBA');
@@ -2297,53 +2300,53 @@ class GestionOCContabilidadController extends Controller
 
 //            dd($request);
 
-            $asiento_cabecera_compra = json_decode($request['asiento_cabecera_compra'], true);
-            $asiento_detalle_compra = json_decode($request['asiento_detalle_compra'], true);
-            $asiento_cabecera_reparable_reversion = json_decode($request['asiento_cabecera_reparable_reversion'], true);
-            $asiento_detalle_reparable_reversion = json_decode($request['asiento_detalle_reparable_reversion'], true);
-            $asiento_cabecera_deduccion = json_decode($request['asiento_cabecera_deduccion'], true);
-            $asiento_detalle_deduccion = json_decode($request['asiento_detalle_deduccion'], true);
-            $asiento_cabecera_percepcion = json_decode($request['asiento_cabecera_percepcion'], true);
-            $asiento_detalle_percepcion = json_decode($request['asiento_detalle_percepcion'], true);
-
-//            dd($asiento_cabecera_compra, $asiento_detalle_compra, $asiento_detalle_reparable_reversion, $asiento_detalle_deduccion, $asiento_detalle_percepcion, $asiento_cabecera_reparable_reversion, $asiento_cabecera_deduccion, $asiento_cabecera_percepcion);;
-
-            $anio_asiento = $request->input('anio_asiento');
-            $periodo_asiento = $request->input('periodo_asiento');
-//            $comprobante_asiento = $request->input('comprobante_asiento');
-            $moneda_asiento = $request->input('moneda_asiento');
-            $tipo_cambio_asiento = $request->input('tipo_cambio_asiento');
-            $empresa_asiento = $request->input('empresa_asiento');
-            $tipo_asiento = $request->input('tipo_asiento');
-            $fecha_asiento = $request->input('fecha_asiento');
-            $tipo_documento_asiento = $request->input('tipo_documento_asiento');
-            $serie_asiento = $request->input('serie_asiento');
-            $numero_asiento = $request->input('numero_asiento');
-            $tipo_documento_ref = $request->input('tipo_documento_ref');
-            $serie_ref_asiento = $request->input('serie_ref_asiento');
-            $numero_ref_asiento = $request->input('numero_ref_asiento');
-            $glosa_asiento = $request->input('glosa_asiento');
-//            $igv_xml = $request->input('igv_xml');
-//            $subtotal_xml = $request->input('subtotal_xml');
-//            $total_xml = $request->input('total_xml');
-//            $tipo_descuento_asiento = $request->input('tipo_descuento_asiento');
-            $const_detraccion_asiento = $request->input('const_detraccion_asiento');
-            $fecha_detraccion_asiento = $request->input('fecha_detraccion_asiento');
-            $porcentaje_detraccion = $request->input('porcentaje_detraccion');
-            $total_detraccion_asiento = $request->input('total_detraccion_asiento');
-
-            $moneda_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $moneda_asiento)->first();
-            $moneda_asiento_conversion_aux = CMPCategoria::where('COD_CATEGORIA', '=', $moneda_asiento)->first();
-
-            if ($moneda_asiento_aux->CODIGO_SUNAT !== 'PEN') {
-                $moneda_asiento_aux = CMPCategoria::where('TXT_GRUPO', '=', 'MONEDA')->where('COD_ESTADO', '=', 1)->where('CODIGO_SUNAT', '=', 'PEN')->first();
-                $moneda_asiento_conversion_aux = CMPCategoria::where('TXT_GRUPO', '=', 'MONEDA')->where('COD_ESTADO', '=', 1)->where('CODIGO_SUNAT', '=', 'USD')->first();
-            }
-
-            $empresa_doc_asiento_aux = STDEmpresa::where('COD_ESTADO', '=', 1)->where('COD_EMPR', '=', $empresa_asiento)->first();
-            $tipo_doc_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_documento_asiento)->first();
-            $tipo_doc_ref_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_documento_ref)->first();
-            $tipo_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_asiento)->first();
+//            $asiento_cabecera_compra = json_decode($request['asiento_cabecera_compra'], true);
+//            $asiento_detalle_compra = json_decode($request['asiento_detalle_compra'], true);
+//            $asiento_cabecera_reparable_reversion = json_decode($request['asiento_cabecera_reparable_reversion'], true);
+//            $asiento_detalle_reparable_reversion = json_decode($request['asiento_detalle_reparable_reversion'], true);
+//            $asiento_cabecera_deduccion = json_decode($request['asiento_cabecera_deduccion'], true);
+//            $asiento_detalle_deduccion = json_decode($request['asiento_detalle_deduccion'], true);
+//            $asiento_cabecera_percepcion = json_decode($request['asiento_cabecera_percepcion'], true);
+//            $asiento_detalle_percepcion = json_decode($request['asiento_detalle_percepcion'], true);
+//
+////            dd($asiento_cabecera_compra, $asiento_detalle_compra, $asiento_detalle_reparable_reversion, $asiento_detalle_deduccion, $asiento_detalle_percepcion, $asiento_cabecera_reparable_reversion, $asiento_cabecera_deduccion, $asiento_cabecera_percepcion);;
+//
+//            $anio_asiento = $request->input('anio_asiento');
+//            $periodo_asiento = $request->input('periodo_asiento');
+////            $comprobante_asiento = $request->input('comprobante_asiento');
+//            $moneda_asiento = $request->input('moneda_asiento');
+//            $tipo_cambio_asiento = $request->input('tipo_cambio_asiento');
+//            $empresa_asiento = $request->input('empresa_asiento');
+//            $tipo_asiento = $request->input('tipo_asiento');
+//            $fecha_asiento = $request->input('fecha_asiento');
+//            $tipo_documento_asiento = $request->input('tipo_documento_asiento');
+//            $serie_asiento = $request->input('serie_asiento');
+//            $numero_asiento = $request->input('numero_asiento');
+//            $tipo_documento_ref = $request->input('tipo_documento_ref');
+//            $serie_ref_asiento = $request->input('serie_ref_asiento');
+//            $numero_ref_asiento = $request->input('numero_ref_asiento');
+//            $glosa_asiento = $request->input('glosa_asiento');
+////            $igv_xml = $request->input('igv_xml');
+////            $subtotal_xml = $request->input('subtotal_xml');
+////            $total_xml = $request->input('total_xml');
+////            $tipo_descuento_asiento = $request->input('tipo_descuento_asiento');
+//            $const_detraccion_asiento = $request->input('const_detraccion_asiento');
+//            $fecha_detraccion_asiento = $request->input('fecha_detraccion_asiento');
+//            $porcentaje_detraccion = $request->input('porcentaje_detraccion');
+//            $total_detraccion_asiento = $request->input('total_detraccion_asiento');
+//
+//            $moneda_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $moneda_asiento)->first();
+//            $moneda_asiento_conversion_aux = CMPCategoria::where('COD_CATEGORIA', '=', $moneda_asiento)->first();
+//
+//            if ($moneda_asiento_aux->CODIGO_SUNAT !== 'PEN') {
+//                $moneda_asiento_aux = CMPCategoria::where('TXT_GRUPO', '=', 'MONEDA')->where('COD_ESTADO', '=', 1)->where('CODIGO_SUNAT', '=', 'PEN')->first();
+//                $moneda_asiento_conversion_aux = CMPCategoria::where('TXT_GRUPO', '=', 'MONEDA')->where('COD_ESTADO', '=', 1)->where('CODIGO_SUNAT', '=', 'USD')->first();
+//            }
+//
+//            $empresa_doc_asiento_aux = STDEmpresa::where('COD_ESTADO', '=', 1)->where('COD_EMPR', '=', $empresa_asiento)->first();
+//            $tipo_doc_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_documento_asiento)->first();
+//            $tipo_doc_ref_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_documento_ref)->first();
+//            $tipo_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_asiento)->first();
 
 //            DD($moneda_asiento_aux, $moneda_asiento_conversion_aux, $empresa_doc_asiento_aux, $tipo_doc_asiento_aux, $tipo_doc_ref_asiento_aux);
 
@@ -2482,6 +2485,7 @@ class GestionOCContabilidadController extends Controller
                 // }
 
                 //GENERACION ASIENTOS
+                /*
                 if (count($asiento_cabecera_compra) > 0 and count($asiento_detalle_compra) > 0) {
 //                DD($asiento_cabecera_compra[0]['COD_CATEGORIA_TIPO_ASIENTO']);
                     $cod_tipo_asiento = $asiento_cabecera_compra[0]['COD_CATEGORIA_TIPO_ASIENTO'];
@@ -2877,7 +2881,7 @@ class GestionOCContabilidadController extends Controller
                         $this->calcular_totales_compras($codAsientoPercepcion);
                     }
                 }
-
+*/
                 DB::commit();
                 Session::flash('operacion_id', 'CONTRATO');
 
@@ -3929,34 +3933,34 @@ class GestionOCContabilidadController extends Controller
 
         if ($_POST) {
 
-            $asiento_cabecera_reparable = json_decode($request['asiento_cabecera_reparable'], true);
-            $asiento_detalle_reparable = json_decode($request['asiento_detalle_reparable'], true);
-
-            $anio_asiento = $request->input('anio_asiento_reparable');
-            $periodo_asiento = $request->input('periodo_asiento_reparable');
-            $moneda_asiento = $request->input('moneda_asiento_reparable');
-            $tipo_cambio_asiento = $request->input('tipo_cambio_asiento_reparable');
-            $empresa_asiento = $request->input('empresa_asiento_reparable');
-            $fecha_asiento = $request->input('fecha_asiento_reparable');
-            $tipo_documento_asiento = $request->input('tipo_documento_asiento_reparable');
-            $serie_asiento = $request->input('serie_asiento_reparable');
-            $numero_asiento = $request->input('numero_asiento_reparable');
-            $tipo_documento_ref = $request->input('tipo_documento_ref_reparable');
-            $serie_ref_asiento = $request->input('serie_ref_asiento_reparable');
-            $numero_ref_asiento = $request->input('numero_ref_asiento_reparable');
-            $glosa_asiento = $request->input('glosa_asiento_reparable');
-
-            $moneda_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $moneda_asiento)->first();
-            $moneda_asiento_conversion_aux = CMPCategoria::where('COD_CATEGORIA', '=', $moneda_asiento)->first();
-
-            if ($moneda_asiento_aux->CODIGO_SUNAT !== 'PEN') {
-                $moneda_asiento_aux = CMPCategoria::where('TXT_GRUPO', '=', 'MONEDA')->where('COD_ESTADO', '=', 1)->where('CODIGO_SUNAT', '=', 'PEN')->first();
-                $moneda_asiento_conversion_aux = CMPCategoria::where('TXT_GRUPO', '=', 'MONEDA')->where('COD_ESTADO', '=', 1)->where('CODIGO_SUNAT', '=', 'USD')->first();
-            }
-
-            $empresa_doc_asiento_aux = STDEmpresa::where('COD_ESTADO', '=', 1)->where('COD_EMPR', '=', $empresa_asiento)->first();
-            $tipo_doc_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_documento_asiento)->first();
-            $tipo_doc_ref_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_documento_ref)->first();
+//            $asiento_cabecera_reparable = json_decode($request['asiento_cabecera_reparable'], true);
+//            $asiento_detalle_reparable = json_decode($request['asiento_detalle_reparable'], true);
+//
+//            $anio_asiento = $request->input('anio_asiento_reparable');
+//            $periodo_asiento = $request->input('periodo_asiento_reparable');
+//            $moneda_asiento = $request->input('moneda_asiento_reparable');
+//            $tipo_cambio_asiento = $request->input('tipo_cambio_asiento_reparable');
+//            $empresa_asiento = $request->input('empresa_asiento_reparable');
+//            $fecha_asiento = $request->input('fecha_asiento_reparable');
+//            $tipo_documento_asiento = $request->input('tipo_documento_asiento_reparable');
+//            $serie_asiento = $request->input('serie_asiento_reparable');
+//            $numero_asiento = $request->input('numero_asiento_reparable');
+//            $tipo_documento_ref = $request->input('tipo_documento_ref_reparable');
+//            $serie_ref_asiento = $request->input('serie_ref_asiento_reparable');
+//            $numero_ref_asiento = $request->input('numero_ref_asiento_reparable');
+//            $glosa_asiento = $request->input('glosa_asiento_reparable');
+//
+//            $moneda_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $moneda_asiento)->first();
+//            $moneda_asiento_conversion_aux = CMPCategoria::where('COD_CATEGORIA', '=', $moneda_asiento)->first();
+//
+//            if ($moneda_asiento_aux->CODIGO_SUNAT !== 'PEN') {
+//                $moneda_asiento_aux = CMPCategoria::where('TXT_GRUPO', '=', 'MONEDA')->where('COD_ESTADO', '=', 1)->where('CODIGO_SUNAT', '=', 'PEN')->first();
+//                $moneda_asiento_conversion_aux = CMPCategoria::where('TXT_GRUPO', '=', 'MONEDA')->where('COD_ESTADO', '=', 1)->where('CODIGO_SUNAT', '=', 'USD')->first();
+//            }
+//
+//            $empresa_doc_asiento_aux = STDEmpresa::where('COD_ESTADO', '=', 1)->where('COD_EMPR', '=', $empresa_asiento)->first();
+//            $tipo_doc_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_documento_asiento)->first();
+//            $tipo_doc_ref_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_documento_ref)->first();
 
             try {
 
@@ -4018,6 +4022,7 @@ class GestionOCContabilidadController extends Controller
                     );
 
                 //GENERACION ASIENTOS
+                /*
                 if (count($asiento_cabecera_reparable) > 0 and count($asiento_detalle_reparable) > 0) {
 //                DD($asiento_cabecera_compra[0]['COD_CATEGORIA_TIPO_ASIENTO']);
                     $cod_tipo_asiento = $asiento_cabecera_reparable[0]['COD_CATEGORIA_TIPO_ASIENTO'];
@@ -4116,7 +4121,7 @@ class GestionOCContabilidadController extends Controller
                         $this->calcular_totales_compras($codAsientoCompra);
                     }
                 }
-
+*/
 
                 DB::commit();
                 return Redirect::to('aprobar-comprobante-contabilidad/' . $idopcion . '/' . $linea . '/' . $prefijo . '/' . $idordencompra)->with('bienhecho', 'Comprobante : ' . $ordencompra->COD_ORDEN . ' REPARABLE CON EXITO');
@@ -4583,34 +4588,34 @@ class GestionOCContabilidadController extends Controller
 
         if ($_POST) {
 
-            $asiento_cabecera_reparable = json_decode($request['asiento_cabecera_reparable'], true);
-            $asiento_detalle_reparable = json_decode($request['asiento_detalle_reparable'], true);
-
-            $anio_asiento = $request->input('anio_asiento_reparable');
-            $periodo_asiento = $request->input('periodo_asiento_reparable');
-            $moneda_asiento = $request->input('moneda_asiento_reparable');
-            $tipo_cambio_asiento = $request->input('tipo_cambio_asiento_reparable');
-            $empresa_asiento = $request->input('empresa_asiento_reparable');
-            $fecha_asiento = $request->input('fecha_asiento_reparable');
-            $tipo_documento_asiento = $request->input('tipo_documento_asiento_reparable');
-            $serie_asiento = $request->input('serie_asiento_reparable');
-            $numero_asiento = $request->input('numero_asiento_reparable');
-            $tipo_documento_ref = $request->input('tipo_documento_ref_reparable');
-            $serie_ref_asiento = $request->input('serie_ref_asiento_reparable');
-            $numero_ref_asiento = $request->input('numero_ref_asiento_reparable');
-            $glosa_asiento = $request->input('glosa_asiento_reparable');
-
-            $moneda_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $moneda_asiento)->first();
-            $moneda_asiento_conversion_aux = CMPCategoria::where('COD_CATEGORIA', '=', $moneda_asiento)->first();
-
-            if ($moneda_asiento_aux->CODIGO_SUNAT !== 'PEN') {
-                $moneda_asiento_aux = CMPCategoria::where('TXT_GRUPO', '=', 'MONEDA')->where('COD_ESTADO', '=', 1)->where('CODIGO_SUNAT', '=', 'PEN')->first();
-                $moneda_asiento_conversion_aux = CMPCategoria::where('TXT_GRUPO', '=', 'MONEDA')->where('COD_ESTADO', '=', 1)->where('CODIGO_SUNAT', '=', 'USD')->first();
-            }
-
-            $empresa_doc_asiento_aux = STDEmpresa::where('COD_ESTADO', '=', 1)->where('COD_EMPR', '=', $empresa_asiento)->first();
-            $tipo_doc_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_documento_asiento)->first();
-            $tipo_doc_ref_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_documento_ref)->first();
+//            $asiento_cabecera_reparable = json_decode($request['asiento_cabecera_reparable'], true);
+//            $asiento_detalle_reparable = json_decode($request['asiento_detalle_reparable'], true);
+//
+//            $anio_asiento = $request->input('anio_asiento_reparable');
+//            $periodo_asiento = $request->input('periodo_asiento_reparable');
+//            $moneda_asiento = $request->input('moneda_asiento_reparable');
+//            $tipo_cambio_asiento = $request->input('tipo_cambio_asiento_reparable');
+//            $empresa_asiento = $request->input('empresa_asiento_reparable');
+//            $fecha_asiento = $request->input('fecha_asiento_reparable');
+//            $tipo_documento_asiento = $request->input('tipo_documento_asiento_reparable');
+//            $serie_asiento = $request->input('serie_asiento_reparable');
+//            $numero_asiento = $request->input('numero_asiento_reparable');
+//            $tipo_documento_ref = $request->input('tipo_documento_ref_reparable');
+//            $serie_ref_asiento = $request->input('serie_ref_asiento_reparable');
+//            $numero_ref_asiento = $request->input('numero_ref_asiento_reparable');
+//            $glosa_asiento = $request->input('glosa_asiento_reparable');
+//
+//            $moneda_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $moneda_asiento)->first();
+//            $moneda_asiento_conversion_aux = CMPCategoria::where('COD_CATEGORIA', '=', $moneda_asiento)->first();
+//
+//            if ($moneda_asiento_aux->CODIGO_SUNAT !== 'PEN') {
+//                $moneda_asiento_aux = CMPCategoria::where('TXT_GRUPO', '=', 'MONEDA')->where('COD_ESTADO', '=', 1)->where('CODIGO_SUNAT', '=', 'PEN')->first();
+//                $moneda_asiento_conversion_aux = CMPCategoria::where('TXT_GRUPO', '=', 'MONEDA')->where('COD_ESTADO', '=', 1)->where('CODIGO_SUNAT', '=', 'USD')->first();
+//            }
+//
+//            $empresa_doc_asiento_aux = STDEmpresa::where('COD_ESTADO', '=', 1)->where('COD_EMPR', '=', $empresa_asiento)->first();
+//            $tipo_doc_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_documento_asiento)->first();
+//            $tipo_doc_ref_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_documento_ref)->first();
 
             try {
 
@@ -4684,6 +4689,7 @@ class GestionOCContabilidadController extends Controller
                 // }
 
                 //GENERACION ASIENTOS
+                /*
                 if (count($asiento_cabecera_reparable) > 0 and count($asiento_detalle_reparable) > 0) {
 //                DD($asiento_cabecera_compra[0]['COD_CATEGORIA_TIPO_ASIENTO']);
                     $cod_tipo_asiento = $asiento_cabecera_reparable[0]['COD_CATEGORIA_TIPO_ASIENTO'];
@@ -4782,6 +4788,7 @@ class GestionOCContabilidadController extends Controller
                         $this->calcular_totales_compras($codAsientoCompra);
                     }
                 }
+*/
 
                 DB::commit();
                 Session::flash('operacion_id', 'ESTIBA');
@@ -4877,34 +4884,34 @@ class GestionOCContabilidadController extends Controller
 
         if ($_POST) {
 
-            $asiento_cabecera_reparable = json_decode($request['asiento_cabecera_reparable'], true);
-            $asiento_detalle_reparable = json_decode($request['asiento_detalle_reparable'], true);
-
-            $anio_asiento = $request->input('anio_asiento_reparable');
-            $periodo_asiento = $request->input('periodo_asiento_reparable');
-            $moneda_asiento = $request->input('moneda_asiento_reparable');
-            $tipo_cambio_asiento = $request->input('tipo_cambio_asiento_reparable');
-            $empresa_asiento = $request->input('empresa_asiento_reparable');
-            $fecha_asiento = $request->input('fecha_asiento_reparable');
-            $tipo_documento_asiento = $request->input('tipo_documento_asiento_reparable');
-            $serie_asiento = $request->input('serie_asiento_reparable');
-            $numero_asiento = $request->input('numero_asiento_reparable');
-            $tipo_documento_ref = $request->input('tipo_documento_ref_reparable');
-            $serie_ref_asiento = $request->input('serie_ref_asiento_reparable');
-            $numero_ref_asiento = $request->input('numero_ref_asiento_reparable');
-            $glosa_asiento = $request->input('glosa_asiento_reparable');
-
-            $moneda_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $moneda_asiento)->first();
-            $moneda_asiento_conversion_aux = CMPCategoria::where('COD_CATEGORIA', '=', $moneda_asiento)->first();
-
-            if ($moneda_asiento_aux->CODIGO_SUNAT !== 'PEN') {
-                $moneda_asiento_aux = CMPCategoria::where('TXT_GRUPO', '=', 'MONEDA')->where('COD_ESTADO', '=', 1)->where('CODIGO_SUNAT', '=', 'PEN')->first();
-                $moneda_asiento_conversion_aux = CMPCategoria::where('TXT_GRUPO', '=', 'MONEDA')->where('COD_ESTADO', '=', 1)->where('CODIGO_SUNAT', '=', 'USD')->first();
-            }
-
-            $empresa_doc_asiento_aux = STDEmpresa::where('COD_ESTADO', '=', 1)->where('COD_EMPR', '=', $empresa_asiento)->first();
-            $tipo_doc_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_documento_asiento)->first();
-            $tipo_doc_ref_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_documento_ref)->first();
+//            $asiento_cabecera_reparable = json_decode($request['asiento_cabecera_reparable'], true);
+//            $asiento_detalle_reparable = json_decode($request['asiento_detalle_reparable'], true);
+//
+//            $anio_asiento = $request->input('anio_asiento_reparable');
+//            $periodo_asiento = $request->input('periodo_asiento_reparable');
+//            $moneda_asiento = $request->input('moneda_asiento_reparable');
+//            $tipo_cambio_asiento = $request->input('tipo_cambio_asiento_reparable');
+//            $empresa_asiento = $request->input('empresa_asiento_reparable');
+//            $fecha_asiento = $request->input('fecha_asiento_reparable');
+//            $tipo_documento_asiento = $request->input('tipo_documento_asiento_reparable');
+//            $serie_asiento = $request->input('serie_asiento_reparable');
+//            $numero_asiento = $request->input('numero_asiento_reparable');
+//            $tipo_documento_ref = $request->input('tipo_documento_ref_reparable');
+//            $serie_ref_asiento = $request->input('serie_ref_asiento_reparable');
+//            $numero_ref_asiento = $request->input('numero_ref_asiento_reparable');
+//            $glosa_asiento = $request->input('glosa_asiento_reparable');
+//
+//            $moneda_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $moneda_asiento)->first();
+//            $moneda_asiento_conversion_aux = CMPCategoria::where('COD_CATEGORIA', '=', $moneda_asiento)->first();
+//
+//            if ($moneda_asiento_aux->CODIGO_SUNAT !== 'PEN') {
+//                $moneda_asiento_aux = CMPCategoria::where('TXT_GRUPO', '=', 'MONEDA')->where('COD_ESTADO', '=', 1)->where('CODIGO_SUNAT', '=', 'PEN')->first();
+//                $moneda_asiento_conversion_aux = CMPCategoria::where('TXT_GRUPO', '=', 'MONEDA')->where('COD_ESTADO', '=', 1)->where('CODIGO_SUNAT', '=', 'USD')->first();
+//            }
+//
+//            $empresa_doc_asiento_aux = STDEmpresa::where('COD_ESTADO', '=', 1)->where('COD_EMPR', '=', $empresa_asiento)->first();
+//            $tipo_doc_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_documento_asiento)->first();
+//            $tipo_doc_ref_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_documento_ref)->first();
 
             try {
 
@@ -4978,6 +4985,7 @@ class GestionOCContabilidadController extends Controller
                 // }
 
                 //GENERACION ASIENTOS
+                /*
                 if (count($asiento_cabecera_reparable) > 0 and count($asiento_detalle_reparable) > 0) {
 //                DD($asiento_cabecera_compra[0]['COD_CATEGORIA_TIPO_ASIENTO']);
                     $cod_tipo_asiento = $asiento_cabecera_reparable[0]['COD_CATEGORIA_TIPO_ASIENTO'];
@@ -5076,7 +5084,7 @@ class GestionOCContabilidadController extends Controller
                         $this->calcular_totales_compras($codAsientoCompra);
                     }
                 }
-
+*/
 //                dd("todo ok");
 
                 DB::commit();
