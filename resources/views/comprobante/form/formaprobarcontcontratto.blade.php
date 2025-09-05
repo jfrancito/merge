@@ -142,7 +142,6 @@
                             </div>
                         </div>
 
-{{--
                         <div class="form-group">
                             <label class="col-sm-12 control-label izquierda" style="text-align: left;">Cuenta Contable
                                 <b>(*)</b></label>
@@ -156,11 +155,11 @@
                                        data-parsley-type="number"
                                        data-parsley-length="[6, 6]"
                                        data-parsley-length-message="El código debe tener exactamente 6 caracteres."
-                                       autocomplete="off" class="form-control dinero input-sm"/>
+                                       autocomplete="off" class="form-control input-sm"/>
 
                             </div>
-                        </div>--}}
-
+                        </div>
+{{--
                         <input type="text"
                                id="nro_cuenta_contable"
                                name="nro_cuenta_contable"
@@ -170,7 +169,7 @@
                                maxlength="6"
                                data-parsley-pattern-message="El código debe tener exactamente 6 números"
                                autocomplete="off"
-                               class="form-control input-sm"/>
+                               class="form-control input-sm"/>--}}
 
 
                     </div>
