@@ -103,7 +103,7 @@
                                        data-parsley-type="number"
                                        data-parsley-length="[6, 6]"
                                        data-parsley-length-message="El código debe tener exactamente 6 caracteres."
-                                       autocomplete="off" class="form-control dinero input-sm"/>
+                                       autocomplete="off" class="form-control input-sm"/>
 
                             </div>
                         </div>
