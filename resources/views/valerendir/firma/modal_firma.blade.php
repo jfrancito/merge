@@ -53,7 +53,7 @@
 
         .firma {
             text-align: center;
-            margin-top: 50px; /* espacio desde arriba */
+            margin-top: 75px; /* espacio desde arriba */
         }
 
         .linea-firma {
@@ -118,53 +118,49 @@
             <td>{{ $txt_descripcion }}</td>
         </tr>
        <tr>
-    <td class="label">
-        @if($cod_categoria_moneda == "MON0000000000001")
-            {{-- Moneda en Soles --}}
-            @if($can_debe_mn != 0)
-                Importe:
-            @else
-                Pago:
-            @endif
-        @else
-            {{-- Moneda en Dólares --}}
-            @if($can_debe_me != 0)
-                Importe:
-            @else
-                Pago:
-            @endif
-        @endif
-    </td>
-    <td>
-        @if($cod_categoria_moneda == "MON0000000000001")
-            {{-- Moneda en Soles --}}
-            @if($can_debe_mn != 0)
-                @php $importe = $can_debe_mn; @endphp
-                S/. {{ number_format($importe, 2) }}
-            @else
-                @php $importe = $can_haber_mn; @endphp
-                S/. {{ number_format($importe, 2) }}
-            @endif
-        @else
-            {{-- Moneda en Dólares --}}
-            @if($can_debe_me != 0)
-                @php $importe = $can_debe_me; @endphp
-                $. {{ number_format($importe, 2) }}
-            @else
-                @php $importe = $can_haber_me; @endphp
-                $. {{ number_format($importe, 2) }}
-            @endif
-        @endif
-    </td>
-</tr>
-
-<tr>
-    <td class="label">Son:</td>
-    
-</tr>
-
-</tr>
-
+            <td class="label">
+                @if($cod_categoria_moneda == "MON0000000000001")
+                    {{-- Moneda en Soles --}}
+                    @if($can_debe_mn != 0)
+                        Importe:
+                    @else
+                        Pago:
+                    @endif
+                @else
+                    {{-- Moneda en Dólares --}}
+                    @if($can_debe_me != 0)
+                        Importe:
+                    @else
+                        Pago:
+                    @endif
+                @endif
+            </td>
+            <td>
+                @if($cod_categoria_moneda == "MON0000000000001")
+                    {{-- Moneda en Soles --}}
+                    @if($can_debe_mn != 0)
+                        @php $importe = $can_debe_mn; @endphp
+                        S/. {{ number_format($importe, 2) }}
+                    @else
+                        @php $importe = $can_haber_mn; @endphp
+                        S/. {{ number_format($importe, 2) }}
+                    @endif
+                @else
+                    {{-- Moneda en Dólares --}}
+                    @if($can_debe_me != 0)
+                        @php $importe = $can_debe_me; @endphp
+                        $. {{ number_format($importe, 2) }}
+                    @else
+                        @php $importe = $can_haber_me; @endphp
+                        $. {{ number_format($importe, 2) }}
+                    @endif
+                @endif
+            </td>
+        </tr>
+        <tr>
+            <td class="label">Son:</td>
+            <td>{{ $texto_importe }}</td>
+        </tr>
     </table>
 
    <div class="firma">

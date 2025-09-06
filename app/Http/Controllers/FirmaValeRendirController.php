@@ -14,6 +14,7 @@ use App\Modelos\WEBRegistroImporteGastos;
 use App\Modelos\ALMCentro;
 use App\Modelos\STDTrabajador;
 use Illuminate\Support\Carbon;
+use App\Helpers\NumeroALetras;
 use Session;
 use App\WEBRegla, App\STDEmpresa, APP\User, App\CMPCategoria;
 use View;
@@ -77,6 +78,18 @@ class FirmaValeRendirController extends Controller
 
        
         if (!file_exists($rutaArchivo)) {
+
+    
+            if ($info->COD_CATEGORIA_MONEDA == "MON0000000000001") {
+                // Moneda en Soles
+                $importe = ($info->CAN_DEBE_MN != 0) ? $info->CAN_DEBE_MN : $info->CAN_HABER_MN;
+                $textoImporte = NumeroALetras::convertir($importe, 'NUEVOS SOLES');
+            } else {
+                // Moneda en Dólares
+                $importe = ($info->CAN_DEBE_ME != 0) ? $info->CAN_DEBE_ME : $info->CAN_HABER_ME;
+                $textoImporte = NumeroALetras::convertir($importe, 'DÓLARES AMERICANOS');
+            }
+
             $pdf = PDF::loadView('valerendir.firma.modal_firma', [
                 'id'                          => $id,
                 'txt_empr_afecta'             => $info->TXT_EMPR_AFECTA ?? '',
@@ -96,7 +109,8 @@ class FirmaValeRendirController extends Controller
                 'txt_categoria_medio_pago'    => $info->TXT_CATEGORIA_MEDIO_PAGO ?? '',
                 'txt_categoria_operacion_caja'=> $info->TXT_CATEGORIA_OPERACION_CAJA ?? '',
                 'txt_categoria_moneda'        => $info->TXT_CATEGORIA_MONEDA ?? '',
-                'txt_caja_banco'              => $info->TXT_CAJA_BANCO ?? ''
+                'txt_caja_banco'              => $info->TXT_CAJA_BANCO ?? '',
+                'texto_importe'               => $textoImporte
             ]);
 
             if (!file_exists(dirname($rutaArchivo))) {
@@ -106,12 +120,11 @@ class FirmaValeRendirController extends Controller
             $pdf->save($rutaArchivo);
         }
 
-      
-        $pdocPath = "C:\\Program Files (x86)\\pDoc Signer\\pDoc Signer.exe";
-        $comando  = 'start "" "' . $pdocPath . '" "' . $rutaArchivo . '"';
+        $rutaWeb = str_replace('\\', '/', $rutaArchivo);
+        $rutaCustom = "pdoc://" . $rutaWeb;
 
-        pclose(popen($comando, "r"));
-
-        return response(null, 204);
+        return redirect()->away($rutaCustom);
     }
 }
+
+
