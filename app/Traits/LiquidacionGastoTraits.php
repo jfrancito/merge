@@ -1046,11 +1046,13 @@ trait LiquidacionGastoTraits
 
     private function lg_lista_cabecera_comprobante_total_validado($fecha_inicio,$fecha_fin,$proveedor_id,$estado_id) {
 
-        $listadatos         =   LqgLiquidacionGasto::where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
-                                ->whereRaw("CAST(FECHA_EMI AS DATE) >= ? and CAST(FECHA_EMI AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+        $listadatos         =   LqgLiquidacionGasto::leftJoin('CMP.DOCUMENTO_CTBLE', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'LQG_LIQUIDACION_GASTO.COD_OSIRIS')
+                                ->select(DB::raw("LQG_LIQUIDACION_GASTO.*, CMP.DOCUMENTO_CTBLE.NRO_SERIE,CMP.DOCUMENTO_CTBLE.NRO_DOC,CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE"))
+                                ->where('LQG_LIQUIDACION_GASTO.COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                                ->whereRaw("CAST(LQG_LIQUIDACION_GASTO.FECHA_EMI AS DATE) >= ? and CAST(LQG_LIQUIDACION_GASTO.FECHA_EMI AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                 ->ProveedorLG($proveedor_id)
                                 ->EstadoLG($estado_id)
-                                ->orderby('FECHA_EMI','ASC')
+                                ->orderby('LQG_LIQUIDACION_GASTO.FECHA_EMI','ASC')
                                 ->get();
 
         return  $listadatos;

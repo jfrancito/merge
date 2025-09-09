@@ -21,6 +21,12 @@
           <span><b>SUB CUENTA : </b>{{$item->TXT_SUBCUENTA}} </span>
           <span><b>CENTRO : </b>{{$item->TXT_CENTRO}} </span>
           <span><b>PERIODO : </b>{{$item->TXT_PERIODO}} </span>
+
+          <span><b>OSIRIS DOCUMENTO : </b>{{$item->NRO_SERIE}} - {{$item->NRO_DOC}} </span>
+          <span><b>OSIRIS ID : </b>{{$item->COD_DOCUMENTO_CTBLE}} </span>
+
+
+
           <span><b>TOTAL : </b> {{$item->TOTAL}}</span>
         </td>
         <td class="cell-detail sorting_1" style="position: relative;">

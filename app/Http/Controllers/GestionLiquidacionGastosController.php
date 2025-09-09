@@ -27,7 +27,7 @@ use App\Modelos\CMPZona;
 use App\Modelos\SunatDocumento;
 use App\Modelos\CMPDocumentoCtble;
 use App\Modelos\TESCuentaBancaria;
-
+use App\Modelos\WEBValeRendir;
 
 use App\Modelos\LqgLiquidacionGasto;
 use App\Modelos\LqgDocumentoHistorial;
@@ -4488,6 +4488,17 @@ class GestionLiquidacionGastosController extends Controller
         $cuentaco_id = $liquidaciongastos->CUENTA_BANCARIA;
 
 
+
+        $doc_arendri    =   '';
+        $doc_monto      =   '';
+        $arendir        =   WEBValeRendir::where('ID','=',$liquidaciongastos->ARENDIR_ID)->first();
+
+        if (count($arendir)>0) {
+            $doc_arendri    =   $arendir->TXT_SERIE.'-'.$arendir->TXT_NUMERO;
+            $doc_monto      =   $arendir->CAN_TOTAL_IMPORTE;
+        }
+
+
         if ($valor == '0') {
 
             $active = "documentos";
@@ -4614,6 +4625,10 @@ class GestionLiquidacionGastosController extends Controller
                 'tipopago_id' => $tipopago_id,
                 'combo_tp' => $combo_tp,
                 'banco_id' => $banco_id,
+                'doc_arendri' => $doc_arendri,
+                'doc_monto' => $doc_monto,
+
+
                 'combobancos' => $combobancos,
                 'cuenta_id' => $cuenta_id,
                 'combocb' => $combocb,

@@ -312,7 +312,7 @@ trait GeneralesTraits
                 		->whereNotIn('ID', $liquidaciones)
 					    ->select(
 					        'ID',
-					        DB::raw("ID_OSIRIS + ' - ' + CAST(CAN_TOTAL_IMPORTE AS VARCHAR) AS MONTO")
+					        DB::raw("CAST(FEC_AUTORIZACION AS VARCHAR) + ' / ' + TXT_SERIE + '-' + TXT_NUMERO  + ' / ' + CAST(CAN_TOTAL_IMPORTE AS VARCHAR) AS MONTO")
 					    )
 			            ->orderBy('ID', 'asc')
 			            ->pluck('MONTO', 'ID')
