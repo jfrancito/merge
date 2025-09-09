@@ -17,6 +17,22 @@ $(document).ready(function(){
 
         let opcion = !vale_rendir_id ? 'I' : 'U';
 
+       let pendientes = 0;
+        $("#vale tbody tr").each(function () {
+            let estadoMerge = $(this).find("td").eq(7).text().trim().toUpperCase();
+            let estadoOsiris = $(this).find("td").eq(8).text().trim().toUpperCase();
+
+            if ((!estadoOsiris || estadoOsiris === "NULL") && estadoMerge !== "RECHAZADO" && estadoMerge !== "ANULADO") {
+                pendientes++;
+            }
+        });
+
+        if (pendientes >= 2) {
+            alerterrorajax("Tienes dos registros pendientes por aprobar.");
+            return;
+        }
+
+
         if (!usuario_autoriza) {
             alerterrorajax("El campo 'Usuario Autoriza' es obligatorio.");
             return;
