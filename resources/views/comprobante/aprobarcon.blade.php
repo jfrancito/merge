@@ -27,6 +27,12 @@
         #asientodetallereparable {
             width: 100% !important;
         }
+        .selected {
+            background-color: #00ffff !important;
+            color: #000000;
+            vertical-align: middle;
+            padding: 1.5em;
+        }
     </style>
 @stop
 @section('section')
@@ -208,6 +214,8 @@
           'prefix': '',
           'placeholder': '0'
       });
+
+      $('.pnlasientos').hide();
 
       @foreach($archivospdf as $index => $item)
         var nombre_archivo = '{{$item->NOMBRE_ARCHIVO}}';

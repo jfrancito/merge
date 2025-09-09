@@ -77,45 +77,101 @@
                                 <tr>
                                     <td><b>ID :</b></td>
                                     <td>{{$oc->COD_DOCUMENTO_CTBLE}}</td>
-                                    <td>{{$autorizacion->COD_AUTORIZACION}}</td>
+                                    <td>
+                                        @if(count($autorizacion)>0)
+                                            {{$autorizacion->COD_AUTORIZACION}}
+                                        @endif
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td><b>DOCUMENTO :</b></td>
                                     <td>{{$oc->NRO_SERIE}} - {{$oc->NRO_DOC}}</td>
-                                    <td>{{$autorizacion->TXT_SERIE}} - {{$autorizacion->TXT_NUMERO}}</td>
+                                    <td>
+                                        @if(count($autorizacion)>0)
+                                            {{$autorizacion->TXT_SERIE}} - {{$autorizacion->TXT_NUMERO}}
+                                        @endif
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td><b>EMPRESA :</b></td>
                                     <td>{{$oc->TXT_EMPR_EMISOR}}</td>
-                                    <td>{{$oc->TXT_EMPR_EMISOR}}</td>
+                                    <td>
+                                        @if(count($autorizacion)>0)
+                                            {{$oc->TXT_EMPR_EMISOR}}
+                                        @endif
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td><b>SOLICITADO POR :</b></td>
                                     <td>{{$oc->TXT_EMPR_RECEPTOR}}</td>
-                                    <td>{{$autorizacion->TXT_EMPRESA}}</td>
+                                    <td>
+                                        @if(count($autorizacion)>0)
+                                            {{$autorizacion->TXT_EMPRESA}}
+                                        @endif
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td><b>AUTORIZADO POR :</b></td>
                                     <td>{{$item->TXT_USUARIO_AUTORIZA}}</td>
-                                    <td>{{$valeRendir->TXT_NOM_AUTORIZA}}</td>
+                                    <td>
+                                        @if(count($autorizacion)>0)
+                                            {{$valeRendir->TXT_NOM_AUTORIZA}}
+                                        @endif
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td><b>MONEDA :</b></td>
                                     <td>{{$oc->TXT_CATEGORIA_MONEDA}}</td>
-                                    <td>{{$autorizacion->TXT_CATEGORIA_MONEDA}}</td>
+                                    <td>
+                                        @if(count($autorizacion)>0)
+                                            {{$autorizacion->TXT_CATEGORIA_MONEDA}}
+                                        @endif
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td><b>IMPORTE TOTAL :</b></td>
                                     <td><b>{{$oc->CAN_TOTAL}}</b></td>
-                                    <td><b>{{$autorizacion->CAN_TOTAL}}</b></td>
+                                    <td><b>
+                                        @if(count($autorizacion)>0)
+                                            {{$autorizacion->CAN_TOTAL}}
+                                        @endif
+                                    </b></td>
                                 </tr>
-
-
                                 <tr>
                                     <td><b>ACCION :</b></td>
                                     <td class="termino"><b>{{$termino}}</b></td>
                                     <td class="termino"><b>{{$montotermino}}</b></td>
                                 </tr>
+                                <tr>
+                                    <td><b>TIPO PAGO :</b></td>
+                                    <td class="">{{$item->TXT_CATEGORIA_TIPOPAGO}}</td>
+                                    <td class="termino"></td>
+                                </tr>
+
+                                <tr>
+                                    <td><b>TIPO CUENTA :</b></td>
+                                    <td class="">{{$item->TXT_CATEGORIA_TIPOCUENTA}}</td>
+                                    <td class="termino"></td>
+                                </tr>
+                                <tr>
+                                    <td><b>BANCO :</b></td>
+                                    <td class="">{{$item->TXT_CATEGORIA_BANCARIO}}</td>
+                                    <td class="termino"></td>
+                                </tr>
+                                <tr>
+                                    <td><b>CUENTA BANCARIA :</b></td>
+                                    <td class="">{{$item->CUENTA_BANCARIA}}</td>
+                                    <td class="termino"></td>
+                                </tr>
+
+                                <tr>
+                                    <td><b>CUENTA BANCARIA CCI :</b></td>
+                                    <td class="">{{$item->CCI_CUENTA_BANCARIA}}</td>
+                                    <td class="termino"></td>
+                                </tr>
+
+
+
 
                             </table>
                     </div>

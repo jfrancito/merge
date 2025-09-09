@@ -34,6 +34,32 @@ $(document).ready(function () {
 
 
     });
+//reparable
+    $('#tipo_igv_id_reparable').on('change', function () {
+        switch ($(this).val()) {
+            case "CTI0000000000002":
+            case "CTI0000000000003":
+                $('#porc_tipo_igv_id_reparable')
+                    .val('0')
+                    .trigger('change')
+                    .prop('disabled', true);
+                break;
+
+            case "CTI0000000000001":
+                $('#porc_tipo_igv_id_reparable')
+                    .val('18')
+                    .trigger('change')
+                    .prop('disabled', false);
+                break;
+
+            default:
+                $('#porc_tipo_igv_id_reparable')
+                    .val('')
+                    .trigger('change')
+                    .prop('disabled', true);
+                break;
+        }
+    });
 
     $("#anio_asiento_reparable").on('change', function () {
 
@@ -57,6 +83,9 @@ $(document).ready(function () {
     $(".btn-regresar-lista-reparable").on('click', function (e) {
         $('.tablageneralreparable').toggle("slow");
         $('.editarcuentasreparable').toggle("slow");
+        setTimeout(function () {
+            $('#asientodetallereparable').DataTable().columns.adjust().draw();
+        }, 3000); // espera medio segundo o el tiempo necesario
     });
 
     $(document).on('click', ".editar-cuenta-reparable", function (e) {
@@ -126,7 +155,7 @@ $(document).ready(function () {
         $('#asiento_id_editar_reparable').val(data_codigo);
         $('#moneda_id_editar_reparable').val(data_moneda);
         $('#tc_editar_reparable').val(data_tc);
-
+        $('#titulodetalle').text('Modificar Detalle');
         $('.btn-registrar-movimiento-reparable').hide();
         $('.btn-editar-movimiento-reparable').show();
         $('.tablageneralreparable').toggle("slow");
@@ -151,7 +180,11 @@ $(document).ready(function () {
 
         document.getElementById("asiento_detalle_reparable").value = JSON.stringify(arrayDetalle);
 
-        $(this).closest("tr").remove();
+        let table = $('#asientodetallereparable').DataTable();
+        let row = $(this).closest('tr');
+        table.row(row).remove().draw();
+
+        //$(this).closest("tr").remove();
 
     });
 
@@ -181,7 +214,7 @@ $(document).ready(function () {
         $('#asiento_id_editar_reparable').val(data_codigo);
         $('#moneda_id_editar_reparable').val(data_moneda);
         $('#tc_editar_reparable').val(data_tc);
-
+        $('#titulodetalle').text('Registrar Detalle');
         $('.btn-editar-movimiento-reparable').hide();
         $('.btn-registrar-movimiento-reparable').show();
         $('.tablageneralreparable').toggle("slow");
@@ -259,6 +292,12 @@ $(document).ready(function () {
                     return false;
                 }
                 break;
+            default:
+                if (porc_afecto_igv === '10' || porc_afecto_igv === '18' || porc_afecto_igv === '0') {
+                    alerterrorajax("No se selecciono afecto IGV no puede ingresar porcentaje de IGV.");
+                    return false;
+                }
+                break;
         }
 
         arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_reparable").value);
@@ -294,6 +333,12 @@ $(document).ready(function () {
             if (parseInt(item.COD_ESTADO) === 1) {
                 if (item.COD_ASIENTO_MOVIMIENTO === asiento_id_editar) {
                     item.COD_CUENTA_CONTABLE = cuenta_contable_id;
+                    item.TXT_CUENTA_CONTABLE = numero_cuenta;
+                    item.TXT_GLOSA = glosa_cuenta;
+                    item.COD_PRODUCTO = '';
+                    item.TXT_NOMBRE_PRODUCTO = '';
+                    item.COD_LOTE = '';
+                    item.NRO_LINEA_PRODUCTO = '0';
                     item.CAN_DEBE_MN = can_debe_mn;
                     item.CAN_HABER_MN = can_haber_mn;
                     item.CAN_DEBE_ME = can_debe_me;
@@ -326,6 +371,10 @@ $(document).ready(function () {
 
         $('.tablageneralreparable').toggle("slow");
         $('.editarcuentasreparable').toggle("slow");
+
+        setTimeout(function () {
+            $('#asientodetallereparable').DataTable().columns.adjust().draw();
+        }, 3000); // espera medio segundo o el tiempo necesario
     });
 
     $(".btn-registrar-movimiento-reparable").on('click', function (e) {
@@ -396,6 +445,12 @@ $(document).ready(function () {
             case 'EIGV':
                 if (porc_afecto_igv === '10' || porc_afecto_igv === '18') {
                     alerterrorajax("Selecciono Exonerado no puede tener porcentaje de IGV.");
+                    return false;
+                }
+                break;
+            default:
+                if (porc_afecto_igv === '10' || porc_afecto_igv === '18' || porc_afecto_igv === '0') {
+                    alerterrorajax("No se selecciono afecto IGV no puede ingresar porcentaje de IGV.");
                     return false;
                 }
                 break;
@@ -501,12 +556,403 @@ $(document).ready(function () {
 
         $('.tablageneralreparable').toggle("slow");
         $('.editarcuentasreparable').toggle("slow");
+
+        setTimeout(function () {
+            table.columns.adjust().draw();
+        }, 3000); // espera medio segundo o el tiempo necesario
     });
 
-    // LINEAS JAVASCRIPT NO REPARABLES
+    //nuevo reparable
+    //no reparable
+
+    $(".btn-guardar_asiento").on('click', function () {
+
+        let arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_compra").value);
+        let arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
+
+        let periodo_asiento = $("#periodo_asiento").val();
+        let comprobante_asiento = $("#comprobante_asiento").val();
+        let moneda_id_editar = $("#moneda_asiento").val();
+        let tc_editar = $("#tipo_cambio_asiento").val();
+        let proveedor_asiento = $("#empresa_asiento").val();
+        let tipo_asiento = $("#tipo_asiento").val();
+        let fecha_asiento = $("#fecha_asiento").val();
+        let tipo_comprobante = $("#tipo_documento_asiento").val();
+        let serie_comprobante = $("#serie_asiento").val();
+        let numero_comprobante = $("#numero_asiento").val();
+        let tipo_comprobante_ref = $("#tipo_documento_ref").val();
+        let serie_comprobante_ref = $("#serie_ref_asiento").val();
+        let numero_comprobante_ref = $("#numero_ref_asiento").val();
+        let glosa_asiento = $("#glosa_asiento").val();
+        let tipo_descuento = $("#tipo_descuento_asiento").val();
+        let constancia_des = $("#const_detraccion_asiento").val();
+        let fecha_des = $("#fecha_detraccion_asiento").val();
+        let porcentaje_des = $("#porcentaje_detraccion").val();
+        let total_des = $("#total_detraccion_asiento").val();
+
+        // Array de todos los valores
+        let campos = [
+            { nombre: "Periodo", valor: periodo_asiento },
+            { nombre: "Comprobante", valor: comprobante_asiento },
+            { nombre: "Moneda", valor: moneda_id_editar },
+            { nombre: "Tipo de Cambio", valor: tc_editar },
+            { nombre: "Proveedor", valor: proveedor_asiento },
+            { nombre: "Tipo Asiento", valor: tipo_asiento },
+            { nombre: "Fecha", valor: fecha_asiento },
+            { nombre: "Tipo Comprobante", valor: tipo_comprobante },
+            { nombre: "Serie", valor: serie_comprobante },
+            { nombre: "Número", valor: numero_comprobante },
+        ];
+
+        // Recorremos y validamos
+        for (let campo of campos) {
+            if (!campo.valor || campo.valor === "") {
+                $.alert({
+                    title: 'Error',
+                    content: 'El campo ' + campo.nombre + ' no puede estar vacío.',
+                    type: 'red',
+                    buttons: {
+                        ok: {
+                            text: 'OK',
+                            btnClass: 'btn-red',
+                        }
+                    }
+                });
+                return false; // Detiene la ejecución
+            }
+        }
+
+        let base_imponible = 0.0000;
+        let base_imponible_10 = 0.0000;
+        let base_ivap = 0.0000;
+        let base_inafecto = 0.0000;
+        let base_exonerado = 0.0000;
+        let total_igv = 0.0000;
+        let total_ivap = 0.0000;
+
+        // Recorrerlo
+        arrayDetalle.forEach(item => {
+            if (parseInt(item.COD_ESTADO) === 1) {
+                switch (item.COD_DOC_CTBLE_REF) {
+                    case 'AIGV':
+                        if (item.COD_ORDEN_REF === '18') {
+                            if (moneda_id_editar !== 'MON0000000000001') {
+                                base_imponible = base_imponible + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                            } else {
+                                base_imponible = base_imponible + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                            }
+                        } else if (item.COD_ORDEN_REF === '10') {
+                            if (moneda_id_editar !== 'MON0000000000001') {
+                                base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                            } else {
+                                base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                            }
+                        }
+                        break;
+                    case 'IIGV':
+                        if (moneda_id_editar !== 'MON0000000000001') {
+                            base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                        } else {
+                            base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                        }
+                        break;
+                    case 'EIGV':
+                        if (moneda_id_editar !== 'MON0000000000001') {
+                            base_exonerado = base_exonerado + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                        } else {
+                            base_exonerado = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                        }
+                        break;
+                }
+                if (/^4011/.test(item.TXT_CUENTA_CONTABLE)) {
+                    if (moneda_id_editar !== 'MON0000000000001') {
+                        total_igv = total_igv + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                    } else {
+                        total_igv = total_igv + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                    }
+                }
+            }
+        });
+
+        arrayCabecera.forEach(item => {
+            item.COD_CATEGORIA_MONEDA = moneda_id_editar;
+            item.CAN_TIPO_CAMBIO = Number(tc_editar.replace(/,/g, "")) || 0;
+            item.FEC_ASIENTO = new Date(fecha_asiento);
+            item.COD_PERIODO = periodo_asiento;
+            item.COD_EMPR_CLI = proveedor_asiento;
+            item.COD_CATEGORIA_TIPO_ASIENTO = tipo_asiento;
+            item.COD_CATEGORIA_TIPO_DOCUMENTO = tipo_comprobante;
+            item.NRO_SERIE = serie_comprobante;
+            item.NRO_DOC = numero_comprobante;
+            item.COD_CATEGORIA_TIPO_DOCUMENTO_REF = tipo_comprobante_ref;
+            item.NRO_SERIE_REF = serie_comprobante_ref;
+            item.NRO_DOC_REF = numero_comprobante_ref;
+            item.TXT_GLOSA = glosa_asiento;
+            item.COD_CATEGORIA_TIPO_DETRACCION = tipo_descuento;
+            item.NRO_DETRACCION = constancia_des;
+            item.FEC_DETRACCION = new Date(fecha_des);
+            item.CAN_DESCUENTO_DETRACCION = Number(porcentaje_des) || 0;
+            item.CAN_TOTAL_DETRACCION = Number(total_des) || 0;
+            item.TXT_REFERENCIA = comprobante_asiento.split("-")[0];
+            //item.CODIGO_CONTABLE = comprobante_asiento.split("-")[1];
+            item.TOTAL_BASE_IMPONIBLE = base_imponible;
+            item.TOTAL_BASE_IMPONIBLE_10 = base_imponible_10;
+            item.TOTAL_BASE_INAFECTA = base_inafecto;
+            item.TOTAL_BASE_EXONERADA = base_exonerado;
+            item.TOTAL_IGV = total_igv;
+            item.TOTAL_AFECTO_IVAP = base_ivap;
+            item.TOTAL_IVAP = total_ivap;
+        });
+
+        let data_input = '';
+
+        $('#asientolista tbody tr').each(function () {
+            if ($(this).hasClass('selected')) {
+                // Cambiar estilo o atributo de las celdas de esta fila
+                data_input = $(this).attr('data_input');
+                $(this).attr('data_asiento_cabecera', JSON.stringify(arrayCabecera));
+                $(this).attr('data_asiento_detalle', JSON.stringify(arrayDetalle));
+            }
+        });
+
+        $('#listone').addClass('active');
+        $('#listtwo').removeClass('active');
+        $('#listtree').removeClass('active');
+        $('#astcabgeneral').addClass('active');
+        $('#astcabcomplementario').removeClass('active');
+        $('#astdetgeneral').removeClass('active');
+
+        $('.pnlasientos').hide();
+        $('#asientolista').focus();
+    })
+
+    $('#tipo_igv_id').on('change', function () {
+        switch ($(this).val()) {
+            case "CTI0000000000002":
+            case "CTI0000000000003":
+                $('#porc_tipo_igv_id')
+                    .val('0')
+                    .trigger('change')
+                    .prop('disabled', true);
+                break;
+
+            case "CTI0000000000001":
+                $('#porc_tipo_igv_id')
+                    .val('18')
+                    .trigger('change')
+                    .prop('disabled', false);
+                break;
+
+            default:
+                $('#porc_tipo_igv_id')
+                    .val('')
+                    .trigger('change')
+                    .prop('disabled', true);
+                break;
+        }
+    });
+
+    $(document).on('click', ".ver-asiento", function (e) {
+        e.preventDefault();
+        debugger;
+        abrircargando();
+
+        let $tr = $(this).closest("tr");
+
+        let data_asiento_cabecera = $tr.attr('data_asiento_cabecera');
+        let data_asiento_detalle = $tr.attr('data_asiento_detalle');
+        let form_id_editar = $tr.attr('data_indicador');
+
+        $('#asientolista tbody tr').removeClass('selected');
+
+        $tr.addClass('selected');
+
+        console.log(data_asiento_cabecera);
+        console.log(data_asiento_detalle);
+        console.log(form_id_editar);
+
+        $('#asiento_cabecera_compra').val(data_asiento_cabecera);
+        $('#asiento_detalle_compra').val(data_asiento_detalle);
+
+        let arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
+        let arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_compra").value);
+
+        // Crear la fila con atributos y estilos
+        let nuevaFila = ``;
+
+        let asiento_id_editar = '';
+        let fecha_asiento = new Date();
+        let periodo_asiento = '';
+
+        let moneda_id_editar = '';
+        let tc_editar = 0.0000;
+        let comprobante_asiento = '';
+        let proveedor_asiento = '';
+        let tipo_asiento = '';
+
+        let numero_cuenta = '';
+        let glosa_cuenta = '';
+        let can_debe_mn = 0.0000;
+        let can_haber_mn = 0.0000;
+        let can_debe_me = 0.0000;
+        let can_haber_me = 0.0000;
+
+        let base_imponible = 0.0000;
+        let base_imponible_10 = 0.0000;
+        let base_ivap = 0.0000;
+        let base_inafecto = 0.0000;
+        let base_exonerado = 0.0000;
+        let total_igv = 0.0000;
+        let total_ivap = 0.0000;
+        let total = 0.0000;
+        let tipo_comprobante = '';
+        let serie_comprobante = '';
+        let numero_comprobante = '';
+        let tipo_comprobante_ref = '';
+        let serie_comprobante_ref = '';
+        let numero_comprobante_ref = '';
+        let glosa_asiento = '';
+        let tipo_descuento = '';
+        let constancia_des = '';
+        let fecha_des = '';
+        let porcentaje_des = '';
+        let total_des = '';
+
+        arrayCabecera.forEach(item => {
+            moneda_id_editar = item.COD_CATEGORIA_MONEDA;
+            tc_editar = parseFloat(item.CAN_TIPO_CAMBIO);
+            fecha_asiento = new Date(item.FEC_ASIENTO);
+            periodo_asiento = item.COD_PERIODO;
+            proveedor_asiento = item.COD_EMPR_CLI;
+            tipo_asiento = item.COD_CATEGORIA_TIPO_ASIENTO;
+            tipo_comprobante = item.COD_CATEGORIA_TIPO_DOCUMENTO;
+            serie_comprobante = item.NRO_SERIE;
+            numero_comprobante = item.NRO_DOC;
+            tipo_comprobante_ref = item.COD_CATEGORIA_TIPO_DOCUMENTO_REF;
+            serie_comprobante_ref = item.NRO_SERIE_REF;
+            numero_comprobante_ref = item.NRO_DOC_REF;
+            glosa_asiento = item.TXT_GLOSA;
+            tipo_descuento = item.COD_CATEGORIA_TIPO_DETRACCION;
+            constancia_des = item.NRO_DETRACCION;
+            fecha_des = item.FEC_DETRACCION;
+            porcentaje_des = item.CAN_DESCUENTO_DETRACCION;
+            total_des = item.CAN_TOTAL_DETRACCION;
+            comprobante_asiento = item.TXT_REFERENCIA;
+            base_imponible = parseFloat(item.TOTAL_BASE_IMPONIBLE);
+            base_imponible_10 = parseFloat(item.TOTAL_BASE_IMPONIBLE_10);
+            base_ivap = parseFloat(item.TOTAL_AFECTO_IVAP);
+            base_inafecto = parseFloat(item.TOTAL_BASE_INAFECTA);
+            base_exonerado = parseFloat(item.TOTAL_BASE_EXONERADA);
+            total_igv = parseFloat(item.TOTAL_IGV);
+            total_ivap = parseFloat(item.TOTAL_IVAP);
+            total = parseFloat(item.TOTAL_BASE_IMPONIBLE) + parseFloat(item.TOTAL_BASE_IMPONIBLE_10) + parseFloat(item.TOTAL_AFECTO_IVAP) + parseFloat(item.TOTAL_BASE_INAFECTA) + parseFloat(item.TOTAL_BASE_EXONERADA) + parseFloat(item.TOTAL_IGV) + parseFloat(item.TOTAL_IVAP);
+        });
+
+        $("#asientototales tbody tr").each(function () {
+            let fila = $(this);
+
+            // Actualizar las celdas visibles de la tabla
+            fila.find(".col-base-imponible").text(number_format(base_imponible, 4, ',', '.'));
+            fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4, ',', '.'));
+            fila.find(".col-base-ivap").text(number_format(base_ivap, 4, ',', '.'));
+            fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4, ',', '.'));
+            fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4, ',', '.'));
+            fila.find(".col-igv").text(number_format(total_igv, 4, ',', '.'));
+            fila.find(".col-ivap").text(number_format(total_ivap, 4, ',', '.'));
+            fila.find(".col-total").text(number_format(total, 4, ',', '.'));
+
+        });
+
+        let table = $('#asientodetalle').DataTable();
+
+        table.clear().draw();
+
+        arrayDetalle.forEach(item => {
+            if (parseInt(item.COD_ESTADO) === 1) {
+                asiento_id_editar = item.COD_ASIENTO_MOVIMIENTO;
+                numero_cuenta = item.TXT_CUENTA_CONTABLE;
+                glosa_cuenta = item.TXT_GLOSA;
+                can_debe_mn = parseFloat(item.CAN_DEBE_MN);
+                can_haber_mn = parseFloat(item.CAN_HABER_MN);
+                can_debe_me = parseFloat(item.CAN_DEBE_ME);
+                can_haber_me = parseFloat(item.CAN_HABER_ME);
+                nuevaFila = `
+            <tr class="fila" data_codigo="${asiento_id_editar}" data_asiento="${form_id_editar}"
+                data_moneda="${moneda_id_editar}" data_tc="${tc_editar}">
+                <td class="col-codigo">${asiento_id_editar}</td>
+                <td class="col-cuenta">${numero_cuenta}</td>
+                <td class="col-glosa">${glosa_cuenta}</td>
+                <td class="col-debe-mn" style="text-align: right">${number_format(can_debe_mn, 4, ',', '.')}</td>
+                <td class="col-haber-mn" style="text-align: right">${number_format(can_haber_mn, 4, ',', '.')}</td>
+                <td class="col-debe-me" style="text-align: right">${number_format(can_debe_me, 4, ',', '.')}</td>
+                <td class="col-haber-me" style="text-align: right">${number_format(can_haber_me, 4, ',', '.')}</td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-primary editar-cuenta">
+                        ✏ Editar
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger eliminar-cuenta">
+                        🗑 Eliminar
+                    </button>
+                </td>
+            </tr>
+        `;
+                table.row.add($(nuevaFila)).draw(false);
+
+            }
+        });
+
+        let anio = fecha_asiento.getFullYear();
+
+        $('#anio_asiento').val(anio.toString()).trigger('change');
+        $('#comprobante_asiento').val(comprobante_asiento);
+        $('#moneda_asiento').val(moneda_id_editar).trigger('change');
+        $('#tipo_cambio_asiento').val(tc_editar);
+        $('#empresa_asiento').val(proveedor_asiento).trigger('change');
+        $('#tipo_asiento').val(tipo_asiento).trigger('change');
+
+        // Formatear a YYYY-MM-DD
+        let fechaFormateada = fecha_asiento.toISOString().split('T')[0];
+
+        // Pasar valor al input con jQuery
+        $('#fecha_asiento').val(fechaFormateada);
+        $('#tipo_documento_asiento').val(tipo_comprobante).trigger('change');
+        $('#serie_asiento').val(serie_comprobante);
+        $('#numero_asiento').val(numero_comprobante);
+        $('#tipo_documento_ref').val(tipo_comprobante_ref).trigger('change');
+        $('#serie_ref_asiento').val(serie_comprobante_ref);
+        $('#numero_ref_asiento').val(numero_comprobante_ref);
+        $('#glosa_asiento').val(glosa_asiento);
+
+        $('#tipo_descuento_asiento').val(tipo_descuento).trigger('change');
+        $('#const_detraccion_asiento').val(constancia_des);
+        $('#fecha_detraccion_asiento').val(fecha_des);
+        $('#porcentaje_detraccion').val(porcentaje_des);
+        $('#total_detraccion_asiento').val(total_des);
+
+        if (tipo_asiento === 'TAS0000000000007') {
+            $('#asientototales').hide();
+        } else {
+            $('#asientototales').show();
+        }
+
+        $('.pnlasientos').show();
+        $('.pnlasientos').focus();
+        $('#asientodetalle').DataTable().columns.adjust().draw();
+
+        setTimeout(function () {
+            $('#periodo_asiento').val(periodo_asiento).trigger('change');
+        }, 3000); // espera medio segundo o el tiempo necesario
+
+        cerrarcargando();
+
+    });
+
     $(".btn-regresar-lista").on('click', function (e) {
         $('.tablageneral').toggle("slow");
         $('.editarcuentas').toggle("slow");
+        setTimeout(function () {
+            $('#asientodetalle').DataTable().columns.adjust().draw();
+        }, 3000); // espera medio segundo o el tiempo necesario
     });
 
     $(".btn-registrar-movimiento").on('click', function (e) {
@@ -579,6 +1025,12 @@ $(document).ready(function () {
             case 'EIGV':
                 if (porc_afecto_igv === '10' || porc_afecto_igv === '18') {
                     alerterrorajax("Selecciono Exonerado no puede tener porcentaje de IGV.");
+                    return false;
+                }
+                break;
+            default:
+                if (porc_afecto_igv === '10' || porc_afecto_igv === '18' || porc_afecto_igv === '0') {
+                    alerterrorajax("No se selecciono afecto IGV no puede ingresar porcentaje de IGV.");
                     return false;
                 }
                 break;
@@ -682,34 +1134,39 @@ $(document).ready(function () {
                 switch (item.COD_DOC_CTBLE_REF) {
                     case 'AIGV':
                         if (item.COD_ORDEN_REF === '18') {
-                            base_imponible = base_imponible + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                             if (moneda_id_editar !== 'MON0000000000001') {
                                 base_imponible = base_imponible + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                            } else {
+                                base_imponible = base_imponible + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                             }
                         } else if (item.COD_ORDEN_REF === '10') {
-                            base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                             if (moneda_id_editar !== 'MON0000000000001') {
                                 base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                            } else {
+                                base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                             }
                         }
                         break;
                     case 'IIGV':
-                        base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                         if (moneda_id_editar !== 'MON0000000000001') {
                             base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                        } else {
+                            base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                         }
                         break;
                     case 'EIGV':
-                        base_exonerado = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                         if (moneda_id_editar !== 'MON0000000000001') {
                             base_exonerado = base_exonerado + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                        } else {
+                            base_exonerado = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                         }
                         break;
                 }
-                if (/^40/.test(item.TXT_CUENTA_CONTABLE)) {
-                    total_igv = total_igv + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                if (/^4011/.test(item.TXT_CUENTA_CONTABLE)) {
                     if (moneda_id_editar !== 'MON0000000000001') {
                         total_igv = total_igv + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                    } else {
+                        total_igv = total_igv + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                     }
                 }
             }
@@ -825,6 +1282,9 @@ $(document).ready(function () {
         }
         $('.tablageneral').toggle("slow");
         $('.editarcuentas').toggle("slow");
+        setTimeout(function () {
+            $('#asientodetalle').DataTable().columns.adjust().draw();
+        }, 3000); // espera medio segundo o el tiempo necesario
     });
 
     $(".btn-editar-movimiento").on('click', function (e) {
@@ -899,6 +1359,12 @@ $(document).ready(function () {
                     return false;
                 }
                 break;
+            default:
+                if (porc_afecto_igv === '10' || porc_afecto_igv === '18' || porc_afecto_igv === '0') {
+                    alerterrorajax("No se selecciono afecto IGV no puede ingresar porcentaje de IGV.");
+                    return false;
+                }
+                break;
         }
 
         switch (form_id_editar) {
@@ -956,6 +1422,12 @@ $(document).ready(function () {
             if (parseInt(item.COD_ESTADO) === 1) {
                 if (item.COD_ASIENTO_MOVIMIENTO === asiento_id_editar) {
                     item.COD_CUENTA_CONTABLE = cuenta_contable_id;
+                    item.TXT_CUENTA_CONTABLE = numero_cuenta;
+                    item.TXT_GLOSA = glosa_cuenta;
+                    item.COD_PRODUCTO = '';
+                    item.TXT_NOMBRE_PRODUCTO = '';
+                    item.COD_LOTE = '';
+                    item.NRO_LINEA_PRODUCTO = '0';
                     item.CAN_DEBE_MN = can_debe_mn;
                     item.CAN_HABER_MN = can_haber_mn;
                     item.CAN_DEBE_ME = can_debe_me;
@@ -967,34 +1439,39 @@ $(document).ready(function () {
                 switch (item.COD_DOC_CTBLE_REF) {
                     case 'AIGV':
                         if (item.COD_ORDEN_REF === '18') {
-                            base_imponible = base_imponible + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                             if (moneda_id_editar !== 'MON0000000000001') {
                                 base_imponible = base_imponible + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                            } else {
+                                base_imponible = base_imponible + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                             }
                         } else if (item.COD_ORDEN_REF === '10') {
-                            base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                             if (moneda_id_editar !== 'MON0000000000001') {
                                 base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                            } else {
+                                base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                             }
                         }
                         break;
                     case 'IIGV':
-                        base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                         if (moneda_id_editar !== 'MON0000000000001') {
                             base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                        } else {
+                            base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                         }
                         break;
                     case 'EIGV':
-                        base_exonerado = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                         if (moneda_id_editar !== 'MON0000000000001') {
                             base_exonerado = base_exonerado + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                        } else {
+                            base_exonerado = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                         }
                         break;
                 }
-                if (/^40/.test(item.TXT_CUENTA_CONTABLE)) {
-                    total_igv = total_igv + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                if (/^4011/.test(item.TXT_CUENTA_CONTABLE)) {
                     if (moneda_id_editar !== 'MON0000000000001') {
                         total_igv = total_igv + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                    } else {
+                        total_igv = total_igv + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                     }
                 }
             }
@@ -1138,6 +1615,9 @@ $(document).ready(function () {
         }
         $('.tablageneral').toggle("slow");
         $('.editarcuentas').toggle("slow");
+        setTimeout(function () {
+            $('#asientodetalle').DataTable().columns.adjust().draw();
+        }, 3000); // espera medio segundo o el tiempo necesario
     });
 
     $(".agregar-linea").on('click', function (e) {
@@ -1230,34 +1710,39 @@ $(document).ready(function () {
                 switch (item.COD_DOC_CTBLE_REF) {
                     case 'AIGV':
                         if (item.COD_ORDEN_REF === '18') {
-                            base_imponible = base_imponible + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                             if (moneda_id_editar !== 'MON0000000000001') {
                                 base_imponible = base_imponible + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                            } else {
+                                base_imponible = base_imponible + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                             }
                         } else if (item.COD_ORDEN_REF === '10') {
-                            base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                             if (moneda_id_editar !== 'MON0000000000001') {
                                 base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                            } else {
+                                base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                             }
                         }
                         break;
                     case 'IIGV':
-                        base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                         if (moneda_id_editar !== 'MON0000000000001') {
                             base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                        } else {
+                            base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                         }
                         break;
                     case 'EIGV':
-                        base_exonerado = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                         if (moneda_id_editar !== 'MON0000000000001') {
                             base_exonerado = base_exonerado + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                        } else {
+                            base_exonerado = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                         }
                         break;
                 }
-                if (/^40/.test(item.TXT_CUENTA_CONTABLE)) {
-                    total_igv = total_igv + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                if (/^4011/.test(item.TXT_CUENTA_CONTABLE)) {
                     if (moneda_id_editar !== 'MON0000000000001') {
                         total_igv = total_igv + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                    } else {
+                        total_igv = total_igv + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                     }
                 }
             }
@@ -1327,7 +1812,11 @@ $(document).ready(function () {
                 break;
         }
 
-        $(this).closest("tr").remove();
+        let table = $('#asientodetalle').DataTable();
+        let row = $(this).closest('tr');
+        table.row(row).remove().draw();
+
+        //$(this).closest("tr").remove();
 
     });
 
@@ -1367,7 +1856,7 @@ $(document).ready(function () {
         // Recorrerlo
         arrayDetalle.forEach(item => {
             if (item.COD_ASIENTO_MOVIMIENTO === data_codigo) {
-                data_cuenta_id = item.COD_CUENTA_CONTABLE;
+                data_cuenta_id = item.COD_CUENTA_CONTABLE === null ? '' : item.COD_CUENTA_CONTABLE;
                 data_debe_mn = item.CAN_DEBE_MN;
                 data_haber_mn = item.CAN_HABER_MN;
                 data_debe_me = item.CAN_DEBE_ME;
@@ -1476,7 +1965,7 @@ $(document).ready(function () {
         }
 
     });
-
+//nuevo
     $('.elimnaritem').on('click', function (event) {
         event.preventDefault();
         var href = $(this).attr('href');
@@ -1498,6 +1987,17 @@ $(document).ready(function () {
 
     $('.btnaprobarcomporbatnte').on('click', function (event) {
         event.preventDefault();
+
+        let detalles = [];
+        $('#asientolista tbody tr').each(function () {
+            detalles.push({
+                cabecera: $(this).attr('data_asiento_cabecera'),
+                detalle: $(this).attr('data_asiento_detalle'),
+            });
+        });
+
+        $('#asientosgenerados').val(JSON.stringify(detalles));
+
         $.confirm({
             title: '¿Confirma la Aprobacion?',
             content: 'Aprobar el Comprobante',

@@ -1062,6 +1062,26 @@ trait GeneralesTraits
         return $combo;
     }
 
+    private function gn_generacion_combo_tipo_documento_sunat($tabla, $atributo1, $atributo2, $titulo, $todo)
+    {
+
+        $array = DB::table($tabla)
+            ->where('COD_ESTADO', '=', 1)
+            ->where('TXT_INDICADOR', '=', 1)
+            ->pluck($atributo2, $atributo1)
+            ->toArray();
+        if ($titulo == '') {
+            $combo = $array;
+        } else {
+            if ($todo == 'TODO') {
+                $combo = array('' => $titulo, $todo => $todo) + $array;
+            } else {
+                $combo = array('' => $titulo) + $array;
+            }
+        }
+
+        return $combo;
+    }
 
     private function gn_generacion_combo_direccion($txt_grupo, $titulo, $todo, $id)
     {

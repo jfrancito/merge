@@ -83,7 +83,7 @@
 
         @include('liquidaciongasto.form.liquidaciongasto.verpdfmultiple')
 
-            {{--@include('comprobante.asiento.contenedorasientolg')--}}
+            @include('comprobante.asiento.contenedorasientolg')
 
         @foreach($tdetliquidaciongastos as $index => $item)
             <div class="dtlg {{$item->ID_DOCUMENTO}}{{$item->ITEM}} @if($index!=0) ocultar @endif">
