@@ -81,7 +81,7 @@
                                                                 </button>
                                                             </a>
                                                             <button type="button" data-url="{{ url('/aprobar-liquidacion-gasto-contabilidad/'.$idopcion.'/'.Hashids::encode(substr($liquidaciongastos->ID_DOCUMENTO, -8))) }}"
-                                                                    class="btn btn-space btn-primary btnaprobarcomporbatnte">
+                                                                    class="btn btn-space btn-primary btnaprobarcomporbatnteconta">
                                                                 Guardar
                                                             </button>
                                                         </p>
