@@ -74,8 +74,9 @@ var App = (function () {
             autoWidth: false,
             lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
             scrollX: true,
-            scrollY: "400px",
+            scrollY: "200px",
             ordering: false,
+            searching: false
         });
 
         $("#asientodetallereparable").dataTable({
@@ -83,8 +84,9 @@ var App = (function () {
             autoWidth: false,
             lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
             scrollX: true,
-            scrollY: "400px",
+            scrollY: "200px",
             ordering: false,
+            searching: false
         });
 
         $("#asientodetallededuccion").dataTable({
@@ -92,8 +94,9 @@ var App = (function () {
             autoWidth: false,
             lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
             scrollX: true,
-            scrollY: "400px",
+            scrollY: "200px",
             ordering: false,
+            searching: false
         });
 
         $("#asientodetallereversion").dataTable({
@@ -101,8 +104,9 @@ var App = (function () {
             autoWidth: false,
             lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
             scrollX: true,
-            scrollY: "400px",
+            scrollY: "200px",
             ordering: false,
+            searching: false
         });
 
         $("#asientodetallepercepcion").dataTable({
@@ -110,8 +114,9 @@ var App = (function () {
             autoWidth: false,
             lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
             scrollX: true,
-            scrollY: "400px",
+            scrollY: "200px",
             ordering: false,
+            searching: false
         });
 
         $("#table1").dataTable({
@@ -268,7 +273,7 @@ var App = (function () {
           ordering: false,
       });
 
-       
+
       $("#importegastos").dataTable({
           responsive: true,
           autoWidth: true,
@@ -276,7 +281,7 @@ var App = (function () {
           scrollX: true,
           scrollY: "300px",
           ordering: false,
-      }); 
+      });
 
       if (!$.fn.DataTable.isDataTable('#vale')) {
           $('#vale').DataTable({
