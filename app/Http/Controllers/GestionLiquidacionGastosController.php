@@ -2561,55 +2561,55 @@ class GestionLiquidacionGastosController extends Controller
                         $this->calcular_totales_compras($codAsiento);
                     }
                 }
-//
-//                $liquidaciongastos = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->first();
-//                $tdetliquidaciongastos = LqgDetLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
-//                $detdocumentolg = LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
-//                $documentohistorial = LqgDocumentoHistorial::where('ID_DOCUMENTO', '=', $iddocumento)->orderby('FECHA', 'DESC')->get();
-//
-//
-//                if ($liquidaciongastos->IND_OBSERVACION == 1) {
-//                    DB::rollback();
-//                    return Redirect::back()->with('errorbd', 'El documento esta observado no se puede observar');
-//                }
-//
-//
-//                $descripcion = $request['descripcion'];
-//                if (rtrim(ltrim($descripcion)) != '') {
-//                    //HISTORIAL DE DOCUMENTO APROBADO
-//                    $documento = new LqgDocumentoHistorial;
-//                    $documento->ID_DOCUMENTO = $liquidaciongastos->ID_DOCUMENTO;
-//                    $documento->DOCUMENTO_ITEM = 1;
-//                    $documento->FECHA = $this->fechaactual;
-//                    $documento->USUARIO_ID = Session::get('usuario')->id;
-//                    $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
-//                    $documento->TIPO = 'ACOTACION POR CONTABILIDAD';
-//                    $documento->MENSAJE = $descripcion;
-//                    $documento->save();
-//                }
-//
-//                LqgLiquidacionGasto::where('ID_DOCUMENTO', $liquidaciongastos->ID_DOCUMENTO)
-//                    ->update(
-//                        [
-//                            'COD_ESTADO' => 'ETM0000000000004',
-//                            'TXT_ESTADO' => 'POR APROBAR ADMINISTRACION',
-//                            'COD_JEFE_APRUEBA' => Session::get('usuario')->id,
-//                            'TXT_JEFE_APRUEBA' => Session::get('usuario')->nombre,
-//                            'FECHA_JEFE_APRUEBA' => $this->fechaactual
-//                        ]
-//                    );
-//
-//                //HISTORIAL DE DOCUMENTO APROBADO
-//                $documento = new LqgDocumentoHistorial;
-//                $documento->ID_DOCUMENTO = $liquidaciongastos->ID_DOCUMENTO;
-//                $documento->DOCUMENTO_ITEM = 1;
-//                $documento->FECHA = $this->fechaactual;
-//                $documento->USUARIO_ID = Session::get('usuario')->id;
-//                $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
-//                $documento->TIPO = 'APROBADO POR CONTABILIDAD';
-//                $documento->MENSAJE = '';
-//                $documento->save();
-//
+
+                $liquidaciongastos = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->first();
+                $tdetliquidaciongastos = LqgDetLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
+                $detdocumentolg = LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
+                $documentohistorial = LqgDocumentoHistorial::where('ID_DOCUMENTO', '=', $iddocumento)->orderby('FECHA', 'DESC')->get();
+
+
+                if ($liquidaciongastos->IND_OBSERVACION == 1) {
+                    DB::rollback();
+                    return Redirect::back()->with('errorbd', 'El documento esta observado no se puede observar');
+                }
+
+
+                $descripcion = $request['descripcion'];
+                if (rtrim(ltrim($descripcion)) != '') {
+                    //HISTORIAL DE DOCUMENTO APROBADO
+                    $documento = new LqgDocumentoHistorial;
+                    $documento->ID_DOCUMENTO = $liquidaciongastos->ID_DOCUMENTO;
+                    $documento->DOCUMENTO_ITEM = 1;
+                    $documento->FECHA = $this->fechaactual;
+                    $documento->USUARIO_ID = Session::get('usuario')->id;
+                    $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+                    $documento->TIPO = 'ACOTACION POR CONTABILIDAD';
+                    $documento->MENSAJE = $descripcion;
+                    $documento->save();
+                }
+
+                LqgLiquidacionGasto::where('ID_DOCUMENTO', $liquidaciongastos->ID_DOCUMENTO)
+                    ->update(
+                        [
+                            'COD_ESTADO' => 'ETM0000000000004',
+                            'TXT_ESTADO' => 'POR APROBAR ADMINISTRACION',
+                            'COD_JEFE_APRUEBA' => Session::get('usuario')->id,
+                            'TXT_JEFE_APRUEBA' => Session::get('usuario')->nombre,
+                            'FECHA_JEFE_APRUEBA' => $this->fechaactual
+                        ]
+                    );
+
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento = new LqgDocumentoHistorial;
+                $documento->ID_DOCUMENTO = $liquidaciongastos->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM = 1;
+                $documento->FECHA = $this->fechaactual;
+                $documento->USUARIO_ID = Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+                $documento->TIPO = 'APROBADO POR CONTABILIDAD';
+                $documento->MENSAJE = '';
+                $documento->save();
+
                 DB::commit();
 //                return Redirect::to('/gestion-de-aprobacion-liquidacion-gastos-contabilidad/' . $idopcion)->with('bienhecho', 'Liquidacion de Gastos : ' . ' APROBADO CON EXITO');
                 return response()->json([
