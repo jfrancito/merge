@@ -193,6 +193,8 @@
             'placeholder': '0'
         });
 
+        $('.pnlasientos').hide();
+
         $('#file-pdf').fileinput({
             theme: 'fa5',
             language: 'es',

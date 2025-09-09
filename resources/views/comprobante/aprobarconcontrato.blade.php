@@ -8,24 +8,30 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/bootstrap-slider/css/bootstrap-slider.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/css/file/fileinput.css') }} "/>
     <style>
-        .editarcuentas{
+        .editarcuentas {
             display: none;
         }
-        .editarcuentasreparable{
+
+        .editarcuentasreparable {
             display: none;
         }
+
         #asientodetalle {
             width: 100% !important;
         }
+
         #asientodetallereversion {
             width: 100% !important;
         }
+
         #asientodetallededuccion {
             width: 100% !important;
         }
+
         #asientodetallepercepcion {
             width: 100% !important;
         }
+
         #asientodetallereparable {
             width: 100% !important;
         }
@@ -213,6 +219,8 @@
             language: 'es',
             allowedFileExtensions: ['pdf'],
         });
+
+        $('.pnlasientos').hide();
 
         @foreach($archivospdf as $index => $item)
         var nombre_archivo = '{{$item->NOMBRE_ARCHIVO}}';

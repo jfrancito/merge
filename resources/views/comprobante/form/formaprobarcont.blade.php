@@ -103,7 +103,7 @@
                                        data-parsley-type="number"
                                        data-parsley-length="[6, 6]"
                                        data-parsley-length-message="El código debe tener exactamente 6 caracteres."
-                                       autocomplete="off" class="form-control dinero input-sm"/>
+                                       autocomplete="off" class="form-control input-sm"/>
 
                             </div>
                         </div>
@@ -115,8 +115,8 @@
         </div>
 
     </div>
-{{--
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-        @include('comprobante.asiento.contenedorasiento')
-    </div>--}}
+        @include('comprobante.asiento.listaasientotabla')
+        @include('comprobante.asiento.contenedorasientoorden')
+    </div>
 </div>
