@@ -2040,7 +2040,7 @@ $(document).ready(function () {
     }
 
 
-    $('.btnaprobarcomporbatnte').on('click', function (event) {
+    $('.btnaprobarcomporbatnteconta').on('click', function (event) {
         event.preventDefault();
         let url = $(this).data('url');
 
@@ -2122,6 +2122,22 @@ $(document).ready(function () {
 
     });
 
+    $('.btnaprobarcomporbatnte').on('click', function (event) {
+        event.preventDefault();
+        $.confirm({
+            title: '¿Confirma la Aprobacion?',
+            content: 'Aprueba el Comprobante',
+            buttons: {
+                confirmar: function () {
+                    $("#formpedido").submit();
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo Aprobacion');
+                }
+            }
+        });
+
+    });
 
     $('.btnrechazocomporbatnte').on('click', function (event) {
         event.preventDefault();
