@@ -1,6 +1,8 @@
 $(document).ready(function () {
     let carpeta = $("#carpeta").val();
 
+    $('.pnlasientos').hide();
+
     //nuevo
     $(".btn-regresar-lista").on('click', function (e) {
         $('.tablageneral').toggle("slow");
@@ -90,16 +92,16 @@ $(document).ready(function () {
 
         // Array de todos los valores
         let campos = [
-            { nombre: "Periodo", valor: periodo_asiento },
-            { nombre: "Comprobante", valor: comprobante_asiento },
-            { nombre: "Moneda", valor: moneda_id_editar },
-            { nombre: "Tipo de Cambio", valor: tc_editar },
-            { nombre: "Proveedor", valor: proveedor_asiento },
-            { nombre: "Tipo Asiento", valor: tipo_asiento },
-            { nombre: "Fecha", valor: fecha_asiento },
-            { nombre: "Tipo Comprobante", valor: tipo_comprobante },
-            { nombre: "Serie", valor: serie_comprobante },
-            { nombre: "Número", valor: numero_comprobante },
+            {nombre: "Periodo", valor: periodo_asiento},
+            {nombre: "Comprobante", valor: comprobante_asiento},
+            {nombre: "Moneda", valor: moneda_id_editar},
+            {nombre: "Tipo de Cambio", valor: tc_editar},
+            {nombre: "Proveedor", valor: proveedor_asiento},
+            {nombre: "Tipo Asiento", valor: tipo_asiento},
+            {nombre: "Fecha", valor: fecha_asiento},
+            {nombre: "Tipo Comprobante", valor: tipo_comprobante},
+            {nombre: "Serie", valor: serie_comprobante},
+            {nombre: "Número", valor: numero_comprobante},
         ];
 
         // Recorremos y validamos
@@ -1807,112 +1809,113 @@ $(document).ready(function () {
         let data_asiento_cabecera = $(this).attr('data_asiento_cabecera');
         let data_asiento_detalle = $(this).attr('data_asiento_detalle');
 
-        $('#asiento_cabecera_compra').val(data_asiento_cabecera);
-        $('#asiento_detalle_compra').val(data_asiento_detalle);
+        if (data_valor_id === '1') {
+            $('#asiento_cabecera_compra').val(data_asiento_cabecera);
+            $('#asiento_detalle_compra').val(data_asiento_detalle);
 
-        let arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
-        let arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_compra").value);
+            let arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
+            let arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_compra").value);
 
-        // Crear la fila con atributos y estilos
-        let nuevaFila = ``;
+            // Crear la fila con atributos y estilos
+            let nuevaFila = ``;
 
-        let asiento_id_editar = '';
-        let fecha_asiento = new Date();
-        let periodo_asiento = '';
-        let form_id_editar = 'C';
-        let moneda_id_editar = '';
-        let tc_editar = 0.0000;
-        let comprobante_asiento = '';
-        let proveedor_asiento = '';
-        let tipo_asiento = '';
+            let asiento_id_editar = '';
+            let fecha_asiento = new Date();
+            let periodo_asiento = '';
+            let form_id_editar = 'C';
+            let moneda_id_editar = '';
+            let tc_editar = 0.0000;
+            let comprobante_asiento = '';
+            let proveedor_asiento = '';
+            let tipo_asiento = '';
 
-        let numero_cuenta = '';
-        let glosa_cuenta = '';
-        let can_debe_mn = 0.0000;
-        let can_haber_mn = 0.0000;
-        let can_debe_me = 0.0000;
-        let can_haber_me = 0.0000;
+            let numero_cuenta = '';
+            let glosa_cuenta = '';
+            let can_debe_mn = 0.0000;
+            let can_haber_mn = 0.0000;
+            let can_debe_me = 0.0000;
+            let can_haber_me = 0.0000;
 
-        let base_imponible = 0.0000;
-        let base_imponible_10 = 0.0000;
-        let base_ivap = 0.0000;
-        let base_inafecto = 0.0000;
-        let base_exonerado = 0.0000;
-        let total_igv = 0.0000;
-        let total_ivap = 0.0000;
-        let total = 0.0000;
-        let tipo_comprobante = '';
-        let serie_comprobante = '';
-        let numero_comprobante = '';
-        let tipo_comprobante_ref = '';
-        let serie_comprobante_ref = '';
-        let numero_comprobante_ref = '';
-        let glosa_asiento = '';
-        let tipo_descuento = '';
-        let constancia_des = '';
-        let fecha_des = '';
-        let porcentaje_des = '';
-        let total_des = '';
+            let base_imponible = 0.0000;
+            let base_imponible_10 = 0.0000;
+            let base_ivap = 0.0000;
+            let base_inafecto = 0.0000;
+            let base_exonerado = 0.0000;
+            let total_igv = 0.0000;
+            let total_ivap = 0.0000;
+            let total = 0.0000;
+            let tipo_comprobante = '';
+            let serie_comprobante = '';
+            let numero_comprobante = '';
+            let tipo_comprobante_ref = '';
+            let serie_comprobante_ref = '';
+            let numero_comprobante_ref = '';
+            let glosa_asiento = '';
+            let tipo_descuento = '';
+            let constancia_des = '';
+            let fecha_des = '';
+            let porcentaje_des = '';
+            let total_des = '';
 
-        arrayCabecera.forEach(item => {
-            moneda_id_editar = item.COD_CATEGORIA_MONEDA;
-            tc_editar = parseFloat(item.CAN_TIPO_CAMBIO);
-            fecha_asiento = new Date(item.FEC_ASIENTO);
-            periodo_asiento = item.COD_PERIODO;
-            proveedor_asiento = item.COD_EMPR_CLI;
-            tipo_asiento = item.COD_CATEGORIA_TIPO_ASIENTO;
-            tipo_comprobante = item.COD_CATEGORIA_TIPO_DOCUMENTO;
-            serie_comprobante = item.NRO_SERIE;
-            numero_comprobante = item.NRO_DOC;
-            tipo_comprobante_ref = item.COD_CATEGORIA_TIPO_DOCUMENTO_REF;
-            serie_comprobante_ref = item.NRO_SERIE_REF;
-            numero_comprobante_ref = item.NRO_DOC_REF;
-            glosa_asiento = item.TXT_GLOSA;
-            tipo_descuento = item.COD_CATEGORIA_TIPO_DETRACCION;
-            constancia_des = item.NRO_DETRACCION;
-            fecha_des = item.FEC_DETRACCION;
-            porcentaje_des = item.CAN_DESCUENTO_DETRACCION;
-            total_des = item.CAN_TOTAL_DESCUENTO;
-            comprobante_asiento = item.TXT_REFERENCIA + '-' + item.CODIGO_CONTABLE;
-            base_imponible = parseFloat(item.TOTAL_BASE_IMPONIBLE);
-            base_imponible_10 = parseFloat(item.TOTAL_BASE_IMPONIBLE_10);
-            base_ivap = parseFloat(item.TOTAL_AFECTO_IVAP);
-            base_inafecto = parseFloat(item.TOTAL_BASE_INAFECTA);
-            base_exonerado = parseFloat(item.TOTAL_BASE_EXONERADA);
-            total_igv = parseFloat(item.TOTAL_IGV);
-            total_ivap = parseFloat(item.TOTAL_IVAP);
-            total = parseFloat(item.TOTAL_BASE_IMPONIBLE) + parseFloat(item.TOTAL_BASE_IMPONIBLE_10) + parseFloat(item.TOTAL_AFECTO_IVAP) + parseFloat(item.TOTAL_BASE_INAFECTA) + parseFloat(item.TOTAL_BASE_EXONERADA) + parseFloat(item.TOTAL_IGV) + parseFloat(item.TOTAL_IVAP);
-        });
+            arrayCabecera.forEach(item => {
+                moneda_id_editar = item.COD_CATEGORIA_MONEDA;
+                tc_editar = parseFloat(item.CAN_TIPO_CAMBIO);
+                fecha_asiento = new Date(item.FEC_ASIENTO);
+                periodo_asiento = item.COD_PERIODO;
+                proveedor_asiento = item.COD_EMPR_CLI;
+                tipo_asiento = item.COD_CATEGORIA_TIPO_ASIENTO;
+                tipo_comprobante = item.COD_CATEGORIA_TIPO_DOCUMENTO;
+                serie_comprobante = item.NRO_SERIE;
+                numero_comprobante = item.NRO_DOC;
+                tipo_comprobante_ref = item.COD_CATEGORIA_TIPO_DOCUMENTO_REF;
+                serie_comprobante_ref = item.NRO_SERIE_REF;
+                numero_comprobante_ref = item.NRO_DOC_REF;
+                glosa_asiento = item.TXT_GLOSA;
+                tipo_descuento = item.COD_CATEGORIA_TIPO_DETRACCION;
+                constancia_des = item.NRO_DETRACCION;
+                fecha_des = item.FEC_DETRACCION;
+                porcentaje_des = item.CAN_DESCUENTO_DETRACCION;
+                total_des = item.CAN_TOTAL_DESCUENTO;
+                comprobante_asiento = item.TXT_REFERENCIA + '-' + item.CODIGO_CONTABLE;
+                base_imponible = parseFloat(item.TOTAL_BASE_IMPONIBLE);
+                base_imponible_10 = parseFloat(item.TOTAL_BASE_IMPONIBLE_10);
+                base_ivap = parseFloat(item.TOTAL_AFECTO_IVAP);
+                base_inafecto = parseFloat(item.TOTAL_BASE_INAFECTA);
+                base_exonerado = parseFloat(item.TOTAL_BASE_EXONERADA);
+                total_igv = parseFloat(item.TOTAL_IGV);
+                total_ivap = parseFloat(item.TOTAL_IVAP);
+                total = parseFloat(item.TOTAL_BASE_IMPONIBLE) + parseFloat(item.TOTAL_BASE_IMPONIBLE_10) + parseFloat(item.TOTAL_AFECTO_IVAP) + parseFloat(item.TOTAL_BASE_INAFECTA) + parseFloat(item.TOTAL_BASE_EXONERADA) + parseFloat(item.TOTAL_IGV) + parseFloat(item.TOTAL_IVAP);
+            });
 
-        $("#asientototales tbody tr").each(function () {
-            let fila = $(this);
+            $("#asientototales tbody tr").each(function () {
+                let fila = $(this);
 
-            // Actualizar las celdas visibles de la tabla
-            fila.find(".col-base-imponible").text(number_format(base_imponible, 4, ',', '.'));
-            fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4, ',', '.'));
-            fila.find(".col-base-ivap").text(number_format(base_ivap, 4, ',', '.'));
-            fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4, ',', '.'));
-            fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4, ',', '.'));
-            fila.find(".col-igv").text(number_format(total_igv, 4, ',', '.'));
-            fila.find(".col-ivap").text(number_format(total_ivap, 4, ',', '.'));
-            fila.find(".col-total").text(number_format(total, 4, ',', '.'));
+                // Actualizar las celdas visibles de la tabla
+                fila.find(".col-base-imponible").text(number_format(base_imponible, 4, ',', '.'));
+                fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4, ',', '.'));
+                fila.find(".col-base-ivap").text(number_format(base_ivap, 4, ',', '.'));
+                fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4, ',', '.'));
+                fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4, ',', '.'));
+                fila.find(".col-igv").text(number_format(total_igv, 4, ',', '.'));
+                fila.find(".col-ivap").text(number_format(total_ivap, 4, ',', '.'));
+                fila.find(".col-total").text(number_format(total, 4, ',', '.'));
 
-        });
+            });
 
-        let table = $('#asientodetalle').DataTable();
+            let table = $('#asientodetalle').DataTable();
 
-        table.clear().draw();
+            table.clear().draw();
 
-        arrayDetalle.forEach(item => {
-            if (parseInt(item.COD_ESTADO) === 1) {
-                asiento_id_editar = item.COD_ASIENTO_MOVIMIENTO;
-                numero_cuenta = item.TXT_CUENTA_CONTABLE;
-                glosa_cuenta = item.TXT_GLOSA;
-                can_debe_mn = parseFloat(item.CAN_DEBE_MN);
-                can_haber_mn = parseFloat(item.CAN_HABER_MN);
-                can_debe_me = parseFloat(item.CAN_DEBE_ME);
-                can_haber_me = parseFloat(item.CAN_HABER_ME);
-                nuevaFila = `
+            arrayDetalle.forEach(item => {
+                if (parseInt(item.COD_ESTADO) === 1) {
+                    asiento_id_editar = item.COD_ASIENTO_MOVIMIENTO;
+                    numero_cuenta = item.TXT_CUENTA_CONTABLE;
+                    glosa_cuenta = item.TXT_GLOSA;
+                    can_debe_mn = parseFloat(item.CAN_DEBE_MN);
+                    can_haber_mn = parseFloat(item.CAN_HABER_MN);
+                    can_debe_me = parseFloat(item.CAN_DEBE_ME);
+                    can_haber_me = parseFloat(item.CAN_HABER_ME);
+                    nuevaFila = `
             <tr class="fila" data_codigo="${asiento_id_editar}" data_asiento="${form_id_editar}"
                 data_moneda="${moneda_id_editar}" data_tc="${tc_editar}">
                 <td class="col-codigo">${asiento_id_editar}</td>
@@ -1932,54 +1935,53 @@ $(document).ready(function () {
                 </td>
             </tr>
         `;
-                table.row.add($(nuevaFila)).draw(false);
+                    table.row.add($(nuevaFila)).draw(false);
 
+                }
+            });
+
+            let anio = fecha_asiento.getFullYear();
+
+            $('#anio_asiento').val(anio.toString()).trigger('change');
+            $('#comprobante_asiento').val(comprobante_asiento);
+            $('#moneda_asiento').val(moneda_id_editar).trigger('change');
+            $('#tipo_cambio_asiento').val(tc_editar);
+            $('#empresa_asiento').val(proveedor_asiento).trigger('change');
+            $('#tipo_asiento').val(tipo_asiento).trigger('change');
+
+            // Formatear a YYYY-MM-DD
+            let fechaFormateada = fecha_asiento.toISOString().split('T')[0];
+
+            // Pasar valor al input con jQuery
+            $('#fecha_asiento').val(fechaFormateada);
+            $('#tipo_documento_asiento').val(tipo_comprobante).trigger('change');
+            $('#serie_asiento').val(serie_comprobante);
+            $('#numero_asiento').val(numero_comprobante);
+            $('#tipo_documento_ref').val(tipo_comprobante_ref).trigger('change');
+            $('#serie_ref_asiento').val(serie_comprobante_ref);
+            $('#numero_ref_asiento').val(numero_comprobante_ref);
+            $('#glosa_asiento').val(glosa_asiento);
+
+            $('#tipo_descuento_asiento').val(tipo_descuento).trigger('change');
+            $('#const_detraccion_asiento').val(constancia_des);
+            $('#fecha_detraccion_asiento').val(fecha_des);
+            $('#porcentaje_detraccion').val(porcentaje_des);
+            $('#total_detraccion_asiento').val(total_des);
+
+            if (tipo_asiento === 'TAS0000000000007') {
+                $('#asientototales').hide();
+            } else {
+                $('#asientototales').show();
             }
-        });
 
-        let anio = fecha_asiento.getFullYear();
-
-        $('#anio_asiento').val(anio.toString()).trigger('change');
-        $('#comprobante_asiento').val(comprobante_asiento);
-        $('#moneda_asiento').val(moneda_id_editar).trigger('change');
-        $('#tipo_cambio_asiento').val(tc_editar);
-        $('#empresa_asiento').val(proveedor_asiento).trigger('change');
-        $('#tipo_asiento').val(tipo_asiento).trigger('change');
-
-        // Formatear a YYYY-MM-DD
-        let fechaFormateada = fecha_asiento.toISOString().split('T')[0];
-
-        // Pasar valor al input con jQuery
-        $('#fecha_asiento').val(fechaFormateada);
-        $('#tipo_documento_asiento').val(tipo_comprobante).trigger('change');
-        $('#serie_asiento').val(serie_comprobante);
-        $('#numero_asiento').val(numero_comprobante);
-        $('#tipo_documento_ref').val(tipo_comprobante_ref).trigger('change');
-        $('#serie_ref_asiento').val(serie_comprobante_ref);
-        $('#numero_ref_asiento').val(numero_comprobante_ref);
-        $('#glosa_asiento').val(glosa_asiento);
-
-        $('#tipo_descuento_asiento').val(tipo_descuento).trigger('change');
-        $('#const_detraccion_asiento').val(constancia_des);
-        $('#fecha_detraccion_asiento').val(fecha_des);
-        $('#porcentaje_detraccion').val(porcentaje_des);
-        $('#total_detraccion_asiento').val(total_des);
-
-        if (tipo_asiento === 'TAS0000000000007') {
-            $('#asientototales').hide();
-        } else {
-            $('#asientototales').show();
-        }
-
-        if (data_valor_id === '1') {
             $('.pnlasientos').show();
             $('.pnlasientos').focus();
             $('#asientodetalle').DataTable().columns.adjust().draw();
-        }
 
-        setTimeout(function () {
-            $('#periodo_asiento').val(periodo_asiento).trigger('change');
-        }, 3000); // espera medio segundo o el tiempo necesario
+            setTimeout(function () {
+                $('#periodo_asiento').val(periodo_asiento).trigger('change');
+            }, 3000); // espera medio segundo o el tiempo necesario
+        }
 
         cerrarcargando();
 

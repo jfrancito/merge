@@ -22,12 +22,11 @@
                         <div class="form-group">
                             <label class="col-sm-12 control-label labelleft negrita">Año :</label>
                             <div class="col-sm-12 abajocaja">
-                                {!! Form::select( 'anio_asiento', $array_anio, '',
+                                {!! Form::select( 'anio_asiento', isset($array_anio) ? $array_anio : [], '',
                                                   [
                                                     'class'       => 'select2 form-control control input-sm' ,
                                                     'id'          => 'anio_asiento',
-                                                    'data-aw'     => '1',
-                                                    'required'    => true,
+                                                    'data-aw'     => '1'
                                                   ]) !!}
                             </div>
                         </div>
@@ -38,12 +37,11 @@
                             <label class="col-sm-12 control-label labelleft negrita">Periodo
                                 :</label>
                             <div class="col-sm-12 abajocaja">
-                                {!! Form::select( 'periodo_asiento', $array_periodo, '',
+                                {!! Form::select( 'periodo_asiento', isset($array_periodo) ? $array_periodo : [], '',
                                                   [
                                                     'class'       => 'select2 form-control control input-sm' ,
                                                     'id'          => 'periodo_asiento',
                                                     'data-aw'     => '2',
-                                                    'required'    => true,
                                                   ]) !!}
                             </div>
                         </div>
@@ -54,7 +52,7 @@
                             <label class="col-sm-12 control-label labelleft negrita">Comprobante
                                 :</label>
                             <div class="col-sm-12 abajocaja">
-                                <input required id="comprobante_asiento" name="comprobante_asiento"
+                                <input id="comprobante_asiento" name="comprobante_asiento"
                                        class="form-control control input-sm" type="text" readonly
                                        value="">
                             </div>
@@ -65,12 +63,11 @@
                         <div class="form-group">
                             <label class="col-sm-12 control-label labelleft negrita">Moneda :</label>
                             <div class="col-sm-12 abajocaja">
-                                {!! Form::select( 'moneda_asiento', $combo_moneda_asiento, '',
+                                {!! Form::select( 'moneda_asiento', isset($combo_moneda_asiento) ? $combo_moneda_asiento : [], '',
                                                   [
                                                     'class'       => 'select2 form-control control input-sm' ,
                                                     'id'          => 'moneda_asiento',
                                                     'data-aw'     => '4',
-                                                    'required'    => true,
                                                   ]) !!}
                             </div>
                         </div>
@@ -82,7 +79,7 @@
                                 :</label>
                             <div class="col-sm-12 abajocaja">
 
-                                <input type="text" required
+                                <input type="text"
                                        id="tipo_cambio_asiento" name='tipo_cambio_asiento'
                                        value="0.0000"
                                        placeholder="Tipo de cambio"
@@ -101,12 +98,11 @@
                         <div class="form-group">
                             <label class="col-sm-12 control-label labelleft negrita">Proveedor :</label>
                             <div class="col-sm-12 abajocaja">
-                                {!! Form::select( 'empresa_asiento', $combo_empresa_proveedor, '',
+                                {!! Form::select( 'empresa_asiento', isset($combo_empresa_proveedor) ? $combo_empresa_proveedor : [], '',
                                                   [
                                                     'class'       => 'select2 form-control control input-sm' ,
                                                     'id'          => 'empresa_asiento',
                                                     'data-aw'     => '6',
-                                                    'required'    => true,
                                                   ]) !!}
                             </div>
                         </div>
@@ -116,12 +112,11 @@
                         <div class="form-group">
                             <label class="col-sm-12 control-label labelleft negrita">Tipo Asiento :</label>
                             <div class="col-sm-12 abajocaja">
-                                {!! Form::select( 'tipo_asiento', $combo_tipo_asiento, '',
+                                {!! Form::select( 'tipo_asiento', isset($combo_tipo_asiento) ? $combo_tipo_asiento : [], '',
                                                   [
                                                     'class'       => 'select2 form-control control input-sm' ,
                                                     'id'          => 'tipo_asiento',
                                                     'data-aw'     => '7',
-                                                    'required'    => true,
                                                   ]) !!}
                             </div>
                         </div>
@@ -132,7 +127,7 @@
                             <label class="col-sm-12 control-label labelleft negrita">Fecha Documento
                                 :</label>
                             <div class="col-sm-12 abajocaja">
-                                <input required id="fecha_asiento" name="fecha_asiento"
+                                <input id="fecha_asiento" name="fecha_asiento"
                                        class="form-control control input-sm" type="date"
                                        value="{{ date("Ymd") }}">
                             </div>
@@ -148,12 +143,11 @@
                         <div class="form-group">
                             <label class="col-sm-12 control-label labelleft negrita">Tipo Documento :</label>
                             <div class="col-sm-12 abajocaja">
-                                {!! Form::select( 'tipo_documento_asiento', $combo_tipo_documento, '',
+                                {!! Form::select( 'tipo_documento_asiento', isset($combo_tipo_documento) ? $combo_tipo_documento : [], '',
                                                   [
                                                     'class'       => 'select2 form-control control input-sm' ,
                                                     'id'          => 'tipo_documento_asiento',
                                                     'data-aw'     => '8',
-                                                    'required'    => true,
                                                   ]) !!}
                             </div>
                         </div>
@@ -164,7 +158,7 @@
                             <label class="col-sm-12 control-label labelleft negrita">Serie Documento
                                 :</label>
                             <div class="col-sm-12 abajocaja">
-                                <input required id="serie_asiento" name="serie_asiento"
+                                <input id="serie_asiento" name="serie_asiento"
                                        class="form-control control input-sm" type="text"
                                        value="">
                             </div>
@@ -176,7 +170,7 @@
                             <label class="col-sm-12 control-label labelleft negrita">Nro. Documento
                                 :</label>
                             <div class="col-sm-12 abajocaja">
-                                <input required id="numero_asiento" name="numero_asiento"
+                                <input id="numero_asiento" name="numero_asiento"
                                        class="form-control control input-sm" type="text"
                                        value="">
                             </div>
@@ -191,7 +185,7 @@
                         <div class="form-group">
                             <label class="col-sm-12 control-label labelleft negrita">Tipo Documento Ref.:</label>
                             <div class="col-sm-12 abajocaja">
-                                {!! Form::select( 'tipo_documento_ref', $combo_tipo_documento, '',
+                                {!! Form::select( 'tipo_documento_ref', isset($combo_tipo_documento) ? $combo_tipo_documento : [], '',
                                                   [
                                                     'class'       => 'select2 form-control control input-sm combo' ,
                                                     'id'          => 'tipo_documento_ref',
@@ -233,7 +227,7 @@
                             <label class="col-sm-12 control-label labelleft negrita">Glosa
                                 :</label>
                             <div class="col-sm-12 abajocaja">
-                                <input required id="glosa_asiento" name="glosa_asiento"
+                                <input id="glosa_asiento" name="glosa_asiento"
                                        class="form-control control input-sm" type="text"
                                        value="">
                             </div>
@@ -251,7 +245,7 @@
                             Descuento
                             :</label>
                         <div class="col-sm-12 abajocaja">
-                            {!! Form::select( 'tipo_descuento_asiento', $combo_descuento, '',
+                            {!! Form::select( 'tipo_descuento_asiento', isset($combo_descuento) ? $combo_descuento : [], '',
                                               [
                                                 'class'       => 'select2 form-control control input-xs' ,
                                                 'id'          => 'tipo_descuento_asiento',
@@ -408,7 +402,7 @@
                             <div class="form-group">
                                 <label class="col-sm-12 control-label labelleft negrita">Nivel:</label>
                                 <div class="col-sm-12 abajocaja">
-                                    {!! Form::select( 'nivel', $combo_nivel_pc, '6',
+                                    {!! Form::select( 'nivel', isset($combo_nivel_pc) ? $combo_nivel_pc : [], '6',
                                                       [
                                                         'class'       => 'select2 form-control control input-xs combo' ,
                                                         'id'          => 'nivel',
@@ -424,7 +418,7 @@
                             <div class="form-group">
                                 <label class="col-sm-12 control-label labelleft negrita">Partida :</label>
                                 <div class="col-sm-12 abajocaja">
-                                    {!! Form::select( 'partida_id', $combo_partida, '',
+                                    {!! Form::select( 'partida_id', isset($combo_partida) ? $combo_partida : [], '',
                                                       [
                                                         'class'       => 'select2 form-control control input-xs combo' ,
                                                         'id'          => 'partida_id',
@@ -439,7 +433,7 @@
                             <div class="form-group">
                                 <label class="col-sm-12 control-label labelleft negrita">Cuenta contable : </label>
                                 <div class="col-sm-12 abajocaja">
-                                    {!! Form::select( 'cuenta_contable_id', $combo_cuenta, '',
+                                    {!! Form::select( 'cuenta_contable_id', isset($combo_cuenta) ? $combo_cuenta : [], '',
                                                       [
                                                         'class'       => 'select2 form-control control input-xs combo' ,
                                                         'id'          => 'cuenta_contable_id',
@@ -467,7 +461,7 @@
                             <div class="form-group">
                                 <label class="col-sm-12 control-label labelleft negrita">Tipo IGV :</label>
                                 <div class="col-sm-12 abajocaja">
-                                    {!! Form::select( 'tipo_igv_id', $combo_tipo_igv, '',
+                                    {!! Form::select( 'tipo_igv_id', isset($combo_tipo_igv) ? $combo_tipo_igv : [], '',
                                                       [
                                                         'class'       => 'select2 form-control control input-xs combo' ,
                                                         'id'          => 'tipo_igv_id',
@@ -481,7 +475,7 @@
                             <div class="form-group">
                                 <label class="col-sm-12 control-label labelleft negrita">% IGV :</label>
                                 <div class="col-sm-12 abajocaja">
-                                    {!! Form::select( 'porc_tipo_igv_id', $combo_porc_tipo_igv, '',
+                                    {!! Form::select( 'porc_tipo_igv_id', isset($combo_porc_tipo_igv) ? $combo_porc_tipo_igv : [], '',
                                                       [
                                                         'class'       => 'select2 form-control control input-xs combo' ,
                                                         'id'          => 'porc_tipo_igv_id',
@@ -495,7 +489,7 @@
                             <div class="form-group">
                                 <label class="col-sm-12 control-label labelleft negrita">Estado :</label>
                                 <div class="col-sm-12 abajocaja">
-                                    {!! Form::select( 'activo', $combo_activo, '1',
+                                    {!! Form::select( 'activo', isset($combo_activo) ? $combo_activo : [], '1',
                                                       [
                                                         'class'       => 'select2 form-control control input-xs combo' ,
                                                         'id'          => 'activo',
