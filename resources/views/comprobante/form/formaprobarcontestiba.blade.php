@@ -69,7 +69,6 @@
         </div>
     </div>
 
-
     <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
         <div class="panel panel-default panel-contrast">
             <div class="panel-heading" style="background: #1d3a6d;color: #fff;">RECOMENDACION
@@ -124,15 +123,12 @@
 <div class="row xs-pt-15">
     <div class="col-xs-6">
         <div class="be-checkbox">
-
-        </div>
-    </div>
-    <div class="col-xs-6">
-        <p class="text-right">
-            <a href="{{ url('/gestion-de-comprobante-contabilidad/'.$idopcion) }}">
-                <button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button>
-            </a>
-            <button type="button" class="btn btn-space btn-primary btnaprobarcomporbatnte">Guardar</button>
-        </p>
-    </div>
+      </div>
+  </div>
+  <div class="col-xs-6">
+    <p class="text-right">
+      <a href="{{ url('/gestion-de-comprobante-contabilidad/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
+      <button type="button"  class="btn btn-space btn-primary btnaprobarcomporbatnte">Guardar</button>
+    </p>
+  </div>
 </div>

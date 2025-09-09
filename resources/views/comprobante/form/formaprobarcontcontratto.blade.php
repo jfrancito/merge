@@ -159,18 +159,17 @@
 
                             </div>
                         </div>
-                        {{--
-                                                <input type="text"
-                                                       id="nro_cuenta_contable"
-                                                       name="nro_cuenta_contable"
-                                                       placeholder="Cuenta Contable"
-                                                       required
-                                                       pattern="\d{6}"
-                                                       maxlength="6"
-                                                       data-parsley-pattern-message="El código debe tener exactamente 6 números"
-                                                       autocomplete="off"
-                                                       class="form-control input-sm"/>--}}
-
+{{--
+                        <input type="text"
+                               id="nro_cuenta_contable"
+                               name="nro_cuenta_contable"
+                               placeholder="Cuenta Contable"
+                               required
+                               pattern="\d{6}"
+                               maxlength="6"
+                               data-parsley-pattern-message="El código debe tener exactamente 6 números"
+                               autocomplete="off"
+                               class="form-control input-sm"/>--}}
 
                     </div>
                 </div>
