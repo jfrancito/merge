@@ -759,8 +759,9 @@
 
         <div class="editarcuentas" style="border-radius: 10px; padding: 10px">
 
-            <div class="col-md-12" style="background: #1d3a6d; color: white">
-                <h1>Asiento Movimiento</h1>
+            <div class="col-md-12"
+                 style="background: #1d3a6d; color: white; padding: 10px; border-radius: 10px">
+                <h4 id="titulodetalle">Agregar o Modificar Detalle</h4>
             </div>
 
             <div class="col-md-12" style="background: white;">

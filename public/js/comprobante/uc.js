@@ -155,7 +155,7 @@ $(document).ready(function () {
         $('#asiento_id_editar_reparable').val(data_codigo);
         $('#moneda_id_editar_reparable').val(data_moneda);
         $('#tc_editar_reparable').val(data_tc);
-        $('#titulodetalle').text('Modificar Detalle');
+        $('#titulodetallereparable').text('Modificar Detalle');
         $('.btn-registrar-movimiento-reparable').hide();
         $('.btn-editar-movimiento-reparable').show();
         $('.tablageneralreparable').toggle("slow");
@@ -214,7 +214,7 @@ $(document).ready(function () {
         $('#asiento_id_editar_reparable').val(data_codigo);
         $('#moneda_id_editar_reparable').val(data_moneda);
         $('#tc_editar_reparable').val(data_tc);
-        $('#titulodetalle').text('Registrar Detalle');
+        $('#titulodetallereparable').text('Registrar Detalle');
         $('.btn-editar-movimiento-reparable').hide();
         $('.btn-registrar-movimiento-reparable').show();
         $('.tablageneralreparable').toggle("slow");
@@ -1661,7 +1661,7 @@ $(document).ready(function () {
         $('#form_id_editar').val(data_asiento);
         $('#moneda_id_editar').val(data_moneda);
         $('#tc_editar').val(data_tc);
-
+        $('#titulodetalle').text('Registrar Detalle');
         $('.btn-editar-movimiento').hide();
         $('.btn-registrar-movimiento').show();
         $('.tablageneral').toggle("slow");
@@ -1902,7 +1902,7 @@ $(document).ready(function () {
         $('#form_id_editar').val(data_asiento);
         $('#moneda_id_editar').val(data_moneda);
         $('#tc_editar').val(data_tc);
-
+        $('#titulodetalle').text('Modificar Detalle');
         $('.btn-registrar-movimiento').hide();
         $('.btn-editar-movimiento').show();
         $('.tablageneral').toggle("slow");
