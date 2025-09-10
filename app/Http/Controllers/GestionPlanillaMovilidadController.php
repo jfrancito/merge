@@ -827,6 +827,11 @@ class GestionPlanillaMovilidadController extends Controller
                 $centro_id = 'CEN0000000000001';
             }
             
+            if (Session::get('usuario')->id == '1CIX00000040') {
+                $centro_id = 'CEN0000000000001';
+            }
+
+
             $serie          =   $this->gn_serie($anio, $mes,$centro_id);
             $numero         =   $this->gn_numero_pl($serie,$centro_id);
 
@@ -1384,6 +1389,11 @@ class GestionPlanillaMovilidadController extends Controller
                         $centro_id = 'CEN0000000000001';
                     }
 
+                    if (Session::get('usuario')->id == '1CIX00000040') {
+                        $centro_id = 'CEN0000000000001';
+                    }
+
+
                     $serie          =   $this->gn_serie($anio, $mes,$centro_id);
                     $numero         =   $this->gn_numero($serie,$centro_id);
 
@@ -1467,6 +1477,10 @@ class GestionPlanillaMovilidadController extends Controller
                 return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd', 'No puede realizar un registro porque no es la empresa a cual pertenece');
             }
             if($centro_id == 'CEN0000000000003'){
+                $centro_id = 'CEN0000000000001';
+            }
+
+            if (Session::get('usuario')->id == '1CIX00000040') {
                 $centro_id = 'CEN0000000000001';
             }
 
@@ -1555,6 +1569,11 @@ class GestionPlanillaMovilidadController extends Controller
                 if($centro_id == 'CEN0000000000003'){
                     $centro_id = 'CEN0000000000001';
                 }
+
+                if (Session::get('usuario')->id == '1CIX00000040') {
+                    $centro_id = 'CEN0000000000001';
+                }
+
 
                 $anio                   =   $this->anio;
                 $mes                    =   $this->mes;
@@ -1693,6 +1712,13 @@ class GestionPlanillaMovilidadController extends Controller
                 if($centro_id == 'CEN0000000000003'){
                     $centro_id = 'CEN0000000000001';
                 }
+
+
+                if (Session::get('usuario')->id == '1CIX00000040') {
+                    $centro_id = 'CEN0000000000001';
+                }
+
+
                 $serie                  =   $this->gn_serie($anio, $mes,$centro_id);
                 $numero                 =   $this->gn_numero($serie,$centro_id);
 
@@ -1844,6 +1870,10 @@ class GestionPlanillaMovilidadController extends Controller
             $centro_id      =       $trabajadorespla->centro_osiris_id;
         }
         if($centro_id == 'CEN0000000000003'){
+            $centro_id = 'CEN0000000000001';
+        }
+
+        if (Session::get('usuario')->id == '1CIX00000040') {
             $centro_id = 'CEN0000000000001';
         }
 
