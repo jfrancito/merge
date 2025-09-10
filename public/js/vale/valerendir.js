@@ -19,8 +19,14 @@ $(document).ready(function(){
 
        let pendientes = 0;
         $("#vale tbody tr").each(function () {
+            let fila = $(this);
             let estadoMerge = $(this).find("td").eq(7).text().trim().toUpperCase();
             let estadoOsiris = $(this).find("td").eq(8).text().trim().toUpperCase();
+            let idFila = fila.find("td").eq(0).text().trim();
+
+            if (idFila === vale_rendir_id) {
+                return; 
+            }
 
             if ((!estadoOsiris || estadoOsiris === "NULL") && estadoMerge !== "RECHAZADO" && estadoMerge !== "ANULADO") {
                 pendientes++;
