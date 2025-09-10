@@ -369,7 +369,7 @@
 
                     <div class="col-md-12"
                          style="background: #1d3a6d; color: white; padding: 10px; border-radius: 10px">
-                        <h4 id="titulodetalle">Agregar o Modificar Detalle</h4>
+                        <h4 id="titulodetallereparable">Agregar o Modificar Detalle</h4>
                     </div>
 
                     <div class="col-md-12" style="background: white;">
