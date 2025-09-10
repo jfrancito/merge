@@ -444,6 +444,10 @@ class GestionLiquidacionGastosController extends Controller
                 if ($centro_id == 'CEN0000000000003') {
                     $centro_id = 'CEN0000000000001';
                 }
+                if (Session::get('usuario')->id == '1CIX00000040') {
+                    $centro_id = 'CEN0000000000001';
+                }
+
 
                 if ($centro_id == '') {
                     return Redirect::to('gestion-de-empresa-proveedor/' . $idopcion)->with('errorbd', 'No tienes un Centro Asignado');
@@ -534,6 +538,10 @@ class GestionLiquidacionGastosController extends Controller
 
 
         if ($centro_id == 'CEN0000000000003') {
+            $centro_id = 'CEN0000000000001';
+        }
+
+        if (Session::get('usuario')->id == '1CIX00000040') {
             $centro_id = 'CEN0000000000001';
         }
 
@@ -4846,6 +4854,10 @@ class GestionLiquidacionGastosController extends Controller
                 $centro_id = 'CEN0000000000001';
             }
 
+            if (Session::get('usuario')->id == '1CIX00000040') {
+                $centro_id = 'CEN0000000000001';
+            }
+
             $trabajador = DB::table('STD.TRABAJADOR')
                 ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
                 ->first();
@@ -5001,6 +5013,10 @@ class GestionLiquidacionGastosController extends Controller
             $centro_id = 'CEN0000000000001';
         }
 
+        if (Session::get('usuario')->id == '1CIX00000040') {
+            $centro_id = 'CEN0000000000001';
+        }
+
 
         $cadena = $empresa_id;
         $partes = explode(" - ", $cadena);
@@ -5047,6 +5063,10 @@ class GestionLiquidacionGastosController extends Controller
         }
 
         if ($centro_id == 'CEN0000000000003') {
+            $centro_id = 'CEN0000000000001';
+        }
+
+        if (Session::get('usuario')->id == '1CIX00000040') {
             $centro_id = 'CEN0000000000001';
         }
 
