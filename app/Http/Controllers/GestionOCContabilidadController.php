@@ -1333,7 +1333,7 @@ class GestionOCContabilidadController extends Controller
             $ordencompra_f = CMPOrden::where('COD_ORDEN', '=', $idoc)->first();
 
             $combo_moneda = $this->gn_generacion_combo_categoria('MONEDA', 'Seleccione moneda', '');
-            $combo_empresa = $this->gn_combo_empresa_xcliprov('Seleccione Proveedor', '', 'P');
+            //$combo_empresa = $this->gn_combo_empresa_xcliprov('Seleccione Proveedor', '', 'P');
             $combo_tipo_documento = $this->gn_generacion_combo_tipo_documento_sunat('STD.TIPO_DOCUMENTO', 'COD_TIPO_DOCUMENTO', 'TXT_TIPO_DOCUMENTO', 'Seleccione tipo documento', '');
 
             $anio_defecto = date('Y', strtotime($fedocumento->FEC_VENTA));
@@ -1392,8 +1392,12 @@ class GestionOCContabilidadController extends Controller
 
                 $ind_reversion = 'R';
 
-                $asiento_reparable_reversion = $this->ejecutarSP(
-                    "EXEC [WEB].[GENERAR_ASIENTO_REPARABLE_FE_DOCUMENTO]
+                $asiento_existe_reparable = WEBAsiento::where('COD_ESTADO', '=', 1)
+                    ->where('TXT_REFERENCIA', '=', $cod_contable)->where('TXT_GLOSA', 'like', "COMPRAS REPARABLE:%")->first();
+
+                if (!empty($asiento_existe_reparable)) {
+                    $asiento_reparable_reversion = $this->ejecutarSP(
+                        "EXEC [WEB].[GENERAR_ASIENTO_REPARABLE_FE_DOCUMENTO]
                 @anio = :anio,
                 @empresa = :empresa,
                 @cod_contable = :cod_contable,
@@ -1401,19 +1405,23 @@ class GestionOCContabilidadController extends Controller
                 @ind_recalcular = :ind_recalcular,
                 @ind_reversion = :ind_reversion,
                 @cod_usuario_registra = :usuario",
-                    [
-                        ':anio' => $anio,
-                        ':empresa' => $empresa,
-                        ':cod_contable' => $cod_contable,
-                        ':ind_anulado' => $ind_anulado,
-                        ':ind_recalcular' => $ind_recalcular,
-                        ':ind_reversion' => $ind_reversion,
-                        ':usuario' => $usuario
-                    ]
-                );
+                        [
+                            ':anio' => $anio,
+                            ':empresa' => $empresa,
+                            ':cod_contable' => $cod_contable,
+                            ':ind_anulado' => $ind_anulado,
+                            ':ind_recalcular' => $ind_recalcular,
+                            ':ind_reversion' => $ind_reversion,
+                            ':usuario' => $usuario
+                        ]
+                    );
+                } else {
+                    $asiento_reparable_reversion = array(0 => [], 1 => [], 2 => []);
+                }
 
-                $asiento_deduccion = $this->ejecutarSP(
-                    "EXEC [WEB].[GENERAR_ASIENTO_DEDUCCION_FE_DOCUMENTO]
+                if ($fedocumento->MONTO_ANTICIPO_DESC > 0.0000) {
+                    $asiento_deduccion = $this->ejecutarSP(
+                        "EXEC [WEB].[GENERAR_ASIENTO_DEDUCCION_FE_DOCUMENTO]
                 @anio = :anio,
                 @empresa = :empresa,
                 @cod_contable = :cod_contable,
@@ -1423,36 +1431,43 @@ class GestionOCContabilidadController extends Controller
                 @centro_costo = :centro_costo,
                 @ind_igv = :ind_igv,
                 @cod_usuario_registra = :usuario",
-                    [
-                        ':anio' => $anio,
-                        ':empresa' => $empresa,
-                        ':cod_contable' => $cod_contable,
-                        ':ind_anulado' => $ind_anulado,
-                        ':igv' => $igv,
-                        ':ind_recalcular' => $ind_recalcular,
-                        ':centro_costo' => $centro_costo,
-                        ':ind_igv' => $ind_igv,
-                        ':usuario' => $usuario
-                    ]
-                );
+                        [
+                            ':anio' => $anio,
+                            ':empresa' => $empresa,
+                            ':cod_contable' => $cod_contable,
+                            ':ind_anulado' => $ind_anulado,
+                            ':igv' => $igv,
+                            ':ind_recalcular' => $ind_recalcular,
+                            ':centro_costo' => $centro_costo,
+                            ':ind_igv' => $ind_igv,
+                            ':usuario' => $usuario
+                        ]
+                    );
+                } else {
+                    $asiento_deduccion = array(0 => [], 1 => [], 2 => []);
+                }
 
-                $asiento_percepcion = $this->ejecutarSP(
-                    "EXEC [WEB].[GENERAR_ASIENTO_PERCEPCION_FE_DOCUMENTO]
+                if ($fedocumento->PERCEPCION > 0.0000) {
+                    $asiento_percepcion = $this->ejecutarSP(
+                        "EXEC [WEB].[GENERAR_ASIENTO_PERCEPCION_FE_DOCUMENTO]
                 @anio = :anio,
                 @empresa = :empresa,
                 @cod_contable = :cod_contable,
                 @ind_anulado = :ind_anulado,
                 @ind_recalcular = :ind_recalcular,
                 @cod_usuario_registra = :usuario",
-                    [
-                        ':anio' => $anio,
-                        ':empresa' => $empresa,
-                        ':cod_contable' => $cod_contable,
-                        ':ind_anulado' => $ind_anulado,
-                        ':ind_recalcular' => $ind_recalcular,
-                        ':usuario' => $usuario
-                    ]
-                );
+                        [
+                            ':anio' => $anio,
+                            ':empresa' => $empresa,
+                            ':cod_contable' => $cod_contable,
+                            ':ind_anulado' => $ind_anulado,
+                            ':ind_recalcular' => $ind_recalcular,
+                            ':usuario' => $usuario
+                        ]
+                    );
+                } else {
+                    $asiento_percepcion = array(0 => [], 1 => [], 2 => []);
+                }
             }
 
             $ind_reversion = 'N';
@@ -1512,7 +1527,7 @@ class GestionOCContabilidadController extends Controller
                     'defecto_anio' => $anio_defecto,
                     'defecto_periodo' => $periodo_defecto,
 
-                    'combo_empresa_proveedor' => $combo_empresa,
+                    //'combo_empresa_proveedor' => $combo_empresa,
                     'combo_tipo_documento' => $combo_tipo_documento,
                     'combo_moneda_asiento' => $combo_moneda,
                     'combo_descuento' => $combo_descuento,
@@ -2481,7 +2496,7 @@ class GestionOCContabilidadController extends Controller
             $linea = $fedocumento->DOCUMENTO_ITEM;
 
             $combo_moneda = $this->gn_generacion_combo_categoria('MONEDA', 'Seleccione moneda', '');
-            $combo_empresa = $this->gn_combo_empresa_xcliprov('Seleccione Proveedor', '', 'P');
+            //$combo_empresa = $this->gn_combo_empresa_xcliprov('Seleccione Proveedor', '', 'P');
             $combo_tipo_documento = $this->gn_generacion_combo_tipo_documento_sunat('STD.TIPO_DOCUMENTO', 'COD_TIPO_DOCUMENTO', 'TXT_TIPO_DOCUMENTO', 'Seleccione tipo documento', '');
 
             $anio_defecto = date('Y', strtotime($fedocumento->FEC_VENTA));
@@ -2564,10 +2579,10 @@ class GestionOCContabilidadController extends Controller
                         ]
                     );
                 } else {
-                    $asiento_reparable_reversion = array(0=>[], 1=>[], 2=>[]);
+                    $asiento_reparable_reversion = array(0 => [], 1 => [], 2 => []);
                 }
 
-                if($fedocumento->MONTO_ANTICIPO_DESC > 0.0000) {
+                if ($fedocumento->MONTO_ANTICIPO_DESC > 0.0000) {
                     $asiento_deduccion = $this->ejecutarSP(
                         "EXEC [WEB].[GENERAR_ASIENTO_DEDUCCION_FE_DOCUMENTO]
                 @anio = :anio,
@@ -2592,10 +2607,10 @@ class GestionOCContabilidadController extends Controller
                         ]
                     );
                 } else {
-                    $asiento_deduccion = array(0=>[], 1=>[], 2=>[]);
+                    $asiento_deduccion = array(0 => [], 1 => [], 2 => []);
                 }
 
-                if($fedocumento->PERCEPCION > 0.0000) {
+                if ($fedocumento->PERCEPCION > 0.0000) {
                     $asiento_percepcion = $this->ejecutarSP(
                         "EXEC [WEB].[GENERAR_ASIENTO_PERCEPCION_FE_DOCUMENTO]
                 @anio = :anio,
@@ -2614,7 +2629,7 @@ class GestionOCContabilidadController extends Controller
                         ]
                     );
                 } else {
-                    $asiento_percepcion = array(0=>[], 1=>[], 2=>[]);
+                    $asiento_percepcion = array(0 => [], 1 => [], 2 => []);
                 }
             }
 
@@ -2685,7 +2700,7 @@ class GestionOCContabilidadController extends Controller
                     'defecto_anio' => $anio_defecto,
                     'defecto_periodo' => $periodo_defecto,
 
-                    'combo_empresa_proveedor' => $combo_empresa,
+                    //'combo_empresa_proveedor' => $combo_empresa,
                     'combo_tipo_documento' => $combo_tipo_documento,
                     'combo_moneda_asiento' => $combo_moneda,
 
@@ -3653,7 +3668,7 @@ class GestionOCContabilidadController extends Controller
             $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)->first();
 
             $combo_moneda = $this->gn_generacion_combo_categoria('MONEDA', 'Seleccione moneda', '');
-            $combo_empresa = $this->gn_combo_empresa_xcliprov('Seleccione Proveedor', '', 'P');
+            //$combo_empresa = $this->gn_combo_empresa_xcliprov('Seleccione Proveedor', '', 'P');
             $combo_tipo_documento = $this->gn_generacion_combo_tipo_documento_sunat('STD.TIPO_DOCUMENTO', 'COD_TIPO_DOCUMENTO', 'TXT_TIPO_DOCUMENTO', 'Seleccione tipo documento', '');
 
             $anio_defecto = date('Y', strtotime($fedocumento->FEC_VENTA));
@@ -3718,8 +3733,12 @@ class GestionOCContabilidadController extends Controller
 
                 $ind_reversion = 'R';
 
-                $asiento_reparable_reversion = $this->ejecutarSP(
-                    "EXEC [WEB].[GENERAR_ASIENTO_REPARABLE_FE_DOCUMENTO]
+                $asiento_existe_reparable = WEBAsiento::where('COD_ESTADO', '=', 1)
+                    ->where('TXT_REFERENCIA', '=', $cod_contable)->where('TXT_GLOSA', 'like', "COMPRAS REPARABLE:%")->first();
+
+                if (!empty($asiento_existe_reparable)) {
+                    $asiento_reparable_reversion = $this->ejecutarSP(
+                        "EXEC [WEB].[GENERAR_ASIENTO_REPARABLE_FE_DOCUMENTO]
                 @anio = :anio,
                 @empresa = :empresa,
                 @cod_contable = :cod_contable,
@@ -3727,19 +3746,23 @@ class GestionOCContabilidadController extends Controller
                 @ind_recalcular = :ind_recalcular,
                 @ind_reversion = :ind_reversion,
                 @cod_usuario_registra = :usuario",
-                    [
-                        ':anio' => $anio,
-                        ':empresa' => $empresa,
-                        ':cod_contable' => $cod_contable,
-                        ':ind_anulado' => $ind_anulado,
-                        ':ind_recalcular' => $ind_recalcular,
-                        ':ind_reversion' => $ind_reversion,
-                        ':usuario' => $usuario
-                    ]
-                );
+                        [
+                            ':anio' => $anio,
+                            ':empresa' => $empresa,
+                            ':cod_contable' => $cod_contable,
+                            ':ind_anulado' => $ind_anulado,
+                            ':ind_recalcular' => $ind_recalcular,
+                            ':ind_reversion' => $ind_reversion,
+                            ':usuario' => $usuario
+                        ]
+                    );
+                } else {
+                    $asiento_reparable_reversion = array(0 => [], 1 => [], 2 => []);
+                }
 
-                $asiento_deduccion = $this->ejecutarSP(
-                    "EXEC [WEB].[GENERAR_ASIENTO_DEDUCCION_FE_DOCUMENTO]
+                if ($fedocumento->MONTO_ANTICIPO_DESC > 0.0000) {
+                    $asiento_deduccion = $this->ejecutarSP(
+                        "EXEC [WEB].[GENERAR_ASIENTO_DEDUCCION_FE_DOCUMENTO]
                 @anio = :anio,
                 @empresa = :empresa,
                 @cod_contable = :cod_contable,
@@ -3749,36 +3772,43 @@ class GestionOCContabilidadController extends Controller
                 @centro_costo = :centro_costo,
                 @ind_igv = :ind_igv,
                 @cod_usuario_registra = :usuario",
-                    [
-                        ':anio' => $anio,
-                        ':empresa' => $empresa,
-                        ':cod_contable' => $cod_contable,
-                        ':ind_anulado' => $ind_anulado,
-                        ':igv' => $igv,
-                        ':ind_recalcular' => $ind_recalcular,
-                        ':centro_costo' => $centro_costo,
-                        ':ind_igv' => $ind_igv,
-                        ':usuario' => $usuario
-                    ]
-                );
+                        [
+                            ':anio' => $anio,
+                            ':empresa' => $empresa,
+                            ':cod_contable' => $cod_contable,
+                            ':ind_anulado' => $ind_anulado,
+                            ':igv' => $igv,
+                            ':ind_recalcular' => $ind_recalcular,
+                            ':centro_costo' => $centro_costo,
+                            ':ind_igv' => $ind_igv,
+                            ':usuario' => $usuario
+                        ]
+                    );
+                } else {
+                    $asiento_deduccion = array(0 => [], 1 => [], 2 => []);
+                }
 
-                $asiento_percepcion = $this->ejecutarSP(
-                    "EXEC [WEB].[GENERAR_ASIENTO_PERCEPCION_FE_DOCUMENTO]
+                if ($fedocumento->PERCEPCION > 0.0000) {
+                    $asiento_percepcion = $this->ejecutarSP(
+                        "EXEC [WEB].[GENERAR_ASIENTO_PERCEPCION_FE_DOCUMENTO]
                 @anio = :anio,
                 @empresa = :empresa,
                 @cod_contable = :cod_contable,
                 @ind_anulado = :ind_anulado,
                 @ind_recalcular = :ind_recalcular,
                 @cod_usuario_registra = :usuario",
-                    [
-                        ':anio' => $anio,
-                        ':empresa' => $empresa,
-                        ':cod_contable' => $cod_contable,
-                        ':ind_anulado' => $ind_anulado,
-                        ':ind_recalcular' => $ind_recalcular,
-                        ':usuario' => $usuario
-                    ]
-                );
+                        [
+                            ':anio' => $anio,
+                            ':empresa' => $empresa,
+                            ':cod_contable' => $cod_contable,
+                            ':ind_anulado' => $ind_anulado,
+                            ':ind_recalcular' => $ind_recalcular,
+                            ':usuario' => $usuario
+                        ]
+                    );
+                } else {
+                    $asiento_percepcion = array(0 => [], 1 => [], 2 => []);
+                }
             }
 
             $ind_reversion = 'N';
@@ -3841,7 +3871,7 @@ class GestionOCContabilidadController extends Controller
                     'defecto_anio' => $anio_defecto,
                     'defecto_periodo' => $periodo_defecto,
 
-                    'combo_empresa_proveedor' => $combo_empresa,
+                    //'combo_empresa_proveedor' => $combo_empresa,
                     'combo_tipo_documento' => $combo_tipo_documento,
                     'combo_moneda_asiento' => $combo_moneda,
 //                    'tipo_doc_fe' => $tipo_doc,
@@ -3877,6 +3907,19 @@ class GestionOCContabilidadController extends Controller
 
 
         }
+    }
+
+    public function buscarProveedor(Request $request)
+    {
+        $q = $request->get('busqueda', '');
+
+        return STDEmpresa::where('COD_ESTADO', '=', 1)
+            ->where('IND_PROVEEDOR', '=', 1)
+            ->where('NOM_EMPR', 'like', "%{$q}%")
+            ->select('COD_EMPR as id', 'NOM_EMPR as text')
+            ->limit(50)
+            ->get();
+
     }
 
     public function actionAjaxComboPeriodoAnioEmpresa(Request $request)

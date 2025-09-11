@@ -7,6 +7,37 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/select2/css/select2.min.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/bootstrap-slider/css/bootstrap-slider.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/css/file/fileinput.css') }} "/>
+    <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/slim-select/2.7.0/slimselect.min.css" rel="stylesheet">
+    <style>
+        .editarcuentas {
+            display: none;
+        }
+
+        .editarcuentasreparable {
+            display: none;
+        }
+
+        #asientodetalle {
+            width: 100% !important;
+        }
+
+        #asientodetallereversion {
+            width: 100% !important;
+        }
+
+        #asientodetallededuccion {
+            width: 100% !important;
+        }
+
+        #asientodetallepercepcion {
+            width: 100% !important;
+        }
+
+        #asientodetallereparable {
+            width: 100% !important;
+        }
+    </style>
 @stop
 @section('section')
 
@@ -163,6 +194,8 @@
 
     <script src="{{ asset('public/js/file/fileinput.js?v='.$version) }}" type="text/javascript"></script>
     <script src="{{ asset('public/js/file/locales/es.js') }}" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/slim-select/2.7.0/slimselect.min.js"></script>
 
     <script type="text/javascript">
         $(document).ready(function () {
@@ -175,6 +208,80 @@
     </script>
 
     <script type="text/javascript">
+
+        document.addEventListener("DOMContentLoaded", function() {
+
+            let carpeta = $("#carpeta").val();
+            let _token = $("#token").val();
+            let link = '/buscar-proveedor';
+
+            let select = new TomSelect("#empresa_asiento", {
+                valueField: 'id',
+                labelField: 'text',
+                searchField: 'text',
+                placeholder: "Escriba para buscar...",
+                preload: true, // carga inicial
+                load: function(query, callback) {
+                    let data = {
+                        _token: _token,
+                        busqueda: query
+                    };
+                    fetch(carpeta + link, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(data)
+                    })
+                        //fetch('/buscar-tipo-documento?q=' + encodeURIComponent(query))
+                        .then(response => response.json())
+                        .then(json => { callback(json); })
+                        .catch(() => { callback(); });
+                }
+            });
+
+            let select_reparable = new TomSelect("#empresa_asiento_reparable", {
+                valueField: 'id',
+                labelField: 'text',
+                searchField: 'text',
+                placeholder: "Escriba para buscar...",
+                preload: true, // carga inicial
+                load: function(query, callback) {
+                    let data = {
+                        _token: _token,
+                        busqueda: query
+                    };
+                    fetch(carpeta + link, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(data)
+                    })
+                        //fetch(carpeta + '/buscar-tipo-documento?q=' + encodeURIComponent(query))
+                        .then(response => response.json())
+                        .then(json => { callback(json); })
+                        .catch(() => { callback(); });
+                }
+            });
+
+            // ✅ Si hay valor por defecto, lo insertamos
+            if (defaultId) {
+                select.addOption({id: defaultId, text: defaultText}); // añade la opción
+                select.setValue(defaultId); // la selecciona
+                select_reparable.addOption({id: defaultId, text: defaultText}); // añade la opción
+                select_reparable.setValue(defaultId); // la selecciona
+            }
+
+            document.querySelectorAll("select.slim").forEach(function(el) {
+                new SlimSelect({
+                    select: el,
+                    placeholder: 'Seleccione...',
+                    allowDeselect: true
+                })
+            })
+
+        });
 
         $('#file-otros').fileinput({
             theme: 'fa5',
