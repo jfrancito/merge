@@ -334,6 +334,12 @@
             'placeholder': '0'
         });
 
+        $('#file-pdf').fileinput({
+            theme: 'fa5',
+            language: 'es',
+            allowedFileExtensions: ['pdf'],
+        });
+
         $('.pnlasientos').hide();
 
         @foreach($archivospdf as $index => $item)

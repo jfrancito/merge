@@ -290,6 +290,12 @@
             'placeholder': '0'
         });
 
+        $('#file-pdf').fileinput({
+            theme: 'fa5',
+            language: 'es',
+            allowedFileExtensions: ['pdf'],
+        });
+
         $('.pnlasientos').hide();
 
         @foreach($archivospdf as $index => $item)
@@ -297,14 +303,14 @@
         $('#file-' + {{$index}}).fileinput({
             theme: 'fa5',
             language: 'es',
-            initialPreview: ["{{ route('serve-file', ['file' => '']) }}" + nombre_archivo],
+            initialPreview: ["{{ route('serve-filecontrato', ['file' => '']) }}" + nombre_archivo],
             initialPreviewAsData: true,
             initialPreviewFileType: 'pdf',
             initialPreviewConfig: [
                 {
                     type: "pdf",
                     caption: nombre_archivo,
-                    downloadUrl: "{{ route('serve-file', ['file' => '']) }}" + nombre_archivo
+                    downloadUrl: "{{ route('serve-filecontrato', ['file' => '']) }}" + nombre_archivo
                 } // Para mostrar el botón de descarga
             ]
         });
