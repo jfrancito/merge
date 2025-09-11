@@ -19,7 +19,7 @@
                             <div class="col-sm-12 abajocaja">
                                 {!! Form::select( 'anio_asiento', $array_anio, $defecto_anio,
                                                   [
-                                                    'class'       => 'select2 form-control control input-sm' ,
+                                                    'class'       => 'slim',
                                                     'id'          => 'anio_asiento',
                                                     'data-aw'     => '1',
                                                     'required'    => true,
@@ -35,7 +35,7 @@
                             <div class="col-sm-12 abajocaja">
                                 {!! Form::select( 'periodo_asiento', $array_periodo, $defecto_periodo,
                                                   [
-                                                    'class'       => 'select2 form-control control input-sm' ,
+                                                    'class'       => 'slim',
                                                     'id'          => 'periodo_asiento',
                                                     'data-aw'     => '2',
                                                     'required'    => true,
@@ -62,7 +62,7 @@
                             <div class="col-sm-12 abajocaja">
                                 {!! Form::select( 'moneda_asiento', $combo_moneda_asiento, !empty($asiento_compra) ? $asiento_compra[1][0]['COD_CATEGORIA_MONEDA'] : ($fedocumento->MONEDA === 'PEN' ? 'MON0000000000001' : 'MON0000000000002'),
                                                   [
-                                                    'class'       => 'select2 form-control control input-sm' ,
+                                                    'class'       => 'slim',
                                                     'id'          => 'moneda_asiento',
                                                     'data-aw'     => '4',
                                                     'required'    => true,
@@ -96,9 +96,8 @@
                         <div class="form-group">
                             <label class="col-sm-12 control-label labelleft negrita">Proveedor :</label>
                             <div class="col-sm-12 abajocaja">
-                                {!! Form::select( 'empresa_asiento', $combo_empresa_proveedor, !empty($asiento_compra) ? $asiento_compra[1][0]['COD_EMPR_CLI'] : '',
+                                {!! Form::select( 'empresa_asiento', [], null,
                                                   [
-                                                    'class'       => 'select2 form-control control input-sm' ,
                                                     'id'          => 'empresa_asiento',
                                                     'data-aw'     => '6',
                                                     'required'    => true,
@@ -107,13 +106,18 @@
                         </div>
                     </div>
 
+                    <script>
+                        let defaultId = "{{ !empty($asiento_compra) ? $asiento_compra[1][0]['COD_EMPR_CLI'] : '' }}";
+                        let defaultText = "{{ !empty($asiento_compra) ? $asiento_compra[1][0]['TXT_EMPR_CLI'] : '' }}";
+                    </script>
+
                     <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 cajareporte">
                         <div class="form-group">
                             <label class="col-sm-12 control-label labelleft negrita">Tipo Asiento :</label>
                             <div class="col-sm-12 abajocaja">
                                 {!! Form::select( 'tipo_asiento', $combo_tipo_asiento, !empty($asiento_compra) ? $asiento_compra[1][0]['COD_CATEGORIA_TIPO_ASIENTO'] : '',
                                                   [
-                                                    'class'       => 'select2 form-control control input-sm' ,
+                                                    'class'       => 'slim',
                                                     'id'          => 'tipo_asiento',
                                                     'data-aw'     => '7',
                                                     'required'    => true,
@@ -145,10 +149,10 @@
                             <div class="col-sm-12 abajocaja">
                                 {!! Form::select( 'tipo_documento_asiento', $combo_tipo_documento, !empty($asiento_compra) ? $asiento_compra[1][0]['COD_CATEGORIA_TIPO_DOCUMENTO'] : '',
                                                   [
-                                                    'class'       => 'select2 form-control control input-sm' ,
-                                                    'id'          => 'tipo_documento_asiento',
-                                                    'data-aw'     => '8',
-                                                    'required'    => true,
+                                                      'class'       => 'slim',
+                                                      'id'          => 'tipo_documento_asiento',
+                                                      'data-aw'     => '8',
+                                                      'required'    => true,
                                                   ]) !!}
                             </div>
                         </div>
@@ -187,7 +191,7 @@
                             <div class="col-sm-12 abajocaja">
                                 {!! Form::select( 'tipo_documento_ref', $combo_tipo_documento, !empty($asiento_compra) ? $asiento_compra[1][0]['COD_CATEGORIA_TIPO_DOCUMENTO_REF'] : '',
                                                   [
-                                                    'class'       => 'select2 form-control control input-sm combo' ,
+                                                    'class'       => 'slim',
                                                     'id'          => 'tipo_documento_ref',
                                                     'data-aw'     => '9'
                                                   ]) !!}
@@ -311,7 +315,7 @@
                         <div class="col-sm-12 abajocaja">
                             {!! Form::select( 'tipo_descuento_asiento', $combo_descuento, !empty($asiento_compra) ? $asiento_compra[1][0]['COD_CATEGORIA_TIPO_DETRACCION'] : ((!empty($fedocumento->MONTO_DETRACCION_XML) ? $fedocumento->MONTO_DETRACCION_XML : 0.00) > 0.00 ? 'DCT0000000000002' : ''),
                                               [
-                                                'class'       => 'select2 form-control control input-xs' ,
+                                                'class'       => 'slim',
                                                 'id'          => 'tipo_descuento_asiento',
                                                 'data-aw'     => '1',
                                               ]) !!}
