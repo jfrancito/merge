@@ -392,9 +392,15 @@
         <div class="tab-container tablageneral">
             <ul class="nav nav-tabs">
                 <li class="active negrita"><a href="#astcompra" data-toggle="tab">COMPRA</a></li>
-                <li class="negrita "><a href="#astreversion" data-toggle="tab">DIARIO REVERSION REPARABLE</a></li>
-                <li class="negrita"><a href="#astdeduccion" data-toggle="tab">DIARIO DEDUCCIÓN ANTICIPO</a></li>
-                <li class="negrita"><a href="#astpercepcion" data-toggle="tab">COMPRA - PERCEPCIÓN</a></li>
+                @if(!empty($asiento_reparable_reversion))
+                    <li class="negrita "><a href="#astreversion" data-toggle="tab">DIARIO REVERSION REPARABLE</a></li>
+                @endif
+                @if(!empty($asiento_deduccion))
+                    <li class="negrita"><a href="#astdeduccion" data-toggle="tab">DIARIO DEDUCCIÓN ANTICIPO</a></li>
+                @endif
+                @if(!empty($asiento_percepcion))
+                    <li class="negrita"><a href="#astpercepcion" data-toggle="tab">COMPRA - PERCEPCIÓN</a></li>
+                @endif
             </ul>
             <div class="tab-content">
                 <div id="astcompra" class="tab-pane active cont">
@@ -422,45 +428,45 @@
                             @foreach($asiento_compra[1] as $key => $asiento_cabecera)
                                 <tr>
                                     <td class="col-base-imponible"
-                                        style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_BASE_IMPONIBLE'], 4, '.', ',') }}</td>
+                                        style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_BASE_IMPONIBLE'], 4) }}</td>
                                     <td class="col-base-imponible-10"
-                                        style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_BASE_IMPONIBLE_10'], 4, '.', ',') }}</td>
+                                        style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_BASE_IMPONIBLE_10'], 4) }}</td>
                                     <td class="col-base-ivap"
-                                        style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_AFECTO_IVAP'], 4, '.', ',') }}</td>
+                                        style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_AFECTO_IVAP'], 4) }}</td>
                                     <td class="col-base-inafecto"
-                                        style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_BASE_INAFECTA'], 4, '.', ',') }}</td>
+                                        style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_BASE_INAFECTA'], 4) }}</td>
                                     <td class="col-base-exonerado"
-                                        style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_BASE_EXONERADA'], 4, '.', ',') }}</td>
+                                        style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_BASE_EXONERADA'], 4) }}</td>
                                     <td class="col-igv"
-                                        style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_IGV'], 4, '.', ',') }}</td>
+                                        style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_IGV'], 4) }}</td>
                                     <td class="col-ivap"
-                                        style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_IVAP'], 4, '.', ',') }}</td>
+                                        style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_IVAP'], 4) }}</td>
                                     <td class="col-total" style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_BASE_IMPONIBLE'] +
                                         $asiento_cabecera['TOTAL_BASE_IMPONIBLE_10'] +
                                         $asiento_cabecera['TOTAL_AFECTO_IVAP'] +
                                         $asiento_cabecera['TOTAL_BASE_INAFECTA'] +
                                         $asiento_cabecera['TOTAL_BASE_EXONERADA'] +
-                                        $asiento_cabecera['TOTAL_IGV'] + $asiento_cabecera['TOTAL_IVAP'], 4, '.', ',') }}</td>
+                                        $asiento_cabecera['TOTAL_IGV'] + $asiento_cabecera['TOTAL_IVAP'], 4) }}</td>
                                 </tr>
                             @endforeach
                         @else
                             <tr>
                                 <td class="col-base-imponible"
-                                    style="text-align: right">{{ number_format(0.0000, 4, '.', ',') }}</td>
+                                    style="text-align: right">{{ number_format(0.0000, 4) }}</td>
                                 <td class="col-base-imponible-10"
-                                    style="text-align: right">{{ number_format(0.0000, 4, '.', ',') }}</td>
+                                    style="text-align: right">{{ number_format(0.0000, 4) }}</td>
                                 <td class="col-base-ivap"
-                                    style="text-align: right">{{ number_format(0.0000, 4, '.', ',') }}</td>
+                                    style="text-align: right">{{ number_format(0.0000, 4) }}</td>
                                 <td class="col-base-inafecto"
-                                    style="text-align: right">{{ number_format(0.0000, 4, '.', ',') }}</td>
+                                    style="text-align: right">{{ number_format(0.0000, 4) }}</td>
                                 <td class="col-base-exonerado"
-                                    style="text-align: right">{{ number_format(0.0000, 4, '.', ',') }}</td>
+                                    style="text-align: right">{{ number_format(0.0000, 4) }}</td>
                                 <td class="col-igv"
-                                    style="text-align: right">{{ number_format(0.0000, 4, '.', ',') }}</td>
+                                    style="text-align: right">{{ number_format(0.0000, 4) }}</td>
                                 <td class="col-ivap"
-                                    style="text-align: right">{{ number_format(0.0000, 4, '.', ',') }}</td>
+                                    style="text-align: right">{{ number_format(0.0000, 4) }}</td>
                                 <td class="col-total"
-                                    style="text-align: right">{{ number_format(0.0000, 4, '.', ',') }}</td>
+                                    style="text-align: right">{{ number_format(0.0000, 4) }}</td>
                             </tr>
                         @endif
                         </tbody>
@@ -494,13 +500,13 @@
                                     <td class="col-cuenta">{{ $asiento_movimiento['TXT_CUENTA_CONTABLE'] }}</td>
                                     <td class="col-glosa">{{ $asiento_movimiento['TXT_GLOSA'] }}</td>
                                     <td class="col-debe-mn"
-                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_MN'], 4, '.', ',') }}</td>
+                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_MN'], 4) }}</td>
                                     <td class="col-haber-mn"
-                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_MN'], 4, '.', ',') }}</td>
+                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_MN'], 4) }}</td>
                                     <td class="col-debe-me"
-                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_ME'], 4, '.', ',') }}</td>
+                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_ME'], 4) }}</td>
                                     <td class="col-haber-me"
-                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_ME'], 4, '.', ',') }}</td>
+                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_ME'], 4) }}</td>
                                     <td>
                                         <button type="button" class="btn btn-sm btn-primary editar-cuenta">
                                             ✏ Editar
@@ -516,244 +522,247 @@
                     </table>
 
                 </div>
-                <div id="astreversion" class="tab-pane cont">
-                    <input type="hidden" id="asiento_cabecera_reparable_reversion"
-                           name="asiento_cabecera_reparable_reversion"
-                           value="{{ json_encode(!empty($asiento_reparable_reversion) ? $asiento_reparable_reversion[1] : []) }}"/>
-                    <input type="hidden" id="asiento_detalle_reparable_reversion"
-                           name="asiento_detalle_reparable_reversion"
-                           value="{{ json_encode(!empty($asiento_reparable_reversion) ? $asiento_reparable_reversion[2] : []) }}"/>
-                    <button data="RV" type="button" class="btn btn-success agregar-linea">
-                        ➕ Agregar línea
-                    </button>
-                    <table id="asientodetallereversion"
-                           class="table table-bordered table-hover td-color-borde td-padding-7 display nowrap"
-                           cellspacing="0" width="100%">
-                        <thead style="background: #1d3a6d; color: white">
-                        <tr>
-                            <th>#</th>
-                            <th>Cuenta</th>
-                            <th>Descripción</th>
-                            <th>Debe MN</th>
-                            <th>Haber MN</th>
-                            <th>Debe ME</th>
-                            <th>Haber ME</th>
-                            <th>Acciones</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @if(!empty($asiento_reparable_reversion))
-                            @foreach($asiento_reparable_reversion[2] as $key => $asiento_movimiento)
-                                <tr class="fila" data_codigo="{{ $asiento_movimiento['COD_ASIENTO_MOVIMIENTO'] }}"
-                                    data_asiento="RV"
-                                    data_moneda="{{ $asiento_compra[1][0]['COD_CATEGORIA_MONEDA'] }}"
-                                    data_tc="{{ $asiento_compra[1][0]['CAN_TIPO_CAMBIO'] }}">
-                                    <td class="col-codigo">{{ $asiento_movimiento['COD_ASIENTO_MOVIMIENTO'] }}</td>
-                                    <td class="col-cuenta">{{ $asiento_movimiento['TXT_CUENTA_CONTABLE'] }}</td>
-                                    <td class="col-glosa">{{ $asiento_movimiento['TXT_GLOSA'] }}</td>
-                                    <td class="col-debe-mn"
-                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_MN'], 4, '.', ',') }}</td>
-                                    <td class="col-haber-mn"
-                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_MN'], 4, '.', ',') }}</td>
-                                    <td class="col-debe-me"
-                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_ME'], 4, '.', ',') }}</td>
-                                    <td class="col-haber-me"
-                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_ME'], 4, '.', ',') }}</td>
-                                    <td>
-                                        <button type="button" class="btn btn-sm btn-primary editar-cuenta">
-                                            ✏ Editar
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-danger eliminar-cuenta">
-                                            🗑 Eliminar
-                                        </button>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        @endif
-                        </tbody>
-                    </table>
+                @if(!empty($asiento_reparable_reversion))
+                    <div id="astreversion" class="tab-pane cont">
+                        <input type="hidden" id="asiento_cabecera_reparable_reversion"
+                               name="asiento_cabecera_reparable_reversion"
+                               value="{{ json_encode(!empty($asiento_reparable_reversion) ? $asiento_reparable_reversion[1] : []) }}"/>
+                        <input type="hidden" id="asiento_detalle_reparable_reversion"
+                               name="asiento_detalle_reparable_reversion"
+                               value="{{ json_encode(!empty($asiento_reparable_reversion) ? $asiento_reparable_reversion[2] : []) }}"/>
+                        <button data="RV" type="button" class="btn btn-success agregar-linea">
+                            ➕ Agregar línea
+                        </button>
+                        <table id="asientodetallereversion"
+                               class="table table-bordered table-hover td-color-borde td-padding-7 display nowrap"
+                               cellspacing="0" width="100%">
+                            <thead style="background: #1d3a6d; color: white">
+                            <tr>
+                                <th>#</th>
+                                <th>Cuenta</th>
+                                <th>Descripción</th>
+                                <th>Debe MN</th>
+                                <th>Haber MN</th>
+                                <th>Debe ME</th>
+                                <th>Haber ME</th>
+                                <th>Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @if(!empty($asiento_reparable_reversion))
+                                @foreach($asiento_reparable_reversion[2] as $key => $asiento_movimiento)
+                                    <tr class="fila" data_codigo="{{ $asiento_movimiento['COD_ASIENTO_MOVIMIENTO'] }}"
+                                        data_asiento="RV"
+                                        data_moneda="{{ $asiento_compra[1][0]['COD_CATEGORIA_MONEDA'] }}"
+                                        data_tc="{{ $asiento_compra[1][0]['CAN_TIPO_CAMBIO'] }}">
+                                        <td class="col-codigo">{{ $asiento_movimiento['COD_ASIENTO_MOVIMIENTO'] }}</td>
+                                        <td class="col-cuenta">{{ $asiento_movimiento['TXT_CUENTA_CONTABLE'] }}</td>
+                                        <td class="col-glosa">{{ $asiento_movimiento['TXT_GLOSA'] }}</td>
+                                        <td class="col-debe-mn"
+                                            style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_MN'], 4) }}</td>
+                                        <td class="col-haber-mn"
+                                            style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_MN'], 4) }}</td>
+                                        <td class="col-debe-me"
+                                            style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_ME'], 4) }}</td>
+                                        <td class="col-haber-me"
+                                            style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_ME'], 4) }}</td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-primary editar-cuenta">
+                                                ✏ Editar
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-danger eliminar-cuenta">
+                                                🗑 Eliminar
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endif
+                            </tbody>
+                        </table>
 
-                </div>
+                    </div>
+                @endif
+                @if(!empty($asiento_deduccion))
+                    <div id="astdeduccion" class="tab-pane cont">
+                        <input type="hidden" id="asiento_cabecera_deduccion" name="asiento_cabecera_deduccion"
+                               value="{{ json_encode(!empty($asiento_deduccion) ? $asiento_deduccion[1] : []) }}"/>
+                        <input type="hidden" id="asiento_detalle_deduccion" name="asiento_detalle_deduccion"
+                               value="{{ json_encode(!empty($asiento_deduccion) ? $asiento_deduccion[2] : []) }}"/>
+                        <button data="D" type="button" class="btn btn-success agregar-linea">
+                            ➕ Agregar línea
+                        </button>
+                        <table id="asientodetallededuccion"
+                               class="table table-bordered table-hover td-color-borde td-padding-7 display nowrap"
+                               cellspacing="0" width="100%">
+                            <thead style="background: #1d3a6d; color: white">
+                            <tr>
+                                <th>#</th>
+                                <th>Cuenta</th>
+                                <th>Descripción</th>
+                                <th>Debe MN</th>
+                                <th>Haber MN</th>
+                                <th>Debe ME</th>
+                                <th>Haber ME</th>
+                                <th>Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @if(!empty($asiento_deduccion))
+                                @foreach($asiento_deduccion[2] as $key => $asiento_movimiento)
+                                    <tr class="fila" data_codigo="{{ $asiento_movimiento['COD_ASIENTO_MOVIMIENTO'] }}"
+                                        data_asiento="D"
+                                        data_moneda="{{ $asiento_compra[1][0]['COD_CATEGORIA_MONEDA'] }}"
+                                        data_tc="{{ $asiento_compra[1][0]['CAN_TIPO_CAMBIO'] }}">
+                                        <td class="col-codigo">{{ $asiento_movimiento['COD_ASIENTO_MOVIMIENTO'] }}</td>
+                                        <td class="col-cuenta">{{ $asiento_movimiento['TXT_CUENTA_CONTABLE'] }}</td>
+                                        <td class="col-glosa">{{ $asiento_movimiento['TXT_GLOSA'] }}</td>
+                                        <td class="col-debe-mn"
+                                            style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_MN'], 4) }}</td>
+                                        <td class="col-haber-mn"
+                                            style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_MN'], 4) }}</td>
+                                        <td class="col-debe-me"
+                                            style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_ME'], 4) }}</td>
+                                        <td class="col-haber-me"
+                                            style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_ME'], 4) }}</td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-primary editar-cuenta">
+                                                ✏ Editar
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-danger eliminar-cuenta">
+                                                🗑 Eliminar
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endif
+                            </tbody>
+                        </table>
 
-                <div id="astdeduccion" class="tab-pane cont">
-                    <input type="hidden" id="asiento_cabecera_deduccion" name="asiento_cabecera_deduccion"
-                           value="{{ json_encode(!empty($asiento_deduccion) ? $asiento_deduccion[1] : []) }}"/>
-                    <input type="hidden" id="asiento_detalle_deduccion" name="asiento_detalle_deduccion"
-                           value="{{ json_encode(!empty($asiento_deduccion) ? $asiento_deduccion[2] : []) }}"/>
-                    <button data="D" type="button" class="btn btn-success agregar-linea">
-                        ➕ Agregar línea
-                    </button>
-                    <table id="asientodetallededuccion"
-                           class="table table-bordered table-hover td-color-borde td-padding-7 display nowrap"
-                           cellspacing="0" width="100%">
-                        <thead style="background: #1d3a6d; color: white">
-                        <tr>
-                            <th>#</th>
-                            <th>Cuenta</th>
-                            <th>Descripción</th>
-                            <th>Debe MN</th>
-                            <th>Haber MN</th>
-                            <th>Debe ME</th>
-                            <th>Haber ME</th>
-                            <th>Acciones</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @if(!empty($asiento_deduccion))
-                            @foreach($asiento_deduccion[2] as $key => $asiento_movimiento)
-                                <tr class="fila" data_codigo="{{ $asiento_movimiento['COD_ASIENTO_MOVIMIENTO'] }}"
-                                    data_asiento="D"
-                                    data_moneda="{{ $asiento_compra[1][0]['COD_CATEGORIA_MONEDA'] }}"
-                                    data_tc="{{ $asiento_compra[1][0]['CAN_TIPO_CAMBIO'] }}">
-                                    <td class="col-codigo">{{ $asiento_movimiento['COD_ASIENTO_MOVIMIENTO'] }}</td>
-                                    <td class="col-cuenta">{{ $asiento_movimiento['TXT_CUENTA_CONTABLE'] }}</td>
-                                    <td class="col-glosa">{{ $asiento_movimiento['TXT_GLOSA'] }}</td>
-                                    <td class="col-debe-mn"
-                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_MN'], 4, '.', ',') }}</td>
-                                    <td class="col-haber-mn"
-                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_MN'], 4, '.', ',') }}</td>
-                                    <td class="col-debe-me"
-                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_ME'], 4, '.', ',') }}</td>
-                                    <td class="col-haber-me"
-                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_ME'], 4, '.', ',') }}</td>
-                                    <td>
-                                        <button type="button" class="btn btn-sm btn-primary editar-cuenta">
-                                            ✏ Editar
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-danger eliminar-cuenta">
-                                            🗑 Eliminar
-                                        </button>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        @endif
-                        </tbody>
-                    </table>
-
-                </div>
-
-                <div id="astpercepcion" class="tab-pane cont">
-                    <input type="hidden" id="asiento_cabecera_percepcion" name="asiento_cabecera_percepcion"
-                           value="{{ json_encode(!empty($asiento_percepcion) ? $asiento_percepcion[1] : []) }}"/>
-                    <input type="hidden" id="asiento_detalle_percepcion" name="asiento_detalle_percepcion"
-                           value="{{ json_encode(!empty($asiento_percepcion) ? $asiento_percepcion[2] : []) }}"/>
-                    <table id="asiento_totales_percepcion"
-                           class="table table-bordered table-hover td-color-borde td-padding-7 display nowrap"
-                           cellspacing="0" width="100%">
-                        <thead style="background: #1d3a6d; color: white">
-                        <tr>
-                            <th>Afecto IGV 18 %</th>
-                            <th>Afecto IGV 10 %</th>
-                            <th>Afecto IVAP</th>
-                            <th>Inafecto</th>
-                            <th>Exonerado</th>
-                            <th>IGV</th>
-                            <th>IVAP</th>
-                            <th>Total</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @if(!empty($asiento_percepcion))
-                            @foreach($asiento_percepcion[1] as $key => $asiento_cabecera)
-                                <tr>
-                                    <td class="col-base-imponible"
-                                        style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_BASE_IMPONIBLE'], 4, '.', ',') }}</td>
-                                    <td class="col-base-imponible-10"
-                                        style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_BASE_IMPONIBLE_10'], 4, '.', ',') }}</td>
-                                    <td class="col-base-ivap"
-                                        style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_AFECTO_IVAP'], 4, '.', ',') }}</td>
-                                    <td class="col-base-inafecto"
-                                        style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_BASE_INAFECTA'], 4, '.', ',') }}</td>
-                                    <td class="col-base-exonerado"
-                                        style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_BASE_EXONERADA'], 4, '.', ',') }}</td>
-                                    <td class="col-igv"
-                                        style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_IGV'], 4, '.', ',') }}</td>
-                                    <td class="col-ivap"
-                                        style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_IVAP'], 4, '.', ',') }}</td>
-                                    <td class="col-total" style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_BASE_IMPONIBLE'] +
+                    </div>
+                @endif
+                @if(!empty($asiento_percepcion))
+                    <div id="astpercepcion" class="tab-pane cont">
+                        <input type="hidden" id="asiento_cabecera_percepcion" name="asiento_cabecera_percepcion"
+                               value="{{ json_encode(!empty($asiento_percepcion) ? $asiento_percepcion[1] : []) }}"/>
+                        <input type="hidden" id="asiento_detalle_percepcion" name="asiento_detalle_percepcion"
+                               value="{{ json_encode(!empty($asiento_percepcion) ? $asiento_percepcion[2] : []) }}"/>
+                        <table id="asiento_totales_percepcion"
+                               class="table table-bordered table-hover td-color-borde td-padding-7 display nowrap"
+                               cellspacing="0" width="100%">
+                            <thead style="background: #1d3a6d; color: white">
+                            <tr>
+                                <th>Afecto IGV 18 %</th>
+                                <th>Afecto IGV 10 %</th>
+                                <th>Afecto IVAP</th>
+                                <th>Inafecto</th>
+                                <th>Exonerado</th>
+                                <th>IGV</th>
+                                <th>IVAP</th>
+                                <th>Total</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @if(!empty($asiento_percepcion))
+                                @foreach($asiento_percepcion[1] as $key => $asiento_cabecera)
+                                    <tr>
+                                        <td class="col-base-imponible"
+                                            style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_BASE_IMPONIBLE'], 4) }}</td>
+                                        <td class="col-base-imponible-10"
+                                            style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_BASE_IMPONIBLE_10'], 4) }}</td>
+                                        <td class="col-base-ivap"
+                                            style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_AFECTO_IVAP'], 4) }}</td>
+                                        <td class="col-base-inafecto"
+                                            style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_BASE_INAFECTA'], 4) }}</td>
+                                        <td class="col-base-exonerado"
+                                            style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_BASE_EXONERADA'], 4) }}</td>
+                                        <td class="col-igv"
+                                            style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_IGV'], 4) }}</td>
+                                        <td class="col-ivap"
+                                            style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_IVAP'], 4) }}</td>
+                                        <td class="col-total" style="text-align: right">{{ number_format($asiento_cabecera['TOTAL_BASE_IMPONIBLE'] +
                                         $asiento_cabecera['TOTAL_BASE_IMPONIBLE_10'] +
                                         $asiento_cabecera['TOTAL_AFECTO_IVAP'] +
                                         $asiento_cabecera['TOTAL_BASE_INAFECTA'] +
                                         $asiento_cabecera['TOTAL_BASE_EXONERADA'] +
-                                        $asiento_cabecera['TOTAL_IGV'] + $asiento_cabecera['TOTAL_IVAP'], 4, '.', ',') }}</td>
+                                        $asiento_cabecera['TOTAL_IGV'] + $asiento_cabecera['TOTAL_IVAP'], 4) }}</td>
+                                    </tr>
+                                @endforeach
+                            @else
+                                <tr>
+                                    <td class="col-base-imponible"
+                                        style="text-align: right">{{ number_format(0.0000, 4) }}</td>
+                                    <td class="col-base-imponible-10"
+                                        style="text-align: right">{{ number_format(0.0000, 4) }}</td>
+                                    <td class="col-base-ivap"
+                                        style="text-align: right">{{ number_format(0.0000, 4) }}</td>
+                                    <td class="col-base-inafecto"
+                                        style="text-align: right">{{ number_format(0.0000, 4) }}</td>
+                                    <td class="col-base-exonerado"
+                                        style="text-align: right">{{ number_format(0.0000, 4) }}</td>
+                                    <td class="col-igv"
+                                        style="text-align: right">{{ number_format(0.0000, 4) }}</td>
+                                    <td class="col-ivap"
+                                        style="text-align: right">{{ number_format(0.0000, 4) }}</td>
+                                    <td class="col-total"
+                                        style="text-align: right">{{ number_format(0.0000, 4) }}</td>
                                 </tr>
-                            @endforeach
-                        @else
+                            @endif
+                            </tbody>
+                        </table>
+
+                        <button data="P" type="button" class="btn btn-success agregar-linea">
+                            ➕ Agregar línea
+                        </button>
+
+                        <table id="asientodetallepercepcion"
+                               class="table table-bordered table-hover td-color-borde td-padding-7 display nowrap"
+                               cellspacing="0" width="100%">
+                            <thead style="background: #1d3a6d; color: white">
                             <tr>
-                                <td class="col-base-imponible"
-                                    style="text-align: right">{{ number_format(0.0000, 4, '.', ',') }}</td>
-                                <td class="col-base-imponible-10"
-                                    style="text-align: right">{{ number_format(0.0000, 4, '.', ',') }}</td>
-                                <td class="col-base-ivap"
-                                    style="text-align: right">{{ number_format(0.0000, 4, '.', ',') }}</td>
-                                <td class="col-base-inafecto"
-                                    style="text-align: right">{{ number_format(0.0000, 4, '.', ',') }}</td>
-                                <td class="col-base-exonerado"
-                                    style="text-align: right">{{ number_format(0.0000, 4, '.', ',') }}</td>
-                                <td class="col-igv"
-                                    style="text-align: right">{{ number_format(0.0000, 4, '.', ',') }}</td>
-                                <td class="col-ivap"
-                                    style="text-align: right">{{ number_format(0.0000, 4, '.', ',') }}</td>
-                                <td class="col-total"
-                                    style="text-align: right">{{ number_format(0.0000, 4, '.', ',') }}</td>
+                                <th>#</th>
+                                <th>Cuenta</th>
+                                <th>Descripción</th>
+                                <th>Debe MN</th>
+                                <th>Haber MN</th>
+                                <th>Debe ME</th>
+                                <th>Haber ME</th>
+                                <th>Acciones</th>
                             </tr>
-                        @endif
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                            @if(!empty($asiento_percepcion))
+                                @foreach($asiento_percepcion[2] as $key => $asiento_movimiento)
+                                    <tr class="fila" data_codigo="{{ $asiento_movimiento['COD_ASIENTO_MOVIMIENTO'] }}"
+                                        data_asiento="P"
+                                        data_moneda="{{ $asiento_compra[1][0]['COD_CATEGORIA_MONEDA'] }}"
+                                        data_tc="{{ $asiento_compra[1][0]['CAN_TIPO_CAMBIO'] }}">
+                                        <td class="col-codigo">{{ $asiento_movimiento['COD_ASIENTO_MOVIMIENTO'] }}</td>
+                                        <td class="col-cuenta">{{ $asiento_movimiento['TXT_CUENTA_CONTABLE'] }}</td>
+                                        <td class="col-glosa">{{ $asiento_movimiento['TXT_GLOSA'] }}</td>
+                                        <td class="col-debe-mn"
+                                            style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_MN'], 4) }}</td>
+                                        <td class="col-haber-mn"
+                                            style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_MN'], 4) }}</td>
+                                        <td class="col-debe-me"
+                                            style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_ME'], 4) }}</td>
+                                        <td class="col-haber-me"
+                                            style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_ME'], 4) }}</td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-primary editar-cuenta">
+                                                ✏ Editar
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-danger eliminar-cuenta">
+                                                🗑 Eliminar
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endif
+                            </tbody>
+                        </table>
 
-                    <button data="P" type="button" class="btn btn-success agregar-linea">
-                        ➕ Agregar línea
-                    </button>
-
-                    <table id="asientodetallepercepcion"
-                           class="table table-bordered table-hover td-color-borde td-padding-7 display nowrap"
-                           cellspacing="0" width="100%">
-                        <thead style="background: #1d3a6d; color: white">
-                        <tr>
-                            <th>#</th>
-                            <th>Cuenta</th>
-                            <th>Descripción</th>
-                            <th>Debe MN</th>
-                            <th>Haber MN</th>
-                            <th>Debe ME</th>
-                            <th>Haber ME</th>
-                            <th>Acciones</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @if(!empty($asiento_percepcion))
-                            @foreach($asiento_percepcion[2] as $key => $asiento_movimiento)
-                                <tr class="fila" data_codigo="{{ $asiento_movimiento['COD_ASIENTO_MOVIMIENTO'] }}"
-                                    data_asiento="P"
-                                    data_moneda="{{ $asiento_compra[1][0]['COD_CATEGORIA_MONEDA'] }}"
-                                    data_tc="{{ $asiento_compra[1][0]['CAN_TIPO_CAMBIO'] }}">
-                                    <td class="col-codigo">{{ $asiento_movimiento['COD_ASIENTO_MOVIMIENTO'] }}</td>
-                                    <td class="col-cuenta">{{ $asiento_movimiento['TXT_CUENTA_CONTABLE'] }}</td>
-                                    <td class="col-glosa">{{ $asiento_movimiento['TXT_GLOSA'] }}</td>
-                                    <td class="col-debe-mn"
-                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_MN'], 4, '.', ',') }}</td>
-                                    <td class="col-haber-mn"
-                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_MN'], 4, '.', ',') }}</td>
-                                    <td class="col-debe-me"
-                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_ME'], 4, '.', ',') }}</td>
-                                    <td class="col-haber-me"
-                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_ME'], 4, '.', ',') }}</td>
-                                    <td>
-                                        <button type="button" class="btn btn-sm btn-primary editar-cuenta">
-                                            ✏ Editar
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-danger eliminar-cuenta">
-                                            🗑 Eliminar
-                                        </button>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        @endif
-                        </tbody>
-                    </table>
-
-                </div>
-
+                    </div>
+                @endif
             </div>
         </div>
 

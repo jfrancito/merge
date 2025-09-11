@@ -2540,8 +2540,12 @@ class GestionOCContabilidadController extends Controller
 
                 $ind_reversion = 'R';
 
-                $asiento_reparable_reversion = $this->ejecutarSP(
-                    "EXEC [WEB].[GENERAR_ASIENTO_REPARABLE_FE_DOCUMENTO]
+                $asiento_existe_reparable = WEBAsiento::where('COD_ESTADO', '=', 1)
+                    ->where('TXT_REFERENCIA', '=', $cod_contable)->where('TXT_GLOSA', 'like', "COMPRAS REPARABLE:%")->first();
+
+                if (!empty($asiento_existe_reparable)) {
+                    $asiento_reparable_reversion = $this->ejecutarSP(
+                        "EXEC [WEB].[GENERAR_ASIENTO_REPARABLE_FE_DOCUMENTO]
                 @anio = :anio,
                 @empresa = :empresa,
                 @cod_contable = :cod_contable,
@@ -2549,19 +2553,23 @@ class GestionOCContabilidadController extends Controller
                 @ind_recalcular = :ind_recalcular,
                 @ind_reversion = :ind_reversion,
                 @cod_usuario_registra = :usuario",
-                    [
-                        ':anio' => $anio,
-                        ':empresa' => $empresa,
-                        ':cod_contable' => $cod_contable,
-                        ':ind_anulado' => $ind_anulado,
-                        ':ind_recalcular' => $ind_recalcular,
-                        ':ind_reversion' => $ind_reversion,
-                        ':usuario' => $usuario
-                    ]
-                );
+                        [
+                            ':anio' => $anio,
+                            ':empresa' => $empresa,
+                            ':cod_contable' => $cod_contable,
+                            ':ind_anulado' => $ind_anulado,
+                            ':ind_recalcular' => $ind_recalcular,
+                            ':ind_reversion' => $ind_reversion,
+                            ':usuario' => $usuario
+                        ]
+                    );
+                } else {
+                    $asiento_reparable_reversion = array(0=>[], 1=>[], 2=>[]);
+                }
 
-                $asiento_deduccion = $this->ejecutarSP(
-                    "EXEC [WEB].[GENERAR_ASIENTO_DEDUCCION_FE_DOCUMENTO]
+                if($fedocumento->MONTO_ANTICIPO_DESC > 0.0000) {
+                    $asiento_deduccion = $this->ejecutarSP(
+                        "EXEC [WEB].[GENERAR_ASIENTO_DEDUCCION_FE_DOCUMENTO]
                 @anio = :anio,
                 @empresa = :empresa,
                 @cod_contable = :cod_contable,
@@ -2571,36 +2579,43 @@ class GestionOCContabilidadController extends Controller
                 @centro_costo = :centro_costo,
                 @ind_igv = :ind_igv,
                 @cod_usuario_registra = :usuario",
-                    [
-                        ':anio' => $anio,
-                        ':empresa' => $empresa,
-                        ':cod_contable' => $cod_contable,
-                        ':ind_anulado' => $ind_anulado,
-                        ':igv' => $igv,
-                        ':ind_recalcular' => $ind_recalcular,
-                        ':centro_costo' => $centro_costo,
-                        ':ind_igv' => $ind_igv,
-                        ':usuario' => $usuario
-                    ]
-                );
+                        [
+                            ':anio' => $anio,
+                            ':empresa' => $empresa,
+                            ':cod_contable' => $cod_contable,
+                            ':ind_anulado' => $ind_anulado,
+                            ':igv' => $igv,
+                            ':ind_recalcular' => $ind_recalcular,
+                            ':centro_costo' => $centro_costo,
+                            ':ind_igv' => $ind_igv,
+                            ':usuario' => $usuario
+                        ]
+                    );
+                } else {
+                    $asiento_deduccion = array(0=>[], 1=>[], 2=>[]);
+                }
 
-                $asiento_percepcion = $this->ejecutarSP(
-                    "EXEC [WEB].[GENERAR_ASIENTO_PERCEPCION_FE_DOCUMENTO]
+                if($fedocumento->PERCEPCION > 0.0000) {
+                    $asiento_percepcion = $this->ejecutarSP(
+                        "EXEC [WEB].[GENERAR_ASIENTO_PERCEPCION_FE_DOCUMENTO]
                 @anio = :anio,
                 @empresa = :empresa,
                 @cod_contable = :cod_contable,
                 @ind_anulado = :ind_anulado,
                 @ind_recalcular = :ind_recalcular,
                 @cod_usuario_registra = :usuario",
-                    [
-                        ':anio' => $anio,
-                        ':empresa' => $empresa,
-                        ':cod_contable' => $cod_contable,
-                        ':ind_anulado' => $ind_anulado,
-                        ':ind_recalcular' => $ind_recalcular,
-                        ':usuario' => $usuario
-                    ]
-                );
+                        [
+                            ':anio' => $anio,
+                            ':empresa' => $empresa,
+                            ':cod_contable' => $cod_contable,
+                            ':ind_anulado' => $ind_anulado,
+                            ':ind_recalcular' => $ind_recalcular,
+                            ':usuario' => $usuario
+                        ]
+                    );
+                } else {
+                    $asiento_percepcion = array(0=>[], 1=>[], 2=>[]);
+                }
             }
 
             $ind_reversion = 'N';
@@ -3163,7 +3178,7 @@ class GestionOCContabilidadController extends Controller
                         $contador = 0;
 
                         foreach ($asiento_detalle_compra as $asiento_detalle_compra_item) {
-                            if (((int) $asiento_detalle_compra_item['COD_ESTADO']) === 1) {
+                            if (((int)$asiento_detalle_compra_item['COD_ESTADO']) === 1) {
                                 $contador++;
 
                                 $params = array(
@@ -3262,7 +3277,7 @@ class GestionOCContabilidadController extends Controller
                         $contador_reversion = 0;
 
                         foreach ($asiento_detalle_reparable_reversion as $asiento_detalle_compra_item) {
-                            if (((int) $asiento_detalle_compra_item['COD_ESTADO']) === 1) {
+                            if (((int)$asiento_detalle_compra_item['COD_ESTADO']) === 1) {
                                 $contador_reversion++;
 
                                 $params = array(
@@ -3361,7 +3376,7 @@ class GestionOCContabilidadController extends Controller
                         $contador_deduccion = 0;
 
                         foreach ($asiento_detalle_deduccion as $asiento_detalle_compra_item) {
-                            if (((int) $asiento_detalle_compra_item['COD_ESTADO']) === 1) {
+                            if (((int)$asiento_detalle_compra_item['COD_ESTADO']) === 1) {
                                 $contador_deduccion++;
 
                                 $params = array(
@@ -3460,7 +3475,7 @@ class GestionOCContabilidadController extends Controller
                         $contador_percepcion = 0;
 
                         foreach ($asiento_detalle_percepcion as $asiento_detalle_compra_item) {
-                            if (((int) $asiento_detalle_compra_item['COD_ESTADO']) === 1) {
+                            if (((int)$asiento_detalle_compra_item['COD_ESTADO']) === 1) {
                                 $contador_percepcion++;
 
                                 $params = array(
