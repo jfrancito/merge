@@ -249,6 +249,10 @@
 
         document.addEventListener("DOMContentLoaded", function() {
 
+            let carpeta = $("#carpeta").val();
+            let _token = $("#token").val();
+            let link = '/buscar-proveedor';
+
             let select = new TomSelect("#empresa_asiento", {
                 valueField: 'id',
                 labelField: 'text',
@@ -256,7 +260,18 @@
                 placeholder: "Escriba para buscar...",
                 preload: true, // carga inicial
                 load: function(query, callback) {
-                    fetch('/buscar-tipo-documento?q=' + encodeURIComponent(query))
+                    let data = {
+                        _token: _token,
+                        busqueda: query
+                    };
+                    fetch(carpeta + link, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    //fetch('/buscar-tipo-documento?q=' + encodeURIComponent(query))
                         .then(response => response.json())
                         .then(json => { callback(json); })
                         .catch(() => { callback(); });
@@ -270,7 +285,18 @@
                 placeholder: "Escriba para buscar...",
                 preload: true, // carga inicial
                 load: function(query, callback) {
-                    fetch('/buscar-tipo-documento?q=' + encodeURIComponent(query))
+                    let data = {
+                        _token: _token,
+                        busqueda: query
+                    };
+                    fetch(carpeta + link, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    //fetch(carpeta + '/buscar-tipo-documento?q=' + encodeURIComponent(query))
                         .then(response => response.json())
                         .then(json => { callback(json); })
                         .catch(() => { callback(); });

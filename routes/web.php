@@ -141,7 +141,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/agregar-extorno-contabilidad-lg/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionAgregarExtornoContabilidadLG');
 	Route::any('/ajax-leer-xml-lg-validar', 'GestionLiquidacionGastosController@actionAjaxLeerXmlLGValidar');
 	Route::any('/validez-comprobante-pdf', 'GestionLiquidacionGastosController@actionLiquidacionValidezComprobantePdf');
-
+    Route::post('/buscar-proveedor', 'GestionOCContabilidadController@buscarProveedor');
 
 	Route::any('/gestion-de-liquidacion-gastos-adm/{idopcion}', 'GestionLiquidacionGastosController@actionListarLGValidado');
 	Route::any('/ajax-buscar-documento-lg', 'GestionLiquidacionGastosController@actionListarAjaxBuscarDocumentoLG');
@@ -614,7 +614,7 @@ Route::group(['middleware' => ['authaw']], function () {
     Route::get('/gestionar-vale-rendir/{idopcion}', 'ValeRendirController@actionValeRendir');
     Route::post('/registrar_vale_rendir', 'ValeRendirController@insertValeRendirAction');
 	Route::post('/data_vale_rendir', 'ValeRendirController@traerdataValeRendirAction');
-Route::post('/ver_detalle_importe_vale', 'ValeRendirController@actionDetalleImporteVale'); 
+Route::post('/ver_detalle_importe_vale', 'ValeRendirController@actionDetalleImporteVale');
     Route::post('/ver_mensaje_vale_rendir', 'ValeRendirController@actionMensajeValeRendir');
 
 	Route::get('/gestion-autoriza-rendir/{idopcion}', 'ValeRendirAutorizaController@actionValeRendirAutoriza');
@@ -683,7 +683,7 @@ Route::post('/ver_detalle_importe_vale', 'ValeRendirController@actionDetalleImpo
 
 
 
- 
+
 
 });
 
