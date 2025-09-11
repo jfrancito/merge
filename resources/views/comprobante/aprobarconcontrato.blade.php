@@ -159,9 +159,6 @@
             type="text/javascript"></script>
     <script src="{{ asset('public/lib/datatables/plugins/buttons/js/jszipoo.min.js') }}"
             type="text/javascript"></script>
-    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/pdfmake.min.js') }}"
-            type="text/javascript"></script>
-    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/vfs_fonts.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/lib/datatables/plugins/buttons/js/buttons.html5.js') }}"
             type="text/javascript"></script>
     <script src="{{ asset('public/lib/datatables/plugins/buttons/js/buttons.flash.js') }}"
@@ -193,7 +190,7 @@
         $(document).ready(function () {
             //initialize the javascript
             App.init();
-            App.formElements();
+            //App.formElements();
             App.dataTables();
             $('form').parsley();
         });
@@ -214,12 +211,6 @@
             'placeholder': '0'
         });
 
-        $('#file-pdf').fileinput({
-            theme: 'fa5',
-            language: 'es',
-            allowedFileExtensions: ['pdf'],
-        });
-
         $('.pnlasientos').hide();
 
         @foreach($archivospdf as $index => $item)
@@ -227,22 +218,19 @@
         $('#file-' + {{$index}}).fileinput({
             theme: 'fa5',
             language: 'es',
-            initialPreview: ["{{ route('serve-filecontrato', ['file' => '']) }}" + nombre_archivo],
+            initialPreview: ["{{ route('serve-file', ['file' => '']) }}" + nombre_archivo],
             initialPreviewAsData: true,
             initialPreviewFileType: 'pdf',
             initialPreviewConfig: [
                 {
                     type: "pdf",
                     caption: nombre_archivo,
-                    downloadUrl: "{{ route('serve-filecontrato', ['file' => '']) }}" + nombre_archivo
+                    downloadUrl: "{{ route('serve-file', ['file' => '']) }}" + nombre_archivo
                 } // Para mostrar el botón de descarga
             ]
         });
         @endforeach
-
-
     </script>
-
 
     <script src="{{ asset('public/js/comprobante/uc.js?v='.$version) }}" type="text/javascript"></script>
 

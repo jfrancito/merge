@@ -203,9 +203,6 @@
             type="text/javascript"></script>
     <script src="{{ asset('public/lib/datatables/plugins/buttons/js/jszipoo.min.js') }}"
             type="text/javascript"></script>
-    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/pdfmake.min.js') }}"
-            type="text/javascript"></script>
-    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/vfs_fonts.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/lib/datatables/plugins/buttons/js/buttons.html5.js') }}"
             type="text/javascript"></script>
     <script src="{{ asset('public/lib/datatables/plugins/buttons/js/buttons.flash.js') }}"
@@ -233,12 +230,11 @@
     <script src="{{ asset('public/js/file/fileinput.js?v='.$version) }}" type="text/javascript"></script>
     <script src="{{ asset('public/js/file/locales/es.js') }}" type="text/javascript"></script>
 
-
     <script type="text/javascript">
         $(document).ready(function () {
             //initialize the javascript
             App.init();
-            App.formElements();
+            //App.formElements();
             App.dataTables();
             $('form').parsley();
         });
@@ -278,9 +274,7 @@
             ]
         });
         @endforeach
-
     </script>
-
 
     <script src="{{ asset('public/js/comprobante/uc.js?v='.$version) }}" type="text/javascript"></script>
 
