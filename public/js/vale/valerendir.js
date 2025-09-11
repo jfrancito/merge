@@ -950,9 +950,25 @@ $(document).ready(function(){
                     }
 
                     // PASAJES INTERPROVINCIAL (TIG0005)
+                    // else if (codigoTipo === "TIG0000000000005") {
+                   //     tipoImporte = filasExistentes === 0 ? valor : 0;
+                   //  }
+
+                    // PASAJES INTERPROVINCIAL (TIG0005)
                     else if (codigoTipo === "TIG0000000000005") {
-                        tipoImporte = filasExistentes === 0 ? valor : 0;
+                        // Verificar si alguna fila ya tiene PASAJES INTERPROVINCIAL
+                        let pasajeYaAgregado = false;
+                        $('#tabla_vale_rendir_detalle tbody tr').each(function () {
+                            let nombres = $(this).find('td').eq(3).html();
+                            if (nombres && nombres.includes(codigosNombres["TIG0000000000005"])) {
+                                pasajeYaAgregado = true;
+                                return false; 
+                            }
+                        });
+
+                        tipoImporte = pasajeYaAgregado ? 0 : valor;
                     }
+
 
                     // Otros casos
                     else {
