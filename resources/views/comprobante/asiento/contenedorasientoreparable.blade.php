@@ -19,7 +19,7 @@
                             <div class="col-sm-12 abajocaja">
                                 {!! Form::select( 'anio_asiento_reparable', $array_anio, $defecto_anio,
                                                   [
-                                                    'class'       => 'select2 form-control control input-sm' ,
+                                                    'class'       => 'slim',
                                                     'id'          => 'anio_asiento_reparable',
                                                     'data-aw'     => '1',
                                                     'required'    => true,
@@ -35,7 +35,7 @@
                             <div class="col-sm-12 abajocaja">
                                 {!! Form::select( 'periodo_asiento_reparable', $array_periodo, $defecto_periodo,
                                                   [
-                                                    'class'       => 'select2 form-control control input-sm' ,
+                                                    'class'       => 'slim',
                                                     'id'          => 'periodo_asiento_reparable',
                                                     'data-aw'     => '2',
                                                     'required'    => true,
@@ -62,7 +62,7 @@
                             <div class="col-sm-12 abajocaja">
                                 {!! Form::select( 'moneda_asiento_reparable', $combo_moneda_asiento, !empty($asiento_reparable) ? $asiento_reparable[1][0]['COD_CATEGORIA_MONEDA'] : ($fedocumento->MONEDA === 'PEN' ? 'MON0000000000001' : 'MON0000000000002'),
                                                   [
-                                                    'class'       => 'select2 form-control control input-sm' ,
+                                                    'class'       => 'slim',
                                                     'id'          => 'moneda_asiento_reparable',
                                                     'data-aw'     => '4',
                                                     'required'    => true,
@@ -96,9 +96,8 @@
                         <div class="form-group">
                             <label class="col-sm-12 control-label labelleft negrita">Proveedor :</label>
                             <div class="col-sm-12 abajocaja">
-                                {!! Form::select( 'empresa_asiento_reparable', $combo_empresa_proveedor, !empty($asiento_reparable) ? $asiento_reparable[1][0]['COD_EMPR_CLI'] : '',
+                                {!! Form::select( 'empresa_asiento_reparable', [], null,
                                                   [
-                                                    'class'       => 'select2 form-control control input-sm' ,
                                                     'id'          => 'empresa_asiento_reparable',
                                                     'data-aw'     => '6',
                                                     'required'    => true,
@@ -113,7 +112,7 @@
                             <div class="col-sm-12 abajocaja">
                                 {!! Form::select( 'tipo_asiento_reparable', $combo_tipo_asiento, !empty($asiento_reparable) ? $asiento_reparable[1][0]['COD_CATEGORIA_TIPO_ASIENTO'] : '',
                                                   [
-                                                    'class'       => 'select2 form-control control input-sm' ,
+                                                    'class'       => 'slim',
                                                     'id'          => 'tipo_asiento_reparable',
                                                     'data-aw'     => '7',
                                                     'required'    => true,
@@ -146,7 +145,7 @@
                             <div class="col-sm-12 abajocaja">
                                 {!! Form::select( 'tipo_documento_asiento_reparable', $combo_tipo_documento, !empty($asiento_reparable) ? $asiento_reparable[1][0]['COD_CATEGORIA_TIPO_DOCUMENTO'] : '',
                                                   [
-                                                    'class'       => 'select2 form-control control input-sm' ,
+                                                    'class'       => 'slim',
                                                     'id'          => 'tipo_documento_asiento_reparable',
                                                     'data-aw'     => '7',
                                                     'required'    => true,
@@ -188,7 +187,7 @@
                             <div class="col-sm-12 abajocaja">
                                 {!! Form::select( 'tipo_documento_ref_reparable', $combo_tipo_documento, !empty($asiento_reparable) ? $asiento_reparable[1][0]['COD_CATEGORIA_TIPO_DOCUMENTO_REF'] : '',
                                                   [
-                                                    'class'       => 'select2 form-control control input-sm combo' ,
+                                                    'class'       => 'slim',
                                                     'id'          => 'tipo_documento_ref_reparable',
                                                     'data-aw'     => '8'
                                                   ]) !!}
