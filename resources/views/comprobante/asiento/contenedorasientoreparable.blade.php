@@ -342,13 +342,13 @@
                                     <td class="col-cuenta">{{ $asiento_movimiento['TXT_CUENTA_CONTABLE'] }}</td>
                                     <td class="col-glosa">{{ $asiento_movimiento['TXT_GLOSA'] }}</td>
                                     <td class="col-debe-mn"
-                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_MN'], 4, '.', ',') }}</td>
+                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_MN'], 4) }}</td>
                                     <td class="col-haber-mn"
-                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_MN'], 4, '.', ',') }}</td>
+                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_MN'], 4) }}</td>
                                     <td class="col-debe-me"
-                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_ME'], 4, '.', ',') }}</td>
+                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_DEBE_ME'], 4) }}</td>
                                     <td class="col-haber-me"
-                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_ME'], 4, '.', ',') }}</td>
+                                        style="text-align: right">{{ number_format($asiento_movimiento['CAN_HABER_ME'], 4) }}</td>
                                     <td>
                                         <button type="button" class="btn btn-sm btn-primary editar-cuenta-reparable">
                                             ✏ Editar

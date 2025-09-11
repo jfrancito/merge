@@ -415,21 +415,21 @@
                         <tbody>
                         <tr>
                             <td class="col-base-imponible"
-                                style="text-align: right">{{ number_format(0.0000, 4, '.', ',') }}</td>
+                                style="text-align: right">{{ number_format(0.0000, 4) }}</td>
                             <td class="col-base-imponible-10"
-                                style="text-align: right">{{ number_format(0.0000, 4, '.', ',') }}</td>
+                                style="text-align: right">{{ number_format(0.0000, 4) }}</td>
                             <td class="col-base-ivap"
-                                style="text-align: right">{{ number_format(0.0000, 4, '.', ',') }}</td>
+                                style="text-align: right">{{ number_format(0.0000, 4) }}</td>
                             <td class="col-base-inafecto"
-                                style="text-align: right">{{ number_format(0.0000, 4, '.', ',') }}</td>
+                                style="text-align: right">{{ number_format(0.0000, 4) }}</td>
                             <td class="col-base-exonerado"
-                                style="text-align: right">{{ number_format(0.0000, 4, '.', ',') }}</td>
+                                style="text-align: right">{{ number_format(0.0000, 4) }}</td>
                             <td class="col-igv"
-                                style="text-align: right">{{ number_format(0.0000, 4, '.', ',') }}</td>
+                                style="text-align: right">{{ number_format(0.0000, 4) }}</td>
                             <td class="col-ivap"
-                                style="text-align: right">{{ number_format(0.0000, 4, '.', ',') }}</td>
+                                style="text-align: right">{{ number_format(0.0000, 4) }}</td>
                             <td class="col-total"
-                                style="text-align: right">{{ number_format(0.0000, 4, '.', ',') }}</td>
+                                style="text-align: right">{{ number_format(0.0000, 4) }}</td>
                         </tr>
                         </tbody>
                     </table>

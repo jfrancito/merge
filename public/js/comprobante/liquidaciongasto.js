@@ -469,10 +469,10 @@ $(document).ready(function () {
                 <td class="col-codigo">${asiento_id_editar}</td>
                 <td class="col-cuenta">${numero_cuenta}</td>
                 <td class="col-glosa">${glosa_cuenta}</td>
-                <td class="col-debe-mn" style="text-align: right">${number_format(can_debe_mn, 4, ',', '.')}</td>
-                <td class="col-haber-mn" style="text-align: right">${number_format(can_haber_mn, 4, ',', '.')}</td>
-                <td class="col-debe-me" style="text-align: right">${number_format(can_debe_me, 4, ',', '.')}</td>
-                <td class="col-haber-me" style="text-align: right">${number_format(can_haber_me, 4, ',', '.')}</td>
+                <td class="col-debe-mn" style="text-align: right">${number_format(can_debe_mn, 4)}</td>
+                <td class="col-haber-mn" style="text-align: right">${number_format(can_haber_mn, 4)}</td>
+                <td class="col-debe-me" style="text-align: right">${number_format(can_debe_me, 4)}</td>
+                <td class="col-haber-me" style="text-align: right">${number_format(can_haber_me, 4)}</td>
                 <td>
                     <button type="button" class="btn btn-sm btn-primary editar-cuenta">
                         ✏ Editar
@@ -509,14 +509,14 @@ $(document).ready(function () {
                     let fila = $(this);
 
                     // Actualizar las celdas visibles de la tabla
-                    fila.find(".col-base-imponible").text(number_format(base_imponible, 4, ',', '.'));
-                    fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4, ',', '.'));
-                    fila.find(".col-base-ivap").text(number_format(base_ivap, 4, ',', '.'));
-                    fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4, ',', '.'));
-                    fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4, ',', '.'));
-                    fila.find(".col-igv").text(number_format(total_igv, 4, ',', '.'));
-                    fila.find(".col-ivap").text(number_format(total_ivap, 4, ',', '.'));
-                    fila.find(".col-total").text(number_format(total, 4, ',', '.'));
+                    fila.find(".col-base-imponible").text(number_format(base_imponible, 4));
+                    fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4));
+                    fila.find(".col-base-ivap").text(number_format(base_ivap, 4));
+                    fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4));
+                    fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4));
+                    fila.find(".col-igv").text(number_format(total_igv, 4));
+                    fila.find(".col-ivap").text(number_format(total_ivap, 4));
+                    fila.find(".col-total").text(number_format(total, 4));
 
                 });
                 break;
@@ -746,24 +746,24 @@ $(document).ready(function () {
                         // Actualizar las celdas visibles de la tabla
                         fila.find(".col-cuenta").text(numero_cuenta);
                         fila.find(".col-glosa").text(glosa_cuenta);
-                        fila.find(".col-debe-mn").text(number_format(can_debe_mn, 4, ',', '.'));
-                        fila.find(".col-haber-mn").text(number_format(can_haber_mn, 4, ',', '.'));
-                        fila.find(".col-debe-me").text(number_format(can_debe_me, 4, ',', '.'));
-                        fila.find(".col-haber-me").text(number_format(can_haber_me, 4, ',', '.'));
+                        fila.find(".col-debe-mn").text(number_format(can_debe_mn, 4));
+                        fila.find(".col-haber-mn").text(number_format(can_haber_mn, 4));
+                        fila.find(".col-debe-me").text(number_format(can_debe_me, 4));
+                        fila.find(".col-haber-me").text(number_format(can_haber_me, 4));
                     }
                 });
                 $("#asientototales tbody tr").each(function () {
                     let fila = $(this);
 
                     // Actualizar las celdas visibles de la tabla
-                    fila.find(".col-base-imponible").text(number_format(base_imponible, 4, ',', '.'));
-                    fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4, ',', '.'));
-                    fila.find(".col-base-ivap").text(number_format(base_ivap, 4, ',', '.'));
-                    fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4, ',', '.'));
-                    fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4, ',', '.'));
-                    fila.find(".col-igv").text(number_format(total_igv, 4, ',', '.'));
-                    fila.find(".col-ivap").text(number_format(total_ivap, 4, ',', '.'));
-                    fila.find(".col-total").text(number_format(total, 4, ',', '.'));
+                    fila.find(".col-base-imponible").text(number_format(base_imponible, 4));
+                    fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4));
+                    fila.find(".col-base-ivap").text(number_format(base_ivap, 4));
+                    fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4));
+                    fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4));
+                    fila.find(".col-igv").text(number_format(total_igv, 4));
+                    fila.find(".col-ivap").text(number_format(total_ivap, 4));
+                    fila.find(".col-total").text(number_format(total, 4));
 
                 });
                 break;
@@ -907,14 +907,14 @@ $(document).ready(function () {
                     let fila = $(this);
 
                     // Actualizar las celdas visibles de la tabla
-                    fila.find(".col-base-imponible").text(number_format(base_imponible, 4, ',', '.'));
-                    fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4, ',', '.'));
-                    fila.find(".col-base-ivap").text(number_format(base_ivap, 4, ',', '.'));
-                    fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4, ',', '.'));
-                    fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4, ',', '.'));
-                    fila.find(".col-igv").text(number_format(total_igv, 4, ',', '.'));
-                    fila.find(".col-ivap").text(number_format(total_ivap, 4, ',', '.'));
-                    fila.find(".col-total").text(number_format(total, 4, ',', '.'));
+                    fila.find(".col-base-imponible").text(number_format(base_imponible, 4));
+                    fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4));
+                    fila.find(".col-base-ivap").text(number_format(base_ivap, 4));
+                    fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4));
+                    fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4));
+                    fila.find(".col-igv").text(number_format(total_igv, 4));
+                    fila.find(".col-ivap").text(number_format(total_ivap, 4));
+                    fila.find(".col-total").text(number_format(total, 4));
 
                 });
                 break;
@@ -1891,14 +1891,14 @@ $(document).ready(function () {
                 let fila = $(this);
 
                 // Actualizar las celdas visibles de la tabla
-                fila.find(".col-base-imponible").text(number_format(base_imponible, 4, ',', '.'));
-                fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4, ',', '.'));
-                fila.find(".col-base-ivap").text(number_format(base_ivap, 4, ',', '.'));
-                fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4, ',', '.'));
-                fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4, ',', '.'));
-                fila.find(".col-igv").text(number_format(total_igv, 4, ',', '.'));
-                fila.find(".col-ivap").text(number_format(total_ivap, 4, ',', '.'));
-                fila.find(".col-total").text(number_format(total, 4, ',', '.'));
+                fila.find(".col-base-imponible").text(number_format(base_imponible, 4));
+                fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4));
+                fila.find(".col-base-ivap").text(number_format(base_ivap, 4));
+                fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4));
+                fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4));
+                fila.find(".col-igv").text(number_format(total_igv, 4));
+                fila.find(".col-ivap").text(number_format(total_ivap, 4));
+                fila.find(".col-total").text(number_format(total, 4));
 
             });
 
@@ -1921,10 +1921,10 @@ $(document).ready(function () {
                 <td class="col-codigo">${asiento_id_editar}</td>
                 <td class="col-cuenta">${numero_cuenta}</td>
                 <td class="col-glosa">${glosa_cuenta}</td>
-                <td class="col-debe-mn" style="text-align: right">${number_format(can_debe_mn, 4, ',', '.')}</td>
-                <td class="col-haber-mn" style="text-align: right">${number_format(can_haber_mn, 4, ',', '.')}</td>
-                <td class="col-debe-me" style="text-align: right">${number_format(can_debe_me, 4, ',', '.')}</td>
-                <td class="col-haber-me" style="text-align: right">${number_format(can_haber_me, 4, ',', '.')}</td>
+                <td class="col-debe-mn" style="text-align: right">${number_format(can_debe_mn, 4)}</td>
+                <td class="col-haber-mn" style="text-align: right">${number_format(can_haber_mn, 4)}</td>
+                <td class="col-debe-me" style="text-align: right">${number_format(can_debe_me, 4)}</td>
+                <td class="col-haber-me" style="text-align: right">${number_format(can_haber_me, 4)}</td>
                 <td>
                     <button type="button" class="btn btn-sm btn-primary editar-cuenta">
                         ✏ Editar
