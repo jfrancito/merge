@@ -23,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
         View::share('capeta', '/merge');
 
 
-        View::share('version', '9.91');
+        View::share('version', '9.92');
 
         View::share('titulo', '');
 
