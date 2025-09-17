@@ -295,8 +295,10 @@ trait UserTraits
 
                 $autorizacion           =   array();
                 $COD_AUTORIZACION       =   '';
-                if(count($valeRendir)>0){
 
+                $subjectcorreo = 'APLICACIÓN DE REEMBOLSO '.$documentoCtble->NRO_SERIE.'-'.$documentoCtble->NRO_DOC;
+                if(count($valeRendir)>0){
+                    $subjectcorreo = 'APLICACION DE VALE CON LIQUIDACION '.$documentoCtble->NRO_SERIE.'-'.$documentoCtble->NRO_DOC;
                     $autorizacion       =   DB::table('TES.AUTORIZACION')
                                             ->where('COD_AUTORIZACION', $valeRendir->ID_OSIRIS)
                                             ->first();
@@ -336,13 +338,13 @@ trait UserTraits
                     'monto_vale'          =>  $monto_vale
                 );
 
-                Mail::send('emails.tesorerialg', $array, function($message) use ($emailfrom,$item,$email,$documentoCtble)
+                Mail::send('emails.tesorerialg', $array, function($message) use ($emailfrom,$item,$email,$documentoCtble,$subjectcorreo)
                 {
                     $emailcopias        = explode(",", $email->correocopia);
                     $message->from($emailfrom->correoprincipal, 'LIQUIDACION '.$item->ID_DOCUMENTO);
                     //$message->to('jorge.saldana@induamerica.com.pe');
                     $message->to($email->correoprincipal)->cc($emailcopias);
-                    $message->subject('APLICACION DE VALE CON LIQUIDACION '.$documentoCtble->NRO_SERIE.'-'.$documentoCtble->NRO_DOC);
+                    $message->subject($subjectcorreo);
                 });
 
                 $pedido                             =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)->first();
