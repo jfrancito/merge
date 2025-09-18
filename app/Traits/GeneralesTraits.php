@@ -22,6 +22,7 @@ use App\Modelos\Archivo;
 use App\Modelos\PlaSerie;
 use App\Modelos\PlaMovilidad;
 use App\Modelos\FePlanillaEntregable;
+use App\Modelos\WEBValeRendir;
 
 
 use App\User;
@@ -326,34 +327,31 @@ trait GeneralesTraits
     public function gn_combo_arendir_restante_nuevo()
     {
 
-        $liquidaciones = DB::table('LQG_LIQUIDACION_GASTO')
-                        ->where('ACTIVO', 1)
-                        ->where('COD_ESTADO', '<>', 'ETM0000000000006')
-                        ->where('USUARIO_CREA', Session::get('usuario')->id)
-                        ->pluck('ARENDIR_ID')
-                        ->toArray();
 
-        $array    =     DB::table('WEB.VALE_RENDIR')
-                        ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
-                        ->where('COD_USUARIO_CREA_AUD', Session::get('usuario')->id)
-                        ->where('COD_CATEGORIA_ESTADO_VALE', 'ETM0000000000007')
-                        ->whereNotIn('ID', $liquidaciones)
-                        ->select(
-                            'ID',
-                            DB::raw("CAST(FEC_AUTORIZACION AS VARCHAR) + ' / ' + TXT_SERIE + '-' + TXT_NUMERO  + ' / ' + CAST(CAN_TOTAL_IMPORTE AS VARCHAR) AS MONTO")
-                        )
-                        ->orderBy('ID', 'asc')
-                        ->pluck('MONTO', 'ID')
-                        ->toArray();
-
-
-
+    $array =   WEBValeRendir::from('WEB.VALE_RENDIR as VR')
+                    ->join('TES.AUTORIZACION as AUT', 'VR.ID_OSIRIS', '=', 'AUT.COD_AUTORIZACION')
+                    ->join('TES.AUTORIZACION_DETALLE as AUD', 'AUT.COD_AUTORIZACION', '=', 'AUD.COD_AUTORIZACION')
+                    ->join('CMP.DOCUMENTO_CTBLE as DOC', 'AUD.COD_DOC_CTBLE', '=', 'DOC.COD_DOCUMENTO_CTBLE')
+                    ->where('VR.COD_USUARIO_CREA_AUD',Session::get('usuario')->id)
+                    ->where('DOC.CAN_SALDO', '>', 0)
+                    ->where('DOC.COD_CATEGORIA_TIPO_DOC', 'TDO0000000000072')
+                    ->select(
+                        'VR.ID',
+                        DB::raw("CAST(VR.FEC_AUTORIZACION AS VARCHAR) + ' / ' + VR.TXT_SERIE + '-' + VR.TXT_NUMERO  + ' / ' + DOC.TXT_CATEGORIA_MONEDA  + ' / ' + CAST(VR.CAN_TOTAL_IMPORTE AS VARCHAR) AS MONTO")
+                    )
+                    ->distinct()
+                    ->orderBy('VR.ID', 'asc')
+                    ->pluck('MONTO', 'VR.ID')
+                    ->toArray();
 
 
 
         $combo = array('' => 'Seleccione un arendir') + $array;
         return $combo;
     }
+
+
+
 
 
     public function gn_combo_arendir()

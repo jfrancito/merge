@@ -4944,7 +4944,7 @@ class GestionLiquidacionGastosController extends Controller
             $autoriza_id = '';
             $combo_autoriza = $this->gn_combo_usuarios();
             $arendir_sel_id = '';
-            $combo_arendir_sel = $this->gn_combo_arendir_restante();
+            $combo_arendir_sel = $this->gn_combo_arendir_restante_nuevo();
 
             $moneda_sel_id = '';
             $combo_moneda_sel = $this->gn_generacion_combo_categoria('MONEDA', "SELECCIONE MONEDA", '');
