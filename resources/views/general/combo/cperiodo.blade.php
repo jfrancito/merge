@@ -14,7 +14,7 @@
 
 @if(isset($ajax))
     <script>
-        new SlimSelect({
+        window.selects['periodo_asiento'] = new SlimSelect({
             select: '#periodo_asiento'
         })
     </script>

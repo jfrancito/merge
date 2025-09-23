@@ -106,6 +106,11 @@
                         </div>
                     </div>
 
+                    <script>
+                        let defaultIdReparable = "{{ !empty($asiento_reparable) ? $asiento_reparable[1][0]['COD_EMPR_CLI'] : '' }}";
+                        let defaultTextReparable = "{{ !empty($asiento_reparable) ? $asiento_reparable[1][0]['TXT_EMPR_CLI'] : '' }}";
+                    </script>
+
                     <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 cajareporte">
                         <div class="form-group">
                             <label class="col-sm-12 control-label labelleft negrita">Tipo Asiento :</label>
@@ -360,6 +365,20 @@
                             @endforeach
                         @endif
                         </tbody>
+                        <tfoot>
+                        <tr>
+                            <th colspan="3" class="text-right">Totales:</th>
+                            <th class="totalDebeMN"
+                                style="text-align: right"></th>
+                            <th class="totalHaberMN"
+                                style="text-align: right"></th>
+                            <th class="totalDebeME"
+                                style="text-align: right"></th>
+                            <th class="totalHaberME"
+                                style="text-align: right"></th>
+                            <th></th>
+                        </tr>
+                        </tfoot>
                     </table>
 
                 </div>
@@ -379,7 +398,7 @@
                                 <div class="col-sm-12 abajocaja">
                                     {!! Form::select( 'nivel_reparable', $combo_nivel_pc, '6',
                                                       [
-                                                        'class'       => 'select2 form-control control input-xs combo' ,
+                                                        'class'       => 'slim',
                                                         'id'          => 'nivel_reparable',
                                                         'data-aw'     => '1',
                                                          'disabled'   => 'disabled'
@@ -395,7 +414,7 @@
                                 <div class="col-sm-12 abajocaja">
                                     {!! Form::select( 'partida_id_reparable', $combo_partida, '',
                                                       [
-                                                        'class'       => 'select2 form-control control input-xs combo' ,
+                                                        'class'       => 'slim',
                                                         'id'          => 'partida_id_reparable',
                                                         'data-aw'     => '2',
                                                       ]) !!}
@@ -410,7 +429,7 @@
                                 <div class="col-sm-12 abajocaja">
                                     {!! Form::select( 'cuenta_contable_id_reparable', $combo_cuenta, '',
                                                       [
-                                                        'class'       => 'select2 form-control control input-xs combo' ,
+                                                        'class'       => 'slim',
                                                         'id'          => 'cuenta_contable_id_reparable',
                                                         'data-aw'     => '3',
                                                       ]) !!}
@@ -438,7 +457,7 @@
                                 <div class="col-sm-12 abajocaja">
                                     {!! Form::select( 'tipo_igv_id_reparable', $combo_tipo_igv, '',
                                                       [
-                                                        'class'       => 'select2 form-control control input-xs combo' ,
+                                                        'class'       => 'slim',
                                                         'id'          => 'tipo_igv_id_reparable',
                                                         'data-aw'     => '4'
                                                       ]) !!}
@@ -452,7 +471,7 @@
                                 <div class="col-sm-12 abajocaja">
                                     {!! Form::select( 'porc_tipo_igv_id_reparable', $combo_porc_tipo_igv, '',
                                                       [
-                                                        'class'       => 'select2 form-control control input-xs combo' ,
+                                                        'class'       => 'slim',
                                                         'id'          => 'porc_tipo_igv_id_reparable',
                                                         'data-aw'     => '4'
                                                       ]) !!}
@@ -466,7 +485,7 @@
                                 <div class="col-sm-12 abajocaja">
                                     {!! Form::select( 'activo_reparable', $combo_activo, '1',
                                                       [
-                                                        'class'       => 'select2 form-control control input-xs combo' ,
+                                                        'class'       => 'slim',
                                                         'id'          => 'activo_reparable',
                                                         'data-aw'     => '5',
                                                         'disabled'    => true

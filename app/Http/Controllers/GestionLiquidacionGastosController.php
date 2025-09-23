@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Modelos\WEBAsiento;
 use Illuminate\Http\Request;
 use App\Modelos\Grupoopcion;
 use App\Modelos\Opcion;
@@ -2359,6 +2360,13 @@ class GestionLiquidacionGastosController extends Controller
                     $detalle_asiento = json_decode($detalle['detalle'], true);
 
                     foreach ($cabecera as $detalle) {
+
+                        $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+                            ->where('COD_ESTADO', '=', 1)
+                            ->where('COD_ASIENTO_MODELO', '=', $cabecera['COD_ASIENTO_MODELO'])
+                            ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
+                            ->first();
+
                         $contador_cabecera = $contador_cabecera + 1;
                         $COD_ASIENTO = $detalle['COD_ASIENTO'];
                         $COD_EMPR = $detalle['COD_EMPR'];
@@ -2439,52 +2447,56 @@ class GestionLiquidacionGastosController extends Controller
                         $tipo_doc_ref_asiento_aux = STDTipoDocumento::where('COD_TIPO_DOCUMENTO', '=', $COD_CATEGORIA_TIPO_DOCUMENTO_REF)->first();
                         $tipo_asiento = CMPCategoria::where('COD_CATEGORIA', '=', $COD_CATEGORIA_TIPO_ASIENTO)->first();
 
-                        $codAsiento = $this->ejecutarAsientosIUDConSalida(
-                            'I',
-                            Session::get('empresas')->COD_EMPR,
-                            $liquidaciongastos->COD_CENTRO,
-                            $COD_PERIODO,
-                            $tipo_asiento->COD_CATEGORIA,
-                            $tipo_asiento->NOM_CATEGORIA,
-                            '',
-                            $FEC_ASIENTO,
-                            $TXT_GLOSA,
-                            $COD_CATEGORIA_ESTADO_ASIENTO,
-                            $TXT_CATEGORIA_ESTADO_ASIENTO,
-                            $moneda_asiento_aux->COD_CATEGORIA,
-                            $moneda_asiento_aux->NOM_CATEGORIA,
-                            $CAN_TIPO_CAMBIO,
-                            0.0000,
-                            0.0000,
-                            '',
-                            '',
-                            0,
-                            $COD_ASIENTO_MODELO,
-                            $TXT_TIPO_REFERENCIA,
-                            $TXT_REFERENCIA . '-' . $CODIGO_CONTABLE,
-                            1,
-                            Session::get('usuario')->id,
-                            '',
-                            '',
-                            $empresa_doc_asiento_aux->COD_EMPR,
-                            $empresa_doc_asiento_aux->NOM_EMPR,
-                            $tipo_doc_asiento_aux->COD_TIPO_DOCUMENTO,
-                            $tipo_doc_asiento_aux->TXT_TIPO_DOCUMENTO,
-                            $NRO_SERIE,
-                            $NRO_DOC,
-                            $FEC_DETRACCION,
-                            $NRO_DETRACCION,
-                            $CAN_DESCUENTO_DETRACCION,
-                            $CAN_TOTAL_DETRACCION,
-                            isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->COD_TIPO_DOCUMENTO : '',
-                            isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->TXT_TIPO_DOCUMENTO : '',
-                            $NRO_SERIE_REF,
-                            $NRO_DOC_REF,
-                            $FEC_VENCIMIENTO,
-                            0,
-                            $moneda_asiento_conversion_aux->COD_CATEGORIA,
-                            $moneda_asiento_conversion_aux->NOM_CATEGORIA
-                        );
+                        if (empty($asiento_busqueda)) {
+                            $codAsiento = $this->ejecutarAsientosIUDConSalida(
+                                'I',
+                                Session::get('empresas')->COD_EMPR,
+                                $liquidaciongastos->COD_CENTRO,
+                                $COD_PERIODO,
+                                $tipo_asiento->COD_CATEGORIA,
+                                $tipo_asiento->NOM_CATEGORIA,
+                                '',
+                                $FEC_ASIENTO,
+                                $TXT_GLOSA,
+                                $COD_CATEGORIA_ESTADO_ASIENTO,
+                                $TXT_CATEGORIA_ESTADO_ASIENTO,
+                                $moneda_asiento_aux->COD_CATEGORIA,
+                                $moneda_asiento_aux->NOM_CATEGORIA,
+                                $CAN_TIPO_CAMBIO,
+                                0.0000,
+                                0.0000,
+                                '',
+                                '',
+                                0,
+                                $COD_ASIENTO_MODELO,
+                                $TXT_TIPO_REFERENCIA,
+                                $TXT_REFERENCIA . '-' . $CODIGO_CONTABLE,
+                                1,
+                                Session::get('usuario')->id,
+                                '',
+                                '',
+                                $empresa_doc_asiento_aux->COD_EMPR,
+                                $empresa_doc_asiento_aux->NOM_EMPR,
+                                $tipo_doc_asiento_aux->COD_TIPO_DOCUMENTO,
+                                $tipo_doc_asiento_aux->TXT_TIPO_DOCUMENTO,
+                                $NRO_SERIE,
+                                $NRO_DOC,
+                                $FEC_DETRACCION,
+                                $NRO_DETRACCION,
+                                $CAN_DESCUENTO_DETRACCION,
+                                $CAN_TOTAL_DETRACCION,
+                                isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->COD_TIPO_DOCUMENTO : '',
+                                isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->TXT_TIPO_DOCUMENTO : '',
+                                $NRO_SERIE_REF,
+                                $NRO_DOC_REF,
+                                $FEC_VENCIMIENTO,
+                                0,
+                                $moneda_asiento_conversion_aux->COD_CATEGORIA,
+                                $moneda_asiento_conversion_aux->NOM_CATEGORIA
+                            );
+                        } else {
+                            $codAsiento = '';
+                        }
                     }
 
                     if (!empty($codAsiento)) {
@@ -2522,7 +2534,7 @@ class GestionLiquidacionGastosController extends Controller
                             $TXT_EMPR_CLI_REF = $movimiento['TXT_EMPR_CLI_REF'];
                             $DOCUMENTO_REF = $movimiento['DOCUMENTO_REF'];
                             $CODIGO_CONTABLE = $movimiento['CODIGO_CONTABLE'];
-                            if (((int) $COD_ESTADO) === 1) {
+                            if (((int)$COD_ESTADO) === 1) {
                                 $contador++;
 
                                 $params = array(

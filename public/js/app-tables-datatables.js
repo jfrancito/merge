@@ -76,7 +76,32 @@ var App = (function () {
             scrollX: true,
             scrollY: "200px",
             ordering: false,
-            searching: false
+            searching: false,
+            footerCallback: function (row, data, start, end, display) {
+                let api = this.api();
+
+                // helper para convertir texto a número
+                let intVal = function (i) {
+                    return typeof i === 'string'
+                        ? parseFloat(i.replace(/[\$,]/g, '')) || 0
+                        : typeof i === 'number'
+                            ? i
+                            : 0;
+                };
+
+                // columnas numéricas a sumar (basado en tu orden)
+                let cols = [3, 4, 5, 6];
+
+                cols.forEach(function (colIdx) {
+                    let total = api
+                        .column(colIdx, { page: 'current' })
+                        .data()
+                        .reduce((a, b) => intVal(a) + intVal(b), 0);
+
+                    // mostrar con 2 decimales
+                    $(api.column(colIdx).footer()).html(number_format(total, 4));
+                });
+            }
         });
 
         $("#asientodetallereparable").dataTable({
@@ -86,7 +111,32 @@ var App = (function () {
             scrollX: true,
             scrollY: "200px",
             ordering: false,
-            searching: false
+            searching: false,
+            footerCallback: function (row, data, start, end, display) {
+                let api = this.api();
+
+                // helper para convertir texto a número
+                let intVal = function (i) {
+                    return typeof i === 'string'
+                        ? parseFloat(i.replace(/[\$,]/g, '')) || 0
+                        : typeof i === 'number'
+                            ? i
+                            : 0;
+                };
+
+                // columnas numéricas a sumar (basado en tu orden)
+                let cols = [3, 4, 5, 6];
+
+                cols.forEach(function (colIdx) {
+                    let total = api
+                        .column(colIdx, { page: 'current' })
+                        .data()
+                        .reduce((a, b) => intVal(a) + intVal(b), 0);
+
+                    // mostrar con 2 decimales
+                    $(api.column(colIdx).footer()).html(total.toFixed(4));
+                });
+            }
         });
 
         $("#asientodetallededuccion").dataTable({
@@ -96,7 +146,32 @@ var App = (function () {
             scrollX: true,
             scrollY: "200px",
             ordering: false,
-            searching: false
+            searching: false,
+            footerCallback: function (row, data, start, end, display) {
+                let api = this.api();
+
+                // helper para convertir texto a número
+                let intVal = function (i) {
+                    return typeof i === 'string'
+                        ? parseFloat(i.replace(/[\$,]/g, '')) || 0
+                        : typeof i === 'number'
+                            ? i
+                            : 0;
+                };
+
+                // columnas numéricas a sumar (basado en tu orden)
+                let cols = [3, 4, 5, 6];
+
+                cols.forEach(function (colIdx) {
+                    let total = api
+                        .column(colIdx, { page: 'current' })
+                        .data()
+                        .reduce((a, b) => intVal(a) + intVal(b), 0);
+
+                    // mostrar con 2 decimales
+                    $(api.column(colIdx).footer()).html(total.toFixed(4));
+                });
+            }
         });
 
         $("#asientodetallereversion").dataTable({
@@ -106,7 +181,32 @@ var App = (function () {
             scrollX: true,
             scrollY: "200px",
             ordering: false,
-            searching: false
+            searching: false,
+            footerCallback: function (row, data, start, end, display) {
+                let api = this.api();
+
+                // helper para convertir texto a número
+                let intVal = function (i) {
+                    return typeof i === 'string'
+                        ? parseFloat(i.replace(/[\$,]/g, '')) || 0
+                        : typeof i === 'number'
+                            ? i
+                            : 0;
+                };
+
+                // columnas numéricas a sumar (basado en tu orden)
+                let cols = [3, 4, 5, 6];
+
+                cols.forEach(function (colIdx) {
+                    let total = api
+                        .column(colIdx, { page: 'current' })
+                        .data()
+                        .reduce((a, b) => intVal(a) + intVal(b), 0);
+
+                    // mostrar con 2 decimales
+                    $(api.column(colIdx).footer()).html(total.toFixed(4));
+                });
+            }
         });
 
         $("#asientodetallepercepcion").dataTable({
@@ -116,7 +216,32 @@ var App = (function () {
             scrollX: true,
             scrollY: "200px",
             ordering: false,
-            searching: false
+            searching: false,
+            footerCallback: function (row, data, start, end, display) {
+                let api = this.api();
+
+                // helper para convertir texto a número
+                let intVal = function (i) {
+                    return typeof i === 'string'
+                        ? parseFloat(i.replace(/[\$,]/g, '')) || 0
+                        : typeof i === 'number'
+                            ? i
+                            : 0;
+                };
+
+                // columnas numéricas a sumar (basado en tu orden)
+                let cols = [3, 4, 5, 6];
+
+                cols.forEach(function (colIdx) {
+                    let total = api
+                        .column(colIdx, { page: 'current' })
+                        .data()
+                        .reduce((a, b) => intVal(a) + intVal(b), 0);
+
+                    // mostrar con 2 decimales
+                    $(api.column(colIdx).footer()).html(total.toFixed(4));
+                });
+            }
         });
 
         $("#table1").dataTable({
@@ -312,6 +437,25 @@ var App = (function () {
             scrollY: "300px",
             ordering: false,
         });
+
+        function number_format(num, decimals = 0, decimal_separator = ".", thousands_separator = ",") {
+            if (isNaN(num) || num === null) return "0";
+
+            // Asegurar número flotante
+            let n = parseFloat(num);
+
+            // Redondear a la cantidad de decimales indicada
+            let fixed = n.toFixed(decimals);
+
+            // Separar parte entera y decimal
+            let parts = fixed.split(".");
+
+            // Insertar separador de miles en la parte entera
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousands_separator);
+
+            // Unir con el separador de decimales
+            return parts.join(decimals > 0 ? decimal_separator : "");
+        }
 
 
     };
