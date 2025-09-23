@@ -9,10 +9,10 @@
     </tr>
     </thead>
     <tbody>
-    @if(!empty($asiento_compra))
+    @if(!empty($asiento_compra[2]))
         <tr data_indicador="C" data_input="C" data_asiento_cabecera="{{json_encode($asiento_compra[1])}}" data_asiento_detalle="{{json_encode($asiento_compra[2])}}">
             <td>{{$asiento_compra[1][0]['TXT_CATEGORIA_TIPO_ASIENTO']}}</td>
-            <td>Asiento Compra - Libro Compra</td>
+            <td>ASIENTO {{$asiento_compra[1][0]['TXT_CATEGORIA_TIPO_ASIENTO']}} - LIBRO {{$asiento_compra[1][0]['TXT_CATEGORIA_TIPO_ASIENTO']}}</td>
             <td>
                 <button type="button" class="btn btn-sm btn-primary ver-asiento">
                     👁 Ver Asiento
@@ -20,10 +20,10 @@
             </td>
         </tr>
     @endif
-    @if(!empty($asiento_reparable_reversion))
+    @if(!empty($asiento_reparable_reversion[2]))
         <tr data_indicador="C" data_input="RV" data_asiento_cabecera="{{json_encode($asiento_reparable_reversion[1])}}" data_asiento_detalle="{{json_encode($asiento_reparable_reversion[2])}}">
             <td>{{$asiento_reparable_reversion[1][0]['TXT_CATEGORIA_TIPO_ASIENTO']}}</td>
-            <td>Asiento Diario - Reversion Asiento Reparable</td>
+            <td>ASIENTO {{$asiento_reparable_reversion[1][0]['TXT_CATEGORIA_TIPO_ASIENTO']}} - REVERSIÓN ASIENTO REPARABLE</td>
             <td>
                 <button type="button" class="btn btn-sm btn-primary ver-asiento">
                     👁 Ver Asiento
@@ -31,10 +31,10 @@
             </td>
         </tr>
     @endif
-    @if(!empty($asiento_deduccion))
+    @if(!empty($asiento_deduccion[2]))
         <tr data_indicador="C" data_input="D" data_asiento_cabecera="{{json_encode($asiento_deduccion[1])}}" data_asiento_detalle="{{json_encode($asiento_deduccion[2])}}">
             <td>{{$asiento_deduccion[1][0]['TXT_CATEGORIA_TIPO_ASIENTO']}}</td>
-            <td>Asiento Diario - Deducción de Anticipo</td>
+            <td>ASIENTO {{$asiento_reparable_reversion[1][0]['TXT_CATEGORIA_TIPO_ASIENTO']}} - DEDUCCIIÓN DE ANTICIPO</td>
             <td>
                 <button type="button" class="btn btn-sm btn-primary ver-asiento">
                     👁 Ver Asiento
@@ -42,10 +42,10 @@
             </td>
         </tr>
     @endif
-    @if(!empty($asiento_percepcion))
+    @if(!empty($asiento_percepcion[2]))
         <tr data_indicador="C" data_input="P" data_asiento_cabecera="{{json_encode($asiento_percepcion[1])}}" data_asiento_detalle="{{json_encode($asiento_percepcion[2])}}">
             <td>{{$asiento_percepcion[1][0]['TXT_CATEGORIA_TIPO_ASIENTO']}}</td>
-            <td>Asiento Compra - Libro Compra Percepción</td>
+            <td>ASIENTO {{$asiento_compra[1][0]['TXT_CATEGORIA_TIPO_ASIENTO']}} - LIBRO {{$asiento_compra[1][0]['TXT_CATEGORIA_TIPO_ASIENTO']}} PERCEPCIÓN</td>
             <td>
                 <button type="button" class="btn btn-sm btn-primary ver-asiento">
                     👁 Ver Asiento
