@@ -2606,6 +2606,7 @@ $(document).ready(function () {
 
     $('.btnaprobarcomporbatnteconta').on('click', function (event) {
         event.preventDefault();
+        abrircargando();
         let url = $(this).data('url');
 
         let detalles = [];

@@ -2369,10 +2369,10 @@ class GestionLiquidacionGastosController extends Controller
 
                     foreach ($cabecera as $detalle) {
 
-                        $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
+                        $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $detalle['TXT_REFERENCIA'])
                             ->where('COD_ESTADO', '=', 1)
-                            ->where('COD_ASIENTO_MODELO', '=', $cabecera['COD_ASIENTO_MODELO'])
-                            ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
+                            ->where('COD_ASIENTO_MODELO', '=', $detalle['COD_ASIENTO_MODELO'])
+                            ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $detalle['COD_CATEGORIA_TIPO_ASIENTO'])
                             ->first();
 
                         $contador_cabecera = $contador_cabecera + 1;
@@ -2587,7 +2587,6 @@ class GestionLiquidacionGastosController extends Controller
                 $detdocumentolg = LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
                 $documentohistorial = LqgDocumentoHistorial::where('ID_DOCUMENTO', '=', $iddocumento)->orderby('FECHA', 'DESC')->get();
 
-
                 if ($liquidaciongastos->IND_OBSERVACION == 1) {
                     DB::rollback();
                     return Redirect::back()->with('errorbd', 'El documento esta observado no se puede observar');
@@ -2631,17 +2630,20 @@ class GestionLiquidacionGastosController extends Controller
                 $documento->save();
 
                 DB::commit();
+                //DB::rollback();
 //                return Redirect::to('/gestion-de-aprobacion-liquidacion-gastos-contabilidad/' . $idopcion)->with('bienhecho', 'Liquidacion de Gastos : ' . ' APROBADO CON EXITO');
                 return response()->json([
                     'status' => 'success',
-                    'mensaje' => $COD_ASIENTO_MOVIMIENTO,
+                    //'mensaje' => json_encode($detalles),
+                    'mensaje' => 'LIQUIDACIÓN DE GASTOS: ' . $liquidaciongastos->ID_DOCUMENTO . ' APROBADO CON EXITO',
                     'redirect' => url('/gestion-de-aprobacion-liquidacion-gastos-contabilidad/' . $idopcion)
                 ]);
             } catch (\Exception $ex) {
                 DB::rollback();
                 return response()->json([
                     'status' => 'error',
-                    'mensaje' => $ex . ' Ocurrio un error inesperado contador' . $contador_cabecera,
+                    'mensaje' => 'OCURRIÓ UN ERROR INESPERADO FILA ASIENTO GENERAR: ' . $contador_cabecera . ' ERROR DESCRICPION: ' . $ex,
+                    //'mensaje' => json_encode($cabecera),
                     'redirect' => url('/gestion-de-aprobacion-liquidacion-gastos-contabilidad/' . $idopcion)
                 ]);
 //                return Redirect::to('/gestion-de-aprobacion-liquidacion-gastos-contabilidad/' . $idopcion)->with('errorbd', $ex . ' Ocurrio un error inesperado');
