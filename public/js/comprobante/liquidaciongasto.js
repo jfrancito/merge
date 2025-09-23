@@ -189,6 +189,8 @@ $(document).ready(function () {
             totalAsiento = redondear4(totalAsientoOriginal);
         }
 
+        debugger;
+
         // si la diferencia es menor o igual a 0.1, ajustar
         if (Math.abs(diferencia) > 0 && Math.abs(diferencia) < 0.1) {
 
@@ -2339,6 +2341,9 @@ $(document).ready(function () {
 
         let data_asiento_cabecera = $(this).attr('data_asiento_cabecera');
         let data_asiento_detalle = $(this).attr('data_asiento_detalle');
+
+        let totallg = $(this).find('td').eq(6).text().trim();
+        $('#total_xml').val(totallg);
 
         if (data_valor_id === '1') {
             $('#asiento_cabecera_compra').val(data_asiento_cabecera);

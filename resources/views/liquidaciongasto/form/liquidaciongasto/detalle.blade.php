@@ -2,7 +2,6 @@
     <div class="panel-heading" style="background: #1d3a6d;color: #fff;">DETALLE DE DOCUMENTOS
     </div>
     <div class="panel-body panel-body-contrast">
-
         <table id="tblactivos" class="table table-condensed table-striped">
             <thead>
             <tr>
@@ -34,4 +33,6 @@
             </tbody>
         </table>
     </div>
+    <input type="hidden" id="total_xml" name="total_xml"
+           value=""/>
 </div>
