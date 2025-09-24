@@ -52,6 +52,10 @@
               <input type="hidden" name="RUTACOMPLETA" id="RUTACOMPLETA" >
               <input type="hidden" name="RUTACOMPLETAPDF" id="RUTACOMPLETAPDF" >
               <input type="hidden" name="NOMBREPDF" id="NOMBREPDF" >
+              <input type="hidden" name="PRIMERA_FECHA_RENDICION_DET" id = "PRIMERA_FECHA_RENDICION_DET" value = "{{$primerafechaar}}">
+              <input type="hidden" name="ULTIMA_FECHA_RENDICION_DET" id = "ULTIMA_FECHA_RENDICION_DET" value = "{{$ultimafecha}}">
+
+
 
               <input type="hidden" name="array_detalle_producto" id='array_detalle_producto' value=''>
           </div>

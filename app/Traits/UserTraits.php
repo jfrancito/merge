@@ -338,9 +338,25 @@ trait UserTraits
                     'monto_vale'          =>  $monto_vale
                 );
 
-                Mail::send('emails.tesorerialg', $array, function($message) use ($emailfrom,$item,$email,$documentoCtble,$subjectcorreo)
+                $user = DB::table('users')->where('id', $item->USUARIO_CREA)->first();
+                $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('COD_TRAB','=',$user->usuarioosiris_id)->first();
+                //correo de trabajadores
+                $correotrabajdor         =    '';
+                if(count($trabajadorcorreo)>0){
+                    if ($trabajadorcorreo->emailcorp !== null) {
+                        $correotrabajador = $trabajadorcorreo->emailcorp;
+                    }
+                }
+
+                Mail::send('emails.tesorerialg', $array, function($message) use ($emailfrom,$item,$email,$documentoCtble,$subjectcorreo,$correotrabajador)
                 {
-                    $emailcopias        = explode(",", $email->correocopia);
+
+                    if($correotrabajador ==''){
+                        $emailcopias        = explode(",", $email->correocopia);  
+                    }else{
+                        $emailcopias        = explode(",", $email->correocopia); 
+                        $emailcopias[]      = $correotrabajador; // Agrega al final del array
+                    }
                     $message->from($emailfrom->correoprincipal, 'LIQUIDACION '.$item->ID_DOCUMENTO);
                     //$message->to('jorge.saldana@induamerica.com.pe');
                     $message->to($email->correoprincipal)->cc($emailcopias);

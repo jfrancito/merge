@@ -2266,20 +2266,20 @@ class GestionOCAdministracionController extends Controller
                                         'IND_NOTIFICACION_CLIENTE'=>1
                                     ]);
 
-                // if($documento_top->COD_CENTRO == 'CEN0000000000004'){
+                if($documento_top->COD_CENTRO == 'CEN0000000000004'){
 
-                //     $iddocumento_sel = $fedocumento->ID_DOCUMENTO;
-                //     DB::connection($conexionbd)->statement("
-                //         UPDATE FE_DOCUMENTO 
-                //         SET COD_CONTACTO = 'ITTR000000000212'
-                //         WHERE 1=1
-                //           AND RUC_PROVEEDOR IN ('20600004027','20602740278','10451734739')
-                //           AND COD_ESTADO = 'ETM0000000000005' 
-                //           AND COD_CONTACTO <> 'ITTR000000000212'
-                //           AND FEC_VENTA >='2025-07-01'
-                //     ");
+                    $iddocumento_sel = $fedocumento->ID_DOCUMENTO;
+                    DB::connection($conexionbd)->statement("
+                        UPDATE FE_DOCUMENTO 
+                        SET COD_CONTACTO = 'ITTR000000000212'
+                        WHERE 1=1
+                          AND RUC_PROVEEDOR IN ('20600004027','20602740278')
+                          AND COD_ESTADO = 'ETM0000000000005' 
+                          AND COD_CONTACTO <> 'ITTR000000000212'
+                          AND FEC_VENTA >='2025-07-01'
+                    ");
 
-                // }
+                }
 
                 //enviar tablas de fe_documento y fe_detalledocuemto
                 if($documento_top->COD_CENTRO == 'CEN0000000000004' || $documento_top->COD_CENTRO == 'CEN0000000000006'){ //rioja
