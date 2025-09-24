@@ -4,28 +4,27 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 
 use Illuminate\Http\Request;
-use App\Traits\ValeRendirTraits;
+use App\Traits\ValeRendirReembolsoTraits;
 use App\Modelos\STDTrabajadorVale;
 use App\Modelos\WEBTipoMotivoValeRendir;
-use App\Modelos\WEBValeRendir;
+use App\Modelos\WEBValeRendirReembolso;
 use App\Modelos\WEBValeRendirDetalle;
 use App\Modelos\WEBRegistroImporteGastos;
 use App\Modelos\ALMCentro;
-use App\Modelos\STDEmpresa;
 use App\Modelos\STDTrabajador;
 use Illuminate\Support\Carbon;
 use Session;
-use App\WEBRegla, APP\User, App\CMPCategoria;
+use App\WEBRegla, App\STDEmpresa, APP\User, App\CMPCategoria;
 use View;
 use Validator;
 
 
 
-class ValeRendirController extends Controller
+class ValeRendirControllerReembolso extends Controller
 {
-    use ValeRendirTraits;  
+    use ValeRendirReembolsoTraits;  
 
-      public function actionValeRendir(Request $request)
+      public function actionValeRendirReembolso(Request $request)
 
     {
        $trabajador     =   DB::table('STD.TRABAJADOR')
@@ -72,28 +71,7 @@ class ValeRendirController extends Controller
         $tipoMotivo = WEBTipoMotivoValeRendir::where('cod_estado',1)->pluck('txt_motivo', 'cod_motivo')->toArray();
         $cod_usuario_registro = Session::get('usuario')->id;
         $cod_empr = Session::get('empresas')->COD_EMPR;
-
-
-        //CUENTA BANCARIA
-
-         $cod_empr_cli = DB::table('users as usu')
-            ->join('SGD.USUARIO as us', 'usu.usuarioosiris_id', '=', 'us.COD_TRABAJADOR')
-            ->join('STD.TRABAJADOR as tra', 'tra.COD_TRAB', '=', 'us.COD_TRABAJADOR')
-            ->join('STD.EMPRESA as emp', 'emp.NRO_DOCUMENTO', '=', 'tra.NRO_DOCUMENTO')
-            ->where('usu.id', $cod_usuario_registro)
-            ->value('emp.COD_EMPR');
-
-
-        $empresatrabjador = STDEmpresa::where('COD_EMPR','=',$cod_empr_cli)->first();
-        $nrodocumentotrab = $empresatrabjador->NRO_DOCUMENTO;
-
-        $values                 =   [$nrodocumentotrab,$cod_empr];
-        $datoscuentasueldo      =   DB::select('exec ListaTrabajadorCuentaSueldo ?,?',$values);   
-
-        $txt_categoria_banco = $datoscuentasueldo[0]->entidad ?? null;
-        $numero_cuenta  = $datoscuentasueldo[0]->numcuenta ?? null;
-
-
+    
 
         // DETALLE - VALE A RENDIR 
          $destino = DB::table('WEB.REGISTRO_IMPORTE_GASTOS')
@@ -103,6 +81,7 @@ class ValeRendirController extends Controller
         ->groupBy('COD_DISTRITO', 'NOM_DISTRITO')
         ->pluck('NOM_DISTRITO', 'COD_DISTRITO')
         ->toArray();
+
 
 
         $importeDestinos = DB::table('WEB.REGISTRO_IMPORTE_GASTOS as main')
@@ -160,11 +139,9 @@ class ValeRendirController extends Controller
                 ->where('ACTIVO', 1)
                 ->get();
 
-            $tipopago = [
-                    0 => 'EFECTIVO',
-                    1 => 'TRANSFERENCIA'
-                ];
 
+        
+      
             reset($usuariosAu);
             $usuario_autoriza_predeterminado = key($usuariosAu);
 
@@ -177,9 +154,8 @@ class ValeRendirController extends Controller
         $combo2 = array('' => 'Seleccione Tipo o Motivo') + $tipoMotivo;
         $combo3 = array('' => 'Seleccione Destino') + $destino;
         $combo4 = array('' => 'Seleccione Moneda') + $moneda;
-        $combo5 = array('' => 'Seleccione Tipo Pago') + $tipopago;
 
-        $listarusuarios = $this->listaValeRendir(
+        $listarusuarios = $this->listaValeRendirReembolso(
     	        "GEN",
     	        "",
     	        "",
@@ -193,64 +169,24 @@ class ValeRendirController extends Controller
     	        ""
     	    );
 
-         $listarusuariosDetalle = $this->listaValeRendirDetalle(
-                "GEN",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                0.0,
-                ""
-            );  
 
-         $listarValePendientes =  $this->listaValeRendirPendientes(
-                "$cod_usuario_registro"
-               
-            );
-
-         $listarLiquidacionesPendientes =  $this->listaLiquidacionesPendientes(
-                "$cod_usuario_registro"
-               
-            );
-
-         $listarDocumentoXML_CDR =  $this->listaDocumentoXML_CDR(
-                "$cod_empr",
-                "$cod_usuario_registro"
-               
-            );
-         $listarlistanegra =  $this->listaNegraProveedores(
-                "$cod_empr"  
-            );
-
-        return view('valerendir.ajax.modalvalerendir', [
+        return view('valerendirreembolso.ajax.modalvalerendirreembolso', [
         	'listausuarios' => $combo,
             'listausuarios1' => $combo1,
             'listausuarios2' => $combo2,
             'listausuarios3' => $combo3,
             'listausuarios4' => $combo4,
-            'listausuarios5' => $combo5,
-            'txt_categoria_banco'   => $txt_categoria_banco,
-            'numero_cuenta'         => $numero_cuenta,
             'usuario_aprueba_predeterminado' => $usuario_aprueba_predeterminado,
             'usuario_autoriza_predeterminado' => $usuario_autoriza_predeterminado,
             'listarusuarios' => $listarusuarios,      
             'nom_centro' => $nom_centro,
             'importeDestinos' => $importeDestinos,
-            'listarValePendientes' => $listarValePendientes,
-            'listarLiquidacionesPendientes' => $listarLiquidacionesPendientes,
-            'listarDocumentoXML_CDR' => $listarDocumentoXML_CDR,
-            'listarlistanegra' => $listarlistanegra,
             'ajax'=>true,   
         ]);
     }
 
 
- public function insertValeRendirAction(Request $request)
+ public function insertValeRendirActionReembolso(Request $request)
     {
         $usuario_autoriza   = $request->input('usuario_autoriza');
         $usuario_aprueba    = $request->input('usuario_aprueba');
@@ -259,15 +195,12 @@ class ValeRendirController extends Controller
         $can_total_importe  = $request->input('can_total_importe');
         $can_total_saldo    = $request->input('can_total_saldo');
         $cod_moneda         = $request->input('cod_moneda');
-        $tipo_pago          = (int) $request->input('tipo_pago');
-        $txt_categoria_banco   = $request->input('txt_categoria_banco');
-        $numero_cuenta         = $request->input('numero_cuenta');
         $vale_rendir_id     = $request->input('vale_rendir_id');
         $opcion             = $request->input('opcion');
         $array_detalle      = $request->input('array_detalle');
 
-        $cod_categoria_estado_vale = 'ETM0000000000001'; // GENERADO
-        $txt_categoria_estado_vale = 'GENERADO';
+        $cod_categoria_estado_vale = 'ETM0000000000005'; // GENERADO
+        $txt_categoria_estado_vale = 'APROBADO';
         $cod_usuario_registro      = Session::get('usuario')->id;
         $txt_nom_solicita          = User::where('id', $cod_usuario_registro)->value('nombre');
 
@@ -291,12 +224,12 @@ class ValeRendirController extends Controller
         // ACTUALIZACIÓN
         if ($opcion === 'U') {
 
-            $estado_vale = WEBValeRendir::where('id', $vale_rendir_id)->value('cod_categoria_estado_vale');
+            $estado_vale = WEBValeRendirReembolso::where('id', $vale_rendir_id)->value('cod_categoria_estado_vale');
             if ($estado_vale === 'ETM0000000000005') {
                 return response()->json(['error' => 'Vale de rendir procesado correctamente.']);
             }
 
-            $this->insertValeRendir(
+            $this->insertValeRendirReembolso(
                 "U",
                 $vale_rendir_id,
                 "", "", "", "", "",
@@ -309,13 +242,12 @@ class ValeRendirController extends Controller
                 "", "",
                 $tipo_motivo,
                 $cod_moneda,
-                $tipo_pago,
+                "",
                 $txt_glosa,
                 "", "", "",
                 $can_total_importe,
                 $can_total_saldo,
-                $txt_categoria_banco, 
-                $numero_cuenta,
+                "", "",
                 $cod_categoria_estado_vale,
                 $txt_categoria_estado_vale,
                 true,
@@ -323,7 +255,7 @@ class ValeRendirController extends Controller
             );
 
             // Eliminar y volver a insertar el detalle
-            $this->insertValeRendirDetalle(
+            $this->insertValeRendirDetalleReembolso(
                 "D",
                 $vale_rendir_id,
                 "01/01/1901",
@@ -346,7 +278,7 @@ class ValeRendirController extends Controller
 
             if (count($array_detalle) > 0) {
                 foreach ($array_detalle as $array) {
-                    $this->insertValeRendirDetalle(
+                    $this->insertValeRendirDetalleReembolso(
                         "I",
                         $vale_rendir_id,
                         $array['fec_inicio'],
@@ -378,31 +310,14 @@ class ValeRendirController extends Controller
         // INSERCIÓN
         else {
             $cod_usuario_registro = Session::get('usuario')->id;
+            $listarValePendientes = $this->listaValeRendirPendientes($cod_usuario_registro);
 
-             $pendienteCount = DB::table('WEB.VALE_RENDIR as vr')
-                ->where('vr.COD_USUARIO_CREA_AUD', $cod_usuario_registro)
-                ->whereIn('vr.COD_CATEGORIA_ESTADO_VALE', [
-                    'ETM0000000000007', // Emitido
-                    'ETM0000000000001', // Pendiente
-                    'ETM0000000000005', // Rendido (pero sin liquidación cerrada)
-                ])
-                ->whereNotIn('vr.ID', function ($query) use ($cod_usuario_registro) {
-                    $query->select('lg.ARENDIR_ID')
-                          ->from('LQG_LIQUIDACION_GASTO as lg')
-                          ->whereIn('lg.COD_ESTADO', [
-                              'ETM0000000000005', // Rendido
-                              'ETM0000000000006'  // Cerrado
-                          ])
-                          ->where('lg.USUARIO_CREA', $cod_usuario_registro);
-                })
-                ->count();
-
-        if ($pendienteCount >= 2) {
-            return response()->json([
-                'error' => 'Usted tiene 2 vales pendientes por rendir. No puede generar un tercer vale.'
-            ]);
-        }
-            $this->insertValeRendir(
+            if (count($listarValePendientes) >= 2) {
+                return response()->json([
+                    'error' => 'Usted tiene 2 vales pendientes por rendir. No puede generar un tercer vale.'
+                ]);
+            }
+            $this->insertValeRendirReembolso(
                 "I",
                 "", "", "", "", "", "",
                 $cod_empr_cli,
@@ -414,15 +329,12 @@ class ValeRendirController extends Controller
                 "", "",
                 $tipo_motivo,
                 $cod_moneda,
-                $tipo_pago,
-                $txt_glosa,
-                "", 
-                "", 
                 "",
+                $txt_glosa,
+                "", "", "",
                 $can_total_importe,
                 $can_total_saldo,
-                $txt_categoria_banco, 
-                $numero_cuenta,
+                "", "",
                 $cod_categoria_estado_vale,
                 $txt_categoria_estado_vale,
                 true,
@@ -430,7 +342,7 @@ class ValeRendirController extends Controller
             );
 
             $cod_empr_aux = Session::get('empresas')->COD_EMPR;
-            $ultimoVale = WEBValeRendir::where('COD_EMPR', $cod_empr_aux)
+            $ultimoVale = WEBValeRendirReembolso::where('COD_EMPR', $cod_empr_aux)
                 ->orderBy('id', 'DESC')
                 ->first();
 
@@ -446,7 +358,7 @@ class ValeRendirController extends Controller
 
                     if ($opcion_detalle === 'U') {
                         $detalle_id = $array['detalle_id'] ?? null;
-                        $this->insertValeRendirDetalle(
+                        $this->insertValeRendirDetalleReembolso(
                             "U",
                             $detalle_id,
                             $array['fec_inicio'],
@@ -460,7 +372,7 @@ class ValeRendirController extends Controller
                             ""
                         );
                     } elseif ($opcion_detalle === 'I') {
-                        $this->insertValeRendirDetalle(
+                        $this->insertValeRendirDetalleReembolso(
                             "I",
                             $nuevo_vale_id,
                             $array['fec_inicio'],
@@ -503,7 +415,7 @@ class ValeRendirController extends Controller
            $txt_nom_autoriza = "";
            $txt_nom_aprueba = "";
 
-            $this->insertValeRendir(
+            $this->insertValeRendirReembolso(
                 'D', 
                 $id_buscar,
                 '', 
@@ -548,7 +460,7 @@ class ValeRendirController extends Controller
             return response()->json(['error' => 'ID del detalle no proporcionado.'], 400);
         }
 
-        $this->insertValeRendirDetalle(
+        $this->insertValeRendirDetalleReembolso(
             "X",              
             $idDetalle,        
             "",
@@ -573,10 +485,10 @@ class ValeRendirController extends Controller
     }
 
 
-	public function traerdataValeRendirAction(Request $request)
+	public function traerdataValeRendirActionReembolso(Request $request)
     {
         $id_buscar = $request->input('valerendir_id');
-        $usuarios = WEBValeRendir::where('ID', $id_buscar)->get(['ID', 'USUARIO_AUTORIZA', 'USUARIO_APRUEBA', 'TIPO_MOTIVO',  'CAN_TOTAL_IMPORTE', 'CAN_TOTAL_SALDO', 'TIPO_PAGO' , 'TXT_CATEGORIA_BANCO', 'NRO_CUENTA' , 'TXT_GLOSA', 'TXT_CATEGORIA_ESTADO_VALE', 'COD_MONEDA'])->toJson();
+        $usuarios = WEBValeRendirReembolso::where('ID', $id_buscar)->get(['ID', 'USUARIO_AUTORIZA', 'USUARIO_APRUEBA', 'TIPO_MOTIVO',  'CAN_TOTAL_IMPORTE', 'CAN_TOTAL_SALDO', 'TXT_GLOSA', 'TXT_CATEGORIA_ESTADO_VALE', 'COD_MONEDA'])->toJson();
         return $usuarios;
 
     }
@@ -584,7 +496,7 @@ class ValeRendirController extends Controller
     public function traerdataValeRendirActionDetalle(Request $request)
     {
         $id_buscar = $request->input('valerendir_id');
-        $detalle = WEBValeRendirDetalle::where('ID', $id_buscar)->WHERE('COD_ESTADO', 1)->get(['ID', 'FEC_INICIO', 'FEC_FIN', 'COD_DESTINO', 'NOM_DESTINO', 'NOM_TIPOS', 'DIAS', 'CAN_UNITARIO', 'CAN_UNITARIO_TOTAL', 'CAN_TOTAL_IMPORTE', 'IND_DESTINO'])->toJson();
+        $detalle = WEBValeRendirDetalleReembolso::where('ID', $id_buscar)->WHERE('COD_ESTADO', 1)->get(['ID', 'FEC_INICIO', 'FEC_FIN', 'COD_DESTINO', 'NOM_DESTINO', 'NOM_TIPOS', 'DIAS', 'CAN_UNITARIO', 'CAN_UNITARIO_TOTAL', 'CAN_TOTAL_IMPORTE', 'IND_DESTINO'])->toJson();
         return $detalle;
 
     }
@@ -594,7 +506,7 @@ class ValeRendirController extends Controller
         $id_buscar = $request->input('valerendir_id'); 
     
    
-    $detallesImporte = WEBValeRendirDetalle::where('ID', $id_buscar)->get(); 
+    $detallesImporte = WEBValeRendirDetalleReembolso::where('ID', $id_buscar)->get(); 
 
     return view('valerendir.ajax.modaldetalleimporte', [
         'ajax' => true,

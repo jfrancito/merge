@@ -21,7 +21,7 @@
                     </div>
                     
                     <div class="listajax">
-                            @include('valerendir.firma.listamodalfirmavalerendir')
+                            @include('valerendir.firma.listamodalfirmaprincipal')
                     </div> 
                 </div>
             </div>
@@ -88,6 +88,45 @@
 
       });
     </script> 
+
+    <script>
+function abrirPdoc(id) {
+    fetch(`/valerendir/exportarpdf/${id}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'ok') {
+                let win = window.open(data.url, "_blank");
+
+                let check = setInterval(() => {
+                    if (win.closed) {
+                        clearInterval(check);
+                        verificarFirma(id);
+                    }
+                }, 1000);
+            }
+        })
+        .catch(err => console.error(err));
+}
+
+function verificarFirma(id) {
+    let intentos = 0;
+    let intervalo = setInterval(() => {
+        fetch(`/valerendir/verificarfirma/${id}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.firmado) {
+                    clearInterval(intervalo);
+                    location.reload();
+                } else if (intentos++ > 10) { 
+                    // ❗ Timeout: después de 10 intentos (~10s) recarga igual
+                    clearInterval(intervalo);
+                    location.reload();
+                }
+            });
+    }, 1000);
+}
+</script>
+
 <script>
 </script>
 <script src="{{ asset('public/js/vale/valefirma.js?v='.$version) }}" type="text/javascript"></script>

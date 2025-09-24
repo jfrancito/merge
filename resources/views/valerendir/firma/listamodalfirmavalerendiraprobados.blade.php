@@ -5,7 +5,7 @@
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
 
-<table table id="tablalistafirmavale" class="table table-striped table-borderless">
+<table table id="tablalistafirmavaleaprobados" class="table table-striped table-borderless">
   <thead style="background-color: #1d3a6d; color: white;">
         <tr>
             <th>ITEM</th>
@@ -28,17 +28,17 @@
   </thead>
 
       <tbody>
-              @foreach($pendientes as $index=>$item) 
+          @foreach($aprobados as $index=>$item)
            <tr>
               <td>{{ $index + 1 }}</td>
               <td>{{$item['ID_AUTORIZACION']}}</td> 
               <td>{{$item['FECHA']}}</td>    
               <td>{{$item['SERIE']}}</td>    
               <td>{{$item['NUMERO']}}</td>    
-              <td>{{$item['NOM_SOLICITA']}}</td>    
+              <td style="width:150px;">{{$item['NOM_SOLICITA']}}</td>
               <td>{{$item['CONTRATO']}}</td>               
               <td>{{$item['CULTIVO']}}</td>    
-              <td>{{$item['TRA_AUTORIZA']}}</td>    
+              <td style="width:150px;">{{$item['TRA_AUTORIZA']}}</td>    
               <td>{{$item['DOCUMENTO']}}</td>  
               <td>{{$item['MONEDA']}}</td>
               <td>{{$item['TIPO_CAMBIO']}}</td>    
@@ -98,12 +98,14 @@
     }
 </style>
 
+
+
 <script>
 @if(isset($ajax))
         $(document).ready(function () {
         $('[data-toggle="tooltip"]').tooltip();
 
-        $('#tablalistafirmavale').DataTable({
+        $('#tablalistafirmavaleaprobados').DataTable({
             pageLength: 10,
             language: {
                 url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
@@ -113,7 +115,6 @@
         });
     });
     @endif
-
 </script>
 
 

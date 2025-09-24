@@ -62,9 +62,18 @@
                 @endif
 
 
+                @if($item['ESTADO_OSIRIS'] === 'GENERADO')
+                    <span class="badge bg-white text-dark">GENERADO</span>
+                @elseif($item['ESTADO_OSIRIS'] === 'COBRADO')
+                    <span class="badge badge-success">COBRADO</span>
+                @elseif($item['ESTADO_OSIRIS'] === 'RECHAZADO')
+                    <span class="badge badge-custom-danger">RECHAZADO</span>
+                 @endif
+
+
                 <div class="dropdown">
 
-                         <button class="btn btn-sm btn-outline-dark dropdown-toggle text-left btn-primary" style="margin-top: 7px;"
+                         <button class="btn btn-sm btn-outline-dark dropdown-toggle text-left btn-primary" style="margin-top: 1px;"
                                 type="button" id="dropdownAcciones{{ $item['ID'] }}"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                              <i class="mdi mdi-eye mr-1"></i> Ver Detalle

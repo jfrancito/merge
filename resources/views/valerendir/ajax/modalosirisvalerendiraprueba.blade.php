@@ -80,14 +80,14 @@
                     rows="2" readonly>{{ $glosaCliente }}</textarea>
             </div>
 
-            <div class="form-group">
+         {{--  <div class="form-group">
                 <label style="font-family: 'Times New Roman', serif; color: #1E90FF; font-size: 15px;">* Tipo de Pago</label>
                 <div class="custom-radio-group">
                     <label style="font-family: 'Times New Roman', serif; color: #708090; font-size: 13px;"><input type="radio" name="tipo_pago" id="radioEfectivo" value="efectivo"> Efectivo</label>
                     <label style="font-family: 'Times New Roman', serif; color: #708090; font-size: 13px;"> <input type="radio" name="tipo_pago" id="radioCaja" value="caja"> Transferencia</label>
                    
                 </div>
-            </div>
+            </div> 
 
             @php
                 $moneda = $cod_moneda === 'MON0000000000001';
@@ -95,7 +95,7 @@
                 $valorNumBanco = $moneda ? $numeroBanco : '';
             @endphp
 
-            <div id="selectContainer" class="form-row" style="display: none;">
+          <div id="selectContainer" class="form-row" style="display: none;">
                 <div class="form-group col-md-6">
                     <label for="nomBanco" style="font-family: 'Times New Roman', serif; color: #1E90FF; font-size: 15px;">* Entidad Bancaria</label>
                     <input type="text" id="nomBanco" name="nomBanco" class="form-control input-custom" 
@@ -106,8 +106,8 @@
                     <input type="text" id="numBanco" name="numBanco" class="form-control input-custom"
                          value="{{ $valorNumBanco }}"  maxlength="20"  data-numbanco="{{$valorNumBanco}}" autocomplete="off" @if($moneda) readonly @endif>
                 </div>
-            </div> 
-
+            </div>  --}}
+ 
             <div class="form-group">
                 <label for="glosa" style="font-family: 'Times New Roman', serif; color: #1E90FF; font-size: 15px;">* Glosa</label>
                 <textarea id="glosa" name="glosa" class="form-control input-custom" rows="2"
@@ -163,14 +163,14 @@
       
     });
 </script>
-
+{{--
 <script>
   document.getElementById('numBanco').addEventListener('keypress', function (e) {
     if (!/[0-9]/.test(e.key)) {
       e.preventDefault();
     }
   });
-</script>
+</script>--}}
 
 
 

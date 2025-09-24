@@ -20,7 +20,9 @@
             $item['COD_CATEGORIA_ESTADO_VALE'] == 'ETM0000000000005' && 
             (
                 $perfil_administracion == '1CIX00000020' || 
-                $perfil_administracion == '1CIX00000033'
+                $perfil_administracion == '1CIX00000033' ||
+                $perfil_administracion == '1CIX00000006' ||
+                $perfil_administracion == '1CIX00000019'   
             )
         )
         <tr data_vale_rendir="{{$item['ID']}}">
