@@ -24,22 +24,44 @@ class FirmaValeRendirController extends Controller
 {
     use ValeFirmaTraits;  
 
-    public function actionRegistroPersonalFirma(Request $request)
+ public function actionRegistroPersonalFirma(Request $request)
     {
-        $cod_empr = Session::get('empresas')->COD_EMPR;
+        $cod_empr   = Session::get('empresas')->COD_EMPR;
         $cod_centro = Session::get('empresas')->COD_CENTRO_SISTEMA;
 
-        $listarFirmaValeRendir = $this->listaFirmaValeRendir(
-            "$cod_empr",
-            "$cod_centro"
-        );
+        $listarFirmaValeRendir = $this->listaFirmaValeRendir($cod_empr, $cod_centro);
+
+        $pendientes = collect();
+        $aprobados  = collect();
+
+        foreach ($listarFirmaValeRendir as $item) {
+            $rutaArchivo = "\\\\10.1.50.2\\comprobantes\\PDF_VALE\\vale_{$item['ID_AUTORIZACION']}.pdf";
+
+            if (file_exists($rutaArchivo) && $this->pdfTieneFirma($rutaArchivo)) {
+                $aprobados->push($item);  
+            } else {
+                $pendientes->push($item); 
+            }
+        }
 
         return view('valerendir.firma.modalfirmavalerendir', [
-            'listarFirmaValeRendir' => $listarFirmaValeRendir,
-            'ajax' => true,   
+            'pendientes' => $pendientes,
+            'aprobados'  => $aprobados,
+            'ajax'       => true,
         ]);
     }
-    
+
+   
+    private function pdfTieneFirma($rutaArchivo)
+    {
+        if (!file_exists($rutaArchivo)) {
+            return false;
+        }
+
+        $contenido = file_get_contents($rutaArchivo, false, null, 0, 50000);
+        return strpos($contenido, '/Sig') !== false;
+    }
+
     public function actionexportarpdf($id)
     {
         // 📂 Ruta UNC a la carpeta compartida

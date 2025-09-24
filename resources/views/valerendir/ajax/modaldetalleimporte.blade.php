@@ -27,15 +27,16 @@
                     $totalGeneral += $detalle->CAN_TOTAL_IMPORTE;
                   @endphp
                 <tr class="text-center">
-                  <td>
-                    <strong class="text-uppercase">{{ $detalle->NOM_DESTINO }}</strong><br>
-                    <small class="text-muted fst-italic">
-                    {{ \Carbon\Carbon::parse($detalle->FEC_INICIO)->format('d/m/Y') ?? '' }}
-                      al
-                      {{ \Carbon\Carbon::parse($detalle->FEC_FIN)->format('d/m/Y') ?? '' }}
-                      ({{ $detalle->DIAS ?? '0' }} día(s))
-                    </small>
-                  </td>
+                 <td>
+                  <strong class="text-uppercase">{{ $detalle->NOM_DESTINO }}</strong><br>
+                  <small class="text-muted fst-italic">
+                    {{ \Carbon\Carbon::parse($detalle->FEC_INICIO)->format('d/m/Y H:i') ?? '' }}
+                     <br> al  <br>
+                    {{ \Carbon\Carbon::parse($detalle->FEC_FIN)->format('d/m/Y H:i') ?? '' }}  <br>
+                    ({{ $detalle->DIAS ?? '0' }} día(s))
+                  </small>
+                </td>
+
                   <td class="text-start">
                    {!! nl2br(e(str_replace('<br>', "\n", $detalle->NOM_TIPOS))) !!}
 

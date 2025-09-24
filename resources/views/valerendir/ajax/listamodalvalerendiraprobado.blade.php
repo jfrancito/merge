@@ -26,7 +26,9 @@
             $item['COD_CATEGORIA_ESTADO_VALE'] == 'ETM0000000000007' && 
             (
                 $perfil_administracion == '1CIX00000020' || 
-                $perfil_administracion == '1CIX00000033'
+                $perfil_administracion == '1CIX00000033' ||
+                $perfil_administracion == '1CIX00000006' ||
+                $perfil_administracion == '1CIX00000019' 
             )
         )
         <tr data_vale_rendir="{{$item['ID']}}">
@@ -64,6 +66,15 @@
                         <span class="badge badge-custom-danger mb-4">{{$item['TXT_CATEGORIA_ESTADO_VALE']}}</span>
                     @endif
 
+
+                    @if($item['ESTADO_OSIRIS'] === 'GENERADO')
+                        <span class="badge bg-white text-dark">GENERADO</span>
+                    @elseif($item['ESTADO_OSIRIS'] === 'COBRADO')
+                        <span class="badge badge-success">COBRADO</span>
+                    @elseif($item['ESTADO_OSIRIS'] === 'RECHAZADO')
+                         <span class="badge badge-custom-danger">RECHAZADO</span>
+                    @endif
+           
                     {{-- Ver Detalle --}}
                     <div class="dropdown">
                         <button class="btn btn-sm btn-outline-dark dropdown-toggle btn-primary"

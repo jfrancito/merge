@@ -1,13 +1,12 @@
 <div class="panel panel-default panel-table">
     <div class="panel panel-default panel-border-color panel-border-color-success">
-        <div class="panel-heading">Solicitud de Vale 
+        <div class="panel-heading">Solicitud de Vale Reembolso
         </div>
     </div>
     <div class="panel-body selectfiltro">
-        <div class='filtrotabla '>
 
-            <div class="container">
-                <div class="row">
+
+        <div class='filtrotabla row'>
             <div class="col-xs-12">
 
                 <input type="hidden" id="vale_rendir_id" value=""/>
@@ -29,6 +28,23 @@
                     </div>
                 </div>
 
+            {{--    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
+                    <div class="form-group">
+                        <label class="col-sm-12 control-label labelleft">Aprueba :</label>
+                        <div class="col-sm-12 abajocaja">
+
+                            {!! Form::select('cliente_select1', $listausuarios1, $usuario_aprueba_predeterminado,
+                               [
+                                 'class'       => 'form-control control select2',
+                                 'id'          => 'cliente_select1',
+                                 'data-aw'     => '1',
+                                 'disabled'    => 'disabled', 
+                               ])
+                            !!}
+
+                        </div>
+                    </div>
+                </div>  --}}
 
                 <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
                     <div class="form-group">
@@ -97,22 +113,34 @@
                 </div>
 
 
-            </div>
+                <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
+                    <div class="form-group">
+                        <label class="col-sm-12 control-label labelleft">Glosa :</label>
+                        <div class="col-sm-12 input-group xs-mb-15">
+                            <textarea id="txt_glosa" name="" placeholder="Glosa" required=""
+                                      autocomplete="off" class="form-control custom-glosa-height"
+                                      data-aw="4"></textarea>
+                            <span class="input-group-btn">
+                            <button id="asignarvalerendir" type="button" class="btn btn-primary ">
+                                  <font style="vertical-align: inherit;"><font
+                                              style="vertical-align: inherit;">Guardar</font></font>
+                                </button>
+                           </span>
+                        </div>
+                    </div>
                 </div>
+
             </div>
 
             <div class="listadetalleajax"></div>
-            @include('valerendir.ajax.modalvalerendircuentabancaria')
-            <div class="ajaxvacio text-center fw-bold"></div>
+
+            <div class="ajaxvacio text-center fw-bold">
+                COMPLETE LOS CAMPOS CORRECTAMENTE ...
+            </div>
 
             <input type="text" id="vale_rendir_id" hidden>
-            <div class="container">
-                <div class="row">
-                    <div class="col-xs-12">
-                        @include('valerendir.modal.detallerendir')
-                    </div>
-                </div>
-            </div>
+            @include('valerendir.modal.detallerendir')
+
             <div id="vale_rendir_detalle" style="display: none;">
 
 
@@ -195,14 +223,13 @@
                 </div>
 
 
-                @include('valerendir.ajax.modalverdetalleimportegastosvalerendir')
-
+              
 
                 <div class="col-xs-12">
                     <div class='listacontratomasiva listajax reporteajax'>
                     </div>
                 </div>
-                @include('valerendir.ajax.listamodaldetalleregistroimporte')
+              @include('valerendir.ajax.listamodaldetalleregistroimporte')
 
             </div>
 
@@ -211,7 +238,7 @@
                 </div>
             </div>
             <div class='listajax'>
-                @include('valerendir.ajax.listamodalvalerendir')
+                   @include('valerendirreembolso.ajax.listamodalvalerendirreembolso')
 
             </div>
         </div>

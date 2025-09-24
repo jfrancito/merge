@@ -6,7 +6,6 @@
             <th class="col">Autoriza</th>
             <th class="col">Aprueba</th>
             <th class="col">Motivo</th>
-            <th class="col">Tipo Pago</th>
             <th class="col">Importe</th>
             <th class="col">Saldo</th>
             <th class="col">Glosa</th>  
@@ -25,7 +24,6 @@
             <td>{{$item['USUARIO_AUTORIZA']}}</td>
             <td>{{$item['USUARIO_APRUEBA']}}</td>
             <td>{{$item['TIPO_MOTIVO']}}</td>
-            <td>{{ $item['TIPO_PAGO'] == 0 ? 'EFECTIVO' : 'TRANSFERENCIA' }}</td>
             <td>{{$item['COD_MONEDA'] == 'MON0000000000001' ? 'S/.' : '$' }} {{ $item['CAN_TOTAL_IMPORTE'] }}</td>
             <td>{{$item['COD_MONEDA'] == 'MON0000000000001' ? 'S/.' : '$' }} {{ $item['CAN_TOTAL_SALDO'] }}</td>
 
@@ -183,28 +181,3 @@
     }
 </style>
 
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-    const table = document.getElementById('vale');
-    const rows = table.querySelectorAll('tbody tr');
-
-    rows.forEach(row => {
-        row.addEventListener('click', function () {
-            // quitar selección previa
-            rows.forEach(r => r.classList.remove('selected'));
-            // marcar la fila actual
-            this.classList.add('selected');
-        });
-    });
-
-    // limpiar selección al hacer click fuera de la tabla
-    document.addEventListener('click', function (e) {
-        const isClickInside = table.contains(e.target);
-        if (!isClickInside) {
-            rows.forEach(r => r.classList.remove('selected'));
-        }
-    });
-});
-
-</script>

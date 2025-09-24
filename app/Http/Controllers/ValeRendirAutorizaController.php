@@ -34,7 +34,6 @@ class ValeRendirAutorizaController extends Controller
         $usuariosAu = STDTrabajadorVale::where('ind_autoriza', 1)->pluck('nombre', 'cod_trabajador_vale')->toArray();
         $tipoMotivo = WEBTipoMotivoValeRendir::where('cod_estado',1)->pluck('txt_motivo', 'cod_motivo')->toArray();
 
-        
         $combo = array('' => 'Seleccione Usuario Autoriza') + $usuariosAu;
         $combo1 = array('' => 'Seleccione Usuario Aprueba') + $usuariosAp;
         $combo2 = array('' => 'Seleccione Tipo o Motivo') + $tipoMotivo;
@@ -44,7 +43,7 @@ class ValeRendirAutorizaController extends Controller
 
 
         $usuario_logueado_id = Session::get('usuario')->usuarioosiris_id;
-
+        
         
         $listarusuarios = $this->listaValeRendirAutoriza(
                 "GEN",
@@ -80,6 +79,8 @@ class ValeRendirAutorizaController extends Controller
 
 
         $valerendir_id = $request->input('valerendir_id');
+        $vale = WEBValeRendir::where('ID', $id_buscar)->first();
+
 
         $registro = DB::table('WEB.VALE_RENDIR')
         ->select('COD_CENTRO')
@@ -88,7 +89,7 @@ class ValeRendirAutorizaController extends Controller
 
         $cod_centro = $registro ? $registro->COD_CENTRO : null;
 
-
+    
             $this->insertValeRendirAutoApruebaRechaza(
                 'D', 
                 $id_buscar,
@@ -107,15 +108,15 @@ class ValeRendirAutorizaController extends Controller
                 '',
                 '',
                 '', 
-                '',
+                $vale->TIPO_PAGO,
                 '',
                 $txt_glosa_autorizado,
                 '',
                 '',
                 0.0, 
                 0.0,
-                '',
-                '',
+                $vale->TXT_CATEGORIA_BANCO,
+                $vale->NRO_CUENTA,
                 $cod_categoria_estado_vale,
                 $txt_categoria_estado_vale, 
                 false,
@@ -135,6 +136,7 @@ class ValeRendirAutorizaController extends Controller
         $txt_categoria_estado_vale = 'RECHAZADO'; 
 
         $valerendir_id = $request->input('valerendir_id');
+        $vale = WEBValeRendir::where('ID', $id_buscar)->first();
 
         $registro = DB::table('WEB.VALE_RENDIR')
         ->select('COD_CENTRO')
@@ -145,6 +147,7 @@ class ValeRendirAutorizaController extends Controller
 
         $usuario_logueado_id = Session::get('usuario')->usuarioosiris_id;
         $usuario_nombre_logueado_id = Session::get('usuario')->nombre;
+
 
            
             $this->insertValeRendirAutoApruebaRechaza(
@@ -165,15 +168,15 @@ class ValeRendirAutorizaController extends Controller
                 '', 
                 '',
                 '',
-                '',
+                $vale->TIPO_PAGO,
                 '',
                 '',
                 $txt_glosa_rechazado, 
                 '',
                 0.0, 
                 0.0,
-                '',
-                '',
+                $vale->TXT_CATEGORIA_BANCO,
+                $vale->NRO_CUENTA,
                 $cod_categoria_estado_vale,
                 $txt_categoria_estado_vale, 
                 false,

@@ -2,7 +2,7 @@
 
 namespace App\Traits;
 
-use App\Modelos\WEBValeRendir;
+use App\Modelos\WEBValeRendirReembolso;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\WEBRegla, App\STDTrabajador, App\STDEmpresa, App\CMPCategoria;
@@ -11,10 +11,10 @@ use App\User;
 use Session;
 use PDO;
 
-trait ValeRendirTraits
+trait ValeRendirReembolsoTraits
 {
 
-    public function insertValeRendir($ind_tipo_operacion, $id, $fec_autorizacion, $txt_serie, $txt_numero , $cod_empr, $cod_centro, $cod_empr_cli, 
+     public function insertValeRendirReembolso($ind_tipo_operacion, $id, $fec_autorizacion, $txt_serie, $txt_numero , $cod_empr, $cod_centro, $cod_empr_cli, 
                                      $txt_nom_solicita, $usuario_autoriza, $txt_nom_autoriza, $usuario_aprueba, $txt_nom_aprueba, $cod_contrato, 
                                      $sub_cuenta, $tipo_motivo, $cod_moneda, $tipo_pago, $txt_glosa, $txt_glosa_autorizado,  $txt_glosa_rechazado, $txt_glosa_aprobado, 
                                      $can_total_importe, $can_total_saldo, $txt_categoria_banco, $numero_cuenta, $cod_categoria_estado_vale, 
@@ -22,7 +22,7 @@ trait ValeRendirTraits
 
     {
          try {
-                  $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC WEB.VALE_RENDIR_IUD
+                  $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC WEB.VALE_RENDIR_REEMBOLSO_IUD
                                                                         @IND_TIPO_OPERACION = ?,
                                                                         @ID = ?,
                                                                         @FEC_AUTORIZACION = ?,
@@ -123,7 +123,7 @@ trait ValeRendirTraits
 
 
 
-     public function insertValeRendirAutoApruebaRechaza($ind_tipo_operacion, $id, $fec_autorizacion, $txt_serie, $txt_numero , $cod_empr, $cod_centro, $cod_empr_cli, 
+     public function insertValeRendirAutoApruebaRechazaReembolso($ind_tipo_operacion, $id, $fec_autorizacion, $txt_serie, $txt_numero , $cod_empr, $cod_centro, $cod_empr_cli, 
                                      $txt_nom_solicita, $usuario_autoriza, $txt_nom_autoriza, $usuario_aprueba, $txt_nom_aprueba, $cod_contrato, 
                                      $sub_cuenta, $tipo_motivo, $cod_moneda, $tipo_pago, $txt_glosa, $txt_glosa_autorizado,  $txt_glosa_rechazado, $txt_glosa_aprobado, 
                                      $can_total_importe, $can_total_saldo, $txt_categoria_banco, $numero_cuenta, $cod_categoria_estado_vale, 
@@ -131,7 +131,7 @@ trait ValeRendirTraits
 
     {
          try {
-                  $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC WEB.VALE_RENDIR_IUD
+                  $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC WEB.VALE_RENDIR_REEMBOLSO_IUD
                                                                         @IND_TIPO_OPERACION = ?,
                                                                         @ID = ?,
                                                                         @FEC_AUTORIZACION = ?,
@@ -210,7 +210,7 @@ trait ValeRendirTraits
 
 
 
-    public function insertValeRendirOsiris($ind_tipo_operacion, $id, $cod_empr, $cod_centro, $cod_empresa, $txt_empresa, 
+    public function insertValeRendirOsirisReembolso($ind_tipo_operacion, $id, $cod_empr, $cod_centro, $cod_empresa, $txt_empresa, 
                                               $cod_contrato, $cod_cultivo, $fec_autorizacion, $cod_tra_autoriza, 
                                               $txt_tra_autoriza, $cod_tipo_documento, $txt_tipo_documento, $txt_serie, $txt_numero, 
                                               $cod_categoria_moneda, $txt_categoria_moneda, $can_tipo_cambio, $can_total, 
@@ -303,7 +303,7 @@ trait ValeRendirTraits
     }
 
 
-    public function insertValeRendirDetalle($ind_tipo_operacion, $id, $fec_inicio, $fec_fin, $cod_empr, $cod_centro, $cod_destino, $nom_destino, $nom_tipos, $dias, $can_unitario, $can_unitario_total, $can_total_importe,  $ind_destino, $ind_propio , $ind_aereo, $cod_estado, $cod_usuario_registro)
+    public function insertValeRendirDetalleReembolso($ind_tipo_operacion, $id, $fec_inicio, $fec_fin, $cod_empr, $cod_centro, $cod_destino, $nom_destino, $nom_tipos, $dias, $can_unitario, $can_unitario_total, $can_total_importe,  $ind_destino, $ind_propio , $ind_aereo, $cod_estado, $cod_usuario_registro)
 
     {
 
@@ -311,7 +311,7 @@ trait ValeRendirTraits
          try {
 
             
-                  $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC WEB.VALE_RENDIR_DETALLE_IUD
+                  $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC WEB.VALE_RENDIR_DETALLE_REEMBOLSO_IUD
                                                                         @IND_TIPO_OPERACION = ?,
                                                                         @ID = ?,
                                                                         @FEC_INICIO = ?,
@@ -388,7 +388,7 @@ trait ValeRendirTraits
       }
     }
 
-     public function listaValeRendir($ind_tipo_operacion, $id, $cod_empr, $cod_centro, $usuario_autoriza, $usuario_aprueba, $tipo_motivo,
+     public function listaValeRendirReembolso($ind_tipo_operacion, $id, $cod_empr, $cod_centro, $usuario_autoriza, $usuario_aprueba, $tipo_motivo,
                                       $txt_glosa, $can_total_importe, $can_total_saldo, $cod_usuario_registro)
     {
         $array_lista_retail = array();
@@ -417,7 +417,7 @@ trait ValeRendirTraits
 
 
                 $cod_centro = $centrot->COD_CENTRO; 
-        $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC WEB.VALE_RENDIR_LISTAR
+        $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC WEB.VALE_RENDIR_REEMBOLSO_LISTAR
 
                                                              @IND_TIPO_OPERACION = ?,
                                                              @ID = ?, 
@@ -453,7 +453,7 @@ trait ValeRendirTraits
         return $array_lista_retail;
     }
 
-   public function listaValeRendirDetalle($ind_tipo_operacion, $id, $cod_empr, $cod_centro, $cod_destino,
+   public function listaValeRendirDetalleReembolso($ind_tipo_operacion, $id, $cod_empr, $cod_centro, $cod_destino,
                                       $nom_destino, $nom_tipos, $dias, $can_unitario, $can_unitario_total, $can_total_importe, $cod_usuario_registro)  
     {
         $array_lista_retail = array();
@@ -484,7 +484,7 @@ trait ValeRendirTraits
 
                 $cod_centro = $centrot->COD_CENTRO; 
         
-        $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC WEB.VALE_RENDIR_DETALLE_LISTAR
+        $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC WEB.VALE_RENDIR_DETALLE_REEMBOLSO_LISTAR
                                                              @IND_TIPO_OPERACION = ?,
                                                              @ID = ?, 
                                                              @COD_EMPR = ?,
@@ -521,7 +521,7 @@ trait ValeRendirTraits
     }
 
 
-    public function listaValeRendirAutoriza($ind_tipo_operacion, $id, $cod_empr, $cod_centro, $usuario_autoriza, $usuario_aprueba, $tipo_motivo,
+    public function listaValeRendirAutorizaReembolso($ind_tipo_operacion, $id, $cod_empr, $cod_centro, $usuario_autoriza, $usuario_aprueba, $tipo_motivo,
                                              $txt_glosa, $can_total_importe, $can_total_saldo, $cod_usuario_registro)
     {
         /*$array_lista_retail = array();
@@ -570,7 +570,7 @@ trait ValeRendirTraits
         $cod_centro = '';
 
 
-        $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC WEB.VALE_RENDIR_LISTAR
+        $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC WEB.VALE_RENDIR_REEMBOLSO_LISTAR
 
                                                              @IND_TIPO_OPERACION = ?,
                                                              @ID = ?, 
@@ -610,7 +610,7 @@ trait ValeRendirTraits
 
 
 
-     public function listaValeRendirAprueba($ind_tipo_operacion, $id, $cod_empr, $cod_centro, $usuario_autoriza, $usuario_aprueba, $tipo_motivo,
+     public function listaValeRendirApruebaReembolso($ind_tipo_operacion, $id, $cod_empr, $cod_centro, $usuario_autoriza, $usuario_aprueba, $tipo_motivo,
                                     $txt_glosa, $can_total_importe, $can_total_saldo, $cod_usuario_registro)
     {
          $array_lista_retail = array();
@@ -625,7 +625,7 @@ trait ValeRendirTraits
         $cod_centro = '';
 
 
-        $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC WEB.VALE_RENDIR_LISTAR
+        $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC WEB.VALE_RENDIR_REEMBOLSO_LISTAR
 
                                                              @IND_TIPO_OPERACION = ?,
                                                              @ID = ?, 
@@ -771,7 +771,6 @@ trait ValeRendirTraits
 
         return $array_lista_retail;
     }
-
 
 
 }

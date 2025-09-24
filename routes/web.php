@@ -617,7 +617,7 @@ Route::group(['middleware' => ['authaw']], function () {
     Route::get('/gestionar-vale-rendir/{idopcion}', 'ValeRendirController@actionValeRendir');
     Route::post('/registrar_vale_rendir', 'ValeRendirController@insertValeRendirAction');
 	Route::post('/data_vale_rendir', 'ValeRendirController@traerdataValeRendirAction');
-Route::post('/ver_detalle_importe_vale', 'ValeRendirController@actionDetalleImporteVale');
+	Route::post('/ver_detalle_importe_vale', 'ValeRendirController@actionDetalleImporteVale');
     Route::post('/ver_mensaje_vale_rendir', 'ValeRendirController@actionMensajeValeRendir');
 
 	Route::get('/gestion-autoriza-rendir/{idopcion}', 'ValeRendirAutorizaController@actionValeRendirAutoriza');
@@ -681,6 +681,11 @@ Route::post('/ver_detalle_importe_vale', 'ValeRendirController@actionDetalleImpo
 
 	Route::get('/firma-de-vale/{idopcion}', 'FirmaValeRendirController@actionRegistroPersonalFirma');
 	Route::get('/exportar_pdf/{id}', 'FirmaValeRendirController@actionexportarpdf')->name('exportar_pdf');
+
+	//VALE A RENDIR REEMBOLSO
+	Route::get('/gestion-de-vale-rendir-reembolso/{idopcion}', 'ValeRendirControllerReembolso@actionValeRendirReembolso');
+    Route::post('/registrar_vale_rendir_reembolso', 'ValeRendirControllerReembolso@insertValeRendirActionReembolso');
+    Route::post('/data_vale_rendir_reembolso', 'ValeRendirControllerReembolso@traerdataValeRendirActionReembolso');
 
 
 
