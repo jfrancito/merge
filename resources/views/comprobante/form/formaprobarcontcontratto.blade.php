@@ -46,7 +46,7 @@
                                             </a>
                                         </li>
 
-                                        @if(Session::get('usuario')->id == '1CIX00000001' or Session::get('usuario')->id == '1CIX00000049')
+                                        @if(Session::get('usuario')->id == '1CIX00000001' or Session::get('usuario')->rol_id == '1CIX00000016' or Session::get('usuario')->rol_id == '1CIX00000015')
                                             <li>
                                                 <a class="elimnaritem"
                                                    href="{{ url('/eliminar-archivo-item-contrato/'.$item->TIPO_ARCHIVO.'/'.$item->NOMBRE_ARCHIVO.'/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -9))) }}">

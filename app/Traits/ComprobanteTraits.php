@@ -3585,6 +3585,18 @@ trait ComprobanteTraits
                                         ->pluck('COD_USUARIO')
                                         ->toArray();
 
+        $documento              =       DB::table('CMP.DOCUMENTO_CTBLE')
+                                        ->join('CMP.REFERENCIA_ASOC', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+                                        ->select(DB::raw('CMP.DOCUMENTO_CTBLE.*,REFERENCIA_ASOC.COD_TABLA,REFERENCIA_ASOC.COD_TABLA_ASOC'))
+                                        ->where('CMP.DOCUMENTO_CTBLE.COD_ESTADO','=','1')
+                                        ->whereIn('COD_CATEGORIA_TIPO_DOC', [
+                                            'TDO0000000000001',
+                                            'TDO0000000000003',
+                                            'TDO0000000000002',
+                                            'TDO0000000000010'
+                                        ]);
+
+
         if($rol->ind_uc == 1){
 
 
@@ -3592,6 +3604,13 @@ trait ComprobanteTraits
                                 ->join('FE_DETALLE_DOCUMENTO', 'FE_DETALLE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.Orden.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
+
+                                ->leftJoin(DB::raw("({$documento->toSql()}) as documentos"), function ($join) use ($documento) {
+                                        $join->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'documentos.COD_TABLA')
+                                             ->addBinding($documento->getBindings());
+                                    })
+                                ->leftjoin('WEBPAGOSOC', 'WEBPAGOSOC.COD_DOCUMENTO_CTBLE', '=', 'documentos.COD_DOCUMENTO_CTBLE')
+
                                 ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 ->where('OPERACION','=','ORDEN_COMPRA')
@@ -3609,6 +3628,12 @@ trait ComprobanteTraits
                                     CMP.Orden.TXT_GLOSA AS TXT_GLOSA_ORDEN,
                                     FE_DOCUMENTO.TXT_REPARABLE AS TXT_REPARABLE_SN, 
                                     FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_N,
+
+                                    WEBPAGOSOC.MEDIO_PAGO,
+                                    WEBPAGOSOC.FECHA_PAGO,
+                                    WEBPAGOSOC.NOMBRE_BANCO,
+                                    WEBPAGOSOC.IMPORTE,
+                                    
 
                                     CMP.CATEGORIA.NOM_CATEGORIA AS AREA, 
                                     (
@@ -3647,13 +3672,18 @@ trait ComprobanteTraits
                                 ->leftjoin('FE_DETALLE_DOCUMENTO', 'FE_DETALLE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.Orden.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
+                                ->leftJoin(DB::raw("({$documento->toSql()}) as documentos"), function ($join) use ($documento) {
+                                        $join->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'documentos.COD_TABLA')
+                                             ->addBinding($documento->getBindings());
+                                    })
+                                ->leftjoin('WEBPAGOSOC', 'WEBPAGOSOC.COD_DOCUMENTO_CTBLE', '=', 'documentos.COD_DOCUMENTO_CTBLE')
                                 ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 ->where('OPERACION','=','ORDEN_COMPRA')
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                //->where('FE_DOCUMENTO.ID_DOCUMENTO','=','IICHCL0000010224')
+                                ->where('FE_DOCUMENTO.ID_DOCUMENTO','=','IILMCR0000032231')
                                 ->select(DB::raw("
                                     FE_DOCUMENTO.*, 
                                     CMP.ORDEN.*,
@@ -3662,6 +3692,10 @@ trait ComprobanteTraits
                                     CMP.Orden.TXT_GLOSA AS TXT_GLOSA_ORDEN,
                                     FE_DOCUMENTO.TXT_REPARABLE AS TXT_REPARABLE_SN, 
                                     FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_N,
+                                    WEBPAGOSOC.MEDIO_PAGO,
+                                    WEBPAGOSOC.FECHA_PAGO,
+                                    WEBPAGOSOC.NOMBRE_BANCO,
+                                    WEBPAGOSOC.IMPORTE,
                                     CMP.CATEGORIA.NOM_CATEGORIA AS AREA, 
                                     (
                                         SELECT STUFF(
@@ -3691,11 +3725,6 @@ trait ComprobanteTraits
                                 "))
                                 ->orderBy('FEC_VENTA','asc')
                                 ->get();
-
-
-            //dd($listadatos);
-
-
         }
 
 
