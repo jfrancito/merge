@@ -2159,18 +2159,25 @@ $(document).ready(function () {
 
     $(".liquidaciongasto").on('change', '#arendir_id', function (e) {
         var arendir_id = $('#arendir_id').val();
-        if (arendir_id == 'SI') {
-            $('.sectorarendir').show();
-
-        } else {
-            $('.sectorarendir').hide();
-        }
+        var idopcion = $('#idopcion').val();
+        var _token = $('#token').val();
+        var link = "/ajax-combo-arendir";
+        var contenedor = "ajax_combo_arendir";
+        data = {
+            _token: _token,
+            arendir_id: arendir_id,
+            idopcion: idopcion
+        };
+        ajax_normal_combo(data, link, contenedor);
     });
 
 
     $(".liquidaciongasto").on('change', '#arendir_sel_id', function (e) {
 
         var arendir_sel_id = $('#arendir_sel_id').val();
+        var arendir_id = $('#arendir_id').val();
+
+
         var idopcion = $('#idopcion').val();
         var _token = $('#token').val();
         var link = "/ajax-combo-autoriza";
@@ -2178,6 +2185,7 @@ $(document).ready(function () {
         data = {
             _token: _token,
             arendir_sel_id: arendir_sel_id,
+            arendir_id: arendir_id,
             idopcion: idopcion
         };
         ajax_normal_combo(data, link, contenedor);

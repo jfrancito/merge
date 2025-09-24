@@ -52,6 +52,296 @@ trait LiquidacionGastoTraits
 {
 
 
+    private function validar_reembolso_supere_monto($liquidaciongastos,$indoperacion,$cod_vale,$importe,$producto_id,$resta) {
+
+        $array  =   array();
+        $monto = 0;
+        $mensaje = '';
+        if($liquidaciongastos->ARENDIR_ID != ''){
+            if($indoperacion=='REEMBOLSO'){
+                $ldetallearendir = DB::table('WEB.VALE_RENDIR_DETALLE_REEMBOLSO')
+                                    ->where('ID', $liquidaciongastos->ARENDIR_ID)
+                                    ->where('COD_ESTADO', 1)
+                                    ->get();
+            }else{
+                $ldetallearendir = DB::table('WEB.VALE_RENDIR_DETALLE')
+                                    ->where('ID', $liquidaciongastos->ARENDIR_ID)
+                                    ->where('COD_ESTADO', 1)
+                                    ->get();
+            }
+
+            if(count($ldetallearendir)>0){
+
+                $motivos = DB::table('WEB.TIPO_IMPORTE_MOTIVO')
+                    ->select('COD_IMPORTE_MOTIVO','TXT_IMPORTE_MOTIVO')
+                    ->get();
+                $mapaMotivos = $motivos->pluck('COD_IMPORTE_MOTIVO','TXT_IMPORTE_MOTIVO')->toArray();
+
+                $resultado = [];
+
+                foreach ($ldetallearendir as $item) {
+                    $conceptos = explode("<br>", $item->NOM_TIPOS);
+                    $montos = explode("<br>", $item->CAN_UNITARIO_TOTAL);
+
+                    foreach ($conceptos as $index => $concepto) {
+                        $monto = $montos[$index] ?? '0';
+                        $monto = floatval(str_replace(['S/.', ' '], '', $monto));
+
+                        // Buscar el ID en la tabla, si no existe dejar vacío
+                        $conceptoId = $mapaMotivos[$concepto] ?? '';
+
+                        // Agrupar
+                        if (!isset($resultado[$concepto])) {
+                            $resultado[$concepto] = [
+                                'concepto' => $concepto,
+                                'concepto_id' => $conceptoId,
+                                'monto' => 0,
+                            ];
+                        }
+                        $resultado[$concepto]['monto'] += $monto;
+                    }
+
+                }
+                // Convertir a array de salida
+                $array = array_values($resultado);
+                $indice = array_search($cod_vale, array_column($array, 'concepto_id'));
+                if ($indice !== false) {
+                    $monto = $array[$indice]['monto'];
+                } else {
+                    $monto = 0;
+                }
+
+                $total = DB::table('LQG_DETDOCUMENTOLIQUIDACIONGASTO')
+                    ->where('ID_DOCUMENTO', $liquidaciongastos->ID_DOCUMENTO)
+                    ->where('TXT_PRODUCTO', $producto_id)
+                    ->where('ACTIVO', 1)
+                    ->sum('TOTAL');
+
+                if($monto==0){
+                    $mensaje = 'El monto supera al producto o el producto no se encuentra configurado en el vale';
+                }
+
+                if (($total+$importe-$resta)>$monto) {
+                    $mensaje = 'El monto supera al producto que se encuentra configurado en el vale';
+                }
+            }
+
+        }
+
+        return  $mensaje;
+    }
+
+
+
+    private function lg_lista_arendirlg($liquidaciongastos,$indicador) {
+
+        $array  =   array();
+        if($liquidaciongastos->ARENDIR_ID != ''){
+
+            $ldetallearendir = DB::table('WEB.VALE_RENDIR_DETALLE')
+                                ->where('ID', $liquidaciongastos->ARENDIR_ID)
+                                ->where('COD_ESTADO', 1)
+                                ->get();
+
+            if(count($ldetallearendir)>0){
+
+                $motivos = DB::table('WEB.TIPO_IMPORTE_MOTIVO')
+                    ->select('COD_IMPORTE_MOTIVO','TXT_IMPORTE_MOTIVO')
+                    ->get();
+                $mapaMotivos = $motivos->pluck('COD_IMPORTE_MOTIVO','TXT_IMPORTE_MOTIVO')->toArray();
+
+                $resultado = [];
+
+                foreach ($ldetallearendir as $item) {
+                    $conceptos = explode("<br>", $item->NOM_TIPOS);
+                    $montos = explode("<br>", $item->CAN_UNITARIO_TOTAL);
+
+                    foreach ($conceptos as $index => $concepto) {
+                        $monto = $montos[$index] ?? '0';
+                        $monto = floatval(str_replace(['S/.', ' '], '', $monto));
+
+                        // Buscar el ID en la tabla, si no existe dejar vacío
+                        $conceptoId = $mapaMotivos[$concepto] ?? '';
+
+                        // Agrupar
+                        if (!isset($resultado[$concepto])) {
+                            $resultado[$concepto] = [
+                                'concepto' => $concepto,
+                                'concepto_id' => $conceptoId,
+                                'monto' => 0,
+                            ];
+                        }
+                        $resultado[$concepto]['monto'] += $monto;
+                    }
+                }
+
+                // Convertir a array de salida
+                $final = array_values($resultado);
+
+                $productos = DB::table('LQG_DETDOCUMENTOLIQUIDACIONGASTO')
+                    ->select(
+                        'COD_PRODUCTO',
+                        'TXT_PRODUCTO',
+                        DB::raw('SUM(CANTIDAD) as CANTIDAD'),
+                        DB::raw('SUM(TOTAL) as TOTAL')
+                    )
+                    ->where('ID_DOCUMENTO', $liquidaciongastos->ID_DOCUMENTO)
+                    ->where('ACTIVO', 1)
+                    ->groupBy('COD_PRODUCTO', 'TXT_PRODUCTO')
+                    ->get()
+                    ->toArray();
+
+
+                        // 1. Traer referencias intermedias
+                        // 1. Traer referencias intermedias
+                        $referencias = DB::table('CMP.REFERENCIA_ASOC')
+                            ->where('TXT_DESCRIPCION', 'ARENDIR')
+                            ->select('COD_TABLA','TXT_TABLA','COD_TABLA_ASOC','TXT_TABLA_ASOC')
+                            ->get()
+                            ->toArray();
+
+                        // 2. Pasamos productos y final a colecciones indexadas
+                        $mapaProductos = collect($productos)->keyBy('COD_PRODUCTO');
+                        $mapaFinal     = collect($final)->keyBy('concepto_id');
+
+                        // 3. Resultado principal
+                        $resultado = [];
+
+                        // Recorremos solo las referencias (pivot central)
+                        foreach ($referencias as $ref) {
+                            $producto = $mapaProductos[$ref->COD_TABLA_ASOC] ?? null;
+                            $concepto = $mapaFinal[$ref->COD_TABLA] ?? null;
+
+                            $resultado[] = [
+                                // Datos de producto (liquidación)
+                                'COD_PRODUCTO' => $producto->COD_PRODUCTO ?? $ref->COD_TABLA_ASOC,
+                                'TXT_PRODUCTO' => $producto->TXT_PRODUCTO ?? $ref->TXT_TABLA_ASOC,
+                                'TOTAL'        => $producto->TOTAL ?? '',
+
+                                // Datos de concepto (vale)
+                                'concepto_id'  => $concepto['concepto_id'] ?? $ref->COD_TABLA,
+                                'concepto'     => $concepto['concepto']    ?? $ref->TXT_TABLA,
+                                'monto'        => $concepto['monto']       ?? '',
+                            ];
+                        }
+
+                        // 4. Agregar productos que no tienen referencia
+                        foreach ($productos as $prod) {
+                            if (!collect($resultado)->contains('COD_PRODUCTO', $prod->COD_PRODUCTO)) {
+                                $resultado[] = [
+                                    'COD_PRODUCTO' => $prod->COD_PRODUCTO,
+                                    'TXT_PRODUCTO' => $prod->TXT_PRODUCTO,
+                                    'TOTAL'        => (float)$prod->TOTAL,
+                                    'concepto_id'  => '',
+                                    'concepto'     => '',
+                                    'monto'        => '',
+                                ];
+                            }
+                        }
+
+                        // 5. Agregar conceptos que no tienen referencia
+                        foreach ($final as $cons) {
+                            if (!collect($resultado)->contains('concepto_id', $cons['concepto_id'])) {
+                                $resultado[] = [
+                                    'COD_PRODUCTO' => '',
+                                    'TXT_PRODUCTO' => '',
+                                    'TOTAL'        => '',
+                                    'concepto_id'  => $cons['concepto_id'],
+                                    'concepto'     => $cons['concepto'],
+                                    'monto'        => $cons['monto'],
+                                ];
+                            }
+                        }
+                        $arrayFiltrado = array_filter($resultado, function($item) {
+                            return !empty($item['TOTAL']) && !empty($item['monto']);
+                        });
+
+                        // Si quieres reindexar el array
+                        $arrayFiltrado = array_values($arrayFiltrado);
+
+
+                        if($indicador == 0){
+
+                            $arrayFiltrado = collect($arrayFiltrado)
+                            ->groupBy('TXT_PRODUCTO')
+                            ->map(function($items, $producto) {
+                                if ($items->count() == 1) {
+                                    // Si solo hay uno, devolverlo tal como está
+                                    return $items->first();
+                                }
+                                
+                                // Si hay varios, agruparlos
+                                $primer_item = $items->first();
+                                
+                                return [
+                                    'COD_PRODUCTO' => $primer_item['COD_PRODUCTO'],
+                                    'TXT_PRODUCTO' => $producto,
+                                    'TOTAL' => $primer_item['TOTAL'], // Se mantiene el primero
+                                    'concepto_id' => $items->last()['concepto_id'], // Se toma el último
+                                    'concepto' => $items->pluck('concepto')->implode(', '), // Se concatenan
+                                    'monto' => $items->sum('monto') // Se suman
+                                ];
+                            })
+                            ->values()
+                            ->toArray();
+
+                        }
+
+
+
+
+                        //dd($arrayFiltrado);
+
+
+                        $array = collect($arrayFiltrado)
+                            ->filter(function($item) {
+                                return !empty($item['TOTAL']) && 
+                                       !empty($item['monto']) && 
+                                       is_numeric($item['TOTAL']) && 
+                                       is_numeric($item['monto']);
+                            })
+                            ->map(function($item) {
+                                $total = (float) $item['TOTAL'];
+                                $monto = (float) $item['monto'];
+                                
+                                $item['TOTAL'] = $total;
+                                $item['monto'] = $monto;
+                                $item['restante'] = round($monto - $total, 2); // Redondear a 2 decimales
+                                
+                                return $item;
+                            })
+                            ->values()
+                            ->toArray();
+
+
+
+
+
+            }
+
+        }
+        return  $array;
+    }
+
+
+
+
+    private function addBusinessDays($fecha, $dias, $excluirDomingos = true) {
+
+        $fecha = Carbon::parse($fecha);
+    
+        for ($i = 0; $i < $dias; $i++) {
+            $fecha->addDay();
+            
+            // Si excluimos domingos y la fecha cae en domingo, seguir sumando
+            while ($excluirDomingos && $fecha->isSunday()) {
+                $fecha->addDay();
+            }
+        }
+        
+        return $fecha;
+    }
+
 
 
     private function lg_lista_cabecera_comprobante_total_gestion_excel($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id) {

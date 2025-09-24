@@ -3,7 +3,7 @@
   <div class="col-sm-12">
       {!! Form::select( 'autoriza_id', $combo_autoriza, array($autoriza_id),
                       [
-                        'class'       => 'select4 form-control control input-xs' ,
+                        'class'       => 'select21 form-control control input-xs' ,
                         'id'          => 'autoriza_id', 
                         'required'    => '',       
                       ]) !!}
@@ -11,7 +11,7 @@
 </div>
 @if(isset($ajax))
   <script type="text/javascript">
-        $(".select4").select2({
+        $(".select21").select2({
             width: '100%'
         });
   </script>

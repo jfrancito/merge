@@ -61,6 +61,8 @@
 
 
                       <input type="hidden" name="ID_DOCUMENTO" id = "ID_DOCUMENTO" value = "{{$liquidaciongastos->ID_DOCUMENTO}}">
+                      <input type="hidden" name="PRIMERA_FECHA_RENDICION" id = "PRIMERA_FECHA_RENDICION" value = "{{$primerafechaar}}">
+                      <input type="hidden" name="ULTIMA_FECHA_RENDICION" id = "ULTIMA_FECHA_RENDICION" value = "{{$ultimafecha}}">
                       <div class="panel panel-default panel-contrast">
                         <div class="panel-heading" style="background: #1d3a6d;color: #fff;">DATOS PARA EMITIR LA LIQUIDACION
 
