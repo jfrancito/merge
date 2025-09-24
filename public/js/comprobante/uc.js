@@ -1471,10 +1471,10 @@ $(document).ready(function () {
                         total_igv = total_igv + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                     }
                 }
-                if(!/^4011/.test(item.TXT_CUENTA_CONTABLE) && !/^42/.test(item.TXT_CUENTA_CONTABLE) && !/^43/.test(item.TXT_CUENTA_CONTABLE)){
-                    if(cadenaNumeroCuenta === ''){
+                if (!/^4011/.test(item.TXT_CUENTA_CONTABLE) && !/^42/.test(item.TXT_CUENTA_CONTABLE) && !/^43/.test(item.TXT_CUENTA_CONTABLE)) {
+                    if (cadenaNumeroCuenta === '') {
                         cadenaNumeroCuenta = item.TXT_CUENTA_CONTABLE;
-                    }else{
+                    } else {
                         cadenaNumeroCuenta = cadenaNumeroCuenta + ',' + item.TXT_CUENTA_CONTABLE;
                     }
                 }
@@ -3011,8 +3011,29 @@ $(document).ready(function () {
     $('.btnaprobarcomporbatnte').on('click', function (event) {
         event.preventDefault();
 
+        let nro_cuenta = $('#nro_cuenta_contable').val();
+
         let detalles = [];
         $('#asientolista tbody tr').each(function () {
+            data_input = $(this).attr('data_input');
+            if (nro_cuenta && nro_cuenta !== '' && data_input === 'C') {
+                    let arrayDetalle = JSON.parse($(this).attr('data_asiento_detalle'));
+                    let cadenaNumeroCuenta = '';
+                    // Recorrerlo
+                    arrayDetalle.forEach(item => {
+                        if (parseInt(item.COD_ESTADO) === 1) {
+                            if (!/^4011/.test(item.TXT_CUENTA_CONTABLE) && !/^42/.test(item.TXT_CUENTA_CONTABLE) && !/^43/.test(item.TXT_CUENTA_CONTABLE)) {
+                                if (cadenaNumeroCuenta === '') {
+                                    cadenaNumeroCuenta = item.TXT_CUENTA_CONTABLE;
+                                } else {
+                                    cadenaNumeroCuenta = cadenaNumeroCuenta + ',' + item.TXT_CUENTA_CONTABLE;
+                                }
+                            }
+                        }
+                    });
+                    $('#nro_cuenta_contable').val(cadenaNumeroCuenta);
+            }
+
             detalles.push({
                 cabecera: $(this).attr('data_asiento_cabecera'),
                 detalle: $(this).attr('data_asiento_detalle'),
