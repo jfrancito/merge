@@ -45,6 +45,14 @@
             vertical-align: middle;
             padding: 1.5em;
         }
+
+        /* Versión pequeña tipo input-sm */
+        .ss-main {
+            height: 38px;         /* ajusta la altura */
+            font-size: 12px;      /* tamaño de fuente */
+            padding: 2px 8px;     /* espacio interno */
+        }
+
     </style>
 @stop
 @section('section')
@@ -307,17 +315,23 @@
             if (defaultId) {
                 select.addOption({id: defaultId, text: defaultText}); // añade la opción
                 select.setValue(defaultId); // la selecciona
-                select_reparable.addOption({id: defaultId, text: defaultText}); // añade la opción
-                select_reparable.setValue(defaultId); // la selecciona
             }
 
+            if (defaultIdReparable) {
+                select_reparable.addOption({id: defaultIdReparable, text: defaultTextReparable}); // añade la opción
+                select_reparable.setValue(defaultIdReparable); // la selecciona
+            }
+
+            window.selects = {};
             document.querySelectorAll("select.slim").forEach(function(el) {
-                new SlimSelect({
+                window.selects[el.id] = new SlimSelect({
                     select: el,
                     placeholder: 'Seleccione...',
                     allowDeselect: true
                 })
             })
+
+            $('.pnlasientos').hide();
 
         });
 
@@ -339,8 +353,6 @@
             language: 'es',
             allowedFileExtensions: ['pdf'],
         });
-
-        $('.pnlasientos').hide();
 
         @foreach($archivospdf as $index => $item)
         var nombre_archivo = '{{$item->NOMBRE_ARCHIVO}}';

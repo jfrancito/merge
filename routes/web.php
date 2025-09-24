@@ -107,6 +107,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-combo-subcuenta', 'GestionLiquidacionGastosController@actionAjaxComboSubCuenta');
 	Route::any('/ajax-combo-item', 'GestionLiquidacionGastosController@actionAjaxComboItem');
 	Route::any('/ajax-combo-autoriza', 'GestionLiquidacionGastosController@actionAjaxComboAutoriza');
+	Route::any('/ajax-combo-arendir', 'GestionLiquidacionGastosController@actionAjaxComboArendir');
+
+
 	Route::any('/extonar-liquidacion-gastos/{idopcion}/{iddocumento}', 'GestionLiquidacionGastosController@actionExtornarLiquidacionGastos');
 	Route::any('/extonar-liquidacion-gastos-detalle/{idopcion}/{item}/{iddocumento}', 'GestionLiquidacionGastosController@actionExtornarLiquidacionGastosDetalle');
 	Route::any('/tutorial/{nombre}', 'GestionLiquidacionGastosController@actionTutorialLiquidacionGastos');

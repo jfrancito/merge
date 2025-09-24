@@ -90,7 +90,7 @@
                         </div>
 
 
-                        <div class="form-group">
+                        <div class="form-group" style="display: none">
                             <label class="col-sm-12 control-label izquierda" style="text-align: left;">Cuenta Contable
                                 <b>(*)</b></label>
                             <div class="col-sm-12">
@@ -115,13 +115,13 @@
         </div>
 
     </div>
-    {{--
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
         @include('comprobante.asiento.listaasientotabla')
         @include('comprobante.asiento.contenedorasientoorden')
     </div>
-    --}}
+    {{--
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
         @include('comprobante.asiento.contenedorasiento')
     </div>
+    --}}
 </div>

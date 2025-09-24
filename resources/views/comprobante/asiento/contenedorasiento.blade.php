@@ -98,9 +98,9 @@
                             <div class="col-sm-12 abajocaja">
                                 {!! Form::select( 'empresa_asiento', [], null,
                                                   [
-                                                    'id'          => 'empresa_asiento',
-                                                    'data-aw'     => '6',
-                                                    'required'    => true,
+                                                      'id'          => 'empresa_asiento',
+                                                      'data-aw'     => '6',
+                                                      'required'    => true,
                                                   ]) !!}
                             </div>
                         </div>
@@ -243,7 +243,7 @@
 
                 <div class="col-xs-12">
 
-                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 cajareporte">
+                    <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 cajareporte">
                         <div class="form-group">
                             <label class="col-sm-12 control-label labelleft negrita">IGV XML
                                 :</label>
@@ -263,7 +263,7 @@
                         </div>
                     </div>
 
-                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 cajareporte">
+                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte">
                         <div class="form-group">
                             <label class="col-sm-12 control-label labelleft negrita">Subtotal XML
                                 :</label>
@@ -283,7 +283,7 @@
                         </div>
                     </div>
 
-                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 cajareporte">
+                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte">
                         <div class="form-group">
                             <label class="col-sm-12 control-label labelleft negrita">Total XML
                                 :</label>
@@ -294,6 +294,46 @@
                                        data_valor="{{(!empty($fedocumento->TOTAL_VENTA_SOLES) ? $fedocumento->TOTAL_VENTA_SOLES : 0.00) > 0.00 ? $fedocumento->TOTAL_VENTA_SOLES : 0.00}}"
                                        name='total_xml'
                                        value="{{(!empty($fedocumento->TOTAL_VENTA_SOLES) ? $fedocumento->TOTAL_VENTA_SOLES : 0.00) > 0.00 ? $fedocumento->TOTAL_VENTA_SOLES : 0.00}}"
+                                       placeholder="0.00"
+                                       autocomplete="off"
+                                       class="form-control input-sm dinero"
+                                       data-aw="1"
+                                       readonly/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 cajareporte">
+                        <div class="form-group">
+                            <label class="col-sm-12 control-label labelleft negrita">Percepción XML
+                                :</label>
+                            <div class="col-sm-12 abajocaja">
+
+                                <input type="text"
+                                       id="percepcion_xml"
+                                       data_valor="{{(!empty($fedocumento->PERCEPCION) ? $fedocumento->PERCEPCION : 0.00) > 0.00 ? $fedocumento->PERCEPCION : 0.00}}"
+                                       name='percepcion_xml'
+                                       value="{{(!empty($fedocumento->PERCEPCION) ? $fedocumento->PERCEPCION : 0.00) > 0.00 ? $fedocumento->PERCEPCION : 0.00}}"
+                                       placeholder="0.00"
+                                       autocomplete="off"
+                                       class="form-control input-sm dinero"
+                                       data-aw="1"
+                                       readonly/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 cajareporte">
+                        <div class="form-group">
+                            <label class="col-sm-12 control-label labelleft negrita">Anticipo
+                                :</label>
+                            <div class="col-sm-12 abajocaja">
+
+                                <input type="text"
+                                       id="anticipo_xml"
+                                       data_valor="{{(!empty($fedocumento->MONTO_ANTICIPO_DESC) ? $fedocumento->MONTO_ANTICIPO_DESC : 0.00) > 0.00 ? $fedocumento->MONTO_ANTICIPO_DESC : 0.00}}"
+                                       name='anticipo_xml'
+                                       value="{{(!empty($fedocumento->MONTO_ANTICIPO_DESC) ? $fedocumento->MONTO_ANTICIPO_DESC : 0.00) > 0.00 ? $fedocumento->MONTO_ANTICIPO_DESC : 0.00}}"
                                        placeholder="0.00"
                                        autocomplete="off"
                                        class="form-control input-sm dinero"
@@ -475,9 +515,23 @@
                         @endif
                         </tbody>
                     </table>
+                    {{--
                     <button data="C" type="button" class="btn btn-success agregar-linea">
-                        ➕ Agregar línea
+                        Agregar línea
                     </button>
+                    --}}
+                    <div class="col-lg-12" style="margin-top: 20px; text-align: right; margin-bottom: 40px;">
+                        <div class="col-lg-12">
+                            <button data="C" type="button" class="btn btn-lg btn-success agregar-linea">
+                                ➕ Agregar Detalle
+                            </button>
+                        </div>
+                        <div class="col-lg-12">
+                            <button data="C" type="button" class="btn btn-lg btn-warning diferencia-montos">
+                                🔄 Recalcular Decimales Debe - Haber
+                            </button>
+                        </div>
+                    </div>
                     <table id="asientodetalle"
                            class="table table-bordered table-hover td-color-borde td-padding-7 display nowrap"
                            cellspacing="0" width="100%">
@@ -523,6 +577,20 @@
                             @endforeach
                         @endif
                         </tbody>
+                        <tfoot>
+                        <tr>
+                            <th colspan="3" class="text-right">Totales:</th>
+                            <th class="totalDebeMN"
+                                style="text-align: right"></th>
+                            <th class="totalHaberMN"
+                                style="text-align: right"></th>
+                            <th class="totalDebeME"
+                                style="text-align: right"></th>
+                            <th class="totalHaberME"
+                                style="text-align: right"></th>
+                            <th></th>
+                        </tr>
+                        </tfoot>
                     </table>
 
                 </div>
@@ -534,9 +602,23 @@
                         <input type="hidden" id="asiento_detalle_reparable_reversion"
                                name="asiento_detalle_reparable_reversion"
                                value="{{ json_encode(!empty($asiento_reparable_reversion) ? $asiento_reparable_reversion[2] : []) }}"/>
+                        {{--
                         <button data="RV" type="button" class="btn btn-success agregar-linea">
-                            ➕ Agregar línea
+                            Agregar línea
                         </button>
+                        --}}
+                        <div class="col-lg-12" style="margin-top: 20px; text-align: right; margin-bottom: 40px;">
+                            <div class="col-lg-12">
+                                <button data="RV" type="button" class="btn btn-lg btn-success agregar-linea">
+                                    ➕ Agregar Detalle
+                                </button>
+                            </div>
+                            <div class="col-lg-12">
+                                <button data="RV" type="button" class="btn btn-lg btn-warning diferencia-montos">
+                                    🔄 Recalcular Decimales Debe - Haber
+                                </button>
+                            </div>
+                        </div>
                         <table id="asientodetallereversion"
                                class="table table-bordered table-hover td-color-borde td-padding-7 display nowrap"
                                cellspacing="0" width="100%">
@@ -582,6 +664,20 @@
                                 @endforeach
                             @endif
                             </tbody>
+                            <tfoot>
+                            <tr>
+                                <th colspan="3" class="text-right">Totales:</th>
+                                <th class="totalDebeMN"
+                                    style="text-align: right"></th>
+                                <th class="totalHaberMN"
+                                    style="text-align: right"></th>
+                                <th class="totalDebeME"
+                                    style="text-align: right"></th>
+                                <th class="totalHaberME"
+                                    style="text-align: right"></th>
+                                <th></th>
+                            </tr>
+                            </tfoot>
                         </table>
 
                     </div>
@@ -592,9 +688,23 @@
                                value="{{ json_encode(!empty($asiento_deduccion) ? $asiento_deduccion[1] : []) }}"/>
                         <input type="hidden" id="asiento_detalle_deduccion" name="asiento_detalle_deduccion"
                                value="{{ json_encode(!empty($asiento_deduccion) ? $asiento_deduccion[2] : []) }}"/>
+                        {{--
                         <button data="D" type="button" class="btn btn-success agregar-linea">
-                            ➕ Agregar línea
+                            Agregar línea
                         </button>
+                        --}}
+                        <div class="col-lg-12" style="margin-top: 20px; text-align: right; margin-bottom: 40px;">
+                            <div class="col-lg-12">
+                                <button data="D" type="button" class="btn btn-lg btn-success agregar-linea">
+                                    ➕ Agregar Detalle
+                                </button>
+                            </div>
+                            <div class="col-lg-12">
+                                <button data="D" type="button" class="btn btn-lg btn-warning diferencia-montos">
+                                    🔄 Recalcular Decimales Debe - Haber
+                                </button>
+                            </div>
+                        </div>
                         <table id="asientodetallededuccion"
                                class="table table-bordered table-hover td-color-borde td-padding-7 display nowrap"
                                cellspacing="0" width="100%">
@@ -640,6 +750,20 @@
                                 @endforeach
                             @endif
                             </tbody>
+                            <tfoot>
+                            <tr>
+                                <th colspan="3" class="text-right">Totales:</th>
+                                <th class="totalDebeMN"
+                                    style="text-align: right"></th>
+                                <th class="totalHaberMN"
+                                    style="text-align: right"></th>
+                                <th class="totalDebeME"
+                                    style="text-align: right"></th>
+                                <th class="totalHaberME"
+                                    style="text-align: right"></th>
+                                <th></th>
+                            </tr>
+                            </tfoot>
                         </table>
 
                     </div>
@@ -713,10 +837,23 @@
                             @endif
                             </tbody>
                         </table>
-
+{{--
                         <button data="P" type="button" class="btn btn-success agregar-linea">
-                            ➕ Agregar línea
+                            Agregar línea
                         </button>
+--}}
+                        <div class="col-lg-12" style="margin-top: 20px; text-align: right; margin-bottom: 40px;">
+                            <div class="col-lg-12">
+                                <button data="P" type="button" class="btn btn-lg btn-success agregar-linea">
+                                    ➕ Agregar Detalle
+                                </button>
+                            </div>
+                            <div class="col-lg-12">
+                                <button data="P" type="button" class="btn btn-lg btn-warning diferencia-montos">
+                                    🔄 Recalcular Decimales Debe - Haber
+                                </button>
+                            </div>
+                        </div>
 
                         <table id="asientodetallepercepcion"
                                class="table table-bordered table-hover td-color-borde td-padding-7 display nowrap"
@@ -763,6 +900,20 @@
                                 @endforeach
                             @endif
                             </tbody>
+                            <tfoot>
+                            <tr>
+                                <th colspan="3" class="text-right">Totales:</th>
+                                <th class="totalDebeMN"
+                                    style="text-align: right"></th>
+                                <th class="totalHaberMN"
+                                    style="text-align: right"></th>
+                                <th class="totalDebeME"
+                                    style="text-align: right"></th>
+                                <th class="totalHaberME"
+                                    style="text-align: right"></th>
+                                <th></th>
+                            </tr>
+                            </tfoot>
                         </table>
 
                     </div>
@@ -785,7 +936,7 @@
                         <div class="col-sm-12 abajocaja">
                             {!! Form::select( 'nivel', $combo_nivel_pc, '6',
                                               [
-                                                'class'       => 'select2 form-control control input-xs combo' ,
+                                                'class'       => 'slim',
                                                 'id'          => 'nivel',
                                                 'data-aw'     => '1',
                                                  'disabled'   => 'disabled'
@@ -801,7 +952,7 @@
                         <div class="col-sm-12 abajocaja">
                             {!! Form::select( 'partida_id', $combo_partida, '',
                                               [
-                                                'class'       => 'select2 form-control control input-xs combo' ,
+                                                'class'       => 'slim',
                                                 'id'          => 'partida_id',
                                                 'data-aw'     => '2',
                                               ]) !!}
@@ -816,7 +967,7 @@
                         <div class="col-sm-12 abajocaja">
                             {!! Form::select( 'cuenta_contable_id', $combo_cuenta, '',
                                               [
-                                                'class'       => 'select2 form-control control input-xs combo' ,
+                                                'class'       => 'slim',
                                                 'id'          => 'cuenta_contable_id',
                                                 'data-aw'     => '3',
                                               ]) !!}
@@ -844,7 +995,7 @@
                         <div class="col-sm-12 abajocaja">
                             {!! Form::select( 'tipo_igv_id', $combo_tipo_igv, '',
                                               [
-                                                'class'       => 'select2 form-control control input-xs combo' ,
+                                                'class'       => 'slim',
                                                 'id'          => 'tipo_igv_id',
                                                 'data-aw'     => '4'
                                               ]) !!}
@@ -858,7 +1009,7 @@
                         <div class="col-sm-12 abajocaja">
                             {!! Form::select( 'porc_tipo_igv_id', $combo_porc_tipo_igv, '',
                                               [
-                                                'class'       => 'select2 form-control control input-xs combo' ,
+                                                'class'       => 'slim',
                                                 'id'          => 'porc_tipo_igv_id',
                                                 'data-aw'     => '4'
                                               ]) !!}
@@ -872,7 +1023,7 @@
                         <div class="col-sm-12 abajocaja">
                             {!! Form::select( 'activo', $combo_activo, '1',
                                               [
-                                                'class'       => 'select2 form-control control input-xs combo' ,
+                                                'class'       => 'slim',
                                                 'id'          => 'activo',
                                                 'data-aw'     => '5',
                                                 'disabled'    => true

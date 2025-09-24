@@ -14,8 +14,8 @@
 
 @if(isset($ajax))
     <script>
-        new SlimSelect({
-            select: '#periodo_asiento'
+        window.selects['periodo_asiento_reparable'] = new SlimSelect({
+            select: '#periodo_asiento_reparable'
         })
     </script>
 @endif

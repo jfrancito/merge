@@ -90,7 +90,7 @@
                                   data-aw="2"></textarea>
                             </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" style="display: none">
                             <label class="col-sm-12 control-label izquierda" style="text-align: left;">Cuenta Contable
                                 <b>(*)</b></label>
                             <div class="col-sm-12">
@@ -112,27 +112,28 @@
             </div>
         </div>
     </div>
-{{--
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
         @include('comprobante.asiento.listaasientotabla')
         @include('comprobante.asiento.contenedorasientoorden')
     </div>
---}}
+    {{--
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
         @include('comprobante.asiento.contenedorasiento')
     </div>
-
+    --}}
 </div>
 
 <div class="row xs-pt-15">
     <div class="col-xs-6">
         <div class="be-checkbox">
-      </div>
-  </div>
-  <div class="col-xs-6">
-    <p class="text-right">
-      <a href="{{ url('/gestion-de-comprobante-contabilidad/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
-      <button type="button"  class="btn btn-space btn-primary btnaprobarcomporbatnte">Guardar</button>
-    </p>
-  </div>
+        </div>
+    </div>
+    <div class="col-xs-6">
+        <p class="text-right">
+            <a href="{{ url('/gestion-de-comprobante-contabilidad/'.$idopcion) }}">
+                <button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button>
+            </a>
+            <button type="button" class="btn btn-space btn-primary btnaprobarcomporbatnte">Guardar</button>
+        </p>
+    </div>
 </div>

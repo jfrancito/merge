@@ -295,8 +295,10 @@ trait UserTraits
 
                 $autorizacion           =   array();
                 $COD_AUTORIZACION       =   '';
-                if(count($valeRendir)>0){
 
+                $subjectcorreo = 'APLICACIÓN DE REEMBOLSO '.$documentoCtble->NRO_SERIE.'-'.$documentoCtble->NRO_DOC;
+                if(count($valeRendir)>0){
+                    $subjectcorreo = 'APLICACION DE VALE CON LIQUIDACION '.$documentoCtble->NRO_SERIE.'-'.$documentoCtble->NRO_DOC;
                     $autorizacion       =   DB::table('TES.AUTORIZACION')
                                             ->where('COD_AUTORIZACION', $valeRendir->ID_OSIRIS)
                                             ->first();
@@ -336,13 +338,29 @@ trait UserTraits
                     'monto_vale'          =>  $monto_vale
                 );
 
-                Mail::send('emails.tesorerialg', $array, function($message) use ($emailfrom,$item,$email,$documentoCtble)
+                $user = DB::table('users')->where('id', $item->USUARIO_CREA)->first();
+                $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('COD_TRAB','=',$user->usuarioosiris_id)->first();
+                //correo de trabajadores
+                $correotrabajdor         =    '';
+                if(count($trabajadorcorreo)>0){
+                    if ($trabajadorcorreo->emailcorp !== null) {
+                        $correotrabajador = $trabajadorcorreo->emailcorp;
+                    }
+                }
+
+                Mail::send('emails.tesorerialg', $array, function($message) use ($emailfrom,$item,$email,$documentoCtble,$subjectcorreo,$correotrabajador)
                 {
-                    $emailcopias        = explode(",", $email->correocopia);
+
+                    if($correotrabajador ==''){
+                        $emailcopias        = explode(",", $email->correocopia);  
+                    }else{
+                        $emailcopias        = explode(",", $email->correocopia); 
+                        $emailcopias[]      = $correotrabajador; // Agrega al final del array
+                    }
                     $message->from($emailfrom->correoprincipal, 'LIQUIDACION '.$item->ID_DOCUMENTO);
                     //$message->to('jorge.saldana@induamerica.com.pe');
                     $message->to($email->correoprincipal)->cc($emailcopias);
-                    $message->subject('APLICACION DE VALE CON LIQUIDACION '.$documentoCtble->NRO_SERIE.'-'.$documentoCtble->NRO_DOC);
+                    $message->subject($subjectcorreo);
                 });
 
                 $pedido                             =   LqgLiquidacionGasto::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)->first();

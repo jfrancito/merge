@@ -4934,7 +4934,7 @@ trait ComprobanteTraits
                                     ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                     ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
                                     ->where('COD_EMPR_EMISOR','=',$cliente_id)
-                                    ->where('FE_DOCUMENTO.area_observacion','=','UCO')
+                                    ->whereIn('FE_DOCUMENTO.area_observacion',['UCO','CONT','ADM'])
                                     ->where('FE_DOCUMENTO.ind_observacion','=','1')
                                     ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                                     ->get();
@@ -5137,10 +5137,9 @@ trait ComprobanteTraits
 
 
         $total_1 = $ordencompra->CAN_TOTAL+$ordencompra_t->CAN_PERCEPCION-$ordencompra_t->CAN_IMPUESTO_RENTA-$ordencompra_t->CAN_RETENCION;
-        $total_2 = $fedocumento->TOTAL_VENTA_XML+$ordencompra_t->CAN_PERCEPCION-$ordencompra_t->CAN_RETENCION;//-$ordencompra_t->CAN_IMPUESTO_RENTA;
+        $total_2 = $fedocumento->TOTAL_VENTA_XML+$ordencompra_t->CAN_PERCEPCION-$ordencompra_t->CAN_RETENCION-$ordencompra_t->CAN_IMPUESTO_RENTA;
 
 
-        //dd($total_1);
 
         $tt_totales = round(abs($total_1 - $total_2), 2);
 
