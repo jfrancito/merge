@@ -170,6 +170,12 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/ajax-cuenta-bancaria-proveedor-lq', 'GestionLiquidacionGastosController@actionAjaxBuscarCuentaBancariaLQ');
 
+	//SUSPENSION DE 4TA CATEGORIA
+	Route::any('/gestion-de-suspension-ta-categoria/{idopcion}', 'GestionCuartaCategoriaController@actionListarSuspensionCuarta');
+	Route::any('/agregar-cuarta-categoria/{idopcion}', 'GestionCuartaCategoriaController@actionAgregarCuartaCategoria');
+
+
+
 	//PLANILLA MOVILIDAD
 	Route::any('/gestion-de-planilla-movilidad/{idopcion}', 'GestionPlanillaMovilidadController@actionListarPlanillaMovilidad');
 	Route::any('/ajax-buscar-documento-fe-entregable-pla-mob', 'GestionPlanillaMovilidadController@actionListarPlanillaMovilidadMobil');
@@ -758,6 +764,28 @@ Route::get('buscarempresalg', function (Illuminate\Http\Request  $request) {
     }
     return \Response::json($valid_tags);
 });
+
+Route::get('buscarempresarenta', function (Illuminate\Http\Request  $request) {
+    $term = $request->term ?: '';
+    $tags = DB::table('STD.EMPRESA')
+		    ->where(function($query) use ($term) {
+		        $query->where('STD.EMPRESA.NOM_EMPR', 'like', '%' . $term . '%')
+		              ->orWhere('STD.EMPRESA.NRO_DOCUMENTO', 'like', '%' . $term . '%');
+		    })
+			->where('STD.EMPRESA.COD_ESTADO','=',1)
+			->where('STD.EMPRESA.NRO_DOCUMENTO','like','1%')
+			->take(100)
+			->select(DB::raw("
+			  STD.EMPRESA.NRO_DOCUMENTO + ' - '+ STD.EMPRESA.NOM_EMPR AS NOMBRE")
+			)
+    		->pluck('NOMBRE', 'NOMBRE');
+    $valid_tags = [];
+    foreach ($tags as $id => $tag) {
+        $valid_tags[] = ['id' => $id, 'text' => $tag];
+    }
+    return \Response::json($valid_tags);
+});
+
 
 
 
