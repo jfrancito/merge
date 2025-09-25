@@ -1581,8 +1581,13 @@ $(document).ready(function () {
 
     $(document).on('click', ".ver-asiento", function (e) {
         e.preventDefault();
-        debugger;
-        abrircargando();
+        if ($('.editarcuentas').is(':visible')) {
+            $('.tablageneral').toggle("slow");
+            $('.editarcuentas').toggle("slow");
+        }
+        setTimeout(function () {
+            $('#asientodetalle').DataTable().columns.adjust().draw();
+        }, 3000); // espera medio segundo o el tiempo necesario
 
         let $tr = $(this).closest("tr");
 
@@ -3011,27 +3016,31 @@ $(document).ready(function () {
     $('.btnaprobarcomporbatnte').on('click', function (event) {
         event.preventDefault();
 
+        abrircargando();
+
         let nro_cuenta = $('#nro_cuenta_contable').val();
 
         let detalles = [];
         $('#asientolista tbody tr').each(function () {
             data_input = $(this).attr('data_input');
-            if (nro_cuenta && nro_cuenta !== '' && data_input === 'C') {
-                    let arrayDetalle = JSON.parse($(this).attr('data_asiento_detalle'));
-                    let cadenaNumeroCuenta = '';
-                    // Recorrerlo
-                    arrayDetalle.forEach(item => {
-                        if (parseInt(item.COD_ESTADO) === 1) {
-                            if (!/^4011/.test(item.TXT_CUENTA_CONTABLE) && !/^42/.test(item.TXT_CUENTA_CONTABLE) && !/^43/.test(item.TXT_CUENTA_CONTABLE)) {
-                                if (cadenaNumeroCuenta === '') {
-                                    cadenaNumeroCuenta = item.TXT_CUENTA_CONTABLE;
-                                } else {
+            if (nro_cuenta === '' && data_input === 'C') {
+                let arrayDetalle = JSON.parse($(this).attr('data_asiento_detalle'));
+                let cadenaNumeroCuenta = '';
+                // Recorrerlo
+                arrayDetalle.forEach(item => {
+                    if (parseInt(item.COD_ESTADO) === 1) {
+                        if (!/^4011/.test(item.TXT_CUENTA_CONTABLE) && !/^42/.test(item.TXT_CUENTA_CONTABLE) && !/^43/.test(item.TXT_CUENTA_CONTABLE)) {
+                            if (cadenaNumeroCuenta === '') {
+                                cadenaNumeroCuenta = item.TXT_CUENTA_CONTABLE;
+                            } else {
+                                if (!cadenaNumeroCuenta.includes(item.TXT_CUENTA_CONTABLE)) {
                                     cadenaNumeroCuenta = cadenaNumeroCuenta + ',' + item.TXT_CUENTA_CONTABLE;
                                 }
                             }
                         }
-                    });
-                    $('#nro_cuenta_contable').val(cadenaNumeroCuenta);
+                    }
+                });
+                $('#nro_cuenta_contable').val(cadenaNumeroCuenta);
             }
 
             detalles.push({
@@ -3313,7 +3322,6 @@ $(document).ready(function () {
         $(".listatabla tr").each(function () {
             check = $(this).find('input');
             nombre = $(this).find('input').attr('id');
-            debugger;
             if (nombre != 'todo') {
                 if ($(check).is(':checked')) {
                     data.push({id: $(check).attr("id")});

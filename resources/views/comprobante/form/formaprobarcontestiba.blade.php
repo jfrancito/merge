@@ -79,7 +79,7 @@
 
                         <div class="form-group sectioncargarimagen">
                             <label class="col-sm-12 control-label" style="text-align: left;"><b>REALIZAR UNA
-                                    RECOMENDCION</b> <br><br></label>
+                                    RECOMENDACIÓN</b> <br><br></label>
                             <div class="col-sm-12">
                           <textarea
                                   name="descripcion"
@@ -100,9 +100,6 @@
                                        value=""
                                        placeholder="Cuenta Contable"
                                        required=""
-                                       data-parsley-type="number"
-                                       data-parsley-length="[6, 6]"
-                                       data-parsley-length-message="El código debe tener exactamente 6 caracteres."
                                        autocomplete="off" class="form-control input-sm"/>
 
                             </div>
