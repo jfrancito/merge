@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
 
 
 
-        View::share('version', '10.01');
+        View::share('version', '10.02');
 
 
         View::share('titulo', '');
