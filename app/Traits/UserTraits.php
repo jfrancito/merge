@@ -312,7 +312,6 @@ trait UserTraits
                                             ->where('ID', $item->ARENDIR_ID)
                                             ->first();
 
-
                 $documentos = DB::table('CMP.DOCUMENTO_CTBLE')
                     ->select([
                         'COD_DOCUMENTO_CTBLE',
