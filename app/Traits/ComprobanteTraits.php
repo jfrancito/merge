@@ -3335,7 +3335,13 @@ trait ComprobanteTraits
                                         FOR XML PATH('')
                                     ), 1, 2, ''
                                 )
-                            ) AS productos_reparable
+                            ) AS productos_reparable,
+                            WEBPAGOSOC.MEDIO_PAGO,
+                            WEBPAGOSOC.FECHA_PAGO,
+                            WEBPAGOSOC.NOMBRE_BANCO,
+                            WEBPAGOSOC.IMPORTE
+
+
                         FROM FE_DOCUMENTO
                         CROSS APPLY (
                             SELECT TOP 1 * 
@@ -3345,6 +3351,24 @@ trait ComprobanteTraits
                         ) AS D
                         INNER JOIN CMP.DOCUMENTO_CTBLE ON D.ID_DOCUMENTO = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE
                         INNER JOIN FE_DETALLE_DOCUMENTO ON FE_DETALLE_DOCUMENTO.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+
+                        LEFT JOIN (SELECT 
+                                    dc.*,
+                                    ra.COD_TABLA,
+                                    ra.COD_TABLA_ASOC
+                                FROM [CMP].[DOCUMENTO_CTBLE] dc
+                                INNER JOIN [CMP].[REFERENCIA_ASOC] ra 
+                                    ON dc.[COD_DOCUMENTO_CTBLE] = ra.[COD_TABLA_ASOC]
+                                WHERE dc.[COD_ESTADO] = '1'
+                                    AND dc.[COD_CATEGORIA_TIPO_DOC] IN (
+                                        'TDO0000000000001',
+                                        'TDO0000000000003',
+                                        'TDO0000000000002',
+                                        'TDO0000000000010'
+                                    )
+                        ) TTF ON D.ID_DOCUMENTO = TTF.COD_TABLA
+                        LEFT JOIN WEBPAGOSOC ON WEBPAGOSOC.COD_DOCUMENTO_CTBLE = TTF.COD_DOCUMENTO_CTBLE
+
                         LEFT JOIN SGD.USUARIO ON SGD.USUARIO.COD_USUARIO = CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD
                         LEFT JOIN CMP.CATEGORIA ON CMP.CATEGORIA.COD_CATEGORIA = SGD.USUARIO.COD_CATEGORIA_AREA
                         WHERE CAST(fecha_pa AS DATE) >= ? 
@@ -3396,7 +3420,11 @@ trait ComprobanteTraits
                                     FOR XML PATH('')
                                 ), 1, 2, ''
                             )
-                        ) AS productos_reparable
+                        ) AS productos_reparable,
+                            WEBPAGOSOC.MEDIO_PAGO,
+                            WEBPAGOSOC.FECHA_PAGO,
+                            WEBPAGOSOC.NOMBRE_BANCO,
+                            WEBPAGOSOC.IMPORTE
                     FROM FE_DOCUMENTO
                     CROSS APPLY (
                         SELECT TOP 1 * 
@@ -3406,8 +3434,28 @@ trait ComprobanteTraits
                     ) AS D
                     INNER JOIN CMP.DOCUMENTO_CTBLE ON D.ID_DOCUMENTO = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE
                     INNER JOIN FE_DETALLE_DOCUMENTO ON FE_DETALLE_DOCUMENTO.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                    LEFT JOIN (SELECT 
+                                dc.*,
+                                ra.COD_TABLA,
+                                ra.COD_TABLA_ASOC
+                            FROM [CMP].[DOCUMENTO_CTBLE] dc
+                            INNER JOIN [CMP].[REFERENCIA_ASOC] ra 
+                                ON dc.[COD_DOCUMENTO_CTBLE] = ra.[COD_TABLA_ASOC]
+                            WHERE dc.[COD_ESTADO] = '1'
+                                AND dc.[COD_CATEGORIA_TIPO_DOC] IN (
+                                    'TDO0000000000001',
+                                    'TDO0000000000003',
+                                    'TDO0000000000002',
+                                    'TDO0000000000010'
+                                )
+                    ) TTF ON D.ID_DOCUMENTO = TTF.COD_TABLA
+                    LEFT JOIN WEBPAGOSOC ON WEBPAGOSOC.COD_DOCUMENTO_CTBLE = TTF.COD_DOCUMENTO_CTBLE
+
                     LEFT JOIN SGD.USUARIO ON SGD.USUARIO.COD_USUARIO = CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD
                     LEFT JOIN CMP.CATEGORIA ON CMP.CATEGORIA.COD_CATEGORIA = SGD.USUARIO.COD_CATEGORIA_AREA
+
+
+
                     WHERE CAST(fecha_pa AS DATE) >= ? 
                       AND CAST(fecha_pa AS DATE) <= ?
                       AND FE_DOCUMENTO.COD_EMPR = ?
@@ -3451,10 +3499,32 @@ trait ComprobanteTraits
                         SELECT FE_DOCUMENTO.*, TES.OPERACION_CAJA.*, FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_FE, 
                         TES.OPERACION_CAJA.TXT_GLOSA AS TXT_GLOSA_ORDEN, FE_DOCUMENTO.TXT_REPARABLE AS TXT_REPARABLE_SN, FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_N,
                         CASE WHEN TES.CAJA_BANCO.IND_CAJA = 0 THEN TES.CAJA_BANCO.TXT_BANCO ELSE TES.CAJA_BANCO.TXT_CAJA_BANCO END as NOMBRE_BANCO_CAJA,
-                        TES.CAJA_BANCO.TXT_CAJA_BANCO as CUENTA
+                        TES.CAJA_BANCO.TXT_CAJA_BANCO as CUENTA,
+                                                    WEBPAGOSOC.MEDIO_PAGO,
+                            WEBPAGOSOC.FECHA_PAGO,
+                            WEBPAGOSOC.NOMBRE_BANCO,
+                            WEBPAGOSOC.IMPORTE
                         FROM FE_DOCUMENTO CROSS APPLY ( SELECT TOP 1 * FROM FE_REF_ASOC WHERE LOTE = FE_DOCUMENTO.ID_DOCUMENTO ORDER BY FE_REF_ASOC.ID_DOCUMENTO ) AS D 
                         INNER JOIN TES.OPERACION_CAJA ON D.ID_DOCUMENTO = TES.OPERACION_CAJA.COD_OPERACION_CAJA
                         INNER JOIN TES.CAJA_BANCO ON TES.OPERACION_CAJA.COD_CAJA_BANCO = TES.CAJA_BANCO.COD_CAJA_BANCO
+
+                        LEFT JOIN (SELECT 
+                                    dc.*,
+                                    ra.COD_TABLA,
+                                    ra.COD_TABLA_ASOC
+                                FROM [CMP].[DOCUMENTO_CTBLE] dc
+                                INNER JOIN [CMP].[REFERENCIA_ASOC] ra 
+                                    ON dc.[COD_DOCUMENTO_CTBLE] = ra.[COD_TABLA_ASOC]
+                                WHERE dc.[COD_ESTADO] = '1'
+                                    AND dc.[COD_CATEGORIA_TIPO_DOC] IN (
+                                        'TDO0000000000001',
+                                        'TDO0000000000003',
+                                        'TDO0000000000002',
+                                        'TDO0000000000010'
+                                    )
+                        ) TTF ON D.ID_DOCUMENTO = TTF.COD_TABLA
+                        LEFT JOIN WEBPAGOSOC ON WEBPAGOSOC.COD_DOCUMENTO_CTBLE = TTF.COD_DOCUMENTO_CTBLE
+
 
                         LEFT JOIN SGD.USUARIO ON SGD.USUARIO.COD_USUARIO = TES.OPERACION_CAJA.COD_USUARIO_CREA_AUD 
                         LEFT JOIN CMP.CATEGORIA ON CMP.CATEGORIA.COD_CATEGORIA = SGD.USUARIO.COD_CATEGORIA_AREA
@@ -3479,10 +3549,32 @@ trait ComprobanteTraits
                     SELECT FE_DOCUMENTO.*, TES.OPERACION_CAJA.*, FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_FE, 
                     TES.OPERACION_CAJA.TXT_GLOSA AS TXT_GLOSA_ORDEN, FE_DOCUMENTO.TXT_REPARABLE AS TXT_REPARABLE_SN, FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_N,
                     CASE WHEN TES.CAJA_BANCO.IND_CAJA = 0 THEN TES.CAJA_BANCO.TXT_BANCO ELSE TES.CAJA_BANCO.TXT_CAJA_BANCO END as NOMBRE_BANCO_CAJA,
-                    TES.CAJA_BANCO.TXT_CAJA_BANCO as CUENTA
+                    TES.CAJA_BANCO.TXT_CAJA_BANCO as CUENTA,
+                                                WEBPAGOSOC.MEDIO_PAGO,
+                            WEBPAGOSOC.FECHA_PAGO,
+                            WEBPAGOSOC.NOMBRE_BANCO,
+                            WEBPAGOSOC.IMPORTE
                     FROM FE_DOCUMENTO CROSS APPLY ( SELECT TOP 1 * FROM FE_REF_ASOC WHERE LOTE = FE_DOCUMENTO.ID_DOCUMENTO ORDER BY FE_REF_ASOC.ID_DOCUMENTO ) AS D 
                     INNER JOIN TES.OPERACION_CAJA ON D.ID_DOCUMENTO = TES.OPERACION_CAJA.COD_OPERACION_CAJA
                     INNER JOIN TES.CAJA_BANCO ON TES.OPERACION_CAJA.COD_CAJA_BANCO = TES.CAJA_BANCO.COD_CAJA_BANCO
+
+                    LEFT JOIN (SELECT 
+                                dc.*,
+                                ra.COD_TABLA,
+                                ra.COD_TABLA_ASOC
+                            FROM [CMP].[DOCUMENTO_CTBLE] dc
+                            INNER JOIN [CMP].[REFERENCIA_ASOC] ra 
+                                ON dc.[COD_DOCUMENTO_CTBLE] = ra.[COD_TABLA_ASOC]
+                            WHERE dc.[COD_ESTADO] = '1'
+                                AND dc.[COD_CATEGORIA_TIPO_DOC] IN (
+                                    'TDO0000000000001',
+                                    'TDO0000000000003',
+                                    'TDO0000000000002',
+                                    'TDO0000000000010'
+                                )
+                    ) TTF ON D.ID_DOCUMENTO = TTF.COD_TABLA
+                    LEFT JOIN WEBPAGOSOC ON WEBPAGOSOC.COD_DOCUMENTO_CTBLE = TTF.COD_DOCUMENTO_CTBLE
+
                     LEFT JOIN SGD.USUARIO ON SGD.USUARIO.COD_USUARIO = TES.OPERACION_CAJA.COD_USUARIO_CREA_AUD 
                     LEFT JOIN CMP.CATEGORIA ON CMP.CATEGORIA.COD_CATEGORIA = SGD.USUARIO.COD_CATEGORIA_AREA
                     WHERE CAST(fecha_pa AS DATE) >= ? 
@@ -3683,7 +3775,7 @@ trait ComprobanteTraits
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                ->where('FE_DOCUMENTO.ID_DOCUMENTO','=','IILMCR0000032231')
+                                //->where('FE_DOCUMENTO.ID_DOCUMENTO','=','IILMCR0000032231')
                                 ->select(DB::raw("
                                     FE_DOCUMENTO.*, 
                                     CMP.ORDEN.*,
@@ -3739,6 +3831,17 @@ trait ComprobanteTraits
         $centro_id      =       $trabajador->COD_ZONA_TIPO;
         $rol            =       WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 
+        $documento              =       DB::table('CMP.DOCUMENTO_CTBLE')
+                                        ->join('CMP.REFERENCIA_ASOC', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+                                        ->select(DB::raw('CMP.DOCUMENTO_CTBLE.*,REFERENCIA_ASOC.COD_TABLA,REFERENCIA_ASOC.COD_TABLA_ASOC'))
+                                        ->where('CMP.DOCUMENTO_CTBLE.COD_ESTADO','=','1')
+                                        ->whereIn('COD_CATEGORIA_TIPO_DOC', [
+                                            'TDO0000000000001',
+                                            'TDO0000000000003',
+                                            'TDO0000000000002',
+                                            'TDO0000000000010'
+                                        ]);
+
 
         if($rol->ind_uc == 1 && Session::get('usuario')->id != '1CIX00000142'){
 
@@ -3748,6 +3851,14 @@ trait ComprobanteTraits
                                 ->join('ALM.CENTRO', 'ALM.CENTRO.COD_CENTRO', '=', 'CMP.DOCUMENTO_CTBLE.COD_CENTRO')
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
+
+                                ->leftJoin(DB::raw("({$documento->toSql()}) as documentos"), function ($join) use ($documento) {
+                                        $join->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'documentos.COD_TABLA')
+                                             ->addBinding($documento->getBindings());
+                                    })
+                                ->leftjoin('WEBPAGOSOC', 'WEBPAGOSOC.COD_DOCUMENTO_CTBLE', '=', 'documentos.COD_DOCUMENTO_CTBLE')
+
+
                                 ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 ->where('OPERACION','=','CONTRATO')
@@ -3764,7 +3875,10 @@ trait ComprobanteTraits
                                     CMP.CATEGORIA.NOM_CATEGORIA AS AREA,
                                     FE_DOCUMENTO.TXT_REPARABLE AS TXT_REPARABLE_SN, 
                                     FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_N,
-
+                                    WEBPAGOSOC.MEDIO_PAGO,
+                                    WEBPAGOSOC.FECHA_PAGO,
+                                    WEBPAGOSOC.NOMBRE_BANCO,
+                                    WEBPAGOSOC.IMPORTE,
 
                                     (
                                         SELECT STUFF((
@@ -3807,6 +3921,13 @@ trait ComprobanteTraits
                                 ->join('ALM.CENTRO', 'ALM.CENTRO.COD_CENTRO', '=', 'CMP.DOCUMENTO_CTBLE.COD_CENTRO')
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
+
+                                ->leftJoin(DB::raw("({$documento->toSql()}) as documentos"), function ($join) use ($documento) {
+                                        $join->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'documentos.COD_TABLA')
+                                             ->addBinding($documento->getBindings());
+                                    })
+                                ->leftjoin('WEBPAGOSOC', 'WEBPAGOSOC.COD_DOCUMENTO_CTBLE', '=', 'documentos.COD_DOCUMENTO_CTBLE')
+
                                 ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 ->where('OPERACION','=','CONTRATO')
@@ -3821,6 +3942,12 @@ trait ComprobanteTraits
                                     CMP.CATEGORIA.NOM_CATEGORIA AS AREA,
                                     FE_DOCUMENTO.TXT_REPARABLE AS TXT_REPARABLE_SN, 
                                     FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_N,
+
+                                    WEBPAGOSOC.MEDIO_PAGO,
+                                    WEBPAGOSOC.FECHA_PAGO,
+                                    WEBPAGOSOC.NOMBRE_BANCO,
+                                    WEBPAGOSOC.IMPORTE,
+
 
                                     (
                                         SELECT STUFF((
