@@ -799,6 +799,12 @@ class UserController extends Controller {
 						 ]);
 	}
 
+    public function actionCorreoReparacionLevantada()
+	{
+		$this->envio_correo_reparacion_levantada();
+	}
+
+
     public function actionCorreoTesoreriaLg()
 	{
 		$this->envio_correo_tesoreria_lq();

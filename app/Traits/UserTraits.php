@@ -15,8 +15,6 @@ use App\Modelos\STDTrabajador;
 use App\Modelos\LqgLiquidacionGasto;
 
 
-
-
 use View;
 use Session;
 use Hashids;
@@ -29,6 +27,50 @@ use App\Traits\WhatsappTraits;
 trait UserTraits
 {
     use WhatsappTraits;
+
+    private function envio_correo_reparacion_levantada() {
+
+        $listaliquidaciones     =   FeDocumento::where('IND_CORREO_REPARABLE', '1')
+                                    ->get();
+
+        foreach($listaliquidaciones as $item){
+    
+                $larchivos              =   DB::table('CMP.DOC_ASOCIAR_COMPRA')
+                                            ->where('COD_ORDEN', 'IICHCL0000012784')
+                                            ->where('TXT_ASIGNADO', 'ARCHIVO_VIRTUAL')
+                                            ->get();
+                $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
+                $email                  =   'facturacion.iacm@induamerica.com.pe';
+                if($item->COD_EMPR == 'IACHEM0000010394'){
+                    $email                  =   'facturacion.iain@induamerica.com.pe';
+                }
+
+
+                $array                  =   Array(
+                    'item'                =>  $item,
+                    'larchivos'           =>  $larchivos
+                );
+                $subjectcorreo = 'SE SUBSANO LA REPARACION DEL DOCUMENTO // '.$item->ID_DOCUMENTO.' // '.$item->OPERACION;
+
+                Mail::send('emails.reparable', $array, function($message) use ($emailfrom,$item,$subjectcorreo,$email)
+                {
+                    $message->from($emailfrom->correoprincipal, 'ORDEN COMPRA '.$item->ID_DOCUMENTO);
+                    $message->to($email)->cc('jorge.saldana@induamerica.com.pe');
+                    $message->subject($subjectcorreo);
+                });
+
+                FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
+                            ->update(
+                                    [
+                                        'IND_CORREO_REPARABLE'=>'2'
+                                    ]);                      
+        }
+        print_r("Se envio correctamente el correo Adminstracion");
+    }
+
+
+
+
 
     private function envio_correo_apcli() {
 

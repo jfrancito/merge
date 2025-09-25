@@ -77,6 +77,15 @@
             <th class= 'tabladp'>MOVIMIENTO</th>
             <th class= 'tabladp'>BANCO</th>
             <th class= 'tabladp'>CUENTA</th>
+
+
+            <th class= 'tabladp'>MEDIO PAGO</th>
+            <th class= 'tabladp'>FECHA PAGO</th>
+            <th class= 'tabladp'>NOMBRE BANCO</th>
+            <th class= 'tabladp'>IMPORTE PAGADO</th>
+            <th class= 'tabladp'>PDF PAGO MERGE</th>
+
+
         </tr>
         @foreach($listadatos as $index => $item) 
         <tr>
@@ -116,6 +125,22 @@
             <td>{{$item->TXT_ITEM_MOVIMIENTO}}</td>
             <td>{{$item->NOMBRE_BANCO_CAJA}}</td>
             <td>{{$item->CUENTA}}</td>
+
+
+            <td>{{$item->MEDIO_PAGO}}</td>
+            <td>{{$item->FECHA_PAGO}}</td>
+            <td>{{$item->NOMBRE_BANCO}}</td>
+            <td>{{$item->IMPORTE}}</td>
+
+            <td>
+                @if($item->COD_ESTADO_FE == 'ETM0000000000008')
+                    SI
+                @else
+                    NO
+                @endif
+            </td>
+
+
         </tr>
         @endforeach
     </table>

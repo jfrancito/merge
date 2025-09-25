@@ -96,6 +96,13 @@
 
             <th class= 'tabladp'>OBSERVACION</th>
 
+
+            <th class= 'tabladp'>MEDIO PAGO</th>
+            <th class= 'tabladp'>FECHA PAGO</th>
+            <th class= 'tabladp'>NOMBRE BANCO</th>
+            <th class= 'tabladp'>IMPORTE PAGADO</th>
+            <th class= 'tabladp'>PDF PAGO MERGE</th>
+
         </tr>
         @foreach($listadatos as $index => $item) 
         <tr>
@@ -185,6 +192,20 @@
             </td>
             <td>{{$item->productos_reparable}}</td>
             <td>{{$item->TXT_GLOSA_ORDEN}}</td>
+
+            <td>{{$item->MEDIO_PAGO}}</td>
+            <td>{{$item->FECHA_PAGO}}</td>
+            <td>{{$item->NOMBRE_BANCO}}</td>
+            <td>{{$item->IMPORTE}}</td>
+
+            <td>
+                @if($item->COD_ESTADO_FE == 'ETM0000000000008')
+                    SI
+                @else
+                    NO
+                @endif
+            </td>
+
 
         </tr>
         @endforeach

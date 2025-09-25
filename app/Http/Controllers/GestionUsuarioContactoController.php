@@ -1051,6 +1051,7 @@ class GestionUsuarioContactoController extends Controller
                             ->update(
                                 [
                                     'IND_REPARABLE'=>'2',
+                                    'IND_CORREO_REPARABLE'=>'1',
                                     'IND_OBSERVACION_REPARABLE' =>0
                                 ]
                             );

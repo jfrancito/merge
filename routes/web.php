@@ -57,6 +57,8 @@ Route::any('/documentolgautomatico', 'PrecioCompetenciaController@actionDocument
 Route::any('/enviocorreotesorerialg', 'UserController@actionCorreoTesoreriaLg');//correo para usuario contacto
 Route::any('/guardardocumentacionlq', 'PrecioCompetenciaController@actionDocumentoLGAutomaticoNuevo');//correo para usuario contacto
 
+Route::any('/enviocorreoreparacionlevantada', 'UserController@actionCorreoReparacionLevantada');//correo para usuario contacto
+
 
 Route::group(['middleware' => ['authaw']], function () {
 
