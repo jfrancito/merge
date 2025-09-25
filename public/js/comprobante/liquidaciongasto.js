@@ -302,16 +302,12 @@ $(document).ready(function () {
         switch ($(this).val()) {
             case "TDO0000000000002":
             case "TDO0000000000010":
-                $('#tipo_asiento')
-                    .val('TAS0000000000007')
-                    .trigger('change')
-                    .prop('disabled', true);
+                window.selects['tipo_asiento'].setSelected('TAS0000000000007');
+                $('#tipo_asiento').trigger('change').prop('disabled', true);
                 break;
             default:
-                $('#tipo_asiento')
-                    .val('TAS0000000000004')
-                    .trigger('change')
-                    .prop('disabled', false);
+                window.selects['tipo_asiento'].setSelected('TAS0000000000004');
+                $('#tipo_asiento').trigger('change').prop('disabled', true);
                 break;
         }
     });
@@ -2544,7 +2540,7 @@ $(document).ready(function () {
             setTimeout(function () {
                 //$('#periodo_asiento').val(periodo_asiento).trigger('change');
                 window.selects['periodo_asiento'].setSelected(periodo_asiento.trim())
-            }, 3000); // espera medio segundo o el tiempo necesario
+            }, 1000); // espera medio segundo o el tiempo necesario
         }
 
         cerrarcargando();
