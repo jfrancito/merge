@@ -858,43 +858,29 @@ $(document).ready(function () {
         if (Math.abs(diferencia) > 0 && Math.abs(diferencia) < 0.1) {
 
             // Recorrerlo
-            arrayDetalle.forEach(item => {
+            for (let item of arrayDetalle) {
                 if (totalAsiento > totalHaberMN || totalAsiento < totalHaberMN) {
                     if (!/^40/.test(item.TXT_CUENTA_CONTABLE) && parseFloat(item.CAN_HABER_MN) > 0.0000) {
                         if (totalAsiento > totalHaberMN) {
                             item.CAN_HABER_MN = redondear4(parseFloat(item.CAN_HABER_MN) + Math.abs(diferencia));
-                            return;
                         } else {
                             item.CAN_HABER_MN = redondear4(parseFloat(item.CAN_HABER_MN) - Math.abs(diferencia));
-                            return;
                         }
+                        break; // ✅ Rompe el bucle
                     }
                 }
+
                 if (totalAsiento > totalDebeMN || totalAsiento < totalDebeMN) {
                     if (!/^40/.test(item.TXT_CUENTA_CONTABLE) && parseFloat(item.CAN_DEBE_MN) > 0.0000) {
                         if (totalAsiento > totalDebeMN) {
                             item.CAN_DEBE_MN = redondear4(parseFloat(item.CAN_DEBE_MN) + Math.abs(diferencia));
-                            return;
                         } else {
                             item.CAN_DEBE_MN = redondear4(parseFloat(item.CAN_DEBE_MN) - Math.abs(diferencia));
-                            return;
                         }
+                        break; // ✅ Rompe el bucle
                     }
                 }
-                /*
-                if (diferencia > 0) {
-                    if (!/^40/.test(item.TXT_CUENTA_CONTABLE) &&  !/^43/.test(item.TXT_CUENTA_CONTABLE) && !/^42/.test(item.TXT_CUENTA_CONTABLE) && parseFloat(item.CAN_HABER_MN) > 0.0000) {
-                        item.CAN_HABER_MN = redondear4(parseFloat(item.CAN_HABER_MN) - Math.abs(diferencia));
-                        return;
-                    }
-                } else {
-                    if (!/^40/.test(item.TXT_CUENTA_CONTABLE) &&  !/^43/.test(item.TXT_CUENTA_CONTABLE) && !/^42/.test(item.TXT_CUENTA_CONTABLE) && parseFloat(item.CAN_DEBE_MN) > 0.0000) {
-                        item.CAN_DEBE_MN = redondear4(parseFloat(item.CAN_DEBE_MN) + Math.abs(diferencia));
-                        return;
-                    }
-                }
-                 */
-            });
+            }
 
             document.getElementById(array_text).value = JSON.stringify(arrayDetalle);
 
@@ -905,7 +891,7 @@ $(document).ready(function () {
                 // obtenemos el índice de la fila
                 let rowIdx = table.row(fila).index();
 
-                //obtenemos el numero de cuenta
+                // obtenemos el numero de cuenta
                 let numero_cuenta = table.cell(rowIdx, 1).data();
 
                 // ejemplo: obtener el valor actual de la columna 3 (Debe MN)
@@ -913,57 +899,30 @@ $(document).ready(function () {
                 let haberMN = parseFloat(table.cell(rowIdx, 4).data().replaceAll(/[\$,]/g, "")) || 0;
 
                 if (totalAsiento > totalHaberMN || totalAsiento < totalHaberMN) {
-                    let nuevoHaberMN = 0;
-                    if (!/^40/.test(numero_cuenta) && parseFloat(haberMN) > 0.0000) {
-                        if (totalAsiento > totalHaberMN) {
-                            nuevoHaberMN = haberMN + Math.abs(diferencia);
-                        } else {
-                            nuevoHaberMN = haberMN - Math.abs(diferencia);
-                        }
+                    if (!/^40/.test(numero_cuenta) && haberMN > 0.0000) {
+                        let nuevoHaberMN = totalAsiento > totalHaberMN
+                            ? haberMN + Math.abs(diferencia)
+                            : haberMN - Math.abs(diferencia);
+
                         table.cell(rowIdx, 4).data(number_format(nuevoHaberMN, 4));
-                        // refrescar la fila para que se vea el cambio
                         table.row(rowIdx).invalidate().draw(false);
-                        return;
+
+                        return false; // ✅ Rompe el bucle de jQuery.each
                     }
                 }
+
                 if (totalAsiento > totalDebeMN || totalAsiento < totalDebeMN) {
-                    let nuevoDebeMN = 0;
-                    if (!/^40/.test(numero_cuenta) && parseFloat(debeMN) > 0.0000) {
-                        if (totalAsiento > totalDebeMN) {
-                            nuevoDebeMN = debeMN + Math.abs(diferencia);
-                        } else {
-                            nuevoDebeMN = debeMN - Math.abs(diferencia);
-                        }
+                    if (!/^40/.test(numero_cuenta) && debeMN > 0.0000) {
+                        let nuevoDebeMN = totalAsiento > totalDebeMN
+                            ? debeMN + Math.abs(diferencia)
+                            : debeMN - Math.abs(diferencia);
+
                         table.cell(rowIdx, 3).data(number_format(nuevoDebeMN, 4));
-                        // refrescar la fila para que se vea el cambio
                         table.row(rowIdx).invalidate().draw(false);
-                        return;
+
+                        return false; // ✅ Rompe el bucle de jQuery.each
                     }
                 }
-                /*
-                // ejemplo: sumarle 10 y actualizarlo
-                if (diferencia > 0) {
-                    let nuevoHaberMN = haberMN - Math.abs(diferencia);
-                    console.log(nuevoHaberMN);
-                    if (!/^40/.test(numero_cuenta) && !/^43/.test(numero_cuenta) && !/^42/.test(numero_cuenta) && haberMN > 0.0000) {
-                        console.log("haber diferente de 40");
-                        table.cell(rowIdx, 4).data(number_format(nuevoHaberMN, 4));
-                        // refrescar la fila para que se vea el cambio
-                        table.row(rowIdx).invalidate().draw(false);
-                        return;
-                    }
-                } else {
-                    let nuevoDebeMN = debeMN + Math.abs(diferencia);
-                    console.log(nuevoDebeMN);
-                    if (!/^40/.test(numero_cuenta) && !/^43/.test(numero_cuenta) && !/^42/.test(numero_cuenta) && debeMN > 0.0000) {
-                        console.log("debe diferente de 40");
-                        table.cell(rowIdx, 3).data(number_format(nuevoDebeMN, 4));
-                        // refrescar la fila para que se vea el cambio
-                        table.row(rowIdx).invalidate().draw(false);
-                        return;
-                    }
-                }
-                 */
             });
 
             // redibujar la tabla → esto dispara footerCallback y recalcula totales
@@ -996,6 +955,8 @@ $(document).ready(function () {
             });
         }
 
+        debugger;
+
         // calcular diferencia
         diferencia = totalHaberME - totalDebeME;
 
@@ -1011,73 +972,66 @@ $(document).ready(function () {
         if (Math.abs(diferencia) > 0 && Math.abs(diferencia) < 0.1) {
 
             // Recorrerlo
-            arrayDetalle.forEach(item => {
+            for (let item of arrayDetalle) {
+                debugger;
                 if (totalAsiento > totalHaberME || totalAsiento < totalHaberME) {
                     if (!/^40/.test(item.TXT_CUENTA_CONTABLE) && parseFloat(item.CAN_HABER_ME) > 0.0000) {
                         if (totalAsiento > totalHaberME) {
                             item.CAN_HABER_ME = redondear4(parseFloat(item.CAN_HABER_ME) + Math.abs(diferencia));
-                            return;
                         } else {
                             item.CAN_HABER_ME = redondear4(parseFloat(item.CAN_HABER_ME) - Math.abs(diferencia));
-                            return;
                         }
+                        break; // ✅ aquí se rompe el bucle
                     }
                 }
+
                 if (totalAsiento > totalDebeME || totalAsiento < totalDebeME) {
                     if (!/^40/.test(item.TXT_CUENTA_CONTABLE) && parseFloat(item.CAN_DEBE_ME) > 0.0000) {
                         if (totalAsiento > totalDebeME) {
                             item.CAN_DEBE_ME = redondear4(parseFloat(item.CAN_DEBE_ME) + Math.abs(diferencia));
-                            return;
                         } else {
                             item.CAN_DEBE_ME = redondear4(parseFloat(item.CAN_DEBE_ME) - Math.abs(diferencia));
-                            return;
                         }
+                        break; // ✅ aquí se rompe el bucle
                     }
                 }
-            });
+            }
 
             document.getElementById(array_text).value = JSON.stringify(arrayDetalle);
 
             // recorrer filas y hacer el cambio
-            $(table_text).each(function () {
+            $(table_text).each(function (index) {
+                debugger;
                 let fila = $(this);
-
-                // obtenemos el índice de la fila
                 let rowIdx = table.row(fila).index();
-
-                //obtenemos el numero de cuenta
                 let numero_cuenta = table.cell(rowIdx, 1).data();
 
-                // ejemplo: obtener el valor actual de la columna 3 (Debe MN)
                 let debeME = parseFloat(table.cell(rowIdx, 5).data().replaceAll(/[\$,]/g, "")) || 0;
                 let haberME = parseFloat(table.cell(rowIdx, 6).data().replaceAll(/[\$,]/g, "")) || 0;
 
                 if (totalAsiento > totalHaberME || totalAsiento < totalHaberME) {
-                    let nuevoHaberME = 0;
-                    if (!/^40/.test(numero_cuenta) && parseFloat(haberME) > 0.0000) {
-                        if (totalAsiento > totalHaberME) {
-                            nuevoHaberME = haberME + Math.abs(diferencia);
-                        } else {
-                            nuevoHaberME = haberME - Math.abs(diferencia);
-                        }
+                    if (!/^40/.test(numero_cuenta) && haberME > 0) {
+                        let nuevoHaberME = totalAsiento > totalHaberME
+                            ? haberME + Math.abs(diferencia)
+                            : haberME - Math.abs(diferencia);
+
                         table.cell(rowIdx, 6).data(number_format(nuevoHaberME, 4));
-                        // refrescar la fila para que se vea el cambio
                         table.row(rowIdx).invalidate().draw(false);
-                        return;
+
+                        return false; // ✅ en jQuery .each, return false rompe el bucle
                     }
                 }
+
                 if (totalAsiento > totalDebeME || totalAsiento < totalDebeME) {
-                    let nuevoDebeME = 0;
-                    if (!/^40/.test(numero_cuenta) && parseFloat(debeME) > 0.0000) {
-                        if (totalAsiento > totalDebeME) {
-                            nuevoDebeME = debeME + Math.abs(diferencia);
-                        } else {
-                            nuevoDebeME = debeME - Math.abs(diferencia);
-                        }
+                    if (!/^40/.test(numero_cuenta) && debeME > 0) {
+                        let nuevoDebeME = totalAsiento > totalDebeME
+                            ? debeME + Math.abs(diferencia)
+                            : debeME - Math.abs(diferencia);
+
                         table.cell(rowIdx, 5).data(number_format(nuevoDebeME, 4));
-                        // refrescar la fila para que se vea el cambio
                         table.row(rowIdx).invalidate().draw(false);
-                        return;
+
+                        return false; // ✅ corta el bucle en jQuery
                     }
                 }
             });
