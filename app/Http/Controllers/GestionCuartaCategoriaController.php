@@ -157,8 +157,14 @@ class GestionCuartaCategoriaController extends Controller
 
             $anio           =   $this->anio;
             $mes            =   $this->mes;
-            $empresa_id     = "";
-            $combo_empresa  = array();
+            $empresa_id     =   "";
+            $combo_empresa  =   array();
+
+            $tarchivos      =   CMPCategoria::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+                                        ->whereIn('TXT_FORMATO', ['PDF'])
+                                        ->get();
+
+
             return View::make('cuartacategoria.agregarcuartacategoria',
                              [
 
