@@ -5423,8 +5423,8 @@ class GestionLiquidacionGastosController extends Controller
         $fecha_fin = $this->fecha_sin_hora;
 
         $listacabecera = LqgLiquidacionGasto::where('ACTIVO', '=', '1')
-            //->whereRaw("CAST(FECHA_CREA  AS DATE) >= ? and CAST(FECHA_CREA  AS DATE) <= ?", [$fecha_inicio, $fecha_fin])
-            //->where('USUARIO_CREA', '=', Session::get('usuario')->id)
+            ->whereRaw("CAST(FECHA_CREA  AS DATE) >= ? and CAST(FECHA_CREA  AS DATE) <= ?", [$fecha_inicio, $fecha_fin])
+            ->where('USUARIO_CREA', '=', Session::get('usuario')->id)
             ->where('COD_EMPRESA', '=', Session::get('empresas')->COD_EMPR)
             ->orderby('FECHA_CREA', 'DESC')->get();
 
