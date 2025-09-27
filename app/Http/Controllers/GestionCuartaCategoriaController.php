@@ -15,6 +15,9 @@ use App\Modelos\CMPCategoria;
 use App\Modelos\PlaDocumentoHistorial;
 use App\Modelos\STDEmpresa;
 use App\Modelos\CONPeriodo;
+use App\Modelos\ProRentaCuartaCategoria;
+
+
 
 use App\Modelos\FePlanillaEntregable;
 use App\Modelos\CMPDocAsociarCompra;
@@ -37,7 +40,7 @@ use App\Traits\CuartaCategoriaTraits;
 use App\Traits\ComprobanteTraits;
 
 
-
+use Carbon\Carbon;
 use Hashids;
 use SplFileInfo;
 use Excel;
@@ -63,96 +66,95 @@ class GestionCuartaCategoriaController extends Controller
                 
                 DB::beginTransaction();
 
+                    $empresa_id                        =   $request['empresa_id'];
+                    $fecha_constancia                  =   $request['fecha_constancia'];
+                    $nro_operacion                     =   $request['nro_operacion'];
+                    $fechaActual = $fecha_constancia;
+                    $fecha = Carbon::parse($fechaActual);
 
-                    $anio           =   $this->anio;
-                    $mes            =   $this->mes;
-                    $periodo        =   $this->gn_periodo_actual_xanio_xempresa($anio, $mes, Session::get('empresas')->COD_EMPR);
+                    // Obtener el fin de año
+                    $finDeAnio = $fecha->copy()->endOfYear(); // 2025-12-31 23:59:59
 
+                    // Obtener solo el año
+                    $anio = $fecha->year; // 2025
 
-                    $trabajador     =   DB::table('STD.TRABAJADOR')
-                                        ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
-                                        ->first();
-                    $dni            =       '';
-                    $centro_id      =       '';
-                    if(count($trabajador)>0){
-                        $dni        =       $trabajador->NRO_DOCUMENTO;
+                    // Formatear si necesitas
+                    $finDeAnioFormateado = $finDeAnio->format('Y-m-d'); // 2025-12-31
+                    $anioFormateado = $anio; // 2025
+                    $partes = explode(" - ", $empresa_id);
+                    $ruc = '';
+                    $td = '01';
+                    if (count($partes) > 1) {
+                        $ruc = trim($partes[0]);
                     }
-                    $trabajadorespla    =   DB::table('WEB.platrabajadores')
-                                            ->where('situacion_id', 'PRMAECEN000000000002')
-                                            ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
-                                            ->where('dni', $dni)
-                                            ->first();
-                    if(count($trabajador)>0){
-                        $centro_id      =       $trabajadorespla->centro_osiris_id;
-                    }
+                    $empresa = STDEmpresa::where('NRO_DOCUMENTO', '=', $ruc)->first();
 
-                    if($centro_id == 'CEN0000000000003'){
-                        $centro_id = 'CEN0000000000001';
-                    }
+                    $idcab                              =   $this->funciones->getCreateIdMaestradocpla('PRO_RENTA_CUARTA_CATEGORIA','RECU');
 
-                    if (Session::get('usuario')->id == '1CIX00000040') {
-                        $centro_id = 'CEN0000000000001';
-                    }
-
-
-                    $serie          =   $this->gn_serie($anio, $mes,$centro_id);
-                    $numero         =   $this->gn_numero($serie,$centro_id);
-
-
-                    $centrot        =   DB::table('ALM.CENTRO')
-                                        ->where('COD_CENTRO', $centro_id)
-                                        ->first();
-
-                    $txttrabajador  =   '';
-                    $codtrabajador  =   '';
-                    $doctrabajador  =   '';
-                    $fecha_creacion =   $this->hoy;
-                    $dtrabajador    =   STDTrabajador::where('COD_TRAB','=',Session::get('usuario')->usuarioosiris_id)->first();
-                    if(count($dtrabajador)>0){
-                        $txttrabajador  =   $dtrabajador->TXT_APE_PATERNO.' '.$dtrabajador->TXT_APE_MATERNO.' '.$dtrabajador->TXT_NOMBRES;
-                        $doctrabajador  =   $dtrabajador->NRO_DOCUMENTO;
-                        $codtrabajador  =   $dtrabajador->COD_TRAB;
-                    }
-                    $idcab                              =   $this->funciones->getCreateIdMaestradocpla('PLA_MOVILIDAD','PLAM');
-                    $codigo                             =   $this->funciones->generar_codigo('PLA_MOVILIDAD',8);
-
-                    $direcion_id                        =   $request['direccion_id'];
-                    $direccion                          =   $this->gn_generacion_combo_direccion_lg_top($direcion_id);
-
-
-                    $cabecera                           =   new PlaMovilidad;
+                    $cabecera                           =   new ProRentaCuartaCategoria;
                     $cabecera->ID_DOCUMENTO             =   $idcab;
-                    $cabecera->CODIGO                   =   $codigo;
-                    $cabecera->SERIE                    =   $serie;
-                    $cabecera->NUMERO                   =   $numero;
-                    $cabecera->COD_TRABAJADOR           =   $codtrabajador;
-                    $cabecera->TXT_TRABAJADOR           =   $txttrabajador;
-                    $cabecera->COD_EMPRESA              =   Session::get('empresas')->COD_EMPR;
-                    $cabecera->TXT_EMPRESA              =   Session::get('empresas')->NOM_EMPR;
-                    $cabecera->DOCUMENTO_TRABAJADOR     =   $doctrabajador;
-                    $cabecera->COD_PERIODO              =   $periodo->COD_PERIODO;
-                    $cabecera->TXT_PERIODO              =   $periodo->TXT_NOMBRE;
-                    $cabecera->COD_ESTADO               =   'ETM0000000000001';
-                    $cabecera->TXT_ESTADO               =   'GENERADO';
-                    $cabecera->COD_CENTRO               =   $centrot->COD_CENTRO;
-                    $cabecera->TXT_CENTRO               =   $centrot->NOM_CENTRO;
-                    $cabecera->COD_DIRECCION            =   $direccion->COD_DIRECCION;
-                    $cabecera->TXT_DIRECCION            =   $direccion->DIRECCION;
-                    $cabecera->IGV                      =   0;
-                    $cabecera->SUBTOTAL                 =   0;
-                    $cabecera->TOTAL                    =   0;
+                    $cabecera->FECHA_CONSTANCIA         =   date_format(date_create($fecha_constancia), 'Ymd');
+                    $cabecera->FECHA_CADUCIDAD          =   date_format(date_create($finDeAnioFormateado), 'Ymd');
+                    $cabecera->ANIO                     =   $anio;
+                    $cabecera->COD_EMPRESA              =   $empresa->COD_EMPR;
+                    $cabecera->RUC                      =   $empresa->NRO_DOCUMENTO;
+                    $cabecera->RAZON_SOCIAL             =   $empresa->NOM_EMPR;
+                    $cabecera->NUMERO_OPERACION         =   $nro_operacion;
+                    $cabecera->COD_ESTADO               =   'ETM0000000000004';
+                    $cabecera->TXT_ESTADO               =   'POR APROBAR ADMINISTRACION';
+                    $cabecera->ACTIVO                   =   1;
                     $cabecera->FECHA_CREA               =   $this->fechaactual;
                     $cabecera->USUARIO_CREA             =   Session::get('usuario')->id;
                     $cabecera->save();
 
+                    $tarchivos                          =   CMPCategoria::where('COD_CATEGORIA','=','DCC0000000000034')->where('COD_ESTADO','=',1)
+                                                            ->get();
 
+                    //GUARDAR 4TA RENTA
+                    foreach($tarchivos as $index => $item){
+
+                        $filescdm          =   $request[$item->COD_CATEGORIA];
+                        if(!is_null($filescdm)){
+                            //CDR
+                            foreach($filescdm as $file){
+
+                                $contadorArchivos = Archivo::count();
+                                $nombre           =      $idcab.'-'.$file->getClientOriginalName();
+                                /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
+                                $prefijocarperta =      'RENTACUARTA';
+                                $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta;
+                                $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                                $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
+                                copy($file->getRealPath(),$rutacompleta);
+                                $path            =      $rutacompleta;
+
+                                $nombreoriginal             =   $file->getClientOriginalName();
+                                $info                       =   new SplFileInfo($nombreoriginal);
+                                $extension                  =   $info->getExtension();
+
+                                $dcontrol                       =   new Archivo;
+                                $dcontrol->ID_DOCUMENTO         =   $idcab;
+                                $dcontrol->DOCUMENTO_ITEM       =   1;
+                                $dcontrol->TIPO_ARCHIVO         =   $item->COD_CATEGORIA;
+                                $dcontrol->NOMBRE_ARCHIVO       =   $nombrefilecdr;
+                                $dcontrol->DESCRIPCION_ARCHIVO  =   $item->NOM_CATEGORIA;
+                                $dcontrol->URL_ARCHIVO      =   $path;
+                                $dcontrol->SIZE             =   filesize($file);
+                                $dcontrol->EXTENSION        =   $extension;
+                                $dcontrol->ACTIVO           =   1;
+                                $dcontrol->FECHA_CREA       =   $this->fechaactual;
+                                $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
+                                $dcontrol->save();
+                            }
+                        }
+                    }
                 DB::commit();
             }catch(\Exception $ex){
                 DB::rollback(); 
-                return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+                return Redirect::to('gestion-de-suspension-ta-categoria/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
                 $iddocumento                            =   Hashids::encode(substr($idcab, -8));
-                return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$iddocumento)->with('bienhecho', 'Planilla Movilidad '.$serie.'-'.$numero.' registrado con exito, ingrese sus comprobantes');
+                return Redirect::to('gestion-de-suspension-ta-categoria/'.$idopcion)->with('bienhecho', 'Renta 4ta Categoria '.$idcab.' registrado con exito');
         }else{
 
             $anio           =   $this->anio;
@@ -160,19 +162,16 @@ class GestionCuartaCategoriaController extends Controller
             $empresa_id     =   "";
             $combo_empresa  =   array();
 
-            $tarchivos      =   CMPCategoria::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
-                                        ->whereIn('TXT_FORMATO', ['PDF'])
-                                        ->get();
+            $tarchivos      =   CMPCategoria::where('COD_CATEGORIA','=','DCC0000000000034')->where('COD_ESTADO','=',1)
+                                ->get();
 
 
             return View::make('cuartacategoria.agregarcuartacategoria',
                              [
 
-
                                 'empresa_id' => $empresa_id,
                                 'combo_empresa' => $combo_empresa,
-
-
+                                'tarchivos' => $tarchivos,
                                 'idopcion' => $idopcion
                              ]);
         }   
@@ -189,7 +188,7 @@ class GestionCuartaCategoriaController extends Controller
         $cod_empresa        =   Session::get('usuario')->usuarioosiris_id;
 
         $lrentacuartacategoria  =   $this->pla_lista_renta_cuarta_categoria();
-        $funcion            =   $this;
+        $funcion                =   $this;
 
         return View::make('cuartacategoria/listacuartacategoria',
                          [

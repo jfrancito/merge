@@ -20,7 +20,7 @@
             <span class="panel-subtitle">Crear un nueva nueva constancia 4ta categoria</span>
           </div>
           <div class="panel-body">
-            <form method="POST" action="{{ url('/agregar-cuarta-categoria/'.$idopcion) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" id ='frmpm'>
+            <form method="POST" action="{{ url('/agregar-cuarta-categoria/'.$idopcion) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" id ='frmpm' enctype="multipart/form-data">
                   {{ csrf_field() }}
                   <div class='formconsulta'>
                     @include('cuartacategoria.form.facuartacategoria')
@@ -145,14 +145,8 @@
 
     <script type="text/javascript">
         @foreach($tarchivos as $index => $item) 
-
-            var extension = '{{$item->TXT_FORMATO}}';
-            if(extension=='ZIP'){
-                extension = 'XML';
-            }
-
-
-            $('#file-{{$item->COD_CATEGORIA_DOCUMENTO}}').fileinput({
+            var extension = 'PDF';
+            $('#file-{{$item->COD_CATEGORIA}}').fileinput({
               theme: 'fa5',
               language: 'es',
               allowedFileExtensions: [extension],
