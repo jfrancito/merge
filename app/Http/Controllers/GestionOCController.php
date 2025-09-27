@@ -226,7 +226,7 @@ class GestionOCController extends Controller
 
         header('Content-Type: text/html; charset=UTF-8');
         //$path = storage_path() . "/exports/FC26-00002985.XML";
-        $path = storage_path() . "/exports/20608606301-01-F001-00002672.xml";
+        $path = storage_path() . "/exports/IICHAU0000011936.xml";
         $parser = new InvoiceParser();
         $xml = file_get_contents($path);
         $factura = $parser->parse($xml);
@@ -239,7 +239,7 @@ class GestionOCController extends Controller
     {
 
         header('Content-Type: text/html; charset=UTF-8');
-        $path = storage_path() . "/exports/RHE1075394716299.xml";
+        $path = storage_path() . "/exports/IICHAU0000011936.xml";
         //$path = storage_path() . "/exports/RHE1044061449953.xml";
 
         $parser = new RHParser();
