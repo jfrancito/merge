@@ -43,6 +43,7 @@ class ValeRendirApruebaController extends Controller
         $combo1 = array('' => 'Seleccione Usuario Aprueba') + $usuariosAp;
         $combo2 = array('' => 'Seleccione Tipo o Motivo') + $tipoMotivo;
 
+ 
         
 
         $cod_usuario_registro = Session::get('usuario')->id;
@@ -50,12 +51,16 @@ class ValeRendirApruebaController extends Controller
         $perfil_administracion = Session::get('usuario')->rol_id;
 
         $usuario_logueado_id = Session::get('usuario')->usuarioosiris_id;
+         $cod_empre = Session::get('empresas')->centro_id;
         $usuario_merge = session::get('usuario')->id;
 
         $usuario_nombre_logueado_id = Session::get('usuario')->nombre;
 
-
-
+        $trabajadorCentro = DB::table('STD.TRABAJADOR')
+        ->select('COD_ZONA_TIPO')
+        ->where('COD_TRAB', $usuario_logueado_id)
+        ->first();
+     
         $listarusuarios = $this->listaValeRendirAprueba(
                  "GEN",
                 "",
@@ -78,6 +83,7 @@ class ValeRendirApruebaController extends Controller
             'usuario_logueado_id' => $usuario_logueado_id,
             'usuario_merge' => $usuario_merge,
             'perfil_administracion' => $perfil_administracion,
+            'trabajadorCentro' => $trabajadorCentro,
             'txtNombreCliente'=>'',
             'ajax'=>true,
          
