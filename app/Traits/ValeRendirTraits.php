@@ -613,7 +613,7 @@ trait ValeRendirTraits
      public function listaValeRendirAprueba($ind_tipo_operacion, $id, $cod_empr, $cod_centro, $usuario_autoriza, $usuario_aprueba, $tipo_motivo,
                                     $txt_glosa, $can_total_importe, $can_total_saldo, $cod_usuario_registro)
     {
-         $array_lista_retail = array();
+        $array_lista_retail = array();
 
         $cod_usuario_registro = "";
 
@@ -621,8 +621,17 @@ trait ValeRendirTraits
         $usuario_aprueba = $usuario->get(0)->usuarioosiris_id;
 
         $cod_empr = Session::get('empresas')->COD_EMPR;
+
+        $usuario_logueado_id = Session::get('usuario')->usuarioosiris_id;
+
+
+        $trabajadorCentro = DB::table('STD.TRABAJADOR')
+        ->select('COD_ZONA_TIPO')
+        ->where('COD_TRAB', $usuario_logueado_id)
+        ->first();
    
-        $cod_centro = '';
+        $cod_centro = $trabajadorCentro->COD_ZONA_TIPO;
+       
 
 
         $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC WEB.VALE_RENDIR_LISTAR
