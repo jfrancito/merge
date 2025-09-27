@@ -199,7 +199,8 @@
                 SEÑORES:
             </td>
             <td style="text-align:right; white-space:nowrap; font-size:12px;">
-                {{ \Carbon\Carbon::now()->formatLocalized('%d de %B de %Y') }}
+                {{ \App\Helpers\NumeroALetras::fechaBonita($fec_operacion) }}
+
             </td>
         </tr>
         <!-- Segunda fila (empresa alineada debajo de SEÑORES) -->
