@@ -28,7 +28,7 @@
                 $perfil_administracion == '1CIX00000020' || 
                 $perfil_administracion == '1CIX00000033' ||
                 $perfil_administracion == '1CIX00000006' ||
-                $perfil_administracion == '1CIX00000019' 
+                $perfil_administracion == '1CIX00000043' 
             )
         )
         <tr data_vale_rendir="{{$item['ID']}}">

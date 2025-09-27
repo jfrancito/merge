@@ -45,7 +45,7 @@
               <td>{{$item['TOTAL']}}</td>   
               <td>{{$item['SALDO']}}</td>   
               <td>
-                <span class="badge badge-success">
+                <span class="badge badge-white">
                     {{ $item['ESTADO'] }}
                 </span>
               </td>
