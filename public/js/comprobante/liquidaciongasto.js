@@ -283,13 +283,14 @@ $(document).ready(function () {
     $('#tipo_documento_asiento').on('change', function () {
         switch ($(this).val()) {
             case "TDO0000000000002":
+            case "TDO0000000000066":
             case "TDO0000000000010":
                 window.selects['tipo_asiento'].setSelected('TAS0000000000007');
                 $('#tipo_asiento').trigger('change').prop('disabled', true);
                 break;
             default:
                 window.selects['tipo_asiento'].setSelected('TAS0000000000004');
-                $('#tipo_asiento').trigger('change').prop('disabled', true);
+                $('#tipo_asiento').trigger('change').prop('disabled', false);
                 break;
         }
     });
