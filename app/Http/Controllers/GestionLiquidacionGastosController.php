@@ -1137,7 +1137,7 @@ class GestionLiquidacionGastosController extends Controller
 
         $listadatos = $this->lg_lista_cabecera_comprobante_total_gestion_excel($cod_empresa, $fecha_inicio, $fecha_fin, $proveedor_id, $estado_id);
         Excel::create($titulo . '-(' . $fecha_actual . ')', function ($excel) use ($listadatos, $titulo, $funcion) {
-            $excel->sheet('ORDEN COMPRA', function ($sheet) use ($listadatos, $titulo, $funcion) {
+            $excel->sheet('LIQUIDACION', function ($sheet) use ($listadatos, $titulo, $funcion) {
 
                 $sheet->loadView('reporte/excel/listacomprobantemasivolq')->with('listadatos', $listadatos)
                     ->with('titulo', $titulo)
@@ -3899,10 +3899,10 @@ class GestionLiquidacionGastosController extends Controller
                             $fechaInicio = Carbon::parse($PRIMERA_FECHA_RENDICION_DET);
                             $fechaFin = Carbon::parse($ULTIMA_FECHA_RENDICION_DET);
                             $fechaMin = Carbon::parse($request['fecha_emision']);
-                            if (!$fechaMin->between($fechaInicio, $fechaFin)) {
-                                return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/-1')
-                                       ->with('errorbd', 'La fecha de emisión (' . $fechaMin->format('Y-m-d') . ') no está dentro del rango a rendir (' . $fechaInicio->format('Y-m-d') . ' / ' . $fechaFin->format('Y-m-d') . ')');
-                            }
+                            // if (!$fechaMin->between($fechaInicio, $fechaFin)) {
+                            //     return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/-1')
+                            //            ->with('errorbd', 'La fecha de emisión (' . $fechaMin->format('Y-m-d') . ') no está dentro del rango a rendir (' . $fechaInicio->format('Y-m-d') . ' / ' . $fechaFin->format('Y-m-d') . ')');
+                            // }
 
                         }
 
@@ -3956,10 +3956,10 @@ class GestionLiquidacionGastosController extends Controller
                             $fechaInicio = Carbon::parse($PRIMERA_FECHA_RENDICION_DET);
                             $fechaFin = Carbon::parse($ULTIMA_FECHA_RENDICION_DET);
                             $fechaMin = Carbon::parse($request['fecha_emision']);
-                            if (!$fechaMin->between($fechaInicio, $fechaFin)) {
-                                return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/-1')
-                                       ->with('errorbd', 'La fecha de emisión (' . $fechaMin->format('Y-m-d') . ') no está dentro del rango a rendir (' . $fechaInicio->format('Y-m-d') . ' / ' . $fechaFin->format('Y-m-d') . ')');
-                            }
+                            // if (!$fechaMin->between($fechaInicio, $fechaFin)) {
+                            //     return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/-1')
+                            //            ->with('errorbd', 'La fecha de emisión (' . $fechaMin->format('Y-m-d') . ') no está dentro del rango a rendir (' . $fechaInicio->format('Y-m-d') . ' / ' . $fechaFin->format('Y-m-d') . ')');
+                            // }
 
                         }
 
@@ -4936,7 +4936,7 @@ class GestionLiquidacionGastosController extends Controller
                     $aniosistemas = date("Y");
                     $messistemas = date("m");
                     if ($aniovale != $aniosistemas && $mesvale != $messistemas) {
-                        return Redirect::to('agregar-liquidacion-gastos/' . $idopcion)->with('errorbd', 'La fecha del arendir no corresponde esta dentro del periodo de la Liquidacion de Gasto');
+                        //return Redirect::to('agregar-liquidacion-gastos/' . $idopcion)->with('errorbd', 'La fecha del arendir no corresponde esta dentro del periodo de la Liquidacion de Gasto');
                     }
                 } else {
                     $vale = DB::table('WEB.VALE_RENDIR')->where('ID', $arendir_sel_id)->first();
@@ -4946,7 +4946,7 @@ class GestionLiquidacionGastosController extends Controller
                     $messistemas = date("m");
 
                     if ($aniovale != $aniosistemas && $mesvale != $messistemas) {
-                        return Redirect::to('agregar-liquidacion-gastos/' . $idopcion)->with('errorbd', 'La fecha del arendir no corresponde esta dentro del periodo de la Liquidacion de Gasto');
+                        //return Redirect::to('agregar-liquidacion-gastos/' . $idopcion)->with('errorbd', 'La fecha del arendir no corresponde esta dentro del periodo de la Liquidacion de Gasto');
                     }
 
                 }

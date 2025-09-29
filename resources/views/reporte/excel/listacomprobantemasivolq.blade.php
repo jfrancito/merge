@@ -77,6 +77,10 @@
             <th class= 'tabladp'>TOTAL</th>
             <th class= 'tabladp'>USUARIO AUTORIZA</th>
 
+            <th class= 'tabladp'>USUARIO</th>
+            <th class= 'tabladp'>CORREO USUARIO</th>
+            <th class= 'tabladp'>JEFE</th>
+            <th class= 'tabladp'>CORREO JEFE</th>
 
         </tr>
         @foreach($listadatos as $index => $item) 
@@ -97,6 +101,14 @@
             <td>{{$item->IGV}}</td>
             <td>{{$item->TOTAL}}</td>
             <td>{{$item->TXT_USUARIO_AUTORIZA}}</td>
+
+            <td>{{$item->TXT_EMPRESA_TRABAJADOR}}</td>
+            <td>{{$item->EMAIL_USUARIO}}</td>
+            <td>{{$item->TXT_USUARIO_AUTORIZA}}</td>
+            <td>{{$item->EMAIL_JEFE}}</td>
+
+
+
         </tr>
         @endforeach
     </table>
