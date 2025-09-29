@@ -1101,7 +1101,10 @@ class UserController extends Controller {
 						->groupBy('empresa_id')
 						->get();
 
-		//dd($this->funciones->prefijomaestra());
+
+
+
+		//dd($listanegra);
 
 		$funcion 	=   $this;
 
@@ -1119,6 +1122,30 @@ class UserController extends Controller {
 		$empresas 	= 	STDEmpresa::where('COD_EMPR','=',$idempresa)
 						->where('COD_ESTADO','=','1')->where('IND_SISTEMA','=','1')->first(); 
 		$color 		=   $this->funciones->color_empresa($empresas->COD_EMPR);
+
+
+		$listanegra = DB::table('LQG_DETLIQUIDACIONGASTO')
+		    ->select([
+		        'COD_USUARIO_AUTORIZA',
+		        'TXT_USUARIO_AUTORIZA', 
+		        'LQG_DETLIQUIDACIONGASTO.TXT_EMPRESA_PROVEEDOR'
+		    ])
+		    ->join('LQG_LIQUIDACION_GASTO', 'LQG_DETLIQUIDACIONGASTO.ID_DOCUMENTO', '=', 'LQG_LIQUIDACION_GASTO.ID_DOCUMENTO')
+		    ->whereRaw('ISNULL(LQG_DETLIQUIDACIONGASTO.IND_TOTAL, 0) = 0')
+		    ->where('LQG_DETLIQUIDACIONGASTO.COD_TIPODOCUMENTO', 'TDO0000000000001')
+		    ->where('LQG_DETLIQUIDACIONGASTO.ACTIVO', 1)
+		    ->whereNotIn('LQG_LIQUIDACION_GASTO.COD_ESTADO', ['ETM0000000000006', 'ETM0000000000001'])
+		    ->where('LQG_DETLIQUIDACIONGASTO.BUSQUEDAD', '>=', 10)
+		    ->where('LQG_DETLIQUIDACIONGASTO.USUARIO_CREA','=',Session::get('usuario')->id)
+		    ->groupBy('COD_USUARIO_AUTORIZA')
+		    ->groupBy('TXT_USUARIO_AUTORIZA')
+		    ->groupBy('LQG_DETLIQUIDACIONGASTO.TXT_EMPRESA_PROVEEDOR')
+		    ->orderBy('LQG_DETLIQUIDACIONGASTO.TXT_EMPRESA_PROVEEDOR', 'ASC')
+		    ->get();
+
+		if(count($listanegra)){
+			Session::flash('listanegra', $listanegra);
+		}
 
 		Session::put('color', $color);
 		Session::put('empresas', $empresas);
