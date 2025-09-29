@@ -295,7 +295,7 @@ class ValeRendirApruebaController extends Controller
         ->where('COD_CENTRO', $centrovale)
         ->max('TXT_NUMERO');
 
-           dd($contrato_diferente);
+        //   dd($contrato_diferente);
 
         $nro_documento = is_null($ultimoCorrelativo) ? 1:$ultimoCorrelativo + 1;
         $nro_documento_formateado = str_pad($nro_documento, 10, '0', STR_PAD_LEFT);
