@@ -51,6 +51,220 @@ class GestionCuartaCategoriaController extends Controller
     use CuartaCategoriaTraits;
     use ComprobanteTraits;
 
+    public function actionAgregarExtornoContabilidadRC($idopcion, $idordencompra, Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion, 'Modificar');
+        if ($validarurl <> 'true') {
+            return $validarurl;
+        }
+        /******************************************************/
+        $idcab = $idordencompra;
+        $iddocumento = $this->funciones->decodificarmaestrapre($idordencompra, 'RECU');
+        View::share('titulo', 'Extornar RENTA CUARTA');
+
+        if ($_POST) {
+
+            try {
+
+                DB::beginTransaction();
+                $cuartacategoria        =   ProRentaCuartaCategoria::where('ID_DOCUMENTO','=',$iddocumento)->first();   
+                $descripcion = $request['descripcionextorno'];
+                //ANULAR TODA LA OPERACION
+                ProRentaCuartaCategoria::where('ID_DOCUMENTO', $iddocumento)
+                    ->update(
+                        [
+                            'OBSERVACION' => $descripcion,
+                            'COD_ESTADO' => 'ETM0000000000006',
+                            'TXT_ESTADO' => 'RECHAZADO',
+                            'USUARIO_MOD' => Session::get('usuario')->id,
+                            'FECHA_MOD' => $this->fechaactual
+                        ]
+                    );
+
+                DB::commit();
+                return Redirect::to('gestion-de-aprobar-cuarta-categoria/' . $idopcion)->with('bienhecho', 'Comprobante : ' . $cuartacategoria->ID_DOCUMENTO . ' EXTORNADO CON EXITO');
+            } catch (\Exception $ex) {
+                DB::rollback();
+                return Redirect::to('gestion-de-aprobar-cuarta-categoria/' . $idopcion)->with('errorbd', $ex . ' Ocurrio un error inesperado');
+            }
+        }
+
+    }
+
+
+    public function actionGestionContabilidadRC($idopcion, $iddocumento,Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        $idcab                  =   $iddocumento;
+        $iddocumento            =   $this->funciones->decodificarmaestrapre($iddocumento,'RECU');
+        View::share('titulo','Gestion Renta de 4ta Categoria Contabilidad');
+
+        $cuartacategoria        =   ProRentaCuartaCategoria::where('ID_DOCUMENTO','=',$iddocumento)->first();
+        $archivospdf            =   Archivo::where('ID_DOCUMENTO','=',$iddocumento)->where('EXTENSION', 'like', '%'.'pdf'.'%')->where('ACTIVO','=','1')->get();
+        $ocultar                =   "";
+        // Construir el array de URLs
+        $initialPreview = [];
+        foreach ($archivospdf as $archivo) {
+            $initialPreview[] = route('serve-filerc', ['file' => $archivo->NOMBRE_ARCHIVO]);
+        }
+        $initialPreviewConfig = [];
+        foreach ($archivospdf as $key => $archivo) {
+            $valor                = '';
+            if($key>0){
+                $valor            = 'ocultar';
+            }
+            $initialPreviewConfig[] = [
+                'type'          => "pdf",
+                'caption'       => $archivo->NOMBRE_ARCHIVO,
+                'downloadUrl'   => route('serve-filerc', ['file' => $archivo->NOMBRE_ARCHIVO]),
+                'frameClass'    => $archivo->ID_DOCUMENTO.$archivo->DOCUMENTO_ITEM.' '.$valor //
+            ];
+        }
+        return View::make('cuartacategoria/gestioncontabilidadcc', 
+                        [
+                            'cuartacategoria'       =>  $cuartacategoria,
+                            'idopcion'              =>  $idopcion,
+                            'idcab'                 =>  $idcab,
+                            'iddocumento'           =>  $iddocumento,
+                            'initialPreview'        => json_encode($initialPreview),
+                            'initialPreviewConfig'  => json_encode($initialPreviewConfig),      
+                        ]);
+
+    }
+
+
+    public function actionAprobarContabilidadRC($idopcion, $iddocumento,Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        $idcab                  =   $iddocumento;
+        $iddocumento            =   $this->funciones->decodificarmaestrapre($iddocumento,'RECU');
+        View::share('titulo','Aprobar Renta de 4ta Categoria Contabilidad');
+
+        if($_POST)
+        {
+            try{    
+                DB::beginTransaction();
+                $cuartacategoria        =   ProRentaCuartaCategoria::where('ID_DOCUMENTO','=',$iddocumento)->first();
+                $descripcion            =   $request['descripcion'];
+                ProRentaCuartaCategoria::where('ID_DOCUMENTO',$cuartacategoria->ID_DOCUMENTO)
+                            ->update(
+                                [
+                                    'COD_ESTADO'=>'ETM0000000000005',
+                                    'TXT_ESTADO'=>'APROBADO',
+                                    'OBSERVACION'=>$descripcion,
+                                    'COD_USUARIO_CON_APRUEBA'=>Session::get('usuario')->id,
+                                    'TXT_USUARIO_CON_APRUEBA'=>Session::get('usuario')->nombre,
+                                    'FECHA_MOD'=>$this->fechaactual
+                                ]
+                            );
+
+                DB::commit();
+                return Redirect::to('/gestion-de-aprobar-cuarta-categoria/'.$idopcion)->with('bienhecho', 'Liquidacion de Gastos : '.$cuartacategoria->ID_DOCUMENTO.' APROBADO CON EXITO');
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                return Redirect::to('/gestion-de-aprobar-cuarta-categoria/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+        }
+        else{
+
+
+            $cuartacategoria        =   ProRentaCuartaCategoria::where('ID_DOCUMENTO','=',$iddocumento)->first();
+            $archivospdf            =   Archivo::where('ID_DOCUMENTO','=',$iddocumento)->where('EXTENSION', 'like', '%'.'pdf'.'%')->where('ACTIVO','=','1')->get();
+            $ocultar                =   "";
+            // Construir el array de URLs
+            $initialPreview = [];
+            foreach ($archivospdf as $archivo) {
+                $initialPreview[] = route('serve-filerc', ['file' => $archivo->NOMBRE_ARCHIVO]);
+            }
+            $initialPreviewConfig = [];
+            foreach ($archivospdf as $key => $archivo) {
+                $valor                = '';
+                if($key>0){
+                    $valor            = 'ocultar';
+                }
+                $initialPreviewConfig[] = [
+                    'type'          => "pdf",
+                    'caption'       => $archivo->NOMBRE_ARCHIVO,
+                    'downloadUrl'   => route('serve-filerc', ['file' => $archivo->NOMBRE_ARCHIVO]),
+                    'frameClass'    => $archivo->ID_DOCUMENTO.$archivo->DOCUMENTO_ITEM.' '.$valor //
+                ];
+            }
+
+            return View::make('cuartacategoria/aprobarcontabilidadcc', 
+                            [
+                                'cuartacategoria'       =>  $cuartacategoria,
+                                'idopcion'              =>  $idopcion,
+                                'idcab'                 =>  $idcab,
+                                'iddocumento'           =>  $iddocumento,
+                                'initialPreview'        => json_encode($initialPreview),
+                                'initialPreviewConfig'  => json_encode($initialPreviewConfig),      
+                            ]);
+
+
+        }
+    }
+
+
+
+    public function actionAprobarRentaCuartaContabilidad($idopcion, Request $request)
+    {
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion, 'Ver');
+        if ($validarurl <> 'true') {
+            return $validarurl;
+        }
+        /******************************************************/
+        View::share('titulo', 'Lista Renta 4ta Categoria (contabilidad)');
+        $tab_id = 'oc';
+        if (isset($request['tab_id'])) {
+            $tab_id = $request['tab_id'];
+        }
+        $lrentacuartacategoria = $this->pla_lista_renta_cuarta_categoria_contabilidad();
+        $funcion = $this;
+        return View::make('cuartacategoria/listacuartacategoriacontabilidad',
+            [
+                'lrentacuartacategoria' => $lrentacuartacategoria,
+                'tab_id' => $tab_id,
+                'funcion' => $funcion,
+                'idopcion' => $idopcion,
+            ]);
+    }
+
+    public function actionRentaCuartaContabilidad($idopcion, Request $request)
+    {
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion, 'Ver');
+        if ($validarurl <> 'true') {
+            return $validarurl;
+        }
+        /******************************************************/
+        View::share('titulo', 'Gestion Renta 4ta Categoria');
+        $tab_id = 'oc';
+        if (isset($request['tab_id'])) {
+            $tab_id = $request['tab_id'];
+        }
+        $lrentacuartacategoria = $this->pla_lista_renta_cuarta_categoria_contabilidad_gestion();
+        $funcion = $this;
+        return View::make('cuartacategoria/listacuartacategoriacontabilidadgestion',
+            [
+                'lrentacuartacategoria' => $lrentacuartacategoria,
+                'tab_id' => $tab_id,
+                'funcion' => $funcion,
+                'idopcion' => $idopcion,
+            ]);
+    }
+
+
     public function actionAgregarCuartaCategoria($idopcion,Request $request)
     {
 
@@ -88,6 +302,15 @@ class GestionCuartaCategoriaController extends Controller
                         $ruc = trim($partes[0]);
                     }
                     $empresa = STDEmpresa::where('NRO_DOCUMENTO', '=', $ruc)->first();
+
+                    $rentacuarta_existe  = ProRentaCuartaCategoria::where('ACTIVO','=','1')->where('RUC','=',$empresa->NRO_DOCUMENTO)
+                                           ->where('COD_ESTADO','<>','ETM0000000000006')->where('ANIO','=',$anio)->get();
+
+
+                    if (count($rentacuarta_existe) >= 1) {
+                        return Redirect::back()->with('errorurl', 'Este Una Renta de cuarta ya registrada esta año para este proveedor');
+                    }
+
 
                     $idcab                              =   $this->funciones->getCreateIdMaestradocpla('PRO_RENTA_CUARTA_CATEGORIA','RECU');
 
