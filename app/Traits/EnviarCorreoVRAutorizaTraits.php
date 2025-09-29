@@ -28,6 +28,7 @@ trait EnviarCorreoVRAutorizaTraits
             ->join('WEB.ListaplatrabajadoresGenereal as tra', 'tra.DNI', '=', 'emp.NRO_DOCUMENTO')
             ->where('vr.ID', $valerendir_id)
             ->select('tra.emailcorp', 'tra.centro_osiris_id')
+            ->first();
 
             $emailTrabajadorAutoriza = DB::table('WEB.VALE_RENDIR as vr')
             ->join('WEB.ListaplatrabajadoresGenereal as tra', 'tra.COD_TRAB', '=', 'vr.USUARIO_AUTORIZA')
@@ -70,10 +71,10 @@ trait EnviarCorreoVRAutorizaTraits
            
             Mail::send('emails.emailvalerendirautoriza',
             ['vale' => $VALE_RENDIR],
-            function ($message) use ($emailfrom, $emailTrabajador, $emailTrabajadorAutoriza, $emailTrabajadorAprueba, $nombreCompleto, $destinatarios) {
+            function ($message) use ($emailfrom, $emailTrabajador, $emailTrabajadorAutoriza, $emailTrabajadorAprueba, $nombreCompleto, $destinatarios, $emailfromcentro) {
                 $message->from($emailfrom, $nombreCompleto)
                         ->to($destinatarios)
-                        ->cc($emailTrabajador, $emailTrabajadorAutoriza) 
+                        ->cc($emailfrom, $emailTrabajadorAutoriza) 
                         ->subject('VALE RENDIR - INDUAMERICA');
             });
 

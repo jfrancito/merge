@@ -269,12 +269,25 @@ class ValeRendirApruebaController extends Controller
 
 
         $combo_series = $notacredito->combo_series_tipodocumento('TDO0000000000072');
+        $centrovale = $txtNombreCliente->COD_CENTRO;
+     
 
+        $conexionbd = 'sqlsrv';
+            if ($centrovale == 'CEN0000000000004') {
+                $conexionbd = 'sqlsrv_r';
+            } elseif ($centrovale == 'CEN0000000000006') {
+                $conexionbd = 'sqlsrv_b';
+            }
 
-        $ultimoCorrelativo = DB::table('TES.AUTORIZACION')
+    // Traer correlativo desde la base correcta
+         $ultimoCorrelativo = DB::connection($conexionbd)
+        ->table('TES.AUTORIZACION')
         ->where('TXT_SERIE', $combo_series)
         ->where('COD_TIPO_DOCUMENTO', 'TDO0000000000072')
+        ->where('COD_CENTRO', $centrovale)
         ->max('TXT_NUMERO');
+
+         //  dd($ultimoCorrelativo);
 
 
         $nro_documento = is_null($ultimoCorrelativo) ? 1:$ultimoCorrelativo + 1;
