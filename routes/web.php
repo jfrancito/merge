@@ -31,6 +31,9 @@ Route::get('/serve-fileestiba', 'FileController@serveFileEstiba')->name('serve-f
 Route::get('/serve-filelg', 'FileController@serveFileLG')->name('serve-filelg');
 Route::get('/serve-filepla', 'FileController@serveFilePlaC')->name('serve-filepla');
 
+Route::get('/serve-filerc', 'FileController@serveFileRC')->name('serve-filerc');
+
+
 Route::get('/serve-filecontrato-sg', 'FileController@serveFileContratoSG')->name('serve-filecontrato-sg');
 Route::get('/serve-filepago', 'FileController@serveFilePago')->name('serve-filepago');
 Route::get('/serve-file-modelo', 'FileController@serveFileModelo')->name('serve-file-modelo');
@@ -173,6 +176,13 @@ Route::group(['middleware' => ['authaw']], function () {
 	//SUSPENSION DE 4TA CATEGORIA
 	Route::any('/gestion-de-suspension-ta-categoria/{idopcion}', 'GestionCuartaCategoriaController@actionListarSuspensionCuarta');
 	Route::any('/agregar-cuarta-categoria/{idopcion}', 'GestionCuartaCategoriaController@actionAgregarCuartaCategoria');
+	Route::any('/descargar-documento-cuarta-categoria/{id}', 'CpeController@descargarArchivoLocalCuartaCategoria');
+
+	Route::any('/gestion-de-aprobar-cuarta-categoria/{idopcion}', 'GestionCuartaCategoriaController@actionAprobarRentaCuartaContabilidad');
+	Route::any('/aprobar-renta-cuarta-contabilidad/{idopcion}/{idordencompra}', 'GestionCuartaCategoriaController@actionAprobarContabilidadRC');
+	Route::any('/agregar-extorno-contabilidad-rc/{idopcion}/{idordencompra}', 'GestionCuartaCategoriaController@actionAgregarExtornoContabilidadRC');
+	Route::any('/gestion-de-cuarta-categoria/{idopcion}', 'GestionCuartaCategoriaController@actionRentaCuartaContabilidad');
+	Route::any('/gestion-renta-cuarta-contabilidad/{idopcion}/{idordencompra}', 'GestionCuartaCategoriaController@actionGestionContabilidadRC');
 
 
 
