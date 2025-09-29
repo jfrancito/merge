@@ -33,6 +33,7 @@ trait EnviarCorreoVRApruebaTraits
             ->join('WEB.ListaplatrabajadoresGenereal as tra', 'tra.DNI', '=', 'emp.NRO_DOCUMENTO')
             ->where('vr.ID', $valerendir_id)
             ->select('tra.emailcorp', 'tra.centro_osiris_id')
+            ->first();
 
             $emailTrabajadorAutoriza = DB::table('WEB.VALE_RENDIR as vr')
             ->join('WEB.ListaplatrabajadoresGenereal as tra', 'tra.COD_TRAB', '=', 'vr.USUARIO_AUTORIZA')
@@ -82,7 +83,7 @@ trait EnviarCorreoVRApruebaTraits
 
             Mail::send('emails.emailvalerendiraprueba',
             ['vale' => $VALE_RENDIR],
-            function ($message) use ($emailfrom, $emailTrabajador, $emailTrabajadorAutoriza, $emailTrabajadorAprueba, $nombreCompleto,  $destinatarios, $copias) {
+            function ($message) use ($emailfrom, $emailTrabajador, $emailTrabajadorAutoriza, $emailTrabajadorAprueba, $nombreCompleto,  $destinatarios, $copias,  $emailfromcentro) {
                 $message->from($emailfrom, $nombreCompleto)
                         ->to($destinatarios)
                         ->cc($copias)
