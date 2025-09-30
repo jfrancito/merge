@@ -288,6 +288,37 @@ class ValeRendirController extends Controller
             ->where('usu.id', $cod_usuario_registro)
             ->value('emp.COD_EMPR');
 
+        $trabajador     =   DB::table('STD.TRABAJADOR')
+                            ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                            ->first();
+        $dni            =       '';
+        $centro_id      =       '';
+
+        if ($trabajador) {
+            $dni = $trabajador->NRO_DOCUMENTO;
+        }
+
+        $trabajadorespla = DB::table('WEB.platrabajadores')
+            ->where('situacion_id', 'PRMAECEN000000000002')
+            ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+            ->where('dni', $dni)
+            ->first();
+
+        if (!$trabajadorespla) {
+            return view('valerendir.modal.modalerrorempresa', [
+                'mensaje' => 'No puede realizar un registro porque no es la empresa a cual pertenece.',
+                'ajax' => true
+            ]);
+        }
+
+        $centro_id = $trabajadorespla->centro_osiris_id;
+
+        $centrot        =   DB::table('ALM.CENTRO')
+                            ->where('COD_CENTRO', $centro_id)
+                            ->first();
+
+        $cod_centro = $centrot->COD_CENTRO; 
+
         // ACTUALIZACIÓN
         if ($opcion === 'U') {
 
@@ -431,9 +462,9 @@ class ValeRendirController extends Controller
 
             $cod_empr_aux = Session::get('empresas')->COD_EMPR;
             $ultimoVale = WEBValeRendir::where('COD_EMPR', $cod_empr_aux)
+                ->where('COD_CENTRO', $cod_centro) 
                 ->orderBy('id', 'DESC')
                 ->first();
-
             if (!$ultimoVale) {
                 return response()->json(['error' => 'Error al recuperar el ID del vale recién insertado.']);
             }
