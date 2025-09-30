@@ -1319,7 +1319,7 @@ class GestionPlanillaMovilidadController extends Controller
                 $nombre_responsable     =   $trabajador->TXT_NOMBRES.' '.$trabajador->TXT_APE_PATERNO.' '.$trabajador->TXT_APE_MATERNO;
                 $rutaImagen             =   public_path('firmas/'.$trabajador->NRO_DOCUMENTO.'.jpg');
                 if (!file_exists($rutaImagen)){
-                    return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd','No puede emitir la Planilla porque no cuenta firma');
+                    //return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd','No puede emitir la Planilla porque no cuenta firma');
                 }
 
                 if(count($tdetplanillamovilidad)<=0){
