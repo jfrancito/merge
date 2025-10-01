@@ -64,11 +64,12 @@ trait EnviarCorreoVRAutorizaTraits
                 $destinatarios = ["doris.delgado@induamerica.com.pe"];
             } elseif ($emailfromcentro === 'CEN0000000000006') {
                 $destinatarios = ["diana.paredes@induamerica.com.pe"];
+            } elseif ($emailfromcentro === 'CEN0000000000002') {
+                $destinatarios = ["magaly.requejo@induamerica.com.pe"];
             } else {
                 $destinatarios = ["marley.sucse@induamerica.com.pe", "diana.malca@induamerica.com.pe"];
             }
 
-           
             Mail::send('emails.emailvalerendirautoriza',
             ['vale' => $VALE_RENDIR],
             function ($message) use ($emailfrom, $emailTrabajador, $emailTrabajadorAutoriza, $emailTrabajadorAprueba, $nombreCompleto, $destinatarios, $emailfromcentro) {

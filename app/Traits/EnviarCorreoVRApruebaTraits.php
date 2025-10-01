@@ -70,6 +70,9 @@ trait EnviarCorreoVRApruebaTraits
             } elseif ($emailfromcentro === 'CEN0000000000006') {
                 $destinatarios = ["diana.paredes@induamerica.com.pe"];
                 $copias = ["diana.paredes@induamerica.com.pe"]; 
+            } elseif ($emailfromcentro === 'CEN0000000000002') {
+                $destinatarios = ["magaly.requejo@induamerica.com.pe"];
+                $copias = ["magaly.requejo@induamerica.com.pe"];
             } else {
                 $destinatarios = ["tesoreria.cix@induamerica.com.pe"];
                 $copias = [
