@@ -58,14 +58,19 @@ class TransferirDataController extends Controller
     use ComprobanteTraits;
     use WhatsappTraits;
     use ComprobanteProvisionTraits;
-
-
-
     use TransferirDataTraits;
     public function actionTransferirVentasAtendidas(Request $request)
     {
         $this->tdventasatendidas();        
     }
+
+
+    public function actionTransferirVentas(Request $request)
+    {
+        dd("hola");
+        //$this->tdventas();        
+    }
+
 
 
 }
