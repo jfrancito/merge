@@ -71,8 +71,13 @@ trait EnviarCorreoVRApruebaTraits
                 $destinatarios = ["diana.paredes@induamerica.com.pe"];
                 $copias = ["diana.paredes@induamerica.com.pe"]; 
             } elseif ($emailfromcentro === 'CEN0000000000002') {
-                $destinatarios = ["magaly.requejo@induamerica.com.pe"];
-                $copias = ["magaly.requejo@induamerica.com.pe"];
+                if ($VALE_RENDIR->TIPO_PAGO == 1) {
+                    $destinatarios = ["lizbeth.marcas@induamerica.com.pe"];
+                    $copias = ["lizbeth.marcas@induamerica.com.pe","tesoreria.cix@induamerica.com.pe","franklin.llontop@induamerica.com.pe"];
+                } else {
+                    $destinatarios = ["lizbeth.marcas@induamerica.com.pe"];
+                    $copias = ["lizbeth.marcas@induamerica.com.pe"];
+                }
             } else {
                 $destinatarios = ["tesoreria.cix@induamerica.com.pe"];
                 $copias = [
