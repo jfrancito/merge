@@ -16,7 +16,7 @@
                   <div class="tools tooltiptop">
 
                     <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones loteentregable">
-                      <span class="tooltiptext" >Ver Folio</span>
+                      <span class="tooltiptext" >Consolidado</span>
                       <strong class='folios_hit' data_folio_sel="@if(count($entregable_sel)>0){{$entregable_sel->FOLIO}}@endif" style="font-size:13px; padding: 5px;">
                         @if(count($entregable_sel)>0)
                           {{$entregable_sel->FOLIO}} ({{$entregable_sel->CAN_FOLIO}})

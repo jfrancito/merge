@@ -259,19 +259,7 @@ class ValeRendirApruebaController extends Controller
             $simbolo_moneda = '$';
         }
 
-        $contrato_diferente = CMPContrato::where('COD_EMPR', '=', $cod_empr)
-            ->where('COD_CATEGORIA_TIPO_CONTRATO', '=', 'TCO0000000000069')
-            ->where('COD_EMPR_CLIENTE', '=', $codemprcliente)
-            ->where('COD_CATEGORIA_MONEDA', $cod_moneda)
-            ->select(DB::raw("COD_CONTRATO,CONCAT(LEFT(COD_CONTRATO, 6), '-', RIGHT(CONCAT('00000', RIGHT(COD_CONTRATO, 5)), 5), ' - {$simbolo_moneda} ', REPLACE(TXT_CATEGORIA_CANAL_VENTA, 'POR', 'X')) AS CUENTA"))
-            ->pluck('CUENTA', 'COD_CONTRATO')
-            ->toArray();
-
-
-        $combo_series = $notacredito->combo_series_tipodocumento('TDO0000000000072');
         $centrovale = $txtNombreCliente->COD_CENTRO;
-     
-
         $conexionbd = 'sqlsrv';
             if ($centrovale == 'CEN0000000000004') {
                 $conexionbd = 'sqlsrv_r';
@@ -279,16 +267,35 @@ class ValeRendirApruebaController extends Controller
                 $conexionbd = 'sqlsrv_b';
             }
 
-    // Traer correlativo desde la base correcta
-         $ultimoCorrelativo = DB::connection($conexionbd)
+        $contrato_diferente = DB::connection($conexionbd)
+                            ->table('CMP.CONTRATO')
+                            ->where('COD_EMPR', $cod_empr)
+                            ->where('COD_CATEGORIA_TIPO_CONTRATO', 'TCO0000000000069')
+                            ->where('COD_EMPR_CLIENTE', $codemprcliente)
+                            ->where('COD_CATEGORIA_MONEDA', $cod_moneda)
+                            ->select(
+                                'COD_CONTRATO',
+                                DB::raw("CONCAT(
+                                    LEFT(COD_CONTRATO, 6), '-', 
+                                    RIGHT(CONCAT('00000', RIGHT(COD_CONTRATO, 5)), 5), 
+                                    ' - {$simbolo_moneda} ', 
+                                    REPLACE(TXT_CATEGORIA_CANAL_VENTA, 'POR', 'X')
+                                ) AS CUENTA")
+                            )
+                            ->pluck('CUENTA', 'COD_CONTRATO')
+                            ->toArray();
+
+        $combo_series = $notacredito->combo_series_tipodocumento('TDO0000000000072');
+      
+     
+        $ultimoCorrelativo = DB::connection($conexionbd)
         ->table('TES.AUTORIZACION')
         ->where('TXT_SERIE', $combo_series)
         ->where('COD_TIPO_DOCUMENTO', 'TDO0000000000072')
         ->where('COD_CENTRO', $centrovale)
         ->max('TXT_NUMERO');
 
-         //  dd($ultimoCorrelativo);
-
+        //   dd($contrato_diferente);
 
         $nro_documento = is_null($ultimoCorrelativo) ? 1:$ultimoCorrelativo + 1;
         $nro_documento_formateado = str_pad($nro_documento, 10, '0', STR_PAD_LEFT);
@@ -296,14 +303,18 @@ class ValeRendirApruebaController extends Controller
         $fecha_actual = date('Y-m-d');
 
       
-        $subcuentas = CMPContrato::from('CMP.CONTRATO AS CON')  
-            ->join('CMP.CONTRATO_CULTIVO AS CUL', 'CON.COD_CONTRATO', '=', 'CUL.COD_CONTRATO')
-            ->where('CON.COD_EMPR', '=', $cod_empr)
-            ->where('CON.COD_CATEGORIA_TIPO_CONTRATO', '=', 'TCO0000000000069')
-            ->where('COD_EMPR_CLIENTE', '=', $codemprcliente)
-            ->select(DB::raw("CON.COD_CONTRATO, CONCAT(CUL.TXT_ZONA_COMERCIAL, '-', CUL.TXT_ZONA_CULTIVO) AS SUBCUENTA"))
-            ->pluck('SUBCUENTA', 'COD_CONTRATO')
-            ->toArray();
+        $subcuentas = DB::connection($conexionbd)
+                    ->table('CMP.CONTRATO AS CON')
+                    ->join('CMP.CONTRATO_CULTIVO AS CUL', 'CON.COD_CONTRATO', '=', 'CUL.COD_CONTRATO')
+                    ->where('CON.COD_EMPR', $cod_empr)
+                    ->where('CON.COD_CATEGORIA_TIPO_CONTRATO', 'TCO0000000000069')
+                    ->where('CON.COD_EMPR_CLIENTE', $codemprcliente)
+                    ->select(
+                        'CON.COD_CONTRATO',
+                        DB::raw("CONCAT(CUL.TXT_ZONA_COMERCIAL, '-', CUL.TXT_ZONA_CULTIVO) AS SUBCUENTA")
+                    )
+                    ->pluck('SUBCUENTA', 'COD_CONTRATO')
+                    ->toArray();
 
        
 

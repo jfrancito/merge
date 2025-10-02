@@ -204,7 +204,7 @@ trait PrecioCompetenciaTraits
 						    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
 						    ->where('ITEM', $item->ITEM)
 						    ->update([
-						        'FECHA_MOD' => date('Y-m-d H:i:s'),  // Better date format
+						        'FECHA_MOD' => date('Ymd H:i:s'),  // Better date format
 						        'BUSQUEDAD' => DB::raw('ISNULL(BUSQUEDAD,0) + 1')  // Correct way to increment
 						    ]);
       	

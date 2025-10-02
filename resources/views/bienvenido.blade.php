@@ -24,6 +24,78 @@
           </div>
 			</div>
 		</div>
+
+
+
+@if(Session::has('listanegra'))
+<div class="modal fade" id="modalListaNegra" tabindex="-1" role="dialog" aria-labelledby="modalListaNegraLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title" id="modalListaNegraLabel">
+                    <i class="fa fa-exclamation-triangle"></i> Alerta: Proveedores con Problemas SUNAT
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger" role="alert">
+                    <strong>Atención:</strong> Los siguientes proveedores tienen problemas para descargar sus comprobantes desde SUNAT. 
+                    Por favor, coordine con ellos antes de continuar con la liquidación.
+                </div>
+                
+                <div class="form-group mb-3">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">
+                                <i class="fa fa-search"></i>
+                            </span>
+                        </div>
+                        <input type="text" class="form-control" id="buscarProveedor" placeholder="Buscar proveedor...">
+                    </div>
+                    <small class="form-text text-muted">
+                        Total de proveedores: <span id="totalProveedores">{{ count(Session::get('listanegra')) }}</span>
+                    </small>
+                </div>
+
+                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                    <table class="table table-striped table-bordered table-sm">
+                        <thead class="thead-dark" >
+                            <tr>
+                                <th style="width: 50px;">#</th>
+                                <th>Proveedor</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaProveedores">
+                            @foreach(Session::get('listanegra') as $index => $proveedor)
+                            <tr class="fila-proveedor">
+                                <td>{{ $index + 1 }}</td>
+                                <td class="proveedor-nombre">{{ $proveedor->TXT_EMPRESA_PROVEEDOR }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="noResultados" class="alert alert-info mt-3" style="display: none;">
+                    <i class="fa fa-info-circle"></i> No se encontraron proveedores con ese criterio de búsqueda.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fa fa-times"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@endif
+
+
   	@include('usuario.modal.musuario')
 	</div>
 @stop 
@@ -100,7 +172,48 @@
 
     });
 
+
+
+
   </script>
+
+
+<script>
+    $(document).ready(function() {
+        // Abrir modal automáticamente
+        $('#modalListaNegra').modal('show');
+        
+        // Funcionalidad de búsqueda
+        $('#buscarProveedor').on('keyup', function() {
+            var valor = $(this).val().toLowerCase();
+            var filasMostradas = 0;
+            
+            $('#tablaProveedores .fila-proveedor').each(function() {
+                var proveedor = $(this).find('.proveedor-nombre').text().toLowerCase();
+                var usuario = $(this).find('.usuario-autoriza').text().toLowerCase();
+                
+                // Buscar en nombre de proveedor y usuario autoriza
+                if (proveedor.indexOf(valor) > -1 || usuario.indexOf(valor) > -1) {
+                    $(this).show();
+                    filasMostradas++;
+                } else {
+                    $(this).hide();
+                }
+            });
+            
+            // Actualizar contador
+            $('#totalProveedores').text(filasMostradas);
+            
+            // Mostrar mensaje si no hay resultados
+            if (filasMostradas === 0) {
+                $('#noResultados').show();
+            } else {
+                $('#noResultados').hide();
+            }
+        });
+    });
+</script>
+
   <script src="{{ asset('public/js/user/proveedor.js?v='.$version) }}" type="text/javascript"></script>
 
 @stop

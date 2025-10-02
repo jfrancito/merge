@@ -1,3 +1,30 @@
+/* Estilos adicionales para mejor visualización */
+#modalListaNegra .table-responsive::-webkit-scrollbar {
+    width: 8px;
+}
+
+#modalListaNegra .table-responsive::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+#modalListaNegra .table-responsive::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+#modalListaNegra .table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+#modalListaNegra .thead-dark th {
+    background-color: #343a40 !important;
+}
+
+
+
+
+
 .fsconttareo{
     font-size: 14px !important;
 }
