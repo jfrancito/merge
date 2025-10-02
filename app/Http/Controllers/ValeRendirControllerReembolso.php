@@ -199,7 +199,7 @@ class ValeRendirControllerReembolso extends Controller
         $opcion             = $request->input('opcion');
         $array_detalle      = $request->input('array_detalle');
 
-        $cod_categoria_estado_vale = 'ETM0000000000005'; // GENERADO
+        $cod_categoria_estado_vale = 'ETM0000000000007'; // 
         $txt_categoria_estado_vale = 'APROBADO';
         $cod_usuario_registro      = Session::get('usuario')->id;
         $txt_nom_solicita          = User::where('id', $cod_usuario_registro)->value('nombre');

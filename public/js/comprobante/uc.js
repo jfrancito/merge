@@ -971,12 +971,16 @@ $(document).ready(function () {
         // si la diferencia es menor o igual a 0.1, ajustar
         if (Math.abs(diferencia) > 0 && Math.abs(diferencia) < 0.1) {
 
+            debugger;
+
             // Recorrerlo
             for (let item of arrayDetalle) {
                 debugger;
-                if (totalAsiento > totalHaberME || totalAsiento < totalHaberME) {
+                //if (totalAsiento > totalHaberME || totalAsiento < totalHaberME) {
+                if (totalDebeME > totalHaberME || totalDebeME < totalHaberME) {
                     if (!/^40/.test(item.TXT_CUENTA_CONTABLE) && parseFloat(item.CAN_HABER_ME) > 0.0000) {
-                        if (totalAsiento > totalHaberME) {
+                        //if (totalAsiento > totalHaberME) {
+                        if (totalDebeME > totalHaberME) {
                             item.CAN_HABER_ME = redondear4(parseFloat(item.CAN_HABER_ME) + Math.abs(diferencia));
                         } else {
                             item.CAN_HABER_ME = redondear4(parseFloat(item.CAN_HABER_ME) - Math.abs(diferencia));
@@ -985,9 +989,11 @@ $(document).ready(function () {
                     }
                 }
 
-                if (totalAsiento > totalDebeME || totalAsiento < totalDebeME) {
+                //if (totalAsiento > totalDebeME || totalAsiento < totalDebeME) {
+                if (totalHaberME > totalDebeME || totalHaberME < totalDebeME) {
                     if (!/^40/.test(item.TXT_CUENTA_CONTABLE) && parseFloat(item.CAN_DEBE_ME) > 0.0000) {
-                        if (totalAsiento > totalDebeME) {
+                        //if (totalAsiento > totalDebeME) {
+                        if (totalHaberME > totalDebeME) {
                             item.CAN_DEBE_ME = redondear4(parseFloat(item.CAN_DEBE_ME) + Math.abs(diferencia));
                         } else {
                             item.CAN_DEBE_ME = redondear4(parseFloat(item.CAN_DEBE_ME) - Math.abs(diferencia));
@@ -1009,9 +1015,11 @@ $(document).ready(function () {
                 let debeME = parseFloat(table.cell(rowIdx, 5).data().replaceAll(/[\$,]/g, "")) || 0;
                 let haberME = parseFloat(table.cell(rowIdx, 6).data().replaceAll(/[\$,]/g, "")) || 0;
 
-                if (totalAsiento > totalHaberME || totalAsiento < totalHaberME) {
+                //if (totalAsiento > totalHaberME || totalAsiento < totalHaberME) {
+                if (totalDebeME > totalHaberME || totalDebeME < totalHaberME) {
                     if (!/^40/.test(numero_cuenta) && haberME > 0) {
-                        let nuevoHaberME = totalAsiento > totalHaberME
+                        //let nuevoHaberME = totalAsiento > totalHaberME
+                        let nuevoHaberME = totalDebeME > totalHaberME
                             ? haberME + Math.abs(diferencia)
                             : haberME - Math.abs(diferencia);
 
@@ -1022,9 +1030,11 @@ $(document).ready(function () {
                     }
                 }
 
-                if (totalAsiento > totalDebeME || totalAsiento < totalDebeME) {
+                //if (totalAsiento > totalDebeME || totalAsiento < totalDebeME) {
+                if (totalHaberME > totalDebeME || totalHaberME < totalDebeME) {
                     if (!/^40/.test(numero_cuenta) && debeME > 0) {
-                        let nuevoDebeME = totalAsiento > totalDebeME
+                        //let nuevoDebeME = totalAsiento > totalDebeME
+                        let nuevoDebeME = totalHaberME > totalDebeME
                             ? debeME + Math.abs(diferencia)
                             : debeME - Math.abs(diferencia);
 
