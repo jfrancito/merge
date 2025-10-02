@@ -24,10 +24,13 @@ use App\Modelos\STDTrabajador;
 use App\Modelos\CMPCategoria;
 use App\Modelos\CMPDocAsociarCompra;
 use App\Modelos\Archivo;
+use App\Modelos\CMPDetalleProducto;
+use App\Modelos\CMPDetalleProductoAF;
 use App\Modelos\CMPDocumentoCtble;
 use App\Modelos\CMPReferecenciaAsoc;
 use App\Modelos\FeRefAsoc;
 
+use App\Modelos\WEBCategoriaActivoFijo;
 
 use Greenter\Parser\DocumentParserInterface;
 use Greenter\Xml\Parser\InvoiceParser;
@@ -47,6 +50,7 @@ use App\Traits\WhatsappTraits;
 
 use Hashids;
 use SplFileInfo;
+use trendClass;
 
 class GestionOCContabilidadController extends Controller
 {
@@ -361,6 +365,7 @@ class GestionOCContabilidadController extends Controller
         $idoc = $this->funciones->decodificarmaestraprefijo($idordencompra, $prefijo);
         $ordencompra = $this->con_lista_cabecera_comprobante_idoc_actual($idoc);
         $detalleordencompra = $this->con_lista_detalle_comprobante_idoc_actual($idoc);
+        $detalleordencompraaf = $this->con_lista_detalle_comprobante_idoc_actual_af($idoc);
         $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)->first();
         $detallefedocumento = FeDetalleDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)->get();
         View::share('titulo', 'Aprobar Comprobante');
@@ -1153,6 +1158,8 @@ class GestionOCContabilidadController extends Controller
             //$lecturacdr             =   $this->lectura_cdr_archivo($idoc,$this->pathFiles,$prefijocarperta,$ordencompra->NRO_DOCUMENTO_CLIENTE);
             //$lecturacdr             =   $this->lectu($idoc,$this->pathFiles,$prefijocarperta,$ordencompra->NRO_DOCUMENTO_CLIENTE);
             $detalleordencompra = $this->con_lista_detalle_comprobante_idoc_actual($idoc);
+            $detalleordencompraaf = $this->con_lista_detalle_comprobante_idoc_actual_af($idoc);
+
             $detallefedocumento = FeDetalleDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)->get();
 
             if ($fedocumento->nestadoCp === null) {
@@ -1518,7 +1525,7 @@ class GestionOCContabilidadController extends Controller
             $combo_activo = array('1' => 'ACTIVO', '0' => 'ELIMINAR');
 
             $combo_tipo_asiento = $this->gn_generacion_combo_categoria('TIPO_ASIENTO', 'Seleccione tipo asiento', '');
-
+            $funciones = $this;
             return View::make('comprobante/aprobarcon',
                 [
                     'fedocumento' => $fedocumento,
@@ -1561,6 +1568,7 @@ class GestionOCContabilidadController extends Controller
                     'ordencompra_t' => $ordencompra_t,
                     'linea' => $linea,
                     'detalleordencompra' => $detalleordencompra,
+                    'detalleordencompraaf' => $detalleordencompraaf,
                     'documentohistorial' => $documentohistorial,
                     'archivos' => $archivos,
                     'archivosanulados' => $archivosanulados,
@@ -1571,6 +1579,7 @@ class GestionOCContabilidadController extends Controller
                     'tp' => $tp,
                     'idopcion' => $idopcion,
                     'idoc' => $idoc,
+                    'funciones'=>$funciones,
                 ]);
 
 
@@ -6104,5 +6113,146 @@ class GestionOCContabilidadController extends Controller
 
         }
     }
+
+    
+    public function actionRegistrarActivoFijoCategoria($idoc, $COD_PRODUCTO,Request $request)
+    {
+        $COD_CAT_ACTFIJO        =   $request['COD_CATEGORIA_AF'];
+        $COD_PRODUCTO           =   $request['COD_PRODUCTO'];
+        $COD_TABLA              =   $request['COD_TABLA'];
+        $NRO_LINEA              =   $request['NRO_LINEA'];
+        $COD_LOTE               =   $request['COD_LOTE'];
+        $CAN_PRODUCTO           =   $request['CAN_PRODUCTO'];
+        $TXT_DETALLE_PRODUCTO   =   $request['TXT_DETALLE_PRODUCTO'];
+        $TXT_NOMBRE_PRODUCTO    =   $request['TXT_NOMBRE_PRODUCTO'];
+        $idcheckbox             =   $request['idcheckbox'];
+        $error                  =   false;
+        $mensaje                =   'REGISTRO CATEGORIA EXITOSO';
+        
+        try {
+
+            $oeExiste           =   CMPDetalleProductoAF::where('COD_TABLA',$COD_TABLA)->where('COD_PRODUCTO',$COD_PRODUCTO)->where('NRO_LINEA',$NRO_LINEA)->first();
+            if($oeExiste){
+                // VALIDAR QUE NO ESTE YA SIENDO PROCESADO O CALCULADO SU DEPRECIACION
+                if(1==0){
+                    $error=true;
+                    $mensaje='YA SE ESTA DEPRECIANDO';
+                }
+                else{
+                    $oeExiste->COD_PRODUCTO           =   $COD_PRODUCTO;
+                    $oeExiste->COD_TABLA              =   $COD_TABLA;
+                    $oeExiste->COD_LOTE               =   $COD_LOTE;
+                    $oeExiste->NRO_LINEA              =   $NRO_LINEA;
+                    $oeExiste->TXT_DETALLE_PRODUCTO   =   $TXT_DETALLE_PRODUCTO;
+                    $oeExiste->TXT_NOMBRE_PRODUCTO    =   $TXT_NOMBRE_PRODUCTO;
+                    $oeExiste->CAN_PRODUCTO           =   $CAN_PRODUCTO;
+                    $oeExiste->COD_CAT_ACTFIJO        =   $COD_CAT_ACTFIJO;
+                    $oeExiste->save();
+                }
+            }
+            else{
+                $oeRegistro                         =   new CMPDetalleProductoAF;
+                $oeRegistro->COD_PRODUCTO           =   $COD_PRODUCTO;
+                $oeRegistro->COD_TABLA              =   $COD_TABLA;
+                $oeRegistro->COD_LOTE               =   $COD_LOTE;
+                $oeRegistro->NRO_LINEA              =   $NRO_LINEA;
+                $oeRegistro->TXT_DETALLE_PRODUCTO   =   $TXT_DETALLE_PRODUCTO;
+                $oeRegistro->TXT_NOMBRE_PRODUCTO    =   $TXT_NOMBRE_PRODUCTO;
+                $oeRegistro->CAN_PRODUCTO           =   $CAN_PRODUCTO;
+                $oeRegistro->COD_CAT_ACTFIJO        =   $COD_CAT_ACTFIJO;
+                $oeRegistro->save();
+            }
+        } catch (\Exception $ex) {
+            $error=true;
+            $mensaje='ocurrio un error inesperado '.$ex;
+        }
+
+        $datos = [
+                    'error'=>$error,
+                    'mensaje'=>$mensaje,
+                    'idcheckbox'=>$idcheckbox
+                ];
+        // $rpta = json_encode($datos,true);
+        return response()->json($datos);
+
+        // return $rpta;
+      
+    }
+
+
+    public function actionAjaxModalActivoFijoCategoria(Request $request)
+    {
+        // ajax-modal-detalle-deuda-contrato
+        $idopcion               =   $request['idopcion'];
+        $COD_PRODUCTO           =   $request['codprod'];
+        $CAN_PRODUCTO          =   $request['cantprod'];
+        $COD_LOTE               =   $request['codlote'];
+        $NRO_LINEA              =   $request['nrolinea'];
+        $TXT_NOMBRE_PRODUCTO    =   $request['txtnombprod'];
+        $TXT_DETALLE_PRODUCTO   =   $request['txtdetprod'];
+        $idoc                   =   $request['idoc'];
+        $idcheckbox             =   $request['idcheckbox'];
+
+        $oeProducto             =   CMPDetalleProducto::where('COD_PRODUCTO',$COD_PRODUCTO)->where('COD_TABLA',$idoc)->where('COD_LOTE',$COD_LOTE)->where('NRO_LINEA',$NRO_LINEA)->first();
+        $combo_categoria_activo_fijo = [''=>'SELECCIONE OPCION']+$this->funciones->combo_categoria_activo_fijo();
+        $oeProductoAF           =   CMPDetalleProductoAF::where('COD_PRODUCTO',$COD_PRODUCTO)->where('COD_TABLA',$idoc)->where('NRO_LINEA',$oeProducto->NRO_LINEA)->first();
+        $select_categoria_id    =   ($oeProductoAF)?$oeProductoAF->COD_CAT_ACTFIJO:'';
+        return View::make('comprobante/modal/ajax/mcategoriaactivofijo',
+                         [          
+                            'COD_PRODUCTO'              => $COD_PRODUCTO,
+                            'CAN_PRODUCTO'             => $CAN_PRODUCTO,
+                            'COD_LOTE'                  => $COD_LOTE,
+                            'NRO_LINEA'                 => $NRO_LINEA,
+                            'TXT_DETALLE_PRODUCTO'      => $TXT_DETALLE_PRODUCTO,
+                            'TXT_NOMBRE_PRODUCTO'       => $TXT_NOMBRE_PRODUCTO,
+                            'combo_categoria_activo_fijo'=>$combo_categoria_activo_fijo,
+                            'select_categoria_id'       =>  $select_categoria_id,
+                            'idopcion'                  => $idopcion,
+                            'oeProducto'                =>  $oeProducto,
+                            'idcheckbox'                =>  $idcheckbox,
+                            'idoc'                      => $idoc,
+                            'ajax'                      => true,                            
+                         ]);
+    
+    }
+
+    public function actionEliminarActivoFijoCategoria($idoc, $COD_PRODUCTO,$COD_LOTE,$NRO_LINEA,Request $request)
+    {
+        // $COD_CAT_ACTFIJO        =   $request['COD_CATEGORIA_AF'];
+        $COD_PRODUCTO           =   $request['codprod'];
+        $COD_TABLA              =   $request['idoc'];
+        $NRO_LINEA              =   $request['nrolinea'];
+        $COD_LOTE               =   $request['codlote'];
+        $idcheckbox             =   $request['idcheckbox'];
+        $error                  =   false;
+        $mensaje                =   'ELIMINACION DE CATEGORIA AF EXITOSA';
+        
+        try {
+
+            $oeExiste           =   CMPDetalleProductoAF::where('COD_TABLA',$COD_TABLA)->where('COD_PRODUCTO',$COD_PRODUCTO)->where('NRO_LINEA',$NRO_LINEA)->first();
+            if($oeExiste){
+                // VALIDAR QUE NO ESTE YA SIENDO PROCESADO O CALCULADO SU DEPRECIACION
+                if(1==0){
+                    $error=true;
+                    $mensaje='YA SE ESTA DEPRECIANDO';
+                }
+                else{
+                    $oeExiste->delete();
+                }
+            }
+
+        } catch (\Exception $ex) {
+            $error=true;
+            $mensaje='ocurrio un error inesperado '.$ex;
+        }
+
+        $datos = [
+                    'error'=>$error,
+                    'mensaje'=>$mensaje,
+                    'idcheckbox'=>$idcheckbox
+                ];
+        return response()->json($datos);
+    }
+
 
 }

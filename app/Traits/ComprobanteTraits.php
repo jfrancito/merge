@@ -14,6 +14,7 @@ use App\Modelos\CMPOrden;
 use App\Modelos\STDTrabajador;
 use App\Modelos\SGDUsuario;
 use App\Modelos\VMergeActual;
+use App\Modelos\VMergeActualAF;
 use App\Modelos\Archivo;
 use App\Modelos\VMergeDocumento;
 use App\Modelos\VMergeDocumentoActual;
@@ -25,6 +26,7 @@ use App\Modelos\CONRegistroCompras;
 
 use App\Modelos\Estado;
 use App\Modelos\CMPDetalleProducto;
+use App\Modelos\CMPDetalleProductoAF;
 use App\Modelos\CMPDocumentoCtble;
 use App\Modelos\ViewDPagar;
 use App\Modelos\FeDocumentoHistorial;
@@ -7018,6 +7020,16 @@ trait ComprobanteTraits
 
 	}
 
+    private function con_lista_detalle_comprobante_idoc_actual_af($idoc) {
+
+        $doc    =   VMergeActualAF::where('COD_ORDEN','=',$idoc)
+
+                            ->get();
+
+        return  $doc;
+
+    }
+
 	private function prefijo_empresa($idempresa) {
 		if($idempresa == 'IACHEM0000010394'){
 			$prefijo = 'II';
@@ -7159,8 +7171,12 @@ trait ComprobanteTraits
 
 	}
 
-
-
+     public function DPAF($COD_TABLA,$COD_PRODUCTO)
+    {
+        return CMPDetalleProductoAF::where('COD_TABLA', $COD_TABLA)
+                    ->where('COD_PRODUCTO', $COD_PRODUCTO)
+                    ->exists();   // devuelve true o false
+    }
 
 
 
