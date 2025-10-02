@@ -743,6 +743,7 @@ Route::get('buscarempresa', function (Illuminate\Http\Request  $request) {
     		->where('NOM_EMPR', 'like', '%'.$term.'%')
 			//->where('STD.EMPRESA.IND_PROVEEDOR','=',1)
 			->where('STD.EMPRESA.COD_ESTADO','=',1)
+			->where('COD_TIPO_DOCUMENTO','=','TDI0000000000006')
 			->take(100)
 			->select(DB::raw("
 			  STD.EMPRESA.NRO_DOCUMENTO + ' - '+ STD.EMPRESA.NOM_EMPR AS NOMBRE")
@@ -763,6 +764,7 @@ Route::get('buscarempresalg', function (Illuminate\Http\Request  $request) {
 		              ->orWhere('STD.EMPRESA.NRO_DOCUMENTO', 'like', '%' . $term . '%');
 		    })
 			->where('STD.EMPRESA.COD_ESTADO','=',1)
+			->where('COD_TIPO_DOCUMENTO','=','TDI0000000000006')
 			->take(100)
 			->select(DB::raw("
 			  STD.EMPRESA.NRO_DOCUMENTO + ' - '+ STD.EMPRESA.NOM_EMPR AS NOMBRE")
@@ -782,6 +784,7 @@ Route::get('buscarempresarenta', function (Illuminate\Http\Request  $request) {
 		        $query->where('STD.EMPRESA.NOM_EMPR', 'like', '%' . $term . '%')
 		              ->orWhere('STD.EMPRESA.NRO_DOCUMENTO', 'like', '%' . $term . '%');
 		    })
+		    ->where('COD_TIPO_DOCUMENTO','=','TDI0000000000006')
 			->where('STD.EMPRESA.COD_ESTADO','=',1)
 			->where('STD.EMPRESA.NRO_DOCUMENTO','like','1%')
 			->take(100)
@@ -795,7 +798,6 @@ Route::get('buscarempresarenta', function (Illuminate\Http\Request  $request) {
     }
     return \Response::json($valid_tags);
 });
-
 
 
 
