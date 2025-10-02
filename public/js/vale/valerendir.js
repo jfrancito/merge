@@ -968,7 +968,7 @@ $(document).ready(function(){
                  // 🚨 Validación de aéreo
                 if (ind_aereo === 1) {
                     // Solo permitir estos tipos cuando es aéreo
-                    if (!["TIG0000000000009","TIG0000000000001","TIG0000000000002","TIG0000000000005"].includes(codigoTipo)) {
+                    if (!["TIG0000000000009","TIG0000000000001","TIG0000000000002","TIG0000000000005","TIG0000000000003"].includes(codigoTipo)) {
                         return; // se salta
                     }
                 } else {
