@@ -408,31 +408,90 @@ class ValeRendirController extends Controller
 
         // INSERCIÓN
         else {
-            $cod_usuario_registro = Session::get('usuario')->id;
+           $cod_usuario_registro = Session::get('usuario')->id;
 
-             $pendienteCount = DB::table('WEB.VALE_RENDIR as vr')
-                ->where('vr.COD_USUARIO_CREA_AUD', $cod_usuario_registro)
-                ->whereIn('vr.COD_CATEGORIA_ESTADO_VALE', [
-                    'ETM0000000000007', // Emitido
-                    'ETM0000000000001', // Pendiente
-                    'ETM0000000000005', // Rendido (pero sin liquidación cerrada)
-                ])
-                ->whereNotIn('vr.ID', function ($query) use ($cod_usuario_registro) {
-                    $query->select('lg.ARENDIR_ID')
-                          ->from('LQG_LIQUIDACION_GASTO as lg')
-                          ->whereIn('lg.COD_ESTADO', [
-                              'ETM0000000000005', // Rendido
-                              'ETM0000000000006'  // Cerrado
-                          ])
-                          ->where('lg.USUARIO_CREA', $cod_usuario_registro);
-                })
-                ->count();
+                // Subconsulta 1
+                $sub1 = DB::table('WEB.VALE_RENDIR as VR')
+                    ->select([
+                        'AD.COD_AUTORIZACION',
+                        'DC.CAN_SALDO',
+                        DB::raw("CASE WHEN AD.COD_AUTORIZACION IS NULL THEN VR.ID ELSE AD.COD_AUTORIZACION END as IDS")
+                    ])
+                    ->leftJoin('TES.AUTORIZACION_DETALLE as AD', 'VR.ID_OSIRIS', '=', 'AD.COD_AUTORIZACION')
+                    ->leftJoin('CMP.DOCUMENTO_CTBLE as DC', 'AD.COD_DOC_CTBLE', '=', 'DC.COD_DOCUMENTO_CTBLE')
+                    ->where('VR.COD_USUARIO_CREA_AUD', $cod_usuario_registro)
+                    ->whereIn('VR.COD_CATEGORIA_ESTADO_VALE', [
+                        'ETM0000000000007',
+                        'ETM0000000000001',
+                        'ETM0000000000005'
+                    ])
+                    ->whereNotExists(function ($query) {
+                        $query->select(DB::raw(1))
+                              ->from('TES.AUTORIZACION as A2')
+                              ->whereRaw('A2.COD_AUTORIZACION = VR.ID_OSIRIS')
+                              ->where('A2.COD_TIPO_ESTADO', 'IACHTE0000000001');
+                    })
+                    ->where(function ($query) use ($cod_usuario_registro) {
+                        $query->whereNotExists(function ($q) use ($cod_usuario_registro) {
+                            $q->select(DB::raw(1))
+                              ->from('LQG_LIQUIDACION_GASTO as LG')
+                              ->whereRaw('LG.ARENDIR_ID = VR.ID')
+                              ->whereIn('LG.COD_ESTADO', [
+                                  'ETM0000000000005',
+                                  'ETM0000000000006'
+                              ])
+                              ->where('LG.USUARIO_CREA', $cod_usuario_registro);
+                        })
+                        ->orWhere(function ($q2) {
+                            $q2->where('DC.CAN_SALDO', '>', 0)
+                               ->orWhereNull('DC.CAN_SALDO'); // <-- Aquí agregamos el IS NULL
+                        });
+                    });
 
-        if ($pendienteCount >= 2) {
-            return response()->json([
-                'error' => 'Usted tiene 2 vales pendientes por rendir. No puede generar un tercer vale.'
-            ]);
-        }
+                // Subconsulta 2
+                $sub2 = DB::table('users as U')
+                    ->select([
+                        'A.COD_AUTORIZACION',
+                        'DC.CAN_SALDO',
+                        'A.COD_AUTORIZACION as IDS'
+                    ])
+                    ->join('STD.TRABAJADOR as T', 'U.usuarioosiris_id', '=', 'T.COD_TRAB')
+                    ->join('STD.EMPRESA as E', 'E.NRO_DOCUMENTO', '=', 'T.NRO_DOCUMENTO')
+                    ->join('CMP.CONTRATO as C', function ($join) {
+                        $join->on('C.COD_EMPR_CLIENTE', '=', 'E.COD_EMPR')
+                             ->where('C.COD_CATEGORIA_CANAL_VENTA', 'CVE0000000000034');
+                    })
+                    ->join('TES.AUTORIZACION as A', function ($join) {
+                        $join->on('A.COD_CONTRATO', '=', 'C.COD_CONTRATO')
+                             ->where('A.COD_TIPO_ESTADO', '<>', 'IACHTE0000000001');
+                    })
+                    ->join('TES.AUTORIZACION_DETALLE as AD', function ($join) {
+                        $join->on('AD.COD_AUTORIZACION', '=', 'A.COD_AUTORIZACION')
+                             ->where('AD.COD_TIPO_DOCUMENTO', 'TDO0000000000072');
+                    })
+                    ->join('CMP.DOCUMENTO_CTBLE as DC', 'DC.COD_DOCUMENTO_CTBLE', '=', 'AD.COD_DOC_CTBLE')
+                    ->where('U.id', $cod_usuario_registro)
+                    ->where(function ($q) {
+                        $q->where('DC.CAN_SALDO', '>', 0)
+                          ->orWhereNull('DC.CAN_SALDO'); // <-- Aquí también agregamos el IS NULL
+                    });
+
+                // Unión de subconsultas
+                $query = $sub1->unionAll($sub2);
+
+                // Contar pendientes
+                $pendienteCount = DB::table(DB::raw("({$query->toSql()}) as P"))
+                    ->mergeBindings($query)
+                    ->distinct()
+                    ->count('IDS');
+
+                if ($pendienteCount >= 2) {
+                    return response()->json([
+                        'error' => 'Usted tiene 2 o más vales pendientes por rendir. No puede generar un tercer vale.'
+                    ]);
+                }
+
+            
             $this->insertValeRendir(
                 "I",
                 "", "", "", "", "", "",
