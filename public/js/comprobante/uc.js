@@ -36,6 +36,49 @@ $(document).ready(function () {
     });
 //reparable
 
+    $("#fecha_asiento_reparable").on('change', function (e) {
+
+        let fecha = $('#fecha_asiento_reparable').val();
+        let _token = $('#token').val();
+
+        if (fecha === null || fecha.trim() === "") {
+            $.alert({
+                title: 'Error',
+                content: 'No hay fecha seleccionada',
+                type: 'red',
+                buttons: {
+                    ok: {
+                        text: 'OK',
+                        btnClass: 'btn-red',
+                    }
+                }
+            })
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: carpeta + "/obtener-periodo-tipo-cambio",
+            data: { _token: _token, fecha: fecha },
+            success: function (res) {
+                $('#tipo_cambio_asiento_reparable').val(res.tipoCambio);
+
+                window.selects['anio_asiento_reparable'].setSelected(res.anio.trim());
+                $('#anio_asiento_reparable').trigger('change');
+
+                setTimeout(function () {
+                    window.selects['periodo_asiento_reparable'].setSelected(res.periodo.trim())
+                    $('#periodo_asiento_reparable').trigger('change');
+                }, 1000);
+
+            },
+            error: function (res) {
+                error500(res);
+            }
+        });
+
+    });
+
     $("#tipo_cambio_asiento_reparable").on('change', function (e) {
 
         let moneda = $('#moneda_asiento_reparable').val();
@@ -1287,6 +1330,49 @@ $(document).ready(function () {
 
         // redibujar la tabla → esto dispara footerCallback y recalcula totales
         table.columns.adjust().draw();
+
+    });
+
+    $("#fecha_asiento").on('change', function (e) {
+
+        let fecha = $('#fecha_asiento').val();
+        let _token = $('#token').val();
+
+        if (fecha === null || fecha.trim() === "") {
+            $.alert({
+                title: 'Error',
+                content: 'No hay fecha seleccionada',
+                type: 'red',
+                buttons: {
+                    ok: {
+                        text: 'OK',
+                        btnClass: 'btn-red',
+                    }
+                }
+            })
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: carpeta + "/obtener-periodo-tipo-cambio",
+            data: { _token: _token, fecha: fecha },
+            success: function (res) {
+                $('#tipo_cambio_asiento').val(res.tipoCambio);
+
+                window.selects['anio_asiento'].setSelected(res.anio.trim());
+                $('#anio_asiento').trigger('change');
+
+                setTimeout(function () {
+                    window.selects['periodo_asiento'].setSelected(res.periodo.trim())
+                    $('#periodo_asiento').trigger('change');
+                }, 1000);
+
+            },
+            error: function (res) {
+                error500(res);
+            }
+        });
 
     });
 
