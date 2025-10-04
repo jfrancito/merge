@@ -782,7 +782,32 @@ trait ValeRendirTraits
     }
 
 
+    public function  valependientesrendir($cod_usuario_crea)
+        {
+            
+            $array_lista_retail = array();
+            $cod_usuario_registro = "";
 
+            $usuario = User::where('id', Session::get('usuario')->id)->get();
+            $cod_empr = Session::get('empresas')->COD_EMPR;
+            $cod_centro = '';
+
+
+            $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC WEB.VALE_PENDIENTES_RENDIR
+
+                                                                 @COD_USUARIO_CREA = ?');
+
+
+                        $stmt->bindParam(1, $cod_usuario_crea, PDO::PARAM_STR);
+
+                        $stmt->execute();
+                                              
+                        while ($row = $stmt->fetch()){
+                          array_push($array_lista_retail, $row);
+                        }
+
+            return $array_lista_retail;
+        }
 }
 
 
