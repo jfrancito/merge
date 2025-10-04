@@ -14,18 +14,25 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/slim-select/2.7.0/slimselect.min.css" rel="stylesheet">
     <style>
         .mdi--file-excel {
-            display: inline-block;
             width: 1em;
             height: 1em;
-            --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zm1.8 18H14l-2-3.4l-2 3.4H8.2l2.9-4.5L8.2 11H10l2 3.4l2-3.4h1.8l-2.9 4.5zM13 9V3.5L18.5 9z'/%3E%3C/svg%3E");
             background-color: currentColor;
             -webkit-mask-image: var(--svg);
             mask-image: var(--svg);
             -webkit-mask-repeat: no-repeat;
             mask-repeat: no-repeat;
-            -webkit-mask-size: 100% 100%;
-            mask-size: 100% 100%;
+            -webkit-mask-size: contain;  /* importante para no deformar */
+            mask-size: contain;
         }
+
+        .btn-group .icon {
+            display: inline-block;
+            width: 1em;   /* mismo ancho */
+            height: 1em;  /* misma altura */
+            font-size: 16px; /* controla el tamaño general */
+            vertical-align: middle;
+        }
+
     </style>
 @stop
 @section('section')
@@ -38,15 +45,16 @@
                         <div class="panel-heading">REPORTE DE LIQUIDACIONES
                             <div class="tools tooltiptop">
 
-                                <div class="dropdown">
-                                    <a href="#" class="tooltipcss opciones buscarliquidaciones">
-                                        <span class="tooltiptext">BUSCAR LIQUIDACIONES</span>
-                                        <span class="icon mdi mdi-search"></span>
-                                    </a>
-                                    <a href="#" class="tooltipcss opciones descargararchivo">
-                                        <span class="tooltiptext">DESCARGAR ARCHIVO EXCEL</span>
-                                        <span class="icon mdi mdi--file-excel"></span>
-                                    </a>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-primary btn-sm tooltipcss buscarliquidaciones">
+                                        <span class="icon mdi mdi-search text-white"></span>
+                                        Buscar
+                                    </button>
+
+                                    <button type="button" class="btn btn-success btn-sm tooltipcss descargararchivo">
+                                        <span class="icon mdi--file-excel text-white"></span>
+                                        Excel
+                                    </button>
                                 </div>
 
                             </div>
@@ -92,7 +100,7 @@
 
                                         <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 cajareporte">
                                             <div class="form-group">
-                                                <label class="col-sm-12 control-label labelleft negrita">Proveedor :</label>
+                                                <label class="col-sm-12 control-label labelleft negrita">Trabajador :</label>
                                                 <div class="col-sm-12 abajocaja">
                                                     {!! Form::select( 'employee', [], '',
                                                                       [
