@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Modelos\CMPTipoCambio;
+use App\Modelos\CONPeriodo;
 use App\Modelos\STDTipoDocumento;
 use App\Modelos\WEBAsiento;
 use App\Modelos\WEBCuentaContable;
+use DateTime;
 use Illuminate\Http\Request;
 use App\Modelos\Grupoopcion;
 use App\Modelos\Opcion;
@@ -350,6 +352,43 @@ class GestionOCContabilidadController extends Controller
         }
     }
 
+    public function actionObtenerPeriodoTipoCambio(Request $request)
+    {
+        $fecha = $request->input('fecha');
+
+        $dt = new DateTime($fecha);
+
+        $tipoCambio = CMPTipoCambio::where('FEC_CAMBIO', '=', $dt)
+            ->where('COD_ESTADO', '=', 1)
+            ->first();
+
+        $periodo = CONPeriodo::where('COD_ANIO', '=', $dt->format("Y"))
+            ->where('COD_MES', '=', $dt->format("m"))
+            ->where('COD_EMPR', '=', Session::get('empresas')->COD_EMPR)
+            ->where('COD_ESTADO', '=', 1)
+            ->first();
+
+        $codPeriodo = '';
+        $codAnio = '';
+        $tipoCambioVenta = 0.0000;
+
+        if(isset($periodo)){
+            $codPeriodo = $periodo->COD_PERIODO;
+            $codAnio = $periodo->COD_ANIO;
+        }
+
+        if(isset($periodo)){
+            $tipoCambioVenta = $tipoCambio->CAN_VENTA;
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'tipoCambio' => $tipoCambioVenta,
+            'periodo' => $codPeriodo,
+            'anio' => $codAnio,
+        ]);
+
+    }
 
     public function actionAprobarContabilidad($idopcion, $linea, $prefijo, $idordencompra, Request $request)
     {
