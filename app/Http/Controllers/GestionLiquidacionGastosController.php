@@ -4942,13 +4942,17 @@ class GestionLiquidacionGastosController extends Controller
 
                 if ($arendir_id == 'REEMBOLSO') {
                     $vale = DB::table('WEB.VALE_RENDIR_REEMBOLSO')->where('ID', $arendir_sel_id)->first();
-                    $fechavale = $vale->FEC_AUTORIZACION;
+                    $fechavale = $vale->FEC_USUARIO_CREA_AUD;
+
+
                     list($aniovale, $mesvale, $diavale) = explode('-', $fechavale);
                     $aniosistemas = date("Y");
                     $messistemas = date("m");
                     if ($aniovale != $aniosistemas && $mesvale != $messistemas) {
                         return Redirect::to('agregar-liquidacion-gastos/' . $idopcion)->with('errorbd', 'La fecha del arendir no corresponde esta dentro del periodo de la Liquidacion de Gasto');
                     }
+
+                    //dd($fechavale);
                 } else {
                     $vale = DB::table('WEB.VALE_RENDIR')->where('ID', $arendir_sel_id)->first();
                     $fechavale = $vale->FEC_AUTORIZACION;
