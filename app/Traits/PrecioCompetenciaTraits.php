@@ -33,6 +33,23 @@ use ZipArchive;
 trait PrecioCompetenciaTraits
 {
 
+	private function prefijo_empresa_pre($idempresa) {
+		if($idempresa == 'IACHEM0000010394'){
+			$prefijo = 'II';
+		}else{
+			$prefijo = 'IS';
+		}
+	 	return  $prefijo;
+	}
+	private function versicarpetanoexiste_pre($ruta) {
+		$valor = false;
+		if (!file_exists($ruta)) {
+		    mkdir($ruta, 0777, true);
+		    $valor=true;
+		}
+		return $valor;
+	}
+
 	private function guadarpdfoi() {
 			
 			$pathFiles='\\\\10.1.50.2';
@@ -42,7 +59,7 @@ trait PrecioCompetenciaTraits
 			    ->where('COD_CATEGORIA_TIPO_ORDEN', 'TOR0000000000021')
 			    ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000008', 'ETM0000000000005'])
 			    ->whereRaw('ISNULL(IND_OI, 0) = 0')
-			    ->where('ID_DOCUMENTO','=','ISLMCE0000000199')
+			    //->where('ID_DOCUMENTO','=','ISLMCE0000000199')
 			    ->orderBy('FEC_ORDEN', 'asc')
 			    ->select('FE_DOCUMENTO.*')
 			    ->get();
@@ -99,21 +116,52 @@ trait PrecioCompetenciaTraits
 	                if($ordencompra->COD_CENTRO == 'CEN0000000000002'){
 	                    $sourceFile = '\\\\10.1.4.201\\cpe\\Orden_Ingreso\\'.$oingreso->COD_TABLA_ASOC.'.pdf';
 	                }
-
 	                $destinationFile = '\\\\10.1.0.201\\cpe\\Orden_Ingreso\\'.$oingreso->COD_TABLA_ASOC.'.pdf';
 	                if (file_exists($sourceFile)){
 	                    copy($sourceFile, $destinationFile);
 	                }
 	            }
-
 						}
 
+	          $destinationFile = '\\\\10.1.0.201\\cpe\\Orden_Ingreso\\'.$oingreso->COD_TABLA_ASOC.'.pdf';
 
+            if (file_exists($destinationFile)){
 
+                $aoc                            =       CMPDocAsociarCompra::where('COD_ORDEN','=',$item->ID_DOCUMENTO)->where('COD_ESTADO','=',1)
+                                                        ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000042'])
+                                                        ->first();
 
+                $contadorArchivos 							= 		  Archivo::count();
+                $nombrefilecdr                  =       $oingreso->COD_TABLA_ASOC.'.pdf';
+                $prefijocarperta                =       $this->prefijo_empresa_pre($ordencompra->COD_EMPR);
+                $rutafile                       =       $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$item->RUC_PROVEEDOR;
+                $rutacompleta                   =       $rutafile.'\\'.$nombrefilecdr;
+                $valor                          =       $this->versicarpetanoexiste_pre($rutafile);
+                $path                           =       $rutacompleta;
+                copy($destinationFile, $rutacompleta);
+                $dcontrol                       =       new Archivo;
+                $dcontrol->ID_DOCUMENTO         =       $item->ID_DOCUMENTO;
+                $dcontrol->DOCUMENTO_ITEM       =       $item->DOCUMENTO_ITEM;
+                $dcontrol->TIPO_ARCHIVO         =       'DCC0000000000042';
+                $dcontrol->NOMBRE_ARCHIVO       =       $nombrefilecdr;
+                $dcontrol->DESCRIPCION_ARCHIVO  =       'ORDEN DE INGRESO';
+                $dcontrol->URL_ARCHIVO          =       $path;
+                $dcontrol->SIZE                 =       100;
+                $dcontrol->EXTENSION            =       '.pdf';
+                $dcontrol->ACTIVO               =       1;
+                $dcontrol->FECHA_CREA           =       date('Ymd H:i:s');
+                $dcontrol->USUARIO_CREA         =       'JNECIOSM';
+                $dcontrol->save();
 
-						dd("HOLA");
+								DB::table('FE_DOCUMENTO')
+						    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
+						    ->update([
+						        'IND_OI'     => '1'
+						    ]);
 
+            }else{
+            	print_r("archivo no encontrado");
+            }
 
 					}else{
 						DB::table('FE_DOCUMENTO')
@@ -121,6 +169,7 @@ trait PrecioCompetenciaTraits
 				    ->update([
 				        'IND_OI'     => '1'
 				    ]);
+
 					}
       }
 
