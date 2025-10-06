@@ -1629,13 +1629,13 @@ class GestionOCContabilidadController extends Controller
                 $documento->MENSAJE = '';
                 $documento->save();
 
-                $trabajador = STDTrabajador::where('NRO_DOCUMENTO', '=', $fedocumento->dni_usuariocontacto)->first();
-                $empresa = STDEmpresa::where('COD_EMPR', '=', $ordencompra->COD_EMPR)->first();
-                $mensaje = 'COMPROBANTE: ' . $fedocumento->ID_DOCUMENTO
-                    . '%0D%0A' . 'EMPRESA : ' . $empresa->NOM_EMPR . '%0D%0A'
-                    . 'PROVEEDOR : ' . $ordencompra->TXT_EMPR_CLIENTE . '%0D%0A'
-                    . 'ESTADO : ' . $fedocumento->TXT_ESTADO . '%0D%0A'
-                    . 'APROBACION DEL DOCUMENTO REPARABLE' . '%0D%0A';
+                // $trabajador = STDTrabajador::where('NRO_DOCUMENTO', '=', $fedocumento->dni_usuariocontacto)->first();
+                // $empresa = STDEmpresa::where('COD_EMPR', '=', $ordencompra->COD_EMPR)->first();
+                // $mensaje = 'COMPROBANTE: ' . $fedocumento->ID_DOCUMENTO
+                //     . '%0D%0A' . 'EMPRESA : ' . $empresa->NOM_EMPR . '%0D%0A'
+                //     . 'PROVEEDOR : ' . $ordencompra->TXT_EMPR_CLIENTE . '%0D%0A'
+                //     . 'ESTADO : ' . $fedocumento->TXT_ESTADO . '%0D%0A'
+                //     . 'APROBACION DEL DOCUMENTO REPARABLE' . '%0D%0A';
                 // if(1==0){
                 //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
                 // }else{

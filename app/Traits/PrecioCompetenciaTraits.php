@@ -15,6 +15,9 @@ use App\Modelos\FeToken;
 use App\Modelos\SunatDocumento;
 use App\Modelos\Archivo;
 use App\Modelos\STDEmpresa;
+use App\Modelos\CMPDocAsociarCompra;
+use App\Modelos\CMPOrden;
+
 
 
 
@@ -29,6 +32,104 @@ use ZipArchive;
 
 trait PrecioCompetenciaTraits
 {
+
+	private function guadarpdfoi() {
+			
+			$pathFiles='\\\\10.1.50.2';
+
+			$documentos = DB::table('FE_DOCUMENTO')
+			    ->join('CMP.ORDEN', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.ORDEN.COD_ORDEN')
+			    ->where('COD_CATEGORIA_TIPO_ORDEN', 'TOR0000000000021')
+			    ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000008', 'ETM0000000000005'])
+			    ->whereRaw('ISNULL(IND_OI, 0) = 0')
+			    ->where('ID_DOCUMENTO','=','ISLMCE0000000199')
+			    ->orderBy('FEC_ORDEN', 'asc')
+			    ->select('FE_DOCUMENTO.*')
+			    ->get();
+
+			//dd($documentos);
+
+
+      foreach($documentos as $index=>$item){
+
+					$archivos = DB::table('ARCHIVOS')
+								    ->where('TIPO_ARCHIVO', 'DCC0000000000042')
+								    ->where('ACTIVO', 1)
+								    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
+								    ->first();
+
+					if(count($archivos)<=0){
+
+						$compras = DB::table('CMP.DOC_ASOCIAR_COMPRA')
+											    ->where('COD_ORDEN', $item->ID_DOCUMENTO)
+											    ->where('COD_CATEGORIA_DOCUMENTO', 'DCC0000000000042')
+											    ->first();
+
+						if(count($compras)<=0){
+
+                $docasociar                              =   New CMPDocAsociarCompra;
+                $docasociar->COD_ORDEN                   =   $item->ID_DOCUMENTO;
+                $docasociar->COD_CATEGORIA_DOCUMENTO     =   'DCC0000000000042';
+                $docasociar->NOM_CATEGORIA_DOCUMENTO     =   'ORDEN DE INGRESO';
+                $docasociar->IND_OBLIGATORIO             =   1;
+                $docasociar->TXT_FORMATO                 =   'PDF';
+                $docasociar->TXT_ASIGNADO                =   'CONTACTO';
+                $docasociar->COD_USUARIO_CREA_AUD        =   'JNECIOSM';
+                $docasociar->FEC_USUARIO_CREA_AUD        =   date('Ymd H:i:s');
+                $docasociar->COD_ESTADO                  =   1;
+                $docasociar->TIP_DOC                     =   'N';
+                $docasociar->save();
+						}
+
+						//COPIAR ARCHIVO DE ORDEN DE INGRESO A LA REAL
+            $ordencompra        =   CMPOrden::where('COD_ORDEN','=',$item->ID_DOCUMENTO)->first();
+						$oingreso 					= 	DB::table('CMP.REFERENCIA_ASOC')
+																    ->where('COD_TABLA', $item->ID_DOCUMENTO)
+																    ->where('COD_TABLA_ASOC', 'LIKE', '%OI%')
+																    ->first();
+
+						if(count($oingreso)>0){
+	            if($ordencompra->COD_CENTRO == 'CEN0000000000004' or $ordencompra->COD_CENTRO == 'CEN0000000000006'or $ordencompra->COD_CENTRO == 'CEN0000000000002'){
+	                if($ordencompra->COD_CENTRO == 'CEN0000000000004'){
+	                    $sourceFile = '\\\\10.1.7.200\\cpe\\Orden_Ingreso\\'.$oingreso->COD_TABLA_ASOC.'.pdf';
+	                }
+	                if($ordencompra->COD_CENTRO == 'CEN0000000000006'){
+	                    $sourceFile = '\\\\10.1.9.43\\cpe\\Orden_Ingreso\\'.$oingreso->COD_TABLA_ASOC.'.pdf';
+	                }
+	                if($ordencompra->COD_CENTRO == 'CEN0000000000002'){
+	                    $sourceFile = '\\\\10.1.4.201\\cpe\\Orden_Ingreso\\'.$oingreso->COD_TABLA_ASOC.'.pdf';
+	                }
+
+	                $destinationFile = '\\\\10.1.0.201\\cpe\\Orden_Ingreso\\'.$oingreso->COD_TABLA_ASOC.'.pdf';
+	                if (file_exists($sourceFile)){
+	                    copy($sourceFile, $destinationFile);
+	                }
+	            }
+
+						}
+
+
+
+
+
+						dd("HOLA");
+
+
+					}else{
+						DB::table('FE_DOCUMENTO')
+				    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
+				    ->update([
+				        'IND_OI'     => '1'
+				    ]);
+					}
+      }
+
+
+
+	}	
+
+
+
 
 	private function buscar_archivo_sunat_lg_nuevo_lg($urlxml,$fetoken,$pathFiles,$prefijocarperta,$ID_DOCUMENTO,$documento,$IND) {
 

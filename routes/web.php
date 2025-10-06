@@ -62,6 +62,9 @@ Route::any('/guardardocumentacionlq', 'PrecioCompetenciaController@actionDocumen
 
 Route::any('/enviocorreoreparacionlevantada', 'UserController@actionCorreoReparacionLevantada');//correo para usuario contacto
 
+Route::any('/guardarpdfoi', 'PrecioCompetenciaController@actionGuardarPdfOi');//correo para usuario contacto
+
+
 
 Route::group(['middleware' => ['authaw']], function () {
 
