@@ -3920,7 +3920,7 @@ class GestionOCController extends Controller
                     $this->insert_referencia_asoc($orden,$detalleproducto,$orden_id[0]);//crea la referencia
                     if (in_array($orden->COD_CATEGORIA_TIPO_ORDEN, ['TOR0000000000026','TOR0000000000022','TOR0000000000021'])) {
 
-                        dd("LLAMAR AL AREA DE SISTEMAS 979820173 PORFAVOR ESTAMOS REVISANDO ESTOS CASOS");
+                        //dd("LLAMAR AL AREA DE SISTEMAS 979820173 PORFAVOR ESTAMOS REVISANDO ESTOS CASOS");
                         $this->insert_detalle_producto_cascara($orden,$detalleproducto,$orden_id[0]);//crea detalle de la orden de ingresa
 
                     }else{
