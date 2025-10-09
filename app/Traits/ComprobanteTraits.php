@@ -49,7 +49,7 @@ trait ComprobanteTraits
 {
 
     public function con_array_canjes() {
-        $array = ['ESTIBA','DOCUMENTO_INTERNO_PRODUCCION','DOCUMENTO_INTERNO_SECADO','DOCUMENTO_SERVICIO_BALANZA'];
+        $array = ['ESTIBA','DOCUMENTO_INTERNO_PRODUCCION','DOCUMENTO_INTERNO_SECADO','DOCUMENTO_SERVICIO_BALANZA','DOCUMENTO_INTERNO_COMPRA'];
         return $array;
     }    
 
@@ -57,7 +57,9 @@ trait ComprobanteTraits
         $array = [  'ESTIBA'=>'TDO0000000000067',
                     'DOCUMENTO_INTERNO_PRODUCCION'=>'TDO0000000000092',
                     'DOCUMENTO_INTERNO_SECADO'=>'TDO0000000000096',
-                    'DOCUMENTO_SERVICIO_BALANZA'=>'TDO0000000000071'];
+                    'DOCUMENTO_SERVICIO_BALANZA'=>'TDO0000000000071',
+                    'DOCUMENTO_INTERNO_COMPRA'=>'TDO0000000000086',
+                ];
         $id = $array[$valor];
 
         return $id;

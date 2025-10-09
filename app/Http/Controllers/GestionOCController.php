@@ -638,7 +638,8 @@ class GestionOCController extends Controller
                                         'ESTIBA' => 'ESTIBA',
                                         'DOCUMENTO_INTERNO_PRODUCCION' => 'DOCUMENTO INTERNO PRODUCCION',
                                         'DOCUMENTO_INTERNO_SECADO' => 'DOCUMENTO INTERNO SECADO',
-                                        'DOCUMENTO_SERVICIO_BALANZA' => 'DOCUMENTO POR SERVICIO DE BALANZA'
+                                        'DOCUMENTO_SERVICIO_BALANZA' => 'DOCUMENTO POR SERVICIO DE BALANZA',
+                                        'DOCUMENTO_INTERNO_COMPRA' => 'DOCUMENTO INTERNO COMPRA'
                                     );
 
         $cod_empresa        =   Session::get('usuario')->usuarioosiris_id;
@@ -666,6 +667,8 @@ class GestionOCController extends Controller
         $proveedor_id               =   '';
 
         $array_canjes               =   $this->con_array_canjes();
+
+
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_administrativo($cod_empresa);
         }else{
