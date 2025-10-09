@@ -2830,7 +2830,7 @@ class GestionOCController extends Controller
 
                         //VALIDAR QUE YA EXISTE ESTE XML
 
-                        $fedocumento_e          =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->whereNotIn('COD_ESTADO',['','ETM0000000000006'])
+                        $fedocumento_e          =   FeDocumento::whereNotIn('COD_ESTADO',['','ETM0000000000006'])
                                                     ->where('RUC_PROVEEDOR','=',$factura->getcompany()->getruc())
                                                     ->where('SERIE','=',$factura->getserie())
                                                     ->where('NUMERO','=',$factura->getcorrelativo())
