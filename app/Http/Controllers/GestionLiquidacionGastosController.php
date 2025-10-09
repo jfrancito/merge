@@ -551,6 +551,7 @@ class GestionLiquidacionGastosController extends Controller
             ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
             ->where('COD_EMPR_CLIENTE', $empresa_id)
             ->where('COD_ESTADO', 1)
+            ->where('COD_CATEGORIA_ESTADO_CONTRATO','!=','ECO0000000000005')
             ->where('COD_CENTRO', $centro_id)
             ->get();
 
