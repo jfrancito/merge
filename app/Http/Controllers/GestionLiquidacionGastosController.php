@@ -3941,12 +3941,18 @@ class GestionLiquidacionGastosController extends Controller
 
                         if($ULTIMA_FECHA_RENDICION_DET!=''){
 
-                            $fechaInicio = Carbon::parse($PRIMERA_FECHA_RENDICION_DET);
-                            $fechaFin = Carbon::parse($ULTIMA_FECHA_RENDICION_DET);
+                            //$fechaInicio = Carbon::parse($PRIMERA_FECHA_RENDICION_DET);
+                            //$fechaFin = Carbon::parse($ULTIMA_FECHA_RENDICION_DET);
+                            $fechaInicio = Carbon::parse($PRIMERA_FECHA_RENDICION_DET)->startOfDay();
+                            $fechaFin = Carbon::parse($ULTIMA_FECHA_RENDICION_DET)->endOfDay();
                             $fechaMin = Carbon::parse($request['fecha_emision']);
+
+
+                            // Validar si está dentro del rango
                             if (!$fechaMin->between($fechaInicio, $fechaFin)) {
                                 return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/-1')
-                                       ->with('errorbd', 'La fecha de emisión (' . $fechaMin->format('Y-m-d') . ') no está dentro del rango a rendir (' . $fechaInicio->format('Y-m-d') . ' / ' . $fechaFin->format('Y-m-d') . ')');
+                                       ->with('errorbd', 'La fecha de emisión (' . $fechaMin->format('Y-m-d') . ') no está dentro del rango a rendir (' . 
+                                       $fechaInicio->format('Y-m-d') . ' / ' . $fechaFin->format('Y-m-d') . ')');
                             }
 
                         }
@@ -3998,9 +4004,15 @@ class GestionLiquidacionGastosController extends Controller
 
                         if($ULTIMA_FECHA_RENDICION_DET!=''){
 
-                            $fechaInicio = Carbon::parse($PRIMERA_FECHA_RENDICION_DET);
-                            $fechaFin = Carbon::parse($ULTIMA_FECHA_RENDICION_DET);
+                            // $fechaInicio = Carbon::parse($PRIMERA_FECHA_RENDICION_DET);
+                            // $fechaFin = Carbon::parse($ULTIMA_FECHA_RENDICION_DET);
+                            // $fechaMin = Carbon::parse($request['fecha_emision']);
+
+                            $fechaInicio = Carbon::parse($PRIMERA_FECHA_RENDICION_DET)->startOfDay();
+                            $fechaFin = Carbon::parse($ULTIMA_FECHA_RENDICION_DET)->endOfDay();
                             $fechaMin = Carbon::parse($request['fecha_emision']);
+
+
                             if (!$fechaMin->between($fechaInicio, $fechaFin)) {
                                 return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/-1')
                                        ->with('errorbd', 'La fecha de emisión (' . $fechaMin->format('Y-m-d') . ') no está dentro del rango a rendir (' . $fechaInicio->format('Y-m-d') . ' / ' . $fechaFin->format('Y-m-d') . ')');
@@ -5151,7 +5163,7 @@ class GestionLiquidacionGastosController extends Controller
             $anio = $this->anio;
             $mes = $this->mes;
 
-            //dd($centrocosto);
+            //dd($trabajadorespla->cadarea);
 
             $area_id = "";
             $area_txt = "";

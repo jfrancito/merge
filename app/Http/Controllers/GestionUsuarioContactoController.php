@@ -479,7 +479,7 @@ class GestionUsuarioContactoController extends Controller
                     $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                                 ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
                                                 ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000004'])
-                                                ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000001'])
+                                                ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000001','DCC0000000000009'])
                                                 //->where('TXT_ASIGNADO','=','CONTACTO')
                                                 ->get();
 
@@ -488,11 +488,12 @@ class GestionUsuarioContactoController extends Controller
                 }else{
                     $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                                 ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
-                                                ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000001'])
+                                                ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000001','DCC0000000000009'])
                                                 //->where('TXT_ASIGNADO','=','CONTACTO')
                                                 ->get();
                 }
 
+                //dd($tarchivos);
 
 
                 foreach($tarchivos as $index => $item){
@@ -535,7 +536,7 @@ class GestionUsuarioContactoController extends Controller
                             $dcontrol->save();
                         }
                     }else{
-                        return Redirect::to('observacion-comprobante-uc-proveedor'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Seleccione los archivos Correspondientes');
+                        return Redirect::to('observacion-comprobante-uc-proveedor/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Seleccione los archivos Correspondientes');
                     }
                 }
 
