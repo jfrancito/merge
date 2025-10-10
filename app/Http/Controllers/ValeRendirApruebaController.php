@@ -43,8 +43,6 @@ class ValeRendirApruebaController extends Controller
         $combo1 = array('' => 'Seleccione Usuario Aprueba') + $usuariosAp;
         $combo2 = array('' => 'Seleccione Tipo o Motivo') + $tipoMotivo;
 
- 
-        
 
         $cod_usuario_registro = Session::get('usuario')->id;
         $cod_empr = Session::get('empresas')->COD_EMPR;
@@ -342,8 +340,11 @@ class ValeRendirApruebaController extends Controller
 
         $valeRendirOsiris       =   WEBValeRendir::where('ID', $id_buscar)->first();
 
+        $cod_usuario_registro = DB::table('users')
+        ->where('id', $valeRendirOsiris->COD_USUARIO_MODIF_AUD)
+        ->value('name');
 
-        
+
         $id = $valeRendirOsiris->ID;
         $cod_empr= $valeRendirOsiris->COD_EMPR;
         $cod_centro = $valeRendirOsiris->COD_CENTRO;
@@ -371,7 +372,7 @@ class ValeRendirApruebaController extends Controller
         $cod_tipo_estado = 'IACHTE0000000017';
         $txt_tipo_estado = 'GENERADO'; 
         $cod_estado = $valeRendirOsiris->COD_ESTADO;
-        $cod_usuario_registro = $valeRendirOsiris->COD_USUARIO_CREA_AUD;
+        $cod_usuario_registro;
         if (empty($nro_cuenta)) {
             $txt_glosa = $valeRendirOsiris->TXT_GLOSA . ' / EFECTIVO';
         } else {

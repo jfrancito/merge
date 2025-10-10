@@ -844,6 +844,17 @@ $(document).ready(function(){
             let fechaMin = new Date(hoy);
             fechaMin.setDate(hoy.getDate() - 7);
 
+
+            let primerDiaMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+            let ultimoDiaMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
+
+
+            if (fechaMin < primerDiaMes) {
+                fechaMin = primerDiaMes;
+            }
+
+            let fechaMax = ultimoDiaMes;
+
             // 🔧 Función para formatear en "YYYY-MM-DDTHH:mm"
             function toLocalDatetimeStr(date) {
                 const yyyy = date.getFullYear();
@@ -854,10 +865,14 @@ $(document).ready(function(){
                 return `${yyyy}-${mm}-${dd}T${hh}:${min}`;
             }
 
+          
             let minDateStr = toLocalDatetimeStr(fechaMin);
+            let maxDateStr = toLocalDatetimeStr(fechaMax);
 
-            $('#fecha_inicio').attr('min', minDateStr);
-            $('#fecha_fin').attr('min', minDateStr);
+             $('#fecha_inicio').attr('min', minDateStr);
+    $('#fecha_inicio').attr('max', maxDateStr);
+    $('#fecha_fin').attr('min', minDateStr);
+    $('#fecha_fin').attr('max', maxDateStr);
         });
 
         function formatToSQLDateTime(fechaLocal) {
