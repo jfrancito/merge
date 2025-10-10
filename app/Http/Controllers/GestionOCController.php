@@ -36,6 +36,9 @@ use Greenter\Xml\Parser\NoteParser;
 use Greenter\Xml\Parser\PerceptionParser;
 use Greenter\Xml\Parser\RHParser;
 use Greenter\Xml\Parser\RetentionParser;
+use Greenter\Xml\Parser\LiquiParser;
+
+
 
 use App\User;
 use Illuminate\Support\Facades\Crypt;
@@ -219,15 +222,23 @@ class GestionOCController extends Controller
     {
 
 
-// $timestamp = hexdec('0x0000000000355486');
-// $fecha = Carbon::createFromTimestamp($timestamp);
-// dd($fecha->toDateTimeString()); // Formato: 'Y-m-d H:i:s'
+        header('Content-Type: text/html; charset=UTF-8');
+        //$path = storage_path() . "/exports/FC26-00002985.XML";
+        $path = storage_path() . "/exports/20602740278-04-E001-15252.xml";
+        $parser = new InvoiceParser();
+        $xml = file_get_contents($path);
+        $factura = $parser->parse($xml);
+        dd($factura);
 
+    }
+
+    public function actionApiLeerXmlSapLiqui(Request $request)
+    {
 
         header('Content-Type: text/html; charset=UTF-8');
         //$path = storage_path() . "/exports/FC26-00002985.XML";
-        $path = storage_path() . "/exports/IICHAU0000011936.xml";
-        $parser = new InvoiceParser();
+        $path = storage_path() . "/exports/20602740278-04-E001-15252.xml";
+        $parser = new LiquiParser();
         $xml = file_get_contents($path);
         $factura = $parser->parse($xml);
         dd($factura);
@@ -651,6 +662,8 @@ class GestionOCController extends Controller
 
         $combo_area         =    $this->gn_combo_area_usuario($estado_id);
         $rol                =    WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
+
+
 
         if($rol->ind_uc == 1){
             $usuario    =   SGDUsuario::where('COD_USUARIO','=',Session::get('usuario')->name)->first();

@@ -261,6 +261,8 @@ Route::group(['middleware' => ['authaw']], function () {
     Route::any('/obtener-reporte-ingresos-salidas-envases-excel', 'IngresosSalidasEnvasesController@actionAjaxListarIngresosSalidasEnvasesExcel');
 
 	Route::any('/leerxmlsinvoice', 'GestionOCController@actionApiLeerXmlSap');
+	Route::any('/leerxmlsinvoiceliqui', 'GestionOCController@actionApiLeerXmlSapLiqui');
+
 	Route::any('/leerrhsinvoice', 'GestionOCController@actionApiLeerRHSap');
 	Route::any('/leerrhsinvoicereten', 'GestionOCController@actionApiLeerRetencionSap');
 
