@@ -479,7 +479,7 @@ class GestionUsuarioContactoController extends Controller
                     $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                                 ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
                                                 ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000004'])
-                                                ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000001'])
+                                                ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000001','DCC0000000000009'])
                                                 //->where('TXT_ASIGNADO','=','CONTACTO')
                                                 ->get();
 
@@ -488,11 +488,12 @@ class GestionUsuarioContactoController extends Controller
                 }else{
                     $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                                 ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
-                                                ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000001'])
+                                                ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000001','DCC0000000000009'])
                                                 //->where('TXT_ASIGNADO','=','CONTACTO')
                                                 ->get();
                 }
 
+                //dd($tarchivos);
 
 
                 foreach($tarchivos as $index => $item){
@@ -535,7 +536,7 @@ class GestionUsuarioContactoController extends Controller
                             $dcontrol->save();
                         }
                     }else{
-                        return Redirect::to('observacion-comprobante-uc-proveedor'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Seleccione los archivos Correspondientes');
+                        return Redirect::to('observacion-comprobante-uc-proveedor/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Seleccione los archivos Correspondientes');
                     }
                 }
 
@@ -613,7 +614,7 @@ class GestionUsuarioContactoController extends Controller
                 $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                             ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000004'])
                                             ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
-                                            ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000001'])
+                                            ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000001','DCC0000000000009'])
                                             //->where('TXT_ASIGNADO','=','CONTACTO')
                                             ->get();
 
@@ -621,7 +622,7 @@ class GestionUsuarioContactoController extends Controller
 
                 $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                             ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
-                                            ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000001'])
+                                            ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000001','DCC0000000000009'])
                                             //->where('TXT_ASIGNADO','=','CONTACTO')
                                             ->get();
             }
@@ -2638,7 +2639,22 @@ class GestionUsuarioContactoController extends Controller
                     $this->insert_almacen_lote($orden,$detalleproducto);
                     $orden_id = $this->insert_orden($orden,$detalleproducto);                 
                     $this->insert_referencia_asoc($orden,$detalleproducto,$orden_id[0]);
-                    $this->insert_detalle_producto($orden,$detalleproducto,$orden_id[0]);
+                    //$this->insert_detalle_producto($orden,$detalleproducto,$orden_id[0]);
+
+
+                    if (in_array($orden->COD_CATEGORIA_TIPO_ORDEN, ['TOR0000000000026','TOR0000000000022','TOR0000000000021'])) {
+                        //dd("LLAMAR AL AREA DE SISTEMAS 979820173 PORFAVOR ESTAMOS REVISANDO ESTOS CASOS");
+                        if($orden->COD_CENTRO != 'CEN0000000000002'){
+                            $this->insert_detalle_producto_cascara($orden,$detalleproducto,$orden_id[0]);//crea detalle de la orden de ingresa   
+                        }else{
+                            $this->insert_detalle_producto($orden,$detalleproducto,$orden_id[0]);//crea detalle de la orden de ingresa
+                        }
+                    }else{
+                        $this->insert_detalle_producto($orden,$detalleproducto,$orden_id[0]);//crea detalle de la orden de ingresa
+                    }
+
+
+
 
 
                     //DETALLE PRODUCTO ACTUALIZAR

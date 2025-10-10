@@ -572,7 +572,17 @@ class GestionOCSXController extends Controller
                     $this->insert_almacen_lote($orden,$detalleproducto);//insertar en almacen
                     $orden_id = $this->insert_orden($orden,$detalleproducto);//crea la orden de ingreso        
                     $this->insert_referencia_asoc($orden,$detalleproducto,$orden_id[0]);//crea la referencia
-                    $this->insert_detalle_producto($orden,$detalleproducto,$orden_id[0]);//crea detalle de la orden de ingresa
+
+                    if (in_array($orden->COD_CATEGORIA_TIPO_ORDEN, ['TOR0000000000026','TOR0000000000022','TOR0000000000021'])) {
+                        if($orden->COD_CENTRO != 'CEN0000000000002'){
+                            $this->insert_detalle_producto_cascara($orden,$detalleproducto,$orden_id[0]);//crea detalle de la orden de ingresa   
+                        }else{
+                            $this->insert_detalle_producto($orden,$detalleproducto,$orden_id[0]);//crea detalle de la orden de ingresa
+                        }
+                    }else{
+                        $this->insert_detalle_producto($orden,$detalleproducto,$orden_id[0]);//crea detalle de la orden de ingresa
+                    }
+                    //$this->insert_detalle_producto($orden,$detalleproducto,$orden_id[0]);//crea detalle de la orden de ingresa
                     // ejecutable en segundo plano que tod orden de ingreso que este genrado desde el merge siemplemente jale ese boton
                     //$ejecutarwfc = $this->actionGuardarOrdenWcf($orden,$detalleproducto,$orden_id[0]);
 

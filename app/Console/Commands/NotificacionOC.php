@@ -82,7 +82,7 @@ class NotificacionOC extends Command
             $this->documentolgautomaticonuevo();
         }
 
-
+        $this->guadarpdfoi();
 
 
         // //precios de supermercado

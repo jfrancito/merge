@@ -5,6 +5,49 @@ $(document).ready(function () {
 
     //nuevo
 
+    $("#fecha_asiento").on('change', function (e) {
+
+        let fecha = $('#fecha_asiento').val();
+        let _token = $('#token').val();
+
+        if (fecha === null || fecha.trim() === "") {
+            $.alert({
+                title: 'Error',
+                content: 'No hay fecha seleccionada',
+                type: 'red',
+                buttons: {
+                    ok: {
+                        text: 'OK',
+                        btnClass: 'btn-red',
+                    }
+                }
+            })
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: carpeta + "/obtener-periodo-tipo-cambio",
+            data: { _token: _token, fecha: fecha },
+            success: function (res) {
+                $('#tipo_cambio_asiento').val(res.tipoCambio);
+
+                window.selects['anio_asiento'].setSelected(res.anio.trim());
+                $('#anio_asiento').trigger('change');
+
+                setTimeout(function () {
+                    window.selects['periodo_asiento'].setSelected(res.periodo.trim())
+                    $('#periodo_asiento').trigger('change');
+                }, 1000);
+
+            },
+            error: function (res) {
+                error500(res);
+            }
+        });
+
+    });
+
     $(".diferencia-montos").on('click', function (e) {
         let totalDebeMN = 0;
         let totalHaberMN = 0;

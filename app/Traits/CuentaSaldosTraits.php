@@ -86,4 +86,19 @@ trait CuentaSaldosTraits
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    private function generar_reporte_liquidaciones($startDate, $endDate, $employee, $company)
+    {
+        $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC [WEB].[REPORTE_LIQUIDACIONES_TRABAJADOR] @PERIODO_INI = ?,
+                                                          @PERIODO_FIN = ?,
+                                                          @COD_TRABAJADOR  = ?,
+                                                          @COD_EMPR = ?');
+        $stmt->bindParam(1, $startDate, PDO::PARAM_STR);
+        $stmt->bindParam(2, $endDate, PDO::PARAM_STR);
+        $stmt->bindParam(3, $employee, PDO::PARAM_STR);
+        $stmt->bindParam(4, $company, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

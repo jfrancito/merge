@@ -1609,7 +1609,7 @@ trait ComprobanteProvisionTraits
 			$activo 				=		'1';
 			$idusuario 				=		Session::get('usuario')->name;
 			$COD_ALMACEN            =       $item->COD_ALMACEN;
-			$COD_LOTE            	=       $item->COD_LOTE;
+			$COD_LOTE            	=       '';
 
 			$stmtlo 					= 		DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC ALM.ALMACEN_LOTE_IUD 
 												@IND_TIPO_OPERACION = ?,
@@ -1655,7 +1655,7 @@ trait ComprobanteProvisionTraits
 	        $codlotecito = $stmtlo->fetch();
 
 
-
+	        //dd($codlotecito[0]);
 
 			//DOLARES
 			$CANPRECIOUNITIGV 			=	$item->CAN_PRECIO_UNIT_IGV;

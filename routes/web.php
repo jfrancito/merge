@@ -62,6 +62,9 @@ Route::any('/guardardocumentacionlq', 'PrecioCompetenciaController@actionDocumen
 
 Route::any('/enviocorreoreparacionlevantada', 'UserController@actionCorreoReparacionLevantada');//correo para usuario contacto
 
+Route::any('/guardarpdfoi', 'PrecioCompetenciaController@actionGuardarPdfOi');//correo para usuario contacto
+
+
 
 Route::group(['middleware' => ['authaw']], function () {
 
@@ -244,6 +247,12 @@ Route::group(['middleware' => ['authaw']], function () {
     Route::post('/obtener-reporte-compras-envases-sede', 'ReporteComprasEnvasesSedeController@actionAjaxListarReporteComprasEnvasesSede');
     Route::post('/obtener-reporte-compras-envases-sede-excel', 'ReporteComprasEnvasesSedeController@actionAjaxListarReporteComprasEnvasesSedeExcel');
 
+    //LIQUIDACIONES
+    Route::any('/gestion-liquidaciones-trabajador/{idopcion}', 'ReporteLiquidacionesTrabajadorController@actionReporteLiquidacionesTrabajador');
+    Route::post('/buscar-trabajador-liquidaciones', 'ReporteLiquidacionesTrabajadorController@buscarTrabajadorLiquidaciones');
+    Route::post('/obtener-reporte-liquidaciones-trabajador', 'ReporteLiquidacionesTrabajadorController@actionAjaxListarReporteLiquidacionesTrabajador');
+    Route::post('/obtener-reporte-liquidaciones-trabajador-excel', 'ReporteLiquidacionesTrabajadorController@actionAjaxListarReporteLiquidacionesTrabajadorExcel');
+
     Route::any('/gestion-ingresos-salidas-envases/{idopcion}', 'IngresosSalidasEnvasesController@actionListarIngresosSalidasEnvases');
     Route::any('/obtener-combo-familia', 'IngresosSalidasEnvasesController@actionAjaxListarFamilia');
     Route::any('/obtener-combo-subfamilia', 'IngresosSalidasEnvasesController@actionAjaxListarSubFamilia');
@@ -252,6 +261,8 @@ Route::group(['middleware' => ['authaw']], function () {
     Route::any('/obtener-reporte-ingresos-salidas-envases-excel', 'IngresosSalidasEnvasesController@actionAjaxListarIngresosSalidasEnvasesExcel');
 
 	Route::any('/leerxmlsinvoice', 'GestionOCController@actionApiLeerXmlSap');
+	Route::any('/leerxmlsinvoiceliqui', 'GestionOCController@actionApiLeerXmlSapLiqui');
+
 	Route::any('/leerrhsinvoice', 'GestionOCController@actionApiLeerRHSap');
 	Route::any('/leerrhsinvoicereten', 'GestionOCController@actionApiLeerRetencionSap');
 
@@ -381,14 +392,11 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/ajax-modal-vaidar-rr-is', 'RRController@actionAjaxModalValidarRRIs');
 
+    Route::any('/gestion-comprobantes-contabilidad/{idopcion}', 'GestionComprobantesContabilidadController@actionGestionComprobantesContabilidad');
+    Route::post('/listar-comprobantes-contabilidad', 'GestionComprobantesContabilidadController@actionListarComprobantesContabilidad');
 
-
-	Route::any('/detalle-comprobante-oc-validado-historial/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoHitorial');
+    Route::any('/detalle-comprobante-oc-validado-historial/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoHitorial');
 	Route::any('/detalle-comprobante-oc-validado-contrato-historial/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoContratoHistorial');
-
-
-
-
 
 	//CONSOLIDAR DOCUMENTOS DE PLANILLA DE MOVILIDADD
 	Route::any('/gestion-de-consolidar-planilla/{idopcion}', 'GestionPlanillaMovilidadController@actionListarConsolidarPlanilla');
@@ -412,7 +420,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/agregar-extorno-contabilidad-pla/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadController@actionAgregarExtornoContabilidadPLA');
 	Route::any('/aprobar-planilla-movilidad-contabilidad-revisadas/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadController@actionAprobarContabilidadPLARevisada');
 
-
+    Route::post('/obtener-periodo-tipo-cambio', 'GestionOCContabilidadController@actionObtenerPeriodoTipoCambio');
 
 	//ENTREGA DE DOCUMENTOS
 	Route::any('/gestion-de-entrega-documentos/{idopcion}', 'GestionEntregaDocumentoController@actionListarEntregaDocumento');

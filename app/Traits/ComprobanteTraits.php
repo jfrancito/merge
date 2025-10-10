@@ -49,7 +49,7 @@ trait ComprobanteTraits
 {
 
     public function con_array_canjes() {
-        $array = ['ESTIBA','DOCUMENTO_INTERNO_PRODUCCION','DOCUMENTO_INTERNO_SECADO','DOCUMENTO_SERVICIO_BALANZA'];
+        $array = ['ESTIBA','DOCUMENTO_INTERNO_PRODUCCION','DOCUMENTO_INTERNO_SECADO','DOCUMENTO_SERVICIO_BALANZA','DOCUMENTO_INTERNO_COMPRA'];
         return $array;
     }    
 
@@ -57,7 +57,9 @@ trait ComprobanteTraits
         $array = [  'ESTIBA'=>'TDO0000000000067',
                     'DOCUMENTO_INTERNO_PRODUCCION'=>'TDO0000000000092',
                     'DOCUMENTO_INTERNO_SECADO'=>'TDO0000000000096',
-                    'DOCUMENTO_SERVICIO_BALANZA'=>'TDO0000000000071'];
+                    'DOCUMENTO_SERVICIO_BALANZA'=>'TDO0000000000071',
+                    'DOCUMENTO_INTERNO_COMPRA'=>'TDO0000000000086',
+                ];
         $id = $array[$valor];
 
         return $id;
@@ -3332,7 +3334,7 @@ trait ComprobanteTraits
                                         SELECT '// ' + d2_interno.MENSAJE
                                         FROM FE_DOCUMENTO_HISTORIAL d2_interno
                                         WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
-                                          
+                                          AND FE_DOCUMENTO.IND_REPARABLE = 1
                                           AND TIPO LIKE 'DOCUMENTO ARCHIVO_%' 
                                         FOR XML PATH('')
                                     ), 1, 2, ''
@@ -3430,7 +3432,7 @@ trait ComprobanteTraits
                                     SELECT '// ' + d2_interno.MENSAJE
                                     FROM FE_DOCUMENTO_HISTORIAL d2_interno
                                     WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
-                                      
+                                      AND FE_DOCUMENTO.IND_REPARABLE = 1
                                       AND TIPO LIKE 'DOCUMENTO ARCHIVO_%' 
                                     FOR XML PATH('')
                                 ), 1, 2, ''
@@ -3679,7 +3681,7 @@ trait ComprobanteTraits
                                                     SELECT '// ' + d2_interno.MENSAJE
                                                     FROM FE_DOCUMENTO_HISTORIAL d2_interno
                                                     WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
-                                                    
+                                                    AND FE_DOCUMENTO.IND_REPARABLE = 1
                                                     AND TIPO LIKE 'DOCUMENTO ARCHIVO_%'
                                                     FOR XML PATH('')
                                                 ), 1, 2, ''
@@ -3785,7 +3787,7 @@ trait ComprobanteTraits
                                                 SELECT '// ' + d2_interno.MENSAJE
                                                 FROM FE_DOCUMENTO_HISTORIAL d2_interno
                                                 WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
-                                                
+                                                AND FE_DOCUMENTO.IND_REPARABLE = 1
                                                 AND TIPO LIKE 'DOCUMENTO ARCHIVO_%' 
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
@@ -3857,12 +3859,24 @@ trait ComprobanteTraits
                                                 SELECT '// ' + d2_interno.MENSAJE
                                                 FROM FE_DOCUMENTO_HISTORIAL d2_interno
                                                 WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
-                                                
+                                                AND FE_DOCUMENTO.IND_REPARABLE = 1
                                                 AND TIPO LIKE 'DOCUMENTO ARCHIVO_%'
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
                                         )
-                                    ) AS productos_reparable
+                                    ) AS productos_reparable,
+                                    (
+                                        SELECT STUFF(
+                                            (
+                                                SELECT '// ' + CONVERT(VARCHAR(20), d3_interno.FECHA, 106)
+                                                FROM FE_DOCUMENTO_HISTORIAL d3_interno
+                                                WHERE d3_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                                                AND TIPO = 'RESOLVIO LOS REPARABLES' 
+                                                FOR XML PATH('')
+                                            ), 1, 2, ''
+                                        )
+                                    ) AS fecha_reparable
+
 
                                 "))
                                 ->orderBy('FEC_VENTA','asc')
@@ -3948,7 +3962,7 @@ trait ComprobanteTraits
                                                 SELECT '// ' + d2_interno.MENSAJE
                                                 FROM FE_DOCUMENTO_HISTORIAL d2_interno
                                                 WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
-                                                
+                                                AND FE_DOCUMENTO.IND_REPARABLE = 1
                                                 AND TIPO LIKE 'DOCUMENTO ARCHIVO_%'
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
@@ -4028,7 +4042,7 @@ trait ComprobanteTraits
                                                 SELECT '// ' + d2_interno.MENSAJE
                                                 FROM FE_DOCUMENTO_HISTORIAL d2_interno
                                                 WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
-                                                
+                                                AND FE_DOCUMENTO.IND_REPARABLE = 1
                                                 AND TIPO LIKE 'DOCUMENTO ARCHIVO_%'
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
@@ -4113,7 +4127,7 @@ trait ComprobanteTraits
                                             SELECT '// ' + d2_interno.MENSAJE
                                             FROM FE_DOCUMENTO_HISTORIAL d2_interno
                                             WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
-                                            
+                                            AND FE_DOCUMENTO.IND_REPARABLE = 1
                                             AND TIPO LIKE 'DOCUMENTO ARCHIVO_%'
                                             FOR XML PATH('')
                                         ), 1, 2, ''

@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Modelos\CMPTipoCambio;
+use App\Modelos\CONPeriodo;
 use App\Modelos\STDTipoDocumento;
 use App\Modelos\WEBAsiento;
 use App\Modelos\WEBCuentaContable;
+use DateTime;
 use Illuminate\Http\Request;
 use App\Modelos\Grupoopcion;
 use App\Modelos\Opcion;
@@ -350,6 +352,43 @@ class GestionOCContabilidadController extends Controller
         }
     }
 
+    public function actionObtenerPeriodoTipoCambio(Request $request)
+    {
+        $fecha = $request->input('fecha');
+
+        $dt = new DateTime($fecha);
+
+        $tipoCambio = CMPTipoCambio::where('FEC_CAMBIO', '=', $dt)
+            ->where('COD_ESTADO', '=', 1)
+            ->first();
+
+        $periodo = CONPeriodo::where('COD_ANIO', '=', $dt->format("Y"))
+            ->where('COD_MES', '=', $dt->format("m"))
+            ->where('COD_EMPR', '=', Session::get('empresas')->COD_EMPR)
+            ->where('COD_ESTADO', '=', 1)
+            ->first();
+
+        $codPeriodo = '';
+        $codAnio = '';
+        $tipoCambioVenta = 0.0000;
+
+        if(isset($periodo)){
+            $codPeriodo = $periodo->COD_PERIODO;
+            $codAnio = $periodo->COD_ANIO;
+        }
+
+        if(isset($periodo)){
+            $tipoCambioVenta = $tipoCambio->CAN_VENTA;
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'tipoCambio' => $tipoCambioVenta,
+            'periodo' => $codPeriodo,
+            'anio' => $codAnio,
+        ]);
+
+    }
 
     public function actionAprobarContabilidad($idopcion, $linea, $prefijo, $idordencompra, Request $request)
     {
@@ -1629,13 +1668,13 @@ class GestionOCContabilidadController extends Controller
                 $documento->MENSAJE = '';
                 $documento->save();
 
-                $trabajador = STDTrabajador::where('NRO_DOCUMENTO', '=', $fedocumento->dni_usuariocontacto)->first();
-                $empresa = STDEmpresa::where('COD_EMPR', '=', $ordencompra->COD_EMPR)->first();
-                $mensaje = 'COMPROBANTE: ' . $fedocumento->ID_DOCUMENTO
-                    . '%0D%0A' . 'EMPRESA : ' . $empresa->NOM_EMPR . '%0D%0A'
-                    . 'PROVEEDOR : ' . $ordencompra->TXT_EMPR_CLIENTE . '%0D%0A'
-                    . 'ESTADO : ' . $fedocumento->TXT_ESTADO . '%0D%0A'
-                    . 'APROBACION DEL DOCUMENTO REPARABLE' . '%0D%0A';
+                // $trabajador = STDTrabajador::where('NRO_DOCUMENTO', '=', $fedocumento->dni_usuariocontacto)->first();
+                // $empresa = STDEmpresa::where('COD_EMPR', '=', $ordencompra->COD_EMPR)->first();
+                // $mensaje = 'COMPROBANTE: ' . $fedocumento->ID_DOCUMENTO
+                //     . '%0D%0A' . 'EMPRESA : ' . $empresa->NOM_EMPR . '%0D%0A'
+                //     . 'PROVEEDOR : ' . $ordencompra->TXT_EMPR_CLIENTE . '%0D%0A'
+                //     . 'ESTADO : ' . $fedocumento->TXT_ESTADO . '%0D%0A'
+                //     . 'APROBACION DEL DOCUMENTO REPARABLE' . '%0D%0A';
                 // if(1==0){
                 //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
                 // }else{
