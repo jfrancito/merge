@@ -67,7 +67,7 @@ class FirmaValeRendirController extends Controller
         // 📂 Ruta UNC a la carpeta compartida
         $rutaArchivo = "\\\\10.1.50.2\\comprobantes\\PDF_VALE\\vale_{$id}.pdf";
 
-       /* $info = DB::table('tes.OPERACION_CAJA as oc')
+        $info = DB::table('tes.OPERACION_CAJA as oc')
             ->join('tes.CAJA_BANCO as cb', 'oc.COD_CAJA_BANCO', '=', 'cb.COD_CAJA_BANCO')
             ->join('STD.EMPRESA as e', 'oc.COD_EMPR', '=', 'e.COD_EMPR') // empresa origen
             ->join('STD.EMPRESA as ea', 'oc.COD_EMPR_AFECTA', '=', 'ea.COD_EMPR') // empresa afectada
@@ -98,11 +98,11 @@ class FirmaValeRendirController extends Controller
             ->where('oc.COD_ITEM_MOVIMIENTO', 'IICHFI0000000025')
             ->first();
 
-       */
+       
         if (!file_exists($rutaArchivo)) {
 
     
-      /*      if ($info->COD_CATEGORIA_MONEDA == "MON0000000000001") {
+            if ($info->COD_CATEGORIA_MONEDA == "MON0000000000001") {
                 // Moneda en Soles
                 $importe = ($info->CAN_DEBE_MN != 0) ? $info->CAN_DEBE_MN : $info->CAN_HABER_MN;
                 $textoImporte = NumeroALetras::convertir($importe, 'NUEVOS SOLES');
@@ -110,10 +110,10 @@ class FirmaValeRendirController extends Controller
                 // Moneda en Dólares
                 $importe = ($info->CAN_DEBE_ME != 0) ? $info->CAN_DEBE_ME : $info->CAN_HABER_ME;
                 $textoImporte = NumeroALetras::convertir($importe, 'DÓLARES AMERICANOS');
-            }*/
+            }
 
             $pdf = PDF::loadView('valerendir.firma.modal_firma', [
-         /*     'id'                          => $id,
+                'id'                          => $id,
                 'txt_empr_afecta'             => $info->TXT_EMPR_AFECTA ?? '',
                 'cod_cultivo_afecta'          => $info->COD_CULTIVO_AFECTA ?? '',
                 'nro_cheque'                  => $info->NRO_CHEQUE ?? '',
@@ -132,7 +132,7 @@ class FirmaValeRendirController extends Controller
                 'txt_categoria_operacion_caja'=> $info->TXT_CATEGORIA_OPERACION_CAJA ?? '',
                 'txt_categoria_moneda'        => $info->TXT_CATEGORIA_MONEDA ?? '',
                 'txt_caja_banco'              => $info->TXT_CAJA_BANCO ?? '',
-                'texto_importe'               => $textoImporte*/
+                'texto_importe'               => $textoImporte
             ]);
 
             if (!file_exists(dirname($rutaArchivo))) {
