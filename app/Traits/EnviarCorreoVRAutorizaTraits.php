@@ -65,7 +65,7 @@ trait EnviarCorreoVRAutorizaTraits
             } elseif ($emailfromcentro === 'CEN0000000000006') {
                 $destinatarios = ["diana.paredes@induamerica.com.pe"];
             } elseif ($emailfromcentro === 'CEN0000000000002') {
-                $destinatarios = ["magaly.requejo@induamerica.com.pe"];
+                $destinatarios = ["lizbeth.marcas@induamerica.com.pe"];
             } else {
                 $destinatarios = ["marley.sucse@induamerica.com.pe", "diana.malca@induamerica.com.pe"];
             }
