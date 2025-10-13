@@ -371,6 +371,10 @@ trait UserTraits
                 }else{
                     if($item->COD_CENTRO == 'CEN0000000000006'){ //bellavista
                         $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00039')->first();
+                    }else{
+                        if($item->COD_CENTRO == 'CEN0000000000002'){ //bellavista
+                            $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00040')->first();
+                        }
                     }
                 }
 
