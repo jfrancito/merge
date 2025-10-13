@@ -65,19 +65,53 @@ trait EnviarCorreoVRApruebaTraits
              $emailfromcentro = $emailTrabajador->centro_osiris_id;
 
             if ($emailfromcentro === 'CEN0000000000004') {
-                $destinatarios = ["doris.delgado@induamerica.com.pe"];
-                $copias = ["doris.delgado@induamerica.com.pe"]; 
+                if ($VALE_RENDIR->TIPO_PAGO == 1) {
+                    $destinatarios = ["doris.delgado@induamerica.com.pe"];
+                    $copias = [
+                        "doris.delgado@induamerica.com.pe",
+                        "tesoreria.cix@induamerica.com.pe",
+                        "franklin.llontop@induamerica.com.pe",
+                        "karim.ramirez@induamerica.com.pe",
+                        "marley.sucse@induamerica.com.pe",
+                        "diana.malca@induamerica.com.pe"
+                    ];
+                } else {
+                    $destinatarios = ["doris.delgado@induamerica.com.pe"];
+                    $copias = ["doris.delgado@induamerica.com.pe"];
+                }
+
             } elseif ($emailfromcentro === 'CEN0000000000006') {
-                $destinatarios = ["diana.paredes@induamerica.com.pe"];
-                $copias = ["diana.paredes@induamerica.com.pe"]; 
+                if ($VALE_RENDIR->TIPO_PAGO == 1) {
+                    $destinatarios = ["diana.paredes@induamerica.com.pe"];
+                    $copias = [
+                        "diana.paredes@induamerica.com.pe",
+                        "tesoreria.cix@induamerica.com.pe",
+                        "franklin.llontop@induamerica.com.pe",
+                        "karim.ramirez@induamerica.com.pe",
+                        "marley.sucse@induamerica.com.pe",
+                        "diana.malca@induamerica.com.pe"
+                    ];
+                } else {
+                    $destinatarios = ["diana.paredes@induamerica.com.pe"];
+                    $copias = ["diana.paredes@induamerica.com.pe"];
+                }
+
             } elseif ($emailfromcentro === 'CEN0000000000002') {
                 if ($VALE_RENDIR->TIPO_PAGO == 1) {
                     $destinatarios = ["lizbeth.marcas@induamerica.com.pe"];
-                    $copias = ["lizbeth.marcas@induamerica.com.pe","tesoreria.cix@induamerica.com.pe","franklin.llontop@induamerica.com.pe"];
+                    $copias = [
+                        "lizbeth.marcas@induamerica.com.pe",
+                        "tesoreria.cix@induamerica.com.pe",
+                        "franklin.llontop@induamerica.com.pe",
+                        "karim.ramirez@induamerica.com.pe",
+                        "marley.sucse@induamerica.com.pe",
+                        "diana.malca@induamerica.com.pe"
+                    ];
                 } else {
                     $destinatarios = ["lizbeth.marcas@induamerica.com.pe"];
                     $copias = ["lizbeth.marcas@induamerica.com.pe"];
                 }
+
             } else {
                 $destinatarios = ["tesoreria.cix@induamerica.com.pe"];
                 $copias = [
