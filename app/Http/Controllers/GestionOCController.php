@@ -37,7 +37,7 @@ use Greenter\Xml\Parser\PerceptionParser;
 use Greenter\Xml\Parser\RHParser;
 use Greenter\Xml\Parser\RetentionParser;
 use Greenter\Xml\Parser\LiquiParser;
-
+use Greenter\Xml\Parser\DespatchParser;
 
 
 use App\User;
@@ -244,6 +244,20 @@ class GestionOCController extends Controller
         dd($factura);
 
     }
+    public function actionApiLeerXmlSapGuia(Request $request)
+    {
+
+        header('Content-Type: text/html; charset=UTF-8');
+        //$path = storage_path() . "/exports/FC26-00002985.XML";
+        $path = storage_path() . "/exports/20481402892-31-EG03-63292.xml";
+        $parser = new DespatchParser();
+        $xml = file_get_contents($path);
+        $factura = $parser->parse($xml);
+        dd($factura);
+
+    }
+
+    
 
 
     public function actionApiLeerRHSap(Request $request)
