@@ -15,7 +15,7 @@ use PDO;
 trait ValePersonalAutorizaTraits
 {
 
-    public function insertRegistroPersonalAutoriza($ind_tipo_operacion, $id, $cod_empr, $cod_centro, $cod_personal, $txt_personal, $cod_gerencia, $txt_gerencia, $cod_area, $txt_area, $cod_cargo, $txt_cargo, $cod_autoriza,  $txt_autoriza, $cod_estado, $cod_usuario_registro)
+    public function insertRegistroPersonalAutoriza($ind_tipo_operacion, $id, $cod_empr, $cod_centro, $cod_personal, $txt_personal, $cod_gerencia, $txt_gerencia, $cod_area, $txt_area, $cod_cargo, $txt_cargo, $cod_autoriza,  $txt_autoriza, $cod_linea, $txt_linea ,$cod_estado, $cod_usuario_registro)
 
     {
          try {
@@ -34,6 +34,8 @@ trait ValePersonalAutorizaTraits
                                                                         @TXT_CARGO = ?,
                                                                         @COD_AUTORIZA = ?,
                                                                         @TXT_AUTORIZA = ?,
+                                                                        @COD_LINEA = ?,
+                                                                        @TXT_LINEA = ?,
                                                                         @COD_ESTADO = ?,
                                                                         @COD_USUARIO_REGISTRO = ?');
 
@@ -55,9 +57,11 @@ trait ValePersonalAutorizaTraits
                  $stmt->bindParam(11, $cod_cargo, PDO::PARAM_STR);
                  $stmt->bindParam(12, $txt_cargo, PDO::PARAM_STR);
                  $stmt->bindParam(13, $cod_autoriza, PDO::PARAM_STR);
-                 $stmt->bindParam(14, $txt_autoriza, PDO::PARAM_STR);           
-                 $stmt->bindParam(15, $cod_estado, PDO::PARAM_BOOL);
-                 $stmt->bindParam(16, $cod_usuario_registro, PDO::PARAM_STR);
+                 $stmt->bindParam(14, $txt_autoriza, PDO::PARAM_STR);   
+                 $stmt->bindParam(15, $cod_linea, PDO::PARAM_STR);
+                 $stmt->bindParam(16, $txt_linea, PDO::PARAM_STR);         
+                 $stmt->bindParam(17, $cod_estado, PDO::PARAM_BOOL);
+                 $stmt->bindParam(18, $cod_usuario_registro, PDO::PARAM_STR);
 
 
                 $stmt->execute();

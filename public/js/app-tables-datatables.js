@@ -456,6 +456,8 @@ var App = (function () {
                 ordering: false
             });
         }
+
+        
         $("#valeaprobado").dataTable({
             responsive: true,
             autoWidth: true,
