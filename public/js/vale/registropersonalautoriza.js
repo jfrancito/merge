@@ -1,14 +1,15 @@
 $(document).ready(function () {
         var carpeta = $("#carpeta").val();
 
-        $('#filtrarpersonal').on('click', function () {
 
+
+        $('#filtrarpersonal').on('click', function () {
                 let _token   = $('#token').val();
                 let sede     = $('#sede_select').val();
                 let gerencia = $('#gerencia_select').val();
                 let area     = $('#area_select').val();
 
-                $.ajax({
+            $.ajax({
                     type: "POST",
                     url: carpeta + "/filtro_personal_autoriza",
                     data: {
@@ -17,41 +18,56 @@ $(document).ready(function () {
                         gerencia : gerencia,
                         area     : area
                     },
-                    success: function(data) {
-                    let table = $('#personalautoriza').DataTable();
-                    table.clear().draw();
+                    success: function(response) {
+                        let table = $('#personalautoriza').DataTable();
+                        table.clear().draw();
 
-                    if (data.length > 0) {
-                        data.forEach(function(item) {
-                            const nombreCompleto = item.nombres + ' ' + item.apellidopaterno + ' ' + item.apellidomaterno;
+                      
+                        const tipos_linea = response.tipos_linea || window.tipos_linea || {};
+                        const data = response.data || response || [];
 
-                    let opciones = '<select class="form-control select-personal">';
-                    opciones += '<option value="">-- Seleccionar --</option>';
+                        if (data.length > 0) {
+                            data.forEach(function(item) {
+                                const nombreCompleto = `${item.nombres} ${item.apellidopaterno} ${item.apellidomaterno}`;
 
-                    data.forEach(function(opt) {
-                        const nombreOpt = opt.nombres + ' ' + opt.apellidopaterno + ' ' + opt.apellidomaterno;
-                        const selected = (opt.cod_trab === item.cod_autorizado) ? 'selected' : '';
-                        opciones += `<option value="${opt.cod_trab}" ${selected}>${nombreOpt}</option>`;
-                    });
+                               
+                               let selectTipoLinea = '<select class="form-control select-tipo-linea" style="width:200px;">';
 
-                    opciones += '</select>';
-                            table.row.add([
+                                selectTipoLinea += '<option value="">-- Seleccionar --</option>';
+                                Object.entries(tipos_linea).forEach(function([cod_linea, txt_linea]) {
+                                    selectTipoLinea += `<option value="${cod_linea}">${txt_linea}</option>`;
+                                });
+                                selectTipoLinea += '</select>';
+
+                               
+                                let opciones = '<select class="form-control select-personal">';
+                                opciones += '<option value="">-- Seleccionar --</option>';
+                                data.forEach(function(opt) {
+                                    const nombreOpt = `${opt.nombres} ${opt.apellidopaterno} ${opt.apellidomaterno}`;
+                                    const selected = (opt.cod_trab === item.cod_autorizado) ? 'selected' : '';
+                                    opciones += `<option value="${opt.cod_trab}" ${selected}>${nombreOpt}</option>`;
+                                });
+                                opciones += '</select>';
+
+                               
+                                table.row.add([
                                     nombreCompleto + `<input type="hidden" class="cod-trab" value="${item.cod_trab}">`,
+                                    selectTipoLinea,
                                     item.cadgerencia + `<input type="hidden" class="gerencia-id" value="${item.gerencia_id}">`,
                                     item.cadarea + `<input type="hidden" class="area-id" value="${item.area_id}">`,
                                     item.cadcargo + `<input type="hidden" class="cargo-id" value="${item.cargo_id}">`,
                                     opciones
-                                    ]).draw(false);
+                                ]).draw(false);
                             });
-                    } else {
+                        } else {
                             $('.ajaxvacio').html("No se encontraron resultados con los filtros seleccionados.");
                         }
                     },
                     error: function () {
                         alerterrorajax('Error al filtrar personal');
-                    }
-                });
-            });
+                 }
+             });
+        });
 
 
            $('#btnGuardarPersonal').on('click', function () {
@@ -62,9 +78,9 @@ $(document).ready(function () {
         $('#personalautoriza tbody tr').each(function () {
             const fila = $(this);
             const personal = fila.find('td').eq(0).text().trim();
-            const gerencia = fila.find('td').eq(1).text().trim();
-            const area = fila.find('td').eq(2).text().trim();
-            const cargo = fila.find('td').eq(3).text().trim();
+            const gerencia = fila.find('td').eq(2).text().trim();
+            const area = fila.find('td').eq(3).text().trim();
+            const cargo = fila.find('td').eq(4).text().trim();
             
             const gerencia_id = fila.find('.gerencia-id').val();
             const area_id = fila.find('.area-id').val();
@@ -75,9 +91,13 @@ $(document).ready(function () {
             const cod_autoriza = fila.find('select.select-personal').val();  
             const txt_autoriza = fila.find('select.select-personal option:selected').text().trim();
 
+
+           const cod_linea = fila.find('select.select-tipo-linea').val() || null;
+           const txt_linea = fila.find('select.select-tipo-linea option:selected').val() ? fila.find('select.select-tipo-linea option:selected').text().trim() : null;
+
             if (cod_autoriza !== '') {
                 dataAGuardar.push({
-                     cod_trab: cod_trab,
+                    cod_trab: cod_trab,
                     personal: personal,
                     gerencia: gerencia,
                     gerencia_id: gerencia_id,
@@ -86,10 +106,12 @@ $(document).ready(function () {
                     cargo: cargo,
                     cargo_id: cargo_id,
                     cod_autoriza: cod_autoriza,
-                    txt_autoriza: txt_autoriza
+                    txt_autoriza: txt_autoriza,
+                    cod_linea: cod_linea,   
+                    txt_linea: txt_linea
                 });
             }
-                });
+        });
 
         if (dataAGuardar.length === 0) {
             alerterrorajax('Debe seleccionar al menos un responsable para autorizar.');

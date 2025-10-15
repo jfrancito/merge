@@ -59,7 +59,6 @@ class ValeRendirControllerReembolso extends Controller
         $cod_centro = $centrot->COD_CENTRO; 
         $nom_centro = $centrot->NOM_CENTRO; 
 
-
         $usuariosAu = DB::table('WEB.VALE_PERSONAL_AUTORIZA')
             ->where('COD_PERSONAL', Session::get('usuario')->usuarioosiris_id)
             ->where('COD_CENTRO', $cod_centro)
@@ -221,7 +220,22 @@ class ValeRendirControllerReembolso extends Controller
             ->where('usu.id', $cod_usuario_registro)
             ->value('emp.COD_EMPR');
 
-        // ACTUALIZACIÓN
+        $trabajador     =   DB::table('STD.TRABAJADOR')
+                            ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                            ->first();
+        $dni            =       '';
+        $centro_id      =       '';
+
+        if ($trabajador) {
+            $dni = $trabajador->NRO_DOCUMENTO;
+        }
+
+        $trabajadorespla = DB::table('WEB.platrabajadores')
+            ->where('situacion_id', 'PRMAECEN000000000002')
+            ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+            ->where('dni', $dni)
+            ->first();
+
         if ($opcion === 'U') {
 
             $estado_vale = WEBValeRendirReembolso::where('id', $vale_rendir_id)->value('cod_categoria_estado_vale');
@@ -309,6 +323,18 @@ class ValeRendirControllerReembolso extends Controller
 
         // INSERCIÓN
         else {
+
+            //VALIDA CON EL DNI TABLA PERSONAL REEMBOLSO Y DNI PLANILLA
+            $personalReembolso = DB::table('WEB.personal_reembolso')
+            ->where('nro_documento', $trabajadorespla->dni)
+            ->first();
+
+            if (!$personalReembolso) {
+                    return response()->json([
+                        'error' => 'Usted no cuenta con permiso para generar un vale de reembolso.'
+                    ]);
+                }
+
             $cod_usuario_registro = Session::get('usuario')->id;
             $listarValePendientes = $this->listaValeRendirPendientes($cod_usuario_registro);
 

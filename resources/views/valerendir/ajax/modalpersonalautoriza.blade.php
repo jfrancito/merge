@@ -99,9 +99,7 @@
 @stop
 @section('script')
 
-<script>
-  var usuarios_autoriza = @json($usuarios_autoriza);
-</script>
+
 
 
 
@@ -163,7 +161,5 @@
 
     });
 </script>
-
-
-    <script src="{{ asset('public/js/vale/registropersonalautoriza.js?v='.$version) }}" type="text/javascript"></script>
+<script src="{{ asset('public/js/vale/registropersonalautoriza.js?v='.$version) }}" type="text/javascript"></script>
 @stop
