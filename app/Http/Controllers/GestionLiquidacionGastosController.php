@@ -3997,7 +3997,7 @@ class GestionLiquidacionGastosController extends Controller
                         if (count($partes) > 1) {
                             $nombre = trim($partes[1]);
                         }
-                        $empresa_trab = STDEmpresa::where('NOM_EMPR', '=', $nombre)->where('COD_ESTADO', '=', '1')->first();
+                        $empresa_trab = STDEmpresa::where('NOM_EMPR', '=', $nombre)->where('COD_TIPO_DOCUMENTO','=','TDI0000000000006')->where('COD_ESTADO', '=', '1')->first();
 
 
                     } else {
@@ -4044,7 +4044,7 @@ class GestionLiquidacionGastosController extends Controller
                         if (count($partes) > 1) {
                             $nombre = trim($partes[1]);
                         }
-                        $empresa_trab = STDEmpresa::where('NOM_EMPR', '=', $nombre)->where('COD_ESTADO', '=', '1')->first();
+                        $empresa_trab = STDEmpresa::where('NOM_EMPR', '=', $nombre)->where('COD_TIPO_DOCUMENTO','=','TDI0000000000006')->where('COD_ESTADO', '=', '1')->first();
 
                     }
                 }

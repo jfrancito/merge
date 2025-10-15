@@ -2270,6 +2270,8 @@ class GestionUsuarioContactoController extends Controller
                                         ->pluck('TIPO_ARCHIVO')
                                         ->toArray();
 
+            //dd($arrayarchivos);
+
             $tiposerie              =   substr($fedocumento->SERIE, 0, 1);
 
             if($tiposerie == 'E'){
@@ -2277,7 +2279,7 @@ class GestionUsuarioContactoController extends Controller
                 $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
                                             ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000004'])
                                             ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
-                                            ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000004','DCC0000000000026','DCC0000000000009'])
+                                            ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000004','DCC0000000000009'])
                                             //->where('TXT_ASIGNADO','=','CONTACTO')
                                             ->get();
 
@@ -2285,7 +2287,7 @@ class GestionUsuarioContactoController extends Controller
 
                 $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
                                             ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
-                                            ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000026','DCC0000000000009'])
+                                            ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000009'])
                                             //->where('TXT_ASIGNADO','=','CONTACTO')
                                             ->get();
 
