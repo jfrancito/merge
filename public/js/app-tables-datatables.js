@@ -299,6 +299,15 @@ var App = (function () {
             ordering: false,
         });
 
+        $("#reporteliquidaciones").dataTable({
+            responsive: true,
+            autoWidth: true,
+            lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+            scrollX: true,
+            scrollY: "300px",
+            ordering: false,
+        });
+
         $("#cxpt").dataTable({
             responsive: true,
             autoWidth: true,
@@ -447,6 +456,8 @@ var App = (function () {
                 ordering: false
             });
         }
+
+        
         $("#valeaprobado").dataTable({
             responsive: true,
             autoWidth: true,

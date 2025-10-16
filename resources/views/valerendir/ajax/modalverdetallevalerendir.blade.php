@@ -62,7 +62,7 @@
                 <div class="row mb-2">
                     <div class="col-sm-4" style="font-weight: bold;"><strong>TIPO PAGO:</strong></div>
                     <div class="col-sm-8">
-                        {{ $tipo_pago == 1 ? 'CAJA' : 'EFECTIVO' }}
+                        {{ $tipo_pago == 1 ? 'TRANSFERENCIA' : 'EFECTIVO' }}
                     </div>
                 </div>
                 @if ($tipo_pago == 1)

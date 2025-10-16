@@ -197,7 +197,7 @@ function ajax_normal_guardar_lista(data,link,btnclick) {
 
 
 function ajax_modal(data,link,modal,contenedor_ajax) {
-
+    debugger;
     abrircargando();
 
     $.ajax({

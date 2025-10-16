@@ -1579,6 +1579,409 @@ trait ComprobanteProvisionTraits
 
         $stmt->execute();
 	}
+
+	private function insert_detalle_producto_cascara($orden,$detalleproducto,$ordeningreso_id) {
+
+
+        $conexionbd         = 'sqlsrv';
+        if($orden->COD_CENTRO == 'CEN0000000000004'){ //rioja
+            $conexionbd         = 'sqlsrv_r';
+        }else{
+            if($orden->COD_CENTRO == 'CEN0000000000006'){ //bellavista
+                $conexionbd         = 'sqlsrv_b';
+            }
+        }
+
+
+		$COD_EMPR            		=       $orden->COD_EMPR;
+		$COD_CENTRO            		=       $orden->COD_CENTRO;
+		$idusuario 					=		Session::get('usuario')->name;
+
+
+
+
+		foreach($detalleproducto as $index => $item){
+
+
+			$IND_TIPO_OPERACION 	=		'I';
+			$fecha_sin 				=		'1901-01-01 00:00:00';
+			$vacio 					=		'';
+			$activo 				=		'1';
+			$idusuario 				=		Session::get('usuario')->name;
+			$COD_ALMACEN            =       $item->COD_ALMACEN;
+			$COD_LOTE            	=       '';
+
+			$stmtlo 					= 		DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC ALM.ALMACEN_LOTE_IUD 
+												@IND_TIPO_OPERACION = ?,
+												@COD_ALMACEN = ?,
+												@COD_LOTE = ?,
+												@COD_EMPR = ?,
+												@COD_CENTRO = ?,
+
+												@TXT_UBICACION = ?,
+												@FEC_HORA_IN = ?,
+												@FEC_HORA_OUT = ?,
+												@COD_EQUIPO = ?,
+												@TIPO_LOTE = ?,
+
+												@COD_GRIFO = ?,
+												@COD_LUG_GRIFO = ?,
+												@COD_EMPR_PROPIETARIO = ?,
+												@COD_EMPR_PROVEEDOR_SERV = ?,
+												@COD_ESTADO = ?,
+
+												@COD_USUARIO_REGISTRO = ?
+												');
+
+	        $stmtlo->bindParam(1, $IND_TIPO_OPERACION ,PDO::PARAM_STR);                   
+	        $stmtlo->bindParam(2, $COD_ALMACEN  ,PDO::PARAM_STR);
+	        $stmtlo->bindParam(3, $COD_LOTE  ,PDO::PARAM_STR);
+	        $stmtlo->bindParam(4, $COD_EMPR  ,PDO::PARAM_STR);
+	        $stmtlo->bindParam(5, $COD_CENTRO  ,PDO::PARAM_STR);
+
+	        $stmtlo->bindParam(6, $vacio ,PDO::PARAM_STR);
+	        $stmtlo->bindParam(7, $fecha_sin  ,PDO::PARAM_STR);
+	        $stmtlo->bindParam(8, $fecha_sin  ,PDO::PARAM_STR);
+	        $stmtlo->bindParam(9, $vacio  ,PDO::PARAM_STR);
+	        $stmtlo->bindParam(10,$vacio  ,PDO::PARAM_STR);
+
+	        $stmtlo->bindParam(11, $vacio ,PDO::PARAM_STR);                   
+	        $stmtlo->bindParam(12, $vacio  ,PDO::PARAM_STR);
+	        $stmtlo->bindParam(13, $COD_EMPR  ,PDO::PARAM_STR);
+	        $stmtlo->bindParam(14, $COD_EMPR  ,PDO::PARAM_STR);
+	        $stmtlo->bindParam(15, $activo  ,PDO::PARAM_STR);
+	        $stmtlo->bindParam(16, $idusuario  ,PDO::PARAM_STR);
+	        $stmtlo->execute();
+	        $codlotecito = $stmtlo->fetch();
+
+
+	        //dd($codlotecito[0]);
+
+			//DOLARES
+			$CANPRECIOUNITIGV 			=	$item->CAN_PRECIO_UNIT_IGV;
+			$CANPRECIOUNIT 				=	$item->CAN_PRECIO_UNIT;
+			$CANPRECIOCOSTO 			=	$item->CAN_PRECIO_COSTO;
+			$CANVALORVTA 				=	$item->CAN_VALOR_VTA;
+			$CANVALORVENTAIGV 			=	$item->CAN_VALOR_VENTA_IGV;
+
+
+			if($orden->COD_CATEGORIA_MONEDA=='MON0000000000002'){
+
+				$CANPRECIOUNITIGV 		=	$item->CAN_PRECIO_UNIT_IGV*$orden->CAN_TIPO_CAMBIO;
+				$CANPRECIOUNIT 			=	$item->CAN_PRECIO_UNIT*$orden->CAN_TIPO_CAMBIO;
+				$CANPRECIOCOSTO 		=	$item->CAN_PRECIO_UNIT*$orden->CAN_TIPO_CAMBIO;
+				$CANVALORVTA 			=	$item->CAN_VALOR_VTA*$orden->CAN_TIPO_CAMBIO;
+				$CANVALORVENTAIGV 		=	$item->CAN_VALOR_VENTA_IGV*$orden->CAN_TIPO_CAMBIO;
+
+			}
+
+
+			$IND_TIPO_OPERACION='I';
+			$COD_TABLA=$ordeningreso_id;
+			$COD_PRODUCTO=$item->COD_PRODUCTO;
+			$COD_LOTE=$codlotecito[0];
+			$NRO_LINEA=$item->NRO_LINEA;
+
+			$TXT_NOMBRE_PRODUCTO=$item->TXT_NOMBRE_PRODUCTO;
+			$TXT_DETALLE_PRODUCTO='';
+			$CAN_PRODUCTO=$item->CAN_PRODUCTO;
+			$CAN_PRODUCTO_ENVIADO=$item->CAN_PRODUCTO_ENVIADO;
+			$CAN_PESO=$item->CAN_PESO;
+
+			$CAN_PESO_PRODUCTO=$item->CAN_PESO_PRODUCTO;
+			$CAN_PESO_ENVIADO=$item->CAN_PESO_ENVIADO;
+			$CAN_PESO_INGRESO=$item->CAN_PESO_INGRESO;
+			$CAN_PESO_SALIDA=$item->CAN_PESO_SALIDA;
+			$CAN_PESO_BRUTO=$item->CAN_PESO_BRUTO;
+
+			$CAM_PESO_TARA=$item->CAM_PESO_TARA;
+			$CAN_PESO_NETO=$item->CAN_PESO_NETO;
+			$CAN_TASA_IGV=0;
+			$CAN_PRECIO_UNIT_IGV=$CANPRECIOUNITIGV;
+			$CAN_PRECIO_UNIT=$CANPRECIOUNIT;
+
+			$CAN_PRECIO_ORIGEN=$item->CAN_PRECIO_ORIGEN;
+			$CAN_PRECIO_COSTO=$CANPRECIOCOSTO;
+			$CAN_PRECIO_BRUTO=$item->CAN_PRECIO_BRUTO;
+			$CAN_PRECIO_KILOS=$item->CAN_PRECIO_KILOS;
+			$CAN_PRECIO_SACOS=$item->CAN_PRECIO_SACOS;
+
+			$CAN_VALOR_VTA=$CANVALORVTA;
+			$CAN_VALOR_VENTA_IGV=$CANVALORVENTAIGV;
+			$CAN_KILOS=$item->CAN_KILOS;
+			$CAN_SACOS=$item->CAN_SACOS;
+			$CAN_PENDIENTE=0;
+
+			$CAN_PORCENTAJE_DESCUENTO=$item->CAN_PORCENTAJE_DESCUENTO;
+			$CAN_DESCUENTO=$item->CAN_DESCUENTO;
+			$CAN_ADELANTO=$item->CAN_ADELANTO;
+			$TXT_DESCRIPCION='';
+			$IND_MATERIAL_SERVICIO=$item->IND_MATERIAL_SERVICIO;
+
+			$IND_IGV=$item->IND_IGV;
+			$COD_ALMACEN=$item->COD_ALMACEN;
+			$TXT_ALMACEN=$item->TXT_ALMACEN;
+			$COD_OPERACION=$item->COD_OPERACION;
+			$COD_OPERACION_AUX=$item->COD_OPERACION_AUX;
+
+			$COD_EMPR_SERV=$item->COD_EMPR_SERV;
+			$TXT_EMPR_SERV=$item->TXT_EMPR_SERV;
+			$NRO_CONTRATO_SERV=$item->NRO_CONTRATO_SERV;
+			$NRO_CONTRATO_CULTIVO_SERV=$item->NRO_CONTRATO_CULTIVO_SERV;
+			$NRO_HABILITACION_SERV=$item->NRO_HABILITACION_SERV;
+
+			$CAN_PRECIO_EMPR_SERV=$item->CAN_PRECIO_EMPR_SERV;
+			$NRO_CONTRATO_GRUPO=$item->NRO_CONTRATO_GRUPO;
+			$NRO_CONTRATO_CULTIVO_GRUPO=$item->NRO_CONTRATO_CULTIVO_GRUPO;
+			$NRO_HABILITACION_GRUPO=$item->NRO_HABILITACION_GRUPO;
+			$COD_CATEGORIA_TIPO_PAGO=$item->COD_CATEGORIA_TIPO_PAGO;
+
+			$COD_USUARIO_INGRESO=$item->COD_USUARIO_INGRESO;
+			$COD_USUARIO_SALIDA=$item->COD_USUARIO_SALIDA;
+			$TXT_GLOSA_PESO_IN=$item->TXT_GLOSA_PESO_IN;
+			$TXT_GLOSA_PESO_OUT=$item->TXT_GLOSA_PESO_OUT;
+			$COD_CONCEPTO_CENTRO_COSTO='';
+
+			$TXT_CONCEPTO_CENTRO_COSTO='';
+			$TXT_REFERENCIA=$item->TXT_REFERENCIA;
+			$TXT_TIPO_REFERENCIA=$item->TXT_TIPO_REFERENCIA;
+			$IND_COSTO_ARBITRARIO=$item->IND_COSTO_ARBITRARIO;
+			$COD_ESTADO=$item->COD_ESTADO;
+
+			$COD_USUARIO_REGISTRO=$idusuario;
+			$COD_TIPO_ESTADO=$item->COD_TIPO_ESTADO;
+			$TXT_TIPO_ESTADO=$item->TXT_TIPO_ESTADO;
+			$TXT_GLOSA_ASIENTO=$item->TXT_GLOSA_ASIENTO;
+			$TXT_CUENTA_CONTABLE=$item->TXT_CUENTA_CONTABLE;
+
+			$COD_ASIENTO_PROVISION=$item->COD_ASIENTO_PROVISION;
+			$COD_ASIENTO_EXTORNO=$item->COD_ASIENTO_EXTORNO;
+			$COD_ASIENTO_CANJE=$item->COD_ASIENTO_CANJE;
+			$COD_TIPO_DOCUMENTO=$item->COD_TIPO_DOCUMENTO;
+			$COD_DOCUMENTO_CTBLE=$item->COD_DOCUMENTO_CTBLE;
+
+			$TXT_SERIE_DOCUMENTO=$item->TXT_SERIE_DOCUMENTO;
+			$TXT_NUMERO_DOCUMENTO=$item->TXT_NUMERO_DOCUMENTO;
+			$COD_GASTO_FUNCION=$item->COD_GASTO_FUNCION;
+			$COD_CENTRO_COSTO=$item->COD_CENTRO_COSTO;
+			$COD_ORDEN_COMPRA=$item->COD_ORDEN_COMPRA;
+
+			$FEC_FECHA_SERV=$item->FEC_FECHA_SERV;
+			$COD_CATEGORIA_TIPO_SERV_ORDEN=$item->COD_CATEGORIA_TIPO_SERV_ORDEN;
+			$IND_GASTO_COSTO=$item->IND_GASTO_COSTO;
+			$CAN_PORCENTAJE_PERCEPCION=$item->CAN_PORCENTAJE_PERCEPCION;
+			$CAN_VALOR_PERCEPCION=$item->CAN_VALOR_PERCEPCION;
+
+
+
+			$stmt 					= 		DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.DETALLE_PRODUCTO_IUD 
+												@IND_TIPO_OPERACION = ?,
+												@COD_TABLA = ?,
+												@COD_PRODUCTO = ?,
+												@COD_LOTE = ?,
+												@NRO_LINEA = ?,
+
+												@TXT_NOMBRE_PRODUCTO = ?,
+												@TXT_DETALLE_PRODUCTO = ?,
+												@CAN_PRODUCTO = ?,
+												@CAN_PRODUCTO_ENVIADO = ?,
+												@CAN_PESO = ?,
+
+												@CAN_PESO_PRODUCTO = ?,
+												@CAN_PESO_ENVIADO = ?,
+												@CAN_PESO_INGRESO = ?,
+												@CAN_PESO_SALIDA = ?,
+												@CAN_PESO_BRUTO = ?,
+
+												@CAM_PESO_TARA = ?,
+												@CAN_PESO_NETO = ?,
+												@CAN_TASA_IGV = ?,
+												@CAN_PRECIO_UNIT_IGV = ?,
+												@CAN_PRECIO_UNIT = ?,
+
+												@CAN_PRECIO_ORIGEN = ?,
+												@CAN_PRECIO_COSTO = ?,
+												@CAN_PRECIO_BRUTO = ?,
+												@CAN_PRECIO_KILOS = ?,
+												@CAN_PRECIO_SACOS = ?,
+
+												@CAN_VALOR_VTA = ?,
+												@CAN_VALOR_VENTA_IGV = ?,
+												@CAN_KILOS = ?,
+												@CAN_SACOS = ?,
+												@CAN_PENDIENTE = ?,
+
+												@CAN_PORCENTAJE_DESCUENTO = ?,
+												@CAN_DESCUENTO = ?,
+												@CAN_ADELANTO = ?,
+												@TXT_DESCRIPCION = ?,
+												@IND_MATERIAL_SERVICIO = ?,
+
+												@IND_IGV = ?,
+												@COD_ALMACEN = ?,
+												@TXT_ALMACEN = ?,
+												@COD_OPERACION = ?,
+												@COD_OPERACION_AUX = ?,
+
+
+												@COD_EMPR_SERV = ?,
+												@TXT_EMPR_SERV = ?,
+												@NRO_CONTRATO_SERV = ?,
+												@NRO_CONTRATO_CULTIVO_SERV = ?,
+												@NRO_HABILITACION_SERV = ?,
+
+												@CAN_PRECIO_EMPR_SERV = ?,
+												@NRO_CONTRATO_GRUPO = ?,
+												@NRO_CONTRATO_CULTIVO_GRUPO = ?,
+												@NRO_HABILITACION_GRUPO = ?,
+												@COD_CATEGORIA_TIPO_PAGO = ?,
+
+												@COD_USUARIO_INGRESO = ?,
+												@COD_USUARIO_SALIDA = ?,
+												@TXT_GLOSA_PESO_IN = ?,
+												@TXT_GLOSA_PESO_OUT = ?,
+												@COD_CONCEPTO_CENTRO_COSTO = ?,
+
+												@TXT_CONCEPTO_CENTRO_COSTO = ?,
+												@TXT_REFERENCIA = ?,
+												@TXT_TIPO_REFERENCIA = ?,
+												@IND_COSTO_ARBITRARIO = ?,
+												@COD_ESTADO = ?,
+
+												@COD_USUARIO_REGISTRO = ?,
+												@COD_TIPO_ESTADO = ?,
+												@TXT_TIPO_ESTADO = ?,
+												@TXT_GLOSA_ASIENTO = ?,
+												@TXT_CUENTA_CONTABLE = ?,
+
+												@COD_ASIENTO_PROVISION = ?,
+												@COD_ASIENTO_EXTORNO = ?,
+												@COD_ASIENTO_CANJE = ?,
+												@COD_TIPO_DOCUMENTO = ?,
+												@COD_DOCUMENTO_CTBLE = ?,
+
+												@TXT_SERIE_DOCUMENTO = ?,
+												@TXT_NUMERO_DOCUMENTO = ?,
+												@COD_GASTO_FUNCION = ?,
+												@COD_CENTRO_COSTO = ?,
+												@COD_ORDEN_COMPRA = ?,
+
+												@FEC_FECHA_SERV = ?,
+												@COD_CATEGORIA_TIPO_SERV_ORDEN = ?,
+												@IND_GASTO_COSTO = ?,
+												@CAN_PORCENTAJE_PERCEPCION = ?,
+												@CAN_VALOR_PERCEPCION = ?
+
+
+												');
+
+
+
+
+	        $stmt->bindParam(1, $IND_TIPO_OPERACION ,PDO::PARAM_STR);                   
+	        $stmt->bindParam(2, $COD_TABLA  ,PDO::PARAM_STR);
+	        $stmt->bindParam(3, $COD_PRODUCTO  ,PDO::PARAM_STR);
+	        $stmt->bindParam(4, $COD_LOTE  ,PDO::PARAM_STR);
+	        $stmt->bindParam(5, $NRO_LINEA  ,PDO::PARAM_STR);
+
+	        $stmt->bindParam(6, $TXT_NOMBRE_PRODUCTO ,PDO::PARAM_STR);
+	        $stmt->bindParam(7, $TXT_DETALLE_PRODUCTO  ,PDO::PARAM_STR);
+	        $stmt->bindParam(8, $CAN_PRODUCTO  ,PDO::PARAM_STR);
+	        $stmt->bindParam(9, $CAN_PRODUCTO_ENVIADO  ,PDO::PARAM_STR);
+	        $stmt->bindParam(10,$CAN_PESO  ,PDO::PARAM_STR);
+
+	        $stmt->bindParam(11, $CAN_PESO_PRODUCTO ,PDO::PARAM_STR);                   
+	        $stmt->bindParam(12, $CAN_PESO_ENVIADO  ,PDO::PARAM_STR);
+	        $stmt->bindParam(13, $CAN_PESO_INGRESO  ,PDO::PARAM_STR);
+	        $stmt->bindParam(14, $CAN_PESO_SALIDA  ,PDO::PARAM_STR);
+	        $stmt->bindParam(15, $CAN_PESO_BRUTO  ,PDO::PARAM_STR);
+
+	        $stmt->bindParam(16, $CAM_PESO_TARA ,PDO::PARAM_STR);
+	        $stmt->bindParam(17, $CAN_PESO_NETO  ,PDO::PARAM_STR);
+	        $stmt->bindParam(18, $CAN_TASA_IGV  ,PDO::PARAM_STR);
+	        $stmt->bindParam(19, $CAN_PRECIO_UNIT_IGV  ,PDO::PARAM_STR);
+	        $stmt->bindParam(20,$CAN_PRECIO_UNIT  ,PDO::PARAM_STR);
+
+	        $stmt->bindParam(21, $CAN_PRECIO_ORIGEN ,PDO::PARAM_STR);                   
+	        $stmt->bindParam(22, $CAN_PRECIO_COSTO  ,PDO::PARAM_STR);
+	        $stmt->bindParam(23, $CAN_PRECIO_BRUTO  ,PDO::PARAM_STR);
+	        $stmt->bindParam(24, $CAN_PRECIO_KILOS  ,PDO::PARAM_STR);
+	        $stmt->bindParam(25, $CAN_PRECIO_SACOS  ,PDO::PARAM_STR);
+
+	        $stmt->bindParam(26, $CAN_VALOR_VTA ,PDO::PARAM_STR);
+	        $stmt->bindParam(27, $CAN_VALOR_VENTA_IGV  ,PDO::PARAM_STR);
+	        $stmt->bindParam(28, $CAN_KILOS  ,PDO::PARAM_STR);
+	        $stmt->bindParam(29, $CAN_SACOS  ,PDO::PARAM_STR);
+	        $stmt->bindParam(30,$CAN_PENDIENTE  ,PDO::PARAM_STR);
+
+	        $stmt->bindParam(31, $CAN_PORCENTAJE_DESCUENTO ,PDO::PARAM_STR);                   
+	        $stmt->bindParam(32, $CAN_DESCUENTO  ,PDO::PARAM_STR);
+	        $stmt->bindParam(33, $CAN_ADELANTO  ,PDO::PARAM_STR);
+	        $stmt->bindParam(34, $TXT_DESCRIPCION  ,PDO::PARAM_STR);
+	        $stmt->bindParam(35, $IND_MATERIAL_SERVICIO  ,PDO::PARAM_STR);
+
+	        $stmt->bindParam(36, $IND_IGV ,PDO::PARAM_STR);
+	        $stmt->bindParam(37, $COD_ALMACEN  ,PDO::PARAM_STR);
+	        $stmt->bindParam(38, $TXT_ALMACEN  ,PDO::PARAM_STR);
+	        $stmt->bindParam(39, $COD_OPERACION  ,PDO::PARAM_STR);
+	        $stmt->bindParam(40,$COD_OPERACION_AUX  ,PDO::PARAM_STR);
+
+	        $stmt->bindParam(41, $COD_EMPR_SERV ,PDO::PARAM_STR);                   
+	        $stmt->bindParam(42, $TXT_EMPR_SERV  ,PDO::PARAM_STR);
+	        $stmt->bindParam(43, $NRO_CONTRATO_SERV  ,PDO::PARAM_STR);
+	        $stmt->bindParam(44, $NRO_CONTRATO_CULTIVO_SERV  ,PDO::PARAM_STR);
+	        $stmt->bindParam(45, $NRO_HABILITACION_SERV  ,PDO::PARAM_STR);
+
+	        $stmt->bindParam(46, $CAN_PRECIO_EMPR_SERV ,PDO::PARAM_STR);
+	        $stmt->bindParam(47, $NRO_CONTRATO_GRUPO  ,PDO::PARAM_STR);
+	        $stmt->bindParam(48, $NRO_CONTRATO_CULTIVO_GRUPO  ,PDO::PARAM_STR);
+	        $stmt->bindParam(49, $NRO_HABILITACION_GRUPO  ,PDO::PARAM_STR);
+	        $stmt->bindParam(50,$COD_CATEGORIA_TIPO_PAGO  ,PDO::PARAM_STR);
+
+	        $stmt->bindParam(51, $COD_USUARIO_INGRESO ,PDO::PARAM_STR);                   
+	        $stmt->bindParam(52, $COD_USUARIO_SALIDA  ,PDO::PARAM_STR);
+	        $stmt->bindParam(53, $TXT_GLOSA_PESO_IN  ,PDO::PARAM_STR);
+	        $stmt->bindParam(54, $TXT_GLOSA_PESO_OUT  ,PDO::PARAM_STR);
+	        $stmt->bindParam(55, $COD_CONCEPTO_CENTRO_COSTO  ,PDO::PARAM_STR);
+
+	        $stmt->bindParam(56, $TXT_CONCEPTO_CENTRO_COSTO ,PDO::PARAM_STR);
+	        $stmt->bindParam(57, $TXT_REFERENCIA  ,PDO::PARAM_STR);
+	        $stmt->bindParam(58, $TXT_TIPO_REFERENCIA  ,PDO::PARAM_STR);
+	        $stmt->bindParam(59, $IND_COSTO_ARBITRARIO  ,PDO::PARAM_STR);
+	        $stmt->bindParam(60,$COD_ESTADO  ,PDO::PARAM_STR);
+
+	        $stmt->bindParam(61, $COD_USUARIO_REGISTRO ,PDO::PARAM_STR);                   
+	        $stmt->bindParam(62, $COD_TIPO_ESTADO  ,PDO::PARAM_STR);
+	        $stmt->bindParam(63, $TXT_TIPO_ESTADO  ,PDO::PARAM_STR);
+	        $stmt->bindParam(64, $TXT_GLOSA_ASIENTO  ,PDO::PARAM_STR);
+	        $stmt->bindParam(65, $TXT_CUENTA_CONTABLE  ,PDO::PARAM_STR);
+
+	        $stmt->bindParam(66, $COD_ASIENTO_PROVISION ,PDO::PARAM_STR);
+	        $stmt->bindParam(67, $COD_ASIENTO_EXTORNO  ,PDO::PARAM_STR);
+	        $stmt->bindParam(68, $COD_ASIENTO_CANJE  ,PDO::PARAM_STR);
+	        $stmt->bindParam(69, $COD_TIPO_DOCUMENTO  ,PDO::PARAM_STR);
+	        $stmt->bindParam(70,$COD_DOCUMENTO_CTBLE  ,PDO::PARAM_STR);
+
+	        $stmt->bindParam(71, $TXT_SERIE_DOCUMENTO ,PDO::PARAM_STR);                   
+	        $stmt->bindParam(72, $TXT_NUMERO_DOCUMENTO  ,PDO::PARAM_STR);
+	        $stmt->bindParam(73, $COD_GASTO_FUNCION  ,PDO::PARAM_STR);
+	        $stmt->bindParam(74, $COD_CENTRO_COSTO  ,PDO::PARAM_STR);
+	        $stmt->bindParam(75, $COD_ORDEN_COMPRA  ,PDO::PARAM_STR);
+
+	        $stmt->bindParam(76, $FEC_FECHA_SERV ,PDO::PARAM_STR);
+	        $stmt->bindParam(77, $COD_CATEGORIA_TIPO_SERV_ORDEN  ,PDO::PARAM_STR);
+	        $stmt->bindParam(78, $IND_GASTO_COSTO  ,PDO::PARAM_STR);
+	        $stmt->bindParam(79, $CAN_PORCENTAJE_PERCEPCION  ,PDO::PARAM_STR);
+	        $stmt->bindParam(80,$CAN_VALOR_PERCEPCION  ,PDO::PARAM_STR);
+
+
+	        $stmt->execute();
+
+		}
+	}
+
+
+
 	private function insert_detalle_producto($orden,$detalleproducto,$ordeningreso_id) {
 
 
@@ -2083,9 +2486,14 @@ trait ComprobanteProvisionTraits
 		$TXT_CATEGORIA_MONEDA='SOLES';
 		$COD_CATEGORIA_ESTADO_ORDEN='EOR0000000000001';
 		$TXT_CATEGORIA_ESTADO_ORDEN='GENERADA';
-		$COD_CATEGORIA_MOVIMIENTO_INVENTARIO='MIN0000000000007';
 
+		$COD_CATEGORIA_MOVIMIENTO_INVENTARIO='MIN0000000000007';
 		$TXT_CATEGORIA_MOVIMIENTO_INVENTARIO='INGRESO POR COMPRAS';
+		if (in_array($orden->COD_CATEGORIA_TIPO_ORDEN, ['TOR0000000000026','TOR0000000000022','TOR0000000000021'])) {
+			$COD_CATEGORIA_MOVIMIENTO_INVENTARIO='MIN0000000000034';
+			$TXT_CATEGORIA_MOVIMIENTO_INVENTARIO='INGRESO POR COMPRA DE ARROZ';
+		}
+
 		$COD_CATEGORIA_PROCESO_SEL='';
 		$TXT_CATEGORIA_PROCESO_SEL='';
 		$COD_CATEGORIA_MODALIDAD_SEL='';
@@ -2546,7 +2954,6 @@ trait ComprobanteProvisionTraits
 			$idusuario 				=		Session::get('usuario')->name;
 			$COD_ALMACEN            =       $item->COD_ALMACEN;
 			$COD_LOTE            	=       $item->COD_LOTE;
-
 
 			$stmt 					= 		DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC ALM.ALMACEN_LOTE_IUD 
 												@IND_TIPO_OPERACION = ?,

@@ -25,32 +25,46 @@
             font-weight: bold;
             margin-bottom: 5px;
         }
+
         h1 { 
             color: #1d3a6d; 
             text-align: center;
             margin: 0;
         }
+
         .voucher {
             text-align: center;
             margin-top: 2px; 
             margin-bottom: 15px;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 8px;
         }
+
         td {
             padding: 2px 5px;
             vertical-align: top;
         }
+
         .label {
             font-weight: bold;
             white-space: nowrap;
+            width: 25%;
         }
+
+        .separator {
+    text-align: right;
+    width: 1%;
+    padding-right: 1px;
+}
+
         .value {
-            width: 40%;
+            width: 23%;
         }
+
         .glosa {
             white-space: normal;
             word-break: break-word;
@@ -64,15 +78,18 @@
             border-top: 2px solid #000;
             margin: 10px 0;
         }
+
         .firma {
             text-align: center;
             margin-top: 75px;
         }
+
         .linea-firma {
             width: 300px;
             border-top: 1px solid #000;
             margin: 0 auto 5px auto;
         }
+
         .firma p {
             margin: 2px 0;
         }
@@ -89,60 +106,76 @@
 
         <table>
             <tr>
-                <td class="label">Caja/Bancos:</td>
+                <td class="label">Caja/Bancos</td>
+                <td class="separator">:</td>
                 <td class="value">{{ $txt_categoria_moneda }} / {{ $txt_caja_banco }}</td>
-                <td class="label">Fecha Operación:</td>
+
+                <td class="label">Fecha Operación</td>
+                <td class="separator">:</td>
                 <td>{{ $fec_operacion }}</td>
             </tr>
             <tr>
-                <td class="label">Titular:</td>
+                <td class="label">Titular</td>
+                <td class="separator">:</td>
                 <td class="value">{{ $txt_empr_afecta }}</td>
-                <td class="label">Fecha Registro:</td>
+
+                <td class="label">Fecha Registro</td>
+                <td class="separator">:</td>
                 <td>{{ $fec_operacion }}</td>
             </tr>
             <tr>
-                <td class="label">Cuenta:</td>
+                <td class="label">Cuenta</td>
+                <td class="separator">:</td>
                 <td class="value">{{ $cod_cultivo_afecta }}</td>
-                <td class="label">Medio Pago:</td>
+
+                <td class="label">Medio Pago</td>
+                <td class="separator">:</td>
                 <td>{{ $txt_categoria_medio_pago }}</td>
             </tr>
             <tr>
-                <td class="label">Cheque:</td>
+                <td class="label">Cheque</td>
+                <td class="separator">:</td>
                 <td class="value">{{ $nro_cheque }}</td>
-                <td class="label">Moneda:</td>
+
+                <td class="label">Moneda</td>
+                <td class="separator">:</td>
                 <td>{{ $txt_categoria_moneda }}</td>
             </tr>
         </table>
 
         <table>
             <tr>
-                <td class="label">Caja Banco:</td>
+                <td class="label">Caja Banco</td>
+                <td class="separator">:</td>
                 <td>{{ $txt_caja_banco }}</td>
             </tr>
             <tr>
-                <td class="label">Glosa:</td>
+                <td class="label">Glosa</td>
+                <td class="separator">:</td>
                 <td class="glosa">{!! nl2br(e($txt_glosa)) !!}</td>
             </tr>
             <tr>
-                <td class="label">Descripción:</td>
+                <td class="label">Descripción</td>
+                <td class="separator">:</td>
                 <td>{{ $txt_descripcion }}</td>
             </tr>
             <tr>
                 <td class="label">
                     @if($cod_categoria_moneda == "MON0000000000001")
                         @if($can_debe_mn != 0)
-                            Importe:
+                            Importe
                         @else
-                            Pago:
+                            Pago
                         @endif
                     @else
                         @if($can_debe_me != 0)
-                            Importe:
+                            Importe
                         @else
-                            Pago:
+                            Pago
                         @endif
                     @endif
                 </td>
+                <td class="separator">:</td>
                 <td>
                     @if($cod_categoria_moneda == "MON0000000000001")
                         @if($can_debe_mn != 0)
@@ -164,7 +197,8 @@
                 </td>
             </tr>
             <tr>
-                <td class="label">Son:</td>
+                <td class="label">Son</td>
+                <td class="separator">:</td>
                 <td>{{ $texto_importe }}</td>
             </tr>
         </table>
@@ -199,7 +233,8 @@
                 SEÑORES:
             </td>
             <td style="text-align:right; white-space:nowrap; font-size:12px;">
-                {{ \Carbon\Carbon::now()->formatLocalized('%d de %B de %Y') }}
+                {{ \App\Helpers\NumeroALetras::fechaBonita($fec_operacion) }}
+
             </td>
         </tr>
         <!-- Segunda fila (empresa alineada debajo de SEÑORES) -->

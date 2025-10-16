@@ -36,6 +36,16 @@
                   Imprimir Consolidado
                 </a>  
               </li>
+
+              <li>
+                <a  href="#" 
+                    data_requerimiento_opcion_id = "{{$item->ID_DOCUMENTO}}"
+                    class="@if($item->COD_CATEGORIA_ESTADO == 'ETM0000000000011') clickpc @endif "
+                 >
+                  SUBIR EL CONSOLIDADO
+                </a>  
+              </li>
+
             </ul>
           </div>
         </td>

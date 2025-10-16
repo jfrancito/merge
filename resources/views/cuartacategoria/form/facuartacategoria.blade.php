@@ -18,7 +18,7 @@
 
     <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
         <div class="form-group ">
-          <label class="col-sm-12 control-label labelleft" >Fecha Constancia: <span class="obligatorio">(*)</span></label>
+          <label class="col-sm-12 control-label labelleft" style="margin-bottom: 3px;" >Fecha Constancia: <span class="obligatorio">(*)</span></label>
           <div class="col-sm-12 abajocaja" >
             <div data-min-view="2" 
                    data-date-format="dd-mm-yyyy"  
@@ -47,11 +47,34 @@
         </div>
     </div>
 
-
-
-
-
   </div>
+
+<div class="row">
+
+  @foreach($tarchivos as $index => $item) 
+        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+          <div class="form-group sectioncargarimagen">
+              <label class="col-sm-12 control-label" style="text-align: left;"><b>{{$item->NOM_CATEGORIA}} ({{$item->COD_CTBLE}})</b> 
+              </label>
+              <div class="col-sm-12">
+                  <div class="file-loading">
+                      <input 
+                      id="file-{{$item->COD_CATEGORIA}}" 
+                      name="{{$item->COD_CATEGORIA}}[]" 
+                      class="file-es"  
+                      type="file" 
+                      multiple data-max-file-count="1"
+                      required>
+                  </div>
+              </div>
+          </div>
+        </div>
+  @endforeach
+
+</div>
+
+
+
 
 
 

@@ -363,7 +363,22 @@ trait UserTraits
                 }
 
                 $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
+
+
                 $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00037')->first();
+                if($item->COD_CENTRO == 'CEN0000000000004'){ //rioja
+                    $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00038')->first();
+                }else{
+                    if($item->COD_CENTRO == 'CEN0000000000006'){ //bellavista
+                        $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00039')->first();
+                    }else{
+                        if($item->COD_CENTRO == 'CEN0000000000002'){ //bellavista
+                            $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00040')->first();
+                        }
+                    }
+                }
+
+
                 $array                  =   Array(
                     'item'                =>  $item,
                     'oc'                  =>  $documentoCtble,
@@ -411,7 +426,6 @@ trait UserTraits
         }
         print_r("Se envio correctamente el correo Adminstracion");
     }
-
 
 
     private function envio_correo_uc() {

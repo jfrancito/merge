@@ -227,6 +227,11 @@ class ValeRendirController extends Controller
                 "$cod_empr"  
             );
 
+        $valependientesrendir =  $this->valependientesrendir(
+                "$cod_usuario_registro"
+               
+            );
+
         return view('valerendir.ajax.modalvalerendir', [
         	'listausuarios' => $combo,
             'listausuarios1' => $combo1,
@@ -244,6 +249,7 @@ class ValeRendirController extends Controller
             'listarValePendientes' => $listarValePendientes,
             'listarLiquidacionesPendientes' => $listarLiquidacionesPendientes,
             'listarDocumentoXML_CDR' => $listarDocumentoXML_CDR,
+            'valependientesrendir' => $valependientesrendir,
             'listarlistanegra' => $listarlistanegra,
             'ajax'=>true,   
         ]);
@@ -287,6 +293,37 @@ class ValeRendirController extends Controller
             ->join('STD.EMPRESA as emp', 'emp.NRO_DOCUMENTO', '=', 'tra.NRO_DOCUMENTO')
             ->where('usu.id', $cod_usuario_registro)
             ->value('emp.COD_EMPR');
+
+        $trabajador     =   DB::table('STD.TRABAJADOR')
+                            ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                            ->first();
+        $dni            =       '';
+        $centro_id      =       '';
+
+        if ($trabajador) {
+            $dni = $trabajador->NRO_DOCUMENTO;
+        }
+
+        $trabajadorespla = DB::table('WEB.platrabajadores')
+            ->where('situacion_id', 'PRMAECEN000000000002')
+            ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+            ->where('dni', $dni)
+            ->first();
+
+        if (!$trabajadorespla) {
+            return view('valerendir.modal.modalerrorempresa', [
+                'mensaje' => 'No puede realizar un registro porque no es la empresa a cual pertenece.',
+                'ajax' => true
+            ]);
+        }
+
+        $centro_id = $trabajadorespla->centro_osiris_id;
+
+        $centrot        =   DB::table('ALM.CENTRO')
+                            ->where('COD_CENTRO', $centro_id)
+                            ->first();
+
+        $cod_centro = $centrot->COD_CENTRO; 
 
         // ACTUALIZACIÓN
         if ($opcion === 'U') {
@@ -377,31 +414,20 @@ class ValeRendirController extends Controller
 
         // INSERCIÓN
         else {
-            $cod_usuario_registro = Session::get('usuario')->id;
+           $cod_usuario_registro = Session::get('usuario')->id;
 
-             $pendienteCount = DB::table('WEB.VALE_RENDIR as vr')
-                ->where('vr.COD_USUARIO_CREA_AUD', $cod_usuario_registro)
-                ->whereIn('vr.COD_CATEGORIA_ESTADO_VALE', [
-                    'ETM0000000000007', // Emitido
-                    'ETM0000000000001', // Pendiente
-                    'ETM0000000000005', // Rendido (pero sin liquidación cerrada)
-                ])
-                ->whereNotIn('vr.ID', function ($query) use ($cod_usuario_registro) {
-                    $query->select('lg.ARENDIR_ID')
-                          ->from('LQG_LIQUIDACION_GASTO as lg')
-                          ->whereIn('lg.COD_ESTADO', [
-                              'ETM0000000000005', // Rendido
-                              'ETM0000000000006'  // Cerrado
-                          ])
-                          ->where('lg.USUARIO_CREA', $cod_usuario_registro);
-                })
-                ->count();
+              $valesPendientes = $this->valependientesrendir($cod_usuario_registro);
 
-        if ($pendienteCount >= 2) {
-            return response()->json([
-                'error' => 'Usted tiene 2 vales pendientes por rendir. No puede generar un tercer vale.'
-            ]);
-        }
+                // Cuento cuántos hay
+                $pendienteCount = count($valesPendientes);
+
+                if ($pendienteCount >= 2) {
+                    return response()->json([
+                        'error' => 'Usted tiene 2 o más vales pendientes por rendir. No puede generar un tercer vale.'
+                    ]);
+                }
+
+
             $this->insertValeRendir(
                 "I",
                 "", "", "", "", "", "",
@@ -431,9 +457,9 @@ class ValeRendirController extends Controller
 
             $cod_empr_aux = Session::get('empresas')->COD_EMPR;
             $ultimoVale = WEBValeRendir::where('COD_EMPR', $cod_empr_aux)
+                ->where('COD_CENTRO', $cod_centro) 
                 ->orderBy('id', 'DESC')
                 ->first();
-
             if (!$ultimoVale) {
                 return response()->json(['error' => 'Error al recuperar el ID del vale recién insertado.']);
             }

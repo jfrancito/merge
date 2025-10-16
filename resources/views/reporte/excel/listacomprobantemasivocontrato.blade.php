@@ -92,6 +92,7 @@
             <th class= 'tabladp'>USUARIO CONTACTO</th>
             <th class= 'tabladp'>REPARABLE</th>
             <th class= 'tabladp'>MENSAJE REPARABLE</th>
+            <th class= 'tabladp'>FECHA SE LEVANTO REPARABLE</th>
 
             <th class= 'tabladp'>MEDIO PAGO</th>
             <th class= 'tabladp'>FECHA PAGO</th>
@@ -181,7 +182,7 @@
                 @ENDIF
             </td>
             <td>{{$item->productos_reparable}}</td>
-
+            <td>{{$item->fecha_reparable}}</td>
             <td>{{$item->MEDIO_PAGO}}</td>
             <td>{{$item->FECHA_PAGO}}</td>
             <td>{{$item->NOMBRE_BANCO}}</td>

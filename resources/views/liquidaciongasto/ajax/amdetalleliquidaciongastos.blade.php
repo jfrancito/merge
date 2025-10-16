@@ -75,13 +75,13 @@
                           <div class="row @if(count($tdetliquidaciongastos)<=0) ocultar @endif" >
 
 
-                          <div class="row @if(count($tdetliquidaciongastos)<=0) ocultar @endif" >
+                          <div class="row @if(count($tdetliquidaciongastos)<=0) ocultar @endif ocultar" >
 
                               <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 cajareporte">
                                   <div class="form-group">
                                     <label class="col-sm-12 control-label labelleft" ><b>Tipo de Pago:</b></label>
                                     <div class="col-sm-12 abajocaja" >
-                                      {!! Form::select( 'tipopago_id', $combo_tp, $tipopago_id,
+                                      {!! Form::select( 'tipopago_id', $combo_tp, array('MPC0000000000001'),
                                                         [
                                                           'class'       => 'select2 form-control control input-xs' ,
                                                           'id'          => 'tipopago_id',

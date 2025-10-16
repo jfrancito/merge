@@ -844,6 +844,17 @@ $(document).ready(function(){
             let fechaMin = new Date(hoy);
             fechaMin.setDate(hoy.getDate() - 7);
 
+
+            let primerDiaMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+            let ultimoDiaMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
+
+
+            if (fechaMin < primerDiaMes) {
+                fechaMin = primerDiaMes;
+            }
+
+            let fechaMax = ultimoDiaMes;
+
             // 🔧 Función para formatear en "YYYY-MM-DDTHH:mm"
             function toLocalDatetimeStr(date) {
                 const yyyy = date.getFullYear();
@@ -854,10 +865,14 @@ $(document).ready(function(){
                 return `${yyyy}-${mm}-${dd}T${hh}:${min}`;
             }
 
+          
             let minDateStr = toLocalDatetimeStr(fechaMin);
+            let maxDateStr = toLocalDatetimeStr(fechaMax);
 
-            $('#fecha_inicio').attr('min', minDateStr);
-            $('#fecha_fin').attr('min', minDateStr);
+             $('#fecha_inicio').attr('min', minDateStr);
+    $('#fecha_inicio').attr('max', maxDateStr);
+    $('#fecha_fin').attr('min', minDateStr);
+    $('#fecha_fin').attr('max', maxDateStr);
         });
 
         function formatToSQLDateTime(fechaLocal) {
@@ -876,7 +891,8 @@ $(document).ready(function(){
             "TIG0000000000005": "PASAJES INTERPROVINCIAL",
             "TIG0000000000006": "COMBUSTIBLE",
             "TIG0000000000007": "PEAJES",
-            "TIG0000000000008": "MANTENIMIENTO DE VEHICULOS"
+            "TIG0000000000008": "MANTENIMIENTO DE VEHICULOS",
+            "TIG0000000000009": "MOVILIDAD AEROPUERTO"
         };
 
       $('#agregarImporteGasto').on('click', function () {
@@ -884,7 +900,7 @@ $(document).ready(function(){
         let codDestino = $('#destino').val();
        
         let fechaInicio = formatToSQLDateTime($('#fecha_inicio').val());
-    let fechaFin    = formatToSQLDateTime($('#fecha_fin').val());
+        let fechaFin    = formatToSQLDateTime($('#fecha_fin').val());
         let nomCentro = $('#nom_centro').val();
         let ind_propio = $('#ind_propio').is(':checked') ? 1 : 0;
         let ind_aereo = $('#ind_aereo').is(':checked') ? 1 : 0;
@@ -963,6 +979,19 @@ $(document).ready(function(){
                 let nombre = codigosNombres[codigoTipo] || codigoTipo;
                 let filasExistentes = filas.length;
 
+                  //PASAJE AREREO - SOLO SE AGREGA 
+                 // 🚨 Validación de aéreo
+                if (ind_aereo === 1) {
+                    // Solo permitir estos tipos cuando es aéreo
+                    if (!["TIG0000000000009","TIG0000000000001","TIG0000000000002","TIG0000000000005","TIG0000000000003"].includes(codigoTipo)) {
+                        return; // se salta
+                    }
+                } else {
+                    // Si no es aéreo, nunca permitir TIG0000000000009
+                    if (codigoTipo === "TIG0000000000009") return;
+                }
+
+
                 // COMBUSTIBLE + PEAJES
                 if ((codigoTipo === "TIG0000000000006" || codigoTipo === "TIG0000000000007") && ind_propio !== 1) return;
 
@@ -991,6 +1020,9 @@ $(document).ready(function(){
                         }
                     });
                     tipoImporte = pasajeYaAgregado ? 0 : valor;
+                }
+                else if (codigoTipo === "TIG0000000000009") {
+                    tipoImporte = valor * 2;
                 }
                 // Otros casos
                 else tipoImporte = valor;

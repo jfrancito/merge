@@ -16,6 +16,7 @@ use App\Modelos\CMPOrden;
 use App\Modelos\STDTrabajador;
 use App\Modelos\SGDUsuario;
 use App\Modelos\VMergeActual;
+use App\Modelos\VMergeActualAF;
 use App\Modelos\Archivo;
 use App\Modelos\VMergeDocumento;
 use App\Modelos\VMergeDocumentoActual;
@@ -27,6 +28,7 @@ use App\Modelos\CONRegistroCompras;
 
 use App\Modelos\Estado;
 use App\Modelos\CMPDetalleProducto;
+use App\Modelos\CMPDetalleProductoAF;
 use App\Modelos\CMPDocumentoCtble;
 use App\Modelos\ViewDPagar;
 use App\Modelos\FeDocumentoHistorial;
@@ -3394,6 +3396,19 @@ trait ComprobanteTraits
                                     ), 1, 2, ''
                                 )
                             ) AS productos_reparable,
+
+                            (
+                                SELECT STUFF(
+                                    (
+                                        SELECT '// ' + CONVERT(VARCHAR(20), d3_interno.FECHA, 106)
+                                        FROM FE_DOCUMENTO_HISTORIAL d3_interno
+                                        WHERE d3_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                                        AND TIPO = 'RESOLVIO LOS REPARABLES' 
+                                        FOR XML PATH('')
+                                    ), 1, 2, ''
+                                )
+                            ) AS fecha_reparable,
+
                             WEBPAGOSOC.MEDIO_PAGO,
                             WEBPAGOSOC.FECHA_PAGO,
                             WEBPAGOSOC.NOMBRE_BANCO,
@@ -3479,6 +3494,19 @@ trait ComprobanteTraits
                                 ), 1, 2, ''
                             )
                         ) AS productos_reparable,
+
+                            (
+                                SELECT STUFF(
+                                    (
+                                        SELECT '// ' + CONVERT(VARCHAR(20), d3_interno.FECHA, 106)
+                                        FROM FE_DOCUMENTO_HISTORIAL d3_interno
+                                        WHERE d3_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                                        AND TIPO = 'RESOLVIO LOS REPARABLES' 
+                                        FOR XML PATH('')
+                                    ), 1, 2, ''
+                                )
+                            ) AS fecha_reparable,
+                        
                             WEBPAGOSOC.MEDIO_PAGO,
                             WEBPAGOSOC.FECHA_PAGO,
                             WEBPAGOSOC.NOMBRE_BANCO,
@@ -3714,7 +3742,18 @@ trait ComprobanteTraits
                                                     FOR XML PATH('')
                                                 ), 1, 2, ''
                                             )
-                                        ) AS productos_reparable
+                                        ) AS productos_reparable,
+                                    (
+                                        SELECT STUFF(
+                                            (
+                                                SELECT '// ' + CONVERT(VARCHAR(20), d3_interno.FECHA, 106)
+                                                FROM FE_DOCUMENTO_HISTORIAL d3_interno
+                                                WHERE d3_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                                                AND TIPO = 'RESOLVIO LOS REPARABLES' 
+                                                FOR XML PATH('')
+                                            ), 1, 2, ''
+                                        )
+                                    ) AS fecha_reparable
 
                                     "))
                                     ->orderBy('FEC_VENTA','asc')
@@ -3809,7 +3848,18 @@ trait ComprobanteTraits
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
                                         )
-                                    ) AS productos_reparable
+                                    ) AS productos_reparable,
+                                    (
+                                        SELECT STUFF(
+                                            (
+                                                SELECT '// ' + CONVERT(VARCHAR(20), d3_interno.FECHA, 106)
+                                                FROM FE_DOCUMENTO_HISTORIAL d3_interno
+                                                WHERE d3_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                                                AND TIPO = 'RESOLVIO LOS REPARABLES' 
+                                                FOR XML PATH('')
+                                            ), 1, 2, ''
+                                        )
+                                    ) AS fecha_reparable
 
                                 "))
                                 ->orderBy('FEC_VENTA','asc')
@@ -3870,7 +3920,19 @@ trait ComprobanteTraits
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
                                         )
-                                    ) AS productos_reparable
+                                    ) AS productos_reparable,
+                                    (
+                                        SELECT STUFF(
+                                            (
+                                                SELECT '// ' + CONVERT(VARCHAR(20), d3_interno.FECHA, 106)
+                                                FROM FE_DOCUMENTO_HISTORIAL d3_interno
+                                                WHERE d3_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                                                AND TIPO = 'RESOLVIO LOS REPARABLES' 
+                                                FOR XML PATH('')
+                                            ), 1, 2, ''
+                                        )
+                                    ) AS fecha_reparable
+
 
                                 "))
                                 ->orderBy('FEC_VENTA','asc')
@@ -3921,7 +3983,7 @@ trait ComprobanteTraits
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 ->where('OPERACION','=','CONTRATO')
                                 ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
-
+                                //->where('WEBPAGOSOC.TXT_GLOSA', 'not like', '%ANTICIPO A PROVEEDOR%')
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
@@ -3961,10 +4023,20 @@ trait ComprobanteTraits
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
                                         )
-                                    ) AS productos_reparable
+                                    ) AS productos_reparable,
 
 
-
+                                 (
+                                        SELECT STUFF(
+                                            (
+                                                SELECT '// ' + CONVERT(VARCHAR(20), d3_interno.FECHA, 106)
+                                                FROM FE_DOCUMENTO_HISTORIAL d3_interno
+                                                WHERE d3_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                                                AND TIPO = 'RESOLVIO LOS REPARABLES' 
+                                                FOR XML PATH('')
+                                            ), 1, 2, ''
+                                        )
+                                    ) AS fecha_reparable
 
 
                                 "))
@@ -3984,6 +4056,8 @@ trait ComprobanteTraits
                                         $join->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'documentos.COD_TABLA')
                                              ->addBinding($documento->getBindings());
                                     })
+                                //->where('FE_DOCUMENTO.ID_DOCUMENTO','=','ISBECTT000018626')
+                                //->where('WEBPAGOSOC.TXT_GLOSA', 'not like', '%ANTICIPO A PROVEEDOR%')
                                 ->leftjoin('WEBPAGOSOC', 'WEBPAGOSOC.COD_DOCUMENTO_CTBLE', '=', 'documentos.COD_DOCUMENTO_CTBLE')
 
                                 ->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
@@ -4029,13 +4103,24 @@ trait ComprobanteTraits
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
                                         )
-                                    ) AS productos_reparable
+                                    ) AS productos_reparable,
+                                    (
+                                        SELECT STUFF(
+                                            (
+                                                SELECT '// ' + CONVERT(VARCHAR(20), d3_interno.FECHA, 106)
+                                                FROM FE_DOCUMENTO_HISTORIAL d3_interno
+                                                WHERE d3_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                                                AND TIPO = 'RESOLVIO LOS REPARABLES' 
+                                                FOR XML PATH('')
+                                            ), 1, 2, ''
+                                        )
+                                    ) AS fecha_reparable
                                     
                                 "))
                                 ->orderBy('FEC_VENTA', 'desc')
                                 ->get();
 
-
+        //dd($listadatos);
 
         }
 
@@ -7161,6 +7246,7 @@ trait ComprobanteTraits
 
 	}
 
+
     private function con_lista_comprobante_orden_pago_idoc($idop) {
 
 
@@ -7186,6 +7272,13 @@ trait ComprobanteTraits
         $doc                    =   CMPDetalleProducto::where('COD_TABLA','=',$idoc)
                                     ->where('COD_ESTADO','=',1)                                    
                                     ->get();
+
+    private function con_lista_detalle_comprobante_idoc_actual_af($idoc) {
+
+        $doc    =   VMergeActualAF::where('COD_ORDEN','=',$idoc)
+
+                            ->get();
+
 
         return  $doc;
 
@@ -7332,8 +7425,12 @@ trait ComprobanteTraits
 
 	}
 
-
-
+     public function DPAF($COD_TABLA,$COD_PRODUCTO)
+    {
+        return CMPDetalleProductoAF::where('COD_TABLA', $COD_TABLA)
+                    ->where('COD_PRODUCTO', $COD_PRODUCTO)
+                    ->exists();   // devuelve true o false
+    }
 
 
 

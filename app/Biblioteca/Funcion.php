@@ -8,6 +8,7 @@ use App\Modelos\Estado;
 use App\Modelos\FeDocumento;
 use App\Modelos\WEBUserEmpresaCentro;
 use App\Modelos\FeDocumentoHistorial;
+use App\Modelos\WEBCategoriaActivoFijo;
 use App\Modelos\CMPDocAsociarCompra;
 
 use Hashids;
@@ -460,6 +461,19 @@ class Funcion {
 		$codcompleto = str_pad($codsuma, $length, "0", STR_PAD_LEFT);
 		return $codcompleto;
 
+	}
+
+	public function combo_categoria_activo_fijo($id_categoria='')
+	{
+		$combo_categorias_activos_fijos = WEBCategoriaActivoFijo::all()->pluck('nombre','id');
+		if($id_categoria!=''){
+			$categoria_sel = WEBCategoriaActivoFijo::find($id_categoria);
+			$combo_categorias_activos_fijos = array($categoria_sel->id => $categoria_sel->nombre) + $combo_categorias_activos_fijos->toArray();
+		}
+		else{
+			$combo_categorias_activos_fijos=$combo_categorias_activos_fijos->toArray();
+		}
+		return $combo_categorias_activos_fijos;
 	}
 
 }

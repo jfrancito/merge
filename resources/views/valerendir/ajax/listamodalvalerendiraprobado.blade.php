@@ -25,10 +25,13 @@
     @if(
             $item['COD_CATEGORIA_ESTADO_VALE'] == 'ETM0000000000007' && 
             (
-                $perfil_administracion == '1CIX00000020' || 
-                $perfil_administracion == '1CIX00000033' ||
-                $perfil_administracion == '1CIX00000006' ||
-                $perfil_administracion == '1CIX00000019' 
+                ($perfil_administracion == '1CIX00000020' && $trabajadorCentro) || 
+                ($perfil_administracion == '1CIX00000033' && $trabajadorCentro) ||
+                ($perfil_administracion == '1CIX00000006' && $trabajadorCentro) ||
+                ($perfil_administracion == '1CIX00000043' && $trabajadorCentro) ||
+                ($perfil_administracion == '1CIX00000044' && $trabajadorCentro) ||
+                ($perfil_administracion == '1CIX00000031' && $trabajadorCentro)
+
             )
         )
         <tr data_vale_rendir="{{$item['ID']}}">

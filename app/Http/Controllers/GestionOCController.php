@@ -37,6 +37,9 @@ use Greenter\Xml\Parser\NoteParser;
 use Greenter\Xml\Parser\PerceptionParser;
 use Greenter\Xml\Parser\RHParser;
 use Greenter\Xml\Parser\RetentionParser;
+use Greenter\Xml\Parser\LiquiParser;
+use Greenter\Xml\Parser\DespatchParser;
+
 
 use App\User;
 use Illuminate\Support\Facades\Crypt;
@@ -220,14 +223,9 @@ class GestionOCController extends Controller
     {
 
 
-// $timestamp = hexdec('0x0000000000355486');
-// $fecha = Carbon::createFromTimestamp($timestamp);
-// dd($fecha->toDateTimeString()); // Formato: 'Y-m-d H:i:s'
-
-
         header('Content-Type: text/html; charset=UTF-8');
         //$path = storage_path() . "/exports/FC26-00002985.XML";
-        $path = storage_path() . "/exports/20608606301-01-F001-00002672.xml";
+        $path = storage_path() . "/exports/20602740278-04-E001-15252.xml";
         $parser = new InvoiceParser();
         $xml = file_get_contents($path);
         $factura = $parser->parse($xml);
@@ -235,12 +233,39 @@ class GestionOCController extends Controller
 
     }
 
+    public function actionApiLeerXmlSapLiqui(Request $request)
+    {
+
+        header('Content-Type: text/html; charset=UTF-8');
+        //$path = storage_path() . "/exports/FC26-00002985.XML";
+        $path = storage_path() . "/exports/20602740278-04-E001-15252.xml";
+        $parser = new LiquiParser();
+        $xml = file_get_contents($path);
+        $factura = $parser->parse($xml);
+        dd($factura);
+
+    }
+    public function actionApiLeerXmlSapGuia(Request $request)
+    {
+
+        header('Content-Type: text/html; charset=UTF-8');
+        //$path = storage_path() . "/exports/FC26-00002985.XML";
+        $path = storage_path() . "/exports/20481402892-31-EG03-63013.xml";
+        $parser = new DespatchParser();
+        $xml = file_get_contents($path);
+        $factura = $parser->parse($xml);
+        dd($factura);
+
+    }
+
+    
+
 
     public function actionApiLeerRHSap(Request $request)
     {
 
         header('Content-Type: text/html; charset=UTF-8');
-        $path = storage_path() . "/exports/RHE1075394716299.xml";
+        $path = storage_path() . "/exports/IICHAU0000011936.xml";
         //$path = storage_path() . "/exports/RHE1044061449953.xml";
 
         $parser = new RHParser();
@@ -654,6 +679,8 @@ class GestionOCController extends Controller
         $combo_area         =    $this->gn_combo_area_usuario($estado_id);
         $rol                =    WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 
+
+
         if($rol->ind_uc == 1){
             $usuario    =   SGDUsuario::where('COD_USUARIO','=',Session::get('usuario')->name)->first();
             if(count($usuario)>0){
@@ -669,6 +696,8 @@ class GestionOCController extends Controller
         $proveedor_id               =   '';
 
         $array_canjes               =   $this->con_array_canjes();
+
+
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_administrativo($cod_empresa);
         }else{
@@ -3287,7 +3316,7 @@ class GestionOCController extends Controller
 
                         //VALIDAR QUE YA EXISTE ESTE XML
 
-                        $fedocumento_e          =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->whereNotIn('COD_ESTADO',['','ETM0000000000006'])
+                        $fedocumento_e          =   FeDocumento::whereNotIn('COD_ESTADO',['','ETM0000000000006'])
                                                     ->where('RUC_PROVEEDOR','=',$factura->getcompany()->getruc())
                                                     ->where('SERIE','=',$factura->getserie())
                                                     ->where('NUMERO','=',$factura->getcorrelativo())
@@ -4375,7 +4404,18 @@ class GestionOCController extends Controller
                     $this->insert_almacen_lote($orden,$detalleproducto);//insertar en almacen
                     $orden_id = $this->insert_orden($orden,$detalleproducto);//crea la orden de ingreso        
                     $this->insert_referencia_asoc($orden,$detalleproducto,$orden_id[0]);//crea la referencia
-                    $this->insert_detalle_producto($orden,$detalleproducto,$orden_id[0]);//crea detalle de la orden de ingresa
+                    if (in_array($orden->COD_CATEGORIA_TIPO_ORDEN, ['TOR0000000000026','TOR0000000000022','TOR0000000000021'])) {
+                        if($orden->COD_CENTRO != 'CEN0000000000002'){
+                            $this->insert_detalle_producto_cascara($orden,$detalleproducto,$orden_id[0]);//crea detalle de la orden de ingresa   
+                        }else{
+                            $this->insert_detalle_producto($orden,$detalleproducto,$orden_id[0]);//crea detalle de la orden de ingresa
+                        }
+                    }else{
+                        $this->insert_detalle_producto($orden,$detalleproducto,$orden_id[0]);//crea detalle de la orden de ingresa
+                    }
+
+
+
                     // ejecutable en segundo plano que tod orden de ingreso que este genrado desde el merge siemplemente jale ese boton
                     //$ejecutarwfc = $this->actionGuardarOrdenWcf($orden,$detalleproducto,$orden_id[0]);
 

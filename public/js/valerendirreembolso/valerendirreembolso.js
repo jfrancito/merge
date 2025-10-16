@@ -111,19 +111,29 @@ $(document).ready(function(){
                                 }
                             });
                         } else {
-
                             $.alert({
-                                title: 'Error',
-                                content: data.error,
+                                title: '',
+                                content: `
+                                    <div style="display: flex; align-items: center; gap: 15px;">
+                                        <div style="font-size: 35px; color: #e74c3c;">&#9888;</div>
+                                        <div>
+                                            <strong style="color: #e74c3c; font-size: 18px;">¡Error!</strong>
+                                            <p style="margin: 8px 0 0; font-size: 15px; color: #333;">${data.error}</p>
+                                        </div>
+                                    </div>
+                                `,
                                 type: 'red',
+                                typeAnimated: true,
+                                boxWidth: '400px',  
+                                useBootstrap: false,
+                                backgroundDismiss: true,
                                 buttons: {
                                     ok: {
-                                        text: 'OK',
+                                        text: 'Aceptar',
                                         btnClass: 'btn-red',
                                     }
                                 }
                             });
-
                         }
                         return;
                     }

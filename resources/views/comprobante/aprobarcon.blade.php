@@ -63,6 +63,9 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="panel panel-default">
+                        <input type="hidden" name="idopcion" id='idopcion' value="{{ $idopcion }}">
+                        <input type="hidden" name="idoc" id='idoc' value="{{ $idoc }}">
+
                         <div class="panel-heading">Revision de Comprobante ({{$ordencompra->COD_ORDEN}})</div>
                         <div class="tab-container">
                             <ul class="nav nav-tabs">
@@ -261,6 +264,13 @@
             let _token = $("#token").val();
             let link = '/buscar-proveedor';
 
+            //siempre que uses nifty modal usar esta libreria para poder abrir los modales
+            $.fn.niftyModal('setDefaults',{
+                overlaySelector: '.modal-overlay',
+                closeSelector: '.modal-close',
+                classAddAfterOpen: 'modal-show',
+              });
+
             let select = new TomSelect("#empresa_asiento", {
                 valueField: 'id',
                 labelField: 'text',
@@ -374,5 +384,6 @@
     </script>
 
     <script src="{{ asset('public/js/comprobante/uc.js?v='.$version) }}" type="text/javascript"></script>
+    <script src="{{ asset('public/js/comprobante/af.js?v='.$version) }}" type="text/javascript"></script>
 
 @stop

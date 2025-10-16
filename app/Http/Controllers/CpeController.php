@@ -57,6 +57,29 @@ class CpeController extends Controller {
     use LiquidacionGastoTraits;
 
 
+    public function descargarArchivoLocalCuartaCategoria($id)
+    {
+
+    	$archivo 		=	Archivo::where('ID_DOCUMENTO','=',$id)->where('ACTIVO','=','1')->first();
+
+        $nombrearchivo  =   trim($archivo->NOMBRE_ARCHIVO);
+        $nombrefile     =   basename($nombrearchivo);
+        $file           =   $this->pathFiles.'\\comprobantes\\RENTACUARTA\\'.basename($archivo->NOMBRE_ARCHIVO);
+
+        if(file_exists($file)){
+            header("Cache-Control: public");
+            header("Content-Description: File Transfer");
+            header("Content-Disposition: attachment; filename=$nombrefile");
+            header("Content-Type: application/pdf");
+            header("Content-Transfer-Encoding: binary");
+            readfile($file);
+            exit;
+        }else{
+            dd('Documento no encontrado');
+        }
+    }
+
+
 
 
     public function descargarArchivoLocalLQ($id,$nombrearchivo,$tipo)

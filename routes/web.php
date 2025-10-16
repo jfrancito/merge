@@ -32,6 +32,9 @@ Route::get('/serve-fileestiba', 'FileController@serveFileEstiba')->name('serve-f
 Route::get('/serve-filelg', 'FileController@serveFileLG')->name('serve-filelg');
 Route::get('/serve-filepla', 'FileController@serveFilePlaC')->name('serve-filepla');
 
+Route::get('/serve-filerc', 'FileController@serveFileRC')->name('serve-filerc');
+
+
 Route::get('/serve-filecontrato-sg', 'FileController@serveFileContratoSG')->name('serve-filecontrato-sg');
 Route::get('/serve-filepago', 'FileController@serveFilePago')->name('serve-filepago');
 Route::get('/serve-file-modelo', 'FileController@serveFileModelo')->name('serve-file-modelo');
@@ -59,6 +62,9 @@ Route::any('/enviocorreotesorerialg', 'UserController@actionCorreoTesoreriaLg');
 Route::any('/guardardocumentacionlq', 'PrecioCompetenciaController@actionDocumentoLGAutomaticoNuevo');//correo para usuario contacto
 
 Route::any('/enviocorreoreparacionlevantada', 'UserController@actionCorreoReparacionLevantada');//correo para usuario contacto
+
+Route::any('/guardarpdfoi', 'PrecioCompetenciaController@actionGuardarPdfOi');//correo para usuario contacto
+
 
 
 Route::group(['middleware' => ['authaw']], function () {
@@ -174,6 +180,13 @@ Route::group(['middleware' => ['authaw']], function () {
 	//SUSPENSION DE 4TA CATEGORIA
 	Route::any('/gestion-de-suspension-ta-categoria/{idopcion}', 'GestionCuartaCategoriaController@actionListarSuspensionCuarta');
 	Route::any('/agregar-cuarta-categoria/{idopcion}', 'GestionCuartaCategoriaController@actionAgregarCuartaCategoria');
+	Route::any('/descargar-documento-cuarta-categoria/{id}', 'CpeController@descargarArchivoLocalCuartaCategoria');
+
+	Route::any('/gestion-de-aprobar-cuarta-categoria/{idopcion}', 'GestionCuartaCategoriaController@actionAprobarRentaCuartaContabilidad');
+	Route::any('/aprobar-renta-cuarta-contabilidad/{idopcion}/{idordencompra}', 'GestionCuartaCategoriaController@actionAprobarContabilidadRC');
+	Route::any('/agregar-extorno-contabilidad-rc/{idopcion}/{idordencompra}', 'GestionCuartaCategoriaController@actionAgregarExtornoContabilidadRC');
+	Route::any('/gestion-de-cuarta-categoria/{idopcion}', 'GestionCuartaCategoriaController@actionRentaCuartaContabilidad');
+	Route::any('/gestion-renta-cuarta-contabilidad/{idopcion}/{idordencompra}', 'GestionCuartaCategoriaController@actionGestionContabilidadRC');
 
 
 
@@ -235,6 +248,12 @@ Route::group(['middleware' => ['authaw']], function () {
     Route::post('/obtener-reporte-compras-envases-sede', 'ReporteComprasEnvasesSedeController@actionAjaxListarReporteComprasEnvasesSede');
     Route::post('/obtener-reporte-compras-envases-sede-excel', 'ReporteComprasEnvasesSedeController@actionAjaxListarReporteComprasEnvasesSedeExcel');
 
+    //LIQUIDACIONES
+    Route::any('/gestion-liquidaciones-trabajador/{idopcion}', 'ReporteLiquidacionesTrabajadorController@actionReporteLiquidacionesTrabajador');
+    Route::post('/buscar-trabajador-liquidaciones', 'ReporteLiquidacionesTrabajadorController@buscarTrabajadorLiquidaciones');
+    Route::post('/obtener-reporte-liquidaciones-trabajador', 'ReporteLiquidacionesTrabajadorController@actionAjaxListarReporteLiquidacionesTrabajador');
+    Route::post('/obtener-reporte-liquidaciones-trabajador-excel', 'ReporteLiquidacionesTrabajadorController@actionAjaxListarReporteLiquidacionesTrabajadorExcel');
+
     Route::any('/gestion-ingresos-salidas-envases/{idopcion}', 'IngresosSalidasEnvasesController@actionListarIngresosSalidasEnvases');
     Route::any('/obtener-combo-familia', 'IngresosSalidasEnvasesController@actionAjaxListarFamilia');
     Route::any('/obtener-combo-subfamilia', 'IngresosSalidasEnvasesController@actionAjaxListarSubFamilia');
@@ -243,6 +262,10 @@ Route::group(['middleware' => ['authaw']], function () {
     Route::any('/obtener-reporte-ingresos-salidas-envases-excel', 'IngresosSalidasEnvasesController@actionAjaxListarIngresosSalidasEnvasesExcel');
 
 	Route::any('/leerxmlsinvoice', 'GestionOCController@actionApiLeerXmlSap');
+	Route::any('/leerxmlsinvoiceliqui', 'GestionOCController@actionApiLeerXmlSapLiqui');
+
+	Route::any('/leerxmlsinvoiceguia', 'GestionOCController@actionApiLeerXmlSapGuia');
+
 	Route::any('/leerrhsinvoice', 'GestionOCController@actionApiLeerRHSap');
 	Route::any('/leerrhsinvoicereten', 'GestionOCController@actionApiLeerRetencionSap');
 
@@ -376,14 +399,11 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/ajax-modal-vaidar-rr-is', 'RRController@actionAjaxModalValidarRRIs');
 
+    Route::any('/gestion-comprobantes-contabilidad/{idopcion}', 'GestionComprobantesContabilidadController@actionGestionComprobantesContabilidad');
+    Route::post('/listar-comprobantes-contabilidad', 'GestionComprobantesContabilidadController@actionListarComprobantesContabilidad');
 
-
-	Route::any('/detalle-comprobante-oc-validado-historial/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoHitorial');
+    Route::any('/detalle-comprobante-oc-validado-historial/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoHitorial');
 	Route::any('/detalle-comprobante-oc-validado-contrato-historial/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoContratoHistorial');
-
-
-
-
 
 	//CONSOLIDAR DOCUMENTOS DE PLANILLA DE MOVILIDADD
 	Route::any('/gestion-de-consolidar-planilla/{idopcion}', 'GestionPlanillaMovilidadController@actionListarConsolidarPlanilla');
@@ -407,7 +427,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/agregar-extorno-contabilidad-pla/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadController@actionAgregarExtornoContabilidadPLA');
 	Route::any('/aprobar-planilla-movilidad-contabilidad-revisadas/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadController@actionAprobarContabilidadPLARevisada');
 
-
+    Route::post('/obtener-periodo-tipo-cambio', 'GestionOCContabilidadController@actionObtenerPeriodoTipoCambio');
 
 	//ENTREGA DE DOCUMENTOS
 	Route::any('/gestion-de-entrega-documentos/{idopcion}', 'GestionEntregaDocumentoController@actionListarEntregaDocumento');
@@ -511,6 +531,10 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/aprobar-comprobante-contabilidad/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAprobarContabilidad');
 	Route::any('/aprobar-comprobante-contabilidad-contrato/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAprobarContabilidadContrato');
 	Route::any('/aprobar-comprobante-contabilidad-estiba/{idopcion}/{lote}', 'GestionOCContabilidadController@actionAprobarContabilidadEstiba');
+	
+	Route::any('/ajax-modal-activo-fijo-categoria', 'GestionOCContabilidadController@actionAjaxModalActivoFijoCategoria');
+	Route::any('/registrar-activo-fijo-categoria/{idopcion}/{idoc}/{codprod}', 'GestionOCContabilidadController@actionRegistrarActivoFijoCategoria');
+	Route::any('/eliminar-activo-fijo-categoria/{idopcion}/{idoc}/{codprod}/{codlote}/{nrolinea}', 'GestionOCContabilidadController@actionEliminarActivoFijoCategoria');
 
 
 
@@ -746,6 +770,7 @@ Route::get('buscarempresa', function (Illuminate\Http\Request  $request) {
     		->where('NOM_EMPR', 'like', '%'.$term.'%')
 			//->where('STD.EMPRESA.IND_PROVEEDOR','=',1)
 			->where('STD.EMPRESA.COD_ESTADO','=',1)
+			->where('COD_TIPO_DOCUMENTO','=','TDI0000000000006')
 			->take(100)
 			->select(DB::raw("
 			  STD.EMPRESA.NRO_DOCUMENTO + ' - '+ STD.EMPRESA.NOM_EMPR AS NOMBRE")
@@ -766,6 +791,7 @@ Route::get('buscarempresalg', function (Illuminate\Http\Request  $request) {
 		              ->orWhere('STD.EMPRESA.NRO_DOCUMENTO', 'like', '%' . $term . '%');
 		    })
 			->where('STD.EMPRESA.COD_ESTADO','=',1)
+			->where('COD_TIPO_DOCUMENTO','=','TDI0000000000006')
 			->take(100)
 			->select(DB::raw("
 			  STD.EMPRESA.NRO_DOCUMENTO + ' - '+ STD.EMPRESA.NOM_EMPR AS NOMBRE")
@@ -785,6 +811,7 @@ Route::get('buscarempresarenta', function (Illuminate\Http\Request  $request) {
 		        $query->where('STD.EMPRESA.NOM_EMPR', 'like', '%' . $term . '%')
 		              ->orWhere('STD.EMPRESA.NRO_DOCUMENTO', 'like', '%' . $term . '%');
 		    })
+		    ->where('COD_TIPO_DOCUMENTO','=','TDI0000000000006')
 			->where('STD.EMPRESA.COD_ESTADO','=',1)
 			->where('STD.EMPRESA.NRO_DOCUMENTO','like','1%')
 			->take(100)
@@ -798,7 +825,6 @@ Route::get('buscarempresarenta', function (Illuminate\Http\Request  $request) {
     }
     return \Response::json($valid_tags);
 });
-
 
 
 

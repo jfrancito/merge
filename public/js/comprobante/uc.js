@@ -36,6 +36,49 @@ $(document).ready(function () {
     });
 //reparable
 
+    $("#fecha_asiento_reparable").on('change', function (e) {
+
+        let fecha = $('#fecha_asiento_reparable').val();
+        let _token = $('#token').val();
+
+        if (fecha === null || fecha.trim() === "") {
+            $.alert({
+                title: 'Error',
+                content: 'No hay fecha seleccionada',
+                type: 'red',
+                buttons: {
+                    ok: {
+                        text: 'OK',
+                        btnClass: 'btn-red',
+                    }
+                }
+            })
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: carpeta + "/obtener-periodo-tipo-cambio",
+            data: { _token: _token, fecha: fecha },
+            success: function (res) {
+                $('#tipo_cambio_asiento_reparable').val(res.tipoCambio);
+
+                window.selects['anio_asiento_reparable'].setSelected(res.anio.trim());
+                $('#anio_asiento_reparable').trigger('change');
+
+                setTimeout(function () {
+                    window.selects['periodo_asiento_reparable'].setSelected(res.periodo.trim())
+                    $('#periodo_asiento_reparable').trigger('change');
+                }, 1000);
+
+            },
+            error: function (res) {
+                error500(res);
+            }
+        });
+
+    });
+
     $("#tipo_cambio_asiento_reparable").on('change', function (e) {
 
         let moneda = $('#moneda_asiento_reparable').val();
@@ -971,12 +1014,16 @@ $(document).ready(function () {
         // si la diferencia es menor o igual a 0.1, ajustar
         if (Math.abs(diferencia) > 0 && Math.abs(diferencia) < 0.1) {
 
+            debugger;
+
             // Recorrerlo
             for (let item of arrayDetalle) {
                 debugger;
-                if (totalAsiento > totalHaberME || totalAsiento < totalHaberME) {
+                //if (totalAsiento > totalHaberME || totalAsiento < totalHaberME) {
+                if (totalDebeME > totalHaberME || totalDebeME < totalHaberME) {
                     if (!/^40/.test(item.TXT_CUENTA_CONTABLE) && parseFloat(item.CAN_HABER_ME) > 0.0000) {
-                        if (totalAsiento > totalHaberME) {
+                        //if (totalAsiento > totalHaberME) {
+                        if (totalDebeME > totalHaberME) {
                             item.CAN_HABER_ME = redondear4(parseFloat(item.CAN_HABER_ME) + Math.abs(diferencia));
                         } else {
                             item.CAN_HABER_ME = redondear4(parseFloat(item.CAN_HABER_ME) - Math.abs(diferencia));
@@ -985,9 +1032,11 @@ $(document).ready(function () {
                     }
                 }
 
-                if (totalAsiento > totalDebeME || totalAsiento < totalDebeME) {
+                //if (totalAsiento > totalDebeME || totalAsiento < totalDebeME) {
+                if (totalHaberME > totalDebeME || totalHaberME < totalDebeME) {
                     if (!/^40/.test(item.TXT_CUENTA_CONTABLE) && parseFloat(item.CAN_DEBE_ME) > 0.0000) {
-                        if (totalAsiento > totalDebeME) {
+                        //if (totalAsiento > totalDebeME) {
+                        if (totalHaberME > totalDebeME) {
                             item.CAN_DEBE_ME = redondear4(parseFloat(item.CAN_DEBE_ME) + Math.abs(diferencia));
                         } else {
                             item.CAN_DEBE_ME = redondear4(parseFloat(item.CAN_DEBE_ME) - Math.abs(diferencia));
@@ -1009,9 +1058,11 @@ $(document).ready(function () {
                 let debeME = parseFloat(table.cell(rowIdx, 5).data().replaceAll(/[\$,]/g, "")) || 0;
                 let haberME = parseFloat(table.cell(rowIdx, 6).data().replaceAll(/[\$,]/g, "")) || 0;
 
-                if (totalAsiento > totalHaberME || totalAsiento < totalHaberME) {
+                //if (totalAsiento > totalHaberME || totalAsiento < totalHaberME) {
+                if (totalDebeME > totalHaberME || totalDebeME < totalHaberME) {
                     if (!/^40/.test(numero_cuenta) && haberME > 0) {
-                        let nuevoHaberME = totalAsiento > totalHaberME
+                        //let nuevoHaberME = totalAsiento > totalHaberME
+                        let nuevoHaberME = totalDebeME > totalHaberME
                             ? haberME + Math.abs(diferencia)
                             : haberME - Math.abs(diferencia);
 
@@ -1022,9 +1073,11 @@ $(document).ready(function () {
                     }
                 }
 
-                if (totalAsiento > totalDebeME || totalAsiento < totalDebeME) {
+                //if (totalAsiento > totalDebeME || totalAsiento < totalDebeME) {
+                if (totalHaberME > totalDebeME || totalHaberME < totalDebeME) {
                     if (!/^40/.test(numero_cuenta) && debeME > 0) {
-                        let nuevoDebeME = totalAsiento > totalDebeME
+                        //let nuevoDebeME = totalAsiento > totalDebeME
+                        let nuevoDebeME = totalHaberME > totalDebeME
                             ? debeME + Math.abs(diferencia)
                             : debeME - Math.abs(diferencia);
 
@@ -1280,6 +1333,49 @@ $(document).ready(function () {
 
     });
 
+    $("#fecha_asiento").on('change', function (e) {
+
+        let fecha = $('#fecha_asiento').val();
+        let _token = $('#token').val();
+
+        if (fecha === null || fecha.trim() === "") {
+            $.alert({
+                title: 'Error',
+                content: 'No hay fecha seleccionada',
+                type: 'red',
+                buttons: {
+                    ok: {
+                        text: 'OK',
+                        btnClass: 'btn-red',
+                    }
+                }
+            })
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: carpeta + "/obtener-periodo-tipo-cambio",
+            data: { _token: _token, fecha: fecha },
+            success: function (res) {
+                $('#tipo_cambio_asiento').val(res.tipoCambio);
+
+                window.selects['anio_asiento'].setSelected(res.anio.trim());
+                $('#anio_asiento').trigger('change');
+
+                setTimeout(function () {
+                    window.selects['periodo_asiento'].setSelected(res.periodo.trim())
+                    $('#periodo_asiento').trigger('change');
+                }, 1000);
+
+            },
+            error: function (res) {
+                error500(res);
+            }
+        });
+
+    });
+
     $(".btn-guardar_asiento").on('click', function () {
 
         let arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_compra").value);
@@ -1518,13 +1614,13 @@ $(document).ready(function () {
     $('#tipo_documento_asiento').on('change', function () {
         switch ($(this).val()) {
             case "TDO0000000000002":
-            case "TDO0000000000010":
+            case "TDO0000000000066":
                 window.selects['tipo_asiento'].setSelected('TAS0000000000007');
                 $('#tipo_asiento').trigger('change').prop('disabled', true);
                 break;
             default:
                 window.selects['tipo_asiento'].setSelected('TAS0000000000004');
-                $('#tipo_asiento').trigger('change').prop('disabled', true);
+                $('#tipo_asiento').trigger('change').prop('disabled', false);
                 break;
         }
     });

@@ -32,7 +32,8 @@ trait EnviarCorreoVRApruebaTraits
             ->join('STD.EMPRESA as emp', 'emp.COD_EMPR', '=', 'vr.COD_EMPR_CLIENTE')
             ->join('WEB.ListaplatrabajadoresGenereal as tra', 'tra.DNI', '=', 'emp.NRO_DOCUMENTO')
             ->where('vr.ID', $valerendir_id)
-            ->value('tra.emailcorp');
+            ->select('tra.emailcorp', 'tra.centro_osiris_id')
+            ->first();
 
             $emailTrabajadorAutoriza = DB::table('WEB.VALE_RENDIR as vr')
             ->join('WEB.ListaplatrabajadoresGenereal as tra', 'tra.COD_TRAB', '=', 'vr.USUARIO_AUTORIZA')
@@ -60,14 +61,74 @@ trait EnviarCorreoVRApruebaTraits
                 return false;
             }
 
-            $emailfrom = $emailTrabajador;
+             $emailfrom = $emailTrabajador->emailcorp;
+             $emailfromcentro = $emailTrabajador->centro_osiris_id;
+
+            if ($emailfromcentro === 'CEN0000000000004') {
+                if ($VALE_RENDIR->TIPO_PAGO == 1) {
+                    $destinatarios = ["doris.delgado@induamerica.com.pe"];
+                    $copias = [
+                        "doris.delgado@induamerica.com.pe",
+                        "tesoreria.cix@induamerica.com.pe",
+                        "franklin.llontop@induamerica.com.pe",
+                        "karim.ramirez@induamerica.com.pe",
+                        "marley.sucse@induamerica.com.pe",
+                        "diana.malca@induamerica.com.pe"
+                    ];
+                } else {
+                    $destinatarios = ["doris.delgado@induamerica.com.pe"];
+                    $copias = ["doris.delgado@induamerica.com.pe"];
+                }
+
+            } elseif ($emailfromcentro === 'CEN0000000000006') {
+                if ($VALE_RENDIR->TIPO_PAGO == 1) {
+                    $destinatarios = ["diana.paredes@induamerica.com.pe"];
+                    $copias = [
+                        "diana.paredes@induamerica.com.pe",
+                        "tesoreria.cix@induamerica.com.pe",
+                        "franklin.llontop@induamerica.com.pe",
+                        "karim.ramirez@induamerica.com.pe",
+                        "marley.sucse@induamerica.com.pe",
+                        "diana.malca@induamerica.com.pe"
+                    ];
+                } else {
+                    $destinatarios = ["diana.paredes@induamerica.com.pe"];
+                    $copias = ["diana.paredes@induamerica.com.pe"];
+                }
+
+            } elseif ($emailfromcentro === 'CEN0000000000002') {
+                if ($VALE_RENDIR->TIPO_PAGO == 1) {
+                    $destinatarios = ["lizbeth.marcas@induamerica.com.pe"];
+                    $copias = [
+                        "lizbeth.marcas@induamerica.com.pe",
+                        "tesoreria.cix@induamerica.com.pe",
+                        "franklin.llontop@induamerica.com.pe",
+                        "karim.ramirez@induamerica.com.pe",
+                        "marley.sucse@induamerica.com.pe",
+                        "diana.malca@induamerica.com.pe"
+                    ];
+                } else {
+                    $destinatarios = ["lizbeth.marcas@induamerica.com.pe"];
+                    $copias = ["lizbeth.marcas@induamerica.com.pe"];
+                }
+
+            } else {
+                $destinatarios = ["tesoreria.cix@induamerica.com.pe"];
+                $copias = [
+                    $emailTrabajador->emailcorp,
+                    'marley.sucse@induamerica.com.pe',
+                    'diana.malca@induamerica.com.pe',
+                    'karim.ramirez@induamerica.com.pe',
+                    'franklin.llontop@induamerica.com.pe'
+                ];
+            }
 
             Mail::send('emails.emailvalerendiraprueba',
             ['vale' => $VALE_RENDIR],
-            function ($message) use ($emailfrom, $emailTrabajador, $emailTrabajadorAutoriza, $emailTrabajadorAprueba, $nombreCompleto) {
+            function ($message) use ($emailfrom, $emailTrabajador, $emailTrabajadorAutoriza, $emailTrabajadorAprueba, $nombreCompleto,  $destinatarios, $copias,  $emailfromcentro) {
                 $message->from($emailfrom, $nombreCompleto)
-                        ->to("tesoreria.cix@induamerica.com.pe")
-                        ->cc([$emailTrabajador, 'marley.sucse@induamerica.com.pe','diana.malca@induamerica.com.pe','karim.ramirez@induamerica.com.pe','franklin.llontop@induamerica.com.pe']) 
+                        ->to($destinatarios)
+                        ->cc($copias)
                         ->subject('VALE RENDIR - INDUAMERICA');
             });
 
@@ -81,5 +142,3 @@ trait EnviarCorreoVRApruebaTraits
 
 }
 
-//unprg--tesoreria
-/// -marley

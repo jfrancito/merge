@@ -27,7 +27,8 @@ trait EnviarCorreoVRAutorizaTraits
             ->join('STD.EMPRESA as emp', 'emp.COD_EMPR', '=', 'vr.COD_EMPR_CLIENTE')
             ->join('WEB.ListaplatrabajadoresGenereal as tra', 'tra.DNI', '=', 'emp.NRO_DOCUMENTO')
             ->where('vr.ID', $valerendir_id)
-            ->value('tra.emailcorp');
+            ->select('tra.emailcorp', 'tra.centro_osiris_id')
+            ->first();
 
             $emailTrabajadorAutoriza = DB::table('WEB.VALE_RENDIR as vr')
             ->join('WEB.ListaplatrabajadoresGenereal as tra', 'tra.COD_TRAB', '=', 'vr.USUARIO_AUTORIZA')
@@ -56,14 +57,25 @@ trait EnviarCorreoVRAutorizaTraits
                 return false;
             }
       
-             $emailfrom = $emailTrabajador;
+             $emailfrom = $emailTrabajador->emailcorp;
+             $emailfromcentro = $emailTrabajador->centro_osiris_id;
+
+            if ($emailfromcentro === 'CEN0000000000004') {
+                $destinatarios = ["doris.delgado@induamerica.com.pe"];
+            } elseif ($emailfromcentro === 'CEN0000000000006') {
+                $destinatarios = ["diana.paredes@induamerica.com.pe"];
+            } elseif ($emailfromcentro === 'CEN0000000000002') {
+                $destinatarios = ["lizbeth.marcas@induamerica.com.pe"];
+            } else {
+                $destinatarios = ["marley.sucse@induamerica.com.pe", "diana.malca@induamerica.com.pe"];
+            }
 
             Mail::send('emails.emailvalerendirautoriza',
             ['vale' => $VALE_RENDIR],
-            function ($message) use ($emailfrom, $emailTrabajador, $emailTrabajadorAutoriza, $emailTrabajadorAprueba, $nombreCompleto) {
+            function ($message) use ($emailfrom, $emailTrabajador, $emailTrabajadorAutoriza, $emailTrabajadorAprueba, $nombreCompleto, $destinatarios, $emailfromcentro) {
                 $message->from($emailfrom, $nombreCompleto)
-                         ->to(["marley.sucse@induamerica.com.pe", "diana.malca@induamerica.com.pe"])
-                        ->cc($emailTrabajador, $emailTrabajadorAutoriza) 
+                        ->to($destinatarios)
+                        ->cc($emailfrom, $emailTrabajadorAutoriza) 
                         ->subject('VALE RENDIR - INDUAMERICA');
             });
 
