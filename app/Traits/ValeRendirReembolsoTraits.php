@@ -524,39 +524,7 @@ trait ValeRendirReembolsoTraits
     public function listaValeRendirAutorizaReembolso($ind_tipo_operacion, $id, $cod_empr, $cod_centro, $usuario_autoriza, $usuario_aprueba, $tipo_motivo,
                                              $txt_glosa, $can_total_importe, $can_total_saldo, $cod_usuario_registro)
     {
-        /*$array_lista_retail = array();
-
-        $cod_usuario_registro = "";
-
-        $usuario = User::where('id', Session::get('usuario')->id)->get();
-        $usuario_autoriza = $usuario->get(0)->usuarioosiris_id;
-
-        $cod_empr = Session::get('empresas')->COD_EMPR;
-        
-        $trabajador = DB::table('STD.TRABAJADOR')
-                        ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
-                        ->first();
-
-            $centro_id = '';
-
-            if ($trabajador) {
-                $empresa = DB::table('STD.EMPRESA')
-                            ->where('COD_EMPR', $trabajador->COD_EMPR)
-                            ->first();
-
-                if ($empresa) {
-                    $centro_id = $empresa->COD_CENTRO_SISTEMA; 
-                }
-            }
-
-            $centrot = DB::table('ALM.CENTRO')
-                        ->where('COD_CENTRO', $centro_id)
-                        ->first();
-
-
-                $cod_centro = $centrot->COD_CENTRO;
-                $nom_centro = $centrot->NOM_CENTRO;*/
-
+      
 
         $array_lista_retail = array();
 

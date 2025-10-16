@@ -870,9 +870,9 @@ $(document).ready(function(){
             let maxDateStr = toLocalDatetimeStr(fechaMax);
 
              $('#fecha_inicio').attr('min', minDateStr);
-    $('#fecha_inicio').attr('max', maxDateStr);
-    $('#fecha_fin').attr('min', minDateStr);
-    $('#fecha_fin').attr('max', maxDateStr);
+             $('#fecha_inicio').attr('max', maxDateStr);
+             $('#fecha_fin').attr('min', minDateStr);
+             $('#fecha_fin').attr('max', maxDateStr);
         });
 
         function formatToSQLDateTime(fechaLocal) {

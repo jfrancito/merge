@@ -198,8 +198,8 @@ class ValeRendirControllerReembolso extends Controller
         $opcion             = $request->input('opcion');
         $array_detalle      = $request->input('array_detalle');
 
-        $cod_categoria_estado_vale = 'ETM0000000000007'; // 
-        $txt_categoria_estado_vale = 'APROBADO';
+        $cod_categoria_estado_vale = 'ETM0000000000001'; // 
+        $txt_categoria_estado_vale = 'GENERADO';
         $cod_usuario_registro      = Session::get('usuario')->id;
         $txt_nom_solicita          = User::where('id', $cod_usuario_registro)->value('nombre');
 
@@ -323,26 +323,6 @@ class ValeRendirControllerReembolso extends Controller
 
         // INSERCIÓN
         else {
-
-            //VALIDA CON EL DNI TABLA PERSONAL REEMBOLSO Y DNI PLANILLA
-            $personalReembolso = DB::table('WEB.personal_reembolso')
-            ->where('nro_documento', $trabajadorespla->dni)
-            ->first();
-
-            if (!$personalReembolso) {
-                    return response()->json([
-                        'error' => 'Usted no cuenta con permiso para generar un vale de reembolso.'
-                    ]);
-                }
-
-            $cod_usuario_registro = Session::get('usuario')->id;
-            $listarValePendientes = $this->listaValeRendirPendientes($cod_usuario_registro);
-
-            if (count($listarValePendientes) >= 2) {
-                return response()->json([
-                    'error' => 'Usted tiene 2 vales pendientes por rendir. No puede generar un tercer vale.'
-                ]);
-            }
             $this->insertValeRendirReembolso(
                 "I",
                 "", "", "", "", "", "",
