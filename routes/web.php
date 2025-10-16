@@ -732,6 +732,11 @@ Route::group(['middleware' => ['authaw']], function () {
     Route::post('/registrar_vale_rendir_reembolso', 'ValeRendirControllerReembolso@insertValeRendirActionReembolso');
     Route::post('/data_vale_rendir_reembolso', 'ValeRendirControllerReembolso@traerdataValeRendirActionReembolso');
 
+    Route::get('/gestion-autoriza-rendir-reembolso/{idopcion}', 'ValeRendirAutorizaControllerReembolso@actionValeRendirAutorizaReembolso');
+	Route::post('/autorizar_vale_rendir_reembolso', 'ValeRendirAutorizaControllerReembolso@actionAutorizarValeRendirReembolso');
+	Route::post('/rechazar_vale_rendir_reembolso', 'ValeRendirAutorizaControllerReembolso@actionRechazarValeRendirReembolso');
+	
+
 
 
 
