@@ -12,5 +12,10 @@ class CMPDetalleProducto extends Model
     protected $primaryKey = 'COD_TABLA';
 	public $incrementing = false;
     public $keyType = 'string';
+
+    public function producto()
+    {
+        return $this->belongsTo('App\Modelos\ALMProducto', 'COD_PRODUCTO', 'COD_PRODUCTO');
+    }
     
 }

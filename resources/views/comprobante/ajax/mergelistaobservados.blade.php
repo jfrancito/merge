@@ -4,6 +4,10 @@
   @if($operacion_id == 'CONTRATO')
     @include('comprobante.ajax.alistaocobservadoscontrato')
   @else
-    @include('comprobante.ajax.alistaocobservadosestiba')
+    @if($operacion_id == 'LIQUIDACION_COMPRA_ANTICIPO')
+      @include('comprobante.ajax.alistaocobservadosliquidacioncompraanticipo')
+    @else
+      @include('comprobante.ajax.alistaocobservadosestiba')
+    @endif
   @endif
 @endif

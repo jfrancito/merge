@@ -35,6 +35,7 @@ class Controller extends BaseController {
 	public $emitido;
 	public $evaluado;
 	public $pathFiles='\\\\10.1.50.2';
+	public $pathFilesLiquidacion='\\\\10.1.0.201\cpe\Liquidacion';
 	public $hoy_sh;
 
 	public $anio;
