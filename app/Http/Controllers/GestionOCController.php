@@ -21,6 +21,7 @@ use App\Modelos\Archivo;
 use App\Modelos\CMPDocAsociarCompra;
 use App\Modelos\CMPDetalleProducto;
 use App\Modelos\CMPDocumentoCtble;
+use App\Modelos\TESAutorizacion;
 use App\Modelos\TESCuentaBancaria;
 use App\Modelos\CMPReferecenciaAsoc;
 use App\Modelos\WEBRol;
@@ -638,7 +639,9 @@ class GestionOCController extends Controller
                                         'ESTIBA' => 'ESTIBA',
                                         'DOCUMENTO_INTERNO_PRODUCCION' => 'DOCUMENTO INTERNO PRODUCCION',
                                         'DOCUMENTO_INTERNO_SECADO' => 'DOCUMENTO INTERNO SECADO',
-                                        'DOCUMENTO_SERVICIO_BALANZA' => 'DOCUMENTO POR SERVICIO DE BALANZA'
+                                        'DOCUMENTO_SERVICIO_BALANZA' => 'DOCUMENTO POR SERVICIO DE BALANZA',
+                                        'DOCUMENTO_INTERNO_COMPRA' => 'DOCUMENTO INTERNO COMPRA',
+                                        'LIQUIDACION_COMPRA_ANTICIPO' => 'LIQUIDACION DE COMPRA ANTICIPO'
                                     );
 
         $cod_empresa        =   Session::get('usuario')->usuarioosiris_id;
@@ -752,17 +755,19 @@ class GestionOCController extends Controller
 
         $array_canjes               =   $this->con_array_canjes();
 
-        if($operacion_id=='ORDEN_COMPRA'){
-            $listadatos         =   $this->con_lista_cabecera_comprobante_administrativo($cod_empresa);
-        }else{
-            if($operacion_id=='CONTRATO'){
-                $listadatos         =   $this->con_lista_cabecera_contrato_administrativo($cod_empresa);
-            }else{
-                if (in_array($operacion_id, $array_canjes)) {
-
-                    $categoria_id       =   $this->con_categoria_canje($operacion_id);
-                    $listadatos         =   $this->con_lista_cabecera_estibas_administrativo($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id);
-
+        if ($operacion_id == 'ORDEN_COMPRA') {
+            $listadatos = $this->con_lista_cabecera_comprobante_administrativo($cod_empresa);
+        } else {
+            if ($operacion_id == 'CONTRATO') {
+                $listadatos = $this->con_lista_cabecera_contrato_administrativo($cod_empresa);
+            } else {
+                if ($operacion_id == 'LIQUIDACION_COMPRA_ANTICIPO') {                    
+                    $listadatos = $this->con_lista_cabecera_liquidacion_compra_anticipo_administrativo($cod_empresa);
+                } else {
+                    if (in_array($operacion_id, $array_canjes)) {
+                        $categoria_id = $this->con_categoria_canje($operacion_id);
+                        $listadatos = $this->con_lista_cabecera_estibas_administrativo($cod_empresa, $area_id, $fecha_inicio, $fecha_fin, $proveedor_id, $categoria_id);
+                    }
                 }
             }
         }
@@ -2458,6 +2463,458 @@ class GestionOCController extends Controller
                          ]);
     }
 
+    public function actionDetalleComprobanteLiquidacionCompraAnticipoAdministrator($procedencia,$idopcion, $prefijo, $idordenpago, Request $request) {
+
+
+        $idop                   =   $this->funciones->decodificarmaestraprefijo($idordenpago,$prefijo);
+        
+        $ordenpago              =   $this->con_lista_comprobante_orden_pago_idoc($idop);
+
+        $idoc                   =   $ordenpago->COD_DOCUMENTO_CTBLE;
+
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_contrato_idoc_actual($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_liquidacion_compra_comprobante_idoc($idoc);
+
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idop)->where('COD_ESTADO','<>','ETM0000000000006')->first();
+        
+        View::share('titulo','REGISTRO DE COMPROBANTE LIQUIDACION COMPRA ANTICIPO: '.$idop);
+        
+        if(count($fedocumento)>0){
+            $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idop)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();        
+            $ingresoliq_id           =   $fedocumento->TXT_INGRESO_LIQ;
+        }else{
+            $detallefedocumento     =   array();
+            $ingresoliq_id           =   'NO';
+        }
+
+        //dd($detallefedocumento);
+
+        $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
+        
+        $contacto               =   DB::table('users')->where('ind_contacto','=',1)->pluck('nombre','id')->toArray();
+        $combocontacto          =   array('' => "Seleccione Contacto") + $contacto;
+        $usuario                =   SGDUsuario::where('COD_USUARIO','=',$ordenpago->COD_USUARIO_CREA_AUD)->first();
+
+        $ordencompra_f          =      CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$idoc)->first();
+
+        $xmlfactura             =   'LIQUIDACION COMPRA';
+        
+        $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$idop)->where('COD_ESTADO','=',1)
+                                        ->get();
+
+        $comboingresoliq         =   array('SI' => 'CON INGRESO' , 'NO' => 'SIN INGRESO');
+        
+        $funcion                =   $this;
+
+        return View::make('comprobante/registrocomprobanteliquidacioncompraanticipoadministrator',
+                         [
+                            'ordenpago'             =>  $ordenpago,
+                            'ordencompra'           =>  $ordencompra,
+                            'ordencompra_f'           =>  $ordencompra_f,
+                            'detalleordencompra'    =>  $detalleordencompra,
+
+                            
+                            'fedocumento'           =>  $fedocumento,
+                            'detallefedocumento'    =>  $detallefedocumento,
+                            'combocontacto'         =>  $combocontacto,
+                            'procedencia'           =>  $procedencia,
+                            'xmlfactura'            =>  $xmlfactura,
+                            'tp'                    =>  $tp,
+                            
+                            'tarchivos'             =>  $tarchivos,
+                            'usuario'               =>  $usuario,
+                            
+                            'comboingresoliq'        =>  $comboingresoliq,
+                            'ingresoliq_id'          =>  $ingresoliq_id,
+                            
+                            'funcion'               =>  $funcion,
+                            'idopcion'              =>  $idopcion,
+                         ]);
+    }
+
+    public function actionCargarXMLLiquidacionCompraAnticipoAdministrator($idopcion, $prefijo, $idordenpago,Request $request)
+    {       
+
+        $idop                   =   $this->funciones->decodificarmaestraprefijo($idordenpago,$prefijo);                
+
+        $rutafila                   =   "";
+        $rutaorden                  =   "";
+        $directorio = $this->pathFilesLiquidacion;
+
+        // Nombre del archivo que estás buscando
+        $nombreArchivoBuscado = $idop.'.xml';
+        // Escanea el directorio
+        $archivos = scandir($directorio);
+        // Inicializa una variable para almacenar el resultado
+        $archivoEncontrado = false;
+        // Recorre la lista de archivos
+        foreach ($archivos as $archivo) {
+            // Omite los elementos '.' y '..'
+            if ($archivo != '.' && $archivo != '..') {
+                // Verifica si el nombre del archivo coincide con el archivo buscado
+                if ($archivo == $nombreArchivoBuscado) {
+                    $archivoEncontrado = true;
+                    break;
+                }
+            }
+        }
+        // Muestra el resultado
+        if ($archivoEncontrado) {
+
+            $rutafila            =   $directorio.'\\'.$nombreArchivoBuscado;
+            $rutaorden           =   $rutafila;
+        } 
+
+        if($_POST)
+        {
+            if ($rutaorden)
+            {
+                try{    
+
+                        DB::beginTransaction();
+                        $ordenpago              =   $this->con_lista_comprobante_orden_pago_idoc($idop);
+                        $documentolinea         =   $this->ge_linea_documento($ordenpago->COD_AUTORIZACION);
+
+                        $idoc                   =   $ordenpago->COD_DOCUMENTO_CTBLE;
+                        $ordencompra            =   $this->con_lista_cabecera_comprobante_contrato_idoc_actual($idoc);
+                        $detalleordencompra     =   $this->con_lista_detalle_liquidacion_compra_comprobante_idoc($idoc);
+                        $procedencia            =   $request['procedencia'];
+                        $ingresoliq_id          =   $request['ingresoliq_id'];                        
+
+                        $empresa                =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+
+                        $moneda                 =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_MONEDA)->first();       
+
+                        if($ingresoliq_id=='SI'){
+                            $archivosdelfe          =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                                        ->where('COD_CATEGORIA','=','DCC0000000000039')->get();  
+                        }else{
+                            $archivosdelfe          =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                                        ->whereIn('COD_CATEGORIA', ['DCC0000000000039','DCC0000000000040','DCC0000000000041'])->get();  
+                        }
+                        
+
+                        $fedocumento_t          =   FeDocumento::where('ID_DOCUMENTO','=',$idop)->where('COD_ESTADO','<>','ETM0000000000006')->first();
+
+                        if(count($fedocumento_t)>0){
+                            DB::table('FE_DOCUMENTO')->where('ID_DOCUMENTO','=',$fedocumento_t->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$fedocumento_t->DOCUMENTO_ITEM)->delete();
+                            DB::table('FE_DETALLE_DOCUMENTO')->where('ID_DOCUMENTO','=',$fedocumento_t->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$fedocumento_t->DOCUMENTO_ITEM)->delete();                            
+                            DB::table('ARCHIVOS')->where('ID_DOCUMENTO','=',$fedocumento_t->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$fedocumento_t->DOCUMENTO_ITEM)->delete();                            
+                        }                      
+
+                        /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
+                        $categorialiq                   =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                                                ->where('COD_CATEGORIA','=','DCC0000000000003')
+                                                                ->first();
+                        
+                        $contadorArchivos = Archivo::count();
+                        $nombrefilecdr                  =       $contadorArchivos.'-LCA-'.$idop.'.xml';
+                        $prefijocarperta                =       $this->prefijo_empresa($ordenpago->COD_EMPR);
+                        $rutafile                       =       $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordenpago->NRO_DOC;
+                        $rutacompleta                   =       $rutafile.'\\'.$nombrefilecdr;
+                        $valor                          =       $this->versicarpetanoexiste($rutafile);
+                        $path                           =       $rutacompleta;
+                        //$directorio                     =       '\\\\10.1.0.201\cpe\Orden_Compra';
+                        //$rutafila                       =       $directorio.'\\'.$nombreArchivoBuscado;
+                        copy($rutaorden,$rutacompleta);
+                        $dcontrol                       =       new Archivo;
+                        $dcontrol->ID_DOCUMENTO         =       $ordenpago->COD_AUTORIZACION;
+                        $dcontrol->DOCUMENTO_ITEM       =       $documentolinea;
+                        $dcontrol->TIPO_ARCHIVO         =       $categorialiq->COD_CATEGORIA;
+                        $dcontrol->NOMBRE_ARCHIVO       =       $nombrefilecdr;
+                        $dcontrol->DESCRIPCION_ARCHIVO  =       $categorialiq->NOM_CATEGORIA;
+                        $dcontrol->URL_ARCHIVO          =       $path;
+                        $dcontrol->SIZE                 =       100;
+                        $dcontrol->EXTENSION            =       '.xml';
+                        $dcontrol->ACTIVO               =       1;
+                        $dcontrol->FECHA_CREA           =       $this->fechaactual;
+                        $dcontrol->USUARIO_CREA         =       Session::get('usuario')->id;
+                        $dcontrol->save();
+
+                        //REGISTRO DEL XML DESDE LIQUIDACION DE COMPRA (TABLA CMP.DOCUMENTO_CTBLE)
+                        
+
+                        $documento                          =   new FeDocumento;
+                        $documento->ID_DOCUMENTO            =   $ordenpago->COD_AUTORIZACION;
+                        $documento->DOCUMENTO_ITEM          =   $documentolinea;
+
+                        $documento->COD_EMPR                =   $ordencompra->COD_EMPR;
+                        $documento->TXT_EMPR                =   $ordencompra->NOM_EMPR;
+                        $documento->TXT_PROCEDENCIA         =   $procedencia;
+                        $documento->ESTADO                  =   'A';
+                        $documento->RUC_PROVEEDOR           =   $ordencompra->NRO_DOCUMENTO_CLIENTE;
+                        $documento->RZ_PROVEEDOR            =   $ordencompra->TXT_EMPR_EMISOR;
+                        $documento->TIPO_CLIENTE            =   6;
+                        $documento->ID_CLIENTE              =   $empresa->NRO_DOCUMENTO;
+                        $documento->NOMBRE_CLIENTE          =   $ordencompra->NOM_EMPR;
+                        $documento->DIRECCION_CLIENTE       =   '';
+                        $documento->SERIE                   =   $ordencompra->NRO_SERIE;
+                        $documento->NUMERO                  =   $ordencompra->NRO_DOC;
+                        $documento->ID_TIPO_DOC             =   '04';
+                        $documento->FEC_VENTA               =   Carbon::parse($ordencompra->FEC_EMISION)->format('Ymd');
+                        $documento->FEC_VENCI_PAGO          =   Carbon::parse($ordencompra->FEC_VENCIMIENTO)->format('Ymd');
+                        $documento->FORMA_PAGO              =   '';
+                        $documento->FORMA_PAGO_DIAS          =  0;
+                        $documento->MONEDA                  =   $moneda->CODIGO_SUNAT;
+
+                        $tc                                 =   (float)$ordencompra->CAN_TIPO_CAMBIO;        
+                        
+                        $documento->VALOR_IGV_ORIG          =   (float)$ordencompra->CAN_IMPUESTO_RENTA;
+                        $documento->VALOR_IGV_SOLES         =   (float)$ordencompra->CAN_IMPUESTO_RENTA;
+                        $documento->SUB_TOTAL_VENTA_ORIG    =   (float)$ordencompra->CAN_SUB_TOTAL;
+                        $documento->SUB_TOTAL_VENTA_SOLES   =   (float)$ordencompra->CAN_SUB_TOTAL;
+                        $documento->TOTAL_VENTA_XML         =   (float)$ordencompra->CAN_TOTAL;
+
+                        $documento->TOTAL_VENTA_ORIG        =   (float)$ordencompra->CAN_TOTAL;
+                        $documento->TOTAL_VENTA_SOLES       =   (float)$ordencompra->CAN_TOTAL;
+
+
+                        $documento->PERCEPCION              =   (float)$ordencompra->CAN_PERCEPCION;
+                        $documento->MONTO_RETENCION         =   (float)$ordencompra->CAN_RETENCION;
+
+                        $documento->HORA_EMISION            =   Carbon::parse($ordencompra->FEC_EMISION)->format('H:i:s');
+                        $documento->IMPUESTO_2              =   0.00;
+                        $documento->TIPO_DETRACCION         =   '';
+                        $documento->PORC_DETRACCION         =   0.00;
+                        $documento->MONTO_DETRACCION        =   (float)$ordencompra->CAN_DETRACCION;
+                        $documento->MONTO_ANTICIPO          =   (float)$ordencompra->CAN_ANTICIPO;                        
+                        $documento->NRO_ORDEN_COMP          =   '';              
+                        $documento->NUM_GUIA                =   '';
+
+
+                        $documento->estadoCp                =   0;
+                        $documento->ARCHIVO_XML             =   $nombrefilecdr;
+                        $documento->ARCHIVO_CDR             =   '';
+                        $documento->ARCHIVO_PDF             =   '';
+                        $documento->COD_CONTACTO            =   '';
+                        $documento->TXT_CONTACTO            =   '';
+                        $documento->COD_ESTADO              =   '';
+                        $documento->TXT_ESTADO              =   '';
+                        $documento->ind_email_uc            =   -1;
+                        $documento->ind_email_ap            =   -1;
+                        $documento->ind_email_adm           =   -1;
+                        $documento->ind_email_ba            =   -1;
+                        $documento->ind_email_clap          =   -1;
+                        $documento->OPERACION               =   'LIQUIDACION_COMPRA_ANTICIPO';
+                        $documento->MONTO_NC                =   0.00;
+
+                        $documento->TXT_INGRESO_LIQ         =   $ingresoliq_id;
+
+                        $documento->ind_ruc                 =   1;
+                        $documento->ind_rz                  =   1;
+                        $documento->ind_moneda              =   1;
+                        $documento->ind_total               =   1;
+                        $documento->ind_cantidaditem        =   1;
+                        $documento->ind_formapago           =   1;
+                        $documento->ind_errototal           =   1;
+                        $documento->CAN_CENTIMO             =   0;
+                       
+                        $documento->save();                        
+
+                        /**********DETALLE*********/
+                        foreach ($detalleordencompra as $indexdet => $itemdet) {
+                                
+                                $linea = str_pad($indexdet+1, 3, "0", STR_PAD_LEFT); 
+                                $detalle                        =   new FeDetalleDocumento;
+                                $detalle->ID_DOCUMENTO          =   $ordenpago->COD_AUTORIZACION;
+                                $detalle->DOCUMENTO_ITEM        =   $documentolinea;
+
+                                $detalle->LINEID                =   $linea;
+                                $detalle->CODPROD               =   $itemdet->COD_PRODUCTO;
+                                $detalle->PRODUCTO              =   $itemdet->TXT_NOMBRE_PRODUCTO;
+                                $detalle->UND_PROD              =   $itemdet->producto->unidadmedida->TXT_ABREVIATURA;
+                                $detalle->CANTIDAD              =   (float)$itemdet->CAN_PRODUCTO;
+                                $detalle->PRECIO_UNIT           =   (float)$itemdet->CAN_PRECIO_UNIT;
+                                $detalle->VAL_IGV_ORIG          =   (float)$itemdet->CAN_TASA_IGV;
+                                $detalle->VAL_IGV_SOL           =   (float)$itemdet->CAN_TASA_IGV;
+                                $detalle->VAL_SUBTOTAL_ORIG     =   (float)$itemdet->CAN_VALOR_VTA;
+                                $detalle->VAL_SUBTOTAL_SOL      =   (float)$itemdet->CAN_VALOR_VTA;
+                                $detalle->VAL_VENTA_ORIG        =   (float)$itemdet->CAN_VALOR_VENTA_IGV;
+                                $detalle->VAL_VENTA_SOL         =   (float)$itemdet->CAN_VALOR_VENTA_IGV;
+                                $detalle->PRECIO_ORIG           =   (float)$itemdet->CAN_PRECIO_UNIT;
+                                $detalle->save();
+
+                        }
+                        
+                        //ARCHIVOS
+                        DB::table('CMP.DOC_ASOCIAR_COMPRA')->where('COD_ORDEN','=',$ordenpago->COD_AUTORIZACION)->delete();
+
+                        foreach($archivosdelfe as $index=>$item){
+
+                                $categoria                               =   CMPCategoria::where('COD_CATEGORIA','=',$item->COD_CATEGORIA)->first();
+
+                                $docasociar                              =   New CMPDocAsociarCompra;
+                                $docasociar->COD_ORDEN                   =   $ordenpago->COD_AUTORIZACION;
+                                $docasociar->COD_CATEGORIA_DOCUMENTO     =   $categoria->COD_CATEGORIA;
+                                $docasociar->NOM_CATEGORIA_DOCUMENTO     =   $categoria->NOM_CATEGORIA;
+                                $docasociar->IND_OBLIGATORIO             =   $categoria->IND_DOCUMENTO_VAL;
+                                $docasociar->TXT_FORMATO                 =   $categoria->COD_CTBLE;
+                                $docasociar->TXT_ASIGNADO                =   $categoria->TXT_ABREVIATURA;
+                                $docasociar->COD_USUARIO_CREA_AUD        =   Session::get('usuario')->id;
+                                $docasociar->FEC_USUARIO_CREA_AUD        =   $this->fechaactual;
+                                $docasociar->COD_ESTADO                  =   1;
+                                $docasociar->TIP_DOC                     =   $categoria->CODIGO_SUNAT;
+                                $docasociar->save();
+                        }
+
+
+
+                        DB::commit();
+
+                }catch(\Exception $ex){
+                    DB::rollback(); 
+                    return Redirect::to('detalle-comprobante-liquidacion-compra-anticipo-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordenpago)->with('errorbd', $ex.' Ocurrio un error inesperado');
+                }
+                return Redirect::to('detalle-comprobante-liquidacion-compra-anticipo-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordenpago)->with('bienhecho', 'Se valido el xml');
+            }else{
+                return Redirect::to('detalle-comprobante-liquidacion-compra-anticipo-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordenpago)->with('errorurl', 'Archivo XML de la Orden de Pago No Encontrado ');
+            }
+
+        }
+    }
+
+    public function actionValidarXMLLiquidacionCompraAnticipoAdministrator($idopcion, $prefijo, $idordenpago,Request $request)
+    {        
+        $idop                   =   $this->funciones->decodificarmaestraprefijo($idordenpago,$prefijo);
+        $ordenpago              =   $this->con_lista_comprobante_orden_pago_idoc($idop);        
+
+        $idoc                   =   $ordenpago->COD_DOCUMENTO_CTBLE;
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_contrato_idoc_actual($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_liquidacion_compra_comprobante_idoc($idoc);
+
+
+        if($_POST)
+        {
+
+            try{    
+                
+                DB::beginTransaction();
+                $contacto_id       =   $request['contacto_id'];
+                $procedencia       =   $request['procedencia'];                
+
+                $fedocumento       =   FeDocumento::where('ID_DOCUMENTO','=',$idop)->where('COD_ESTADO','<>','ETM0000000000006')->first();                
+                
+                $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$idop)->where('COD_ESTADO','=',1)->get();                
+
+                foreach($tarchivos as $index => $item){
+
+                    $filescdm          =   $request[$item->COD_CATEGORIA_DOCUMENTO];
+                    if(!is_null($filescdm)){
+
+                        foreach($filescdm as $file){
+
+                            $contadorArchivos = Archivo::count();                            
+                            /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
+                            $prefijocarperta =      $this->prefijo_empresa($ordenpago->COD_EMPR);
+                            $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordenpago->NRO_DOC;                            
+                            $nombrefilecdr   =      $contadorArchivos.'-LCA-'.$file->getClientOriginalName();
+                            $valor           =      $this->versicarpetanoexiste($rutafile);
+                            $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
+                            copy($file->getRealPath(),$rutacompleta);
+                            $path            =      $rutacompleta;
+
+                            $nombreoriginal             =   $file->getClientOriginalName();
+                            $info                       =   new SplFileInfo($nombreoriginal);
+                            $extension                  =   $info->getExtension();
+
+                            $dcontrol                       =   new Archivo;
+                            $dcontrol->ID_DOCUMENTO         =   $ordenpago->COD_AUTORIZACION;
+                            $dcontrol->DOCUMENTO_ITEM       =   $fedocumento->DOCUMENTO_ITEM;
+                            $dcontrol->TIPO_ARCHIVO         =   $item->COD_CATEGORIA_DOCUMENTO;
+                            $dcontrol->NOMBRE_ARCHIVO       =   $nombrefilecdr;
+                            $dcontrol->DESCRIPCION_ARCHIVO  =   $item->NOM_CATEGORIA_DOCUMENTO;
+
+
+                            $dcontrol->URL_ARCHIVO      =   $path;
+                            $dcontrol->SIZE             =   filesize($file);
+                            $dcontrol->EXTENSION        =   $extension;
+                            $dcontrol->ACTIVO           =   1;
+                            $dcontrol->FECHA_CREA       =   $this->fechaactual;
+                            $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
+                            $dcontrol->save();
+                        }
+                    }
+                }              
+
+                $contacto                                 =   SGDUsuario::where('COD_TRABAJADOR','=',$contacto_id)->first();
+                $trabajador                               =   STDTrabajador::where('COD_TRAB','=',$contacto->COD_TRABAJADOR)->first();
+                //$contacto                               =   User::where('id','=',$contacto_id)->first();                
+                
+                FeDocumento::where('ID_DOCUMENTO','=',$idop)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                            ->update(
+                                [                                    
+                                    'ARCHIVO_CDR'=>'',
+                                    'ARCHIVO_PDF'=>'',
+                                    'COD_ESTADO'=>'ETM0000000000002',
+                                    'TXT_ESTADO'=>'POR APROBAR USUARIO CONTACTO',
+                                    'dni_usuariocontacto'=>$trabajador->NRO_DOCUMENTO,
+                                    'COD_CONTACTO'=>$contacto->COD_TRABAJADOR,                                    
+                                    'ind_email_uc'=>0,
+                                    'TXT_CONTACTO'=>$contacto->NOM_TRABAJADOR,
+                                    'fecha_pa'=>$this->fechaactual,
+                                    'usuario_pa'=>Session::get('usuario')->id,
+                                ]
+                            );
+
+
+                $ordenpago_t                          =   TESAutorizacion::where('COD_AUTORIZACION','=',$idop)->first();
+
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento                              =   new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $idop;
+                $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA                       =   date_format(date_create($ordenpago_t->FEC_USUARIO_CREA_AUD), 'Ymd h:i:s');
+                $documento->USUARIO_ID                  =   $contacto->COD_TRABAJADOR;
+                $documento->USUARIO_NOMBRE              =   $contacto->NOM_TRABAJADOR;
+                $documento->TIPO                        =   'CREO ORDEN PAGO';
+                $documento->MENSAJE                     =   '';
+                $documento->save();
+
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento                              =   new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $idop;
+                $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA                       =   $this->fechaactual;
+                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                $documento->TIPO                        =   'SUBIO DOCUMENTOS';
+                $documento->MENSAJE                     =   '';
+                $documento->save();
+
+
+                FeDocumento::where('ID_DOCUMENTO',$idop)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                            ->update(
+                                [
+                                    'COD_ESTADO'=>'ETM0000000000004',
+                                    'TXT_ESTADO'=>'POR APROBAR ADMINISTRACION',
+                                    'ind_email_ap'=>0,
+                                    'fecha_uc'=>$this->fechaactual,
+                                    'usuario_uc'=>Session::get('usuario')->id
+                                ]
+                            );
+
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento                              =   new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $idop;
+                $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA                       =   $this->fechaactual;
+                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                $documento->TIPO                        =   'APROBADO POR USUARIO CONTACTO';
+                $documento->MENSAJE                     =   '';
+                $documento->save();               
+
+
+                DB::commit();
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                //dd($ex);
+                return Redirect::to('detalle-comprobante-liquidacion-compra-anticipo-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordenpago)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+            return Redirect::to('gestion-de-orden-compra/'.$idopcion)->with('bienhecho', 'Se valido el xml correctamente');
+
+        }
+    }
 
     public function actionDetalleComprobanteOCAdministrator($procedencia,$idopcion, $prefijo, $idordencompra, Request $request) {
 

@@ -31,6 +31,7 @@ use Greenter\Xml\Parser\InvoiceParser;
 use Greenter\Xml\Parser\NoteParser;
 use Greenter\Xml\Parser\PerceptionParser;
 use Greenter\Xml\Parser\RHParser;
+use Greenter\Xml\Parser\LiquiParser;
 
 
 use App\User;
@@ -503,40 +504,78 @@ class GestionEstibaController extends Controller
 
                 //dd($MONTO_ANTICIPO_DESC);
                 
-                FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
-                            ->update(
-                                [
+                if($fedocumento->OPERACION == 'DOCUMENTO_INTERNO_COMPRA'){
+                    FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                ->update(
+                                    [
 
-                                    'CTA_DETRACCION'=>$ctadetraccion,
-                                    'VALOR_DETRACCION'=>$tipo_detraccion_id,
-                                    'MONTO_DETRACCION_XML'=>$monto_detraccion,
-                                    'MONTO_DETRACCION_RED'=>round($monto_detraccion),
-                                    'COD_PAGO_DETRACCION'=>$COD_PAGO_DETRACCION,
-                                    'TXT_PAGO_DETRACCION'=>$TXT_PAGO_DETRACCION,
+                                        'CTA_DETRACCION'=>$ctadetraccion,
+                                        'VALOR_DETRACCION'=>$tipo_detraccion_id,
+                                        'MONTO_DETRACCION_XML'=>$monto_detraccion,
+                                        'MONTO_DETRACCION_RED'=>round($monto_detraccion),
+                                        'COD_PAGO_DETRACCION'=>$COD_PAGO_DETRACCION,
+                                        'TXT_PAGO_DETRACCION'=>$TXT_PAGO_DETRACCION,
 
-                                    'MONTO_ANTICIPO_DESC'=>$MONTO_ANTICIPO_DESC,
-                                    'COD_ANTICIPO'=>$COD_ANTICIPO,
-                                    'SERIE_ANTICIPO'=>$SERIE_ANTICIPO,
-                                    'NRO_ANTICIPO'=>$NRO_ANTICIPO,
+                                        'MONTO_ANTICIPO_DESC'=>$MONTO_ANTICIPO_DESC,
+                                        'COD_ANTICIPO'=>$COD_ANTICIPO,
+                                        'SERIE_ANTICIPO'=>$SERIE_ANTICIPO,
+                                        'NRO_ANTICIPO'=>$NRO_ANTICIPO,
 
 
-                                    'COD_CATEGORIA_BANCO'=>$bancocategoria->COD_CATEGORIA,
-                                    'TXT_CATEGORIA_BANCO'=>$bancocategoria->NOM_CATEGORIA,
-                                    'TXT_NRO_CUENTA_BANCARIA'=>$cb_id,
-                                    'ARCHIVO_CDR'=>'',
-                                    'ARCHIVO_PDF'=>'',
-                                    'COD_ESTADO'=>'ETM0000000000002',
-                                    'TXT_ESTADO'=>'POR APROBAR USUARIO CONTACTO',
-                                    'dni_usuariocontacto'=>$trabajador->NRO_DOCUMENTO,
-                                    'COD_CONTACTO'=>$contacto->COD_TRABAJADOR,
-                                    'CODIGO_CDR'=>$codigocdr,
-                                    'RESPUESTA_CDR'=>$respuestacdr,
-                                    'ind_email_uc'=>0,
-                                    'TXT_CONTACTO'=>$contacto->NOM_TRABAJADOR,
-                                    'fecha_pa'=>$this->fechaactual,
-                                    'usuario_pa'=>Session::get('usuario')->id,
-                                ]
-                            );
+                                        //'COD_CATEGORIA_BANCO'=>$bancocategoria->COD_CATEGORIA,
+                                        //'TXT_CATEGORIA_BANCO'=>$bancocategoria->NOM_CATEGORIA,
+                                        //'TXT_NRO_CUENTA_BANCARIA'=>$cb_id,
+                                        'ARCHIVO_CDR'=>'',
+                                        'ARCHIVO_PDF'=>'',
+                                        'COD_ESTADO'=>'ETM0000000000002',
+                                        'TXT_ESTADO'=>'POR APROBAR USUARIO CONTACTO',
+                                        'dni_usuariocontacto'=>$trabajador->NRO_DOCUMENTO,
+                                        'COD_CONTACTO'=>$contacto->COD_TRABAJADOR,
+                                        'CODIGO_CDR'=>$codigocdr,
+                                        'RESPUESTA_CDR'=>$respuestacdr,
+                                        'ind_email_uc'=>0,
+                                        'TXT_CONTACTO'=>$contacto->NOM_TRABAJADOR,
+                                        'fecha_pa'=>$this->fechaactual,
+                                        'usuario_pa'=>Session::get('usuario')->id,
+                                    ]
+                                );    
+                }else{
+                    FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                ->update(
+                                    [
+
+                                        'CTA_DETRACCION'=>$ctadetraccion,
+                                        'VALOR_DETRACCION'=>$tipo_detraccion_id,
+                                        'MONTO_DETRACCION_XML'=>$monto_detraccion,
+                                        'MONTO_DETRACCION_RED'=>round($monto_detraccion),
+                                        'COD_PAGO_DETRACCION'=>$COD_PAGO_DETRACCION,
+                                        'TXT_PAGO_DETRACCION'=>$TXT_PAGO_DETRACCION,
+
+                                        'MONTO_ANTICIPO_DESC'=>$MONTO_ANTICIPO_DESC,
+                                        'COD_ANTICIPO'=>$COD_ANTICIPO,
+                                        'SERIE_ANTICIPO'=>$SERIE_ANTICIPO,
+                                        'NRO_ANTICIPO'=>$NRO_ANTICIPO,
+
+
+                                        'COD_CATEGORIA_BANCO'=>$bancocategoria->COD_CATEGORIA,
+                                        'TXT_CATEGORIA_BANCO'=>$bancocategoria->NOM_CATEGORIA,
+                                        'TXT_NRO_CUENTA_BANCARIA'=>$cb_id,
+                                        'ARCHIVO_CDR'=>'',
+                                        'ARCHIVO_PDF'=>'',
+                                        'COD_ESTADO'=>'ETM0000000000002',
+                                        'TXT_ESTADO'=>'POR APROBAR USUARIO CONTACTO',
+                                        'dni_usuariocontacto'=>$trabajador->NRO_DOCUMENTO,
+                                        'COD_CONTACTO'=>$contacto->COD_TRABAJADOR,
+                                        'CODIGO_CDR'=>$codigocdr,
+                                        'RESPUESTA_CDR'=>$respuestacdr,
+                                        'ind_email_uc'=>0,
+                                        'TXT_CONTACTO'=>$contacto->NOM_TRABAJADOR,
+                                        'fecha_pa'=>$this->fechaactual,
+                                        'usuario_pa'=>Session::get('usuario')->id,
+                                    ]
+                                );
+                }
+                
 
                 //HISTORIAL DE DOCUMENTO APROBADO
                 $documento                              =   new FeDocumentoHistorial;
@@ -560,17 +599,29 @@ class GestionEstibaController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
-
-                FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
-                            ->update(
-                                [
-                                    'COD_ESTADO'=>'ETM0000000000003',
-                                    'TXT_ESTADO'=>'POR APROBAR CONTABILIDAD',
-                                    'ind_email_ap'=>0,
-                                    'fecha_uc'=>$this->fechaactual,
-                                    'usuario_uc'=>Session::get('usuario')->id
-                                ]
-                            );
+                if($fedocumento->OPERACION == 'DOCUMENTO_INTERNO_COMPRA'){
+                    FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                ->update(
+                                    [
+                                        'COD_ESTADO'=>'ETM0000000000004',
+                                        'TXT_ESTADO'=>'POR APROBAR ADMINISTRACION',
+                                        'ind_email_ap'=>0,
+                                        'fecha_uc'=>$this->fechaactual,
+                                        'usuario_uc'=>Session::get('usuario')->id
+                                    ]
+                                );
+                }else{
+                    FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                ->update(
+                                    [
+                                        'COD_ESTADO'=>'ETM0000000000003',
+                                        'TXT_ESTADO'=>'POR APROBAR CONTABILIDAD',
+                                        'ind_email_ap'=>0,
+                                        'fecha_uc'=>$this->fechaactual,
+                                        'usuario_uc'=>Session::get('usuario')->id
+                                    ]
+                                );
+                }                
 
                 //HISTORIAL DE DOCUMENTO APROBADO
                 $documento                              =   new FeDocumentoHistorial;
@@ -755,8 +806,15 @@ class GestionEstibaController extends Controller
 
         $cb_id                  =   '';
         $combocb                =   array('' => "Seleccione Cuenta Bancaria");
-        $combodocumento         =   array('DCC0000000000002' => 'FACTURA ELECTRONICA' , 'DCC0000000000013' => 'RECIBO POR HONORARIO');
-        $documento_id           =   'DCC0000000000013';
+
+        if($fereftop1->OPERACION == 'DOCUMENTO_INTERNO_COMPRA'){
+            $combodocumento         =   array('DCC0000000000043' => 'LIQUIDACION COMPRA');
+            $documento_id           =   'DCC0000000000043';
+        }else{
+            $combodocumento         =   array('DCC0000000000002' => 'FACTURA ELECTRONICA' , 'DCC0000000000013' => 'RECIBO POR HONORARIO');
+            $documento_id           =   'DCC0000000000013';
+        }
+        
         $funcion                =   $this;
 
 
@@ -890,6 +948,16 @@ class GestionEstibaController extends Controller
                                                     ->whereIn('COD_CATEGORIA', ['DCC0000000000002','DCC0000000000003','DCC0000000000004','DCC0000000000006'])
                                                     ->get();
 
+                        }elseif($documento_id=='DCC0000000000043'){
+                            //LIQUIDACION COMPRA
+                            $parser             =   new LiquiParser();
+                            $xml                =   file_get_contents($path);
+                            $factura            =   $parser->parse($xml);
+                            $tipo_documento_le  =   $factura->gettipoDoc();
+                            $moneda_le          =   $factura->gettipoMoneda();
+                            $archivosdelfe      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000043','DCC0000000000003'])
+                                                    ->get();
                         }else{
 
                             //RECIBO POR HONORARIO

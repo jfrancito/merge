@@ -300,7 +300,7 @@ trait UserTraits
                                         ->get();
 
         foreach($listaliquidaciones as $item){
-
+            $correotrabajdor         =    '';
             $documentoCtble         =   DB::table('CMP.DOCUMENTO_CTBLE')
                                         ->where('COD_CATEGORIA_ESTADO_DOC_CTBLE','=','EDC0000000000009')
                                         ->where('COD_DOCUMENTO_CTBLE', $item->COD_OSIRIS)
@@ -382,7 +382,7 @@ trait UserTraits
                 $user = DB::table('users')->where('id', $item->USUARIO_CREA)->first();
                 $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('COD_TRAB','=',$user->usuarioosiris_id)->first();
                 //correo de trabajadores
-                $correotrabajdor         =    '';
+                $correotrabajador         =    '';
                 if(count($trabajadorcorreo)>0){
                     if ($trabajadorcorreo->emailcorp !== null) {
                         $correotrabajador = $trabajadorcorreo->emailcorp;

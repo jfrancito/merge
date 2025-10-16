@@ -12,6 +12,7 @@ $(document).ready(function(){
         var _token              =   $('#token').val();
         var operacion_id        =   $(this).val();
         var valores = array_canjes();
+        debugger;
         if(valores.includes(operacion_id)){
             $('.sec_estiba').removeClass('ocultar');
         }else{

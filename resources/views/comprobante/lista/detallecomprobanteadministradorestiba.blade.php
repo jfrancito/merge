@@ -43,29 +43,33 @@
                 </div>
               </div>
             </div>
-            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-              <div class="panel panel-default panel-contrast">
-                <div class="panel-heading" style="background: #1d3a6d;color: #fff;">CONSULTA API SUNAT
-                </div>
-                <div class="panel-body panel-body-contrast">
-                    @if(count($fedocumento)<=0)
-                        <div class="col-sm-12">
-                            <b>CARGAR XML</b>
-                        </div>
-                    @else
-                        <div class="col-sm-12">
-                            <p style="margin:0px;"><b>Respuesta Sunat</b> : {{$fedocumento->message}}</p>
-                            <p style="margin:0px;" class='@if($fedocumento->estadoCp == 1) msjexitoso @else msjerror @endif'><b>Estado Comprobante</b> : 
-                                {{$fedocumento->nestadoCp}}
-                            </p>
-                            <p style="margin:0px;"><b>Estado Ruc</b> : {{$fedocumento->nestadoRuc}}</p>
-                            <p style="margin:0px;"><b>Estado Domicilio</b> : {{$fedocumento->ncondDomiRuc}}</p>
-                            <p style="margin:0px;"><b>Respuesta CDR</b> : {{$fedocumento->RESPUESTA_CDR}}</p>
-                        </div>
-                    @endif
+
+            @if($fereftop1->OPERACION != 'DOCUMENTO_INTERNO_COMPRA')
+              <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+                <div class="panel panel-default panel-contrast">
+                  <div class="panel-heading" style="background: #1d3a6d;color: #fff;">CONSULTA API SUNAT
+                  </div>
+                  <div class="panel-body panel-body-contrast">
+                      @if(count($fedocumento)<=0)
+                          <div class="col-sm-12">
+                              <b>CARGAR XML</b>
+                          </div>
+                      @else
+                          <div class="col-sm-12">
+                              <p style="margin:0px;"><b>Respuesta Sunat</b> : {{$fedocumento->message}}</p>
+                              <p style="margin:0px;" class='@if($fedocumento->estadoCp == 1) msjexitoso @else msjerror @endif'><b>Estado Comprobante</b> : 
+                                  {{$fedocumento->nestadoCp}}
+                              </p>
+                              <p style="margin:0px;"><b>Estado Ruc</b> : {{$fedocumento->nestadoRuc}}</p>
+                              <p style="margin:0px;"><b>Estado Domicilio</b> : {{$fedocumento->ncondDomiRuc}}</p>
+                              <p style="margin:0px;"><b>Respuesta CDR</b> : {{$fedocumento->RESPUESTA_CDR}}</p>
+                          </div>
+                      @endif
+                  </div>
                 </div>
               </div>
-            </div>
+            @endif
+
             <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
               <div class="panel panel-default panel-contrast">
                 <div class="panel-heading" style="background: #1d3a6d;color: #fff;">DOCUMENTOS ASOCIADOS 
@@ -111,9 +115,9 @@
                 <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
                   <div class="panel panel-default panel-contrast">
                     <div class="panel-heading" style="background: #1d3a6d;color: #fff;">{{$fereftop1->OPERACION}}
-
-                      <a href="{{ url('/agregar-suspension/'.$idopcion.'/'.$idoc) }}" class="btn btn-rounded btn-space btn-success">Tiene Suspension</a>
-
+                      @if($fereftop1->OPERACION != 'DOCUMENTO_INTERNO_COMPRA')
+                        <a href="{{ url('/agregar-suspension/'.$idopcion.'/'.$idoc) }}" class="btn btn-rounded btn-space btn-success">Tiene Suspension</a>
+                      @endif
                     </div>
                     <div class="panel-body panel-body-contrast">
                       <table class="table table-condensed table-striped">
@@ -218,148 +222,148 @@
                   </div>
                 </div>
               </div>
+              @if($fereftop1->OPERACION != 'DOCUMENTO_INTERNO_COMPRA')
+                <div class="row">
+                  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="panel panel-default panel-contrast">
+                      <div class="panel-heading" style="background: #1d3a6d;color: #fff;">DATOS PARA PAGOS
 
-              <div class="row">
-                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                  <div class="panel panel-default panel-contrast">
-                    <div class="panel-heading" style="background: #1d3a6d;color: #fff;">DATOS PARA PAGOS
+                        <div class="tools ver_cuenta_bancaria_estiba select" style="cursor: pointer;padding-left: 12px;"> <span class="label label-success">Ver Cuenta</span></div>
+                        <div class="tools agregar_cuenta_bancaria_estiba select" style="cursor: pointer;"> <span class="label label-success">Agregar Cuenta</span></div>
 
-                      <div class="tools ver_cuenta_bancaria_estiba select" style="cursor: pointer;padding-left: 12px;"> <span class="label label-success">Ver Cuenta</span></div>
-                      <div class="tools agregar_cuenta_bancaria_estiba select" style="cursor: pointer;"> <span class="label label-success">Agregar Cuenta</span></div>
+                      </div>
+                      <div class="panel-body panel-body-contrast">
+                              <div class="row">
 
-                    </div>
-                    <div class="panel-body panel-body-contrast">
-                            <div class="row">
+                                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px;">
+                                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 cajareporte">
+                                            <div class="form-group">
+                                              <label class="col-sm-12 control-label labelleft" ><b>Entidad Bancaria que se le va a pagar al proveedor :</b></label>
+                                              <div class="col-sm-12 abajocaja" >
 
-                                  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px;">
-                                      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 cajareporte">
-                                          <div class="form-group">
-                                            <label class="col-sm-12 control-label labelleft" ><b>Entidad Bancaria que se le va a pagar al proveedor :</b></label>
-                                            <div class="col-sm-12 abajocaja" >
-
-                                              @if($banco_id=='BAM0000000000011')
-                                                <input type="hidden" name="entidadbanco_id" value ='{{$banco_id}}'>
-                                                {!! Form::select( 'entidadbanco_id', $combobancos, array($banco_id),
-                                                                  [
-                                                                    'class'       => 'select2 form-control control input-xs entidadbancoestiba' ,
-                                                                    'id'          => 'entidadbanco_id',
-                                                                    'required'    => '',
-                                                                    'data-aw'     => '1',
-                                                                    'disabled' => 'disabled'
-                                                                  ]) !!}
-                                              @else
-                                                {!! Form::select( 'entidadbanco_id', $combobancos, array($banco_id),
-                                                                  [
-                                                                    'class'       => 'select2 form-control control input-xs entidadbancoestiba' ,
-                                                                    'id'          => 'entidadbanco_id',
-                                                                    'required'    => '',
-                                                                    'data-aw'     => '1',
-                                                                  ]) !!}
-                                              @endif
+                                                @if($banco_id=='BAM0000000000011')
+                                                  <input type="hidden" name="entidadbanco_id" value ='{{$banco_id}}'>
+                                                  {!! Form::select( 'entidadbanco_id', $combobancos, array($banco_id),
+                                                                    [
+                                                                      'class'       => 'select2 form-control control input-xs entidadbancoestiba' ,
+                                                                      'id'          => 'entidadbanco_id',
+                                                                      'required'    => '',
+                                                                      'data-aw'     => '1',
+                                                                      'disabled' => 'disabled'
+                                                                    ]) !!}
+                                                @else
+                                                  {!! Form::select( 'entidadbanco_id', $combobancos, array($banco_id),
+                                                                    [
+                                                                      'class'       => 'select2 form-control control input-xs entidadbancoestiba' ,
+                                                                      'id'          => 'entidadbanco_id',
+                                                                      'required'    => '',
+                                                                      'data-aw'     => '1',
+                                                                    ]) !!}
+                                                @endif
 
 
+                                              </div>
                                             </div>
-                                          </div>
-                                      </div>
-                                      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 cajareporte ajax_cb">
-                                        @include('comprobante.combo.combo_cuenta_bancaria')
-                                      </div>
-                                  </div>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 cajareporte ajax_cb">
+                                          @include('comprobante.combo.combo_cuenta_bancaria')
+                                        </div>
+                                    </div>
 
 
-                            </div>
+                              </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              @endif
+              @if($fereftop1->OPERACION != 'DOCUMENTO_INTERNO_COMPRA')
+                <div class="row @if($fedocumento->ID_TIPO_DOC =='R1') ocultar @endif">
+                  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="panel panel-default panel-contrast">
+                      <div class="panel-heading" style="background: #1d3a6d;color: #fff;">
+                        <div><h4>DETRACION DE LA FACTURACION : {{round($fedocumento->TOTAL_VENTA_ORIG,2)}} x 4% = {{$fedocumento->TOTAL_VENTA_ORIG * 0.04}}</h4> </div>
+                        <div><h6>* Solo llenar para montos mayores a 401 o cuando sea traslado de la selva</h6> </div>
+                      </div>
+                      <div class="panel-body panel-body-contrast">
+                              <div class="row">
 
+                                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px;">
 
-              <div class="row @if($fedocumento->ID_TIPO_DOC =='R1') ocultar @endif">
-                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                  <div class="panel panel-default panel-contrast">
-                    <div class="panel-heading" style="background: #1d3a6d;color: #fff;">
-                      <div><h4>DETRACION DE LA FACTURACION : {{round($fedocumento->TOTAL_VENTA_ORIG,2)}} x 4% = {{$fedocumento->TOTAL_VENTA_ORIG * 0.04}}</h4> </div>
-                      <div><h6>* Solo llenar para montos mayores a 401 o cuando sea traslado de la selva</h6> </div>
-                    </div>
-                    <div class="panel-body panel-body-contrast">
-                            <div class="row">
-
-                                  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px;">
-
-                                      <div class="col-xs-12 col-sm-4 col-md-4 col-lg-3">
-                                        <div class="form-group">
-                                          <label class="col-sm-12 control-label labelleft" >
-                                              <div class="tooltipfr"><b>Cuenta Detracción (*)</b>
-                                                <span class="tooltiptext">Solo numeros</span>
-                                              </div>
-
-
-                                          </label>
-                                          <div class="col-sm-12 abajocaja" >
-                                              <input type="text" name="ctadetraccion" id='ctadetraccion' class="form-control control input-sm cuentanumero" value = '{{$empresa->TXT_DETRACCION}}'>
-                                          </div>
-                                        </div>
-                                      </div>
-
-
-                                      <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 cajareporte">
+                                        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-3">
                                           <div class="form-group">
                                             <label class="col-sm-12 control-label labelleft" >
-                                              <div class="tooltipfr"><b>Valor Detraccion (*)</b>
-                                                <span class="tooltiptext">Si la detraccion corresponde a la factura o aun monto referencial</span>
-                                              </div>
+                                                <div class="tooltipfr"><b>Cuenta Detracción (*)</b>
+                                                  <span class="tooltiptext">Solo numeros</span>
+                                                </div>
+
+
                                             </label>
                                             <div class="col-sm-12 abajocaja" >
-                                              {!! Form::select( 'tipo_detraccion_id', $combotipodetraccion, array(),
-                                                                [
-                                                                  'class'       => 'select2 form-control control input-xs' ,
-                                                                  'id'          => 'tipo_detraccion_id',
-                                                                  'data-aw'     => '1',
-                                                                ]) !!}
+                                                <input type="text" name="ctadetraccion" id='ctadetraccion' class="form-control control input-sm cuentanumero" value = '{{$empresa->TXT_DETRACCION}}'>
                                             </div>
-                                          </div>
-                                      </div>
-
-                                      <div class="col-xs-12 col-sm-4 col-md-4 col-lg-3">
-                                        <div class="form-group">
-                                          <label class="col-sm-12 control-label labelleft" ><b>Monto de Detracion (*):</b></label>
-                                          <div class="col-sm-12 abajocaja" >
-                                              <input type="text" name="monto_detraccion" id='monto_detraccion' class="form-control control input-sm importe" 
-                                              value = '0.0'>
                                           </div>
                                         </div>
-                                      </div>
 
-                                      <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 cajareporte">
-                                          <div class="form-group">
-                                            <label class="col-sm-12 control-label labelleft" >
-                                              
-                                              <div class="tooltipfr"><b>Pago Detraccion (*)</b>
-                                                <span class="tooltiptext">Seleccione quien va hacer el pago de la detraccion</span>
+
+                                        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 cajareporte">
+                                            <div class="form-group">
+                                              <label class="col-sm-12 control-label labelleft" >
+                                                <div class="tooltipfr"><b>Valor Detraccion (*)</b>
+                                                  <span class="tooltiptext">Si la detraccion corresponde a la factura o aun monto referencial</span>
+                                                </div>
+                                              </label>
+                                              <div class="col-sm-12 abajocaja" >
+                                                {!! Form::select( 'tipo_detraccion_id', $combotipodetraccion, array(),
+                                                                  [
+                                                                    'class'       => 'select2 form-control control input-xs' ,
+                                                                    'id'          => 'tipo_detraccion_id',
+                                                                    'data-aw'     => '1',
+                                                                  ]) !!}
                                               </div>
-                                            </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-3">
+                                          <div class="form-group">
+                                            <label class="col-sm-12 control-label labelleft" ><b>Monto de Detracion (*):</b></label>
                                             <div class="col-sm-12 abajocaja" >
-                                              {!! Form::select( 'pago_detraccion', $combopagodetraccion, array(),
-                                                                [
-                                                                  'class'       => 'select2 form-control control input-xs' ,
-                                                                  'id'          => 'pago_detraccion',
-                                                                  'data-aw'     => '1',
-                                                                ]) !!}
+                                                <input type="text" name="monto_detraccion" id='monto_detraccion' class="form-control control input-sm importe" 
+                                                value = '0.0'>
                                             </div>
                                           </div>
-                                      </div>
+                                        </div>
+
+                                        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 cajareporte">
+                                            <div class="form-group">
+                                              <label class="col-sm-12 control-label labelleft" >
+                                                
+                                                <div class="tooltipfr"><b>Pago Detraccion (*)</b>
+                                                  <span class="tooltiptext">Seleccione quien va hacer el pago de la detraccion</span>
+                                                </div>
+                                              </label>
+                                              <div class="col-sm-12 abajocaja" >
+                                                {!! Form::select( 'pago_detraccion', $combopagodetraccion, array(),
+                                                                  [
+                                                                    'class'       => 'select2 form-control control input-xs' ,
+                                                                    'id'          => 'pago_detraccion',
+                                                                    'data-aw'     => '1',
+                                                                  ]) !!}
+                                              </div>
+                                            </div>
+                                        </div>
 
 
 
-                                  </div>
+                                    </div>
 
 
-                            </div>
+                              </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-
+              @endif
               <div class="row">
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                   <div class="panel panel-default panel-contrast">
@@ -453,25 +457,25 @@
                                         </div>
                                       </div>
 
-
-                                      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 cajareporte @if((float)$monto_anticipo<=0) ocultar @endif">
-                                          <div class="form-group">
-                                            <label class="col-sm-12 control-label labelleft" >
-                                              <div class="tooltipfr"><b>Aplicar Anticipo </b>
-                                                <span class="tooltiptext">¿Se le aplicara el anticipo a esta factura?</span>
+                                      @if($fereftop1->OPERACION != 'DOCUMENTO_INTERNO_COMPRA')
+                                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 cajareporte @if((float)$monto_anticipo<=0) ocultar @endif">
+                                            <div class="form-group">
+                                              <label class="col-sm-12 control-label labelleft" >
+                                                <div class="tooltipfr"><b>Aplicar Anticipo </b>
+                                                  <span class="tooltiptext">¿Se le aplicara el anticipo a esta factura?</span>
+                                                </div>
+                                              :</label>
+                                              <div class="col-sm-12 abajocaja" >
+                                                {!! Form::select( 'monto_anticipo', $comboant, array(),
+                                                                  [
+                                                                    'class'       => 'select2 form-control control input-sm' ,
+                                                                    'id'          => 'monto_anticipo',
+                                                                    'data-aw'     => '1',
+                                                                  ]) !!}
                                               </div>
-                                            :</label>
-                                            <div class="col-sm-12 abajocaja" >
-                                              {!! Form::select( 'monto_anticipo', $comboant, array(),
-                                                                [
-                                                                  'class'       => 'select2 form-control control input-sm' ,
-                                                                  'id'          => 'monto_anticipo',
-                                                                  'data-aw'     => '1',
-                                                                ]) !!}
                                             </div>
-                                          </div>
-                                      </div>
-
+                                        </div>
+                                      @endif
                                   </div>
 
                                   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px;">

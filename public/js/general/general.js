@@ -80,7 +80,7 @@ $(document).ready(function(){
 });
 
 function array_canjes() {
-    const array = ['ESTIBA', 'DOCUMENTO_INTERNO_PRODUCCION', 'DOCUMENTO_INTERNO_SECADO', 'DOCUMENTO_SERVICIO_BALANZA'];
+    const array = ['ESTIBA', 'DOCUMENTO_INTERNO_PRODUCCION', 'DOCUMENTO_INTERNO_SECADO', 'DOCUMENTO_SERVICIO_BALANZA', 'DOCUMENTO_INTERNO_COMPRA'];
     return array;
 }
 

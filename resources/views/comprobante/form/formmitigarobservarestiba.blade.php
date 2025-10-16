@@ -2,9 +2,11 @@
   <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
     @include('comprobante.form.estiba.comparar')
   </div>
+  @IF($fedocumento->OPERACION != 'DOCUMENTO_INTERNO_COMPRA')
   <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
       @include('comprobante.form.contrato.consultaapi')
   </div>
+  @ENDIF
   <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
     @include('comprobante.form.contrato.seguimiento')
   </div> 
@@ -18,78 +20,78 @@
   </div>
 </div>
 
+@IF($fedocumento->OPERACION != 'DOCUMENTO_INTERNO_COMPRA')
+  <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="panel panel-default panel-contrast">
+        <div class="panel-heading" style="background: #1d3a6d;color: #fff;">
+          <div><h4>DETRACION DE LA FACTURACION : {{$fedocumento->TOTAL_VENTA_ORIG}} x 4% = {{$fedocumento->TOTAL_VENTA_ORIG * 0.04}}</h4> </div>
+          <div><h6>* Solo llenar para montos mayores a 401</h6> </div>
+        </div>
+        <div class="panel-body panel-body-contrast">
+                <div class="row">
 
-<div class="row">
-  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-    <div class="panel panel-default panel-contrast">
-      <div class="panel-heading" style="background: #1d3a6d;color: #fff;">
-        <div><h4>DETRACION DE LA FACTURACION : {{$fedocumento->TOTAL_VENTA_ORIG}} x 4% = {{$fedocumento->TOTAL_VENTA_ORIG * 0.04}}</h4> </div>
-        <div><h6>* Solo llenar para montos mayores a 401</h6> </div>
-      </div>
-      <div class="panel-body panel-body-contrast">
-              <div class="row">
-
-                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px;">
-
-
-                        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-3">
-                          <div class="form-group">
-                            <label class="col-sm-12 control-label labelleft" style="text-align: left;"><b>Cuenta Detracción (*): solo numero</b></label>
-                            <div class="col-sm-12 abajocaja" >
-                                <input type="text" name="ctadetraccion" id='ctadetraccion' class="form-control control input-sm cuentanumero" value = '{{$empresa->TXT_DETRACCION}}'>
-                            </div>
-                          </div>
-                        </div>
+                      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px;">
 
 
-                        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 cajareporte">
+                          <div class="col-xs-12 col-sm-4 col-md-4 col-lg-3">
                             <div class="form-group">
-                              <label class="col-sm-12 control-label labelleft" style="text-align: left;"><b>Valor Detraccion (*):</b></label>
+                              <label class="col-sm-12 control-label labelleft" style="text-align: left;"><b>Cuenta Detracción (*): solo numero</b></label>
                               <div class="col-sm-12 abajocaja" >
-                                {!! Form::select( 'tipo_detraccion_id', $combotipodetraccion, array($fedocumento->VALOR_DETRACCION),
-                                                  [
-                                                    'class'       => 'select2 form-control control input-xs' ,
-                                                    'id'          => 'tipo_detraccion_id',
-                                                    'data-aw'     => '1',
-                                                  ]) !!}
+                                  <input type="text" name="ctadetraccion" id='ctadetraccion' class="form-control control input-sm cuentanumero" value = '{{$empresa->TXT_DETRACCION}}'>
                               </div>
                             </div>
-                        </div>
-
-                        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-3">
-                          <div class="form-group">
-                            <label class="col-sm-12 control-label labelleft" style="text-align: left;"><b>Monto de Detracion (*):</b></label>
-                            <div class="col-sm-12 abajocaja" >
-                                <input type="text" name="monto_detraccion" id='monto_detraccion' class="form-control control input-sm importe" value = '{{$fedocumento->MONTO_DETRACCION}}'>
-                            </div>
                           </div>
-                        </div>
 
-                        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 cajareporte">
+
+                          <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 cajareporte">
+                              <div class="form-group">
+                                <label class="col-sm-12 control-label labelleft" style="text-align: left;"><b>Valor Detraccion (*):</b></label>
+                                <div class="col-sm-12 abajocaja" >
+                                  {!! Form::select( 'tipo_detraccion_id', $combotipodetraccion, array($fedocumento->VALOR_DETRACCION),
+                                                    [
+                                                      'class'       => 'select2 form-control control input-xs' ,
+                                                      'id'          => 'tipo_detraccion_id',
+                                                      'data-aw'     => '1',
+                                                    ]) !!}
+                                </div>
+                              </div>
+                          </div>
+
+                          <div class="col-xs-12 col-sm-4 col-md-4 col-lg-3">
                             <div class="form-group">
-                              <label class="col-sm-12 control-label labelleft" style="text-align: left;"><b>Pago Detraccion (*):</b></label>
+                              <label class="col-sm-12 control-label labelleft" style="text-align: left;"><b>Monto de Detracion (*):</b></label>
                               <div class="col-sm-12 abajocaja" >
-                                {!! Form::select( 'pago_detraccion', $combopagodetraccion, array($fedocumento->COD_PAGO_DETRACCION),
-                                                  [
-                                                    'class'       => 'select2 form-control control input-xs' ,
-                                                    'id'          => 'pago_detraccion',
-                                                    'data-aw'     => '1',
-                                                  ]) !!}
+                                  <input type="text" name="monto_detraccion" id='monto_detraccion' class="form-control control input-sm importe" value = '{{$fedocumento->MONTO_DETRACCION}}'>
                               </div>
                             </div>
-                        </div>
+                          </div>
+
+                          <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 cajareporte">
+                              <div class="form-group">
+                                <label class="col-sm-12 control-label labelleft" style="text-align: left;"><b>Pago Detraccion (*):</b></label>
+                                <div class="col-sm-12 abajocaja" >
+                                  {!! Form::select( 'pago_detraccion', $combopagodetraccion, array($fedocumento->COD_PAGO_DETRACCION),
+                                                    [
+                                                      'class'       => 'select2 form-control control input-xs' ,
+                                                      'id'          => 'pago_detraccion',
+                                                      'data-aw'     => '1',
+                                                    ]) !!}
+                                </div>
+                              </div>
+                          </div>
 
 
 
-                    </div>
+                      </div>
 
 
-              </div>
+                </div>
+        </div>
       </div>
     </div>
   </div>
-</div>
-
+@ENDIF
 
 <div class="row">
   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">

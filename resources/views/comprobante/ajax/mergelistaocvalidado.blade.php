@@ -7,7 +7,11 @@
     @if($operacion_id == 'COMISION')
       @include('comprobante.ajax.alistaocvalidadocomision')
     @else
-      @include('comprobante.ajax.alistaocvalidadoestiba')
+      @if($operacion_id == 'LIQUIDACION_COMPRA_ANTICIPO')
+        @include('comprobante.ajax.alistaocvalidadoliquidacioncompraanticipo')
+      @else
+        @include('comprobante.ajax.alistaocvalidadoestiba')
+      @endif
     @endif
   @endif
 @endif

@@ -1,45 +1,32 @@
 
 <div class="row">
   <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-    @include('comprobante.form.estiba.comparar')
-  </div>
-  @IF($fedocumento->OPERACION != 'DOCUMENTO_INTERNO_COMPRA')
-    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-        @include('comprobante.form.contrato.consultaapi')
-        @include('comprobante.form.contrato.infodetraccion')
-    </div>
-  @ENDIF
+    @include('comprobante.form.liquidacioncompraanticipo.comparar')
+  </div>  
   <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-    @include('comprobante.form.contrato.seguimiento')
+    @include('comprobante.form.liquidacioncompraanticipo.seguimiento')
   </div> 
 </div>
-
 <div class="row">
   <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-    @include('comprobante.form.estiba.archivos')
+    @include('comprobante.form.liquidacioncompraanticipo.archivos')
   </div>
   <div class="col-xs-12 col-sm-6 col-md-8 col-lg-8">
-    @include('comprobante.form.estiba.informacion')
+    @include('comprobante.form.liquidacioncompraanticipo.informacion')
   </div>
 </div>
 
-@IF($fedocumento->OPERACION != 'DOCUMENTO_INTERNO_COMPRA')
-  <div class="row">
-      @include('comprobante.form.contrato.pagobanco')
-  </div>
 
-  <div class="row">
-      @include('comprobante.form.contrato.detraccion')
-  </div>
-@ENDIF
 <div class="row">
   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
     @include('comprobante.form.ordencompra.verarchivopdfmultiple')
   </div>
 </div>
+
+
 <div class="row">
   <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-    @include('comprobante.form.estiba.archivosobservados')
+    @include('comprobante.form.liquidacioncompraanticipo.archivosobservados')
   </div>
 </div>
 
@@ -112,7 +99,7 @@
   </div>
   <div class="col-xs-6">
     <p class="text-right">
-      <a href="{{ url('/gestion-de-comprobante-contabilidad/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
+      <a href="{{ url('/gestion-de-administracion-aprobar/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
       <button type="submit" class="btn btn-space btn-primary btnaprobarcomporbatnte">Guardar</button>
     </p>
   </div>
