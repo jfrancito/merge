@@ -7273,6 +7273,7 @@ trait ComprobanteTraits
                                     ->where('COD_ESTADO','=',1)                                    
                                     ->get();
 
+    }
     private function con_lista_detalle_comprobante_idoc_actual_af($idoc) {
 
         $doc    =   VMergeActualAF::where('COD_ORDEN','=',$idoc)
