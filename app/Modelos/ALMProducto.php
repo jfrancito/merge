@@ -12,6 +12,11 @@ class ALMProducto extends Model
 	public $incrementing        =   false;
     public $keyType             =   'string';
 
+    public function unidadmedida()
+    {
+        return $this->belongsTo('App\Modelos\CMPCategoria', 'COD_CATEGORIA_UNIDAD_MEDIDA', 'COD_CATEGORIA');
+    }
+
 }
 
 
