@@ -3939,23 +3939,30 @@ class GestionLiquidacionGastosController extends Controller
                     if ($tipodoc_id == 'TDO0000000000001') {
 
 
-                        if($ULTIMA_FECHA_RENDICION_DET!=''){
-
-                            //$fechaInicio = Carbon::parse($PRIMERA_FECHA_RENDICION_DET);
-                            //$fechaFin = Carbon::parse($ULTIMA_FECHA_RENDICION_DET);
-                            $fechaInicio = Carbon::parse($PRIMERA_FECHA_RENDICION_DET)->startOfDay();
-                            $fechaFin = Carbon::parse($ULTIMA_FECHA_RENDICION_DET)->endOfDay();
-                            $fechaMin = Carbon::parse($request['fecha_emision']);
 
 
-                            // Validar si está dentro del rango
-                            if (!$fechaMin->between($fechaInicio, $fechaFin)) {
-                                return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/-1')
-                                       ->with('errorbd', 'La fecha de emisión (' . $fechaMin->format('Y-m-d') . ') no está dentro del rango a rendir (' . 
-                                       $fechaInicio->format('Y-m-d') . ' / ' . $fechaFin->format('Y-m-d') . ')');
+                        if($request['producto_id_factura'] != 'SERVICIO DE TRANSPORTE DE PASAJEROS'){
+
+                            if($ULTIMA_FECHA_RENDICION_DET!=''){
+
+                                //$fechaInicio = Carbon::parse($PRIMERA_FECHA_RENDICION_DET);
+                                //$fechaFin = Carbon::parse($ULTIMA_FECHA_RENDICION_DET);
+                                $fechaInicio = Carbon::parse($PRIMERA_FECHA_RENDICION_DET)->startOfDay();
+                                $fechaFin = Carbon::parse($ULTIMA_FECHA_RENDICION_DET)->endOfDay();
+                                $fechaMin = Carbon::parse($request['fecha_emision']);
+
+
+                                // Validar si está dentro del rango
+                                if (!$fechaMin->between($fechaInicio, $fechaFin)) {
+                                    return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/-1')
+                                           ->with('errorbd', 'La fecha de emisión (' . $fechaMin->format('Y-m-d') . ') no está dentro del rango a rendir (' . 
+                                           $fechaInicio->format('Y-m-d') . ' / ' . $fechaFin->format('Y-m-d') . ')');
+                                }
+
                             }
-
+                            
                         }
+
 
 
                         $fetoken = FeToken::where('COD_EMPR', '=', Session::get('empresas')->COD_EMPR)->where('TIPO', '=', 'COMPROBANTE_PAGO')->first();

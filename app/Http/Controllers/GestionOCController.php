@@ -2606,7 +2606,10 @@ class GestionOCController extends Controller
 
                         $idoc                   =   $ordenpago->COD_DOCUMENTO_CTBLE;
                         $ordencompra            =   $this->con_lista_cabecera_comprobante_contrato_idoc_actual($idoc);
+                        //dd($idoc);
                         $detalleordencompra     =   $this->con_lista_detalle_liquidacion_compra_comprobante_idoc($idoc);
+
+                        //dd($detalleordencompra);
                         $procedencia            =   $request['procedencia'];
                         $ingresoliq_id          =   $request['ingresoliq_id'];                        
 
@@ -2739,6 +2742,9 @@ class GestionOCController extends Controller
                         $documento->CAN_CENTIMO             =   0;
                        
                         $documento->save();                        
+
+
+                        //dd($detalleordencompra);
 
                         /**********DETALLE*********/
                         foreach ($detalleordencompra as $indexdet => $itemdet) {

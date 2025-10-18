@@ -1465,6 +1465,8 @@ class GestionPlanillaMovilidadController extends Controller
             if(count($trabajador)>0){
                 $dni        =       $trabajador->NRO_DOCUMENTO;
             }
+
+            //dd($dni);
             $trabajadorespla    =   DB::table('WEB.platrabajadores')
                                     ->where('situacion_id', 'PRMAECEN000000000002')
                                     ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
