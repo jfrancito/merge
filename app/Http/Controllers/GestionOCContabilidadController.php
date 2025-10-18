@@ -3810,7 +3810,8 @@ class GestionOCContabilidadController extends Controller
                 $respuesta = $asiento_compra[0][0]['RESPUESTA'];
             }
 
-            if ($respuesta === 'ASIENTO CORRECTO') {
+            //if ($respuesta === 'ASIENTO CORRECTO') {
+            if (!empty($asiento_compra)) {
 
                 $ind_reversion = 'R';
 
@@ -6153,7 +6154,7 @@ class GestionOCContabilidadController extends Controller
         }
     }
 
-    
+
     public function actionRegistrarActivoFijoCategoria($idoc, $COD_PRODUCTO,Request $request)
     {
         $COD_CAT_ACTFIJO        =   $request['COD_CATEGORIA_AF'];
@@ -6167,7 +6168,7 @@ class GestionOCContabilidadController extends Controller
         $idcheckbox             =   $request['idcheckbox'];
         $error                  =   false;
         $mensaje                =   'REGISTRO CATEGORIA EXITOSO';
-        
+
         try {
 
             $oeExiste           =   CMPDetalleProductoAF::where('COD_TABLA',$COD_TABLA)->where('COD_PRODUCTO',$COD_PRODUCTO)->where('NRO_LINEA',$NRO_LINEA)->first();
@@ -6215,7 +6216,7 @@ class GestionOCContabilidadController extends Controller
         return response()->json($datos);
 
         // return $rpta;
-      
+
     }
 
 
@@ -6237,7 +6238,7 @@ class GestionOCContabilidadController extends Controller
         $oeProductoAF           =   CMPDetalleProductoAF::where('COD_PRODUCTO',$COD_PRODUCTO)->where('COD_TABLA',$idoc)->where('NRO_LINEA',$oeProducto->NRO_LINEA)->first();
         $select_categoria_id    =   ($oeProductoAF)?$oeProductoAF->COD_CAT_ACTFIJO:'';
         return View::make('comprobante/modal/ajax/mcategoriaactivofijo',
-                         [          
+                         [
                             'COD_PRODUCTO'              => $COD_PRODUCTO,
                             'CAN_PRODUCTO'             => $CAN_PRODUCTO,
                             'COD_LOTE'                  => $COD_LOTE,
@@ -6250,9 +6251,9 @@ class GestionOCContabilidadController extends Controller
                             'oeProducto'                =>  $oeProducto,
                             'idcheckbox'                =>  $idcheckbox,
                             'idoc'                      => $idoc,
-                            'ajax'                      => true,                            
+                            'ajax'                      => true,
                          ]);
-    
+
     }
 
     public function actionEliminarActivoFijoCategoria($idoc, $COD_PRODUCTO,$COD_LOTE,$NRO_LINEA,Request $request)
@@ -6265,7 +6266,7 @@ class GestionOCContabilidadController extends Controller
         $idcheckbox             =   $request['idcheckbox'];
         $error                  =   false;
         $mensaje                =   'ELIMINACION DE CATEGORIA AF EXITOSA';
-        
+
         try {
 
             $oeExiste           =   CMPDetalleProductoAF::where('COD_TABLA',$COD_TABLA)->where('COD_PRODUCTO',$COD_PRODUCTO)->where('NRO_LINEA',$NRO_LINEA)->first();
