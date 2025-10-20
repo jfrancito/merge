@@ -1207,6 +1207,7 @@ trait LiquidacionGastoTraits
 
                 $detdocumentolg         =   LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
                                             ->where('ITEM','=',$item->ITEM)
+                                            ->whereRaw("ISNULL(IND_OSIRIS, 0) <> 1")
                                             ->where('ACTIVO','=','1')->get();
                                             
                 foreach($detdocumentolg as $indexdoc => $itemdoc){
@@ -1595,6 +1596,7 @@ trait LiquidacionGastoTraits
     private function lg_calcular_total_observar($iddocumento) {
 
         $detdocumentolg                     =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
+                                                ->whereRaw("ISNULL(IND_OSIRIS, 0) <> 1")
                                                 ->where('ACTIVO','=',1)
                                                 ->get();
 
@@ -1612,6 +1614,7 @@ trait LiquidacionGastoTraits
     private function lg_calcular_total_detalle($iddocumento) {
 
          $detdocumentolg                     =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
+                                                ->whereRaw("ISNULL(IND_OSIRIS, 0) <> 1")
                                                 ->where('ACTIVO','=',1)
                                                 ->get();
 
@@ -1643,6 +1646,7 @@ trait LiquidacionGastoTraits
                             ]);
 
         $detdocumentolg                     =   LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
+                                                ->whereRaw("ISNULL(IND_OSIRIS, 0) <> 1")
                                                 ->where('ACTIVO','=',1)
                                                 ->get();
 
@@ -1659,6 +1663,7 @@ trait LiquidacionGastoTraits
     private function lg_calcular_total_cabecera($iddocumento) {
 
         $detdocumentolg                     =   LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
+                                                ->whereRaw("ISNULL(IND_OSIRIS, 0) <> 1")
                                                 ->where('ACTIVO','=',1)
                                                 ->get();
 
