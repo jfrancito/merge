@@ -4703,7 +4703,7 @@ class GestionLiquidacionGastosController extends Controller
             $combocb = array('' => "Seleccione Cuenta Bancaria");
         }
 
-        if($liquidaciongastos->ARENDIR == 'REEMBOLSO'){
+        if($liquidaciongastos->ARENDIR != 'REEMBOLSO'){
             $tipopago_id = 'MPC0000000000001';
         }
 
