@@ -2271,7 +2271,10 @@ class GestionLiquidacionGastosController extends Controller
                 $anio = $this->anio;
                 $mes = $this->mes;
                 $periodo = $this->gn_periodo_actual_xanio_xempresa($anio, $mes, Session::get('empresas')->COD_EMPR);
-                $osiris = $this->lg_enviar_osiris($liquidaciongastos, $tdetliquidaciongastos, $detdocumentolg, $SERIE, $CORRELATIVO, $periodo);
+
+                $tdetliquidaciongastos_sinaereo = LqgDetLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->whereRaw("ISNULL(IND_OSIRIS, 0) <> 1")->where('ACTIVO', '=', '1')->get();
+
+                $osiris = $this->lg_enviar_osiris($liquidaciongastos, $tdetliquidaciongastos_sinaereo, $detdocumentolg, $SERIE, $CORRELATIVO, $periodo);
                 LqgLiquidacionGasto::where('ID_DOCUMENTO', $liquidaciongastos->ID_DOCUMENTO)
                     ->update(
                         [
@@ -3675,6 +3678,31 @@ class GestionLiquidacionGastosController extends Controller
                     ->get();
             }
 
+            if($detliquidaciongasto->COD_TIPODOCUMENTO !='TDO0000000000010'){
+                if($request['producto_id'] == 'SERVICIO DE TRANSPORTE AEREO'){
+                    return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/' . $item)->with('errorbd', 'Este producto solo se puede registrar con ticket');
+                }
+            }
+
+            $IND_OSIRIS = 0;
+            if($detliquidaciongasto->COD_TIPODOCUMENTO =='TDO0000000000010'){
+                if($request['producto_id'] == 'SERVICIO DE TRANSPORTE AEREO'){
+                    $IND_OSIRIS = 1;
+
+                    LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
+                                ->update(
+                                        [
+                                            'IND_OSIRIS'=> 1
+                                        ]); 
+
+                }
+            }
+
+            if($request['producto_id'] == 'MOVILIDAD AEROPUERTO'){
+                return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/' . $item)->with('errorbd', 'Este producto solo se puede registrar con factura');
+            }
+
+
             if(count($ldetallearendir)>0){
                 if(count($referencia_asoc)>0){
                     $mensaje_error_vale = $this->validar_reembolso_supere_monto($liquidaciongastos,$liquidaciongastos->ARENDIR,$referencia_asoc->COD_TABLA,$importe,$producto_id);
@@ -3691,6 +3719,9 @@ class GestionLiquidacionGastosController extends Controller
             if ($igv_id == '1') {
                 $subtotal = $importe / 1.18;
             }
+
+
+
 
 
             $cabecera = new LqgDetDocumentoLiquidacionGasto;
@@ -3711,6 +3742,8 @@ class GestionLiquidacionGastosController extends Controller
             $cabecera->TXT_CENTRO = $detliquidaciongasto->TXT_CENTRO;
             $cabecera->FECHA_CREA = $this->fechaactual;
             $cabecera->USUARIO_CREA = Session::get('usuario')->id;
+            $cabecera->IND_OSIRIS = $IND_OSIRIS;
+
             $cabecera->save();
 
             //CALCULAR TOTALES
@@ -3832,14 +3865,14 @@ class GestionLiquidacionGastosController extends Controller
                     return stripos($item, 'FACTURA') !== false;
                 }));
 
-                //$tieneFactura = in_array('FACTURA', $comprobantes);
+                $tieneFactura = in_array('FACTURA', $comprobantes);
 
 
-                // if (!in_array($tipodoc_id, ['TDO0000000000001', 'TDO0000000000010'])) {
-                //     if ($tieneFactura == 1) {
-                //         return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/-1')->with('errorbd', 'Este proveedor emite FACTURA');
-                //     }
-                // }
+                if (!in_array($tipodoc_id, ['TDO0000000000001', 'TDO0000000000010'])) {
+                    if ($tieneFactura == 1) {
+                        return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/-1')->with('errorbd', 'Este proveedor emite FACTURA');
+                    }
+                }
                 $token = '';
 
                 $PRIMERA_FECHA_RENDICION_DET =     $request['PRIMERA_FECHA_RENDICION_DET'];
@@ -3869,10 +3902,14 @@ class GestionLiquidacionGastosController extends Controller
                         $fechaMin = Carbon::parse($fechaMinima);
                         $fechaMax = Carbon::parse($fechaMaxima);
                         // Validar que estén dentro del rango
-                        // if (!($fechaMin->between($fechaInicio, $fechaFin) && $fechaMax->between($fechaInicio, $fechaFin))) {
-                        //     return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/-1')
-                        //            ->with('errorbd', 'Las fechas de movilidad no están dentro del rango a rendir (' . $fechaInicio->format('Y-m-d') . ' / ' . $fechaFin->format('Y-m-d') . ')');
-                        // }
+
+                        if($liquidaciongastos->REEMBOLSO != 'REEMBOLSO'){
+                            if (!($fechaMin->between($fechaInicio, $fechaFin) && $fechaMax->between($fechaInicio, $fechaFin))) {
+                                return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/-1')
+                                       ->with('errorbd', 'Las fechas de movilidad no están dentro del rango a rendir (' . $fechaInicio->format('Y-m-d') . ' / ' . $fechaFin->format('Y-m-d') . ')');
+                            }   
+                        }
+
                     }
 
                     $planillamovilidad = DB::table('PLA_MOVILIDAD')
@@ -3938,7 +3975,7 @@ class GestionLiquidacionGastosController extends Controller
 
                     if ($tipodoc_id == 'TDO0000000000001') {
 
-
+                                //MOVILIDAD AEROPUERTO
 
 
                         if($request['producto_id_factura'] != 'SERVICIO DE TRANSPORTE DE PASAJEROS'){
@@ -3951,12 +3988,13 @@ class GestionLiquidacionGastosController extends Controller
                                 $fechaFin = Carbon::parse($ULTIMA_FECHA_RENDICION_DET)->endOfDay();
                                 $fechaMin = Carbon::parse($request['fecha_emision']);
 
-
-                                // Validar si está dentro del rango
-                                if (!$fechaMin->between($fechaInicio, $fechaFin)) {
-                                    return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/-1')
-                                           ->with('errorbd', 'La fecha de emisión (' . $fechaMin->format('Y-m-d') . ') no está dentro del rango a rendir (' . 
-                                           $fechaInicio->format('Y-m-d') . ' / ' . $fechaFin->format('Y-m-d') . ')');
+                                if($liquidaciongastos->REEMBOLSO != 'REEMBOLSO'){
+                                    // Validar si está dentro del rango
+                                    if (!$fechaMin->between($fechaInicio, $fechaFin)) {
+                                        return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/-1')
+                                               ->with('errorbd', 'La fecha de emisión (' . $fechaMin->format('Y-m-d') . ') no está dentro del rango a rendir (' . 
+                                               $fechaInicio->format('Y-m-d') . ' / ' . $fechaFin->format('Y-m-d') . ')');
+                                    }
                                 }
 
                             }
@@ -4020,10 +4058,16 @@ class GestionLiquidacionGastosController extends Controller
                             $fechaMin = Carbon::parse($request['fecha_emision']);
 
 
-                            if (!$fechaMin->between($fechaInicio, $fechaFin)) {
-                                return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/-1')
-                                       ->with('errorbd', 'La fecha de emisión (' . $fechaMin->format('Y-m-d') . ') no está dentro del rango a rendir (' . $fechaInicio->format('Y-m-d') . ' / ' . $fechaFin->format('Y-m-d') . ')');
+                            if($liquidaciongastos->REEMBOLSO != 'REEMBOLSO'){
+
+                                if (!$fechaMin->between($fechaInicio, $fechaFin)) {
+                                    return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/-1')
+                                           ->with('errorbd', 'La fecha de emisión (' . $fechaMin->format('Y-m-d') . ') no está dentro del rango a rendir (' . $fechaInicio->format('Y-m-d') . ' / ' . $fechaFin->format('Y-m-d') . ')');
+                                }
+
                             }
+
+
 
                         }
 
@@ -4205,22 +4249,28 @@ class GestionLiquidacionGastosController extends Controller
                     $producto = DB::table('ALM.PRODUCTO')->where('NOM_PRODUCTO', '=', $request['producto_id_factura'])->first();
 
 
-                    // $importe = $request['totaldetalle'];
-                    // $resta = 0;
-                    // $liquidaciongastos = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->first();
-                    // $referencia_asoc =  DB::table('CMP.REFERENCIA_ASOC')
-                    //                     ->where('TXT_DESCRIPCION', 'ARENDIR')
-                    //                     ->where('TXT_TABLA_ASOC', $producto->NOM_PRODUCTO)
-                    //                     ->first();
+                    if($request['producto_id_factura'] != 'MOVILIDAD AEROPUERTO'){
 
-                    // if(count($referencia_asoc)>0){
-                    //     $mensaje_error_vale = $this->validar_reembolso_supere_monto($liquidaciongastos,$liquidaciongastos->ARENDIR,$referencia_asoc->COD_TABLA,$importe,$producto_id,$resta);
-                    //     if($mensaje_error_vale!=''){
-                    //         return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/' . $item)->with('errorbd', $mensaje_error_vale); 
-                    //     }
-                    // }else{
-                    //     return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/' . $item)->with('errorbd', 'Este producto no esta relacionado en la tabla referencia');
-                    // }
+                        $importe = $request['totaldetalle'];
+                        $resta = 0;
+                        $liquidaciongastos = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->first();
+                        $referencia_asoc =  DB::table('CMP.REFERENCIA_ASOC')
+                                            ->where('TXT_DESCRIPCION', 'ARENDIR')
+                                            ->where('TXT_TABLA_ASOC', $producto->NOM_PRODUCTO)
+                                            ->first();
+
+                        if(count($referencia_asoc)>0){
+                            $mensaje_error_vale = $this->validar_reembolso_supere_monto($liquidaciongastos,$liquidaciongastos->ARENDIR,$referencia_asoc->COD_TABLA,$importe,$producto_id,$resta);
+                            if($mensaje_error_vale!=''){
+                                return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/' . $item)->with('errorbd', $mensaje_error_vale); 
+                            }
+                        }else{
+                            return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/' . $item)->with('errorbd', 'Este producto no esta relacionado en la tabla referencia');
+                        }
+
+
+                    }
+
 
 
                     //dd($producto);
@@ -4899,6 +4949,11 @@ class GestionLiquidacionGastosController extends Controller
             $combocb = array('' => "Seleccione Cuenta Bancaria");
         }
 
+        if($liquidaciongastos->ARENDIR == 'REEMBOLSO'){
+            $tipopago_id = 'MPC0000000000001';
+        }
+
+
         //dd($cuentaco_id);
         return View::make('liquidaciongasto.modificarliquidaciongastos',
             [
@@ -5001,9 +5056,9 @@ class GestionLiquidacionGastosController extends Controller
                     list($aniovale, $mesvale, $diavale) = explode('-', $fechavale);
                     $aniosistemas = date("Y");
                     $messistemas = date("m");
-                    if ($aniovale != $aniosistemas && $mesvale != $messistemas) {
-                        return Redirect::to('agregar-liquidacion-gastos/' . $idopcion)->with('errorbd', 'La fecha del arendir no corresponde esta dentro del periodo de la Liquidacion de Gasto');
-                    }
+                    // if ($aniovale != $aniosistemas && $mesvale != $messistemas) {
+                    //     return Redirect::to('agregar-liquidacion-gastos/' . $idopcion)->with('errorbd', 'La fecha del arendir no corresponde esta dentro del periodo de la Liquidacion de Gasto');
+                    // }
 
                     //dd($fechavale);
                 } else {

@@ -3186,6 +3186,14 @@ $(document).ready(function () {
             }
 
             var producto_id_factura = $('#producto_id_factura').val();
+
+            if (producto_id_factura == "SERVICIO DE TRANSPORTE AEREO") {
+                    alerterrorajax("Este Producto solo se debe subir con ticket.");
+                    cerrarcargando();
+                    return false;
+            }
+
+
             var igv_id_factura = $('#igv_id_factura').val();
             var ESTADOCP = $('#ESTADOCP').val();
             var ESTADORUC = $('#ESTADORUC').val();
