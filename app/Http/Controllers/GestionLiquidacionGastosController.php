@@ -449,6 +449,13 @@ class GestionLiquidacionGastosController extends Controller
                     $centro_id = 'CEN0000000000001';
                 }
 
+                if (Session::get('usuario')->id == '1CIX00000380') {
+                    $centro_id = 'CEN0000000000002';
+                }
+                if (Session::get('usuario')->id == '1CIX00000391') {
+                    $centro_id = 'CEN0000000000002';
+                }
+
 
                 if ($centro_id == '') {
                     return Redirect::to('gestion-de-empresa-proveedor/' . $idopcion)->with('errorbd', 'No tienes un Centro Asignado');
@@ -544,6 +551,13 @@ class GestionLiquidacionGastosController extends Controller
 
         if (Session::get('usuario')->id == '1CIX00000040') {
             $centro_id = 'CEN0000000000001';
+        }
+
+        if (Session::get('usuario')->id == '1CIX00000380') {
+            $centro_id = 'CEN0000000000002';
+        }
+        if (Session::get('usuario')->id == '1CIX00000391') {
+            $centro_id = 'CEN0000000000002';
         }
 
         $contratos = DB::table('CMP.CONTRATO')
@@ -5128,6 +5142,12 @@ class GestionLiquidacionGastosController extends Controller
             $centro_id = 'CEN0000000000001';
         }
 
+        if (Session::get('usuario')->id == '1CIX00000380') {
+            $centro_id = 'CEN0000000000002';
+        }
+        if (Session::get('usuario')->id == '1CIX00000391') {
+            $centro_id = 'CEN0000000000002';
+        }
 
         $cadena = $empresa_id;
         $partes = explode(" - ", $cadena);
@@ -5180,6 +5200,14 @@ class GestionLiquidacionGastosController extends Controller
         if (Session::get('usuario')->id == '1CIX00000040') {
             $centro_id = 'CEN0000000000001';
         }
+        
+        if (Session::get('usuario')->id == '1CIX00000380') {
+            $centro_id = 'CEN0000000000002';
+        }
+        if (Session::get('usuario')->id == '1CIX00000391') {
+            $centro_id = 'CEN0000000000002';
+        }
+
 
         $cadena = $empresa_id;
         $partes = explode(" - ", $cadena);
