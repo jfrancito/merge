@@ -184,22 +184,47 @@ trait PrecioCompetenciaTraits
 
 		$array_nombre_archivo = array();
 		$curl = curl_init();
-		curl_setopt_array($curl, array(
-		  CURLOPT_URL => $urlxml,
-		  CURLOPT_RETURNTRANSFER => true,
-		  CURLOPT_ENCODING => '',
-		  CURLOPT_MAXREDIRS => 10,
+		// curl_setopt_array($curl, array(
+		//   CURLOPT_URL => $urlxml,
+		//   CURLOPT_RETURNTRANSFER => true,
+		//   CURLOPT_ENCODING => '',
+		//   CURLOPT_MAXREDIRS => 10,
 
-			CURLOPT_TIMEOUT => 15, // 👈 máximo 10 segundos para la respuesta
-			CURLOPT_CONNECTTIMEOUT => 10, // 👈 máximo 5 segundos para conectar
+		// 	CURLOPT_TIMEOUT => 15, // 👈 máximo 10 segundos para la respuesta
+		// 	CURLOPT_CONNECTTIMEOUT => 10, // 👈 máximo 5 segundos para conectar
 
-		  CURLOPT_FOLLOWLOCATION => true,
-		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-		  CURLOPT_CUSTOMREQUEST => 'GET',
-		  CURLOPT_HTTPHEADER => array(
-		    'Authorization: Bearer '.$fetoken->TOKEN
-		  ),
-		));
+		//   CURLOPT_FOLLOWLOCATION => true,
+		//   CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		//   CURLOPT_CUSTOMREQUEST => 'GET',
+		//   CURLOPT_HTTPHEADER => array(
+		//     'Authorization: Bearer '.$fetoken->TOKEN
+		//   ),
+		// ));
+
+    curl_setopt_array($curl, array(
+        CURLOPT_URL => $urlxml,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 15, // máximo 15 segundos para la respuesta
+        CURLOPT_CONNECTTIMEOUT => 10, // máximo 10 segundos para conectar
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'GET',
+        CURLOPT_HTTPHEADER => array(
+            'Accept: application/json, text/plain, */*',
+            'Accept-Encoding: gzip, deflate, br, zstd',
+            'Accept-Language: es-ES,es;q=0.9',
+            'Origin: https://e-factura.sunat.gob.pe',
+            'Referer: https://e-factura.sunat.gob.pe/',
+            'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+                . 'AppleWebKit/537.36 (KHTML, like Gecko) '
+                . 'Chrome/141.0.0.0 Safari/537.36',
+            'Authorization: Bearer '.$fetoken->TOKEN
+        ),
+    ));
+
+
 		$response = curl_exec($curl);
 		curl_close($curl);
 
