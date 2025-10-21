@@ -312,8 +312,11 @@ class CpeController extends Controller {
 			$correlativo 	 		 	= 	$request['correlativo'];
 			$fetoken 					=	FeToken::where('COD_EMPR','=',Session::get('empresas')->COD_EMPR)->where('TIPO','=','COMPROBANTE_PAGO')->first();
 			//buscar xml
+
 			$urlxml 					= 	'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/02';
 			$respuetaxml 				=	$this->buscar_archivo_sunat($urlxml,$fetoken);
+
+			//dd($respuetaxml);
 			$urlxml 					= 	'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/01';
 			$respuetapdf 				=	$this->buscar_archivo_sunat($urlxml,$fetoken);
 			$urlxml 					= 	'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/03';
