@@ -225,6 +225,21 @@ class Funcion {
 		return $idopcioncompleta;
 
 	}
+	public function decodificarmaestratercero($id) {
+
+		//decodificar variable
+		$iddeco = Hashids::decode($id);
+
+		//ver si viene con letras la cadena codificada
+		if (count($iddeco) == 0) {
+			return '';
+		}
+
+		$idopcioncompleta = $iddeco[0];
+		$idopcioncompleta = $idopcioncompleta;
+		return $idopcioncompleta;
+
+	}
 
 
 	public function decodificarmaestra($id) {

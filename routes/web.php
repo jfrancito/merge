@@ -228,6 +228,15 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/gestion-de-usuarios/{idopcion}', 'UserController@actionListarUsuarios');
 	Route::any('/agregar-usuario/{idopcion}', 'UserController@actionAgregarUsuario');
 	Route::any('/modificar-usuario/{idopcion}/{idusuario}', 'UserController@actionModificarUsuario');
+
+
+
+	Route::any('/gestion-de-registros-terceros/{idopcion}', 'UserController@actionListarTerceros');
+	Route::any('/agregar-tercero/{idopcion}', 'UserController@actionAgregarTercero');
+	Route::any('/modificar-tercero/{idopcion}/{idusuario}', 'UserController@actionModificarTercero');
+
+
+
 	Route::any('/ajax-activar-perfiles', 'UserController@actionAjaxActivarPerfiles');
 
 	Route::any('/gestion-de-roles/{idopcion}', 'UserController@actionListarRoles');
