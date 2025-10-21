@@ -1486,10 +1486,15 @@ class GestionPlanillaMovilidadController extends Controller
                 $centro_id = 'CEN0000000000001';
             }
 
+            if (Session::get('usuario')->id == '1CIX00000380') {
+                $centro_id = 'CEN0000000000002';
+            }
+
+
 
             $periodo        =   $this->gn_periodo_actual_xanio_xempresa($anio, $mes, Session::get('empresas')->COD_EMPR);
 
-            //dd($centro_id);
+            //dd($dni);
 
             $serie          =   $this->gn_serie($anio, $mes,$centro_id);
             $numero         =   $this->gn_numero($serie,$centro_id);
