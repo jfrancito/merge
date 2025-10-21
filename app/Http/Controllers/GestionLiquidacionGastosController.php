@@ -3897,10 +3897,16 @@ class GestionLiquidacionGastosController extends Controller
 
                     if($ULTIMA_FECHA_RENDICION_DET!=''){
 
-                        $fechaInicio = Carbon::parse($PRIMERA_FECHA_RENDICION_DET);
-                        $fechaFin = Carbon::parse($ULTIMA_FECHA_RENDICION_DET);
-                        $fechaMin = Carbon::parse($fechaMinima);
-                        $fechaMax = Carbon::parse($fechaMaxima);
+
+                        $fechaInicio = Carbon::parse($PRIMERA_FECHA_RENDICION_DET)->startOfDay();
+                        $fechaFin = Carbon::parse($ULTIMA_FECHA_RENDICION_DET)->endOfDay();
+                        $fechaMin = Carbon::parse($fechaMinima)->startOfDay();
+                        $fechaMax = Carbon::parse($fechaMaxima)->endOfDay();
+
+                        // $fechaInicio = Carbon::parse($PRIMERA_FECHA_RENDICION_DET);
+                        // $fechaFin = Carbon::parse($ULTIMA_FECHA_RENDICION_DET);
+                        // $fechaMin = Carbon::parse($fechaMinima);
+                        // $fechaMax = Carbon::parse($fechaMaxima);
                         // Validar que estén dentro del rango
 
                         if($liquidaciongastos->REEMBOLSO != 'REEMBOLSO'){
@@ -3909,6 +3915,7 @@ class GestionLiquidacionGastosController extends Controller
                                        ->with('errorbd', 'Las fechas de movilidad no están dentro del rango a rendir (' . $fechaInicio->format('Y-m-d') . ' / ' . $fechaFin->format('Y-m-d') . ')');
                             }   
                         }
+
 
                     }
 
@@ -4953,6 +4960,13 @@ class GestionLiquidacionGastosController extends Controller
 
             if (Session::get('usuario')->id == '1CIX00000040') {
                 $centro_id = 'CEN0000000000001';
+            }
+
+            if (Session::get('usuario')->id == '1CIX00000380') {
+                $centro_id = 'CEN0000000000002';
+            }
+            if (Session::get('usuario')->id == '1CIX00000391') {
+                $centro_id = 'CEN0000000000002';
             }
 
             $trabajador = DB::table('STD.TRABAJADOR')
