@@ -27,6 +27,8 @@ class ValeRendirControllerReembolso extends Controller
       public function actionValeRendirReembolso(Request $request)
 
     {
+
+
        $trabajador     =   DB::table('STD.TRABAJADOR')
                             ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
                             ->first();
@@ -43,12 +45,25 @@ class ValeRendirControllerReembolso extends Controller
             ->where('dni', $dni)
             ->first();
 
+
         if (!$trabajadorespla) {
             return view('valerendir.modal.modalerrorempresa', [
                 'mensaje' => 'No puede realizar un registro porque no es la empresa a cual pertenece.',
                 'ajax' => true
             ]);
         }
+
+        $cadlocal = trim(strtoupper($trabajadorespla->cadlocal ?? ''));
+
+       if (
+            stripos($cadlocal, 'SEDE ICA') !== false ||
+            stripos($cadlocal, 'SEDE CHIMBOTE') !== false
+        ) {
+            $trabajadorespla->centro_osiris_id = 'CEN0000000000002';
+        }
+     
+
+       
 
         $centro_id = $trabajadorespla->centro_osiris_id;
 
@@ -235,6 +250,8 @@ class ValeRendirControllerReembolso extends Controller
             ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
             ->where('dni', $dni)
             ->first();
+
+        
 
         if ($opcion === 'U') {
 
