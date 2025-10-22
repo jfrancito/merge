@@ -674,8 +674,13 @@ class ValeRendirController extends Controller
         $txt_glosa = $vale->first()->TXT_GLOSA ?? null;
         $txt_glosa_venta = $detallesImporte->pluck('TXT_GLOSA_VENTA')->filter()->implode(' // ');
         $txt_glosa_cobranza = $detallesImporte->pluck('TXT_GLOSA_COBRANZA')->filter()->implode(' // ');
+        
 
-
+       $trabajador     =   DB::table('STD.TRABAJADOR')
+                            ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                            ->first();
+        $dni            =       '';
+        $centro_id      =       '';
 
         if ($trabajador) {
             $dni = $trabajador->NRO_DOCUMENTO;
