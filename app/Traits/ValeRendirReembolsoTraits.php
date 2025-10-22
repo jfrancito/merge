@@ -54,8 +54,8 @@ trait ValeRendirReembolsoTraits
                                                                         @COD_ESTADO = ?,
                                                                         @COD_USUARIO_REGISTRO = ?');
 
-                 $cod_usuario_registro = Session::get('usuario')->id;
-                 $cod_empr = Session::get('empresas')->COD_EMPR;
+               $cod_usuario_registro = Session::get('usuario')->id;
+               $cod_empr = Session::get('empresas')->COD_EMPR;
                  
                $trabajador     =   DB::table('STD.TRABAJADOR')
                             ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
@@ -70,6 +70,15 @@ trait ValeRendirReembolsoTraits
                                         ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
                                         ->where('dni', $dni)
                                         ->first();
+                 $cadlocal = trim(strtoupper($trabajadorespla->cadlocal ?? ''));
+
+                if (
+                    stripos($cadlocal, 'SEDE ICA') !== false ||
+                    stripos($cadlocal, 'SEDE CHIMBOTE') !== false
+                ) {
+                    $trabajadorespla->centro_osiris_id = 'CEN0000000000002';
+                }
+     
                 if(count($trabajador)>0){
                     $centro_id      =       $trabajadorespla->centro_osiris_id;
                 }
@@ -79,7 +88,6 @@ trait ValeRendirReembolsoTraits
 
 
                 $cod_centro = $centrot->COD_CENTRO; 
-            
 
                  $stmt->bindParam(1, $ind_tipo_operacion, PDO::PARAM_STR);
                  $stmt->bindParam(2, $id, PDO::PARAM_STR);
@@ -393,9 +401,9 @@ trait ValeRendirReembolsoTraits
     {
         $array_lista_retail = array();
 
-        $cod_usuario_registro = Session::get('usuario')->id;
-        $cod_empr = Session::get('empresas')->COD_EMPR;
-        $trabajador     =   DB::table('STD.TRABAJADOR')
+            $cod_usuario_registro = Session::get('usuario')->id;
+            $cod_empr = Session::get('empresas')->COD_EMPR;
+            $trabajador     =   DB::table('STD.TRABAJADOR')
                             ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
                             ->first();
                 $dni            =       '';

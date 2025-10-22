@@ -13,6 +13,7 @@ use App\Modelos\WEBRegistroImporteGastos;
 use App\Modelos\ALMCentro;
 use App\Modelos\STDTrabajador;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 use Session;
 use App\WEBRegla, App\STDEmpresa, APP\User, App\CMPCategoria;
 use View;
@@ -74,6 +75,7 @@ class ValeRendirControllerReembolso extends Controller
         $cod_centro = $centrot->COD_CENTRO; 
         $nom_centro = $centrot->NOM_CENTRO; 
 
+
         $usuariosAu = DB::table('WEB.VALE_PERSONAL_AUTORIZA')
             ->where('COD_PERSONAL', Session::get('usuario')->usuarioosiris_id)
             ->where('COD_CENTRO', $cod_centro)
@@ -85,7 +87,7 @@ class ValeRendirControllerReembolso extends Controller
         $tipoMotivo = WEBTipoMotivoValeRendir::where('cod_estado',1)->pluck('txt_motivo', 'cod_motivo')->toArray();
         $cod_usuario_registro = Session::get('usuario')->id;
         $cod_empr = Session::get('empresas')->COD_EMPR;
-    
+
 
         // DETALLE - VALE A RENDIR 
          $destino = DB::table('WEB.REGISTRO_IMPORTE_GASTOS')
@@ -202,6 +204,7 @@ class ValeRendirControllerReembolso extends Controller
 
  public function insertValeRendirActionReembolso(Request $request)
     {
+
         $usuario_autoriza   = $request->input('usuario_autoriza');
         $usuario_aprueba    = $request->input('usuario_aprueba');
         $tipo_motivo        = $request->input('tipo_motivo');
@@ -250,8 +253,23 @@ class ValeRendirControllerReembolso extends Controller
             ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
             ->where('dni', $dni)
             ->first();
+        $cadlocal = trim(strtoupper($trabajadorespla->cadlocal ?? ''));
 
-        
+       if (
+            stripos($cadlocal, 'SEDE ICA') !== false ||
+            stripos($cadlocal, 'SEDE CHIMBOTE') !== false
+        ) {
+            $trabajadorespla->centro_osiris_id = 'CEN0000000000002';
+        }
+Log::info('insertValeRendirActionReembolso - Datos iniciales', [
+    'usuario_autoriza' => $usuario_autoriza,
+    'usuario_aprueba' => $usuario_aprueba,
+    'trabajadorespla' => $trabajadorespla,
+    'dni' => $dni,
+    'cod_empr_cli' => $cod_empr_cli,
+    'opcion' => $opcion,
+]);
+
 
         if ($opcion === 'U') {
 
@@ -260,10 +278,16 @@ class ValeRendirControllerReembolso extends Controller
                 return response()->json(['error' => 'Vale de rendir procesado correctamente.']);
             }
 
+            
+
             $this->insertValeRendirReembolso(
                 "U",
                 $vale_rendir_id,
-                "", "", "", "", "",
+                "", 
+                "", 
+                "", 
+                "", 
+                "",
                 $cod_empr_cli,
                 $txt_nom_solicita,
                 $usuario_autoriza,

@@ -853,7 +853,7 @@ $(document).ready(function(){
 
 
             let primerDiaMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-            let ultimoDiaMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
+            let ultimoDiaMes = new Date(hoy.getFullYear(), hoy.getMonth() + 2, 0);
 
 
             if (fechaMin < primerDiaMes) {
