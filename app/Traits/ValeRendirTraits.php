@@ -54,31 +54,52 @@ trait ValeRendirTraits
                                                                         @COD_ESTADO = ?,
                                                                         @COD_USUARIO_REGISTRO = ?');
 
-                 $cod_usuario_registro = Session::get('usuario')->id;
-                 $cod_empr = Session::get('empresas')->COD_EMPR;
-                 
-               $trabajador     =   DB::table('STD.TRABAJADOR')
-                            ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                    $cod_usuario_registro = Session::get('usuario')->id;
+                    $cod_empr = Session::get('empresas')->COD_EMPR;
+                     
+                    $trabajador     =   DB::table('STD.TRABAJADOR')
+                                ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                                ->first();
+                    $dni            =       '';
+                    $centro_id      =       '';
+
+                    if ($trabajador) {
+                        $dni = $trabajador->NRO_DOCUMENTO;
+                    }
+
+                    $trabajadorespla = DB::table('WEB.platrabajadores')
+                        ->where('situacion_id', 'PRMAECEN000000000002')
+                        ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+                        ->where('dni', $dni)
+                        ->first();
+
+                    if ($trabajadorespla) {
+                      
+                        $centro_id = $trabajadorespla->centro_osiris_id;
+
+                    } else {
+        
+                        $tercero = DB::table('terceros')
+                            ->where('DNI', $dni)
                             ->first();
-                $dni            =       '';
-                $centro_id      =       '';
-                if(count($trabajador)>0){
-                    $dni        =       $trabajador->NRO_DOCUMENTO;
-                }
-                $trabajadorespla    =   DB::table('WEB.platrabajadores')
-                                        ->where('situacion_id', 'PRMAECEN000000000002')
-                                        ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
-                                        ->where('dni', $dni)
-                                        ->first();
-                if(count($trabajador)>0){
-                    $centro_id      =       $trabajadorespla->centro_osiris_id;
-                }
-                $centrot        =   DB::table('ALM.CENTRO')
-                                    ->where('COD_CENTRO', $centro_id)
-                                    ->first();
 
+                        $centro_id = $tercero->COD_CENTRO;
+                    }
 
-                $cod_centro = $centrot->COD_CENTRO; 
+                    $cod_centro = '';
+                    $nom_centro = '';
+
+                    if ($centro_id) {
+                        $centro = DB::table('ALM.CENTRO')
+                            ->where('COD_CENTRO', $centro_id)
+                            ->first();
+
+                        if ($centro) {
+                            $cod_centro = $centro->COD_CENTRO;
+                            $nom_centro = $centro->NOM_CENTRO;
+                        }
+                    }
+
             
 
                  $stmt->bindParam(1, $ind_tipo_operacion, PDO::PARAM_STR);
@@ -303,7 +324,7 @@ trait ValeRendirTraits
     }
 
 
-    public function insertValeRendirDetalle($ind_tipo_operacion, $id, $fec_inicio, $fec_fin, $cod_empr, $cod_centro, $cod_destino, $nom_destino, $nom_tipos, $dias, $can_unitario, $can_unitario_total, $can_total_importe,  $ind_destino, $ind_propio , $ind_aereo, $cod_estado, $cod_usuario_registro)
+    public function insertValeRendirDetalle($ind_tipo_operacion, $id, $fec_inicio, $fec_fin, $cod_empr, $cod_centro, $cod_destino, $nom_destino, $nom_tipos, $dias, $can_unitario, $can_unitario_total, $can_total_importe,  $ind_destino, $ind_propio , $ind_aereo, $txt_glosa_venta, $txt_glosa_cobranza, $cod_estado, $cod_usuario_registro)
 
     {
 
@@ -328,33 +349,56 @@ trait ValeRendirTraits
                                                                         @IND_DESTINO = ?,
                                                                         @IND_PROPIO = ?,
                                                                         @IND_AEREO = ?,
+                                                                        @TXT_GLOSA_VENTA = ?,
+                                                                        @TXT_GLOSA_COBRANZA = ?,
                                                                         @COD_ESTADO = ?,
                                                                         @COD_USUARIO_REGISTRO = ?');
 
                  $cod_usuario_registro = Session::get('usuario')->id;
                  $cod_empr = Session::get('empresas')->COD_EMPR;
-                $trabajador     =   DB::table('STD.TRABAJADOR')
-                            ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
-                            ->first();
-                $dni            =       '';
-                $centro_id      =       '';
-                if(count($trabajador)>0){
-                    $dni        =       $trabajador->NRO_DOCUMENTO;
-                }
-                $trabajadorespla    =   DB::table('WEB.platrabajadores')
-                                        ->where('situacion_id', 'PRMAECEN000000000002')
-                                        ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
-                                        ->where('dni', $dni)
-                                        ->first();
-                if(count($trabajador)>0){
-                    $centro_id      =       $trabajadorespla->centro_osiris_id;
-                }
-                $centrot        =   DB::table('ALM.CENTRO')
-                                    ->where('COD_CENTRO', $centro_id)
+                 $trabajador     =   DB::table('STD.TRABAJADOR')
+                                    ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
                                     ->first();
+                        $dni            =       '';
+                        $centro_id      =       '';
 
+                        if ($trabajador) {
+                            $dni = $trabajador->NRO_DOCUMENTO;
+                        }
 
-                $cod_centro = $centrot->COD_CENTRO; 
+                        $trabajadorespla = DB::table('WEB.platrabajadores')
+                            ->where('situacion_id', 'PRMAECEN000000000002')
+                            ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+                            ->where('dni', $dni)
+                            ->first();
+
+                        if ($trabajadorespla) {
+                          
+                            $centro_id = $trabajadorespla->centro_osiris_id;
+
+                        } else {
+            
+                            $tercero = DB::table('terceros')
+                                ->where('DNI', $dni)
+                                ->first();
+
+                            $centro_id = $tercero->COD_CENTRO;
+                        }
+
+                        $cod_centro = '';
+                        $nom_centro = '';
+
+                        if ($centro_id) {
+                            $centro = DB::table('ALM.CENTRO')
+                                ->where('COD_CENTRO', $centro_id)
+                                ->first();
+
+                            if ($centro) {
+                                $cod_centro = $centro->COD_CENTRO;
+                                $nom_centro = $centro->NOM_CENTRO;
+                            }
+                        }
+
 
                 $fec_inicio = !empty($fec_inicio) ? date("Ymd H:i:s", strtotime($fec_inicio)) : null;
                 $fec_fin    = !empty($fec_fin)    ? date("Ymd H:i:s", strtotime($fec_fin))    : null;
@@ -376,8 +420,10 @@ trait ValeRendirTraits
                  $stmt->bindParam(14, $ind_destino, PDO::PARAM_BOOL);
                  $stmt->bindParam(15, $ind_propio, PDO::PARAM_BOOL);
                  $stmt->bindParam(16, $ind_aereo, PDO::PARAM_BOOL);
-                 $stmt->bindParam(17, $cod_estado, PDO::PARAM_BOOL);
-                 $stmt->bindParam(18, $cod_usuario_registro, PDO::PARAM_STR);
+                 $stmt->bindParam(17, $txt_glosa_venta, PDO::PARAM_BOOL);
+                 $stmt->bindParam(18, $txt_glosa_cobranza, PDO::PARAM_BOOL);
+                 $stmt->bindParam(19, $cod_estado, PDO::PARAM_BOOL);
+                 $stmt->bindParam(20, $cod_usuario_registro, PDO::PARAM_STR);
 
 
                 $stmt->execute();
@@ -395,28 +441,50 @@ trait ValeRendirTraits
 
         $cod_usuario_registro = Session::get('usuario')->id;
         $cod_empr = Session::get('empresas')->COD_EMPR;
-       $trabajador     =   DB::table('STD.TRABAJADOR')
-                            ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+
+        $trabajador     =   DB::table('STD.TRABAJADOR')
+                                ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                                ->first();
+                    $dni            =       '';
+                    $centro_id      =       '';
+
+                    if ($trabajador) {
+                        $dni = $trabajador->NRO_DOCUMENTO;
+                    }
+
+                    $trabajadorespla = DB::table('WEB.platrabajadores')
+                        ->where('situacion_id', 'PRMAECEN000000000002')
+                        ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+                        ->where('dni', $dni)
+                        ->first();
+
+                    if ($trabajadorespla) {
+                      
+                        $centro_id = $trabajadorespla->centro_osiris_id;
+
+                    } else {
+        
+                        $tercero = DB::table('terceros')
+                            ->where('DNI', $dni)
                             ->first();
-                $dni            =       '';
-                $centro_id      =       '';
-                if(count($trabajador)>0){
-                    $dni        =       $trabajador->NRO_DOCUMENTO;
-                }
-                $trabajadorespla    =   DB::table('WEB.platrabajadores')
-                                        ->where('situacion_id', 'PRMAECEN000000000002')
-                                        ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
-                                        ->where('dni', $dni)
-                                        ->first();
-                if(count($trabajador)>0){
-                    $centro_id      =       $trabajadorespla->centro_osiris_id;
-                }
-                $centrot        =   DB::table('ALM.CENTRO')
-                                    ->where('COD_CENTRO', $centro_id)
-                                    ->first();
 
+                        $centro_id = $tercero->COD_CENTRO;
+                    }
 
-                $cod_centro = $centrot->COD_CENTRO; 
+                    $cod_centro = '';
+                    $nom_centro = '';
+
+                    if ($centro_id) {
+                        $centro = DB::table('ALM.CENTRO')
+                            ->where('COD_CENTRO', $centro_id)
+                            ->first();
+
+                        if ($centro) {
+                            $cod_centro = $centro->COD_CENTRO;
+                            $nom_centro = $centro->NOM_CENTRO;
+                        }
+                    }
+
         $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC WEB.VALE_RENDIR_LISTAR
 
                                                              @IND_TIPO_OPERACION = ?,
@@ -462,28 +530,47 @@ trait ValeRendirTraits
         $cod_usuario_registro = Session::get('usuario')->id;
         $cod_empr = Session::get('empresas')->COD_EMPR;
         $trabajador     =   DB::table('STD.TRABAJADOR')
-                            ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
-                            ->first();
-                $dni            =       '';
-                $centro_id      =       '';
-                if(count($trabajador)>0){
-                    $dni        =       $trabajador->NRO_DOCUMENTO;
-                }
-                $trabajadorespla    =   DB::table('WEB.platrabajadores')
-                                        ->where('situacion_id', 'PRMAECEN000000000002')
-                                        ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
-                                        ->where('dni', $dni)
-                                        ->first();
-                if(count($trabajador)>0){
-                    $centro_id      =       $trabajadorespla->centro_osiris_id;
-                }
-                $centrot        =   DB::table('ALM.CENTRO')
-                                    ->where('COD_CENTRO', $centro_id)
-                                    ->first();
+                                ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                                ->first();
+                    $dni            =       '';
+                    $centro_id      =       '';
 
+                    if ($trabajador) {
+                        $dni = $trabajador->NRO_DOCUMENTO;
+                    }
 
-                $cod_centro = $centrot->COD_CENTRO; 
+                    $trabajadorespla = DB::table('WEB.platrabajadores')
+                        ->where('situacion_id', 'PRMAECEN000000000002')
+                        ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+                        ->where('dni', $dni)
+                        ->first();
+
+                    if ($trabajadorespla) {
+                      
+                        $centro_id = $trabajadorespla->centro_osiris_id;
+
+                    } else {
         
+                        $tercero = DB::table('terceros')
+                            ->where('DNI', $dni)
+                            ->first();
+
+                        $centro_id = $tercero->COD_CENTRO;
+                    }
+
+                    $cod_centro = '';
+                    $nom_centro = '';
+
+                    if ($centro_id) {
+                        $centro = DB::table('ALM.CENTRO')
+                            ->where('COD_CENTRO', $centro_id)
+                            ->first();
+
+                        if ($centro) {
+                            $cod_centro = $centro->COD_CENTRO;
+                            $nom_centro = $centro->NOM_CENTRO;
+                        }
+                    }
         $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC WEB.VALE_RENDIR_DETALLE_LISTAR
                                                              @IND_TIPO_OPERACION = ?,
                                                              @ID = ?, 

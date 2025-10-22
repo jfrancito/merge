@@ -44,21 +44,37 @@ class ValeRendirController extends Controller
             ->where('dni', $dni)
             ->first();
 
-        if (!$trabajadorespla) {
-            return view('valerendir.modal.modalerrorempresa', [
-                'mensaje' => 'No puede realizar un registro porque no es la empresa a cual pertenece.',
-                'ajax' => true
-            ]);
+
+        if ($trabajadorespla) {
+            $centro_id = $trabajadorespla->centro_osiris_id;
+
+        } else {
+            $tercero = DB::table('terceros')
+                ->where('DNI', $dni)
+                ->first();
+
+            if (!$tercero) {
+                return view('valerendir.modal.modalerrorempresa', [
+                    'mensaje' => 'No puede realizar un registro porque no es la empresa a cual pertenece.',
+                    'ajax' => true
+                ]);
+            }
+            $centro_id = $tercero->COD_CENTRO;
         }
 
-        $centro_id = $trabajadorespla->centro_osiris_id;
+        $cod_centro = '';
+        $nom_centro = '';
 
-        $centrot        =   DB::table('ALM.CENTRO')
-                            ->where('COD_CENTRO', $centro_id)
-                            ->first();
+        if ($centro_id) {
+            $centro = DB::table('ALM.CENTRO')
+                ->where('COD_CENTRO', $centro_id)
+                ->first();
 
-        $cod_centro = $centrot->COD_CENTRO; 
-        $nom_centro = $centrot->NOM_CENTRO; 
+            if ($centro) {
+                $cod_centro = $centro->COD_CENTRO;
+                $nom_centro = $centro->NOM_CENTRO;
+            }
+        }
 
 
         $usuariosAu = DB::table('WEB.VALE_PERSONAL_AUTORIZA')
@@ -93,6 +109,15 @@ class ValeRendirController extends Controller
         $txt_categoria_banco = $datoscuentasueldo[0]->entidad ?? null;
         $numero_cuenta  = $datoscuentasueldo[0]->numcuenta ?? null;
 
+        $areacomercial = DB::table('WEB.platrabajadores')
+        ->where('situacion_id', 'PRMAECEN000000000002') // activo
+        ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+        ->where('dni', $dni)
+        ->value('cadarea');
+
+        $codlinea = DB::table('WEB.VALE_PERSONAL_AUTORIZA')
+                  ->where('COD_PERSONAL', $trabajador->COD_TRAB)
+                  ->value('COD_LINEA');
 
 
         // DETALLE - VALE A RENDIR 
@@ -121,6 +146,7 @@ class ValeRendirController extends Controller
                                 AND sub.COD_CENTRO = main.COD_CENTRO
                                 AND sub.IND_DESTINO = main.IND_DESTINO
                                 AND sub.COD_ESTADO = 1
+                                AND sub.COD_LINEA = '$codlinea'
                             FOR XML PATH(''), TYPE
                         ).value('.', 'NVARCHAR(MAX)'), 1, 2, '') AS TXT_NOM_TIPO
                     "),
@@ -134,12 +160,14 @@ class ValeRendirController extends Controller
                                 AND sub.COD_CENTRO = main.COD_CENTRO
                                 AND sub.IND_DESTINO = main.IND_DESTINO
                                 AND sub.COD_ESTADO = 1
+                                AND sub.COD_LINEA = '$codlinea'
                             FOR XML PATH(''), TYPE
                         ).value('.', 'NVARCHAR(MAX)'), 1, 2, '') AS COD_TIPO
                     ")
                 )
                 ->where('main.COD_CENTRO', $cod_centro)
                 ->where('main.COD_ESTADO', 1)
+                ->where('main.COD_LINEA', $codlinea)
                 ->groupBy(
                     'main.COD_DISTRITO',
                     'main.NOM_DISTRITO',
@@ -251,6 +279,8 @@ class ValeRendirController extends Controller
             'listarDocumentoXML_CDR' => $listarDocumentoXML_CDR,
             'valependientesrendir' => $valependientesrendir,
             'listarlistanegra' => $listarlistanegra,
+            'areacomercial' => $areacomercial,
+            'codlinea' => $codlinea,
             'ajax'=>true,   
         ]);
     }
@@ -377,6 +407,8 @@ class ValeRendirController extends Controller
                 "",
                 "",
                 "",
+                "",
+                "",
                 false,
                 $txt_nom_solicita
             );
@@ -400,6 +432,8 @@ class ValeRendirController extends Controller
                         $array['ind_destino'],
                         $array['ind_propio'],
                         $array['ind_aereo'],
+                        $array['txt_glosa_venta'],
+                        $array['txt_glosa_cobranza'],
                         true,
                         ""
                     );
@@ -416,7 +450,7 @@ class ValeRendirController extends Controller
         else {
            $cod_usuario_registro = Session::get('usuario')->id;
 
-              $valesPendientes = $this->valependientesrendir($cod_usuario_registro);
+               $valesPendientes = $this->valependientesrendir($cod_usuario_registro);
 
                 // Cuento cuántos hay
                 $pendienteCount = count($valesPendientes);
@@ -482,6 +516,8 @@ class ValeRendirController extends Controller
                             $array['ind_destino'],
                             $array['ind_propio'],
                             $array['ind_aereo'],
+                            $array['txt_glosa_venta'],
+                            $array['txt_glosa_cobranza'],
                             true,
                             ""
                         );
@@ -501,6 +537,8 @@ class ValeRendirController extends Controller
                             $array['ind_destino'],
                             $array['ind_propio'],
                             $array['ind_aereo'],
+                            $array['txt_glosa_venta'],
+                            $array['txt_glosa_cobranza'],
                             true,
                             ""
                         );
@@ -590,7 +628,9 @@ class ValeRendirController extends Controller
             0.0, 
             "",
             "",  
-            "",            
+            "",  
+            "",
+            "",          
             true,
             Session::get('usuario')->id
         );
@@ -610,7 +650,7 @@ class ValeRendirController extends Controller
     public function traerdataValeRendirActionDetalle(Request $request)
     {
         $id_buscar = $request->input('valerendir_id');
-        $detalle = WEBValeRendirDetalle::where('ID', $id_buscar)->WHERE('COD_ESTADO', 1)->get(['ID', 'FEC_INICIO', 'FEC_FIN', 'COD_DESTINO', 'NOM_DESTINO', 'NOM_TIPOS', 'DIAS', 'CAN_UNITARIO', 'CAN_UNITARIO_TOTAL', 'CAN_TOTAL_IMPORTE', 'IND_DESTINO'])->toJson();
+        $detalle = WEBValeRendirDetalle::where('ID', $id_buscar)->WHERE('COD_ESTADO', 1)->get(['ID', 'FEC_INICIO', 'FEC_FIN', 'COD_DESTINO', 'NOM_DESTINO', 'NOM_TIPOS', 'DIAS', 'CAN_UNITARIO', 'CAN_UNITARIO_TOTAL', 'CAN_TOTAL_IMPORTE', 'IND_DESTINO', 'TXT_GLOSA_VENTA', 'TXT_GLOSA_COBRANZA'])->toJson();
         return $detalle;
 
     }
@@ -618,16 +658,85 @@ class ValeRendirController extends Controller
     public function actionDetalleImporteVale(Request $request)
     { 
         $id_buscar = $request->input('valerendir_id'); 
-    
-   
-    $detallesImporte = WEBValeRendirDetalle::where('ID', $id_buscar)->get(); 
 
-    return view('valerendir.ajax.modaldetalleimporte', [
-        'ajax' => true,
-        'detalles' => $detallesImporte
-    ]);  
+        
+        $vale = WEBValeRendir::where('ID', $id_buscar)->first(); // primero en lugar de get(), para tener objeto
+        $detallesImporte = WEBValeRendirDetalle::where('ID', $id_buscar)->get(); 
 
-    }   
+        
+        $fecha_inicio = $detallesImporte->min('FEC_INICIO');
+        $fecha_fin = $detallesImporte->max('FEC_FIN');
+        $cod_centro = $detallesImporte->first()->COD_CENTRO ?? null;
+        $ultimo = $detallesImporte->last();
+        $ultimo_destino = $ultimo ? $ultimo->NOM_DESTINO : '';
+        $total_dias = $detallesImporte->sum('DIAS');
+        $ruta_viaje = $detallesImporte->pluck('NOM_DESTINO')->implode('/ ');
+        $txt_glosa = $vale->first()->TXT_GLOSA ?? null;
+        $txt_glosa_venta = $detallesImporte->pluck('TXT_GLOSA_VENTA')->filter()->implode(' // ');
+        $txt_glosa_cobranza = $detallesImporte->pluck('TXT_GLOSA_COBRANZA')->filter()->implode(' // ');
+
+
+
+        if ($trabajador) {
+            $dni = $trabajador->NRO_DOCUMENTO;
+        }
+
+        $trabajadorespla = DB::table('WEB.platrabajadores')
+            ->where('situacion_id', 'PRMAECEN000000000002')
+            ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+            ->where('dni', $dni)
+            ->first();
+
+
+        if ($trabajadorespla) {
+            $centro_id = $trabajadorespla->centro_osiris_id;
+
+        } else {
+            $tercero = DB::table('terceros')
+                ->where('DNI', $dni)
+                ->first();
+            $centro_id = $tercero->COD_CENTRO;
+        }
+
+        $cod_centro = '';
+        $nom_centro = '';
+
+        if ($centro_id) {
+            $centro = DB::table('ALM.CENTRO')
+                ->where('COD_CENTRO', $centro_id)
+                ->first();
+
+            if ($centro) {
+                $cod_centro = $centro->COD_CENTRO;
+                $nom_centro = $centro->NOM_CENTRO;
+            }
+        }
+
+         $areacomercial = DB::table('WEB.platrabajadores')
+        ->where('situacion_id', 'PRMAECEN000000000002') // activo
+        ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+        ->where('dni', $dni)
+        ->value('cadarea');
+
+
+        
+        return view('valerendir.ajax.modaldetalleimporte', [
+            'ajax' => true,
+            'valerendir' => $vale,
+            'detalles' => $detallesImporte,
+            'fecha_inicio' => $fecha_inicio,
+            'fecha_fin' => $fecha_fin,
+            'cod_centro' => $cod_centro,
+            'ultimo_destino' => $ultimo_destino,
+            'txt_glosa' => $txt_glosa,
+            'total_dias' => $total_dias,
+            'ruta_viaje' => $ruta_viaje,
+            'txt_glosa_venta' => $txt_glosa_venta,
+            'txt_glosa_cobranza' => $txt_glosa_cobranza,
+            'areacomercial' => $areacomercial
+        ]);  
+    }
+
 
     public function actionMensajeValeRendir(Request $request)
     { 

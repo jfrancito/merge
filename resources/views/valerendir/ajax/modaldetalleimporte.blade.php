@@ -1,71 +1,39 @@
-<div class="modal-header bg-primary text-white py-2" style="font-family: 'Times New Roman', serif;">
-    <h5 class="modal-title w-50 text-center fw-bold" style="font-size: 1.5em;">
+<div class="modal-header bg-primary text-white py-2">
+    <h5 class="modal-title w-50 text-center fw-bold">
         DETALLE VIÁTICOS DE VIAJE
     </h5>
 </div>
 
-<!-- Tabla Detalle -->
-<div class="modal-body p-3" style="font-family: 'Segoe UI', sans-serif;">
-  <div class="table-responsive">
-    <table class="table table-bordered table-striped table-hover align-middle shadow-sm">
-      <thead class="table-primary text-center">
-        <tr>
-          <th style="width: 40%; text-align: center;">DESTINO Y FECHAS</th>
-          <th style="width: 40%; text-align: center;">DESCRIPCIÓN</th>
-          <th style="width: 20%; text-align: center;">COSTO UNIT. (S/)</th>
-          <th style="width: 20%; text-align: center;">IMPORTE (S/)</th>
-          <th style="width: 20%; text-align: center;">TOTAL</th>
-        </tr>
-      </thead>
-      <tbody>
-            @php
-                $totalGeneral = 0;
-            @endphp
-                
-            @foreach($detalles as $detalle)
-                 @php
-                    $totalGeneral += $detalle->CAN_TOTAL_IMPORTE;
-                  @endphp
-                <tr class="text-center">
-                 <td>
-                  <strong class="text-uppercase">{{ $detalle->NOM_DESTINO }}</strong><br>
-                  <small class="text-muted fst-italic">
-                    {{ \Carbon\Carbon::parse($detalle->FEC_INICIO)->format('d/m/Y H:i') ?? '' }}
-                     <br> al  <br>
-                    {{ \Carbon\Carbon::parse($detalle->FEC_FIN)->format('d/m/Y H:i') ?? '' }}  <br>
-                    ({{ $detalle->DIAS ?? '0' }} día(s))
-                  </small>
-                </td>
+<div class="modal-body p-3">
 
-                  <td class="text-start">
-                   {!! nl2br(e(str_replace('<br>', "\n", $detalle->NOM_TIPOS))) !!}
+ <ul class="nav nav-tabs">
+  <li class="active">
+    <a href="#resumenviaticos" data-toggle="tab"><b>RESUMEN VIÁTICOS</b></a>
+  </li>
+  <li>
+    <a href="#detalleviaticos" data-toggle="tab"><b>DETALLE VIÁTICOS</b></a>
+  </li>
+</ul>
 
-                  </td>
-                  <td class="text-primary fw-semibold">
-                     {!! nl2br(e(str_replace('<br>', "\n", $detalle->CAN_UNITARIO))) !!}
-                 </td>
-                <td class="text-success fw-semibold">
-                    {!! nl2br(e(str_replace('<br>', "\n", $detalle->CAN_UNITARIO_TOTAL))) !!}
-                </td>
-                  <td>
-                    <span class="badge bg-dark fs-6">
-                      S/ {{ number_format($detalle->CAN_TOTAL_IMPORTE, 2) }}
-                    </span>
-                  </td>
-                </tr>
-            @endforeach
-                <tr class="text-center bg-light">
-                  <td colspan="4" class="text-end" style="font-weight: bold !important;">TOTAL GENERAL (S/)</td>
-                  <td>
-                    <span class="badge bg-primary fs-6">
-                      S/ {{ number_format($totalGeneral, 2) }}
-                    </span>
-                  </td>
-                </tr>
-      </tbody>
-    </table>
-        <div class="modal-footer justify-content-center"> 
-           <button type="button" data-dismiss="modal" class="btn btn-primary btn-space modal-close">Cerrar</button>
-        </div>
+<div class="tab-content mt-3">
+  <div id="resumenviaticos" class="tab-pane active">
+    @include('valerendir.ajax.modaldetalleimporteviaticosresumen')
+  </div>
+  <div id="detalleviaticos" class="tab-pane">
+    @include('valerendir.ajax.modaldetalleimporteviaticos')
   </div>
 </div>
+
+
+  <div class="modal-footer justify-content-center bg-light" 
+       style="margin-top:-10px; border-top:1px solid #dee2e6;">
+    <button type="button" data-dismiss="modal" 
+            class="btn btn-primary btn-space modal-close">
+      Cerrar
+    </button>
+  </div>
+
+</div>
+
+
+      

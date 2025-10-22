@@ -22,8 +22,7 @@
                                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
                                         <div class="form-group">
 
-                                            <label class="col-sm-12 control-label labelleft">Sede
-                                                :</label>
+                                             <label class="col-sm-12 control-label labelleft negrita"> SEDE <span class="obligatorio">(*)</span> :</label>
                                             <div class="col-sm-12 abajocaja">
                                                 {!! Form::select('sede_select', $listasede, '',
                                                    [
@@ -39,8 +38,7 @@
 
                                        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
                                         <div class="form-group">
-                                            <label class="col-sm-12 control-label labelleft">Gerencia
-                                                :</label>
+                                            <label class="col-sm-12 control-label labelleft negrita"> GERENCIA <span class="obligatorio">(*)</span> :</label>
                                             <div class="col-sm-12 abajocaja">
                                                 {!! Form::select('gerencia_select', $listagerencia, '',
                                                    [
@@ -56,7 +54,7 @@
 
                                       <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
                                         <div class="form-group">
-                                            <label class="col-sm-12 control-label labelleft">Área :</label>
+                                             <label class="col-sm-12 control-label labelleft negrita"> ÁREA <span class="obligatorio">(*)</span> :</label>
                                             <div class="col-sm-12">
                                                  <div class="input-group">
                                                 {!! Form::select('area_select', $listaarea, '',

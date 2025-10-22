@@ -115,6 +115,7 @@
 
     <script>
         var importeDestinos = {!! json_encode($importeDestinos, JSON_UNESCAPED_UNICODE) !!};
+        var areacomercial = {!! json_encode(strtoupper($areacomercial ?? '')) !!};
     </script>
 
     <script src="{{ asset('public/js/general/inputmask/inputmask.js') }}" type="text/javascript"></script>
