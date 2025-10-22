@@ -395,7 +395,7 @@ trait ValeRendirReembolsoTraits
 
         $cod_usuario_registro = Session::get('usuario')->id;
         $cod_empr = Session::get('empresas')->COD_EMPR;
-       $trabajador     =   DB::table('STD.TRABAJADOR')
+        $trabajador     =   DB::table('STD.TRABAJADOR')
                             ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
                             ->first();
                 $dni            =       '';
@@ -408,6 +408,15 @@ trait ValeRendirReembolsoTraits
                                         ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
                                         ->where('dni', $dni)
                                         ->first();
+                 $cadlocal = trim(strtoupper($trabajadorespla->cadlocal ?? ''));
+
+                if (
+                    stripos($cadlocal, 'SEDE ICA') !== false ||
+                    stripos($cadlocal, 'SEDE CHIMBOTE') !== false
+                ) {
+                    $trabajadorespla->centro_osiris_id = 'CEN0000000000002';
+                }
+     
                 if(count($trabajador)>0){
                     $centro_id      =       $trabajadorespla->centro_osiris_id;
                 }
