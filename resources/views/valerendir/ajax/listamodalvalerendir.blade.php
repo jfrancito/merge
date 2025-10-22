@@ -177,7 +177,7 @@
 
     .selected {
     background-color: #7d9ac0 !important;
-    color: #FFFFFF;
+    color: #7d9ac0;
     vertical-align: middle;
     padding: 1.5em;
     }

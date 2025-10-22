@@ -199,13 +199,85 @@ class ValeRendirAutorizaController extends Controller
         $id_buscar = $request->input('valerendir_id'); 
     
    
+        $vale = WEBValeRendir::where('ID', $id_buscar)->first(); // primero en lugar de get(), para tener objeto
         $detallesImporte = WEBValeRendirDetalle::where('ID', $id_buscar)->get(); 
+
+        
+        $fecha_inicio = $detallesImporte->min('FEC_INICIO');
+        $fecha_fin = $detallesImporte->max('FEC_FIN');
+        $cod_centro = $detallesImporte->first()->COD_CENTRO ?? null;
+        $ultimo = $detallesImporte->last();
+        $ultimo_destino = $ultimo ? $ultimo->NOM_DESTINO : '';
+        $total_dias = $detallesImporte->sum('DIAS');
+        $ruta_viaje = $detallesImporte->pluck('NOM_DESTINO')->implode('/ ');
+        $txt_glosa = $vale->first()->TXT_GLOSA ?? null;
+        $txt_glosa_venta = $detallesImporte->pluck('TXT_GLOSA_VENTA')->filter()->implode(' // ');
+        $txt_glosa_cobranza = $detallesImporte->pluck('TXT_GLOSA_COBRANZA')->filter()->implode(' // ');
+
+        $trabajador     =   DB::table('STD.TRABAJADOR')
+                            ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                            ->first();
+        $dni            =       '';
+        $centro_id      =       '';
+
+        if ($trabajador) {
+            $dni = $trabajador->NRO_DOCUMENTO;
+        }
+
+        $trabajadorespla = DB::table('WEB.platrabajadores')
+            ->where('situacion_id', 'PRMAECEN000000000002')
+            ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+            ->where('dni', $dni)
+            ->first();
+
+
+        if ($trabajadorespla) {
+            $centro_id = $trabajadorespla->centro_osiris_id;
+
+        } else {
+            $tercero = DB::table('terceros')
+                ->where('DNI', $dni)
+                ->first();
+            $centro_id = $tercero->COD_CENTRO;
+        }
+
+        $cod_centro = '';
+        $nom_centro = '';
+
+        if ($centro_id) {
+            $centro = DB::table('ALM.CENTRO')
+                ->where('COD_CENTRO', $centro_id)
+                ->first();
+
+            if ($centro) {
+                $cod_centro = $centro->COD_CENTRO;
+                $nom_centro = $centro->NOM_CENTRO;
+            }
+        }
+
+         $areacomercial = DB::table('WEB.platrabajadores')
+        ->where('situacion_id', 'PRMAECEN000000000002') // activo
+        ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+        ->where('dni', $dni)
+        ->value('cadarea');
+
+
 
         return view('valerendir.ajax.modaldetalleimporte', [
             'ajax' => true,
-            'detalles' => $detallesImporte
+            'valerendir' => $vale,
+            'detalles' => $detallesImporte,
+            'fecha_inicio' => $fecha_inicio,
+            'fecha_fin' => $fecha_fin,
+            'cod_centro' => $cod_centro,
+            'ultimo_destino' => $ultimo_destino,
+            'txt_glosa' => $txt_glosa,
+            'total_dias' => $total_dias,
+            'ruta_viaje' => $ruta_viaje,
+            'txt_glosa_venta' => $txt_glosa_venta,
+            'txt_glosa_cobranza' => $txt_glosa_cobranza,
+            'areacomercial' => $areacomercial
         ]);  
-
     }         
 }
  

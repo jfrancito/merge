@@ -11,18 +11,30 @@
       <div class="panel-body panel-body-contrast" id="form_cuenta" style="display:none;">
           <div class="container" style="margin-top:15px;">
                   <div class="row mt-4">
-                      <div class="col-md-3 col-lg-2">
-                          <label for="tipo_pago" class="form-label fw-bold">Tipo de Pago :</label>
-                          {!! Form::select('tipo_pago', $listausuarios5, '',
+                     
+
+                      <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
+                          <div class="form-group">
+                                <label for="tipo_pago" class="col-sm-12 control-label labelleft negrita">
+                                        TIPO DE PAGO <span class="obligatorio">(*)</span> :
+                                </label>
+                                <div class="col-sm-12 input-group xs-mb-12">
+                                        {!! Form::select('tipo_pago', $listausuarios5, '',
                                  [
                                    'class'       => 'form-select select2',
                                    'id'          => 'tipo_pago',
                                    'data-aw'     => '1',
                                  ])
                           !!}
-                      </div>
+                                  </div>
+                            </div>
+                     </div>
+
+
                     <div class="col-md-4 col-lg-3" id="grupo_entidad">
-                        <label class="form-label fw-bold">Entidad Financiera :</label>
+                        <label class="form-label fw-bold labelleft negrita">
+                                        ENTIDAD FINANCIERA <span class="obligatorio">(*)</span> :
+                         </label>
                         <input type="text" 
                                name="txt_categoria_banco" 
                                id="txt_categoria_banco"
@@ -32,7 +44,9 @@
                     </div>
 
                     <div class="col-md-4 col-lg-3" id="grupo_cuenta">
-                        <label class="form-label fw-bold">Cuenta Bancaria :</label>
+                       <label class="form-label fw-bold labelleft negrita">
+                                        CUENTA BANCARIA <span class="obligatorio">(*)</span> :
+                         </label>
                         <input type="text" 
                                name="numero_cuenta" 
                                id="numero_cuenta"
@@ -42,11 +56,11 @@
                     </div>
 
 
-                      <div class="col-md-4 col-lg-3">
-                          <label for="txt_glosa" class="form-label fw-bold">Glosa :</label>
-                          <textarea id="txt_glosa" name="glosa" placeholder="Glosa" required
-                                    class="form-control" rows="2"></textarea>
-                      </div>
+                    <div class="col-md-4 col-lg-3">
+                      <label for="txt_glosa" class="form-label fw-bold labelleft negrita">OBJETIVO Y ACTIVIDADES A REALIZAR <span class="obligatorio">(*)</span>:</label>
+                            <textarea id="txt_glosa" name="glosa" placeholder="Glosa" required
+                                      class="form-control w-100" rows="4"></textarea>
+                   </div>
                   </div>
           </div>
 

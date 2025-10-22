@@ -109,7 +109,9 @@ class RegistroPersonalAutorizaController extends Controller
                 't.gerencia_id',
                 't.area_id',
                 't.cargo_id',
-                DB::raw('vpa.COD_AUTORIZA as cod_autorizado')
+                DB::raw('vpa.COD_AUTORIZA as cod_autorizado'),
+                DB::raw('vpa.COD_LINEA as cod_linea_autorizado'),
+                DB::raw('vpa.TXT_LINEA as txt_linea_autorizado')
             )
             ->leftJoin('WEB.VALE_PERSONAL_AUTORIZA as vpa', function($join) {
                 $join->on(DB::raw("RTRIM(LTRIM(vpa.TXT_PERSONAL))"), DB::raw("RTRIM(LTRIM(t.nombres + ' ' + t.apellidopaterno + ' ' + t.apellidomaterno))"))
@@ -147,11 +149,17 @@ class RegistroPersonalAutorizaController extends Controller
 
         foreach ($registros as $item) {
 
-            $registroExistente = DB::table('WEB.VALE_PERSONAL_AUTORIZA')
+            /*$registroExistente = DB::table('WEB.VALE_PERSONAL_AUTORIZA')
                 ->where(DB::raw("RTRIM(LTRIM(TXT_PERSONAL))"), trim($item['personal']))
                 ->where(DB::raw("RTRIM(LTRIM(TXT_AREA))"), trim($item['area']))
                 ->where('COD_ESTADO', 1)
+                ->first();*/
+
+                $registroExistente = DB::table('WEB.VALE_PERSONAL_AUTORIZA')
+                ->where('COD_PERSONAL', $item['cod_trab'])      // Identificador único del trabajador
+                ->where('COD_ESTADO', 1)
                 ->first();
+
 
             if ($registroExistente) {
              
