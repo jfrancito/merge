@@ -12,10 +12,13 @@
               <div class="panel panel-default panel-table">
                 <div class="panel-heading">Lista de Terceros
                   <div class="tools">
-                    <a href="{{ url('/agregar-tercero/'.$idopcion) }}" data-toggle="tooltip" data-placement="top" title="Crear Usuario">
-                      <span class="icon mdi mdi-plus-circle-o"></span>
-                    </a>
-
+                    <a href="{{ url('/agregar-tercero/'.$idopcion) }}" 
+                     class="btn btn-success btn-sm d-flex align-items-center" 
+                     data-toggle="tooltip" 
+                     data-placement="top" 
+                     title="Agregar Usuario">
+                     <i class="mdi mdi-plus-circle-outline me-2"></i> Agregar Usuario
+                     </a>
                   </div>
                 </div>
                 <div class="panel-body">

@@ -843,9 +843,6 @@ $(document).ready(function(){
         });
 
 
-
-      
-
         $(document).ready(function () {
             let hoy = new Date();
             let fechaMin = new Date(hoy);

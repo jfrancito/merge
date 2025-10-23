@@ -355,6 +355,12 @@ class ValeRendirController extends Controller
 
         $cod_centro = $centrot->COD_CENTRO; 
 
+        $areacomercial = DB::table('WEB.platrabajadores')
+        ->where('situacion_id', 'PRMAECEN000000000002') // activo
+        ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+        ->where('dni', $dni)
+        ->value('cadarea');
+
         // ACTUALIZACIÓN
         if ($opcion === 'U') {
 
@@ -438,6 +444,12 @@ class ValeRendirController extends Controller
                         ""
                     );
                 }
+
+                if (isset($array['nom_tipos']) && stripos($array['nom_tipos'], 'COMBUSTIBLE') !== false) {
+                        DB::table('WEB.REGISTRO_IMPORTE_GASTOS')
+                            ->where('TXT_NOM_TIPO', 'COMBUSTIBLE')
+                            ->update(['CAN_TOTAL_IMPORTE' => 0]);
+                    }
             }
 
             return response()->json([
@@ -448,19 +460,30 @@ class ValeRendirController extends Controller
 
         // INSERCIÓN
         else {
-           $cod_usuario_registro = Session::get('usuario')->id;
+               $cod_usuario_registro = Session::get('usuario')->id;
 
                $valesPendientes = $this->valependientesrendir($cod_usuario_registro);
+               $pendienteCount = count($valesPendientes);
 
-                // Cuento cuántos hay
-                $pendienteCount = count($valesPendientes);
-
-                if ($pendienteCount >= 2) {
+               /* if ($pendienteCount >= 2) {
                     return response()->json([
                         'error' => 'Usted tiene 2 o más vales pendientes por rendir. No puede generar un tercer vale.'
                     ]);
-                }
+                }*/
 
+                if ($areacomercial == 'MARKETING') {
+                    if ($pendienteCount >= 3) {
+                        return response()->json([
+                            'error' => 'Usted tiene 3 o más vales pendientes por rendir. No puede generar un cuarto vale.'
+                        ]);
+                    }
+                } else {
+                    if ($pendienteCount >= 2) {
+                        return response()->json([
+                            'error' => 'Usted tiene 2 o más vales pendientes por rendir. No puede generar un tercer vale.'
+                        ]);
+                    }
+                }
 
             $this->insertValeRendir(
                 "I",
@@ -521,6 +544,12 @@ class ValeRendirController extends Controller
                             true,
                             ""
                         );
+
+                        if (isset($array['nom_tipos']) && stripos($array['nom_tipos'], 'COMBUSTIBLE') !== false) {
+                        DB::table('WEB.REGISTRO_IMPORTE_GASTOS')
+                            ->where('TXT_NOM_TIPO', 'COMBUSTIBLE')
+                            ->update(['CAN_TOTAL_IMPORTE' => 0]);
+                        }
                     } elseif ($opcion_detalle === 'I') {
                         $this->insertValeRendirDetalle(
                             "I",
@@ -542,6 +571,12 @@ class ValeRendirController extends Controller
                             true,
                             ""
                         );
+                    }
+
+                    if (isset($array['nom_tipos']) && stripos($array['nom_tipos'], 'COMBUSTIBLE') !== false) {
+                        DB::table('WEB.REGISTRO_IMPORTE_GASTOS')
+                            ->where('TXT_NOM_TIPO', 'COMBUSTIBLE')
+                            ->update(['CAN_TOTAL_IMPORTE' => 0]);
                     }
                 }
             }
