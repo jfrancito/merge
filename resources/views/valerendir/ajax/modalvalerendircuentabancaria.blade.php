@@ -58,20 +58,20 @@
 
                     <div class="col-md-4 col-lg-3">
                       <label for="txt_glosa" class="form-label fw-bold labelleft negrita">OBJETIVO Y ACTIVIDADES A REALIZAR <span class="obligatorio">(*)</span>:</label>
-                            <textarea id="txt_glosa" name="glosa" placeholder="Glosa" required
+                            <textarea id="txt_glosa" name="glosa" placeholder="Objetivo y Actividades a Realizar" required
                                       class="form-control w-100" rows="4"></textarea>
                    </div>
                   </div>
           </div>
 
-          <div class="row xs-pt-15 mt-3" style="margin-bottom: 15px;">
+      {{-- <div class="row xs-pt-15 mt-3" style="margin-bottom: 15px;">
               <div class="col-xs-6"></div>
               <div class="col-xs-6 text-right">
                    <button id="asignarvalerendir" type="button" class="btn btn-primary">
                        EMITIR VALE
                    </button>
               </div>
-          </div>
+          </div> --}}
       </div>
     </div>
 

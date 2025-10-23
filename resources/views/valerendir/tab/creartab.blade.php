@@ -245,6 +245,15 @@
                 </div> <!-- vale_rendir_detalle -->
             </div> <!-- container -->
 
+              <div class="row xs-pt-15 mt-3" style="margin-bottom: 15px;">
+              <div class="col-xs-6"></div>
+              <div class="col-xs-6 text-right">
+                   <button id="asignarvalerendir" type="button" class="btn btn-primary">
+                       EMITIR VALE
+                   </button>
+              </div>
+          </div>
+
             <div class="col-xs-12">
                 <div class="listacontratomasiva listajax reporteajax"></div>
             </div>

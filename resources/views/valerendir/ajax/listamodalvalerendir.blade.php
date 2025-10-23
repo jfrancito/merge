@@ -9,7 +9,7 @@
             <th class="col">Tipo Pago</th>
             <th class="col">Importe</th>
             <th class="col">Saldo</th>
-            <th class="col">Glosa</th>  
+            <th class="col">Actividades a Realizar</th>  
             <th class="col">Estado Merge</th>  
             <th class="col">Estado Osiris</th>
             <th class="col">Ver Detalle</th>  
