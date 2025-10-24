@@ -1883,7 +1883,7 @@ class UserController extends Controller {
 		                                          	COD_CENTRO,
 		                                          	NOM_CENTRO")
 		                                        )->first();
-
+	        	$banco    					=   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->WHERE('COD_CATEGORIA','=',$request['banco_id'])->first();
 
 				$tercero            	 	=	new Tercero;
 				$tercero->DNI 	     	 	=   $trabajador->NRO_DOCUMENTO;
@@ -1896,7 +1896,9 @@ class UserController extends Controller {
 				$tercero->COD_CENTRO  		=	$centro->COD_CENTRO;
 				$tercero->TXT_CENTRO 	   	=  	$centro->NOM_CENTRO;
 				$tercero->COD_CENTRO  		=	$centro->COD_CENTRO;
-
+				$tercero->COD_BANCO  		=	$banco->COD_CATEGORIA;
+				$tercero->TXT_BANCO  		=	$banco->NOM_CATEGORIA;
+				$tercero->TXT_CUENTA_CORRIENTE =	$request['cuenta_bancaria'];
 	            $tercero->FECHA_CREA 		= 	$this->fechaactual;
 	            $tercero->USUARIO_CREA 		= 	Session::get('usuario')->id;
 				$tercero->save();
@@ -1947,11 +1949,27 @@ class UserController extends Controller {
 
 		}else{
 
+
+            $arraydni    				=   DB::table('WEB.platrabajadores')
+		                                    //->where('situacion_id', 'PRMAECEN000000000002')
+		                                    //->where('dni','=','41277717')
+	                                        ->pluck('dni')
+	                                        ->toArray();
+
+            $arraytrabajadores    		=   DB::table('STD.TRABAJADOR')
+		                                    ->whereIn('NRO_DOCUMENTO',$arraydni)
+	                                        ->pluck('COD_TRAB')
+	                                        ->toArray();
+
+
 			$listapersonal 				= 	DB::table('WEB.LISTAPERSONAL')
 	    									->leftJoin('users', 'WEB.LISTAPERSONAL.id', '=', 'users.usuarioosiris_id')
 	    									->whereNull('users.usuarioosiris_id')
+	    									->whereNotIn('WEB.LISTAPERSONAL.id',$arraytrabajadores)
+	    									->where('WEB.LISTAPERSONAL.id','not like','JVE%')
 	    									->select('WEB.LISTAPERSONAL.id','WEB.LISTAPERSONAL.nombres')
 	    									->get();
+
 			$rol 						= 	DB::table('WEB.Rols')->where('ind_merge','=',1)->where('id','=','1CIX00000048')->pluck('nombre','id')->toArray();
 
 
@@ -1999,12 +2017,21 @@ class UserController extends Controller {
 	        $area_id 					=	'';
 
 			$comborol  					= 	array('' => "Seleccione Rol") + $rol;
+
+
+	        $banco_id       			=   'BAM0000000000001';
+	        $arraybancos    			=   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
+	        $combobancos    			=   array('' => "Seleccione Entidad Bancaria") + $arraybancos;
+
 		
 			return View::make('usuario/agregartercero',
 						[
 							'comborol'  		=> $comborol,
 							'combo_empresa'  	=> $combo_empresa,
 							'empresa_id'  		=> $empresa_id,
+							'banco_id'  		=> $banco_id,
+							'combobancos'  		=> $combobancos,
+
 							'combo_centro'  	=> $combo_centro,
 							'centro_id'  		=> $centro_id,
 							'combo_area'  		=> $combo_area,
@@ -2108,6 +2135,7 @@ class UserController extends Controller {
 			                                          	COD_CENTRO,
 			                                          	NOM_CENTRO")
 			                                        )->first();
+	        	$banco    					=   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->WHERE('COD_CATEGORIA','=',$request['banco_id'])->first();
 
 
 			        Tercero::where('DNI', $idusuario)
@@ -2120,6 +2148,9 @@ class UserController extends Controller {
 			                    'TXT_EMPRESA' => $empresa->NOM_EMPR,
 			                    'COD_CENTRO' => $centro->COD_CENTRO,
 			                    'TXT_CENTRO' => $centro->NOM_CENTRO,
+			                    'TXT_CUENTA_CORRIENTE' => $request['cuenta_bancaria'],
+			                    'TXT_BANCO' => $banco->NOM_CATEGORIA,
+			                    'COD_BANCO' => $banco->COD_CATEGORIA,
 			                    'FECHA_MOD' => $this->fechaactual,
 			                    'USUARIO_MOD' => Session::get('usuario')->id
 			                ]
@@ -2197,11 +2228,18 @@ class UserController extends Controller {
 		        $combo_area               	=   array('' => "Seleccione area") + $listaarea;
 		        $area_id 					=	$tercero->COD_AREA;
 
+
+		        $banco_id       			=   $tercero->COD_BANCO;;
+		        $arraybancos    			=   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
+		        $combobancos    			=   array('' => "Seleccione Entidad Bancaria") + $arraybancos;
+
+
 		        return View::make('usuario/modificartercero', 
 		        				[
 		        					'usuario'  		=> $usuario,
 		        					'tercero'  		=> $tercero,
-
+									'banco_id'  	=> $banco_id,
+									'combobancos'  		=> $combobancos,
 		        					
 									'combo_empresa'  	=> $combo_empresa,
 									'empresa_id'  		=> $empresa_id,

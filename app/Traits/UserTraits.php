@@ -28,6 +28,14 @@ trait UserTraits
 {
     use WhatsappTraits;
 
+    private function eliminacion_vales_arendir() {
+
+        $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC WEB.CULMINAR_VALE');
+        $stmt->execute();
+
+    }
+
+
     private function envio_correo_reparacion_levantada() {
 
         $listaliquidaciones     =   FeDocumento::where('IND_CORREO_REPARABLE', '1')

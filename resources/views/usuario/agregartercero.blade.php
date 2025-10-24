@@ -128,10 +128,32 @@
                 </div>
               </div>
 
+              <div class="form-group">
+
+                <label class="col-sm-3 control-label">Banco</label>
+                <div class="col-sm-5">
+                  {!! Form::select( 'banco_id', $combobancos, array($banco_id),
+                                    [
+                                      'class'       => 'form-control control input-sm select2' ,
+                                      'id'          => 'banco_id',
+                                      'required'    => '',
+                                      'data-aw'     => '7'
+                                    ]) !!}
+                </div>
+              </div>
 
 
+              <div class="form-group">
+                <label class="col-sm-3 control-label">Cuenta Bancaria</label>
+                <div class="col-sm-5">
 
+                  <input  type="text"
+                          id="cuenta_bancaria" name='cuenta_bancaria' value="{{ old('cuenta_bancaria') }}" placeholder="Cuenta Bancaria"
+                          required = ""
+                          autocomplete="off" class="form-control input-sm"/>
 
+                </div>
+              </div>
 
               <div class="row xs-pt-15">
                 <div class="col-xs-6">
