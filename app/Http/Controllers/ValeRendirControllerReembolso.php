@@ -8,7 +8,7 @@ use App\Traits\ValeRendirReembolsoTraits;
 use App\Modelos\STDTrabajadorVale;
 use App\Modelos\WEBTipoMotivoValeRendir;
 use App\Modelos\WEBValeRendirReembolso;
-use App\Modelos\WEBValeRendirDetalle;
+use App\Modelos\WEBValeRendirDetalleReembolso;
 use App\Modelos\WEBRegistroImporteGastos;
 use App\Modelos\ALMCentro;
 use App\Modelos\STDTrabajador;
@@ -58,7 +58,9 @@ class ValeRendirControllerReembolso extends Controller
 
        if (
             stripos($cadlocal, 'SEDE ICA') !== false ||
-            stripos($cadlocal, 'SEDE CHIMBOTE') !== false
+            stripos($cadlocal, 'SEDE CHIMBOTE') !== false ||
+            stripos($cadlocal, 'SEDE TRUJILLO') !== false ||
+            stripos($cadlocal, 'SEDE PIURA') !== false 
         ) {
             $trabajadorespla->centro_osiris_id = 'CEN0000000000002';
         }
@@ -82,6 +84,8 @@ class ValeRendirControllerReembolso extends Controller
             ->where('COD_ESTADO', '!=', 0)
             ->pluck('TXT_AUTORIZA', 'COD_AUTORIZA')
             ->toArray();
+
+         
 
         $usuariosAp =  DB::table('WEB.VALE_PERSONAL_APRUEBA')->where('cod_centro', $cod_centro)->pluck('txt_aprueba', 'cod_aprueba')->toArray();
         $tipoMotivo = WEBTipoMotivoValeRendir::where('cod_estado',1)->pluck('txt_motivo', 'cod_motivo')->toArray();
@@ -149,15 +153,7 @@ class ValeRendirControllerReembolso extends Controller
             ->pluck('NOM_CATEGORIA', 'COD_CATEGORIA')
             ->toArray();
 
-            $listacabecera = DB::table('LQG_DETLIQUIDACIONGASTO')
-                ->where('ID_DOCUMENTO', 'LIQG00000158')
-                ->where('COD_TIPODOCUMENTO', 'TDO0000000000001')
-                ->where('ACTIVO', 1)
-                ->get();
-
-
-        
-      
+           
             reset($usuariosAu);
             $usuario_autoriza_predeterminado = key($usuariosAu);
 
@@ -261,15 +257,6 @@ class ValeRendirControllerReembolso extends Controller
         ) {
             $trabajadorespla->centro_osiris_id = 'CEN0000000000002';
         }
-Log::info('insertValeRendirActionReembolso - Datos iniciales', [
-    'usuario_autoriza' => $usuario_autoriza,
-    'usuario_aprueba' => $usuario_aprueba,
-    'trabajadorespla' => $trabajadorespla,
-    'dni' => $dni,
-    'cod_empr_cli' => $cod_empr_cli,
-    'opcion' => $opcion,
-]);
-
 
         if ($opcion === 'U') {
 
@@ -278,7 +265,7 @@ Log::info('insertValeRendirActionReembolso - Datos iniciales', [
                 return response()->json(['error' => 'Vale de rendir procesado correctamente.']);
             }
 
-            
+
 
             $this->insertValeRendirReembolso(
                 "U",
@@ -309,7 +296,6 @@ Log::info('insertValeRendirActionReembolso - Datos iniciales', [
                 ""
             );
 
-            // Eliminar y volver a insertar el detalle
             $this->insertValeRendirDetalleReembolso(
                 "D",
                 $vale_rendir_id,
@@ -364,6 +350,18 @@ Log::info('insertValeRendirActionReembolso - Datos iniciales', [
 
         // INSERCIÓN
         else {
+
+             //VALIDA CON EL DNI TABLA PERSONAL REEMBOLSO Y DNI PLANILLA
+            $personalReembolso = DB::table('WEB.personal_reembolso')
+            ->where('nro_documento', $trabajadorespla->dni)
+            ->first();
+
+            if (!$personalReembolso) {
+                    return response()->json([
+                        'error' => 'Usted no cuenta con permiso para generar un vale de reembolso.'
+                    ]);
+                }
+
             $this->insertValeRendirReembolso(
                 "I",
                 "", "", "", "", "", "",
@@ -548,14 +546,14 @@ Log::info('insertValeRendirActionReembolso - Datos iniciales', [
 
     }
 
-    public function actionDetalleImporteVale(Request $request)
+    public function actionDetalleImporteValeReembolso(Request $request)
     { 
         $id_buscar = $request->input('valerendir_id'); 
     
    
     $detallesImporte = WEBValeRendirDetalleReembolso::where('ID', $id_buscar)->get(); 
 
-    return view('valerendir.ajax.modaldetalleimporte', [
+    return view('valerendirreembolso.ajax.modaldetalleimportereembolso', [
         'ajax' => true,
         'detalles' => $detallesImporte
     ]);  
@@ -599,4 +597,6 @@ Log::info('insertValeRendirActionReembolso - Datos iniciales', [
     }
 
 }
+
+
 

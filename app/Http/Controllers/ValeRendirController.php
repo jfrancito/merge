@@ -369,6 +369,14 @@ class ValeRendirController extends Controller
                 return response()->json(['error' => 'Vale de rendir procesado correctamente.']);
             }
 
+            if ($trabajadorespla) {
+                        $cod_personal_rendir = 'TPR0000000000001';
+                        $txt_personal_rendir = 'PLANILLA';
+            } else {
+                        $cod_personal_rendir = 'TPR0000000000002';
+                        $txt_personal_rendir = 'TERCEROS';
+            }
+
             $this->insertValeRendir(
                 "U",
                 $vale_rendir_id,
@@ -391,6 +399,8 @@ class ValeRendirController extends Controller
                 $numero_cuenta,
                 $cod_categoria_estado_vale,
                 $txt_categoria_estado_vale,
+                $cod_personal_rendir,
+                $txt_personal_rendir,
                 true,
                 ""
             );
@@ -485,6 +495,14 @@ class ValeRendirController extends Controller
                     }
                 }
 
+                if ($trabajadorespla) {
+                        $cod_personal_rendir = 'TPR0000000000001';
+                        $txt_personal_rendir = 'PLANILLA';
+                    } else {
+                        $cod_personal_rendir = 'TPR0000000000002';
+                        $txt_personal_rendir = 'TERCEROS';
+                    }
+
             $this->insertValeRendir(
                 "I",
                 "", "", "", "", "", "",
@@ -508,6 +526,8 @@ class ValeRendirController extends Controller
                 $numero_cuenta,
                 $cod_categoria_estado_vale,
                 $txt_categoria_estado_vale,
+                $cod_personal_rendir,
+                $txt_personal_rendir,
                 true,
                 ""
             );
@@ -631,6 +651,8 @@ class ValeRendirController extends Controller
                 '',
                 $cod_categoria_estado_vale,
                 $txt_categoria_estado_vale, 
+                '',
+                '',
                 false,
                 Session::get('usuario')->id 
             );
@@ -706,7 +728,7 @@ class ValeRendirController extends Controller
         $ultimo_destino = $ultimo ? $ultimo->NOM_DESTINO : '';
         $total_dias = $detallesImporte->sum('DIAS');
         $ruta_viaje = $detallesImporte->pluck('NOM_DESTINO')->implode('/ ');
-        $txt_glosa = $vale->first()->TXT_GLOSA ?? null;
+        $txt_glosa = $vale->TXT_GLOSA ?? null;
         $txt_glosa_venta = $detallesImporte->pluck('TXT_GLOSA_VENTA')->filter()->implode(' // ');
         $txt_glosa_cobranza = $detallesImporte->pluck('TXT_GLOSA_COBRANZA')->filter()->implode(' // ');
         

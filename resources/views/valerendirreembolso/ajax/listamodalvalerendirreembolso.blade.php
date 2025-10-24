@@ -69,7 +69,7 @@
 
                             @if(!in_array($item['TIPO_MOTIVO'], $motivosPermitidos))
                           
-                             <a class="dropdown-item verdetalleimporte-valerendir-vale d-flex align-items-center" href="#">
+                             <a class="dropdown-item verdetalleimporte-valerendir-vale-reembolso d-flex align-items-center" href="#">
                                <i class="mdi mdi-check-circle-outline text-success mr-2"></i> Detalle Importe Gastos
                             </a>
                             @endif

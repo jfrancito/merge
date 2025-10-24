@@ -8,7 +8,7 @@ use App\Traits\ValeRendirReembolsoTraits;
 use App\Modelos\STDTrabajadorVale;
 use App\Modelos\WEBTipoMotivoValeRendir;
 use App\Modelos\WEBValeRendirReembolso;
-use App\Modelos\WEBValeRendirDetalle;
+use App\Modelos\WEBValeRendirDetalleReembolso;
 use App\Modelos\ALMCentro;
 use App\Modelos\STDTrabajador;
 use Session;
@@ -201,7 +201,7 @@ class ValeRendirAutorizaControllerReembolso extends Controller
    
         $detallesImporte = WEBValeRendirDetalleReembolso::where('ID', $id_buscar)->get(); 
 
-        return view('valerendir.ajax.modaldetalleimportereembolso', [
+        return view('valerendirreembolso.ajax.modaldetalleimportereembolso', [
             'ajax' => true,
             'detalles' => $detallesImporte
         ]);  
