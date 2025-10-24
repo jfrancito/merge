@@ -9,8 +9,11 @@ use App\Modelos\STDTrabajadorVale;
 use App\Modelos\WEBTipoMotivoValeRendir;
 use App\Modelos\WEBValeRendir;
 use App\Modelos\WEBValeRendirDetalle;
+use App\Modelos\WEBRegistroImporteGastos;
 use App\Modelos\ALMCentro;
 use App\Modelos\STDTrabajador;
+use Illuminate\Support\Facades\Log;
+
 use Session;
 use App\WEBRegla, App\STDEmpresa, APP\User, App\CMPCategoria;
 use View;
@@ -59,6 +62,7 @@ class ValeRendirAutorizaController extends Controller
                 ""
             );
 
+       
         return view('valerendir.ajax.modalvalerendirautoriza', [
                     'listausuarios' => $combo,
                     'listausuarios1' => $combo1,
@@ -119,6 +123,8 @@ class ValeRendirAutorizaController extends Controller
                 $vale->NRO_CUENTA,
                 $cod_categoria_estado_vale,
                 $txt_categoria_estado_vale, 
+                '',
+                '',
                 false,
                 Session::get('usuario')->id 
             );
@@ -179,6 +185,8 @@ class ValeRendirAutorizaController extends Controller
                 $vale->NRO_CUENTA,
                 $cod_categoria_estado_vale,
                 $txt_categoria_estado_vale, 
+                '',
+                '',
                 false,
                 Session::get('usuario')->id 
             );
@@ -197,7 +205,6 @@ class ValeRendirAutorizaController extends Controller
         public function actionDetalleImporte(Request $request)
     { 
         $id_buscar = $request->input('valerendir_id'); 
-    
    
         $vale = WEBValeRendir::where('ID', $id_buscar)->first(); // primero en lugar de get(), para tener objeto
         $detallesImporte = WEBValeRendirDetalle::where('ID', $id_buscar)->get(); 
@@ -210,56 +217,12 @@ class ValeRendirAutorizaController extends Controller
         $ultimo_destino = $ultimo ? $ultimo->NOM_DESTINO : '';
         $total_dias = $detallesImporte->sum('DIAS');
         $ruta_viaje = $detallesImporte->pluck('NOM_DESTINO')->implode('/ ');
-        $txt_glosa = $vale->first()->TXT_GLOSA ?? null;
+        $txt_glosa = $vale->TXT_GLOSA ?? null;
         $txt_glosa_venta = $detallesImporte->pluck('TXT_GLOSA_VENTA')->filter()->implode(' // ');
         $txt_glosa_cobranza = $detallesImporte->pluck('TXT_GLOSA_COBRANZA')->filter()->implode(' // ');
 
-        $trabajador     =   DB::table('STD.TRABAJADOR')
-                            ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
-                            ->first();
-        $dni            =       '';
-        $centro_id      =       '';
 
-        if ($trabajador) {
-            $dni = $trabajador->NRO_DOCUMENTO;
-        }
-
-        $trabajadorespla = DB::table('WEB.platrabajadores')
-            ->where('situacion_id', 'PRMAECEN000000000002')
-            ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
-            ->where('dni', $dni)
-            ->first();
-
-
-        if ($trabajadorespla) {
-            $centro_id = $trabajadorespla->centro_osiris_id;
-
-        } else {
-            $tercero = DB::table('terceros')
-                ->where('DNI', $dni)
-                ->first();
-            $centro_id = $tercero->COD_CENTRO;
-        }
-
-        $cod_centro = '';
-        $nom_centro = '';
-
-        if ($centro_id) {
-            $centro = DB::table('ALM.CENTRO')
-                ->where('COD_CENTRO', $centro_id)
-                ->first();
-
-            if ($centro) {
-                $cod_centro = $centro->COD_CENTRO;
-                $nom_centro = $centro->NOM_CENTRO;
-            }
-        }
-
-         $areacomercial = DB::table('WEB.platrabajadores')
-        ->where('situacion_id', 'PRMAECEN000000000002') // activo
-        ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
-        ->where('dni', $dni)
-        ->value('cadarea');
+         $areacomercial = '';
 
 
 

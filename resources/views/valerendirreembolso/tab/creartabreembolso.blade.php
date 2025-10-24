@@ -208,13 +208,13 @@
                     </div>
 
                     <!-- Botón Ver Detalle -->
-                    <div class="form-group">
+                   {{-- <div class="form-group">
                         <button type="button"
-                                class="btn btn-primary verdetalleimportegastos-valerendir"
+                                class="btn btn-primary verdetalleimportegastos-valerendir-reembolso"
                                 title="Ver detalle de importes">
                             <i class="mdi mdi-eye mdi-24px"></i>
                         </button>
-                    </div>
+                    </div>--}}
 
                     <!-- Hidden Inputs -->
                     <input type="hidden" id="nom_centro" value="{{ $nom_centro }}">
@@ -229,7 +229,7 @@
                     <div class='listacontratomasiva listajax reporteajax'>
                     </div>
                 </div>
-              @include('valerendir.ajax.listamodaldetalleregistroimporte')
+              @include('valerendirreembolso.ajax.listamodaldetalleregistroimportereembolso')
 
             </div>
 

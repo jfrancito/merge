@@ -539,13 +539,13 @@ $(document).ready(function(){
                                                 valerendir_id           : valerendir_id,
                                             };
 
-            ajax_modal(data, "/ver_detalle_importe_autoriza",
+            ajax_modal(data, "/ver_detalle_importe_autoriza_reembolso",
                        "modal-verdetalledocumentoimporteautoriza-solicitud",
                        "modal-verdetalledocumentoimporteautoriza-solicitud-container");
         });
 
 
-        $(".valerendirprincipal").on('click', '.verdetalleimporte-valerendir-vale', function(e) {
+        $(".valerendirprincipal").on('click', '.verdetalleimporte-valerendir-vale-reembolso', function(e) {
             e.preventDefault(); 
             let valerendir_id = $(this).closest('tr').attr('data_vale_rendir_reembolso'); 
 
@@ -557,7 +557,7 @@ $(document).ready(function(){
                                                 valerendir_id           : valerendir_id,
                                             };
 
-            ajax_modal(data, "/ver_detalle_importe_vale",
+            ajax_modal(data, "/ver_detalle_importe_vale_reembolso",
                        "modal-verdetalledocumentoimportevale-solicitud",
                        "modal-verdetalledocumentoimportevale-solicitud-container");
         });
@@ -853,7 +853,7 @@ $(document).ready(function(){
         }
 
 
-       $(document).on('click', '.verdetalleimportegastos-valerendir', function () {
+       $(document).on('click', '.verdetalleimportegastos-valerendir-reembolso', function () {
         let filas = $('#tabla_vale_rendir_detalle tbody tr');
         let cuerpoModal = $('#tablaDetalleModal tbody');
 

@@ -25,16 +25,24 @@ class RegistroPersonalAutorizaController extends Controller
         
 
         $sede = DB::table('WEB.ListaplatrabajadoresGenereal')
-	         ->select('centro_osiris_id', 'cadlocal')
-	         ->whereIn('centro_osiris_id', [
-			        'CEN0000000000001',
-			        'CEN0000000000002',
-			        'CEN0000000000004',
-			        'CEN0000000000006'
-			    ])
-	         ->groupBy('centro_osiris_id', 'cadlocal')
-	         ->pluck('cadlocal', 'centro_osiris_id')
-	         ->toArray();
+                ->select('centro_osiris_id', 'cadlocal')
+                ->whereIn('centro_osiris_id', [
+                    'CEN0000000000001',
+                    'CEN0000000000002',
+                    'CEN0000000000004',
+                    'CEN0000000000006'
+                ])
+                ->where(function ($query) {
+                    $query->where('centro_osiris_id', '<>', 'CEN0000000000001') // todos menos el 0001
+                          ->orWhere(function ($q) {
+                              $q->where('centro_osiris_id', 'CEN0000000000001')
+                                ->where('cadlocal', 'LIKE', '%CHICLAYO%'); // solo Chiclayo para el 0001
+                          });
+                })
+                ->groupBy('centro_osiris_id', 'cadlocal')
+                ->pluck('cadlocal', 'centro_osiris_id')
+                ->toArray();
+
 
 		$gerencia = DB::table('WEB.ListaplatrabajadoresGenereal')
 	    ->select(DB::raw("UPPER(LTRIM(RTRIM(cadgerencia))) AS cadgerencia"))

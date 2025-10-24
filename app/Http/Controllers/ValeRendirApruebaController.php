@@ -147,6 +147,8 @@ class ValeRendirApruebaController extends Controller
                 $vale->NRO_CUENTA,
                 $cod_categoria_estado_vale,
                 $txt_categoria_estado_vale, 
+                '',
+                '',
                 false,
                 Session::get('usuario')->id 
             );
@@ -215,6 +217,8 @@ class ValeRendirApruebaController extends Controller
                 $vale->NRO_CUENTA,
                 $cod_categoria_estado_vale,
                 $txt_categoria_estado_vale, 
+                '',
+                '',
                 false,
                 Session::get('usuario')->id 
             );
@@ -503,52 +507,9 @@ class ValeRendirApruebaController extends Controller
         $txt_glosa_venta = $detallesImporte->pluck('TXT_GLOSA_VENTA')->filter()->implode(' // ');
         $txt_glosa_cobranza = $detallesImporte->pluck('TXT_GLOSA_COBRANZA')->filter()->implode(' // ');
 
-        $trabajador     =   DB::table('STD.TRABAJADOR')
-                            ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
-                            ->first();
-        $dni            =       '';
-        $centro_id      =       '';
+       
 
-        if ($trabajador) {
-            $dni = $trabajador->NRO_DOCUMENTO;
-        }
-
-        $trabajadorespla = DB::table('WEB.platrabajadores')
-            ->where('situacion_id', 'PRMAECEN000000000002')
-            ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
-            ->where('dni', $dni)
-            ->first();
-
-
-        if ($trabajadorespla) {
-            $centro_id = $trabajadorespla->centro_osiris_id;
-
-        } else {
-            $tercero = DB::table('terceros')
-                ->where('DNI', $dni)
-                ->first();
-            $centro_id = $tercero->COD_CENTRO;
-        }
-
-        $cod_centro = '';
-        $nom_centro = '';
-
-        if ($centro_id) {
-            $centro = DB::table('ALM.CENTRO')
-                ->where('COD_CENTRO', $centro_id)
-                ->first();
-
-            if ($centro) {
-                $cod_centro = $centro->COD_CENTRO;
-                $nom_centro = $centro->NOM_CENTRO;
-            }
-        }
-
-         $areacomercial = DB::table('WEB.platrabajadores')
-        ->where('situacion_id', 'PRMAECEN000000000002') // activo
-        ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
-        ->where('dni', $dni)
-        ->value('cadarea');
+         $areacomercial = '';
 
    
         return view('valerendir.ajax.modaldetalleimporte', [

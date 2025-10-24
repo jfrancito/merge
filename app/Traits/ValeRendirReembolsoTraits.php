@@ -74,7 +74,9 @@ trait ValeRendirReembolsoTraits
 
                 if (
                     stripos($cadlocal, 'SEDE ICA') !== false ||
-                    stripos($cadlocal, 'SEDE CHIMBOTE') !== false
+                    stripos($cadlocal, 'SEDE CHIMBOTE') !== false ||
+                    stripos($cadlocal, 'SEDE TRUJILLO') !== false ||
+                    stripos($cadlocal, 'SEDE PIURA') !== false 
                 ) {
                     $trabajadorespla->centro_osiris_id = 'CEN0000000000002';
                 }
@@ -420,7 +422,9 @@ trait ValeRendirReembolsoTraits
 
                 if (
                     stripos($cadlocal, 'SEDE ICA') !== false ||
-                    stripos($cadlocal, 'SEDE CHIMBOTE') !== false
+                    stripos($cadlocal, 'SEDE CHIMBOTE') !== false ||
+                    stripos($cadlocal, 'SEDE TRUJILLO') !== false ||
+                    stripos($cadlocal, 'SEDE PIURA') !== false 
                 ) {
                     $trabajadorespla->centro_osiris_id = 'CEN0000000000002';
                 }

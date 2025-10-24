@@ -18,7 +18,7 @@ trait ValeRendirTraits
                                      $txt_nom_solicita, $usuario_autoriza, $txt_nom_autoriza, $usuario_aprueba, $txt_nom_aprueba, $cod_contrato, 
                                      $sub_cuenta, $tipo_motivo, $cod_moneda, $tipo_pago, $txt_glosa, $txt_glosa_autorizado,  $txt_glosa_rechazado, $txt_glosa_aprobado, 
                                      $can_total_importe, $can_total_saldo, $txt_categoria_banco, $numero_cuenta, $cod_categoria_estado_vale, 
-                                     $txt_categoria_estado_vale, $cod_estado, $cod_usuario_registro)
+                                     $txt_categoria_estado_vale, $cod_personal_rendir, $txt_personal_rendir, $cod_estado, $cod_usuario_registro)
 
     {
          try {
@@ -51,6 +51,8 @@ trait ValeRendirTraits
                                                                         @NRO_CUENTA = ?,
                                                                         @COD_CATEGORIA_ESTADO_VALE = ?,
                                                                         @TXT_CATEGORIA_ESTADO_VALE = ?,
+                                                                        @COD_PERSONAL_RENDIR = ?,
+                                                                        @TXT_PERSONAL_RENDIR = ?,
                                                                         @COD_ESTADO = ?,
                                                                         @COD_USUARIO_REGISTRO = ?');
 
@@ -130,8 +132,10 @@ trait ValeRendirTraits
                  $stmt->bindParam(26, $numero_cuenta, PDO::PARAM_STR);
                  $stmt->bindParam(27, $cod_categoria_estado_vale, PDO::PARAM_STR);
                  $stmt->bindParam(28, $txt_categoria_estado_vale, PDO::PARAM_STR);
-                 $stmt->bindParam(29, $cod_estado, PDO::PARAM_BOOL);
-                 $stmt->bindParam(30, $cod_usuario_registro, PDO::PARAM_STR);
+                 $stmt->bindParam(29, $cod_personal_rendir, PDO::PARAM_STR);
+                 $stmt->bindParam(30, $txt_personal_rendir, PDO::PARAM_STR);
+                 $stmt->bindParam(31, $cod_estado, PDO::PARAM_BOOL);
+                 $stmt->bindParam(32, $cod_usuario_registro, PDO::PARAM_STR);
 
 
                 $stmt->execute();
@@ -148,7 +152,7 @@ trait ValeRendirTraits
                                      $txt_nom_solicita, $usuario_autoriza, $txt_nom_autoriza, $usuario_aprueba, $txt_nom_aprueba, $cod_contrato, 
                                      $sub_cuenta, $tipo_motivo, $cod_moneda, $tipo_pago, $txt_glosa, $txt_glosa_autorizado,  $txt_glosa_rechazado, $txt_glosa_aprobado, 
                                      $can_total_importe, $can_total_saldo, $txt_categoria_banco, $numero_cuenta, $cod_categoria_estado_vale, 
-                                     $txt_categoria_estado_vale, $cod_estado, $cod_usuario_registro)
+                                     $txt_categoria_estado_vale, $cod_personal_rendir, $txt_personal_rendir, $cod_estado, $cod_usuario_registro)
 
     {
          try {
@@ -181,6 +185,8 @@ trait ValeRendirTraits
                                                                         @NRO_CUENTA = ?,
                                                                         @COD_CATEGORIA_ESTADO_VALE = ?,
                                                                         @TXT_CATEGORIA_ESTADO_VALE = ?,
+                                                                        @COD_PERSONAL_RENDIR = ?,
+                                                                        @TXT_PERSONAL_RENDIR = ?,
                                                                         @COD_ESTADO = ?,
                                                                         @COD_USUARIO_REGISTRO = ?');
 
@@ -216,8 +222,10 @@ trait ValeRendirTraits
                  $stmt->bindParam(26, $numero_cuenta, PDO::PARAM_STR);
                  $stmt->bindParam(27, $cod_categoria_estado_vale, PDO::PARAM_STR);
                  $stmt->bindParam(28, $txt_categoria_estado_vale, PDO::PARAM_STR);
-                 $stmt->bindParam(29, $cod_estado, PDO::PARAM_BOOL);
-                 $stmt->bindParam(30, $cod_usuario_registro, PDO::PARAM_STR);
+                 $stmt->bindParam(29, $cod_personal_rendir, PDO::PARAM_STR);
+                 $stmt->bindParam(30, $txt_personal_rendir, PDO::PARAM_STR);
+                 $stmt->bindParam(31, $cod_estado, PDO::PARAM_BOOL);
+                 $stmt->bindParam(32, $cod_usuario_registro, PDO::PARAM_STR);
 
 
                 $stmt->execute();
