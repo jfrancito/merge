@@ -5159,7 +5159,7 @@ class GestionLiquidacionGastosController extends Controller
 
         $combo_cuenta = $this->lg_combo_cuenta_moneda("Seleccione una Cuenta", "", "TCO0000000000069", $centro_id, $empresa_id, $moneda_sel_id);
         //$combo_cuenta           =   $this->lg_combo_cuenta_lg_moneda('Seleccione una Cuenta','','',$centro_id,$empresa_id,$moneda_sel_id);
-
+        //dd($empresa_id);
 
         return View::make('general/ajax/combocuenta',
             [

@@ -1508,6 +1508,20 @@ class GestionPlanillaMovilidadController extends Controller
                 $centro_id = 'CEN0000000000002';
             }
 
+            $dtrabajador    =   STDTrabajador::where('COD_TRAB','=',Session::get('usuario')->usuarioosiris_id)->first();
+            if (is_null($centro_id)) {
+                $trabajadoresplasc    =     DB::table('WEB.platrabajadores')
+                                            ->where('situacion_id', 'PRMAECEN000000000002')
+                                            ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+                                            ->where('dni', $dni)
+                                            ->first();
+                if(count($trabajadoresplasc)>0){
+                    return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd', 'El trabajador '.$dtrabajador->TXT_APE_PATERNO.' '.$dtrabajador->TXT_APE_MATERNO.' '.$dtrabajador->TXT_NOMBRES. 'tiene una SEDE no identificada '.$trabajadoresplasc->cadlocal);
+                }else{
+                    return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd', 'El trabajador no esta en planilla');
+                }
+            }
+
 
             $periodo        =   $this->gn_periodo_actual_xanio_xempresa($anio, $mes, Session::get('empresas')->COD_EMPR);
 
