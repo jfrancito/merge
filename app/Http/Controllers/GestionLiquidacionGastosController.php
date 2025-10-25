@@ -4001,7 +4001,7 @@ class GestionLiquidacionGastosController extends Controller
                         if($request['producto_id_factura'] != 'SERVICIO DE TRANSPORTE DE PASAJEROS'){
 
 
-                            
+
                             if (!empty($ULTIMA_FECHA_RENDICION_DET)) {
 
                                 //$fechaInicio = Carbon::parse($PRIMERA_FECHA_RENDICION_DET);
@@ -4010,7 +4010,7 @@ class GestionLiquidacionGastosController extends Controller
                                 $fechaFin = Carbon::parse($ULTIMA_FECHA_RENDICION_DET)->endOfDay();
                                 $fechaMin = Carbon::parse($request['fecha_emision']);
 
-                                if($liquidaciongastos->REEMBOLSO != 'REEMBOLSO'){
+                                if($liquidaciongastos->ARENDIR != 'REEMBOLSO'){
                                     // Validar si está dentro del rango
                                     if (!$fechaMin->between($fechaInicio, $fechaFin)) {
 
@@ -4021,7 +4021,7 @@ class GestionLiquidacionGastosController extends Controller
                                 }
 
                             }
-                            
+
 
 
                         }
@@ -4083,7 +4083,7 @@ class GestionLiquidacionGastosController extends Controller
                             $fechaMin = Carbon::parse($request['fecha_emision']);
 
 
-                            if($liquidaciongastos->REEMBOLSO != 'REEMBOLSO'){
+                            if($liquidaciongastos->ARENDIR != 'REEMBOLSO'){
 
                                 if (!$fechaMin->between($fechaInicio, $fechaFin)) {
                                     return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/-1')
@@ -4272,7 +4272,7 @@ class GestionLiquidacionGastosController extends Controller
 
 
                     $producto = DB::table('ALM.PRODUCTO')->where('NOM_PRODUCTO', '=', $request['producto_id_factura'])->first();
-
+                                                           
                     if($request['producto_id_factura'] != 'MOVILIDAD AEROPUERTO'){
 
                         $importe = $request['totaldetalle'];
@@ -4283,14 +4283,18 @@ class GestionLiquidacionGastosController extends Controller
                                             ->where('TXT_TABLA_ASOC', $producto->NOM_PRODUCTO)
                                             ->first();
                         $producto_id = $producto->NOM_PRODUCTO;
+
+
                         if (!empty($ULTIMA_FECHA_RENDICION_DET)) {
                             if(count($referencia_asoc)>0){
+
+
                                 $mensaje_error_vale = $this->validar_reembolso_supere_monto($liquidaciongastos,$liquidaciongastos->ARENDIR,$referencia_asoc->COD_TABLA,$importe,$producto_id,$resta);
                                 if($mensaje_error_vale!=''){
-                                    return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/' . $item)->with('errorbd', $mensaje_error_vale); 
+                                    return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/-1')->with('errorbd', $mensaje_error_vale); 
                                 }
                             }else{
-                                return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/' . $item)->with('errorbd', 'Este producto no esta relacionado en la tabla referencia');
+                                return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/-1')->with('errorbd', 'Este producto no esta relacionado en la tabla referencia');
                             }
                         }
                     }
@@ -4660,7 +4664,9 @@ class GestionLiquidacionGastosController extends Controller
             $tdetliquidacionitem = LqgDetLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ITEM', '=', $valor)->first();
             $tdetdocliquidacionitem = LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->where('ITEM', '=', $valor)->get();
 
-            $tipodoc_id = $tdetliquidacionitem->COD_TIPODOCUMENTO;
+            //dd($tdetliquidacionitem);
+
+            $tipodoc_id = '';
 
 
             $combo_tipodoc = $this->lg_combo_tipodocumento("Seleccione Tipo Documento");
