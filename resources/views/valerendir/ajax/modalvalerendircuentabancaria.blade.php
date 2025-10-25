@@ -11,25 +11,22 @@
       <div class="panel-body panel-body-contrast" id="form_cuenta" style="display:none;">
           <div class="container" style="margin-top:15px;">
                   <div class="row mt-4">
-                     
-
-                      <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
+                    
+                        <div class="col-md-3 col-lg-3">
                           <div class="form-group">
-                                <label for="tipo_pago" class="col-sm-12 control-label labelleft negrita">
-                                        TIPO DE PAGO <span class="obligatorio">(*)</span> :
-                                </label>
-                                <div class="col-sm-12 input-group xs-mb-12">
-                                        {!! Form::select('tipo_pago', $listausuarios5, '',
-                                 [
-                                   'class'       => 'form-select select2',
-                                   'id'          => 'tipo_pago',
-                                   'data-aw'     => '1',
-                                 ])
-                          !!}
-                                  </div>
-                            </div>
-                     </div>
-
+                            <label for="tipo_pago" class="control-label labelleft negrita">
+                              TIPO DE PAGO <span class="obligatorio">(*)</span> :
+                            </label>
+                            {!! Form::select('tipo_pago', $listausuarios5, '',
+                              [
+                                'class' => 'form-select select2',
+                                'id' => 'tipo_pago',
+                                'data-aw' => '1',
+                                'style' => 'width:100%;'
+                              ])
+                            !!}
+                          </div>
+                        </div>
 
                     <div class="col-md-4 col-lg-3" id="grupo_entidad">
                         <label class="form-label fw-bold labelleft negrita">
@@ -130,3 +127,4 @@
 
   });
 </script>
+
