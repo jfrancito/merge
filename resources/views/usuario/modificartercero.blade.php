@@ -146,7 +146,7 @@
                 <div class="col-sm-5">
 
                   <input  type="text"
-                          id="cuenta_bancaria" name='cuenta_bancaria' value="{{ old('cuenta_bancaria') }}" placeholder="Cuenta Bancaria"
+                          id="cuenta_bancaria" name='cuenta_bancaria' value="{{old('cuenta_bancaria',$tercero->TXT_CUENTA_CORRIENTE)}}" placeholder="Cuenta Bancaria"
                           required = ""
                           autocomplete="off" class="form-control input-sm"/>
 
