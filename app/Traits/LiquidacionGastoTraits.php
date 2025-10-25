@@ -121,7 +121,7 @@ trait LiquidacionGastoTraits
                     $mensaje = 'El monto supera al producto o el producto no se encuentra configurado en el vale';
                 }
 
-                if (($total+$importe-$resta)>$monto) {
+                if (($total+$importe-$resta)>($monto+0.2)) {
                     $mensaje = 'El monto supera al producto que se encuentra configurado en el vale';
                 }
             }
