@@ -217,8 +217,8 @@ class ValeRendirApruebaController extends Controller
                 $vale->NRO_CUENTA,
                 $cod_categoria_estado_vale,
                 $txt_categoria_estado_vale, 
-                '',
-                '',
+                $vale->COD_PERSONAL_RENDIR,
+                $vale->TXT_PERSONAL_RENDIR,
                 false,
                 Session::get('usuario')->id 
             );

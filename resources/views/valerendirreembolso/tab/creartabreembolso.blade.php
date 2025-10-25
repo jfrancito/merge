@@ -171,15 +171,18 @@
                                data-aw="1">
                     </div>
 
-                    <!-- Destino -->
-                    <div class="form-group" style="min-width: 250px;">
-                        <label class="control-label labelleft">Destino:</label>
-                        {!! Form::select('destino', $listausuarios3, '', [
+                     <div class="col-md-3 col-lg-3">
+                          <div class="form-group">
+                            <label for="tipo_pago" class="control-label labelleft negrita">
+                              DESTINO <span class="obligatorio">(*)</span> :
+                            </label>
+                             {!! Form::select('destino', $listausuarios3, '', [
                             'class'   => 'form-control control select2',
                             'id'      => 'destino',
                             'data-aw' => '1',
                         ]) !!}
-                    </div>
+                          </div>
+                        </div>
 
                     <!-- Movilidad Propia -->
                     <div class="form-group"
@@ -221,10 +224,7 @@
                     <input type="hidden" id="importeDestinos"
                            value="{{ json_encode($importeDestinos) }}">
                 </div>
-
-
-              
-
+                
                 <div class="col-xs-12">
                     <div class='listacontratomasiva listajax reporteajax'>
                     </div>
