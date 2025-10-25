@@ -4666,7 +4666,7 @@ class GestionLiquidacionGastosController extends Controller
 
             //dd($tdetliquidacionitem);
 
-            $tipodoc_id = '';
+            $tipodoc_id = $tdetliquidacionitem->COD_TIPODOCUMENTO;
 
 
             $combo_tipodoc = $this->lg_combo_tipodocumento("Seleccione Tipo Documento");
