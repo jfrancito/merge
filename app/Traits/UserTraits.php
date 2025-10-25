@@ -386,6 +386,10 @@ trait UserTraits
                     }
                 }
 
+                //TRANSFERENCIA Y REEMBOLSO
+                if($item->ARENDIR == 'REEMBOLSO' && $item->COD_CATEGORIA_TIPOPAGO == 'MPC0000000000002'){
+                    $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00037')->first();
+                }
 
                 $array                  =   Array(
                     'item'                =>  $item,
