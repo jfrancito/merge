@@ -46,7 +46,6 @@ class ValeRendirControllerReembolso extends Controller
             ->where('dni', $dni)
             ->first();
 
-
         if (!$trabajadorespla) {
             return view('valerendir.modal.modalerrorempresa', [
                 'mensaje' => 'No puede realizar un registro porque no es la empresa a cual pertenece.',
@@ -65,8 +64,6 @@ class ValeRendirControllerReembolso extends Controller
             $trabajadorespla->centro_osiris_id = 'CEN0000000000002';
         }
      
-
-       
 
         $centro_id = $trabajadorespla->centro_osiris_id;
 
@@ -91,6 +88,12 @@ class ValeRendirControllerReembolso extends Controller
         $tipoMotivo = WEBTipoMotivoValeRendir::where('cod_estado',1)->pluck('txt_motivo', 'cod_motivo')->toArray();
         $cod_usuario_registro = Session::get('usuario')->id;
         $cod_empr = Session::get('empresas')->COD_EMPR;
+
+        $areacomercial = DB::table('WEB.platrabajadores')
+        ->where('situacion_id', 'PRMAECEN000000000002') // activo
+        ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+        ->where('dni', $dni)
+        ->value('cadarea');
 
 
         // DETALLE - VALE A RENDIR 
@@ -251,6 +254,7 @@ class ValeRendirControllerReembolso extends Controller
             ->first();
         $cadlocal = trim(strtoupper($trabajadorespla->cadlocal ?? ''));
 
+
        if (
             stripos($cadlocal, 'SEDE ICA') !== false ||
             stripos($cadlocal, 'SEDE CHIMBOTE') !== false
@@ -356,7 +360,7 @@ class ValeRendirControllerReembolso extends Controller
             ->where('nro_documento', $trabajadorespla->dni)
             ->first();
 
-            if (!$personalReembolso) {
+            if (!$personalReembolso && strtoupper($trabajadorespla->cadarea) !== 'MARKETING') {
                     return response()->json([
                         'error' => 'Usted no cuenta con permiso para generar un vale de reembolso.'
                     ]);

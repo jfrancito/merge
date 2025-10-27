@@ -53,6 +53,7 @@ use App\Traits\GeneralesTraits;
 use App\Traits\ComprobanteProvisionTraits;
 use App\Traits\ComprobanteTraits;
 use App\Traits\LiquidacionGastoTraits;
+use App\Traits\ValeRendirTraits;
 
 class UserController extends Controller {
 
@@ -61,6 +62,7 @@ class UserController extends Controller {
     use ComprobanteProvisionTraits;
     use ComprobanteTraits;
     use LiquidacionGastoTraits;
+    use ValeRendirTraits;
 
 	public function actionDescargarManual(Request $request)
 	{
@@ -1271,6 +1273,9 @@ class UserController extends Controller {
 		$count_observados_lg 				= 	0;
 		$count_observadoslg_le 				= 	0;
 
+		//vl
+		$urlvl 								=	'';
+		$count_x_aprobar_vl				    = 	0;
 
 
 		if($trol->ind_uc == 1){
@@ -1510,6 +1515,7 @@ class UserController extends Controller {
     				$urldis 				=	'/gestion-de-administracion-aprobar/j25?operacion_id=DOCUMENTO_INTERNO_SECADO';
     				$urldib 				=	'/gestion-de-administracion-aprobar/j25?operacion_id=DOCUMENTO_SERVICIO_BALANZA';
     				$urllg 					=	'/gestion-de-aprobacion-liquidacion-gastos-administracion/rR6';
+    				$urlvl					=	'/gestion-aprueba-rendir/APz';
 
 
 					//ESTIBA
@@ -1588,6 +1594,30 @@ class UserController extends Controller {
 		        	$listadatosob    		=   $this->lg_lista_cabecera_comprobante_total_obs_le_administracion();
 					$count_observadoslg_le	= 	count($listadatosob);
 
+					//VALE
+					$listadatos             = $this->listaValeRendirAprueba(
+												    'GEN',   
+												    '',      
+												    '',      
+												    '',      
+												    '',      
+												    '',      
+												    '',      
+												    '',      
+												    0,       
+												    0,       
+												    ''       
+												);
+
+												$listadatos = array_filter($listadatos, function ($vale) {
+											    $estado = is_array($vale)
+											        ? trim($vale['COD_CATEGORIA_ESTADO_VALE'] ?? '')
+											        : trim($vale->COD_CATEGORIA_ESTADO_VALE ?? '');
+
+											    return $estado === 'ETM0000000000005';
+												});
+					$listadatos 			= array_values($listadatos);
+					$count_x_aprobar_vl		= count($listadatos);
 
 				}
 			}
@@ -1629,6 +1659,10 @@ class UserController extends Controller {
 						 	'count_x_aprobar_lg' 		=> $count_x_aprobar_lg,
 						 	'count_observados_lg' 		=> $count_observados_lg,
 						 	'count_observadoslg_le' 	=> $count_observadoslg_le,
+
+						 	'urlvl' 					=> $urlvl,
+						 	'count_x_aprobar_vl' 		=> $count_x_aprobar_vl,
+						 	
 
 						 	'urldip' 					=> $urldip,
 						 	'count_reparables_dip' 		=> $count_reparables_dip,
