@@ -4524,14 +4524,22 @@ class GestionLiquidacionGastosController extends Controller
         if (count($trabajador) > 0) {
             $dni = $trabajador->NRO_DOCUMENTO;
         }
+
         $trabajadorespla = DB::table('WEB.platrabajadores')
             ->where('situacion_id', 'PRMAECEN000000000002')
             ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
             ->where('dni', $dni)
             ->first();
 
-        if (count($trabajadorespla) <= 0) {
-            return Redirect::to('gestion-de-liquidacion-gastos/' . $idopcion)->with('errorbd', 'No existe registro en planilla');
+        $terceros   =   DB::table('TERCEROS')
+                        ->where('USER_ID', Session::get('usuario')->id)
+                        ->where('ACTIVO', 1)
+                        ->first();
+     
+        if (count($terceros) <= 0) {
+            if (count($trabajadorespla) <= 0) {
+                return Redirect::to('gestion-de-liquidacion-gastos/' . $idopcion)->with('errorbd', 'No existe registro en planilla');
+            }
         }
 
 
@@ -4620,12 +4628,29 @@ class GestionLiquidacionGastosController extends Controller
             $gasto_id = "";
             $combo_gasto = $this->lg_combo_gasto("Seleccione Gasto");
 
-            $centrocosto = DB::table('CON.CENTRO_COSTO')
-                ->where('COD_ESTADO', 1)
-                ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
-                ->where('TXT_REFERENCIA_PLANILLA', 'LIKE', '%' . $trabajadorespla->cadarea . '%')
-                //->where('TXT_REFERENCIA_PLANILLA', $trabajadorespla->cadarea)
-                ->where('IND_MOVIMIENTO', 1)->first();
+
+            //terceros
+            $terceros   =   DB::table('TERCEROS')
+                            ->where('USER_ID', Session::get('usuario')->id)
+                            ->where('ACTIVO', 1)
+                            ->first();
+         
+            if (count($terceros) > 0) {
+                $area_planilla = $terceros->TXT_AREA;
+                $centrocosto = DB::table('CON.CENTRO_COSTO')
+                    ->where('COD_ESTADO', 1)
+                    ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
+                    ->where('COD_CENTRO_COSTO', '=', $terceros->COD_AREA)
+                    ->where('IND_MOVIMIENTO', 1)->first();
+            }else{
+                $area_planilla = $trabajadorespla->cadarea;
+                $centrocosto = DB::table('CON.CENTRO_COSTO')
+                    ->where('COD_ESTADO', 1)
+                    ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
+                    ->where('TXT_REFERENCIA_PLANILLA', 'LIKE', '%' . $trabajadorespla->cadarea . '%')
+                    //->where('TXT_REFERENCIA_PLANILLA', $trabajadorespla->cadarea)
+                    ->where('IND_MOVIMIENTO', 1)->first();
+            }
 
             //dd($centrocosto);
 
@@ -4633,7 +4658,7 @@ class GestionLiquidacionGastosController extends Controller
             if (count($centrocosto) > 0) {
                 $costo_id = $centrocosto->COD_CENTRO_COSTO;
             }
-            $combo_costo = $this->lg_combo_costo_xtrabajador("Seleccione Costo", $trabajadorespla->cadarea);
+            $combo_costo = $this->lg_combo_costo_xtrabajador("Seleccione Costo", $area_planilla);
             $tdetliquidacionitem = array();
             $tdetdocliquidacionitem = array();
             $archivos = array();
@@ -5373,6 +5398,8 @@ class GestionLiquidacionGastosController extends Controller
             ->where('USUARIO_CREA', '=', Session::get('usuario')->id)
             ->where('COD_EMPRESA', '=', Session::get('empresas')->COD_EMPR)
             ->orderby('FECHA_CREA', 'DESC')->get();
+
+        //dd(Session::get('usuario')->id);
 
         $listadatos = array();
         $funcion = $this;
