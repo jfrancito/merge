@@ -503,7 +503,7 @@ class ValeRendirApruebaController extends Controller
         $ultimo_destino = $ultimo ? $ultimo->NOM_DESTINO : '';
         $total_dias = $detallesImporte->sum('DIAS');
         $ruta_viaje = $detallesImporte->pluck('NOM_DESTINO')->implode('/ ');
-        $txt_glosa = $vale->first()->TXT_GLOSA ?? null;
+        $txt_glosa = $vale->TXT_GLOSA ?? null;
         $txt_glosa_venta = $detallesImporte->pluck('TXT_GLOSA_VENTA')->filter()->implode(' // ');
         $txt_glosa_cobranza = $detallesImporte->pluck('TXT_GLOSA_COBRANZA')->filter()->implode(' // ');
 
