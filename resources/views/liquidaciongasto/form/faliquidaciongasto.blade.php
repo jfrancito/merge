@@ -94,9 +94,9 @@
       @include('liquidaciongasto.ajax.comboarendir')
     </div>
 
-</div>
+  </div>
 
-<div class="row">
+  <div class="row">
 
     <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 cajaautoriza ajax_combo_autoriza">
       @include('liquidaciongasto.ajax.comboautoriza')

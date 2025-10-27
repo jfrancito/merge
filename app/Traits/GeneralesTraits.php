@@ -357,12 +357,20 @@ trait GeneralesTraits
     {
 
 
+    $liquidaciones = DB::table('LQG_LIQUIDACION_GASTO')
+                    ->where('ACTIVO', 1)
+                    ->where('COD_ESTADO', '<>', 'ETM0000000000006')
+                    ->where('USUARIO_CREA', Session::get('usuario')->id)
+                    ->pluck('ARENDIR_ID')
+                    ->toArray();
+
     $array =   WEBValeRendir::from('WEB.VALE_RENDIR as VR')
                     ->join('TES.AUTORIZACION as AUT', 'VR.ID_OSIRIS', '=', 'AUT.COD_AUTORIZACION')
                     ->join('TES.AUTORIZACION_DETALLE as AUD', 'AUT.COD_AUTORIZACION', '=', 'AUD.COD_AUTORIZACION')
                     ->join('CMP.DOCUMENTO_CTBLE as DOC', 'AUD.COD_DOC_CTBLE', '=', 'DOC.COD_DOCUMENTO_CTBLE')
                     ->where('VR.COD_USUARIO_CREA_AUD',Session::get('usuario')->id)
                     ->where('DOC.CAN_SALDO', '>', 0)
+                    ->whereNotIn('ID', $liquidaciones)
                     ->where('DOC.COD_CATEGORIA_TIPO_DOC', 'TDO0000000000072')
                     ->select(
                         'VR.ID',
@@ -372,8 +380,6 @@ trait GeneralesTraits
                     ->orderBy('VR.ID', 'asc')
                     ->pluck('MONTO', 'VR.ID')
                     ->toArray();
-
-
 
         $combo = array('' => 'Seleccione un arendir') + $array;
         return $combo;
