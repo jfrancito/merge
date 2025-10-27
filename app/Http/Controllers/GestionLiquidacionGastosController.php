@@ -442,19 +442,14 @@ class GestionLiquidacionGastosController extends Controller
                     $centro_id = $trabajadorespla->centro_osiris_id;
                 }
 
-                if ($centro_id == 'CEN0000000000003') {
-                    $centro_id = 'CEN0000000000001';
-                }
-                if (Session::get('usuario')->id == '1CIX00000040') {
-                    $centro_id = 'CEN0000000000001';
+                $terceros   =   DB::table('TERCEROS')
+                                ->where('USER_ID', Session::get('usuario')->id)
+                                ->where('ACTIVO', 1)
+                                ->first();
+                if (count($terceros) > 0) {
+                    $centro_id = $terceros->COD_CENTRO;
                 }
 
-                if (Session::get('usuario')->id == '1CIX00000380') {
-                    $centro_id = 'CEN0000000000002';
-                }
-                if (Session::get('usuario')->id == '1CIX00000391') {
-                    $centro_id = 'CEN0000000000002';
-                }
 
 
                 if ($centro_id == '') {
@@ -545,19 +540,12 @@ class GestionLiquidacionGastosController extends Controller
         }
 
 
-        if ($centro_id == 'CEN0000000000003') {
-            $centro_id = 'CEN0000000000001';
-        }
-
-        if (Session::get('usuario')->id == '1CIX00000040') {
-            $centro_id = 'CEN0000000000001';
-        }
-
-        if (Session::get('usuario')->id == '1CIX00000380') {
-            $centro_id = 'CEN0000000000002';
-        }
-        if (Session::get('usuario')->id == '1CIX00000391') {
-            $centro_id = 'CEN0000000000002';
+        $terceros   =   DB::table('TERCEROS')
+                        ->where('USER_ID', Session::get('usuario')->id)
+                        ->where('ACTIVO', 1)
+                        ->first();
+        if (count($terceros) > 0) {
+            $centro_id = $terceros->COD_CENTRO;
         }
 
         $contratos = DB::table('CMP.CONTRATO')
@@ -3432,17 +3420,17 @@ class GestionLiquidacionGastosController extends Controller
 
                     //solo 2 dias
                     $fechaDada = $request['ULTIMA_FECHA_RENDICION'];
-                    $fechaSumada = $this->addBusinessDays($fechaDada, 2, true);
+                    $fechaSumada = $this->addBusinessDays($fechaDada, 4, true);
                     $fechaActual = Carbon::now();
                     if ($fechaSumada->lessThan($fechaActual)) {
-                        //return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/0')->with('errorbd', 'La ultima fecha para emitir esta Liquidacion de Gastos debio ser es hasta '.$fechaSumada);
+                        return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/0')->with('errorbd', 'La ultima fecha para emitir esta Liquidacion de Gastos debio ser es hasta '.$fechaSumada);
                     }
 
                     //dd($request['ULTIMA_FECHA_RENDICION']);
 
                     $tdetliquidaciongastos = LqgDetLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
                     if (count($tdetliquidaciongastos) <= 0) {
-                        //return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/0')->with('errorbd', 'Para poder emitir tiene que cargar sus documentos');
+                        return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/0')->with('errorbd', 'Para poder emitir tiene que cargar sus documentos');
                     }
 
 
@@ -4272,7 +4260,7 @@ class GestionLiquidacionGastosController extends Controller
 
 
                     $producto = DB::table('ALM.PRODUCTO')->where('NOM_PRODUCTO', '=', $request['producto_id_factura'])->first();
-                                                           
+                                       
                     if($request['producto_id_factura'] != 'MOVILIDAD AEROPUERTO'){
 
                         $importe = $request['totaldetalle'];
@@ -4284,10 +4272,8 @@ class GestionLiquidacionGastosController extends Controller
                                             ->first();
                         $producto_id = $producto->NOM_PRODUCTO;
 
-
                         if (!empty($ULTIMA_FECHA_RENDICION_DET)) {
                             if(count($referencia_asoc)>0){
-
 
                                 $mensaje_error_vale = $this->validar_reembolso_supere_monto($liquidaciongastos,$liquidaciongastos->ARENDIR,$referencia_asoc->COD_TABLA,$importe,$producto_id,$resta);
                                 if($mensaje_error_vale!=''){
@@ -4895,12 +4881,30 @@ class GestionLiquidacionGastosController extends Controller
                     ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
                     ->where('dni', $dni)
                     ->first();
-                $centrocosto = DB::table('CON.CENTRO_COSTO')
-                    ->where('COD_ESTADO', 1)
-                    ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
-                    //->where('TXT_REFERENCIA_PLANILLA', $trabajadorespla->cadarea)
-                    ->where('TXT_REFERENCIA_PLANILLA', 'LIKE', '%' . $trabajadorespla->cadarea . '%')
-                    ->where('IND_MOVIMIENTO', 1)->first();
+
+                //terceros
+                $terceros   =   DB::table('TERCEROS')
+                                ->where('USER_ID', Session::get('usuario')->id)
+                                ->where('ACTIVO', 1)
+                                ->first();
+             
+                if (count($terceros) > 0) {
+                    $area_planilla = $terceros->TXT_AREA;
+                    $centrocosto = DB::table('CON.CENTRO_COSTO')
+                        ->where('COD_ESTADO', 1)
+                        ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
+                        ->where('COD_CENTRO_COSTO', '=', $terceros->COD_AREA)
+                        ->where('IND_MOVIMIENTO', 1)->first();
+                }else{
+                    $area_planilla = $trabajadorespla->cadarea;
+                    $centrocosto = DB::table('CON.CENTRO_COSTO')
+                        ->where('COD_ESTADO', 1)
+                        ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
+                        //->where('TXT_REFERENCIA_PLANILLA', $trabajadorespla->cadarea)
+                        ->where('TXT_REFERENCIA_PLANILLA', 'LIKE', '%' . $trabajadorespla->cadarea . '%')
+                        ->where('IND_MOVIMIENTO', 1)->first();
+                }
+
                 $area_id = "";
                 $area_txt = "";
 
@@ -4947,6 +4951,8 @@ class GestionLiquidacionGastosController extends Controller
                 $cabecera->USUARIO_CREA = Session::get('usuario')->id;
                 $cabecera->save();
 
+                //dd("hola");
+
                 DB::commit();
             } catch (\Exception $ex) {
                 DB::rollback();
@@ -4975,22 +4981,23 @@ class GestionLiquidacionGastosController extends Controller
             if (count($trabajadorespla) > 0) {
                 $centro_id = $trabajadorespla->centro_osiris_id;
             } else {
-                return Redirect::to('gestion-de-liquidacion-gastos/' . $idopcion)->with('errorbd', 'No puede realizar un registro porque no es la empresa a cual pertenece');
+                //terceros
+                $terceros   =   DB::table('TERCEROS')
+                                ->where('USER_ID', Session::get('usuario')->id)
+                                ->where('ACTIVO', 1)
+                                ->first();
+                if (count($terceros) <= 0) {
+                    return Redirect::to('gestion-de-liquidacion-gastos/' . $idopcion)->with('errorbd', 'No puede realizar un registro porque no es la empresa a cual pertenece');
+                }
+
             }
 
-            if ($centro_id == 'CEN0000000000003') {
-                $centro_id = 'CEN0000000000001';
-            }
-
-            if (Session::get('usuario')->id == '1CIX00000040') {
-                $centro_id = 'CEN0000000000001';
-            }
-
-            if (Session::get('usuario')->id == '1CIX00000380') {
-                $centro_id = 'CEN0000000000002';
-            }
-            if (Session::get('usuario')->id == '1CIX00000391') {
-                $centro_id = 'CEN0000000000002';
+            $terceros   =   DB::table('TERCEROS')
+                            ->where('USER_ID', Session::get('usuario')->id)
+                            ->where('ACTIVO', 1)
+                            ->first();
+            if (count($terceros) > 0) {
+                $centro_id = $terceros->COD_CENTRO;
             }
 
             $trabajador = DB::table('STD.TRABAJADOR')
@@ -5001,23 +5008,44 @@ class GestionLiquidacionGastosController extends Controller
             if (count($trabajador) > 0) {
                 $dni = $trabajador->NRO_DOCUMENTO;
             }
+
             $trabajadorespla = DB::table('WEB.platrabajadores')
                 ->where('situacion_id', 'PRMAECEN000000000002')
                 ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
                 ->where('dni', $dni)
                 ->first();
 
-            $centrocosto = DB::table('CON.CENTRO_COSTO')
-                ->where('COD_ESTADO', 1)
-                ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
-                ->where('TXT_REFERENCIA_PLANILLA', 'LIKE', '%' . $trabajadorespla->cadarea . '%')
-                ->where('IND_MOVIMIENTO', 1)->first();
 
-            $area_planilla = $trabajadorespla->cadarea;
+            //terceros
+            $terceros   =   DB::table('TERCEROS')
+                            ->where('USER_ID', Session::get('usuario')->id)
+                            ->where('ACTIVO', 1)
+                            ->first();
+         
+            if (count($terceros) > 0) {
+                $area_planilla = $terceros->TXT_AREA;
+
+                $centrocosto = DB::table('CON.CENTRO_COSTO')
+                    ->where('COD_ESTADO', 1)
+                    ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
+                    ->where('COD_CENTRO_COSTO', '=', $terceros->COD_AREA)
+                    ->where('IND_MOVIMIENTO', 1)->first();
+
+            }else{
+                $area_planilla = $trabajadorespla->cadarea;
+                $centrocosto = DB::table('CON.CENTRO_COSTO')
+                    ->where('COD_ESTADO', 1)
+                    ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
+                    ->where('TXT_REFERENCIA_PLANILLA', 'LIKE', '%' . $trabajadorespla->cadarea . '%')
+                    ->where('IND_MOVIMIENTO', 1)->first();
+
+            }
+
+
             $anio = $this->anio;
             $mes = $this->mes;
 
-            //dd($trabajadorespla->cadarea);
+
 
             $area_id = "";
             $area_txt = "";
@@ -5141,23 +5169,19 @@ class GestionLiquidacionGastosController extends Controller
             ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
             ->where('dni', $dni)
             ->first();
-        if (count($trabajador) > 0) {
+
+        if (count($trabajadorespla) > 0) {
             $centro_id = $trabajadorespla->centro_osiris_id;
         }
-        if ($centro_id == 'CEN0000000000003') {
-            $centro_id = 'CEN0000000000001';
+
+        $terceros   =   DB::table('TERCEROS')
+                        ->where('USER_ID', Session::get('usuario')->id)
+                        ->where('ACTIVO', 1)
+                        ->first();
+        if (count($terceros) > 0) {
+            $centro_id = $terceros->COD_CENTRO;
         }
 
-        if (Session::get('usuario')->id == '1CIX00000040') {
-            $centro_id = 'CEN0000000000001';
-        }
-
-        if (Session::get('usuario')->id == '1CIX00000380') {
-            $centro_id = 'CEN0000000000002';
-        }
-        if (Session::get('usuario')->id == '1CIX00000391') {
-            $centro_id = 'CEN0000000000002';
-        }
 
         $cadena = $empresa_id;
         $partes = explode(" - ", $cadena);
@@ -5169,7 +5193,7 @@ class GestionLiquidacionGastosController extends Controller
 
         $combo_cuenta = $this->lg_combo_cuenta_moneda("Seleccione una Cuenta", "", "TCO0000000000069", $centro_id, $empresa_id, $moneda_sel_id);
         //$combo_cuenta           =   $this->lg_combo_cuenta_lg_moneda('Seleccione una Cuenta','','',$centro_id,$empresa_id,$moneda_sel_id);
-        //dd($empresa_id);
+
 
         return View::make('general/ajax/combocuenta',
             [
@@ -5203,19 +5227,12 @@ class GestionLiquidacionGastosController extends Controller
             $centro_id = $trabajadorespla->centro_osiris_id;
         }
 
-        if ($centro_id == 'CEN0000000000003') {
-            $centro_id = 'CEN0000000000001';
-        }
-
-        if (Session::get('usuario')->id == '1CIX00000040') {
-            $centro_id = 'CEN0000000000001';
-        }
-        
-        if (Session::get('usuario')->id == '1CIX00000380') {
-            $centro_id = 'CEN0000000000002';
-        }
-        if (Session::get('usuario')->id == '1CIX00000391') {
-            $centro_id = 'CEN0000000000002';
+        $terceros   =   DB::table('TERCEROS')
+                        ->where('USER_ID', Session::get('usuario')->id)
+                        ->where('ACTIVO', 1)
+                        ->first();
+        if (count($terceros) > 0) {
+            $centro_id = $terceros->COD_CENTRO;
         }
 
 
