@@ -11,6 +11,7 @@
                       $countdis   =   $count_x_aprobar_dis+$count_reparables_dis+$count_reparables__revdis+$count_observados_dis+$count_observadosdis_le;
                       $countdib   =   $count_x_aprobar_dib+$count_reparables_dib+$count_reparables__revdib+$count_observados_dib+$count_observadosdib_le;
                       $countlg    =   $count_x_aprobar_lg+$count_observados_lg+$count_observadoslg_le;
+                      $countvl    =   $count_x_aprobar_vl;
                       $cantotal   =   $countoc+$countcon+$countest+$countdip+$countdis+$countdib;
                     @endphp
 
@@ -83,6 +84,15 @@
                             </a>
                         </li>
 
+                        <li class="nav-item">
+                            <a class="nav-link category-tab" data-category="dvl">
+                                <span class="nav-text">VALES A RENDIR</span>
+                                <div class="notification-container">
+                                    <span class="notification-badge">{{$countvl}}</span>
+                                </div>
+                            </a>
+                        </li>
+
 
 
                     </ul>
@@ -131,6 +141,10 @@
 
             <div id="dlg" class="category-content">
                 @include('usuario.dashboard.dlg')
+            </div>
+
+            <div id="dvl" class="category-content">
+                @include('usuario.dashboard.dvl')
             </div>
 
 

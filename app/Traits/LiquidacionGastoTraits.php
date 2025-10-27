@@ -1403,6 +1403,8 @@ trait LiquidacionGastoTraits
         return  $listadatos;
     }
 
+
+
     private function lg_lista_cabecera_comprobante_total_jefe() {
         if(Session::get('usuario')->id== '1CIX00000001'){
 
