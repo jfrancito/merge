@@ -4,6 +4,12 @@ $(document).ready(function(){
 	var carpeta = $("#carpeta").val();
 
 
+	$('#personal').on('change', function() {
+	    var dataUsuario = $(this).find(':selected').attr('data_usuario');
+	    $("#name").val(dataUsuario.trim());
+	    
+	    //console.log(dataUsuario);
+	});
 
 
 
