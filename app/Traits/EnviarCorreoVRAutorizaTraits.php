@@ -102,7 +102,7 @@ trait EnviarCorreoVRAutorizaTraits
             if ($cod_personal_rendir === 'TPR0000000000002') {
                 $emailfrom = $emailTrabajadorTercero;
                 $nombreFrom = $nombreCompletoTercero;
-                $emailTo = $emailAutorizaTercero;
+                $emailTo = $emailTrabajadorAutoriza;
                 $emailfromcentro = $centroVale;
 
             } else {
@@ -134,7 +134,7 @@ trait EnviarCorreoVRAutorizaTraits
             function ($message) use ($emailfrom, $nombreFrom, $emailTo, $destinatarios, $emailfromcentro) {
                 $message->from($emailfrom, $nombreFrom)
                         ->to($destinatarios)
-                        ->cc([$emailfrom, $emailTo])
+                        ->cc($emailTo)
                         ->subject('VALE RENDIR - INDUAMERICA');
             });
 
