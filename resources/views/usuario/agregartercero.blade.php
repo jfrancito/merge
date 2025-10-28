@@ -30,7 +30,7 @@
                     <optgroup label="Usuarios">
                       <option value="">Seleccione Personal</option>
                       @foreach($listapersonal as $item)
-                        <option value="{{$item->id}}">{{$item->nombres}}</option>
+                        <option value="{{$item->id}}" data_usuario='{{$item->COD_USUARIO}}'>{{$item->nombres}}</option>
                       @endforeach
                     </optgroup>
                   </select>

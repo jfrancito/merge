@@ -3336,7 +3336,26 @@ class GestionLiquidacionGastosController extends Controller
             try {
                 DB::beginTransaction();
 
-                $liquidaciongastos = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->first();
+                $liquidaciongastos  =   LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->first();
+
+                $ldetallearendir    =   DB::table('WEB.VALE_RENDIR_DETALLE')
+                                        ->where('ID', $liquidaciongastos->ARENDIR_ID)
+                                        ->where('COD_ESTADO', 1)
+                                        ->where('IND_AEREO','=',1)
+                                        ->first();
+
+                if (count($ldetallearendir) > 0) {
+
+                    $productospasajeaereo  =    DB::table('LQG_DETDOCUMENTOLIQUIDACIONGASTO')
+                                                ->where('ID_DOCUMENTO', $iddocumento)
+                                                ->where('COD_PRODUCTO','=','PRD0000000024431')
+                                                ->where('ACTIVO', 1)
+                                                ->get();
+
+                    if (count($productospasajeaereo) <= 0) {                       
+                        return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/0')->with('errorbd', 'Su vale tiene indicador de PASAJE AEREO debe subir tambien en la Liquidacion');
+                    }
+                }
 
                 $tipopago_id = $request['tipopago_id'];
                 $entidadbanco_id = $request['entidadbanco_id'];
