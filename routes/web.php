@@ -190,7 +190,9 @@ Route::group(['middleware' => ['authaw']], function () {
 
 
 	//MOVILIDAD IMPULSO
-	Route::any('/gestion-de-planilla-movilidad/{idopcion}', 'GestionPlanillaMovilidadImpulsoController@actionListarPlanillaMovilidadImpulso');
+	Route::any('/gestion-movilidad-impulso/{idopcion}', 'GestionPlanillaMovilidadImpulsoController@actionListarPlanillaMovilidadImpulso');
+	Route::any('/agregar-movilidad-impulso/{idopcion}', 'GestionPlanillaMovilidadImpulsoController@actionAgregarMovilidadImpulso');
+
 
 
 
