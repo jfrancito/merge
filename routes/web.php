@@ -189,6 +189,10 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/gestion-renta-cuarta-contabilidad/{idopcion}/{idordencompra}', 'GestionCuartaCategoriaController@actionGestionContabilidadRC');
 
 
+	//MOVILIDAD IMPULSO
+	Route::any('/gestion-de-planilla-movilidad/{idopcion}', 'GestionPlanillaMovilidadImpulsoController@actionListarPlanillaMovilidadImpulso');
+
+
 
 	//PLANILLA MOVILIDAD
 	Route::any('/gestion-de-planilla-movilidad/{idopcion}', 'GestionPlanillaMovilidadController@actionListarPlanillaMovilidad');
