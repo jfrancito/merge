@@ -1985,7 +1985,7 @@ class UserController extends Controller {
 
 
             $arraydni    				=   DB::table('WEB.platrabajadores')
-		                                    //->where('situacion_id', 'PRMAECEN000000000002')
+		                                    ->where('situacion_id', 'PRMAECEN000000000002')
 		                                    //->where('dni','=','41277717')
 	                                        ->pluck('dni')
 	                                        ->toArray();
