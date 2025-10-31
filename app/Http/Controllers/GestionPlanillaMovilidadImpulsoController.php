@@ -129,52 +129,41 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
                     $idcab                              =   $this->funciones->getCreateIdMaestradocpla('SEMANA_IMPULSO','SEMI');
 
 
-                    $semana_id                          =   $request['semana_id'];
+                    $semana_id          =   $request['semana_id'];
+                    $cadena             =   $semana_id;
+                    $partes             =   explode(' - ', $cadena);
+                    $anio               =   $partes[0];     // 2025
+                    $semana             =   $partes[1];   // 43
 
-
-
-    [ID_DOCUMENTO] [varchar](20) NOT NULL,
-    [ANIO] [varchar](20) NULL,
-    [NRO_SEMANA] INT NULL,
-    [FECHA_INICIO] [date] NULL,
-    [FECHA_FIN] [date] NULL,
-    [COD_EMPRESA] [varchar](20) NULL,
-    [TXT_EMPRESA] [varchar](200) NULL,
-    [COD_EMPRESA_TRABAJADOR] [varchar](20) NULL,
-    [TXT_EMPRESA_TRABAJADOR] [varchar](1000) NULL,
-    [MONTO] [decimal](18, 2) NULL,
-    [COD_ESTADO] [varchar](20) NULL,
-    [TXT_ESTADO] [varchar](200) NULL,
-    [ACTIVO] [int] NOT NULL DEFAULT ((1)),
-    [FECHA_CREA] [datetime] NOT NULL,
-    [USUARIO_CREA] [varchar](20) NOT NULL,
-    [FECHA_MOD] [datetime] NULL,
-    [USUARIO_MOD] [varchar](20) NULL
+                    $semanat            =   DB::table('TES.CALENDARIO_SEMANA')
+                                            ->where('ANIO', $anio)
+                                            ->where('ACTIVO', 1)
+                                            ->where('NRO_SEMANA', $semana)
+                                            ->first();
 
                     $cabecera                           =   new SemanaImpulso;
                     $cabecera->ID_DOCUMENTO             =   $idcab;
-                    $cabecera->CODIGO                   =   $codigo;
-                    $cabecera->SERIE                    =   $serie;
-                    $cabecera->NUMERO                   =   $numero;
-                    $cabecera->COD_TRABAJADOR           =   $codtrabajador;
-                    $cabecera->TXT_TRABAJADOR           =   $txttrabajador;
+                    $cabecera->ANIO                     =   $anio;
+                    $cabecera->NRO_SEMANA               =   $semana;
+                    $cabecera->FECHA_INICIO             =   $semanat->FEC_INI;
+                    $cabecera->FECHA_FIN                =   $semanat->FEC_FIN;
                     $cabecera->COD_EMPRESA              =   Session::get('empresas')->COD_EMPR;
                     $cabecera->TXT_EMPRESA              =   Session::get('empresas')->NOM_EMPR;
-                    $cabecera->DOCUMENTO_TRABAJADOR     =   $doctrabajador;
-                    $cabecera->COD_PERIODO              =   $periodo->COD_PERIODO;
-                    $cabecera->TXT_PERIODO              =   $periodo->TXT_NOMBRE;
+                    $cabecera->COD_EMPRESA_TRABAJADOR   =   $codtrabajador;
+                    $cabecera->TXT_EMPRESA_TRABAJADOR   =   $txttrabajador;
+                    $cabecera->MONTO                    =   0;
                     $cabecera->COD_ESTADO               =   'ETM0000000000001';
                     $cabecera->TXT_ESTADO               =   'GENERADO';
-                    $cabecera->COD_CENTRO               =   $centrot->COD_CENTRO;
-                    $cabecera->TXT_CENTRO               =   $centrot->NOM_CENTRO;
-                    $cabecera->COD_DIRECCION            =   $direccion->COD_DIRECCION;
-                    $cabecera->TXT_DIRECCION            =   $direccion->DIRECCION;
-                    $cabecera->IGV                      =   0;
-                    $cabecera->SUBTOTAL                 =   0;
-                    $cabecera->TOTAL                    =   0;
                     $cabecera->FECHA_CREA               =   $this->fechaactual;
                     $cabecera->USUARIO_CREA             =   Session::get('usuario')->id;
                     $cabecera->save();
+
+
+
+
+
+
+
 
 
                 DB::commit();
