@@ -1167,7 +1167,7 @@ trait LiquidacionGastoTraits
                 $TXT_TABLA              =       'CMP.DOCUMENTO_CTBLE';
                 $TXT_GLOSA              =       'LIQUIDACION GASTOS';
 
-                $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.REFERENCIA_ASOC_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?');
+                $stmt = DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.REFERENCIA_ASOC_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?');
                 $stmt->bindParam(1, $accion ,PDO::PARAM_STR);                                   //@IND_TIPO_OPERACION='I',
                 $stmt->bindParam(2, $coddocumentodet[0]  ,PDO::PARAM_STR);                      //@COD_TABLA='IILMNC0000000495',
                 $stmt->bindParam(3, $coddocumento[0] ,PDO::PARAM_STR);                          //@COD_TABLA_ASOC='IILMFC0000005728',
@@ -1187,7 +1187,7 @@ trait LiquidacionGastoTraits
                 $TXT_TABLA              =       'CMP.DOCUMENTO_CTBLE';
                 $TXT_GLOSA              =       'LIQUIDACION GASTOS';
 
-                $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.REFERENCIA_ASOC_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?');
+                $stmt = DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.REFERENCIA_ASOC_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?');
                 $stmt->bindParam(1, $accion ,PDO::PARAM_STR);                                   //@IND_TIPO_OPERACION='I',
                 $stmt->bindParam(2, $coddocumento[0]  ,PDO::PARAM_STR);                      //@COD_TABLA='IILMNC0000000495',
                 $stmt->bindParam(3, $coddocumentodet[0] ,PDO::PARAM_STR);                          //@COD_TABLA_ASOC='IILMFC0000005728',
@@ -1223,7 +1223,7 @@ trait LiquidacionGastoTraits
                         $COD_USUARIO_REGISTRO                   =       Session::get('usuario')->name;
 
 
-                        $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.DETALLE_PRODUCTO_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?');
+                        $stmt = DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.DETALLE_PRODUCTO_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?');
                         $stmt->bindParam(1, $accion ,PDO::PARAM_STR);                                   //@IND_TIPO_OPERACION='I',
                         $stmt->bindParam(2, $coddocumentodet[0]  ,PDO::PARAM_STR);                      //@COD_TABLA='IILMVR0000002923',
                         $stmt->bindParam(3, $COD_PRODUCTO ,PDO::PARAM_STR);                             //@COD_PRODUCTO='PRD0000000016186',

@@ -1223,6 +1223,33 @@ trait GeneralesTraits
         return $combo;
     }
 
+    private function gn_generacion_combo_semana($titulo, $todo)
+    {
+
+        $array = DB::table('TES.CALENDARIO_SEMANA')
+            ->where('COD_ESTADO', 1)
+            ->select(
+                DB::raw("CAST(ANIO AS varchar(4)) + ' - ' + CAST(NRO_SEMANA AS varchar(10)) AS COD_SEMANA"),
+                DB::raw("CONVERT(varchar(10), FEC_INI, 103) + ' - ' + CONVERT(varchar(10), FEC_FIN, 103) AS SEMANA")
+            )
+            ->whereRaw('YEAR(GETDATE()) >= YEAR(FEC_INI)')
+            ->whereRaw('MONTH(GETDATE()) >= MONTH(FEC_INI)')
+            ->orderBy('ANIO','desc')
+            ->orderBy('NRO_SEMANA','desc')
+            ->pluck('SEMANA', 'COD_SEMANA')
+            ->toArray();
+
+
+        if ($todo == 'TODO') {
+            $combo = array('' => $titulo, $todo => $todo) + $array;
+        } else {
+            $combo = array('' => $titulo) + $array;
+        }
+
+        return $combo;
+    }
+
+
 
     private function gn_generacion_combo_direccion_lg($titulo, $todo)
     {

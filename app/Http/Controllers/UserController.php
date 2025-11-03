@@ -1985,7 +1985,7 @@ class UserController extends Controller {
 
 
             $arraydni    				=   DB::table('WEB.platrabajadores')
-		                                    //->where('situacion_id', 'PRMAECEN000000000002')
+		                                    ->where('situacion_id', 'PRMAECEN000000000002')
 		                                    //->where('dni','=','41277717')
 	                                        ->pluck('dni')
 	                                        ->toArray();
@@ -1996,12 +1996,12 @@ class UserController extends Controller {
 	                                        ->toArray();
 
 
-			$listapersonal 				= 	DB::table('WEB.LISTAPERSONAL')
-	    									->leftJoin('users', 'WEB.LISTAPERSONAL.id', '=', 'users.usuarioosiris_id')
+			$listapersonal 				= 	DB::table('WEB.LISTAPERSONAL_TER')
+	    									->leftJoin('users', 'WEB.LISTAPERSONAL_TER.id', '=', 'users.usuarioosiris_id')
 	    									->whereNull('users.usuarioosiris_id')
-	    									->whereNotIn('WEB.LISTAPERSONAL.id',$arraytrabajadores)
-	    									->where('WEB.LISTAPERSONAL.id','not like','JVE%')
-	    									->select('WEB.LISTAPERSONAL.id','WEB.LISTAPERSONAL.nombres')
+	    									->whereNotIn('WEB.LISTAPERSONAL_TER.id',$arraytrabajadores)
+	    									->where('WEB.LISTAPERSONAL_TER.id','not like','JVE%')
+	    									->select('WEB.LISTAPERSONAL_TER.id','WEB.LISTAPERSONAL_TER.nombres','WEB.LISTAPERSONAL_TER.COD_USUARIO')
 	    									->get();
 
 			$rol 						= 	DB::table('WEB.Rols')->where('ind_merge','=',1)->where('id','=','1CIX00000048')->pluck('nombre','id')->toArray();
