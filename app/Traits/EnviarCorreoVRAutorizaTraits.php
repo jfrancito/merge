@@ -102,7 +102,7 @@ trait EnviarCorreoVRAutorizaTraits
             if ($cod_personal_rendir === 'TPR0000000000002') {
                 $emailfrom = $emailTrabajadorTercero;
                 $nombreFrom = $nombreCompletoTercero;
-                $emailTo = $emailTrabajadorAutoriza;
+                $emailTo = $emailAutorizaTercero;
                 $emailfromcentro = $centroVale;
 
             } else {
