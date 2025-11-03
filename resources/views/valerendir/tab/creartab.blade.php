@@ -178,8 +178,8 @@
                             </div>
                         </div>
 
-                        <!-- MONTOS APROXIMADOS (COMERCIAL) -->
-                        @if(isset($areacomercial) && strtoupper($areacomercial) == 'COMERCIAL')
+                        <!-- MONTOS APROXIMADOS (VENTAS) -->
+                        @if(isset($areacomercial) && strtoupper($areacomercial) == 'VENTAS')
                             <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
                                 <label for="txt_glosa_venta" class="form-label fw-bold labelleft negrita">
                                     MONTO APROX. DE VENTA <span class="obligatorio">(*)</span> :
@@ -206,12 +206,12 @@
                                     <input class="form-check-input" type="checkbox" id="ind_propio" value="1">
                                     <label class="form-check-label negrita">MOVILIDAD PROPIA</label>
                                 </div>
-                                @if($codlinea == 'TPL0000000000001' || $codlinea == 'TPL0000000000002')
+                                
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="ind_aereo" value="1">
                                     <label class="form-check-label negrita">PASAJE AÉREO</label>
                                 </div>
-                                @endif
+                                
                             </div>
 
                             <!-- BOTONES -->

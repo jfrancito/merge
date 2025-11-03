@@ -753,10 +753,10 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::post('/rechazar_vale_rendir_reembolso', 'ValeRendirAutorizaControllerReembolso@actionRechazarValeRendirReembolso');
 	Route::post('/ver_detalle_importe_autoriza_reembolso', 'ValeRendirAutorizaControllerReembolso@actionDetalleImporteReembolso');
 	
-
-
-
-
+	//GESTION LISTA VALE A RENDIR ADMINISTRACION
+	Route::any('/gestion-de-vale-rendir-administracion/{idopcion}', 'GestionValeRendirController@actionListarValeRendir');
+	Route::any('/ajax-buscar-documento-vl', 'GestionValeRendirController@actionListarAjaxBuscarDocumentoVL');
+	Route::post('/ver_detalle_vale_gestion', 'GestionValeRendirController@actionVerDetalleVale');
 
 
 
