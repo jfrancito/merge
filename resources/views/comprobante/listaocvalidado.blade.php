@@ -217,6 +217,8 @@
           </div>
     </div>
   </div>
+    @include('comprobante.modal.mregistrorequerimiento')
+  
 @stop
 @section('script')
   <script src="{{ asset('public/lib/datatables/js/jquery.dataTables.min.js') }}" type="text/javascript"></script>

@@ -248,6 +248,34 @@ class UserController extends Controller {
 	}
 
 
+	public function actionAjaxModalVerCuentaBancariaOCIndividual(Request $request)
+	{
+
+        $orden_id               =   $request['orden_id'];
+        $data_banco_codigo      =   $request['data_banco_codigo'];
+        $data_numero_cuenta     =   $request['data_numero_cuenta'];
+
+        $idopcion               =   $request['idopcion'];
+        $fedocumento          	=   FeDocumento::where('ID_DOCUMENTO','=',$orden_id)->first();
+		$empresa 				=	STDEmpresa::where('NRO_DOCUMENTO','=',$fedocumento->RUC_PROVEEDOR)->first();
+
+		$cuentabancarias 		= 	TESCuentaBancaria::where('COD_EMPR_TITULAR','=',$empresa->COD_EMPR)
+									->where('COD_ESTADO','=',1)
+									->where('TXT_NRO_CUENTA_BANCARIA','=',$data_numero_cuenta)
+									->where('COD_EMPR_BANCO','=',$data_banco_codigo)
+									->orderby('TXT_EMPR_BANCO','ASC')
+								  	->get();
+
+		return View::make('usuario/modal/ajax/mvercuentabancariaindividual',
+						 [		 	
+
+						 	'cuentabancarias' 				=> $cuentabancarias,
+						 	'idopcion' 						=> $idopcion,
+						 	'ajax' 							=> true,						 	
+						 ]);
+	}
+
+
 
 	public function actionAjaxModalVerCuentaBancariaOC(Request $request)
 	{

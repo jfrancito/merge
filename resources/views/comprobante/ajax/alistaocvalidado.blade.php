@@ -46,7 +46,8 @@
           <span><b>U. CONTACTO: </b>{{date_format(date_create($item->fecha_uc), 'd-m-Y h:i:s')}}</span>
           <span><b>CONTABILIDAD : </b> {{date_format(date_create($item->fecha_pr), 'd-m-Y h:i:s')}}</span>
           <span><b>ADMINISTRACION : </b> {{date_format(date_create($item->fecha_ap), 'd-m-Y h:i:s')}}</span>
-
+          <div class="tools ver_cuenta_bancaria_indi select" data_orden_id = "{{$item->ID_DOCUMENTO}}" data_numero_cuenta = "{{$item->TXT_NRO_CUENTA_BANCARIA}}" data_banco_codigo = "{{$item->COD_CATEGORIA_BANCO}}"
+            style="cursor: pointer;width: 80px;"> <span class="label label-success">Ver Cuenta</span></div>
         </td>
 
         @include('comprobante.ajax.estadosgestion')
