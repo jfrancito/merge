@@ -24,6 +24,10 @@ class AppServiceProvider extends ServiceProvider
 
         View::share('version', '11.66');
 
+
+
+
+
         View::share('titulo', '');
 
         Validator::extend('unico', function($attribute, $value, $parameters , $validator){

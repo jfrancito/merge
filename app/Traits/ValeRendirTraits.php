@@ -878,7 +878,7 @@ trait ValeRendirTraits
 
 
     public function  valependientesrendir($cod_usuario_crea)
-        {
+    {
             
             $array_lista_retail = array();
             $cod_usuario_registro = "";
@@ -902,7 +902,35 @@ trait ValeRendirTraits
                         }
 
             return $array_lista_retail;
-        }
+    }
+
+
+    private function lg_lista_cabecera_vale_rendir($fecha_inicio, $fecha_fin, $estado_id)
+    {
+        $listavale = DB::table('WEB.VALE_RENDIR as V')
+            ->select(
+                'V.*',
+                DB::raw('(
+                    SELECT TOP 1 D.NOM_DESTINO 
+                    FROM WEB.VALE_RENDIR_DETALLE AS D 
+                    WHERE D.ID = V.ID 
+                    ORDER BY D.FEC_USUARIO_CREA_AUD DESC
+                ) as NOM_DESTINO')
+            )
+            ->where('V.COD_EMPR', Session::get('empresas')->COD_EMPR)
+            ->when($estado_id != '' && $estado_id != 'TODO', function ($query) use ($estado_id) {
+                $query->where('V.COD_CATEGORIA_ESTADO_VALE', '=', $estado_id);
+            })
+            ->where(function ($query) use ($fecha_inicio, $fecha_fin) {
+                $query->whereBetween(DB::raw("CAST(V.FEC_USUARIO_CREA_AUD AS DATE)"), [$fecha_inicio, $fecha_fin])
+                    ->orWhereBetween(DB::raw("CAST(V.FEC_USUARIO_MODIF_AUD AS DATE)"), [$fecha_inicio, $fecha_fin]);
+            })
+            ->orderBy('V.ID', 'ASC')
+            ->get();
+
+        return $listavale;
+    }
+
 }
 
 
