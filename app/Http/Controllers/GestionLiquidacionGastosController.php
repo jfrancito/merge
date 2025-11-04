@@ -5280,7 +5280,7 @@ class GestionLiquidacionGastosController extends Controller
         if (count($terceros) > 0) {
             $centro_id = $terceros->COD_CENTRO;
         }
-        //dd($terceros);
+
 
         $cadena = $empresa_id;
         $partes = explode(" - ", $cadena);
@@ -5288,7 +5288,7 @@ class GestionLiquidacionGastosController extends Controller
         if (count($partes) > 1) {
             $nombre = trim($partes[1]);
         }
-
+        //dd($nombre);
 
         $combo_cuenta = $this->lg_combo_cuenta_lg('Seleccione una Cuenta', '', '', $centro_id, $nombre);
 

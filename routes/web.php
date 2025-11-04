@@ -94,6 +94,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/configurar-datos-cuenta-bancaria-oc/{prefijo_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaOC');
 
 	Route::any('/ajax-modal-ver-cuenta-bancaria-oc', 'UserController@actionAjaxModalVerCuentaBancariaOC');
+
+	Route::any('/ajax-modal-ver-cuenta-bancaria-oc-individual', 'UserController@actionAjaxModalVerCuentaBancariaOCIndividual');
+
 	Route::any('/ajax-modal-ver-cuenta-bancaria-lq', 'UserController@actionAjaxModalVerCuentaBancariaLQ');
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-lq', 'UserController@actionAjaxModalConfiguracionCuentaBancariaLQ');
 	Route::any('/configurar-datos-cuenta-bancaria-lq/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaLQ');
@@ -192,9 +195,12 @@ Route::group(['middleware' => ['authaw']], function () {
 	//MOVILIDAD IMPULSO
 	Route::any('/gestion-movilidad-impulso/{idopcion}', 'GestionPlanillaMovilidadImpulsoController@actionListarPlanillaMovilidadImpulso');
 	Route::any('/agregar-movilidad-impulso/{idopcion}', 'GestionPlanillaMovilidadImpulsoController@actionAgregarMovilidadImpulso');
-
-
-
+	Route::any('/modificar-movilidad-impulso/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionModificarMovilidadImpulso');
+	Route::any('/guardar-movilidad-detalle/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionGuardarDetalleMovilidadImpulso');
+	Route::any('/emitir-movilidad-impulso/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionEmitirDetalleMovilidadImpulso');
+	Route::any('/gestion-de-aprobacion-movilidad-impulso-jefe/{idopcion}', 'GestionPlanillaMovilidadImpulsoController@actionAprobarMovilidadImpulsoJefe');
+	Route::any('/aprobar-movilidad-impulso-jefe/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadImpulsoController@actionAprobarJefeMV');
+	Route::any('/agregar-extorno-jefe-mv/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadImpulsoController@actionAgregarExtornoJefe');
 
 	//PLANILLA MOVILIDAD
 	Route::any('/gestion-de-planilla-movilidad/{idopcion}', 'GestionPlanillaMovilidadController@actionListarPlanillaMovilidad');
