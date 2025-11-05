@@ -19,7 +19,7 @@
               <ul class="nav nav-tabs">
                 <li class="active"><a href="#aprobar" data-toggle="tab"><b>APROBAR y RECOMENDAR</b></a></li>
                 <li><a href="#observar" data-toggle="tab"><b>OBSERVAR</b></a></li>
-                <li><a href="#rechazar" data-toggle="tab"><b>EXTORNAR</b></a></li>
+                <!-- <li><a href="#rechazar" data-toggle="tab"><b>EXTORNAR</b></a></li> -->
               </ul>
               <div class="tab-content">
                 <div id="aprobar" class="tab-pane active cont">
