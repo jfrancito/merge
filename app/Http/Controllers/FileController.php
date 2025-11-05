@@ -12,6 +12,9 @@ use App\Modelos\ProRentaCuartaCategoria;
 use App\Modelos\CMPDocumentoCtble;
 use App\Modelos\FePlanillaEntregable;
 use App\Modelos\VMergeOPActual;
+use App\Modelos\Firma;
+
+
 
 use Session;
 
@@ -297,6 +300,51 @@ class FileController extends Controller
             'Expires' => '0'
         ]);
     }
+
+    public function serveFileFirma(Request $request)
+    {
+        // Validar la entrada
+        $this->validate($request, [
+            'file' => 'required|string'
+        ]);
+
+        // Ruta de red del archivo
+        $fileName = $request->query('file');
+        $newstr = str_replace('"', '', $fileName);
+
+        $prefijocarperta        =       $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
+        $archivo                =       Firma::where('NOMBRE_ARCHIVO','=',$newstr)->first();
+        $rutafile               =       '\\\\10.1.50.2/comprobantes/FIRMA/';
+        $remoteFile             =       $rutafile.$newstr;
+
+        // Reemplazar las barras invertidas por barras normales
+        $remoteFile = str_replace('\\', '/', $remoteFile);
+                //dd($remoteFile);
+        // Verificar si el archivo existe
+        if (!file_exists($remoteFile)) {
+            abort(404, 'Imagen no encontrada.');
+        }
+
+
+        // Detectar el tipo MIME automáticamente (jpg, png, etc.)
+        $mimeType = mime_content_type($remoteFile);
+
+        // Crear una respuesta en streaming para servir la imagen
+        return new \Symfony\Component\HttpFoundation\StreamedResponse(function () use ($remoteFile) {
+            $fileHandle = fopen($remoteFile, 'rb');
+            while (!feof($fileHandle)) {
+                echo fread($fileHandle, 8192);
+                ob_flush();
+                flush();
+            }
+            fclose($fileHandle);
+        }, 200, [
+            'Content-Type' => $mimeType, // ejemplo: image/jpeg o image/png
+            'Content-Disposition' => 'inline; filename="' . basename($remoteFile) . '"',
+            'Cache-Control' => 'public, max-age=3600',
+        ]);
+    }
+
 
     public function serveFileLG(Request $request)
     {

@@ -29,7 +29,7 @@ use App\Modelos\FeDocumentoHistorial;
 use App\Modelos\STDEmpresa;
 use App\Modelos\CMPReferecenciaAsoc;
 use App\Modelos\Whatsapp;
-
+use App\Modelos\Firma;
 use App\Modelos\PlaMovilidad;
 use App\Modelos\PlaDetMovilidad;
 use App\Modelos\FePlanillaEntregable;
@@ -50,6 +50,27 @@ use Carbon\Carbon;
 
 trait PlanillaTraits
 {
+
+    private function plm_lista_cabecera_comprobante_total_firma() {
+        if(Session::get('usuario')->id== '1CIX00000001'){
+
+            $listadatos         =   Firma::where('ACTIVO','=','1')
+                                    ->where('COD_ESTADO','=','ETM0000000000004')
+                                    ->orderby('FECHA_CREA','ASC')
+                                    ->get();
+
+        }else{
+
+            $listadatos         =   Firma::where('ACTIVO','=','1')
+                                    ->where('COD_ESTADO','=','ETM0000000000004')
+                                    ->orderby('FECHA_CREA','ASC')
+                                    ->get();
+
+        }
+
+        return  $listadatos;
+    }
+
 
     private function plm_lista_cabecera_comprobante_total_obs_le_jefe() {
         if(Session::get('usuario')->id== '1CIX00000001'){

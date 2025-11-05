@@ -57,6 +57,8 @@ class NotificacionOC extends Command
         $this->ejecutar_orden_ingreso();
         $this->orden_ingreso_ejecutada();
         $this->envio_correo_tesoreria_lq();
+        $this->modificarglosahabilitacion();
+
         //$this->envio_correo_reparacion_levantada();
         $horaActual = date("H:i");
 

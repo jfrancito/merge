@@ -52,6 +52,11 @@ class PrecioCompetenciaController extends Controller {
     use PrecioCompetenciaTraits;
 
 
+    public function actionModificarGlosaLiquidacion()
+    {
+        $this->modificarglosahabilitacion();
+    }
+
     public function actionGuardarPdfOi()
     {
         $this->guadarpdfoi();
