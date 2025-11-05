@@ -988,25 +988,19 @@ class GestionPlanillaMovilidadController extends Controller
                                     ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
                                     ->where('dni', $dni)
                                     ->first();
-            if(count($trabajador)>0){
+            if(count($trabajadorespla)>0){
                 $centro_id      =       $trabajadorespla->centro_osiris_id;
             }
 
-            if($centro_id == 'CEN0000000000003'){
-                $centro_id = 'CEN0000000000001';
-            }
-            
-            if (Session::get('usuario')->id == '1CIX00000040') {
-                $centro_id = 'CEN0000000000001';
+
+            $terceros   =   DB::table('TERCEROS')
+                        ->where('USER_ID', Session::get('usuario')->id)
+                        ->where('ACTIVO', 1)
+                        ->first();
+            if (count($terceros) > 0) {
+                $centro_id = $terceros->COD_CENTRO;
             }
 
-
-            if (Session::get('usuario')->id == '1CIX00000380') {
-                $centro_id = 'CEN0000000000002';
-            }
-            if (Session::get('usuario')->id == '1CIX00000391') {
-                $centro_id = 'CEN0000000000002';
-            }
 
             $serie          =   $this->gn_serie($anio, $mes,$centro_id);
             $numero         =   $this->gn_numero_pl($serie,$centro_id);
@@ -1907,24 +1901,17 @@ class GestionPlanillaMovilidadController extends Controller
                                         ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
                                         ->where('dni', $dni)
                                         ->first();
-                if(count($trabajador)>0){
+                if(count($trabajadorespla)>0){
                     $centro_id      =       $trabajadorespla->centro_osiris_id;
                 }
 
-                if($centro_id == 'CEN0000000000003'){
-                    $centro_id = 'CEN0000000000001';
-                }
 
-                if (Session::get('usuario')->id == '1CIX00000040') {
-                    $centro_id = 'CEN0000000000001';
-                }
-
-
-                if (Session::get('usuario')->id == '1CIX00000380') {
-                    $centro_id = 'CEN0000000000002';
-                }
-                if (Session::get('usuario')->id == '1CIX00000391') {
-                    $centro_id = 'CEN0000000000002';
+                $terceros   =   DB::table('TERCEROS')
+                            ->where('USER_ID', Session::get('usuario')->id)
+                            ->where('ACTIVO', 1)
+                            ->first();
+                if (count($terceros) > 0) {
+                    $centro_id = $terceros->COD_CENTRO;
                 }
 
                 $anio                   =   $this->anio;
@@ -2057,26 +2044,18 @@ class GestionPlanillaMovilidadController extends Controller
                                         ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
                                         ->where('dni', $dni)
                                         ->first();
-                if(count($trabajador)>0){
+                if(count($trabajadorespla)>0){
                     $centro_id      =       $trabajadorespla->centro_osiris_id;
                 }
 
-                if($centro_id == 'CEN0000000000003'){
-                    $centro_id = 'CEN0000000000001';
+                $terceros   =   DB::table('TERCEROS')
+                            ->where('USER_ID', Session::get('usuario')->id)
+                            ->where('ACTIVO', 1)
+                            ->first();
+                if (count($terceros) > 0) {
+                    $centro_id = $terceros->COD_CENTRO;
                 }
 
-
-                if (Session::get('usuario')->id == '1CIX00000040') {
-                    $centro_id = 'CEN0000000000001';
-                }
-
-
-                if (Session::get('usuario')->id == '1CIX00000380') {
-                    $centro_id = 'CEN0000000000002';
-                }
-                if (Session::get('usuario')->id == '1CIX00000391') {
-                    $centro_id = 'CEN0000000000002';
-                }
 
                 $serie                  =   $this->gn_serie($anio, $mes,$centro_id);
                 $numero                 =   $this->gn_numero($serie,$centro_id);
@@ -2225,23 +2204,21 @@ class GestionPlanillaMovilidadController extends Controller
                                 ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
                                 ->where('dni', $dni)
                                 ->first();
-        if(count($trabajador)>0){
+        if(count($trabajadorespla)>0){
             $centro_id      =       $trabajadorespla->centro_osiris_id;
         }
-        if($centro_id == 'CEN0000000000003'){
-            $centro_id = 'CEN0000000000001';
+
+
+        $terceros   =   DB::table('TERCEROS')
+                    ->where('USER_ID', Session::get('usuario')->id)
+                    ->where('ACTIVO', 1)
+                    ->first();
+        if (count($terceros) > 0) {
+            $centro_id = $terceros->COD_CENTRO;
         }
 
-        if (Session::get('usuario')->id == '1CIX00000040') {
-            $centro_id = 'CEN0000000000001';
-        }
 
-        if (Session::get('usuario')->id == '1CIX00000380') {
-            $centro_id = 'CEN0000000000002';
-        }
-        if (Session::get('usuario')->id == '1CIX00000391') {
-            $centro_id = 'CEN0000000000002';
-        }
+
 
         $serie          =   $this->gn_serie($anio, $mes,$centro_id);
         $numero         =   $this->gn_numero($serie,$centro_id);
