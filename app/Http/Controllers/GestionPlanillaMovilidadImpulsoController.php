@@ -471,7 +471,6 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
                         return Redirect::back()->withInput()->with('errorurl', 'Las fechas deben estar en el mismo periodo');
                     }
 
-                    dd("hola");
 
                     $anio               =   $inicio->year;
                     $mes                =   $inicio->month;
@@ -507,8 +506,8 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
 
 
                     if ($semanat) {
-                        $fechaInicio = new DateTime($semanat->FEC_INI);
-                        $fechaFin = new DateTime($semanat->FEC_FIN);
+                        $fechaInicio = new DateTime($fecha_inicio);
+                        $fechaFin = new DateTime($fecha_fin);
                         $cont = 1;
                         // Recorremos día por día
                         while ($fechaInicio <= $fechaFin) {

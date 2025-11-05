@@ -4669,6 +4669,9 @@ class GestionLiquidacionGastosController extends Controller
                     ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
                     ->where('COD_CENTRO_COSTO', '=', $terceros->COD_AREA)
                     ->where('IND_MOVIMIENTO', 1)->first();
+                    $combo_costo = $this->lg_combo_costo_xtrabajador_tercero("Seleccione Costo", $terceros->COD_AREA);
+
+
             }else{
                 $area_planilla = $trabajadorespla->cadarea;
                 $centrocosto = DB::table('CON.CENTRO_COSTO')
@@ -4677,15 +4680,17 @@ class GestionLiquidacionGastosController extends Controller
                     ->where('TXT_REFERENCIA_PLANILLA', 'LIKE', '%' . $trabajadorespla->cadarea . '%')
                     //->where('TXT_REFERENCIA_PLANILLA', $trabajadorespla->cadarea)
                     ->where('IND_MOVIMIENTO', 1)->first();
+                $combo_costo = $this->lg_combo_costo_xtrabajador("Seleccione Costo", $area_planilla);
+
             }
 
-            //dd($centrocosto);
 
             $costo_id = "";
             if (count($centrocosto) > 0) {
                 $costo_id = $centrocosto->COD_CENTRO_COSTO;
             }
-            $combo_costo = $this->lg_combo_costo_xtrabajador("Seleccione Costo", $area_planilla);
+
+
             $tdetliquidacionitem = array();
             $tdetdocliquidacionitem = array();
             $archivos = array();
@@ -4693,7 +4698,7 @@ class GestionLiquidacionGastosController extends Controller
             if ($valor_nuevo == '-1') {
                 $active = "registro";
             }
-
+            //dd($combo_costo);
 
         } else {
 
@@ -4727,10 +4732,13 @@ class GestionLiquidacionGastosController extends Controller
             //dd("hola");
             $costo_id = $tdetliquidacionitem->COD_COSTO;
             $combo_costo = $this->lg_combo_costo_xtrabajador("Seleccione Costo", $trabajadorespla->cadarea);
+
+
             $ajax = true;
             $archivos = Archivo::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->where('DOCUMENTO_ITEM', '=', $valor)->get();
 
         }
+
 
         $tarchivos = CMPCategoria::where('TXT_GRUPO', '=', 'DOCUMENTOS_COMPRA')
             ->whereIn('COD_CATEGORIA', ['DCC0000000000036', 'DCC0000000000004'])->get();
@@ -4777,7 +4785,7 @@ class GestionLiquidacionGastosController extends Controller
         }
 
 
-        //dd($cuentaco_id);
+        //dd($combo_costo);
         return View::make('liquidaciongasto.modificarliquidaciongastos',
             [
                 'liquidaciongastos' => $liquidaciongastos,
