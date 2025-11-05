@@ -771,9 +771,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/gestion-de-vale-rendir-administracion/{idopcion}', 'GestionValeRendirController@actionListarValeRendir');
 	Route::any('/ajax-buscar-documento-vl', 'GestionValeRendirController@actionListarAjaxBuscarDocumentoVL');
 	Route::post('/ver_detalle_vale_gestion', 'GestionValeRendirController@actionVerDetalleVale');
-
-
-
+	Route::post('/actualizar_dias_vale', 'GestionValeRendirController@actionActualizarDiasVale');
 });
 
 Route::get('/pruebaemail/{emailfrom}/{nombreusuario}', 'PruebasController@actionPruebaEmail');

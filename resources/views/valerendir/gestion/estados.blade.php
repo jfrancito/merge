@@ -17,7 +17,7 @@
             @if($item->COD_CATEGORIA_ESTADO_VALE == 'ETM0000000000003') 
                 <span class="badge badge-primary">{{$item->TXT_CATEGORIA_ESTADO_VALE}}</span>
             @else
-              @if($item->COD_CATEGORIA_ESTADO_VALE == 'ETM0000000000006') 
+              @if($item->COD_CATEGORIA_ESTADO_VALE == 'ETM0000000000010') 
                   <span class="badge badge-danger">{{$item->TXT_CATEGORIA_ESTADO_VALE}}</span>
               @else
                 @if($item->COD_CATEGORIA_ESTADO_VALE == 'ETM0000000000008') 

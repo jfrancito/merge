@@ -26,6 +26,7 @@ trait EnviarCorreoVRAutorizaTraits
             $cod_personal_rendir = DB::table('WEB.VALE_RENDIR')
                 ->where('ID', $valerendir_id)
                 ->value('COD_PERSONAL_RENDIR');
+                
             $centroVale = DB::table('WEB.VALE_RENDIR')
                 ->where('ID', $valerendir_id)
                 ->value('COD_CENTRO');

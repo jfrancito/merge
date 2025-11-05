@@ -925,8 +925,9 @@ trait ValeRendirTraits
                 $query->whereBetween(DB::raw("CAST(V.FEC_USUARIO_CREA_AUD AS DATE)"), [$fecha_inicio, $fecha_fin])
                     ->orWhereBetween(DB::raw("CAST(V.FEC_USUARIO_MODIF_AUD AS DATE)"), [$fecha_inicio, $fecha_fin]);
             })
-            ->orderBy('V.ID', 'ASC')
-            ->get();
+             ->orderBy('V.COD_CENTRO', 'ASC') 
+             ->orderBy('V.ID', 'DESC')  
+             ->get();
 
         return $listavale;
     }

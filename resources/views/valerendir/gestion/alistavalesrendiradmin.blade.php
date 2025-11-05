@@ -53,13 +53,13 @@
           <div class="btn-group btn-hspace">
             <button type="button" id="dropdownAcciones{{ $item->ID }}" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>
             <ul role="menu" class="dropdown-menu pull-right">
-              <li>
-                 <a class="dropdown-item verdetalle-valegestion d-flex align-items-center" href="#">
-                    <i class="mdi mdi-check-circle-outline text-success mr-2"></i> Detalle Vale a Rendir
-                  </a>
-            
-                </a>
-              </li>
+                @if($item->TIPO_MOTIVO == 'TIP0000000000003')
+                <li>
+                    <a class="dropdown-item verdetalle-valegestion d-flex align-items-center" href="#">
+                        <i class="mdi mdi-check-circle-outline text-success mr-2"></i> Detalle Vale a Rendir
+                    </a>
+                </li>
+            @endif
             </ul>
           </div>
         </td>
