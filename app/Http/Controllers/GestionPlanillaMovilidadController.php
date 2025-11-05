@@ -1666,7 +1666,7 @@ class GestionPlanillaMovilidadController extends Controller
 
             $rutaImagen             =   public_path('firmas/'.$dni.'.jpg');
             if (!file_exists($rutaImagen)){
-                //return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd','No cuenta con firma suba su firma');
+                return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd','No cuenta con firma suba su firma');
             }
 
             //dd($dni);
