@@ -1569,12 +1569,17 @@ class GestionPlanillaMovilidadController extends Controller
                     if(count($trabajador)>0){
                         $dni        =       $trabajador->NRO_DOCUMENTO;
                     }
+
+
+
                     $trabajadorespla    =   DB::table('WEB.platrabajadores')
                                             ->where('situacion_id', 'PRMAECEN000000000002')
                                             ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
                                             ->where('dni', $dni)
                                             ->first();
-                    if(count($trabajador)>0){
+
+
+                    if(count($trabajadorespla)>0){
                         $centro_id      =       $trabajadorespla->centro_osiris_id;
                     }
 
@@ -1609,6 +1614,7 @@ class GestionPlanillaMovilidadController extends Controller
 
                     $direcion_id                        =   $request['direccion_id'];
                     $direccion                          =   $this->gn_generacion_combo_direccion_lg_top($direcion_id);
+
 
 
                     $cabecera                           =   new PlaMovilidad;
@@ -1660,7 +1666,7 @@ class GestionPlanillaMovilidadController extends Controller
 
             $rutaImagen             =   public_path('firmas/'.$dni.'.jpg');
             if (!file_exists($rutaImagen)){
-                return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd','No cuenta con firma suba su firma');
+                //return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd','No cuenta con firma suba su firma');
             }
 
             //dd($dni);

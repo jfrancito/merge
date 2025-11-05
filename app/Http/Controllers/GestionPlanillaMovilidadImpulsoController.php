@@ -49,6 +49,7 @@ use Hashids;
 use SplFileInfo;
 use Excel;
 use DateTime;
+use Carbon\Carbon;
 
 class GestionPlanillaMovilidadImpulsoController extends Controller
 {
@@ -454,20 +455,27 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
                         $doctrabajador  =   $dtrabajador->NRO_DOCUMENTO;
                         $codtrabajador  =   $dtrabajador->COD_TRAB;
                     }
-                    $idcab                              =   $this->funciones->getCreateIdMaestradocpla('SEMANA_IMPULSO','SEMI');
+                    $idcab              =   $this->funciones->getCreateIdMaestradocpla('SEMANA_IMPULSO','SEMI');
+                    $fecha_inicio       =   $request['fecha_inicio'];
+                    $fecha_fin          =   $request['fecha_fin'];
+                    // Convertir a objetos Carbon
+                    $inicio = Carbon::parse($fecha_inicio);
+                    $fin = Carbon::parse($fecha_fin);
+                    // Extraer año y mes
+                    $anio_inicio = $inicio->year;
+                    $mes_inicio = $inicio->month;
+                    $anio_fin = $fin->year;
+                    $mes_fin = $fin->month;
+                    // Validar que estén en el mismo periodo (mismo año y mes)
+                    if (!($anio_inicio === $anio_fin && $mes_inicio === $mes_fin)) {
+                        return Redirect::back()->withInput()->with('errorurl', 'Las fechas deben estar en el mismo periodo');
+                    }
 
+                    dd("hola");
 
-                    $semana_id          =   $request['semana_id'];
-                    $cadena             =   $semana_id;
-                    $partes             =   explode(' - ', $cadena);
-                    $anio               =   $partes[0];     // 2025
-                    $semana             =   $partes[1];   // 43
+                    $anio               =   $inicio->year;
+                    $mes                =   $inicio->month;
 
-                    $semanat            =   DB::table('TES.CALENDARIO_SEMANA')
-                                            ->where('ANIO', $anio)
-                                            ->where('COD_ESTADO', 1)
-                                            ->where('NRO_SEMANA', $semana)
-                                            ->first();
                     $area_id            =   $request['area_id'];
                     $area_nombre        =   $request['area_nombre'];
                     $centro_id          =   $request['centro_id'];
@@ -477,7 +485,7 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
                     $cabecera                           =   new SemanaImpulso;
                     $cabecera->ID_DOCUMENTO             =   $idcab;
                     $cabecera->ANIO                     =   $anio;
-                    $cabecera->NRO_SEMANA               =   $semana;
+                    $cabecera->MES                      =   $semana;
                     $cabecera->FECHA_INICIO             =   $semanat->FEC_INI;
                     $cabecera->FECHA_FIN                =   $semanat->FEC_FIN;
                     $cabecera->COD_EMPRESA              =   Session::get('empresas')->COD_EMPR;
@@ -601,20 +609,24 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
 
             $combosemana                 =       $this->gn_generacion_combo_semana("Seleccione Semana",""); 
             $semana_id                   =       '';
-            $fecha_creacion =   $this->hoy;
-
+            $fecha_creacion              =       $this->hoy;
+            $fecha_inicio                =       $this->fecha_sin_hora;
+            $fecha_fin                   =       $this->fecha_sin_hora;
 
             return View::make('planillamovilidadimpulso.agregarmovilidadimpulso',
                              [
-                                'combosemana' => $combosemana,
-                                'semana_id' => $semana_id,
-                                'fecha_creacion' => $fecha_creacion,
-                                'area_id'       => $area_id,
-                                'area_nombre'       => $area_nombre,
-                                'centro_id'     => $centro_id,
-                                'centro_id'     => $centro_id,
+                                'combosemana'       => $combosemana,
+                                'semana_id'         => $semana_id,
+                                'fecha_creacion'    => $fecha_creacion,
 
-                                'idopcion' => $idopcion
+                                'fecha_inicio'      => $fecha_inicio,
+                                'fecha_fin'         => $fecha_fin,
+
+                                'area_id'           => $area_id,
+                                'area_nombre'       => $area_nombre,
+                                'centro_id'         => $centro_id,
+                                'centro_id'         => $centro_id,
+                                'idopcion'          => $idopcion
                              ]);
         }   
     }
