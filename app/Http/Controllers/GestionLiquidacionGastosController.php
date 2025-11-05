@@ -3437,9 +3437,17 @@ class GestionLiquidacionGastosController extends Controller
 
                 } else {
 
+                    $arendri            =   DB::table('WEB.VALE_RENDIR')
+                                            ->where('ID', $liquidaciongastos->ARENDIR_ID)
+                                            ->first();
+                    $diasarendir        =   1;                       
+                    if(count($arendri)>0){
+                        $diasarendir    = $arendri->AUMENTO_DIAS ?? 0;;  
+                    }
+
                     //solo 2 dias
                     $fechaDada = $request['ULTIMA_FECHA_RENDICION'];
-                    $fechaSumada = $this->addBusinessDays($fechaDada, 4, true);
+                    $fechaSumada = $this->addBusinessDays($fechaDada, 4 + $diasarendir, true);
                     $fechaActual = Carbon::now();
                     if ($fechaSumada->lessThan($fechaActual)) {
                         return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/0')->with('errorbd', 'La ultima fecha para emitir esta Liquidacion de Gastos debio ser es hasta '.$fechaSumada);
