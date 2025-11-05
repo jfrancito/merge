@@ -19,6 +19,8 @@ use App\Modelos\CONPeriodo;
 use App\Modelos\FePlanillaEntregable;
 use App\Modelos\CMPDocAsociarCompra;
 use App\Modelos\Archivo;
+use App\Modelos\Firma;
+
 
 use Greenter\Parser\DocumentParserInterface;
 use Greenter\Xml\Parser\InvoiceParser;
@@ -47,6 +49,173 @@ class GestionPlanillaMovilidadController extends Controller
     use GeneralesTraits;
     use PlanillaTraits;
     use ComprobanteTraits;
+
+    public function actionAgregarExtornoFirma($idopcion, $idordencompra, Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion, 'Modificar');
+        if ($validarurl <> 'true') {
+            return $validarurl;
+        }
+        /******************************************************/
+        $idcab = $idordencompra;
+        $iddocumento = $this->funciones->decodificarmaestrapre($idordencompra, 'FIRM');
+        View::share('titulo', 'Extornar Firma');
+
+        if ($_POST) {
+
+            try {
+
+                DB::beginTransaction();
+                $descripcion = $request['descripcionextorno'];
+                $firma = Firma::where('ID_DOCUMENTO', '=', $iddocumento)->first();
+                //ANULAR TODA LA OPERACION
+                Firma::where('ID_DOCUMENTO', $iddocumento)
+                    ->update(
+                        [
+                            'COD_ESTADO' => 'ETM0000000000006',
+                            'TXT_ESTADO' => 'RECHAZADO',
+                            'TXT_EXTORNO' => $descripcion
+                        ]
+                    );
+
+                DB::commit();
+                return Redirect::to('gestion-de-aprobacion-firma-administracion/' . $idopcion)->with('bienhecho', 'Comprobante : ' . $firma->ID_DOCUMENTO . ' EXTORNADO CON EXITO');
+            } catch (\Exception $ex) {
+                DB::rollback();
+                return Redirect::to('gestion-de-aprobacion-firma-administracion/' . $idopcion)->with('errorbd', $ex . ' Ocurrio un error inesperado');
+            }
+        }
+
+    }
+
+    public function actionAprobarAdministracionFirma($idopcion, $iddocumento, Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion, 'Modificar');
+        if ($validarurl <> 'true') {
+            return $validarurl;
+        }
+        /******************************************************/
+        $idcab = $iddocumento;
+        $iddocumento = $this->funciones->decodificarmaestrapre($iddocumento, 'FIRM');
+        View::share('titulo', 'Aprobar Firma');
+
+        if ($_POST) {
+            try {
+
+                DB::beginTransaction();
+                $firma = Firma::where('ID_DOCUMENTO', '=', $iddocumento)->first();
+
+                Firma::where('ID_DOCUMENTO', $firma->ID_DOCUMENTO)
+                    ->update(
+                        [
+                            'COD_ESTADO' => 'ETM0000000000005',
+                            'TXT_ESTADO' => 'APROBADO',
+                            'USUARIO_MOD' => Session::get('usuario')->id,
+                            'FECHA_MOD' => $this->fechaactual
+                        ]
+                    );
+
+
+                $origen = '\\\\10.1.50.2\\comprobantes\\FIRMA\\'.$firma->NOMBRE_ARCHIVO;
+                $destino = public_path('firmas/'.$firma->NOMBRE_ARCHIVO);
+
+                // Reemplazar las barras invertidas por barras normales (por si acaso)
+                $origen = str_replace('\\', '/', $origen);
+
+                // Verificar si el archivo existe en el origen
+                if (file_exists($origen)) {
+                    // Copiar el archivo a la carpeta local
+                    if (!copy($origen, $destino)) {
+                        return Redirect::to('/gestion-de-aprobacion-firma-administracion/' . $idopcion)->with('errorbd', $ex . ' Error al copiar el archivo.');
+                    }
+                } else {
+                    return Redirect::to('/gestion-de-aprobacion-firma-administracion/' . $idopcion)->with('errorbd', $ex . ' El archivo de origen no existe');
+                }
+
+
+                DB::commit();
+                return Redirect::to('/gestion-de-aprobacion-firma-administracion/' . $idopcion)->with('bienhecho', 'FIRMA : ' . $firma->DNI . ' APROBADO CON EXITO');
+            } catch (\Exception $ex) {
+                DB::rollback();
+                return Redirect::to('/gestion-de-aprobacion-firma-administracion/' . $idopcion)->with('errorbd', $ex . ' Ocurrio un error inesperado');
+            }
+        } else {
+
+
+            $archivospdf = Firma::where('ID_DOCUMENTO', '=', $iddocumento)->get();
+
+            $ocultar = "";
+            // Construir el array de URLs
+            $initialPreview = [];
+            foreach ($archivospdf as $archivo) {
+                $initialPreview[] = route('serve-filefirma', ['file' => $archivo->NOMBRE_ARCHIVO]);
+            }
+            $initialPreviewConfig = [];
+
+            foreach ($archivospdf as $key => $archivo) {
+                $valor = '';
+                if ($key > 0) {
+                    $valor = 'ocultar';
+                }
+                $initialPreviewConfig[] = [
+                    'type' => "pdf",
+                    'caption' => $archivo->NOMBRE_ARCHIVO,
+                    'downloadUrl' => route('serve-filefirma', ['file' => $archivo->NOMBRE_ARCHIVO]),
+                    'frameClass' => $archivo->ID_DOCUMENTO . ' ' . $valor //
+                ];
+            }
+
+            //dd($initialPreviewConfig);
+            $archivos = Archivo::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
+            $firma = Firma::where('ID_DOCUMENTO', '=', $iddocumento)->first();
+            return View::make('planillamovilidad/aprobaradministracionfirma',
+                [
+                    'firma' => $firma,
+                    'archivos' => $archivos,
+                    'idopcion' => $idopcion,
+                    'idcab' => $idcab,
+                    'iddocumento' => $iddocumento,
+                    'initialPreview' => json_encode($initialPreview),
+                    'initialPreviewConfig' => json_encode($initialPreviewConfig),
+                ]);
+
+
+        }
+    }
+
+
+
+    public function actionAprobarFirma($idopcion, Request $request)
+    {
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion, 'Ver');
+        if ($validarurl <> 'true') {
+            return $validarurl;
+        }
+        /******************************************************/
+        View::share('titulo', 'Lista firma (administracion)');
+        $tab_id = 'oc';
+        if (isset($request['tab_id'])) {
+            $tab_id = $request['tab_id'];
+        }
+
+        $listadatos = $this->plm_lista_cabecera_comprobante_total_firma();
+
+        $funcion = $this;
+        return View::make('planillamovilidad/listamovilidadafirma',
+            [
+                'listadatos' => $listadatos,
+                'tab_id' => $tab_id,
+                'funcion' => $funcion,
+                'idopcion' => $idopcion,
+            ]);
+    }
+
+
 
     public function actionAgregarExtornoContabilidadPLA($idopcion, $idordencompra,Request $request)
     {
@@ -1246,8 +1415,24 @@ class GestionPlanillaMovilidadController extends Controller
         $fecha_fin          =   $this->fecha_sin_hora;
 
         $planillamovilidad  =   $this->pla_lista_planilla_movilidad_personal($fecha_inicio,$fecha_fin);
-        //dd($planillamovilidad);
+        $trabajador =   DB::table('STD.TRABAJADOR')
+                        ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                        ->first();
 
+        $ruta = public_path('firmas/'.$trabajador->NRO_DOCUMENTO.'.jpg');
+        $mensaje_firma = "SI CUENTA CON FIRMA PUEDE REGISTRAR SU PLANILLA DE MOVILIDAD";
+        if (!file_exists($ruta)) {
+
+            $mensaje_firma  = "NO CUENTA CON FIRMA PUEDE REGISTRAR SU PLANILLA DE MOVILIDAD";
+            $firma          =   DB::table('FIRMAS')
+                                ->where('DNI', $trabajador->NRO_DOCUMENTO)
+                                ->orderBy('FECHA_MOD','DESC')
+                                ->first();
+            if (count($firma)>0) {
+                $mensaje_firma  = "SU ULTIMA SOLICITUD DE FIRMA ESTA EN ESTADO ".$firma->TXT_ESTADO; 
+            }
+
+        }
 
         $listadatos     =   array();
         $funcion        =   $this;
@@ -1256,6 +1441,7 @@ class GestionPlanillaMovilidadController extends Controller
                             'listadatos'        =>  $listadatos,
                             'funcion'           =>  $funcion,
                             'idopcion'          =>  $idopcion,
+                            'mensaje_firma'     =>  $mensaje_firma,
                             'planillamovilidad' =>  $planillamovilidad,
                             'fecha_inicio'      =>  $fecha_inicio,
                             'fecha_fin'         =>  $fecha_fin
@@ -1481,6 +1667,11 @@ class GestionPlanillaMovilidadController extends Controller
                 $dni        =       $trabajador->NRO_DOCUMENTO;
             }
 
+            $rutaImagen             =   public_path('firmas/'.$dni.'.jpg');
+            if (!file_exists($rutaImagen)){
+                return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd','No cuenta con firma suba su firma');
+            }
+
             //dd($dni);
             $trabajadorespla    =   DB::table('WEB.platrabajadores')
                                     ->where('situacion_id', 'PRMAECEN000000000002')
@@ -1491,21 +1682,16 @@ class GestionPlanillaMovilidadController extends Controller
             if(count($trabajadorespla)>0){
                 $centro_id      =       $trabajadorespla->centro_osiris_id;
             }else{
-                return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd', 'No puede realizar un registro porque no es la empresa a cual pertenece');
-            }
-            if($centro_id == 'CEN0000000000003'){
-                $centro_id = 'CEN0000000000001';
-            }
 
-            if (Session::get('usuario')->id == '1CIX00000040') {
-                $centro_id = 'CEN0000000000001';
-            }
-
-            if (Session::get('usuario')->id == '1CIX00000380') {
-                $centro_id = 'CEN0000000000002';
-            }
-            if (Session::get('usuario')->id == '1CIX00000391') {
-                $centro_id = 'CEN0000000000002';
+                $terceros   =   DB::table('TERCEROS')
+                                ->where('USER_ID', Session::get('usuario')->id)
+                                ->where('ACTIVO', 1)
+                                ->first();
+                if (count($terceros) > 0) {
+                    $centro_id = $terceros->COD_CENTRO;
+                }else{
+                    return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd', 'No puede realizar un registro porque no es la empresa a cual pertenece'); 
+                }
             }
 
             $dtrabajador    =   STDTrabajador::where('COD_TRAB','=',Session::get('usuario')->usuarioosiris_id)->first();
@@ -1563,6 +1749,84 @@ class GestionPlanillaMovilidadController extends Controller
                                 'txttrabajador' => $txttrabajador,
                                 'doctrabajador' => $doctrabajador,
                                 'fecha_creacion' => $fecha_creacion,
+                                'idopcion' => $idopcion
+                             ]);
+        }   
+    }
+
+
+    public function actionSubirFirma($idopcion,Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Anadir');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+
+        if($_POST)
+        {
+
+            try{    
+                
+                DB::beginTransaction();
+
+                    $files                      =   $request['firma'];
+                    if(!is_null($files)){
+                        foreach($files as $file){
+
+                            $trabajador                 =   DB::table('STD.TRABAJADOR')
+                                                            ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                                                            ->first();
+                            $rutafile                   =      $this->pathFiles.'\\comprobantes\\FIRMA';
+                            $nombrefilecdr              =      $trabajador->NRO_DOCUMENTO.'.jpg';
+                            $rutacompleta               =      $rutafile.'\\'.$nombrefilecdr;
+                            copy($file->getRealPath(),$rutacompleta);
+                            $path                       =      $rutacompleta;
+
+                            $nombreoriginal             =   $file->getClientOriginalName();
+                            $info                       =   new SplFileInfo($nombreoriginal);
+                            $extension                  =   $info->getExtension();
+                            $idcab                      =   $this->funciones->getCreateIdMaestradocpla('FIRMAS','FIRM');
+
+                            $dcontrol                   =   new Firma;
+                            $dcontrol->ID_DOCUMENTO     =   $idcab;
+                            $dcontrol->TXT_NOMBRE       =   Session::get('usuario')->nombre;
+                            $dcontrol->DNI              =   $trabajador->NRO_DOCUMENTO;
+                            $dcontrol->NOMBRE_ARCHIVO       =   $nombrefilecdr;
+                            $dcontrol->DESCRIPCION_ARCHIVO  =   'FIRMA';
+                            $dcontrol->URL_ARCHIVO      =   $path;
+                            $dcontrol->SIZE             =   filesize($file);
+                            $dcontrol->EXTENSION        =   $extension;
+                            $dcontrol->COD_ESTADO       =   'ETM0000000000004';
+                            $dcontrol->TXT_ESTADO       =   'POR APROBAR ADMINISTRACION';                       
+                            $dcontrol->ACTIVO           =   1;
+                            $dcontrol->FECHA_CREA       =   $this->fechaactual;
+                            $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
+                            $dcontrol->save();
+
+                        }
+                    }
+
+                DB::commit();
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+                $iddocumento                            =   Hashids::encode(substr($idcab, -8));
+                return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('bienhecho', 'Su firma fue registrado con exito');
+        }else{
+
+            $trabajador =   DB::table('STD.TRABAJADOR')
+                            ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                            ->first();
+            $ruta = public_path('firmas/'.$trabajador->NRO_DOCUMENTO.'.jpg');
+
+            if (file_exists($ruta)) {
+                return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd','Usted ya cuenta con una firma confirmada');
+            }
+
+            return View::make('planillamovilidad.agregarfirma',
+                             [
                                 'idopcion' => $idopcion
                              ]);
         }   

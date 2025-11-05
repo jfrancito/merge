@@ -14,21 +14,20 @@
     <div class="row">
       <div class="col-md-12">
           <div class="panel panel-default">
-            <div class="panel-heading">Revision de Comporbante ({{$liquidaciongastos->ID_DOCUMENTO}})</div>
+            <div class="panel-heading">Revision de Comprobante ({{$firma->ID_DOCUMENTO}})</div>
             <div class="tab-container">
               <ul class="nav nav-tabs">
                 <li class="active"><a href="#aprobar" data-toggle="tab"><b>APROBAR y RECOMENDAR</b></a></li>
-                <li><a href="#observar" data-toggle="tab"><b>OBSERVAR</b></a></li>
-                <!-- <li><a href="#rechazar" data-toggle="tab"><b>EXTORNAR</b></a></li> -->
+                <li><a href="#rechazar" data-toggle="tab"><b>EXTORNAR</b></a></li>
               </ul>
               <div class="tab-content">
                 <div id="aprobar" class="tab-pane active cont">
                       <div class="panel panel-default panel-border-color panel-border-color-primary">
-                        <div class="panel-heading panel-heading-divider">Aprobar Liquidacion de Gastos Administracion<span class="panel-subtitle">Aprobar una Liquidacion de Gastos Administracion</span></div>
+                        <div class="panel-heading panel-heading-divider">Aprobar Movilidad Impulso Jefe<span class="panel-subtitle">Aprobar una Movilidad Impulso Jefe</span></div>
                         <div class="panel-body">
-                          <form method="POST" id='formpedido' action="{{ url('/aprobar-liquidacion-gasto-administracion/'.$idopcion.'/'.Hashids::encode(substr($liquidaciongastos->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
-                                {{ csrf_field() }}
-                            @include('liquidaciongasto.form.formaprobaradministracionlg')
+                          <form method="POST" id='formpedido' action="{{ url('/aprobar-firma-administracion/'.$idopcion.'/'.Hashids::encode(substr($firma->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
+                            {{ csrf_field() }}
+                            @include('planillamovilidad.form.formaprobarfirma')
                             <div class="row xs-pt-15">
                               <div class="col-xs-6">
                                   <div class="be-checkbox">
@@ -36,7 +35,7 @@
                               </div>
                               <div class="col-xs-6">
                                 <p class="text-right">
-                                  <a href="{{ url('/gestion-de-contabilidad-aprobar/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
+                                  <a href="{{ url('/gestion-de-aprobacion-firma-administracion/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
                                   <button type="button"  class="btn btn-space btn-primary btnaprobarcomporbatnte">Guardar</button>
                                 </p>
                               </div>
@@ -45,39 +44,15 @@
                         </div>
                       </div>
                 </div>
-                <div id="observar" class="tab-pane cont">
-                  <div class="panel panel-default panel-border-color panel-border-color-primary">
-                    <div class="panel-heading panel-heading-divider">Observar Comprobante<span class="panel-subtitle">Observar un Comprobante</span></div>
-                    <div class="panel-body">
-                        <form method="POST" id='formpedidoobservar' action="{{ url('/agregar-observar-administrador/'.$idopcion.'/'.Hashids::encode(substr($liquidaciongastos->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
-                              {{ csrf_field() }}
-                          <input type="hidden" name="data_observacion" id="data_observacion">
-                          @include('liquidaciongasto.form.formobservaradm')
-                          <div class="row xs-pt-15">
-                            <div class="col-xs-6">
-                                <div class="be-checkbox">
-                                </div>
-                            </div>
-                            <div class="col-xs-6">
-                              <p class="text-right">
-                                <a href="{{ url('/gestion-de-aprobacion-liquidacion-gasto-jefe/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
-                                <button type="button"  class="btn btn-space btn-primary btnobservarcomporbatnte">Guardar</button>
-                              </p>
-                            </div>
-                          </div>
-                          
-                        </form>
-                    </div>
-                  </div>
-                </div>
+
 
                 <div id="rechazar" class="tab-pane">
                   <div class="panel panel-default panel-border-color panel-border-color-primary">
                     <div class="panel-heading panel-heading-divider">Extornar<span class="panel-subtitle">Extornar un Comprobante</span></div>
                     <div class="panel-body">
-                        <form method="POST" id='formpedidorechazar' action="{{ url('/agregar-extorno-administracion/'.$idopcion.'/'.Hashids::encode(substr($liquidaciongastos->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
+                        <form method="POST" id='formpedidorechazar' action="{{ url('/agregar-extorno-administracion-firma/'.$idopcion.'/'.Hashids::encode(substr($firma->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                               {{ csrf_field() }}
-                          @include('liquidaciongasto.form.formrechazo')
+                          @include('planillamovilidad.form.formrechazo')
 
                           <div class="row xs-pt-15">
                             <div class="col-xs-6">
@@ -86,7 +61,7 @@
                             </div>
                             <div class="col-xs-6">
                               <p class="text-right">
-                                <a href="{{ url('/gestion-de-aprobacion-liquidacion-gastos-administracion/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
+                                <a href="{{ url('/gestion-de-aprobacion-firma-administracion/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
                                 <button type="button"  class="btn btn-space btn-primary btnrechazocomporbatnte">Guardar</button>
                               </p>
                             </div>
@@ -98,7 +73,7 @@
                 </div>
 
 
-              </div>
+
             </div>
           </div>
       </div>
@@ -131,7 +106,6 @@
         $('form').parsley();
       });
     </script>
-
     <script type="text/javascript">
 
           var initialPreview = {!! $initialPreview !!};
@@ -175,6 +149,8 @@
 
           
     </script>
-     
+
+
+
     <script src="{{ asset('public/js/comprobante/liquidaciongasto.js?v='.$version) }}" type="text/javascript"></script>
 @stop

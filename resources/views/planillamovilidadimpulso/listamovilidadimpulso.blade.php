@@ -80,7 +80,7 @@
                     </div>
                   </div>
                   <div class='listajax'>
-                    @include('planillamovilidad.ajax.alistaplanillamovilidad')
+                    @include('planillamovilidadimpulso.ajax.alistamovilidadimpulso')
                   </div>
                 </div>
               </div>
