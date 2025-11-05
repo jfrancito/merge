@@ -97,14 +97,55 @@ class GestionValeRendirController extends Controller
     
         $vale = WEBValeRendir::where('ID', $id_buscar)->first();
         $detallesImporte = WEBValeRendirDetalle::where('ID', $id_buscar)->get(); 
- 
 
-       
+      
+        $fecha_inicio = $detallesImporte->min('FEC_INICIO');
+        $fecha_fin = $detallesImporte->max('FEC_FIN');
+        $cod_centro = $detallesImporte->first()->COD_CENTRO ?? null;
+        $ultimo = $detallesImporte->last();
+        $ultimo_destino = $ultimo ? $ultimo->NOM_DESTINO : '';
+        $total_dias = $detallesImporte->sum('DIAS');
+        $ruta_viaje = $detallesImporte->pluck('NOM_DESTINO')->implode('/ ');
+        $txt_glosa = $vale->TXT_GLOSA ?? null;
+ 
         return view('valerendir.gestion.modalvaledetallegestion', [
             'ajax' => true,
+            'fecha_inicio' => $fecha_inicio,
+            'fecha_fin' => $fecha_fin,
             'vale' => $vale,
+            'cod_centro' => $cod_centro,
+            'ultimo_destino' => $ultimo_destino,
+            'txt_glosa' => $txt_glosa,
+            'total_dias' => $total_dias,
+            'ruta_viaje' => $ruta_viaje,
             'detallesImporte' => $detallesImporte
         ]);  
+    }
+
+   public function actionActualizarDiasVale(Request $request)
+    {
+        $vale_id = $request->input('vale_id');
+        $aumento_dias = $request->input('aumento_dias');
+
+        if (!$vale_id || $aumento_dias === null) {
+            return response()->json(['error' => 'Faltan datos requeridos.']);
+        }
+
+        try {
+            $vale = WEBValeRendir::find($vale_id);
+
+            if (!$vale) {
+                return response()->json(['error' => 'Vale no encontrado.']);
+            }
+
+            WEBValeRendir::where('ID', $vale_id)
+                ->update(['AUMENTO_DIAS' => $aumento_dias]);
+
+            return response()->json(['success' => 'Vale actualizado correctamente.']);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al actualizar: ' . $e->getMessage()]);
+        }
     }
 
 }

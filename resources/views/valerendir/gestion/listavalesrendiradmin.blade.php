@@ -96,16 +96,6 @@
                             <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
 
                                 <div class="form-group">
-                                  <label class="col-sm-12 control-label labelleft" >Proveedor :</label>
-                                  <div class="col-sm-12 abajocaja" >
-                                   
-                                  </div>
-                                </div>
-                            </div> 
-
-                            <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
-
-                                <div class="form-group">
                                   <label class="col-sm-12 control-label labelleft" >Estados :</label>
                                   <div class="col-sm-12 abajocaja" >
                                      {!! Form::select(
@@ -134,6 +124,9 @@
                   <div class='listajax'>
                     @include('valerendir.gestion.alistavalesrendiradmin') 
                   </div>
+
+                  @include('valerendir.modal.detallerendir')
+
                 </div>
               </div>
             </div>

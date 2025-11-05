@@ -55,7 +55,7 @@ class ValeRendirControllerReembolso extends Controller
 
         $cadlocal = trim(strtoupper($trabajadorespla->cadlocal ?? ''));
 
-       if (
+        if (
             stripos($cadlocal, 'SEDE PIURA') !== false ||
             stripos($cadlocal, 'SEDE CHIMBOTE') !== false ||
              stripos($cadlocal, 'SEDE TRUJILLO') !== false

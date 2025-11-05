@@ -57,4 +57,47 @@ $(document).ready(function () {
                 "modal-verdetalledocumentogestion-solicitud-container"
             );
      });
+
+    $(document).on('click', '#btn_guardar_aumento_dias', function () {
+        var vale_id = $('#vale_id').val();
+        var aumento_dias = $('#aumento_dias').val();
+        var _token = $('#token').val();
+
+        if ($.trim(aumento_dias) === '') {
+            alerterrorajax("Ingrese el número de días a aumentar.");
+            return false;
+        }
+
+        var data = {
+            _token: _token,
+            vale_id: vale_id,
+            aumento_dias: aumento_dias
+        };
+
+        $.ajax({
+            type: "POST",
+            url: carpeta + "/actualizar_dias_vale",
+            data: data,
+            dataType: "json",
+            success: function (response) {
+               
+                if (response.success) {
+                    alertajax(response.success);
+
+                    setTimeout(function() {
+                    location.reload();
+                }, 1000);
+                
+                } else if (response.error) {
+                    alerterrorajax(response.error);
+
+                } else {
+                    alerterrorajax("Ocurrió un error inesperado.");
+                }
+            },
+            error: function (xhr, status, error) {
+                alerterrorajax("Error al guardar: " + error);
+            }
+        });
+    });
 });
