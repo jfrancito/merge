@@ -18,7 +18,7 @@ use App\Modelos\STDEmpresa;
 use App\Modelos\CMPDocAsociarCompra;
 use App\Modelos\CMPOrden;
 
-
+use App\Modelos\CMPHabilitacion;
 
 
 use View;
@@ -32,6 +32,55 @@ use ZipArchive;
 
 trait PrecioCompetenciaTraits
 {
+
+
+	private function modificarglosahabilitacion() {
+			
+
+		$documentos = DB::table('LQG_LIQUIDACION_GASTO')
+		    ->join('WEB.VALE_RENDIR', 'LQG_LIQUIDACION_GASTO.ARENDIR_ID', '=', 'WEB.VALE_RENDIR.ID')
+		    ->join('TES.AUTORIZACION', 'TES.AUTORIZACION.COD_AUTORIZACION', '=', 'WEB.VALE_RENDIR.ID_OSIRIS')
+		    ->join('CMP.HABILITACION', function ($join) {
+		        $join->on('CMP.HABILITACION.COD_DOCUMENTO_CTBLE', '=', 'LQG_LIQUIDACION_GASTO.COD_OSIRIS')
+		             ->where('CMP.HABILITACION.COD_PRODUCTO', '=', 'PRD0000000014312');
+		    })
+		    ->where('LQG_LIQUIDACION_GASTO.ACTIVO', 1)
+		    ->whereRaw('ISNULL(LQG_LIQUIDACION_GASTO.IND_VALE_OSIRIS, 0) = 0')
+		    ->whereNotIn('LQG_LIQUIDACION_GASTO.COD_ESTADO', ['ETM0000000000006'])
+		    ->whereRaw("ISNULL(LQG_LIQUIDACION_GASTO.ARENDIR_ID, '') != ''")
+		    ->whereRaw("ISNULL(LQG_LIQUIDACION_GASTO.COD_OSIRIS, '') != ''")
+		    ->select(
+		        'CMP.HABILITACION.COD_HABILITACION',
+		        'LQG_LIQUIDACION_GASTO.COD_OSIRIS',
+		        'LQG_LIQUIDACION_GASTO.ID_DOCUMENTO',
+		        'LQG_LIQUIDACION_GASTO.ARENDIR_ID',
+		        'WEB.VALE_RENDIR.ID_OSIRIS',
+		        'TES.AUTORIZACION.TXT_SERIE',
+		        'TES.AUTORIZACION.TXT_NUMERO',
+		        'CMP.HABILITACION.TXT_OBSERVACION'
+		    )
+		    ->get();
+
+		//dd($documentos);
+	    foreach($documentos as $index=>$item){
+
+				DB::table('CMP.HABILITACION')
+				    ->where('COD_HABILITACION', $item->COD_HABILITACION)
+				    ->update([
+				        'TXT_OBSERVACION' => DB::raw("TXT_OBSERVACION + ' / ' + '" . $item->TXT_SERIE . ' ' . $item->TXT_NUMERO . "'")
+				    ]);
+
+				DB::table('LQG_LIQUIDACION_GASTO')
+				    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
+				    ->update([
+				        'IND_VALE_OSIRIS' => 1
+				    ]);
+	   }
+
+	}	
+
+
+
 
 	private function prefijo_empresa_pre($idempresa) {
 		if($idempresa == 'IACHEM0000010394'){
