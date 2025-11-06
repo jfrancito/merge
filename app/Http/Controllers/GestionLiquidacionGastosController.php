@@ -4729,9 +4729,35 @@ class GestionLiquidacionGastosController extends Controller
 
             $tipopago_id = $liquidaciongastos->COD_CATEGORIA_TIPOPAGO;
 
-            //dd("hola");
+            //dd($trabajadorespla);
             $costo_id = $tdetliquidacionitem->COD_COSTO;
-            $combo_costo = $this->lg_combo_costo_xtrabajador("Seleccione Costo", $trabajadorespla->cadarea);
+
+            //terceros
+            $terceros   =   DB::table('TERCEROS')
+                            ->where('USER_ID', Session::get('usuario')->id)
+                            ->where('ACTIVO', 1)
+                            ->first();
+         
+            if (count($terceros) > 0) {
+                $area_planilla = $terceros->TXT_AREA;
+                $centrocosto = DB::table('CON.CENTRO_COSTO')
+                    ->where('COD_ESTADO', 1)
+                    ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
+                    ->where('COD_CENTRO_COSTO', '=', $terceros->COD_AREA)
+                    ->where('IND_MOVIMIENTO', 1)->first();
+                    $combo_costo = $this->lg_combo_costo_xtrabajador_tercero("Seleccione Costo", $terceros->COD_AREA);
+
+
+            }else{
+                $area_planilla = $trabajadorespla->cadarea;
+                $centrocosto = DB::table('CON.CENTRO_COSTO')
+                    ->where('COD_ESTADO', 1)
+                    ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
+                    ->where('TXT_REFERENCIA_PLANILLA', 'LIKE', '%' . $trabajadorespla->cadarea . '%')
+                    //->where('TXT_REFERENCIA_PLANILLA', $trabajadorespla->cadarea)
+                    ->where('IND_MOVIMIENTO', 1)->first();
+                $combo_costo = $this->lg_combo_costo_xtrabajador("Seleccione Costo", $trabajadorespla->cadarea);
+            }
 
 
             $ajax = true;

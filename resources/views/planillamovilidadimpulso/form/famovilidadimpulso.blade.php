@@ -53,7 +53,7 @@
 
     <div class="ol-xs-12 col-sm-4 col-md-3 col-lg-3">
       <div class="form-group">
-        <label class="col-sm-12 control-label labelleft negrita">SEMANA :</label>
+        <label class="col-sm-12 control-label labelleft negrita">RANGO DE DIAS :</label>
         <div class="col-sm-12">
             <input  type="text"
                     id="semana" name='semana' 

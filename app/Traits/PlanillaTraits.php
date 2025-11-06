@@ -169,8 +169,25 @@ trait PlanillaTraits
 
     }
 
-
-
+    private function obtenerNombreDiaDinamico($fecha) {
+        $carbonFecha = Carbon::parse($fecha);
+        
+        // Para Laravel 5.4, usar format en español manualmente
+        $dias = [
+            'Monday' => 'Lunes',
+            'Tuesday' => 'Martes',
+            'Wednesday' => 'Miércoles',
+            'Thursday' => 'Jueves',
+            'Friday' => 'Viernes',
+            'Saturday' => 'Sábado',
+            'Sunday' => 'Domingo'
+        ];
+        
+        $nombreIngles = $carbonFecha->format('l');
+        $nombreEspanol = isset($dias[$nombreIngles]) ? $dias[$nombreIngles] : $nombreIngles;
+        
+        return $nombreEspanol . ' ' . $carbonFecha->format('d/m');
+    }
     private function obtenerNombreDia($numeroDia) {
         $dias = [
             1 => 'Lunes',
