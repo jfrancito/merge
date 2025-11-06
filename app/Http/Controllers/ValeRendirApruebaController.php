@@ -297,6 +297,8 @@ class ValeRendirApruebaController extends Controller
         ->where('COD_CENTRO', $centrovale)
         ->max('TXT_NUMERO');
 
+        
+
         //   dd($contrato_diferente);
 
         $nro_documento = is_null($ultimoCorrelativo) ? 1:$ultimoCorrelativo + 1;
@@ -389,7 +391,7 @@ class ValeRendirApruebaController extends Controller
 
         $codigo = $this->insertValeRendirOsiris(
             "I", 
-            $id, 
+            "", 
             $cod_empr, 
             $cod_centro, 
             $cod_empresa,

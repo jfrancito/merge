@@ -6,6 +6,7 @@ $(document).ready(function () {
         var fecha_inicio = $('#fecha_inicio').val();
         var fecha_fin = $('#fecha_fin').val();
         var estado_id = $('#estado_id').val();
+        var tipo_vale = $('#tipo_vale').val();
         var idopcion = $('#idopcion').val();
         var _token = $('#token').val();
 
@@ -25,10 +26,11 @@ $(document).ready(function () {
 
         data = {
             _token: _token,
-            fecha_inicio: fecha_inicio,
-            fecha_fin: fecha_fin,
-            estado_id: estado_id,
-            idopcion: idopcion
+            fecha_inicio : fecha_inicio,
+            fecha_fin    : fecha_fin,
+            estado_id    : estado_id,
+            tipo_vale    : tipo_vale,
+            idopcion     : idopcion
         };
         ajax_normal(data, "/ajax-buscar-documento-vl");
 
