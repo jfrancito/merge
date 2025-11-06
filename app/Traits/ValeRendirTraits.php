@@ -905,10 +905,12 @@ trait ValeRendirTraits
     }
 
 
-    private function lg_lista_cabecera_vale_rendir($fecha_inicio, $fecha_fin, $estado_id)
+      private function lg_lista_cabecera_vale_rendir($fecha_inicio, $fecha_fin, $estado_id, $tipo_vale)
     {
-        $listavale = DB::table('WEB.VALE_RENDIR as V')
+       
+        $queryRendir = DB::table('WEB.VALE_RENDIR as V')
             ->select(
+                DB::raw("'RENDIR' as TIPO_VALE"),
                 'V.*',
                 DB::raw('(
                     SELECT TOP 1 D.NOM_DESTINO 
@@ -924,12 +926,59 @@ trait ValeRendirTraits
             ->where(function ($query) use ($fecha_inicio, $fecha_fin) {
                 $query->whereBetween(DB::raw("CAST(V.FEC_USUARIO_CREA_AUD AS DATE)"), [$fecha_inicio, $fecha_fin])
                     ->orWhereBetween(DB::raw("CAST(V.FEC_USUARIO_MODIF_AUD AS DATE)"), [$fecha_inicio, $fecha_fin]);
-            })
-             ->orderBy('V.COD_CENTRO', 'ASC') 
-             ->orderBy('V.ID', 'DESC')  
-             ->get();
+            });
 
-        return $listavale;
+       
+        $queryReembolso = DB::table('WEB.VALE_RENDIR_REEMBOLSO as R')
+            ->select(
+                DB::raw("'REEMBOLSO' as TIPO_VALE"),
+                'R.*',
+                DB::raw('NULL as COD_PERSONAL_RENDIR'),
+                DB::raw('NULL as TXT_PERSONAL_RENDIR'),
+                DB::raw('NULL as AUMENTO_DIAS'),
+                DB::raw('(
+                    SELECT TOP 1 D.NOM_DESTINO 
+                    FROM WEB.VALE_RENDIR_DETALLE_REEMBOLSO AS D 
+                    WHERE D.ID = R.ID 
+                    ORDER BY D.FEC_USUARIO_CREA_AUD DESC
+                ) as NOM_DESTINO')
+            )
+            ->where('R.COD_EMPR', Session::get('empresas')->COD_EMPR)
+            ->when($estado_id != '' && $estado_id != 'TODO', function ($query) use ($estado_id) {
+                $query->where('R.COD_CATEGORIA_ESTADO_VALE', '=', $estado_id);
+            })
+            ->where(function ($query) use ($fecha_inicio, $fecha_fin) {
+                $query->whereBetween(DB::raw("CAST(R.FEC_USUARIO_CREA_AUD AS DATE)"), [$fecha_inicio, $fecha_fin])
+                    ->orWhereBetween(DB::raw("CAST(R.FEC_USUARIO_MODIF_AUD AS DATE)"), [$fecha_inicio, $fecha_fin]);
+            });
+
+        
+            if ($tipo_vale === 'REEMBOLSO') {
+                    $listavale = $queryReembolso
+                    ->orderBy('COD_CENTRO', 'ASC')
+                    ->orderBy(DB::raw('LEFT(ID, 6)'), 'ASC')
+                    ->orderBy(DB::raw('CAST(SUBSTRING(ID, 7, LEN(ID)) AS BIGINT)'), 'DESC')
+                    ->get();
+            } elseif ($tipo_vale === 'TODO') {
+                // 🔹 Generamos SQL crudo para la unión
+                $unionSql = $queryRendir->unionAll($queryReembolso)->toSql();
+
+                // 🔹 Encapsulamos el UNION en una subconsulta (compatible con todas las versiones)
+                $listavale = DB::table(DB::raw("($unionSql) as VALES"))
+                    ->mergeBindings($queryRendir) // importante: mantiene los bindings de parámetros
+                    ->orderBy('COD_CENTRO', 'ASC')
+                    ->orderBy(DB::raw('LEFT(ID, 6)'), 'ASC')
+                    ->orderBy(DB::raw('CAST(SUBSTRING(ID, 7, LEN(ID)) AS BIGINT)'), 'DESC')
+                    ->get();
+            } else {
+                $listavale = $queryRendir
+                    ->orderBy('COD_CENTRO', 'ASC')
+                    ->orderBy(DB::raw('LEFT(ID, 6)'), 'ASC')
+                    ->orderBy(DB::raw('CAST(SUBSTRING(ID, 7, LEN(ID)) AS BIGINT)'), 'DESC')
+                    ->get();
+            }
+        
+            return $listavale;
     }
 
 }

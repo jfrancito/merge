@@ -41,12 +41,20 @@ class GestionValeRendirController extends Controller
             'ETM0000000000001' => 'GENERADO',
             'ETM0000000000005' => 'AUTORIZADO',
             'ETM0000000000007' => 'APROBADO',
+            'ETM0000000000010' => 'ANULADO',
+        ];
+
+         $combo_tipo_vale = [
+        'RENDIR' => 'VALE A RENDIR',
+        'REEMBOLSO' => 'REEMBOLSO',
+        'TODO' => 'TODO',
         ];
 
 
     
-        $estado_id = 'TODO';
-        $listavale = $this->lg_lista_cabecera_vale_rendir($fecha_inicio, $fecha_fin, $estado_id);
+         $estado_id = 'TODO';
+         $tipo_vale = 'TODO';
+         $listavale = $this->lg_lista_cabecera_vale_rendir($fecha_inicio, $fecha_fin, $estado_id, $tipo_vale);
 
 
         $funcion = $this;
@@ -59,7 +67,9 @@ class GestionValeRendirController extends Controller
             'fecha_inicio' => $fecha_inicio,
             'fecha_fin' => $fecha_fin,
             'estado_id' => $estado_id,
-            'combo_estado' => $combo_estado
+            'combo_estado' => $combo_estado,
+            'combo_tipo_vale' => $combo_tipo_vale,
+            'tipo_vale' => $tipo_vale
         ]);
 
     }
@@ -71,10 +81,11 @@ class GestionValeRendirController extends Controller
         $fecha_inicio = $request['fecha_inicio'];
         $fecha_fin = $request['fecha_fin'];
         $estado_id = $request['estado_id'];
+        $tipo_vale = $request['tipo_vale'];
         $idopcion = $request['idopcion'];
 
 
-        $listavale = $this->lg_lista_cabecera_vale_rendir($fecha_inicio, $fecha_fin, $estado_id);
+        $listavale = $this->lg_lista_cabecera_vale_rendir($fecha_inicio, $fecha_fin, $estado_id, $tipo_vale);
         $funcion = $this;
 
         return View::make('valerendir/gestion/alistavalesrendiradmin',
@@ -82,6 +93,7 @@ class GestionValeRendirController extends Controller
                 'fecha_inicio' => $fecha_inicio,
                 'fecha_fin' => $fecha_fin,
                 'estado_id' => $estado_id,
+                'tipo_vale' => $tipo_vale,
                 'idopcion' => $idopcion,
                 'listavale' => $listavale,
                 'ajax' => true,

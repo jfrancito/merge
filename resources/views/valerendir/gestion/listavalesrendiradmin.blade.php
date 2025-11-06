@@ -93,6 +93,26 @@
                               </div>
                             </div> 
 
+                             <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
+
+                                <div class="form-group">
+                                  <label class="col-sm-12 control-label labelleft" >Tipo vale :</label>
+                                  <div class="col-sm-12 abajocaja" >
+                                    {!! Form::select(
+                                                      'tipo_vale',
+                                                      $combo_tipo_vale,
+                                                      $tipo_vale, // Valor seleccionado por defecto
+                                                      [
+                                                          'class'       => 'select2 form-control control input-sm',
+                                                          'id'          => 'tipo_vale',
+                                                          'required'    => '',
+                                                          'data-aw'     => '2',
+                                                      ]
+                                                  ) !!}
+                                  </div>
+                                </div>
+                            </div> 
+
                             <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
 
                                 <div class="form-group">
