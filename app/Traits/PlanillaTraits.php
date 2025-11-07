@@ -35,6 +35,9 @@ use App\Modelos\PlaDetMovilidad;
 use App\Modelos\FePlanillaEntregable;
 use App\Modelos\DetalleSemanaImpulso;
 use App\Modelos\SemanaImpulso;
+use App\Modelos\LoteImpulso;
+
+
 
 use App\User;
 
@@ -153,6 +156,27 @@ trait PlanillaTraits
         return  $listadatos;
     }
 
+
+    private function calcular_total_movilidad_impulso_masivo($iddocumento,$semana_impulso_id) {
+
+        $lote                   =   LoteImpulso::where('ID_DOCUMENTO','=',$iddocumento)->first();
+        $tdetplanillamovilidad  =   DetalleSemanaImpulso::where('LOTE_IMPULSO_ID','=',$lote->ID_DOCUMENTO)->where('ACTIVO','=','1')->get();
+
+        SemanaImpulso::where('LOTE_IMPULSO_ID','=',$lote->LOTE_IMPULSO_ID)->where('ID_DOCUMENTO','=',$semana_impulso_id)
+                    ->update(
+                            [
+                                'MONTO'=> $tdetplanillamovilidad->SUM('MONTO')
+                            ]);
+
+        LoteImpulso::where('ID_DOCUMENTO','=',$iddocumento)
+                    ->update(
+                            [
+                                'MONTO'=> $tdetplanillamovilidad->SUM('MONTO')
+                            ]);
+
+
+
+    }
 
 
     private function calcular_total_movilidad_impulso($iddocumento) {

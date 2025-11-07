@@ -199,6 +199,12 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/aprobar-movilidad-impulso-jefe/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadImpulsoController@actionAprobarJefeMV');
 	Route::any('/agregar-extorno-jefe-mv/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadImpulsoController@actionAgregarExtornoJefe');
 
+	Route::any('/gestion-movilidad-impulso-masivo/{idopcion}', 'GestionPlanillaMovilidadImpulsoController@actionListarPlanillaMovilidadImpulsoMasivo');
+	Route::any('/agregar-movilidad-impulso-masivo/{idopcion}', 'GestionPlanillaMovilidadImpulsoController@actionAgregarMovilidadImpulsoMasivo');
+	Route::any('/modificar-movilidad-impulso-masivo/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionModificarMovilidadImpulsoMasivo');
+	Route::any('/ajax-modal-detalle-planilla-movilidad-impulso', 'GestionPlanillaMovilidadImpulsoController@actionDetallePlanillaMovilidadImpulso');
+	Route::any('/guardar-detalle-movilidad-impulso-trabajador/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionGuardarMovilidadTrabajador');
+	Route::any('/guardar-movilidad-detalle-masivo/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionGuardarDetalleMovilidadImpulsoMasivo');
 
 
 	//PLANILLA MOVILIDAD

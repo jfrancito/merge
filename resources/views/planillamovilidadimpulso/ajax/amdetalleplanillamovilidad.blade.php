@@ -46,7 +46,6 @@
                                 [
                                     'class' => 'select2 form-control control input-sm',
                                     'id' => "configuracion_{$index}_{$diaNumero}",
-                                    'placeholder' => 'Seleccionar...',
                                     'style' => 'min-width: 100px;'
                                 ]
                             ) !!}

@@ -3679,6 +3679,8 @@ class GestionLiquidacionGastosController extends Controller
             $periodo = $this->gn_periodo_actual_xanio_xempresa($anio, $mes, Session::get('empresas')->COD_EMPR);
             $detliquidaciongasto = LqgDetLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ITEM', '=', $item)->first();
             $detdocumentolg = LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ITEM', '=', $item)->get();
+
+            
             $itemdet = count($detdocumentolg) + 1;
             $producto = DB::table('ALM.PRODUCTO')->where('NOM_PRODUCTO', '=', $producto_id)->first();
             $fecha_creacion = $this->hoy;
@@ -3734,7 +3736,7 @@ class GestionLiquidacionGastosController extends Controller
 
             if(count($ldetallearendir)>0){
                 if(count($referencia_asoc)>0){
-                    $mensaje_error_vale = $this->validar_reembolso_supere_monto($liquidaciongastos,$liquidaciongastos->ARENDIR,$referencia_asoc->COD_TABLA,$importe,$producto_id);
+                    $mensaje_error_vale = $this->validar_reembolso_supere_monto($liquidaciongastos,$liquidaciongastos->ARENDIR,$referencia_asoc->COD_TABLA,$importe,$producto_id,0);
                     if($mensaje_error_vale!=''){
                         return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/' . $item)->with('errorbd', $mensaje_error_vale); 
                     }
