@@ -416,8 +416,8 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
         $cod_empresa        =   Session::get('usuario')->usuarioosiris_id;
         $fecha_inicio       =   $this->fecha_menos_diez_dias;
         $fecha_fin          =   $this->fecha_sin_hora;
-        //$planillamovilidad  =   $this->pla_lista_planilla_movilidad_impulso_personal($fecha_inicio,$fecha_fin);
-        $planillamovilidad  =   array();
+        $planillamovilidad  =   $this->pla_lista_planilla_movilidad_impulso_masivo($fecha_inicio,$fecha_fin);
+        //$planillamovilidad  =   array();
         $listadatos         =   array();
         $funcion            =   $this;
 
@@ -1199,74 +1199,11 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
         }
 
 
-        // //ASIGNADO
-        // $datos = DB::table('SEMANA_IMPULSO')
-        //     ->join('DETALLE_SEMANA_IMPULSO', 'SEMANA_IMPULSO.ID_DOCUMENTO', '=', 'DETALLE_SEMANA_IMPULSO.ID_DOCUMENTO')
-        //     ->select('DETALLE_SEMANA_IMPULSO.*','SEMANA_IMPULSO.*')
-        //     ->where('SEMANA_IMPULSO.LOTE_IMPULSO_ID','=',$iddocumento)
-        //     ->get();
-
-        // // Calcular días del rango
-        // $fechaInicio = \Carbon\Carbon::parse($datos->first()->FECHA_INICIO);
-        // $fechaFin = \Carbon\Carbon::parse($datos->first()->FECHA_FIN);
-        // $totalDias = $fechaInicio->diffInDays($fechaFin) + 1;
-
-        // // Agrupar por ID_DOCUMENTO y generar combos para cada grupo
-        // $datosAgrupados = $datos->groupBy('ID_DOCUMENTO')->map(function ($grupo) use ($fechaInicio, $fechaFin, $totalDias) {
-        //     $area_id = $grupo->first()->AREA_ID;
-        //     $centro_id = $grupo->first()->CENTRO_ID;
-            
-        //     // Generar el combo para este grupo específico
-        //     $comboConfiguracion = $this->gn_generacion_combo_impulso($area_id, $centro_id, "Seleccione", "");
-            
-        //     $fila = [
-        //         'ID_DOCUMENTO' => $grupo->first()->ID_DOCUMENTO,
-        //         'TIPO' => $grupo->first()->TIPO,
-        //         'AREA_ID' => $area_id,
-        //         'CENTRO_ID' => $centro_id,
-        //         'COD_CONFIGURACION' => $grupo->first()->COD_CONFIGURACION,
-        //         'COD_CATEGORIA_IMPULSO' => $grupo->first()->COD_CATEGORIA_IMPULSO,
-        //         'TXT_CATEGORIA_IMPULSO' => $grupo->first()->TXT_CATEGORIA_IMPULSO,
-        //         'TXT_PREFIJO_IMPULSO' => $grupo->first()->TXT_PREFIJO_IMPULSO,
-        //         'MONTO' => $grupo->first()->MONTO,
-        //         'ACTIVO' => $grupo->first()->ACTIVO,
-        //         'TXT_EMPRESA_TRABAJADOR' => $grupo->first()->TXT_EMPRESA_TRABAJADOR,
-        //         'FECHA_INICIO' => $grupo->first()->FECHA_INICIO,
-        //         'FECHA_FIN' => $grupo->first()->FECHA_FIN,
-        //         'total_dias' => $totalDias,
-        //         'combo_configuracion' => $comboConfiguracion, // Aquí pasamos el combo generado
-        //         'dias' => []
-        //     ];
-            
-        //     // Crear array con todas las fechas del rango
-        //     $fechaActual = $fechaInicio->copy();
-        //     $contadorDia = 1;
-            
-        //     while ($fechaActual <= $fechaFin) {
-        //         $diaEncontrado = $grupo->where('DIA', $contadorDia)->first();
-                
-        //         $fila['dias'][$contadorDia] = [
-        //             'nombre' => $this->obtenerNombreDiaDinamico($fechaActual),
-        //             'fecha' => $fechaActual->format('Y-m-d'),
-        //             'fecha_formateada' => $fechaActual->format('d/m'),
-        //             'data' => $diaEncontrado,
-        //             'numero_dia' => $contadorDia
-        //         ];
-                
-        //         $fechaActual->addDay();
-        //         $contadorDia++;
-        //     }
-            
-        //     return $fila;
-        // });
-
-
-
         // Obtener datos agrupados por ID_DOCUMENTO y TIPO
         $datos = DB::table('SEMANA_IMPULSO')
             ->join('DETALLE_SEMANA_IMPULSO', 'SEMANA_IMPULSO.ID_DOCUMENTO', '=', 'DETALLE_SEMANA_IMPULSO.ID_DOCUMENTO')
             ->where('SEMANA_IMPULSO.LOTE_IMPULSO_ID','=',$iddocumento)
-            ->select('DETALLE_SEMANA_IMPULSO.*','SEMANA_IMPULSO.*')
+            ->select('DETALLE_SEMANA_IMPULSO.*','SEMANA_IMPULSO.*','DETALLE_SEMANA_IMPULSO.MONTO AS MONTODETALLE')
             ->get();
         $datosAgrupados     = [];
         $datosParaVista     = [];
@@ -1299,7 +1236,7 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
                         'COD_CATEGORIA_IMPULSO' => $grupoTipo->first()->COD_CATEGORIA_IMPULSO,
                         'TXT_CATEGORIA_IMPULSO' => $grupoTipo->first()->TXT_CATEGORIA_IMPULSO,
                         'TXT_PREFIJO_IMPULSO' => $grupoTipo->first()->TXT_PREFIJO_IMPULSO,
-                        'MONTO' => $grupoTipo->first()->MONTO,
+                        'MONTO' => $grupoTipo->first()->MONTODETALLE,
                         'ACTIVO' => $grupoTipo->first()->ACTIVO,
                         'TXT_EMPRESA_TRABAJADOR' => $grupoTipo->first()->TXT_EMPRESA_TRABAJADOR,
                         'FECHA_INICIO' => $grupoTipo->first()->FECHA_INICIO,
@@ -1344,7 +1281,7 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
                 }
             }            
         }    
-
+        //dd($datosParaVista);
         return View::make('planillamovilidadimpulso.modificarmovilidadimpulsomasivo',
                          [
                             'lote' => $lote,

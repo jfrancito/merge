@@ -205,6 +205,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-modal-detalle-planilla-movilidad-impulso', 'GestionPlanillaMovilidadImpulsoController@actionDetallePlanillaMovilidadImpulso');
 	Route::any('/guardar-detalle-movilidad-impulso-trabajador/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionGuardarMovilidadTrabajador');
 	Route::any('/guardar-movilidad-detalle-masivo/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionGuardarDetalleMovilidadImpulsoMasivo');
+	Route::any('/extonar-planilla-movilidad-masivo/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionExtornarPlanillaMovilidadMasivo');
+
+
 
 
 	//PLANILLA MOVILIDAD
