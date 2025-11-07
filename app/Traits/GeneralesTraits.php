@@ -1247,6 +1247,34 @@ trait GeneralesTraits
 
         return $combo;
     }
+    private function gn_generacion_combo_impulso_vendedor($area_id,$centro_id,$titulo, $todo,$usuario)
+    {
+        //dd();
+        $array = DB::table('CONFIGURACION_IMPULSO')
+            ->where('ACTIVO', 1)
+            ->select(
+                DB::raw("ID_CONFIGURACION"),
+                DB::raw("CAST(CATEGORIA_TXT AS varchar(3)) + ' - ' + CAST(MONTO AS varchar(10)) AS CATEGORIA_TXT")
+            )
+            ->where('CENTRO_ID','=',$centro_id)
+            ->where('AREA_ID','=',$area_id)
+            ->where('ID_CONFIGURACION','!=','CFG000000000007')
+            ->where(function($query) use ($usuario) {
+                $query->whereNull('COD_JEFE_VENTA')
+                      ->orWhere('COD_JEFE_VENTA', $usuario);
+            })
+            ->pluck('CATEGORIA_TXT', 'ID_CONFIGURACION')
+            ->toArray();
+
+        if ($todo == 'TODO') {
+            $combo = array('' => $titulo, $todo => $todo) + $array;
+        } else {
+            $combo = array('' => $titulo) + $array;
+        }
+
+        return $combo;
+    }
+
 
 
     private function gn_generacion_combo_semana($titulo, $todo)

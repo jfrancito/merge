@@ -1,6 +1,23 @@
 
 $(document).ready(function(){
     var carpeta = $("#carpeta").val();
+
+    $(".planillamovilidad").on('click','.agregartrabajador', function() {
+        // debugger;
+        var _token                                   =   $('#token').val();
+        var data_planilla_movilidad_id               =   $(this).attr('data_planilla_movilidad_id');
+        var idopcion                                 =   $('#idopcion').val();
+        data                                         =   {
+                                                                _token                                   : _token,
+                                                                data_planilla_movilidad_id               : data_planilla_movilidad_id,
+                                                                idopcion                                 : idopcion
+                                                         };
+                                        
+        ajax_modal(data,"/ajax-modal-detalle-planilla-movilidad-impulso",
+                  "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+
+    });
+
     $(".planillamovilidad").on('click','.selpartida', function(e) {
         $('.nav-tabs a[href="#partida"]').tab('show');
     });
