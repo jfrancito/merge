@@ -64,7 +64,7 @@
                                 <!-- Para OTRO_TIPO/ADICIONAL: Solo INPUT TEXT -->
                                 {!! Form::text(
                                     "datos[$index][dias][$diaNumero][valor_texto]", 
-                                    isset($diaData['data']->MONTO) ? $diaData['data']->MONTO : (isset($diaData['data']->COD_CONFIGURACION) ? $diaData['data']->COD_CONFIGURACION : ''),
+                                    isset($diaData['data']->MONTODETALLE) ? $diaData['data']->MONTODETALLE : (isset($diaData['data']->COD_CONFIGURACION) ? $diaData['data']->COD_CONFIGURACION : ''),
                                     [
                                         'class' => 'form-control control input-sm importe',
                                         'id' => "texto_{$index}_{$diaNumero}",
@@ -72,7 +72,6 @@
                                         'placeholder' => 'Ingrese valor'
                                     ]
                                 ) !!}
-                                {{$diaData['data']->MONTO}}
                                 @else
                                 <!-- Para otros tipos no especificados: SELECT por defecto -->
                                 {!! Form::select(

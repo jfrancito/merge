@@ -2151,17 +2151,23 @@ class GestionPlanillaMovilidadController extends Controller
     }
 
 
-    public function actionExtornarPlanillaMovilidad($idopcion,$iddocumento,Request $request)
+    public function actionExtornarPlanillaMovilidadMasivo($idopcion,$iddocumento,Request $request)
     {
 
-        $iddocumento = $this->funciones->decodificarmaestrapre($iddocumento,'PLAM');
-        View::share('titulo','Extonnar Planilla Movilidad');
-        $planillamovilidad = PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first();
+        $iddocumento = $this->funciones->decodificarmaestrapre($iddocumento,'LOIM');
+        View::share('titulo','Extonnar Movilidad Impulso');
+
+
+        $lote = LoteImpulso::where('ID_DOCUMENTO','=',$iddocumento)->first();
         if($planillamovilidad->COD_ESTADO!='ETM0000000000001'){
-            return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd', 'Ya no puede extornar esta PLANILLA DE MOVILIDAD');
+            return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd', 'Ya no puede extornar esta MOVILIDAD DE IMPULSO');
         }
-        $planillamovilidad->ACTIVO = 0;
-        $planillamovilidad->save();
+
+        $lote->COD_ESTADO = 0;
+        $lote->ACTIVO = 0;
+        $lote->ACTIVO = 0;
+        $lote->save();
+
 
         DB::table('PLA_DETMOVILIDAD')
             ->where('ID_DOCUMENTO', $iddocumento) // Reemplaza con el valor real
@@ -2170,6 +2176,8 @@ class GestionPlanillaMovilidadController extends Controller
         return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('bienhecho', 'Se extorno la PLANILLA DE MOVILIDAD ');
 
     }
+
+
 
     public function actionModificarPlanillaMovilidad($idopcion,$iddocumento,Request $request)
     {

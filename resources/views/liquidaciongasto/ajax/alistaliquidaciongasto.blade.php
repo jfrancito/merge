@@ -1,23 +1,19 @@
 <table id="tdpm" class="table table-striped table-striped  nowrap listatabla" style='width: 100%;'>
   <thead>
     <tr>
+      <th class="ocultar">ID</th> 
       <th>LIQUIDACION GASTO</th> 
     </tr>
   </thead>
   <tbody>
     @foreach($listacabecera as $index=>$item)
       <tr>
+        <td class="ocultar">{{$index + 1}}</td>
         <td class="cell-detail" style="position: relative;">
-
           <span style="display: block;"><b>ID : </b> {{$item->ID_DOCUMENTO}}</span>
           <span style="display: block;"><b>CODIGO : </b> {{$item->CODIGO}}</span>
-
-
           <span style="display: block;"><b>ARENDIR : </b> {{$item->ARENDIR_ID}}</span>
           <span style="display: block;"><b>TIPO ARENDIR : </b> {{$item->ARENDIR}}</span>
-
-
-
           <span style="display: block;"><b>TRABAJADOR : </b> {{$item->TXT_EMPRESA_TRABAJADOR}}</span>
           <span style="display: block;"><b>FECHA EMISION : {{date_format(date_create($item->FECHA_EMI), 'd/m/Y')}}</b></span>
           <span style="display: block;"><b>FECHA CREACION : {{date_format(date_create($item->FECHA_CREA), 'd/m/Y')}}</b></span>
