@@ -162,7 +162,7 @@
                         </div>
 
                         <!-- DESTINO -->
-                        <div class="col-xs-12 col-sm-12 col-md-2 col-lg-3 cajareporte ind_producto">
+                        <div class="col-12 col-md-3">
                             <div class="form-group">
                                 <label class="col-sm-12 control-label labelleft negrita">
                                     DESTINO <span class="obligatorio">(*)</span> :
@@ -180,7 +180,7 @@
 
                         <!-- MONTOS APROXIMADOS (VENTAS) -->
                         @if(isset($areacomercial) && strtoupper($areacomercial) == 'VENTAS')
-                            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
+                           <div class="col-12 col-md-3">
                                 <label for="txt_glosa_venta" class="form-label fw-bold labelleft negrita">
                                     MONTO APROX. DE VENTA <span class="obligatorio">(*)</span> :
                                 </label>
@@ -188,7 +188,7 @@
                                           class="form-control" rows="3"></textarea>
                             </div>
 
-                            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
+                           <div class="col-12 col-md-3">
                                 <label for="txt_glosa_cobranza" class="form-label fw-bold labelleft negrita">
                                     MONTO APROX. DE COBRANZA <span class="obligatorio">(*)</span> :
                                 </label>
