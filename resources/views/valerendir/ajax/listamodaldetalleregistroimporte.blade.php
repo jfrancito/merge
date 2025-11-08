@@ -13,7 +13,7 @@
             <th>Importe</th>
             <th style="display:none;">Indicador</th>
 
-            @if(isset($areacomercial) && strtoupper($areacomercial) == 'COMERCIAL')
+            @if(isset($areacomercial) && strtoupper($areacomercial) == 'VENTAS')
                 <th>Monto Aprox. Venta</th>
                 <th>Monto Aprox. Cobranza</th>
             @endif
@@ -27,7 +27,7 @@
     </tbody>
     <tfoot>
         @php
-            $colspan = isset($areacomercial) && strtoupper($areacomercial) == 'COMERCIAL' ? 10 : 8;
+            $colspan = isset($areacomercial) && strtoupper($areacomercial) == 'VENTAS' ? 10 : 8;
         @endphp
         <tr id="fila_total">
             <!-- Celda TOTAL alineada a la derecha mediante div -->
