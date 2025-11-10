@@ -76,9 +76,7 @@ trait LiquidacionGastoTraits
                     ->select('COD_IMPORTE_MOTIVO','TXT_IMPORTE_MOTIVO')
                     ->get();
                 $mapaMotivos = $motivos->pluck('COD_IMPORTE_MOTIVO','TXT_IMPORTE_MOTIVO')->toArray();
-
                 $resultado = [];
-
                 foreach ($ldetallearendir as $item) {
                     $conceptos = explode("<br>", $item->NOM_TIPOS);
                     $montos = explode("<br>", $item->CAN_UNITARIO_TOTAL);
@@ -102,6 +100,9 @@ trait LiquidacionGastoTraits
                     }
 
                 }
+
+
+
                 // Convertir a array de salida
                 $array = array_values($resultado);
                 $indice = array_search($cod_vale, array_column($array, 'concepto_id'));
@@ -109,6 +110,26 @@ trait LiquidacionGastoTraits
                     $monto = $array[$indice]['monto'];
                 } else {
                     $monto = 0;
+                }
+
+                if($monto==0 && $cod_vale == 'TIG0000000000004'){
+                    $cod_vale = 'TIG0000000000005';
+                    $indice = array_search($cod_vale, array_column($array, 'concepto_id'));
+                    if ($indice !== false) {
+                        $monto = $array[$indice]['monto'];
+                    } else {
+                        $monto = 0;
+                    }
+                }
+
+                if($monto==0 && $cod_vale == 'TIG0000000000005'){
+                    $cod_vale = 'TIG0000000000004';
+                    $indice = array_search($cod_vale, array_column($array, 'concepto_id'));
+                    if ($indice !== false) {
+                        $monto = $array[$indice]['monto'];
+                    } else {
+                        $monto = 0;
+                    }
                 }
 
                 $total = DB::table('LQG_DETDOCUMENTOLIQUIDACIONGASTO')
@@ -120,7 +141,7 @@ trait LiquidacionGastoTraits
                 if($monto==0){
                     $mensaje = 'El monto supera al producto o el producto no se encuentra configurado en el vale';
                 }
-                //dd();
+                //dd($monto);
                 if (($total+$importe-$resta)>($monto+0.2)) {
                     $mensaje = 'El monto supera al producto que se encuentra configurado en el vale';
                 }

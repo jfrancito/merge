@@ -4300,15 +4300,17 @@ class GestionLiquidacionGastosController extends Controller
                         $importe = $request['totaldetalle'];
                         $resta = 0;
                         $liquidaciongastos = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->first();
+
                         $referencia_asoc =  DB::table('CMP.REFERENCIA_ASOC')
                                             ->where('TXT_DESCRIPCION', 'ARENDIR')
                                             ->where('TXT_TABLA_ASOC', $producto->NOM_PRODUCTO)
                                             ->first();
-                        $producto_id = $producto->NOM_PRODUCTO;
 
+                        $producto_id = $producto->NOM_PRODUCTO;
+                        //DD($referencia_asoc);
                         if (!empty($ULTIMA_FECHA_RENDICION_DET)) {
                             if(count($referencia_asoc)>0){
-
+                                
                                 $mensaje_error_vale = $this->validar_reembolso_supere_monto($liquidaciongastos,$liquidaciongastos->ARENDIR,$referencia_asoc->COD_TABLA,$importe,$producto_id,$resta);
                                 if($mensaje_error_vale!=''){
                                     return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/-1')->with('errorbd', $mensaje_error_vale); 
@@ -4452,7 +4454,7 @@ class GestionLiquidacionGastosController extends Controller
                 if ($tipodoc_id == 'TDO0000000000070' || $tipodoc_id == 'TDO0000000000001') {
                     $itemsel = '0';
                 }
-                        //DD("HOLA");
+                                    //dd("entro02");
 
                 $this->lg_calcular_total($iddocumento, $item);
                 DB::commit();
