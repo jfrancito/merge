@@ -55,7 +55,7 @@
         <div class="col-sm-12">
             <input  type="text"
                     id="semana" name='semana' 
-                    value="{{$lote->FECHA_INICIO}} // {{$lote->FECHA_FIN}}"                         
+                    value="{{date_format(date_create($lote->FECHA_INICIO), 'd-m-Y')}} // {{date_format(date_create($lote->FECHA_FIN), 'd-m-Y')}} "                         
                     placeholder="SEMANA"
                     readonly = "readonly"
                     required = ""

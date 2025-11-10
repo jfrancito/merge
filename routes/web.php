@@ -206,9 +206,14 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/guardar-detalle-movilidad-impulso-trabajador/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionGuardarMovilidadTrabajador');
 	Route::any('/guardar-movilidad-detalle-masivo/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionGuardarDetalleMovilidadImpulsoMasivo');
 	Route::any('/extonar-planilla-movilidad-masivo/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionExtornarPlanillaMovilidadMasivo');
+	Route::any('/ajax-buscar-documento-fe-entregable-pla-mob-masivo', 'GestionPlanillaMovilidadImpulsoController@actionListarPlanillaMovilidadMobilMasivo');
+	Route::any('/emitir-movilidad-impulso-masivo/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionEmitirDetalleMovilidadImpulsoMasivo');
+	Route::any('/ajax-modal-configuracion-cuenta-bancaria-impulso', 'GestionPlanillaMovilidadImpulsoController@actionAjaxModalConfiguracionCuentaBancariaImpulso');
+	Route::any('/configurar-datos-cuenta-bancaria-impulso/{orden_id}/{idopcion}', 'GestionPlanillaMovilidadImpulsoController@actionConfigurarDatosCuentaBancariaImpulso');
+	Route::any('/ajax-modal-ver-cuenta-bancaria-impulso', 'GestionPlanillaMovilidadImpulsoController@actionAjaxModalVerCuentaBancariaImpulso');
+	Route::any('/cambiar-cuenta-corriente-impulso/{empresa_id}/{banco_id}/{nro_cuenta}/{moneda_id}/{idoc}/{idopcion}', 'GestionPlanillaMovilidadImpulsoController@actionCambiarCuentaCorrienteImpulso');
 
-
-
+	Route::any('/extonar-planilla-movilidad-impulso/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionExtornarPlanillaMovilidadImpulso');
 
 	//PLANILLA MOVILIDAD
 

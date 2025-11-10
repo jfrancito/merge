@@ -1,12 +1,17 @@
 <table id="tdpm" class="table table-striped table-striped  nowrap listatabla" style='width: 100%;'>
   <thead>
     <tr>
+      <th class="ocultar">ID</th>
       <th>PLANILLA MOVILIDAD</th> 
     </tr>
   </thead>
   <tbody>
     @foreach($planillamovilidad as $index=>$item)
       <tr>
+        <td class="ocultar">
+          {{$index+1}}
+        </td>
+
         <td class="cell-detail" style="position: relative;">
           <span style="display: block;"><b>DOCUMENTO : </b> {{$item->SERIE}} - {{$item->NUMERO}}</span>
           <span style="display: block;"><b>TOTAL : </b> {{$item->TOTAL}}</span>

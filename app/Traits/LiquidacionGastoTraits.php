@@ -120,7 +120,7 @@ trait LiquidacionGastoTraits
                 if($monto==0){
                     $mensaje = 'El monto supera al producto o el producto no se encuentra configurado en el vale';
                 }
-
+                //dd();
                 if (($total+$importe-$resta)>($monto+0.2)) {
                     $mensaje = 'El monto supera al producto que se encuentra configurado en el vale';
                 }
@@ -1764,6 +1764,16 @@ trait LiquidacionGastoTraits
         $combo      =       array('' => $titulo) + $array;
         return  $combo;                    
     }
+
+
+    private function lg_combo_tipodocumento_impulso($titulo,$tipo_documento_id) {
+        $array      =       STDTipoDocumento::whereIn('COD_TIPO_DOCUMENTO',[$tipo_documento_id])
+                            ->pluck('TXT_TIPO_DOCUMENTO','COD_TIPO_DOCUMENTO')
+                            ->toArray();
+        $combo      =       array('' => $titulo) + $array;
+        return  $combo;                    
+    }
+
 
     private function lg_combo_cuenta_moneda($titulo,$todo,$tipocontrato,$centro_id,$empresa_id,$moneda_id) {
 

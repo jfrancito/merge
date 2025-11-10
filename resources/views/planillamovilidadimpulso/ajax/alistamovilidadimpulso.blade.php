@@ -28,6 +28,14 @@
           <a href="{{ url('/modificar-movilidad-impulso/'.$idopcion.'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -8))) }}" 
             style="margin-top: 5px;float: right;" class="btn btn-rounded btn-space btn-success btn-sm">MODIFICAR</a>
 
+          @if($item->COD_ESTADO == 'ETM0000000000001')
+            <form method="POST" id='forextornar' action="{{ url('/extonar-planilla-movilidad-impulso/'.$idopcion.'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
+                  {{ csrf_field() }}
+                  <button type= 'button' style="margin-top: 5px;float: right;" class="btn btn-rounded btn-space btn-danger btn-sm btn-extonar-pm">EXTORNAR</button>
+            </form>
+          @endif
+
+
         </td>
       </tr>                    
     @endforeach
