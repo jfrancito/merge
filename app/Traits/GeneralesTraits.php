@@ -285,7 +285,7 @@ trait GeneralesTraits
     {
 
         $array = User::where('activo', '=', 1)
-            ->where('id', '<>', '1CIX00000001')
+            //->where('id', '<>', '1CIX00000001')
             ->where('id', '=', $usuario_id)
             ->where('rol_id', '<>', '1CIX00000024')
             ->orderBy('nombre', 'asc')
@@ -317,6 +317,33 @@ trait GeneralesTraits
                         )
                         ->orderBy('ID', 'asc')
                         ->pluck('MONTO', 'ID')
+                        ->toArray();
+
+        $combo = array('' => 'Seleccione un arendir') + $array;
+        return $combo;
+    }
+
+
+    public function gn_combo_arendir_restante_impulso()
+    {
+
+        $liquidaciones = DB::table('LQG_LIQUIDACION_GASTO')
+                        ->where('ACTIVO', 1)
+                        ->where('COD_ESTADO', '<>', 'ETM0000000000006')
+                        ->where('USUARIO_CREA', Session::get('usuario')->id)
+                        ->pluck('ARENDIR_ID')
+                        ->toArray();
+
+        $array    =     DB::table('SEMANA_IMPULSO')
+                        ->where('COD_TRABAJADOR', Session::get('usuario')->usuarioosiris_id)
+                        ->where('COD_ESTADO', 'ETM0000000000005')
+                        ->whereNotIn('ID_DOCUMENTO', $liquidaciones)
+                        ->select(
+                            'ID_DOCUMENTO',
+                            DB::raw("CAST(FECHA_CREA AS VARCHAR) + ' / ' + ID_DOCUMENTO + ' / ' + CAST(MONTO AS VARCHAR) AS MONTO")
+                        )
+                        ->orderBy('ID_DOCUMENTO', 'asc')
+                        ->pluck('MONTO', 'ID_DOCUMENTO')
                         ->toArray();
 
         $combo = array('' => 'Seleccione un arendir') + $array;
@@ -384,6 +411,8 @@ trait GeneralesTraits
         $combo = array('' => 'Seleccione un arendir') + $array;
         return $combo;
     }
+
+
 
 
 

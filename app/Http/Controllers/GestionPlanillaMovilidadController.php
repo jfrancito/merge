@@ -1841,6 +1841,57 @@ class GestionPlanillaMovilidadController extends Controller
                 $total                  =   $request['total'];
                 $activo                 =   $request['activo'];
 
+
+                $plmovilidad            =   PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first();
+
+                $trabajador             =   DB::table('STD.TRABAJADOR')
+                                            ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                                            ->first();
+                $dni                    =   '';
+                if(count($trabajador)>0){
+                    $dni        =       $trabajador->NRO_DOCUMENTO;
+                }
+                $trabajadorespla    =   DB::table('WEB.platrabajadores')
+                                        ->where('situacion_id', 'PRMAECEN000000000002')
+                                        ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+                                        ->where('dni', $dni)
+                                        ->first();
+                $area_id                = $trabajadorespla->area_id;
+                $mensaje_extra          = '';
+
+                //VENDEDOR
+
+                $area_id                = 'PRMAECEN000000000172';//ELIMINAR
+
+
+                $impulsadora            =   $this->plm_identificar_si_es_impulsadora($area_id);
+                $impulsadora            =   0;//ELIMINAR
+
+                $monto_validar_diario   =   45;
+                if($impulsadora == 1){
+                    $monto_validar_diario   =   $this->plm_monto_total_impulsadora($plmovilidad->COD_TRABAJADOR,$fecha_gasto);
+                    $mensaje_extra = '(IMPULSADORA O VENDEDOR)';
+                }
+
+                //VALIDAR QUE LAS PLANILLAS DE MOVILIDAD SEAN DEL MISMO PERIODO
+                $periodo                =   CONPeriodo::where('COD_PERIODO','=',$plmovilidad->COD_PERIODO)->first(); 
+                $fecha                  =   $fecha_gasto;
+                $periodo_actual         =   $periodo->TXT_CODIGO;
+
+                // Convertir a objetos Carbon
+                $fechaObj = \Carbon\Carbon::createFromFormat('d-m-Y', $fecha_gasto);
+                $periodoAnio = explode('-', $periodo_actual)[0]; // 2024
+                $periodoMes = explode('-', $periodo_actual)[1];  // 3
+                // Crear fecha de inicio y fin del periodo
+                $inicioPeriodo = \Carbon\Carbon::create($periodoAnio, $periodoMes, 1);
+                $finPeriodo = $inicioPeriodo->copy()->endOfMonth();
+
+                //dd($finPeriodo);
+                // Validar
+                if (!$fechaObj->between($inicioPeriodo, $finPeriodo)) {
+                   return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd', 'La fecha NO está dentro del periodo seleccionado'); 
+                }
+
                 $detplanillamovilidad_item   =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->where('ITEM','=',$item)->first();
                 //VALIDAR QUE SOLO SEA 45 SOLES DIARIOS
                 $totaldia = DB::table('PLA_MOVILIDAD')
@@ -1851,8 +1902,8 @@ class GestionPlanillaMovilidadController extends Controller
                     ->where('PLA_DETMOVILIDAD.USUARIO_CREA', Session::get('usuario')->id)
                     ->sum('PLA_DETMOVILIDAD.TOTAL');
                 $totaldiario =    (float)$total  + ($totaldia-$detplanillamovilidad_item->TOTAL);
-                if($totaldiario>45){
-                    return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd', 'Supero el maximo saldo de 45 soles al dia');
+                if($totaldiario>$monto_validar_diario){
+                    return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd', 'Supero el maximo saldo de '.$monto_validar_diario.' soles al dia '.$mensaje_extra);
                 }
 
                 //VALIDAR QUE SOLO MENSUALMENTE SEA 1130
@@ -1987,6 +2038,54 @@ class GestionPlanillaMovilidadController extends Controller
                 $anio                   =   $this->anio;
                 $mes                    =   $this->mes;
                 $periodo                =   $this->gn_periodo_actual_xanio_xempresa($anio, $mes, Session::get('empresas')->COD_EMPR);
+                $plmovilidad            =   PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first();
+
+                $trabajador     =   DB::table('STD.TRABAJADOR')
+                                    ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                                    ->first();
+                $dni            =       '';
+                if(count($trabajador)>0){
+                    $dni        =       $trabajador->NRO_DOCUMENTO;
+                }
+                $trabajadorespla    =   DB::table('WEB.platrabajadores')
+                                        ->where('situacion_id', 'PRMAECEN000000000002')
+                                        ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+                                        ->where('dni', $dni)
+                                        ->first();
+                $area_id = $trabajadorespla->area_id;
+                $mensaje_extra = '';
+
+                //VENDEDOR
+                $area_id = 'PRMAECEN000000000172';//ELIMINAR
+
+
+                $impulsadora            =   $this->plm_identificar_si_es_impulsadora($area_id);
+                $monto_validar_diario   =   45;
+                if($impulsadora == 1){
+                    $monto_validar_diario   =   $this->plm_monto_total_impulsadora($plmovilidad->COD_TRABAJADOR,$fecha_gasto);
+                    $mensaje_extra = '(IMPULSADORA O VENDEDOR)';
+                }
+
+                //VALIDAR QUE LAS PLANILLAS DE MOVILIDAD SEAN DEL MISMO PERIODO
+
+                $periodo                =   CONPeriodo::where('COD_PERIODO','=',$plmovilidad->COD_PERIODO)->first(); 
+
+                $fecha                  = $fecha_gasto;
+                $periodo_actual         = $periodo->TXT_CODIGO;
+
+                // Convertir a objetos Carbon
+                $fechaObj = \Carbon\Carbon::createFromFormat('d-m-Y', $fecha_gasto);
+                $periodoAnio = explode('-', $periodo_actual)[0]; // 2024
+                $periodoMes = explode('-', $periodo_actual)[1];  // 3
+                // Crear fecha de inicio y fin del periodo
+                $inicioPeriodo = \Carbon\Carbon::create($periodoAnio, $periodoMes, 1);
+                $finPeriodo = $inicioPeriodo->copy()->endOfMonth();
+
+                //dd($finPeriodo);
+                // Validar
+                if (!$fechaObj->between($inicioPeriodo, $finPeriodo)) {
+                   return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd', 'La fecha NO está dentro del periodo seleccionado'); 
+                }
 
                 //VALIDAR QUE SOLO SEA 45 SOLES DIARIOS
                 $totaldia = DB::table('PLA_MOVILIDAD')
@@ -1997,8 +2096,8 @@ class GestionPlanillaMovilidadController extends Controller
                     ->where('PLA_DETMOVILIDAD.USUARIO_CREA', Session::get('usuario')->id)
                     ->sum('PLA_DETMOVILIDAD.TOTAL');
                 $totaldiario =    (float)$total + $totaldia;
-                if($totaldiario>45){
-                    return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd', 'Supero el maximo saldo de 45 soles al dia');
+                if($totaldiario>$monto_validar_diario){
+                    return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd', 'Supero el maximo saldo de '.$monto_validar_diario.' soles al dia '.$mensaje_extra);
                 }
 
                 //VALIDAR QUE SOLO MENSUALMENTE SEA 1130
@@ -2145,29 +2244,31 @@ class GestionPlanillaMovilidadController extends Controller
             DB::commit();
         }catch(\Exception $ex){
             DB::rollback(); 
+            dd("hola1");
             return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd', $ex.' Ocurrio un error inesperado');
         }
             return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('bienhecho', 'Se Agrego un nuevo item con exito');
     }
 
 
-    public function actionExtornarPlanillaMovilidadMasivo($idopcion,$iddocumento,Request $request)
+
+
+    public function actionExtornarPlanillaMovilidad($idopcion,$iddocumento,Request $request)
     {
 
-        $iddocumento = $this->funciones->decodificarmaestrapre($iddocumento,'LOIM');
+        $iddocumento = $this->funciones->decodificarmaestrapre($iddocumento,'PLAM');
         View::share('titulo','Extonnar Movilidad Impulso');
 
 
-        $lote = LoteImpulso::where('ID_DOCUMENTO','=',$iddocumento)->first();
-        if($planillamovilidad->COD_ESTADO!='ETM0000000000001'){
-            return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd', 'Ya no puede extornar esta MOVILIDAD DE IMPULSO');
+        $lote = PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first();
+        if($lote->COD_ESTADO!='ETM0000000000001'){
+            return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd', 'Ya no puede extornar esta PLANILLA MOVILIDAD');
         }
 
-        $lote->COD_ESTADO = 0;
-        $lote->ACTIVO = 0;
+        $lote->COD_ESTADO = 'ETM0000000000006';
+        $lote->TXT_ESTADO = 'RECHAZADO';
         $lote->ACTIVO = 0;
         $lote->save();
-
 
         DB::table('PLA_DETMOVILIDAD')
             ->where('ID_DOCUMENTO', $iddocumento) // Reemplaza con el valor real
@@ -2176,7 +2277,6 @@ class GestionPlanillaMovilidadController extends Controller
         return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('bienhecho', 'Se extorno la PLANILLA DE MOVILIDAD ');
 
     }
-
 
 
     public function actionModificarPlanillaMovilidad($idopcion,$iddocumento,Request $request)

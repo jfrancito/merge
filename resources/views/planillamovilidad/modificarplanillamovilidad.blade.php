@@ -14,8 +14,8 @@
     <div class="row">
       <div class="col-md-12">
         <div class="panel panel-default panel-border-color panel-border-color-primary">
-          <div class="panel-heading panel-heading-divider">PLANILLA DE MOVILIDAD 
-            <div class="tools tooltiptop">
+          <div class="panel-heading panel-heading-divider">PLANILLA DE MOVILIDAD  ({{$planillamovilidad->ID_DOCUMENTO}})
+            <div class="tools tooltiptop"> 
               <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones agregardetalle"
                 data_planilla_movilidad_id = '{{$planillamovilidad->ID_DOCUMENTO}}' style="width:140px;">
                 <span class="tooltiptext" >Agregar Detalle</span>

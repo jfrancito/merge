@@ -54,6 +54,39 @@ use Carbon\Carbon;
 trait PlanillaTraits
 {
 
+
+    private function plm_monto_total_impulsadora($trabajador_id,$fecha_pago) {
+
+        $total = DB::table('SEMANA_IMPULSO')
+            ->join('DETALLE_SEMANA_IMPULSO', 'SEMANA_IMPULSO.ID_DOCUMENTO', '=', 'DETALLE_SEMANA_IMPULSO.ID_DOCUMENTO')
+            ->where('SEMANA_IMPULSO.COD_TRABAJADOR', $trabajador_id)
+            ->where('SEMANA_IMPULSO.COD_ESTADO', 'ETM0000000000005')
+            ->where('FECHA', $fecha_pago)
+            ->selectRaw('SUM(DETALLE_SEMANA_IMPULSO.MONTO) as total_monto')
+            ->first();
+
+        $sumaTotal = $total->total_monto ?? 0;
+
+        return  $sumaTotal;
+    }
+
+    private function plm_identificar_si_es_impulsadora($area_id) {
+
+        $ind_impulsadora =  0;
+        $configuraciones =  DB::table('CONFIGURACION_IMPULSO')
+                            ->where('ACTIVO', 1)
+                            ->where('AREA_ID', '=',$area_id)
+                            ->get();
+        if(count($configuraciones)>0){
+            $ind_impulsadora =  1;
+        }else{
+            $ind_impulsadora =  0;
+        }
+
+        return  $ind_impulsadora;
+    }
+
+
     private function plm_lista_cabecera_comprobante_total_firma() {
         if(Session::get('usuario')->id== '1CIX00000001'){
 
@@ -232,6 +265,7 @@ trait PlanillaTraits
             $planillamovilidad  =   SemanaImpulso::where('ACTIVO','=','1')
                                     ->whereRaw("CAST(FECHA_CREA  AS DATE) >= ? and CAST(FECHA_CREA  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                     ->where('COD_EMPRESA','=', Session::get('empresas')->COD_EMPR)
+                                    ->whereRaw("ISNULL(LOTE_IMPULSO_ID,'') = ''")
                                     ->where('USUARIO_CREA','=',Session::get('usuario')->id)
                                     ->orderby('FECHA_CREA','DESC')->get();
                                     
@@ -240,6 +274,7 @@ trait PlanillaTraits
             $planillamovilidad  =   SemanaImpulso::where('ACTIVO','=','1')
                                     ->whereRaw("CAST(FECHA_CREA  AS DATE) >= ? and CAST(FECHA_CREA  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                     ->where('USUARIO_CREA','=',Session::get('usuario')->id)
+                                    ->whereRaw("ISNULL(LOTE_IMPULSO_ID,'') = ''")
                                     ->where('COD_EMPRESA','=', Session::get('empresas')->COD_EMPR)
                                     ->orderby('FECHA_CREA','DESC')->get();
 

@@ -5,6 +5,10 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/datetimepicker/css/bootstrap-datetimepicker.min.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/select2/css/select2.min.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/bootstrap-slider/css/bootstrap-slider.css') }} "/>
+    <!-- En tu layout o vista -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
 
 @stop
 @section('section')
@@ -39,7 +43,7 @@
 
                 <div class="row">
                   <div class="col-xs-12 ">
-                    <form method="POST" action="{{ url('/emitir-movilidad-impulso/'.$idopcion.'/'.Hashids::encode(substr($lote->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" id ='frmpmemitir'>
+                    <form method="POST" action="{{ url('/emitir-movilidad-impulso-masivo/'.$idopcion.'/'.Hashids::encode(substr($lote->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" id ='frmpmemitir'>
                           {{ csrf_field() }}
                           <div class="row xs-pt-15">
                             <div class="col-xs-6">

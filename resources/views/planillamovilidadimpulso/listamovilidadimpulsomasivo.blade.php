@@ -21,7 +21,7 @@
                       Crear Movilidad
                     </a>
 
-                    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscardocumentomob">
+                    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscardocumentomobmasivo">
                       <span class="tooltiptext">Buscar Documento</span>
                       <span class="icon mdi mdi-search"></span>
                     </a>
@@ -143,6 +143,6 @@
 
     });
   </script>
-  <script src="{{ asset('public/js/comprobante/planilla.js?v='.$version) }}" type="text/javascript"></script>
+  <script src="{{ asset('public/js/comprobante/planillaimpulso.js?v='.$version) }}" type="text/javascript"></script>
 
 @stop

@@ -294,18 +294,18 @@ trait UserTraits
 
     private function envio_correo_tesoreria_lq() {
 
-        $listaliquidaciones          =   LqgLiquidacionGasto::where('COD_ESTADO', 'ETM0000000000005')
-                                        //->where('ID_DOCUMENTO','=','LIQG00000329')
-                                        ->where(function($query) {
-                                            $query->whereNull('IND_CORREO')
-                                                  ->orWhere('IND_CORREO', 0);
-                                        })
-                                        //->where('ARENDIR_ID','<>','')
-                                        ->where(function($query) {
-                                            $query->whereNotNull('COD_OSIRIS')
-                                                  ->where('COD_OSIRIS', '<>', '');
-                                        })
-                                        ->get();
+        $listaliquidaciones          =      LqgLiquidacionGasto::where('COD_ESTADO', 'ETM0000000000005')
+                                            //->where('ID_DOCUMENTO','=','LIQG00000329')
+                                            ->where(function($query) {
+                                                $query->whereNull('IND_CORREO')
+                                                      ->orWhere('IND_CORREO', 0);
+                                            })
+                                            //->where('ARENDIR_ID','<>','')
+                                            ->where(function($query) {
+                                                $query->whereNotNull('COD_OSIRIS')
+                                                      ->where('COD_OSIRIS', '<>', '');
+                                            })
+                                            ->get();
 
         foreach($listaliquidaciones as $item){
             $correotrabajdor         =    '';

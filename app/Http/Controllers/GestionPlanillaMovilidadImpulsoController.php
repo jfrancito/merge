@@ -22,6 +22,8 @@ use App\Modelos\SemanaImpulso;
 use App\Modelos\ALMCentro;
 use App\Modelos\LqgDocumentoHistorial;
 use App\Modelos\LoteImpulso;
+use App\Modelos\TESCuentaBancaria;
+
 
 use App\Modelos\FePlanillaEntregable;
 use App\Modelos\CMPDocAsociarCompra;
@@ -321,6 +323,54 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
             ]);
     }
 
+    public function actionEmitirDetalleMovilidadImpulsoMasivo($idopcion,$iddocumento,Request $request)
+    {
+        $idcab       = $iddocumento;
+        $iddocumento = $this->funciones->decodificarmaestrapre($iddocumento,'LOIM');
+        if($_POST)
+        {
+            try{ 
+                DB::beginTransaction();
+                $lote                    =   LoteImpulso::where('ID_DOCUMENTO','=',$iddocumento)->first();
+
+                if((float)$lote->MONTO<=0){
+                    return Redirect::to('modificar-movilidad-impulso-masivo/'.$idopcion.'/'.$idcab)->with('errorbd','Para poder emitir el monto tiene que ser mayor que cero');
+                }
+
+                $listasemanaimpulso      =   SemanaImpulso::where('LOTE_IMPULSO_ID','=',$iddocumento)->get(); 
+                foreach ($listasemanaimpulso as $item) {
+                    $planillamovilidad      =   SemanaImpulso::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)->first(); 
+                    SemanaImpulso::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
+                                ->update(
+                                        [
+                                            'FECHA_MOD'=> $this->fechaactual,
+                                            'FECHA_EMI'=> $this->fechaactual,
+                                            'USUARIO_MOD'=> Session::get('usuario')->id,
+                                            'IND_OBSERVACION' => 0,
+                                            'COD_ESTADO'=> 'ETM0000000000005',
+                                            'TXT_ESTADO'=> 'APROBADO'
+                                        ]);
+                }
+                LoteImpulso::where('ID_DOCUMENTO','=',$iddocumento)
+                            ->update(
+                                    [
+                                        'FECHA_MOD'=> $this->fechaactual,
+                                        'FECHA_EMI'=> $this->fechaactual,
+                                        'USUARIO_MOD'=> Session::get('usuario')->id,
+                                        'IND_OBSERVACION' => 0,
+                                        'COD_ESTADO'=> 'ETM0000000000005',
+                                        'TXT_ESTADO'=> 'APROBADO'
+                                    ]);
+                DB::commit();
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                return Redirect::to('modificar-movilidad-impulso-masivo/'.$idopcion.'/'.$idcab)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+            return Redirect::to('gestion-movilidad-impulso-masivo/'.$idopcion)->with('bienhecho', 'Movilidad Impulso Masivo'.$idcab.' emitido con exito');
+        }  
+    }
+
+
 
     public function actionEmitirDetalleMovilidadImpulso($idopcion,$iddocumento,Request $request)
     {
@@ -331,7 +381,7 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
             try{ 
                 DB::beginTransaction();
                 $planillamovilidad      =   SemanaImpulso::where('ID_DOCUMENTO','=',$iddocumento)->first(); 
-                if($planillamovilidad->MOMTO>0){
+                if((float)$planillamovilidad->MONTO<=0){
                     return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd','Para poder emitir el monto tiene que ser mayor que cero');
                 }
                 SemanaImpulso::where('ID_DOCUMENTO','=',$iddocumento)
@@ -406,13 +456,34 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
                          ]);
     }
 
+
+    public function actionListarPlanillaMovilidadMobilMasivo(Request $request) {
+
+        $fecha_inicio   =   $request['fecha_inicio'];
+        $fecha_fin      =   $request['fecha_fin'];
+        $idopcion       =   $request['idopcion'];
+        $funcion        =   $this;
+
+        $planillamovilidad  =   $this->pla_lista_planilla_movilidad_impulso_masivo($fecha_inicio,$fecha_fin);
+
+        return View::make('planillamovilidadimpulso/ajax/alistamovilidadimpulsomasivo',
+                         [
+                            'fecha_inicio'          =>  $fecha_inicio,
+                            'fecha_fin'             =>  $fecha_fin,
+                            'idopcion'              =>  $idopcion,
+                            'planillamovilidad'     =>  $planillamovilidad,
+                            'ajax'                  =>  true,
+                            'funcion'               =>  $funcion
+                         ]);
+    }
+
     public function actionListarPlanillaMovilidadImpulsoMasivo($idopcion)
     {
         /******************* validar url **********************/
         $validarurl = $this->funciones->getUrl($idopcion,'Ver');
         if($validarurl <> 'true'){return $validarurl;}
         /******************************************************/
-        View::share('titulo','Lista Movilidad Impulso');
+        View::share('titulo','Lista Movilidad Impulso Masivo');
         $cod_empresa        =   Session::get('usuario')->usuarioosiris_id;
         $fecha_inicio       =   $this->fecha_menos_diez_dias;
         $fecha_fin          =   $this->fecha_sin_hora;
@@ -464,6 +535,23 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
                     if (!($anio_inicio === $anio_fin && $mes_inicio === $mes_fin)) {
                         return Redirect::back()->withInput()->with('errorurl', 'Las fechas deben estar en el mismo periodo');
                     }
+
+                    $existeCruce = DB::table('LOTE_IMPULSO')
+                        ->where('ACTIVO', 1)
+                        ->where(function($query) use ($fecha_inicio, $fecha_fin) {
+                            $query->whereBetween('FECHA_INICIO', [$fecha_inicio, $fecha_fin])
+                                  ->orWhereBetween('FECHA_FIN', [$fecha_inicio, $fecha_fin])
+                                  ->orWhere(function($q) use ($fecha_inicio, $fecha_fin) {
+                                      $q->where('FECHA_INICIO', '<=', $fecha_inicio)
+                                        ->where('FECHA_FIN', '>=', $fecha_fin);
+                                  });
+                        })
+                        ->exists();
+
+                    if ($existeCruce) {
+                        return Redirect::back()->withInput()->with('errorurl', 'Las fechas ingresadas se cruzan con un registro activo existente.');
+                    }
+
 
                     $anio               =   $inicio->year;
                     $mes                =   $inicio->month;
@@ -579,6 +667,23 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
                     }
 
 
+                    $existeCruce = DB::table('SEMANA_IMPULSO')
+                        ->where('ACTIVO', 1)
+                        ->where(function($query) use ($fecha_inicio, $fecha_fin) {
+                            $query->whereBetween('FECHA_INICIO', [$fecha_inicio, $fecha_fin])
+                                  ->orWhereBetween('FECHA_FIN', [$fecha_inicio, $fecha_fin])
+                                  ->orWhere(function($q) use ($fecha_inicio, $fecha_fin) {
+                                      $q->where('FECHA_INICIO', '<=', $fecha_inicio)
+                                        ->where('FECHA_FIN', '>=', $fecha_fin);
+                                  });
+                        })
+                        ->exists();
+
+                    if ($existeCruce) {
+                        return Redirect::back()->withInput()->with('errorurl', 'Las fechas ingresadas se cruzan con un registro activo existente.');
+                    }
+
+
                     $anio               =   $inicio->year;
                     $mes                =   $inicio->month;
 
@@ -586,6 +691,19 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
                     $area_nombre        =   $request['area_nombre'];
                     $centro_id          =   $request['centro_id'];
                     $centro             =   ALMCentro::where('COD_CENTRO', '=', $centro_id)->first();
+
+                    $empresa            =   DB::table('users')
+                                                ->join('STD.TRABAJADOR', 'users.usuarioosiris_id', '=', 'STD.TRABAJADOR.COD_TRAB')
+                                                ->join('STD.EMPRESA', 'STD.EMPRESA.NRO_DOCUMENTO', '=', 'STD.TRABAJADOR.NRO_DOCUMENTO')
+                                                ->where('users.activo', '1')
+                                                ->where('STD.EMPRESA.NRO_DOCUMENTO', $dni)
+                                                ->select(
+                                                    'STD.TRABAJADOR.COD_TRAB',
+                                                    'STD.EMPRESA.COD_EMPR',
+                                                    'STD.EMPRESA.NOM_EMPR',
+                                                    'STD.TRABAJADOR.TXT_NOMBRES',
+                                                    'users.nombre'
+                                                )->first();
 
 
                     $cabecera                           =   new SemanaImpulso;
@@ -596,8 +714,10 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
                     $cabecera->FECHA_FIN                =   $fecha_fin;
                     $cabecera->COD_EMPRESA              =   Session::get('empresas')->COD_EMPR;
                     $cabecera->TXT_EMPRESA              =   Session::get('empresas')->NOM_EMPR;
-                    $cabecera->COD_EMPRESA_TRABAJADOR   =   $codtrabajador;
-                    $cabecera->TXT_EMPRESA_TRABAJADOR   =   $txttrabajador;
+                    $cabecera->COD_EMPRESA_TRABAJADOR   =   $empresa->COD_EMPR;
+                    $cabecera->TXT_EMPRESA_TRABAJADOR   =   $empresa->nombre;
+                    $cabecera->COD_TRABAJADOR           =   $codtrabajador;
+                    $cabecera->TXT_TRABAJADOR           =   $txttrabajador;
                     $cabecera->AREA_ID                  =   $area_id;
                     $cabecera->AREA_TXT                 =   $area_nombre;
                     $cabecera->CENTRO_ID                =   $centro->COD_CENTRO;
@@ -691,7 +811,7 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
             $area_id = $trabajadorespla->area_id;
             $area_nombre = $trabajadorespla->cadarea;
 
-            //IMPULSADORA
+            // //IMPULSADORA
             // $area_id = 'PRMAECEN000000000155';//ELIMINAR
             // $area_nombre = 'AUTOSERVICIOS';//ELIMINAR
 
@@ -853,6 +973,64 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
         }   
     }
 
+    public function actionExtornarPlanillaMovilidadMasivo($idopcion,$iddocumento,Request $request)
+    {
+
+        $iddocumento = $this->funciones->decodificarmaestrapre($iddocumento,'LOIM');
+        View::share('titulo','Extonnr Movilidad Impulso Masivo');
+        $lote = LoteImpulso::where('ID_DOCUMENTO','=',$iddocumento)->first();
+        if($lote->COD_ESTADO!='ETM0000000000001'){
+            return Redirect::to('gestion-movilidad-impulso-masivo/'.$idopcion)->with('errorbd', 'Ya no puede extornar esta MOVILIDAD DE IMPULSO');
+        }
+
+        $lote->COD_ESTADO = 'ETM0000000000006';
+        $lote->TXT_ESTADO = 'RECHAZADO';
+        $lote->ACTIVO = 0;
+        $lote->save();
+        DB::table('SEMANA_IMPULSO')
+            ->where('LOTE_IMPULSO_ID', $iddocumento) // Reemplaza con el valor real
+            ->update([
+                'ACTIVO' => 0,
+                'COD_ESTADO' => 'ETM0000000000006',
+                'TXT_ESTADO' => 'RECHAZADO'
+            ]);
+        DB::table('DETALLE_SEMANA_IMPULSO')
+            ->where('LOTE_IMPULSO_ID', $iddocumento) // Reemplaza con el valor real
+            ->update([
+                'ACTIVO' => 0
+            ]);
+
+        return Redirect::to('gestion-movilidad-impulso-masivo/'.$idopcion)->with('bienhecho', 'Se extorno la PLANILLA DE MOVILIDAD ');
+
+    }
+
+    public function actionExtornarPlanillaMovilidadImpulso($idopcion,$iddocumento,Request $request)
+    {
+
+        $iddocumento = $this->funciones->decodificarmaestrapre($iddocumento,'SEMI');
+        View::share('titulo','Extonnr Movilidad Impulso Masivo');
+        $lote = SemanaImpulso::where('ID_DOCUMENTO','=',$iddocumento)->first();
+        if($lote->COD_ESTADO!='ETM0000000000001'){
+            return Redirect::to('gestion-movilidad-impulso/'.$idopcion)->with('errorbd', 'Ya no puede extornar esta MOVILIDAD DE IMPULSO');
+        }
+
+        $lote->COD_ESTADO = 'ETM0000000000006';
+        $lote->TXT_ESTADO = 'RECHAZADO';
+        $lote->ACTIVO = 0;
+        $lote->save();
+
+        DB::table('DETALLE_SEMANA_IMPULSO')
+            ->where('LOTE_IMPULSO_ID', $iddocumento) // Reemplaza con el valor real
+            ->update([
+                'ACTIVO' => 0
+            ]);
+
+        return Redirect::to('gestion-movilidad-impulso/'.$idopcion)->with('bienhecho', 'Se extorno la PLANILLA DE MOVILIDAD ');
+
+    }
+
+
+
     public function actionGuardarDetalleMovilidadImpulsoMasivo($idopcion,$iddocumento,Request $request)
     {
 
@@ -952,51 +1130,6 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
                 }
 
 
-                // //MONTO
-                // foreach ($datosadicional as $registro) {
-                //     $idDocumento = $registro['id_documento'];
-
-                //     $movilidad          =   SemanaImpulso::where('ID_DOCUMENTO','=',$idDocumento)->first();
-                //     // Si hay días configurados
-                //     if (isset($registro['dias'])) {
-                //         foreach ($registro['dias'] as $diaNumero => $diaData) {
-
-                //             $configuracion      =   DB::table('CONFIGURACION_IMPULSO')->where('CATEGORIA_TXT','=','ADICIONAL')
-                //                                     ->where('AREA_ID','=',$movilidad->AREA_ID)
-                //                                     ->where('CENTRO_ID','=',$movilidad->CENTRO_ID)
-                //                                     ->first();
-                //             $dia                =   Carbon::parse($diaData['fecha'])->day;
-                //             $diaNumero_c        =   $dia;
-                //             //dd($diaData);
-
-                //             if(count($configuracion)>0){
-
-                //                 $categoriaimpulso      =   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','PLANILLA_IMPULSO')->where('COD_CATEGORIA','=',$configuracion->CATEGORIA_ID)->first();
-
-                //                 DetalleSemanaImpulso::where('ID_DOCUMENTO','=',$idDocumento)->where('DIA','=',$diaNumero)->where('TIPO','=','ADICIONAL')
-                //                             ->update(
-                //                                     [
-
-                //                                         'COD_CONFIGURACION'=>$configuracion->ID_CONFIGURACION,
-                //                                         'COD_CATEGORIA_IMPULSO'=>$categoriaimpulso->COD_CATEGORIA,
-                //                                         'TXT_CATEGORIA_IMPULSO'=>$categoriaimpulso->NOM_CATEGORIA,
-                //                                         'TXT_PREFIJO_IMPULSO'=>$categoriaimpulso->TXT_PREFIJO,
-                //                                         'FECHA_MOD'=>$this->fechaactual,
-                //                                         'MONTO'=>$diaData['configuracion'],
-                //                                         'USUARIO_MOD'=>Session::get('usuario')->id
-
-                //                                     ]);
-
-                //                 $this->calcular_total_movilidad_impulso($iddocumento);
-
-                //             }
-
-                //         }
-                //     }
-                // }
-
-
-
                 DB::commit();
             }catch(\Exception $ex){
                 DB::rollback(); 
@@ -1034,7 +1167,7 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
         $datos = DB::table('SEMANA_IMPULSO')
             ->join('DETALLE_SEMANA_IMPULSO', 'SEMANA_IMPULSO.ID_DOCUMENTO', '=', 'DETALLE_SEMANA_IMPULSO.ID_DOCUMENTO')
             ->where('DETALLE_SEMANA_IMPULSO.TIPO', 'ASIGNADO')
-            ->select('DETALLE_SEMANA_IMPULSO.*','SEMANA_IMPULSO.TXT_EMPRESA_TRABAJADOR','SEMANA_IMPULSO.FECHA_INICIO','SEMANA_IMPULSO.FECHA_FIN')
+            ->select('DETALLE_SEMANA_IMPULSO.*','SEMANA_IMPULSO.*','DETALLE_SEMANA_IMPULSO.MONTO AS MONTODETALLE')
             ->where('SEMANA_IMPULSO.ID_DOCUMENTO','=',$iddocumento)
             ->get();
 
@@ -1048,11 +1181,13 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
             $fila = [
                 'ID_DOCUMENTO' => $grupo->first()->ID_DOCUMENTO,
                 'TIPO' => $grupo->first()->TIPO,
+                'TXT_EMPR_BANCO' => $grupo->first()->TXT_EMPR_BANCO,
+                'TXT_NRO_CUENTA_BANCARIA' => $grupo->first()->TXT_NRO_CUENTA_BANCARIA,
                 'COD_CONFIGURACION' => $grupo->first()->COD_CONFIGURACION,
                 'COD_CATEGORIA_IMPULSO' => $grupo->first()->COD_CATEGORIA_IMPULSO,
                 'TXT_CATEGORIA_IMPULSO' => $grupo->first()->TXT_CATEGORIA_IMPULSO,
                 'TXT_PREFIJO_IMPULSO' => $grupo->first()->TXT_PREFIJO_IMPULSO,
-                'MONTO' => $grupo->first()->MONTO,
+                'MONTODETALLE' => $grupo->first()->MONTODETALLE,
                 'ACTIVO' => $grupo->first()->ACTIVO,
                 'TXT_EMPRESA_TRABAJADOR' => $grupo->first()->TXT_EMPRESA_TRABAJADOR,
                 'FECHA_INICIO' => $grupo->first()->FECHA_INICIO,
@@ -1091,7 +1226,7 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
         $datosadicional = DB::table('SEMANA_IMPULSO')
             ->join('DETALLE_SEMANA_IMPULSO', 'SEMANA_IMPULSO.ID_DOCUMENTO', '=', 'DETALLE_SEMANA_IMPULSO.ID_DOCUMENTO')
             ->where('DETALLE_SEMANA_IMPULSO.TIPO', 'ADICIONAL')
-            ->select('DETALLE_SEMANA_IMPULSO.*','SEMANA_IMPULSO.TXT_EMPRESA_TRABAJADOR','SEMANA_IMPULSO.FECHA_INICIO','SEMANA_IMPULSO.FECHA_FIN')
+            ->select('DETALLE_SEMANA_IMPULSO.*','SEMANA_IMPULSO.*','DETALLE_SEMANA_IMPULSO.MONTO AS MONTODETALLE')
             ->where('SEMANA_IMPULSO.ID_DOCUMENTO','=',$iddocumento)
             ->get();
 
@@ -1105,11 +1240,14 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
             $fila = [
                 'ID_DOCUMENTO' => $grupo->first()->ID_DOCUMENTO,
                 'TIPO' => $grupo->first()->TIPO,
+                'TXT_EMPR_BANCO' => $grupo->first()->TXT_EMPR_BANCO,
+                'TXT_NRO_CUENTA_BANCARIA' => $grupo->first()->TXT_NRO_CUENTA_BANCARIA,
+
                 'COD_CONFIGURACION' => $grupo->first()->COD_CONFIGURACION,
                 'COD_CATEGORIA_IMPULSO' => $grupo->first()->COD_CATEGORIA_IMPULSO,
                 'TXT_CATEGORIA_IMPULSO' => $grupo->first()->TXT_CATEGORIA_IMPULSO,
                 'TXT_PREFIJO_IMPULSO' => $grupo->first()->TXT_PREFIJO_IMPULSO,
-                'MONTO' => $grupo->first()->MONTO,
+                'MONTODETALLE' => $grupo->first()->MONTODETALLE,
                 'ACTIVO' => $grupo->first()->ACTIVO,
                 'TXT_EMPRESA_TRABAJADOR' => $grupo->first()->TXT_EMPRESA_TRABAJADOR,
                 'FECHA_INICIO' => $grupo->first()->FECHA_INICIO,
@@ -1182,6 +1320,149 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
 
     }
 
+    public function actionConfigurarDatosCuentaBancariaImpulso($orden_id,$idopcion,Request $request)
+    {
+
+
+        $idoc                                       =   $orden_id;
+        $ordencompra                                =   SemanaImpulso::where('ID_DOCUMENTO','=',$idoc)->first();
+
+        $banco_id                                   =   $request['banco_id'];
+        $tipocuenta_id                              =   $request['tipocuenta_id'];
+        $moneda_id                                  =   $request['moneda_id'];
+        $numerocuenta                               =   $request['numerocuenta'];
+        $numerocuentacci                            =   $request['numerocuentacci'];
+        $carnetextranjeria                          =   $request['carnetextranjeria'];
+
+        $banco                                      =   CMPCategoria::where('COD_CATEGORIA','=',$banco_id)->first();
+        $tipocuenta                                 =   CMPCategoria::where('COD_CATEGORIA','=',$tipocuenta_id)->first();
+        $moneda                                     =   CMPCategoria::where('COD_CATEGORIA','=',$moneda_id)->first();
+        $empresa                                    =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPRESA_TRABAJADOR)->first();
+
+        $tescuentabb                                =   TESCuentaBancaria::where('COD_EMPR_TITULAR','=',$empresa->COD_EMPR)
+                                                        ->where('COD_EMPR_BANCO','=',$banco->COD_CATEGORIA)
+                                                        ->where('COD_CATEGORIA_MONEDA','=',$moneda->COD_CATEGORIA)
+                                                        ->where('TXT_TIPO_REFERENCIA','=',$tipocuenta->COD_CATEGORIA)
+                                                        ->where('TXT_NRO_CUENTA_BANCARIA','=',$numerocuenta)
+                                                        ->first();
+
+        if(count($tescuentabb) > 0){
+                return Redirect::back()->withInput()->with('errorurl', 'La cuenta ya se cuenta registrado');
+        }
+
+
+        $cuentabancaria                             =   New TESCuentaBancaria();
+        $cuentabancaria->COD_EMPR_TITULAR           =   $empresa->COD_EMPR;
+        $cuentabancaria->COD_EMPR_BANCO             =   $banco->COD_CATEGORIA;
+        $cuentabancaria->TXT_NRO_CUENTA_BANCARIA    =   $numerocuenta;
+        $cuentabancaria->TXT_EMPR_TITULAR           =   $empresa->NOM_EMPR;
+        $cuentabancaria->TXT_EMPR_BANCO             =   $banco->NOM_CATEGORIA;
+        $cuentabancaria->COD_CATEGORIA_MONEDA       =   $moneda->COD_CATEGORIA;
+        $cuentabancaria->TXT_CATEGORIA_MONEDA       =   $moneda->NOM_CATEGORIA;
+        $cuentabancaria->TXT_NRO_CCI                =   $numerocuentacci;
+        $cuentabancaria->TXT_GLOSA                  =   '';
+        $cuentabancaria->TXT_TIPO_REFERENCIA        =   $tipocuenta->COD_CATEGORIA;
+        $cuentabancaria->TXT_REFERENCIA             =   $tipocuenta->NOM_CATEGORIA;
+        $cuentabancaria->COD_USUARIO_CREA_AUD       =   Session::get('usuario')->id;
+        $cuentabancaria->FEC_USUARIO_CREA_AUD       =   $this->fechaactual;
+        $cuentabancaria->COD_ESTADO                 =   1;
+        $cuentabancaria->CARNET_EXTRANJERIA         =   $carnetextranjeria;
+        $cuentabancaria->COD_CUENTA_CONTABLE        =   '';
+        $cuentabancaria->TXT_CUENTA_CONTABLE        =   '';
+        $cuentabancaria->save();
+
+        return Redirect::back()->withInput()->with('bienhecho', 'Cuenta Bancaria '.$numerocuenta.' registrada con éxito');
+
+
+    }
+
+    public function actionAjaxModalVerCuentaBancariaImpulso(Request $request)
+    {
+
+        $orden_id               =   $request['orden_id'];
+        $idopcion               =   $request['idopcion'];
+        $ordencompra            =   SemanaImpulso::where('ID_DOCUMENTO','=',$orden_id)->first();
+        $cuentabancarias        =   TESCuentaBancaria::where('COD_EMPR_TITULAR','=',$ordencompra->COD_EMPRESA_TRABAJADOR)
+                                    ->where('COD_ESTADO','=',1)
+                                    ->orderby('TXT_EMPR_BANCO','ASC')
+                                    ->get();
+
+        return View::make('planillamovilidadimpulso/modal/ajax/mvercuentabancaria',
+                         [          
+
+                            'cuentabancarias'               => $cuentabancarias,
+                            'idoc'                          => $orden_id,
+                            'idopcion'                      => $idopcion,
+                            'ajax'                          => true,                            
+                         ]);
+    }
+
+
+    public function actionCambiarCuentaCorrienteImpulso($empresa_id,$banco_id,$nro_cuenta,$moneda_id,$idoc,$idopcion)
+    {
+        $cuentabancarias        =   TESCuentaBancaria::where('COD_EMPR_TITULAR','=',$empresa_id)
+                                    ->where('COD_EMPR_BANCO','=',$banco_id)
+                                    ->where('TXT_NRO_CUENTA_BANCARIA','=',$nro_cuenta)
+                                    ->where('COD_CATEGORIA_MONEDA','=',$moneda_id)
+                                    ->first();
+
+        if(count($cuentabancarias)>0){
+
+
+                SemanaImpulso::where('ID_DOCUMENTO',$idoc)
+                            ->update(
+                                [
+                                    'COD_EMPR_BANCO'=>$cuentabancarias->COD_EMPR_BANCO,
+                                    'TXT_EMPR_BANCO'=>$cuentabancarias->TXT_EMPR_BANCO,
+                                    'COD_MONEDA_BANCO'=>$cuentabancarias->COD_CATEGORIA_MONEDA,
+                                    'TXT_MONEDA_BANCO'=>$cuentabancarias->TXT_CATEGORIA_MONEDA,
+                                    'COD_TIPO_CUENTA'=>$cuentabancarias->TXT_TIPO_REFERENCIA,
+                                    'TXT_TIPO_CUENTA'=>$cuentabancarias->TXT_REFERENCIA,
+                                    'TXT_NRO_CUENTA_BANCARIA'=>$cuentabancarias->TXT_NRO_CUENTA_BANCARIA,
+                                    'TXT_NRO_CCI'=>$cuentabancarias->TXT_NRO_CCI,
+                                ]
+                            );
+
+
+        }                           
+
+        return Redirect::back()->withInput()->with('bienhecho', 'Se realizo la modificacion de la cuenta bancaria '.$idoc);
+
+    }
+
+
+    public function actionAjaxModalConfiguracionCuentaBancariaImpulso(Request $request)
+    {
+
+        $orden_id               =   $request['orden_id'];
+        $idopcion               =   $request['idopcion'];
+
+
+        $ordencompra            =   SemanaImpulso::where('ID_DOCUMENTO','=',$orden_id)->first();
+
+        $usuario                =   User::where('id','=',Session::get('usuario')->id)->first();
+        $combo_banco            =   $this->gn_generacion_combo_categoria('BANCOS_MERGE','Seleccione banco','');
+        $defecto_banco          =   '';
+        $combo_tipocuenta       =   $this->gn_generacion_combo_categoria('CUENTA_MERGE','Seleccione tipo cuenta','');
+        $defecto_tipocuenta     =   '';
+        $combo_moneda           =   $this->gn_generacion_combo_categoria('MONEDA_MERGE','Seleccione moneda','');
+        $defecto_moneda         =   '';
+
+        return View::make('planillamovilidadimpulso/modal/ajax/mdatoscuentabancariaimpulso',
+                         [          
+                            'usuario'                       => $usuario,
+                            'ordencompra'                   => $ordencompra,
+                            'orden_id'                      => $orden_id,
+                            'idopcion'                      => $idopcion,
+                            'combo_banco'                   => $combo_banco,
+                            'defecto_banco'                 => $defecto_banco,
+                            'combo_tipocuenta'              => $combo_tipocuenta,
+                            'defecto_tipocuenta'            => $defecto_tipocuenta,
+                            'combo_moneda'                  => $combo_moneda,
+                            'defecto_moneda'                => $defecto_moneda,                         
+                            'ajax'                          => true,                            
+                         ]);
+    }
 
 
     public function actionModificarMovilidadImpulsoMasivo($idopcion,$iddocumento,Request $request)
@@ -1195,7 +1476,7 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
         View::share('titulo','Agregar Detalle Movilidad Impulso Masivo');
         $lote          =   LoteImpulso::where('ID_DOCUMENTO','=',$iddocumento)->first();
         if($lote->COD_ESTADO!='ETM0000000000001'){
-            return Redirect::to('gestion-movilidad-impulso/'.$idopcion)->with('errorbd', 'Ya no puede modificar esta MOVILIDAD DE IMPULSO');
+            return Redirect::to('gestion-movilidad-impulso-masivo/'.$idopcion)->with('errorbd', 'Ya no puede modificar esta MOVILIDAD DE IMPULSO');
         }
 
 
@@ -1232,6 +1513,8 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
                         'TIPO' => $grupoTipo->first()->TIPO,
                         'AREA_ID' => $area_id,
                         'CENTRO_ID' => $centro_id,
+                        'TXT_EMPR_BANCO' => $grupoTipo->first()->TXT_EMPR_BANCO,
+                        'TXT_NRO_CUENTA_BANCARIA' => $grupoTipo->first()->TXT_NRO_CUENTA_BANCARIA,
                         'COD_CONFIGURACION' => $grupoTipo->first()->COD_CONFIGURACION,
                         'COD_CATEGORIA_IMPULSO' => $grupoTipo->first()->COD_CATEGORIA_IMPULSO,
                         'TXT_CATEGORIA_IMPULSO' => $grupoTipo->first()->TXT_CATEGORIA_IMPULSO,
@@ -1300,8 +1583,20 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
         $funcion            =       $this;
         $fecha_fin          =       $this->fecha_sin_hora;
 
-        $arraymotivo        =       DB::table('users')->join('STD.TRABAJADOR', 'users.usuarioosiris_id', '=', 'STD.TRABAJADOR.COD_TRAB')->where('activo','=','1')->where('users.rol_id', '1CIX00000047')
-                                    ->pluck('nombre','COD_TRAB')->toArray();
+        $arraymotivo        =       DB::table('users')
+                                    ->join('STD.TRABAJADOR', 'users.usuarioosiris_id', '=', 'STD.TRABAJADOR.COD_TRAB')
+                                    ->join('STD.EMPRESA', 'STD.EMPRESA.NRO_DOCUMENTO', '=', 'STD.TRABAJADOR.NRO_DOCUMENTO')
+                                    ->where('users.activo', '1')
+                                    ->where('users.rol_id', '1CIX00000047')
+                                    ->select(
+                                        'STD.TRABAJADOR.COD_TRAB',
+                                        'STD.EMPRESA.COD_EMPR',
+                                        'STD.EMPRESA.NOM_EMPR',
+                                        'STD.TRABAJADOR.TXT_NOMBRES',
+                                        'users.nombre'
+                                    )
+                                    ->pluck('nombre','COD_EMPR')->toArray();
+
         $combotrabajador    =       array('' => "SELECCIONE TRABAJADOR") + $arraymotivo;
         $trabajador_id      =       '';
 
@@ -1329,7 +1624,20 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
             
             DB::beginTransaction();
                 $lote           =   LoteImpulso::where('ID_DOCUMENTO','=',$iddocumento)->first();
-                $trabajador_id  =   $request['trabajador_id']; 
+                $empresa_id     =   $request['trabajador_id'];
+                $empresa        =   DB::table('users')
+                                            ->join('STD.TRABAJADOR', 'users.usuarioosiris_id', '=', 'STD.TRABAJADOR.COD_TRAB')
+                                            ->join('STD.EMPRESA', 'STD.EMPRESA.NRO_DOCUMENTO', '=', 'STD.TRABAJADOR.NRO_DOCUMENTO')
+                                            ->where('users.activo', '1')
+                                            ->where('STD.EMPRESA.COD_EMPR', $empresa_id)
+                                            ->select(
+                                                'STD.TRABAJADOR.COD_TRAB',
+                                                'STD.EMPRESA.COD_EMPR',
+                                                'STD.EMPRESA.NOM_EMPR',
+                                                'STD.TRABAJADOR.TXT_NOMBRES',
+                                                'users.nombre'
+                                            )->first();
+                $trabajador_id  =   $empresa->COD_TRAB;
                 $anio           =   $this->anio;
                 $mes            =   $this->mes;
                 $trabajador     =   DB::table('STD.TRABAJADOR')
@@ -1395,6 +1703,9 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
                 $mes                =   $inicio->month;
                 $centro             =   ALMCentro::where('COD_CENTRO', '=', $centro_id)->first();
 
+
+
+
                 //dd($centro);
 
 
@@ -1407,8 +1718,11 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
                 $cabecera->FECHA_FIN                =   $fecha_fin;
                 $cabecera->COD_EMPRESA              =   Session::get('empresas')->COD_EMPR;
                 $cabecera->TXT_EMPRESA              =   Session::get('empresas')->NOM_EMPR;
-                $cabecera->COD_EMPRESA_TRABAJADOR   =   $codtrabajador;
-                $cabecera->TXT_EMPRESA_TRABAJADOR   =   $txttrabajador;
+                $cabecera->COD_EMPRESA_TRABAJADOR   =   $empresa->COD_EMPR;
+                $cabecera->TXT_EMPRESA_TRABAJADOR   =   $empresa->nombre;
+                $cabecera->COD_TRABAJADOR           =   $codtrabajador;
+                $cabecera->TXT_TRABAJADOR           =   $txttrabajador;
+
                 $cabecera->AREA_ID                  =   $area_id;
                 $cabecera->AREA_TXT                 =   $area_nombre;
                 $cabecera->CENTRO_ID                =   $centro->COD_CENTRO;

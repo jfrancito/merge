@@ -2,6 +2,53 @@
 $(document).ready(function(){
     var carpeta = $("#carpeta").val();
 
+
+    $(".planillamovilidad").on('click','.agregar_cuenta_bancaria_oc', function() {
+
+        var _token                  =   $('#token').val();
+        var idopcion                =   $('#idopcion').val();
+        var orden_id                =   $(this).attr('data_id');
+
+        data                        =   {
+                                            _token                  : _token,
+                                            orden_id                : orden_id,
+                                            idopcion                : idopcion,
+
+                                        };
+
+        ajax_modal(data,"/ajax-modal-configuracion-cuenta-bancaria-impulso",
+                  "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+
+    });
+
+
+    $(".planillamovilidad").on('click','.ver_cuenta_bancaria', function() {
+
+        var _token                  =   $('#token').val();
+        var orden_id                =   $(this).attr('data_id');
+        var idopcion                =   $('#idopcion').val();
+
+
+
+        data                        =   {
+                                            _token                  : _token,
+                                            orden_id                : orden_id,
+                                            idopcion                : idopcion,
+                                        };
+
+        ajax_modal(data,"/ajax-modal-ver-cuenta-bancaria-impulso",
+              "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+
+
+
+    });
+
+
+
+
+
+
+
     $(".planillamovilidad").on('click','.agregartrabajador', function() {
         // debugger;
         var _token                                   =   $('#token').val();
@@ -134,6 +181,28 @@ $(document).ready(function(){
 
     });
 
+
+    $(".cfedocumento").on('click','.buscardocumentomobmasivo', function() {
+
+        event.preventDefault();
+
+        var fecha_inicio         =   $('#fecha_inicio').val();
+        var fecha_fin            =   $('#fecha_fin').val();
+        var idopcion             =   $('#idopcion').val();
+        var _token               =   $('#token').val();
+        //validacioones
+        if(fecha_inicio ==''){ alerterrorajax("Seleccione una fecha inicio."); return false;}
+        if(fecha_fin ==''){ alerterrorajax("Seleccione una fecha fin."); return false;}
+
+        data            =   {
+                                _token                  : _token,
+                                fecha_inicio            : fecha_inicio,
+                                fecha_fin               : fecha_fin,
+                                idopcion                : idopcion
+                            };
+        ajax_normal(data,"/ajax-buscar-documento-fe-entregable-pla-mob-masivo");
+
+    });
 
     $(".cfedocumento").on('click','.buscardocumentomob', function() {
 
@@ -613,53 +682,260 @@ $(document).ready(function(){
     $(".planillamovilidad").on('click','.btnmovilidaddetalle', function(e) {
         event.preventDefault();
         var _token                  =   $('#token').val();
+        valor                       =   validarDatosAntesDeGuardar();
+        if(valor){
+
+            $.confirm({
+                title: '¿Confirma el registro?',
+                content: 'Registro de movilidad impulso',
+                buttons: {
+                    confirmar: function () {
+                         $( "#frmdetalleimpulso" ).submit();   
+                    },
+                    cancelar: function () {
+                        $.alert('Se cancelo la emision');
+                        window.location.reload();
+                    }
+                }
+            });
+
+        }
 
 
-        $.confirm({
-            title: '¿Confirma el registro?',
-            content: 'Registro de movilidad impulso',
-            buttons: {
-                confirmar: function () {
-                     $( "#frmdetalleimpulso" ).submit();   
-                },
-                cancelar: function () {
-                    $.alert('Se cancelo la emision');
-                    window.location.reload();
+
+    });
+
+    function validarDatosAntesDeGuardar() {
+        let errores = [];
+        let tabla = document.getElementById('nso_check');
+        let filas = tabla.querySelectorAll('tbody tr');
+        
+        filas.forEach((fila, indexFila) => {
+            let tipoCelda = fila.querySelector('td:nth-child(3)');
+            let tipo = tipoCelda ? tipoCelda.textContent.trim() : '';
+            
+            if (tipo === 'ASIGNADO') {
+                let siguienteFila = filas[indexFila + 1];
+                if (!siguienteFila) return;
+                
+                let siguienteTipoCelda = siguienteFila.querySelector('td:nth-child(3)');
+                let siguienteTipo = siguienteTipoCelda ? siguienteTipoCelda.textContent.trim() : '';
+                
+                if (siguienteTipo === 'OTRO_TIPO' || siguienteTipo === 'ADICIONAL') {
+                    let celdasAsignado = fila.querySelectorAll('td.text-center');
+                    let celdasOtro = siguienteFila.querySelectorAll('td.text-center');
+                    
+                    for (let i = 0; i < celdasAsignado.length && i < celdasOtro.length; i++) {
+                        let celdaAsignado = celdasAsignado[i];
+                        let celdaOtro = celdasOtro[i];
+                        
+                        let selectAsignado = celdaAsignado.querySelector('select');
+                        let selectfecha_formateada = celdaAsignado.querySelector('input[name="fecha_formateada"]');
+                        let valorFecha = selectfecha_formateada ? selectfecha_formateada.value : '';
+                        let inputOtro = celdaOtro.querySelector('input[type="text"]');
+                        
+                        if (selectAsignado && inputOtro && inputOtro.value !== '') {
+                            let textoSeleccionado = selectAsignado.options[selectAsignado.selectedIndex].text;
+                            let valorIngresado = parseFloat(inputOtro.value) || 0;
+                            
+                            console.log(`Día ${i+1}: Select texto="${textoSeleccionado}", Input valor=${valorIngresado}`);
+                            
+                            let valorMaximoPermitido = extraerValorDelSelect(textoSeleccionado);
+                            
+                            console.log(`Valor máximo extraído: ${valorMaximoPermitido}`);
+                            
+                            if (valorIngresado > valorMaximoPermitido) {
+                                let nombreTrabajador = fila.querySelector('td:first-child').textContent.trim();
+                                let diaNumero = i + 1;
+                                
+                                errores.push({
+                                    trabajador: nombreTrabajador,
+                                    dia: valorFecha,
+                                    valorMaximo: valorMaximoPermitido,
+                                    valorIngresado: valorIngresado,
+                                    textoSelect: textoSeleccionado
+                                });
+                            }
+                        }
+                    }
                 }
             }
         });
+        
+        if (errores.length > 0) {
+            mostrarErrores(errores);
+            return false;
+        } else {
+            return true;
+        }
+    }
 
-    });
+    function extraerValorDelSelect(textoSelect) {
+        if (!textoSelect || textoSelect === '-' || textoSelect === '') {
+            return 0;
+        }
+        
+        console.log(`Extrayendo valor de: "${textoSelect}"`);
+        
+        // Buscar el patrón: número con decimales al final del string
+        let match = textoSelect.match(/(\d+\.\d+)$/);
+        if (match) {
+            let valor = parseFloat(match[1]);
+            console.log(`Encontrado con regex: ${valor}`);
+            return valor;
+        }
+        
+        // Si no encuentra con decimales, buscar cualquier número
+        let numeros = textoSelect.match(/\d+\.?\d*/g);
+        if (numeros && numeros.length > 0) {
+            // Tomar el último número encontrado (asumiendo que es el valor)
+            let valor = parseFloat(numeros[numeros.length - 1]);
+            console.log(`Encontrado en array: ${valor}`);
+            return valor;
+        }
+        
+        console.log(`No se pudo extraer valor, retornando 0`);
+        return 0;
+    }
+
+    function mostrarErrores(errores) {
+        let mensaje = "❌ ERRORES DE VALIDACIÓN:\n\n";
+        mensaje += "Se encontraron los siguientes problemas:\n\n";
+
+        errores.forEach((error, index) => {
+            mensaje += `${index + 1}. TRABAJADOR: ${error.trabajador}\n`;
+            mensaje += `   DÍA ${error.dia}: Valor ingresado (${error.valorIngresado}) \n`;
+            mensaje += `   EXCEDE el valor máximo permitido (${error.valorMaximo})\n`;
+            mensaje += `   Configuración seleccionada: ${error.textoSelect}\n\n`;
+        });
+
+        mensaje += "Por favor, ajuste los valores antes de guardar.";
+
+        // SweetAlert2
+        Swal.fire({
+            icon: 'error',
+            title: '❌ ERRORES DE VALIDACIÓN',
+            html: formatMessage(errores),
+            confirmButtonText: 'Entendido',
+            confirmButtonColor: '#d33',
+            width: '600px',
+            customClass: {
+                popup: 'custom-swal-popup'
+            }
+        });
+    }
+
+    // Función para formatear el mensaje como HTML
+    function formatMessage(errores) {
+        let html = '<div class="text-left">';
+        html += '<p class="mb-3"><strong>Se encontraron los siguientes problemas:</strong></p>';
+        
+        errores.forEach((error, index) => {
+            html += `<div class="error-item mb-3 p-2 border rounded">`;
+            html += `<strong>${index + 1}. TRABAJADOR:</strong> ${error.trabajador}<br>`;
+            html += `<strong>DÍA ${error.dia}:</strong> Valor ingresado (<span class="text-danger">${error.valorIngresado}</span>)<br>`;
+            html += `<strong>EXCEDE</strong> el valor máximo permitido (<span class="text-success">${error.valorMaximo}</span>)<br>`;
+            html += `<strong>Configuración seleccionada:</strong> ${error.textoSelect}`;
+            html += `</div>`;
+        });
+        
+        html += '<p class="mt-3 text-warning"><strong>Por favor, ajuste los valores antes de guardar.</strong></p>';
+        html += '</div>';
+        
+        return html;
+    }
+
+
+    function validarYGuardar() {
+        if (validarDatosAntesDeGuardar()) {
+            alert('✅ Todos los datos son válidos. Procediendo a guardar...');
+            // document.getElementById('formulario').submit();
+        } else {
+            alert('❌ No se puede guardar debido a errores de validación.');
+        }
+    }
+
+
 
 
     $(".planillamovilidad").on('click','.btnemitirplanillamovilidad', function(e) {
         event.preventDefault();
         var _token                  =   $('#token').val();
         var data_lote               =   $(this).attr('data_lote');
-        var tipo_solicitud          =   $("#tipo_solicitud").val();
-        var autoriza_id             =   $("#autoriza_id").val();
 
-        if(tipo_solicitud == 'REEMBOLSO'){
-            if(autoriza_id == ''){
-                alerterrorajax('Seleccione quien autorizara su REEMBOLSO'); return false;
-            }
+        // Validar bancos
+        const erroresBanco = validarBancosAsignados();
+        debugger;
+        if (erroresBanco.length > 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Bancos Pendientes',
+                html: `
+                    <div class="text-left">
+                        <p>Hay <strong>${erroresBanco.length}</strong> trabajador(es) sin banco asignado:</p>
+                        <ul class="text-start">
+                            ${erroresBanco.slice(0, 5).map(error => 
+                                `<li><strong>${error.trabajador}</strong></li>`
+                            ).join('')}
+                        </ul>
+                        ${erroresBanco.length > 5 ? `<p>... y ${erroresBanco.length - 5} más</p>` : ''}
+                        <p class="mt-3">¿Desea continuar de todos modos?</p>
+                    </div>
+                `,
+                confirmButtonText: 'Entendido',
+                confirmButtonColor: '#d33'
+            }).then((result) => {
+                return false;
+            });
+        } else {
+            $.confirm({
+                title: '¿Confirma la emision?',
+                content: 'Registro de emision de movilidad',
+                buttons: {
+                    confirmar: function () {
+                         $( "#frmpmemitir" ).submit();   
+                    },
+                    cancelar: function () {
+                        $.alert('Se cancelo la emision');
+                        window.location.reload();
+                    }
+                }
+            });
         }
 
-        $.confirm({
-            title: '¿Confirma la emision?',
-            content: 'Registro de emision de movilidad',
-            buttons: {
-                confirmar: function () {
-                     $( "#frmpmemitir" ).submit();   
-                },
-                cancelar: function () {
-                    $.alert('Se cancelo la emision');
-                    window.location.reload();
+
+
+
+
+
+    });
+
+
+    function validarBancosAsignados() {
+        let errores = [];
+        
+        // Recorrer todas las filas
+        document.querySelectorAll('tbody tr').forEach((fila, index) => {
+            const tipo = fila.querySelector('input[name*="[tipo]"]')?.value;
+            const trabajador = fila.querySelector('td:first-child')?.textContent.trim();
+            const inputBanco = fila.querySelector('input[name="TXT_EMPR_BANCO"]');
+            debugger;
+            // Solo validar para tipo ASIGNADO
+            if (tipo === 'ASIGNADO') {
+                if (!inputBanco || !inputBanco.value || inputBanco.value.trim() === '') {
+                    errores.push({
+                        trabajador: trabajador,
+                        tipo: tipo,
+                        mensaje: 'Trabajador ASIGNADO sin banco'
+                    });
                 }
             }
         });
+        
+        return errores;
+    }
 
-    });
+
 
 
     $('.btnaprobarcomporbatnte').on('click', function(event){
