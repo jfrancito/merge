@@ -1049,7 +1049,7 @@ $(document).ready(function(){
 
         let columnasGlosa = "";
 
-        if (areacomercial === "COMERCIAL") {
+        if (areacomercial === "VENTAS") {
             columnasGlosa = `
                 <td>${txt_glosa_venta}</td>
                 <td>${txt_glosa_cobranza}</td>
