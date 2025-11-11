@@ -2056,10 +2056,11 @@ class GestionPlanillaMovilidadController extends Controller
                 $mensaje_extra = '';
 
                 //VENDEDOR
-                $area_id = 'PRMAECEN000000000172';//ELIMINAR
+                //$area_id = 'PRMAECEN000000000172';//ELIMINAR
 
 
                 $impulsadora            =   $this->plm_identificar_si_es_impulsadora($area_id);
+                $impulsadora = 0;//ELIMINAR
                 $monto_validar_diario   =   45;
                 if($impulsadora == 1){
                     $monto_validar_diario   =   $this->plm_monto_total_impulsadora($plmovilidad->COD_TRABAJADOR,$fecha_gasto);
@@ -2257,7 +2258,7 @@ class GestionPlanillaMovilidadController extends Controller
     {
 
         $iddocumento = $this->funciones->decodificarmaestrapre($iddocumento,'PLAM');
-        View::share('titulo','Extonnar Movilidad Impulso');
+        View::share('titulo','Extonnar Planilla Movilidad');
 
 
         $lote = PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first();
