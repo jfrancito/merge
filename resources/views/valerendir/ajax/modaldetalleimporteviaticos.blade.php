@@ -1,9 +1,9 @@
-<div style="display:flex; justify-content:center; width:100%; margin:0 auto;">
+<div class="scroll_text scroll_text_heigth_aler" style="display:flex; justify-content:center; width:100%; margin:0 auto;">
   <table class="table table-bordered table-striped table-hover align-middle"
          style="width:95%; max-width:1100px; margin:auto; table-layout:fixed;">
     <thead class="table-primary text-center">
       <tr>
-        <th style="width:25%; text-align:center;">DESTINO Y FECHAS</th>
+        <th style="width:28%; text-align:center;">DESTINO Y FECHAS</th>
         <th style="width:40%; text-align:center;">DESCRIPCIÓN</th>
         <th style="width:25%; text-align:center;">COSTO UNIT. (S/)</th>
         <th style="width:25%; text-align:center;">IMPORTE (S/)</th>

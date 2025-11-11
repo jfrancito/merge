@@ -37,7 +37,8 @@
                                id="txt_categoria_banco"
                                value="{{ $txt_categoria_banco }}" 
                                data-valor="{{ $txt_categoria_banco }}"
-                               class="form-control bg-light" readonly>
+                               class="form-control bg-light" readonly
+                               autocomplete="off">
                     </div>
 
                     <div class="col-md-4 col-lg-3" id="grupo_cuenta">
@@ -49,7 +50,9 @@
                                id="numero_cuenta"
                                value="{{ $numero_cuenta }}" 
                                data-valor="{{ $numero_cuenta }}"
-                               class="form-control bg-light" readonly>
+                               class="form-control bg-light" readonly
+                               autocomplete="off"
+                               pattern="[0-9]*">
                     </div>
 
 
@@ -118,23 +121,36 @@
         var codMoneda = $("#cod_moneda").val();
 
        
-        if (codMoneda === "MON0000000000001") { // SOLES
-            $("#txt_categoria_banco, #numero_cuenta")
-                .prop("readonly", true)
-                .addClass("bg-light");
-        } 
-        else if (codMoneda === "MON0000000000002") { // DÓLARES
-            $("#txt_categoria_banco, #numero_cuenta")
-                .prop("readonly", false)
-                .removeClass("bg-light");
-        } 
-        else {
-           
-            $("#txt_categoria_banco, #numero_cuenta")
-                .prop("readonly", true)
-                .addClass("bg-light");
-        }
+      if (codMoneda === "MON0000000000001") { 
+       
+        $("#txt_categoria_banco").val($("#txt_categoria_banco").data("valor"));
+        $("#numero_cuenta").val($("#numero_cuenta").data("valor"));
+
+        $("#txt_categoria_banco, #numero_cuenta")
+            .prop("readonly", true)
+            .addClass("bg-light");
+       } 
+      else if (codMoneda === "MON0000000000002") { 
+        
+        $("#txt_categoria_banco, #numero_cuenta")
+            .val('')
+            .prop("readonly", false)
+            .removeClass("bg-light");
+      } 
+      else {
+        
+        $("#txt_categoria_banco").val($("#txt_categoria_banco").data("valor"));
+        $("#numero_cuenta").val($("#numero_cuenta").data("valor"));
+
+        $("#txt_categoria_banco, #numero_cuenta")
+            .prop("readonly", true)
+            .addClass("bg-light");
+      } 
     }
+
+    $("#numero_cuenta").on("input", function() {
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
 
     toggleCamposPago();
     toggleCamposMoneda();
