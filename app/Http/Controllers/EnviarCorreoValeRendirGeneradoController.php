@@ -42,6 +42,7 @@ class EnviarCorreoValeRendirGeneradoController extends Controller
         $exito = $this->enviarCorreoValeRendirGenerado($valerendir_id);
         return response()->json(['success' => $exito]);
     }
+
 }
 
 
