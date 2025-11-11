@@ -13,6 +13,7 @@
         </td>
 
         <td class="cell-detail" style="position: relative;">
+          <span style="display: block;"><b>ID : </b> {{$item->ID_DOCUMENTO}}</span>
           <span style="display: block;"><b>DOCUMENTO : </b> {{$item->SERIE}} - {{$item->NUMERO}}</span>
           <span style="display: block;"><b>TOTAL : </b> {{$item->TOTAL}}</span>
           <span style="display: block;"><b>FECHA EMISION : {{date_format(date_create($item->FECHA_EMI), 'd/m/Y')}}</b></span>

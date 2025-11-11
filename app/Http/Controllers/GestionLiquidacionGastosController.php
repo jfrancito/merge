@@ -4020,8 +4020,7 @@ class GestionLiquidacionGastosController extends Controller
 
                         //MOVILIDAD AEROPUERTO
 
-                        if($request['producto_id_factura'] != 'SERVICIO DE TRANSPORTE DE PASAJEROS'){
-
+                        if($request['producto_id_factura'] != 'SERVICIO DE TRANSPORTE AEREO'){
 
 
                             if (!empty($ULTIMA_FECHA_RENDICION_DET)) {
