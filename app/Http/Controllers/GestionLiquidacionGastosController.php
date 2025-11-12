@@ -189,9 +189,9 @@ class GestionLiquidacionGastosController extends Controller
         $idoc = $ID_DOCUMENTO;
         $ordencompra = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $idoc)->first();
 
-
         $tescuentabb = TESCuentaBancaria::where('COD_EMPR_TITULAR', '=', $ordencompra->COD_EMPRESA_TRABAJADOR)
             ->where('COD_EMPR_BANCO', '=', $entidadbanco_id)
+            ->where('TXT_CATEGORIA_MONEDA', '=', $ordencompra->TXT_CATEGORIA_MONEDA)
             ->where('COD_ESTADO', '=', 1)
             ->select(DB::raw("
                                           TXT_NRO_CUENTA_BANCARIA,
@@ -1059,10 +1059,12 @@ class GestionLiquidacionGastosController extends Controller
         $indicador = 0;
         $listaarendirlg = $this->lg_lista_arendirlg($liquidaciongastos,$indicador);
         //dd($listaarendirlg);
-
+            $valearendir_info = $this->lq_valearendir($liquidaciongastos->ID_DOCUMENTO);
+                    
         return View::make('liquidaciongasto/detallelgvalidado',
             [
                 'liquidaciongastos' => $liquidaciongastos,
+                'valearendir_info' => $valearendir_info,
                 'tdetliquidaciongastos' => $tdetliquidaciongastos,
                 'productosagru' => $productosagru,
                 'listaarendirlg' => $listaarendirlg,
@@ -1085,12 +1087,8 @@ class GestionLiquidacionGastosController extends Controller
         $fecha_inicio = $request['fecha_inicio'];
         $fecha_fin = $request['fecha_fin'];
         $idopcion = $request['idopcion'];
+        $listacabecera = $this->lg_lista_liquidacion_gastos($fecha_inicio, $fecha_fin);
 
-        $listacabecera = LqgLiquidacionGasto::where('ACTIVO', '=', '1')
-            ->whereRaw("CAST(FECHA_CREA  AS DATE) >= ? and CAST(FECHA_CREA  AS DATE) <= ?", [$fecha_inicio, $fecha_fin])
-            ->where('USUARIO_CREA', '=', Session::get('usuario')->id)
-            ->where('COD_EMPRESA', '=', Session::get('empresas')->COD_EMPR)
-            ->orderby('FECHA_CREA', 'DESC')->get();
         $funcion = $this;
 
         return View::make('liquidaciongasto/ajax/alistaliquidaciongasto',
@@ -2346,10 +2344,14 @@ class GestionLiquidacionGastosController extends Controller
             $listaarendirlg = $this->lg_lista_arendirlg($liquidaciongastos,$indicador);
             //dd($listaarendirlg);
 
+            $valearendir_info = $this->lq_valearendir($liquidaciongastos->ID_DOCUMENTO);
+
+
             return View::make('liquidaciongasto/aprobaradministracionlg',
                 [
                     'liquidaciongastos' => $liquidaciongastos,
                     'indicador' => $indicador,
+                    'valearendir_info' => $valearendir_info,
                     'listaarendirlg' => $listaarendirlg,
                     'tdetliquidaciongastos' => $tdetliquidaciongastos,
                     'tdetliquidaciongastosel' => $tdetliquidaciongastosel,
@@ -2800,12 +2802,14 @@ class GestionLiquidacionGastosController extends Controller
             $listaarendirlg = $this->lg_lista_arendirlg($liquidaciongastos,$indicador);
             //dd($listaarendirlg);
 
+            $valearendir_info = $this->lq_valearendir($liquidaciongastos->ID_DOCUMENTO);
+
 
             return View::make('liquidaciongasto/aprobarcontabilidadlg',
                 [
                     'indicador' => $indicador,
                     'listaarendirlg' => $listaarendirlg,
-
+                    'valearendir_info' => $valearendir_info,
                     'liquidaciongastos' => $liquidaciongastos,
                     'tdetliquidaciongastos' => $tdetliquidaciongastos,
                     'tdetliquidaciongastosel' => $tdetliquidaciongastosel,
@@ -3347,6 +3351,18 @@ class GestionLiquidacionGastosController extends Controller
                                         ->where('COD_ESTADO', 1)
                                         ->where('IND_AEREO','=',1)
                                         ->first();
+
+
+                //VALIDAR QUE TODOS LOS DETALLES TENGAN VALOR MAYOR A CERO
+
+                $detallescero           =   DB::table('LQG_DETLIQUIDACIONGASTO')
+                                        ->where('ID_DOCUMENTO', $iddocumento)
+                                        ->where('TOTAL', '<=', 0)
+                                        ->first();
+               if (count($detalles) > 0) {
+                    return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/0')
+                    ->with('errorbd', 'Su '.$detallescero->TXT_TIPODOCUMENTO.' : '.$detallescero->SERIE.'-'.$detallescero->NUMERO.' TIENE UN VALOR CERO INGRESE VALOR');
+                }
 
                 if (count($ldetallearendir) > 0) {
 
@@ -5363,16 +5379,24 @@ class GestionLiquidacionGastosController extends Controller
             $centro_id = $terceros->COD_CENTRO;
         }
 
+        //dd($empresa_id);
 
         $cadena = $empresa_id;
         $partes = explode(" - ", $cadena);
         $nombre = '';
+        $ruc = '';        
         if (count($partes) > 1) {
+            $ruc = trim($partes[0]);
             $nombre = trim($partes[1]);
         }
-        //dd($nombre);
 
-        $combo_cuenta = $this->lg_combo_cuenta_lg('Seleccione una Cuenta', '', '', $centro_id, $nombre);
+        $empresa   =   DB::table('STD.EMPRESA ')
+                        ->where('NRO_DOCUMENTO', $ruc)
+                        ->first();
+        //DD($empresa->COD_EMPR);
+
+
+        $combo_cuenta = $this->lg_combo_cuenta_lg_nuevo('Seleccione una Cuenta', '', '', $centro_id, $empresa->COD_EMPR);
 
 
         return View::make('general/ajax/combocuenta',
@@ -5404,6 +5428,21 @@ class GestionLiquidacionGastosController extends Controller
 
     }
 
+    public function actionAjaxModalComparativa(Request $request)
+    {
+        $id_documento = $request['id_documento'];
+        $liquidaciongastos = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $id_documento)->first();
+        $indicador = 0;
+        $listaarendirlg = $this->lg_lista_arendirlg($liquidaciongastos,$indicador);
+
+        return View::make('liquidaciongasto/modal/ajax/mlistacomparativa',
+            [
+                'listaarendirlg' => $listaarendirlg,
+                'liquidaciongastos' => $liquidaciongastos,
+                'ajax' => true,
+            ]);
+
+    }
 
 
 
@@ -5411,10 +5450,10 @@ class GestionLiquidacionGastosController extends Controller
     {
 
         $arendir_id = $request['arendir_id'];
+        $moneda_sel_c_id = $request['moneda_sel_c_id'];
         $arendir_sel_id = '';
-
         if($arendir_id=='VALE'){
-            $combo_arendir_sel = $this->gn_combo_arendir_restante_nuevo();       
+            $combo_arendir_sel = $this->gn_combo_arendir_restante_nuevo($moneda_sel_c_id);       
         }else{
         if($arendir_id=='IMPULSO'){
             $combo_arendir_sel = $this->gn_combo_arendir_restante_impulso();       
@@ -5516,12 +5555,7 @@ class GestionLiquidacionGastosController extends Controller
         $cod_empresa = Session::get('usuario')->usuarioosiris_id;
         $fecha_inicio = $this->fecha_menos_diez_dias;
         $fecha_fin = $this->fecha_sin_hora;
-
-        $listacabecera = LqgLiquidacionGasto::where('ACTIVO', '=', '1')
-            ->whereRaw("CAST(FECHA_CREA  AS DATE) >= ? and CAST(FECHA_CREA  AS DATE) <= ?", [$fecha_inicio, $fecha_fin])
-            ->where('USUARIO_CREA', '=', Session::get('usuario')->id)
-            ->where('COD_EMPRESA', '=', Session::get('empresas')->COD_EMPR)
-            ->orderby('FECHA_CREA', 'DESC')->get();
+        $listacabecera = $this->lg_lista_liquidacion_gastos($fecha_inicio, $fecha_fin);
 
         //dd(Session::get('usuario')->id);
 

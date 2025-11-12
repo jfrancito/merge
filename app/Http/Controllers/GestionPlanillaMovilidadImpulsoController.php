@@ -1476,7 +1476,7 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
         View::share('titulo','Agregar Detalle Movilidad Impulso Masivo');
         $lote          =   LoteImpulso::where('ID_DOCUMENTO','=',$iddocumento)->first();
         if($lote->COD_ESTADO!='ETM0000000000001'){
-            return Redirect::to('gestion-movilidad-impulso-masivo/'.$idopcion)->with('errorbd', 'Ya no puede modificar esta MOVILIDAD DE IMPULSO');
+            //return Redirect::to('gestion-movilidad-impulso-masivo/'.$idopcion)->with('errorbd', 'Ya no puede modificar esta MOVILIDAD DE IMPULSO');
         }
 
 

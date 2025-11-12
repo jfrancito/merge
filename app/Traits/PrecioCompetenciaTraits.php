@@ -183,7 +183,7 @@ trait PrecioCompetenciaTraits
                 $contadorArchivos 							= 		  Archivo::count();
                 $nombrefilecdr                  =       $oingreso->COD_TABLA_ASOC.'.pdf';
                 $prefijocarperta                =       $this->prefijo_empresa_pre($ordencompra->COD_EMPR);
-                $rutafile                       =       $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$item->RUC_PROVEEDOR;
+                $rutafile                       =       $pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$item->RUC_PROVEEDOR;
                 $rutacompleta                   =       $rutafile.'\\'.$nombrefilecdr;
                 $valor                          =       $this->versicarpetanoexiste_pre($rutafile);
                 $path                           =       $rutacompleta;
