@@ -2060,10 +2060,12 @@ class GestionPlanillaMovilidadController extends Controller
 
 
                 $impulsadora            =   $this->plm_identificar_si_es_impulsadora($area_id);
+
                 $impulsadora = 0;//ELIMINAR
                 $monto_validar_diario   =   45;
                 if($impulsadora == 1){
                     $monto_validar_diario   =   $this->plm_monto_total_impulsadora($plmovilidad->COD_TRABAJADOR,$fecha_gasto);
+                                    //dd($monto_validar_diario);
                     $mensaje_extra = '(IMPULSADORA O VENDEDOR)';
                 }
 
@@ -2646,6 +2648,31 @@ class GestionPlanillaMovilidadController extends Controller
     }
 
 
+    public function actionListaAcumuladoDias(Request $request) {
+
+        $fecha_inicio       =       $request['fecha_inicio'];
+        $fecha_fin          =       $request['fecha_fin'];
+
+        $resultados         =       DB::table('PLA_MOVILIDAD')
+                                    ->join('PLA_DETMOVILIDAD', 'PLA_MOVILIDAD.ID_DOCUMENTO', '=', 'PLA_DETMOVILIDAD.ID_DOCUMENTO')
+                                    ->where('PLA_MOVILIDAD.ACTIVO', 1)
+                                    ->where('PLA_DETMOVILIDAD.ACTIVO', 1)
+                                    ->where('PLA_MOVILIDAD.COD_ESTADO', '!=', 'ETM0000000000006')
+                                    ->where('PLA_MOVILIDAD.COD_TRABAJADOR', Session::get('usuario')->usuarioosiris_id)
+                                    ->whereBetween('FECHA_GASTO', [$fecha_inicio, $fecha_fin])
+                                    ->groupBy('FECHA_GASTO')
+                                    ->orderBy('FECHA_GASTO','DESC')
+                                    ->select('FECHA_GASTO', DB::raw('SUM(PLA_DETMOVILIDAD.TOTAL) as TOTAL'))
+                                    ->get();
+
+        return View::make('planillamovilidad/modal/ajax/malistaacumuladodias',
+                         [
+                            'resultados'            =>  $resultados,
+                            'fecha_inicio'          =>  $fecha_inicio,
+                            'fecha_fin'             =>  $fecha_fin,
+                            'ajax'                  =>  true,
+                         ]);
+    }
 
 
 }

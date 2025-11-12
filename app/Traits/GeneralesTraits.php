@@ -380,7 +380,7 @@ trait GeneralesTraits
     }
 
 
-    public function gn_combo_arendir_restante_nuevo()
+    public function gn_combo_arendir_restante_nuevo($moneda_sel_c_id)
     {
 
 
@@ -397,6 +397,7 @@ trait GeneralesTraits
                     ->join('CMP.DOCUMENTO_CTBLE as DOC', 'AUD.COD_DOC_CTBLE', '=', 'DOC.COD_DOCUMENTO_CTBLE')
                     ->where('VR.COD_USUARIO_CREA_AUD',Session::get('usuario')->id)
                     ->where('DOC.CAN_SALDO', '>', 0)
+                    ->where('COD_MONEDA',$moneda_sel_c_id)
                     ->whereNotIn('ID', $liquidaciones)
                     ->where('DOC.COD_CATEGORIA_TIPO_DOC', 'TDO0000000000072')
                     ->select(

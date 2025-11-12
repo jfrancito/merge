@@ -5,6 +5,21 @@ $(document).ready(function () {
 
     //nuevo
 
+
+    $(".liquidaciongasto").on('click','.btncuadrocomparativo', function() {
+        // debugger;
+        var _token                                   =   $('#token').val();
+        let id_documento                             =   $(this).attr("data_id");
+        var idopcion                                 =   $('#idopcion').val();
+        data                                          =   {
+                                                                _token                  : _token,
+                                                                id_documento            : id_documento,
+                                                                idopcion                : idopcion
+                                                            };
+        ajax_modal(data,"/ajax-modal-lista-comparativa",
+                  "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+
+    });
     $("#fecha_asiento").on('change', function (e) {
 
         let fecha = $('#fecha_asiento').val();
@@ -1618,7 +1633,7 @@ $(document).ready(function () {
         var _token = $('#token').val();
         var entidadbanco_id = $(this).val();
         var ID_DOCUMENTO = $('#ID_DOCUMENTO').val();
-
+        debugger;
         $.ajax({
             type: "POST",
             url: carpeta + "/ajax-cuenta-bancaria-proveedor-lq",
@@ -2765,11 +2780,23 @@ $(document).ready(function () {
         var arendir_id = $('#arendir_id').val();
         var idopcion = $('#idopcion').val();
         var _token = $('#token').val();
+
+        var moneda_sel_c_id = $('#moneda_sel_c_id').val(); 
+
+        if(arendir_id == 'VALE'){
+            if (moneda_sel_c_id == '') {
+                $('#arendir_id').val('').trigger('change');
+                alerterrorajax("Selecciona una Moneda");
+                return false;
+            }   
+        }   
+
         var link = "/ajax-combo-arendir";
         var contenedor = "ajax_combo_arendir";
         data = {
             _token: _token,
             arendir_id: arendir_id,
+            moneda_sel_c_id: moneda_sel_c_id,
             idopcion: idopcion
         };
         ajax_normal_combo(data, link, contenedor);
