@@ -44,7 +44,21 @@ $(document).ready(function(){
     });
 
 
+    $(".planillamovilidad").on('click','.agregartrabajadorventa', function() {
+        // debugger;
+        var _token                                   =   $('#token').val();
+        var data_planilla_movilidad_id               =   $(this).attr('data_planilla_movilidad_id');
+        var idopcion                                 =   $('#idopcion').val();
+        data                                         =   {
+                                                                _token                                   : _token,
+                                                                data_planilla_movilidad_id               : data_planilla_movilidad_id,
+                                                                idopcion                                 : idopcion
+                                                         };
+                                        
+        ajax_modal(data,"/ajax-modal-detalle-planilla-movilidad-venta",
+                  "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
 
+    });
 
 
 

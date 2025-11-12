@@ -31,7 +31,7 @@
             </thead>
             <tbody>
                 @foreach($datosParaVista as $index => $fila)
-                <tr>
+                <tr class="@if($fila['TIPO'] == 'ADICIONAL') ocultar @endif">
                     <td style="width: 300px !important;" >{{ $fila['TXT_EMPRESA_TRABAJADOR'] }}</td>
                     <td>{{date_format(date_create($fila['FECHA_INICIO']), 'd-m-Y')}}  / {{date_format(date_create($fila['FECHA_FIN']), 'd-m-Y')}}</td>
                     <td style="width: 150px !important;">{{ $fila['TIPO'] }}</td>
@@ -40,7 +40,6 @@
                             <span style="padding-left: 0px;">{{ $fila['TXT_EMPR_BANCO'] }}</span><span style="padding-left: 0px;" class="cell-detail-description">{{ $fila['TXT_NRO_CUENTA_BANCARIA'] }}</span>
                         @endif
                     </td>
-                    
                     <input type="hidden" name="datos[{{ $index }}][id_documento]" value="{{ $fila['ID_DOCUMENTO'] }}">
                     <input type="hidden" name="datos[{{ $index }}][txt_empresa_trabajador]" value="{{ $fila['TXT_EMPRESA_TRABAJADOR'] }}">
                     <input type="hidden" name="datos[{{ $index }}][tipo]" value="{{ $fila['TIPO'] }}">
@@ -81,19 +80,8 @@
                                     ]
                                 ) !!}
                                 @else
-                                <!-- Para otros tipos no especificados: SELECT por defecto -->
-                                {!! Form::select(
-                                    "datos[$index][dias][$diaNumero][configuracion]", 
-                                    $fila['combo_configuracion'], 
-                                    isset($diaData['data']->COD_CONFIGURACION) ? $diaData['data']->COD_CONFIGURACION : null,
-                                    [
-                                        'class' => 'select2 form-control control input-sm',
-                                        'id' => "configuracion_{$index}_{$diaNumero}",
-                                        'style' => 'min-width: 100px;'
-                                    ]
-                                ) !!}
+                                    -
                                 @endif
-                                
                             @else
                                 -
                             @endif

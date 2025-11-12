@@ -18,9 +18,9 @@
     <div class="row">
       <div class="col-md-12">
         <div class="panel panel-default panel-border-color panel-border-color-primary">
-          <div class="panel-heading panel-heading-divider">MOVILIDAD DE IMPULSO MASIVO ({{$lote->ID_DOCUMENTO}})  
+          <div class="panel-heading panel-heading-divider">MOVILIDAD DE VENTA MASIVO ({{$lote->ID_DOCUMENTO}})  
             <div class="tools tooltiptop">
-              <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones agregartrabajador"
+              <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones agregartrabajadorventa"
                 data_planilla_movilidad_id = '{{$lote->ID_DOCUMENTO}}' style="width:140px;">
                 <span class="tooltiptext" >Agregar Trabajador</span>
                 Agregar Trabajador              
@@ -31,19 +31,19 @@
           </div>
           <div class="panel-body">
 
-                <form method="POST" action="{{ url('/guardar-movilidad-detalle-masivo/'.$idopcion.'/'.Hashids::encode(substr($lote->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" id ='frmdetalleimpulso'>
+                <form method="POST" action="{{ url('/guardar-movilidad-detalle-masivo-venta/'.$idopcion.'/'.Hashids::encode(substr($lote->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" id ='frmdetalleimpulso'>
                       {{ csrf_field() }}
                   <div class='formconsulta'>
-                    @include('planillamovilidadimpulso.form.famovilidadimpulsomasivo')
+                    @include('planillamovilidadimpulso.form.famovilidadventamasivo')
                   </div>
                   <div class='detallemovilidad' style="margin-top:15px;">
-                    @include('planillamovilidadimpulso.ajax.amdetalleplanillamovilidadmasivo')
+                    @include('planillamovilidadimpulso.ajax.amdetalleplanillamovilidadmasivoventa')
                   </div>
                 </form>
 
                 <div class="row">
                   <div class="col-xs-12 ">
-                    <form method="POST" action="{{ url('/emitir-movilidad-impulso-masivo/'.$idopcion.'/'.Hashids::encode(substr($lote->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" id ='frmpmemitir'>
+                    <form method="POST" action="{{ url('/emitir-movilidad-venta-masivo/'.$idopcion.'/'.Hashids::encode(substr($lote->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" id ='frmpmemitir'>
                           {{ csrf_field() }}
                           <div class="row xs-pt-15">
                             <div class="col-xs-6">

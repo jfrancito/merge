@@ -284,9 +284,10 @@ trait PlanillaTraits
         return  $planillamovilidad;
     }
 
-    private function pla_lista_planilla_movilidad_impulso_masivo($fecha_inicio,$fecha_fin) {
+    private function pla_lista_planilla_movilidad_impulso_masivo($fecha_inicio,$fecha_fin,$tipo) {
 
         $planillamovilidad      =   LoteImpulso::where('ACTIVO','=','1')
+                                    ->where('TIPO_LOTE','=',$tipo)
                                     ->whereRaw("CAST(FECHA_CREA  AS DATE) >= ? and CAST(FECHA_CREA  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                     ->where('USUARIO_CREA','=',Session::get('usuario')->id)
                                     ->where('COD_EMPRESA','=', Session::get('empresas')->COD_EMPR)
