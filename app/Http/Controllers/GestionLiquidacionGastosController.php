@@ -3359,7 +3359,7 @@ class GestionLiquidacionGastosController extends Controller
                                         ->where('ID_DOCUMENTO', $iddocumento)
                                         ->where('TOTAL', '<=', 0)
                                         ->first();
-               if (count($detalles) > 0) {
+               if (count($detallescero) > 0) {
                     return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/0')
                     ->with('errorbd', 'Su '.$detallescero->TXT_TIPODOCUMENTO.' : '.$detallescero->SERIE.'-'.$detallescero->NUMERO.' TIENE UN VALOR CERO INGRESE VALOR');
                 }
@@ -4037,8 +4037,8 @@ class GestionLiquidacionGastosController extends Controller
                         //MOVILIDAD AEROPUERTO
 
                         if($request['producto_id_factura'] != 'SERVICIO DE TRANSPORTE AEREO'){
-
-
+                            
+                            if($request['producto_id_factura'] != 'SERVICIO DE TRANSPORTE DE PASAJEROS'){
                             if (!empty($ULTIMA_FECHA_RENDICION_DET)) {
 
                                 //$fechaInicio = Carbon::parse($PRIMERA_FECHA_RENDICION_DET);
@@ -4059,7 +4059,7 @@ class GestionLiquidacionGastosController extends Controller
 
                             }
 
-
+                            }
 
                         }
 

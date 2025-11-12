@@ -1287,7 +1287,7 @@ trait GeneralesTraits
                 DB::raw("CAST(CATEGORIA_TXT AS varchar(3)) + ' - ' + CAST(MONTO AS varchar(10)) AS CATEGORIA_TXT")
             )
             ->where('CENTRO_ID','=',$centro_id)
-            ->where('AREA_ID','=',$area_id)
+            ->where('AREA_TXT','=',$area_id)
             ->where('ID_CONFIGURACION','!=','CFG000000000007')
             ->where(function($query) use ($usuario) {
                 $query->whereNull('COD_JEFE_VENTA')
