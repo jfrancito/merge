@@ -96,3 +96,9 @@ thead tr:first-child th[colspan] {
   border-bottom: none !important;
 }
 </style>
+
+<script type="text/javascript">
+        $(document).ready(function () {
+            App.dataTables();
+        });
+</script>
