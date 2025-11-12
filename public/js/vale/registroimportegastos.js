@@ -265,4 +265,34 @@ $(document).ready(function(){
         // Ejemplo: si quieres llenar un input oculto con uno de los IDs
         // $('#importe_gastos_id').val(idGerente || idJefe || idDemas);
     });
+
+
+    $(".importegastosprincipal").on('click', '.buscardocumento', function (event) {
+
+        event.preventDefault();
+
+        var cod_centro   = $('#cod_centro').val();
+        var cod_distrito = $('#cod_distrito').val();
+        var idopcion     = $('#idopcion').val();
+        var _token       = $('#token').val();
+
+        if ($.trim(cod_centro) === '') {
+            alerterrorajax("Seleccione lugar de partida.");
+            return false;
+        }
+        if ($.trim(cod_distrito) === '') {
+            alerterrorajax("Seleccione lugar de destino.");
+            return false;
+        }
+
+        var data = {
+            _token: _token,
+            cod_centro: cod_centro,
+            cod_distrito: cod_distrito,
+            idopcion: idopcion
+        };
+
+        ajax_normal_combo(data, "/ajax-buscar-documento-rg", 'listaajaxaux');
+    });
+
 });
