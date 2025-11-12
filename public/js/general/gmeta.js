@@ -33,7 +33,7 @@ var carpeta = $("#carpeta").val();
 //ajax normal
 
 function ajax_normal_combo(data,link,contenedor) {
-    $(".listajax").html("");
+    $("."+contenedor).html("");
     abrircargando();
     $.ajax({
         type    :   "POST",

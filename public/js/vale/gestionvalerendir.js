@@ -10,11 +10,6 @@ $(document).ready(function () {
         var idopcion = $('#idopcion').val();
         var _token = $('#token').val();
 
-        console.log("Fecha inicio:", fecha_inicio);
-        console.log("Fecha fin:", fecha_fin);
-        console.log("Estado:", estado_id);
-        console.log("ID opción:", idopcion);
-
         if ($.trim(fecha_inicio) === '') {
             alerterrorajax("Seleccione una fecha inicio.");
             return false;

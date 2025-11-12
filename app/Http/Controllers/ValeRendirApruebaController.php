@@ -272,6 +272,7 @@ class ValeRendirApruebaController extends Controller
         $contrato_diferente = DB::connection($conexionbd)
                             ->table('CMP.CONTRATO')
                             ->where('COD_EMPR', $cod_empr)
+                            ->where('COD_CENTRO' , $centrovale)
                             ->where('COD_CATEGORIA_TIPO_CONTRATO', 'TCO0000000000069')
                             ->where('COD_EMPR_CLIENTE', $codemprcliente)
                             ->where('COD_CATEGORIA_MONEDA', $cod_moneda)
@@ -311,6 +312,7 @@ class ValeRendirApruebaController extends Controller
                     ->table('CMP.CONTRATO AS CON')
                     ->join('CMP.CONTRATO_CULTIVO AS CUL', 'CON.COD_CONTRATO', '=', 'CUL.COD_CONTRATO')
                     ->where('CON.COD_EMPR', $cod_empr)
+                    ->where('COD_CENTRO' , $centrovale)
                     ->where('CON.COD_CATEGORIA_TIPO_CONTRATO', 'TCO0000000000069')
                     ->where('CON.COD_EMPR_CLIENTE', $codemprcliente)
                     ->select(

@@ -751,6 +751,8 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::post('/validar_destino_distrito', 'RegistroImporteGastosController@validarDestinoPorDistrito');
 
+	Route::any('/ajax-buscar-documento-rg', 'RegistroImporteGastosController@actionListarAjaxBuscarDocumentoRG');
+
 	//PATANLLA 1
 
 	Route::get('/gestionar-personal-autoriza/{idopcion}', 'RegistroPersonalAutorizaController@actionRegistroPersonalAutoriza');
