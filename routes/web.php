@@ -115,6 +115,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-combo-autoriza', 'GestionLiquidacionGastosController@actionAjaxComboAutoriza');
 	Route::any('/ajax-combo-arendir', 'GestionLiquidacionGastosController@actionAjaxComboArendir');
 
+	Route::any('/ajax-modal-lista-comparativa', 'GestionLiquidacionGastosController@actionAjaxModalComparativa');
+
 
 	Route::any('/extonar-liquidacion-gastos/{idopcion}/{iddocumento}', 'GestionLiquidacionGastosController@actionExtornarLiquidacionGastos');
 	Route::any('/extonar-liquidacion-gastos-detalle/{idopcion}/{item}/{iddocumento}', 'GestionLiquidacionGastosController@actionExtornarLiquidacionGastosDetalle');
@@ -238,15 +240,12 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-modal-modificar-detalle-planilla-movilidad', 'GestionPlanillaMovilidadController@actionModificarDetallePlanillaMovilidad');
 	Route::any('/modificar-detalle-planilla-movilidad/{idopcion}/{iddocumento}/{item}', 'GestionPlanillaMovilidadController@actionGuardarModificarDetallePlanillaMovilidad');
 	Route::any('/emitir-planilla-movilidad/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadController@actionEmitirDetallePlanillaMovilidad');
-
 	Route::any('/gestion-de-aprobacion-planilla-movilidad-jefe/{idopcion}', 'GestionPlanillaMovilidadController@actionAprobarPlanillaMovilidadJefe');
 	Route::any('/aprobar-planilla-movilidad-jefe/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadController@actionAprobarJefe');
-
 	Route::any('/gestion-de-aprobacion-planilla-movilidad-administracion/{idopcion}', 'GestionPlanillaMovilidadController@actionAprobarPlanillaMovilidadAdministracion');
 	Route::any('/aprobar-planilla-movilidad-administracion/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadController@actionAprobarAdministracion');
-
 	Route::any('/pdf-planilla-movilidad/{iddocumento}', 'GestionPlanillaMovilidadController@actionPDFPlanillaMovilidad');
-
+	Route::any('/ajax-modal-lista-acumulado-dias', 'GestionPlanillaMovilidadController@actionListaAcumuladoDias');
 
 
 	Route::any('/ajax-select-combo-provincia-partida', 'GestionPlanillaMovilidadController@actionSelectComboProvinciaPartida');

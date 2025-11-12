@@ -17,6 +17,12 @@
                   <div class="tools tooltiptop">
 
 
+                    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones btnacumuladodias" style="width:140px;">
+                      <span class="tooltiptext">Total x Dias</span>
+                      Total x Dias
+                    </a>
+
+
                     <a href="{{ url('/subir-firma/'.$idopcion) }}" class="btn btn-secondary botoncabecera tooltipcss opciones" style="width:140px;">
                       <span class="tooltiptext">Subir Firma</span>
                       Subir Firma

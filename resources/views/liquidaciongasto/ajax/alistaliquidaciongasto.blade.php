@@ -12,7 +12,11 @@
         <td class="cell-detail" style="position: relative;">
           <span style="display: block;"><b>ID : </b> {{$item->ID_DOCUMENTO}}</span>
           <span style="display: block;"><b>CODIGO : </b> {{$item->CODIGO}}</span>
-          <span style="display: block;"><b>ARENDIR : </b> {{$item->ARENDIR_ID}}</span>
+          <span style="display: block;"><b>ARENDIR : (MERGE)</b> {{$item->ARENDIR_ID}}</span>
+          <span style="display: block;"><b>SERIE ARENDRI (OSIRIS): </b> {{$item->TXT_SERIE}}</span>
+          <span style="display: block;"><b>NUMERO ARENDIR (OSIRIS): </b> {{$item->TXT_NUMERO}}</span>
+
+
           <span style="display: block;"><b>TIPO ARENDIR : </b> {{$item->ARENDIR}}</span>
           <span style="display: block;"><b>TRABAJADOR : </b> {{$item->TXT_EMPRESA_TRABAJADOR}}</span>
           <span style="display: block;"><b>FECHA EMISION : {{date_format(date_create($item->FECHA_EMI), 'd/m/Y')}}</b></span>

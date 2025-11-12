@@ -46,7 +46,7 @@
 
                   <input  type="text"
                           id="name" name='name' value="{{ old('name') }}" placeholder="Usuario"
-                          required = ""
+                          required = "" readonly="readonly"
                           autocomplete="off" class="form-control input-sm" data-aw="4"/>
 
                     @include('error.erroresvalidate', [ 'id' => $errors->has('name')  , 

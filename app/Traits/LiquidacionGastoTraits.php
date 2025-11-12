@@ -154,6 +154,20 @@ trait LiquidacionGastoTraits
 
 
 
+    private function lq_valearendir($ID_DOCUMENTO) {
+
+        $valearendir_info = LqgLiquidacionGasto::where('LQG_LIQUIDACION_GASTO.ACTIVO', '=', '1')
+            ->where('LQG_LIQUIDACION_GASTO.ID_DOCUMENTO', '=', $ID_DOCUMENTO)
+            ->leftJoin('WEB.VALE_RENDIR', 'LQG_LIQUIDACION_GASTO.ARENDIR_ID', '=', 'WEB.VALE_RENDIR.ID')
+            ->leftJoin('TES.AUTORIZACION', 'WEB.VALE_RENDIR.ID_OSIRIS', '=', 'TES.AUTORIZACION.COD_AUTORIZACION')
+            ->select('TES.AUTORIZACION.*')
+            ->orderBy('LQG_LIQUIDACION_GASTO.FECHA_CREA', 'DESC')
+            ->first();
+        
+        return $valearendir_info;
+    }
+
+
     private function lg_lista_arendirlg($liquidaciongastos,$indicador) {
 
         $array  =   array();
@@ -363,6 +377,23 @@ trait LiquidacionGastoTraits
         return $fecha;
     }
 
+
+
+    private function lg_lista_liquidacion_gastos($fecha_inicio, $fecha_fin) {
+
+
+        $listacabecera = LqgLiquidacionGasto::where('LQG_LIQUIDACION_GASTO.ACTIVO', '=', '1')
+            ->whereRaw("CAST(LQG_LIQUIDACION_GASTO.FECHA_CREA AS DATE) >= ? and CAST(LQG_LIQUIDACION_GASTO.FECHA_CREA AS DATE) <= ?", [$fecha_inicio, $fecha_fin])
+            ->where('LQG_LIQUIDACION_GASTO.USUARIO_CREA', '=', Session::get('usuario')->id)
+            ->where('LQG_LIQUIDACION_GASTO.COD_EMPRESA', '=', Session::get('empresas')->COD_EMPR)
+            ->leftJoin('WEB.VALE_RENDIR', 'LQG_LIQUIDACION_GASTO.ARENDIR_ID', '=', 'WEB.VALE_RENDIR.ID')
+            ->leftJoin('TES.AUTORIZACION', 'WEB.VALE_RENDIR.ID_OSIRIS', '=', 'TES.AUTORIZACION.COD_AUTORIZACION')
+            ->select('LQG_LIQUIDACION_GASTO.*','TES.AUTORIZACION.TXT_SERIE','TES.AUTORIZACION.TXT_NUMERO')
+            ->orderBy('LQG_LIQUIDACION_GASTO.FECHA_CREA', 'DESC')
+            ->get();
+
+        return  $listacabecera;
+    }
 
 
     private function lg_lista_cabecera_comprobante_total_gestion_excel($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id) {
@@ -1900,6 +1931,29 @@ trait LiquidacionGastoTraits
 
         return  $combo;                    
     }
+
+    private function lg_combo_cuenta_lg_nuevo($titulo,$todo,$tipocontrato,$centro_id,$empresa_id) {
+
+
+        $array                          = DB::table('CMP.CONTRATO as TBL')
+                                            ->selectRaw("
+                                                TBL.COD_CONTRATO,
+                                                LEFT(TBL.COD_CONTRATO, 6) + '-0' + CAST(CAST(RIGHT(TBL.COD_CONTRATO, 10) AS INT) AS VARCHAR(10)) + ' -- ' 
+                                                + IIF(TBL.COD_CATEGORIA_MONEDA = 'MON0000000000001', 'S/', '$') + ' ' + TBL.TXT_CATEGORIA_TIPO_CONTRATO AS CONTRATO
+                                            ")
+                                            ->where('TBL.COD_ESTADO', 1)
+                                            ->where('TBL.COD_EMPR', Session::get('empresas')->COD_EMPR)
+                                            ->where('TBL.COD_CENTRO', $centro_id)
+                                            ->where('TBL.COD_EMPR_CLIENTE', $empresa_id)
+                                            ->whereNotIn('TBL.COD_CATEGORIA_ESTADO_CONTRATO', ['ECO0000000000005', 'ECO0000000000006'])
+                                            ->pluck('CONTRATO','COD_CONTRATO')
+                                            ->toArray();
+
+        $combo                  =   array('' => $titulo) + $array;
+
+        return  $combo;                    
+    }
+
 
     private function lg_combo_cuenta_lg_moneda($titulo,$todo,$tipocontrato,$centro_id,$empresa_id,$moneda_id) {
 

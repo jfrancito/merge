@@ -16,8 +16,14 @@
         <div class="panel panel-default panel-border-color panel-border-color-primary">
           <div class="panel-heading panel-heading-divider">LIQUIDACION DE GASTOS ({{$liquidaciongastos->ID_DOCUMENTO}})
 
-            <span class="panel-subtitle">Crear un nueva nueva liquidacion de gastos</span>
+            <span class="panel-subtitle">Emitir la liquidacion de gastos</span>
             <input type="hidden" name="idopcion" id='idopcion' value='{{$idopcion}}'>
+            <div class="tools tooltiptop">
+              <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones btncuadrocomparativo" data_id="{{$liquidaciongastos->ID_DOCUMENTO}}" style="width:140px;">
+                <span class="tooltiptext">Cuadro Comparativo</span>
+                Cuadro Comparativo
+              </a>
+            </div>
           </div>
           <div class="panel-body">
                 <div class='formconsulta'>

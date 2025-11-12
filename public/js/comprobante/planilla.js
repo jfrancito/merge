@@ -539,6 +539,30 @@ $(document).ready(function(){
 
     });
 
+    $(".cfedocumento").on('click','.btnacumuladodias', function() {
+        // debugger;
+        var _token                                   =   $('#token').val();
+        var fecha_inicio                             =   $('#fecha_inicio').val();
+        var fecha_fin                                =   $('#fecha_fin').val();
+
+        if(fecha_inicio ==''){ alerterrorajax("Seleccione una Fecha de inicio."); return false;}
+        if(fecha_fin ==''){ alerterrorajax("Seleccione una Fecha de fin."); return false;}
+
+        var idopcion                                 =   $('#idopcion').val();
+
+        data                        =   {
+                                            _token                  : _token,
+                                            fecha_inicio            : fecha_inicio,
+                                            fecha_fin               : fecha_fin,
+                                            idopcion                : idopcion
+                                        };
+                                        
+        ajax_modal(data,"/ajax-modal-lista-acumulado-dias",
+                  "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+
+    });
+
+
     $(".planillamovilidad").on('click','.modificardetallepm', function() {
         // debugger;
         var _token                                   =   $('#token').val();
