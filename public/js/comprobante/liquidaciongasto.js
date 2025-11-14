@@ -2847,7 +2847,7 @@ $(document).ready(function () {
             $('#subcuenta_id').prop('disabled', true);
             $('.sectorplanilla').show();
             $('.sectorxml').hide();
-
+            $('.sectorotrotipo').hide();
             //$('.sectorxmlmodal').show();
             //$('.DCC0000000000036').show();
 
@@ -2870,6 +2870,11 @@ $(document).ready(function () {
                 $('.sectorplanilla').hide();
                 $('.sectorxml').hide();
                 $('.sectorxmlmodal').show();
+                $('.sectorotrotipo').show();
+
+
+
+
                 $('.DCC0000000000036').show();
             }
         }
@@ -3265,12 +3270,27 @@ $(document).ready(function () {
         } else {
 
             if (tipodoc_id != 'TDO0000000000070') {
+
                 let comprobante = $('#file-DCC0000000000036')[0].files.length > 0;
                 if (!comprobante) {
                     alerterrorajax("Debe subir el comprobante electronico.");
                     cerrarcargando();
                     return false;
                 }
+
+                var producto_id_factura = $('#producto_id_factura').val();
+                var igv_id_factura = $('#igv_id_factura').val();
+                if (producto_id_factura == '') {
+                    alerterrorajax("Seleccione un Producto.");
+                    cerrarcargando();
+                    return false;
+                }
+                if (igv_id_factura == '') {
+                    alerterrorajax("Seleccione si es Afecto");
+                    cerrarcargando();
+                    return false;
+                }
+
             }
 
         }
