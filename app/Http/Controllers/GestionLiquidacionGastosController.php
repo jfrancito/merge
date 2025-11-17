@@ -4182,7 +4182,8 @@ class GestionLiquidacionGastosController extends Controller
                     $nombre = trim($partes[0]);
 
                 }
-                $empresa_trab = STDEmpresa::where('NRO_DOCUMENTO', '=', $nombre)->where('COD_TIPO_DOCUMENTO','=','TDI0000000000006')->where('COD_ESTADO', '=', '1')->first();
+
+
 
                 $bliquidacion = DB::table('LQG_DETLIQUIDACIONGASTO')
                     ->where('SERIE', $serie)
