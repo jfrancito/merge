@@ -4102,9 +4102,9 @@ class GestionLiquidacionGastosController extends Controller
                         $partes = explode(" - ", $cadena);
                         $nombre = '';
                         if (count($partes) > 1) {
-                            $nombre = trim($partes[1]);
+                            $nombre = trim($partes[0]);
                         }
-                        $empresa_trab = STDEmpresa::where('NOM_EMPR', '=', $nombre)->where('COD_TIPO_DOCUMENTO','=','TDI0000000000006')->where('COD_ESTADO', '=', '1')->first();
+                        $empresa_trab = STDEmpresa::where('NRO_DOCUMENTO', '=', $nombre)->where('COD_TIPO_DOCUMENTO','=','TDI0000000000006')->where('COD_ESTADO', '=', '1')->first();
 
 
                     } else {
@@ -4153,13 +4153,13 @@ class GestionLiquidacionGastosController extends Controller
                         $partes = explode(" - ", $cadena);
                         $nombre = '';
                         if (count($partes) > 1) {
-                            $nombre = trim($partes[1]);
+                            $nombre = trim($partes[0]);
                         }
-                        $empresa_trab = STDEmpresa::where('NOM_EMPR', '=', $nombre)->where('COD_TIPO_DOCUMENTO','=','TDI0000000000006')->where('COD_ESTADO', '=', '1')->first();
+                        $empresa_trab = STDEmpresa::where('NRO_DOCUMENTO', '=', $nombre)->where('COD_TIPO_DOCUMENTO','=','TDI0000000000006')->where('COD_ESTADO', '=', '1')->first();
 
                     }
                 }
-
+                $tipodoc_id = $request['tipodoc_id'];
                 $tdetliquidaciongastos = LqgDetLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->get();
                 $item = count($tdetliquidaciongastos) + 1;
                 $cuenta = CMPContrato::where('COD_CONTRATO', '=', $cuenta_id)->first();
@@ -4172,7 +4172,17 @@ class GestionLiquidacionGastosController extends Controller
                 $nombre_doc_sinceros = $serie . '-' . $numero;
                 $numero = str_pad($numero, 10, "0", STR_PAD_LEFT);
                 $nombre_doc = $serie . '-' . $numero;
+                $empresa_id = $request['empresa_id'];
 
+                //dd($empresa_id);
+                $cadena = $empresa_id;
+                $partes = explode(" - ", $cadena);
+                $nombre = '';
+                if (count($partes) > 1) {
+                    $nombre = trim($partes[0]);
+
+                }
+                $empresa_trab = STDEmpresa::where('NRO_DOCUMENTO', '=', $nombre)->where('COD_TIPO_DOCUMENTO','=','TDI0000000000006')->where('COD_ESTADO', '=', '1')->first();
 
                 $bliquidacion = DB::table('LQG_DETLIQUIDACIONGASTO')
                     ->where('SERIE', $serie)
