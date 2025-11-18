@@ -87,14 +87,17 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-contrato', 'UserController@actionAjaxModalConfiguracionCuentaBancariaContrato');
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-oc', 'UserController@actionAjaxModalConfiguracionCuentaBancariaOC');
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-estiba', 'UserController@actionAjaxModalConfiguracionCuentaBancariaEstiba');
+	Route::any('/ajax-modal-configuracion-cuenta-bancaria-liq-com-an', 'UserController@actionAjaxModalConfiguracionCuentaBancariaLiqComAn');
 	Route::any('/configurar-datos-cuenta-bancaria-estiba/{empresa_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaEstiba');
 	Route::any('/ajax-modal-ver-cuenta-bancaria-estiba', 'UserController@actionAjaxModalVerCuentaBancariaEstiba');
 
 	Route::any('/configurar-datos-cuenta-bancaria-contrato/{prefijo_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaContrato');
+	Route::any('/configurar-datos-cuenta-bancaria-liquidacion-compra-anticipo/{prefijo_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaLiquidacionCompraAnticipo');
 	Route::any('/configurar-datos-cuenta-bancaria-oc/{prefijo_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaOC');
 
 	Route::any('/ajax-modal-ver-cuenta-bancaria-oc', 'UserController@actionAjaxModalVerCuentaBancariaOC');
 	Route::any('/ajax-modal-ver-cuenta-bancaria-lq', 'UserController@actionAjaxModalVerCuentaBancariaLQ');
+	Route::any('/ajax-modal-ver-cuenta-bancaria-liq-com-an', 'UserController@actionAjaxModalVerCuentaBancariaLiqComAn');
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-lq', 'UserController@actionAjaxModalConfiguracionCuentaBancariaLQ');
 	Route::any('/configurar-datos-cuenta-bancaria-lq/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaLQ');
 
@@ -353,6 +356,7 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/ajax-cuenta-bancaria-proveedor-contrato', 'GestionOCController@actionAjaxBuscarCuentaBancariaContrato');
 	Route::any('/ajax-cuenta-bancaria-proveedor-oc', 'GestionOCController@actionAjaxBuscarCuentaBancariaOC');
+	Route::any('/ajax-cuenta-bancaria-proveedor-liquidacioncompraanticipo', 'GestionOCController@actionAjaxBuscarCuentaBancariaLiquidacionCompraAnticipo');
 	Route::any('/ajax-cuenta-bancaria-proveedor-estiba', 'GestionOCController@actionAjaxBuscarCuentaBancariaEstiba');
 
 	Route::any('/ajax-moneda-ajax-cuenta', 'GestionOCController@actionAjaxMonedaAjaxCuenta');
@@ -372,7 +376,8 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	//ADMINISTRATOR ESTIBA
 	Route::any('/select-xml-estiba/{idopcion}', 'GestionEstibaController@actionDetalleSelectEstiba');
-	Route::any('/detalle-comprobante-estiba-administrator/{idopcion}/{lote}', 'GestionEstibaController@actionDetalleComprobanteestibaAdministrator');
+	Route::any('/select-xml-estiba-documento-interno-compra/{idopcion}', 'GestionEstibaController@actionDetalleSelectEstibaDocumentoInternoCompra');
+	Route::any('/detalle-comprobante-estiba-administrator/{idopcion}/{lote}', 'GestionEstibaController@actionDetalleComprobanteestibaAdministrator');	
 	Route::any('/subir-xml-cargar-datos-estiba-administrator/{idopcion}/{lote}', 'GestionEstibaController@actionCargarXMLEstibaAdministrator');
 	Route::any('/validar-xml-oc-estiba-administrator/{idopcion}/{lote}', 'GestionEstibaController@actionValidarXMLEstibaAdministrator');
 	Route::any('/ajax-modal-detalle-lotes', 'GestionEstibaController@actionCargarModalDetalleLotes');

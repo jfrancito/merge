@@ -20,7 +20,11 @@
                             @include('comprobante.hextorno')
                     </div>
                     <div class="panel-body">
-                      @include('comprobante.lista.detallecomprobanteadministradorestiba')
+                        @if($fereftop1->OPERACION == 'DOCUMENTO_INTERNO_COMPRA')                            
+                            @include('comprobante.lista.detallecomprobanteadministradorestibadocumentointernocompra')
+                        @else
+                            @include('comprobante.lista.detallecomprobanteadministradorestiba')
+                        @endif                      
                     </div>
                 </div>
             </div>

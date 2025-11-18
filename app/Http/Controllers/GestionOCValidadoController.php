@@ -605,6 +605,9 @@ class GestionOCValidadoController extends Controller
         $archivos               =   $this->lista_archivos_total($idoc,$fedocumento->DOCUMENTO_ITEM);
         $archivospdf            =   $this->lista_archivos_total_pdf($idoc,$fedocumento->DOCUMENTO_ITEM);
         $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+
+        $fereftop1              =   FeRefAsoc::where('lote','=',$idoc)->first();
+
         $lotes                  =   FeRefAsoc::where('lote','=',$idoc)                                        
                                     ->pluck('ID_DOCUMENTO')
                                     ->toArray();
@@ -614,6 +617,7 @@ class GestionOCValidadoController extends Controller
         return View::make('comprobante/registrocomprobantevalidadoestiba',
                          [
                             'fedocumento'           =>  $fedocumento,
+                            'fereftop1'             =>  $fereftop1,
                             'detallefedocumento'    =>  $detallefedocumento,
                             'documento_asociados'   =>  $documento_asociados,
                             'documento_top'         =>  $documento_top,

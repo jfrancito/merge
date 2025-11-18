@@ -24,6 +24,7 @@ use App\Modelos\CMPDocumentoCtble;
 use App\Modelos\TESCuentaBancaria;
 use App\Modelos\CMPReferecenciaAsoc;
 use App\Modelos\FeRefAsoc;
+use App\Modelos\VMergeDocumento;
 
 use App\Modelos\CMPOrden;
 use Greenter\Parser\DocumentParserInterface;
@@ -32,6 +33,7 @@ use Greenter\Xml\Parser\NoteParser;
 use Greenter\Xml\Parser\PerceptionParser;
 use Greenter\Xml\Parser\RHParser;
 use Greenter\Xml\Parser\LiquiParser;
+use Illuminate\Support\Facades\Mail;
 
 
 use App\User;
@@ -504,77 +506,40 @@ class GestionEstibaController extends Controller
 
                 //dd($MONTO_ANTICIPO_DESC);
                 
-                if($fedocumento->OPERACION == 'DOCUMENTO_INTERNO_COMPRA'){
-                    FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
-                                ->update(
-                                    [
+                FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                    ->update(
+                        [
 
-                                        'CTA_DETRACCION'=>$ctadetraccion,
-                                        'VALOR_DETRACCION'=>$tipo_detraccion_id,
-                                        'MONTO_DETRACCION_XML'=>$monto_detraccion,
-                                        'MONTO_DETRACCION_RED'=>round($monto_detraccion),
-                                        'COD_PAGO_DETRACCION'=>$COD_PAGO_DETRACCION,
-                                        'TXT_PAGO_DETRACCION'=>$TXT_PAGO_DETRACCION,
+                            'CTA_DETRACCION'=>$ctadetraccion,
+                            'VALOR_DETRACCION'=>$tipo_detraccion_id,
+                            'MONTO_DETRACCION_XML'=>$monto_detraccion,
+                            'MONTO_DETRACCION_RED'=>round($monto_detraccion),
+                            'COD_PAGO_DETRACCION'=>$COD_PAGO_DETRACCION,
+                            'TXT_PAGO_DETRACCION'=>$TXT_PAGO_DETRACCION,
 
-                                        'MONTO_ANTICIPO_DESC'=>$MONTO_ANTICIPO_DESC,
-                                        'COD_ANTICIPO'=>$COD_ANTICIPO,
-                                        'SERIE_ANTICIPO'=>$SERIE_ANTICIPO,
-                                        'NRO_ANTICIPO'=>$NRO_ANTICIPO,
-
-
-                                        //'COD_CATEGORIA_BANCO'=>$bancocategoria->COD_CATEGORIA,
-                                        //'TXT_CATEGORIA_BANCO'=>$bancocategoria->NOM_CATEGORIA,
-                                        //'TXT_NRO_CUENTA_BANCARIA'=>$cb_id,
-                                        'ARCHIVO_CDR'=>'',
-                                        'ARCHIVO_PDF'=>'',
-                                        'COD_ESTADO'=>'ETM0000000000002',
-                                        'TXT_ESTADO'=>'POR APROBAR USUARIO CONTACTO',
-                                        'dni_usuariocontacto'=>$trabajador->NRO_DOCUMENTO,
-                                        'COD_CONTACTO'=>$contacto->COD_TRABAJADOR,
-                                        'CODIGO_CDR'=>$codigocdr,
-                                        'RESPUESTA_CDR'=>$respuestacdr,
-                                        'ind_email_uc'=>0,
-                                        'TXT_CONTACTO'=>$contacto->NOM_TRABAJADOR,
-                                        'fecha_pa'=>$this->fechaactual,
-                                        'usuario_pa'=>Session::get('usuario')->id,
-                                    ]
-                                );    
-                }else{
-                    FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
-                                ->update(
-                                    [
-
-                                        'CTA_DETRACCION'=>$ctadetraccion,
-                                        'VALOR_DETRACCION'=>$tipo_detraccion_id,
-                                        'MONTO_DETRACCION_XML'=>$monto_detraccion,
-                                        'MONTO_DETRACCION_RED'=>round($monto_detraccion),
-                                        'COD_PAGO_DETRACCION'=>$COD_PAGO_DETRACCION,
-                                        'TXT_PAGO_DETRACCION'=>$TXT_PAGO_DETRACCION,
-
-                                        'MONTO_ANTICIPO_DESC'=>$MONTO_ANTICIPO_DESC,
-                                        'COD_ANTICIPO'=>$COD_ANTICIPO,
-                                        'SERIE_ANTICIPO'=>$SERIE_ANTICIPO,
-                                        'NRO_ANTICIPO'=>$NRO_ANTICIPO,
+                            'MONTO_ANTICIPO_DESC'=>$MONTO_ANTICIPO_DESC,
+                            'COD_ANTICIPO'=>$COD_ANTICIPO,
+                            'SERIE_ANTICIPO'=>$SERIE_ANTICIPO,
+                            'NRO_ANTICIPO'=>$NRO_ANTICIPO,
 
 
-                                        'COD_CATEGORIA_BANCO'=>$bancocategoria->COD_CATEGORIA,
-                                        'TXT_CATEGORIA_BANCO'=>$bancocategoria->NOM_CATEGORIA,
-                                        'TXT_NRO_CUENTA_BANCARIA'=>$cb_id,
-                                        'ARCHIVO_CDR'=>'',
-                                        'ARCHIVO_PDF'=>'',
-                                        'COD_ESTADO'=>'ETM0000000000002',
-                                        'TXT_ESTADO'=>'POR APROBAR USUARIO CONTACTO',
-                                        'dni_usuariocontacto'=>$trabajador->NRO_DOCUMENTO,
-                                        'COD_CONTACTO'=>$contacto->COD_TRABAJADOR,
-                                        'CODIGO_CDR'=>$codigocdr,
-                                        'RESPUESTA_CDR'=>$respuestacdr,
-                                        'ind_email_uc'=>0,
-                                        'TXT_CONTACTO'=>$contacto->NOM_TRABAJADOR,
-                                        'fecha_pa'=>$this->fechaactual,
-                                        'usuario_pa'=>Session::get('usuario')->id,
-                                    ]
-                                );
-                }
+                            'COD_CATEGORIA_BANCO'=>$bancocategoria->COD_CATEGORIA,
+                            'TXT_CATEGORIA_BANCO'=>$bancocategoria->NOM_CATEGORIA,
+                            'TXT_NRO_CUENTA_BANCARIA'=>$cb_id,
+                            'ARCHIVO_CDR'=>'',
+                            'ARCHIVO_PDF'=>'',
+                            'COD_ESTADO'=>'ETM0000000000002',
+                            'TXT_ESTADO'=>'POR APROBAR USUARIO CONTACTO',
+                            'dni_usuariocontacto'=>$trabajador->NRO_DOCUMENTO,
+                            'COD_CONTACTO'=>$contacto->COD_TRABAJADOR,
+                            'CODIGO_CDR'=>$codigocdr,
+                            'RESPUESTA_CDR'=>$respuestacdr,
+                            'ind_email_uc'=>0,
+                            'TXT_CONTACTO'=>$contacto->NOM_TRABAJADOR,
+                            'fecha_pa'=>$this->fechaactual,
+                            'usuario_pa'=>Session::get('usuario')->id,
+                        ]
+                    );
                 
 
                 //HISTORIAL DE DOCUMENTO APROBADO
@@ -656,6 +621,48 @@ class GestionEstibaController extends Controller
                 //     }
                 // }
 
+                if($fedocumento->OPERACION == 'DOCUMENTO_INTERNO_COMPRA'){
+
+                    $ordencompra         =       VMergeDocumento::leftJoin('FE_REF_ASOC', function ($leftJoin){
+                                                    $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
+                                                        ->where('FE_REF_ASOC.COD_ESTADO', '=', '1');
+                                                })
+                                                ->leftJoin('FE_DOCUMENTO', function ($leftJoin){
+                                                    $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                                                        ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                                                })                                                
+                                                ->where('VMERGEDOCUMENTOS.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                                ->WHERE('FE_REF_ASOC.LOTE','=',$idoc)                                                                                                
+                                                ->WHERE('VMERGEDOCUMENTOS.COD_ESTADO','=','1')                                                
+                                                ->orderBy('VMERGEDOCUMENTOS.FEC_EMISION','ASC')
+                                                ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
+                                                                    FEC_EMISION,
+                                                                    TXT_CATEGORIA_MONEDA,
+                                                                    TXT_EMPR_EMISOR,
+                                                                    COD_USUARIO_CREA_AUD,
+                                                                    CAN_TOTAL,
+                                                                    NRO_SERIE,
+                                                                    NRO_DOC,
+                                                                    FE_REF_ASOC.LOTE AS LOTE_DOC,                                                                    
+                                                                    FE_DOCUMENTO.ID_DOCUMENTO,
+                                                                    FE_DOCUMENTO.COD_ESTADO,
+                                                                    FE_DOCUMENTO.TXT_ESTADO,
+                                                                    FE_REF_ASOC.TOTAL_MERGE
+                                                                '))
+                                                ->first();
+
+                    Mail::send('emails.emaildocumentointernocompragenerado',
+                    [
+                        'ordencompra'       => $ordencompra,
+                        'estado'            => 'APROBADO POR USUARIO CONTACTO',
+                    ],
+                    function ($message) {
+                        $message->from('helpdeskisl@induamerica.com.pe', 'Vituchin')
+                                ->to('german.zamora@induamerica.com.pe')                            
+                                ->subject('DOCUMENTO INTERNO COMPRA - INDUAMERICA');
+                    });    
+                }                
+
                 DB::commit();
             }catch(\Exception $ex){
                 DB::rollback(); 
@@ -732,6 +739,74 @@ class GestionEstibaController extends Controller
             }else{
                 $lote = $feref->LOTE;
             }
+        }
+
+        return Redirect::to('detalle-comprobante-estiba-administrator/'.$idopcion.'/'.$lote);
+    }
+
+    public function actionDetalleSelectEstibaDocumentoInternoCompra($idopcion,Request $request)
+    {
+        $jsondocumenos                          =    json_decode($request['jsondocumenos'],true);
+        $operacion_id                           =    $request['operacion_sel'];
+        $lote                                   =    $this->funciones->generar_lote('FE_REF_ASOC',8);
+
+        $sw_sel                                 =    0;
+        $sw_no_sel                              =    0;
+        //si solo hay uno de los seleccionados
+        foreach ($jsondocumenos as $key => $item) {
+            $ID_DOCUMENTO = $item['data_requerimiento_id'];
+            $feref = FeRefAsoc::where('ID_DOCUMENTO','=',$ID_DOCUMENTO)->where('COD_ESTADO','=','1')->first();
+            if(count($feref)>0){
+                $sw_sel                         =    $sw_sel + 1;  
+            }else{
+                $sw_no_sel                      =    $sw_no_sel + 1;
+            }
+        }
+        if($sw_sel >= 1 && $sw_no_sel >=1){
+            return Redirect::to('gestion-de-orden-compra/'.$idopcion)->with('errorbd', 'Has seleccionado Documentos que ya tienen lotes activos');  
+        }
+
+        foreach ($jsondocumenos as $key => $item) {
+            $ID_DOCUMENTO   = $item['data_requerimiento_id'];            
+            $LOTE           = $item['data_lote'];
+            $TOTAL_MERGE    = $item['data_mergetotal'];
+
+            $feref = FeRefAsoc::where('ID_DOCUMENTO','=',$ID_DOCUMENTO)
+                        ->where('LOTE','=',$LOTE)
+                        ->where('COD_ESTADO','=','1')
+                        ->first();
+
+            if(count($feref)<=0){
+                $docasociar                              =   New FeRefAsoc;
+                $docasociar->LOTE                        =   $lote;
+                $docasociar->ID_DOCUMENTO                =   $ID_DOCUMENTO;
+                $docasociar->FECHA_CREA                  =   $this->fechaactual;
+                $docasociar->COD_ESTADO                  =   1;
+                $docasociar->ESTATUS                     =   'OFF';
+                $docasociar->OPERACION                   =   $operacion_id;
+                $docasociar->USUARIO_CREA                =   Session::get('usuario')->id;
+                $docasociar->TOTAL_MERGE                 =   $TOTAL_MERGE;
+                $docasociar->save();            
+            }else{
+
+                $fedocumento    =   FeDocumento::where('ID_DOCUMENTO','=',$LOTE)->where('COD_ESTADO','<>','ETM0000000000006')->first();
+
+                if(count($fedocumento)<=0){
+                    FeRefAsoc::where('ID_DOCUMENTO','=',$ID_DOCUMENTO)
+                        ->where('LOTE','=',$LOTE)
+                        ->where('COD_ESTADO','=','1')
+                        ->update(
+                                [
+                                    'TOTAL_MERGE'=>$TOTAL_MERGE,
+                                    'USUARIO_MOD'=>Session::get('usuario')->id,
+                                    'FECHA_MOD'=>$this->fechaactual,
+                                ]);    
+                }
+
+                
+
+                $lote = $feref->LOTE;
+            } 
         }
 
         return Redirect::to('detalle-comprobante-estiba-administrator/'.$idopcion.'/'.$lote);
@@ -894,9 +969,7 @@ class GestionEstibaController extends Controller
                             'fereftop1'             =>  $fereftop1,
                             'idopcion'              =>  $idopcion,
                          ]);
-    }
-
-
+    }   
 
     public function actionCargarXMLEstibaAdministrator($idopcion, $lote,Request $request)
     {
@@ -956,7 +1029,7 @@ class GestionEstibaController extends Controller
                             $tipo_documento_le  =   $factura->gettipoDoc();
                             $moneda_le          =   $factura->gettipoMoneda();
                             $archivosdelfe      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000043','DCC0000000000003'])
+                                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000043','DCC0000000000045','DCC0000000000003','DCC0000000000001','DCC0000000000042'])
                                                     ->get();
                         }else{
 
@@ -1126,7 +1199,13 @@ class GestionEstibaController extends Controller
                         $documento_top          =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->first();
 
                         //VALIDAR QUE ALGUNOS CAMPOS SEAN IGUALES
-                        $this->con_validar_documento_proveedor_estiba($documento_asociados,$documento_top,$fedocumento,$detallefedocumento,$idoc);
+                        if($request['operacion_id']=='DOCUMENTO_INTERNO_COMPRA'){
+                            $this->con_validar_documento_proveedor_estiba_doc_int_com($idoc,$documento_top,$fedocumento,$detallefedocumento,$idoc);
+                        }else{
+                            $this->con_validar_documento_proveedor_estiba($documento_asociados,$documento_top,$fedocumento,$detallefedocumento,$idoc);
+                        }
+
+                        
 
                         $token = '';
                         if($prefijocarperta =='II'){
