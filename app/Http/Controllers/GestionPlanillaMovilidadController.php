@@ -19,6 +19,8 @@ use App\Modelos\CONPeriodo;
 use App\Modelos\FePlanillaEntregable;
 use App\Modelos\CMPDocAsociarCompra;
 use App\Modelos\Archivo;
+use App\Modelos\Firma;
+
 
 use Greenter\Parser\DocumentParserInterface;
 use Greenter\Xml\Parser\InvoiceParser;
@@ -47,6 +49,173 @@ class GestionPlanillaMovilidadController extends Controller
     use GeneralesTraits;
     use PlanillaTraits;
     use ComprobanteTraits;
+
+    public function actionAgregarExtornoFirma($idopcion, $idordencompra, Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion, 'Modificar');
+        if ($validarurl <> 'true') {
+            return $validarurl;
+        }
+        /******************************************************/
+        $idcab = $idordencompra;
+        $iddocumento = $this->funciones->decodificarmaestrapre($idordencompra, 'FIRM');
+        View::share('titulo', 'Extornar Firma');
+
+        if ($_POST) {
+
+            try {
+
+                DB::beginTransaction();
+                $descripcion = $request['descripcionextorno'];
+                $firma = Firma::where('ID_DOCUMENTO', '=', $iddocumento)->first();
+                //ANULAR TODA LA OPERACION
+                Firma::where('ID_DOCUMENTO', $iddocumento)
+                    ->update(
+                        [
+                            'COD_ESTADO' => 'ETM0000000000006',
+                            'TXT_ESTADO' => 'RECHAZADO',
+                            'TXT_EXTORNO' => $descripcion
+                        ]
+                    );
+
+                DB::commit();
+                return Redirect::to('gestion-de-aprobacion-firma-administracion/' . $idopcion)->with('bienhecho', 'Comprobante : ' . $firma->ID_DOCUMENTO . ' EXTORNADO CON EXITO');
+            } catch (\Exception $ex) {
+                DB::rollback();
+                return Redirect::to('gestion-de-aprobacion-firma-administracion/' . $idopcion)->with('errorbd', $ex . ' Ocurrio un error inesperado');
+            }
+        }
+
+    }
+
+    public function actionAprobarAdministracionFirma($idopcion, $iddocumento, Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion, 'Modificar');
+        if ($validarurl <> 'true') {
+            return $validarurl;
+        }
+        /******************************************************/
+        $idcab = $iddocumento;
+        $iddocumento = $this->funciones->decodificarmaestrapre($iddocumento, 'FIRM');
+        View::share('titulo', 'Aprobar Firma');
+
+        if ($_POST) {
+            try {
+
+                DB::beginTransaction();
+                $firma = Firma::where('ID_DOCUMENTO', '=', $iddocumento)->first();
+
+                Firma::where('ID_DOCUMENTO', $firma->ID_DOCUMENTO)
+                    ->update(
+                        [
+                            'COD_ESTADO' => 'ETM0000000000005',
+                            'TXT_ESTADO' => 'APROBADO',
+                            'USUARIO_MOD' => Session::get('usuario')->id,
+                            'FECHA_MOD' => $this->fechaactual
+                        ]
+                    );
+
+
+                $origen = '\\\\10.1.50.2\\comprobantes\\FIRMA\\'.$firma->NOMBRE_ARCHIVO;
+                $destino = public_path('firmas/'.$firma->NOMBRE_ARCHIVO);
+
+                // Reemplazar las barras invertidas por barras normales (por si acaso)
+                $origen = str_replace('\\', '/', $origen);
+
+                // Verificar si el archivo existe en el origen
+                if (file_exists($origen)) {
+                    // Copiar el archivo a la carpeta local
+                    if (!copy($origen, $destino)) {
+                        return Redirect::to('/gestion-de-aprobacion-firma-administracion/' . $idopcion)->with('errorbd', $ex . ' Error al copiar el archivo.');
+                    }
+                } else {
+                    return Redirect::to('/gestion-de-aprobacion-firma-administracion/' . $idopcion)->with('errorbd', $ex . ' El archivo de origen no existe');
+                }
+
+
+                DB::commit();
+                return Redirect::to('/gestion-de-aprobacion-firma-administracion/' . $idopcion)->with('bienhecho', 'FIRMA : ' . $firma->DNI . ' APROBADO CON EXITO');
+            } catch (\Exception $ex) {
+                DB::rollback();
+                return Redirect::to('/gestion-de-aprobacion-firma-administracion/' . $idopcion)->with('errorbd', $ex . ' Ocurrio un error inesperado');
+            }
+        } else {
+
+
+            $archivospdf = Firma::where('ID_DOCUMENTO', '=', $iddocumento)->get();
+
+            $ocultar = "";
+            // Construir el array de URLs
+            $initialPreview = [];
+            foreach ($archivospdf as $archivo) {
+                $initialPreview[] = route('serve-filefirma', ['file' => $archivo->NOMBRE_ARCHIVO]);
+            }
+            $initialPreviewConfig = [];
+
+            foreach ($archivospdf as $key => $archivo) {
+                $valor = '';
+                if ($key > 0) {
+                    $valor = 'ocultar';
+                }
+                $initialPreviewConfig[] = [
+                    'type' => "pdf",
+                    'caption' => $archivo->NOMBRE_ARCHIVO,
+                    'downloadUrl' => route('serve-filefirma', ['file' => $archivo->NOMBRE_ARCHIVO]),
+                    'frameClass' => $archivo->ID_DOCUMENTO . ' ' . $valor //
+                ];
+            }
+
+            //dd($initialPreviewConfig);
+            $archivos = Archivo::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
+            $firma = Firma::where('ID_DOCUMENTO', '=', $iddocumento)->first();
+            return View::make('planillamovilidad/aprobaradministracionfirma',
+                [
+                    'firma' => $firma,
+                    'archivos' => $archivos,
+                    'idopcion' => $idopcion,
+                    'idcab' => $idcab,
+                    'iddocumento' => $iddocumento,
+                    'initialPreview' => json_encode($initialPreview),
+                    'initialPreviewConfig' => json_encode($initialPreviewConfig),
+                ]);
+
+
+        }
+    }
+
+
+
+    public function actionAprobarFirma($idopcion, Request $request)
+    {
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion, 'Ver');
+        if ($validarurl <> 'true') {
+            return $validarurl;
+        }
+        /******************************************************/
+        View::share('titulo', 'Lista firma (administracion)');
+        $tab_id = 'oc';
+        if (isset($request['tab_id'])) {
+            $tab_id = $request['tab_id'];
+        }
+
+        $listadatos = $this->plm_lista_cabecera_comprobante_total_firma();
+
+        $funcion = $this;
+        return View::make('planillamovilidad/listamovilidadafirma',
+            [
+                'listadatos' => $listadatos,
+                'tab_id' => $tab_id,
+                'funcion' => $funcion,
+                'idopcion' => $idopcion,
+            ]);
+    }
+
+
 
     public function actionAgregarExtornoContabilidadPLA($idopcion, $idordencompra,Request $request)
     {
@@ -819,16 +988,17 @@ class GestionPlanillaMovilidadController extends Controller
                                     ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
                                     ->where('dni', $dni)
                                     ->first();
-            if(count($trabajador)>0){
+            if(count($trabajadorespla)>0){
                 $centro_id      =       $trabajadorespla->centro_osiris_id;
             }
 
-            if($centro_id == 'CEN0000000000003'){
-                $centro_id = 'CEN0000000000001';
-            }
-            
-            if (Session::get('usuario')->id == '1CIX00000040') {
-                $centro_id = 'CEN0000000000001';
+
+            $terceros   =   DB::table('TERCEROS')
+                        ->where('USER_ID', Session::get('usuario')->id)
+                        ->where('ACTIVO', 1)
+                        ->first();
+            if (count($terceros) > 0) {
+                $centro_id = $terceros->COD_CENTRO;
             }
 
 
@@ -1239,8 +1409,24 @@ class GestionPlanillaMovilidadController extends Controller
         $fecha_fin          =   $this->fecha_sin_hora;
 
         $planillamovilidad  =   $this->pla_lista_planilla_movilidad_personal($fecha_inicio,$fecha_fin);
-        //dd($planillamovilidad);
+        $trabajador =   DB::table('STD.TRABAJADOR')
+                        ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                        ->first();
 
+        $ruta = public_path('firmas/'.$trabajador->NRO_DOCUMENTO.'.jpg');
+        $mensaje_firma = "SI CUENTA CON FIRMA PUEDE REGISTRAR SU PLANILLA DE MOVILIDAD";
+        if (!file_exists($ruta)) {
+
+            $mensaje_firma  = "NO CUENTA CON FIRMA PUEDE REGISTRAR SU PLANILLA DE MOVILIDAD";
+            $firma          =   DB::table('FIRMAS')
+                                ->where('DNI', $trabajador->NRO_DOCUMENTO)
+                                ->orderBy('FECHA_MOD','DESC')
+                                ->first();
+            if (count($firma)>0) {
+                $mensaje_firma  = "SU ULTIMA SOLICITUD DE FIRMA ESTA EN ESTADO ".$firma->TXT_ESTADO; 
+            }
+
+        }
 
         $listadatos     =   array();
         $funcion        =   $this;
@@ -1249,6 +1435,7 @@ class GestionPlanillaMovilidadController extends Controller
                             'listadatos'        =>  $listadatos,
                             'funcion'           =>  $funcion,
                             'idopcion'          =>  $idopcion,
+                            'mensaje_firma'     =>  $mensaje_firma,
                             'planillamovilidad' =>  $planillamovilidad,
                             'fecha_inicio'      =>  $fecha_inicio,
                             'fecha_fin'         =>  $fecha_fin
@@ -1319,7 +1506,7 @@ class GestionPlanillaMovilidadController extends Controller
                 $nombre_responsable     =   $trabajador->TXT_NOMBRES.' '.$trabajador->TXT_APE_PATERNO.' '.$trabajador->TXT_APE_MATERNO;
                 $rutaImagen             =   public_path('firmas/'.$trabajador->NRO_DOCUMENTO.'.jpg');
                 if (!file_exists($rutaImagen)){
-                    //return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd','No puede emitir la Planilla porque no cuenta firma');
+                    return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd','No puede emitir la Planilla porque no cuenta firma');
                 }
 
                 if(count($tdetplanillamovilidad)<=0){
@@ -1376,23 +1563,27 @@ class GestionPlanillaMovilidadController extends Controller
                     if(count($trabajador)>0){
                         $dni        =       $trabajador->NRO_DOCUMENTO;
                     }
+
+
+
                     $trabajadorespla    =   DB::table('WEB.platrabajadores')
                                             ->where('situacion_id', 'PRMAECEN000000000002')
                                             ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
                                             ->where('dni', $dni)
                                             ->first();
-                    if(count($trabajador)>0){
+
+
+                    if(count($trabajadorespla)>0){
                         $centro_id      =       $trabajadorespla->centro_osiris_id;
                     }
 
-                    if($centro_id == 'CEN0000000000003'){
-                        $centro_id = 'CEN0000000000001';
+                    $terceros   =   DB::table('TERCEROS')
+                                ->where('USER_ID', Session::get('usuario')->id)
+                                ->where('ACTIVO', 1)
+                                ->first();
+                    if (count($terceros) > 0) {
+                        $centro_id = $terceros->COD_CENTRO;
                     }
-
-                    if (Session::get('usuario')->id == '1CIX00000040') {
-                        $centro_id = 'CEN0000000000001';
-                    }
-
 
                     $serie          =   $this->gn_serie($anio, $mes,$centro_id);
                     $numero         =   $this->gn_numero($serie,$centro_id);
@@ -1417,6 +1608,7 @@ class GestionPlanillaMovilidadController extends Controller
 
                     $direcion_id                        =   $request['direccion_id'];
                     $direccion                          =   $this->gn_generacion_combo_direccion_lg_top($direcion_id);
+
 
 
                     $cabecera                           =   new PlaMovilidad;
@@ -1465,6 +1657,13 @@ class GestionPlanillaMovilidadController extends Controller
             if(count($trabajador)>0){
                 $dni        =       $trabajador->NRO_DOCUMENTO;
             }
+
+            $rutaImagen             =   public_path('firmas/'.$dni.'.jpg');
+            if (!file_exists($rutaImagen)){
+                return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd','No cuenta con firma suba su firma');
+            }
+
+            //dd($dni);
             $trabajadorespla    =   DB::table('WEB.platrabajadores')
                                     ->where('situacion_id', 'PRMAECEN000000000002')
                                     ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
@@ -1474,20 +1673,36 @@ class GestionPlanillaMovilidadController extends Controller
             if(count($trabajadorespla)>0){
                 $centro_id      =       $trabajadorespla->centro_osiris_id;
             }else{
-                return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd', 'No puede realizar un registro porque no es la empresa a cual pertenece');
-            }
-            if($centro_id == 'CEN0000000000003'){
-                $centro_id = 'CEN0000000000001';
+
+                $terceros   =   DB::table('TERCEROS')
+                                ->where('USER_ID', Session::get('usuario')->id)
+                                ->where('ACTIVO', 1)
+                                ->first();
+                if (count($terceros) > 0) {
+                    $centro_id = $terceros->COD_CENTRO;
+                }else{
+                    return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd', 'No puede realizar un registro porque no es la empresa a cual pertenece'); 
+                }
             }
 
-            if (Session::get('usuario')->id == '1CIX00000040') {
-                $centro_id = 'CEN0000000000001';
+            $dtrabajador    =   STDTrabajador::where('COD_TRAB','=',Session::get('usuario')->usuarioosiris_id)->first();
+            if (is_null($centro_id)) {
+                $trabajadoresplasc    =     DB::table('WEB.platrabajadores')
+                                            ->where('situacion_id', 'PRMAECEN000000000002')
+                                            ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+                                            ->where('dni', $dni)
+                                            ->first();
+                if(count($trabajadoresplasc)>0){
+                    return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd', 'El trabajador '.$dtrabajador->TXT_APE_PATERNO.' '.$dtrabajador->TXT_APE_MATERNO.' '.$dtrabajador->TXT_NOMBRES. 'tiene una SEDE no identificada '.$trabajadoresplasc->cadlocal);
+                }else{
+                    return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd', 'El trabajador no esta en planilla');
+                }
             }
 
 
             $periodo        =   $this->gn_periodo_actual_xanio_xempresa($anio, $mes, Session::get('empresas')->COD_EMPR);
 
-            //dd($centro_id);
+            //dd($dni);
 
             $serie          =   $this->gn_serie($anio, $mes,$centro_id);
             $numero         =   $this->gn_numero($serie,$centro_id);
@@ -1531,6 +1746,84 @@ class GestionPlanillaMovilidadController extends Controller
     }
 
 
+    public function actionSubirFirma($idopcion,Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Anadir');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+
+        if($_POST)
+        {
+
+            try{    
+                
+                DB::beginTransaction();
+
+                    $files                      =   $request['firma'];
+                    if(!is_null($files)){
+                        foreach($files as $file){
+
+                            $trabajador                 =   DB::table('STD.TRABAJADOR')
+                                                            ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                                                            ->first();
+                            $rutafile                   =      $this->pathFiles.'\\comprobantes\\FIRMA';
+                            $nombrefilecdr              =      $trabajador->NRO_DOCUMENTO.'.jpg';
+                            $rutacompleta               =      $rutafile.'\\'.$nombrefilecdr;
+                            copy($file->getRealPath(),$rutacompleta);
+                            $path                       =      $rutacompleta;
+
+                            $nombreoriginal             =   $file->getClientOriginalName();
+                            $info                       =   new SplFileInfo($nombreoriginal);
+                            $extension                  =   $info->getExtension();
+                            $idcab                      =   $this->funciones->getCreateIdMaestradocpla('FIRMAS','FIRM');
+
+                            $dcontrol                   =   new Firma;
+                            $dcontrol->ID_DOCUMENTO     =   $idcab;
+                            $dcontrol->TXT_NOMBRE       =   Session::get('usuario')->nombre;
+                            $dcontrol->DNI              =   $trabajador->NRO_DOCUMENTO;
+                            $dcontrol->NOMBRE_ARCHIVO       =   $nombrefilecdr;
+                            $dcontrol->DESCRIPCION_ARCHIVO  =   'FIRMA';
+                            $dcontrol->URL_ARCHIVO      =   $path;
+                            $dcontrol->SIZE             =   filesize($file);
+                            $dcontrol->EXTENSION        =   $extension;
+                            $dcontrol->COD_ESTADO       =   'ETM0000000000004';
+                            $dcontrol->TXT_ESTADO       =   'POR APROBAR ADMINISTRACION';                       
+                            $dcontrol->ACTIVO           =   1;
+                            $dcontrol->FECHA_CREA       =   $this->fechaactual;
+                            $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
+                            $dcontrol->save();
+
+                        }
+                    }
+
+                DB::commit();
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+                $iddocumento                            =   Hashids::encode(substr($idcab, -8));
+                return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('bienhecho', 'Su firma fue registrado con exito');
+        }else{
+
+            $trabajador =   DB::table('STD.TRABAJADOR')
+                            ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                            ->first();
+            $ruta = public_path('firmas/'.$trabajador->NRO_DOCUMENTO.'.jpg');
+
+            if (file_exists($ruta)) {
+                return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd','Usted ya cuenta con una firma confirmada');
+            }
+
+            return View::make('planillamovilidad.agregarfirma',
+                             [
+                                'idopcion' => $idopcion
+                             ]);
+        }   
+    }
+
+
     public function actionGuardarModificarDetallePlanillaMovilidad($idopcion,$iddocumento,$item,Request $request)
     {
 
@@ -1548,6 +1841,57 @@ class GestionPlanillaMovilidadController extends Controller
                 $total                  =   $request['total'];
                 $activo                 =   $request['activo'];
 
+
+                $plmovilidad            =   PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first();
+
+                $trabajador             =   DB::table('STD.TRABAJADOR')
+                                            ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                                            ->first();
+                $dni                    =   '';
+                if(count($trabajador)>0){
+                    $dni        =       $trabajador->NRO_DOCUMENTO;
+                }
+                $trabajadorespla    =   DB::table('WEB.platrabajadores')
+                                        ->where('situacion_id', 'PRMAECEN000000000002')
+                                        ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+                                        ->where('dni', $dni)
+                                        ->first();
+                // $area_id                = $trabajadorespla->area_id;
+                // $mensaje_extra          = '';
+
+                // //VENDEDOR
+
+                // $area_id                = 'PRMAECEN000000000172';//ELIMINAR
+
+
+                // $impulsadora            =   $this->plm_identificar_si_es_impulsadora($area_id);
+                $impulsadora            =   0;//ELIMINAR
+
+                $monto_validar_diario   =   45;
+                if($impulsadora == 1){
+                    $monto_validar_diario   =   $this->plm_monto_total_impulsadora($plmovilidad->COD_TRABAJADOR,$fecha_gasto);
+                    $mensaje_extra = '(IMPULSADORA O VENDEDOR)';
+                }
+
+                //VALIDAR QUE LAS PLANILLAS DE MOVILIDAD SEAN DEL MISMO PERIODO
+                $periodo                =   CONPeriodo::where('COD_PERIODO','=',$plmovilidad->COD_PERIODO)->first(); 
+                $fecha                  =   $fecha_gasto;
+                $periodo_actual         =   $periodo->TXT_CODIGO;
+
+                // Convertir a objetos Carbon
+                $fechaObj = \Carbon\Carbon::createFromFormat('d-m-Y', $fecha_gasto);
+                $periodoAnio = explode('-', $periodo_actual)[0]; // 2024
+                $periodoMes = explode('-', $periodo_actual)[1];  // 3
+                // Crear fecha de inicio y fin del periodo
+                $inicioPeriodo = \Carbon\Carbon::create($periodoAnio, $periodoMes, 1);
+                $finPeriodo = $inicioPeriodo->copy()->endOfMonth();
+
+                //dd($finPeriodo);
+                // Validar
+                if (!$fechaObj->between($inicioPeriodo, $finPeriodo)) {
+                   return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd', 'La fecha NO está dentro del periodo seleccionado'); 
+                }
+
                 $detplanillamovilidad_item   =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->where('ITEM','=',$item)->first();
                 //VALIDAR QUE SOLO SEA 45 SOLES DIARIOS
                 $totaldia = DB::table('PLA_MOVILIDAD')
@@ -1558,8 +1902,8 @@ class GestionPlanillaMovilidadController extends Controller
                     ->where('PLA_DETMOVILIDAD.USUARIO_CREA', Session::get('usuario')->id)
                     ->sum('PLA_DETMOVILIDAD.TOTAL');
                 $totaldiario =    (float)$total  + ($totaldia-$detplanillamovilidad_item->TOTAL);
-                if($totaldiario>45){
-                    return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd', 'Supero el maximo saldo de 45 soles al dia');
+                if($totaldiario>$monto_validar_diario){
+                    return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd', 'Supero el maximo saldo de '.$monto_validar_diario.' soles al dia '.$mensaje_extra);
                 }
 
                 //VALIDAR QUE SOLO MENSUALMENTE SEA 1130
@@ -1608,18 +1952,18 @@ class GestionPlanillaMovilidadController extends Controller
                                         ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
                                         ->where('dni', $dni)
                                         ->first();
-                if(count($trabajador)>0){
+                if(count($trabajadorespla)>0){
                     $centro_id      =       $trabajadorespla->centro_osiris_id;
                 }
 
-                if($centro_id == 'CEN0000000000003'){
-                    $centro_id = 'CEN0000000000001';
-                }
 
-                if (Session::get('usuario')->id == '1CIX00000040') {
-                    $centro_id = 'CEN0000000000001';
+                $terceros   =   DB::table('TERCEROS')
+                            ->where('USER_ID', Session::get('usuario')->id)
+                            ->where('ACTIVO', 1)
+                            ->first();
+                if (count($terceros) > 0) {
+                    $centro_id = $terceros->COD_CENTRO;
                 }
-
 
                 $anio                   =   $this->anio;
                 $mes                    =   $this->mes;
@@ -1694,6 +2038,74 @@ class GestionPlanillaMovilidadController extends Controller
                 $anio                   =   $this->anio;
                 $mes                    =   $this->mes;
                 $periodo                =   $this->gn_periodo_actual_xanio_xempresa($anio, $mes, Session::get('empresas')->COD_EMPR);
+                $plmovilidad            =   PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first();
+
+                $trabajador     =   DB::table('STD.TRABAJADOR')
+                                    ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                                    ->first();
+                $dni            =       '';
+
+
+
+                if(count($trabajador)>0){
+                    $dni        =       $trabajador->NRO_DOCUMENTO;
+                }
+
+
+                $trabajadorespla    =   DB::table('WEB.platrabajadores')
+                                        ->where('situacion_id', 'PRMAECEN000000000002')
+                                        ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+                                        ->where('dni', $dni)
+                                        ->first();
+
+                $terceros           =   DB::table('TERCEROS')
+                                        ->where('USER_ID', Session::get('usuario')->id)
+                                        ->where('ACTIVO', 1)
+                                        ->first();
+
+                $centro_id = '';                        
+                if (count($terceros) > 0) {
+                    $centro_id = $terceros->COD_CENTRO;
+                }
+
+
+                // $area_id = $trabajadorespla->area_id;
+                // $mensaje_extra = '';
+
+                // //VENDEDOR
+                // //$area_id = 'PRMAECEN000000000172';//ELIMINAR
+
+
+                // $impulsadora            =   $this->plm_identificar_si_es_impulsadora($area_id);
+
+                $impulsadora = 0;//ELIMINAR
+                $monto_validar_diario   =   45;
+                if($impulsadora == 1){
+                    $monto_validar_diario   =   $this->plm_monto_total_impulsadora($plmovilidad->COD_TRABAJADOR,$fecha_gasto);
+                                    //dd($monto_validar_diario);
+                    $mensaje_extra = '(IMPULSADORA O VENDEDOR)';
+                }
+
+                //VALIDAR QUE LAS PLANILLAS DE MOVILIDAD SEAN DEL MISMO PERIODO
+
+                $periodo                =   CONPeriodo::where('COD_PERIODO','=',$plmovilidad->COD_PERIODO)->first(); 
+
+                $fecha                  = $fecha_gasto;
+                $periodo_actual         = $periodo->TXT_CODIGO;
+
+                // Convertir a objetos Carbon
+                $fechaObj = \Carbon\Carbon::createFromFormat('d-m-Y', $fecha_gasto);
+                $periodoAnio = explode('-', $periodo_actual)[0]; // 2024
+                $periodoMes = explode('-', $periodo_actual)[1];  // 3
+                // Crear fecha de inicio y fin del periodo
+                $inicioPeriodo = \Carbon\Carbon::create($periodoAnio, $periodoMes, 1);
+                $finPeriodo = $inicioPeriodo->copy()->endOfMonth();
+
+                //dd($finPeriodo);
+                // Validar
+                if (!$fechaObj->between($inicioPeriodo, $finPeriodo)) {
+                   return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd', 'La fecha NO está dentro del periodo seleccionado'); 
+                }
 
                 //VALIDAR QUE SOLO SEA 45 SOLES DIARIOS
                 $totaldia = DB::table('PLA_MOVILIDAD')
@@ -1704,8 +2116,8 @@ class GestionPlanillaMovilidadController extends Controller
                     ->where('PLA_DETMOVILIDAD.USUARIO_CREA', Session::get('usuario')->id)
                     ->sum('PLA_DETMOVILIDAD.TOTAL');
                 $totaldiario =    (float)$total + $totaldia;
-                if($totaldiario>45){
-                    return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd', 'Supero el maximo saldo de 45 soles al dia');
+                if($totaldiario>$monto_validar_diario){
+                    return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd', 'Supero el maximo saldo de '.$monto_validar_diario.' soles al dia '.$mensaje_extra);
                 }
 
                 //VALIDAR QUE SOLO MENSUALMENTE SEA 1130
@@ -1751,17 +2163,16 @@ class GestionPlanillaMovilidadController extends Controller
                                         ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
                                         ->where('dni', $dni)
                                         ->first();
-                if(count($trabajador)>0){
+                if(count($trabajadorespla)>0){
                     $centro_id      =       $trabajadorespla->centro_osiris_id;
                 }
 
-                if($centro_id == 'CEN0000000000003'){
-                    $centro_id = 'CEN0000000000001';
-                }
-
-
-                if (Session::get('usuario')->id == '1CIX00000040') {
-                    $centro_id = 'CEN0000000000001';
+                $terceros   =   DB::table('TERCEROS')
+                            ->where('USER_ID', Session::get('usuario')->id)
+                            ->where('ACTIVO', 1)
+                            ->first();
+                if (count($terceros) > 0) {
+                    $centro_id = $terceros->COD_CENTRO;
                 }
 
 
@@ -1853,10 +2264,13 @@ class GestionPlanillaMovilidadController extends Controller
             DB::commit();
         }catch(\Exception $ex){
             DB::rollback(); 
+            //dd("hola1");
             return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd', $ex.' Ocurrio un error inesperado');
         }
             return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('bienhecho', 'Se Agrego un nuevo item con exito');
     }
+
+
 
 
     public function actionExtornarPlanillaMovilidad($idopcion,$iddocumento,Request $request)
@@ -1864,12 +2278,17 @@ class GestionPlanillaMovilidadController extends Controller
 
         $iddocumento = $this->funciones->decodificarmaestrapre($iddocumento,'PLAM');
         View::share('titulo','Extonnar Planilla Movilidad');
-        $planillamovilidad = PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first();
-        if($planillamovilidad->COD_ESTADO!='ETM0000000000001'){
-            return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd', 'Ya no puede extornar esta PLANILLA DE MOVILIDAD');
+
+
+        $lote = PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first();
+        if($lote->COD_ESTADO!='ETM0000000000001'){
+            return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd', 'Ya no puede extornar esta PLANILLA MOVILIDAD');
         }
-        $planillamovilidad->ACTIVO = 0;
-        $planillamovilidad->save();
+
+        $lote->COD_ESTADO = 'ETM0000000000006';
+        $lote->TXT_ESTADO = 'RECHAZADO';
+        $lote->ACTIVO = 0;
+        $lote->save();
 
         DB::table('PLA_DETMOVILIDAD')
             ->where('ID_DOCUMENTO', $iddocumento) // Reemplaza con el valor real
@@ -1878,6 +2297,7 @@ class GestionPlanillaMovilidadController extends Controller
         return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('bienhecho', 'Se extorno la PLANILLA DE MOVILIDAD ');
 
     }
+
 
     public function actionModificarPlanillaMovilidad($idopcion,$iddocumento,Request $request)
     {
@@ -1912,16 +2332,21 @@ class GestionPlanillaMovilidadController extends Controller
                                 ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
                                 ->where('dni', $dni)
                                 ->first();
-        if(count($trabajador)>0){
+        if(count($trabajadorespla)>0){
             $centro_id      =       $trabajadorespla->centro_osiris_id;
         }
-        if($centro_id == 'CEN0000000000003'){
-            $centro_id = 'CEN0000000000001';
+
+
+        $terceros   =   DB::table('TERCEROS')
+                    ->where('USER_ID', Session::get('usuario')->id)
+                    ->where('ACTIVO', 1)
+                    ->first();
+        if (count($terceros) > 0) {
+            $centro_id = $terceros->COD_CENTRO;
         }
 
-        if (Session::get('usuario')->id == '1CIX00000040') {
-            $centro_id = 'CEN0000000000001';
-        }
+
+
 
         $serie          =   $this->gn_serie($anio, $mes,$centro_id);
         $numero         =   $this->gn_numero($serie,$centro_id);
@@ -2240,6 +2665,31 @@ class GestionPlanillaMovilidadController extends Controller
     }
 
 
+    public function actionListaAcumuladoDias(Request $request) {
+
+        $fecha_inicio       =       $request['fecha_inicio'];
+        $fecha_fin          =       $request['fecha_fin'];
+
+        $resultados         =       DB::table('PLA_MOVILIDAD')
+                                    ->join('PLA_DETMOVILIDAD', 'PLA_MOVILIDAD.ID_DOCUMENTO', '=', 'PLA_DETMOVILIDAD.ID_DOCUMENTO')
+                                    ->where('PLA_MOVILIDAD.ACTIVO', 1)
+                                    ->where('PLA_DETMOVILIDAD.ACTIVO', 1)
+                                    ->where('PLA_MOVILIDAD.COD_ESTADO', '!=', 'ETM0000000000006')
+                                    ->where('PLA_MOVILIDAD.COD_TRABAJADOR', Session::get('usuario')->usuarioosiris_id)
+                                    ->whereBetween('FECHA_GASTO', [$fecha_inicio, $fecha_fin])
+                                    ->groupBy('FECHA_GASTO')
+                                    ->orderBy('FECHA_GASTO','DESC')
+                                    ->select('FECHA_GASTO', DB::raw('SUM(PLA_DETMOVILIDAD.TOTAL) as TOTAL'))
+                                    ->get();
+
+        return View::make('planillamovilidad/modal/ajax/malistaacumuladodias',
+                         [
+                            'resultados'            =>  $resultados,
+                            'fecha_inicio'          =>  $fecha_inicio,
+                            'fecha_fin'             =>  $fecha_fin,
+                            'ajax'                  =>  true,
+                         ]);
+    }
 
 
 }

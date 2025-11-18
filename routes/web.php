@@ -31,8 +31,8 @@ Route::get('/serve-fileliquidacioncompraanticipo', 'FileController@serveFileLiqu
 Route::get('/serve-fileestiba', 'FileController@serveFileEstiba')->name('serve-fileestiba');
 Route::get('/serve-filelg', 'FileController@serveFileLG')->name('serve-filelg');
 Route::get('/serve-filepla', 'FileController@serveFilePlaC')->name('serve-filepla');
-
 Route::get('/serve-filerc', 'FileController@serveFileRC')->name('serve-filerc');
+Route::get('/serve-filefirma', 'FileController@serveFileFirma')->name('serve-filefirma');
 
 
 Route::get('/serve-filecontrato-sg', 'FileController@serveFileContratoSG')->name('serve-filecontrato-sg');
@@ -60,12 +60,9 @@ Route::any('/transferirdataventas', 'TransferirDataController@actionTransferirVe
 Route::any('/documentolgautomatico', 'PrecioCompetenciaController@actionDocumentoLGAutomatico');//TRANSFERIR DATA AGENTE IA
 Route::any('/enviocorreotesorerialg', 'UserController@actionCorreoTesoreriaLg');//correo para usuario contacto
 Route::any('/guardardocumentacionlq', 'PrecioCompetenciaController@actionDocumentoLGAutomaticoNuevo');//correo para usuario contacto
-
 Route::any('/enviocorreoreparacionlevantada', 'UserController@actionCorreoReparacionLevantada');//correo para usuario contacto
-
 Route::any('/guardarpdfoi', 'PrecioCompetenciaController@actionGuardarPdfOi');//correo para usuario contacto
-
-
+Route::any('/cambiarglosadehabilitacion', 'PrecioCompetenciaController@actionModificarGlosaLiquidacion');//correo para usuario contacto
 
 Route::group(['middleware' => ['authaw']], function () {
 
@@ -78,10 +75,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/configurar-datos-cuenta-bancaria/{idusuario}', 'UserController@actionConfigurarDatosCuentaBancaria');
 	Route::any('/ajax-eliminar-cb', 'UserController@actionEliminarCuentaBancaria');
 
-
 	Route::any('/pdf-sunat-personal', 'GestionLiquidacionGastosController@actionPdfSunatPersonal');
-
-
 
 	Route::any('/ajax-modal-ver-cuenta-bancaria-contrato', 'UserController@actionAjaxModalVerCuentaBancariaContrato');
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-contrato', 'UserController@actionAjaxModalConfiguracionCuentaBancariaContrato');
@@ -96,6 +90,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/configurar-datos-cuenta-bancaria-oc/{prefijo_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaOC');
 
 	Route::any('/ajax-modal-ver-cuenta-bancaria-oc', 'UserController@actionAjaxModalVerCuentaBancariaOC');
+
+	Route::any('/ajax-modal-ver-cuenta-bancaria-oc-individual', 'UserController@actionAjaxModalVerCuentaBancariaOCIndividual');
+
 	Route::any('/ajax-modal-ver-cuenta-bancaria-lq', 'UserController@actionAjaxModalVerCuentaBancariaLQ');
 	Route::any('/ajax-modal-ver-cuenta-bancaria-liq-com-an', 'UserController@actionAjaxModalVerCuentaBancariaLiqComAn');
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-lq', 'UserController@actionAjaxModalConfiguracionCuentaBancariaLQ');
@@ -120,6 +117,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-combo-item', 'GestionLiquidacionGastosController@actionAjaxComboItem');
 	Route::any('/ajax-combo-autoriza', 'GestionLiquidacionGastosController@actionAjaxComboAutoriza');
 	Route::any('/ajax-combo-arendir', 'GestionLiquidacionGastosController@actionAjaxComboArendir');
+
+	Route::any('/ajax-modal-lista-comparativa', 'GestionLiquidacionGastosController@actionAjaxModalComparativa');
 
 
 	Route::any('/extonar-liquidacion-gastos/{idopcion}/{iddocumento}', 'GestionLiquidacionGastosController@actionExtornarLiquidacionGastos');
@@ -158,6 +157,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/validez-comprobante-pdf', 'GestionLiquidacionGastosController@actionLiquidacionValidezComprobantePdf');
     Route::post('/buscar-proveedor', 'GestionOCContabilidadController@buscarProveedor');
 
+
+
+
 	Route::any('/gestion-de-liquidacion-gastos-adm/{idopcion}', 'GestionLiquidacionGastosController@actionListarLGValidado');
 	Route::any('/ajax-buscar-documento-lg', 'GestionLiquidacionGastosController@actionListarAjaxBuscarDocumentoLG');
 	Route::any('/detalle-comprobante-lg-validado/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionDetallaComprobanteLGValidado');
@@ -192,30 +194,73 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/gestion-renta-cuarta-contabilidad/{idopcion}/{idordencompra}', 'GestionCuartaCategoriaController@actionGestionContabilidadRC');
 
 
+	//MOVILIDAD IMPULSO
+	Route::any('/gestion-movilidad-impulso/{idopcion}', 'GestionPlanillaMovilidadImpulsoController@actionListarPlanillaMovilidadImpulso');
+	Route::any('/agregar-movilidad-impulso/{idopcion}', 'GestionPlanillaMovilidadImpulsoController@actionAgregarMovilidadImpulso');
+	Route::any('/modificar-movilidad-impulso/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionModificarMovilidadImpulso');
+	Route::any('/guardar-movilidad-detalle/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionGuardarDetalleMovilidadImpulso');
+	Route::any('/emitir-movilidad-impulso/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionEmitirDetalleMovilidadImpulso');
+	Route::any('/gestion-de-aprobacion-movilidad-impulso-jefe/{idopcion}', 'GestionPlanillaMovilidadImpulsoController@actionAprobarMovilidadImpulsoJefe');
+	Route::any('/aprobar-movilidad-impulso-jefe/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadImpulsoController@actionAprobarJefeMV');
+	Route::any('/agregar-extorno-jefe-mv/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadImpulsoController@actionAgregarExtornoJefe');
+
+	Route::any('/seguimiento-movilidad-impulso/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadImpulsoController@actionSeguimientoMovilidadImpulso');
+
+
+	Route::any('/gestion-movilidad-impulso-masivo/{idopcion}', 'GestionPlanillaMovilidadImpulsoController@actionListarPlanillaMovilidadImpulsoMasivo');
+	Route::any('/agregar-movilidad-impulso-masivo/{idopcion}', 'GestionPlanillaMovilidadImpulsoController@actionAgregarMovilidadImpulsoMasivo');
+	Route::any('/modificar-movilidad-impulso-masivo/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionModificarMovilidadImpulsoMasivo');
+	Route::any('/ajax-modal-detalle-planilla-movilidad-impulso', 'GestionPlanillaMovilidadImpulsoController@actionDetallePlanillaMovilidadImpulso');
+	Route::any('/guardar-detalle-movilidad-impulso-trabajador/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionGuardarMovilidadTrabajador');
+	Route::any('/guardar-movilidad-detalle-masivo/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionGuardarDetalleMovilidadImpulsoMasivo');
+
+	Route::any('/extonar-planilla-movilidad-masivo/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionExtornarPlanillaMovilidadMasivo');
+	Route::any('/ajax-buscar-documento-fe-entregable-pla-mob-masivo', 'GestionPlanillaMovilidadImpulsoController@actionListarPlanillaMovilidadMobilMasivo');
+	Route::any('/emitir-movilidad-impulso-masivo/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionEmitirDetalleMovilidadImpulsoMasivo');
+	Route::any('/ajax-modal-configuracion-cuenta-bancaria-impulso', 'GestionPlanillaMovilidadImpulsoController@actionAjaxModalConfiguracionCuentaBancariaImpulso');
+	Route::any('/configurar-datos-cuenta-bancaria-impulso/{orden_id}/{idopcion}', 'GestionPlanillaMovilidadImpulsoController@actionConfigurarDatosCuentaBancariaImpulso');
+	Route::any('/ajax-modal-ver-cuenta-bancaria-impulso', 'GestionPlanillaMovilidadImpulsoController@actionAjaxModalVerCuentaBancariaImpulso');
+	Route::any('/cambiar-cuenta-corriente-impulso/{empresa_id}/{banco_id}/{nro_cuenta}/{moneda_id}/{idoc}/{idopcion}', 'GestionPlanillaMovilidadImpulsoController@actionCambiarCuentaCorrienteImpulso');
+	Route::any('/extonar-planilla-movilidad-impulso/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionExtornarPlanillaMovilidadImpulso');
+
+	//MOVILIDAD VENTAS
+	Route::any('/gestion-movilidad-venta-masivo/{idopcion}', 'GestionPlanillaMovilidadImpulsoController@actionListarPlanillaMovilidadVentaMasivo');
+	Route::any('/agregar-movilidad-venta-masivo/{idopcion}', 'GestionPlanillaMovilidadImpulsoController@actionAgregarMovilidadVentaMasivo');
+	Route::any('/modificar-movilidad-venta-masivo/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionModificarMovilidadVenta');
+	Route::any('/ajax-modal-detalle-planilla-movilidad-venta', 'GestionPlanillaMovilidadImpulsoController@actionDetallePlanillaMovilidadVenta');
+	Route::any('/guardar-detalle-movilidad-venta-trabajador/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionGuardarMovilidadTrabajadorVenta');
+	Route::any('/guardar-movilidad-detalle-masivo-venta/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionGuardarDetalleMovilidadVentaMasivo');
+	Route::any('/emitir-movilidad-venta-masivo/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionEmitirDetalleMovilidadVentaMasivo');
+	Route::any('/extonar-planilla-movilidad-masivo-venta/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionExtornarPlanillaMovilidadMasivoVenta');
+	Route::any('/seguimiento-movilidad-venta/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadImpulsoController@actionSeguimientoMovilidadVenta');
+
+
+
 
 	//PLANILLA MOVILIDAD
+
+	Route::any('/gestion-de-aprobacion-firma-administracion/{idopcion}', 'GestionPlanillaMovilidadController@actionAprobarFirma');
+	Route::any('/aprobar-firma-administracion/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadController@actionAprobarAdministracionFirma');
+	Route::any('/agregar-extorno-administracion-firma/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadController@actionAgregarExtornoFirma');
 	Route::any('/gestion-de-planilla-movilidad/{idopcion}', 'GestionPlanillaMovilidadController@actionListarPlanillaMovilidad');
 	Route::any('/ajax-buscar-documento-fe-entregable-pla-mob', 'GestionPlanillaMovilidadController@actionListarPlanillaMovilidadMobil');
-
 	Route::any('/agregar-planilla-movilidad/{idopcion}', 'GestionPlanillaMovilidadController@actionAgregarPlanillaMovilidad');
 	Route::any('/modificar-planilla-movilidad/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadController@actionModificarPlanillaMovilidad');
-
 	Route::any('/extonar-planilla-movilidad/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadController@actionExtornarPlanillaMovilidad');
+
+	Route::any('/subir-firma/{idopcion}', 'GestionPlanillaMovilidadController@actionSubirFirma');
 
 	Route::any('/ajax-modal-detalle-planilla-movilidad', 'GestionPlanillaMovilidadController@actionDetallePlanillaMovilidad');
 	Route::any('/guardar-detalle-planilla-movilidad/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadController@actionGuardarDetallePlanillaMovilidad');
 	Route::any('/ajax-modal-modificar-detalle-planilla-movilidad', 'GestionPlanillaMovilidadController@actionModificarDetallePlanillaMovilidad');
 	Route::any('/modificar-detalle-planilla-movilidad/{idopcion}/{iddocumento}/{item}', 'GestionPlanillaMovilidadController@actionGuardarModificarDetallePlanillaMovilidad');
 	Route::any('/emitir-planilla-movilidad/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadController@actionEmitirDetallePlanillaMovilidad');
-
 	Route::any('/gestion-de-aprobacion-planilla-movilidad-jefe/{idopcion}', 'GestionPlanillaMovilidadController@actionAprobarPlanillaMovilidadJefe');
 	Route::any('/aprobar-planilla-movilidad-jefe/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadController@actionAprobarJefe');
-
 	Route::any('/gestion-de-aprobacion-planilla-movilidad-administracion/{idopcion}', 'GestionPlanillaMovilidadController@actionAprobarPlanillaMovilidadAdministracion');
 	Route::any('/aprobar-planilla-movilidad-administracion/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadController@actionAprobarAdministracion');
-
 	Route::any('/pdf-planilla-movilidad/{iddocumento}', 'GestionPlanillaMovilidadController@actionPDFPlanillaMovilidad');
-
+	Route::any('/ajax-modal-lista-acumulado-dias', 'GestionPlanillaMovilidadController@actionListaAcumuladoDias');
 
 
 	Route::any('/ajax-select-combo-provincia-partida', 'GestionPlanillaMovilidadController@actionSelectComboProvinciaPartida');
@@ -231,6 +276,15 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/gestion-de-usuarios/{idopcion}', 'UserController@actionListarUsuarios');
 	Route::any('/agregar-usuario/{idopcion}', 'UserController@actionAgregarUsuario');
 	Route::any('/modificar-usuario/{idopcion}/{idusuario}', 'UserController@actionModificarUsuario');
+
+
+
+	Route::any('/gestion-de-registros-terceros/{idopcion}', 'UserController@actionListarTerceros');
+	Route::any('/agregar-tercero/{idopcion}', 'UserController@actionAgregarTercero');
+	Route::any('/modificar-tercero/{idopcion}/{idusuario}', 'UserController@actionModificarTercero');
+
+
+
 	Route::any('/ajax-activar-perfiles', 'UserController@actionAjaxActivarPerfiles');
 
 	Route::any('/gestion-de-roles/{idopcion}', 'UserController@actionListarRoles');
@@ -702,6 +756,8 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::post('/validar_destino_distrito', 'RegistroImporteGastosController@validarDestinoPorDistrito');
 
+	Route::any('/ajax-buscar-documento-rg', 'RegistroImporteGastosController@actionListarAjaxBuscarDocumentoRG');
+
 	//PATANLLA 1
 
 	Route::get('/gestionar-personal-autoriza/{idopcion}', 'RegistroPersonalAutorizaController@actionRegistroPersonalAutoriza');
@@ -736,13 +792,18 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::get('/gestion-de-vale-rendir-reembolso/{idopcion}', 'ValeRendirControllerReembolso@actionValeRendirReembolso');
     Route::post('/registrar_vale_rendir_reembolso', 'ValeRendirControllerReembolso@insertValeRendirActionReembolso');
     Route::post('/data_vale_rendir_reembolso', 'ValeRendirControllerReembolso@traerdataValeRendirActionReembolso');
+    Route::post('/ver_detalle_importe_vale_reembolso', 'ValeRendirControllerReembolso@actionDetalleImporteValeReembolso');
 
-
-
-
-
-
-
+    Route::get('/gestion-autoriza-rendir-reembolso/{idopcion}', 'ValeRendirAutorizaControllerReembolso@actionValeRendirAutorizaReembolso');
+	Route::post('/autorizar_vale_rendir_reembolso', 'ValeRendirAutorizaControllerReembolso@actionAutorizarValeRendirReembolso');
+	Route::post('/rechazar_vale_rendir_reembolso', 'ValeRendirAutorizaControllerReembolso@actionRechazarValeRendirReembolso');
+	Route::post('/ver_detalle_importe_autoriza_reembolso', 'ValeRendirAutorizaControllerReembolso@actionDetalleImporteReembolso');
+	
+	//GESTION LISTA VALE A RENDIR ADMINISTRACION
+	Route::any('/gestion-de-vale-rendir-administracion/{idopcion}', 'GestionValeRendirController@actionListarValeRendir');
+	Route::any('/ajax-buscar-documento-vl', 'GestionValeRendirController@actionListarAjaxBuscarDocumentoVL');
+	Route::post('/ver_detalle_vale_gestion', 'GestionValeRendirController@actionVerDetalleVale');
+	Route::post('/actualizar_dias_vale', 'GestionValeRendirController@actionActualizarDiasVale');
 });
 
 Route::get('/pruebaemail/{emailfrom}/{nombreusuario}', 'PruebasController@actionPruebaEmail');

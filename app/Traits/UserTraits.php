@@ -28,6 +28,14 @@ trait UserTraits
 {
     use WhatsappTraits;
 
+    private function eliminacion_vales_arendir() {
+
+        $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC WEB.CULMINAR_VALE');
+        $stmt->execute();
+
+    }
+
+
     private function envio_correo_reparacion_levantada() {
 
         $listaliquidaciones     =   FeDocumento::where('IND_CORREO_REPARABLE', '1')
@@ -286,18 +294,18 @@ trait UserTraits
 
     private function envio_correo_tesoreria_lq() {
 
-        $listaliquidaciones          =   LqgLiquidacionGasto::where('COD_ESTADO', 'ETM0000000000005')
-                                        //->where('ID_DOCUMENTO','=','LIQG00000329')
-                                        ->where(function($query) {
-                                            $query->whereNull('IND_CORREO')
-                                                  ->orWhere('IND_CORREO', 0);
-                                        })
-                                        //->where('ARENDIR_ID','<>','')
-                                        ->where(function($query) {
-                                            $query->whereNotNull('COD_OSIRIS')
-                                                  ->where('COD_OSIRIS', '<>', '');
-                                        })
-                                        ->get();
+        $listaliquidaciones          =      LqgLiquidacionGasto::where('COD_ESTADO', 'ETM0000000000005')
+                                            //->where('ID_DOCUMENTO','=','LIQG00000329')
+                                            ->where(function($query) {
+                                                $query->whereNull('IND_CORREO')
+                                                      ->orWhere('IND_CORREO', 0);
+                                            })
+                                            //->where('ARENDIR_ID','<>','')
+                                            ->where(function($query) {
+                                                $query->whereNotNull('COD_OSIRIS')
+                                                      ->where('COD_OSIRIS', '<>', '');
+                                            })
+                                            ->get();
 
         foreach($listaliquidaciones as $item){
             $correotrabajdor         =    '';
@@ -378,6 +386,10 @@ trait UserTraits
                     }
                 }
 
+                //TRANSFERENCIA Y REEMBOLSO
+                if($item->ARENDIR == 'REEMBOLSO' && $item->COD_CATEGORIA_TIPOPAGO == 'MPC0000000000002'){
+                    $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00037')->first();
+                }
 
                 $array                  =   Array(
                     'item'                =>  $item,

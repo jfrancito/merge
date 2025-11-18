@@ -74,8 +74,8 @@
                         <span class="badge bg-white text-dark">GENERADO</span>
                     @elseif($item['ESTADO_OSIRIS'] === 'COBRADO')
                         <span class="badge badge-success">COBRADO</span>
-                    @elseif($item['ESTADO_OSIRIS'] === 'RECHAZADO')
-                         <span class="badge badge-custom-danger">RECHAZADO</span>
+                    @elseif($item['ESTADO_OSIRIS'] === 'ANULADO')
+                         <span class="badge badge-custom-danger">ANULADO</span>
                     @endif
            
                     {{-- Ver Detalle --}}

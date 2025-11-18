@@ -3075,7 +3075,7 @@ $(document).ready(function () {
                 // Recorrerlo
                 arrayDetalle.forEach(item => {
                     if (parseInt(item.COD_ESTADO) === 1) {
-                        if (!/^4011/.test(item.TXT_CUENTA_CONTABLE) && !/^42/.test(item.TXT_CUENTA_CONTABLE) && !/^43/.test(item.TXT_CUENTA_CONTABLE)) {
+                        if (!/^4011/.test(item.TXT_CUENTA_CONTABLE) && !/^421/.test(item.TXT_CUENTA_CONTABLE) && !/^431/.test(item.TXT_CUENTA_CONTABLE)) {
                             if (cadenaNumeroCuenta === '') {
                                 cadenaNumeroCuenta = item.TXT_CUENTA_CONTABLE;
                             } else {

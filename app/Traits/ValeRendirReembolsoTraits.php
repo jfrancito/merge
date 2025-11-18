@@ -54,8 +54,8 @@ trait ValeRendirReembolsoTraits
                                                                         @COD_ESTADO = ?,
                                                                         @COD_USUARIO_REGISTRO = ?');
 
-                 $cod_usuario_registro = Session::get('usuario')->id;
-                 $cod_empr = Session::get('empresas')->COD_EMPR;
+               $cod_usuario_registro = Session::get('usuario')->id;
+               $cod_empr = Session::get('empresas')->COD_EMPR;
                  
                $trabajador     =   DB::table('STD.TRABAJADOR')
                             ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
@@ -70,6 +70,21 @@ trait ValeRendirReembolsoTraits
                                         ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
                                         ->where('dni', $dni)
                                         ->first();
+                 $cadlocal = trim(strtoupper($trabajadorespla->cadlocal ?? ''));
+
+                 if (
+                    stripos($cadlocal, 'SEDE PIURA') !== false ||
+                    stripos($cadlocal, 'SEDE CHIMBOTE') !== false ||
+                     stripos($cadlocal, 'SEDE TRUJILLO') !== false
+                ) {
+                        $trabajadorespla->centro_osiris_id = 'CEN0000000000001';
+                    }
+                elseif (
+                        stripos($cadlocal, 'SEDE ICA') !== false
+                    ) {
+                        $trabajadorespla->centro_osiris_id = 'CEN0000000000002';
+                }
+     
                 if(count($trabajador)>0){
                     $centro_id      =       $trabajadorespla->centro_osiris_id;
                 }
@@ -79,7 +94,6 @@ trait ValeRendirReembolsoTraits
 
 
                 $cod_centro = $centrot->COD_CENTRO; 
-            
 
                  $stmt->bindParam(1, $ind_tipo_operacion, PDO::PARAM_STR);
                  $stmt->bindParam(2, $id, PDO::PARAM_STR);
@@ -393,9 +407,9 @@ trait ValeRendirReembolsoTraits
     {
         $array_lista_retail = array();
 
-        $cod_usuario_registro = Session::get('usuario')->id;
-        $cod_empr = Session::get('empresas')->COD_EMPR;
-       $trabajador     =   DB::table('STD.TRABAJADOR')
+            $cod_usuario_registro = Session::get('usuario')->id;
+            $cod_empr = Session::get('empresas')->COD_EMPR;
+            $trabajador     =   DB::table('STD.TRABAJADOR')
                             ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
                             ->first();
                 $dni            =       '';
@@ -408,6 +422,21 @@ trait ValeRendirReembolsoTraits
                                         ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
                                         ->where('dni', $dni)
                                         ->first();
+                 $cadlocal = trim(strtoupper($trabajadorespla->cadlocal ?? ''));
+
+                 if (
+                    stripos($cadlocal, 'SEDE PIURA') !== false ||
+                    stripos($cadlocal, 'SEDE CHIMBOTE') !== false ||
+                     stripos($cadlocal, 'SEDE TRUJILLO') !== false
+                ) {
+                        $trabajadorespla->centro_osiris_id = 'CEN0000000000001';
+                    }
+                elseif (
+                        stripos($cadlocal, 'SEDE ICA') !== false
+                    ) {
+                        $trabajadorespla->centro_osiris_id = 'CEN0000000000002';
+                }
+     
                 if(count($trabajador)>0){
                     $centro_id      =       $trabajadorespla->centro_osiris_id;
                 }
@@ -524,39 +553,7 @@ trait ValeRendirReembolsoTraits
     public function listaValeRendirAutorizaReembolso($ind_tipo_operacion, $id, $cod_empr, $cod_centro, $usuario_autoriza, $usuario_aprueba, $tipo_motivo,
                                              $txt_glosa, $can_total_importe, $can_total_saldo, $cod_usuario_registro)
     {
-        /*$array_lista_retail = array();
-
-        $cod_usuario_registro = "";
-
-        $usuario = User::where('id', Session::get('usuario')->id)->get();
-        $usuario_autoriza = $usuario->get(0)->usuarioosiris_id;
-
-        $cod_empr = Session::get('empresas')->COD_EMPR;
-        
-        $trabajador = DB::table('STD.TRABAJADOR')
-                        ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
-                        ->first();
-
-            $centro_id = '';
-
-            if ($trabajador) {
-                $empresa = DB::table('STD.EMPRESA')
-                            ->where('COD_EMPR', $trabajador->COD_EMPR)
-                            ->first();
-
-                if ($empresa) {
-                    $centro_id = $empresa->COD_CENTRO_SISTEMA; 
-                }
-            }
-
-            $centrot = DB::table('ALM.CENTRO')
-                        ->where('COD_CENTRO', $centro_id)
-                        ->first();
-
-
-                $cod_centro = $centrot->COD_CENTRO;
-                $nom_centro = $centrot->NOM_CENTRO;*/
-
+      
 
         $array_lista_retail = array();
 

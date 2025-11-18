@@ -8,11 +8,12 @@ use App\Traits\ValeRendirReembolsoTraits;
 use App\Modelos\STDTrabajadorVale;
 use App\Modelos\WEBTipoMotivoValeRendir;
 use App\Modelos\WEBValeRendirReembolso;
-use App\Modelos\WEBValeRendirDetalle;
+use App\Modelos\WEBValeRendirDetalleReembolso;
 use App\Modelos\WEBRegistroImporteGastos;
 use App\Modelos\ALMCentro;
 use App\Modelos\STDTrabajador;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 use Session;
 use App\WEBRegla, App\STDEmpresa, APP\User, App\CMPCategoria;
 use View;
@@ -27,6 +28,8 @@ class ValeRendirControllerReembolso extends Controller
       public function actionValeRendirReembolso(Request $request)
 
     {
+
+
        $trabajador     =   DB::table('STD.TRABAJADOR')
                             ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
                             ->first();
@@ -50,6 +53,23 @@ class ValeRendirControllerReembolso extends Controller
             ]);
         }
 
+        $cadlocal = trim(strtoupper($trabajadorespla->cadlocal ?? ''));
+
+        if (
+            stripos($cadlocal, 'SEDE PIURA') !== false ||
+            stripos($cadlocal, 'SEDE CHIMBOTE') !== false ||
+             stripos($cadlocal, 'SEDE TRUJILLO') !== false
+        ) {
+                $trabajadorespla->centro_osiris_id = 'CEN0000000000001';
+            }
+        elseif (
+                stripos($cadlocal, 'SEDE ICA') !== false
+            ) {
+                $trabajadorespla->centro_osiris_id = 'CEN0000000000002';
+        }
+
+     
+
         $centro_id = $trabajadorespla->centro_osiris_id;
 
         $centrot        =   DB::table('ALM.CENTRO')
@@ -59,6 +79,7 @@ class ValeRendirControllerReembolso extends Controller
         $cod_centro = $centrot->COD_CENTRO; 
         $nom_centro = $centrot->NOM_CENTRO; 
 
+
         $usuariosAu = DB::table('WEB.VALE_PERSONAL_AUTORIZA')
             ->where('COD_PERSONAL', Session::get('usuario')->usuarioosiris_id)
             ->where('COD_CENTRO', $cod_centro)
@@ -66,11 +87,19 @@ class ValeRendirControllerReembolso extends Controller
             ->pluck('TXT_AUTORIZA', 'COD_AUTORIZA')
             ->toArray();
 
+         
+
         $usuariosAp =  DB::table('WEB.VALE_PERSONAL_APRUEBA')->where('cod_centro', $cod_centro)->pluck('txt_aprueba', 'cod_aprueba')->toArray();
         $tipoMotivo = WEBTipoMotivoValeRendir::where('cod_estado',1)->pluck('txt_motivo', 'cod_motivo')->toArray();
         $cod_usuario_registro = Session::get('usuario')->id;
         $cod_empr = Session::get('empresas')->COD_EMPR;
-    
+
+        $areacomercial = DB::table('WEB.platrabajadores')
+        ->where('situacion_id', 'PRMAECEN000000000002') // activo
+        ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+        ->where('dni', $dni)
+        ->value('cadarea');
+
 
         // DETALLE - VALE A RENDIR 
          $destino = DB::table('WEB.REGISTRO_IMPORTE_GASTOS')
@@ -132,15 +161,7 @@ class ValeRendirControllerReembolso extends Controller
             ->pluck('NOM_CATEGORIA', 'COD_CATEGORIA')
             ->toArray();
 
-            $listacabecera = DB::table('LQG_DETLIQUIDACIONGASTO')
-                ->where('ID_DOCUMENTO', 'LIQG00000158')
-                ->where('COD_TIPODOCUMENTO', 'TDO0000000000001')
-                ->where('ACTIVO', 1)
-                ->get();
-
-
-        
-      
+           
             reset($usuariosAu);
             $usuario_autoriza_predeterminado = key($usuariosAu);
 
@@ -187,6 +208,7 @@ class ValeRendirControllerReembolso extends Controller
 
  public function insertValeRendirActionReembolso(Request $request)
     {
+
         $usuario_autoriza   = $request->input('usuario_autoriza');
         $usuario_aprueba    = $request->input('usuario_aprueba');
         $tipo_motivo        = $request->input('tipo_motivo');
@@ -198,8 +220,8 @@ class ValeRendirControllerReembolso extends Controller
         $opcion             = $request->input('opcion');
         $array_detalle      = $request->input('array_detalle');
 
-        $cod_categoria_estado_vale = 'ETM0000000000007'; // 
-        $txt_categoria_estado_vale = 'APROBADO';
+        $cod_categoria_estado_vale = 'ETM0000000000001'; // 
+        $txt_categoria_estado_vale = 'GENERADO';
         $cod_usuario_registro      = Session::get('usuario')->id;
         $txt_nom_solicita          = User::where('id', $cod_usuario_registro)->value('nombre');
 
@@ -235,6 +257,15 @@ class ValeRendirControllerReembolso extends Controller
             ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
             ->where('dni', $dni)
             ->first();
+        $cadlocal = trim(strtoupper($trabajadorespla->cadlocal ?? ''));
+
+
+       if (
+            stripos($cadlocal, 'SEDE ICA') !== false ||
+            stripos($cadlocal, 'SEDE CHIMBOTE') !== false
+        ) {
+            $trabajadorespla->centro_osiris_id = 'CEN0000000000002';
+        }
 
         if ($opcion === 'U') {
 
@@ -243,10 +274,16 @@ class ValeRendirControllerReembolso extends Controller
                 return response()->json(['error' => 'Vale de rendir procesado correctamente.']);
             }
 
+
+
             $this->insertValeRendirReembolso(
                 "U",
                 $vale_rendir_id,
-                "", "", "", "", "",
+                "", 
+                "", 
+                "", 
+                "", 
+                "",
                 $cod_empr_cli,
                 $txt_nom_solicita,
                 $usuario_autoriza,
@@ -268,7 +305,6 @@ class ValeRendirControllerReembolso extends Controller
                 ""
             );
 
-            // Eliminar y volver a insertar el detalle
             $this->insertValeRendirDetalleReembolso(
                 "D",
                 $vale_rendir_id,
@@ -324,25 +360,17 @@ class ValeRendirControllerReembolso extends Controller
         // INSERCIÓN
         else {
 
-            //VALIDA CON EL DNI TABLA PERSONAL REEMBOLSO Y DNI PLANILLA
+             //VALIDA CON EL DNI TABLA PERSONAL REEMBOLSO Y DNI PLANILLA
             $personalReembolso = DB::table('WEB.personal_reembolso')
             ->where('nro_documento', $trabajadorespla->dni)
             ->first();
 
-            if (!$personalReembolso) {
+            if (!$personalReembolso && strtoupper($trabajadorespla->cadarea) !== 'MARKETING') {
                     return response()->json([
                         'error' => 'Usted no cuenta con permiso para generar un vale de reembolso.'
                     ]);
                 }
 
-            $cod_usuario_registro = Session::get('usuario')->id;
-            $listarValePendientes = $this->listaValeRendirPendientes($cod_usuario_registro);
-
-            if (count($listarValePendientes) >= 2) {
-                return response()->json([
-                    'error' => 'Usted tiene 2 vales pendientes por rendir. No puede generar un tercer vale.'
-                ]);
-            }
             $this->insertValeRendirReembolso(
                 "I",
                 "", "", "", "", "", "",
@@ -527,14 +555,14 @@ class ValeRendirControllerReembolso extends Controller
 
     }
 
-    public function actionDetalleImporteVale(Request $request)
+    public function actionDetalleImporteValeReembolso(Request $request)
     { 
         $id_buscar = $request->input('valerendir_id'); 
     
    
     $detallesImporte = WEBValeRendirDetalleReembolso::where('ID', $id_buscar)->get(); 
 
-    return view('valerendir.ajax.modaldetalleimporte', [
+    return view('valerendirreembolso.ajax.modaldetalleimportereembolso', [
         'ajax' => true,
         'detalles' => $detallesImporte
     ]);  
@@ -578,4 +606,6 @@ class ValeRendirControllerReembolso extends Controller
     }
 
 }
+
+
 

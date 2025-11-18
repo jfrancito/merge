@@ -44,22 +44,37 @@ class ValeRendirController extends Controller
             ->where('dni', $dni)
             ->first();
 
-        if (!$trabajadorespla) {
-            return view('valerendir.modal.modalerrorempresa', [
-                'mensaje' => 'No puede realizar un registro porque no es la empresa a cual pertenece.',
-                'ajax' => true
-            ]);
+
+        if ($trabajadorespla) {
+            $centro_id = $trabajadorespla->centro_osiris_id;
+
+        } else {
+            $tercero = DB::table('terceros')
+                ->where('DNI', $dni)
+                ->first();
+
+            if (!$tercero) {
+                return view('valerendir.modal.modalerrorempresa', [
+                    'mensaje' => 'No puede realizar un registro porque no es la empresa a cual pertenece.',
+                    'ajax' => true
+                ]);
+            }
+            $centro_id = $tercero->COD_CENTRO;
         }
 
-        $centro_id = $trabajadorespla->centro_osiris_id;
+        $cod_centro = '';
+        $nom_centro = '';
 
-        $centrot        =   DB::table('ALM.CENTRO')
-                            ->where('COD_CENTRO', $centro_id)
-                            ->first();
+        if ($centro_id) {
+            $centro = DB::table('ALM.CENTRO')
+                ->where('COD_CENTRO', $centro_id)
+                ->first();
 
-        $cod_centro = $centrot->COD_CENTRO; 
-        $nom_centro = $centrot->NOM_CENTRO; 
-
+            if ($centro) {
+                $cod_centro = $centro->COD_CENTRO;
+                $nom_centro = $centro->NOM_CENTRO;
+            }
+        }
 
         $usuariosAu = DB::table('WEB.VALE_PERSONAL_AUTORIZA')
             ->where('COD_PERSONAL', Session::get('usuario')->usuarioosiris_id)
@@ -67,6 +82,9 @@ class ValeRendirController extends Controller
             ->where('COD_ESTADO', '!=', 0)
             ->pluck('TXT_AUTORIZA', 'COD_AUTORIZA')
             ->toArray();
+
+
+
 
         $usuariosAp =  DB::table('WEB.VALE_PERSONAL_APRUEBA')->where('cod_centro', $cod_centro)->pluck('txt_aprueba', 'cod_aprueba')->toArray();
         $tipoMotivo = WEBTipoMotivoValeRendir::where('cod_estado',1)->pluck('txt_motivo', 'cod_motivo')->toArray();
@@ -90,9 +108,42 @@ class ValeRendirController extends Controller
         $values                 =   [$nrodocumentotrab,$cod_empr];
         $datoscuentasueldo      =   DB::select('exec ListaTrabajadorCuentaSueldo ?,?',$values);   
 
-        $txt_categoria_banco = $datoscuentasueldo[0]->entidad ?? null;
-        $numero_cuenta  = $datoscuentasueldo[0]->numcuenta ?? null;
+        /*$txt_categoria_banco = $datoscuentasueldo[0]->entidad ?? null;
+        $numero_cuenta  = $datoscuentasueldo[0]->numcuenta ?? null;*/
 
+        $txt_categoria_banco = null;
+        $numero_cuenta = null;
+
+        if (!empty($datoscuentasueldo)) {
+            // Caso trabajador interno
+            $txt_categoria_banco = $datoscuentasueldo[0]->entidad ?? null;
+            $numero_cuenta = $datoscuentasueldo[0]->numcuenta ?? null;
+        } else {
+            // Caso tercero
+            $tercero = DB::table('terceros')
+                ->where('DNI', $dni)
+                ->select('txt_banco', 'txt_cuenta_corriente')
+                ->first();
+
+            if ($tercero) {
+                $txt_categoria_banco = $tercero->txt_banco;
+                $numero_cuenta = $tercero->txt_cuenta_corriente;
+            } else {
+                // Si no está en ninguno, podrías manejarlo con un mensaje o dejar nulos
+                $txt_categoria_banco = null;
+                $numero_cuenta = null;
+            }
+        }
+
+        $areacomercial = DB::table('WEB.platrabajadores')
+        ->where('situacion_id', 'PRMAECEN000000000002') // activo
+        ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+        ->where('dni', $dni)
+        ->value('cadarea');
+
+        $codlinea = DB::table('WEB.VALE_PERSONAL_AUTORIZA')
+                  ->where('COD_PERSONAL', $trabajador->COD_TRAB)
+                  ->value('COD_LINEA');
 
 
         // DETALLE - VALE A RENDIR 
@@ -121,6 +172,7 @@ class ValeRendirController extends Controller
                                 AND sub.COD_CENTRO = main.COD_CENTRO
                                 AND sub.IND_DESTINO = main.IND_DESTINO
                                 AND sub.COD_ESTADO = 1
+                                AND sub.COD_LINEA = '$codlinea'
                             FOR XML PATH(''), TYPE
                         ).value('.', 'NVARCHAR(MAX)'), 1, 2, '') AS TXT_NOM_TIPO
                     "),
@@ -134,12 +186,14 @@ class ValeRendirController extends Controller
                                 AND sub.COD_CENTRO = main.COD_CENTRO
                                 AND sub.IND_DESTINO = main.IND_DESTINO
                                 AND sub.COD_ESTADO = 1
+                                AND sub.COD_LINEA = '$codlinea'
                             FOR XML PATH(''), TYPE
                         ).value('.', 'NVARCHAR(MAX)'), 1, 2, '') AS COD_TIPO
                     ")
                 )
                 ->where('main.COD_CENTRO', $cod_centro)
                 ->where('main.COD_ESTADO', 1)
+                ->where('main.COD_LINEA', $codlinea)
                 ->groupBy(
                     'main.COD_DISTRITO',
                     'main.NOM_DISTRITO',
@@ -251,6 +305,8 @@ class ValeRendirController extends Controller
             'listarDocumentoXML_CDR' => $listarDocumentoXML_CDR,
             'valependientesrendir' => $valependientesrendir,
             'listarlistanegra' => $listarlistanegra,
+            'areacomercial' => $areacomercial,
+            'codlinea' => $codlinea,
             'ajax'=>true,   
         ]);
     }
@@ -294,7 +350,7 @@ class ValeRendirController extends Controller
             ->where('usu.id', $cod_usuario_registro)
             ->value('emp.COD_EMPR');
 
-        $trabajador     =   DB::table('STD.TRABAJADOR')
+       $trabajador     =   DB::table('STD.TRABAJADOR')
                             ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
                             ->first();
         $dni            =       '';
@@ -310,20 +366,38 @@ class ValeRendirController extends Controller
             ->where('dni', $dni)
             ->first();
 
-        if (!$trabajadorespla) {
-            return view('valerendir.modal.modalerrorempresa', [
-                'mensaje' => 'No puede realizar un registro porque no es la empresa a cual pertenece.',
-                'ajax' => true
-            ]);
+
+        if ($trabajadorespla) {
+            $centro_id = $trabajadorespla->centro_osiris_id;
+
+        } else {
+            $tercero = DB::table('terceros')
+                ->where('DNI', $dni)
+                ->first();
+                
+            $centro_id = $tercero->COD_CENTRO;
         }
 
-        $centro_id = $trabajadorespla->centro_osiris_id;
+        $cod_centro = '';
+        $nom_centro = '';
 
-        $centrot        =   DB::table('ALM.CENTRO')
-                            ->where('COD_CENTRO', $centro_id)
-                            ->first();
+        if ($centro_id) {
+            $centro = DB::table('ALM.CENTRO')
+                ->where('COD_CENTRO', $centro_id)
+                ->first();
 
-        $cod_centro = $centrot->COD_CENTRO; 
+            if ($centro) {
+                $cod_centro = $centro->COD_CENTRO;
+                $nom_centro = $centro->NOM_CENTRO;
+            }
+        }
+
+
+        $areacomercial = DB::table('WEB.platrabajadores')
+        ->where('situacion_id', 'PRMAECEN000000000002') // activo
+        ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+        ->where('dni', $dni)
+        ->value('cadarea');
 
         // ACTUALIZACIÓN
         if ($opcion === 'U') {
@@ -331,6 +405,14 @@ class ValeRendirController extends Controller
             $estado_vale = WEBValeRendir::where('id', $vale_rendir_id)->value('cod_categoria_estado_vale');
             if ($estado_vale === 'ETM0000000000005') {
                 return response()->json(['error' => 'Vale de rendir procesado correctamente.']);
+            }
+
+            if ($trabajadorespla) {
+                        $cod_personal_rendir = 'TPR0000000000001';
+                        $txt_personal_rendir = 'PLANILLA';
+            } else {
+                        $cod_personal_rendir = 'TPR0000000000002';
+                        $txt_personal_rendir = 'TERCEROS';
             }
 
             $this->insertValeRendir(
@@ -355,6 +437,8 @@ class ValeRendirController extends Controller
                 $numero_cuenta,
                 $cod_categoria_estado_vale,
                 $txt_categoria_estado_vale,
+                $cod_personal_rendir,
+                $txt_personal_rendir,
                 true,
                 ""
             );
@@ -374,6 +458,8 @@ class ValeRendirController extends Controller
                 "",
                 "",
                 0.0,
+                "",
+                "",
                 "",
                 "",
                 "",
@@ -400,10 +486,18 @@ class ValeRendirController extends Controller
                         $array['ind_destino'],
                         $array['ind_propio'],
                         $array['ind_aereo'],
+                        $array['txt_glosa_venta'],
+                        $array['txt_glosa_cobranza'],
                         true,
                         ""
                     );
                 }
+
+                if (isset($array['nom_tipos']) && stripos($array['nom_tipos'], 'COMBUSTIBLE') !== false) {
+                        DB::table('WEB.REGISTRO_IMPORTE_GASTOS')
+                            ->where('TXT_NOM_TIPO', 'COMBUSTIBLE')
+                            ->update(['CAN_TOTAL_IMPORTE' => 0]);
+                    }
             }
 
             return response()->json([
@@ -414,19 +508,38 @@ class ValeRendirController extends Controller
 
         // INSERCIÓN
         else {
-           $cod_usuario_registro = Session::get('usuario')->id;
+               $cod_usuario_registro = Session::get('usuario')->id;
 
-              $valesPendientes = $this->valependientesrendir($cod_usuario_registro);
+               $valesPendientes = $this->valependientesrendir($cod_usuario_registro);
+               $pendienteCount = count($valesPendientes);
 
-                // Cuento cuántos hay
-                $pendienteCount = count($valesPendientes);
-
-                if ($pendienteCount >= 2) {
+               /* if ($pendienteCount >= 2) {
                     return response()->json([
                         'error' => 'Usted tiene 2 o más vales pendientes por rendir. No puede generar un tercer vale.'
                     ]);
+                }*/
+
+                if ($areacomercial == 'MARKETING') {
+                    if ($pendienteCount >= 3) {
+                        return response()->json([
+                            'error' => 'Usted tiene 3 o más vales pendientes por rendir. No puede generar un cuarto vale.'
+                        ]);
+                    }
+                } else {
+                    if ($pendienteCount >= 2) {
+                        return response()->json([
+                            'error' => 'Usted tiene 2 o más vales pendientes por rendir. No puede generar un tercer vale.'
+                        ]);
+                    }
                 }
 
+                if ($trabajadorespla) {
+                        $cod_personal_rendir = 'TPR0000000000001';
+                        $txt_personal_rendir = 'PLANILLA';
+                    } else {
+                        $cod_personal_rendir = 'TPR0000000000002';
+                        $txt_personal_rendir = 'TERCEROS';
+                    }
 
             $this->insertValeRendir(
                 "I",
@@ -451,13 +564,17 @@ class ValeRendirController extends Controller
                 $numero_cuenta,
                 $cod_categoria_estado_vale,
                 $txt_categoria_estado_vale,
+                $cod_personal_rendir,
+                $txt_personal_rendir,
                 true,
                 ""
             );
 
             $cod_empr_aux = Session::get('empresas')->COD_EMPR;
+            $cod_usuario_registro_aux = Session::get('usuario')->id;
             $ultimoVale = WEBValeRendir::where('COD_EMPR', $cod_empr_aux)
                 ->where('COD_CENTRO', $cod_centro) 
+                ->where('COD_USUARIO_CREA_AUD', $cod_usuario_registro_aux)
                 ->orderBy('id', 'DESC')
                 ->first();
             if (!$ultimoVale) {
@@ -482,9 +599,17 @@ class ValeRendirController extends Controller
                             $array['ind_destino'],
                             $array['ind_propio'],
                             $array['ind_aereo'],
+                            $array['txt_glosa_venta'],
+                            $array['txt_glosa_cobranza'],
                             true,
                             ""
                         );
+
+                        if (isset($array['nom_tipos']) && stripos($array['nom_tipos'], 'COMBUSTIBLE') !== false) {
+                        DB::table('WEB.REGISTRO_IMPORTE_GASTOS')
+                            ->where('TXT_NOM_TIPO', 'COMBUSTIBLE')
+                            ->update(['CAN_TOTAL_IMPORTE' => 0]);
+                        }
                     } elseif ($opcion_detalle === 'I') {
                         $this->insertValeRendirDetalle(
                             "I",
@@ -501,9 +626,17 @@ class ValeRendirController extends Controller
                             $array['ind_destino'],
                             $array['ind_propio'],
                             $array['ind_aereo'],
+                            $array['txt_glosa_venta'],
+                            $array['txt_glosa_cobranza'],
                             true,
                             ""
                         );
+                    }
+
+                    if (isset($array['nom_tipos']) && stripos($array['nom_tipos'], 'COMBUSTIBLE') !== false) {
+                        DB::table('WEB.REGISTRO_IMPORTE_GASTOS')
+                            ->where('TXT_NOM_TIPO', 'COMBUSTIBLE')
+                            ->update(['CAN_TOTAL_IMPORTE' => 0]);
                     }
                 }
             }
@@ -528,6 +661,30 @@ class ValeRendirController extends Controller
            $txt_nom_solicita = "";
            $txt_nom_autoriza = "";
            $txt_nom_aprueba = "";
+           $trabajador     =   DB::table('STD.TRABAJADOR')
+                                    ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                                    ->first();
+                $dni            =       '';
+                $centro_id      =       '';
+
+                if ($trabajador) {
+                    $dni = $trabajador->NRO_DOCUMENTO;
+                }
+
+        $trabajadorespla = DB::table('WEB.platrabajadores')
+            ->where('situacion_id', 'PRMAECEN000000000002')
+            ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+            ->where('dni', $dni)
+            ->first();
+
+            if ($trabajadorespla) {
+                        $cod_personal_rendir = 'TPR0000000000001';
+                        $txt_personal_rendir = 'PLANILLA';
+                    } else {
+                        $cod_personal_rendir = 'TPR0000000000002';
+                        $txt_personal_rendir = 'TERCEROS';
+                    }
+
 
             $this->insertValeRendir(
                 'D', 
@@ -558,6 +715,8 @@ class ValeRendirController extends Controller
                 '',
                 $cod_categoria_estado_vale,
                 $txt_categoria_estado_vale, 
+                $cod_personal_rendir,
+                $txt_personal_rendir,
                 false,
                 Session::get('usuario')->id 
             );
@@ -590,7 +749,9 @@ class ValeRendirController extends Controller
             0.0, 
             "",
             "",  
-            "",            
+            "",  
+            "",
+            "",          
             true,
             Session::get('usuario')->id
         );
@@ -610,7 +771,7 @@ class ValeRendirController extends Controller
     public function traerdataValeRendirActionDetalle(Request $request)
     {
         $id_buscar = $request->input('valerendir_id');
-        $detalle = WEBValeRendirDetalle::where('ID', $id_buscar)->WHERE('COD_ESTADO', 1)->get(['ID', 'FEC_INICIO', 'FEC_FIN', 'COD_DESTINO', 'NOM_DESTINO', 'NOM_TIPOS', 'DIAS', 'CAN_UNITARIO', 'CAN_UNITARIO_TOTAL', 'CAN_TOTAL_IMPORTE', 'IND_DESTINO'])->toJson();
+        $detalle = WEBValeRendirDetalle::where('ID', $id_buscar)->WHERE('COD_ESTADO', 1)->get(['ID', 'FEC_INICIO', 'FEC_FIN', 'COD_DESTINO', 'NOM_DESTINO', 'NOM_TIPOS', 'DIAS', 'CAN_UNITARIO', 'CAN_UNITARIO_TOTAL', 'CAN_TOTAL_IMPORTE', 'IND_DESTINO', 'TXT_GLOSA_VENTA', 'TXT_GLOSA_COBRANZA'])->toJson();
         return $detalle;
 
     }
@@ -618,16 +779,90 @@ class ValeRendirController extends Controller
     public function actionDetalleImporteVale(Request $request)
     { 
         $id_buscar = $request->input('valerendir_id'); 
-    
-   
-    $detallesImporte = WEBValeRendirDetalle::where('ID', $id_buscar)->get(); 
 
-    return view('valerendir.ajax.modaldetalleimporte', [
-        'ajax' => true,
-        'detalles' => $detallesImporte
-    ]);  
+        
+        $vale = WEBValeRendir::where('ID', $id_buscar)->first(); // primero en lugar de get(), para tener objeto
+        $detallesImporte = WEBValeRendirDetalle::where('ID', $id_buscar)->get(); 
 
-    }   
+        
+        $fecha_inicio = $detallesImporte->min('FEC_INICIO');
+        $fecha_fin = $detallesImporte->max('FEC_FIN');
+        $cod_centro = $detallesImporte->first()->COD_CENTRO ?? null;
+        $ultimo = $detallesImporte->last();
+        $ultimo_destino = $ultimo ? $ultimo->NOM_DESTINO : '';
+        $total_dias = $detallesImporte->sum('DIAS');
+        $ruta_viaje = $detallesImporte->pluck('NOM_DESTINO')->implode('/ ');
+        $txt_glosa = $vale->TXT_GLOSA ?? null;
+        $txt_glosa_venta = $detallesImporte->pluck('TXT_GLOSA_VENTA')->filter()->implode(' // ');
+        $txt_glosa_cobranza = $detallesImporte->pluck('TXT_GLOSA_COBRANZA')->filter()->implode(' // ');
+        
+
+       $trabajador     =   DB::table('STD.TRABAJADOR')
+                            ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                            ->first();
+        $dni            =       '';
+        $centro_id      =       '';
+
+        if ($trabajador) {
+            $dni = $trabajador->NRO_DOCUMENTO;
+        }
+
+        $trabajadorespla = DB::table('WEB.platrabajadores')
+            ->where('situacion_id', 'PRMAECEN000000000002')
+            ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+            ->where('dni', $dni)
+            ->first();
+
+
+        if ($trabajadorespla) {
+            $centro_id = $trabajadorespla->centro_osiris_id;
+
+        } else {
+            $tercero = DB::table('terceros')
+                ->where('DNI', $dni)
+                ->first();
+            $centro_id = $tercero->COD_CENTRO;
+        }
+
+        $cod_centro = '';
+        $nom_centro = '';
+
+        if ($centro_id) {
+            $centro = DB::table('ALM.CENTRO')
+                ->where('COD_CENTRO', $centro_id)
+                ->first();
+
+            if ($centro) {
+                $cod_centro = $centro->COD_CENTRO;
+                $nom_centro = $centro->NOM_CENTRO;
+            }
+        }
+
+         $areacomercial = DB::table('WEB.platrabajadores')
+        ->where('situacion_id', 'PRMAECEN000000000002') // activo
+        ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+        ->where('dni', $dni)
+        ->value('cadarea');
+
+
+        
+        return view('valerendir.ajax.modaldetalleimporte', [
+            'ajax' => true,
+            'valerendir' => $vale,
+            'detalles' => $detallesImporte,
+            'fecha_inicio' => $fecha_inicio,
+            'fecha_fin' => $fecha_fin,
+            'cod_centro' => $cod_centro,
+            'ultimo_destino' => $ultimo_destino,
+            'txt_glosa' => $txt_glosa,
+            'total_dias' => $total_dias,
+            'ruta_viaje' => $ruta_viaje,
+            'txt_glosa_venta' => $txt_glosa_venta,
+            'txt_glosa_cobranza' => $txt_glosa_cobranza,
+            'areacomercial' => $areacomercial
+        ]);  
+    }
+
 
     public function actionMensajeValeRendir(Request $request)
     { 

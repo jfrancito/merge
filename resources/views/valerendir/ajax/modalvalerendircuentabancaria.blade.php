@@ -11,108 +11,154 @@
       <div class="panel-body panel-body-contrast" id="form_cuenta" style="display:none;">
           <div class="container" style="margin-top:15px;">
                   <div class="row mt-4">
-                      <div class="col-md-3 col-lg-2">
-                          <label for="tipo_pago" class="form-label fw-bold">Tipo de Pago :</label>
-                          {!! Form::select('tipo_pago', $listausuarios5, '',
-                                 [
-                                   'class'       => 'form-select select2',
-                                   'id'          => 'tipo_pago',
-                                   'data-aw'     => '1',
-                                 ])
-                          !!}
-                      </div>
+                    
+                        <div class="col-md-3 col-lg-3">
+                          <div class="form-group">
+                            <label for="tipo_pago" class="control-label labelleft negrita">
+                              TIPO DE PAGO <span class="obligatorio">(*)</span> :
+                            </label>
+                            {!! Form::select('tipo_pago', $listausuarios5, '',
+                              [
+                                'class' => 'form-select select2',
+                                'id' => 'tipo_pago',
+                                'data-aw' => '1',
+                                'style' => 'width:100%;'
+                              ])
+                            !!}
+                          </div>
+                        </div>
+
                     <div class="col-md-4 col-lg-3" id="grupo_entidad">
-                        <label class="form-label fw-bold">Entidad Financiera :</label>
+                        <label class="form-label fw-bold labelleft negrita">
+                                        ENTIDAD FINANCIERA <span class="obligatorio">(*)</span> :
+                         </label>
                         <input type="text" 
                                name="txt_categoria_banco" 
                                id="txt_categoria_banco"
                                value="{{ $txt_categoria_banco }}" 
                                data-valor="{{ $txt_categoria_banco }}"
-                               class="form-control bg-light" readonly>
+                               class="form-control bg-light" readonly
+                               autocomplete="off">
                     </div>
 
                     <div class="col-md-4 col-lg-3" id="grupo_cuenta">
-                        <label class="form-label fw-bold">Cuenta Bancaria :</label>
+                       <label class="form-label fw-bold labelleft negrita">
+                                        CUENTA BANCARIA <span class="obligatorio">(*)</span> :
+                         </label>
                         <input type="text" 
                                name="numero_cuenta" 
                                id="numero_cuenta"
                                value="{{ $numero_cuenta }}" 
                                data-valor="{{ $numero_cuenta }}"
-                               class="form-control bg-light" readonly>
+                               class="form-control bg-light" readonly
+                               autocomplete="off"
+                               pattern="[0-9]*">
                     </div>
 
 
-                      <div class="col-md-4 col-lg-3">
-                          <label for="txt_glosa" class="form-label fw-bold">Glosa :</label>
-                          <textarea id="txt_glosa" name="glosa" placeholder="Glosa" required
-                                    class="form-control" rows="2"></textarea>
-                      </div>
+                    <div class="col-md-4 col-lg-3">
+                      <label for="txt_glosa" class="form-label fw-bold labelleft negrita">OBJETIVO Y ACTIVIDADES A REALIZAR <span class="obligatorio">(*)</span>:</label>
+                            <textarea id="txt_glosa" name="glosa" placeholder="Objetivo y Actividades a Realizar" required
+                                      class="form-control w-100" rows="4"></textarea>
+                   </div>
                   </div>
           </div>
 
-          <div class="row xs-pt-15 mt-3" style="margin-bottom: 15px;">
+      {{-- <div class="row xs-pt-15 mt-3" style="margin-bottom: 15px;">
               <div class="col-xs-6"></div>
               <div class="col-xs-6 text-right">
                    <button id="asignarvalerendir" type="button" class="btn btn-primary">
                        EMITIR VALE
                    </button>
               </div>
-          </div>
+          </div> --}}
       </div>
     </div>
 
 
 <script>
-  $(document).ready(function() {
+ $(document).ready(function() {
 
-     
-      $(".agregar_cuenta_bancaria").on("click", function() {
-          $("#form_cuenta").slideToggle("fast");
+    // --- Tu código existente ---
+    $(".agregar_cuenta_bancaria").on("click", function() {
+        $("#form_cuenta").slideToggle("fast");
+        if ($(this).text().trim() === "Agregar Cuenta") {
+            $(this).text("Ocultar");
+        } else {
+            $(this).text("Agregar Cuenta");
+        }
+    });
 
-          if ($(this).text().trim() === "Agregar Cuenta") {
-              $(this).text("Ocultar");
-          } else {
-              $(this).text("Agregar Cuenta");
-          }
-      });
+    function toggleCamposPago() {
+        var tipo = $("#tipo_pago").val();
 
-      function toggleCamposPago() {
-          var tipo = $("#tipo_pago").val();
+        if (tipo == "0") { // EFECTIVO
+            $("#grupo_entidad, #grupo_cuenta").hide();
+            $("input[name='txt_categoria_banco']").val('');
+            $("input[name='numero_cuenta']").val('');
+        } 
+        else if (tipo == "1") { // TRANSFERENCIA
+            $("#grupo_entidad, #grupo_cuenta").show();
 
-          if (tipo == "0") { // EFECTIVO
-              $("#grupo_entidad, #grupo_cuenta").hide();
+            if ($("input[name='txt_categoria_banco']").val() === '') {
+                $("input[name='txt_categoria_banco']").val(
+                    $("input[name='txt_categoria_banco']").data("valor")
+                );
+            }
+            if ($("input[name='numero_cuenta']").val() === '') {
+                $("input[name='numero_cuenta']").val(
+                    $("input[name='numero_cuenta']").data("valor")
+                );
+            }
+        } 
+        else {
+            $("#grupo_entidad, #grupo_cuenta").hide();
+        }
+    }
 
-              // limpiar campos
-              $("input[name='txt_categoria_banco']").val('');
-              $("input[name='numero_cuenta']").val('');
-          } 
-          else if (tipo == "1") { // TRANSFERENCIA
-              $("#grupo_entidad, #grupo_cuenta").show();
+   
+    function toggleCamposMoneda() {
+        var codMoneda = $("#cod_moneda").val();
 
-              // restaurar valores originales solo si están vacíos
-              if ($("input[name='txt_categoria_banco']").val() === '') {
-                  $("input[name='txt_categoria_banco']").val(
-                      $("input[name='txt_categoria_banco']").data("valor")
-                  );
-              }
-              if ($("input[name='numero_cuenta']").val() === '') {
-                  $("input[name='numero_cuenta']").val(
-                      $("input[name='numero_cuenta']").data("valor")
-                  );
-              }
-          } 
-          else {
-              $("#grupo_entidad, #grupo_cuenta").hide();
-          }
-      }
+       
+      if (codMoneda === "MON0000000000001") { 
+       
+        $("#txt_categoria_banco").val($("#txt_categoria_banco").data("valor"));
+        $("#numero_cuenta").val($("#numero_cuenta").data("valor"));
 
-      
-      toggleCamposPago();
+        $("#txt_categoria_banco, #numero_cuenta")
+            .prop("readonly", true)
+            .addClass("bg-light");
+       } 
+      else if (codMoneda === "MON0000000000002") { 
+        
+        $("#txt_categoria_banco, #numero_cuenta")
+            .val('')
+            .prop("readonly", false)
+            .removeClass("bg-light");
+      } 
+      else {
+        
+        $("#txt_categoria_banco").val($("#txt_categoria_banco").data("valor"));
+        $("#numero_cuenta").val($("#numero_cuenta").data("valor"));
 
-     
-      $("#tipo_pago").on("change", function() {
-          toggleCamposPago();
-      });
+        $("#txt_categoria_banco, #numero_cuenta")
+            .prop("readonly", true)
+            .addClass("bg-light");
+      } 
+    }
 
-  });
+    $("#numero_cuenta").on("input", function() {
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
+
+    toggleCamposPago();
+    toggleCamposMoneda();
+
+    $("#tipo_pago").on("change", toggleCamposPago);
+    $("#cod_moneda").on("change", toggleCamposMoneda);
+
+});
+
 </script>
+

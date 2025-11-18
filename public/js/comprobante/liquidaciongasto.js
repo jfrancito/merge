@@ -5,6 +5,21 @@ $(document).ready(function () {
 
     //nuevo
 
+
+    $(".liquidaciongasto").on('click','.btncuadrocomparativo', function() {
+        // debugger;
+        var _token                                   =   $('#token').val();
+        let id_documento                             =   $(this).attr("data_id");
+        var idopcion                                 =   $('#idopcion').val();
+        data                                          =   {
+                                                                _token                  : _token,
+                                                                id_documento            : id_documento,
+                                                                idopcion                : idopcion
+                                                            };
+        ajax_modal(data,"/ajax-modal-lista-comparativa",
+                  "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+
+    });
     $("#fecha_asiento").on('change', function (e) {
 
         let fecha = $('#fecha_asiento').val();
@@ -1618,7 +1633,7 @@ $(document).ready(function () {
         var _token = $('#token').val();
         var entidadbanco_id = $(this).val();
         var ID_DOCUMENTO = $('#ID_DOCUMENTO').val();
-
+        debugger;
         $.ajax({
             type: "POST",
             url: carpeta + "/ajax-cuenta-bancaria-proveedor-lq",
@@ -2573,6 +2588,23 @@ $(document).ready(function () {
 
     });
 
+    $('.btnobservarcomporbatntemv').on('click', function (event) {
+        event.preventDefault();
+        $.confirm({
+            title: '¿Confirma la Observacion?',
+            content: 'Observacion el Comprobante',
+            buttons: {
+                confirmar: function () {
+                    $("#formpedidoobservar").submit();
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo la Observacion');
+                }
+            }
+        });
+
+    });
+
     $('.btnobservarcomporbatnte').on('click', function (event) {
         event.preventDefault();
 
@@ -2748,11 +2780,23 @@ $(document).ready(function () {
         var arendir_id = $('#arendir_id').val();
         var idopcion = $('#idopcion').val();
         var _token = $('#token').val();
+
+        var moneda_sel_c_id = $('#moneda_sel_c_id').val(); 
+
+        if(arendir_id == 'VALE'){
+            if (moneda_sel_c_id == '') {
+                $('#arendir_id').val('').trigger('change');
+                alerterrorajax("Selecciona una Moneda");
+                return false;
+            }   
+        }   
+
         var link = "/ajax-combo-arendir";
         var contenedor = "ajax_combo_arendir";
         data = {
             _token: _token,
             arendir_id: arendir_id,
+            moneda_sel_c_id: moneda_sel_c_id,
             idopcion: idopcion
         };
         ajax_normal_combo(data, link, contenedor);
@@ -2803,7 +2847,7 @@ $(document).ready(function () {
             $('#subcuenta_id').prop('disabled', true);
             $('.sectorplanilla').show();
             $('.sectorxml').hide();
-
+            $('.sectorotrotipo').hide();
             //$('.sectorxmlmodal').show();
             //$('.DCC0000000000036').show();
 
@@ -2826,6 +2870,11 @@ $(document).ready(function () {
                 $('.sectorplanilla').hide();
                 $('.sectorxml').hide();
                 $('.sectorxmlmodal').show();
+                $('.sectorotrotipo').show();
+
+
+
+
                 $('.DCC0000000000036').show();
             }
         }
@@ -3186,6 +3235,14 @@ $(document).ready(function () {
             }
 
             var producto_id_factura = $('#producto_id_factura').val();
+
+            if (producto_id_factura == "SERVICIO DE TRANSPORTE AEREO") {
+                    alerterrorajax("Este Producto solo se debe subir con ticket.");
+                    cerrarcargando();
+                    return false;
+            }
+
+
             var igv_id_factura = $('#igv_id_factura').val();
             var ESTADOCP = $('#ESTADOCP').val();
             var ESTADORUC = $('#ESTADORUC').val();
@@ -3213,12 +3270,27 @@ $(document).ready(function () {
         } else {
 
             if (tipodoc_id != 'TDO0000000000070') {
+
                 let comprobante = $('#file-DCC0000000000036')[0].files.length > 0;
                 if (!comprobante) {
                     alerterrorajax("Debe subir el comprobante electronico.");
                     cerrarcargando();
                     return false;
                 }
+
+                var producto_id_factura = $('#producto_id_factura').val();
+                var igv_id_factura = $('#igv_id_factura').val();
+                if (producto_id_factura == '') {
+                    alerterrorajax("Seleccione un Producto.");
+                    cerrarcargando();
+                    return false;
+                }
+                if (igv_id_factura == '') {
+                    alerterrorajax("Seleccione si es Afecto");
+                    cerrarcargando();
+                    return false;
+                }
+
             }
 
         }

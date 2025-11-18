@@ -4,13 +4,11 @@
         <tr>
             <th class="col">ID</th>
             <th class="col">Autoriza</th>
-            <th class="col">Aprueba</th>
             <th class="col">Motivo</th>
             <th class="col">Importe</th>
             <th class="col">Saldo</th>
             <th class="col">Glosa</th>  
             <th class="col">Estado Merge</th>  
-            <th class="col">Estado Osiris</th>
             <th class="col">Ver Detalle</th>  
             <th class="col">Anular</th>  
 
@@ -19,10 +17,9 @@
     </thead>
     <tbody>
         @foreach($listarusuarios as $index=>$item)  
-        <tr class="dobleclickpc" data_vale_rendir="{{$item['ID']}}" style="cursor:pointer;">
+        <tr class="dobleclickpc" data_vale_rendir_reembolso="{{$item['ID']}}" style="cursor:pointer;">
             <td>{{$item['ID']}}</td>
             <td>{{$item['USUARIO_AUTORIZA']}}</td>
-            <td>{{$item['USUARIO_APRUEBA']}}</td>
             <td>{{$item['TIPO_MOTIVO']}}</td>
             <td>{{$item['COD_MONEDA'] == 'MON0000000000001' ? 'S/.' : '$' }} {{ $item['CAN_TOTAL_IMPORTE'] }}</td>
             <td>{{$item['COD_MONEDA'] == 'MON0000000000001' ? 'S/.' : '$' }} {{ $item['CAN_TOTAL_SALDO'] }}</td>
@@ -39,16 +36,6 @@
                     <span class="badge badge-danger">{{$item['TXT_CATEGORIA_ESTADO_VALE']}}</span>
                 @else
                      <span class="badge badge-custom-danger">{{$item['TXT_CATEGORIA_ESTADO_VALE']}}</span>                        
-                @endif
-            </td>
-
-            <td>   
-                @if($item['ESTADO_OSIRIS'] === 'GENERADO')
-                    <span class="badge bg-white text-dark">GENERADO</span>
-                @elseif($item['ESTADO_OSIRIS'] === 'COBRADO')
-                    <span class="badge badge-success">COBRADO</span>
-                @elseif($item['ESTADO_OSIRIS'] === 'RECHAZADO')
-                     <span class="badge badge-custom-danger">RECHAZADO</span>
                 @endif
             </td>
 
@@ -82,7 +69,7 @@
 
                             @if(!in_array($item['TIPO_MOTIVO'], $motivosPermitidos))
                           
-                             <a class="dropdown-item verdetalleimporte-valerendir-vale d-flex align-items-center" href="#">
+                             <a class="dropdown-item verdetalleimporte-valerendir-vale-reembolso d-flex align-items-center" href="#">
                                <i class="mdi mdi-check-circle-outline text-success mr-2"></i> Detalle Importe Gastos
                             </a>
                             @endif

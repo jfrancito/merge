@@ -285,7 +285,7 @@ trait GeneralesTraits
     {
 
         $array = User::where('activo', '=', 1)
-            ->where('id', '<>', '1CIX00000001')
+            //->where('id', '<>', '1CIX00000001')
             ->where('id', '=', $usuario_id)
             ->where('rol_id', '<>', '1CIX00000024')
             ->orderBy('nombre', 'asc')
@@ -324,6 +324,33 @@ trait GeneralesTraits
     }
 
 
+    public function gn_combo_arendir_restante_impulso()
+    {
+
+        $liquidaciones = DB::table('LQG_LIQUIDACION_GASTO')
+                        ->where('ACTIVO', 1)
+                        ->where('COD_ESTADO', '<>', 'ETM0000000000006')
+                        ->where('USUARIO_CREA', Session::get('usuario')->id)
+                        ->pluck('ARENDIR_ID')
+                        ->toArray();
+
+        $array    =     DB::table('SEMANA_IMPULSO')
+                        ->where('COD_TRABAJADOR', Session::get('usuario')->usuarioosiris_id)
+                        ->where('COD_ESTADO', 'ETM0000000000005')
+                        ->whereNotIn('ID_DOCUMENTO', $liquidaciones)
+                        ->select(
+                            'ID_DOCUMENTO',
+                            DB::raw("CAST(FECHA_CREA AS VARCHAR) + ' / ' + ID_DOCUMENTO + ' / ' + CAST(MONTO AS VARCHAR) AS MONTO")
+                        )
+                        ->orderBy('ID_DOCUMENTO', 'asc')
+                        ->pluck('MONTO', 'ID_DOCUMENTO')
+                        ->toArray();
+
+        $combo = array('' => 'Seleccione un arendir') + $array;
+        return $combo;
+    }
+
+
 
     public function gn_combo_arendir_restante()
     {
@@ -353,9 +380,16 @@ trait GeneralesTraits
     }
 
 
-    public function gn_combo_arendir_restante_nuevo()
+    public function gn_combo_arendir_restante_nuevo($moneda_sel_c_id)
     {
 
+
+    $liquidaciones = DB::table('LQG_LIQUIDACION_GASTO')
+                    ->where('ACTIVO', 1)
+                    ->where('COD_ESTADO', '<>', 'ETM0000000000006')
+                    ->where('USUARIO_CREA', Session::get('usuario')->id)
+                    ->pluck('ARENDIR_ID')
+                    ->toArray();
 
     $array =   WEBValeRendir::from('WEB.VALE_RENDIR as VR')
                     ->join('TES.AUTORIZACION as AUT', 'VR.ID_OSIRIS', '=', 'AUT.COD_AUTORIZACION')
@@ -363,6 +397,8 @@ trait GeneralesTraits
                     ->join('CMP.DOCUMENTO_CTBLE as DOC', 'AUD.COD_DOC_CTBLE', '=', 'DOC.COD_DOCUMENTO_CTBLE')
                     ->where('VR.COD_USUARIO_CREA_AUD',Session::get('usuario')->id)
                     ->where('DOC.CAN_SALDO', '>', 0)
+                    ->where('COD_MONEDA',$moneda_sel_c_id)
+                    ->whereNotIn('ID', $liquidaciones)
                     ->where('DOC.COD_CATEGORIA_TIPO_DOC', 'TDO0000000000072')
                     ->select(
                         'VR.ID',
@@ -373,11 +409,11 @@ trait GeneralesTraits
                     ->pluck('MONTO', 'VR.ID')
                     ->toArray();
 
-
-
         $combo = array('' => 'Seleccione un arendir') + $array;
         return $combo;
     }
+
+
 
 
 
@@ -675,26 +711,60 @@ trait GeneralesTraits
     private function buscar_archivo_sunat($urlxml, $fetoken)
     {
 
-        $array_nombre_archivo = array();
+
         $curl = curl_init();
+
         curl_setopt_array($curl, array(
             CURLOPT_URL => $urlxml,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 15, // 👈 máximo 10 segundos para la respuesta
-            CURLOPT_CONNECTTIMEOUT => 10, // 👈 máximo 5 segundos para conectar
-
+            CURLOPT_TIMEOUT => 15, // máximo 15 segundos para la respuesta
+            CURLOPT_CONNECTTIMEOUT => 10, // máximo 10 segundos para conectar
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'GET',
             CURLOPT_HTTPHEADER => array(
-                'Authorization: Bearer ' . $fetoken->TOKEN
+                'Accept: application/json, text/plain, */*',
+                'Accept-Encoding: gzip, deflate, br, zstd',
+                'Accept-Language: es-ES,es;q=0.9',
+                'Origin: https://e-factura.sunat.gob.pe',
+                'Referer: https://e-factura.sunat.gob.pe/',
+                'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+                    . 'AppleWebKit/537.36 (KHTML, like Gecko) '
+                    . 'Chrome/141.0.0.0 Safari/537.36',
+                'Authorization: Bearer '.$fetoken->TOKEN
             ),
         ));
         $response = curl_exec($curl);
         curl_close($curl);
         $response_array = json_decode($response, true);
+
+
+
+
+        // $array_nombre_archivo = array();
+        // $curl = curl_init();
+        // curl_setopt_array($curl, array(
+        //     CURLOPT_URL => $urlxml,
+        //     CURLOPT_RETURNTRANSFER => true,
+        //     CURLOPT_ENCODING => '',
+        //     CURLOPT_MAXREDIRS => 10,
+        //     CURLOPT_TIMEOUT => 15, // 👈 máximo 10 segundos para la respuesta
+        //     CURLOPT_CONNECTTIMEOUT => 10, // 👈 máximo 5 segundos para conectar
+
+        //     CURLOPT_FOLLOWLOCATION => true,
+        //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        //     CURLOPT_CUSTOMREQUEST => 'GET',
+        //     CURLOPT_HTTPHEADER => array(
+        //         'Authorization: Bearer eyJraWQiOiJhcGkuc3VuYXQuZ29iLnBlLmtpZDAwMSIsInR5cCI6IkpXVCIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIyMDYwMjc0MDI3OCIsImF1ZCI6Ilt7XCJhcGlcIjpcImh0dHBzOlwvXC9hcGktY3BlLnN1bmF0LmdvYi5wZVwiLFwicmVjdXJzb1wiOlt7XCJpZFwiOlwiXC92MVwvY29udHJpYnV5ZW50ZVwvY29uc3VsdGFjcGVcIixcImluZGljYWRvclwiOlwiMVwiLFwiZ3RcIjpcIjEwMDEwMFwifSx7XCJpZFwiOlwiXC92MVwvY29udHJpYnV5ZW50ZVwvcGFyYW1ldHJvc1wiLFwiaW5kaWNhZG9yXCI6XCIxXCIsXCJndFwiOlwiMTAwMTAwXCJ9XX1dIiwidXNlcmRhdGEiOnsibnVtUlVDIjoiMjA2MDI3NDAyNzgiLCJ0aWNrZXQiOiIxMjk0MTUxMDU0ODI1IiwibnJvUmVnaXN0cm8iOiIiLCJhcGVNYXRlcm5vIjoiIiwibG9naW4iOiIyMDYwMjc0MDI3OFNJU1RFTTAyIiwibm9tYnJlQ29tcGxldG8iOiJJTkRVQU1FUklDQSBJTlRFUk5BQ0lPTkFMIFMuQS5DLiIsIm5vbWJyZXMiOiJJTkRVQU1FUklDQSBJTlRFUk5BQ0lPTkFMIFMuQS5DLiIsImNvZERlcGVuZCI6IjAwMTEiLCJjb2RUT3BlQ29tZXIiOiIiLCJjb2RDYXRlIjoiIiwibml2ZWxVTyI6MCwiY29kVU8iOiIiLCJjb3JyZW8iOiIiLCJ1c3VhcmlvU09MIjoiU0lTVEVNMDIiLCJpZCI6IiIsImRlc1VPIjoiIiwiZGVzQ2F0ZSI6IiIsImFwZVBhdGVybm8iOiIiLCJpZENlbHVsYXIiOm51bGwsIm1hcCI6eyJpc0Nsb24iOmZhbHNlLCJkZHBEYXRhIjp7ImRkcF9udW1ydWMiOiIyMDYwMjc0MDI3OCIsImRkcF9udW1yZWciOiIwMDExIiwiZGRwX2VzdGFkbyI6IjAwIiwiZGRwX2ZsYWcyMiI6IjAwIiwiZGRwX3ViaWdlbyI6IjE1MDEzMSIsImRkcF90YW1hbm8iOiIwMSIsImRkcF90cG9lbXAiOiIzOSIsImRkcF9jaWl1IjoiNTEyMjUifSwiaWRNZW51IjoiMTI5NDE1MTA1NDgyNSIsImpuZGlQb29sIjoicDAwMTEiLCJ0aXBVc3VhcmlvIjoiMSIsInRpcE9yaWdlbiI6IklUIiwicHJpbWVyQWNjZXNvIjp0cnVlfX0sIm5iZiI6MTc2MTA3NzQ3MCwiY2xpZW50SWQiOiJjZDhlN2FmYi1hMGUyLTQyMTctOTE4Ny04ODIwNmU0YmE3YWYiLCJpc3MiOiJodHRwczpcL1wvYXBpLXNlZ3VyaWRhZC5zdW5hdC5nb2IucGVcL3YxXC9jbGllbnRlc3NvbFwvY2Q4ZTdhZmItYTBlMi00MjE3LTkxODctODgyMDZlNGJhN2FmXC9vYXV0aDJcL3Rva2VuXC8iLCJleHAiOjE3NjEwODEwNzAsImdyYW50VHlwZSI6ImF1dGhvcml6YXRpb25fdG9rZW4iLCJpYXQiOjE3NjEwNzc0NzB9.IykzCt533iYTkoe7purPZ0nrBYV8NYsF0Hnw03UAfH1NNfimJVlY0mIDpHqNAlIN4ZvP_MItyv_rXFZdp26cgOA_sJptwJ3h7j4rDibqA_FXEXKZVRqWovuDDnozrAhCKwn4W6q6GFxvTMpsy856K2aKdJKVwS4nOQphSseeo4ajQL6F1dXimhtVcwCZP7IhVkNa8pr0dwpg2z2XVbSGVjqODMnOg30BDmgTpwJnejm_-hnTAWM2YLvs1NgrJjVi4OhoysQxGMw2JV23OTGTYQzoZpfZ8gDTxs6Kr7yx-9K-3vp1SVZQ5vo-k-PpwfJoiPSMXvGeZY7WU2uQWBBlAg'
+        //     ),
+        // ));
+        // $response = curl_exec($curl);
+        // curl_close($curl);
+        // $response_array = json_decode($response, true);
+
+        //dd($response_array);
 
         if (!isset($response_array['nomArchivo'])) {
             $array_nombre_archivo = [
@@ -1182,6 +1252,87 @@ trait GeneralesTraits
 
         return $combo;
     }
+
+    private function gn_generacion_combo_impulso($area_id,$centro_id,$titulo, $todo)
+    {
+        //dd();
+        $array = DB::table('CONFIGURACION_IMPULSO')
+            ->where('ACTIVO', 1)
+            ->select(
+                DB::raw("ID_CONFIGURACION"),
+                DB::raw("CAST(CATEGORIA_TXT AS varchar(3)) + ' - ' + CAST(MONTO AS varchar(10)) AS CATEGORIA_TXT")
+            )
+            ->where('CENTRO_ID','=',$centro_id)
+            ->where('AREA_ID','=',$area_id)
+            ->where('ID_CONFIGURACION','!=','CFG000000000007')
+            ->pluck('CATEGORIA_TXT', 'ID_CONFIGURACION')
+
+            ->toArray();
+
+        if ($todo == 'TODO') {
+            $combo = array('' => $titulo, $todo => $todo) + $array;
+        } else {
+            $combo = array('' => $titulo) + $array;
+        }
+
+        return $combo;
+    }
+    private function gn_generacion_combo_impulso_vendedor($area_id,$centro_id,$titulo, $todo,$usuario)
+    {
+        //dd();
+        $array = DB::table('CONFIGURACION_IMPULSO')
+            ->where('ACTIVO', 1)
+            ->select(
+                DB::raw("ID_CONFIGURACION"),
+                DB::raw("CAST(CATEGORIA_TXT AS varchar(3)) + ' - ' + CAST(MONTO AS varchar(10)) AS CATEGORIA_TXT")
+            )
+            ->where('CENTRO_ID','=',$centro_id)
+            ->where('AREA_TXT','=',$area_id)
+            ->where('ID_CONFIGURACION','!=','CFG000000000007')
+            ->where(function($query) use ($usuario) {
+                $query->whereNull('COD_JEFE_VENTA')
+                      ->orWhere('COD_JEFE_VENTA', $usuario);
+            })
+            ->pluck('CATEGORIA_TXT', 'ID_CONFIGURACION')
+            ->toArray();
+
+        if ($todo == 'TODO') {
+            $combo = array('' => $titulo, $todo => $todo) + $array;
+        } else {
+            $combo = array('' => $titulo) + $array;
+        }
+
+        return $combo;
+    }
+
+
+
+    private function gn_generacion_combo_semana($titulo, $todo)
+    {
+
+        $array = DB::table('TES.CALENDARIO_SEMANA')
+            ->where('COD_ESTADO', 1)
+            ->select(
+                DB::raw("CAST(ANIO AS varchar(4)) + ' - ' + CAST(NRO_SEMANA AS varchar(10)) AS COD_SEMANA"),
+                DB::raw("CONVERT(varchar(10), FEC_INI, 103) + ' - ' + CONVERT(varchar(10), FEC_FIN, 103) AS SEMANA")
+            )
+            ->whereRaw('YEAR(GETDATE()) >= YEAR(FEC_INI)')
+            ->whereRaw('MONTH(GETDATE()) >= MONTH(FEC_INI)')
+            ->orderBy('ANIO','desc')
+            ->orderBy('NRO_SEMANA','desc')
+            ->pluck('SEMANA', 'COD_SEMANA')
+            ->toArray();
+
+
+        if ($todo == 'TODO') {
+            $combo = array('' => $titulo, $todo => $todo) + $array;
+        } else {
+            $combo = array('' => $titulo) + $array;
+        }
+
+        return $combo;
+    }
+
 
 
     private function gn_generacion_combo_direccion_lg($titulo, $todo)

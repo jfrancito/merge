@@ -2305,6 +2305,8 @@ trait ComprobanteTraits
                             }
                             if(isset($datares['condDomiRuc'])){
                                 $tablaestaDomiRuc       = Estado::where('tipo','=','condDomiRuc')->where('codigo','=',$datares['condDomiRuc'])->first();
+                                if($datares['condDomiRuc']=='-'){$datares['condDomiRuc']='00';}
+                                
                                 $estadoDomiRuc          = $tablaestaDomiRuc->codigo;
                                 $txtestadoDomiRuc       = $tablaestaDomiRuc->nombre;
                             }
@@ -7437,9 +7439,10 @@ trait ComprobanteTraits
         $doc                    =   CMPDetalleProducto::where('COD_TABLA','=',$idoc)
                                     ->where('COD_ESTADO','=',1)                                    
                                     ->get();
+        return  $doc;                 
 
-        return  $doc;
     }
+
 
     private function con_lista_detalle_comprobante_idoc_actual_af($idoc) {
 

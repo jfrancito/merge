@@ -229,6 +229,373 @@ $(document).ready(function(){
         });
 
 
+          $(".valerendirprincipal").on('dblclick', '.dobleclickpc', function (e) {
+            let _token = $('#token').val();
+            let valerendir_id = $(this).attr('data_vale_rendir_reembolso');
+
+            $.ajax({
+                type: "POST",
+                url: carpeta + "/data_vale_rendir_reembolso",
+                data: {
+                    _token: _token,
+                    valerendir_id: valerendir_id
+                },
+                success: function (data) {
+                    let data_left = JSON.parse(data);
+                    let estadoVale = data_left["0"]["TXT_CATEGORIA_ESTADO_VALE"];
+
+                    if (estadoVale !== 'GENERADO') {
+                        alerterrorajax('Solo se puede modificar un Vale de Rendir con estado "GENERADO".');
+                        return;
+                    }
+
+                    // Cargar cabecera
+                    $('#cliente_select').val(data_left["0"]["USUARIO_AUTORIZA"]).trigger('change');
+                    $('#cliente_select1').val(data_left[0].USUARIO_APRUEBA ?? '').trigger('change');
+                    $('#tipo_motivo').val(data_left["0"]["TIPO_MOTIVO"]).trigger('change');
+                    $('#can_total_importe').val(data_left["0"]["CAN_TOTAL_IMPORTE"]);
+                    $('#can_total_saldo').val(data_left["0"]["CAN_TOTAL_SALDO"]);
+                    $('#txt_glosa').val(data_left["0"]["TXT_GLOSA"]);
+                    $('#cod_moneda').val(data_left["0"]["COD_MONEDA"]).trigger('change'); 
+                    $('#vale_rendir_id').val(valerendir_id);
+                    $('#btntexto').text('Modificar');
+
+                    $.ajax({
+                        type: "POST",
+                        url: carpeta + "/data_vale_rendir_detalle_reembolso",
+                        data: {
+                            _token: _token,
+                            valerendir_id: valerendir_id
+                        },
+                        success: function (data) {
+                            let data_left = JSON.parse(data);
+                            $('#data_vale_rendir_detalle_reembolso tbody').empty();
+
+                            data_left.forEach(function (item) {
+                                let fec_inicio = item.FEC_INICIO ? item.FEC_INICIO.replace(".000", "") : "";
+                                let fec_fin    = item.FEC_FIN    ? item.FEC_FIN.replace(".000", "") : "";
+                                let row = '<tr data-id="' + item.ID + '" data-cod-destino="' + item.COD_DESTINO + '">';
+                                row += '<td data-fecha="' + fec_inicio + '">' + fec_inicio + '</td>';
+                                row += '<td data-fecha="' + fec_fin + '">' + fec_fin + '</td>';
+                                row += '<td>' + item.NOM_DESTINO + '</td>';
+                                row += '<td>' + item.NOM_TIPOS + '</td>';
+                                row += '<td>' + item.DIAS + '</td>';
+                                row += '<td>' + item.CAN_UNITARIO + '</td>';
+                                row += '<td>' + item.CAN_UNITARIO_TOTAL + '</td>';
+                                row += '<td>' + ((parseFloat(item.CAN_TOTAL_IMPORTE) || 0).toFixed(2)) + '</td>';
+                                row += '<td><button type="button" class="btn btn-danger btn-sm eliminarFila" data-id-detalle="' + item.ID + '"><i class="fa fa-trash"></i></button></td>';
+                                row += '</tr>';
+                                $('#tabla_vale_rendir_detalle tbody').append(row);
+                            });
+
+                            $('#detalle_id').val(valerendir_id);
+                            $('#asignarvalerendir').text('Modificar');
+                        },
+                        error: function (data) {
+                            error500(data);
+                        }
+                    });
+                },
+                error: function (data) {
+                    error500(data);
+                }
+            });
+        });
+
+
+
+        $(".valerendirprincipal").on('click', '.delete-valerendir', function(e) {
+            e.preventDefault();
+            
+            var valerendir_id = $(this).closest('tr').attr('data_vale_rendir_reembolso');
+            var _token = $('#token').val();
+
+            $.ajax({
+                type: "POST",
+                url: carpeta + "/eliminar_vale_rendir",
+                data: {
+                    _token: _token,
+                    valerendir_id: valerendir_id
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $.ajax({
+                            type: "GET",
+                            url: carpeta + "/rechazar_correo_generado",
+                            data: {
+                                valerendir_id: valerendir_id
+                            },
+                            success: function () {
+                                console.log('Correo de eliminación enviado correctamente.');
+                            },
+                            error: function () {
+                                console.warn('Error al enviar el correo de eliminación.');
+                            }
+                        });
+
+                        location.reload();
+
+                    } else {
+                        alerterrorajax('Error al eliminar el vale de rendir.');
+                    }
+                },
+                error: function(data) {
+                    alerterrorajax('Error al eliminar el vale de rendir.');
+                }
+            });
+        });
+
+
+        // DETALLE
+        $('#tabla_vale_rendir_detalle').on('click', '.eliminarFila', function () {
+            let _token = $('#token').val();
+            let id_detalle = $(this).data('id-detalle');
+                let cod_destino = $(this).data('cod-destino');
+
+            $.ajax({
+                type: "POST",
+                url: carpeta + "/eliminar_vale_rendir_detalle",
+                data: {
+                    _token: _token,
+                    id_detalle: id_detalle,
+                    cod_destino: cod_destino
+                },
+                success: function (data) {
+                    // Elimina visualmente la fila si el backend responde correctamente
+                    if (data.success) {
+                        alertajax(data.success);
+                       $('tr[data-id="' + id_detalle + '"][data-cod-destino="' + cod_destino + '"]').remove();
+                         actualizarTotalImporte(); 
+                    } else {
+                        alerterrorajax('Ocurrió un error al eliminar el detalle.');
+                    }
+                },
+                error: function (data) {
+                    error500(data);
+                }
+             });
+        });
+
+
+
+        $('#tabla_vale_rendir_detalle').on('click', '.eliminarFila', function () {
+            $(this).closest('tr').remove();
+            actualizarTotalImporte();
+        });
+
+       $(".valerendirprincipal").on('click', '.rechazar-valerendir', function(e) {
+            e.preventDefault();
+            
+            var valerendir_id = $(this).closest('tr').attr('data_vale_rendir_reembolso');
+                $('#rechazoModal').data('valerendir-id', valerendir_id);
+                $('#rechazoModal').modal('show');
+        });
+
+        $('#confirmRechazo').on('click', function() {
+            var valerendir_id = $('#rechazoModal').data('valerendir-id');
+            var motivo_rechazo = $('#motivoRechazo').val().trim();  
+
+                if (motivo_rechazo === '') {
+                    alerterrorajax('Por favor ingrese un motivo de rechazo.');
+                    return;
+                }
+
+            var _token = $('#token').val();     
+
+
+            $.ajax({
+                    type: "POST",
+                    url: carpeta + "/rechazar_vale_rendir_reembolso",
+                    data: {
+                        _token: _token,
+                        valerendir_id: valerendir_id,
+                        motivo_rechazo: motivo_rechazo  
+                    },
+
+                    success: function(response) {
+                        if (response.success) {
+                            alertajax('Vale de rendir rechazado con éxito.');
+
+                            var row = $("tr[data_vale_rendir_reembolso='" + valerendir_id + "']");
+                            row.find("td").eq(7).html('<span class="badge badge-danger">RECHAZADO</span>'); 
+                            location.reload(); 
+
+                            row.find(".autorizar-valerendir").hide();
+                            row.find(".aprobar-valerendir").hide();
+                            row.find(".rechazar-valerendir").hide();
+
+                            $('#rechazoModal').modal('hide');
+
+                        }else{
+                            alerterrorajax('Error al rechazar el vale de rendir.');
+                        }
+                    },
+                    error: function() {
+                        alerterrorajax('Error al procesar la solicitud.');
+                    }
+             });    
+        });
+
+
+        $(".valerendirprincipal").on('click', '.autorizar-valerendir', function(e) {
+             e.preventDefault();
+        
+             var valerendir_id = $(this).closest('tr').attr('data_vale_rendir_reembolso');
+                $('#autorizaModal').data('valerendir-id', valerendir_id);
+                $('#autorizaModal').modal('show');
+        });
+
+        $('#confirmAutoriza').on('click', function() {
+                var valerendir_id = $('#autorizaModal').data('valerendir-id');
+                var motivo_autoriza = $('#motivoAutoriza').val().trim();  
+
+                if (motivo_autoriza === '') {
+                    alerterrorajax('Por favor ingrese un motivo de autorizacion.');
+                    return;
+                }
+
+                var _token = $('#token').val();
+                
+                $.ajax({
+                    type: "POST",
+                    url: carpeta + "/autorizar_vale_rendir_reembolso",
+                    data: {
+                        _token: _token,
+                        valerendir_id: valerendir_id,
+                        motivo_autoriza: motivo_autoriza 
+                    },
+
+                    success: function(response) {
+                        if (response.success) {
+                            alertajax('Vale de rendir autorizado con éxito.');
+
+                    $.ajax({
+
+                            type: "GET",
+                            url: carpeta + "/enviar_correo_autoriza",
+                            data: {
+
+                                valerendir_id: valerendir_id
+                            },
+                            success: function() {
+                                console.log('Correo enviado correctamente.');
+                            },
+                            error: function() {
+                                console.warn('Error al enviar el correo.');
+                            }
+                        });
+
+                            
+                            var row = $("tr[data_vale_rendir_reembolso='" + valerendir_id + "']");
+                            row.find("td").eq(7).html('<span class="badge badge-warning">APROBADO</span>'); 
+                           
+                            location.reload(); 
+
+                            row.find(".autorizar-valerendir").hide();
+                            row.find(".aprobar-valerendir").hide();
+                            row.find(".rechazar-valerendir").hide();
+
+
+
+                            $('#autorizaModal').modal('hide');
+                        } 
+                    },
+                    error: function() {
+                        alerterrorajax('Error al procesar la solicitud.');
+                    }
+                });
+        });
+
+
+
+
+        $(".valerendirprincipal").on('click', '.verdetalleimporte-valerendir', function(e) {
+            e.preventDefault(); 
+            let valerendir_id = $(this).closest('tr').attr('data_vale_rendir_reembolso'); 
+
+            $('#vale_rendir_id').val(valerendir_id); 
+            var _token = $('#token').val();
+           
+            data                        =   {
+                                                _token                  : _token,
+                                                valerendir_id           : valerendir_id,
+                                            };
+
+            ajax_modal(data, "/ver_detalle_importe",
+                       "modal-verdetalledocumentoimporte-solicitud",
+                       "modal-verdetalledocumentoimporte-solicitud-container");
+        });
+
+
+        $(".valerendirprincipal").on('click', '.verdetalleimporte-valerendir-autoriza', function(e) {
+            e.preventDefault(); 
+            let valerendir_id = $(this).closest('tr').attr('data_vale_rendir_reembolso'); 
+
+            $('#vale_rendir_id').val(valerendir_id); 
+            var _token = $('#token').val();
+           
+            data                        =   {
+                                                _token                  : _token,
+                                                valerendir_id           : valerendir_id,
+                                            };
+
+            ajax_modal(data, "/ver_detalle_importe_autoriza_reembolso",
+                       "modal-verdetalledocumentoimporteautoriza-solicitud",
+                       "modal-verdetalledocumentoimporteautoriza-solicitud-container");
+        });
+
+
+        $(".valerendirprincipal").on('click', '.verdetalleimporte-valerendir-vale-reembolso', function(e) {
+            e.preventDefault(); 
+            let valerendir_id = $(this).closest('tr').attr('data_vale_rendir_reembolso'); 
+
+            $('#vale_rendir_id').val(valerendir_id); 
+            var _token = $('#token').val();
+           
+            data                        =   {
+                                                _token                  : _token,
+                                                valerendir_id           : valerendir_id,
+                                            };
+
+            ajax_modal(data, "/ver_detalle_importe_vale_reembolso",
+                       "modal-verdetalledocumentoimportevale-solicitud",
+                       "modal-verdetalledocumentoimportevale-solicitud-container");
+        });
+
+
+
+
+         $(".valerendirprincipal").on('click', '.vermensaje-valerendir', function(e) {
+            e.preventDefault(); 
+            //let valerendir_id = $(this).closest('tr').attr('data_vale_rendir'); 
+            //$('#vale_rendir_id').val(valerendir_id); 
+            var _token = $('#token').val();
+           
+            data                        =   {
+                                                _token                  : _token,
+                                                //valerendir_id           : valerendir_id,
+                                            };
+
+            ajax_modal(data,"/ver_mensaje_vale_rendir",
+                      "modal-verdetalledocumentomensajevale-solicitud","modal-verdetalledocumentomensajevale-solicitud-container");
+
+        });
+
+       
+
+        $(document).on("click", ".show-glosa", function() {
+            var glosaText = $(this).data('glosa');
+            var type = $(this).data('type');
+
+            if (type === "rechazo") {
+                    $("#glosaRechazoMessage").text(glosaText);
+                    $('#glosaModal').modal('show');
+            } else if (type === "autoriza") {
+                    $("#glosaAutorizaMessage").text(glosaText);
+                    $('#glosaModal1').modal('show');
+            }
+        });
+
 
     //DETALLE
         $('#tipo_motivo').on('change', function () {
@@ -274,9 +641,6 @@ $(document).ready(function(){
         });
 
 
-
-      
-
         $(document).ready(function () {
             let hoy = new Date();
             let fechaMin = new Date(hoy);
@@ -304,7 +668,7 @@ $(document).ready(function(){
         }
 
 
-        var importeDestinos = JSON.parse($('#importeDestinos').val());
+      
      
         const codigosNombres = {
             "TIG0000000000001": "ALIMENTACION",
@@ -489,7 +853,7 @@ $(document).ready(function(){
         }
 
 
-       $(document).on('click', '.verdetalleimportegastos-valerendir', function () {
+       $(document).on('click', '.verdetalleimportegastos-valerendir-reembolso', function () {
         let filas = $('#tabla_vale_rendir_detalle tbody tr');
         let cuerpoModal = $('#tablaDetalleModal tbody');
 
@@ -546,8 +910,4 @@ $(document).ready(function(){
                 $(this).addClass('selected');
             });
         });
-
-
-
-
 });

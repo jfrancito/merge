@@ -81,6 +81,8 @@ $(document).ready(function(){
                     ind_destino: parseInt(fila.find('td').eq(8).text().trim()) || 0,
                     ind_propio: parseInt(fila.find('td').eq(9).text().trim()) || 0,
                     ind_aereo: parseInt(fila.find('td').eq(10).text().trim()) || 0,
+                    txt_glosa_venta: fila.find('td').eq(11).text().trim(),
+                    txt_glosa_cobranza: fila.find('td').eq(12).text().trim(),
                     opcion_detalle: 'I',
                     detalle_id: fila.data('id')
                 });
@@ -310,11 +312,15 @@ $(document).ready(function(){
                                 row += '<td>' + item.CAN_UNITARIO + '</td>';
                                 row += '<td>' + item.CAN_UNITARIO_TOTAL + '</td>';
                                 row += '<td>' + ((parseFloat(item.CAN_TOTAL_IMPORTE) || 0).toFixed(2)) + '</td>';
+                                if (areacomercial === 'COMERCIAL') {
+                                    row += `<td>${item.TXT_GLOSA_VENTA || ''}</td>`;
+                                    row += `<td>${item.TXT_GLOSA_COBRANZA || ''}</td>`;
+                                }
                                 row += '<td><button type="button" class="btn btn-danger btn-sm eliminarFila" data-id-detalle="' + item.ID + '"><i class="fa fa-trash"></i></button></td>';
                                 row += '</tr>';
                                 $('#tabla_vale_rendir_detalle tbody').append(row);
                             });
-
+                            actualizarTotalImporte();
                             $('#detalle_id').val(valerendir_id);
                             $('#asignarvalerendir').text('Modificar');
                         },
@@ -739,6 +745,7 @@ $(document).ready(function(){
         });
 
 
+            //DETALLE IMPORTE VIATICOS
         $(".valerendirprincipal").on('click', '.verdetalleimporte-valerendir-vale', function(e) {
             e.preventDefault(); 
             let valerendir_id = $(this).closest('tr').attr('data_vale_rendir'); 
@@ -836,9 +843,6 @@ $(document).ready(function(){
         });
 
 
-
-      
-
         $(document).ready(function () {
             let hoy = new Date();
             let fechaMin = new Date(hoy);
@@ -846,7 +850,7 @@ $(document).ready(function(){
 
 
             let primerDiaMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-            let ultimoDiaMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
+            let ultimoDiaMes = new Date(hoy.getFullYear(), hoy.getMonth() + 2, 0);
 
 
             if (fechaMin < primerDiaMes) {
@@ -870,9 +874,9 @@ $(document).ready(function(){
             let maxDateStr = toLocalDatetimeStr(fechaMax);
 
              $('#fecha_inicio').attr('min', minDateStr);
-    $('#fecha_inicio').attr('max', maxDateStr);
-    $('#fecha_fin').attr('min', minDateStr);
-    $('#fecha_fin').attr('max', maxDateStr);
+             $('#fecha_inicio').attr('max', maxDateStr);
+             $('#fecha_fin').attr('min', minDateStr);
+             $('#fecha_fin').attr('max', maxDateStr);
         });
 
         function formatToSQLDateTime(fechaLocal) {
@@ -898,13 +902,21 @@ $(document).ready(function(){
       $('#agregarImporteGasto').on('click', function () {
         let destino = $('#destino option:selected').text();
         let codDestino = $('#destino').val();
-       
         let fechaInicio = formatToSQLDateTime($('#fecha_inicio').val());
         let fechaFin    = formatToSQLDateTime($('#fecha_fin').val());
         let nomCentro = $('#nom_centro').val();
         let ind_propio = $('#ind_propio').is(':checked') ? 1 : 0;
         let ind_aereo = $('#ind_aereo').is(':checked') ? 1 : 0;
-        console.log(fechaInicio, fechaFin);
+        let txt_glosa_venta = $('#txt_glosa_venta').val();
+        let txt_glosa_cobranza = $('#txt_glosa_cobranza').val();
+
+
+       if (areacomercial === "COMERCIAL") {
+            if (!txt_glosa_venta || !txt_glosa_cobranza) {
+                alerterrorajax('Por favor Ingresar el Monto Aprox. de VENTA O COBRANZA');
+                 return;
+            }
+        }
 
         // Validaciones de campos obligatorios
         if (!codDestino || !fechaInicio || !fechaFin) {
@@ -1034,6 +1046,16 @@ $(document).ready(function(){
             });
         }
 
+
+        let columnasGlosa = "";
+
+        if (areacomercial === "VENTAS") {
+            columnasGlosa = `
+                <td>${txt_glosa_venta}</td>
+                <td>${txt_glosa_cobranza}</td>
+            `;
+        }
+
     // 🔹 Agregar fila a la tabla
         let nuevaFila = `
                 <tr data-cod-destino="${codDestino}" data-id="">
@@ -1048,6 +1070,7 @@ $(document).ready(function(){
                     <td style="display:none;">${ind_destino}</td>
                     <td style="display:none;">${ind_propio}</td>
                     <td style="display:none;">${ind_aereo}</td>
+                    ${columnasGlosa}
                     <td><button type="button" class="btn btn-danger btn-sm eliminarFila"><i class="fa fa-trash"></i></button></td>
                 </tr>
             `;

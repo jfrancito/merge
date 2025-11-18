@@ -9,7 +9,7 @@
             <th class="col">Tipo Pago</th>
             <th class="col">Importe</th>
             <th class="col">Saldo</th>
-            <th class="col">Glosa</th>  
+            <th class="col">Actividades a Realizar</th>  
             <th class="col">Estado Merge</th>  
             <th class="col">Estado Osiris</th>
             <th class="col">Ver Detalle</th>  
@@ -49,8 +49,8 @@
                     <span class="badge bg-white text-dark">GENERADO</span>
                 @elseif($item['ESTADO_OSIRIS'] === 'COBRADO')
                     <span class="badge badge-success">COBRADO</span>
-                @elseif($item['ESTADO_OSIRIS'] === 'RECHAZADO')
-                     <span class="badge badge-custom-danger">RECHAZADO</span>
+                @elseif($item['ESTADO_OSIRIS'] === 'ANULADO')
+                     <span class="badge badge-custom-danger">ANULADO</span>
                 @endif
             </td>
 
@@ -177,7 +177,7 @@
 
     .selected {
     background-color: #7d9ac0 !important;
-    color: #FFFFFF;
+    color: #7d9ac0;
     vertical-align: middle;
     padding: 1.5em;
     }

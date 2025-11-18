@@ -4,9 +4,8 @@
       <th>ITEM</th>
       <th>CODIGO</th>
       <th>CUENTA</th>
-
       <th>FECHA EMISION</th>
-      <th>FECHA CREACION</th>
+
       <th>PERIODO</th>
       <th>TOTAL</th>
       <th>TRABAJADOR</th>
@@ -14,6 +13,8 @@
       <th>AUTORIZA</th>
       <th>MONEDA</th>
 
+      <th>TIPO VALE</th>
+      <th>VALE</th>
       <th>REVISION</th>
     </tr>
   </thead>
@@ -23,15 +24,16 @@
         <td>{{$index+1}}</td>
         <td>{{$item->CODIGO}}</td>
         <td>{{$item->TXT_CUENTA}}</td>
-        
         <td>{{date_format(date_create($item->FECHA_EMI), 'd/m/Y')}}</td>
-        <td>{{date_format(date_create($item->FECHA_CREA), 'd/m/Y')}}</td>
         <td>{{$item->TXT_PERIODO}}</td>
         <td>{{$item->TOTAL}}</td>
         <td>{{$item->TXT_EMPRESA_TRABAJADOR}}</td>
         <td>{{$item->TXT_CENTRO}}</td>
         <td>{{$item->TXT_USUARIO_AUTORIZA}}</td>
         <td>{{$item->TXT_CATEGORIA_MONEDA}}</td>
+        
+        <td>{{$item->ARENDIR}}</td>
+        <td>{{$item->ARENDIR_ID}}</td>
         
         <td class="rigth">
           <div class="btn-group btn-hspace">

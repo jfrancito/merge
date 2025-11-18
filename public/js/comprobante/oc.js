@@ -16,6 +16,30 @@ $(document).ready(function(){
     });
 
 
+    $(".cfedocumento").on('click','.ver_cuenta_bancaria_indi', function() {
+
+        var _token                  =   $('#token').val();
+        const orden_id              =   $(this).attr('data_orden_id');
+        const data_banco_codigo     =   $(this).attr('data_banco_codigo');
+        const data_numero_cuenta    =   $(this).attr('data_numero_cuenta');
+        var idopcion                =   $('#idopcion').val();
+
+        data                        =   {
+                                            _token                  : _token,
+                                            orden_id                : orden_id,
+                                            data_banco_codigo       : data_banco_codigo,
+                                            data_numero_cuenta      : data_numero_cuenta,
+                                            idopcion                : idopcion,
+                                        };
+                                        
+        ajax_modal(data,"/ajax-modal-ver-cuenta-bancaria-oc-individual",
+                  "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+
+
+
+    });
+
+
     $(".agestioncomprobante").on('change','.selectoperacion', function() {
 
 

@@ -171,15 +171,18 @@
                                data-aw="1">
                     </div>
 
-                    <!-- Destino -->
-                    <div class="form-group" style="min-width: 250px;">
-                        <label class="control-label labelleft">Destino:</label>
-                        {!! Form::select('destino', $listausuarios3, '', [
+                     <div class="col-md-3 col-lg-3">
+                          <div class="form-group">
+                            <label for="tipo_pago" class="control-label labelleft negrita">
+                              DESTINO <span class="obligatorio">(*)</span> :
+                            </label>
+                             {!! Form::select('destino', $listausuarios3, '', [
                             'class'   => 'form-control control select2',
                             'id'      => 'destino',
                             'data-aw' => '1',
                         ]) !!}
-                    </div>
+                          </div>
+                        </div>
 
                     <!-- Movilidad Propia -->
                     <div class="form-group"
@@ -208,28 +211,25 @@
                     </div>
 
                     <!-- Botón Ver Detalle -->
-                    <div class="form-group">
+                   {{-- <div class="form-group">
                         <button type="button"
-                                class="btn btn-primary verdetalleimportegastos-valerendir"
+                                class="btn btn-primary verdetalleimportegastos-valerendir-reembolso"
                                 title="Ver detalle de importes">
                             <i class="mdi mdi-eye mdi-24px"></i>
                         </button>
-                    </div>
+                    </div>--}}
 
                     <!-- Hidden Inputs -->
                     <input type="hidden" id="nom_centro" value="{{ $nom_centro }}">
                     <input type="hidden" id="importeDestinos"
                            value="{{ json_encode($importeDestinos) }}">
                 </div>
-
-
-              
-
+                
                 <div class="col-xs-12">
                     <div class='listacontratomasiva listajax reporteajax'>
                     </div>
                 </div>
-              @include('valerendir.ajax.listamodaldetalleregistroimporte')
+              @include('valerendirreembolso.ajax.listamodaldetalleregistroimportereembolso')
 
             </div>
 

@@ -57,6 +57,8 @@ class NotificacionOC extends Command
         $this->ejecutar_orden_ingreso();
         $this->orden_ingreso_ejecutada();
         $this->envio_correo_tesoreria_lq();
+        $this->modificarglosahabilitacion();
+
         //$this->envio_correo_reparacion_levantada();
         $horaActual = date("H:i");
 
@@ -76,10 +78,9 @@ class NotificacionOC extends Command
         }
 
 
-
-
         if($horaActual == '01:00' || $horaActual == '03:00' || $horaActual == '05:00'){
             $this->documentolgautomaticonuevo();
+            $this->eliminacion_vales_arendir();
         }
 
         $this->guadarpdfoi();

@@ -147,6 +147,8 @@ class ValeRendirApruebaController extends Controller
                 $vale->NRO_CUENTA,
                 $cod_categoria_estado_vale,
                 $txt_categoria_estado_vale, 
+                $vale->COD_PERSONAL_RENDIR,
+                $vale->TXT_PERSONAL_RENDIR,
                 false,
                 Session::get('usuario')->id 
             );
@@ -215,6 +217,8 @@ class ValeRendirApruebaController extends Controller
                 $vale->NRO_CUENTA,
                 $cod_categoria_estado_vale,
                 $txt_categoria_estado_vale, 
+                $vale->COD_PERSONAL_RENDIR,
+                $vale->TXT_PERSONAL_RENDIR,
                 false,
                 Session::get('usuario')->id 
             );
@@ -268,6 +272,7 @@ class ValeRendirApruebaController extends Controller
         $contrato_diferente = DB::connection($conexionbd)
                             ->table('CMP.CONTRATO')
                             ->where('COD_EMPR', $cod_empr)
+                            ->where('COD_CENTRO' , $centrovale)
                             ->where('COD_CATEGORIA_TIPO_CONTRATO', 'TCO0000000000069')
                             ->where('COD_EMPR_CLIENTE', $codemprcliente)
                             ->where('COD_CATEGORIA_MONEDA', $cod_moneda)
@@ -293,6 +298,8 @@ class ValeRendirApruebaController extends Controller
         ->where('COD_CENTRO', $centrovale)
         ->max('TXT_NUMERO');
 
+        
+
         //   dd($contrato_diferente);
 
         $nro_documento = is_null($ultimoCorrelativo) ? 1:$ultimoCorrelativo + 1;
@@ -305,6 +312,7 @@ class ValeRendirApruebaController extends Controller
                     ->table('CMP.CONTRATO AS CON')
                     ->join('CMP.CONTRATO_CULTIVO AS CUL', 'CON.COD_CONTRATO', '=', 'CUL.COD_CONTRATO')
                     ->where('CON.COD_EMPR', $cod_empr)
+                    ->where('COD_CENTRO' , $centrovale)
                     ->where('CON.COD_CATEGORIA_TIPO_CONTRATO', 'TCO0000000000069')
                     ->where('CON.COD_EMPR_CLIENTE', $codemprcliente)
                     ->select(
@@ -385,7 +393,7 @@ class ValeRendirApruebaController extends Controller
 
         $codigo = $this->insertValeRendirOsiris(
             "I", 
-            $id, 
+            "", 
             $cod_empr, 
             $cod_centro, 
             $cod_empresa,
@@ -488,11 +496,40 @@ class ValeRendirApruebaController extends Controller
     { 
         $id_buscar = $request->input('valerendir_id'); 
     
+        $vale = WEBValeRendir::where('ID', $id_buscar)->first(); // primero en lugar de get(), para tener objeto
         $detallesImporte = WEBValeRendirDetalle::where('ID', $id_buscar)->get(); 
+
+        
+        $fecha_inicio = $detallesImporte->min('FEC_INICIO');
+        $fecha_fin = $detallesImporte->max('FEC_FIN');
+        $cod_centro = $detallesImporte->first()->COD_CENTRO ?? null;
+        $ultimo = $detallesImporte->last();
+        $ultimo_destino = $ultimo ? $ultimo->NOM_DESTINO : '';
+        $total_dias = $detallesImporte->sum('DIAS');
+        $ruta_viaje = $detallesImporte->pluck('NOM_DESTINO')->implode('/ ');
+        $txt_glosa = $vale->TXT_GLOSA ?? null;
+        $txt_glosa_venta = $detallesImporte->pluck('TXT_GLOSA_VENTA')->filter()->implode(' // ');
+        $txt_glosa_cobranza = $detallesImporte->pluck('TXT_GLOSA_COBRANZA')->filter()->implode(' // ');
+
+       
+
+         $areacomercial = '';
+
    
         return view('valerendir.ajax.modaldetalleimporte', [
             'ajax' => true,
-            'detalles' => $detallesImporte
+            'valerendir' => $vale,
+            'detalles' => $detallesImporte,
+            'fecha_inicio' => $fecha_inicio,
+            'fecha_fin' => $fecha_fin,
+            'cod_centro' => $cod_centro,
+            'ultimo_destino' => $ultimo_destino,
+            'txt_glosa' => $txt_glosa,
+            'total_dias' => $total_dias,
+            'ruta_viaje' => $ruta_viaje,
+            'txt_glosa_venta' => $txt_glosa_venta,
+            'txt_glosa_cobranza' => $txt_glosa_cobranza,
+            'areacomercial' => $areacomercial
         ]);  
     }         
 

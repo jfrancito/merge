@@ -25,16 +25,24 @@ class RegistroPersonalAutorizaController extends Controller
         
 
         $sede = DB::table('WEB.ListaplatrabajadoresGenereal')
-	         ->select('centro_osiris_id', 'cadlocal')
-	         ->whereIn('centro_osiris_id', [
-			        'CEN0000000000001',
-			        'CEN0000000000002',
-			        'CEN0000000000004',
-			        'CEN0000000000006'
-			    ])
-	         ->groupBy('centro_osiris_id', 'cadlocal')
-	         ->pluck('cadlocal', 'centro_osiris_id')
-	         ->toArray();
+                ->select('centro_osiris_id', 'cadlocal')
+                ->whereIn('centro_osiris_id', [
+                    'CEN0000000000001',
+                    'CEN0000000000002',
+                    'CEN0000000000004',
+                    'CEN0000000000006'
+                ])
+                ->where(function ($query) {
+                    $query->where('centro_osiris_id', '<>', 'CEN0000000000001') // todos menos el 0001
+                          ->orWhere(function ($q) {
+                              $q->where('centro_osiris_id', 'CEN0000000000001')
+                                ->where('cadlocal', 'LIKE', '%CHICLAYO%'); // solo Chiclayo para el 0001
+                          });
+                })
+                ->groupBy('centro_osiris_id', 'cadlocal')
+                ->pluck('cadlocal', 'centro_osiris_id')
+                ->toArray();
+
 
 		$gerencia = DB::table('WEB.ListaplatrabajadoresGenereal')
 	    ->select(DB::raw("UPPER(LTRIM(RTRIM(cadgerencia))) AS cadgerencia"))
@@ -109,7 +117,9 @@ class RegistroPersonalAutorizaController extends Controller
                 't.gerencia_id',
                 't.area_id',
                 't.cargo_id',
-                DB::raw('vpa.COD_AUTORIZA as cod_autorizado')
+                DB::raw('vpa.COD_AUTORIZA as cod_autorizado'),
+                DB::raw('vpa.COD_LINEA as cod_linea_autorizado'),
+                DB::raw('vpa.TXT_LINEA as txt_linea_autorizado')
             )
             ->leftJoin('WEB.VALE_PERSONAL_AUTORIZA as vpa', function($join) {
                 $join->on(DB::raw("RTRIM(LTRIM(vpa.TXT_PERSONAL))"), DB::raw("RTRIM(LTRIM(t.nombres + ' ' + t.apellidopaterno + ' ' + t.apellidomaterno))"))
@@ -147,11 +157,17 @@ class RegistroPersonalAutorizaController extends Controller
 
         foreach ($registros as $item) {
 
-            $registroExistente = DB::table('WEB.VALE_PERSONAL_AUTORIZA')
+            /*$registroExistente = DB::table('WEB.VALE_PERSONAL_AUTORIZA')
                 ->where(DB::raw("RTRIM(LTRIM(TXT_PERSONAL))"), trim($item['personal']))
                 ->where(DB::raw("RTRIM(LTRIM(TXT_AREA))"), trim($item['area']))
                 ->where('COD_ESTADO', 1)
+                ->first();*/
+
+                $registroExistente = DB::table('WEB.VALE_PERSONAL_AUTORIZA')
+                ->where('COD_PERSONAL', $item['cod_trab'])      // Identificador único del trabajador
+                ->where('COD_ESTADO', 1)
                 ->first();
+
 
             if ($registroExistente) {
              

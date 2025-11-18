@@ -17,6 +17,17 @@
                   <div class="tools tooltiptop">
 
 
+                    <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones btnacumuladodias" style="width:140px;">
+                      <span class="tooltiptext">Total x Dias</span>
+                      Total x Dias
+                    </a>
+
+
+                    <a href="{{ url('/subir-firma/'.$idopcion) }}" class="btn btn-secondary botoncabecera tooltipcss opciones" style="width:140px;">
+                      <span class="tooltiptext">Subir Firma</span>
+                      Subir Firma
+                    </a>
+
                     <a href="{{ url('/tutorial/planillaovilidad_03.mp4') }}" class="btn btn-secondary botoncabecera tooltipcss opciones" style="width:140px;" Target="_blank">
                       <span class="tooltip-text">Ver Tutorial</span>
                       Tutorial
@@ -80,7 +91,16 @@
 
                           </div>
 
+                    <div class="row">
+                      
+                  <div role="alert" class="alert alert-primary alert-icon alert-icon-colored alert-dismissible">
+                    <div class="icon"><span class="mdi mdi-info-outline"></span></div>
+                    <div class="message">
+                      <strong> {{$mensaje_firma}} </strong>
+                    </div>
+                  </div>
 
+                    </div>
                     <div class="col-xs-12">
                       <input type="hidden" name="idopcion" id='idopcion' value='{{$idopcion}}'>
                     </div>

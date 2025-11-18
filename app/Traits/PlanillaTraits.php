@@ -29,10 +29,16 @@ use App\Modelos\FeDocumentoHistorial;
 use App\Modelos\STDEmpresa;
 use App\Modelos\CMPReferecenciaAsoc;
 use App\Modelos\Whatsapp;
-
+use App\Modelos\Firma;
 use App\Modelos\PlaMovilidad;
 use App\Modelos\PlaDetMovilidad;
 use App\Modelos\FePlanillaEntregable;
+use App\Modelos\DetalleSemanaImpulso;
+use App\Modelos\SemanaImpulso;
+use App\Modelos\LoteImpulso;
+
+
+
 use App\User;
 
 use ZipArchive;
@@ -47,6 +53,248 @@ use Carbon\Carbon;
 
 trait PlanillaTraits
 {
+
+
+    private function plm_monto_total_impulsadora($trabajador_id,$fecha_pago) {
+
+        $total = DB::table('SEMANA_IMPULSO')
+            ->join('DETALLE_SEMANA_IMPULSO', 'SEMANA_IMPULSO.ID_DOCUMENTO', '=', 'DETALLE_SEMANA_IMPULSO.ID_DOCUMENTO')
+            ->where('SEMANA_IMPULSO.COD_TRABAJADOR', $trabajador_id)
+            ->where('SEMANA_IMPULSO.COD_ESTADO', 'ETM0000000000005')
+            ->where('FECHA', $fecha_pago)
+            ->selectRaw('SUM(DETALLE_SEMANA_IMPULSO.MONTO) as total_monto')
+            ->first();
+
+        $sumaTotal = $total->total_monto ?? 0;
+
+        return  $sumaTotal;
+    }
+
+    private function plm_identificar_si_es_impulsadora($area_id) {
+
+        $ind_impulsadora =  0;
+        $configuraciones =  DB::table('CONFIGURACION_IMPULSO')
+                            ->where('ACTIVO', 1)
+                            ->where('AREA_ID', '=',$area_id)
+                            ->get();
+        if(count($configuraciones)>0){
+            $ind_impulsadora =  1;
+        }else{
+            $ind_impulsadora =  0;
+        }
+
+        return  $ind_impulsadora;
+    }
+
+
+    private function plm_lista_cabecera_comprobante_total_firma() {
+        if(Session::get('usuario')->id== '1CIX00000001'){
+
+            $listadatos         =   Firma::where('ACTIVO','=','1')
+                                    ->where('COD_ESTADO','=','ETM0000000000004')
+                                    ->orderby('FECHA_CREA','ASC')
+                                    ->get();
+
+        }else{
+
+            $listadatos         =   Firma::where('ACTIVO','=','1')
+                                    ->where('COD_ESTADO','=','ETM0000000000004')
+                                    ->orderby('FECHA_CREA','ASC')
+                                    ->get();
+
+        }
+
+        return  $listadatos;
+    }
+
+
+    private function plm_lista_cabecera_comprobante_total_obs_le_jefe() {
+        if(Session::get('usuario')->id== '1CIX00000001'){
+
+            $listadatos         =   SemanaImpulso::where('ACTIVO','=','1')
+                                    ->where('IND_OBSERVACION','=',0)
+                                    ->where('COD_ESTADO','=','ETM0000000000010')
+                                    ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                                    ->orderby('FECHA_CREA','ASC')
+                                    ->get();
+
+        }else{
+
+            $listadatos         =   SemanaImpulso::where('ACTIVO','=','1')
+                                    ->where('IND_OBSERVACION','=',0)
+                                    ->where('COD_USUARIO_AUTORIZA','=',Session::get('usuario')->id)
+                                    ->where('COD_ESTADO','=','ETM0000000000010')
+                                    ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                                    ->orderby('FECHA_CREA','ASC')
+                                    ->get();
+
+        }
+
+        return  $listadatos;
+    }
+
+    private function plm_lista_cabecera_comprobante_total_jefe() {
+        if(Session::get('usuario')->id== '1CIX00000001'){
+
+            $listadatos         =   SemanaImpulso::where('ACTIVO','=','1')
+                                    ->where(function ($query) {
+                                        $query->where('IND_OBSERVACION', '<>', 1)
+                                              ->orWhereNull('IND_OBSERVACION');
+                                    })
+                                    ->where('COD_ESTADO','=','ETM0000000000010')
+                                    ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                                    ->orderby('FECHA_CREA','ASC')
+                                    ->get();
+
+        }else{
+
+            $listadatos         =   SemanaImpulso::where('ACTIVO','=','1')
+                                    ->where(function ($query) {
+                                        $query->where('IND_OBSERVACION', '<>', 1)
+                                              ->orWhereNull('IND_OBSERVACION');
+                                    })
+                                    ->where('COD_USUARIO_AUTORIZA','=',Session::get('usuario')->id)
+                                    ->where('COD_ESTADO','=','ETM0000000000010')
+                                    ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                                    ->orderby('FECHA_CREA','ASC')
+                                    ->get();
+
+        }
+
+        return  $listadatos;
+    }
+
+    private function plm_lista_cabecera_comprobante_total_obs_jefe() {
+        if(Session::get('usuario')->id== '1CIX00000001'){
+
+            $listadatos         =   SemanaImpulso::where('ACTIVO','=','1')
+                                    ->where('IND_OBSERVACION','=',1)
+                                    ->where('COD_ESTADO','=','ETM0000000000010')
+                                    ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                                    ->orderby('FECHA_CREA','ASC')
+                                    ->get();
+
+        }else{
+
+            $listadatos         =   SemanaImpulso::where('ACTIVO','=','1')
+                                    ->where('IND_OBSERVACION','=',1)
+                                    ->where('COD_USUARIO_AUTORIZA','=',Session::get('usuario')->id)
+                                    ->where('COD_ESTADO','=','ETM0000000000010')
+                                    ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                                    ->orderby('FECHA_CREA','ASC')
+                                    ->get();
+
+        }
+
+        return  $listadatos;
+    }
+
+
+    private function calcular_total_movilidad_impulso_masivo($iddocumento,$semana_impulso_id) {
+
+        $lote                   =   LoteImpulso::where('ID_DOCUMENTO','=',$iddocumento)->first();
+        $tdetplanillamovilidad  =   DetalleSemanaImpulso::where('LOTE_IMPULSO_ID','=',$lote->ID_DOCUMENTO)->where('ACTIVO','=','1')->get();
+
+        SemanaImpulso::where('LOTE_IMPULSO_ID','=',$lote->LOTE_IMPULSO_ID)->where('ID_DOCUMENTO','=',$semana_impulso_id)
+                    ->update(
+                            [
+                                'MONTO'=> $tdetplanillamovilidad->SUM('MONTO')
+                            ]);
+
+        LoteImpulso::where('ID_DOCUMENTO','=',$iddocumento)
+                    ->update(
+                            [
+                                'MONTO'=> $tdetplanillamovilidad->SUM('MONTO')
+                            ]);
+
+
+
+    }
+
+
+    private function calcular_total_movilidad_impulso($iddocumento) {
+
+        $tdetplanillamovilidad  =   DetalleSemanaImpulso::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->get();
+
+        SemanaImpulso::where('ID_DOCUMENTO','=',$iddocumento)
+                    ->update(
+                            [
+                                'MONTO'=> $tdetplanillamovilidad->SUM('MONTO')
+                            ]);
+
+
+
+    }
+
+    private function obtenerNombreDiaDinamico($fecha) {
+        $carbonFecha = Carbon::parse($fecha);
+        
+        // Para Laravel 5.4, usar format en español manualmente
+        $dias = [
+            'Monday' => 'Lunes',
+            'Tuesday' => 'Martes',
+            'Wednesday' => 'Miércoles',
+            'Thursday' => 'Jueves',
+            'Friday' => 'Viernes',
+            'Saturday' => 'Sábado',
+            'Sunday' => 'Domingo'
+        ];
+        
+        $nombreIngles = $carbonFecha->format('l');
+        $nombreEspanol = isset($dias[$nombreIngles]) ? $dias[$nombreIngles] : $nombreIngles;
+        
+        return $nombreEspanol . ' ' . $carbonFecha->format('d/m');
+    }
+    private function obtenerNombreDia($numeroDia) {
+        $dias = [
+            1 => 'Lunes',
+            2 => 'Martes',
+            3 => 'Miércoles',
+            4 => 'Jueves',
+            5 => 'Viernes',
+            6 => 'Sábado',
+            7 => 'Domingo'
+        ];
+        
+        return $dias[$numeroDia] ?? 'Día ' . $numeroDia;
+    }
+
+    private function pla_lista_planilla_movilidad_impulso_personal($fecha_inicio,$fecha_fin) {
+        if(Session::get('usuario')->id== '1CIX00000001'){
+
+            $planillamovilidad  =   SemanaImpulso::where('ACTIVO','=','1')
+                                    ->whereRaw("CAST(FECHA_CREA  AS DATE) >= ? and CAST(FECHA_CREA  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                    ->where('COD_EMPRESA','=', Session::get('empresas')->COD_EMPR)
+                                    ->whereRaw("ISNULL(LOTE_IMPULSO_ID,'') = ''")
+                                    ->where('USUARIO_CREA','=',Session::get('usuario')->id)
+                                    ->orderby('FECHA_CREA','DESC')->get();
+                                    
+        }else{
+
+            $planillamovilidad  =   SemanaImpulso::where('ACTIVO','=','1')
+                                    ->whereRaw("CAST(FECHA_CREA  AS DATE) >= ? and CAST(FECHA_CREA  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                    ->where('USUARIO_CREA','=',Session::get('usuario')->id)
+                                    ->whereRaw("ISNULL(LOTE_IMPULSO_ID,'') = ''")
+                                    ->where('COD_EMPRESA','=', Session::get('empresas')->COD_EMPR)
+                                    ->orderby('FECHA_CREA','DESC')->get();
+
+
+        }
+
+        return  $planillamovilidad;
+    }
+
+    private function pla_lista_planilla_movilidad_impulso_masivo($fecha_inicio,$fecha_fin,$tipo) {
+
+        $planillamovilidad      =   LoteImpulso::where('ACTIVO','=','1')
+                                    ->where('TIPO_LOTE','=',$tipo)
+                                    ->whereRaw("CAST(FECHA_CREA  AS DATE) >= ? and CAST(FECHA_CREA  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                    ->where('USUARIO_CREA','=',Session::get('usuario')->id)
+                                    ->where('COD_EMPRESA','=', Session::get('empresas')->COD_EMPR)
+                                    ->orderby('FECHA_CREA','DESC')->get();
+        return  $planillamovilidad;
+    }
+
 
 
     private function pla_lista_planilla_movilidad_personal($fecha_inicio,$fecha_fin) {

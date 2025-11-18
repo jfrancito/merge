@@ -13,8 +13,9 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="panel panel-default panel-table">
-                        <div class="panel-heading">Registro Importe Gastos
-                        </div>
+                           <div class="panel panel-default panel-border-color panel-border-color-success">
+                                <div class="panel-heading">Registro Importe Gastos</div>
+                            </div>
                         <div class="panel-body selectfiltro">
 
                             <div class='filtrotabla row'>
@@ -23,8 +24,7 @@
 
                                      <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
                                         <div class="form-group">
-                                            <label class="col-sm-12 control-label labelleft">Origen
-                                                :</label>
+                                            <label class="col-sm-12 control-label labelleft negrita"> ORIGEN <span class="obligatorio">(*)</span> :</label>
                                             <div class="col-sm-12 abajocaja">
                                                 {!! Form::select('cliente_select', $listacentro, '',
                                                    [
@@ -40,8 +40,7 @@
 
                                     <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
                                         <div class="form-group">
-                                            <label class="col-sm-12 control-label labelleft">Departamento :
-                                            </label>
+                                            <label class="col-sm-12 control-label labelleft negrita"> DEPARTAMENTO <span class="obligatorio">(*)</span> :</label>
                                             <div class="col-sm-12 abajocaja">
                                                 {!! Form::select('cliente_select1', $listadepartamento, '',
                                                    [
@@ -56,7 +55,7 @@
 
                                     <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
                                         <div class="form-group">
-                                            <label class="col-sm-12 control-label labelleft">Provincia :</label>
+                                            <label class="col-sm-12 control-label labelleft negrita"> PROVINCIA <span class="obligatorio">(*)</span> :</label>
                                              <div class="col-sm-12 abajocaja">
                                                 {!! Form::select('cliente_select2', $listaprovincia, '',
                                                    [
@@ -73,7 +72,7 @@
                                 <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
 
                                         <div class="form-group">
-                                            <label class="col-sm-12 control-label labelleft">Distrito :</label>
+                                            <label class="col-sm-12 control-label labelleft negrita"> DISTRITO <span class="obligatorio">(*)</span> :</label>
                                              <div class="col-sm-12 abajocaja">
                                                 {!! Form::select('cliente_select3', $listadistrito, '',
                                                    [
@@ -86,20 +85,23 @@
                                         </div>
                                     </div> 
 
-                                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
+                                <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
 
                                         <div class="form-group">
-                                            <label class="col-sm-12 control-label labelleft">Importe :</label>
-                                            <div class="col-sm-12 input-group xs-mb-15">
-
-                                                <input type="text"
-                                                       id="can_total_importe" name='' value="" placeholder="Importe"
-                                                       required=""
-                                                       autocomplete="off" class="form-control input-md dinero_masivo"
-                                                       data-aw="4"/>
+                                           <label class="col-sm-12 control-label labelleft negrita" style="margin-top:10px;"> TIPO DE LÍNEA <span class="obligatorio">(*)</span> :</label>
+                                             <div class="col-sm-12 abajocaja">
+                                                {!! Form::select('cliente_select4', $listatipolinea, '',
+                                                   [
+                                                     'class'       => 'form-control control select2' ,
+                                                     'id'          => 'cliente_select4',
+                                                     'data-aw'     => '1',
+                                                   ])
+                                                !!}
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> 
+
+                                   
 
                                   {{--}}   <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
 
@@ -118,7 +120,7 @@
                                     
                                     <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
                                         <div class="form-group">
-                                            <label class="col-sm-12 control-label labelleft">Tipo :</label>
+                                        <label class="col-sm-12 control-label labelleft negrita"style="margin-top:10px;"> TIPO DE IMPORTE <span class="obligatorio">(*)</span> :</label>
                                            <div class="col-sm-12 abajocaja">
                                                    
                                                  {!! Form::select('cod_tipo', $listatipoimporte, '',
@@ -133,9 +135,24 @@
                                             </div>
                                         </div>
 
+                                     <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
+
+                                        <div class="form-group">
+                                            <label class="col-sm-12 control-label labelleft negrita"style="margin-top:10px;"> IMPORTE <span class="obligatorio">(*)</span> :</label>
+                                            <div class="col-sm-12 input-group xs-mb-15">
+
+                                                <input type="text"
+                                                       id="can_total_importe" name='' value="" placeholder="Importe"
+                                                       required=""
+                                                       autocomplete="off" class="form-control input-md dinero_masivo"
+                                                       data-aw="4"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
                                         <div class="form-group">
-                                            <label class="col-sm-12 control-label labelleft">Indicador Destino - Ruta corta :</label>
+                                            <label class="col-sm-12 control-label labelleft negrita"style="margin-top:10px;"> IND DESTINO - RUTA CORTA <span class="obligatorio">(*)</span> :</label>
                                             <div class="col-sm-12">
                                                  <div class="input-group">
                                                  {!! Form::select('ind_destino', ['' => 'Selecciona indicador', '1' => 'Sí', '0' => 'No'], null, [
@@ -155,13 +172,61 @@
 
                                 <div class="listadetalleajax"></div>
                                       <div class='ajaxvacio text-center'>
-                                            Complete los campos correctamente ...
+                                            COMPLETE LOS CAMPOS CORRECTAMENTE ...
                                       </div>
-                                <div class="col-xs-12">
-                                    <div class='listacontratomasiva listajax reporteajax'>    
+                               
+
+                            <div class="panel panel-default panel-border-color panel-border-color-primary">
+                                <div class="panel-heading">
+                                    <div class="tools tooltiptop">
+                                        <div class="dropdown">
+                                            <a href="#" class="btn btn-secondary botoncabecera tooltipcss opciones buscardocumento">
+                                                <span class="tooltiptext">Buscar</span>
+                                                <span class="icon mdi mdi-search"></span>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
+
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
+                                            <div class="form-group">
+                                                <label class="col-sm-12 control-label labelleft negrita">PARTIDA <span class="obligatorio">(*)</span> :</label>
+                                                <div class="col-sm-12 abajocaja">
+                                                    {!! Form::select('cod_centro', $listalugarpartida, '', [
+                                                        'class' => 'form-control control select2',
+                                                        'id' => 'cod_centro',
+                                                        'data-aw' => '1',
+                                                    ]) !!}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 cajareporte ind_producto">
+                                            <div class="form-group">
+                                                <label class="col-sm-12 control-label labelleft negrita">DESTINO <span class="obligatorio">(*)</span> :</label>
+                                                <div class="col-sm-12 abajocaja">
+                                                    {!! Form::select('cod_distrito', $listalugardestino, '', [
+                                                        'class' => 'form-control control select2',
+                                                        'id' => 'cod_distrito',
+                                                        'data-aw' => '1',
+                                                    ]) !!}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                                <div class="col-xs-12">
+                                    <div class='listacontratomasiva listajax reporteajax'></div>
+                                </div>
+                                <div class='listaajaxaux'>    
                                 @include('valerendir.ajax.listamodalregistroimportegastos')
+                                </div>
                             </div>
                         </div>
                     </div>

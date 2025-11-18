@@ -31,13 +31,15 @@ $(document).ready(function () {
                                 const nombreCompleto = `${item.nombres} ${item.apellidopaterno} ${item.apellidomaterno}`;
 
                                
-                               let selectTipoLinea = '<select class="form-control select-tipo-linea" style="width:200px;">';
-
+                              // Crear el select de Tipo de Línea y marcar el valor actual si existe
+                                let selectTipoLinea = '<select class="form-control select-tipo-linea" style="width:200px;">';
                                 selectTipoLinea += '<option value="">-- Seleccionar --</option>';
                                 Object.entries(tipos_linea).forEach(function([cod_linea, txt_linea]) {
-                                    selectTipoLinea += `<option value="${cod_linea}">${txt_linea}</option>`;
+                                    const selected = (cod_linea === item.cod_linea_autorizado) ? 'selected' : '';
+                                    selectTipoLinea += `<option value="${cod_linea}" ${selected}>${txt_linea}</option>`;
                                 });
                                 selectTipoLinea += '</select>';
+
 
                                
                                 let opciones = '<select class="form-control select-personal">';
@@ -76,6 +78,10 @@ $(document).ready(function () {
            let dataAGuardar = [];
 
         $('#personalautoriza tbody tr').each(function () {
+
+      
+
+
             const fila = $(this);
             const personal = fila.find('td').eq(0).text().trim();
             const gerencia = fila.find('td').eq(2).text().trim();
@@ -92,8 +98,8 @@ $(document).ready(function () {
             const txt_autoriza = fila.find('select.select-personal option:selected').text().trim();
 
 
-           const cod_linea = fila.find('select.select-tipo-linea').val() || null;
-           const txt_linea = fila.find('select.select-tipo-linea option:selected').val() ? fila.find('select.select-tipo-linea option:selected').text().trim() : null;
+            const cod_linea = fila.find('select.select-tipo-linea').val() || null;
+            const txt_linea = fila.find('select.select-tipo-linea option:selected').val() ? fila.find('select.select-tipo-linea option:selected').text().trim() : null;
 
             if (cod_autoriza !== '') {
                 dataAGuardar.push({

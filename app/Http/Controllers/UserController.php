@@ -17,6 +17,8 @@ use App\Modelos\ALMCentro;
 use App\Modelos\WEBListaPersonal;
 use App\Modelos\LqgLiquidacionGasto;
 
+use App\Modelos\Tercero;
+
 
 
 use App\User;
@@ -52,6 +54,7 @@ use App\Traits\GeneralesTraits;
 use App\Traits\ComprobanteProvisionTraits;
 use App\Traits\ComprobanteTraits;
 use App\Traits\LiquidacionGastoTraits;
+use App\Traits\ValeRendirTraits;
 
 class UserController extends Controller {
 
@@ -60,6 +63,7 @@ class UserController extends Controller {
     use ComprobanteProvisionTraits;
     use ComprobanteTraits;
     use LiquidacionGastoTraits;
+    use ValeRendirTraits;
 
 	public function actionDescargarManual(Request $request)
 	{
@@ -274,6 +278,34 @@ class UserController extends Controller {
 
 						 	'cuentabancarias' 				=> $cuentabancarias,
 						 	'idoc' 							=> $idoc,
+						 	'idopcion' 						=> $idopcion,
+						 	'ajax' 							=> true,						 	
+						 ]);
+	}
+
+
+	public function actionAjaxModalVerCuentaBancariaOCIndividual(Request $request)
+	{
+
+        $orden_id               =   $request['orden_id'];
+        $data_banco_codigo      =   $request['data_banco_codigo'];
+        $data_numero_cuenta     =   $request['data_numero_cuenta'];
+
+        $idopcion               =   $request['idopcion'];
+        $fedocumento          	=   FeDocumento::where('ID_DOCUMENTO','=',$orden_id)->first();
+		$empresa 				=	STDEmpresa::where('NRO_DOCUMENTO','=',$fedocumento->RUC_PROVEEDOR)->first();
+
+		$cuentabancarias 		= 	TESCuentaBancaria::where('COD_EMPR_TITULAR','=',$empresa->COD_EMPR)
+									->where('COD_ESTADO','=',1)
+									->where('TXT_NRO_CUENTA_BANCARIA','=',$data_numero_cuenta)
+									->where('COD_EMPR_BANCO','=',$data_banco_codigo)
+									->orderby('TXT_EMPR_BANCO','ASC')
+								  	->get();
+
+		return View::make('usuario/modal/ajax/mvercuentabancariaindividual',
+						 [		 	
+
+						 	'cuentabancarias' 				=> $cuentabancarias,
 						 	'idopcion' 						=> $idopcion,
 						 	'ajax' 							=> true,						 	
 						 ]);
@@ -1385,6 +1417,9 @@ class UserController extends Controller {
 		$count_observados_lg 				= 	0;
 		$count_observadoslg_le 				= 	0;
 
+		//vl
+		$urlvl 								=	'';
+		$count_x_aprobar_vl				    = 	0;
 
 
 		if($trol->ind_uc == 1){
@@ -1624,6 +1659,7 @@ class UserController extends Controller {
     				$urldis 				=	'/gestion-de-administracion-aprobar/j25?operacion_id=DOCUMENTO_INTERNO_SECADO';
     				$urldib 				=	'/gestion-de-administracion-aprobar/j25?operacion_id=DOCUMENTO_SERVICIO_BALANZA';
     				$urllg 					=	'/gestion-de-aprobacion-liquidacion-gastos-administracion/rR6';
+    				$urlvl					=	'/gestion-aprueba-rendir/APz';
 
 
 					//ESTIBA
@@ -1702,6 +1738,30 @@ class UserController extends Controller {
 		        	$listadatosob    		=   $this->lg_lista_cabecera_comprobante_total_obs_le_administracion();
 					$count_observadoslg_le	= 	count($listadatosob);
 
+					//VALE
+					$listadatos             = $this->listaValeRendirAprueba(
+												    'GEN',   
+												    '',      
+												    '',      
+												    '',      
+												    '',      
+												    '',      
+												    '',      
+												    '',      
+												    0,       
+												    0,       
+												    ''       
+												);
+
+												$listadatos = array_filter($listadatos, function ($vale) {
+											    $estado = is_array($vale)
+											        ? trim($vale['COD_CATEGORIA_ESTADO_VALE'] ?? '')
+											        : trim($vale->COD_CATEGORIA_ESTADO_VALE ?? '');
+
+											    return $estado === 'ETM0000000000005';
+												});
+					$listadatos 			= array_values($listadatos);
+					$count_x_aprobar_vl		= count($listadatos);
 
 				}
 			}
@@ -1743,6 +1803,10 @@ class UserController extends Controller {
 						 	'count_x_aprobar_lg' 		=> $count_x_aprobar_lg,
 						 	'count_observados_lg' 		=> $count_observados_lg,
 						 	'count_observadoslg_le' 	=> $count_observadoslg_le,
+
+						 	'urlvl' 					=> $urlvl,
+						 	'count_x_aprobar_vl' 		=> $count_x_aprobar_vl,
+						 	
 
 						 	'urldip' 					=> $urldip,
 						 	'count_reparables_dip' 		=> $count_reparables_dip,
@@ -1855,6 +1919,27 @@ class UserController extends Controller {
 						 ]);
 	}
 
+	public function actionListarTerceros($idopcion)
+	{
+		/******************* validar url **********************/
+		$validarurl = $this->funciones->getUrl($idopcion,'Ver');
+	    if($validarurl <> 'true'){return $validarurl;}
+	    /******************************************************/
+        $array_rols     = 	WEBRol::where('ind_merge','=',1)
+                         	->pluck('id')
+                         	->toArray();
+
+	    $listaterceros  = 	Tercero::orderBy('FECHA_CREA', 'DESC')
+	    					->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+	    					->get();
+
+		return View::make('usuario/listaterceros',
+						 [
+						 	'listaterceros' => $listaterceros,
+						 	'idopcion' => $idopcion,
+						 ]);
+	}
+
 
 	public function actionAgregarUsuario($idopcion,Request $request)
 	{
@@ -1929,7 +2014,211 @@ class UserController extends Controller {
 						]);
 		}
 	}
+	public function actionAgregarTercero($idopcion,Request $request)
+	{
+		/******************* validar url **********************/
+		$validarurl = $this->funciones->getUrl($idopcion,'Anadir');
+	    if($validarurl <> 'true'){return $validarurl;}
+	    /******************************************************/
 
+		if($_POST)
+		{
+
+            try {
+
+                DB::beginTransaction();
+
+				$usuario 	= 	User::where('name', $request['name'])->first();  
+				if(count($usuario)>0){
+					return Redirect::back()->withInput()->with('errorbd', 'Este usuario con ese name ya esta registrado');
+				}
+
+				$personal_id 	 		 	= 	$request['personal'];
+				$personal     				=   WEBListaPersonal::where('id', '=', $personal_id)->first();
+				$trabajador 				= 	DB::table('STD.TRABAJADOR')->where('COD_TRAB','=',$personal->id)->first();
+				$idusers 				 	=   $this->funciones->getCreateIdMaestra('users');
+
+
+		        $area              			=   DB::table('CON.CENTRO_COSTO')
+								                ->where('COD_CENTRO_COSTO','=', $request['area_id'])
+		                                        ->select(DB::raw("
+		                                          	COD_CENTRO_COSTO,
+		                                          	TXT_NOMBRE")
+		                                        )->first();
+
+
+		        $empresa              		=   DB::table('STD.EMPRESA')
+		                                        ->where('COD_EMPR','=',$request['empresa_id'])
+		                                        ->select(DB::raw("
+		                                          STD.EMPRESA.COD_EMPR,
+		                                          STD.EMPRESA.NOM_EMPR")
+		                                        )->first();
+
+
+		        $centro              		=   DB::table('ALM.CENTRO')
+		                                        ->where('COD_CENTRO','=',$request['centro_id'])
+		                                        ->select(DB::raw("
+		                                          	COD_CENTRO,
+		                                          	NOM_CENTRO")
+		                                        )->first();
+	        	$banco    					=   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->WHERE('COD_CATEGORIA','=',$request['banco_id'])->first();
+
+				$tercero            	 	=	new Tercero;
+				$tercero->DNI 	     	 	=   $trabajador->NRO_DOCUMENTO;
+				$tercero->USER_ID 	     	=   $idusers;
+				$tercero->NOMBRE  		 	=	$personal->nombres;
+				$tercero->COD_AREA  		=	$area->COD_CENTRO_COSTO;
+				$tercero->TXT_AREA 	   		=  	$area->TXT_NOMBRE;
+				$tercero->COD_EMPRESA  		=	$empresa->COD_EMPR;
+				$tercero->TXT_EMPRESA 	   	=  	$empresa->NOM_EMPR;
+				$tercero->COD_CENTRO  		=	$centro->COD_CENTRO;
+				$tercero->TXT_CENTRO 	   	=  	$centro->NOM_CENTRO;
+				$tercero->COD_CENTRO  		=	$centro->COD_CENTRO;
+				$tercero->COD_BANCO  		=	$banco->COD_CATEGORIA;
+				$tercero->TXT_BANCO  		=	$banco->NOM_CATEGORIA;
+				$tercero->TXT_CUENTA_CORRIENTE =	$request['cuenta_bancaria'];
+	            $tercero->FECHA_CREA 		= 	$this->fechaactual;
+	            $tercero->USUARIO_CREA 		= 	Session::get('usuario')->id;
+				$tercero->save();
+
+
+				$cabecera            	 	=	new User;
+				$cabecera->id 	     	 	=   $idusers;
+				$cabecera->nombre 	     	=   $personal->nombres;
+				$cabecera->name  		 	=	$request['name'];
+				$cabecera->passwordmobil  	=	$request['password'];
+				$cabecera->fecha_crea 	   	=  	$this->fechaactual;
+				$cabecera->password 	 	= 	Crypt::encrypt($request['password']);
+				$cabecera->ind_confirmacion	= 	1;
+				$cabecera->ind_contacto 	= 	1;	
+				$cabecera->email_confirmacion 	= 	1;
+				$cabecera->rol_id 	 		= 	$request['rol_id'];
+				$cabecera->usuarioosiris_id	= 	$personal->id;
+				$cabecera->save();
+
+
+
+				$id 						= 	$this->funciones->getCreateIdMaestra('WEB.userempresacentros');
+			    $detalle            		=	new WEBUserEmpresaCentro;
+			    $detalle->id 	    		=  	$id;
+				$detalle->empresa_id 		= 	'IACHEM0000010394';
+				$detalle->centro_id    		=  	$centro->COD_CENTRO;
+				$detalle->fecha_crea 	 	= 	$this->fechaactual;
+				$detalle->usuario_id    	=  	$idusers;
+				$detalle->save();
+				$id 						= 	$this->funciones->getCreateIdMaestra('WEB.userempresacentros');
+			    $detalle            		=	new WEBUserEmpresaCentro;
+			    $detalle->id 	    		=  	$id;
+				$detalle->empresa_id 		= 	'IACHEM0000007086';
+				$detalle->centro_id    		=  	$centro->COD_CENTRO;
+				$detalle->fecha_crea 	 	= 	$this->fechaactual;
+				$detalle->usuario_id    	=  	$idusers;
+				$detalle->save();
+
+
+ 
+                DB::commit();
+            } catch (\Exception $ex) {
+                DB::rollback();
+                return Redirect::to('/gestion-de-registros-terceros/' . $idopcion)->with('errorbd', $ex . ' Ocurrio un error inesperado');
+            }
+
+ 			return Redirect::to('/gestion-de-registros-terceros/'.$idopcion)->with('bienhecho', 'Tercero '.$personal->nombres.' registrado con exito');
+
+		}else{
+
+
+            $arraydni    				=   DB::table('WEB.platrabajadores')
+		                                    ->where('situacion_id', 'PRMAECEN000000000002')
+		                                    //->where('dni','=','41277717')
+	                                        ->pluck('dni')
+	                                        ->toArray();
+
+            $arraytrabajadores    		=   DB::table('STD.TRABAJADOR')
+		                                    ->whereIn('NRO_DOCUMENTO',$arraydni)
+	                                        ->pluck('COD_TRAB')
+	                                        ->toArray();
+
+
+			$listapersonal 				= 	DB::table('WEB.LISTAPERSONAL_TER')
+	    									->leftJoin('users', 'WEB.LISTAPERSONAL_TER.id', '=', 'users.usuarioosiris_id')
+	    									->whereNull('users.usuarioosiris_id')
+	    									->whereNotIn('WEB.LISTAPERSONAL_TER.id',$arraytrabajadores)
+	    									->where('WEB.LISTAPERSONAL_TER.id','not like','JVE%')
+	    									->select('WEB.LISTAPERSONAL_TER.id','WEB.LISTAPERSONAL_TER.nombres','WEB.LISTAPERSONAL_TER.COD_USUARIO')
+	    									->get();
+
+			$rol 						= 	DB::table('WEB.Rols')->where('ind_merge','=',1)->where('id','=','1CIX00000048')->pluck('nombre','id')->toArray();
+
+
+	        $listaempresa              =   DB::table('STD.EMPRESA')
+	                                        ->where('STD.EMPRESA.IND_PROVEEDOR','=',1)
+	                                        ->where('STD.EMPRESA.COD_ESTADO','=',1)
+	                                        ->where('COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+	                                        ->whereIn('STD.EMPRESA.COD_EMPR',['IACHEM0000010394', 'IACHEM0000007086'])
+	                                        ->select(DB::raw("
+	                                          STD.EMPRESA.COD_EMPR,
+	                                          STD.EMPRESA.NOM_EMPR AS NOMBRE")
+	                                        )
+	                                        ->pluck('NOMBRE','COD_EMPR')
+	                                        ->toArray();
+
+	        $combo_empresa              =   array('' => "Seleccione empresa") + $listaempresa;
+	        $empresa_id 				=	'';
+
+
+	        $listacentro              	=   DB::table('ALM.CENTRO')
+	                                        ->where('COD_ESTADO','=',1)
+	                                        ->select(DB::raw("
+	                                          	COD_CENTRO,
+	                                          	NOM_CENTRO AS NOMBRE")
+	                                        )
+	                                        ->pluck('NOMBRE','COD_CENTRO')
+	                                        ->toArray();
+
+	        $combo_centro               =   array('' => "Seleccione centro") + $listacentro;
+	        $centro_id 					=	'';
+
+
+	        $listaarea              	=   DB::table('CON.CENTRO_COSTO')
+							                ->where('COD_ESTADO', 1)
+							                ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
+							                ->where('IND_MOVIMIENTO', 1)
+	                                        ->select(DB::raw("
+	                                          	COD_CENTRO_COSTO,
+	                                          	TXT_NOMBRE AS NOMBRE")
+	                                        )
+	                                        ->pluck('NOMBRE','COD_CENTRO_COSTO')
+	                                        ->toArray();
+
+	        $combo_area               	=   array('' => "Seleccione area") + $listaarea;
+	        $area_id 					=	'';
+
+			$comborol  					= 	array('' => "Seleccione Rol") + $rol;
+
+
+	        $banco_id       			=   'BAM0000000000001';
+	        $arraybancos    			=   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
+	        $combobancos    			=   array('' => "Seleccione Entidad Bancaria") + $arraybancos;
+
+		
+			return View::make('usuario/agregartercero',
+						[
+							'comborol'  		=> $comborol,
+							'combo_empresa'  	=> $combo_empresa,
+							'empresa_id'  		=> $empresa_id,
+							'banco_id'  		=> $banco_id,
+							'combobancos'  		=> $combobancos,
+
+							'combo_centro'  	=> $combo_centro,
+							'centro_id'  		=> $centro_id,
+							'combo_area'  		=> $combo_area,
+							'area_id'  			=> $area_id,
+							'listapersonal'  	=> $listapersonal,			
+						  	'idopcion'  		=> $idopcion
+						]);
+		}
+	}
 
 	public function actionModificarUsuario($idopcion,$idusuario,Request $request)
 	{
@@ -1982,6 +2271,167 @@ class UserController extends Controller {
 		        				]);
 		}
 	}
+
+	public function actionModificarTercero($idopcion,$idusuario,Request $request)
+	{
+
+		/******************* validar url **********************/
+		$validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+	    if($validarurl <> 'true'){return $validarurl;}
+	    /******************************************************/
+	    $idusuario = $this->funciones->decodificarmaestratercero($idusuario);
+
+		if($_POST)
+		{
+            try {
+
+                DB::beginTransaction();
+
+
+					$tercero 					= 	Tercero::where('DNI', $idusuario)->first();
+					$usuario 					= 	User::where('id', $tercero->USER_ID)->first(); 
+
+			        $area              			=   DB::table('CON.CENTRO_COSTO')
+									                ->where('COD_CENTRO_COSTO','=', $request['area_id'])
+			                                        ->select(DB::raw("
+			                                          	COD_CENTRO_COSTO,
+			                                          	TXT_NOMBRE")
+			                                        )->first();
+
+
+			        $empresa              		=   DB::table('STD.EMPRESA')
+			                                        ->where('COD_EMPR','=',$request['empresa_id'])
+			                                        ->select(DB::raw("
+			                                          STD.EMPRESA.COD_EMPR,
+			                                          STD.EMPRESA.NOM_EMPR")
+			                                        )->first();
+
+
+			        $centro              		=   DB::table('ALM.CENTRO')
+			                                        ->where('COD_CENTRO','=',$request['centro_id'])
+			                                        ->select(DB::raw("
+			                                          	COD_CENTRO,
+			                                          	NOM_CENTRO")
+			                                        )->first();
+	        	$banco    					=   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->WHERE('COD_CATEGORIA','=',$request['banco_id'])->first();
+
+
+			        Tercero::where('DNI', $idusuario)
+			            ->update(
+			                [
+			                    'ACTIVO' => $request['activo'],
+			                    'COD_AREA' => $area->COD_CENTRO_COSTO,
+			                    'TXT_AREA' => $area->TXT_NOMBRE,
+			                    'COD_EMPRESA' => $empresa->COD_EMPR,
+			                    'TXT_EMPRESA' => $empresa->NOM_EMPR,
+			                    'COD_CENTRO' => $centro->COD_CENTRO,
+			                    'TXT_CENTRO' => $centro->NOM_CENTRO,
+			                    'TXT_CUENTA_CORRIENTE' => $request['cuenta_bancaria'],
+			                    'TXT_BANCO' => $banco->NOM_CATEGORIA,
+			                    'COD_BANCO' => $banco->COD_CATEGORIA,
+			                    'FECHA_MOD' => $this->fechaactual,
+			                    'USUARIO_MOD' => Session::get('usuario')->id
+			                ]
+			            );
+
+					$cabecera            	 =	User::find($usuario->id);			
+					$cabecera->name  		 =	$request['name'];
+					$cabecera->passwordmobil =	$request['password'];
+					$cabecera->fecha_mod 	 =  $this->fechaactual;
+					$cabecera->password 	 = 	Crypt::encrypt($request['password']);
+					$cabecera->activo 	 	 =  $request['activo'];			
+					$cabecera->rol_id 	 	 = 	$request['rol_id']; 
+					$cabecera->ind_confirmacion	= 	1;
+					$cabecera->ind_contacto 	= 	1;
+					$cabecera->email_confirmacion 	= 	1;
+					$cabecera->save();
+
+                DB::commit();
+            } catch (\Exception $ex) {
+                DB::rollback();
+                return Redirect::to('/gestion-de-registros-terceros/' . $idopcion)->with('errorbd', $ex . ' Ocurrio un error inesperado');
+            }
+ 			return Redirect::to('/gestion-de-registros-terceros/'.$idopcion)->with('bienhecho', 'Tercero '.$request['nombre'].' modificado con exito');
+
+
+		}else{
+
+
+				$tercero 					= 	Tercero::where('DNI', $idusuario)->first();
+				$usuario 					= 	User::where('id', $tercero->USER_ID)->first();  
+				$rol 						= 	DB::table('WEB.Rols')->where('id','=','1CIX00000048')->pluck('nombre','id')->toArray();
+				$comborol  					= 	array($usuario->rol_id => $usuario->rol->nombre) + $rol;
+				$funcion 					= 	$this;	
+
+		        $listaempresa              =   DB::table('STD.EMPRESA')
+		                                        ->where('STD.EMPRESA.IND_PROVEEDOR','=',1)
+		                                        ->where('STD.EMPRESA.COD_ESTADO','=',1)
+		                                        ->where('COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+		                                        ->whereIn('STD.EMPRESA.COD_EMPR',['IACHEM0000010394', 'IACHEM0000007086'])
+		                                        ->select(DB::raw("
+		                                          STD.EMPRESA.COD_EMPR,
+		                                          STD.EMPRESA.NOM_EMPR AS NOMBRE")
+		                                        )
+		                                        ->pluck('NOMBRE','COD_EMPR')
+		                                        ->toArray();
+
+		        $combo_empresa              =   array('' => "Seleccione empresa") + $listaempresa;
+		        $empresa_id 				=	$tercero->COD_EMPRESA;
+
+
+		        $listacentro              	=   DB::table('ALM.CENTRO')
+		                                        ->where('COD_ESTADO','=',1)
+		                                        ->select(DB::raw("
+		                                          	COD_CENTRO,
+		                                          	NOM_CENTRO AS NOMBRE")
+		                                        )
+		                                        ->pluck('NOMBRE','COD_CENTRO')
+		                                        ->toArray();
+
+		        $combo_centro               =   array('' => "Seleccione centro") + $listacentro;
+		        $centro_id 					=	$tercero->COD_CENTRO;
+
+
+		        $listaarea              	=   DB::table('CON.CENTRO_COSTO')
+								                ->where('COD_ESTADO', 1)
+								                ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
+								                ->where('IND_MOVIMIENTO', 1)
+		                                        ->select(DB::raw("
+		                                          	COD_CENTRO_COSTO,
+		                                          	TXT_NOMBRE AS NOMBRE")
+		                                        )
+		                                        ->pluck('NOMBRE','COD_CENTRO_COSTO')
+		                                        ->toArray();
+
+		        $combo_area               	=   array('' => "Seleccione area") + $listaarea;
+		        $area_id 					=	$tercero->COD_AREA;
+
+
+		        $banco_id       			=   $tercero->COD_BANCO;;
+		        $arraybancos    			=   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
+		        $combobancos    			=   array('' => "Seleccione Entidad Bancaria") + $arraybancos;
+
+
+		        return View::make('usuario/modificartercero', 
+		        				[
+		        					'usuario'  		=> $usuario,
+		        					'tercero'  		=> $tercero,
+									'banco_id'  	=> $banco_id,
+									'combobancos'  		=> $combobancos,
+		        					
+									'combo_empresa'  	=> $combo_empresa,
+									'empresa_id'  		=> $empresa_id,
+									'combo_centro'  	=> $combo_centro,
+									'centro_id'  		=> $centro_id,
+									'combo_area'  		=> $combo_area,
+									'area_id'  			=> $area_id,
+									'comborol' 		=> $comborol,
+						  			'idopcion' 		=> $idopcion,
+									'funcion' 		=> $funcion,
+		        				]);
+		}
+	}
+
 
 	public function actionListarRoles($idopcion) {
 

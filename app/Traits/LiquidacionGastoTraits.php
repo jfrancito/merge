@@ -76,9 +76,7 @@ trait LiquidacionGastoTraits
                     ->select('COD_IMPORTE_MOTIVO','TXT_IMPORTE_MOTIVO')
                     ->get();
                 $mapaMotivos = $motivos->pluck('COD_IMPORTE_MOTIVO','TXT_IMPORTE_MOTIVO')->toArray();
-
                 $resultado = [];
-
                 foreach ($ldetallearendir as $item) {
                     $conceptos = explode("<br>", $item->NOM_TIPOS);
                     $montos = explode("<br>", $item->CAN_UNITARIO_TOTAL);
@@ -102,6 +100,28 @@ trait LiquidacionGastoTraits
                     }
 
                 }
+
+
+                // Agrupar y sumar
+                $resultado = collect($resultado)->groupBy(function($item) {
+                    // Unir TIG0000000000004 y TIG0000000000005 en uno
+                    if (in_array($item['concepto_id'], ['TIG0000000000004', 'TIG0000000000005'])) {
+                        return 'PASAJES_UNIFICADOS';
+                    }
+                    return $item['concepto_id'];
+                })->map(function($group, $key) {
+                    if ($key === 'PASAJES_UNIFICADOS') {
+                        return [
+                            'concepto' => 'PASAJES UNIFICADOS',
+                            'concepto_id' => 'TIG0000000000004', // Puedes usar cualquiera de los dos
+                            'monto' => $group->sum('monto')
+                        ];
+                    }
+                    
+                    // Para los demás conceptos, mantener el primero
+                    return $group->first();
+                })->values()->all();
+
                 // Convertir a array de salida
                 $array = array_values($resultado);
                 $indice = array_search($cod_vale, array_column($array, 'concepto_id'));
@@ -109,6 +129,26 @@ trait LiquidacionGastoTraits
                     $monto = $array[$indice]['monto'];
                 } else {
                     $monto = 0;
+                }
+
+                if($monto==0 && $cod_vale == 'TIG0000000000004'){
+                    $cod_vale = 'TIG0000000000005';
+                    $indice = array_search($cod_vale, array_column($array, 'concepto_id'));
+                    if ($indice !== false) {
+                        $monto = $array[$indice]['monto'];
+                    } else {
+                        $monto = 0;
+                    }
+                }
+
+                if($monto==0 && $cod_vale == 'TIG0000000000005'){
+                    $cod_vale = 'TIG0000000000004';
+                    $indice = array_search($cod_vale, array_column($array, 'concepto_id'));
+                    if ($indice !== false) {
+                        $monto = $array[$indice]['monto'];
+                    } else {
+                        $monto = 0;
+                    }
                 }
 
                 $total = DB::table('LQG_DETDOCUMENTOLIQUIDACIONGASTO')
@@ -120,8 +160,8 @@ trait LiquidacionGastoTraits
                 if($monto==0){
                     $mensaje = 'El monto supera al producto o el producto no se encuentra configurado en el vale';
                 }
-
-                if (($total+$importe-$resta)>$monto) {
+                //dd($monto);
+                if (($total+$importe-$resta)>($monto+0.2)) {
                     $mensaje = 'El monto supera al producto que se encuentra configurado en el vale';
                 }
             }
@@ -131,6 +171,20 @@ trait LiquidacionGastoTraits
         return  $mensaje;
     }
 
+
+
+    private function lq_valearendir($ID_DOCUMENTO) {
+
+        $valearendir_info = LqgLiquidacionGasto::where('LQG_LIQUIDACION_GASTO.ACTIVO', '=', '1')
+            ->where('LQG_LIQUIDACION_GASTO.ID_DOCUMENTO', '=', $ID_DOCUMENTO)
+            ->leftJoin('WEB.VALE_RENDIR', 'LQG_LIQUIDACION_GASTO.ARENDIR_ID', '=', 'WEB.VALE_RENDIR.ID')
+            ->leftJoin('TES.AUTORIZACION', 'WEB.VALE_RENDIR.ID_OSIRIS', '=', 'TES.AUTORIZACION.COD_AUTORIZACION')
+            ->select('TES.AUTORIZACION.*')
+            ->orderBy('LQG_LIQUIDACION_GASTO.FECHA_CREA', 'DESC')
+            ->first();
+        
+        return $valearendir_info;
+    }
 
 
     private function lg_lista_arendirlg($liquidaciongastos,$indicador) {
@@ -342,6 +396,23 @@ trait LiquidacionGastoTraits
         return $fecha;
     }
 
+
+
+    private function lg_lista_liquidacion_gastos($fecha_inicio, $fecha_fin) {
+
+
+        $listacabecera = LqgLiquidacionGasto::where('LQG_LIQUIDACION_GASTO.ACTIVO', '=', '1')
+            ->whereRaw("CAST(LQG_LIQUIDACION_GASTO.FECHA_CREA AS DATE) >= ? and CAST(LQG_LIQUIDACION_GASTO.FECHA_CREA AS DATE) <= ?", [$fecha_inicio, $fecha_fin])
+            ->where('LQG_LIQUIDACION_GASTO.USUARIO_CREA', '=', Session::get('usuario')->id)
+            ->where('LQG_LIQUIDACION_GASTO.COD_EMPRESA', '=', Session::get('empresas')->COD_EMPR)
+            ->leftJoin('WEB.VALE_RENDIR', 'LQG_LIQUIDACION_GASTO.ARENDIR_ID', '=', 'WEB.VALE_RENDIR.ID')
+            ->leftJoin('TES.AUTORIZACION', 'WEB.VALE_RENDIR.ID_OSIRIS', '=', 'TES.AUTORIZACION.COD_AUTORIZACION')
+            ->select('LQG_LIQUIDACION_GASTO.*','TES.AUTORIZACION.TXT_SERIE','TES.AUTORIZACION.TXT_NUMERO')
+            ->orderBy('LQG_LIQUIDACION_GASTO.FECHA_CREA', 'DESC')
+            ->get();
+
+        return  $listacabecera;
+    }
 
 
     private function lg_lista_cabecera_comprobante_total_gestion_excel($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id) {
@@ -1167,7 +1238,7 @@ trait LiquidacionGastoTraits
                 $TXT_TABLA              =       'CMP.DOCUMENTO_CTBLE';
                 $TXT_GLOSA              =       'LIQUIDACION GASTOS';
 
-                $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.REFERENCIA_ASOC_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?');
+                $stmt = DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.REFERENCIA_ASOC_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?');
                 $stmt->bindParam(1, $accion ,PDO::PARAM_STR);                                   //@IND_TIPO_OPERACION='I',
                 $stmt->bindParam(2, $coddocumentodet[0]  ,PDO::PARAM_STR);                      //@COD_TABLA='IILMNC0000000495',
                 $stmt->bindParam(3, $coddocumento[0] ,PDO::PARAM_STR);                          //@COD_TABLA_ASOC='IILMFC0000005728',
@@ -1187,7 +1258,7 @@ trait LiquidacionGastoTraits
                 $TXT_TABLA              =       'CMP.DOCUMENTO_CTBLE';
                 $TXT_GLOSA              =       'LIQUIDACION GASTOS';
 
-                $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.REFERENCIA_ASOC_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?');
+                $stmt = DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.REFERENCIA_ASOC_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?');
                 $stmt->bindParam(1, $accion ,PDO::PARAM_STR);                                   //@IND_TIPO_OPERACION='I',
                 $stmt->bindParam(2, $coddocumento[0]  ,PDO::PARAM_STR);                      //@COD_TABLA='IILMNC0000000495',
                 $stmt->bindParam(3, $coddocumentodet[0] ,PDO::PARAM_STR);                          //@COD_TABLA_ASOC='IILMFC0000005728',
@@ -1207,6 +1278,7 @@ trait LiquidacionGastoTraits
 
                 $detdocumentolg         =   LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
                                             ->where('ITEM','=',$item->ITEM)
+                                            ->whereRaw("ISNULL(IND_OSIRIS, 0) <> 1")
                                             ->where('ACTIVO','=','1')->get();
                                             
                 foreach($detdocumentolg as $indexdoc => $itemdoc){
@@ -1222,7 +1294,7 @@ trait LiquidacionGastoTraits
                         $COD_USUARIO_REGISTRO                   =       Session::get('usuario')->name;
 
 
-                        $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.DETALLE_PRODUCTO_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?');
+                        $stmt = DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.DETALLE_PRODUCTO_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?');
                         $stmt->bindParam(1, $accion ,PDO::PARAM_STR);                                   //@IND_TIPO_OPERACION='I',
                         $stmt->bindParam(2, $coddocumentodet[0]  ,PDO::PARAM_STR);                      //@COD_TABLA='IILMVR0000002923',
                         $stmt->bindParam(3, $COD_PRODUCTO ,PDO::PARAM_STR);                             //@COD_PRODUCTO='PRD0000000016186',
@@ -1401,6 +1473,8 @@ trait LiquidacionGastoTraits
 
         return  $listadatos;
     }
+
+
 
     private function lg_lista_cabecera_comprobante_total_jefe() {
         if(Session::get('usuario')->id== '1CIX00000001'){
@@ -1595,6 +1669,7 @@ trait LiquidacionGastoTraits
     private function lg_calcular_total_observar($iddocumento) {
 
         $detdocumentolg                     =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
+                                                ->whereRaw("ISNULL(IND_OSIRIS, 0) <> 1")
                                                 ->where('ACTIVO','=',1)
                                                 ->get();
 
@@ -1612,6 +1687,7 @@ trait LiquidacionGastoTraits
     private function lg_calcular_total_detalle($iddocumento) {
 
          $detdocumentolg                     =   LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
+                                                ->whereRaw("ISNULL(IND_OSIRIS, 0) <> 1")
                                                 ->where('ACTIVO','=',1)
                                                 ->get();
 
@@ -1643,6 +1719,7 @@ trait LiquidacionGastoTraits
                             ]);
 
         $detdocumentolg                     =   LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
+                                                ->whereRaw("ISNULL(IND_OSIRIS, 0) <> 1")
                                                 ->where('ACTIVO','=',1)
                                                 ->get();
 
@@ -1659,6 +1736,7 @@ trait LiquidacionGastoTraits
     private function lg_calcular_total_cabecera($iddocumento) {
 
         $detdocumentolg                     =   LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
+                                                ->whereRaw("ISNULL(IND_OSIRIS, 0) <> 1")
                                                 ->where('ACTIVO','=',1)
                                                 ->get();
 
@@ -1670,6 +1748,22 @@ trait LiquidacionGastoTraits
                                 'IGV'=> $detdocumentolg->SUM('IGV')
                             ]);                   
     }
+
+    private function lg_combo_costo_xtrabajador_tercero($titulo,$txt_referencia) {
+
+        $array =        DB::table('CON.CENTRO_COSTO')
+                        ->where('COD_ESTADO', 1)
+                        ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
+                        ->where('COD_CENTRO_COSTO' ,'=', $txt_referencia)
+                        ->where('IND_MOVIMIENTO', 1)
+                        ->orderBy('TXT_NOMBRE')
+                        ->pluck('TXT_NOMBRE','COD_CENTRO_COSTO')
+                        ->toArray();
+
+        $combo      =       array('' => $titulo) + $array;
+        return  $combo;                    
+    }
+
 
 
     private function lg_combo_costo_xtrabajador($titulo,$txt_referencia) {
@@ -1741,6 +1835,16 @@ trait LiquidacionGastoTraits
         $combo      =       array('' => $titulo) + $array;
         return  $combo;                    
     }
+
+
+    private function lg_combo_tipodocumento_impulso($titulo,$tipo_documento_id) {
+        $array      =       STDTipoDocumento::whereIn('COD_TIPO_DOCUMENTO',[$tipo_documento_id])
+                            ->pluck('TXT_TIPO_DOCUMENTO','COD_TIPO_DOCUMENTO')
+                            ->toArray();
+        $combo      =       array('' => $titulo) + $array;
+        return  $combo;                    
+    }
+
 
     private function lg_combo_cuenta_moneda($titulo,$todo,$tipocontrato,$centro_id,$empresa_id,$moneda_id) {
 
@@ -1846,6 +1950,29 @@ trait LiquidacionGastoTraits
 
         return  $combo;                    
     }
+
+    private function lg_combo_cuenta_lg_nuevo($titulo,$todo,$tipocontrato,$centro_id,$empresa_id) {
+
+
+        $array                          = DB::table('CMP.CONTRATO as TBL')
+                                            ->selectRaw("
+                                                TBL.COD_CONTRATO,
+                                                LEFT(TBL.COD_CONTRATO, 6) + '-0' + CAST(CAST(RIGHT(TBL.COD_CONTRATO, 10) AS INT) AS VARCHAR(10)) + ' -- ' 
+                                                + IIF(TBL.COD_CATEGORIA_MONEDA = 'MON0000000000001', 'S/', '$') + ' ' + TBL.TXT_CATEGORIA_TIPO_CONTRATO AS CONTRATO
+                                            ")
+                                            ->where('TBL.COD_ESTADO', 1)
+                                            ->where('TBL.COD_EMPR', Session::get('empresas')->COD_EMPR)
+                                            ->where('TBL.COD_CENTRO', $centro_id)
+                                            ->where('TBL.COD_EMPR_CLIENTE', $empresa_id)
+                                            ->whereNotIn('TBL.COD_CATEGORIA_ESTADO_CONTRATO', ['ECO0000000000005', 'ECO0000000000006'])
+                                            ->pluck('CONTRATO','COD_CONTRATO')
+                                            ->toArray();
+
+        $combo                  =   array('' => $titulo) + $array;
+
+        return  $combo;                    
+    }
+
 
     private function lg_combo_cuenta_lg_moneda($titulo,$todo,$tipocontrato,$centro_id,$empresa_id,$moneda_id) {
 

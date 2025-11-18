@@ -18,7 +18,7 @@ use App\Modelos\STDEmpresa;
 use App\Modelos\CMPDocAsociarCompra;
 use App\Modelos\CMPOrden;
 
-
+use App\Modelos\CMPHabilitacion;
 
 
 use View;
@@ -32,6 +32,55 @@ use ZipArchive;
 
 trait PrecioCompetenciaTraits
 {
+
+
+	private function modificarglosahabilitacion() {
+			
+
+		$documentos = DB::table('LQG_LIQUIDACION_GASTO')
+		    ->join('WEB.VALE_RENDIR', 'LQG_LIQUIDACION_GASTO.ARENDIR_ID', '=', 'WEB.VALE_RENDIR.ID')
+		    ->join('TES.AUTORIZACION', 'TES.AUTORIZACION.COD_AUTORIZACION', '=', 'WEB.VALE_RENDIR.ID_OSIRIS')
+		    ->join('CMP.HABILITACION', function ($join) {
+		        $join->on('CMP.HABILITACION.COD_DOCUMENTO_CTBLE', '=', 'LQG_LIQUIDACION_GASTO.COD_OSIRIS')
+		             ->where('CMP.HABILITACION.COD_PRODUCTO', '=', 'PRD0000000014312');
+		    })
+		    ->where('LQG_LIQUIDACION_GASTO.ACTIVO', 1)
+		    ->whereRaw('ISNULL(LQG_LIQUIDACION_GASTO.IND_VALE_OSIRIS, 0) = 0')
+		    ->whereNotIn('LQG_LIQUIDACION_GASTO.COD_ESTADO', ['ETM0000000000006'])
+		    ->whereRaw("ISNULL(LQG_LIQUIDACION_GASTO.ARENDIR_ID, '') != ''")
+		    ->whereRaw("ISNULL(LQG_LIQUIDACION_GASTO.COD_OSIRIS, '') != ''")
+		    ->select(
+		        'CMP.HABILITACION.COD_HABILITACION',
+		        'LQG_LIQUIDACION_GASTO.COD_OSIRIS',
+		        'LQG_LIQUIDACION_GASTO.ID_DOCUMENTO',
+		        'LQG_LIQUIDACION_GASTO.ARENDIR_ID',
+		        'WEB.VALE_RENDIR.ID_OSIRIS',
+		        'TES.AUTORIZACION.TXT_SERIE',
+		        'TES.AUTORIZACION.TXT_NUMERO',
+		        'CMP.HABILITACION.TXT_OBSERVACION'
+		    )
+		    ->get();
+
+		//dd($documentos);
+	    foreach($documentos as $index=>$item){
+
+				DB::table('CMP.HABILITACION')
+				    ->where('COD_HABILITACION', $item->COD_HABILITACION)
+				    ->update([
+				        'TXT_OBSERVACION' => DB::raw("TXT_OBSERVACION + ' / ' + '" . $item->TXT_SERIE . ' ' . $item->TXT_NUMERO . "'")
+				    ]);
+
+				DB::table('LQG_LIQUIDACION_GASTO')
+				    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
+				    ->update([
+				        'IND_VALE_OSIRIS' => 1
+				    ]);
+	   }
+
+	}	
+
+
+
 
 	private function prefijo_empresa_pre($idempresa) {
 		if($idempresa == 'IACHEM0000010394'){
@@ -134,7 +183,7 @@ trait PrecioCompetenciaTraits
                 $contadorArchivos 							= 		  Archivo::count();
                 $nombrefilecdr                  =       $oingreso->COD_TABLA_ASOC.'.pdf';
                 $prefijocarperta                =       $this->prefijo_empresa_pre($ordencompra->COD_EMPR);
-                $rutafile                       =       $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$item->RUC_PROVEEDOR;
+                $rutafile                       =       $pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$item->RUC_PROVEEDOR;
                 $rutacompleta                   =       $rutafile.'\\'.$nombrefilecdr;
                 $valor                          =       $this->versicarpetanoexiste_pre($rutafile);
                 $path                           =       $rutacompleta;
@@ -184,22 +233,47 @@ trait PrecioCompetenciaTraits
 
 		$array_nombre_archivo = array();
 		$curl = curl_init();
-		curl_setopt_array($curl, array(
-		  CURLOPT_URL => $urlxml,
-		  CURLOPT_RETURNTRANSFER => true,
-		  CURLOPT_ENCODING => '',
-		  CURLOPT_MAXREDIRS => 10,
+		// curl_setopt_array($curl, array(
+		//   CURLOPT_URL => $urlxml,
+		//   CURLOPT_RETURNTRANSFER => true,
+		//   CURLOPT_ENCODING => '',
+		//   CURLOPT_MAXREDIRS => 10,
 
-			CURLOPT_TIMEOUT => 15, // 👈 máximo 10 segundos para la respuesta
-			CURLOPT_CONNECTTIMEOUT => 10, // 👈 máximo 5 segundos para conectar
+		// 	CURLOPT_TIMEOUT => 15, // 👈 máximo 10 segundos para la respuesta
+		// 	CURLOPT_CONNECTTIMEOUT => 10, // 👈 máximo 5 segundos para conectar
 
-		  CURLOPT_FOLLOWLOCATION => true,
-		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-		  CURLOPT_CUSTOMREQUEST => 'GET',
-		  CURLOPT_HTTPHEADER => array(
-		    'Authorization: Bearer '.$fetoken->TOKEN
-		  ),
-		));
+		//   CURLOPT_FOLLOWLOCATION => true,
+		//   CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		//   CURLOPT_CUSTOMREQUEST => 'GET',
+		//   CURLOPT_HTTPHEADER => array(
+		//     'Authorization: Bearer '.$fetoken->TOKEN
+		//   ),
+		// ));
+
+    curl_setopt_array($curl, array(
+        CURLOPT_URL => $urlxml,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 15, // máximo 15 segundos para la respuesta
+        CURLOPT_CONNECTTIMEOUT => 10, // máximo 10 segundos para conectar
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'GET',
+        CURLOPT_HTTPHEADER => array(
+            'Accept: application/json, text/plain, */*',
+            'Accept-Encoding: gzip, deflate, br, zstd',
+            'Accept-Language: es-ES,es;q=0.9',
+            'Origin: https://e-factura.sunat.gob.pe',
+            'Referer: https://e-factura.sunat.gob.pe/',
+            'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+                . 'AppleWebKit/537.36 (KHTML, like Gecko) '
+                . 'Chrome/141.0.0.0 Safari/537.36',
+            'Authorization: Bearer '.$fetoken->TOKEN
+        ),
+    ));
+
+
 		$response = curl_exec($curl);
 		curl_close($curl);
 

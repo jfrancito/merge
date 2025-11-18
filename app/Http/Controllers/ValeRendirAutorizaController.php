@@ -9,8 +9,11 @@ use App\Modelos\STDTrabajadorVale;
 use App\Modelos\WEBTipoMotivoValeRendir;
 use App\Modelos\WEBValeRendir;
 use App\Modelos\WEBValeRendirDetalle;
+use App\Modelos\WEBRegistroImporteGastos;
 use App\Modelos\ALMCentro;
 use App\Modelos\STDTrabajador;
+use Illuminate\Support\Facades\Log;
+
 use Session;
 use App\WEBRegla, App\STDEmpresa, APP\User, App\CMPCategoria;
 use View;
@@ -59,6 +62,7 @@ class ValeRendirAutorizaController extends Controller
                 ""
             );
 
+       
         return view('valerendir.ajax.modalvalerendirautoriza', [
                     'listausuarios' => $combo,
                     'listausuarios1' => $combo1,
@@ -119,6 +123,8 @@ class ValeRendirAutorizaController extends Controller
                 $vale->NRO_CUENTA,
                 $cod_categoria_estado_vale,
                 $txt_categoria_estado_vale, 
+                $vale->COD_PERSONAL_RENDIR,
+                $vale->TXT_PERSONAL_RENDIR,
                 false,
                 Session::get('usuario')->id 
             );
@@ -179,6 +185,8 @@ class ValeRendirAutorizaController extends Controller
                 $vale->NRO_CUENTA,
                 $cod_categoria_estado_vale,
                 $txt_categoria_estado_vale, 
+                $vale->COD_PERSONAL_RENDIR,
+                $vale->TXT_PERSONAL_RENDIR,
                 false,
                 Session::get('usuario')->id 
             );
@@ -197,15 +205,42 @@ class ValeRendirAutorizaController extends Controller
         public function actionDetalleImporte(Request $request)
     { 
         $id_buscar = $request->input('valerendir_id'); 
-    
    
+        $vale = WEBValeRendir::where('ID', $id_buscar)->first(); // primero en lugar de get(), para tener objeto
         $detallesImporte = WEBValeRendirDetalle::where('ID', $id_buscar)->get(); 
+
+        
+        $fecha_inicio = $detallesImporte->min('FEC_INICIO');
+        $fecha_fin = $detallesImporte->max('FEC_FIN');
+        $cod_centro = $detallesImporte->first()->COD_CENTRO ?? null;
+        $ultimo = $detallesImporte->last();
+        $ultimo_destino = $ultimo ? $ultimo->NOM_DESTINO : '';
+        $total_dias = $detallesImporte->sum('DIAS');
+        $ruta_viaje = $detallesImporte->pluck('NOM_DESTINO')->implode('/ ');
+        $txt_glosa = $vale->TXT_GLOSA ?? null;
+        $txt_glosa_venta = $detallesImporte->pluck('TXT_GLOSA_VENTA')->filter()->implode(' // ');
+        $txt_glosa_cobranza = $detallesImporte->pluck('TXT_GLOSA_COBRANZA')->filter()->implode(' // ');
+
+
+         $areacomercial = '';
+
+
 
         return view('valerendir.ajax.modaldetalleimporte', [
             'ajax' => true,
-            'detalles' => $detallesImporte
+            'valerendir' => $vale,
+            'detalles' => $detallesImporte,
+            'fecha_inicio' => $fecha_inicio,
+            'fecha_fin' => $fecha_fin,
+            'cod_centro' => $cod_centro,
+            'ultimo_destino' => $ultimo_destino,
+            'txt_glosa' => $txt_glosa,
+            'total_dias' => $total_dias,
+            'ruta_viaje' => $ruta_viaje,
+            'txt_glosa_venta' => $txt_glosa_venta,
+            'txt_glosa_cobranza' => $txt_glosa_cobranza,
+            'areacomercial' => $areacomercial
         ]);  
-
     }         
 }
  
