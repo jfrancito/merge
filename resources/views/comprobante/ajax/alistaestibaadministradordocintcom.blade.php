@@ -1,4 +1,3 @@
-
 <div class="panel-heading">
 
   <div class="tools tooltiptop">
@@ -18,7 +17,7 @@
 <br>
 
 <div class="panel-heading">
-  <form method="POST" id='formre' action="{{ url('/select-xml-estiba/'.$idopcion) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
+  <form method="POST" id='formre' action="{{ url('/select-xml-estiba-documento-interno-compra/'.$idopcion) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
         {{ csrf_field()}}
         <input type="hidden" name="jsondocumenos" id = 'jsondocumenos'>
         <input type="hidden" name="operacion_sel" id="operacion_sel" value = '{{$operacion_id}}'>
@@ -54,7 +53,8 @@
       <th>FECHA </th>
       <th>MONEDA</th>
       <th>PROVEEDOR</th>
-      <th>TOTAL</th>      
+      <th>TOTAL</th>
+      <th>TOTAL MERGE</th>
       <th>USUARIO CREACION</th>
       <th>ESTADO</th>
       <th>LOTE</th>
@@ -63,7 +63,8 @@
         <div class="text-center be-checkbox be-checkbox-sm has-primary">
           <input  type="checkbox"
                   class="todo_asignar input_asignar"
-                  id="todo_asignar"                  
+                  id="todo_asignar"
+                  disabled
           >
           <label  for="todo_asignar"
                   data-atr = "todas_asignar"
@@ -76,7 +77,7 @@
   </thead>
   <tbody>
     @foreach($listadatos as $index => $item)
-      <tr data_requerimiento_id = "{{$item->COD_DOCUMENTO_CTBLE}}" data_lote = "{{$item->LOTE_DOC}}" data_total = "{{$item->CAN_TOTAL}}">
+      <tr data_requerimiento_id = "{{$item->COD_DOCUMENTO_CTBLE}}" data_lote = "{{$item->LOTE_DOC}}" data_total = "{{$item->CAN_TOTAL}}" data_mergetotal = "{{$item->TOTAL_MERGE}}">
         <td><b>{{$index + 1}}</b></td>
         <td><b>{{$operacion_id}}</b></td>
         <td>{{$item->COD_DOCUMENTO_CTBLE}}</td>
@@ -86,6 +87,16 @@
         <td>{{$item->TXT_CATEGORIA_MONEDA}}</td>
         <td>{{$item->TXT_EMPR_EMISOR}}</td>
         <td>{{$item->CAN_TOTAL}}</td>        
+        <td class="dflex">
+            <input 
+              type="number" 
+              name="input_mergetotal" 
+              id='input_mergetotal' 
+              class="input_mergetotal" 
+              step='0.0001' min=0 max={{ $item->CAN_TOTAL-$item->TOTAL_MERGE }}
+              value="{{ $item->CAN_TOTAL-$item->TOTAL_MERGE }}"
+            >            
+        </td>        
         <td>{{$item->COD_USUARIO_CREA_AUD}}</td>
         @include('comprobante.ajax.estados')
         <td>{{$item->LOTE_DOC}}</td>
@@ -93,14 +104,14 @@
         <td class="rigth">
           <div class="text-center be-checkbox be-checkbox-sm has-primary">
             <input  type="checkbox"
-              class="{{$item->COD_DOCUMENTO_CTBLE}} input_asignar"
+              class="{{$item->COD_DOCUMENTO_CTBLE}}-{{$item->LOTE_DOC}} input_asignar"
               data_total = "{{$item->CAN_TOTAL}}"   
-              id="{{$item->COD_DOCUMENTO_CTBLE}}" >
-            <label  for="{{$item->COD_DOCUMENTO_CTBLE}}"
+              id="{{$item->COD_DOCUMENTO_CTBLE}}-{{$item->LOTE_DOC}}" >
+            <label  for="{{$item->COD_DOCUMENTO_CTBLE}}-{{$item->LOTE_DOC}}"
                   data-atr = "ver"
                   class = "checkbox checkbox_asignar"
                   data_total = "{{$item->CAN_TOTAL}}"                
-                  name="{{$item->COD_DOCUMENTO_CTBLE}}"
+                  name="{{$item->COD_DOCUMENTO_CTBLE}}-{{$item->LOTE_DOC}}"
             ></label>
           </div>
         </td>

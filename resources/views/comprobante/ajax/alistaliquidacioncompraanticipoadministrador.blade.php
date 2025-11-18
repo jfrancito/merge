@@ -25,7 +25,7 @@
 
         <td>{{$item->TXT_SERIE}} - {{$item->TXT_NUMERO}}</td>
         <td>{{$funcion->funciones->estorno_referencia($item->COD_AUTORIZACION)}}</td>
-        <td>{{$item->FEC_EMISION}}</td>
+        <td>{{$item->FEC_AUTORIZACION}}</td>
         <td>{{$item->TXT_CATEGORIA_MONEDA}}</td>
         <td>{{$item->TXT_EMPRESA}}</td>
         <td>{{$item->CAN_TOTAL}}</td>

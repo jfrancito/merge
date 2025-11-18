@@ -2471,14 +2471,21 @@ class GestionOCAdministracionController extends Controller
 
             if($fedocumento->TXT_INGRESO_LIQ=='SI'){
                 $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                        ->where('COD_ESTADO','=',1)                                        
-                                        ->where('COD_CATEGORIA','=','DCC0000000000039')
-                                        ->get();                
+                                            ->where('COD_ESTADO','=',1)                                        
+                                            ->whereIn('COD_CATEGORIA', ['DCC0000000000039','DCC0000000000040','DCC0000000000041','DCC0000000000044','DCC0000000000045'])
+                                            ->get();                
             }else{
-                $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                        ->where('COD_ESTADO','=',1)                                        
-                                        ->whereIn('COD_CATEGORIA',['DCC0000000000039','DCC0000000000040','DCC0000000000041'])
-                                        ->get();                
+                if($ordenpago->COD_CENTRO == 'CEN0000000000004' || $ordenpago->COD_CENTRO == 'CEN0000000000006'){ //rioja o bellavista
+                    $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                                ->where('COD_ESTADO','=',1)                                        
+                                                ->whereIn('COD_CATEGORIA', ['DCC0000000000041','DCC0000000000044','DCC0000000000045','DCC0000000000046'])
+                                                ->get();                
+                }else{
+                    $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                                ->where('COD_ESTADO','=',1)                                        
+                                                ->whereIn('COD_CATEGORIA', ['DCC0000000000041','DCC0000000000044','DCC0000000000045'])
+                                                ->get();
+                }                
             }            
 
             $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$idop)->where('COD_ESTADO','=',1)
@@ -3096,6 +3103,8 @@ class GestionOCAdministracionController extends Controller
                 ];
             }
 
+            $fereftop1              =   FeRefAsoc::where('lote','=',$idoc)->first();
+
             $lotes                  =   FeRefAsoc::where('lote','=',$idoc)                                        
                                         ->pluck('ID_DOCUMENTO')
                                         ->toArray();
@@ -3105,6 +3114,7 @@ class GestionOCAdministracionController extends Controller
             return View::make('comprobante/aprobaradmestiba', 
                             [
                                 'fedocumento'           =>  $fedocumento,
+                                'fereftop1'             =>  $fereftop1,
                                 'initialPreview'        =>  json_encode($initialPreview),
                                 'initialPreviewConfig'  =>  json_encode($initialPreviewConfig),
                                 'archivos'              =>  $archivos,

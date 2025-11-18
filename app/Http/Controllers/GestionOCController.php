@@ -45,6 +45,7 @@ use App\User;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Mail;
 use Session;
 use View;
 use App\Traits\GeneralesTraits;
@@ -107,7 +108,38 @@ class GestionOCController extends Controller
                          ]);
     }
 
+    public function actionAjaxBuscarCuentaBancariaLiquidacionCompraAnticipo(Request $request)
+    {
 
+
+        $entidadbanco_id        =   $request['entidadbanco_id'];
+        $prefijo_id             =   $request['prefijo_id'];
+        $orden_id               =   $request['orden_id'];
+
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo($orden_id,$prefijo_id);
+        $ordencompra            =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$idoc)->first();
+
+        $tescuentabb            =   TESCuentaBancaria::where('COD_EMPR_TITULAR','=',$ordencompra->COD_EMPR_EMISOR)
+                                    ->where('COD_EMPR_BANCO','=',$entidadbanco_id)
+                                    ->where('COD_ESTADO','=',1)
+                                    ->select(DB::raw("
+                                          TXT_NRO_CUENTA_BANCARIA,
+                                          TXT_REFERENCIA + ' - '+ TXT_NRO_CUENTA_BANCARIA AS nombre")
+                                        )
+                                    ->pluck('nombre','TXT_NRO_CUENTA_BANCARIA')
+                                    ->toArray();
+
+        $combocb                =   array('' => "Seleccione Cuenta Bancaria") + $tescuentabb;
+        $funcion                =   $this;
+
+        return View::make('comprobante/combo/combo_cuenta_bancaria',
+                         [
+                            'combocb'                   =>  $combocb,
+                            'entidadbanco_id'           =>  $entidadbanco_id,
+                            'empresa_cliente_id'        =>  $ordencompra->COD_EMPR_CLIENTE,
+                            'ajax'                      =>  true,
+                         ]);
+    }
 
     public function actionAjaxBuscarCuentaBancariaContrato(Request $request)
     {
@@ -707,8 +739,12 @@ class GestionOCController extends Controller
                 if (in_array($operacion_id, $array_canjes)) {
 
                     $categoria_id       =   $this->con_categoria_canje($operacion_id);
-                    $listadatos         =   $this->con_lista_cabecera_estibas_administrativo($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id);
 
+                    if($operacion_id=='DOCUMENTO_INTERNO_COMPRA'){
+                        $listadatos         =   $this->con_lista_cabecera_estibas_administrativo_doc_int_com($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id);
+                    }else{
+                        $listadatos         =   $this->con_lista_cabecera_estibas_administrativo($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id);
+                    }
                 }
             }
         }
@@ -795,7 +831,12 @@ class GestionOCController extends Controller
                 } else {
                     if (in_array($operacion_id, $array_canjes)) {
                         $categoria_id = $this->con_categoria_canje($operacion_id);
-                        $listadatos = $this->con_lista_cabecera_estibas_administrativo($cod_empresa, $area_id, $fecha_inicio, $fecha_fin, $proveedor_id, $categoria_id);
+
+                        if($operacion_id=='DOCUMENTO_INTERNO_COMPRA'){
+                            $listadatos         =   $this->con_lista_cabecera_estibas_administrativo_doc_int_com($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id);
+                        }else{
+                            $listadatos         =   $this->con_lista_cabecera_estibas_administrativo($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id);
+                        }                        
                     }
                 }
             }
@@ -2508,12 +2549,25 @@ class GestionOCController extends Controller
         
         View::share('titulo','REGISTRO DE COMPROBANTE LIQUIDACION COMPRA ANTICIPO: '.$idop);
         
+        $banco_id               =   '';
         if(count($fedocumento)>0){
             $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idop)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();        
             $ingresoliq_id           =   $fedocumento->TXT_INGRESO_LIQ;
+
+            //EMPRESA RELACIONADA
+            $empresa_relacionada    =   STDEmpresa::where('NRO_DOCUMENTO','=',$fedocumento->RUC_PROVEEDOR)
+                                        ->where('IND_RELACIONADO','=',1)
+                                        ->first();
+
+
+            if(count($empresa_relacionada)>0){
+                $banco_id               =   'BAM0000000000011';  
+            }
         }else{
             $detallefedocumento     =   array();
             $ingresoliq_id           =   'NO';
+
+            $empresa_relacionada    =   array();
         }
 
         //dd($detallefedocumento);
@@ -2535,14 +2589,23 @@ class GestionOCController extends Controller
         
         $funcion                =   $this;
 
+        $arraybancos            =   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
+        $combobancos            =   array('' => "Seleccione Entidad Bancaria") + $arraybancos;
+
+        $cb_id                  =   '';        
+        $combocb                =   array('' => "Seleccione Cuenta Bancaria");
+
         return View::make('comprobante/registrocomprobanteliquidacioncompraanticipoadministrator',
                          [
                             'ordenpago'             =>  $ordenpago,
                             'ordencompra'           =>  $ordencompra,
+                            'banco_id'              =>  $banco_id,
+                            'combobancos'           =>  $combobancos,
                             'ordencompra_f'           =>  $ordencompra_f,
                             'detalleordencompra'    =>  $detalleordencompra,
 
-                            
+                            'cb_id'                 =>  $cb_id,
+                            'combocb'               =>  $combocb,
                             'fedocumento'           =>  $fedocumento,
                             'detallefedocumento'    =>  $detallefedocumento,
                             'combocontacto'         =>  $combocontacto,
@@ -2619,10 +2682,16 @@ class GestionOCController extends Controller
 
                         if($ingresoliq_id=='SI'){
                             $archivosdelfe          =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                        ->where('COD_CATEGORIA','=','DCC0000000000039')->get();  
-                        }else{
-                            $archivosdelfe          =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                        ->whereIn('COD_CATEGORIA', ['DCC0000000000039','DCC0000000000040','DCC0000000000041'])->get();  
+                                                        ->whereIn('COD_CATEGORIA', ['DCC0000000000039','DCC0000000000040','DCC0000000000041','DCC0000000000043','DCC0000000000045'])
+                                                        ->get();  
+                        }else{                            
+                            if($ordenpago->COD_CENTRO == 'CEN0000000000004' || $ordenpago->COD_CENTRO == 'CEN0000000000006'){ //rioja o bellavista
+                                $archivosdelfe          =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                                        ->whereIn('COD_CATEGORIA', ['DCC0000000000041','DCC0000000000043','DCC0000000000045','DCC0000000000046'])->get();  
+                            }else{
+                                $archivosdelfe          =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                                        ->whereIn('COD_CATEGORIA', ['DCC0000000000041','DCC0000000000043','DCC0000000000045'])->get();  
+                            }
                         }
                         
 
@@ -2874,10 +2943,17 @@ class GestionOCController extends Controller
                 $contacto                                 =   SGDUsuario::where('COD_TRABAJADOR','=',$contacto_id)->first();
                 $trabajador                               =   STDTrabajador::where('COD_TRAB','=',$contacto->COD_TRABAJADOR)->first();
                 //$contacto                               =   User::where('id','=',$contacto_id)->first();                
+
+                $entidadbanco_id   =   $request['entidadbanco_id'];
+                $bancocategoria    =   CMPCategoria::where('COD_CATEGORIA','=',$entidadbanco_id)->first();
+                $cb_id             =   $request['cb_id'];
                 
                 FeDocumento::where('ID_DOCUMENTO','=',$idop)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(
                                 [                                    
+                                    'COD_CATEGORIA_BANCO'=>$bancocategoria->COD_CATEGORIA,
+                                    'TXT_CATEGORIA_BANCO'=>$bancocategoria->NOM_CATEGORIA,
+                                    'TXT_NRO_CUENTA_BANCARIA'=>$cb_id,
                                     'ARCHIVO_CDR'=>'',
                                     'ARCHIVO_PDF'=>'',
                                     'COD_ESTADO'=>'ETM0000000000002',
@@ -2938,6 +3014,17 @@ class GestionOCController extends Controller
                 $documento->TIPO                        =   'APROBADO POR USUARIO CONTACTO';
                 $documento->MENSAJE                     =   '';
                 $documento->save();               
+
+                Mail::send('emails.emailliquidacioncompraanticipogenerado',
+                [
+                    'ordenpago'     => $ordenpago,
+                    'estado'        => 'APROBADO POR USUARIO CONTACTO',
+                ],
+                function ($message) {
+                    $message->from('helpdeskisl@induamerica.com.pe', 'Vituchin')
+                            ->to('german.zamora@induamerica.com.pe')                            
+                            ->subject('LIQUIDACION DE COMPRA ANTICIPO - INDUAMERICA');
+                });
 
 
                 DB::commit();
