@@ -76,9 +76,23 @@
   </div>
 </div>
 
+<div id="modal-verdetalleimportedocumentogestion-solicitud" class="modal-container colored-header colored-header-primary modal-effect-8">
+  <div class="modal-content ">
+	<div class='modal-verdetalleimportedocumentogestion-solicitud-container'>
+	</div>
+  </div>
+</div>
+
 <div id="modal-verdetalledocumentogestion-solicitud" class="modal-container colored-header colored-header-primary modal-effect-8">
   <div class="modal-content ">
 	<div class='modal-verdetalledocumentogestion-solicitud-container'>
+	</div>
+  </div>
+</div>
+
+<div id="modal-aumdetalleimportedocumentogestion-solicitud" class="modal-container colored-header colored-header-primary modal-effect-8">
+  <div class="modal-content ">
+	<div class='modal-aumdetalleimportedocumentogestion-solicitud-container'>
 	</div>
   </div>
 </div>
