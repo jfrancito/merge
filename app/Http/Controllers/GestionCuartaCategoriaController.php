@@ -323,8 +323,8 @@ class GestionCuartaCategoriaController extends Controller
                     $cabecera->RUC                      =   $empresa->NRO_DOCUMENTO;
                     $cabecera->RAZON_SOCIAL             =   $empresa->NOM_EMPR;
                     $cabecera->NUMERO_OPERACION         =   $nro_operacion;
-                    $cabecera->COD_ESTADO               =   'ETM0000000000004';
-                    $cabecera->TXT_ESTADO               =   'POR APROBAR ADMINISTRACION';
+                    $cabecera->COD_ESTADO               =   'ETM0000000000003';
+                    $cabecera->TXT_ESTADO               =   'POR APROBAR CONTABILIDAD';
                     $cabecera->ACTIVO                   =   1;
                     $cabecera->FECHA_CREA               =   $this->fechaactual;
                     $cabecera->USUARIO_CREA             =   Session::get('usuario')->id;

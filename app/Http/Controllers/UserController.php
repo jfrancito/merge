@@ -55,6 +55,9 @@ use App\Traits\ComprobanteProvisionTraits;
 use App\Traits\ComprobanteTraits;
 use App\Traits\LiquidacionGastoTraits;
 use App\Traits\ValeRendirTraits;
+use App\Traits\CuartaCategoriaTraits;
+
+
 
 class UserController extends Controller {
 
@@ -64,7 +67,7 @@ class UserController extends Controller {
     use ComprobanteTraits;
     use LiquidacionGastoTraits;
     use ValeRendirTraits;
-
+    use CuartaCategoriaTraits;
 	public function actionDescargarManual(Request $request)
 	{
 	    $filePath = public_path('manual-proveedor.pdf');
@@ -1422,6 +1425,11 @@ class UserController extends Controller {
 		$count_x_aprobar_vl				    = 	0;
 
 
+		//renta
+		$urlrenta 							=	'';
+		$count_x_aprobar_renta 				= 	0;
+
+
 		if($trol->ind_uc == 1){
 
 			$listadatos      		=   $this->con_lista_cabecera_comprobante_total_uc($cod_empresa);
@@ -1542,10 +1550,10 @@ class UserController extends Controller {
 
 
 
-    			$urllg 					    =	'/gestion-de-aprobacion-liquidacion-gastos-contabilidad/xvr';
-
-
-
+    			$urllg 					=	'/gestion-de-aprobacion-liquidacion-gastos-contabilidad/xvr';
+    			$urlrenta				=	'/gestion-de-aprobar-cuarta-categoria/YWp';
+				$listadatos  			= 	$this->pla_lista_renta_cuarta_categoria_contabilidad();
+				$count_x_aprobar_renta 	= 	 count($listadatos);
 
         		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_cont_contrato($cod_empresa);
 				$count_x_aprobar_con 	= 	 count($listadatos);
@@ -1763,6 +1771,10 @@ class UserController extends Controller {
 					$listadatos 			= array_values($listadatos);
 					$count_x_aprobar_vl		= count($listadatos);
 
+
+
+
+
 				}
 			}
 		}
@@ -1804,8 +1816,13 @@ class UserController extends Controller {
 						 	'count_observados_lg' 		=> $count_observados_lg,
 						 	'count_observadoslg_le' 	=> $count_observadoslg_le,
 
+						 	'urlrenta' 					=> $urlrenta,
+						 	'count_x_aprobar_renta' 	=> $count_x_aprobar_renta,
+
+
 						 	'urlvl' 					=> $urlvl,
 						 	'count_x_aprobar_vl' 		=> $count_x_aprobar_vl,
+
 						 	
 
 						 	'urldip' 					=> $urldip,
