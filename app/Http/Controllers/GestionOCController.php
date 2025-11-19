@@ -3261,62 +3261,71 @@ class GestionOCController extends Controller
             }
         }
         $comboant               =   array('' => "Seleccione Anticipo")+$arrayitem;
-        $rutasuspencion         =   '';
 
+
+        $rutasuspencion             =   '';
+        $fedocumento_suspension     =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('ID_TIPO_DOC','=','R1')->first();
         //VALIDAR QUE SI TIENE CONSTANCIA DE SUSPENSION DE CUARTA LO SUBA SI NO QUE SUBA LA CONSTANCIA
-        if($ordencompra_f->CAN_TOTAL>1500 && $ordencompra_f->CCAN_RETENCION<=0){
-            $empresa_susp = STDEmpresa::where('COD_EMPR','=',$ordencompra_f->COD_EMPR_CLIENTE)->first();
-            $fecha_orden = $ordencompra_f->FEC_ORDEN;
-            $fechaObj = new DateTime($fecha_orden);
-            $anio = $fechaObj->format('Y');
+        if(count($fedocumento_suspension)>0){
 
-            $rentas = DB::table('PRO_RENTA_CUARTA_CATEGORIA')
-                ->where('RUC', $empresa_susp->NRO_DOCUMENTO)
-                ->where('COD_ESTADO', 'ETM0000000000005')
-                ->where('ANIO', $anio)
-                ->first();
+            if($ordencompra_f->CAN_TOTAL>1500 && $ordencompra_f->CAN_RETENCION<=0){
+                $empresa_susp = STDEmpresa::where('COD_EMPR','=',$ordencompra_f->COD_EMPR_CLIENTE)->first();
+                $fecha_orden = $ordencompra_f->FEC_ORDEN;
+                $fechaObj = new DateTime($fecha_orden);
+                $anio = $fechaObj->format('Y');
 
-            if(count($rentas)<=0){
-                return Redirect::back()->with('errorurl', 'Este Comprobante necesita la suspension de 4ta categoria que este aprobado por contabilidad');
-            }else{
-
-                $arentas = DB::table('ARCHIVOS')
-                    ->where('ID_DOCUMENTO', $rentas->ID_DOCUMENTO)
+                $rentas = DB::table('PRO_RENTA_CUARTA_CATEGORIA')
+                    ->where('RUC', $empresa_susp->NRO_DOCUMENTO)
+                    ->where('COD_ESTADO', 'ETM0000000000005')
+                    ->where('ANIO', $anio)
                     ->first();
-                $rutasuspencion = $arentas->URL_ARCHIVO;
 
-                $doccompras     =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra_f->COD_ORDEN)
-                                    ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000034')->where('COD_ESTADO','=',1)->first();
-                if(count($doccompras)<=0){
-                    $docasociar                              =   New CMPDocAsociarCompra;
-                    $docasociar->COD_ORDEN                   =   $ordencompra_f->COD_ORDEN;
-                    $docasociar->COD_CATEGORIA_DOCUMENTO     =   'DCC0000000000034';
-                    $docasociar->NOM_CATEGORIA_DOCUMENTO     =   'SUSPENSION DE 4TA CATEGORIA';
-                    $docasociar->IND_OBLIGATORIO             =   0;
-                    $docasociar->TXT_FORMATO                 =   'PDF';
-                    $docasociar->TXT_ASIGNADO                =   'CONTACTO        ';
-                    $docasociar->COD_USUARIO_CREA_AUD        =   Session::get('usuario')->id;
-                    $docasociar->FEC_USUARIO_CREA_AUD        =   $this->fechaactual;
-                    $docasociar->COD_ESTADO                  =   1;
-                    $docasociar->TIP_DOC                     =   'N';
-                    $docasociar->save();
+                if(count($rentas)<=0){
+                    return Redirect::back()->with('errorurl', 'Este Comprobante necesita la suspension de 4ta categoria que este aprobado por contabilidad');
+                }else{
+
+                    $arentas = DB::table('ARCHIVOS')
+                        ->where('ID_DOCUMENTO', $rentas->ID_DOCUMENTO)
+                        ->first();
+                    $rutasuspencion = $arentas->URL_ARCHIVO;
+
+                    $doccompras     =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra_f->COD_ORDEN)
+                                        ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000034')->where('COD_ESTADO','=',1)->first();
+                    if(count($doccompras)<=0){
+                        $docasociar                              =   New CMPDocAsociarCompra;
+                        $docasociar->COD_ORDEN                   =   $ordencompra_f->COD_ORDEN;
+                        $docasociar->COD_CATEGORIA_DOCUMENTO     =   'DCC0000000000034';
+                        $docasociar->NOM_CATEGORIA_DOCUMENTO     =   'SUSPENSION DE 4TA CATEGORIA';
+                        $docasociar->IND_OBLIGATORIO             =   0;
+                        $docasociar->TXT_FORMATO                 =   'PDF';
+                        $docasociar->TXT_ASIGNADO                =   'CONTACTO        ';
+                        $docasociar->COD_USUARIO_CREA_AUD        =   Session::get('usuario')->id;
+                        $docasociar->FEC_USUARIO_CREA_AUD        =   $this->fechaactual;
+                        $docasociar->COD_ESTADO                  =   1;
+                        $docasociar->TIP_DOC                     =   'N';
+                        $docasociar->save();
+                    }
                 }
+
+            }
+            if($rutasuspencion!=''){
+                if($tiposerie == 'E'){
+                    $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra_f->COD_ORDEN)->where('COD_ESTADO','=',1)
+                                                ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000004','DCC0000000000034'])
+                                                ->whereIn('TXT_ASIGNADO', ['PROVEEDOR','CONTACTO'])
+                                                ->get();
+                }else{
+                    $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra_f->COD_ORDEN)->where('COD_ESTADO','=',1)
+                                                ->where('COD_CATEGORIA_DOCUMENTO','<>','DCC0000000000003','DCC0000000000034')
+                                                ->whereIn('TXT_ASIGNADO', ['PROVEEDOR','CONTACTO'])
+                                                ->get();
+                }  
             }
 
+
         }
-        if($rutasuspencion!=''){
-            if($tiposerie == 'E'){
-                $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra_f->COD_ORDEN)->where('COD_ESTADO','=',1)
-                                            ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000004','DCC0000000000034'])
-                                            ->whereIn('TXT_ASIGNADO', ['PROVEEDOR','CONTACTO'])
-                                            ->get();
-            }else{
-                $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra_f->COD_ORDEN)->where('COD_ESTADO','=',1)
-                                            ->where('COD_CATEGORIA_DOCUMENTO','<>','DCC0000000000003','DCC0000000000034')
-                                            ->whereIn('TXT_ASIGNADO', ['PROVEEDOR','CONTACTO'])
-                                            ->get();
-            }  
-        }
+
+
 
         return View::make('comprobante/registrocomprobanteadministrator',
                          [
