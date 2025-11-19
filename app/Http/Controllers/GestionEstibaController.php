@@ -47,7 +47,7 @@ use App\Traits\ComprobanteTraits;
 use App\Traits\WhatsappTraits;
 use App\Traits\ComprobanteProvisionTraits;
 use PDO;
-
+use DateTime;
 use Storage;
 use ZipArchive;
 use Hashids;
@@ -242,6 +242,44 @@ class GestionEstibaController extends Controller
                     $dcontrol->USUARIO_CREA         =       Session::get('usuario')->id;
                     $dcontrol->save();
                 }
+
+                //guardar orden de compra precargada
+                $rutasuspencion       =   $request['rutasuspencion'];
+                if($rutasuspencion!=''){
+
+                    $aoc                            =       CMPDocAsociarCompra::where('COD_ORDEN','=',$idoc)->where('COD_ESTADO','=',1)
+                                                            ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000034'])//cambiar
+                                                            ->first();
+
+                    //$contadorArchivos = Archivo::count();
+                    $contadorArchivos               =       Archivo::count();
+
+                    $nombrefilecdr                  =       $contadorArchivos.'-'.$idoc.'.pdf';//cambiar
+                    $prefijocarperta                =       $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
+                    $rutafile                       =       $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$lote;//cambiar
+                    $rutacompleta                   =       $rutafile.'\\'.$nombrefilecdr;
+                    $valor                          =       $this->versicarpetanoexiste($rutafile);
+                    $path                           =       $rutacompleta;
+
+
+                    copy($rutasuspencion,$rutacompleta);
+                    $dcontrol                       =       new Archivo;
+                    $dcontrol->ID_DOCUMENTO         =       $idoc;
+                    $dcontrol->DOCUMENTO_ITEM       =       $fedocumento->DOCUMENTO_ITEM;
+                    $dcontrol->TIPO_ARCHIVO         =       $aoc->COD_CATEGORIA_DOCUMENTO;
+                    $dcontrol->NOMBRE_ARCHIVO       =       $nombrefilecdr;
+                    $dcontrol->DESCRIPCION_ARCHIVO  =       $aoc->NOM_CATEGORIA_DOCUMENTO;
+                    $dcontrol->URL_ARCHIVO          =       $path;
+                    $dcontrol->SIZE                 =       100;
+                    $dcontrol->EXTENSION            =       '.pdf';
+                    $dcontrol->ACTIVO               =       1;
+                    $dcontrol->FECHA_CREA           =       $this->fechaactual;
+                    $dcontrol->USUARIO_CREA         =       Session::get('usuario')->id;
+                    $dcontrol->save();
+
+                }
+
+
 
                 $tiposerie              =   substr($fedocumento->SERIE, 0, 1);
                 if($tiposerie == 'E'){
@@ -940,6 +978,70 @@ class GestionEstibaController extends Controller
 
         }
         $comboant               =   array('' => "Seleccione Anticipo")+$arrayitem;
+
+        $rutasuspencion             =   '';
+        $fedocumento_suspension     =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('ID_TIPO_DOC','=','R1')->first();
+        //VALIDAR QUE SI TIENE CONSTANCIA DE SUSPENSION DE CUARTA LO SUBA SI NO QUE SUBA LA CONSTANCIA
+        if(count($fedocumento_suspension)>0){
+
+            if($fedocumento_suspension->TOTAL_VENTA_ORIG>1500 && $fedocumento_suspension->CAN_IMPUESTO_RENTA<=0){
+                $empresa_susp = STDEmpresa::where('NRO_DOCUMENTO','=',$fedocumento_suspension->RUC_PROVEEDOR)->first();
+                $fecha_orden = $fedocumento_suspension->FEC_VENTA;
+                $fechaObj = new DateTime($fecha_orden);
+                $anio = $fechaObj->format('Y');
+
+                $rentas = DB::table('PRO_RENTA_CUARTA_CATEGORIA')
+                    ->where('RUC', $empresa_susp->NRO_DOCUMENTO)
+                    ->where('COD_ESTADO', 'ETM0000000000005')
+                    ->where('ANIO', $anio)
+                    ->first();
+
+                if(count($rentas)<=0){
+                    return Redirect::back()->with('errorurl', 'Este Comprobante necesita la suspension de 4ta categoria que este aprobado por contabilidad');
+                }else{
+
+                    $arentas = DB::table('ARCHIVOS')
+                        ->where('ID_DOCUMENTO', $rentas->ID_DOCUMENTO)
+                        ->first();
+                    $rutasuspencion = $arentas->URL_ARCHIVO;
+
+                    $doccompras     =   CMPDocAsociarCompra::where('COD_ORDEN','=',$fedocumento_suspension->ID_DOCUMENTO)
+                                        ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000034')->where('COD_ESTADO','=',1)->first();
+                    if(count($doccompras)<=0){
+                        $docasociar                              =   New CMPDocAsociarCompra;
+                        $docasociar->COD_ORDEN                   =   $fedocumento_suspension->ID_DOCUMENTO;
+                        $docasociar->COD_CATEGORIA_DOCUMENTO     =   'DCC0000000000034';
+                        $docasociar->NOM_CATEGORIA_DOCUMENTO     =   'SUSPENSION DE 4TA CATEGORIA';
+                        $docasociar->IND_OBLIGATORIO             =   0;
+                        $docasociar->TXT_FORMATO                 =   'PDF';
+                        $docasociar->TXT_ASIGNADO                =   'CONTACTO        ';
+                        $docasociar->COD_USUARIO_CREA_AUD        =   Session::get('usuario')->id;
+                        $docasociar->FEC_USUARIO_CREA_AUD        =   $this->fechaactual;
+                        $docasociar->COD_ESTADO                  =   1;
+                        $docasociar->TIP_DOC                     =   'N';
+                        $docasociar->save();
+                    }
+                }
+
+            }
+            if($rutasuspencion!=''){
+                if($tiposerie == 'E'){
+                    $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$fedocumento_suspension->ID_DOCUMENTO)->where('COD_ESTADO','=',1)
+                                                ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000004','DCC0000000000034'])
+                                                ->whereIn('TXT_ASIGNADO', ['PROVEEDOR','CONTACTO'])
+                                                ->get();
+                }else{
+                    $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$fedocumento_suspension->ID_DOCUMENTO)->where('COD_ESTADO','=',1)
+                                                ->where('COD_CATEGORIA_DOCUMENTO','<>','DCC0000000000003','DCC0000000000034')
+                                                ->whereIn('TXT_ASIGNADO', ['PROVEEDOR','CONTACTO'])
+                                                ->get();
+                }  
+            }
+
+
+        }
+
+
         
         return View::make('comprobante/registrocomprobanteestibaadministrator',
                          [
@@ -948,6 +1050,8 @@ class GestionEstibaController extends Controller
                             'combotipodetraccion'   =>  $combotipodetraccion,
                             'combopagodetraccion'   =>  $combopagodetraccion,
                             'fedocumento_x'         =>  $fedocumento_x,
+                            'rutasuspencion'        =>  $rutasuspencion,
+
                             'empresa'               =>  $empresa,
                             'combobancos'           =>  $combobancos,
                             'documento_asociados'   =>  $documento_asociados,
@@ -1008,7 +1112,7 @@ class GestionEstibaController extends Controller
                         $extension       =      $info->getExtension();
                         copy($file->getRealPath(),$rutacompleta);
                         $path            =   $rutacompleta;
-
+                        $cant_rentencion_cuarta = 0;
                         if($documento_id=='DCC0000000000002'){
                             //FACTURA
                             /****************************************  LEER EL XML Y GUARDAR   *********************************/
@@ -1041,6 +1145,27 @@ class GestionEstibaController extends Controller
                             $moneda_le = 'PEN';
                             $archivosdelfe      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                                     ->whereIn('COD_CATEGORIA', ['DCC0000000000013','DCC0000000000003','DCC0000000000006'])->get();
+
+
+                            //VALIDAR QUE SI TIENE CONSTANCIA DE SUSPENSION DE CUARTA LO SUBA SI NO QUE SUBA LA CONSTANCIA
+                            if($factura->getmtoImpVenta()>1500 && $factura->getsumOtrosCargos()<=0){
+                                $cant_rentencion_cuarta = $factura->getsumOtrosCargos();
+                                $empresa_susp = STDEmpresa::where('NRO_DOCUMENTO','=',$factura->getcompany()->getruc())->first();
+                                $fecha_orden = $factura->getfechaEmision()->format('Ymd');
+                                $fechaObj = new DateTime($fecha_orden);
+                                $anio = $fechaObj->format('Y');
+
+                                $rentas = DB::table('PRO_RENTA_CUARTA_CATEGORIA')
+                                    ->where('RUC', $empresa_susp->NRO_DOCUMENTO)
+                                    ->where('COD_ESTADO', 'ETM0000000000005')
+                                    ->where('ANIO', $anio)
+                                    ->first();
+
+                                if(count($rentas)<=0){
+                                    return Redirect::back()->with('errorurl', 'Este Comprobante necesita la suspension de 4ta categoria que este aprobado por contabilidad');
+                                }
+                            }
+
                         }
                         //VALIDAR QUE YA EXISTE ESTE XML
                         $fedocumento_e          =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->whereNotIn('COD_ESTADO',['','ETM0000000000006'])
@@ -1098,7 +1223,7 @@ class GestionEstibaController extends Controller
                         $documento->TOTAL_VENTA_SOLES       =   $factura->getmtoImpVenta();
                         $documento->TOTAL_VENTA_XML         =   $factura->getmtoImpVenta();
 
-
+                        $documento->CAN_IMPUESTO_RENTA      =   $cant_rentencion_cuarta;
                         $documento->PERCEPCION              =   $cant_perception;
                         $documento->MONTO_RETENCION         =   $cant_rentencion;
 

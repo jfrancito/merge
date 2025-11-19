@@ -110,6 +110,7 @@
             <form method="POST" action="{{ url('validar-xml-oc-estiba-administrator/'.$idopcion.'/'.$idoc) }}" name="formguardardatos" id="formguardardatos" enctype="multipart/form-data" >
              {{ csrf_field() }}
               <input type="hidden" name="rutaorden" id='rutaorden' value = '{{$rutaorden}}'>
+              <input type="hidden" name="rutasuspencion" id='rutasuspencion' value = '{{$rutasuspencion}}'>
               <div class="row">
 
                 <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
@@ -372,6 +373,10 @@
                     <div class="panel-body panel-body-contrast">
 
                             <div class="row">
+                                  @if($rutasuspencion != '')
+                                    <div><b style="color: #4285f4;">LA SUSPENSION DE 4TA CATEGORIA SE CARGARA DESPUES DE GUARDAR</b></div><br>
+                                  @endif
+                              
                                   @if($rutaorden != '')
                                     <div><b>LOS ARCHIVOS DE CONTRATOS Y GUIAS RELACIONADAS SE CARGARAN DESPUES DE GUARDAR</b></div><br>
                                   @endif

@@ -97,7 +97,7 @@
 
                         <li class="nav-item">
                             <a class="nav-link category-tab" data-category="rentaq">
-                                <span class="nav-text">RENTA DE QUINTA</span>
+                                <span class="nav-text">SUSPENSION RENTA DE 4TA </span>
                                 <div class="notification-container">
                                     <span class="notification-badge">{{$countrenta}}</span>
                                 </div>
