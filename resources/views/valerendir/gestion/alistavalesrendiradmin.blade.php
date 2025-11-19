@@ -55,8 +55,20 @@
             <button type="button" id="dropdownAcciones{{ $item->ID }}" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>
             <ul role="menu" class="dropdown-menu pull-right">
                 <li>
-                    <a class="dropdown-item verdetalle-valegestion d-flex align-items-center" href="#">
+                    <a class="dropdown-item verdetalleimporte-valegestion d-flex align-items-center" href="#">
                         <i class="mdi mdi-check-circle-outline text-success mr-2"></i> Detalle Vale a Rendir
+                    </a>
+                </li>
+
+                <li>
+                    <a class="dropdown-item verdetalle-valegestion d-flex align-items-center" href="#">
+                        <i class="mdi mdi-check-circle-outline text-success mr-2"></i> Aumentar Días Rendición 
+                    </a>
+                </li>
+
+                <li>
+                    <a class="dropdown-item aumdetalleimporte-valegestion d-flex align-items-center" href="#">
+                        <i class="mdi mdi-check-circle-outline text-success mr-2"></i> Aumentar Importe Viáticos 
                     </a>
                 </li>
             </ul>

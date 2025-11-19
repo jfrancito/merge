@@ -65,6 +65,17 @@ $(document).ready(function(){
                 return;
             }
 
+            if (tipo_pago == "0") {
+                txt_categoria_banco = '';
+                numero_cuenta = '';
+                
+            } else if (tipo_pago == "1") {
+                if (!txt_categoria_banco || !numero_cuenta) {
+                    alerterrorajax("Debe ingresar la entidad financiera y número de cuenta para transferencias.");
+                    return;
+                }
+            }
+
             let detalles = [];
             $('#tabla_vale_rendir_detalle tbody tr').each(function () {
                 let fila = $(this);
@@ -1010,11 +1021,12 @@ $(document).ready(function(){
                 // Filtro para destino propio
                 if (ind_propio === 1 && !["TIG0000000000001","TIG0000000000002","TIG0000000000006","TIG0000000000007"].includes(codigoTipo)) return;
 
-                // PASAJES TERRESTRES
+                // PASAJES INTERDEPATAMENTALES
                 if (codigoTipo === "TIG0000000000004") {
                     if (ind_aereo === 1) return;
                     tipoImporte = filasExistentes === 0 ? valor * 2 : valor;
                 }
+
                 // ALIMENTACION, ALOJAMIENTO, MOVILIDAD LOCAL
                 else if (["TIG0000000000001","TIG0000000000002","TIG0000000000003"].includes(codigoTipo)) {
                     if (codigoTipo === "TIG0000000000001" && ind_propio === 1) tipoImporte = valor * (diffDays >= 2 ? (diffDays + 1) : 1);

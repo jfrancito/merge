@@ -785,8 +785,15 @@ Route::group(['middleware' => ['authaw']], function () {
 	//GESTION LISTA VALE A RENDIR ADMINISTRACION
 	Route::any('/gestion-de-vale-rendir-administracion/{idopcion}', 'GestionValeRendirController@actionListarValeRendir');
 	Route::any('/ajax-buscar-documento-vl', 'GestionValeRendirController@actionListarAjaxBuscarDocumentoVL');
+	Route::post('/ver_detalle_importe_vale_gestion', 'GestionValeRendirController@actionVerDetalleValeImporte');
 	Route::post('/ver_detalle_vale_gestion', 'GestionValeRendirController@actionVerDetalleVale');
+	Route::post('/aum_detalle_importe_vale_gestion', 'GestionValeRendirController@actionVAumDetalleValeImporte');
 	Route::post('/actualizar_dias_vale', 'GestionValeRendirController@actionActualizarDiasVale');
+	Route::post('/actualizar_importe_vale', 'GestionValeRendirController@actionActualizarImporteVale');
+
+	Route::get('/enviar_correo_detalle_dias', 'EnviarCorreoValeRendirDetalleDiasController@actionEnviarCorreoVRDetalleDias');
+	Route::get('/enviar_correo_detalle_importe', 'EnviarCorreoValeRendirDetalleImporteController@actionEnviarCorreoVRDetalleImporte');
+
 });
 
 Route::get('/pruebaemail/{emailfrom}/{nombreusuario}', 'PruebasController@actionPruebaEmail');

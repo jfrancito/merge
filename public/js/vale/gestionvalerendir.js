@@ -31,6 +31,32 @@ $(document).ready(function () {
 
     });
 
+
+    $(".valerendir").on('click', '.verdetalleimporte-valegestion', function(e) {
+        e.preventDefault();
+
+        let valerendir_id = $(this).closest('tr').attr('data_vale_rendir'); 
+        var _token = $('#token').val();
+
+            if (!valerendir_id) {
+                alert("No se encontró el ID del vale.");
+                return;
+            }
+
+            let data = {
+                _token: _token,
+                valerendir_id: valerendir_id,
+            };
+
+            ajax_modal(
+                data,
+                "/ver_detalle_importe_vale_gestion",
+                "modal-verdetalleimportedocumentogestion-solicitud",
+                "modal-verdetalleimportedocumentogestion-solicitud-container"
+            );
+     });
+
+
     $(".valerendir").on('click', '.verdetalle-valegestion', function(e) {
         e.preventDefault();
 
@@ -52,6 +78,30 @@ $(document).ready(function () {
                 "/ver_detalle_vale_gestion",
                 "modal-verdetalledocumentogestion-solicitud",
                 "modal-verdetalledocumentogestion-solicitud-container"
+            );
+     });
+
+    $(".valerendir").on('click', '.aumdetalleimporte-valegestion', function(e) {
+        e.preventDefault();
+
+        let valerendir_id = $(this).closest('tr').attr('data_vale_rendir'); 
+        var _token = $('#token').val();
+
+            if (!valerendir_id) {
+                alert("No se encontró el ID del vale.");
+                return;
+            }
+
+            let data = {
+                _token: _token,
+                valerendir_id: valerendir_id,
+            };
+
+            ajax_modal(
+                data,
+                "/aum_detalle_importe_vale_gestion",
+                "modal-aumdetalleimportedocumentogestion-solicitud",
+                "modal-aumdetalleimportedocumentogestion-solicitud-container"
             );
      });
 
@@ -97,4 +147,48 @@ $(document).ready(function () {
             }
         });
     });
+
+
+    $(document).on('click', '#btn_guardar', function () {
+
+        let detalles = [];
+
+        $(".input-importe").each(function () {
+
+            let valor = $(this).val();
+            let id = $(this).data("detalle-id");
+            let destino = $(this).data("destino");
+            let nomdestino = $(this).data("nomdestino");
+            let nomtipo = $(this).data("nomtipo");
+            let linea = $(this).data("linea");
+
+            detalles.push({
+                id: id,
+                destino: destino,
+                linea: linea,
+                nomtipo : nomtipo,
+                nomdestino : nomdestino,
+                importe: valor
+            });
+        });
+
+        $.ajax({
+            type: "POST",
+            url: carpeta + "/actualizar_importe_vale",
+            data: {
+                _token: $('#token').val(),
+                detalles: detalles
+            },
+            success: function(response) {
+                if (response.success) {
+                    alertajax("Importes actualizados correctamente");
+                    location.reload();
+                } else {
+                    alerterrorajax("Error: " + response.error);
+                }
+            }
+        });
+    });
+
+
 });

@@ -77,38 +77,38 @@
 
 
 <script>
- $(document).ready(function() {
+$(document).ready(function() {
 
-    // --- Tu código existente ---
     $(".agregar_cuenta_bancaria").on("click", function() {
         $("#form_cuenta").slideToggle("fast");
-        if ($(this).text().trim() === "Agregar Cuenta") {
-            $(this).text("Ocultar");
-        } else {
-            $(this).text("Agregar Cuenta");
-        }
+        $(this).text($(this).text().trim() === "Agregar Cuenta" ? "Ocultar" : "Agregar Cuenta");
     });
 
     function toggleCamposPago() {
         var tipo = $("#tipo_pago").val();
+        var codMoneda = ($("#cod_moneda").val() || "").trim().toUpperCase();
 
         if (tipo == "0") { // EFECTIVO
             $("#grupo_entidad, #grupo_cuenta").hide();
-            $("input[name='txt_categoria_banco']").val('');
-            $("input[name='numero_cuenta']").val('');
+            $("#txt_categoria_banco, #numero_cuenta").val('');
         } 
         else if (tipo == "1") { // TRANSFERENCIA
             $("#grupo_entidad, #grupo_cuenta").show();
 
-            if ($("input[name='txt_categoria_banco']").val() === '') {
-                $("input[name='txt_categoria_banco']").val(
-                    $("input[name='txt_categoria_banco']").data("valor")
-                );
-            }
-            if ($("input[name='numero_cuenta']").val() === '') {
-                $("input[name='numero_cuenta']").val(
-                    $("input[name='numero_cuenta']").data("valor")
-                );
+            // 💵 Si la moneda es DÓLARES, los campos deben estar vacíos y editables
+            if (codMoneda === "MON0000000000002") {
+                $("#txt_categoria_banco, #numero_cuenta")
+                    .val('')
+                    .prop("readonly", false)
+                    .removeClass("bg-light");
+            } 
+            else { // 💰 Si es SOLES u otra
+                $("#txt_categoria_banco").val($("#txt_categoria_banco").data("valor"));
+                $("#numero_cuenta").val($("#numero_cuenta").data("valor"));
+
+                $("#txt_categoria_banco, #numero_cuenta")
+                    .prop("readonly", true)
+                    .addClass("bg-light");
             }
         } 
         else {
@@ -116,36 +116,27 @@
         }
     }
 
-   
     function toggleCamposMoneda() {
-        var codMoneda = $("#cod_moneda").val();
+        var codMoneda = ($("#cod_moneda").val() || "").trim().toUpperCase();
+        var tipo = $("#tipo_pago").val();
 
-       
-      if (codMoneda === "MON0000000000001") { 
-       
-        $("#txt_categoria_banco").val($("#txt_categoria_banco").data("valor"));
-        $("#numero_cuenta").val($("#numero_cuenta").data("valor"));
+        // Solo aplica si está seleccionada "Transferencia"
+        if (tipo == "1") {
+            if (codMoneda === "MON0000000000002") {
+                $("#txt_categoria_banco, #numero_cuenta")
+                    .val('')
+                    .prop("readonly", false)
+                    .removeClass("bg-light");
+            } 
+            else if (codMoneda === "MON0000000000001") {
+                $("#txt_categoria_banco").val($("#txt_categoria_banco").data("valor"));
+                $("#numero_cuenta").val($("#numero_cuenta").data("valor"));
 
-        $("#txt_categoria_banco, #numero_cuenta")
-            .prop("readonly", true)
-            .addClass("bg-light");
-       } 
-      else if (codMoneda === "MON0000000000002") { 
-        
-        $("#txt_categoria_banco, #numero_cuenta")
-            .val('')
-            .prop("readonly", false)
-            .removeClass("bg-light");
-      } 
-      else {
-        
-        $("#txt_categoria_banco").val($("#txt_categoria_banco").data("valor"));
-        $("#numero_cuenta").val($("#numero_cuenta").data("valor"));
-
-        $("#txt_categoria_banco, #numero_cuenta")
-            .prop("readonly", true)
-            .addClass("bg-light");
-      } 
+                $("#txt_categoria_banco, #numero_cuenta")
+                    .prop("readonly", true)
+                    .addClass("bg-light");
+            }
+        }
     }
 
     $("#numero_cuenta").on("input", function() {
@@ -155,10 +146,16 @@
     toggleCamposPago();
     toggleCamposMoneda();
 
-    $("#tipo_pago").on("change", toggleCamposPago);
-    $("#cod_moneda").on("change", toggleCamposMoneda);
+    // Eventos
+    $("#tipo_pago").on("change", function() {
+        toggleCamposPago();
+        toggleCamposMoneda(); // <-- asegura coherencia
+    });
 
+    $('#cod_moneda').on('select2:select', function () {
+        toggleCamposMoneda();
+    });
 });
-
 </script>
+
 
