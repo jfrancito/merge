@@ -6221,6 +6221,7 @@ trait ComprobanteTraits
                                     ->whereIn('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_DOC', [
                                         'TDO0000000000001',
                                         'TDO0000000000003',
+                                        'TDO0000000000010',
                                         'TDO0000000000002'
                                     ])->first();
 
@@ -6272,7 +6273,8 @@ trait ComprobanteTraits
                                         'TDO0000000000001',
                                         'TDO0000000000003',
                                         'TDO0000000000034',
-                                        'TDO0000000000002'
+                                        'TDO0000000000002',
+                                        'TDO0000000000010'
                                     ]);
 
         //dd($moneda_id);

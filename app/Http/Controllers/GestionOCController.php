@@ -57,6 +57,7 @@ use Storage;
 use ZipArchive;
 use Hashids;
 use SplFileInfo;
+use DateTime;
 use Carbon\Carbon;
 class GestionOCController extends Controller
 {
@@ -3049,16 +3050,13 @@ class GestionOCController extends Controller
         if($tiposerie == 'E'){
 
             $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
-                                        //->where('IND_OBLIGATORIO','=',1)
                                         ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000004'])
                                         ->whereIn('TXT_ASIGNADO', ['PROVEEDOR','CONTACTO'])
                                         ->get();
 
         }else{
             $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
-                                        //->where('IND_OBLIGATORIO','=',1)
                                         ->where('COD_CATEGORIA_DOCUMENTO','<>','DCC0000000000003')
-                                        //->where('TXT_ASIGNADO','=','PROVEEDOR')
                                         ->whereIn('TXT_ASIGNADO', ['PROVEEDOR','CONTACTO'])
                                         ->get();
         }
@@ -3115,16 +3113,6 @@ class GestionOCController extends Controller
             // Muestra el resultado
             if ($archivoEncontrado) {
                 $rutafila         =   $directorio.'\\'.$nombreArchivoBuscado;
-                // $fileContents = file_get_contents($rutafila);
-                // // Usa el facade Storage para almacenar el archivo en el storage de Laravel
-                // //Storage::disk('local')->put($destinationPath, $fileContents);
-                // $ruta                   =   storage_path('app/oc/');
-                // //dd($ruta);
-                // copy($rutafila,$ruta.$nombreArchivoBuscado);
-
-
-
-                // $rutaorden           =   asset('storage/app/oc/'.$nombreArchivoBuscado);
                 $rutaorden           =  $rutafila;
             } 
         }
@@ -3186,10 +3174,62 @@ class GestionOCController extends Controller
             }
         }
         $comboant               =   array('' => "Seleccione Anticipo")+$arrayitem;
+        $rutasuspencion         =   '';
 
+        //VALIDAR QUE SI TIENE CONSTANCIA DE SUSPENSION DE CUARTA LO SUBA SI NO QUE SUBA LA CONSTANCIA
+        if($ordencompra_f->CAN_TOTAL>1500 && $ordencompra_f->CCAN_RETENCION<=0){
+            $empresa_susp = STDEmpresa::where('COD_EMPR','=',$ordencompra_f->COD_EMPR_CLIENTE)->first();
+            $fecha_orden = $ordencompra_f->FEC_ORDEN;
+            $fechaObj = new DateTime($fecha_orden);
+            $anio = $fechaObj->format('Y');
 
+            $rentas = DB::table('PRO_RENTA_CUARTA_CATEGORIA')
+                ->where('RUC', $empresa_susp->NRO_DOCUMENTO)
+                ->where('COD_ESTADO', 'ETM0000000000005')
+                ->where('ANIO', $anio)
+                ->first();
 
-        //dd($ordencompra_f->CAN_DETRACCION);
+            if(count($rentas)<=0){
+                return Redirect::back()->with('errorurl', 'Este Comprobante necesita la suspension de 4ta categoria que este aprobado por contabilidad');
+            }else{
+
+                $arentas = DB::table('ARCHIVOS')
+                    ->where('ID_DOCUMENTO', $rentas->ID_DOCUMENTO)
+                    ->first();
+                $rutasuspencion = $arentas->URL_ARCHIVO;
+
+                $doccompras     =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra_f->COD_ORDEN)
+                                    ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000034')->where('COD_ESTADO','=',1)->first();
+                if(count($doccompras)<=0){
+                    $docasociar                              =   New CMPDocAsociarCompra;
+                    $docasociar->COD_ORDEN                   =   $ordencompra_f->COD_ORDEN;
+                    $docasociar->COD_CATEGORIA_DOCUMENTO     =   'DCC0000000000034';
+                    $docasociar->NOM_CATEGORIA_DOCUMENTO     =   'SUSPENSION DE 4TA CATEGORIA';
+                    $docasociar->IND_OBLIGATORIO             =   0;
+                    $docasociar->TXT_FORMATO                 =   'PDF';
+                    $docasociar->TXT_ASIGNADO                =   'CONTACTO        ';
+                    $docasociar->COD_USUARIO_CREA_AUD        =   Session::get('usuario')->id;
+                    $docasociar->FEC_USUARIO_CREA_AUD        =   $this->fechaactual;
+                    $docasociar->COD_ESTADO                  =   1;
+                    $docasociar->TIP_DOC                     =   'N';
+                    $docasociar->save();
+                }
+            }
+
+        }
+        if($rutasuspencion!=''){
+            if($tiposerie == 'E'){
+                $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra_f->COD_ORDEN)->where('COD_ESTADO','=',1)
+                                            ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000004','DCC0000000000034'])
+                                            ->whereIn('TXT_ASIGNADO', ['PROVEEDOR','CONTACTO'])
+                                            ->get();
+            }else{
+                $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra_f->COD_ORDEN)->where('COD_ESTADO','=',1)
+                                            ->where('COD_CATEGORIA_DOCUMENTO','<>','DCC0000000000003','DCC0000000000034')
+                                            ->whereIn('TXT_ASIGNADO', ['PROVEEDOR','CONTACTO'])
+                                            ->get();
+            }  
+        }
 
         return View::make('comprobante/registrocomprobanteadministrator',
                          [
@@ -3206,6 +3246,7 @@ class GestionOCController extends Controller
                             'empresa'               =>  $empresa,
                             'combopagodetraccion'   =>  $combopagodetraccion,
                             'rutaorden'             =>  $rutaorden,
+                            'rutasuspencion'        =>  $rutasuspencion,
                             'fedocumento_x'         =>  $fedocumento_x,
                             'detalleordencompra'    =>  $detalleordencompra,
                             'fedocumento'           =>  $fedocumento,
@@ -3231,7 +3272,6 @@ class GestionOCController extends Controller
         $idoc                   =   $this->funciones->decodificarmaestraprefijo($idordencompra,$prefijo);
         $ordencompra            =   $this->con_lista_cabecera_comprobante_idoc($idoc);
         $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc($idoc);
-
         $procedencia            =   $request['procedencia'];
 
 
@@ -3314,6 +3354,25 @@ class GestionOCController extends Controller
 
                             $tipo_documento_le = 'R1';
                             $moneda_le = 'PEN';
+
+
+                            //VALIDAR QUE SI TIENE CONSTANCIA DE SUSPENSION DE CUARTA LO SUBA SI NO QUE SUBA LA CONSTANCIA
+                            if($ordencompra_t->CAN_TOTAL>1500 && $ordencompra_t->CCAN_RETENCION<=0){
+                                $empresa_susp = STDEmpresa::where('COD_EMPR','=',$ordencompra_t->COD_EMPR_CLIENTE)->first();
+                                $fecha_orden = $ordencompra_t->FEC_ORDEN;
+                                $fechaObj = new DateTime($fecha_orden);
+                                $anio = $fechaObj->format('Y');
+                                $rentas = DB::table('PRO_RENTA_CUARTA_CATEGORIA')
+                                    ->where('RUC', $empresa_susp->NRO_DOCUMENTO)
+                                    ->where('COD_ESTADO', 'ETM0000000000005')
+                                    ->where('ANIO', $anio)
+                                    ->first();
+                                if(count($rentas)<=0){
+                                    return Redirect::back()->with('errorurl', 'Este Comprobante necesita la suspension de 4ta categoria que este aprobado por contabilidad');
+                                }
+
+                            }
+
                         }
 
 
@@ -4163,6 +4222,39 @@ class GestionOCController extends Controller
                     //$directorio                     =       '\\\\10.1.0.201\cpe\Orden_Compra';
                     //$rutafila                       =       $directorio.'\\'.$nombreArchivoBuscado;
                     copy($rutaorden,$rutacompleta);
+                    $dcontrol                       =       new Archivo;
+                    $dcontrol->ID_DOCUMENTO         =       $ordencompra->COD_ORDEN;
+                    $dcontrol->DOCUMENTO_ITEM       =       $fedocumento->DOCUMENTO_ITEM;
+                    $dcontrol->TIPO_ARCHIVO         =       $aoc->COD_CATEGORIA_DOCUMENTO;
+                    $dcontrol->NOMBRE_ARCHIVO       =       $nombrefilecdr;
+                    $dcontrol->DESCRIPCION_ARCHIVO  =       $aoc->NOM_CATEGORIA_DOCUMENTO;
+                    $dcontrol->URL_ARCHIVO          =       $path;
+                    $dcontrol->SIZE                 =       100;
+                    $dcontrol->EXTENSION            =       '.pdf';
+                    $dcontrol->ACTIVO               =       1;
+                    $dcontrol->FECHA_CREA           =       $this->fechaactual;
+                    $dcontrol->USUARIO_CREA         =       Session::get('usuario')->id;
+                    $dcontrol->save();
+
+                }
+
+                //guardar orden de compra precargada
+                $rutasuspencion       =   $request['rutasuspencion'];
+                if($rutasuspencion!=''){
+
+                    $aoc                            =       CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+                                                            ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000034'])
+                                                            ->first();
+                    $contadorArchivos               =       Archivo::count();
+                    $nombrefilecdr                  =       $contadorArchivos.'-'.$ordencompra->COD_ORDEN.'.pdf';
+                    $prefijocarperta                =       $this->prefijo_empresa($ordencompra->COD_EMPR);
+                    $rutafile                       =       $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
+                    $rutacompleta                   =       $rutafile.'\\'.$nombrefilecdr;
+                    $valor                          =       $this->versicarpetanoexiste($rutafile);
+                    $path                           =       $rutacompleta;
+                    //$directorio                     =       '\\\\10.1.0.201\cpe\Orden_Compra';
+                    //$rutafila                       =       $directorio.'\\'.$nombreArchivoBuscado;
+                    copy($rutasuspencion,$rutacompleta);
                     $dcontrol                       =       new Archivo;
                     $dcontrol->ID_DOCUMENTO         =       $ordencompra->COD_ORDEN;
                     $dcontrol->DOCUMENTO_ITEM       =       $fedocumento->DOCUMENTO_ITEM;

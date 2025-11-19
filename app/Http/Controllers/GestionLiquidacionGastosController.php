@@ -479,7 +479,6 @@ class GestionLiquidacionGastosController extends Controller
                     return Redirect::to('gestion-de-empresa-proveedor/' . $idopcion)->with('errorbd', 'No existe Zona 02 en el osiris');
                 }
 
-
                 $departamentos = CMPCategoria::where('TXT_GRUPO', '=', 'DEPARTAMENTO')->where('NOM_CATEGORIA', '=', $departamento)->first();
                 if (count($departamentos) <= 0) {
                     return Redirect::to('gestion-de-empresa-proveedor/' . $idopcion)->with('errorbd', 'No existe Departamento en el osiris');
@@ -520,29 +519,25 @@ class GestionLiquidacionGastosController extends Controller
         $ruc_buscar = $request['ruc_buscar'];
         $urlxml = 'https://dniruc.apisperu.com/api/v1/ruc/' . $ruc_buscar . '?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImhlbnJyeWluZHVAZ21haWwuY29tIn0.m3cyXSejlDWl0BLcphHPUTfPNqpa5kXWoBcmQ6WvkII';
         $respuetaxml = $this->buscar_ruc_sunat_lg($urlxml);
-        $empresa_id = '';
 
-
-        $empresa = STDEmpresa::where('NRO_DOCUMENTO', '=', $ruc_buscar)->first();
-        if (count($empresa) > 0) {
-            $empresa_id = $empresa->COD_EMPR;
-        }
         $trabajador = DB::table('STD.TRABAJADOR')
             ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
             ->first();
+
         $centro_id = '';
         if (count($trabajador) > 0) {
             $dni = $trabajador->NRO_DOCUMENTO;
         }
+
         $trabajadorespla = DB::table('WEB.platrabajadores')
             ->where('situacion_id', 'PRMAECEN000000000002')
             ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
             ->where('dni', $dni)
             ->first();
-        if (count($trabajador) > 0) {
+
+        if (count($trabajadorespla) > 0) {
             $centro_id = $trabajadorespla->centro_osiris_id;
         }
-
 
         $terceros   =   DB::table('TERCEROS')
                         ->where('USER_ID', Session::get('usuario')->id)
@@ -552,7 +547,23 @@ class GestionLiquidacionGastosController extends Controller
             $centro_id = $terceros->COD_CENTRO;
         }
 
-        $contratos = DB::table('CMP.CONTRATO')
+        $conexionbd         = 'sqlsrv';
+        if($centro_id == 'CEN0000000000004'){ //rioja
+            $conexionbd         = 'sqlsrv_r';
+        }else{
+            if($centro_id == 'CEN0000000000006'){ //bellavista
+                $conexionbd         = 'sqlsrv_b';
+            }
+        }
+
+        $empresa_id = '';
+        $empresa = DB::connection($conexionbd)->table('STD.EMPRESA')->where('NRO_DOCUMENTO', '=', $ruc_buscar)->first();
+
+        if (count($empresa) > 0) {
+            $empresa_id = $empresa->COD_EMPR;
+        }
+
+        $contratos = DB::connection($conexionbd)->table('CMP.CONTRATO')
             ->where('TXT_CATEGORIA_TIPO_CONTRATO', 'PROVEEDOR')
             ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
             ->where('COD_EMPR_CLIENTE', $empresa_id)

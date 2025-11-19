@@ -53,7 +53,7 @@ trait CuartaCategoriaTraits
     private function pla_lista_renta_cuarta_categoria_contabilidad() {
 
         $lrentacuartacategoria  =   ProRentaCuartaCategoria::where('ACTIVO','=','1')
-                                    ->where('COD_ESTADO','=','ETM0000000000004')
+                                    ->where('COD_ESTADO','=','ETM0000000000003')
                                     ->orderby('FECHA_CREA','DESC')->get();
 
         return  $lrentacuartacategoria;
