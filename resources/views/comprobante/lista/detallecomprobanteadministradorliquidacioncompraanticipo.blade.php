@@ -206,6 +206,65 @@
               <div class="row">
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                   <div class="panel panel-default panel-contrast">
+                    <div class="panel-heading" style="background: #1d3a6d;color: #fff;">DATOS PARA PAGOS
+
+                      <div class="tools ver_cuenta_bancaria_liq_com_an select" style="cursor: pointer;padding-left: 12px;"> <span class="label label-success">Ver Cuenta</span></div>
+                      <div class="tools agregar_cuenta_bancaria_liq_com_an select" style="cursor: pointer;"> <span class="label label-success">Agregar Cuenta</span></div>
+
+                    </div>
+                    <div class="panel-body panel-body-contrast">
+                            <div class="row">
+
+                                  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px;">
+                                      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 cajareporte">
+                                          <div class="form-group">
+                                            <label class="col-sm-12 control-label labelleft" ><b>Entidad Bancaria que se le va a pagar al proveedor :</b></label>
+                                            <div class="col-sm-12 abajocaja" >
+
+                                              @if($banco_id=='BAM0000000000011')
+                                                <input type="hidden" name="entidadbanco_id" value ='{{$banco_id}}'>
+                                                {!! Form::select( 'entidadbanco_id', $combobancos, array($banco_id),
+                                                                  [
+                                                                    'class'       => 'select2 form-control control input-xs entidadbancoliquidacioncompraanticipo' ,
+                                                                    'id'          => 'entidadbanco_id',
+                                                                    'required'    => '',
+                                                                    'data-aw'     => '1',
+                                                                    'disabled' => 'disabled'
+                                                                  ]) !!}
+                                              @else
+                                                {!! Form::select( 'entidadbanco_id', $combobancos, array($banco_id),
+                                                                  [
+                                                                    'class'       => 'select2 form-control control input-xs entidadbancoliquidacioncompraanticipo' ,
+                                                                    'id'          => 'entidadbanco_id',
+                                                                    'required'    => '',
+                                                                    'data-aw'     => '1',
+                                                                  ]) !!}
+                                              @endif
+                                            </div>
+                                          </div>
+                                      </div>
+                                      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 cajareporte ajax_cb">
+                                        @include('comprobante.combo.combo_cuenta_bancaria')
+                                      </div>
+
+
+
+
+                                  </div>
+
+
+
+                            </div>
+
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                  <div class="panel panel-default panel-contrast">
                     <div class="panel-heading" style="background: #1d3a6d;color: #fff;">SUBIR ARCHIVOS
                     </div>
                     <div class="panel-body panel-body-contrast">
@@ -213,7 +272,13 @@
                             <div class="row">                                  
                                   @foreach($tarchivos as $index => $item)
                                     <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3" style="margin-top:15px;">
-                                        <label class="col-sm-12 control-label" style="text-align: left;height: 50px;"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}} ({{$item->TXT_FORMATO}})</b> 
+                                        <label class="col-sm-12 control-label" style="text-align: left;height: 50px;">
+                                          <b>
+                                            {{$item->NOM_CATEGORIA_DOCUMENTO}} ({{$item->TXT_FORMATO}})
+                                            @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000040')
+                                              <span class='msjerror'>(OPCIONAL)</span>
+                                            @endif
+                                          </b> 
                                           @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000005') <b>(Descargue el pdf de este enlace <a href="https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaWeb.jsp" target="_blank">Sunat</a> y subalo para que pueda aprobar</b>) @else @endif </label>
                                       <div class="form-group sectioncargarimagen">
 
@@ -225,7 +290,7 @@
                                                   class="file-es"  
                                                   type="file" 
                                                   multiple data-max-file-count="1"
-                                                  required>
+                                                  @if($item->COD_CATEGORIA_DOCUMENTO != 'DCC0000000000040') required @endif >
                                               </div>
                                           </div>
                                       </div>
@@ -255,10 +320,10 @@
                                           <input type="hidden" name="valor_igv" id='valor_igv' value = '{{(float)$fedocumento->VALOR_IGV_ORIG}}'>
                                           <input type="hidden" name="empresa_id" id='empresa_id' value = '{{$ordencompra_f->COD_EMPR}}'>
                                           <input type="hidden" name="monto_total" id='monto_total' value = '{{$fedocumento->TOTAL_VENTA_ORIG}}'>
-                                          <input type="hidden" name="prefijo_id" id='prefijo_id' value = '{{substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7)}}'>
-                                          <input type="hidden" name="orden_id" id='orden_id' value = '{{Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -9))}}'>
+                                          <input type="hidden" name="prefijo_id" id='prefijo_id' value = '{{substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,6)}}'>
+                                          <input type="hidden" name="orden_id" id='orden_id' value = '{{Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -10))}}'>
                                           <input type="hidden" name="contacto_id" id='contacto_id' value = '{{$usuario->COD_TRABAJADOR}}'>
-                                          <button type="submit" class="btn btn-space btn-success btn-guardar-xml-contrato">Guardar</button>
+                                          <button type="submit" class="btn btn-space btn-success btn-guardar-xml-liquidacion-compra-anticipo">Guardar</button>
                                         </p>
                                       </div>
                                   </div>

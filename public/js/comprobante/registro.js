@@ -76,6 +76,22 @@ $(document).ready(function(){
 
     });
 
+    $(".registrocomprobante").on('click','.ver_cuenta_bancaria_liq_com_an', function() {
+
+        var _token                  =   $('#token').val();
+        var prefijo_id              =   $('#prefijo_id').val();
+        var orden_id                =   $('#orden_id').val();
+        var idopcion                =   $('#idopcion').val();
+        data                        =   {
+                                            _token                  : _token,
+                                            prefijo_id              : prefijo_id,
+                                            orden_id                : orden_id,
+                                        };
+
+        ajax_modal(data,"/ajax-modal-ver-cuenta-bancaria-liq-com-an",
+                  "modal-configuracion-usuario-detalle","modal-configuracion-usuario-detalle-container");
+
+    });
 
     $(".registrocomprobante").on('click','.agregar_cuenta_bancaria_oc', function() {
 
@@ -115,6 +131,25 @@ $(document).ready(function(){
                                         };
 
         ajax_modal(data,"/ajax-modal-configuracion-cuenta-bancaria-contrato",
+                  "modal-configuracion-usuario-detalle","modal-configuracion-usuario-detalle-container");
+
+    });
+
+    $(".registrocomprobante").on('click','.agregar_cuenta_bancaria_liq_com_an', function() {
+
+        var _token                  =   $('#token').val();
+        var idopcion                =   $('#idopcion').val();
+        var prefijo_id              =   $('#prefijo_id').val();
+        var orden_id                =   $('#orden_id').val();
+        data                        =   {
+                                            _token                  : _token,
+                                            prefijo_id              : prefijo_id,
+                                            orden_id                : orden_id,
+                                            idopcion                : idopcion,
+
+                                        };
+
+        ajax_modal(data,"/ajax-modal-configuracion-cuenta-bancaria-liq-com-an",
                   "modal-configuracion-usuario-detalle","modal-configuracion-usuario-detalle-container");
 
     });
@@ -166,7 +201,7 @@ $(document).ready(function(){
         var prefijo_id          =   $('#prefijo_id').val();
         var orden_id            =   $('#orden_id').val();
 
-        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009', 'BAM0000000000011'];
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009', 'BAM0000000000011', 'BAM0000000000013'];
 
         if(valores.includes(entidadbanco_id)){
             $('.ajax_cb').addClass('ocultar');
@@ -179,6 +214,42 @@ $(document).ready(function(){
         $.ajax({
               type    :     "POST",
               url     :     carpeta+"/ajax-cuenta-bancaria-proveedor-oc",
+              data    :     {
+                                _token              : _token,
+                                entidadbanco_id     : entidadbanco_id,
+                                prefijo_id          : prefijo_id,
+                                orden_id            : orden_id
+                            },
+                success: function (data) {
+                    $('.ajax_cb').html(data);
+                },
+                error: function (data) {
+                    error500(data);
+                }
+        });
+    });
+
+    $(".registrocomprobante").on('change','.entidadbancoliquidacioncompraanticipo', function() {
+
+
+        var _token              =   $('#token').val();
+        var entidadbanco_id     =   $(this).val();
+        var prefijo_id          =   $('#prefijo_id').val();
+        var orden_id            =   $('#orden_id').val();
+
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009', 'BAM0000000000011', 'BAM0000000000013'];
+
+        if(valores.includes(entidadbanco_id)){
+            $('.ajax_cb').addClass('ocultar');
+        }else{
+            $('.ajax_cb').removeClass('ocultar');
+        }
+
+        debugger;
+
+        $.ajax({
+              type    :     "POST",
+              url     :     carpeta+"/ajax-cuenta-bancaria-proveedor-liquidacioncompraanticipo",
               data    :     {
                                 _token              : _token,
                                 entidadbanco_id     : entidadbanco_id,
@@ -287,6 +358,14 @@ $(document).ready(function(){
         var empresa_id          =   $('#empresa_id').val();
         debugger;
 
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009', 'BAM0000000000011', 'BAM0000000000013'];
+
+        if(valores.includes(entidadbanco_id)){
+            $('.ajax_cb').addClass('ocultar');
+        }else{
+            $('.ajax_cb').removeClass('ocultar');
+        }
+
         $.ajax({
               type    :     "POST",
               url     :     carpeta+"/ajax-cuenta-bancaria-proveedor-estiba",
@@ -359,7 +438,7 @@ $(document).ready(function(){
             }
         }
         var cb_id                   =   $('#cb_id').val();
-        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011'];
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011', 'BAM0000000000013'];
         if(!valores.includes(entidadbanco_id)){
             if(cb_id==''){
                 alerterrorajax("Seleccione una Cuenta Bancaria."); return false;
@@ -411,7 +490,59 @@ $(document).ready(function(){
         }
 
         var cb_id                   =   $('#cb_id').val();
-        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011'];
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011', 'BAM0000000000013'];
+        if(!valores.includes(entidadbanco_id)){
+            if(cb_id==''){
+                alerterrorajax("Seleccione una Cuenta Bancaria."); return false;
+            }
+        }
+        if(te =='0'){ alerterrorajax("Hay errores en la validacion del XML."); return false;}
+        $.confirm({
+            title: '¿Confirmar la validación?',
+            content: 'Merge de Comprobante',
+            buttons: {
+                confirmar: function () {
+                    abrircargando();
+                    $( "#formguardardatos" ).submit();
+
+                    setTimeout(function() {
+                       cerrarcargando();
+                    }, 8000);
+ 
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo la validación');
+                }
+            }
+        });
+
+
+    });
+
+    $(".registrocomprobante").on('click','.btn-guardar-xml-liquidacion-compra-anticipo', function(e) {
+
+        event.preventDefault();
+        var _token                  =   $('#token').val();
+        var te                      =   $('#te').val();
+        var entidadbanco_id         =   $('#entidadbanco_id').val();
+        var monto_total             =   parseFloat($('#monto_total').val());
+        var ctadetraccion           =   $('#ctadetraccion').val();
+        var tipo_detraccion_id      =   $('#tipo_detraccion_id').val();
+        var monto_detraccion        =   $('#monto_detraccion').val();
+        var pago_detraccion         =   $('#pago_detraccion').val();
+        var valor_igv               =   $('#valor_igv').val();
+
+        if(valor_igv>0){
+            if(monto_total > 401){ 
+                if(ctadetraccion.trim() ==''){ alerterrorajax("Ingrese una Cuenta de Detraccion."); return false;}
+                if(tipo_detraccion_id ==''){ alerterrorajax("Seleeccione un valor de detraccion"); return false;}
+                if(monto_detraccion =='0'){ alerterrorajax("Ingrese Monto de Detraccion."); return false;}
+                if(pago_detraccion ==''){ alerterrorajax("Seleeccione un pago de detraccion"); return false;}
+            }
+        }
+
+        var cb_id                   =   $('#cb_id').val();
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011','BAM0000000000013'];
         if(!valores.includes(entidadbanco_id)){
             if(cb_id==''){
                 alerterrorajax("Seleccione una Cuenta Bancaria."); return false;
@@ -462,7 +593,7 @@ $(document).ready(function(){
             if(pago_detraccion ==''){ alerterrorajax("Seleeccione un pago de detraccion"); return false;}            
         }
 
-        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011'];
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011', 'BAM0000000000013'];
 
         if(!valores.includes(entidadbanco_id)){
             if(cb_id==''){
@@ -524,7 +655,7 @@ $(document).ready(function(){
             if(pago_detraccion ==''){ alerterrorajax("Seleeccione un pago de detraccion"); return false;}            
         }
 
-        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011'];
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011', 'BAM0000000000013'];
 
         if(!valores.includes(entidadbanco_id)){
             if(cb_id==''){

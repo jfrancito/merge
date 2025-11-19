@@ -31,7 +31,7 @@
             </thead>
             <tbody>
                 @foreach($datosParaVista as $index => $fila)
-                <tr>
+                <tr class=" @if($fila['TIPO'] == 'ADICIONAL') ocultar @endif">
                     <td style="width: 300px !important;" >{{ $fila['TXT_EMPRESA_TRABAJADOR'] }}</td>
                     <td>{{date_format(date_create($fila['FECHA_INICIO']), 'd-m-Y')}}  / {{date_format(date_create($fila['FECHA_FIN']), 'd-m-Y')}}</td>
                     <td style="width: 150px !important;">{{ $fila['TIPO'] }}</td>
@@ -56,44 +56,14 @@
                                 <input type="hidden" name="datos[{{ $index }}][dias][{{ $diaNumero }}][dia]" value="{{ $diaNumero }}">
                                 <input type="hidden" name="fecha_formateada" value="{{ $diaData['fecha_formateada'] }}">
                                 @if($fila['TIPO'] == 'ASIGNADO')
-                                <!-- Para ASIGNADO: Solo SELECT -->
-                                {!! Form::select(
-                                    "datos[$index][dias][$diaNumero][configuracion]", 
-                                    $fila['combo_configuracion'], 
-                                    isset($diaData['data']->COD_CONFIGURACION) ? $diaData['data']->COD_CONFIGURACION : null,
-                                    [
-                                        'class' => 'select2 form-control control input-sm',
-                                        'id' => "configuracion_{$index}_{$diaNumero}",
-                                        'style' => 'min-width: 100px;'
-                                    ]
-                                ) !!}
+ 
+                                {{isset($diaData['data']->MONTODETALLE) ? $diaData['data']->MONTODETALLE : (isset($diaData['data']->COD_CONFIGURACION) ? $diaData['data']->COD_CONFIGURACION : '')}}
                                 
                                 @elseif($fila['TIPO'] == 'OTRO_TIPO' || $fila['TIPO'] == 'ADICIONAL')
-                                <!-- Para OTRO_TIPO/ADICIONAL: Solo INPUT TEXT -->
-                                {!! Form::text(
-                                    "datos[$index][dias][$diaNumero][valor_texto]", 
-                                    isset($diaData['data']->MONTODETALLE) ? $diaData['data']->MONTODETALLE : (isset($diaData['data']->COD_CONFIGURACION) ? $diaData['data']->COD_CONFIGURACION : ''),
-                                    [
-                                        'class' => 'form-control control input-sm importe',
-                                        'id' => "texto_{$index}_{$diaNumero}",
-                                        'style' => 'min-width: 100px;',
-                                        'placeholder' => 'Ingrese valor'
-                                    ]
-                                ) !!}
+                                    {{isset($diaData['data']->MONTODETALLE) ? $diaData['data']->MONTODETALLE : (isset($diaData['data']->COD_CONFIGURACION) ? $diaData['data']->COD_CONFIGURACION : '')}}
                                 @else
-                                <!-- Para otros tipos no especificados: SELECT por defecto -->
-                                {!! Form::select(
-                                    "datos[$index][dias][$diaNumero][configuracion]", 
-                                    $fila['combo_configuracion'], 
-                                    isset($diaData['data']->COD_CONFIGURACION) ? $diaData['data']->COD_CONFIGURACION : null,
-                                    [
-                                        'class' => 'select2 form-control control input-sm',
-                                        'id' => "configuracion_{$index}_{$diaNumero}",
-                                        'style' => 'min-width: 100px;'
-                                    ]
-                                ) !!}
+                                    0
                                 @endif
-                                
                             @else
                                 -
                             @endif
@@ -105,12 +75,3 @@
         </table>
     @endif
 </div>
-
-
-@if(isset($ajax))
-  <script type="text/javascript">
-    $(document).ready(function(){
-       App.dataTables();
-    });
-  </script> 
-@endif

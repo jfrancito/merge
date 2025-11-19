@@ -7,7 +7,7 @@
 
         <div class="tab-content">
           	<div id="registro" class="tab-pane active cont">
-						<form method="POST" id ='agregarpmd' class="form2" action="{{ url('/guardar-detalle-movilidad-impulso-trabajador/'.$idopcion.'/'.Hashids::encode(substr($planillamovilidad->ID_DOCUMENTO, -8))) }}">
+						<form method="POST" id ='agregarpmd' class="form2" action="{{ url('/guardar-detalle-movilidad-venta-trabajador/'.$idopcion.'/'.Hashids::encode(substr($planillamovilidad->ID_DOCUMENTO, -8))) }}">
 							{{ csrf_field() }}
 							<div class="modal-header">
 								<button type="button" data-dismiss="modal" aria-hidden="true" class="close modal-close"><span class="mdi mdi-close"></span></button>
@@ -21,7 +21,7 @@
 
 										<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 											<div class="form-group">
-											  <label class="col-sm-12 control-label labelleft negrita" >IMPULSADORA <span class="obligatorio">(*)</span> :</label>
+											  <label class="col-sm-12 control-label labelleft negrita" >VENDEDOR <span class="obligatorio">(*)</span> :</label>
 											  <div class="col-sm-12">
 											      {!! Form::select( 'trabajador_id', $combotrabajador, $trabajador_id,
 									                              [

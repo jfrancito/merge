@@ -1778,6 +1778,9 @@ class GestionUsuarioContactoController extends Controller
             $combopagodetraccion    =   array('' => "Seleccione Pago Detraccion",Session::get('empresas')->COD_EMPR => Session::get('empresas')->NOM_EMPR , $empresa->COD_EMPR => $empresa->NOM_EMPR);
             $arraybancos            =   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
             $combobancos            =   array('' => "Seleccione Entidad Bancaria") + $arraybancos;
+
+            $fereftop1              =   FeRefAsoc::where('lote','=',$idoc)->first();
+
             $lotes                  =   FeRefAsoc::where('lote','=',$idoc)                                        
                                         ->pluck('ID_DOCUMENTO')
                                         ->toArray();
@@ -1788,6 +1791,7 @@ class GestionUsuarioContactoController extends Controller
             return View::make('comprobante/observarucestiba', 
                             [
                                 'fedocumento'           =>  $fedocumento,
+                                'fereftop1'             =>  $fereftop1,
                                 'empresa'               =>  $empresa,
                                 'lote'                  =>  $idoc,
                                 'documento_asociados'   =>  $documento_asociados,
@@ -2366,13 +2370,14 @@ class GestionUsuarioContactoController extends Controller
                 $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idop)->where('DOCUMENTO_ITEM','=',$linea)->first();
 
                 $arrayarchivos          =   Archivo::where('ID_DOCUMENTO','=',$idop)
-                                            ->where('ACTIVO','=','1')
+                                            ->where('ACTIVO','=','0')
                                             ->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                            ->distinct()
                                             ->pluck('TIPO_ARCHIVO')
                                             ->toArray();
 
                 $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$idop)->where('COD_ESTADO','=',1)
-                                            ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
+                                            ->whereIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
                                             ->get();                
 
                 foreach($tarchivos as $index => $item){
@@ -2414,7 +2419,7 @@ class GestionUsuarioContactoController extends Controller
                             $dcontrol->save();
                         }
                     }else{
-                        return Redirect::to('observacion-comprobante-uc-liquidacion-compra-anticipo'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordenpago)->with('errorurl', 'Seleccione los archivos Correspondientes');
+                        return Redirect::to('observacion-comprobante-uc-liquidacion-compra-anticipo/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordenpago)->with('errorurl', 'Seleccione los archivos Correspondientes');
                     }
                 }
 
@@ -2452,14 +2457,15 @@ class GestionUsuarioContactoController extends Controller
             $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
 
             $arrayarchivos          =   Archivo::where('ID_DOCUMENTO','=',$idop)
-                                            ->where('ACTIVO','=','1')
+                                            ->where('ACTIVO','=','0')
                                             ->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                            ->distinct()
                                             ->pluck('TIPO_ARCHIVO')
                                             ->toArray();
 
  
             $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$idop)->where('COD_ESTADO','=',1)
-                                            ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
+                                            ->whereIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
                                             ->get();            
 
             $documentohistorial     =   FeDocumentoHistorial::where('ID_DOCUMENTO','=',$idop)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)

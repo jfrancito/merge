@@ -102,6 +102,25 @@ trait LiquidacionGastoTraits
                 }
 
 
+                // Agrupar y sumar
+                $resultado = collect($resultado)->groupBy(function($item) {
+                    // Unir TIG0000000000004 y TIG0000000000005 en uno
+                    if (in_array($item['concepto_id'], ['TIG0000000000004', 'TIG0000000000005'])) {
+                        return 'PASAJES_UNIFICADOS';
+                    }
+                    return $item['concepto_id'];
+                })->map(function($group, $key) {
+                    if ($key === 'PASAJES_UNIFICADOS') {
+                        return [
+                            'concepto' => 'PASAJES UNIFICADOS',
+                            'concepto_id' => 'TIG0000000000004', // Puedes usar cualquiera de los dos
+                            'monto' => $group->sum('monto')
+                        ];
+                    }
+                    
+                    // Para los demás conceptos, mantener el primero
+                    return $group->first();
+                })->values()->all();
 
                 // Convertir a array de salida
                 $array = array_values($resultado);

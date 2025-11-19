@@ -12,7 +12,8 @@
                       $countdib   =   $count_x_aprobar_dib+$count_reparables_dib+$count_reparables__revdib+$count_observados_dib+$count_observadosdib_le;
                       $countlg    =   $count_x_aprobar_lg+$count_observados_lg+$count_observadoslg_le;
                       $countvl    =   $count_x_aprobar_vl;
-                      $cantotal   =   $countoc+$countcon+$countest+$countdip+$countdis+$countdib;
+                      $countrenta =   $count_x_aprobar_renta;
+                      $cantotal   =   $countoc+$countcon+$countest+$countdip+$countdis+$countdib+$countrenta;
                     @endphp
 
                     @if($trol->ind_uc == 1)
@@ -94,6 +95,15 @@
                         </li>
 
 
+                        <li class="nav-item">
+                            <a class="nav-link category-tab" data-category="rentaq">
+                                <span class="nav-text">SUSPENSION RENTA DE 4TA </span>
+                                <div class="notification-container">
+                                    <span class="notification-badge">{{$countrenta}}</span>
+                                </div>
+                            </a>
+                        </li>
+
 
                     </ul>
                 </nav>
@@ -145,6 +155,10 @@
 
             <div id="dvl" class="category-content">
                 @include('usuario.dashboard.dvl')
+            </div>
+
+            <div id="rentaq" class="category-content">
+                @include('usuario.dashboard.rentaq')
             </div>
 
 

@@ -73,7 +73,7 @@
             <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
               <div class="panel panel-default panel-contrast">
                 <div class="panel-heading" style="background: #1d3a6d;color: #fff;">DOCUMENTOS ASOCIADOS 
-                  {{number_format($documento_asociados->sum('CAN_TOTAL'), 2, '.', ',')}}
+                  {{number_format($fereftop1->TOTAL_MERGE, 2, '.', ',')}}
                 </div>
                 <div class="panel-body panel-body-contrast">
 
@@ -94,7 +94,7 @@
                             <td>{{$item->COD_DOCUMENTO_CTBLE}}</td>
                             <td>{{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</td>
                             <td>{{$item->TXT_EMPR_EMISOR}}</td>
-                            <td>{{number_format($item->CAN_TOTAL, 2, '.', ',')}}</td>
+                            <td>{{number_format($fereftop1->TOTAL_MERGE, 2, '.', ',')}}</td>
                           </tr>
                         @endforeach
                     </tbody>
@@ -110,7 +110,6 @@
             <form method="POST" action="{{ url('validar-xml-oc-estiba-administrator/'.$idopcion.'/'.$idoc) }}" name="formguardardatos" id="formguardardatos" enctype="multipart/form-data" >
              {{ csrf_field() }}
               <input type="hidden" name="rutaorden" id='rutaorden' value = '{{$rutaorden}}'>
-              <input type="hidden" name="rutasuspencion" id='rutasuspencion' value = '{{$rutasuspencion}}'>
               <div class="row">
 
                 <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
@@ -145,7 +144,7 @@
                             </tr>
                             <tr>
                               <td><b>Total</b></td>
-                              <td><p class='subtitulomerge'>{{number_format($documento_asociados->sum('CAN_TOTAL'), 4, '.', ',')}}</p></td>
+                              <td><p class='subtitulomerge'>{{number_format($fereftop1->TOTAL_MERGE, 4, '.', ',')}}</p></td>
                               <td>
                                 <div class='subtitulomerge @if($fedocumento->ind_total == 1) msjexitoso @else msjerror @endif'>
                                     <b>{{number_format($fedocumento->TOTAL_VENTA_ORIG, 4, '.', ',')}}</b>
@@ -223,61 +222,61 @@
                   </div>
                 </div>
               </div>
-              @if($fereftop1->OPERACION != 'DOCUMENTO_INTERNO_COMPRA')
-                <div class="row">
-                  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                    <div class="panel panel-default panel-contrast">
-                      <div class="panel-heading" style="background: #1d3a6d;color: #fff;">DATOS PARA PAGOS
+              
+              <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                  <div class="panel panel-default panel-contrast">
+                    <div class="panel-heading" style="background: #1d3a6d;color: #fff;">DATOS PARA PAGOS
 
-                        <div class="tools ver_cuenta_bancaria_estiba select" style="cursor: pointer;padding-left: 12px;"> <span class="label label-success">Ver Cuenta</span></div>
-                        <div class="tools agregar_cuenta_bancaria_estiba select" style="cursor: pointer;"> <span class="label label-success">Agregar Cuenta</span></div>
+                      <div class="tools ver_cuenta_bancaria_estiba select" style="cursor: pointer;padding-left: 12px;"> <span class="label label-success">Ver Cuenta</span></div>
+                      <div class="tools agregar_cuenta_bancaria_estiba select" style="cursor: pointer;"> <span class="label label-success">Agregar Cuenta</span></div>
 
-                      </div>
-                      <div class="panel-body panel-body-contrast">
-                              <div class="row">
+                    </div>
+                    <div class="panel-body panel-body-contrast">
+                            <div class="row">
 
-                                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px;">
-                                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 cajareporte">
-                                            <div class="form-group">
-                                              <label class="col-sm-12 control-label labelleft" ><b>Entidad Bancaria que se le va a pagar al proveedor :</b></label>
-                                              <div class="col-sm-12 abajocaja" >
+                                  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px;">
+                                      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 cajareporte">
+                                          <div class="form-group">
+                                            <label class="col-sm-12 control-label labelleft" ><b>Entidad Bancaria que se le va a pagar al proveedor :</b></label>
+                                            <div class="col-sm-12 abajocaja" >
 
-                                                @if($banco_id=='BAM0000000000011')
-                                                  <input type="hidden" name="entidadbanco_id" value ='{{$banco_id}}'>
-                                                  {!! Form::select( 'entidadbanco_id', $combobancos, array($banco_id),
-                                                                    [
-                                                                      'class'       => 'select2 form-control control input-xs entidadbancoestiba' ,
-                                                                      'id'          => 'entidadbanco_id',
-                                                                      'required'    => '',
-                                                                      'data-aw'     => '1',
-                                                                      'disabled' => 'disabled'
-                                                                    ]) !!}
-                                                @else
-                                                  {!! Form::select( 'entidadbanco_id', $combobancos, array($banco_id),
-                                                                    [
-                                                                      'class'       => 'select2 form-control control input-xs entidadbancoestiba' ,
-                                                                      'id'          => 'entidadbanco_id',
-                                                                      'required'    => '',
-                                                                      'data-aw'     => '1',
-                                                                    ]) !!}
-                                                @endif
+                                              @if($banco_id=='BAM0000000000011')
+                                                <input type="hidden" name="entidadbanco_id" value ='{{$banco_id}}'>
+                                                {!! Form::select( 'entidadbanco_id', $combobancos, array($banco_id),
+                                                                  [
+                                                                    'class'       => 'select2 form-control control input-xs entidadbancoestiba' ,
+                                                                    'id'          => 'entidadbanco_id',
+                                                                    'required'    => '',
+                                                                    'data-aw'     => '1',
+                                                                    'disabled' => 'disabled'
+                                                                  ]) !!}
+                                              @else
+                                                {!! Form::select( 'entidadbanco_id', $combobancos, array($banco_id),
+                                                                  [
+                                                                    'class'       => 'select2 form-control control input-xs entidadbancoestiba' ,
+                                                                    'id'          => 'entidadbanco_id',
+                                                                    'required'    => '',
+                                                                    'data-aw'     => '1',
+                                                                  ]) !!}
+                                              @endif
 
 
-                                              </div>
                                             </div>
-                                        </div>
-                                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 cajareporte ajax_cb">
-                                          @include('comprobante.combo.combo_cuenta_bancaria')
-                                        </div>
-                                    </div>
+                                          </div>
+                                      </div>
+                                      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 cajareporte ajax_cb">
+                                        @include('comprobante.combo.combo_cuenta_bancaria')
+                                      </div>
+                                  </div>
 
 
-                              </div>
-                      </div>
+                            </div>
                     </div>
                   </div>
                 </div>
-              @endif
+              </div>
+              
               @if($fereftop1->OPERACION != 'DOCUMENTO_INTERNO_COMPRA')
                 <div class="row @if($fedocumento->ID_TIPO_DOC =='R1') ocultar @endif">
                   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
@@ -373,10 +372,6 @@
                     <div class="panel-body panel-body-contrast">
 
                             <div class="row">
-                                  @if($rutasuspencion != '')
-                                    <div><b style="color: #4285f4;">LA SUSPENSION DE 4TA CATEGORIA SE CARGARA DESPUES DE GUARDAR</b></div><br>
-                                  @endif
-                              
                                   @if($rutaorden != '')
                                     <div><b>LOS ARCHIVOS DE CONTRATOS Y GUIAS RELACIONADAS SE CARGARAN DESPUES DE GUARDAR</b></div><br>
                                   @endif
@@ -522,5 +517,3 @@
 
         </div>
 </div>
-
-

@@ -195,7 +195,7 @@
       </div>
   </div>
 
-  <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 sectorxml ocultar">
+  <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 sectorxml sectorotrotipo ocultar">
     <div class="form-group">
       <label class="col-sm-12 control-label labelleft negrita" >PRODUCTO <span class="obligatorio">(*)</span> :</label>
       <div class="col-sm-12">
@@ -208,7 +208,7 @@
     </div>
   </div>
 
-  <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 sectorxml ocultar">
+  <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 sectorxml sectorotrotipo ocultar">
     <div class="form-group">
       <label class="col-sm-12 control-label labelleft negrita" >¿ESTA AFECTO A IGV?<span class="obligatorio">(*)</span> :</label>
       <div class="col-sm-12">
@@ -265,7 +265,7 @@
 </div>
 
 @if(count($tdetliquidacionitem)>0) 
-  @if(!in_array($tdetliquidacionitem->COD_TIPODOCUMENTO, ['TDO0000000000070','TDO0000000000001']))
+  @if(!in_array($tdetliquidacionitem->COD_TIPODOCUMENTO, ['TDO0000000000070','TDO0000000000001','TDO0000000000003','TDO0000000000010']))
   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="text-align: right;margin-top: 13px;margin-bottom: 13px;">
     <button 
           type="button" 
@@ -300,7 +300,7 @@
             <span style="display: block;"><b>SUBTOTAL : </b> {{$item->SUBTOTAL}}</span>
             <span style="display: block;"><b>IGV : </b> {{$item->IGV}}</span>
             <span style="display: block;"><b>TOTAL : </b> {{$item->TOTAL}}</span>
-            @if(!in_array($tdetliquidacionitem->COD_TIPODOCUMENTO, ['TDO0000000000070','TDO0000000000001']))
+            @if(!in_array($tdetliquidacionitem->COD_TIPODOCUMENTO, ['TDO0000000000070','TDO0000000000001','TDO0000000000003','TDO0000000000010']))
               <button type="button" data_iddocumento = "{{$item->ID_DOCUMENTO}}" data_item = "{{$item->ITEM}}" data_item_documento = "{{$item->ITEMDOCUMENTO}}" style="margin-top: 5px;float: right;" class="btn btn-rounded btn-space btn-success btn-sm modificardetalledocumentolg">MODIFICAR</button>
             @endif
           </td>

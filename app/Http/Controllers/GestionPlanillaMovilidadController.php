@@ -1856,15 +1856,15 @@ class GestionPlanillaMovilidadController extends Controller
                                         ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
                                         ->where('dni', $dni)
                                         ->first();
-                $area_id                = $trabajadorespla->area_id;
-                $mensaje_extra          = '';
+                // $area_id                = $trabajadorespla->area_id;
+                // $mensaje_extra          = '';
 
-                //VENDEDOR
+                // //VENDEDOR
 
-                $area_id                = 'PRMAECEN000000000172';//ELIMINAR
+                // $area_id                = 'PRMAECEN000000000172';//ELIMINAR
 
 
-                $impulsadora            =   $this->plm_identificar_si_es_impulsadora($area_id);
+                // $impulsadora            =   $this->plm_identificar_si_es_impulsadora($area_id);
                 $impulsadora            =   0;//ELIMINAR
 
                 $monto_validar_diario   =   45;
@@ -2044,22 +2044,39 @@ class GestionPlanillaMovilidadController extends Controller
                                     ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
                                     ->first();
                 $dni            =       '';
+
+
+
                 if(count($trabajador)>0){
                     $dni        =       $trabajador->NRO_DOCUMENTO;
                 }
+
+
                 $trabajadorespla    =   DB::table('WEB.platrabajadores')
                                         ->where('situacion_id', 'PRMAECEN000000000002')
                                         ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
                                         ->where('dni', $dni)
                                         ->first();
-                $area_id = $trabajadorespla->area_id;
-                $mensaje_extra = '';
 
-                //VENDEDOR
-                //$area_id = 'PRMAECEN000000000172';//ELIMINAR
+                $terceros           =   DB::table('TERCEROS')
+                                        ->where('USER_ID', Session::get('usuario')->id)
+                                        ->where('ACTIVO', 1)
+                                        ->first();
+
+                $centro_id = '';                        
+                if (count($terceros) > 0) {
+                    $centro_id = $terceros->COD_CENTRO;
+                }
 
 
-                $impulsadora            =   $this->plm_identificar_si_es_impulsadora($area_id);
+                // $area_id = $trabajadorespla->area_id;
+                // $mensaje_extra = '';
+
+                // //VENDEDOR
+                // //$area_id = 'PRMAECEN000000000172';//ELIMINAR
+
+
+                // $impulsadora            =   $this->plm_identificar_si_es_impulsadora($area_id);
 
                 $impulsadora = 0;//ELIMINAR
                 $monto_validar_diario   =   45;
@@ -2247,7 +2264,7 @@ class GestionPlanillaMovilidadController extends Controller
             DB::commit();
         }catch(\Exception $ex){
             DB::rollback(); 
-            dd("hola1");
+            //dd("hola1");
             return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd', $ex.' Ocurrio un error inesperado');
         }
             return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('bienhecho', 'Se Agrego un nuevo item con exito');

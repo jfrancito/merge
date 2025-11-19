@@ -81,10 +81,12 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-contrato', 'UserController@actionAjaxModalConfiguracionCuentaBancariaContrato');
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-oc', 'UserController@actionAjaxModalConfiguracionCuentaBancariaOC');
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-estiba', 'UserController@actionAjaxModalConfiguracionCuentaBancariaEstiba');
+	Route::any('/ajax-modal-configuracion-cuenta-bancaria-liq-com-an', 'UserController@actionAjaxModalConfiguracionCuentaBancariaLiqComAn');
 	Route::any('/configurar-datos-cuenta-bancaria-estiba/{empresa_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaEstiba');
 	Route::any('/ajax-modal-ver-cuenta-bancaria-estiba', 'UserController@actionAjaxModalVerCuentaBancariaEstiba');
 
 	Route::any('/configurar-datos-cuenta-bancaria-contrato/{prefijo_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaContrato');
+	Route::any('/configurar-datos-cuenta-bancaria-liquidacion-compra-anticipo/{prefijo_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaLiquidacionCompraAnticipo');
 	Route::any('/configurar-datos-cuenta-bancaria-oc/{prefijo_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaOC');
 
 	Route::any('/ajax-modal-ver-cuenta-bancaria-oc', 'UserController@actionAjaxModalVerCuentaBancariaOC');
@@ -92,6 +94,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-modal-ver-cuenta-bancaria-oc-individual', 'UserController@actionAjaxModalVerCuentaBancariaOCIndividual');
 
 	Route::any('/ajax-modal-ver-cuenta-bancaria-lq', 'UserController@actionAjaxModalVerCuentaBancariaLQ');
+	Route::any('/ajax-modal-ver-cuenta-bancaria-liq-com-an', 'UserController@actionAjaxModalVerCuentaBancariaLiqComAn');
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-lq', 'UserController@actionAjaxModalConfiguracionCuentaBancariaLQ');
 	Route::any('/configurar-datos-cuenta-bancaria-lq/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaLQ');
 
@@ -201,12 +204,16 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/aprobar-movilidad-impulso-jefe/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadImpulsoController@actionAprobarJefeMV');
 	Route::any('/agregar-extorno-jefe-mv/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadImpulsoController@actionAgregarExtornoJefe');
 
+	Route::any('/seguimiento-movilidad-impulso/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadImpulsoController@actionSeguimientoMovilidadImpulso');
+
+
 	Route::any('/gestion-movilidad-impulso-masivo/{idopcion}', 'GestionPlanillaMovilidadImpulsoController@actionListarPlanillaMovilidadImpulsoMasivo');
 	Route::any('/agregar-movilidad-impulso-masivo/{idopcion}', 'GestionPlanillaMovilidadImpulsoController@actionAgregarMovilidadImpulsoMasivo');
 	Route::any('/modificar-movilidad-impulso-masivo/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionModificarMovilidadImpulsoMasivo');
 	Route::any('/ajax-modal-detalle-planilla-movilidad-impulso', 'GestionPlanillaMovilidadImpulsoController@actionDetallePlanillaMovilidadImpulso');
 	Route::any('/guardar-detalle-movilidad-impulso-trabajador/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionGuardarMovilidadTrabajador');
 	Route::any('/guardar-movilidad-detalle-masivo/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionGuardarDetalleMovilidadImpulsoMasivo');
+
 	Route::any('/extonar-planilla-movilidad-masivo/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionExtornarPlanillaMovilidadMasivo');
 	Route::any('/ajax-buscar-documento-fe-entregable-pla-mob-masivo', 'GestionPlanillaMovilidadImpulsoController@actionListarPlanillaMovilidadMobilMasivo');
 	Route::any('/emitir-movilidad-impulso-masivo/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionEmitirDetalleMovilidadImpulsoMasivo');
@@ -214,19 +221,27 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/configurar-datos-cuenta-bancaria-impulso/{orden_id}/{idopcion}', 'GestionPlanillaMovilidadImpulsoController@actionConfigurarDatosCuentaBancariaImpulso');
 	Route::any('/ajax-modal-ver-cuenta-bancaria-impulso', 'GestionPlanillaMovilidadImpulsoController@actionAjaxModalVerCuentaBancariaImpulso');
 	Route::any('/cambiar-cuenta-corriente-impulso/{empresa_id}/{banco_id}/{nro_cuenta}/{moneda_id}/{idoc}/{idopcion}', 'GestionPlanillaMovilidadImpulsoController@actionCambiarCuentaCorrienteImpulso');
-
 	Route::any('/extonar-planilla-movilidad-impulso/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionExtornarPlanillaMovilidadImpulso');
+
+	//MOVILIDAD VENTAS
+	Route::any('/gestion-movilidad-venta-masivo/{idopcion}', 'GestionPlanillaMovilidadImpulsoController@actionListarPlanillaMovilidadVentaMasivo');
+	Route::any('/agregar-movilidad-venta-masivo/{idopcion}', 'GestionPlanillaMovilidadImpulsoController@actionAgregarMovilidadVentaMasivo');
+	Route::any('/modificar-movilidad-venta-masivo/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionModificarMovilidadVenta');
+	Route::any('/ajax-modal-detalle-planilla-movilidad-venta', 'GestionPlanillaMovilidadImpulsoController@actionDetallePlanillaMovilidadVenta');
+	Route::any('/guardar-detalle-movilidad-venta-trabajador/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionGuardarMovilidadTrabajadorVenta');
+	Route::any('/guardar-movilidad-detalle-masivo-venta/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionGuardarDetalleMovilidadVentaMasivo');
+	Route::any('/emitir-movilidad-venta-masivo/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionEmitirDetalleMovilidadVentaMasivo');
+	Route::any('/extonar-planilla-movilidad-masivo-venta/{idopcion}/{iddocumento}', 'GestionPlanillaMovilidadImpulsoController@actionExtornarPlanillaMovilidadMasivoVenta');
+	Route::any('/seguimiento-movilidad-venta/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadImpulsoController@actionSeguimientoMovilidadVenta');
+
+
+
 
 	//PLANILLA MOVILIDAD
 
 	Route::any('/gestion-de-aprobacion-firma-administracion/{idopcion}', 'GestionPlanillaMovilidadController@actionAprobarFirma');
 	Route::any('/aprobar-firma-administracion/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadController@actionAprobarAdministracionFirma');
 	Route::any('/agregar-extorno-administracion-firma/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadController@actionAgregarExtornoFirma');
-
-
-
-
-
 	Route::any('/gestion-de-planilla-movilidad/{idopcion}', 'GestionPlanillaMovilidadController@actionListarPlanillaMovilidad');
 	Route::any('/ajax-buscar-documento-fe-entregable-pla-mob', 'GestionPlanillaMovilidadController@actionListarPlanillaMovilidadMobil');
 	Route::any('/agregar-planilla-movilidad/{idopcion}', 'GestionPlanillaMovilidadController@actionAgregarPlanillaMovilidad');
@@ -395,6 +410,7 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/ajax-cuenta-bancaria-proveedor-contrato', 'GestionOCController@actionAjaxBuscarCuentaBancariaContrato');
 	Route::any('/ajax-cuenta-bancaria-proveedor-oc', 'GestionOCController@actionAjaxBuscarCuentaBancariaOC');
+	Route::any('/ajax-cuenta-bancaria-proveedor-liquidacioncompraanticipo', 'GestionOCController@actionAjaxBuscarCuentaBancariaLiquidacionCompraAnticipo');
 	Route::any('/ajax-cuenta-bancaria-proveedor-estiba', 'GestionOCController@actionAjaxBuscarCuentaBancariaEstiba');
 
 	Route::any('/ajax-moneda-ajax-cuenta', 'GestionOCController@actionAjaxMonedaAjaxCuenta');
@@ -414,7 +430,8 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	//ADMINISTRATOR ESTIBA
 	Route::any('/select-xml-estiba/{idopcion}', 'GestionEstibaController@actionDetalleSelectEstiba');
-	Route::any('/detalle-comprobante-estiba-administrator/{idopcion}/{lote}', 'GestionEstibaController@actionDetalleComprobanteestibaAdministrator');
+	Route::any('/select-xml-estiba-documento-interno-compra/{idopcion}', 'GestionEstibaController@actionDetalleSelectEstibaDocumentoInternoCompra');
+	Route::any('/detalle-comprobante-estiba-administrator/{idopcion}/{lote}', 'GestionEstibaController@actionDetalleComprobanteestibaAdministrator');	
 	Route::any('/subir-xml-cargar-datos-estiba-administrator/{idopcion}/{lote}', 'GestionEstibaController@actionCargarXMLEstibaAdministrator');
 	Route::any('/validar-xml-oc-estiba-administrator/{idopcion}/{lote}', 'GestionEstibaController@actionValidarXMLEstibaAdministrator');
 	Route::any('/ajax-modal-detalle-lotes', 'GestionEstibaController@actionCargarModalDetalleLotes');
