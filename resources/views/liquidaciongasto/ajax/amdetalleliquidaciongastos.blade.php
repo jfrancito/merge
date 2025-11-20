@@ -65,9 +65,9 @@
                       <input type="hidden" name="ULTIMA_FECHA_RENDICION" id = "ULTIMA_FECHA_RENDICION" value = "{{$ultimafecha}}">
                       <div class="panel panel-default panel-contrast">
                         <div class="panel-heading" style="background: #1d3a6d;color: #fff;">DATOS PARA EMITIR LA LIQUIDACION
-
+<!-- 
                           <div class="tools ver_cuenta_bancaria select" style="cursor: pointer;padding-left: 12px;"> <span class="label label-success" style="font-size: 13px !important;">Ver Cuenta</span></div>
-                          <div class="tools agregar_cuenta_bancaria select" style="cursor: pointer;"> <span class="label label-success" style="font-size: 13px !important;">Agregar Cuenta</span></div>
+                          <div class="tools agregar_cuenta_bancaria select" style="cursor: pointer;"> <span class="label label-success" style="font-size: 13px !important;">Agregar Cuenta</span></div> -->
 
                         </div>
                         <div class="panel-body panel-body-contrast">
@@ -91,22 +91,51 @@
                                     </div>
                                   </div>
                               </div>
+
+                            
                               <div class='@if($tipopago_id != "MPC0000000000002") ocultar @endif  detallecuenta'>
-                                <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 cajareporte">
-                                    <div class="form-group">
-                                      <label class="col-sm-12 control-label labelleft" ><b>Entidad Bancaria:</b></label>
-                                      <div class="col-sm-12 abajocaja" >
-                                        {!! Form::select( 'entidadbanco_id', $combobancos, $banco_id,
-                                                          [
-                                                            'class'       => 'select2 form-control control input-xs entidadbanco' ,
-                                                            'id'          => 'entidadbanco_id',
-                                                            'data-aw'     => '1',
-                                                          ]) !!}
-                                      </div>
+
+
+                                <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 ocultar">
+                                  <div class="form-group">
+                                    <label class="col-sm-12 control-label labelleft negrita">Entidad Bancaria:</label>
+                                    <div class="col-sm-12">
+                                        <input  type="text"
+                                                id="banco_e_id" name='banco_e_id' 
+                                                value="{{$banco_e_id}}"                         
+                                                placeholder="Entidad Bancaria"
+                                                readonly = "readonly"
+                                                autocomplete="off" class="form-control input-sm"/>
                                     </div>
+                                  </div>
                                 </div>
-                                <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 cajareporte ajax_cb">
-                                  @include('liquidaciongasto.combo.combo_cuenta_bancaria')
+
+                                <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
+                                  <div class="form-group">
+                                    <label class="col-sm-12 control-label labelleft negrita">Entidad Bancaria:</label>
+                                    <div class="col-sm-12">
+                                        <input  type="text"
+                                                id="entidadbanco_id" name='entidadbanco_id' 
+                                                value="{{$banco_nombre}}"                         
+                                                placeholder="Entidad Bancaria"
+                                                readonly = "readonly"
+                                                autocomplete="off" class="form-control input-sm"/>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
+                                  <div class="form-group">
+                                    <label class="col-sm-12 control-label labelleft negrita">Numero Cuenta:</label>
+                                    <div class="col-sm-12">
+                                        <input  type="text"
+                                                id="cuentaco_id" name='cuentaco_id' 
+                                                value="{{$numero_cuenta}}"                         
+                                                placeholder="NUMERO CUENTA"
+                                                readonly = "readonly"
+                                                autocomplete="off" class="form-control input-sm"/>
+                                    </div>
+                                  </div>
                                 </div>
 
                               </div>
