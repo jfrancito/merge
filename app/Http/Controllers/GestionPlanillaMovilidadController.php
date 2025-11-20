@@ -1658,6 +1658,16 @@ class GestionPlanillaMovilidadController extends Controller
                 $dni        =       $trabajador->NRO_DOCUMENTO;
             }
 
+            $terceros   =   DB::table('TERCEROS')
+                        ->where('USER_ID', Session::get('usuario')->id)
+                        ->where('ACTIVO', 1)
+                        ->first();
+            if (count($terceros) > 0) {
+                $centro_id = $terceros->COD_CENTRO;
+                $dni        =       $terceros->DNI;
+            }
+
+            //DD($dni);
             $rutaImagen             =   public_path('firmas/'.$dni.'.jpg');
             if (!file_exists($rutaImagen)){
                 return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd','No cuenta con firma suba su firma');

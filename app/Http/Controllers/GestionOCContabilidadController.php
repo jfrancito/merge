@@ -2744,6 +2744,7 @@ class GestionOCContabilidadController extends Controller
             return View::make('comprobante/aprobarconestiba',
                 [
                     'fedocumento' => $fedocumento,
+
                     'detalleordencompra' => $detalleordencompra,
                     'documento_asociados' => $documento_asociados,
                     'documento_top' => $documento_top,

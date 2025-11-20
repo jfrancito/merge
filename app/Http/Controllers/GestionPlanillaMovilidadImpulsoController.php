@@ -2355,6 +2355,7 @@ class GestionPlanillaMovilidadImpulsoController extends Controller
                     return Redirect::back()->withInput()->with('errorurl', 'El trabajador no pertenece a esta empresa');
                 }
 
+
                 $cod_empr               =   Session::get('empresas')->COD_EMPR;
                 $values                 =   [$dni,$cod_empr];
                 $datoscuentasueldo      =   DB::select('exec ListaTrabajadorCuentaSueldo ?,?',$values);
