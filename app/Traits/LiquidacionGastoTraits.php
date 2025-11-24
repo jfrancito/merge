@@ -545,7 +545,12 @@ trait LiquidacionGastoTraits
 
         if($ind_empresa == 0){
 
-            $stmt = DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC STD.EMPRESA_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?');
+            if($centro_id == 'CEN0000000000004' || $centro_id == 'CEN0000000000006'){ //rioja
+                $stmt = DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC STD.EMPRESA_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?');
+            }else{
+                $stmt = DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC STD.EMPRESA_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?');
+            }
+
             $stmt->bindParam(1, $accion ,PDO::PARAM_STR);                                   //@IND_TIPO_OPERACION='I',
             $stmt->bindParam(2, $vacio  ,PDO::PARAM_STR);                                   //@COD_EMPR=@p2 output,
             $stmt->bindParam(3, $empresa_id ,PDO::PARAM_STR);                               //@COD_EMPR_SISTEMA='IACHEM0000010394',
@@ -601,10 +606,18 @@ trait LiquidacionGastoTraits
             $stmt->bindParam(47, $valor_cero  ,PDO::PARAM_STR);                             //@IND_GASTO=0,
             $stmt->bindParam(48, $vacio  ,PDO::PARAM_STR);                                  //@COD_CATEGORIA_BANCO='',
             $stmt->bindParam(49, $vacio  ,PDO::PARAM_STR);                                  //@NRO_CUENTA_BANCARIA='',
-            $stmt->bindParam(50, $vacio  ,PDO::PARAM_STR);                                  //@TXT_CLAVE_LLAVE=''
-
+            if($centro_id == 'CEN0000000000001' || $centro_id == 'CEN0000000000002'){
+                $stmt->bindParam(50, $vacio  ,PDO::PARAM_STR);                              //@TXT_CLAVE_LLAVE=''
+            }
             $stmt->execute();
             $coddocumento = $stmt->fetch();
+
+
+
+
+
+
+
 
             $COD_ESTABLECIMIENTO_SUNAT  = '0001';
             $stmt = DB::connection($conexionbd)->getPdo()->prepare('SET NOCOUNT ON;EXEC STD.EMPRESA_DIRECCION_IUD ?,?,?,?,?,?,?,?,?,?,?,?,?,?');

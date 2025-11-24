@@ -2630,17 +2630,24 @@ class GestionOCController extends Controller
 
         $idop                   =   $this->funciones->decodificarmaestraprefijo($idordenpago,$prefijo);                
 
-        $rutafila                   =   "";
-        $rutaorden                  =   "";
-        $directorio = $this->pathFilesLiquidacion;
+        $rutafila               =   "";
+        $rutaorden              =   "";
+        $directorio             = $this->pathFilesLiquidacion;
 
+
+        $ordenpago              =   $this->con_lista_comprobante_orden_pago_idoc($idop);
+        $idoc                   =   $ordenpago->COD_DOCUMENTO_CTBLE;
+        $liquidacion            =   $this->con_lista_cabecera_comprobante_contrato_idoc_actual($idoc);
         // Nombre del archivo que estás buscando
         $nombreArchivoBuscado = $idop.'.xml';
+        $nombreArchivoBuscado = $liquidacion->COD_EMPR_EMISOR.'-04-'.$liquidacion->NRO_SERIE.'-'.$liquidacion->NRO_DOC.'.xml';        
         // Escanea el directorio
         $archivos = scandir($directorio);
         // Inicializa una variable para almacenar el resultado
         $archivoEncontrado = false;
         // Recorre la lista de archivos
+        //dd($nombreArchivoBuscado);
+
         foreach ($archivos as $archivo) {
             // Omite los elementos '.' y '..'
             if ($archivo != '.' && $archivo != '..') {
@@ -2657,6 +2664,7 @@ class GestionOCController extends Controller
             $rutafila            =   $directorio.'\\'.$nombreArchivoBuscado;
             $rutaorden           =   $rutafila;
         } 
+
 
         if($_POST)
         {
