@@ -3358,7 +3358,7 @@ class GestionUsuarioContactoController extends Controller
             //VALIDAR QUE SI TIENE CONSTANCIA DE SUSPENSION DE CUARTA LO SUBA SI NO QUE SUBA LA CONSTANCIA
             if(count($fedocumento_suspension)>0){
 
-                if($ordencompra_f->CAN_TOTAL>1500 && $ordencompra_f->CAN_RETENCION<=0){
+                if($ordencompra_f->CAN_TOTAL>1500 && $ordencompra_f->CAN_IMPUESTO_RENTA<=0){
                     $empresa_susp = STDEmpresa::where('COD_EMPR','=',$ordencompra_f->COD_EMPR_CLIENTE)->first();
                     $fecha_orden = $ordencompra_f->FEC_ORDEN;
                     $fechaObj = new DateTime($fecha_orden);
