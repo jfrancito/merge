@@ -24,7 +24,7 @@
           <span style="display: block;"><b>PERIODO : </b> {{$item->TXT_PERIODO}}</span>
           <span style="display: block;"><b>CENTRO : </b> {{$item->TXT_CENTRO}}</span>
           <span style="display: block;"><b>AUTORIZA : </b> {{$item->TXT_USUARIO_AUTORIZA}}</span>
-          <span style="display: block;"><b>TOTAL : </b> {{$item->TOTAL}}</span>
+          <span style="display: block;"><b>TOTAL : </b> {{$item->TOTAL}} </span>
           <span><b>ESTADO : </b> @include('planillamovilidad.ajax.estados')</span>
           <span><b>OBSERVACION : </b> 
               @if($item->IND_OBSERVACION == '0') 
@@ -37,9 +37,9 @@
           <a href="{{ url('/modificar-liquidacion-gastos/'.$idopcion.'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -8)).'/0') }}" style="margin-top: 5px;float: right;" class="btn btn-rounded btn-space btn-success btn-sm">MODIFICAR</a>
         
           @if($item->COD_ESTADO == 'ETM0000000000001')
-            <form method="POST" id='forextornar' action="{{ url('/extonar-liquidacion-gastos/'.$idopcion.'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
+            <form method="POST" id='forextornar{{$item->ID_DOCUMENTO}}' action="{{ url('/extonar-liquidacion-gastos/'.$idopcion.'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                   {{ csrf_field() }}
-                  <button type= 'button' style="margin-top: 5px;float: right;" class="btn btn-rounded btn-space btn-danger btn-sm btn-extonar-lg">EXTORNAR</button>
+                  <button type= 'button' style="margin-top: 5px;float: right;" class="btn btn-rounded btn-space btn-danger btn-sm btn-extonar-lg" data_extorno="{{$item->ID_DOCUMENTO}}">EXTORNAR</button>
             </form>
           @endif
 

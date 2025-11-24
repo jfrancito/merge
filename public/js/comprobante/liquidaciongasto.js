@@ -1885,12 +1885,16 @@ $(document).ready(function () {
     $(".cfedocumento").on('click', '.btn-extonar-lg', function (e) {
         event.preventDefault();
         var _token = $('#token').val();
+        var data_extorno = $(this).attr('data_extorno');
+        debugger;
         $.confirm({
             title: '¿Confirma el extorno?',
             content: 'Extorno de Liquidacion de Gastos',
             buttons: {
                 confirmar: function () {
-                    $("#forextornar").submit();
+                    
+                    debugger;
+                    $("#forextornar"+data_extorno).submit();
                 },
                 cancelar: function () {
                     $.alert('Se cancelo el extorno');
