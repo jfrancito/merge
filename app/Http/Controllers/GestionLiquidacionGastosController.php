@@ -4606,6 +4606,7 @@ class GestionLiquidacionGastosController extends Controller
     {
 
         $iddocumento = $this->funciones->decodificarmaestrapre($iddocumento, 'LIQG');
+
         View::share('titulo', 'Agregar Detalle Liquidacion de Gastos');
         $liquidaciongastos = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->first();
         $tdetliquidaciongastos = LqgDetLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', 1)->get();
@@ -4614,6 +4615,10 @@ class GestionLiquidacionGastosController extends Controller
         if ($liquidaciongastos->COD_ESTADO != 'ETM0000000000001' && $liquidaciongastos->IND_OBSERVACION == 0) {
             return Redirect::to('gestion-de-liquidacion-gastos/' . $idopcion)->with('errorbd', 'Ya no puede extornar esta LIQUIDACION DE GASTOS');
         }
+
+
+
+
         $liquidaciongastos->ACTIVO = 0;
         $liquidaciongastos->save();
 
@@ -5535,9 +5540,9 @@ class GestionLiquidacionGastosController extends Controller
 
         $empresa   =   DB::table('STD.EMPRESA ')
                         ->where('NRO_DOCUMENTO', $ruc)
+                        ->where('COD_ESTADO', 1)
                         ->first();
         //DD($empresa->COD_EMPR);
-
 
         $combo_cuenta = $this->lg_combo_cuenta_lg_nuevo('Seleccione una Cuenta', '', '', $centro_id, $empresa->COD_EMPR);
 
