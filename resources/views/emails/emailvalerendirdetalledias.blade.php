@@ -7,8 +7,10 @@
 <body style="font-family: 'Times New Roman', Times, serif;">
 
 <p>
-    Sres.<br>
-    Se adjunta el Vale a Rendir, el cambio de rubro
+    Estimados,<br><br>
+    Se informa que el Vale a Rendir <strong>{{ $vale->ID }}</strong> ha sido actualizado, 
+    registrando un aumento de plazo a <strong>{{ $vale->AUMENTO_DIAS }}</strong> día(s) 
+    para la emisión de su liquidación.
 </p>
 
 </body>

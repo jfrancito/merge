@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Traits\ValeRendirTraits;
 use App\Traits\EnviarCorreoVRDetalleImporteTraits;
+use App\Traits\EnviarCorreoVRDetalleDiasTraits;
 use App\Modelos\STDTrabajadorVale;
 use App\Modelos\WEBTipoMotivoValeRendir;
 use App\Modelos\WEBValeRendir;
@@ -22,7 +23,7 @@ use Validator;
 
 class GestionValeRendirController extends Controller
 {
-    use ValeRendirTraits, EnviarCorreoVRDetalleImporteTraits;
+    use ValeRendirTraits, EnviarCorreoVRDetalleImporteTraits, EnviarCorreoVRDetalleDiasTraits;
 
   
     public function actionListarValeRendir($idopcion)
@@ -134,11 +135,14 @@ class GestionValeRendirController extends Controller
             $dni = $trabajador->NRO_DOCUMENTO;
         }
 
+
         $trabajadorespla = DB::table('WEB.platrabajadores')
             ->where('situacion_id', 'PRMAECEN000000000002')
-            ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+           // ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
             ->where('dni', $dni)
             ->first();
+
+   //dd($trabajadorespla);
 
 
         if ($trabajadorespla) {
@@ -276,7 +280,12 @@ class GestionValeRendirController extends Controller
             }
 
             WEBValeRendir::where('ID', $vale_id)
-                ->update(['AUMENTO_DIAS' => $aumento_dias]);
+                ->update([
+                    'AUMENTO_DIAS' => $aumento_dias,
+                    'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id
+                ]);
+
+            $this->enviarCorreoValeRendirDetalleDias($vale_id);
 
             return response()->json(['success' => 'Vale actualizado correctamente.']);
 
@@ -362,7 +371,8 @@ class GestionValeRendirController extends Controller
                     ->where('ID', $id)
                     ->where('COD_DESTINO', $destino)
                     ->update([
-                        'CAN_UNITARIO_TOTAL' => implode("<br>", $importeActual)
+                        'CAN_UNITARIO_TOTAL' => implode("<br>", $importeActual),
+                        'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id
                     ]);
             }
 

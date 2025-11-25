@@ -1022,10 +1022,24 @@ $(document).ready(function(){
                 if (ind_propio === 1 && !["TIG0000000000001","TIG0000000000002","TIG0000000000006","TIG0000000000007"].includes(codigoTipo)) return;
 
                 // PASAJES INTERDEPATAMENTALES
-                if (codigoTipo === "TIG0000000000004") {
+                /*if (codigoTipo === "TIG0000000000004") {
                     if (ind_aereo === 1) return;
                     tipoImporte = filasExistentes === 0 ? valor * 2 : valor;
+                }*/
+                // PASAJE INTERDEPARTAMENTAL
+                if (codigoTipo === "TIG0000000000004") {
+
+                    if (ind_aereo === 1) return;
+
+                    let totalFilas = filasExistentes + 1; // contando la fila nueva
+
+                    if (totalFilas === 1) {
+                        tipoImporte = valor * 2; // solo si hay 1 fila
+                    } else {
+                        tipoImporte = valor*0; // si hay 2 o más filas
+                    }
                 }
+
 
                 // ALIMENTACION, ALOJAMIENTO, MOVILIDAD LOCAL
                 else if (["TIG0000000000001","TIG0000000000002","TIG0000000000003"].includes(codigoTipo)) {
