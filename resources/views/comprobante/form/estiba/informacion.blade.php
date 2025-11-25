@@ -24,7 +24,7 @@
                                                         <td>{{$item->COD_DOCUMENTO_CTBLE}}</td>
                                                         <td>{{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</td>
                                                         <td>{{$item->TXT_EMPR_EMISOR}}</td>
-                                                        <td>{{number_format($fereftop1->TOTAL_MERGE, 4, '.', ',')}}</td>
+                                                        <td>{{number_format($item->CAN_TOTAL, 4, '.', ',')}}</td>
                                                       </tr>
                                                     @endforeach
                                                 </tbody>
@@ -33,7 +33,7 @@
                                                     <th></th>
                                                     <th></th>      
                                                     <th></th>
-                                                    <th>{{$fereftop1->TOTAL_MERGE}}</th>
+                                                    <th>{{$documento_asociados->sum('CAN_TOTAL')}}</th>
                                                   </tr>
 
                                                 </tfooter>

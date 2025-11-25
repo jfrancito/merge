@@ -1450,14 +1450,14 @@ class GestionOCController extends Controller
 
             $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                         //->where('IND_OBLIGATORIO','=',1)
-                                        ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000004'])
+                                        ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000004','DCC0000000000034'])
                                         ->where('TXT_ASIGNADO','=','PROVEEDOR')
                                         ->get();
 
         }else{
             $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                         //->where('IND_OBLIGATORIO','=',1)
-                                        ->where('COD_CATEGORIA_DOCUMENTO','<>','DCC0000000000003')
+                                        ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000034'])
                                         ->where('TXT_ASIGNADO','=','PROVEEDOR')
                                         ->get();
         }
@@ -2630,17 +2630,24 @@ class GestionOCController extends Controller
 
         $idop                   =   $this->funciones->decodificarmaestraprefijo($idordenpago,$prefijo);                
 
-        $rutafila                   =   "";
-        $rutaorden                  =   "";
-        $directorio = $this->pathFilesLiquidacion;
+        $rutafila               =   "";
+        $rutaorden              =   "";
+        $directorio             = $this->pathFilesLiquidacion;
 
+
+        $ordenpago              =   $this->con_lista_comprobante_orden_pago_idoc($idop);
+        $idoc                   =   $ordenpago->COD_DOCUMENTO_CTBLE;
+        $liquidacion            =   $this->con_lista_cabecera_comprobante_contrato_idoc_actual($idoc);
         // Nombre del archivo que estás buscando
         $nombreArchivoBuscado = $idop.'.xml';
+        $nombreArchivoBuscado = $liquidacion->COD_EMPR_EMISOR.'-04-'.$liquidacion->NRO_SERIE.'-'.$liquidacion->NRO_DOC.'.xml';        
         // Escanea el directorio
         $archivos = scandir($directorio);
         // Inicializa una variable para almacenar el resultado
         $archivoEncontrado = false;
         // Recorre la lista de archivos
+        //dd($nombreArchivoBuscado);
+
         foreach ($archivos as $archivo) {
             // Omite los elementos '.' y '..'
             if ($archivo != '.' && $archivo != '..') {
@@ -2657,6 +2664,7 @@ class GestionOCController extends Controller
             $rutafila            =   $directorio.'\\'.$nombreArchivoBuscado;
             $rutaorden           =   $rutafila;
         } 
+
 
         if($_POST)
         {
@@ -3268,7 +3276,7 @@ class GestionOCController extends Controller
         //VALIDAR QUE SI TIENE CONSTANCIA DE SUSPENSION DE CUARTA LO SUBA SI NO QUE SUBA LA CONSTANCIA
         if(count($fedocumento_suspension)>0){
 
-            if($ordencompra_f->CAN_TOTAL>1500 && $ordencompra_f->CAN_RETENCION<=0){
+            if($ordencompra_f->CAN_TOTAL>1500 && $ordencompra_f->CAN_IMPUESTO_RENTA<=0){
                 $empresa_susp = STDEmpresa::where('COD_EMPR','=',$ordencompra_f->COD_EMPR_CLIENTE)->first();
                 $fecha_orden = $ordencompra_f->FEC_ORDEN;
                 $fechaObj = new DateTime($fecha_orden);
@@ -3453,7 +3461,7 @@ class GestionOCController extends Controller
 
 
                             //VALIDAR QUE SI TIENE CONSTANCIA DE SUSPENSION DE CUARTA LO SUBA SI NO QUE SUBA LA CONSTANCIA
-                            if($ordencompra_t->CAN_TOTAL>1500 && $ordencompra_t->CCAN_RETENCION<=0){
+                            if($ordencompra_t->CAN_TOTAL>1500 && $ordencompra_t->CAN_IMPUESTO_RENTA<=0){
                                 $empresa_susp = STDEmpresa::where('COD_EMPR','=',$ordencompra_t->COD_EMPR_CLIENTE)->first();
                                 $fecha_orden = $ordencompra_t->FEC_ORDEN;
                                 $fechaObj = new DateTime($fecha_orden);

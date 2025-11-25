@@ -196,6 +196,11 @@
       </div>
       <div class="panel-body panel-body-contrast">
               <div class="row">
+
+                @if($rutasuspencion != '')
+                  <div><b style="color: #4285f4;">LA SUSPENSION DE 4TA CATEGORIA SE CARGARA DESPUES DE GUARDAR</b></div><br>
+                @endif
+                
                 @foreach($tarchivos as $index => $item) 
 
 
@@ -309,7 +314,7 @@
   </div>
 
 
-
+              <input type="hidden" name="rutasuspencion" id='rutasuspencion' value = '{{$rutasuspencion}}'>
 
 </div>
 

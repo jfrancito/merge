@@ -442,7 +442,7 @@ class GestionLiquidacionGastosController extends Controller
                     ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
                     ->where('dni', $dni)
                     ->first();
-                if (count($trabajador) > 0) {
+                if (count($trabajadorespla) > 0) {
                     $centro_id = $trabajadorespla->centro_osiris_id;
                 }
 
@@ -3390,17 +3390,13 @@ class GestionLiquidacionGastosController extends Controller
 
                 $tipopago_id = $request['tipopago_id'];
                 $entidadbanco_id = $request['entidadbanco_id'];
+                $banco_e_id = $request['banco_e_id'];
+
                 $cb_id = $request['cb_id'];
 
                 $tipopago = CMPCategoria::where('COD_CATEGORIA', '=', $tipopago_id)->first();
-                $entidadbanco = CMPCategoria::where('COD_CATEGORIA', '=', $entidadbanco_id)->first();
+                $entidadbanco = CMPCategoria::where('COD_CATEGORIA', '=', $banco_e_id)->first();
                 $cb = CMPCategoria::where('COD_CATEGORIA', '=', $cb_id)->first();
-
-
-                $cuentas = DB::table('TES.CUENTA_BANCARIA')
-                    ->where('COD_EMPR_TITULAR', $liquidaciongastos->COD_EMPRESA_TRABAJADOR)
-                    ->where('TXT_NRO_CUENTA_BANCARIA', $cb_id)
-                    ->first(); // Para obtener una colección
 
 
                 $entidadbancaria_id = '';
@@ -3412,16 +3408,12 @@ class GestionLiquidacionGastosController extends Controller
                 $cuentanro = '';
                 $cuentanrocci = '';
 
-                if (count($cuentas) > 0) {
+                if ($tipopago_id == 'MPC0000000000002') {
 
                     $entidadbancaria_id = $entidadbanco->COD_CATEGORIA;
                     $entidadbancaria_txt = $entidadbanco->NOM_CATEGORIA;
+                    $cuentanro = $request['numero_cuenta'];
 
-                    $tipocuenta_id = $cuentas->TXT_TIPO_REFERENCIA;
-                    $tipocuenta_txt = $cuentas->TXT_REFERENCIA;
-
-                    $cuentanro = $cuentas->TXT_NRO_CUENTA_BANCARIA;
-                    $cuentanrocci = $cuentas->TXT_NRO_CCI;
                 }
 
 
@@ -4614,6 +4606,7 @@ class GestionLiquidacionGastosController extends Controller
     {
 
         $iddocumento = $this->funciones->decodificarmaestrapre($iddocumento, 'LIQG');
+
         View::share('titulo', 'Agregar Detalle Liquidacion de Gastos');
         $liquidaciongastos = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->first();
         $tdetliquidaciongastos = LqgDetLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', 1)->get();
@@ -4622,6 +4615,10 @@ class GestionLiquidacionGastosController extends Controller
         if ($liquidaciongastos->COD_ESTADO != 'ETM0000000000001' && $liquidaciongastos->IND_OBSERVACION == 0) {
             return Redirect::to('gestion-de-liquidacion-gastos/' . $idopcion)->with('errorbd', 'Ya no puede extornar esta LIQUIDACION DE GASTOS');
         }
+
+
+
+
         $liquidaciongastos->ACTIVO = 0;
         $liquidaciongastos->save();
 
@@ -4965,6 +4962,25 @@ class GestionLiquidacionGastosController extends Controller
         $arraybancos = DB::table('CMP.CATEGORIA')->where('TXT_GRUPO', '=', 'BANCOS_MERGE')->where('COD_ESTADO', '=', '1')->pluck('NOM_CATEGORIA', 'COD_CATEGORIA')->toArray();
         $combobancos = array('' => "Seleccione Entidad Bancaria") + $arraybancos;
 
+        $numero_cuenta ="";
+        $banco_nombre ="";
+        $banco_e_id ="";
+
+        $cod_empr               =   Session::get('empresas')->COD_EMPR;
+        $values                 =   [$dni,$cod_empr];
+        $datoscuentasueldo      =   DB::select('exec ListaTrabajadorCuentaSueldo ?,?',$values);
+        $txt_categoria_banco    =   '';
+        $numero_cuenta          =   '';
+        $txt_categoria_banco    =   $datoscuentasueldo[0]->entidad ?? null;
+        $numero_cuenta          =   $datoscuentasueldo[0]->numcuenta ?? null;
+        $banco                  =   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO', 'BANCOS_MERGE')->where('TXT_REFERENCIA', $txt_categoria_banco)->first();
+        if(count($banco)>0){
+            $banco_nombre =$banco->NOM_CATEGORIA;
+            $banco_e_id =$banco->COD_CATEGORIA;
+        }
+
+
+
         if ($tipopago_id == 'MPC0000000000002') {
 
             $cuentas = DB::table('TES.CUENTA_BANCARIA')
@@ -4973,6 +4989,7 @@ class GestionLiquidacionGastosController extends Controller
                 ->first();
 
             $combocb = array('' => "Seleccione Cuenta Bancaria", $cuentas->TXT_NRO_CUENTA_BANCARIA => $cuentas->TXT_REFERENCIA . ' - ' . $cuentas->TXT_NRO_CUENTA_BANCARIA);
+
         } else {
             $combocb = array('' => "Seleccione Cuenta Bancaria");
         }
@@ -4980,6 +4997,7 @@ class GestionLiquidacionGastosController extends Controller
         if($liquidaciongastos->ARENDIR != 'REEMBOLSO'){
             $tipopago_id = 'MPC0000000000001';
         }
+
 
 
         //dd($combo_costo);
@@ -4996,7 +5014,10 @@ class GestionLiquidacionGastosController extends Controller
                 'fechasarendir' => $fechasarendir,
                 'primerafechaar' => $primerafechaar,
                 'ultimafecha' => $ultimafecha,
+                'banco_nombre' => $banco_nombre,
+                'banco_e_id' => $banco_e_id,
 
+                'numero_cuenta' => $numero_cuenta,
                 'combobancos' => $combobancos,
                 'cuenta_id' => $cuenta_id,
                 'combocb' => $combocb,
@@ -5163,7 +5184,7 @@ class GestionLiquidacionGastosController extends Controller
                     $centrocosto = DB::table('CON.CENTRO_COSTO')
                         ->where('COD_ESTADO', 1)
                         ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
-                        ->where('COD_CENTRO_COSTO', '=', $terceros->COD_AREA)
+                        ->where('TXT_NOMBRE', '=', $area_planilla)
                         ->where('IND_MOVIMIENTO', 1)->first();
                 }else{
                     $area_planilla = $trabajadorespla->cadarea;
@@ -5290,14 +5311,14 @@ class GestionLiquidacionGastosController extends Controller
                             ->where('USER_ID', Session::get('usuario')->id)
                             ->where('ACTIVO', 1)
                             ->first();
-         
+
             if (count($terceros) > 0) {
                 $area_planilla = $terceros->TXT_AREA;
 
                 $centrocosto = DB::table('CON.CENTRO_COSTO')
                     ->where('COD_ESTADO', 1)
                     ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
-                    ->where('COD_CENTRO_COSTO', '=', $terceros->COD_AREA)
+                    ->where('TXT_NOMBRE', '=', $area_planilla)
                     ->where('IND_MOVIMIENTO', 1)->first();
 
             }else{
@@ -5367,6 +5388,8 @@ class GestionLiquidacionGastosController extends Controller
                 $combo_arendir = array('' => "SELECCIONE SI TIENE A RENDIR", 'NO' => "NO");
             }
             $combo_arendir = array('' => "SELECCIONE UN A RENDIR", 'VALE' => "VALE A RENDIR", 'REEMBOLSO' => "REEMBOLSO", 'IMPULSO' => "MOVILIDAD IMPULSO");
+            $combo_arendir = array('' => "SELECCIONE UN A RENDIR", 'VALE' => "VALE A RENDIR", 'REEMBOLSO' => "REEMBOLSO");
+
             //$combo_arendir       =   array('' => "SELECCIONE SI TIENE A RENDIR",'NO' => "NO");
             $arendir_id = "";
             $centro = ALMCentro::where('COD_CENTRO', '=', $centro_id)->first();
@@ -5517,9 +5540,9 @@ class GestionLiquidacionGastosController extends Controller
 
         $empresa   =   DB::table('STD.EMPRESA ')
                         ->where('NRO_DOCUMENTO', $ruc)
+                        ->where('COD_ESTADO', 1)
                         ->first();
         //DD($empresa->COD_EMPR);
-
 
         $combo_cuenta = $this->lg_combo_cuenta_lg_nuevo('Seleccione una Cuenta', '', '', $centro_id, $empresa->COD_EMPR);
 

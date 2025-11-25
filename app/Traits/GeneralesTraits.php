@@ -398,7 +398,7 @@ trait GeneralesTraits
                     ->where('VR.COD_USUARIO_CREA_AUD',Session::get('usuario')->id)
                     ->where('DOC.CAN_SALDO', '>', 0)
                     ->where('COD_MONEDA',$moneda_sel_c_id)
-                    ->whereNotIn('ID', $liquidaciones)
+                    //->whereNotIn('ID', $liquidaciones)
                     ->where('DOC.COD_CATEGORIA_TIPO_DOC', 'TDO0000000000072')
                     ->select(
                         'VR.ID',
