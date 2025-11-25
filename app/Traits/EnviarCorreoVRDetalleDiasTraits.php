@@ -20,14 +20,9 @@ trait EnviarCorreoVRDetalleDiasTraits
 {
     public function enviarCorreoValeRendirDetalleDias($valerendir_id)
     {
-        try {
-
-
-            \Log::error("ingreso al envio ");
-            \Log::info("Celda stop");
+         try {
 
             $VALE_RENDIR = WEBValeRendir::where("ID", '=', $valerendir_id)->first();
-            // Detalles
             $detalles = WEBValeRendirDetalle::where("ID", $valerendir_id)->get();
 
 
@@ -57,11 +52,22 @@ trait EnviarCorreoVRDetalleDiasTraits
             ->whereIn('tra.codempresa', ['PRMAECEN000000000003', 'PRMAECEN000000000004'])
             ->value('tra.emailcorp');
 
-            $emailTrabajadorAprueba = DB::table('WEB.VALE_RENDIR as vr')
+            /*$emailTrabajadorAprueba = DB::table('WEB.VALE_RENDIR as vr')
             ->join('WEB.ListaplatrabajadoresGenereal as tra', 'tra.COD_TRAB', '=', 'vr.USUARIO_APRUEBA')
             ->where('vr.ID', $valerendir_id)
             ->whereIn('tra.codempresa', ['PRMAECEN000000000003', 'PRMAECEN000000000004'])
+            ->value('tra.emailcorp');*/
+
+            $emailTrabajadorAprueba = DB::table('WEB.VALE_RENDIR as vr')
+            ->join('users as u', 'u.id', '=', 'vr.COD_USUARIO_MODIF_AUD')
+            ->join('WEB.ListaplatrabajadoresGenereal as tra', 'tra.COD_TRAB', '=', 'u.usuarioosiris_id')
+            ->where('vr.ID', $valerendir_id)
+            ->whereIn('tra.codempresa', [
+                'PRMAECEN000000000003',
+                'PRMAECEN000000000004'
+            ])
             ->value('tra.emailcorp');
+
 
             $nombreAprobador = DB::table('WEB.VALE_RENDIR as vr')
             ->join('WEB.ListaplatrabajadoresGenereal as tra', 'tra.COD_TRAB', '=', 'vr.USUARIO_APRUEBA')
@@ -221,10 +227,10 @@ trait EnviarCorreoVRDetalleDiasTraits
                     ];
             }
 
-            Mail::send('emails.emailvalerendiraprueba',
+
+            Mail::send('emails.emailvalerendirdetalledias',
             [
                 'vale' => $VALE_RENDIR,
-                'detalles' => $detalles,
             ],
             function ($message) use ($emailfrom, $nombreFrom,  $destinatarios, $copias,  $emailfromcentro) {
                 $message->from($emailfrom, $nombreFrom)

@@ -52,11 +52,22 @@ trait EnviarCorreoVRDetalleImporteTraits
             ->whereIn('tra.codempresa', ['PRMAECEN000000000003', 'PRMAECEN000000000004'])
             ->value('tra.emailcorp');
 
-            $emailTrabajadorAprueba = DB::table('WEB.VALE_RENDIR as vr')
+            /*$emailTrabajadorAprueba = DB::table('WEB.VALE_RENDIR as vr')
             ->join('WEB.ListaplatrabajadoresGenereal as tra', 'tra.COD_TRAB', '=', 'vr.USUARIO_APRUEBA')
             ->where('vr.ID', $valerendir_id)
             ->whereIn('tra.codempresa', ['PRMAECEN000000000003', 'PRMAECEN000000000004'])
+            ->value('tra.emailcorp');*/
+
+            $emailTrabajadorAprueba = DB::table('WEB.VALE_RENDIR as vr')
+            ->join('users as u', 'u.id', '=', 'vr.COD_USUARIO_MODIF_AUD')
+            ->join('WEB.ListaplatrabajadoresGenereal as tra', 'tra.COD_TRAB', '=', 'u.usuarioosiris_id')
+            ->where('vr.ID', $valerendir_id)
+            ->whereIn('tra.codempresa', [
+                'PRMAECEN000000000003',
+                'PRMAECEN000000000004'
+            ])
             ->value('tra.emailcorp');
+
 
             $nombreAprobador = DB::table('WEB.VALE_RENDIR as vr')
             ->join('WEB.ListaplatrabajadoresGenereal as tra', 'tra.COD_TRAB', '=', 'vr.USUARIO_APRUEBA')
@@ -210,13 +221,11 @@ trait EnviarCorreoVRDetalleImporteTraits
 
                     $copias = [
                         $emailTrabajadorAutoriza,
-                        
+                        'marley.sucse@induamerica.com.pe',
+                        'diana.malca@induamerica.com.pe',
                         'franklin.llontop@induamerica.com.pe'
                     ];
             }
-
-            \Log::info("Enviando correo para vale: " . $valerendir_id);
-            \Log::info("EmailFrom: $emailfrom, NombreFrom: $nombreFrom, EmailTo: $emailTo");
 
 
             Mail::send('emails.emailvalerendirdetalleimporte',
