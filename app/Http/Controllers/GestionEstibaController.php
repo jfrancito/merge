@@ -1127,6 +1127,9 @@ class GestionEstibaController extends Controller
 
                         }elseif($documento_id=='DCC0000000000043'){
                             //LIQUIDACION COMPRA
+
+
+
                             $parser             =   new LiquiParser();
                             $xml                =   file_get_contents($path);
                             $factura            =   $parser->parse($xml);
@@ -1135,6 +1138,19 @@ class GestionEstibaController extends Controller
                             $archivosdelfe      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                                     ->whereIn('COD_CATEGORIA', ['DCC0000000000043','DCC0000000000045','DCC0000000000003','DCC0000000000001','DCC0000000000042'])
                                                     ->get();
+
+
+                            //GUARDAR EL XML
+                            $empresa_liqui        =     STDEmpresa::where('NRO_DOCUMENTO','=',$factura->getcompany()->getruc())->where('COD_ESTADO','=','1')->first();
+                            $correlativo_completo =     str_pad($factura->getcorrelativo(), 10, '0', STR_PAD_LEFT); 
+                            $nombre_xml_liqui     =     $factura->getcompany()->getruc().'-04-'.$factura->getserie().'-'.$correlativo_completo.'.xml';
+                            $destino              =     '\\\\10.1.0.201\\cpe\\Liquidacion\\'.$nombre_xml_liqui;
+                            $archivo              =     $file->getRealPath();
+                            copy($archivo,$destino);
+
+                            //dd("hola");
+
+
                         }else{
 
                             //RECIBO POR HONORARIO
