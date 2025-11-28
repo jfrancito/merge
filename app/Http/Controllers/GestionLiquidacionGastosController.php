@@ -3364,6 +3364,64 @@ class GestionLiquidacionGastosController extends Controller
                                         ->first();
 
 
+                //VALIDAR QUE LOS DOCUMENTOS QUE ESTAN ASOCIANDO NO SE REPITAN ENTRE SI EN LA MISMA LIQUIDACION
+
+                $mismaliquidacion =     DB::table('LQG_DETLIQUIDACIONGASTO')
+                                        ->select('COD_EMPRESA_PROVEEDOR', 'TXT_EMPRESA_PROVEEDOR', 'SERIE', 'NUMERO', 'COD_TIPODOCUMENTO')
+                                        ->selectRaw('COUNT(COD_EMPRESA_PROVEEDOR) AS REPETIDO')
+                                        ->where('ID_DOCUMENTO', $iddocumento)
+                                        ->where('ACTIVO', 1)
+                                        ->groupBy('COD_EMPRESA_PROVEEDOR', 'TXT_EMPRESA_PROVEEDOR', 'SERIE', 'NUMERO', 'COD_TIPODOCUMENTO')
+                                        ->havingRaw('COUNT(COD_EMPRESA_PROVEEDOR) > 1')
+                                        ->get();
+
+               if (count($mismaliquidacion) > 0) {
+                    return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/0')
+                    ->with('errorbd', 'HAY DOCUMENTOS QUE ESTAN DUPLICADOS EN TU LIQUIDACION');
+                }
+
+                //VALIDAR QUE LOS DOCUMENTOS NO SE REPITAN CON OTROS INGRESADOS
+
+                $existenDuplicados = DB::table('LQG_DETLIQUIDACIONGASTO AS nuevo')
+                    ->where('nuevo.ID_DOCUMENTO', $iddocumento)
+                    ->where('nuevo.ACTIVO', 1)
+                    ->whereExists(function ($query) use ($iddocumento) {
+                        $query->select(DB::raw(1))
+                              ->from('LQG_DETLIQUIDACIONGASTO AS existente')
+                              ->join('LQG_LIQUIDACION_GASTO', 'existente.ID_DOCUMENTO', '=', 'LQG_LIQUIDACION_GASTO.ID_DOCUMENTO')
+                              ->whereRaw('existente.COD_EMPRESA_PROVEEDOR = nuevo.COD_EMPRESA_PROVEEDOR')
+                              ->whereRaw('existente.SERIE = nuevo.SERIE')
+                              ->whereRaw('existente.NUMERO = nuevo.NUMERO')
+                              ->whereRaw('existente.COD_TIPODOCUMENTO = nuevo.COD_TIPODOCUMENTO')
+                              ->where('LQG_LIQUIDACION_GASTO.ACTIVO', 1)
+                              ->where('existente.ACTIVO', 1)
+                              ->where('LQG_LIQUIDACION_GASTO.COD_ESTADO', '!=', 'ETM0000000000006')
+                              ->where('existente.ID_DOCUMENTO', '<>', $iddocumento);
+                    })
+                    ->exists(); // Esto devuelve true si existe al menos uno
+
+                if ($existenDuplicados) {
+                    return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/0')
+                    ->with('errorbd', 'No se puede registrar el documento. Existen documentos duplicados en la base de datos.');
+                }
+
+
+                //VALIDAR QUE LOS VALES NO SE REPITAN ENTRE SI 
+
+
+                $arendir    = DB::table('LQG_LIQUIDACION_GASTO')
+                                ->where('ACTIVO', 1)
+                                ->where('COD_ESTADO', '!=', 'ETM0000000000006')
+                                ->where('ARENDIR_ID', $liquidaciongastos->ARENDIR_ID)
+                                ->where('ID_DOCUMENTO', '<>', $iddocumento)
+                                ->get();
+
+                if ($arendir) {
+                    return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/0')
+                    ->with('errorbd', 'YA EXISTE ESTE CODIGO DE ARENDIR EN OTRA LIQUIDACION');
+                }
+
+
                 //VALIDAR QUE TODOS LOS DETALLES TENGAN VALOR MAYOR A CERO
 
                 $detallescero           =   DB::table('LQG_DETLIQUIDACIONGASTO')
