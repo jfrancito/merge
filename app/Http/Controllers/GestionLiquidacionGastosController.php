@@ -3416,7 +3416,7 @@ class GestionLiquidacionGastosController extends Controller
                                 ->where('ID_DOCUMENTO', '<>', $iddocumento)
                                 ->get();
 
-                if ($arendir) {
+                if (count($arendir)>0) {
                     return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/0')
                     ->with('errorbd', 'YA EXISTE ESTE CODIGO DE ARENDIR EN OTRA LIQUIDACION');
                 }
