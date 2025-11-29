@@ -1488,11 +1488,13 @@ trait GeneralesTraits
     ) {
         $pdo = DB::connection()->getPdo();
 
+        $PREFIJO = 'AS' . substr($COD_EMPR, 0, 2) . substr($TXT_CATEGORIA_TIPO_ASIENTO, 0, 2);
+
         // OJO: ejecutamos el proc y capturamos la salida
         $sql = "
         DECLARE @COD_ASIENTO_OUT CHAR(16);
 
-        EXEC [WEB].[ASIENTOS_IUD]
+        EXEC [WEB].[ASIENTOS_IUD_PREFIJO]
             @IND_TIPO_OPERACION = :IND_TIPO_OPERACION,
             @COD_ASIENTO = @COD_ASIENTO_OUT OUTPUT,
             @COD_EMPR = :COD_EMPR,
@@ -1537,8 +1539,8 @@ trait GeneralesTraits
             @FEC_VENCIMIENTO = :FEC_VENCIMIENTO,
             @IND_AFECTO = :IND_AFECTO,
             @COD_CATEGORIA_MONEDA_CONVERSION = :COD_CATEGORIA_MONEDA_CONVERSION,
-            @TXT_CATEGORIA_MONEDA_CONVERSION = :TXT_CATEGORIA_MONEDA_CONVERSION;
-
+            @TXT_CATEGORIA_MONEDA_CONVERSION = :TXT_CATEGORIA_MONEDA_CONVERSION,
+            @PREFIJO = :PREFIJO;
         SELECT @COD_ASIENTO_OUT AS COD_ASIENTO;
     ";
 
@@ -1589,7 +1591,7 @@ trait GeneralesTraits
         $stmt->bindValue(':IND_AFECTO', $IND_AFECTO);
         $stmt->bindValue(':COD_CATEGORIA_MONEDA_CONVERSION', $COD_CATEGORIA_MONEDA_CONVERSION);
         $stmt->bindValue(':TXT_CATEGORIA_MONEDA_CONVERSION', $TXT_CATEGORIA_MONEDA_CONVERSION);
-
+        $stmt->bindValue(':PREFIJO', $PREFIJO);
         // Ejecutamos
         $stmt->execute();
 
@@ -1605,10 +1607,12 @@ trait GeneralesTraits
     {
         $pdo = DB::connection()->getPdo();
 
+        $PREFIJO = 'ASMO' . substr($params["empresa"], 0, 2) ;
+
         $sql = "
     DECLARE @COD_ASIENTO_MOVIMIENTO_OUT CHAR(16);
 
-    EXEC [WEB].[ASIENTO_MOVIMIENTOS_IUD]
+    EXEC [WEB].[ASIENTO_MOVIMIENTOS_IUD_PREFIJO]
         @IND_TIPO_OPERACION       = :op,
         @COD_ASIENTO_MOVIMIENTO   = @COD_ASIENTO_MOVIMIENTO_OUT OUTPUT,
         @COD_EMPR                 = :empresa,
@@ -1634,8 +1638,8 @@ trait GeneralesTraits
         @COD_PRODUCTO             = :codProducto,
         @TXT_NOMBRE_PRODUCTO      = :txtNombreProducto,
         @COD_LOTE                 = :codLote,
-        @NRO_LINEA_PRODUCTO       = :nroLineaProducto;
-
+        @NRO_LINEA_PRODUCTO       = :nroLineaProducto,
+        @PREFIJO                  = :prefijo;
     SELECT @COD_ASIENTO_MOVIMIENTO_OUT AS COD_ASIENTO_MOVIMIENTO;
     ";
 
@@ -1645,6 +1649,8 @@ trait GeneralesTraits
         foreach ($params as $key => $value) {
             $stmt->bindValue(":$key", $value);
         }
+
+        $stmt->bindValue(':prefijo', $PREFIJO);
 
         $stmt->execute();
 
