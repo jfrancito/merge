@@ -5075,6 +5075,62 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
+    private function con_lista_cabecera_comprobante_total_gestion_reparable_admin($cliente_id,$tipoarchivo_id,$estado_id) {
+
+           
+        $listadatos     =   FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+                            ->whereNotIn('FE_DOCUMENTO.COD_ESTADO',['','ETM0000000000006'])
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                            ->where('OPERACION','=','ORDEN_COMPRA')
+                            ->whereRaw("isnull(MODO_REPARABLE,'') = 'ARCHIVO_VIRTUAL'")
+                            ->where('IND_REPARABLE', 0)
+                            ->whereRaw("isnull(IND_REPARABLE_ADMIN,-1) <> 0")
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                            ->orderBy('IND_OBSERVACION_REPARABLE','asc')
+                            ->get();
+
+
+        return  $listadatos;
+    }
+    private function con_lista_cabecera_comprobante_total_gestion_reparable_estiba_admin($cliente_id,$tipoarchivo_id,$estado_id,$operacion_id) {
+
+
+
+        $listadatos          =      FeDocumento::where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                    ->where('OPERACION','=',$operacion_id)
+                                    ->whereRaw("isnull(MODO_REPARABLE,'') = 'ARCHIVO_VIRTUAL'")
+                                    ->where('IND_REPARABLE', 0)
+                                    ->whereRaw("isnull(IND_REPARABLE_ADMIN,-1) <> 0")
+                                    ->whereNotIn('FE_DOCUMENTO.COD_ESTADO',['','ETM0000000000006'])
+                                    ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                    ->orderBy('IND_OBSERVACION_REPARABLE','asc')
+                                    ->get();
+
+
+        return  $listadatos;
+    }
+
+
+
+
+    private function con_lista_cabecera_comprobante_total_gestion_reparable_contrato_admin($cliente_id,$tipoarchivo_id,$estado_id) {
+
+
+        $listadatos          =      FeDocumento::Join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                                    ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                    ->where('OPERACION','=','CONTRATO')
+                                    ->whereRaw("isnull(MODO_REPARABLE,'') = 'ARCHIVO_VIRTUAL'")
+                                    ->where('IND_REPARABLE', 0)
+                                    ->whereRaw("isnull(IND_REPARABLE_ADMIN,-1) <> 0")
+                                    ->whereNotIn('FE_DOCUMENTO.COD_ESTADO',['','ETM0000000000006'])
+                                    ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                    ->orderBy('IND_OBSERVACION_REPARABLE','asc')
+                                    ->get();
+
+
+        return  $listadatos;
+    }
 
     private function con_lista_cabecera_comprobante_total_gestion_reparable($cliente_id,$tipoarchivo_id,$estado_id) {
 
