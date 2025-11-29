@@ -553,6 +553,15 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/gestion-de-comprobantes-observados/{idopcion}', 'GestionUsuarioContactoController@actionListarComprobantesObservados');
 	Route::any('/gestion-de-comprobantes-reparable/{idopcion}', 'GestionUsuarioContactoController@actionListarComprobantesReparable');
 
+
+
+	Route::any('/gestion-de-reparable-admin/{idopcion}', 'GestionUsuarioContactoController@actionListarComprobantesReparableAdmin');
+	Route::any('/reparable-comprobante-uc-admin/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionUsuarioContactoController@actionReparableUCAdmin');
+	Route::any('/ajax-buscar-documento-gestion-reparable-admin', 'GestionUsuarioContactoController@actionListarAjaxBuscarDocumentoReparableAdmin');
+	Route::any('/reparable-comprobante-uc-contrato-admin/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionUsuarioContactoController@actionReparableUCContratoAdmin');
+	Route::any('/reparable-comprobante-uc-estiba-admin/{idopcion}/{lote}', 'GestionUsuarioContactoController@actionReparableUCEstibaAdmin');
+
+
 	Route::any('/ajax-modal-reparable-masivo', 'GestionUsuarioContactoController@actionListarAjaxModalReparableMasivo');
 
 
