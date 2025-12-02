@@ -5082,12 +5082,13 @@ trait ComprobanteTraits
                             ->whereNotIn('FE_DOCUMENTO.COD_ESTADO',['','ETM0000000000006'])
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                            ->where('FEC_ORDEN','>','2025-11-01')
                             ->where('OPERACION','=','ORDEN_COMPRA')
                             ->whereRaw("isnull(MODO_REPARABLE,'') = 'ARCHIVO_VIRTUAL'")
                             ->where('IND_REPARABLE', 0)
                             ->whereRaw("isnull(IND_REPARABLE_ADMIN,-1) <> 0")
                             ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
-                            ->orderBy('IND_OBSERVACION_REPARABLE','asc')
+                            ->orderBy('FEC_ORDEN','desc')
                             ->get();
 
 
