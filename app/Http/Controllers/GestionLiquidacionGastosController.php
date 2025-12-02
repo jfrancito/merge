@@ -3385,6 +3385,7 @@ class GestionLiquidacionGastosController extends Controller
                 $existenDuplicados = DB::table('LQG_DETLIQUIDACIONGASTO AS nuevo')
                     ->where('nuevo.ID_DOCUMENTO', $iddocumento)
                     ->where('nuevo.ACTIVO', 1)
+                    ->where('nuevo.COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
                     ->whereExists(function ($query) use ($iddocumento) {
                         $query->select(DB::raw(1))
                               ->from('LQG_DETLIQUIDACIONGASTO AS existente')
