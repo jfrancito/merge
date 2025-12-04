@@ -372,20 +372,16 @@
                     <div class="panel-body panel-body-contrast">
 
                             <div class="row">
-                                  @if($rutaorden != '')
-                                    <div><b>LOS ARCHIVOS DE CONTRATOS Y GUIAS RELACIONADAS SE CARGARAN DESPUES DE GUARDAR</b></div><br>
-                                  @endif
+
                                   @foreach($tarchivos as $index => $item) 
-                                    @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000026')
+                                    @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000001')
                                       @if($rutaorden != '')
-                                        
+                                        <div><b>LA ORDEN DE COMPRA SE CARGARA DESPUES DE GUARDAR</b></div><br>
                                       @else
-                                        <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3" style="margin-top:15px;">
-                                            <label class="col-sm-12 control-label" style="text-align: left; height: 50px;"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}} ({{$item->TXT_FORMATO}})</b> 
-                                              @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000005') <b>(Descargue el pdf de este enlace <a href="https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaWeb.jsp" target="_blank">Sunat</a> y subalo para que pueda aprobar</b>)@endif </label>
+                                        <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
                                           <div class="form-group sectioncargarimagen">
-
-
+                                            <label class="col-sm-12 control-label" style="text-align: left;"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}} (@if($item->TXT_FORMATO == 'ZIP') XML @else {{$item->TXT_FORMATO}} @endif)</b> 
+                                              @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000005') <b>(Descargue el pdf de este enlace <a href="https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaWeb.jsp" target="_blank">Sunat</a> y subalo para que pueda aprobar</b>) @else <br><br> @endif
                                               <div class="col-sm-12">
                                                   <div class="file-loading">
                                                       <input 

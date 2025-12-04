@@ -212,24 +212,21 @@ class GestionEstibaController extends Controller
                 $rutaorden       =   $request['rutaorden'];
                 if($rutaorden!=''){
 
-                    $aoc                            =       CMPDocAsociarCompra::where('COD_ORDEN','=',$idoc)->where('COD_ESTADO','=',1)
-                                                            ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000026'])//cambiar
+                    $aoc                            =       CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+                                                            ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000001'])
                                                             ->first();
-
-                    //$contadorArchivos = Archivo::count();
-                    $contadorArchivos               =       Archivo::count();
-
-                    $nombrefilecdr                  =       $contadorArchivos.'-'.$idoc.'.pdf';//cambiar
-                    $prefijocarperta                =       $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
-                    $rutafile                       =       $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$lote;//cambiar
+                    $contadorArchivos = Archivo::count();
+                    $nombrefilecdr                  =       $contadorArchivos.'-'.$ordencompra->COD_ORDEN.'.pdf';
+                    $prefijocarperta                =       $this->prefijo_empresa($ordencompra->COD_EMPR);
+                    $rutafile                       =       $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
                     $rutacompleta                   =       $rutafile.'\\'.$nombrefilecdr;
                     $valor                          =       $this->versicarpetanoexiste($rutafile);
                     $path                           =       $rutacompleta;
-
-
+                    //$directorio                     =       '\\\\10.1.0.201\cpe\Orden_Compra';
+                    //$rutafila                       =       $directorio.'\\'.$nombreArchivoBuscado;
                     copy($rutaorden,$rutacompleta);
                     $dcontrol                       =       new Archivo;
-                    $dcontrol->ID_DOCUMENTO         =       $idoc;
+                    $dcontrol->ID_DOCUMENTO         =       $ordencompra->COD_ORDEN;
                     $dcontrol->DOCUMENTO_ITEM       =       $fedocumento->DOCUMENTO_ITEM;
                     $dcontrol->TIPO_ARCHIVO         =       $aoc->COD_CATEGORIA_DOCUMENTO;
                     $dcontrol->NOMBRE_ARCHIVO       =       $nombrefilecdr;
@@ -241,6 +238,7 @@ class GestionEstibaController extends Controller
                     $dcontrol->FECHA_CREA           =       $this->fechaactual;
                     $dcontrol->USUARIO_CREA         =       Session::get('usuario')->id;
                     $dcontrol->save();
+                    
                 }
 
                 //guardar orden de compra precargada
@@ -1041,6 +1039,63 @@ class GestionEstibaController extends Controller
 
         }
 
+        $orde_cascara = DB::table('CMP.REFERENCIA_ASOC')
+            ->join('CMP.ORDEN', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC', '=', 'CMP.ORDEN.COD_ORDEN')
+            ->select('CMP.REFERENCIA_ASOC.*', 'CMP.ORDEN.*')
+            ->where('CMP.REFERENCIA_ASOC.COD_TABLA', $documento_top->COD_DOCUMENTO_CTBLE)
+            ->where('CMP.ORDEN.COD_CATEGORIA_TIPO_ORDEN', 'TOR0000000000016')
+            ->first();
+        $sourceFile = '\\\\10.1.0.201\cpe\Orden_Cascara';
+        if($documento_top->COD_CENTRO == 'CEN0000000000004' or $documento_top->COD_CENTRO == 'CEN0000000000006'){
+            if($documento_top->COD_CENTRO == 'CEN0000000000004'){
+                $sourceFile = '\\\\10.1.7.200\\cpe\\Orden_Cascara\\'.$orde_cascara->COD_ORDEN.'.pdf';
+            }
+            if($documento_top->COD_CENTRO == 'CEN0000000000006'){
+                $sourceFile = '\\\\10.1.9.43\\cpe\\Orden_Cascara\\'.$orde_cascara->COD_ORDEN.'.pdf';
+            }
+            $destinationFile = '\\\\10.1.0.201\\cpe\\Orden_Cascara\\'.$orde_cascara->COD_ORDEN.'.pdf';
+            // Intenta copiar el archivo
+            if (file_exists($sourceFile)){
+                copy($sourceFile, $destinationFile);
+            }
+        }
+
+
+        $fileordencompra            =   CMPDocAsociarCompra::where('COD_ORDEN','=',$idoc)
+                                        ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000001')
+                                        ->where('COD_ESTADO','=','1')
+                                        ->first();
+
+        $rutafila                   =   "";
+        $rutaorden                  =   "";
+        //dd($fileordencompra);
+        if(count($fileordencompra)>0){
+            $directorio = '\\\\10.1.0.201\cpe\Orden_Cascara';
+            // Nombre del archivo que estás buscando
+            $nombreArchivoBuscado = $orde_cascara->COD_ORDEN.'.pdf';
+            // Escanea el directorio
+            $archivos = scandir($directorio);
+            // Inicializa una variable para almacenar el resultado
+            $archivoEncontrado = false;
+            // Recorre la lista de archivos
+            foreach ($archivos as $archivo) {
+                // Omite los elementos '.' y '..'
+                if ($archivo != '.' && $archivo != '..') {
+                    // Verifica si el nombre del archivo coincide con el archivo buscado
+                    if ($archivo == $nombreArchivoBuscado) {
+                        $archivoEncontrado = true;
+                        break;
+                    }
+                }
+            }
+            // Muestra el resultado
+            if ($archivoEncontrado) {
+                $rutafila         =   $directorio.'\\'.$nombreArchivoBuscado;
+                $rutaorden           =  $rutafila;
+            } 
+        }
+
+
 
         
         return View::make('comprobante/registrocomprobanteestibaadministrator',
@@ -1051,7 +1106,7 @@ class GestionEstibaController extends Controller
                             'combopagodetraccion'   =>  $combopagodetraccion,
                             'fedocumento_x'         =>  $fedocumento_x,
                             'rutasuspencion'        =>  $rutasuspencion,
-
+                            'rutaorden'             =>  $rutaorden,
                             'empresa'               =>  $empresa,
                             'combobancos'           =>  $combobancos,
                             'documento_asociados'   =>  $documento_asociados,
