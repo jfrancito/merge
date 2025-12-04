@@ -212,13 +212,13 @@ class GestionEstibaController extends Controller
                 $rutaorden       =   $request['rutaorden'];
                 if($rutaorden!=''){
 
-                    $aoc                            =       CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+                    $aoc                            =       CMPDocAsociarCompra::where('COD_ORDEN','=',$idoc)->where('COD_ESTADO','=',1)
                                                             ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000001'])
                                                             ->first();
                     $contadorArchivos = Archivo::count();
-                    $nombrefilecdr                  =       $contadorArchivos.'-'.$ordencompra->COD_ORDEN.'.pdf';
-                    $prefijocarperta                =       $this->prefijo_empresa($ordencompra->COD_EMPR);
-                    $rutafile                       =       $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
+                    $nombrefilecdr                  =       $contadorArchivos.'-'.$idoc.'.pdf';
+                    $prefijocarperta                =       $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
+                    $rutafile                       =       $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$lote;//cambiar
                     $rutacompleta                   =       $rutafile.'\\'.$nombrefilecdr;
                     $valor                          =       $this->versicarpetanoexiste($rutafile);
                     $path                           =       $rutacompleta;
@@ -226,7 +226,7 @@ class GestionEstibaController extends Controller
                     //$rutafila                       =       $directorio.'\\'.$nombreArchivoBuscado;
                     copy($rutaorden,$rutacompleta);
                     $dcontrol                       =       new Archivo;
-                    $dcontrol->ID_DOCUMENTO         =       $ordencompra->COD_ORDEN;
+                    $dcontrol->ID_DOCUMENTO         =       $idoc;
                     $dcontrol->DOCUMENTO_ITEM       =       $fedocumento->DOCUMENTO_ITEM;
                     $dcontrol->TIPO_ARCHIVO         =       $aoc->COD_CATEGORIA_DOCUMENTO;
                     $dcontrol->NOMBRE_ARCHIVO       =       $nombrefilecdr;
@@ -238,9 +238,7 @@ class GestionEstibaController extends Controller
                     $dcontrol->FECHA_CREA           =       $this->fechaactual;
                     $dcontrol->USUARIO_CREA         =       Session::get('usuario')->id;
                     $dcontrol->save();
-                    
                 }
-
                 //guardar orden de compra precargada
                 $rutasuspencion       =   $request['rutasuspencion'];
                 if($rutasuspencion!=''){

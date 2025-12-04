@@ -6905,6 +6905,9 @@ trait ComprobanteTraits
                                                     '))
                                     ->get();
 
+        //dd($centro_id);
+
+
         }
 
 
