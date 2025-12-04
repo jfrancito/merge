@@ -2668,10 +2668,13 @@ class GestionOCController extends Controller
 
         if($_POST)
         {
+
+
+                        $procedencia            =   $request['procedencia'];
             if ($rutaorden)
             {
                 try{    
-
+                        //dd("hola");
                         DB::beginTransaction();
                         $ordenpago              =   $this->con_lista_comprobante_orden_pago_idoc($idop);
                         $documentolinea         =   $this->ge_linea_documento($ordenpago->COD_AUTORIZACION);
@@ -2682,16 +2685,16 @@ class GestionOCController extends Controller
                         $detalleordencompra     =   $this->con_lista_detalle_liquidacion_compra_comprobante_idoc($idoc);
 
                         //dd($detalleordencompra);
-                        $procedencia            =   $request['procedencia'];
-                        $ingresoliq_id          =   $request['ingresoliq_id'];                        
 
+                        $ingresoliq_id          =   $request['ingresoliq_id'];                        
+                        //dd($procedencia);
                         $empresa                =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
 
                         $moneda                 =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_MONEDA)->first();       
 
                         if($ingresoliq_id=='SI'){
                             $archivosdelfe          =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                        ->whereIn('COD_CATEGORIA', ['DCC0000000000039','DCC0000000000040','DCC0000000000041','DCC0000000000043','DCC0000000000045'])
+                                                        ->whereIn('COD_CATEGORIA', ['DCC0000000000040','DCC0000000000041','DCC0000000000043','DCC0000000000045'])
                                                         ->get();  
                         }else{                            
                             if($ordenpago->COD_CENTRO == 'CEN0000000000004' || $ordenpago->COD_CENTRO == 'CEN0000000000006'){ //rioja o bellavista
@@ -2880,6 +2883,7 @@ class GestionOCController extends Controller
                 }
                 return Redirect::to('detalle-comprobante-liquidacion-compra-anticipo-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordenpago)->with('bienhecho', 'Se valido el xml');
             }else{
+                dd("errpr");
                 return Redirect::to('detalle-comprobante-liquidacion-compra-anticipo-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordenpago)->with('errorurl', 'Archivo XML de la Orden de Pago No Encontrado ');
             }
 
