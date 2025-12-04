@@ -3397,11 +3397,12 @@ class GestionLiquidacionGastosController extends Controller
                               ->where('LQG_LIQUIDACION_GASTO.ACTIVO', 1)
                               ->where('existente.ACTIVO', 1)
                               ->where('LQG_LIQUIDACION_GASTO.COD_ESTADO', '!=', 'ETM0000000000006')
+                              ->where('existente.COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
                               ->where('existente.ID_DOCUMENTO', '<>', $iddocumento);
                     })
-                    ->exists(); // Esto devuelve true si existe al menos uno
-
-                if ($existenDuplicados) {
+                    ->get(); // Esto devuelve true si existe al menos uno
+                //dd($existenDuplicados);
+                if (count($existenDuplicados)>0) {
                     return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/0')
                     ->with('errorbd', 'No se puede registrar el documento. Existen documentos duplicados en la base de datos.');
                 }

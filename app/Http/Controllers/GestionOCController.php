@@ -3030,8 +3030,8 @@ class GestionOCController extends Controller
                     'estado'        => 'APROBADO POR USUARIO CONTACTO',
                 ],
                 function ($message) {
-                    $message->from('helpdeskisl@induamerica.com.pe', 'Vituchin')
-                            ->to('german.zamora@induamerica.com.pe')                            
+                    $message->from('jessica.sandoval@induamerica.com.pe', 'Sistemas')
+                            ->to('jorge.saldana@induamerica.com.pe')                            
                             ->subject('LIQUIDACION DE COMPRA ANTICIPO - INDUAMERICA');
                 });
 

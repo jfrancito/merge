@@ -695,8 +695,8 @@ class GestionEstibaController extends Controller
                         'estado'            => 'APROBADO POR USUARIO CONTACTO',
                     ],
                     function ($message) {
-                        $message->from('helpdeskisl@induamerica.com.pe', 'Vituchin')
-                                ->to('german.zamora@induamerica.com.pe')                            
+                        $message->from('jessica.sandoval@induamerica.com.pe', 'Sistemas')
+                                ->to('jorge.saldana@induamerica.com.pe')                            
                                 ->subject('DOCUMENTO INTERNO COMPRA - INDUAMERICA');
                     });    
                 }                
@@ -1136,7 +1136,7 @@ class GestionEstibaController extends Controller
                             $tipo_documento_le  =   $factura->gettipoDoc();
                             $moneda_le          =   $factura->gettipoMoneda();
                             $archivosdelfe      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000043','DCC0000000000045','DCC0000000000003','DCC0000000000001','DCC0000000000042'])
+                                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000043','DCC0000000000045','DCC0000000000003','DCC0000000000001'])
                                                     ->get();
 
 
