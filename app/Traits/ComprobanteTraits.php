@@ -6382,7 +6382,7 @@ trait ComprobanteTraits
         $documento              =   DB::table('CMP.DOCUMENTO_CTBLE')
                                     ->join('CMP.REFERENCIA_ASOC', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
                                     ->where('CMP.REFERENCIA_ASOC.COD_ESTADO','=','1')
-                                    ->select(DB::raw('CMP.DOCUMENTO_CTBLE.*,REFERENCIA_ASOC.COD_TABLA,REFERENCIA_ASOC.COD_TABLA_ASOC'))
+                                    ->select(DB::raw('CMP.DOCUMENTO_CTBLE.*,REFERENCIA_ASOC.COD_TABLA,REFERENCIA_ASOC.COD_TABLA_ASOC,CMP.DOCUMENTO_CTBLE.FEC_EMISION as FEC_EMISION_DOC'))
                                     ->whereIn('COD_CATEGORIA_TIPO_DOC', [
                                         'TDO0000000000001',
                                         'TDO0000000000003',
@@ -6411,15 +6411,15 @@ trait ComprobanteTraits
                                                  ->addBinding($oi->getBindings());
                                         })
 
-                                    ->whereRaw("CAST(documentos.FEC_EMISION AS DATE) >= ? and CAST(documentos.FEC_EMISION AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                    ->whereRaw("CAST(CMP.Orden.FEC_ORDEN AS DATE) >= ? and CAST(CMP.Orden.FEC_ORDEN AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                     ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                     ->where('FE_DOCUMENTO.OPERACION','=','ORDEN_COMPRA')
-                                    ->where('documentos.COD_ESTADO','=','1')
+                                    ->where('CMP.Orden.COD_ESTADO','=','1')
                                     ->where(function ($query) {
                                         $query->where('FOLIO', '=', '');
                                         $query->orWhereNull('FOLIO');
                                     })
-                                    //->where('CMP.Orden.COD_ORDEN','=','ISBECL0000001705')
+                                    ->where('CMP.Orden.COD_ORDEN','=','IIBECE0000000448')
                                     ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005'])
                                     ->where('CMP.Orden.COD_CATEGORIA_ESTADO_ORDEN','=','EOR0000000000003')
                                     ->where('CMP.Orden.COD_EMPR','=',$empresa_id)
@@ -6435,6 +6435,9 @@ trait ComprobanteTraits
                                     )
                                     ->orderBy('documentos.FEC_EMISION','asc')
                                     ->get();
+
+        //dd($listadatos);
+
         return  $listadatos;
 
     }
