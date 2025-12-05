@@ -2993,6 +2993,9 @@ trait ComprobanteTraits
                             ->Fecha('RE',$fecha_inicio,$fecha_fin)
                             ->orderBy('fecha_uc','desc')
                             ->get();
+
+
+
         return  $listadatos;
     }
 
@@ -3027,6 +3030,9 @@ trait ComprobanteTraits
                             ->ProveedorFE($proveedor_id)
                             ->orderBy('fecha_uc','desc')
                             ->get();
+
+        //dd($listadatos);
+
 
         return  $listadatos;
     }
@@ -6302,64 +6308,60 @@ trait ComprobanteTraits
 
         
 
-        //dd($documentosdetraccion);
-        foreach($documentosdetraccion as $index => $item){
+        // //dd($documentosdetraccion);
+        // foreach($documentosdetraccion as $index => $item){
 
-            $retencionigv = (float)($item->TOTAL_VENTA_ORIG-$item->MONTO_NC)*(3/100);
-            //FE_DOCUMENTO
-            FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
-                        ->update(
-                            [
-                                'MONTO_RETENCION'=>$retencionigv
-                            ]
-                        );
-            //OC
-            CMPOrden::where('COD_ORDEN','=',$item->ID_DOCUMENTO)
-                        ->update(
-                            [
-                                'CAN_RETENCION'=>$retencionigv,
-                                'CAN_NETO_PAGAR' => \DB::raw('CAN_TOTAL - ' . $retencionigv)
-                            ]
-                        );
+        //     $retencionigv = (float)($item->TOTAL_VENTA_ORIG-$item->MONTO_NC)*(3/100);
+        //     //FE_DOCUMENTO
+        //     FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
+        //                 ->update(
+        //                     [
+        //                         'MONTO_RETENCION'=>$retencionigv
+        //                     ]
+        //                 );
+        //     //OC
+        //     CMPOrden::where('COD_ORDEN','=',$item->ID_DOCUMENTO)
+        //                 ->update(
+        //                     [
+        //                         'CAN_RETENCION'=>$retencionigv,
+        //                         'CAN_NETO_PAGAR' => \DB::raw('CAN_TOTAL - ' . $retencionigv)
+        //                     ]
+        //                 );
 
 
 
-            $documento02      =     DB::table('CMP.DOCUMENTO_CTBLE')
-                                    ->join('CMP.REFERENCIA_ASOC', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
-                                    ->select(DB::raw('CMP.DOCUMENTO_CTBLE.*'))
-                                    ->where('CMP.DOCUMENTO_CTBLE.COD_ESTADO','=','1')
-                                    ->where('CMP.REFERENCIA_ASOC.COD_ESTADO','=','1')
-                                    ->where('CMP.REFERENCIA_ASOC.COD_TABLA','=',$item->ID_DOCUMENTO)
-                                    ->whereIn('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_DOC', [
-                                        'TDO0000000000001',
-                                        'TDO0000000000003',
-                                        'TDO0000000000010',
-                                        'TDO0000000000002'
-                                    ])->first();
+        //     $documento02      =     DB::table('CMP.DOCUMENTO_CTBLE')
+        //                             ->join('CMP.REFERENCIA_ASOC', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+        //                             ->select(DB::raw('CMP.DOCUMENTO_CTBLE.*'))
+        //                             ->where('CMP.DOCUMENTO_CTBLE.COD_ESTADO','=','1')
+        //                             ->where('CMP.REFERENCIA_ASOC.COD_ESTADO','=','1')
+        //                             ->where('CMP.REFERENCIA_ASOC.COD_TABLA','=',$item->ID_DOCUMENTO)
+        //                             ->whereIn('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_DOC', [
+        //                                 'TDO0000000000001',
+        //                                 'TDO0000000000003',
+        //                                 'TDO0000000000010',
+        //                                 'TDO0000000000002'
+        //                             ])->first();
 
-            if(count($documento02)>0){
-                CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$documento02->COD_DOCUMENTO_CTBLE)
-                            ->update(
-                                [
-                                    'CAN_RETENCION'=>$retencionigv,
-                                    'CAN_DCTO'=>3
-                                ]
-                            );
-                CONRegistroCompras::where('COD_DOCUMENTO_CTBLE','=',$documento02->COD_DOCUMENTO_CTBLE)
-                            ->update(
-                                [
-                                    'CAN_RETENCION_MONTO'=>$retencionigv,
-                                    'CAN_RETENCION_PORCENTAJE'=>3
-                                ]
-                            );
-            }
-        }
+        //     if(count($documento02)>0){
+        //         CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$documento02->COD_DOCUMENTO_CTBLE)
+        //                     ->update(
+        //                         [
+        //                             'CAN_RETENCION'=>$retencionigv,
+        //                             'CAN_DCTO'=>3
+        //                         ]
+        //                     );
+        //         CONRegistroCompras::where('COD_DOCUMENTO_CTBLE','=',$documento02->COD_DOCUMENTO_CTBLE)
+        //                     ->update(
+        //                         [
+        //                             'CAN_RETENCION_MONTO'=>$retencionigv,
+        //                             'CAN_RETENCION_PORCENTAJE'=>3
+        //                         ]
+        //                     );
+        //     }
+        // }
 
         ////////////////////////////////////
-
-
-
-
 
 
         $rol                    =   WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
