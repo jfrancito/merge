@@ -6419,7 +6419,7 @@ trait ComprobanteTraits
                                         $query->where('FOLIO', '=', '');
                                         $query->orWhereNull('FOLIO');
                                     })
-                                    ->where('CMP.Orden.COD_ORDEN','=','IIBECE0000000448')
+                                    //->where('CMP.Orden.COD_ORDEN','=','IIBECE0000000448')
                                     ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005'])
                                     ->where('CMP.Orden.COD_CATEGORIA_ESTADO_ORDEN','=','EOR0000000000003')
                                     ->where('CMP.Orden.COD_EMPR','=',$empresa_id)
