@@ -477,7 +477,7 @@ trait PrecioCompetenciaTraits
 									DB::table('LQG_DETLIQUIDACIONGASTO')
 									    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
 									    ->where('ITEM', $item->ITEM)
-									    ->where('CONTADOR','=', '3')
+									    ->where('CONTADOR','>=', '3')
 									    ->update([
 									        'IND_TOTAL'     => '1'
 									    ]);
@@ -487,7 +487,7 @@ trait PrecioCompetenciaTraits
 									DB::table('LQG_DETLIQUIDACIONGASTO')
 									    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
 									    ->where('ITEM', $item->ITEM)
-									    ->where('CONTADOR','=', '2')
+									    ->where('CONTADOR','>=', '2')
 									    ->update([
 									        'IND_TOTAL'     => '1'
 									    ]);
