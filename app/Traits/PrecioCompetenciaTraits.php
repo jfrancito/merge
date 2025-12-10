@@ -303,11 +303,11 @@ trait PrecioCompetenciaTraits
 			    $zip->extractTo($rutafile); // descomprime todo
 			    $zip->close();
 			    $rutacompleta    =      $rutafile.'\\'.$archivoDescomprimido;
-			    print_r($IND);
+
 			    if($IND == 'IND_XML'){
 
 
-									DB::table('LQG_DETLIQUIDACIONGASTO')
+					DB::table('LQG_DETLIQUIDACIONGASTO')
 							    ->where('ID_DOCUMENTO', $documento->ID_DOCUMENTO)
 							    ->where('ITEM', $documento->ITEM)
 							    ->update([
@@ -328,6 +328,7 @@ trait PrecioCompetenciaTraits
                   $dcontrol->FECHA_CREA           =   date('Ymd H:i:s');
                   $dcontrol->USUARIO_CREA         =   Session::get('usuario')->id;
                   $dcontrol->save();
+
 
 			    }
 
@@ -415,22 +416,24 @@ trait PrecioCompetenciaTraits
 														    ->join('LQG_LIQUIDACION_GASTO', 'LQG_DETLIQUIDACIONGASTO.ID_DOCUMENTO', '=', 'LQG_LIQUIDACION_GASTO.ID_DOCUMENTO')
 														    ->where('LQG_DETLIQUIDACIONGASTO.ACTIVO', 1)
 														    ->where('LQG_DETLIQUIDACIONGASTO.COD_TIPODOCUMENTO', 'TDO0000000000001')
+														    //->where('LQG_DETLIQUIDACIONGASTO.ID_DOCUMENTO', 'LIQG00000315')
+														    //->where('LQG_DETLIQUIDACIONGASTO.ITEM', '15')
 														    ->whereNotIn('LQG_LIQUIDACION_GASTO.COD_ESTADO', ['ETM0000000000006', 'ETM0000000000001'])
 														    ->whereRaw('ISNULL(LQG_DETLIQUIDACIONGASTO.IND_TOTAL, 0) = 0')
 														    ->orderBy('FECHA_EMI', 'asc')
 														    ->get();
 
-			//dd($listasunattareas);
+
 
       foreach($listasunattareas as $index=>$item){
 
-						DB::table('LQG_DETLIQUIDACIONGASTO')
-						    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
-						    ->where('ITEM', $item->ITEM)
-						    ->update([
-						        'FECHA_MOD' => date('Ymd H:i:s'),  // Better date format
-						        'BUSQUEDAD' => DB::raw('ISNULL(BUSQUEDAD,0) + 1')  // Correct way to increment
-						    ]);
+		DB::table('LQG_DETLIQUIDACIONGASTO')
+		    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
+		    ->where('ITEM', $item->ITEM)
+		    ->update([
+		        'FECHA_MOD' => date('Ymd H:i:s'),  // Better date format
+		        'BUSQUEDAD' => DB::raw('ISNULL(BUSQUEDAD,0) + 1')  // Correct way to increment
+		    ]);
       	
           try{  
 

@@ -4889,12 +4889,16 @@ class GestionLiquidacionGastosController extends Controller
          
             if (count($terceros) > 0) {
                 $area_planilla = $terceros->TXT_AREA;
+                //dd($area_planilla);
+
                 $centrocosto = DB::table('CON.CENTRO_COSTO')
                     ->where('COD_ESTADO', 1)
                     ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
-                    ->where('COD_CENTRO_COSTO', '=', $terceros->COD_AREA)
-                    ->where('IND_MOVIMIENTO', 1)->first();
-                    $combo_costo = $this->lg_combo_costo_xtrabajador_tercero("Seleccione Costo", $terceros->COD_AREA);
+                    ->where('TXT_NOMBRE', '=', $area_planilla)
+                    ->where('IND_MOVIMIENTO', 1)
+                    ->first();
+
+                    $combo_costo = $this->lg_combo_costo_xtrabajador_tercero_nombre("Seleccione Costo", $area_planilla);
 
 
             }else{
@@ -4968,12 +4972,22 @@ class GestionLiquidacionGastosController extends Controller
          
             if (count($terceros) > 0) {
                 $area_planilla = $terceros->TXT_AREA;
+                // $centrocosto = DB::table('CON.CENTRO_COSTO')
+                //     ->where('COD_ESTADO', 1)
+                //     ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
+                //     ->where('COD_CENTRO_COSTO', '=', $terceros->COD_AREA)
+                //     ->where('IND_MOVIMIENTO', 1)->first();
+                //     $combo_costo = $this->lg_combo_costo_xtrabajador_tercero("Seleccione Costo", $terceros->COD_AREA);
+
                 $centrocosto = DB::table('CON.CENTRO_COSTO')
                     ->where('COD_ESTADO', 1)
                     ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
-                    ->where('COD_CENTRO_COSTO', '=', $terceros->COD_AREA)
-                    ->where('IND_MOVIMIENTO', 1)->first();
-                    $combo_costo = $this->lg_combo_costo_xtrabajador_tercero("Seleccione Costo", $terceros->COD_AREA);
+                    ->where('TXT_NOMBRE', '=', $area_planilla)
+                    ->where('IND_MOVIMIENTO', 1)
+                    ->first();
+
+                    $combo_costo = $this->lg_combo_costo_xtrabajador_tercero_nombre("Seleccione Costo", $area_planilla);
+
 
 
             }else{
