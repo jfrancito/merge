@@ -277,7 +277,7 @@ trait PrecioCompetenciaTraits
 		$response = curl_exec($curl);
 		curl_close($curl);
 
-
+		//dd($response);
 		$response_array = json_decode($response, true);
 		if (!isset($response_array['nomArchivo'])) {
 			print_r("NO HAY");
@@ -307,14 +307,6 @@ trait PrecioCompetenciaTraits
 			    if($IND == 'IND_XML'){
 
 
-					DB::table('LQG_DETLIQUIDACIONGASTO')
-							    ->where('ID_DOCUMENTO', $documento->ID_DOCUMENTO)
-							    ->where('ITEM', $documento->ITEM)
-							    ->update([
-							        'IND_XML'     => '1',
-							        'CONTADOR'    => DB::raw('ISNULL(CONTADOR,0) + 1'),
-							    ]);
-
                   $dcontrol                       =   new Archivo;
                   $dcontrol->ID_DOCUMENTO         =   $documento->ID_DOCUMENTO;
                   $dcontrol->DOCUMENTO_ITEM       =   $documento->ITEM;
@@ -326,10 +318,22 @@ trait PrecioCompetenciaTraits
                   $dcontrol->EXTENSION            =   'pdf';
                   $dcontrol->ACTIVO               =   1;
                   $dcontrol->FECHA_CREA           =   date('Ymd H:i:s');
-                  $dcontrol->USUARIO_CREA         =   Session::get('usuario')->id;
+                  $dcontrol->USUARIO_CREA         =   'SISTEMAS';
                   $dcontrol->save();
 
+                  //dd($rutacompleta);
 
+					DB::table('LQG_DETLIQUIDACIONGASTO')
+							    ->where('ID_DOCUMENTO', $documento->ID_DOCUMENTO)
+							    ->where('ITEM', $documento->ITEM)
+							    ->update([
+							        'IND_XML'     => '1',
+							        'CONTADOR'    => DB::raw('ISNULL(CONTADOR,0) + 1'),
+							    ]);
+
+
+
+                  //print_r($documento->ID_DOCUMENTO);
 			    }
 
 			    if($IND == 'IND_PDF'){
@@ -353,7 +357,7 @@ trait PrecioCompetenciaTraits
                   $dcontrol->EXTENSION            =   'pdf';
                   $dcontrol->ACTIVO               =   1;
                   $dcontrol->FECHA_CREA           =   date('Ymd H:i:s');
-                  $dcontrol->USUARIO_CREA         =   Session::get('usuario')->id;
+                  $dcontrol->USUARIO_CREA         =   'SISTEMAS';;
                   $dcontrol->save();
 
 			    }
@@ -379,7 +383,7 @@ trait PrecioCompetenciaTraits
                   $dcontrol->EXTENSION            =   'pdf';
                   $dcontrol->ACTIVO               =   1;
                   $dcontrol->FECHA_CREA           =   date('Ymd H:i:s');
-                  $dcontrol->USUARIO_CREA         =   Session::get('usuario')->id;
+                  $dcontrol->USUARIO_CREA         =   'SISTEMAS';
                   $dcontrol->save();
 
 
@@ -416,8 +420,8 @@ trait PrecioCompetenciaTraits
 														    ->join('LQG_LIQUIDACION_GASTO', 'LQG_DETLIQUIDACIONGASTO.ID_DOCUMENTO', '=', 'LQG_LIQUIDACION_GASTO.ID_DOCUMENTO')
 														    ->where('LQG_DETLIQUIDACIONGASTO.ACTIVO', 1)
 														    ->where('LQG_DETLIQUIDACIONGASTO.COD_TIPODOCUMENTO', 'TDO0000000000001')
-														    //->where('LQG_DETLIQUIDACIONGASTO.ID_DOCUMENTO', 'LIQG00000315')
-														    //->where('LQG_DETLIQUIDACIONGASTO.ITEM', '15')
+														    //->where('LQG_DETLIQUIDACIONGASTO.ID_DOCUMENTO', 'LIQG00000077')
+														    //->where('LQG_DETLIQUIDACIONGASTO.ITEM', '10')
 														    ->whereNotIn('LQG_LIQUIDACION_GASTO.COD_ESTADO', ['ETM0000000000006', 'ETM0000000000001'])
 														    ->whereRaw('ISNULL(LQG_DETLIQUIDACIONGASTO.IND_TOTAL, 0) = 0')
 														    ->orderBy('FECHA_EMI', 'asc')
