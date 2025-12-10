@@ -850,6 +850,67 @@ trait ComprobanteTraits
     }
 
 
+    private function con_lista_cabecera_comprobante_entregable_lca($cliente_id,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$operacion_id,$moneda_id) {
+
+
+        $fecha_corte            =   date('Ymd');
+
+        $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+        $centro_id          =       $trabajador->COD_ZONA_TIPO;
+
+        $array_usuarios         =   SGDUsuario::Area($area_id)
+                                    ->whereNotNull('COD_CATEGORIA_AREA')
+                                    ->pluck('COD_USUARIO')
+                                    ->toArray();
+
+        $rol            =       WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
+
+        if($rol->ind_uc == 1){
+
+            $listadatos                 = DB::table('FE_DOCUMENTO')
+                                        ->join('TES.AUTORIZACION_DETALLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'TES.AUTORIZACION_DETALLE.COD_AUTORIZACION')
+                                        ->where('TES.AUTORIZACION_DETALLE.COD_EMPR','=',$empresa_id)
+                                        ->where('TES.AUTORIZACION_DETALLE.COD_TIPO_DOCUMENTO','=','TDO0000000000004')
+                                        ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO','=',$banco_id)
+                                        //->where('FE_DOCUMENTO.usuario_pa','=',Session::get('usuario')->id)
+                                        ->where('FE_DOCUMENTO.COD_ESTADO', 'ETM0000000000005')
+                                        ->where('FE_DOCUMENTO.OPERACION', $operacion_id)
+                                        ->where(function ($query) {
+                                            $query->where('FOLIO', '=', '');
+                                            $query->orWhereNull('FOLIO');
+                                        })
+                                        ->selectRaw('DISTINCT FE_DOCUMENTO.*, TES.AUTORIZACION_DETALLE.*') // DISTINCT aplicado solo a estas columnas
+                                        ->get();
+
+
+
+
+        }else{
+
+            $listadatos                 = DB::table('FE_DOCUMENTO')
+                                        ->join('TES.AUTORIZACION_DETALLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'TES.AUTORIZACION_DETALLE.COD_AUTORIZACION')
+                                        ->where('TES.AUTORIZACION_DETALLE.COD_EMPR','=',$empresa_id)
+                                        ->where('TES.AUTORIZACION_DETALLE.COD_TIPO_DOCUMENTO','=','TDO0000000000004')
+                                        ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO','=',$banco_id)
+                                        //->where('FE_DOCUMENTO.usuario_pa','=',Session::get('usuario')->id)
+                                        ->where('FE_DOCUMENTO.COD_ESTADO', 'ETM0000000000005')
+                                        ->where('FE_DOCUMENTO.OPERACION', $operacion_id)
+                                        ->where(function ($query) {
+                                            $query->where('FOLIO', '=', '');
+                                            $query->orWhereNull('FOLIO');
+                                        })
+                                        ->selectRaw('DISTINCT FE_DOCUMENTO.*, TES.AUTORIZACION_DETALLE.*') // DISTINCT aplicado solo a estas columnas
+                                        ->get();
+
+            //dd($listadatos);
+
+
+        }
+
+        return  $listadatos;
+
+    }
+
     private function con_lista_cabecera_comprobante_entregable_contrato_sinfolio($cliente_id,$empresa_id) {
 
 
@@ -6089,6 +6150,17 @@ trait ComprobanteTraits
     }
 
 
+    private function con_lista_cabecera_comprobante_entregable_modal_moneda_lca($folio,$moneda_id) {
+
+        $listadatos             =   FeDocumento::where('FOLIO','=',$folio)
+                                    ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
+                                    ->select(DB::raw('FE_DOCUMENTO.*,FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_VOUCHER'))
+                                    ->get();
+        return  $listadatos;
+    }
+
+
+
     private function con_lista_cabecera_comprobante_entregable_modal_moneda($folio,$moneda_id) {
 
         $documento              =   DB::table('CMP.DOCUMENTO_CTBLE')
@@ -6419,7 +6491,7 @@ trait ComprobanteTraits
                                         $query->where('FOLIO', '=', '');
                                         $query->orWhereNull('FOLIO');
                                     })
-                                    //->where('CMP.Orden.COD_ORDEN','=','IIBECE0000000448')
+                                    //->where('CMP.Orden.COD_ORDEN','=','IIRJCE0000001231')
                                     ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005'])
                                     ->where('CMP.Orden.COD_CATEGORIA_ESTADO_ORDEN','=','EOR0000000000003')
                                     ->where('CMP.Orden.COD_EMPR','=',$empresa_id)
