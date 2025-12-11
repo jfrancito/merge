@@ -1044,7 +1044,8 @@ class GestionEstibaController extends Controller
             ->where('CMP.ORDEN.COD_CATEGORIA_TIPO_ORDEN', 'TOR0000000000016')
             ->first();
 
-
+        $rutafila                   =   "";
+        $rutaorden                  =   "";
 
         if(count($orde_cascara)>0){
 
@@ -1069,8 +1070,7 @@ class GestionEstibaController extends Controller
                                             ->where('COD_ESTADO','=','1')
                                             ->first();
 
-            $rutafila                   =   "";
-            $rutaorden                  =   "";
+
             //dd($fileordencompra);
             if(count($fileordencompra)>0){
                 $directorio = '\\\\10.1.0.201\cpe\Orden_Cascara';
