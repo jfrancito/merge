@@ -805,7 +805,6 @@ class GestionOCController extends Controller
 
 
 
-
     public function actionListarAjaxBuscarDocumentoAdmin(Request $request) {
 
         $operacion_id   =   $request['operacion_id'];

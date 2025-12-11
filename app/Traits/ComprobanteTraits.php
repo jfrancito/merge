@@ -7102,113 +7102,114 @@ trait ComprobanteTraits
 
     private function con_lista_cabecera_estibas_administrativo_doc_int_com($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id) {
 
-        $estado_no          =       'ETM0000000000006';
-        $trabajador         =      STDTrabajador::where('COD_TRAB','=',$cod_empresa)->first();
-        $centro_id          =       $trabajador->COD_ZONA_TIPO;
+            $estado_no          =       'ETM0000000000006';
+            $trabajador         =      STDTrabajador::where('COD_TRAB','=',$cod_empresa)->first();
+            $centro_id          =       $trabajador->COD_ZONA_TIPO;
 
 
-        $tipodoc_id         =       $categoria_id;
-        $array_usuarios     =       SGDUsuario::Area($area_id)
-                                    ->whereNotNull('COD_CATEGORIA_AREA')
-                                    ->pluck('COD_USUARIO')
-                                    ->toArray();
+            $tipodoc_id         =       $categoria_id;
+            $array_usuarios     =       SGDUsuario::Area($area_id)
+                                        ->whereNotNull('COD_CATEGORIA_AREA')
+                                        ->pluck('COD_USUARIO')
+                                        ->toArray();
 
-        //marilu
-        if(Session::get('usuario')->name=='MPACHECU'){
-            array_push($array_usuarios, 'HPEREZAL');
+            //marilu
+            if(Session::get('usuario')->name=='MPACHECU'){
+                array_push($array_usuarios, 'HPEREZAL');
+            }
+       
+
+            if(Session::get('usuario')->id== '1CIX00000001'){
+
+                $listadatos         =       VMergeDocumento::leftJoin('VMERGEDOCUMENTO_INTERNO_COMPRA', function($leftJoin) {
+                                                $leftJoin->on('VMERGEDOCUMENTO_INTERNO_COMPRA.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE');
+                                            })
+                                            ->leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                                $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTO_INTERNO_COMPRA.LOTE')
+                                                    ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                                            })
+                                            //->WHERE('VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE','=','IICHEST000068311')
+                                            ->where('VMERGEDOCUMENTOS.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                            ->where(function ($query) {
+                                                $query->where('VMERGEDOCUMENTO_INTERNO_COMPRA.ESTATUS', '=', 'OFF')
+                                                      ->orWhereNull('VMERGEDOCUMENTO_INTERNO_COMPRA.ESTATUS')
+                                                      ->orwhere('VMERGEDOCUMENTO_INTERNO_COMPRA.ESTATUS', '=', '')
+                                                      ->orWhereRaw("CAN_TOTAL <> COALESCE(VMERGEDOCUMENTO_INTERNO_COMPRA.TOTAL_MERGE, 0)");
+                                            })
+                                            ->whereRaw("CAST(VMERGEDOCUMENTOS.FEC_EMISION AS DATE) >= ? and CAST(VMERGEDOCUMENTOS.FEC_EMISION AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                            ->where('COD_EMPR_EMISOR','=',$proveedor_id)
+                                            ->WHERE('VMERGEDOCUMENTOS.COD_ESTADO','=','1')
+                                            //->whereIn('VMERGEDOCUMENTOS.COD_USUARIO_CREA_AUD',$array_usuarios)
+                                            ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
+                                            ->orderBy('VMERGEDOCUMENTOS.FEC_EMISION','ASC')
+                                            ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
+                                                                FEC_EMISION,
+                                                                TXT_CATEGORIA_MONEDA,
+                                                                TXT_EMPR_EMISOR,
+                                                                COD_USUARIO_CREA_AUD,
+                                                                CAN_TOTAL,
+                                                                NRO_SERIE,
+                                                                NRO_DOC,
+                                                                VMERGEDOCUMENTO_INTERNO_COMPRA.LOTE AS LOTE_DOC,
+                                                                FE_DOCUMENTO.ID_DOCUMENTO,
+                                                                FE_DOCUMENTO.COD_ESTADO,
+                                                                FE_DOCUMENTO.TXT_ESTADO,
+                                                                COALESCE(VMERGEDOCUMENTO_INTERNO_COMPRA.TOTAL_MERGE, 0) AS TOTAL_MERGE
+                                                            '))
+                                            ->get();
+
+                
+
+
+
+            }else{
+
+
+                $listadatos         =       VMergeDocumento::leftJoin('VMERGEDOCUMENTO_INTERNO_COMPRA', function($leftJoin) {
+                                                $leftJoin->on('VMERGEDOCUMENTO_INTERNO_COMPRA.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE');
+                                            })
+                                            ->leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                                $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTO_INTERNO_COMPRA.LOTE')
+                                                    ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                                            })
+                                            //->WHERE('VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE','=','IICHEST000068311')
+                                            ->where('VMERGEDOCUMENTOS.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                            ->where(function ($query) {
+                                                $query->where('VMERGEDOCUMENTO_INTERNO_COMPRA.ESTATUS', '=', 'OFF')
+                                                      ->orWhereNull('VMERGEDOCUMENTO_INTERNO_COMPRA.ESTATUS')
+                                                      ->orwhere('VMERGEDOCUMENTO_INTERNO_COMPRA.ESTATUS', '=', '')
+                                                      ->orWhereRaw("CAN_TOTAL <> COALESCE(VMERGEDOCUMENTO_INTERNO_COMPRA.TOTAL_MERGE, 0)");
+                                            })
+                                            ->whereRaw("CAST(VMERGEDOCUMENTOS.FEC_EMISION AS DATE) >= ? and CAST(VMERGEDOCUMENTOS.FEC_EMISION AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                            ->where('COD_EMPR_EMISOR','=',$proveedor_id)
+                                            ->WHERE('VMERGEDOCUMENTOS.COD_ESTADO','=','1')
+                                            ->whereIn('VMERGEDOCUMENTOS.COD_USUARIO_CREA_AUD',$array_usuarios)
+                                            ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
+                                            ->orderBy('VMERGEDOCUMENTOS.FEC_EMISION','ASC')
+                                            ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
+                                                                FEC_EMISION,
+                                                                TXT_CATEGORIA_MONEDA,
+                                                                TXT_EMPR_EMISOR,
+                                                                COD_USUARIO_CREA_AUD,
+                                                                CAN_TOTAL,
+                                                                NRO_SERIE,
+                                                                NRO_DOC,
+                                                                VMERGEDOCUMENTO_INTERNO_COMPRA.LOTE AS LOTE_DOC,
+                                                                FE_DOCUMENTO.ID_DOCUMENTO,
+                                                                FE_DOCUMENTO.COD_ESTADO,
+                                                                FE_DOCUMENTO.TXT_ESTADO,
+                                                                COALESCE(VMERGEDOCUMENTO_INTERNO_COMPRA.TOTAL_MERGE, 0) AS TOTAL_MERGE
+                                                            '))
+                                            ->get();           
+
+            }
+
+
+
+
+            return  $listadatos;
         }
-   
 
-        if(Session::get('usuario')->id== '1CIX00000001'){
-
-            $listadatos         =       VMergeDocumento::leftJoin('VMERGEDOCUMENTO_INTERNO_COMPRA', function($leftJoin) {
-                                            $leftJoin->on('VMERGEDOCUMENTO_INTERNO_COMPRA.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE');
-                                        })
-                                        ->leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
-                                            $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTO_INTERNO_COMPRA.LOTE')
-                                                ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
-                                        })
-                                        //->WHERE('VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE','=','IICHEST000068311')
-                                        ->where('VMERGEDOCUMENTOS.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                                        ->where(function ($query) {
-                                            $query->where('VMERGEDOCUMENTO_INTERNO_COMPRA.ESTATUS', '=', 'OFF')
-                                                  ->orWhereNull('VMERGEDOCUMENTO_INTERNO_COMPRA.ESTATUS')
-                                                  ->orwhere('VMERGEDOCUMENTO_INTERNO_COMPRA.ESTATUS', '=', '')
-                                                  ->orWhereRaw("CAN_TOTAL <> COALESCE(VMERGEDOCUMENTO_INTERNO_COMPRA.TOTAL_MERGE, 0)");
-                                        })
-                                        ->whereRaw("CAST(VMERGEDOCUMENTOS.FEC_EMISION AS DATE) >= ? and CAST(VMERGEDOCUMENTOS.FEC_EMISION AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
-                                        ->where('COD_EMPR_EMISOR','=',$proveedor_id)
-                                        ->WHERE('VMERGEDOCUMENTOS.COD_ESTADO','=','1')
-                                        //->whereIn('VMERGEDOCUMENTOS.COD_USUARIO_CREA_AUD',$array_usuarios)
-                                        ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
-                                        ->orderBy('VMERGEDOCUMENTOS.FEC_EMISION','ASC')
-                                        ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
-                                                            FEC_EMISION,
-                                                            TXT_CATEGORIA_MONEDA,
-                                                            TXT_EMPR_EMISOR,
-                                                            COD_USUARIO_CREA_AUD,
-                                                            CAN_TOTAL,
-                                                            NRO_SERIE,
-                                                            NRO_DOC,
-                                                            VMERGEDOCUMENTO_INTERNO_COMPRA.LOTE AS LOTE_DOC,
-                                                            FE_DOCUMENTO.ID_DOCUMENTO,
-                                                            FE_DOCUMENTO.COD_ESTADO,
-                                                            FE_DOCUMENTO.TXT_ESTADO,
-                                                            COALESCE(VMERGEDOCUMENTO_INTERNO_COMPRA.TOTAL_MERGE, 0) AS TOTAL_MERGE
-                                                        '))
-                                        ->get();
-
-            
-
-
-
-        }else{
-
-
-            $listadatos         =       VMergeDocumento::leftJoin('VMERGEDOCUMENTO_INTERNO_COMPRA', function($leftJoin) {
-                                            $leftJoin->on('VMERGEDOCUMENTO_INTERNO_COMPRA.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE');
-                                        })
-                                        ->leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
-                                            $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTO_INTERNO_COMPRA.LOTE')
-                                                ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
-                                        })
-                                        //->WHERE('VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE','=','IICHEST000068311')
-                                        ->where('VMERGEDOCUMENTOS.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                                        ->where(function ($query) {
-                                            $query->where('VMERGEDOCUMENTO_INTERNO_COMPRA.ESTATUS', '=', 'OFF')
-                                                  ->orWhereNull('VMERGEDOCUMENTO_INTERNO_COMPRA.ESTATUS')
-                                                  ->orwhere('VMERGEDOCUMENTO_INTERNO_COMPRA.ESTATUS', '=', '')
-                                                  ->orWhereRaw("CAN_TOTAL <> COALESCE(VMERGEDOCUMENTO_INTERNO_COMPRA.TOTAL_MERGE, 0)");
-                                        })
-                                        ->whereRaw("CAST(VMERGEDOCUMENTOS.FEC_EMISION AS DATE) >= ? and CAST(VMERGEDOCUMENTOS.FEC_EMISION AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
-                                        ->where('COD_EMPR_EMISOR','=',$proveedor_id)
-                                        ->WHERE('VMERGEDOCUMENTOS.COD_ESTADO','=','1')
-                                        ->whereIn('VMERGEDOCUMENTOS.COD_USUARIO_CREA_AUD',$array_usuarios)
-                                        ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
-                                        ->orderBy('VMERGEDOCUMENTOS.FEC_EMISION','ASC')
-                                        ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
-                                                            FEC_EMISION,
-                                                            TXT_CATEGORIA_MONEDA,
-                                                            TXT_EMPR_EMISOR,
-                                                            COD_USUARIO_CREA_AUD,
-                                                            CAN_TOTAL,
-                                                            NRO_SERIE,
-                                                            NRO_DOC,
-                                                            VMERGEDOCUMENTO_INTERNO_COMPRA.LOTE AS LOTE_DOC,
-                                                            FE_DOCUMENTO.ID_DOCUMENTO,
-                                                            FE_DOCUMENTO.COD_ESTADO,
-                                                            FE_DOCUMENTO.TXT_ESTADO,
-                                                            COALESCE(VMERGEDOCUMENTO_INTERNO_COMPRA.TOTAL_MERGE, 0) AS TOTAL_MERGE
-                                                        '))
-                                        ->get();           
-
-        }
-
-
-
-
-        return  $listadatos;
-    }
 
     private function con_combo_cabecera_estibas_administrativo($cliente_id,$area_id,$categoria_id) {
 
