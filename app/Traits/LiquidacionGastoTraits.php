@@ -197,6 +197,7 @@ trait LiquidacionGastoTraits
                                 ->where('COD_ESTADO', 1)
                                 ->get();
 
+
             if(count($ldetallearendir)>0){
 
                 $motivos = DB::table('WEB.TIPO_IMPORTE_MOTIVO')
@@ -231,6 +232,7 @@ trait LiquidacionGastoTraits
 
                 // Convertir a array de salida
                 $final = array_values($resultado);
+
 
                 $productos = DB::table('LQG_DETDOCUMENTOLIQUIDACIONGASTO')
                     ->select(
@@ -367,6 +369,29 @@ trait LiquidacionGastoTraits
                             ->values()
                             ->toArray();
 
+
+                        // Primero, obtener los concepto_id que ya existen en $array
+                        $conceptosExistentes = array_column($array, 'concepto_id');
+
+                        // Recorrer $final y agregar los que no existen
+                        foreach ($final as $itemFinal) {
+                            if (!in_array($itemFinal['concepto_id'], $conceptosExistentes)) {
+                                $array[] = [
+                                    'COD_PRODUCTO' => $itemFinal['concepto_id'],
+                                    'TXT_PRODUCTO' => $itemFinal['concepto'],
+                                    'TOTAL' => 0,
+                                    'concepto_id' => $itemFinal['concepto_id'],
+                                    'concepto' => $itemFinal['concepto'],
+                                    'monto' => $itemFinal['monto'],
+                                    'restante' => $itemFinal['monto'] // O 0 según tu lógica
+                                ];
+                            }
+                        }
+
+                        // Si quieres ordenar por concepto_id después de agregar
+                        usort($array, function($a, $b) {
+                            return strcmp($a['concepto_id'], $b['concepto_id']);
+                        });
 
 
 
