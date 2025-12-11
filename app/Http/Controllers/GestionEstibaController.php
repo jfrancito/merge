@@ -1043,55 +1043,65 @@ class GestionEstibaController extends Controller
             ->where('CMP.REFERENCIA_ASOC.COD_TABLA', $documento_top->COD_DOCUMENTO_CTBLE)
             ->where('CMP.ORDEN.COD_CATEGORIA_TIPO_ORDEN', 'TOR0000000000016')
             ->first();
-        $sourceFile = '\\\\10.1.0.201\cpe\Orden_Cascara';
-        if($documento_top->COD_CENTRO == 'CEN0000000000004' or $documento_top->COD_CENTRO == 'CEN0000000000006'){
-            if($documento_top->COD_CENTRO == 'CEN0000000000004'){
-                $sourceFile = '\\\\10.1.7.200\\cpe\\Orden_Cascara\\'.$orde_cascara->COD_ORDEN.'.pdf';
-            }
-            if($documento_top->COD_CENTRO == 'CEN0000000000006'){
-                $sourceFile = '\\\\10.1.9.43\\cpe\\Orden_Cascara\\'.$orde_cascara->COD_ORDEN.'.pdf';
-            }
-            $destinationFile = '\\\\10.1.0.201\\cpe\\Orden_Cascara\\'.$orde_cascara->COD_ORDEN.'.pdf';
-            // Intenta copiar el archivo
-            if (file_exists($sourceFile)){
-                copy($sourceFile, $destinationFile);
-            }
-        }
 
 
-        $fileordencompra            =   CMPDocAsociarCompra::where('COD_ORDEN','=',$idoc)
-                                        ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000001')
-                                        ->where('COD_ESTADO','=','1')
-                                        ->first();
 
-        $rutafila                   =   "";
-        $rutaorden                  =   "";
-        //dd($fileordencompra);
-        if(count($fileordencompra)>0){
-            $directorio = '\\\\10.1.0.201\cpe\Orden_Cascara';
-            // Nombre del archivo que estás buscando
-            $nombreArchivoBuscado = $orde_cascara->COD_ORDEN.'.pdf';
-            // Escanea el directorio
-            $archivos = scandir($directorio);
-            // Inicializa una variable para almacenar el resultado
-            $archivoEncontrado = false;
-            // Recorre la lista de archivos
-            foreach ($archivos as $archivo) {
-                // Omite los elementos '.' y '..'
-                if ($archivo != '.' && $archivo != '..') {
-                    // Verifica si el nombre del archivo coincide con el archivo buscado
-                    if ($archivo == $nombreArchivoBuscado) {
-                        $archivoEncontrado = true;
-                        break;
-                    }
+        if(count($orde_cascara)>0){
+
+            $sourceFile = '\\\\10.1.0.201\cpe\Orden_Cascara';
+            if($documento_top->COD_CENTRO == 'CEN0000000000004' or $documento_top->COD_CENTRO == 'CEN0000000000006'){
+                if($documento_top->COD_CENTRO == 'CEN0000000000004'){
+                    $sourceFile = '\\\\10.1.7.200\\cpe\\Orden_Cascara\\'.$orde_cascara->COD_ORDEN.'.pdf';
+                }
+                if($documento_top->COD_CENTRO == 'CEN0000000000006'){
+                    $sourceFile = '\\\\10.1.9.43\\cpe\\Orden_Cascara\\'.$orde_cascara->COD_ORDEN.'.pdf';
+                }
+                $destinationFile = '\\\\10.1.0.201\\cpe\\Orden_Cascara\\'.$orde_cascara->COD_ORDEN.'.pdf';
+                // Intenta copiar el archivo
+                if (file_exists($sourceFile)){
+                    copy($sourceFile, $destinationFile);
                 }
             }
-            // Muestra el resultado
-            if ($archivoEncontrado) {
-                $rutafila         =   $directorio.'\\'.$nombreArchivoBuscado;
-                $rutaorden           =  $rutafila;
-            } 
+
+
+            $fileordencompra            =   CMPDocAsociarCompra::where('COD_ORDEN','=',$idoc)
+                                            ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000001')
+                                            ->where('COD_ESTADO','=','1')
+                                            ->first();
+
+            $rutafila                   =   "";
+            $rutaorden                  =   "";
+            //dd($fileordencompra);
+            if(count($fileordencompra)>0){
+                $directorio = '\\\\10.1.0.201\cpe\Orden_Cascara';
+                // Nombre del archivo que estás buscando
+                $nombreArchivoBuscado = $orde_cascara->COD_ORDEN.'.pdf';
+                // Escanea el directorio
+                $archivos = scandir($directorio);
+                // Inicializa una variable para almacenar el resultado
+                $archivoEncontrado = false;
+                // Recorre la lista de archivos
+                foreach ($archivos as $archivo) {
+                    // Omite los elementos '.' y '..'
+                    if ($archivo != '.' && $archivo != '..') {
+                        // Verifica si el nombre del archivo coincide con el archivo buscado
+                        if ($archivo == $nombreArchivoBuscado) {
+                            $archivoEncontrado = true;
+                            break;
+                        }
+                    }
+                }
+                // Muestra el resultado
+                if ($archivoEncontrado) {
+                    $rutafila         =   $directorio.'\\'.$nombreArchivoBuscado;
+                    $rutaorden           =  $rutafila;
+                } 
+            }          
+
+
         }
+
+
 
 
 

@@ -41,7 +41,7 @@
                 <td></td>
                 <td><b>{{ number_format($sumaMonto, 2) }}</b></td>
                 <td><b>{{ number_format($sumaTotal, 2) }}</b></td>
-                <td></td>
+                <td><b>{{ number_format($sumaRestante, 2) }}</b></td>
             </tr>
             </tbody>
         </table>
