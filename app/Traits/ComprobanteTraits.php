@@ -468,68 +468,71 @@ trait ComprobanteTraits
 
         $fecha_corte            =   date('Ymd');
         //UPDATE DE CENTIMOS CONTRATOS
-        // DB::update("
-        //     UPDATE CMP.DOCUMENTO_CTBLE
-        //     SET CMP.DOCUMENTO_CTBLE.CAN_TOTAL = CONTRATO.CAN_TOTAL
-        //     FROM FE_DOCUMENTO 
-        //     INNER JOIN CMP.DOCUMENTO_CTBLE CONTRATO 
-        //         ON FE_DOCUMENTO.ID_DOCUMENTO = CONTRATO.COD_DOCUMENTO_CTBLE
-        //     INNER JOIN CMP.REFERENCIA_ASOC 
-        //         ON COD_TABLA = CONTRATO.COD_DOCUMENTO_CTBLE 
-        //         AND REFERENCIA_ASOC.COD_ESTADO = 1
-        //     INNER JOIN CMP.DOCUMENTO_CTBLE 
-        //         ON COD_TABLA_ASOC = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE 
-        //         AND CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_DOC IN ('TDO0000000000001','TDO0000000000002')
-        //     INNER JOIN CMP.HABILITACION 
-        //         ON CMP.HABILITACION.COD_DOCUMENTO_CTBLE = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE 
-        //         AND NOM_PRODUCTO = 'COMPRA'
-        //     WHERE FE_DOCUMENTO.OPERACION = 'CONTRATO'
-        //     AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
-        //     AND CMP.DOCUMENTO_CTBLE.CAN_TOTAL <> CONTRATO.CAN_TOTAL
-        //     AND ABS(CMP.DOCUMENTO_CTBLE.CAN_TOTAL - CONTRATO.CAN_TOTAL) <= 0.1
-        // ");
+        DB::update("
+            UPDATE CMP.DOCUMENTO_CTBLE
+            SET CMP.DOCUMENTO_CTBLE.CAN_TOTAL = CONTRATO.CAN_TOTAL
+            FROM FE_DOCUMENTO 
+            INNER JOIN CMP.DOCUMENTO_CTBLE CONTRATO 
+                ON FE_DOCUMENTO.ID_DOCUMENTO = CONTRATO.COD_DOCUMENTO_CTBLE
+            INNER JOIN CMP.REFERENCIA_ASOC 
+                ON COD_TABLA = CONTRATO.COD_DOCUMENTO_CTBLE 
+                AND REFERENCIA_ASOC.COD_ESTADO = 1
+            INNER JOIN CMP.DOCUMENTO_CTBLE 
+                ON COD_TABLA_ASOC = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE 
+                AND CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_DOC IN ('TDO0000000000001','TDO0000000000002')
+            INNER JOIN CMP.HABILITACION 
+                ON CMP.HABILITACION.COD_DOCUMENTO_CTBLE = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE 
+                AND NOM_PRODUCTO = 'COMPRA'
+            WHERE FE_DOCUMENTO.OPERACION = 'CONTRATO'
+            AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
+            AND CMP.DOCUMENTO_CTBLE.CAN_TOTAL <> CONTRATO.CAN_TOTAL
+            AND ABS(CMP.DOCUMENTO_CTBLE.CAN_TOTAL - CONTRATO.CAN_TOTAL) <= 0.1
+            AND CMP.HABILITACION.FEC_HABILITACION >= DATEADD(MONTH, -2, GETDATE())
+        ");
 
-        // DB::update("
-        //     UPDATE CMP.HABILITACION
-        //     SET CMP.HABILITACION.CAN_IMPORTE = CONTRATO.CAN_TOTAL
-        //     FROM FE_DOCUMENTO
-        //     INNER JOIN CMP.DOCUMENTO_CTBLE CONTRATO 
-        //         ON FE_DOCUMENTO.ID_DOCUMENTO = CONTRATO.COD_DOCUMENTO_CTBLE
-        //     INNER JOIN CMP.REFERENCIA_ASOC 
-        //         ON COD_TABLA = CONTRATO.COD_DOCUMENTO_CTBLE 
-        //         AND REFERENCIA_ASOC.COD_ESTADO = 1
-        //     INNER JOIN CMP.DOCUMENTO_CTBLE 
-        //         ON COD_TABLA_ASOC = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE 
-        //         AND CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_DOC IN ('TDO0000000000001','TDO0000000000002')
-        //     INNER JOIN CMP.HABILITACION 
-        //         ON CMP.HABILITACION.COD_DOCUMENTO_CTBLE = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE 
-        //         AND NOM_PRODUCTO = 'COMPRA'
-        //     WHERE FE_DOCUMENTO.OPERACION = 'CONTRATO'
-        //     AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
-        //     AND CMP.HABILITACION.CAN_IMPORTE <> CONTRATO.CAN_TOTAL
-        //     AND ABS(CMP.HABILITACION.CAN_IMPORTE - CONTRATO.CAN_TOTAL) <= 0.1
-        // ");
+        DB::update("
+            UPDATE CMP.HABILITACION
+            SET CMP.HABILITACION.CAN_IMPORTE = CONTRATO.CAN_TOTAL
+            FROM FE_DOCUMENTO
+            INNER JOIN CMP.DOCUMENTO_CTBLE CONTRATO 
+                ON FE_DOCUMENTO.ID_DOCUMENTO = CONTRATO.COD_DOCUMENTO_CTBLE
+            INNER JOIN CMP.REFERENCIA_ASOC 
+                ON COD_TABLA = CONTRATO.COD_DOCUMENTO_CTBLE 
+                AND REFERENCIA_ASOC.COD_ESTADO = 1
+            INNER JOIN CMP.DOCUMENTO_CTBLE 
+                ON COD_TABLA_ASOC = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE 
+                AND CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_DOC IN ('TDO0000000000001','TDO0000000000002')
+            INNER JOIN CMP.HABILITACION 
+                ON CMP.HABILITACION.COD_DOCUMENTO_CTBLE = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE 
+                AND NOM_PRODUCTO = 'COMPRA'
+            WHERE FE_DOCUMENTO.OPERACION = 'CONTRATO'
+            AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
+            AND CMP.HABILITACION.CAN_IMPORTE <> CONTRATO.CAN_TOTAL
+            AND ABS(CMP.HABILITACION.CAN_IMPORTE - CONTRATO.CAN_TOTAL) <= 0.1
+            AND CMP.HABILITACION.FEC_HABILITACION >= DATEADD(MONTH, -2, GETDATE())
+        ");
 
-        // DB::update("
-        //     UPDATE CMP.HABILITACION
-        //     SET CMP.HABILITACION.CAN_CAPITAL_SALDO = CONTRATO.CAN_TOTAL
-        //     FROM FE_DOCUMENTO
-        //     INNER JOIN CMP.DOCUMENTO_CTBLE CONTRATO 
-        //         ON FE_DOCUMENTO.ID_DOCUMENTO = CONTRATO.COD_DOCUMENTO_CTBLE
-        //     INNER JOIN CMP.REFERENCIA_ASOC 
-        //         ON COD_TABLA = CONTRATO.COD_DOCUMENTO_CTBLE 
-        //         AND REFERENCIA_ASOC.COD_ESTADO = 1
-        //     INNER JOIN CMP.DOCUMENTO_CTBLE 
-        //         ON COD_TABLA_ASOC = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE 
-        //         AND CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_DOC IN ('TDO0000000000001','TDO0000000000002')
-        //     INNER JOIN CMP.HABILITACION 
-        //         ON CMP.HABILITACION.COD_DOCUMENTO_CTBLE = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE 
-        //         AND NOM_PRODUCTO = 'COMPRA'
-        //     WHERE FE_DOCUMENTO.OPERACION = 'CONTRATO'
-        //     AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
-        //     AND CMP.HABILITACION.CAN_CAPITAL_SALDO <> CONTRATO.CAN_TOTAL
-        //     AND ABS(CMP.HABILITACION.CAN_CAPITAL_SALDO - CONTRATO.CAN_TOTAL) <= 0.1
-        // ");
+        DB::update("
+            UPDATE CMP.HABILITACION
+            SET CMP.HABILITACION.CAN_CAPITAL_SALDO = CONTRATO.CAN_TOTAL
+            FROM FE_DOCUMENTO
+            INNER JOIN CMP.DOCUMENTO_CTBLE CONTRATO 
+                ON FE_DOCUMENTO.ID_DOCUMENTO = CONTRATO.COD_DOCUMENTO_CTBLE
+            INNER JOIN CMP.REFERENCIA_ASOC 
+                ON COD_TABLA = CONTRATO.COD_DOCUMENTO_CTBLE 
+                AND REFERENCIA_ASOC.COD_ESTADO = 1
+            INNER JOIN CMP.DOCUMENTO_CTBLE 
+                ON COD_TABLA_ASOC = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE 
+                AND CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_DOC IN ('TDO0000000000001','TDO0000000000002')
+            INNER JOIN CMP.HABILITACION 
+                ON CMP.HABILITACION.COD_DOCUMENTO_CTBLE = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE 
+                AND NOM_PRODUCTO = 'COMPRA'
+            WHERE FE_DOCUMENTO.OPERACION = 'CONTRATO'
+            AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
+            AND CMP.HABILITACION.CAN_CAPITAL_SALDO <> CONTRATO.CAN_TOTAL
+            AND ABS(CMP.HABILITACION.CAN_CAPITAL_SALDO - CONTRATO.CAN_TOTAL) <= 0.1
+            AND CMP.HABILITACION.FEC_HABILITACION >= DATEADD(MONTH, -2, GETDATE())
+        ");
 
 
         $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
@@ -643,126 +646,129 @@ trait ComprobanteTraits
 
         //UPDATE DE CENTIMOS MASIVOS
 
-        // DB::update("
-        //     UPDATE CMP.DOCUMENTO_CTBLE
-        //     SET CMP.DOCUMENTO_CTBLE.CAN_TOTAL = FE_DOCUMENTO.TOTAL_VENTA_ORIG
-        //     FROM FE_DOCUMENTO
-        //     INNER JOIN (
-        //         SELECT FE_DOCUMENTO.ID_DOCUMENTO, DIP.COD_TABLA_ASOC
-        //         FROM FE_DOCUMENTO
-        //         INNER JOIN FE_REF_ASOC 
-        //             ON FE_DOCUMENTO.ID_DOCUMENTO = FE_REF_ASOC.LOTE 
-        //             AND FE_DOCUMENTO.OPERACION = FE_REF_ASOC.OPERACION
-        //         INNER JOIN CMP.REFERENCIA_ASOC DIP 
-        //             ON DIP.COD_TABLA = FE_REF_ASOC.ID_DOCUMENTO 
-        //             AND DIP.COD_ESTADO = 1 
-        //             AND DIP.TXT_TABLA_ASOC = 'CMP.DOCUMENTO_CTBLE'
-        //         WHERE FE_DOCUMENTO.OPERACION IN (
-        //             'DOCUMENTO_INTERNO_SECADO',
-        //             'DOCUMENTO_INTERNO_PRODUCCION',
-        //             'DOCUMENTO_SERVICIO_BALANZA',
-        //             'ESTIBA'
-        //         )
-        //         AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
-        //         GROUP BY FE_DOCUMENTO.ID_DOCUMENTO, DIP.COD_TABLA_ASOC
-        //     ) REF 
-        //         ON REF.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
-        //     INNER JOIN CMP.DOCUMENTO_CTBLE 
-        //         ON REF.COD_TABLA_ASOC = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE
-        //     INNER JOIN CMP.HABILITACION 
-        //         ON CMP.HABILITACION.COD_DOCUMENTO_CTBLE = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE 
-        //         AND NOM_PRODUCTO = 'COMPRA'
-        //     WHERE FE_DOCUMENTO.OPERACION IN (
-        //         'DOCUMENTO_INTERNO_SECADO',
-        //         'DOCUMENTO_INTERNO_PRODUCCION',
-        //         'DOCUMENTO_SERVICIO_BALANZA',
-        //         'ESTIBA'
-        //     )
-        //     AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
-        //     AND CMP.DOCUMENTO_CTBLE.CAN_TOTAL <> FE_DOCUMENTO.TOTAL_VENTA_ORIG
-        //     AND ABS(CMP.DOCUMENTO_CTBLE.CAN_TOTAL - FE_DOCUMENTO.TOTAL_VENTA_ORIG) <= 0.1
-        // ");
+        DB::update("
+            UPDATE CMP.DOCUMENTO_CTBLE
+            SET CMP.DOCUMENTO_CTBLE.CAN_TOTAL = FE_DOCUMENTO.TOTAL_VENTA_ORIG
+            FROM FE_DOCUMENTO
+            INNER JOIN (
+                SELECT FE_DOCUMENTO.ID_DOCUMENTO, DIP.COD_TABLA_ASOC
+                FROM FE_DOCUMENTO
+                INNER JOIN FE_REF_ASOC 
+                    ON FE_DOCUMENTO.ID_DOCUMENTO = FE_REF_ASOC.LOTE 
+                    AND FE_DOCUMENTO.OPERACION = FE_REF_ASOC.OPERACION
+                INNER JOIN CMP.REFERENCIA_ASOC DIP 
+                    ON DIP.COD_TABLA = FE_REF_ASOC.ID_DOCUMENTO 
+                    AND DIP.COD_ESTADO = 1 
+                    AND DIP.TXT_TABLA_ASOC = 'CMP.DOCUMENTO_CTBLE'
+                WHERE FE_DOCUMENTO.OPERACION IN (
+                    'DOCUMENTO_INTERNO_SECADO',
+                    'DOCUMENTO_INTERNO_PRODUCCION',
+                    'DOCUMENTO_SERVICIO_BALANZA',
+                    'ESTIBA'
+                )
+                AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
+                GROUP BY FE_DOCUMENTO.ID_DOCUMENTO, DIP.COD_TABLA_ASOC
+            ) REF 
+                ON REF.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+            INNER JOIN CMP.DOCUMENTO_CTBLE 
+                ON REF.COD_TABLA_ASOC = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE
+            INNER JOIN CMP.HABILITACION 
+                ON CMP.HABILITACION.COD_DOCUMENTO_CTBLE = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE 
+                AND NOM_PRODUCTO = 'COMPRA'
+            WHERE FE_DOCUMENTO.OPERACION IN (
+                'DOCUMENTO_INTERNO_SECADO',
+                'DOCUMENTO_INTERNO_PRODUCCION',
+                'DOCUMENTO_SERVICIO_BALANZA',
+                'ESTIBA'
+            )
+            AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
+            AND CMP.DOCUMENTO_CTBLE.CAN_TOTAL <> FE_DOCUMENTO.TOTAL_VENTA_ORIG
+            AND ABS(CMP.DOCUMENTO_CTBLE.CAN_TOTAL - FE_DOCUMENTO.TOTAL_VENTA_ORIG) <= 0.1
+            AND CMP.HABILITACION.FEC_HABILITACION >= DATEADD(MONTH, -2, GETDATE())
+        ");
 
 
-        // DB::update("
-        //     UPDATE CMP.HABILITACION
-        //     SET CMP.HABILITACION.CAN_IMPORTE = FE_DOCUMENTO.TOTAL_VENTA_ORIG
-        //     FROM FE_DOCUMENTO
-        //     INNER JOIN (
-        //         SELECT FE_DOCUMENTO.ID_DOCUMENTO, DIP.COD_TABLA_ASOC
-        //         FROM FE_DOCUMENTO
-        //         INNER JOIN FE_REF_ASOC 
-        //             ON FE_DOCUMENTO.ID_DOCUMENTO = FE_REF_ASOC.LOTE 
-        //             AND FE_DOCUMENTO.OPERACION = FE_REF_ASOC.OPERACION
-        //         INNER JOIN CMP.REFERENCIA_ASOC DIP 
-        //             ON DIP.COD_TABLA = FE_REF_ASOC.ID_DOCUMENTO 
-        //             AND DIP.COD_ESTADO = 1 
-        //             AND DIP.TXT_TABLA_ASOC = 'CMP.DOCUMENTO_CTBLE'
-        //         WHERE FE_DOCUMENTO.OPERACION IN (
-        //             'DOCUMENTO_INTERNO_SECADO',
-        //             'DOCUMENTO_INTERNO_PRODUCCION',
-        //             'DOCUMENTO_SERVICIO_BALANZA',
-        //             'ESTIBA'
-        //         )
-        //         AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
-        //         GROUP BY FE_DOCUMENTO.ID_DOCUMENTO, DIP.COD_TABLA_ASOC
-        //     ) REF 
-        //         ON REF.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
-        //     INNER JOIN CMP.DOCUMENTO_CTBLE 
-        //         ON REF.COD_TABLA_ASOC = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE
-        //     INNER JOIN CMP.HABILITACION 
-        //         ON CMP.HABILITACION.COD_DOCUMENTO_CTBLE = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE 
-        //         AND NOM_PRODUCTO = 'COMPRA'
-        //     WHERE FE_DOCUMENTO.OPERACION IN (
-        //         'DOCUMENTO_INTERNO_SECADO',
-        //         'DOCUMENTO_INTERNO_PRODUCCION',
-        //         'DOCUMENTO_SERVICIO_BALANZA',
-        //         'ESTIBA'
-        //     )
-        //     AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
-        //     AND CMP.HABILITACION.CAN_IMPORTE <> FE_DOCUMENTO.TOTAL_VENTA_ORIG
-        //     AND ABS(CMP.HABILITACION.CAN_IMPORTE - FE_DOCUMENTO.TOTAL_VENTA_ORIG) <= 0.1
-        // ");
+        DB::update("
+            UPDATE CMP.HABILITACION
+            SET CMP.HABILITACION.CAN_IMPORTE = FE_DOCUMENTO.TOTAL_VENTA_ORIG
+            FROM FE_DOCUMENTO
+            INNER JOIN (
+                SELECT FE_DOCUMENTO.ID_DOCUMENTO, DIP.COD_TABLA_ASOC
+                FROM FE_DOCUMENTO
+                INNER JOIN FE_REF_ASOC 
+                    ON FE_DOCUMENTO.ID_DOCUMENTO = FE_REF_ASOC.LOTE 
+                    AND FE_DOCUMENTO.OPERACION = FE_REF_ASOC.OPERACION
+                INNER JOIN CMP.REFERENCIA_ASOC DIP 
+                    ON DIP.COD_TABLA = FE_REF_ASOC.ID_DOCUMENTO 
+                    AND DIP.COD_ESTADO = 1 
+                    AND DIP.TXT_TABLA_ASOC = 'CMP.DOCUMENTO_CTBLE'
+                WHERE FE_DOCUMENTO.OPERACION IN (
+                    'DOCUMENTO_INTERNO_SECADO',
+                    'DOCUMENTO_INTERNO_PRODUCCION',
+                    'DOCUMENTO_SERVICIO_BALANZA',
+                    'ESTIBA'
+                )
+                AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
+                GROUP BY FE_DOCUMENTO.ID_DOCUMENTO, DIP.COD_TABLA_ASOC
+            ) REF 
+                ON REF.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+            INNER JOIN CMP.DOCUMENTO_CTBLE 
+                ON REF.COD_TABLA_ASOC = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE
+            INNER JOIN CMP.HABILITACION 
+                ON CMP.HABILITACION.COD_DOCUMENTO_CTBLE = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE 
+                AND NOM_PRODUCTO = 'COMPRA'
+            WHERE FE_DOCUMENTO.OPERACION IN (
+                'DOCUMENTO_INTERNO_SECADO',
+                'DOCUMENTO_INTERNO_PRODUCCION',
+                'DOCUMENTO_SERVICIO_BALANZA',
+                'ESTIBA'
+            )
+            AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
+            AND CMP.HABILITACION.CAN_IMPORTE <> FE_DOCUMENTO.TOTAL_VENTA_ORIG
+            AND ABS(CMP.HABILITACION.CAN_IMPORTE - FE_DOCUMENTO.TOTAL_VENTA_ORIG) <= 0.1
+            AND CMP.HABILITACION.FEC_HABILITACION >= DATEADD(MONTH, -2, GETDATE())
+        ");
 
-        // DB::update("
-        //     UPDATE CMP.HABILITACION
-        //     SET CMP.HABILITACION.CAN_CAPITAL_SALDO = FE_DOCUMENTO.TOTAL_VENTA_ORIG
-        //     FROM FE_DOCUMENTO
-        //     INNER JOIN (
-        //         SELECT FE_DOCUMENTO.ID_DOCUMENTO, DIP.COD_TABLA_ASOC
-        //         FROM FE_DOCUMENTO
-        //         INNER JOIN FE_REF_ASOC 
-        //             ON FE_DOCUMENTO.ID_DOCUMENTO = FE_REF_ASOC.LOTE 
-        //             AND FE_DOCUMENTO.OPERACION = FE_REF_ASOC.OPERACION
-        //         INNER JOIN CMP.REFERENCIA_ASOC DIP 
-        //             ON DIP.COD_TABLA = FE_REF_ASOC.ID_DOCUMENTO 
-        //             AND DIP.COD_ESTADO = 1 
-        //             AND DIP.TXT_TABLA_ASOC = 'CMP.DOCUMENTO_CTBLE'
-        //         WHERE FE_DOCUMENTO.OPERACION IN (
-        //             'DOCUMENTO_INTERNO_SECADO',
-        //             'DOCUMENTO_INTERNO_PRODUCCION',
-        //             'DOCUMENTO_SERVICIO_BALANZA',
-        //             'ESTIBA'
-        //         )
-        //         AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
-        //         GROUP BY FE_DOCUMENTO.ID_DOCUMENTO, DIP.COD_TABLA_ASOC
-        //     ) REF 
-        //         ON REF.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
-        //     INNER JOIN CMP.DOCUMENTO_CTBLE 
-        //         ON REF.COD_TABLA_ASOC = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE
-        //     INNER JOIN CMP.HABILITACION 
-        //         ON CMP.HABILITACION.COD_DOCUMENTO_CTBLE = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE 
-        //         AND NOM_PRODUCTO = 'COMPRA'
-        //     WHERE FE_DOCUMENTO.OPERACION IN (
-        //         'DOCUMENTO_INTERNO_SECADO',
-        //         'DOCUMENTO_INTERNO_PRODUCCION',
-        //         'DOCUMENTO_SERVICIO_BALANZA',
-        //         'ESTIBA'
-        //     )
-        //     AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
-        //     AND CMP.HABILITACION.CAN_CAPITAL_SALDO <> FE_DOCUMENTO.TOTAL_VENTA_ORIG
-        //     AND ABS(CMP.HABILITACION.CAN_CAPITAL_SALDO - FE_DOCUMENTO.TOTAL_VENTA_ORIG) <= 0.1
-        // ");
+        DB::update("
+            UPDATE CMP.HABILITACION
+            SET CMP.HABILITACION.CAN_CAPITAL_SALDO = FE_DOCUMENTO.TOTAL_VENTA_ORIG
+            FROM FE_DOCUMENTO
+            INNER JOIN (
+                SELECT FE_DOCUMENTO.ID_DOCUMENTO, DIP.COD_TABLA_ASOC
+                FROM FE_DOCUMENTO
+                INNER JOIN FE_REF_ASOC 
+                    ON FE_DOCUMENTO.ID_DOCUMENTO = FE_REF_ASOC.LOTE 
+                    AND FE_DOCUMENTO.OPERACION = FE_REF_ASOC.OPERACION
+                INNER JOIN CMP.REFERENCIA_ASOC DIP 
+                    ON DIP.COD_TABLA = FE_REF_ASOC.ID_DOCUMENTO 
+                    AND DIP.COD_ESTADO = 1 
+                    AND DIP.TXT_TABLA_ASOC = 'CMP.DOCUMENTO_CTBLE'
+                WHERE FE_DOCUMENTO.OPERACION IN (
+                    'DOCUMENTO_INTERNO_SECADO',
+                    'DOCUMENTO_INTERNO_PRODUCCION',
+                    'DOCUMENTO_SERVICIO_BALANZA',
+                    'ESTIBA'
+                )
+                AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
+                GROUP BY FE_DOCUMENTO.ID_DOCUMENTO, DIP.COD_TABLA_ASOC
+            ) REF 
+                ON REF.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+            INNER JOIN CMP.DOCUMENTO_CTBLE 
+                ON REF.COD_TABLA_ASOC = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE
+            INNER JOIN CMP.HABILITACION 
+                ON CMP.HABILITACION.COD_DOCUMENTO_CTBLE = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE 
+                AND NOM_PRODUCTO = 'COMPRA'
+            WHERE FE_DOCUMENTO.OPERACION IN (
+                'DOCUMENTO_INTERNO_SECADO',
+                'DOCUMENTO_INTERNO_PRODUCCION',
+                'DOCUMENTO_SERVICIO_BALANZA',
+                'ESTIBA'
+            )
+            AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
+            AND CMP.HABILITACION.CAN_CAPITAL_SALDO <> FE_DOCUMENTO.TOTAL_VENTA_ORIG
+            AND ABS(CMP.HABILITACION.CAN_CAPITAL_SALDO - FE_DOCUMENTO.TOTAL_VENTA_ORIG) <= 0.1
+            AND CMP.HABILITACION.FEC_HABILITACION >= DATEADD(MONTH, -2, GETDATE())
+        ");
 
 
         $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
@@ -6209,57 +6215,63 @@ trait ComprobanteTraits
     private function con_lista_cabecera_comprobante_entregable($cliente_id,$fecha_inicio,$fecha_fin,$empresa_id,$centro_id,$area_id,$banco_id,$moneda_id) {
 
         $fecha_corte            =   date('Ymd');
+
+
+
         //UPDATE DE CENTIMOS ORDEN DE COMPRAS
-        // DB::update("
-        //     UPDATE CMP.DOCUMENTO_CTBLE
-        //     SET CMP.DOCUMENTO_CTBLE.CAN_TOTAL = CMP.ORDEN.CAN_TOTAL
-        //     FROM FE_DOCUMENTO 
-        //     INNER JOIN CMP.ORDEN ON FE_DOCUMENTO.ID_DOCUMENTO = CMP.ORDEN.COD_ORDEN
-        //     INNER JOIN CMP.REFERENCIA_ASOC ON COD_TABLA = COD_ORDEN AND REFERENCIA_ASOC.COD_ESTADO = 1
-        //     INNER JOIN CMP.DOCUMENTO_CTBLE ON COD_TABLA_ASOC = COD_DOCUMENTO_CTBLE AND COD_CATEGORIA_TIPO_DOC IN ('TDO0000000000001','TDO0000000000002')
-        //     INNER JOIN CMP.HABILITACION ON CMP.HABILITACION.COD_DOCUMENTO_CTBLE = DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE AND NOM_PRODUCTO = 'COMPRA'
-        //     WHERE FE_DOCUMENTO.OPERACION = 'ORDEN_COMPRA'
-        //     AND FE_DOCUMENTO.COD_ESTADO NOT IN ('', 'ETM0000000000006')
-        //     AND CMP.DOCUMENTO_CTBLE.CAN_TOTAL <> CMP.ORDEN.CAN_TOTAL 
-        //     AND ABS(CMP.DOCUMENTO_CTBLE.CAN_TOTAL - CMP.ORDEN.CAN_TOTAL) <= 0.1
-        // ");
+        DB::update("
+            UPDATE CMP.DOCUMENTO_CTBLE
+            SET CMP.DOCUMENTO_CTBLE.CAN_TOTAL = CMP.ORDEN.CAN_TOTAL
+            FROM FE_DOCUMENTO 
+            INNER JOIN CMP.ORDEN ON FE_DOCUMENTO.ID_DOCUMENTO = CMP.ORDEN.COD_ORDEN
+            INNER JOIN CMP.REFERENCIA_ASOC ON COD_TABLA = COD_ORDEN AND REFERENCIA_ASOC.COD_ESTADO = 1
+            INNER JOIN CMP.DOCUMENTO_CTBLE ON COD_TABLA_ASOC = COD_DOCUMENTO_CTBLE AND COD_CATEGORIA_TIPO_DOC IN ('TDO0000000000001','TDO0000000000002')
+            INNER JOIN CMP.HABILITACION ON CMP.HABILITACION.COD_DOCUMENTO_CTBLE = DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE AND NOM_PRODUCTO = 'COMPRA'
+            WHERE FE_DOCUMENTO.OPERACION = 'ORDEN_COMPRA'
+            AND FE_DOCUMENTO.COD_ESTADO NOT IN ('', 'ETM0000000000006')
+            AND CMP.DOCUMENTO_CTBLE.CAN_TOTAL <> CMP.ORDEN.CAN_TOTAL 
+            AND ABS(CMP.DOCUMENTO_CTBLE.CAN_TOTAL - CMP.ORDEN.CAN_TOTAL) <= 0.1
+            AND CMP.HABILITACION.FEC_HABILITACION >= DATEADD(MONTH, -2, GETDATE())
+        ");
 
-        // DB::update("
-        //     UPDATE CMP.HABILITACION
-        //     SET CMP.HABILITACION.CAN_IMPORTE = CMP.ORDEN.CAN_TOTAL
-        //     FROM FE_DOCUMENTO 
-        //     INNER JOIN CMP.ORDEN ON FE_DOCUMENTO.ID_DOCUMENTO = CMP.ORDEN.COD_ORDEN
-        //     INNER JOIN CMP.REFERENCIA_ASOC ON COD_TABLA = COD_ORDEN AND REFERENCIA_ASOC.COD_ESTADO = 1
-        //     INNER JOIN CMP.DOCUMENTO_CTBLE ON COD_TABLA_ASOC = COD_DOCUMENTO_CTBLE 
-        //         AND COD_CATEGORIA_TIPO_DOC IN ('TDO0000000000001', 'TDO0000000000002')
-        //     INNER JOIN CMP.HABILITACION ON CMP.HABILITACION.COD_DOCUMENTO_CTBLE = DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE 
-        //         AND NOM_PRODUCTO = 'COMPRA'
-        //     WHERE FE_DOCUMENTO.OPERACION = 'ORDEN_COMPRA'
-        //     AND FE_DOCUMENTO.COD_ESTADO NOT IN ('', 'ETM0000000000006')
-        //     AND CMP.HABILITACION.CAN_IMPORTE <> CMP.ORDEN.CAN_TOTAL
-        //     AND ABS(CMP.HABILITACION.CAN_IMPORTE - CMP.ORDEN.CAN_TOTAL) <= 0.1
-        // ");
+        DB::update("
+            UPDATE CMP.HABILITACION
+            SET CMP.HABILITACION.CAN_IMPORTE = CMP.ORDEN.CAN_TOTAL
+            FROM FE_DOCUMENTO 
+            INNER JOIN CMP.ORDEN ON FE_DOCUMENTO.ID_DOCUMENTO = CMP.ORDEN.COD_ORDEN
+            INNER JOIN CMP.REFERENCIA_ASOC ON COD_TABLA = COD_ORDEN AND REFERENCIA_ASOC.COD_ESTADO = 1
+            INNER JOIN CMP.DOCUMENTO_CTBLE ON COD_TABLA_ASOC = COD_DOCUMENTO_CTBLE 
+                AND COD_CATEGORIA_TIPO_DOC IN ('TDO0000000000001', 'TDO0000000000002')
+            INNER JOIN CMP.HABILITACION ON CMP.HABILITACION.COD_DOCUMENTO_CTBLE = DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE 
+                AND NOM_PRODUCTO = 'COMPRA'
+            WHERE FE_DOCUMENTO.OPERACION = 'ORDEN_COMPRA'
+            AND FE_DOCUMENTO.COD_ESTADO NOT IN ('', 'ETM0000000000006')
+            AND CMP.HABILITACION.CAN_IMPORTE <> CMP.ORDEN.CAN_TOTAL
+            AND ABS(CMP.HABILITACION.CAN_IMPORTE - CMP.ORDEN.CAN_TOTAL) <= 0.1
+            AND CMP.HABILITACION.FEC_HABILITACION >= DATEADD(MONTH, -2, GETDATE())
+        ");
 
-        // DB::update("
-        //     UPDATE CMP.HABILITACION
-        //     SET CMP.HABILITACION.CAN_CAPITAL_SALDO = CMP.ORDEN.CAN_TOTAL
-        //     FROM FE_DOCUMENTO 
-        //     INNER JOIN CMP.ORDEN 
-        //         ON FE_DOCUMENTO.ID_DOCUMENTO = CMP.ORDEN.COD_ORDEN
-        //     INNER JOIN CMP.REFERENCIA_ASOC 
-        //         ON COD_TABLA = COD_ORDEN 
-        //         AND REFERENCIA_ASOC.COD_ESTADO = 1
-        //     INNER JOIN CMP.DOCUMENTO_CTBLE 
-        //         ON COD_TABLA_ASOC = COD_DOCUMENTO_CTBLE 
-        //         AND COD_CATEGORIA_TIPO_DOC IN ('TDO0000000000001','TDO0000000000002')
-        //     INNER JOIN CMP.HABILITACION 
-        //         ON CMP.HABILITACION.COD_DOCUMENTO_CTBLE = DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE 
-        //         AND NOM_PRODUCTO = 'COMPRA'
-        //     WHERE FE_DOCUMENTO.OPERACION = 'ORDEN_COMPRA'
-        //     AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
-        //     AND CMP.HABILITACION.CAN_CAPITAL_SALDO <> CMP.ORDEN.CAN_TOTAL
-        //     AND ABS(CMP.HABILITACION.CAN_CAPITAL_SALDO - CMP.ORDEN.CAN_TOTAL) <= 0.1
-        // ");
+        DB::update("
+            UPDATE CMP.HABILITACION
+            SET CMP.HABILITACION.CAN_CAPITAL_SALDO = CMP.ORDEN.CAN_TOTAL
+            FROM FE_DOCUMENTO 
+            INNER JOIN CMP.ORDEN 
+                ON FE_DOCUMENTO.ID_DOCUMENTO = CMP.ORDEN.COD_ORDEN
+            INNER JOIN CMP.REFERENCIA_ASOC 
+                ON COD_TABLA = COD_ORDEN 
+                AND REFERENCIA_ASOC.COD_ESTADO = 1
+            INNER JOIN CMP.DOCUMENTO_CTBLE 
+                ON COD_TABLA_ASOC = COD_DOCUMENTO_CTBLE 
+                AND COD_CATEGORIA_TIPO_DOC IN ('TDO0000000000001','TDO0000000000002')
+            INNER JOIN CMP.HABILITACION 
+                ON CMP.HABILITACION.COD_DOCUMENTO_CTBLE = DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE 
+                AND NOM_PRODUCTO = 'COMPRA'
+            WHERE FE_DOCUMENTO.OPERACION = 'ORDEN_COMPRA'
+            AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
+            AND CMP.HABILITACION.CAN_CAPITAL_SALDO <> CMP.ORDEN.CAN_TOTAL
+            AND ABS(CMP.HABILITACION.CAN_CAPITAL_SALDO - CMP.ORDEN.CAN_TOTAL) <= 0.1
+            AND CMP.HABILITACION.FEC_HABILITACION >= DATEADD(MONTH, -2, GETDATE())
+        ");
 
 
         //UPDATE PARA EL ANTICIPO
@@ -6381,57 +6393,56 @@ trait ComprobanteTraits
         
 
         // //dd($documentosdetraccion);
-        // foreach($documentosdetraccion as $index => $item){
+        foreach($documentosdetraccion as $index => $item){
 
-        //     $retencionigv = (float)($item->TOTAL_VENTA_ORIG-$item->MONTO_NC)*(3/100);
-        //     //FE_DOCUMENTO
-        //     FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
-        //                 ->update(
-        //                     [
-        //                         'MONTO_RETENCION'=>$retencionigv
-        //                     ]
-        //                 );
-        //     //OC
-        //     CMPOrden::where('COD_ORDEN','=',$item->ID_DOCUMENTO)
-        //                 ->update(
-        //                     [
-        //                         'CAN_RETENCION'=>$retencionigv,
-        //                         'CAN_NETO_PAGAR' => \DB::raw('CAN_TOTAL - ' . $retencionigv)
-        //                     ]
-        //                 );
+            $retencionigv = (float)($item->TOTAL_VENTA_ORIG-$item->MONTO_NC)*(3/100);
+            //FE_DOCUMENTO
+            FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
+                        ->update(
+                            [
+                                'MONTO_RETENCION'=>$retencionigv
+                            ]
+                        );
+            //OC
+            CMPOrden::where('COD_ORDEN','=',$item->ID_DOCUMENTO)
+                        ->update(
+                            [
+                                'CAN_RETENCION'=>$retencionigv,
+                                'CAN_NETO_PAGAR' => \DB::raw('CAN_TOTAL - ' . $retencionigv)
+                            ]
+                        );
 
 
+            $documento02      =     DB::table('CMP.DOCUMENTO_CTBLE')
+                                    ->join('CMP.REFERENCIA_ASOC', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+                                    ->select(DB::raw('CMP.DOCUMENTO_CTBLE.*'))
+                                    ->where('CMP.DOCUMENTO_CTBLE.COD_ESTADO','=','1')
+                                    ->where('CMP.REFERENCIA_ASOC.COD_ESTADO','=','1')
+                                    ->where('CMP.REFERENCIA_ASOC.COD_TABLA','=',$item->ID_DOCUMENTO)
+                                    ->whereIn('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_DOC', [
+                                        'TDO0000000000001',
+                                        'TDO0000000000003',
+                                        'TDO0000000000010',
+                                        'TDO0000000000002'
+                                    ])->first();
 
-        //     $documento02      =     DB::table('CMP.DOCUMENTO_CTBLE')
-        //                             ->join('CMP.REFERENCIA_ASOC', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
-        //                             ->select(DB::raw('CMP.DOCUMENTO_CTBLE.*'))
-        //                             ->where('CMP.DOCUMENTO_CTBLE.COD_ESTADO','=','1')
-        //                             ->where('CMP.REFERENCIA_ASOC.COD_ESTADO','=','1')
-        //                             ->where('CMP.REFERENCIA_ASOC.COD_TABLA','=',$item->ID_DOCUMENTO)
-        //                             ->whereIn('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_DOC', [
-        //                                 'TDO0000000000001',
-        //                                 'TDO0000000000003',
-        //                                 'TDO0000000000010',
-        //                                 'TDO0000000000002'
-        //                             ])->first();
-
-        //     if(count($documento02)>0){
-        //         CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$documento02->COD_DOCUMENTO_CTBLE)
-        //                     ->update(
-        //                         [
-        //                             'CAN_RETENCION'=>$retencionigv,
-        //                             'CAN_DCTO'=>3
-        //                         ]
-        //                     );
-        //         CONRegistroCompras::where('COD_DOCUMENTO_CTBLE','=',$documento02->COD_DOCUMENTO_CTBLE)
-        //                     ->update(
-        //                         [
-        //                             'CAN_RETENCION_MONTO'=>$retencionigv,
-        //                             'CAN_RETENCION_PORCENTAJE'=>3
-        //                         ]
-        //                     );
-        //     }
-        // }
+            if(count($documento02)>0){
+                CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$documento02->COD_DOCUMENTO_CTBLE)
+                            ->update(
+                                [
+                                    'CAN_RETENCION'=>$retencionigv,
+                                    'CAN_DCTO'=>3
+                                ]
+                            );
+                CONRegistroCompras::where('COD_DOCUMENTO_CTBLE','=',$documento02->COD_DOCUMENTO_CTBLE)
+                            ->update(
+                                [
+                                    'CAN_RETENCION_MONTO'=>$retencionigv,
+                                    'CAN_RETENCION_PORCENTAJE'=>3
+                                ]
+                            );
+            }
+        }
 
         ////////////////////////////////////
 
