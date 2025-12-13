@@ -3059,6 +3059,28 @@ $(document).ready(function () {
 
     });
 
+
+    $('.btnaprobarcomporbatntereparable').on('click', function (event) {
+        event.preventDefault();
+
+        abrircargando();
+
+        $.confirm({
+            title: '¿Confirma la Aprobacion?',
+            content: 'Aprobar el Comprobante',
+            buttons: {
+                confirmar: function () {
+                    $("#formpedidoreparable").submit();
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo Aprobacion');
+                }
+            }
+        });
+
+    });
+
+
     $('.btnaprobarcomporbatnte').on('click', function (event) {
         event.preventDefault();
 
