@@ -141,8 +141,6 @@ class ValeRendirController extends Controller
         ->where('dni', $dni)
         ->value('cadarea');
 
-        dd($areacomercial);
-
         $codlinea = DB::table('WEB.VALE_PERSONAL_AUTORIZA')
                   ->where('COD_PERSONAL', $trabajador->COD_TRAB)
                   ->value('COD_LINEA');
