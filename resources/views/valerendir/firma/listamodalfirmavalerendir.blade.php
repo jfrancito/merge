@@ -117,4 +117,17 @@
 </script>
 
 
+<script>
+let abrioPdf = false;
 
+$(document).on("click", ".btn-pdf", function () {
+    abrioPdf = true;
+});
+
+// Cuando el usuario vuelva desde el pdocSigner
+document.addEventListener("visibilitychange", function() {
+    if (!document.hidden && abrioPdf) {
+        location.reload();
+    }
+});
+</script>
