@@ -3364,6 +3364,66 @@ class GestionLiquidacionGastosController extends Controller
                                         ->first();
 
 
+                //VALIDAR QUE LOS DOCUMENTOS QUE ESTAN ASOCIANDO NO SE REPITAN ENTRE SI EN LA MISMA LIQUIDACION
+
+                $mismaliquidacion =     DB::table('LQG_DETLIQUIDACIONGASTO')
+                                        ->select('COD_EMPRESA_PROVEEDOR', 'TXT_EMPRESA_PROVEEDOR', 'SERIE', 'NUMERO', 'COD_TIPODOCUMENTO')
+                                        ->selectRaw('COUNT(COD_EMPRESA_PROVEEDOR) AS REPETIDO')
+                                        ->where('ID_DOCUMENTO', $iddocumento)
+                                        ->where('ACTIVO', 1)
+                                        ->groupBy('COD_EMPRESA_PROVEEDOR', 'TXT_EMPRESA_PROVEEDOR', 'SERIE', 'NUMERO', 'COD_TIPODOCUMENTO')
+                                        ->havingRaw('COUNT(COD_EMPRESA_PROVEEDOR) > 1')
+                                        ->get();
+
+               if (count($mismaliquidacion) > 0) {
+                    return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/0')
+                    ->with('errorbd', 'HAY DOCUMENTOS QUE ESTAN DUPLICADOS EN TU LIQUIDACION');
+                }
+
+                //VALIDAR QUE LOS DOCUMENTOS NO SE REPITAN CON OTROS INGRESADOS
+
+                $existenDuplicados = DB::table('LQG_DETLIQUIDACIONGASTO AS nuevo')
+                    ->where('nuevo.ID_DOCUMENTO', $iddocumento)
+                    ->where('nuevo.ACTIVO', 1)
+                    ->where('nuevo.COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                    ->whereExists(function ($query) use ($iddocumento) {
+                        $query->select(DB::raw(1))
+                              ->from('LQG_DETLIQUIDACIONGASTO AS existente')
+                              ->join('LQG_LIQUIDACION_GASTO', 'existente.ID_DOCUMENTO', '=', 'LQG_LIQUIDACION_GASTO.ID_DOCUMENTO')
+                              ->whereRaw('existente.COD_EMPRESA_PROVEEDOR = nuevo.COD_EMPRESA_PROVEEDOR')
+                              ->whereRaw('existente.SERIE = nuevo.SERIE')
+                              ->whereRaw('existente.NUMERO = nuevo.NUMERO')
+                              ->whereRaw('existente.COD_TIPODOCUMENTO = nuevo.COD_TIPODOCUMENTO')
+                              ->where('LQG_LIQUIDACION_GASTO.ACTIVO', 1)
+                              ->where('existente.ACTIVO', 1)
+                              ->where('LQG_LIQUIDACION_GASTO.COD_ESTADO', '!=', 'ETM0000000000006')
+                              ->where('existente.COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                              ->where('existente.ID_DOCUMENTO', '<>', $iddocumento);
+                    })
+                    ->get(); // Esto devuelve true si existe al menos uno
+                //dd($existenDuplicados);
+                if (count($existenDuplicados)>0) {
+                    return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/0')
+                    ->with('errorbd', 'No se puede registrar el documento. Existen documentos duplicados en la base de datos.');
+                }
+
+
+                //VALIDAR QUE LOS VALES NO SE REPITAN ENTRE SI 
+
+
+                $arendir    = DB::table('LQG_LIQUIDACION_GASTO')
+                                ->where('ACTIVO', 1)
+                                ->where('COD_ESTADO', '!=', 'ETM0000000000006')
+                                ->where('ARENDIR_ID', $liquidaciongastos->ARENDIR_ID)
+                                ->where('ID_DOCUMENTO', '<>', $iddocumento)
+                                ->get();
+
+                if (count($arendir)>0) {
+                    return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/0')
+                    ->with('errorbd', 'YA EXISTE ESTE CODIGO DE ARENDIR EN OTRA LIQUIDACION');
+                }
+
+
                 //VALIDAR QUE TODOS LOS DETALLES TENGAN VALOR MAYOR A CERO
 
                 $detallescero           =   DB::table('LQG_DETLIQUIDACIONGASTO')
@@ -4829,12 +4889,16 @@ class GestionLiquidacionGastosController extends Controller
          
             if (count($terceros) > 0) {
                 $area_planilla = $terceros->TXT_AREA;
+                //dd($area_planilla);
+
                 $centrocosto = DB::table('CON.CENTRO_COSTO')
                     ->where('COD_ESTADO', 1)
                     ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
-                    ->where('COD_CENTRO_COSTO', '=', $terceros->COD_AREA)
-                    ->where('IND_MOVIMIENTO', 1)->first();
-                    $combo_costo = $this->lg_combo_costo_xtrabajador_tercero("Seleccione Costo", $terceros->COD_AREA);
+                    ->where('TXT_NOMBRE', '=', $area_planilla)
+                    ->where('IND_MOVIMIENTO', 1)
+                    ->first();
+
+                    $combo_costo = $this->lg_combo_costo_xtrabajador_tercero_nombre("Seleccione Costo", $area_planilla);
 
 
             }else{
@@ -4908,12 +4972,22 @@ class GestionLiquidacionGastosController extends Controller
          
             if (count($terceros) > 0) {
                 $area_planilla = $terceros->TXT_AREA;
+                // $centrocosto = DB::table('CON.CENTRO_COSTO')
+                //     ->where('COD_ESTADO', 1)
+                //     ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
+                //     ->where('COD_CENTRO_COSTO', '=', $terceros->COD_AREA)
+                //     ->where('IND_MOVIMIENTO', 1)->first();
+                //     $combo_costo = $this->lg_combo_costo_xtrabajador_tercero("Seleccione Costo", $terceros->COD_AREA);
+
                 $centrocosto = DB::table('CON.CENTRO_COSTO')
                     ->where('COD_ESTADO', 1)
                     ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
-                    ->where('COD_CENTRO_COSTO', '=', $terceros->COD_AREA)
-                    ->where('IND_MOVIMIENTO', 1)->first();
-                    $combo_costo = $this->lg_combo_costo_xtrabajador_tercero("Seleccione Costo", $terceros->COD_AREA);
+                    ->where('TXT_NOMBRE', '=', $area_planilla)
+                    ->where('IND_MOVIMIENTO', 1)
+                    ->first();
+
+                    $combo_costo = $this->lg_combo_costo_xtrabajador_tercero_nombre("Seleccione Costo", $area_planilla);
+
 
 
             }else{

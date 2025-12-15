@@ -2386,7 +2386,7 @@ $(document).ready(function () {
         let totallg = $(this).find('td').eq(6).text().trim();
         $('#total_xml').val(totallg);
 
-        if (data_valor_id === '1') {
+        if (data_valor_id === '1' && data_asiento_cabecera !== '') {
             $('#asiento_cabecera_compra').val(data_asiento_cabecera);
             $('#asiento_detalle_compra').val(data_asiento_detalle);
 

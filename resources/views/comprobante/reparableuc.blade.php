@@ -27,7 +27,7 @@
                         <div class="panel panel-default panel-border-color panel-border-color-primary">
                           <div class="panel-heading panel-heading-divider">Aprobar Comprobante Reparable<span class="panel-subtitle">Aprobar un Comprobante Contabilidad</span></div>
                           <div class="panel-body">
-                            <form method="POST" id='formpedido' action="{{ url('/aprobar-comprobante-contabilidad-reparable/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
+                            <form method="POST" id='formpedidoreparable' action="{{ url('/aprobar-comprobante-contabilidad-reparable/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
                                   {{ csrf_field() }}
                               @include('comprobante.form.formaprobarcontreparable')
                               <div class="row xs-pt-15">
@@ -38,7 +38,7 @@
                                 <div class="col-xs-6">
                                   <p class="text-right">
                                     <a href="{{ url('/gestion-de-comprobantes-reparable/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
-                                    <button type="button"  class="btn btn-space btn-primary btnaprobarcomporbatnte">Guardar</button>
+                                    <button type="button"  class="btn btn-space btn-primary btnaprobarcomporbatntereparable">Guardar</button>
                                   </p>
                                 </div>
                               </div>

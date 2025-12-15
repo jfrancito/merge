@@ -213,20 +213,17 @@ class GestionEstibaController extends Controller
                 if($rutaorden!=''){
 
                     $aoc                            =       CMPDocAsociarCompra::where('COD_ORDEN','=',$idoc)->where('COD_ESTADO','=',1)
-                                                            ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000026'])//cambiar
+                                                            ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000001'])
                                                             ->first();
-
-                    //$contadorArchivos = Archivo::count();
-                    $contadorArchivos               =       Archivo::count();
-
-                    $nombrefilecdr                  =       $contadorArchivos.'-'.$idoc.'.pdf';//cambiar
+                    $contadorArchivos = Archivo::count();
+                    $nombrefilecdr                  =       $contadorArchivos.'-'.$idoc.'.pdf';
                     $prefijocarperta                =       $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
                     $rutafile                       =       $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$lote;//cambiar
                     $rutacompleta                   =       $rutafile.'\\'.$nombrefilecdr;
                     $valor                          =       $this->versicarpetanoexiste($rutafile);
                     $path                           =       $rutacompleta;
-
-
+                    //$directorio                     =       '\\\\10.1.0.201\cpe\Orden_Compra';
+                    //$rutafila                       =       $directorio.'\\'.$nombreArchivoBuscado;
                     copy($rutaorden,$rutacompleta);
                     $dcontrol                       =       new Archivo;
                     $dcontrol->ID_DOCUMENTO         =       $idoc;
@@ -242,7 +239,6 @@ class GestionEstibaController extends Controller
                     $dcontrol->USUARIO_CREA         =       Session::get('usuario')->id;
                     $dcontrol->save();
                 }
-
                 //guardar orden de compra precargada
                 $rutasuspencion       =   $request['rutasuspencion'];
                 if($rutasuspencion!=''){
@@ -695,8 +691,8 @@ class GestionEstibaController extends Controller
                         'estado'            => 'APROBADO POR USUARIO CONTACTO',
                     ],
                     function ($message) {
-                        $message->from('helpdeskisl@induamerica.com.pe', 'Vituchin')
-                                ->to('german.zamora@induamerica.com.pe')                            
+                        $message->from('jessica.sandoval@induamerica.com.pe', 'Sistemas')
+                                ->to('jorge.saldana@induamerica.com.pe')                            
                                 ->subject('DOCUMENTO INTERNO COMPRA - INDUAMERICA');
                     });    
                 }                
@@ -1041,6 +1037,73 @@ class GestionEstibaController extends Controller
 
         }
 
+        $orde_cascara = DB::table('CMP.REFERENCIA_ASOC')
+            ->join('CMP.ORDEN', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC', '=', 'CMP.ORDEN.COD_ORDEN')
+            ->select('CMP.REFERENCIA_ASOC.*', 'CMP.ORDEN.*')
+            ->where('CMP.REFERENCIA_ASOC.COD_TABLA', $documento_top->COD_DOCUMENTO_CTBLE)
+            ->where('CMP.ORDEN.COD_CATEGORIA_TIPO_ORDEN', 'TOR0000000000016')
+            ->first();
+
+        $rutafila                   =   "";
+        $rutaorden                  =   "";
+
+        if(count($orde_cascara)>0){
+
+            $sourceFile = '\\\\10.1.0.201\cpe\Orden_Cascara';
+            if($documento_top->COD_CENTRO == 'CEN0000000000004' or $documento_top->COD_CENTRO == 'CEN0000000000006'){
+                if($documento_top->COD_CENTRO == 'CEN0000000000004'){
+                    $sourceFile = '\\\\10.1.7.200\\cpe\\Orden_Cascara\\'.$orde_cascara->COD_ORDEN.'.pdf';
+                }
+                if($documento_top->COD_CENTRO == 'CEN0000000000006'){
+                    $sourceFile = '\\\\10.1.9.43\\cpe\\Orden_Cascara\\'.$orde_cascara->COD_ORDEN.'.pdf';
+                }
+                $destinationFile = '\\\\10.1.0.201\\cpe\\Orden_Cascara\\'.$orde_cascara->COD_ORDEN.'.pdf';
+                // Intenta copiar el archivo
+                if (file_exists($sourceFile)){
+                    copy($sourceFile, $destinationFile);
+                }
+            }
+
+
+            $fileordencompra            =   CMPDocAsociarCompra::where('COD_ORDEN','=',$idoc)
+                                            ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000001')
+                                            ->where('COD_ESTADO','=','1')
+                                            ->first();
+
+
+            //dd($fileordencompra);
+            if(count($fileordencompra)>0){
+                $directorio = '\\\\10.1.0.201\cpe\Orden_Cascara';
+                // Nombre del archivo que estás buscando
+                $nombreArchivoBuscado = $orde_cascara->COD_ORDEN.'.pdf';
+                // Escanea el directorio
+                $archivos = scandir($directorio);
+                // Inicializa una variable para almacenar el resultado
+                $archivoEncontrado = false;
+                // Recorre la lista de archivos
+                foreach ($archivos as $archivo) {
+                    // Omite los elementos '.' y '..'
+                    if ($archivo != '.' && $archivo != '..') {
+                        // Verifica si el nombre del archivo coincide con el archivo buscado
+                        if ($archivo == $nombreArchivoBuscado) {
+                            $archivoEncontrado = true;
+                            break;
+                        }
+                    }
+                }
+                // Muestra el resultado
+                if ($archivoEncontrado) {
+                    $rutafila         =   $directorio.'\\'.$nombreArchivoBuscado;
+                    $rutaorden           =  $rutafila;
+                } 
+            }          
+
+
+        }
+
+
+
+
 
         
         return View::make('comprobante/registrocomprobanteestibaadministrator',
@@ -1051,7 +1114,7 @@ class GestionEstibaController extends Controller
                             'combopagodetraccion'   =>  $combopagodetraccion,
                             'fedocumento_x'         =>  $fedocumento_x,
                             'rutasuspencion'        =>  $rutasuspencion,
-
+                            'rutaorden'             =>  $rutaorden,
                             'empresa'               =>  $empresa,
                             'combobancos'           =>  $combobancos,
                             'documento_asociados'   =>  $documento_asociados,
@@ -1127,14 +1190,30 @@ class GestionEstibaController extends Controller
 
                         }elseif($documento_id=='DCC0000000000043'){
                             //LIQUIDACION COMPRA
+
+
+
                             $parser             =   new LiquiParser();
                             $xml                =   file_get_contents($path);
                             $factura            =   $parser->parse($xml);
                             $tipo_documento_le  =   $factura->gettipoDoc();
                             $moneda_le          =   $factura->gettipoMoneda();
                             $archivosdelfe      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000043','DCC0000000000045','DCC0000000000003','DCC0000000000001','DCC0000000000042'])
+                                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000043','DCC0000000000045','DCC0000000000003','DCC0000000000001'])
                                                     ->get();
+
+
+                            //GUARDAR EL XML
+                            $empresa_liqui        =     STDEmpresa::where('NRO_DOCUMENTO','=',$factura->getcompany()->getruc())->where('COD_ESTADO','=','1')->first();
+                            $correlativo_completo =     str_pad($factura->getcorrelativo(), 10, '0', STR_PAD_LEFT); 
+                            $nombre_xml_liqui     =     $factura->getcompany()->getruc().'-04-'.$factura->getserie().'-'.$correlativo_completo.'.xml';
+                            $destino              =     '\\\\10.1.0.201\\cpe\\Liquidacion\\'.$nombre_xml_liqui;
+                            $archivo              =     $file->getRealPath();
+                            copy($archivo,$destino);
+
+                            //dd("hola");
+
+
                         }else{
 
                             //RECIBO POR HONORARIO

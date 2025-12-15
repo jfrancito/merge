@@ -4,6 +4,13 @@
   @if($operacion_id == 'CONTRATO')
     @include('entregadocumento.ajax.alistaocentregablecontrato')
   @else
-    @include('entregadocumento.ajax.alistaocentregableestiba')
+
+      @if($operacion_id == 'LIQUIDACION_COMPRA_ANTICIPO')
+        @include('entregadocumento.ajax.alistaocentregablelqa')
+      @else
+        @include('entregadocumento.ajax.alistaocentregableestiba')
+      @endif
+
+    
   @endif
 @endif

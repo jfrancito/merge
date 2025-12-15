@@ -2080,7 +2080,7 @@ class GestionPlanillaMovilidadController extends Controller
 
 
                 // $area_id = $trabajadorespla->area_id;
-                // $mensaje_extra = '';
+                $mensaje_extra = '';
 
                 // //VENDEDOR
                 // //$area_id = 'PRMAECEN000000000172';//ELIMINAR
@@ -2111,7 +2111,7 @@ class GestionPlanillaMovilidadController extends Controller
                 $inicioPeriodo = \Carbon\Carbon::create($periodoAnio, $periodoMes, 1);
                 $finPeriodo = $inicioPeriodo->copy()->endOfMonth();
 
-                //dd($finPeriodo);
+
                 // Validar
                 if (!$fechaObj->between($inicioPeriodo, $finPeriodo)) {
                    return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd', 'La fecha NO está dentro del periodo seleccionado'); 
@@ -2125,7 +2125,11 @@ class GestionPlanillaMovilidadController extends Controller
                     ->whereDate('FECHA_GASTO', $fecha_gasto)
                     ->where('PLA_DETMOVILIDAD.USUARIO_CREA', Session::get('usuario')->id)
                     ->sum('PLA_DETMOVILIDAD.TOTAL');
+
+
                 $totaldiario =    (float)$total + $totaldia;
+                //dd($monto_validar_diario);
+
                 if($totaldiario>$monto_validar_diario){
                     return Redirect::to('modificar-planilla-movilidad/'.$idopcion.'/'.$idcab)->with('errorbd', 'Supero el maximo saldo de '.$monto_validar_diario.' soles al dia '.$mensaje_extra);
                 }
