@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<CreditNote xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:ccts="urn:un:unece:uncefact:documentation:2" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2" xmlns:qdt="urn:oasis:names:specification:ubl:schema:xsd:QualifiedDatatypes-2" xmlns:sac="urn:oasis:names:specification:ubl:schema:xsd:SignatureAggregateComponents-2" xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2">
+  <!--ext:UBLExtensions - (1) Integración de Firma de Certificado-->
+  <ext:UBLExtensions>
+    <ext:UBLExtension>
+      <ext:ExtensionContent><ds:Signature Id="SignatureSP"><SignedInfo xmlns="http://www.w3.org/2000/09/xmldsig#"><CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" /><DigestValue>M2Iu87HsVS0d8P0IU+d4T9MNkeg=</DigestValue></Reference></SignedInfo><SignatureValue xmlns="http://www.w3.org/2000/09/xmldsig#">kSlNa7rq3E/6I/T4hQ3eBAxLuVNmsAnMoxs7MFb0NqilU37BzZsqyuj1T7p0pTafammakFDWYXM+qPIjSoPApB2bXIVLpU9XowfKmlAtNBz5igyvF6PmenKkuNAk2paDmot9090ZEl4OtiA6lPRlVoqBQMvWBAUANwuVk9FihmIU9NNtt9ILLTCCNPtbRMUrosZXTtht5XHS6r4sWeSmu9ucpMQW2EYqqZvWNxbDMIIVmaZ6Xe8mK0mT/0j70c0ei1+nOI8wN87VCQqfKi2TQRXjaN6e6tA2kemmUDIfjnS54owdRs11++xuCpxKceeSdOyCvmIhc+MorcIEQ8PJvg==</SignatureValue><KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#"><X509Data><X509SubjectName>C=PE, O=INDUAMERICA SERVICIOS LOGISTICOS S.A.C., OID.2.5.4.97=20479729141, OU=Issued by AC CAMERFIRMA PERÚ SAC ER [PE1], OU=GERENCIA DE ADMINISTRACION, T=GERENTE DE ADMINISTRACION, S=LIMA - LIMA, L=VILLA EL SALVADOR, SERIALNUMBER=DNI:44420198, SN=RIOJA VALLEJOS, G=SUZZETTE JOSSIE, CN=SUZZETTE JOSSIE RIOJA VALLEJOS, E=suzzette.rioja@induamerica.com.pe</X509SubjectName><X509Certificate>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</X509Certificate></X509Data></KeyInfo></ds:Signature></ext:ExtensionContent>
+    </ext:UBLExtension>
+  </ext:UBLExtensions>
+  <!--cbc:UBLVersionID - (2) Versión UBL-->
+  <cbc:UBLVersionID>2.1</cbc:UBLVersionID>
+  <!--cbc:CustomizationID - (3) Versión de la Estructura del Documento-->
+  <cbc:CustomizationID>2.0</cbc:CustomizationID>
+  <!--cbc:ID - (6) Serie(4) y Correlativo(8) del comprobante-->
+  <cbc:ID>F006-00000165</cbc:ID>
+  <!--cbc:IssueDate - (9) Fecha de Emisión-->
+  <cbc:IssueDate>2025-11-04</cbc:IssueDate>
+  <!--cbc:IssueTime - (10) Hora de Emisión-->
+  <cbc:IssueTime>00:00:00</cbc:IssueTime>
+  <!--cbc:Note - (13) Monto de Letras o agregar otros tipo de leyenda según catálogo 52-->
+  <cbc:Note languageLocaleID="1000">TRES MIL CINCUENTA Y CUATRO CON 00/100</cbc:Note>
+  <!--cbc:DocumentCurrencyCode - (14) Moneda según Catálogo 2-->
+  <cbc:DocumentCurrencyCode listID="ISO 4217 Alpha" listName="Currency" listAgencyID="United Nations Economic Commission for Europe">PEN</cbc:DocumentCurrencyCode>
+  <!--cac:DiscrepancyResponse - (24) Descripción del Comprobante Afectado-->
+  <cac:DiscrepancyResponse>
+    <cbc:ResponseCode>09</cbc:ResponseCode>
+    <cbc:Description>Disminución en el valor</cbc:Description>
+  </cac:DiscrepancyResponse>
+  <!--cac:OrderReference - (25) Número de Referencia-->
+  <!--cac:BillingReference - (26) Documento de Referencia - Factura o Boleta-->
+  <cac:BillingReference>
+    <cac:InvoiceDocumentReference>
+      <cbc:ID>F005-00007073</cbc:ID>
+      <cbc:DocumentTypeCode>01</cbc:DocumentTypeCode>
+    </cac:InvoiceDocumentReference>
+  </cac:BillingReference>
+  <!--cac:DespatchDocumentReference - (27) Número de Orden-->
+  <!--cac:AdditionalDocumentReference - (30) Documentos de refrencias adicionales-->
+  <!--cac:Signature - (34) Información de la Firma-->
+  <cac:Signature>
+    <cbc:ID>IDSignSP</cbc:ID>
+    <cac:SignatoryParty>
+      <cac:PartyIdentification>
+        <cbc:ID>20479729141</cbc:ID>
+      </cac:PartyIdentification>
+      <cac:PartyName>
+        <cbc:Name>INDUAMERICA SERVICIOS LOGÍSTICOS S.A.C.</cbc:Name>
+      </cac:PartyName>
+    </cac:SignatoryParty>
+    <cac:DigitalSignatureAttachment>
+      <cac:ExternalReference>
+        <cbc:URI>#SignatureSP</cbc:URI>
+      </cac:ExternalReference>
+    </cac:DigitalSignatureAttachment>
+  </cac:Signature>
+  <!--cac:AccountingSupplierParty - (35) Datos del Emisor-->
+  <cac:AccountingSupplierParty>
+    <cac:Party>
+      <cac:PartyIdentification>
+        <cbc:ID schemeID="6" schemeName="Documento de Identidad" schemeAgencyName="PE:SUNAT" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06">20479729141</cbc:ID>
+      </cac:PartyIdentification>
+      <cac:PartyName>
+        <cbc:Name>INDUAMERICA SERVICIOS LOGÍSTICOS S.A.C.</cbc:Name>
+      </cac:PartyName>
+      <cac:PartyLegalEntity>
+        <cbc:RegistrationName>INDUAMERICA SERVICIOS LOGÍSTICOS S.A.C.</cbc:RegistrationName>
+        <cac:RegistrationAddress>
+          <cbc:ID schemeAgencyName="PE:INEI" schemeName="Ubigeos">150131</cbc:ID>
+          <cbc:AddressTypeCode listAgencyName="PE:SUNAT" listName="Establecimientos anexos">0000</cbc:AddressTypeCode>
+          <cbc:CitySubdivisionName>(EDIFICIO WHITE)</cbc:CitySubdivisionName>
+          <cbc:CityName>LIMA</cbc:CityName>
+          <cbc:CountrySubentity>LIMA</cbc:CountrySubentity>
+          <cbc:District>SAN ISIDRO</cbc:District>
+          <cac:AddressLine>
+            <cbc:Line>AV. CAMINO REAL NRO. 931 INT. 201</cbc:Line>
+          </cac:AddressLine>
+          <cac:Country>
+            <cbc:IdentificationCode listID="ISO 3166-1" listAgencyName="United Nations Economic Commission for Europe" listName="Country">PE</cbc:IdentificationCode>
+          </cac:Country>
+        </cac:RegistrationAddress>
+      </cac:PartyLegalEntity>
+    </cac:Party>
+  </cac:AccountingSupplierParty>
+  <!--cac:AccountingCustomerParty - (36) Datos del Receptor-->
+  <cac:AccountingCustomerParty>
+    <cac:Party>
+      <cac:PartyIdentification>
+        <cbc:ID schemeID="6" schemeName="Documento de Identidad" schemeAgencyName="PE:SUNAT" schemeURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo06">20602740278</cbc:ID>
+      </cac:PartyIdentification>
+      <cac:PartyLegalEntity>
+        <cbc:RegistrationName>INDUAMERICA INTERNACIONAL S.A.C</cbc:RegistrationName>
+      </cac:PartyLegalEntity>
+    </cac:Party>
+  </cac:AccountingCustomerParty>
+  <!--cac:PaymentTerms - (45) Forma de pago-->
+  <!--cac:TaxTotal - (51) Sumatoria de Montos según tributos.-->
+  <cac:TaxTotal>
+    <cbc:TaxAmount currencyID="PEN">465.86</cbc:TaxAmount>
+    <cac:TaxSubtotal>
+      <cbc:TaxableAmount currencyID="PEN">2588.14</cbc:TaxableAmount>
+      <cbc:TaxAmount currencyID="PEN">465.86</cbc:TaxAmount>
+      <cac:TaxCategory>
+        <cac:TaxScheme>
+          <cbc:ID>1000</cbc:ID>
+          <cbc:Name>IGV</cbc:Name>
+          <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>
+        </cac:TaxScheme>
+      </cac:TaxCategory>
+    </cac:TaxSubtotal>
+  </cac:TaxTotal>
+  <!--cac:LegalMonetaryTotal - (53) Importe Total de Ventas de Servicios o Bienes.-->
+  <cac:LegalMonetaryTotal>
+    <cbc:AllowanceTotalAmount currencyID="PEN">0.00</cbc:AllowanceTotalAmount>
+    <cbc:ChargeTotalAmount currencyID="PEN">0.00</cbc:ChargeTotalAmount>
+    <cbc:PayableAmount currencyID="PEN">3054.00</cbc:PayableAmount>
+  </cac:LegalMonetaryTotal>
+  <!--- - - - - - - - - - - - - - - - - - - - - - - - ITEM N° 1 - - - - - - - - - - - - - - - - - - - - - - - - -->
+  <!--cac:CreditNoteLine - (54) Detalle de Comprobante (Items de Bienes o Servicios con Montos incluídos cargos y descuentos).-->
+  <cac:CreditNoteLine>
+    <!--cbc:ID - (54.1) Número de Linea-->
+    <cbc:ID>1</cbc:ID>
+    <!--cbc:CreditedQuantity - (54.4) Cantidad de Bien o Servicio-->
+    <cbc:CreditedQuantity unitCode="TNE" unitCodeListID="UN/ECE rec 20" unitCodeListAgencyName="United Nations Economic Commission for Europe">1.000</cbc:CreditedQuantity>
+    <!--cbc:LineExtensionAmount - (54.5) Valor de Venta de Bien o Servicio-->
+    <cbc:LineExtensionAmount currencyID="PEN">2588.14</cbc:LineExtensionAmount>
+    <!--cac:PricingReference - (54.18) Referencia de Precio del Bien o Servicio-->
+    <cac:PricingReference>
+      <cac:AlternativeConditionPrice>
+        <cbc:PriceAmount currencyID="PEN">3054.0100000000</cbc:PriceAmount>
+        <cbc:PriceTypeCode>01</cbc:PriceTypeCode>
+      </cac:AlternativeConditionPrice>
+    </cac:PricingReference>
+    <!--cac:TaxTotal - (54.22) Total de IGV-->
+    <cac:TaxTotal>
+      <cbc:TaxAmount currencyID="PEN">465.87</cbc:TaxAmount>
+      <cac:TaxSubtotal>
+        <cbc:TaxableAmount currencyID="PEN">2588.14</cbc:TaxableAmount>
+        <cbc:TaxAmount currencyID="PEN">465.87</cbc:TaxAmount>
+        <cac:TaxCategory>
+          <cbc:Percent>18.00</cbc:Percent>
+          <cbc:TaxExemptionReasonCode listAgencyName="PE:SUNAT" listName="Afectacion del IGV" listURI="urn:pe:gob:sunat:cpe:see:gem:catalogos:catalogo07">10</cbc:TaxExemptionReasonCode>
+          <cac:TaxScheme>
+            <cbc:ID>1000</cbc:ID>
+            <cbc:Name>IGV</cbc:Name>
+            <cbc:TaxTypeCode>VAT</cbc:TaxTypeCode>
+          </cac:TaxScheme>
+        </cac:TaxCategory>
+      </cac:TaxSubtotal>
+    </cac:TaxTotal>
+    <!--cac:Item - (54.24) Descripción de Item.-->
+    <cac:Item>
+      <cbc:Description>PRODUCTO:ARROZ-RUTA:LAMBAYEQUE-LIMA-TBV-880-AWT-995-OPCH0000000541750 GRT: VAR1-0000075, GRR: T002-0005748</cbc:Description>
+    </cac:Item>
+    <!--cac:Price - (54.25) Valor unitario por item.-->
+    <cac:Price>
+      <cbc:PriceAmount currencyID="PEN">2588.1400000000</cbc:PriceAmount>
+    </cac:Price>
+  </cac:CreditNoteLine>
+  <!--- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+</CreditNote>

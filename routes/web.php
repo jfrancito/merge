@@ -329,6 +329,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/leerxmlsinvoiceliqui', 'GestionOCController@actionApiLeerXmlSapLiqui');
 
 	Route::any('/leerxmlsinvoiceguia', 'GestionOCController@actionApiLeerXmlSapGuia');
+	Route::any('/leerxmlsinvoicenc', 'GestionOCController@actionApiLeerXmlSapNC');
+
 
 	Route::any('/leerrhsinvoice', 'GestionOCController@actionApiLeerRHSap');
 	Route::any('/leerrhsinvoicereten', 'GestionOCController@actionApiLeerRetencionSap');

@@ -1451,6 +1451,21 @@ class UserController extends Controller {
 		$urlrenta 							=	'';
 		$count_x_aprobar_renta 				= 	0;
 
+		//documento interno compra
+        $url_obs_dic 					    =	'';
+		$urldic 							=	'';
+		$count_x_aprobar_dic 				= 	0;
+		$count_observados_dic				= 	0;
+		$count_observadosdic_le 			= 	0;
+
+		//liquidacion compra anticipo
+        $url_obs_lqa 					    =	'';
+		$urllqa 							=	'';
+		$count_x_aprobar_lqa 				= 	0;
+		$count_observados_lqa				= 	0;
+		$count_observadoslqa_le 			= 	0;
+
+
 
 		if($trol->ind_uc == 1){
 
@@ -1691,6 +1706,11 @@ class UserController extends Controller {
     				$urllg 					=	'/gestion-de-aprobacion-liquidacion-gastos-administracion/rR6';
     				$urlvl					=	'/gestion-aprueba-rendir/APz';
 
+    				//documento interno compra
+    				$urldic 				=	'/gestion-de-administracion-aprobar/j25?operacion_id=DOCUMENTO_INTERNO_COMPRA';
+
+    				//documento interno compra
+    				$urllqa 				=	'/gestion-de-administracion-aprobar/j25?operacion_id=LIQUIDACION_COMPRA_ANTICIPO';
 
 					//ESTIBA
 					$operacion_id 			=	'ESTIBA';
@@ -1768,6 +1788,31 @@ class UserController extends Controller {
 		        	$listadatosob    		=   $this->lg_lista_cabecera_comprobante_total_obs_le_administracion();
 					$count_observadoslg_le	= 	count($listadatosob);
 
+
+					//DOCUMENTO INTERNO COMPRA
+					$operacion_id 			=	'DOCUMENTO_INTERNO_COMPRA';
+	        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_adm_estiba($cod_empresa,$operacion_id);
+					$count_x_aprobar_dic 	= 	 count($listadatos);
+
+		        	$lisadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs($cod_empresa,$operacion_id);
+					$count_observados_dic 	= 	count($listadatosob);
+
+		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas($cod_empresa,$operacion_id);
+					$count_observadosdic_le 	= 	count($listadatosob);
+
+
+					//LIQUIDACION DE OMPRA ANTIPIO
+					$operacion_id 			=	'LIQUIDACION_COMPRA_ANTICIPO';
+	        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_adm_estiba($cod_empresa,$operacion_id);
+					$count_x_aprobar_lqa 	= 	 count($listadatos);
+
+		        	$lisadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs($cod_empresa,$operacion_id);
+					$count_observados_lqa 	= 	count($listadatosob);
+
+		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas($cod_empresa,$operacion_id);
+					$count_observadoslqa_le 	= 	count($listadatosob);
+
+
 					//VALE
 					$listadatos             = $this->listaValeRendirAprueba(
 												    'GEN',   
@@ -1822,6 +1867,19 @@ class UserController extends Controller {
 						 	'count_observados_est' 		=> $count_observados_est,
 						 	'count_x_aprobar_est' 		=> $count_x_aprobar_est,
 						 	'count_x_aprobar_dip' 		=> $count_x_aprobar_dip,
+
+						 	'count_x_aprobar_dic' 		=> $count_x_aprobar_dic,
+						 	'count_observados_dic' 		=> $count_observados_dic,
+						 	'count_observadosdic_le' 	=> $count_observadosdic_le,
+						 	'urldic' 					=> $urldic,
+
+
+						 	'count_x_aprobar_lqa' 		=> $count_x_aprobar_lqa,
+						 	'count_observados_lqa' 		=> $count_observados_lqa,
+						 	'count_observadoslqa_le' 	=> $count_observadoslqa_le,
+						 	'urllqa' 					=> $urllqa,
+
+
 
 						 	'urlestiba' 				=> $urlestiba,
 						 	'count_reparables_est' 		=> $count_reparables_est,

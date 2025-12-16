@@ -11,9 +11,16 @@
                       $countdis   =   $count_x_aprobar_dis+$count_reparables_dis+$count_reparables__revdis+$count_observados_dis+$count_observadosdis_le;
                       $countdib   =   $count_x_aprobar_dib+$count_reparables_dib+$count_reparables__revdib+$count_observados_dib+$count_observadosdib_le;
                       $countlg    =   $count_x_aprobar_lg+$count_observados_lg+$count_observadoslg_le;
+
+                      $countdic    =   $count_x_aprobar_dic+$count_observados_dic+$count_observadosdic_le;
+
+                      $countlqa    =   $count_x_aprobar_lqa+$count_observados_lqa+$count_observadoslqa_le;
+
+
+
                       $countvl    =   $count_x_aprobar_vl;
                       $countrenta =   $count_x_aprobar_renta;
-                      $cantotal   =   $countoc+$countcon+$countest+$countdip+$countdis+$countdib+$countrenta;
+                      $cantotal   =   $countoc+$countcon+$countest+$countdip+$countdis+$countdib+$countrenta+$countdic+$countlqa;
                     @endphp
 
                     @if($trol->ind_uc == 1)
@@ -105,6 +112,24 @@
                         </li>
 
 
+                        <li class="nav-item">
+                            <a class="nav-link category-tab" data-category="dic">
+                                <span class="nav-text">DOCUMENTO INTERNO DE COMPRA </span>
+                                <div class="notification-container">
+                                    <span class="notification-badge">{{$countdic}}</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link category-tab" data-category="lqa">
+                                <span class="nav-text">LIQUIDACION COMPRA ANTICIPO </span>
+                                <div class="notification-container">
+                                    <span class="notification-badge">{{$countlqa}}</span>
+                                </div>
+                            </a>
+                        </li>
+
+
                     </ul>
                 </nav>
                 @if($trol->ind_uc != 1)
@@ -159,6 +184,15 @@
 
             <div id="rentaq" class="category-content">
                 @include('usuario.dashboard.rentaq')
+            </div>
+
+            <!-- Contenido de Categoría 04 -->
+            <div id="dic" class="category-content">
+                @include('usuario.dashboard.dic')
+            </div>
+            <!-- Contenido de Categoría 04 -->
+            <div id="lqa" class="category-content">
+                @include('usuario.dashboard.lqa')
             </div>
 
 
