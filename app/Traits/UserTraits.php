@@ -13,6 +13,9 @@ use App\Modelos\FeDocumento;
 use App\Modelos\VMergeOC;
 use App\Modelos\STDTrabajador;
 use App\Modelos\LqgLiquidacionGasto;
+use App\Modelos\VMergeDocumento;
+use App\Modelos\VMergeOP;
+
 
 
 use View;
@@ -437,6 +440,265 @@ trait UserTraits
             }                            
         }
         print_r("Se envio correctamente el correo Adminstracion");
+    }
+
+    private function envio_correo_jefeacopiodic() {
+
+        $listadocumentos          =   FeDocumento::where('OPERACION','=','DOCUMENTO_INTERNO_COMPRA')
+                                      ->where('COD_ESTADO','=','ETM0000000000012')
+                                      ->where('IND_EMAIL_JEFE_ACOPIO','=',0)
+                                      ->get();
+
+
+        foreach($listadocumentos as $item){
+
+            $ordencompra         =      VMergeDocumento::leftJoin('FE_REF_ASOC', function ($leftJoin){
+                                            $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
+                                                ->where('FE_REF_ASOC.COD_ESTADO', '=', '1');
+                                        })
+                                        ->leftJoin('FE_DOCUMENTO', function ($leftJoin){
+                                            $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                                                ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                                        })                                                
+                                        ->WHERE('FE_REF_ASOC.LOTE','=',$item->ID_DOCUMENTO)                                                                                                
+                                        ->WHERE('VMERGEDOCUMENTOS.COD_ESTADO','=','1')                                                
+                                        ->orderBy('VMERGEDOCUMENTOS.FEC_EMISION','ASC')
+                                        ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
+                                                            FEC_EMISION,
+                                                            TXT_CATEGORIA_MONEDA,
+                                                            TXT_EMPR_EMISOR,
+                                                            COD_USUARIO_CREA_AUD,
+                                                            CAN_TOTAL,
+                                                            NRO_SERIE,
+                                                            NRO_DOC,
+                                                            FE_REF_ASOC.LOTE AS LOTE_DOC,                                                                    
+                                                            FE_DOCUMENTO.ID_DOCUMENTO,
+                                                            VMERGEDOCUMENTOS.COD_CENTRO,
+                                                            VMERGEDOCUMENTOS.COD_ESTADO,
+                                                            FE_DOCUMENTO.TXT_ESTADO,
+                                                            FE_REF_ASOC.TOTAL_MERGE
+                                                        '))
+                                        ->first();
+
+            $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
+            $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00041')->first();
+            if($ordencompra->COD_CENTRO == 'CEN0000000000004'){ //rioja
+                $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00041')->first();
+            }else{
+                if($ordencompra->COD_CENTRO == 'CEN0000000000006'){ //bellavista
+                    $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00041')->first();
+                }else{
+                    if($ordencompra->COD_CENTRO == 'CEN0000000000002'){ //bellavista
+                        $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00041')->first();
+                    }
+                }
+            }
+            $subjectcorreo = "DOCUMENTO INTERNO COMPRA (".$item->ID_DOCUMENTO.")";
+
+            $array  =        [
+                                    'ordencompra'       => $ordencompra,
+                                    'estado'            => 'POR APROBAR JEFE DE ACOPIO',
+                             ];
+
+            Mail::send('emails.emaildocumentointernocompragenerado', $array, function($message) use ($emailfrom,$item,$email,$subjectcorreo)
+            {
+                $emailcopias        = explode(",", $email->correocopia);  
+                $message->from($emailfrom->correoprincipal, 'DOCUMENTO INTERNO COMPRA JEFE ACOPIO ('.$item->ID_DOCUMENTO.')');
+                $message->to($email->correoprincipal)->cc($emailcopias);
+                $message->subject($subjectcorreo);
+            });
+
+            FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
+                        ->update(
+                                [
+                                    'IND_EMAIL_JEFE_ACOPIO'=>'1'
+                                ]);  
+
+        }
+
+        print_r("Se envio correctamente el correo jefe de acopio");
+    }
+
+
+    private function envio_correo_admindic() {
+
+        $listadocumentos          =   FeDocumento::where('OPERACION','=','DOCUMENTO_INTERNO_COMPRA')
+                                      ->where('COD_ESTADO','=','ETM0000000000004')
+                                      ->where('IND_EMAIL_ADMINISTRACION_ACOPIO','=',0)
+                                      ->get();
+
+
+        foreach($listadocumentos as $item){
+
+            $ordencompra         =      VMergeDocumento::leftJoin('FE_REF_ASOC', function ($leftJoin){
+                                            $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
+                                                ->where('FE_REF_ASOC.COD_ESTADO', '=', '1');
+                                        })
+                                        ->leftJoin('FE_DOCUMENTO', function ($leftJoin){
+                                            $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                                                ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                                        })                                                
+                                        ->WHERE('FE_REF_ASOC.LOTE','=',$item->ID_DOCUMENTO)                                                                                                
+                                        ->WHERE('VMERGEDOCUMENTOS.COD_ESTADO','=','1')                                                
+                                        ->orderBy('VMERGEDOCUMENTOS.FEC_EMISION','ASC')
+                                        ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
+                                                            FEC_EMISION,
+                                                            TXT_CATEGORIA_MONEDA,
+                                                            TXT_EMPR_EMISOR,
+                                                            COD_USUARIO_CREA_AUD,
+                                                            CAN_TOTAL,
+                                                            NRO_SERIE,
+                                                            NRO_DOC,
+                                                            FE_REF_ASOC.LOTE AS LOTE_DOC,                                                                    
+                                                            FE_DOCUMENTO.ID_DOCUMENTO,
+                                                            VMERGEDOCUMENTOS.COD_CENTRO,
+                                                            VMERGEDOCUMENTOS.COD_ESTADO,
+                                                            FE_DOCUMENTO.TXT_ESTADO,
+                                                            FE_REF_ASOC.TOTAL_MERGE
+                                                        '))
+                                        ->first();
+
+            $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
+            $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00043')->first();
+            if($ordencompra->COD_CENTRO == 'CEN0000000000004'){ //rioja
+                $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00043')->first();
+            }else{
+                if($ordencompra->COD_CENTRO == 'CEN0000000000006'){ //bellavista
+                    $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00043')->first();
+                }else{
+                    if($ordencompra->COD_CENTRO == 'CEN0000000000002'){ //bellavista
+                        $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00043')->first();
+                    }
+                }
+            }
+            $subjectcorreo = "DOCUMENTO INTERNO COMPRA (".$item->ID_DOCUMENTO.")";
+
+            $array  =        [
+                                    'ordencompra'       => $ordencompra,
+                                    'estado'            => 'POR APROBAR ADMINISTRACION',
+                             ];
+
+            Mail::send('emails.emaildocumentointernocompragenerado', $array, function($message) use ($emailfrom,$item,$email,$subjectcorreo)
+            {
+                $emailcopias        = explode(",", $email->correocopia);  
+                $message->from($emailfrom->correoprincipal, 'DOCUMENTO INTERNO COMPRA ADMINISTRACION ('.$item->ID_DOCUMENTO.')');
+                $message->to($email->correoprincipal)->cc($emailcopias);
+                $message->subject($subjectcorreo);
+            });
+
+            FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
+                        ->update(
+                                [
+                                    'IND_EMAIL_ADMINISTRACION_ACOPIO'=>'1'
+                                ]);  
+
+        }
+
+        print_r("Se envio correctamente el correo administracion");
+    }
+
+    private function envio_correo_adminlqc() {
+
+        $listadocumentos          =   FeDocumento::where('OPERACION','=','LIQUIDACION_COMPRA_ANTICIPO')
+                                      ->where('COD_ESTADO','=','ETM0000000000004')
+                                      ->where('IND_EMAIL_ADMINISTRACION_ACOPIO','=',0)
+                                      ->get();
+
+        foreach($listadocumentos as $item){
+
+            $ordenpago              =      VMergeOP::where('COD_ESTADO','=','1')
+                                                ->where('COD_AUTORIZACION','=',$item->ID_DOCUMENTO)
+                                                ->first();
+
+            $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
+            $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00044')->first();
+            if($ordenpago->COD_CENTRO == 'CEN0000000000004'){ //rioja
+                $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00044')->first();
+            }else{
+                if($ordenpago->COD_CENTRO == 'CEN0000000000006'){ //bellavista
+                    $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00044')->first();
+                }else{
+                    if($ordenpago->COD_CENTRO == 'CEN0000000000002'){ //bellavista
+                        $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00044')->first();
+                    }
+                }
+            }
+            $subjectcorreo = "LIQUIDACION DE COMPRA ANTICIPO (".$item->ID_DOCUMENTO.")";
+            $array  =        [
+                                    'ordenpago'       => $ordenpago,
+                                    'estado'            => 'POR APROBAR ADMINISTRACION',
+                             ];
+
+            Mail::send('emails.emailliquidacioncompraanticipogenerado', $array, function($message) use ($emailfrom,$item,$email,$subjectcorreo)
+            {
+                $emailcopias        = explode(",", $email->correocopia);  
+                $message->from($emailfrom->correoprincipal, 'LIQUIDACION DE COMPRA ANTICIPO ADMINISTRACION ('.$item->ID_DOCUMENTO.')');
+                $message->to($email->correoprincipal)->cc($emailcopias);
+                $message->subject($subjectcorreo);
+            });
+
+            FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
+                        ->update(
+                                [
+                                    'IND_EMAIL_ADMINISTRACION_ACOPIO'=>'1'
+                                ]);  
+
+        }
+
+        print_r("Se envio correctamente el correo administracion");
+    }
+
+
+
+    private function envio_correo_jefeacopiolqc() {
+
+        $listadocumentos          =   FeDocumento::where('OPERACION','=','LIQUIDACION_COMPRA_ANTICIPO')
+                                      ->where('COD_ESTADO','=','ETM0000000000012')
+                                      ->where('IND_EMAIL_JEFE_ACOPIO','=',0)
+                                      ->get();
+
+        foreach($listadocumentos as $item){
+
+            $ordenpago              =      VMergeOP::where('COD_ESTADO','=','1')
+                                                ->where('COD_AUTORIZACION','=',$item->ID_DOCUMENTO)
+                                                ->first();
+
+            $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
+            $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00042')->first();
+            if($ordenpago->COD_CENTRO == 'CEN0000000000004'){ //rioja
+                $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00042')->first();
+            }else{
+                if($ordenpago->COD_CENTRO == 'CEN0000000000006'){ //bellavista
+                    $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00042')->first();
+                }else{
+                    if($ordenpago->COD_CENTRO == 'CEN0000000000002'){ //bellavista
+                        $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00042')->first();
+                    }
+                }
+            }
+            $subjectcorreo = "LIQUIDACION DE COMPRA ANTICIPO (".$item->ID_DOCUMENTO.")";
+            $array  =        [
+                                    'ordenpago'       => $ordenpago,
+                                    'estado'            => 'POR APROBAR JEFE DE ACOPIO',
+                             ];
+
+            Mail::send('emails.emailliquidacioncompraanticipogenerado', $array, function($message) use ($emailfrom,$item,$email,$subjectcorreo)
+            {
+                $emailcopias        = explode(",", $email->correocopia);  
+                $message->from($emailfrom->correoprincipal, 'LIQUIDACION DE COMPRA ANTICIPO JEFE ACOPIO ('.$item->ID_DOCUMENTO.')');
+                $message->to($email->correoprincipal)->cc($emailcopias);
+                $message->subject($subjectcorreo);
+            });
+
+            FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
+                        ->update(
+                                [
+                                    'IND_EMAIL_JEFE_ACOPIO'=>'1'
+                                ]);  
+
+        }
+
+        print_r("Se envio correctamente el correo jefe de acopio");
     }
 
 
