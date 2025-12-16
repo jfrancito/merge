@@ -21,7 +21,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Schema::defaultStringLength(191);
         View::share('capeta', '/merge');
-        View::share('version', '12.09');
+        View::share('version', '12.10');
 
         View::share('titulo', '');
 

@@ -956,6 +956,28 @@ class UserController extends Controller {
 	}
 
 
+    public function actionCorreoAdminDic()
+	{
+		$this->envio_correo_admindic();
+	}
+
+    public function actionCorreoJefeAcopioDic()
+	{
+		$this->envio_correo_jefeacopiodic();
+	}
+
+
+    public function actionCorreoJefeAcopioLqc()
+	{
+		$this->envio_correo_jefeacopiolqc();
+	}
+
+    public function actionCorreoAdminLqc()
+	{
+		$this->envio_correo_adminlqc();
+	}
+
+
     public function actionCorreoTesoreriaLg()
 	{
 		$this->envio_correo_tesoreria_lq();

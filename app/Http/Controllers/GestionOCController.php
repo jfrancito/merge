@@ -3004,12 +3004,12 @@ class GestionOCController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
-
                 FeDocumento::where('ID_DOCUMENTO',$idop)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(
                                 [
-                                    'COD_ESTADO'=>'ETM0000000000004',
-                                    'TXT_ESTADO'=>'POR APROBAR ADMINISTRACION',
+                                    'COD_ESTADO'=>'ETM0000000000012',
+                                    'TXT_ESTADO'=>'POR APROBAR JEFE ACOPIO',
+                                    'IND_EMAIL_JEFE_ACOPIO'=>0,
                                     'ind_email_ap'=>0,
                                     'fecha_uc'=>$this->fechaactual,
                                     'usuario_uc'=>Session::get('usuario')->id
@@ -3026,17 +3026,6 @@ class GestionOCController extends Controller
                 $documento->TIPO                        =   'APROBADO POR USUARIO CONTACTO';
                 $documento->MENSAJE                     =   '';
                 $documento->save();               
-
-                Mail::send('emails.emailliquidacioncompraanticipogenerado',
-                [
-                    'ordenpago'     => $ordenpago,
-                    'estado'        => 'APROBADO POR USUARIO CONTACTO',
-                ],
-                function ($message) {
-                    $message->from('jessica.sandoval@induamerica.com.pe', 'Sistemas')
-                            ->to('jorge.saldana@induamerica.com.pe')                            
-                            ->subject('LIQUIDACION DE COMPRA ANTICIPO - INDUAMERICA');
-                });
 
 
                 DB::commit();

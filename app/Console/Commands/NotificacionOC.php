@@ -59,6 +59,14 @@ class NotificacionOC extends Command
         $this->envio_correo_tesoreria_lq();
         $this->modificarglosahabilitacion();
 
+        //envio de usuario contacto a jefe de acopio
+        $this->envio_correo_jefeacopiodic();
+        $this->envio_correo_jefeacopiolqc();
+
+        //envio de usuario contacto a administracion
+        $this->envio_correo_admindic();
+        $this->envio_correo_adminlqc();
+
         //$this->envio_correo_reparacion_levantada();
         $horaActual = date("H:i");
 
