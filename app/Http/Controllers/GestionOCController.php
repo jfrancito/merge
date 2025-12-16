@@ -291,7 +291,18 @@ class GestionOCController extends Controller
 
     }
 
-    
+    public function actionApiLeerXmlSapNC(Request $request)
+    {
+
+        header('Content-Type: text/html; charset=UTF-8');
+        //$path = storage_path() . "/exports/FC26-00002985.XML";
+        $path = storage_path() . "/exports/20479729141-07-F006-00000165.xml";
+        $parser = new NoteParser();
+        $xml = file_get_contents($path);
+        $factura = $parser->parse($xml);
+        dd($factura);
+
+    }
 
 
     public function actionApiLeerRHSap(Request $request)
