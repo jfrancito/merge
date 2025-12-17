@@ -73,6 +73,7 @@
                                           style="border-radius: 0px;"
                                     >
                                         {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
 
                                         <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 cajareporte">
                                             <div class="form-group">

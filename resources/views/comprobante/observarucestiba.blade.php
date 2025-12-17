@@ -17,6 +17,7 @@
           <div class="panel-body">
             <form method="POST" id='formpedido' action="{{ url('/observacion-comprobante-uc-estiba/'.$idopcion.'/'.$lote) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
                   {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
               @include('comprobante.form.formmitigarobservarestiba')
             </form>
           </div>

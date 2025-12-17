@@ -28,6 +28,7 @@
                     <div class="panel-body">
                       <form method="POST" id='formpedido' action="{{ url('/aprobar-comprobante-uc-contrato/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -9))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
                             {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
                         @include('comprobante.form.formaprobarcontrato')
 
                       </form>
@@ -40,6 +41,7 @@
                     <div class="panel-body">
                       <form method="POST" id='formpedidoobservar' action="{{ url('/agregar-observacion-uc-contrato/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -9))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                             {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
                         @include('comprobante.form.formobservaruccontrato')
                       </form>
                     </div>

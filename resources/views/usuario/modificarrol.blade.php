@@ -18,6 +18,7 @@
           <div class="panel-body">
             <form method="POST" action="{{ url('/modificar-rol/'.$idopcion.'/'.Hashids::encode(substr($rol->id, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                   {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
 
               <div class="form-group">
                 <label class="col-sm-3 control-label">Nombres</label>

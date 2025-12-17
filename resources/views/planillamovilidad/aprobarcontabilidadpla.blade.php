@@ -27,6 +27,7 @@
                         <div class="panel-body">
                           <form method="POST" id='formpedido' action="{{ url('/aprobar-planilla-movilidad-contabilidad/'.$idopcion.'/'.Hashids::encode(substr($feplanillaentrega->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
                             {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
                             @include('planillamovilidad.form.formaprobarcontpla')
                             <div class="row xs-pt-15">
                               <div class="col-xs-6">
@@ -51,6 +52,7 @@
 
                         <form method="POST" id='formpedidorechazar' action="{{ url('/agregar-extorno-contabilidad-pla/'.$idopcion.'/'.Hashids::encode(substr($feplanillaentrega->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                               {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
                           @include('planillamovilidad.form.formrechazocont')
 
                           <div class="row xs-pt-15">

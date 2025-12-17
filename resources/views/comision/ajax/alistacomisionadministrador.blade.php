@@ -21,6 +21,7 @@
           class="form-horizontal group-border-dashed" enctype="multipart/form-data">
         {{ csrf_field()}}
         <input type="hidden" name="jsondocumenos" id='jsondocumenos'>
+        
 
     </form>
     <div class="tools tooltiptop">

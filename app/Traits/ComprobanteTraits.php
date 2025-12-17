@@ -24,6 +24,8 @@ use App\Modelos\CMPDocAsociarCompra;
 use App\Modelos\WEBRol;
 use App\Modelos\FeRefAsoc;
 use App\Modelos\CONRegistroCompras;
+use App\Modelos\FeDocumentoGeolocalizacion;
+
 
 
 use App\Modelos\Estado;
@@ -49,6 +51,7 @@ use Carbon\Carbon;
 
 trait ComprobanteTraits
 {
+
 
     public function con_array_canjes() {
         $array = ['ESTIBA','DOCUMENTO_INTERNO_PRODUCCION','DOCUMENTO_INTERNO_SECADO','DOCUMENTO_SERVICIO_BALANZA','DOCUMENTO_INTERNO_COMPRA'];
@@ -79,7 +82,69 @@ trait ComprobanteTraits
     } 
 
 
+    private function con_datos_de_la_pc_lqg($device,$fedocumento,$accion) {
 
+        // Capturar información del dispositivo desde JavaScript
+        $deviceInfo = [];
+        if ($device) {
+            $deviceInfo = json_decode($device, true);
+            $documento                              =   new FeDocumentoGeolocalizacion;
+            $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+            $documento->ITEM                        =   $fedocumento->ITEM;
+            $documento->FECHA                       =   date_format(date_create(date('Ymd h:i:s')), 'Ymd h:i:s');
+            $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+            $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+            $documento->ACCION                      =   $accion;
+            $documento->ID                          =   $deviceInfo['fingerprint'];
+            $documento->IP                          =   $deviceInfo['ip'];
+            $documento->NAVEGADOR                   =   $deviceInfo['navegador'];
+            $documento->RESOLUCION                  =   $deviceInfo['resolucion'];
+            $documento->MEMORIA                     =   $deviceInfo['memoria'];
+            $documento->NUCLEO                      =   $deviceInfo['nucleos'];
+            $documento->GPU                         =   $deviceInfo['gpu'];
+            $documento->TIMEZONE                    =   $deviceInfo['timezone'];
+            $documento->IDIOMA                      =   $deviceInfo['idioma'];
+            $documento->PLATAFORMA                  =   $deviceInfo['plataforma'];
+            $documento->DISPOSITIVO                 =   $deviceInfo['tipo_dispositivo'];
+            $documento->SISTEMA_OPERATIVO           =   $deviceInfo['sistema_operativo'];
+            $documento->ES_TACTIL                   =   $deviceInfo['es_tactil'];
+            $documento->save();
+        }
+        
+    }
+
+
+
+    private function con_datos_de_la_pc($device,$fedocumento,$accion) {
+
+        // Capturar información del dispositivo desde JavaScript
+        $deviceInfo = [];
+        if ($device) {
+            $deviceInfo = json_decode($device, true);
+            $documento                              =   new FeDocumentoGeolocalizacion;
+            $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+            $documento->ITEM                        =   $fedocumento->DOCUMENTO_ITEM;
+            $documento->FECHA                       =   date_format(date_create(date('Ymd h:i:s')), 'Ymd h:i:s');
+            $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+            $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+            $documento->ACCION                      =   $accion;
+            $documento->ID                          =   $deviceInfo['fingerprint'];
+            $documento->IP                          =   $deviceInfo['ip'];
+            $documento->NAVEGADOR                   =   $deviceInfo['navegador'];
+            $documento->RESOLUCION                  =   $deviceInfo['resolucion'];
+            $documento->MEMORIA                     =   $deviceInfo['memoria'];
+            $documento->NUCLEO                      =   $deviceInfo['nucleos'];
+            $documento->GPU                         =   $deviceInfo['gpu'];
+            $documento->TIMEZONE                    =   $deviceInfo['timezone'];
+            $documento->IDIOMA                      =   $deviceInfo['idioma'];
+            $documento->PLATAFORMA                  =   $deviceInfo['plataforma'];
+            $documento->DISPOSITIVO                 =   $deviceInfo['tipo_dispositivo'];
+            $documento->SISTEMA_OPERATIVO           =   $deviceInfo['sistema_operativo'];
+            $documento->ES_TACTIL                   =   $deviceInfo['es_tactil'];
+            $documento->save();
+        }
+        
+    }
 
     public function con_si_hay_retencion_lista($data_folio) {
 

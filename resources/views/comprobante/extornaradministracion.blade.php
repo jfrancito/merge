@@ -17,6 +17,7 @@
           <div class="panel-body">
             <form method="POST" id='formpedido' action="{{ url('/extornar-aprobar-comprobante-administrador/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                   {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
               @include('comprobante.form.formextornar')
             </form>
           </div>

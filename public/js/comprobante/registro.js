@@ -445,6 +445,14 @@ $(document).ready(function(){
             }
         }
         if(te =='0'){ alerterrorajax("Hay errores en la validacion del XML."); return false;}
+        //informacion de maquina
+        captureDeviceInfo().then(info => {
+            // Convertimos el objeto a texto JSON para que viaje en el input
+            $('#device_info').val(JSON.stringify(info));
+            
+            console.log("Datos capturados listos para enviar");
+        });
+        
         $.confirm({
             title: '¿Confirmar la validación?',
             content: 'Merge de Comprobante',
@@ -497,6 +505,16 @@ $(document).ready(function(){
             }
         }
         if(te =='0'){ alerterrorajax("Hay errores en la validacion del XML."); return false;}
+
+        //informacion de maquina
+        captureDeviceInfo().then(info => {
+            // Convertimos el objeto a texto JSON para que viaje en el input
+            $('#device_info').val(JSON.stringify(info));
+            
+            console.log("Datos capturados listos para enviar");
+        });
+
+
         $.confirm({
             title: '¿Confirmar la validación?',
             content: 'Merge de Comprobante',
@@ -549,6 +567,15 @@ $(document).ready(function(){
             }
         }
         if(te =='0'){ alerterrorajax("Hay errores en la validacion del XML."); return false;}
+
+        //informacion de maquina
+        captureDeviceInfo().then(info => {
+            // Convertimos el objeto a texto JSON para que viaje en el input
+            $('#device_info').val(JSON.stringify(info));
+            
+            console.log("Datos capturados listos para enviar");
+        });
+
         $.confirm({
             title: '¿Confirmar la validación?',
             content: 'Merge de Comprobante',
@@ -581,11 +608,17 @@ $(document).ready(function(){
         var cb_id                   =   $('#cb_id').val();
         var detraccion              =   $('#detraccion').val();
 
-
         var ctadetraccion           =   $('#ctadetraccion').val();
         var monto_detraccion        =   $('#monto_detraccion').val();
         var pago_detraccion         =   $('#pago_detraccion').val();
 
+        //informacion de maquina
+        captureDeviceInfo().then(info => {
+            // Convertimos el objeto a texto JSON para que viaje en el input
+            $('#device_info').val(JSON.stringify(info));
+            
+            console.log("Datos capturados listos para enviar");
+        });
         debugger;
         if(detraccion>0){
             if(ctadetraccion.trim() ==''){ alerterrorajax("Ingrese una Cuenta de Detraccion."); return false;}
@@ -602,6 +635,14 @@ $(document).ready(function(){
         }
 
         if(te =='0'){ alerterrorajax("Hay errores en la validacion del XML."); return false;}
+
+        //informacion de maquina
+        captureDeviceInfo().then(info => {
+            // Convertimos el objeto a texto JSON para que viaje en el input
+            $('#device_info').val(JSON.stringify(info));
+            
+            console.log("Datos capturados listos para enviar");
+        });
 
         $.confirm({
             title: '¿Confirmar la validación?',
@@ -664,6 +705,14 @@ $(document).ready(function(){
         }
 
         if(te =='0'){ alerterrorajax("Hay errores en la validacion del XML."); return false;}
+
+        //informacion de maquina
+        captureDeviceInfo().then(info => {
+            // Convertimos el objeto a texto JSON para que viaje en el input
+            $('#device_info').val(JSON.stringify(info));
+            
+            console.log("Datos capturados listos para enviar");
+        });
 
         $.confirm({
             title: '¿Confirmar la validación?',
