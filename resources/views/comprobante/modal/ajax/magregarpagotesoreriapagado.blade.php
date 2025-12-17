@@ -1,5 +1,6 @@
 <form method="POST" id='formpedido' action="{{ url('/pago-comprobante-tesoreria-pagado/'.$idopcion.'/'.$linea.'/'.substr($fedocumento->ID_DOCUMENTO, 0,6).'/'.Hashids::encode(substr($fedocumento->ID_DOCUMENTO, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
 {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
 
 	<div class="modal-header" style="background: #1d3a6d;">
 		<button type="button" data-dismiss="modal" aria-hidden="true" class="close modal-close"><span class="mdi mdi-close"></span></button>

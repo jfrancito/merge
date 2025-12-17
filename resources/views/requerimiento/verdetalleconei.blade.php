@@ -23,6 +23,7 @@
               <div class="panel panel-default">
                 <form method="POST" action="{{ url('/agregar-requerimiento-conei/'.$idopcion) }}" style="border-radius: 0px;" enctype="multipart/form-data">
                     {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
                     @include('requerimiento.lista.detalleconei')
                 </form>
               </div>

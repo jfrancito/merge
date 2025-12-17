@@ -1235,6 +1235,12 @@ class GestionLiquidacionGastosController extends Controller
                 $documento->MENSAJE = $descripcion;
                 $documento->save();
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'DOCUMENTO EXTORNADO');
+                //geolocalizacion
+
+
                 //ANULAR TODA LA OPERACION
                 LqgLiquidacionGasto::where('ID_DOCUMENTO', $iddocumento)
                     ->update(
@@ -1296,6 +1302,12 @@ class GestionLiquidacionGastosController extends Controller
                 $documento->TIPO = 'DOCUMENTO EXTORNADO';
                 $documento->MENSAJE = $descripcion;
                 $documento->save();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'DOCUMENTO EXTORNADO');
+                //geolocalizacion
+
 
                 //ANULAR TODA LA OPERACION
                 LqgLiquidacionGasto::where('ID_DOCUMENTO', $iddocumento)
@@ -1360,6 +1372,12 @@ class GestionLiquidacionGastosController extends Controller
                 $documento->TIPO = 'DOCUMENTO EXTORNADO';
                 $documento->MENSAJE = $descripcion;
                 $documento->save();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'DOCUMENTO EXTORNADO');
+                //geolocalizacion
+
 
                 //ANULAR TODA LA OPERACION
                 LqgLiquidacionGasto::where('ID_DOCUMENTO', $iddocumento)
@@ -2283,6 +2301,12 @@ class GestionLiquidacionGastosController extends Controller
                 $documento->MENSAJE = '';
                 $documento->save();
 
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'APROBADO POR ADMINISTRACION');
+                //geolocalizacion
+
                 $anio = $this->anio;
                 $mes = $this->mes;
                 $periodo = $this->gn_periodo_actual_xanio_xempresa($anio, $mes, Session::get('empresas')->COD_EMPR);
@@ -2673,6 +2697,12 @@ class GestionLiquidacionGastosController extends Controller
                 $documento->MENSAJE = '';
                 $documento->save();
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'APROBADO POR CONTABILIDAD');
+                //geolocalizacion
+
+
                 DB::commit();
                 //DB::rollback();
 //                return Redirect::to('/gestion-de-aprobacion-liquidacion-gastos-contabilidad/' . $idopcion)->with('bienhecho', 'Liquidacion de Gastos : ' . ' APROBADO CON EXITO');
@@ -2963,6 +2993,12 @@ class GestionLiquidacionGastosController extends Controller
                 $documento->save();
                 $this->lg_calcular_total_observar($iddocumento);
 
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'OBSERVADO POR JEFE');
+                //geolocalizacion
+
                 DB::commit();
 
 
@@ -3045,6 +3081,11 @@ class GestionLiquidacionGastosController extends Controller
                 $documento->MENSAJE = $descripcion;
                 $documento->save();
                 $this->lg_calcular_total_observar($iddocumento);
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'OBSERVADO POR ADMINISTRACION');
+                //geolocalizacion
 
                 DB::commit();
 
@@ -3130,6 +3171,14 @@ class GestionLiquidacionGastosController extends Controller
                 $documento->save();
                 $this->lg_calcular_total_observar($iddocumento);
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'OBSERVADO POR CONTABILIDAD');
+                //geolocalizacion
+
+
+
+
                 DB::commit();
                 return Redirect::to('/gestion-de-aprobacion-liquidacion-gastos-contabilidad/' . $idopcion)->with('bienhecho', 'Liquidacion Gastos : ' . $liquidaciongastos->CODIGO . ' Observado con Exito');
             } catch (\Exception $ex) {
@@ -3204,6 +3253,13 @@ class GestionLiquidacionGastosController extends Controller
                 $documento->TIPO = 'APROBADO POR EL JEFE';
                 $documento->MENSAJE = '';
                 $documento->save();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'APROBADO POR EL JEFE');
+                //geolocalizacion
+
+
 
                 DB::commit();
                 return Redirect::to('/gestion-de-aprobacion-liquidacion-gasto-jefe/' . $idopcion)->with('bienhecho', 'Liquidacion de Gastos : ' . $liquidaciongastos->CODIGO . ' APROBADO CON EXITO');
@@ -3518,6 +3574,12 @@ class GestionLiquidacionGastosController extends Controller
                     $documento->MENSAJE = '';
                     $documento->save();
 
+                    //geolocalizacion
+                    $device_info       =   $request['device_info'];
+                    $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'SE LEVANTARON LAS OBSERVACIONES');
+                    //geolocalizacion
+
+
                 } else {
 
                     $arendri            =   DB::table('WEB.VALE_RENDIR')
@@ -3575,6 +3637,13 @@ class GestionLiquidacionGastosController extends Controller
                     $documento->TIPO = 'CREO LIQUIDACION DE GASTO';
                     $documento->MENSAJE = '';
                     $documento->save();
+
+                    //geolocalizacion
+                    $device_info       =   $request['device_info'];
+                    $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'CREO LIQUIDACION DE GASTO');
+                    //geolocalizacion
+
+
                 }
 
 

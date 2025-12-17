@@ -90,6 +90,8 @@
                                                   class="form-horizontal group-border-dashed"
                                                   enctype="multipart/form-data">
                                                 {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
+                                                
                                                 @include('comprobante.form.formaprobarcontcontratto')
                                                 {{--@include('comprobante.asiento.contenedorasiento')--}}
                                             </form>
@@ -107,6 +109,7 @@
                                                   style="border-radius: 0px;"
                                                   class="form-horizontal group-border-dashed">
                                                 {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
                                                 @include('comprobante.form.formobservarcontrato')
                                             </form>
                                         </div>
@@ -124,6 +127,7 @@
                                                   style="border-radius: 0px;"
                                                   class="form-horizontal group-border-dashed">
                                                 {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
                                                 @include('comprobante.form.formreparablecontrato')
                                             </form>
                                         </div>
@@ -141,6 +145,7 @@
                                                   style="border-radius: 0px;"
                                                   class="form-horizontal group-border-dashed">
                                                 {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
                                                 @include('comprobante.form.formrechazocontrato')
                                             </form>
                                         </div>

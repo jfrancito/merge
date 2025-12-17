@@ -51,6 +51,7 @@
           <div id="crearfolios" class="tab-pane cont">
             <form method="POST" action="{{ url('/crear-folio-entregable-pla/'.$idopcion) }}">
                   {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
                     <div class="col-md-12">
 
                         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
@@ -95,6 +96,7 @@
           <div id="guardarfolio" class="tab-pane cont">
             <form method="POST" action="{{ url('/guardar-folio-entregable-pla/'.$idopcion) }}">
                   {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
                     <div class="col-md-12">
                         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                           <div class="form-group">

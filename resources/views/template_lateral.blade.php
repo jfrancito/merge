@@ -69,6 +69,8 @@
     <script src="{{ asset('public/js/general/general.js?v='.$version) }}" type="text/javascript"></script>
     <script src="{{ asset('public/js/general/gmeta.js?v='.$version) }}" type="text/javascript"></script>
     <script src="{{ asset('public/js/general/jquery-confirm.min.js?v='.$version) }}" type="text/javascript"></script>
+    <script src="{{ asset('public/js/comprobante/datospc.js?v='.$version) }}" type="text/javascript"></script>
+
     @yield('script')
     <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
 <!--     <script type="module">

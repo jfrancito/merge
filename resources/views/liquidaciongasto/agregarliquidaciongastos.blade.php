@@ -19,6 +19,7 @@
           <div class="panel-body">
             <form method="POST" action="{{ url('/agregar-liquidacion-gastos/'.$idopcion) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" id ='frmpm'>
                   {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
                   <div class='formconsulta'>
                     @include('liquidaciongasto.form.faliquidaciongasto')
                     <div class="row xs-pt-15">

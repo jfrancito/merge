@@ -221,6 +221,11 @@ class GestionOCContabilidadController extends Controller
                     $documento->MENSAJE = '';
                     $documento->save();
 
+                    //geolocalizacion
+                    $device_info       =   $request['device_info'];
+                    $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR CONTABILIDAD');
+                    //geolocalizacion
+
 
                     //whatsaap para administracion
                     $fedocumento_w = FeDocumento::where('ID_DOCUMENTO', '=', $pedido_id)->first();
@@ -332,6 +337,11 @@ class GestionOCContabilidadController extends Controller
             $documento->TIPO = 'RECHAZADO POR CONTABILIDAD';
             $documento->MENSAJE = '';
             $documento->save();
+
+            //geolocalizacion
+            $device_info       =   $request['device_info'];
+            $this->con_datos_de_la_pc($device_info,$fedocumento,'RECHAZADO POR CONTABILIDAD');
+            //geolocalizacion
 
             return Redirect::to('/gestion-de-contabilidad-aprobar/' . $idopcion)->with('bienhecho', 'Comprobantes Lote: ' . $ordencompra->COD_ORDEN . ' EXTORNADA con EXITO');
 
@@ -775,6 +785,12 @@ class GestionOCContabilidadController extends Controller
                 $documento->TIPO = 'APROBADO POR CONTABILIDAD';
                 $documento->MENSAJE = '';
                 $documento->save();
+
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR CONTABILIDAD');
+                //geolocalizacion
 
                 //whatsaap para administracion
                 $fedocumento_w = FeDocumento::where('ID_DOCUMENTO', '=', $pedido_id)->where('DOCUMENTO_ITEM', '=', $linea)->first();
@@ -1668,6 +1684,11 @@ class GestionOCContabilidadController extends Controller
                 $documento->MENSAJE = '';
                 $documento->save();
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO DOCUMENTO REPARABLE');
+                //geolocalizacion
+
                 // $trabajador = STDTrabajador::where('NRO_DOCUMENTO', '=', $fedocumento->dni_usuariocontacto)->first();
                 // $empresa = STDEmpresa::where('COD_EMPR', '=', $ordencompra->COD_EMPR)->first();
                 // $mensaje = 'COMPROBANTE: ' . $fedocumento->ID_DOCUMENTO
@@ -2075,6 +2096,12 @@ class GestionOCContabilidadController extends Controller
                 $documento->TIPO = 'APROBADO POR CONTABILIDAD';
                 $documento->MENSAJE = '';
                 $documento->save();
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR CONTABILIDAD');
+                //geolocalizacion
+
+
 
                 //whatsaap para administracion
                 $fedocumento_w = FeDocumento::where('ID_DOCUMENTO', '=', $pedido_id)->first();
@@ -3192,6 +3219,12 @@ class GestionOCContabilidadController extends Controller
                 $documento->MENSAJE = '';
                 $documento->save();
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR CONTABILIDAD');
+                //geolocalizacion
+
+
                 //whatsaap para administracion
                 $fedocumento_w = FeDocumento::where('ID_DOCUMENTO', '=', $pedido_id)->where('DOCUMENTO_ITEM', '=', $linea)->first();
                 $ordencompra = CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE', '=', $pedido_id)->first();
@@ -4125,6 +4158,12 @@ class GestionOCContabilidadController extends Controller
                 $documento->MENSAJE = $descripcion;
                 $documento->save();
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'OBSERVADO POR CONTABILIDAD');
+                //geolocalizacion
+
+
                 FeDocumento::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
                     ->update(
                         [
@@ -4269,6 +4308,12 @@ class GestionOCContabilidadController extends Controller
                 $documento->MENSAJE = $descripcion;
                 $documento->save();
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'OBSERVADO POR CONTABILIDAD REPARABLE');
+                //geolocalizacion
+
+
                 FeDocumento::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
                     ->update(
                         [
@@ -4366,6 +4411,11 @@ class GestionOCContabilidadController extends Controller
                 $documento->TIPO = 'DOCUMENTO EXTORNADO';
                 $documento->MENSAJE = $descripcion;
                 $documento->save();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'DOCUMENTO EXTORNADO');
+                //geolocalizacion
 
                 //ANULAR TODA LA OPERACION
                 FeDocumento::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
@@ -4470,6 +4520,11 @@ class GestionOCContabilidadController extends Controller
                 $documento->TIPO = 'DOCUMENTO EXTORNADO';
                 $documento->MENSAJE = $descripcion;
                 $documento->save();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'DOCUMENTO EXTORNADO');
+                //geolocalizacion
 
                 //ANULAR TODA LA OPERACION
                 FeDocumento::where('ID_DOCUMENTO', $idoc)
@@ -4600,6 +4655,10 @@ class GestionOCContabilidadController extends Controller
                 $documento->MENSAJE = $descripcion;
                 $documento->save();
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'DOCUMENTO EXTORNADO');
+                //geolocalizacion
 
                 //ANULAR TODA LA OPERACION
                 FeDocumento::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
@@ -4761,6 +4820,11 @@ class GestionOCContabilidadController extends Controller
                 $documento->TIPO = 'DOCUMENTO ' . $reparable;
                 $documento->MENSAJE = $descripcion;
                 $documento->save();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento, 'DOCUMENTO ' . $reparable);
+                //geolocalizacion
 
                 FeDocumento::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
                     ->update(
@@ -5035,6 +5099,11 @@ class GestionOCContabilidadController extends Controller
                 $documento->MENSAJE = $descripcion;
                 $documento->save();
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'OBSERVADO POR CONTABILIDAD');
+                //geolocalizacion
+
                 FeDocumento::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
                     ->update(
                         [
@@ -5217,6 +5286,12 @@ class GestionOCContabilidadController extends Controller
                 $documento->TIPO = 'OBSERVADO POR CONTABILIDAD';
                 $documento->MENSAJE = $descripcion;
                 $documento->save();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'OBSERVADO POR CONTABILIDAD');
+                //geolocalizacion
+
                 FeDocumento::where('ID_DOCUMENTO', $idoc)
                     ->update(
                         [
@@ -5412,6 +5487,13 @@ class GestionOCContabilidadController extends Controller
                 $documento->TIPO = 'DOCUMENTO ' . $reparable;
                 $documento->MENSAJE = $descripcion;
                 $documento->save();
+
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'DOCUMENTO ' . $reparable);
+                //geolocalizacion
+
                 FeDocumento::where('ID_DOCUMENTO', $idoc)
                     ->update(
                         [
@@ -5707,6 +5789,12 @@ class GestionOCContabilidadController extends Controller
                 $documento->TIPO = 'DOCUMENTO ' . $reparable;
                 $documento->MENSAJE = $descripcion;
                 $documento->save();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'DOCUMENTO ' . $reparable);
+                //geolocalizacion
+
                 FeDocumento::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
                     ->update(
                         [

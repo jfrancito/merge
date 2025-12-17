@@ -19,6 +19,7 @@
 
             <form method="POST" action="{{ url('/subir-firma/'.$idopcion) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
                 {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
 
       				<div class="form-group sectioncargarimagen iaprobado">
       						<label class="col-sm-3 control-label">Firma :</label>

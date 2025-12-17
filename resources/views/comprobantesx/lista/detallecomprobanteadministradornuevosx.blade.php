@@ -3,8 +3,11 @@
           @if(count($fedocumento)>0)
             <form method="POST" action="{{ url('validar-xml-oc-administrator-sx/'.$idopcion.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" name="formguardardatos" id="formguardardatos" enctype="multipart/form-data" >
              {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
               <input type="hidden" name="procedencia" id='procedencia' value = '{{$procedencia}}'>
               <input type="hidden" name="rutaorden" id='rutaorden' value = '{{$rutaorden}}'>
+              
+              
               <div class="row">
 
                 <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">

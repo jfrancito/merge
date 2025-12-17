@@ -480,6 +480,12 @@ class GestionEstibaController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'SUBIO DOCUMENTOS');
+                //geolocalizacion
+
+
                 if($fedocumento->OPERACION == 'DOCUMENTO_INTERNO_COMPRA'){
                     FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                                 ->update(
@@ -515,6 +521,11 @@ class GestionEstibaController extends Controller
                 $documento->TIPO                        =   'APROBADO POR USUARIO CONTACTO';
                 $documento->MENSAJE                     =   '';
                 $documento->save();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR USUARIO CONTACTO');
+                //geolocalizacion
 
               
                 DB::commit();

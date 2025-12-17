@@ -22,6 +22,7 @@
           <div class="panel-body">
             <form method="POST" action="{{ url('/agregar-cuarta-categoria/'.$idopcion) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" id ='frmpm' enctype="multipart/form-data">
                   {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
                   <div class='formconsulta'>
                     @include('cuartacategoria.form.facuartacategoria')
                     <div class="row xs-pt-15">

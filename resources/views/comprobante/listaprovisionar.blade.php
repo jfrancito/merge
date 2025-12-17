@@ -18,6 +18,7 @@
                   <div class="tools tooltiptop">
                     <form method="POST" id='formpedido' class='opciones' action="{{ url('/provisionar-documentos/'.$idopcion) }}" style="display: inline-block;" >
                       {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
                       <input type="hidden" id='pedido' name='pedido' >
                       <a href="#" class="tooltipcss" id='provisionar' >
                         <span class="tooltiptext">Provisionar</span>

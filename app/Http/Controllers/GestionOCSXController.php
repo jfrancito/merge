@@ -540,6 +540,11 @@ class GestionOCSXController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'SUBIO DOCUMENTOS');
+                //geolocalizacion
+
 
                 $orden                                  =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
                 $fedocumento_x                          =   FeDocumento::where('TXT_REFERENCIA','=',$idoc)->first();
@@ -635,6 +640,12 @@ class GestionOCSXController extends Controller
                     $documento->TIPO                        =   'APROBADO POR USUARIO CONTACTO';
                     $documento->MENSAJE                     =   '';
                     $documento->save();
+
+                    //geolocalizacion
+                    $device_info       =   $request['device_info'];
+                    $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR USUARIO CONTACTO');
+                    //geolocalizacion
+
 
                     //whatsaap para contabilidad
                     // $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->first();

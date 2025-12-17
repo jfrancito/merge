@@ -263,6 +263,12 @@ class GestionOCAcopioController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();                
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR JEFE DE ACOPIO');
+                //geolocalizacion
+
+
                 DB::commit();
 
                 Session::flash('operacion_id', 'LIQUIDACION_COMPRA_ANTICIPO');
@@ -463,6 +469,13 @@ class GestionOCAcopioController extends Controller
                 $documento->MENSAJE                     =   $descripcion;
                 $documento->save();
 
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'OBSERVADO POR JEFE ACOPIO');
+                //geolocalizacion
+
+
                 FeDocumento::where('ID_DOCUMENTO',$idop)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
                                 [
@@ -600,6 +613,12 @@ class GestionOCAcopioController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
  
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR JEFE DE ACOPIO');
+                //geolocalizacion
+
                 DB::commit();
 
                 Session::flash('operacion_id', $request['operacion_id']);
@@ -766,6 +785,11 @@ class GestionOCAcopioController extends Controller
                 $documento->MENSAJE                     =   $descripcion;
                 $documento->save();
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'OBSERVADO POR JEFE ACOPIO');
+                //geolocalizacion
+
                 FeDocumento::where('ID_DOCUMENTO',$idoc)
                             ->update(
                                 [
@@ -774,7 +798,6 @@ class GestionOCAcopioController extends Controller
                                     'area_observacion'=>'CONT'
                                 ]
                             );
-
 
                 DB::commit();
 

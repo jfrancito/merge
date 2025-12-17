@@ -606,6 +606,11 @@ class GestionOCController extends Controller
                 $documento->save();
 
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'SUBIO DOCUMENTOS');
+                //geolocalizacion
+
                 //LE LLEGA AL USUARIO DE CONTACTO
                 // $trabajador         =   STDTrabajador::where('COD_TRAB','=',$contacto->COD_TRABAJADOR)->first();
                 // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
@@ -2205,6 +2210,11 @@ class GestionOCController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'SUBIO DOCUMENTOS');
+                //geolocalizacion
+
                 // $fedocumento_w       =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
                 // //LE LLEGA AL USUARIO DE CONTACTO
                 // $trabajador         =   STDTrabajador::where('COD_TRAB','=',$contacto->COD_TRABAJADOR)->first();
@@ -2893,7 +2903,7 @@ class GestionOCController extends Controller
                 }
                 return Redirect::to('detalle-comprobante-liquidacion-compra-anticipo-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordenpago)->with('bienhecho', 'Se valido el xml');
             }else{
-                dd("errpr");
+                //dd("errpr");
                 return Redirect::to('detalle-comprobante-liquidacion-compra-anticipo-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordenpago)->with('errorurl', 'Archivo XML de la Orden de Pago No Encontrado ');
             }
 
@@ -3015,6 +3025,11 @@ class GestionOCController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'SUBIO DOCUMENTOS');
+                //geolocalizacion
+
                 FeDocumento::where('ID_DOCUMENTO',$idop)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(
                                 [
@@ -3037,6 +3052,13 @@ class GestionOCController extends Controller
                 $documento->TIPO                        =   'APROBADO POR USUARIO CONTACTO';
                 $documento->MENSAJE                     =   '';
                 $documento->save();               
+
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR USUARIO CONTACTO');
+                //geolocalizacion
+
 
 
                 DB::commit();
@@ -4577,6 +4599,12 @@ class GestionOCController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'SUBIO DOCUMENTOS');
+                //geolocalizacion
+
                 $orden                                  =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
 
 
@@ -4673,6 +4701,12 @@ class GestionOCController extends Controller
                     $documento->TIPO                        =   'APROBADO POR USUARIO CONTACTO';
                     $documento->MENSAJE                     =   '';
                     $documento->save();
+
+                    //geolocalizacion
+                    $device_info       =   $request['device_info'];
+                    $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR USUARIO CONTACTO');
+                    //geolocalizacion
+
 
                     //whatsaap para contabilidad
                     // $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->first();
@@ -5221,6 +5255,11 @@ class GestionOCController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'SUBIO DOCUMENTOS');
+                //geolocalizacion
+
 
                 FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(
@@ -5243,6 +5282,11 @@ class GestionOCController extends Controller
                 $documento->TIPO                        =   'APROBADO POR USUARIO CONTACTO';
                 $documento->MENSAJE                     =   '';
                 $documento->save();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR USUARIO CONTACTO');
+                //geolocalizacion
 
 
                 //whatsaap para contabilidad
