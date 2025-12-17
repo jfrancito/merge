@@ -976,6 +976,10 @@ class UserController extends Controller {
 	{
 		$this->envio_correo_adminlqc();
 	}
+    public function actionCorreoAprobado()
+	{
+		$this->envio_correo_aprobado();
+	}
 
 
     public function actionCorreoTesoreriaLg()

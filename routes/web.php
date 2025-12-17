@@ -70,6 +70,8 @@ Route::any('/enviocorreojefeacopiolqc', 'UserController@actionCorreoJefeAcopioLq
 Route::any('/enviocorreoadmindic', 'UserController@actionCorreoAdminDic');//correo para jefe acopio liuidacion compra
 Route::any('/enviocorreoadminlqc', 'UserController@actionCorreoAdminLqc');//correo para jefe acopio liuidacion compra
 
+Route::any('/enviocorreoaprobado', 'UserController@actionCorreoAprobado');//correo para jefe acopio liuidacion compra
+
 
 Route::group(['middleware' => ['authaw']], function () {
 

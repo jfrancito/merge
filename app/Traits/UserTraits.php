@@ -649,6 +649,60 @@ trait UserTraits
     }
 
 
+    private function envio_correo_aprobado() {
+
+        $listadocumentos          =   FeDocumento::where()
+                                      ->where('COD_ESTADO','=','ETM0000000000005')
+                                      ->where('IND_EMAIL_APROBADO','=',0)
+                                      ->get();
+
+        dd($listadocumentos);
+
+        // foreach($listadocumentos as $item){
+
+        //     $ordenpago              =      VMergeOP::where('COD_ESTADO','=','1')
+        //                                         ->where('COD_AUTORIZACION','=',$item->ID_DOCUMENTO)
+        //                                         ->first();
+
+        //     $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
+        //     $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00044')->first();
+        //     if($ordenpago->COD_CENTRO == 'CEN0000000000004'){ //rioja
+        //         $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00044')->first();
+        //     }else{
+        //         if($ordenpago->COD_CENTRO == 'CEN0000000000006'){ //bellavista
+        //             $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00044')->first();
+        //         }else{
+        //             if($ordenpago->COD_CENTRO == 'CEN0000000000002'){ //bellavista
+        //                 $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00044')->first();
+        //             }
+        //         }
+        //     }
+        //     $subjectcorreo = "LIQUIDACION DE COMPRA ANTICIPO (".$item->ID_DOCUMENTO.")";
+        //     $array  =        [
+        //                             'ordenpago'       => $ordenpago,
+        //                             'estado'            => 'POR APROBAR ADMINISTRACION',
+        //                      ];
+
+        //     Mail::send('emails.emailliquidacioncompraanticipogenerado', $array, function($message) use ($emailfrom,$item,$email,$subjectcorreo)
+        //     {
+        //         $emailcopias        = explode(",", $email->correocopia);  
+        //         $message->from($emailfrom->correoprincipal, 'LIQUIDACION DE COMPRA ANTICIPO ADMINISTRACION ('.$item->ID_DOCUMENTO.')');
+        //         $message->to($email->correoprincipal)->cc($emailcopias);
+        //         $message->subject($subjectcorreo);
+        //     });
+
+        //     FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
+        //                 ->update(
+        //                         [
+        //                             'IND_EMAIL_ADMINISTRACION_ACOPIO'=>'1'
+        //                         ]);  
+
+        // }
+
+        print_r("Se envio correctamente el correo administracion");
+    }
+
+
 
     private function envio_correo_jefeacopiolqc() {
 
