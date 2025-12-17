@@ -2176,6 +2176,16 @@ class GestionLiquidacionGastosController extends Controller
             try {
 
                 DB::beginTransaction();
+
+
+
+                $fedocumento_ap = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('COD_ESTADO','<>','ETM0000000000004')->first();
+                if (count($fedocumento_ap)>0) {
+                    return Redirect::back()->with('errorurl', 'El documento esta aprobado');
+                }
+
+
+
                 $liquidaciongastos = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->first();
                 $tdetliquidaciongastos = LqgDetLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
                 $detdocumentolg = LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
@@ -2425,6 +2435,13 @@ class GestionLiquidacionGastosController extends Controller
             try {
 
                 DB::beginTransaction();
+
+
+                $fedocumento_ap = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('COD_ESTADO','<>','ETM0000000000003')->first();
+                if (count($fedocumento_ap)>0) {
+                    return Redirect::back()->with('errorurl', 'El documento esta aprobado');
+                }
+
 
                 $detalles = $request->input('detalles');
 
