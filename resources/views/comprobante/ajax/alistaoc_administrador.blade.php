@@ -67,13 +67,13 @@
                   Agregar Archivos
                 </a>  
               </li>
-              
-<!--               <li>
+              @if(Session::get('usuario')->id == '1CIX00000001' || Session::get('usuario')->id == '1CIX00000094')
+              <li>
                 <a href="{{ url('/quitar-archivo-uc/'.$procedencia.'/'.$idopcion.'/'.substr($item->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($item->COD_ORDEN, -10))) }}">
                   Quitar Archivos
                 </a>  
-              </li> -->
-
+              </li>
+              @endif
 
             </ul>
           </div>
