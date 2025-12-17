@@ -2709,7 +2709,7 @@ class GestionOCAdministracionController extends Controller
                 DB::beginTransaction();
 
 
-                $fedocumento_ap = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)->where('COD_ESTADO','<>','ETM0000000000004')->first();
+                $fedocumento_ap = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('COD_ESTADO','<>','ETM0000000000004')->first();
                 if (count($fedocumento_ap)>0) {
                     return Redirect::back()->with('errorurl', 'El documento esta aprobado');
                 }
