@@ -529,6 +529,23 @@ class GestionOCSXController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
+                $ordencompra_tt                            =   CMPOrden::where('COD_ORDEN','=',$fedocumento->ID_DOCUMENTO)->first();
+                $trabajador = DB::table('STD.TRABAJADOR')->where('COD_TRAB', $ordencompra_tt->COD_TRABAJADOR_ENCARGADO)->first();
+                $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('dni','=',$trabajador->NRO_DOCUMENTO)->first();
+
+                if(count($trabajadorcorreo)>0){
+                    $documento                              =   new FeDocumentoHistorial;
+                    $documento->ID_DOCUMENTO                =   $ordencompra_tt->COD_ORDEN;
+                    $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                    $documento->FECHA                       =   date_format(date_create($ordencompra_tt->FEC_USUARIO_CREA_AUD), 'Ymd h:i:s');
+                    $documento->USUARIO_ID                  =   $trabajadorcorreo->COD_TRAB;
+                    $documento->USUARIO_NOMBRE              =   $trabajadorcorreo->apellidopaterno.' '.$trabajadorcorreo->apellidomaterno.' '.$trabajadorcorreo->nombres;;
+                    $documento->TIPO                        =   'APRUEBA EN OSIRIS';
+                    $documento->MENSAJE                     =   '';
+                    $documento->save();
+                }
+
+
                 //HISTORIAL DE DOCUMENTO APROBADO
                 $documento                              =   new FeDocumentoHistorial;
                 $documento->ID_DOCUMENTO                =   $ordencompra->COD_ORDEN;
