@@ -421,6 +421,14 @@ class GestionOCContabilidadController extends Controller
 
         if ($_POST) {
 
+
+
+                $fedocumento_ap = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)->where('COD_ESTADO','<>','ETM0000000000003')->first();
+                if (count($fedocumento_ap)>0) {
+                    return Redirect::back()->with('errorurl', 'El documento esta aprobado');
+                }
+
+
 //            $asiento_cabecera_compra = json_decode($request['asiento_cabecera_compra'], true);
 //            $asiento_detalle_compra = json_decode($request['asiento_detalle_compra'], true);
 //            $asiento_cabecera_reparable_reversion = json_decode($request['asiento_cabecera_reparable_reversion'], true);
@@ -1730,6 +1738,13 @@ class GestionOCContabilidadController extends Controller
 
         if ($_POST) {
 
+
+                $fedocumento_ap = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)->where('COD_ESTADO','<>','ETM0000000000003')->first();
+                if (count($fedocumento_ap)>0) {
+                    return Redirect::back()->with('errorurl', 'El documento esta aprobado');
+                }
+
+
 //            $asiento_cabecera_compra = json_decode($request['asiento_cabecera_compra'], true);
 //            $asiento_detalle_compra = json_decode($request['asiento_detalle_compra'], true);
 //            $asiento_cabecera_reparable_reversion = json_decode($request['asiento_cabecera_reparable_reversion'], true);
@@ -2841,6 +2856,11 @@ class GestionOCContabilidadController extends Controller
         View::share('titulo', 'Aprobar Comprobante');
 
         if ($_POST) {
+
+                $fedocumento_ap = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)->where('COD_ESTADO','<>','ETM0000000000003')->first();
+                if (count($fedocumento_ap)>0) {
+                    return Redirect::back()->with('errorurl', 'El documento esta aprobado');
+                }
 
 //            $asiento_cabecera_compra = json_decode($request['asiento_cabecera_compra'], true);
 //            $asiento_detalle_compra = json_decode($request['asiento_detalle_compra'], true);

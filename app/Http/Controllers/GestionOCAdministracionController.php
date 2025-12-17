@@ -1200,6 +1200,12 @@ class GestionOCAdministracionController extends Controller
                 
                 DB::beginTransaction();
 
+                $fedocumento_ap = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)->where('COD_ESTADO','<>','ETM0000000000004')->first();
+                if (count($fedocumento_ap)>0) {
+                    return Redirect::back()->with('errorurl', 'El documento esta aprobado');
+                }
+
+
                 $pedido_id          =   $idoc;
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
                 if($fedocumento->ind_observacion==1){
@@ -1659,6 +1665,11 @@ class GestionOCAdministracionController extends Controller
                 DB::beginTransaction();
 
 
+                $fedocumento_ap = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)->where('COD_ESTADO','<>','ETM0000000000004')->first();
+                if (count($fedocumento_ap)>0) {
+                    return Redirect::back()->with('errorurl', 'El documento esta aprobado');
+                }
+
                 $pedido_id          =   $idoc;
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
 
@@ -2095,6 +2106,12 @@ class GestionOCAdministracionController extends Controller
             try{    
                 
                 DB::beginTransaction();
+
+
+                $fedocumento_ap = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)->where('COD_ESTADO','<>','ETM0000000000004')->first();
+                if (count($fedocumento_ap)>0) {
+                    return Redirect::back()->with('errorurl', 'El documento esta aprobado');
+                }
 
 
                 $pedido_id          =   $idoc;
@@ -2691,6 +2708,11 @@ class GestionOCAdministracionController extends Controller
                 
                 DB::beginTransaction();
 
+
+                $fedocumento_ap = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)->where('COD_ESTADO','<>','ETM0000000000004')->first();
+                if (count($fedocumento_ap)>0) {
+                    return Redirect::back()->with('errorurl', 'El documento esta aprobado');
+                }
 
                 $pedido_id          =   $idoc;
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->first();
