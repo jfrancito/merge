@@ -16,7 +16,7 @@ use App\Modelos\LqgLiquidacionGasto;
 use App\Modelos\VMergeDocumento;
 use App\Modelos\VMergeOP;
 
-
+use App\Modelos\CMPOrden;
 
 use View;
 use Session;
@@ -651,53 +651,125 @@ trait UserTraits
 
     private function envio_correo_aprobado() {
 
-        $listadocumentos          =   FeDocumento::where()
-                                      ->where('COD_ESTADO','=','ETM0000000000005')
+        $listadocumentos          =   FeDocumento::where('COD_ESTADO','=','ETM0000000000005')
                                       ->where('IND_EMAIL_APROBADO','=',0)
+                                      //->where('ID_DOCUMENTO','=','IILMCR0000033070')
                                       ->get();
 
-        dd($listadocumentos);
+        foreach($listadocumentos as $item){
 
-        // foreach($listadocumentos as $item){
+            $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
+            $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00045')->first();
+            $fe_historial           =   DB::table('FE_DOCUMENTO_HISTORIAL')
+                                        ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
+                                        ->where('TIPO', 'like', '%APROBADO POR%')
+                                        ->orderBy('FECHA', 'desc')
+                                        ->get();
+            $subjectcorreo          =   "COMPRA APROBADA ".$item->ID_DOCUMENTO." (".$item->OPERACION.")";
 
-        //     $ordenpago              =      VMergeOP::where('COD_ESTADO','=','1')
-        //                                         ->where('COD_AUTORIZACION','=',$item->ID_DOCUMENTO)
-        //                                         ->first();
+            //correo de trabajadores
+            $correotrabajador         =    '';
+            foreach($fe_historial as $item3){
+                    $user = DB::table('users')->where('id', $item3->USUARIO_ID)->first();
+                    $trabajador = DB::table('STD.TRABAJADOR')->where('COD_TRAB', $user->usuarioosiris_id)->first();
 
-        //     $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
-        //     $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00044')->first();
-        //     if($ordenpago->COD_CENTRO == 'CEN0000000000004'){ //rioja
-        //         $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00044')->first();
-        //     }else{
-        //         if($ordenpago->COD_CENTRO == 'CEN0000000000006'){ //bellavista
-        //             $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00044')->first();
-        //         }else{
-        //             if($ordenpago->COD_CENTRO == 'CEN0000000000002'){ //bellavista
-        //                 $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00044')->first();
-        //             }
-        //         }
-        //     }
-        //     $subjectcorreo = "LIQUIDACION DE COMPRA ANTICIPO (".$item->ID_DOCUMENTO.")";
-        //     $array  =        [
-        //                             'ordenpago'       => $ordenpago,
-        //                             'estado'            => 'POR APROBAR ADMINISTRACION',
-        //                      ];
+                    $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('dni','=',$trabajador->NRO_DOCUMENTO)->first();
+                    if(count($trabajadorcorreo)>0){
+                        if ($trabajadorcorreo->emailcorp !== null) {
+                            $correotrabajador = $correotrabajador.$trabajadorcorreo->emailcorp.',';
+                        }
+                    }
+            }
 
-        //     Mail::send('emails.emailliquidacioncompraanticipogenerado', $array, function($message) use ($emailfrom,$item,$email,$subjectcorreo)
-        //     {
-        //         $emailcopias        = explode(",", $email->correocopia);  
-        //         $message->from($emailfrom->correoprincipal, 'LIQUIDACION DE COMPRA ANTICIPO ADMINISTRACION ('.$item->ID_DOCUMENTO.')');
-        //         $message->to($email->correoprincipal)->cc($emailcopias);
-        //         $message->subject($subjectcorreo);
-        //     });
 
-        //     FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
-        //                 ->update(
-        //                         [
-        //                             'IND_EMAIL_ADMINISTRACION_ACOPIO'=>'1'
-        //                         ]);  
+            $usuario_solicita = '';
+            $usuario_autoriza = '';
+            $usuario_aprueba = '';
 
-        // }
+            if($item->OPERACION == 'ORDEN_COMPRA'){
+
+                $ordencompra            =   CMPOrden::where('COD_ORDEN','=',$item->ID_DOCUMENTO)->first();
+
+
+                $trabajador = DB::table('STD.TRABAJADOR')->where('COD_TRAB', $ordencompra->COD_TRABAJADOR_SOLICITA)->first();
+                $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('dni','=',$trabajador->NRO_DOCUMENTO)->first();
+                if(count($trabajadorcorreo)>0){
+                    $usuario_solicita = $trabajadorcorreo->apellidopaterno.' '.$trabajadorcorreo->apellidomaterno.' '.$trabajadorcorreo->nombres;
+                    if ($trabajadorcorreo->emailcorp !== null) {
+                        $correotrabajador = $correotrabajador.$trabajadorcorreo->emailcorp.',';
+                    }
+                }
+
+                $trabajador = DB::table('STD.TRABAJADOR')->where('COD_TRAB', $ordencompra->COD_TRABAJADOR_ENCARGADO)->first();
+                $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('dni','=',$trabajador->NRO_DOCUMENTO)->first();
+                if(count($trabajadorcorreo)>0){
+                    $usuario_autoriza = $trabajadorcorreo->apellidopaterno.' '.$trabajadorcorreo->apellidomaterno.' '.$trabajadorcorreo->nombres;
+                    if ($trabajadorcorreo->emailcorp !== null) {
+                        $correotrabajador = $correotrabajador.$trabajadorcorreo->emailcorp.',';
+                    }
+                }
+                $trabajador = DB::table('STD.TRABAJADOR')->where('COD_TRAB', $ordencompra->COD_TRABAJADOR_COMISIONISTA)->first();
+                $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('dni','=',$trabajador->NRO_DOCUMENTO)->first();
+                if(count($trabajadorcorreo)>0){
+                    $usuario_aprueba = $trabajadorcorreo->apellidopaterno.' '.$trabajadorcorreo->apellidomaterno.' '.$trabajadorcorreo->nombres;
+                    if ($trabajadorcorreo->emailcorp !== null) {
+                        $correotrabajador = $correotrabajador.$trabajadorcorreo->emailcorp.',';
+                    }
+                }
+
+            }
+
+
+            // 1. Eliminar espacios en blanco al inicio y final
+            $correotrabajador = trim($correotrabajador);
+            
+            // 2. Eliminar coma final si existe
+            $correotrabajador = rtrim($correotrabajador, ',');
+            
+            // 3. Convertir a array
+            $correotrabajador = explode(',', $correotrabajador);
+            
+            // 4. Limpiar cada correo (eliminar espacios)
+            $correotrabajador = array_map('trim', $correotrabajador);
+            
+            // 5. Eliminar elementos vacíos
+            $correotrabajador = array_filter($correotrabajador);
+            
+            // 6. Eliminar duplicados manteniendo el orden
+            $correotrabajador = array_unique($correotrabajador);
+            $correosLimpios = implode(',', $correotrabajador);
+
+            $array  =        [
+                                    'item'       => $item,
+                                    'fe_historial'     => $fe_historial,
+                                    'usuario_solicita'     => $usuario_solicita,
+                                    'usuario_autoriza'     => $usuario_autoriza,
+                                    'usuario_aprueba'     => $usuario_aprueba,
+                             ];
+
+
+            Mail::send('emails.emailcompraaprobado', $array, function($message) use ($emailfrom,$item,$email,$subjectcorreo,$correosLimpios)
+            {
+
+
+                if($correosLimpios ==''){
+                    $emailcopias        = explode(",", $email->correocopia);  
+                }else{
+                    $emailcopias        = explode(",", $email->correocopia.','.$correosLimpios); 
+                }
+
+                $message->from($emailfrom->correoprincipal, 'COMPRA APROBADA ('.$item->ID_DOCUMENTO.')');
+                $message->to($email->correoprincipal)->cc($emailcopias);
+                $message->subject($subjectcorreo);
+            });
+
+            FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
+                        ->update(
+                                [
+                                    'IND_EMAIL_APROBADO'=>'1'
+                                ]);  
+
+        }
 
         print_r("Se envio correctamente el correo administracion");
     }

@@ -92,6 +92,8 @@ class NotificacionOC extends Command
         }
 
         $this->guadarpdfoi();
+        $this->envio_correo_aprobado();
+
 
 
         // //precios de supermercado
