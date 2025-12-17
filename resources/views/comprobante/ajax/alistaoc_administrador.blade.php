@@ -59,15 +59,13 @@
                     @endif
                   @endif
                 @endif
-
               </li>
-
               <li>
                 <a href="{{ url('/agregar-archivo-uc/'.$procedencia.'/'.$idopcion.'/'.substr($item->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($item->COD_ORDEN, -10))) }}">
                   Agregar Archivos
                 </a>  
               </li>
-              @if(Session::get('usuario')->id == '1CIX00000001' || Session::get('usuario')->id == '1CIX00000094')
+              @if(Session::get('usuario')->id == '1CIX00000001')
               <li>
                 <a href="{{ url('/quitar-archivo-uc/'.$procedencia.'/'.$idopcion.'/'.substr($item->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($item->COD_ORDEN, -10))) }}">
                   Quitar Archivos

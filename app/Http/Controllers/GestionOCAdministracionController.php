@@ -1274,6 +1274,7 @@ class GestionOCAdministracionController extends Controller
                                 [
                                     'COD_ESTADO'=>'ETM0000000000005',
                                     'TXT_ESTADO'=>'APROBADO',
+                                    'IND_EMAIL_APROBADO'=>'0',
                                     'ind_email_clap'=>0,
                                     'fecha_ap'=>$this->fechaactual,
                                     'usuario_ap'=>Session::get('usuario')->id
@@ -1756,6 +1757,7 @@ class GestionOCAdministracionController extends Controller
                                 [
                                     'COD_ESTADO'=>'ETM0000000000005',
                                     'TXT_ESTADO'=>'APROBADO',
+                                    'IND_EMAIL_APROBADO'=>'0',
                                     'ind_email_clap'=>0,
                                     'fecha_ap'=>$this->fechaactual,
                                     'usuario_ap'=>Session::get('usuario')->id
@@ -2198,6 +2200,7 @@ class GestionOCAdministracionController extends Controller
                                 [
                                     'COD_ESTADO'=>'ETM0000000000005',
                                     'TXT_ESTADO'=>'APROBADO',
+                                    'IND_EMAIL_APROBADO'=>'0',
                                     'ind_email_clap'=>0,
                                     'fecha_ap'=>$this->fechaactual,
                                     'usuario_ap'=>Session::get('usuario')->id
@@ -2782,6 +2785,7 @@ class GestionOCAdministracionController extends Controller
                                 [
                                     'COD_ESTADO'=>'ETM0000000000005',
                                     'TXT_ESTADO'=>'APROBADO',
+                                    'IND_EMAIL_APROBADO'=>'0',
                                     'ind_email_clap'=>0,
                                     'fecha_ap'=>$this->fechaactual,
                                     'usuario_ap'=>Session::get('usuario')->id
