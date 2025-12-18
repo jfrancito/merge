@@ -427,6 +427,12 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-moneda-ajax-cuenta', 'GestionOCController@actionAjaxMonedaAjaxCuenta');
 
 
+	//PROVISION DE GASTO 
+	Route::any('/detalle-comprobante-provision-administrator/{procedencia}/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCSXController@actionDetalleComprobanteProvisionGasto');
+
+
+
+
 
 
 	//ADMINISTRATOR CONTRATO

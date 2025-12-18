@@ -934,7 +934,7 @@ class GestionEstibaController extends Controller
 
 
 
-
+        //dd("hola");
         
         return View::make('comprobante/registrocomprobanteestibaadministrator',
                          [

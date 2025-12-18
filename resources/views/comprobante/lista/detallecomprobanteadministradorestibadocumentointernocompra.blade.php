@@ -8,7 +8,7 @@
                 <div class="panel-body panel-body-contrast">
                   <form method="POST" action="{{ url('subir-xml-cargar-datos-estiba-administrator/'.$idopcion.'/'.$idoc) }}" name="formcargardatos" id="formcargardatos" enctype="multipart/form-data" >
                      {{ csrf_field() }}
-<input type="hidden" name="device_info" id='device_info'>
+                      <input type="hidden" name="device_info" id='device_info'>
 
                       <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 cajareporte">
 
@@ -104,13 +104,15 @@
                 </div>
               </div>
             </div>
+
+
           </div>
 
 
           @if(count($fedocumento)>0)
             <form method="POST" action="{{ url('validar-xml-oc-estiba-administrator/'.$idopcion.'/'.$idoc) }}" name="formguardardatos" id="formguardardatos" enctype="multipart/form-data" >
              {{ csrf_field() }}
-<input type="hidden" name="device_info" id='device_info'>
+              <input type="hidden" name="device_info" id='device_info'>
               <input type="hidden" name="rutaorden" id='rutaorden' value = '{{$rutaorden}}'>
               
               
@@ -487,7 +489,7 @@
                                           <input type="hidden" name="idopcion" id='idopcion' value = '{{$idopcion}}'>
                                           <input type="hidden" name="te" id='te' value = '{{$fedocumento->ind_errototal}}'>
                                           <input type="hidden" name="valor_igv" id='valor_igv' value = '{{(float)$fedocumento->VALOR_IGV_ORIG}}'>
-                                          <input type="hidden" name="empresa_id" id='empresa_id' value = '{{$empresa->COD_EMPR}}'>
+                                          <input type="hidden" name="empresa_id" id='empresa_id' value = "{{Session::get('empresas')->COD_EMPR}}">
                                           <input type="hidden" name="monto_total" id='monto_total' value = '{{$fedocumento->TOTAL_VENTA_ORIG}}'>
                                           <input type="hidden" name="tipo_documento_id" id='tipo_documento_id' value = '{{$fedocumento->ID_TIPO_DOC}}'>
                                           <input type="hidden" name="orden_id" id='orden_id' value = '{{$idoc}}'>
