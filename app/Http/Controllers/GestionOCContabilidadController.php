@@ -1739,7 +1739,7 @@ class GestionOCContabilidadController extends Controller
         if ($_POST) {
 
 
-                $fedocumento_ap = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)->where('COD_ESTADO','<>','ETM0000000000003')->first();
+                $fedocumento_ap = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('COD_ESTADO','<>','ETM0000000000003')->first();
                 if (count($fedocumento_ap)>0) {
                     return Redirect::back()->with('errorurl', 'El documento esta aprobado');
                 }
