@@ -980,6 +980,15 @@ class UserController extends Controller {
 	{
 		$this->envio_correo_aprobado();
 	}
+    public function actionCorreoAprobadoAdmin()
+	{
+		$this->envio_correo_aprobado_admin();
+	}
+
+    public function actionCrearExcelAprobadoAdmin()
+	{
+		$this->crear_excel_aporbado_admin();
+	}
 
 
     public function actionCorreoTesoreriaLg()

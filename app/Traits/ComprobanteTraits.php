@@ -72,7 +72,7 @@ trait ComprobanteTraits
 
     public function con_usuarios_cambio_cuenta() {
         $sw = 0;
-        $array = ['1CIX00000217','1CIX00000001'];
+        $array = ['1CIX00000422','1CIX00000001'];
         $valor = Session::get('usuario')->id;
 
         if (in_array($valor, $array)) {
@@ -3402,7 +3402,7 @@ trait ComprobanteTraits
     }
 
     private function array_usuario_jefes() {
-        $array = ['1CIX00000072','1CIX00000075','1CIX00000073','1CIX00000188','1CIX00000217'];
+        $array = ['1CIX00000072','1CIX00000075','1CIX00000073','1CIX00000188','1CIX00000422'];
         return $array;
     }
 
