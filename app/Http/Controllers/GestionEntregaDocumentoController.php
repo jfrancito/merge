@@ -68,7 +68,7 @@ class GestionEntregaDocumentoController extends Controller
                 $area_id        =   $tp_area->COD_CATEGORIA;
             }
         }
-        if(Session::get('usuario')->id == '1CIX00000217'){
+        if(Session::get('usuario')->id == '1CIX00000422'){
             $area_id        =   'TODO';
         }
         if($operacion_id=='ORDEN_COMPRA'){
@@ -146,7 +146,7 @@ class GestionEntregaDocumentoController extends Controller
         }
 
 
-        if(Session::get('usuario')->id == '1CIX00000217'){
+        if(Session::get('usuario')->id == '1CIX00000422'){
             $area_id        =   'TODO';
             $combo_area     =   $this->gn_combo_area_usuario($estado_id);
 

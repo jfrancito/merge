@@ -26,7 +26,7 @@ use Keygen;
 use Mail;
 use PDO;
 use App\Traits\WhatsappTraits;
-
+use Maatwebsite\Excel\Facades\Excel;
 trait UserTraits
 {
     use WhatsappTraits;
@@ -663,6 +663,7 @@ trait UserTraits
             $fe_historial           =   DB::table('FE_DOCUMENTO_HISTORIAL')
                                         ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
                                         ->where('TIPO', 'like', '%APROBADO POR%')
+                                        ->where('TIPO','<>','APROBADO POR ADMINISTRACION')
                                         ->orderBy('FECHA', 'desc')
                                         ->get();
             $subjectcorreo          =   "COMPRA APROBADA ".$item->ID_DOCUMENTO." (".$item->OPERACION.")";
@@ -773,6 +774,223 @@ trait UserTraits
 
         print_r("Se envio correctamente el correo administracion");
     }
+
+
+    private function envio_correo_aprobado_admin() {
+
+        $listadocumentos          =   FeDocumento::whereIn('COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
+                                      ->where(function($q) {
+                                            $q->whereNull('IND_EMAIL_APROBADO_ADMIN')
+                                              ->orWhere('IND_EMAIL_APROBADO_ADMIN', 0);
+                                        })
+                                      ->whereDate('fecha_ap', date('Y-m-d'))
+                                      ->get();
+
+        dd($listadocumentos);
+
+
+        // foreach($listadocumentos as $item){
+
+        //     $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
+        //     $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00045')->first();
+        //     $fe_historial           =   DB::table('FE_DOCUMENTO_HISTORIAL')
+        //                                 ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
+        //                                 ->where('TIPO', 'like', '%APROBADO POR%')
+        //                                 ->where('TIPO','<>','APROBADO POR ADMINISTRACION')
+        //                                 ->orderBy('FECHA', 'desc')
+        //                                 ->get();
+        //     $subjectcorreo          =   "COMPRA APROBADA ".$item->ID_DOCUMENTO." (".$item->OPERACION.")";
+
+        //     //correo de trabajadores
+        //     $correotrabajador         =    '';
+        //     foreach($fe_historial as $item3){
+        //             $user = DB::table('users')->where('id', $item3->USUARIO_ID)->first();
+        //             $trabajador = DB::table('STD.TRABAJADOR')->where('COD_TRAB', $user->usuarioosiris_id)->first();
+
+        //             $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('dni','=',$trabajador->NRO_DOCUMENTO)->first();
+        //             if(count($trabajadorcorreo)>0){
+        //                 if ($trabajadorcorreo->emailcorp !== null) {
+        //                     $correotrabajador = $correotrabajador.$trabajadorcorreo->emailcorp.',';
+        //                 }
+        //             }
+        //     }
+
+
+        //     $usuario_solicita = '';
+        //     $usuario_autoriza = '';
+        //     $usuario_aprueba = '';
+
+        //     if($item->OPERACION == 'ORDEN_COMPRA'){
+
+        //         $ordencompra            =   CMPOrden::where('COD_ORDEN','=',$item->ID_DOCUMENTO)->first();
+
+
+        //         $trabajador = DB::table('STD.TRABAJADOR')->where('COD_TRAB', $ordencompra->COD_TRABAJADOR_SOLICITA)->first();
+        //         $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('dni','=',$trabajador->NRO_DOCUMENTO)->first();
+        //         if(count($trabajadorcorreo)>0){
+        //             $usuario_solicita = $trabajadorcorreo->apellidopaterno.' '.$trabajadorcorreo->apellidomaterno.' '.$trabajadorcorreo->nombres;
+        //             if ($trabajadorcorreo->emailcorp !== null) {
+        //                 $correotrabajador = $correotrabajador.$trabajadorcorreo->emailcorp.',';
+        //             }
+        //         }
+
+        //         $trabajador = DB::table('STD.TRABAJADOR')->where('COD_TRAB', $ordencompra->COD_TRABAJADOR_ENCARGADO)->first();
+        //         $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('dni','=',$trabajador->NRO_DOCUMENTO)->first();
+        //         if(count($trabajadorcorreo)>0){
+        //             $usuario_autoriza = $trabajadorcorreo->apellidopaterno.' '.$trabajadorcorreo->apellidomaterno.' '.$trabajadorcorreo->nombres;
+        //             if ($trabajadorcorreo->emailcorp !== null) {
+        //                 $correotrabajador = $correotrabajador.$trabajadorcorreo->emailcorp.',';
+        //             }
+        //         }
+        //         $trabajador = DB::table('STD.TRABAJADOR')->where('COD_TRAB', $ordencompra->COD_TRABAJADOR_COMISIONISTA)->first();
+        //         $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('dni','=',$trabajador->NRO_DOCUMENTO)->first();
+        //         if(count($trabajadorcorreo)>0){
+        //             $usuario_aprueba = $trabajadorcorreo->apellidopaterno.' '.$trabajadorcorreo->apellidomaterno.' '.$trabajadorcorreo->nombres;
+        //             if ($trabajadorcorreo->emailcorp !== null) {
+        //                 $correotrabajador = $correotrabajador.$trabajadorcorreo->emailcorp.',';
+        //             }
+        //         }
+
+        //     }
+
+
+        //     // 1. Eliminar espacios en blanco al inicio y final
+        //     $correotrabajador = trim($correotrabajador);
+            
+        //     // 2. Eliminar coma final si existe
+        //     $correotrabajador = rtrim($correotrabajador, ',');
+            
+        //     // 3. Convertir a array
+        //     $correotrabajador = explode(',', $correotrabajador);
+            
+        //     // 4. Limpiar cada correo (eliminar espacios)
+        //     $correotrabajador = array_map('trim', $correotrabajador);
+            
+        //     // 5. Eliminar elementos vacíos
+        //     $correotrabajador = array_filter($correotrabajador);
+            
+        //     // 6. Eliminar duplicados manteniendo el orden
+        //     $correotrabajador = array_unique($correotrabajador);
+        //     $correosLimpios = implode(',', $correotrabajador);
+
+        //     $array  =        [
+        //                             'item'       => $item,
+        //                             'fe_historial'     => $fe_historial,
+        //                             'usuario_solicita'     => $usuario_solicita,
+        //                             'usuario_autoriza'     => $usuario_autoriza,
+        //                             'usuario_aprueba'     => $usuario_aprueba,
+        //                      ];
+
+
+        //     Mail::send('emails.emailcompraaprobado', $array, function($message) use ($emailfrom,$item,$email,$subjectcorreo,$correosLimpios)
+        //     {
+
+
+        //         if($correosLimpios ==''){
+        //             $emailcopias        = explode(",", $email->correocopia);  
+        //         }else{
+        //             $emailcopias        = explode(",", $email->correocopia.','.$correosLimpios); 
+        //         }
+
+        //         $message->from($emailfrom->correoprincipal, 'COMPRA APROBADA ('.$item->ID_DOCUMENTO.')');
+        //         $message->to($email->correoprincipal)->cc($emailcopias);
+        //         $message->subject($subjectcorreo);
+        //     });
+
+        //     FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
+        //                 ->update(
+        //                         [
+        //                             'IND_EMAIL_APROBADO'=>'1'
+        //                         ]);  
+
+        // }
+
+        print_r("Se envio correctamente el correo administracion");
+    }
+
+    private function crear_excel_aporbado_admin() {
+
+        $listadocumentos = FeDocumento::whereIn('COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
+            ->where(function($q) {
+                $q->whereNull('IND_EMAIL_APROBADO_ADMIN')
+                  ->orWhere('IND_EMAIL_APROBADO_ADMIN', 0);
+            })
+            ->whereDate('fecha_ap', date('Y-m-d'))
+            ->orderBy('fecha_ap','asc')
+            ->get();
+
+        $fecha_actual = date("Y-m-d");
+        $titulo = 'Compras-Aprobadas-(' . $fecha_actual . ')';
+
+        // 1. Guardar LOCALMENTE primero (esto siempre funciona)
+        $rutaLocal = storage_path('app/excel_temp/');
+
+        // Crear carpeta temporal si no existe
+        if (!file_exists($rutaLocal)) {
+            mkdir($rutaLocal, 0777, true);
+        }
+
+        // Generar Excel localmente
+        Excel::create($titulo, function($excel) use ($listadocumentos, $titulo) {
+            $excel->sheet('OC', function($sheet) use ($listadocumentos, $titulo) {
+                $sheet->loadView('excel.listacomprasaprobadas')
+                      ->with('listadocumentos', $listadocumentos)
+                      ->with('titulo', $titulo);
+            });
+        })->store('xls', $rutaLocal);
+
+        // Ruta completa del archivo local
+        $archivoLocal = $rutaLocal . $titulo . '.xls';
+
+        // 2. Intentar copiar a la red
+        $rutaRed = '\\\\10.1.50.2\\comprobantes\\EXCELOC\\';
+        $archivoRed = $rutaRed . $titulo . '_' . date('His') . '.xls'; // Agregar hora para evitar duplicados
+
+        // Intentar copiar de diferentes maneras
+        $copiado = false;
+
+        // Método 1: copy() nativo de PHP
+        if (copy($archivoLocal, $archivoRed)) {
+            $copiado = true;
+            echo "✅ Archivo copiado exitosamente usando copy()<br>";
+        } 
+        // Método 2: file_put_contents
+        elseif (file_put_contents($archivoRed, file_get_contents($archivoLocal))) {
+            $copiado = true;
+            echo "✅ Archivo copiado exitosamente usando file_put_contents<br>";
+        }
+        // Método 3: Usar COM si es Windows
+        elseif (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            // Comando de Windows para copiar
+            $comando = 'copy "' . $archivoLocal . '" "' . $archivoRed . '"';
+            exec($comando, $output, $returnCode);
+            
+            if ($returnCode === 0) {
+                $copiado = true;
+                echo "✅ Archivo copiado usando comando Windows<br>";
+            }
+        }
+
+        if ($copiado) {
+            echo "📁 <strong>Archivo en red:</strong> " . $archivoRed . "<br>";
+            // Opcional: eliminar el archivo local
+            unlink($archivoLocal);
+        } else {
+            echo "⚠️ <strong>No se pudo copiar a la red</strong><br>";
+            echo "📁 <strong>Archivo local:</strong> " . $archivoLocal . "<br>";
+            echo "🔗 <a href='" . url('descargar-excel/' . basename($archivoLocal)) . "' target='_blank'>Descargar aquí</a><br>";
+            
+            // También puedes moverlo a una carpeta pública
+            $rutaPublica = public_path('descargas/' . $titulo . '.xls');
+            if (copy($archivoLocal, $rutaPublica)) {
+                echo "📁 <strong>Archivo público:</strong> " . url('descargas/' . $titulo . '.xls') . "<br>";
+            }
+        }
+
+
+    }
+
+
 
 
 
