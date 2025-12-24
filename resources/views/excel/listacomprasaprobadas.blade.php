@@ -19,18 +19,16 @@
 	    <tr>
 	      <th>OPERACION</th>
 	      <th>N° DE ORDEN DE COMPRA</th>
-
 	      <th>EMPRESA</th>
 	      <th>PROVEEDOR</th>
-	      <th>TIPO DE COMPROBANTE</th>
 	      <th>N° COMPROBANTE</th>
-	      <th>GLOSA</th>
 	      <th>IMPORTE TOTAL</th>
 	      <th>IMPORTE NETO</th>
 	      <th>GENERO OC</th>
 	      <th>FECHA DE APROBACION</th>
 	      <th>APROBACION JEFATURA</th>
 	      <th>FECHA DE APROBACION</th>
+
 	      <th>CONTABILIDAD</th>
 	      <th>FECHA DE APROBACION</th>     
 	      <th>ADMINISTRACION</th>
@@ -42,25 +40,20 @@
 	      <tr>
 	        <td>{{$item->OPERACION}}</td>
 	        <td>{{$item->ID_DOCUMENTO}}</td>
-
 	        <td>{{$item->NOMBRE_CLIENTE}}</td>
 	        <td>{{$item->RZ_PROVEEDOR}}</td>
-	        <td>{{$item->NOMBRE_CLIENTE}}</td>
-	        <td>{{$item->ID_DOCUMENTO}}</td>      
-	        <td>{{$item->OPERACION}}</td>
-	        <td>{{$item->ID_DOCUMENTO}}</td>
-	        <td>{{$item->OPERACION}}</td>
-	        <td>{{$item->ID_DOCUMENTO}}</td>
+	        <td>{{$item->SERIE}} - {{ str_pad($item->NUMERO, 10, '0', STR_PAD_LEFT) }}</td>
+	        <td>{{$item->TOTAL_VENTA_ORIG}}</td>      
+	        <td>{{$item->SUB_TOTAL_VENTA_ORIG}}</td>
+	        <td>{{$item->nombre}}</td>
+	        <td>{{$item->fecha_uc}}</td>
+	        <td>{{$item->TXT_NOMBRES}}</td>
+	        <td>{{$item->fecha_uc}}</td>
 
-	        <td>{{$item->OPERACION}}</td>
-	        <td>{{$item->ID_DOCUMENTO}}</td>
-	        <td>{{$item->OPERACION}}</td>
-	        <td>{{$item->ID_DOCUMENTO}}</td>      
-	        <td>{{$item->OPERACION}}</td>
-	        <td>{{$item->ID_DOCUMENTO}}</td>
-	        <td>{{$item->OPERACION}}</td>
-
-
+	        <td>{{$item->nombreconta}}</td>
+	        <td>{{$item->fecha_pr}}</td>
+	        <td>{{$item->nombreadmin}}</td>      
+	        <td>{{$item->fecha_ap}}</td>
 
 	      </tr>                    
 	    @endforeach

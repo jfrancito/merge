@@ -70,6 +70,12 @@ class NotificacionOC extends Command
         //$this->envio_correo_reparacion_levantada();
         $horaActual = date("H:i");
 
+        if($horaActual == '06:00' || $horaActual == '07:00' || $horaActual == '08:00'){
+            $this->crear_excel_aporbado_admin();
+        }
+
+
+
 
         if($horaActual == '07:00' || $horaActual == '08:00' || $horaActual == '09:00' ||
             $horaActual == '10:00' ||  $horaActual == '11:00' ||
