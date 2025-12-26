@@ -75,8 +75,6 @@ class NotificacionOC extends Command
         }
 
 
-
-
         if($horaActual == '07:00' || $horaActual == '08:00' || $horaActual == '09:00' ||
             $horaActual == '10:00' ||  $horaActual == '11:00' ||
             $horaActual == '12:00' ||  $horaActual == '13:00' || 
@@ -84,11 +82,11 @@ class NotificacionOC extends Command
             $horaActual == '16:00' ||  $horaActual == '17:00' ||
             $horaActual == '20:00'){
 
-
             $this->sunat_cdr();
             $this->sunat_cdr_contrato();
             $this->cambiar_fecha_vencimiento();
             $this->cambiar_parcialmente();
+            
         }
 
 
