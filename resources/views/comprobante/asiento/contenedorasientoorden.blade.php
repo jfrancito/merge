@@ -238,7 +238,7 @@
                             <label class="col-sm-12 control-label labelleft negrita">Glosa
                                 :</label>
                             <div class="col-sm-12 abajocaja">
-                                <input required id="glosa_asiento" name="glosa_asiento"
+                                <input id="glosa_asiento" name="glosa_asiento"
                                        class="form-control control input-sm" type="text"
                                        value="">
                             </div>
