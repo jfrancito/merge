@@ -1711,20 +1711,31 @@ class GestionOCContabilidadController extends Controller
                 $device_info       =   $request['device_info'];
                 $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO DOCUMENTO REPARABLE');
                 //geolocalizacion
+                //VERIFICAR SI ES HIBRIDO
+                $tarchivoshibrido       =   CMPDocAsociarCompra::where('COD_ORDEN','=',$pedido_id)
+                                            ->whereIn('TXT_ASIGNADO', ['ARCHIVO_VIRTUAL'])
+                                            ->where('TIP_DOC','=','F')
+                                            ->get();
 
-                // $trabajador = STDTrabajador::where('NRO_DOCUMENTO', '=', $fedocumento->dni_usuariocontacto)->first();
-                // $empresa = STDEmpresa::where('COD_EMPR', '=', $ordencompra->COD_EMPR)->first();
-                // $mensaje = 'COMPROBANTE: ' . $fedocumento->ID_DOCUMENTO
-                //     . '%0D%0A' . 'EMPRESA : ' . $empresa->NOM_EMPR . '%0D%0A'
-                //     . 'PROVEEDOR : ' . $ordencompra->TXT_EMPR_CLIENTE . '%0D%0A'
-                //     . 'ESTADO : ' . $fedocumento->TXT_ESTADO . '%0D%0A'
-                //     . 'APROBACION DEL DOCUMENTO REPARABLE' . '%0D%0A';
-                // if(1==0){
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                // }else{
-                //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                // }
+
+                foreach($tarchivoshibrido as $index => $item){
+
+                    CMPDocAsociarCompra::where('COD_ORDEN',$pedido_id)->where('COD_CATEGORIA_DOCUMENTO','=',$item->COD_CATEGORIA_DOCUMENTO)
+                                        ->where('TIP_DOC','=','F')
+                                        ->update(
+                                            [
+                                                'TXT_ASIGNADO'=>'ARCHIVO_FISICO'
+                                            ]
+                                        );
+                    FeDocumento::where('ID_DOCUMENTO',$pedido_id)
+                                ->update(
+                                    [
+                                        'IND_REPARABLE'=>'1',
+                                        'MODO_REPARABLE'=>'ARCHIVO_FISICO'
+                                    ]
+                                );
+                }
+
 
                 DB::commit();
                 return Redirect::to('/gestion-de-comprobantes-reparable/' . $idopcion)->with('bienhecho', 'Comprobante : ' . $ordencompra->COD_ORDEN . ' APROBADO CON EXITO');
@@ -4838,6 +4849,8 @@ class GestionOCContabilidadController extends Controller
                 $descripcion = $request['descripcion'];
                 $archivore = $request['archivore'];
                 $reparable = $request['reparable'];
+                $archivofi = $request['archivofi'];
+
 
 
                 if ($fedocumento->IND_REPARABLE == 1) {
@@ -4851,9 +4864,18 @@ class GestionOCContabilidadController extends Controller
                     return Redirect::to('aprobar-comprobante-contabilidad/' . $idopcion . '/' . $linea . '/' . $prefijo . '/' . $idordencompra)->with('errorbd', 'Tiene que seleccionar almenos un item');
                 }
 
+                $modohibrido = '';
                 foreach ($archivore as $index => $item) {
-                    //dd($item);
+
                     $categoria = CMPCategoria::where('COD_CATEGORIA', '=', $item)->first();
+
+                    //dd($item);
+                    $tipo_doc = $categoria->CODIGO_SUNAT;
+                    if (in_array($item, $archivofi, true)) {
+                        $tipo_doc = 'F';
+                        $modohibrido = 'ARCHIVO_FISICO';
+                    }
+
                     $docasociar = new CMPDocAsociarCompra;
                     $docasociar->COD_ORDEN = $idoc;
                     $docasociar->COD_CATEGORIA_DOCUMENTO = $categoria->COD_CATEGORIA;
@@ -4864,9 +4886,13 @@ class GestionOCContabilidadController extends Controller
                     $docasociar->COD_USUARIO_CREA_AUD = Session::get('usuario')->id;
                     $docasociar->FEC_USUARIO_CREA_AUD = $this->fechaactual;
                     $docasociar->COD_ESTADO = 1;
-                    $docasociar->TIP_DOC = $categoria->CODIGO_SUNAT;
+                    $docasociar->TIP_DOC = $tipo_doc;
                     $docasociar->save();
                 }
+
+
+
+
 
 
                 //HISTORIAL DE DOCUMENTO APROBADO
@@ -4890,7 +4916,8 @@ class GestionOCContabilidadController extends Controller
                         [
                             'IND_REPARABLE' => 1,
                             'MODO_REPARABLE' => $reparable,
-                            'TXT_REPARABLE' => 'REPARABLE'
+                            'TXT_REPARABLE' => 'REPARABLE',
+                            'MODO_REPARABLE_HIBRIDO' => $modohibrido
                         ]
                     );
 
@@ -5509,6 +5536,13 @@ class GestionOCContabilidadController extends Controller
                 $archivoob = $request['archivore'];
                 $reparable = $request['reparable'];
 
+                $archivofi = $request['archivofi'];
+
+                $modohibrido = '';
+
+
+
+
                 if ($fedocumento->IND_REPARABLE == 1) {
                     DB::rollback();
                     return Redirect::back()->with('errorurl', 'El documento ya esta reparado no se puede reparar');
@@ -5523,6 +5557,15 @@ class GestionOCContabilidadController extends Controller
                 foreach ($archivoob as $index => $item) {
                     //dd($item);
                     $categoria = CMPCategoria::where('COD_CATEGORIA', '=', $item)->first();
+
+                    //dd($item);
+                    $tipo_doc = $categoria->CODIGO_SUNAT;
+                    if (in_array($item, $archivofi, true)) {
+                        $tipo_doc = 'F';
+                        $modohibrido = 'ARCHIVO_FISICO';
+                    }
+
+
                     $docasociar = new CMPDocAsociarCompra;
                     $docasociar->COD_ORDEN = $idoc;
                     $docasociar->COD_CATEGORIA_DOCUMENTO = $categoria->COD_CATEGORIA;
@@ -5533,7 +5576,7 @@ class GestionOCContabilidadController extends Controller
                     $docasociar->COD_USUARIO_CREA_AUD = Session::get('usuario')->id;
                     $docasociar->FEC_USUARIO_CREA_AUD = $this->fechaactual;
                     $docasociar->COD_ESTADO = 1;
-                    $docasociar->TIP_DOC = $categoria->CODIGO_SUNAT;
+                    $docasociar->TIP_DOC = $tipo_doc;
                     $docasociar->save();
                 }
                 //HISTORIAL DE DOCUMENTO APROBADO
@@ -5558,7 +5601,8 @@ class GestionOCContabilidadController extends Controller
                         [
                             'IND_REPARABLE' => 1,
                             'MODO_REPARABLE' => $reparable,
-                            'TXT_REPARABLE' => 'REPARABLE'
+                            'TXT_REPARABLE' => 'REPARABLE',
+                            'MODO_REPARABLE_HIBRIDO' => $modohibrido
                         ]
                     );
                 //LE LLEGA AL USUARIO DE CONTACTO
@@ -5810,6 +5854,11 @@ class GestionOCContabilidadController extends Controller
                 $descripcion = $request['descripcion'];
                 $archivoob = $request['archivore'];
                 $reparable = $request['reparable'];
+                $archivofi = $request['archivofi'];
+
+                $modohibrido = '';
+
+
 
                 if ($fedocumento->IND_REPARABLE == 1) {
                     DB::rollback();
@@ -5825,6 +5874,14 @@ class GestionOCContabilidadController extends Controller
                 foreach ($archivoob as $index => $item) {
                     //dd($item);
                     $categoria = CMPCategoria::where('COD_CATEGORIA', '=', $item)->first();
+                    //dd($item);
+                    $tipo_doc = $categoria->CODIGO_SUNAT;
+                    if (in_array($item, $archivofi, true)) {
+                        $tipo_doc = 'F';
+                        $modohibrido = 'ARCHIVO_FISICO';
+                    }
+
+
                     $docasociar = new CMPDocAsociarCompra;
                     $docasociar->COD_ORDEN = $idoc;
                     $docasociar->COD_CATEGORIA_DOCUMENTO = $categoria->COD_CATEGORIA;
@@ -5835,7 +5892,7 @@ class GestionOCContabilidadController extends Controller
                     $docasociar->COD_USUARIO_CREA_AUD = Session::get('usuario')->id;
                     $docasociar->FEC_USUARIO_CREA_AUD = $this->fechaactual;
                     $docasociar->COD_ESTADO = 1;
-                    $docasociar->TIP_DOC = $categoria->CODIGO_SUNAT;
+                    $docasociar->TIP_DOC = $tipo_doc;
                     $docasociar->save();
                 }
                 //HISTORIAL DE DOCUMENTO APROBADO
@@ -5859,7 +5916,8 @@ class GestionOCContabilidadController extends Controller
                         [
                             'IND_REPARABLE' => 1,
                             'MODO_REPARABLE' => $reparable,
-                            'TXT_REPARABLE' => 'REPARABLE'
+                            'TXT_REPARABLE' => 'REPARABLE',
+                            'MODO_REPARABLE_HIBRIDO' => $modohibrido
                         ]
                     );
                 //LE LLEGA AL USUARIO DE CONTACTO
