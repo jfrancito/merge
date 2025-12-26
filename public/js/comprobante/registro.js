@@ -358,7 +358,7 @@ $(document).ready(function(){
         var empresa_id          =   $('#empresa_id').val();
         debugger;
 
-        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009', 'BAM0000000000011', 'BAM0000000000013', 'BAM0000000000014'];
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009', 'BAM0000000000011', 'BAM0000000000013', 'BAM0000000000014', 'BAM0000000000015'];
 
         if(valores.includes(entidadbanco_id)){
             $('.ajax_cb').addClass('ocultar');
