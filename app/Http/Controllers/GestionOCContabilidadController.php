@@ -4871,10 +4871,14 @@ class GestionOCContabilidadController extends Controller
 
                     //dd($item);
                     $tipo_doc = $categoria->CODIGO_SUNAT;
-                    if (in_array($item, $archivofi, true)) {
-                        $tipo_doc = 'F';
-                        $modohibrido = 'ARCHIVO_FISICO';
+
+                    if(count($archivofi)>0){
+                        if (in_array($item, $archivofi, true)) {
+                            $tipo_doc = 'F';
+                            $modohibrido = 'ARCHIVO_FISICO';
+                        }                       
                     }
+
 
                     $docasociar = new CMPDocAsociarCompra;
                     $docasociar->COD_ORDEN = $idoc;
@@ -5560,9 +5564,11 @@ class GestionOCContabilidadController extends Controller
 
                     //dd($item);
                     $tipo_doc = $categoria->CODIGO_SUNAT;
-                    if (in_array($item, $archivofi, true)) {
-                        $tipo_doc = 'F';
-                        $modohibrido = 'ARCHIVO_FISICO';
+                    if(count($archivofi)>0){
+                        if (in_array($item, $archivofi, true)) {
+                            $tipo_doc = 'F';
+                            $modohibrido = 'ARCHIVO_FISICO';
+                        }                       
                     }
 
 
@@ -5876,9 +5882,11 @@ class GestionOCContabilidadController extends Controller
                     $categoria = CMPCategoria::where('COD_CATEGORIA', '=', $item)->first();
                     //dd($item);
                     $tipo_doc = $categoria->CODIGO_SUNAT;
-                    if (in_array($item, $archivofi, true)) {
-                        $tipo_doc = 'F';
-                        $modohibrido = 'ARCHIVO_FISICO';
+                    if(count($archivofi)>0){
+                        if (in_array($item, $archivofi, true)) {
+                            $tipo_doc = 'F';
+                            $modohibrido = 'ARCHIVO_FISICO';
+                        }                       
                     }
 
 
