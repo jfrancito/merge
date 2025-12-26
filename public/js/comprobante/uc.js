@@ -3115,7 +3115,7 @@ $(document).ready(function () {
 
         let ruta = window.location.pathname;
 
-        if (!ruta.toLowerCase().includes('administracion')) {
+        if (ruta.toLowerCase().includes('contabilidad')) {
 
             let nro_cuenta = $('#nro_cuenta_contable').val();
 
