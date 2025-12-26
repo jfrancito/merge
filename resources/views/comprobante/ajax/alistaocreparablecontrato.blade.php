@@ -34,7 +34,8 @@
 
           @include('comprobante.ajax.areparable')
 
-
+          <span><b>TIPO ARCHIVO : </b> {{$item->MODO_REPARABLE}}</span>
+          <span><b>TIPO ARCHIVO HIBRIDO: </b> {{$item->MODO_REPARABLE_HIBRIDO}}</span>
         </td>
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>SERIE : {{$item->SERIE}} </b> </span>

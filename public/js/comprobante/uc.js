@@ -20,6 +20,20 @@ $(document).ready(function () {
 
     var carpeta = $("#carpeta").val();
 
+    $(".comboreparable").on('change', function (e) {
+        
+        let reparable = $(this).val();
+        if(reparable == 'ARCHIVO_FISICO'){
+            $('.checkfisico').addClass('ocultar');
+        }else{
+            $('.checkfisico').removeClass('ocultar');
+        }
+
+        console.log(reparable);
+
+    });
+
+
     $(".secaprobar").on('click', '.mdidetoi', function (e) {
         var _token = $('#token').val();
         var idopcion = $('#idopcion').val();
