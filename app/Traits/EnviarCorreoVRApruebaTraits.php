@@ -133,6 +133,7 @@ trait EnviarCorreoVRApruebaTraits
                         "franklin.llontop@induamerica.com.pe",
                         "karim.ramirez@induamerica.com.pe",
                         "marley.sucse@induamerica.com.pe",
+                        "analucia.lopez@induamerica.com.pe",
                         "diana.malca@induamerica.com.pe"
                     ];
                 } else {
@@ -149,6 +150,7 @@ trait EnviarCorreoVRApruebaTraits
                         "franklin.llontop@induamerica.com.pe",
                         "karim.ramirez@induamerica.com.pe",
                         "marley.sucse@induamerica.com.pe",
+                        "analucia.lopez@induamerica.com.pe",
                         "diana.malca@induamerica.com.pe"
                     ];
                 } else {
@@ -165,6 +167,7 @@ trait EnviarCorreoVRApruebaTraits
                         "franklin.llontop@induamerica.com.pe",
                         "karim.ramirez@induamerica.com.pe",
                         "marley.sucse@induamerica.com.pe",
+                        "analucia.lopez@induamerica.com.pe",
                         "diana.malca@induamerica.com.pe"
                     ];
                 } else {
@@ -178,6 +181,7 @@ trait EnviarCorreoVRApruebaTraits
                     $emailTrabajador->emailcorp,
                     'marley.sucse@induamerica.com.pe',
                     'diana.malca@induamerica.com.pe',
+                    "analucia.lopez@induamerica.com.pe",
                     'karim.ramirez@induamerica.com.pe',
                     'franklin.llontop@induamerica.com.pe'
                 ];
