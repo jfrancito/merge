@@ -3148,6 +3148,7 @@ $(document).ready(function () {
                     $('#nro_cuenta_contable').val(cadenaNumeroCuenta);
                 }
 
+                /*
                 arrayCabecera.forEach(item => {
 
                     if (item.TXT_GLOSA.includes('REPARABLE') || item.TXT_GLOSA.includes('ANTICIPO')) {
@@ -3162,7 +3163,7 @@ $(document).ready(function () {
                         }
                     }
 
-                });
+                });*/
 
                 detalles.push({
                     cabecera: $(this).attr('data_asiento_cabecera'),
