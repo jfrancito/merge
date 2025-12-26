@@ -111,7 +111,7 @@
                                     <td>{{$item->SERIE}} - {{$item->NUMERO}}</td>
                                     <td>{{$item->MONEDA}}</td>
                                     <td>{{$item->OPERACION}}</td>
-                                    <td>{{$item->TOTAL_VENTA_ORIG}}</td>
+                                    <td>{{number_format($item->TOTAL_VENTA_ORIG, 2, '.', ',')}}</td>
                                 </tr>
                             </table>
                     </div>

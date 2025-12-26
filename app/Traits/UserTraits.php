@@ -694,31 +694,49 @@ trait UserTraits
                 $ordencompra            =   CMPOrden::where('COD_ORDEN','=',$item->ID_DOCUMENTO)->first();
 
 
+
+
                 $trabajador = DB::table('STD.TRABAJADOR')->where('COD_TRAB', $ordencompra->COD_TRABAJADOR_SOLICITA)->first();
                 $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('dni','=',$trabajador->NRO_DOCUMENTO)->first();
                 if(count($trabajadorcorreo)>0){
-                    $usuario_solicita = $trabajadorcorreo->apellidopaterno.' '.$trabajadorcorreo->apellidomaterno.' '.$trabajadorcorreo->nombres;
-                    if ($trabajadorcorreo->emailcorp !== null) {
-                        $correotrabajador = $correotrabajador.$trabajadorcorreo->emailcorp.',';
+
+                    if($trabajador->COD_TRAB != 'ISTR000000000033'){
+
+                        $usuario_solicita = $trabajadorcorreo->apellidopaterno.' '.$trabajadorcorreo->apellidomaterno.' '.$trabajadorcorreo->nombres;
+                        if ($trabajadorcorreo->emailcorp !== null) {
+                            $correotrabajador = $correotrabajador.$trabajadorcorreo->emailcorp.',';
+                        }
+
                     }
+
+
                 }
+
 
                 $trabajador = DB::table('STD.TRABAJADOR')->where('COD_TRAB', $ordencompra->COD_TRABAJADOR_ENCARGADO)->first();
                 $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('dni','=',$trabajador->NRO_DOCUMENTO)->first();
                 if(count($trabajadorcorreo)>0){
-                    $usuario_autoriza = $trabajadorcorreo->apellidopaterno.' '.$trabajadorcorreo->apellidomaterno.' '.$trabajadorcorreo->nombres;
-                    if ($trabajadorcorreo->emailcorp !== null) {
-                        $correotrabajador = $correotrabajador.$trabajadorcorreo->emailcorp.',';
+
+                    if($trabajador->COD_TRAB != 'ISTR000000000033'){
+                        $usuario_autoriza = $trabajadorcorreo->apellidopaterno.' '.$trabajadorcorreo->apellidomaterno.' '.$trabajadorcorreo->nombres;
+                        if ($trabajadorcorreo->emailcorp !== null) {
+                            $correotrabajador = $correotrabajador.$trabajadorcorreo->emailcorp.',';
+                        }
                     }
+
                 }
+
                 $trabajador = DB::table('STD.TRABAJADOR')->where('COD_TRAB', $ordencompra->COD_TRABAJADOR_COMISIONISTA)->first();
                 $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('dni','=',$trabajador->NRO_DOCUMENTO)->first();
                 if(count($trabajadorcorreo)>0){
-                    $usuario_aprueba = $trabajadorcorreo->apellidopaterno.' '.$trabajadorcorreo->apellidomaterno.' '.$trabajadorcorreo->nombres;
-                    if ($trabajadorcorreo->emailcorp !== null) {
-                        $correotrabajador = $correotrabajador.$trabajadorcorreo->emailcorp.',';
+                    if($trabajador->COD_TRAB != 'ISTR000000000033'){
+                        $usuario_aprueba = $trabajadorcorreo->apellidopaterno.' '.$trabajadorcorreo->apellidomaterno.' '.$trabajadorcorreo->nombres;
+                        if ($trabajadorcorreo->emailcorp !== null) {
+                            $correotrabajador = $correotrabajador.$trabajadorcorreo->emailcorp.',';
+                        }
                     }
                 }
+
 
             }
 
