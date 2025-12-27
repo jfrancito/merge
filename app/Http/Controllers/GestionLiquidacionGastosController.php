@@ -3972,22 +3972,22 @@ class GestionLiquidacionGastosController extends Controller
             if($detliquidaciongasto->COD_TIPODOCUMENTO =='TDO0000000000010'){
                 if($request['producto_id'] == 'SERVICIO DE TRANSPORTE AEREO'){
 
-                    // $arendri            =   DB::table('WEB.VALE_RENDIR')
-                    //                         ->where('ID', $liquidaciongastos->ARENDIR_ID)
-                    //                         ->first();
-                    // $diasarendir        =   1;                       
-                    // if(count($arendri)>0){
-                    //     $diasarendir    = $arendri->AUMENTO_DIAS ?? 0;;  
-                    // }
+                    $arendri            =   DB::table('WEB.VALE_RENDIR')
+                                            ->where('ID', $liquidaciongastos->ARENDIR_ID)
+                                            ->first(); 
+
+                    if(count($arendri)>0){
+                        if($arendri->TIPO_MOTIVO == 'TIP0000000000003'){
+                            $IND_OSIRIS = 1;
+                            LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
+                                        ->update(
+                                                [
+                                                    'IND_OSIRIS'=> 1
+                                                ]); 
+                        }
+                    }
 
 
-                    $IND_OSIRIS = 1;
-
-                    LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
-                                ->update(
-                                        [
-                                            'IND_OSIRIS'=> 1
-                                        ]); 
 
                 }
             }
@@ -4730,13 +4730,22 @@ class GestionLiquidacionGastosController extends Controller
                         $IND_OSIRIS = 0;
                         if($detliquidaciongasto->COD_TIPODOCUMENTO =='TDO0000000000010'){
                             if($request['producto_id_factura'] == 'SERVICIO DE TRANSPORTE AEREO'){
-                                $IND_OSIRIS = 1;
 
-                                LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
-                                            ->update(
-                                                    [
-                                                        'IND_OSIRIS'=> 1
-                                                    ]); 
+                                $arendri            =   DB::table('WEB.VALE_RENDIR')
+                                                        ->where('ID', $liquidaciongastos->ARENDIR_ID)
+                                                        ->first(); 
+
+                                if(count($arendri)>0){
+                                    if($arendri->TIPO_MOTIVO == 'TIP0000000000003'){
+                                        $IND_OSIRIS = 1;
+                                        LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
+                                                    ->update(
+                                                            [
+                                                                'IND_OSIRIS'=> 1
+                                                            ]); 
+                                    }
+                                }
+
 
                             }
                         }
