@@ -49,7 +49,7 @@ use App\Traits\GeneralesTraits;
 use App\Traits\ComprobanteTraits;
 use App\Traits\WhatsappTraits;
 
-
+use PDO;
 use Hashids;
 use SplFileInfo;
 use trendClass;
