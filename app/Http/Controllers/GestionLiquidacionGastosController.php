@@ -3585,6 +3585,7 @@ class GestionLiquidacionGastosController extends Controller
 
                 $detallescero           =   DB::table('LQG_DETLIQUIDACIONGASTO')
                                         ->where('ID_DOCUMENTO', $iddocumento)
+                                        ->where('ACTIVO','=','1')
                                         ->where('TOTAL', '<=', 0)
                                         ->first();
                if (count($detallescero) > 0) {
