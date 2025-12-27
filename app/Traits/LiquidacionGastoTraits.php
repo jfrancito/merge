@@ -1553,6 +1553,31 @@ trait LiquidacionGastoTraits
         return  $listadatos;
     }
 
+    private function lg_lista_cabecera_comprobante_total_historial_le_jefe() {
+        if(Session::get('usuario')->id== '1CIX00000001'){
+
+            $listadatos         =   LqgLiquidacionGasto::where('ACTIVO','=','1')
+                                    ->where('COD_USUARIO_AUTORIZA','=',Session::get('usuario')->id)
+                                    ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                                    ->whereNotIn('COD_ESTADO', ['ETM0000000000001'])
+                                    ->orderby('FECHA_EMI','ASC')
+                                    ->get();
+
+        }else{
+
+            $listadatos         =   LqgLiquidacionGasto::where('ACTIVO','=','1')
+                                    ->where('COD_USUARIO_AUTORIZA','=',Session::get('usuario')->id)
+                                    ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                                    ->whereNotIn('COD_ESTADO', ['ETM0000000000001'])
+                                    ->orderby('FECHA_EMI','ASC')
+                                    ->get();
+
+        }
+
+        return  $listadatos;
+    }
+
+
 
     private function lg_lista_cabecera_comprobante_total_contabilidad() {
 
