@@ -27,6 +27,8 @@ Route::group(['middleware' => ['guestaw']], function () {
 
 Route::get('/serve-file', 'FileController@serveFile')->name('serve-file');
 Route::get('/serve-filecontrato', 'FileController@serveFileContrato')->name('serve-filecontrato');
+Route::get('/serve-filenotacredito', 'FileController@serveFileNotaCredito')->name('serve-filenotacredito');
+Route::get('/serve-filenotadebito', 'FileController@serveFileNotaDebito')->name('serve-filenotadebito');
 Route::get('/serve-fileliquidacioncompraanticipo', 'FileController@serveFileLiquidacionCompraAnticipo')->name('serve-fileliquidacioncompraanticipo');
 Route::get('/serve-fileestiba', 'FileController@serveFileEstiba')->name('serve-fileestiba');
 Route::get('/serve-filelg', 'FileController@serveFileLG')->name('serve-filelg');
@@ -87,6 +89,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/pdf-sunat-personal', 'GestionLiquidacionGastosController@actionPdfSunatPersonal');
 
 	Route::any('/ajax-modal-ver-cuenta-bancaria-contrato', 'UserController@actionAjaxModalVerCuentaBancariaContrato');
+	Route::any('/ajax-modal-ver-cuenta-bancaria-pg', 'UserController@actionAjaxModalVerCuentaBancariaPG');
+
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-contrato', 'UserController@actionAjaxModalConfiguracionCuentaBancariaContrato');
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-oc', 'UserController@actionAjaxModalConfiguracionCuentaBancariaOC');
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-estiba', 'UserController@actionAjaxModalConfiguracionCuentaBancariaEstiba');
@@ -166,7 +170,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/validez-comprobante-pdf', 'GestionLiquidacionGastosController@actionLiquidacionValidezComprobantePdf');
     Route::post('/buscar-proveedor', 'GestionOCContabilidadController@buscarProveedor');
 
-
+	Route::any('/aprobar-liquidacion-gasto-jefe-historial/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionAprobarJefeLGHistorial');
 
 
 	Route::any('/gestion-de-liquidacion-gastos-adm/{idopcion}', 'GestionLiquidacionGastosController@actionListarLGValidado');
@@ -410,7 +414,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/subir-xml-cargar-datos-administrator/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionCargarXMLAdministrator');
 	Route::any('/validar-xml-oc-administrator/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionValidarXMLAdministrator');
 	Route::any('/validar-xml-oc-administrator-sx/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCSXController@actionValidarXMLAdministratorSX');
-
+	
 
 	Route::any('/agregar-archivo-uc/{procedencia}/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionAgregarArchivoUC');
 	Route::any('/quitar-archivo-uc/{procedencia}/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionQuitarArchivoUC');
@@ -426,7 +430,9 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/ajax-moneda-ajax-cuenta', 'GestionOCController@actionAjaxMonedaAjaxCuenta');
 
-
+	//PROVISION DE GASTOS
+	Route::any('/detalle-comprobante-provision-gasto-administrator/{procedencia}/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCSXController@actionDetalleComprobantePGAdministratorSinXML');
+	Route::any('/validar-xml-oc-administrator-sx-pg/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCSXController@actionValidarXMLAdministratorSXPG');
 
 
 	//ADMINISTRATOR CONTRATO
@@ -434,10 +440,20 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/subir-xml-cargar-datos-contrato-administrator/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionCargarXMLContratoAdministrator');
 	Route::any('/validar-xml-oc-contrato-administrator/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionValidarXMLContratoAdministrator');
 
+	//ADMINISTRATOR NOTA CREDITO
+	Route::any('/detalle-comprobante-nota-credito-administrator/{procedencia}/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionDetalleComprobanteNotaCreditoAdministrator');
+	Route::any('/subir-xml-cargar-datos-nota-credito-administrator/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionCargarXMLNotaCreditoAdministrator');
+	Route::any('/validar-xml-nota-credito-administrator/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionValidarXMLNotaCreditoAdministrator');
+
+	//ADMINISTRATOR NOTA DEBITO
+	Route::any('/detalle-comprobante-nota-debito-administrator/{procedencia}/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionDetalleComprobanteNotaDebitoAdministrator');
+	Route::any('/subir-xml-cargar-datos-nota-debito-administrator/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionCargarXMLNotaDebitoAdministrator');
+	Route::any('/validar-xml-nota-debito-administrator/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionValidarXMLNotaDebitoAdministrator');
+
 	//ADMINISTRATOR LIQUIDACION COMPRA ANTICIPO
 	Route::any('/detalle-comprobante-liquidacion-compra-anticipo-administrator/{procedencia}/{idopcion}/{prefijo}/{idordenpago}', 'GestionOCController@actionDetalleComprobanteLiquidacionCompraAnticipoAdministrator');	
 	Route::any('/subir-xml-cargar-datos-liquidacion-compra-anticipo-administrator/{idopcion}/{prefijo}/{idordenpago}', 'GestionOCController@actionCargarXMLLiquidacionCompraAnticipoAdministrator');
-	Route::any('/validar-xml-oc-liquidacion-compra-anticipo-administrator/{idopcion}/{prefijo}/{idordenpago}', 'GestionOCController@actionValidarXMLLiquidacionCompraAnticipoAdministrator');
+	Route::any('/validar-xml-oc-liquidacion-compra-anticipo-administrator/{idopcion}/{prefijo}/{idordenpago}', 'GestionOCController@actionValidarXMLLiquidacionCompraAnticipoAdministrator');	
 
 	//ADMINISTRATOR ESTIBA
 	Route::any('/select-xml-estiba/{idopcion}', 'GestionEstibaController@actionDetalleSelectEstiba');
@@ -559,6 +575,10 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/detalle-comprobante-oc-validado-liquidacion-compra-anticipo/{idopcion}/{linea}/{prefijo}/{idordenpago}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoLiquidacionCompraAnticipo');
 
+	Route::any('/detalle-comprobante-oc-validado-nota-credito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoNotaCredito');
+
+	Route::any('/detalle-comprobante-oc-validado-nota-debito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoNotaDebito');
+
     Route::any('/ajax-combo-periodo-xanio-xempresa', 'GestionOCContabilidadController@actionAjaxComboPeriodoAnioEmpresa');
     Route::any('/ajax-combo-periodo-xanio-xempresareparable', 'GestionOCContabilidadController@actionAjaxComboPeriodoAnioEmpresaReparable');
 	Route::any('/gestion-de-comprobantes-observados/{idopcion}', 'GestionUsuarioContactoController@actionListarComprobantesObservados');
@@ -599,6 +619,10 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/observacion-comprobante-uc-liquidacion-compra-anticipo/{idopcion}/{linea}/{prefijo}/{idordenpago}', 'GestionUsuarioContactoController@actionObservarUCLiquidacionCompraAnticipo');
 
+	Route::any('/observacion-comprobante-uc-nota-credito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionUsuarioContactoController@actionObservarUCNotaCredito');
+
+	Route::any('/observacion-comprobante-uc-nota-debito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionUsuarioContactoController@actionObservarUCNotaDebito');
+
 	Route::any('/observacion-comprobante-uc-estiba/{idopcion}/{lote}', 'GestionUsuarioContactoController@actionObservarUCEstiba');
 
 
@@ -609,6 +633,8 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/aprobar-comprobante-contabilidad/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAprobarContabilidad');
 	Route::any('/aprobar-comprobante-contabilidad-contrato/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAprobarContabilidadContrato');
+	Route::any('/aprobar-comprobante-contabilidad-nota-credito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAprobarContabilidadNotaCredito');
+	Route::any('/aprobar-comprobante-contabilidad-nota-debito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAprobarContabilidadNotaDebito');
 	Route::any('/aprobar-comprobante-contabilidad-estiba/{idopcion}/{lote}', 'GestionOCContabilidadController@actionAprobarContabilidadEstiba');
 	
 	Route::any('/ajax-modal-activo-fijo-categoria', 'GestionOCContabilidadController@actionAjaxModalActivoFijoCategoria');
@@ -626,6 +652,8 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/agregar-observacion-contabilidad/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAgregarObservacionContabilidad');
 	Route::any('/agregar-observacion-contabilidad-contrato/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAgregarObservacionContabilidadContrato');
+	Route::any('/agregar-observacion-contabilidad-nota-credito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAgregarObservacionContabilidadNotaCredito');
+	Route::any('/agregar-observacion-contabilidad-nota-debito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAgregarObservacionContabilidadNotaDebito');
 	Route::any('/agregar-observacion-contabilidad-estiba/{idopcion}/{lote}', 'GestionOCContabilidadController@actionAgregarObservacionContabilidadEstiba');
 
 
@@ -639,6 +667,8 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/agregar-extorno-contabilidad/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAgregarExtornoContabilidad');
 	Route::any('/agregar-extorno-contrato-contabilidad/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAgregarExtornoContratoContabilidad');
+	Route::any('/agregar-extorno-nota-credito-contabilidad/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAgregarExtornoNotaCreditoContabilidad');
+	Route::any('/agregar-extorno-nota-debito-contabilidad/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAgregarExtornoNotaDebitoContabilidad');	
 	Route::any('/agregar-extorno-estiba-contabilidad/{idopcion}/{lote}', 'GestionOCContabilidadController@actionAgregarExtornoEstibaContabilidad');
 
 
@@ -663,6 +693,12 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/agregar-observacion-administracion-liquidacion-compra-anticipo/{idopcion}/{linea}/{prefijo}/{idordenpago}', 'GestionOCAdministracionController@actionAgregarObservacionAdministracionLiquidacionCompraAnticipo');
 	Route::any('/descargar-archivo-requerimiento-liquidacion-compra-anticipo/{tipo}/{idopcion}/{linea}/{prefijo}/{idordenpago}', 'GestionOCValidadoController@actionDescargarLiquidacionCompraAnticipo');
 	Route::any('/descargar-archivo-requerimiento-liquidacion-compra-anticipo-anulado/{tipo}/{idopcion}/{linea}/{prefijo}/{idordenpago}', 'GestionOCValidadoController@actionDescargarLiquidacionCompraAnticipoAnulado');
+
+	Route::any('/aprobar-comprobante-administracion-nota-credito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCAdministracionController@actionAprobarAdministracionNotaCredito');
+	Route::any('/agregar-observacion-administracion-nota-credito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCAdministracionController@actionAgregarObservacionAdministracionNotaCredito');
+
+	Route::any('/aprobar-comprobante-administracion-nota-debito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCAdministracionController@actionAprobarAdministracionNotaDebito');
+	Route::any('/agregar-observacion-administracion-nota-debito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCAdministracionController@actionAgregarObservacionAdministracionNotaDebito');
 
 
 	Route::any('/ajax-buscar-documento-gestion-contabilidad', 'GestionOCContabilidadController@actionListarAjaxBuscarDocumentoContabilidad');
@@ -724,15 +760,24 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/gestion-de-provision-comprobante/{idopcion}', 'GestionOCProvisionController@actionListarComprobanteProvision');
 	Route::any('/provisionar-documentos/{idopcion}', 'GestionOCProvisionController@actionListarProvisionarComprobante');
+
+
+	
 	Route::any('/descargar-archivo-requerimiento-xml/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDescargarXML');
 	Route::any('/descargar-archivo-requerimiento-cdr/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDescargarCDR');
 	Route::any('/descargar-archivo-requerimiento-pdf/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDescargarPDF');
 	Route::any('/descargar-archivo-requerimiento/{tipo}/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDescargar');
 	Route::any('/descargar-archivo-requerimiento-contrato/{tipo}/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDescargarContrato');
+	Route::any('/descargar-archivo-requerimiento-nota-credito/{tipo}/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDescargarNotaCredito');
+	Route::any('/descargar-archivo-requerimiento-nota-debito/{tipo}/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDescargarNotaDebito');
 	Route::any('/descargar-archivo-requerimiento-anulado/{tipo}/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDescargarAnulado');
 	Route::any('/descargar-archivo-requerimiento-contrato-anulado/{tipo}/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDescargarContratoAnulado');
+	Route::any('/descargar-archivo-requerimiento-nota-credito-anulado/{tipo}/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDescargarNotaCreditoAnulado');
+	Route::any('/descargar-archivo-requerimiento-nota-debito-anulado/{tipo}/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDescargarNotaDebitoAnulado');
 	Route::any('/eliminar-archivo-item/{tipo}/{nombrearchivo}/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionEliminarItem');
 	Route::any('/eliminar-archivo-item-contrato/{tipo}/{nombrearchivo}/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionEliminarItemContrato');
+	Route::any('/eliminar-archivo-item-nota-credito/{tipo}/{nombrearchivo}/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionEliminarItemNotaCredito');
+	Route::any('/eliminar-archivo-item-nota-debito/{tipo}/{nombrearchivo}/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionEliminarItemNotaDebito');
 
 	Route::any('/ajax-eliminar-archivo-item-pp', 'GestionOCTesoreriaController@actionEliminarItemPP');
 

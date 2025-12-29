@@ -2843,7 +2843,7 @@ $(document).ready(function () {
 
         limpiarxml();
 
-
+        debugger;
         if (tipodoc_id == 'TDO0000000000070') {
             $('#serie, #numero, #fecha_emision').prop('readonly', true);
             $('#empresa_id').prop('disabled', true);

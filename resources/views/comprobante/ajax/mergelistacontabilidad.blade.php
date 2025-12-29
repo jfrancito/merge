@@ -4,6 +4,14 @@
   @if($operacion_id == 'CONTRATO')
     @include('comprobante.ajax.alistacontabilidadcontrato')
   @else
-    @include('comprobante.ajax.alistacontabilidadestiba')
+    @if($operacion_id == 'NOTA_CREDITO')
+      @include('comprobante.ajax.alistacontabilidadnotacredito')
+    @else
+      @if($operacion_id == 'NOTA_DEBITO')
+        @include('comprobante.ajax.alistacontabilidadnotadebito')
+      @else
+        @include('comprobante.ajax.alistacontabilidadestiba')
+      @endif
+    @endif
   @endif
 @endif

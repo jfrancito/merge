@@ -49,7 +49,7 @@ use App\Traits\GeneralesTraits;
 use App\Traits\ComprobanteTraits;
 use App\Traits\WhatsappTraits;
 
-
+use PDO;
 use Hashids;
 use SplFileInfo;
 use trendClass;
@@ -83,7 +83,9 @@ class GestionOCContabilidadController extends Controller
             'ESTIBA' => 'ESTIBA',
             'DOCUMENTO_INTERNO_PRODUCCION' => 'DOCUMENTO INTERNO PRODUCCION',
             'DOCUMENTO_INTERNO_SECADO' => 'DOCUMENTO INTERNO SECADO',
-            'DOCUMENTO_SERVICIO_BALANZA' => 'DOCUMENTO POR SERVICIO DE BALANZA'
+            'DOCUMENTO_SERVICIO_BALANZA' => 'DOCUMENTO POR SERVICIO DE BALANZA',
+            'NOTA_CREDITO' => 'NOTA DE CREDITO',
+            'NOTA_DEBITO' => 'NOTA DE DEBITO'
         );
 
         if (isset($request['operacion_id'])) {
@@ -108,14 +110,25 @@ class GestionOCContabilidadController extends Controller
                 $listadatos_obs = $this->con_lista_cabecera_comprobante_total_cont_contrato_obs($cod_empresa);
                 $listadatos_obs_le = $this->con_lista_cabecera_comprobante_total_cont_contrato_levantadas($cod_empresa);
             } else {
+                if ($operacion_id == 'NOTA_CREDITO') {
+                    $listadatos = $this->con_lista_cabecera_comprobante_total_cont_nota_credito($cod_empresa);
+                    $listadatos_obs = $this->con_lista_cabecera_comprobante_total_cont_nota_credito_obs($cod_empresa);
+                    $listadatos_obs_le = $this->con_lista_cabecera_comprobante_total_cont_nota_credito_levantadas($cod_empresa);
+                } else {
+                    if ($operacion_id == 'NOTA_DEBITO') {                        
+                        $listadatos = $this->con_lista_cabecera_comprobante_total_cont_nota_debito($cod_empresa);
+                        $listadatos_obs = $this->con_lista_cabecera_comprobante_total_cont_nota_debito_obs($cod_empresa);
+                        $listadatos_obs_le = $this->con_lista_cabecera_comprobante_total_cont_nota_debito_levantadas($cod_empresa);
+                    } else {
 
-                if (in_array($operacion_id, $array_canjes)) {
-                    $categoria_id = $this->con_categoria_canje($operacion_id);
-                    $listadatos = $this->con_lista_cabecera_comprobante_total_cont_estiba($cod_empresa, $operacion_id);
-                    $listadatos_obs = $this->con_lista_cabecera_comprobante_total_cont_estiba_obs($cod_empresa, $operacion_id);
-                    $listadatos_obs_le = $this->con_lista_cabecera_comprobante_total_cont_estiba_levantadas($cod_empresa, $operacion_id);
+                        if (in_array($operacion_id, $array_canjes)) {
+                            $categoria_id = $this->con_categoria_canje($operacion_id);
+                            $listadatos = $this->con_lista_cabecera_comprobante_total_cont_estiba($cod_empresa, $operacion_id);
+                            $listadatos_obs = $this->con_lista_cabecera_comprobante_total_cont_estiba_obs($cod_empresa, $operacion_id);
+                            $listadatos_obs_le = $this->con_lista_cabecera_comprobante_total_cont_estiba_levantadas($cod_empresa, $operacion_id);
+                        }
+                    }
                 }
-
             }
         }
         $funcion = $this;
@@ -155,11 +168,23 @@ class GestionOCContabilidadController extends Controller
                 $listadatos_obs = $this->con_lista_cabecera_comprobante_total_cont_contrato_obs($cod_empresa);
                 $listadatos_obs_le = $this->con_lista_cabecera_comprobante_total_cont_contrato_levantadas($cod_empresa);
             } else {
-                $array_canjes = $this->con_array_canjes();
-                if (in_array($operacion_id, $array_canjes)) {
-                    $listadatos = $this->con_lista_cabecera_comprobante_total_cont_estiba($cod_empresa, $operacion_id);
-                    $listadatos_obs = $this->con_lista_cabecera_comprobante_total_cont_estiba_obs($cod_empresa, $operacion_id);
-                    $listadatos_obs_le = $this->con_lista_cabecera_comprobante_total_cont_estiba_levantadas($cod_empresa, $operacion_id);
+                if ($operacion_id == 'NOTA_CREDITO') {
+                    $listadatos = $this->con_lista_cabecera_comprobante_total_cont_nota_credito($cod_empresa);
+                    $listadatos_obs = $this->con_lista_cabecera_comprobante_total_cont_nota_credito_obs($cod_empresa);
+                    $listadatos_obs_le = $this->con_lista_cabecera_comprobante_total_cont_nota_credito_levantadas($cod_empresa);
+                } else {
+                    if ($operacion_id == 'NOTA_DEBITO') {
+                        $listadatos = $this->con_lista_cabecera_comprobante_total_cont_nota_debito($cod_empresa);
+                        $listadatos_obs = $this->con_lista_cabecera_comprobante_total_cont_nota_debito_obs($cod_empresa);
+                        $listadatos_obs_le = $this->con_lista_cabecera_comprobante_total_cont_nota_debito_levantadas($cod_empresa);
+                    } else {
+                        $array_canjes = $this->con_array_canjes();
+                        if (in_array($operacion_id, $array_canjes)) {
+                            $listadatos = $this->con_lista_cabecera_comprobante_total_cont_estiba($cod_empresa, $operacion_id);
+                            $listadatos_obs = $this->con_lista_cabecera_comprobante_total_cont_estiba_obs($cod_empresa, $operacion_id);
+                            $listadatos_obs_le = $this->con_lista_cabecera_comprobante_total_cont_estiba_levantadas($cod_empresa, $operacion_id);
+                        }
+                    }
                 }
             }
         }
@@ -382,12 +407,12 @@ class GestionOCContabilidadController extends Controller
         $codAnio = '';
         $tipoCambioVenta = 0.0000;
 
-        if(isset($periodo)){
+        if (isset($periodo)) {
             $codPeriodo = $periodo->COD_PERIODO;
             $codAnio = $periodo->COD_ANIO;
         }
 
-        if(isset($periodo)){
+        if (isset($periodo)) {
             $tipoCambioVenta = $tipoCambio->CAN_VENTA;
         }
 
@@ -480,14 +505,14 @@ class GestionOCContabilidadController extends Controller
 
                 foreach ($detalles as $detalle) {
 
-                    $cabecera = json_decode($detalle['cabecera'], true);
+                    $cabeceras = json_decode($detalle['cabecera'], true);
                     $detalle_asiento = json_decode($detalle['detalle'], true);
 
-                    foreach ($cabecera as $cabecera) {
+                    foreach ($cabeceras as $cabecera) {
 
                         $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                             ->where('COD_ESTADO', '=', 1)
-                            ->where('COD_ASIENTO_MODELO', '=', $cabecera['COD_ASIENTO_MODELO'])
+                            //->where('COD_ASIENTO_MODELO', '=', $cabecera['COD_ASIENTO_MODELO'])
                             ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                             ->first();
 
@@ -570,7 +595,7 @@ class GestionOCContabilidadController extends Controller
                         $tipo_doc_ref_asiento_aux = STDTipoDocumento::where('COD_TIPO_DOCUMENTO', '=', $COD_CATEGORIA_TIPO_DOCUMENTO_REF)->first();
                         $tipo_asiento = CMPCategoria::where('COD_CATEGORIA', '=', $COD_CATEGORIA_TIPO_ASIENTO)->first();
 
-                        if(empty($asiento_busqueda)) {
+                        if (empty($asiento_busqueda)) {
                             $codAsiento = $this->ejecutarAsientosIUDConSalida(
                                 'I',
                                 Session::get('empresas')->COD_EMPR,
@@ -657,7 +682,7 @@ class GestionOCContabilidadController extends Controller
                             $TXT_EMPR_CLI_REF = $movimiento['TXT_EMPR_CLI_REF'];
                             $DOCUMENTO_REF = $movimiento['DOCUMENTO_REF'];
                             $CODIGO_CONTABLE = $movimiento['CODIGO_CONTABLE'];
-                            if (((int) $COD_ESTADO) === 1) {
+                            if (((int)$COD_ESTADO) === 1) {
                                 $contador++;
 
                                 $params = array(
@@ -809,403 +834,403 @@ class GestionOCContabilidadController extends Controller
                     . '%0D%0A' . 'EMPRESA : ' . $empresa->NOM_EMPR . '%0D%0A'
                     . 'PROVEEDOR : ' . $ordencompra->TXT_EMPR_CLIENTE . '%0D%0A'
                     . 'ESTADO : ' . $fedocumento_w->TXT_ESTADO . '%0D%0A';
-/*
-                //GENERACION ASIENTOS
-                if (count($asiento_cabecera_compra) > 0 and count($asiento_detalle_compra) > 0) {
-                    $cod_tipo_asiento = $asiento_cabecera_compra[0]['COD_CATEGORIA_TIPO_ASIENTO'];
-                    $des_tipo_asiento = $asiento_cabecera_compra[0]['TXT_CATEGORIA_TIPO_ASIENTO'];
-                    $cod_estado_asiento = $asiento_cabecera_compra[0]['COD_CATEGORIA_ESTADO_ASIENTO'];
-                    $des_estado_asiento = $asiento_cabecera_compra[0]['TXT_CATEGORIA_ESTADO_ASIENTO'];
+                /*
+                                //GENERACION ASIENTOS
+                                if (count($asiento_cabecera_compra) > 0 and count($asiento_detalle_compra) > 0) {
+                                    $cod_tipo_asiento = $asiento_cabecera_compra[0]['COD_CATEGORIA_TIPO_ASIENTO'];
+                                    $des_tipo_asiento = $asiento_cabecera_compra[0]['TXT_CATEGORIA_TIPO_ASIENTO'];
+                                    $cod_estado_asiento = $asiento_cabecera_compra[0]['COD_CATEGORIA_ESTADO_ASIENTO'];
+                                    $des_estado_asiento = $asiento_cabecera_compra[0]['TXT_CATEGORIA_ESTADO_ASIENTO'];
 
-                    $codAsientoCompra = $this->ejecutarAsientosIUDConSalida(
-                        'I',
-                        Session::get('empresas')->COD_EMPR,
-                        'CEN0000000000001',
-                        $periodo_asiento,
-                        $tipo_asiento_aux->COD_CATEGORIA,
-                        $tipo_asiento_aux->NOM_CATEGORIA,
-                        '',
-                        $fecha_asiento,
-                        $glosa_asiento,
-                        $cod_estado_asiento,
-                        $des_estado_asiento,
-                        $moneda_asiento_aux->COD_CATEGORIA,
-                        $moneda_asiento_aux->NOM_CATEGORIA,
-                        $tipo_cambio_asiento,
-                        0.0000,
-                        0.0000,
-                        '',
-                        '',
-                        0,
-                        $asiento_cabecera_compra[0]['COD_ASIENTO_MODELO'],
-                        $asiento_cabecera_compra[0]['TXT_TIPO_REFERENCIA'],
-                        $asiento_cabecera_compra[0]['TXT_REFERENCIA'],
-                        1,
-                        Session::get('usuario')->id,
-                        '',
-                        '',
-                        $empresa_doc_asiento_aux->COD_EMPR,
-                        $empresa_doc_asiento_aux->NOM_EMPR,
-                        $tipo_doc_asiento_aux->COD_TIPO_DOCUMENTO,
-                        $tipo_doc_asiento_aux->TXT_TIPO_DOCUMENTO,
-                        $serie_asiento,
-                        $numero_asiento,
-                        $fecha_detraccion_asiento,
-                        $const_detraccion_asiento,
-                        $porcentaje_detraccion,
-                        $total_detraccion_asiento,
-                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->COD_TIPO_DOCUMENTO : '',
-                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->TXT_TIPO_DOCUMENTO : '',
-                        $serie_ref_asiento,
-                        $numero_ref_asiento,
-                        $fecha_asiento,
-                        0,
-                        $moneda_asiento_conversion_aux->COD_CATEGORIA,
-                        $moneda_asiento_conversion_aux->NOM_CATEGORIA
-                    );
+                                    $codAsientoCompra = $this->ejecutarAsientosIUDConSalida(
+                                        'I',
+                                        Session::get('empresas')->COD_EMPR,
+                                        'CEN0000000000001',
+                                        $periodo_asiento,
+                                        $tipo_asiento_aux->COD_CATEGORIA,
+                                        $tipo_asiento_aux->NOM_CATEGORIA,
+                                        '',
+                                        $fecha_asiento,
+                                        $glosa_asiento,
+                                        $cod_estado_asiento,
+                                        $des_estado_asiento,
+                                        $moneda_asiento_aux->COD_CATEGORIA,
+                                        $moneda_asiento_aux->NOM_CATEGORIA,
+                                        $tipo_cambio_asiento,
+                                        0.0000,
+                                        0.0000,
+                                        '',
+                                        '',
+                                        0,
+                                        $asiento_cabecera_compra[0]['COD_ASIENTO_MODELO'],
+                                        $asiento_cabecera_compra[0]['TXT_TIPO_REFERENCIA'],
+                                        $asiento_cabecera_compra[0]['TXT_REFERENCIA'],
+                                        1,
+                                        Session::get('usuario')->id,
+                                        '',
+                                        '',
+                                        $empresa_doc_asiento_aux->COD_EMPR,
+                                        $empresa_doc_asiento_aux->NOM_EMPR,
+                                        $tipo_doc_asiento_aux->COD_TIPO_DOCUMENTO,
+                                        $tipo_doc_asiento_aux->TXT_TIPO_DOCUMENTO,
+                                        $serie_asiento,
+                                        $numero_asiento,
+                                        $fecha_detraccion_asiento,
+                                        $const_detraccion_asiento,
+                                        $porcentaje_detraccion,
+                                        $total_detraccion_asiento,
+                                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->COD_TIPO_DOCUMENTO : '',
+                                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->TXT_TIPO_DOCUMENTO : '',
+                                        $serie_ref_asiento,
+                                        $numero_ref_asiento,
+                                        $fecha_asiento,
+                                        0,
+                                        $moneda_asiento_conversion_aux->COD_CATEGORIA,
+                                        $moneda_asiento_conversion_aux->NOM_CATEGORIA
+                                    );
 
-                    if (!empty($codAsientoCompra)) {
+                                    if (!empty($codAsientoCompra)) {
 
-                        $contador = 0;
+                                        $contador = 0;
 
-                        foreach ($asiento_detalle_compra as $asiento_detalle_compra_item) {
-                            if (((int)$asiento_detalle_compra_item['COD_ESTADO']) === 1) {
-                                $contador++;
+                                        foreach ($asiento_detalle_compra as $asiento_detalle_compra_item) {
+                                            if (((int)$asiento_detalle_compra_item['COD_ESTADO']) === 1) {
+                                                $contador++;
 
-                                $params = array(
-                                    'op' => 'I',
-                                    'empresa' => Session::get('empresas')->COD_EMPR,
-                                    'centro' => 'CEN0000000000001',
-                                    'asiento' => $codAsientoCompra,
-                                    'cuenta' => $asiento_detalle_compra_item['COD_CUENTA_CONTABLE'],
-                                    'txtCuenta' => $asiento_detalle_compra_item['TXT_CUENTA_CONTABLE'],
-                                    'glosa' => $asiento_detalle_compra_item['TXT_GLOSA'],
-                                    'debeMN' => $asiento_detalle_compra_item['CAN_DEBE_MN'],
-                                    'haberMN' => $asiento_detalle_compra_item['CAN_HABER_MN'],
-                                    'debeME' => $asiento_detalle_compra_item['CAN_DEBE_ME'],
-                                    'haberME' => $asiento_detalle_compra_item['CAN_HABER_ME'],
-                                    'linea' => $contador,
-                                    'codCuo' => '',
-                                    'indExtorno' => 0,
-                                    'txtTipoReferencia' => '',
-                                    'txtReferencia' => '',
-                                    'codEstado' => $asiento_detalle_compra_item['COD_ESTADO'],
-                                    'codUsuario' => Session::get('usuario')->id,
-                                    'codDocCtableRef' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'],
-                                    'codOrdenRef' => $asiento_detalle_compra_item['COD_ORDEN_REF'],
-                                    'indProducto' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'] !== '' ? 1 : 0,
-                                    'codProducto' => $asiento_detalle_compra_item['COD_PRODUCTO'],
-                                    'txtNombreProducto' => $asiento_detalle_compra_item['TXT_NOMBRE_PRODUCTO'],
-                                    'codLote' => $asiento_detalle_compra_item['COD_LOTE'],
-                                    'nroLineaProducto' => $asiento_detalle_compra_item['NRO_LINEA_PRODUCTO'],
-                                );
+                                                $params = array(
+                                                    'op' => 'I',
+                                                    'empresa' => Session::get('empresas')->COD_EMPR,
+                                                    'centro' => 'CEN0000000000001',
+                                                    'asiento' => $codAsientoCompra,
+                                                    'cuenta' => $asiento_detalle_compra_item['COD_CUENTA_CONTABLE'],
+                                                    'txtCuenta' => $asiento_detalle_compra_item['TXT_CUENTA_CONTABLE'],
+                                                    'glosa' => $asiento_detalle_compra_item['TXT_GLOSA'],
+                                                    'debeMN' => $asiento_detalle_compra_item['CAN_DEBE_MN'],
+                                                    'haberMN' => $asiento_detalle_compra_item['CAN_HABER_MN'],
+                                                    'debeME' => $asiento_detalle_compra_item['CAN_DEBE_ME'],
+                                                    'haberME' => $asiento_detalle_compra_item['CAN_HABER_ME'],
+                                                    'linea' => $contador,
+                                                    'codCuo' => '',
+                                                    'indExtorno' => 0,
+                                                    'txtTipoReferencia' => '',
+                                                    'txtReferencia' => '',
+                                                    'codEstado' => $asiento_detalle_compra_item['COD_ESTADO'],
+                                                    'codUsuario' => Session::get('usuario')->id,
+                                                    'codDocCtableRef' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'],
+                                                    'codOrdenRef' => $asiento_detalle_compra_item['COD_ORDEN_REF'],
+                                                    'indProducto' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'] !== '' ? 1 : 0,
+                                                    'codProducto' => $asiento_detalle_compra_item['COD_PRODUCTO'],
+                                                    'txtNombreProducto' => $asiento_detalle_compra_item['TXT_NOMBRE_PRODUCTO'],
+                                                    'codLote' => $asiento_detalle_compra_item['COD_LOTE'],
+                                                    'nroLineaProducto' => $asiento_detalle_compra_item['NRO_LINEA_PRODUCTO'],
+                                                );
 
-                                $this->ejecutarAsientosMovimientosIUDConSalida($params);
-                            }
-                        }
-                        $this->generar_destinos_compras($anio_asiento, Session::get('empresas')->COD_EMPR, $codAsientoCompra, '', Session::get('usuario')->id);
-                        $this->gn_generar_total_asientos($codAsientoCompra);
-                        $this->calcular_totales_compras($codAsientoCompra);
-                    }
-                }
+                                                $this->ejecutarAsientosMovimientosIUDConSalida($params);
+                                            }
+                                        }
+                                        $this->generar_destinos_compras($anio_asiento, Session::get('empresas')->COD_EMPR, $codAsientoCompra, '', Session::get('usuario')->id);
+                                        $this->gn_generar_total_asientos($codAsientoCompra);
+                                        $this->calcular_totales_compras($codAsientoCompra);
+                                    }
+                                }
 
-                if (count($asiento_cabecera_reparable_reversion) > 0 and count($asiento_detalle_reparable_reversion) > 0) {
+                                if (count($asiento_cabecera_reparable_reversion) > 0 and count($asiento_detalle_reparable_reversion) > 0) {
 
-                    $cod_tipo_asiento = $asiento_cabecera_reparable_reversion[0]['COD_CATEGORIA_TIPO_ASIENTO'];
-                    $des_tipo_asiento = $asiento_cabecera_reparable_reversion[0]['TXT_CATEGORIA_TIPO_ASIENTO'];
-                    $cod_estado_asiento = $asiento_cabecera_reparable_reversion[0]['COD_CATEGORIA_ESTADO_ASIENTO'];
-                    $des_estado_asiento = $asiento_cabecera_reparable_reversion[0]['TXT_CATEGORIA_ESTADO_ASIENTO'];
+                                    $cod_tipo_asiento = $asiento_cabecera_reparable_reversion[0]['COD_CATEGORIA_TIPO_ASIENTO'];
+                                    $des_tipo_asiento = $asiento_cabecera_reparable_reversion[0]['TXT_CATEGORIA_TIPO_ASIENTO'];
+                                    $cod_estado_asiento = $asiento_cabecera_reparable_reversion[0]['COD_CATEGORIA_ESTADO_ASIENTO'];
+                                    $des_estado_asiento = $asiento_cabecera_reparable_reversion[0]['TXT_CATEGORIA_ESTADO_ASIENTO'];
 
-                    $codAsientoReversion = $this->ejecutarAsientosIUDConSalida(
-                        'I',
-                        Session::get('empresas')->COD_EMPR,
-                        'CEN0000000000001',
-                        $periodo_asiento,
-                        $cod_tipo_asiento,
-                        $des_tipo_asiento,
-                        '',
-                        $fecha_asiento,
-                        $asiento_cabecera_reparable_reversion[0]['TXT_GLOSA'],
-                        $cod_estado_asiento,
-                        $des_estado_asiento,
-                        $moneda_asiento_aux->COD_CATEGORIA,
-                        $moneda_asiento_aux->NOM_CATEGORIA,
-                        $tipo_cambio_asiento,
-                        0.0000,
-                        0.0000,
-                        '',
-                        '',
-                        0,
-                        $asiento_cabecera_reparable_reversion[0]['COD_ASIENTO_MODELO'],
-                        $asiento_cabecera_reparable_reversion[0]['TXT_TIPO_REFERENCIA'],
-                        $asiento_cabecera_reparable_reversion[0]['TXT_REFERENCIA'],
-                        1,
-                        Session::get('usuario')->id,
-                        '',
-                        '',
-                        $empresa_doc_asiento_aux->COD_EMPR,
-                        $empresa_doc_asiento_aux->NOM_EMPR,
-                        $tipo_doc_asiento_aux->COD_TIPO_DOCUMENTO,
-                        $tipo_doc_asiento_aux->TXT_TIPO_DOCUMENTO,
-                        $serie_asiento,
-                        $numero_asiento,
-                        $fecha_detraccion_asiento,
-                        $const_detraccion_asiento,
-                        $porcentaje_detraccion,
-                        $total_detraccion_asiento,
-                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->COD_TIPO_DOCUMENTO : '',
-                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->TXT_TIPO_DOCUMENTO : '',
-                        $serie_ref_asiento,
-                        $numero_ref_asiento,
-                        $fecha_asiento,
-                        0,
-                        $moneda_asiento_conversion_aux->COD_CATEGORIA,
-                        $moneda_asiento_conversion_aux->NOM_CATEGORIA
-                    );
+                                    $codAsientoReversion = $this->ejecutarAsientosIUDConSalida(
+                                        'I',
+                                        Session::get('empresas')->COD_EMPR,
+                                        'CEN0000000000001',
+                                        $periodo_asiento,
+                                        $cod_tipo_asiento,
+                                        $des_tipo_asiento,
+                                        '',
+                                        $fecha_asiento,
+                                        $asiento_cabecera_reparable_reversion[0]['TXT_GLOSA'],
+                                        $cod_estado_asiento,
+                                        $des_estado_asiento,
+                                        $moneda_asiento_aux->COD_CATEGORIA,
+                                        $moneda_asiento_aux->NOM_CATEGORIA,
+                                        $tipo_cambio_asiento,
+                                        0.0000,
+                                        0.0000,
+                                        '',
+                                        '',
+                                        0,
+                                        $asiento_cabecera_reparable_reversion[0]['COD_ASIENTO_MODELO'],
+                                        $asiento_cabecera_reparable_reversion[0]['TXT_TIPO_REFERENCIA'],
+                                        $asiento_cabecera_reparable_reversion[0]['TXT_REFERENCIA'],
+                                        1,
+                                        Session::get('usuario')->id,
+                                        '',
+                                        '',
+                                        $empresa_doc_asiento_aux->COD_EMPR,
+                                        $empresa_doc_asiento_aux->NOM_EMPR,
+                                        $tipo_doc_asiento_aux->COD_TIPO_DOCUMENTO,
+                                        $tipo_doc_asiento_aux->TXT_TIPO_DOCUMENTO,
+                                        $serie_asiento,
+                                        $numero_asiento,
+                                        $fecha_detraccion_asiento,
+                                        $const_detraccion_asiento,
+                                        $porcentaje_detraccion,
+                                        $total_detraccion_asiento,
+                                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->COD_TIPO_DOCUMENTO : '',
+                                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->TXT_TIPO_DOCUMENTO : '',
+                                        $serie_ref_asiento,
+                                        $numero_ref_asiento,
+                                        $fecha_asiento,
+                                        0,
+                                        $moneda_asiento_conversion_aux->COD_CATEGORIA,
+                                        $moneda_asiento_conversion_aux->NOM_CATEGORIA
+                                    );
 
-                    if (!empty($codAsientoReversion)) {
+                                    if (!empty($codAsientoReversion)) {
 
-                        $contador_reversion = 0;
+                                        $contador_reversion = 0;
 
-                        foreach ($asiento_detalle_reparable_reversion as $asiento_detalle_compra_item) {
-                            if (((int)$asiento_detalle_compra_item['COD_ESTADO']) === 1) {
-                                $contador_reversion++;
+                                        foreach ($asiento_detalle_reparable_reversion as $asiento_detalle_compra_item) {
+                                            if (((int)$asiento_detalle_compra_item['COD_ESTADO']) === 1) {
+                                                $contador_reversion++;
 
-                                $params = array(
-                                    'op' => 'I',
-                                    'empresa' => Session::get('empresas')->COD_EMPR,
-                                    'centro' => 'CEN0000000000001',
-                                    'asiento' => $codAsientoReversion,
-                                    'cuenta' => $asiento_detalle_compra_item['COD_CUENTA_CONTABLE'],
-                                    'txtCuenta' => $asiento_detalle_compra_item['TXT_CUENTA_CONTABLE'],
-                                    'glosa' => $asiento_detalle_compra_item['TXT_GLOSA'],
-                                    'debeMN' => $asiento_detalle_compra_item['CAN_DEBE_MN'],
-                                    'haberMN' => $asiento_detalle_compra_item['CAN_HABER_MN'],
-                                    'debeME' => $asiento_detalle_compra_item['CAN_DEBE_ME'],
-                                    'haberME' => $asiento_detalle_compra_item['CAN_HABER_ME'],
-                                    'linea' => $contador_reversion,
-                                    'codCuo' => '',
-                                    'indExtorno' => 0,
-                                    'txtTipoReferencia' => '',
-                                    'txtReferencia' => '',
-                                    'codEstado' => $asiento_detalle_compra_item['COD_ESTADO'],
-                                    'codUsuario' => Session::get('usuario')->id,
-                                    'codDocCtableRef' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'],
-                                    'codOrdenRef' => $asiento_detalle_compra_item['COD_ORDEN_REF'],
-                                    'indProducto' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'] !== '' ? 1 : 0,
-                                    'codProducto' => $asiento_detalle_compra_item['COD_PRODUCTO'],
-                                    'txtNombreProducto' => $asiento_detalle_compra_item['TXT_NOMBRE_PRODUCTO'],
-                                    'codLote' => $asiento_detalle_compra_item['COD_LOTE'],
-                                    'nroLineaProducto' => $asiento_detalle_compra_item['NRO_LINEA_PRODUCTO'],
-                                );
+                                                $params = array(
+                                                    'op' => 'I',
+                                                    'empresa' => Session::get('empresas')->COD_EMPR,
+                                                    'centro' => 'CEN0000000000001',
+                                                    'asiento' => $codAsientoReversion,
+                                                    'cuenta' => $asiento_detalle_compra_item['COD_CUENTA_CONTABLE'],
+                                                    'txtCuenta' => $asiento_detalle_compra_item['TXT_CUENTA_CONTABLE'],
+                                                    'glosa' => $asiento_detalle_compra_item['TXT_GLOSA'],
+                                                    'debeMN' => $asiento_detalle_compra_item['CAN_DEBE_MN'],
+                                                    'haberMN' => $asiento_detalle_compra_item['CAN_HABER_MN'],
+                                                    'debeME' => $asiento_detalle_compra_item['CAN_DEBE_ME'],
+                                                    'haberME' => $asiento_detalle_compra_item['CAN_HABER_ME'],
+                                                    'linea' => $contador_reversion,
+                                                    'codCuo' => '',
+                                                    'indExtorno' => 0,
+                                                    'txtTipoReferencia' => '',
+                                                    'txtReferencia' => '',
+                                                    'codEstado' => $asiento_detalle_compra_item['COD_ESTADO'],
+                                                    'codUsuario' => Session::get('usuario')->id,
+                                                    'codDocCtableRef' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'],
+                                                    'codOrdenRef' => $asiento_detalle_compra_item['COD_ORDEN_REF'],
+                                                    'indProducto' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'] !== '' ? 1 : 0,
+                                                    'codProducto' => $asiento_detalle_compra_item['COD_PRODUCTO'],
+                                                    'txtNombreProducto' => $asiento_detalle_compra_item['TXT_NOMBRE_PRODUCTO'],
+                                                    'codLote' => $asiento_detalle_compra_item['COD_LOTE'],
+                                                    'nroLineaProducto' => $asiento_detalle_compra_item['NRO_LINEA_PRODUCTO'],
+                                                );
 
-                                $this->ejecutarAsientosMovimientosIUDConSalida($params);
-                            }
-                        }
-                        $this->generar_destinos_compras($anio_asiento, Session::get('empresas')->COD_EMPR, $codAsientoReversion, '', Session::get('usuario')->id);
-                        $this->gn_generar_total_asientos($codAsientoReversion);
-                        $this->calcular_totales_compras($codAsientoReversion);
-                    }
-                }
+                                                $this->ejecutarAsientosMovimientosIUDConSalida($params);
+                                            }
+                                        }
+                                        $this->generar_destinos_compras($anio_asiento, Session::get('empresas')->COD_EMPR, $codAsientoReversion, '', Session::get('usuario')->id);
+                                        $this->gn_generar_total_asientos($codAsientoReversion);
+                                        $this->calcular_totales_compras($codAsientoReversion);
+                                    }
+                                }
 
-                if (count($asiento_cabecera_deduccion) > 0 and count($asiento_detalle_deduccion) > 0) {
+                                if (count($asiento_cabecera_deduccion) > 0 and count($asiento_detalle_deduccion) > 0) {
 
-                    $cod_tipo_asiento = $asiento_cabecera_deduccion[0]['COD_CATEGORIA_TIPO_ASIENTO'];
-                    $des_tipo_asiento = $asiento_cabecera_deduccion[0]['TXT_CATEGORIA_TIPO_ASIENTO'];
-                    $cod_estado_asiento = $asiento_cabecera_deduccion[0]['COD_CATEGORIA_ESTADO_ASIENTO'];
-                    $des_estado_asiento = $asiento_cabecera_deduccion[0]['TXT_CATEGORIA_ESTADO_ASIENTO'];
+                                    $cod_tipo_asiento = $asiento_cabecera_deduccion[0]['COD_CATEGORIA_TIPO_ASIENTO'];
+                                    $des_tipo_asiento = $asiento_cabecera_deduccion[0]['TXT_CATEGORIA_TIPO_ASIENTO'];
+                                    $cod_estado_asiento = $asiento_cabecera_deduccion[0]['COD_CATEGORIA_ESTADO_ASIENTO'];
+                                    $des_estado_asiento = $asiento_cabecera_deduccion[0]['TXT_CATEGORIA_ESTADO_ASIENTO'];
 
-                    $codAsientoDeduccion = $this->ejecutarAsientosIUDConSalida(
-                        'I',
-                        Session::get('empresas')->COD_EMPR,
-                        'CEN0000000000001',
-                        $periodo_asiento,
-                        $cod_tipo_asiento,
-                        $des_tipo_asiento,
-                        '',
-                        $fecha_asiento,
-                        $asiento_cabecera_deduccion[0]['TXT_GLOSA'],
-                        $cod_estado_asiento,
-                        $des_estado_asiento,
-                        $moneda_asiento_aux->COD_CATEGORIA,
-                        $moneda_asiento_aux->NOM_CATEGORIA,
-                        $tipo_cambio_asiento,
-                        0.0000,
-                        0.0000,
-                        '',
-                        '',
-                        0,
-                        $asiento_cabecera_deduccion[0]['COD_ASIENTO_MODELO'],
-                        $asiento_cabecera_deduccion[0]['TXT_TIPO_REFERENCIA'],
-                        $asiento_cabecera_deduccion[0]['TXT_REFERENCIA'],
-                        1,
-                        Session::get('usuario')->id,
-                        '',
-                        '',
-                        $empresa_doc_asiento_aux->COD_EMPR,
-                        $empresa_doc_asiento_aux->NOM_EMPR,
-                        $tipo_doc_asiento_aux->COD_TIPO_DOCUMENTO,
-                        $tipo_doc_asiento_aux->TXT_TIPO_DOCUMENTO,
-                        $serie_asiento,
-                        $numero_asiento,
-                        $fecha_detraccion_asiento,
-                        $const_detraccion_asiento,
-                        $porcentaje_detraccion,
-                        $total_detraccion_asiento,
-                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->COD_TIPO_DOCUMENTO : '',
-                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->TXT_TIPO_DOCUMENTO : '',
-                        $serie_ref_asiento,
-                        $numero_ref_asiento,
-                        $fecha_asiento,
-                        0,
-                        $moneda_asiento_conversion_aux->COD_CATEGORIA,
-                        $moneda_asiento_conversion_aux->NOM_CATEGORIA
-                    );
+                                    $codAsientoDeduccion = $this->ejecutarAsientosIUDConSalida(
+                                        'I',
+                                        Session::get('empresas')->COD_EMPR,
+                                        'CEN0000000000001',
+                                        $periodo_asiento,
+                                        $cod_tipo_asiento,
+                                        $des_tipo_asiento,
+                                        '',
+                                        $fecha_asiento,
+                                        $asiento_cabecera_deduccion[0]['TXT_GLOSA'],
+                                        $cod_estado_asiento,
+                                        $des_estado_asiento,
+                                        $moneda_asiento_aux->COD_CATEGORIA,
+                                        $moneda_asiento_aux->NOM_CATEGORIA,
+                                        $tipo_cambio_asiento,
+                                        0.0000,
+                                        0.0000,
+                                        '',
+                                        '',
+                                        0,
+                                        $asiento_cabecera_deduccion[0]['COD_ASIENTO_MODELO'],
+                                        $asiento_cabecera_deduccion[0]['TXT_TIPO_REFERENCIA'],
+                                        $asiento_cabecera_deduccion[0]['TXT_REFERENCIA'],
+                                        1,
+                                        Session::get('usuario')->id,
+                                        '',
+                                        '',
+                                        $empresa_doc_asiento_aux->COD_EMPR,
+                                        $empresa_doc_asiento_aux->NOM_EMPR,
+                                        $tipo_doc_asiento_aux->COD_TIPO_DOCUMENTO,
+                                        $tipo_doc_asiento_aux->TXT_TIPO_DOCUMENTO,
+                                        $serie_asiento,
+                                        $numero_asiento,
+                                        $fecha_detraccion_asiento,
+                                        $const_detraccion_asiento,
+                                        $porcentaje_detraccion,
+                                        $total_detraccion_asiento,
+                                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->COD_TIPO_DOCUMENTO : '',
+                                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->TXT_TIPO_DOCUMENTO : '',
+                                        $serie_ref_asiento,
+                                        $numero_ref_asiento,
+                                        $fecha_asiento,
+                                        0,
+                                        $moneda_asiento_conversion_aux->COD_CATEGORIA,
+                                        $moneda_asiento_conversion_aux->NOM_CATEGORIA
+                                    );
 
-                    if (!empty($codAsientoDeduccion)) {
+                                    if (!empty($codAsientoDeduccion)) {
 
-                        $contador_deduccion = 0;
+                                        $contador_deduccion = 0;
 
-                        foreach ($asiento_detalle_deduccion as $asiento_detalle_compra_item) {
-                            if (((int)$asiento_detalle_compra_item['COD_ESTADO']) === 1) {
-                                $contador_deduccion++;
+                                        foreach ($asiento_detalle_deduccion as $asiento_detalle_compra_item) {
+                                            if (((int)$asiento_detalle_compra_item['COD_ESTADO']) === 1) {
+                                                $contador_deduccion++;
 
-                                $params = array(
-                                    'op' => 'I',
-                                    'empresa' => Session::get('empresas')->COD_EMPR,
-                                    'centro' => 'CEN0000000000001',
-                                    'asiento' => $codAsientoDeduccion,
-                                    'cuenta' => $asiento_detalle_compra_item['COD_CUENTA_CONTABLE'],
-                                    'txtCuenta' => $asiento_detalle_compra_item['TXT_CUENTA_CONTABLE'],
-                                    'glosa' => $asiento_detalle_compra_item['TXT_GLOSA'],
-                                    'debeMN' => $asiento_detalle_compra_item['CAN_DEBE_MN'],
-                                    'haberMN' => $asiento_detalle_compra_item['CAN_HABER_MN'],
-                                    'debeME' => $asiento_detalle_compra_item['CAN_DEBE_ME'],
-                                    'haberME' => $asiento_detalle_compra_item['CAN_HABER_ME'],
-                                    'linea' => $contador_deduccion,
-                                    'codCuo' => '',
-                                    'indExtorno' => 0,
-                                    'txtTipoReferencia' => '',
-                                    'txtReferencia' => '',
-                                    'codEstado' => $asiento_detalle_compra_item['COD_ESTADO'],
-                                    'codUsuario' => Session::get('usuario')->id,
-                                    'codDocCtableRef' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'],
-                                    'codOrdenRef' => $asiento_detalle_compra_item['COD_ORDEN_REF'],
-                                    'indProducto' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'] !== '' ? 1 : 0,
-                                    'codProducto' => $asiento_detalle_compra_item['COD_PRODUCTO'],
-                                    'txtNombreProducto' => $asiento_detalle_compra_item['TXT_NOMBRE_PRODUCTO'],
-                                    'codLote' => $asiento_detalle_compra_item['COD_LOTE'],
-                                    'nroLineaProducto' => $asiento_detalle_compra_item['NRO_LINEA_PRODUCTO'],
-                                );
+                                                $params = array(
+                                                    'op' => 'I',
+                                                    'empresa' => Session::get('empresas')->COD_EMPR,
+                                                    'centro' => 'CEN0000000000001',
+                                                    'asiento' => $codAsientoDeduccion,
+                                                    'cuenta' => $asiento_detalle_compra_item['COD_CUENTA_CONTABLE'],
+                                                    'txtCuenta' => $asiento_detalle_compra_item['TXT_CUENTA_CONTABLE'],
+                                                    'glosa' => $asiento_detalle_compra_item['TXT_GLOSA'],
+                                                    'debeMN' => $asiento_detalle_compra_item['CAN_DEBE_MN'],
+                                                    'haberMN' => $asiento_detalle_compra_item['CAN_HABER_MN'],
+                                                    'debeME' => $asiento_detalle_compra_item['CAN_DEBE_ME'],
+                                                    'haberME' => $asiento_detalle_compra_item['CAN_HABER_ME'],
+                                                    'linea' => $contador_deduccion,
+                                                    'codCuo' => '',
+                                                    'indExtorno' => 0,
+                                                    'txtTipoReferencia' => '',
+                                                    'txtReferencia' => '',
+                                                    'codEstado' => $asiento_detalle_compra_item['COD_ESTADO'],
+                                                    'codUsuario' => Session::get('usuario')->id,
+                                                    'codDocCtableRef' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'],
+                                                    'codOrdenRef' => $asiento_detalle_compra_item['COD_ORDEN_REF'],
+                                                    'indProducto' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'] !== '' ? 1 : 0,
+                                                    'codProducto' => $asiento_detalle_compra_item['COD_PRODUCTO'],
+                                                    'txtNombreProducto' => $asiento_detalle_compra_item['TXT_NOMBRE_PRODUCTO'],
+                                                    'codLote' => $asiento_detalle_compra_item['COD_LOTE'],
+                                                    'nroLineaProducto' => $asiento_detalle_compra_item['NRO_LINEA_PRODUCTO'],
+                                                );
 
-                                $this->ejecutarAsientosMovimientosIUDConSalida($params);
-                            }
-                        }
-                        $this->generar_destinos_compras($anio_asiento, Session::get('empresas')->COD_EMPR, $codAsientoDeduccion, '', Session::get('usuario')->id);
-                        $this->gn_generar_total_asientos($codAsientoDeduccion);
-                        $this->calcular_totales_compras($codAsientoDeduccion);
-                    }
-                }
+                                                $this->ejecutarAsientosMovimientosIUDConSalida($params);
+                                            }
+                                        }
+                                        $this->generar_destinos_compras($anio_asiento, Session::get('empresas')->COD_EMPR, $codAsientoDeduccion, '', Session::get('usuario')->id);
+                                        $this->gn_generar_total_asientos($codAsientoDeduccion);
+                                        $this->calcular_totales_compras($codAsientoDeduccion);
+                                    }
+                                }
 
-                if (count($asiento_cabecera_percepcion) > 0 and count($asiento_detalle_percepcion) > 0) {
+                                if (count($asiento_cabecera_percepcion) > 0 and count($asiento_detalle_percepcion) > 0) {
 
-                    $cod_tipo_asiento = $asiento_cabecera_percepcion[0]['COD_CATEGORIA_TIPO_ASIENTO'];
-                    $des_tipo_asiento = $asiento_cabecera_percepcion[0]['TXT_CATEGORIA_TIPO_ASIENTO'];
-                    $cod_estado_asiento = $asiento_cabecera_percepcion[0]['COD_CATEGORIA_ESTADO_ASIENTO'];
-                    $des_estado_asiento = $asiento_cabecera_percepcion[0]['TXT_CATEGORIA_ESTADO_ASIENTO'];
+                                    $cod_tipo_asiento = $asiento_cabecera_percepcion[0]['COD_CATEGORIA_TIPO_ASIENTO'];
+                                    $des_tipo_asiento = $asiento_cabecera_percepcion[0]['TXT_CATEGORIA_TIPO_ASIENTO'];
+                                    $cod_estado_asiento = $asiento_cabecera_percepcion[0]['COD_CATEGORIA_ESTADO_ASIENTO'];
+                                    $des_estado_asiento = $asiento_cabecera_percepcion[0]['TXT_CATEGORIA_ESTADO_ASIENTO'];
 
-                    $codAsientoPercepcion = $this->ejecutarAsientosIUDConSalida(
-                        'I',
-                        Session::get('empresas')->COD_EMPR,
-                        'CEN0000000000001',
-                        $periodo_asiento,
-                        $cod_tipo_asiento,
-                        $des_tipo_asiento,
-                        '',
-                        $fecha_asiento,
-                        $asiento_cabecera_percepcion[0]['TXT_GLOSA'],
-                        $cod_estado_asiento,
-                        $des_estado_asiento,
-                        $moneda_asiento_aux->COD_CATEGORIA,
-                        $moneda_asiento_aux->NOM_CATEGORIA,
-                        $tipo_cambio_asiento,
-                        0.0000,
-                        0.0000,
-                        '',
-                        '',
-                        0,
-                        $asiento_cabecera_percepcion[0]['COD_ASIENTO_MODELO'],
-                        $asiento_cabecera_percepcion[0]['TXT_TIPO_REFERENCIA'],
-                        $asiento_cabecera_percepcion[0]['TXT_REFERENCIA'],
-                        1,
-                        Session::get('usuario')->id,
-                        '',
-                        '',
-                        $empresa_doc_asiento_aux->COD_EMPR,
-                        $empresa_doc_asiento_aux->NOM_EMPR,
-                        $tipo_doc_asiento_aux->COD_TIPO_DOCUMENTO,
-                        $tipo_doc_asiento_aux->TXT_TIPO_DOCUMENTO,
-                        $serie_asiento,
-                        $numero_asiento,
-                        $fecha_detraccion_asiento,
-                        $const_detraccion_asiento,
-                        $porcentaje_detraccion,
-                        $total_detraccion_asiento,
-                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->COD_TIPO_DOCUMENTO : '',
-                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->TXT_TIPO_DOCUMENTO : '',
-                        $serie_ref_asiento,
-                        $numero_ref_asiento,
-                        $fecha_asiento,
-                        0,
-                        $moneda_asiento_conversion_aux->COD_CATEGORIA,
-                        $moneda_asiento_conversion_aux->NOM_CATEGORIA
-                    );
+                                    $codAsientoPercepcion = $this->ejecutarAsientosIUDConSalida(
+                                        'I',
+                                        Session::get('empresas')->COD_EMPR,
+                                        'CEN0000000000001',
+                                        $periodo_asiento,
+                                        $cod_tipo_asiento,
+                                        $des_tipo_asiento,
+                                        '',
+                                        $fecha_asiento,
+                                        $asiento_cabecera_percepcion[0]['TXT_GLOSA'],
+                                        $cod_estado_asiento,
+                                        $des_estado_asiento,
+                                        $moneda_asiento_aux->COD_CATEGORIA,
+                                        $moneda_asiento_aux->NOM_CATEGORIA,
+                                        $tipo_cambio_asiento,
+                                        0.0000,
+                                        0.0000,
+                                        '',
+                                        '',
+                                        0,
+                                        $asiento_cabecera_percepcion[0]['COD_ASIENTO_MODELO'],
+                                        $asiento_cabecera_percepcion[0]['TXT_TIPO_REFERENCIA'],
+                                        $asiento_cabecera_percepcion[0]['TXT_REFERENCIA'],
+                                        1,
+                                        Session::get('usuario')->id,
+                                        '',
+                                        '',
+                                        $empresa_doc_asiento_aux->COD_EMPR,
+                                        $empresa_doc_asiento_aux->NOM_EMPR,
+                                        $tipo_doc_asiento_aux->COD_TIPO_DOCUMENTO,
+                                        $tipo_doc_asiento_aux->TXT_TIPO_DOCUMENTO,
+                                        $serie_asiento,
+                                        $numero_asiento,
+                                        $fecha_detraccion_asiento,
+                                        $const_detraccion_asiento,
+                                        $porcentaje_detraccion,
+                                        $total_detraccion_asiento,
+                                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->COD_TIPO_DOCUMENTO : '',
+                                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->TXT_TIPO_DOCUMENTO : '',
+                                        $serie_ref_asiento,
+                                        $numero_ref_asiento,
+                                        $fecha_asiento,
+                                        0,
+                                        $moneda_asiento_conversion_aux->COD_CATEGORIA,
+                                        $moneda_asiento_conversion_aux->NOM_CATEGORIA
+                                    );
 
-                    if (!empty($codAsientoPercepcion)) {
+                                    if (!empty($codAsientoPercepcion)) {
 
-                        $contador_percepcion = 0;
+                                        $contador_percepcion = 0;
 
-                        foreach ($asiento_detalle_percepcion as $asiento_detalle_compra_item) {
-                            if (((int)$asiento_detalle_compra_item['COD_ESTADO']) === 1) {
-                                $contador_percepcion++;
+                                        foreach ($asiento_detalle_percepcion as $asiento_detalle_compra_item) {
+                                            if (((int)$asiento_detalle_compra_item['COD_ESTADO']) === 1) {
+                                                $contador_percepcion++;
 
-                                $params = array(
-                                    'op' => 'I',
-                                    'empresa' => Session::get('empresas')->COD_EMPR,
-                                    'centro' => 'CEN0000000000001',
-                                    'asiento' => $codAsientoPercepcion,
-                                    'cuenta' => $asiento_detalle_compra_item['COD_CUENTA_CONTABLE'],
-                                    'txtCuenta' => $asiento_detalle_compra_item['TXT_CUENTA_CONTABLE'],
-                                    'glosa' => $asiento_detalle_compra_item['TXT_GLOSA'],
-                                    'debeMN' => $asiento_detalle_compra_item['CAN_DEBE_MN'],
-                                    'haberMN' => $asiento_detalle_compra_item['CAN_HABER_MN'],
-                                    'debeME' => $asiento_detalle_compra_item['CAN_DEBE_ME'],
-                                    'haberME' => $asiento_detalle_compra_item['CAN_HABER_ME'],
-                                    'linea' => $contador_percepcion,
-                                    'codCuo' => '',
-                                    'indExtorno' => 0,
-                                    'txtTipoReferencia' => '',
-                                    'txtReferencia' => '',
-                                    'codEstado' => $asiento_detalle_compra_item['COD_ESTADO'],
-                                    'codUsuario' => Session::get('usuario')->id,
-                                    'codDocCtableRef' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'],
-                                    'codOrdenRef' => $asiento_detalle_compra_item['COD_ORDEN_REF'],
-                                    'indProducto' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'] !== '' ? 1 : 0,
-                                    'codProducto' => $asiento_detalle_compra_item['COD_PRODUCTO'],
-                                    'txtNombreProducto' => $asiento_detalle_compra_item['TXT_NOMBRE_PRODUCTO'],
-                                    'codLote' => $asiento_detalle_compra_item['COD_LOTE'],
-                                    'nroLineaProducto' => $asiento_detalle_compra_item['NRO_LINEA_PRODUCTO'],
-                                );
+                                                $params = array(
+                                                    'op' => 'I',
+                                                    'empresa' => Session::get('empresas')->COD_EMPR,
+                                                    'centro' => 'CEN0000000000001',
+                                                    'asiento' => $codAsientoPercepcion,
+                                                    'cuenta' => $asiento_detalle_compra_item['COD_CUENTA_CONTABLE'],
+                                                    'txtCuenta' => $asiento_detalle_compra_item['TXT_CUENTA_CONTABLE'],
+                                                    'glosa' => $asiento_detalle_compra_item['TXT_GLOSA'],
+                                                    'debeMN' => $asiento_detalle_compra_item['CAN_DEBE_MN'],
+                                                    'haberMN' => $asiento_detalle_compra_item['CAN_HABER_MN'],
+                                                    'debeME' => $asiento_detalle_compra_item['CAN_DEBE_ME'],
+                                                    'haberME' => $asiento_detalle_compra_item['CAN_HABER_ME'],
+                                                    'linea' => $contador_percepcion,
+                                                    'codCuo' => '',
+                                                    'indExtorno' => 0,
+                                                    'txtTipoReferencia' => '',
+                                                    'txtReferencia' => '',
+                                                    'codEstado' => $asiento_detalle_compra_item['COD_ESTADO'],
+                                                    'codUsuario' => Session::get('usuario')->id,
+                                                    'codDocCtableRef' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'],
+                                                    'codOrdenRef' => $asiento_detalle_compra_item['COD_ORDEN_REF'],
+                                                    'indProducto' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'] !== '' ? 1 : 0,
+                                                    'codProducto' => $asiento_detalle_compra_item['COD_PRODUCTO'],
+                                                    'txtNombreProducto' => $asiento_detalle_compra_item['TXT_NOMBRE_PRODUCTO'],
+                                                    'codLote' => $asiento_detalle_compra_item['COD_LOTE'],
+                                                    'nroLineaProducto' => $asiento_detalle_compra_item['NRO_LINEA_PRODUCTO'],
+                                                );
 
-                                $this->ejecutarAsientosMovimientosIUDConSalida($params);
-                            }
-                        }
-                        $this->generar_destinos_compras($anio_asiento, Session::get('empresas')->COD_EMPR, $codAsientoPercepcion, '', Session::get('usuario')->id);
-                        $this->gn_generar_total_asientos($codAsientoPercepcion);
-                        $this->calcular_totales_compras($codAsientoPercepcion);
-                    }
-                }
-*/
+                                                $this->ejecutarAsientosMovimientosIUDConSalida($params);
+                                            }
+                                        }
+                                        $this->generar_destinos_compras($anio_asiento, Session::get('empresas')->COD_EMPR, $codAsientoPercepcion, '', Session::get('usuario')->id);
+                                        $this->gn_generar_total_asientos($codAsientoPercepcion);
+                                        $this->calcular_totales_compras($codAsientoPercepcion);
+                                    }
+                                }
+                */
                 DB::commit();
                 return Redirect::to('/gestion-de-contabilidad-aprobar/' . $idopcion)->with('bienhecho', 'Comprobante : ' . $ordencompra->COD_ORDEN . ' APROBADO CON EXITO');
             } catch (\Exception $ex) {
@@ -1469,14 +1494,24 @@ class GestionOCContabilidadController extends Controller
                 $respuesta = $asiento_compra[0][0]['RESPUESTA'];
             }
 
-            if ($respuesta === 'ASIENTO CORRECTO') {
+            if(count($asiento_compra)<=2){
+                array_push($asiento_compra,[]);
+            }
+
+            //if ($respuesta === 'ASIENTO CORRECTO') {
+            if (!empty($asiento_compra)) {
 
                 $ind_reversion = 'R';
 
                 $asiento_existe_reparable = WEBAsiento::where('COD_ESTADO', '=', 1)
-                    ->where('TXT_REFERENCIA', '=', $cod_contable)->where('TXT_GLOSA', 'like', "COMPRAS REPARABLE:%")->first();
+                    ->where('TXT_REFERENCIA', '=', $cod_contable)
+                    ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', 'TAS0000000000007')
+                    ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
+                    ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
+                    ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', "%NAVASOFT%")
+                    ->first();
 
-                if (!empty($asiento_existe_reparable)) {
+                if ($asiento_existe_reparable) {
                     $asiento_reparable_reversion = $this->ejecutarSP(
                         "EXEC [WEB].[GENERAR_ASIENTO_REPARABLE_FE_DOCUMENTO]
                 @anio = :anio,
@@ -1497,7 +1532,7 @@ class GestionOCContabilidadController extends Controller
                         ]
                     );
                 } else {
-                    $asiento_reparable_reversion = array(0 => [], 1 => [], 2 => []);
+                    $asiento_reparable_reversion = [[], [], []];
                 }
 
                 if ($fedocumento->MONTO_ANTICIPO_DESC > 0.0000) {
@@ -1525,7 +1560,7 @@ class GestionOCContabilidadController extends Controller
                         ]
                     );
                 } else {
-                    $asiento_deduccion = array(0 => [], 1 => [], 2 => []);
+                    $asiento_deduccion = [[], [], []];
                 }
 
                 if ($fedocumento->PERCEPCION > 0.0000) {
@@ -1547,7 +1582,7 @@ class GestionOCContabilidadController extends Controller
                         ]
                     );
                 } else {
-                    $asiento_percepcion = array(0 => [], 1 => [], 2 => []);
+                    $asiento_percepcion = [[], [], []];
                 }
             }
 
@@ -1572,6 +1607,11 @@ class GestionOCContabilidadController extends Controller
                     ':usuario' => $usuario
                 ]
             );
+
+            if(count($asiento_reparable)<=2){
+                array_push($asiento_reparable,[]);
+            }
+            //dd($asiento_compra, $asiento_reparable, $asiento_percepcion, $asiento_reparable_reversion, $asiento_deduccion);
 
             $array_nivel_pc = $this->pc_array_nivel_cuentas_contable(Session::get('empresas')->COD_EMPR, $anio);
             $combo_nivel_pc = $this->gn_generacion_combo_array('Seleccione nivel', '', $array_nivel_pc);
@@ -1642,7 +1682,7 @@ class GestionOCContabilidadController extends Controller
                     'tp' => $tp,
                     'idopcion' => $idopcion,
                     'idoc' => $idoc,
-                    'funciones'=>$funciones,
+                    'funciones' => $funciones,
                 ]);
 
 
@@ -1696,20 +1736,31 @@ class GestionOCContabilidadController extends Controller
                 $device_info       =   $request['device_info'];
                 $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO DOCUMENTO REPARABLE');
                 //geolocalizacion
+                //VERIFICAR SI ES HIBRIDO
+                $tarchivoshibrido       =   CMPDocAsociarCompra::where('COD_ORDEN','=',$pedido_id)
+                                            ->whereIn('TXT_ASIGNADO', ['ARCHIVO_VIRTUAL'])
+                                            ->where('TIP_DOC','=','F')
+                                            ->get();
 
-                // $trabajador = STDTrabajador::where('NRO_DOCUMENTO', '=', $fedocumento->dni_usuariocontacto)->first();
-                // $empresa = STDEmpresa::where('COD_EMPR', '=', $ordencompra->COD_EMPR)->first();
-                // $mensaje = 'COMPROBANTE: ' . $fedocumento->ID_DOCUMENTO
-                //     . '%0D%0A' . 'EMPRESA : ' . $empresa->NOM_EMPR . '%0D%0A'
-                //     . 'PROVEEDOR : ' . $ordencompra->TXT_EMPR_CLIENTE . '%0D%0A'
-                //     . 'ESTADO : ' . $fedocumento->TXT_ESTADO . '%0D%0A'
-                //     . 'APROBACION DEL DOCUMENTO REPARABLE' . '%0D%0A';
-                // if(1==0){
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                // }else{
-                //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                // }
+
+                foreach($tarchivoshibrido as $index => $item){
+
+                    CMPDocAsociarCompra::where('COD_ORDEN',$pedido_id)->where('COD_CATEGORIA_DOCUMENTO','=',$item->COD_CATEGORIA_DOCUMENTO)
+                                        ->where('TIP_DOC','=','F')
+                                        ->update(
+                                            [
+                                                'TXT_ASIGNADO'=>'ARCHIVO_FISICO'
+                                            ]
+                                        );
+                    FeDocumento::where('ID_DOCUMENTO',$pedido_id)
+                                ->update(
+                                    [
+                                        'IND_REPARABLE'=>'1',
+                                        'MODO_REPARABLE'=>'ARCHIVO_FISICO'
+                                    ]
+                                );
+                }
+
 
                 DB::commit();
                 return Redirect::to('/gestion-de-comprobantes-reparable/' . $idopcion)->with('bienhecho', 'Comprobante : ' . $ordencompra->COD_ORDEN . ' APROBADO CON EXITO');
@@ -1796,14 +1847,14 @@ class GestionOCContabilidadController extends Controller
 
                 foreach ($detalles as $detalle) {
 
-                    $cabecera = json_decode($detalle['cabecera'], true);
+                    $cabeceras = json_decode($detalle['cabecera'], true);
                     $detalle_asiento = json_decode($detalle['detalle'], true);
 
-                    foreach ($cabecera as $cabecera) {
+                    foreach ($cabeceras as $cabecera) {
 
                         $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                             ->where('COD_ESTADO', '=', 1)
-                            ->where('COD_ASIENTO_MODELO', '=', $cabecera['COD_ASIENTO_MODELO'])
+                            //->where('COD_ASIENTO_MODELO', '=', $cabecera['COD_ASIENTO_MODELO'])
                             ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                             ->first();
 
@@ -1886,7 +1937,7 @@ class GestionOCContabilidadController extends Controller
                         $tipo_doc_ref_asiento_aux = STDTipoDocumento::where('COD_TIPO_DOCUMENTO', '=', $COD_CATEGORIA_TIPO_DOCUMENTO_REF)->first();
                         $tipo_asiento = CMPCategoria::where('COD_CATEGORIA', '=', $COD_CATEGORIA_TIPO_ASIENTO)->first();
 
-                        if(empty($asiento_busqueda)) {
+                        if (empty($asiento_busqueda)) {
                             $codAsiento = $this->ejecutarAsientosIUDConSalida(
                                 'I',
                                 Session::get('empresas')->COD_EMPR,
@@ -2135,403 +2186,403 @@ class GestionOCContabilidadController extends Controller
                 //     $this->insertar_whatsaap('51920721827','JESSICA DEL PILAR',$mensaje,'');
                 //     //$this->insertar_whatsaap('51948634244','ELSA ANA BELEN',$mensaje,'');
                 // }
-/*
-                //GENERACION ASIENTOS
-                if (count($asiento_cabecera_compra) > 0 and count($asiento_detalle_compra) > 0) {
-                    $cod_tipo_asiento = $asiento_cabecera_compra[0]['COD_CATEGORIA_TIPO_ASIENTO'];
-                    $des_tipo_asiento = $asiento_cabecera_compra[0]['TXT_CATEGORIA_TIPO_ASIENTO'];
-                    $cod_estado_asiento = $asiento_cabecera_compra[0]['COD_CATEGORIA_ESTADO_ASIENTO'];
-                    $des_estado_asiento = $asiento_cabecera_compra[0]['TXT_CATEGORIA_ESTADO_ASIENTO'];
+                /*
+                                //GENERACION ASIENTOS
+                                if (count($asiento_cabecera_compra) > 0 and count($asiento_detalle_compra) > 0) {
+                                    $cod_tipo_asiento = $asiento_cabecera_compra[0]['COD_CATEGORIA_TIPO_ASIENTO'];
+                                    $des_tipo_asiento = $asiento_cabecera_compra[0]['TXT_CATEGORIA_TIPO_ASIENTO'];
+                                    $cod_estado_asiento = $asiento_cabecera_compra[0]['COD_CATEGORIA_ESTADO_ASIENTO'];
+                                    $des_estado_asiento = $asiento_cabecera_compra[0]['TXT_CATEGORIA_ESTADO_ASIENTO'];
 
-                    $codAsientoCompra = $this->ejecutarAsientosIUDConSalida(
-                        'I',
-                        Session::get('empresas')->COD_EMPR,
-                        'CEN0000000000001',
-                        $periodo_asiento,
-                        $tipo_asiento_aux->COD_CATEGORIA,
-                        $tipo_asiento_aux->NOM_CATEGORIA,
-                        '',
-                        $fecha_asiento,
-                        $glosa_asiento,
-                        $cod_estado_asiento,
-                        $des_estado_asiento,
-                        $moneda_asiento_aux->COD_CATEGORIA,
-                        $moneda_asiento_aux->NOM_CATEGORIA,
-                        $tipo_cambio_asiento,
-                        0.0000,
-                        0.0000,
-                        '',
-                        '',
-                        0,
-                        $asiento_cabecera_compra[0]['COD_ASIENTO_MODELO'],
-                        $asiento_cabecera_compra[0]['TXT_TIPO_REFERENCIA'],
-                        $asiento_cabecera_compra[0]['TXT_REFERENCIA'],
-                        1,
-                        Session::get('usuario')->id,
-                        '',
-                        '',
-                        $empresa_doc_asiento_aux->COD_EMPR,
-                        $empresa_doc_asiento_aux->NOM_EMPR,
-                        $tipo_doc_asiento_aux->COD_TIPO_DOCUMENTO,
-                        $tipo_doc_asiento_aux->TXT_TIPO_DOCUMENTO,
-                        $serie_asiento,
-                        $numero_asiento,
-                        $fecha_detraccion_asiento,
-                        $const_detraccion_asiento,
-                        $porcentaje_detraccion,
-                        $total_detraccion_asiento,
-                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->COD_TIPO_DOCUMENTO : '',
-                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->TXT_TIPO_DOCUMENTO : '',
-                        $serie_ref_asiento,
-                        $numero_ref_asiento,
-                        $fecha_asiento,
-                        0,
-                        $moneda_asiento_conversion_aux->COD_CATEGORIA,
-                        $moneda_asiento_conversion_aux->NOM_CATEGORIA
-                    );
+                                    $codAsientoCompra = $this->ejecutarAsientosIUDConSalida(
+                                        'I',
+                                        Session::get('empresas')->COD_EMPR,
+                                        'CEN0000000000001',
+                                        $periodo_asiento,
+                                        $tipo_asiento_aux->COD_CATEGORIA,
+                                        $tipo_asiento_aux->NOM_CATEGORIA,
+                                        '',
+                                        $fecha_asiento,
+                                        $glosa_asiento,
+                                        $cod_estado_asiento,
+                                        $des_estado_asiento,
+                                        $moneda_asiento_aux->COD_CATEGORIA,
+                                        $moneda_asiento_aux->NOM_CATEGORIA,
+                                        $tipo_cambio_asiento,
+                                        0.0000,
+                                        0.0000,
+                                        '',
+                                        '',
+                                        0,
+                                        $asiento_cabecera_compra[0]['COD_ASIENTO_MODELO'],
+                                        $asiento_cabecera_compra[0]['TXT_TIPO_REFERENCIA'],
+                                        $asiento_cabecera_compra[0]['TXT_REFERENCIA'],
+                                        1,
+                                        Session::get('usuario')->id,
+                                        '',
+                                        '',
+                                        $empresa_doc_asiento_aux->COD_EMPR,
+                                        $empresa_doc_asiento_aux->NOM_EMPR,
+                                        $tipo_doc_asiento_aux->COD_TIPO_DOCUMENTO,
+                                        $tipo_doc_asiento_aux->TXT_TIPO_DOCUMENTO,
+                                        $serie_asiento,
+                                        $numero_asiento,
+                                        $fecha_detraccion_asiento,
+                                        $const_detraccion_asiento,
+                                        $porcentaje_detraccion,
+                                        $total_detraccion_asiento,
+                                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->COD_TIPO_DOCUMENTO : '',
+                                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->TXT_TIPO_DOCUMENTO : '',
+                                        $serie_ref_asiento,
+                                        $numero_ref_asiento,
+                                        $fecha_asiento,
+                                        0,
+                                        $moneda_asiento_conversion_aux->COD_CATEGORIA,
+                                        $moneda_asiento_conversion_aux->NOM_CATEGORIA
+                                    );
 
-                    if (!empty($codAsientoCompra)) {
+                                    if (!empty($codAsientoCompra)) {
 
-                        $contador = 0;
+                                        $contador = 0;
 
-                        foreach ($asiento_detalle_compra as $asiento_detalle_compra_item) {
-                            if (((int)$asiento_detalle_compra_item['COD_ESTADO']) === 1) {
-                                $contador++;
+                                        foreach ($asiento_detalle_compra as $asiento_detalle_compra_item) {
+                                            if (((int)$asiento_detalle_compra_item['COD_ESTADO']) === 1) {
+                                                $contador++;
 
-                                $params = array(
-                                    'op' => 'I',
-                                    'empresa' => Session::get('empresas')->COD_EMPR,
-                                    'centro' => 'CEN0000000000001',
-                                    'asiento' => $codAsientoCompra,
-                                    'cuenta' => $asiento_detalle_compra_item['COD_CUENTA_CONTABLE'],
-                                    'txtCuenta' => $asiento_detalle_compra_item['TXT_CUENTA_CONTABLE'],
-                                    'glosa' => $asiento_detalle_compra_item['TXT_GLOSA'],
-                                    'debeMN' => $asiento_detalle_compra_item['CAN_DEBE_MN'],
-                                    'haberMN' => $asiento_detalle_compra_item['CAN_HABER_MN'],
-                                    'debeME' => $asiento_detalle_compra_item['CAN_DEBE_ME'],
-                                    'haberME' => $asiento_detalle_compra_item['CAN_HABER_ME'],
-                                    'linea' => $contador,
-                                    'codCuo' => '',
-                                    'indExtorno' => 0,
-                                    'txtTipoReferencia' => '',
-                                    'txtReferencia' => '',
-                                    'codEstado' => $asiento_detalle_compra_item['COD_ESTADO'],
-                                    'codUsuario' => Session::get('usuario')->id,
-                                    'codDocCtableRef' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'],
-                                    'codOrdenRef' => $asiento_detalle_compra_item['COD_ORDEN_REF'],
-                                    'indProducto' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'] !== '' ? 1 : 0,
-                                    'codProducto' => $asiento_detalle_compra_item['COD_PRODUCTO'],
-                                    'txtNombreProducto' => $asiento_detalle_compra_item['TXT_NOMBRE_PRODUCTO'],
-                                    'codLote' => $asiento_detalle_compra_item['COD_LOTE'],
-                                    'nroLineaProducto' => $asiento_detalle_compra_item['NRO_LINEA_PRODUCTO'],
-                                );
+                                                $params = array(
+                                                    'op' => 'I',
+                                                    'empresa' => Session::get('empresas')->COD_EMPR,
+                                                    'centro' => 'CEN0000000000001',
+                                                    'asiento' => $codAsientoCompra,
+                                                    'cuenta' => $asiento_detalle_compra_item['COD_CUENTA_CONTABLE'],
+                                                    'txtCuenta' => $asiento_detalle_compra_item['TXT_CUENTA_CONTABLE'],
+                                                    'glosa' => $asiento_detalle_compra_item['TXT_GLOSA'],
+                                                    'debeMN' => $asiento_detalle_compra_item['CAN_DEBE_MN'],
+                                                    'haberMN' => $asiento_detalle_compra_item['CAN_HABER_MN'],
+                                                    'debeME' => $asiento_detalle_compra_item['CAN_DEBE_ME'],
+                                                    'haberME' => $asiento_detalle_compra_item['CAN_HABER_ME'],
+                                                    'linea' => $contador,
+                                                    'codCuo' => '',
+                                                    'indExtorno' => 0,
+                                                    'txtTipoReferencia' => '',
+                                                    'txtReferencia' => '',
+                                                    'codEstado' => $asiento_detalle_compra_item['COD_ESTADO'],
+                                                    'codUsuario' => Session::get('usuario')->id,
+                                                    'codDocCtableRef' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'],
+                                                    'codOrdenRef' => $asiento_detalle_compra_item['COD_ORDEN_REF'],
+                                                    'indProducto' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'] !== '' ? 1 : 0,
+                                                    'codProducto' => $asiento_detalle_compra_item['COD_PRODUCTO'],
+                                                    'txtNombreProducto' => $asiento_detalle_compra_item['TXT_NOMBRE_PRODUCTO'],
+                                                    'codLote' => $asiento_detalle_compra_item['COD_LOTE'],
+                                                    'nroLineaProducto' => $asiento_detalle_compra_item['NRO_LINEA_PRODUCTO'],
+                                                );
 
-                                $this->ejecutarAsientosMovimientosIUDConSalida($params);
-                            }
-                        }
-                        $this->generar_destinos_compras($anio_asiento, Session::get('empresas')->COD_EMPR, $codAsientoCompra, '', Session::get('usuario')->id);
-                        $this->gn_generar_total_asientos($codAsientoCompra);
-                        $this->calcular_totales_compras($codAsientoCompra);
-                    }
-                }
+                                                $this->ejecutarAsientosMovimientosIUDConSalida($params);
+                                            }
+                                        }
+                                        $this->generar_destinos_compras($anio_asiento, Session::get('empresas')->COD_EMPR, $codAsientoCompra, '', Session::get('usuario')->id);
+                                        $this->gn_generar_total_asientos($codAsientoCompra);
+                                        $this->calcular_totales_compras($codAsientoCompra);
+                                    }
+                                }
 
-                if (count($asiento_cabecera_reparable_reversion) > 0 and count($asiento_detalle_reparable_reversion) > 0) {
+                                if (count($asiento_cabecera_reparable_reversion) > 0 and count($asiento_detalle_reparable_reversion) > 0) {
 
-                    $cod_tipo_asiento = $asiento_cabecera_reparable_reversion[0]['COD_CATEGORIA_TIPO_ASIENTO'];
-                    $des_tipo_asiento = $asiento_cabecera_reparable_reversion[0]['TXT_CATEGORIA_TIPO_ASIENTO'];
-                    $cod_estado_asiento = $asiento_cabecera_reparable_reversion[0]['COD_CATEGORIA_ESTADO_ASIENTO'];
-                    $des_estado_asiento = $asiento_cabecera_reparable_reversion[0]['TXT_CATEGORIA_ESTADO_ASIENTO'];
+                                    $cod_tipo_asiento = $asiento_cabecera_reparable_reversion[0]['COD_CATEGORIA_TIPO_ASIENTO'];
+                                    $des_tipo_asiento = $asiento_cabecera_reparable_reversion[0]['TXT_CATEGORIA_TIPO_ASIENTO'];
+                                    $cod_estado_asiento = $asiento_cabecera_reparable_reversion[0]['COD_CATEGORIA_ESTADO_ASIENTO'];
+                                    $des_estado_asiento = $asiento_cabecera_reparable_reversion[0]['TXT_CATEGORIA_ESTADO_ASIENTO'];
 
-                    $codAsientoReversion = $this->ejecutarAsientosIUDConSalida(
-                        'I',
-                        Session::get('empresas')->COD_EMPR,
-                        'CEN0000000000001',
-                        $periodo_asiento,
-                        $cod_tipo_asiento,
-                        $des_tipo_asiento,
-                        '',
-                        $fecha_asiento,
-                        $asiento_cabecera_reparable_reversion[0]['TXT_GLOSA'],
-                        $cod_estado_asiento,
-                        $des_estado_asiento,
-                        $moneda_asiento_aux->COD_CATEGORIA,
-                        $moneda_asiento_aux->NOM_CATEGORIA,
-                        $tipo_cambio_asiento,
-                        0.0000,
-                        0.0000,
-                        '',
-                        '',
-                        0,
-                        $asiento_cabecera_reparable_reversion[0]['COD_ASIENTO_MODELO'],
-                        $asiento_cabecera_reparable_reversion[0]['TXT_TIPO_REFERENCIA'],
-                        $asiento_cabecera_reparable_reversion[0]['TXT_REFERENCIA'],
-                        1,
-                        Session::get('usuario')->id,
-                        '',
-                        '',
-                        $empresa_doc_asiento_aux->COD_EMPR,
-                        $empresa_doc_asiento_aux->NOM_EMPR,
-                        $tipo_doc_asiento_aux->COD_TIPO_DOCUMENTO,
-                        $tipo_doc_asiento_aux->TXT_TIPO_DOCUMENTO,
-                        $serie_asiento,
-                        $numero_asiento,
-                        $fecha_detraccion_asiento,
-                        $const_detraccion_asiento,
-                        $porcentaje_detraccion,
-                        $total_detraccion_asiento,
-                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->COD_TIPO_DOCUMENTO : '',
-                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->TXT_TIPO_DOCUMENTO : '',
-                        $serie_ref_asiento,
-                        $numero_ref_asiento,
-                        $fecha_asiento,
-                        0,
-                        $moneda_asiento_conversion_aux->COD_CATEGORIA,
-                        $moneda_asiento_conversion_aux->NOM_CATEGORIA
-                    );
+                                    $codAsientoReversion = $this->ejecutarAsientosIUDConSalida(
+                                        'I',
+                                        Session::get('empresas')->COD_EMPR,
+                                        'CEN0000000000001',
+                                        $periodo_asiento,
+                                        $cod_tipo_asiento,
+                                        $des_tipo_asiento,
+                                        '',
+                                        $fecha_asiento,
+                                        $asiento_cabecera_reparable_reversion[0]['TXT_GLOSA'],
+                                        $cod_estado_asiento,
+                                        $des_estado_asiento,
+                                        $moneda_asiento_aux->COD_CATEGORIA,
+                                        $moneda_asiento_aux->NOM_CATEGORIA,
+                                        $tipo_cambio_asiento,
+                                        0.0000,
+                                        0.0000,
+                                        '',
+                                        '',
+                                        0,
+                                        $asiento_cabecera_reparable_reversion[0]['COD_ASIENTO_MODELO'],
+                                        $asiento_cabecera_reparable_reversion[0]['TXT_TIPO_REFERENCIA'],
+                                        $asiento_cabecera_reparable_reversion[0]['TXT_REFERENCIA'],
+                                        1,
+                                        Session::get('usuario')->id,
+                                        '',
+                                        '',
+                                        $empresa_doc_asiento_aux->COD_EMPR,
+                                        $empresa_doc_asiento_aux->NOM_EMPR,
+                                        $tipo_doc_asiento_aux->COD_TIPO_DOCUMENTO,
+                                        $tipo_doc_asiento_aux->TXT_TIPO_DOCUMENTO,
+                                        $serie_asiento,
+                                        $numero_asiento,
+                                        $fecha_detraccion_asiento,
+                                        $const_detraccion_asiento,
+                                        $porcentaje_detraccion,
+                                        $total_detraccion_asiento,
+                                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->COD_TIPO_DOCUMENTO : '',
+                                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->TXT_TIPO_DOCUMENTO : '',
+                                        $serie_ref_asiento,
+                                        $numero_ref_asiento,
+                                        $fecha_asiento,
+                                        0,
+                                        $moneda_asiento_conversion_aux->COD_CATEGORIA,
+                                        $moneda_asiento_conversion_aux->NOM_CATEGORIA
+                                    );
 
-                    if (!empty($codAsientoReversion)) {
+                                    if (!empty($codAsientoReversion)) {
 
-                        $contador_reversion = 0;
+                                        $contador_reversion = 0;
 
-                        foreach ($asiento_detalle_reparable_reversion as $asiento_detalle_compra_item) {
-                            if (((int)$asiento_detalle_compra_item['COD_ESTADO']) === 1) {
-                                $contador_reversion++;
+                                        foreach ($asiento_detalle_reparable_reversion as $asiento_detalle_compra_item) {
+                                            if (((int)$asiento_detalle_compra_item['COD_ESTADO']) === 1) {
+                                                $contador_reversion++;
 
-                                $params = array(
-                                    'op' => 'I',
-                                    'empresa' => Session::get('empresas')->COD_EMPR,
-                                    'centro' => 'CEN0000000000001',
-                                    'asiento' => $codAsientoReversion,
-                                    'cuenta' => $asiento_detalle_compra_item['COD_CUENTA_CONTABLE'],
-                                    'txtCuenta' => $asiento_detalle_compra_item['TXT_CUENTA_CONTABLE'],
-                                    'glosa' => $asiento_detalle_compra_item['TXT_GLOSA'],
-                                    'debeMN' => $asiento_detalle_compra_item['CAN_DEBE_MN'],
-                                    'haberMN' => $asiento_detalle_compra_item['CAN_HABER_MN'],
-                                    'debeME' => $asiento_detalle_compra_item['CAN_DEBE_ME'],
-                                    'haberME' => $asiento_detalle_compra_item['CAN_HABER_ME'],
-                                    'linea' => $contador_reversion,
-                                    'codCuo' => '',
-                                    'indExtorno' => 0,
-                                    'txtTipoReferencia' => '',
-                                    'txtReferencia' => '',
-                                    'codEstado' => $asiento_detalle_compra_item['COD_ESTADO'],
-                                    'codUsuario' => Session::get('usuario')->id,
-                                    'codDocCtableRef' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'],
-                                    'codOrdenRef' => $asiento_detalle_compra_item['COD_ORDEN_REF'],
-                                    'indProducto' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'] !== '' ? 1 : 0,
-                                    'codProducto' => $asiento_detalle_compra_item['COD_PRODUCTO'],
-                                    'txtNombreProducto' => $asiento_detalle_compra_item['TXT_NOMBRE_PRODUCTO'],
-                                    'codLote' => $asiento_detalle_compra_item['COD_LOTE'],
-                                    'nroLineaProducto' => $asiento_detalle_compra_item['NRO_LINEA_PRODUCTO'],
-                                );
+                                                $params = array(
+                                                    'op' => 'I',
+                                                    'empresa' => Session::get('empresas')->COD_EMPR,
+                                                    'centro' => 'CEN0000000000001',
+                                                    'asiento' => $codAsientoReversion,
+                                                    'cuenta' => $asiento_detalle_compra_item['COD_CUENTA_CONTABLE'],
+                                                    'txtCuenta' => $asiento_detalle_compra_item['TXT_CUENTA_CONTABLE'],
+                                                    'glosa' => $asiento_detalle_compra_item['TXT_GLOSA'],
+                                                    'debeMN' => $asiento_detalle_compra_item['CAN_DEBE_MN'],
+                                                    'haberMN' => $asiento_detalle_compra_item['CAN_HABER_MN'],
+                                                    'debeME' => $asiento_detalle_compra_item['CAN_DEBE_ME'],
+                                                    'haberME' => $asiento_detalle_compra_item['CAN_HABER_ME'],
+                                                    'linea' => $contador_reversion,
+                                                    'codCuo' => '',
+                                                    'indExtorno' => 0,
+                                                    'txtTipoReferencia' => '',
+                                                    'txtReferencia' => '',
+                                                    'codEstado' => $asiento_detalle_compra_item['COD_ESTADO'],
+                                                    'codUsuario' => Session::get('usuario')->id,
+                                                    'codDocCtableRef' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'],
+                                                    'codOrdenRef' => $asiento_detalle_compra_item['COD_ORDEN_REF'],
+                                                    'indProducto' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'] !== '' ? 1 : 0,
+                                                    'codProducto' => $asiento_detalle_compra_item['COD_PRODUCTO'],
+                                                    'txtNombreProducto' => $asiento_detalle_compra_item['TXT_NOMBRE_PRODUCTO'],
+                                                    'codLote' => $asiento_detalle_compra_item['COD_LOTE'],
+                                                    'nroLineaProducto' => $asiento_detalle_compra_item['NRO_LINEA_PRODUCTO'],
+                                                );
 
-                                $this->ejecutarAsientosMovimientosIUDConSalida($params);
-                            }
-                        }
-                        $this->generar_destinos_compras($anio_asiento, Session::get('empresas')->COD_EMPR, $codAsientoReversion, '', Session::get('usuario')->id);
-                        $this->gn_generar_total_asientos($codAsientoReversion);
-                        $this->calcular_totales_compras($codAsientoReversion);
-                    }
-                }
+                                                $this->ejecutarAsientosMovimientosIUDConSalida($params);
+                                            }
+                                        }
+                                        $this->generar_destinos_compras($anio_asiento, Session::get('empresas')->COD_EMPR, $codAsientoReversion, '', Session::get('usuario')->id);
+                                        $this->gn_generar_total_asientos($codAsientoReversion);
+                                        $this->calcular_totales_compras($codAsientoReversion);
+                                    }
+                                }
 
-                if (count($asiento_cabecera_deduccion) > 0 and count($asiento_detalle_deduccion) > 0) {
+                                if (count($asiento_cabecera_deduccion) > 0 and count($asiento_detalle_deduccion) > 0) {
 
-                    $cod_tipo_asiento = $asiento_cabecera_deduccion[0]['COD_CATEGORIA_TIPO_ASIENTO'];
-                    $des_tipo_asiento = $asiento_cabecera_deduccion[0]['TXT_CATEGORIA_TIPO_ASIENTO'];
-                    $cod_estado_asiento = $asiento_cabecera_deduccion[0]['COD_CATEGORIA_ESTADO_ASIENTO'];
-                    $des_estado_asiento = $asiento_cabecera_deduccion[0]['TXT_CATEGORIA_ESTADO_ASIENTO'];
+                                    $cod_tipo_asiento = $asiento_cabecera_deduccion[0]['COD_CATEGORIA_TIPO_ASIENTO'];
+                                    $des_tipo_asiento = $asiento_cabecera_deduccion[0]['TXT_CATEGORIA_TIPO_ASIENTO'];
+                                    $cod_estado_asiento = $asiento_cabecera_deduccion[0]['COD_CATEGORIA_ESTADO_ASIENTO'];
+                                    $des_estado_asiento = $asiento_cabecera_deduccion[0]['TXT_CATEGORIA_ESTADO_ASIENTO'];
 
-                    $codAsientoDeduccion = $this->ejecutarAsientosIUDConSalida(
-                        'I',
-                        Session::get('empresas')->COD_EMPR,
-                        'CEN0000000000001',
-                        $periodo_asiento,
-                        $cod_tipo_asiento,
-                        $des_tipo_asiento,
-                        '',
-                        $fecha_asiento,
-                        $asiento_cabecera_deduccion[0]['TXT_GLOSA'],
-                        $cod_estado_asiento,
-                        $des_estado_asiento,
-                        $moneda_asiento_aux->COD_CATEGORIA,
-                        $moneda_asiento_aux->NOM_CATEGORIA,
-                        $tipo_cambio_asiento,
-                        0.0000,
-                        0.0000,
-                        '',
-                        '',
-                        0,
-                        $asiento_cabecera_deduccion[0]['COD_ASIENTO_MODELO'],
-                        $asiento_cabecera_deduccion[0]['TXT_TIPO_REFERENCIA'],
-                        $asiento_cabecera_deduccion[0]['TXT_REFERENCIA'],
-                        1,
-                        Session::get('usuario')->id,
-                        '',
-                        '',
-                        $empresa_doc_asiento_aux->COD_EMPR,
-                        $empresa_doc_asiento_aux->NOM_EMPR,
-                        $tipo_doc_asiento_aux->COD_TIPO_DOCUMENTO,
-                        $tipo_doc_asiento_aux->TXT_TIPO_DOCUMENTO,
-                        $serie_asiento,
-                        $numero_asiento,
-                        $fecha_detraccion_asiento,
-                        $const_detraccion_asiento,
-                        $porcentaje_detraccion,
-                        $total_detraccion_asiento,
-                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->COD_TIPO_DOCUMENTO : '',
-                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->TXT_TIPO_DOCUMENTO : '',
-                        $serie_ref_asiento,
-                        $numero_ref_asiento,
-                        $fecha_asiento,
-                        0,
-                        $moneda_asiento_conversion_aux->COD_CATEGORIA,
-                        $moneda_asiento_conversion_aux->NOM_CATEGORIA
-                    );
+                                    $codAsientoDeduccion = $this->ejecutarAsientosIUDConSalida(
+                                        'I',
+                                        Session::get('empresas')->COD_EMPR,
+                                        'CEN0000000000001',
+                                        $periodo_asiento,
+                                        $cod_tipo_asiento,
+                                        $des_tipo_asiento,
+                                        '',
+                                        $fecha_asiento,
+                                        $asiento_cabecera_deduccion[0]['TXT_GLOSA'],
+                                        $cod_estado_asiento,
+                                        $des_estado_asiento,
+                                        $moneda_asiento_aux->COD_CATEGORIA,
+                                        $moneda_asiento_aux->NOM_CATEGORIA,
+                                        $tipo_cambio_asiento,
+                                        0.0000,
+                                        0.0000,
+                                        '',
+                                        '',
+                                        0,
+                                        $asiento_cabecera_deduccion[0]['COD_ASIENTO_MODELO'],
+                                        $asiento_cabecera_deduccion[0]['TXT_TIPO_REFERENCIA'],
+                                        $asiento_cabecera_deduccion[0]['TXT_REFERENCIA'],
+                                        1,
+                                        Session::get('usuario')->id,
+                                        '',
+                                        '',
+                                        $empresa_doc_asiento_aux->COD_EMPR,
+                                        $empresa_doc_asiento_aux->NOM_EMPR,
+                                        $tipo_doc_asiento_aux->COD_TIPO_DOCUMENTO,
+                                        $tipo_doc_asiento_aux->TXT_TIPO_DOCUMENTO,
+                                        $serie_asiento,
+                                        $numero_asiento,
+                                        $fecha_detraccion_asiento,
+                                        $const_detraccion_asiento,
+                                        $porcentaje_detraccion,
+                                        $total_detraccion_asiento,
+                                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->COD_TIPO_DOCUMENTO : '',
+                                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->TXT_TIPO_DOCUMENTO : '',
+                                        $serie_ref_asiento,
+                                        $numero_ref_asiento,
+                                        $fecha_asiento,
+                                        0,
+                                        $moneda_asiento_conversion_aux->COD_CATEGORIA,
+                                        $moneda_asiento_conversion_aux->NOM_CATEGORIA
+                                    );
 
-                    if (!empty($codAsientoDeduccion)) {
+                                    if (!empty($codAsientoDeduccion)) {
 
-                        $contador_deduccion = 0;
+                                        $contador_deduccion = 0;
 
-                        foreach ($asiento_detalle_deduccion as $asiento_detalle_compra_item) {
-                            if (((int)$asiento_detalle_compra_item['COD_ESTADO']) === 1) {
-                                $contador_deduccion++;
+                                        foreach ($asiento_detalle_deduccion as $asiento_detalle_compra_item) {
+                                            if (((int)$asiento_detalle_compra_item['COD_ESTADO']) === 1) {
+                                                $contador_deduccion++;
 
-                                $params = array(
-                                    'op' => 'I',
-                                    'empresa' => Session::get('empresas')->COD_EMPR,
-                                    'centro' => 'CEN0000000000001',
-                                    'asiento' => $codAsientoDeduccion,
-                                    'cuenta' => $asiento_detalle_compra_item['COD_CUENTA_CONTABLE'],
-                                    'txtCuenta' => $asiento_detalle_compra_item['TXT_CUENTA_CONTABLE'],
-                                    'glosa' => $asiento_detalle_compra_item['TXT_GLOSA'],
-                                    'debeMN' => $asiento_detalle_compra_item['CAN_DEBE_MN'],
-                                    'haberMN' => $asiento_detalle_compra_item['CAN_HABER_MN'],
-                                    'debeME' => $asiento_detalle_compra_item['CAN_DEBE_ME'],
-                                    'haberME' => $asiento_detalle_compra_item['CAN_HABER_ME'],
-                                    'linea' => $contador_deduccion,
-                                    'codCuo' => '',
-                                    'indExtorno' => 0,
-                                    'txtTipoReferencia' => '',
-                                    'txtReferencia' => '',
-                                    'codEstado' => $asiento_detalle_compra_item['COD_ESTADO'],
-                                    'codUsuario' => Session::get('usuario')->id,
-                                    'codDocCtableRef' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'],
-                                    'codOrdenRef' => $asiento_detalle_compra_item['COD_ORDEN_REF'],
-                                    'indProducto' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'] !== '' ? 1 : 0,
-                                    'codProducto' => $asiento_detalle_compra_item['COD_PRODUCTO'],
-                                    'txtNombreProducto' => $asiento_detalle_compra_item['TXT_NOMBRE_PRODUCTO'],
-                                    'codLote' => $asiento_detalle_compra_item['COD_LOTE'],
-                                    'nroLineaProducto' => $asiento_detalle_compra_item['NRO_LINEA_PRODUCTO'],
-                                );
+                                                $params = array(
+                                                    'op' => 'I',
+                                                    'empresa' => Session::get('empresas')->COD_EMPR,
+                                                    'centro' => 'CEN0000000000001',
+                                                    'asiento' => $codAsientoDeduccion,
+                                                    'cuenta' => $asiento_detalle_compra_item['COD_CUENTA_CONTABLE'],
+                                                    'txtCuenta' => $asiento_detalle_compra_item['TXT_CUENTA_CONTABLE'],
+                                                    'glosa' => $asiento_detalle_compra_item['TXT_GLOSA'],
+                                                    'debeMN' => $asiento_detalle_compra_item['CAN_DEBE_MN'],
+                                                    'haberMN' => $asiento_detalle_compra_item['CAN_HABER_MN'],
+                                                    'debeME' => $asiento_detalle_compra_item['CAN_DEBE_ME'],
+                                                    'haberME' => $asiento_detalle_compra_item['CAN_HABER_ME'],
+                                                    'linea' => $contador_deduccion,
+                                                    'codCuo' => '',
+                                                    'indExtorno' => 0,
+                                                    'txtTipoReferencia' => '',
+                                                    'txtReferencia' => '',
+                                                    'codEstado' => $asiento_detalle_compra_item['COD_ESTADO'],
+                                                    'codUsuario' => Session::get('usuario')->id,
+                                                    'codDocCtableRef' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'],
+                                                    'codOrdenRef' => $asiento_detalle_compra_item['COD_ORDEN_REF'],
+                                                    'indProducto' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'] !== '' ? 1 : 0,
+                                                    'codProducto' => $asiento_detalle_compra_item['COD_PRODUCTO'],
+                                                    'txtNombreProducto' => $asiento_detalle_compra_item['TXT_NOMBRE_PRODUCTO'],
+                                                    'codLote' => $asiento_detalle_compra_item['COD_LOTE'],
+                                                    'nroLineaProducto' => $asiento_detalle_compra_item['NRO_LINEA_PRODUCTO'],
+                                                );
 
-                                $this->ejecutarAsientosMovimientosIUDConSalida($params);
-                            }
-                        }
-                        $this->generar_destinos_compras($anio_asiento, Session::get('empresas')->COD_EMPR, $codAsientoDeduccion, '', Session::get('usuario')->id);
-                        $this->gn_generar_total_asientos($codAsientoDeduccion);
-                        $this->calcular_totales_compras($codAsientoDeduccion);
-                    }
-                }
+                                                $this->ejecutarAsientosMovimientosIUDConSalida($params);
+                                            }
+                                        }
+                                        $this->generar_destinos_compras($anio_asiento, Session::get('empresas')->COD_EMPR, $codAsientoDeduccion, '', Session::get('usuario')->id);
+                                        $this->gn_generar_total_asientos($codAsientoDeduccion);
+                                        $this->calcular_totales_compras($codAsientoDeduccion);
+                                    }
+                                }
 
-                if (count($asiento_cabecera_percepcion) > 0 and count($asiento_detalle_percepcion) > 0) {
+                                if (count($asiento_cabecera_percepcion) > 0 and count($asiento_detalle_percepcion) > 0) {
 
-                    $cod_tipo_asiento = $asiento_cabecera_percepcion[0]['COD_CATEGORIA_TIPO_ASIENTO'];
-                    $des_tipo_asiento = $asiento_cabecera_percepcion[0]['TXT_CATEGORIA_TIPO_ASIENTO'];
-                    $cod_estado_asiento = $asiento_cabecera_percepcion[0]['COD_CATEGORIA_ESTADO_ASIENTO'];
-                    $des_estado_asiento = $asiento_cabecera_percepcion[0]['TXT_CATEGORIA_ESTADO_ASIENTO'];
+                                    $cod_tipo_asiento = $asiento_cabecera_percepcion[0]['COD_CATEGORIA_TIPO_ASIENTO'];
+                                    $des_tipo_asiento = $asiento_cabecera_percepcion[0]['TXT_CATEGORIA_TIPO_ASIENTO'];
+                                    $cod_estado_asiento = $asiento_cabecera_percepcion[0]['COD_CATEGORIA_ESTADO_ASIENTO'];
+                                    $des_estado_asiento = $asiento_cabecera_percepcion[0]['TXT_CATEGORIA_ESTADO_ASIENTO'];
 
-                    $codAsientoPercepcion = $this->ejecutarAsientosIUDConSalida(
-                        'I',
-                        Session::get('empresas')->COD_EMPR,
-                        'CEN0000000000001',
-                        $periodo_asiento,
-                        $cod_tipo_asiento,
-                        $des_tipo_asiento,
-                        '',
-                        $fecha_asiento,
-                        $asiento_cabecera_percepcion[0]['TXT_GLOSA'],
-                        $cod_estado_asiento,
-                        $des_estado_asiento,
-                        $moneda_asiento_aux->COD_CATEGORIA,
-                        $moneda_asiento_aux->NOM_CATEGORIA,
-                        $tipo_cambio_asiento,
-                        0.0000,
-                        0.0000,
-                        '',
-                        '',
-                        0,
-                        $asiento_cabecera_percepcion[0]['COD_ASIENTO_MODELO'],
-                        $asiento_cabecera_percepcion[0]['TXT_TIPO_REFERENCIA'],
-                        $asiento_cabecera_percepcion[0]['TXT_REFERENCIA'],
-                        1,
-                        Session::get('usuario')->id,
-                        '',
-                        '',
-                        $empresa_doc_asiento_aux->COD_EMPR,
-                        $empresa_doc_asiento_aux->NOM_EMPR,
-                        $tipo_doc_asiento_aux->COD_TIPO_DOCUMENTO,
-                        $tipo_doc_asiento_aux->TXT_TIPO_DOCUMENTO,
-                        $serie_asiento,
-                        $numero_asiento,
-                        $fecha_detraccion_asiento,
-                        $const_detraccion_asiento,
-                        $porcentaje_detraccion,
-                        $total_detraccion_asiento,
-                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->COD_TIPO_DOCUMENTO : '',
-                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->TXT_TIPO_DOCUMENTO : '',
-                        $serie_ref_asiento,
-                        $numero_ref_asiento,
-                        $fecha_asiento,
-                        0,
-                        $moneda_asiento_conversion_aux->COD_CATEGORIA,
-                        $moneda_asiento_conversion_aux->NOM_CATEGORIA
-                    );
+                                    $codAsientoPercepcion = $this->ejecutarAsientosIUDConSalida(
+                                        'I',
+                                        Session::get('empresas')->COD_EMPR,
+                                        'CEN0000000000001',
+                                        $periodo_asiento,
+                                        $cod_tipo_asiento,
+                                        $des_tipo_asiento,
+                                        '',
+                                        $fecha_asiento,
+                                        $asiento_cabecera_percepcion[0]['TXT_GLOSA'],
+                                        $cod_estado_asiento,
+                                        $des_estado_asiento,
+                                        $moneda_asiento_aux->COD_CATEGORIA,
+                                        $moneda_asiento_aux->NOM_CATEGORIA,
+                                        $tipo_cambio_asiento,
+                                        0.0000,
+                                        0.0000,
+                                        '',
+                                        '',
+                                        0,
+                                        $asiento_cabecera_percepcion[0]['COD_ASIENTO_MODELO'],
+                                        $asiento_cabecera_percepcion[0]['TXT_TIPO_REFERENCIA'],
+                                        $asiento_cabecera_percepcion[0]['TXT_REFERENCIA'],
+                                        1,
+                                        Session::get('usuario')->id,
+                                        '',
+                                        '',
+                                        $empresa_doc_asiento_aux->COD_EMPR,
+                                        $empresa_doc_asiento_aux->NOM_EMPR,
+                                        $tipo_doc_asiento_aux->COD_TIPO_DOCUMENTO,
+                                        $tipo_doc_asiento_aux->TXT_TIPO_DOCUMENTO,
+                                        $serie_asiento,
+                                        $numero_asiento,
+                                        $fecha_detraccion_asiento,
+                                        $const_detraccion_asiento,
+                                        $porcentaje_detraccion,
+                                        $total_detraccion_asiento,
+                                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->COD_TIPO_DOCUMENTO : '',
+                                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->TXT_TIPO_DOCUMENTO : '',
+                                        $serie_ref_asiento,
+                                        $numero_ref_asiento,
+                                        $fecha_asiento,
+                                        0,
+                                        $moneda_asiento_conversion_aux->COD_CATEGORIA,
+                                        $moneda_asiento_conversion_aux->NOM_CATEGORIA
+                                    );
 
-                    if (!empty($codAsientoPercepcion)) {
+                                    if (!empty($codAsientoPercepcion)) {
 
-                        $contador_percepcion = 0;
+                                        $contador_percepcion = 0;
 
-                        foreach ($asiento_detalle_percepcion as $asiento_detalle_compra_item) {
-                            if (((int)$asiento_detalle_compra_item['COD_ESTADO']) === 1) {
-                                $contador_percepcion++;
+                                        foreach ($asiento_detalle_percepcion as $asiento_detalle_compra_item) {
+                                            if (((int)$asiento_detalle_compra_item['COD_ESTADO']) === 1) {
+                                                $contador_percepcion++;
 
-                                $params = array(
-                                    'op' => 'I',
-                                    'empresa' => Session::get('empresas')->COD_EMPR,
-                                    'centro' => 'CEN0000000000001',
-                                    'asiento' => $codAsientoPercepcion,
-                                    'cuenta' => $asiento_detalle_compra_item['COD_CUENTA_CONTABLE'],
-                                    'txtCuenta' => $asiento_detalle_compra_item['TXT_CUENTA_CONTABLE'],
-                                    'glosa' => $asiento_detalle_compra_item['TXT_GLOSA'],
-                                    'debeMN' => $asiento_detalle_compra_item['CAN_DEBE_MN'],
-                                    'haberMN' => $asiento_detalle_compra_item['CAN_HABER_MN'],
-                                    'debeME' => $asiento_detalle_compra_item['CAN_DEBE_ME'],
-                                    'haberME' => $asiento_detalle_compra_item['CAN_HABER_ME'],
-                                    'linea' => $contador_percepcion,
-                                    'codCuo' => '',
-                                    'indExtorno' => 0,
-                                    'txtTipoReferencia' => '',
-                                    'txtReferencia' => '',
-                                    'codEstado' => $asiento_detalle_compra_item['COD_ESTADO'],
-                                    'codUsuario' => Session::get('usuario')->id,
-                                    'codDocCtableRef' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'],
-                                    'codOrdenRef' => $asiento_detalle_compra_item['COD_ORDEN_REF'],
-                                    'indProducto' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'] !== '' ? 1 : 0,
-                                    'codProducto' => $asiento_detalle_compra_item['COD_PRODUCTO'],
-                                    'txtNombreProducto' => $asiento_detalle_compra_item['TXT_NOMBRE_PRODUCTO'],
-                                    'codLote' => $asiento_detalle_compra_item['COD_LOTE'],
-                                    'nroLineaProducto' => $asiento_detalle_compra_item['NRO_LINEA_PRODUCTO'],
-                                );
+                                                $params = array(
+                                                    'op' => 'I',
+                                                    'empresa' => Session::get('empresas')->COD_EMPR,
+                                                    'centro' => 'CEN0000000000001',
+                                                    'asiento' => $codAsientoPercepcion,
+                                                    'cuenta' => $asiento_detalle_compra_item['COD_CUENTA_CONTABLE'],
+                                                    'txtCuenta' => $asiento_detalle_compra_item['TXT_CUENTA_CONTABLE'],
+                                                    'glosa' => $asiento_detalle_compra_item['TXT_GLOSA'],
+                                                    'debeMN' => $asiento_detalle_compra_item['CAN_DEBE_MN'],
+                                                    'haberMN' => $asiento_detalle_compra_item['CAN_HABER_MN'],
+                                                    'debeME' => $asiento_detalle_compra_item['CAN_DEBE_ME'],
+                                                    'haberME' => $asiento_detalle_compra_item['CAN_HABER_ME'],
+                                                    'linea' => $contador_percepcion,
+                                                    'codCuo' => '',
+                                                    'indExtorno' => 0,
+                                                    'txtTipoReferencia' => '',
+                                                    'txtReferencia' => '',
+                                                    'codEstado' => $asiento_detalle_compra_item['COD_ESTADO'],
+                                                    'codUsuario' => Session::get('usuario')->id,
+                                                    'codDocCtableRef' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'],
+                                                    'codOrdenRef' => $asiento_detalle_compra_item['COD_ORDEN_REF'],
+                                                    'indProducto' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'] !== '' ? 1 : 0,
+                                                    'codProducto' => $asiento_detalle_compra_item['COD_PRODUCTO'],
+                                                    'txtNombreProducto' => $asiento_detalle_compra_item['TXT_NOMBRE_PRODUCTO'],
+                                                    'codLote' => $asiento_detalle_compra_item['COD_LOTE'],
+                                                    'nroLineaProducto' => $asiento_detalle_compra_item['NRO_LINEA_PRODUCTO'],
+                                                );
 
-                                $this->ejecutarAsientosMovimientosIUDConSalida($params);
-                            }
-                        }
-                        $this->generar_destinos_compras($anio_asiento, Session::get('empresas')->COD_EMPR, $codAsientoPercepcion, '', Session::get('usuario')->id);
-                        $this->gn_generar_total_asientos($codAsientoPercepcion);
-                        $this->calcular_totales_compras($codAsientoPercepcion);
-                    }
-                }
-*/
+                                                $this->ejecutarAsientosMovimientosIUDConSalida($params);
+                                            }
+                                        }
+                                        $this->generar_destinos_compras($anio_asiento, Session::get('empresas')->COD_EMPR, $codAsientoPercepcion, '', Session::get('usuario')->id);
+                                        $this->gn_generar_total_asientos($codAsientoPercepcion);
+                                        $this->calcular_totales_compras($codAsientoPercepcion);
+                                    }
+                                }
+                */
                 DB::commit();
                 Session::flash('operacion_id', 'ESTIBA');
                 return Redirect::to('/gestion-de-contabilidad-aprobar/' . $idopcion)->with('bienhecho', 'Comprobante : ' . $pedido_id . ' APROBADO CON EXITO');
@@ -2663,14 +2714,20 @@ class GestionOCContabilidadController extends Controller
                 $respuesta = $asiento_compra[0][0]['RESPUESTA'];
             }
 
-            if ($respuesta === 'ASIENTO CORRECTO') {
+            //if ($respuesta === 'ASIENTO CORRECTO') {
+            if (!empty($asiento_compra)) {
 
                 $ind_reversion = 'R';
 
                 $asiento_existe_reparable = WEBAsiento::where('COD_ESTADO', '=', 1)
-                    ->where('TXT_REFERENCIA', '=', $cod_contable)->where('TXT_GLOSA', 'like', "COMPRAS REPARABLE:%")->first();
+                    ->where('TXT_REFERENCIA', '=', $cod_contable)
+                    ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', 'TAS0000000000007')
+                    ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
+                    ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
+                    ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', "%NAVASOFT%")
+                    ->first();
 
-                if (!empty($asiento_existe_reparable)) {
+                if ($asiento_existe_reparable) {
                     $asiento_reparable_reversion = $this->ejecutarSP(
                         "EXEC [WEB].[GENERAR_ASIENTO_REPARABLE_FE_DOCUMENTO]
                 @anio = :anio,
@@ -2691,7 +2748,7 @@ class GestionOCContabilidadController extends Controller
                         ]
                     );
                 } else {
-                    $asiento_reparable_reversion = array(0 => [], 1 => [], 2 => []);
+                    $asiento_reparable_reversion = [[], [], []];
                 }
 
                 if ($fedocumento->MONTO_ANTICIPO_DESC > 0.0000) {
@@ -2719,7 +2776,7 @@ class GestionOCContabilidadController extends Controller
                         ]
                     );
                 } else {
-                    $asiento_deduccion = array(0 => [], 1 => [], 2 => []);
+                    $asiento_deduccion = [[], [], []];
                 }
 
                 if ($fedocumento->PERCEPCION > 0.0000) {
@@ -2741,7 +2798,7 @@ class GestionOCContabilidadController extends Controller
                         ]
                     );
                 } else {
-                    $asiento_percepcion = array(0 => [], 1 => [], 2 => []);
+                    $asiento_percepcion = [[], [], []];
                 }
             }
 
@@ -2917,14 +2974,14 @@ class GestionOCContabilidadController extends Controller
 
                 foreach ($detalles as $detalle) {
 
-                    $cabecera = json_decode($detalle['cabecera'], true);
+                    $cabeceras = json_decode($detalle['cabecera'], true);
                     $detalle_asiento = json_decode($detalle['detalle'], true);
 
-                    foreach ($cabecera as $cabecera) {
+                    foreach ($cabeceras as $cabecera) {
 
                         $asiento_busqueda = WEBAsiento::where('TXT_REFERENCIA', '=', $cabecera['TXT_REFERENCIA'])
                             ->where('COD_ESTADO', '=', 1)
-                            ->where('COD_ASIENTO_MODELO', '=', $cabecera['COD_ASIENTO_MODELO'])
+                            //->where('COD_ASIENTO_MODELO', '=', $cabecera['COD_ASIENTO_MODELO'])
                             ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', $cabecera['COD_CATEGORIA_TIPO_ASIENTO'])
                             ->first();
 
@@ -3007,7 +3064,7 @@ class GestionOCContabilidadController extends Controller
                         $tipo_doc_ref_asiento_aux = STDTipoDocumento::where('COD_TIPO_DOCUMENTO', '=', $COD_CATEGORIA_TIPO_DOCUMENTO_REF)->first();
                         $tipo_asiento = CMPCategoria::where('COD_CATEGORIA', '=', $COD_CATEGORIA_TIPO_ASIENTO)->first();
 
-                        if(empty($asiento_busqueda)) {
+                        if (empty($asiento_busqueda)) {
                             $codAsiento = $this->ejecutarAsientosIUDConSalida(
                                 'I',
                                 Session::get('empresas')->COD_EMPR,
@@ -3268,403 +3325,403 @@ class GestionOCContabilidadController extends Controller
                 //     //$this->insertar_whatsaap('51948634244','ELSA ANA BELEN',$mensaje,'');
 
                 // }
-/*
-                //GENERACION ASIENTOS
-                if (count($asiento_cabecera_compra) > 0 and count($asiento_detalle_compra) > 0) {
-                    $cod_tipo_asiento = $asiento_cabecera_compra[0]['COD_CATEGORIA_TIPO_ASIENTO'];
-                    $des_tipo_asiento = $asiento_cabecera_compra[0]['TXT_CATEGORIA_TIPO_ASIENTO'];
-                    $cod_estado_asiento = $asiento_cabecera_compra[0]['COD_CATEGORIA_ESTADO_ASIENTO'];
-                    $des_estado_asiento = $asiento_cabecera_compra[0]['TXT_CATEGORIA_ESTADO_ASIENTO'];
+                /*
+                                //GENERACION ASIENTOS
+                                if (count($asiento_cabecera_compra) > 0 and count($asiento_detalle_compra) > 0) {
+                                    $cod_tipo_asiento = $asiento_cabecera_compra[0]['COD_CATEGORIA_TIPO_ASIENTO'];
+                                    $des_tipo_asiento = $asiento_cabecera_compra[0]['TXT_CATEGORIA_TIPO_ASIENTO'];
+                                    $cod_estado_asiento = $asiento_cabecera_compra[0]['COD_CATEGORIA_ESTADO_ASIENTO'];
+                                    $des_estado_asiento = $asiento_cabecera_compra[0]['TXT_CATEGORIA_ESTADO_ASIENTO'];
 
-                    $codAsientoCompra = $this->ejecutarAsientosIUDConSalida(
-                        'I',
-                        Session::get('empresas')->COD_EMPR,
-                        'CEN0000000000001',
-                        $periodo_asiento,
-                        $tipo_asiento_aux->COD_CATEGORIA,
-                        $tipo_asiento_aux->NOM_CATEGORIA,
-                        '',
-                        $fecha_asiento,
-                        $glosa_asiento,
-                        $cod_estado_asiento,
-                        $des_estado_asiento,
-                        $moneda_asiento_aux->COD_CATEGORIA,
-                        $moneda_asiento_aux->NOM_CATEGORIA,
-                        $tipo_cambio_asiento,
-                        0.0000,
-                        0.0000,
-                        '',
-                        '',
-                        0,
-                        $asiento_cabecera_compra[0]['COD_ASIENTO_MODELO'],
-                        $asiento_cabecera_compra[0]['TXT_TIPO_REFERENCIA'],
-                        $asiento_cabecera_compra[0]['TXT_REFERENCIA'],
-                        1,
-                        Session::get('usuario')->id,
-                        '',
-                        '',
-                        $empresa_doc_asiento_aux->COD_EMPR,
-                        $empresa_doc_asiento_aux->NOM_EMPR,
-                        $tipo_doc_asiento_aux->COD_TIPO_DOCUMENTO,
-                        $tipo_doc_asiento_aux->TXT_TIPO_DOCUMENTO,
-                        $serie_asiento,
-                        $numero_asiento,
-                        $fecha_detraccion_asiento,
-                        $const_detraccion_asiento,
-                        $porcentaje_detraccion,
-                        $total_detraccion_asiento,
-                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->COD_TIPO_DOCUMENTO : '',
-                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->TXT_TIPO_DOCUMENTO : '',
-                        $serie_ref_asiento,
-                        $numero_ref_asiento,
-                        $fecha_asiento,
-                        0,
-                        $moneda_asiento_conversion_aux->COD_CATEGORIA,
-                        $moneda_asiento_conversion_aux->NOM_CATEGORIA
-                    );
+                                    $codAsientoCompra = $this->ejecutarAsientosIUDConSalida(
+                                        'I',
+                                        Session::get('empresas')->COD_EMPR,
+                                        'CEN0000000000001',
+                                        $periodo_asiento,
+                                        $tipo_asiento_aux->COD_CATEGORIA,
+                                        $tipo_asiento_aux->NOM_CATEGORIA,
+                                        '',
+                                        $fecha_asiento,
+                                        $glosa_asiento,
+                                        $cod_estado_asiento,
+                                        $des_estado_asiento,
+                                        $moneda_asiento_aux->COD_CATEGORIA,
+                                        $moneda_asiento_aux->NOM_CATEGORIA,
+                                        $tipo_cambio_asiento,
+                                        0.0000,
+                                        0.0000,
+                                        '',
+                                        '',
+                                        0,
+                                        $asiento_cabecera_compra[0]['COD_ASIENTO_MODELO'],
+                                        $asiento_cabecera_compra[0]['TXT_TIPO_REFERENCIA'],
+                                        $asiento_cabecera_compra[0]['TXT_REFERENCIA'],
+                                        1,
+                                        Session::get('usuario')->id,
+                                        '',
+                                        '',
+                                        $empresa_doc_asiento_aux->COD_EMPR,
+                                        $empresa_doc_asiento_aux->NOM_EMPR,
+                                        $tipo_doc_asiento_aux->COD_TIPO_DOCUMENTO,
+                                        $tipo_doc_asiento_aux->TXT_TIPO_DOCUMENTO,
+                                        $serie_asiento,
+                                        $numero_asiento,
+                                        $fecha_detraccion_asiento,
+                                        $const_detraccion_asiento,
+                                        $porcentaje_detraccion,
+                                        $total_detraccion_asiento,
+                                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->COD_TIPO_DOCUMENTO : '',
+                                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->TXT_TIPO_DOCUMENTO : '',
+                                        $serie_ref_asiento,
+                                        $numero_ref_asiento,
+                                        $fecha_asiento,
+                                        0,
+                                        $moneda_asiento_conversion_aux->COD_CATEGORIA,
+                                        $moneda_asiento_conversion_aux->NOM_CATEGORIA
+                                    );
 
-                    if (!empty($codAsientoCompra)) {
+                                    if (!empty($codAsientoCompra)) {
 
-                        $contador = 0;
+                                        $contador = 0;
 
-                        foreach ($asiento_detalle_compra as $asiento_detalle_compra_item) {
-                            if (((int)$asiento_detalle_compra_item['COD_ESTADO']) === 1) {
-                                $contador++;
+                                        foreach ($asiento_detalle_compra as $asiento_detalle_compra_item) {
+                                            if (((int)$asiento_detalle_compra_item['COD_ESTADO']) === 1) {
+                                                $contador++;
 
-                                $params = array(
-                                    'op' => 'I',
-                                    'empresa' => Session::get('empresas')->COD_EMPR,
-                                    'centro' => 'CEN0000000000001',
-                                    'asiento' => $codAsientoCompra,
-                                    'cuenta' => $asiento_detalle_compra_item['COD_CUENTA_CONTABLE'],
-                                    'txtCuenta' => $asiento_detalle_compra_item['TXT_CUENTA_CONTABLE'],
-                                    'glosa' => $asiento_detalle_compra_item['TXT_GLOSA'],
-                                    'debeMN' => $asiento_detalle_compra_item['CAN_DEBE_MN'],
-                                    'haberMN' => $asiento_detalle_compra_item['CAN_HABER_MN'],
-                                    'debeME' => $asiento_detalle_compra_item['CAN_DEBE_ME'],
-                                    'haberME' => $asiento_detalle_compra_item['CAN_HABER_ME'],
-                                    'linea' => $contador,
-                                    'codCuo' => '',
-                                    'indExtorno' => 0,
-                                    'txtTipoReferencia' => '',
-                                    'txtReferencia' => '',
-                                    'codEstado' => $asiento_detalle_compra_item['COD_ESTADO'],
-                                    'codUsuario' => Session::get('usuario')->id,
-                                    'codDocCtableRef' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'],
-                                    'codOrdenRef' => $asiento_detalle_compra_item['COD_ORDEN_REF'],
-                                    'indProducto' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'] !== '' ? 1 : 0,
-                                    'codProducto' => $asiento_detalle_compra_item['COD_PRODUCTO'],
-                                    'txtNombreProducto' => $asiento_detalle_compra_item['TXT_NOMBRE_PRODUCTO'],
-                                    'codLote' => $asiento_detalle_compra_item['COD_LOTE'],
-                                    'nroLineaProducto' => $asiento_detalle_compra_item['NRO_LINEA_PRODUCTO'],
-                                );
+                                                $params = array(
+                                                    'op' => 'I',
+                                                    'empresa' => Session::get('empresas')->COD_EMPR,
+                                                    'centro' => 'CEN0000000000001',
+                                                    'asiento' => $codAsientoCompra,
+                                                    'cuenta' => $asiento_detalle_compra_item['COD_CUENTA_CONTABLE'],
+                                                    'txtCuenta' => $asiento_detalle_compra_item['TXT_CUENTA_CONTABLE'],
+                                                    'glosa' => $asiento_detalle_compra_item['TXT_GLOSA'],
+                                                    'debeMN' => $asiento_detalle_compra_item['CAN_DEBE_MN'],
+                                                    'haberMN' => $asiento_detalle_compra_item['CAN_HABER_MN'],
+                                                    'debeME' => $asiento_detalle_compra_item['CAN_DEBE_ME'],
+                                                    'haberME' => $asiento_detalle_compra_item['CAN_HABER_ME'],
+                                                    'linea' => $contador,
+                                                    'codCuo' => '',
+                                                    'indExtorno' => 0,
+                                                    'txtTipoReferencia' => '',
+                                                    'txtReferencia' => '',
+                                                    'codEstado' => $asiento_detalle_compra_item['COD_ESTADO'],
+                                                    'codUsuario' => Session::get('usuario')->id,
+                                                    'codDocCtableRef' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'],
+                                                    'codOrdenRef' => $asiento_detalle_compra_item['COD_ORDEN_REF'],
+                                                    'indProducto' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'] !== '' ? 1 : 0,
+                                                    'codProducto' => $asiento_detalle_compra_item['COD_PRODUCTO'],
+                                                    'txtNombreProducto' => $asiento_detalle_compra_item['TXT_NOMBRE_PRODUCTO'],
+                                                    'codLote' => $asiento_detalle_compra_item['COD_LOTE'],
+                                                    'nroLineaProducto' => $asiento_detalle_compra_item['NRO_LINEA_PRODUCTO'],
+                                                );
 
-                                $this->ejecutarAsientosMovimientosIUDConSalida($params);
-                            }
-                        }
-                        $this->generar_destinos_compras($anio_asiento, Session::get('empresas')->COD_EMPR, $codAsientoCompra, '', Session::get('usuario')->id);
-                        $this->gn_generar_total_asientos($codAsientoCompra);
-                        $this->calcular_totales_compras($codAsientoCompra);
-                    }
-                }
+                                                $this->ejecutarAsientosMovimientosIUDConSalida($params);
+                                            }
+                                        }
+                                        $this->generar_destinos_compras($anio_asiento, Session::get('empresas')->COD_EMPR, $codAsientoCompra, '', Session::get('usuario')->id);
+                                        $this->gn_generar_total_asientos($codAsientoCompra);
+                                        $this->calcular_totales_compras($codAsientoCompra);
+                                    }
+                                }
 
-                if (count($asiento_cabecera_reparable_reversion) > 0 and count($asiento_detalle_reparable_reversion) > 0) {
+                                if (count($asiento_cabecera_reparable_reversion) > 0 and count($asiento_detalle_reparable_reversion) > 0) {
 
-                    $cod_tipo_asiento = $asiento_cabecera_reparable_reversion[0]['COD_CATEGORIA_TIPO_ASIENTO'];
-                    $des_tipo_asiento = $asiento_cabecera_reparable_reversion[0]['TXT_CATEGORIA_TIPO_ASIENTO'];
-                    $cod_estado_asiento = $asiento_cabecera_reparable_reversion[0]['COD_CATEGORIA_ESTADO_ASIENTO'];
-                    $des_estado_asiento = $asiento_cabecera_reparable_reversion[0]['TXT_CATEGORIA_ESTADO_ASIENTO'];
+                                    $cod_tipo_asiento = $asiento_cabecera_reparable_reversion[0]['COD_CATEGORIA_TIPO_ASIENTO'];
+                                    $des_tipo_asiento = $asiento_cabecera_reparable_reversion[0]['TXT_CATEGORIA_TIPO_ASIENTO'];
+                                    $cod_estado_asiento = $asiento_cabecera_reparable_reversion[0]['COD_CATEGORIA_ESTADO_ASIENTO'];
+                                    $des_estado_asiento = $asiento_cabecera_reparable_reversion[0]['TXT_CATEGORIA_ESTADO_ASIENTO'];
 
-                    $codAsientoReversion = $this->ejecutarAsientosIUDConSalida(
-                        'I',
-                        Session::get('empresas')->COD_EMPR,
-                        'CEN0000000000001',
-                        $periodo_asiento,
-                        $cod_tipo_asiento,
-                        $des_tipo_asiento,
-                        '',
-                        $fecha_asiento,
-                        $asiento_cabecera_reparable_reversion[0]['TXT_GLOSA'],
-                        $cod_estado_asiento,
-                        $des_estado_asiento,
-                        $moneda_asiento_aux->COD_CATEGORIA,
-                        $moneda_asiento_aux->NOM_CATEGORIA,
-                        $tipo_cambio_asiento,
-                        0.0000,
-                        0.0000,
-                        '',
-                        '',
-                        0,
-                        $asiento_cabecera_reparable_reversion[0]['COD_ASIENTO_MODELO'],
-                        $asiento_cabecera_reparable_reversion[0]['TXT_TIPO_REFERENCIA'],
-                        $asiento_cabecera_reparable_reversion[0]['TXT_REFERENCIA'],
-                        1,
-                        Session::get('usuario')->id,
-                        '',
-                        '',
-                        $empresa_doc_asiento_aux->COD_EMPR,
-                        $empresa_doc_asiento_aux->NOM_EMPR,
-                        $tipo_doc_asiento_aux->COD_TIPO_DOCUMENTO,
-                        $tipo_doc_asiento_aux->TXT_TIPO_DOCUMENTO,
-                        $serie_asiento,
-                        $numero_asiento,
-                        $fecha_detraccion_asiento,
-                        $const_detraccion_asiento,
-                        $porcentaje_detraccion,
-                        $total_detraccion_asiento,
-                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->COD_TIPO_DOCUMENTO : '',
-                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->TXT_TIPO_DOCUMENTO : '',
-                        $serie_ref_asiento,
-                        $numero_ref_asiento,
-                        $fecha_asiento,
-                        0,
-                        $moneda_asiento_conversion_aux->COD_CATEGORIA,
-                        $moneda_asiento_conversion_aux->NOM_CATEGORIA
-                    );
+                                    $codAsientoReversion = $this->ejecutarAsientosIUDConSalida(
+                                        'I',
+                                        Session::get('empresas')->COD_EMPR,
+                                        'CEN0000000000001',
+                                        $periodo_asiento,
+                                        $cod_tipo_asiento,
+                                        $des_tipo_asiento,
+                                        '',
+                                        $fecha_asiento,
+                                        $asiento_cabecera_reparable_reversion[0]['TXT_GLOSA'],
+                                        $cod_estado_asiento,
+                                        $des_estado_asiento,
+                                        $moneda_asiento_aux->COD_CATEGORIA,
+                                        $moneda_asiento_aux->NOM_CATEGORIA,
+                                        $tipo_cambio_asiento,
+                                        0.0000,
+                                        0.0000,
+                                        '',
+                                        '',
+                                        0,
+                                        $asiento_cabecera_reparable_reversion[0]['COD_ASIENTO_MODELO'],
+                                        $asiento_cabecera_reparable_reversion[0]['TXT_TIPO_REFERENCIA'],
+                                        $asiento_cabecera_reparable_reversion[0]['TXT_REFERENCIA'],
+                                        1,
+                                        Session::get('usuario')->id,
+                                        '',
+                                        '',
+                                        $empresa_doc_asiento_aux->COD_EMPR,
+                                        $empresa_doc_asiento_aux->NOM_EMPR,
+                                        $tipo_doc_asiento_aux->COD_TIPO_DOCUMENTO,
+                                        $tipo_doc_asiento_aux->TXT_TIPO_DOCUMENTO,
+                                        $serie_asiento,
+                                        $numero_asiento,
+                                        $fecha_detraccion_asiento,
+                                        $const_detraccion_asiento,
+                                        $porcentaje_detraccion,
+                                        $total_detraccion_asiento,
+                                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->COD_TIPO_DOCUMENTO : '',
+                                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->TXT_TIPO_DOCUMENTO : '',
+                                        $serie_ref_asiento,
+                                        $numero_ref_asiento,
+                                        $fecha_asiento,
+                                        0,
+                                        $moneda_asiento_conversion_aux->COD_CATEGORIA,
+                                        $moneda_asiento_conversion_aux->NOM_CATEGORIA
+                                    );
 
-                    if (!empty($codAsientoReversion)) {
+                                    if (!empty($codAsientoReversion)) {
 
-                        $contador_reversion = 0;
+                                        $contador_reversion = 0;
 
-                        foreach ($asiento_detalle_reparable_reversion as $asiento_detalle_compra_item) {
-                            if (((int)$asiento_detalle_compra_item['COD_ESTADO']) === 1) {
-                                $contador_reversion++;
+                                        foreach ($asiento_detalle_reparable_reversion as $asiento_detalle_compra_item) {
+                                            if (((int)$asiento_detalle_compra_item['COD_ESTADO']) === 1) {
+                                                $contador_reversion++;
 
-                                $params = array(
-                                    'op' => 'I',
-                                    'empresa' => Session::get('empresas')->COD_EMPR,
-                                    'centro' => 'CEN0000000000001',
-                                    'asiento' => $codAsientoReversion,
-                                    'cuenta' => $asiento_detalle_compra_item['COD_CUENTA_CONTABLE'],
-                                    'txtCuenta' => $asiento_detalle_compra_item['TXT_CUENTA_CONTABLE'],
-                                    'glosa' => $asiento_detalle_compra_item['TXT_GLOSA'],
-                                    'debeMN' => $asiento_detalle_compra_item['CAN_DEBE_MN'],
-                                    'haberMN' => $asiento_detalle_compra_item['CAN_HABER_MN'],
-                                    'debeME' => $asiento_detalle_compra_item['CAN_DEBE_ME'],
-                                    'haberME' => $asiento_detalle_compra_item['CAN_HABER_ME'],
-                                    'linea' => $contador_reversion,
-                                    'codCuo' => '',
-                                    'indExtorno' => 0,
-                                    'txtTipoReferencia' => '',
-                                    'txtReferencia' => '',
-                                    'codEstado' => $asiento_detalle_compra_item['COD_ESTADO'],
-                                    'codUsuario' => Session::get('usuario')->id,
-                                    'codDocCtableRef' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'],
-                                    'codOrdenRef' => $asiento_detalle_compra_item['COD_ORDEN_REF'],
-                                    'indProducto' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'] !== '' ? 1 : 0,
-                                    'codProducto' => $asiento_detalle_compra_item['COD_PRODUCTO'],
-                                    'txtNombreProducto' => $asiento_detalle_compra_item['TXT_NOMBRE_PRODUCTO'],
-                                    'codLote' => $asiento_detalle_compra_item['COD_LOTE'],
-                                    'nroLineaProducto' => $asiento_detalle_compra_item['NRO_LINEA_PRODUCTO'],
-                                );
+                                                $params = array(
+                                                    'op' => 'I',
+                                                    'empresa' => Session::get('empresas')->COD_EMPR,
+                                                    'centro' => 'CEN0000000000001',
+                                                    'asiento' => $codAsientoReversion,
+                                                    'cuenta' => $asiento_detalle_compra_item['COD_CUENTA_CONTABLE'],
+                                                    'txtCuenta' => $asiento_detalle_compra_item['TXT_CUENTA_CONTABLE'],
+                                                    'glosa' => $asiento_detalle_compra_item['TXT_GLOSA'],
+                                                    'debeMN' => $asiento_detalle_compra_item['CAN_DEBE_MN'],
+                                                    'haberMN' => $asiento_detalle_compra_item['CAN_HABER_MN'],
+                                                    'debeME' => $asiento_detalle_compra_item['CAN_DEBE_ME'],
+                                                    'haberME' => $asiento_detalle_compra_item['CAN_HABER_ME'],
+                                                    'linea' => $contador_reversion,
+                                                    'codCuo' => '',
+                                                    'indExtorno' => 0,
+                                                    'txtTipoReferencia' => '',
+                                                    'txtReferencia' => '',
+                                                    'codEstado' => $asiento_detalle_compra_item['COD_ESTADO'],
+                                                    'codUsuario' => Session::get('usuario')->id,
+                                                    'codDocCtableRef' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'],
+                                                    'codOrdenRef' => $asiento_detalle_compra_item['COD_ORDEN_REF'],
+                                                    'indProducto' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'] !== '' ? 1 : 0,
+                                                    'codProducto' => $asiento_detalle_compra_item['COD_PRODUCTO'],
+                                                    'txtNombreProducto' => $asiento_detalle_compra_item['TXT_NOMBRE_PRODUCTO'],
+                                                    'codLote' => $asiento_detalle_compra_item['COD_LOTE'],
+                                                    'nroLineaProducto' => $asiento_detalle_compra_item['NRO_LINEA_PRODUCTO'],
+                                                );
 
-                                $this->ejecutarAsientosMovimientosIUDConSalida($params);
-                            }
-                        }
-                        $this->generar_destinos_compras($anio_asiento, Session::get('empresas')->COD_EMPR, $codAsientoReversion, '', Session::get('usuario')->id);
-                        $this->gn_generar_total_asientos($codAsientoReversion);
-                        $this->calcular_totales_compras($codAsientoReversion);
-                    }
-                }
+                                                $this->ejecutarAsientosMovimientosIUDConSalida($params);
+                                            }
+                                        }
+                                        $this->generar_destinos_compras($anio_asiento, Session::get('empresas')->COD_EMPR, $codAsientoReversion, '', Session::get('usuario')->id);
+                                        $this->gn_generar_total_asientos($codAsientoReversion);
+                                        $this->calcular_totales_compras($codAsientoReversion);
+                                    }
+                                }
 
-                if (count($asiento_cabecera_deduccion) > 0 and count($asiento_detalle_deduccion) > 0) {
+                                if (count($asiento_cabecera_deduccion) > 0 and count($asiento_detalle_deduccion) > 0) {
 
-                    $cod_tipo_asiento = $asiento_cabecera_deduccion[0]['COD_CATEGORIA_TIPO_ASIENTO'];
-                    $des_tipo_asiento = $asiento_cabecera_deduccion[0]['TXT_CATEGORIA_TIPO_ASIENTO'];
-                    $cod_estado_asiento = $asiento_cabecera_deduccion[0]['COD_CATEGORIA_ESTADO_ASIENTO'];
-                    $des_estado_asiento = $asiento_cabecera_deduccion[0]['TXT_CATEGORIA_ESTADO_ASIENTO'];
+                                    $cod_tipo_asiento = $asiento_cabecera_deduccion[0]['COD_CATEGORIA_TIPO_ASIENTO'];
+                                    $des_tipo_asiento = $asiento_cabecera_deduccion[0]['TXT_CATEGORIA_TIPO_ASIENTO'];
+                                    $cod_estado_asiento = $asiento_cabecera_deduccion[0]['COD_CATEGORIA_ESTADO_ASIENTO'];
+                                    $des_estado_asiento = $asiento_cabecera_deduccion[0]['TXT_CATEGORIA_ESTADO_ASIENTO'];
 
-                    $codAsientoDeduccion = $this->ejecutarAsientosIUDConSalida(
-                        'I',
-                        Session::get('empresas')->COD_EMPR,
-                        'CEN0000000000001',
-                        $periodo_asiento,
-                        $cod_tipo_asiento,
-                        $des_tipo_asiento,
-                        '',
-                        $fecha_asiento,
-                        $asiento_cabecera_deduccion[0]['TXT_GLOSA'],
-                        $cod_estado_asiento,
-                        $des_estado_asiento,
-                        $moneda_asiento_aux->COD_CATEGORIA,
-                        $moneda_asiento_aux->NOM_CATEGORIA,
-                        $tipo_cambio_asiento,
-                        0.0000,
-                        0.0000,
-                        '',
-                        '',
-                        0,
-                        $asiento_cabecera_deduccion[0]['COD_ASIENTO_MODELO'],
-                        $asiento_cabecera_deduccion[0]['TXT_TIPO_REFERENCIA'],
-                        $asiento_cabecera_deduccion[0]['TXT_REFERENCIA'],
-                        1,
-                        Session::get('usuario')->id,
-                        '',
-                        '',
-                        $empresa_doc_asiento_aux->COD_EMPR,
-                        $empresa_doc_asiento_aux->NOM_EMPR,
-                        $tipo_doc_asiento_aux->COD_TIPO_DOCUMENTO,
-                        $tipo_doc_asiento_aux->TXT_TIPO_DOCUMENTO,
-                        $serie_asiento,
-                        $numero_asiento,
-                        $fecha_detraccion_asiento,
-                        $const_detraccion_asiento,
-                        $porcentaje_detraccion,
-                        $total_detraccion_asiento,
-                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->COD_TIPO_DOCUMENTO : '',
-                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->TXT_TIPO_DOCUMENTO : '',
-                        $serie_ref_asiento,
-                        $numero_ref_asiento,
-                        $fecha_asiento,
-                        0,
-                        $moneda_asiento_conversion_aux->COD_CATEGORIA,
-                        $moneda_asiento_conversion_aux->NOM_CATEGORIA
-                    );
+                                    $codAsientoDeduccion = $this->ejecutarAsientosIUDConSalida(
+                                        'I',
+                                        Session::get('empresas')->COD_EMPR,
+                                        'CEN0000000000001',
+                                        $periodo_asiento,
+                                        $cod_tipo_asiento,
+                                        $des_tipo_asiento,
+                                        '',
+                                        $fecha_asiento,
+                                        $asiento_cabecera_deduccion[0]['TXT_GLOSA'],
+                                        $cod_estado_asiento,
+                                        $des_estado_asiento,
+                                        $moneda_asiento_aux->COD_CATEGORIA,
+                                        $moneda_asiento_aux->NOM_CATEGORIA,
+                                        $tipo_cambio_asiento,
+                                        0.0000,
+                                        0.0000,
+                                        '',
+                                        '',
+                                        0,
+                                        $asiento_cabecera_deduccion[0]['COD_ASIENTO_MODELO'],
+                                        $asiento_cabecera_deduccion[0]['TXT_TIPO_REFERENCIA'],
+                                        $asiento_cabecera_deduccion[0]['TXT_REFERENCIA'],
+                                        1,
+                                        Session::get('usuario')->id,
+                                        '',
+                                        '',
+                                        $empresa_doc_asiento_aux->COD_EMPR,
+                                        $empresa_doc_asiento_aux->NOM_EMPR,
+                                        $tipo_doc_asiento_aux->COD_TIPO_DOCUMENTO,
+                                        $tipo_doc_asiento_aux->TXT_TIPO_DOCUMENTO,
+                                        $serie_asiento,
+                                        $numero_asiento,
+                                        $fecha_detraccion_asiento,
+                                        $const_detraccion_asiento,
+                                        $porcentaje_detraccion,
+                                        $total_detraccion_asiento,
+                                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->COD_TIPO_DOCUMENTO : '',
+                                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->TXT_TIPO_DOCUMENTO : '',
+                                        $serie_ref_asiento,
+                                        $numero_ref_asiento,
+                                        $fecha_asiento,
+                                        0,
+                                        $moneda_asiento_conversion_aux->COD_CATEGORIA,
+                                        $moneda_asiento_conversion_aux->NOM_CATEGORIA
+                                    );
 
-                    if (!empty($codAsientoDeduccion)) {
+                                    if (!empty($codAsientoDeduccion)) {
 
-                        $contador_deduccion = 0;
+                                        $contador_deduccion = 0;
 
-                        foreach ($asiento_detalle_deduccion as $asiento_detalle_compra_item) {
-                            if (((int)$asiento_detalle_compra_item['COD_ESTADO']) === 1) {
-                                $contador_deduccion++;
+                                        foreach ($asiento_detalle_deduccion as $asiento_detalle_compra_item) {
+                                            if (((int)$asiento_detalle_compra_item['COD_ESTADO']) === 1) {
+                                                $contador_deduccion++;
 
-                                $params = array(
-                                    'op' => 'I',
-                                    'empresa' => Session::get('empresas')->COD_EMPR,
-                                    'centro' => 'CEN0000000000001',
-                                    'asiento' => $codAsientoDeduccion,
-                                    'cuenta' => $asiento_detalle_compra_item['COD_CUENTA_CONTABLE'],
-                                    'txtCuenta' => $asiento_detalle_compra_item['TXT_CUENTA_CONTABLE'],
-                                    'glosa' => $asiento_detalle_compra_item['TXT_GLOSA'],
-                                    'debeMN' => $asiento_detalle_compra_item['CAN_DEBE_MN'],
-                                    'haberMN' => $asiento_detalle_compra_item['CAN_HABER_MN'],
-                                    'debeME' => $asiento_detalle_compra_item['CAN_DEBE_ME'],
-                                    'haberME' => $asiento_detalle_compra_item['CAN_HABER_ME'],
-                                    'linea' => $contador_deduccion,
-                                    'codCuo' => '',
-                                    'indExtorno' => 0,
-                                    'txtTipoReferencia' => '',
-                                    'txtReferencia' => '',
-                                    'codEstado' => $asiento_detalle_compra_item['COD_ESTADO'],
-                                    'codUsuario' => Session::get('usuario')->id,
-                                    'codDocCtableRef' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'],
-                                    'codOrdenRef' => $asiento_detalle_compra_item['COD_ORDEN_REF'],
-                                    'indProducto' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'] !== '' ? 1 : 0,
-                                    'codProducto' => $asiento_detalle_compra_item['COD_PRODUCTO'],
-                                    'txtNombreProducto' => $asiento_detalle_compra_item['TXT_NOMBRE_PRODUCTO'],
-                                    'codLote' => $asiento_detalle_compra_item['COD_LOTE'],
-                                    'nroLineaProducto' => $asiento_detalle_compra_item['NRO_LINEA_PRODUCTO'],
-                                );
+                                                $params = array(
+                                                    'op' => 'I',
+                                                    'empresa' => Session::get('empresas')->COD_EMPR,
+                                                    'centro' => 'CEN0000000000001',
+                                                    'asiento' => $codAsientoDeduccion,
+                                                    'cuenta' => $asiento_detalle_compra_item['COD_CUENTA_CONTABLE'],
+                                                    'txtCuenta' => $asiento_detalle_compra_item['TXT_CUENTA_CONTABLE'],
+                                                    'glosa' => $asiento_detalle_compra_item['TXT_GLOSA'],
+                                                    'debeMN' => $asiento_detalle_compra_item['CAN_DEBE_MN'],
+                                                    'haberMN' => $asiento_detalle_compra_item['CAN_HABER_MN'],
+                                                    'debeME' => $asiento_detalle_compra_item['CAN_DEBE_ME'],
+                                                    'haberME' => $asiento_detalle_compra_item['CAN_HABER_ME'],
+                                                    'linea' => $contador_deduccion,
+                                                    'codCuo' => '',
+                                                    'indExtorno' => 0,
+                                                    'txtTipoReferencia' => '',
+                                                    'txtReferencia' => '',
+                                                    'codEstado' => $asiento_detalle_compra_item['COD_ESTADO'],
+                                                    'codUsuario' => Session::get('usuario')->id,
+                                                    'codDocCtableRef' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'],
+                                                    'codOrdenRef' => $asiento_detalle_compra_item['COD_ORDEN_REF'],
+                                                    'indProducto' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'] !== '' ? 1 : 0,
+                                                    'codProducto' => $asiento_detalle_compra_item['COD_PRODUCTO'],
+                                                    'txtNombreProducto' => $asiento_detalle_compra_item['TXT_NOMBRE_PRODUCTO'],
+                                                    'codLote' => $asiento_detalle_compra_item['COD_LOTE'],
+                                                    'nroLineaProducto' => $asiento_detalle_compra_item['NRO_LINEA_PRODUCTO'],
+                                                );
 
-                                $this->ejecutarAsientosMovimientosIUDConSalida($params);
-                            }
-                        }
-                        $this->generar_destinos_compras($anio_asiento, Session::get('empresas')->COD_EMPR, $codAsientoDeduccion, '', Session::get('usuario')->id);
-                        $this->gn_generar_total_asientos($codAsientoDeduccion);
-                        $this->calcular_totales_compras($codAsientoDeduccion);
-                    }
-                }
+                                                $this->ejecutarAsientosMovimientosIUDConSalida($params);
+                                            }
+                                        }
+                                        $this->generar_destinos_compras($anio_asiento, Session::get('empresas')->COD_EMPR, $codAsientoDeduccion, '', Session::get('usuario')->id);
+                                        $this->gn_generar_total_asientos($codAsientoDeduccion);
+                                        $this->calcular_totales_compras($codAsientoDeduccion);
+                                    }
+                                }
 
-                if (count($asiento_cabecera_percepcion) > 0 and count($asiento_detalle_percepcion) > 0) {
+                                if (count($asiento_cabecera_percepcion) > 0 and count($asiento_detalle_percepcion) > 0) {
 
-                    $cod_tipo_asiento = $asiento_cabecera_percepcion[0]['COD_CATEGORIA_TIPO_ASIENTO'];
-                    $des_tipo_asiento = $asiento_cabecera_percepcion[0]['TXT_CATEGORIA_TIPO_ASIENTO'];
-                    $cod_estado_asiento = $asiento_cabecera_percepcion[0]['COD_CATEGORIA_ESTADO_ASIENTO'];
-                    $des_estado_asiento = $asiento_cabecera_percepcion[0]['TXT_CATEGORIA_ESTADO_ASIENTO'];
+                                    $cod_tipo_asiento = $asiento_cabecera_percepcion[0]['COD_CATEGORIA_TIPO_ASIENTO'];
+                                    $des_tipo_asiento = $asiento_cabecera_percepcion[0]['TXT_CATEGORIA_TIPO_ASIENTO'];
+                                    $cod_estado_asiento = $asiento_cabecera_percepcion[0]['COD_CATEGORIA_ESTADO_ASIENTO'];
+                                    $des_estado_asiento = $asiento_cabecera_percepcion[0]['TXT_CATEGORIA_ESTADO_ASIENTO'];
 
-                    $codAsientoPercepcion = $this->ejecutarAsientosIUDConSalida(
-                        'I',
-                        Session::get('empresas')->COD_EMPR,
-                        'CEN0000000000001',
-                        $periodo_asiento,
-                        $cod_tipo_asiento,
-                        $des_tipo_asiento,
-                        '',
-                        $fecha_asiento,
-                        $asiento_cabecera_percepcion[0]['TXT_GLOSA'],
-                        $cod_estado_asiento,
-                        $des_estado_asiento,
-                        $moneda_asiento_aux->COD_CATEGORIA,
-                        $moneda_asiento_aux->NOM_CATEGORIA,
-                        $tipo_cambio_asiento,
-                        0.0000,
-                        0.0000,
-                        '',
-                        '',
-                        0,
-                        $asiento_cabecera_percepcion[0]['COD_ASIENTO_MODELO'],
-                        $asiento_cabecera_percepcion[0]['TXT_TIPO_REFERENCIA'],
-                        $asiento_cabecera_percepcion[0]['TXT_REFERENCIA'],
-                        1,
-                        Session::get('usuario')->id,
-                        '',
-                        '',
-                        $empresa_doc_asiento_aux->COD_EMPR,
-                        $empresa_doc_asiento_aux->NOM_EMPR,
-                        $tipo_doc_asiento_aux->COD_TIPO_DOCUMENTO,
-                        $tipo_doc_asiento_aux->TXT_TIPO_DOCUMENTO,
-                        $serie_asiento,
-                        $numero_asiento,
-                        $fecha_detraccion_asiento,
-                        $const_detraccion_asiento,
-                        $porcentaje_detraccion,
-                        $total_detraccion_asiento,
-                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->COD_TIPO_DOCUMENTO : '',
-                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->TXT_TIPO_DOCUMENTO : '',
-                        $serie_ref_asiento,
-                        $numero_ref_asiento,
-                        $fecha_asiento,
-                        0,
-                        $moneda_asiento_conversion_aux->COD_CATEGORIA,
-                        $moneda_asiento_conversion_aux->NOM_CATEGORIA
-                    );
+                                    $codAsientoPercepcion = $this->ejecutarAsientosIUDConSalida(
+                                        'I',
+                                        Session::get('empresas')->COD_EMPR,
+                                        'CEN0000000000001',
+                                        $periodo_asiento,
+                                        $cod_tipo_asiento,
+                                        $des_tipo_asiento,
+                                        '',
+                                        $fecha_asiento,
+                                        $asiento_cabecera_percepcion[0]['TXT_GLOSA'],
+                                        $cod_estado_asiento,
+                                        $des_estado_asiento,
+                                        $moneda_asiento_aux->COD_CATEGORIA,
+                                        $moneda_asiento_aux->NOM_CATEGORIA,
+                                        $tipo_cambio_asiento,
+                                        0.0000,
+                                        0.0000,
+                                        '',
+                                        '',
+                                        0,
+                                        $asiento_cabecera_percepcion[0]['COD_ASIENTO_MODELO'],
+                                        $asiento_cabecera_percepcion[0]['TXT_TIPO_REFERENCIA'],
+                                        $asiento_cabecera_percepcion[0]['TXT_REFERENCIA'],
+                                        1,
+                                        Session::get('usuario')->id,
+                                        '',
+                                        '',
+                                        $empresa_doc_asiento_aux->COD_EMPR,
+                                        $empresa_doc_asiento_aux->NOM_EMPR,
+                                        $tipo_doc_asiento_aux->COD_TIPO_DOCUMENTO,
+                                        $tipo_doc_asiento_aux->TXT_TIPO_DOCUMENTO,
+                                        $serie_asiento,
+                                        $numero_asiento,
+                                        $fecha_detraccion_asiento,
+                                        $const_detraccion_asiento,
+                                        $porcentaje_detraccion,
+                                        $total_detraccion_asiento,
+                                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->COD_TIPO_DOCUMENTO : '',
+                                        isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->TXT_TIPO_DOCUMENTO : '',
+                                        $serie_ref_asiento,
+                                        $numero_ref_asiento,
+                                        $fecha_asiento,
+                                        0,
+                                        $moneda_asiento_conversion_aux->COD_CATEGORIA,
+                                        $moneda_asiento_conversion_aux->NOM_CATEGORIA
+                                    );
 
-                    if (!empty($codAsientoPercepcion)) {
+                                    if (!empty($codAsientoPercepcion)) {
 
-                        $contador_percepcion = 0;
+                                        $contador_percepcion = 0;
 
-                        foreach ($asiento_detalle_percepcion as $asiento_detalle_compra_item) {
-                            if (((int)$asiento_detalle_compra_item['COD_ESTADO']) === 1) {
-                                $contador_percepcion++;
+                                        foreach ($asiento_detalle_percepcion as $asiento_detalle_compra_item) {
+                                            if (((int)$asiento_detalle_compra_item['COD_ESTADO']) === 1) {
+                                                $contador_percepcion++;
 
-                                $params = array(
-                                    'op' => 'I',
-                                    'empresa' => Session::get('empresas')->COD_EMPR,
-                                    'centro' => 'CEN0000000000001',
-                                    'asiento' => $codAsientoPercepcion,
-                                    'cuenta' => $asiento_detalle_compra_item['COD_CUENTA_CONTABLE'],
-                                    'txtCuenta' => $asiento_detalle_compra_item['TXT_CUENTA_CONTABLE'],
-                                    'glosa' => $asiento_detalle_compra_item['TXT_GLOSA'],
-                                    'debeMN' => $asiento_detalle_compra_item['CAN_DEBE_MN'],
-                                    'haberMN' => $asiento_detalle_compra_item['CAN_HABER_MN'],
-                                    'debeME' => $asiento_detalle_compra_item['CAN_DEBE_ME'],
-                                    'haberME' => $asiento_detalle_compra_item['CAN_HABER_ME'],
-                                    'linea' => $contador_percepcion,
-                                    'codCuo' => '',
-                                    'indExtorno' => 0,
-                                    'txtTipoReferencia' => '',
-                                    'txtReferencia' => '',
-                                    'codEstado' => $asiento_detalle_compra_item['COD_ESTADO'],
-                                    'codUsuario' => Session::get('usuario')->id,
-                                    'codDocCtableRef' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'],
-                                    'codOrdenRef' => $asiento_detalle_compra_item['COD_ORDEN_REF'],
-                                    'indProducto' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'] !== '' ? 1 : 0,
-                                    'codProducto' => $asiento_detalle_compra_item['COD_PRODUCTO'],
-                                    'txtNombreProducto' => $asiento_detalle_compra_item['TXT_NOMBRE_PRODUCTO'],
-                                    'codLote' => $asiento_detalle_compra_item['COD_LOTE'],
-                                    'nroLineaProducto' => $asiento_detalle_compra_item['NRO_LINEA_PRODUCTO'],
-                                );
+                                                $params = array(
+                                                    'op' => 'I',
+                                                    'empresa' => Session::get('empresas')->COD_EMPR,
+                                                    'centro' => 'CEN0000000000001',
+                                                    'asiento' => $codAsientoPercepcion,
+                                                    'cuenta' => $asiento_detalle_compra_item['COD_CUENTA_CONTABLE'],
+                                                    'txtCuenta' => $asiento_detalle_compra_item['TXT_CUENTA_CONTABLE'],
+                                                    'glosa' => $asiento_detalle_compra_item['TXT_GLOSA'],
+                                                    'debeMN' => $asiento_detalle_compra_item['CAN_DEBE_MN'],
+                                                    'haberMN' => $asiento_detalle_compra_item['CAN_HABER_MN'],
+                                                    'debeME' => $asiento_detalle_compra_item['CAN_DEBE_ME'],
+                                                    'haberME' => $asiento_detalle_compra_item['CAN_HABER_ME'],
+                                                    'linea' => $contador_percepcion,
+                                                    'codCuo' => '',
+                                                    'indExtorno' => 0,
+                                                    'txtTipoReferencia' => '',
+                                                    'txtReferencia' => '',
+                                                    'codEstado' => $asiento_detalle_compra_item['COD_ESTADO'],
+                                                    'codUsuario' => Session::get('usuario')->id,
+                                                    'codDocCtableRef' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'],
+                                                    'codOrdenRef' => $asiento_detalle_compra_item['COD_ORDEN_REF'],
+                                                    'indProducto' => $asiento_detalle_compra_item['COD_DOC_CTBLE_REF'] !== '' ? 1 : 0,
+                                                    'codProducto' => $asiento_detalle_compra_item['COD_PRODUCTO'],
+                                                    'txtNombreProducto' => $asiento_detalle_compra_item['TXT_NOMBRE_PRODUCTO'],
+                                                    'codLote' => $asiento_detalle_compra_item['COD_LOTE'],
+                                                    'nroLineaProducto' => $asiento_detalle_compra_item['NRO_LINEA_PRODUCTO'],
+                                                );
 
-                                $this->ejecutarAsientosMovimientosIUDConSalida($params);
-                            }
-                        }
-                        $this->generar_destinos_compras($anio_asiento, Session::get('empresas')->COD_EMPR, $codAsientoPercepcion, '', Session::get('usuario')->id);
-                        $this->gn_generar_total_asientos($codAsientoPercepcion);
-                        $this->calcular_totales_compras($codAsientoPercepcion);
-                    }
-                }
-*/
+                                                $this->ejecutarAsientosMovimientosIUDConSalida($params);
+                                            }
+                                        }
+                                        $this->generar_destinos_compras($anio_asiento, Session::get('empresas')->COD_EMPR, $codAsientoPercepcion, '', Session::get('usuario')->id);
+                                        $this->gn_generar_total_asientos($codAsientoPercepcion);
+                                        $this->calcular_totales_compras($codAsientoPercepcion);
+                                    }
+                                }
+                */
                 DB::commit();
                 Session::flash('operacion_id', 'CONTRATO');
                 return Redirect::to('/gestion-de-contabilidad-aprobar/' . $idopcion)->with('bienhecho', 'Comprobante : ' . $ordencompra->COD_DOCUMENTO_CTBLE . ' APROBADO CON EXITO');
@@ -3870,9 +3927,14 @@ class GestionOCContabilidadController extends Controller
                 $ind_reversion = 'R';
 
                 $asiento_existe_reparable = WEBAsiento::where('COD_ESTADO', '=', 1)
-                    ->where('TXT_REFERENCIA', '=', $cod_contable)->where('TXT_GLOSA', 'like', "COMPRAS REPARABLE:%")->first();
+                    ->where('TXT_REFERENCIA', '=', $cod_contable)
+                    ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', 'TAS0000000000007')
+                    ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
+                    ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
+                    ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', "%NAVASOFT%")
+                    ->first();
 
-                if (!empty($asiento_existe_reparable)) {
+                if ($asiento_existe_reparable) {
                     $asiento_reparable_reversion = $this->ejecutarSP(
                         "EXEC [WEB].[GENERAR_ASIENTO_REPARABLE_FE_DOCUMENTO]
                 @anio = :anio,
@@ -3893,7 +3955,7 @@ class GestionOCContabilidadController extends Controller
                         ]
                     );
                 } else {
-                    $asiento_reparable_reversion = array(0 => [], 1 => [], 2 => []);
+                    $asiento_reparable_reversion = [[], [], []];
                 }
 
                 if ($fedocumento->MONTO_ANTICIPO_DESC > 0.0000) {
@@ -3921,7 +3983,7 @@ class GestionOCContabilidadController extends Controller
                         ]
                     );
                 } else {
-                    $asiento_deduccion = array(0 => [], 1 => [], 2 => []);
+                    $asiento_deduccion = [[], [], []];
                 }
 
                 if ($fedocumento->PERCEPCION > 0.0000) {
@@ -3943,7 +4005,7 @@ class GestionOCContabilidadController extends Controller
                         ]
                     );
                 } else {
-                    $asiento_percepcion = array(0 => [], 1 => [], 2 => []);
+                    $asiento_percepcion = [[], [], []];
                 }
             }
 
@@ -4040,6 +4102,668 @@ class GestionOCContabilidadController extends Controller
                     'idopcion' => $idopcion,
                     'idoc' => $idoc,
                 ]);
+
+
+        }
+    }
+
+    public function actionAprobarContabilidadNotaCredito($idopcion, $linea, $prefijo, $idordencompra,Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo($idordencompra,$prefijo);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_nota_credito_idoc_actual($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_producto_comprobante_idoc($idoc);
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
+        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+        View::share('titulo','Aprobar Comprobante');
+
+        if($_POST)
+        {
+
+
+            try{    
+                
+                DB::beginTransaction();
+
+
+                $pedido_id          =   $idoc;
+                $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
+
+                if($fedocumento->ind_observacion==1){
+                    return Redirect::back()->with('errorurl', 'El documento esta observado no se puede aprobar');
+                }
+
+                $descripcion        =   $request['descripcion'];
+                if(rtrim(ltrim($descripcion)) != ''){
+                    //HISTORIAL DE DOCUMENTO APROBADO
+                    $documento                              =   new FeDocumentoHistorial;
+                    $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                    $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                    $documento->FECHA                       =   $this->fechaactual;
+                    $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                    $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                    $documento->TIPO                        =   'RECOMENDACION POR CONTABILIDAD';
+                    $documento->MENSAJE                     =   $descripcion;
+                    $documento->save();
+                    //LE LLEGA AL USUARIO DE CONTACTO
+                    $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+                    $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                    $mensaje            =   'COMPROBANTE: '.$fedocumento->ID_DOCUMENTO
+                                            .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                                            .'PROVEEDOR : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'
+                                            .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
+                                            .'RECOMENDACION : '.$descripcion.'%0D%0A';
+                    // //dd($trabajador);                        
+                    // if(1==0){
+                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                    // }else{
+                    //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
+                    // }  
+                }
+
+
+
+                $filespdf          =   $request['otros'];
+                if(!is_null($filespdf)){
+                    //PDF
+                    foreach($filespdf as $file){
+
+                            //
+                            $contadorArchivos = Archivo::count();
+
+                        $nombre          =      $ordencompra->COD_DOCUMENTO_CTBLE.'-'.$file->getClientOriginalName();
+                        /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
+                        $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
+                        $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
+                        //$nombrefilepdf   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
+                        $nombrefilepdf   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                        $valor           =      $this->versicarpetanoexiste($rutafile);
+                        $rutacompleta    =      $rutafile.'\\'.$nombrefilepdf;
+                        copy($file->getRealPath(),$rutacompleta);
+                        $path            =      $rutacompleta;
+
+                        $nombreoriginal             =   $file->getClientOriginalName();
+                        $info                       =   new SplFileInfo($nombreoriginal);
+                        $extension                  =   $info->getExtension();
+
+                        $dcontrol                   =   new Archivo;
+                        $dcontrol->ID_DOCUMENTO     =   $ordencompra->COD_DOCUMENTO_CTBLE;
+                        $dcontrol->DOCUMENTO_ITEM   =   $fedocumento->DOCUMENTO_ITEM;
+                        $dcontrol->TIPO_ARCHIVO     =   'OTROS_UC';
+                        $dcontrol->NOMBRE_ARCHIVO   =   $nombrefilepdf;
+                        $dcontrol->DESCRIPCION_ARCHIVO  =   'OTROS CONTABILIDAD';
+                        $dcontrol->URL_ARCHIVO      =   $path;
+                        $dcontrol->SIZE             =   filesize($file);
+                        $dcontrol->EXTENSION        =   $extension;
+                        $dcontrol->ACTIVO           =   1;
+                        $dcontrol->FECHA_CREA       =   $this->fechaactual;
+                        $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
+                        $dcontrol->save();
+                        //dd($nombre);
+                    }
+                }
+
+
+                $nro_cuenta_contable=   $request['nro_cuenta_contable'];
+
+
+                FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
+                            ->update(
+                                [
+                                    'COD_ESTADO'=>'ETM0000000000004',
+                                    'TXT_ESTADO'=>'POR APROBAR ADMINISTRACION',
+                                    'NRO_CUENTA'=>$nro_cuenta_contable,
+                                    
+                                    'ind_email_adm'=>0,
+                                    'fecha_pr'=>$this->fechaactual,
+                                    'usuario_pr'=>Session::get('usuario')->id
+                                ]
+                            );
+
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento                              =   new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA                       =   $this->fechaactual;
+                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                $documento->TIPO                        =   'APROBADO POR CONTABILIDAD';
+                $documento->MENSAJE                     =   '';
+                $documento->save();
+
+                //whatsaap para administracion
+                $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
+                $ordencompra        =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$pedido_id)->first();
+
+                //$ordencompra        =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();
+
+                $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO
+                                        .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                                        .'PROVEEDOR : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'
+                                        .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
+
+                // if(1==0){
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                // }else{
+
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                //     //CONTABILIDAD
+                //     $this->insertar_whatsaap('51971575452','GISELA',$mensaje,'');
+                //     $this->insertar_whatsaap('51920721827','JESSICA DEL PILAR',$mensaje,'');
+                //     //$this->insertar_whatsaap('51948634244','ELSA ANA BELEN',$mensaje,'');
+
+                // }   
+
+                DB::commit();
+                Session::flash('operacion_id', 'NOTA_CREDITO');
+
+                return Redirect::to('/gestion-de-contabilidad-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_DOCUMENTO_CTBLE.' APROBADO CON EXITO');
+            }catch(\Exception $ex){
+                DB::rollback(); 
+
+                Session::flash('operacion_id', 'NOTA_CREDITO');
+
+                return Redirect::to('gestion-de-contabilidad-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+
+        
+        }
+        else{
+
+            //lectura del cdr
+            $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);
+            $lecturacdr             =   $this->lectura_cdr_archivo($idoc,$this->pathFiles,$prefijocarperta,$ordencompra->NRO_DOCUMENTO_CLIENTE);
+
+            if($fedocumento->nestadoCp === null){
+
+                $fechaemision           =      date_format(date_create($fedocumento->FEC_VENTA), 'd/m/Y');
+                $token = '';
+                if($prefijocarperta =='II'){
+                    $token           =      $this->generartoken_ii();
+                }else{
+                    $token           =      $this->generartoken_is();
+                }
+                $rvalidar = $this->validar_xml( $token,
+                                                $fedocumento->ID_CLIENTE,
+                                                $fedocumento->RUC_PROVEEDOR,
+                                                $fedocumento->ID_TIPO_DOC,
+                                                $fedocumento->SERIE,
+                                                $fedocumento->NUMERO,
+                                                $fechaemision,
+                                                $fedocumento->TOTAL_VENTA_ORIG);
+                $arvalidar = json_decode($rvalidar, true);
+                if(isset($arvalidar['success'])){
+
+                    if($arvalidar['success']){
+
+
+
+                        $datares              = $arvalidar['data'];
+
+                        if (!isset($datares['estadoCp'])){
+                            return Redirect::back()->with('errorurl', 'Hay fallas en sunat para consultar el XML');
+                        }
+
+                        $estadoCp             = $datares['estadoCp'];
+                        $tablaestacp          = Estado::where('tipo','=','estadoCp')->where('codigo','=',$estadoCp)->first();
+
+                        $estadoRuc            = '';
+                        $txtestadoRuc         = '';
+                        $estadoDomiRuc        = '';
+                        $txtestadoDomiRuc     = '';
+
+                        if(isset($datares['estadoRuc'])){
+                            $tablaestaruc          = Estado::where('tipo','=','estadoRuc')->where('codigo','=',$datares['estadoRuc'])->first();
+                            $estadoRuc             = $tablaestaruc->codigo;
+                            $txtestadoRuc          = $tablaestaruc->nombre;
+                        }
+                        if(isset($datares['condDomiRuc'])){
+                            $tablaestaDomiRuc       = Estado::where('tipo','=','condDomiRuc')->where('codigo','=',$datares['condDomiRuc'])->first();
+                            $estadoDomiRuc          = $tablaestaDomiRuc->codigo;
+                            $txtestadoDomiRuc       = $tablaestaDomiRuc->nombre;
+                        }
+
+                        FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)
+                                    ->update(
+                                            [
+                                                'success'=>$arvalidar['success'],
+                                                'message'=>$arvalidar['message'],
+                                                'estadoCp'=>$tablaestacp->codigo,
+                                                'nestadoCp'=>$tablaestacp->nombre,
+                                                'estadoRuc'=>$estadoRuc,
+                                                'nestadoRuc'=>$txtestadoRuc,
+                                                'condDomiRuc'=>$estadoDomiRuc,
+                                                'ncondDomiRuc'=>$txtestadoDomiRuc,
+                                            ]);
+                    }else{
+                        FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)
+                                    ->update(
+                                            [
+                                                'success'=>$arvalidar['success'],
+                                                'message'=>$arvalidar['message']
+                                            ]);
+                    }
+                }
+
+            }
+
+
+
+
+            $detalleordencompra     =   $this->con_lista_detalle_producto_comprobante_idoc($idoc);
+            $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+
+            $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
+            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)                                        
+                                        ->get();
+
+            $documentohistorial     =   FeDocumentoHistorial::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                        ->orderBy('FECHA','DESC')
+                                        ->get();
+
+
+            $archivos               =   $this->lista_archivos_total($idoc,$fedocumento->DOCUMENTO_ITEM);
+            $archivospdf            =   $this->lista_archivos_total_pdf($idoc,$fedocumento->DOCUMENTO_ITEM);
+
+
+            $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+
+
+
+
+            $trabajador             =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+            $codigo_sunat           =   'N';
+
+            $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                        ->where('COD_ESTADO','=',1)
+                                        ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->whereNotIn('COD_CATEGORIA',['DCC0000000000003','DCC0000000000004'])
+                                        ->get();
+
+            $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
+                                        ->pluck('COD_CATEGORIA_DOCUMENTO')
+                                        ->toArray();
+
+            $archivosselect         =   Archivo::Join('CMP.CATEGORIA','TIPO_ARCHIVO','=','COD_CATEGORIA')
+                                        ->where('ID_DOCUMENTO','=',$idoc)
+                                        ->pluck('COD_CATEGORIA')
+                                        ->toArray();
+
+            $documentoscomprarepable=   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                        ->where('COD_ESTADO','=',1)
+                                        ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->whereNotIn('COD_CATEGORIA',['DCC0000000000003','DCC0000000000004'])
+                                        //->whereNotIn('COD_CATEGORIA',$archivosselect)
+                                        ->get();
+
+            $comboreparable         =   array('ARCHIVO_VIRTUAL' => 'ARCHIVO_VIRTUAL','ARCHIVO_FISICO' => 'ARCHIVO_FISICO');
+
+            $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
+
+            return View::make('comprobante/aprobarconnotacredito', 
+                            [
+                                'fedocumento'           =>  $fedocumento,
+                                'ordencompra'           =>  $ordencompra,
+                                'linea'                 =>  $linea,
+
+                                'detalleordencompra'    =>  $detalleordencompra,
+                                'archivospdf'           =>  $archivospdf,
+
+                                'trabajador'            =>  $trabajador,
+                                'documentoscompra'      =>  $documentoscompra,
+                                'totalarchivos'         =>  $totalarchivos,
+
+                                'documentoscomprarepable'   =>  $documentoscomprarepable,
+                                'comboreparable'            =>  $comboreparable,
+
+
+
+                                'documentohistorial'    =>  $documentohistorial,
+                                'archivos'              =>  $archivos,
+                                'archivosanulados'      =>  $archivosanulados,
+                                'detallefedocumento'    =>  $detallefedocumento,
+                                'tarchivos'             =>  $tarchivos,
+                                'tp'                    =>  $tp,
+                                'idopcion'              =>  $idopcion,
+                                'idoc'                  =>  $idoc,
+                            ]);
+
+
+        }
+    }
+
+    public function actionAprobarContabilidadNotaDebito($idopcion, $linea, $prefijo, $idordencompra,Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo($idordencompra,$prefijo);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_nota_debito_idoc_actual($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_producto_comprobante_idoc($idoc);
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
+        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+        View::share('titulo','Aprobar Comprobante');
+
+        if($_POST)
+        {
+
+
+            try{    
+                
+                DB::beginTransaction();
+
+
+                $pedido_id          =   $idoc;
+                $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
+
+                if($fedocumento->ind_observacion==1){
+                    return Redirect::back()->with('errorurl', 'El documento esta observado no se puede aprobar');
+                }
+
+                $descripcion        =   $request['descripcion'];
+                if(rtrim(ltrim($descripcion)) != ''){
+                    //HISTORIAL DE DOCUMENTO APROBADO
+                    $documento                              =   new FeDocumentoHistorial;
+                    $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                    $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                    $documento->FECHA                       =   $this->fechaactual;
+                    $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                    $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                    $documento->TIPO                        =   'RECOMENDACION POR CONTABILIDAD';
+                    $documento->MENSAJE                     =   $descripcion;
+                    $documento->save();
+                    //LE LLEGA AL USUARIO DE CONTACTO
+                    $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+                    $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                    $mensaje            =   'COMPROBANTE: '.$fedocumento->ID_DOCUMENTO
+                                            .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                                            .'PROVEEDOR : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'
+                                            .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
+                                            .'RECOMENDACION : '.$descripcion.'%0D%0A';
+                    // //dd($trabajador);                        
+                    // if(1==0){
+                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                    // }else{
+                    //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
+                    // }  
+                }
+
+
+
+                $filespdf          =   $request['otros'];
+                if(!is_null($filespdf)){
+                    //PDF
+                    foreach($filespdf as $file){
+
+                            //
+                            $contadorArchivos = Archivo::count();
+
+                        $nombre          =      $ordencompra->COD_DOCUMENTO_CTBLE.'-'.$file->getClientOriginalName();
+                        /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
+                        $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
+                        $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
+                        //$nombrefilepdf   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
+                        $nombrefilepdf   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                        $valor           =      $this->versicarpetanoexiste($rutafile);
+                        $rutacompleta    =      $rutafile.'\\'.$nombrefilepdf;
+                        copy($file->getRealPath(),$rutacompleta);
+                        $path            =      $rutacompleta;
+
+                        $nombreoriginal             =   $file->getClientOriginalName();
+                        $info                       =   new SplFileInfo($nombreoriginal);
+                        $extension                  =   $info->getExtension();
+
+                        $dcontrol                   =   new Archivo;
+                        $dcontrol->ID_DOCUMENTO     =   $ordencompra->COD_DOCUMENTO_CTBLE;
+                        $dcontrol->DOCUMENTO_ITEM   =   $fedocumento->DOCUMENTO_ITEM;
+                        $dcontrol->TIPO_ARCHIVO     =   'OTROS_UC';
+                        $dcontrol->NOMBRE_ARCHIVO   =   $nombrefilepdf;
+                        $dcontrol->DESCRIPCION_ARCHIVO  =   'OTROS CONTABILIDAD';
+                        $dcontrol->URL_ARCHIVO      =   $path;
+                        $dcontrol->SIZE             =   filesize($file);
+                        $dcontrol->EXTENSION        =   $extension;
+                        $dcontrol->ACTIVO           =   1;
+                        $dcontrol->FECHA_CREA       =   $this->fechaactual;
+                        $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
+                        $dcontrol->save();
+                        //dd($nombre);
+                    }
+                }
+
+
+                $nro_cuenta_contable=   $request['nro_cuenta_contable'];
+
+
+                FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
+                            ->update(
+                                [
+                                    'COD_ESTADO'=>'ETM0000000000004',
+                                    'TXT_ESTADO'=>'POR APROBAR ADMINISTRACION',
+                                    'NRO_CUENTA'=>$nro_cuenta_contable,
+                                    
+                                    'ind_email_adm'=>0,
+                                    'fecha_pr'=>$this->fechaactual,
+                                    'usuario_pr'=>Session::get('usuario')->id
+                                ]
+                            );
+
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento                              =   new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA                       =   $this->fechaactual;
+                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                $documento->TIPO                        =   'APROBADO POR CONTABILIDAD';
+                $documento->MENSAJE                     =   '';
+                $documento->save();
+
+                //whatsaap para administracion
+                $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
+                $ordencompra        =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$pedido_id)->first();
+
+                //$ordencompra        =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();
+
+                $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO
+                                        .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                                        .'PROVEEDOR : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'
+                                        .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
+
+                // if(1==0){
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                // }else{
+
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                //     //CONTABILIDAD
+                //     $this->insertar_whatsaap('51971575452','GISELA',$mensaje,'');
+                //     $this->insertar_whatsaap('51920721827','JESSICA DEL PILAR',$mensaje,'');
+                //     //$this->insertar_whatsaap('51948634244','ELSA ANA BELEN',$mensaje,'');
+
+                // }   
+
+                DB::commit();
+                Session::flash('operacion_id', 'NOTA_DEBITO');
+
+                return Redirect::to('/gestion-de-contabilidad-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_DOCUMENTO_CTBLE.' APROBADO CON EXITO');
+            }catch(\Exception $ex){
+                DB::rollback(); 
+
+                Session::flash('operacion_id', 'NOTA_DEBITO');
+
+                return Redirect::to('gestion-de-contabilidad-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+
+        
+        }
+        else{
+
+            //lectura del cdr
+            $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);
+            $lecturacdr             =   $this->lectura_cdr_archivo($idoc,$this->pathFiles,$prefijocarperta,$ordencompra->NRO_DOCUMENTO_CLIENTE);
+
+            if($fedocumento->nestadoCp === null){
+
+                $fechaemision           =      date_format(date_create($fedocumento->FEC_VENTA), 'd/m/Y');
+                $token = '';
+                if($prefijocarperta =='II'){
+                    $token           =      $this->generartoken_ii();
+                }else{
+                    $token           =      $this->generartoken_is();
+                }
+                $rvalidar = $this->validar_xml( $token,
+                                                $fedocumento->ID_CLIENTE,
+                                                $fedocumento->RUC_PROVEEDOR,
+                                                $fedocumento->ID_TIPO_DOC,
+                                                $fedocumento->SERIE,
+                                                $fedocumento->NUMERO,
+                                                $fechaemision,
+                                                $fedocumento->TOTAL_VENTA_ORIG);
+                $arvalidar = json_decode($rvalidar, true);
+                if(isset($arvalidar['success'])){
+
+                    if($arvalidar['success']){
+
+
+
+                        $datares              = $arvalidar['data'];
+
+                        if (!isset($datares['estadoCp'])){
+                            return Redirect::back()->with('errorurl', 'Hay fallas en sunat para consultar el XML');
+                        }
+
+                        $estadoCp             = $datares['estadoCp'];
+                        $tablaestacp          = Estado::where('tipo','=','estadoCp')->where('codigo','=',$estadoCp)->first();
+
+                        $estadoRuc            = '';
+                        $txtestadoRuc         = '';
+                        $estadoDomiRuc        = '';
+                        $txtestadoDomiRuc     = '';
+
+                        if(isset($datares['estadoRuc'])){
+                            $tablaestaruc          = Estado::where('tipo','=','estadoRuc')->where('codigo','=',$datares['estadoRuc'])->first();
+                            $estadoRuc             = $tablaestaruc->codigo;
+                            $txtestadoRuc          = $tablaestaruc->nombre;
+                        }
+                        if(isset($datares['condDomiRuc'])){
+                            $tablaestaDomiRuc       = Estado::where('tipo','=','condDomiRuc')->where('codigo','=',$datares['condDomiRuc'])->first();
+                            $estadoDomiRuc          = $tablaestaDomiRuc->codigo;
+                            $txtestadoDomiRuc       = $tablaestaDomiRuc->nombre;
+                        }
+
+                        FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)
+                                    ->update(
+                                            [
+                                                'success'=>$arvalidar['success'],
+                                                'message'=>$arvalidar['message'],
+                                                'estadoCp'=>$tablaestacp->codigo,
+                                                'nestadoCp'=>$tablaestacp->nombre,
+                                                'estadoRuc'=>$estadoRuc,
+                                                'nestadoRuc'=>$txtestadoRuc,
+                                                'condDomiRuc'=>$estadoDomiRuc,
+                                                'ncondDomiRuc'=>$txtestadoDomiRuc,
+                                            ]);
+                    }else{
+                        FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)
+                                    ->update(
+                                            [
+                                                'success'=>$arvalidar['success'],
+                                                'message'=>$arvalidar['message']
+                                            ]);
+                    }
+                }
+
+            }
+
+
+
+
+            $detalleordencompra     =   $this->con_lista_detalle_producto_comprobante_idoc($idoc);
+            $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+
+            $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
+            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)                                        
+                                        ->get();
+
+            $documentohistorial     =   FeDocumentoHistorial::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                        ->orderBy('FECHA','DESC')
+                                        ->get();
+
+
+            $archivos               =   $this->lista_archivos_total($idoc,$fedocumento->DOCUMENTO_ITEM);
+            $archivospdf            =   $this->lista_archivos_total_pdf($idoc,$fedocumento->DOCUMENTO_ITEM);
+
+
+            $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+
+
+
+
+            $trabajador             =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+            $codigo_sunat           =   'N';
+
+            $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                        ->where('COD_ESTADO','=',1)
+                                        ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->whereNotIn('COD_CATEGORIA',['DCC0000000000003','DCC0000000000004'])
+                                        ->get();
+
+            $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
+                                        ->pluck('COD_CATEGORIA_DOCUMENTO')
+                                        ->toArray();
+
+            $archivosselect         =   Archivo::Join('CMP.CATEGORIA','TIPO_ARCHIVO','=','COD_CATEGORIA')
+                                        ->where('ID_DOCUMENTO','=',$idoc)
+                                        ->pluck('COD_CATEGORIA')
+                                        ->toArray();
+
+            $documentoscomprarepable=   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                        ->where('COD_ESTADO','=',1)
+                                        ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->whereNotIn('COD_CATEGORIA',['DCC0000000000003','DCC0000000000004'])
+                                        //->whereNotIn('COD_CATEGORIA',$archivosselect)
+                                        ->get();
+
+            $comboreparable         =   array('ARCHIVO_VIRTUAL' => 'ARCHIVO_VIRTUAL','ARCHIVO_FISICO' => 'ARCHIVO_FISICO');
+
+            $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
+
+            return View::make('comprobante/aprobarconnotadebito', 
+                            [
+                                'fedocumento'           =>  $fedocumento,
+                                'ordencompra'           =>  $ordencompra,
+                                'linea'                 =>  $linea,
+
+                                'detalleordencompra'    =>  $detalleordencompra,
+                                'archivospdf'           =>  $archivospdf,
+
+                                'trabajador'            =>  $trabajador,
+                                'documentoscompra'      =>  $documentoscompra,
+                                'totalarchivos'         =>  $totalarchivos,
+
+                                'documentoscomprarepable'   =>  $documentoscomprarepable,
+                                'comboreparable'            =>  $comboreparable,
+
+
+
+                                'documentohistorial'    =>  $documentohistorial,
+                                'archivos'              =>  $archivos,
+                                'archivosanulados'      =>  $archivosanulados,
+                                'detallefedocumento'    =>  $detallefedocumento,
+                                'tarchivos'             =>  $tarchivos,
+                                'tp'                    =>  $tp,
+                                'idopcion'              =>  $idopcion,
+                                'idoc'                  =>  $idoc,
+                            ]);
 
 
         }
@@ -4500,6 +5224,218 @@ class GestionOCContabilidadController extends Controller
         }
     }
 
+    public function actionAgregarExtornoNotaCreditoContabilidad($idopcion, $linea, $prefijo, $idordencompra, Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion, 'Modificar');
+        if ($validarurl <> 'true') {
+            return $validarurl;
+        }
+        /******************************************************/
+        $idoc = $this->funciones->decodificarmaestraprefijo($idordencompra, $prefijo);
+        $ordencompra = $this->con_lista_cabecera_comprobante_nota_credito_idoc_actual($idoc);
+        $detalleordencompra = $this->con_lista_detalle_producto_comprobante_idoc($idoc);
+        $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)->first();
+        $detallefedocumento = FeDetalleDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)->get();
+        View::share('titulo', 'Extorno Comprobante');
+
+        if ($_POST) {
+
+            try {
+
+                DB::beginTransaction();
+                $pedido_id = $idoc;
+                $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $pedido_id)->where('DOCUMENTO_ITEM', '=', $linea)->first();
+                $descripcion = $request['descripcionextorno'];
+
+                //GUARDAR LA REFENCIA ORIGINAL DEL EXTORNO
+                FeDocumento::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
+                    ->update(
+                        [
+                            'TXT_REFERENCIA' => $idoc
+                        ]
+                    );
+                //GUARDAR EN EL HISTORIAL QUE SE EXTORNO UN VEZ
+                $documento = new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO = $fedocumento->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM = $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA = $this->fechaactual;
+                $documento->USUARIO_ID = Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+                $documento->TIPO = 'DOCUMENTO EXTORNADO';
+                $documento->MENSAJE = $descripcion;
+                $documento->save();
+
+                //ANULAR TODA LA OPERACION
+                FeDocumento::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
+                    ->update(
+                        [
+                            'ID_DOCUMENTO' => $idoc . 'X',
+                            'COD_ESTADO' => 'ETM0000000000006',
+                            'TXT_ESTADO' => 'RECHAZADO',
+                            'ind_observacion' => 0
+                        ]
+                    );
+                FeDetalleDocumento::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
+                    ->update(
+                        [
+                            'ID_DOCUMENTO' => $idoc . 'X'
+                        ]
+                    );
+
+                FeDocumentoHistorial::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
+                    ->update(
+                        [
+                            'ID_DOCUMENTO' => $idoc . 'X'
+                        ]
+                    );
+                FeFormaPago::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
+                    ->update(
+                        [
+                            'ID_DOCUMENTO' => $idoc . 'X'
+                        ]
+                    );
+                Archivo::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
+                    ->update(
+                        [
+                            'ID_DOCUMENTO' => $idoc . 'X'
+                        ]
+                    );
+                //LE LLEGA AL USUARIO DE CONTACTO
+                // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+                // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                // $mensaje            =   'COMPROBANTE REPARABLE: '.$fedocumento->ID_DOCUMENTO
+                //                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                //                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
+                //                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
+                //                         .'MENSAJE : '.$descripcion.'%0D%0A';
+                // //dd($trabajador);
+                // if(1==0){
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                // }else{
+                //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                // }
+
+                DB::commit();
+                Session::flash('operacion_id', 'NOTA_CREDITO');
+                return Redirect::to('/gestion-de-contabilidad-aprobar/' . $idopcion)->with('bienhecho', 'Comprobante : ' . $ordencompra->COD_DOCUMENTO_CTBLE . ' EXTORNADO CON EXITO');
+            } catch (\Exception $ex) {
+                DB::rollback();
+                Session::flash('operacion_id', 'NOTA_CREDITO');
+
+                return Redirect::to('gestion-de-contabilidad-aprobar/' . $idopcion)->with('errorbd', $ex . ' Ocurrio un error inesperado');
+            }
+        }
+    }
+
+    public function actionAgregarExtornoNotaDebitoContabilidad($idopcion, $linea, $prefijo, $idordencompra, Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion, 'Modificar');
+        if ($validarurl <> 'true') {
+            return $validarurl;
+        }
+        /******************************************************/
+        $idoc = $this->funciones->decodificarmaestraprefijo($idordencompra, $prefijo);
+        $ordencompra = $this->con_lista_cabecera_comprobante_nota_debito_idoc_actual($idoc);
+        $detalleordencompra = $this->con_lista_detalle_producto_comprobante_idoc($idoc);
+        $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)->first();
+        $detallefedocumento = FeDetalleDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)->get();
+        View::share('titulo', 'Extorno Comprobante');
+
+        if ($_POST) {
+
+            try {
+
+                DB::beginTransaction();
+                $pedido_id = $idoc;
+                $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $pedido_id)->where('DOCUMENTO_ITEM', '=', $linea)->first();
+                $descripcion = $request['descripcionextorno'];
+
+                //GUARDAR LA REFENCIA ORIGINAL DEL EXTORNO
+                FeDocumento::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
+                    ->update(
+                        [
+                            'TXT_REFERENCIA' => $idoc
+                        ]
+                    );
+                //GUARDAR EN EL HISTORIAL QUE SE EXTORNO UN VEZ
+                $documento = new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO = $fedocumento->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM = $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA = $this->fechaactual;
+                $documento->USUARIO_ID = Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+                $documento->TIPO = 'DOCUMENTO EXTORNADO';
+                $documento->MENSAJE = $descripcion;
+                $documento->save();
+
+                //ANULAR TODA LA OPERACION
+                FeDocumento::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
+                    ->update(
+                        [
+                            'ID_DOCUMENTO' => $idoc . 'X',
+                            'COD_ESTADO' => 'ETM0000000000006',
+                            'TXT_ESTADO' => 'RECHAZADO',
+                            'ind_observacion' => 0
+                        ]
+                    );
+                FeDetalleDocumento::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
+                    ->update(
+                        [
+                            'ID_DOCUMENTO' => $idoc . 'X'
+                        ]
+                    );
+
+                FeDocumentoHistorial::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
+                    ->update(
+                        [
+                            'ID_DOCUMENTO' => $idoc . 'X'
+                        ]
+                    );
+                FeFormaPago::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
+                    ->update(
+                        [
+                            'ID_DOCUMENTO' => $idoc . 'X'
+                        ]
+                    );
+                Archivo::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
+                    ->update(
+                        [
+                            'ID_DOCUMENTO' => $idoc . 'X'
+                        ]
+                    );
+                //LE LLEGA AL USUARIO DE CONTACTO
+                // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+                // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                // $mensaje            =   'COMPROBANTE REPARABLE: '.$fedocumento->ID_DOCUMENTO
+                //                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                //                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
+                //                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
+                //                         .'MENSAJE : '.$descripcion.'%0D%0A';
+                // //dd($trabajador);
+                // if(1==0){
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                // }else{
+                //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                // }
+
+                DB::commit();
+                Session::flash('operacion_id', 'NOTA_DEBITO');
+                return Redirect::to('/gestion-de-contabilidad-aprobar/' . $idopcion)->with('bienhecho', 'Comprobante : ' . $ordencompra->COD_DOCUMENTO_CTBLE . ' EXTORNADO CON EXITO');
+            } catch (\Exception $ex) {
+                DB::rollback();
+                Session::flash('operacion_id', 'NOTA_DEBITO');
+
+                return Redirect::to('gestion-de-contabilidad-aprobar/' . $idopcion)->with('errorbd', $ex . ' Ocurrio un error inesperado');
+            }
+        }
+    }
+
     public function actionAgregarExtornoEstibaContabilidad($idopcion, $lote, Request $request)
     {
 
@@ -4716,6 +5652,19 @@ class GestionOCContabilidadController extends Controller
                         ]
                     );
 
+
+                $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC WEB.LISTAR_FORMATO_ASIENTOS_VENTAS
+                                                            @FECHA_INICIO = ?,
+                                                            @FECHA_FIN = ?,
+                                                            @COD_EMPRESA = ?,
+                                                            @EMITIDA = ?');
+
+                $stmt->bindParam(1, $fecha_inicio, PDO::PARAM_STR);
+                $stmt->bindParam(2, $fecha_fin, PDO::PARAM_STR);
+                $stmt->bindParam(3, $cod_empresa, PDO::PARAM_STR);
+                $stmt->bindParam(4, $emitido, PDO::PARAM_STR);
+                $stmt->execute();
+
                 //LE LLEGA AL USUARIO DE CONTACTO
                 // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
                 // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
@@ -4799,6 +5748,8 @@ class GestionOCContabilidadController extends Controller
                 $descripcion = $request['descripcion'];
                 $archivore = $request['archivore'];
                 $reparable = $request['reparable'];
+                $archivofi = $request['archivofi'];
+
 
 
                 if ($fedocumento->IND_REPARABLE == 1) {
@@ -4812,9 +5763,22 @@ class GestionOCContabilidadController extends Controller
                     return Redirect::to('aprobar-comprobante-contabilidad/' . $idopcion . '/' . $linea . '/' . $prefijo . '/' . $idordencompra)->with('errorbd', 'Tiene que seleccionar almenos un item');
                 }
 
+                $modohibrido = '';
                 foreach ($archivore as $index => $item) {
-                    //dd($item);
+
                     $categoria = CMPCategoria::where('COD_CATEGORIA', '=', $item)->first();
+
+                    //dd($item);
+                    $tipo_doc = $categoria->CODIGO_SUNAT;
+
+                    if(count($archivofi)>0){
+                        if (in_array($item, $archivofi, true)) {
+                            $tipo_doc = 'F';
+                            $modohibrido = 'ARCHIVO_FISICO';
+                        }                       
+                    }
+
+
                     $docasociar = new CMPDocAsociarCompra;
                     $docasociar->COD_ORDEN = $idoc;
                     $docasociar->COD_CATEGORIA_DOCUMENTO = $categoria->COD_CATEGORIA;
@@ -4825,9 +5789,13 @@ class GestionOCContabilidadController extends Controller
                     $docasociar->COD_USUARIO_CREA_AUD = Session::get('usuario')->id;
                     $docasociar->FEC_USUARIO_CREA_AUD = $this->fechaactual;
                     $docasociar->COD_ESTADO = 1;
-                    $docasociar->TIP_DOC = $categoria->CODIGO_SUNAT;
+                    $docasociar->TIP_DOC = $tipo_doc;
                     $docasociar->save();
                 }
+
+
+
+
 
 
                 //HISTORIAL DE DOCUMENTO APROBADO
@@ -4851,7 +5819,8 @@ class GestionOCContabilidadController extends Controller
                         [
                             'IND_REPARABLE' => 1,
                             'MODO_REPARABLE' => $reparable,
-                            'TXT_REPARABLE' => 'REPARABLE'
+                            'TXT_REPARABLE' => 'REPARABLE',
+                            'MODO_REPARABLE_HIBRIDO' => $modohibrido
                         ]
                     );
 
@@ -5227,6 +6196,388 @@ class GestionOCContabilidadController extends Controller
         }
     }
 
+    public function actionAgregarObservacionContabilidadNotaCredito($idopcion, $linea, $prefijo, $idordencompra, Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion, 'Modificar');
+        if ($validarurl <> 'true') {
+            return $validarurl;
+        }
+        /******************************************************/
+        $idoc = $this->funciones->decodificarmaestraprefijo($idordencompra, $prefijo);
+        $ordencompra = $this->con_lista_cabecera_comprobante_nota_credito_idoc_actual($idoc);
+        $detalleordencompra = $this->con_lista_detalle_producto_comprobante_idoc($idoc);
+        $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)->first();
+        $detallefedocumento = FeDetalleDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)->get();
+        View::share('titulo', 'Observar Comprobante');
+
+        if ($_POST) {
+
+            try {
+
+                DB::beginTransaction();
+                $pedido_id = $idoc;
+                $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $pedido_id)->where('DOCUMENTO_ITEM', '=', $linea)->first();
+                $descripcion = $request['descripcion'];
+                $archivoob = $request['archivoob'];
+
+
+                if ($fedocumento->ind_observacion == 1) {
+                    DB::rollback();
+                    return Redirect::back()->with('errorurl', 'El documento esta observado no se puede observar');
+                }
+
+
+                if (count($archivoob) <= 0) {
+                    DB::rollback();
+                    return Redirect::to('agregar-observacion-contabilidad-contrato/' . $idopcion . '/' . $linea . '/' . $prefijo . '/' . $idordencompra)->with('errorbd', 'Tiene que seleccionar almenos un item');
+                }
+
+
+                foreach ($archivoob as $index => $item) {
+
+                    $docu_asoci = CMPDocAsociarCompra::where('COD_ORDEN', '=', $idoc)->where('COD_ESTADO', '=', 1)
+                        ->where('COD_CATEGORIA_DOCUMENTO', '=', $item)->first();
+                    if (count($docu_asoci) > 0) {
+
+                        Archivo::where('ID_DOCUMENTO', '=', $idoc)
+                            ->where('ACTIVO', '=', '1')
+                            ->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)
+                            ->where('TIPO_ARCHIVO', '=', $item)
+                            ->update(
+                                [
+                                    'ACTIVO' => 0,
+                                    'FECHA_MOD' => $this->fechaactual,
+                                    'USUARIO_MOD' => Session::get('usuario')->id
+                                ]
+                            );
+
+                    } else {
+
+                        $categoria = CMPCategoria::where('COD_CATEGORIA', '=', $item)->first();
+                        $docasociar = new CMPDocAsociarCompra;
+                        $docasociar->COD_ORDEN = $idoc;
+                        $docasociar->COD_CATEGORIA_DOCUMENTO = $categoria->COD_CATEGORIA;
+                        $docasociar->NOM_CATEGORIA_DOCUMENTO = $categoria->NOM_CATEGORIA;
+                        $docasociar->IND_OBLIGATORIO = 0;
+                        $docasociar->TXT_FORMATO = $categoria->COD_CTBLE;
+                        $docasociar->TXT_ASIGNADO = $categoria->TXT_ABREVIATURA;
+                        $docasociar->COD_USUARIO_CREA_AUD = Session::get('usuario')->id;
+                        $docasociar->FEC_USUARIO_CREA_AUD = $this->fechaactual;
+                        $docasociar->COD_ESTADO = 1;
+                        $docasociar->TIP_DOC = $categoria->CODIGO_SUNAT;
+                        $docasociar->save();
+
+                    }
+
+
+                }
+
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento = new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO = $fedocumento->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM = $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA = $this->fechaactual;
+                $documento->USUARIO_ID = Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+                $documento->TIPO = 'OBSERVADO POR CONTABILIDAD';
+                $documento->MENSAJE = $descripcion;
+                $documento->save();
+
+                FeDocumento::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
+                    ->update(
+                        [
+                            'ind_observacion' => 1,
+                            'TXT_OBSERVADO' => 'OBSERVADO',
+                            'area_observacion' => 'CONT'
+                        ]
+                    );
+
+                //LE LLEGA AL USUARIO DE CONTACTO
+                // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+                // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                // $mensaje            =   'COMPROBANTE OBSERVADO: '.$fedocumento->ID_DOCUMENTO
+                //                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                //                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'
+                //                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
+                //                         .'MENSAJE : '.$descripcion.'%0D%0A';
+
+                // //dd($trabajador);
+                // if(1==0){
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                // }else{
+                //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                // }
+
+                DB::commit();
+                Session::flash('operacion_id', 'NOTA_CREDITO');
+
+                return Redirect::to('/gestion-de-contabilidad-aprobar/' . $idopcion)->with('bienhecho', 'Comprobante : ' . $ordencompra->COD_DOCUMENTO_CTBLE . ' OBSERVADO CON EXITO');
+            } catch (\Exception $ex) {
+                DB::rollback();
+                Session::flash('operacion_id', 'NOTA_CREDITO');
+
+                return Redirect::to('gestion-de-contabilidad-aprobar/' . $idopcion)->with('errorbd', $ex . ' Ocurrio un error inesperado');
+            }
+
+
+        } else {
+
+            $detalleordencompra = $this->con_lista_detalle_producto_comprobante_idoc($idoc);
+            $detallefedocumento = FeDetalleDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)->get();
+            $tp = CMPCategoria::where('COD_CATEGORIA', '=', $ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
+
+            if ($fedocumento->ind_observacion == 1) {
+                return Redirect::to('gestion-de-contabilidad-aprobar/' . $idopcion)->with('errorbd', 'Existen Observaciones pendientes por atender');
+            }
+
+            $trabajador = STDTrabajador::where('NRO_DOCUMENTO', '=', $fedocumento->dni_usuariocontacto)->first();
+
+            $tarchivos = CMPDocAsociarCompra::where('COD_ORDEN', '=', $ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO', '=', 1)
+                //->where('IND_OBLIGATORIO','=',1)                
+                ->get();
+
+
+            $documentohistorial = FeDocumentoHistorial::where('ID_DOCUMENTO', '=', $ordencompra->COD_DOCUMENTO_CTBLE)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)
+                ->orderBy('FECHA', 'DESC')
+                ->get();
+
+
+            $archivos = Archivo::where('ID_DOCUMENTO', '=', $idoc)
+                ->where('ACTIVO', '=', '1')
+                ->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)->get();
+
+            $codigo_sunat = 'N';
+
+            $documentoscompra = CMPCategoria::where('TXT_GRUPO', '=', 'DOCUMENTOS_COMPRA')
+                ->where('COD_ESTADO', '=', 1)
+                ->where('CODIGO_SUNAT', '=', $codigo_sunat)
+                ->whereNotIn('COD_CATEGORIA', ['DCC0000000000003', 'DCC0000000000004'])
+                ->get();
+
+            $totalarchivos = CMPDocAsociarCompra::where('COD_ORDEN', '=', $ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO', '=', 1)
+                ->pluck('COD_CATEGORIA_DOCUMENTO')
+                ->toArray();
+
+            //dd($totalarchivos);
+            //dd($documentoscompra);
+
+            return View::make('comprobante/observarcontabilidadcontrato',
+                [
+                    'fedocumento' => $fedocumento,
+                    'ordencompra' => $ordencompra,
+                    'linea' => $linea,
+                    'documentoscompra' => $documentoscompra,
+                    'detalleordencompra' => $detalleordencompra,
+                    'documentohistorial' => $documentohistorial,
+                    'archivos' => $archivos,
+                    'detallefedocumento' => $detallefedocumento,
+                    'tarchivos' => $tarchivos,
+                    'totalarchivos' => $totalarchivos,
+                    'trabajador' => $trabajador,
+
+                    'tp' => $tp,
+                    'idopcion' => $idopcion,
+                    'idoc' => $idoc,
+                ]);
+
+
+        }
+    }
+
+    public function actionAgregarObservacionContabilidadNotaDebito($idopcion, $linea, $prefijo, $idordencompra, Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion, 'Modificar');
+        if ($validarurl <> 'true') {
+            return $validarurl;
+        }
+        /******************************************************/
+        $idoc = $this->funciones->decodificarmaestraprefijo($idordencompra, $prefijo);
+        $ordencompra = $this->con_lista_cabecera_comprobante_nota_debito_idoc_actual($idoc);
+        $detalleordencompra = $this->con_lista_detalle_producto_comprobante_idoc($idoc);
+        $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)->first();
+        $detallefedocumento = FeDetalleDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)->get();
+        View::share('titulo', 'Observar Comprobante');
+
+        if ($_POST) {
+
+            try {
+
+                DB::beginTransaction();
+                $pedido_id = $idoc;
+                $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $pedido_id)->where('DOCUMENTO_ITEM', '=', $linea)->first();
+                $descripcion = $request['descripcion'];
+                $archivoob = $request['archivoob'];
+
+
+                if ($fedocumento->ind_observacion == 1) {
+                    DB::rollback();
+                    return Redirect::back()->with('errorurl', 'El documento esta observado no se puede observar');
+                }
+
+
+                if (count($archivoob) <= 0) {
+                    DB::rollback();
+                    return Redirect::to('agregar-observacion-contabilidad-contrato/' . $idopcion . '/' . $linea . '/' . $prefijo . '/' . $idordencompra)->with('errorbd', 'Tiene que seleccionar almenos un item');
+                }
+
+
+                foreach ($archivoob as $index => $item) {
+
+                    $docu_asoci = CMPDocAsociarCompra::where('COD_ORDEN', '=', $idoc)->where('COD_ESTADO', '=', 1)
+                        ->where('COD_CATEGORIA_DOCUMENTO', '=', $item)->first();
+                    if (count($docu_asoci) > 0) {
+
+                        Archivo::where('ID_DOCUMENTO', '=', $idoc)
+                            ->where('ACTIVO', '=', '1')
+                            ->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)
+                            ->where('TIPO_ARCHIVO', '=', $item)
+                            ->update(
+                                [
+                                    'ACTIVO' => 0,
+                                    'FECHA_MOD' => $this->fechaactual,
+                                    'USUARIO_MOD' => Session::get('usuario')->id
+                                ]
+                            );
+
+                    } else {
+
+                        $categoria = CMPCategoria::where('COD_CATEGORIA', '=', $item)->first();
+                        $docasociar = new CMPDocAsociarCompra;
+                        $docasociar->COD_ORDEN = $idoc;
+                        $docasociar->COD_CATEGORIA_DOCUMENTO = $categoria->COD_CATEGORIA;
+                        $docasociar->NOM_CATEGORIA_DOCUMENTO = $categoria->NOM_CATEGORIA;
+                        $docasociar->IND_OBLIGATORIO = 0;
+                        $docasociar->TXT_FORMATO = $categoria->COD_CTBLE;
+                        $docasociar->TXT_ASIGNADO = $categoria->TXT_ABREVIATURA;
+                        $docasociar->COD_USUARIO_CREA_AUD = Session::get('usuario')->id;
+                        $docasociar->FEC_USUARIO_CREA_AUD = $this->fechaactual;
+                        $docasociar->COD_ESTADO = 1;
+                        $docasociar->TIP_DOC = $categoria->CODIGO_SUNAT;
+                        $docasociar->save();
+
+                    }
+
+
+                }
+
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento = new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO = $fedocumento->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM = $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA = $this->fechaactual;
+                $documento->USUARIO_ID = Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+                $documento->TIPO = 'OBSERVADO POR CONTABILIDAD';
+                $documento->MENSAJE = $descripcion;
+                $documento->save();
+
+                FeDocumento::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
+                    ->update(
+                        [
+                            'ind_observacion' => 1,
+                            'TXT_OBSERVADO' => 'OBSERVADO',
+                            'area_observacion' => 'CONT'
+                        ]
+                    );
+
+                //LE LLEGA AL USUARIO DE CONTACTO
+                // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+                // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
+                // $mensaje            =   'COMPROBANTE OBSERVADO: '.$fedocumento->ID_DOCUMENTO
+                //                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
+                //                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'
+                //                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
+                //                         .'MENSAJE : '.$descripcion.'%0D%0A';
+
+                // //dd($trabajador);
+                // if(1==0){
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                // }else{
+                //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                // }
+
+                DB::commit();
+                Session::flash('operacion_id', 'NOTA_DEBITO');
+
+                return Redirect::to('/gestion-de-contabilidad-aprobar/' . $idopcion)->with('bienhecho', 'Comprobante : ' . $ordencompra->COD_DOCUMENTO_CTBLE . ' OBSERVADO CON EXITO');
+            } catch (\Exception $ex) {
+                DB::rollback();
+                Session::flash('operacion_id', 'NOTA_DEBITO');
+
+                return Redirect::to('gestion-de-contabilidad-aprobar/' . $idopcion)->with('errorbd', $ex . ' Ocurrio un error inesperado');
+            }
+
+
+        } else {
+
+            $detalleordencompra = $this->con_lista_detalle_producto_comprobante_idoc($idoc);
+            $detallefedocumento = FeDetalleDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)->get();
+            $tp = CMPCategoria::where('COD_CATEGORIA', '=', $ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
+
+            if ($fedocumento->ind_observacion == 1) {
+                return Redirect::to('gestion-de-contabilidad-aprobar/' . $idopcion)->with('errorbd', 'Existen Observaciones pendientes por atender');
+            }
+
+            $trabajador = STDTrabajador::where('NRO_DOCUMENTO', '=', $fedocumento->dni_usuariocontacto)->first();
+
+            $tarchivos = CMPDocAsociarCompra::where('COD_ORDEN', '=', $ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO', '=', 1)
+                //->where('IND_OBLIGATORIO','=',1)                
+                ->get();
+
+
+            $documentohistorial = FeDocumentoHistorial::where('ID_DOCUMENTO', '=', $ordencompra->COD_DOCUMENTO_CTBLE)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)
+                ->orderBy('FECHA', 'DESC')
+                ->get();
+
+
+            $archivos = Archivo::where('ID_DOCUMENTO', '=', $idoc)
+                ->where('ACTIVO', '=', '1')
+                ->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)->get();
+
+            $codigo_sunat = 'N';
+
+            $documentoscompra = CMPCategoria::where('TXT_GRUPO', '=', 'DOCUMENTOS_COMPRA')
+                ->where('COD_ESTADO', '=', 1)
+                ->where('CODIGO_SUNAT', '=', $codigo_sunat)
+                ->whereNotIn('COD_CATEGORIA', ['DCC0000000000003', 'DCC0000000000004'])
+                ->get();
+
+            $totalarchivos = CMPDocAsociarCompra::where('COD_ORDEN', '=', $ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO', '=', 1)
+                ->pluck('COD_CATEGORIA_DOCUMENTO')
+                ->toArray();
+
+            //dd($totalarchivos);
+            //dd($documentoscompra);
+
+            return View::make('comprobante/observarcontabilidadcontrato',
+                [
+                    'fedocumento' => $fedocumento,
+                    'ordencompra' => $ordencompra,
+                    'linea' => $linea,
+                    'documentoscompra' => $documentoscompra,
+                    'detalleordencompra' => $detalleordencompra,
+                    'documentohistorial' => $documentohistorial,
+                    'archivos' => $archivos,
+                    'detallefedocumento' => $detallefedocumento,
+                    'tarchivos' => $tarchivos,
+                    'totalarchivos' => $totalarchivos,
+                    'trabajador' => $trabajador,
+
+                    'tp' => $tp,
+                    'idopcion' => $idopcion,
+                    'idoc' => $idoc,
+                ]);
+
+
+        }
+    }
+
     public function actionAgregarObservacionContabilidadEstiba($idopcion, $lote, Request $request)
     {
 
@@ -5470,6 +6821,13 @@ class GestionOCContabilidadController extends Controller
                 $archivoob = $request['archivore'];
                 $reparable = $request['reparable'];
 
+                $archivofi = $request['archivofi'];
+
+                $modohibrido = '';
+
+
+
+
                 if ($fedocumento->IND_REPARABLE == 1) {
                     DB::rollback();
                     return Redirect::back()->with('errorurl', 'El documento ya esta reparado no se puede reparar');
@@ -5484,6 +6842,17 @@ class GestionOCContabilidadController extends Controller
                 foreach ($archivoob as $index => $item) {
                     //dd($item);
                     $categoria = CMPCategoria::where('COD_CATEGORIA', '=', $item)->first();
+
+                    //dd($item);
+                    $tipo_doc = $categoria->CODIGO_SUNAT;
+                    if(count($archivofi)>0){
+                        if (in_array($item, $archivofi, true)) {
+                            $tipo_doc = 'F';
+                            $modohibrido = 'ARCHIVO_FISICO';
+                        }                       
+                    }
+
+
                     $docasociar = new CMPDocAsociarCompra;
                     $docasociar->COD_ORDEN = $idoc;
                     $docasociar->COD_CATEGORIA_DOCUMENTO = $categoria->COD_CATEGORIA;
@@ -5494,7 +6863,7 @@ class GestionOCContabilidadController extends Controller
                     $docasociar->COD_USUARIO_CREA_AUD = Session::get('usuario')->id;
                     $docasociar->FEC_USUARIO_CREA_AUD = $this->fechaactual;
                     $docasociar->COD_ESTADO = 1;
-                    $docasociar->TIP_DOC = $categoria->CODIGO_SUNAT;
+                    $docasociar->TIP_DOC = $tipo_doc;
                     $docasociar->save();
                 }
                 //HISTORIAL DE DOCUMENTO APROBADO
@@ -5519,7 +6888,8 @@ class GestionOCContabilidadController extends Controller
                         [
                             'IND_REPARABLE' => 1,
                             'MODO_REPARABLE' => $reparable,
-                            'TXT_REPARABLE' => 'REPARABLE'
+                            'TXT_REPARABLE' => 'REPARABLE',
+                            'MODO_REPARABLE_HIBRIDO' => $modohibrido
                         ]
                     );
                 //LE LLEGA AL USUARIO DE CONTACTO
@@ -5771,6 +7141,11 @@ class GestionOCContabilidadController extends Controller
                 $descripcion = $request['descripcion'];
                 $archivoob = $request['archivore'];
                 $reparable = $request['reparable'];
+                $archivofi = $request['archivofi'];
+
+                $modohibrido = '';
+
+
 
                 if ($fedocumento->IND_REPARABLE == 1) {
                     DB::rollback();
@@ -5786,6 +7161,16 @@ class GestionOCContabilidadController extends Controller
                 foreach ($archivoob as $index => $item) {
                     //dd($item);
                     $categoria = CMPCategoria::where('COD_CATEGORIA', '=', $item)->first();
+                    //dd($item);
+                    $tipo_doc = $categoria->CODIGO_SUNAT;
+                    if(count($archivofi)>0){
+                        if (in_array($item, $archivofi, true)) {
+                            $tipo_doc = 'F';
+                            $modohibrido = 'ARCHIVO_FISICO';
+                        }                       
+                    }
+
+
                     $docasociar = new CMPDocAsociarCompra;
                     $docasociar->COD_ORDEN = $idoc;
                     $docasociar->COD_CATEGORIA_DOCUMENTO = $categoria->COD_CATEGORIA;
@@ -5796,7 +7181,7 @@ class GestionOCContabilidadController extends Controller
                     $docasociar->COD_USUARIO_CREA_AUD = Session::get('usuario')->id;
                     $docasociar->FEC_USUARIO_CREA_AUD = $this->fechaactual;
                     $docasociar->COD_ESTADO = 1;
-                    $docasociar->TIP_DOC = $categoria->CODIGO_SUNAT;
+                    $docasociar->TIP_DOC = $tipo_doc;
                     $docasociar->save();
                 }
                 //HISTORIAL DE DOCUMENTO APROBADO
@@ -5820,7 +7205,8 @@ class GestionOCContabilidadController extends Controller
                         [
                             'IND_REPARABLE' => 1,
                             'MODO_REPARABLE' => $reparable,
-                            'TXT_REPARABLE' => 'REPARABLE'
+                            'TXT_REPARABLE' => 'REPARABLE',
+                            'MODO_REPARABLE_HIBRIDO' => $modohibrido
                         ]
                     );
                 //LE LLEGA AL USUARIO DE CONTACTO
@@ -6264,63 +7650,61 @@ class GestionOCContabilidadController extends Controller
     }
 
 
-    public function actionRegistrarActivoFijoCategoria($idoc, $COD_PRODUCTO,Request $request)
+    public function actionRegistrarActivoFijoCategoria($idoc, $COD_PRODUCTO, Request $request)
     {
-        $COD_CAT_ACTFIJO        =   $request['COD_CATEGORIA_AF'];
-        $COD_PRODUCTO           =   $request['COD_PRODUCTO'];
-        $COD_TABLA              =   $request['COD_TABLA'];
-        $NRO_LINEA              =   $request['NRO_LINEA'];
-        $COD_LOTE               =   $request['COD_LOTE'];
-        $CAN_PRODUCTO           =   $request['CAN_PRODUCTO'];
-        $TXT_DETALLE_PRODUCTO   =   $request['TXT_DETALLE_PRODUCTO'];
-        $TXT_NOMBRE_PRODUCTO    =   $request['TXT_NOMBRE_PRODUCTO'];
-        $idcheckbox             =   $request['idcheckbox'];
-        $error                  =   false;
-        $mensaje                =   'REGISTRO CATEGORIA EXITOSO';
+        $COD_CAT_ACTFIJO = $request['COD_CATEGORIA_AF'];
+        $COD_PRODUCTO = $request['COD_PRODUCTO'];
+        $COD_TABLA = $request['COD_TABLA'];
+        $NRO_LINEA = $request['NRO_LINEA'];
+        $COD_LOTE = $request['COD_LOTE'];
+        $CAN_PRODUCTO = $request['CAN_PRODUCTO'];
+        $TXT_DETALLE_PRODUCTO = $request['TXT_DETALLE_PRODUCTO'];
+        $TXT_NOMBRE_PRODUCTO = $request['TXT_NOMBRE_PRODUCTO'];
+        $idcheckbox = $request['idcheckbox'];
+        $error = false;
+        $mensaje = 'REGISTRO CATEGORIA EXITOSO';
 
         try {
 
-            $oeExiste           =   CMPDetalleProductoAF::where('COD_TABLA',$COD_TABLA)->where('COD_PRODUCTO',$COD_PRODUCTO)->where('NRO_LINEA',$NRO_LINEA)->first();
-            if($oeExiste){
+            $oeExiste = CMPDetalleProductoAF::where('COD_TABLA', $COD_TABLA)->where('COD_PRODUCTO', $COD_PRODUCTO)->where('NRO_LINEA', $NRO_LINEA)->first();
+            if ($oeExiste) {
                 // VALIDAR QUE NO ESTE YA SIENDO PROCESADO O CALCULADO SU DEPRECIACION
-                if(1==0){
-                    $error=true;
-                    $mensaje='YA SE ESTA DEPRECIANDO';
-                }
-                else{
-                    $oeExiste->COD_PRODUCTO           =   $COD_PRODUCTO;
-                    $oeExiste->COD_TABLA              =   $COD_TABLA;
-                    $oeExiste->COD_LOTE               =   $COD_LOTE;
-                    $oeExiste->NRO_LINEA              =   $NRO_LINEA;
-                    $oeExiste->TXT_DETALLE_PRODUCTO   =   $TXT_DETALLE_PRODUCTO;
-                    $oeExiste->TXT_NOMBRE_PRODUCTO    =   $TXT_NOMBRE_PRODUCTO;
-                    $oeExiste->CAN_PRODUCTO           =   $CAN_PRODUCTO;
-                    $oeExiste->COD_CAT_ACTFIJO        =   $COD_CAT_ACTFIJO;
+                if (1 == 0) {
+                    $error = true;
+                    $mensaje = 'YA SE ESTA DEPRECIANDO';
+                } else {
+                    $oeExiste->COD_PRODUCTO = $COD_PRODUCTO;
+                    $oeExiste->COD_TABLA = $COD_TABLA;
+                    $oeExiste->COD_LOTE = $COD_LOTE;
+                    $oeExiste->NRO_LINEA = $NRO_LINEA;
+                    $oeExiste->TXT_DETALLE_PRODUCTO = $TXT_DETALLE_PRODUCTO;
+                    $oeExiste->TXT_NOMBRE_PRODUCTO = $TXT_NOMBRE_PRODUCTO;
+                    $oeExiste->CAN_PRODUCTO = $CAN_PRODUCTO;
+                    $oeExiste->COD_CAT_ACTFIJO = $COD_CAT_ACTFIJO;
                     $oeExiste->save();
                 }
-            }
-            else{
-                $oeRegistro                         =   new CMPDetalleProductoAF;
-                $oeRegistro->COD_PRODUCTO           =   $COD_PRODUCTO;
-                $oeRegistro->COD_TABLA              =   $COD_TABLA;
-                $oeRegistro->COD_LOTE               =   $COD_LOTE;
-                $oeRegistro->NRO_LINEA              =   $NRO_LINEA;
-                $oeRegistro->TXT_DETALLE_PRODUCTO   =   $TXT_DETALLE_PRODUCTO;
-                $oeRegistro->TXT_NOMBRE_PRODUCTO    =   $TXT_NOMBRE_PRODUCTO;
-                $oeRegistro->CAN_PRODUCTO           =   $CAN_PRODUCTO;
-                $oeRegistro->COD_CAT_ACTFIJO        =   $COD_CAT_ACTFIJO;
+            } else {
+                $oeRegistro = new CMPDetalleProductoAF;
+                $oeRegistro->COD_PRODUCTO = $COD_PRODUCTO;
+                $oeRegistro->COD_TABLA = $COD_TABLA;
+                $oeRegistro->COD_LOTE = $COD_LOTE;
+                $oeRegistro->NRO_LINEA = $NRO_LINEA;
+                $oeRegistro->TXT_DETALLE_PRODUCTO = $TXT_DETALLE_PRODUCTO;
+                $oeRegistro->TXT_NOMBRE_PRODUCTO = $TXT_NOMBRE_PRODUCTO;
+                $oeRegistro->CAN_PRODUCTO = $CAN_PRODUCTO;
+                $oeRegistro->COD_CAT_ACTFIJO = $COD_CAT_ACTFIJO;
                 $oeRegistro->save();
             }
         } catch (\Exception $ex) {
-            $error=true;
-            $mensaje='ocurrio un error inesperado '.$ex;
+            $error = true;
+            $mensaje = 'ocurrio un error inesperado ' . $ex;
         }
 
         $datos = [
-                    'error'=>$error,
-                    'mensaje'=>$mensaje,
-                    'idcheckbox'=>$idcheckbox
-                ];
+            'error' => $error,
+            'mensaje' => $mensaje,
+            'idcheckbox' => $idcheckbox
+        ];
         // $rpta = json_encode($datos,true);
         return response()->json($datos);
 
@@ -6332,74 +7716,73 @@ class GestionOCContabilidadController extends Controller
     public function actionAjaxModalActivoFijoCategoria(Request $request)
     {
         // ajax-modal-detalle-deuda-contrato
-        $idopcion               =   $request['idopcion'];
-        $COD_PRODUCTO           =   $request['codprod'];
-        $CAN_PRODUCTO          =   $request['cantprod'];
-        $COD_LOTE               =   $request['codlote'];
-        $NRO_LINEA              =   $request['nrolinea'];
-        $TXT_NOMBRE_PRODUCTO    =   $request['txtnombprod'];
-        $TXT_DETALLE_PRODUCTO   =   $request['txtdetprod'];
-        $idoc                   =   $request['idoc'];
-        $idcheckbox             =   $request['idcheckbox'];
+        $idopcion = $request['idopcion'];
+        $COD_PRODUCTO = $request['codprod'];
+        $CAN_PRODUCTO = $request['cantprod'];
+        $COD_LOTE = $request['codlote'];
+        $NRO_LINEA = $request['nrolinea'];
+        $TXT_NOMBRE_PRODUCTO = $request['txtnombprod'];
+        $TXT_DETALLE_PRODUCTO = $request['txtdetprod'];
+        $idoc = $request['idoc'];
+        $idcheckbox = $request['idcheckbox'];
 
-        $oeProducto             =   CMPDetalleProducto::where('COD_PRODUCTO',$COD_PRODUCTO)->where('COD_TABLA',$idoc)->where('COD_LOTE',$COD_LOTE)->where('NRO_LINEA',$NRO_LINEA)->first();
-        $combo_categoria_activo_fijo = [''=>'SELECCIONE OPCION']+$this->funciones->combo_categoria_activo_fijo();
-        $oeProductoAF           =   CMPDetalleProductoAF::where('COD_PRODUCTO',$COD_PRODUCTO)->where('COD_TABLA',$idoc)->where('NRO_LINEA',$oeProducto->NRO_LINEA)->first();
-        $select_categoria_id    =   ($oeProductoAF)?$oeProductoAF->COD_CAT_ACTFIJO:'';
+        $oeProducto = CMPDetalleProducto::where('COD_PRODUCTO', $COD_PRODUCTO)->where('COD_TABLA', $idoc)->where('COD_LOTE', $COD_LOTE)->where('NRO_LINEA', $NRO_LINEA)->first();
+        $combo_categoria_activo_fijo = ['' => 'SELECCIONE OPCION'] + $this->funciones->combo_categoria_activo_fijo();
+        $oeProductoAF = CMPDetalleProductoAF::where('COD_PRODUCTO', $COD_PRODUCTO)->where('COD_TABLA', $idoc)->where('NRO_LINEA', $oeProducto->NRO_LINEA)->first();
+        $select_categoria_id = ($oeProductoAF) ? $oeProductoAF->COD_CAT_ACTFIJO : '';
         return View::make('comprobante/modal/ajax/mcategoriaactivofijo',
-                         [
-                            'COD_PRODUCTO'              => $COD_PRODUCTO,
-                            'CAN_PRODUCTO'             => $CAN_PRODUCTO,
-                            'COD_LOTE'                  => $COD_LOTE,
-                            'NRO_LINEA'                 => $NRO_LINEA,
-                            'TXT_DETALLE_PRODUCTO'      => $TXT_DETALLE_PRODUCTO,
-                            'TXT_NOMBRE_PRODUCTO'       => $TXT_NOMBRE_PRODUCTO,
-                            'combo_categoria_activo_fijo'=>$combo_categoria_activo_fijo,
-                            'select_categoria_id'       =>  $select_categoria_id,
-                            'idopcion'                  => $idopcion,
-                            'oeProducto'                =>  $oeProducto,
-                            'idcheckbox'                =>  $idcheckbox,
-                            'idoc'                      => $idoc,
-                            'ajax'                      => true,
-                         ]);
+            [
+                'COD_PRODUCTO' => $COD_PRODUCTO,
+                'CAN_PRODUCTO' => $CAN_PRODUCTO,
+                'COD_LOTE' => $COD_LOTE,
+                'NRO_LINEA' => $NRO_LINEA,
+                'TXT_DETALLE_PRODUCTO' => $TXT_DETALLE_PRODUCTO,
+                'TXT_NOMBRE_PRODUCTO' => $TXT_NOMBRE_PRODUCTO,
+                'combo_categoria_activo_fijo' => $combo_categoria_activo_fijo,
+                'select_categoria_id' => $select_categoria_id,
+                'idopcion' => $idopcion,
+                'oeProducto' => $oeProducto,
+                'idcheckbox' => $idcheckbox,
+                'idoc' => $idoc,
+                'ajax' => true,
+            ]);
 
     }
 
-    public function actionEliminarActivoFijoCategoria($idoc, $COD_PRODUCTO,$COD_LOTE,$NRO_LINEA,Request $request)
+    public function actionEliminarActivoFijoCategoria($idoc, $COD_PRODUCTO, $COD_LOTE, $NRO_LINEA, Request $request)
     {
         // $COD_CAT_ACTFIJO        =   $request['COD_CATEGORIA_AF'];
-        $COD_PRODUCTO           =   $request['codprod'];
-        $COD_TABLA              =   $request['idoc'];
-        $NRO_LINEA              =   $request['nrolinea'];
-        $COD_LOTE               =   $request['codlote'];
-        $idcheckbox             =   $request['idcheckbox'];
-        $error                  =   false;
-        $mensaje                =   'ELIMINACION DE CATEGORIA AF EXITOSA';
+        $COD_PRODUCTO = $request['codprod'];
+        $COD_TABLA = $request['idoc'];
+        $NRO_LINEA = $request['nrolinea'];
+        $COD_LOTE = $request['codlote'];
+        $idcheckbox = $request['idcheckbox'];
+        $error = false;
+        $mensaje = 'ELIMINACION DE CATEGORIA AF EXITOSA';
 
         try {
 
-            $oeExiste           =   CMPDetalleProductoAF::where('COD_TABLA',$COD_TABLA)->where('COD_PRODUCTO',$COD_PRODUCTO)->where('NRO_LINEA',$NRO_LINEA)->first();
-            if($oeExiste){
+            $oeExiste = CMPDetalleProductoAF::where('COD_TABLA', $COD_TABLA)->where('COD_PRODUCTO', $COD_PRODUCTO)->where('NRO_LINEA', $NRO_LINEA)->first();
+            if ($oeExiste) {
                 // VALIDAR QUE NO ESTE YA SIENDO PROCESADO O CALCULADO SU DEPRECIACION
-                if(1==0){
-                    $error=true;
-                    $mensaje='YA SE ESTA DEPRECIANDO';
-                }
-                else{
+                if (1 == 0) {
+                    $error = true;
+                    $mensaje = 'YA SE ESTA DEPRECIANDO';
+                } else {
                     $oeExiste->delete();
                 }
             }
 
         } catch (\Exception $ex) {
-            $error=true;
-            $mensaje='ocurrio un error inesperado '.$ex;
+            $error = true;
+            $mensaje = 'ocurrio un error inesperado ' . $ex;
         }
 
         $datos = [
-                    'error'=>$error,
-                    'mensaje'=>$mensaje,
-                    'idcheckbox'=>$idcheckbox
-                ];
+            'error' => $error,
+            'mensaje' => $mensaje,
+            'idcheckbox' => $idcheckbox
+        ];
         return response()->json($datos);
     }
 

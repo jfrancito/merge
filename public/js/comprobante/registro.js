@@ -38,6 +38,25 @@ $(document).ready(function(){
 
     });
 
+
+    $(".registrocomprobante").on('click','.ver_cuenta_bancaria_pg', function() {
+
+        var _token                  =   $('#token').val();
+        var prefijo_id              =   $('#prefijo_id').val();
+        var orden_id                =   $('#orden_id').val();
+        var idopcion                =   $('#idopcion').val();
+        data                        =   {
+                                            _token                  : _token,
+                                            prefijo_id              : prefijo_id,
+                                            orden_id                : orden_id,
+                                        };
+
+        ajax_modal(data,"/ajax-modal-ver-cuenta-bancaria-pg",
+                  "modal-configuracion-usuario-detalle","modal-configuracion-usuario-detalle-container");
+
+    });
+
+
     $(".registrocomprobante").on('click','.ver_cuenta_bancaria_estiba', function() {
 
         var _token                  =   $('#token').val();
@@ -201,7 +220,7 @@ $(document).ready(function(){
         var prefijo_id          =   $('#prefijo_id').val();
         var orden_id            =   $('#orden_id').val();
 
-        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009', 'BAM0000000000011', 'BAM0000000000013'];
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009', 'BAM0000000000011', 'BAM0000000000013', 'BAM0000000000014', 'BAM0000000000015'];
 
         if(valores.includes(entidadbanco_id)){
             $('.ajax_cb').addClass('ocultar');
@@ -237,7 +256,7 @@ $(document).ready(function(){
         var prefijo_id          =   $('#prefijo_id').val();
         var orden_id            =   $('#orden_id').val();
 
-        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009', 'BAM0000000000011', 'BAM0000000000013'];
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009', 'BAM0000000000011', 'BAM0000000000013', 'BAM0000000000014', 'BAM0000000000015'];
 
         if(valores.includes(entidadbanco_id)){
             $('.ajax_cb').addClass('ocultar');
@@ -358,7 +377,7 @@ $(document).ready(function(){
         var empresa_id          =   $('#empresa_id').val();
         debugger;
 
-        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009', 'BAM0000000000011', 'BAM0000000000013', 'BAM0000000000014'];
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009', 'BAM0000000000011', 'BAM0000000000013', 'BAM0000000000014', 'BAM0000000000015'];
 
         if(valores.includes(entidadbanco_id)){
             $('.ajax_cb').addClass('ocultar');
@@ -438,7 +457,7 @@ $(document).ready(function(){
             }
         }
         var cb_id                   =   $('#cb_id').val();
-        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011', 'BAM0000000000013'];
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011', 'BAM0000000000013', 'BAM0000000000014', 'BAM0000000000015'];
         if(!valores.includes(entidadbanco_id)){
             if(cb_id==''){
                 alerterrorajax("Seleccione una Cuenta Bancaria."); return false;
@@ -498,7 +517,7 @@ $(document).ready(function(){
         }
 
         var cb_id                   =   $('#cb_id').val();
-        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011', 'BAM0000000000013'];
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011', 'BAM0000000000013', 'BAM0000000000014', 'BAM0000000000015'];
         if(!valores.includes(entidadbanco_id)){
             if(cb_id==''){
                 alerterrorajax("Seleccione una Cuenta Bancaria."); return false;
@@ -560,7 +579,7 @@ $(document).ready(function(){
         }
 
         var cb_id                   =   $('#cb_id').val();
-        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011','BAM0000000000013'];
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011','BAM0000000000013', 'BAM0000000000014', 'BAM0000000000015'];
         if(!valores.includes(entidadbanco_id)){
             if(cb_id==''){
                 alerterrorajax("Seleccione una Cuenta Bancaria."); return false;
@@ -576,6 +595,70 @@ $(document).ready(function(){
             console.log("Datos capturados listos para enviar");
         });
 
+        $.confirm({
+            title: '¿Confirmar la validación?',
+            content: 'Merge de Comprobante',
+            buttons: {
+                confirmar: function () {
+                    abrircargando();
+                    $( "#formguardardatos" ).submit();
+
+                    setTimeout(function() {
+                       cerrarcargando();
+                    }, 8000);
+ 
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo la validación');
+                }
+            }
+        });
+
+
+    });
+
+    $(".registrocomprobante").on('click','.btn-guardar-xml-nota-credito', function(e) {
+
+        event.preventDefault();
+        var _token                  =   $('#token').val();
+        var te                      =   $('#te').val();
+        
+        var monto_total             =   parseFloat($('#monto_total').val());        
+        var valor_igv               =   $('#valor_igv').val();        
+        
+        if(te =='0'){ alerterrorajax("Hay errores en la validacion del XML."); return false;}
+        $.confirm({
+            title: '¿Confirmar la validación?',
+            content: 'Merge de Comprobante',
+            buttons: {
+                confirmar: function () {
+                    abrircargando();
+                    $( "#formguardardatos" ).submit();
+
+                    setTimeout(function() {
+                       cerrarcargando();
+                    }, 8000);
+ 
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo la validación');
+                }
+            }
+        });
+
+
+    });
+
+    $(".registrocomprobante").on('click','.btn-guardar-xml-nota-debito', function(e) {
+
+        event.preventDefault();
+        var _token                  =   $('#token').val();
+        var te                      =   $('#te').val();
+        
+        var monto_total             =   parseFloat($('#monto_total').val());        
+        var valor_igv               =   $('#valor_igv').val();        
+        
+        if(te =='0'){ alerterrorajax("Hay errores en la validacion del XML."); return false;}
         $.confirm({
             title: '¿Confirmar la validación?',
             content: 'Merge de Comprobante',
@@ -626,7 +709,7 @@ $(document).ready(function(){
             if(pago_detraccion ==''){ alerterrorajax("Seleeccione un pago de detraccion"); return false;}            
         }
 
-        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011', 'BAM0000000000013'];
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011', 'BAM0000000000013', 'BAM0000000000014', 'BAM0000000000015'];
 
         if(!valores.includes(entidadbanco_id)){
             if(cb_id==''){
@@ -696,7 +779,7 @@ $(document).ready(function(){
             if(pago_detraccion ==''){ alerterrorajax("Seleeccione un pago de detraccion"); return false;}            
         }
 
-        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011', 'BAM0000000000013'];
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011', 'BAM0000000000013', 'BAM0000000000014', 'BAM0000000000015'];
 
         if(!valores.includes(entidadbanco_id)){
             if(cb_id==''){

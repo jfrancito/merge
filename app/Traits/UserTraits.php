@@ -661,7 +661,7 @@ trait UserTraits
         foreach($listadocumentos as $item){
 
             $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
-            $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00045')->first();
+            $email                  =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00046')->first();
             $fe_historial           =   DB::table('FE_DOCUMENTO_HISTORIAL')
                                         ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
                                         ->where('TIPO', 'like', '%APROBADO POR%')

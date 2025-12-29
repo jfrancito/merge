@@ -28,7 +28,7 @@
     </div>
     @include('comprobante.modal.mregistrorequerimiento')
 
-    @include('usuario.modal.musuario')
+    
 
 </div>
 

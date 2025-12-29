@@ -9,6 +9,7 @@
             <li class="@if($tab_id=='oc') active @endif"><a href="#oc" data-toggle="tab">LIQUIDACION DE GASTO <span class="badge badge-success" style="font-size:16px">{{count($listadatos)}}</span></a></li>
             <li class="@if($tab_id=='observado') active @endif"><a href="#observado" data-toggle="tab">OBSERVADOS <span class="badge badge-danger" style="font-size:16px">{{count($listadatos_obs)}}</span></a></li>
             <li class="@if($tab_id=='observadole') active @endif"><a href="#observadole" data-toggle="tab">OBSERVACIONES LEVANTADAS <span class="badge badge-primary" style="font-size:16px">{{count($listadatos_obs_le)}}</span></a></li>
+            <li class="@if($tab_id=='historialliq') active @endif"><a href="#historialliq" data-toggle="tab">HISTORIAL DE LIQUIDACIONES <span class="badge badge-primary" style="font-size:16px">{{count($listadatos_his_le)}}</span></a></li>
           </ul>
           <div class="tab-content">
             <div id="oc" class="tab-pane @if($tab_id=='oc') active @endif cont">
@@ -20,6 +21,11 @@
             <div id="observadole" class="tab-pane @if($tab_id=='observadole') active @endif cont">
               @include('liquidaciongasto.lista.ajax.alistalgjefe', ['id' => 'nso_obs_le' , 'listadatos' => $listadatos_obs_le])
             </div>
+
+            <div id="historialliq" class="tab-pane @if($tab_id=='historialliq') active @endif cont">
+              @include('liquidaciongasto.lista.ajax.alistalgjefehistorial', ['id' => 'nso_his_le' , 'listadatos' => $listadatos_his_le])
+            </div>
+
           </div>
         </div>
       </div>
