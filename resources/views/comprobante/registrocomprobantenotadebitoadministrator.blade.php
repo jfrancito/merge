@@ -20,15 +20,15 @@
                             @include('comprobante.hextorno')
                     </div>
                     <div class="panel-body">
-                      @include('comprobante.lista.detallecomprobanteadministradorcontrato')
+                      @include('comprobante.lista.detallecomprobanteadministradornotadebito')
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </div>    
     @include('comprobante.modal.mregistrorequerimiento')
 
-    
+    @include('usuario.modal.musuario')
 
 </div>
 
@@ -131,17 +131,7 @@
               allowedFileExtensions: ['{{$item->TXT_FORMATO}}'],
             });
 
-        @endforeach
-
-        @foreach($array_guias as $index => $item) 
-
-            $("#file-{{$item['COD_DOCUMENTO_CTBLE']}}").fileinput({
-              theme: 'fa5',
-              language: 'es',
-              allowedFileExtensions: ['pdf'],
-            });
-
-        @endforeach
+        @endforeach       
 
 
     </script>
@@ -150,4 +140,3 @@
     
     
 @stop
-

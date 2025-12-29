@@ -10,7 +10,15 @@
       @if($operacion_id == 'LIQUIDACION_COMPRA_ANTICIPO')
         @include('comprobante.ajax.alistaocvalidadoliquidacioncompraanticipo')
       @else
-        @include('comprobante.ajax.alistaocvalidadoestiba')
+        @if($operacion_id == 'NOTA_CREDITO')
+          @include('comprobante.ajax.alistaocvalidadonotacredito')
+        @else
+          @if($operacion_id == 'NOTA_DEBITO')
+            @include('comprobante.ajax.alistaocvalidadonotadebito')
+          @else
+            @include('comprobante.ajax.alistaocvalidadoestiba')
+          @endif
+        @endif
       @endif
     @endif
   @endif

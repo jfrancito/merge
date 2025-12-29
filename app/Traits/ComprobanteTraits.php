@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\Crypt;
 use App\Modelos\VMergeOC;
 use App\Modelos\VMergeOP;
 use App\Modelos\VMergeOPActual;
+use App\Modelos\VMergeNC;
+use App\Modelos\VMergeNCActual;
+use App\Modelos\VMergeND;
+use App\Modelos\VMergeNDActual;
 use App\Modelos\FeDocumento;
 use App\Modelos\CMPCategoria;
 use App\Modelos\CMPOrden;
@@ -2938,6 +2942,59 @@ trait ComprobanteTraits
 
         return  $listadatos;
     }
+
+    private function con_lista_cabecera_comprobante_total_cont_nota_credito($cliente_id) {
+
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                            //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC'))
+                            ->where('OPERACION','=','NOTA_CREDITO')
+
+                            ->where(function ($query) {
+                                $query->where('ind_observacion', '<>', 1)
+                                      ->orWhereNull('ind_observacion');
+                            })
+                            ->where(function ($query) {
+                                $query->where('area_observacion', '=', '')
+                                      ->orwhere('area_observacion', '=', 'UCO')
+                                      ->orWhereNull('area_observacion');
+                            })
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
+                            ->orderBy('ind_observacion','asc')
+                            ->orderBy('fecha_uc','asc')
+
+                            ->get();
+
+        return  $listadatos;
+    }
+
+    private function con_lista_cabecera_comprobante_total_cont_nota_debito($cliente_id) {
+
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                            //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC'))
+                            ->where('OPERACION','=','NOTA_DEBITO')
+
+                            ->where(function ($query) {
+                                $query->where('ind_observacion', '<>', 1)
+                                      ->orWhereNull('ind_observacion');
+                            })
+                            ->where(function ($query) {
+                                $query->where('area_observacion', '=', '')
+                                      ->orwhere('area_observacion', '=', 'UCO')
+                                      ->orWhereNull('area_observacion');
+                            })
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
+                            ->orderBy('ind_observacion','asc')
+                            ->orderBy('fecha_uc','asc')
+
+                            ->get();
+
+        return  $listadatos;
+    }
+    
     private function con_lista_cabecera_comprobante_total_cont_estiba_levantadas($cliente_id,$operacion_id) {
 
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
@@ -2961,6 +3018,40 @@ trait ComprobanteTraits
                             //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
                             ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC'))
                             ->where('OPERACION','=','CONTRATO')
+                            ->where('ind_observacion','=',0)
+                            ->where('area_observacion','=','CONT')
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
+                            ->orderBy('ind_observacion','asc')
+                            ->orderBy('fecha_uc','asc')
+
+                            ->get();
+
+        return  $listadatos;
+    }
+    private function con_lista_cabecera_comprobante_total_cont_nota_credito_levantadas($cliente_id) {
+
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                            //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC'))
+                            ->where('OPERACION','=','NOTA_CREDITO')
+                            ->where('ind_observacion','=',0)
+                            ->where('area_observacion','=','CONT')
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
+                            ->orderBy('ind_observacion','asc')
+                            ->orderBy('fecha_uc','asc')
+
+                            ->get();
+
+        return  $listadatos;
+    }
+    private function con_lista_cabecera_comprobante_total_cont_nota_debito_levantadas($cliente_id) {
+
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                            //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC'))
+                            ->where('OPERACION','=','NOTA_DEBITO')
                             ->where('ind_observacion','=',0)
                             ->where('area_observacion','=','CONT')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
@@ -3006,6 +3097,38 @@ trait ComprobanteTraits
 
         return  $listadatos;
     }
+    private function con_lista_cabecera_comprobante_total_cont_nota_credito_obs($cliente_id) {
+
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                            //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC'))
+                            ->where('OPERACION','=','NOTA_CREDITO')
+                             ->where('ind_observacion','=',1)
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
+                            ->orderBy('ind_observacion','asc')
+                            ->orderBy('fecha_uc','asc')
+
+                            ->get();
+
+        return  $listadatos;
+    }
+    private function con_lista_cabecera_comprobante_total_cont_nota_debito_obs($cliente_id) {
+
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                            //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC'))
+                            ->where('OPERACION','=','NOTA_DEBITO')
+                             ->where('ind_observacion','=',1)
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
+                            ->orderBy('ind_observacion','asc')
+                            ->orderBy('fecha_uc','asc')
+
+                            ->get();
+
+        return  $listadatos;
+    }
     private function con_lista_cabecera_comprobante_total_adm_contrato_obs_levantadas($cliente_id) {
 
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
@@ -3036,6 +3159,38 @@ trait ComprobanteTraits
                             ->where('area_observacion','=','ADM')
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
                             ->orderBy('fecha_pr','asc')
+                            ->get();
+
+        return  $listadatos;
+    }
+
+    private function con_lista_cabecera_comprobante_total_adm_nota_credito_obs_levantadas($cliente_id) {
+
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')                            
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC'))
+                            ->where('OPERACION','=','NOTA_CREDITO')
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('ind_observacion','=',0)
+                            ->where('area_observacion','=','ADM')
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
+                            ->orderBy('ind_observacion','asc')
+                            ->orderBy('fecha_uc','asc')
+                            ->get();
+
+        return  $listadatos;
+    }
+
+    private function con_lista_cabecera_comprobante_total_adm_nota_debito_obs_levantadas($cliente_id) {
+
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')                            
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC'))
+                            ->where('OPERACION','=','NOTA_DEBITO')
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('ind_observacion','=',0)
+                            ->where('area_observacion','=','ADM')
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
+                            ->orderBy('ind_observacion','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -3320,6 +3475,54 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
+    private function con_lista_cabecera_comprobante_total_adm_nota_credito($cliente_id) {
+
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))                            
+                            ->where('OPERACION','=','NOTA_CREDITO')
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where(function ($query) {
+                                $query->where('ind_observacion', '<>', 1)
+                                      ->orWhereNull('ind_observacion');
+                            })
+
+                            ->where(function ($query) {
+                                $query->where('area_observacion', '=', '')
+                                      ->orWhereNull('area_observacion')
+                                      ->orWhereIn('area_observacion',['CONT','UCO']);
+                            })
+
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
+                            ->orderBy('fecha_pr','asc')
+                            ->get();
+
+        return  $listadatos;
+    }
+
+    private function con_lista_cabecera_comprobante_total_adm_nota_debito($cliente_id) {
+
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))                            
+                            ->where('OPERACION','=','NOTA_DEBITO')
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where(function ($query) {
+                                $query->where('ind_observacion', '<>', 1)
+                                      ->orWhereNull('ind_observacion');
+                            })
+
+                            ->where(function ($query) {
+                                $query->where('area_observacion', '=', '')
+                                      ->orWhereNull('area_observacion')
+                                      ->orWhereIn('area_observacion',['CONT','UCO']);
+                            })
+
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
+                            ->orderBy('fecha_pr','asc')
+                            ->get();
+
+        return  $listadatos;
+    }
+
     private function con_lista_cabecera_comprobante_total_adm_estiba($cliente_id,$operacion_id) {
 
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
@@ -3372,6 +3575,34 @@ trait ComprobanteTraits
         $listadatos     =   FeDocumento::leftJoin('TES.AUTORIZACION', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'TES.AUTORIZACION.COD_AUTORIZACION')
                             ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                             ->where('OPERACION','=','LIQUIDACION_COMPRA_ANTICIPO')
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('ind_observacion','=',1)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
+                            ->orderBy('fecha_pr','asc')
+                            ->get();
+
+        return  $listadatos;
+    }
+
+    private function con_lista_cabecera_comprobante_total_adm_nota_credito_obs($cliente_id) {
+
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                            ->where('OPERACION','=','NOTA_CREDITO')
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('ind_observacion','=',1)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
+                            ->orderBy('fecha_pr','asc')
+                            ->get();
+
+        return  $listadatos;
+    }
+
+    private function con_lista_cabecera_comprobante_total_adm_nota_debito_obs($cliente_id) {
+
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                            ->where('OPERACION','=','NOTA_DEBITO')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('ind_observacion','=',1)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
@@ -4395,6 +4626,126 @@ trait ComprobanteTraits
                                 ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
                                 ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA'))
                                 ->orderBy('fecha_pa', 'desc')
+                                ->get();
+        }
+
+
+
+
+
+        return  $listadatos;
+
+
+    }
+
+    private function con_lista_cabecera_comprobante_total_gestion_nota_credito($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id) {
+
+
+        $trabajador     =       STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+        $centro_id      =       $trabajador->COD_ZONA_TIPO;
+        $rol            =       WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
+
+
+        $usuario_id             =   Session::get('usuario')->id;
+        $array_jefes            =   $this->array_usuario_jefes();
+
+        if($rol->ind_uc == 1 && !in_array($usuario_id, $array_jefes)){
+            //dd("hola03");
+            $listadatos     =   FeDocumento::join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')                                
+                                ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD')
+                                ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
+
+                                //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                                //->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                ->Fecha($filtrofecha_id,$fecha_inicio,$fecha_fin)
+                                //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                                ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)                                
+                                ->where('OPERACION','=','NOTA_CREDITO')
+                                ->ProveedorFE($proveedor_id)
+                                ->EstadoFE($estado_id)
+                                ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA,FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_UC'))
+                                ->orderBy('fecha_uc','asc')
+                                ->get();
+
+        }else{
+            //dd("hola02");
+            $listadatos     =   FeDocumento::join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')                                
+                                ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD')
+                                ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
+
+                                //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                                //->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                ->Fecha($filtrofecha_id,$fecha_inicio,$fecha_fin)
+                                //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                                ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                //->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
+                                ->where('OPERACION','=','NOTA_CREDITO')
+                                ->ProveedorFE($proveedor_id)
+                                ->EstadoFE($estado_id)
+                                ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA,FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_UC'))
+                                ->orderBy('fecha_uc','asc')
+                                ->get();
+        }
+
+
+
+
+
+        return  $listadatos;
+
+
+    }
+
+    private function con_lista_cabecera_comprobante_total_gestion_nota_debito($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id) {
+
+
+        $trabajador     =       STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+        $centro_id      =       $trabajador->COD_ZONA_TIPO;
+        $rol            =       WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
+
+
+        $usuario_id             =   Session::get('usuario')->id;
+        $array_jefes            =   $this->array_usuario_jefes();
+
+        if($rol->ind_uc == 1 && !in_array($usuario_id, $array_jefes)){
+            //dd("hola03");
+            $listadatos     =   FeDocumento::join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')                                
+                                ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD')
+                                ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
+
+                                //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                                //->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                ->Fecha($filtrofecha_id,$fecha_inicio,$fecha_fin)
+                                //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                                ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)                                
+                                ->where('OPERACION','=','NOTA_DEBITO')
+                                ->ProveedorFE($proveedor_id)
+                                ->EstadoFE($estado_id)
+                                ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA,FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_UC'))
+                                ->orderBy('fecha_uc','asc')
+                                ->get();
+
+        }else{
+            //dd("hola02");
+            $listadatos     =   FeDocumento::join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')                                
+                                ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD')
+                                ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
+
+                                //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                                //->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                ->Fecha($filtrofecha_id,$fecha_inicio,$fecha_fin)
+                                //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                                ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                //->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
+                                ->where('OPERACION','=','NOTA_DEBITO')
+                                ->ProveedorFE($proveedor_id)
+                                ->EstadoFE($estado_id)
+                                ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA,FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_UC'))
+                                ->orderBy('fecha_uc','asc')
                                 ->get();
         }
 
@@ -5497,6 +5848,38 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
+    private function con_lista_cabecera_comprobante_total_gestion_observados_nota_credito($cliente_id) {
+
+        $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+        $centro_id           =      $trabajador->COD_ZONA_TIPO;        
+        $listadatos          =      FeDocumento::Join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                                    ->where('OPERACION','=','NOTA_CREDITO')
+                                    ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                    ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                    ->where('FE_DOCUMENTO.area_observacion','<>','UCO')
+                                    ->where('FE_DOCUMENTO.ind_observacion','=','1')
+                                    ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                    ->get();
+
+        return  $listadatos;
+    }
+
+    private function con_lista_cabecera_comprobante_total_gestion_observados_nota_debito($cliente_id) {
+
+        $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+        $centro_id           =      $trabajador->COD_ZONA_TIPO;        
+        $listadatos          =      FeDocumento::Join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                                    ->where('OPERACION','=','NOTA_DEBITO')
+                                    ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                    ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                    ->where('FE_DOCUMENTO.area_observacion','<>','UCO')
+                                    ->where('FE_DOCUMENTO.ind_observacion','=','1')
+                                    ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                    ->get();
+
+        return  $listadatos;
+    }
+
     private function con_lista_cabecera_comprobante_total_gestion_observados_contrato_proveedores($cliente_id) {
 
         $listadatos          =      FeDocumento::Join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
@@ -5847,6 +6230,142 @@ trait ComprobanteTraits
         }else{  $ind_errototal      =   0;  }
 
 
+
+        FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)
+                    ->update(
+                            [
+                                'ind_ruc'=>$ind_ruc,
+                                'ind_rz'=>$ind_rz,
+                                
+                                'ind_moneda'=>$ind_moneda,
+                                'ind_total'=>$ind_total,
+                                'ind_cantidaditem'=>$ind_cantidaditem,
+                                'ind_formapago'=>$ind_formapago,
+                                'ind_errototal'=>$ind_errototal,
+                                'CAN_CENTIMO'=>$diferencia_total,
+
+                            ]);
+
+    }
+
+    private function con_validar_documento_proveedor_nota_credito($ordencompra,$fedocumento,$detalleordencompra,$detallefedocumento){
+
+        $ind_ruc            =   0;
+        $ind_rz             =   0;
+        $ind_moneda         =   0;
+        $ind_total          =   0;
+        $ind_cantidaditem   =   1;
+        $ind_formapago      =   1;
+        $ind_errototal      =   1;
+        //ruc
+        if($ordencompra->NRO_DOCUMENTO_CLIENTE == $fedocumento->RUC_PROVEEDOR){
+            $ind_ruc            =   1;  
+        }else{  $ind_errototal      =   0;  }
+
+        if(ltrim(rtrim(strtoupper($ordencompra->TXT_EMPR_EMISOR))) == ltrim(rtrim(strtoupper($fedocumento->RZ_PROVEEDOR)))){
+            $ind_rz             =   1;  
+        }//else{  $ind_errototal      =   0;  }
+
+
+        //moneda
+        $txtmoneda          =   '';
+        if($fedocumento->MONEDA == 'PEN'){
+            $txtmoneda          =   'SOLES';    
+        }else{
+            $txtmoneda          =   'DOLARES';
+        }
+        if($ordencompra->TXT_CATEGORIA_MONEDA == $txtmoneda){
+            $ind_moneda             =   1;  
+        }else{  $ind_errototal      =   0;  }
+        //total
+
+
+
+        $total_1 = $ordencompra->CAN_TOTAL;
+        $total_2 = $fedocumento->TOTAL_VENTA_XML;
+        $tt_totales = round(abs($total_1 - $total_2), 2);
+
+        //dd($tt_totales);
+        $diferencia_total = 0;
+        //0.02
+        if($tt_totales <= 0.09){
+            $ind_total          =   1;  
+            $diferencia_total = round($total_1 - $total_2,2);
+
+        }else{  $ind_errototal      =   0;  }
+
+
+        // if(number_format($ordencompra->CAN_TOTAL, 4, '.', '') == number_format($fedocumento->TOTAL_VENTA_ORIG, 4, '.', '')){
+        //     $ind_total          =   1;  
+        // }else{  $ind_errototal      =   0;  }
+
+        FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)
+                    ->update(
+                            [
+                                'ind_ruc'=>$ind_ruc,
+                                'ind_rz'=>$ind_rz,
+                                
+                                'ind_moneda'=>$ind_moneda,
+                                'ind_total'=>$ind_total,
+                                'ind_cantidaditem'=>$ind_cantidaditem,
+                                'ind_formapago'=>$ind_formapago,
+                                'ind_errototal'=>$ind_errototal,
+                                'CAN_CENTIMO'=>$diferencia_total,
+
+                            ]);
+
+    }
+
+    private function con_validar_documento_proveedor_nota_debito($ordencompra,$fedocumento,$detalleordencompra,$detallefedocumento){
+
+        $ind_ruc            =   0;
+        $ind_rz             =   0;
+        $ind_moneda         =   0;
+        $ind_total          =   0;
+        $ind_cantidaditem   =   1;
+        $ind_formapago      =   1;
+        $ind_errototal      =   1;
+        //ruc
+        if($ordencompra->NRO_DOCUMENTO_CLIENTE == $fedocumento->RUC_PROVEEDOR){
+            $ind_ruc            =   1;  
+        }else{  $ind_errototal      =   0;  }
+
+        if(ltrim(rtrim(strtoupper($ordencompra->TXT_EMPR_EMISOR))) == ltrim(rtrim(strtoupper($fedocumento->RZ_PROVEEDOR)))){
+            $ind_rz             =   1;  
+        }//else{  $ind_errototal      =   0;  }
+
+
+        //moneda
+        $txtmoneda          =   '';
+        if($fedocumento->MONEDA == 'PEN'){
+            $txtmoneda          =   'SOLES';    
+        }else{
+            $txtmoneda          =   'DOLARES';
+        }
+        if($ordencompra->TXT_CATEGORIA_MONEDA == $txtmoneda){
+            $ind_moneda             =   1;  
+        }else{  $ind_errototal      =   0;  }
+        //total
+
+
+
+        $total_1 = $ordencompra->CAN_TOTAL;
+        $total_2 = $fedocumento->TOTAL_VENTA_XML;
+        $tt_totales = round(abs($total_1 - $total_2), 2);
+
+        //dd($tt_totales);
+        $diferencia_total = 0;
+        //0.02
+        if($tt_totales <= 0.09){
+            $ind_total          =   1;  
+            $diferencia_total = round($total_1 - $total_2,2);
+
+        }else{  $ind_errototal      =   0;  }
+
+
+        // if(number_format($ordencompra->CAN_TOTAL, 4, '.', '') == number_format($fedocumento->TOTAL_VENTA_ORIG, 4, '.', '')){
+        //     $ind_total          =   1;  
+        // }else{  $ind_errototal      =   0;  }
 
         FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)
                     ->update(
@@ -6844,6 +7363,153 @@ trait ComprobanteTraits
 	 	return  $listadatos;
 	}
 
+    private function con_lista_cabecera_nota_credito_administrativo($cliente_id) {
+
+        $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+        $array_trabajadores  =      STDTrabajador::where('NRO_DOCUMENTO','=',$trabajador->NRO_DOCUMENTO)
+                                    ->pluck('COD_TRAB')
+                                    ->toArray();
+
+        $array_usuarios      =      SGDUsuario::whereIn('COD_TRABAJADOR',$array_trabajadores)
+                                    ->pluck('COD_USUARIO')
+                                    ->toArray();
+        $estado_no           =      'ETM0000000000006';
+
+        if(Session::get('usuario')->id== '1CIX00000001'){
+
+            $listadatos     =   VMergeNC::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                            $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGENC.COD_DOCUMENTO_CTBLE')
+                                                ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                                        })
+                                //->whereIn('VMERGENC.COD_USUARIO_CREA_AUD',$array_usuarios)
+                                ->where('VMERGENC.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                ->where(function ($query) {
+                                    $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
+                                          ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
+                                          ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
+                                })
+                                //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                                ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
+                                                    FEC_EMISION,
+                                                    TXT_CATEGORIA_MONEDA,
+                                                    TXT_EMPR_EMISOR,
+                                                    COD_USUARIO_CREA_AUD,
+                                                    CAN_TOTAL,
+                                                    NRO_SERIE,
+                                                    NRO_DOC,
+                                                    FE_DOCUMENTO.ID_DOCUMENTO,
+                                                    FE_DOCUMENTO.COD_ESTADO,
+                                                    FE_DOCUMENTO.TXT_ESTADO
+                                                '))                                
+                                ->get();
+
+        }else{
+
+            $listadatos     =   VMergeNC::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                            $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGENC.COD_DOCUMENTO_CTBLE')
+                                                ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                                        })
+                                ->whereIn('VMERGENC.COD_USUARIO_CREA_AUD',$array_usuarios)
+                                ->where('VMERGENC.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                ->where(function ($query) {
+                                    $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
+                                          ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
+                                          ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
+                                })
+                                //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                                ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
+                                                    FEC_EMISION,
+                                                    TXT_CATEGORIA_MONEDA,
+                                                    TXT_EMPR_EMISOR,
+                                                    COD_USUARIO_CREA_AUD,
+                                                    CAN_TOTAL,
+                                                    NRO_SERIE,
+                                                    NRO_DOC,
+                                                    FE_DOCUMENTO.ID_DOCUMENTO,
+                                                    FE_DOCUMENTO.COD_ESTADO,
+                                                    FE_DOCUMENTO.TXT_ESTADO
+                                                '))                                
+                                ->get();
+
+        }
+
+
+        return  $listadatos;
+    }
+
+    private function con_lista_cabecera_nota_debito_administrativo($cliente_id) {
+
+        $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+        $array_trabajadores  =      STDTrabajador::where('NRO_DOCUMENTO','=',$trabajador->NRO_DOCUMENTO)
+                                    ->pluck('COD_TRAB')
+                                    ->toArray();
+
+        $array_usuarios      =      SGDUsuario::whereIn('COD_TRABAJADOR',$array_trabajadores)
+                                    ->pluck('COD_USUARIO')
+                                    ->toArray();
+        $estado_no           =      'ETM0000000000006';
+
+        if(Session::get('usuario')->id== '1CIX00000001'){
+
+            $listadatos     =   VMergeND::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                            $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEND.COD_DOCUMENTO_CTBLE')
+                                                ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                                        })
+                                //->whereIn('VMERGEND.COD_USUARIO_CREA_AUD',$array_usuarios)
+                                ->where('VMERGEND.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                ->where(function ($query) {
+                                    $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
+                                          ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
+                                          ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
+                                })
+                                //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                                ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
+                                                    FEC_EMISION,
+                                                    TXT_CATEGORIA_MONEDA,
+                                                    TXT_EMPR_EMISOR,
+                                                    COD_USUARIO_CREA_AUD,
+                                                    CAN_TOTAL,
+                                                    NRO_SERIE,
+                                                    NRO_DOC,
+                                                    FE_DOCUMENTO.ID_DOCUMENTO,
+                                                    FE_DOCUMENTO.COD_ESTADO,
+                                                    FE_DOCUMENTO.TXT_ESTADO
+                                                '))                                
+                                ->get();
+
+        }else{
+
+            $listadatos     =   VMergeND::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                            $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEND.COD_DOCUMENTO_CTBLE')
+                                                ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                                        })
+                                ->whereIn('VMERGEND.COD_USUARIO_CREA_AUD',$array_usuarios)
+                                ->where('VMERGEND.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                ->where(function ($query) {
+                                    $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
+                                          ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
+                                          ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
+                                })
+                                //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                                ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
+                                                    FEC_EMISION,
+                                                    TXT_CATEGORIA_MONEDA,
+                                                    TXT_EMPR_EMISOR,
+                                                    COD_USUARIO_CREA_AUD,
+                                                    CAN_TOTAL,
+                                                    NRO_SERIE,
+                                                    NRO_DOC,
+                                                    FE_DOCUMENTO.ID_DOCUMENTO,
+                                                    FE_DOCUMENTO.COD_ESTADO,
+                                                    FE_DOCUMENTO.TXT_ESTADO
+                                                '))                                
+                                ->get();
+
+        }
+
+
+        return  $listadatos;
+    }
 
     private function con_lista_cabecera_comprobante_administrativo_filtro($cliente_id) {
 
@@ -7763,6 +8429,54 @@ trait ComprobanteTraits
 
     }
 
+    private function con_lista_cabecera_comprobante_nota_credito_idoc($idoc) {
+
+
+        $contrato                =      VMergeNC::where('COD_ESTADO','=','1')
+                                            ->where('COD_DOCUMENTO_CTBLE','=',$idoc)
+                                            ->first();
+
+        return  $contrato;
+    }
+
+    private function con_lista_cabecera_comprobante_nota_credito_idoc_actual($idoc) {
+
+
+        $contrato                =      VMergeNCActual::where('COD_ESTADO','=','1')
+                                            ->where('COD_DOCUMENTO_CTBLE','=',$idoc)
+                                            ->first();
+
+        return  $contrato;
+    }
+
+    private function con_lista_cabecera_comprobante_nota_debito_idoc($idoc) {
+
+
+        $contrato                =      VMergeND::where('COD_ESTADO','=','1')
+                                            ->where('COD_DOCUMENTO_CTBLE','=',$idoc)
+                                            ->first();
+
+        return  $contrato;
+    }
+
+    private function con_lista_cabecera_comprobante_nota_debito_idoc_actual($idoc) {
+
+
+        $contrato                =      VMergeNDActual::where('COD_ESTADO','=','1')
+                                            ->where('COD_DOCUMENTO_CTBLE','=',$idoc)
+                                            ->first();
+
+        return  $contrato;
+    }
+
+    private function con_lista_detalle_producto_comprobante_idoc($idoc) {
+
+        $doc                    =   CMPDetalleProducto::where('COD_TABLA','=',$idoc)
+                                    ->where('COD_ESTADO','=',1)                                    
+                                    ->get();
+        return  $doc;                 
+
+    }
 
     private function con_lista_detalle_comprobante_idoc_actual_af($idoc) {
 
