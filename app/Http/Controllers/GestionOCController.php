@@ -739,9 +739,7 @@ class GestionOCController extends Controller
                                         'DOCUMENTO_SERVICIO_BALANZA' => 'DOCUMENTO POR SERVICIO DE BALANZA',
                                         'DOCUMENTO_INTERNO_COMPRA' => 'DOCUMENTO INTERNO COMPRA',
                                         'LIQUIDACION_COMPRA_ANTICIPO' => 'LIQUIDACION DE COMPRA ANTICIPO',
-
-                                        'PROVISION_GASTO' => 'PROVISION DE GASTOS'
-
+                                        'PROVISION_GASTO' => 'PROVISION DE GASTOS',
                                         'NOTA_CREDITO' => 'NOTA DE CREDITO',
                                         'NOTA_DEBITO' => 'NOTA DE DEBITO'
 
