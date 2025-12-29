@@ -7,7 +7,15 @@
     @if($operacion_id == 'LIQUIDACION_COMPRA_ANTICIPO')
       @include('comprobante.ajax.alistaliquidacioncompraanticipoareaadministrador')
     @else
-      @include('comprobante.ajax.alistaestibaareaadministrador')
+      @if($operacion_id == 'NOTA_CREDITO')
+        @include('comprobante.ajax.alistanotacreditoareaadministrador')
+      @else
+        @if($operacion_id == 'NOTA_DEBITO')
+          @include('comprobante.ajax.alistanotadebitoareaadministrador')
+        @else
+          @include('comprobante.ajax.alistaestibaareaadministrador')
+        @endif
+      @endif
     @endif
   @endif
 @endif
