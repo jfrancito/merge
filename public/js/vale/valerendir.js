@@ -642,7 +642,14 @@ $(document).ready(function(){
          if (!cod_contrato || !sub_cuenta ) {
                  alerterrorajax("El usuario no cuenta con contrato o sub cuenta.");
             return; 
-            }
+        }
+
+          if (!txt_serie || !txt_numero ) {
+                 alerterrorajax("El usuario no cuenta con serie en Osiris.");
+            return; 
+        }
+
+
 
      /*    if (tipo_pago === 1) {
             if (!numero_cuenta || !txt_categoria_banco) {

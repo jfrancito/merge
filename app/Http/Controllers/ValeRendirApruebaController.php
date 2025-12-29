@@ -289,6 +289,14 @@ class ValeRendirApruebaController extends Controller
                             ->toArray();
 
         $combo_series = $notacredito->combo_series_tipodocumento('TDO0000000000072');
+
+        if (
+            is_array($combo_series) &&
+            count($combo_series) === 1 &&
+            array_key_exists('', $combo_series)
+        ) {
+            $combo_series = null; // o '' si prefieres
+        }
       
      
         $ultimoCorrelativo = DB::connection($conexionbd)
@@ -297,6 +305,8 @@ class ValeRendirApruebaController extends Controller
         ->where('COD_TIPO_DOCUMENTO', 'TDO0000000000072')
         ->where('COD_CENTRO', $centrovale)
         ->max('TXT_NUMERO');
+
+
 
         
 
