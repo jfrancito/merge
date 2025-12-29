@@ -426,7 +426,17 @@ class UserController extends Controller {
         $orden_id               =   $request['orden_id'];
         $empresa_id             =   $request['empresa_id'];
         $idoc                   =   $orden_id;
-		$cuentabancarias 		= 	TESCuentaBancaria::where('COD_EMPR_TITULAR','=',$empresa_id)
+
+		$documento = DB::table('FE_DOCUMENTO')
+		    ->where('ID_DOCUMENTO', $idoc)
+		    ->first();
+
+		$empresa = DB::table('STD.EMPRESA')
+		    ->where('NRO_DOCUMENTO', $documento->RUC_PROVEEDOR)
+		    ->where('COD_ESTADO', 1)
+		    ->first();
+
+		$cuentabancarias 		= 	TESCuentaBancaria::where('COD_EMPR_TITULAR','=',$empresa->COD_EMPR)
 									->where('COD_ESTADO','=',1)
 									->orderby('TXT_EMPR_BANCO','ASC')
 								  	->get();
@@ -461,6 +471,30 @@ class UserController extends Controller {
 						 ]);
 	}
 
+
+	public function actionAjaxModalVerCuentaBancariaPG(Request $request)
+	{
+
+        $prefijo_id             =   $request['prefijo_id'];
+        $orden_id               =   $request['orden_id'];
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo_contrato($idordencompra,$prefijo);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_pg_idoc($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_pg_comprobante_idoc($idoc);
+
+		$cuentabancarias 		= 	TESCuentaBancaria::where('COD_EMPR_TITULAR','=',$ordencompra->COD_EMPR_EMISOR)
+									->where('COD_ESTADO','=',1)
+									->orderby('TXT_EMPR_BANCO','ASC')
+								  	->get();
+
+		return View::make('usuario/modal/ajax/mvercuentabancaria',
+						 [		 	
+
+						 	'cuentabancarias' 				=> $cuentabancarias,					 	
+						 	'ajax' 							=> true,						 	
+						 ]);
+	}
+
+
 	public function actionConfigurarDatosCuentaBancariaEstiba($empresa_id,$orden_id,$idopcion,Request $request)
 	{
 
@@ -475,7 +509,17 @@ class UserController extends Controller {
 		$moneda 									=	CMPCategoria::where('COD_CATEGORIA','=',$moneda_id)->first();
 		$empresa 									=	STDEmpresa::where('COD_EMPR','=',$empresa_id)->first();
 
-		$tescuentabb    							=   TESCuentaBancaria::where('COD_EMPR_TITULAR','=',$empresa->COD_EMPR)
+		$documento = DB::table('FE_DOCUMENTO')
+		    ->where('ID_DOCUMENTO', $idoc)
+		    ->first();
+
+		$empresaclie = DB::table('STD.EMPRESA')
+		    ->where('NRO_DOCUMENTO', $documento->RUC_PROVEEDOR)
+		    ->where('COD_ESTADO', 1)
+		    ->first();
+
+
+		$tescuentabb    							=   TESCuentaBancaria::where('COD_EMPR_TITULAR','=',$empresaclie->COD_EMPR)
 														->where('COD_EMPR_BANCO','=',$banco->COD_CATEGORIA)
 														->where('COD_CATEGORIA_MONEDA','=',$moneda->COD_CATEGORIA)
 														->where('TXT_TIPO_REFERENCIA','=',$tipocuenta->COD_CATEGORIA)
@@ -489,10 +533,10 @@ class UserController extends Controller {
 
 
 		$cuentabancaria 							=	New TESCuentaBancaria();
-		$cuentabancaria->COD_EMPR_TITULAR 			=   $empresa->COD_EMPR;
+		$cuentabancaria->COD_EMPR_TITULAR 			=   $empresaclie->COD_EMPR;
 		$cuentabancaria->COD_EMPR_BANCO 			=   $banco->COD_CATEGORIA;
 		$cuentabancaria->TXT_NRO_CUENTA_BANCARIA	=   $numerocuenta;
-		$cuentabancaria->TXT_EMPR_TITULAR 			=   $empresa->NOM_EMPR;
+		$cuentabancaria->TXT_EMPR_TITULAR 			=   $empresaclie->NOM_EMPR;
 		$cuentabancaria->TXT_EMPR_BANCO 			=   $banco->NOM_CATEGORIA;
 		$cuentabancaria->COD_CATEGORIA_MONEDA 		=   $moneda->COD_CATEGORIA;
 		$cuentabancaria->TXT_CATEGORIA_MONEDA 		=   $moneda->NOM_CATEGORIA;

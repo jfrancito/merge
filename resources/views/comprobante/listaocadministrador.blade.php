@@ -113,14 +113,7 @@
                               </div>
                           </div>
 
-
-
                         </div>
-
-
-
-
-
                         
                       <div class="col-xs-12">
                         <input type="hidden" name="idopcion" id='idopcion' value='{{$idopcion}}'>

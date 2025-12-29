@@ -932,10 +932,6 @@ class GestionEstibaController extends Controller
         }
 
 
-
-
-
-        
         return View::make('comprobante/registrocomprobanteestibaadministrator',
                          [
                             'monto_anticipo'        =>  $monto_anticipo,

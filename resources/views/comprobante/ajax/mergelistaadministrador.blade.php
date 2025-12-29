@@ -4,9 +4,13 @@
   @if($operacion_id == 'CONTRATO')
     @include('comprobante.ajax.alistacontratoadministrador')
   @else
-    @if($operacion_id == 'LIQUIDACION_COMPRA_ANTICIPO')
-      @include('comprobante.ajax.alistaliquidacioncompraanticipoadministrador')
+    @if($operacion_id == 'PROVISION_GASTO')
+      @include('comprobante.ajax.alistarprovisiongastoadministrador')
     @else
+
+        @if($operacion_id == 'LIQUIDACION_COMPRA_ANTICIPO')
+          @include('comprobante.ajax.alistaliquidacioncompraanticipoadministrador')
+
       @if($operacion_id == 'NOTA_CREDITO')
         @include('comprobante.ajax.alistanotacreditoadministrador')
       @else
@@ -19,7 +23,9 @@
             @include('comprobante.ajax.alistaestibaadministrador')
           @endif
         @endif
+
       @endif
+
     @endif
   @endif
 @endif
