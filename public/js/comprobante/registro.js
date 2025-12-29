@@ -38,6 +38,25 @@ $(document).ready(function(){
 
     });
 
+
+    $(".registrocomprobante").on('click','.ver_cuenta_bancaria_pg', function() {
+
+        var _token                  =   $('#token').val();
+        var prefijo_id              =   $('#prefijo_id').val();
+        var orden_id                =   $('#orden_id').val();
+        var idopcion                =   $('#idopcion').val();
+        data                        =   {
+                                            _token                  : _token,
+                                            prefijo_id              : prefijo_id,
+                                            orden_id                : orden_id,
+                                        };
+
+        ajax_modal(data,"/ajax-modal-ver-cuenta-bancaria-pg",
+                  "modal-configuracion-usuario-detalle","modal-configuracion-usuario-detalle-container");
+
+    });
+
+
     $(".registrocomprobante").on('click','.ver_cuenta_bancaria_estiba', function() {
 
         var _token                  =   $('#token').val();

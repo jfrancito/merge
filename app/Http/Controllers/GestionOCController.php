@@ -203,12 +203,18 @@ class GestionOCController extends Controller
         $prefijo_id             =   $request['prefijo_id'];
         $orden_id               =   $request['orden_id'];
         $empresa_id             =   $request['empresa_id'];
-
-        //dd($entidadbanco_id);
-
         $idoc                   =   $orden_id;
+        $documento              =   DB::table('FE_DOCUMENTO')
+                                    ->where('ID_DOCUMENTO', $idoc)
+                                    ->first();
 
-        $tescuentabb            =   TESCuentaBancaria::where('COD_EMPR_TITULAR','=',$empresa_id)
+        $empresa                =   DB::table('STD.EMPRESA')
+                                    ->where('NRO_DOCUMENTO', $documento->RUC_PROVEEDOR)
+                                    ->where('COD_ESTADO', 1)
+                                    ->first();
+
+
+        $tescuentabb            =   TESCuentaBancaria::where('COD_EMPR_TITULAR','=',$empresa->COD_EMPR)
                                     ->where('COD_EMPR_BANCO','=',$entidadbanco_id)
                                     ->where('COD_ESTADO','=',1)
                                     ->select(DB::raw("
@@ -724,7 +730,7 @@ class GestionOCController extends Controller
             $operacion_id       =   'CONTRATO';
         }
 
-        //$combo_operacion    =   array('ORDEN_COMPRA' => 'ORDEN COMPRA','CONTRATO' => 'CONTRATO','ESTIBA' => 'ESTIBA');
+        //$operacion_id       =   'PROVISION_GASTO';
         $combo_operacion    =   array(  'ORDEN_COMPRA' => 'ORDEN COMPRA',
                                         'CONTRATO' => 'CONTRATO',
                                         'ESTIBA' => 'ESTIBA',
@@ -732,7 +738,8 @@ class GestionOCController extends Controller
                                         'DOCUMENTO_INTERNO_SECADO' => 'DOCUMENTO INTERNO SECADO',
                                         'DOCUMENTO_SERVICIO_BALANZA' => 'DOCUMENTO POR SERVICIO DE BALANZA',
                                         'DOCUMENTO_INTERNO_COMPRA' => 'DOCUMENTO INTERNO COMPRA',
-                                        'LIQUIDACION_COMPRA_ANTICIPO' => 'LIQUIDACION DE COMPRA ANTICIPO'
+                                        'LIQUIDACION_COMPRA_ANTICIPO' => 'LIQUIDACION DE COMPRA ANTICIPO',
+                                        'PROVISION_GASTO' => 'PROVISION DE GASTOS'
                                     );
 
         $cod_empresa        =   Session::get('usuario')->usuarioosiris_id;
@@ -770,16 +777,21 @@ class GestionOCController extends Controller
             if($operacion_id=='CONTRATO'){
                 $listadatos         =   $this->con_lista_cabecera_contrato_administrativo($cod_empresa);
             }else{
-                if (in_array($operacion_id, $array_canjes)) {
 
-                    $categoria_id       =   $this->con_categoria_canje($operacion_id);
-
-                    if($operacion_id=='DOCUMENTO_INTERNO_COMPRA'){
-                        $listadatos         =   $this->con_lista_cabecera_estibas_administrativo_doc_int_com($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id);
-                    }else{
-                        $listadatos         =   $this->con_lista_cabecera_estibas_administrativo($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id);
+                if($operacion_id=='PROVISION_GASTO'){
+                    $listadatos         =   $this->con_lista_cabecera_provision_gasto_administrativo($cod_empresa);
+                }else{
+                    if (in_array($operacion_id, $array_canjes)) {
+                        $categoria_id       =   $this->con_categoria_canje($operacion_id);
+                        if($operacion_id=='DOCUMENTO_INTERNO_COMPRA'){
+                            $listadatos         =   $this->con_lista_cabecera_estibas_administrativo_doc_int_com($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id);
+                        }else{
+                            $listadatos         =   $this->con_lista_cabecera_estibas_administrativo($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id);
+                        }
                     }
+
                 }
+
             }
         }
 
@@ -859,17 +871,22 @@ class GestionOCController extends Controller
             if ($operacion_id == 'CONTRATO') {
                 $listadatos = $this->con_lista_cabecera_contrato_administrativo($cod_empresa);
             } else {
-                if ($operacion_id == 'LIQUIDACION_COMPRA_ANTICIPO') {                    
-                    $listadatos = $this->con_lista_cabecera_liquidacion_compra_anticipo_administrativo($cod_empresa);
-                } else {
-                    if (in_array($operacion_id, $array_canjes)) {
-                        $categoria_id = $this->con_categoria_canje($operacion_id);
 
-                        if($operacion_id=='DOCUMENTO_INTERNO_COMPRA'){
-                            $listadatos         =   $this->con_lista_cabecera_estibas_administrativo_doc_int_com($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id);
-                        }else{
-                            $listadatos         =   $this->con_lista_cabecera_estibas_administrativo($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id);
-                        }                        
+                if($operacion_id=='PROVISION_GASTO'){
+                    $listadatos         =   $this->con_lista_cabecera_provision_gasto_administrativo($cod_empresa);
+                }else{
+                    if ($operacion_id == 'LIQUIDACION_COMPRA_ANTICIPO') {                    
+                        $listadatos = $this->con_lista_cabecera_liquidacion_compra_anticipo_administrativo($cod_empresa);
+                    } else {
+                        if (in_array($operacion_id, $array_canjes)) {
+                            $categoria_id = $this->con_categoria_canje($operacion_id);
+
+                            if($operacion_id=='DOCUMENTO_INTERNO_COMPRA'){
+                                $listadatos         =   $this->con_lista_cabecera_estibas_administrativo_doc_int_com($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id);
+                            }else{
+                                $listadatos         =   $this->con_lista_cabecera_estibas_administrativo($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id);
+                            }                        
+                        }
                     }
                 }
             }

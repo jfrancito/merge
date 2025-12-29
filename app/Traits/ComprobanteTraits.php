@@ -25,7 +25,7 @@ use App\Modelos\WEBRol;
 use App\Modelos\FeRefAsoc;
 use App\Modelos\CONRegistroCompras;
 use App\Modelos\FeDocumentoGeolocalizacion;
-
+use App\Modelos\VMergeDocumentoPg;
 
 
 use App\Modelos\Estado;
@@ -6984,6 +6984,87 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
+
+    private function con_lista_cabecera_provision_gasto_administrativo($cliente_id) {
+
+        $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+        $array_trabajadores  =      STDTrabajador::where('NRO_DOCUMENTO','=',$trabajador->NRO_DOCUMENTO)
+                                    ->pluck('COD_TRAB')
+                                    ->toArray();
+        $array_usuarios      =      SGDUsuario::whereIn('COD_TRABAJADOR',$array_trabajadores)
+                                    ->pluck('COD_USUARIO')
+                                    ->toArray();
+        $estado_no          =       'ETM0000000000006';
+
+
+
+        $centro_id          =       $trabajador->COD_ZONA_TIPO;
+        $tipodoc_id         =       'TDO0000000000014';
+
+
+        if(Session::get('usuario')->id== '1CIX00000001'){
+
+            $listadatos         =       VMergeDocumentoPg::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                            $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOSPG.COD_DOCUMENTO_CTBLE')
+                                                ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                                        })
+                                        ->where('VMERGEDOCUMENTOSPG.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                        ->where(function ($query) {
+                                            $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
+                                                  ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
+                                                  ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
+                                        })
+                                        ->whereRaw('YEAR(FEC_EMISION) >= ?', [2024])
+                                        ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
+                                                            FEC_EMISION,
+                                                            TXT_CATEGORIA_MONEDA,
+                                                            TXT_EMPR_EMISOR,
+                                                            COD_USUARIO_CREA_AUD,
+                                                            CAN_TOTAL,
+                                                            NRO_SERIE,
+                                                            NRO_DOC,
+                                                            
+                                                            FE_DOCUMENTO.ID_DOCUMENTO,
+                                                            FE_DOCUMENTO.COD_ESTADO,
+                                                            FE_DOCUMENTO.TXT_ESTADO
+                                                        '))
+                                        ->get();
+
+        }else{
+
+            $listadatos         =       VMergeDocumentoPg::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                            $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOSPG.COD_DOCUMENTO_CTBLE')
+                                                ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                                        })
+                                        ->where('VMERGEDOCUMENTOSPG.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                        ->where(function ($query) {
+                                            $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
+                                                  ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
+                                                  ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
+                                        })
+                                        ->whereRaw('YEAR(FEC_EMISION) >= ?', [2024])
+                                        ->where('COD_CENTRO','=',$centro_id)
+                                        ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
+                                                            FEC_EMISION,
+                                                            TXT_CATEGORIA_MONEDA,
+                                                            TXT_EMPR_EMISOR,
+                                                            COD_USUARIO_CREA_AUD,
+                                                            CAN_TOTAL,
+                                                            NRO_SERIE,
+                                                            NRO_DOC,
+                                                            
+                                                            FE_DOCUMENTO.ID_DOCUMENTO,
+                                                            FE_DOCUMENTO.COD_ESTADO,
+                                                            FE_DOCUMENTO.TXT_ESTADO
+                                                        '))
+                                        ->get();
+
+        }
+
+
+        return  $listadatos;
+    }
+
     private function con_lista_cabecera_liquidacion_compra_anticipo_administrativo($cliente_id) {
 
         $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
@@ -7586,6 +7667,20 @@ trait ComprobanteTraits
         return  $contrato;
     }
 
+    private function con_lista_cabecera_comprobante_pg_idoc($idoc) {
+
+
+        $contrato                =      VMergeDocumentoPg::where('COD_ESTADO','=','1')
+                                            ->where('COD_DOCUMENTO_CTBLE','=',$idoc)
+                                            ->first();
+
+        return  $contrato;
+    }
+
+
+
+
+
     private function con_lista_cabecera_comprobante_contrato_idoc_actual($idoc) {
 
 
@@ -7607,6 +7702,15 @@ trait ComprobanteTraits
 
     }
 
+    private function con_lista_detalle_pg_comprobante_idoc($idoc) {
+
+        $doc                    =   CMPDetalleProducto::where('COD_TABLA','=',$idoc)
+                                    ->where('COD_ESTADO','=',1)
+                                    ->get();
+
+        return  $doc;
+
+    }
 
 
 

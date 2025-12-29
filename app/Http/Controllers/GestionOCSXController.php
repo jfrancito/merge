@@ -58,11 +58,217 @@ class GestionOCSXController extends Controller
     use ComprobanteTraits;
     use WhatsappTraits;
     use ComprobanteProvisionTraits;
-
     public function actionSunatCDR()
     {
         $this->sunat_cdr();
     }
+
+
+
+    public function actionDetalleComprobantePGAdministratorSinXML($procedencia,$idopcion, $prefijo, $idordencompra, Request $request) {
+
+
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo_contrato($idordencompra,$prefijo);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_pg_idoc($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_pg_comprobante_idoc($idoc);
+
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
+        $ordencompra_n          =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$idoc)->first();
+
+        View::share('titulo','REGISTRO DE COMPROBANTE PROVISION DE GASTOS SIN XML: '.$idoc);
+        $tiposerie              =   '';
+        $fedocumento_t          =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
+        if(count($fedocumento_t)>0){
+            DB::table('FE_DOCUMENTO')->where('ID_DOCUMENTO','=',$fedocumento_t->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$fedocumento_t->DOCUMENTO_ITEM)->delete();
+            DB::table('FE_DETALLE_DOCUMENTO')->where('ID_DOCUMENTO','=',$fedocumento_t->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$fedocumento_t->DOCUMENTO_ITEM)->delete();
+            DB::table('FE_FORMAPAGO')->where('ID_DOCUMENTO','=',$fedocumento_t->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$fedocumento_t->DOCUMENTO_ITEM)->delete();
+            DB::table('ARCHIVOS')->where('ID_DOCUMENTO','=',$fedocumento_t->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$fedocumento_t->DOCUMENTO_ITEM)->delete();
+            DB::table('FE_DOCUMENTO_HISTORIAL')->where('ID_DOCUMENTO','=',$fedocumento_t->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$fedocumento_t->DOCUMENTO_ITEM)->delete();
+            DB::table('CMP.DOC_ASOCIAR_COMPRA')->where('COD_ORDEN','=',$fedocumento_t->ID_DOCUMENTO)->delete();
+        }
+
+        $documentolinea                     =   $this->ge_linea_documento($ordencompra->COD_DOCUMENTO_CTBLE);
+        //REGISTRO DEL XML LEIDO
+        $documento                          =   new FeDocumento;
+        $documento->ID_DOCUMENTO            =   $ordencompra->COD_DOCUMENTO_CTBLE;
+        $documento->DOCUMENTO_ITEM          =   $documentolinea;
+        $documento->COD_EMPR                =   Session::get('empresas')->COD_EMPR;
+        $documento->TXT_EMPR                =   Session::get('empresas')->NOM_EMPR;
+        $documento->TXT_PROCEDENCIA         =   $procedencia;
+        $documento->ESTADO                  =   'A';
+        $documento->RUC_PROVEEDOR           =   $ordencompra->NRO_DOCUMENTO;
+        $documento->RZ_PROVEEDOR            =   $ordencompra->TXT_EMPR_EMISOR;
+        $documento->TIPO_CLIENTE            =   '';
+        $documento->ID_CLIENTE              =   Session::get('empresas')->NRO_DOCUMENTO;
+        $documento->NOMBRE_CLIENTE          =   Session::get('empresas')->NOM_EMPR;
+        $documento->DIRECCION_CLIENTE       =   '';
+        $documento->SERIE                   =   $ordencompra->NRO_SERIE;
+        $documento->NUMERO                  =   $ordencompra->NRO_DOC;
+        $documento->ID_TIPO_DOC             =   '';
+        $documento->FEC_VENTA               =   date_format(date_create($ordencompra->FEC_EMISION), 'Ymd');
+        $documento->FEC_VENCI_PAGO          =   date_format(date_create($ordencompra->FEC_EMISION), 'Ymd');
+        $documento->FORMA_PAGO              =   '';
+        $documento->FORMA_PAGO_DIAS         =   0;
+        $documento->MONEDA                  =   '';
+        $documento->VALOR_IGV_ORIG          =   0;
+        $documento->VALOR_IGV_SOLES         =   0;
+        $documento->SUB_TOTAL_VENTA_ORIG    =   $ordencompra_n->CAN_SUB_TOTAL;
+        $documento->SUB_TOTAL_VENTA_SOLES   =   $ordencompra_n->CAN_SUB_TOTAL;
+        $documento->TOTAL_VENTA_ORIG        =   $ordencompra_n->CAN_TOTAL;
+        $documento->TOTAL_VENTA_SOLES       =   $ordencompra_n->CAN_TOTAL;
+        $documento->PERCEPCION              =   0;
+        $documento->MONTO_RETENCION         =   0;
+        $documento->HORA_EMISION            =   date_format(date_create($ordencompra_n->FEC_EMISION), 'h:i:s');
+        $documento->IMPUESTO_2              =   0;
+        $documento->TIPO_DETRACCION         =   '';
+        $documento->PORC_DETRACCION         =   0;
+        $documento->MONTO_DETRACCION        =   0;
+        $documento->MONTO_ANTICIPO          =   0;
+        $documento->NRO_ORDEN_COMP          =   '';              
+        $documento->NUM_GUIA                =   '';
+        $documento->estadoCp                =   0;
+        $documento->ARCHIVO_XML             =   '';
+        $documento->ARCHIVO_CDR             =   '';
+        $documento->ARCHIVO_PDF             =   '';
+        $documento->COD_CONTACTO            =   '';
+        $documento->TXT_CONTACTO            =   '';
+        $documento->COD_ESTADO              =   '';
+        $documento->TXT_ESTADO              =   '';
+        $documento->ind_email_uc            =   -1;
+        $documento->ind_email_ap            =   -1;
+        $documento->ind_email_adm           =   -1;
+        $documento->ind_email_ba            =   -1;
+        $documento->ind_email_clap          =   -1;
+        $documento->OPERACION               =   'PROVISION_GASTO';
+        $documento->OPERACION_DET           =   'SIN_XML';
+        $documento->MONTO_NC                =   0.00;
+        $documento->save();
+
+        $contacto               =   DB::table('users')->where('ind_contacto','=',1)->pluck('nombre','id')->toArray();
+        $combocontacto          =   array('' => "Seleccione Contacto") + $contacto;
+        $xmlfactura             =   'FACTURA';
+        $rhxml                  =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
+                                    //->where('IND_OBLIGATORIO','=',1)
+                                    ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000013'])
+                                    ->where('TXT_ASIGNADO','=','PROVEEDOR')
+                                    ->first();
+        $usuario                =   SGDUsuario::where('COD_USUARIO','=',$ordencompra->COD_USUARIO_CREA_AUD)->first();
+
+        if(count($rhxml)>0){
+            $xmlfactura         =   $rhxml->NOM_CATEGORIA_DOCUMENTO;
+        }
+        $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
+
+
+        $docasociar                              =   New CMPDocAsociarCompra;
+        $docasociar->COD_ORDEN                   =   $ordencompra->COD_DOCUMENTO_CTBLE;
+        $docasociar->COD_CATEGORIA_DOCUMENTO     =   'DCC0000000000001';
+        $docasociar->NOM_CATEGORIA_DOCUMENTO     =   'ORDEN DE COMPRA';
+        $docasociar->IND_OBLIGATORIO             =   1;
+        $docasociar->TXT_FORMATO                 =   'PDF';
+        $docasociar->TXT_ASIGNADO                =   'CONTACTO';
+        $docasociar->COD_USUARIO_CREA_AUD        =   Session::get('usuario')->id;
+        $docasociar->FEC_USUARIO_CREA_AUD        =   $this->fechaactual;
+        $docasociar->COD_ESTADO                  =   1;
+        $docasociar->TIP_DOC                     =   'N';
+        $docasociar->save();
+
+        $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
+                                    ->whereIn('TXT_FORMATO', ['PDF'])
+                                    ->get();
+
+        $ordencompra_f          =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$idoc)->first();
+
+        $rutafila                   =   "";
+        $rutaorden                  =   "";
+
+        $funcion                =   $this;
+        $fedocumento_x          =   FeDocumento::where('TXT_REFERENCIA','=',$idoc)->first();
+
+        $arraybancos            =   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
+        $combobancos            =   array('' => "Seleccione Entidad Bancaria") + $arraybancos;
+
+        $cb_id                  =   '';
+        $combocb                =   array('' => "Seleccione Cuenta Bancaria");
+        $user_orden             =   User::where('usuarioosiris_id','=',$ordencompra_f->COD_EMPR_EMISOR)->first();
+        $empresa                =   STDEmpresa::where('COD_EMPR','=',$ordencompra_f->COD_EMPR_EMISOR)->first();
+
+
+        $combotipodetraccion    =   array('' => "Seleccione Tipo Detraccion",'MONTO_REFERENCIAL' => 'MONTO REFERENCIAL' , 'MONTO_FACTURACION' => 'MONTO FACTURACION');
+        $combopagodetraccion    =   array('' => "Seleccione Pago Detraccion",$ordencompra_f->COD_EMPR_EMISOR => $ordencompra_f->TXT_EMPR_EMISOR , Session::get('empresas')->COD_EMPR => Session::get('empresas')->NOM_EMPR);
+
+        $fedocumento_x          =   FeDocumento::where('TXT_REFERENCIA','=',$idoc)->first();
+
+        //ANTICIPO
+        $COD_EMPR               =   Session::get('empresas')->COD_EMPR;
+        $COD_CENTRO             =   '';
+        $FEC_CORTE              =   $this->hoy_sh;
+        $CLIENTE                =   $ordencompra_f->COD_EMPR_EMISOR;
+        $COD_MONEDA             =   $ordencompra_f->COD_CATEGORIA_MONEDA;
+
+        $monto_anticipo         =   0.00;
+
+        $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.OBTENER_ADELANTOS_PROVEEDOR_DETALLADO 
+                                                                @COD_EMPR = ?,
+                                                                @COD_CENTRO = ?,
+                                                                @FEC_CORTE = ?,
+                                                                @CLIENTE = ?,
+                                                                @COD_MONEDA = ?'
+                                                            );
+        $stmt->bindParam(1, $COD_EMPR, PDO::PARAM_STR);
+        $stmt->bindParam(2, $COD_CENTRO, PDO::PARAM_STR);
+        $stmt->bindParam(3, $FEC_CORTE, PDO::PARAM_STR);
+        $stmt->bindParam(4, $CLIENTE, PDO::PARAM_STR);
+        $stmt->bindParam(5, $COD_MONEDA, PDO::PARAM_STR);
+        $stmt->execute();
+        $listaanticipo = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $arrayitem      = array();
+
+        //ver si ya estan registrados algunos anticipos
+        foreach ($listaanticipo as $index => $item) {
+
+            $existeanticipo          =   FeDocumento::where('COD_ANTICIPO','=',$item['COD_HABILITACION'])
+                                         ->whereIn('COD_ESTADO',['ETM0000000000002','ETM0000000000003','ETM0000000000004','ETM0000000000005','ETM0000000000008'])
+                                         ->first();
+            if(count($existeanticipo)<=0){
+                $arrayitem               =   $arrayitem + array($item['COD_HABILITACION'] => $item['NRO_SERIE'].'-'.$item['NRO_DOC'].' // '.$item['CAN_SALDO']);
+                $monto_anticipo          =   $monto_anticipo + (float)$item['CAN_SALDO'];  
+            }
+
+        }
+        $comboant               =   array('' => "Seleccione Anticipo")+$arrayitem;
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
+        
+
+        return View::make('comprobantesx/registrocomprobanteadministratorsxpg',
+                         [
+                            'ordencompra'           =>  $ordencompra,
+                            'detalleordencompra'    =>  $detalleordencompra,
+                            'fedocumento_x'         =>  $fedocumento_x,
+                            'ordencompra_f'         =>  $ordencompra_f,
+                            'combobancos'           =>  $combobancos,
+                            'combocb'               =>  $combocb,
+                            'empresa'               =>  $empresa,
+
+                            'comboant'              =>  $comboant,
+                            'monto_anticipo'        =>  $monto_anticipo,
+                            'combotipodetraccion'   =>  $combotipodetraccion,
+                            'combopagodetraccion'   =>  $combopagodetraccion,
+
+                            'fedocumento'           =>  $fedocumento,
+                            'combocontacto'         =>  $combocontacto,
+                            'procedencia'           =>  $procedencia,
+                            'xmlfactura'            =>  $xmlfactura,
+                            'tp'                    =>  $tp,
+                            'tarchivos'             =>  $tarchivos,
+                            'usuario'               =>  $usuario,
+                            'rutaorden'             =>  $rutaorden,
+                            'funcion'               =>  $funcion,
+                            'idopcion'              =>  $idopcion,
+                         ]);
+    }
+
+
 
     public function actionDetalleComprobanteOCAdministratorSinXML($procedencia,$idopcion, $prefijo, $idordencompra, Request $request) {
 
@@ -315,6 +521,9 @@ class GestionOCSXController extends Controller
                             'idopcion'              =>  $idopcion,
                          ]);
     }
+
+
+
 
 
     public function actionValidarXMLAdministratorSX($idopcion, $prefijo, $idordencompra,Request $request)
@@ -702,7 +911,281 @@ class GestionOCSXController extends Controller
     }
 
 
+    public function actionValidarXMLAdministratorSXPG($idopcion, $prefijo, $idordencompra,Request $request)
+    {
 
+        $file                   =   $request['inputxml'];
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo_contrato($idordencompra,$prefijo);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_pg_idoc($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_pg_comprobante_idoc($idoc);
+
+        if($_POST)
+        {
+
+            try{    
+                
+                DB::beginTransaction();
+                $contacto_id       =   $request['contacto_id'];
+                $procedencia       =   $request['procedencia'];
+                $fedocumento       =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
+
+                //guardar orden de compra precargada
+                $rutaorden       =   $request['rutaorden'];
+                if($rutaorden!=''){
+                    $aoc                            =       CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+                                                            ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000001'])
+                                                            ->first();
+                    $contadorArchivos = Archivo::count();
+                    $nombrefilecdr                  =       $contadorArchivos.'-'.$ordencompra->COD_ORDEN.'.pdf';
+                    $prefijocarperta                =       $this->prefijo_empresa($ordencompra->COD_EMPR);
+                    $rutafile                       =       $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
+                    $rutacompleta                   =       $rutafile.'\\'.$nombrefilecdr;
+                    $valor                          =       $this->versicarpetanoexiste($rutafile);
+                    $path                           =       $rutacompleta;
+                    //$directorio                     =       '\\\\10.1.0.201\cpe\Orden_Compra';
+                    //$rutafila                       =       $directorio.'\\'.$nombreArchivoBuscado;
+                    copy($rutaorden,$rutacompleta);
+                    $dcontrol                       =       new Archivo;
+                    $dcontrol->ID_DOCUMENTO         =       $ordencompra->COD_ORDEN;
+                    $dcontrol->DOCUMENTO_ITEM       =       $fedocumento->DOCUMENTO_ITEM;
+                    $dcontrol->TIPO_ARCHIVO         =       $aoc->COD_CATEGORIA_DOCUMENTO;
+                    $dcontrol->NOMBRE_ARCHIVO       =       $nombrefilecdr;
+                    $dcontrol->DESCRIPCION_ARCHIVO  =       $aoc->NOM_CATEGORIA_DOCUMENTO;
+                    $dcontrol->URL_ARCHIVO          =       $path;
+                    $dcontrol->SIZE                 =       100;
+                    $dcontrol->EXTENSION            =       '.pdf';
+                    $dcontrol->ACTIVO               =       1;
+                    $dcontrol->FECHA_CREA           =       $this->fechaactual;
+                    $dcontrol->USUARIO_CREA         =       Session::get('usuario')->id;
+                    $dcontrol->save();
+                }
+
+                $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+                                            ->whereIn('TXT_FORMATO', ['PDF'])
+                                            ->get();
+
+                foreach($tarchivos as $index => $item){
+                    $filescdm          =   $request[$item->COD_CATEGORIA_DOCUMENTO];
+                    if(!is_null($filescdm)){
+
+                        foreach($filescdm as $file){
+
+                            $contadorArchivos = Archivo::count();
+                            $nombre          =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
+                            /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
+                            $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
+                            $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
+                            // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
+                            $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                            $valor           =      $this->versicarpetanoexiste($rutafile);
+                            $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
+                            copy($file->getRealPath(),$rutacompleta);
+                            $path            =      $rutacompleta;
+
+                            $nombreoriginal             =   $file->getClientOriginalName();
+                            $info                       =   new SplFileInfo($nombreoriginal);
+                            $extension                  =   $info->getExtension();
+
+                            $dcontrol                       =   new Archivo;
+                            $dcontrol->ID_DOCUMENTO         =   $ordencompra->COD_ORDEN;
+                            $dcontrol->DOCUMENTO_ITEM       =   $fedocumento->DOCUMENTO_ITEM;
+                            $dcontrol->TIPO_ARCHIVO         =   $item->COD_CATEGORIA_DOCUMENTO;
+                            $dcontrol->NOMBRE_ARCHIVO       =   $nombrefilecdr;
+                            $dcontrol->DESCRIPCION_ARCHIVO  =   $item->NOM_CATEGORIA_DOCUMENTO;
+
+
+                            $dcontrol->URL_ARCHIVO      =   $path;
+                            $dcontrol->SIZE             =   filesize($file);
+                            $dcontrol->EXTENSION        =   $extension;
+                            $dcontrol->ACTIVO           =   1;
+                            $dcontrol->FECHA_CREA       =   $this->fechaactual;
+                            $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
+                            $dcontrol->save();
+                        }
+                    }
+                }
+
+                $contacto                                 =   SGDUsuario::where('COD_TRABAJADOR','=',$contacto_id)->first();
+                $trabajador                               =   STDTrabajador::where('COD_TRAB','=',$contacto->COD_TRABAJADOR)->first();
+                $ordencompra_t                            =   CMPOrden::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->first();
+                $entidadbanco_id                          =   $request['entidadbanco_id'];
+                $bancocategoria                           =   CMPCategoria::where('COD_CATEGORIA','=',$entidadbanco_id)->first();
+                $cb_id                                    =   $request['cb_id'];
+                $ctadetraccion                            =   $request['ctadetraccion'];
+                $monto_detraccion                         =   $request['monto_detraccion'];
+                $pago_detraccion                          =   $request['pago_detraccion'];
+                $empresa_sel                              =   STDEmpresa::where('COD_EMPR','=',$pago_detraccion)->first();
+                $COD_PAGO_DETRACCION                      =   '';
+                $TXT_PAGO_DETRACCION                      =   '';
+                if(count($empresa_sel)>0){
+                    $COD_PAGO_DETRACCION = $empresa_sel->COD_EMPR;
+                    $TXT_PAGO_DETRACCION = $empresa_sel->NOM_EMPR;
+                }
+                if($ctadetraccion!=''){
+                    STDEmpresa::where('COD_EMPR',$ordencompra_t->COD_EMPR_CLIENTE)
+                                ->update(
+                                    [
+                                        'TXT_DETRACCION'=>$ctadetraccion
+                                    ]
+                                );
+                }
+                $monto_anticipo_txt     =   $request['monto_anticipo'];
+                $MONTO_ANTICIPO_DESC    =   0.00;
+                $COD_ANTICIPO           =   '';
+                $SERIE_ANTICIPO         =   '';
+                $NRO_ANTICIPO           =   '';
+
+                if($monto_anticipo_txt!=''){
+                    $COD_EMPR               =   Session::get('empresas')->COD_EMPR;
+                    $COD_CENTRO             =   '';
+                    $FEC_CORTE              =   $this->hoy_sh;
+                    $CLIENTE                =   $ordencompra_t->COD_EMPR_CLIENTE;
+                    $COD_MONEDA             =   $ordencompra_t->COD_CATEGORIA_MONEDA;
+                    $monto_anticipo         =   0.00;
+
+                    $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC CMP.OBTENER_ADELANTOS_PROVEEDOR_DETALLADO 
+                                                                            @COD_EMPR = ?,
+                                                                            @COD_CENTRO = ?,
+                                                                            @FEC_CORTE = ?,
+                                                                            @CLIENTE = ?,
+                                                                            @COD_MONEDA = ?'
+                                                                        );
+                    $stmt->bindParam(1, $COD_EMPR, PDO::PARAM_STR);
+                    $stmt->bindParam(2, $COD_CENTRO, PDO::PARAM_STR);
+                    $stmt->bindParam(3, $FEC_CORTE, PDO::PARAM_STR);
+                    $stmt->bindParam(4, $CLIENTE, PDO::PARAM_STR);
+                    $stmt->bindParam(5, $COD_MONEDA, PDO::PARAM_STR);
+                    $stmt->execute();
+                    $listaanticipo = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    $arrayitem      = array();
+
+
+                    foreach ($listaanticipo as $index => $item) {
+                        if($item['COD_HABILITACION'] == $monto_anticipo_txt){
+                            $MONTO_ANTICIPO_DESC = (float)$item['CAN_SALDO'];
+                            $COD_ANTICIPO = $item['COD_HABILITACION'];
+                            $SERIE_ANTICIPO = $item['NRO_SERIE'];
+                            $NRO_ANTICIPO = $item['NRO_DOC'];
+                        }
+                    }
+                }
+
+                $serie                  =   $request['serie'];
+                $numero                 =   $request['numero'];
+                $fechaventa             =   $request['fechaventa'];
+                $fechavencimiento       =   $request['fechavencimiento'];
+
+                FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                            ->update(
+                                [
+                                    'COD_CATEGORIA_BANCO'=>$bancocategoria->COD_CATEGORIA,
+                                    'TXT_CATEGORIA_BANCO'=>$bancocategoria->NOM_CATEGORIA,
+                                    'TXT_NRO_CUENTA_BANCARIA'=>$cb_id,
+                                    'ARCHIVO_CDR'=>'',
+                                    'ARCHIVO_PDF'=>'',
+
+                                    'MONTO_ANTICIPO_DESC'=>$MONTO_ANTICIPO_DESC,
+                                    'COD_ANTICIPO'=>$COD_ANTICIPO,
+                                    'SERIE_ANTICIPO'=>$SERIE_ANTICIPO,
+                                    'NRO_ANTICIPO'=>$NRO_ANTICIPO,
+
+                                    'SERIE'=>$serie,
+                                    'NUMERO'=>$numero,
+                                    'FEC_VENTA'=>$fechaventa,
+                                    'FEC_VENCI_PAGO'=>$fechavencimiento,
+
+                                    'CTA_DETRACCION'=>$ctadetraccion,
+                                    'MONTO_DETRACCION_XML'=>$monto_detraccion,
+                                    'MONTO_DETRACCION_RED'=>round($monto_detraccion),
+                                    'COD_PAGO_DETRACCION'=>$COD_PAGO_DETRACCION,
+                                    'TXT_PAGO_DETRACCION'=>$TXT_PAGO_DETRACCION,
+
+                                    'COD_ESTADO'=>'ETM0000000000002',
+                                    'TXT_ESTADO'=>'POR APROBAR USUARIO CONTACTO',
+                                    'dni_usuariocontacto'=>$trabajador->NRO_DOCUMENTO,
+                                    'COD_CONTACTO'=>$contacto->COD_TRABAJADOR,
+                                    'ind_email_uc'=>0,
+                                    'TXT_CONTACTO'=>$contacto->NOM_TRABAJADOR,
+                                    'fecha_pa'=>$this->fechaactual,
+                                    'usuario_pa'=>Session::get('usuario')->id,
+
+                                ]
+                            );
+
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento                              =   new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $ordencompra->COD_ORDEN;
+                $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA                       =   date_format(date_create($ordencompra_t->FEC_USUARIO_CREA_AUD), 'Ymd h:i:s');
+                $documento->USUARIO_ID                  =   $contacto->COD_TRABAJADOR;
+                $documento->USUARIO_NOMBRE              =   $contacto->NOM_TRABAJADOR;
+                $documento->TIPO                        =   'CREO ORDEN COMPRA';
+                $documento->MENSAJE                     =   '';
+                $documento->save();
+
+
+                $ordencompra_tt                            =   CMPOrden::where('COD_ORDEN','=',$fedocumento->ID_DOCUMENTO)->first();
+                $trabajador = DB::table('STD.TRABAJADOR')->where('COD_TRAB', $ordencompra_tt->COD_TRABAJADOR_ENCARGADO)->first();
+                $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('dni','=',$trabajador->NRO_DOCUMENTO)->first();
+
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento                              =   new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $ordencompra->COD_ORDEN;
+                $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA                       =   $this->fechaactual;
+                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                $documento->TIPO                        =   'SUBIO DOCUMENTOS';
+                $documento->MENSAJE                     =   '';
+                $documento->save();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'SUBIO DOCUMENTOS');
+                //geolocalizacion
+
+                $orden                                  =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$idoc)->first();
+                $fedocumento_x                          =   FeDocumento::where('TXT_REFERENCIA','=',$idoc)->first();
+
+                //SI ES SERVICIO PASA NORMAL
+                FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                            ->update(
+                                [
+                                    'COD_ESTADO'=>'ETM0000000000003',
+                                    'TXT_ESTADO'=>'POR APROBAR CONTABILIDAD',
+                                    'ind_email_ap'=>0,
+                                    'fecha_uc'=>$this->fechaactual,
+                                    'usuario_uc'=>Session::get('usuario')->id
+                                ]
+                            );
+
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento                              =   new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA                       =   $this->fechaactual;
+                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                $documento->TIPO                        =   'APROBADO POR USUARIO CONTACTO';
+                $documento->MENSAJE                     =   '';
+                $documento->save();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR USUARIO CONTACTO');
+                //geolocalizacion
+
+ 
+                DB::commit();
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                //dd($ex);
+                return Redirect::to('detalle-comprobante-oc-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+            return Redirect::to('gestion-de-orden-compra/'.$idopcion)->with('bienhecho', 'Se valido el xml correctamente');
+
+        }
+    }
 
 
 }

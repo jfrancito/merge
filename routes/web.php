@@ -87,6 +87,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/pdf-sunat-personal', 'GestionLiquidacionGastosController@actionPdfSunatPersonal');
 
 	Route::any('/ajax-modal-ver-cuenta-bancaria-contrato', 'UserController@actionAjaxModalVerCuentaBancariaContrato');
+	Route::any('/ajax-modal-ver-cuenta-bancaria-pg', 'UserController@actionAjaxModalVerCuentaBancariaPG');
+
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-contrato', 'UserController@actionAjaxModalConfiguracionCuentaBancariaContrato');
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-oc', 'UserController@actionAjaxModalConfiguracionCuentaBancariaOC');
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-estiba', 'UserController@actionAjaxModalConfiguracionCuentaBancariaEstiba');
@@ -426,7 +428,9 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/ajax-moneda-ajax-cuenta', 'GestionOCController@actionAjaxMonedaAjaxCuenta');
 
-
+	//PROVISION DE GASTOS
+	Route::any('/detalle-comprobante-provision-gasto-administrator/{procedencia}/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCSXController@actionDetalleComprobantePGAdministratorSinXML');
+	Route::any('/validar-xml-oc-administrator-sx-pg/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCSXController@actionValidarXMLAdministratorSXPG');
 
 
 	//ADMINISTRATOR CONTRATO
@@ -724,6 +728,9 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/gestion-de-provision-comprobante/{idopcion}', 'GestionOCProvisionController@actionListarComprobanteProvision');
 	Route::any('/provisionar-documentos/{idopcion}', 'GestionOCProvisionController@actionListarProvisionarComprobante');
+
+
+	
 	Route::any('/descargar-archivo-requerimiento-xml/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDescargarXML');
 	Route::any('/descargar-archivo-requerimiento-cdr/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDescargarCDR');
 	Route::any('/descargar-archivo-requerimiento-pdf/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDescargarPDF');
