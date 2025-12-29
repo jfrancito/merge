@@ -33,6 +33,7 @@
 
                 <form method="POST" action="{{ url('/guardar-movilidad-detalle-masivo/'.$idopcion.'/'.Hashids::encode(substr($lote->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" id ='frmdetalleimpulso'>
                       {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
                   <div class='formconsulta'>
                     @include('planillamovilidadimpulso.form.famovilidadimpulsomasivo')
                   </div>
@@ -45,6 +46,7 @@
                   <div class="col-xs-12 ">
                     <form method="POST" action="{{ url('/emitir-movilidad-impulso-masivo/'.$idopcion.'/'.Hashids::encode(substr($lote->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" id ='frmpmemitir'>
                           {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
                           <div class="row xs-pt-15">
                             <div class="col-xs-6">
                                 <div class="be-checkbox">

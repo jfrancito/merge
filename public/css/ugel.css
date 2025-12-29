@@ -1,3 +1,7 @@
+.ocultar{
+  display: none ;
+}
+
 .importecomision {
     height: 26px;
     width: 90px !important;

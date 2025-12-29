@@ -29,6 +29,7 @@
 
             <form method="POST" action="{{ url('/emitir-planilla-movilidad/'.$idopcion.'/'.Hashids::encode(substr($planillamovilidad->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" id ='frmpmemitir'>
                   {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
                 <div class='formconsulta'>
                   @include('planillamovilidad.form.faplanillamovilidad')
                 </div>

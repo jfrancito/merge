@@ -151,6 +151,7 @@ trait EnviarCorreoVRDetalleImporteTraits
                         $emailTrabajadorAutoriza,
                         'marley.sucse@induamerica.com.pe',
                         'diana.malca@induamerica.com.pe',
+                        'analucia.lopez@induamerica.com.pe',
                         'franklin.llontop@induamerica.com.pe'
                     ];
                 } else {
@@ -161,6 +162,7 @@ trait EnviarCorreoVRDetalleImporteTraits
                         $emailTrabajadorAutoriza,
                         'marley.sucse@induamerica.com.pe',
                         'diana.malca@induamerica.com.pe',
+                        'analucia.lopez@induamerica.com.pe',
                         'franklin.llontop@induamerica.com.pe'
                     ];
                 }
@@ -175,6 +177,7 @@ trait EnviarCorreoVRDetalleImporteTraits
                         $emailTrabajadorAutoriza,
                         'marley.sucse@induamerica.com.pe',
                         'diana.malca@induamerica.com.pe',
+                        'analucia.lopez@induamerica.com.pe',
                         'franklin.llontop@induamerica.com.pe'
                     ];
                 } else {
@@ -186,6 +189,7 @@ trait EnviarCorreoVRDetalleImporteTraits
                         $emailTrabajadorAutoriza,
                         'marley.sucse@induamerica.com.pe',
                         'diana.malca@induamerica.com.pe',
+                        'analucia.lopez@induamerica.com.pe',
                         'franklin.llontop@induamerica.com.pe'
                     ];
                 }
@@ -200,6 +204,7 @@ trait EnviarCorreoVRDetalleImporteTraits
                         $emailTrabajadorAutoriza,
                         'marley.sucse@induamerica.com.pe',
                         'diana.malca@induamerica.com.pe',
+                        'analucia.lopez@induamerica.com.pe',
                         'franklin.llontop@induamerica.com.pe'
                     ];
                 } else {
@@ -210,6 +215,7 @@ trait EnviarCorreoVRDetalleImporteTraits
                         $emailTrabajadorAutoriza,
                         'marley.sucse@induamerica.com.pe',
                         'diana.malca@induamerica.com.pe',
+                        'analucia.lopez@induamerica.com.pe',
                         'franklin.llontop@induamerica.com.pe'
                     ];
                 }
@@ -223,7 +229,9 @@ trait EnviarCorreoVRDetalleImporteTraits
                         $emailTrabajadorAutoriza,
                         'marley.sucse@induamerica.com.pe',
                         'diana.malca@induamerica.com.pe',
+                        'analucia.lopez@induamerica.com.pe',
                         'franklin.llontop@induamerica.com.pe'
+                       
                     ];
             }
 

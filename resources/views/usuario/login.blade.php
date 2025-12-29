@@ -54,6 +54,7 @@
 
                       <form method="POST" action="{{ url('login') }}">
                         {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
 
                         <div class="form-group">
 

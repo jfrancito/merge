@@ -33,6 +33,7 @@
       <div class="form-v10-content">
         <form class="form-detail" action="{{ url('registrate') }}" method="POST" id="myform">
           {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
           <div class="form-left">
             <h2>Datos Principales </h2> 
                 <div class="row regla-modal">

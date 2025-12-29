@@ -28,6 +28,7 @@
 
                 <form method="POST" action="{{ url('/guardar-movilidad-detalle/'.$idopcion.'/'.Hashids::encode(substr($movilidad->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" id ='frmdetalleimpulso'>
                       {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
                   <div class='formconsulta'>
                     @include('planillamovilidadimpulso.form.famovilidadimpulso')
                   </div>
@@ -45,6 +46,7 @@
                   <div class="col-xs-12 col-sm-6 col-md-4 col-lg-6">
                     <form method="POST" action="{{ url('/emitir-movilidad-impulso/'.$idopcion.'/'.Hashids::encode(substr($movilidad->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" id ='frmpmemitir'>
                           {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
 
                         <div class="row xs-pt-15">
                           <div class="col-xs-6">

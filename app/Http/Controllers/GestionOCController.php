@@ -291,7 +291,18 @@ class GestionOCController extends Controller
 
     }
 
-    
+    public function actionApiLeerXmlSapNC(Request $request)
+    {
+
+        header('Content-Type: text/html; charset=UTF-8');
+        //$path = storage_path() . "/exports/FC26-00002985.XML";
+        $path = storage_path() . "/exports/20479729141-07-F006-00000165.xml";
+        $parser = new NoteParser();
+        $xml = file_get_contents($path);
+        $factura = $parser->parse($xml);
+        dd($factura);
+
+    }
 
 
     public function actionApiLeerRHSap(Request $request)
@@ -583,6 +594,23 @@ class GestionOCController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
+
+                $ordencompra_tt                            =   CMPOrden::where('COD_ORDEN','=',$fedocumento->ID_DOCUMENTO)->first();
+                $trabajador = DB::table('STD.TRABAJADOR')->where('COD_TRAB', $ordencompra_tt->COD_TRABAJADOR_ENCARGADO)->first();
+                $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('dni','=',$trabajador->NRO_DOCUMENTO)->first();
+
+                if(count($trabajadorcorreo)>0){
+                    $documento                              =   new FeDocumentoHistorial;
+                    $documento->ID_DOCUMENTO                =   $ordencompra_tt->COD_ORDEN;
+                    $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                    $documento->FECHA                       =   date_format(date_create($ordencompra_tt->FEC_USUARIO_CREA_AUD), 'Ymd h:i:s');
+                    $documento->USUARIO_ID                  =   $trabajadorcorreo->COD_TRAB;
+                    $documento->USUARIO_NOMBRE              =   $trabajadorcorreo->apellidopaterno.' '.$trabajadorcorreo->apellidomaterno.' '.$trabajadorcorreo->nombres;;
+                    $documento->TIPO                        =   'APRUEBA EN OSIRIS';
+                    $documento->MENSAJE                     =   '';
+                    $documento->save();
+                }
+
                 //HISTORIAL DE DOCUMENTO APROBADO
                 $documento                              =   new FeDocumentoHistorial;
                 $documento->ID_DOCUMENTO                =   $ordencompra->COD_ORDEN;
@@ -594,6 +622,11 @@ class GestionOCController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'SUBIO DOCUMENTOS');
+                //geolocalizacion
 
                 //LE LLEGA AL USUARIO DE CONTACTO
                 // $trabajador         =   STDTrabajador::where('COD_TRAB','=',$contacto->COD_TRABAJADOR)->first();
@@ -2193,6 +2226,23 @@ class GestionOCController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
+
+                $ordencompra_tt                            =   CMPOrden::where('COD_ORDEN','=',$fedocumento->ID_DOCUMENTO)->first();
+                $trabajador = DB::table('STD.TRABAJADOR')->where('COD_TRAB', $ordencompra_tt->COD_TRABAJADOR_ENCARGADO)->first();
+                $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('dni','=',$trabajador->NRO_DOCUMENTO)->first();
+
+                if(count($trabajadorcorreo)>0){
+                    $documento                              =   new FeDocumentoHistorial;
+                    $documento->ID_DOCUMENTO                =   $ordencompra_tt->COD_ORDEN;
+                    $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                    $documento->FECHA                       =   date_format(date_create($ordencompra_tt->FEC_USUARIO_CREA_AUD), 'Ymd h:i:s');
+                    $documento->USUARIO_ID                  =   $trabajadorcorreo->COD_TRAB;
+                    $documento->USUARIO_NOMBRE              =   $trabajadorcorreo->apellidopaterno.' '.$trabajadorcorreo->apellidomaterno.' '.$trabajadorcorreo->nombres;;
+                    $documento->TIPO                        =   'APRUEBA EN OSIRIS';
+                    $documento->MENSAJE                     =   '';
+                    $documento->save();
+                }
+
                 //HISTORIAL DE DOCUMENTO APROBADO
                 $documento                              =   new FeDocumentoHistorial;
                 $documento->ID_DOCUMENTO                =   $ordencompra->COD_ORDEN;
@@ -2203,6 +2253,11 @@ class GestionOCController extends Controller
                 $documento->TIPO                        =   'SUBIO DOCUMENTOS';
                 $documento->MENSAJE                     =   '';
                 $documento->save();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'SUBIO DOCUMENTOS');
+                //geolocalizacion
 
                 // $fedocumento_w       =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
                 // //LE LLEGA AL USUARIO DE CONTACTO
@@ -3027,7 +3082,7 @@ class GestionOCController extends Controller
                 }
                 return Redirect::to('detalle-comprobante-liquidacion-compra-anticipo-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordenpago)->with('bienhecho', 'Se valido el xml');
             }else{
-                dd("errpr");
+                //dd("errpr");
                 return Redirect::to('detalle-comprobante-liquidacion-compra-anticipo-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordenpago)->with('errorurl', 'Archivo XML de la Orden de Pago No Encontrado ');
             }
 
@@ -3149,12 +3204,17 @@ class GestionOCController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'SUBIO DOCUMENTOS');
+                //geolocalizacion
 
                 FeDocumento::where('ID_DOCUMENTO',$idop)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(
                                 [
-                                    'COD_ESTADO'=>'ETM0000000000004',
-                                    'TXT_ESTADO'=>'POR APROBAR ADMINISTRACION',
+                                    'COD_ESTADO'=>'ETM0000000000012',
+                                    'TXT_ESTADO'=>'POR APROBAR JEFE ACOPIO',
+                                    'IND_EMAIL_JEFE_ACOPIO'=>0,
                                     'ind_email_ap'=>0,
                                     'fecha_uc'=>$this->fechaactual,
                                     'usuario_uc'=>Session::get('usuario')->id
@@ -3172,16 +3232,12 @@ class GestionOCController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();               
 
-                Mail::send('emails.emailliquidacioncompraanticipogenerado',
-                [
-                    'ordenpago'     => $ordenpago,
-                    'estado'        => 'APROBADO POR USUARIO CONTACTO',
-                ],
-                function ($message) {
-                    $message->from('jessica.sandoval@induamerica.com.pe', 'Sistemas')
-                            ->to('jorge.saldana@induamerica.com.pe')                            
-                            ->subject('LIQUIDACION DE COMPRA ANTICIPO - INDUAMERICA');
-                });
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR USUARIO CONTACTO');
+                //geolocalizacion
+
 
 
                 DB::commit();
@@ -5403,6 +5459,23 @@ class GestionOCController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
+
+                $ordencompra_tt                            =   CMPOrden::where('COD_ORDEN','=',$fedocumento->ID_DOCUMENTO)->first();
+                $trabajador = DB::table('STD.TRABAJADOR')->where('COD_TRAB', $ordencompra_tt->COD_TRABAJADOR_ENCARGADO)->first();
+                $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('dni','=',$trabajador->NRO_DOCUMENTO)->first();
+
+                if(count($trabajadorcorreo)>0){
+                    $documento                              =   new FeDocumentoHistorial;
+                    $documento->ID_DOCUMENTO                =   $ordencompra_tt->COD_ORDEN;
+                    $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                    $documento->FECHA                       =   date_format(date_create($ordencompra_tt->FEC_USUARIO_CREA_AUD), 'Ymd h:i:s');
+                    $documento->USUARIO_ID                  =   $trabajadorcorreo->COD_TRAB;
+                    $documento->USUARIO_NOMBRE              =   $trabajadorcorreo->apellidopaterno.' '.$trabajadorcorreo->apellidomaterno.' '.$trabajadorcorreo->nombres;;
+                    $documento->TIPO                        =   'APRUEBA EN OSIRIS';
+                    $documento->MENSAJE                     =   '';
+                    $documento->save();
+                }
+
                 //HISTORIAL DE DOCUMENTO APROBADO
                 $documento                              =   new FeDocumentoHistorial;
                 $documento->ID_DOCUMENTO                =   $ordencompra->COD_ORDEN;
@@ -5413,6 +5486,12 @@ class GestionOCController extends Controller
                 $documento->TIPO                        =   'SUBIO DOCUMENTOS';
                 $documento->MENSAJE                     =   '';
                 $documento->save();
+
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'SUBIO DOCUMENTOS');
+                //geolocalizacion
 
                 $orden                                  =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
 
@@ -5510,6 +5589,12 @@ class GestionOCController extends Controller
                     $documento->TIPO                        =   'APROBADO POR USUARIO CONTACTO';
                     $documento->MENSAJE                     =   '';
                     $documento->save();
+
+                    //geolocalizacion
+                    $device_info       =   $request['device_info'];
+                    $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR USUARIO CONTACTO');
+                    //geolocalizacion
+
 
                     //whatsaap para contabilidad
                     // $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->first();
@@ -6059,6 +6144,11 @@ class GestionOCController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'SUBIO DOCUMENTOS');
+                //geolocalizacion
+
 
                 FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(
@@ -6081,6 +6171,11 @@ class GestionOCController extends Controller
                 $documento->TIPO                        =   'APROBADO POR USUARIO CONTACTO';
                 $documento->MENSAJE                     =   '';
                 $documento->save();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR USUARIO CONTACTO');
+                //geolocalizacion
 
 
                 //whatsaap para contabilidad

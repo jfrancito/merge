@@ -165,6 +165,13 @@ class GestionUsuarioContactoController extends Controller
                         $documento->TIPO                        =   'RESOLVIO LOS REPARABLES';
                         $documento->MENSAJE                     =   '';
                         $documento->save();
+
+                        //geolocalizacion
+                        $device_info       =   $request['device_info'];
+                        $this->con_datos_de_la_pc($device_info,$fedocumento,'RESOLVIO LOS REPARABLES');
+                        //geolocalizacion
+
+
                     }
                 }
                 DB::commit();
@@ -682,6 +689,12 @@ class GestionUsuarioContactoController extends Controller
                 $documento->save();
 
 
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'RESOLVIO LAS OBSERVACIONES');
+                //geolocalizacion
+
                 //whatsaap para contabilidad
                 // $fedocumento_w          =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
                 // $ordencompra            =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();            
@@ -914,6 +927,11 @@ class GestionUsuarioContactoController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'RESOLVIO LAS OBSERVACIONES');
+                //geolocalizacion
+
                 //whatsaap para contabilidad
                 // $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
                 $ordencompra        =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();            
@@ -997,13 +1015,16 @@ class GestionUsuarioContactoController extends Controller
 
                 $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                             ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
-                                            ->whereNotIn('TXT_ASIGNADO', ['ARCHIVO_VIRTUAL','ARCHIVO_FISICO'])
+                                            //->whereNotIn('TXT_ASIGNADO', ['ARCHIVO_VIRTUAL','ARCHIVO_FISICO'])
                                             ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000009'])
                                             //->where('TXT_ASIGNADO','=','CONTACTO')
                                             ->get();
+            
+            //dd($tarchivos);
+
 
             }
-            
+
             if($fedocumento->OPERACION_DET == 'SIN_XML'){
                 $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                             ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
@@ -1142,53 +1163,66 @@ class GestionUsuarioContactoController extends Controller
                         }
                     }
 
-                    //whatsaap para contabilidad
-                    // $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
-                    // $ordencompra        =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();            
-                    // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                    // $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO
-                    //                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-                    //                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
-                    //                         .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A'
-                    //                         .'MENSAJE : '.'RESOLVIO LOS REPARABLES'.'%0D%0A';
+                    FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
+                    ->update(
+                        [
+                            'IND_REPARABLE'=>'2',
+                            'IND_CORREO_REPARABLE'=>'1',
+                            'IND_OBSERVACION_REPARABLE' =>0
+                        ]
+                    );
 
-                    // if(1==0){
-                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                    // }else{
-                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                    //     $this->insertar_whatsaap('51979659002','HAMILTON',$mensaje,'');
-                    //     $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
 
-                    //     //CONTABILIDAD
-                    //     if($prefijocarperta=='II'){
-                    //         $this->insertar_whatsaap('51965991360','ANGHIE',$mensaje,'');           //INTERNACIONAL
-                    //         $this->insertar_whatsaap('51988650421','LUCELY',$mensaje,'');           //INTERNACIONAL
-                    //     }else{
-                    //         $this->insertar_whatsaap('51950638955','MIGUEL',$mensaje,'');           //COMERCIAL
-                    //         $this->insertar_whatsaap('51935387084','VASQUEZ',$mensaje,'');          //COMERCIAL
-                    //     }
-                    // }  
+
+                    //HISTORIAL DE DOCUMENTO APROBADO
+                    $documento                              =   new FeDocumentoHistorial;
+                    $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                    $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                    $documento->FECHA                       =   $this->fechaactual;
+                    $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                    $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                    $documento->TIPO                        =   'RESOLVIO LOS REPARABLES VIRTUAL';
+                    $documento->MENSAJE                     =   '';
+                    $documento->save();
+
+                    //geolocalizacion
+                    $device_info       =   $request['device_info'];
+                    $this->con_datos_de_la_pc($device_info,$fedocumento,'RESOLVIO LOS REPARABLES VIRTUAL');
+                    //geolocalizacion
+
+
+
+                }else{
+                    FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
+                    ->update(
+                        [
+                            'IND_REPARABLE'=>'0'
+                        ]
+                    );
+
+                    //HISTORIAL DE DOCUMENTO APROBADO
+                    $documento                              =   new FeDocumentoHistorial;
+                    $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                    $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                    $documento->FECHA                       =   $this->fechaactual;
+                    $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                    $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                    $documento->TIPO                        =   'RESOLVIO LOS REPARABLES FISICO';
+                    $documento->MENSAJE                     =   '';
+                    $documento->save();
+
+                    //geolocalizacion
+                    $device_info       =   $request['device_info'];
+                    $this->con_datos_de_la_pc($device_info,$fedocumento,'RESOLVIO LOS REPARABLES FISICO');
+                    //geolocalizacion
+
+
 
                 }
 
-                FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
-                            ->update(
-                                [
-                                    'IND_REPARABLE'=>'2',
-                                    'IND_CORREO_REPARABLE'=>'1',
-                                    'IND_OBSERVACION_REPARABLE' =>0
-                                ]
-                            );
-                //HISTORIAL DE DOCUMENTO APROBADO
-                $documento                              =   new FeDocumentoHistorial;
-                $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
-                $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
-                $documento->FECHA                       =   $this->fechaactual;
-                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
-                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
-                $documento->TIPO                        =   'RESOLVIO LOS REPARABLES';
-                $documento->MENSAJE                     =   '';
-                $documento->save();
+
+
+
 
                 DB::commit();
                 return Redirect::to('/gestion-de-comprobantes-reparable/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' RESUELTO CON EXITO');
@@ -1302,6 +1336,12 @@ class GestionUsuarioContactoController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'REVISION DE REPARABLE ADMINISTRACION');
+                //geolocalizacion
+
+
                 DB::commit();
                 return Redirect::to('/gestion-de-reparable-admin/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' RESUELTO CON EXITO');
             }catch(\Exception $ex){
@@ -1408,6 +1448,12 @@ class GestionUsuarioContactoController extends Controller
                 $documento->TIPO                        =   'REVISION DE REPARABLE ADMINISTRACION';
                 $documento->MENSAJE                     =   '';
                 $documento->save();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'REVISION DE REPARABLE ADMINISTRACION');
+                //geolocalizacion
+
 
                 DB::commit();
                 return Redirect::to('/gestion-de-reparable-admin/'.$idopcion)->with('bienhecho', 'Comprobante : '.$idoc.' RESUELTO CON EXITO');
@@ -1562,31 +1608,7 @@ class GestionUsuarioContactoController extends Controller
                         }
                     }
 
-                    //whatsaap para contabilidad
-                    // $empresa_anti       =   STDEmpresa::where('NRO_DOCUMENTO','=',$fedocumento->RUC_PROVEEDOR)->first();
-                    // $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->first();
-                    // $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO
-                    //                         .'%0D%0A'.'EMPRESA : '.Session::get('empresas')->NOM_EMPR.'%0D%0A'
-                    //                         .'PROVEEDOR : '.$empresa_anti->NOM_EMPR.'%0D%0A'
-                    //                         .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A'
-                    //                         .'MENSAJE : '.'RESOLVIO LOS REPARABLES'.'%0D%0A';
 
-                    // if(1==0){
-                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                    // }else{
-                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                    //     $this->insertar_whatsaap('51979659002','HAMILTON',$mensaje,'');
-                    //     $prefijocarperta =      $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
-                    //     //CONTABILIDAD
-                    //     if($prefijocarperta=='II'){
-                    //         $this->insertar_whatsaap('51965991360','ANGHIE',$mensaje,'');           //INTERNACIONAL
-                    //         $this->insertar_whatsaap('51988650421','LUCELY',$mensaje,'');           //INTERNACIONAL
-                    //     }else{
-                    //         $this->insertar_whatsaap('51950638955','MIGUEL',$mensaje,'');           //COMERCIAL
-                    //         $this->insertar_whatsaap('51935387084','VASQUEZ',$mensaje,'');          //COMERCIAL
-                    //     }
-
-                    // }  
 
                 }
 
@@ -1606,6 +1628,38 @@ class GestionUsuarioContactoController extends Controller
                 $documento->TIPO                        =   'RESOLVIO LOS REPARABLES';
                 $documento->MENSAJE                     =   '';
                 $documento->save();
+
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'RESOLVIO LOS REPARABLES');
+                //geolocalizacion
+
+
+                $tarchivoshibrido       =   CMPDocAsociarCompra::where('COD_ORDEN','=',$pedido_id)
+                                            ->whereIn('TXT_ASIGNADO', ['ARCHIVO_VIRTUAL'])
+                                            ->where('TIP_DOC','=','F')
+                                            ->get();
+
+                //dd($tarchivoshibrido);
+                foreach($tarchivoshibrido as $index => $item){
+
+                    CMPDocAsociarCompra::where('COD_ORDEN',$pedido_id)->where('COD_CATEGORIA_DOCUMENTO','=',$item->COD_CATEGORIA_DOCUMENTO)
+                                        ->where('TIP_DOC','=','F')
+                                        ->update(
+                                            [
+                                                'TXT_ASIGNADO'=>'ARCHIVO_FISICO'
+                                            ]
+                                        );
+                    FeDocumento::where('ID_DOCUMENTO',$pedido_id)
+                                ->update(
+                                    [
+                                        'IND_REPARABLE'=>'1',
+                                        'MODO_REPARABLE'=>'ARCHIVO_FISICO'
+                                    ]
+                                );
+                }
+
 
 
                 DB::commit();
@@ -1710,6 +1764,11 @@ class GestionUsuarioContactoController extends Controller
                 $documento->TIPO                        =   'REVISION DE REPARABLE ADMINISTRACION';
                 $documento->MENSAJE                     =   '';
                 $documento->save();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'REVISION DE REPARABLE ADMINISTRACION');
+                //geolocalizacion
 
 
                 DB::commit();
@@ -1872,33 +1931,7 @@ class GestionUsuarioContactoController extends Controller
                             return Redirect::to('reparable-comprobante-uc-contrato'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Seleccione los archivos Correspondientes');
                         }
                     }
-
-                    //whatsaap para contabilidad
-                    // $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
-                    // $ordencompra        =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$pedido_id)->first();            
-                    // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                    // $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO
-                    //                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-                    //                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'
-                    //                         .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A'
-                    //                         .'MENSAJE : '.'RESOLVIO LOS REPARABLES'.'%0D%0A';
-
-                    // if(1==0){
-                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                    // }else{
-                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                    //     $this->insertar_whatsaap('51979659002','HAMILTON',$mensaje,'');
-                    //     $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
-                    //     //CONTABILIDAD
-                    //     if($prefijocarperta=='II'){
-                    //         $this->insertar_whatsaap('51965991360','ANGHIE',$mensaje,'');           //INTERNACIONAL
-                    //         $this->insertar_whatsaap('51988650421','LUCELY',$mensaje,'');           //INTERNACIONAL
-                    //     }else{
-                    //         $this->insertar_whatsaap('51950638955','MIGUEL',$mensaje,'');           //COMERCIAL
-                    //         $this->insertar_whatsaap('51935387084','VASQUEZ',$mensaje,'');          //COMERCIAL
-                    //     }
-
-                    // }  
+ 
 
                 }
 
@@ -1918,6 +1951,38 @@ class GestionUsuarioContactoController extends Controller
                 $documento->TIPO                        =   'RESOLVIO LOS REPARABLES';
                 $documento->MENSAJE                     =   '';
                 $documento->save();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'RESOLVIO LOS REPARABLES');
+                //geolocalizacion
+
+
+
+                $tarchivoshibrido       =   CMPDocAsociarCompra::where('COD_ORDEN','=',$pedido_id)
+                                            ->whereIn('TXT_ASIGNADO', ['ARCHIVO_VIRTUAL'])
+                                            ->where('TIP_DOC','=','F')
+                                            ->get();
+
+                //dd($tarchivoshibrido);
+                foreach($tarchivoshibrido as $index => $item){
+
+                    CMPDocAsociarCompra::where('COD_ORDEN',$pedido_id)->where('COD_CATEGORIA_DOCUMENTO','=',$item->COD_CATEGORIA_DOCUMENTO)
+                                        ->where('TIP_DOC','=','F')
+                                        ->update(
+                                            [
+                                                'TXT_ASIGNADO'=>'ARCHIVO_FISICO'
+                                            ]
+                                        );
+                    FeDocumento::where('ID_DOCUMENTO',$pedido_id)
+                                ->update(
+                                    [
+                                        'IND_REPARABLE'=>'1',
+                                        'MODO_REPARABLE'=>'ARCHIVO_FISICO'
+                                    ]
+                                );
+                }
+
 
 
                 DB::commit();
@@ -2127,6 +2192,11 @@ class GestionUsuarioContactoController extends Controller
                 $documento->TIPO                        =   'RESOLVIO LAS OBSERVACIONES';
                 $documento->MENSAJE                     =   '';
                 $documento->save();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'RESOLVIO LAS OBSERVACIONES');
+                //geolocalizacion
 
                 //whatsaap para contabilidad
                 // $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->first();
@@ -2671,6 +2741,11 @@ class GestionUsuarioContactoController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'RESOLVIO LAS OBSERVACIONES');
+                //geolocalizacion
+
                 //whatsaap para contabilidad
 
                 // $fedocumento_w          =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
@@ -2876,6 +2951,11 @@ class GestionUsuarioContactoController extends Controller
                 $documento->TIPO                        =   'RESOLVIO LAS OBSERVACIONES';
                 $documento->MENSAJE                     =   '';
                 $documento->save();               
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'RESOLVIO LAS OBSERVACIONES');
+                //geolocalizacion
 
                 DB::commit();
                 return Redirect::to('/gestion-de-comprobantes-observados/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_DOCUMENTO_CTBLE.' RESUELTO CON EXITO');
@@ -3485,6 +3565,11 @@ class GestionUsuarioContactoController extends Controller
                     $documento->save();
 
 
+                    //geolocalizacion
+                    $device_info       =   $request['device_info'];
+                    $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR USUARIO CONTACTO');
+                    //geolocalizacion
+
                     //whatsaap para contabilidad
                     // $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->first();
                     // $ordencompra        =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();            
@@ -3597,6 +3682,12 @@ class GestionUsuarioContactoController extends Controller
             $documento->TIPO                        =   'RECHAZADO POR USUARIO CONTACTO';
             $documento->MENSAJE                     =   '';
             $documento->save();
+
+            //geolocalizacion
+            $device_info       =   $request['device_info'];
+            $this->con_datos_de_la_pc($device_info,$fedocumento,'RECHAZADO POR USUARIO CONTACTO');
+            //geolocalizacion
+
 
             // DB::table('FE_DOCUMENTO_HISTORIAL')->where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->delete();
             // DB::table('ARCHIVOS')->where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->delete();
@@ -3960,6 +4051,11 @@ class GestionUsuarioContactoController extends Controller
                     $documento->MENSAJE                     =   '';
                     $documento->save();
 
+
+                    //geolocalizacion
+                    $device_info       =   $request['device_info'];
+                    $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR USUARIO CONTACTO');
+                    //geolocalizacion
 
                     //whatsaap para contabilidad
                     // $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
@@ -4427,6 +4523,12 @@ class GestionUsuarioContactoController extends Controller
                 $documento->MENSAJE                     =   $descripcion;
                 $documento->save();
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'OBSERVADO POR USUARIO CONTACTO');
+                //geolocalizacion
+
+
                 FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
                                 [
@@ -4600,6 +4702,11 @@ class GestionUsuarioContactoController extends Controller
                 $documento->TIPO                        =   'OBSERVADO POR ADMINISTRACION';
                 $documento->MENSAJE                     =   $descripcion;
                 $documento->save();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'OBSERVADO POR ADMINISTRACION');
+                //geolocalizacion
 
                 FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
@@ -5032,7 +5139,10 @@ class GestionUsuarioContactoController extends Controller
                 $documento->TIPO                        =   'APROBADO POR USUARIO CONTACTO';
                 $documento->MENSAJE                     =   '';
                 $documento->save();
-
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR USUARIO CONTACTO');
+                //geolocalizacion
 
 
                 //whatsaap para contabilidad

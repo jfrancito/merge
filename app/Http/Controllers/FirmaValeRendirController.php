@@ -62,6 +62,7 @@ class FirmaValeRendirController extends Controller
         return strpos($contenido, '/Sig') !== false;
     }
 
+ 
     public function actionexportarpdf($id)
     {
         // 📂 Ruta UNC a la carpeta compartida
@@ -95,7 +96,10 @@ class FirmaValeRendirController extends Controller
                 'e.NOM_EMPR'
             )
             ->where('oc.TXT_REFERENCIA', $id)
-            ->where('oc.COD_ITEM_MOVIMIENTO', 'IICHFI0000000025')
+            ->whereIn('oc.COD_ITEM_MOVIMIENTO', [
+                 'IICHFI0000000025',
+                'ISCHFI0000000028'
+            ])
             ->first();
 
        
@@ -147,6 +151,7 @@ class FirmaValeRendirController extends Controller
 
         return redirect()->away($rutaCustom);
     }
+
 }
 
 

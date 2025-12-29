@@ -66,6 +66,15 @@ Route::any('/enviocorreoreparacionlevantada', 'UserController@actionCorreoRepara
 Route::any('/guardarpdfoi', 'PrecioCompetenciaController@actionGuardarPdfOi');//correo para usuario contacto
 Route::any('/cambiarglosadehabilitacion', 'PrecioCompetenciaController@actionModificarGlosaLiquidacion');//correo para usuario contacto
 
+Route::any('/enviocorreojefeacopiodic', 'UserController@actionCorreoJefeAcopioDic');//correo para jefe acopio liuidacion compra
+Route::any('/enviocorreojefeacopiolqc', 'UserController@actionCorreoJefeAcopioLqc');//correo para jefe acopio liuidacion compra
+Route::any('/enviocorreoadmindic', 'UserController@actionCorreoAdminDic');//correo para jefe acopio liuidacion compra
+Route::any('/enviocorreoadminlqc', 'UserController@actionCorreoAdminLqc');//correo para jefe acopio liuidacion compra
+Route::any('/enviocorreoaprobado', 'UserController@actionCorreoAprobado');//correo para jefe acopio liuidacion compra
+
+Route::any('/enviocorreoaprobadoadmin', 'UserController@actionCorreoAprobadoAdmin');//correo para jefe acopio liuidacion compra
+Route::any('/crearexceladminaprobado', 'UserController@actionCrearExcelAprobadoAdmin');//correo para jefe acopio liuidacion compra
+
 Route::group(['middleware' => ['authaw']], function () {
 
 	Route::get('/bienvenido', 'UserController@actionBienvenido');
@@ -159,7 +168,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/validez-comprobante-pdf', 'GestionLiquidacionGastosController@actionLiquidacionValidezComprobantePdf');
     Route::post('/buscar-proveedor', 'GestionOCContabilidadController@buscarProveedor');
 
-
+	Route::any('/aprobar-liquidacion-gasto-jefe-historial/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionAprobarJefeLGHistorial');
 
 
 	Route::any('/gestion-de-liquidacion-gastos-adm/{idopcion}', 'GestionLiquidacionGastosController@actionListarLGValidado');
@@ -324,6 +333,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/leerxmlsinvoiceliqui', 'GestionOCController@actionApiLeerXmlSapLiqui');
 
 	Route::any('/leerxmlsinvoiceguia', 'GestionOCController@actionApiLeerXmlSapGuia');
+	Route::any('/leerxmlsinvoicenc', 'GestionOCController@actionApiLeerXmlSapNC');
+
 
 	Route::any('/leerrhsinvoice', 'GestionOCController@actionApiLeerRHSap');
 	Route::any('/leerrhsinvoicereten', 'GestionOCController@actionApiLeerRetencionSap');
@@ -696,6 +707,16 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/aprobar-comprobante-administracion-estiba/{idopcion}/{lote}', 'GestionOCAdministracionController@actionAprobarAdministracionEstiba');
 	Route::any('/agregar-observacion-administracion-estiba/{idopcion}/{lote}', 'GestionOCAdministracionController@actionAgregarObservacionAdministracionEstiba');
+
+
+	//ACOPIO
+	Route::any('/gestion-de-acopio-liquidacion-compra/{idopcion}', 'GestionOCAcopioController@actionListarComprobanteAcopio');
+	Route::any('/ajax-buscar-documento-gestion-acopio', 'GestionOCAcopioController@actionListarAjaxBuscarDocumentoAcopio');
+	Route::any('/aprobar-comprobante-acopio-liquidacion-compra-anticipo/{idopcion}/{linea}/{prefijo}/{idordenpago}', 'GestionOCAcopioController@actionAprobarAcopioLiquidacionCompraAnticipo');
+	Route::any('/agregar-observacion-acopio-liquidacion-compra-anticipo/{idopcion}/{linea}/{prefijo}/{idordenpago}', 'GestionOCAcopioController@actionAgregarObservacionAcopioLiquidacionCompraAnticipo');
+	Route::any('/aprobar-comprobante-acopio-liquidacion-compra-anticipo/{idopcion}/{linea}/{prefijo}/{idordenpago}', 'GestionOCAcopioController@actionAprobarAcopioLiquidacionCompraAnticipo');
+	Route::any('/aprobar-comprobante-acopio-estiba/{idopcion}/{lote}', 'GestionOCAcopioController@actionAprobarAcopioEstiba');
+	Route::any('/agregar-observacion-acopio-estiba/{idopcion}/{lote}', 'GestionOCAcopioController@actionAgregarObservacionAcopioEstiba');
 
 
 	Route::any('/ajax-buscar-documento-gestion-administracion', 'GestionOCAdministracionController@actionListarAjaxBuscarDocumentoAdministracion');

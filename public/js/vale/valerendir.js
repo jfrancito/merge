@@ -922,7 +922,7 @@ $(document).ready(function(){
         let txt_glosa_cobranza = $('#txt_glosa_cobranza').val();
 
 
-       if (areacomercial === "COMERCIAL") {
+       if (areacomercial === "VENTAS") {
             if (!txt_glosa_venta || !txt_glosa_cobranza) {
                 alerterrorajax('Por favor Ingresar el Monto Aprox. de VENTA O COBRANZA');
                  return;

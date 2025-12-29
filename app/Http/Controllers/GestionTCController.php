@@ -723,6 +723,11 @@ class GestionTCController extends Controller
                 $documento->save();
 
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'SUBIO DOCUMENTOS');
+                //geolocalizacion
+
                 // $fedocumento_w       =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
                 // //LE LLEGA AL USUARIO DE CONTACTO
                 // $trabajador         =   STDTrabajador::where('COD_TRAB','=',$contacto->COD_TRABAJADOR)->first();

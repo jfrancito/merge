@@ -10,7 +10,8 @@
                               action="{{ url('subir-xml-cargar-datos-comision-administrator/'.$idopcion.'/'.$idoc) }}"
                               name="formcargardatos" id="formcargardatos" enctype="multipart/form-data">
                             {{ csrf_field() }}
-
+<input type="hidden" name="device_info" id='device_info'>
+                            
                             <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 cajareporte">
 
                                 <div class="form-group">
@@ -116,7 +117,9 @@
             <form method="POST" action="{{ url('validar-xml-oc-comision-administrator/'.$idopcion.'/'.$idoc) }}"
                   name="formguardardatos" id="formguardardatos" enctype="multipart/form-data">
                 {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
                 <input type="hidden" name="rutaorden" id='rutaorden' value='{{$rutaorden}}'>
+                
                 <div class="row">
 
                     <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">

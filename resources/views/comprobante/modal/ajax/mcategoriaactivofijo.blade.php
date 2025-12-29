@@ -14,6 +14,7 @@
 		id="frmAgregarCategoriaActivoFijo"
 	>    
 	{{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
 
 		<div class="modal-body loteestiba" style="padding-top: 0px;">
 			

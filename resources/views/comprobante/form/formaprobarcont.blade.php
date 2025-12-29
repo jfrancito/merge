@@ -91,7 +91,7 @@
                         </div>
 
 
-                        <div class="form-group" style="display: none">
+                        <div id="div_cuenta_contable" class="form-group" style="display: none">
                             <label class="col-sm-12 control-label izquierda" style="text-align: left;">Cuenta Contable
                                 <b>(*)</b></label>
                             <div class="col-sm-12">

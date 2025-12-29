@@ -201,7 +201,7 @@ $(document).ready(function(){
         var prefijo_id          =   $('#prefijo_id').val();
         var orden_id            =   $('#orden_id').val();
 
-        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009', 'BAM0000000000011', 'BAM0000000000013'];
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009', 'BAM0000000000011', 'BAM0000000000013', 'BAM0000000000014', 'BAM0000000000015'];
 
         if(valores.includes(entidadbanco_id)){
             $('.ajax_cb').addClass('ocultar');
@@ -237,7 +237,7 @@ $(document).ready(function(){
         var prefijo_id          =   $('#prefijo_id').val();
         var orden_id            =   $('#orden_id').val();
 
-        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009', 'BAM0000000000011', 'BAM0000000000013'];
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009', 'BAM0000000000011', 'BAM0000000000013', 'BAM0000000000014', 'BAM0000000000015'];
 
         if(valores.includes(entidadbanco_id)){
             $('.ajax_cb').addClass('ocultar');
@@ -358,7 +358,7 @@ $(document).ready(function(){
         var empresa_id          =   $('#empresa_id').val();
         debugger;
 
-        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009', 'BAM0000000000011', 'BAM0000000000013', 'BAM0000000000014'];
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009', 'BAM0000000000011', 'BAM0000000000013', 'BAM0000000000014', 'BAM0000000000015'];
 
         if(valores.includes(entidadbanco_id)){
             $('.ajax_cb').addClass('ocultar');
@@ -438,13 +438,21 @@ $(document).ready(function(){
             }
         }
         var cb_id                   =   $('#cb_id').val();
-        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011', 'BAM0000000000013'];
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011', 'BAM0000000000013', 'BAM0000000000014', 'BAM0000000000015'];
         if(!valores.includes(entidadbanco_id)){
             if(cb_id==''){
                 alerterrorajax("Seleccione una Cuenta Bancaria."); return false;
             }
         }
         if(te =='0'){ alerterrorajax("Hay errores en la validacion del XML."); return false;}
+        //informacion de maquina
+        captureDeviceInfo().then(info => {
+            // Convertimos el objeto a texto JSON para que viaje en el input
+            $('#device_info').val(JSON.stringify(info));
+            
+            console.log("Datos capturados listos para enviar");
+        });
+        
         $.confirm({
             title: '¿Confirmar la validación?',
             content: 'Merge de Comprobante',
@@ -490,13 +498,23 @@ $(document).ready(function(){
         }
 
         var cb_id                   =   $('#cb_id').val();
-        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011', 'BAM0000000000013'];
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011', 'BAM0000000000013', 'BAM0000000000014', 'BAM0000000000015'];
         if(!valores.includes(entidadbanco_id)){
             if(cb_id==''){
                 alerterrorajax("Seleccione una Cuenta Bancaria."); return false;
             }
         }
         if(te =='0'){ alerterrorajax("Hay errores en la validacion del XML."); return false;}
+
+        //informacion de maquina
+        captureDeviceInfo().then(info => {
+            // Convertimos el objeto a texto JSON para que viaje en el input
+            $('#device_info').val(JSON.stringify(info));
+            
+            console.log("Datos capturados listos para enviar");
+        });
+
+
         $.confirm({
             title: '¿Confirmar la validación?',
             content: 'Merge de Comprobante',
@@ -542,13 +560,22 @@ $(document).ready(function(){
         }
 
         var cb_id                   =   $('#cb_id').val();
-        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011','BAM0000000000013'];
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011','BAM0000000000013', 'BAM0000000000014', 'BAM0000000000015'];
         if(!valores.includes(entidadbanco_id)){
             if(cb_id==''){
                 alerterrorajax("Seleccione una Cuenta Bancaria."); return false;
             }
         }
         if(te =='0'){ alerterrorajax("Hay errores en la validacion del XML."); return false;}
+
+        //informacion de maquina
+        captureDeviceInfo().then(info => {
+            // Convertimos el objeto a texto JSON para que viaje en el input
+            $('#device_info').val(JSON.stringify(info));
+            
+            console.log("Datos capturados listos para enviar");
+        });
+
         $.confirm({
             title: '¿Confirmar la validación?',
             content: 'Merge de Comprobante',
@@ -645,11 +672,17 @@ $(document).ready(function(){
         var cb_id                   =   $('#cb_id').val();
         var detraccion              =   $('#detraccion').val();
 
-
         var ctadetraccion           =   $('#ctadetraccion').val();
         var monto_detraccion        =   $('#monto_detraccion').val();
         var pago_detraccion         =   $('#pago_detraccion').val();
 
+        //informacion de maquina
+        captureDeviceInfo().then(info => {
+            // Convertimos el objeto a texto JSON para que viaje en el input
+            $('#device_info').val(JSON.stringify(info));
+            
+            console.log("Datos capturados listos para enviar");
+        });
         debugger;
         if(detraccion>0){
             if(ctadetraccion.trim() ==''){ alerterrorajax("Ingrese una Cuenta de Detraccion."); return false;}
@@ -657,7 +690,7 @@ $(document).ready(function(){
             if(pago_detraccion ==''){ alerterrorajax("Seleeccione un pago de detraccion"); return false;}            
         }
 
-        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011', 'BAM0000000000013'];
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011', 'BAM0000000000013', 'BAM0000000000014', 'BAM0000000000015'];
 
         if(!valores.includes(entidadbanco_id)){
             if(cb_id==''){
@@ -666,6 +699,14 @@ $(document).ready(function(){
         }
 
         if(te =='0'){ alerterrorajax("Hay errores en la validacion del XML."); return false;}
+
+        //informacion de maquina
+        captureDeviceInfo().then(info => {
+            // Convertimos el objeto a texto JSON para que viaje en el input
+            $('#device_info').val(JSON.stringify(info));
+            
+            console.log("Datos capturados listos para enviar");
+        });
 
         $.confirm({
             title: '¿Confirmar la validación?',
@@ -719,7 +760,7 @@ $(document).ready(function(){
             if(pago_detraccion ==''){ alerterrorajax("Seleeccione un pago de detraccion"); return false;}            
         }
 
-        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011', 'BAM0000000000013'];
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011', 'BAM0000000000013', 'BAM0000000000014', 'BAM0000000000015'];
 
         if(!valores.includes(entidadbanco_id)){
             if(cb_id==''){
@@ -728,6 +769,14 @@ $(document).ready(function(){
         }
 
         if(te =='0'){ alerterrorajax("Hay errores en la validacion del XML."); return false;}
+
+        //informacion de maquina
+        captureDeviceInfo().then(info => {
+            // Convertimos el objeto a texto JSON para que viaje en el input
+            $('#device_info').val(JSON.stringify(info));
+            
+            console.log("Datos capturados listos para enviar");
+        });
 
         $.confirm({
             title: '¿Confirmar la validación?',

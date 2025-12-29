@@ -331,124 +331,6 @@ class GestionEstibaController extends Controller
                     }
                 }
  
-                /////////////////////////////////////////////GUARDAR GUIAS REMITENTE /////////////////////////////////////////
-                // //guardar las guias que ya existen
-                // $arrayreferencia_guia       =   CMPReferecenciaAsoc::where('COD_TABLA','=',$idoc)
-                //                                 ->where('COD_TABLA_ASOC', 'like', '%GRR%')
-                //                                 ->where('COD_ESTADO','=',1)
-                //                                 ->pluck('COD_TABLA_ASOC')
-                //                                 ->toArray();
-                // $lista_guias                 =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$arrayreferencia_guia)
-                //                                 ->where('COD_ESTADO','=',1)
-                //                                 ->get();
-
-
-                // $array_guias                 =   array();                               
-                // $rutaordenguia               =   "";
-
-                // foreach ($lista_guias as $index=>$item) {
-
-                //     $array_nuevo            =   array(); 
-                //     $directorio = '\\\\10.1.0.201\cpe\Contratos';
-                //     // Nombre del archivo que estás buscando
-                //     $nombreArchivoBuscado = $item->COD_DOCUMENTO_CTBLE.'.pdf';
-                //     // Escanea el directorio
-                //     $archivos = scandir($directorio);
-                //     // Inicializa una variable para almacenar el resultado
-                //     $archivoEncontrado = false;
-                //     // Recorre la lista de archivos
-                //     foreach ($archivos as $archivo) {
-                //         // Omite los elementos '.' y '..'
-                //         if ($archivo != '.' && $archivo != '..') {
-                //             // Verifica si el nombre del archivo coincide con el archivo buscado
-                //             if ($archivo == $nombreArchivoBuscado) {
-                //                 $archivoEncontrado = true;
-                //                 break;
-                //             }
-                //         }
-                //     }
-                //     // Muestra el resultado
-                //     if ($archivoEncontrado) {
-
-                //         $rutaordenguia                  =       $directorio.'\\'.$nombreArchivoBuscado;
-
-                //         $contadorArchivos = Archivo::count();
-                //         $nombrefilecdr                  =       $contadorArchivos.'-'.$item->COD_DOCUMENTO_CTBLE.'.pdf';
-                //         $prefijocarperta                =       $this->prefijo_empresa($ordencompra->COD_EMPR);
-                //         $rutafile                       =       $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
-                //         $rutacompleta                   =       $rutafile.'\\'.$nombrefilecdr;
-                //         $valor                          =       $this->versicarpetanoexiste($rutafile);
-                //         $path                           =       $rutacompleta;
-
-                //         //dd($rutacompleta);
-
-                //         copy($rutaordenguia,$rutacompleta);
-                //         $dcontrol                       =       new Archivo;
-                //         $dcontrol->ID_DOCUMENTO         =       $ordencompra->COD_DOCUMENTO_CTBLE;
-                //         $dcontrol->DOCUMENTO_ITEM       =       $fedocumento->DOCUMENTO_ITEM;
-                //         $dcontrol->TIPO_ARCHIVO         =       $item->COD_DOCUMENTO_CTBLE;
-                //         $dcontrol->NOMBRE_ARCHIVO       =       $nombrefilecdr;
-                //         $dcontrol->DESCRIPCION_ARCHIVO  =       'GUIA REMITENTE '.$item->NRO_SERIE.'-'.$item->NRO_DOC;
-                //         $dcontrol->URL_ARCHIVO          =       $path;
-                //         $dcontrol->SIZE                 =       100;
-                //         $dcontrol->EXTENSION            =       '.pdf';
-                //         $dcontrol->ACTIVO               =       1;
-                //         $dcontrol->FECHA_CREA           =       $this->fechaactual;
-                //         $dcontrol->USUARIO_CREA         =       Session::get('usuario')->id;
-                //         $dcontrol->save();
-                //         $rutaordenguia                  =   $directorio.'\\'.$nombreArchivoBuscado;
-                //     }else{
-                //         $rutaordenguia           =  '';
-                //         $array_nuevo             =  array(
-                //                                         "COD_DOCUMENTO_CTBLE"       => $item->COD_DOCUMENTO_CTBLE,
-                //                                         "NRO_SERIE"                 => $item->NRO_SERIE,
-                //                                         "NRO_DOC"                   => $item->NRO_DOC,
-                //                                         "rutaordenguia"             => $rutaordenguia,
-                //                                     );
-                //         array_push($array_guias,$array_nuevo);           
-                //     }
-                // }
-
-                // //guardar guias remitentes del array
-                // foreach ($array_guias as $index=>$item) {
-                //     $filescdm          =   $request[$item['COD_DOCUMENTO_CTBLE']];
-                //     if(!is_null($filescdm)){
-                //         foreach($filescdm as $file){
-                //             $contadorArchivos = Archivo::count();
-                //             $nombre          =      $item['COD_DOCUMENTO_CTBLE'].'-'.$file->getClientOriginalName();
-                //             /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
-                //             $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
-                //             $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
-                //             // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                //             $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
-                //             $valor           =      $this->versicarpetanoexiste($rutafile);
-                //             $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
-                //             copy($file->getRealPath(),$rutacompleta);
-                //             $path            =      $rutacompleta;
-
-                //             $nombreoriginal                 =   $file->getClientOriginalName();
-                //             $info                           =   new SplFileInfo($nombreoriginal);
-                //             $extension                      =   $info->getExtension();
-
-                //             $dcontrol                       =   new Archivo;
-                //             $dcontrol->ID_DOCUMENTO         =   $ordencompra->COD_DOCUMENTO_CTBLE;
-                //             $dcontrol->DOCUMENTO_ITEM       =   $fedocumento->DOCUMENTO_ITEM;
-                //             $dcontrol->TIPO_ARCHIVO         =   $item['COD_DOCUMENTO_CTBLE'];
-                //             $dcontrol->NOMBRE_ARCHIVO       =   $nombrefilecdr;
-                //             $dcontrol->DESCRIPCION_ARCHIVO  =   'GUIA REMITENTE '.$item['NRO_SERIE'].'-'.$item['NRO_DOC'];
-
-
-                //             $dcontrol->URL_ARCHIVO      =   $path;
-                //             $dcontrol->SIZE             =   filesize($file);
-                //             $dcontrol->EXTENSION        =   $extension;
-                //             $dcontrol->ACTIVO           =   1;
-                //             $dcontrol->FECHA_CREA       =   $this->fechaactual;
-                //             $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
-                //             $dcontrol->save();
-                //         }
-                //     }
-                // }
-
                 $contacto                                 =   SGDUsuario::where('COD_TRABAJADOR','=',$contacto_id)->first();
                 $trabajador                               =   STDTrabajador::where('COD_TRAB','=',$contacto->COD_TRABAJADOR)->first();
                 //$contacto                               =   User::where('id','=',$contacto_id)->first();
@@ -598,12 +480,19 @@ class GestionEstibaController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'SUBIO DOCUMENTOS');
+                //geolocalizacion
+
+
                 if($fedocumento->OPERACION == 'DOCUMENTO_INTERNO_COMPRA'){
                     FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                                 ->update(
                                     [
-                                        'COD_ESTADO'=>'ETM0000000000004',
-                                        'TXT_ESTADO'=>'POR APROBAR ADMINISTRACION',
+                                        'COD_ESTADO'=>'ETM0000000000012',
+                                        'TXT_ESTADO'=>'POR APROBAR JEFE ACOPIO',
+                                        'IND_EMAIL_JEFE_ACOPIO'=>0,
                                         'ind_email_ap'=>0,
                                         'fecha_uc'=>$this->fechaactual,
                                         'usuario_uc'=>Session::get('usuario')->id
@@ -633,74 +522,15 @@ class GestionEstibaController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR USUARIO CONTACTO');
+                //geolocalizacion
 
-                //whatsaap para contabilidad
-                $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->first();
-                $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO
-                                        .'%0D%0A'.'EMPRESA : '.Session::get('empresas')->NOM_EMPR.'%0D%0A'
-                                        .'PROVEEDOR : '.$empresa_anti->NOM_EMPR.'%0D%0A'
-                                        .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
-                // if(1==0){
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                // }else{
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                //     $this->insertar_whatsaap('51979659002','HAMILTON',$mensaje,'');
-                //     $prefijocarperta =      $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
-                //     if($prefijocarperta=='II'){
-                //         $this->insertar_whatsaap('51965991360','ANGHIE',$mensaje,'');           //INTERNACIONAL
-                //         $this->insertar_whatsaap('51988650421','LUCELY',$mensaje,'');           //INTERNACIONAL
-                //     }else{
-                //         $this->insertar_whatsaap('51950638955','MIGUEL',$mensaje,'');           //COMERCIAL
-                //         $this->insertar_whatsaap('51935387084','VASQUEZ',$mensaje,'');          //COMERCIAL
-                //     }
-                // }
-
-                if($fedocumento->OPERACION == 'DOCUMENTO_INTERNO_COMPRA'){
-
-                    $ordencompra         =       VMergeDocumento::leftJoin('FE_REF_ASOC', function ($leftJoin){
-                                                    $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
-                                                        ->where('FE_REF_ASOC.COD_ESTADO', '=', '1');
-                                                })
-                                                ->leftJoin('FE_DOCUMENTO', function ($leftJoin){
-                                                    $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
-                                                        ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
-                                                })                                                
-                                                ->where('VMERGEDOCUMENTOS.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                                                ->WHERE('FE_REF_ASOC.LOTE','=',$idoc)                                                                                                
-                                                ->WHERE('VMERGEDOCUMENTOS.COD_ESTADO','=','1')                                                
-                                                ->orderBy('VMERGEDOCUMENTOS.FEC_EMISION','ASC')
-                                                ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
-                                                                    FEC_EMISION,
-                                                                    TXT_CATEGORIA_MONEDA,
-                                                                    TXT_EMPR_EMISOR,
-                                                                    COD_USUARIO_CREA_AUD,
-                                                                    CAN_TOTAL,
-                                                                    NRO_SERIE,
-                                                                    NRO_DOC,
-                                                                    FE_REF_ASOC.LOTE AS LOTE_DOC,                                                                    
-                                                                    FE_DOCUMENTO.ID_DOCUMENTO,
-                                                                    FE_DOCUMENTO.COD_ESTADO,
-                                                                    FE_DOCUMENTO.TXT_ESTADO,
-                                                                    FE_REF_ASOC.TOTAL_MERGE
-                                                                '))
-                                                ->first();
-
-                    Mail::send('emails.emaildocumentointernocompragenerado',
-                    [
-                        'ordencompra'       => $ordencompra,
-                        'estado'            => 'APROBADO POR USUARIO CONTACTO',
-                    ],
-                    function ($message) {
-                        $message->from('jessica.sandoval@induamerica.com.pe', 'Sistemas')
-                                ->to('jorge.saldana@induamerica.com.pe')                            
-                                ->subject('DOCUMENTO INTERNO COMPRA - INDUAMERICA');
-                    });    
-                }                
-
+              
                 DB::commit();
             }catch(\Exception $ex){
-                DB::rollback(); 
-                //dd($ex);
+                DB::rollback();
                 return Redirect::to('detalle-comprobante-estiba-administrator/'.$idopcion.'/'.$lote)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
             return Redirect::to('gestion-de-orden-compra/'.$idopcion)->with('bienhecho', 'Se valido el xml correctamente');

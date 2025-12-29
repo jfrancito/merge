@@ -21,6 +21,7 @@
           <div class="panel-body">
             <form method="POST" action="{{ url('/gestion-de-cpe/'.$idopcion) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed frmbuscar">
                   {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
 
               <div class="form-group">
                 <label class="col-sm-3 control-label">RUC</label>

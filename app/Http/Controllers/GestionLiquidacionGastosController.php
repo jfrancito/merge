@@ -1235,6 +1235,12 @@ class GestionLiquidacionGastosController extends Controller
                 $documento->MENSAJE = $descripcion;
                 $documento->save();
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'DOCUMENTO EXTORNADO');
+                //geolocalizacion
+
+
                 //ANULAR TODA LA OPERACION
                 LqgLiquidacionGasto::where('ID_DOCUMENTO', $iddocumento)
                     ->update(
@@ -1296,6 +1302,12 @@ class GestionLiquidacionGastosController extends Controller
                 $documento->TIPO = 'DOCUMENTO EXTORNADO';
                 $documento->MENSAJE = $descripcion;
                 $documento->save();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'DOCUMENTO EXTORNADO');
+                //geolocalizacion
+
 
                 //ANULAR TODA LA OPERACION
                 LqgLiquidacionGasto::where('ID_DOCUMENTO', $iddocumento)
@@ -1360,6 +1372,12 @@ class GestionLiquidacionGastosController extends Controller
                 $documento->TIPO = 'DOCUMENTO EXTORNADO';
                 $documento->MENSAJE = $descripcion;
                 $documento->save();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'DOCUMENTO EXTORNADO');
+                //geolocalizacion
+
 
                 //ANULAR TODA LA OPERACION
                 LqgLiquidacionGasto::where('ID_DOCUMENTO', $iddocumento)
@@ -2158,6 +2176,16 @@ class GestionLiquidacionGastosController extends Controller
             try {
 
                 DB::beginTransaction();
+
+
+
+                $fedocumento_ap = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('COD_ESTADO','<>','ETM0000000000004')->first();
+                if (count($fedocumento_ap)>0) {
+                    return Redirect::back()->with('errorurl', 'El documento esta aprobado');
+                }
+
+
+
                 $liquidaciongastos = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->first();
                 $tdetliquidaciongastos = LqgDetLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
                 $detdocumentolg = LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
@@ -2283,6 +2311,12 @@ class GestionLiquidacionGastosController extends Controller
                 $documento->MENSAJE = '';
                 $documento->save();
 
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'APROBADO POR ADMINISTRACION');
+                //geolocalizacion
+
                 $anio = $this->anio;
                 $mes = $this->mes;
                 $periodo = $this->gn_periodo_actual_xanio_xempresa($anio, $mes, Session::get('empresas')->COD_EMPR);
@@ -2401,6 +2435,13 @@ class GestionLiquidacionGastosController extends Controller
             try {
 
                 DB::beginTransaction();
+
+
+                $fedocumento_ap = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('COD_ESTADO','<>','ETM0000000000003')->first();
+                if (count($fedocumento_ap)>0) {
+                    return Redirect::back()->with('errorurl', 'El documento esta aprobado');
+                }
+
 
                 $detalles = $request->input('detalles');
 
@@ -2672,6 +2713,12 @@ class GestionLiquidacionGastosController extends Controller
                 $documento->TIPO = 'APROBADO POR CONTABILIDAD';
                 $documento->MENSAJE = '';
                 $documento->save();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'APROBADO POR CONTABILIDAD');
+                //geolocalizacion
+
 
                 DB::commit();
                 //DB::rollback();
@@ -2963,6 +3010,12 @@ class GestionLiquidacionGastosController extends Controller
                 $documento->save();
                 $this->lg_calcular_total_observar($iddocumento);
 
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'OBSERVADO POR JEFE');
+                //geolocalizacion
+
                 DB::commit();
 
 
@@ -3045,6 +3098,11 @@ class GestionLiquidacionGastosController extends Controller
                 $documento->MENSAJE = $descripcion;
                 $documento->save();
                 $this->lg_calcular_total_observar($iddocumento);
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'OBSERVADO POR ADMINISTRACION');
+                //geolocalizacion
 
                 DB::commit();
 
@@ -3130,6 +3188,14 @@ class GestionLiquidacionGastosController extends Controller
                 $documento->save();
                 $this->lg_calcular_total_observar($iddocumento);
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'OBSERVADO POR CONTABILIDAD');
+                //geolocalizacion
+
+
+
+
                 DB::commit();
                 return Redirect::to('/gestion-de-aprobacion-liquidacion-gastos-contabilidad/' . $idopcion)->with('bienhecho', 'Liquidacion Gastos : ' . $liquidaciongastos->CODIGO . ' Observado con Exito');
             } catch (\Exception $ex) {
@@ -3204,6 +3270,13 @@ class GestionLiquidacionGastosController extends Controller
                 $documento->TIPO = 'APROBADO POR EL JEFE';
                 $documento->MENSAJE = '';
                 $documento->save();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'APROBADO POR EL JEFE');
+                //geolocalizacion
+
+
 
                 DB::commit();
                 return Redirect::to('/gestion-de-aprobacion-liquidacion-gasto-jefe/' . $idopcion)->with('bienhecho', 'Liquidacion de Gastos : ' . $liquidaciongastos->CODIGO . ' APROBADO CON EXITO');
@@ -3282,6 +3355,89 @@ class GestionLiquidacionGastosController extends Controller
         }
     }
 
+    public function actionAprobarJefeLGHistorial($idopcion, $iddocumento, Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion, 'Modificar');
+        if ($validarurl <> 'true') {
+            return $validarurl;
+        }
+        /******************************************************/
+        $idcab = $iddocumento;
+        $iddocumento = $this->funciones->decodificarmaestrapre($iddocumento, 'LIQG');
+        View::share('titulo', 'Revisar Liquidacion de Gasto Jefe');
+
+
+        $liquidaciongastos = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->first();
+        $tdetliquidaciongastos = LqgDetLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
+
+        $detdocumentolg = LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
+        $documentohistorial = LqgDocumentoHistorial::where('ID_DOCUMENTO', '=', $iddocumento)->orderby('FECHA', 'DESC')->get();
+        $archivospdf = Archivo::where('ID_DOCUMENTO', '=', $iddocumento)->where('EXTENSION', 'like', '%' . 'pdf' . '%')->get();
+
+        $tdetliquidaciongastosel = LqgDetLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '0')->get();
+
+
+        $ocultar = "";
+        // Construir el array de URLs
+        $initialPreview = [];
+        foreach ($archivospdf as $archivo) {
+            $initialPreview[] = route('serve-filelg', ['file' => $archivo->NOMBRE_ARCHIVO]);
+        }
+        $initialPreviewConfig = [];
+
+
+        foreach ($archivospdf as $key => $archivo) {
+            $valor = '';
+            if ($key > 0) {
+                $valor = 'ocultar';
+            }
+            $initialPreviewConfig[] = [
+                'type' => "pdf",
+                'caption' => $archivo->NOMBRE_ARCHIVO,
+                'downloadUrl' => route('serve-filelg', ['file' => $archivo->NOMBRE_ARCHIVO]),
+                'frameClass' => $archivo->ID_DOCUMENTO . $archivo->DOCUMENTO_ITEM . ' ' . $valor //
+            ];
+        }
+
+        //dd($tdetliquidaciongastos);
+        $productosagru = DB::table('LQG_DETDOCUMENTOLIQUIDACIONGASTO')
+            ->select('COD_PRODUCTO', 'TXT_PRODUCTO', DB::raw('SUM(CANTIDAD) as CANTIDAD'), DB::raw('SUM(TOTAL) as TOTAL'))
+            ->where('ID_DOCUMENTO', $iddocumento)
+            ->where('ACTIVO', 1)
+            ->groupBy('COD_PRODUCTO', 'TXT_PRODUCTO')
+            ->get();
+
+        $archivos = Archivo::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
+
+        $indicador = 0;
+        $listaarendirlg = $this->lg_lista_arendirlg($liquidaciongastos,$indicador);
+        //dd($listaarendirlg);
+
+
+        return View::make('liquidaciongasto/aprobarjefelghis',
+            [
+                'liquidaciongastos' => $liquidaciongastos,
+                'indicador' => $indicador,
+                'listaarendirlg' => $listaarendirlg,
+                'tdetliquidaciongastos' => $tdetliquidaciongastos,
+                'tdetliquidaciongastosel' => $tdetliquidaciongastosel,
+                'productosagru' => $productosagru,
+                'archivos' => $archivos,
+                'detdocumentolg' => $detdocumentolg,
+                'documentohistorial' => $documentohistorial,
+                'idopcion' => $idopcion,
+                'idcab' => $idcab,
+                'iddocumento' => $iddocumento,
+                'initialPreview' => json_encode($initialPreview),
+                'initialPreviewConfig' => json_encode($initialPreviewConfig),
+            ]);
+
+
+        
+    }
+
 
     public function actionAprobarLiquidacionGastoJefe($idopcion, Request $request)
     {
@@ -3300,7 +3456,7 @@ class GestionLiquidacionGastosController extends Controller
         $listadatos = $this->lg_lista_cabecera_comprobante_total_jefe();
         $listadatos_obs = $this->lg_lista_cabecera_comprobante_total_obs_jefe();
         $listadatos_obs_le = $this->lg_lista_cabecera_comprobante_total_obs_le_jefe();
-
+        $listadatos_his_le = $this->lg_lista_cabecera_comprobante_total_historial_le_jefe();
 
         $funcion = $this;
         return View::make('liquidaciongasto/listaliquidaciongastojefe',
@@ -3308,6 +3464,7 @@ class GestionLiquidacionGastosController extends Controller
                 'listadatos' => $listadatos,
                 'listadatos_obs' => $listadatos_obs,
                 'listadatos_obs_le' => $listadatos_obs_le,
+                'listadatos_his_le' => $listadatos_his_le,
                 'tab_id' => $tab_id,
                 'funcion' => $funcion,
                 'idopcion' => $idopcion,
@@ -3428,6 +3585,7 @@ class GestionLiquidacionGastosController extends Controller
 
                 $detallescero           =   DB::table('LQG_DETLIQUIDACIONGASTO')
                                         ->where('ID_DOCUMENTO', $iddocumento)
+                                        ->where('ACTIVO','=','1')
                                         ->where('TOTAL', '<=', 0)
                                         ->first();
                if (count($detallescero) > 0) {
@@ -3518,6 +3676,12 @@ class GestionLiquidacionGastosController extends Controller
                     $documento->MENSAJE = '';
                     $documento->save();
 
+                    //geolocalizacion
+                    $device_info       =   $request['device_info'];
+                    $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'SE LEVANTARON LAS OBSERVACIONES');
+                    //geolocalizacion
+
+
                 } else {
 
                     $arendri            =   DB::table('WEB.VALE_RENDIR')
@@ -3575,6 +3739,13 @@ class GestionLiquidacionGastosController extends Controller
                     $documento->TIPO = 'CREO LIQUIDACION DE GASTO';
                     $documento->MENSAJE = '';
                     $documento->save();
+
+                    //geolocalizacion
+                    $device_info       =   $request['device_info'];
+                    $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'CREO LIQUIDACION DE GASTO');
+                    //geolocalizacion
+
+
                 }
 
 
@@ -3801,13 +3972,23 @@ class GestionLiquidacionGastosController extends Controller
             $IND_OSIRIS = 0;
             if($detliquidaciongasto->COD_TIPODOCUMENTO =='TDO0000000000010'){
                 if($request['producto_id'] == 'SERVICIO DE TRANSPORTE AEREO'){
-                    $IND_OSIRIS = 1;
 
-                    LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
-                                ->update(
-                                        [
-                                            'IND_OSIRIS'=> 1
-                                        ]); 
+                    $arendri            =   DB::table('WEB.VALE_RENDIR')
+                                            ->where('ID', $liquidaciongastos->ARENDIR_ID)
+                                            ->first(); 
+
+                    if(count($arendri)>0){
+                        if($arendri->TIPO_MOTIVO == 'TIP0000000000003'){
+                            $IND_OSIRIS = 1;
+                            LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
+                                        ->update(
+                                                [
+                                                    'IND_OSIRIS'=> 1
+                                                ]); 
+                        }
+                    }
+
+
 
                 }
             }
@@ -4550,13 +4731,22 @@ class GestionLiquidacionGastosController extends Controller
                         $IND_OSIRIS = 0;
                         if($detliquidaciongasto->COD_TIPODOCUMENTO =='TDO0000000000010'){
                             if($request['producto_id_factura'] == 'SERVICIO DE TRANSPORTE AEREO'){
-                                $IND_OSIRIS = 1;
 
-                                LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
-                                            ->update(
-                                                    [
-                                                        'IND_OSIRIS'=> 1
-                                                    ]); 
+                                $arendri            =   DB::table('WEB.VALE_RENDIR')
+                                                        ->where('ID', $liquidaciongastos->ARENDIR_ID)
+                                                        ->first(); 
+
+                                if(count($arendri)>0){
+                                    if($arendri->TIPO_MOTIVO == 'TIP0000000000003'){
+                                        $IND_OSIRIS = 1;
+                                        LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
+                                                    ->update(
+                                                            [
+                                                                'IND_OSIRIS'=> 1
+                                                            ]); 
+                                    }
+                                }
+
 
                             }
                         }

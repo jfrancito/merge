@@ -59,8 +59,20 @@ class NotificacionOC extends Command
         $this->envio_correo_tesoreria_lq();
         $this->modificarglosahabilitacion();
 
+        //envio de usuario contacto a jefe de acopio
+        $this->envio_correo_jefeacopiodic();
+        $this->envio_correo_jefeacopiolqc();
+
+        //envio de usuario contacto a administracion
+        $this->envio_correo_admindic();
+        $this->envio_correo_adminlqc();
+
         //$this->envio_correo_reparacion_levantada();
         $horaActual = date("H:i");
+
+        if($horaActual == '06:00' || $horaActual == '07:00' || $horaActual == '08:00'){
+            $this->crear_excel_aporbado_admin();
+        }
 
 
         if($horaActual == '07:00' || $horaActual == '08:00' || $horaActual == '09:00' ||
@@ -70,11 +82,11 @@ class NotificacionOC extends Command
             $horaActual == '16:00' ||  $horaActual == '17:00' ||
             $horaActual == '20:00'){
 
-
             $this->sunat_cdr();
             $this->sunat_cdr_contrato();
             $this->cambiar_fecha_vencimiento();
             $this->cambiar_parcialmente();
+            
         }
 
 
@@ -84,6 +96,8 @@ class NotificacionOC extends Command
         }
 
         $this->guadarpdfoi();
+        $this->envio_correo_aprobado();
+
 
 
         // //precios de supermercado

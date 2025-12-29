@@ -37,6 +37,7 @@
             <form method="POST" action="{{ url('/modificar-opcion/'.$idopcion.'/'.Hashids::encode(substr($registro->id,-8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
 
                   {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
 
 
 

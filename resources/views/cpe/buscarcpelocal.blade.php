@@ -18,6 +18,7 @@
           <div class="panel-body">
             <form method="POST" action="{{ url('/gestion-de-sunat-cpe-local/'.$idopcion) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed frmbuscar">
                   {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
 
 
               <div class="form-group">
