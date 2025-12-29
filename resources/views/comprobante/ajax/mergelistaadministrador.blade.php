@@ -7,10 +7,18 @@
     @if($operacion_id == 'LIQUIDACION_COMPRA_ANTICIPO')
       @include('comprobante.ajax.alistaliquidacioncompraanticipoadministrador')
     @else
-      @if($operacion_id == 'DOCUMENTO_INTERNO_COMPRA')
-        @include('comprobante.ajax.alistaestibaadministradordocintcom')
+      @if($operacion_id == 'NOTA_CREDITO')
+        @include('comprobante.ajax.alistanotacreditoadministrador')
       @else
-        @include('comprobante.ajax.alistaestibaadministrador')
+        @if($operacion_id == 'NOTA_DEBITO')
+          @include('comprobante.ajax.alistanotadebitoadministrador')
+        @else
+          @if($operacion_id == 'DOCUMENTO_INTERNO_COMPRA')
+            @include('comprobante.ajax.alistaestibaadministradordocintcom')
+          @else
+            @include('comprobante.ajax.alistaestibaadministrador')
+          @endif
+        @endif
       @endif
     @endif
   @endif

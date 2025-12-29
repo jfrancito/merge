@@ -571,6 +571,70 @@ $(document).ready(function(){
 
     });
 
+    $(".registrocomprobante").on('click','.btn-guardar-xml-nota-credito', function(e) {
+
+        event.preventDefault();
+        var _token                  =   $('#token').val();
+        var te                      =   $('#te').val();
+        
+        var monto_total             =   parseFloat($('#monto_total').val());        
+        var valor_igv               =   $('#valor_igv').val();        
+        
+        if(te =='0'){ alerterrorajax("Hay errores en la validacion del XML."); return false;}
+        $.confirm({
+            title: '¿Confirmar la validación?',
+            content: 'Merge de Comprobante',
+            buttons: {
+                confirmar: function () {
+                    abrircargando();
+                    $( "#formguardardatos" ).submit();
+
+                    setTimeout(function() {
+                       cerrarcargando();
+                    }, 8000);
+ 
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo la validación');
+                }
+            }
+        });
+
+
+    });
+
+    $(".registrocomprobante").on('click','.btn-guardar-xml-nota-debito', function(e) {
+
+        event.preventDefault();
+        var _token                  =   $('#token').val();
+        var te                      =   $('#te').val();
+        
+        var monto_total             =   parseFloat($('#monto_total').val());        
+        var valor_igv               =   $('#valor_igv').val();        
+        
+        if(te =='0'){ alerterrorajax("Hay errores en la validacion del XML."); return false;}
+        $.confirm({
+            title: '¿Confirmar la validación?',
+            content: 'Merge de Comprobante',
+            buttons: {
+                confirmar: function () {
+                    abrircargando();
+                    $( "#formguardardatos" ).submit();
+
+                    setTimeout(function() {
+                       cerrarcargando();
+                    }, 8000);
+ 
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo la validación');
+                }
+            }
+        });
+
+
+    });
+
 
     $(".registrocomprobante").on('click','.btn-guardar-xml', function(e) {
 
