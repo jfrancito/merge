@@ -931,50 +931,51 @@ class GestionOCSXController extends Controller
 
                 //guardar orden de compra precargada
                 $rutaorden       =   $request['rutaorden'];
-                if($rutaorden!=''){
-                    $aoc                            =       CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
-                                                            ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000001'])
-                                                            ->first();
-                    $contadorArchivos = Archivo::count();
-                    $nombrefilecdr                  =       $contadorArchivos.'-'.$ordencompra->COD_ORDEN.'.pdf';
-                    $prefijocarperta                =       $this->prefijo_empresa($ordencompra->COD_EMPR);
-                    $rutafile                       =       $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
-                    $rutacompleta                   =       $rutafile.'\\'.$nombrefilecdr;
-                    $valor                          =       $this->versicarpetanoexiste($rutafile);
-                    $path                           =       $rutacompleta;
-                    //$directorio                     =       '\\\\10.1.0.201\cpe\Orden_Compra';
-                    //$rutafila                       =       $directorio.'\\'.$nombreArchivoBuscado;
-                    copy($rutaorden,$rutacompleta);
-                    $dcontrol                       =       new Archivo;
-                    $dcontrol->ID_DOCUMENTO         =       $ordencompra->COD_ORDEN;
-                    $dcontrol->DOCUMENTO_ITEM       =       $fedocumento->DOCUMENTO_ITEM;
-                    $dcontrol->TIPO_ARCHIVO         =       $aoc->COD_CATEGORIA_DOCUMENTO;
-                    $dcontrol->NOMBRE_ARCHIVO       =       $nombrefilecdr;
-                    $dcontrol->DESCRIPCION_ARCHIVO  =       $aoc->NOM_CATEGORIA_DOCUMENTO;
-                    $dcontrol->URL_ARCHIVO          =       $path;
-                    $dcontrol->SIZE                 =       100;
-                    $dcontrol->EXTENSION            =       '.pdf';
-                    $dcontrol->ACTIVO               =       1;
-                    $dcontrol->FECHA_CREA           =       $this->fechaactual;
-                    $dcontrol->USUARIO_CREA         =       Session::get('usuario')->id;
-                    $dcontrol->save();
-                }
+                // if($rutaorden!=''){
+                //     $aoc                            =       CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+                //                                             ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000001'])
+                //                                             ->first();
+                //     $contadorArchivos = Archivo::count();
+                //     $nombrefilecdr                  =       $contadorArchivos.'-'.$ordencompra->COD_ORDEN.'.pdf';
+                //     $prefijocarperta                =       $this->prefijo_empresa($ordencompra->COD_EMPR);
+                //     $rutafile                       =       $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
+                //     $rutacompleta                   =       $rutafile.'\\'.$nombrefilecdr;
+                //     $valor                          =       $this->versicarpetanoexiste($rutafile);
+                //     $path                           =       $rutacompleta;
 
-                $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+                //     copy($rutaorden,$rutacompleta);
+                //     $dcontrol                       =       new Archivo;
+                //     $dcontrol->ID_DOCUMENTO         =       $ordencompra->COD_ORDEN;
+                //     $dcontrol->DOCUMENTO_ITEM       =       $fedocumento->DOCUMENTO_ITEM;
+                //     $dcontrol->TIPO_ARCHIVO         =       $aoc->COD_CATEGORIA_DOCUMENTO;
+                //     $dcontrol->NOMBRE_ARCHIVO       =       $nombrefilecdr;
+                //     $dcontrol->DESCRIPCION_ARCHIVO  =       $aoc->NOM_CATEGORIA_DOCUMENTO;
+                //     $dcontrol->URL_ARCHIVO          =       $path;
+                //     $dcontrol->SIZE                 =       100;
+                //     $dcontrol->EXTENSION            =       '.pdf';
+                //     $dcontrol->ACTIVO               =       1;
+                //     $dcontrol->FECHA_CREA           =       $this->fechaactual;
+                //     $dcontrol->USUARIO_CREA         =       Session::get('usuario')->id;
+                //     $dcontrol->save();
+                // }
+
+                $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
                                             ->whereIn('TXT_FORMATO', ['PDF'])
                                             ->get();
 
+
                 foreach($tarchivos as $index => $item){
+
                     $filescdm          =   $request[$item->COD_CATEGORIA_DOCUMENTO];
                     if(!is_null($filescdm)){
 
                         foreach($filescdm as $file){
 
                             $contadorArchivos = Archivo::count();
-                            $nombre          =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
+                            $nombre          =      $ordencompra->COD_DOCUMENTO_CTBLE.'-'.$file->getClientOriginalName();
                             /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
                             $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
-                            $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
+                            $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO;
                             // $nombrefilecdr   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
                             $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
                             $valor           =      $this->versicarpetanoexiste($rutafile);
@@ -987,7 +988,7 @@ class GestionOCSXController extends Controller
                             $extension                  =   $info->getExtension();
 
                             $dcontrol                       =   new Archivo;
-                            $dcontrol->ID_DOCUMENTO         =   $ordencompra->COD_ORDEN;
+                            $dcontrol->ID_DOCUMENTO         =   $ordencompra->COD_DOCUMENTO_CTBLE;
                             $dcontrol->DOCUMENTO_ITEM       =   $fedocumento->DOCUMENTO_ITEM;
                             $dcontrol->TIPO_ARCHIVO         =   $item->COD_CATEGORIA_DOCUMENTO;
                             $dcontrol->NOMBRE_ARCHIVO       =   $nombrefilecdr;
@@ -1007,7 +1008,7 @@ class GestionOCSXController extends Controller
 
                 $contacto                                 =   SGDUsuario::where('COD_TRABAJADOR','=',$contacto_id)->first();
                 $trabajador                               =   STDTrabajador::where('COD_TRAB','=',$contacto->COD_TRABAJADOR)->first();
-                $ordencompra_t                            =   CMPOrden::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->first();
+                $ordencompra_t                            =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$ordencompra->COD_DOCUMENTO_CTBLE)->first();
                 $entidadbanco_id                          =   $request['entidadbanco_id'];
                 $bancocategoria                           =   CMPCategoria::where('COD_CATEGORIA','=',$entidadbanco_id)->first();
                 $cb_id                                    =   $request['cb_id'];
@@ -1022,7 +1023,7 @@ class GestionOCSXController extends Controller
                     $TXT_PAGO_DETRACCION = $empresa_sel->NOM_EMPR;
                 }
                 if($ctadetraccion!=''){
-                    STDEmpresa::where('COD_EMPR',$ordencompra_t->COD_EMPR_CLIENTE)
+                    STDEmpresa::where('COD_EMPR',$ordencompra_t->COD_EMPR_EMISOR)
                                 ->update(
                                     [
                                         'TXT_DETRACCION'=>$ctadetraccion
@@ -1039,7 +1040,7 @@ class GestionOCSXController extends Controller
                     $COD_EMPR               =   Session::get('empresas')->COD_EMPR;
                     $COD_CENTRO             =   '';
                     $FEC_CORTE              =   $this->hoy_sh;
-                    $CLIENTE                =   $ordencompra_t->COD_EMPR_CLIENTE;
+                    $CLIENTE                =   $ordencompra_t->COD_EMPR_EMISOR;
                     $COD_MONEDA             =   $ordencompra_t->COD_CATEGORIA_MONEDA;
                     $monto_anticipo         =   0.00;
 
@@ -1070,10 +1071,7 @@ class GestionOCSXController extends Controller
                     }
                 }
 
-                $serie                  =   $request['serie'];
-                $numero                 =   $request['numero'];
-                $fechaventa             =   $request['fechaventa'];
-                $fechavencimiento       =   $request['fechavencimiento'];
+
 
                 FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(
@@ -1088,11 +1086,6 @@ class GestionOCSXController extends Controller
                                     'COD_ANTICIPO'=>$COD_ANTICIPO,
                                     'SERIE_ANTICIPO'=>$SERIE_ANTICIPO,
                                     'NRO_ANTICIPO'=>$NRO_ANTICIPO,
-
-                                    'SERIE'=>$serie,
-                                    'NUMERO'=>$numero,
-                                    'FEC_VENTA'=>$fechaventa,
-                                    'FEC_VENCI_PAGO'=>$fechavencimiento,
 
                                     'CTA_DETRACCION'=>$ctadetraccion,
                                     'MONTO_DETRACCION_XML'=>$monto_detraccion,
@@ -1114,7 +1107,7 @@ class GestionOCSXController extends Controller
 
                 //HISTORIAL DE DOCUMENTO APROBADO
                 $documento                              =   new FeDocumentoHistorial;
-                $documento->ID_DOCUMENTO                =   $ordencompra->COD_ORDEN;
+                $documento->ID_DOCUMENTO                =   $ordencompra->COD_DOCUMENTO_CTBLE;
                 $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
                 $documento->FECHA                       =   date_format(date_create($ordencompra_t->FEC_USUARIO_CREA_AUD), 'Ymd h:i:s');
                 $documento->USUARIO_ID                  =   $contacto->COD_TRABAJADOR;
@@ -1124,13 +1117,9 @@ class GestionOCSXController extends Controller
                 $documento->save();
 
 
-                $ordencompra_tt                            =   CMPOrden::where('COD_ORDEN','=',$fedocumento->ID_DOCUMENTO)->first();
-                $trabajador = DB::table('STD.TRABAJADOR')->where('COD_TRAB', $ordencompra_tt->COD_TRABAJADOR_ENCARGADO)->first();
-                $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('dni','=',$trabajador->NRO_DOCUMENTO)->first();
-
                 //HISTORIAL DE DOCUMENTO APROBADO
                 $documento                              =   new FeDocumentoHistorial;
-                $documento->ID_DOCUMENTO                =   $ordencompra->COD_ORDEN;
+                $documento->ID_DOCUMENTO                =   $ordencompra->COD_DOCUMENTO_CTBLE;
                 $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
                 $documento->FECHA                       =   $this->fechaactual;
                 $documento->USUARIO_ID                  =   Session::get('usuario')->id;
@@ -1180,7 +1169,7 @@ class GestionOCSXController extends Controller
             }catch(\Exception $ex){
                 DB::rollback(); 
                 //dd($ex);
-                return Redirect::to('detalle-comprobante-oc-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', $ex.' Ocurrio un error inesperado');
+                return Redirect::to('detalle-comprobante-provision-gasto-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
             return Redirect::to('gestion-de-orden-compra/'.$idopcion)->with('bienhecho', 'Se valido el xml correctamente');
 

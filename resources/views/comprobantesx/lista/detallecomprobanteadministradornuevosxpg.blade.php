@@ -88,7 +88,7 @@
                     <div class="panel-heading" style="background: #1d3a6d;color: #fff;">DATOS PARA PAGOS
 
                       <div class="tools ver_cuenta_bancaria_pg select" style="cursor: pointer;padding-left: 12px;"> <span class="label label-success">Ver Cuenta</span></div>
-                      <div class="tools agregar_cuenta_bancaria select" style="cursor: pointer;"> <span class="label label-success">Agregar Cuenta</span></div>
+                      <div class="tools agregar_cuenta_bancaria_pg select" style="cursor: pointer;"> <span class="label label-success">Agregar Cuenta</span></div>
 
                     </div>
                     <div class="panel-body panel-body-contrast">
@@ -101,7 +101,7 @@
                                             <div class="col-sm-12 abajocaja" >
                                               {!! Form::select( 'entidadbanco_id', $combobancos, array(),
                                                                 [
-                                                                  'class'       => 'select2 form-control control input-xs entidadbanco' ,
+                                                                  'class'       => 'select2 form-control control input-xs entidadbancopg' ,
                                                                   'id'          => 'entidadbanco_id',
                                                                   'required'    => '',
                                                                   'data-aw'     => '1',

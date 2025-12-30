@@ -3271,6 +3271,27 @@ $(document).ready(function () {
 
     });
 
+
+
+    $('.btnaprobarcomporbatntenuevo').on('click', function(event){
+        event.preventDefault();
+        $.confirm({
+            title: '¿Confirma la Aprobacion?',
+            content: 'Aprobar el Comprobante',
+            buttons: {
+                confirmar: function () {
+                    $( "#formpedido" ).submit();
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo Aprobacion');
+                }
+            }
+        });
+
+    });
+
+
+
     $('.btnobservarcomporbatnte').on('click', function (event) {
         event.preventDefault();
         $.confirm({
