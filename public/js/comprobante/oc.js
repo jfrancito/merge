@@ -39,6 +39,27 @@ $(document).ready(function(){
 
     });
 
+    $(".cfedocumento").on('click','.cambiar_reparable', function() {
+
+        var _token                  =   $('#token').val();
+        const orden_id              =   $(this).attr('data_orden_id');
+        var idopcion                =   $('#idopcion').val();
+
+        data                        =   {
+                                            _token                  : _token,
+                                            orden_id                : orden_id,
+                                            idopcion                : idopcion,
+                                        };
+                                        
+        ajax_modal(data,"/ajax-modal-cambiar-reparable",
+                  "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+
+
+
+    });
+
+
+
 
     $(".agestioncomprobante").on('change','.selectoperacion', function() {
 

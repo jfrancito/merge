@@ -109,6 +109,11 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-modal-ver-cuenta-bancaria-oc', 'UserController@actionAjaxModalVerCuentaBancariaOC');
 
 	Route::any('/ajax-modal-ver-cuenta-bancaria-oc-individual', 'UserController@actionAjaxModalVerCuentaBancariaOCIndividual');
+	Route::any('/ajax-modal-cambiar-reparable', 'UserController@actionAjaxModalCambiarReparable');
+	Route::any('/guardar-cambio-reparable/{orden_id}/{idopcion}', 'UserController@actionGuardarCambiarReparable');
+
+
+
 
 	Route::any('/ajax-modal-ver-cuenta-bancaria-lq', 'UserController@actionAjaxModalVerCuentaBancariaLQ');
 	Route::any('/ajax-modal-ver-cuenta-bancaria-liq-com-an', 'UserController@actionAjaxModalVerCuentaBancariaLiqComAn');

@@ -352,7 +352,60 @@ class UserController extends Controller {
 						 ]);
 	}
 
+	public function actionAjaxModalCambiarReparable(Request $request)
+	{
 
+        $orden_id               =   $request['orden_id'];
+        $idopcion               =   $request['idopcion'];
+        $fedocumento          	=   FeDocumento::where('ID_DOCUMENTO','=',$orden_id)->first();
+		$empresa 				=	STDEmpresa::where('NRO_DOCUMENTO','=',$fedocumento->RUC_PROVEEDOR)->first();
+		$combo_usuario 			= 	$this->gn_generacion_combo_usuario_reparable('Seleccione usuario','');
+		$usuario_id             =   '';
+
+		return View::make('usuario/modal/ajax/mcambiarreparable',
+						 [		 	
+
+						 	'fedocumento' 					=> $fedocumento,
+						 	'orden_id' 						=> $orden_id,
+						 	'idopcion' 						=> $idopcion,
+						 	'combo_usuario' 				=> $combo_usuario,
+						 	'usuario_id' 					=> $usuario_id,
+						 	'ajax' 							=> true,						 	
+						 ]);
+	}
+
+
+
+	public function actionGuardarCambiarReparable($orden_id,$idopcion,Request $request)
+	{
+
+
+		$usuario_id 	 		 	 				= 	$request['usuario_id'];
+        $fedocumento          						=   FeDocumento::where('ID_DOCUMENTO','=',$orden_id)->first();
+		$usuario 									= 	User::where('id', $usuario_id)->first();
+
+        FeDocumento::where('ID_DOCUMENTO',$orden_id)
+                    ->update(
+                        [
+                            'COD_CONTACTO'=>$usuario->usuarioosiris_id
+                        ]
+                    );
+
+        $documento                              =   new FeDocumentoHistorial;
+        $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+        $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+        $documento->FECHA                       =   $this->fechaactual;
+        $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+        $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+        $documento->TIPO                        =   'CAMBIO REPARABLE A '. $usuario->nombre;
+        $documento->MENSAJE                     =   '';
+        $documento->save();
+
+
+		return Redirect::to('gestion-de-oc-validado-proveedores/'.$idopcion)->with('bienhecho', 'Se realizo la modificacion deL reparable '.$orden_id);
+
+
+	}
 
 	public function actionAjaxModalVerCuentaBancariaOC(Request $request)
 	{
@@ -814,6 +867,7 @@ class UserController extends Controller {
 
 
 	}
+
 
 
 	public function actionConfigurarDatosCuentaBancariaLQ($ID_DOCUMENTO,$idopcion,Request $request)

@@ -31,11 +31,7 @@
           <span><b>NUMERO  : {{$item->NUMERO}}</b></span>
           <span><b>FECCHA : </b> {{$item->FEC_VENTA}}</span>
           <span><b>AREA : </b> {{$item->AREA}}</span>
-
           <span><b>FORMA PAGO : </b> {{$item->FORMA_PAGO}}</span>
-
-
-          <!-- <span><b>TOTAL : </b> {{number_format($item->TOTAL_VENTA_ORIG+$item->PERCEPCION+$item->MONTO_RETENCION, 4, '.', ',')}}</span> -->
           <span><b>TOTAL : </b> {{number_format($item->TOTAL_VENTA_ORIG, 4, '.', ',')}}</span>
           <span><b>PERCEPCION : </b> {{$item->PERCEPCION}}</span>
           <span><b>RETENCION : </b> {{$item->MONTO_RETENCION}}</span>
@@ -47,7 +43,15 @@
           <span><b>CONTABILIDAD : </b> {{date_format(date_create($item->fecha_pr), 'd-m-Y h:i:s')}}</span>
           <span><b>ADMINISTRACION : </b> {{date_format(date_create($item->fecha_ap), 'd-m-Y h:i:s')}}</span>
           <div class="tools ver_cuenta_bancaria_indi select" data_orden_id = "{{$item->ID_DOCUMENTO}}" data_numero_cuenta = "{{$item->TXT_NRO_CUENTA_BANCARIA}}" data_banco_codigo = "{{$item->COD_CATEGORIA_BANCO}}"
-            style="cursor: pointer;width: 80px;"> <span class="label label-success">Ver Cuenta</span></div>
+            style="cursor: pointer;width: 80px;margin-bottom: 5px;"> <span class="label label-success">Ver Cuenta</span></div>
+
+
+          @if($item->IND_REPARABLE == 1 && ( Session::get('usuario')->rol_id == '1CIX00000001' || Session::get('usuario')->rol_id == '1CIX00000019'))
+            <div class="tools cambiar_reparable select" data_orden_id = "{{$item->ID_DOCUMENTO}}" 
+              style="cursor: pointer;width: 105px;"> <span class="label label-primary">Cambiar reparable</span></div>
+
+          @endif
+
         </td>
 
         @include('comprobante.ajax.estadosgestion')

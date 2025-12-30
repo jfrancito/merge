@@ -21,8 +21,6 @@
             @else
               @include('comprobante.ajax.alistaocvalidadoestiba')
             @endif
-
-
           @endif
         @endif
       @endif
