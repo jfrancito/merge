@@ -16,7 +16,11 @@
           @if($operacion_id == 'NOTA_DEBITO')
             @include('comprobante.ajax.alistaocvalidadonotadebito')
           @else
-            @include('comprobante.ajax.alistaocvalidadoestiba')
+            @if($operacion_id == 'PROVISION_GASTO')
+              @include('comprobante.ajax.alistaocvalidadopg')
+            @else
+              @include('comprobante.ajax.alistaocvalidadoestiba')
+            @endif
           @endif
         @endif
       @endif

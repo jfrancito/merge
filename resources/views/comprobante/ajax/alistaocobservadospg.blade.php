@@ -1,10 +1,10 @@
 <table id="nso" class="table table-striped table-borderless table-hover td-color-borde td-padding-7 listatabla">
   <thead>
     <tr>
-      <th>ITEM</th>
-      <th>ORDEN COMPRA</th>
+      <th>NOTA DE DEBITO</th>
       <th>FACTURA</th>
       <th>REGISTRO</th>
+      
       <th>ESTADO</th>
       <th>OPCION</th>
     </tr>
@@ -12,57 +12,49 @@
   <tbody>
     @foreach($listadatos as $index => $item)
       <tr data_requerimiento_id = "{{$item->id}}">
-        <td>{{$index + 1}}</td>
         <td class="cell-detail sorting_1" style="position: relative;">
-          <span><b>CODIGO : {{$item->COD_ORDEN}} </b> </span>
-          <span><b>FECHA  : {{$item->FEC_ORDEN}}</b></span>
-          <span><b>DOCUMENTO : </b>{{$item->RUC_PROVEEDOR}}</span>
-          <span><b>PROVEEDOR : </b>{{$item->TXT_EMPR_CLIENTE}} </span>
+          <span><b>CODIGO : {{$item->COD_DOCUMENTO_CTBLE}} </b> </span>
+          <span><b>FECHA  : {{$item->FEC_EMISION}}</b></span>
+          <span><b>PROVEEDOR : </b> {{$item->TXT_EMPR_EMISOR}}</span>
           <span><b>TOTAL : </b> {{$item->CAN_TOTAL}}</span>
-          <span><b>USUARIO CONTACTO : </b> {{$item->TXT_CONTACTO_UC}}</span>
-          <span><b>FOLIO : </b> {{$item->FOLIO}}</span>
-          <span><b>BANCO : </b> {{$item->TXT_CATEGORIA_BANCO}}</span>
+          <span><b>DOCUMENTO : </b> {{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</span>
+          
+          <span><b>ORSERVACION : </b>               
+              @if($item->ind_observacion == 1) 
+                  <span class="badge badge-danger" style="display: inline-block;">EN PROCESO</span>
+              @else
+                @if($item->ind_observacion == 0) 
+                    <span class="badge badge-default" style="display: inline-block;">SIN OBSERVACIONES</span>
+                @else
+                    <span class="badge badge-default" style="display: inline-block;">SIN OBSERVACIONES</span>
+                @endif
+              @endif
+          </span>
 
-          <span><b>H. OBSERVACION : </b> {{$item->TXT_OBSERVADO}}</span>
-          <span><b>H. REPARABLE : </b> {{$item->TXT_REPARABLE}}</span>
+
         </td>
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>SERIE : {{$item->SERIE}} </b> </span>
           <span><b>NUMERO  : {{$item->NUMERO}}</b></span>
           <span><b>FECCHA : </b> {{$item->FEC_VENTA}}</span>
-          <span><b>AREA : </b> {{$item->AREA}}</span>
           <span><b>FORMA PAGO : </b> {{$item->FORMA_PAGO}}</span>
           <span><b>TOTAL : </b> {{number_format($item->TOTAL_VENTA_ORIG, 4, '.', ',')}}</span>
-          <span><b>PERCEPCION : </b> {{$item->PERCEPCION}}</span>
-          <span><b>RETENCION : </b> {{$item->MONTO_RETENCION}}</span>
-
         </td>
+
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>PROVEEDOR : </b>  {{date_format(date_create($item->fecha_pa), 'd-m-Y h:i:s')}}</span>
           <span><b>U. CONTACTO: </b>{{date_format(date_create($item->fecha_uc), 'd-m-Y h:i:s')}}</span>
           <span><b>CONTABILIDAD : </b> {{date_format(date_create($item->fecha_pr), 'd-m-Y h:i:s')}}</span>
           <span><b>ADMINISTRACION : </b> {{date_format(date_create($item->fecha_ap), 'd-m-Y h:i:s')}}</span>
-          <div class="tools ver_cuenta_bancaria_indi select" data_orden_id = "{{$item->ID_DOCUMENTO}}" data_numero_cuenta = "{{$item->TXT_NRO_CUENTA_BANCARIA}}" data_banco_codigo = "{{$item->COD_CATEGORIA_BANCO}}"
-            style="cursor: pointer;width: 80px;margin-bottom: 5px;"> <span class="label label-success">Ver Cuenta</span></div>
-
-
-          @if($item->IND_REPARABLE == 1 && ( Session::get('usuario')->rol_id == '1CIX00000001' || Session::get('usuario')->rol_id == '1CIX00000019'))
-            <div class="tools cambiar_reparable select" data_orden_id = "{{$item->ID_DOCUMENTO}}" 
-              style="cursor: pointer;width: 105px;"> <span class="label label-primary">Cambiar reparable</span></div>
-
-          @endif
-
         </td>
 
-        @include('comprobante.ajax.estadosgestion')
+        @include('comprobante.ajax.estados')
         <td class="rigth">
           <div class="btn-group btn-hspace">
             <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>
             <ul role="menu" class="dropdown-menu pull-right">
               <li>
-                <a href="{{ url('/detalle-comprobante-oc-validado/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,6).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -10))) }}">
-                    Detalle de Registro
-                </a>
+                <a href="{{ url('/observacion-comprobante-uc-pg/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,7).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -9))) }}">Observacion</a>  
               </li>
             </ul>
           </div>

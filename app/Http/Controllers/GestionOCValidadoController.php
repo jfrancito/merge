@@ -406,6 +406,7 @@ class GestionOCValidadoController extends Controller
                                         'DOCUMENTO_INTERNO_COMPRA' => 'DOCUMENTO INTERNO COMPRA',
                                         'COMISION' => 'COMISION',                                        
                                         'LIQUIDACION_COMPRA_ANTICIPO' => 'LIQUIDACION DE COMPRA ANTICIPO',
+                                        'PROVISION_GASTO' => 'PROVISION DE GASTO',
                                         'NOTA_CREDITO' => 'NOTA DE CREDITO',
                                         'NOTA_DEBITO' => 'NOTA DE DEBITO'
                                     );
@@ -477,7 +478,14 @@ class GestionOCValidadoController extends Controller
                         if($operacion_id=='NOTA_DEBITO'){
                             $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_nota_debito($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
                         }else{
-                            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$operacion_id);
+
+                            if($operacion_id=='PROVISION_GASTO'){
+                                $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_pg($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id);
+                            }else{
+                                $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_estiba($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id,$operacion_id);
+                            }
+
+
                         }
                     }
                 }
@@ -807,6 +815,64 @@ class GestionOCValidadoController extends Controller
                             'idopcion'              =>  $idopcion,
                          ]);
     }
+
+    public function actionDetalleComprobanteOCValidadoPg($idopcion,$linea, $prefijo, $idordencompra, Request $request) {
+
+        View::share('titulo','Detalle de Comprobante');
+
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo_contrato($idordencompra,$prefijo);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_pg_idoc($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_pg_comprobante_idoc($idoc);
+
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
+        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+
+        $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);
+
+        $xmlarchivo             =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE.'\\'.$fedocumento->ARCHIVO_XML;
+        $cdrarchivo             =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE.'\\'.$fedocumento->ARCHIVO_CDR;
+        $pdfarchivo             =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE.'\\'.$fedocumento->ARCHIVO_PDF;
+        $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
+        $documentohistorial     =   FeDocumentoHistorial::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                    ->orderBy('FECHA','DESC')
+                                    ->get();
+        //dd($documentohistorial);
+
+        $funcion                =   $this;
+
+        $archivos               =   $this->lista_archivos_total($idoc,$fedocumento->DOCUMENTO_ITEM);
+        $archivospdf            =   $this->lista_archivos_total_pdf($idoc,$fedocumento->DOCUMENTO_ITEM);
+
+
+
+        $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+        //transferencia   
+        // Verificar si la cadena contiene 'TPS' o 'TPL'
+
+        $resultado = '';
+        
+
+
+
+        //dd($archivos);
+        return View::make('comprobante/registrocomprobantevalidadopg',
+                         [
+                            'ordencompra'           =>  $ordencompra,                            
+                            'detalleordencompra'    =>  $detalleordencompra,
+                            'fedocumento'           =>  $fedocumento,
+                            'detallefedocumento'    =>  $detallefedocumento,
+                            'documentohistorial'    =>  $documentohistorial,
+                            'archivos'              =>  $archivos,
+                            'archivosanulados'              =>  $archivosanulados,
+                            'linea'                 =>  $linea,
+                            'archivospdf'           =>  $archivospdf,                         
+                            'xmlarchivo'            =>  $xmlarchivo,
+                            'tp'                    =>  $tp,
+                            'funcion'               =>  $funcion,
+                            'idopcion'              =>  $idopcion,
+                         ]);
+    }
+
 
     public function actionDetalleComprobanteOCValidadoEstiba($idopcion,$lote, Request $request) {
 
@@ -1320,6 +1386,44 @@ class GestionOCValidadoController extends Controller
         $nombrearchivo          =   trim($archivo->NOMBRE_ARCHIVO);
         $nombrefile             =   basename($nombrearchivo);
         $file                   =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE.'\\'.basename($archivo->NOMBRE_ARCHIVO);
+
+
+        if(file_exists($file)){
+            header("Cache-Control: public");
+            header("Content-Description: File Transfer");
+            header("Content-Disposition: attachment; filename=$nombrefile");
+            header("Content-Type: application/xml");
+            header("Content-Transfer-Encoding: binary");
+            readfile($file);
+            exit;
+        }else{
+            dd('Documento no encontrado');
+        }
+
+    }
+
+    public function actionDescargarPG($tipo,$idopcion,$linea, $prefijo, $idordencompra, Request $request)
+    {
+
+
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo_contrato($idordencompra,$prefijo);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_pg_idoc($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_pg_comprobante_idoc($idoc);
+
+
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
+        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+        //dd($ordencompra);
+
+        $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);
+
+
+        //dd($idoc);
+
+        $archivo                =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','1')->where('TIPO_ARCHIVO','=',$tipo)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->first();
+        $nombrearchivo          =   trim($archivo->NOMBRE_ARCHIVO);
+        $nombrefile             =   basename($nombrearchivo);
+        $file                   =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO.'\\'.basename($archivo->NOMBRE_ARCHIVO);
 
 
         if(file_exists($file)){

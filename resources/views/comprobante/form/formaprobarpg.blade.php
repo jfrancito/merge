@@ -1,12 +1,9 @@
 
 <div class="row">
-  <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-    @include('comprobante.form.notadebito.comparar')
+  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+    @include('comprobante.form.pg.comparar')
   </div>
-  <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-      @include('comprobante.form.notadebito.consultaapi')      
-  </div>
-  <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-8">
     @include('comprobante.form.notadebito.seguimiento')
   </div> 
 </div>
@@ -39,18 +36,11 @@
                       <ul role="menu" class="dropdown-menu pull-right">
                         
                         <li>
-                          <a href="{{ url('/descargar-archivo-requerimiento-nota-debito/'.$item->TIPO_ARCHIVO.'/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -10))) }}">
+                          <a href="{{ url('/descargar-archivo-requerimiento-pg/'.$item->TIPO_ARCHIVO.'/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -9))) }}">
                             Descargar
                           </a>  
                         </li>
 
-                        @if(Session::get('usuario')->id == '1CIX00000001' or Session::get('usuario')->id == '1CIX00000049')
-                          <li>
-                            <a class="elimnaritem"  href="{{ url('/eliminar-archivo-item-nota-debito/'.$item->TIPO_ARCHIVO.'/'.$item->NOMBRE_ARCHIVO.'/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -10))) }}">
-                              Eliminar Item
-                            </a>
-                          </li>
-                        @endif
 
                       </ul>
                     </div>
@@ -63,7 +53,7 @@
     </div>
   </div>
   <div class="col-xs-12 col-sm-6 col-md-8 col-lg-8">
-    @include('comprobante.form.notadebito.informacion')
+    @include('comprobante.form.pg.informacion')
   </div>
 </div>
 

@@ -172,6 +172,38 @@ class GestionOCController extends Controller
     }
 
 
+    public function actionAjaxBuscarCuentaBancariaPg(Request $request)
+    {
+
+
+        $entidadbanco_id        =   $request['entidadbanco_id'];
+        $prefijo_id             =   $request['prefijo_id'];
+        $orden_id               =   $request['orden_id'];
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo_contrato($orden_id,$prefijo_id);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_pg_idoc($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_pg_comprobante_idoc($idoc);
+
+
+        $tescuentabb            =   TESCuentaBancaria::where('COD_EMPR_TITULAR','=',$ordencompra->COD_EMPR_EMISOR)
+                                    ->where('COD_EMPR_BANCO','=',$entidadbanco_id)
+                                    ->where('COD_ESTADO','=',1)
+                                    ->select(DB::raw("
+                                          TXT_NRO_CUENTA_BANCARIA,
+                                          TXT_REFERENCIA + ' - '+ TXT_NRO_CUENTA_BANCARIA AS nombre")
+                                        )
+                                    ->pluck('nombre','TXT_NRO_CUENTA_BANCARIA')
+                                    ->toArray();
+        $combocb                =   array('' => "Seleccione Cuenta Bancaria") + $tescuentabb;
+        $funcion                =   $this;
+
+        return View::make('comprobante/combo/combo_cuenta_bancaria',
+                         [
+                            'combocb'                   =>  $combocb,
+                            'ajax'                      =>  true,
+                         ]);
+    }
+
+
     public function actionAjaxMonedaAjaxCuenta(Request $request)
     {
 

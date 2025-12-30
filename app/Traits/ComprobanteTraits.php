@@ -539,7 +539,7 @@ trait ComprobanteTraits
         //UPDATE DE CENTIMOS CONTRATOS
         DB::update("
             UPDATE CMP.DOCUMENTO_CTBLE
-            SET CMP.DOCUMENTO_CTBLE.CAN_TOTAL = CONTRATO.CAN_TOTAL
+            SET CMP.DOCUMENTO_CTBLE.CAN_TOTAL = CONTRATO.CAN_TOTAL , CMP.DOCUMENTO_CTBLE.FEC_USUARIO_MODIF_AUD = GETDATE()
             FROM FE_DOCUMENTO 
             INNER JOIN CMP.DOCUMENTO_CTBLE CONTRATO 
                 ON FE_DOCUMENTO.ID_DOCUMENTO = CONTRATO.COD_DOCUMENTO_CTBLE
@@ -556,12 +556,13 @@ trait ComprobanteTraits
             AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
             AND CMP.DOCUMENTO_CTBLE.CAN_TOTAL <> CONTRATO.CAN_TOTAL
             AND ABS(CMP.DOCUMENTO_CTBLE.CAN_TOTAL - CONTRATO.CAN_TOTAL) <= 0.1
+            AND CMP.DOCUMENTO_CTBLE.CAN_SALDO <> 0
             AND CMP.HABILITACION.FEC_HABILITACION >= DATEADD(MONTH, -2, GETDATE())
         ");
 
         DB::update("
             UPDATE CMP.HABILITACION
-            SET CMP.HABILITACION.CAN_IMPORTE = CONTRATO.CAN_TOTAL
+            SET CMP.HABILITACION.CAN_IMPORTE = CONTRATO.CAN_TOTAL , CMP.HABILITACION.FEC_USUARIO_MODIF_AUD = GETDATE()
             FROM FE_DOCUMENTO
             INNER JOIN CMP.DOCUMENTO_CTBLE CONTRATO 
                 ON FE_DOCUMENTO.ID_DOCUMENTO = CONTRATO.COD_DOCUMENTO_CTBLE
@@ -577,13 +578,14 @@ trait ComprobanteTraits
             WHERE FE_DOCUMENTO.OPERACION = 'CONTRATO'
             AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
             AND CMP.HABILITACION.CAN_IMPORTE <> CONTRATO.CAN_TOTAL
+            AND CMP.DOCUMENTO_CTBLE.CAN_SALDO <> 0
             AND ABS(CMP.HABILITACION.CAN_IMPORTE - CONTRATO.CAN_TOTAL) <= 0.1
             AND CMP.HABILITACION.FEC_HABILITACION >= DATEADD(MONTH, -2, GETDATE())
         ");
 
         DB::update("
             UPDATE CMP.HABILITACION
-            SET CMP.HABILITACION.CAN_CAPITAL_SALDO = CONTRATO.CAN_TOTAL
+            SET CMP.HABILITACION.CAN_CAPITAL_SALDO = CONTRATO.CAN_TOTAL , CMP.HABILITACION.FEC_USUARIO_MODIF_AUD = GETDATE()
             FROM FE_DOCUMENTO
             INNER JOIN CMP.DOCUMENTO_CTBLE CONTRATO 
                 ON FE_DOCUMENTO.ID_DOCUMENTO = CONTRATO.COD_DOCUMENTO_CTBLE
@@ -599,6 +601,7 @@ trait ComprobanteTraits
             WHERE FE_DOCUMENTO.OPERACION = 'CONTRATO'
             AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
             AND CMP.HABILITACION.CAN_CAPITAL_SALDO <> CONTRATO.CAN_TOTAL
+            AND CMP.DOCUMENTO_CTBLE.CAN_SALDO <> 0
             AND ABS(CMP.HABILITACION.CAN_CAPITAL_SALDO - CONTRATO.CAN_TOTAL) <= 0.1
             AND CMP.HABILITACION.FEC_HABILITACION >= DATEADD(MONTH, -2, GETDATE())
         ");
@@ -717,7 +720,7 @@ trait ComprobanteTraits
 
         DB::update("
             UPDATE CMP.DOCUMENTO_CTBLE
-            SET CMP.DOCUMENTO_CTBLE.CAN_TOTAL = FE_DOCUMENTO.TOTAL_VENTA_ORIG
+            SET CMP.DOCUMENTO_CTBLE.CAN_TOTAL = FE_DOCUMENTO.TOTAL_VENTA_ORIG , CMP.DOCUMENTO_CTBLE.FEC_USUARIO_MODIF_AUD = GETDATE()
             FROM FE_DOCUMENTO
             INNER JOIN (
                 SELECT FE_DOCUMENTO.ID_DOCUMENTO, DIP.COD_TABLA_ASOC
@@ -752,6 +755,7 @@ trait ComprobanteTraits
             )
             AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
             AND CMP.DOCUMENTO_CTBLE.CAN_TOTAL <> FE_DOCUMENTO.TOTAL_VENTA_ORIG
+            AND CMP.DOCUMENTO_CTBLE.CAN_SALDO <> 0
             AND ABS(CMP.DOCUMENTO_CTBLE.CAN_TOTAL - FE_DOCUMENTO.TOTAL_VENTA_ORIG) <= 0.1
             AND CMP.HABILITACION.FEC_HABILITACION >= DATEADD(MONTH, -2, GETDATE())
         ");
@@ -759,7 +763,7 @@ trait ComprobanteTraits
 
         DB::update("
             UPDATE CMP.HABILITACION
-            SET CMP.HABILITACION.CAN_IMPORTE = FE_DOCUMENTO.TOTAL_VENTA_ORIG
+            SET CMP.HABILITACION.CAN_IMPORTE = FE_DOCUMENTO.TOTAL_VENTA_ORIG , CMP.HABILITACION.FEC_USUARIO_MODIF_AUD = GETDATE()
             FROM FE_DOCUMENTO
             INNER JOIN (
                 SELECT FE_DOCUMENTO.ID_DOCUMENTO, DIP.COD_TABLA_ASOC
@@ -794,13 +798,14 @@ trait ComprobanteTraits
             )
             AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
             AND CMP.HABILITACION.CAN_IMPORTE <> FE_DOCUMENTO.TOTAL_VENTA_ORIG
+            AND CMP.DOCUMENTO_CTBLE.CAN_SALDO <> 0
             AND ABS(CMP.HABILITACION.CAN_IMPORTE - FE_DOCUMENTO.TOTAL_VENTA_ORIG) <= 0.1
             AND CMP.HABILITACION.FEC_HABILITACION >= DATEADD(MONTH, -2, GETDATE())
         ");
 
         DB::update("
             UPDATE CMP.HABILITACION
-            SET CMP.HABILITACION.CAN_CAPITAL_SALDO = FE_DOCUMENTO.TOTAL_VENTA_ORIG
+            SET CMP.HABILITACION.CAN_CAPITAL_SALDO = FE_DOCUMENTO.TOTAL_VENTA_ORIG , CMP.HABILITACION.FEC_USUARIO_MODIF_AUD = GETDATE()
             FROM FE_DOCUMENTO
             INNER JOIN (
                 SELECT FE_DOCUMENTO.ID_DOCUMENTO, DIP.COD_TABLA_ASOC
@@ -836,6 +841,7 @@ trait ComprobanteTraits
             AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
             AND CMP.HABILITACION.CAN_CAPITAL_SALDO <> FE_DOCUMENTO.TOTAL_VENTA_ORIG
             AND ABS(CMP.HABILITACION.CAN_CAPITAL_SALDO - FE_DOCUMENTO.TOTAL_VENTA_ORIG) <= 0.1
+            AND CMP.DOCUMENTO_CTBLE.CAN_SALDO <> 0
             AND CMP.HABILITACION.FEC_HABILITACION >= DATEADD(MONTH, -2, GETDATE())
         ");
 
@@ -2995,6 +3001,35 @@ trait ComprobanteTraits
         return  $listadatos;
     }
     
+
+
+    private function con_lista_cabecera_comprobante_total_cont_pg($cliente_id) {
+
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC'))
+                            ->where('OPERACION','=','PROVISION_GASTO')
+
+                            ->where(function ($query) {
+                                $query->where('ind_observacion', '<>', 1)
+                                      ->orWhereNull('ind_observacion');
+                            })
+                            ->where(function ($query) {
+                                $query->where('area_observacion', '=', '')
+                                      ->orwhere('area_observacion', '=', 'UCO')
+                                      ->orWhereNull('area_observacion');
+                            })
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
+                            ->orderBy('ind_observacion','asc')
+                            ->orderBy('fecha_uc','asc')
+
+                            ->get();
+
+        return  $listadatos;
+    }
+    
+
+
     private function con_lista_cabecera_comprobante_total_cont_estiba_levantadas($cliente_id,$operacion_id) {
 
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
@@ -3046,6 +3081,24 @@ trait ComprobanteTraits
 
         return  $listadatos;
     }
+    private function con_lista_cabecera_comprobante_total_cont_pg_levantadas($cliente_id) {
+
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                            //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC'))
+                            ->where('OPERACION','=','PROVISION_GASTO')
+                            ->where('ind_observacion','=',0)
+                            ->where('area_observacion','=','CONT')
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
+                            ->orderBy('ind_observacion','asc')
+                            ->orderBy('fecha_uc','asc')
+
+                            ->get();
+
+        return  $listadatos;
+    }
+
     private function con_lista_cabecera_comprobante_total_cont_nota_debito_levantadas($cliente_id) {
 
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
@@ -3063,6 +3116,7 @@ trait ComprobanteTraits
 
         return  $listadatos;
     }
+
     private function con_lista_cabecera_comprobante_total_cont_estiba_obs($cliente_id,$operacion_id) {
 
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
@@ -3129,6 +3183,23 @@ trait ComprobanteTraits
 
         return  $listadatos;
     }
+
+    private function con_lista_cabecera_comprobante_total_cont_pg_obs($cliente_id) {
+
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC'))
+                            ->where('OPERACION','=','PROVISION_GASTO')
+                             ->where('ind_observacion','=',1)
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
+                            ->orderBy('ind_observacion','asc')
+                            ->orderBy('fecha_uc','asc')
+
+                            ->get();
+
+        return  $listadatos;
+    }
+
     private function con_lista_cabecera_comprobante_total_adm_contrato_obs_levantadas($cliente_id) {
 
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
@@ -3180,6 +3251,21 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
+    private function con_lista_cabecera_comprobante_total_adm_pg_obs_levantadas($cliente_id) {
+
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')                            
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC'))
+                            ->where('OPERACION','=','PROVISION_GASTO')
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('ind_observacion','=',0)
+                            ->where('area_observacion','=','ADM')
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
+                            ->orderBy('ind_observacion','asc')
+                            ->orderBy('fecha_uc','asc')
+                            ->get();
+
+        return  $listadatos;
+    }
     private function con_lista_cabecera_comprobante_total_adm_nota_debito_obs_levantadas($cliente_id) {
 
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')                            
@@ -3195,6 +3281,7 @@ trait ComprobanteTraits
 
         return  $listadatos;
     }
+
 
     private function con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas($cliente_id,$operacion_id) {
 
@@ -3523,6 +3610,31 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
+    private function con_lista_cabecera_comprobante_total_adm_pg($cliente_id) {
+
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))                            
+                            ->where('OPERACION','=','PROVISION_GASTO')
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where(function ($query) {
+                                $query->where('ind_observacion', '<>', 1)
+                                      ->orWhereNull('ind_observacion');
+                            })
+
+                            ->where(function ($query) {
+                                $query->where('area_observacion', '=', '')
+                                      ->orWhereNull('area_observacion')
+                                      ->orWhereIn('area_observacion',['CONT','UCO']);
+                            })
+
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
+                            ->orderBy('fecha_pr','asc')
+                            ->get();
+
+        return  $listadatos;
+    }
+
+
     private function con_lista_cabecera_comprobante_total_adm_estiba($cliente_id,$operacion_id) {
 
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
@@ -3603,6 +3715,20 @@ trait ComprobanteTraits
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                             ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                             ->where('OPERACION','=','NOTA_DEBITO')
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('ind_observacion','=',1)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
+                            ->orderBy('fecha_pr','asc')
+                            ->get();
+
+        return  $listadatos;
+    }
+
+    private function con_lista_cabecera_comprobante_total_adm_pg_obs($cliente_id) {
+
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                            ->where('OPERACION','=','PROVISION_GASTO')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('ind_observacion','=',1)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
@@ -4758,6 +4884,58 @@ trait ComprobanteTraits
 
     }
 
+    private function con_lista_cabecera_comprobante_total_gestion_pg($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id) {
+
+
+        $trabajador     =       STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+        $centro_id      =       $trabajador->COD_ZONA_TIPO;
+        $rol            =       WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
+
+
+        $usuario_id             =   Session::get('usuario')->id;
+        $array_jefes            =   $this->array_usuario_jefes();
+
+        if($rol->ind_uc == 1 && !in_array($usuario_id, $array_jefes)){
+
+            $listadatos     =   FeDocumento::join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')                                
+                                ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD')
+                                ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
+                                ->Fecha($filtrofecha_id,$fecha_inicio,$fecha_fin)
+                                ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)                                
+                                ->where('OPERACION','=','PROVISION_GASTO')
+                                ->ProveedorFE($proveedor_id)
+                                ->EstadoFE($estado_id)
+                                ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA,FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_UC'))
+                                ->orderBy('fecha_uc','asc')
+                                ->get();
+
+        }else{
+
+            $listadatos     =   FeDocumento::join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')                                
+                                ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD')
+                                ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
+                                ->Fecha($filtrofecha_id,$fecha_inicio,$fecha_fin)
+                                ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                ->where('OPERACION','=','PROVISION_GASTO')
+                                ->ProveedorFE($proveedor_id)
+                                ->EstadoFE($estado_id)
+                                ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,CMP.CATEGORIA.NOM_CATEGORIA AS AREA,FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_UC'))
+                                ->orderBy('fecha_uc','asc')
+                                ->get();
+        }
+
+
+
+
+
+        return  $listadatos;
+
+
+    }
+
+
     private function con_lista_cabecera_comprobante_total_gestion_liquidacion_compra_anticipo($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id) {
 
 
@@ -5855,6 +6033,7 @@ trait ComprobanteTraits
         $listadatos          =      FeDocumento::Join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                                     ->where('OPERACION','=','NOTA_CREDITO')
                                     ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                    ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
                                     ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
                                     ->where('FE_DOCUMENTO.area_observacion','<>','UCO')
                                     ->where('FE_DOCUMENTO.ind_observacion','=','1')
@@ -5871,6 +6050,7 @@ trait ComprobanteTraits
         $listadatos          =      FeDocumento::Join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                                     ->where('OPERACION','=','NOTA_DEBITO')
                                     ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                    ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
                                     ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
                                     ->where('FE_DOCUMENTO.area_observacion','<>','UCO')
                                     ->where('FE_DOCUMENTO.ind_observacion','=','1')
@@ -5879,6 +6059,28 @@ trait ComprobanteTraits
 
         return  $listadatos;
     }
+
+    private function con_lista_cabecera_comprobante_total_gestion_observados_pg($cliente_id) {
+
+        $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+        $centro_id           =      $trabajador->COD_ZONA_TIPO;   
+
+        //dd($cliente_id);
+
+        $listadatos          =      FeDocumento::Join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                                    ->where('OPERACION','=','PROVISION_GASTO')
+                                    ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                    ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
+                                    ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                    ->where('FE_DOCUMENTO.area_observacion','<>','UCO')
+                                    ->where('FE_DOCUMENTO.ind_observacion','=','1')
+                                    ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                    ->get();
+
+        return  $listadatos;
+    }
+
+
 
     private function con_lista_cabecera_comprobante_total_gestion_observados_contrato_proveedores($cliente_id) {
 
@@ -6805,7 +7007,7 @@ trait ComprobanteTraits
         //UPDATE DE CENTIMOS ORDEN DE COMPRAS
         DB::update("
             UPDATE CMP.DOCUMENTO_CTBLE
-            SET CMP.DOCUMENTO_CTBLE.CAN_TOTAL = CMP.ORDEN.CAN_TOTAL
+            SET CMP.DOCUMENTO_CTBLE.CAN_TOTAL = CMP.ORDEN.CAN_TOTAL , CMP.DOCUMENTO_CTBLE.FEC_USUARIO_MODIF_AUD = GETDATE()
             FROM FE_DOCUMENTO 
             INNER JOIN CMP.ORDEN ON FE_DOCUMENTO.ID_DOCUMENTO = CMP.ORDEN.COD_ORDEN
             INNER JOIN CMP.REFERENCIA_ASOC ON COD_TABLA = COD_ORDEN AND REFERENCIA_ASOC.COD_ESTADO = 1
@@ -6814,13 +7016,14 @@ trait ComprobanteTraits
             WHERE FE_DOCUMENTO.OPERACION = 'ORDEN_COMPRA'
             AND FE_DOCUMENTO.COD_ESTADO NOT IN ('', 'ETM0000000000006')
             AND CMP.DOCUMENTO_CTBLE.CAN_TOTAL <> CMP.ORDEN.CAN_TOTAL 
+            AND CMP.DOCUMENTO_CTBLE.CAN_SALDO <> 0
             AND ABS(CMP.DOCUMENTO_CTBLE.CAN_TOTAL - CMP.ORDEN.CAN_TOTAL) <= 0.1
             AND CMP.HABILITACION.FEC_HABILITACION >= DATEADD(MONTH, -2, GETDATE())
         ");
 
         DB::update("
             UPDATE CMP.HABILITACION
-            SET CMP.HABILITACION.CAN_IMPORTE = CMP.ORDEN.CAN_TOTAL
+            SET CMP.HABILITACION.CAN_IMPORTE = CMP.ORDEN.CAN_TOTAL , CMP.HABILITACION.FEC_USUARIO_MODIF_AUD = GETDATE()
             FROM FE_DOCUMENTO 
             INNER JOIN CMP.ORDEN ON FE_DOCUMENTO.ID_DOCUMENTO = CMP.ORDEN.COD_ORDEN
             INNER JOIN CMP.REFERENCIA_ASOC ON COD_TABLA = COD_ORDEN AND REFERENCIA_ASOC.COD_ESTADO = 1
@@ -6831,13 +7034,14 @@ trait ComprobanteTraits
             WHERE FE_DOCUMENTO.OPERACION = 'ORDEN_COMPRA'
             AND FE_DOCUMENTO.COD_ESTADO NOT IN ('', 'ETM0000000000006')
             AND CMP.HABILITACION.CAN_IMPORTE <> CMP.ORDEN.CAN_TOTAL
+            AND CMP.DOCUMENTO_CTBLE.CAN_SALDO <> 0
             AND ABS(CMP.HABILITACION.CAN_IMPORTE - CMP.ORDEN.CAN_TOTAL) <= 0.1
             AND CMP.HABILITACION.FEC_HABILITACION >= DATEADD(MONTH, -2, GETDATE())
         ");
 
         DB::update("
             UPDATE CMP.HABILITACION
-            SET CMP.HABILITACION.CAN_CAPITAL_SALDO = CMP.ORDEN.CAN_TOTAL
+            SET CMP.HABILITACION.CAN_CAPITAL_SALDO = CMP.ORDEN.CAN_TOTAL , CMP.HABILITACION.FEC_USUARIO_MODIF_AUD = GETDATE()
             FROM FE_DOCUMENTO 
             INNER JOIN CMP.ORDEN 
                 ON FE_DOCUMENTO.ID_DOCUMENTO = CMP.ORDEN.COD_ORDEN
@@ -6853,6 +7057,7 @@ trait ComprobanteTraits
             WHERE FE_DOCUMENTO.OPERACION = 'ORDEN_COMPRA'
             AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
             AND CMP.HABILITACION.CAN_CAPITAL_SALDO <> CMP.ORDEN.CAN_TOTAL
+            AND CMP.DOCUMENTO_CTBLE.CAN_SALDO <> 0
             AND ABS(CMP.HABILITACION.CAN_CAPITAL_SALDO - CMP.ORDEN.CAN_TOTAL) <= 0.1
             AND CMP.HABILITACION.FEC_HABILITACION >= DATEADD(MONTH, -2, GETDATE())
         ");
