@@ -280,10 +280,22 @@ $(document).ready(function(){
                     let data_left = JSON.parse(data);
                     let estadoVale = data_left["0"]["TXT_CATEGORIA_ESTADO_VALE"];
 
-                    if (estadoVale !== 'GENERADO') {
+                  /*  if (estadoVale !== 'GENERADO') {
                         alerterrorajax('Solo se puede modificar un Vale de Rendir con estado "GENERADO".');
                         return;
+                    }*/
+
+                    if (
+                        estadoVale == 'GENERADO' ||
+                        estadoVale == 'AUTORIZADO' ||
+                        estadoVale == 'APROBADO' ||
+                        estadoVale == 'ANULADO'
+                    ) {
+                        alerterrorajax('No se puede modificar este vale a rendir.');
+                        return;
                     }
+
+
 
                     // Cargar cabecera
                     $('#cliente_select').val(data_left["0"]["USUARIO_AUTORIZA"]).trigger('change');
