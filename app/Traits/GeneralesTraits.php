@@ -1466,6 +1466,27 @@ trait GeneralesTraits
         return $combo;
     }
 
+    private function gn_generacion_combo_usuario_reparable($titulo, $todo)
+    {
+
+        $array = DB::table('users')
+            ->where('activo', '=', 1)
+            ->where('id', '<>', '1CIX00000001')
+            ->where('rol_id', '<>', '1CIX00000024')
+            ->pluck('nombre', 'id')
+            ->toArray();
+
+
+
+        if ($todo == 'TODO') {
+            $combo = array('' => $titulo, $todo => $todo) + $array;
+        } else {
+            $combo = array('' => $titulo) + $array;
+        }
+
+        return $combo;
+    }
+
 
     public function gn_background_fila_activo($activo)
     {
