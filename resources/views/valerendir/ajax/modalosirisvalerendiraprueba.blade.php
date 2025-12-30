@@ -18,8 +18,11 @@
                             <option value="{{ $key }}">{{ $value }}</option>
                         @endforeach
                     </select>--}} 
-                    <input type="text" id="cuenta_id" name="cuenta_id" class="form-control input-custom"
-                        value="{{ reset($combo_series) }}" readonly>
+                 {{--   <input type="text" id="cuenta_id" name="cuenta_id" class="form-control input-custom"
+                        value="{{ reset($combo_series) }}" readonly>--}} 
+
+                        <input type="text" id="cuenta_id" name="cuenta_id" class="form-control input-custom"
+                        value="{{ is_array($combo_series) ? reset($combo_series) : '' }}" readonly>
 
                 </div>
 
