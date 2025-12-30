@@ -154,6 +154,26 @@ $(document).ready(function(){
 
     });
 
+    $(".registrocomprobante").on('click','.agregar_cuenta_bancaria_pg', function() {
+
+        var _token                  =   $('#token').val();
+        var idopcion                =   $('#idopcion').val();
+        var prefijo_id              =   $('#prefijo_id').val();
+        var orden_id                =   $('#orden_id').val();
+        data                        =   {
+                                            _token                  : _token,
+                                            prefijo_id              : prefijo_id,
+                                            orden_id                : orden_id,
+                                            idopcion                : idopcion,
+
+                                        };
+
+        ajax_modal(data,"/ajax-modal-configuracion-cuenta-bancaria-pg",
+                  "modal-configuracion-usuario-detalle","modal-configuracion-usuario-detalle-container");
+
+    });
+
+
     $(".registrocomprobante").on('click','.agregar_cuenta_bancaria_liq_com_an', function() {
 
         var _token                  =   $('#token').val();
@@ -335,6 +355,42 @@ $(document).ready(function(){
 
 
 
+    $(".registrocomprobante").on('change','.entidadbancopg', function() {
+
+        debugger;
+
+        var _token              =   $('#token').val();
+        var entidadbanco_id     =   $(this).val();
+        var prefijo_id          =   $('#prefijo_id').val();
+        var orden_id            =   $('#orden_id').val();
+
+
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009', 'BAM0000000000011', 'BAM0000000000013', 'BAM0000000000014', 'BAM0000000000015'];
+
+        if(valores.includes(entidadbanco_id)){
+            $('.ajax_cb').addClass('ocultar');
+        }else{
+            $('.ajax_cb').removeClass('ocultar');
+        }
+
+
+        $.ajax({
+              type    :     "POST",
+              url     :     carpeta+"/ajax-cuenta-bancaria-proveedor-pg",
+              data    :     {
+                                _token              : _token,
+                                entidadbanco_id     : entidadbanco_id,
+                                prefijo_id          : prefijo_id,
+                                orden_id            : orden_id
+                            },
+                success: function (data) {
+                    $('.ajax_cb').html(data);
+                },
+                error: function (data) {
+                    error500(data);
+                }
+        });
+    });
 
 
     $(".registrocomprobante").on('change','.entidadbanco', function() {
@@ -345,6 +401,16 @@ $(document).ready(function(){
         var entidadbanco_id     =   $(this).val();
         var prefijo_id          =   $('#prefijo_id').val();
         var orden_id            =   $('#orden_id').val();
+
+
+        var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009', 'BAM0000000000011', 'BAM0000000000013', 'BAM0000000000014', 'BAM0000000000015'];
+
+        if(valores.includes(entidadbanco_id)){
+            $('.ajax_cb').addClass('ocultar');
+        }else{
+            $('.ajax_cb').removeClass('ocultar');
+        }
+
 
         debugger;
 

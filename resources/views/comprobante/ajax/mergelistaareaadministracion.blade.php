@@ -13,7 +13,14 @@
         @if($operacion_id == 'NOTA_DEBITO')
           @include('comprobante.ajax.alistanotadebitoareaadministrador')
         @else
-          @include('comprobante.ajax.alistaestibaareaadministrador')
+
+          @if($operacion_id == 'PROVISION_GASTO')
+            @include('comprobante.ajax.alistapgareaadministrador')
+          @else
+            @include('comprobante.ajax.alistaestibaareaadministrador')
+          @endif
+
+
         @endif
       @endif
     @endif

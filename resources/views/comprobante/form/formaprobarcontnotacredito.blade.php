@@ -169,7 +169,7 @@
   <div class="col-xs-6">
     <p class="text-right">
       <a href="{{ url('/gestion-de-contabilidad-aprobar/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button></a>
-      <button type="button"  class="btn btn-space btn-primary btnaprobarcomporbatnte">Guardar</button>
+      <button type="button"  class="btn btn-space btn-primary btnaprobarcomporbatntenuevo">Guardar</button>
     </p>
   </div>
 </div>

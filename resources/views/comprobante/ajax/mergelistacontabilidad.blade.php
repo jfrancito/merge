@@ -10,7 +10,13 @@
       @if($operacion_id == 'NOTA_DEBITO')
         @include('comprobante.ajax.alistacontabilidadnotadebito')
       @else
-        @include('comprobante.ajax.alistacontabilidadestiba')
+
+        @if($operacion_id == 'PROVISION_GASTO')
+          @include('comprobante.ajax.alistacontabilidadpg')
+        @else
+          @include('comprobante.ajax.alistacontabilidadestiba')
+        @endif
+
       @endif
     @endif
   @endif
