@@ -4706,6 +4706,130 @@ trait ComprobanteTraits
     }
 
 
+    private function con_lista_cabecera_comprobante_total_gestion_estiba_reparable_excel($cod_empresa,$tipoarchivo_id,$estado_id,$operacion_id) {
+
+
+
+        // Primero: Obtener los IDs (corregido para Laravel 5.4)
+        $listadatosss = FeDocumento::where('FE_DOCUMENTO.COD_EMPR', Session::get('empresas')->COD_EMPR)
+            ->where('OPERACION', $operacion_id)
+            ->tipoArchivo($tipoarchivo_id) // Si es un scope
+            ->estadoReparable($estado_id)   // Si es un scope
+            ->whereNotIn('FE_DOCUMENTO.COD_ESTADO', ['', 'ETM0000000000006'])
+            ->pluck('ID_DOCUMENTO') // En Laravel 5.4 usa lists(), no pluck()
+            ->toArray();
+
+
+
+        // Si la lista está vacía, retornar array vacío
+        if (empty($listadatosss)) {
+            return [];
+        }
+
+        // Segundo: Construir el query con parámetros correctos
+        $placeholders = implode(',', array_fill(0, count($listadatosss), '?'));
+        $parametros = [
+            Session::get('empresas')->COD_EMPR,
+            $operacion_id
+        ];
+
+        // Agregar los IDs como parámetros individuales
+        foreach ($listadatosss as $id) {
+            $parametros[] = $id;
+        }
+
+        $sql = "
+            SELECT 
+                FE_DOCUMENTO.*, 
+                CMP.DOCUMENTO_CTBLE.*,
+                FE_DETALLE_DOCUMENTO.*,
+                FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_FE, 
+                CMP.DOCUMENTO_CTBLE.TXT_GLOSA AS TXT_GLOSA_ORDEN,
+                FE_DOCUMENTO.TXT_REPARABLE AS TXT_REPARABLE_SN, 
+                FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_N,
+                CMP.CATEGORIA.NOM_CATEGORIA AS AREA, 
+                (
+                    SELECT STUFF(
+                        (
+                            SELECT '// ' + d2_interno.TXT_NOMBRE_PRODUCTO
+                            FROM CMP.DETALLE_PRODUCTO d2_interno
+                            WHERE d2_interno.COD_TABLA = FE_DOCUMENTO.ID_DOCUMENTO
+                            FOR XML PATH('')
+                        ), 1, 2, ''
+                    )
+                ) AS productos_cabecera2,
+                (
+                    SELECT STUFF(
+                        (
+                            SELECT '// ' + d2_interno.MENSAJE
+                            FROM FE_DOCUMENTO_HISTORIAL d2_interno
+                            WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                              AND FE_DOCUMENTO.IND_REPARABLE = 1
+                              AND TIPO LIKE 'DOCUMENTO ARCHIVO_%' 
+                            FOR XML PATH('')
+                        ), 1, 2, ''
+                    )
+                ) AS productos_reparable,
+                (
+                    SELECT STUFF(
+                        (
+                            SELECT '// ' + CONVERT(VARCHAR(20), d3_interno.FECHA, 106)
+                            FROM FE_DOCUMENTO_HISTORIAL d3_interno
+                            WHERE d3_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                            AND TIPO = 'RESOLVIO LOS REPARABLES' 
+                            FOR XML PATH('')
+                        ), 1, 2, ''
+                    )
+                ) AS fecha_reparable,
+                WEBPAGOSOC.MEDIO_PAGO,
+                WEBPAGOSOC.FECHA_PAGO,
+                WEBPAGOSOC.NOMBRE_BANCO,
+                WEBPAGOSOC.IMPORTE
+            FROM FE_DOCUMENTO
+            CROSS APPLY (
+                SELECT TOP 1 * 
+                FROM FE_REF_ASOC 
+                WHERE LOTE = FE_DOCUMENTO.ID_DOCUMENTO 
+                ORDER BY FE_REF_ASOC.ID_DOCUMENTO
+            ) AS D
+            INNER JOIN CMP.DOCUMENTO_CTBLE ON D.ID_DOCUMENTO = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE
+            INNER JOIN FE_DETALLE_DOCUMENTO ON FE_DETALLE_DOCUMENTO.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+            LEFT JOIN (
+                SELECT 
+                    dc.*,
+                    ra.COD_TABLA,
+                    ra.COD_TABLA_ASOC
+                FROM [CMP].[DOCUMENTO_CTBLE] dc
+                INNER JOIN [CMP].[REFERENCIA_ASOC] ra 
+                    ON dc.[COD_DOCUMENTO_CTBLE] = ra.[COD_TABLA_ASOC]
+                WHERE dc.[COD_ESTADO] = '1'
+                    AND dc.[COD_CATEGORIA_TIPO_DOC] IN (
+                        'TDO0000000000001',
+                        'TDO0000000000003',
+                        'TDO0000000000002',
+                        'TDO0000000000010'
+                    )
+            ) TTF ON D.ID_DOCUMENTO = TTF.COD_TABLA
+            LEFT JOIN WEBPAGOSOC ON WEBPAGOSOC.COD_DOCUMENTO_CTBLE = TTF.COD_DOCUMENTO_CTBLE
+            LEFT JOIN SGD.USUARIO ON SGD.USUARIO.COD_USUARIO = CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD
+            LEFT JOIN CMP.CATEGORIA ON CMP.CATEGORIA.COD_CATEGORIA = SGD.USUARIO.COD_CATEGORIA_AREA
+            WHERE 
+                FE_DOCUMENTO.COD_EMPR = ?
+                AND FE_DOCUMENTO.OPERACION = ?
+                AND FE_DOCUMENTO.ID_DOCUMENTO IN ($placeholders)
+                AND FE_DOCUMENTO.COD_ESTADO <> ''
+            ORDER BY FEC_VENTA ASC
+        ";
+
+        $listadatos = DB::select($sql, $parametros);
+
+
+        return  $listadatos;
+
+
+    }
+
+
 
     private function con_lista_cabecera_comprobante_total_gestion_contrato($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id) {
 
