@@ -5618,7 +5618,7 @@ class GestionOCController extends Controller
 
                 }else{
 
-                
+                    return Redirect::back()->with('errorurl', 'No se puede integrar ningun documento hasta proximo aviso');
                     //SI ES SERVICIO PASA NORMAL
                     FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                                 ->update(
@@ -6200,7 +6200,7 @@ class GestionOCController extends Controller
                 $device_info       =   $request['device_info'];
                 $this->con_datos_de_la_pc($device_info,$fedocumento,'SUBIO DOCUMENTOS');
                 //geolocalizacion
-
+                return Redirect::back()->with('errorurl', 'No se puede integrar ningun documento hasta proximo aviso');
 
                 FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(
@@ -6530,7 +6530,7 @@ class GestionOCController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
-
+                return Redirect::back()->with('errorurl', 'No se puede integrar ningun documento hasta proximo aviso');
                 FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(
                                 [
@@ -6815,7 +6815,7 @@ class GestionOCController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
-
+                return Redirect::back()->with('errorurl', 'No se puede integrar ningun documento hasta proximo aviso');
                 FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(
                                 [

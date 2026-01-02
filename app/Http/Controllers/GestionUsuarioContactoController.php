@@ -3746,6 +3746,8 @@ class GestionUsuarioContactoController extends Controller
                                     ]
                                 );
 
+                    return Redirect::back()->with('errorurl', 'No se puede integrar ningun documento hasta proximo aviso');
+
                     FeDocumento::where('ID_DOCUMENTO',$pedido_id)
                                 ->update(
                                     [
@@ -4223,7 +4225,7 @@ class GestionUsuarioContactoController extends Controller
 
                 }else{
 
-                  
+                    return Redirect::back()->with('errorurl', 'No se puede integrar ningun documento hasta proximo aviso');
                     FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
                                 ->update(
                                     [
@@ -5311,7 +5313,7 @@ class GestionUsuarioContactoController extends Controller
                     }
                 }
 
-
+                return Redirect::back()->with('errorurl', 'No se puede integrar ningun documento hasta proximo aviso');
                 FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(
                                 [
