@@ -179,7 +179,22 @@ class ReporteComprobanteController extends Controller
                     });
                 })->export('xls');
 
-            } 
+            } else{
+
+
+
+                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_estiba_reparable_excel($cod_empresa,$tipoarchivo_id,$estado_id,$operacion_id);
+                    
+                    Excel::create($titulo.'-('.$fecha_actual.')', function($excel) use ($listadatos,$titulo,$funcion,$operacion_id) {
+                        $excel->sheet($operacion_id.' REPARABLE', function($sheet) use ($listadatos,$titulo,$funcion,$operacion_id) {
+
+                            $sheet->loadView('reporte/excel/listacomprobantemasivoestiba')->with('listadatos',$listadatos)
+                                                                               ->with('titulo',$titulo)
+                                                                               ->with('funcion',$funcion);                                               
+                        });
+                    })->export('xls');
+
+            }
 
         }
 
