@@ -843,7 +843,7 @@ class GestionOCSXController extends Controller
 
                 }else{
 
-                
+                    return Redirect::back()->with('errorurl', 'No se puede integrar ningun documento hasta proximo aviso');
                     //SI ES SERVICIO PASA NORMAL
                     FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                                 ->update(
@@ -1136,6 +1136,8 @@ class GestionOCSXController extends Controller
                 $orden                                  =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$idoc)->first();
                 $fedocumento_x                          =   FeDocumento::where('TXT_REFERENCIA','=',$idoc)->first();
 
+
+                return Redirect::back()->with('errorurl', 'No se puede integrar ningun documento hasta proximo aviso');
                 //SI ES SERVICIO PASA NORMAL
                 FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(

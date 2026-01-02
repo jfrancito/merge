@@ -499,6 +499,9 @@ class GestionEstibaController extends Controller
                                     ]
                                 );
                 }else{
+
+                    return Redirect::back()->with('errorurl', 'No se puede integrar ningun documento hasta proximo aviso');
+
                     FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                                 ->update(
                                     [
