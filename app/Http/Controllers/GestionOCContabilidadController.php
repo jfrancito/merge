@@ -3885,8 +3885,9 @@ class GestionOCContabilidadController extends Controller
 
             $array_anio_pc = $this->pc_array_anio_cuentas_contable(Session::get('empresas')->COD_EMPR);
             $combo_anio_pc = $this->gn_generacion_combo_array('Seleccione año', '', $array_anio_pc);
-            $array_periodo_pc = $this->gn_periodo_actual_xanio_xempresa($this->anio, $mes_defecto, Session::get('empresas')->COD_EMPR);
-            $combo_periodo = $this->gn_combo_periodo_xanio_xempresa($this->anio, Session::get('empresas')->COD_EMPR, '', 'Seleccione periodo');
+            $array_periodo_pc = $this->gn_periodo_actual_xanio_xempresa($anio_defecto, $mes_defecto, Session::get('empresas')->COD_EMPR);
+            //dd($mes_defecto);
+            $combo_periodo = $this->gn_combo_periodo_xanio_xempresa($anio_defecto, Session::get('empresas')->COD_EMPR, '', 'Seleccione periodo');
             $periodo_defecto = $array_periodo_pc->COD_PERIODO;
 
             $sel_tipo_descuento = '';
