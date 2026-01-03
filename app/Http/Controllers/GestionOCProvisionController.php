@@ -29,7 +29,6 @@ use View;
 use App\Traits\GeneralesTraits;
 use App\Traits\ComprobanteTraits;
 use App\Traits\ComprobanteProvisionTraits;
-use App\Traits\ComprobanteProvisionTraits;
 
 use Hashids;
 use SplFileInfo;
