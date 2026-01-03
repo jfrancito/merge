@@ -3944,7 +3944,7 @@ class GestionUsuarioContactoController extends Controller
                 $pedido_id          =   $idoc;
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
 
-
+                return Redirect::back()->with('errorurl', 'No se puede integrar ningun documento hasta proximo aviso');
                 if($fedocumento->ind_observacion==1){
                     return Redirect::back()->with('errorurl', 'El documento esta observado no se puede aprobar');
                 }
