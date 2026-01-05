@@ -5454,7 +5454,7 @@ trait ComprobanteTraits
                     ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR)
                     ->whereBetween('TES.FEC_MOVIMIENTO_CAJABANCO', [$fecha_inicio, $fecha_fin])
                     ->where('TES.TXT_ITEM_MOVIMIENTO', 'like', '%PAGO DE PRESTAMOS BANCARIOS%')
-                    ->where('CTB.TXT_DESCRIPCION', 'like', '%INTERES%');
+                    ->where('CTB.TXT_DESCRIPCION', 'like', '%INTERESES POR%');
 
         $registros = $consulta1->unionAll($consulta2)->unionAll($consulta3)->get();
 
