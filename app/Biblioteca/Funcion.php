@@ -20,6 +20,33 @@ use table;
 class Funcion {
 
 
+	public function cuenta_osiris_lic($id_documento){
+
+		$nombre = 	'';
+		$lote 	= 	DB::table('FE_REF_ASOC')
+					->where('LOTE', $id_documento)
+					->first();
+		if(count($lote)>0){
+
+			$referencia = DB::table('CMP.REFERENCIA_ASOC')
+			    ->where('COD_TABLA', $lote->ID_DOCUMENTO)
+			    ->where('TXT_TABLA_ASOC', 'CMP.ORDEN')
+			    ->first();
+
+			if(count($referencia)>0){
+				$orden = DB::table('CMP.ORDEN')
+				    ->where('COD_ORDEN', $referencia->COD_TABLA_ASOC)
+				    ->first();
+				if(count($orden)>0){
+					$nombre = 	$orden->TXT_EMPR_CLIENTE;
+				}
+
+			}
+
+		}
+		
+		return $nombre;
+	}
 
 
 	public function tiene_perfil($empresa_id,$centro_id,$usuario_id) {
