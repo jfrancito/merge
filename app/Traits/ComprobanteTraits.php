@@ -2859,7 +2859,7 @@ trait ComprobanteTraits
                      		->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
 							->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
                             ->orderBy('ind_observacion','asc')
-                            ->orderBy('fecha_uc','asc')
+                            ->orderBy('fecha_pr','asc')
 							->get();
 
 	 	return  $listadatos;
@@ -2877,7 +2877,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
                             ->orderBy('ind_observacion','asc')
-                            ->orderBy('fecha_uc','asc')
+                            ->orderBy('fecha_pr','asc')
                             ->get();
 
         return  $listadatos;
@@ -2894,7 +2894,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
                             ->orderBy('ind_observacion','asc')
-                            ->orderBy('fecha_uc','asc')
+                            ->orderBy('fecha_pr','asc')
                             ->get();
 
         return  $listadatos;
@@ -2921,7 +2921,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
                             ->orderBy('ind_observacion','asc')
-                            ->orderBy('fecha_uc','asc')
+                            ->orderBy('fecha_pr','asc')
                             ->get();
 
         return  $listadatos;
@@ -2947,7 +2947,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
                             ->orderBy('ind_observacion','asc')
-                            ->orderBy('fecha_uc','asc')
+                            ->orderBy('fecha_pr','asc')
 
                             ->get();
 
@@ -2974,7 +2974,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
                             ->orderBy('ind_observacion','asc')
-                            ->orderBy('fecha_uc','asc')
+                            ->orderBy('fecha_pr','asc')
 
                             ->get();
 
@@ -3029,7 +3029,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
                             ->orderBy('ind_observacion','asc')
-                            ->orderBy('fecha_uc','asc')
+                            ->orderBy('fecha_pr','asc')
 
                             ->get();
 
@@ -3066,7 +3066,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
                             ->orderBy('ind_observacion','asc')
-                            ->orderBy('fecha_uc','asc')
+                            ->orderBy('fecha_pr','asc')
 
                             ->get();
 
@@ -3083,7 +3083,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
                             ->orderBy('ind_observacion','asc')
-                            ->orderBy('fecha_uc','asc')
+                            ->orderBy('fecha_pr','asc')
 
                             ->get();
 
@@ -3153,7 +3153,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
                             ->orderBy('ind_observacion','asc')
-                            ->orderBy('fecha_uc','asc')
+                            ->orderBy('fecha_pr','asc')
 
                             ->get();
 
@@ -3169,7 +3169,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
                             ->orderBy('ind_observacion','asc')
-                            ->orderBy('fecha_uc','asc')
+                            ->orderBy('fecha_pr','asc')
 
                             ->get();
 
@@ -3237,7 +3237,7 @@ trait ComprobanteTraits
                             ->where('ind_observacion','=',0)
                             ->where('area_observacion','=','ADM')
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -3466,7 +3466,7 @@ trait ComprobanteTraits
 							->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
 							->where('ind_observacion','=',1)
 							->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
 							->get();
 
 	 	return  $listadatos;
@@ -3483,7 +3483,7 @@ trait ComprobanteTraits
                             ->where('ind_observacion','=',0)
                             ->where('area_observacion','=','ADM')
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -3507,7 +3507,7 @@ trait ComprobanteTraits
                                       ->orWhereIn('area_observacion',['UCO']);
                             })
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -3540,7 +3540,7 @@ trait ComprobanteTraits
                             })
 
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -3564,7 +3564,7 @@ trait ComprobanteTraits
                             })
 
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -3588,7 +3588,7 @@ trait ComprobanteTraits
                             })
 
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -3612,7 +3612,7 @@ trait ComprobanteTraits
                             })
 
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -3636,7 +3636,7 @@ trait ComprobanteTraits
                             })
 
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -3663,7 +3663,7 @@ trait ComprobanteTraits
                                       ->orWhereIn('area_observacion',['UCO']);
                             })
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -3684,7 +3684,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('ind_observacion','=',1)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -3698,7 +3698,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('ind_observacion','=',1)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -3712,7 +3712,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('ind_observacion','=',1)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -3726,7 +3726,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('ind_observacion','=',1)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -3740,7 +3740,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('ind_observacion','=',1)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -3760,7 +3760,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('ind_observacion','=',1)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
