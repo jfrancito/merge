@@ -10,6 +10,7 @@
                      {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
 
+
                       <div class="col-xs-12 col-sm-10 col-md-10 col-lg-10 cajareporte">
 
                           <div class="form-group">
@@ -42,6 +43,7 @@
             <form method="POST" action="{{ url('validar-xml-oc-liquidacion-compra-anticipo-administrator/'.$idopcion.'/'.substr($ordenpago->COD_AUTORIZACION, 0,6).'/'.Hashids::encode(substr($ordenpago->COD_AUTORIZACION, -10))) }}" name="formguardardatos" id="formguardardatos" enctype="multipart/form-data" >
              {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
               <input type="hidden" name="procedencia" id='procedencia' value = '{{$procedencia}}'>
               
                            

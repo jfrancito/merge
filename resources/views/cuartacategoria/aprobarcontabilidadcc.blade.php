@@ -75,6 +75,7 @@
                                                   enctype="multipart/form-data">
                                                 {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                                                 @include('cuartacategoria.form.formaprobarcontcc')
                                                 <div class="row xs-pt-15">
                                                     <div class="col-xs-6">
@@ -112,6 +113,7 @@
                                                   class="form-horizontal group-border-dashed">
                                                 {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                                                 @include('cuartacategoria.form.formrechazocont')
 
                                                 <div class="row xs-pt-15">

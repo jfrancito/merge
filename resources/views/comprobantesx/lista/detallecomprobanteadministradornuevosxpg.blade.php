@@ -4,6 +4,7 @@
             <form method="POST" action="{{ url('validar-xml-oc-administrator-sx-pg/'.$idopcion.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -9))) }}" name="formguardardatos" id="formguardardatos" enctype="multipart/form-data" >
              {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
               <input type="hidden" name="procedencia" id='procedencia' value = '{{$procedencia}}'>
               <input type="hidden" name="rutaorden" id='rutaorden' value = '{{$rutaorden}}'>
               

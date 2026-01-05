@@ -24,6 +24,7 @@
 <input type="hidden" name="device_info" id='device_info'>
 
 
+
               <div class="form-group">
                 <label class="col-sm-3 control-label">Personal</label>
                 <div class="col-sm-5">

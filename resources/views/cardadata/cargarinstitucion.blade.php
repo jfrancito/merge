@@ -24,6 +24,7 @@
                             <form method="POST" action="{{ url('subir-excel-cargar-datos/'.$idopcion) }}" name="formcargardatos" id="formcargardatos" enctype="multipart/form-data" >
                                {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                                
                                 <div class="container text-center">
                                     <div class="row justify-content-md-center">                  

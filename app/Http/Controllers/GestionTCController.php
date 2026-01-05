@@ -722,29 +722,12 @@ class GestionTCController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
-
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
                 $this->con_datos_de_la_pc($device_info,$fedocumento,'SUBIO DOCUMENTOS');
-                //geolocalizacion
+                //geolocalización
 
-                // $fedocumento_w       =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
-                // //LE LLEGA AL USUARIO DE CONTACTO
-                // $trabajador         =   STDTrabajador::where('COD_TRAB','=',$contacto->COD_TRABAJADOR)->first();
-                // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                // $mensaje            =   'COMPROBANTE : '.$fedocumento->ID_DOCUMENTO
-                //                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-                //                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'
-                //                         .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
-                // //dd($trabajador);                        
-                // if(1==0){
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                // }else{
-                //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                //     //$this->insertar_whatsaap('51914693880','JOSE CHERO',$mensaje,'');
 
-                // }                       
 
                 DB::commit();
 

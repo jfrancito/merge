@@ -11,6 +11,7 @@
                               name="formcargardatos" id="formcargardatos" enctype="multipart/form-data">
                             {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                             
                             <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 cajareporte">
 
@@ -118,6 +119,7 @@
                   name="formguardardatos" id="formguardardatos" enctype="multipart/form-data">
                 {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                 <input type="hidden" name="rutaorden" id='rutaorden' value='{{$rutaorden}}'>
                 
                 <div class="row">

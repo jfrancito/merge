@@ -106,6 +106,7 @@
         <form method="POST" action="{{ url('validar-xml-oc/'.$idopcion.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" name="formcargardatos" id="formcargardatos" enctype="multipart/form-data" >
            {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
             <div class="container">
                 <div class="row justify-content-md-center">
 

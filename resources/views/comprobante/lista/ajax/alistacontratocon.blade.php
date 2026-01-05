@@ -19,7 +19,7 @@
 
       <th>FECHA EMISION</th>
       <th>CODIGO</th>
-      <th>COND. PAGO</th>
+      <th>ID</th>
       <th>USUARIO CONTACTO</th>
 
       <th>TIEMPO AT.</th>
@@ -42,7 +42,7 @@
 
         <td>{{date_format(date_create($item->FEC_EMISION), 'd-m-Y')}}</td>
         <td>{{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</td>
-        <td>{{$item->TXT_CATEGORIA_CONDICION_PAGO}}</td>
+        <td>{{$item->ID_DOCUMENTO}}</td>
         <td>{{$item->TXT_CONTACTO_UC}}</td>
 
 

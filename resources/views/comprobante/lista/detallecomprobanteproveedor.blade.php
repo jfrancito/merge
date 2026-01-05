@@ -10,6 +10,7 @@
                   <form method="POST" action="{{ url('subir-xml-cargar-datos-proveedor/'.$idopcion.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" name="formcargardatos" id="formcargardatos" enctype="multipart/form-data" >
                      {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <div class="col-xs-6 col-sm-6 col-md-6 col-lg-10 negrita" align="left">
@@ -57,6 +58,7 @@
             <form method="POST" action="{{ url('validar-xml-oc-proveedor/'.$idopcion.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" name="formguardardatos" id="formguardardatos" enctype="multipart/form-data" >
              {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
               <input type="hidden" name="procedencia" id='procedencia' value = '{{$procedencia}}'>
 
               <div class="row">

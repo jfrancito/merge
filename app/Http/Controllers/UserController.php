@@ -401,6 +401,11 @@ class UserController extends Controller {
         $documento->MENSAJE                     =   '';
         $documento->save();
 
+        //geolocalizacion
+        $device_info       =   $request['device_info'];
+        $this->con_datos_de_la_pc($device_info,$fedocumento,'CAMBIO REPARABLE A '. $usuario->nombre);
+        //geolocalización
+
 
 		return Redirect::to('gestion-de-oc-validado-proveedores/'.$idopcion)->with('bienhecho', 'Se realizo la modificacion deL reparable '.$orden_id);
 
@@ -497,6 +502,12 @@ class UserController extends Controller {
                 $documento->TIPO                        =   'CAMBIO DE CUENTA BANCARIA '.$fe_documento->TXT_NRO_CUENTA_BANCARIA.' POR '.$cuentabancarias->TXT_NRO_CUENTA_BANCARIA;
                 $documento->MENSAJE                     =   '';
                 $documento->save();
+
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'CAMBIO DE CUENTA BANCARIA '.$fe_documento->TXT_NRO_CUENTA_BANCARIA.' POR '.$cuentabancarias->TXT_NRO_CUENTA_BANCARIA);
+                //geolocalización
 
 
 		}						  	

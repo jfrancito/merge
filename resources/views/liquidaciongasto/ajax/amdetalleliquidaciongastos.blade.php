@@ -46,6 +46,7 @@
                                 <form method="POST" id='forextornardetallelq{{$item->ITEM}}' action="{{ url('/extonar-liquidacion-gastos-detalle/'.$idopcion.'/'.$item->ITEM.'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                                       {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                                       <button type= 'submit' style="margin-top: 5px;float: right;" data_item = '{{$item->ITEM}}' class="btn btn-rounded btn-space btn-danger btn-sm btn-extonar-detalle-lg">EXTORNAR</button>
                                 </form>
                                 <a href="{{ url('/modificar-liquidacion-gastos/'.$idopcion.'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -8)).'/'.$item->ITEM) }}" style="margin-top: 5px;float: right;" class="btn btn-rounded btn-space btn-success btn-sm">MODIFICAR</a>
@@ -60,6 +61,7 @@
                 <form method="POST" action="{{ url('/emitir-liquidacion-gastos/'.$idopcion.'/'.Hashids::encode(substr($liquidaciongastos->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" id ='frmpmemitir'>
                       {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
 
 
                       <input type="hidden" name="ID_DOCUMENTO" id = "ID_DOCUMENTO" value = "{{$liquidaciongastos->ID_DOCUMENTO}}">
@@ -229,6 +231,7 @@
             <form method="POST" id="frmdetallelg" action="{{ url('/guardar-detalle-liquidacion-gastos/'.$idopcion.'/'.Hashids::encode(substr($liquidaciongastos->ID_DOCUMENTO, -8))) }}" enctype="multipart/form-data">
                   {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                   @include('liquidaciongasto.form.faliquidaciongastodetalle')
             </form>
           </div>

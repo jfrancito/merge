@@ -341,7 +341,7 @@ class GestionOCAdministracionController extends Controller
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
                 $this->con_datos_de_la_pc($device_info,$fedocumento,'OBSERVADO POR ADMINISTRACION');
-                //geolocalizacion
+                //geolocalización
 
                 FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
@@ -517,6 +517,12 @@ class GestionOCAdministracionController extends Controller
                 $documento->MENSAJE                     =   $descripcion;
                 $documento->save();
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'OBSERVADO POR ADMINISTRACION');
+                //geolocalización
+
+
                 FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
                                 [
@@ -526,10 +532,6 @@ class GestionOCAdministracionController extends Controller
                                 ]
                             );
 
-                //geolocalizacion
-                $device_info       =   $request['device_info'];
-                $this->con_datos_de_la_pc($device_info,$fedocumento,'OBSERVADO POR ADMINISTRACION');
-                //geolocalizacion 
 
                 DB::commit();
 
@@ -694,6 +696,12 @@ class GestionOCAdministracionController extends Controller
                 $documento->TIPO                        =   'OBSERVADO POR ADMINISTRACION';
                 $documento->MENSAJE                     =   $descripcion;
                 $documento->save();
+
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'OBSERVADO POR ADMINISTRACION');
+                //geolocalización
 
                 FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
@@ -888,6 +896,12 @@ class GestionOCAdministracionController extends Controller
                 $documento->MENSAJE                     =   $descripcion;
                 $documento->save();
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'OBSERVADO POR ADMINISTRACION');
+                //geolocalización
+
+
                 FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
                                 [
@@ -1004,6 +1018,12 @@ class GestionOCAdministracionController extends Controller
                 $documento->MENSAJE                     =   $descripcion;
                 $documento->save();
 
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'OBSERVADO POR ADMINISTRACION');
+                //geolocalización
+
+
                 FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
                                 [
@@ -1013,22 +1033,6 @@ class GestionOCAdministracionController extends Controller
                                 ]
                             );
 
-                //LE LLEGA AL USUARIO DE CONTACTO
-               // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
-               //  $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-               //  $mensaje            =   'COMPROBANTE OBSERVADO: '.$fedocumento->ID_DOCUMENTO
-               //                          .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-               //                          .'PROVEEDOR : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'
-               //                          .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
-               //                          .'MENSAJE : '.$descripcion.'%0D%0A'; 
-
-                //dd($trabajador);                        
-                // if(1==0){
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                // }else{
-                //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                // }  
 
                 DB::commit();
 
@@ -1190,7 +1194,9 @@ class GestionOCAdministracionController extends Controller
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
                 $this->con_datos_de_la_pc($device_info,$fedocumento,'OBSERVADO POR ADMINISTRACION');
-                //geolocalizacion
+                //geolocalización
+
+
 
                 FeDocumento::where('ID_DOCUMENTO',$idoc)
                             ->update(
@@ -1381,11 +1387,11 @@ class GestionOCAdministracionController extends Controller
                 $documento->MENSAJE                     =   $descripcion;
                 $documento->save();
 
- 
-                //geolocalizacion
+                 //geolocalizacion
                 $device_info       =   $request['device_info'];
                 $this->con_datos_de_la_pc($device_info,$fedocumento,'RECOMENDACION POR ADMINISTRACION');
-                //geolocalizacion
+                //geolocalización
+
 
                 DB::commit();
                 return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' RECOMENDACION CON EXITO');
@@ -1481,10 +1487,11 @@ class GestionOCAdministracionController extends Controller
                 $documento->MENSAJE                     =   $descripcion;
                 $documento->save();
 
+
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
                 $this->con_datos_de_la_pc($device_info,$fedocumento,'RECOMENDACION POR ADMINISTRACION');
-                //geolocalizacion
+                //geolocalización
 
 
                 DB::commit();
@@ -1582,7 +1589,9 @@ class GestionOCAdministracionController extends Controller
                     //geolocalizacion
                     $device_info       =   $request['device_info'];
                     $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR ADMINISTRACION');
-                    //geolocalizacion
+                    //geolocalización
+
+
 
                     $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->first();
 
@@ -1677,7 +1686,7 @@ class GestionOCAdministracionController extends Controller
             //geolocalizacion
             $device_info       =   $request['device_info'];
             $this->con_datos_de_la_pc($device_info,$fedocumento,'RECHAZADO POR ADMINISTRACION');
-            //geolocalizacion
+            //geolocalización
 
             return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobantes Lote: '.$ordencompra->COD_ORDEN.' EXTORNADA con EXITO');
         
@@ -1775,7 +1784,7 @@ class GestionOCAdministracionController extends Controller
                     $documento->FECHA                       =   $this->fechaactual;
                     $documento->USUARIO_ID                  =   Session::get('usuario')->id;
                     $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
-                    $documento->TIPO                        =   'RECOMENDACION POR CONTABILIDAD';
+                    $documento->TIPO                        =   'RECOMENDACION POR ADMINISTRACION';
                     $documento->MENSAJE                     =   $descripcion;
                     $documento->save();
 
@@ -1826,8 +1835,8 @@ class GestionOCAdministracionController extends Controller
                 FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
                                 [
-                                    'COD_ESTADO'=>'ETM0000000000005',
-                                    'TXT_ESTADO'=>'APROBADO',
+                                    'COD_ESTADO'=>'ETM0000000000003',
+                                    'TXT_ESTADO'=>'POR APROBAR CONTABILIDADD',
                                     'IND_EMAIL_APROBADO'=>'0',
                                     'IND_EMAIL_APROBADO_ADMIN'=>'0',
                                     'ind_email_clap'=>0,
@@ -1842,170 +1851,6 @@ class GestionOCAdministracionController extends Controller
                                                 ->orderBy('NRO_LINEA','ASC')
                                                 ->get();
 
-                $conexionbd         = 'sqlsrv';
-                if($orden->COD_CENTRO == 'CEN0000000000004'){ //rioja
-                    $conexionbd         = 'sqlsrv_r';
-                }else{
-                    if($orden->COD_CENTRO == 'CEN0000000000006'){ //bellavista
-                        $conexionbd         = 'sqlsrv_b';
-                    }
-                }
-
-                DB::connection($conexionbd)->table('CMP.ORDEN')
-                    ->where('COD_ORDEN', $orden->COD_ORDEN)
-                    ->update(['COD_OPERACION' => 1,'FEC_USUARIO_MODIF_AUD'=>$this->hoy]);
-
-
-                //enviar tablas de fe_documento y fe_detalledocuemto
-                if($orden->COD_CENTRO == 'CEN0000000000004' || $orden->COD_CENTRO == 'CEN0000000000006'){ //rioja
-                    //dd($conexionbd);
-                    //FE_DOCUENTO
-                    $referenciaAsocQuery = FeDocumento::select('ID_DOCUMENTO'
-                                              ,'DOCUMENTO_ITEM'
-                                              ,'RUC_PROVEEDOR'
-                                              ,'RZ_PROVEEDOR'
-                                              ,'TIPO_CLIENTE'
-                                              ,'ID_CLIENTE'
-                                              ,'NOMBRE_CLIENTE'
-                                              ,'DIRECCION_CLIENTE'
-                                              ,'NUM_DOC_VENTA'
-                                              ,'SERIE'
-                                              ,'NUMERO'
-                                              ,'ID_TIPO_DOC'
-                                              ,'FEC_VENTA'
-                                              ,'FEC_VENCI_PAGO'
-                                              ,'FORMA_PAGO'
-                                              ,'FORMA_PAGO_DIAS'
-                                              ,'MONEDA'
-                                              ,'VALOR_TIPO_CAMBIO'
-                                              ,'VALOR_IGV_ORIG'
-                                              ,'VALOR_IGV_SOLES'
-                                              ,'SUB_TOTAL_VENTA_ORIG'
-                                              ,'SUB_TOTAL_VENTA_SOLES'
-                                              ,'TOTAL_VENTA_ORIG'
-                                              ,'TOTAL_VENTA_SOLES'
-                                              ,'V_EXONERADO'
-                                              ,'ESTADO'
-                                              ,'NUM_DOC_ELECT'
-                                              ,'ES_TRANS_GRATUITA'
-                                              ,'DES_COM'
-                                              ,'ES_ANULADO'
-                                              ,'ENVIADO_EMAIL'
-                                              ,'ENVIADO_EXTERNO'
-                                              ,'NRO_ORDEN_COMP'
-                                              ,'NUM_GUIA'
-                                              ,'TIPO_DOC_REL'
-                                              ,'CON_DETRACCION'
-                                              ,'OBSERVACION'
-                                              ,'HORA_EMISION'
-                                              ,'ES_TURISTICO'
-                                              ,'ES_EXONERADO'
-                                              ,'GUIA_CLIENTE'
-                                              ,'GLOSA_DETALE'
-                                              ,'VALIDACION_SUNAT'
-                                              ,'ID_MOTIVO_EMISION'
-                                              ,'MOTIVO_EMISION'
-                                              ,'MONTO_IMP_BOLSA'
-                                              ,'MONTO_DETRACCION'
-                                              ,'MONTO_RETENCION'
-                                              ,'MONTO_NETO_PAGO'
-                                              ,'DESCUENTO_I'
-                                              ,'DESCUENTO'
-                                              ,'IMPUESTO_2'
-                                              ,'TIPO_DETRACCION'
-                                              ,'PORC_DETRACCION'
-                                              ,'MONTO_ANTICIPO'
-                                              ,'COD_ESTADO'
-                                              ,'TXT_ESTADO'
-                                              ,'COD_EMPR'
-                                              ,'TXT_EMPR'
-                                              ,'COD_CONTACTO'
-                                              ,'TXT_CONTACTO'
-                                              ,'TXT_PROCEDENCIA'
-                                              ,'ARCHIVO_XML'
-                                              ,'ARCHIVO_CDR'
-                                              ,'ARCHIVO_PDF'
-                                              ,'success'
-                                              ,'message'
-                                              ,'estadoCp'
-                                              ,'nestadoCp'
-                                              ,'estadoRuc'
-                                              ,'nestadoRuc'
-                                              ,'condDomiRuc'
-                                              ,'ncondDomiRuc'
-                                              ,'CODIGO_CDR'
-                                              ,'RESPUESTA_CDR'
-                                              ,'ind_ruc'
-                                              ,'ind_rz'
-                                              ,'ind_moneda'
-                                              ,'ind_total'
-                                              ,'ind_cantidaditem'
-                                              ,'ind_formapago'
-                                              ,'ind_errototal'
-                                              ,'dni_usuariocontacto'
-                                              ,'usuario_pa'
-                                              ,'usuario_uc'
-                                              ,'usuario_ap'
-                                              ,'usuario_pr'
-                                              ,'usuario_ex'
-                                              ,'mensaje_exuc'
-                                              ,'mensaje_exap'
-                                              ,'mensaje_exadm'
-                                              ,'ind_email_uc'
-                                              ,'ind_email_ap'
-                                              ,'ind_email_adm'
-                                              ,'ind_email_clap'
-                                              ,'ind_email_ba'
-                                              ,'ind_observacion'
-                                              ,'area_observacion'
-                                              ,'OPERACION'
-                                              ,'PERCEPCION'
-                                              ,'usuario_tes'
-                                              ,'LOTE')
-                        ->where('ID_DOCUMENTO', '=', $orden->COD_ORDEN)
-                        ->get();
-
-                        
-                    //dd($referenciaAsocQuery);
-                    // Convertir el resultado en un array para poder insertarlo más adelante
-                    $dataToInsert = $referenciaAsocQuery->toArray();
-                    //dd($dataToInsert);
-
-                    // Paso 2: Insertar los datos en la segunda base de datos
-                    DB::connection($conexionbd)->table('FE_DOCUMENTO')->insert($dataToInsert);
-
-                    //FE_DETALLE_DOCUENTO
-                    $referenciaAsocQueryd = FeDetalleDocumento::select('*')
-                        ->where('ID_DOCUMENTO', '=', $orden->COD_ORDEN)
-                        ->get();
-                    // Convertir el resultado en un array para poder insertarlo más adelante
-                    $dataToInsertd = $referenciaAsocQueryd->toArray();
-                    // Paso 2: Insertar los datos en la segunda base de datos
-                    DB::connection($conexionbd)->table('FE_DETALLE_DOCUMENTO')->insert($dataToInsertd);
-
-
-                    //FE_FORMAPAGO
-                    $referenciaAsocQueryfp = FeFormaPago::select('ID_DOCUMENTO','DOCUMENTO_ITEM','ID_CUOTA','ID_MONEDA','MONTO_CUOTA','FECHA_PAGO')
-                        ->where('ID_DOCUMENTO', '=', $orden->COD_ORDEN)
-                        ->get();
-                    // Convertir el resultado en un array para poder insertarlo más adelante
-                    //$dataToInsertfp = $referenciaAsocQueryfp->toArray();
-
-
-                    $dataToInsertfp = $referenciaAsocQueryfp->map(function ($item) {
-                        if ($item['FECHA_PAGO']) {
-                            $item['FECHA_PAGO'] = date('Ymd', strtotime($item['FECHA_PAGO']));
-                        }
-                        return $item;
-                    })->toArray();
-
-                    // Paso 2: Insertar los datos en la segunda base de datos
-                    DB::connection($conexionbd)->table('FE_FORMAPAGO')->insert($dataToInsertfp);
-
-
-
-                }
-
                 //HISTORIAL DE DOCUMENTO APROBADO
                 $documento                              =   new FeDocumentoHistorial;
                 $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
@@ -2017,13 +1862,13 @@ class GestionOCAdministracionController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
-                $ordencompra        =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();            
-
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
                 $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR ADMINISTRACION');
-                //geolocalizacion
+                //geolocalización
 
+
+                $ordencompra        =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();            
 
                 DB::commit();
                 return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' APROBADO CON EXITO');
@@ -2246,21 +2091,259 @@ class GestionOCAdministracionController extends Controller
                     $documento->TIPO                        =   'RECOMENDACION POR CONTABILIDAD';
                     $documento->MENSAJE                     =   $descripcion;
                     $documento->save();
-                    //LE LLEGA AL USUARIO DE CONTACTO
-                    // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
-                    // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                    // $mensaje            =   'COMPROBANTE: '.$fedocumento->ID_DOCUMENTO
-                    //                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-                    //                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'
-                    //                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
-                    //                         .'RECOMENDACION : '.$descripcion.'%0D%0A';
-                    // //dd($trabajador);                        
-                    // if(1==0){
-                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                    // }else{
-                    //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                    // }  
+                }
+
+
+                $filespdf          =   $request['otros'];
+                if(!is_null($filespdf)){
+                    //PDF
+                    foreach($filespdf as $file){
+
+                            //
+                            $contadorArchivos = Archivo::count();
+
+                        $nombre          =      $ordencompra->COD_DOCUMENTO_CTBLE.'-'.$file->getClientOriginalName();
+                        /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
+                        $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
+                        $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
+                        //$nombrefilepdf   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
+                        $nombrefilepdf   =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                        $valor           =      $this->versicarpetanoexiste($rutafile);
+                        $rutacompleta    =      $rutafile.'\\'.$nombrefilepdf;
+                        copy($file->getRealPath(),$rutacompleta);
+                        $path            =      $rutacompleta;
+
+                        $nombreoriginal             =   $file->getClientOriginalName();
+                        $info                       =   new SplFileInfo($nombreoriginal);
+                        $extension                  =   $info->getExtension();
+
+                        $dcontrol                   =   new Archivo;
+                        $dcontrol->ID_DOCUMENTO     =   $ordencompra->COD_DOCUMENTO_CTBLE;
+                        $dcontrol->DOCUMENTO_ITEM   =   $fedocumento->DOCUMENTO_ITEM;
+                        $dcontrol->TIPO_ARCHIVO     =   'OTROS_UC';
+                        $dcontrol->NOMBRE_ARCHIVO   =   $nombrefilepdf;
+                        $dcontrol->DESCRIPCION_ARCHIVO  =   'OTROS ADMINISTRACION';
+                        $dcontrol->URL_ARCHIVO      =   $path;
+                        $dcontrol->SIZE             =   filesize($file);
+                        $dcontrol->EXTENSION        =   $extension;
+                        $dcontrol->ACTIVO           =   1;
+                        $dcontrol->FECHA_CREA       =   $this->fechaactual;
+                        $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
+                        $dcontrol->save();
+                        //dd($nombre);
+                    }
+                }
+
+
+                FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
+                            ->update(
+                                [
+                                    'COD_ESTADO'=>'ETM0000000000003',
+                                    'TXT_ESTADO'=>'POR APROBAR CONTABILIDADD',
+                                    'IND_EMAIL_APROBADO'=>'0',
+                                    'IND_EMAIL_APROBADO_ADMIN'=>'0',
+                                    'ind_email_clap'=>0,
+                                    'fecha_ap'=>$this->fechaactual,
+                                    'usuario_ap'=>Session::get('usuario')->id
+                                ]
+                            );
+
+
+
+                
+                $detalleproducto            =   CMPDetalleProducto::where('CMP.DETALLE_PRODUCTO.COD_ESTADO','=',1)
+                                                ->where('CMP.DETALLE_PRODUCTO.COD_TABLA','=',$pedido_id)
+                                                ->orderBy('NRO_LINEA','ASC')
+                                                ->get();
+
+
+
+
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento                              =   new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA                       =   $this->fechaactual;
+                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                $documento->TIPO                        =   'APROBADO POR ADMINISTRACION';
+                $documento->MENSAJE                     =   '';
+                $documento->save();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR ADMINISTRACION');
+                //geolocalización
+
+
+                //whatsaap para administracion
+                $ordencompra        =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$pedido_id)->first();
+
+                DB::commit();
+
+                Session::flash('operacion_id', 'CONTRATO');
+                return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_DOCUMENTO_CTBLE.' APROBADO CON EXITO');
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                Session::flash('operacion_id', 'CONTRATO');
+                return Redirect::to('gestion-de-administracion-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+
+        }
+        else{
+
+            $detalleordencompra     =   $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
+            $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+
+            $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
+            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
+                                        //->where('IND_OBLIGATORIO','=',1)
+                                        ->where('TXT_ASIGNADO','=','CONTACTO')
+                                        ->get();
+
+            $documentohistorial     =   FeDocumentoHistorial::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                                        ->orderBy('FECHA','DESC')
+                                        ->get();
+
+            $archivos               =   $this->lista_archivos_total($idoc,$fedocumento->DOCUMENTO_ITEM);
+            $archivospdf            =   $this->lista_archivos_total_pdf($idoc,$fedocumento->DOCUMENTO_ITEM);
+
+
+            $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+
+
+            $trabajador             =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
+            $codigo_sunat           =   'N';
+
+            $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                        ->where('COD_ESTADO','=',1)
+                                        ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->whereNotIn('COD_CATEGORIA',['DCC0000000000003','DCC0000000000004'])
+                                        ->get();
+
+            $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
+                                        ->pluck('COD_CATEGORIA_DOCUMENTO')
+                                        ->toArray();
+
+
+            //transferencia   
+            $resultado = '';
+            // Verificar si la cadena contiene 'TPS' o 'TPL'
+            if (strpos($ordencompra->NRO_ITT, 'TPS') !== false || strpos($ordencompra->NRO_ITT, 'TPL') !== false) {
+                $partes = explode(' / ', $ordencompra->NRO_ITT);
+                $resultado = $partes[0];
+            }
+            $transferencia        =   CMPOrden::where('COD_ORDEN','=',$resultado)->first();    
+
+
+
+            $transferencia_doc      =   DB::table('CMP.REFERENCIA_ASOC')
+                                        ->where('COD_TABLA', $resultado)
+                                        ->where(function ($query) {
+                                            $query->where('COD_TABLA_ASOC', 'like', '%TPS%')
+                                                  ->orWhere('COD_TABLA_ASOC', 'like', '%TPL%');
+                                        })
+                                        ->where('COD_ESTADO', 1)
+                                        ->first();
+
+
+
+            //Archivo multiple
+
+
+            // Construir el array de URLs
+            $initialPreview = [];
+            foreach ($archivospdf as $archivo) {
+                $initialPreview[] = route('serve-filecontrato', ['file' => $archivo->NOMBRE_ARCHIVO]);
+            }
+            $initialPreviewConfig = [];
+            foreach ($archivospdf as $key => $archivo) {
+                $initialPreviewConfig[] = [
+                    'type'          => "pdf",
+                    'caption' => $archivo->NOMBRE_ARCHIVO,
+                    'downloadUrl' => route('serve-filecontrato', ['file' => $archivo->NOMBRE_ARCHIVO])
+                ];
+            }
+
+
+
+
+            return View::make('comprobante/aprobaradmcontrato', 
+                            [
+                                'fedocumento'           =>  $fedocumento,
+                                'ordencompra'           =>  $ordencompra,
+                                'initialPreview'        => json_encode($initialPreview),
+                                'initialPreviewConfig'  => json_encode($initialPreviewConfig),
+
+
+                                'linea'                 =>  $linea,
+                                'archivos'              =>  $archivos,
+                                'archivosanulados'      =>  $archivosanulados,
+                                'transferencia'         =>  $transferencia,
+                                'transferencia_doc'     =>  $transferencia_doc,
+
+                                'trabajador'            =>  $trabajador,
+                                'documentoscompra'      =>  $documentoscompra,
+                                'totalarchivos'         =>  $totalarchivos,
+
+
+                                'documentohistorial'    =>  $documentohistorial,
+                                'archivospdf'           =>  $archivospdf,
+                                'detalleordencompra'    =>  $detalleordencompra,
+                                'detallefedocumento'    =>  $detallefedocumento,
+                                'tarchivos'             =>  $tarchivos,
+                                'tp'                    =>  $tp,
+                                'idopcion'              =>  $idopcion,
+                                'idoc'                  =>  $idoc,
+                            ]);
+
+
+        }
+    }
+
+    public function actionAprobarAdministracionNotaCredito($idopcion, $linea,$prefijo, $idordencompra,Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo($idordencompra,$prefijo);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_nota_credito_idoc_actual($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_producto_comprobante_idoc($idoc);
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
+        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+        View::share('titulo','Aprobar  Comprobante');
+
+        if($_POST)
+        {
+
+            try{    
+                
+                DB::beginTransaction();
+
+
+                $pedido_id          =   $idoc;
+                $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
+
+                if($fedocumento->ind_observacion==1){
+                    return Redirect::back()->with('errorurl', 'El documento esta observado no se puede aprobar');
+                }
+
+
+                $descripcion        =   $request['descripcion'];
+                if(rtrim(ltrim($descripcion)) != ''){
+                    //HISTORIAL DE DOCUMENTO APROBADO
+                    $documento                              =   new FeDocumentoHistorial;
+                    $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                    $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                    $documento->FECHA                       =   $this->fechaactual;
+                    $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                    $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                    $documento->TIPO                        =   'RECOMENDACION POR CONTABILIDAD';
+                    $documento->MENSAJE                     =   $descripcion;
+                    $documento->save();
+ 
                 }
 
 
@@ -2310,10 +2393,8 @@ class GestionOCAdministracionController extends Controller
                 FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
                                 [
-                                    'COD_ESTADO'=>'ETM0000000000005',
-                                    'TXT_ESTADO'=>'APROBADO',
-                                    'IND_EMAIL_APROBADO'=>'0',
-                                    'IND_EMAIL_APROBADO_ADMIN'=>'0',
+                                    'COD_ESTADO'=>'ETM0000000000003',
+                                    'TXT_ESTADO'=>'POR APROBAR CONTABILIDADD',
                                     'ind_email_clap'=>0,
                                     'fecha_ap'=>$this->fechaactual,
                                     'usuario_ap'=>Session::get('usuario')->id
@@ -2502,450 +2583,13 @@ class GestionOCAdministracionController extends Controller
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
                 $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR ADMINISTRACION');
-                //geolocalizacion
+                //geolocalización
 
                 //whatsaap para administracion
                 // $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
                 $ordencompra        =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$pedido_id)->first();
 
-                // //$ordencompra        =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();            
-                // $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO.'%0D%0A'.'Proveedor : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'.'Estado : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
-                // $trabajador         =   STDTrabajador::where('COD_TRAB','=',$fedocumento_w->COD_CONTACTO)->first();
-                // if(1==0){
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                // }else{
-                //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');          
-                // }    
-
-                DB::commit();
-
-                Session::flash('operacion_id', 'CONTRATO');
-                return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_DOCUMENTO_CTBLE.' APROBADO CON EXITO');
-            }catch(\Exception $ex){
-                DB::rollback(); 
-                Session::flash('operacion_id', 'CONTRATO');
-                return Redirect::to('gestion-de-administracion-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
-            }
-
-        }
-        else{
-
-            $detalleordencompra     =   $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
-            $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
-
-            $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
-            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
-                                        //->where('IND_OBLIGATORIO','=',1)
-                                        ->where('TXT_ASIGNADO','=','CONTACTO')
-                                        ->get();
-
-            $documentohistorial     =   FeDocumentoHistorial::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
-                                        ->orderBy('FECHA','DESC')
-                                        ->get();
-
-            $archivos               =   $this->lista_archivos_total($idoc,$fedocumento->DOCUMENTO_ITEM);
-            $archivospdf            =   $this->lista_archivos_total_pdf($idoc,$fedocumento->DOCUMENTO_ITEM);
-
-
-            $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
-
-
-            $trabajador             =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
-            $codigo_sunat           =   'N';
-
-            $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                        ->where('COD_ESTADO','=',1)
-                                        ->where('CODIGO_SUNAT','=',$codigo_sunat)
-                                        ->whereNotIn('COD_CATEGORIA',['DCC0000000000003','DCC0000000000004'])
-                                        ->get();
-
-            $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
-                                        ->pluck('COD_CATEGORIA_DOCUMENTO')
-                                        ->toArray();
-
-
-            //transferencia   
-            $resultado = '';
-            // Verificar si la cadena contiene 'TPS' o 'TPL'
-            if (strpos($ordencompra->NRO_ITT, 'TPS') !== false || strpos($ordencompra->NRO_ITT, 'TPL') !== false) {
-                $partes = explode(' / ', $ordencompra->NRO_ITT);
-                $resultado = $partes[0];
-            }
-            $transferencia        =   CMPOrden::where('COD_ORDEN','=',$resultado)->first();    
-
-
-
-            $transferencia_doc      =   DB::table('CMP.REFERENCIA_ASOC')
-                                        ->where('COD_TABLA', $resultado)
-                                        ->where(function ($query) {
-                                            $query->where('COD_TABLA_ASOC', 'like', '%TPS%')
-                                                  ->orWhere('COD_TABLA_ASOC', 'like', '%TPL%');
-                                        })
-                                        ->where('COD_ESTADO', 1)
-                                        ->first();
-
-
-
-            //Archivo multiple
-
-
-            // Construir el array de URLs
-            $initialPreview = [];
-            foreach ($archivospdf as $archivo) {
-                $initialPreview[] = route('serve-filecontrato', ['file' => $archivo->NOMBRE_ARCHIVO]);
-            }
-            $initialPreviewConfig = [];
-            foreach ($archivospdf as $key => $archivo) {
-                $initialPreviewConfig[] = [
-                    'type'          => "pdf",
-                    'caption' => $archivo->NOMBRE_ARCHIVO,
-                    'downloadUrl' => route('serve-filecontrato', ['file' => $archivo->NOMBRE_ARCHIVO])
-                ];
-            }
-
-
-
-
-            return View::make('comprobante/aprobaradmcontrato', 
-                            [
-                                'fedocumento'           =>  $fedocumento,
-                                'ordencompra'           =>  $ordencompra,
-                                'initialPreview'        => json_encode($initialPreview),
-                                'initialPreviewConfig'  => json_encode($initialPreviewConfig),
-
-
-                                'linea'                 =>  $linea,
-                                'archivos'              =>  $archivos,
-                                'archivosanulados'      =>  $archivosanulados,
-                                'transferencia'         =>  $transferencia,
-                                'transferencia_doc'     =>  $transferencia_doc,
-
-                                'trabajador'            =>  $trabajador,
-                                'documentoscompra'      =>  $documentoscompra,
-                                'totalarchivos'         =>  $totalarchivos,
-
-
-                                'documentohistorial'    =>  $documentohistorial,
-                                'archivospdf'           =>  $archivospdf,
-                                'detalleordencompra'    =>  $detalleordencompra,
-                                'detallefedocumento'    =>  $detallefedocumento,
-                                'tarchivos'             =>  $tarchivos,
-                                'tp'                    =>  $tp,
-                                'idopcion'              =>  $idopcion,
-                                'idoc'                  =>  $idoc,
-                            ]);
-
-
-        }
-    }
-
-    public function actionAprobarAdministracionNotaCredito($idopcion, $linea,$prefijo, $idordencompra,Request $request)
-    {
-
-        /******************* validar url **********************/
-        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
-        if($validarurl <> 'true'){return $validarurl;}
-        /******************************************************/
-        $idoc                   =   $this->funciones->decodificarmaestraprefijo($idordencompra,$prefijo);
-        $ordencompra            =   $this->con_lista_cabecera_comprobante_nota_credito_idoc_actual($idoc);
-        $detalleordencompra     =   $this->con_lista_detalle_producto_comprobante_idoc($idoc);
-        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
-        $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
-        View::share('titulo','Aprobar  Comprobante');
-
-        if($_POST)
-        {
-
-            try{    
-                
-                DB::beginTransaction();
-
-
-                $pedido_id          =   $idoc;
-                $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
-
-                if($fedocumento->ind_observacion==1){
-                    return Redirect::back()->with('errorurl', 'El documento esta observado no se puede aprobar');
-                }
-
-
-                $descripcion        =   $request['descripcion'];
-                if(rtrim(ltrim($descripcion)) != ''){
-                    //HISTORIAL DE DOCUMENTO APROBADO
-                    $documento                              =   new FeDocumentoHistorial;
-                    $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
-                    $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
-                    $documento->FECHA                       =   $this->fechaactual;
-                    $documento->USUARIO_ID                  =   Session::get('usuario')->id;
-                    $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
-                    $documento->TIPO                        =   'RECOMENDACION POR CONTABILIDAD';
-                    $documento->MENSAJE                     =   $descripcion;
-                    $documento->save();
-                    //LE LLEGA AL USUARIO DE CONTACTO
-                    // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
-                    // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                    // $mensaje            =   'COMPROBANTE: '.$fedocumento->ID_DOCUMENTO
-                    //                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-                    //                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'
-                    //                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
-                    //                         .'RECOMENDACION : '.$descripcion.'%0D%0A';
-                    // //dd($trabajador);                        
-                    // if(1==0){
-                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                    // }else{
-                    //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                    // }  
-                }
-
-
-
-
-                $filespdf          =   $request['otros'];
-                if(!is_null($filespdf)){
-                    //PDF
-                    foreach($filespdf as $file){
-
-                            //
-                            $contadorArchivos = Archivo::count();
-
-                        $nombre          =      $ordencompra->COD_DOCUMENTO_CTBLE.'-'.$file->getClientOriginalName();
-                        /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
-                        $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
-                        $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
-                        //$nombrefilepdf   =      $ordencompra->COD_ORDEN.'-'.$file->getClientOriginalName();
-                        $nombrefilepdf   =      $contadorArchivos.'-'.$file->getClientOriginalName();
-                        $valor           =      $this->versicarpetanoexiste($rutafile);
-                        $rutacompleta    =      $rutafile.'\\'.$nombrefilepdf;
-                        copy($file->getRealPath(),$rutacompleta);
-                        $path            =      $rutacompleta;
-
-                        $nombreoriginal             =   $file->getClientOriginalName();
-                        $info                       =   new SplFileInfo($nombreoriginal);
-                        $extension                  =   $info->getExtension();
-
-                        $dcontrol                   =   new Archivo;
-                        $dcontrol->ID_DOCUMENTO     =   $ordencompra->COD_DOCUMENTO_CTBLE;
-                        $dcontrol->DOCUMENTO_ITEM   =   $fedocumento->DOCUMENTO_ITEM;
-                        $dcontrol->TIPO_ARCHIVO     =   'OTROS_UC';
-                        $dcontrol->NOMBRE_ARCHIVO   =   $nombrefilepdf;
-                        $dcontrol->DESCRIPCION_ARCHIVO  =   'OTROS ADMINISTRACION';
-                        $dcontrol->URL_ARCHIVO      =   $path;
-                        $dcontrol->SIZE             =   filesize($file);
-                        $dcontrol->EXTENSION        =   $extension;
-                        $dcontrol->ACTIVO           =   1;
-                        $dcontrol->FECHA_CREA       =   $this->fechaactual;
-                        $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
-                        $dcontrol->save();
-                        //dd($nombre);
-                    }
-                }
-
-
-                FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
-                            ->update(
-                                [
-                                    'COD_ESTADO'=>'ETM0000000000005',
-                                    'TXT_ESTADO'=>'APROBADO',
-                                    'ind_email_clap'=>0,
-                                    'fecha_ap'=>$this->fechaactual,
-                                    'usuario_ap'=>Session::get('usuario')->id
-                                ]
-                            );
-
-                $orden                      =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$pedido_id)->first();
-
-
-                $conexionbd         = 'sqlsrv';
-                if($orden->COD_CENTRO == 'CEN0000000000004'){ //rioja
-                    $conexionbd         = 'sqlsrv_r';
-                }else{
-                    if($orden->COD_CENTRO == 'CEN0000000000006'){ //bellavista
-                        $conexionbd         = 'sqlsrv_b';
-                    }
-                }
-
-                DB::connection($conexionbd)->table('CMP.DOCUMENTO_CTBLE')
-                ->where('COD_DOCUMENTO_CTBLE','=',$pedido_id)
-                            ->update(
-                                    [
-                                        'IND_NOTIFICACION_CLIENTE'=>1
-                                    ]);
-
-                //enviar tablas de fe_documento y fe_detalledocuemto
-                if($orden->COD_CENTRO == 'CEN0000000000004' || $orden->COD_CENTRO == 'CEN0000000000006'){ //rioja
-                    //dd($conexionbd);
-                    //FE_DOCUENTO
-                    $referenciaAsocQuery = FeDocumento::select('ID_DOCUMENTO'
-                                              ,'DOCUMENTO_ITEM'
-                                              ,'RUC_PROVEEDOR'
-                                              ,'RZ_PROVEEDOR'
-                                              ,'TIPO_CLIENTE'
-                                              ,'ID_CLIENTE'
-                                              ,'NOMBRE_CLIENTE'
-                                              ,'DIRECCION_CLIENTE'
-                                              ,'NUM_DOC_VENTA'
-                                              ,'SERIE'
-                                              ,'NUMERO'
-                                              ,'ID_TIPO_DOC'
-                                              ,'FEC_VENTA'
-                                              ,'FEC_VENCI_PAGO'
-                                              ,'FORMA_PAGO'
-                                              ,'FORMA_PAGO_DIAS'
-                                              ,'MONEDA'
-                                              ,'VALOR_TIPO_CAMBIO'
-                                              ,'VALOR_IGV_ORIG'
-                                              ,'VALOR_IGV_SOLES'
-                                              ,'SUB_TOTAL_VENTA_ORIG'
-                                              ,'SUB_TOTAL_VENTA_SOLES'
-                                              ,'TOTAL_VENTA_ORIG'
-                                              ,'TOTAL_VENTA_SOLES'
-                                              ,'V_EXONERADO'
-                                              ,'ESTADO'
-                                              ,'NUM_DOC_ELECT'
-                                              ,'ES_TRANS_GRATUITA'
-                                              ,'DES_COM'
-                                              ,'ES_ANULADO'
-                                              ,'ENVIADO_EMAIL'
-                                              ,'ENVIADO_EXTERNO'
-                                              ,'NRO_ORDEN_COMP'
-                                              ,'NUM_GUIA'
-                                              ,'TIPO_DOC_REL'
-                                              ,'CON_DETRACCION'
-                                              ,'OBSERVACION'
-                                              ,'HORA_EMISION'
-                                              ,'ES_TURISTICO'
-                                              ,'ES_EXONERADO'
-                                              ,'GUIA_CLIENTE'
-                                              ,'GLOSA_DETALE'
-                                              ,'VALIDACION_SUNAT'
-                                              ,'ID_MOTIVO_EMISION'
-                                              ,'MOTIVO_EMISION'
-                                              ,'MONTO_IMP_BOLSA'
-                                              ,'MONTO_DETRACCION'
-                                              ,'MONTO_RETENCION'
-                                              ,'MONTO_NETO_PAGO'
-                                              ,'DESCUENTO_I'
-                                              ,'DESCUENTO'
-                                              ,'IMPUESTO_2'
-                                              ,'TIPO_DETRACCION'
-                                              ,'PORC_DETRACCION'
-                                              ,'MONTO_ANTICIPO'
-                                              ,'COD_ESTADO'
-                                              ,'TXT_ESTADO'
-                                              ,'COD_EMPR'
-                                              ,'TXT_EMPR'
-                                              ,'COD_CONTACTO'
-                                              ,'TXT_CONTACTO'
-                                              ,'TXT_PROCEDENCIA'
-                                              ,'ARCHIVO_XML'
-                                              ,'ARCHIVO_CDR'
-                                              ,'ARCHIVO_PDF'
-                                              ,'success'
-                                              ,'message'
-                                              ,'estadoCp'
-                                              ,'nestadoCp'
-                                              ,'estadoRuc'
-                                              ,'nestadoRuc'
-                                              ,'condDomiRuc'
-                                              ,'ncondDomiRuc'
-                                              ,'CODIGO_CDR'
-                                              ,'RESPUESTA_CDR'
-                                              ,'ind_ruc'
-                                              ,'ind_rz'
-                                              ,'ind_moneda'
-                                              ,'ind_total'
-                                              ,'ind_cantidaditem'
-                                              ,'ind_formapago'
-                                              ,'ind_errototal'
-                                              ,'dni_usuariocontacto'
-                                              ,'usuario_pa'
-                                              ,'usuario_uc'
-                                              ,'usuario_ap'
-                                              ,'usuario_pr'
-                                              ,'usuario_ex'
-                                              ,'mensaje_exuc'
-                                              ,'mensaje_exap'
-                                              ,'mensaje_exadm'
-                                              ,'ind_email_uc'
-                                              ,'ind_email_ap'
-                                              ,'ind_email_adm'
-                                              ,'ind_email_clap'
-                                              ,'ind_email_ba'
-                                              ,'ind_observacion'
-                                              ,'area_observacion'
-                                              ,'OPERACION'
-                                              ,'PERCEPCION'
-                                              ,'usuario_tes'
-                                              ,'LOTE')
-                        ->where('ID_DOCUMENTO', '=', $orden->COD_DOCUMENTO_CTBLE)
-                        ->get();
-
-                        
-                    //dd($referenciaAsocQuery);
-                    // Convertir el resultado en un array para poder insertarlo más adelante
-                    $dataToInsert = $referenciaAsocQuery->toArray();
-                    //dd($dataToInsert);
-
-                    // Paso 2: Insertar los datos en la segunda base de datos
-                    DB::connection($conexionbd)->table('FE_DOCUMENTO')->insert($dataToInsert);
-
-                    //FE_DETALLE_DOCUENTO
-                    $referenciaAsocQueryd = FeDetalleDocumento::select('*')
-                        ->where('ID_DOCUMENTO', '=', $orden->COD_DOCUMENTO_CTBLE)
-                        ->get();
-                    // Convertir el resultado en un array para poder insertarlo más adelante
-                    $dataToInsertd = $referenciaAsocQueryd->toArray();
-
-                    // Paso 2: Insertar los datos en la segunda base de datos
-                    DB::connection($conexionbd)->table('FE_DETALLE_DOCUMENTO')->insert($dataToInsertd);
-
-                    //CMPDocAsociarCompra
-                    $referenciaAsocQueryac = CMPDocAsociarCompra::select('COD_ORDEN','COD_CATEGORIA_DOCUMENTO','NOM_CATEGORIA_DOCUMENTO','IND_OBLIGATORIO','TXT_FORMATO','TXT_ASIGNADO','COD_USUARIO_CREA_AUD','COD_ESTADO','TIP_DOC')
-                        ->where('COD_ORDEN', '=', $idoc)
-                        ->get();
-                    // Convertir el resultado en un array para poder insertarlo más adelante
-                    $dataToInserac = $referenciaAsocQueryac->toArray();
-                    // Paso 2: Insertar los datos en la segunda base de datos
-                    DB::connection($conexionbd)->table('CMP.DOC_ASOCIAR_COMPRA')->insert($dataToInserac);
-                    
-
-                }
-
-                
-                $detalleproducto            =   CMPDetalleProducto::where('CMP.DETALLE_PRODUCTO.COD_ESTADO','=',1)
-                                                ->where('CMP.DETALLE_PRODUCTO.COD_TABLA','=',$pedido_id)
-                                                ->orderBy('NRO_LINEA','ASC')
-                                                ->get();
-
-
-
-
-                //HISTORIAL DE DOCUMENTO APROBADO
-                $documento                              =   new FeDocumentoHistorial;
-                $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
-                $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
-                $documento->FECHA                       =   $this->fechaactual;
-                $documento->USUARIO_ID                  =   Session::get('usuario')->id;
-                $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
-                $documento->TIPO                        =   'APROBADO POR ADMINISTRACION';
-                $documento->MENSAJE                     =   '';
-                $documento->save();
-
-                //whatsaap para administracion
-                // $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
-                $ordencompra        =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$pedido_id)->first();
-
-                // //$ordencompra        =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();            
-                // $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO.'%0D%0A'.'Proveedor : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'.'Estado : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
-                // $trabajador         =   STDTrabajador::where('COD_TRAB','=',$fedocumento_w->COD_CONTACTO)->first();
-                // if(1==0){
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                // }else{
-                //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');          
-                // }    
+  
 
                 DB::commit();
 
@@ -3139,8 +2783,8 @@ class GestionOCAdministracionController extends Controller
                 FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
                                 [
-                                    'COD_ESTADO'=>'ETM0000000000005',
-                                    'TXT_ESTADO'=>'APROBADO',
+                                    'COD_ESTADO'=>'ETM0000000000003',
+                                    'TXT_ESTADO'=>'POR APROBAR CONTABILIDADD',
                                     'ind_email_clap'=>0,
                                     'fecha_ap'=>$this->fechaactual,
                                     'usuario_ap'=>Session::get('usuario')->id
@@ -3321,6 +2965,12 @@ class GestionOCAdministracionController extends Controller
                 $documento->TIPO                        =   'APROBADO POR ADMINISTRACION';
                 $documento->MENSAJE                     =   '';
                 $documento->save();
+
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR ADMINISTRACION');
+                //geolocalización
 
                 //whatsaap para administracion
                 $ordencompra        =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$pedido_id)->first();
@@ -3461,21 +3111,7 @@ class GestionOCAdministracionController extends Controller
                     $documento->TIPO                        =   'RECOMENDACION POR CONTABILIDAD';
                     $documento->MENSAJE                     =   $descripcion;
                     $documento->save();
-                    //LE LLEGA AL USUARIO DE CONTACTO
-                    // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
-                    // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                    // $mensaje            =   'COMPROBANTE: '.$fedocumento->ID_DOCUMENTO
-                    //                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-                    //                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'
-                    //                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
-                    //                         .'RECOMENDACION : '.$descripcion.'%0D%0A';
-                    // //dd($trabajador);                        
-                    // if(1==0){
-                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                    // }else{
-                    //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                    // }  
+  
                 }
 
 
@@ -3525,8 +3161,8 @@ class GestionOCAdministracionController extends Controller
                 FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
                                 [
-                                    'COD_ESTADO'=>'ETM0000000000005',
-                                    'TXT_ESTADO'=>'APROBADO',
+                                    'COD_ESTADO'=>'ETM0000000000003',
+                                    'TXT_ESTADO'=>'POR APROBAR CONTABILIDADD',
                                     'ind_email_clap'=>0,
                                     'fecha_ap'=>$this->fechaactual,
                                     'usuario_ap'=>Session::get('usuario')->id
@@ -3712,19 +3348,16 @@ class GestionOCAdministracionController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
-                //whatsaap para administracion
-                // $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR ADMINISTRACION');
+                //geolocalización
+
+
                 $ordencompra        =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$pedido_id)->first();
 
-                // //$ordencompra        =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();            
-                // $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO.'%0D%0A'.'Proveedor : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'.'Estado : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
-                // $trabajador         =   STDTrabajador::where('COD_TRAB','=',$fedocumento_w->COD_CONTACTO)->first();
-                // if(1==0){
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                // }else{
-                //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');          
-                // }    
+  
 
                 DB::commit();
 
@@ -3880,21 +3513,7 @@ class GestionOCAdministracionController extends Controller
                     $documento->TIPO                        =   'RECOMENDACION POR ADMINISTRACION';
                     $documento->MENSAJE                     =   $descripcion;
                     $documento->save();
-                    //LE LLEGA AL USUARIO DE CONTACTO
-                    // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
-                    // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                    // $mensaje            =   'COMPROBANTE: '.$fedocumento->ID_DOCUMENTO
-                    //                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-                    //                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'
-                    //                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
-                    //                         .'RECOMENDACION : '.$descripcion.'%0D%0A';
-                    // //dd($trabajador);                        
-                    // if(1==0){
-                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                    // }else{
-                    //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                    // }  
+
                 }
 
 
@@ -4123,7 +3742,8 @@ class GestionOCAdministracionController extends Controller
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
                 $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR ADMINISTRACION');
-                //geolocalizacion
+                //geolocalización
+
 
                 DB::commit();
 
@@ -4327,11 +3947,11 @@ class GestionOCAdministracionController extends Controller
                 $documento->MENSAJE                     =   $descripcion;
                 $documento->save();
 
+
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
                 $this->con_datos_de_la_pc($device_info,$fedocumento,'OBSERVADO POR ADMINISTRACION');
-                //geolocalizacion
-
+                //geolocalización
 
                 FeDocumento::where('ID_DOCUMENTO',$idop)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
@@ -4525,19 +4145,6 @@ class GestionOCAdministracionController extends Controller
                 }
 
 
-                FeDocumento::where('ID_DOCUMENTO',$pedido_id)
-                            ->update(
-                                [
-                                    'COD_ESTADO'=>'ETM0000000000005',
-                                    'TXT_ESTADO'=>'APROBADO',
-                                    'IND_EMAIL_APROBADO'=>'0',
-                                    'IND_EMAIL_APROBADO_ADMIN'=>'0',
-                                    'ind_email_clap'=>0,
-                                    'fecha_ap'=>$this->fechaactual,
-                                    'usuario_ap'=>Session::get('usuario')->id
-                                ]
-                            );
-
                 $lotes                  =   FeRefAsoc::where('lote','=',$idoc)                                        
                                             ->pluck('ID_DOCUMENTO')
                                             ->toArray();
@@ -4553,180 +4160,198 @@ class GestionOCAdministracionController extends Controller
                 }
 
 
-                DB::connection($conexionbd)->table('CMP.DOCUMENTO_CTBLE')
-                ->where('COD_DOCUMENTO_CTBLE','=',$pedido_id)
-                            ->update(
+
+                if($fedocumento->OPERACION == 'DOCUMENTO_INTERNO_COMPRA'){
+
+                    FeDocumento::where('ID_DOCUMENTO',$pedido_id)
+                                ->update(
                                     [
-                                        'IND_NOTIFICACION_CLIENTE'=>1
-                                    ]);
+                                        'COD_ESTADO'=>'ETM0000000000005',
+                                        'TXT_ESTADO'=>'APROBADO',
+                                        'IND_EMAIL_APROBADO'=>'0',
+                                        'IND_EMAIL_APROBADO_ADMIN'=>'0',
+                                        'ind_email_clap'=>0,
+                                        'fecha_ap'=>$this->fechaactual,
+                                        'usuario_ap'=>Session::get('usuario')->id
+                                    ]
+                                );
 
-                if($documento_top->COD_CENTRO == 'CEN0000000000004'){
+                    DB::connection($conexionbd)->table('CMP.DOCUMENTO_CTBLE')
+                    ->where('COD_DOCUMENTO_CTBLE','=',$pedido_id)
+                                ->update(
+                                        [
+                                            'IND_NOTIFICACION_CLIENTE'=>1
+                                        ]);
 
-                    $iddocumento_sel = $fedocumento->ID_DOCUMENTO;
-                    DB::connection($conexionbd)->statement("
-                        UPDATE FE_DOCUMENTO 
-                        SET COD_CONTACTO = 'ITTR000000000212'
-                        WHERE 1=1
-                          AND RUC_PROVEEDOR IN ('20600004027','20602740278')
-                          AND COD_ESTADO = 'ETM0000000000005' 
-                          AND COD_CONTACTO <> 'ITTR000000000212'
-                          AND FEC_VENTA >='2025-07-01'
-                    ");
+
+                    //enviar tablas de fe_documento y fe_detalledocuemto
+                    if($documento_top->COD_CENTRO == 'CEN0000000000004' || $documento_top->COD_CENTRO == 'CEN0000000000006'){ //rioja
+                        //dd($conexionbd);
+                        //FE_DOCUENTO
+                        $referenciaAsocQuery = FeDocumento::select('ID_DOCUMENTO'
+                                                  ,'DOCUMENTO_ITEM'
+                                                  ,'RUC_PROVEEDOR'
+                                                  ,'RZ_PROVEEDOR'
+                                                  ,'TIPO_CLIENTE'
+                                                  ,'ID_CLIENTE'
+                                                  ,'NOMBRE_CLIENTE'
+                                                  ,'DIRECCION_CLIENTE'
+                                                  ,'NUM_DOC_VENTA'
+                                                  ,'SERIE'
+                                                  ,'NUMERO'
+                                                  ,'ID_TIPO_DOC'
+                                                  ,'FEC_VENTA'
+                                                  ,'FEC_VENCI_PAGO'
+                                                  ,'FORMA_PAGO'
+                                                  ,'FORMA_PAGO_DIAS'
+                                                  ,'MONEDA'
+                                                  ,'VALOR_TIPO_CAMBIO'
+                                                  ,'VALOR_IGV_ORIG'
+                                                  ,'VALOR_IGV_SOLES'
+                                                  ,'SUB_TOTAL_VENTA_ORIG'
+                                                  ,'SUB_TOTAL_VENTA_SOLES'
+                                                  ,'TOTAL_VENTA_ORIG'
+                                                  ,'TOTAL_VENTA_SOLES'
+                                                  ,'V_EXONERADO'
+                                                  ,'ESTADO'
+                                                  ,'NUM_DOC_ELECT'
+                                                  ,'ES_TRANS_GRATUITA'
+                                                  ,'DES_COM'
+                                                  ,'ES_ANULADO'
+                                                  ,'ENVIADO_EMAIL'
+                                                  ,'ENVIADO_EXTERNO'
+                                                  ,'NRO_ORDEN_COMP'
+                                                  ,'NUM_GUIA'
+                                                  ,'TIPO_DOC_REL'
+                                                  ,'CON_DETRACCION'
+                                                  ,'OBSERVACION'
+                                                  ,'HORA_EMISION'
+                                                  ,'ES_TURISTICO'
+                                                  ,'ES_EXONERADO'
+                                                  ,'GUIA_CLIENTE'
+                                                  ,'GLOSA_DETALE'
+                                                  ,'VALIDACION_SUNAT'
+                                                  ,'ID_MOTIVO_EMISION'
+                                                  ,'MOTIVO_EMISION'
+                                                  ,'MONTO_IMP_BOLSA'
+                                                  ,'MONTO_DETRACCION'
+                                                  ,'MONTO_RETENCION'
+                                                  ,'MONTO_NETO_PAGO'
+                                                  ,'DESCUENTO_I'
+                                                  ,'DESCUENTO'
+                                                  ,'IMPUESTO_2'
+                                                  ,'TIPO_DETRACCION'
+                                                  ,'PORC_DETRACCION'
+                                                  ,'MONTO_ANTICIPO'
+                                                  ,'COD_ESTADO'
+                                                  ,'TXT_ESTADO'
+                                                  ,'COD_EMPR'
+                                                  ,'TXT_EMPR'
+                                                  ,'COD_CONTACTO'
+                                                  ,'TXT_CONTACTO'
+                                                  ,'TXT_PROCEDENCIA'
+                                                  ,'ARCHIVO_XML'
+                                                  ,'ARCHIVO_CDR'
+                                                  ,'ARCHIVO_PDF'
+                                                  ,'success'
+                                                  ,'message'
+                                                  ,'estadoCp'
+                                                  ,'nestadoCp'
+                                                  ,'estadoRuc'
+                                                  ,'nestadoRuc'
+                                                  ,'condDomiRuc'
+                                                  ,'ncondDomiRuc'
+                                                  ,'CODIGO_CDR'
+                                                  ,'RESPUESTA_CDR'
+                                                  ,'ind_ruc'
+                                                  ,'ind_rz'
+                                                  ,'ind_moneda'
+                                                  ,'ind_total'
+                                                  ,'ind_cantidaditem'
+                                                  ,'ind_formapago'
+                                                  ,'ind_errototal'
+                                                  ,'dni_usuariocontacto'
+                                                  ,'usuario_pa'
+                                                  ,'usuario_uc'
+                                                  ,'usuario_ap'
+                                                  ,'usuario_pr'
+                                                  ,'usuario_ex'
+                                                  ,'mensaje_exuc'
+                                                  ,'mensaje_exap'
+                                                  ,'mensaje_exadm'
+                                                  ,'ind_email_uc'
+                                                  ,'ind_email_ap'
+                                                  ,'ind_email_adm'
+                                                  ,'ind_email_clap'
+                                                  ,'ind_email_ba'
+                                                  ,'ind_observacion'
+                                                  ,'area_observacion'
+                                                  ,'OPERACION'
+                                                  ,'PERCEPCION'
+                                                  ,'usuario_tes'
+                                                  ,'LOTE')
+                            ->where('ID_DOCUMENTO', '=', $idoc)
+                            ->get();
+
+                            
+                        //dd($referenciaAsocQuery);
+                        // Convertir el resultado en un array para poder insertarlo más adelante
+                        $dataToInsert = $referenciaAsocQuery->toArray();
+                        //dd($dataToInsert);
+
+                        // Paso 2: Insertar los datos en la segunda base de datos
+                        DB::connection($conexionbd)->table('FE_DOCUMENTO')->insert($dataToInsert);
+
+
+
+                        //FE_DETALLE_DOCUENTO
+                        $referenciaAsocQueryd = FeDetalleDocumento::select('*')
+                            ->where('ID_DOCUMENTO', '=', $idoc)
+                            ->get();
+                        // Convertir el resultado en un array para poder insertarlo más adelante
+                        $dataToInsertd = $referenciaAsocQueryd->toArray();
+
+                        // Paso 2: Insertar los datos en la segunda base de datos
+                        DB::connection($conexionbd)->table('FE_DETALLE_DOCUMENTO')->insert($dataToInsertd);
+
+
+                        //FE_REFENCIA_DOC
+                        $referenciaAsocQueryr = FeRefAsoc::select('LOTE','ID_DOCUMENTO','ESTATUS','COD_ESTADO','OPERACION')
+                            ->where('LOTE', '=', $idoc)
+                            ->get();
+                        // Convertir el resultado en un array para poder insertarlo más adelante
+                        $dataToInsertr = $referenciaAsocQueryr->toArray();
+                        // Paso 2: Insertar los datos en la segunda base de datos
+                        DB::connection($conexionbd)->table('FE_REF_ASOC')->insert($dataToInsertr);
+
+                        //CMPDocAsociarCompra
+                        $referenciaAsocQueryac = CMPDocAsociarCompra::select('COD_ORDEN','COD_CATEGORIA_DOCUMENTO','NOM_CATEGORIA_DOCUMENTO','IND_OBLIGATORIO','TXT_FORMATO','TXT_ASIGNADO','COD_USUARIO_CREA_AUD','COD_ESTADO','TIP_DOC')
+                            ->where('COD_ORDEN', '=', $idoc)
+                            ->get();
+                        // Convertir el resultado en un array para poder insertarlo más adelante
+                        $dataToInserac = $referenciaAsocQueryac->toArray();
+                        // Paso 2: Insertar los datos en la segunda base de datos
+                        DB::connection($conexionbd)->table('CMP.DOC_ASOCIAR_COMPRA')->insert($dataToInserac);
+
+                    }
+
+                }else{
+
+                    FeDocumento::where('ID_DOCUMENTO',$pedido_id)
+                                ->update(
+                                    [
+                                        'COD_ESTADO'=>'ETM0000000000003',
+                                        'TXT_ESTADO'=>'POR APROBAR CONTABILIDADD',
+                                        'IND_EMAIL_APROBADO'=>'0',
+                                        'IND_EMAIL_APROBADO_ADMIN'=>'0',
+                                        'ind_email_clap'=>0,
+                                        'fecha_ap'=>$this->fechaactual,
+                                        'usuario_ap'=>Session::get('usuario')->id
+                                    ]
+                                );
 
                 }
 
-                //enviar tablas de fe_documento y fe_detalledocuemto
-                if($documento_top->COD_CENTRO == 'CEN0000000000004' || $documento_top->COD_CENTRO == 'CEN0000000000006'){ //rioja
-                    //dd($conexionbd);
-                    //FE_DOCUENTO
-                    $referenciaAsocQuery = FeDocumento::select('ID_DOCUMENTO'
-                                              ,'DOCUMENTO_ITEM'
-                                              ,'RUC_PROVEEDOR'
-                                              ,'RZ_PROVEEDOR'
-                                              ,'TIPO_CLIENTE'
-                                              ,'ID_CLIENTE'
-                                              ,'NOMBRE_CLIENTE'
-                                              ,'DIRECCION_CLIENTE'
-                                              ,'NUM_DOC_VENTA'
-                                              ,'SERIE'
-                                              ,'NUMERO'
-                                              ,'ID_TIPO_DOC'
-                                              ,'FEC_VENTA'
-                                              ,'FEC_VENCI_PAGO'
-                                              ,'FORMA_PAGO'
-                                              ,'FORMA_PAGO_DIAS'
-                                              ,'MONEDA'
-                                              ,'VALOR_TIPO_CAMBIO'
-                                              ,'VALOR_IGV_ORIG'
-                                              ,'VALOR_IGV_SOLES'
-                                              ,'SUB_TOTAL_VENTA_ORIG'
-                                              ,'SUB_TOTAL_VENTA_SOLES'
-                                              ,'TOTAL_VENTA_ORIG'
-                                              ,'TOTAL_VENTA_SOLES'
-                                              ,'V_EXONERADO'
-                                              ,'ESTADO'
-                                              ,'NUM_DOC_ELECT'
-                                              ,'ES_TRANS_GRATUITA'
-                                              ,'DES_COM'
-                                              ,'ES_ANULADO'
-                                              ,'ENVIADO_EMAIL'
-                                              ,'ENVIADO_EXTERNO'
-                                              ,'NRO_ORDEN_COMP'
-                                              ,'NUM_GUIA'
-                                              ,'TIPO_DOC_REL'
-                                              ,'CON_DETRACCION'
-                                              ,'OBSERVACION'
-                                              ,'HORA_EMISION'
-                                              ,'ES_TURISTICO'
-                                              ,'ES_EXONERADO'
-                                              ,'GUIA_CLIENTE'
-                                              ,'GLOSA_DETALE'
-                                              ,'VALIDACION_SUNAT'
-                                              ,'ID_MOTIVO_EMISION'
-                                              ,'MOTIVO_EMISION'
-                                              ,'MONTO_IMP_BOLSA'
-                                              ,'MONTO_DETRACCION'
-                                              ,'MONTO_RETENCION'
-                                              ,'MONTO_NETO_PAGO'
-                                              ,'DESCUENTO_I'
-                                              ,'DESCUENTO'
-                                              ,'IMPUESTO_2'
-                                              ,'TIPO_DETRACCION'
-                                              ,'PORC_DETRACCION'
-                                              ,'MONTO_ANTICIPO'
-                                              ,'COD_ESTADO'
-                                              ,'TXT_ESTADO'
-                                              ,'COD_EMPR'
-                                              ,'TXT_EMPR'
-                                              ,'COD_CONTACTO'
-                                              ,'TXT_CONTACTO'
-                                              ,'TXT_PROCEDENCIA'
-                                              ,'ARCHIVO_XML'
-                                              ,'ARCHIVO_CDR'
-                                              ,'ARCHIVO_PDF'
-                                              ,'success'
-                                              ,'message'
-                                              ,'estadoCp'
-                                              ,'nestadoCp'
-                                              ,'estadoRuc'
-                                              ,'nestadoRuc'
-                                              ,'condDomiRuc'
-                                              ,'ncondDomiRuc'
-                                              ,'CODIGO_CDR'
-                                              ,'RESPUESTA_CDR'
-                                              ,'ind_ruc'
-                                              ,'ind_rz'
-                                              ,'ind_moneda'
-                                              ,'ind_total'
-                                              ,'ind_cantidaditem'
-                                              ,'ind_formapago'
-                                              ,'ind_errototal'
-                                              ,'dni_usuariocontacto'
-                                              ,'usuario_pa'
-                                              ,'usuario_uc'
-                                              ,'usuario_ap'
-                                              ,'usuario_pr'
-                                              ,'usuario_ex'
-                                              ,'mensaje_exuc'
-                                              ,'mensaje_exap'
-                                              ,'mensaje_exadm'
-                                              ,'ind_email_uc'
-                                              ,'ind_email_ap'
-                                              ,'ind_email_adm'
-                                              ,'ind_email_clap'
-                                              ,'ind_email_ba'
-                                              ,'ind_observacion'
-                                              ,'area_observacion'
-                                              ,'OPERACION'
-                                              ,'PERCEPCION'
-                                              ,'usuario_tes'
-                                              ,'LOTE')
-                        ->where('ID_DOCUMENTO', '=', $idoc)
-                        ->get();
-
-                        
-                    //dd($referenciaAsocQuery);
-                    // Convertir el resultado en un array para poder insertarlo más adelante
-                    $dataToInsert = $referenciaAsocQuery->toArray();
-                    //dd($dataToInsert);
-
-                    // Paso 2: Insertar los datos en la segunda base de datos
-                    DB::connection($conexionbd)->table('FE_DOCUMENTO')->insert($dataToInsert);
-
-
-
-                    //FE_DETALLE_DOCUENTO
-                    $referenciaAsocQueryd = FeDetalleDocumento::select('*')
-                        ->where('ID_DOCUMENTO', '=', $idoc)
-                        ->get();
-                    // Convertir el resultado en un array para poder insertarlo más adelante
-                    $dataToInsertd = $referenciaAsocQueryd->toArray();
-
-                    // Paso 2: Insertar los datos en la segunda base de datos
-                    DB::connection($conexionbd)->table('FE_DETALLE_DOCUMENTO')->insert($dataToInsertd);
-
-
-                    //FE_REFENCIA_DOC
-                    $referenciaAsocQueryr = FeRefAsoc::select('LOTE','ID_DOCUMENTO','ESTATUS','COD_ESTADO','OPERACION')
-                        ->where('LOTE', '=', $idoc)
-                        ->get();
-                    // Convertir el resultado en un array para poder insertarlo más adelante
-                    $dataToInsertr = $referenciaAsocQueryr->toArray();
-                    // Paso 2: Insertar los datos en la segunda base de datos
-                    DB::connection($conexionbd)->table('FE_REF_ASOC')->insert($dataToInsertr);
-
-                    //CMPDocAsociarCompra
-                    $referenciaAsocQueryac = CMPDocAsociarCompra::select('COD_ORDEN','COD_CATEGORIA_DOCUMENTO','NOM_CATEGORIA_DOCUMENTO','IND_OBLIGATORIO','TXT_FORMATO','TXT_ASIGNADO','COD_USUARIO_CREA_AUD','COD_ESTADO','TIP_DOC')
-                        ->where('COD_ORDEN', '=', $idoc)
-                        ->get();
-                    // Convertir el resultado en un array para poder insertarlo más adelante
-                    $dataToInserac = $referenciaAsocQueryac->toArray();
-                    // Paso 2: Insertar los datos en la segunda base de datos
-                    DB::connection($conexionbd)->table('CMP.DOC_ASOCIAR_COMPRA')->insert($dataToInserac);
-
-
-
-                }
 
                 $detalleproducto            =   CMPDetalleProducto::where('CMP.DETALLE_PRODUCTO.COD_ESTADO','=',1)
                                                 ->where('CMP.DETALLE_PRODUCTO.COD_TABLA','=',$pedido_id)
@@ -4743,11 +4368,11 @@ class GestionOCAdministracionController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
  
-
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
                 $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR ADMINISTRACION');
-                //geolocalizacion
+                //geolocalización
+
 
                 DB::commit();
 

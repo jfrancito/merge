@@ -1237,8 +1237,8 @@ class GestionLiquidacionGastosController extends Controller
 
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
-                $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'DOCUMENTO EXTORNADO');
-                //geolocalizacion
+                $this->con_datos_de_la_pc($device_info,$liquidaciongastos,'DOCUMENTO EXTORNADO');
+                //geolocalización
 
 
                 //ANULAR TODA LA OPERACION
@@ -1303,11 +1303,11 @@ class GestionLiquidacionGastosController extends Controller
                 $documento->MENSAJE = $descripcion;
                 $documento->save();
 
+
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
-                $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'DOCUMENTO EXTORNADO');
-                //geolocalizacion
-
+                $this->con_datos_de_la_pc($device_info,$liquidaciongastos,'DOCUMENTO EXTORNADO');
+                //geolocalización
 
                 //ANULAR TODA LA OPERACION
                 LqgLiquidacionGasto::where('ID_DOCUMENTO', $iddocumento)
@@ -1375,8 +1375,8 @@ class GestionLiquidacionGastosController extends Controller
 
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
-                $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'DOCUMENTO EXTORNADO');
-                //geolocalizacion
+                $this->con_datos_de_la_pc($device_info,$liquidaciongastos,'DOCUMENTO EXTORNADO');
+                //geolocalización
 
 
                 //ANULAR TODA LA OPERACION
@@ -2311,11 +2311,11 @@ class GestionLiquidacionGastosController extends Controller
                 $documento->MENSAJE = '';
                 $documento->save();
 
-
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
-                $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'APROBADO POR ADMINISTRACION');
-                //geolocalizacion
+                $this->con_datos_de_la_pc($device_info,$liquidaciongastos,'APROBADO POR ADMINISTRACION');
+                //geolocalización
+
 
                 $anio = $this->anio;
                 $mes = $this->mes;
@@ -2716,8 +2716,10 @@ class GestionLiquidacionGastosController extends Controller
 
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
-                $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'APROBADO POR CONTABILIDAD');
-                //geolocalizacion
+                $this->con_datos_de_la_pc($device_info,$liquidaciongastos,'APROBADO POR CONTABILIDAD');
+                //geolocalización
+
+
 
 
                 DB::commit();
@@ -3010,11 +3012,11 @@ class GestionLiquidacionGastosController extends Controller
                 $documento->save();
                 $this->lg_calcular_total_observar($iddocumento);
 
-
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
-                $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'OBSERVADO POR JEFE');
-                //geolocalizacion
+                $this->con_datos_de_la_pc($device_info,$liquidaciongastos,'OBSERVADO POR JEFE');
+                //geolocalización
+
 
                 DB::commit();
 
@@ -3099,10 +3101,13 @@ class GestionLiquidacionGastosController extends Controller
                 $documento->save();
                 $this->lg_calcular_total_observar($iddocumento);
 
+
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
-                $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'OBSERVADO POR ADMINISTRACION');
-                //geolocalizacion
+                $this->con_datos_de_la_pc($device_info,$liquidaciongastos,'OBSERVADO POR ADMINISTRACION');
+                //geolocalización
+
+
 
                 DB::commit();
 
@@ -3188,12 +3193,11 @@ class GestionLiquidacionGastosController extends Controller
                 $documento->save();
                 $this->lg_calcular_total_observar($iddocumento);
 
+
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
-                $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'OBSERVADO POR CONTABILIDAD');
-                //geolocalizacion
-
-
+                $this->con_datos_de_la_pc($device_info,$liquidaciongastos,'OBSERVADO POR CONTABILIDAD');
+                //geolocalización
 
 
                 DB::commit();
@@ -3273,8 +3277,8 @@ class GestionLiquidacionGastosController extends Controller
 
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
-                $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'APROBADO POR EL JEFE');
-                //geolocalizacion
+                $this->con_datos_de_la_pc($device_info,$liquidaciongastos,'APROBADO POR EL JEFE');
+                //geolocalización
 
 
 
@@ -3678,8 +3682,8 @@ class GestionLiquidacionGastosController extends Controller
 
                     //geolocalizacion
                     $device_info       =   $request['device_info'];
-                    $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'SE LEVANTARON LAS OBSERVACIONES');
-                    //geolocalizacion
+                    $this->con_datos_de_la_pc($device_info,$liquidaciongastos,'SE LEVANTARON LAS OBSERVACIONES');
+                    //geolocalización
 
 
                 } else {
@@ -3742,8 +3746,10 @@ class GestionLiquidacionGastosController extends Controller
 
                     //geolocalizacion
                     $device_info       =   $request['device_info'];
-                    $this->con_datos_de_la_pc_lqg($device_info,$liquidaciongastos,'CREO LIQUIDACION DE GASTO');
-                    //geolocalizacion
+                    $this->con_datos_de_la_pc($device_info,$liquidaciongastos,'CREO LIQUIDACION DE GASTO');
+                    //geolocalización
+
+
 
 
                 }

@@ -30,6 +30,7 @@
                             <form method="POST" id='formpedidoreparable' action="{{ url('/aprobar-comprobante-contabilidad-reparable/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
                                   {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                               @include('comprobante.form.formaprobarcontreparable')
                               <div class="row xs-pt-15">
                                 <div class="col-xs-6">
@@ -55,6 +56,7 @@
                           <form method="POST" id='formpedidoobservar' action="{{ url('/agregar-observacion-contabilidad-reparable/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                                 {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                             @include('comprobante.form.formobservarreparable')
                             <div class="row xs-pt-15">
                               <div class="col-xs-6">
@@ -87,6 +89,7 @@
               <form method="POST" id='formpedido' action="{{ url('/reparable-comprobante-uc/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
                     {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                 @include('comprobante.form.formmitigarreparable')
               </form>
 
