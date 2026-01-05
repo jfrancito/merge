@@ -2852,7 +2852,8 @@ trait ComprobanteTraits
                             })
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
-                                      ->orwhere('area_observacion', '=', 'UCO')
+                                      //->orwhere('area_observacion', '=', 'UCO')
+                                      ->orWhereIn('area_observacion',['ADM','UCO'])
                                       ->orWhereNull('area_observacion');
                             })
                      		->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
@@ -2913,14 +2914,14 @@ trait ComprobanteTraits
                             })
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
-                                      ->orwhere('area_observacion', '=', 'UCO')
+                                      //->orwhere('area_observacion', '=', 'UCO')
+                                      ->orWhereIn('area_observacion',['ADM','UCO'])
                                       ->orWhereNull('area_observacion');
                             })
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
                             ->orderBy('ind_observacion','asc')
                             ->orderBy('fecha_uc','asc')
-
                             ->get();
 
         return  $listadatos;
@@ -2939,7 +2940,8 @@ trait ComprobanteTraits
                             })
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
-                                      ->orwhere('area_observacion', '=', 'UCO')
+                                      //->orwhere('area_observacion', '=', 'UCO')
+                                      ->orWhereIn('area_observacion',['ADM','UCO'])
                                       ->orWhereNull('area_observacion');
                             })
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
@@ -2965,7 +2967,8 @@ trait ComprobanteTraits
                             })
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
-                                      ->orwhere('area_observacion', '=', 'UCO')
+                                      //->orwhere('area_observacion', '=', 'UCO')
+                                      ->orWhereIn('area_observacion',['ADM','UCO'])
                                       ->orWhereNull('area_observacion');
                             })
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
@@ -2991,7 +2994,8 @@ trait ComprobanteTraits
                             })
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
-                                      ->orwhere('area_observacion', '=', 'UCO')
+                                      //->orwhere('area_observacion', '=', 'UCO')
+                                      ->orWhereIn('area_observacion',['ADM','UCO'])
                                       ->orWhereNull('area_observacion');
                             })
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
@@ -3018,7 +3022,8 @@ trait ComprobanteTraits
                             })
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
-                                      ->orwhere('area_observacion', '=', 'UCO')
+                                      //->orwhere('area_observacion', '=', 'UCO')
+                                      ->orWhereIn('area_observacion',['ADM','UCO'])
                                       ->orWhereNull('area_observacion');
                             })
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
@@ -3499,7 +3504,7 @@ trait ComprobanteTraits
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
                                       ->orWhereNull('area_observacion')
-                                      ->orWhereIn('area_observacion',['CONT','UCO']);
+                                      ->orWhereIn('area_observacion',['UCO']);
                             })
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
                             ->orderBy('fecha_pr','asc')
@@ -3531,7 +3536,7 @@ trait ComprobanteTraits
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
                                       ->orWhereNull('area_observacion')
-                                      ->orWhereIn('area_observacion',['CONT','UCO']);
+                                      ->orWhereIn('area_observacion',['UCO']);
                             })
 
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
@@ -3555,7 +3560,7 @@ trait ComprobanteTraits
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
                                       ->orWhereNull('area_observacion')
-                                      ->orWhereIn('area_observacion',['CONT','UCO']);
+                                      ->orWhereIn('area_observacion',['UCO']);
                             })
 
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
@@ -3579,7 +3584,7 @@ trait ComprobanteTraits
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
                                       ->orWhereNull('area_observacion')
-                                      ->orWhereIn('area_observacion',['CONT','UCO']);
+                                      ->orWhereIn('area_observacion',['UCO']);
                             })
 
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
@@ -3603,7 +3608,7 @@ trait ComprobanteTraits
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
                                       ->orWhereNull('area_observacion')
-                                      ->orWhereIn('area_observacion',['CONT','UCO']);
+                                      ->orWhereIn('area_observacion',['UCO']);
                             })
 
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
@@ -3627,7 +3632,7 @@ trait ComprobanteTraits
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
                                       ->orWhereNull('area_observacion')
-                                      ->orWhereIn('area_observacion',['CONT','UCO']);
+                                      ->orWhereIn('area_observacion',['UCO']);
                             })
 
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
@@ -3655,7 +3660,7 @@ trait ComprobanteTraits
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
                                       ->orWhereNull('area_observacion')
-                                      ->orWhereIn('area_observacion',['CONT','UCO']);
+                                      ->orWhereIn('area_observacion',['UCO']);
                             })
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
                             ->orderBy('fecha_pr','asc')
