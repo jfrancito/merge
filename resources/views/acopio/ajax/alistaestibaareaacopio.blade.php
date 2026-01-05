@@ -25,6 +25,8 @@
                 </thead>
                 <tbody>
                   @foreach($listadatos as $index => $item)
+                  @php $NOMBRE_OSIRIS =  $funcion->funciones->cuenta_osiris_lic($item->ID_DOCUMENTO) @endphp
+
                     <tr data_requerimiento_id = "{{$item->ID_DOCUMENTO}}">
                       <td>{{$index+1}}</td>
                       <td class="cell-detail sorting_1" style="position: relative;">
@@ -33,6 +35,7 @@
                         @endphp
                         <span><b>LOTE : {{$item->ID_DOCUMENTO}} </b> </span>
                         <span><b>PROVEEDOR : </b> {{$item->RZ_PROVEEDOR}}</span>
+                        <span><b>CUENTA OSIRIS : </b> {{$NOMBRE_OSIRIS}}</span>
                         <span><b>SERIE : {{$item->SERIE}} </b> </span>
                         <span><b>NUMERO  : {{$item->NUMERO}}</b></span>
                         <span><b>FECHA : </b> {{$item->FEC_VENTA}}</span>
