@@ -9,6 +9,7 @@
                 <div class="panel-body panel-body-contrast">
                   <form method="POST" action="{{ url('subir-xml-cargar-datos-nota-credito-administrator/'.$idopcion.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -10))) }}" name="formcargardatos" id="formcargardatos" enctype="multipart/form-data" >
                      {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
                       <div class="col-sm-12">
                           <div class="form-group">
                               <label class="col-sm-12 control-label labelleft" >Archivo :</label>
@@ -57,6 +58,7 @@
           @if(count($fedocumento)>0)
             <form method="POST" action="{{ url('validar-xml-nota-credito-administrator/'.$idopcion.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -10))) }}" name="formguardardatos" id="formguardardatos" enctype="multipart/form-data" >
              {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
               <input type="hidden" name="procedencia" id='procedencia' value = '{{$procedencia}}'>              
               <div class="row">
 

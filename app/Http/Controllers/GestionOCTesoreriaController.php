@@ -360,11 +360,6 @@ class GestionOCTesoreriaController extends Controller
                 $documento->save();
 
 
-                //geolocalizacion
-                $device_info       =   $request['device_info'];
-                $this->con_datos_de_la_pc($device_info,$fedocumento,'SUBIO DOCUMENTOS');
-                //geolocalizacion
-
                 FeDocumento::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)
                     ->update(
                         [
@@ -385,10 +380,12 @@ class GestionOCTesoreriaController extends Controller
                 $documento->MENSAJE = '';
                 $documento->save();
 
+
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
                 $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR TESORERIA');
-                //geolocalizacion
+                //geolocalización
+
 
 
                 DB::commit();
@@ -1269,6 +1266,12 @@ class GestionOCTesoreriaController extends Controller
         $documento->MENSAJE = '';
         $documento->save();
 
+        //geolocalizacion
+        $device_info       =   $request['device_info'];
+        $this->con_datos_de_la_pc($device_info,$fedocumento,'ELIMINO ITEM ' . $archivo->DESCRIPCION_ARCHIVO);
+        //geolocalización
+
+
         print_r("bien");
 
     }
@@ -2066,7 +2069,8 @@ class GestionOCTesoreriaController extends Controller
                     //geolocalizacion
                     $device_info       =   $request['device_info'];
                     $this->con_datos_de_la_pc($device_info,$fedocumento,'SUBIO COMPROBANTE DE PAGO');
-                    //geolocalizacion
+                    //geolocalización
+
 
                 }
 
@@ -2125,10 +2129,12 @@ class GestionOCTesoreriaController extends Controller
             $documento->MENSAJE = '';
             $documento->save();
 
+
             //geolocalizacion
             $device_info       =   $request['device_info'];
             $this->con_datos_de_la_pc($device_info,$fedocumento,'EXTORNO COMPROBANTE DE PAGO');
-            //geolocalizacion
+            //geolocalización
+
 
 
             Session::flash('operacion_id', 'CONTRATO');
@@ -2188,9 +2194,7 @@ class GestionOCTesoreriaController extends Controller
             //geolocalizacion
             $device_info       =   $request['device_info'];
             $this->con_datos_de_la_pc($device_info,$fedocumento,'EXTORNO COMPROBANTE DE PAGO');
-            //geolocalizacion
-
-
+            //geolocalización
 
             DB::commit();
             return Redirect::to('/gestion-de-comprobante-pago-tesoreria/' . $idopcion)->with('bienhecho', 'Comprobante : ' . $ordencompra->COD_ORDEN . ' Extornado con exito');
@@ -2565,7 +2569,7 @@ class GestionOCTesoreriaController extends Controller
                     //geolocalizacion
                     $device_info       =   $request['device_info'];
                     $this->con_datos_de_la_pc($device_info,$fedocumento,'SUBIO PARTE COMPROBANTE DE PAGO');
-                    //geolocalizacion
+                    //geolocalización
 
 
 
@@ -2593,10 +2597,12 @@ class GestionOCTesoreriaController extends Controller
                     $documento->MENSAJE = '';
                     $documento->save();
 
+
                     //geolocalizacion
                     $device_info       =   $request['device_info'];
                     $this->con_datos_de_la_pc($device_info,$fedocumento,'SUBIO COMPROBANTE DE PAGO');
-                    //geolocalizacion
+                    //geolocalización
+
 
 
                 }
@@ -2794,7 +2800,9 @@ class GestionOCTesoreriaController extends Controller
                     //geolocalizacion
                     $device_info       =   $request['device_info'];
                     $this->con_datos_de_la_pc($device_info,$fedocumento,'SUBIO PARTE COMPROBANTE DE PAGO');
-                    //geolocalizacion
+                    //geolocalización
+
+
 
 
                 } else {
@@ -2821,10 +2829,12 @@ class GestionOCTesoreriaController extends Controller
                     $documento->MENSAJE = '';
                     $documento->save();
 
+
                     //geolocalizacion
                     $device_info       =   $request['device_info'];
                     $this->con_datos_de_la_pc($device_info,$fedocumento,'SUBIO COMPROBANTE DE PAGO');
-                    //geolocalizacion
+                    //geolocalización
+
 
 
                 }
@@ -2941,10 +2951,12 @@ class GestionOCTesoreriaController extends Controller
                 $documento->MENSAJE = '';
                 $documento->save();
 
+
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
                 $this->con_datos_de_la_pc($device_info,$fedocumento,'SUBIO COMPROBANTE DE PAGO');
-                //geolocalizacion
+                //geolocalización
+
 
 
                 DB::commit();

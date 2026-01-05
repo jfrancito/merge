@@ -74,6 +74,7 @@
                                         {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
 
+
                                         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 cajareporte">
                                             <div class="form-group">
                                                 <label class="col-sm-12 control-label labelleft negrita">EMPRESAS

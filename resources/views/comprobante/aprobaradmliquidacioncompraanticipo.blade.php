@@ -31,6 +31,7 @@
                       <form method="POST" id='formpedido' action="{{ url('/aprobar-comprobante-administracion-liquidacion-compra-anticipo/'.$idopcion.'/'.$linea.'/'.substr($ordenpago->COD_AUTORIZACION, 0,6).'/'.Hashids::encode(substr($ordenpago->COD_AUTORIZACION, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
                             {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                             
                         @include('comprobante.form.formaprobaradminliquidacioncompraanticipo')
                       </form>
@@ -50,6 +51,7 @@
                       <form method="POST" id='formpedidoobservar' action="{{ url('/agregar-observacion-administracion-liquidacion-compra-anticipo/'.$idopcion.'/'.$linea.'/'.substr($ordenpago->COD_AUTORIZACION, 0,6).'/'.Hashids::encode(substr($ordenpago->COD_AUTORIZACION, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                             {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                             
                         @include('comprobante.form.formobservaradminliquidacioncompraanticipo')
                       </form>

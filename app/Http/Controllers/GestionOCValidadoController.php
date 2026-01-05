@@ -105,7 +105,7 @@ class GestionOCValidadoController extends Controller
         //geolocalizacion
         $device_info       =   $request['device_info'];
         $this->con_datos_de_la_pc($device_info,$fedocumento,'ELIMINO ITEM '.$archivo->DESCRIPCION_ARCHIVO);
-        //geolocalizacion
+        //geolocalización
 
 
         return Redirect::to('aprobar-comprobante-contabilidad-contrato/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('bienhecho', 'Item : '.$archivo->DESCRIPCION_ARCHIVO.' Elimino CON EXITO');;
@@ -155,6 +155,14 @@ class GestionOCValidadoController extends Controller
         $documento->MENSAJE                     =   '';
         $documento->save();
 
+
+        //geolocalizacion
+        $device_info       =   $request['device_info'];
+        $this->con_datos_de_la_pc($device_info,$fedocumento,'ELIMINO ITEM '.$archivo->DESCRIPCION_ARCHIVO);
+        //geolocalización
+
+
+
         return Redirect::to('aprobar-comprobante-contabilidad-nota-credito/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('bienhecho', 'Item : '.$archivo->DESCRIPCION_ARCHIVO.' Elimino CON EXITO');;
 
 
@@ -201,6 +209,12 @@ class GestionOCValidadoController extends Controller
         $documento->TIPO                        =   'ELIMINO ITEM '.$archivo->DESCRIPCION_ARCHIVO;
         $documento->MENSAJE                     =   '';
         $documento->save();
+
+        //geolocalizacion
+        $device_info       =   $request['device_info'];
+        $this->con_datos_de_la_pc($device_info,$fedocumento,'ELIMINO ITEM '.$archivo->DESCRIPCION_ARCHIVO);
+        //geolocalización
+
 
         return Redirect::to('aprobar-comprobante-contabilidad-nota-debito/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('bienhecho', 'Item : '.$archivo->DESCRIPCION_ARCHIVO.' Elimino CON EXITO');;
 
@@ -249,7 +263,8 @@ class GestionOCValidadoController extends Controller
         //geolocalizacion
         $device_info       =   $request['device_info'];
         $this->con_datos_de_la_pc($device_info,$fedocumento,'ELIMINO ITEM '.$archivo->DESCRIPCION_ARCHIVO);
-        //geolocalizacion
+        //geolocalización
+
 
         return Redirect::to('aprobar-comprobante-contabilidad/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('bienhecho', 'Item : '.$archivo->DESCRIPCION_ARCHIVO.' Elimino CON EXITO');;
 

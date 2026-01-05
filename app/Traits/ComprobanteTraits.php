@@ -127,7 +127,7 @@ trait ComprobanteTraits
             $deviceInfo = json_decode($device, true);
             $documento                              =   new FeDocumentoGeolocalizacion;
             $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
-            $documento->ITEM                        =   $fedocumento->DOCUMENTO_ITEM;
+            $documento->ITEM                        =   1;
             $documento->FECHA                       =   date_format(date_create(date('Ymd h:i:s')), 'Ymd h:i:s');
             $documento->USUARIO_ID                  =   Session::get('usuario')->id;
             $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
@@ -2194,8 +2194,8 @@ trait ComprobanteTraits
                 FeDocumento::where('ID_DOCUMENTO',$item->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$item->DOCUMENTO_ITEM)
                             ->update(
                                 [
-                                    'COD_ESTADO'=>'ETM0000000000003',
-                                    'TXT_ESTADO'=>'POR APROBAR CONTABILIDAD',
+                                    'COD_ESTADO'=>'ETM0000000000004',
+                                    'TXT_ESTADO'=>'POR APROBAR ADMINISTRACCION',
                                     'ind_email_ap'=>0,
                                     'fecha_uc'=>$fechaactual,
                                     'usuario_uc'=>$item->usuario_uc

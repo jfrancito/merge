@@ -91,6 +91,7 @@
                                                   enctype="multipart/form-data">
                                                 {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                                                 
                                                 @include('comprobante.form.formaprobarcont')
                                                 <div class="row xs-pt-15">
@@ -130,6 +131,7 @@
                                                   class="form-horizontal group-border-dashed">
                                                 {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                                                 
                                                 @include('comprobante.form.formobservar')
 
@@ -173,6 +175,7 @@
                                                   class="form-horizontal group-border-dashed">
                                                 {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                                                 
                                                 @include('comprobante.form.formreparable')
                                             </form>
@@ -191,6 +194,7 @@
                                                   class="form-horizontal group-border-dashed">
                                                 {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                                                 
                                                 @include('comprobante.form.formrechazo')
                                             </form>

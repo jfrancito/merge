@@ -480,10 +480,7 @@ class GestionEstibaController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
-                //geolocalizacion
-                $device_info       =   $request['device_info'];
-                $this->con_datos_de_la_pc($device_info,$fedocumento,'SUBIO DOCUMENTOS');
-                //geolocalizacion
+
 
 
                 if($fedocumento->OPERACION == 'DOCUMENTO_INTERNO_COMPRA'){
@@ -500,13 +497,13 @@ class GestionEstibaController extends Controller
                                 );
                 }else{
 
-                    return Redirect::back()->with('errorurl', 'No se puede integrar ningun documento hasta proximo aviso');
+                    //return Redirect::back()->with('errorurl', 'No se puede integrar ningun documento hasta proximo aviso');
 
                     FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                                 ->update(
                                     [
-                                        'COD_ESTADO'=>'ETM0000000000003',
-                                        'TXT_ESTADO'=>'POR APROBAR CONTABILIDAD',
+                                        'COD_ESTADO'=>'ETM0000000000004',
+                                        'TXT_ESTADO'=>'POR APROBAR ADMINISTRACCION',//CAMBIO
                                         'ind_email_ap'=>0,
                                         'fecha_uc'=>$this->fechaactual,
                                         'usuario_uc'=>Session::get('usuario')->id
@@ -528,7 +525,7 @@ class GestionEstibaController extends Controller
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
                 $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR USUARIO CONTACTO');
-                //geolocalizacion
+                //geolocalización
 
               
                 DB::commit();

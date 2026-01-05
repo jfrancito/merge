@@ -90,6 +90,7 @@
                                                   enctype="multipart/form-data">
                                                 {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                                                 <input type="hidden" name="operacion_id" id="operacion_id"
                                                        value="{{$fedocumento->OPERACION}}">
                                                 @include('comprobante.form.formaprobarcontestiba')
@@ -109,6 +110,7 @@
                                                   class="form-horizontal group-border-dashed">
                                                 {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                                                 <input type="hidden" name="operacion_id" id="operacion_id"
                                                        value="{{$fedocumento->OPERACION}}">
                                                 @include('comprobante.form.formobservarestiba')
@@ -130,6 +132,7 @@
                                                   class="form-horizontal group-border-dashed">
                                                 {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                                                 <input type="hidden" name="operacion_id" id="operacion_id"
                                                        value="{{$fedocumento->OPERACION}}">
                                                 @include('comprobante.form.formreparableestiba')
@@ -150,6 +153,7 @@
                                                   class="form-horizontal group-border-dashed">
                                                 {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                                                 <input type="hidden" name="operacion_id" id="operacion_id"
                                                        value="{{$fedocumento->OPERACION}}">
                                                 @include('comprobante.form.formrechazoestiba')
