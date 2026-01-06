@@ -1798,6 +1798,9 @@ class UserController extends Controller {
         		$url_rep_dis_revisar 		=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=DOCUMENTO_INTERNO_SECADO&estado_id=2';
         		$url_rep_dib_revisar 		=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=DOCUMENTO_SERVICIO_BALANZA&estado_id=2';
 
+				//documento interno compra
+				$urldic 					=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=DOCUMENTO_INTERNO_COMPRA';
+
 
 
     			$urllg 					=	'/gestion-de-aprobacion-liquidacion-gastos-contabilidad/xvr';
@@ -1880,6 +1883,19 @@ class UserController extends Controller {
 				$count_observados_dib 	= 	count($listadatosob);
 	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_estiba_levantadas($cod_empresa,$operacion_id);
 				$count_observadosdib_le	= 	count($listadatosob);
+
+
+
+				//DOCUMENTO INTERNO COMPRA
+				$operacion_id 			=	'DOCUMENTO_INTERNO_COMPRA';
+        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_cont_estiba($cod_empresa,$operacion_id);
+				$count_x_aprobar_dic 	= 	 count($listadatos);
+
+	        	$lisadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_estiba_obs($cod_empresa,$operacion_id);
+				$count_observados_dic 	= 	count($listadatosob);
+
+	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_estiba_levantadas($cod_empresa,$operacion_id);
+				$count_observadosdic_le 	= 	count($listadatosob);
 
 
 				//LIQUIDACION DE GASTOS

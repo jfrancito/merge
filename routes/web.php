@@ -650,6 +650,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/aprobar-comprobante-contabilidad-nota-credito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAprobarContabilidadNotaCredito');
 	Route::any('/aprobar-comprobante-contabilidad-nota-debito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAprobarContabilidadNotaDebito');
 	Route::any('/aprobar-comprobante-contabilidad-estiba/{idopcion}/{lote}', 'GestionOCContabilidadController@actionAprobarContabilidadEstiba');
+	Route::any('/aprobar-comprobante-contabilidad-estiba-dic/{idopcion}/{lote}', 'GestionOCContabilidadController@actionAprobarContabilidadEstibaDIC');
 	
 	Route::any('/aprobar-comprobante-contabilidad-pg/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAprobarContabilidadPG');
 
@@ -677,9 +678,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/agregar-reparable-contabilidad/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAgregarReparableContabilidad');
 	Route::any('/agregar-reparable-contabilidad-contrato/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAgregarReparableContabilidadContrato');
 	Route::any('/agregar-reparable-contabilidad-estiba/{idopcion}/{lote}', 'GestionOCContabilidadController@actionAgregarReparableContabilidadEstiba');
-
-
-
+	Route::any('/agregar-reparable-contabilidad-estiba-dic/{idopcion}/{lote}', 'GestionOCContabilidadController@actionAgregarReparableContabilidadEstibaDIC');
 
 
 	Route::any('/agregar-extorno-contabilidad/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAgregarExtornoContabilidad');
@@ -688,8 +687,6 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/agregar-extorno-nota-debito-contabilidad/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAgregarExtornoNotaDebitoContabilidad');	
 	Route::any('/agregar-extorno-estiba-contabilidad/{idopcion}/{lote}', 'GestionOCContabilidadController@actionAgregarExtornoEstibaContabilidad');
 	Route::any('/agregar-extorno-pg-contabilidad/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAgregarExtornoPGContabilidad');	
-
-
 
 
 	Route::any('/agregar-recomendacion-contabilidad/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAgregarRecomendacionContabilidad');
