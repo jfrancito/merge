@@ -14,9 +14,12 @@
         @if($operacion_id == 'PROVISION_GASTO')
           @include('comprobante.ajax.alistacontabilidadpg')
         @else
-          @include('comprobante.ajax.alistacontabilidadestiba')
+          @if($operacion_id == 'DOCUMENTO_INTERNO_COMPRA')
+            @include('comprobante.ajax.alistacontabilidadestibadic')
+          @else
+            @include('comprobante.ajax.alistacontabilidadestiba')
+          @endif
         @endif
-
       @endif
     @endif
   @endif
