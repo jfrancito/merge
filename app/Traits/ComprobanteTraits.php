@@ -5507,7 +5507,8 @@ trait ComprobanteTraits
                         'TES.COD_FLUJO_CAJA',
                         'TES.TXT_FLUJO_CAJA',
                         'TES.COD_ITEM_MOVIMIENTO',
-                        'TES.TXT_ITEM_MOVIMIENTO'
+                        'TES.TXT_ITEM_MOVIMIENTO',
+                        'TCB.COD_BANCO'
                     )
                     ->whereIn('TES.COD_OPERACION_CAJA', $array)
                     ->whereIn('TES.COD_FLUJO_CAJA', [
@@ -5716,6 +5717,63 @@ trait ComprobanteTraits
         return  $registros;                             
     }
 
+    private function gn_lista_comision_asociados_top_get($array) {
+            
+
+        $registros = DB::table('TES.OPERACION_CAJA as TES')
+                    ->leftJoin('STD.EMPRESA as EMS', 'TES.COD_EMPR', '=', 'EMS.COD_EMPR')
+                    ->leftJoin('TES.CAJA_BANCO as TCB', 'TES.COD_CAJA_BANCO', '=', 'TCB.COD_CAJA_BANCO')
+                    ->leftJoin('STD.EMPRESA as EMP', 'TCB.COD_BANCO', '=', 'EMP.COD_EMPR')
+                    ->leftJoin('CMP.CATEGORIA as CMD', 'TES.COD_CATEGORIA_MONEDA', '=', 'CMD.COD_CATEGORIA')
+                    ->leftJoin('CMP.CATEGORIA as CME', function($join) {
+                        $join->on('TES.COD_CATEGORIA_ESTADO', '=', 'CME.COD_CATEGORIA')
+                             ->where('CME.TXT_GRUPO', 'ESTADO_OPERACION_CAJA');
+                    })
+                    ->select(
+                        'TES.COD_OPERACION_CAJA',
+                        'TES.COD_EMPR',
+                        'EMS.NOM_EMPR',
+                        'TES.COD_CAJA_BANCO',
+                        DB::raw("CASE WHEN TCB.IND_CAJA = 0 THEN TCB.TXT_BANCO ELSE TCB.TXT_CAJA_BANCO END as NOMBRE_BANCO_CAJA"),
+                        'TCB.TXT_CAJA_BANCO as CUENTA',
+                        'TES.FEC_OPERACION as FEC_REGISTRO',
+                        'TES.FEC_MOVIMIENTO_CAJABANCO as FEC_MOVIMIENTO',
+                        'TES.NRO_CUENTA_BANCARIA',
+                        'TES.NRO_VOUCHER',
+                        'CMD.NOM_CATEGORIA as MONEDA',
+                        'CME.NOM_CATEGORIA as ESTADO',
+                        DB::raw('(TES.CAN_HABER_MN - TES.CAN_DEBE_MN) as MONTO_SOLES'),
+                        DB::raw('(TES.CAN_HABER_ME - TES.CAN_DEBE_ME) as MONTO_DOLARES'),
+                        'TES.TXT_GLOSA',
+                        'TES.COD_FLUJO_CAJA',
+                        'TES.TXT_FLUJO_CAJA',
+                        'TES.COD_ITEM_MOVIMIENTO',
+                        'TES.TXT_ITEM_MOVIMIENTO',
+                        'EMP.NRO_DOCUMENTO AS RUC'
+                    )
+                    ->whereIn('TES.COD_OPERACION_CAJA', $array)
+                    ->whereIn('TES.COD_FLUJO_CAJA', [
+                        'IICHFC0000000004',
+                        'IICHFC0000000009',
+                        'IICHFC0000000012',
+                        'ISCHFC0000000012',
+                        'ISCHFC0000000027',
+                        'ISCHFC0000000036',
+                        'ISCHFC0000000033'
+                    ])
+                    ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
+                    ->where('TES.IND_EXTORNO', 0)
+                    ->where('TES.COD_ESTADO', 1)
+                    ->whereIn('TES.COD_CATEGORIA_OPERACION_ORIGEN', [
+                        'OOC0000000000008',
+                        'OOC0000000000005'
+                    ])
+                    ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR) // variable pasada desde tu controlador
+                    ->get();
+
+
+        return  $registros;                             
+    }
 
 
     private function gn_combo_proveedor_fe_documento($todo) {
