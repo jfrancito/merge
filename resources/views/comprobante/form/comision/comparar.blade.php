@@ -16,7 +16,7 @@
               <tr>
                 <td><b>RUC</b></td>
                 <td><p class='subtitulomerge'>{{$documento_top->RUC}}</p></td>
-                <td class="@if($fedocumento->OPERACION_DET == 'SIN_XML') ocultar @endif">
+                <td class="">
                   <div class='subtitulomerge @if($fedocumento->ind_ruc == 1) msjexitoso @else msjerror @endif'><b>{{$fedocumento->RUC_PROVEEDOR}}</b>
                   </div>
                 </td>
