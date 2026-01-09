@@ -58,7 +58,8 @@
                                           style="border-radius: 0px;"
                                     >
                                         {{ csrf_field() }}
-<input type="hidden" name="device_info" id='device_info'>                                                           
+<input type="hidden" name="device_info" id='device_info'>
+                                                           
 
                                         <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
                                                <div class="form-group quitar-tb">

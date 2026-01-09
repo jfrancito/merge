@@ -2,6 +2,7 @@
 {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
 
+
 	<div class="modal-header" style="background: #1d3a6d;">
 		<button type="button" data-dismiss="modal" aria-hidden="true" class="close modal-close"><span class="mdi mdi-close"></span></button>
 

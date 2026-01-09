@@ -127,7 +127,7 @@ trait ComprobanteTraits
             $deviceInfo = json_decode($device, true);
             $documento                              =   new FeDocumentoGeolocalizacion;
             $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
-            $documento->ITEM                        =   $fedocumento->DOCUMENTO_ITEM;
+            $documento->ITEM                        =   1;
             $documento->FECHA                       =   date_format(date_create(date('Ymd h:i:s')), 'Ymd h:i:s');
             $documento->USUARIO_ID                  =   Session::get('usuario')->id;
             $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
@@ -860,6 +860,7 @@ trait ComprobanteTraits
                                     ->join('CMP.REFERENCIA_ASOC', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
                                     ->select(DB::raw('CMP.DOCUMENTO_CTBLE.*,REFERENCIA_ASOC.COD_TABLA,REFERENCIA_ASOC.COD_TABLA_ASOC'))
                                     ->where('CMP.DOCUMENTO_CTBLE.COD_ESTADO','=','1')
+                                    ->where('CMP.REFERENCIA_ASOC.COD_ESTADO','=','1')
                                     ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_ESTADO_DOC_CTBLE','=','EDC0000000000009')
                                     ->whereIn('COD_CATEGORIA_TIPO_DOC', [
                                         'TDO0000000000001',
@@ -878,6 +879,7 @@ trait ComprobanteTraits
                                             $join->on('CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
                                                  ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE');
                                         })
+                                        ->where('CMP.REFERENCIA_ASOC.COD_ESTADO','=','1')
                                         ->where('CMP.DOCUMENTO_CTBLE.COD_EMPR','=',$empresa_id)
                                         ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA','=',$moneda_id)
                                         ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO','=',$banco_id)
@@ -906,6 +908,7 @@ trait ComprobanteTraits
                                             $join->on('CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
                                                  ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE');
                                         })
+                                         ->where('CMP.REFERENCIA_ASOC.COD_ESTADO','=','1')
                                         ->where('CMP.DOCUMENTO_CTBLE.COD_EMPR','=',$empresa_id)
                                         ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA','=',$moneda_id)
                                         ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO','=',$banco_id)
@@ -2191,8 +2194,8 @@ trait ComprobanteTraits
                 FeDocumento::where('ID_DOCUMENTO',$item->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$item->DOCUMENTO_ITEM)
                             ->update(
                                 [
-                                    'COD_ESTADO'=>'ETM0000000000003',
-                                    'TXT_ESTADO'=>'POR APROBAR CONTABILIDAD',
+                                    'COD_ESTADO'=>'ETM0000000000004',
+                                    'TXT_ESTADO'=>'POR APROBAR ADMINISTRACCION',
                                     'ind_email_ap'=>0,
                                     'fecha_uc'=>$fechaactual,
                                     'usuario_uc'=>$item->usuario_uc
@@ -2849,13 +2852,14 @@ trait ComprobanteTraits
                             })
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
-                                      ->orwhere('area_observacion', '=', 'UCO')
+                                      //->orwhere('area_observacion', '=', 'UCO')
+                                      ->orWhereIn('area_observacion',['ADM','UCO'])
                                       ->orWhereNull('area_observacion');
                             })
                      		->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
 							->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
                             ->orderBy('ind_observacion','asc')
-                            ->orderBy('fecha_uc','asc')
+                            ->orderBy('fecha_pr','asc')
 							->get();
 
 	 	return  $listadatos;
@@ -2873,7 +2877,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
                             ->orderBy('ind_observacion','asc')
-                            ->orderBy('fecha_uc','asc')
+                            ->orderBy('fecha_pr','asc')
                             ->get();
 
         return  $listadatos;
@@ -2890,7 +2894,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
                             ->orderBy('ind_observacion','asc')
-                            ->orderBy('fecha_uc','asc')
+                            ->orderBy('fecha_pr','asc')
                             ->get();
 
         return  $listadatos;
@@ -2910,14 +2914,14 @@ trait ComprobanteTraits
                             })
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
-                                      ->orwhere('area_observacion', '=', 'UCO')
+                                      //->orwhere('area_observacion', '=', 'UCO')
+                                      ->orWhereIn('area_observacion',['ADM','UCO'])
                                       ->orWhereNull('area_observacion');
                             })
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
                             ->orderBy('ind_observacion','asc')
-                            ->orderBy('fecha_uc','asc')
-
+                            ->orderBy('fecha_pr','asc')
                             ->get();
 
         return  $listadatos;
@@ -2936,13 +2940,14 @@ trait ComprobanteTraits
                             })
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
-                                      ->orwhere('area_observacion', '=', 'UCO')
+                                      //->orwhere('area_observacion', '=', 'UCO')
+                                      ->orWhereIn('area_observacion',['ADM','UCO'])
                                       ->orWhereNull('area_observacion');
                             })
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
                             ->orderBy('ind_observacion','asc')
-                            ->orderBy('fecha_uc','asc')
+                            ->orderBy('fecha_pr','asc')
 
                             ->get();
 
@@ -2962,13 +2967,14 @@ trait ComprobanteTraits
                             })
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
-                                      ->orwhere('area_observacion', '=', 'UCO')
+                                      //->orwhere('area_observacion', '=', 'UCO')
+                                      ->orWhereIn('area_observacion',['ADM','UCO'])
                                       ->orWhereNull('area_observacion');
                             })
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
                             ->orderBy('ind_observacion','asc')
-                            ->orderBy('fecha_uc','asc')
+                            ->orderBy('fecha_pr','asc')
 
                             ->get();
 
@@ -2988,7 +2994,8 @@ trait ComprobanteTraits
                             })
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
-                                      ->orwhere('area_observacion', '=', 'UCO')
+                                      //->orwhere('area_observacion', '=', 'UCO')
+                                      ->orWhereIn('area_observacion',['ADM','UCO'])
                                       ->orWhereNull('area_observacion');
                             })
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
@@ -3015,13 +3022,14 @@ trait ComprobanteTraits
                             })
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
-                                      ->orwhere('area_observacion', '=', 'UCO')
+                                      //->orwhere('area_observacion', '=', 'UCO')
+                                      ->orWhereIn('area_observacion',['ADM','UCO'])
                                       ->orWhereNull('area_observacion');
                             })
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
                             ->orderBy('ind_observacion','asc')
-                            ->orderBy('fecha_uc','asc')
+                            ->orderBy('fecha_pr','asc')
 
                             ->get();
 
@@ -3058,7 +3066,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
                             ->orderBy('ind_observacion','asc')
-                            ->orderBy('fecha_uc','asc')
+                            ->orderBy('fecha_pr','asc')
 
                             ->get();
 
@@ -3075,7 +3083,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
                             ->orderBy('ind_observacion','asc')
-                            ->orderBy('fecha_uc','asc')
+                            ->orderBy('fecha_pr','asc')
 
                             ->get();
 
@@ -3145,7 +3153,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
                             ->orderBy('ind_observacion','asc')
-                            ->orderBy('fecha_uc','asc')
+                            ->orderBy('fecha_pr','asc')
 
                             ->get();
 
@@ -3161,7 +3169,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
                             ->orderBy('ind_observacion','asc')
-                            ->orderBy('fecha_uc','asc')
+                            ->orderBy('fecha_pr','asc')
 
                             ->get();
 
@@ -3229,7 +3237,7 @@ trait ComprobanteTraits
                             ->where('ind_observacion','=',0)
                             ->where('area_observacion','=','ADM')
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -3458,7 +3466,7 @@ trait ComprobanteTraits
 							->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
 							->where('ind_observacion','=',1)
 							->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
 							->get();
 
 	 	return  $listadatos;
@@ -3475,7 +3483,7 @@ trait ComprobanteTraits
                             ->where('ind_observacion','=',0)
                             ->where('area_observacion','=','ADM')
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -3496,10 +3504,10 @@ trait ComprobanteTraits
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
                                       ->orWhereNull('area_observacion')
-                                      ->orWhereIn('area_observacion',['CONT','UCO']);
+                                      ->orWhereIn('area_observacion',['UCO']);
                             })
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -3528,11 +3536,11 @@ trait ComprobanteTraits
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
                                       ->orWhereNull('area_observacion')
-                                      ->orWhereIn('area_observacion',['CONT','UCO']);
+                                      ->orWhereIn('area_observacion',['UCO']);
                             })
 
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -3552,11 +3560,11 @@ trait ComprobanteTraits
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
                                       ->orWhereNull('area_observacion')
-                                      ->orWhereIn('area_observacion',['CONT','UCO']);
+                                      ->orWhereIn('area_observacion',['UCO']);
                             })
 
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -3576,11 +3584,11 @@ trait ComprobanteTraits
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
                                       ->orWhereNull('area_observacion')
-                                      ->orWhereIn('area_observacion',['CONT','UCO']);
+                                      ->orWhereIn('area_observacion',['UCO']);
                             })
 
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -3600,11 +3608,11 @@ trait ComprobanteTraits
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
                                       ->orWhereNull('area_observacion')
-                                      ->orWhereIn('area_observacion',['CONT','UCO']);
+                                      ->orWhereIn('area_observacion',['UCO']);
                             })
 
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -3624,11 +3632,11 @@ trait ComprobanteTraits
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
                                       ->orWhereNull('area_observacion')
-                                      ->orWhereIn('area_observacion',['CONT','UCO']);
+                                      ->orWhereIn('area_observacion',['UCO']);
                             })
 
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -3652,10 +3660,10 @@ trait ComprobanteTraits
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
                                       ->orWhereNull('area_observacion')
-                                      ->orWhereIn('area_observacion',['CONT','UCO']);
+                                      ->orWhereIn('area_observacion',['UCO']);
                             })
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -3676,7 +3684,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('ind_observacion','=',1)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -3690,7 +3698,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('ind_observacion','=',1)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -3704,7 +3712,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('ind_observacion','=',1)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -3718,7 +3726,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('ind_observacion','=',1)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -3732,7 +3740,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('ind_observacion','=',1)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -3752,7 +3760,7 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('ind_observacion','=',1)
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
-                            ->orderBy('fecha_pr','asc')
+                            ->orderBy('fecha_uc','asc')
                             ->get();
 
         return  $listadatos;
@@ -4703,6 +4711,130 @@ trait ComprobanteTraits
     }
 
 
+    private function con_lista_cabecera_comprobante_total_gestion_estiba_reparable_excel($cod_empresa,$tipoarchivo_id,$estado_id,$operacion_id) {
+
+
+
+        // Primero: Obtener los IDs (corregido para Laravel 5.4)
+        $listadatosss = FeDocumento::where('FE_DOCUMENTO.COD_EMPR', Session::get('empresas')->COD_EMPR)
+            ->where('OPERACION', $operacion_id)
+            ->tipoArchivo($tipoarchivo_id) // Si es un scope
+            ->estadoReparable($estado_id)   // Si es un scope
+            ->whereNotIn('FE_DOCUMENTO.COD_ESTADO', ['', 'ETM0000000000006'])
+            ->pluck('ID_DOCUMENTO') // En Laravel 5.4 usa lists(), no pluck()
+            ->toArray();
+
+
+
+        // Si la lista está vacía, retornar array vacío
+        if (empty($listadatosss)) {
+            return [];
+        }
+
+        // Segundo: Construir el query con parámetros correctos
+        $placeholders = implode(',', array_fill(0, count($listadatosss), '?'));
+        $parametros = [
+            Session::get('empresas')->COD_EMPR,
+            $operacion_id
+        ];
+
+        // Agregar los IDs como parámetros individuales
+        foreach ($listadatosss as $id) {
+            $parametros[] = $id;
+        }
+
+        $sql = "
+            SELECT 
+                FE_DOCUMENTO.*, 
+                CMP.DOCUMENTO_CTBLE.*,
+                FE_DETALLE_DOCUMENTO.*,
+                FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_FE, 
+                CMP.DOCUMENTO_CTBLE.TXT_GLOSA AS TXT_GLOSA_ORDEN,
+                FE_DOCUMENTO.TXT_REPARABLE AS TXT_REPARABLE_SN, 
+                FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_N,
+                CMP.CATEGORIA.NOM_CATEGORIA AS AREA, 
+                (
+                    SELECT STUFF(
+                        (
+                            SELECT '// ' + d2_interno.TXT_NOMBRE_PRODUCTO
+                            FROM CMP.DETALLE_PRODUCTO d2_interno
+                            WHERE d2_interno.COD_TABLA = FE_DOCUMENTO.ID_DOCUMENTO
+                            FOR XML PATH('')
+                        ), 1, 2, ''
+                    )
+                ) AS productos_cabecera2,
+                (
+                    SELECT STUFF(
+                        (
+                            SELECT '// ' + d2_interno.MENSAJE
+                            FROM FE_DOCUMENTO_HISTORIAL d2_interno
+                            WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                              AND FE_DOCUMENTO.IND_REPARABLE = 1
+                              AND TIPO LIKE 'DOCUMENTO ARCHIVO_%' 
+                            FOR XML PATH('')
+                        ), 1, 2, ''
+                    )
+                ) AS productos_reparable,
+                (
+                    SELECT STUFF(
+                        (
+                            SELECT '// ' + CONVERT(VARCHAR(20), d3_interno.FECHA, 106)
+                            FROM FE_DOCUMENTO_HISTORIAL d3_interno
+                            WHERE d3_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                            AND TIPO = 'RESOLVIO LOS REPARABLES' 
+                            FOR XML PATH('')
+                        ), 1, 2, ''
+                    )
+                ) AS fecha_reparable,
+                WEBPAGOSOC.MEDIO_PAGO,
+                WEBPAGOSOC.FECHA_PAGO,
+                WEBPAGOSOC.NOMBRE_BANCO,
+                WEBPAGOSOC.IMPORTE
+            FROM FE_DOCUMENTO
+            CROSS APPLY (
+                SELECT TOP 1 * 
+                FROM FE_REF_ASOC 
+                WHERE LOTE = FE_DOCUMENTO.ID_DOCUMENTO 
+                ORDER BY FE_REF_ASOC.ID_DOCUMENTO
+            ) AS D
+            INNER JOIN CMP.DOCUMENTO_CTBLE ON D.ID_DOCUMENTO = CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE
+            INNER JOIN FE_DETALLE_DOCUMENTO ON FE_DETALLE_DOCUMENTO.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+            LEFT JOIN (
+                SELECT 
+                    dc.*,
+                    ra.COD_TABLA,
+                    ra.COD_TABLA_ASOC
+                FROM [CMP].[DOCUMENTO_CTBLE] dc
+                INNER JOIN [CMP].[REFERENCIA_ASOC] ra 
+                    ON dc.[COD_DOCUMENTO_CTBLE] = ra.[COD_TABLA_ASOC]
+                WHERE dc.[COD_ESTADO] = '1'
+                    AND dc.[COD_CATEGORIA_TIPO_DOC] IN (
+                        'TDO0000000000001',
+                        'TDO0000000000003',
+                        'TDO0000000000002',
+                        'TDO0000000000010'
+                    )
+            ) TTF ON D.ID_DOCUMENTO = TTF.COD_TABLA
+            LEFT JOIN WEBPAGOSOC ON WEBPAGOSOC.COD_DOCUMENTO_CTBLE = TTF.COD_DOCUMENTO_CTBLE
+            LEFT JOIN SGD.USUARIO ON SGD.USUARIO.COD_USUARIO = CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD
+            LEFT JOIN CMP.CATEGORIA ON CMP.CATEGORIA.COD_CATEGORIA = SGD.USUARIO.COD_CATEGORIA_AREA
+            WHERE 
+                FE_DOCUMENTO.COD_EMPR = ?
+                AND FE_DOCUMENTO.OPERACION = ?
+                AND FE_DOCUMENTO.ID_DOCUMENTO IN ($placeholders)
+                AND FE_DOCUMENTO.COD_ESTADO <> ''
+            ORDER BY FEC_VENTA ASC
+        ";
+
+        $listadatos = DB::select($sql, $parametros);
+
+
+        return  $listadatos;
+
+
+    }
+
+
 
     private function con_lista_cabecera_comprobante_total_gestion_contrato($cliente_id,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$filtrofecha_id) {
 
@@ -5322,7 +5454,7 @@ trait ComprobanteTraits
                     ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR)
                     ->whereBetween('TES.FEC_MOVIMIENTO_CAJABANCO', [$fecha_inicio, $fecha_fin])
                     ->where('TES.TXT_ITEM_MOVIMIENTO', 'like', '%PAGO DE PRESTAMOS BANCARIOS%')
-                    ->where('CTB.TXT_DESCRIPCION', 'like', '%INTERES%');
+                    ->where('CTB.TXT_DESCRIPCION', 'like', '%INTERESES POR%');
 
         $registros = $consulta1->unionAll($consulta2)->unionAll($consulta3)->get();
 
@@ -5375,7 +5507,8 @@ trait ComprobanteTraits
                         'TES.COD_FLUJO_CAJA',
                         'TES.TXT_FLUJO_CAJA',
                         'TES.COD_ITEM_MOVIMIENTO',
-                        'TES.TXT_ITEM_MOVIMIENTO'
+                        'TES.TXT_ITEM_MOVIMIENTO',
+                        'TCB.COD_BANCO'
                     )
                     ->whereIn('TES.COD_OPERACION_CAJA', $array)
                     ->whereIn('TES.COD_FLUJO_CAJA', [
@@ -5590,6 +5723,63 @@ trait ComprobanteTraits
         return  $registros;                             
     }
 
+    private function gn_lista_comision_asociados_top_get($array) {
+            
+
+        $registros = DB::table('TES.OPERACION_CAJA as TES')
+                    ->leftJoin('STD.EMPRESA as EMS', 'TES.COD_EMPR', '=', 'EMS.COD_EMPR')
+                    ->leftJoin('TES.CAJA_BANCO as TCB', 'TES.COD_CAJA_BANCO', '=', 'TCB.COD_CAJA_BANCO')
+                    ->leftJoin('STD.EMPRESA as EMP', 'TCB.COD_BANCO', '=', 'EMP.COD_EMPR')
+                    ->leftJoin('CMP.CATEGORIA as CMD', 'TES.COD_CATEGORIA_MONEDA', '=', 'CMD.COD_CATEGORIA')
+                    ->leftJoin('CMP.CATEGORIA as CME', function($join) {
+                        $join->on('TES.COD_CATEGORIA_ESTADO', '=', 'CME.COD_CATEGORIA')
+                             ->where('CME.TXT_GRUPO', 'ESTADO_OPERACION_CAJA');
+                    })
+                    ->select(
+                        'TES.COD_OPERACION_CAJA',
+                        'TES.COD_EMPR',
+                        'EMS.NOM_EMPR',
+                        'TES.COD_CAJA_BANCO',
+                        DB::raw("CASE WHEN TCB.IND_CAJA = 0 THEN TCB.TXT_BANCO ELSE TCB.TXT_CAJA_BANCO END as NOMBRE_BANCO_CAJA"),
+                        'TCB.TXT_CAJA_BANCO as CUENTA',
+                        'TES.FEC_OPERACION as FEC_REGISTRO',
+                        'TES.FEC_MOVIMIENTO_CAJABANCO as FEC_MOVIMIENTO',
+                        'TES.NRO_CUENTA_BANCARIA',
+                        'TES.NRO_VOUCHER',
+                        'CMD.NOM_CATEGORIA as MONEDA',
+                        'CME.NOM_CATEGORIA as ESTADO',
+                        DB::raw('(TES.CAN_HABER_MN - TES.CAN_DEBE_MN) as MONTO_SOLES'),
+                        DB::raw('(TES.CAN_HABER_ME - TES.CAN_DEBE_ME) as MONTO_DOLARES'),
+                        'TES.TXT_GLOSA',
+                        'TES.COD_FLUJO_CAJA',
+                        'TES.TXT_FLUJO_CAJA',
+                        'TES.COD_ITEM_MOVIMIENTO',
+                        'TES.TXT_ITEM_MOVIMIENTO',
+                        'EMP.NRO_DOCUMENTO AS RUC'
+                    )
+                    ->whereIn('TES.COD_OPERACION_CAJA', $array)
+                    ->whereIn('TES.COD_FLUJO_CAJA', [
+                        'IICHFC0000000004',
+                        'IICHFC0000000009',
+                        'IICHFC0000000012',
+                        'ISCHFC0000000012',
+                        'ISCHFC0000000027',
+                        'ISCHFC0000000036',
+                        'ISCHFC0000000033'
+                    ])
+                    ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
+                    ->where('TES.IND_EXTORNO', 0)
+                    ->where('TES.COD_ESTADO', 1)
+                    ->whereIn('TES.COD_CATEGORIA_OPERACION_ORIGEN', [
+                        'OOC0000000000008',
+                        'OOC0000000000005'
+                    ])
+                    ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR) // variable pasada desde tu controlador
+                    ->get();
+
+
+        return  $registros;                             
+    }
 
 
     private function gn_combo_proveedor_fe_documento($todo) {

@@ -19,7 +19,13 @@
             @if($operacion_id == 'PROVISION_GASTO')
               @include('comprobante.ajax.alistaocvalidadopg')
             @else
-              @include('comprobante.ajax.alistaocvalidadoestiba')
+
+              @if($operacion_id == 'DOCUMENTO_INTERNO_COMPRA')
+                @include('comprobante.ajax.alistaocvalidadoestibadic')
+              @else
+                @include('comprobante.ajax.alistaocvalidadoestiba')
+              @endif
+
             @endif
           @endif
         @endif

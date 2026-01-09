@@ -265,9 +265,8 @@ class GestionOCAcopioController extends Controller
 
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
-                $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR JEFE DE ACOPIO');
-                //geolocalizacion
-
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR JEFE ACOPIO');
+                //geolocalización
 
                 DB::commit();
 
@@ -469,11 +468,11 @@ class GestionOCAcopioController extends Controller
                 $documento->MENSAJE                     =   $descripcion;
                 $documento->save();
 
-
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
                 $this->con_datos_de_la_pc($device_info,$fedocumento,'OBSERVADO POR JEFE ACOPIO');
-                //geolocalizacion
+                //geolocalización
+
 
 
                 FeDocumento::where('ID_DOCUMENTO',$idop)->where('DOCUMENTO_ITEM','=',$linea)
@@ -613,11 +612,11 @@ class GestionOCAcopioController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
  
-
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
-                $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR JEFE DE ACOPIO');
-                //geolocalizacion
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR JEFE ACOPIO');
+                //geolocalización
+
 
                 DB::commit();
 
@@ -788,7 +787,9 @@ class GestionOCAcopioController extends Controller
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
                 $this->con_datos_de_la_pc($device_info,$fedocumento,'OBSERVADO POR JEFE ACOPIO');
-                //geolocalizacion
+                //geolocalización
+
+
 
                 FeDocumento::where('ID_DOCUMENTO',$idoc)
                             ->update(

@@ -322,7 +322,7 @@ class ReporteInventarioController extends Controller
 
         $listacascara   =  $this->ListarInventario($fecha_hasta, $cod_empr, 'FAM0000000000046', 'SFM0000000000025','',''); 
         $listapilado    =   $this->ListarInventario($fecha_hasta, $cod_empr, 'FAM0000000000008', '','',''); 
-        $listatransito  =   $this->ListarOrdenesTransito($fecha_hasta, $cod_empr, 'FAM0000000000008',''); 
+        $listatransito  =   $this->ListarOrdenesTransito($fecha_hasta, $cod_empr, 'FAM0000000000008')->fetchAll(PDO::FETCH_ASSOC); 
         $listapaca      =   $this->ListarInventario($fecha_hasta, $cod_empr, 'FAM0000000000062', '','',''); 
         $listaenvase    =   $this->ListarInventario($fecha_hasta, $cod_empr, 'FAM0000000000026', '','',''); 
         $listabobina    =   $this->ListarInventario($fecha_hasta, $cod_empr, '', '','','TPR0000000000004'); 
@@ -333,6 +333,8 @@ class ReporteInventarioController extends Controller
         $listaenvasecose    =   $this->ListarInventario($fecha_hasta, $cod_empr, 'FAM0000000000026', '','AXI0000000000003','');
         $listafertilizante  =   $this->ListarInventario($fecha_hasta, $cod_empr, 'FAM0000000000036', '','',''); 
         
+        $detalletransito = [];
+
         foreach ($listacascara as $item) {
             $cod_pro = $item['COD_PRODUCTO'];
             $cod_cen = $item['COD_CENTRO'];
@@ -358,9 +360,9 @@ class ReporteInventarioController extends Controller
 
             $data_pilado[$cod_pro][$tipo][] = $item;            
             $data_pilado_fisico[$cod_pro][$tipo][] = $item;
+            
         }    
-
-
+        
         $data_paca      = [];
         foreach ($listapaca as $item) {
             $cod_pro = $item['COD_PRODUCTO'];
@@ -471,7 +473,7 @@ class ReporteInventarioController extends Controller
         	 $cod_empr, $data_cascara,$data_pilado,$data_pilado_fisico, $data_paca,$data_envase,
 			 $data_envase_fisico, $data_bobina, $data_suministro, $data_envaseprod, $data_envasedesp,
 			 $data_envasedesp_fisico, $data_envasecose, $data_fertilizante,$pos_cascara,$pos_pilado,$pos_paca,
-			 $pos_envase,$pos_bobina,$pos_suministro,$pos_envaseprod,$pos_envasedesp,$pos_envasecose,$pos_fertilizante  
+			 $pos_envase,$pos_bobina,$pos_suministro,$pos_envaseprod,$pos_envasedesp,$pos_envasecose,$pos_fertilizante,$listatransito  
         ){
 
         	    $excel->sheet('Inventarios Consolidados', function ($sheet) use ($cod_empr,
@@ -788,6 +790,27 @@ class ReporteInventarioController extends Controller
 
                     $sheet->loadView('inventario/ajax/afertilizante')->with(['listafertilizante'=>$data_fertilizante,
                                     									'codempr_filtro'=>$cod_empr]);
+                }); 
+
+
+    			$excel->sheet('Detalle Transito', function ($sheet) use ($listatransito) {   
+    				$sheet->setWidth('A', 15);
+    				$sheet->setWidth('B', 45);
+    				$sheet->setWidth('C', 15);
+    				$sheet->setWidth('D', 45);
+    				$sheet->setWidth('E', 20);
+    				$sheet->setWidth('F', 15);
+    				$sheet->setWidth('G', 20);
+    				$sheet->setWidth('H', 40);
+    				$sheet->setWidth('I', 15);
+    				$sheet->setWidth('J', 15);
+    				$sheet->setWidth('K', 15);
+
+                 	$sheet->setColumnFormat(array('C:K' => '0.00'));
+                    $sheet->row(1, function ($row) { $row->setBackground('#1D3A6D'); $row->setFontColor('#FFFFFF'); });                    
+                    $sheet->row(count($listatransito)+2, function ($row) { $row->setFont(['bold' => true]); });
+
+                    $sheet->loadView('inventario/ajax/adetalletransito')->with(['listatransito'=>$listatransito]);
                 }); 
 
         })->download('xlsx');

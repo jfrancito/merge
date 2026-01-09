@@ -21,6 +21,7 @@
                 {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
 
+
       				<div class="form-group sectioncargarimagen iaprobado">
       						<label class="col-sm-3 control-label">Firma :</label>
       						<div class="col-sm-6">

@@ -766,11 +766,6 @@ class GestionOCSXController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
-                //geolocalizacion
-                $device_info       =   $request['device_info'];
-                $this->con_datos_de_la_pc($device_info,$fedocumento,'SUBIO DOCUMENTOS');
-                //geolocalizacion
-
 
                 $orden                                  =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
                 $fedocumento_x                          =   FeDocumento::where('TXT_REFERENCIA','=',$idoc)->first();
@@ -843,13 +838,13 @@ class GestionOCSXController extends Controller
 
                 }else{
 
-                
+                    //return Redirect::back()->with('errorurl', 'No se puede integrar ningun documento hasta proximo aviso');
                     //SI ES SERVICIO PASA NORMAL
                     FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                                 ->update(
                                     [
-                                        'COD_ESTADO'=>'ETM0000000000003',
-                                        'TXT_ESTADO'=>'POR APROBAR CONTABILIDAD',
+                                        'COD_ESTADO'=>'ETM0000000000004',
+                                        'TXT_ESTADO'=>'POR APROBAR ADMINISTRACCION',
                                         'ind_email_ap'=>0,
                                         'fecha_uc'=>$this->fechaactual,
                                         'usuario_uc'=>Session::get('usuario')->id
@@ -867,36 +862,15 @@ class GestionOCSXController extends Controller
                     $documento->MENSAJE                     =   '';
                     $documento->save();
 
+
                     //geolocalizacion
                     $device_info       =   $request['device_info'];
                     $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR USUARIO CONTACTO');
-                    //geolocalizacion
+                    //geolocalización
 
 
-                    //whatsaap para contabilidad
-                    // $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->first();
-                    // $ordencompra        =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();            
-                    // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
-                    // $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO
-                    //                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
-                    //                         .'PROVEEDOR : '.$ordencompra->TXT_EMPR_CLIENTE.'%0D%0A'
-                    //                         .'ESTADO : '.$fedocumento_w->TXT_ESTADO.'%0D%0A';
 
-                    // if(1==0){
-                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                    // }else{
-                    //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                    //     $this->insertar_whatsaap('51979659002','HAMILTON',$mensaje,'');
-                    //     $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
-                    //     //CONTABILIDAD
-                    //     if($prefijocarperta=='II'){
-                    //         $this->insertar_whatsaap('51965991360','ANGHIE',$mensaje,'');           //INTERNACIONAL
-                    //         $this->insertar_whatsaap('51988650421','LUCELY',$mensaje,'');           //INTERNACIONAL
-                    //     }else{
-                    //         $this->insertar_whatsaap('51950638955','MIGUEL',$mensaje,'');           //COMERCIAL
-                    //         $this->insertar_whatsaap('51935387084','VASQUEZ',$mensaje,'');          //COMERCIAL
-                    //     }
-                    // } 
+
                 }
 
                 DB::commit();
@@ -1128,20 +1102,19 @@ class GestionOCSXController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
-                //geolocalizacion
-                $device_info       =   $request['device_info'];
-                $this->con_datos_de_la_pc($device_info,$fedocumento,'SUBIO DOCUMENTOS');
-                //geolocalizacion
+
 
                 $orden                                  =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$idoc)->first();
                 $fedocumento_x                          =   FeDocumento::where('TXT_REFERENCIA','=',$idoc)->first();
 
+
+                //return Redirect::back()->with('errorurl', 'No se puede integrar ningun documento hasta proximo aviso');
                 //SI ES SERVICIO PASA NORMAL
                 FeDocumento::where('ID_DOCUMENTO',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(
                                 [
-                                    'COD_ESTADO'=>'ETM0000000000003',
-                                    'TXT_ESTADO'=>'POR APROBAR CONTABILIDAD',
+                                    'COD_ESTADO'=>'ETM0000000000004',
+                                    'TXT_ESTADO'=>'POR APROBAR ADMINISTRACCION',
                                     'ind_email_ap'=>0,
                                     'fecha_uc'=>$this->fechaactual,
                                     'usuario_uc'=>Session::get('usuario')->id
@@ -1162,7 +1135,8 @@ class GestionOCSXController extends Controller
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
                 $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR USUARIO CONTACTO');
-                //geolocalizacion
+                //geolocalización
+
 
  
                 DB::commit();

@@ -56,6 +56,7 @@
                         {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
 
+
                         <div class="form-group">
 
                           <input id="name" name='name' type="text" required = "" value="{{ old('name') }}"  placeholder="RUC" autocomplete="off" class="form-control" data-aw="1"/>

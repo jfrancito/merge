@@ -27,6 +27,7 @@
                           <form method="POST" id='formpedido' action="{{ url('/aprobar-planilla-movilidad-contabilidad/'.$idopcion.'/'.Hashids::encode(substr($feplanillaentrega->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
                             {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                             @include('planillamovilidad.form.formaprobarcontpla')
                           </form>
                         </div>

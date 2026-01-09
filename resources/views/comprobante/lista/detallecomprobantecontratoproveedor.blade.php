@@ -13,6 +13,7 @@
                      {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
 
+
                       <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 cajareporte">
 
                           <div class="form-group">
@@ -57,6 +58,7 @@
             <form method="POST" action="{{ url('validar-xml-contrato-proveedor/'.$idopcion.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -9))) }}" name="formguardardatos" id="formguardardatos" enctype="multipart/form-data" >
              {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
               <input type="hidden" name="procedencia" id='procedencia' value = '{{$procedencia}}'>
 
               <div class="row">

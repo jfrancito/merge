@@ -18,6 +18,7 @@
             <form method="POST" action="{{ url('/agregar-grupo-servicio/'.$idopcion) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                   {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
               @include('configuracion.form.fgruposervicio')
             </form>
           </div>

@@ -29,6 +29,7 @@
                           <form method="POST" id='formpedido' action="{{ url('/aprobar-liquidacion-gasto-administracion/'.$idopcion.'/'.Hashids::encode(substr($liquidaciongastos->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
                                 {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                             @include('liquidaciongasto.form.formaprobaradministracionlg')
                             <div class="row xs-pt-15">
                               <div class="col-xs-6">
@@ -53,6 +54,7 @@
                         <form method="POST" id='formpedidoobservar' action="{{ url('/agregar-observar-administrador/'.$idopcion.'/'.Hashids::encode(substr($liquidaciongastos->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                               {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                           <input type="hidden" name="data_observacion" id="data_observacion">
                           @include('liquidaciongasto.form.formobservaradm')
                           <div class="row xs-pt-15">
@@ -80,6 +82,7 @@
                         <form method="POST" id='formpedidorechazar' action="{{ url('/agregar-extorno-administracion/'.$idopcion.'/'.Hashids::encode(substr($liquidaciongastos->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                               {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                           @include('liquidaciongasto.form.formrechazo')
 
                           <div class="row xs-pt-15">

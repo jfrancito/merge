@@ -40,6 +40,7 @@
             <form method="POST" id='forextornar{{$item->ID_DOCUMENTO}}' action="{{ url('/extonar-liquidacion-gastos/'.$idopcion.'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                   {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                   <button type= 'button' style="margin-top: 5px;float: right;" class="btn btn-rounded btn-space btn-danger btn-sm btn-extonar-lg" data_extorno="{{$item->ID_DOCUMENTO}}">EXTORNAR</button>
             </form>
           @endif

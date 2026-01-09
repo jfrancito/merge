@@ -21,6 +21,7 @@
             <form method="POST" action="{{ url('/modificar-usuario/'.$idopcion.'/'.Hashids::encode(substr($usuario->id, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed"> 
                   {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
               
                 <div class="form-group">
                     <label class="col-sm-3 control-label">Personal</label>

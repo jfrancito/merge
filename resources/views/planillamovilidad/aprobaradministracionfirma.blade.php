@@ -28,6 +28,7 @@
                           <form method="POST" id='formpedido' action="{{ url('/aprobar-firma-administracion/'.$idopcion.'/'.Hashids::encode(substr($firma->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
                             {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                             @include('planillamovilidad.form.formaprobarfirma')
                             <div class="row xs-pt-15">
                               <div class="col-xs-6">
@@ -54,6 +55,7 @@
                         <form method="POST" id='formpedidorechazar' action="{{ url('/agregar-extorno-administracion-firma/'.$idopcion.'/'.Hashids::encode(substr($firma->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                               {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                           @include('planillamovilidad.form.formrechazo')
 
                           <div class="row xs-pt-15">

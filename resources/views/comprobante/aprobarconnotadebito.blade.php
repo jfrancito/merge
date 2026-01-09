@@ -31,6 +31,7 @@
                     <div class="panel-body">
                       <form method="POST" id='formpedido' action="{{ url('/aprobar-comprobante-contabilidad-nota-debito/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
                             {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
                         @include('comprobante.form.formaprobarcontnotadebito')
                       </form>
                     </div>
@@ -43,6 +44,7 @@
                     <div class="panel-body">
                       <form method="POST" id='formpedidoobservar' action="{{ url('/agregar-observacion-contabilidad-nota-debito/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                             {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
                         @include('comprobante.form.formobservarnotadebito')
                       </form>
                     </div>
@@ -55,6 +57,7 @@
                     <div class="panel-body">
                         <form method="POST" id='formpedidorechazar' action="{{ url('/agregar-extorno-nota-debito-contabilidad/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -10))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                               {{ csrf_field() }}
+<input type="hidden" name="device_info" id='device_info'>
                           @include('comprobante.form.formrechazonotadebito')
                         </form>
                     </div>

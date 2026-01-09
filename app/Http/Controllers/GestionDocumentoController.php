@@ -765,11 +765,10 @@ class GestionDocumentoController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
-
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
                 $this->con_datos_de_la_pc($device_info,$fedocumento,'SUBIO DOCUMENTOS');
-                //geolocalizacion
+                //geolocalización
 
 
                 DB::commit();

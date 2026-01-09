@@ -19,6 +19,7 @@
             <form method="POST" action="{{ url('/modificar-productos/'.$idopcion.'/'.Hashids::encode(substr($producto->id, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                   {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
               @include('configuracion.form.fproducto')
             </form>
           </div>

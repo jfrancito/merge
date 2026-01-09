@@ -91,6 +91,7 @@
                                                   enctype="multipart/form-data">
                                                 {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                                                 
                                                 @include('comprobante.form.formaprobarcontcontratto')
                                                 {{--@include('comprobante.asiento.contenedorasiento')--}}
@@ -110,6 +111,7 @@
                                                   class="form-horizontal group-border-dashed">
                                                 {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                                                 @include('comprobante.form.formobservarcontrato')
                                             </form>
                                         </div>
@@ -128,6 +130,7 @@
                                                   class="form-horizontal group-border-dashed">
                                                 {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                                                 @include('comprobante.form.formreparablecontrato')
                                             </form>
                                         </div>
@@ -146,6 +149,7 @@
                                                   class="form-horizontal group-border-dashed">
                                                 {{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
                                                 @include('comprobante.form.formrechazocontrato')
                                             </form>
                                         </div>

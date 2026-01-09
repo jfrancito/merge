@@ -31,34 +31,38 @@
             <ul role="menu" class="dropdown-menu pull-right">
               <li>
 
-                @if(ltrim(rtrim($item->COD_ESTADO)) == '') 
-                    <a href="{{ url('/detalle-comprobante-oc-administrator/'.$procedencia.'/'.$idopcion.'/'.substr($item->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($item->COD_ORDEN, -10))) }}">
-                      Registro XML
-                    </a>
-                @else
 
-                  @if(is_null($item->COD_ESTADO)) 
+                  @if(ltrim(rtrim($item->COD_ESTADO)) == '') 
                       <a href="{{ url('/detalle-comprobante-oc-administrator/'.$procedencia.'/'.$idopcion.'/'.substr($item->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($item->COD_ORDEN, -10))) }}">
                         Registro XML
                       </a>
                   @else
-                    @if($item->COD_ESTADO != 'ETM0000000000001')
-                      @if($item->COD_ESTADO != 'ETM0000000000006')
-                        <a href="{{ url('/detalle-comprobante-oc-validado/'.$idopcion.'/'.substr($item->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($item->COD_ORDEN, -10))) }}">
-                          Detalle de Registro
-                        </a>
-                      @else
+
+                    @if(is_null($item->COD_ESTADO)) 
                         <a href="{{ url('/detalle-comprobante-oc-administrator/'.$procedencia.'/'.$idopcion.'/'.substr($item->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($item->COD_ORDEN, -10))) }}">
                           Registro XML
                         </a>
-                      @endif
                     @else
-                        <a href="{{ url('/detalle-comprobante-oc-administrator/'.$procedencia.'/'.$idopcion.'/'.substr($item->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($item->COD_ORDEN, -10))) }}">
-                          Registro XML
-                        </a>
+                      @if($item->COD_ESTADO != 'ETM0000000000001')
+                        @if($item->COD_ESTADO != 'ETM0000000000006')
+                          <a href="{{ url('/detalle-comprobante-oc-validado/'.$idopcion.'/'.substr($item->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($item->COD_ORDEN, -10))) }}">
+                            Detalle de Registro
+                          </a>
+                        @else
+                          <a href="{{ url('/detalle-comprobante-oc-administrator/'.$procedencia.'/'.$idopcion.'/'.substr($item->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($item->COD_ORDEN, -10))) }}">
+                            Registro XML
+                          </a>
+                        @endif
+                      @else
+                          <a href="{{ url('/detalle-comprobante-oc-administrator/'.$procedencia.'/'.$idopcion.'/'.substr($item->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($item->COD_ORDEN, -10))) }}">
+                            Registro XML
+                          </a>
+                      @endif
                     @endif
                   @endif
-                @endif
+
+
+
               </li>
               <li>
                 <a href="{{ url('/agregar-archivo-uc/'.$procedencia.'/'.$idopcion.'/'.substr($item->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($item->COD_ORDEN, -10))) }}">

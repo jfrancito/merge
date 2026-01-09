@@ -17,7 +17,14 @@
           @if($operacion_id == 'PROVISION_GASTO')
             @include('comprobante.ajax.alistapgareaadministrador')
           @else
-            @include('comprobante.ajax.alistaestibaareaadministrador')
+
+            @if($operacion_id == 'DOCUMENTO_INTERNO_COMPRA')
+              @include('comprobante.ajax.alistaestibaareaadministradordic')
+            @else
+              @include('comprobante.ajax.alistaestibaareaadministrador')
+            @endif
+
+
           @endif
 
 

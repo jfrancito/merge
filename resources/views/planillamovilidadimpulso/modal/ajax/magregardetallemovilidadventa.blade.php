@@ -10,6 +10,7 @@
 						<form method="POST" id ='agregarpmd' class="form2" action="{{ url('/guardar-detalle-movilidad-venta-trabajador/'.$idopcion.'/'.Hashids::encode(substr($planillamovilidad->ID_DOCUMENTO, -8))) }}">
 							{{ csrf_field() }}
 <input type="hidden" name="device_info" id='device_info'>
+
 							<div class="modal-header">
 								<button type="button" data-dismiss="modal" aria-hidden="true" class="close modal-close"><span class="mdi mdi-close"></span></button>
 								<h3 class="modal-title">
