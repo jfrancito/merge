@@ -699,8 +699,6 @@ class GestionOCTesoreriaController extends Controller
                                 $detalle->PRECIO_ORIG = (float)$itemdet->getmtoPrecioUnitario();
                                 $detalle->save();
 
-                            }
-
                             /**********FORMA DE PAGO*********/
                             foreach ($factura->getFormaPago() as $indexfor => $itemfor) {
                                 $fechapago = date_format(date_create($itemfor->getfecha()), 'Ymd');
@@ -714,6 +712,20 @@ class GestionOCTesoreriaController extends Controller
                                 $forma->save();
 
                             }
+
+                            /****************************************  VALIDAR SI EL ARCHIVO ESTA ACEPTADO POR SUNAT  *********************************/
+
+
+                            $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('COD_ESTADO', '<>', 'ETM0000000000006')->first();
+                            $fechaemision = date_format(date_create($fedocumento->FEC_VENTA), 'd/m/Y');
+                            $detallefedocumento = FeDetalleDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)->get();
+                            $lotes = FeRefAsoc::where('lote', '=', $idoc)
+                                ->pluck('ID_DOCUMENTO')
+                                ->toArray();
+
+
+                            $documento_asociados = $this->gn_lista_comision_asociados_atendidos($lotes, $idoc);
+                            $documento_top = $this->gn_lista_comision_asociados_top_terminado($lotes, $idoc);
 
                             /****************************************  VALIDAR SI EL ARCHIVO ESTA ACEPTADO POR SUNAT  *********************************/
 
