@@ -462,6 +462,8 @@ class GestionOCTesoreriaController extends Controller
                         $archivosdelfe = CMPCategoria::where('TXT_GRUPO', '=', 'DOCUMENTOS_COMPRA')
                             ->whereIn('COD_CATEGORIA', ['DCC0000000000013', 'DCC0000000000003'])->get();
                     }
+
+
                     //VALIDAR QUE YA EXISTE ESTE XML
                     $fedocumento_e = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->whereNotIn('COD_ESTADO', ['', 'ETM0000000000006'])
                         ->where('RUC_PROVEEDOR', '=', $factura->getcompany()->getruc())
@@ -618,7 +620,7 @@ class GestionOCTesoreriaController extends Controller
 
                     $documento_asociados = $this->gn_lista_comision_asociados_atendidos($lotes, $idoc);
                     $documento_top = $this->gn_lista_comision_asociados_top_terminado($lotes, $idoc);
-
+                    //dd($documento_top);
                     //VALIDAR QUE ALGUNOS CAMPOS SEAN IGUALES
                     $this->con_validar_documento_proveedor_comision($documento_asociados, $documento_top, $fedocumento, $detallefedocumento, $idoc);
 
