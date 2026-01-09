@@ -698,7 +698,7 @@ class GestionOCTesoreriaController extends Controller
                                 $detalle->VAL_VENTA_SOL = (float)$itemdet->getigv() + (float)$itemdet->getmtoValorVenta();
                                 $detalle->PRECIO_ORIG = (float)$itemdet->getmtoPrecioUnitario();
                                 $detalle->save();
-
+                            }
                             /**********FORMA DE PAGO*********/
                             foreach ($factura->getFormaPago() as $indexfor => $itemfor) {
                                 $fechapago = date_format(date_create($itemfor->getfecha()), 'Ymd');
