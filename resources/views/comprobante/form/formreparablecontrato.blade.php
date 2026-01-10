@@ -50,12 +50,6 @@
                 <input id="{{$item->COD_CATEGORIA}}R" value="{{$item->COD_CATEGORIA}}" type="checkbox"
                        name="archivore[]">
                 <label for="{{$item->COD_CATEGORIA}}R">{{$item->NOM_CATEGORIA}} ({{$item->COD_CTBLE}})</label>
-
-                <input id="{{$item->COD_CATEGORIA}}F" class='checkfisico' value="{{$item->COD_CATEGORIA}}" type="checkbox"
-                       name="archivofi[]">
-                <label for="{{$item->COD_CATEGORIA}}F" class='checkfisico'>(FISICO)</label>
-
-
             </div>
         @endforeach
     </div>

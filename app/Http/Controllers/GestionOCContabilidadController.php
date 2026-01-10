@@ -567,8 +567,7 @@ class GestionOCContabilidadController extends Controller
                         }
 
                         $empresa_doc_asiento_aux = STDEmpresa::where('COD_ESTADO', '=', 1)->where('COD_EMPR', '=', $COD_EMPR_CLI)->first();
-//                        $tipo_doc_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $COD_CATEGORIA_TIPO_DOCUMENTO)->first();
-//                        $tipo_doc_ref_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $COD_CATEGORIA_TIPO_DOCUMENTO_REF)->first();
+
                         $tipo_doc_asiento_aux = STDTipoDocumento::where('COD_TIPO_DOCUMENTO', '=', $COD_CATEGORIA_TIPO_DOCUMENTO)->first();
                         $tipo_doc_ref_asiento_aux = STDTipoDocumento::where('COD_TIPO_DOCUMENTO', '=', $COD_CATEGORIA_TIPO_DOCUMENTO_REF)->first();
                         $tipo_asiento = CMPCategoria::where('COD_CATEGORIA', '=', $COD_CATEGORIA_TIPO_ASIENTO)->first();
@@ -1182,7 +1181,7 @@ class GestionOCContabilidadController extends Controller
                 //->whereNotIn('COD_CATEGORIA',$archivosselect)
                 ->get();
 
-            $comboreparable = array('ARCHIVO_VIRTUAL' => 'ARCHIVO_VIRTUAL', 'ARCHIVO_FISICO' => 'ARCHIVO_FISICO');
+            $comboreparable = array('ARCHIVO_VIRTUAL' => 'ARCHIVO_VIRTUAL', 'ARCHIVO_FISICO' => 'ARCHIVO_FISICO', 'ARCHIVO_VIRTUAL_FISICO' => 'ARCHIVO_VIRTUAL_FISICO');
             $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)->first();
             $ordencompra_f = CMPOrden::where('COD_ORDEN', '=', $idoc)->first();
 
@@ -1877,8 +1876,7 @@ class GestionOCContabilidadController extends Controller
                                         //->whereNotIn('COD_CATEGORIA',$archivosselect)
                                         ->get();
 
-            $comboreparable         =   array('ARCHIVO_VIRTUAL' => 'ARCHIVO_VIRTUAL','ARCHIVO_FISICO' => 'ARCHIVO_FISICO');
-
+            $comboreparable = array('ARCHIVO_VIRTUAL' => 'ARCHIVO_VIRTUAL', 'ARCHIVO_FISICO' => 'ARCHIVO_FISICO', 'ARCHIVO_VIRTUAL_FISICO' => 'ARCHIVO_VIRTUAL_FISICO');
             $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->first();
 
             $lotes                  =   FeRefAsoc::where('lote','=',$idoc)                                        
@@ -2525,7 +2523,7 @@ class GestionOCContabilidadController extends Controller
                 //->whereNotIn('COD_CATEGORIA',$archivosselect)
                 ->get();
 
-            $comboreparable = array('ARCHIVO_VIRTUAL' => 'ARCHIVO_VIRTUAL', 'ARCHIVO_FISICO' => 'ARCHIVO_FISICO');
+            $comboreparable = array('ARCHIVO_VIRTUAL' => 'ARCHIVO_VIRTUAL', 'ARCHIVO_FISICO' => 'ARCHIVO_FISICO', 'ARCHIVO_VIRTUAL_FISICO' => 'ARCHIVO_VIRTUAL_FISICO');    
 
             $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->first();
 
@@ -3419,7 +3417,7 @@ class GestionOCContabilidadController extends Controller
                 //->whereNotIn('COD_CATEGORIA',$archivosselect)
                 ->get();
 
-            $comboreparable = array('ARCHIVO_VIRTUAL' => 'ARCHIVO_VIRTUAL', 'ARCHIVO_FISICO' => 'ARCHIVO_FISICO');
+           $comboreparable = array('ARCHIVO_VIRTUAL' => 'ARCHIVO_VIRTUAL', 'ARCHIVO_FISICO' => 'ARCHIVO_FISICO', 'ARCHIVO_VIRTUAL_FISICO' => 'ARCHIVO_VIRTUAL_FISICO');
 
             $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)->first();
 
@@ -3948,7 +3946,7 @@ class GestionOCContabilidadController extends Controller
                                         //->whereNotIn('COD_CATEGORIA',$archivosselect)
                                         ->get();
 
-            $comboreparable         =   array('ARCHIVO_VIRTUAL' => 'ARCHIVO_VIRTUAL','ARCHIVO_FISICO' => 'ARCHIVO_FISICO');
+            $comboreparable = array('ARCHIVO_VIRTUAL' => 'ARCHIVO_VIRTUAL', 'ARCHIVO_FISICO' => 'ARCHIVO_FISICO', 'ARCHIVO_VIRTUAL_FISICO' => 'ARCHIVO_VIRTUAL_FISICO');
 
             $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
 
@@ -4264,7 +4262,7 @@ class GestionOCContabilidadController extends Controller
                                         //->whereNotIn('COD_CATEGORIA',$archivosselect)
                                         ->get();
 
-            $comboreparable         =   array('ARCHIVO_VIRTUAL' => 'ARCHIVO_VIRTUAL','ARCHIVO_FISICO' => 'ARCHIVO_FISICO');
+            $comboreparable = array('ARCHIVO_VIRTUAL' => 'ARCHIVO_VIRTUAL', 'ARCHIVO_FISICO' => 'ARCHIVO_FISICO', 'ARCHIVO_VIRTUAL_FISICO' => 'ARCHIVO_VIRTUAL_FISICO');
 
             $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
 
@@ -4512,7 +4510,7 @@ class GestionOCContabilidadController extends Controller
                                         //->whereNotIn('COD_CATEGORIA',$archivosselect)
                                         ->get();
 
-            $comboreparable         =   array('ARCHIVO_VIRTUAL' => 'ARCHIVO_VIRTUAL','ARCHIVO_FISICO' => 'ARCHIVO_FISICO');
+            $comboreparable = array('ARCHIVO_VIRTUAL' => 'ARCHIVO_VIRTUAL', 'ARCHIVO_FISICO' => 'ARCHIVO_FISICO', 'ARCHIVO_VIRTUAL_FISICO' => 'ARCHIVO_VIRTUAL_FISICO');
 
             $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
 
@@ -5615,8 +5613,6 @@ class GestionOCContabilidadController extends Controller
             }
 
             $empresa_doc_asiento_aux = STDEmpresa::where('COD_ESTADO', '=', 1)->where('COD_EMPR', '=', $empresa_asiento)->first();
-//            $tipo_doc_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_documento_asiento)->first();
-//            $tipo_doc_ref_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_documento_ref)->first();
             $tipo_doc_asiento_aux = STDTipoDocumento::where('COD_TIPO_DOCUMENTO', '=', $tipo_documento_asiento)->first();
             $tipo_doc_ref_asiento_aux = STDTipoDocumento::where('COD_TIPO_DOCUMENTO', '=', $tipo_documento_ref)->first();
 
@@ -5643,22 +5639,21 @@ class GestionOCContabilidadController extends Controller
                     return Redirect::to('aprobar-comprobante-contabilidad/' . $idopcion . '/' . $linea . '/' . $prefijo . '/' . $idordencompra)->with('errorbd', 'Tiene que seleccionar almenos un item');
                 }
 
+
                 $modohibrido = '';
+                $reparable_ori = $reparable;
+                if($reparable == 'ARCHIVO_VIRTUAL_FISICO'){
+                    $reparable = 'ARCHIVO_VIRTUAL';
+                }
+
                 foreach ($archivore as $index => $item) {
 
                     $categoria = CMPCategoria::where('COD_CATEGORIA', '=', $item)->first();
-
-                    //dd($item);
                     $tipo_doc = $categoria->CODIGO_SUNAT;
-
-                    if(count($archivofi)>0){
-                        if (in_array($item, $archivofi, true)) {
+                    if($reparable_ori == 'ARCHIVO_VIRTUAL_FISICO'){
                             $tipo_doc = 'F';
-                            $modohibrido = 'ARCHIVO_FISICO';
-                        }                       
+                            $modohibrido = 'ARCHIVO_FISICO';                      
                     }
-
-
                     $docasociar = new CMPDocAsociarCompra;
                     $docasociar->COD_ORDEN = $idoc;
                     $docasociar->COD_CATEGORIA_DOCUMENTO = $categoria->COD_CATEGORIA;
@@ -5672,11 +5667,6 @@ class GestionOCContabilidadController extends Controller
                     $docasociar->TIP_DOC = $tipo_doc;
                     $docasociar->save();
                 }
-
-
-
-
-
 
                 //HISTORIAL DE DOCUMENTO APROBADO
                 $documento = new FeDocumentoHistorial;
@@ -6929,13 +6919,7 @@ class GestionOCContabilidadController extends Controller
                 $descripcion = $request['descripcion'];
                 $archivoob = $request['archivore'];
                 $reparable = $request['reparable'];
-
                 $archivofi = $request['archivofi'];
-
-                $modohibrido = '';
-
-
-
 
                 if ($fedocumento->IND_REPARABLE == 1) {
                     DB::rollback();
@@ -6948,19 +6932,19 @@ class GestionOCContabilidadController extends Controller
                 }
 
 
+                $modohibrido = '';
+                $reparable_ori = $reparable;
+                if($reparable == 'ARCHIVO_VIRTUAL_FISICO'){
+                    $reparable = 'ARCHIVO_VIRTUAL';
+                }
+
                 foreach ($archivoob as $index => $item) {
-                    //dd($item);
                     $categoria = CMPCategoria::where('COD_CATEGORIA', '=', $item)->first();
-
-                    //dd($item);
                     $tipo_doc = $categoria->CODIGO_SUNAT;
-                    if(count($archivofi)>0){
-                        if (in_array($item, $archivofi, true)) {
+                    if($reparable_ori == 'ARCHIVO_VIRTUAL_FISICO'){
                             $tipo_doc = 'F';
-                            $modohibrido = 'ARCHIVO_FISICO';
-                        }                       
+                            $modohibrido = 'ARCHIVO_FISICO';                      
                     }
-
 
                     $docasociar = new CMPDocAsociarCompra;
                     $docasociar->COD_ORDEN = $idoc;
@@ -6975,6 +6959,12 @@ class GestionOCContabilidadController extends Controller
                     $docasociar->TIP_DOC = $tipo_doc;
                     $docasociar->save();
                 }
+
+
+
+
+
+
                 //HISTORIAL DE DOCUMENTO APROBADO
                 $documento = new FeDocumentoHistorial;
                 $documento->ID_DOCUMENTO = $fedocumento->ID_DOCUMENTO;
@@ -7238,9 +7228,6 @@ class GestionOCContabilidadController extends Controller
                 $reparable = $request['reparable'];
                 $archivofi = $request['archivofi'];
 
-                $modohibrido = '';
-
-
 
                 if ($fedocumento->IND_REPARABLE == 1) {
                     DB::rollback();
@@ -7253,18 +7240,19 @@ class GestionOCContabilidadController extends Controller
                 }
 
 
-                foreach ($archivoob as $index => $item) {
-                    //dd($item);
-                    $categoria = CMPCategoria::where('COD_CATEGORIA', '=', $item)->first();
-                    //dd($item);
-                    $tipo_doc = $categoria->CODIGO_SUNAT;
-                    if(count($archivofi)>0){
-                        if (in_array($item, $archivofi, true)) {
-                            $tipo_doc = 'F';
-                            $modohibrido = 'ARCHIVO_FISICO';
-                        }                       
-                    }
+                $modohibrido = '';
+                $reparable_ori = $reparable;
+                if($reparable == 'ARCHIVO_VIRTUAL_FISICO'){
+                    $reparable = 'ARCHIVO_VIRTUAL';
+                }
 
+                foreach ($archivoob as $index => $item) {
+                    $categoria = CMPCategoria::where('COD_CATEGORIA', '=', $item)->first();
+                    $tipo_doc = $categoria->CODIGO_SUNAT;
+                    if($reparable_ori == 'ARCHIVO_VIRTUAL_FISICO'){
+                            $tipo_doc = 'F';
+                            $modohibrido = 'ARCHIVO_FISICO';                      
+                    }
 
                     $docasociar = new CMPDocAsociarCompra;
                     $docasociar->COD_ORDEN = $idoc;
@@ -7279,6 +7267,7 @@ class GestionOCContabilidadController extends Controller
                     $docasociar->TIP_DOC = $tipo_doc;
                     $docasociar->save();
                 }
+
                 //HISTORIAL DE DOCUMENTO APROBADO
                 $documento = new FeDocumentoHistorial;
                 $documento->ID_DOCUMENTO = $fedocumento->ID_DOCUMENTO;
@@ -7293,9 +7282,6 @@ class GestionOCContabilidadController extends Controller
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
                 $this->con_datos_de_la_pc($device_info,$fedocumento,'DOCUMENTO ' . $reparable);
-                //geolocalización
-
-
 
                 FeDocumento::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
                     ->update(
