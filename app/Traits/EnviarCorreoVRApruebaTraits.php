@@ -132,6 +132,8 @@ trait EnviarCorreoVRApruebaTraits
                         "tesoreria.cix@induamerica.com.pe",
                         "franklin.llontop@induamerica.com.pe",
                         "karim.ramirez@induamerica.com.pe",
+                        "catherine.quiroz@induamerica.com.pe",
+                        "fiorela.carrasco@induamerica.com.pe",
                         "marley.sucse@induamerica.com.pe",
                         "analucia.lopez@induamerica.com.pe",
                         "diana.malca@induamerica.com.pe"
@@ -149,6 +151,8 @@ trait EnviarCorreoVRApruebaTraits
                         "tesoreria.cix@induamerica.com.pe",
                         "franklin.llontop@induamerica.com.pe",
                         "karim.ramirez@induamerica.com.pe",
+                        "catherine.quiroz@induamerica.com.pe",
+                        "fiorela.carrasco@induamerica.com.pe",
                         "marley.sucse@induamerica.com.pe",
                         "analucia.lopez@induamerica.com.pe",
                         "diana.malca@induamerica.com.pe"
@@ -166,6 +170,8 @@ trait EnviarCorreoVRApruebaTraits
                         "tesoreria.cix@induamerica.com.pe",
                         "franklin.llontop@induamerica.com.pe",
                         "karim.ramirez@induamerica.com.pe",
+                        "catherine.quiroz@induamerica.com.pe",
+                        "fiorela.carrasco@induamerica.com.pe",
                         "marley.sucse@induamerica.com.pe",
                         "analucia.lopez@induamerica.com.pe",
                         "diana.malca@induamerica.com.pe"
@@ -183,6 +189,8 @@ trait EnviarCorreoVRApruebaTraits
                     'diana.malca@induamerica.com.pe',
                     "analucia.lopez@induamerica.com.pe",
                     'karim.ramirez@induamerica.com.pe',
+                    "catherine.quiroz@induamerica.com.pe",
+                    "fiorela.carrasco@induamerica.com.pe",
                     'franklin.llontop@induamerica.com.pe'
                 ];
             }
