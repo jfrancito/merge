@@ -68,7 +68,7 @@
 
     <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
         <div class="panel panel-default panel-contrast">
-            <div class="panel-heading" style="background: #1d3a6d;color: #fff;">RECOMENDACION
+            <div class="panel-heading" style="background: #1d3a6d;color: #fff;">OBSERVACIONES
             </div>
             <div class="panel-body panel-body-contrast">
                 <div class="row">
@@ -78,7 +78,7 @@
 
                         <div class="form-group sectioncargarimagen">
                             <label class="col-sm-12 control-label" style="text-align: left;"><b>REALIZAR UNA
-                                    RECOMENDACIÓN</b> <br><br></label>
+                                    OBSERVACION</b> <br><br></label>
                             <div class="col-sm-12">
                           <textarea
                                   name="descripcion"
