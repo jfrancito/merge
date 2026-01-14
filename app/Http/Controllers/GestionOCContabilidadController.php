@@ -4673,6 +4673,7 @@ class GestionOCContabilidadController extends Controller
                             ->update(
                                 [
                                     'ACTIVO' => 0,
+                                    'EXTENSION' => 'OBS',
                                     'FECHA_MOD' => $this->fechaactual,
                                     'USUARIO_MOD' => Session::get('usuario')->id
                                 ]
@@ -4691,7 +4692,7 @@ class GestionOCContabilidadController extends Controller
                         $docasociar->COD_USUARIO_CREA_AUD = Session::get('usuario')->id;
                         $docasociar->FEC_USUARIO_CREA_AUD = $this->fechaactual;
                         $docasociar->COD_ESTADO = 1;
-                        $docasociar->TIP_DOC = $categoria->CODIGO_SUNAT;
+                        $docasociar->TIP_DOC = 'O';
                         $docasociar->save();
 
                     }
@@ -5940,7 +5941,7 @@ class GestionOCContabilidadController extends Controller
                     return Redirect::to('agregar-observacion-contabilidad-contrato/' . $idopcion . '/' . $linea . '/' . $prefijo . '/' . $idordencompra)->with('errorbd', 'Tiene que seleccionar almenos un item');
                 }
 
-
+                                    
                 foreach ($archivoob as $index => $item) {
 
                     $docu_asoci = CMPDocAsociarCompra::where('COD_ORDEN', '=', $idoc)->where('COD_ESTADO', '=', 1)
@@ -5954,6 +5955,7 @@ class GestionOCContabilidadController extends Controller
                             ->update(
                                 [
                                     'ACTIVO' => 0,
+                                    'EXTENSION' => 'OBS',
                                     'FECHA_MOD' => $this->fechaactual,
                                     'USUARIO_MOD' => Session::get('usuario')->id
                                 ]
@@ -5972,7 +5974,7 @@ class GestionOCContabilidadController extends Controller
                         $docasociar->COD_USUARIO_CREA_AUD = Session::get('usuario')->id;
                         $docasociar->FEC_USUARIO_CREA_AUD = $this->fechaactual;
                         $docasociar->COD_ESTADO = 1;
-                        $docasociar->TIP_DOC = $categoria->CODIGO_SUNAT;
+                        $docasociar->TIP_DOC = 'O';
                         $docasociar->save();
 
                     }
@@ -6137,6 +6139,7 @@ class GestionOCContabilidadController extends Controller
                             ->update(
                                 [
                                     'ACTIVO' => 0,
+                                    'EXTENSION' => 'OBS',
                                     'FECHA_MOD' => $this->fechaactual,
                                     'USUARIO_MOD' => Session::get('usuario')->id
                                 ]
@@ -6155,7 +6158,7 @@ class GestionOCContabilidadController extends Controller
                         $docasociar->COD_USUARIO_CREA_AUD = Session::get('usuario')->id;
                         $docasociar->FEC_USUARIO_CREA_AUD = $this->fechaactual;
                         $docasociar->COD_ESTADO = 1;
-                        $docasociar->TIP_DOC = $categoria->CODIGO_SUNAT;
+                        $docasociar->TIP_DOC = 'O';
                         $docasociar->save();
 
                     }
@@ -6304,6 +6307,7 @@ class GestionOCContabilidadController extends Controller
                 }
 
 
+
                 foreach ($archivoob as $index => $item) {
 
                     $docu_asoci = CMPDocAsociarCompra::where('COD_ORDEN', '=', $idoc)->where('COD_ESTADO', '=', 1)
@@ -6317,6 +6321,7 @@ class GestionOCContabilidadController extends Controller
                             ->update(
                                 [
                                     'ACTIVO' => 0,
+                                    'EXTENSION' => 'OBS',
                                     'FECHA_MOD' => $this->fechaactual,
                                     'USUARIO_MOD' => Session::get('usuario')->id
                                 ]
@@ -6335,7 +6340,7 @@ class GestionOCContabilidadController extends Controller
                         $docasociar->COD_USUARIO_CREA_AUD = Session::get('usuario')->id;
                         $docasociar->FEC_USUARIO_CREA_AUD = $this->fechaactual;
                         $docasociar->COD_ESTADO = 1;
-                        $docasociar->TIP_DOC = $categoria->CODIGO_SUNAT;
+                        $docasociar->TIP_DOC = 'O';
                         $docasociar->save();
 
                     }
@@ -6487,6 +6492,7 @@ class GestionOCContabilidadController extends Controller
                 }
 
 
+
                 foreach ($archivoob as $index => $item) {
 
                     $docu_asoci = CMPDocAsociarCompra::where('COD_ORDEN', '=', $idoc)->where('COD_ESTADO', '=', 1)
@@ -6500,6 +6506,7 @@ class GestionOCContabilidadController extends Controller
                             ->update(
                                 [
                                     'ACTIVO' => 0,
+                                    'EXTENSION' => 'OBS',
                                     'FECHA_MOD' => $this->fechaactual,
                                     'USUARIO_MOD' => Session::get('usuario')->id
                                 ]
@@ -6518,7 +6525,7 @@ class GestionOCContabilidadController extends Controller
                         $docasociar->COD_USUARIO_CREA_AUD = Session::get('usuario')->id;
                         $docasociar->FEC_USUARIO_CREA_AUD = $this->fechaactual;
                         $docasociar->COD_ESTADO = 1;
-                        $docasociar->TIP_DOC = $categoria->CODIGO_SUNAT;
+                        $docasociar->TIP_DOC = 'O';
                         $docasociar->save();
 
                     }
@@ -6605,6 +6612,9 @@ class GestionOCContabilidadController extends Controller
                     DB::rollback();
                     return Redirect::to('agregar-observacion-contabilidad-estiba/' . $idopcion . '/' . $lote)->with('errorbd', 'Tiene que seleccionar almenos un item');
                 }
+
+
+
                 foreach ($archivoob as $index => $item) {
                     $docu_asoci = CMPDocAsociarCompra::where('COD_ORDEN', '=', $idoc)->where('COD_ESTADO', '=', 1)
                         ->where('COD_CATEGORIA_DOCUMENTO', '=', $item)->first();
@@ -6617,6 +6627,7 @@ class GestionOCContabilidadController extends Controller
                             ->update(
                                 [
                                     'ACTIVO' => 0,
+                                    'EXTENSION' => 'OBS',
                                     'FECHA_MOD' => $this->fechaactual,
                                     'USUARIO_MOD' => Session::get('usuario')->id
                                 ]
@@ -6635,7 +6646,7 @@ class GestionOCContabilidadController extends Controller
                         $docasociar->COD_USUARIO_CREA_AUD = Session::get('usuario')->id;
                         $docasociar->FEC_USUARIO_CREA_AUD = $this->fechaactual;
                         $docasociar->COD_ESTADO = 1;
-                        $docasociar->TIP_DOC = $categoria->CODIGO_SUNAT;
+                        $docasociar->TIP_DOC = 'O';
                         $docasociar->save();
 
                     }

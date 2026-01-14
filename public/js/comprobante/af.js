@@ -31,6 +31,7 @@ $(document).ready(function () {
 
 	
 
+
 	$(".tablainformacion .btnActivoFijo").on('click', function (e) {
 		// debugger;
 		e.preventDefault();
