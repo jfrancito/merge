@@ -49,6 +49,7 @@ use ZipArchive;
 use Hashids;
 use SplFileInfo;
 use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
 
 
 class GestionOCTesoreriaController extends Controller
@@ -1358,6 +1359,37 @@ class GestionOCTesoreriaController extends Controller
                 'ajax' => true,
                 'funcion' => $funcion
             ]);
+    }
+
+
+    public function actionComprobanteMasivoTesoreriaComisionExcel($fecha_inicio,$fecha_fin,$banco_id,$idopcion)
+    {
+        set_time_limit(0);
+
+        $cod_empresa            =   Session::get('usuario')->usuarioosiris_id;
+        $fechadia               =   date_format(date_create(date('d-m-Y')), 'd-m-Y');
+        $fecha_actual           =   date("Y-m-d");
+        $titulo                 =   'Comprobantes-Comision-Faltantes-Integrar';
+        $funcion                =   $this;
+
+        if($banco_id == 'TODO'){
+            $listadatos             =   $this->gn_lista_comision_todo($fecha_inicio, $fecha_fin, $banco_id);
+        }else{
+            $listadatos             =   $this->gn_lista_comision($fecha_inicio, $fecha_fin, $banco_id);
+        }
+
+
+
+
+        Excel::create($titulo.'-('.$fecha_actual.')', function($excel) use ($listadatos,$titulo,$funcion) {
+            $excel->sheet('COMPROBANTE', function($sheet) use ($listadatos,$titulo,$funcion) {
+                $sheet->loadView('reporte/excel/listacomprobantemasivotesoreriacomision')->with('listadatos',$listadatos)
+                                                                   ->with('titulo',$titulo)
+                                                                   ->with('funcion',$funcion);                                               
+            });
+        })->export('xls');
+
+
     }
 
 

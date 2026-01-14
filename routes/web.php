@@ -391,6 +391,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/gestion-de-integracion-comisiones/{idopcion}', 'GestionOCTesoreriaController@actionListarComisionAdmin');
 	Route::any('/ajax-buscar-documento-comision-admin', 'GestionOCTesoreriaController@actionAjaxListarComisionAdmin');
 	Route::any('/ajax-modal-detalle-comision', 'GestionOCTesoreriaController@actionCargarModalDetalleComision');
+	Route::any('/comprobante-masivo-tesoreria-comision-excel/{fecha_inicio}/{fecha_fin}/{banco_id}/{idopcion}', 'GestionOCTesoreriaController@actionComprobanteMasivoTesoreriaComisionExcel');
+
+
 
 	Route::any('/ajax-modal-detalle-lotes-comision', 'GestionOCTesoreriaController@actionCargarModalDetalleLotesComision');
 	Route::any('/select-xml-comision/{idopcion}', 'GestionOCTesoreriaController@actionDetalleSelectComision');
