@@ -4664,6 +4664,8 @@ class GestionOCContabilidadController extends Controller
 
                     $docu_asoci = CMPDocAsociarCompra::where('COD_ORDEN', '=', $idoc)->where('COD_ESTADO', '=', 1)
                         ->where('COD_CATEGORIA_DOCUMENTO', '=', $item)->first();
+
+                        
                     if (count($docu_asoci) > 0) {
 
                         Archivo::where('ID_DOCUMENTO', '=', $idoc)
@@ -4699,6 +4701,8 @@ class GestionOCContabilidadController extends Controller
 
 
                 }
+
+                
 
                 //HISTORIAL DE DOCUMENTO APROBADO
                 $documento = new FeDocumentoHistorial;
