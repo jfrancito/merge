@@ -19,5 +19,7 @@ class WEBGrupoopcion extends Model
         return $this->hasMany('App\Modelos\WEBOpcion', 'grupoopcion_id', 'id');
     }
 
+    
+
 
 }
