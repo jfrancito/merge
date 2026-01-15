@@ -1447,6 +1447,7 @@ class UserController extends Controller {
 											->groupBy('web.grupoopciones.orden')
 											->select('web.grupoopciones.id','web.grupoopciones.nombre','web.grupoopciones.icono','web.grupoopciones.orden')
 											->orderBy('web.grupoopciones.orden', 'asc')
+											->orderBy('web.opciones.orden', 'asc')
 											->get();
 
 					$listaopciones    	= 	WEBRolOpcion::join('web.opciones', 'web.rolopciones.opcion_id', '=', 'web.opciones.id')
