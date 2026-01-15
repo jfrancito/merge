@@ -2342,15 +2342,7 @@ class GestionOCController extends Controller
 
 
         $xmlfactura             =   'FACTURA';
-        // $rhxml                  =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
-        //                             //->where('IND_OBLIGATORIO','=',1)
-        //                             ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000013'])
-        //                             ->where('TXT_ASIGNADO','=','PROVEEDOR')
-        //                             ->first();
 
-        // if(count($rhxml)>0){
-        //     $xmlfactura             =   $rhxml->NOM_CATEGORIA_DOCUMENTO;
-        // }
 
         if($tiposerie == 'E'){
 

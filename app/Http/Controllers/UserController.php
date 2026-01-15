@@ -80,7 +80,7 @@ class UserController extends Controller {
 
 	public function actionAjaxModalConfiguracionCuentaBancariaContrato(Request $request)
 	{
-
+        //dd($request);
         $prefijo_id             =   $request['prefijo_id'];
         $orden_id               =   $request['orden_id'];
         $idopcion               =   $request['idopcion'];
