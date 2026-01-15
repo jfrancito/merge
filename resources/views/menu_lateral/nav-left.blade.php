@@ -13,10 +13,10 @@
                 @endif
                 <li class="parent"><a href="#"><i class="icon mdi {{$grupo->icono}}"></i><span>{{$grupo->nombre}}</span></a>
                   <ul class="sub-mensu">
-                    @foreach($grupo->opcion()->orderBy('orden', 'asc')->get() as $opcion)
+                    @foreach($grupo->opcion()->orderBy('orden', 'asc')->get() as $item => $opcion)
                       @if(in_array($opcion->id, Session::get('listaopciones')))
                         <li>
-                          <a href="{{ url('/'.$opcion->pagina.'/'.Hashids::encode(substr($opcion->id, -8))) }}">{{$opcion->nombre}}</a>
+                          <a href="{{ url('/'.$opcion->pagina.'/'.Hashids::encode(substr($opcion->id, -8))) }}">{{$opcion->nombre}} {{$opcion->orden}}</a>
                         </li>
                       @endif
                     @endforeach
