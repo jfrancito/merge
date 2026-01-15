@@ -1445,6 +1445,7 @@ class UserController extends Controller {
 											->groupBy('web.grupoopciones.nombre')
 											->groupBy('web.grupoopciones.icono')
 											->groupBy('web.grupoopciones.orden')
+											->groupBy('web.opciones.orden')
 											->select('web.grupoopciones.id','web.grupoopciones.nombre','web.grupoopciones.icono','web.grupoopciones.orden')
 											->orderBy('web.grupoopciones.orden', 'asc')
 											->orderBy('web.opciones.orden', 'asc')
