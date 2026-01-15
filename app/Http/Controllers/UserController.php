@@ -1455,7 +1455,7 @@ class UserController extends Controller {
 											->where('web.opciones.ind_merge', '=', 1)
 											->where('rol_id', '=', $tusuario->rol_id)
 											->where('ver', '=', 1)
-											->orderBy('orden', 'asc')
+											->orderBy('WEB.rolopciones.orden', 'asc')
 											->pluck('opcion_id')
 											->toArray();
 
