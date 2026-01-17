@@ -962,9 +962,7 @@ trait UserTraits
                 }
             });
 
-
-            FeDocumento::whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
-                        ->where(function($q) {
+            FeDocumento::where(function($q) {
                             $q->whereNull('IND_EMAIL_APROBADO_ADMIN')
                               ->orWhere('IND_EMAIL_APROBADO_ADMIN', 0);
                         })
