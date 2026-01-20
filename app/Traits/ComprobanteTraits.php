@@ -2746,39 +2746,39 @@ trait ComprobanteTraits
 
 
 
-	private function con_lista_cabecera_comprobante_provisionar($cliente_id) {
+    private function con_lista_cabecera_comprobante_provisionar($cliente_id) {
 
-		$listadatos 	= 	VMergeOC::leftJoin('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
-							->whereIn('COD_ESTADO', ['ETM0000000000005'])
+        $listadatos     =   VMergeOC::leftJoin('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
+                            ->whereIn('COD_ESTADO', ['ETM0000000000005'])
                             //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
-							->select(DB::raw('	COD_ORDEN,
-												FEC_ORDEN,
-												TXT_CATEGORIA_MONEDA,
-												TXT_EMPR_CLIENTE,
-												MAX(CAN_TOTAL) CAN_TOTAL,
-												MAX(ID_DOCUMENTO) AS ID_DOCUMENTO,
-												MAX(COD_ESTADO) AS COD_ESTADO,
-												MAX(TXT_ESTADO) AS TXT_ESTADO
-											'))
-							->groupBy('COD_ORDEN')
-							->groupBy('FEC_ORDEN')
-							->groupBy('TXT_CATEGORIA_MONEDA')
-							->groupBy('TXT_EMPR_CLIENTE')
-							->get();
+                            ->select(DB::raw('  COD_ORDEN,
+                                                FEC_ORDEN,
+                                                TXT_CATEGORIA_MONEDA,
+                                                TXT_EMPR_CLIENTE,
+                                                MAX(CAN_TOTAL) CAN_TOTAL,
+                                                MAX(ID_DOCUMENTO) AS ID_DOCUMENTO,
+                                                MAX(COD_ESTADO) AS COD_ESTADO,
+                                                MAX(TXT_ESTADO) AS TXT_ESTADO
+                                            '))
+                            ->groupBy('COD_ORDEN')
+                            ->groupBy('FEC_ORDEN')
+                            ->groupBy('TXT_CATEGORIA_MONEDA')
+                            ->groupBy('TXT_EMPR_CLIENTE')
+                            ->get();
 
-	 	return  $listadatos;
-	}
+        return  $listadatos;
+    }
 
 
-	private function con_lista_cabecera_comprobante_total_uc($cliente_id) {
+    private function con_lista_cabecera_comprobante_total_uc($cliente_id) {
 
-		//HACER UNA UNION DE TODAS LOS ID DE TRABAJADORES QUE TIENE ESTE USUARIO
-		$trabajador 		 = 		STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+        //HACER UNA UNION DE TODAS LOS ID DE TRABAJADORES QUE TIENE ESTE USUARIO
+        $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
 
-		$array_trabajadores  =		STDTrabajador::where('NRO_DOCUMENTO','=',$trabajador->NRO_DOCUMENTO)
-									->pluck('COD_TRAB')
-									->toArray();
-	
+        $array_trabajadores  =      STDTrabajador::where('NRO_DOCUMENTO','=',$trabajador->NRO_DOCUMENTO)
+                                    ->pluck('COD_TRAB')
+                                    ->toArray();
+    
         if(Session::get('usuario')->id== '1CIX00000001'){
 
             $listadatos         =       FeDocumento::leftJoin('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
@@ -2810,8 +2810,8 @@ trait ComprobanteTraits
 
 
 
-	 	return  $listadatos;
-	}
+        return  $listadatos;
+    }
 
 
     private function con_lista_cabecera_comprobante_total_contrato_uc($cliente_id) {
@@ -2839,12 +2839,12 @@ trait ComprobanteTraits
     }
 
 
-	private function con_lista_cabecera_comprobante_total_cont($cliente_id) {
+    private function con_lista_cabecera_comprobante_total_cont($cliente_id) {
 
-		$listadatos 	= 	FeDocumento::leftJoin('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+        $listadatos     =   FeDocumento::leftJoin('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
                             ->leftJoin('CMP.CATEGORIA as PAGO', 'PAGO.COD_CATEGORIA', '=', 'CMP.Orden.COD_CATEGORIA_TIPO_PAGO')
-							//->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
-							->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC,PAGO.NOM_CATEGORIA COND_PAGO'))
+                            //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC,PAGO.NOM_CATEGORIA COND_PAGO'))
                             ->where('OPERACION','=','ORDEN_COMPRA')
                             ->where(function ($query) {
                                 $query->where('ind_observacion', '<>', 1)
@@ -2856,14 +2856,14 @@ trait ComprobanteTraits
                                       ->orWhereIn('area_observacion',['ADM','UCO'])
                                       ->orWhereNull('area_observacion');
                             })
-                     		->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-							->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
                             ->orderBy('ind_observacion','asc')
                             ->orderBy('fecha_pr','asc')
-							->get();
+                            ->get();
 
-	 	return  $listadatos;
-	}
+        return  $listadatos;
+    }
 
 
     private function con_lista_cabecera_comprobante_total_cont_obs_levantadas($cliente_id) {
@@ -3457,20 +3457,20 @@ trait ComprobanteTraits
 
 
 
-	private function con_lista_cabecera_comprobante_total_adm_obs($cliente_id) {
+    private function con_lista_cabecera_comprobante_total_adm_obs($cliente_id) {
 
-		$listadatos 	= 	FeDocumento::leftJoin('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
-							//->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
-							->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+        $listadatos     =   FeDocumento::leftJoin('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+                            //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                             ->where('OPERACION','=','ORDEN_COMPRA')
-							->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-							->where('ind_observacion','=',1)
-							->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('ind_observacion','=',1)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
                             ->orderBy('fecha_uc','asc')
-							->get();
+                            ->get();
 
-	 	return  $listadatos;
-	}
+        return  $listadatos;
+    }
 
 
     private function con_lista_cabecera_comprobante_total_adm_obs_levantadas($cliente_id) {
@@ -5250,6 +5250,7 @@ trait ComprobanteTraits
             
         $estado_no          =       'ETM0000000000006';
 
+
         $consulta1 = DB::table('TES.OPERACION_CAJA as TES')
                     ->leftJoin('FE_REF_ASOC', function ($leftJoin){
                         $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'TES.COD_OPERACION_CAJA')
@@ -5310,7 +5311,10 @@ trait ComprobanteTraits
                         'IICHFC0000000012',
                         'ISCHFC0000000012',
                         'ISCHFC0000000027',
-                        'ISCHFC0000000036'
+                        'ISCHFC0000000036',
+                        'ISCHFC0000000033',
+                        'ISCHFC0000000037',
+                        'IICHFC0000000037'
                     ])
                     ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
                     ->where('TES.IND_EXTORNO', 0)
@@ -5391,69 +5395,169 @@ trait ComprobanteTraits
                                 ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR)
                                 ->whereBetween('TES.FEC_MOVIMIENTO_CAJABANCO', [$fecha_inicio, $fecha_fin]);
 
+                    // $consulta3 = DB::table('TES.OPERACION_CAJA as TES')
+                    //             ->leftJoin('FE_REF_ASOC', function ($leftJoin){
+                    //                 $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'TES.COD_OPERACION_CAJA')
+                    //                         ->where('FE_REF_ASOC.COD_ESTADO', '=', '1')
+                    //                         ->WhereNull('FE_REF_ASOC.TXT_ESTADO')
+                    //                         ->orwhere('FE_REF_ASOC.TXT_ESTADO', '=', '');
+
+                    //             })
+                    //             ->leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                    //                 $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                    //                     ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                    //             })
+
+                    // ->leftJoin('STD.EMPRESA as EMS', 'TES.COD_EMPR', '=', 'EMS.COD_EMPR')
+                    // ->leftJoin('TES.CAJA_BANCO as TCB', 'TES.COD_CAJA_BANCO', '=', 'TCB.COD_CAJA_BANCO')
+                    // ->leftJoin('CMP.CATEGORIA as CMD', 'TES.COD_CATEGORIA_MONEDA', '=', 'CMD.COD_CATEGORIA')
+                    // ->leftJoin('CMP.CATEGORIA as CME', function($join) {
+                    //     $join->on('TES.COD_CATEGORIA_ESTADO', '=', 'CME.COD_CATEGORIA')
+                    //          ->where('CME.TXT_GRUPO', '=', 'ESTADO_OPERACION_CAJA');
+                    // })
+                    // ->leftJoin('SGD.USUARIO as USU', 'TES.COD_USUARIO_CREA_AUD', '=', 'USU.COD_USUARIO')
+                    // ->join('CON.ASIENTO_MOVIMIENTO as ASM', 'TES.COD_ASIENTO', '=', 'ASM.COD_ASIENTO')
+                    // ->join('CON.CUENTA_CONTABLE as CTB', 'ASM.COD_CUENTA_CONTABLE', '=', 'CTB.COD_CUENTA_CONTABLE')
+                    // ->select(
+                    //     'TES.COD_OPERACION_CAJA',
+                    //     'TES.COD_EMPR',
+                    //     'EMS.NOM_EMPR',
+                    //     'TES.COD_CAJA_BANCO',
+                    //     DB::raw("CASE WHEN TCB.IND_CAJA=0 THEN TCB.TXT_BANCO ELSE TCB.TXT_CAJA_BANCO END AS NOMBRE_BANCO_CAJA"),
+                    //     'TCB.TXT_CAJA_BANCO as CUENTA',
+                    //     'TES.FEC_OPERACION as FEC_REGISTRO',
+                    //     'TES.FEC_MOVIMIENTO_CAJABANCO as FEC_MOVIMIENTO',
+                    //     'TES.NRO_CUENTA_BANCARIA',
+                    //     'TES.NRO_VOUCHER',
+                    //     'CMD.NOM_CATEGORIA as MONEDA',
+                    //     'CME.NOM_CATEGORIA as ESTADO',
+                    //     DB::raw('ABS(ASM.CAN_DEBE_MN - ASM.CAN_HABER_MN) as MONTO_SOLES'),
+                    //     DB::raw('ABS(ASM.CAN_DEBE_ME - ASM.CAN_HABER_ME) as MONTO_DOLARES'),
+                    //     DB::raw("
+                    //         CASE 
+                    //             WHEN CMD.NOM_CATEGORIA = 'SOLES' THEN (ABS(ASM.CAN_DEBE_MN - ASM.CAN_HABER_MN))
+                    //             ELSE (ABS(ASM.CAN_DEBE_ME - ASM.CAN_HABER_ME))
+                    //         END AS MONTO
+                    //     "),
+                    //     DB::raw("ISNULL(TES.ATENDIDO,0) AS MONTOATENDIDO"),
+                    //     'TES.TXT_GLOSA',
+                    //     'TES.COD_FLUJO_CAJA',
+                    //     'TES.TXT_FLUJO_CAJA',
+                    //     'TES.COD_ITEM_MOVIMIENTO',
+                    //     'TES.TXT_ITEM_MOVIMIENTO',
+                    //     'FE_REF_ASOC.LOTE AS LOTE_DOC',
+                    //     'FE_DOCUMENTO.ID_DOCUMENTO',
+                    //     'FE_DOCUMENTO.COD_ESTADO',
+                    //     'FE_DOCUMENTO.TXT_ESTADO',
+                    //     'USU.NOM_TRABAJADOR'
+                    // )
+                    // ->where('TES.IND_EXTORNO', 0)
+                    // ->where('TES.COD_ESTADO', 1)
+                    // ->where('TES.COD_CAJA_BANCO', $banco_id)
+                    // ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR)
+                    // ->whereBetween('TES.FEC_MOVIMIENTO_CAJABANCO', [$fecha_inicio, $fecha_fin])
+                    // ->where('TES.TXT_ITEM_MOVIMIENTO', 'like', '%PAGO DE PRESTAMOS BANCARIOS%')
+                    // ->where('CTB.TXT_DESCRIPCION', 'like', '%INTERESES POR%');
+
+
                     $consulta3 = DB::table('TES.OPERACION_CAJA as TES')
-                                ->leftJoin('FE_REF_ASOC', function ($leftJoin){
-                                    $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'TES.COD_OPERACION_CAJA')
-                                            ->where('FE_REF_ASOC.COD_ESTADO', '=', '1')
-                                            ->WhereNull('FE_REF_ASOC.TXT_ESTADO')
-                                            ->orwhere('FE_REF_ASOC.TXT_ESTADO', '=', '');
+                        ->leftJoin('FE_REF_ASOC', function ($leftJoin) {
+                            $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'TES.COD_OPERACION_CAJA')
+                                    ->where('FE_REF_ASOC.COD_ESTADO', '=', '1')
+                                    ->where(function ($query) {
+                                        $query->whereNull('FE_REF_ASOC.TXT_ESTADO')
+                                              ->orWhere('FE_REF_ASOC.TXT_ESTADO', '=', '');
+                                    });
+                        })
+                        ->leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no) {
+                            $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                                    ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                        })
+                        ->leftJoin('STD.EMPRESA as EMS', 'TES.COD_EMPR', '=', 'EMS.COD_EMPR')
+                        ->leftJoin('TES.CAJA_BANCO as TCB', 'TES.COD_CAJA_BANCO', '=', 'TCB.COD_CAJA_BANCO')
+                        ->leftJoin('CMP.CATEGORIA as CMD', 'TES.COD_CATEGORIA_MONEDA', '=', 'CMD.COD_CATEGORIA')
+                        ->leftJoin('CMP.CATEGORIA as CME', function($join) {
+                            $join->on('TES.COD_CATEGORIA_ESTADO', '=', 'CME.COD_CATEGORIA')
+                                 ->where('CME.TXT_GRUPO', '=', 'ESTADO_OPERACION_CAJA');
+                        })
+                        ->leftJoin('SGD.USUARIO as USU', 'TES.COD_USUARIO_CREA_AUD', '=', 'USU.COD_USUARIO')
+                        ->join('CON.ASIENTO_MOVIMIENTO as ASM', 'TES.COD_ASIENTO', '=', 'ASM.COD_ASIENTO')
+                        ->join('CON.CUENTA_CONTABLE as CTB', 'ASM.COD_CUENTA_CONTABLE', '=', 'CTB.COD_CUENTA_CONTABLE')
+                        ->leftJoin(DB::raw('(
+                            SELECT 
+                                TES2.COD_OPERACION_CAJA,
+                                CASE 
+                                    WHEN CMD2.NOM_CATEGORIA = \'SOLES\' THEN ABS(ASM2.CAN_DEBE_MN - ASM2.CAN_HABER_MN)
+                                    ELSE ABS(ASM2.CAN_DEBE_ME - ASM2.CAN_HABER_ME)
+                                END AS MONTODESCUENTO
+                            FROM TES.OPERACION_CAJA as TES2
+                            LEFT JOIN CMP.CATEGORIA as CMD2 ON TES2.COD_CATEGORIA_MONEDA = CMD2.COD_CATEGORIA
+                            INNER JOIN CON.ASIENTO_MOVIMIENTO as ASM2 ON TES2.COD_ASIENTO = ASM2.COD_ASIENTO
+                            INNER JOIN CON.CUENTA_CONTABLE as CTB2 ON ASM2.COD_CUENTA_CONTABLE = CTB2.COD_CUENTA_CONTABLE
+                            WHERE TES2.IND_EXTORNO = 0
+                                AND TES2.COD_ESTADO = 1
+                                AND CTB2.TXT_DESCRIPCION LIKE \'%INTERES DE PRESTAMOS FINANCIEROS%\'
+                        ) as descuentos'), 'descuentos.COD_OPERACION_CAJA', '=', 'TES.COD_OPERACION_CAJA')
+                        ->leftJoin(DB::raw('(
+                            SELECT 
+                                TES2.COD_OPERACION_CAJA,
+                                CASE 
+                                    WHEN CMD2.NOM_CATEGORIA = \'SOLES\' THEN ABS(ASM2.CAN_DEBE_MN - ASM2.CAN_HABER_MN)
+                                    ELSE ABS(ASM2.CAN_DEBE_ME - ASM2.CAN_HABER_ME)
+                                END AS MONTOAUMENTO
+                            FROM TES.OPERACION_CAJA as TES2
+                            LEFT JOIN CMP.CATEGORIA as CMD2 ON TES2.COD_CATEGORIA_MONEDA = CMD2.COD_CATEGORIA
+                            INNER JOIN CON.ASIENTO_MOVIMIENTO as ASM2 ON TES2.COD_ASIENTO = ASM2.COD_ASIENTO
+                            INNER JOIN CON.CUENTA_CONTABLE as CTB2 ON ASM2.COD_CUENTA_CONTABLE = CTB2.COD_CUENTA_CONTABLE
+                            WHERE TES2.IND_EXTORNO = 0
+                                AND TES2.COD_ESTADO = 1
+                                AND CTB2.TXT_DESCRIPCION LIKE \'%COMISION POR PRESTAMOS FINANCIEROS%\'
+                        ) as aumentos'), 'aumentos.COD_OPERACION_CAJA', '=', 'TES.COD_OPERACION_CAJA')
 
-                                })
-                                ->leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
-                                    $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
-                                        ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
-                                })
+                        ->select(
+                            'TES.COD_OPERACION_CAJA',
+                            'TES.COD_EMPR',
+                            'EMS.NOM_EMPR',
+                            'TES.COD_CAJA_BANCO',
+                            DB::raw("CASE WHEN TCB.IND_CAJA=0 THEN TCB.TXT_BANCO ELSE TCB.TXT_CAJA_BANCO END AS NOMBRE_BANCO_CAJA"),
+                            'TCB.TXT_CAJA_BANCO as CUENTA',
+                            'TES.FEC_OPERACION as FEC_REGISTRO',
+                            'TES.FEC_MOVIMIENTO_CAJABANCO as FEC_MOVIMIENTO',
+                            'TES.NRO_CUENTA_BANCARIA',
+                            'TES.NRO_VOUCHER',
+                            'CMD.NOM_CATEGORIA as MONEDA',
+                            'CME.NOM_CATEGORIA as ESTADO',
+                            DB::raw('ABS(ASM.CAN_DEBE_MN - ASM.CAN_HABER_MN) as MONTO_SOLES'),
+                            DB::raw('ABS(ASM.CAN_DEBE_ME - ASM.CAN_HABER_ME) as MONTO_DOLARES'),
+                            DB::raw("
+                                CASE 
+                                    WHEN CMD.NOM_CATEGORIA = 'SOLES' THEN 
+                                        ABS(ASM.CAN_DEBE_MN - ASM.CAN_HABER_MN) - ISNULL(descuentos.MONTODESCUENTO, 0) + ISNULL(aumentos.MONTOAUMENTO, 0)
+                                    ELSE 
+                                        ABS(ASM.CAN_DEBE_ME - ASM.CAN_HABER_ME) - ISNULL(descuentos.MONTODESCUENTO, 0) + ISNULL(aumentos.MONTOAUMENTO, 0)
+                                END AS MONTO
+                            "),
+                            DB::raw("ISNULL(TES.ATENDIDO,0) AS MONTOATENDIDO"),
+                            'TES.TXT_GLOSA',
+                            'TES.COD_FLUJO_CAJA',
+                            'TES.TXT_FLUJO_CAJA',
+                            'TES.COD_ITEM_MOVIMIENTO',
+                            'TES.TXT_ITEM_MOVIMIENTO',
+                            'FE_REF_ASOC.LOTE AS LOTE_DOC',
+                            'FE_DOCUMENTO.ID_DOCUMENTO',
+                            'FE_DOCUMENTO.COD_ESTADO',
+                            'FE_DOCUMENTO.TXT_ESTADO',
+                            'USU.NOM_TRABAJADOR'
+                        )
+                        ->where('TES.IND_EXTORNO', 0)
+                        ->where('TES.COD_ESTADO', 1)
+                        ->where('TES.COD_CAJA_BANCO', $banco_id)
+                        ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR)
+                        ->whereBetween('TES.FEC_MOVIMIENTO_CAJABANCO', [$fecha_inicio, $fecha_fin])
+                        ->where('TES.TXT_ITEM_MOVIMIENTO', 'like', '%PAGO DE PRESTAMOS BANCARIOS%')
+                        ->where('CTB.TXT_DESCRIPCION', 'like', '%INTERESES POR%');
 
-                    ->leftJoin('STD.EMPRESA as EMS', 'TES.COD_EMPR', '=', 'EMS.COD_EMPR')
-                    ->leftJoin('TES.CAJA_BANCO as TCB', 'TES.COD_CAJA_BANCO', '=', 'TCB.COD_CAJA_BANCO')
-                    ->leftJoin('CMP.CATEGORIA as CMD', 'TES.COD_CATEGORIA_MONEDA', '=', 'CMD.COD_CATEGORIA')
-                    ->leftJoin('CMP.CATEGORIA as CME', function($join) {
-                        $join->on('TES.COD_CATEGORIA_ESTADO', '=', 'CME.COD_CATEGORIA')
-                             ->where('CME.TXT_GRUPO', '=', 'ESTADO_OPERACION_CAJA');
-                    })
-                    ->leftJoin('SGD.USUARIO as USU', 'TES.COD_USUARIO_CREA_AUD', '=', 'USU.COD_USUARIO')
-                    ->join('CON.ASIENTO_MOVIMIENTO as ASM', 'TES.COD_ASIENTO', '=', 'ASM.COD_ASIENTO')
-                    ->join('CON.CUENTA_CONTABLE as CTB', 'ASM.COD_CUENTA_CONTABLE', '=', 'CTB.COD_CUENTA_CONTABLE')
-                    ->select(
-                        'TES.COD_OPERACION_CAJA',
-                        'TES.COD_EMPR',
-                        'EMS.NOM_EMPR',
-                        'TES.COD_CAJA_BANCO',
-                        DB::raw("CASE WHEN TCB.IND_CAJA=0 THEN TCB.TXT_BANCO ELSE TCB.TXT_CAJA_BANCO END AS NOMBRE_BANCO_CAJA"),
-                        'TCB.TXT_CAJA_BANCO as CUENTA',
-                        'TES.FEC_OPERACION as FEC_REGISTRO',
-                        'TES.FEC_MOVIMIENTO_CAJABANCO as FEC_MOVIMIENTO',
-                        'TES.NRO_CUENTA_BANCARIA',
-                        'TES.NRO_VOUCHER',
-                        'CMD.NOM_CATEGORIA as MONEDA',
-                        'CME.NOM_CATEGORIA as ESTADO',
-                        DB::raw('ABS(ASM.CAN_DEBE_MN - ASM.CAN_HABER_MN) as MONTO_SOLES'),
-                        DB::raw('ABS(ASM.CAN_DEBE_ME - ASM.CAN_HABER_ME) as MONTO_DOLARES'),
-                        DB::raw("
-                            CASE 
-                                WHEN CMD.NOM_CATEGORIA = 'SOLES' THEN (ABS(ASM.CAN_DEBE_MN - ASM.CAN_HABER_MN))
-                                ELSE (ABS(ASM.CAN_DEBE_ME - ASM.CAN_HABER_ME))
-                            END AS MONTO
-                        "),
-                        DB::raw("ISNULL(TES.ATENDIDO,0) AS MONTOATENDIDO"),
-                        'TES.TXT_GLOSA',
-                        'TES.COD_FLUJO_CAJA',
-                        'TES.TXT_FLUJO_CAJA',
-                        'TES.COD_ITEM_MOVIMIENTO',
-                        'TES.TXT_ITEM_MOVIMIENTO',
-                        'FE_REF_ASOC.LOTE AS LOTE_DOC',
-                        'FE_DOCUMENTO.ID_DOCUMENTO',
-                        'FE_DOCUMENTO.COD_ESTADO',
-                        'FE_DOCUMENTO.TXT_ESTADO',
-                        'USU.NOM_TRABAJADOR'
-                    )
-                    ->where('TES.IND_EXTORNO', 0)
-                    ->where('TES.COD_ESTADO', 1)
-                    ->where('TES.COD_CAJA_BANCO', $banco_id)
-                    ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR)
-                    ->whereBetween('TES.FEC_MOVIMIENTO_CAJABANCO', [$fecha_inicio, $fecha_fin])
-                    ->where('TES.TXT_ITEM_MOVIMIENTO', 'like', '%PAGO DE PRESTAMOS BANCARIOS%')
-                    ->where('CTB.TXT_DESCRIPCION', 'like', '%INTERESES POR%');
+
 
         $registros = $consulta1->unionAll($consulta2)->unionAll($consulta3)->get();
 
@@ -5524,7 +5628,10 @@ trait ComprobanteTraits
                         'IICHFC0000000012',
                         'ISCHFC0000000012',
                         'ISCHFC0000000027',
-                        'ISCHFC0000000036'
+                        'ISCHFC0000000036',
+                        'ISCHFC0000000033',
+                        'ISCHFC0000000037',
+                        'IICHFC0000000037'
                     ])
                     ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
                     ->where('TES.IND_EXTORNO', 0)
@@ -5729,7 +5836,9 @@ trait ComprobanteTraits
                         'ISCHFC0000000012',
                         'ISCHFC0000000027',
                         'ISCHFC0000000036',
-                        'ISCHFC0000000033'
+                        'ISCHFC0000000033',
+                        'ISCHFC0000000037',
+                        'IICHFC0000000037'
                     ])
                     ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
                     ->where('TES.IND_EXTORNO', 0)
@@ -5742,7 +5851,7 @@ trait ComprobanteTraits
                     ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR) // variable pasada desde tu controlador
                     ->get();
 
-
+        //dd($registros);
         return  $registros;                             
     }
 
@@ -5794,7 +5903,8 @@ trait ComprobanteTraits
                 'ISCHFC0000000012',
                 'ISCHFC0000000027',
                 'ISCHFC0000000036',
-                'ISCHFC0000000033'
+                'ISCHFC0000000033',
+                'IICHFC0000000037'
             ])
             ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
             ->where('TES.IND_EXTORNO', 0)
@@ -5858,7 +5968,9 @@ trait ComprobanteTraits
                         'IICHFC0000000012',
                         'ISCHFC0000000012',
                         'ISCHFC0000000027',
-                        'ISCHFC0000000036'
+                        'ISCHFC0000000036',
+                        'ISCHFC0000000033',
+                        'IICHFC0000000037'
                     ])
                     ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
                     ->where('TES.IND_EXTORNO', 0)
@@ -5917,7 +6029,8 @@ trait ComprobanteTraits
                         'ISCHFC0000000012',
                         'ISCHFC0000000027',
                         'ISCHFC0000000036',
-                        'ISCHFC0000000033'
+                        'ISCHFC0000000033',
+                        'IICHFC0000000037'
                     ])
                     ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
                     ->where('TES.IND_EXTORNO', 0)
@@ -5976,7 +6089,8 @@ trait ComprobanteTraits
                         'ISCHFC0000000012',
                         'ISCHFC0000000027',
                         'ISCHFC0000000036',
-                        'ISCHFC0000000033'
+                        'ISCHFC0000000033',
+                        'IICHFC0000000037'
                     ])
                     ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
                     ->where('TES.IND_EXTORNO', 0)
@@ -6017,17 +6131,17 @@ trait ComprobanteTraits
 
     private function gn_combo_estado_fe_documento($todo) {
 
-		$array 							= 	DB::table('CMP.CATEGORIA')
-        									->where('COD_ESTADO','=',1)
-        									->where('TXT_GRUPO','=','ESTADO_MERGE')
-		        							->pluck('NOM_CATEGORIA','COD_CATEGORIA')
-											->toArray();
-		if($todo=='TODO'){
-			$combo  				= 	array($todo => $todo) + $array;
-		}else{
-			$combo  				= 	$array;
-		}
-	 	return  $combo;	                   
+        $array                          =   DB::table('CMP.CATEGORIA')
+                                            ->where('COD_ESTADO','=',1)
+                                            ->where('TXT_GRUPO','=','ESTADO_MERGE')
+                                            ->pluck('NOM_CATEGORIA','COD_CATEGORIA')
+                                            ->toArray();
+        if($todo=='TODO'){
+            $combo                  =   array($todo => $todo) + $array;
+        }else{
+            $combo                  =   $array;
+        }
+        return  $combo;                    
     }
 
 
@@ -6328,7 +6442,7 @@ trait ComprobanteTraits
     }
 
 
-	private function con_lista_cabecera_comprobante_total_gestion_observados($cliente_id) {
+    private function con_lista_cabecera_comprobante_total_gestion_observados($cliente_id) {
 
         $rol            =       WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
         if($rol->ind_uc == 1){
@@ -6357,8 +6471,8 @@ trait ComprobanteTraits
         
 
 
-	 	return  $listadatos;
-	}
+        return  $listadatos;
+    }
 
     private function con_lista_cabecera_comprobante_total_gestion_observados_estibas($cliente_id,$operacion_id) {
 
@@ -6504,7 +6618,7 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
-	private function con_lista_cabecera_comprobante_total_gestion_historial($cliente_id) {
+    private function con_lista_cabecera_comprobante_total_gestion_historial($cliente_id) {
 
         if(Session::get('usuario')->id== '1CIX00000001'){
 
@@ -6537,8 +6651,8 @@ trait ComprobanteTraits
 
 
 
-	 	return  $listadatos;
-	}
+        return  $listadatos;
+    }
 
 
     private function con_lista_cabecera_comprobante_total_gestion_historial_contrato($cliente_id) {
@@ -6562,75 +6676,75 @@ trait ComprobanteTraits
 
 
 
-	private function con_validar_documento($ordencompra,$fedocumento,$detalleordencompra,$detallefedocumento){
+    private function con_validar_documento($ordencompra,$fedocumento,$detalleordencompra,$detallefedocumento){
 
-		$ind_ruc 			=	0;
-		$ind_rz 			=	0;
-		$ind_moneda 		=	0;
-		$ind_total 			=	0;
-		$ind_cantidaditem 	=	0;
-		$ind_formapago 		=	0;
-		$ind_errototal 		=	1;
-		//ruc
-		if($ordencompra->NRO_DOCUMENTO_CLIENTE == $fedocumento->RUC_PROVEEDOR){
-			$ind_ruc 			=	1;	
-		}else{ 	$ind_errototal 		=	0;  }
+        $ind_ruc            =   0;
+        $ind_rz             =   0;
+        $ind_moneda         =   0;
+        $ind_total          =   0;
+        $ind_cantidaditem   =   0;
+        $ind_formapago      =   0;
+        $ind_errototal      =   1;
+        //ruc
+        if($ordencompra->NRO_DOCUMENTO_CLIENTE == $fedocumento->RUC_PROVEEDOR){
+            $ind_ruc            =   1;  
+        }else{  $ind_errototal      =   0;  }
 
-		if(ltrim(rtrim(strtoupper($ordencompra->TXT_EMPR_CLIENTE))) == ltrim(rtrim(strtoupper($fedocumento->RZ_PROVEEDOR)))){
-			$ind_rz 			=	1;	
-		}else{ 	$ind_errototal 		=	0;  }
+        if(ltrim(rtrim(strtoupper($ordencompra->TXT_EMPR_CLIENTE))) == ltrim(rtrim(strtoupper($fedocumento->RZ_PROVEEDOR)))){
+            $ind_rz             =   1;  
+        }else{  $ind_errototal      =   0;  }
 
 
-		//moneda
-		$txtmoneda 			=	'';
-		if($fedocumento->MONEDA == 'PEN'){
-			$txtmoneda 			=	'SOLES';	
-		}else{
-			$txtmoneda 			=	'DOLARES';
-		}
-		if($ordencompra->TXT_CATEGORIA_MONEDA == $txtmoneda){
-			$ind_moneda 			=	1;	
-		}else{ 	$ind_errototal 		=	0;  }
-		//total
-		if(number_format($ordencompra->CAN_TOTAL, 4, '.', '') == number_format($fedocumento->TOTAL_VENTA_ORIG, 4, '.', '')){
-			$ind_total 			=	1;	
-		}else{ 	$ind_errototal 		=	0;  }
+        //moneda
+        $txtmoneda          =   '';
+        if($fedocumento->MONEDA == 'PEN'){
+            $txtmoneda          =   'SOLES';    
+        }else{
+            $txtmoneda          =   'DOLARES';
+        }
+        if($ordencompra->TXT_CATEGORIA_MONEDA == $txtmoneda){
+            $ind_moneda             =   1;  
+        }else{  $ind_errototal      =   0;  }
+        //total
+        if(number_format($ordencompra->CAN_TOTAL, 4, '.', '') == number_format($fedocumento->TOTAL_VENTA_ORIG, 4, '.', '')){
+            $ind_total          =   1;  
+        }else{  $ind_errototal      =   0;  }
 
 
         $ordencompra_t          =   CMPOrden::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->first();
 
-		if($ordencompra_t->IND_MATERIAL_SERVICIO == 'S'){
-			$ind_cantidaditem 			=	1;	
-		}else{
-			//numero_items
-			if(count($detalleordencompra) == count($detallefedocumento)){
-				$ind_cantidaditem 			=	1;	
-			}else{ 	$ind_errototal 		=	0;  }
+        if($ordencompra_t->IND_MATERIAL_SERVICIO == 'S'){
+            $ind_cantidaditem           =   1;  
+        }else{
+            //numero_items
+            if(count($detalleordencompra) == count($detallefedocumento)){
+                $ind_cantidaditem           =   1;  
+            }else{  $ind_errototal      =   0;  }
 
-		}
+        }
 
-		$tp = CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
-		//print($tp->CODIGO_SUNAT);
-		//dd(substr(strtoupper(ltrim(rtrim($fedocumento->FORMA_PAGO))), 0, 3));
+        $tp = CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
+        //print($tp->CODIGO_SUNAT);
+        //dd(substr(strtoupper(ltrim(rtrim($fedocumento->FORMA_PAGO))), 0, 3));
 
-		if($tp->CODIGO_SUNAT == substr(strtoupper(ltrim(rtrim($fedocumento->FORMA_PAGO))), 0, 3)){
-			$ind_formapago 			=	1;	
-		}else{ 	$ind_errototal 		=	0;  }
-
-
+        if($tp->CODIGO_SUNAT == substr(strtoupper(ltrim(rtrim($fedocumento->FORMA_PAGO))), 0, 3)){
+            $ind_formapago          =   1;  
+        }else{  $ind_errototal      =   0;  }
 
 
-		// if($tp->CODIGO_SUNAT == substr(strtoupper($fedocumento->FORMA_PAGO), 0, 3)){
 
-		// 	if( $tp->CODIGO_SUNAT == 'CRE' ){
-		// 		$ind_formapago 			=	1;	
-		// 		$diasdeorden = $tp->COD_CTBLE;
-		// 		if($fedocumento->FORMA_PAGO_DIAS != $diasdeorden){
-		// 			$ind_formapago 			=	0;
-		// 			$ind_errototal 			=	0; 
-		// 		}
-		// 	}
-		// }else{ 	$ind_errototal 		=	0;  }
+
+        // if($tp->CODIGO_SUNAT == substr(strtoupper($fedocumento->FORMA_PAGO), 0, 3)){
+
+        //  if( $tp->CODIGO_SUNAT == 'CRE' ){
+        //      $ind_formapago          =   1;  
+        //      $diasdeorden = $tp->COD_CTBLE;
+        //      if($fedocumento->FORMA_PAGO_DIAS != $diasdeorden){
+        //          $ind_formapago          =   0;
+        //          $ind_errototal          =   0; 
+        //      }
+        //  }
+        // }else{   $ind_errototal      =   0;  }
 
 
         FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)
@@ -6646,17 +6760,17 @@ trait ComprobanteTraits
                                 'ind_errototal'=>$ind_errototal,
                             ]);
 
-	}
+    }
 
-	private function con_validar_documento_proveedor($ordencompra,$fedocumento,$detalleordencompra,$detallefedocumento){
+    private function con_validar_documento_proveedor($ordencompra,$fedocumento,$detalleordencompra,$detallefedocumento){
 
-		$ind_ruc 			=	0;
-		$ind_rz 			=	0;
-		$ind_moneda 		=	0;
-		$ind_total 			=	0;
-		$ind_cantidaditem 	=	0;
-		$ind_formapago 		=	0;
-		$ind_errototal 		=	1;
+        $ind_ruc            =   0;
+        $ind_rz             =   0;
+        $ind_moneda         =   0;
+        $ind_total          =   0;
+        $ind_cantidaditem   =   0;
+        $ind_formapago      =   0;
+        $ind_errototal      =   1;
         $ind_fecha          =   0;
 
 
@@ -6674,27 +6788,27 @@ trait ComprobanteTraits
             $ind_fecha             =   1;  
         }else{  $ind_errototal      =   0;  }
 
-		//ruc
-		if($ordencompra->NRO_DOCUMENTO_CLIENTE == $fedocumento->RUC_PROVEEDOR){
-			$ind_ruc 			=	1;	
-		}else{ 	$ind_errototal 		=	0;  }
+        //ruc
+        if($ordencompra->NRO_DOCUMENTO_CLIENTE == $fedocumento->RUC_PROVEEDOR){
+            $ind_ruc            =   1;  
+        }else{  $ind_errototal      =   0;  }
 
         $fe_rz =str_replace('  ', ' ', $fedocumento->RZ_PROVEEDOR);
-		if(ltrim(rtrim(strtoupper($ordencompra->TXT_EMPR_CLIENTE))) == ltrim(rtrim(strtoupper($fe_rz)))){
-			$ind_rz 			=	1;	
-		}//else{ 	$ind_errototal 		=	0;  }
+        if(ltrim(rtrim(strtoupper($ordencompra->TXT_EMPR_CLIENTE))) == ltrim(rtrim(strtoupper($fe_rz)))){
+            $ind_rz             =   1;  
+        }//else{    $ind_errototal      =   0;  }
 
-		//moneda
-		$txtmoneda 			=	'';
-		if($fedocumento->MONEDA == 'PEN'){
-			$txtmoneda 			=	'SOLES';	
-		}else{
-			$txtmoneda 			=	'DOLARES';
-		}
-		if($ordencompra->TXT_CATEGORIA_MONEDA == $txtmoneda){
-			$ind_moneda 			=	1;	
-		}else{ 	$ind_errototal 		=	0;  }
-		//total
+        //moneda
+        $txtmoneda          =   '';
+        if($fedocumento->MONEDA == 'PEN'){
+            $txtmoneda          =   'SOLES';    
+        }else{
+            $txtmoneda          =   'DOLARES';
+        }
+        if($ordencompra->TXT_CATEGORIA_MONEDA == $txtmoneda){
+            $ind_moneda             =   1;  
+        }else{  $ind_errototal      =   0;  }
+        //total
         $ordencompra_t          =   CMPOrden::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->first();
 
 
@@ -6713,10 +6827,10 @@ trait ComprobanteTraits
 
         $diferencia_total = 0;
         //0.02
-		if($tt_totales <= 0.09){
-			$ind_total 			=	1;
+        if($tt_totales <= 0.09){
+            $ind_total          =   1;
             $diferencia_total = round($total_1 - $total_2,2);
-		}else{ 	$ind_errototal 		=	0;  }
+        }else{  $ind_errototal      =   0;  }
 
 
         //dd($fe_rz);
@@ -6727,9 +6841,9 @@ trait ComprobanteTraits
         // }
 
 
-		if($ordencompra_t->IND_MATERIAL_SERVICIO == 'S'){
-			$ind_cantidaditem 			=	1;	
-		}else{
+        if($ordencompra_t->IND_MATERIAL_SERVICIO == 'S'){
+            $ind_cantidaditem           =   1;  
+        }else{
 
             if($ordencompra_t->TXT_CONFORMIDAD != ''){
                 $ind_cantidaditem           =   1;  
@@ -6741,12 +6855,12 @@ trait ComprobanteTraits
 
             }
 
-		}
+        }
 
-		$tp = CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
-		if($tp->CODIGO_SUNAT == substr(strtoupper(ltrim(rtrim($fedocumento->FORMA_PAGO))), 0, 3)){
-			$ind_formapago 			=	1;	
-		}else{ 	$ind_errototal 		=	0;  }
+        $tp = CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
+        if($tp->CODIGO_SUNAT == substr(strtoupper(ltrim(rtrim($fedocumento->FORMA_PAGO))), 0, 3)){
+            $ind_formapago          =   1;  
+        }else{  $ind_errototal      =   0;  }
 
         //dd($ind_formapago);
 
@@ -6764,7 +6878,7 @@ trait ComprobanteTraits
                                 'CAN_CENTIMO'=>$diferencia_total,
                             ]);
 
-	}
+    }
 
 
     private function con_validar_documento_proveedor_contrato($ordencompra,$fedocumento,$detalleordencompra,$detallefedocumento){
@@ -7172,9 +7286,9 @@ trait ComprobanteTraits
         return $array;
     }
 
-	private function con_lista_cabecera_comprobante($cliente_id) {
+    private function con_lista_cabecera_comprobante($cliente_id) {
 
-		$estado_no      =   'ETM0000000000006';
+        $estado_no      =   'ETM0000000000006';
 
         if(Session::get('usuario')->id== '1CIX00000001'){
 
@@ -7251,8 +7365,8 @@ trait ComprobanteTraits
 
 
         //dd($listadatos);
-	 	return  $listadatos;
-	}
+        return  $listadatos;
+    }
 
 
 
@@ -7893,19 +8007,17 @@ trait ComprobanteTraits
     }
 
 
+    private function con_lista_cabecera_comprobante_administrativo_anticipo($cliente_id) {
 
+        $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+        $array_trabajadores  =      STDTrabajador::where('NRO_DOCUMENTO','=',$trabajador->NRO_DOCUMENTO)
+                                    ->pluck('COD_TRAB')
+                                    ->toArray();
 
-	private function con_lista_cabecera_comprobante_administrativo($cliente_id) {
-
-		$trabajador 		 = 		STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
-		$array_trabajadores  =		STDTrabajador::where('NRO_DOCUMENTO','=',$trabajador->NRO_DOCUMENTO)
-									->pluck('COD_TRAB')
-									->toArray();
-
-		$array_usuarios  	 =		SGDUsuario::whereIn('COD_TRABAJADOR',$array_trabajadores)
-									->pluck('COD_USUARIO')
-									->toArray();
-		$estado_no           =      'ETM0000000000006';
+        $array_usuarios      =      SGDUsuario::whereIn('COD_TRABAJADOR',$array_trabajadores)
+                                    ->pluck('COD_USUARIO')
+                                    ->toArray();
+        $estado_no           =      'ETM0000000000006';
 
         if(Session::get('usuario')->id== '1CIX00000001'){
 
@@ -7915,6 +8027,7 @@ trait ComprobanteTraits
                                         })
                                 //->whereIn('VMERGEOC.COD_USUARIO_CREA_AUD',$array_usuarios)
                                 ->where('VMERGEOC.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                ->where('IND_TIPO_COMPRA','=','A')
                                 ->where(function ($query) {
                                     $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
                                           ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
@@ -7946,6 +8059,7 @@ trait ComprobanteTraits
                                         })
                                 ->whereIn('VMERGEOC.COD_USUARIO_CREA_AUD',$array_usuarios)
                                 ->where('VMERGEOC.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                ->where('IND_TIPO_COMPRA','=','A')
                                 ->where(function ($query) {
                                     $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
                                           ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
@@ -7972,8 +8086,92 @@ trait ComprobanteTraits
         }
 
 
-	 	return  $listadatos;
-	}
+        return  $listadatos;
+    }
+
+
+
+    private function con_lista_cabecera_comprobante_administrativo($cliente_id) {
+
+        $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+        $array_trabajadores  =      STDTrabajador::where('NRO_DOCUMENTO','=',$trabajador->NRO_DOCUMENTO)
+                                    ->pluck('COD_TRAB')
+                                    ->toArray();
+
+        $array_usuarios      =      SGDUsuario::whereIn('COD_TRABAJADOR',$array_trabajadores)
+                                    ->pluck('COD_USUARIO')
+                                    ->toArray();
+        $estado_no           =      'ETM0000000000006';
+
+        if(Session::get('usuario')->id== '1CIX00000001'){
+
+            $listadatos     =   VMergeOC::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                            $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
+                                                ->where('COD_ESTADO', '<>', 'ETM0000000000006');
+                                        })
+                                //->whereIn('VMERGEOC.COD_USUARIO_CREA_AUD',$array_usuarios)
+                                ->where('VMERGEOC.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                ->where('IND_TIPO_COMPRA','<>','A')
+                                ->where(function ($query) {
+                                    $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
+                                          ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
+                                          ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
+                                })
+                                //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                                ->select(DB::raw('  COD_ORDEN,
+                                                    FEC_ORDEN,
+                                                    TXT_CATEGORIA_MONEDA,
+                                                    TXT_EMPR_CLIENTE,
+                                                    COD_USUARIO_CREA_AUD,
+                                                    MAX(CAN_TOTAL) CAN_TOTAL,
+                                                    MAX(FE_DOCUMENTO.ID_DOCUMENTO) AS ID_DOCUMENTO,
+                                                    MAX(FE_DOCUMENTO.COD_ESTADO) AS COD_ESTADO,
+                                                    MAX(FE_DOCUMENTO.TXT_ESTADO) AS TXT_ESTADO
+                                                '))
+                                ->groupBy('COD_ORDEN')
+                                ->groupBy('FEC_ORDEN')
+                                ->groupBy('TXT_CATEGORIA_MONEDA')
+                                ->groupBy('TXT_EMPR_CLIENTE')
+                                ->groupBy('COD_USUARIO_CREA_AUD')
+                                ->get();
+
+        }else{
+
+            $listadatos     =   VMergeOC::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                            $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
+                                                ->where('COD_ESTADO', '<>', 'ETM0000000000006');
+                                        })
+                                ->whereIn('VMERGEOC.COD_USUARIO_CREA_AUD',$array_usuarios)
+                                ->where('VMERGEOC.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                ->where('IND_TIPO_COMPRA','<>','A')
+                                ->where(function ($query) {
+                                    $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
+                                          ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
+                                          ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
+                                })
+                                //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
+                                ->select(DB::raw('  COD_ORDEN,
+                                                    FEC_ORDEN,
+                                                    TXT_CATEGORIA_MONEDA,
+                                                    TXT_EMPR_CLIENTE,
+                                                    COD_USUARIO_CREA_AUD,
+                                                    MAX(CAN_TOTAL) CAN_TOTAL,
+                                                    MAX(FE_DOCUMENTO.ID_DOCUMENTO) AS ID_DOCUMENTO,
+                                                    MAX(FE_DOCUMENTO.COD_ESTADO) AS COD_ESTADO,
+                                                    MAX(FE_DOCUMENTO.TXT_ESTADO) AS TXT_ESTADO
+                                                '))
+                                ->groupBy('COD_ORDEN')
+                                ->groupBy('FEC_ORDEN')
+                                ->groupBy('TXT_CATEGORIA_MONEDA')
+                                ->groupBy('TXT_EMPR_CLIENTE')
+                                ->groupBy('COD_USUARIO_CREA_AUD')
+                                ->get();
+
+        }
+
+
+        return  $listadatos;
+    }
 
     private function con_lista_cabecera_nota_credito_administrativo($cliente_id) {
 
@@ -8215,6 +8413,7 @@ trait ComprobanteTraits
                                                             CAN_TOTAL,
                                                             NRO_SERIE,
                                                             NRO_DOC,
+                                                           
                                                             
                                                             FE_DOCUMENTO.ID_DOCUMENTO,
                                                             FE_DOCUMENTO.COD_ESTADO,
@@ -8247,6 +8446,7 @@ trait ComprobanteTraits
                                                         CAN_TOTAL,
                                                         NRO_SERIE,
                                                         NRO_DOC,
+
                                                         
                                                         FE_DOCUMENTO.ID_DOCUMENTO,
                                                         FE_DOCUMENTO.COD_ESTADO,
@@ -8256,8 +8456,20 @@ trait ComprobanteTraits
 
         }
 
+        $codigos = $listadatos->pluck('COD_DOCUMENTO_CTBLE')->unique();
 
+        if ($codigos->isNotEmpty()) {
 
+            $firmas = DB::table('CMP.DOCUMENTO_CTBLE')
+                ->whereIn('COD_DOCUMENTO_CTBLE', $codigos)
+                ->pluck('ESTADO_FIRMA', 'COD_DOCUMENTO_CTBLE');
+
+            $listadatos->transform(function ($item) use ($firmas) {
+                $item->ESTADO_FIRMA = $firmas[$item->COD_DOCUMENTO_CTBLE] ?? 0;
+                return $item;
+            });
+
+        }
 
         return  $listadatos;
     }
@@ -8593,8 +8805,6 @@ trait ComprobanteTraits
                                                             '))
                                             ->get();
 
-                
-
 
 
             }else{
@@ -8863,76 +9073,76 @@ trait ComprobanteTraits
 
     }
 
-	private function con_lista_cabecera_comprobante_total($cliente_id) {
+    private function con_lista_cabecera_comprobante_total($cliente_id) {
 
-		$listadatos 	= 	VMergeOC::leftJoin('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
-							//->where('COD_ESTADO','=','ETM0000000000002')
-							->whereIn('COD_ESTADO', ['ETM0000000000001', 'ETM0000000000002', 'ETM0000000000003', 'ETM0000000000004', 'ETM0000000000005', 'ETM0000000000006'])
+        $listadatos     =   VMergeOC::leftJoin('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
+                            //->where('COD_ESTADO','=','ETM0000000000002')
+                            ->whereIn('COD_ESTADO', ['ETM0000000000001', 'ETM0000000000002', 'ETM0000000000003', 'ETM0000000000004', 'ETM0000000000005', 'ETM0000000000006'])
                             //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
-							->select(DB::raw('	COD_ORDEN,
-												FEC_ORDEN,
-												TXT_CATEGORIA_MONEDA,
-												TXT_EMPR_CLIENTE,
-												MAX(CAN_TOTAL) CAN_TOTAL,
-												MAX(ID_DOCUMENTO) AS ID_DOCUMENTO,
-												MAX(COD_ESTADO) AS COD_ESTADO,
-												MAX(TXT_ESTADO) AS TXT_ESTADO
-											'))
-							->groupBy('COD_ORDEN')
-							->groupBy('FEC_ORDEN')
-							->groupBy('TXT_CATEGORIA_MONEDA')
-							->groupBy('TXT_EMPR_CLIENTE')
-							->get();
+                            ->select(DB::raw('  COD_ORDEN,
+                                                FEC_ORDEN,
+                                                TXT_CATEGORIA_MONEDA,
+                                                TXT_EMPR_CLIENTE,
+                                                MAX(CAN_TOTAL) CAN_TOTAL,
+                                                MAX(ID_DOCUMENTO) AS ID_DOCUMENTO,
+                                                MAX(COD_ESTADO) AS COD_ESTADO,
+                                                MAX(TXT_ESTADO) AS TXT_ESTADO
+                                            '))
+                            ->groupBy('COD_ORDEN')
+                            ->groupBy('FEC_ORDEN')
+                            ->groupBy('TXT_CATEGORIA_MONEDA')
+                            ->groupBy('TXT_EMPR_CLIENTE')
+                            ->get();
 
-	 	return  $listadatos;
-	}
-
-
-	private function con_lista_cabecera_comprobante_idoc_actual($idoc) {
+        return  $listadatos;
+    }
 
 
-		$oc 	= 	VMergeActual::where('COD_ORDEN','=',$idoc)
-							->select(DB::raw('COD_ORDEN,COD_EMPR,NOM_EMPR,TXT_CATEGORIA_MONEDA,NRO_DOCUMENTO,FEC_ORDEN,
-												TXT_CATEGORIA_MONEDA,TXT_EMPR_CLIENTE,NRO_DOCUMENTO_CLIENTE,MAX(CAN_TOTAL) CAN_TOTAL,COD_CATEGORIA_TIPO_PAGO
-												,COD_USUARIO_CREA_AUD'))
-							->groupBy('COD_ORDEN')
-							->groupBy('FEC_ORDEN')
-							->groupBy('TXT_CATEGORIA_MONEDA')
-							->groupBy('TXT_EMPR_CLIENTE')
-							->groupBy('NRO_DOCUMENTO_CLIENTE')
-							->groupBy('NRO_DOCUMENTO')
-							->groupBy('COD_EMPR')
-							->groupBy('NOM_EMPR')
-							->groupBy('TXT_CATEGORIA_MONEDA')
-							->groupBy('COD_CATEGORIA_TIPO_PAGO')
-							->groupBy('COD_USUARIO_CREA_AUD')
-							->first();
-
-	 	return  $oc;
-	}
+    private function con_lista_cabecera_comprobante_idoc_actual($idoc) {
 
 
-	private function con_lista_cabecera_comprobante_idoc($idoc) {
+        $oc     =   VMergeActual::where('COD_ORDEN','=',$idoc)
+                            ->select(DB::raw('COD_ORDEN,COD_EMPR,NOM_EMPR,TXT_CATEGORIA_MONEDA,NRO_DOCUMENTO,FEC_ORDEN,
+                                                TXT_CATEGORIA_MONEDA,TXT_EMPR_CLIENTE,NRO_DOCUMENTO_CLIENTE,MAX(CAN_TOTAL) CAN_TOTAL,COD_CATEGORIA_TIPO_PAGO
+                                                ,COD_USUARIO_CREA_AUD'))
+                            ->groupBy('COD_ORDEN')
+                            ->groupBy('FEC_ORDEN')
+                            ->groupBy('TXT_CATEGORIA_MONEDA')
+                            ->groupBy('TXT_EMPR_CLIENTE')
+                            ->groupBy('NRO_DOCUMENTO_CLIENTE')
+                            ->groupBy('NRO_DOCUMENTO')
+                            ->groupBy('COD_EMPR')
+                            ->groupBy('NOM_EMPR')
+                            ->groupBy('TXT_CATEGORIA_MONEDA')
+                            ->groupBy('COD_CATEGORIA_TIPO_PAGO')
+                            ->groupBy('COD_USUARIO_CREA_AUD')
+                            ->first();
 
-		$oc 	             = 	VMergeOC::where('COD_ORDEN','=',$idoc)
-    							->select(DB::raw('COD_ORDEN,COD_EMPR,NOM_EMPR,TXT_CATEGORIA_MONEDA,NRO_DOCUMENTO,FEC_ORDEN,
-    												TXT_CATEGORIA_MONEDA,TXT_EMPR_CLIENTE,NRO_DOCUMENTO_CLIENTE,MAX(CAN_TOTAL) CAN_TOTAL,COD_CATEGORIA_TIPO_PAGO
-    												,COD_USUARIO_CREA_AUD'))
-    							->groupBy('COD_ORDEN')
-    							->groupBy('FEC_ORDEN')
-    							->groupBy('TXT_CATEGORIA_MONEDA')
-    							->groupBy('TXT_EMPR_CLIENTE')
-    							->groupBy('NRO_DOCUMENTO_CLIENTE')
-    							->groupBy('NRO_DOCUMENTO')
-    							->groupBy('COD_EMPR')
-    							->groupBy('NOM_EMPR')
-    							->groupBy('TXT_CATEGORIA_MONEDA')
-    							->groupBy('COD_CATEGORIA_TIPO_PAGO')
-    							->groupBy('COD_USUARIO_CREA_AUD')
-    							->first();
+        return  $oc;
+    }
 
-	 	return  $oc;
-	}
+
+    private function con_lista_cabecera_comprobante_idoc($idoc) {
+
+        $oc                  =  VMergeOC::where('COD_ORDEN','=',$idoc)
+                                ->select(DB::raw('COD_ORDEN,COD_EMPR,NOM_EMPR,TXT_CATEGORIA_MONEDA,NRO_DOCUMENTO,FEC_ORDEN,
+                                                    TXT_CATEGORIA_MONEDA,TXT_EMPR_CLIENTE,NRO_DOCUMENTO_CLIENTE,MAX(CAN_TOTAL) CAN_TOTAL,COD_CATEGORIA_TIPO_PAGO
+                                                    ,COD_USUARIO_CREA_AUD'))
+                                ->groupBy('COD_ORDEN')
+                                ->groupBy('FEC_ORDEN')
+                                ->groupBy('TXT_CATEGORIA_MONEDA')
+                                ->groupBy('TXT_EMPR_CLIENTE')
+                                ->groupBy('NRO_DOCUMENTO_CLIENTE')
+                                ->groupBy('NRO_DOCUMENTO')
+                                ->groupBy('COD_EMPR')
+                                ->groupBy('NOM_EMPR')
+                                ->groupBy('TXT_CATEGORIA_MONEDA')
+                                ->groupBy('COD_CATEGORIA_TIPO_PAGO')
+                                ->groupBy('COD_USUARIO_CREA_AUD')
+                                ->first();
+
+        return  $oc;
+    }
 
 
     private function con_lista_cabecera_comprobante_contrato_idoc($idoc) {
@@ -8992,24 +9202,24 @@ trait ComprobanteTraits
 
 
 
-	private function con_lista_detalle_comprobante_idoc($idoc) {
+    private function con_lista_detalle_comprobante_idoc($idoc) {
 
-		$doc 	= 	VMergeOC::where('COD_ORDEN','=',$idoc)
-							->get();
+        $doc    =   VMergeOC::where('COD_ORDEN','=',$idoc)
+                            ->get();
 
-	 	return  $doc;
+        return  $doc;
 
-	}
+    }
 
-	private function con_lista_detalle_comprobante_idoc_actual($idoc) {
+    private function con_lista_detalle_comprobante_idoc_actual($idoc) {
 
-		$doc 	= 	VMergeActual::where('COD_ORDEN','=',$idoc)
+        $doc    =   VMergeActual::where('COD_ORDEN','=',$idoc)
 
-							->get();
+                            ->get();
 
-	 	return  $doc;
+        return  $doc;
 
-	}
+    }
 
 
     private function con_lista_comprobante_orden_pago_idoc($idop) {
@@ -9099,146 +9309,146 @@ trait ComprobanteTraits
 
     }
 
-	private function prefijo_empresa($idempresa) {
-		if($idempresa == 'IACHEM0000010394'){
-			$prefijo = 'II';
-		}else{
-			$prefijo = 'IS';
-		}
-	 	return  $prefijo;
-	}
+    private function prefijo_empresa($idempresa) {
+        if($idempresa == 'IACHEM0000010394'){
+            $prefijo = 'II';
+        }else{
+            $prefijo = 'IS';
+        }
+        return  $prefijo;
+    }
 
-	private function versicarpetanoexiste($ruta) {
-		$valor = false;
-		if (!file_exists($ruta)) {
-		    mkdir($ruta, 0777, true);
-		    $valor=true;
-		}
-		return $valor;
-	}
-
-
-	private function generartoken_ii() {
-
-		$cliente_id = 'fb4f07e7-7ef4-4345-b434-11f3b1fd9f02';
-		$client_secret = '6BnfVO7Uc0bSAPU/FcfkIw==';
-		$curl = curl_init();
-		curl_setopt_array($curl, array(
-		  CURLOPT_URL => 'https://api-seguridad.sunat.gob.pe/v1/clientesextranet/'.$cliente_id.'/oauth2/token/',
-		  CURLOPT_RETURNTRANSFER => true,
-		  CURLOPT_POST => true,
-		  CURLOPT_ENCODING => '',
-		  CURLOPT_MAXREDIRS => 10,
-		  CURLOPT_TIMEOUT => 0,
-		  CURLOPT_AUTOREFERER => true,
-		  CURLOPT_SSL_VERIFYPEER => false,
-		  CURLOPT_SSL_VERIFYHOST => false,
-		  CURLOPT_FOLLOWLOCATION => true,
-		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-		  CURLOPT_CUSTOMREQUEST => 'POST',
-		  CURLOPT_POSTFIELDS => 'grant_type=client_credentials&scope=https%3A%2F%2Fapi.sunat.gob.pe%2Fv1%2Fcontribuyente%2Fcontribuyentes&client_id='.$cliente_id.'&client_secret='.$client_secret,
-		  CURLOPT_HTTPHEADER => array(
-		    'Content-Type: application/x-www-form-urlencoded',
-		    'Cookie: BIGipServerpool-e-plataformaunica-https=!npyoItrPwoiiUEHNnEfW6R1uaTqJDv+jJpdnaYgKdF+RvWima7xHYkuTAfphnUd/q7rgRvf+p/i4jA==; TS019e7fc2=019edc9eb870d9467c32c316be86f95256352673bd84f6776735f1a4bd678d04918fc02cf3d561b81ca4461a95d35151850b9e2387'
-		  ),
-		));
-		$response = curl_exec($curl);
-		curl_close($curl);
-		$atoken = json_decode($response, true);
-		$token = $this->existe_vacio($atoken,'access_token');
-
-		return $token;
-
-	}
+    private function versicarpetanoexiste($ruta) {
+        $valor = false;
+        if (!file_exists($ruta)) {
+            mkdir($ruta, 0777, true);
+            $valor=true;
+        }
+        return $valor;
+    }
 
 
-	private function generartoken_is() {
-		
-		$cliente_id = '1649d1ba-1fc9-45b9-a506-ebe0cc16393f';
-		$client_secret = 'WJgOtY9fz91iHv6NZuWeew==';
-		$curl = curl_init();
-		curl_setopt_array($curl, array(
-		  CURLOPT_URL => 'https://api-seguridad.sunat.gob.pe/v1/clientesextranet/'.$cliente_id.'/oauth2/token/',
-		  CURLOPT_RETURNTRANSFER => true,
-		  CURLOPT_POST => true,
-		  CURLOPT_ENCODING => '',
-		  CURLOPT_MAXREDIRS => 10,
-		  CURLOPT_TIMEOUT => 0,
-		  CURLOPT_AUTOREFERER => true,
-		  CURLOPT_SSL_VERIFYPEER => false,
-		  CURLOPT_SSL_VERIFYHOST => false,
-		  CURLOPT_FOLLOWLOCATION => true,
-		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-		  CURLOPT_CUSTOMREQUEST => 'POST',
-		  CURLOPT_POSTFIELDS => 'grant_type=client_credentials&scope=https%3A%2F%2Fapi.sunat.gob.pe%2Fv1%2Fcontribuyente%2Fcontribuyentes&client_id='.$cliente_id.'&client_secret='.$client_secret,
-		  CURLOPT_HTTPHEADER => array(
-		    'Content-Type: application/x-www-form-urlencoded',
-		    'Cookie: BIGipServerpool-e-plataformaunica-https=!npyoItrPwoiiUEHNnEfW6R1uaTqJDv+jJpdnaYgKdF+RvWima7xHYkuTAfphnUd/q7rgRvf+p/i4jA==; TS019e7fc2=019edc9eb870d9467c32c316be86f95256352673bd84f6776735f1a4bd678d04918fc02cf3d561b81ca4461a95d35151850b9e2387'
-		  ),
-		));
-		$response = curl_exec($curl);
-		curl_close($curl);
-		$atoken = json_decode($response, true);
-		$token = $this->existe_vacio($atoken,'access_token');
-		return $token;
+    private function generartoken_ii() {
 
-	}
+        $cliente_id = 'fb4f07e7-7ef4-4345-b434-11f3b1fd9f02';
+        $client_secret = '6BnfVO7Uc0bSAPU/FcfkIw==';
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => 'https://api-seguridad.sunat.gob.pe/v1/clientesextranet/'.$cliente_id.'/oauth2/token/',
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_POST => true,
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 0,
+          CURLOPT_AUTOREFERER => true,
+          CURLOPT_SSL_VERIFYPEER => false,
+          CURLOPT_SSL_VERIFYHOST => false,
+          CURLOPT_FOLLOWLOCATION => true,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => 'POST',
+          CURLOPT_POSTFIELDS => 'grant_type=client_credentials&scope=https%3A%2F%2Fapi.sunat.gob.pe%2Fv1%2Fcontribuyente%2Fcontribuyentes&client_id='.$cliente_id.'&client_secret='.$client_secret,
+          CURLOPT_HTTPHEADER => array(
+            'Content-Type: application/x-www-form-urlencoded',
+            'Cookie: BIGipServerpool-e-plataformaunica-https=!npyoItrPwoiiUEHNnEfW6R1uaTqJDv+jJpdnaYgKdF+RvWima7xHYkuTAfphnUd/q7rgRvf+p/i4jA==; TS019e7fc2=019edc9eb870d9467c32c316be86f95256352673bd84f6776735f1a4bd678d04918fc02cf3d561b81ca4461a95d35151850b9e2387'
+          ),
+        ));
+        $response = curl_exec($curl);
+        curl_close($curl);
+        $atoken = json_decode($response, true);
+        $token = $this->existe_vacio($atoken,'access_token');
 
-	private function validar_xml($token,$ruc,$numRuc,$codComp,$numeroSerie,$numero,$fechaEmision,$monto) {
+        return $token;
 
-		$json 				= 	'{
-								    "numRuc" : "'.$numRuc.'",
-								    "codComp" : "'.$codComp.'",
-								    "numeroSerie" : "'.$numeroSerie.'",
-								    "numero" : "'.$numero.'",
-								    "fechaEmision" : "'.$fechaEmision.'",
-								    "monto" : "'.round($monto,4).'"
-								}';
-
-		$curl = curl_init();
-		curl_setopt_array($curl, array(
-		  CURLOPT_URL => 'https://api.sunat.gob.pe/v1/contribuyente/contribuyentes/'.$ruc.'/validarcomprobante',
-		  CURLOPT_RETURNTRANSFER => true,
-		  CURLOPT_POST => true,
-
-		  CURLOPT_ENCODING => '',
-		  CURLOPT_MAXREDIRS => 10,
-		  CURLOPT_TIMEOUT => 0,
-		  CURLOPT_AUTOREFERER => true,
-		  CURLOPT_SSL_VERIFYPEER => false,
-		  CURLOPT_SSL_VERIFYHOST => false,
-		  CURLOPT_FOLLOWLOCATION => true,
-		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-		  CURLOPT_CUSTOMREQUEST => 'POST',
-		  CURLOPT_POSTFIELDS =>$json,
-		  CURLOPT_HTTPHEADER => array(
-		    'Content-Type: application/json',
-		    'Authorization: Bearer '.$token,
-		    'Cookie: TS012c881c=019edc9eb8ff55ad0feefbb4565864996e15bb9e987323078781cb5b85100d034c66c76db2bb1bf9ccf4a82c15d22272160b5a62d6'
-		  ),
-		));
-
-		$response = curl_exec($curl);
-		curl_close($curl);
-		
-		return $response;
+    }
 
 
-	}
+    private function generartoken_is() {
+        
+        $cliente_id = '1649d1ba-1fc9-45b9-a506-ebe0cc16393f';
+        $client_secret = 'WJgOtY9fz91iHv6NZuWeew==';
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => 'https://api-seguridad.sunat.gob.pe/v1/clientesextranet/'.$cliente_id.'/oauth2/token/',
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_POST => true,
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 0,
+          CURLOPT_AUTOREFERER => true,
+          CURLOPT_SSL_VERIFYPEER => false,
+          CURLOPT_SSL_VERIFYHOST => false,
+          CURLOPT_FOLLOWLOCATION => true,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => 'POST',
+          CURLOPT_POSTFIELDS => 'grant_type=client_credentials&scope=https%3A%2F%2Fapi.sunat.gob.pe%2Fv1%2Fcontribuyente%2Fcontribuyentes&client_id='.$cliente_id.'&client_secret='.$client_secret,
+          CURLOPT_HTTPHEADER => array(
+            'Content-Type: application/x-www-form-urlencoded',
+            'Cookie: BIGipServerpool-e-plataformaunica-https=!npyoItrPwoiiUEHNnEfW6R1uaTqJDv+jJpdnaYgKdF+RvWima7xHYkuTAfphnUd/q7rgRvf+p/i4jA==; TS019e7fc2=019edc9eb870d9467c32c316be86f95256352673bd84f6776735f1a4bd678d04918fc02cf3d561b81ca4461a95d35151850b9e2387'
+          ),
+        ));
+        $response = curl_exec($curl);
+        curl_close($curl);
+        $atoken = json_decode($response, true);
+        $token = $this->existe_vacio($atoken,'access_token');
+        return $token;
+
+    }
+
+    private function validar_xml($token,$ruc,$numRuc,$codComp,$numeroSerie,$numero,$fechaEmision,$monto) {
+
+        $json               =   '{
+                                    "numRuc" : "'.$numRuc.'",
+                                    "codComp" : "'.$codComp.'",
+                                    "numeroSerie" : "'.$numeroSerie.'",
+                                    "numero" : "'.$numero.'",
+                                    "fechaEmision" : "'.$fechaEmision.'",
+                                    "monto" : "'.round($monto,4).'"
+                                }';
+
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => 'https://api.sunat.gob.pe/v1/contribuyente/contribuyentes/'.$ruc.'/validarcomprobante',
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_POST => true,
+
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 0,
+          CURLOPT_AUTOREFERER => true,
+          CURLOPT_SSL_VERIFYPEER => false,
+          CURLOPT_SSL_VERIFYHOST => false,
+          CURLOPT_FOLLOWLOCATION => true,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => 'POST',
+          CURLOPT_POSTFIELDS =>$json,
+          CURLOPT_HTTPHEADER => array(
+            'Content-Type: application/json',
+            'Authorization: Bearer '.$token,
+            'Cookie: TS012c881c=019edc9eb8ff55ad0feefbb4565864996e15bb9e987323078781cb5b85100d034c66c76db2bb1bf9ccf4a82c15d22272160b5a62d6'
+          ),
+        ));
+
+        $response = curl_exec($curl);
+        curl_close($curl);
+        
+        return $response;
+
+
+    }
 
 
 
-	public function existe_vacio($item,$nombre)
-	{
-		$valor = '';
-		if(!isset($item[$nombre])){
-			$valor  = 	'';
-		}else{
-			$valor  = 	rtrim(ltrim($item[$nombre]));
-		}
-		return $valor;
+    public function existe_vacio($item,$nombre)
+    {
+        $valor = '';
+        if(!isset($item[$nombre])){
+            $valor  =   '';
+        }else{
+            $valor  =   rtrim(ltrim($item[$nombre]));
+        }
+        return $valor;
 
-	}
+    }
 
      public function DPAF($COD_TABLA,$COD_PRODUCTO)
     {

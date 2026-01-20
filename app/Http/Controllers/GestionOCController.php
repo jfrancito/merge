@@ -756,8 +756,8 @@ class GestionOCController extends Controller
                                         'LIQUIDACION_COMPRA_ANTICIPO' => 'LIQUIDACION DE COMPRA ANTICIPO',
                                         'PROVISION_GASTO' => 'PROVISION DE GASTOS',
                                         'NOTA_CREDITO' => 'NOTA DE CREDITO',
-                                        'NOTA_DEBITO' => 'NOTA DE DEBITO'
-
+                                        'NOTA_DEBITO' => 'NOTA DE DEBITO',
+                                        'ORDEN_COMPRA_ANTICIPO' => 'ORDEN COMPRA ANTICIPO',
                                     );
 
         $cod_empresa        =   Session::get('usuario')->usuarioosiris_id;
@@ -792,25 +792,29 @@ class GestionOCController extends Controller
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_administrativo($cod_empresa);
         }else{
-            if($operacion_id=='CONTRATO'){
-                $listadatos         =   $this->con_lista_cabecera_contrato_administrativo($cod_empresa);
+            if($operacion_id=='ORDEN_COMPRA_ANTICIPO'){
+                $listadatos         =   $this->con_lista_cabecera_comprobante_administrativo_anticipo($cod_empresa);
             }else{
+                    if($operacion_id=='CONTRATO'){
+                        $listadatos         =   $this->con_lista_cabecera_contrato_administrativo($cod_empresa);
+                    }else{
 
-                if($operacion_id=='PROVISION_GASTO'){
-                    $listadatos         =   $this->con_lista_cabecera_provision_gasto_administrativo($cod_empresa);
-                }else{
-                    if (in_array($operacion_id, $array_canjes)) {
-                        $categoria_id       =   $this->con_categoria_canje($operacion_id);
-                        if($operacion_id=='DOCUMENTO_INTERNO_COMPRA'){
-                            $listadatos         =   $this->con_lista_cabecera_estibas_administrativo_doc_int_com($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id);
+                        if($operacion_id=='PROVISION_GASTO'){
+                            $listadatos         =   $this->con_lista_cabecera_provision_gasto_administrativo($cod_empresa);
                         }else{
-                            $listadatos         =   $this->con_lista_cabecera_estibas_administrativo($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id);
+                            if (in_array($operacion_id, $array_canjes)) {
+                                $categoria_id       =   $this->con_categoria_canje($operacion_id);
+                                if($operacion_id=='DOCUMENTO_INTERNO_COMPRA'){
+                                    $listadatos         =   $this->con_lista_cabecera_estibas_administrativo_doc_int_com($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id);
+                                }else{
+                                    $listadatos         =   $this->con_lista_cabecera_estibas_administrativo($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id);
+                                }
+                            }
+
                         }
+
                     }
-
-                }
-
-            }
+            }       
         }
 
 
@@ -830,6 +834,64 @@ class GestionOCController extends Controller
                             'proveedor_id'      =>  $proveedor_id
 
                          ]);
+    }
+
+
+     public function actionPDFContrato($cod_contrato)
+    {
+        $cod_contrato = trim($cod_contrato);
+
+        $ruta = "\\\\10.1.0.201\\cpe\\Contratos\\{$cod_contrato}.pdf";
+
+        $rutaWeb   = str_replace('\\', '/', $ruta);
+        $rutaPdoc  = "pdoc://" . $rutaWeb;
+
+        return redirect()->away($rutaPdoc);
+    }
+    
+    public function actionVerificarFirmaContrato(Request $request)
+    {
+        $cod_contrato = trim($request->cod_contrato);
+
+        $ruta = "\\\\10.1.0.201\\cpe\\Contratos\\{$cod_contrato}.pdf";
+
+        if (!file_exists($ruta)) {
+            return response()->json([
+                'firmado' => false,
+                'mensaje' => 'Archivo no existe'
+            ]);
+        }
+
+        if ($this->pdfTieneFirma($ruta)) {
+
+        DB::table(DB::raw('CMP.DOCUMENTO_CTBLE'))
+            ->where('COD_DOCUMENTO_CTBLE', $cod_contrato)
+            ->update(['ESTADO_FIRMA' => 1]);
+
+        return response()->json(['firmado' => true]);
+
+        } else {
+
+            DB::table(DB::raw('CMP.DOCUMENTO_CTBLE'))
+                ->where('COD_DOCUMENTO_CTBLE', $cod_contrato)
+                ->update(['ESTADO_FIRMA' => 0]);
+
+            return response()->json(['firmado' => false]);
+        }
+
+        return response()->json([
+            'firmado' => false
+        ]);
+    }
+
+    private function pdfTieneFirma($rutaArchivo)
+    {
+        if (!file_exists($rutaArchivo)) {
+            return false;
+        }
+
+        $contenido = file_get_contents($rutaArchivo, false, null, 0, 50000);
+        return strpos($contenido, '/Sig') !== false;
     }
 
 
@@ -886,36 +948,39 @@ class GestionOCController extends Controller
         if ($operacion_id == 'ORDEN_COMPRA') {
             $listadatos = $this->con_lista_cabecera_comprobante_administrativo($cod_empresa);
         } else {
-            if ($operacion_id == 'CONTRATO') {
-                $listadatos = $this->con_lista_cabecera_contrato_administrativo($cod_empresa);
-            } else {
-
-                  
-                if($operacion_id=='PROVISION_GASTO'){
-                    $listadatos         =   $this->con_lista_cabecera_provision_gasto_administrativo($cod_empresa);
-                }
-                if ($operacion_id == 'LIQUIDACION_COMPRA_ANTICIPO') {                    
-                    $listadatos = $this->con_lista_cabecera_liquidacion_compra_anticipo_administrativo($cod_empresa);
+            if($operacion_id=='ORDEN_COMPRA_ANTICIPO'){
+                $listadatos         =   $this->con_lista_cabecera_comprobante_administrativo_anticipo($cod_empresa);
+            }else{
+                if ($operacion_id == 'CONTRATO') {
+                    $listadatos = $this->con_lista_cabecera_contrato_administrativo($cod_empresa);
                 } else {
-                    if ($operacion_id == 'NOTA_CREDITO') {                    
-                        $listadatos = $this->con_lista_cabecera_nota_credito_administrativo($cod_empresa);
-                    } else {
-                        if ($operacion_id == 'NOTA_DEBITO') {                    
-                            $listadatos = $this->con_lista_cabecera_nota_debito_administrativo($cod_empresa);
-                        } else {
-                            if (in_array($operacion_id, $array_canjes)) {
-                                $categoria_id = $this->con_categoria_canje($operacion_id);
 
-                                if($operacion_id=='DOCUMENTO_INTERNO_COMPRA'){
-                                    $listadatos         =   $this->con_lista_cabecera_estibas_administrativo_doc_int_com($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id);
-                                }else{
-                                    $listadatos         =   $this->con_lista_cabecera_estibas_administrativo($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id);
-                                }                        
-                            }
-
-                        }
+                    if($operacion_id=='PROVISION_GASTO'){
+                        $listadatos         =   $this->con_lista_cabecera_provision_gasto_administrativo($cod_empresa);
                     }
-                  
+                    if ($operacion_id == 'LIQUIDACION_COMPRA_ANTICIPO') {                    
+                        $listadatos = $this->con_lista_cabecera_liquidacion_compra_anticipo_administrativo($cod_empresa);
+                    } else {
+                        if ($operacion_id == 'NOTA_CREDITO') {                    
+                            $listadatos = $this->con_lista_cabecera_nota_credito_administrativo($cod_empresa);
+                        } else {
+                            if ($operacion_id == 'NOTA_DEBITO') {                    
+                                $listadatos = $this->con_lista_cabecera_nota_debito_administrativo($cod_empresa);
+                            } else {
+                                if (in_array($operacion_id, $array_canjes)) {
+                                    $categoria_id = $this->con_categoria_canje($operacion_id);
+
+                                    if($operacion_id=='DOCUMENTO_INTERNO_COMPRA'){
+                                        $listadatos         =   $this->con_lista_cabecera_estibas_administrativo_doc_int_com($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id);
+                                    }else{
+                                        $listadatos         =   $this->con_lista_cabecera_estibas_administrativo($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id);
+                                    }                        
+                                }
+
+                            }
+                        }
+                      
+                    }
                 }
             }
         }

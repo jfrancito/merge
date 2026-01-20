@@ -379,6 +379,13 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/gestion-de-oc-proveedores/{idopcion}', 'GestionOCController@actionListarOC');
 	Route::any('/gestion-de-orden-compra/{idopcion}', 'GestionOCController@actionListarOCAdmin');
+	Route::get('/ver-contrato-pdf/{cod_contrato}','GestionOCController@actionPDFContrato')->name('contrato.pdf');
+	Route::post('/verificar-firma-contrato','GestionOCController@actionVerificarFirmaContrato')->name('verificar.firma.contrato');
+
+
+	
+
+
 	Route::any('/detalle-comprobante-oc/{procedencia}/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionDetalleComprobanteOC');
 	Route::any('/subir-xml-cargar-datos/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionCargarXML');
 	Route::any('/validar-xml-oc/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionValidarXML');
