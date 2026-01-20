@@ -5310,7 +5310,10 @@ trait ComprobanteTraits
                         'IICHFC0000000012',
                         'ISCHFC0000000012',
                         'ISCHFC0000000027',
-                        'ISCHFC0000000036'
+                        'ISCHFC0000000036',
+                        'ISCHFC0000000033',
+                        'ISCHFC0000000037',
+                        'IICHFC0000000037'
                     ])
                     ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
                     ->where('TES.IND_EXTORNO', 0)
@@ -5524,7 +5527,10 @@ trait ComprobanteTraits
                         'IICHFC0000000012',
                         'ISCHFC0000000012',
                         'ISCHFC0000000027',
-                        'ISCHFC0000000036'
+                        'ISCHFC0000000036',
+                        'ISCHFC0000000033',
+                        'ISCHFC0000000037',
+                        'IICHFC0000000037'
                     ])
                     ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
                     ->where('TES.IND_EXTORNO', 0)
@@ -5729,7 +5735,9 @@ trait ComprobanteTraits
                         'ISCHFC0000000012',
                         'ISCHFC0000000027',
                         'ISCHFC0000000036',
-                        'ISCHFC0000000033'
+                        'ISCHFC0000000033',
+                        'ISCHFC0000000037',
+                        'IICHFC0000000037'
                     ])
                     ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
                     ->where('TES.IND_EXTORNO', 0)
@@ -5742,7 +5750,7 @@ trait ComprobanteTraits
                     ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR) // variable pasada desde tu controlador
                     ->get();
 
-
+        //dd($registros);
         return  $registros;                             
     }
 
@@ -5794,7 +5802,8 @@ trait ComprobanteTraits
                 'ISCHFC0000000012',
                 'ISCHFC0000000027',
                 'ISCHFC0000000036',
-                'ISCHFC0000000033'
+                'ISCHFC0000000033',
+                'IICHFC0000000037'
             ])
             ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
             ->where('TES.IND_EXTORNO', 0)
@@ -5858,7 +5867,9 @@ trait ComprobanteTraits
                         'IICHFC0000000012',
                         'ISCHFC0000000012',
                         'ISCHFC0000000027',
-                        'ISCHFC0000000036'
+                        'ISCHFC0000000036',
+                        'ISCHFC0000000033',
+                        'IICHFC0000000037'
                     ])
                     ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
                     ->where('TES.IND_EXTORNO', 0)
@@ -5917,7 +5928,8 @@ trait ComprobanteTraits
                         'ISCHFC0000000012',
                         'ISCHFC0000000027',
                         'ISCHFC0000000036',
-                        'ISCHFC0000000033'
+                        'ISCHFC0000000033',
+                        'IICHFC0000000037'
                     ])
                     ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
                     ->where('TES.IND_EXTORNO', 0)
@@ -5976,7 +5988,8 @@ trait ComprobanteTraits
                         'ISCHFC0000000012',
                         'ISCHFC0000000027',
                         'ISCHFC0000000036',
-                        'ISCHFC0000000033'
+                        'ISCHFC0000000033',
+                        'IICHFC0000000037'
                     ])
                     ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
                     ->where('TES.IND_EXTORNO', 0)
