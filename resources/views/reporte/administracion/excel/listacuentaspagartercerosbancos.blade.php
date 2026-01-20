@@ -23,6 +23,9 @@
         .center{
             text-align: center;
         }
+        .border{
+            border: 0.5px solid #000000;
+        }
     </style>
     <table>
         <thead>
@@ -46,7 +49,7 @@
         </thead>
         <tbody>
         @foreach($cuentas as $index=>$item)
-            @if($item['IND_REL'] === 'T' AND $item['IND_CP'] === 'C')
+            @if($item['IND_REL'] === 'T' AND $item['IND_CP'] === 'P' AND str_contains($item['NOM_CLIENTE'], 'BANCO'))
                 <tr>
                     <td class="border"> {{$item['NOM_CLIENTE']}}</td>
                     <td class="border">{{substr($item['NRO_CONTRATO'],0,6).'-'.strval(intval(substr($item['NRO_CONTRATO'],6,16)))}}</td>
