@@ -794,6 +794,7 @@ class GestionOCController extends Controller
         }else{
             if($operacion_id=='CONTRATO'){
                 $listadatos         =   $this->con_lista_cabecera_contrato_administrativo($cod_empresa);
+
             }else{
 
                 if($operacion_id=='PROVISION_GASTO'){
@@ -830,6 +831,64 @@ class GestionOCController extends Controller
                             'proveedor_id'      =>  $proveedor_id
 
                          ]);
+    }
+
+
+     public function actionPDFContrato($cod_contrato)
+    {
+        $cod_contrato = trim($cod_contrato);
+
+        $ruta = "\\\\10.1.0.201\\cpe\\Contratos\\{$cod_contrato}.pdf";
+
+        $rutaWeb   = str_replace('\\', '/', $ruta);
+        $rutaPdoc  = "pdoc://" . $rutaWeb;
+
+        return redirect()->away($rutaPdoc);
+    }
+    
+    public function actionVerificarFirmaContrato(Request $request)
+    {
+        $cod_contrato = trim($request->cod_contrato);
+
+        $ruta = "\\\\10.1.0.201\\cpe\\Contratos\\{$cod_contrato}.pdf";
+
+        if (!file_exists($ruta)) {
+            return response()->json([
+                'firmado' => false,
+                'mensaje' => 'Archivo no existe'
+            ]);
+        }
+
+        if ($this->pdfTieneFirma($ruta)) {
+
+        DB::table(DB::raw('CMP.DOCUMENTO_CTBLE'))
+            ->where('COD_DOCUMENTO_CTBLE', $cod_contrato)
+            ->update(['ESTADO_FIRMA' => 1]);
+
+        return response()->json(['firmado' => true]);
+
+        } else {
+
+            DB::table(DB::raw('CMP.DOCUMENTO_CTBLE'))
+                ->where('COD_DOCUMENTO_CTBLE', $cod_contrato)
+                ->update(['ESTADO_FIRMA' => 0]);
+
+            return response()->json(['firmado' => false]);
+        }
+
+        return response()->json([
+            'firmado' => false
+        ]);
+    }
+
+    private function pdfTieneFirma($rutaArchivo)
+    {
+        if (!file_exists($rutaArchivo)) {
+            return false;
+        }
+
+        $contenido = file_get_contents($rutaArchivo, false, null, 0, 50000);
+        return strpos($contenido, '/Sig') !== false;
     }
 
 
