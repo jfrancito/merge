@@ -1,4 +1,4 @@
-<table id="cxpr" class="table table-striped table-bordered table-hover td-color-borde td-padding-7 display nowrap" style='width: 100%;'>
+<table id="cxprr" class="table table-striped table-bordered table-hover td-color-borde td-padding-7 display nowrap" style='width: 100%;'>
     @php
         $total_mn = 0.0000;
         $total_me = 0.0000;
