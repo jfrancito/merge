@@ -9,6 +9,7 @@
                 <li class="negrita"><a href="#cpagar" data-toggle="tab">Cuentas por Pagar Terceros</a></li>
                 <li class="negrita"><a href="#cpagarrel" data-toggle="tab">Cuentas por Pagar Relacionadas</a></li>
             @endif
+                <li class="negrita"><a href="#retenciones" data-toggle="tab">Cuentas Retenciones</a></li>
         </ul>
 
         <div class="tab-content">
@@ -27,6 +28,7 @@
                 <div id="cpagarrel" class="tab-pane cont">
                     @include('reporte.administracion.ajax.listacuentaspagarrelacionadas')
                 </div>
+                    @include('reporte.administracion.ajax.listacuentaspagarrelacionadasretenciones')
             @endif
         </div>
 
