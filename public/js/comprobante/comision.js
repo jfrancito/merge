@@ -2,6 +2,29 @@ $(document).ready(function(){
     var carpeta = $("#carpeta").val();
 
 
+    $(".agestioncomprobante").on('click','#descargarcomprobantemasivotesoreriracomisionexcel', function() {
+
+        var fecha_inicio         =   $('#fecha_inicio').val();
+        var fecha_fin            =   $('#fecha_fin').val();
+        var banco_id             =   $('#banco_id').val();
+
+        var idopcion             =   $('#idopcion').val();
+        var _token               =   $('#token').val();
+
+
+        //validacioones
+        if(fecha_inicio ==''){ alerterrorajax("Seleccione una fecha inicio."); return false;}
+        if(fecha_fin ==''){ alerterrorajax("Seleccione una fecha fin."); return false;}
+        if(banco_id ==''){ alerterrorajax("Seleccione una banco."); return false;}
+
+        href = $(this).attr('data-href')+'/'+fecha_inicio+'/'+fecha_fin+'/'+banco_id+'/'+idopcion;
+        $(this).prop('href', href);
+        return true;
+
+
+    });
+    
+
 
     $(".agestioncomprobante").on('click','.verlote', function(e) {
 

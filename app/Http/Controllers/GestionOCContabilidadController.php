@@ -990,8 +990,6 @@ class GestionOCContabilidadController extends Controller
 
 
             $prefijocarperta = $this->prefijo_empresa($ordencompra->COD_EMPR);
-            //$lecturacdr             =   $this->lectura_cdr_archivo($idoc,$this->pathFiles,$prefijocarperta,$ordencompra->NRO_DOCUMENTO_CLIENTE);
-            //$lecturacdr             =   $this->lectu($idoc,$this->pathFiles,$prefijocarperta,$ordencompra->NRO_DOCUMENTO_CLIENTE);
             $detalleordencompra = $this->con_lista_detalle_comprobante_idoc_actual($idoc);
             $detalleordencompraaf = $this->con_lista_detalle_comprobante_idoc_actual_af($idoc);
 
@@ -1158,11 +1156,12 @@ class GestionOCContabilidadController extends Controller
             }
             $trabajador = STDTrabajador::where('NRO_DOCUMENTO', '=', $fedocumento->dni_usuariocontacto)->first();
 
-            $documentoscompra = CMPCategoria::where('TXT_GRUPO', '=', 'DOCUMENTOS_COMPRA')
-                ->whereNotIn('COD_CATEGORIA', ['DCC0000000000003', 'DCC0000000000004'])
-                ->where('COD_ESTADO', '=', 1)
-                ->where('CODIGO_SUNAT', '=', $codigo_sunat)
-                ->get();
+            $documentoscompra   =       CMPCategoria::where('TXT_GRUPO', '=', 'DOCUMENTOS_COMPRA')
+                                        ->whereNotIn('COD_CATEGORIA', ['DCC0000000000003', 'DCC0000000000004'])
+                                        ->where('TXT_GLOSA','=','O')
+                                        ->where('COD_ESTADO', '=', 1)
+                                        ->where('CODIGO_SUNAT', '=', $codigo_sunat)
+                                        ->get();
 
             $totalarchivos = CMPDocAsociarCompra::where('COD_ORDEN', '=', $ordencompra->COD_ORDEN)->where('COD_ESTADO', '=', 1)
                 ->pluck('COD_CATEGORIA_DOCUMENTO')
@@ -1177,6 +1176,7 @@ class GestionOCContabilidadController extends Controller
             $documentoscomprarepable = CMPCategoria::where('TXT_GRUPO', '=', 'DOCUMENTOS_COMPRA')
                 ->where('COD_ESTADO', '=', 1)
                 ->where('CODIGO_SUNAT', '=', $codigo_sunat)
+                ->where('TXT_TIPO_REFERENCIA','=','R')
                 ->whereNotIn('COD_CATEGORIA', ['DCC0000000000003', 'DCC0000000000004'])
                 //->whereNotIn('COD_CATEGORIA',$archivosselect)
                 ->get();
@@ -1854,9 +1854,13 @@ class GestionOCContabilidadController extends Controller
             $trabajador             =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
             $codigo_sunat           =   'N';
 
+
+
+
             $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                         ->where('COD_ESTADO','=',1)
                                         ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->where('TXT_GLOSA','=','O')
                                         ->whereNotIn('COD_CATEGORIA',['DCC0000000000003','DCC0000000000004'])
                                         ->get();
 
@@ -1872,6 +1876,7 @@ class GestionOCContabilidadController extends Controller
             $documentoscomprarepable=   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                         ->where('COD_ESTADO','=',1)
                                         ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->where('TXT_TIPO_REFERENCIA','=','R')
                                         ->whereNotIn('COD_CATEGORIA',['DCC0000000000003','DCC0000000000004'])
                                         //->whereNotIn('COD_CATEGORIA',$archivosselect)
                                         ->get();
@@ -2501,9 +2506,13 @@ class GestionOCContabilidadController extends Controller
             $trabajador = STDTrabajador::where('NRO_DOCUMENTO', '=', $fedocumento->dni_usuariocontacto)->first();
             $codigo_sunat = 'N';
 
+
+
+
             $documentoscompra = CMPCategoria::where('TXT_GRUPO', '=', 'DOCUMENTOS_COMPRA')
                 ->where('COD_ESTADO', '=', 1)
                 ->where('CODIGO_SUNAT', '=', $codigo_sunat)
+                ->where('TXT_GLOSA','=','O')
                 ->whereNotIn('COD_CATEGORIA', ['DCC0000000000003', 'DCC0000000000004'])
                 ->get();
 
@@ -2519,6 +2528,7 @@ class GestionOCContabilidadController extends Controller
             $documentoscomprarepable = CMPCategoria::where('TXT_GRUPO', '=', 'DOCUMENTOS_COMPRA')
                 ->where('COD_ESTADO', '=', 1)
                 ->where('CODIGO_SUNAT', '=', $codigo_sunat)
+                ->where('TXT_TIPO_REFERENCIA','=','R')
                 ->whereNotIn('COD_CATEGORIA', ['DCC0000000000003', 'DCC0000000000004'])
                 //->whereNotIn('COD_CATEGORIA',$archivosselect)
                 ->get();
@@ -3395,8 +3405,12 @@ class GestionOCContabilidadController extends Controller
             $trabajador = STDTrabajador::where('NRO_DOCUMENTO', '=', $fedocumento->dni_usuariocontacto)->first();
             $codigo_sunat = 'N';
 
+
+
+
             $documentoscompra = CMPCategoria::where('TXT_GRUPO', '=', 'DOCUMENTOS_COMPRA')
                 ->where('COD_ESTADO', '=', 1)
+                ->where('TXT_GLOSA','=','O')
                 ->where('CODIGO_SUNAT', '=', $codigo_sunat)
                 ->whereNotIn('COD_CATEGORIA', ['DCC0000000000003', 'DCC0000000000004'])
                 ->get();
@@ -3413,6 +3427,7 @@ class GestionOCContabilidadController extends Controller
             $documentoscomprarepable = CMPCategoria::where('TXT_GRUPO', '=', 'DOCUMENTOS_COMPRA')
                 ->where('COD_ESTADO', '=', 1)
                 ->where('CODIGO_SUNAT', '=', $codigo_sunat)
+                ->where('TXT_TIPO_REFERENCIA','=','R')
                 ->whereNotIn('COD_CATEGORIA', ['DCC0000000000003', 'DCC0000000000004'])
                 //->whereNotIn('COD_CATEGORIA',$archivosselect)
                 ->get();
@@ -3924,8 +3939,12 @@ class GestionOCContabilidadController extends Controller
             $trabajador             =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
             $codigo_sunat           =   'N';
 
+
+
+
             $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                         ->where('COD_ESTADO','=',1)
+                                        ->where('TXT_GLOSA','=','O')
                                         ->where('CODIGO_SUNAT','=',$codigo_sunat)
                                         ->whereNotIn('COD_CATEGORIA',['DCC0000000000003','DCC0000000000004'])
                                         ->get();
@@ -3942,6 +3961,7 @@ class GestionOCContabilidadController extends Controller
             $documentoscomprarepable=   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                         ->where('COD_ESTADO','=',1)
                                         ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->where('TXT_TIPO_REFERENCIA','=','R')
                                         ->whereNotIn('COD_CATEGORIA',['DCC0000000000003','DCC0000000000004'])
                                         //->whereNotIn('COD_CATEGORIA',$archivosselect)
                                         ->get();
@@ -4240,9 +4260,13 @@ class GestionOCContabilidadController extends Controller
             $trabajador             =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
             $codigo_sunat           =   'N';
 
+
+
+
             $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                         ->where('COD_ESTADO','=',1)
                                         ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->where('TXT_GLOSA','=','O')
                                         ->whereNotIn('COD_CATEGORIA',['DCC0000000000003','DCC0000000000004'])
                                         ->get();
 
@@ -4258,6 +4282,7 @@ class GestionOCContabilidadController extends Controller
             $documentoscomprarepable=   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                         ->where('COD_ESTADO','=',1)
                                         ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->where('TXT_TIPO_REFERENCIA','=','R')
                                         ->whereNotIn('COD_CATEGORIA',['DCC0000000000003','DCC0000000000004'])
                                         //->whereNotIn('COD_CATEGORIA',$archivosselect)
                                         ->get();
@@ -4488,9 +4513,13 @@ class GestionOCContabilidadController extends Controller
             $trabajador             =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
             $codigo_sunat           =   'N';
 
+
+
+
             $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                         ->where('COD_ESTADO','=',1)
                                         ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->where('TXT_GLOSA','=','O')
                                         ->whereNotIn('COD_CATEGORIA',['DCC0000000000003','DCC0000000000004'])
                                         ->get();
 
@@ -4506,6 +4535,7 @@ class GestionOCContabilidadController extends Controller
             $documentoscomprarepable=   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                         ->where('COD_ESTADO','=',1)
                                         ->where('CODIGO_SUNAT','=',$codigo_sunat)
+                                        ->where('TXT_TIPO_REFERENCIA','=','R')
                                         ->whereNotIn('COD_CATEGORIA',['DCC0000000000003','DCC0000000000004'])
                                         //->whereNotIn('COD_CATEGORIA',$archivosselect)
                                         ->get();
@@ -4634,6 +4664,8 @@ class GestionOCContabilidadController extends Controller
 
                     $docu_asoci = CMPDocAsociarCompra::where('COD_ORDEN', '=', $idoc)->where('COD_ESTADO', '=', 1)
                         ->where('COD_CATEGORIA_DOCUMENTO', '=', $item)->first();
+
+                        
                     if (count($docu_asoci) > 0) {
 
                         Archivo::where('ID_DOCUMENTO', '=', $idoc)
@@ -4643,6 +4675,7 @@ class GestionOCContabilidadController extends Controller
                             ->update(
                                 [
                                     'ACTIVO' => 0,
+                                    'EXTENSION' => 'OBS',
                                     'FECHA_MOD' => $this->fechaactual,
                                     'USUARIO_MOD' => Session::get('usuario')->id
                                 ]
@@ -4661,13 +4694,15 @@ class GestionOCContabilidadController extends Controller
                         $docasociar->COD_USUARIO_CREA_AUD = Session::get('usuario')->id;
                         $docasociar->FEC_USUARIO_CREA_AUD = $this->fechaactual;
                         $docasociar->COD_ESTADO = 1;
-                        $docasociar->TIP_DOC = $categoria->CODIGO_SUNAT;
+                        $docasociar->TIP_DOC = 'O';
                         $docasociar->save();
 
                     }
 
 
                 }
+
+                
 
                 //HISTORIAL DE DOCUMENTO APROBADO
                 $documento = new FeDocumentoHistorial;
@@ -5910,7 +5945,7 @@ class GestionOCContabilidadController extends Controller
                     return Redirect::to('agregar-observacion-contabilidad-contrato/' . $idopcion . '/' . $linea . '/' . $prefijo . '/' . $idordencompra)->with('errorbd', 'Tiene que seleccionar almenos un item');
                 }
 
-
+                                    
                 foreach ($archivoob as $index => $item) {
 
                     $docu_asoci = CMPDocAsociarCompra::where('COD_ORDEN', '=', $idoc)->where('COD_ESTADO', '=', 1)
@@ -5924,6 +5959,7 @@ class GestionOCContabilidadController extends Controller
                             ->update(
                                 [
                                     'ACTIVO' => 0,
+                                    'EXTENSION' => 'OBS',
                                     'FECHA_MOD' => $this->fechaactual,
                                     'USUARIO_MOD' => Session::get('usuario')->id
                                 ]
@@ -5942,7 +5978,7 @@ class GestionOCContabilidadController extends Controller
                         $docasociar->COD_USUARIO_CREA_AUD = Session::get('usuario')->id;
                         $docasociar->FEC_USUARIO_CREA_AUD = $this->fechaactual;
                         $docasociar->COD_ESTADO = 1;
-                        $docasociar->TIP_DOC = $categoria->CODIGO_SUNAT;
+                        $docasociar->TIP_DOC = 'O';
                         $docasociar->save();
 
                     }
@@ -6107,6 +6143,7 @@ class GestionOCContabilidadController extends Controller
                             ->update(
                                 [
                                     'ACTIVO' => 0,
+                                    'EXTENSION' => 'OBS',
                                     'FECHA_MOD' => $this->fechaactual,
                                     'USUARIO_MOD' => Session::get('usuario')->id
                                 ]
@@ -6125,7 +6162,7 @@ class GestionOCContabilidadController extends Controller
                         $docasociar->COD_USUARIO_CREA_AUD = Session::get('usuario')->id;
                         $docasociar->FEC_USUARIO_CREA_AUD = $this->fechaactual;
                         $docasociar->COD_ESTADO = 1;
-                        $docasociar->TIP_DOC = $categoria->CODIGO_SUNAT;
+                        $docasociar->TIP_DOC = 'O';
                         $docasociar->save();
 
                     }
@@ -6274,6 +6311,7 @@ class GestionOCContabilidadController extends Controller
                 }
 
 
+
                 foreach ($archivoob as $index => $item) {
 
                     $docu_asoci = CMPDocAsociarCompra::where('COD_ORDEN', '=', $idoc)->where('COD_ESTADO', '=', 1)
@@ -6287,6 +6325,7 @@ class GestionOCContabilidadController extends Controller
                             ->update(
                                 [
                                     'ACTIVO' => 0,
+                                    'EXTENSION' => 'OBS',
                                     'FECHA_MOD' => $this->fechaactual,
                                     'USUARIO_MOD' => Session::get('usuario')->id
                                 ]
@@ -6305,7 +6344,7 @@ class GestionOCContabilidadController extends Controller
                         $docasociar->COD_USUARIO_CREA_AUD = Session::get('usuario')->id;
                         $docasociar->FEC_USUARIO_CREA_AUD = $this->fechaactual;
                         $docasociar->COD_ESTADO = 1;
-                        $docasociar->TIP_DOC = $categoria->CODIGO_SUNAT;
+                        $docasociar->TIP_DOC = 'O';
                         $docasociar->save();
 
                     }
@@ -6457,6 +6496,7 @@ class GestionOCContabilidadController extends Controller
                 }
 
 
+
                 foreach ($archivoob as $index => $item) {
 
                     $docu_asoci = CMPDocAsociarCompra::where('COD_ORDEN', '=', $idoc)->where('COD_ESTADO', '=', 1)
@@ -6470,6 +6510,7 @@ class GestionOCContabilidadController extends Controller
                             ->update(
                                 [
                                     'ACTIVO' => 0,
+                                    'EXTENSION' => 'OBS',
                                     'FECHA_MOD' => $this->fechaactual,
                                     'USUARIO_MOD' => Session::get('usuario')->id
                                 ]
@@ -6488,7 +6529,7 @@ class GestionOCContabilidadController extends Controller
                         $docasociar->COD_USUARIO_CREA_AUD = Session::get('usuario')->id;
                         $docasociar->FEC_USUARIO_CREA_AUD = $this->fechaactual;
                         $docasociar->COD_ESTADO = 1;
-                        $docasociar->TIP_DOC = $categoria->CODIGO_SUNAT;
+                        $docasociar->TIP_DOC = 'O';
                         $docasociar->save();
 
                     }
@@ -6575,6 +6616,9 @@ class GestionOCContabilidadController extends Controller
                     DB::rollback();
                     return Redirect::to('agregar-observacion-contabilidad-estiba/' . $idopcion . '/' . $lote)->with('errorbd', 'Tiene que seleccionar almenos un item');
                 }
+
+
+
                 foreach ($archivoob as $index => $item) {
                     $docu_asoci = CMPDocAsociarCompra::where('COD_ORDEN', '=', $idoc)->where('COD_ESTADO', '=', 1)
                         ->where('COD_CATEGORIA_DOCUMENTO', '=', $item)->first();
@@ -6587,6 +6631,7 @@ class GestionOCContabilidadController extends Controller
                             ->update(
                                 [
                                     'ACTIVO' => 0,
+                                    'EXTENSION' => 'OBS',
                                     'FECHA_MOD' => $this->fechaactual,
                                     'USUARIO_MOD' => Session::get('usuario')->id
                                 ]
@@ -6605,7 +6650,7 @@ class GestionOCContabilidadController extends Controller
                         $docasociar->COD_USUARIO_CREA_AUD = Session::get('usuario')->id;
                         $docasociar->FEC_USUARIO_CREA_AUD = $this->fechaactual;
                         $docasociar->COD_ESTADO = 1;
-                        $docasociar->TIP_DOC = $categoria->CODIGO_SUNAT;
+                        $docasociar->TIP_DOC = 'O';
                         $docasociar->save();
 
                     }

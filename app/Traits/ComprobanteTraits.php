@@ -5240,8 +5240,7 @@ trait ComprobanteTraits
                     ->where('CBC.COD_ACTIVO', 1)
                     ->pluck('TEXTO', 'COD_CAJA_BANCO') // Si quieres cambiar, lee abajo
                     ->toArray();
-
-        $combo               =   array('' => 'Seleccione Banco') + $array;
+        $combo               =   array('' => 'Seleccione Banco','TODO' => 'TODO') + $array;
 
         return  $combo;                             
     }
@@ -5311,7 +5310,10 @@ trait ComprobanteTraits
                         'IICHFC0000000012',
                         'ISCHFC0000000012',
                         'ISCHFC0000000027',
-                        'ISCHFC0000000036'
+                        'ISCHFC0000000036',
+                        'ISCHFC0000000033',
+                        'ISCHFC0000000037',
+                        'IICHFC0000000037'
                     ])
                     ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
                     ->where('TES.IND_EXTORNO', 0)
@@ -5461,7 +5463,222 @@ trait ComprobanteTraits
         return  $registros;                             
     }
 
+    private function gn_lista_comision_todo($fecha_inicio,$fecha_fin,$banco_id) {
+            
+        $estado_no          =       'ETM0000000000006';
 
+        $consulta1 = DB::table('TES.OPERACION_CAJA as TES')
+                    ->leftJoin('FE_REF_ASOC', function ($leftJoin){
+                        $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'TES.COD_OPERACION_CAJA')
+                                ->where('FE_REF_ASOC.COD_ESTADO', '=', '1')
+                                ->WhereNull('FE_REF_ASOC.TXT_ESTADO')
+                                ->orwhere('FE_REF_ASOC.TXT_ESTADO', '=', '');
+
+                    })
+                    ->leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                        $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                            ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                    })
+                    ->leftJoin('STD.EMPRESA as EMS', 'TES.COD_EMPR', '=', 'EMS.COD_EMPR')
+                    ->leftJoin('TES.CAJA_BANCO as TCB', 'TES.COD_CAJA_BANCO', '=', 'TCB.COD_CAJA_BANCO')
+                    ->leftJoin('CMP.CATEGORIA as CMD', 'TES.COD_CATEGORIA_MONEDA', '=', 'CMD.COD_CATEGORIA')
+                    ->leftJoin('CMP.CATEGORIA as CME', function($join) {
+                        $join->on('TES.COD_CATEGORIA_ESTADO', '=', 'CME.COD_CATEGORIA')
+                             ->where('CME.TXT_GRUPO', 'ESTADO_OPERACION_CAJA');
+                    })
+                    ->leftJoin('SGD.USUARIO as USU', 'TES.COD_USUARIO_CREA_AUD', '=', 'USU.COD_USUARIO')
+                    ->select(
+                        'TES.COD_OPERACION_CAJA',
+                        'TES.COD_EMPR',
+                        'EMS.NOM_EMPR',
+                        'TES.COD_CAJA_BANCO',
+                        DB::raw("CASE WHEN TCB.IND_CAJA = 0 THEN TCB.TXT_BANCO ELSE TCB.TXT_CAJA_BANCO END as NOMBRE_BANCO_CAJA"),
+                        'TCB.TXT_CAJA_BANCO as CUENTA',
+                        'TES.FEC_OPERACION as FEC_REGISTRO',
+                        'TES.FEC_MOVIMIENTO_CAJABANCO as FEC_MOVIMIENTO',
+                        'TES.NRO_CUENTA_BANCARIA',
+                        'TES.NRO_VOUCHER',
+                        'CMD.NOM_CATEGORIA as MONEDA',
+                        'CME.NOM_CATEGORIA as ESTADO',
+                        DB::raw('(TES.CAN_HABER_MN - TES.CAN_DEBE_MN)  as MONTO_SOLES'),
+                        DB::raw('(TES.CAN_HABER_ME - TES.CAN_DEBE_ME)  as MONTO_DOLARES'),
+
+                        DB::raw("
+                            CASE 
+                                WHEN CMD.NOM_CATEGORIA = 'SOLES' THEN (TES.CAN_HABER_MN - TES.CAN_DEBE_MN)
+                                ELSE (TES.CAN_HABER_ME - TES.CAN_DEBE_ME)
+                            END AS MONTO
+                        "),
+                        DB::raw("ISNULL(TES.ATENDIDO,0) AS MONTOATENDIDO"),
+                        'TES.TXT_GLOSA',
+                        'TES.COD_FLUJO_CAJA',
+                        'TES.TXT_FLUJO_CAJA',
+                        'TES.COD_ITEM_MOVIMIENTO',
+                        'TES.TXT_ITEM_MOVIMIENTO',
+                        'FE_REF_ASOC.LOTE AS LOTE_DOC',
+                        'FE_DOCUMENTO.ID_DOCUMENTO',
+                        'FE_DOCUMENTO.COD_ESTADO',
+                        'FE_DOCUMENTO.TXT_ESTADO',
+                        'USU.NOM_TRABAJADOR'
+                    )
+                    ->whereIn('TES.COD_FLUJO_CAJA', [
+                        'IICHFC0000000004',
+                        'IICHFC0000000009',
+                        'IICHFC0000000012',
+                        'ISCHFC0000000012',
+                        'ISCHFC0000000027',
+                        'ISCHFC0000000036',
+                        'ISCHFC0000000033',
+                        'ISCHFC0000000037',
+                        'IICHFC0000000037'
+                    ])
+                    ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
+                    ->where('TES.IND_EXTORNO', 0)
+                    ->where('TES.COD_ESTADO', 1)
+                    ->where('TES.COD_CATEGORIA_OPERACION_ORIGEN', 'OOC0000000000008')
+                    ->whereNotIn('TES.COD_ITEM_MOVIMIENTO', ['IICHIM0000000020', 'ISCHIM0000000020'])
+                    //->where('TES.COD_CAJA_BANCO', $banco_id)
+                    ->whereRaw("
+                        CASE 
+                            WHEN CMD.NOM_CATEGORIA = 'SOLES' THEN (TES.CAN_HABER_MN - TES.CAN_DEBE_MN)
+                            ELSE (TES.CAN_HABER_ME - TES.CAN_DEBE_ME)
+                        END - ISNULL(TES.ATENDIDO, 0) <> 0
+                    ")
+                    ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR) // variable pasada desde tu controlador
+                    ->whereBetween('TES.FEC_MOVIMIENTO_CAJABANCO', [$fecha_inicio, $fecha_fin]);
+
+
+
+                    $consulta2 = DB::table('TES.OPERACION_CAJA as TES')
+                                ->leftJoin('FE_REF_ASOC', function ($leftJoin){
+                                    $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'TES.COD_OPERACION_CAJA')
+                                            ->where('FE_REF_ASOC.COD_ESTADO', '=', '1')
+                                            ->WhereNull('FE_REF_ASOC.TXT_ESTADO')
+                                            ->orwhere('FE_REF_ASOC.TXT_ESTADO', '=', '');
+
+                                })
+                                ->leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                    $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                                        ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                                })
+
+                                ->leftJoin('STD.EMPRESA as EMS', 'TES.COD_EMPR', '=', 'EMS.COD_EMPR')
+                                ->leftJoin('TES.CAJA_BANCO as TCB', 'TES.COD_CAJA_BANCO', '=', 'TCB.COD_CAJA_BANCO')
+                                ->leftJoin('CMP.CATEGORIA as CMD', 'TES.COD_CATEGORIA_MONEDA', '=', 'CMD.COD_CATEGORIA')
+                                ->leftJoin('CMP.CATEGORIA as CME', function ($join) {
+                                    $join->on('TES.COD_CATEGORIA_ESTADO', '=', 'CME.COD_CATEGORIA')
+                                         ->where('CME.TXT_GRUPO', 'ESTADO_OPERACION_CAJA');
+                                })
+                                ->leftJoin('SGD.USUARIO as USU', 'TES.COD_USUARIO_CREA_AUD', '=', 'USU.COD_USUARIO')
+                                ->select(
+                                    'TES.COD_OPERACION_CAJA',
+                                    'TES.COD_EMPR',
+                                    'EMS.NOM_EMPR',
+                                    'TES.COD_CAJA_BANCO',
+                                    DB::raw("CASE WHEN TCB.IND_CAJA=0 THEN TCB.TXT_BANCO ELSE TCB.TXT_CAJA_BANCO END AS NOMBRE_BANCO_CAJA"),
+                                    'TCB.TXT_CAJA_BANCO as CUENTA',
+                                    'TES.FEC_OPERACION as FEC_REGISTRO',
+                                    'TES.FEC_MOVIMIENTO_CAJABANCO as FEC_MOVIMIENTO',
+                                    'TES.NRO_CUENTA_BANCARIA',
+                                    'TES.NRO_VOUCHER',
+                                    'CMD.NOM_CATEGORIA as MONEDA',
+                                    'CME.NOM_CATEGORIA as ESTADO',
+                                    DB::raw('(TES.CAN_HABER_MN - TES.CAN_DEBE_MN) as MONTO_SOLES'),
+                                    DB::raw('(TES.CAN_HABER_ME - TES.CAN_DEBE_ME) as MONTO_DOLARES'),
+                                    DB::raw("
+                                        CASE 
+                                            WHEN CMD.NOM_CATEGORIA = 'SOLES' THEN (TES.CAN_HABER_MN - TES.CAN_DEBE_MN)
+                                            ELSE (TES.CAN_HABER_ME - TES.CAN_DEBE_ME)
+                                        END AS MONTO
+                                    "),
+                                    DB::raw("ISNULL(TES.ATENDIDO,0) AS MONTOATENDIDO"),
+                                    'TES.TXT_GLOSA',
+                                    'TES.COD_FLUJO_CAJA',
+                                    'TES.TXT_FLUJO_CAJA',
+                                    'TES.COD_ITEM_MOVIMIENTO',
+                                    'TES.TXT_ITEM_MOVIMIENTO',
+                                    'FE_REF_ASOC.LOTE AS LOTE_DOC',
+                                    'FE_DOCUMENTO.ID_DOCUMENTO',
+                                    'FE_DOCUMENTO.COD_ESTADO',
+                                    'FE_DOCUMENTO.TXT_ESTADO',
+                                    'USU.NOM_TRABAJADOR'
+                                )
+                                ->where('TES.IND_EXTORNO', 0)
+                                ->where('TES.COD_ESTADO', 1)
+                                ->whereNotIn('TES.COD_ITEM_MOVIMIENTO', ['IICHIM0000000020', 'ISCHIM0000000020'])
+                                //->where('TES.COD_CAJA_BANCO', $banco_id)
+                                ->where('TES.TXT_ITEM_MOVIMIENTO', 'like', '%CAMBIO DE MONEDA%')
+                                ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR)
+                                ->whereBetween('TES.FEC_MOVIMIENTO_CAJABANCO', [$fecha_inicio, $fecha_fin]);
+
+                    $consulta3 = DB::table('TES.OPERACION_CAJA as TES')
+                                ->leftJoin('FE_REF_ASOC', function ($leftJoin){
+                                    $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'TES.COD_OPERACION_CAJA')
+                                            ->where('FE_REF_ASOC.COD_ESTADO', '=', '1')
+                                            ->WhereNull('FE_REF_ASOC.TXT_ESTADO')
+                                            ->orwhere('FE_REF_ASOC.TXT_ESTADO', '=', '');
+
+                                })
+                                ->leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                    $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                                        ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                                })
+
+                    ->leftJoin('STD.EMPRESA as EMS', 'TES.COD_EMPR', '=', 'EMS.COD_EMPR')
+                    ->leftJoin('TES.CAJA_BANCO as TCB', 'TES.COD_CAJA_BANCO', '=', 'TCB.COD_CAJA_BANCO')
+                    ->leftJoin('CMP.CATEGORIA as CMD', 'TES.COD_CATEGORIA_MONEDA', '=', 'CMD.COD_CATEGORIA')
+                    ->leftJoin('CMP.CATEGORIA as CME', function($join) {
+                        $join->on('TES.COD_CATEGORIA_ESTADO', '=', 'CME.COD_CATEGORIA')
+                             ->where('CME.TXT_GRUPO', '=', 'ESTADO_OPERACION_CAJA');
+                    })
+                    ->leftJoin('SGD.USUARIO as USU', 'TES.COD_USUARIO_CREA_AUD', '=', 'USU.COD_USUARIO')
+                    ->join('CON.ASIENTO_MOVIMIENTO as ASM', 'TES.COD_ASIENTO', '=', 'ASM.COD_ASIENTO')
+                    ->join('CON.CUENTA_CONTABLE as CTB', 'ASM.COD_CUENTA_CONTABLE', '=', 'CTB.COD_CUENTA_CONTABLE')
+                    ->select(
+                        'TES.COD_OPERACION_CAJA',
+                        'TES.COD_EMPR',
+                        'EMS.NOM_EMPR',
+                        'TES.COD_CAJA_BANCO',
+                        DB::raw("CASE WHEN TCB.IND_CAJA=0 THEN TCB.TXT_BANCO ELSE TCB.TXT_CAJA_BANCO END AS NOMBRE_BANCO_CAJA"),
+                        'TCB.TXT_CAJA_BANCO as CUENTA',
+                        'TES.FEC_OPERACION as FEC_REGISTRO',
+                        'TES.FEC_MOVIMIENTO_CAJABANCO as FEC_MOVIMIENTO',
+                        'TES.NRO_CUENTA_BANCARIA',
+                        'TES.NRO_VOUCHER',
+                        'CMD.NOM_CATEGORIA as MONEDA',
+                        'CME.NOM_CATEGORIA as ESTADO',
+                        DB::raw('ABS(ASM.CAN_DEBE_MN - ASM.CAN_HABER_MN) as MONTO_SOLES'),
+                        DB::raw('ABS(ASM.CAN_DEBE_ME - ASM.CAN_HABER_ME) as MONTO_DOLARES'),
+                        DB::raw("
+                            CASE 
+                                WHEN CMD.NOM_CATEGORIA = 'SOLES' THEN (ABS(ASM.CAN_DEBE_MN - ASM.CAN_HABER_MN))
+                                ELSE (ABS(ASM.CAN_DEBE_ME - ASM.CAN_HABER_ME))
+                            END AS MONTO
+                        "),
+                        DB::raw("ISNULL(TES.ATENDIDO,0) AS MONTOATENDIDO"),
+                        'TES.TXT_GLOSA',
+                        'TES.COD_FLUJO_CAJA',
+                        'TES.TXT_FLUJO_CAJA',
+                        'TES.COD_ITEM_MOVIMIENTO',
+                        'TES.TXT_ITEM_MOVIMIENTO',
+                        'FE_REF_ASOC.LOTE AS LOTE_DOC',
+                        'FE_DOCUMENTO.ID_DOCUMENTO',
+                        'FE_DOCUMENTO.COD_ESTADO',
+                        'FE_DOCUMENTO.TXT_ESTADO',
+                        'USU.NOM_TRABAJADOR'
+                    )
+                    ->where('TES.IND_EXTORNO', 0)
+                    ->where('TES.COD_ESTADO', 1)
+                    //->where('TES.COD_CAJA_BANCO', $banco_id)
+                    ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR)
+                    ->whereBetween('TES.FEC_MOVIMIENTO_CAJABANCO', [$fecha_inicio, $fecha_fin])
+                    ->where('TES.TXT_ITEM_MOVIMIENTO', 'like', '%PAGO DE PRESTAMOS BANCARIOS%')
+                    ->where('CTB.TXT_DESCRIPCION', 'like', '%INTERESES POR%');
+
+        $registros = $consulta1->unionAll($consulta2)->unionAll($consulta3)->get();
+
+        return  $registros;                             
+    }
 
     private function gn_lista_comision_asociados_atendidos($array,$lote) {
 
@@ -5518,7 +5735,9 @@ trait ComprobanteTraits
                         'ISCHFC0000000012',
                         'ISCHFC0000000027',
                         'ISCHFC0000000036',
-                        'ISCHFC0000000033'
+                        'ISCHFC0000000033',
+                        'ISCHFC0000000037',
+                        'IICHFC0000000037'
                     ])
                     ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
                     ->where('TES.IND_EXTORNO', 0)
@@ -5531,7 +5750,7 @@ trait ComprobanteTraits
                     ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR) // variable pasada desde tu controlador
                     ->get();
 
-
+        //dd($registros);
         return  $registros;                             
     }
 
@@ -5583,7 +5802,8 @@ trait ComprobanteTraits
                 'ISCHFC0000000012',
                 'ISCHFC0000000027',
                 'ISCHFC0000000036',
-                'ISCHFC0000000033'
+                'ISCHFC0000000033',
+                'IICHFC0000000037'
             ])
             ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
             ->where('TES.IND_EXTORNO', 0)
@@ -5647,7 +5867,9 @@ trait ComprobanteTraits
                         'IICHFC0000000012',
                         'ISCHFC0000000012',
                         'ISCHFC0000000027',
-                        'ISCHFC0000000036'
+                        'ISCHFC0000000036',
+                        'ISCHFC0000000033',
+                        'IICHFC0000000037'
                     ])
                     ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
                     ->where('TES.IND_EXTORNO', 0)
@@ -5706,7 +5928,8 @@ trait ComprobanteTraits
                         'ISCHFC0000000012',
                         'ISCHFC0000000027',
                         'ISCHFC0000000036',
-                        'ISCHFC0000000033'
+                        'ISCHFC0000000033',
+                        'IICHFC0000000037'
                     ])
                     ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
                     ->where('TES.IND_EXTORNO', 0)
@@ -5765,7 +5988,8 @@ trait ComprobanteTraits
                         'ISCHFC0000000012',
                         'ISCHFC0000000027',
                         'ISCHFC0000000036',
-                        'ISCHFC0000000033'
+                        'ISCHFC0000000033',
+                        'IICHFC0000000037'
                     ])
                     ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
                     ->where('TES.IND_EXTORNO', 0)

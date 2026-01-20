@@ -24,7 +24,7 @@
     </thead>
     <tbody>
     @foreach($cuentas as $index=>$item)
-        @if($item['IND_REL'] === 'R' AND $item['IND_CP'] === 'P' AND !str_contains($item['TipoDocumento'], 'COMPROBANTE DE RETENCION DE IGV'))
+        @if($item['IND_REL'] === 'R' AND $item['IND_CP'] === 'P' AND str_contains($item['TipoDocumento'], 'COMPROBANTE DE RETENCION DE IGV'))
             <tr>
                 <td>{{$item['NOM_CLIENTE']}}</td>
                 <td>{{substr($item['NRO_CONTRATO'],0,6).'-'.strval(intval(substr($item['NRO_CONTRATO'],6,16)))}}</td>

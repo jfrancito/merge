@@ -49,6 +49,7 @@ use ZipArchive;
 use Hashids;
 use SplFileInfo;
 use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
 
 
 class GestionOCTesoreriaController extends Controller
@@ -699,6 +700,8 @@ class GestionOCTesoreriaController extends Controller
                                 $detalle->PRECIO_ORIG = (float)$itemdet->getmtoPrecioUnitario();
                                 $detalle->save();
                             }
+
+
                             /**********FORMA DE PAGO*********/
                             foreach ($factura->getFormaPago() as $indexfor => $itemfor) {
                                 $fechapago = date_format(date_create($itemfor->getfecha()), 'Ymd');
@@ -728,7 +731,7 @@ class GestionOCTesoreriaController extends Controller
                             $documento_top = $this->gn_lista_comision_asociados_top_terminado($lotes, $idoc);
 
                             /****************************************  VALIDAR SI EL ARCHIVO ESTA ACEPTADO POR SUNAT  *********************************/
-
+                            //dd($documento_top);
 
                             $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('COD_ESTADO', '<>', 'ETM0000000000006')->first();
                             $fechaemision = date_format(date_create($fedocumento->FEC_VENTA), 'd/m/Y');
@@ -1358,6 +1361,37 @@ class GestionOCTesoreriaController extends Controller
                 'ajax' => true,
                 'funcion' => $funcion
             ]);
+    }
+
+
+    public function actionComprobanteMasivoTesoreriaComisionExcel($fecha_inicio,$fecha_fin,$banco_id,$idopcion)
+    {
+        set_time_limit(0);
+
+        $cod_empresa            =   Session::get('usuario')->usuarioosiris_id;
+        $fechadia               =   date_format(date_create(date('d-m-Y')), 'd-m-Y');
+        $fecha_actual           =   date("Y-m-d");
+        $titulo                 =   'Comprobantes-Comision-Faltantes-Integrar';
+        $funcion                =   $this;
+
+        if($banco_id == 'TODO'){
+            $listadatos             =   $this->gn_lista_comision_todo($fecha_inicio, $fecha_fin, $banco_id);
+        }else{
+            $listadatos             =   $this->gn_lista_comision($fecha_inicio, $fecha_fin, $banco_id);
+        }
+
+
+
+
+        Excel::create($titulo.'-('.$fecha_actual.')', function($excel) use ($listadatos,$titulo,$funcion) {
+            $excel->sheet('COMPROBANTE', function($sheet) use ($listadatos,$titulo,$funcion) {
+                $sheet->loadView('reporte/excel/listacomprobantemasivotesoreriacomision')->with('listadatos',$listadatos)
+                                                                   ->with('titulo',$titulo)
+                                                                   ->with('funcion',$funcion);                                               
+            });
+        })->export('xls');
+
+
     }
 
 

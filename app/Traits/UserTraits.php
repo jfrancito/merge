@@ -805,7 +805,7 @@ trait UserTraits
                             ->leftJoin('users as uconta', 'uconta.id', '=', 'FE_DOCUMENTO.usuario_pr')
                             ->leftJoin('users as uadmin', 'uadmin.id', '=', 'FE_DOCUMENTO.usuario_ap')
                             ->select('FE_DOCUMENTO.*','CMP.ORDEN.*','users.*','STD.TRABAJADOR.*','uconta.nombre as nombreconta','uadmin.nombre as nombreadmin')
-                            ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
+                            //->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
                             ->where(function($q) {
                                 $q->whereNull('IND_EMAIL_APROBADO_ADMIN')
                                   ->orWhere('IND_EMAIL_APROBADO_ADMIN', 0);
@@ -962,9 +962,7 @@ trait UserTraits
                 }
             });
 
-
-            FeDocumento::whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
-                        ->where(function($q) {
+            FeDocumento::where(function($q) {
                             $q->whereNull('IND_EMAIL_APROBADO_ADMIN')
                               ->orWhere('IND_EMAIL_APROBADO_ADMIN', 0);
                         })

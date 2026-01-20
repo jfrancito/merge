@@ -141,6 +141,7 @@ $(document).ready(function(){
         var idopcion                =   $('#idopcion').val();
         var prefijo_id              =   $('#prefijo_id').val();
         var orden_id                =   $('#orden_id').val();
+        debugger;
         data                        =   {
                                             _token                  : _token,
                                             prefijo_id              : prefijo_id,

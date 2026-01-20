@@ -1,7 +1,6 @@
 @extends('template_lateral')
 @section('style')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.min.css" crossorigin="anonymous">
-
         <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/datatables/css/dataTables.bootstrap.min.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/datatables/css/responsive.dataTables.min.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/datetimepicker/css/bootstrap-datetimepicker.min.css') }} "/>
@@ -27,16 +26,10 @@
         </div>
     </div>
     @include('comprobante.modal.mregistrorequerimiento')
-
-    
-
+    @include('usuario.modal.musuario')
 </div>
-
-
 @stop
-
 @section('script')
-
 
   <script src="{{ asset('public/js/general/inputmask/inputmask.js') }}" type="text/javascript"></script> 
   <script src="{{ asset('public/js/general/inputmask/inputmask.extensions.js') }}" type="text/javascript"></script> 

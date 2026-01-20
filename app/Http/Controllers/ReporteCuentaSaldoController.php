@@ -169,6 +169,22 @@ class ReporteCuentaSaldoController extends Controller
                     ->with('funcion', $funcion)
                     ->with('cuentas', $cuentas);
             });
+            $excel->sheet('CxP Retenciones', function ($sheet) use ($cuentas, $funcion) {
+                $sheet->setStyle(array(
+                    'font' => array(
+                        'name'      =>  'Calibri',
+                        'size'      =>  9
+                    )
+                ));
+                $sheet->setColumnFormat(array(
+                    'M:O' => '#,##0.00',
+                    'D' => '#,##0.00',
+                    'E' => NumberFormat::FORMAT_DATE_YYYYMMDD
+                ));
+                $sheet->loadView('reporte/administracion/excel/listacuentaspagarrelacionadasretenciones')
+                    ->with('funcion', $funcion)
+                    ->with('cuentas', $cuentas);
+            });
         })->export('xlsx');
     }
 }

@@ -80,7 +80,7 @@ class UserController extends Controller {
 
 	public function actionAjaxModalConfiguracionCuentaBancariaContrato(Request $request)
 	{
-
+        //dd($request);
         $prefijo_id             =   $request['prefijo_id'];
         $orden_id               =   $request['orden_id'];
         $idopcion               =   $request['idopcion'];
@@ -1449,11 +1449,12 @@ class UserController extends Controller {
 											->orderBy('web.grupoopciones.orden', 'asc')
 											->get();
 
+
 					$listaopciones    	= 	WEBRolOpcion::join('web.opciones', 'web.rolopciones.opcion_id', '=', 'web.opciones.id')
 											->where('web.opciones.ind_merge', '=', 1)
 											->where('rol_id', '=', $tusuario->rol_id)
 											->where('ver', '=', 1)
-											->orderBy('orden', 'asc')
+											->orderBy('WEB.rolopciones.orden', 'asc')
 											->pluck('opcion_id')
 											->toArray();
 
