@@ -11,9 +11,9 @@
       <th>TOTAL</th>
       <th>USUARIO CREACION</th>
       <th>ESTADO</th>
-      <th>ESTADO FIRMA</th>
+    {{--  <th>ESTADO FIRMA</th> --}}
       <th>OPCION</th>
-      <th>PDF</th>
+    {{--  <th>PDF</th> --}}
     </tr>
   </thead>
   <tbody>
