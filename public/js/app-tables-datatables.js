@@ -28,7 +28,7 @@ var App = (function () {
             }]
         });
 
-        $("#nsovale").dataTable({
+        $("#nsovales").dataTable({
             dom: 'Bfrtip',
             buttons: [
                 'csv', 'excel', 'pdf'

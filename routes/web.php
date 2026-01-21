@@ -907,6 +907,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	//GESTION LISTA VALE A RENDIR ADMINISTRACION
 	Route::any('/gestion-de-vale-rendir-administracion/{idopcion}', 'GestionValeRendirController@actionListarValeRendir');
 	Route::any('/ajax-buscar-documento-vl', 'GestionValeRendirController@actionListarAjaxBuscarDocumentoVL');
+	Route::get('/descargar-excel-vl','GestionValeRendirController@actionExportarExcelVL');
+
 	Route::post('/ver_detalle_importe_vale_gestion', 'GestionValeRendirController@actionVerDetalleValeImporte');
 	Route::post('/ver_detalle_vale_gestion', 'GestionValeRendirController@actionVerDetalleVale');
 	Route::post('/aum_detalle_importe_vale_gestion', 'GestionValeRendirController@actionVAumDetalleValeImporte');

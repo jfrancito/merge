@@ -24,7 +24,8 @@
                 ($perfil_administracion == '1CIX00000006' && $trabajadorCentro) ||
                 ($perfil_administracion == '1CIX00000043' && $trabajadorCentro) ||
                 ($perfil_administracion == '1CIX00000044' && $trabajadorCentro) ||
-                ($perfil_administracion == '1CIX00000031' && $trabajadorCentro)
+                ($perfil_administracion == '1CIX00000031' && $trabajadorCentro) ||
+                ($perfil_administracion == '1CIX00000002' && $trabajadorCentro)
 
             )
         )
