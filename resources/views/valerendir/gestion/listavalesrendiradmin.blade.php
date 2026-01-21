@@ -23,6 +23,7 @@
                             <span class="tooltiptext">Buscar Documento</span>
                             <span class="icon mdi mdi-search"></span>
                           </a>
+                          
 
                           <span class="icon mdi mdi-more-vert dropdown-toggle" id="menudespacho"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"></span>
@@ -42,7 +43,9 @@
                               </li>
                           </ul>
                       </div>
+
                   </div>
+
 
 
 
