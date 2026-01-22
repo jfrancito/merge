@@ -4488,6 +4488,7 @@ class GestionOCContabilidadController extends Controller
         }
         else{
 
+            $ordencompra            =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$idoc)->first();
             //lectura del cdr
             $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);
             $lecturacdr             =   $this->lectura_cdr_archivo($idoc,$this->pathFiles,$prefijocarperta,$ordencompra->NRO_DOCUMENTO_CLIENTE);
@@ -5437,28 +5438,12 @@ class GestionOCContabilidadController extends Controller
                             'COD_ESTADO' => '0'
                         ]);
 
-                //LE LLEGA AL USUARIO DE CONTACTO
-                // $empresa_anti       =   STDEmpresa::where('NRO_DOCUMENTO','=',$fedocumento->RUC_PROVEEDOR)->first();
-                // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
-                // $mensaje            =   'COMPROBANTE REPARABLE: '.$fedocumento->ID_DOCUMENTO
-                //                         .'%0D%0A'.'EMPRESA : '.Session::get('empresas')->NOM_EMPR.'%0D%0A'
-                //                         .'PROVEEDOR : '.$empresa_anti->NOM_EMPR.'%0D%0A'
-                //                         .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
-                //                         .'MENSAJE : '.$descripcion.'%0D%0A';
-                // //dd($trabajador);
-                // if(1==0){
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                // }else{
-                //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
-                // }
-
                 DB::commit();
-                Session::flash('operacion_id', 'CONTRATO');
+                Session::flash('operacion_id', $request['operacion_id']);
                 return Redirect::to('/gestion-de-contabilidad-aprobar/' . $idopcion)->with('bienhecho', 'Comprobante : ' . $idoc . ' EXTORNADO CON EXITO');
             } catch (\Exception $ex) {
                 DB::rollback();
-                Session::flash('operacion_id', 'CONTRATO');
+                Session::flash('operacion_id', $request['operacion_id']);
 
                 return Redirect::to('gestion-de-contabilidad-aprobar/' . $idopcion)->with('errorbd', $ex . ' Ocurrio un error inesperado');
             }
@@ -7258,8 +7243,6 @@ class GestionOCContabilidadController extends Controller
             }
 
             $empresa_doc_asiento_aux = STDEmpresa::where('COD_ESTADO', '=', 1)->where('COD_EMPR', '=', $empresa_asiento)->first();
-//            $tipo_doc_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_documento_asiento)->first();
-//            $tipo_doc_ref_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $tipo_documento_ref)->first();
             $tipo_doc_asiento_aux = STDTipoDocumento::where('COD_TIPO_DOCUMENTO', '=', $tipo_documento_asiento)->first();
             $tipo_doc_ref_asiento_aux = STDTipoDocumento::where('COD_TIPO_DOCUMENTO', '=', $tipo_documento_ref)->first();
 
@@ -7341,7 +7324,7 @@ class GestionOCContabilidadController extends Controller
 
                 //GENERACION ASIENTOS
                 if (count($asiento_cabecera_reparable) > 0 and count($asiento_detalle_reparable) > 0) {
-//                DD($asiento_cabecera_compra[0]['COD_CATEGORIA_TIPO_ASIENTO']);
+
                     $cod_tipo_asiento = $asiento_cabecera_reparable[0]['COD_CATEGORIA_TIPO_ASIENTO'];
                     $des_tipo_asiento = $asiento_cabecera_reparable[0]['TXT_CATEGORIA_TIPO_ASIENTO'];
                     $cod_estado_asiento = $asiento_cabecera_reparable[0]['COD_CATEGORIA_ESTADO_ASIENTO'];
@@ -7489,9 +7472,6 @@ class GestionOCContabilidadController extends Controller
                 ->pluck('COD_CATEGORIA_DOCUMENTO')
                 ->toArray();
 
-            //dd($totalarchivos);
-            //dd($documentoscompra);
-
             return View::make('comprobante/reparablecontabilidadcontrato',
                 [
                     'fedocumento' => $fedocumento,
@@ -7513,6 +7493,331 @@ class GestionOCContabilidadController extends Controller
 
 
         }
+    }
+
+
+    public function actionAgregarReparableContabilidadPg($idopcion, $linea, $prefijo, $idordencompra, Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion, 'Modificar');
+        if ($validarurl <> 'true') {
+            return $validarurl;
+        }
+        /******************************************************/
+        $idoc = $this->funciones->decodificarmaestraprefijo_contrato($idordencompra, $prefijo);
+        $ordencompra = $this->con_lista_cabecera_comprobante_contrato_idoc_actual($idoc);
+        $detalleordencompra = $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
+        $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)->first();
+        $detallefedocumento = FeDetalleDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)->get();
+        View::share('titulo', 'Reparable Comprobante');
+
+        if ($_POST) {
+
+            try {
+
+                DB::beginTransaction();
+                $pedido_id = $idoc;
+                $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $pedido_id)->where('DOCUMENTO_ITEM', '=', $linea)->first();
+                $descripcion = $request['descripcion'];
+                $archivoob = $request['archivore'];
+                $reparable = $request['reparable'];
+                $archivofi = $request['archivofi'];
+
+
+                if ($fedocumento->IND_REPARABLE == 1) {
+                    DB::rollback();
+                    return Redirect::back()->with('errorurl', 'El documento ya esta reparado no se puede reparar');
+                }
+
+                if (count($archivoob) <= 0) {
+                    DB::rollback();
+                    return Redirect::to('aprobar-comprobante-contabilidad/' . $idopcion . '/' . $linea . '/' . $prefijo . '/' . $idordencompra)->with('errorbd', 'Tiene que seleccionar almenos un item');
+                }
+
+
+                $modohibrido = '';
+                $reparable_ori = $reparable;
+                if($reparable == 'ARCHIVO_VIRTUAL_FISICO'){
+                    $reparable = 'ARCHIVO_VIRTUAL';
+                }
+
+                foreach ($archivoob as $index => $item) {
+                    $categoria = CMPCategoria::where('COD_CATEGORIA', '=', $item)->first();
+                    $tipo_doc = $categoria->CODIGO_SUNAT;
+                    if($reparable_ori == 'ARCHIVO_VIRTUAL_FISICO'){
+                            $tipo_doc = 'F';
+                            $modohibrido = 'ARCHIVO_FISICO';                      
+                    }
+
+                    $docasociar = new CMPDocAsociarCompra;
+                    $docasociar->COD_ORDEN = $idoc;
+                    $docasociar->COD_CATEGORIA_DOCUMENTO = $categoria->COD_CATEGORIA;
+                    $docasociar->NOM_CATEGORIA_DOCUMENTO = $categoria->NOM_CATEGORIA;
+                    $docasociar->IND_OBLIGATORIO = 0;
+                    $docasociar->TXT_FORMATO = $categoria->COD_CTBLE;
+                    $docasociar->TXT_ASIGNADO = $reparable;
+                    $docasociar->COD_USUARIO_CREA_AUD = Session::get('usuario')->id;
+                    $docasociar->FEC_USUARIO_CREA_AUD = $this->fechaactual;
+                    $docasociar->COD_ESTADO = 1;
+                    $docasociar->TIP_DOC = $tipo_doc;
+                    $docasociar->save();
+                }
+
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento = new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO = $fedocumento->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM = $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA = $this->fechaactual;
+                $documento->USUARIO_ID = Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+                $documento->TIPO = 'DOCUMENTO ' . $reparable;
+                $documento->MENSAJE = $descripcion;
+                $documento->save();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'DOCUMENTO ' . $reparable);
+
+                FeDocumento::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
+                    ->update(
+                        [
+                            'IND_REPARABLE' => 1,
+                            'MODO_REPARABLE' => $reparable,
+                            'TXT_REPARABLE' => 'REPARABLE',
+                            'MODO_REPARABLE_HIBRIDO' => $modohibrido
+                        ]
+                    );
+
+                DB::commit();
+                Session::flash('operacion_id', 'PROVISION_GASTO');
+
+                return Redirect::to('/gestion-de-contabilidad-aprobar/' . $idopcion)->with('bienhecho', 'Comprobante : ' . $fedocumento->ID_DOCUMENTO . ' REPARABLE CON EXITO');
+            } catch (\Exception $ex) {
+                DB::rollback();
+                Session::flash('operacion_id', 'PROVISION_GASTO');
+
+                return Redirect::to('gestion-de-contabilidad-aprobar/' . $idopcion)->with('errorbd', $ex . ' Ocurrio un error inesperado');
+            }
+
+
+        } 
+    }
+
+    public function actionAgregarReparableContabilidadNC($idopcion, $linea, $prefijo, $idordencompra, Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion, 'Modificar');
+        if ($validarurl <> 'true') {
+            return $validarurl;
+        }
+        /******************************************************/
+        $idoc = $this->funciones->decodificarmaestraprefijo_contrato($idordencompra, $prefijo);
+        $ordencompra = $this->con_lista_cabecera_comprobante_contrato_idoc_actual($idoc);
+        $detalleordencompra = $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
+        $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)->first();
+        $detallefedocumento = FeDetalleDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)->get();
+        View::share('titulo', 'Reparable Comprobante');
+
+        if ($_POST) {
+
+            try {
+
+                DB::beginTransaction();
+                $pedido_id = $idoc;
+                $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $pedido_id)->where('DOCUMENTO_ITEM', '=', $linea)->first();
+                $descripcion = $request['descripcion'];
+                $archivoob = $request['archivore'];
+                $reparable = $request['reparable'];
+                $archivofi = $request['archivofi'];
+
+
+                if ($fedocumento->IND_REPARABLE == 1) {
+                    DB::rollback();
+                    return Redirect::back()->with('errorurl', 'El documento ya esta reparado no se puede reparar');
+                }
+
+                if (count($archivoob) <= 0) {
+                    DB::rollback();
+                    return Redirect::to('aprobar-comprobante-contabilidad/' . $idopcion . '/' . $linea . '/' . $prefijo . '/' . $idordencompra)->with('errorbd', 'Tiene que seleccionar almenos un item');
+                }
+
+
+                $modohibrido = '';
+                $reparable_ori = $reparable;
+                if($reparable == 'ARCHIVO_VIRTUAL_FISICO'){
+                    $reparable = 'ARCHIVO_VIRTUAL';
+                }
+
+                foreach ($archivoob as $index => $item) {
+                    $categoria = CMPCategoria::where('COD_CATEGORIA', '=', $item)->first();
+                    $tipo_doc = $categoria->CODIGO_SUNAT;
+                    if($reparable_ori == 'ARCHIVO_VIRTUAL_FISICO'){
+                            $tipo_doc = 'F';
+                            $modohibrido = 'ARCHIVO_FISICO';                      
+                    }
+
+                    $docasociar = new CMPDocAsociarCompra;
+                    $docasociar->COD_ORDEN = $idoc;
+                    $docasociar->COD_CATEGORIA_DOCUMENTO = $categoria->COD_CATEGORIA;
+                    $docasociar->NOM_CATEGORIA_DOCUMENTO = $categoria->NOM_CATEGORIA;
+                    $docasociar->IND_OBLIGATORIO = 0;
+                    $docasociar->TXT_FORMATO = $categoria->COD_CTBLE;
+                    $docasociar->TXT_ASIGNADO = $reparable;
+                    $docasociar->COD_USUARIO_CREA_AUD = Session::get('usuario')->id;
+                    $docasociar->FEC_USUARIO_CREA_AUD = $this->fechaactual;
+                    $docasociar->COD_ESTADO = 1;
+                    $docasociar->TIP_DOC = $tipo_doc;
+                    $docasociar->save();
+                }
+
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento = new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO = $fedocumento->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM = $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA = $this->fechaactual;
+                $documento->USUARIO_ID = Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+                $documento->TIPO = 'DOCUMENTO ' . $reparable;
+                $documento->MENSAJE = $descripcion;
+                $documento->save();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'DOCUMENTO ' . $reparable);
+
+                FeDocumento::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
+                    ->update(
+                        [
+                            'IND_REPARABLE' => 1,
+                            'MODO_REPARABLE' => $reparable,
+                            'TXT_REPARABLE' => 'REPARABLE',
+                            'MODO_REPARABLE_HIBRIDO' => $modohibrido
+                        ]
+                    );
+
+                DB::commit();
+                Session::flash('operacion_id', 'NOTA_CREDITO');
+
+                return Redirect::to('/gestion-de-contabilidad-aprobar/' . $idopcion)->with('bienhecho', 'Comprobante : ' . $fedocumento->ID_DOCUMENTO . ' REPARABLE CON EXITO');
+            } catch (\Exception $ex) {
+                DB::rollback();
+                Session::flash('operacion_id', 'NOTA_CREDITO');
+
+                return Redirect::to('gestion-de-contabilidad-aprobar/' . $idopcion)->with('errorbd', $ex . ' Ocurrio un error inesperado');
+            }
+
+
+        } 
+    }
+
+    public function actionAgregarReparableContabilidadND($idopcion, $linea, $prefijo, $idordencompra, Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion, 'Modificar');
+        if ($validarurl <> 'true') {
+            return $validarurl;
+        }
+        /******************************************************/
+        $idoc = $this->funciones->decodificarmaestraprefijo_contrato($idordencompra, $prefijo);
+        $ordencompra = $this->con_lista_cabecera_comprobante_contrato_idoc_actual($idoc);
+        $detalleordencompra = $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
+        $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)->first();
+        $detallefedocumento = FeDetalleDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)->get();
+        View::share('titulo', 'Reparable Comprobante');
+
+        if ($_POST) {
+
+            try {
+
+                DB::beginTransaction();
+                $pedido_id = $idoc;
+                $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $pedido_id)->where('DOCUMENTO_ITEM', '=', $linea)->first();
+                $descripcion = $request['descripcion'];
+                $archivoob = $request['archivore'];
+                $reparable = $request['reparable'];
+                $archivofi = $request['archivofi'];
+
+
+                if ($fedocumento->IND_REPARABLE == 1) {
+                    DB::rollback();
+                    return Redirect::back()->with('errorurl', 'El documento ya esta reparado no se puede reparar');
+                }
+
+                if (count($archivoob) <= 0) {
+                    DB::rollback();
+                    return Redirect::to('aprobar-comprobante-contabilidad/' . $idopcion . '/' . $linea . '/' . $prefijo . '/' . $idordencompra)->with('errorbd', 'Tiene que seleccionar almenos un item');
+                }
+
+
+                $modohibrido = '';
+                $reparable_ori = $reparable;
+                if($reparable == 'ARCHIVO_VIRTUAL_FISICO'){
+                    $reparable = 'ARCHIVO_VIRTUAL';
+                }
+
+                foreach ($archivoob as $index => $item) {
+                    $categoria = CMPCategoria::where('COD_CATEGORIA', '=', $item)->first();
+                    $tipo_doc = $categoria->CODIGO_SUNAT;
+                    if($reparable_ori == 'ARCHIVO_VIRTUAL_FISICO'){
+                            $tipo_doc = 'F';
+                            $modohibrido = 'ARCHIVO_FISICO';                      
+                    }
+
+                    $docasociar = new CMPDocAsociarCompra;
+                    $docasociar->COD_ORDEN = $idoc;
+                    $docasociar->COD_CATEGORIA_DOCUMENTO = $categoria->COD_CATEGORIA;
+                    $docasociar->NOM_CATEGORIA_DOCUMENTO = $categoria->NOM_CATEGORIA;
+                    $docasociar->IND_OBLIGATORIO = 0;
+                    $docasociar->TXT_FORMATO = $categoria->COD_CTBLE;
+                    $docasociar->TXT_ASIGNADO = $reparable;
+                    $docasociar->COD_USUARIO_CREA_AUD = Session::get('usuario')->id;
+                    $docasociar->FEC_USUARIO_CREA_AUD = $this->fechaactual;
+                    $docasociar->COD_ESTADO = 1;
+                    $docasociar->TIP_DOC = $tipo_doc;
+                    $docasociar->save();
+                }
+
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento = new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO = $fedocumento->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM = $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA = $this->fechaactual;
+                $documento->USUARIO_ID = Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+                $documento->TIPO = 'DOCUMENTO ' . $reparable;
+                $documento->MENSAJE = $descripcion;
+                $documento->save();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'DOCUMENTO ' . $reparable);
+
+                FeDocumento::where('ID_DOCUMENTO', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)
+                    ->update(
+                        [
+                            'IND_REPARABLE' => 1,
+                            'MODO_REPARABLE' => $reparable,
+                            'TXT_REPARABLE' => 'REPARABLE',
+                            'MODO_REPARABLE_HIBRIDO' => $modohibrido
+                        ]
+                    );
+
+                DB::commit();
+                Session::flash('operacion_id', 'NOTA_DEBITO');
+
+                return Redirect::to('/gestion-de-contabilidad-aprobar/' . $idopcion)->with('bienhecho', 'Comprobante : ' . $fedocumento->ID_DOCUMENTO . ' REPARABLE CON EXITO');
+            } catch (\Exception $ex) {
+                DB::rollback();
+                Session::flash('operacion_id', 'NOTA_DEBITO');
+
+                return Redirect::to('gestion-de-contabilidad-aprobar/' . $idopcion)->with('errorbd', $ex . ' Ocurrio un error inesperado');
+            }
+
+
+        } 
     }
 
     public function actionAgregarRecomendacionContabilidad($idopcion, $linea, $prefijo, $idordencompra, Request $request)

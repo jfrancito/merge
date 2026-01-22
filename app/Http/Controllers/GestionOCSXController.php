@@ -439,17 +439,9 @@ class GestionOCSXController extends Controller
         $combocb                =   array('' => "Seleccione Cuenta Bancaria");
         $user_orden             =   User::where('usuarioosiris_id','=',$ordencompra->COD_EMPR_CLIENTE)->first();
         $empresa                =   STDEmpresa::where('COD_EMPR','=',$ordencompra_f->COD_EMPR_CLIENTE)->first();
-
-
-        //dd($ordencompra);
-
         $combotipodetraccion    =   array('' => "Seleccione Tipo Detraccion",'MONTO_REFERENCIAL' => 'MONTO REFERENCIAL' , 'MONTO_FACTURACION' => 'MONTO FACTURACION');
         $combopagodetraccion    =   array('' => "Seleccione Pago Detraccion",$ordencompra_f->COD_EMPR_CLIENTE => $ordencompra_f->TXT_EMPR_CLIENTE , $ordencompra->COD_EMPR => $ordencompra->NOM_EMPR);
-
-        //dd($combopagodetraccion);
-
         $fedocumento_x          =   FeDocumento::where('TXT_REFERENCIA','=',$idoc)->first();
-
 
         //ANTICIPO
         $COD_EMPR               =   Session::get('empresas')->COD_EMPR;

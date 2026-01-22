@@ -334,7 +334,11 @@ class GestionUsuarioContactoController extends Controller
                                         'ESTIBA' => 'ESTIBA',
                                         'DOCUMENTO_INTERNO_PRODUCCION' => 'DOCUMENTO INTERNO PRODUCCION',
                                         'DOCUMENTO_INTERNO_SECADO' => 'DOCUMENTO INTERNO SECADO',
-                                        'DOCUMENTO_SERVICIO_BALANZA' => 'DOCUMENTO POR SERVICIO DE BALANZA'
+                                        'DOCUMENTO_SERVICIO_BALANZA' => 'DOCUMENTO POR SERVICIO DE BALANZA',
+                                        'PROVISION_GASTO'               => 'PROVISION DE GASTO',
+                                        'NOTA_CREDITO'                  => 'NOTA DE CREDITO',
+                                        'NOTA_DEBITO'                   => 'NOTA DE DEBITO'
+
                                     );
 
         $tipoarchivo_id     =   'TODO';

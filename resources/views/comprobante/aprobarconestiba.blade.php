@@ -89,7 +89,7 @@
                                                   class="form-horizontal group-border-dashed"
                                                   enctype="multipart/form-data">
                                                 {{ csrf_field() }}
-<input type="hidden" name="device_info" id='device_info'>
+                                                <input type="hidden" name="device_info" id='device_info'>
 
                                                 <input type="hidden" name="operacion_id" id="operacion_id"
                                                        value="{{$fedocumento->OPERACION}}">
@@ -108,12 +108,12 @@
                                                   action="{{ url('/agregar-observacion-contabilidad-estiba/'.$idopcion.'/'.$lote) }}"
                                                   style="border-radius: 0px;"
                                                   class="form-horizontal group-border-dashed">
-                                                {{ csrf_field() }}
-<input type="hidden" name="device_info" id='device_info'>
+                                                    {{ csrf_field() }}
+                                                    <input type="hidden" name="device_info" id='device_info'>
 
-                                                <input type="hidden" name="operacion_id" id="operacion_id"
+                                                    <input type="hidden" name="operacion_id" id="operacion_id"
                                                        value="{{$fedocumento->OPERACION}}">
-                                                @include('comprobante.form.formobservarestiba')
+                                                    @include('comprobante.form.formobservarestiba')
                                             </form>
                                         </div>
                                     </div>
@@ -152,7 +152,7 @@
                                                   style="border-radius: 0px;"
                                                   class="form-horizontal group-border-dashed">
                                                 {{ csrf_field() }}
-<input type="hidden" name="device_info" id='device_info'>
+                                                <input type="hidden" name="device_info" id='device_info'>
 
                                                 <input type="hidden" name="operacion_id" id="operacion_id"
                                                        value="{{$fedocumento->OPERACION}}">

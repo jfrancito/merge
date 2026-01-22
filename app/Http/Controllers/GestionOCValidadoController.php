@@ -837,11 +837,13 @@ class GestionOCValidadoController extends Controller
 
         $idoc                   =   $this->funciones->decodificarmaestraprefijo_contrato($idordencompra,$prefijo);
         $ordencompra            =   $this->con_lista_cabecera_comprobante_pg_idoc($idoc);
+        $ordencompra            =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$idoc)->first();
+
         $detalleordencompra     =   $this->con_lista_detalle_pg_comprobante_idoc($idoc);
 
         $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
         $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
-
+        //dd($ordencompra);
         $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);
 
         $xmlarchivo             =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE.'\\'.$fedocumento->ARCHIVO_XML;
