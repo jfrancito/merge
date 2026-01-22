@@ -28,7 +28,7 @@ var App = (function () {
             }]
         });
 
-        $("#nsovale").dataTable({
+        $("#nsovales").dataTable({
             dom: 'Bfrtip',
             buttons: [
                 'csv', 'excel', 'pdf'
@@ -76,7 +76,7 @@ var App = (function () {
                 sortable: false
             }]
         });
-        
+
 
         $("#nso_obs").dataTable({
             dom: 'Bfrtip',
@@ -343,7 +343,25 @@ var App = (function () {
             ordering: false,
         });
 
+        $("#cxptb").dataTable({
+            responsive: true,
+            autoWidth: true,
+            lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+            scrollX: true,
+            scrollY: "300px",
+            ordering: false,
+        });
+
         $("#cxpr").dataTable({
+            responsive: true,
+            autoWidth: true,
+            lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+            scrollX: true,
+            scrollY: "300px",
+            ordering: false,
+        });
+
+        $("#cxprr").dataTable({
             responsive: true,
             autoWidth: true,
             lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
@@ -483,7 +501,7 @@ var App = (function () {
             });
         }
 
-        
+
         $("#valeaprobado").dataTable({
             responsive: true,
             autoWidth: true,

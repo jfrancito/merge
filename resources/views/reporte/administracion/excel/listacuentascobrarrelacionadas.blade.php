@@ -34,7 +34,7 @@
             <th class="center tablaho">FECHA DOCUMENTO</th>
             <th class="center tablaho">TIPO DOCUMENTO</th>
             <th class="center tablaho">NUMERO DOCUMENTO</th>
-            <th class="center tablaho">FACTURAS RELACIONADAS</th>
+            <th class="center tablaho">FACTURAS</th>
             <th class="center tablaho">DIAS TRANSCURRIDOS</th>
             <th class="center tablaho">MONEDA</th>
             <th class="center tablaho">JEFE VENTA</th>

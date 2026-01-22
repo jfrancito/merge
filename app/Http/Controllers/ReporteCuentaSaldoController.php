@@ -120,6 +120,21 @@ class ReporteCuentaSaldoController extends Controller
                 $sheet->loadView('reporte/administracion/excel/listacuentascobrarterceros')
                     ->with('funcion', $funcion)
                     ->with('cuentas', $cuentas);
+                $sheet->setWidth('A', 30);
+                $sheet->setWidth('B', 15);
+                $sheet->setWidth('C', 15);
+                $sheet->setWidth('D', 15);
+                $sheet->setWidth('E', 15);
+                $sheet->setWidth('F', 30);
+                $sheet->setWidth('G', 25);
+                $sheet->setWidth('H', 25);
+                $sheet->setWidth('I', 15);
+                $sheet->setWidth('J', 10);
+                $sheet->setWidth('K', 30);
+                $sheet->setWidth('L', 25);
+                $sheet->setWidth('M', 25);
+                $sheet->setWidth('N', 25);
+                $sheet->setWidth('O', 25);
             });
             $excel->sheet('CxC Relacionadas', function ($sheet) use ($cuentas, $funcion) {
                 $sheet->setStyle(array(
@@ -136,6 +151,21 @@ class ReporteCuentaSaldoController extends Controller
                 $sheet->loadView('reporte/administracion/excel/listacuentascobrarrelacionadas')
                     ->with('funcion', $funcion)
                     ->with('cuentas', $cuentas);
+                $sheet->setWidth('A', 30);
+                $sheet->setWidth('B', 15);
+                $sheet->setWidth('C', 15);
+                $sheet->setWidth('D', 15);
+                $sheet->setWidth('E', 15);
+                $sheet->setWidth('F', 30);
+                $sheet->setWidth('G', 25);
+                $sheet->setWidth('H', 25);
+                $sheet->setWidth('I', 15);
+                $sheet->setWidth('J', 10);
+                $sheet->setWidth('K', 30);
+                $sheet->setWidth('L', 25);
+                $sheet->setWidth('M', 25);
+                $sheet->setWidth('N', 25);
+                $sheet->setWidth('O', 25);
             });
             $excel->sheet('CxP Terceros', function ($sheet) use ($cuentas, $funcion) {
                 $sheet->setStyle(array(
@@ -152,6 +182,21 @@ class ReporteCuentaSaldoController extends Controller
                 $sheet->loadView('reporte/administracion/excel/listacuentaspagarterceros')
                     ->with('funcion', $funcion)
                     ->with('cuentas', $cuentas);
+                $sheet->setWidth('A', 30);
+                $sheet->setWidth('B', 15);
+                $sheet->setWidth('C', 15);
+                $sheet->setWidth('D', 15);
+                $sheet->setWidth('E', 15);
+                $sheet->setWidth('F', 30);
+                $sheet->setWidth('G', 25);
+                $sheet->setWidth('H', 25);
+                $sheet->setWidth('I', 15);
+                $sheet->setWidth('J', 10);
+                $sheet->setWidth('K', 30);
+                $sheet->setWidth('L', 25);
+                $sheet->setWidth('M', 25);
+                $sheet->setWidth('N', 25);
+                $sheet->setWidth('O', 25);
             });
             $excel->sheet('CxP Relacionadas', function ($sheet) use ($cuentas, $funcion) {
                 $sheet->setStyle(array(
@@ -168,6 +213,21 @@ class ReporteCuentaSaldoController extends Controller
                 $sheet->loadView('reporte/administracion/excel/listacuentaspagarrelacionadas')
                     ->with('funcion', $funcion)
                     ->with('cuentas', $cuentas);
+                $sheet->setWidth('A', 30);
+                $sheet->setWidth('B', 15);
+                $sheet->setWidth('C', 15);
+                $sheet->setWidth('D', 15);
+                $sheet->setWidth('E', 15);
+                $sheet->setWidth('F', 30);
+                $sheet->setWidth('G', 25);
+                $sheet->setWidth('H', 25);
+                $sheet->setWidth('I', 15);
+                $sheet->setWidth('J', 10);
+                $sheet->setWidth('K', 30);
+                $sheet->setWidth('L', 25);
+                $sheet->setWidth('M', 25);
+                $sheet->setWidth('N', 25);
+                $sheet->setWidth('O', 25);
             });
             $excel->sheet('CxP Retenciones', function ($sheet) use ($cuentas, $funcion) {
                 $sheet->setStyle(array(
@@ -184,6 +244,52 @@ class ReporteCuentaSaldoController extends Controller
                 $sheet->loadView('reporte/administracion/excel/listacuentaspagarrelacionadasretenciones')
                     ->with('funcion', $funcion)
                     ->with('cuentas', $cuentas);
+                $sheet->setWidth('A', 30);
+                $sheet->setWidth('B', 15);
+                $sheet->setWidth('C', 15);
+                $sheet->setWidth('D', 15);
+                $sheet->setWidth('E', 15);
+                $sheet->setWidth('F', 30);
+                $sheet->setWidth('G', 25);
+                $sheet->setWidth('H', 25);
+                $sheet->setWidth('I', 15);
+                $sheet->setWidth('J', 10);
+                $sheet->setWidth('K', 30);
+                $sheet->setWidth('L', 25);
+                $sheet->setWidth('M', 25);
+                $sheet->setWidth('N', 25);
+                $sheet->setWidth('O', 25);
+            });
+            $excel->sheet('CxP Bancos', function ($sheet) use ($cuentas, $funcion) {
+                $sheet->setStyle(array(
+                    'font' => array(
+                        'name'      =>  'Calibri',
+                        'size'      =>  9
+                    )
+                ));
+                $sheet->setColumnFormat(array(
+                    'M:O' => '#,##0.00',
+                    'D' => '#,##0.00',
+                    'E' => NumberFormat::FORMAT_DATE_YYYYMMDD
+                ));
+                $sheet->loadView('reporte/administracion/excel/listacuentaspagartercerosbancos')
+                    ->with('funcion', $funcion)
+                    ->with('cuentas', $cuentas);
+                $sheet->setWidth('A', 30);
+                $sheet->setWidth('B', 15);
+                $sheet->setWidth('C', 15);
+                $sheet->setWidth('D', 15);
+                $sheet->setWidth('E', 15);
+                $sheet->setWidth('F', 30);
+                $sheet->setWidth('G', 25);
+                $sheet->setWidth('H', 25);
+                $sheet->setWidth('I', 15);
+                $sheet->setWidth('J', 10);
+                $sheet->setWidth('K', 30);
+                $sheet->setWidth('L', 25);
+                $sheet->setWidth('M', 25);
+                $sheet->setWidth('N', 25);
+                $sheet->setWidth('O', 25);
             });
         })->export('xlsx');
     }
