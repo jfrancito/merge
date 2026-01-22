@@ -41,7 +41,7 @@
 					    </tr>
 					    <tr>
 					      <td class="primertab"><b>FECHA EMISION</b></td>
-					      <td><b> : </b>{{date_format(date_create($feplanillaentrega->FEC_EMISION), 'd/m/Y h:i:s')}}</td>
+					      <td><b> : </b>{{date_format(date_create($feplanillaentrega->FEC_EMISION), 'd/m/Y')}}</td>
 					    </tr>
 						<tr>
 					      <td class="primertab"><b>DNI</b></td>
