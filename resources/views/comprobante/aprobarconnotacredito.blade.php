@@ -20,7 +20,8 @@
             <div class="tab-container">
               <ul class="nav nav-tabs">
                 <li class="active"><a href="#aprobar" data-toggle="tab"><b>APROBAR y RECOMENDAR</b></a></li>
-                <li><a href="#observar" data-toggle="tab"><b>OBSERVAR</b></a></li>                
+                <li><a href="#observar" data-toggle="tab"><b>OBSERVAR</b></a></li>
+                <li><a href="#reparable" data-toggle="tab"><b>REPARABLE</b></a></li>                
                 <li><a href="#rechazar" data-toggle="tab"><b>EXTORNAR</b></a></li>
               </ul>
               <div class="tab-content">
@@ -50,6 +51,25 @@
                     </div>
                   </div>
                 </div>
+
+                <div id="reparable" class="tab-pane">
+                    <div class="panel panel-default panel-border-color panel-border-color-primary">
+                        <div class="panel-heading panel-heading-divider">Reparable<span
+                                    class="panel-subtitle">Reparar un Comprobante</span></div>
+                        <div class="panel-body">
+                            <form method="POST" id='formpedidoreparable'
+                                  action="{{ url('/agregar-reparable-contabilidad-nc/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,7).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -9))) }}"
+                                  style="border-radius: 0px;"
+                                  class="form-horizontal group-border-dashed">
+                                {{ csrf_field() }}
+                                <input type="hidden" name="device_info" id='device_info'>
+
+                                @include('comprobante.form.formreparablenc')
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
 
                 <div id="rechazar" class="tab-pane">
                   <div class="panel panel-default panel-border-color panel-border-color-primary">

@@ -4,7 +4,7 @@ $(document).ready(function(){
     $(".agestioncomprobante").on('change','.input_asignar', function() {
         var operacion_sel           =   $('#operacion_sel').val();
 
-        if (operacion_sel === 'DOCUMENTO_INTERNO_COMPRA') {
+        if (operacion_sel === 'DOCUMENTO_INTERNO_COMPRA' || operacion_sel === 'ORDEN_COMPRA_ANTICIPO') {
 
             // Permitir solo uno seleccionado
             if ($(this).is(":checked")) {
@@ -217,8 +217,8 @@ $(document).ready(function(){
         data = dataenviar();
 
         if(data.length<=0){alerterrorajax('Seleccione por lo menos una fila'); return false;}
-
-        if($('#operacion_sel').val() === 'DOCUMENTO_INTERNO_COMPRA'){
+        debugger;
+        if($('#operacion_sel').val() === 'DOCUMENTO_INTERNO_COMPRA' || $('#operacion_sel').val() === 'ORDEN_COMPRA_ANTICIPO'){
             if(data[0].data_mergetotal>data[0].data_totalmax){alerterrorajax('TOTAL MERGE debe ser menor o igual q el TOTAL: '+data[0].data_totalmax); return false;}    
         }
 
@@ -251,7 +251,7 @@ $(document).ready(function(){
                     var item = { data_requerimiento_id: data_requerimiento_id };
 
                     // Solo para DOCUMENTO_INTERNO_COMPRA agregamos input_mergetotal
-                    if(operacion === 'DOCUMENTO_INTERNO_COMPRA'){
+                    if(operacion === 'DOCUMENTO_INTERNO_COMPRA' || operacion === 'ORDEN_COMPRA_ANTICIPO' ){
                         var total                       = parseFloat($(this).attr('data_total'));
                         var totalmerge                  = parseFloat($(this).attr('data_mergetotal'));
                         var totalmax                    = total-totalmerge;
@@ -283,7 +283,7 @@ $(document).ready(function(){
                 total                       = parseFloat($(this).attr('data_total'));
                 if($(check).is(':checked')){
 
-                    if($('#operacion_sel').val() === 'DOCUMENTO_INTERNO_COMPRA'){
+                    if($('#operacion_sel').val() === 'DOCUMENTO_INTERNO_COMPRA' || $('#operacion_sel').val() === 'ORDEN_COMPRA_ANTICIPO'){
                         var input_mergetotal                       = parseFloat($(this).find('.input_mergetotal').val()) || 0;
                         data_total = input_mergetotal;
                     }

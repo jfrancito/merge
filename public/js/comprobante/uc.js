@@ -3409,6 +3409,63 @@ $(document).ready(function () {
 
     });
 
+    $('.btnreparablecomporbatntepg').on('click', function (event) {
+        event.preventDefault();
+
+        $.confirm({
+            title: '¿Confirma la Reparacion?',
+            content: 'Reparacion el Comprobante',
+            buttons: {
+                confirmar: function () {
+                    $("#formpedidoreparable").submit();
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo la Reparacion');
+                }
+            }
+        });
+
+    });
+
+    $('.btnreparablecomporbatntend').on('click', function (event) {
+        event.preventDefault();
+
+        $.confirm({
+            title: '¿Confirma la Reparacion?',
+            content: 'Reparacion el Comprobante',
+            buttons: {
+                confirmar: function () {
+                    $("#formpedidoreparable").submit();
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo la Reparacion');
+                }
+            }
+        });
+
+    });
+
+    $('.btnreparablecomporbatntenc').on('click', function (event) {
+        event.preventDefault();
+
+        $.confirm({
+            title: '¿Confirma la Reparacion?',
+            content: 'Reparacion el Comprobante',
+            buttons: {
+                confirmar: function () {
+                    $("#formpedidoreparable").submit();
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo la Reparacion');
+                }
+            }
+        });
+
+    });
+
+
+
+
     $('.btnrechazocomporbatnte').on('click', function (event) {
         event.preventDefault();
         $.confirm({
@@ -3580,13 +3637,6 @@ $(document).ready(function () {
         return parts.join(decimals > 0 ? decimal_separator : "");
     }
 
-    // Ajustar columnas al cambiar de tab
-    $('a[data-toggle="tab"], a[data-bs-toggle="tab"]').on('shown.bs.tab', function () {
-        $('#asientodetalle').DataTable().columns.adjust().draw();
-        $('#asientodetallereversion').DataTable().columns.adjust().draw();
-        $('#asientodetallededuccion').DataTable().columns.adjust().draw();
-        $('#asientodetallepercepcion').DataTable().columns.adjust().draw();
-        $('#asientodetallereparable').DataTable().columns.adjust().draw();
-    });
+
 
 });

@@ -985,7 +985,7 @@ class GestionOCController extends Controller
             }
         }
 
-        
+        //dd($listadatos);
         $procedencia        =   'ADM';
         $funcion                =   $this;
         return View::make('comprobante/ajax/mergelistaadministrador',
@@ -3436,7 +3436,6 @@ class GestionOCController extends Controller
         //si es de bellavista y rioja copir la orden de compra
         $ordencompra_f            =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
 
-
         $sourceFile = '\\\\10.1.0.201\cpe\Orden_Compra';
         if($ordencompra_f->COD_CENTRO == 'CEN0000000000004' or $ordencompra_f->COD_CENTRO == 'CEN0000000000006'){
             if($ordencompra_f->COD_CENTRO == 'CEN0000000000004'){
@@ -3446,8 +3445,6 @@ class GestionOCController extends Controller
                 $sourceFile = '\\\\10.1.9.43\\cpe\\Orden_Compra\\'.$ordencompra->COD_ORDEN.'.pdf';
             }
             $destinationFile = '\\\\10.1.0.201\\cpe\\Orden_Compra\\'.$ordencompra->COD_ORDEN.'.pdf';
-
-            //dd($sourceFile);
 
             // Intenta copiar el archivo
             if (file_exists($sourceFile)){

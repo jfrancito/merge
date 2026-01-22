@@ -5395,71 +5395,6 @@ trait ComprobanteTraits
                                 ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR)
                                 ->whereBetween('TES.FEC_MOVIMIENTO_CAJABANCO', [$fecha_inicio, $fecha_fin]);
 
-                    // $consulta3 = DB::table('TES.OPERACION_CAJA as TES')
-                    //             ->leftJoin('FE_REF_ASOC', function ($leftJoin){
-                    //                 $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'TES.COD_OPERACION_CAJA')
-                    //                         ->where('FE_REF_ASOC.COD_ESTADO', '=', '1')
-                    //                         ->WhereNull('FE_REF_ASOC.TXT_ESTADO')
-                    //                         ->orwhere('FE_REF_ASOC.TXT_ESTADO', '=', '');
-
-                    //             })
-                    //             ->leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
-                    //                 $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
-                    //                     ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
-                    //             })
-
-                    // ->leftJoin('STD.EMPRESA as EMS', 'TES.COD_EMPR', '=', 'EMS.COD_EMPR')
-                    // ->leftJoin('TES.CAJA_BANCO as TCB', 'TES.COD_CAJA_BANCO', '=', 'TCB.COD_CAJA_BANCO')
-                    // ->leftJoin('CMP.CATEGORIA as CMD', 'TES.COD_CATEGORIA_MONEDA', '=', 'CMD.COD_CATEGORIA')
-                    // ->leftJoin('CMP.CATEGORIA as CME', function($join) {
-                    //     $join->on('TES.COD_CATEGORIA_ESTADO', '=', 'CME.COD_CATEGORIA')
-                    //          ->where('CME.TXT_GRUPO', '=', 'ESTADO_OPERACION_CAJA');
-                    // })
-                    // ->leftJoin('SGD.USUARIO as USU', 'TES.COD_USUARIO_CREA_AUD', '=', 'USU.COD_USUARIO')
-                    // ->join('CON.ASIENTO_MOVIMIENTO as ASM', 'TES.COD_ASIENTO', '=', 'ASM.COD_ASIENTO')
-                    // ->join('CON.CUENTA_CONTABLE as CTB', 'ASM.COD_CUENTA_CONTABLE', '=', 'CTB.COD_CUENTA_CONTABLE')
-                    // ->select(
-                    //     'TES.COD_OPERACION_CAJA',
-                    //     'TES.COD_EMPR',
-                    //     'EMS.NOM_EMPR',
-                    //     'TES.COD_CAJA_BANCO',
-                    //     DB::raw("CASE WHEN TCB.IND_CAJA=0 THEN TCB.TXT_BANCO ELSE TCB.TXT_CAJA_BANCO END AS NOMBRE_BANCO_CAJA"),
-                    //     'TCB.TXT_CAJA_BANCO as CUENTA',
-                    //     'TES.FEC_OPERACION as FEC_REGISTRO',
-                    //     'TES.FEC_MOVIMIENTO_CAJABANCO as FEC_MOVIMIENTO',
-                    //     'TES.NRO_CUENTA_BANCARIA',
-                    //     'TES.NRO_VOUCHER',
-                    //     'CMD.NOM_CATEGORIA as MONEDA',
-                    //     'CME.NOM_CATEGORIA as ESTADO',
-                    //     DB::raw('ABS(ASM.CAN_DEBE_MN - ASM.CAN_HABER_MN) as MONTO_SOLES'),
-                    //     DB::raw('ABS(ASM.CAN_DEBE_ME - ASM.CAN_HABER_ME) as MONTO_DOLARES'),
-                    //     DB::raw("
-                    //         CASE 
-                    //             WHEN CMD.NOM_CATEGORIA = 'SOLES' THEN (ABS(ASM.CAN_DEBE_MN - ASM.CAN_HABER_MN))
-                    //             ELSE (ABS(ASM.CAN_DEBE_ME - ASM.CAN_HABER_ME))
-                    //         END AS MONTO
-                    //     "),
-                    //     DB::raw("ISNULL(TES.ATENDIDO,0) AS MONTOATENDIDO"),
-                    //     'TES.TXT_GLOSA',
-                    //     'TES.COD_FLUJO_CAJA',
-                    //     'TES.TXT_FLUJO_CAJA',
-                    //     'TES.COD_ITEM_MOVIMIENTO',
-                    //     'TES.TXT_ITEM_MOVIMIENTO',
-                    //     'FE_REF_ASOC.LOTE AS LOTE_DOC',
-                    //     'FE_DOCUMENTO.ID_DOCUMENTO',
-                    //     'FE_DOCUMENTO.COD_ESTADO',
-                    //     'FE_DOCUMENTO.TXT_ESTADO',
-                    //     'USU.NOM_TRABAJADOR'
-                    // )
-                    // ->where('TES.IND_EXTORNO', 0)
-                    // ->where('TES.COD_ESTADO', 1)
-                    // ->where('TES.COD_CAJA_BANCO', $banco_id)
-                    // ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR)
-                    // ->whereBetween('TES.FEC_MOVIMIENTO_CAJABANCO', [$fecha_inicio, $fecha_fin])
-                    // ->where('TES.TXT_ITEM_MOVIMIENTO', 'like', '%PAGO DE PRESTAMOS BANCARIOS%')
-                    // ->where('CTB.TXT_DESCRIPCION', 'like', '%INTERESES POR%');
-
-
                     $consulta3 = DB::table('TES.OPERACION_CAJA as TES')
                         ->leftJoin('FE_REF_ASOC', function ($leftJoin) {
                             $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'TES.COD_OPERACION_CAJA')
@@ -6673,7 +6608,74 @@ trait ComprobanteTraits
     }
 
 
+    private function con_validar_documento_anticipo($ordencompra,$fedocumento,$detalleordencompra,$detallefedocumento,$empresa_sel,$fereftop1){
 
+        $ind_ruc            =   0;
+        $ind_rz             =   0;
+        $ind_moneda         =   0;
+        $ind_total          =   0;
+        $ind_cantidaditem   =   0;
+        $ind_formapago      =   0;
+        $ind_errototal      =   1;
+        //ruc
+
+        if($empresa_sel->NRO_DOCUMENTO == $fedocumento->RUC_PROVEEDOR){
+            $ind_ruc            =   1;  
+        }else{  $ind_errototal      =   0;  }
+
+        if(ltrim(rtrim(strtoupper($ordencompra->TXT_EMPR_CLIENTE))) == ltrim(rtrim(strtoupper($fedocumento->RZ_PROVEEDOR)))){
+            $ind_rz             =   1;  
+        }else{  $ind_errototal      =   0;  }
+
+
+        //moneda
+        $txtmoneda          =   '';
+        if($fedocumento->MONEDA == 'PEN'){
+            $txtmoneda          =   'SOLES';    
+        }else{
+            $txtmoneda          =   'DOLARES';
+        }
+        if($ordencompra->TXT_CATEGORIA_MONEDA == $txtmoneda){
+            $ind_moneda             =   1;  
+        }else{  $ind_errototal      =   0;  }
+        //total
+        if(number_format($fereftop1->TOTAL_MERGE, 4, '.', '') == number_format($fedocumento->TOTAL_VENTA_ORIG, 4, '.', '')){
+            $ind_total          =   1;  
+        }else{  $ind_errototal      =   0;  }
+
+
+        $ordencompra_t          =   CMPOrden::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->first();
+
+        if($ordencompra_t->IND_MATERIAL_SERVICIO == 'S'){
+            $ind_cantidaditem           =   1;  
+        }else{
+            //numero_items
+            if(count($detalleordencompra) == count($detallefedocumento)){
+                $ind_cantidaditem           =   1;  
+            }else{  $ind_errototal      =   0;  }
+
+        }
+
+        $tp = CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
+        if($tp->CODIGO_SUNAT == substr(strtoupper(ltrim(rtrim($fedocumento->FORMA_PAGO))), 0, 3)){
+            $ind_formapago          =   1;  
+        }else{  $ind_errototal      =   0;  }
+
+
+        FeDocumento::where('ID_DOCUMENTO','=',$fedocumento->ID_DOCUMENTO)
+                    ->update(
+                            [
+                                'ind_ruc'=>$ind_ruc,
+                                'ind_rz'=>$ind_rz,
+                                
+                                'ind_moneda'=>$ind_moneda,
+                                'ind_total'=>$ind_total,
+                                'ind_cantidaditem'=>$ind_cantidaditem,
+                                'ind_formapago'=>$ind_formapago,
+                                'ind_errototal'=>$ind_errototal,
+                            ]);
+
+    }
 
 
     private function con_validar_documento($ordencompra,$fedocumento,$detalleordencompra,$detallefedocumento){
@@ -8021,11 +8023,14 @@ trait ComprobanteTraits
 
         if(Session::get('usuario')->id== '1CIX00000001'){
 
-            $listadatos     =   VMergeOC::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
-                                            $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
+
+            $listadatos     =   VMergeOC::leftJoin('VMERGEDOCUMENTO_ORDEN_COMPRA_ANTICIPO', function($leftJoin) {
+                                                $leftJoin->on('VMERGEDOCUMENTO_ORDEN_COMPRA_ANTICIPO.ID_DOCUMENTO', '=', 'VMergeOC.COD_ORDEN');
+                                            })
+                                ->leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                            $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
                                                 ->where('COD_ESTADO', '<>', 'ETM0000000000006');
                                         })
-                                //->whereIn('VMERGEOC.COD_USUARIO_CREA_AUD',$array_usuarios)
                                 ->where('VMERGEOC.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 ->where('IND_TIPO_COMPRA','=','A')
                                 ->where(function ($query) {
@@ -8033,6 +8038,13 @@ trait ComprobanteTraits
                                           ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
                                           ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
                                 })
+                                ->where(function ($query) {
+                                    $query->where('VMERGEDOCUMENTO_ORDEN_COMPRA_ANTICIPO.ESTATUS', '=', 'OFF')
+                                          ->orWhereNull('VMERGEDOCUMENTO_ORDEN_COMPRA_ANTICIPO.ESTATUS')
+                                          ->orwhere('VMERGEDOCUMENTO_ORDEN_COMPRA_ANTICIPO.ESTATUS', '=', '')
+                                          ->orWhereRaw("CAN_TOTAL <> COALESCE(VMERGEDOCUMENTO_ORDEN_COMPRA_ANTICIPO.TOTAL_MERGE, 0)");
+                                })
+
                                 //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
                                 ->select(DB::raw('  COD_ORDEN,
                                                     FEC_ORDEN,
@@ -8042,12 +8054,16 @@ trait ComprobanteTraits
                                                     MAX(CAN_TOTAL) CAN_TOTAL,
                                                     MAX(FE_DOCUMENTO.ID_DOCUMENTO) AS ID_DOCUMENTO,
                                                     MAX(FE_DOCUMENTO.COD_ESTADO) AS COD_ESTADO,
-                                                    MAX(FE_DOCUMENTO.TXT_ESTADO) AS TXT_ESTADO
+                                                    MAX(FE_DOCUMENTO.TXT_ESTADO) AS TXT_ESTADO,
+                                                    VMERGEDOCUMENTO_ORDEN_COMPRA_ANTICIPO.LOTE AS LOTE_DOC,
+                                                    COALESCE(MAX(VMERGEDOCUMENTO_ORDEN_COMPRA_ANTICIPO.TOTAL_MERGE), 0) AS TOTAL_MERGE
+
                                                 '))
                                 ->groupBy('COD_ORDEN')
                                 ->groupBy('FEC_ORDEN')
                                 ->groupBy('TXT_CATEGORIA_MONEDA')
                                 ->groupBy('TXT_EMPR_CLIENTE')
+                                ->groupBy('VMERGEDOCUMENTO_ORDEN_COMPRA_ANTICIPO.LOTE')
                                 ->groupBy('COD_USUARIO_CREA_AUD')
                                 ->get();
 
