@@ -43,6 +43,7 @@ use App\Traits\ComprobanteTraits;
 use Hashids;
 use SplFileInfo;
 use Excel;
+use DateTime;
 
 class GestionPlanillaMovilidadController extends Controller
 {
@@ -766,11 +767,44 @@ class GestionPlanillaMovilidadController extends Controller
             $id_documento                           =   $request['ID_DOCUMENTO'];
 
 
+            //validar la planilla de movilidad que sean todas del mismo periodo
+
+            $masperiodos = PlaMovilidad::select('COD_PERIODO')
+                            ->where('FOLIO_RESERVA', $folio)
+                            ->groupBy('COD_PERIODO')
+                            ->get();
+
+            if (count($masperiodos) > 1) {
+                return Redirect::to('gestion-de-consolidar-planilla/' . $idopcion)->with('errorbd', 'Hay planillas de movilidad que tiene diferentes periodos');
+            }
+
+            $movilidad        =   PlaMovilidad::select('COD_PERIODO')
+                                ->where('FOLIO_RESERVA', $folio)
+                                ->groupBy('COD_PERIODO')
+                                ->first();
+
+            $periodo = DB::table('CON.PERIODO')
+                        ->where('COD_PERIODO', 'IICHPE0000000091')
+                        ->first(); // first() para un solo registro
+
+            $fechaString = date_format(date_create($periodo->FEC_FIN), 'd-m-Y');
+            $fechaObj = DateTime::createFromFormat('d-m-Y', $fechaString);
+            $fechaActual = new DateTime();
+            $mesAnioFecha = $fechaObj->format('Y-m'); // "2025-08"
+            $mesAnioActual = $fechaActual->format('Y-m'); // "2024-03" (ejemplo actual)
+
+            if ($mesAnioFecha === $mesAnioActual) {
+                $fecha_periodo = date('d-m-Y');
+            } else {
+                $fecha_periodo = $fechaString;
+            }
+
+            //dd($fecha_periodo);
             FePlanillaEntregable::where('FOLIO','=',$folio)
                         ->update(
                             [
                                 'SELECCION'=>0,
-                                'FEC_EMISION'=>$this->fecha_sin_hora,
+                                'FEC_EMISION'=>$fecha_periodo,
                                 'COD_USUARIO_EMITE'=>Session::get('usuario')->id,
                                 'TXT_USUARIO_EMITE'=>Session::get('usuario')->nombre,
                                 'TXT_GLOSA'=>$glosa_g,
