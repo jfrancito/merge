@@ -5307,6 +5307,7 @@ trait ComprobanteTraits
                     )
                     ->whereIn('TES.COD_FLUJO_CAJA', [
                         'IICHFC0000000004',
+                        'ISCHFC0000000004',
                         'IICHFC0000000009',
                         'IICHFC0000000012',
                         'ISCHFC0000000012',
@@ -5316,10 +5317,10 @@ trait ComprobanteTraits
                         'ISCHFC0000000037',
                         'IICHFC0000000037'
                     ])
-                    ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
+                    ->whereIn('TES.COD_CATEGORIA_OPERACION_CAJA', ['OPC0000000000002', 'OPC0000000000001'])
                     ->where('TES.IND_EXTORNO', 0)
                     ->where('TES.COD_ESTADO', 1)
-                    ->where('TES.COD_CATEGORIA_OPERACION_ORIGEN', 'OOC0000000000008')
+                    ->whereIn('TES.COD_CATEGORIA_OPERACION_ORIGEN', ['OOC0000000000008', 'OOC0000000000009'])
                     ->whereNotIn('TES.COD_ITEM_MOVIMIENTO', ['IICHIM0000000020', 'ISCHIM0000000020'])
                     ->where('TES.COD_CAJA_BANCO', $banco_id)
                     ->whereRaw("
