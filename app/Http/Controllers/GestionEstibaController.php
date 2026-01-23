@@ -1033,7 +1033,7 @@ class GestionEstibaController extends Controller
         $fereftop1              =   FeRefAsoc::where('lote','=',$lote)->first();
         $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
         View::share('titulo','REGISTRO DE COMPROBANTE '.$fereftop1->OPERACION.' : '.$lote);
-        $tiposerie              =   substr($fedocumento->SERIE, 0, 1);
+        $tiposerie              =   '';
         $empresa                =   array();
         $combopagodetraccion    =   array();
         $usuario                =   SGDUsuario::where('COD_TRABAJADOR','=',Session::get('usuario')->usuarioosiris_id)->first();
@@ -1054,7 +1054,19 @@ class GestionEstibaController extends Controller
             if(count($empresa_relacionada)>0){
                 $banco_id               =   'BAM0000000000011';  
             }
-            
+            $lotes                  =   FeRefAsoc::where('lote','=',$lote)                                        
+                                        ->pluck('ID_DOCUMENTO')
+                                        ->toArray();
+            $ordencompra_f            =   CMPOrden::whereIn('COD_ORDEN',$lotes)->first();
+            $ordencompra              =   CMPOrden::whereIn('COD_ORDEN',$lotes)->first();
+
+            if($fedocumento->OPERACION_DET == 'SIN_XML'){
+                $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
+                                            ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000004'])
+                                            ->whereIn('TXT_ASIGNADO', ['PROVEEDOR','CONTACTO'])
+                                            ->get();   
+            }
+
         }else{
             $detallefedocumento     =   array();
             $empresa_relacionada    =   array();
@@ -1212,12 +1224,7 @@ class GestionEstibaController extends Controller
                                         ->get();
         }
 
-        if($fedocumento->OPERACION_DET == 'SIN_XML'){
-            $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
-                                        ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000003','DCC0000000000004'])
-                                        ->whereIn('TXT_ASIGNADO', ['PROVEEDOR','CONTACTO'])
-                                        ->get();   
-        }
+
 
         //si es de bellavista y rioja copir la orden de compra
         $ordencompra_f            =   CMPOrden::whereIn('COD_ORDEN',$lotes)->first();
