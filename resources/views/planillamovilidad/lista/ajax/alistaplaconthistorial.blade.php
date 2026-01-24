@@ -18,6 +18,7 @@
         <th>NRO FOLIO</th>
         <th>ID LIQUIDACION</th>
         <th>ESTADO LIQUIDACION</th>
+        <th>ESTADO CONSOLIDADO</th>
       </tr>
     </thead>
     <tbody>
@@ -37,6 +38,7 @@
           <td>{{$item->SERIEFOLIO}} - {{$item->NUMEROFOLIO}}</td>
           <td>{{$item->ID_DOCUMENTO}}</td>
           <td>{{$item->TXT_ESTADO}}</td>
+          <td>{{$item->TXT_ESTADO_CONSOLIDADO}}</td>
         </tr>
       @endforeach
     </tbody>
