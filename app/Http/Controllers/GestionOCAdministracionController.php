@@ -4312,18 +4312,18 @@ class GestionOCAdministracionController extends Controller
             if($fedocumento->TXT_INGRESO_LIQ=='SI'){
                 $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                             ->where('COD_ESTADO','=',1)                                        
-                                            ->whereIn('COD_CATEGORIA', ['DCC0000000000039','DCC0000000000040','DCC0000000000041','DCC0000000000044','DCC0000000000045'])
+                                            ->whereIn('COD_CATEGORIA', ['DCC0000000000039','DCC0000000000040','DCC0000000000041','DCC0000000000044','DCC0000000000045','DCC0000000000049'])
                                             ->get();                
             }else{
                 if($ordenpago->COD_CENTRO == 'CEN0000000000004' || $ordenpago->COD_CENTRO == 'CEN0000000000006'){ //rioja o bellavista
                     $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                                 ->where('COD_ESTADO','=',1)                                        
-                                                ->whereIn('COD_CATEGORIA', ['DCC0000000000041','DCC0000000000044','DCC0000000000045','DCC0000000000046'])
+                                                ->whereIn('COD_CATEGORIA', ['DCC0000000000041','DCC0000000000044','DCC0000000000045','DCC0000000000046','DCC0000000000049'])
                                                 ->get();                
                 }else{
                     $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                                 ->where('COD_ESTADO','=',1)                                        
-                                                ->whereIn('COD_CATEGORIA', ['DCC0000000000041','DCC0000000000044','DCC0000000000045'])
+                                                ->whereIn('COD_CATEGORIA', ['DCC0000000000041','DCC0000000000044','DCC0000000000045','DCC0000000000049'])
                                                 ->get();
                 }                
             }            
