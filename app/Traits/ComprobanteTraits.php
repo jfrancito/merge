@@ -3472,6 +3472,26 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
+    private function con_lista_cabecera_comprobante_oca_total_adm_obs($cliente_id) {
+
+        $listadatos     =   FeDocumento::join('FE_REF_ASOC', function ($join) {
+                                $join->on('FE_REF_ASOC.LOTE', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
+                                    ->where('ESTATUS', 'ON')
+                                    ->where('FE_REF_ASOC.COD_ESTADO', '1');
+                            })
+                            ->leftJoin('CMP.Orden', 'FE_REF_ASOC.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+                            ->select(DB::raw('FE_DOCUMENTO.* ,CMP.Orden.*,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                            ->where('FE_DOCUMENTO.OPERACION','=','ORDEN_COMPRA')
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('ind_observacion','=',1)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
+                            ->orderBy('fecha_uc','asc')
+                            ->get();
+
+        return  $listadatos;
+    }
+
+
 
     private function con_lista_cabecera_comprobante_total_adm_obs_levantadas($cliente_id) {
 
@@ -3488,6 +3508,27 @@ trait ComprobanteTraits
 
         return  $listadatos;
     }
+
+    private function con_lista_cabecera_comprobante_oca_total_adm_obs_levantadas($cliente_id) {
+
+        $listadatos     =   FeDocumento::join('FE_REF_ASOC', function ($join) {
+                                $join->on('FE_REF_ASOC.LOTE', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
+                                    ->where('ESTATUS', 'ON')
+                                    ->where('FE_REF_ASOC.COD_ESTADO', '1');
+                            })
+                            ->leftJoin('CMP.Orden', 'FE_REF_ASOC.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+                            ->select(DB::raw('FE_DOCUMENTO.* ,CMP.Orden.*,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                            ->where('FE_DOCUMENTO.OPERACION','=','ORDEN_COMPRA')
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('ind_observacion','=',0)
+                            ->where('area_observacion','=','ADM')
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
+                            ->orderBy('fecha_uc','asc')
+                            ->get();
+
+        return  $listadatos;
+    }
+
 
 
     private function con_lista_cabecera_comprobante_total_adm($cliente_id) {
@@ -3512,6 +3553,34 @@ trait ComprobanteTraits
 
         return  $listadatos;
     }
+
+    private function con_lista_cabecera_comprobante_oca_total_adm($cliente_id) {
+
+        $listadatos     =   FeDocumento::join('FE_REF_ASOC', function ($join) {
+                                $join->on('FE_REF_ASOC.LOTE', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
+                                    ->where('ESTATUS', 'ON')
+                                    ->where('FE_REF_ASOC.COD_ESTADO', '1');
+                            })
+                            ->leftJoin('CMP.Orden', 'FE_REF_ASOC.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+                            ->select(DB::raw('FE_DOCUMENTO.* ,CMP.Orden.*,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                            ->where('FE_DOCUMENTO.OPERACION','=','ORDEN_COMPRA_ANTICIPO')
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where(function ($query) {
+                                $query->where('ind_observacion', '<>', 1)
+                                      ->orWhereNull('ind_observacion');
+                            })
+                            ->where(function ($query) {
+                                $query->where('area_observacion', '=', '')
+                                      ->orWhereNull('area_observacion')
+                                      ->orWhereIn('area_observacion',['UCO']);
+                            })
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
+                            ->orderBy('fecha_uc','asc')
+                            ->get();
+
+        return  $listadatos;
+    }
+
 
 
 

@@ -115,7 +115,7 @@
           </div>
 
           @if(count($fedocumento)>0)
-            <form method="POST" action="{{ url('validar-xml-oc-estiba-administrator/'.$idopcion.'/'.$idoc) }}" name="formguardardatos" id="formguardardatos" enctype="multipart/form-data" >
+            <form method="POST" action="{{ url('validar-xml-oc-estiba-administrator-oca/'.$idopcion.'/'.$idoc) }}" name="formguardardatos" id="formguardardatos" enctype="multipart/form-data" >
              {{ csrf_field() }}
             <input type="hidden" name="device_info" id='device_info'>
               <input type="hidden" name="rutaorden" id='rutaorden' value = '{{$rutaorden}}'>
@@ -199,18 +199,18 @@
                                   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px;">
                                       <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 cajareporte">
                                           <div class="form-group">
-                                            <label class="col-sm-12 control-label labelleft" ><b>Serie :</b></label>
+                                            <label class="col-sm-12 control-label labelleft" ><b>Serie : (4 digitos)</b></label>
                                             <div class="col-sm-12 abajocaja" >
-                                                <input type="text" name="serie" id='serie' class="form-control control input-sm" >
+                                                <input type="text" name="serie" id='serie' class="form-control control input-sm" maxlength="4">
                                             </div>
                                           </div>
                                       </div>
 
                                       <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3 cajareporte">
                                           <div class="form-group">
-                                            <label class="col-sm-12 control-label labelleft" ><b>Numero :</b></label>
+                                            <label class="col-sm-12 control-label labelleft" ><b>Numero : (10 digitos)</b></label>
                                             <div class="col-sm-12 abajocaja" >
-                                                <input type="text" name="numero" id='numero' class="form-control control input-sm " >
+                                                <input type="text" name="numero" id='numero' class="form-control control input-sm" maxlength="10">
                                             </div>
                                           </div>
                                       </div>
@@ -302,7 +302,7 @@
                                                 </div>
                                               </label>
                                               <div class="col-sm-12 abajocaja" >
-                                                {!! Form::select( 'tipo_detraccion_id', $combotipodetraccion, array(),
+                                                {!! Form::select( 'tipo_detraccion_id', $combotipodetraccion, array('MONTO_FACTURACION'),
                                                                   [
                                                                     'class'       => 'select2 form-control control input-xs' ,
                                                                     'id'          => 'tipo_detraccion_id',
@@ -317,7 +317,7 @@
                                             <label class="col-sm-12 control-label labelleft" ><b>Monto de Detracion (*):</b></label>
                                             <div class="col-sm-12 abajocaja" >
                                                 <input type="text" name="monto_detraccion" id='monto_detraccion' value="{{$fedocumento->MONTO_DETRACCION_RED}}" class="form-control control input-sm importe" 
-                                                value = '0.0'>
+                                                value = '0.0' readonly>
                                             </div>
                                           </div>
                                         </div>
@@ -471,7 +471,7 @@
                                           <input type="hidden" name="idopcion" id='idopcion' value = '{{$idopcion}}'>
                                           <input type="hidden" name="empresa_id" id='empresa_id' value = '{{$ordencompra_f->COD_EMPR}}'>
                                           <input type="hidden" name="prefijo_id" id='prefijo_id' value = '{{substr($ordencompra->COD_ORDEN, 0,6)}}'>
-                                          <input type="hidden" name="orden_id" id='orden_id' value = '{{Hashids::encode(substr($ordencompra->COD_ORDEN, -10))}}'>
+                                          <input type="hidden" name="orden_id" id='orden_id' value = '{{$idoc}}'>
                                           <input type="hidden" name="detraccion" id='detraccion' value = '{{(float)$ordencompra_f->CAN_DETRACCION}}'>
                                           <input type="hidden" name="te" id='te' value = '{{$fedocumento->ind_errototal}}'>
                                           <input type="hidden" name="contacto_id" id='contacto_id' value = '{{$usuario->COD_TRABAJADOR}}'>
