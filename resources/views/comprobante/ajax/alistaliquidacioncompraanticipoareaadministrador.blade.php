@@ -33,8 +33,8 @@
                       <td class="cell-detail sorting_1" style="position: relative;">
                         <span><b>CODIGO : {{$item->COD_AUTORIZACION}} </b> </span>
                         <span><b>FECHA  : {{$item->FEC_AUTORIZACION}}</b></span>
-                        <span><b>PROVEEDOR : </b> {{$item->TXT_EMPRESA}}</span>
-                        <span><b>CUENTA OSIRIS : </b> {{$NOMBRE_OSIRIS}}</span>
+                        <span><b>CUENTA OSIRIS : </b> {{$item->TXT_EMPRESA}}</span>
+                        <span><b>PROVEEDOR: </b> {{$NOMBRE_OSIRIS}}</span>
                         <span><b>TOTAL : </b> {{$item->CAN_TOTAL}}</span>
                         <span><b>ORSERVACION : </b>               
                             @if($item->ind_observacion == 1) 
@@ -109,8 +109,8 @@
                       <td class="cell-detail sorting_1" style="position: relative;">
                         <span><b>CODIGO : {{$item->COD_AUTORIZACION}} </b> </span>
                         <span><b>FECHA  : {{$item->FEC_AUTORIZACION}}</b></span>
-                        <span><b>PROVEEDOR : </b> {{$item->TXT_EMPRESA}}</span>
-                        <span><b>CUENTA OSIRIS : </b> {{$NOMBRE_OSIRIS}}</span>
+                        <span><b>CUENTA OSIRIS : </b> {{$item->TXT_EMPRESA}}</span>
+                        <span><b>PROVEEDOR: </b> {{$NOMBRE_OSIRIS}}</span>
                         <span><b>TOTAL : </b> {{$item->CAN_TOTAL}}</span>
                         <span><b>ORSERVACION : </b>               
                             @if($item->ind_observacion == 1) 
@@ -185,8 +185,8 @@
                       <td class="cell-detail sorting_1" style="position: relative;">
                         <span><b>CODIGO : {{$item->COD_AUTORIZACION}} </b> </span>
                         <span><b>FECHA  : {{$item->FEC_AUTORIZACION}}</b></span>
-                        <span><b>PROVEEDOR : </b> {{$item->TXT_EMPRESA}}</span>
-                        <span><b>CUENTA OSIRIS : </b> {{$NOMBRE_OSIRIS}}</span>
+                        <span><b>CUENTA OSIRIS : </b> {{$item->TXT_EMPRESA}}</span>
+                        <span><b>PROVEEDOR: </b> {{$NOMBRE_OSIRIS}}</span>
                         <span><b>TOTAL : </b> {{$item->CAN_TOTAL}}</span>
                         <span><b>ORSERVACION : </b>               
                             @if($item->ind_observacion == 1) 
