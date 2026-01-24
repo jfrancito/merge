@@ -366,6 +366,14 @@ trait PlanillaTraits
                                 WEB.cadcargo,
                                 WEB.emailcorp,
                                 JEFE.emailcorp AS email_jefe")
+                                 ->selectRaw("
+                                    (
+                                        SELECT TOP 1 TXT_CATEGORIA_ESTADO
+                                        FROM FE_PLANILLA_ENTREGABLE
+                                        WHERE FOLIO = PLA_MOVILIDAD.FOLIO
+                                           OR FOLIO = PLA_MOVILIDAD.FOLIO_RESERVA
+                                    ) AS TXT_ESTADO_CONSOLIDADO
+                                ")
 
                             ->join('LQG_DETLIQUIDACIONGASTO', 'PLA_MOVILIDAD.ID_DOCUMENTO', '=', 'LQG_DETLIQUIDACIONGASTO.COD_PLA_MOVILIDAD')
                             ->join('LQG_LIQUIDACION_GASTO', 'LQG_LIQUIDACION_GASTO.ID_DOCUMENTO', '=', 'LQG_DETLIQUIDACIONGASTO.ID_DOCUMENTO')
