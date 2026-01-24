@@ -35,7 +35,7 @@ Route::get('/serve-filelg', 'FileController@serveFileLG')->name('serve-filelg');
 Route::get('/serve-filepla', 'FileController@serveFilePlaC')->name('serve-filepla');
 Route::get('/serve-filerc', 'FileController@serveFileRC')->name('serve-filerc');
 Route::get('/serve-filefirma', 'FileController@serveFileFirma')->name('serve-filefirma');
-
+Route::get('/serve-fileordencompraanticipo', 'FileController@serveFileOrdenCompraAnticipo')->name('serve-fileordencompraanticipo');
 
 Route::get('/serve-filecontrato-sg', 'FileController@serveFileContratoSG')->name('serve-filecontrato-sg');
 Route::get('/serve-filepago', 'FileController@serveFilePago')->name('serve-filepago');
@@ -485,6 +485,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/subir-xml-cargar-datos-estiba-administrator/{idopcion}/{lote}', 'GestionEstibaController@actionCargarXMLEstibaAdministrator');
 	Route::any('/subir-xml-cargar-datos-estiba-administrator-orden-compra-anticipo/{idopcion}/{lote}', 'GestionEstibaController@actionCargarXMLEstibaAdministratorOrdenCompraAnticipo');
 	Route::any('/validar-xml-oc-estiba-administrator/{idopcion}/{lote}', 'GestionEstibaController@actionValidarXMLEstibaAdministrator');
+	Route::any('/validar-xml-oc-estiba-administrator-oca/{idopcion}/{lote}', 'GestionEstibaController@actionValidarXMLEstibaAdministratorOCA');
+
 
 	Route::any('/ajax-modal-detalle-lotes', 'GestionEstibaController@actionCargarModalDetalleLotes');
 	Route::any('/ajax-eliminar-lote-estiba', 'GestionEstibaController@actionEliminacionLoteEstiba');
@@ -710,6 +712,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/aprobar-comprobante-administracion/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCAdministracionController@actionAprobarAdministracion');
 	Route::any('/agregar-extorno-administracion-oc/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCAdministracionController@actionAgregarExtornoAdministracionOC');
 	Route::any('/agregar-extorno-estiba-administracion/{idopcion}/{lote}', 'GestionOCAdministracionController@actionAgregarExtornoEstibaAdministracion');
+
+	Route::any('/aprobar-comprobante-administracion-oca/{idopcion}/{linea}/{idordencompra}', 'GestionOCAdministracionController@actionAprobarAdministracionOCA');
 
 
 	Route::any('/agregar-observacion-administracion/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCAdministracionController@actionAgregarObservacionAdministracion');

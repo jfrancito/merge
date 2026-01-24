@@ -236,6 +236,9 @@ class GestionOCController extends Controller
         $orden_id               =   $request['orden_id'];
         $empresa_id             =   $request['empresa_id'];
         $idoc                   =   $orden_id;
+
+        //dd($orden_id);
+
         $documento              =   DB::table('FE_DOCUMENTO')
                                     ->where('ID_DOCUMENTO', $idoc)
                                     ->first();
@@ -2969,15 +2972,15 @@ class GestionOCController extends Controller
 
                         if($ingresoliq_id=='SI'){
                             $archivosdelfe          =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                        ->whereIn('COD_CATEGORIA', ['DCC0000000000040','DCC0000000000041','DCC0000000000043','DCC0000000000045'])
+                                                        ->whereIn('COD_CATEGORIA', ['DCC0000000000040','DCC0000000000041','DCC0000000000043','DCC0000000000045','DCC0000000000049'])
                                                         ->get();  
                         }else{                            
                             if($ordenpago->COD_CENTRO == 'CEN0000000000004' || $ordenpago->COD_CENTRO == 'CEN0000000000006'){ //rioja o bellavista
                                 $archivosdelfe          =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                        ->whereIn('COD_CATEGORIA', ['DCC0000000000041','DCC0000000000043','DCC0000000000045','DCC0000000000046'])->get();  
+                                                        ->whereIn('COD_CATEGORIA', ['DCC0000000000041','DCC0000000000043','DCC0000000000045','DCC0000000000046','DCC0000000000049'])->get();  
                             }else{
                                 $archivosdelfe          =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                        ->whereIn('COD_CATEGORIA', ['DCC0000000000041','DCC0000000000043','DCC0000000000045'])->get();  
+                                                        ->whereIn('COD_CATEGORIA', ['DCC0000000000041','DCC0000000000043','DCC0000000000045','DCC0000000000049'])->get();  
                             }
                         }
                         

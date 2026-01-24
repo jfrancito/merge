@@ -6,7 +6,7 @@
       <div class="panel panel-default">
         <div class="tab-container">
           <ul class="nav nav-tabs">
-            <li class="@if($tab_id=='oc') active @endif"><a href="#oc" data-toggle="tab">LIQUIDACION COMPRA ANTICIPO <span class="badge badge-success" style="font-size:16px">{{count($listadatos)}}</span></a></li>
+            <li class="@if($tab_id=='oc') active @endif"><a href="#oc" data-toggle="tab">ORDEN COMPRA <span class="badge badge-success" style="font-size:16px">{{count($listadatos)}}</span></a></li>
             <li class="@if($tab_id=='observado') active @endif"><a href="#observado" data-toggle="tab">OBSERVADOS <span class="badge badge-danger" style="font-size:16px">{{count($listadatos_obs)}}</span></a></li>
             <li class="@if($tab_id=='observadole') active @endif"><a href="#observadole" data-toggle="tab">OBSERVACIONES LEVANTADAS <span class="badge badge-primary" style="font-size:16px">{{count($listadatos_obs_le)}}</span></a></li>
           </ul>
@@ -16,7 +16,7 @@
                 <thead>
                   <tr>
                     <th>ITEM</th>
-                    <th>LIQUIDACION COMPRA ANTICIPO</th>
+                    <th>ORDEN COMPRA</th>
                     <th>FACTURA</th>
                     <th>REGISTRO</th>
 
@@ -26,15 +26,16 @@
                 </thead>
                 <tbody>
                   @foreach($listadatos as $index => $item)
-                    @php $NOMBRE_OSIRIS =  $funcion->funciones->cuenta_osiris_lca($item->ID_DOCUMENTO) @endphp
                     <tr data_requerimiento_id = "{{$item->ID_DOCUMENTO}}">
                       <td>{{$index+1}}</td>
 
                       <td class="cell-detail sorting_1" style="position: relative;">
-                        <span><b>CODIGO : {{$item->COD_AUTORIZACION}} </b> </span>
-                        <span><b>FECHA  : {{$item->FEC_AUTORIZACION}}</b></span>
-                        <span><b>PROVEEDOR : </b> {{$item->TXT_EMPRESA}}</span>
-                        <span><b>CUENTA OSIRIS : </b> {{$NOMBRE_OSIRIS}}</span>
+                        <span><b>LOTE : {{$item->ID_DOCUMENTO}} </b> </span>
+                        <span><b>CPE : </b> {{$item->OPERACION_DET}}</span>
+
+                        <span><b>CODIGO : {{$item->COD_ORDEN}} </b> </span>
+                        <span><b>FECHA  : {{$item->FEC_ORDEN}}</b></span>
+                        <span><b>PROVEEDOR : </b> {{$item->TXT_EMPR_CLIENTE}}</span>
                         <span><b>TOTAL : </b> {{$item->CAN_TOTAL}}</span>
                         <span><b>ORSERVACION : </b>               
                             @if($item->ind_observacion == 1) 
@@ -47,16 +48,23 @@
                               @endif
                             @endif
                         </span>
+
+
+                        <span><b>CAJA CHICA : </b>  
+                            @if($item->TXT_A_TIEMPO == 'CAJA_SI') 
+                              <span class="badge badge-success" style="display: inline-block;">{{$item->TXT_A_TIEMPO}}</span>
+                            @else
+                              <span class="badge badge-default" style="display: inline-block;">{{$item->TXT_A_TIEMPO}}</span>
+                            @endif
+                        </span>  
+
                       </td>
                       <td class="cell-detail sorting_1" style="position: relative;">
                         <span><b>SERIE : {{$item->SERIE}} </b> </span>
                         <span><b>NUMERO  : {{$item->NUMERO}}</b></span>
                         <span><b>FECCHA : </b> {{$item->FEC_VENTA}}</span>
                         <span><b>FORMA PAGO : </b> {{$item->FORMA_PAGO}}</span>
-                        <!-- <span><b>TOTAL : </b> {{number_format($item->TOTAL_VENTA_ORIG+$item->PERCEPCION+$item->MONTO_RETENCION, 4, '.', ',')}}</span> -->
                         <span><b>TOTAL : </b> {{number_format($item->TOTAL_VENTA_ORIG, 4, '.', ',')}}</span>
-
-
                         <span><b>PERCEPCION : </b> {{$item->PERCEPCION}}</span>
                         <span><b>RETENCION : </b> {{$item->MONTO_RETENCION}}</span>
                       </td>
@@ -64,7 +72,8 @@
                       <td class="cell-detail sorting_1" style="position: relative;">
                         <span><b>PROVEEDOR : </b>  {{date_format(date_create($item->fecha_pa), 'd-m-Y h:i:s')}}</span>
                         <span style="font-size: 18px;"><b>U. CONTACTO: </b>{{date_format(date_create($item->fecha_uc), 'd-m-Y h:i:s')}}</span>
-                        
+                        <!-- <span style="font-size: 18px;"><b>CONTABILIDAD : </b> {{date_format(date_create($item->fecha_pr), 'd-m-Y h:i:s')}}</span> -->
+
                       </td>
 
                       @include('comprobante.ajax.estados')
@@ -73,7 +82,7 @@
                           <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>
                           <ul role="menu" class="dropdown-menu pull-right">
                             <li>
-                              <a href="{{ url('/aprobar-comprobante-administracion-liquidacion-compra-anticipo/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,6).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -10))) }}">
+                              <a href="{{ url('/aprobar-comprobante-administracion-oca/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.$item->ID_DOCUMENTO) }}">
                                 Revisar Comprobante
                               </a>  
                             </li>
@@ -90,7 +99,7 @@
                 <thead>
                   <tr>
                     <th>ITEM</th>
-                    <th>LIQUIDACION COMPRA ANTICIPO</th>
+                    <th>ORDEN COMPRA</th>
                     <th>FACTURA</th>
                     <th>REGISTRO</th>
 
@@ -100,17 +109,13 @@
                 </thead>
                 <tbody>
                   @foreach($listadatos_obs as $index => $item)
-                    @php $NOMBRE_OSIRIS =  $funcion->funciones->cuenta_osiris_lca($item->ID_DOCUMENTO) @endphp
-
-
                     <tr data_requerimiento_id = "{{$item->ID_DOCUMENTO}}">
                       <td>{{$index+1}}</td>
 
                       <td class="cell-detail sorting_1" style="position: relative;">
-                        <span><b>CODIGO : {{$item->COD_AUTORIZACION}} </b> </span>
-                        <span><b>FECHA  : {{$item->FEC_AUTORIZACION}}</b></span>
-                        <span><b>PROVEEDOR : </b> {{$item->TXT_EMPRESA}}</span>
-                        <span><b>CUENTA OSIRIS : </b> {{$NOMBRE_OSIRIS}}</span>
+                        <span><b>CODIGO : {{$item->COD_ORDEN}} </b> </span>
+                        <span><b>FECHA  : {{$item->FEC_ORDEN}}</b></span>
+                        <span><b>PROVEEDOR : </b> {{$item->TXT_EMPR_CLIENTE}}</span>
                         <span><b>TOTAL : </b> {{$item->CAN_TOTAL}}</span>
                         <span><b>ORSERVACION : </b>               
                             @if($item->ind_observacion == 1) 
@@ -123,6 +128,16 @@
                               @endif
                             @endif
                         </span>
+
+
+                        <span><b>CAJA CHICA : </b>  
+                            @if($item->TXT_A_TIEMPO == 'CAJA_SI') 
+                              <span class="badge badge-success" style="display: inline-block;">{{$item->TXT_A_TIEMPO}}</span>
+                            @else
+                              <span class="badge badge-default" style="display: inline-block;">{{$item->TXT_A_TIEMPO}}</span>
+                            @endif
+                        </span>  
+
                       </td>
                       <td class="cell-detail sorting_1" style="position: relative;">
                         <span><b>SERIE : {{$item->SERIE}} </b> </span>
@@ -139,6 +154,7 @@
                       <td class="cell-detail sorting_1" style="position: relative;">
                         <span><b>PROVEEDOR : </b>  {{date_format(date_create($item->fecha_pa), 'd-m-Y h:i:s')}}</span>
                         <span style="font-size: 18px;"><b>U. CONTACTO: </b>{{date_format(date_create($item->fecha_uc), 'd-m-Y h:i:s')}}</span>
+                        <!-- <span style="font-size: 18px;"><b>CONTABILIDAD : </b> {{date_format(date_create($item->fecha_pr), 'd-m-Y h:i:s')}}</span> -->
 
                       </td>
 
@@ -148,7 +164,7 @@
                           <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>
                           <ul role="menu" class="dropdown-menu pull-right">
                             <li>
-                              <a href="{{ url('/aprobar-comprobante-administracion-liquidacion-compra-anticipo/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,6).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -10))) }}">
+                              <a href="{{ url('/aprobar-comprobante-administracion/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,6).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -10))) }}">
                                 Revisar Comprobante
                               </a>  
                             </li>
@@ -166,7 +182,7 @@
                 <thead>
                   <tr>
                     <th>ITEM</th>
-                    <th>LIQUIDACION COMPRA ANTICIPO</th>
+                    <th>ORDEN COMPRA</th>
                     <th>FACTURA</th>
                     <th>REGISTRO</th>
 
@@ -176,17 +192,13 @@
                 </thead>
                 <tbody>
                   @foreach($listadatos_obs_le as $index => $item)
-                    @php $NOMBRE_OSIRIS =  $funcion->funciones->cuenta_osiris_lca($item->ID_DOCUMENTO) @endphp
-
-
                     <tr data_requerimiento_id = "{{$item->ID_DOCUMENTO}}">
                       <td>{{$index+1}}</td>
 
                       <td class="cell-detail sorting_1" style="position: relative;">
-                        <span><b>CODIGO : {{$item->COD_AUTORIZACION}} </b> </span>
-                        <span><b>FECHA  : {{$item->FEC_AUTORIZACION}}</b></span>
-                        <span><b>PROVEEDOR : </b> {{$item->TXT_EMPRESA}}</span>
-                        <span><b>CUENTA OSIRIS : </b> {{$NOMBRE_OSIRIS}}</span>
+                        <span><b>CODIGO : {{$item->COD_ORDEN}} </b> </span>
+                        <span><b>FECHA  : {{$item->FEC_ORDEN}}</b></span>
+                        <span><b>PROVEEDOR : </b> {{$item->TXT_EMPR_CLIENTE}}</span>
                         <span><b>TOTAL : </b> {{$item->CAN_TOTAL}}</span>
                         <span><b>ORSERVACION : </b>               
                             @if($item->ind_observacion == 1) 
@@ -198,7 +210,16 @@
                                   <span class="badge badge-default" style="display: inline-block;">SIN OBSERVACIONES</span>
                               @endif
                             @endif
-                        </span>                     
+                        </span>
+
+
+                        <span><b>CAJA CHICA : </b>  
+                            @if($item->TXT_A_TIEMPO == 'CAJA_SI') 
+                              <span class="badge badge-success" style="display: inline-block;">{{$item->TXT_A_TIEMPO}}</span>
+                            @else
+                              <span class="badge badge-default" style="display: inline-block;">{{$item->TXT_A_TIEMPO}}</span>
+                            @endif
+                        </span>  
 
                       </td>
                       <td class="cell-detail sorting_1" style="position: relative;">
@@ -216,7 +237,8 @@
                       <td class="cell-detail sorting_1" style="position: relative;">
                         <span><b>PROVEEDOR : </b>  {{date_format(date_create($item->fecha_pa), 'd-m-Y h:i:s')}}</span>
                         <span style="font-size: 18px;"><b>U. CONTACTO: </b>{{date_format(date_create($item->fecha_uc), 'd-m-Y h:i:s')}}</span>
-                        
+                        <!-- <span style="font-size: 18px;"><b>CONTABILIDAD : </b> {{date_format(date_create($item->fecha_pr), 'd-m-Y h:i:s')}}</span> -->
+
                       </td>
 
                       @include('comprobante.ajax.estados')
@@ -225,7 +247,7 @@
                           <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>
                           <ul role="menu" class="dropdown-menu pull-right">
                             <li>
-                              <a href="{{ url('/aprobar-comprobante-administracion-liquidacion-compra-anticipo/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,6).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -10))) }}">
+                              <a href="{{ url('/aprobar-comprobante-administracion/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,6).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -10))) }}">
                                 Revisar Comprobante
                               </a>  
                             </li>
