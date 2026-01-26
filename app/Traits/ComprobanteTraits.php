@@ -7323,7 +7323,7 @@ trait ComprobanteTraits
             $ind_moneda             =   1;  
         }else{  $ind_errototal      =   0;  }
         $total_1 = $ferefasoc->TOTAL_MERGE;
-        $total_2 = $fedocumento->TOTAL_VENTA_ORIG;
+        $total_2 = $fedocumento->TOTAL_VENTA_ORIG+$fedocumento->MONTO_ANTICIPO_DESC;
         $tt_totales = round(abs($total_1 - $total_2), 2);
         $diferencia_total = 0;
 
