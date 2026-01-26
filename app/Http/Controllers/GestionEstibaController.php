@@ -1938,6 +1938,8 @@ class GestionEstibaController extends Controller
                         //$cant_perception                    =   $factura->getperception();
                         $cant_perception                    =   0;
 
+
+                        //dd($factura->gettotalAnticipos());
                         //REGISTRO DEL XML LEIDO
                         $documento                          =   new FeDocumento;
                         $documento->ID_DOCUMENTO            =   $idoc;
@@ -1981,6 +1983,8 @@ class GestionEstibaController extends Controller
                         $documento->MONTO_ANTICIPO          =   $factura->getdestotalAnticipos();
                         $documento->NRO_ORDEN_COMP          =   $factura->getcompra();              
                         $documento->NUM_GUIA                =   $factura->getguiaEmbebida();
+                        $documento->MONTO_ANTICIPO_DESC     =   $factura->gettotalAnticipos();
+
                         $documento->estadoCp                =   0;
                         $documento->ARCHIVO_XML             =   $nombrefile;
                         $documento->ARCHIVO_CDR             =   '';

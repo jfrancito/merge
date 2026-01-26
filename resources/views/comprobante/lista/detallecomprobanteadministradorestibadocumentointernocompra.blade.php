@@ -157,6 +157,11 @@
                                 </div>
                               </td>
                             </tr>
+                            <tr>
+                              <td><b>ANTICIPO</b></td>
+                              <td  colspan="2" class=""><b>{{$fedocumento->MONTO_ANTICIPO_DESC}}</b></td>
+                            </tr>
+
                         </tbody>
                       </table>
                     </div>
