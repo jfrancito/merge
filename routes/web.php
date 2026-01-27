@@ -665,7 +665,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/aprobar-comprobante-contabilidad-estiba-dic/{idopcion}/{lote}', 'GestionOCContabilidadController@actionAprobarContabilidadEstibaDIC');
 	
 	Route::any('/aprobar-comprobante-contabilidad-pg/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAprobarContabilidadPG');
-
+	Route::any('/aprobar-comprobante-contabilidad-estiba-oca/{idopcion}/{lote}', 'GestionOCContabilidadController@actionAprobarContabilidadEstibaOca');
 
 	Route::any('/ajax-modal-activo-fijo-categoria', 'GestionOCContabilidadController@actionAjaxModalActivoFijoCategoria');
 	Route::any('/registrar-activo-fijo-categoria/{idopcion}/{idoc}/{codprod}', 'GestionOCContabilidadController@actionRegistrarActivoFijoCategoria');
@@ -714,6 +714,12 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/agregar-extorno-estiba-administracion/{idopcion}/{lote}', 'GestionOCAdministracionController@actionAgregarExtornoEstibaAdministracion');
 
 	Route::any('/aprobar-comprobante-administracion-oca/{idopcion}/{linea}/{idordencompra}', 'GestionOCAdministracionController@actionAprobarAdministracionOCA');
+
+	Route::any('/agregar-extorno-administracion-oc-moca/{idopcion}/{idordencompra}', 'GestionOCAdministracionController@actionAgregarExtornoAdministracionOCMoca');
+	Route::any('/agregar-observacion-administracion-moca/{idopcion}/{idordencompra}', 'GestionOCAdministracionController@actionAgregarObservacionAdministracionMoca');
+	Route::any('/observacion-comprobante-uc-estiba-oca/{idopcion}/{lote}', 'GestionUsuarioContactoController@actionObservarUCEstibaMoca');
+
+
 
 
 	Route::any('/agregar-observacion-administracion/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCAdministracionController@actionAgregarObservacionAdministracion');
