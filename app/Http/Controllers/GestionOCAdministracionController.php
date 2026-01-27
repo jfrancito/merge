@@ -1745,6 +1745,115 @@ class GestionOCAdministracionController extends Controller
 
     }
 
+    public function actionAgregarObservacionAdministracionMoca($idopcion, $lote, Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion, 'Modificar');
+        if ($validarurl <> 'true') {
+            return $validarurl;
+        }
+        /******************************************************/
+        $idoc = $lote;
+        $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->first();
+        $detallefedocumento = FeDetalleDocumento::where('ID_DOCUMENTO', '=', $idoc)->get();
+        View::share('titulo', 'Observar Comprobante');
+
+        if ($_POST) {
+
+            try {
+
+                DB::beginTransaction();
+                $pedido_id = $idoc;
+                $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $pedido_id)->first();
+                $descripcion = $request['descripcion'];
+                $archivoob = $request['archivoob'];
+                if ($fedocumento->ind_observacion == 1) {
+                    DB::rollback();
+                    return Redirect::back()->with('errorurl', 'El documento esta observado no se puede observar');
+                }
+                if (count($archivoob) <= 0) {
+                    DB::rollback();
+                    return Redirect::to('aprobar-comprobante-administracion-oca/' . $idopcion . '/' . $lote)->with('errorbd', 'Tiene que seleccionar almenos un item');
+                }
+
+                foreach ($archivoob as $index => $item) {
+                    $docu_asoci = CMPDocAsociarCompra::where('COD_ORDEN', '=', $idoc)->where('COD_ESTADO', '=', 1)
+                        ->where('COD_CATEGORIA_DOCUMENTO', '=', $item)->first();
+                    if (count($docu_asoci) > 0) {
+
+                        Archivo::where('ID_DOCUMENTO', '=', $idoc)
+                            ->where('ACTIVO', '=', '1')
+                            ->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)
+                            ->where('TIPO_ARCHIVO', '=', $item)
+                            ->update(
+                                [
+                                    'ACTIVO' => 0,
+                                    'EXTENSION' => 'OBS',
+                                    'FECHA_MOD' => $this->fechaactual,
+                                    'USUARIO_MOD' => Session::get('usuario')->id
+                                ]
+                            );
+
+                    } else {
+
+                        $categoria = CMPCategoria::where('COD_CATEGORIA', '=', $item)->first();
+                        $docasociar = new CMPDocAsociarCompra;
+                        $docasociar->COD_ORDEN = $idoc;
+                        $docasociar->COD_CATEGORIA_DOCUMENTO = $categoria->COD_CATEGORIA;
+                        $docasociar->NOM_CATEGORIA_DOCUMENTO = $categoria->NOM_CATEGORIA;
+                        $docasociar->IND_OBLIGATORIO = 0;
+                        $docasociar->TXT_FORMATO = $categoria->COD_CTBLE;
+                        $docasociar->TXT_ASIGNADO = $categoria->TXT_ABREVIATURA;
+                        $docasociar->COD_USUARIO_CREA_AUD = Session::get('usuario')->id;
+                        $docasociar->FEC_USUARIO_CREA_AUD = $this->fechaactual;
+                        $docasociar->COD_ESTADO = 1;
+                        $docasociar->TIP_DOC = 'O';
+                        $docasociar->save();
+
+                    }
+                }
+                //HISTORIAL DE DOCUMENTO APROBADO
+                $documento = new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO = $fedocumento->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM = $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA = $this->fechaactual;
+                $documento->USUARIO_ID = Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+                $documento->TIPO = 'OBSERVADO POR ADMINSTRACION';
+                $documento->MENSAJE = $descripcion;
+                $documento->save();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'OBSERVADO POR ADMINSTRACION');
+                //geolocalización
+
+                FeDocumento::where('ID_DOCUMENTO', $idoc)
+                    ->update(
+                        [
+                            'ind_observacion' => 1,
+                            'TXT_OBSERVADO' => 'OBSERVADO',
+                            'area_observacion' => 'ADM'
+                        ]
+                    );
+ 
+                DB::commit();
+                Session::flash('operacion_id', $request['operacion_id']);
+                return Redirect::to('/gestion-de-administracion-aprobar/' . $idopcion)->with('bienhecho', 'Comprobante : ' . $lote . ' OBSERVADO CON EXITO');
+
+
+            } catch (\Exception $ex) {
+                DB::rollback();
+                Session::flash('operacion_id', $request['operacion_id']);
+
+                return Redirect::to('gestion-de-administracion-aprobar/' . $idopcion)->with('errorbd', $ex . ' Ocurrio un error inesperado');
+            }
+
+        }
+    }
+
+
     public function actionAgregarExtornoEstibaAdministracion($idopcion, $lote, Request $request)
     {
 
@@ -1849,6 +1958,113 @@ class GestionOCAdministracionController extends Controller
             }
         }
     }
+
+    public function actionAgregarExtornoAdministracionOCMoca($idopcion, $lote, Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion, 'Modificar');
+        if ($validarurl <> 'true') {
+            return $validarurl;
+        }
+        /******************************************************/
+        $idoc = $lote;
+        //dd($idoc);
+        $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->first();
+        $detallefedocumento = FeDetalleDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)->get();
+        View::share('titulo', 'Extorno Comprobante');
+
+        if ($_POST) {
+
+            try {
+
+                DB::beginTransaction();
+                $pedido_id = $idoc;
+                $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $pedido_id)->first();
+                $descripcion = $request['descripcionextorno'];
+
+                //GUARDAR LA REFENCIA ORIGINAL DEL EXTORNO
+                FeDocumento::where('ID_DOCUMENTO', $idoc)
+                    ->update(
+                        [
+                            'TXT_REFERENCIA' => $idoc
+                        ]
+                    );
+                //GUARDAR EN EL HISTORIAL QUE SE EXTORNO UN VEZ
+                $documento = new FeDocumentoHistorial;
+                $documento->ID_DOCUMENTO = $fedocumento->ID_DOCUMENTO;
+                $documento->DOCUMENTO_ITEM = $fedocumento->DOCUMENTO_ITEM;
+                $documento->FECHA = $this->fechaactual;
+                $documento->USUARIO_ID = Session::get('usuario')->id;
+                $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+                $documento->TIPO = 'DOCUMENTO EXTORNADO';
+                $documento->MENSAJE = $descripcion;
+                $documento->save();
+
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'DOCUMENTO EXTORNADO');
+                //geolocalización
+
+
+
+                //ANULAR TODA LA OPERACION
+                FeDocumento::where('ID_DOCUMENTO', $idoc)
+                    ->update(
+                        [
+                            'ID_DOCUMENTO' => $idoc . 'X',
+                            'COD_ESTADO' => 'ETM0000000000006',
+                            'TXT_ESTADO' => 'RECHAZADO',
+                            'ind_observacion' => 0
+                        ]
+                    );
+                FeDetalleDocumento::where('ID_DOCUMENTO', $idoc)
+                    ->update(
+                        [
+                            'ID_DOCUMENTO' => $idoc . 'X'
+                        ]
+                    );
+
+                FeDocumentoHistorial::where('ID_DOCUMENTO', $idoc)
+                    ->update(
+                        [
+                            'ID_DOCUMENTO' => $idoc . 'X'
+                        ]
+                    );
+                FeFormaPago::where('ID_DOCUMENTO', $idoc)
+                    ->update(
+                        [
+                            'ID_DOCUMENTO' => $idoc . 'X'
+                        ]
+                    );
+                Archivo::where('ID_DOCUMENTO', $idoc)
+                    ->update(
+                        [
+                            'ID_DOCUMENTO' => $idoc . 'X'
+                        ]
+                    );
+
+                FeRefAsoc::where('LOTE', '=', $idoc)
+                    ->update(
+                        [
+                            'FECHA_MOD' => $this->fechaactual,
+                            'USUARIO_MOD' => Session::get('usuario')->id,
+                            'COD_ESTADO' => '0'
+                        ]);
+
+
+                DB::commit();
+                Session::flash('operacion_id', $request['operacion_id']);
+                return Redirect::to('/gestion-de-administracion-aprobar/' . $idopcion)->with('bienhecho', 'Comprobante : ' . $idoc . ' EXTORNADO CON EXITO');
+            } catch (\Exception $ex) {
+                DB::rollback();
+                Session::flash('operacion_id', $request['operacion_id']);
+
+                return Redirect::to('gestion-de-administracion-aprobar/' . $idopcion)->with('errorbd', $ex . ' Ocurrio un error inesperado');
+            }
+        }
+    }
+
 
 
 
@@ -2278,6 +2494,7 @@ class GestionOCAdministracionController extends Controller
         $lotes                  =   FeRefAsoc::where('lote','=',$idoc)                                        
                                     ->first();
         $idcompra               =   $lotes->ID_DOCUMENTO;
+
         $ordencompra            =   $this->con_lista_cabecera_comprobante_idoc_actual($idcompra);
         $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc_actual($idcompra);
 
@@ -2398,11 +2615,10 @@ class GestionOCAdministracionController extends Controller
                 $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR ADMINISTRACION');
                 //geolocalización
 
-
-                $ordencompra        =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();            
+       
 
                 DB::commit();
-                return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' APROBADO CON EXITO');
+                return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$pedido_id.' APROBADO CON EXITO');
             }catch(\Exception $ex){
                 DB::rollback(); 
                 return Redirect::to('gestion-de-administracion-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
@@ -2516,14 +2732,14 @@ class GestionOCAdministracionController extends Controller
             // Construir el array de URLs
             $initialPreview = [];
             foreach ($archivospdf as $archivo) {
-                $initialPreview[] = route('serve-file', ['file' => $archivo->NOMBRE_ARCHIVO]);
+                $initialPreview[] = route('serve-fileliquidacioncompraanticipo', ['file' => $archivo->NOMBRE_ARCHIVO]);
             }
             $initialPreviewConfig = [];
             foreach ($archivospdf as $key => $archivo) {
                 $initialPreviewConfig[] = [
                     'type'          => "pdf",
                     'caption' => $archivo->NOMBRE_ARCHIVO,
-                    'downloadUrl' => route('serve-file', ['file' => $archivo->NOMBRE_ARCHIVO])
+                    'downloadUrl' => route('serve-fileliquidacioncompraanticipo', ['file' => $archivo->NOMBRE_ARCHIVO])
                 ];
             }
 

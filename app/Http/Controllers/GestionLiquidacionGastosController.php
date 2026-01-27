@@ -3986,7 +3986,7 @@ class GestionLiquidacionGastosController extends Controller
                     if(count($arendri)>0){
                         if($arendri->TIPO_MOTIVO == 'TIP0000000000003'){
                             $IND_OSIRIS = 1;
-                            LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
+                            LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ITEM', '=', $item)
                                         ->update(
                                                 [
                                                     'IND_OSIRIS'=> 1
@@ -4745,7 +4745,7 @@ class GestionLiquidacionGastosController extends Controller
                                 if(count($arendri)>0){
                                     if($arendri->TIPO_MOTIVO == 'TIP0000000000003'){
                                         $IND_OSIRIS = 1;
-                                        LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)
+                                        LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ITEM', '=', $item)
                                                     ->update(
                                                             [
                                                                 'IND_OSIRIS'=> 1

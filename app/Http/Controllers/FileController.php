@@ -318,14 +318,13 @@ class FileController extends Controller
 
         $archivo                =       Archivo::where('NOMBRE_ARCHIVO','=',$newstr)->first();
         $fedocumento            =       FeDocumento::where('ID_DOCUMENTO','=',$archivo->ID_DOCUMENTO)->first();
-        $ordencompra            =       VMergeOPActual::where('COD_AUTORIZACION','=',$archivo->ID_DOCUMENTO)->first();
-        $prefijocarperta        =       $this->prefijo_empresa($ordencompra->COD_EMPR);
+        $prefijocarperta        =       $this->prefijo_empresa($fedocumento->COD_EMPR);
 
 
-        //dd($prefijocarperta);
 
-        $rutafile               =       '\\\\10.1.50.2/comprobantes/'.$prefijocarperta.'/'.$ordencompra->NRO_DOC.'/';
 
+        $rutafile               =       '\\\\10.1.50.2/comprobantes/'.$prefijocarperta.'/'.$fedocumento->ID_DOCUMENTO.'/';
+        //dd($rutafile);
         $remoteFile             =       $rutafile.$newstr;
 
         // Reemplazar las barras invertidas por barras normales
