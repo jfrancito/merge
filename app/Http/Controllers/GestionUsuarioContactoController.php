@@ -4016,6 +4016,9 @@ class GestionUsuarioContactoController extends Controller
                 
                 DB::beginTransaction();
                 $pedido_id          =   $idoc;
+
+                $ordencompra            =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
+
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
 
                 //return Redirect::back()->with('errorurl', 'No se puede integrar ningun documento hasta proximo aviso');
