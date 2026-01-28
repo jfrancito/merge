@@ -2914,6 +2914,29 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
+    private function con_lista_cabecera_comprobante_oca_total_cont_obs_levantadas($cliente_id) {
+
+        $listadatos     =   FeDocumento::join('FE_REF_ASOC', function ($join) {
+                                $join->on('FE_REF_ASOC.LOTE', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
+                                    ->where('ESTATUS', 'ON')
+                                    ->where('FE_REF_ASOC.COD_ESTADO', '1');
+                            })
+                            ->leftJoin('CMP.Orden', 'FE_REF_ASOC.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+                            ->leftJoin('CMP.CATEGORIA as PAGO', 'PAGO.COD_CATEGORIA', '=', 'CMP.Orden.COD_CATEGORIA_TIPO_PAGO')
+                            ->select(DB::raw('FE_DOCUMENTO.* ,CMP.Orden.*,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC,PAGO.NOM_CATEGORIA COND_PAGO'))
+                            ->where('FE_DOCUMENTO.OPERACION','=','ORDEN_COMPRA_ANTICIPO')
+                            ->where('ind_observacion','=',0)
+                            ->where('area_observacion','=','CONT')
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
+                            ->orderBy('ind_observacion','asc')
+                            ->orderBy('fecha_pr','asc')
+                            ->get();
+
+        return  $listadatos;
+    }
+
+
 
     private function con_lista_cabecera_comprobante_total_cont_obs($cliente_id) {
 
@@ -2931,6 +2954,27 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
+
+    private function con_lista_cabecera_comprobante_oca_total_cont_obs($cliente_id) {
+
+        $listadatos     =   FeDocumento::join('FE_REF_ASOC', function ($join) {
+                                $join->on('FE_REF_ASOC.LOTE', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
+                                    ->where('ESTATUS', 'ON')
+                                    ->where('FE_REF_ASOC.COD_ESTADO', '1');
+                            })
+                            ->leftJoin('CMP.Orden', 'FE_REF_ASOC.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+                            ->leftJoin('CMP.CATEGORIA as PAGO', 'PAGO.COD_CATEGORIA', '=', 'CMP.Orden.COD_CATEGORIA_TIPO_PAGO')
+                            ->select(DB::raw('FE_DOCUMENTO.* ,CMP.Orden.*,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC,PAGO.NOM_CATEGORIA COND_PAGO'))
+                            ->where('FE_DOCUMENTO.OPERACION','=','ORDEN_COMPRA_ANTICIPO')
+                            ->where('ind_observacion','=',1)
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
+                            ->orderBy('ind_observacion','asc')
+                            ->orderBy('fecha_pr','asc')
+                            ->get();
+
+        return  $listadatos;
+    }
 
 
     private function con_lista_cabecera_comprobante_total_cont_estiba($cliente_id,$operacion_id) {
@@ -5234,7 +5278,6 @@ trait ComprobanteTraits
         $trabajador     =       STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
         $centro_id      =       $trabajador->COD_ZONA_TIPO;
         $rol            =       WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
-
 
         if($rol->ind_uc == 1 && Session::get('usuario')->id != '1CIX00000142'){
 
@@ -8274,7 +8317,7 @@ trait ComprobanteTraits
                                         })
                                 //->whereIn('VMERGEOC.COD_USUARIO_CREA_AUD',$array_usuarios)
                                 ->where('VMERGEOC.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                                ->where('IND_TIPO_COMPRA','<>','A')
+                                //->where('IND_TIPO_COMPRA','<>','A')
                                 ->where(function ($query) {
                                     $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
                                           ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
@@ -8306,7 +8349,7 @@ trait ComprobanteTraits
                                         })
                                 ->whereIn('VMERGEOC.COD_USUARIO_CREA_AUD',$array_usuarios)
                                 ->where('VMERGEOC.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                                ->where('IND_TIPO_COMPRA','<>','A')
+                                //->where('IND_TIPO_COMPRA','<>','A')
                                 ->where(function ($query) {
                                     $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
                                           ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')

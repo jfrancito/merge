@@ -81,7 +81,7 @@
                                         </div>
                                         <div class="panel-body">
                                             <form method="POST" id='formpedido'
-                                                  action="{{ url('/aprobar-comprobante-contabilidad-estiba/'.$idopcion.'/'.$lote) }}"
+                                                  action="{{ url('/aprobar-comprobante-contabilidad-estiba-oca/'.$idopcion.'/'.$lote) }}"
                                                   style="border-radius: 0px;"
                                                   class="form-horizontal group-border-dashed"
                                                   enctype="multipart/form-data">

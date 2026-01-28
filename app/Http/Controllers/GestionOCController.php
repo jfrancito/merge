@@ -5144,7 +5144,36 @@ class GestionOCController extends Controller
                 $procedencia       =   $request['procedencia'];
                 $fedocumento       =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
 
-                //dd("hola");
+
+
+                //VALIDAR QUE LAS OC NO TENGAN UN ANTICIPO EN SEGUIMIENTO
+                $ocas               =   DB::table('FE_REF_ASOC')
+                                        ->where('ID_DOCUMENTO', $idoc)
+                                        ->where('COD_ESTADO', 1)
+                                        ->first();
+                if(count($ocas)>0){
+                    $estados = ['ETM0000000000003', 'ETM0000000000004'];
+                    $documento_camino = DB::table('FE_DOCUMENTO')
+                                        ->where('ID_DOCUMENTO', $ocas->LOTE)
+                                        ->whereIn('COD_ESTADO', $estados)
+                                        ->first();
+                    if(count($documento_camino)>0){
+                        return Redirect::back()->with('errorurl', 'Existe una Orden de Compra Anticipo que esta en camino de aprobacion '.$ocas->LOTE);
+                    }
+                }
+
+
+                //ANTICIPO
+                $ANTIPOC_OC = DB::table('FE_REF_ASOC')
+                    ->select(DB::raw('SUM(FE_REF_ASOC.TOTAL_MERGE) as total'))
+                    ->join('FE_DOCUMENTO', 'FE_REF_ASOC.LOTE', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
+                    ->where('FE_REF_ASOC.ID_DOCUMENTO', 'IILMCL0000002235')
+                    ->where('FE_REF_ASOC.COD_ESTADO', 1)
+                    ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000005', 'ETM0000000000008'])
+                    ->first();
+                    
+                $total_anticipo_t = $ANTIPOC_OC->total ?? 0;
+
 
                 /**************************** VALIDAR CDR Y LEER RESPUESTA ******************************/
                 $filescdr          =   $request['DCC0000000000004'];
@@ -5482,9 +5511,7 @@ class GestionOCController extends Controller
                 }
 
 
-
-
-
+                $MONTO_ANTICIPO_DESC = $MONTO_ANTICIPO_DESC + $total_anticipo_t;
 
                 FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                             ->update(

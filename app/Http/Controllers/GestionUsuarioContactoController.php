@@ -4017,7 +4017,7 @@ class GestionUsuarioContactoController extends Controller
                 DB::beginTransaction();
                 $pedido_id          =   $idoc;
 
-                $ordencompra            =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
+                //$ordencompra        =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
 
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
 
@@ -4548,7 +4548,7 @@ class GestionUsuarioContactoController extends Controller
                 } 
             }
 
-                    
+      
             $archivospdf            =   Archivo::where('ID_DOCUMENTO','=',$idoc)
                                         ->where('ACTIVO','=','1')
                                         ->where('EXTENSION', 'like', '%'.'pdf'.'%')

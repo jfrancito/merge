@@ -89,7 +89,7 @@
                                   data-aw="2"></textarea>
                             </div>
                         </div>
-                        <div class="form-group" style="display: none">
+                        <div class="form-group">
                             <label class="col-sm-12 control-label izquierda" style="text-align: left;">Cuenta Contable
                                 <b>(*)</b></label>
                             <div class="col-sm-12">
@@ -121,7 +121,7 @@
             <a href="{{ url('/gestion-de-comprobante-contabilidad/'.$idopcion) }}">
                 <button type="button" class="btn btn-space btn-danger btncancelar">Cancelar</button>
             </a>
-            <button type="button" class="btn btn-space btn-primary btnaprobarcomporbatnte">Guardar</button>
+            <button type="button" class="btn btn-space btn-primary btnaprobarcomporbatntenuevo">Guardar</button>
         </p>
     </div>
 </div>
