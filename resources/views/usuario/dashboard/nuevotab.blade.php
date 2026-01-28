@@ -11,16 +11,17 @@
                       $countdis   =   $count_x_aprobar_dis+$count_reparables_dis+$count_reparables__revdis+$count_observados_dis+$count_observadosdis_le;
                       $countdib   =   $count_x_aprobar_dib+$count_reparables_dib+$count_reparables__revdib+$count_observados_dib+$count_observadosdib_le;
                       $countlg    =   $count_x_aprobar_lg+$count_observados_lg+$count_observadoslg_le;
-
                       $countdic    =   $count_x_aprobar_dic+$count_observados_dic+$count_observadosdic_le;
-
                       $countlqa    =   $count_x_aprobar_lqa+$count_observados_lqa+$count_observadoslqa_le;
+                      $countpgs    =   $count_x_aprobar_pgs+$count_observados_pgs+$count_observadospgs_le;
 
-
+                      $countnoc    =   $count_x_aprobar_noc+$count_observados_noc+$count_observadosnoc_le;
+                      $countnod    =   $count_x_aprobar_nod+$count_observados_nod+$count_observadosnod_le;
+                      $countoca    =   $count_x_aprobar_oca+$count_observados_oca+$count_observadosoca_le;
 
                       $countvl    =   $count_x_aprobar_vl;
                       $countrenta =   $count_x_aprobar_renta;
-                      $cantotal   =   $countoc+$countcon+$countest+$countdip+$countdis+$countdib+$countrenta+$countdic+$countlqa;
+                      $cantotal   =   $countoc+$countcon+$countest+$countdip+$countdis+$countdib+$countrenta+$countdic+$countlqa+$countpgs+$countnoc+$countnod+$countoca;
                     @endphp
 
                     @if($trol->ind_uc == 1)
@@ -120,6 +121,9 @@
                                 </div>
                             </a>
                         </li>
+
+
+
                         <li class="nav-item">
                             <a class="nav-link category-tab" data-category="lqa">
                                 <span class="nav-text">LIQUIDACION COMPRA ANTICIPO </span>
@@ -128,6 +132,47 @@
                                 </div>
                             </a>
                         </li>
+
+
+                        <li class="nav-item">
+                            <a class="nav-link category-tab" data-category="pgs">
+                                <span class="nav-text">PROVISION DE GASTOS </span>
+                                <div class="notification-container">
+                                    <span class="notification-badge">{{$countpgs}}</span>
+                                </div>
+                            </a>
+                        </li>
+
+
+                        <li class="nav-item">
+                            <a class="nav-link category-tab" data-category="noc">
+                                <span class="nav-text">NOTA DE CREDITO </span>
+                                <div class="notification-container">
+                                    <span class="notification-badge">{{$countnoc}}</span>
+                                </div>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link category-tab" data-category="nod">
+                                <span class="nav-text">NOTA DE DEBITO </span>
+                                <div class="notification-container">
+                                    <span class="notification-badge">{{$countnod}}</span>
+                                </div>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link category-tab" data-category="oca">
+                                <span class="nav-text">ORDEN COMPRA ANTICIPO </span>
+                                <div class="notification-container">
+                                    <span class="notification-badge">{{$countoca}}</span>
+                                </div>
+                            </a>
+                        </li>
+
+
+
 
 
                     </ul>
@@ -194,6 +239,23 @@
             <div id="lqa" class="category-content">
                 @include('usuario.dashboard.lqa')
             </div>
+
+            <div id="pgs" class="category-content">
+                @include('usuario.dashboard.pgs')
+            </div>
+
+
+            <div id="noc" class="category-content">
+                @include('usuario.dashboard.noc')
+            </div>
+            <div id="nod" class="category-content">
+                @include('usuario.dashboard.nod')
+            </div>
+            <div id="oca" class="category-content">
+                @include('usuario.dashboard.oca')
+            </div>
+
+
 
 
         </main>

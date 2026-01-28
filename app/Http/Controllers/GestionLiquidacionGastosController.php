@@ -31,7 +31,7 @@ use App\Modelos\TESCuentaBancaria;
 use App\Modelos\WEBValeRendir;
 
 use App\Modelos\SemanaImpulso;
-
+use App\Modelos\CONPeriodo;
 
 
 use App\Modelos\LqgLiquidacionGasto;
@@ -2324,6 +2324,7 @@ class GestionLiquidacionGastosController extends Controller
                 $tdetliquidaciongastos_sinaereo = LqgDetLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->whereRaw("ISNULL(IND_OSIRIS, 0) <> 1")->where('ACTIVO', '=', '1')->get();
 
                 $osiris = $this->lg_enviar_osiris($liquidaciongastos, $tdetliquidaciongastos_sinaereo, $detdocumentolg, $SERIE, $CORRELATIVO, $periodo);
+
                 LqgLiquidacionGasto::where('ID_DOCUMENTO', $liquidaciongastos->ID_DOCUMENTO)
                     ->update(
                         [
@@ -2415,6 +2416,25 @@ class GestionLiquidacionGastosController extends Controller
         }
     }
 
+
+    public function actionRegularizarVacios(Request $request)
+    {
+
+        $iddocumento = 'IILMLG0000006967';
+        $liquidaciongastos = LqgLiquidacionGasto::where('COD_OSIRIS', '=', $iddocumento)->first();
+        $iddocumento = $liquidaciongastos->ID_DOCUMENTO;        
+        $tdetliquidaciongastos = LqgDetLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
+        $detdocumentolg = LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
+        $documentohistorial = LqgDocumentoHistorial::where('ID_DOCUMENTO', '=', $iddocumento)->orderby('FECHA', 'DESC')->get();
+        $tdetliquidaciongastos_sinaereo = LqgDetLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->whereRaw("ISNULL(IND_OSIRIS, 0) <> 1")->where('ACTIVO', '=', '1')->get();
+        $documento = DB::table('CMP.DOCUMENTO_CTBLE')
+            ->select('COD_PERIODO', DB::raw('*'))
+            ->where('COD_DOCUMENTO_CTBLE', $liquidaciongastos->COD_OSIRIS)
+            ->first();
+        $periodo = CONPeriodo::where('COD_PERIODO', '=', $documento->COD_PERIODO)->first();
+        $osiris = $this->lg_enviar_osiris_vacios($liquidaciongastos, $tdetliquidaciongastos_sinaereo, $detdocumentolg,$periodo);
+
+    }
 
     public function actionAprobarContabilidadLG($idopcion, $iddocumento, Request $request)
     {
