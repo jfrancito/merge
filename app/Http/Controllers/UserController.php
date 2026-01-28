@@ -1680,6 +1680,35 @@ class UserController extends Controller {
 		$count_observadoslqa_le 			= 	0;
 
 
+		//provision de gastos
+        $url_obs_pgs 					    =	'';
+		$urlpgs 							=	'';
+		$count_x_aprobar_pgs 				= 	0;
+		$count_observados_pgs				= 	0;
+		$count_observadospgs_le 			= 	0;
+
+		//nota de credito
+        $url_obs_noc 					    =	'';
+		$urlnoc 							=	'';
+		$count_x_aprobar_noc 				= 	0;
+		$count_observados_noc				= 	0;
+		$count_observadosnoc_le 			= 	0;
+
+		//nota de debito
+        $url_obs_nod 					    =	'';
+		$urlnod 							=	'';
+		$count_x_aprobar_nod 				= 	0;
+		$count_observados_nod				= 	0;
+		$count_observadosnod_le 			= 	0;
+
+		//orden compra anticipo
+        $url_obs_oca 					    =	'';
+		$urloca 							=	'';
+		$count_x_aprobar_oca 				= 	0;
+		$count_observados_oca				= 	0;
+		$count_observadosoca_le 			= 	0;
+
+
 
 		if($trol->ind_uc == 1){
 
@@ -1801,6 +1830,12 @@ class UserController extends Controller {
 
 				//documento interno compra
 				$urldic 					=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=DOCUMENTO_INTERNO_COMPRA';
+				$urlpgs 					=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=PROVISION_GASTO';
+				$urlnoc 					=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=NOTA_CREDITO';
+				$urlnod 					=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=NOTA_DEBITO';
+				$urloca 					=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=ORDEN_COMPRA_ANTICIPO';
+
+
 
 
 
@@ -1907,6 +1942,52 @@ class UserController extends Controller {
 	        	$listadatosob    		=   $this->lg_lista_cabecera_comprobante_total_obs_le_contabilidad();
 				$count_observadoslg_le	= 	count($listadatosob);
 
+
+				//PROVISION DE GASTOS
+				$operacion_id 			=	'PROVISION_GASTO';
+        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_cont_pg($cod_empresa,$operacion_id);
+				$count_x_aprobar_pgs 	= 	 count($listadatos);
+
+	        	$lisadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_pg_obs($cod_empresa,$operacion_id);
+				$count_observados_pgs 	= 	count($listadatosob);
+
+	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_pg_levantadas($cod_empresa,$operacion_id);
+				$count_observadospgs_le 	= 	count($listadatosob);
+
+				//NOTA_CREDITO
+				$operacion_id 			=	'NOTA_CREDITO';
+        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_cont_nota_credito($cod_empresa,$operacion_id);
+				$count_x_aprobar_noc 	= 	 count($listadatos);
+
+	        	$lisadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_nota_credito_obs($cod_empresa,$operacion_id);
+				$count_observados_noc 	= 	count($listadatosob);
+
+	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_nota_credito_levantadas($cod_empresa,$operacion_id);
+				$count_observadosnoc_le 	= 	count($listadatosob);
+
+
+				//NOTA_DEBITO
+				$operacion_id 			=	'NOTA_DEBITO';
+        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_cont_nota_debito($cod_empresa,$operacion_id);
+				$count_x_aprobar_nod 	= 	 count($listadatos);
+
+	        	$lisadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_nota_debito_obs($cod_empresa,$operacion_id);
+				$count_observados_nod 	= 	count($listadatosob);
+
+	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_nota_debito_levantadas($cod_empresa,$operacion_id);
+				$count_observadosnod_le 	= 	count($listadatosob);
+
+				//ORDEN_COMPRA_ANTICIPO
+				$operacion_id 			=	'ORDEN_COMPRA_ANTICIPO';
+        		$listadatos     		=   $this->con_lista_cabecera_comprobante_oca_total_cont($cod_empresa,$operacion_id);
+				$count_x_aprobar_oca 	= 	 count($listadatos);
+
+	        	$lisadatosob    		=   $this->con_lista_cabecera_comprobante_oca_total_cont_obs($cod_empresa,$operacion_id);
+				$count_observados_oca 	= 	count($listadatosob);
+
+	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_oca_total_cont_obs_levantadas($cod_empresa,$operacion_id);
+				$count_observadosoca_le 	= 	count($listadatosob);
+
 			}
 			//ADMINISTRACION
 			else{
@@ -1938,6 +2019,12 @@ class UserController extends Controller {
 
     				//documento interno compra
     				$urldic 				=	'/gestion-de-administracion-aprobar/j25?operacion_id=DOCUMENTO_INTERNO_COMPRA';
+					$urlpgs 				=	'/gestion-de-administracion-aprobar/j25?operacion_id=PROVISION_GASTO';
+
+					$urlnoc 				=	'/gestion-de-administracion-aprobar/j25?operacion_id=NOTA_CREDITO';
+					$urlnod 				=	'/gestion-de-administracion-aprobar/j25?operacion_id=NOTA_DEBITO';
+					$urloca 				=	'/gestion-de-administracion-aprobar/j25?operacion_id=ORDEN_COMPRA_ANTICIPO';
+
 
     				//documento interno compra
     				$urllqa 				=	'/gestion-de-administracion-aprobar/j25?operacion_id=LIQUIDACION_COMPRA_ANTICIPO';
@@ -2031,6 +2118,54 @@ class UserController extends Controller {
 					$count_observadosdic_le 	= 	count($listadatosob);
 
 
+
+
+					//PROVISION_GASTO
+					$operacion_id 			=	'PROVISION_GASTO';
+	        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_adm_pg($cod_empresa,$operacion_id);
+					$count_x_aprobar_pgs 	= 	 count($listadatos);
+
+		        	$lisadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_pg_obs($cod_empresa,$operacion_id);
+					$count_observados_pgs 	= 	count($listadatosob);
+
+		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_pg_obs_levantadas($cod_empresa,$operacion_id);
+					$count_observadospgs_le = 	count($listadatosob);
+
+
+					//NOTA_CREDITO
+					$operacion_id 			=	'NOTA_CREDITO';
+	        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_adm_nota_credito($cod_empresa,$operacion_id);
+					$count_x_aprobar_noc 	= 	 count($listadatos);
+
+		        	$lisadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_nota_credito_obs($cod_empresa,$operacion_id);
+					$count_observados_noc 	= 	count($listadatosob);
+
+		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_nota_credito_obs_levantadas($cod_empresa,$operacion_id);
+					$count_observadosnoc_le = 	count($listadatosob);
+
+					//NOTA_DEBITO
+					$operacion_id 			=	'NOTA_DEBITO';
+	        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_adm_nota_debito($cod_empresa,$operacion_id);
+					$count_x_aprobar_nod 	= 	 count($listadatos);
+
+		        	$lisadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_nota_debito_obs($cod_empresa,$operacion_id);
+					$count_observados_nod 	= 	count($listadatosob);
+
+		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_nota_debito_obs_levantadas($cod_empresa,$operacion_id);
+					$count_observadosnod_le = 	count($listadatosob);
+
+
+					//ORDEN_COMPRA_ANTICIPO
+					$operacion_id 			=	'ORDEN_COMPRA_ANTICIPO';
+	        		$listadatos     		=   $this->con_lista_cabecera_comprobante_oca_total_adm($cod_empresa,$operacion_id);
+					$count_x_aprobar_oca 	= 	 count($listadatos);
+
+		        	$lisadatosob    		=   $this->con_lista_cabecera_comprobante_oca_total_adm_obs($cod_empresa,$operacion_id);
+					$count_observados_oca 	= 	count($listadatosob);
+
+		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_oca_total_adm_obs_levantadas($cod_empresa,$operacion_id);
+					$count_observadosoca_le = 	count($listadatosob);
+
 					//LIQUIDACION DE OMPRA ANTIPIO
 					$operacion_id 			=	'LIQUIDACION_COMPRA_ANTICIPO';
 	        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_adm_estiba($cod_empresa,$operacion_id);
@@ -2103,6 +2238,26 @@ class UserController extends Controller {
 						 	'count_observadosdic_le' 	=> $count_observadosdic_le,
 						 	'urldic' 					=> $urldic,
 
+						 	'count_x_aprobar_pgs' 		=> $count_x_aprobar_pgs,
+						 	'count_observados_pgs' 		=> $count_observados_pgs,
+						 	'count_observadospgs_le' 	=> $count_observadospgs_le,
+						 	'urlpgs' 					=> $urlpgs,
+
+
+						 	'count_x_aprobar_noc' 		=> $count_x_aprobar_noc,
+						 	'count_observados_noc' 		=> $count_observados_noc,
+						 	'count_observadosnoc_le' 	=> $count_observadosnoc_le,
+						 	'urlnoc' 					=> $urlnoc,
+
+						 	'count_x_aprobar_nod' 		=> $count_x_aprobar_nod,
+						 	'count_observados_nod' 		=> $count_observados_nod,
+						 	'count_observadosnod_le' 	=> $count_observadosnod_le,
+						 	'urlnod' 					=> $urlnod,
+
+						 	'count_x_aprobar_oca' 		=> $count_x_aprobar_oca,
+						 	'count_observados_oca' 		=> $count_observados_oca,
+						 	'count_observadosoca_le' 	=> $count_observadosoca_le,
+						 	'urloca' 					=> $urloca,
 
 						 	'count_x_aprobar_lqa' 		=> $count_x_aprobar_lqa,
 						 	'count_observados_lqa' 		=> $count_observados_lqa,

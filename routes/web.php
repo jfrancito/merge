@@ -142,6 +142,8 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/ajax-modal-lista-comparativa', 'GestionLiquidacionGastosController@actionAjaxModalComparativa');
 
+	Route::any('/regularizar-vacios-lq', 'GestionLiquidacionGastosController@actionRegularizarVacios');
+
 
 	Route::any('/extonar-liquidacion-gastos/{idopcion}/{iddocumento}', 'GestionLiquidacionGastosController@actionExtornarLiquidacionGastos');
 	Route::any('/extonar-liquidacion-gastos-detalle/{idopcion}/{item}/{iddocumento}', 'GestionLiquidacionGastosController@actionExtornarLiquidacionGastosDetalle');
