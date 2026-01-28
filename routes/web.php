@@ -598,6 +598,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/detalle-comprobante-oc-validado-estiba/{idopcion}/{lote}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoEstiba');
 	Route::any('/detalle-comprobante-oc-validado-comision/{idopcion}/{lote}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoComision');
 
+	Route::any('/detalle-comprobante-oc-validado-estiba-oca/{idopcion}/{lote}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoEstibaOCA');
+
+
 	Route::any('/detalle-comprobante-oc-validado-liquidacion-compra-anticipo/{idopcion}/{linea}/{prefijo}/{idordenpago}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoLiquidacionCompraAnticipo');
 
 	Route::any('/detalle-comprobante-oc-validado-nota-credito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoNotaCredito');
