@@ -1609,17 +1609,15 @@ class GestionOCValidadoController extends Controller
         $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
         //dd($ordencompra);
 
-        $prefijocarperta        =   $this->prefijo_empresa($ordencompra->COD_EMPR);
+        $prefijocarperta        =   $this->prefijo_empresa($fedocumento->COD_EMPR);
 
-
-        //dd($idoc);
 
         $archivo                =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','1')->where('TIPO_ARCHIVO','=',$tipo)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->first();
         $nombrearchivo          =   trim($archivo->NOMBRE_ARCHIVO);
         $nombrefile             =   basename($nombrearchivo);
-        $file                   =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO.'\\'.basename($archivo->NOMBRE_ARCHIVO);
+        $file                   =   $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$fedocumento->RUC_PROVEEDOR.'\\'.basename($archivo->NOMBRE_ARCHIVO);
 
-
+        //dd($file);
         if(file_exists($file)){
             header("Cache-Control: public");
             header("Content-Description: File Transfer");
