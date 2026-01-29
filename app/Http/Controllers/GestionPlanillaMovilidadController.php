@@ -784,7 +784,7 @@ class GestionPlanillaMovilidadController extends Controller
                                 ->first();
 
             $periodo = DB::table('CON.PERIODO')
-                        ->where('COD_PERIODO', 'IICHPE0000000091')
+                        ->where('COD_PERIODO', $movilidad->COD_PERIODO)
                         ->first(); // first() para un solo registro
 
             $fechaString = date_format(date_create($periodo->FEC_FIN), 'd-m-Y');
