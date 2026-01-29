@@ -1945,13 +1945,13 @@ class UserController extends Controller {
 
 				//PROVISION DE GASTOS
 				$operacion_id 			=	'PROVISION_GASTO';
-        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_cont_pg($cod_empresa,$operacion_id);
+        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_cont_pg($cod_empresa);
 				$count_x_aprobar_pgs 	= 	 count($listadatos);
 
-	        	$lisadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_pg_obs($cod_empresa,$operacion_id);
-				$count_observados_pgs 	= 	count($listadatosob);
+	        	$lisadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_pg_obs($cod_empresa);
+				$count_observados_pgs 	= 	count($lisadatosob);
 
-	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_pg_levantadas($cod_empresa,$operacion_id);
+	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_pg_levantadas($cod_empresa);
 				$count_observadospgs_le 	= 	count($listadatosob);
 
 				//NOTA_CREDITO
@@ -1960,7 +1960,7 @@ class UserController extends Controller {
 				$count_x_aprobar_noc 	= 	 count($listadatos);
 
 	        	$lisadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_nota_credito_obs($cod_empresa,$operacion_id);
-				$count_observados_noc 	= 	count($listadatosob);
+				$count_observados_noc 	= 	count($lisadatosob);
 
 	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_nota_credito_levantadas($cod_empresa,$operacion_id);
 				$count_observadosnoc_le 	= 	count($listadatosob);
@@ -1972,7 +1972,7 @@ class UserController extends Controller {
 				$count_x_aprobar_nod 	= 	 count($listadatos);
 
 	        	$lisadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_nota_debito_obs($cod_empresa,$operacion_id);
-				$count_observados_nod 	= 	count($listadatosob);
+				$count_observados_nod 	= 	count($lisadatosob);
 
 	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_nota_debito_levantadas($cod_empresa,$operacion_id);
 				$count_observadosnod_le 	= 	count($listadatosob);
@@ -1983,7 +1983,7 @@ class UserController extends Controller {
 				$count_x_aprobar_oca 	= 	 count($listadatos);
 
 	        	$lisadatosob    		=   $this->con_lista_cabecera_comprobante_oca_total_cont_obs($cod_empresa,$operacion_id);
-				$count_observados_oca 	= 	count($listadatosob);
+				$count_observados_oca 	= 	count($lisadatosob);
 
 	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_oca_total_cont_obs_levantadas($cod_empresa,$operacion_id);
 				$count_observadosoca_le 	= 	count($listadatosob);
@@ -2126,7 +2126,7 @@ class UserController extends Controller {
 					$count_x_aprobar_pgs 	= 	 count($listadatos);
 
 		        	$lisadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_pg_obs($cod_empresa,$operacion_id);
-					$count_observados_pgs 	= 	count($listadatosob);
+					$count_observados_pgs 	= 	count($lisadatosob);
 
 		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_pg_obs_levantadas($cod_empresa,$operacion_id);
 					$count_observadospgs_le = 	count($listadatosob);
@@ -2138,7 +2138,7 @@ class UserController extends Controller {
 					$count_x_aprobar_noc 	= 	 count($listadatos);
 
 		        	$lisadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_nota_credito_obs($cod_empresa,$operacion_id);
-					$count_observados_noc 	= 	count($listadatosob);
+					$count_observados_noc 	= 	count($lisadatosob);
 
 		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_nota_credito_obs_levantadas($cod_empresa,$operacion_id);
 					$count_observadosnoc_le = 	count($listadatosob);
@@ -2149,7 +2149,7 @@ class UserController extends Controller {
 					$count_x_aprobar_nod 	= 	 count($listadatos);
 
 		        	$lisadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_nota_debito_obs($cod_empresa,$operacion_id);
-					$count_observados_nod 	= 	count($listadatosob);
+					$count_observados_nod 	= 	count($lisadatosob);
 
 		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_nota_debito_obs_levantadas($cod_empresa,$operacion_id);
 					$count_observadosnod_le = 	count($listadatosob);
@@ -2161,7 +2161,7 @@ class UserController extends Controller {
 					$count_x_aprobar_oca 	= 	 count($listadatos);
 
 		        	$lisadatosob    		=   $this->con_lista_cabecera_comprobante_oca_total_adm_obs($cod_empresa,$operacion_id);
-					$count_observados_oca 	= 	count($listadatosob);
+					$count_observados_oca 	= 	count($lisadatosob);
 
 		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_oca_total_adm_obs_levantadas($cod_empresa,$operacion_id);
 					$count_observadosoca_le = 	count($listadatosob);
@@ -2172,7 +2172,7 @@ class UserController extends Controller {
 					$count_x_aprobar_lqa 	= 	 count($listadatos);
 
 		        	$lisadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs($cod_empresa,$operacion_id);
-					$count_observados_lqa 	= 	count($listadatosob);
+					$count_observados_lqa 	= 	count($lisadatosob);
 
 		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas($cod_empresa,$operacion_id);
 					$count_observadoslqa_le 	= 	count($listadatosob);
