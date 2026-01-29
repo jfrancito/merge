@@ -2721,12 +2721,19 @@ class GestionOCController extends Controller
        
 
         $fedocumento_x          =   FeDocumento::where('TXT_REFERENCIA','=',$idoc)->first();     
+        $combotipodocumento     =   array('CON_CPE' => 'CON CPE','SIN_CPE' => 'SIN_CPE');
+        $tipodocumento_id       =   'CON_CPE';
+
 
         return View::make('comprobante/registrocomprobantenotacreditoadministrator',
                          [
                             'ordencompra'           =>  $ordencompra,
                             'user_orden'            =>  $user_orden,
-                            'empresa'               =>  $empresa,                            
+                            'empresa'               =>  $empresa,
+
+                            'combotipodocumento'    =>  $combotipodocumento,
+                            'tipodocumento_id'      =>  $tipodocumento_id, 
+
                             'ordencompra_f'         =>  $ordencompra_f,
                             'fedocumento_x'         =>  $fedocumento_x,                            
                             'detalleordencompra'    =>  $detalleordencompra,                            
@@ -4448,8 +4455,7 @@ class GestionOCController extends Controller
 
         if($_POST)
         {
-            if (!empty($file)) 
-            {
+
                 try{    
 
                         DB::beginTransaction();
@@ -4457,6 +4463,7 @@ class GestionOCController extends Controller
                         $referenciaasoc         =   CMPReferecenciaAsoc::where('COD_TABLA','=',$idoc)->first();
                         $ordencompra_f          =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$referenciaasoc->COD_TABLA_ASOC)->first();
                         
+
                         if($ordencompra_t->CAN_TOTAL>$ordencompra_f->CAN_TOTAL){
                             return Redirect::back()->with('errorurl', 'El importe de la nota de crédito no puede ser mayor a la factura relacionada');
                         }
@@ -4475,295 +4482,418 @@ class GestionOCController extends Controller
                             DB::table('FE_DOCUMENTO_HISTORIAL')->where('ID_DOCUMENTO','=',$fedocumento_t->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$fedocumento_t->DOCUMENTO_ITEM)->delete();
                         }
 
-                        /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
-                        $contadorArchivos = Archivo::count();
-                        $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
-                        $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
-                        $nombrefile      =      $contadorArchivos.'-'.$file->getClientOriginalName();
-                        $valor           =      $this->versicarpetanoexiste($rutafile);
-                        $rutacompleta    =      $rutafile.'\\'.$nombrefile;
+                        $tipodocumento_id           =   $request['tipodocumento_id'];
+                    
+                        if($tipodocumento_id=='SIN_CPE'){
 
-                        $nombreoriginal             =   $file->getClientOriginalName();
-                        $info                       =   new SplFileInfo($nombreoriginal);
-                        $extension                  =   $info->getExtension();
+                            $cant_perception                    =   0;
+                            $monto_detraccion                   =   0;
+                            $cant_rentencion                    =   0;
+                            $ordencompra                        =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$idoc)->first();
+                            $empresa_sel                        =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR_EMISOR)->first();
 
-                        copy($file->getRealPath(),$rutacompleta);
-                        //dd($extractedFile);
-                        $path            =   $rutacompleta;
+                            //dd($ordencompra);
+                            $documentolinea                     =   $this->ge_linea_documento($idoc);
+                            //REGISTRO DEL XML LEIDO
+                            $documento                          =   new FeDocumento;
+                            $documento->ID_DOCUMENTO            =   $idoc;
+                            $documento->DOCUMENTO_ITEM          =   $documentolinea;
+                            $documento->COD_EMPR                =   Session::get('empresas')->COD_EMPR;
+                            $documento->TXT_EMPR                =   Session::get('empresas')->NOM_EMPR;
+                            $documento->TXT_PROCEDENCIA         =   'ADM';
+                            $documento->ESTADO                  =   'A';
+                            $documento->RUC_PROVEEDOR           =   $empresa_sel->NRO_DOCUMENTO;
+                            $documento->RZ_PROVEEDOR            =   $ordencompra->TXT_EMPR_EMISOR;
+                            $documento->TIPO_CLIENTE            =   '';
+                            $documento->ID_CLIENTE              =   Session::get('empresas')->NRO_DOCUMENTO;
+                            $documento->NOMBRE_CLIENTE          =   Session::get('empresas')->NOM_EMPR;
+                            $documento->DIRECCION_CLIENTE       =   '';
+                            $documento->SERIE                   =   '';
+                            $documento->NUMERO                  =   '';
+                            $documento->ID_TIPO_DOC             =   '';
+                            $documento->FEC_VENTA               =   date_format(date_create($ordencompra->FEC_EMISION), 'Ymd');
+                            $documento->FEC_VENCI_PAGO          =   date_format(date_create($ordencompra->FEC_EMISION), 'Ymd');
+                            $documento->FORMA_PAGO              =   '';
+                            $documento->FORMA_PAGO_DIAS         =   0;
+                            $documento->MONEDA                  =   '';
+                            $documento->VALOR_IGV_ORIG          =   0;
+                            $documento->VALOR_IGV_SOLES         =   0;
+                            $documento->SUB_TOTAL_VENTA_ORIG    =   $ordencompra->CAN_TOTAL;
+                            $documento->SUB_TOTAL_VENTA_SOLES   =   $ordencompra->CAN_TOTAL;
+                            $documento->TOTAL_VENTA_ORIG        =   $ordencompra->CAN_TOTAL;
+                            $documento->TOTAL_VENTA_SOLES       =   $ordencompra->CAN_TOTAL;
+                            $documento->PERCEPCION              =   0;
+                            $documento->MONTO_RETENCION         =   0;
+                            $documento->HORA_EMISION            =   date_format(date_create($ordencompra->FEC_EMISION), 'h:i:s');
+                            $documento->IMPUESTO_2              =   0;
+                            $documento->TIPO_DETRACCION         =   '';
+                            $documento->PORC_DETRACCION         =   0;
+                            $documento->MONTO_DETRACCION        =   0;
+                            $documento->MONTO_ANTICIPO          =   0;
+                            $documento->NRO_ORDEN_COMP          =   '';              
+                            $documento->NUM_GUIA                =   '';
+                            $documento->estadoCp                =   0;
+                            $documento->ARCHIVO_XML             =   '';
+                            $documento->ARCHIVO_CDR             =   '';
+                            $documento->ARCHIVO_PDF             =   '';
+                            $documento->COD_CONTACTO            =   '';
+                            $documento->TXT_CONTACTO            =   '';
+                            $documento->COD_ESTADO              =   '';
+                            $documento->TXT_ESTADO              =   '';
+                            $documento->ind_email_uc            =   -1;
+                            $documento->ind_email_ap            =   -1;
+                            $documento->ind_email_adm           =   -1;
+                            $documento->ind_email_ba            =   -1;
+                            $documento->ind_email_clap          =   -1;
+
+                            $documento->ind_ruc                 =    1;
+                            $documento->ind_rz                  =    1;
+                            $documento->ind_moneda              =    1;
+                            $documento->ind_total               =    1;
+                            $documento->ind_cantidaditem        =    1;
+                            $documento->ind_formapago           =    1;
+                            $documento->ind_errototal           =    1;
+
+                            $documento->OPERACION               =   'NOTA_CREDITO';
+                            $documento->OPERACION_DET           =   'SIN_XML';
+                            $documento->MONTO_NC                =   0.00;
+                            $documento->MONTO_DETRACCION_XML    =   (float)$monto_detraccion;
+                            $documento->MONTO_DETRACCION_RED    =   round((float)$monto_detraccion);
+                            $documento->MONTO_RETENCION         =   $cant_rentencion;
+                            $documento->save();
 
 
-                        //FACTURA
-                        /****************************************  LEER EL XML Y GUARDAR   *********************************/
-                        $parser             = new NoteParser();
-                        $xml                = file_get_contents($path);
-                        $factura            = $parser->parse($xml);
-                        //dd($factura);
-                        $tipo_documento_le  = $factura->gettipoDoc();
-                        $moneda_le          = $factura->gettipoMoneda();
 
-                        if($ordencompra->COD_CATEGORIA_MOTIVO_EMISION=='MEM0000000000004' || $ordencompra->COD_CATEGORIA_MOTIVO_EMISION=='MEM0000000000007'){
                             $archivosdelfe          =      CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                        ->whereIn('COD_CATEGORIA', ['DCC0000000000003','DCC0000000000004','DCC0000000000030','DCC0000000000007'])
+                                                        ->whereIn('COD_CATEGORIA', ['DCC0000000000030'])
                                                         ->get();
-                        }else{                            
-                            $archivosdelfe          =      CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                        ->whereIn('COD_CATEGORIA', ['DCC0000000000003','DCC0000000000004','DCC0000000000030'])
-                                                        ->get();
-                        }
-
-
-                        //VALIDAR QUE YA EXISTE ESTE XML
-
-                        $fedocumento_e          =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->whereNotIn('COD_ESTADO',['','ETM0000000000006'])
-                                                    ->where('RUC_PROVEEDOR','=',$factura->getcompany()->getruc())
-                                                    ->where('SERIE','=',$factura->getserie())
-                                                    ->where('NUMERO','=',$factura->getcorrelativo())
-                                                    ->where('ID_TIPO_DOC','=',$tipo_documento_le)
-                                                    ->first();
-                        if(count($fedocumento_e)>0){
-                            return Redirect::back()->with('errorurl', 'Este XML ya fue integrado en otra orden de compra');
-                        }
-
-                        //VALIDAR QUE EL XML SEA DE LA EMPRESA
-                        if($factura->getClient()->getnumDoc()!= Session::get('empresas')->NRO_DOCUMENTO){
-                            return Redirect::back()->with('errorurl', 'El xml no corresponde a la empresa '.Session::get('empresas')->NRO_DOCUMENTO);
-                        }
-
-                        $rz_p                               =   str_replace(["![CDATA[", "]]"], "", $factura->getcompany()->getrazonSocial());
-                        $rz_p                               =    str_replace("?", "Ñ", $rz_p);
-                        $rz_p                               =   str_replace("ï¿½", "Ñ", $rz_p);
-                        $rz_p                               =   str_replace("MARILÑ", "MARILÚ", $rz_p);
-
-                        $documentolinea                     =   $this->ge_linea_documento($ordencompra->COD_DOCUMENTO_CTBLE);
-                        //$cant_rentencion                    =   $ordencompra_t->CAN_RETENCION;
-                        //$cant_perception                    =   $factura->getperception();
-                        $cant_perception                    =   0;
-                        $cant_rentencion                    =   0;
-
-
-                        //REGISTRO DEL XML LEIDO
-                        $documento                          =   new FeDocumento;
-                        $documento->ID_DOCUMENTO            =   $ordencompra->COD_DOCUMENTO_CTBLE;
-                        $documento->DOCUMENTO_ITEM          =   $documentolinea;
-
-                        $documento->COD_EMPR                =   $ordencompra->COD_EMPR;
-                        $documento->TXT_EMPR                =   $ordencompra->NOM_EMPR;
-                        $documento->TXT_PROCEDENCIA         =   $procedencia;
-                        $documento->ESTADO                  =   'A';
-                        $documento->RUC_PROVEEDOR           =   $factura->getcompany()->getruc();
-                        $documento->RZ_PROVEEDOR            =   $rz_p;
-                        $documento->TIPO_CLIENTE            =   $factura->getClient()->gettipoDoc();
-                        $documento->ID_CLIENTE              =   $factura->getClient()->getnumDoc();
-                        $documento->NOMBRE_CLIENTE          =   $factura->getClient()->getrznSocial();
-                        $documento->DIRECCION_CLIENTE       =   '';
-                        $documento->SERIE                   =   $factura->getserie();
-                        $documento->NUMERO                  =   $factura->getcorrelativo();
-                        $documento->ID_TIPO_DOC             =   $tipo_documento_le;
-                        $documento->FEC_VENTA               =   $factura->getfechaEmision()->format('Ymd');
-                        $documento->FEC_VENCI_PAGO          =   $factura->getfechaEmision()->format('Ymd');
-                        //$documento->FORMA_PAGO              =   $factura->getcondicionPago();
-                        $documento->FORMA_PAGO              =   '';
-                        $documento->FORMA_PAGO_DIAS          =  0;
-                        $documento->MONEDA                  =   $moneda_le;
-
-                        $documento->VALOR_IGV_ORIG          =   $factura->getmtoIGV();
-                        $documento->VALOR_IGV_SOLES         =   $factura->getmtoIGV();
-                        $documento->SUB_TOTAL_VENTA_ORIG    =   $factura->getmtoOperGravadas();
-                        $documento->SUB_TOTAL_VENTA_SOLES   =   $factura->getmtoOperGravadas();
-                        $documento->TOTAL_VENTA_XML         =   $factura->getmtoImpVenta();
-
-                        $documento->TOTAL_VENTA_ORIG        =   $ordencompra->CAN_TOTAL;
-                        $documento->TOTAL_VENTA_SOLES       =   $factura->getmtoImpVenta();
-
-
-                        $documento->PERCEPCION              =   $cant_perception;
-                        $documento->MONTO_RETENCION         =   $cant_rentencion;
-
-                        $documento->HORA_EMISION            =   $factura->gethoraEmision();
-                        $documento->IMPUESTO_2              =   $factura->getmtoOtrosTributos();
-                        //$documento->TIPO_DETRACCION         =   $factura->getdetraccion()->gettipoDet();
-                        //$documento->PORC_DETRACCION         =   floatval($factura->getdetraccion()->getporcDet());
-                        //$documento->MONTO_DETRACCION        =   (float)$factura->getdetraccion()->getbaseDetr();
-                        //$documento->MONTO_ANTICIPO          =   $factura->getdestotalAnticipos();
-                        //$documento->OBSERVACION             =   $factura->getobservacion();
-                        //$documento->NRO_ORDEN_COMP          =   $factura->getcompra();              
-                        //$documento->NUM_GUIA                =   $factura->getguiaEmbebida();
-
-
-                        $documento->estadoCp                =   0;
-                        $documento->ARCHIVO_XML             =   $nombrefile;
-                        $documento->ARCHIVO_CDR             =   '';
-                        $documento->ARCHIVO_PDF             =   '';
-                        $documento->COD_CONTACTO            =   '';
-                        $documento->TXT_CONTACTO            =   '';
-                        $documento->COD_ESTADO              =   '';
-                        $documento->TXT_ESTADO              =   '';
-                        $documento->ind_email_uc            =   -1;
-                        $documento->ind_email_ap            =   -1;
-                        $documento->ind_email_adm           =   -1;
-                        $documento->ind_email_ba            =   -1;
-                        $documento->ind_email_clap          =   -1;
-                        $documento->OPERACION               =   'NOTA_CREDITO';
-                        $documento->MONTO_NC                =   0.00;
-                        
-                        $documento->save();
-
-
-                        //dd("entro");
-                        //ARCHIVO
-                        $dcontrol                   =   new Archivo;
-                        $dcontrol->ID_DOCUMENTO     =   $ordencompra->COD_DOCUMENTO_CTBLE;
-                        $dcontrol->DOCUMENTO_ITEM   =   $documentolinea;
-                        $dcontrol->TIPO_ARCHIVO     =   'DCC0000000000003';
-                        $dcontrol->NOMBRE_ARCHIVO   =   $nombrefile;
-                        $dcontrol->DESCRIPCION_ARCHIVO  =   'XML DE NOTA DE CREDITO';
-                        $dcontrol->URL_ARCHIVO      =   $path;
-                        $dcontrol->SIZE             =   filesize($file);
-                        $dcontrol->EXTENSION        =   $extension;
-                        $dcontrol->ACTIVO           =   1;
-                        $dcontrol->FECHA_CREA       =   $this->fechaactual;
-                        $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
-                        $dcontrol->save();
-
-
-
-                        /**********DETALLE*********/
-                        foreach ($factura->getdetails() as $indexdet => $itemdet) {
-
-                                $producto                           = str_replace("<![CDATA[","",$itemdet->getdescripcion());
-                                $producto                           = str_replace("]]>","",$producto);
-                                $producto                           = preg_replace('/[^A-Za-z0-9\s]/', '', $producto);
-
-                                $linea = str_pad($indexdet+1, 3, "0", STR_PAD_LEFT); 
-                                $detalle                        =   new FeDetalleDocumento;
-                                $detalle->ID_DOCUMENTO          =   $ordencompra->COD_DOCUMENTO_CTBLE;
-                                $detalle->DOCUMENTO_ITEM        =   $documentolinea;
-
-                                $detalle->LINEID                =   $linea;
-                                $detalle->CODPROD               =   $itemdet->getcodProducto();
-                                $detalle->PRODUCTO              =   $producto;
-                                $detalle->UND_PROD              =   $itemdet->getunidad();
-                                $detalle->CANTIDAD              =   $itemdet->getcantidad();
-                                $detalle->PRECIO_UNIT           =   (float)$itemdet->getmtoValorUnitario();
-                                $detalle->VAL_IGV_ORIG          =   (float)$itemdet->getigv();
-                                $detalle->VAL_IGV_SOL           =   (float)$itemdet->getigv();
-                                $detalle->VAL_SUBTOTAL_ORIG     =   (float)$itemdet->getmtoValorVenta();
-                                $detalle->VAL_SUBTOTAL_SOL      =   (float)$itemdet->getmtoValorVenta();
-                                $detalle->VAL_VENTA_ORIG        =   (float)$itemdet->getigv()+(float)$itemdet->getmtoValorVenta();
-                                $detalle->VAL_VENTA_SOL         =   (float)$itemdet->getigv()+(float)$itemdet->getmtoValorVenta();
-                                $detalle->PRECIO_ORIG           =   (float)$itemdet->getmtoPrecioUnitario();
-                                $detalle->save();
-
-                        }                    
-
-                        /****************************************  VALIDAR SI EL ARCHIVO ESTA ACEPTADO POR SUNAT  *********************************/
-
-
-                        $fedocumento         =      FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','<>','ETM0000000000006')->first();
-                        $fechaemision        =      date_format(date_create($fedocumento->FEC_VENTA), 'd/m/Y');
-                        $detallefedocumento  =      FeDetalleDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
-
-
-                        //VALIDAR QUE ALGUNOS CAMPOS SEAN IGUALES
-                        $this->con_validar_documento_proveedor_nota_credito($ordencompra,$fedocumento,$detalleordencompra,$detallefedocumento);
-
-
-                        $token = '';
-                        if($prefijocarperta =='II'){
-                            $token           =      $this->generartoken_ii();
-                        }else{
-                            $token           =      $this->generartoken_is();
-                        }
-
-                        //dd($token);
-
-                        $rvalidar = $this->validar_xml( $token,
-                                                        $fedocumento->ID_CLIENTE,
-                                                        $fedocumento->RUC_PROVEEDOR,
-                                                        $fedocumento->ID_TIPO_DOC,
-                                                        $fedocumento->SERIE,
-                                                        $fedocumento->NUMERO,
-                                                        $fechaemision,
-                                                        $fedocumento->TOTAL_VENTA_ORIG);
-
-                        $arvalidar = json_decode($rvalidar, true);
-
-                        //dd($arvalidar);
-
-                        if(isset($arvalidar['success'])){
-
-                            if($arvalidar['success']){
-
-
-
-                                $datares              = $arvalidar['data'];
-
-                                if (!isset($datares['estadoCp'])){
-                                    return Redirect::back()->with('errorurl', 'Hay fallas en sunat para consultar el XML');
-                                }
-
-                                $estadoCp             = $datares['estadoCp'];
-                                $tablaestacp          = Estado::where('tipo','=','estadoCp')->where('codigo','=',$estadoCp)->first();
-
-                                $estadoRuc            = '';
-                                $txtestadoRuc         = '';
-                                $estadoDomiRuc        = '';
-                                $txtestadoDomiRuc     = '';
-
-                                if(isset($datares['estadoRuc'])){
-                                    $tablaestaruc          = Estado::where('tipo','=','estadoRuc')->where('codigo','=',$datares['estadoRuc'])->first();
-                                    $estadoRuc             = $tablaestaruc->codigo;
-                                    $txtestadoRuc          = $tablaestaruc->nombre;
-                                }
-                                if(isset($datares['condDomiRuc'])){
-                                    $tablaestaDomiRuc       = Estado::where('tipo','=','condDomiRuc')->where('codigo','=',$datares['condDomiRuc'])->first();
-                                    $estadoDomiRuc          = $tablaestaDomiRuc->codigo;
-                                    $txtestadoDomiRuc       = $tablaestaDomiRuc->nombre;
-                                }
-
-                                FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)
-                                            ->update(
-                                                    [
-                                                        'success'=>$arvalidar['success'],
-                                                        'message'=>$arvalidar['message'],
-                                                        'estadoCp'=>$tablaestacp->codigo,
-                                                        'nestadoCp'=>$tablaestacp->nombre,
-                                                        'estadoRuc'=>$estadoRuc,
-                                                        'nestadoRuc'=>$txtestadoRuc,
-                                                        'condDomiRuc'=>$estadoDomiRuc,
-                                                        'ncondDomiRuc'=>$txtestadoDomiRuc,
-                                                    ]);
-                            }else{
-                                FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)
-                                            ->update(
-                                                    [
-                                                        'success'=>$arvalidar['success'],
-                                                        'message'=>$arvalidar['message']
-                                                    ]);
+                            //ARCHIVOS
+                            DB::table('CMP.DOC_ASOCIAR_COMPRA')->where('COD_ORDEN','=',$idoc)->delete();
+                            foreach($archivosdelfe as $index=>$item){
+                                    $categoria                               =   CMPCategoria::where('COD_CATEGORIA','=',$item->COD_CATEGORIA)->first();
+                                    $docasociar                              =   New CMPDocAsociarCompra;
+                                    $docasociar->COD_ORDEN                   =   $idoc;
+                                    $docasociar->COD_CATEGORIA_DOCUMENTO     =   $categoria->COD_CATEGORIA;
+                                    $docasociar->NOM_CATEGORIA_DOCUMENTO     =   $categoria->NOM_CATEGORIA;
+                                    $docasociar->IND_OBLIGATORIO             =   $categoria->IND_DOCUMENTO_VAL;
+                                    $docasociar->TXT_FORMATO                 =   $categoria->COD_CTBLE;
+                                    $docasociar->TXT_ASIGNADO                =   $categoria->TXT_ABREVIATURA;
+                                    $docasociar->COD_USUARIO_CREA_AUD        =   Session::get('usuario')->id;
+                                    $docasociar->FEC_USUARIO_CREA_AUD        =   $this->fechaactual;
+                                    $docasociar->COD_ESTADO                  =   1;
+                                    $docasociar->TIP_DOC                     =   $categoria->CODIGO_SUNAT;
+                                    $docasociar->save();
                             }
+
+
+
+
+                        }else{
+
+
+                            if (!empty($file)) 
+                            {
+
+
+                                /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
+                                $contadorArchivos = Archivo::count();
+                                $prefijocarperta =      $this->prefijo_empresa($ordencompra->COD_EMPR);
+                                $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordencompra->NRO_DOCUMENTO_CLIENTE;
+                                $nombrefile      =      $contadorArchivos.'-'.$file->getClientOriginalName();
+                                $valor           =      $this->versicarpetanoexiste($rutafile);
+                                $rutacompleta    =      $rutafile.'\\'.$nombrefile;
+
+                                $nombreoriginal             =   $file->getClientOriginalName();
+                                $info                       =   new SplFileInfo($nombreoriginal);
+                                $extension                  =   $info->getExtension();
+
+                                copy($file->getRealPath(),$rutacompleta);
+                                //dd($extractedFile);
+                                $path            =   $rutacompleta;
+
+
+                                //FACTURA
+                                /****************************************  LEER EL XML Y GUARDAR   *********************************/
+                                $parser             = new NoteParser();
+                                $xml                = file_get_contents($path);
+                                $factura            = $parser->parse($xml);
+                                //dd($factura);
+                                $tipo_documento_le  = $factura->gettipoDoc();
+                                $moneda_le          = $factura->gettipoMoneda();
+
+                                if($ordencompra->COD_CATEGORIA_MOTIVO_EMISION=='MEM0000000000004' || $ordencompra->COD_CATEGORIA_MOTIVO_EMISION=='MEM0000000000007'){
+                                    $archivosdelfe          =      CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                                                ->whereIn('COD_CATEGORIA', ['DCC0000000000003','DCC0000000000004','DCC0000000000030','DCC0000000000007'])
+                                                                ->get();
+                                }else{                            
+                                    $archivosdelfe          =      CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                                                ->whereIn('COD_CATEGORIA', ['DCC0000000000003','DCC0000000000004','DCC0000000000030'])
+                                                                ->get();
+                                }
+
+
+                                //VALIDAR QUE YA EXISTE ESTE XML
+
+                                $fedocumento_e          =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->whereNotIn('COD_ESTADO',['','ETM0000000000006'])
+                                                            ->where('RUC_PROVEEDOR','=',$factura->getcompany()->getruc())
+                                                            ->where('SERIE','=',$factura->getserie())
+                                                            ->where('NUMERO','=',$factura->getcorrelativo())
+                                                            ->where('ID_TIPO_DOC','=',$tipo_documento_le)
+                                                            ->first();
+                                if(count($fedocumento_e)>0){
+                                    return Redirect::back()->with('errorurl', 'Este XML ya fue integrado en otra orden de compra');
+                                }
+
+                                //VALIDAR QUE EL XML SEA DE LA EMPRESA
+                                if($factura->getClient()->getnumDoc()!= Session::get('empresas')->NRO_DOCUMENTO){
+                                    return Redirect::back()->with('errorurl', 'El xml no corresponde a la empresa '.Session::get('empresas')->NRO_DOCUMENTO);
+                                }
+
+                                $rz_p                               =   str_replace(["![CDATA[", "]]"], "", $factura->getcompany()->getrazonSocial());
+                                $rz_p                               =    str_replace("?", "Ñ", $rz_p);
+                                $rz_p                               =   str_replace("ï¿½", "Ñ", $rz_p);
+                                $rz_p                               =   str_replace("MARILÑ", "MARILÚ", $rz_p);
+
+                                $documentolinea                     =   $this->ge_linea_documento($ordencompra->COD_DOCUMENTO_CTBLE);
+                                //$cant_rentencion                    =   $ordencompra_t->CAN_RETENCION;
+                                //$cant_perception                    =   $factura->getperception();
+                                $cant_perception                    =   0;
+                                $cant_rentencion                    =   0;
+
+
+                                //REGISTRO DEL XML LEIDO
+                                $documento                          =   new FeDocumento;
+                                $documento->ID_DOCUMENTO            =   $ordencompra->COD_DOCUMENTO_CTBLE;
+                                $documento->DOCUMENTO_ITEM          =   $documentolinea;
+
+                                $documento->COD_EMPR                =   $ordencompra->COD_EMPR;
+                                $documento->TXT_EMPR                =   $ordencompra->NOM_EMPR;
+                                $documento->TXT_PROCEDENCIA         =   $procedencia;
+                                $documento->ESTADO                  =   'A';
+                                $documento->RUC_PROVEEDOR           =   $factura->getcompany()->getruc();
+                                $documento->RZ_PROVEEDOR            =   $rz_p;
+                                $documento->TIPO_CLIENTE            =   $factura->getClient()->gettipoDoc();
+                                $documento->ID_CLIENTE              =   $factura->getClient()->getnumDoc();
+                                $documento->NOMBRE_CLIENTE          =   $factura->getClient()->getrznSocial();
+                                $documento->DIRECCION_CLIENTE       =   '';
+                                $documento->SERIE                   =   $factura->getserie();
+                                $documento->NUMERO                  =   $factura->getcorrelativo();
+                                $documento->ID_TIPO_DOC             =   $tipo_documento_le;
+                                $documento->FEC_VENTA               =   $factura->getfechaEmision()->format('Ymd');
+                                $documento->FEC_VENCI_PAGO          =   $factura->getfechaEmision()->format('Ymd');
+                                //$documento->FORMA_PAGO              =   $factura->getcondicionPago();
+                                $documento->FORMA_PAGO              =   '';
+                                $documento->FORMA_PAGO_DIAS          =  0;
+                                $documento->MONEDA                  =   $moneda_le;
+
+                                $documento->VALOR_IGV_ORIG          =   $factura->getmtoIGV();
+                                $documento->VALOR_IGV_SOLES         =   $factura->getmtoIGV();
+                                $documento->SUB_TOTAL_VENTA_ORIG    =   $factura->getmtoOperGravadas();
+                                $documento->SUB_TOTAL_VENTA_SOLES   =   $factura->getmtoOperGravadas();
+                                $documento->TOTAL_VENTA_XML         =   $factura->getmtoImpVenta();
+
+                                $documento->TOTAL_VENTA_ORIG        =   $ordencompra->CAN_TOTAL;
+                                $documento->TOTAL_VENTA_SOLES       =   $factura->getmtoImpVenta();
+
+
+                                $documento->PERCEPCION              =   $cant_perception;
+                                $documento->MONTO_RETENCION         =   $cant_rentencion;
+
+                                $documento->HORA_EMISION            =   $factura->gethoraEmision();
+                                $documento->IMPUESTO_2              =   $factura->getmtoOtrosTributos();
+                                //$documento->TIPO_DETRACCION         =   $factura->getdetraccion()->gettipoDet();
+                                //$documento->PORC_DETRACCION         =   floatval($factura->getdetraccion()->getporcDet());
+                                //$documento->MONTO_DETRACCION        =   (float)$factura->getdetraccion()->getbaseDetr();
+                                //$documento->MONTO_ANTICIPO          =   $factura->getdestotalAnticipos();
+                                //$documento->OBSERVACION             =   $factura->getobservacion();
+                                //$documento->NRO_ORDEN_COMP          =   $factura->getcompra();              
+                                //$documento->NUM_GUIA                =   $factura->getguiaEmbebida();
+
+
+                                $documento->estadoCp                =   0;
+                                $documento->ARCHIVO_XML             =   $nombrefile;
+                                $documento->ARCHIVO_CDR             =   '';
+                                $documento->ARCHIVO_PDF             =   '';
+                                $documento->COD_CONTACTO            =   '';
+                                $documento->TXT_CONTACTO            =   '';
+                                $documento->COD_ESTADO              =   '';
+                                $documento->TXT_ESTADO              =   '';
+                                $documento->ind_email_uc            =   -1;
+                                $documento->ind_email_ap            =   -1;
+                                $documento->ind_email_adm           =   -1;
+                                $documento->ind_email_ba            =   -1;
+                                $documento->ind_email_clap          =   -1;
+                                $documento->OPERACION               =   'NOTA_CREDITO';
+                                $documento->MONTO_NC                =   0.00;
+                                
+                                $documento->save();
+
+
+                                //dd("entro");
+                                //ARCHIVO
+                                $dcontrol                   =   new Archivo;
+                                $dcontrol->ID_DOCUMENTO     =   $ordencompra->COD_DOCUMENTO_CTBLE;
+                                $dcontrol->DOCUMENTO_ITEM   =   $documentolinea;
+                                $dcontrol->TIPO_ARCHIVO     =   'DCC0000000000003';
+                                $dcontrol->NOMBRE_ARCHIVO   =   $nombrefile;
+                                $dcontrol->DESCRIPCION_ARCHIVO  =   'XML DE NOTA DE CREDITO';
+                                $dcontrol->URL_ARCHIVO      =   $path;
+                                $dcontrol->SIZE             =   filesize($file);
+                                $dcontrol->EXTENSION        =   $extension;
+                                $dcontrol->ACTIVO           =   1;
+                                $dcontrol->FECHA_CREA       =   $this->fechaactual;
+                                $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
+                                $dcontrol->save();
+
+
+
+                                /**********DETALLE*********/
+                                foreach ($factura->getdetails() as $indexdet => $itemdet) {
+
+                                        $producto                           = str_replace("<![CDATA[","",$itemdet->getdescripcion());
+                                        $producto                           = str_replace("]]>","",$producto);
+                                        $producto                           = preg_replace('/[^A-Za-z0-9\s]/', '', $producto);
+
+                                        $linea = str_pad($indexdet+1, 3, "0", STR_PAD_LEFT); 
+                                        $detalle                        =   new FeDetalleDocumento;
+                                        $detalle->ID_DOCUMENTO          =   $ordencompra->COD_DOCUMENTO_CTBLE;
+                                        $detalle->DOCUMENTO_ITEM        =   $documentolinea;
+
+                                        $detalle->LINEID                =   $linea;
+                                        $detalle->CODPROD               =   $itemdet->getcodProducto();
+                                        $detalle->PRODUCTO              =   $producto;
+                                        $detalle->UND_PROD              =   $itemdet->getunidad();
+                                        $detalle->CANTIDAD              =   $itemdet->getcantidad();
+                                        $detalle->PRECIO_UNIT           =   (float)$itemdet->getmtoValorUnitario();
+                                        $detalle->VAL_IGV_ORIG          =   (float)$itemdet->getigv();
+                                        $detalle->VAL_IGV_SOL           =   (float)$itemdet->getigv();
+                                        $detalle->VAL_SUBTOTAL_ORIG     =   (float)$itemdet->getmtoValorVenta();
+                                        $detalle->VAL_SUBTOTAL_SOL      =   (float)$itemdet->getmtoValorVenta();
+                                        $detalle->VAL_VENTA_ORIG        =   (float)$itemdet->getigv()+(float)$itemdet->getmtoValorVenta();
+                                        $detalle->VAL_VENTA_SOL         =   (float)$itemdet->getigv()+(float)$itemdet->getmtoValorVenta();
+                                        $detalle->PRECIO_ORIG           =   (float)$itemdet->getmtoPrecioUnitario();
+                                        $detalle->save();
+
+                                }                    
+
+                                /****************************************  VALIDAR SI EL ARCHIVO ESTA ACEPTADO POR SUNAT  *********************************/
+
+
+                                $fedocumento         =      FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','<>','ETM0000000000006')->first();
+                                $fechaemision        =      date_format(date_create($fedocumento->FEC_VENTA), 'd/m/Y');
+                                $detallefedocumento  =      FeDetalleDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+
+
+                                //VALIDAR QUE ALGUNOS CAMPOS SEAN IGUALES
+                                $this->con_validar_documento_proveedor_nota_credito($ordencompra,$fedocumento,$detalleordencompra,$detallefedocumento);
+
+
+                                $token = '';
+                                if($prefijocarperta =='II'){
+                                    $token           =      $this->generartoken_ii();
+                                }else{
+                                    $token           =      $this->generartoken_is();
+                                }
+
+                                //dd($token);
+
+                                $rvalidar = $this->validar_xml( $token,
+                                                                $fedocumento->ID_CLIENTE,
+                                                                $fedocumento->RUC_PROVEEDOR,
+                                                                $fedocumento->ID_TIPO_DOC,
+                                                                $fedocumento->SERIE,
+                                                                $fedocumento->NUMERO,
+                                                                $fechaemision,
+                                                                $fedocumento->TOTAL_VENTA_ORIG);
+
+                                $arvalidar = json_decode($rvalidar, true);
+
+                                //dd($arvalidar);
+
+                                if(isset($arvalidar['success'])){
+
+                                    if($arvalidar['success']){
+
+
+
+                                        $datares              = $arvalidar['data'];
+
+                                        if (!isset($datares['estadoCp'])){
+                                            return Redirect::back()->with('errorurl', 'Hay fallas en sunat para consultar el XML');
+                                        }
+
+                                        $estadoCp             = $datares['estadoCp'];
+                                        $tablaestacp          = Estado::where('tipo','=','estadoCp')->where('codigo','=',$estadoCp)->first();
+
+                                        $estadoRuc            = '';
+                                        $txtestadoRuc         = '';
+                                        $estadoDomiRuc        = '';
+                                        $txtestadoDomiRuc     = '';
+
+                                        if(isset($datares['estadoRuc'])){
+                                            $tablaestaruc          = Estado::where('tipo','=','estadoRuc')->where('codigo','=',$datares['estadoRuc'])->first();
+                                            $estadoRuc             = $tablaestaruc->codigo;
+                                            $txtestadoRuc          = $tablaestaruc->nombre;
+                                        }
+                                        if(isset($datares['condDomiRuc'])){
+                                            $tablaestaDomiRuc       = Estado::where('tipo','=','condDomiRuc')->where('codigo','=',$datares['condDomiRuc'])->first();
+                                            $estadoDomiRuc          = $tablaestaDomiRuc->codigo;
+                                            $txtestadoDomiRuc       = $tablaestaDomiRuc->nombre;
+                                        }
+
+                                        FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)
+                                                    ->update(
+                                                            [
+                                                                'success'=>$arvalidar['success'],
+                                                                'message'=>$arvalidar['message'],
+                                                                'estadoCp'=>$tablaestacp->codigo,
+                                                                'nestadoCp'=>$tablaestacp->nombre,
+                                                                'estadoRuc'=>$estadoRuc,
+                                                                'nestadoRuc'=>$txtestadoRuc,
+                                                                'condDomiRuc'=>$estadoDomiRuc,
+                                                                'ncondDomiRuc'=>$txtestadoDomiRuc,
+                                                            ]);
+                                    }else{
+                                        FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)
+                                                    ->update(
+                                                            [
+                                                                'success'=>$arvalidar['success'],
+                                                                'message'=>$arvalidar['message']
+                                                            ]);
+                                    }
+                                }
+                                
+
+                                //ARCHIVOS
+                                DB::table('CMP.DOC_ASOCIAR_COMPRA')->where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->delete();
+
+                                foreach($archivosdelfe as $index=>$item){
+
+                                        $categoria                               =   CMPCategoria::where('COD_CATEGORIA','=',$item->COD_CATEGORIA)->first();
+
+                                        $docasociar                              =   New CMPDocAsociarCompra;
+                                        $docasociar->COD_ORDEN                   =   $ordencompra->COD_DOCUMENTO_CTBLE;
+                                        $docasociar->COD_CATEGORIA_DOCUMENTO     =   $categoria->COD_CATEGORIA;
+                                        $docasociar->NOM_CATEGORIA_DOCUMENTO     =   $categoria->NOM_CATEGORIA;
+                                        $docasociar->IND_OBLIGATORIO             =   $categoria->IND_DOCUMENTO_VAL;
+                                        $docasociar->TXT_FORMATO                 =   $categoria->COD_CTBLE;
+                                        $docasociar->TXT_ASIGNADO                =   $categoria->TXT_ABREVIATURA;
+                                        $docasociar->COD_USUARIO_CREA_AUD        =   Session::get('usuario')->id;
+                                        $docasociar->FEC_USUARIO_CREA_AUD        =   $this->fechaactual;
+                                        $docasociar->COD_ESTADO                  =   1;
+                                        $docasociar->TIP_DOC                     =   $categoria->CODIGO_SUNAT;
+                                        $docasociar->save();
+                                }
+
+
+                            }
+                            else{
+                                return Redirect::to('detalle-comprobante-nota-credito-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Seleccione Archivo XML a Importar ');
+                            }
+
+
                         }
-                        
 
-                        //ARCHIVOS
-                        DB::table('CMP.DOC_ASOCIAR_COMPRA')->where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->delete();
-
-                        foreach($archivosdelfe as $index=>$item){
-
-                                $categoria                               =   CMPCategoria::where('COD_CATEGORIA','=',$item->COD_CATEGORIA)->first();
-
-                                $docasociar                              =   New CMPDocAsociarCompra;
-                                $docasociar->COD_ORDEN                   =   $ordencompra->COD_DOCUMENTO_CTBLE;
-                                $docasociar->COD_CATEGORIA_DOCUMENTO     =   $categoria->COD_CATEGORIA;
-                                $docasociar->NOM_CATEGORIA_DOCUMENTO     =   $categoria->NOM_CATEGORIA;
-                                $docasociar->IND_OBLIGATORIO             =   $categoria->IND_DOCUMENTO_VAL;
-                                $docasociar->TXT_FORMATO                 =   $categoria->COD_CTBLE;
-                                $docasociar->TXT_ASIGNADO                =   $categoria->TXT_ABREVIATURA;
-                                $docasociar->COD_USUARIO_CREA_AUD        =   Session::get('usuario')->id;
-                                $docasociar->FEC_USUARIO_CREA_AUD        =   $this->fechaactual;
-                                $docasociar->COD_ESTADO                  =   1;
-                                $docasociar->TIP_DOC                     =   $categoria->CODIGO_SUNAT;
-                                $docasociar->save();
-                        }
 
 
 
@@ -4774,10 +4904,6 @@ class GestionOCController extends Controller
                     return Redirect::to('detalle-comprobante-nota-credito-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', $ex.' Ocurrio un error inesperado');
                 }
                 return Redirect::to('detalle-comprobante-nota-credito-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('bienhecho', 'Se valido el xml');
-            }else{
-                return Redirect::to('detalle-comprobante-nota-credito-administrator/'.$procedencia.'/'.$idopcion.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Seleccione Archivo XML a Importar ');
-            }
-
         }
     }
 
