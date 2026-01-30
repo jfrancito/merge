@@ -1934,6 +1934,20 @@ class UserController extends Controller {
 				$count_observadosdic_le 	= 	count($listadatosob);
 
 
+
+				//LIQUIDACION DE OMPRA ANTIPIO
+				$operacion_id 			=	'LIQUIDACION_COMPRA_ANTICIPO';
+        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_con_liquidacion_compra_anticipo($cod_empresa,$operacion_id);
+				$count_x_aprobar_lqa 	= 	 count($listadatos);
+	        	$lisadatosob    		=   $this->con_lista_cabecera_comprobante_total_con_liquidacion_compra_anticipo_obs($cod_empresa,$operacion_id);
+				$count_observados_lqa 	= 	count($lisadatosob);
+	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_con_liquidacion_compra_anticipo_obs_levantadas($cod_empresa,$operacion_id);
+				$count_observadoslqa_le 	= 	count($listadatosob);
+
+
+
+
+
 				//LIQUIDACION DE GASTOS
         		$listadatos     		=   $this->lg_lista_cabecera_comprobante_total_contabilidad();
 				$count_x_aprobar_lg 	= 	count($listadatos);
