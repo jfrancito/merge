@@ -205,6 +205,185 @@ trait AnalisisLiquidacionGastoTraits
         ];
     }
 
+    public function getDashboardProductos($request)
+    {
+        $query = VLiquidacionGastos_Analitica::query();
+        $this->scopeFilterAnalitica($query, $request);
+
+        $topProductos = (clone $query)
+            ->select('NOMBRE_PRODUCTO', DB::raw('SUM(TOTAL_GENERAL) as total'))
+            ->groupBy('NOMBRE_PRODUCTO')
+            ->orderBy('total', 'desc')
+            ->limit(10)
+            ->get();
+
+        $evolucionProducto = (clone $query)
+            ->select('MES', 'ANIO', 'NOMBRE_PRODUCTO', DB::raw('SUM(TOTAL_GENERAL) as total'))
+            ->groupBy('MES', 'ANIO', 'NOMBRE_PRODUCTO')
+            ->orderBy('ANIO', 'asc')
+            ->orderBy('MES', 'asc')
+            ->get();
+
+        return [
+            'top_productos' => $topProductos,
+            'evolucion_producto' => $evolucionProducto,
+            'detalle' => $query->get()
+        ];
+    }
+
+    public function getDashboardComparativos($request)
+    {
+        // 1. Current Query
+        $queryActual = VLiquidacionGastos_Analitica::query();
+        $this->scopeFilterAnalitica($queryActual, $request);
+
+        // 2. Logic for Previous Period
+        $requestPrev = clone $request;
+        $tipoComparacion = $request->get('comparar_vs', 'anterior'); // 'anterior' or 'anio_pasado'
+
+        $anios = explode(',', $request->ano);
+        $meses = array_filter(explode(',', $request->mes));
+
+        if ($tipoComparacion == 'anio_pasado') {
+            // Easy case: same months/period, but last year
+            $requestPrev->ano = (string) ((int) $request->ano - 1);
+        } else {
+            // Sequential comparison
+            if (count($meses) == 1) {
+                // Month vs Prev Month
+                $m = (int) $meses[0];
+                $y = (int) $anios[0];
+                if ($m == 1) {
+                    $requestPrev->mes = '12';
+                    $requestPrev->ano = (string) ($y - 1);
+                } else {
+                    $requestPrev->mes = (string) ($m - 1);
+                    $requestPrev->ano = (string) $y;
+                }
+            } elseif (count($meses) == 3) {
+                // Quarter vs Prev Quarter
+                $firstMonth = (int) min($meses);
+                $y = (int) $anios[0];
+                if ($firstMonth == 1) { // Q1 -> Q4 Last Year
+                    $requestPrev->mes = '10,11,12';
+                    $requestPrev->ano = (string) ($y - 1);
+                } else { // Q2->Q1, Q3->Q2, Q4->Q3
+                    $start = $firstMonth - 3;
+                    $requestPrev->mes = $start . ',' . ($start + 1) . ',' . ($start + 2);
+                }
+            } else {
+                // Default: Year vs Prev Year
+                $requestPrev->ano = (string) ((int) $request->ano - 1);
+                // Maintain all months if multiple were selected
+            }
+        }
+
+        $queryPrev = VLiquidacionGastos_Analitica::query();
+        $this->scopeFilterAnalitica($queryPrev, $requestPrev);
+
+        // KPI Calculations
+        $gastoActual = $queryActual->sum('TOTAL_GENERAL');
+        $gastoPrev = $queryPrev->sum('TOTAL_GENERAL');
+        $variacionAbs = $gastoActual - $gastoPrev;
+        $variacionPct = $gastoPrev > 0 ? ($variacionAbs / $gastoPrev) * 100 : ($gastoActual > 0 ? 100 : 0);
+
+        return [
+            'kpis' => [
+                'actual' => $gastoActual,
+                'anterior' => $gastoPrev,
+                'variacion_abs' => $variacionAbs,
+                'variacion_pct' => $variacionPct,
+                'label_actual' => $this->getPeriodLabel($request),
+                'label_prev' => $this->getPeriodLabel($requestPrev),
+            ],
+            'comparativo_area' => $this->compareByCategory($queryActual, $queryPrev, 'NOMBRE_AREA_TRABAJO'),
+            'comparativo_centro' => $this->compareByCategory($queryActual, $queryPrev, 'NOMBRE_CENTRO_TRABAJO'),
+            'comparativo_proveedor' => $this->compareByCategory($queryActual, $queryPrev, 'NOMBRE_PROVEEDOR'),
+            'comparativo_responsable' => $this->compareByCategory($queryActual, $queryPrev, 'NOMBRE_TRABAJADOR'),
+            'comparativo_producto' => $this->compareByCategory($queryActual, $queryPrev, 'NOMBRE_PRODUCTO'),
+            'evolucion_mensual' => $this->getDashboardEjecutivo($request)['evolucion_mensual']
+        ];
+    }
+
+    private function compareByCategory($qActual, $qPrev, $column)
+    {
+        $actual = (clone $qActual)
+            ->select($column, DB::raw('SUM(TOTAL_GENERAL) as total'), DB::raw('COUNT(*) as cantidad'))
+            ->groupBy($column)
+            ->get()
+            ->keyBy($column);
+
+        $prev = (clone $qPrev)
+            ->select($column, DB::raw('SUM(TOTAL_GENERAL) as total'), DB::raw('COUNT(*) as cantidad'))
+            ->groupBy($column)
+            ->get()
+            ->keyBy($column);
+
+        $merged = [];
+        $allKeys = $actual->keys()->merge($prev->keys())->unique();
+
+        foreach ($allKeys as $key) {
+            if (!$key)
+                continue;
+
+            $valActual = isset($actual[$key]) ? $actual[$key]->total : 0;
+            $cantActual = isset($actual[$key]) ? $actual[$key]->cantidad : 0;
+            $valPrev = isset($prev[$key]) ? $prev[$key]->total : 0;
+            $cantPrev = isset($prev[$key]) ? $prev[$key]->cantidad : 0;
+
+            $diff = $valActual - $valPrev;
+            $pct = $valPrev > 0 ? ($diff / $valPrev) * 100 : ($valActual > 0 ? 100 : 0);
+
+            $ticketActual = $cantActual > 0 ? ($valActual / $cantActual) : 0;
+            $ticketPrev = $cantPrev > 0 ? ($valPrev / $cantPrev) : 0;
+            $ticketDiff = $ticketActual - $ticketPrev;
+            $ticketPct = $ticketPrev > 0 ? ($ticketDiff / $ticketPrev) * 100 : ($ticketActual > 0 ? 100 : 0);
+
+            $merged[] = [
+                'categoria' => $key,
+                'actual' => $valActual,
+                'anterior' => $valPrev,
+                'cantidad_actual' => $cantActual,
+                'cantidad_anterior' => $cantPrev,
+                'ticket_actual' => $ticketActual,
+                'ticket_anterior' => $ticketPrev,
+                'ticket_variacion_pct' => $ticketPct,
+                'variacion_abs' => $diff,
+                'variacion_pct' => $pct
+            ];
+        }
+
+        usort($merged, function ($a, $b) {
+            $valA = abs($a['variacion_abs']);
+            $valB = abs($b['variacion_abs']);
+            if ($valA == $valB)
+                return 0;
+            return ($valB > $valA) ? 1 : -1;
+        });
+
+        return $merged;
+    }
+
+    private function getPeriodLabel($request)
+    {
+        $anios = explode(',', $request->ano);
+        $mesesStr = isset($request->mes) ? $request->mes : '';
+        $meses = array_filter(explode(',', $mesesStr));
+        $mesesNombres = [1 => 'Ene', 2 => 'Feb', 3 => 'Mar', 4 => 'Abr', 5 => 'May', 6 => 'Jun', 7 => 'Jul', 8 => 'Ago', 9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Dic'];
+
+        if (count($meses) == 1) {
+            return $mesesNombres[(int) $meses[0]] . ' ' . $anios[0];
+        } elseif (count($meses) > 1 && count($meses) < 12) {
+            $min = (int) min($meses);
+            $max = (int) max($meses);
+            return $mesesNombres[$min] . '-' . $mesesNombres[$max] . ' ' . $anios[0];
+        } elseif (count($meses) == 12 || count($meses) == 0) {
+            return 'Año ' . $anios[0];
+        }
+
+        return count($anios) == 1 ? $anios[0] : 'Periodo';
+    }
+
     public function getDashboardDetalle($request)
     {
         $query = VLiquidacionGastos_Analitica::query();
