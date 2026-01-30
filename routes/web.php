@@ -947,6 +947,36 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::get('/enviar_correo_detalle_dias', 'EnviarCorreoValeRendirDetalleDiasController@actionEnviarCorreoVRDetalleDias');
 	Route::get('/enviar_correo_detalle_importe', 'EnviarCorreoValeRendirDetalleImporteController@actionEnviarCorreoVRDetalleImporte');
 
+	//ORDEN PEDIDO 
+
+	Route::get('/gestion-de-orden-pedido-compras/{idopcion}', 'GestionOrdenPedidoController@actionOrdenPedido');
+	Route::post('/registrar_orden_pedido', 'GestionOrdenPedidoController@insertOrdenPedidoAction');
+	Route::post('/emitir_orden_pedido', 'GestionOrdenPedidoController@insertEmitirOrdenPedido');
+	Route::post('/anular_orden_pedido', 'GestionOrdenPedidoController@insertAnularOrdenPedido');
+	Route::post('/obtener-meses', 'GestionOrdenPedidoController@obtenerMeses');
+	Route::post('/ver_detalle_orden_pedido', 'GestionOrdenPedidoController@actionDetallePedido');
+
+
+	Route::get('/gestion-de-autorizacion-orden-pedido/{idopcion}', 'GestionOrdenPedidoAutorizaController@actionOrdenPedidoAutoriza');
+	Route::post('/autorizar_orden_pedido', 'GestionOrdenPedidoAutorizaController@insertAutorizaOrdenPedido');
+	Route::post('/rechazar_orden_pedido', 'GestionOrdenPedidoAutorizaController@insertRechazarOrdenPedido');
+	Route::post('/ver_detalle_orden_pedido', 'GestionOrdenPedidoAutorizaController@actionDetallePedido');
+
+	Route::get('/gestion-de-aprobacion-orden-pedido-ger/{idopcion}', 'GestionOrdenPedidoApruebaGerController@actionOrdenPedidoApruebaGer');
+	Route::post('/ap_ger_orden_pedido', 'GestionOrdenPedidoApruebaGerController@insertApruebaOrdenPedidoGer');
+	Route::post('/rechazar_orden_pedido', 'GestionOrdenPedidoApruebaGerController@insertRechazarOrdenPedidoGer');
+	Route::post('/ver_detalle_orden_pedido', 'GestionOrdenPedidoApruebaGerController@actionDetallePedido');
+
+
+	Route::get('/gestion-de-aprobacion-orden-pedido-adm/{idopcion}', 'GestionOrdenPedidoApruebaAdmController@actionOrdenPedidoApruebaAdm');
+	Route::post('/ap_adm_orden_pedido', 'GestionOrdenPedidoApruebaAdmController@insertApruebaOrdenPedidoAdm');
+	Route::post('/rechazar_orden_pedido', 'GestionOrdenPedidoApruebaAdmController@insertRechazarOrdenPedidoAdm');
+	Route::post('/ver_detalle_orden_pedido', 'GestionOrdenPedidoApruebaAdmController@actionDetallePedido');
+
+
+
+
+
 });
 
 Route::get('/pruebaemail/{emailfrom}/{nombreusuario}', 'PruebasController@actionPruebaEmail');
