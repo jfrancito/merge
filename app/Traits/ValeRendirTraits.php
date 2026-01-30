@@ -148,7 +148,7 @@ trait ValeRendirTraits
 
 
 
-     public function insertValeRendirAutoApruebaRechaza($ind_tipo_operacion, $id, $fec_autorizacion, $txt_serie, $txt_numero , $cod_empr, $cod_centro, $cod_empr_cli, 
+    public function insertValeRendirAutoApruebaRechaza($ind_tipo_operacion, $id, $fec_autorizacion, $txt_serie, $txt_numero , $cod_empr, $cod_centro, $cod_empr_cli, 
                                      $txt_nom_solicita, $usuario_autoriza, $txt_nom_autoriza, $usuario_aprueba, $txt_nom_aprueba, $cod_contrato, 
                                      $sub_cuenta, $tipo_motivo, $cod_moneda, $tipo_pago, $txt_glosa, $txt_glosa_autorizado,  $txt_glosa_rechazado, $txt_glosa_aprobado, 
                                      $can_total_importe, $can_total_saldo, $txt_categoria_banco, $numero_cuenta, $cod_categoria_estado_vale, 
