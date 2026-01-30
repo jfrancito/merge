@@ -101,6 +101,12 @@ class GestionAnalisisLiquidacionGastosController extends Controller
             case 'responsables':
                 $data = $this->getDashboardResponsables($request);
                 break;
+            case 'productos':
+                $data = $this->getDashboardProductos($request);
+                break;
+            case 'comparativos':
+                $data = $this->getDashboardComparativos($request);
+                break;
             case 'detalle':
                 $data = $this->getDashboardDetalle($request);
                 break;
