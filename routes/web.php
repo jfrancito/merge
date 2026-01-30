@@ -35,7 +35,7 @@ Route::get('/serve-filelg', 'FileController@serveFileLG')->name('serve-filelg');
 Route::get('/serve-filepla', 'FileController@serveFilePlaC')->name('serve-filepla');
 Route::get('/serve-filerc', 'FileController@serveFileRC')->name('serve-filerc');
 Route::get('/serve-filefirma', 'FileController@serveFileFirma')->name('serve-filefirma');
-
+Route::get('/serve-fileordencompraanticipo', 'FileController@serveFileOrdenCompraAnticipo')->name('serve-fileordencompraanticipo');
 
 Route::get('/serve-filecontrato-sg', 'FileController@serveFileContratoSG')->name('serve-filecontrato-sg');
 Route::get('/serve-filepago', 'FileController@serveFilePago')->name('serve-filepago');
@@ -141,6 +141,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-combo-arendir', 'GestionLiquidacionGastosController@actionAjaxComboArendir');
 
 	Route::any('/ajax-modal-lista-comparativa', 'GestionLiquidacionGastosController@actionAjaxModalComparativa');
+
+	Route::any('/regularizar-vacios-lq', 'GestionLiquidacionGastosController@actionRegularizarVacios');
 
 
 	Route::any('/extonar-liquidacion-gastos/{idopcion}/{iddocumento}', 'GestionLiquidacionGastosController@actionExtornarLiquidacionGastos');
@@ -485,6 +487,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/subir-xml-cargar-datos-estiba-administrator/{idopcion}/{lote}', 'GestionEstibaController@actionCargarXMLEstibaAdministrator');
 	Route::any('/subir-xml-cargar-datos-estiba-administrator-orden-compra-anticipo/{idopcion}/{lote}', 'GestionEstibaController@actionCargarXMLEstibaAdministratorOrdenCompraAnticipo');
 	Route::any('/validar-xml-oc-estiba-administrator/{idopcion}/{lote}', 'GestionEstibaController@actionValidarXMLEstibaAdministrator');
+	Route::any('/validar-xml-oc-estiba-administrator-oca/{idopcion}/{lote}', 'GestionEstibaController@actionValidarXMLEstibaAdministratorOCA');
+
 
 	Route::any('/ajax-modal-detalle-lotes', 'GestionEstibaController@actionCargarModalDetalleLotes');
 	Route::any('/ajax-eliminar-lote-estiba', 'GestionEstibaController@actionEliminacionLoteEstiba');
@@ -596,6 +600,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/detalle-comprobante-oc-validado-estiba/{idopcion}/{lote}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoEstiba');
 	Route::any('/detalle-comprobante-oc-validado-comision/{idopcion}/{lote}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoComision');
 
+	Route::any('/detalle-comprobante-oc-validado-estiba-oca/{idopcion}/{lote}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoEstibaOCA');
+
+
 	Route::any('/detalle-comprobante-oc-validado-liquidacion-compra-anticipo/{idopcion}/{linea}/{prefijo}/{idordenpago}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoLiquidacionCompraAnticipo');
 
 	Route::any('/detalle-comprobante-oc-validado-nota-credito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoNotaCredito');
@@ -663,7 +670,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/aprobar-comprobante-contabilidad-estiba-dic/{idopcion}/{lote}', 'GestionOCContabilidadController@actionAprobarContabilidadEstibaDIC');
 	
 	Route::any('/aprobar-comprobante-contabilidad-pg/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAprobarContabilidadPG');
-
+	Route::any('/aprobar-comprobante-contabilidad-estiba-oca/{idopcion}/{lote}', 'GestionOCContabilidadController@actionAprobarContabilidadEstibaOca');
 
 	Route::any('/ajax-modal-activo-fijo-categoria', 'GestionOCContabilidadController@actionAjaxModalActivoFijoCategoria');
 	Route::any('/registrar-activo-fijo-categoria/{idopcion}/{idoc}/{codprod}', 'GestionOCContabilidadController@actionRegistrarActivoFijoCategoria');
@@ -711,6 +718,14 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/agregar-extorno-administracion-oc/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCAdministracionController@actionAgregarExtornoAdministracionOC');
 	Route::any('/agregar-extorno-estiba-administracion/{idopcion}/{lote}', 'GestionOCAdministracionController@actionAgregarExtornoEstibaAdministracion');
 
+	Route::any('/aprobar-comprobante-administracion-oca/{idopcion}/{linea}/{idordencompra}', 'GestionOCAdministracionController@actionAprobarAdministracionOCA');
+
+	Route::any('/agregar-extorno-administracion-oc-moca/{idopcion}/{idordencompra}', 'GestionOCAdministracionController@actionAgregarExtornoAdministracionOCMoca');
+	Route::any('/agregar-observacion-administracion-moca/{idopcion}/{idordencompra}', 'GestionOCAdministracionController@actionAgregarObservacionAdministracionMoca');
+	Route::any('/observacion-comprobante-uc-estiba-oca/{idopcion}/{lote}', 'GestionUsuarioContactoController@actionObservarUCEstibaMoca');
+
+
+
 
 	Route::any('/agregar-observacion-administracion/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCAdministracionController@actionAgregarObservacionAdministracion');
 	Route::any('/agregar-observacion-uc/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionUsuarioContactoController@actionAgregarObservacionUC');
@@ -731,6 +746,10 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/aprobar-comprobante-administracion-nota-debito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCAdministracionController@actionAprobarAdministracionNotaDebito');
 	Route::any('/agregar-observacion-administracion-nota-debito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCAdministracionController@actionAgregarObservacionAdministracionNotaDebito');
+
+	Route::any('/aprobar-comprobante-contabilidad-liquidacion-compra-anticipo/{idopcion}/{linea}/{prefijo}/{idordenpago}', 'GestionOCContabilidadController@actionAprobarContabilidadLiquidacionCompraAnticipo');
+	Route::any('/agregar-observacion-contabilidad-liquidacion-compra-anticipo/{idopcion}/{linea}/{prefijo}/{idordenpago}', 'GestionOCContabilidadController@actionAgregarObservacionContabilidadLiquidacionCompraAnticipo');
+	
 
 
 	Route::any('/aprobar-comprobante-administracion-pg/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCAdministracionController@actionAprobarAdministracionPG');

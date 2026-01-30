@@ -659,7 +659,7 @@ class GestionEntregaDocumentoController extends Controller
             }
         }
 
-        //dd($folio->COD_CATEGORIA_MONEDA);
+        //dd($listadatossoles);
         //COD_CATEGORIA_MONEDA
 
         $operacion_id           =   $folio->OPERACION;

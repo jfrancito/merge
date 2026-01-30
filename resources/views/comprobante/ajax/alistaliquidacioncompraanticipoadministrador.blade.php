@@ -19,10 +19,8 @@
   <tbody>
     @foreach($listadatos as $index => $item)
       <tr data_requerimiento_id = "{{$item->id}}">
-
         <td><b>LIQUIDACION DE COMPRA ANTICIPO</b></td>
         <td>{{$item->COD_AUTORIZACION}}</td>
-
         <td>{{$item->TXT_SERIE}} - {{$item->TXT_NUMERO}}</td>
         <td>{{$funcion->funciones->estorno_referencia($item->COD_AUTORIZACION)}}</td>
         <td>{{$item->FEC_AUTORIZACION}}</td>

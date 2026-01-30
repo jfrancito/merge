@@ -9,8 +9,23 @@
                 <div class="panel-body panel-body-contrast">
                   <form method="POST" action="{{ url('subir-xml-cargar-datos-nota-credito-administrator/'.$idopcion.'/'.substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -10))) }}" name="formcargardatos" id="formcargardatos" enctype="multipart/form-data" >
                      {{ csrf_field() }}
-<input type="hidden" name="device_info" id='device_info'>
+                        <input type="hidden" name="device_info" id='device_info'>
                       <div class="col-sm-12">
+                          <div class="form-group">
+                            <label class="col-sm-12 control-label labelleft" >Tipo Documento :</label>
+                            <div class="col-sm-12 abajocaja" >
+                              {!! Form::select( 'tipodocumento_id', $combotipodocumento, array($tipodocumento_id),
+                                                [
+                                                  'class'       => 'select2 form-control control input-sm' ,
+                                                  'id'          => 'tipodocumento_id',
+                                                  'required'    => '',
+                                                  'data-aw'     => '1',
+                                                ]) !!}
+                            </div>
+                          </div>
+
+
+                        
                           <div class="form-group">
                               <label class="col-sm-12 control-label labelleft" >Archivo :</label>
                               <div class="col-xs-6 col-sm-6 col-md-6 col-lg-10 negrita" align="left">

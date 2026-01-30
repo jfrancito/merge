@@ -73,7 +73,7 @@
                           <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>
                           <ul role="menu" class="dropdown-menu pull-right">
                             <li>
-                              <a href="{{ url('/aprobar-comprobante-administracion-liquidacion-compra-anticipo/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,6).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -10))) }}">
+                              <a href="{{ url('/aprobar-comprobante-contabilidad-liquidacion-compra-anticipo/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,6).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -10))) }}">
                                 Revisar Comprobante
                               </a>  
                             </li>
@@ -148,7 +148,7 @@
                           <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>
                           <ul role="menu" class="dropdown-menu pull-right">
                             <li>
-                              <a href="{{ url('/aprobar-comprobante-administracion-liquidacion-compra-anticipo/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,6).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -10))) }}">
+                              <a href="{{ url('/aprobar-comprobante-contabilidad-liquidacion-compra-anticipo/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,6).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -10))) }}">
                                 Revisar Comprobante
                               </a>  
                             </li>
@@ -225,7 +225,7 @@
                           <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>
                           <ul role="menu" class="dropdown-menu pull-right">
                             <li>
-                              <a href="{{ url('/aprobar-comprobante-administracion-liquidacion-compra-anticipo/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,6).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -10))) }}">
+                              <a href="{{ url('/aprobar-comprobante-contabilidad-liquidacion-compra-anticipo/'.$idopcion.'/'.$item->DOCUMENTO_ITEM.'/'.substr($item->ID_DOCUMENTO, 0,6).'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -10))) }}">
                                 Revisar Comprobante
                               </a>  
                             </li>

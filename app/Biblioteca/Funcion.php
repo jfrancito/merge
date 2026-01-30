@@ -20,6 +20,34 @@ use table;
 class Funcion {
 
 
+	public function cuenta_osiris_lca($id_documento){
+
+		$nombre = 	'';
+
+
+		$lote 	= 	DB::table('TES.AUTORIZACION_DETALLE')
+					->where('COD_AUTORIZACION', $id_documento)
+					->where('COD_TIPO_DOCUMENTO', 'TDO0000000000004')
+					->first();
+
+		if(count($lote)>0){
+
+			$referencia = DB::table('CMP.DOCUMENTO_CTBLE')
+			    ->where('COD_DOCUMENTO_CTBLE', $lote->COD_DOC_CTBLE)
+			    ->first();
+
+			if(count($referencia)>0){
+
+					$nombre = 	$referencia->TXT_EMPR_EMISOR;
+
+			}
+
+		}
+		
+		return $nombre;
+	}
+
+
 	public function cuenta_osiris_lic($id_documento){
 
 		$nombre = 	'';

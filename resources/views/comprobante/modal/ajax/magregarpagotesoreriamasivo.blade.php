@@ -79,6 +79,7 @@
 
 	<div class="modal-footer">
 		<input type="hidden" name="datastring" id='datastring' value='{{$datastring_n}}' >
+		<input type="hidden" name="operacion" id='operacion' value='{{$operacion_id}}' >
 	  <button type="submit" data-dismiss="modal" class="btn btn-success btn-guardar-configuracion">Guardar</button>
 	</div>
 </form>
