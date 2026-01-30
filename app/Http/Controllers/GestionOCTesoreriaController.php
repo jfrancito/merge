@@ -330,7 +330,6 @@ class GestionOCTesoreriaController extends Controller
                 $documento_asociados = $this->gn_lista_comision_asociados($lotes);
                 $documento_top = $this->gn_lista_comision_asociados_top($lotes);
 
-
                 FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)
                     ->update(
                         [

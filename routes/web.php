@@ -179,7 +179,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/agregar-extorno-contabilidad-lg/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionAgregarExtornoContabilidadLG');
 	Route::any('/ajax-leer-xml-lg-validar', 'GestionLiquidacionGastosController@actionAjaxLeerXmlLGValidar');
 	Route::any('/validez-comprobante-pdf', 'GestionLiquidacionGastosController@actionLiquidacionValidezComprobantePdf');
-    Route::post('/buscar-proveedor', 'GestionOCContabilidadController@buscarProveedor');
+	Route::post('/buscar-proveedor', 'GestionOCContabilidadController@buscarProveedor');
 
 	Route::any('/aprobar-liquidacion-gasto-jefe-historial/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionAprobarJefeLGHistorial');
 
@@ -205,6 +205,11 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/guardar-empresa-proveedor/{idopcion}', 'GestionLiquidacionGastosController@actionGuardarEmpresaProveedor');
 
 	Route::any('/ajax-cuenta-bancaria-proveedor-lq', 'GestionLiquidacionGastosController@actionAjaxBuscarCuentaBancariaLQ');
+
+	//ANALISIS DE LIQUIDACION DE COMPRA
+	Route::any('/gestion-de-analisis-liquidacion-compra/{idopcion}', 'GestionAnalisisLiquidacionGastosController@actionGestionAnalisisaLiquidacionCompra');
+	Route::post('/actionAjaxDashboards', 'GestionAnalisisLiquidacionGastosController@actionAjaxDashboards');
+
 
 	//SUSPENSION DE 4TA CATEGORIA
 	Route::any('/gestion-de-suspension-ta-categoria/{idopcion}', 'GestionCuartaCategoriaController@actionListarSuspensionCuarta');
@@ -319,28 +324,28 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-listado-de-opciones', 'UserController@actionAjaxListarOpciones');
 	Route::any('/ajax-activar-permisos', 'UserController@actionAjaxActivarPermisos');
 
-    //REPORTES
-    Route::any('/gestion-saldos-cobrar-pagar/{idopcion}', 'ReporteCuentaSaldoController@actionReporteCuentaSaldo');
-    Route::post('/obtener_tipo_cambio', 'ReporteCuentaSaldoController@actionObtenerTipoCambio');
-    Route::post('/obtener-reporte-cuentas-saldo', 'ReporteCuentaSaldoController@actionAjaxListarReporteCuentasSaldo');
-    Route::post('/obtener-reporte-cuentas-saldo-excel', 'ReporteCuentaSaldoController@actionAjaxListarReporteCuentasSaldoExcel');
+	//REPORTES
+	Route::any('/gestion-saldos-cobrar-pagar/{idopcion}', 'ReporteCuentaSaldoController@actionReporteCuentaSaldo');
+	Route::post('/obtener_tipo_cambio', 'ReporteCuentaSaldoController@actionObtenerTipoCambio');
+	Route::post('/obtener-reporte-cuentas-saldo', 'ReporteCuentaSaldoController@actionAjaxListarReporteCuentasSaldo');
+	Route::post('/obtener-reporte-cuentas-saldo-excel', 'ReporteCuentaSaldoController@actionAjaxListarReporteCuentasSaldoExcel');
 
-    Route::any('/gestion-compras-envases-periodo/{idopcion}', 'ReporteComprasEnvasesSedeController@actionReporteComprasEnvasesSede');
-    Route::post('/obtener-reporte-compras-envases-sede', 'ReporteComprasEnvasesSedeController@actionAjaxListarReporteComprasEnvasesSede');
-    Route::post('/obtener-reporte-compras-envases-sede-excel', 'ReporteComprasEnvasesSedeController@actionAjaxListarReporteComprasEnvasesSedeExcel');
+	Route::any('/gestion-compras-envases-periodo/{idopcion}', 'ReporteComprasEnvasesSedeController@actionReporteComprasEnvasesSede');
+	Route::post('/obtener-reporte-compras-envases-sede', 'ReporteComprasEnvasesSedeController@actionAjaxListarReporteComprasEnvasesSede');
+	Route::post('/obtener-reporte-compras-envases-sede-excel', 'ReporteComprasEnvasesSedeController@actionAjaxListarReporteComprasEnvasesSedeExcel');
 
-    //LIQUIDACIONES
-    Route::any('/gestion-liquidaciones-trabajador/{idopcion}', 'ReporteLiquidacionesTrabajadorController@actionReporteLiquidacionesTrabajador');
-    Route::post('/buscar-trabajador-liquidaciones', 'ReporteLiquidacionesTrabajadorController@buscarTrabajadorLiquidaciones');
-    Route::post('/obtener-reporte-liquidaciones-trabajador', 'ReporteLiquidacionesTrabajadorController@actionAjaxListarReporteLiquidacionesTrabajador');
-    Route::post('/obtener-reporte-liquidaciones-trabajador-excel', 'ReporteLiquidacionesTrabajadorController@actionAjaxListarReporteLiquidacionesTrabajadorExcel');
+	//LIQUIDACIONES
+	Route::any('/gestion-liquidaciones-trabajador/{idopcion}', 'ReporteLiquidacionesTrabajadorController@actionReporteLiquidacionesTrabajador');
+	Route::post('/buscar-trabajador-liquidaciones', 'ReporteLiquidacionesTrabajadorController@buscarTrabajadorLiquidaciones');
+	Route::post('/obtener-reporte-liquidaciones-trabajador', 'ReporteLiquidacionesTrabajadorController@actionAjaxListarReporteLiquidacionesTrabajador');
+	Route::post('/obtener-reporte-liquidaciones-trabajador-excel', 'ReporteLiquidacionesTrabajadorController@actionAjaxListarReporteLiquidacionesTrabajadorExcel');
 
-    Route::any('/gestion-ingresos-salidas-envases/{idopcion}', 'IngresosSalidasEnvasesController@actionListarIngresosSalidasEnvases');
-    Route::any('/obtener-combo-familia', 'IngresosSalidasEnvasesController@actionAjaxListarFamilia');
-    Route::any('/obtener-combo-subfamilia', 'IngresosSalidasEnvasesController@actionAjaxListarSubFamilia');
-    Route::any('/obtener-combo-producto', 'IngresosSalidasEnvasesController@actionAjaxListarProducto');
-    Route::any('/obtener-ingresos-salidas-envases', 'IngresosSalidasEnvasesController@actionAjaxListarIngresosSalidasEnvases');
-    Route::any('/obtener-reporte-ingresos-salidas-envases-excel', 'IngresosSalidasEnvasesController@actionAjaxListarIngresosSalidasEnvasesExcel');
+	Route::any('/gestion-ingresos-salidas-envases/{idopcion}', 'IngresosSalidasEnvasesController@actionListarIngresosSalidasEnvases');
+	Route::any('/obtener-combo-familia', 'IngresosSalidasEnvasesController@actionAjaxListarFamilia');
+	Route::any('/obtener-combo-subfamilia', 'IngresosSalidasEnvasesController@actionAjaxListarSubFamilia');
+	Route::any('/obtener-combo-producto', 'IngresosSalidasEnvasesController@actionAjaxListarProducto');
+	Route::any('/obtener-ingresos-salidas-envases', 'IngresosSalidasEnvasesController@actionAjaxListarIngresosSalidasEnvases');
+	Route::any('/obtener-reporte-ingresos-salidas-envases-excel', 'IngresosSalidasEnvasesController@actionAjaxListarIngresosSalidasEnvasesExcel');
 
 	Route::any('/leerxmlsinvoice', 'GestionOCController@actionApiLeerXmlSap');
 	Route::any('/leerxmlsinvoiceliqui', 'GestionOCController@actionApiLeerXmlSapLiqui');
@@ -381,11 +386,11 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/gestion-de-oc-proveedores/{idopcion}', 'GestionOCController@actionListarOC');
 	Route::any('/gestion-de-orden-compra/{idopcion}', 'GestionOCController@actionListarOCAdmin');
-	Route::get('/ver-contrato-pdf/{cod_contrato}','GestionOCController@actionPDFContrato')->name('contrato.pdf');
-	Route::post('/verificar-firma-contrato','GestionOCController@actionVerificarFirmaContrato')->name('verificar.firma.contrato');
+	Route::get('/ver-contrato-pdf/{cod_contrato}', 'GestionOCController@actionPDFContrato')->name('contrato.pdf');
+	Route::post('/verificar-firma-contrato', 'GestionOCController@actionVerificarFirmaContrato')->name('verificar.firma.contrato');
 
 
-	
+
 
 
 	Route::any('/detalle-comprobante-oc/{procedencia}/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionDetalleComprobanteOC');
@@ -435,7 +440,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/subir-xml-cargar-datos-administrator/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionCargarXMLAdministrator');
 	Route::any('/validar-xml-oc-administrator/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionValidarXMLAdministrator');
 	Route::any('/validar-xml-oc-administrator-sx/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCSXController@actionValidarXMLAdministratorSX');
-	
+
 
 	Route::any('/agregar-archivo-uc/{procedencia}/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionAgregarArchivoUC');
 	Route::any('/quitar-archivo-uc/{procedencia}/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionQuitarArchivoUC');
@@ -474,9 +479,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/validar-xml-nota-debito-administrator/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCController@actionValidarXMLNotaDebitoAdministrator');
 
 	//ADMINISTRATOR LIQUIDACION COMPRA ANTICIPO
-	Route::any('/detalle-comprobante-liquidacion-compra-anticipo-administrator/{procedencia}/{idopcion}/{prefijo}/{idordenpago}', 'GestionOCController@actionDetalleComprobanteLiquidacionCompraAnticipoAdministrator');	
+	Route::any('/detalle-comprobante-liquidacion-compra-anticipo-administrator/{procedencia}/{idopcion}/{prefijo}/{idordenpago}', 'GestionOCController@actionDetalleComprobanteLiquidacionCompraAnticipoAdministrator');
 	Route::any('/subir-xml-cargar-datos-liquidacion-compra-anticipo-administrator/{idopcion}/{prefijo}/{idordenpago}', 'GestionOCController@actionCargarXMLLiquidacionCompraAnticipoAdministrator');
-	Route::any('/validar-xml-oc-liquidacion-compra-anticipo-administrator/{idopcion}/{prefijo}/{idordenpago}', 'GestionOCController@actionValidarXMLLiquidacionCompraAnticipoAdministrator');	
+	Route::any('/validar-xml-oc-liquidacion-compra-anticipo-administrator/{idopcion}/{prefijo}/{idordenpago}', 'GestionOCController@actionValidarXMLLiquidacionCompraAnticipoAdministrator');
 
 	//ADMINISTRATOR ESTIBA
 	Route::any('/select-xml-estiba/{idopcion}', 'GestionEstibaController@actionDetalleSelectEstiba');
@@ -510,10 +515,10 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/ajax-modal-vaidar-rr-is', 'RRController@actionAjaxModalValidarRRIs');
 
-    Route::any('/gestion-comprobantes-contabilidad/{idopcion}', 'GestionComprobantesContabilidadController@actionGestionComprobantesContabilidad');
-    Route::post('/listar-comprobantes-contabilidad', 'GestionComprobantesContabilidadController@actionListarComprobantesContabilidad');
+	Route::any('/gestion-comprobantes-contabilidad/{idopcion}', 'GestionComprobantesContabilidadController@actionGestionComprobantesContabilidad');
+	Route::post('/listar-comprobantes-contabilidad', 'GestionComprobantesContabilidadController@actionListarComprobantesContabilidad');
 
-    Route::any('/detalle-comprobante-oc-validado-historial/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoHitorial');
+	Route::any('/detalle-comprobante-oc-validado-historial/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoHitorial');
 	Route::any('/detalle-comprobante-oc-validado-contrato-historial/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoContratoHistorial');
 
 	//CONSOLIDAR DOCUMENTOS DE PLANILLA DE MOVILIDADD
@@ -538,7 +543,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/agregar-extorno-contabilidad-pla/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadController@actionAgregarExtornoContabilidadPLA');
 	Route::any('/aprobar-planilla-movilidad-contabilidad-revisadas/{idopcion}/{idordencompra}', 'GestionPlanillaMovilidadController@actionAprobarContabilidadPLARevisada');
 
-    Route::post('/obtener-periodo-tipo-cambio', 'GestionOCContabilidadController@actionObtenerPeriodoTipoCambio');
+	Route::post('/obtener-periodo-tipo-cambio', 'GestionOCContabilidadController@actionObtenerPeriodoTipoCambio');
 
 	//ENTREGA DE DOCUMENTOS
 	Route::any('/gestion-de-entrega-documentos/{idopcion}', 'GestionEntregaDocumentoController@actionListarEntregaDocumento');
@@ -612,8 +617,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/detalle-comprobante-oc-validado-pg/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDetalleComprobanteOCValidadoPg');
 
 
-    Route::any('/ajax-combo-periodo-xanio-xempresa', 'GestionOCContabilidadController@actionAjaxComboPeriodoAnioEmpresa');
-    Route::any('/ajax-combo-periodo-xanio-xempresareparable', 'GestionOCContabilidadController@actionAjaxComboPeriodoAnioEmpresaReparable');
+	Route::any('/ajax-combo-periodo-xanio-xempresa', 'GestionOCContabilidadController@actionAjaxComboPeriodoAnioEmpresa');
+	Route::any('/ajax-combo-periodo-xanio-xempresareparable', 'GestionOCContabilidadController@actionAjaxComboPeriodoAnioEmpresaReparable');
 	Route::any('/gestion-de-comprobantes-observados/{idopcion}', 'GestionUsuarioContactoController@actionListarComprobantesObservados');
 	Route::any('/gestion-de-comprobantes-reparable/{idopcion}', 'GestionUsuarioContactoController@actionListarComprobantesReparable');
 
@@ -668,7 +673,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/aprobar-comprobante-contabilidad-nota-debito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAprobarContabilidadNotaDebito');
 	Route::any('/aprobar-comprobante-contabilidad-estiba/{idopcion}/{lote}', 'GestionOCContabilidadController@actionAprobarContabilidadEstiba');
 	Route::any('/aprobar-comprobante-contabilidad-estiba-dic/{idopcion}/{lote}', 'GestionOCContabilidadController@actionAprobarContabilidadEstibaDIC');
-	
+
 	Route::any('/aprobar-comprobante-contabilidad-pg/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAprobarContabilidadPG');
 	Route::any('/aprobar-comprobante-contabilidad-estiba-oca/{idopcion}/{lote}', 'GestionOCContabilidadController@actionAprobarContabilidadEstibaOca');
 
@@ -697,7 +702,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/agregar-reparable-contabilidad-pg/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAgregarReparableContabilidadPg');
 	Route::any('/agregar-reparable-contabilidad-nc/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAgregarReparableContabilidadNC');
 	Route::any('/agregar-reparable-contabilidad-nd/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAgregarReparableContabilidadND');
-	
+
 
 	Route::any('/agregar-reparable-contabilidad-estiba/{idopcion}/{lote}', 'GestionOCContabilidadController@actionAgregarReparableContabilidadEstiba');
 	Route::any('/agregar-reparable-contabilidad-estiba-dic/{idopcion}/{lote}', 'GestionOCContabilidadController@actionAgregarReparableContabilidadEstibaDIC');
@@ -706,9 +711,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/agregar-extorno-contabilidad/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAgregarExtornoContabilidad');
 	Route::any('/agregar-extorno-contrato-contabilidad/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAgregarExtornoContratoContabilidad');
 	Route::any('/agregar-extorno-nota-credito-contabilidad/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAgregarExtornoNotaCreditoContabilidad');
-	Route::any('/agregar-extorno-nota-debito-contabilidad/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAgregarExtornoNotaDebitoContabilidad');	
+	Route::any('/agregar-extorno-nota-debito-contabilidad/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAgregarExtornoNotaDebitoContabilidad');
 	Route::any('/agregar-extorno-estiba-contabilidad/{idopcion}/{lote}', 'GestionOCContabilidadController@actionAgregarExtornoEstibaContabilidad');
-	Route::any('/agregar-extorno-pg-contabilidad/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAgregarExtornoPGContabilidad');	
+	Route::any('/agregar-extorno-pg-contabilidad/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAgregarExtornoPGContabilidad');
 
 
 	Route::any('/agregar-recomendacion-contabilidad/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAgregarRecomendacionContabilidad');
@@ -749,7 +754,7 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/aprobar-comprobante-contabilidad-liquidacion-compra-anticipo/{idopcion}/{linea}/{prefijo}/{idordenpago}', 'GestionOCContabilidadController@actionAprobarContabilidadLiquidacionCompraAnticipo');
 	Route::any('/agregar-observacion-contabilidad-liquidacion-compra-anticipo/{idopcion}/{linea}/{prefijo}/{idordenpago}', 'GestionOCContabilidadController@actionAgregarObservacionContabilidadLiquidacionCompraAnticipo');
-	
+
 
 
 	Route::any('/aprobar-comprobante-administracion-pg/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCAdministracionController@actionAprobarAdministracionPG');
@@ -816,7 +821,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/provisionar-documentos/{idopcion}', 'GestionOCProvisionController@actionListarProvisionarComprobante');
 
 
-	
+
 	Route::any('/descargar-archivo-requerimiento-xml/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDescargarXML');
 	Route::any('/descargar-archivo-requerimiento-cdr/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDescargarCDR');
 	Route::any('/descargar-archivo-requerimiento-pdf/{idopcion}/{prefijo}/{idordencompra}', 'GestionOCValidadoController@actionDescargarPDF');
@@ -843,15 +848,15 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/gestion-de-modelos-comprobantes/{idopcion}', 'GestionOCValidadoController@actionModelosComprobantes');
 
 	Route::any('/gestion-reporte-inventario/{idopcion}', 'ReporteInventarioController@actionListarReporteInventario');
-    Route::any('/ajax-reporte-inventario', 'ReporteInventarioController@actionAjaxListarReporteInventario');
-    Route::any('/descargar-archivo-inventario-consolidado', 'ReporteInventarioController@actionAjaxListarReporteInventarioExcel');
+	Route::any('/ajax-reporte-inventario', 'ReporteInventarioController@actionAjaxListarReporteInventario');
+	Route::any('/descargar-archivo-inventario-consolidado', 'ReporteInventarioController@actionAjaxListarReporteInventarioExcel');
 
-    //VALE A RENDIR
-    Route::get('/gestionar-vale-rendir/{idopcion}', 'ValeRendirController@actionValeRendir');
-    Route::post('/registrar_vale_rendir', 'ValeRendirController@insertValeRendirAction');
+	//VALE A RENDIR
+	Route::get('/gestionar-vale-rendir/{idopcion}', 'ValeRendirController@actionValeRendir');
+	Route::post('/registrar_vale_rendir', 'ValeRendirController@insertValeRendirAction');
 	Route::post('/data_vale_rendir', 'ValeRendirController@traerdataValeRendirAction');
 	Route::post('/ver_detalle_importe_vale', 'ValeRendirController@actionDetalleImporteVale');
-    Route::post('/ver_mensaje_vale_rendir', 'ValeRendirController@actionMensajeValeRendir');
+	Route::post('/ver_mensaje_vale_rendir', 'ValeRendirController@actionMensajeValeRendir');
 
 	Route::get('/gestion-autoriza-rendir/{idopcion}', 'ValeRendirAutorizaController@actionValeRendirAutoriza');
 	Route::post('/autorizar_vale_rendir', 'ValeRendirAutorizaController@actionAutorizarValeRendir');
@@ -895,15 +900,15 @@ Route::group(['middleware' => ['authaw']], function () {
 
 
 
-  //PATANLLA  2
+	//PATANLLA  2
 	Route::get('/gestion-de-personal-aprueba-vale/{idopcion}', 'RegistroPersonalApruebaController@actionRegistroPersonalAprueba');
-    Route::post('/registrar_personal_aprueba', 'RegistroPersonalApruebaController@insertPersonalAprueba');
-    Route::post('/obtener_area_cargo', 'RegistroPersonalApruebaController@obtenerAreaYCargo');
+	Route::post('/registrar_personal_aprueba', 'RegistroPersonalApruebaController@insertPersonalAprueba');
+	Route::post('/obtener_area_cargo', 'RegistroPersonalApruebaController@obtenerAreaYCargo');
 
-    Route::post('/data_personal_aprueba', 'RegistroPersonalApruebaController@traerdataPersonalApruebaAction');
+	Route::post('/data_personal_aprueba', 'RegistroPersonalApruebaController@traerdataPersonalApruebaAction');
 	Route::post('/eliminar_personal_aprueba', 'RegistroPersonalApruebaController@actionEliminarRegistroPersonalAprueba');
 
-  //CORREO VALE RENDIR
+	//CORREO VALE RENDIR
 
 	Route::get('/enviar_correo_generado', 'EnviarCorreoValeRendirGeneradoController@actionEnviarCorreoVRGenerado');
 	Route::get('/enviar_correo_autoriza', 'EnviarCorreoValeRendirAutorizaController@actionEnviarCorreoVRAutoriza');
@@ -912,26 +917,26 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::get('/rechazar_correo_generado', 'RechazarCorreoValeRendirGeneradoController@actionRechazarCorreoVRGenerado');
 	Route::get('/rechazar_correo_autoriza', 'RechazarCorreoValeRendirAutorizaController@actionRechazarCorreoVRAutoriza');
 
-   //FIRMA VALE A RENDIR
+	//FIRMA VALE A RENDIR
 
 	Route::get('/firma-de-vale/{idopcion}', 'FirmaValeRendirController@actionRegistroPersonalFirma');
 	Route::get('/exportar_pdf/{id}', 'FirmaValeRendirController@actionexportarpdf')->name('exportar_pdf');
 
 	//VALE A RENDIR REEMBOLSO
 	Route::get('/gestion-de-vale-rendir-reembolso/{idopcion}', 'ValeRendirControllerReembolso@actionValeRendirReembolso');
-    Route::post('/registrar_vale_rendir_reembolso', 'ValeRendirControllerReembolso@insertValeRendirActionReembolso');
-    Route::post('/data_vale_rendir_reembolso', 'ValeRendirControllerReembolso@traerdataValeRendirActionReembolso');
-    Route::post('/ver_detalle_importe_vale_reembolso', 'ValeRendirControllerReembolso@actionDetalleImporteValeReembolso');
+	Route::post('/registrar_vale_rendir_reembolso', 'ValeRendirControllerReembolso@insertValeRendirActionReembolso');
+	Route::post('/data_vale_rendir_reembolso', 'ValeRendirControllerReembolso@traerdataValeRendirActionReembolso');
+	Route::post('/ver_detalle_importe_vale_reembolso', 'ValeRendirControllerReembolso@actionDetalleImporteValeReembolso');
 
-    Route::get('/gestion-autoriza-rendir-reembolso/{idopcion}', 'ValeRendirAutorizaControllerReembolso@actionValeRendirAutorizaReembolso');
+	Route::get('/gestion-autoriza-rendir-reembolso/{idopcion}', 'ValeRendirAutorizaControllerReembolso@actionValeRendirAutorizaReembolso');
 	Route::post('/autorizar_vale_rendir_reembolso', 'ValeRendirAutorizaControllerReembolso@actionAutorizarValeRendirReembolso');
 	Route::post('/rechazar_vale_rendir_reembolso', 'ValeRendirAutorizaControllerReembolso@actionRechazarValeRendirReembolso');
 	Route::post('/ver_detalle_importe_autoriza_reembolso', 'ValeRendirAutorizaControllerReembolso@actionDetalleImporteReembolso');
-	
+
 	//GESTION LISTA VALE A RENDIR ADMINISTRACION
 	Route::any('/gestion-de-vale-rendir-administracion/{idopcion}', 'GestionValeRendirController@actionListarValeRendir');
 	Route::any('/ajax-buscar-documento-vl', 'GestionValeRendirController@actionListarAjaxBuscarDocumentoVL');
-	Route::get('/descargar-excel-vl','GestionValeRendirController@actionExportarExcelVL');
+	Route::get('/descargar-excel-vl', 'GestionValeRendirController@actionExportarExcelVL');
 
 	Route::post('/ver_detalle_importe_vale_gestion', 'GestionValeRendirController@actionVerDetalleValeImporte');
 	Route::post('/ver_detalle_vale_gestion', 'GestionValeRendirController@actionVerDetalleVale');
@@ -977,143 +982,149 @@ Route::group(['middleware' => ['authaw']], function () {
 Route::get('/pruebaemail/{emailfrom}/{nombreusuario}', 'PruebasController@actionPruebaEmail');
 
 
-Route::get('buscarcliente', function (Illuminate\Http\Request  $request) {
-    $term = $request->term ?: '';
-    $tags = DB::table('STD.EMPRESA')
-    		->leftJoin('users', 'STD.EMPRESA.COD_EMPR', '=', 'users.usuarioosiris_id')
-    		->where('NOM_EMPR', 'like', '%'.$term.'%')
-			->where('STD.EMPRESA.IND_PROVEEDOR','=',1)
-			->where('STD.EMPRESA.COD_ESTADO','=',1)
-			->whereNull('users.usuarioosiris_id')
-			->take(100)
-			->select(DB::raw("
+Route::get('buscarcliente', function (Illuminate\Http\Request $request) {
+	$term = $request->term ?: '';
+	$tags = DB::table('STD.EMPRESA')
+		->leftJoin('users', 'STD.EMPRESA.COD_EMPR', '=', 'users.usuarioosiris_id')
+		->where('NOM_EMPR', 'like', '%' . $term . '%')
+		->where('STD.EMPRESA.IND_PROVEEDOR', '=', 1)
+		->where('STD.EMPRESA.COD_ESTADO', '=', 1)
+		->whereNull('users.usuarioosiris_id')
+		->take(100)
+		->select(
+			DB::raw("
 			  STD.EMPRESA.NRO_DOCUMENTO + ' - '+ STD.EMPRESA.NOM_EMPR AS NOMBRE")
-			)
-    		->pluck('NOMBRE', 'NOMBRE');
-    $valid_tags = [];
-    foreach ($tags as $id => $tag) {
-        $valid_tags[] = ['id' => $id, 'text' => $tag];
-    }
-    return \Response::json($valid_tags);
+		)
+		->pluck('NOMBRE', 'NOMBRE');
+	$valid_tags = [];
+	foreach ($tags as $id => $tag) {
+		$valid_tags[] = ['id' => $id, 'text' => $tag];
+	}
+	return \Response::json($valid_tags);
 });
 
 
-Route::get('buscarempresa', function (Illuminate\Http\Request  $request) {
-    $term = $request->term ?: '';
-    $tags = DB::table('STD.EMPRESA')
-    		->where('NOM_EMPR', 'like', '%'.$term.'%')
-			//->where('STD.EMPRESA.IND_PROVEEDOR','=',1)
-			->where('STD.EMPRESA.COD_ESTADO','=',1)
-			->where('COD_TIPO_DOCUMENTO','=','TDI0000000000006')
-			->take(100)
-			->select(DB::raw("
+Route::get('buscarempresa', function (Illuminate\Http\Request $request) {
+	$term = $request->term ?: '';
+	$tags = DB::table('STD.EMPRESA')
+		->where('NOM_EMPR', 'like', '%' . $term . '%')
+		//->where('STD.EMPRESA.IND_PROVEEDOR','=',1)
+		->where('STD.EMPRESA.COD_ESTADO', '=', 1)
+		->where('COD_TIPO_DOCUMENTO', '=', 'TDI0000000000006')
+		->take(100)
+		->select(
+			DB::raw("
 			  STD.EMPRESA.NRO_DOCUMENTO + ' - '+ STD.EMPRESA.NOM_EMPR AS NOMBRE")
-			)
-    		->pluck('NOMBRE', 'NOMBRE');
-    $valid_tags = [];
-    foreach ($tags as $id => $tag) {
-        $valid_tags[] = ['id' => $id, 'text' => $tag];
-    }
-    return \Response::json($valid_tags);
+		)
+		->pluck('NOMBRE', 'NOMBRE');
+	$valid_tags = [];
+	foreach ($tags as $id => $tag) {
+		$valid_tags[] = ['id' => $id, 'text' => $tag];
+	}
+	return \Response::json($valid_tags);
 });
 
-Route::get('buscarempresalg', function (Illuminate\Http\Request  $request) {
-    $term = $request->term ?: '';
-    $tags = DB::table('STD.EMPRESA')
-		    ->where(function($query) use ($term) {
-		        $query->where('STD.EMPRESA.NOM_EMPR', 'like', '%' . $term . '%')
-		              ->orWhere('STD.EMPRESA.NRO_DOCUMENTO', 'like', '%' . $term . '%');
-		    })
-			->where('STD.EMPRESA.COD_ESTADO','=',1)
-			->where('COD_TIPO_DOCUMENTO','=','TDI0000000000006')
-			->take(100)
-			->select(DB::raw("
+Route::get('buscarempresalg', function (Illuminate\Http\Request $request) {
+	$term = $request->term ?: '';
+	$tags = DB::table('STD.EMPRESA')
+		->where(function ($query) use ($term) {
+			$query->where('STD.EMPRESA.NOM_EMPR', 'like', '%' . $term . '%')
+				->orWhere('STD.EMPRESA.NRO_DOCUMENTO', 'like', '%' . $term . '%');
+		})
+		->where('STD.EMPRESA.COD_ESTADO', '=', 1)
+		->where('COD_TIPO_DOCUMENTO', '=', 'TDI0000000000006')
+		->take(100)
+		->select(
+			DB::raw("
 			  STD.EMPRESA.NRO_DOCUMENTO + ' - '+ STD.EMPRESA.NOM_EMPR AS NOMBRE")
-			)
-    		->pluck('NOMBRE', 'NOMBRE');
-    $valid_tags = [];
-    foreach ($tags as $id => $tag) {
-        $valid_tags[] = ['id' => $id, 'text' => $tag];
-    }
-    return \Response::json($valid_tags);
+		)
+		->pluck('NOMBRE', 'NOMBRE');
+	$valid_tags = [];
+	foreach ($tags as $id => $tag) {
+		$valid_tags[] = ['id' => $id, 'text' => $tag];
+	}
+	return \Response::json($valid_tags);
 });
 
-Route::get('buscarempresarenta', function (Illuminate\Http\Request  $request) {
-    $term = $request->term ?: '';
-    $tags = DB::table('STD.EMPRESA')
-		    ->where(function($query) use ($term) {
-		        $query->where('STD.EMPRESA.NOM_EMPR', 'like', '%' . $term . '%')
-		              ->orWhere('STD.EMPRESA.NRO_DOCUMENTO', 'like', '%' . $term . '%');
-		    })
-		    ->where('COD_TIPO_DOCUMENTO','=','TDI0000000000006')
-			->where('STD.EMPRESA.COD_ESTADO','=',1)
-			->where('STD.EMPRESA.NRO_DOCUMENTO','like','1%')
-			->take(100)
-			->select(DB::raw("
+Route::get('buscarempresarenta', function (Illuminate\Http\Request $request) {
+	$term = $request->term ?: '';
+	$tags = DB::table('STD.EMPRESA')
+		->where(function ($query) use ($term) {
+			$query->where('STD.EMPRESA.NOM_EMPR', 'like', '%' . $term . '%')
+				->orWhere('STD.EMPRESA.NRO_DOCUMENTO', 'like', '%' . $term . '%');
+		})
+		->where('COD_TIPO_DOCUMENTO', '=', 'TDI0000000000006')
+		->where('STD.EMPRESA.COD_ESTADO', '=', 1)
+		->where('STD.EMPRESA.NRO_DOCUMENTO', 'like', '1%')
+		->take(100)
+		->select(
+			DB::raw("
 			  STD.EMPRESA.NRO_DOCUMENTO + ' - '+ STD.EMPRESA.NOM_EMPR AS NOMBRE")
-			)
-    		->pluck('NOMBRE', 'NOMBRE');
-    $valid_tags = [];
-    foreach ($tags as $id => $tag) {
-        $valid_tags[] = ['id' => $id, 'text' => $tag];
-    }
-    return \Response::json($valid_tags);
+		)
+		->pluck('NOMBRE', 'NOMBRE');
+	$valid_tags = [];
+	foreach ($tags as $id => $tag) {
+		$valid_tags[] = ['id' => $id, 'text' => $tag];
+	}
+	return \Response::json($valid_tags);
 });
 
 
 
-Route::get('buscarproducto', function (Illuminate\Http\Request  $request) {
-    $term = $request->term ?: '';
-    $tags = DB::table('ALM.PRODUCTO')
-    		->where('NOM_PRODUCTO', 'like', '%'.$term.'%')
-			->where('ALM.PRODUCTO.COD_ESTADO','=',1)
-			->where('ALM.PRODUCTO.IND_DISPONIBLE','=',1)
-			->where('ALM.PRODUCTO.IND_MATERIAL_SERVICIO','=','S')
-			->where('COD_CATEGORIA_CLASE','=','1')
-			->take(100)
-			->select(DB::raw("
+Route::get('buscarproducto', function (Illuminate\Http\Request $request) {
+	$term = $request->term ?: '';
+	$tags = DB::table('ALM.PRODUCTO')
+		->where('NOM_PRODUCTO', 'like', '%' . $term . '%')
+		->where('ALM.PRODUCTO.COD_ESTADO', '=', 1)
+		->where('ALM.PRODUCTO.IND_DISPONIBLE', '=', 1)
+		->where('ALM.PRODUCTO.IND_MATERIAL_SERVICIO', '=', 'S')
+		->where('COD_CATEGORIA_CLASE', '=', '1')
+		->take(100)
+		->select(
+			DB::raw("
 			  ALM.PRODUCTO.NOM_PRODUCTO")
-			)
-    		->pluck('NOM_PRODUCTO', 'NOM_PRODUCTO');
-    $valid_tags = [];
-    foreach ($tags as $id => $tag) {
-        $valid_tags[] = ['id' => $id, 'text' => $tag];
-    }
-    return \Response::json($valid_tags);
+		)
+		->pluck('NOM_PRODUCTO', 'NOM_PRODUCTO');
+	$valid_tags = [];
+	foreach ($tags as $id => $tag) {
+		$valid_tags[] = ['id' => $id, 'text' => $tag];
+	}
+	return \Response::json($valid_tags);
 });
 
 
 
 
 
-Route::get('buscarclientey', function (Illuminate\Http\Request  $request) {
+Route::get('buscarclientey', function (Illuminate\Http\Request $request) {
 
 
-    $term = $request->term ?: '';
+	$term = $request->term ?: '';
 
 	print_r("1");
 
-	$tags 				= 	DB::table('STD.EMPRESA')
-									->leftJoin('users', 'STD.EMPRESA.COD_EMPR', '=', 'users.usuarioosiris_id')
-									->whereNull('users.usuarioosiris_id')
-									->where('STD.EMPRESA.IND_PROVEEDOR','=',1)
-									->where('STD.EMPRESA.NOM_EMPR', 'like', '%'.$term.'%')
-									->where('STD.EMPRESA.COD_ESTADO','=',1)
-									->select('STD.EMPRESA.COD_EMPR','STD.EMPRESA.NOM_EMPR')
-									->select(DB::raw("
+	$tags = DB::table('STD.EMPRESA')
+		->leftJoin('users', 'STD.EMPRESA.COD_EMPR', '=', 'users.usuarioosiris_id')
+		->whereNull('users.usuarioosiris_id')
+		->where('STD.EMPRESA.IND_PROVEEDOR', '=', 1)
+		->where('STD.EMPRESA.NOM_EMPR', 'like', '%' . $term . '%')
+		->where('STD.EMPRESA.COD_ESTADO', '=', 1)
+		->select('STD.EMPRESA.COD_EMPR', 'STD.EMPRESA.NOM_EMPR')
+		->select(
+			DB::raw("
 									  STD.EMPRESA.COD_EMPR,
 									  STD.EMPRESA.NRO_DOCUMENTO + ' - '+ STD.EMPRESA.NOM_EMPR AS NOMBRE")
-									)
-									->take(10)
-									->pluck('NOMBRE', 'NOMBRE');
-    $valid_tags = [];
-    foreach ($tags as $id => $tag) {
+		)
+		->take(10)
+		->pluck('NOMBRE', 'NOMBRE');
+	$valid_tags = [];
+	foreach ($tags as $id => $tag) {
 
-        $valid_tags[] = ['id' => $id, 'text' => $tag];
-    }
+		$valid_tags[] = ['id' => $id, 'text' => $tag];
+	}
 
 
-    return \Response::json($valid_tags);
+	return \Response::json($valid_tags);
 });
 
 
