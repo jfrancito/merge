@@ -162,7 +162,7 @@ $(document).ready(function(){
         var _token                  =   $('#token').val();
         var data_requerimiento_id   =   $(this).attr('data_requerimiento_id');
         var data_linea              =   $(this).attr('data_linea');
-
+        var operacion_id            =   $('#operacion_id').val();
 
         var idopcion                =   $('#idopcion').val();
 
@@ -171,6 +171,7 @@ $(document).ready(function(){
                                             data_requerimiento_id   : data_requerimiento_id,
                                             data_linea              : data_linea,
                                             idopcion                : idopcion,
+                                            operacion_id            : operacion_id,
                                         };
         ajax_modal(data,"/ajax-modal-tesoreria-pago-estiba",
                   "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
@@ -284,7 +285,7 @@ $(document).ready(function(){
 
         var _token                  =   $('#token').val();
         var idopcion                =   $('#idopcion').val();
-
+        var operacion_id            =   $('#operacion_id').val();
 
         var array_item              =   datamasivo();
         if(array_item.length<=0){alerterrorajax('No existe ningun registro'); return false;}
@@ -293,6 +294,7 @@ $(document).ready(function(){
         data                        =   {
                                             _token                  : _token,
                                             datastring              : datastring,
+                                            operacion_id            : operacion_id,
                                             idopcion                : idopcion
                                         };
 
