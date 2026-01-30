@@ -747,6 +747,10 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/aprobar-comprobante-administracion-nota-debito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCAdministracionController@actionAprobarAdministracionNotaDebito');
 	Route::any('/agregar-observacion-administracion-nota-debito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCAdministracionController@actionAgregarObservacionAdministracionNotaDebito');
 
+	Route::any('/aprobar-comprobante-contabilidad-liquidacion-compra-anticipo/{idopcion}/{linea}/{prefijo}/{idordenpago}', 'GestionOCContabilidadController@actionAprobarContabilidadLiquidacionCompraAnticipo');
+	Route::any('/agregar-observacion-contabilidad-liquidacion-compra-anticipo/{idopcion}/{linea}/{prefijo}/{idordenpago}', 'GestionOCContabilidadController@actionAgregarObservacionContabilidadLiquidacionCompraAnticipo');
+	
+
 
 	Route::any('/aprobar-comprobante-administracion-pg/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCAdministracionController@actionAprobarAdministracionPG');
 	Route::any('/agregar-observacion-administracion-pg/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCAdministracionController@actionAgregarObservacionAdministracionPG');

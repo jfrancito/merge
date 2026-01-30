@@ -318,12 +318,11 @@ class FileController extends Controller
 
         $archivo                =       Archivo::where('NOMBRE_ARCHIVO','=',$newstr)->first();
         $fedocumento            =       FeDocumento::where('ID_DOCUMENTO','=',$archivo->ID_DOCUMENTO)->first();
+        $op                     =       VMergeOPActual::where('COD_ESTADO','=','1')
+                                            ->where('COD_AUTORIZACION','=',$fedocumento->ID_DOCUMENTO)
+                                            ->first();
         $prefijocarperta        =       $this->prefijo_empresa($fedocumento->COD_EMPR);
-
-
-
-
-        $rutafile               =       '\\\\10.1.50.2/comprobantes/'.$prefijocarperta.'/'.$fedocumento->ID_DOCUMENTO.'/';
+        $rutafile               =       '\\\\10.1.50.2/comprobantes/'.$prefijocarperta.'/'.$op->NRO_DOC.'/';
         //dd($rutafile);
         $remoteFile             =       $rutafile.$newstr;
 
