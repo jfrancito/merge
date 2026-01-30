@@ -1449,6 +1449,8 @@ class GestionOCTesoreriaController extends Controller
         $cod_orden = $request['data_requerimiento_id'];
         $linea = $request['data_linea'];
         $idopcion = $request['idopcion'];
+        $operacion_id = $request['operacion_id'];
+
 
         $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $cod_orden)->where('DOCUMENTO_ITEM', '=', $linea)->first();
         //ARCHIVOS
@@ -1487,6 +1489,7 @@ class GestionOCTesoreriaController extends Controller
                 'idopcion' => $idopcion,
                 'fedocumento' => $fedocumento,
                 'tarchivos' => $tarchivos,
+                'operacion_id' => $operacion_id,
                 'ajax' => true,
             ]);
     }
@@ -1995,6 +1998,8 @@ class GestionOCTesoreriaController extends Controller
 
         $idopcion = $request['idopcion'];
         $datastring_n = $request['datastring'];
+        $operacion_id = $request['operacion_id'];
+
         $datastring = json_decode($request['datastring'], false);
 
         $archivosdelfe = CMPCategoria::where('TXT_GRUPO', '=', 'DOCUMENTOS_COMPRA')
@@ -2035,6 +2040,8 @@ class GestionOCTesoreriaController extends Controller
                 'datastring' => $datastring,
                 'idopcion' => $idopcion,
                 'tarchivos' => $tarchivos,
+                'operacion_id' => $operacion_id,
+
                 'ajax' => true,
             ]);
     }
@@ -2058,6 +2065,8 @@ class GestionOCTesoreriaController extends Controller
 
                 DB::beginTransaction();
                 $datastring = json_decode($request['datastring'], false);
+                $operacion = $request['operacion'];
+
 
                 foreach ($datastring as $index_asiento => $itemc) {
                     $pedido_id = $itemc->id;
@@ -2247,7 +2256,7 @@ class GestionOCTesoreriaController extends Controller
                 }
 
                 DB::commit();
-                Session::flash('operacion_id', 'CONTRATO');
+                Session::flash('operacion_id', $operacion);
                 return Redirect::to('/gestion-de-tesoreria-aprobar/' . $idopcion)->with('bienhecho', 'Comprobantes Masivo Aprobado con exito');
             } catch (\Exception $ex) {
                 DB::rollback();
@@ -3046,7 +3055,7 @@ class GestionOCTesoreriaController extends Controller
             try {
 
                 DB::beginTransaction();
-
+                $operacion = $request['operacion'];
                 $pedido_id = $idoc;
                 $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $pedido_id)->where('DOCUMENTO_ITEM', '=', $linea)->first();
                 $tarchivos = CMPDocAsociarCompra::where('COD_ORDEN', '=', $fedocumento->ID_DOCUMENTO)->where('COD_ESTADO', '=', 1)
@@ -3132,7 +3141,7 @@ class GestionOCTesoreriaController extends Controller
 
 
                 DB::commit();
-                Session::flash('operacion_id', 'ESTIBA');
+                Session::flash('operacion_id', $operacion);
                 return Redirect::to('/gestion-de-tesoreria-aprobar/' . $idopcion)->with('bienhecho', 'Comprobante : ' . $fedocumento->ID_DOCUMENTO . ' APROBADO CON EXITO');
             } catch (\Exception $ex) {
                 DB::rollback();
