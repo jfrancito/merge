@@ -20,6 +20,9 @@
                             <span class="status-online"><i class="fa fa-circle"></i> En línea</span>
                         </div>
                         <div class="chat-actions">
+                            <button class="btn-insights" id="btn_insights" title="Sorpréndeme con insights">
+                                <i class="fa fa-magic"></i> Sorpréndeme
+                            </button>
                             <button class="btn-clear-chat" id="btn_clear_chat" title="Nueva conversación">
                                 <i class="fa fa-refresh"></i>
                             </button>

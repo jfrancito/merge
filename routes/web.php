@@ -219,6 +219,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::post('/api/asistente-analitico/preguntas-frecuentes/{idopcion}', 'GestionAnalisisLiquidacionGastosController@actionGuardarPreguntaFrecuente');
 	Route::delete('/api/asistente-analitico/preguntas-frecuentes/{idopcion}', 'GestionAnalisisLiquidacionGastosController@actionEliminarPreguntaFrecuente');
 
+	// Insights Automáticos ("Sorpréndeme")
+	Route::get('/api/asistente-analitico/insights/{idopcion}', 'GestionAnalisisLiquidacionGastosController@actionGenerarInsights');
+
 	//SUSPENSION DE 4TA CATEGORIA
 	Route::any('/gestion-de-suspension-ta-categoria/{idopcion}', 'GestionCuartaCategoriaController@actionListarSuspensionCuarta');
 	Route::any('/agregar-cuarta-categoria/{idopcion}', 'GestionCuartaCategoriaController@actionAgregarCuartaCategoria');
@@ -689,7 +692,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/registrar-activo-fijo-categoria/{idopcion}/{idoc}/{codprod}', 'GestionOCContabilidadController@actionRegistrarActivoFijoCategoria');
 	Route::any('/eliminar-activo-fijo-categoria/{idopcion}/{idoc}/{codprod}/{codlote}/{nrolinea}', 'GestionOCContabilidadController@actionEliminarActivoFijoCategoria');
 
-
+	Route::any('/aprobar-comprobante-contabilidad-estiba-comision/{idopcion}/{lote}', 'GestionOCContabilidadController@actionAprobarContabilidadEstibaComision');
 
 	Route::any('/aprobar-comprobante-contabilidad-reparable/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAprobarContabilidadReparable');
 	//Route::any('/aprobar-comprobante-contabilidad-contrato/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionAprobarContabilidadContrato');
