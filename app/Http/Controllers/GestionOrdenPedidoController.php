@@ -124,7 +124,7 @@ class GestionOrdenPedidoController extends Controller
 		 $estado_merge = 'ETM0000000000001'; 
 
 
-		 $periodo_anio = DB::table('Web.periodos')
+		/* $periodo_anio = DB::table('Web.periodos')
 				    ->select('anio')
 				    ->whereIn('anio', ['2026'])
 				    ->where('COD_EMPR', $empresa)
@@ -134,11 +134,14 @@ class GestionOrdenPedidoController extends Controller
 				    ->pluck('anio', 'anio')
 				    ->toArray();
 
-		  $combo8 = ['' => 'Seleccione Año'] + $periodo_anio;
+		  $combo8 = ['' => 'Seleccione Año'] + $periodo_anio;*/
+
+		$periodo_anio = DB::table('Web.periodos')->where('activo', 1)->where('COD_EMPR', $empresa)->pluck('anio', 'COD_PERIODO')->toArray();
+        $combo8 = array('' => 'Seleccione Año') + $periodo_anio;
 
 
 
-		$periodo_mes = DB::table('Web.periodos')
+		/*$periodo_mes = DB::table('Web.periodos')
 		    ->where('anio', $periodo_anio)
 		    ->where('COD_EMPR', $empresa)
 		    ->where('activo', 1) 
@@ -147,8 +150,15 @@ class GestionOrdenPedidoController extends Controller
 		    ->pluck('TXT_NOMBRE', 'COD_PERIODO')
 		    ->toArray();
 
-		$combo9 = ['' => 'Seleccione Mes'] + $periodo_mes;
+		$combo9 = ['' => 'Seleccione Mes'] + $periodo_mes;*/
 
+		$periodo_mes = DB::table('Web.periodos')
+					    ->where('activo', 1)
+					    ->where('COD_EMPR', $empresa)
+					    ->pluck('TXT_NOMBRE', 'COD_PERIODO')
+					    ->toArray();
+
+        $combo9 = array('' => 'Seleccione Mes') + $periodo_mes;
 
 	
 
@@ -210,7 +220,7 @@ class GestionOrdenPedidoController extends Controller
         ]);
     }
 
-    public function obtenerMeses(Request $request)
+   /* public function obtenerMeses(Request $request)
 	{
 	    $anio    = $request->anio;
 	    $empresa = $request->empresa;
@@ -223,7 +233,7 @@ class GestionOrdenPedidoController extends Controller
 			    ->pluck('TXT_NOMBRE', 'COD_PERIODO');
 	    return response()->json($meses);
 	}
-
+  */
 
 
     private function obtenerNumeroPedido($cod_empr, $cod_centro)
