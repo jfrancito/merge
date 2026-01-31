@@ -209,7 +209,15 @@ Route::group(['middleware' => ['authaw']], function () {
 	//ANALISIS DE LIQUIDACION DE COMPRA
 	Route::any('/gestion-de-analisis-liquidacion-compra/{idopcion}', 'GestionAnalisisLiquidacionGastosController@actionGestionAnalisisaLiquidacionCompra');
 	Route::post('/actionAjaxDashboards', 'GestionAnalisisLiquidacionGastosController@actionAjaxDashboards');
+	Route::any('/gestion-de-asistente-liquidacion-compra/{idopcion}', 'GestionAnalisisLiquidacionGastosController@actionGestionAsistenteLiquidacionCompra');
+	Route::post('/api/asistente-analitico/{idopcion}', 'GestionAnalisisLiquidacionGastosController@actionApiAsistenteAnalitico');
+	Route::get('/api/asistente-analitico/conversacion/{idopcion}', 'GestionAnalisisLiquidacionGastosController@actionCargarConversacion');
+	Route::delete('/api/asistente-analitico/conversacion/{idopcion}', 'GestionAnalisisLiquidacionGastosController@actionLimpiarConversacion');
 
+	// Preguntas Frecuentes
+	Route::get('/api/asistente-analitico/preguntas-frecuentes/{idopcion}', 'GestionAnalisisLiquidacionGastosController@actionGetPreguntasFrecuentes');
+	Route::post('/api/asistente-analitico/preguntas-frecuentes/{idopcion}', 'GestionAnalisisLiquidacionGastosController@actionGuardarPreguntaFrecuente');
+	Route::delete('/api/asistente-analitico/preguntas-frecuentes/{idopcion}', 'GestionAnalisisLiquidacionGastosController@actionEliminarPreguntaFrecuente');
 
 	//SUSPENSION DE 4TA CATEGORIA
 	Route::any('/gestion-de-suspension-ta-categoria/{idopcion}', 'GestionCuartaCategoriaController@actionListarSuspensionCuarta');

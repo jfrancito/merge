@@ -125,6 +125,53 @@
     .kpi-row .card-kpi:hover {
         transform: translateY(-5px);
     }
+
+    .btn-asistente-ia {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        z-index: 9999;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 13px;
+        padding: 12px 28px;
+        letter-spacing: 1px;
+        box-shadow: 0 10px 25px rgba(63, 81, 181, 0.4);
+        border-radius: 50px;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        color: white !important;
+        display: flex;
+        align-items: center;
+        text-decoration: none !important;
+        animation: float-btn 3s ease-in-out infinite;
+    }
+
+    .btn-asistente-ia:hover {
+        transform: scale(1.05) translateY(-5px);
+        box-shadow: 0 15px 35px rgba(63, 81, 181, 0.5);
+        background: linear-gradient(135deg, #303f9f 0%, #3f51b5 100%);
+    }
+
+    .btn-asistente-ia i {
+        font-size: 20px;
+        margin-right: 10px;
+    }
+
+    @keyframes float-btn {
+        0% {
+            transform: translateY(0px);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
+
+        100% {
+            transform: translateY(0px);
+        }
+    }
 </style>
 @stop
 
@@ -784,6 +831,10 @@
     </div>
 </div>
 
+<a href="{{ url('gestion-de-asistente-liquidacion-compra/jZW') }}" class="btn-asistente-ia" target="_blank">
+    <i class="mdi mdi-face-profile"></i> Preguntar al Asistente IA
+</a>
+
 @stop
 @section('script')
 <script src="{{ asset('public/js/general/inputmask/jquery.inputmask.js') }}" type="text/javascript"></script>
@@ -853,8 +904,7 @@
         $('#container_f2_mes').on('click', '.filter-btn', function () {
             // No need to manually trigger because analisisliquidaciongasto.js already has a listener for .filter-btn
             // We just ensure the hidden value is correct if the global one fails for some reason
-            // but the global one is usually enough.
-        });
+            // but the global one is usually enough.    });
     });
 </script>
 @stop
