@@ -91,10 +91,11 @@
     letter-spacing: .12em;
 }
 .pedido-numero {
-    font-size: 1.05rem;
-    font-weight: 700;
-    letter-spacing: .15em;
+    font-size: 1.6rem;
+    font-weight: 900;
+    letter-spacing: .22em;
 }
+
 
 
 /* ===== SCROLL ===== */
@@ -159,13 +160,13 @@
 
 /* ===== PRODUCTO ===== */
 .detalle-table td:nth-child(2) {
-    font-weight: 600;
+    font-weight: 900;
     color: #1f2a50;
 }
 
 /* ===== CATEGORIA ===== */
 .detalle-table td:nth-child(3) {
-    font-size: .9rem;
+    font-size: 1.25rem;
     color: #6c757d;
 }
 
@@ -173,12 +174,13 @@
 .badge-cantidad {
     background: linear-gradient(135deg, #e7efff, #d6e2ff);
     color: #1f4ed8;
-    font-weight: 700;
-    font-size: .78rem;
-    padding: 6px 16px;
+      font-size: 1.45rem;   /* ⬅ aquí lo agrandas */
+    font-weight: 900;
+    padding: 10px 22px;
     border-radius: 999px;
     box-shadow: inset 0 0 0 1px rgba(31,78,216,.15);
 }
+
 
 /* ===== OBSERVACION ===== */
 .observacion {

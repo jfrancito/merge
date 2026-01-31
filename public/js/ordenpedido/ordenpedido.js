@@ -318,7 +318,7 @@ $(document).ready(function () {
     });
 
 
-    $('#cod_anio').on('change', function () {
+   /* $('#cod_anio').on('change', function () {
 
             let anio    = $(this).val();
             let empresa = $('#cod_empr').val();
@@ -356,7 +356,7 @@ $(document).ready(function () {
                     alert('Error al cargar los meses');
                 }
             });
-        });
+        });*/
 
     /* ===============================
        SELECCIONAR / ELIMINAR FILA

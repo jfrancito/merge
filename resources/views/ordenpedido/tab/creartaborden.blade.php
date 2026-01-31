@@ -131,10 +131,15 @@
                         MES <span class="obligatorio">(*)</span>
                     </label>
                     <div class="col-md-8">
-                        {!! Form::select('cod_periodo', ['' => 'Seleccione Mes'], '', [
+                     {{--  {!! Form::select('cod_periodo', ['' => 'Seleccione Mes'], '', [
                                 'id' => 'cod_periodo',
                                 'class' => 'form-control control select2'
-                            ]) !!}
+                            ]) !!}  --}} 
+
+                          {!! Form::select('cod_periodo', $periodo_mes, '', [
+                            'id' => 'cod_periodo',
+                            'class' => 'form-control control select2'
+                        ]) !!}
 
                     </div>
                 </div>
