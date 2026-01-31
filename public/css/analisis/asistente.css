@@ -83,17 +83,23 @@
 
 .chat-actions {
     margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .btn-clear-chat {
     background: rgba(255, 255, 255, 0.1);
     border: none;
     color: white;
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     cursor: pointer;
     transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-clear-chat:hover {
@@ -227,6 +233,20 @@
 
 .message-content li {
     margin: 8px 0;
+}
+
+/* Message Timestamp */
+.message-time {
+    display: block;
+    text-align: right;
+    font-size: 10px;
+    opacity: 0.5;
+    margin-top: 8px;
+    font-style: italic;
+}
+
+.user-message .message-time {
+    opacity: 0.7;
 }
 
 /* Quick Question Links */
@@ -797,62 +817,86 @@
 /* Saved Questions */
 .saved-questions-container {
     background: white;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    margin-bottom: 20px;
+    border-radius: 10px;
+    padding: 12px 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    margin-bottom: 15px;
 }
 
 .saved-questions-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
 }
 
 .saved-question-chip {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    padding: 8px 14px;
-    border-radius: 20px;
-    font-size: 13px;
-    color: #475569;
+    background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%);
+    border: 1px solid #fde047;
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 11px;
+    color: #854d0e;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     transition: all 0.2s ease;
+    max-width: 200px;
+}
+
+.saved-question-chip .question-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .saved-question-chip:hover {
-    background: #f1f5f9;
-    border-color: #cbd5e1;
+    background: linear-gradient(135deg, #fef08a 0%, #facc15 100%);
+    border-color: #facc15;
     transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(250, 204, 21, 0.3);
 }
 
 .saved-question-chip .delete-question {
-    color: #cbd5e1;
+    color: #ca8a04;
     font-weight: bold;
-    font-size: 16px;
+    font-size: 14px;
     line-height: 1;
-    padding: 0 4px;
+    padding: 0 3px;
     border-radius: 50%;
+    opacity: 0.6;
 }
 
 .saved-question-chip .delete-question:hover {
-    color: #ef4444;
-    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+    background: rgba(220, 38, 38, 0.1);
+    opacity: 1;
 }
 
+/* SAVE QUESTION BUTTON (Star/Favorite Icon) */
 .btn-save-question {
-    background: none;
-    border: none;
-    color: #cbd5e1;
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: rgba(30, 41, 59, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.6);
     cursor: pointer;
-    padding: 5px;
-    margin-left: 10px;
-    font-size: 14px;
-    transition: color 0.2s;
+    padding: 4px;
+    font-size: 10px;
+    transition: all 0.2s;
     opacity: 0;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.message {
+    position: relative;
 }
 
 .message:hover .btn-save-question {
@@ -860,7 +904,10 @@
 }
 
 .btn-save-question:hover {
-    color: #f59e0b;
+    color: #fbbf24;
+    background: rgba(251, 191, 36, 0.2);
+    border-color: #fbbf24;
+    transform: scale(1.1);
 }
 
 /* Responsive */
@@ -882,5 +929,146 @@
 
     .results-panel {
         min-height: 400px;
+    }
+}
+
+/* ==============================================
+   INSIGHTS BUTTON ("SORPRÉNDEME")
+   ============================================== */
+.btn-insights {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 10px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+}
+
+.btn-insights:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+}
+
+.btn-insights i {
+    font-size: 14px;
+}
+
+/* ==============================================
+   INSIGHTS CONTAINER (in chat messages)
+   ============================================== */
+.insights-container {
+    padding: 5px 0;
+}
+
+.insights-intro {
+    font-size: 14px;
+    margin-bottom: 15px;
+    color: #374151;
+}
+
+/* Alerts Section */
+.insights-alerts {
+    margin-bottom: 15px;
+}
+
+.alert-item {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.alert-item.alert-warning {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border-left: 4px solid #f59e0b;
+    color: #92400e;
+}
+
+.alert-item.alert-success {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    border-left: 4px solid #10b981;
+    color: #065f46;
+}
+
+.alert-item.alert-info {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    border-left: 4px solid #3b82f6;
+    color: #1e40af;
+}
+
+/* Insights Grid */
+.insights-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.insight-card {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    transition: all 0.2s ease;
+}
+
+.insight-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-color: #667eea;
+}
+
+.insight-icon {
+    font-size: 28px;
+    line-height: 1;
+}
+
+.insight-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.insight-title {
+    font-size: 11px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.insight-value {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+    line-height: 1.3;
+}
+
+.insight-detail {
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+/* Responsive adjustments for insights */
+@media (max-width: 768px) {
+    .insights-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .btn-insights span {
+        display: none;
     }
 }

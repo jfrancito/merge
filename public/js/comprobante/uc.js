@@ -10,10 +10,7 @@ function toggleContent() {
     }
 }
 
-// Inicialmente colapsar el contenido adicional
-document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById('longText').classList.add('collapsed');
-});
+
 
 
 $(document).ready(function () {
@@ -3280,6 +3277,7 @@ $(document).ready(function () {
             content: 'Aprobar el Comprobante',
             buttons: {
                 confirmar: function () {
+                    debugger;
                     $( "#formpedido" ).submit();
                 },
                 cancelar: function () {
@@ -3289,6 +3287,27 @@ $(document).ready(function () {
         });
 
     });
+
+    $('.btnaprobarcomporbatntenuevocomision').on('click', function(event){
+        event.preventDefault();
+        $.confirm({
+            title: '¿Confirma la Aprobacion?',
+            content: 'Aprobar el Comprobante',
+            buttons: {
+                confirmar: function () {
+                    debugger;
+                    $( "#formpedidocomision" ).submit();
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo Aprobacion');
+                }
+            }
+        });
+
+    });
+
+
+
 
 
 

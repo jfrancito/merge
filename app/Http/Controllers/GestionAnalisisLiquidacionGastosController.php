@@ -314,4 +314,48 @@ class GestionAnalisisLiquidacionGastosController extends Controller
         }
     }
 
+    /**
+     * Generar Insights Automáticos ("Sorpréndeme")
+     */
+    public function actionGenerarInsights($idopcion, Request $request)
+    {
+        try {
+            $usuarioId = Session::get('usuario') ? Session::get('usuario')->id : 0;
+
+            // Guardar mensaje del usuario
+            \App\Modelos\ConversacionAsistente::guardarMensaje(
+                $usuarioId,
+                'user',
+                '✨ [Sorpréndeme] - Solicité un análisis automático'
+            );
+
+            // Generar insights usando el trait
+            $response = $this->generateInsights();
+
+            // Guardar respuesta del asistente (solo mensaje corto, no el HTML completo)
+            if (isset($response['success']) && $response['success']) {
+                $modoInsight = $response['ai_mode'] ?? 'Insights';
+                $resumenCorto = "✅ Análisis completado - {$modoInsight}. Revisa el panel de resultados para ver los detalles.";
+
+                \App\Modelos\ConversacionAsistente::guardarMensaje(
+                    $usuarioId,
+                    'assistant',
+                    $resumenCorto,
+                    'Insights Automáticos',
+                    'insights',
+                    null
+                );
+            }
+
+            return response()->json($response);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al generar insights: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
 }
+

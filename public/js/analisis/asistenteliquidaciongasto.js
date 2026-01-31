@@ -13,6 +13,7 @@
         apiUrl: `/merge/api/asistente-analitico/${idopcion}`,
         conversacionUrl: `/merge/api/asistente-analitico/conversacion/${idopcion}`,
         preguntasUrl: `/merge/api/asistente-analitico/preguntas-frecuentes/${idopcion}`,
+        insightsUrl: `/merge/api/asistente-analitico/insights/${idopcion}`,
         maxRetries: 2,
         typingDelay: 1500
     };
@@ -62,6 +63,9 @@
 
         // Export results (PDF)
         $('#btn_export_pdf').on('click', exportToPDF);
+
+        // Insights Button ("Sorpréndeme")
+        $('#btn_insights').on('click', generateInsights);
 
         // Saved Questions Interactions
         $(document).on('click', '.saved-question-chip', function (e) {
@@ -117,9 +121,14 @@
         processQuery(message);
     }
 
-    function addMessage(content, type, isHtml = false) {
+    function addMessage(content, type, isHtml = false, timestamp = null) {
         const messagesContainer = $('#chat_messages');
         const avatarIcon = type === 'user' ? 'fa-user' : 'fa-robot';
+
+        // Format timestamp
+        const now = timestamp ? new Date(timestamp) : new Date();
+        const timeStr = now.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
+        const dateStr = now.toLocaleDateString('es-PE', { day: '2-digit', month: 'short' });
 
         let actionsHtml = '';
         if (type === 'user') {
@@ -136,6 +145,7 @@
                 <div class="message-content">
                     ${isHtml ? content : `<p>${escapeHtml(content)}</p>`}
                     ${actionsHtml}
+                    <span class="message-time">${dateStr} ${timeStr}</span>
                 </div>
             </div>
         `;
@@ -184,6 +194,82 @@
         conversationHistory = [];
         resetResultsPanel();
     }
+
+    /**
+     * Generate Automatic Insights ("Sorpréndeme")
+     */
+    function generateInsights() {
+        // Get current time for timestamps
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
+        const dateStr = now.toLocaleDateString('es-PE', { day: '2-digit', month: 'short' });
+
+        // Add user message to chat
+        const userMessage = `
+            <div class="message user-message">
+                <div class="message-avatar"><i class="fa fa-user"></i></div>
+                <div class="message-content">
+                    <p>✨ Sorpréndeme con un análisis automático</p>
+                    <span class="message-time">${dateStr} ${timeStr}</span>
+                </div>
+            </div>
+        `;
+        $('#chat_messages').append(userMessage);
+        scrollToBottom();
+
+        // Show typing indicator
+        showTyping(true);
+        $('#typing_indicator .typing-text').text('Analizando patrones...');
+
+        // Call the insights API
+        $.ajax({
+            url: CONFIG.insightsUrl,
+            method: 'GET',
+            success: function (response) {
+                showTyping(false);
+
+                // Get response time
+                const respNow = new Date();
+                const respTimeStr = respNow.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
+                const respDateStr = respNow.toLocaleDateString('es-PE', { day: '2-digit', month: 'short' });
+
+                if (response.success) {
+                    // Add simplified bot response to chat
+                    const botMessage = `
+                        <div class="message bot-message">
+                            <div class="message-avatar"><i class="fa fa-robot"></i></div>
+                            <div class="message-content">
+                                <p>✅ ¡Análisis completado! He encontrado información interesante en tus datos.</p>
+                                <p class="text-muted" style="font-size: 11px; margin-top: 5px;">
+                                    <i class="fa fa-arrow-right"></i> Revisa el <strong>Panel de Resultados</strong> a la derecha para ver los detalles completos.
+                                </p>
+                                <span class="message-time">${respDateStr} ${respTimeStr}</span>
+                            </div>
+                        </div>
+                    `;
+                    $('#chat_messages').append(botMessage);
+                    scrollToBottom();
+
+                    // Update results panel - pass wrapped response so updateResultsPanel finds .data
+                    if (response.data) {
+                        updateResultsPanel({ data: response.data, ai_mode: response.ai_mode, sql_ejecutado: response.sql_ejecutado });
+                    }
+
+                } else {
+                    addBotMessage(response.message || 'Error al generar insights');
+                }
+            },
+            error: function (xhr) {
+                showTyping(false);
+                let errorMsg = 'Error al conectar con el servidor';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMsg = xhr.responseJSON.message;
+                }
+                addBotMessage(`<p class="error-message">❌ ${errorMsg}</p>`);
+            }
+        });
+    }
+
 
     /**
      * Load conversation history from server
