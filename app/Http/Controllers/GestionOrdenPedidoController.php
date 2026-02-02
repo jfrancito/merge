@@ -65,17 +65,20 @@ class GestionOrdenPedidoController extends Controller
 						        'IACHEM0000010394',
 						        'IACHEM0000007086'
 						    ])
-						    ->pluck(
-						        DB::raw("
-						            LTRIM(RTRIM(
-						                ISNULL(nombres,'') + ' ' +
-						                ISNULL(apellidopaterno,'') + ' ' +
-						                ISNULL(apellidomaterno,'')
-						            ))
-						        "),
-						        'COD_TRAB'
-						    )
-						    ->toArray();
+						     ->orderBy('apellidopaterno')
+						     ->orderBy('apellidomaterno')
+						     ->orderBy('nombres')
+						      ->pluck(
+							        DB::raw("
+							            LTRIM(RTRIM(
+							                ISNULL(apellidopaterno,'') + ' ' +
+							                ISNULL(apellidomaterno,'') + ' ' +
+							                ISNULL(nombres,'')
+							            ))
+							        "),
+							        'COD_TRAB'
+							    )
+							    ->toArray();
 		 $combo5 = array('' => 'Seleccione Jefe Autoriza') + $usuarioAutoriza;
 
 		 $usuario_aprueba_ger = DB::table('WEB.ListaplatrabajadoresGenereal')
@@ -85,17 +88,20 @@ class GestionOrdenPedidoController extends Controller
 						        'IACHEM0000010394',
 						        'IACHEM0000007086'
 						    ])
+						     ->orderBy('apellidopaterno')
+						    ->orderBy('apellidomaterno')
+						    ->orderBy('nombres')
 						    ->pluck(
-						        DB::raw("
-						            LTRIM(RTRIM(
-						                ISNULL(nombres,'') + ' ' +
-						                ISNULL(apellidopaterno,'') + ' ' +
-						                ISNULL(apellidomaterno,'')
-						            ))
-						        "),
-						        'COD_TRAB'
-						    )
-						    ->toArray();
+							        DB::raw("
+							            LTRIM(RTRIM(
+							                ISNULL(apellidopaterno,'') + ' ' +
+							                ISNULL(apellidomaterno,'') + ' ' +
+							                ISNULL(nombres,'')
+							            ))
+							        "),
+							        'COD_TRAB'
+							    )
+							    ->toArray();
 		 $combo6 = array('' => 'Seleccione  Aprueba Gerente') + $usuario_aprueba_ger;
 
 		 $usuario_aprueba_adm = DB::table('WEB.ListaplatrabajadoresGenereal')
@@ -108,17 +114,20 @@ class GestionOrdenPedidoController extends Controller
 						        'IITR000000000391',
 						        'IATR000000000199'
 						    ])
-						    ->pluck(
-						        DB::raw("
-						            LTRIM(RTRIM(
-						                ISNULL(nombres,'') + ' ' +
-						                ISNULL(apellidopaterno,'') + ' ' +
-						                ISNULL(apellidomaterno,'')
-						            ))
-						        "),
-						        'COD_TRAB'
-						    )
-						    ->toArray();
+						     ->orderBy('apellidopaterno')
+						    ->orderBy('apellidomaterno')
+						    ->orderBy('nombres')
+						     ->pluck(
+							        DB::raw("
+							            LTRIM(RTRIM(
+							                ISNULL(apellidopaterno,'') + ' ' +
+							                ISNULL(apellidomaterno,'') + ' ' +
+							                ISNULL(nombres,'')
+							            ))
+							        "),
+							        'COD_TRAB'
+							    )
+							    ->toArray();
 		 $combo7 = array('' => 'Seleccione  Aprueba Administracion') + $usuario_aprueba_adm;
 		 $estadosMerge = DB::table('CMP.CATEGORIA') ->where('TXT_GRUPO', 'ESTADO_MERGE')->pluck('NOM_CATEGORIA', 'COD_CATEGORIA')->toArray();
 		 $estado_merge = 'ETM0000000000001'; 
@@ -136,11 +145,10 @@ class GestionOrdenPedidoController extends Controller
 
 		  $combo8 = ['' => 'Seleccione Año'] + $periodo_anio;*/
 
-		$periodo_anio = DB::table('Web.periodos')->where('activo', 1)->where('COD_EMPR', $empresa)->pluck('anio', 'COD_PERIODO')->toArray();
+		$periodo_anio = DB::table('Web.periodos')->where('activo', 1)->where('COD_EMPR', $empresa)->pluck('anio', 'anio')->toArray();
         $combo8 = array('' => 'Seleccione Año') + $periodo_anio;
 
-
-
+       
 		/*$periodo_mes = DB::table('Web.periodos')
 		    ->where('anio', $periodo_anio)
 		    ->where('COD_EMPR', $empresa)
@@ -162,13 +170,23 @@ class GestionOrdenPedidoController extends Controller
 
 	
 
-	     $nro_pedido = $this->obtenerNumeroPedido($empresa, $cod_centro);
+	 	$area = DB::table('WEB.ListaplatrabajadoresGenereal')
+		    ->where('situacion_id', 'PRMAECEN000000000002')
+		    ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+		    ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+		    ->select('area_id', 'cadarea')
+		    ->first();
+
+		$area_id = $area->area_id ?? '';
+		$nomArea = $area->cadarea ?? '';
+
+	    $nro_pedido = $this->obtenerNumeroPedido($empresa, $cod_centro);
 
 
 	    // DETALLE DEL PEDIDO 
 
 	    // $producto = DB::table('ALM.PRODUCTO')->where('cod_estado', 1)->pluck('NOM_PRODUCTO', 'COD_PRODUCTO')->toArray();
-	     $producto = DB::table('ALM.PRODUCTO as PRD')
+	    $producto = DB::table('ALM.PRODUCTO as PRD')
 	    				->join('CMP.CATEGORIA as CAT', 'PRD.COD_CATEGORIA_UNIDAD_MEDIDA', '=', 'CAT.COD_CATEGORIA')
 	    				->where('PRD.COD_ESTADO', 1)
 	   					 ->select(
@@ -215,7 +233,8 @@ class GestionOrdenPedidoController extends Controller
     		'nro_pedido'            => $nro_pedido,
     		'producto'              => $producto,
     		'listapedido'           => $listapedido,  
-    		'usuario_solicita'      => $usuario_solicita,
+    		'nomArea'				=> $nomArea,
+    		'area_id'				=> $area_id,
             'ajax'=>true,    
         ]);
     }
@@ -275,13 +294,13 @@ class GestionOrdenPedidoController extends Controller
 	    $cod_empr     = $request->input('cod_empr');
 	    $cod_centro   = $request->input('cod_centro');
 	    $cod_tipo_pedido = $request->input('cod_tipo_pedido');
-	    $cod_tipo_frecuencia = $request->input('cod_tipo_frecuencia');
 	    $cod_trabajador_solicita = $request->input('cod_trabajador_solicita');
 	    $cod_trabajador_autoriza = $request->input('cod_trabajador_autoriza');
 	    $cod_trabajador_aprueba_ger = $request->input('cod_trabajador_aprueba_ger');
 	    $cod_trabajador_aprueba_adm = $request->input('cod_trabajador_aprueba_adm');
 	    $txt_glosa   = $request->input('txt_glosa');
 	    $cod_estado  = $request->input('cod_estado');
+	    $cod_area  = $request->input('cod_area');
 	    $orden_pedido_id = $request->input('orden_pedido_id');
 	    $opcion      = $request->input('opcion');
 	     $array_detalle      = $request->input('array_detalle');
@@ -289,7 +308,7 @@ class GestionOrdenPedidoController extends Controller
 	    // =======================
 	    // Procesar nombres y textos relacionados
 	    // =======================
-	    $registro_periodo = DB::table('CON.PERIODO')
+	    $registro_periodo = DB::table('Web.periodos')
 	        ->where('COD_PERIODO', $cod_periodo)
 	        ->first();
 	    $txt_nombre = $registro_periodo->TXT_NOMBRE ?? '';
@@ -332,9 +351,14 @@ class GestionOrdenPedidoController extends Controller
 	    ) : '';
 
 	    $registro_estado = DB::table('CMP.CATEGORIA')
-	        ->where('COD_cATEGORIA', $cod_estado)
+	        ->where('COD_CATEGORIA', $cod_estado)
 	        ->first();
 	    $txt_estado  = $registro_estado->NOM_CATEGORIA ?? '';
+
+	    $registro_area = DB::table('WEB.ListaplatrabajadoresGenereal')
+	        ->where('area_id', $cod_area)
+	        ->first();
+	    $txt_area  = $registro_area->cadarea ?? '';
 
 	    // =======================
 	    // Determinar acción: Insertar o Actualizar
@@ -365,6 +389,8 @@ class GestionOrdenPedidoController extends Controller
 	        $txt_glosa,
 	        $cod_estado,
 	        $txt_estado,
+	        $cod_area,
+	        $txt_area,
 	        true,
 	        ""
 	    );
@@ -456,6 +482,8 @@ class GestionOrdenPedidoController extends Controller
             $pedido->TXT_GLOSA,
             $estado->COD_CATEGORIA,
             $estado->NOM_CATEGORIA,
+            $pedido->COD_AREA,
+            $pedido->TXT_AREA,
             true,
             ""
         );
@@ -502,6 +530,8 @@ class GestionOrdenPedidoController extends Controller
             $pedido->TXT_GLOSA,
             $estado->COD_CATEGORIA,
             $estado->NOM_CATEGORIA,
+            $pedido->COD_AREA,
+            $pedido->TXT_AREA,
             true,
             ""
         );

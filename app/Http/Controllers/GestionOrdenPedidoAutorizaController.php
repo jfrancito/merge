@@ -52,7 +52,6 @@ class GestionOrdenPedidoAutorizaController extends Controller
             ""                     
          );
 
-       
 
         return view('ordenpedido.ajax.autorizaordenpedido', [
                     'listapedido' => $listapedido,
@@ -99,6 +98,8 @@ class GestionOrdenPedidoAutorizaController extends Controller
             $pedido->TXT_GLOSA,
             $estado->COD_CATEGORIA,
             $estado->NOM_CATEGORIA,
+            $pedido->COD_AREA,
+            $pedido->TXT_AREA,
             true,
             ""
         );
@@ -145,6 +146,8 @@ class GestionOrdenPedidoAutorizaController extends Controller
             $pedido->TXT_GLOSA,
             $estado->COD_CATEGORIA,
             $estado->NOM_CATEGORIA,
+            $pedido->COD_AREA,
+            $pedido->TXT_AREA,
             true,
             ""
         );

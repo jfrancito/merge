@@ -17,8 +17,7 @@ trait OrdenPedidoTraits
 
     public function insertOrdenPedido($ind_tipo_operacion, $id_pedido, $fec_pedido, $cod_periodo, $txt_nombre, $cod_anio, $cod_empr, $cod_centro, 
                                       $cod_tipo_pedido, $txt_tipo_pedido, $cod_trabajador_solicita, $txt_trabajador_solicita, 
-                                      $cod_trabajador_autoriza, $txt_trabajador_autoriza, $cod_trabajador_aprueba_ger, $txt_trabajador_aprueba_ger, $cod_trabajador_aprueba_adm, 
-                                      $txt_trabajador_aprueba_adm,  $txt_glosa, $cod_estado, $txt_estado, $activo, $cod_usuario_registro)
+                                      $cod_trabajador_autoriza, $txt_trabajador_autoriza, $cod_trabajador_aprueba_ger, $txt_trabajador_aprueba_ger,          $cod_trabajador_aprueba_adm, $txt_trabajador_aprueba_adm,  $txt_glosa, $cod_estado, $txt_estado, $cod_area,          $txt_area, $activo, $cod_usuario_registro)
 
     {
         try {
@@ -44,6 +43,8 @@ trait OrdenPedidoTraits
                                                                         @TXT_GLOSA = ?,
                                                                         @COD_ESTADO = ?,
                                                                         @TXT_ESTADO = ?,
+                                                                        @COD_AREA = ?,
+                                                                        @TXT_AREA = ?,
                                                                         @ACTIVO = ?,
                                                                         @COD_USUARIO_REGISTRO = ?');
 
@@ -73,8 +74,10 @@ trait OrdenPedidoTraits
                  $stmt->bindParam(19, $txt_glosa, PDO::PARAM_STR);
                  $stmt->bindParam(20, $cod_estado, PDO::PARAM_STR);
                  $stmt->bindParam(21, $txt_estado, PDO::PARAM_STR);
-                 $stmt->bindParam(22, $activo, PDO::PARAM_STR);
-                 $stmt->bindParam(23, $cod_usuario_registro, PDO::PARAM_STR);
+                 $stmt->bindParam(22, $cod_area, PDO::PARAM_STR);
+                 $stmt->bindParam(23, $txt_area, PDO::PARAM_STR);
+                 $stmt->bindParam(24, $activo, PDO::PARAM_STR);
+                 $stmt->bindParam(25, $cod_usuario_registro, PDO::PARAM_STR);
 
 
                 $stmt->execute();

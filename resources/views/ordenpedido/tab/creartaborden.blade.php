@@ -62,13 +62,12 @@
                     </label>
                     <div class="col-md-8">
                        <input type="date"
-       id="fec_pedido"
-       name="fec_pedido"
-       class="form-control control"
-       style="height:38px"
-       value="{{ date('Y-m-d') }}"
-          readonly>
-
+                               id="fec_pedido"
+                               name="fec_pedido"
+                               class="form-control control"
+                               style="height:38px"
+                               value="{{ date('Y-m-d') }}"
+                               readonly>
                     </div>
                 </div>
             </div>
@@ -107,20 +106,24 @@
                     </div>
                 </div>
             </div>
+                <div class="col-md-6">
+                    <div class="row">
+                        <label class="col-md-4 control-label label-sm text-center negrita">
+                            ÁREA <span class="obligatorio">(*)</span>
+                        </label>
+                        <div class="col-md-8">
+                            <input type="text"
+                                   class="form-control control text-uppercase"
+                                   value="{{ strtoupper($nomArea ?? '') }}"
+                                   readonly>
 
-            <div class="col-md-6">
-                <div class="row">
-                    <label class="col-md-4 control-label label-sm text-center negrita">
-                        AUTORIZADO POR <span class="obligatorio">(*)</span>
-                    </label>
-                    <div class="col-md-8">
-                        {!! Form::select('cod_trabajador_autoriza', $usuario_autoriza, '', [
-                            'id' => 'cod_trabajador_autoriza',
-                            'class' => 'form-control control select2'
-                        ]) !!}
+                            <input type="hidden"
+                                   id="cod_area"
+                                   name="cod_area"
+                                   value="{{ $area_id }}">
+                        </div>
                     </div>
                 </div>
-            </div>
         </div>
 
         <!-- FILA 4 -->
@@ -145,17 +148,17 @@
                 </div>
             </div>
 
-            <div class="col-md-6">
+
+             <div class="col-md-6">
                 <div class="row">
                     <label class="col-md-4 control-label label-sm text-center negrita">
-                        APROBADO GERENCIA <span class="obligatorio">(*)</span>
+                        AUTORIZADO POR <span class="obligatorio">(*)</span>
                     </label>
                     <div class="col-md-8">
-                        {!! Form::select('cod_trabajador_aprueba_ger', $usuario_aprueba_ger, '', [
-                            'id' => 'cod_trabajador_aprueba_ger',
+                        {!! Form::select('cod_trabajador_autoriza', $usuario_autoriza, '', [
+                            'id' => 'cod_trabajador_autoriza',
                             'class' => 'form-control control select2'
                         ]) !!}
-
                     </div>
                 </div>
             </div>
@@ -181,14 +184,16 @@
                 </div>
             </div>
 
+
+
             <div class="col-md-6">
                 <div class="row">
                     <label class="col-md-4 control-label label-sm text-center negrita">
-                        APROBADO ADMIN <span class="obligatorio">(*)</span>
+                        APROBADO GERENCIA <span class="obligatorio">(*)</span>
                     </label>
                     <div class="col-md-8">
-                       {!! Form::select('cod_trabajador_aprueba_adm', $usuario_aprueba_adm, '', [
-                            'id' => 'cod_trabajador_aprueba_adm',
+                        {!! Form::select('cod_trabajador_aprueba_ger', $usuario_aprueba_ger, '', [
+                            'id' => 'cod_trabajador_aprueba_ger',
                             'class' => 'form-control control select2'
                         ]) !!}
 
@@ -217,33 +222,17 @@
                 </div>
             </div>
 
-            <div class="col-md-6">
-                <div class="row">
-                    <label class="col-md-4 control-label label-sm text-center negrita">
-                        OBSERVACIÓN <span class="obligatorio">(*)</span>
-                    </label>
-                    <div class="col-md-8">
-                        <textarea id="txt_glosa"
-                                  name="txt_glosa"
-                                  class="form-control"
-                                  rows="2"
-                                  required
-                                  placeholder="Observación"></textarea>
-                    </div>
-                </div>
-            </div>
-        </div>
+          
 
-        <!-- FILA 7 -->
-        <div class="row form-row">
+
             <div class="col-md-6">
                 <div class="row">
                     <label class="col-md-4 control-label label-sm text-center negrita">
-                        TIPO <span class="obligatorio">(*)</span>
+                        APROBADO ADMIN <span class="obligatorio">(*)</span>
                     </label>
                     <div class="col-md-8">
-                        {!! Form::select('cod_tipo_pedido', $listatipopedido, '', [
-                            'id' => 'cod_tipo_pedido',
+                       {!! Form::select('cod_trabajador_aprueba_adm', $usuario_aprueba_adm, '', [
+                            'id' => 'cod_trabajador_aprueba_adm',
                             'class' => 'form-control control select2'
                         ]) !!}
 
@@ -251,6 +240,45 @@
                 </div>
             </div>
         </div>
+
+        <!-- FILA 7 -->
+       <!-- FILA 7 -->
+<div class="row form-row">
+
+    <!-- TIPO -->
+    <div class="col-md-6">
+        <div class="row">
+            <label class="col-md-4 control-label label-sm text-center negrita">
+                TIPO <span class="obligatorio">(*)</span>
+            </label>
+            <div class="col-md-8">
+                {!! Form::select('cod_tipo_pedido', $listatipopedido, '', [
+                    'id' => 'cod_tipo_pedido',
+                    'class' => 'form-control control select2'
+                ]) !!}
+            </div>
+        </div>
+    </div>
+
+    <!-- OBSERVACIÓN -->
+    <div class="col-md-6">
+        <div class="row">
+            <label class="col-md-4 control-label label-sm text-center negrita">
+                OBSERVACIÓN <span class="obligatorio">(*)</span>
+            </label>
+            <div class="col-md-8">
+                <textarea id="txt_glosa"
+                          name="txt_glosa"
+                          class="form-control"
+                          rows="2"
+                          required
+                          placeholder="Observación"></textarea>
+            </div>
+        </div>
+    </div>
+
+</div>
+
 
         <!-- FILA 8 -->
       

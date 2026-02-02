@@ -16,6 +16,7 @@
                         <th>AÑO</th>
                         <th>TIPO PEDIDO</th>
                         <th>SOLICITA</th>
+                        <th>AREA</th>
                         <th>AUTORIZA</th>
                         <th>APRUEBA GER</th>
                         <th>APRUEBA ADM</th>
@@ -24,36 +25,46 @@
                         <th>VER DETALLE</th>
                     </tr>
                 </thead>
-                <tbody>
+               <tbody>
                     @foreach($listapedido as $index => $item)
-                       @if ($item['COD_ESTADO'] === 'ETM0000000000013' || $item['COD_ESTADO'] === 'ETM0000000000004' || $item['COD_ESTADO'] === 'ETM0000000000005' ||$item['COD_ESTADO'] === 'ETM0000000000005'  && $item['COD_TRABAJADOR_AUTORIZA'] === $usuario_logueado_id)
 
-                        <tr class="align-middle">
-                            <td>{{ $item['ID_PEDIDO'] }}</td>
-                            <td>{{ $item['FEC_PEDIDO'] }}</td>
-                            <td>{{ $item['TXT_NOMBRE'] }}</td>
-                            <td>{{ $item['COD_ANIO'] }}</td>
-                            <td class="col-nombre">{{ $item['TXT_TIPO_PEDIDO'] }}</td>
-                            <td class="col-nombre">{{ $item['TXT_TRABAJADOR_SOLICITA'] }}</td>
-                            <td class="col-nombre">{{ $item['TXT_TRABAJADOR_AUTORIZA'] }}</td>
-                            <td class="col-nombre">{{ $item['TXT_TRABAJADOR_APRUEBA_GER'] }}</td>
-                            <td class="col-nombre">{{ $item['TXT_TRABAJADOR_APRUEBA_ADM'] }}</td>
-                            <td class="col-glosa">{{ $item['TXT_GLOSA'] }}</td>
-                            <td>@include('comprobante.ajax.estadospedido')</td>
-                           <td class="text-center">
-                            <div class="grupo-acciones">
-                                 <button 
-                                    class="btn btn-sm btn-primary ver-detalle-pedido"
-                                    data-id="{{ $item['ID_PEDIDO'] }}"
-                                    title="Ver detalle del pedido">
-                                    <i class="fa fa-eye me-1"></i>
-                                    Detalle
-                                </button>
-                            </div>
-                        </td>
+                        @if (
+                            (
+                                $item['COD_ESTADO'] === 'ETM0000000000013'
+                                || $item['COD_ESTADO'] === 'ETM0000000000004'
+                                || $item['COD_ESTADO'] === 'ETM0000000000005'
+                            )
+                            && $item['COD_TRABAJADOR_AUTORIZA'] === $usuario_logueado_id
+                        )
 
-                        </tr>
+                            <tr class="align-middle">
+                                <td>{{ $item['ID_PEDIDO'] }}</td>
+                                <td>{{ $item['FEC_PEDIDO'] }}</td>
+                                <td>{{ $item['TXT_NOMBRE'] }}</td>
+                                <td>{{ $item['COD_ANIO'] }}</td>
+                                <td class="col-nombre">{{ $item['TXT_TIPO_PEDIDO'] }}</td>
+                                <td class="col-nombre">{{ $item['TXT_TRABAJADOR_SOLICITA'] }}</td>
+                                <td class="col-nombre">{{ $item['TXT_AREA'] }}</td>
+                                <td class="col-nombre">{{ $item['TXT_TRABAJADOR_AUTORIZA'] }}</td>
+                                <td class="col-nombre">{{ $item['TXT_TRABAJADOR_APRUEBA_GER'] }}</td>
+                                <td class="col-nombre">{{ $item['TXT_TRABAJADOR_APRUEBA_ADM'] }}</td>
+                                <td class="col-glosa">{{ $item['TXT_GLOSA'] }}</td>
+                                <td>@include('comprobante.ajax.estadospedido')</td>
+                                <td class="text-center">
+                                    <div class="grupo-acciones">
+                                        <button 
+                                            class="btn btn-sm btn-primary ver-detalle-pedido"
+                                            data-id="{{ $item['ID_PEDIDO'] }}"
+                                            title="Ver detalle del pedido">
+                                            <i class="fa fa-eye me-1"></i>
+                                            Detalle
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
                         @endif
+
                     @endforeach
                 </tbody>
             </table>
