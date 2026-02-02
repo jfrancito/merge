@@ -71,10 +71,19 @@ trait AnalisisLiquidacionGastoTraits
         $query = VLiquidacionGastos_Analitica::query();
         $this->scopeFilterAnalitica($query, $request);
 
-        $totalGeneral = $query->sum('TOTAL_GENERAL');
-        $totalDocumentos = $query->count();
+        // Obtener totales en una sola query agregada
+        $totales = (clone $query)->selectRaw('
+            SUM(TOTAL_GENERAL) as total_general,
+            COUNT(*) as total_documentos,
+            MAX(TOTAL_GENERAL) as max_gasto,
+            COUNT(DISTINCT ID_TRABAJADOR) as total_trabajadores
+        ')->first();
+
+        $totalGeneral = $totales->total_general ?? 0;
+        $totalDocumentos = $totales->total_documentos ?? 0;
         $ticketPromedio = $totalDocumentos > 0 ? ($totalGeneral / $totalDocumentos) : 0;
 
+        // Queries agrupadas (necesarias para charts)
         $porMoneda = (clone $query)
             ->select('MONEDA', DB::raw('SUM(TOTAL_GENERAL) as total'))
             ->groupBy('MONEDA')
@@ -96,6 +105,7 @@ trait AnalisisLiquidacionGastoTraits
             ->select('TIPO_DOCUMENTO', DB::raw('COUNT(*) as cantidad'))
             ->groupBy('TIPO_DOCUMENTO')
             ->orderBy('cantidad', 'desc')
+            ->limit(10)
             ->get();
 
         $topAreas = (clone $query)
@@ -112,22 +122,19 @@ trait AnalisisLiquidacionGastoTraits
             ->limit(5)
             ->get();
 
-        $totalTrabajadores = (clone $query)->distinct()->count('ID_TRABAJADOR');
-        $maxGasto = (clone $query)->max('TOTAL_GENERAL');
-
         return [
             'total_general' => $totalGeneral,
             'total_documentos' => $totalDocumentos,
             'ticket_promedio' => $ticketPromedio,
-            'total_trabajadores' => $totalTrabajadores,
-            'max_gasto' => $maxGasto,
+            'total_trabajadores' => $totales->total_trabajadores ?? 0,
+            'max_gasto' => $totales->max_gasto ?? 0,
             'por_moneda' => $porMoneda,
             'por_estado' => $porEstado,
             'evolucion_mensual' => $evolucionMensual,
             'por_tipo_documento' => $porTipoDocumento,
             'top_areas' => $topAreas,
             'top_proveedores' => $topProveedoresExec,
-            'detalle' => $query->get()
+            'detalle' => [] // Eliminado para mejorar rendimiento - usar tab Detalle si se necesita
         ];
     }
 
@@ -140,18 +147,20 @@ trait AnalisisLiquidacionGastoTraits
             ->select('NOMBRE_AREA_TRABAJO', DB::raw('SUM(TOTAL_GENERAL) as total'))
             ->groupBy('NOMBRE_AREA_TRABAJO')
             ->orderBy('total', 'desc')
+            ->limit(15)
             ->get();
 
         $porCentro = (clone $query)
             ->select('NOMBRE_CENTRO_TRABAJO', DB::raw('SUM(TOTAL_GENERAL) as total'))
             ->groupBy('NOMBRE_CENTRO_TRABAJO')
             ->orderBy('total', 'desc')
+            ->limit(15)
             ->get();
 
         return [
             'por_area' => $porArea,
             'por_centro' => $porCentro,
-            'detalle' => $query->get()
+            'detalle' => []
         ];
     }
 
@@ -161,14 +170,17 @@ trait AnalisisLiquidacionGastoTraits
         $this->scopeFilterAnalitica($query, $request);
 
         $topProveedores = (clone $query)
-            ->select('NOMBRE_PROVEEDOR', DB::raw('SUM(TOTAL_GENERAL) as total'))
+            ->select('NOMBRE_PROVEEDOR', DB::raw('SUM(TOTAL_GENERAL) as total'), DB::raw('COUNT(*) as cantidad'))
             ->groupBy('NOMBRE_PROVEEDOR')
             ->orderBy('total', 'desc')
-            ->limit(10)
+            ->limit(15)
             ->get();
 
+        // Evolución solo del top 5 proveedores para rendimiento
+        $top5Names = $topProveedores->take(5)->pluck('NOMBRE_PROVEEDOR')->toArray();
         $evolucionProveedor = (clone $query)
             ->select('MES', 'ANIO', 'NOMBRE_PROVEEDOR', DB::raw('SUM(TOTAL_GENERAL) as total'))
+            ->whereIn('NOMBRE_PROVEEDOR', $top5Names)
             ->groupBy('MES', 'ANIO', 'NOMBRE_PROVEEDOR')
             ->orderBy('ANIO', 'asc')
             ->orderBy('MES', 'asc')
@@ -177,7 +189,7 @@ trait AnalisisLiquidacionGastoTraits
         return [
             'top_proveedores' => $topProveedores,
             'evolucion_provider' => $evolucionProveedor,
-            'detalle' => $query->get()
+            'detalle' => []
         ];
     }
 
@@ -187,21 +199,23 @@ trait AnalisisLiquidacionGastoTraits
         $this->scopeFilterAnalitica($query, $request);
 
         $porSolicitante = (clone $query)
-            ->select('NOMBRE_TRABAJADOR', DB::raw('SUM(TOTAL_GENERAL) as total'))
+            ->select('NOMBRE_TRABAJADOR', DB::raw('SUM(TOTAL_GENERAL) as total'), DB::raw('COUNT(*) as cantidad'))
             ->groupBy('NOMBRE_TRABAJADOR')
             ->orderBy('total', 'desc')
+            ->limit(15)
             ->get();
 
         $porAutorizador = (clone $query)
-            ->select('NOMBRE_JEFE_AUTORIZA', DB::raw('SUM(TOTAL_GENERAL) as total'))
+            ->select('NOMBRE_JEFE_AUTORIZA', DB::raw('SUM(TOTAL_GENERAL) as total'), DB::raw('COUNT(*) as cantidad'))
             ->groupBy('NOMBRE_JEFE_AUTORIZA')
             ->orderBy('total', 'desc')
+            ->limit(15)
             ->get();
 
         return [
             'por_solicitante' => $porSolicitante,
             'por_autorizador' => $porAutorizador,
-            'detalle' => $query->get()
+            'detalle' => []
         ];
     }
 
@@ -211,14 +225,17 @@ trait AnalisisLiquidacionGastoTraits
         $this->scopeFilterAnalitica($query, $request);
 
         $topProductos = (clone $query)
-            ->select('NOMBRE_PRODUCTO', DB::raw('SUM(TOTAL_GENERAL) as total'))
+            ->select('NOMBRE_PRODUCTO', DB::raw('SUM(TOTAL_GENERAL) as total'), DB::raw('COUNT(*) as cantidad'))
             ->groupBy('NOMBRE_PRODUCTO')
             ->orderBy('total', 'desc')
-            ->limit(10)
+            ->limit(15)
             ->get();
 
+        // Evolución solo del top 5 productos para rendimiento
+        $top5Names = $topProductos->take(5)->pluck('NOMBRE_PRODUCTO')->toArray();
         $evolucionProducto = (clone $query)
             ->select('MES', 'ANIO', 'NOMBRE_PRODUCTO', DB::raw('SUM(TOTAL_GENERAL) as total'))
+            ->whereIn('NOMBRE_PRODUCTO', $top5Names)
             ->groupBy('MES', 'ANIO', 'NOMBRE_PRODUCTO')
             ->orderBy('ANIO', 'asc')
             ->orderBy('MES', 'asc')
@@ -227,7 +244,7 @@ trait AnalisisLiquidacionGastoTraits
         return [
             'top_productos' => $topProductos,
             'evolucion_producto' => $evolucionProducto,
-            'detalle' => $query->get()
+            'detalle' => []
         ];
     }
 
@@ -239,18 +256,15 @@ trait AnalisisLiquidacionGastoTraits
 
         // 2. Logic for Previous Period
         $requestPrev = clone $request;
-        $tipoComparacion = $request->get('comparar_vs', 'anterior'); // 'anterior' or 'anio_pasado'
+        $tipoComparacion = $request->get('comparar_vs', 'anterior');
 
         $anios = explode(',', $request->ano);
         $meses = array_filter(explode(',', $request->mes));
 
         if ($tipoComparacion == 'anio_pasado') {
-            // Easy case: same months/period, but last year
             $requestPrev->ano = (string) ((int) $request->ano - 1);
         } else {
-            // Sequential comparison
             if (count($meses) == 1) {
-                // Month vs Prev Month
                 $m = (int) $meses[0];
                 $y = (int) $anios[0];
                 if ($m == 1) {
@@ -261,32 +275,30 @@ trait AnalisisLiquidacionGastoTraits
                     $requestPrev->ano = (string) $y;
                 }
             } elseif (count($meses) == 3) {
-                // Quarter vs Prev Quarter
                 $firstMonth = (int) min($meses);
                 $y = (int) $anios[0];
-                if ($firstMonth == 1) { // Q1 -> Q4 Last Year
+                if ($firstMonth == 1) {
                     $requestPrev->mes = '10,11,12';
                     $requestPrev->ano = (string) ($y - 1);
-                } else { // Q2->Q1, Q3->Q2, Q4->Q3
+                } else {
                     $start = $firstMonth - 3;
                     $requestPrev->mes = $start . ',' . ($start + 1) . ',' . ($start + 2);
                 }
             } else {
-                // Default: Year vs Prev Year
                 $requestPrev->ano = (string) ((int) $request->ano - 1);
-                // Maintain all months if multiple were selected
             }
         }
 
         $queryPrev = VLiquidacionGastos_Analitica::query();
         $this->scopeFilterAnalitica($queryPrev, $requestPrev);
 
-        // KPI Calculations
-        $gastoActual = $queryActual->sum('TOTAL_GENERAL');
-        $gastoPrev = $queryPrev->sum('TOTAL_GENERAL');
+        // KPI Calculations - una sola query para ambos
+        $gastoActual = (clone $queryActual)->sum('TOTAL_GENERAL');
+        $gastoPrev = (clone $queryPrev)->sum('TOTAL_GENERAL');
         $variacionAbs = $gastoActual - $gastoPrev;
         $variacionPct = $gastoPrev > 0 ? ($variacionAbs / $gastoPrev) * 100 : ($gastoActual > 0 ? 100 : 0);
 
+        // Solo comparar las categorías principales
         return [
             'kpis' => [
                 'actual' => $gastoActual,
@@ -297,11 +309,16 @@ trait AnalisisLiquidacionGastoTraits
                 'label_prev' => $this->getPeriodLabel($requestPrev),
             ],
             'comparativo_area' => $this->compareByCategory($queryActual, $queryPrev, 'NOMBRE_AREA_TRABAJO'),
-            'comparativo_centro' => $this->compareByCategory($queryActual, $queryPrev, 'NOMBRE_CENTRO_TRABAJO'),
             'comparativo_proveedor' => $this->compareByCategory($queryActual, $queryPrev, 'NOMBRE_PROVEEDOR'),
+            'comparativo_centro' => $this->compareByCategory($queryActual, $queryPrev, 'NOMBRE_CENTRO_TRABAJO'),
             'comparativo_responsable' => $this->compareByCategory($queryActual, $queryPrev, 'NOMBRE_TRABAJADOR'),
             'comparativo_producto' => $this->compareByCategory($queryActual, $queryPrev, 'NOMBRE_PRODUCTO'),
-            'evolucion_mensual' => $this->getDashboardEjecutivo($request)['evolucion_mensual']
+            'evolucion_mensual' => (clone $queryActual)
+                ->select('MES', 'ANIO', DB::raw('SUM(TOTAL_GENERAL) as total'))
+                ->groupBy('MES', 'ANIO')
+                ->orderBy('ANIO', 'asc')
+                ->orderBy('MES', 'asc')
+                ->get()
         ];
     }
 

@@ -65,14 +65,32 @@ class GestionAnalisisLiquidacionGastosController extends Controller
         /******************************************************/
         View::share('titulo', 'Análisis de Liquidación de Gastos');
 
-        // Obtener listas de filtros directamente de la vista histórica para evitar errores de tablas inexistentes
-        $lista_empresas = VLiquidacionGastos_Analitica::select('ID_EMPRESA', 'NOMBRE_EMPRESA')->distinct()->pluck('NOMBRE_EMPRESA', 'ID_EMPRESA')->all();
-        $lista_monedas = VLiquidacionGastos_Analitica::select('MONEDA')->distinct()->pluck('MONEDA', 'MONEDA')->all();
-        $lista_estados = VLiquidacionGastos_Analitica::select('ESTADO_LIQUIDACION')->distinct()->pluck('ESTADO_LIQUIDACION', 'ESTADO_LIQUIDACION')->all();
-        $lista_centros = VLiquidacionGastos_Analitica::select('ID_CENTRO_TRABAJO', 'NOMBRE_CENTRO_TRABAJO')->distinct()->pluck('NOMBRE_CENTRO_TRABAJO', 'ID_CENTRO_TRABAJO')->all();
-        $lista_areas = VLiquidacionGastos_Analitica::select('ID_AREA_TRABAJO', 'NOMBRE_AREA_TRABAJO')->distinct()->pluck('NOMBRE_AREA_TRABAJO', 'ID_AREA_TRABAJO')->all();
+        // Usar caché para las listas de filtros (5 minutos)
+        $cacheKey = 'analisis_filtros_listas';
+        $filtros = \Cache::remember($cacheKey, 300, function () {
+            // Una sola query agregada para obtener todos los datos únicos
+            $datos = VLiquidacionGastos_Analitica::select(
+                'ID_EMPRESA',
+                'NOMBRE_EMPRESA',
+                'MONEDA',
+                'ESTADO_LIQUIDACION',
+                'ID_CENTRO_TRABAJO',
+                'NOMBRE_CENTRO_TRABAJO',
+                'ID_AREA_TRABAJO',
+                'NOMBRE_AREA_TRABAJO',
+                'ANIO'
+            )->distinct()->get();
 
-        $anios = VLiquidacionGastos_Analitica::select('ANIO')->distinct()->orderBy('ANIO', 'desc')->pluck('ANIO', 'ANIO')->all();
+            return [
+                'empresas' => $datos->pluck('NOMBRE_EMPRESA', 'ID_EMPRESA')->unique()->filter()->all(),
+                'monedas' => $datos->pluck('MONEDA', 'MONEDA')->unique()->filter()->all(),
+                'estados' => $datos->pluck('ESTADO_LIQUIDACION', 'ESTADO_LIQUIDACION')->unique()->filter()->all(),
+                'centros' => $datos->pluck('NOMBRE_CENTRO_TRABAJO', 'ID_CENTRO_TRABAJO')->unique()->filter()->all(),
+                'areas' => $datos->pluck('NOMBRE_AREA_TRABAJO', 'ID_AREA_TRABAJO')->unique()->filter()->all(),
+                'anios' => $datos->pluck('ANIO', 'ANIO')->unique()->sort()->reverse()->all()
+            ];
+        });
+
         $meses = [
             '1' => 'Enero',
             '2' => 'Febrero',
@@ -92,12 +110,12 @@ class GestionAnalisisLiquidacionGastosController extends Controller
             'analisisliquidaciongasto/analisiliquidaciongastos',
             [
                 'idopcion' => $idopcion,
-                'lista_empresas' => $lista_empresas,
-                'lista_monedas' => $lista_monedas,
-                'lista_estados' => $lista_estados,
-                'lista_centros' => $lista_centros,
-                'lista_areas' => $lista_areas,
-                'anios' => $anios,
+                'lista_empresas' => $filtros['empresas'],
+                'lista_monedas' => $filtros['monedas'],
+                'lista_estados' => $filtros['estados'],
+                'lista_centros' => $filtros['centros'],
+                'lista_areas' => $filtros['areas'],
+                'anios' => $filtros['anios'],
                 'meses' => $meses,
             ]
         );

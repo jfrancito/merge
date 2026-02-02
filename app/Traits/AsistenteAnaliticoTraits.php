@@ -822,7 +822,7 @@ PROMPT;
         $meses = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
         try {
-            // ========== DATOS BASE ==========
+            // ========== DATOS BASE (solo 2 queries) ==========
             $totalAnual = VLiquidacionGastos_Analitica::where('ANIO', $currentYear)->sum('TOTAL_GENERAL');
             $docsAnual = VLiquidacionGastos_Analitica::where('ANIO', $currentYear)->distinct()->count('ID_LIQUIDACION');
 
@@ -837,210 +837,139 @@ PROMPT;
                 'tipo' => 'info'
             ];
 
-
-            // ========== 2. COMPARACIÓN MES ACTUAL VS ANTERIOR ==========
-            $gastoMesActual = VLiquidacionGastos_Analitica::where('ANIO', $currentYear)
-                ->where('MES', $currentMonth)
-                ->sum('TOTAL_GENERAL');
-
-            $gastoMesAnterior = VLiquidacionGastos_Analitica::where('ANIO', $previousMonthYear)
-                ->where('MES', $previousMonth)
-                ->sum('TOTAL_GENERAL');
-
-            $variacion = $gastoMesAnterior > 0
-                ? (($gastoMesActual - $gastoMesAnterior) / $gastoMesAnterior) * 100
-                : 0;
-
-            $meses = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-
-            if (abs($variacion) > 20) {
-                $alertas[] = [
-                    'tipo' => $variacion > 0 ? 'warning' : 'success',
-                    'icono' => $variacion > 0 ? '📈' : '📉',
-                    'titulo' => $variacion > 0 ? 'Incremento Significativo' : 'Ahorro Detectado',
-                    'mensaje' => sprintf(
-                        'El gasto de %s (%s) %s un <strong>%.1f%%</strong> respecto a %s.',
-                        $meses[$currentMonth],
-                        'S/ ' . number_format($gastoMesActual, 2),
-                        $variacion > 0 ? 'aumentó' : 'disminuyó',
-                        abs($variacion),
-                        $meses[$previousMonth]
-                    )
-                ];
-            }
-
-            // ========== 3. TOP PROVEEDOR DEL MES ==========
-            $topProveedor = VLiquidacionGastos_Analitica::where('ANIO', $currentYear)
-                ->where('MES', $currentMonth)
-                ->select('NOMBRE_PROVEEDOR', DB::raw('SUM(TOTAL_GENERAL) as total'))
-                ->groupBy('NOMBRE_PROVEEDOR')
-                ->orderBy('total', 'DESC')
-                ->first();
-
-            if ($topProveedor) {
-                $insights[] = [
-                    'icono' => '🏆',
-                    'titulo' => 'Mayor Proveedor del Mes',
-                    'valor' => $topProveedor->NOMBRE_PROVEEDOR,
-                    'detalle' => 'S/ ' . number_format($topProveedor->total, 2)
-                ];
-            }
-
-            // ========== 4. ÁREA CON MÁS GASTO ==========
-            $topArea = VLiquidacionGastos_Analitica::where('ANIO', $currentYear)
-                ->select('NOMBRE_AREA_TRABAJO', DB::raw('SUM(TOTAL_GENERAL) as total'))
-                ->groupBy('NOMBRE_AREA_TRABAJO')
-                ->orderBy('total', 'DESC')
-                ->first();
-
-            if ($topArea) {
-                $insights[] = [
-                    'icono' => '🏢',
-                    'titulo' => 'Área con Mayor Gasto',
-                    'valor' => $topArea->NOMBRE_AREA_TRABAJO,
-                    'detalle' => 'S/ ' . number_format($topArea->total, 2) . ' en ' . $currentYear
-                ];
-            }
-
-            // ========== 5. TICKET PROMEDIO ==========
+            // Ticket promedio (sin query adicional)
             $ticketPromedio = $docsAnual > 0 ? $totalAnual / $docsAnual : 0;
             $insights[] = [
                 'icono' => '🎫',
                 'titulo' => 'Ticket Promedio',
                 'valor' => 'S/ ' . number_format($ticketPromedio, 2),
-                'detalle' => 'Por documento en ' . $currentYear
+                'detalle' => 'Por documento'
             ];
 
-            // ========== 6. DÍA/MES CON MÁS ACTIVIDAD ==========
-            $mesMasActivo = VLiquidacionGastos_Analitica::where('ANIO', $currentYear)
-                ->select('MES', DB::raw('COUNT(DISTINCT ID_LIQUIDACION) as cantidad'))
-                ->groupBy('MES')
-                ->orderBy('cantidad', 'DESC')
-                ->first();
+            // ========== DATOS ESPECÍFICOS POR MODO (1-2 queries según modo) ==========
+            $tablaData = [];
+            $chartLabels = [];
+            $chartValues = [];
+            $columnas = ['#', 'Item', 'Monto', 'Cantidad'];
+            $chartType = 'bar';
+            $chartLabel = 'Monto (S/)';
+            $periodoTexto = 'Año ' . $currentYear;
+            $filtrosTexto = ucfirst($modoActual);
 
-            if ($mesMasActivo) {
-                $insights[] = [
-                    'icono' => '📅',
-                    'titulo' => 'Mes Más Activo',
-                    'valor' => $meses[$mesMasActivo->MES],
-                    'detalle' => number_format($mesMasActivo->cantidad) . ' liquidaciones'
-                ];
-            }
-
-            // ========== 7. CONCENTRACIÓN DE PROVEEDORES ==========
-            $top5Proveedores = VLiquidacionGastos_Analitica::where('ANIO', $currentYear)
-                ->select('NOMBRE_PROVEEDOR', DB::raw('SUM(TOTAL_GENERAL) as total'))
-                ->groupBy('NOMBRE_PROVEEDOR')
-                ->orderBy('total', 'DESC')
-                ->limit(5)
-                ->get();
-
-            $totalTop5 = $top5Proveedores->sum('total');
-            $concentracion = $totalAnual > 0 ? ($totalTop5 / $totalAnual) * 100 : 0;
-
-            if ($concentracion > 50) {
-                $alertas[] = [
-                    'tipo' => 'info',
-                    'icono' => '⚠️',
-                    'titulo' => 'Alta Concentración',
-                    'mensaje' => sprintf(
-                        'Los <strong>5 principales proveedores</strong> representan el <strong>%.1f%%</strong> del gasto total. Considera diversificar.',
-                        $concentracion
-                    )
-                ];
-            }
-
-            // ========== INSIGHTS ESPECÍFICOS POR MODO ==========
             switch ($modoActual) {
                 case 'proveedores':
-                    // Proveedor con más documentos
-                    $provMasDocs = VLiquidacionGastos_Analitica::where('ANIO', $currentYear)
-                        ->select('NOMBRE_PROVEEDOR', DB::raw('COUNT(DISTINCT ID_LIQUIDACION) as cantidad'))
+                    // Solo 1 query para proveedores
+                    $dataProveedores = VLiquidacionGastos_Analitica::where('ANIO', $currentYear)
+                        ->select('NOMBRE_PROVEEDOR', DB::raw('SUM(TOTAL_GENERAL) as total'), DB::raw('COUNT(DISTINCT ID_LIQUIDACION) as cantidad'))
                         ->groupBy('NOMBRE_PROVEEDOR')
-                        ->orderBy('cantidad', 'DESC')
-                        ->first();
-                    if ($provMasDocs) {
-                        $insights[] = [
-                            'icono' => '📋',
-                            'titulo' => 'Más Frecuente',
-                            'valor' => $provMasDocs->NOMBRE_PROVEEDOR,
-                            'detalle' => $provMasDocs->cantidad . ' liquidaciones'
-                        ];
+                        ->orderBy('total', 'DESC')
+                        ->limit(10)
+                        ->get();
+
+                    foreach ($dataProveedores as $i => $row) {
+                        $tablaData[] = ['#' => $i + 1, 'Proveedor' => $row->NOMBRE_PROVEEDOR, 'Monto' => 'S/ ' . number_format($row->total, 2), 'Docs' => $row->cantidad];
+                        $chartLabels[] = substr($row->NOMBRE_PROVEEDOR, 0, 12);
+                        $chartValues[] = $row->total;
+                    }
+                    $columnas = ['#', 'Proveedor', 'Monto', 'Docs'];
+                    $chartLabel = 'Top Proveedores';
+                    $filtrosTexto = 'Top 10 Proveedores';
+
+                    // Insight del top
+                    if (count($dataProveedores) > 0) {
+                        $insights[] = ['icono' => '🏆', 'titulo' => 'Mayor Proveedor', 'valor' => $dataProveedores[0]->NOMBRE_PROVEEDOR, 'detalle' => 'S/ ' . number_format($dataProveedores[0]->total, 2)];
                     }
                     break;
 
                 case 'areas':
-                    // Top 3 áreas
-                    $top3Areas = VLiquidacionGastos_Analitica::where('ANIO', $currentYear)
-                        ->select('NOMBRE_AREA_TRABAJO', DB::raw('SUM(TOTAL_GENERAL) as total'))
+                    // Solo 1 query para áreas
+                    $dataAreas = VLiquidacionGastos_Analitica::where('ANIO', $currentYear)
+                        ->select('NOMBRE_AREA_TRABAJO', DB::raw('SUM(TOTAL_GENERAL) as total'), DB::raw('COUNT(DISTINCT ID_LIQUIDACION) as cantidad'))
                         ->groupBy('NOMBRE_AREA_TRABAJO')
                         ->orderBy('total', 'DESC')
-                        ->limit(3)
                         ->get();
-                    foreach ($top3Areas as $idx => $area) {
-                        $insights[] = [
-                            'icono' => ($idx === 0) ? '🥇' : (($idx === 1) ? '🥈' : '🥉'),
-                            'titulo' => 'Área #' . ($idx + 1),
-                            'valor' => $area->NOMBRE_AREA_TRABAJO,
-                            'detalle' => 'S/ ' . number_format($area->total, 2)
-                        ];
+
+                    foreach ($dataAreas as $i => $row) {
+                        $pct = $totalAnual > 0 ? ($row->total / $totalAnual) * 100 : 0;
+                        $tablaData[] = ['#' => $i + 1, 'Área' => $row->NOMBRE_AREA_TRABAJO, 'Monto' => 'S/ ' . number_format($row->total, 2), '%' => number_format($pct, 1) . '%'];
+                        $chartLabels[] = substr($row->NOMBRE_AREA_TRABAJO, 0, 10);
+                        $chartValues[] = $row->total;
+                    }
+                    $columnas = ['#', 'Área', 'Monto', '%'];
+                    $chartType = 'doughnut';
+                    $chartLabel = 'Por Área';
+                    $filtrosTexto = 'Todas las Áreas';
+
+                    if (count($dataAreas) > 0) {
+                        $insights[] = ['icono' => '🏢', 'titulo' => 'Mayor Área', 'valor' => $dataAreas[0]->NOMBRE_AREA_TRABAJO, 'detalle' => 'S/ ' . number_format($dataAreas[0]->total, 2)];
                     }
                     break;
 
                 case 'temporal':
-                    // Trimestre con más gasto
-                    $topTrimestre = VLiquidacionGastos_Analitica::where('ANIO', $currentYear)
-                        ->select('TRIMESTRE', DB::raw('SUM(TOTAL_GENERAL) as total'))
+                    // Solo 1 query para trimestres
+                    $dataTrimestres = VLiquidacionGastos_Analitica::where('ANIO', $currentYear)
+                        ->select('TRIMESTRE', DB::raw('SUM(TOTAL_GENERAL) as total'), DB::raw('COUNT(DISTINCT ID_LIQUIDACION) as cantidad'))
                         ->groupBy('TRIMESTRE')
-                        ->orderBy('total', 'DESC')
-                        ->first();
-                    if ($topTrimestre) {
-                        $insights[] = [
-                            'icono' => '📆',
-                            'titulo' => 'Trimestre con Más Gasto',
-                            'valor' => 'Q' . $topTrimestre->TRIMESTRE,
-                            'detalle' => 'S/ ' . number_format($topTrimestre->total, 2)
-                        ];
+                        ->orderBy('TRIMESTRE')
+                        ->get();
+
+                    foreach ($dataTrimestres as $row) {
+                        $tablaData[] = ['#' => 'Q' . $row->TRIMESTRE, 'Trimestre' => 'Trimestre ' . $row->TRIMESTRE, 'Monto' => 'S/ ' . number_format($row->total, 2), 'Docs' => $row->cantidad];
+                        $chartLabels[] = 'Q' . $row->TRIMESTRE;
+                        $chartValues[] = $row->total;
+                    }
+                    $columnas = ['#', 'Trimestre', 'Monto', 'Docs'];
+                    $chartLabel = 'Por Trimestre';
+                    $filtrosTexto = 'Trimestral';
+
+                    $maxTrim = $dataTrimestres->sortByDesc('total')->first();
+                    if ($maxTrim) {
+                        $insights[] = ['icono' => '📆', 'titulo' => 'Mejor Trimestre', 'valor' => 'Q' . $maxTrim->TRIMESTRE, 'detalle' => 'S/ ' . number_format($maxTrim->total, 2)];
                     }
                     break;
 
                 case 'comparativo':
-                    // Diferencia con año anterior
-                    $totalAnioAnterior = VLiquidacionGastos_Analitica::where('ANIO', $currentYear - 1)->sum('TOTAL_GENERAL');
-                    $diffAnual = $totalAnioAnterior > 0 ? (($totalAnual - $totalAnioAnterior) / $totalAnioAnterior) * 100 : 0;
-                    $insights[] = [
-                        'icono' => $diffAnual >= 0 ? '📈' : '📉',
-                        'titulo' => 'vs Año Anterior',
-                        'valor' => ($diffAnual >= 0 ? '+' : '') . number_format($diffAnual, 1) . '%',
-                        'detalle' => 'Comparado con ' . ($currentYear - 1)
-                    ];
+                    // Solo 1 query para meses
+                    $dataMeses = VLiquidacionGastos_Analitica::where('ANIO', $currentYear)
+                        ->select('MES', DB::raw('SUM(TOTAL_GENERAL) as total'), DB::raw('COUNT(DISTINCT ID_LIQUIDACION) as cantidad'))
+                        ->groupBy('MES')
+                        ->orderBy('MES')
+                        ->limit(6) // Solo últimos 6 meses con datos
+                        ->get();
+
+                    foreach ($dataMeses as $row) {
+                        $tablaData[] = ['#' => $row->MES, 'Mes' => $meses[$row->MES], 'Monto' => 'S/ ' . number_format($row->total, 2), 'Docs' => $row->cantidad];
+                        $chartLabels[] = substr($meses[$row->MES], 0, 3);
+                        $chartValues[] = $row->total;
+                    }
+                    $columnas = ['#', 'Mes', 'Monto', 'Docs'];
+                    $chartType = 'line';
+                    $chartLabel = 'Mensual';
+                    $filtrosTexto = 'Comparativo Mensual';
                     break;
-            }
 
-            // ========== 8. TENDENCIA MENSUAL (Chart Data) ==========
-            $tendencia = VLiquidacionGastos_Analitica::where('ANIO', $currentYear)
-                ->select('MES', DB::raw('SUM(TOTAL_GENERAL) as total'))
-                ->groupBy('MES')
-                ->orderBy('MES')
-                ->get();
+                default: // general - evolución mensual
+                    $dataMeses = VLiquidacionGastos_Analitica::where('ANIO', $currentYear)
+                        ->select('MES', DB::raw('SUM(TOTAL_GENERAL) as total'), DB::raw('COUNT(DISTINCT ID_LIQUIDACION) as cantidad'))
+                        ->groupBy('MES')
+                        ->orderBy('MES')
+                        ->get();
 
-            $chartLabels = [];
-            $chartValues = [];
-            foreach ($tendencia as $row) {
-                $chartLabels[] = $meses[$row->MES];
-                $chartValues[] = $row->total;
-            }
+                    foreach ($dataMeses as $row) {
+                        $tablaData[] = ['#' => $row->MES, 'Mes' => $meses[$row->MES], 'Monto' => 'S/ ' . number_format($row->total, 2), 'Docs' => $row->cantidad];
+                        $chartLabels[] = substr($meses[$row->MES], 0, 3);
+                        $chartValues[] = $row->total;
+                    }
+                    $columnas = ['#', 'Mes', 'Monto', 'Docs'];
+                    $chartType = 'line';
+                    $chartLabel = 'Evolución Mensual';
+                    $filtrosTexto = 'Resumen General';
 
-            // ========== 9. TABLA TOP 5 PROVEEDORES ==========
-            $tablaData = [];
-            foreach ($top5Proveedores as $i => $prov) {
-                $porcentaje = $totalAnual > 0 ? ($prov->total / $totalAnual) * 100 : 0;
-                $tablaData[] = [
-                    '#' => $i + 1,
-                    'Proveedor' => $prov->NOMBRE_PROVEEDOR,
-                    'Monto' => 'S/ ' . number_format($prov->total, 2),
-                    '% del Total' => number_format($porcentaje, 1) . '%'
-                ];
+                    $maxMes = $dataMeses->sortByDesc('total')->first();
+                    if ($maxMes) {
+                        $insights[] = ['icono' => '📅', 'titulo' => 'Mes Pico', 'valor' => $meses[$maxMes->MES], 'detalle' => 'S/ ' . number_format($maxMes->total, 2)];
+                    }
+                    break;
             }
 
             // ========== CONSTRUIR MENSAJE HTML ==========
@@ -1084,124 +1013,6 @@ PROMPT;
             }
             $mensajeHtml .= '</div>';
             $mensajeHtml .= '</div>';
-
-            $this->logAssistant('Insights generados exitosamente', [
-                'insights_count' => count($insights),
-                'alertas_count' => count($alertas),
-                'modo' => $modoActual
-            ]);
-
-            // ========== GENERAR DATOS ESPECÍFICOS POR MODO ==========
-            $tablaData = [];
-            $chartLabels = [];
-            $chartValues = [];
-            $columnas = ['#', 'Categoría', 'Monto', 'Cantidad'];
-            $chartType = 'bar';
-            $chartLabel = 'Monto (S/)';
-            $periodoTexto = 'Año ' . $currentYear;
-            $filtrosTexto = 'Modo: ' . ucfirst($modoActual);
-
-            switch ($modoActual) {
-                case 'proveedores':
-                    // Top 10 proveedores
-                    $dataProveedores = VLiquidacionGastos_Analitica::where('ANIO', $currentYear)
-                        ->select('NOMBRE_PROVEEDOR', DB::raw('SUM(TOTAL_GENERAL) as total'), DB::raw('COUNT(DISTINCT ID_LIQUIDACION) as cantidad'))
-                        ->groupBy('NOMBRE_PROVEEDOR')
-                        ->orderBy('total', 'DESC')
-                        ->limit(10)
-                        ->get();
-                    foreach ($dataProveedores as $i => $row) {
-                        $tablaData[] = ['#' => $i + 1, 'Proveedor' => $row->NOMBRE_PROVEEDOR, 'Monto' => 'S/ ' . number_format($row->total, 2), 'Docs' => $row->cantidad];
-                        $chartLabels[] = strlen($row->NOMBRE_PROVEEDOR) > 15 ? substr($row->NOMBRE_PROVEEDOR, 0, 15) . '...' : $row->NOMBRE_PROVEEDOR;
-                        $chartValues[] = $row->total;
-                    }
-                    $columnas = ['#', 'Proveedor', 'Monto', 'Docs'];
-                    $chartLabel = 'Top Proveedores (S/)';
-                    $filtrosTexto = 'Top 10 Proveedores';
-                    break;
-
-                case 'areas':
-                    // Gasto por área
-                    $dataAreas = VLiquidacionGastos_Analitica::where('ANIO', $currentYear)
-                        ->select('NOMBRE_AREA_TRABAJO', DB::raw('SUM(TOTAL_GENERAL) as total'), DB::raw('COUNT(DISTINCT ID_LIQUIDACION) as cantidad'))
-                        ->groupBy('NOMBRE_AREA_TRABAJO')
-                        ->orderBy('total', 'DESC')
-                        ->get();
-                    foreach ($dataAreas as $i => $row) {
-                        $pct = $totalAnual > 0 ? ($row->total / $totalAnual) * 100 : 0;
-                        $tablaData[] = ['#' => $i + 1, 'Área' => $row->NOMBRE_AREA_TRABAJO, 'Monto' => 'S/ ' . number_format($row->total, 2), '%' => number_format($pct, 1) . '%'];
-                        $chartLabels[] = strlen($row->NOMBRE_AREA_TRABAJO) > 12 ? substr($row->NOMBRE_AREA_TRABAJO, 0, 12) . '...' : $row->NOMBRE_AREA_TRABAJO;
-                        $chartValues[] = $row->total;
-                    }
-                    $columnas = ['#', 'Área', 'Monto', '%'];
-                    $chartType = 'doughnut';
-                    $chartLabel = 'Distribución por Área';
-                    $filtrosTexto = 'Todas las Áreas';
-                    break;
-
-                case 'temporal':
-                    // Evolución por trimestre
-                    $dataTrimestres = VLiquidacionGastos_Analitica::where('ANIO', $currentYear)
-                        ->select('TRIMESTRE', DB::raw('SUM(TOTAL_GENERAL) as total'), DB::raw('COUNT(DISTINCT ID_LIQUIDACION) as cantidad'))
-                        ->groupBy('TRIMESTRE')
-                        ->orderBy('TRIMESTRE')
-                        ->get();
-                    foreach ($dataTrimestres as $row) {
-                        $tablaData[] = ['#' => 'Q' . $row->TRIMESTRE, 'Trimestre' => 'Trimestre ' . $row->TRIMESTRE, 'Monto' => 'S/ ' . number_format($row->total, 2), 'Docs' => $row->cantidad];
-                        $chartLabels[] = 'Q' . $row->TRIMESTRE;
-                        $chartValues[] = $row->total;
-                    }
-                    $columnas = ['#', 'Trimestre', 'Monto', 'Docs'];
-                    $chartType = 'bar';
-                    $chartLabel = 'Gasto por Trimestre';
-                    $filtrosTexto = 'Evolución Trimestral';
-                    break;
-
-                case 'comparativo':
-                    // Comparar últimos 3 meses
-                    $mesActual = $currentMonth;
-                    $mesesCompare = [];
-                    for ($i = 2; $i >= 0; $i--) {
-                        $m = $mesActual - $i;
-                        $y = $currentYear;
-                        if ($m <= 0) {
-                            $m += 12;
-                            $y--;
-                        }
-                        $mesesCompare[] = ['mes' => $m, 'anio' => $y];
-                    }
-                    foreach ($mesesCompare as $mc) {
-                        $gastoMes = VLiquidacionGastos_Analitica::where('ANIO', $mc['anio'])->where('MES', $mc['mes'])->sum('TOTAL_GENERAL');
-                        $docsMes = VLiquidacionGastos_Analitica::where('ANIO', $mc['anio'])->where('MES', $mc['mes'])->distinct()->count('ID_LIQUIDACION');
-                        $tablaData[] = ['#' => $meses[$mc['mes']], 'Mes' => $meses[$mc['mes']] . ' ' . $mc['anio'], 'Monto' => 'S/ ' . number_format($gastoMes, 2), 'Docs' => $docsMes];
-                        $chartLabels[] = $meses[$mc['mes']];
-                        $chartValues[] = $gastoMes;
-                    }
-                    $columnas = ['#', 'Mes', 'Monto', 'Docs'];
-                    $chartType = 'line';
-                    $chartLabel = 'Últimos 3 Meses';
-                    $filtrosTexto = 'Comparativa Mensual';
-                    $periodoTexto = $meses[$mesesCompare[0]['mes']] . ' - ' . $meses[$mesesCompare[2]['mes']] . ' ' . $currentYear;
-                    break;
-
-                default: // general
-                    // Evolución mensual del año
-                    $dataMeses = VLiquidacionGastos_Analitica::where('ANIO', $currentYear)
-                        ->select('MES', DB::raw('SUM(TOTAL_GENERAL) as total'), DB::raw('COUNT(DISTINCT ID_LIQUIDACION) as cantidad'))
-                        ->groupBy('MES')
-                        ->orderBy('MES')
-                        ->get();
-                    foreach ($dataMeses as $row) {
-                        $tablaData[] = ['#' => $row->MES, 'Mes' => $meses[$row->MES], 'Monto' => 'S/ ' . number_format($row->total, 2), 'Docs' => $row->cantidad];
-                        $chartLabels[] = substr($meses[$row->MES], 0, 3);
-                        $chartValues[] = $row->total;
-                    }
-                    $columnas = ['#', 'Mes', 'Monto', 'Docs'];
-                    $chartType = 'line';
-                    $chartLabel = 'Evolución Mensual';
-                    $filtrosTexto = 'Resumen General';
-                    break;
-            }
 
             // Sugerencias según modo
             $sugerenciasMap = [
