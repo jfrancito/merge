@@ -222,6 +222,25 @@ Route::group(['middleware' => ['authaw']], function () {
 	// Insights Automáticos ("Sorpréndeme")
 	Route::get('/api/asistente-analitico/insights/{idopcion}', 'GestionAnalisisLiquidacionGastosController@actionGenerarInsights');
 
+
+	//REPORTE DE CONCILIACON DE LIQUIDACION GASTOS Y VALES
+	Route::any(
+		'/gestion-de-conciliacion-liquidacion-vale/{idopcion}',
+		'GestionConciliacionLiquidacionGastosController@actionGestionConciliacionLiquidacionCompra'
+	);
+	Route::post(
+		'/buscar-reporte-conciliacion',
+		'GestionConciliacionLiquidacionGastosController@buscarReporteConciliacion'
+	);
+	Route::any(
+		'/exportar-excel-conciliacion-detalle',
+		'GestionConciliacionLiquidacionGastosController@exportarExcelDetalle'
+	);
+
+
+
+
+
 	//SUSPENSION DE 4TA CATEGORIA
 	Route::any('/gestion-de-suspension-ta-categoria/{idopcion}', 'GestionCuartaCategoriaController@actionListarSuspensionCuarta');
 	Route::any('/agregar-cuarta-categoria/{idopcion}', 'GestionCuartaCategoriaController@actionAgregarCuartaCategoria');
