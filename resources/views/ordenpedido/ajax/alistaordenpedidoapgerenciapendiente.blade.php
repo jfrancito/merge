@@ -16,6 +16,7 @@
                         <th>AÑO</th>
                         <th>TIPO PEDIDO</th>
                         <th>SOLICITA</th>
+                        <th>AREA</th>
                         <th>AUTORIZA</th>
                         <th>APRUEBA GER</th>
                         <th>APRUEBA ADM</th>
@@ -34,14 +35,14 @@
                             <td>{{ $item['COD_ANIO'] }}</td>
                             <td class="col-nombre">{{ $item['TXT_TIPO_PEDIDO'] }}</td>
                             <td class="col-nombre">{{ $item['TXT_TRABAJADOR_SOLICITA'] }}</td>
+                            <td class="col-nombre">{{ $item['TXT_AREA'] }}</td>
                             <td class="col-nombre">{{ $item['TXT_TRABAJADOR_AUTORIZA'] }}</td>
                             <td class="col-nombre">{{ $item['TXT_TRABAJADOR_APRUEBA_GER'] }}</td>
                             <td class="col-nombre">{{ $item['TXT_TRABAJADOR_APRUEBA_ADM'] }}</td>
 
-                        <td class="col-glosa">{{ $item['TXT_GLOSA'] }}</td>
-                            <td>
-                                 @include('comprobante.ajax.estadospedido')
-                           <td class="text-center">
+                            <td class="col-glosa">{{ $item['TXT_GLOSA'] }}</td>
+                            <td>@include('comprobante.ajax.estadospedido')</td>
+                            <td class="text-center">
                             <div class="grupo-acciones">
 
                                 <!-- VER DETALLE (SIEMPRE VISIBLE) -->

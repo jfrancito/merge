@@ -100,6 +100,8 @@ class GestionOrdenPedidoApruebaAdmController extends Controller
             $pedido->TXT_GLOSA,
             $estado->COD_CATEGORIA,
             $estado->NOM_CATEGORIA,
+            $pedido->COD_AREA,
+            $pedido->TXT_AREA,
             true,
             ""
         );
@@ -146,6 +148,8 @@ class GestionOrdenPedidoApruebaAdmController extends Controller
             $pedido->TXT_GLOSA,
             $estado->COD_CATEGORIA,
             $estado->NOM_CATEGORIA,
+            $pedido->COD_AREA,
+            $pedido->TXT_AREA,
             true,
             ""
         );
