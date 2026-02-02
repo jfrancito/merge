@@ -100,147 +100,151 @@ $(document).ready(function () {
        REGISTRAR ORDEN DE PEDIDO
        =============================== */
 
-    $(".ordenpedidoprincipal").on('click', '#asignarordenpedido', function (e) {
-        e.preventDefault();
-        abrircargando();
+    /* ===============================
+   REGISTRAR ORDEN DE PEDIDO
+   =============================== */
 
-        let _token = $('#token').val();
-        let fec_pedido = $('#fec_pedido').val();
-        let cod_periodo = $('#cod_periodo').val();
-        let cod_anio = $('#cod_anio').val();
-        let cod_empr = $('#cod_empr').val();
-        let cod_centro = $('#cod_centro').val();
-        let cod_tipo_pedido = $('#cod_tipo_pedido').val();
-        let cod_trabajador_solicita = $('#cod_trabajador_solicita').val();
-        let cod_trabajador_autoriza = $('#cod_trabajador_autoriza').val();
-        let cod_trabajador_aprueba_ger = $('#cod_trabajador_aprueba_ger').val();
-        let cod_trabajador_aprueba_adm = $('#cod_trabajador_aprueba_adm').val();
-        let txt_glosa = $('#txt_glosa').val();
-        let cod_estado = $('#cod_estado').val();
-        let orden_pedido_id = $('#orden_pedido_id').val();
+$(".ordenpedidoprincipal").on('click', '#asignarordenpedido', function (e) {
+    e.preventDefault();
+    abrircargando();
 
-        let opcion = !orden_pedido_id ? 'I' : 'U';
+    let _token = $('#token').val();
+    let fec_pedido = $('#fec_pedido').val();
+    let cod_periodo = $('#cod_periodo').val();
+    let cod_anio = $('#cod_anio').val();
+    let cod_empr = $('#cod_empr').val();
+    let cod_centro = $('#cod_centro').val();
+    let cod_tipo_pedido = $('#cod_tipo_pedido').val();
+    let cod_trabajador_solicita = $('#cod_trabajador_solicita').val();
+    let cod_trabajador_autoriza = $('#cod_trabajador_autoriza').val();
+    let cod_trabajador_aprueba_ger = $('#cod_trabajador_aprueba_ger').val();
+    let cod_trabajador_aprueba_adm = $('#cod_trabajador_aprueba_adm').val();
+    let txt_glosa = $('#txt_glosa').val();
+    let cod_estado = $('#cod_estado').val();
+    let cod_area = $('#cod_area').val();
+    let orden_pedido_id = $('#orden_pedido_id').val();
 
-        function errorCampo(mensaje) {
+    let opcion = !orden_pedido_id ? 'I' : 'U';
+
+    /* ========= VALIDACIONES ========= */
+
+    function errorCampo(mensaje) {
         cerrarcargando();
         modalBonito({
-                tipo: 'error',
-                icono: '❌',
-                titulo: 'Campos obligatorios',
-                mensaje: mensaje
-            });
-        }
-
-        if (!cod_anio) {
-            errorCampo('Debe seleccionar:<br><b>Año</b>');
-            return;
-        }
-
-        if (!cod_periodo) {
-            errorCampo('Debe seleccionar:<br><b>Mes</b>');
-            return;
-        }
-
-        if (!cod_tipo_pedido) {
-            errorCampo('Debe seleccionar:<br><b>Tipo Pedido</b>');
-            return;
-        }
-
-        if (!cod_trabajador_autoriza) {
-            errorCampo('Debe seleccionar:<br><b>Usuario Autoriza</b>');
-            return;
-        }
-
-        if (!cod_trabajador_aprueba_ger) {
-            errorCampo('Debe seleccionar:<br><b>Usuario Aprueba Gerencia</b>');
-            return;
-        }
-
-        if (!cod_trabajador_aprueba_adm) {
-            errorCampo('Debe seleccionar:<br><b>Usuario Aprueba Administración</b>');
-            return;
-        }
-
-        if (!txt_glosa) {
-            errorCampo('Debe completar:<br><b>Observación</b>');
-            return;
-        }
-
-
-       
-        /* ARMAR DETALLE */
-        let detalles = [];
-        $('#tabla_detalle_pedido tbody tr').each(function () {
-            let tds = $(this).find('td');
-            detalles.push({
-                cod_producto: tds.eq(1).text().trim(),
-                nom_producto: tds.eq(2).text().trim(),
-                cod_categoria: tds.eq(3).text().trim(),
-                nom_categoria: tds.eq(4).text().trim(),
-                cantidad: parseInt(tds.eq(5).text().trim()) || 0,
-                txt_observacion: tds.eq(6).text().trim(),
-                opcion_detalle: 'I',
-                detalle_id: null
-            });
+            tipo: 'error',
+            icono: '❌',
+            titulo: 'Campos obligatorios',
+            mensaje: mensaje
         });
+    }
 
-        if (detalles.length === 0) {
-            cerrarcargando();
-            modalBonito({
-                tipo: 'warn',
-                icono: '🛒',
-                titulo: 'No hay productos',
-                mensaje: 'Debe agregar al menos <b>un producto</b> para guardar la Orden de Pedido.'
-            });
-            return;
-        }
+    if (!cod_anio) return errorCampo('Debe seleccionar:<br><b>Año</b>');
+    if (!cod_periodo) return errorCampo('Debe seleccionar:<br><b>Mes</b>');
+    if (!cod_tipo_pedido) return errorCampo('Debe seleccionar:<br><b>Tipo Pedido</b>');
+    if (!cod_trabajador_autoriza) return errorCampo('Debe seleccionar:<br><b>Usuario Autoriza</b>');
+    if (!cod_trabajador_aprueba_ger) return errorCampo('Debe seleccionar:<br><b>Usuario Aprueba Gerencia</b>');
+    if (!cod_trabajador_aprueba_adm) return errorCampo('Debe seleccionar:<br><b>Usuario Aprueba Administración</b>');
+    if (!txt_glosa) return errorCampo('Debe completar:<br><b>Observación</b>');
 
-        cerrarcargando();
+    /* ========= DETALLE ========= */
 
-        /* CONFIRMAR */
-        modalBonito({
-            tipo: 'info',
-            icono: '📝',
-            titulo: 'Confirmar registro',
-            mensaje: '¿Deseas guardar la <b>Orden de Pedido</b>?<br>Esta acción no se puede deshacer.',
-            confirmar: true,
-            onConfirm: function () {
-                abrircargando();
-                $.ajax({
-                    type: "POST",
-                    url: carpeta + "/registrar_orden_pedido",
-                    data: {
-                        _token,
-                        fec_pedido,
-                        cod_periodo,
-                        cod_anio,
-                        cod_empr,
-                        cod_centro,
-                        cod_tipo_pedido,
-                        cod_trabajador_solicita,
-                        cod_trabajador_autoriza,
-                        cod_trabajador_aprueba_ger,
-                        cod_trabajador_aprueba_adm,
-                        txt_glosa,
-                        cod_estado,
-                        orden_pedido_id,
-                        opcion,
-                        array_detalle: detalles
-                    },
-                    success: function () {
-                        cerrarcargando();
-                        modalBonito({
-                            tipo: 'success',
-                            icono: '✔',
-                            titulo: 'Operación exitosa',
-                            mensaje: 'La Orden de Pedido fue registrada correctamente.'
-                        });
-                        location.reload();
-                    }
-                });
-            }
+    let detalles = [];
+    $('#tabla_detalle_pedido tbody tr').each(function () {
+        let tds = $(this).find('td');
+        detalles.push({
+            cod_producto: tds.eq(1).text().trim(),
+            nom_producto: tds.eq(2).text().trim(),
+            cod_categoria: tds.eq(3).text().trim(),
+            nom_categoria: tds.eq(4).text().trim(),
+            cantidad: parseInt(tds.eq(5).text().trim()) || 0,
+            txt_observacion: tds.eq(6).text().trim(),
+            opcion_detalle: 'I',
+            detalle_id: null
         });
     });
+
+    if (detalles.length === 0) {
+        cerrarcargando();
+        modalBonito({
+            tipo: 'warn',
+            icono: '🛒',
+            titulo: 'No hay productos',
+            mensaje: 'Debe agregar al menos <b>un producto</b>.'
+        });
+        return;
+    }
+
+    cerrarcargando();
+
+    /* ========= CONFIRMAR ========= */
+
+    modalBonito({
+        tipo: 'info',
+        icono: '📝',
+        titulo: 'Confirmar registro',
+        mensaje: '¿Deseas guardar la <b>Orden de Pedido</b>?',
+        confirmar: true,
+        onConfirm: function () {
+
+            abrircargando();
+
+            $.ajax({
+                type: "POST",
+                url: carpeta + "/registrar_orden_pedido",
+                data: {
+                    _token,
+                    fec_pedido,
+                    cod_periodo,
+                    cod_anio,
+                    cod_empr,
+                    cod_centro,
+                    cod_tipo_pedido,
+                    cod_trabajador_solicita,
+                    cod_trabajador_autoriza,
+                    cod_trabajador_aprueba_ger,
+                    cod_trabajador_aprueba_adm,
+                    txt_glosa,
+                    cod_estado,
+                    cod_area,
+                    orden_pedido_id,
+                    opcion,
+                    array_detalle: detalles
+                },
+
+                /* ===== OK ===== */
+                success: function (resp) {
+                    modalBonito({
+                        tipo: 'success',
+                        icono: '✔',
+                        titulo: 'Operación exitosa',
+                        mensaje: 'La Orden de Pedido fue registrada correctamente.'
+                    });
+
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                },
+
+                /* ===== ERROR ===== */
+                error: function (xhr) {
+                    modalBonito({
+                        tipo: 'error',
+                        icono: '❌',
+                        titulo: 'Error',
+                        mensaje: xhr.responseJSON?.message || 
+                                 'Ocurrió un error al guardar la Orden de Pedido.'
+                    });
+                },
+
+                /* ===== SIEMPRE ===== */
+                complete: function () {
+                    cerrarcargando(); // 👈 nunca se queda cargando
+                }
+            });
+        }
+    });
+});
+
 
     /* ===============================
        AGREGAR PRODUCTO

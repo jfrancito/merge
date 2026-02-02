@@ -16,6 +16,7 @@
                         <th>AÑO</th>
                         <th>TIPO PEDIDO</th>
                         <th>SOLICITA</th>
+                        <th>AREA</th>
                         <th>AUTORIZA</th>
                         <th>APRUEBA GER</th>
                         <th>APRUEBA ADM</th>
@@ -24,9 +25,12 @@
                         <th>VER DETALLE</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @foreach($listapedido as $index => $item)
-                       @if ($item['COD_ESTADO'] === 'ETM0000000000010' && $item['COD_TRABAJADOR_AUTORIZA'] === $usuario_logueado_id)
+               <tbody>
+                @foreach($listapedido as $index => $item)
+
+                    @if ($item['COD_ESTADO'] === 'ETM0000000000010'
+                        && $item['COD_TRABAJADOR_AUTORIZA'] === $usuario_logueado_id)
+
                         <tr class="align-middle">
                             <td>{{ $item['ID_PEDIDO'] }}</td>
                             <td>{{ $item['FEC_PEDIDO'] }}</td>
@@ -34,53 +38,50 @@
                             <td>{{ $item['COD_ANIO'] }}</td>
                             <td class="col-nombre">{{ $item['TXT_TIPO_PEDIDO'] }}</td>
                             <td class="col-nombre">{{ $item['TXT_TRABAJADOR_SOLICITA'] }}</td>
+                            <td class="col-nombre">{{ $item['TXT_AREA'] }}</td>
                             <td class="col-nombre">{{ $item['TXT_TRABAJADOR_AUTORIZA'] }}</td>
                             <td class="col-nombre">{{ $item['TXT_TRABAJADOR_APRUEBA_GER'] }}</td>
                             <td class="col-nombre">{{ $item['TXT_TRABAJADOR_APRUEBA_ADM'] }}</td>
+                            <td class="col-glosa">{{ $item['TXT_GLOSA'] }}</td>
 
-                        <td class="col-glosa">{{ $item['TXT_GLOSA'] }}</td>
-                            <td>
-                                 @include('comprobante.ajax.estadospedido')
-                        
+                            <!-- ESTADO -->
+                            <td>@include('comprobante.ajax.estadospedido')</td>
 
-                         <td class="text-center">
-                                                    <div class="grupo-acciones">
+                            <!-- ACCIONES -->
+                            <td class="text-center">
+                                <div class="grupo-acciones">
 
-                                                        <!-- VER DETALLE (SIEMPRE VISIBLE) -->
-                                                       <button 
-                                                            class="btn btn-sm btn-primary ver-detalle-pedido"
-                                                            data-id="{{ $item['ID_PEDIDO'] }}"
-                                                            title="Ver detalle del pedido">
-                                                            <i class="fa fa-eye me-1"></i>
-                                                            Detalle
-                                                        </button>
+                                    <button 
+                                        class="btn btn-sm btn-primary ver-detalle-pedido"
+                                        data-id="{{ $item['ID_PEDIDO'] }}"
+                                        title="Ver detalle del pedido">
+                                        <i class="fa fa-eye me-1"></i>
+                                        Detalle
+                                    </button>
 
+                                    <button 
+                                        class="btn btn-sm btn-success autorizar-pedido"
+                                        data-id="{{ $item['ID_PEDIDO'] }}"
+                                        title="Autorizar pedido">
+                                        <i class="fa fa-check-circle me-1"></i>
+                                        Autorizar
+                                    </button>
 
-                                                        <!-- AUTORIZAR -->
-                                                        <button 
-                                                             class="btn btn-sm btn-success autorizar-pedido"
-                                                             data-id="{{ $item['ID_PEDIDO'] }}"
-                                                             data-bs-toggle="tooltip"
-                                                             title="Autorizar pedido">
-                                                            <i class="fa fa-check-circle me-1"></i>
-                                                                    Autorizar
-                                                        </button>
+                                    <button 
+                                        class="btn btn-sm btn-danger rechazar-pedido"
+                                        data-id="{{ $item['ID_PEDIDO'] }}"
+                                        title="Rechazar pedido">
+                                        <i class="fa fa-times-circle me-1"></i>
+                                        Rechazar
+                                    </button>
 
-                                                                <!-- RECHAZAR -->
-                                                        <button 
-                                                            class="btn btn-sm btn-danger rechazar-pedido"
-                                                            data-id="{{ $item['ID_PEDIDO'] }}"
-                                                            title="Rechazar pedido">
-                                                            <i class="fa fa-times-circle me-1"></i>
-                                                            Rechazar
-                                                        </button>
-                                                    </div>
-                        </td>
-
+                                </div>
+                            </td>
                         </tr>
-                      @endif
-                    @endforeach
-                </tbody>
+
+                    @endif
+                @endforeach
+            </tbody>
             </table>
         </div>
     </div>
