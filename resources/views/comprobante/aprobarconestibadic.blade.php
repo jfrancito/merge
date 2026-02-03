@@ -92,36 +92,153 @@
       </div>
     </div>
   </div>
-</div>  
+</div>
 
 @stop
 
 @section('script')
 
+    <script src="{{ asset('public/js/general/inputmask/inputmask.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('public/js/general/inputmask/inputmask.extensions.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('public/js/general/inputmask/inputmask.numeric.extensions.js') }}"
+            type="text/javascript"></script>
+    <script src="{{ asset('public/js/general/inputmask/inputmask.date.extensions.js') }}"
+            type="text/javascript"></script>
+    <script src="{{ asset('public/js/general/inputmask/jquery.inputmask.js') }}" type="text/javascript"></script>
+
+    <script src="{{ asset('public/lib/datatables/js/jquery.dataTables.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('public/lib/datatables/js/dataTables.bootstrap.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/dataTables.buttons.js') }}"
+            type="text/javascript"></script>
+    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/jszipoo.min.js') }}"
+            type="text/javascript"></script>
+    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/buttons.html5.js') }}"
+            type="text/javascript"></script>
+    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/buttons.flash.js') }}"
+            type="text/javascript"></script>
+    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/buttons.print.js') }}"
+            type="text/javascript"></script>
+    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/buttons.colVis.js') }}"
+            type="text/javascript"></script>
+    <script src="{{ asset('public/lib/datatables/plugins/buttons/js/buttons.bootstrap.js') }}"
+            type="text/javascript"></script>
+    <script src="{{ asset('public/js/app-tables-datatables.js?v='.$version) }}" type="text/javascript"></script>
+
     <script src="{{ asset('public/lib/jquery-ui/jquery-ui.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/lib/jquery.nestable/jquery.nestable.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/lib/moment.js/min/moment.min.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('public/lib/datetimepicker/js/bootstrap-datetimepicker.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('public/lib/datetimepicker/js/bootstrap-datetimepicker.min.js') }}"
+            type="text/javascript"></script>
     <script src="{{ asset('public/lib/select2/js/select2.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/lib/bootstrap-slider/js/bootstrap-slider.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/js/app-form-elements.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/lib/parsley/parsley.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('public/lib/jquery.niftymodals/dist/jquery.niftymodals.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('public/lib/jquery.niftymodals/dist/jquery.niftymodals.js') }}"
+            type="text/javascript"></script>
 
     <script src="{{ asset('public/js/file/fileinput.js?v='.$version) }}" type="text/javascript"></script>
     <script src="{{ asset('public/js/file/locales/es.js') }}" type="text/javascript"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/slim-select/2.7.0/slimselect.min.js"></script>
 
     <script type="text/javascript">
-      $(document).ready(function(){
-        //initialize the javascript
-        App.init();
-        App.formElements();
-        $('form').parsley();
-      });
-    </script> 
+        $(document).ready(function () {
+            //initialize the javascript
+            App.init();
+            //App.formElements();
+            App.dataTables();
+            $('form').parsley();
+        });
+    </script>
 
-    <script type="text/javascript">    
+    <script type="text/javascript">
+
+        document.addEventListener("DOMContentLoaded", function() {
+
+            let carpeta = $("#carpeta").val();
+            let _token = $("#token").val();
+            let link = '/buscar-proveedor';
+
+            //siempre que uses nifty modal usar esta libreria para poder abrir los modales
+            $.fn.niftyModal('setDefaults',{
+                overlaySelector: '.modal-overlay',
+                closeSelector: '.modal-close',
+                classAddAfterOpen: 'modal-show',
+            });
+
+            let select = new TomSelect("#empresa_asiento", {
+                valueField: 'id',
+                labelField: 'text',
+                searchField: 'text',
+                placeholder: "Escriba para buscar...",
+                preload: true, // carga inicial
+                load: function(query, callback) {
+                    let data = {
+                        _token: _token,
+                        busqueda: query
+                    };
+                    fetch(carpeta + link, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(data)
+                    })
+                        //fetch('/buscar-tipo-documento?q=' + encodeURIComponent(query))
+                        .then(response => response.json())
+                        .then(json => { callback(json); })
+                        .catch(() => { callback(); });
+                }
+            });
+
+            let select_reparable = new TomSelect("#empresa_asiento_reparable", {
+                valueField: 'id',
+                labelField: 'text',
+                searchField: 'text',
+                placeholder: "Escriba para buscar...",
+                preload: true, // carga inicial
+                load: function(query, callback) {
+                    let data = {
+                        _token: _token,
+                        busqueda: query
+                    };
+                    fetch(carpeta + link, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(data)
+                    })
+                        //fetch(carpeta + '/buscar-tipo-documento?q=' + encodeURIComponent(query))
+                        .then(response => response.json())
+                        .then(json => { callback(json); })
+                        .catch(() => { callback(); });
+                }
+            });
+
+            // ✅ Si hay valor por defecto, lo insertamos
+            if (defaultId) {
+                select.addOption({id: defaultId, text: defaultText}); // añade la opción
+                select.setValue(defaultId); // la selecciona
+            }
+
+            if (defaultIdReparable) {
+                select_reparable.addOption({id: defaultIdReparable, text: defaultTextReparable}); // añade la opción
+                select_reparable.setValue(defaultIdReparable); // la selecciona
+            }
+
+            window.selects = {};
+            document.querySelectorAll("select.slim").forEach(function(el) {
+                window.selects[el.id] = new SlimSelect({
+                    select: el,
+                    placeholder: 'Seleccione...',
+                    allowDeselect: true
+                })
+            })
+
+            $('.pnlasientos').hide();
+
+        });
 
            $('#file-otros').fileinput({
               theme: 'fa5',
@@ -149,7 +266,7 @@
             });
           @endforeach
 
-           
+
     </script>
 
 

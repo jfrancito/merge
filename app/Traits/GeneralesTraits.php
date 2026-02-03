@@ -1612,6 +1612,24 @@ trait GeneralesTraits
 
     }
 
+    private function anular_asiento_sic($empresa, $cod_contable, $usuario, $fecha)
+    {
+        $ind_operacion = 'A';
+        $stmt2 = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC [WEB].[ANULAR_EXTORNAR_ASIENTO] @TIPO_OPERACION = ?,
+                                                 @COD_EMPR = ?,
+                                                 @COD_CONTABLE = ?,
+                                                 @USUARIO_ANULACION = ?,
+                                                 @FEC_ANULACION_AUX = ?');
+
+        $stmt2->bindParam(1, $ind_operacion, PDO::PARAM_STR);
+        $stmt2->bindParam(2, $empresa, PDO::PARAM_STR);
+        $stmt2->bindParam(3, $cod_contable, PDO::PARAM_STR);
+        $stmt2->bindParam(4, $usuario, PDO::PARAM_STR);
+        $stmt2->bindParam(5, $fecha, PDO::PARAM_STR);
+        $stmt2->execute();
+
+    }
+
     private function ejecutarAsientosIUDConSalida(
         $IND_TIPO_OPERACION = 'I',
         $COD_EMPR = '',
