@@ -116,9 +116,6 @@
                                     </div>
                                 </div>
 
-
-
-
                                 <div id="rechazar" class="tab-pane">
                                     <div class="panel panel-default panel-border-color panel-border-color-primary">
                                         <div class="panel-heading panel-heading-divider">Extornar<span
@@ -138,8 +135,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-
                             </div>
                         </div>
                     </div>
@@ -148,7 +143,6 @@
             </div>
         </div>
     </div>
-
 @stop
 
 @section('script')
@@ -206,7 +200,7 @@
         });
     </script>
 
-    <script type="text/javascript">    
+    <script type="text/javascript">
 
       $('#file-otros').fileinput({
         theme: 'fa5',
