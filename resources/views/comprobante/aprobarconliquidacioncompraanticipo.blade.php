@@ -215,44 +215,10 @@
                 }
             });
 
-            let select_reparable = new TomSelect("#empresa_asiento_reparable", {
-                valueField: 'id',
-                labelField: 'text',
-                searchField: 'text',
-                placeholder: "Escriba para buscar...",
-                preload: true, // carga inicial
-                load: function (query, callback) {
-                    let data = {
-                        _token: _token,
-                        busqueda: query
-                    };
-                    fetch(carpeta + link, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(data)
-                    })
-                        //fetch(carpeta + '/buscar-tipo-documento?q=' + encodeURIComponent(query))
-                        .then(response => response.json())
-                        .then(json => {
-                            callback(json);
-                        })
-                        .catch(() => {
-                            callback();
-                        });
-                }
-            });
-
             // ✅ Si hay valor por defecto, lo insertamos
             if (defaultId) {
                 select.addOption({id: defaultId, text: defaultText}); // añade la opción
                 select.setValue(defaultId); // la selecciona
-            }
-
-            if (defaultIdReparable) {
-                select_reparable.addOption({id: defaultIdReparable, text: defaultTextReparable}); // añade la opción
-                select_reparable.setValue(defaultIdReparable); // la selecciona
             }
 
             window.selects = {};
