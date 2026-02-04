@@ -3268,7 +3268,8 @@ class GestionOCController extends Controller
                     $nombrefilecdr   =       $contadorArchivos.'-'.$ordenpago->COD_AUTORIZACION.'.pdf';
                     $valor           =      $this->versicarpetanoexiste($rutafile);
                     $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
-                    copy($file->getRealPath(),$rutacompleta);
+                    copy($rutaorden,$rutacompleta);
+                    //copy($file->getRealPath(),$rutacompleta);
                     $path            =      $rutacompleta;
 
                     $dcontrol                       =   new Archivo;
@@ -3286,6 +3287,7 @@ class GestionOCController extends Controller
                     $dcontrol->save();
 
                 }
+                //dd("bien");
 
                 $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$idop)->where('COD_ESTADO','=',1)->get();                
 
