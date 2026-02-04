@@ -477,7 +477,7 @@ class GestionOCTesoreriaController extends Controller
                         $documento->PORC_DETRACCION         =   0;
                         $documento->MONTO_DETRACCION        =   0;
                         $documento->MONTO_ANTICIPO          =   0;
-                        $documento->NRO_ORDEN_COMP          =   '';              
+                        $documento->NRO_ORDEN_COMP          =   '';
                         $documento->NUM_GUIA                =   '';
                         $documento->estadoCp                =   0;
                         $documento->ARCHIVO_XML             =   '';
@@ -841,7 +841,7 @@ class GestionOCTesoreriaController extends Controller
                     }
 
 
-
+                    /*
                     $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('COD_ESTADO', '<>', 'ETM0000000000006')->first();
                     $anio = $this->anio;
                     $empresa = Session::get('empresas')->COD_EMPR;
@@ -1089,7 +1089,7 @@ class GestionOCTesoreriaController extends Controller
 
                     } else {
                         $respuesta = 'GENERACIÓN INCORRECTA ASIENTO';
-                    }
+                    }*/
 
                     DB::commit();
                 } catch (\Exception $ex) {
@@ -1386,7 +1386,7 @@ class GestionOCTesoreriaController extends Controller
             $excel->sheet('COMPROBANTE', function($sheet) use ($listadatos,$titulo,$funcion) {
                 $sheet->loadView('reporte/excel/listacomprobantemasivotesoreriacomision')->with('listadatos',$listadatos)
                                                                    ->with('titulo',$titulo)
-                                                                   ->with('funcion',$funcion);                                               
+                                                                   ->with('funcion',$funcion);
             });
         })->export('xls');
 
@@ -1520,7 +1520,7 @@ class GestionOCTesoreriaController extends Controller
             'DOCUMENTO_INTERNO_PRODUCCION' => 'DOCUMENTO INTERNO PRODUCCION',
             'DOCUMENTO_INTERNO_SECADO' => 'DOCUMENTO INTERNO SECADO',
             'DOCUMENTO_SERVICIO_BALANZA' => 'DOCUMENTO POR SERVICIO DE BALANZA',
-            'DOCUMENTO_INTERNO_COMPRA' => 'DOCUMENTO INTERNO COMPRA',                                     
+            'DOCUMENTO_INTERNO_COMPRA' => 'DOCUMENTO INTERNO COMPRA',
             'LIQUIDACION_COMPRA_ANTICIPO' => 'LIQUIDACION DE COMPRA ANTICIPO',
             'PROVISION_GASTO' => 'PROVISION DE GASTO',
             'NOTA_CREDITO' => 'NOTA DE CREDITO',
