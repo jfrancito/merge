@@ -2380,6 +2380,8 @@ class GestionPlanillaMovilidadController extends Controller
                                 ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
                                 ->where('dni', $dni)
                                 ->first();
+
+        //dd($dni);
         if(count($trabajadorespla)>0){
             $centro_id      =       $trabajadorespla->centro_osiris_id;
         }
