@@ -8864,31 +8864,33 @@ trait ComprobanteTraits
 
         }else{
 
-        $listadatos         =       VMergeOP::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
-                                        $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEOP.COD_AUTORIZACION')
-                                            ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
-                                    })                                    
-                                    ->where('VMERGEOP.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                                    ->where(function ($query) {
-                                        $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
-                                              ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
-                                              ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
-                                    })                                    
-                                    ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
-                                    ->where('COD_CENTRO','=',$centro_id)                                    
-                                    ->select(DB::raw('  COD_AUTORIZACION,
-                                                        FEC_EMISION,
-                                                        TXT_CATEGORIA_MONEDA,
-                                                        TXT_EMPR_EMISOR,
-                                                        COD_USUARIO_CREA_AUD,
-                                                        CAN_TOTAL,
-                                                        TXT_SERIE,
-                                                        TXT_NUMERO,                                                               
-                                                        FE_DOCUMENTO.ID_DOCUMENTO,
-                                                        FE_DOCUMENTO.COD_ESTADO,
-                                                        FE_DOCUMENTO.TXT_ESTADO
-                                                    '))
-                                    ->get();
+            $listadatos         =       VMergeOP::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                            $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEOP.COD_AUTORIZACION')
+                                                ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                                        })                                        
+                                        ->where('VMERGEOP.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                        ->where(function ($query) {
+                                            $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
+                                                  ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
+                                                  ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
+                                        })                                        
+                                        ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
+                                        ->where('COD_CENTRO','=',$centro_id)   
+                                        ->select(DB::raw('  COD_AUTORIZACION,
+                                                            FEC_EMISION,
+                                                            TXT_CATEGORIA_MONEDA,
+                                                            TXT_EMPRESA,
+                                                            COD_USUARIO_CREA_AUD,
+                                                            CAN_TOTAL,
+                                                            TXT_SERIE,
+                                                            TXT_NUMERO,                                                               
+                                                            FE_DOCUMENTO.ID_DOCUMENTO,
+                                                            FE_DOCUMENTO.COD_ESTADO,
+                                                            FE_DOCUMENTO.TXT_ESTADO
+                                                        '))
+                                        ->get();
+
+
 
         //dd($centro_id);
 
