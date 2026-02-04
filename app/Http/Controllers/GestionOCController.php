@@ -3265,15 +3265,11 @@ class GestionOCController extends Controller
                     /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
                     $prefijocarperta =      $this->prefijo_empresa($ordenpago->COD_EMPR);
                     $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordenpago->NRO_DOC;                            
-                    $nombrefilecdr   =      $contadorArchivos.'-LCA-'.$file->getClientOriginalName();
+                    $nombrefilecdr   =       $contadorArchivos.'-'.$ordenpago->COD_AUTORIZACION.'.pdf';
                     $valor           =      $this->versicarpetanoexiste($rutafile);
                     $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
                     copy($file->getRealPath(),$rutacompleta);
                     $path            =      $rutacompleta;
-
-                    $nombreoriginal             =   $file->getClientOriginalName();
-                    $info                       =   new SplFileInfo($nombreoriginal);
-                    $extension                  =   $info->getExtension();
 
                     $dcontrol                       =   new Archivo;
                     $dcontrol->ID_DOCUMENTO         =   $ordenpago->COD_AUTORIZACION;
@@ -3282,9 +3278,9 @@ class GestionOCController extends Controller
                     $dcontrol->NOMBRE_ARCHIVO       =   $nombrefilecdr;
                     $dcontrol->DESCRIPCION_ARCHIVO  =   $aoc->NOM_CATEGORIA_DOCUMENTO;
                     $dcontrol->URL_ARCHIVO      =   $path;
-                    $dcontrol->SIZE             =   filesize($file);
-                    $dcontrol->EXTENSION        =   $extension;
-                    $dcontrol->ACTIVO           =   1;
+                    $dcontrol->SIZE                 =       100;
+                    $dcontrol->EXTENSION            =       '.pdf';
+                    $dcontrol->ACTIVO               =       1;
                     $dcontrol->FECHA_CREA       =   $this->fechaactual;
                     $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
                     $dcontrol->save();
