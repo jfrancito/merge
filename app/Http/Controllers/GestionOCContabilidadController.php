@@ -5952,7 +5952,7 @@ class GestionOCContabilidadController extends Controller
             $usuario = Session::get('usuario')->id;
 
             $asiento_compra = $this->ejecutarSP(
-                "EXEC [WEB].[GENERAR_ASIENTO_COMPRAS_FE_DOCUMENTO]
+                "EXEC [WEB].[GENERAR_ASIENTO_COMPRAS_FE_DOCUMENTO_COMISION]
                 @anio = :anio,
                 @empresa = :empresa,
                 @cod_contable = :cod_contable,
@@ -9857,6 +9857,9 @@ class GestionOCContabilidadController extends Controller
                             'ID_DOCUMENTO' => $idoc . 'X'
                         ]
                     );
+
+                $this->anular_asiento_sic(Session::get('empresas')->COD_EMPR,$idoc,Session::get('usuario')->id,'1901-01-01');
+
                 //LE LLEGA AL USUARIO DE CONTACTO
                 // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
                 // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
@@ -9969,6 +9972,7 @@ class GestionOCContabilidadController extends Controller
                             'ID_DOCUMENTO' => $idoc . 'X'
                         ]
                     );
+                $this->anular_asiento_sic(Session::get('empresas')->COD_EMPR,$idoc,Session::get('usuario')->id,'1901-01-01');
                 //LE LLEGA AL USUARIO DE CONTACTO
                 // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
                 // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
@@ -10081,6 +10085,7 @@ class GestionOCContabilidadController extends Controller
                             'ID_DOCUMENTO' => $idoc . 'X'
                         ]
                     );
+                $this->anular_asiento_sic(Session::get('empresas')->COD_EMPR,$idoc,Session::get('usuario')->id,'1901-01-01');
                 //LE LLEGA AL USUARIO DE CONTACTO
                 // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
                 // $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
@@ -10300,7 +10305,7 @@ class GestionOCContabilidadController extends Controller
                             'USUARIO_MOD' => Session::get('usuario')->id,
                             'COD_ESTADO' => '0'
                         ]);
-
+                $this->anular_asiento_sic(Session::get('empresas')->COD_EMPR,$idoc,Session::get('usuario')->id,'1901-01-01');
                 DB::commit();
                 Session::flash('operacion_id', $request['operacion_id']);
                 return Redirect::to('/gestion-de-contabilidad-aprobar/' . $idopcion)->with('bienhecho', 'Comprobante : ' . $idoc . ' EXTORNADO CON EXITO');
@@ -10412,7 +10417,9 @@ class GestionOCContabilidadController extends Controller
                         ]
                     );
 
+                $this->anular_asiento_sic(Session::get('empresas')->COD_EMPR,$idoc,Session::get('usuario')->id,'1901-01-01');
 
+                /*
                 $stmt = DB::connection('sqlsrv')->getPdo()->prepare('SET NOCOUNT ON;EXEC WEB.LISTAR_FORMATO_ASIENTOS_VENTAS
                                                             @FECHA_INICIO = ?,
                                                             @FECHA_FIN = ?,
@@ -10423,7 +10430,7 @@ class GestionOCContabilidadController extends Controller
                 $stmt->bindParam(2, $fecha_fin, PDO::PARAM_STR);
                 $stmt->bindParam(3, $cod_empresa, PDO::PARAM_STR);
                 $stmt->bindParam(4, $emitido, PDO::PARAM_STR);
-                $stmt->execute();
+                $stmt->execute();*/
 
                 //LE LLEGA AL USUARIO DE CONTACTO
                 // $trabajador         =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();

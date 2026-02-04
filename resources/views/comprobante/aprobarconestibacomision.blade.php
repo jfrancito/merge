@@ -225,7 +225,7 @@
                         });
                 }
             });
-
+/*
             let select_reparable = new TomSelect("#empresa_asiento_reparable", {
                 valueField: 'id',
                 labelField: 'text',
@@ -253,18 +253,18 @@
                             callback();
                         });
                 }
-            });
+            });*/
 
             // ✅ Si hay valor por defecto, lo insertamos
             if (defaultId) {
                 select.addOption({id: defaultId, text: defaultText}); // añade la opción
                 select.setValue(defaultId); // la selecciona
             }
-
+/*
             if (defaultIdReparable) {
                 select_reparable.addOption({id: defaultIdReparable, text: defaultTextReparable}); // añade la opción
                 select_reparable.setValue(defaultIdReparable); // la selecciona
-            }
+            }*/
 
             window.selects = {};
             document.querySelectorAll("select.slim").forEach(function (el) {
