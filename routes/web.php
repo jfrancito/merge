@@ -585,6 +585,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-modal-detalle-entregable', 'GestionEntregaDocumentoController@actionModalEntregaDocumentoFolio');
 	Route::any('/descargar-folio-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarDocumentoFolio');
 	Route::any('/descargar-folio-dic-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarDocumentoDICFolio');
+	Route::any('/descargar-folio-lca-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarDocumentoLCAFolio');
+
 
 	Route::any('/ajax-modal-detalle-deuda-contrato', 'GestionEntregaDocumentoController@actionModaDetalleDeudaContrato');
 	Route::any('/entrega-masivo-excel/{operacion_id}/{idopcion}', 'GestionEntregaDocumentoController@actionEntregableMasivoExcel');

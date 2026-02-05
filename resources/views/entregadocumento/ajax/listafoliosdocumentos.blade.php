@@ -30,25 +30,27 @@
           <div class="btn-group btn-hspace">
             <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>
             <ul role="menu" class="dropdown-menu pull-right">
-
               @if($item->OPERACION=='DOCUMENTO_INTERNO_COMPRA')
-
                 <li>
                   <a href="{{ url('/descargar-folio-dic-excel/'.$item->FOLIO) }}">
                     Descargar Resumen
                   </a>  
                 </li>
-
               @else
-                <li>
-                  <a href="{{ url('/descargar-folio-excel/'.$item->FOLIO) }}">
-                    Descargar Resumen
-                  </a>  
-                </li>
+                @if($item->OPERACION=='LIQUIDACION_COMPRA_ANTICIPO')
+                  <li>
+                    <a href="{{ url('/descargar-folio-lca-excel/'.$item->FOLIO) }}">
+                      Descargar Resumen
+                    </a>  
+                  </li>
+                @else
+                  <li>
+                    <a href="{{ url('/descargar-folio-excel/'.$item->FOLIO) }}">
+                      Descargar Resumen
+                    </a>  
+                  </li>
+                @endif
               @endif
-
-
-
               @if($item->OPERACION=='CONTRATO')
                 @include('entregadocumento.excel.opcionct')
               @else
