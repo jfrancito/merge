@@ -20,6 +20,23 @@ use table;
 class Funcion {
 
 
+	public function cuenta_osiris_lca_folio($id_documento){
+
+		$nombre = 	'';
+
+
+		$lote 	= 	DB::table('TES.AUTORIZACION')
+					->where('COD_AUTORIZACION', $id_documento)
+					->first();
+
+		if(count($lote)>0){
+			$nombre = 	$lote->TXT_EMPRESA;
+		}
+		
+		return $nombre;
+	}
+
+
 	public function cuenta_osiris_lca($id_documento){
 
 		$nombre = 	'';
