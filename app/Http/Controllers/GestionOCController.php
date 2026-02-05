@@ -918,7 +918,16 @@ class GestionOCController extends Controller
         }
 
         $categoria_id   =   $this->con_categoria_canje($operacion_id);
-        $combo_proveedor=   $this->con_combo_cabecera_estibas_administrativo($cod_empresa,$area_id,$categoria_id);
+
+        if($operacion_id == 'DOCUMENTO_INTERNO_COMPRA'){
+            $combo_proveedor=   $this->con_combo_cabecera_estibas_administrativo_dic($cod_empresa,$area_id,$categoria_id);
+        }else{
+
+            $combo_proveedor=   $this->con_combo_cabecera_estibas_administrativo($cod_empresa,$area_id,$categoria_id);
+
+        }
+
+
         $procedencia    =   'ADM';
         $funcion        =   $this;
         return View::make('comprobante/combo/combo_proveedor',

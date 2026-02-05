@@ -9232,7 +9232,96 @@ trait ComprobanteTraits
 
     }
 
+    private function con_combo_cabecera_estibas_administrativo_dic($cliente_id,$area_id,$categoria_id) {
 
+        $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+
+        $array_trabajadores  =      STDTrabajador::where('NRO_DOCUMENTO','=',$trabajador->NRO_DOCUMENTO)
+                                    ->pluck('COD_TRAB')
+                                    ->toArray();
+
+        $array_usuarios      =      SGDUsuario::whereIn('COD_TRABAJADOR',$array_trabajadores)
+                                    ->pluck('COD_USUARIO')
+                                    ->toArray();
+        $estado_no          =       'ETM0000000000006';
+        $centro_id          =       $trabajador->COD_ZONA_TIPO;
+        $tipodoc_id         =       $categoria_id;
+
+
+        $array_usuarios     =       SGDUsuario::Area($area_id)
+                                    ->whereNotNull('COD_CATEGORIA_AREA')
+                                    ->pluck('COD_USUARIO')
+                                    ->toArray();
+
+
+        //marilu
+        if(Session::get('usuario')->name=='MPACHECU'){
+            array_push($array_usuarios, 'HPEREZAL');
+        }
+
+
+
+        if(Session::get('usuario')->id== '1CIX00000001'){
+
+            $listadatos         =       VMergeDocumento::leftJoin('FE_REF_ASOC', function ($leftJoin){
+                                            $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
+                                                ->where('FE_REF_ASOC.COD_ESTADO', '=', '1');
+                                        })
+                                        ->leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                            $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                                                ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                                        })
+                                        //->WHERE('VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE','=','IICHEST000068311')
+                                        ->where('VMERGEDOCUMENTOS.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                        ->where(function ($query) {
+                                            $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
+                                                  ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
+                                                  ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
+                                        })
+                                        ->WHERE('VMERGEDOCUMENTOS.COD_ESTADO','=','1')
+                                        ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
+                                        ->select(DB::raw(' 
+                                                            COD_EMPR_EMISOR,
+                                                            TXT_EMPR_EMISOR
+                                                        '))
+                                        ->pluck('TXT_EMPR_EMISOR','COD_EMPR_EMISOR')
+                                        ->toArray();
+                          
+
+        }else{
+
+
+            $listadatos         =       VMergeDocumento::leftJoin('FE_REF_ASOC', function ($leftJoin){
+                                            $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
+                                                ->where('FE_REF_ASOC.COD_ESTADO', '=', '1');
+                                        })
+                                        ->leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                            $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                                                ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
+                                        })
+                                        //->WHERE('VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE','=','IICHEST000068311')
+                                        ->where('VMERGEDOCUMENTOS.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                        ->where(function ($query) {
+                                            $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
+                                                  ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
+                                                  ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
+                                        })
+                                        ->WHERE('VMERGEDOCUMENTOS.COD_ESTADO','=','1')
+                                        ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
+                                        ->select(DB::raw(' 
+                                                            COD_EMPR_EMISOR,
+                                                            TXT_EMPR_EMISOR
+                                                        '))
+                                        ->pluck('TXT_EMPR_EMISOR','COD_EMPR_EMISOR')
+                                        ->toArray();
+
+
+        }
+
+        $combo                  =   array(''=>'Seleccionar Porveedor') + $listadatos;
+        return  $combo; 
+
+    }
 
 
 

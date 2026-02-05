@@ -61,6 +61,9 @@ Route::any('/leerpreciocompetencia', 'PrecioCompetenciaController@actionScrapear
 Route::any('/transferirdataventas', 'TransferirDataController@actionTransferirVentasAtendidas');//TRANSFERIR DATA AGENTE IA
 Route::any('/documentolgautomatico', 'PrecioCompetenciaController@actionDocumentoLGAutomatico');//TRANSFERIR DATA AGENTE IA
 Route::any('/enviocorreotesorerialg', 'UserController@actionCorreoTesoreriaLg');//correo para usuario contacto
+Route::any('/detraccionsunat', 'UserController@actionDetraccionSunat');//correo para usuario contacto
+
+
 Route::any('/guardardocumentacionlq', 'PrecioCompetenciaController@actionDocumentoLGAutomaticoNuevo');//correo para usuario contacto
 Route::any('/enviocorreoreparacionlevantada', 'UserController@actionCorreoReparacionLevantada');//correo para usuario contacto
 Route::any('/guardarpdfoi', 'PrecioCompetenciaController@actionGuardarPdfOi');//correo para usuario contacto
@@ -74,6 +77,8 @@ Route::any('/enviocorreoaprobado', 'UserController@actionCorreoAprobado');//corr
 
 Route::any('/enviocorreoaprobadoadmin', 'UserController@actionCorreoAprobadoAdmin');//correo para jefe acopio liuidacion compra
 Route::any('/crearexceladminaprobado', 'UserController@actionCrearExcelAprobadoAdmin');//correo para jefe acopio liuidacion compra
+
+
 
 Route::group(['middleware' => ['authaw']], function () {
 
