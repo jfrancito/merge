@@ -1166,6 +1166,11 @@ class UserController extends Controller {
 		$this->envio_correo_jefeacopiodic();
 	}
 
+    public function actionDetraccionSunat()
+	{
+		$this->envio_detraccion_sunat();
+	}
+
 
     public function actionCorreoJefeAcopioLqc()
 	{
