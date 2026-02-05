@@ -25,7 +25,6 @@
 		      <th>PROVEEDOR</th>
 		      <th>BANCO</th>
 		      <th>CUENTA ABONO</th>
-		      <th>COMPROBANTE ASOCIADO</th>
 		      <th>FECHA APROBACION ADMIN</th>
 		      <th>SUBIO VOUCHER</th>
 
@@ -45,7 +44,7 @@
 		  <tbody>
 		  	@php $monto_total =  0; @endphp
 		    @foreach($listadatos as $index => $item)
-		       @php $NOMBRE_OSIRIS =  $funcion->funciones->cuenta_osiris_lca($item->ID_DOCUMENTO) @endphp
+		       @php $NOMBRE_OSIRIS =  $funcion->funciones->cuenta_osiris_lca_folio($item->ID_DOCUMENTO) @endphp
 		      <tr>
 		        <td>{{$index + 1}}</td>
 		        <td>{{$item->OPERACION}}</td>
