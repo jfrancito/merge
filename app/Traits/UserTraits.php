@@ -75,6 +75,12 @@ trait UserTraits
 
             if ($data['cod'] == 200 && isset($data['resultado'])) {
                 foreach ($data['resultado'] as $registro) {
+                    $timestamp_ms = $registro['fec_pago'];
+                    // Convertir a segundos (dividir entre 1000)
+                    $timestamp_segundos = $timestamp_ms / 1000;
+                    // Obtener fecha
+                    $fecha = date('Ymd H:i:s', $timestamp_segundos);
+
 
 
                     $documento                              =   new DetraccionSunat;
@@ -98,7 +104,7 @@ trait UserTraits
 
                     $documento->mto_deposito                =   $registro['mto_deposito'];
                     $documento->num_comprobante             =   $registro['num_comprobante'];
-                    $documento->fec_pago                    =   $registro['fec_pago'];
+                    $documento->fec_pago                    =   $fecha;
                     $documento->tip_doc_adq                 =   $registro['tip_doc_adq'];
                     $documento->num_serie                   =   $registro['num_serie'];
 
