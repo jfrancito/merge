@@ -9263,15 +9263,21 @@ trait ComprobanteTraits
 
         if(Session::get('usuario')->id== '1CIX00000001'){
 
-            $listadatos         =       VMergeDocumento::leftJoin('FE_REF_ASOC', function ($leftJoin){
-                                            $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
-                                                ->where('FE_REF_ASOC.COD_ESTADO', '=', '1');
+            $listadatos         =       VMergeDocumento::leftJoin('VMERGEDOCUMENTO_INTERNO_COMPRA', function($leftJoin) {
+                                                $leftJoin->on('VMERGEDOCUMENTO_INTERNO_COMPRA.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE');
                                         })
                                         ->leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
-                                            $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                                            $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTO_INTERNO_COMPRA.LOTE')
                                                 ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
                                         })
                                         //->WHERE('VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE','=','IICHEST000068311')
+                                        ->where('VMERGEDOCUMENTOS.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                        ->where(function ($query) {
+                                            $query->where('VMERGEDOCUMENTO_INTERNO_COMPRA.ESTATUS', '=', 'OFF')
+                                                  ->orWhereNull('VMERGEDOCUMENTO_INTERNO_COMPRA.ESTATUS')
+                                                  ->orwhere('VMERGEDOCUMENTO_INTERNO_COMPRA.ESTATUS', '=', '')
+                                                  ->orWhereRaw("CAN_TOTAL <> COALESCE(VMERGEDOCUMENTO_INTERNO_COMPRA.TOTAL_MERGE, 0)");
+                                        })
                                         ->where('VMERGEDOCUMENTOS.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                         ->where(function ($query) {
                                             $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
@@ -9286,20 +9292,29 @@ trait ComprobanteTraits
                                                         '))
                                         ->pluck('TXT_EMPR_EMISOR','COD_EMPR_EMISOR')
                                         ->toArray();
+
+
+
                           
 
         }else{
 
 
-            $listadatos         =       VMergeDocumento::leftJoin('FE_REF_ASOC', function ($leftJoin){
-                                            $leftJoin->on('FE_REF_ASOC.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE')
-                                                ->where('FE_REF_ASOC.COD_ESTADO', '=', '1');
+            $listadatos         =       VMergeDocumento::leftJoin('VMERGEDOCUMENTO_INTERNO_COMPRA', function($leftJoin) {
+                                                $leftJoin->on('VMERGEDOCUMENTO_INTERNO_COMPRA.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE');
                                         })
                                         ->leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
-                                            $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
+                                            $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEDOCUMENTO_INTERNO_COMPRA.LOTE')
                                                 ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
                                         })
                                         //->WHERE('VMERGEDOCUMENTOS.COD_DOCUMENTO_CTBLE','=','IICHEST000068311')
+                                        ->where('VMERGEDOCUMENTOS.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                        ->where(function ($query) {
+                                            $query->where('VMERGEDOCUMENTO_INTERNO_COMPRA.ESTATUS', '=', 'OFF')
+                                                  ->orWhereNull('VMERGEDOCUMENTO_INTERNO_COMPRA.ESTATUS')
+                                                  ->orwhere('VMERGEDOCUMENTO_INTERNO_COMPRA.ESTATUS', '=', '')
+                                                  ->orWhereRaw("CAN_TOTAL <> COALESCE(VMERGEDOCUMENTO_INTERNO_COMPRA.TOTAL_MERGE, 0)");
+                                        })
                                         ->where('VMERGEDOCUMENTOS.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                         ->where(function ($query) {
                                             $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
@@ -9314,7 +9329,6 @@ trait ComprobanteTraits
                                                         '))
                                         ->pluck('TXT_EMPR_EMISOR','COD_EMPR_EMISOR')
                                         ->toArray();
-
 
         }
 
