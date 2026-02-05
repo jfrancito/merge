@@ -45,6 +45,8 @@
         <th class="tablaho">CENTRO COSTO</th>
         <th class="tablaho">GLOSA</th>
         <th class="tablaho">USUARIO</th>
+        <th class="tablaho">USUARIO</th>
+
     </tr>
     </thead>
     <tbody>
@@ -54,7 +56,9 @@
             <td class="border">{{ $item['NOM_CENTRO'] }}</td>
             <td class="border">{{ $item['TRABAJADOR'] }}</td>
             <td class="border">
-                {{ \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel(new \DateTime($item['FECHA_LIQUIDACION'])) }}
+                @if(!empty($item['FECHA_LIQUIDACION']))
+                    {{ \Carbon\Carbon::parse($item['FECHA_LIQUIDACION'])->format('d/m/Y') }}
+                @endif
             </td>
             <td class="border">{{ $item['MES'] }}</td>
             <td class="border">{{ $item['NRO_LIQUIDACION'] }}</td>
@@ -64,7 +68,7 @@
             <td class="border">{{ $item['NRO_DOCUMENTO'] }}</td>
             <td class="border">
                 @if(!empty($item['FEC_EMISION']))
-                    {{ \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel(new \DateTime($item['FEC_EMISION'])) }}
+                    {{ \Carbon\Carbon::parse($item['FEC_EMISION'])->format('d/m/Y') }}
                 @endif
             </td>
             <td class="border">{{ $item['PRODUCTO'] }}</td>
@@ -74,6 +78,7 @@
             <td class="border">{{ $item['CENTRO_COSTO'] }}</td>
             <td class="border">{{ $item['GLOSA'] }}</td>
             <td class="border">{{ $item['USUARIO_REGISTRO'] }}</td>
+            <td class="border">{{ $item['AUTORIZA'] }}</td>
         </tr>
         @php
             $total_soles += $item['MONTO_DOCUMENTO_SOLES'];
