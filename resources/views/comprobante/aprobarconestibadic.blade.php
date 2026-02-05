@@ -328,8 +328,11 @@
             language: 'es',
             allowedFileExtensions: ['pdf'],
         });
+
+        let nombre_archivo = ''
+
         @foreach($archivospdf as $index => $item)
-        let nombre_archivo = '{{$item->NOMBRE_ARCHIVO}}';
+        nombre_archivo = '{{$item->NOMBRE_ARCHIVO}}';
 
         $('#file-' + {{$index}}).fileinput({
             theme: 'fa5',
