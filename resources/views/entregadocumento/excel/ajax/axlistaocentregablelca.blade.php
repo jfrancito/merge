@@ -63,7 +63,9 @@
 		            @ENDIF
 		        </td>
 
-		        <td><b>{{$item->TOTAL_VENTA_ORIG}}</b></td>
+
+				<td><b>{{number_format($item->TOTAL_VENTA_ORIG, 2, '.', ',')}}</b></td>
+
 		        <td>
 		          @IF($item->MONTO_DETRACCION_RED>0)
 		            DETRACION
