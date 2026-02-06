@@ -17,6 +17,9 @@
                 <button type="button" class="btn btn-sm btn-primary ver-asiento">
                     👁 Ver Asiento
                 </button>
+                <button type="button" class="btn btn-sm btn-danger eliminar-fila">
+                    🗑 Eliminar
+                </button>
             </td>
         </tr>
     @endif
@@ -27,6 +30,9 @@
             <td>
                 <button type="button" class="btn btn-sm btn-primary ver-asiento">
                     👁 Ver Asiento
+                </button>
+                <button type="button" class="btn btn-sm btn-danger eliminar-fila">
+                    🗑 Eliminar
                 </button>
             </td>
         </tr>
@@ -39,6 +45,9 @@
                 <button type="button" class="btn btn-sm btn-primary ver-asiento">
                     👁 Ver Asiento
                 </button>
+                <button type="button" class="btn btn-sm btn-danger eliminar-fila">
+                    🗑 Eliminar
+                </button>
             </td>
         </tr>
     @endif
@@ -49,6 +58,9 @@
             <td>
                 <button type="button" class="btn btn-sm btn-primary ver-asiento">
                     👁 Ver Asiento
+                </button>
+                <button type="button" class="btn btn-sm btn-danger eliminar-fila">
+                    🗑 Eliminar
                 </button>
             </td>
         </tr>
