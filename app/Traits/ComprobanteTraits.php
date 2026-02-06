@@ -7754,6 +7754,7 @@ trait ComprobanteTraits
                                             $join->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'oi.COD_TABLA')
                                                  ->addBinding($oi->getBindings());
                                         })
+                                    ->whereRaw('CAST(FE_DOCUMENTO.TOTAL_VENTA_ORIG AS FLOAT) = CAST(documentos.CAN_TOTAL AS FLOAT)')
                                     ->where('FOLIO','=',$folio)
                                     ->where('CMP.ORDEN.COD_CATEGORIA_MONEDA','=',$moneda_id)
                                     ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
@@ -7761,6 +7762,8 @@ trait ComprobanteTraits
                                         FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_VOUCHER'))
                                     ->orderBy('documentos.FEC_VENCIMIENTO','asc')
                                     ->get();
+
+
         return  $listadatos;
     }
 
@@ -8221,6 +8224,7 @@ trait ComprobanteTraits
                                          ->where('CMP.REFERENCIA_ASOC.TXT_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE');
                                 })
                                 ->where('CMP.REFERENCIA_ASOC.COD_ESTADO', 1)
+                                ->whereRaw('CAST(FE_DOCUMENTO.TOTAL_VENTA_ORIG AS FLOAT) = CAST(CMP.DOCUMENTO_CTBLE.CAN_TOTAL AS FLOAT)')
                                 ->where('FE_DOCUMENTO.FOLIO', $folio)
                                 ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_MONEDA','=',$moneda_id)
                                 ->whereIn('FE_DOCUMENTO.OPERACION',$this->con_array_canjes())
