@@ -886,6 +886,7 @@ trait ComprobanteTraits
                                         ->where('FE_DOCUMENTO.usuario_pa','=',Session::get('usuario')->id)
                                         //->whereIn('CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD',$array_usuarios)
                                         ->where('FE_DOCUMENTO.COD_ESTADO', 'ETM0000000000005')
+                                        ->whereRaw('CAST(FE_DOCUMENTO.TOTAL_VENTA_ORIG AS FLOAT) = CAST(CMP.DOCUMENTO_CTBLE.CAN_TOTAL AS FLOAT)')
                                         //->where('FE_DOCUMENTO.ID_DOCUMENTO', '00000180')
                                         ->where('FE_DOCUMENTO.OPERACION', $operacion_id)
                                         ->where(function ($query) {
@@ -914,6 +915,7 @@ trait ComprobanteTraits
                                         ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO','=',$banco_id)
                                         ->whereIn('CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD',$array_usuarios)
                                         ->where('FE_DOCUMENTO.COD_ESTADO', 'ETM0000000000005')
+                                        ->whereRaw('CAST(FE_DOCUMENTO.TOTAL_VENTA_ORIG AS FLOAT) = CAST(CMP.DOCUMENTO_CTBLE.CAN_TOTAL AS FLOAT)')
                                         ->where(function ($query) {
                                             $query->where('FOLIO', '=', '');
                                             $query->orWhereNull('FOLIO');
