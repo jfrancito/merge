@@ -430,6 +430,7 @@ class GestionOCTesoreriaController extends Controller
                             ->pluck('ID_DOCUMENTO')
                             ->toArray();
                         $documento_asociados = $this->gn_lista_comision_asociados_atendidos($lotes, $lote);
+                        //dd($documento_asociados);
                         $total = 0;
                         foreach ($documento_asociados as $index => $item) {
 
