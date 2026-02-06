@@ -43,8 +43,8 @@ trait UserTraits
             ->where('TIPO', 'DETRACCIONES')
             ->get();
 
-        $fechaInicio = '01/01/2026';
-        $fechaFin = '31/01/2026';
+        $fechaInicio = '01/01/2025';
+        $fechaFin = '31/01/2025';
         // Para iterar sobre los resultados
         foreach ($empresas as $item) {
             $curl = curl_init();
