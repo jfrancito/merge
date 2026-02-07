@@ -62,6 +62,8 @@
     <table>
         <tr>
             <th class= 'tabladp'>FECHA EMISIÓN DE COMPROBANTE</th>
+            <th class= 'tabladp'>FECHA REVISION CONTABILIDAD</th>
+
             <th class= 'tabladp'>FECHA AUTORIZACION</th>
             <th class= 'tabladp'>TIPO DE DOCUMENTO</th>
             <th class= 'tabladp'>CODIGO DE DOCUMENTO</th>
@@ -92,7 +94,8 @@
             <th class= 'tabladp'>USUARIO CONTACTO</th>
             <th class= 'tabladp'>REPARABLE</th>
             <th class= 'tabladp'>MENSAJE REPARABLE</th>
-            <th class= 'tabladp'>FECHA SE LEVANTO REPARABLE</th>
+            <th class= 'tabladp'>FECHA SE LEVANTO REPARABLE (USUARIO)</th>
+            <th class= 'tabladp'>FECHA SE LEVANTO REPARABLE (CONTA)</th>
 
             <th class= 'tabladp'>MEDIO PAGO</th>
             <th class= 'tabladp'>FECHA PAGO</th>
@@ -104,6 +107,8 @@
         @foreach($listadatos as $index => $item) 
         <tr>
             <td>{{date_format(date_create($item->FEC_VENTA), 'd-m-Y')}}</td>
+            <td>{{date_format(date_create($item->fecha_pr), 'd-m-Y')}}</td>
+            
             <td>{{date_format(date_create($item->fecha_ap), 'd-m-Y h:i:s')}}</td>
             <td>
                 @if($item->ID_TIPO_DOC == '01')
@@ -183,6 +188,8 @@
             </td>
             <td>{{$item->productos_reparable}}</td>
             <td>{{$item->fecha_reparable}}</td>
+            <td>{{$item->fecha_reparable_conta}}</td>
+            
             <td>{{$item->MEDIO_PAGO}}</td>
             <td>{{$item->FECHA_PAGO}}</td>
             <td>{{$item->NOMBRE_BANCO}}</td>

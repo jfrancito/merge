@@ -30,7 +30,7 @@ use App\Modelos\FeRefAsoc;
 use App\Modelos\CONRegistroCompras;
 use App\Modelos\FeDocumentoGeolocalizacion;
 use App\Modelos\VMergeDocumentoPg;
-
+use App\Modelos\VDetraccionesConPagos;
 
 use App\Modelos\Estado;
 use App\Modelos\CMPDetalleProducto;
@@ -4096,7 +4096,7 @@ trait ComprobanteTraits
                                         SELECT '// ' + d2_interno.MENSAJE
                                         FROM FE_DOCUMENTO_HISTORIAL d2_interno
                                         WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
-                                          AND FE_DOCUMENTO.IND_REPARABLE = 1
+                                          AND (FE_DOCUMENTO.IND_REPARABLE = 1 OR FE_DOCUMENTO.IND_REPARABLE = 2)
                                           AND TIPO LIKE 'DOCUMENTO ARCHIVO_%' 
                                         FOR XML PATH('')
                                     ), 1, 2, ''
@@ -4114,6 +4114,17 @@ trait ComprobanteTraits
                                     ), 1, 2, ''
                                 )
                             ) AS fecha_reparable,
+                            (
+                                SELECT STUFF(
+                                    (
+                                        SELECT '// ' + CONVERT(VARCHAR(20), d4_interno.FECHA, 106)
+                                        FROM FE_DOCUMENTO_HISTORIAL d4_interno
+                                        WHERE d4_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                                        AND TIPO = 'APROBADO DOCUMENTO REPARABLE' 
+                                        FOR XML PATH('')
+                                    ), 1, 2, ''
+                                )
+                            ) AS fecha_reparable_conta,
 
                             WEBPAGOSOC.MEDIO_PAGO,
                             WEBPAGOSOC.FECHA_PAGO,
@@ -4194,7 +4205,7 @@ trait ComprobanteTraits
                                     SELECT '// ' + d2_interno.MENSAJE
                                     FROM FE_DOCUMENTO_HISTORIAL d2_interno
                                     WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
-                                      AND FE_DOCUMENTO.IND_REPARABLE = 1
+                                      AND (FE_DOCUMENTO.IND_REPARABLE = 1 OR FE_DOCUMENTO.IND_REPARABLE = 2)
                                       AND TIPO LIKE 'DOCUMENTO ARCHIVO_%' 
                                     FOR XML PATH('')
                                 ), 1, 2, ''
@@ -4212,7 +4223,18 @@ trait ComprobanteTraits
                                     ), 1, 2, ''
                                 )
                             ) AS fecha_reparable,
-                        
+                            (
+                                SELECT STUFF(
+                                    (
+                                        SELECT '// ' + CONVERT(VARCHAR(20), d4_interno.FECHA, 106)
+                                        FROM FE_DOCUMENTO_HISTORIAL d4_interno
+                                        WHERE d4_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                                        AND TIPO = 'APROBADO DOCUMENTO REPARABLE' 
+                                        FOR XML PATH('')
+                                    ), 1, 2, ''
+                                )
+                            ) AS fecha_reparable_conta,
+                                    
                             WEBPAGOSOC.MEDIO_PAGO,
                             WEBPAGOSOC.FECHA_PAGO,
                             WEBPAGOSOC.NOMBRE_BANCO,
@@ -4443,7 +4465,7 @@ trait ComprobanteTraits
                                                     SELECT '// ' + d2_interno.MENSAJE
                                                     FROM FE_DOCUMENTO_HISTORIAL d2_interno
                                                     WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
-                                                    AND FE_DOCUMENTO.IND_REPARABLE = 1
+                                                    AND (FE_DOCUMENTO.IND_REPARABLE = 1 OR FE_DOCUMENTO.IND_REPARABLE = 2)
                                                     AND TIPO LIKE 'DOCUMENTO ARCHIVO_%'
                                                     FOR XML PATH('')
                                                 ), 1, 2, ''
@@ -4459,7 +4481,18 @@ trait ComprobanteTraits
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
                                         )
-                                    ) AS fecha_reparable
+                                    ) AS fecha_reparable,
+                                    (
+                                        SELECT STUFF(
+                                            (
+                                                SELECT '// ' + CONVERT(VARCHAR(20), d4_interno.FECHA, 106)
+                                                FROM FE_DOCUMENTO_HISTORIAL d4_interno
+                                                WHERE d4_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                                                AND TIPO = 'APROBADO DOCUMENTO REPARABLE' 
+                                                FOR XML PATH('')
+                                            ), 1, 2, ''
+                                        )
+                                    ) AS fecha_reparable_conta
 
                                     "))
                                     ->orderBy('FEC_VENTA','asc')
@@ -4549,7 +4582,7 @@ trait ComprobanteTraits
                                                 SELECT '// ' + d2_interno.MENSAJE
                                                 FROM FE_DOCUMENTO_HISTORIAL d2_interno
                                                 WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
-                                                AND FE_DOCUMENTO.IND_REPARABLE = 1
+                                                AND (FE_DOCUMENTO.IND_REPARABLE = 1 OR FE_DOCUMENTO.IND_REPARABLE = 2)
                                                 AND TIPO LIKE 'DOCUMENTO ARCHIVO_%' 
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
@@ -4565,11 +4598,24 @@ trait ComprobanteTraits
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
                                         )
-                                    ) AS fecha_reparable
-
+                                    ) AS fecha_reparable,
+                                    (
+                                        SELECT STUFF(
+                                            (
+                                                SELECT '// ' + CONVERT(VARCHAR(20), d4_interno.FECHA, 106)
+                                                FROM FE_DOCUMENTO_HISTORIAL d4_interno
+                                                WHERE d4_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                                                AND TIPO = 'APROBADO DOCUMENTO REPARABLE' 
+                                                FOR XML PATH('')
+                                            ), 1, 2, ''
+                                        )
+                                    ) AS fecha_reparable_conta
                                 "))
                                 ->orderBy('FEC_VENTA','asc')
                                 ->get();
+
+
+
 
 
         }else{
@@ -4621,7 +4667,7 @@ trait ComprobanteTraits
                                                 SELECT '// ' + d2_interno.MENSAJE
                                                 FROM FE_DOCUMENTO_HISTORIAL d2_interno
                                                 WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
-                                                AND FE_DOCUMENTO.IND_REPARABLE = 1
+                                                AND (FE_DOCUMENTO.IND_REPARABLE = 1 OR FE_DOCUMENTO.IND_REPARABLE = 2)
                                                 AND TIPO LIKE 'DOCUMENTO ARCHIVO_%'
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
@@ -4637,7 +4683,18 @@ trait ComprobanteTraits
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
                                         )
-                                    ) AS fecha_reparable
+                                    ) AS fecha_reparable,
+                                    (
+                                        SELECT STUFF(
+                                            (
+                                                SELECT '// ' + CONVERT(VARCHAR(20), d4_interno.FECHA, 106)
+                                                FROM FE_DOCUMENTO_HISTORIAL d4_interno
+                                                WHERE d4_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                                                AND TIPO = 'APROBADO DOCUMENTO REPARABLE' 
+                                                FOR XML PATH('')
+                                            ), 1, 2, ''
+                                        )
+                                    ) AS fecha_reparable_conta
 
 
                                 "))
@@ -4724,7 +4781,7 @@ trait ComprobanteTraits
                                                 SELECT '// ' + d2_interno.MENSAJE
                                                 FROM FE_DOCUMENTO_HISTORIAL d2_interno
                                                 WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
-                                                AND FE_DOCUMENTO.IND_REPARABLE = 1
+                                                AND (FE_DOCUMENTO.IND_REPARABLE = 1 OR FE_DOCUMENTO.IND_REPARABLE = 2)
                                                 AND TIPO LIKE 'DOCUMENTO ARCHIVO_%'
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
@@ -4742,7 +4799,18 @@ trait ComprobanteTraits
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
                                         )
-                                    ) AS fecha_reparable
+                                    ) AS fecha_reparable,
+                                    (
+                                        SELECT STUFF(
+                                            (
+                                                SELECT '// ' + CONVERT(VARCHAR(20), d4_interno.FECHA, 106)
+                                                FROM FE_DOCUMENTO_HISTORIAL d4_interno
+                                                WHERE d4_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                                                AND TIPO = 'APROBADO DOCUMENTO REPARABLE' 
+                                                FOR XML PATH('')
+                                            ), 1, 2, ''
+                                        )
+                                    ) AS fecha_reparable_conta
 
 
                                 "))
@@ -4804,7 +4872,7 @@ trait ComprobanteTraits
                                                 SELECT '// ' + d2_interno.MENSAJE
                                                 FROM FE_DOCUMENTO_HISTORIAL d2_interno
                                                 WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
-                                                AND FE_DOCUMENTO.IND_REPARABLE = 1
+                                                AND (FE_DOCUMENTO.IND_REPARABLE = 1 OR FE_DOCUMENTO.IND_REPARABLE = 2)
                                                 AND TIPO LIKE 'DOCUMENTO ARCHIVO_%'
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
@@ -4820,7 +4888,18 @@ trait ComprobanteTraits
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
                                         )
-                                    ) AS fecha_reparable
+                                    ) AS fecha_reparable,
+                                    (
+                                        SELECT STUFF(
+                                            (
+                                                SELECT '// ' + CONVERT(VARCHAR(20), d4_interno.FECHA, 106)
+                                                FROM FE_DOCUMENTO_HISTORIAL d4_interno
+                                                WHERE d4_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                                                AND TIPO = 'APROBADO DOCUMENTO REPARABLE' 
+                                                FOR XML PATH('')
+                                            ), 1, 2, ''
+                                        )
+                                    ) AS fecha_reparable_conta
                                     
                                 "))
                                 ->orderBy('FEC_VENTA', 'desc')
@@ -4896,7 +4975,7 @@ trait ComprobanteTraits
                                                 SELECT '// ' + d2_interno.MENSAJE
                                                 FROM FE_DOCUMENTO_HISTORIAL d2_interno
                                                 WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
-                                                AND FE_DOCUMENTO.IND_REPARABLE = 1
+                                                AND (FE_DOCUMENTO.IND_REPARABLE = 1 OR FE_DOCUMENTO.IND_REPARABLE = 2)
                                                 AND TIPO LIKE 'DOCUMENTO ARCHIVO_%'
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
@@ -4912,7 +4991,18 @@ trait ComprobanteTraits
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
                                         )
-                                    ) AS fecha_reparable
+                                    ) AS fecha_reparable,
+                                    (
+                                        SELECT STUFF(
+                                            (
+                                                SELECT '// ' + CONVERT(VARCHAR(20), d4_interno.FECHA, 106)
+                                                FROM FE_DOCUMENTO_HISTORIAL d4_interno
+                                                WHERE d4_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                                                AND TIPO = 'APROBADO DOCUMENTO REPARABLE' 
+                                                FOR XML PATH('')
+                                            ), 1, 2, ''
+                                        )
+                                    ) AS fecha_reparable_conta
                                     
                                 "))
                                 ->orderBy('FEC_VENTA', 'desc')
@@ -4964,7 +5054,7 @@ trait ComprobanteTraits
                                                 SELECT '// ' + d2_interno.MENSAJE
                                                 FROM FE_DOCUMENTO_HISTORIAL d2_interno
                                                 WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
-                                                AND FE_DOCUMENTO.IND_REPARABLE = 1
+                                                AND (FE_DOCUMENTO.IND_REPARABLE = 1 OR FE_DOCUMENTO.IND_REPARABLE = 2)
                                                 AND TIPO LIKE 'DOCUMENTO ARCHIVO_%'
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
@@ -4980,7 +5070,18 @@ trait ComprobanteTraits
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
                                         )
-                                    ) AS fecha_reparable
+                                    ) AS fecha_reparable,
+                                    (
+                                        SELECT STUFF(
+                                            (
+                                                SELECT '// ' + CONVERT(VARCHAR(20), d4_interno.FECHA, 106)
+                                                FROM FE_DOCUMENTO_HISTORIAL d4_interno
+                                                WHERE d4_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                                                AND TIPO = 'APROBADO DOCUMENTO REPARABLE' 
+                                                FOR XML PATH('')
+                                            ), 1, 2, ''
+                                        )
+                                    ) AS fecha_reparable_conta
                                     
                                 "))
                                 ->orderBy('FEC_VENTA', 'desc')
@@ -5055,7 +5156,7 @@ trait ComprobanteTraits
                                                 SELECT '// ' + d2_interno.MENSAJE
                                                 FROM FE_DOCUMENTO_HISTORIAL d2_interno
                                                 WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
-                                                AND FE_DOCUMENTO.IND_REPARABLE = 1
+                                                AND (FE_DOCUMENTO.IND_REPARABLE = 1 OR FE_DOCUMENTO.IND_REPARABLE = 2)
                                                 AND TIPO LIKE 'DOCUMENTO ARCHIVO_%'
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
@@ -5071,7 +5172,18 @@ trait ComprobanteTraits
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
                                         )
-                                    ) AS fecha_reparable
+                                    ) AS fecha_reparable,
+                                    (
+                                        SELECT STUFF(
+                                            (
+                                                SELECT '// ' + CONVERT(VARCHAR(20), d4_interno.FECHA, 106)
+                                                FROM FE_DOCUMENTO_HISTORIAL d4_interno
+                                                WHERE d4_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                                                AND TIPO = 'APROBADO DOCUMENTO REPARABLE' 
+                                                FOR XML PATH('')
+                                            ), 1, 2, ''
+                                        )
+                                    ) AS fecha_reparable_conta
                                     
                                 "))
                                 ->orderBy('FEC_VENTA', 'desc')
@@ -5123,7 +5235,7 @@ trait ComprobanteTraits
                                                 SELECT '// ' + d2_interno.MENSAJE
                                                 FROM FE_DOCUMENTO_HISTORIAL d2_interno
                                                 WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
-                                                AND FE_DOCUMENTO.IND_REPARABLE = 1
+                                                AND (FE_DOCUMENTO.IND_REPARABLE = 1 OR FE_DOCUMENTO.IND_REPARABLE = 2)
                                                 AND TIPO LIKE 'DOCUMENTO ARCHIVO_%'
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
@@ -5139,7 +5251,18 @@ trait ComprobanteTraits
                                                 FOR XML PATH('')
                                             ), 1, 2, ''
                                         )
-                                    ) AS fecha_reparable
+                                    ) AS fecha_reparable,
+                                    (
+                                        SELECT STUFF(
+                                            (
+                                                SELECT '// ' + CONVERT(VARCHAR(20), d4_interno.FECHA, 106)
+                                                FROM FE_DOCUMENTO_HISTORIAL d4_interno
+                                                WHERE d4_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                                                AND TIPO = 'APROBADO DOCUMENTO REPARABLE' 
+                                                FOR XML PATH('')
+                                            ), 1, 2, ''
+                                        )
+                                    ) AS fecha_reparable_conta
                                     
                                 "))
                                 ->orderBy('FEC_VENTA', 'desc')
@@ -5208,7 +5331,7 @@ trait ComprobanteTraits
                                             SELECT '// ' + d2_interno.MENSAJE
                                             FROM FE_DOCUMENTO_HISTORIAL d2_interno
                                             WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
-                                            AND FE_DOCUMENTO.IND_REPARABLE = 1
+                                            AND (FE_DOCUMENTO.IND_REPARABLE = 1 OR FE_DOCUMENTO.IND_REPARABLE = 2)
                                             AND TIPO LIKE 'DOCUMENTO ARCHIVO_%'
                                             FOR XML PATH('')
                                         ), 1, 2, ''
@@ -5289,7 +5412,7 @@ trait ComprobanteTraits
                             SELECT '// ' + d2_interno.MENSAJE
                             FROM FE_DOCUMENTO_HISTORIAL d2_interno
                             WHERE d2_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
-                              AND FE_DOCUMENTO.IND_REPARABLE = 1
+                              AND (FE_DOCUMENTO.IND_REPARABLE = 1 OR FE_DOCUMENTO.IND_REPARABLE = 2)
                               AND TIPO LIKE 'DOCUMENTO ARCHIVO_%' 
                             FOR XML PATH('')
                         ), 1, 2, ''
@@ -5306,6 +5429,20 @@ trait ComprobanteTraits
                         ), 1, 2, ''
                     )
                 ) AS fecha_reparable,
+                (
+                    SELECT STUFF(
+                        (
+                            SELECT '// ' + CONVERT(VARCHAR(20), d4_interno.FECHA, 106)
+                            FROM FE_DOCUMENTO_HISTORIAL d4_interno
+                            WHERE d4_interno.ID_DOCUMENTO = FE_DOCUMENTO.ID_DOCUMENTO
+                            AND TIPO = 'APROBADO DOCUMENTO REPARABLE' 
+                            FOR XML PATH('')
+                        ), 1, 2, ''
+                    )
+                ) AS fecha_reparable_conta,
+
+
+
                 WEBPAGOSOC.MEDIO_PAGO,
                 WEBPAGOSOC.FECHA_PAGO,
                 WEBPAGOSOC.NOMBRE_BANCO,
@@ -8094,6 +8231,43 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
+    private function con_lista_cabecera_comprobante_entregable_modal_moneda_detraccion($folio,$moneda_id) {
+
+
+        $listadatos             =   VDetraccionesConPagos::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'V_DETRACCIONES_CON_PAGOS.ID_DOCUMENTO')
+                                    ->where('FE_DOCUMENTO.FOLIO_DETRACCION','=',$folio)
+                                    ->where('V_DETRACCIONES_CON_PAGOS.COD_CATEGORIA_MONEDA','=',$moneda_id)
+                                    ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
+                                    ->select(DB::raw('V_DETRACCIONES_CON_PAGOS.* ,FE_DOCUMENTO.*,
+                                        FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_VOUCHER'))
+                                    ->orderBy('V_DETRACCIONES_CON_PAGOS.FEC_EMISION','asc')
+                                    ->get();
+
+
+        return  $listadatos;
+    }
+
+
+
+
+    private function con_lista_cabecera_comprobante_entregable_detraccion($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$moneda_id,$operacion_id) {
+
+        $fecha_corte            =   date('Ymd');
+
+        $listadatos             =   VDetraccionesConPagos::whereRaw("CAST(FEC_EMISION AS DATE) >= ? and CAST(FEC_EMISION AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                    ->where('COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                    ->where(function ($query) {
+                                        $query->where('FOLIO_DETRACCION', '=', '');
+                                        $query->orWhereNull('FOLIO_DETRACCION');
+                                    })
+                                    ->where('COD_CATEGORIA_MONEDA','=',$moneda_id)
+                                    ->where('CREAR_FOLIO','=',$operacion_id)
+                                    ->orderBy('FEC_EMISION','asc')
+                                    ->get();
+
+        return  $listadatos;
+
+    }
 
 
 

@@ -26,15 +26,13 @@ Use Nexmo;
 use Keygen;
 use Mail;
 use PDO;
-use App\Traits\WhatsappTraits;
+
 
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 
 trait UserTraits
 {
-    use WhatsappTraits;
-
 
 
     private function envio_detraccion_sunat(){
@@ -43,87 +41,127 @@ trait UserTraits
             ->where('TIPO', 'DETRACCIONES')
             ->get();
 
-        $fechaInicio = '01/01/2025';
-        $fechaFin = '31/01/2025';
+        // Obtener fecha actual
+        $fecha = Carbon::now();
+        // Último día del mes actual
+        $ultimoDiaMes = $fecha->endOfMonth()->format('d/m/Y');
+        // Resultado: 28/02/2026
+        // Primer día del mes anterior
+        $primerDiaMesAnterior = $fecha->subMonth()->startOfMonth()->format('d/m/Y');
+        // Resultado: 01/01/2026
+        $fechaInicio = $primerDiaMesAnterior;
+        $fechaFin = $ultimoDiaMes;
         // Para iterar sobre los resultados
-        foreach ($empresas as $item) {
-            $curl = curl_init();
-            curl_setopt_array($curl, array(
-              CURLOPT_URL => 'https://e-plataformaunica.sunat.gob.pe/v1/recaudacion/tributaria/declapago/detracciones/t/consultar?null=null&fechaInicio='.urlencode($fechaInicio).'&fechaFin='.urlencode($fechaFin).'&tipoCuenta=1&tipoConsulta=pagosIndividuales&periodo=&_=1770216422973',
-              CURLOPT_RETURNTRANSFER => true,
-              CURLOPT_ENCODING => '',
-              CURLOPT_MAXREDIRS => 10,
-              CURLOPT_TIMEOUT => 0,
-              CURLOPT_FOLLOWLOCATION => true,
-              CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-              CURLOPT_CUSTOMREQUEST => 'GET',
-              CURLOPT_HTTPHEADER => array(
-                'accept: application/json, text/plain, */*',
-                'accept-encoding: gzip, deflate, br, zstd',
-                'accept-language: es-ES,es;q=0.9',
-                'connection: keep-alive',
-                'host: e-plataformaunica.sunat.gob.pe',
-                'Cookie: _ga_MSH22BL6C7=GS1.1.1735672224.1.1.1735672333.0.0.0; _ga_6LRF6GC6EC=GS2.1.s1753135783$o7$g0$t1753135837$j6$l0$h0; site24x7rumID=989612737329205.1768856228639.1768856295052.0; _ga=GA1.3.1567168574.1705528569; _gid=GA1.3.737557782.1770216344; _ga_6NCEEN6JSV=GS2.1.s1770216343$o201$g0$t1770216373$j30$l0$h0; _ga_PZPKQVJ49Q=GS2.3.s1770216389$o48$g0$t1770216389$j60$l0$h0; TS01645459=019edc9eb891edb4e174f3bcc9525076c70beda76c2a47e82d35e47d266fb179cc4d08b25d6c1ef13f7e5401c5b8b8f813593b6527; TS01645459=014dc399cba0ba2b480d3477b305ebc140850ff5dc0e56cf3c4156f3a55c328c5a0f6629b8b15da8dfca3fe73d753db7998f9ac35a',
-                'idformulario: *MENU*',
-                'idcache: '.$item->TOKEN
-              ),
-            ));
-            $response = curl_exec($curl);
-            curl_close($curl);
+        DB::table('DETRACION_SUNAT')->where('fec_pago_desc','>=',$fechaInicio)->where('fec_pago_desc','<=',$fechaFin)->delete();
 
-            $data = json_decode($response, true); // true para array asociativo
+        $fechaInicio_n = Carbon::createFromFormat('d/m/Y', $fechaInicio);
+        $fechaFin_n = Carbon::createFromFormat('d/m/Y', $fechaFin);
 
-            if ($data['cod'] == 200 && isset($data['resultado'])) {
-                foreach ($data['resultado'] as $registro) {
-                    $timestamp_ms = $registro['fec_pago'];
-                    // Convertir a segundos (dividir entre 1000)
-                    $timestamp_segundos = $timestamp_ms / 1000;
-                    // Obtener fecha
-                    $fecha = date('Ymd H:i:s', $timestamp_segundos);
+        // Crear copia para iterar
+        $fechaActual = $fechaInicio_n->copy();
 
+        // Recorrer mes por mes
+        while ($fechaActual <= $fechaFin_n) {
+            $fechaInicio = $fechaActual->copy()->startOfMonth()->format('d/m/Y');
+            $fechaFin = $fechaActual->copy()->endOfMonth()->format('d/m/Y');
+            
 
+            foreach ($empresas as $item) {
+                $curl = curl_init();
+                curl_setopt_array($curl, array(
+                  CURLOPT_URL => 'https://e-plataformaunica.sunat.gob.pe/v1/recaudacion/tributaria/declapago/detracciones/t/consultar?null=null&fechaInicio='.urlencode($fechaInicio).'&fechaFin='.urlencode($fechaFin).'&tipoCuenta=1&tipoConsulta=pagosIndividuales&periodo=&_=1770216422973',
+                  CURLOPT_RETURNTRANSFER => true,
+                  CURLOPT_ENCODING => '',
+                  CURLOPT_MAXREDIRS => 10,
+                  CURLOPT_TIMEOUT => 0,
+                  CURLOPT_FOLLOWLOCATION => true,
+                  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                  CURLOPT_CUSTOMREQUEST => 'GET',
+                  CURLOPT_HTTPHEADER => array(
+                    'accept: application/json, text/plain, */*',
+                    'accept-encoding: gzip, deflate, br, zstd',
+                    'accept-language: es-ES,es;q=0.9',
+                    'connection: keep-alive',
+                    'host: e-plataformaunica.sunat.gob.pe',
+                    'Cookie: _ga_MSH22BL6C7=GS1.1.1735672224.1.1.1735672333.0.0.0; _ga_6LRF6GC6EC=GS2.1.s1753135783$o7$g0$t1753135837$j6$l0$h0; site24x7rumID=989612737329205.1768856228639.1768856295052.0; _ga=GA1.3.1567168574.1705528569; _gid=GA1.3.737557782.1770216344; _ga_6NCEEN6JSV=GS2.1.s1770216343$o201$g0$t1770216373$j30$l0$h0; _ga_PZPKQVJ49Q=GS2.3.s1770216389$o48$g0$t1770216389$j60$l0$h0; TS01645459=019edc9eb891edb4e174f3bcc9525076c70beda76c2a47e82d35e47d266fb179cc4d08b25d6c1ef13f7e5401c5b8b8f813593b6527; TS01645459=014dc399cba0ba2b480d3477b305ebc140850ff5dc0e56cf3c4156f3a55c328c5a0f6629b8b15da8dfca3fe73d753db7998f9ac35a',
+                    'idformulario: *MENU*',
+                    'idcache: '.$item->TOKEN
+                  ),
+                ));
+                $response = curl_exec($curl);
+                curl_close($curl);
 
-                    $documento                              =   new DetraccionSunat;
-                    $documento->num_pres                    =   $registro['num_pres'];
-                    $documento->cod_usuario_sol             =   $registro['cod_usuario_sol'];
-                    $documento->des_prov                    =   $registro['des_prov'];
-                    $documento->cod_tipcomprobante          =   $registro['cod_tipcomprobante'];
-                    $documento->num_ruc_proveedor           =   $registro['num_ruc_proveedor'];
+                $data = json_decode($response, true); // true para array asociativo
 
-                    $documento->per_tributario              =   $registro['per_tributario'];
-                    $documento->fec_pago_desc               =   $registro['fec_pago_desc'];
-                    $documento->num_npd                     =   $registro['num_npd'];
-                    $documento->des_adq                     =   $registro['des_adq'];
-                    $documento->num_constancia              =   $registro['num_constancia'];
-
-                    $documento->tip_bien                    =   $registro['tip_bien'];
-                    $documento->tip_operacion               =   $registro['tip_operacion'];
-                    $documento->num_doc_adq                 =   $registro['num_doc_adq'];
-                    $documento->mto_deposito_desc           =   $registro['mto_deposito_desc'];
-                    $documento->num_cuenta                  =   $registro['num_cuenta'];
-
-                    $documento->mto_deposito                =   $registro['mto_deposito'];
-                    $documento->num_comprobante             =   $registro['num_comprobante'];
-                    $documento->fec_pago                    =   $fecha;
-                    $documento->tip_doc_adq                 =   $registro['tip_doc_adq'];
-                    $documento->num_serie                   =   $registro['num_serie'];
-
-                    $documento->origen_desc                 =   $registro['origen_desc'];
-                    $documento->cod_tipcta                  =   $registro['cod_tipcta'];
-                    $documento->empresa_id                  =   $item->COD_EMPR;
-                    $documento->empresa_nombre              =   $item->TXT_EMPR;
-                    $documento->id_documento                =   '';
-                    $documento->save();
+                if ($data['cod'] == 200 && isset($data['resultado'])) {
+                    foreach ($data['resultado'] as $registro) {
+                        $timestamp_ms = $registro['fec_pago'];
+                        // Convertir a segundos (dividir entre 1000)
+                        $timestamp_segundos = $timestamp_ms / 1000;
+                        // Obtener fecha
+                        $fecha = date('Ymd H:i:s', $timestamp_segundos);
 
 
-                }
-                
-                echo "Total registros: " . count($data['resultado']);
-            } else {
-                echo "Error: " . $data['msg'] . " (Código: " . $data['cod'] . ")";
+
+                        $documento                              =   new DetraccionSunat;
+                        $documento->num_pres                    =   $registro['num_pres'];
+                        $documento->cod_usuario_sol             =   $registro['cod_usuario_sol'];
+                        $documento->des_prov                    =   $registro['des_prov'];
+                        $documento->cod_tipcomprobante          =   $registro['cod_tipcomprobante'];
+                        $documento->num_ruc_proveedor           =   $registro['num_ruc_proveedor'];
+
+                        $documento->per_tributario              =   $registro['per_tributario'];
+                        $documento->fec_pago_desc               =   $registro['fec_pago_desc'];
+                        $documento->num_npd                     =   $registro['num_npd'];
+                        $documento->des_adq                     =   $registro['des_adq'];
+                        $documento->num_constancia              =   $registro['num_constancia'];
+
+                        $documento->tip_bien                    =   $registro['tip_bien'];
+                        $documento->tip_operacion               =   $registro['tip_operacion'];
+                        $documento->num_doc_adq                 =   $registro['num_doc_adq'];
+                        $documento->mto_deposito_desc           =   $registro['mto_deposito_desc'];
+                        $documento->num_cuenta                  =   $registro['num_cuenta'];
+
+                        $documento->mto_deposito                =   $registro['mto_deposito'];
+                        $documento->num_comprobante             =   $registro['num_comprobante'];
+                        $documento->fec_pago                    =   $fecha;
+                        $documento->tip_doc_adq                 =   $registro['tip_doc_adq'];
+                        $documento->num_serie                   =   $registro['num_serie'];
+
+                        $documento->origen_desc                 =   $registro['origen_desc'];
+                        $documento->cod_tipcta                  =   $registro['cod_tipcta'];
+                        $documento->empresa_id                  =   $item->COD_EMPR;
+                        $documento->empresa_nombre              =   $item->TXT_EMPR;
+                        $documento->id_documento                =   '';
+                        $documento->save();
+
+
+                    }
+                } 
+
             }
 
+            
+            // Avanzar al siguiente mes
+            $fechaActual->addMonth();
         }
+
+
+        $sql = "
+            UPDATE det
+            SET det.id_documento = doc.ID_DOCUMENTO
+            FROM DETRACION_SUNAT det
+            INNER JOIN FE_DOCUMENTO doc ON 
+                det.num_ruc_proveedor = doc.RUC_PROVEEDOR 
+                AND det.cod_tipcomprobante = doc.ID_TIPO_DOC
+                AND det.num_serie = doc.SERIE
+                AND det.num_comprobante = RIGHT('00000000' + doc.NUMERO, 8)
+            WHERE doc.COD_ESTADO IN ('ETM0000000000005', 'ETM0000000000008')
+        ";
+
+        $affectedRows = DB::update($sql);
+
+
     }
 
 
