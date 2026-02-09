@@ -141,7 +141,7 @@ class GestionOCContabilidadController extends Controller
         $banco_id        =   $request['banco_id'];
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
         $listadatos     =   $this->con_lista_cabecera_comprobante_entregable_detraccion($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$moneda_id,$operacion_id);
-        $this->envio_detraccion_sunat();
+        //$this->envio_detraccion_sunat();
         $funcion        =   $this;
         $entregable_sel =   FeDocumentoEntregableDetraccion::where('COD_CATEGORIA_ESTADO','=','ETM0000000000001')
                                             ->where('COD_ESTADO','=','1')
