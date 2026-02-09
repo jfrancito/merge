@@ -4709,6 +4709,7 @@ class GestionUsuarioContactoController extends Controller
             }
 
 
+            $funciones = $this;
 
             return View::make('comprobante/aprobaruc', 
                             [
@@ -4739,6 +4740,10 @@ class GestionUsuarioContactoController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+                                
                             ]);
 
 
@@ -5740,6 +5745,7 @@ class GestionUsuarioContactoController extends Controller
                 }
             }
             $comboant               =   array('' => "Seleccione Anticipo")+$arrayitem;
+            $funciones = $this;
 
 
             return View::make('comprobante/aprobaruccontrato', 
@@ -5773,7 +5779,10 @@ class GestionUsuarioContactoController extends Controller
                                 'array_guias'           =>  $array_guias,
                                 'array_guias_no'        =>  $array_guias_no,
 
-                                'procedencia'           =>  $procedencia,                                
+                                'procedencia'           =>  $procedencia,   
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 
