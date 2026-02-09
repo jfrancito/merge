@@ -1301,6 +1301,7 @@ class GestionUsuarioContactoController extends Controller
             $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
             $ordencompra_f          =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
 
+            $funciones = $this;
 
             return View::make('comprobante/observaruc', 
                             [
@@ -1317,6 +1318,9 @@ class GestionUsuarioContactoController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+                                
                             ]);
 
 
