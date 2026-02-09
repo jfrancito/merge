@@ -7166,7 +7166,7 @@ trait ComprobanteTraits
                                     //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
                                     ->where('OPERACION','=','CONTRATO')
                                     ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                                    //->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
+                                    ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
                                     ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
                                     ->where('FE_DOCUMENTO.area_observacion','<>','UCO')
                                     ->where('FE_DOCUMENTO.ind_observacion','=','1')
