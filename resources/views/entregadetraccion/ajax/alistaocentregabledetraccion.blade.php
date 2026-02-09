@@ -20,6 +20,8 @@
         <td class="cell-detail sorting_1" style="position: relative;">
           <span><b>COMPROBANTE : </b> {{$item->ID_DOCUMENTO}}  </span>
           <span><b>OPERACION  :</b> {{$item->OPERACION}}</span>
+          <span><b>PROVEEDOR : </b> {{$item->TXT_EMPR_EMISOR}}  </span>
+
           <span><b>PAGO DETRACCION  :</b> {{$item->TXT_PAGO_DETRACCION}}</span>
           <span><b>MONTO DETRACCION  :</b> {{$item->MONTO_DETRACCION_RED}}</span>
           <span><b>TOTAL  :</b> {{$item->TOTAL_VENTA_ORIG}}</span>
@@ -36,6 +38,8 @@
           <span><b>SERIE  :</b> {{$item->NRO_SERIE}}</span>
           <span><b>NRO  :</b> {{$item->NRO_DOC}}</span>
           <span><b>MONEDA  :</b> {{$item->TXT_CATEGORIA_MONEDA}}</span>
+          <span><b>PAGO DETRACCION : </b> {{$item->TXT_PAGO_DETRACCION}}  </span>
+          
         </td>
 
         <td class="cell-detail sorting_1" style="position: relative;">
