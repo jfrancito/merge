@@ -1772,6 +1772,9 @@ class GestionUsuarioContactoController extends Controller
             $documento_asociados    =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->get();
             $documento_top          =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->first();
 
+            $funciones = $this;
+
+
 
             return View::make('comprobante/repararucestibaadmin', 
                             [
@@ -1786,6 +1789,9 @@ class GestionUsuarioContactoController extends Controller
                                 'tarchivos'             =>  $tarchivos,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+                                
                             ]);
 
 
@@ -1979,6 +1985,7 @@ class GestionUsuarioContactoController extends Controller
             $documento_asociados    =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->get();
             $documento_top          =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->first();
 
+            $funciones = $this;
 
             return View::make('comprobante/repararucestiba', 
                             [
@@ -1993,6 +2000,9 @@ class GestionUsuarioContactoController extends Controller
                                 'tarchivos'             =>  $tarchivos,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 
@@ -2095,6 +2105,10 @@ class GestionUsuarioContactoController extends Controller
 
             $rol                    =   WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 
+            $funciones = $this;
+
+
+
             return View::make('comprobante/repararuccontratoadmin', 
                             [
                                 'fedocumento'           =>  $fedocumento,
@@ -2109,6 +2123,9 @@ class GestionUsuarioContactoController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 
@@ -2309,6 +2326,9 @@ class GestionUsuarioContactoController extends Controller
 
             $rol                    =   WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 
+            $funciones = $this;
+
+
             return View::make('comprobante/repararuccontrato', 
                             [
                                 'fedocumento'           =>  $fedocumento,
@@ -2323,6 +2343,9 @@ class GestionUsuarioContactoController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 
