@@ -447,8 +447,9 @@ class GestionUsuarioContactoController extends Controller
                 ];
             }
 
-
-            return View::make('comprobante/observarucestibamoca',
+            $funciones = $this;
+                                
+            return View::make('comprobante/observarucestibamoca', 
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'fereftop1'             =>  $fereftop1,
@@ -479,6 +480,9 @@ class GestionUsuarioContactoController extends Controller
                                 //'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+                                
                             ]);
 
 
@@ -1074,7 +1078,9 @@ class GestionUsuarioContactoController extends Controller
 
             //dd($ordencompra_f);
 
-            return View::make('comprobante/observarucprovedor',
+            $funciones = $this;
+
+            return View::make('comprobante/observarucprovedor', 
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'archivosanulados'           =>  $archivosanulados,
@@ -1090,6 +1096,9 @@ class GestionUsuarioContactoController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 
@@ -1302,6 +1311,7 @@ class GestionUsuarioContactoController extends Controller
             $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
             $ordencompra_f          =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
 
+            $funciones = $this;
 
             return View::make('comprobante/observaruc',
                             [
@@ -1318,6 +1328,9 @@ class GestionUsuarioContactoController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+                                
                             ]);
 
 
@@ -1969,6 +1982,9 @@ class GestionUsuarioContactoController extends Controller
             $documento_asociados    =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->get();
             $documento_top          =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->first();
 
+            $funciones = $this;
+
+
 
             return View::make('comprobante/repararucestibaadmin',
                             [
@@ -1983,6 +1999,9 @@ class GestionUsuarioContactoController extends Controller
                                 'tarchivos'             =>  $tarchivos,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+                                
                             ]);
 
 
@@ -2176,6 +2195,7 @@ class GestionUsuarioContactoController extends Controller
             $documento_asociados    =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->get();
             $documento_top          =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->first();
 
+            $funciones = $this;
 
             return View::make('comprobante/repararucestiba',
                             [
@@ -2190,6 +2210,9 @@ class GestionUsuarioContactoController extends Controller
                                 'tarchivos'             =>  $tarchivos,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 
@@ -2292,7 +2315,9 @@ class GestionUsuarioContactoController extends Controller
 
             $rol                    =   WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 
-            return View::make('comprobante/repararuccontratoadmin',
+            $funciones = $this;
+
+            return View::make('comprobante/repararuccontratoadmin', 
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
@@ -2306,6 +2331,9 @@ class GestionUsuarioContactoController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 
@@ -2506,7 +2534,9 @@ class GestionUsuarioContactoController extends Controller
 
             $rol                    =   WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 
-            return View::make('comprobante/repararuccontrato',
+            $funciones = $this;
+
+            return View::make('comprobante/repararuccontrato', 
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
@@ -2520,6 +2550,9 @@ class GestionUsuarioContactoController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 
@@ -2730,6 +2763,7 @@ class GestionUsuarioContactoController extends Controller
             $documento_asociados    =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->get();
             $documento_top          =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->first();
 
+            $funciones = $this;
 
             return View::make('comprobante/observarucestiba',
                             [
@@ -2751,6 +2785,9 @@ class GestionUsuarioContactoController extends Controller
                                 //'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 
@@ -2963,6 +3000,7 @@ class GestionUsuarioContactoController extends Controller
             $arraybancos            =   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
             $combobancos            =   array('' => "Seleccione Entidad Bancaria") + $arraybancos;
 
+            $funciones = $this;
 
 
             return View::make('comprobante/observaruccontrato',
@@ -2986,6 +3024,9 @@ class GestionUsuarioContactoController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 
@@ -3206,7 +3247,9 @@ class GestionUsuarioContactoController extends Controller
             $arraybancos            =   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
             $combobancos            =   array('' => "Seleccione Entidad Bancaria") + $arraybancos;
 
-            return View::make('comprobante/observaruccontratoproveedor',
+            $funciones = $this;
+
+            return View::make('comprobante/observaruccontratoproveedor', 
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
@@ -3225,6 +3268,9 @@ class GestionUsuarioContactoController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 
@@ -3370,6 +3416,7 @@ class GestionUsuarioContactoController extends Controller
                                         ->get();
 
             $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idop)->where('ACTIVO','=','1')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+            $funciones = $this;
 
             return View::make('comprobante/observarucliquidacioncompraanticipo',
                             [
@@ -3385,6 +3432,9 @@ class GestionUsuarioContactoController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 
@@ -3562,6 +3612,7 @@ class GestionUsuarioContactoController extends Controller
             $empresa                =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR_EMISOR)->first();
 
 
+            $funciones = $this;
 
 
 
@@ -3583,6 +3634,9 @@ class GestionUsuarioContactoController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 
@@ -3761,6 +3815,8 @@ class GestionUsuarioContactoController extends Controller
             $empresa                =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR_EMISOR)->first();
 
 
+            $funciones = $this;
+
 
 
 
@@ -3782,6 +3838,9 @@ class GestionUsuarioContactoController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 
@@ -3959,10 +4018,8 @@ class GestionUsuarioContactoController extends Controller
 
             $user_orden             =   User::where('usuarioosiris_id','=',$ordencompra->COD_EMPR_EMISOR)->first();
             $empresa                =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR_EMISOR)->first();
-
-
-
-
+            
+            $funciones = $this;
 
             return View::make('comprobante/observarucpg',
                             [
@@ -3982,6 +4039,9 @@ class GestionUsuarioContactoController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 
@@ -4877,6 +4937,7 @@ class GestionUsuarioContactoController extends Controller
             }
 
 
+            $funciones = $this;
 
             return View::make('comprobante/aprobaruc',
                             [
@@ -4907,6 +4968,10 @@ class GestionUsuarioContactoController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+                                
                             ]);
 
 
@@ -5068,8 +5133,10 @@ class GestionUsuarioContactoController extends Controller
 
             //dd($totalarchivos);
             //dd($documentoscompra);
+                                    
+            $funciones = $this;
 
-            return View::make('comprobante/observaradministracion',
+            return View::make('comprobante/observaradministracion', 
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
@@ -5086,6 +5153,9 @@ class GestionUsuarioContactoController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 
@@ -5246,7 +5316,9 @@ class GestionUsuarioContactoController extends Controller
                                         ->pluck('COD_CATEGORIA_DOCUMENTO')
                                         ->toArray();
 
-            return View::make('comprobante/observaradministracioncontrato',
+            $funciones = $this;
+
+            return View::make('comprobante/observaradministracioncontrato', 
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
@@ -5263,6 +5335,9 @@ class GestionUsuarioContactoController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 
@@ -5896,6 +5971,7 @@ class GestionUsuarioContactoController extends Controller
                 }
             }
             $comboant               =   array('' => "Seleccione Anticipo")+$arrayitem;
+            $funciones = $this;
 
 
             return View::make('comprobante/aprobaruccontrato',
@@ -5929,7 +6005,10 @@ class GestionUsuarioContactoController extends Controller
                                 'array_guias'           =>  $array_guias,
                                 'array_guias_no'        =>  $array_guias_no,
 
-                                'procedencia'           =>  $procedencia,
+                                'procedencia'           =>  $procedencia,   
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 

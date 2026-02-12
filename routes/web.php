@@ -61,6 +61,9 @@ Route::any('/leerpreciocompetencia', 'PrecioCompetenciaController@actionScrapear
 Route::any('/transferirdataventas', 'TransferirDataController@actionTransferirVentasAtendidas');//TRANSFERIR DATA AGENTE IA
 Route::any('/documentolgautomatico', 'PrecioCompetenciaController@actionDocumentoLGAutomatico');//TRANSFERIR DATA AGENTE IA
 Route::any('/enviocorreotesorerialg', 'UserController@actionCorreoTesoreriaLg');//correo para usuario contacto
+Route::any('/detraccionsunat', 'UserController@actionDetraccionSunat');//correo para usuario contacto
+
+
 Route::any('/guardardocumentacionlq', 'PrecioCompetenciaController@actionDocumentoLGAutomaticoNuevo');//correo para usuario contacto
 Route::any('/enviocorreoreparacionlevantada', 'UserController@actionCorreoReparacionLevantada');//correo para usuario contacto
 Route::any('/guardarpdfoi', 'PrecioCompetenciaController@actionGuardarPdfOi');//correo para usuario contacto
@@ -74,6 +77,8 @@ Route::any('/enviocorreoaprobado', 'UserController@actionCorreoAprobado');//corr
 
 Route::any('/enviocorreoaprobadoadmin', 'UserController@actionCorreoAprobadoAdmin');//correo para jefe acopio liuidacion compra
 Route::any('/crearexceladminaprobado', 'UserController@actionCrearExcelAprobadoAdmin');//correo para jefe acopio liuidacion compra
+
+
 
 Route::group(['middleware' => ['authaw']], function () {
 
@@ -535,14 +540,10 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/gestion-de-historial-comprobantes/{idopcion}', 'GestionOCValidadoController@actionListarOCHistorial');
 	Route::any('/ajax-buscar-documento-fe', 'GestionOCValidadoController@actionListarAjaxBuscarDocumento');
 	Route::any('/ajax-buscar-documento-fe-historial', 'GestionOCValidadoController@actionListarAjaxBuscarDocumentoHistorial');
-
 	Route::any('/gestion-compra-sire/{idopcion}', 'CpeController@actionGestionSireCompra');
 	Route::any('/ajax-buscar-sire-compra', 'CpeController@actionAjaxBuscarSireCompra');
-
 	Route::any('/gestion-vaidar-rr/{idopcion}', 'RRController@actionGestionValidarRR');
 	Route::any('/ajax-vaidar-rr', 'RRController@actionAjaxValidarRR');
-
-
 	Route::any('/ajax-modal-vaidar-rr-is', 'RRController@actionAjaxModalValidarRRIs');
 
 	Route::any('/gestion-comprobantes-contabilidad/{idopcion}', 'GestionComprobantesContabilidadController@actionGestionComprobantesContabilidad');
@@ -585,6 +586,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-modal-detalle-entregable', 'GestionEntregaDocumentoController@actionModalEntregaDocumentoFolio');
 	Route::any('/descargar-folio-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarDocumentoFolio');
 	Route::any('/descargar-folio-dic-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarDocumentoDICFolio');
+	Route::any('/descargar-folio-lca-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarDocumentoLCAFolio');
+
 
 	Route::any('/ajax-modal-detalle-deuda-contrato', 'GestionEntregaDocumentoController@actionModaDetalleDeudaContrato');
 	Route::any('/entrega-masivo-excel/{operacion_id}/{idopcion}', 'GestionEntregaDocumentoController@actionEntregableMasivoExcel');
@@ -689,6 +692,23 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/observacion-comprobante-uc-nota-debito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionUsuarioContactoController@actionObservarUCNotaDebito');
 	Route::any('/observacion-comprobante-uc-estiba/{idopcion}/{lote}', 'GestionUsuarioContactoController@actionObservarUCEstiba');
 	Route::any('/observacion-comprobante-uc-pg/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionUsuarioContactoController@actionObservarUCPG');
+
+
+
+	//	PAGOS DETRACCIONES	
+	Route::any('/gestion-de-pago-detracciones/{idopcion}', 'GestionOCContabilidadController@actionListarPagoDetraccion');
+	Route::any('/ajax-buscar-documento-fe-entregable-detraccion', 'GestionOCContabilidadController@actionListarAjaxBuscarDocumentoDetraccion');
+	Route::any('/ajax-modal-detalle-folios-detraccion', 'GestionOCContabilidadController@actionEntregableModalDetalleFolioDetraccion');
+	Route::any('/crear-folio-entregable-detraccion/{idopcion}', 'GestionOCContabilidadController@actionEntregableCrearFolioEntregableDetraccion');
+	Route::any('/ajax-select-folio-pagos-detracion', 'GestionOCContabilidadController@actionEntregableSelectFolioPagoDetraccion');
+	Route::any('/ajax-crear-folio-pagos-detracion', 'GestionOCContabilidadController@actionEntregableCrearFolioDetraccion');
+	Route::any('/ajax-detalle-folio-pagos-detraccion', 'GestionOCContabilidadController@actionEntregableDetalleFolioPagoDetraccion');
+	Route::any('/guardar-folio-entregable-detraccion/{idopcion}', 'GestionOCContabilidadController@actionEntregableGuardarFolioEntregableDetraccion');
+	Route::any('/ajax-extornar-folio-pagos-detraccion', 'GestionOCContabilidadController@actionEntregableExtornoFolioPagoDetraccion');
+	Route::any('/gestion-de-macro-detracciones/{idopcion}', 'GestionOCContabilidadController@actionListarEntregaDocumentoFolioDetraccion');
+	Route::any('/descargar-folio-excel-detraccion/{folio}', 'GestionOCContabilidadController@actionDescargarDocumentoFolioDetraccion');
+	Route::any('/descargar-folio-excel-detraccion-macro/{folio}', 'GestionOCContabilidadController@actionDescargarDocumentoFolioDetraccionMacro');
+
 
 
 

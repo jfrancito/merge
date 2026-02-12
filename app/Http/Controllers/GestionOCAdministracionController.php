@@ -2440,7 +2440,7 @@ class GestionOCAdministracionController extends Controller
             //dd($initialPreviewConfig);
 
 
-
+            $funciones = $this;
 
 
             return View::make('comprobante/aprobaradm', 
@@ -2476,6 +2476,10 @@ class GestionOCAdministracionController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
+                                
                             ]);
 
 
@@ -2746,6 +2750,7 @@ class GestionOCAdministracionController extends Controller
             $ordencompra          =   CMPOrden::where('COD_ORDEN',$idcompra)->first();  
             $empresa_sel          =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR_CLIENTE)->first();
             $fereftop1            =   FeRefAsoc::where('lote','=',$idoc)->first();
+            $funciones = $this;
 
             //dd($initialPreviewConfig);
             return View::make('comprobante/aprobaradmoca', 
@@ -2783,6 +2788,8 @@ class GestionOCAdministracionController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
                             ]);
 
 
@@ -3012,6 +3019,7 @@ class GestionOCAdministracionController extends Controller
 
 
 
+            $funciones = $this;
 
             return View::make('comprobante/aprobaradmcontrato', 
                             [
@@ -3040,6 +3048,9 @@ class GestionOCAdministracionController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 
@@ -3404,7 +3415,7 @@ class GestionOCAdministracionController extends Controller
             }
 
 
-
+            $funciones = $this;
 
             return View::make('comprobante/aprobaradmnotacredito', 
                             [
@@ -3432,6 +3443,9 @@ class GestionOCAdministracionController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 
@@ -3779,6 +3793,7 @@ class GestionOCAdministracionController extends Controller
                 ];
             }
 
+            $funciones = $this;
 
             return View::make('comprobante/aprobaradmpg', 
                             [
@@ -3806,6 +3821,9 @@ class GestionOCAdministracionController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 
@@ -4173,6 +4191,7 @@ class GestionOCAdministracionController extends Controller
 
 
 
+            $funciones = $this;
 
             return View::make('comprobante/aprobaradmnotadebito', 
                             [
@@ -4200,6 +4219,9 @@ class GestionOCAdministracionController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 
@@ -4410,6 +4432,7 @@ class GestionOCAdministracionController extends Controller
             }
 
 
+            $funciones = $this;
 
 
             return View::make('comprobante/aprobaradmliquidacioncompraanticipo', 
@@ -4438,6 +4461,9 @@ class GestionOCAdministracionController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 
@@ -4845,6 +4871,8 @@ class GestionOCAdministracionController extends Controller
             $documento_asociados    =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->get();
             $documento_top          =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->first();
 
+            $funciones = $this;
+
             return View::make('comprobante/aprobaradmestiba', 
                             [
                                 'fedocumento'           =>  $fedocumento,
@@ -4866,6 +4894,9 @@ class GestionOCAdministracionController extends Controller
                                 'lote'                  =>  $idoc,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 

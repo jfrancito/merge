@@ -31,6 +31,9 @@ use App\Modelos\CMPDetalleProductoAF;
 use App\Modelos\CMPDocumentoCtble;
 use App\Modelos\CMPReferecenciaAsoc;
 use App\Modelos\FeRefAsoc;
+use App\Modelos\FeDocumentoEntregableDetraccion;
+
+use App\Modelos\WEBRol;
 
 use App\Modelos\WEBCategoriaActivoFijo;
 
@@ -45,20 +48,562 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Session;
 use View;
+use App\Traits\UserTraits;
 use App\Traits\GeneralesTraits;
 use App\Traits\ComprobanteTraits;
 use App\Traits\WhatsappTraits;
+
 
 use PDO;
 use Hashids;
 use SplFileInfo;
 use trendClass;
+use Excel;
 
 class GestionOCContabilidadController extends Controller
 {
     use GeneralesTraits;
     use ComprobanteTraits;
     use WhatsappTraits;
+    use UserTraits;
+
+    public function actionListarPagoDetraccion($idopcion)
+    {
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Ver');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        View::share('titulo','Lista Documentos para entrega');
+        $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
+
+        $fecha_inicio   =   $this->fecha_menos_diez_dias;
+        $fecha_fin      =   $this->fecha_sin_hora;
+
+        $empresa_id     =   Session::get('empresas')->COD_EMPR;
+        $combo_empresa  =   $this->gn_combo_empresa_empresa($empresa_id);
+
+        $banco_id       =   'BAM0000000000005';
+        $arraybancos    =   DB::table('CMP.CATEGORIA')->where('COD_CATEGORIA','=','BAM0000000000005')->where('TXT_GRUPO','=','BANCOS_MERGE')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
+        $combobancos    =   $arraybancos;
+
+        $combo_moneda   =   $this->gn_generacion_combo_categoria('MONEDA','Seleccione moneda','');
+        $moneda_id      =   'MON0000000000001';
+
+        $combo_operacion   =   array('SI' => 'YA SE PAGO', 'NO' => 'NO SE PAGO') ;
+        $operacion_id      =   'NO';
+
+
+        $listadatos     =   $this->con_lista_cabecera_comprobante_entregable_detraccion($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$moneda_id,$operacion_id);
+        $this->envio_detraccion_sunat();
+
+        $entregable_sel =   FeDocumentoEntregableDetraccion::where('COD_CATEGORIA_ESTADO','=','ETM0000000000001')
+                            ->where('COD_ESTADO','=','1')
+                            ->where('SELECCION','=','1')
+                            ->where('USUARIO_CREA','=',Session::get('usuario')->id)
+                            ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                            ->first();
+
+        $funcion        =   $this;
+        return View::make('entregadetraccion/listaentregadetracion',
+                         [
+                            'listadatos'        =>  $listadatos,
+                            'entregable_sel'    =>  $entregable_sel,
+
+                            
+                            'funcion'           =>  $funcion,
+                            'idopcion'          =>  $idopcion,
+                            'fecha_inicio'      =>  $fecha_inicio,
+                            'combo_moneda'      =>  $combo_moneda,
+                            'moneda_id'         =>  $moneda_id,
+
+                            'fecha_fin'         =>  $fecha_fin,
+
+                            'empresa_id'        =>  $empresa_id,
+                            'combo_empresa'     =>  $combo_empresa,
+
+                            'combo_operacion'   =>  $combo_operacion,
+                            'operacion_id'      =>  $operacion_id,
+
+                            'banco_id'          =>  $banco_id,
+                            'combobancos'       =>  $combobancos,
+
+                         ]);
+    }
+
+    public function actionListarAjaxBuscarDocumentoDetraccion(Request $request) {
+
+        $fecha_inicio   =   $request['fecha_inicio'];
+        $fecha_fin      =   $request['fecha_fin'];
+        $empresa_id     =   $request['empresa_id'];  
+        $idopcion       =   $request['idopcion'];
+        $moneda_id      =   $request['moneda_id'];
+        $operacion_id   =   $request['operacion_id'];
+        $banco_id        =   $request['banco_id'];
+        $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
+        $listadatos     =   $this->con_lista_cabecera_comprobante_entregable_detraccion($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$moneda_id,$operacion_id);
+        //$this->envio_detraccion_sunat();
+        $funcion        =   $this;
+        $entregable_sel =   FeDocumentoEntregableDetraccion::where('COD_CATEGORIA_ESTADO','=','ETM0000000000001')
+                                            ->where('COD_ESTADO','=','1')
+                                            ->where('SELECCION','=','1')
+                                            ->where('USUARIO_CREA','=',Session::get('usuario')->id)
+                                            ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                                            ->first();
+
+
+        return View::make('entregadetraccion/ajax/mergelistadetraccion',
+                         [
+                            'fecha_inicio'          =>  $fecha_inicio,
+                            'entregable_sel'        =>  $entregable_sel,
+                            'fecha_fin'             =>  $fecha_fin,
+                            'empresa_id'            =>  $empresa_id,
+                            'idopcion'              =>  $idopcion,
+                            'cod_empresa'           =>  $cod_empresa,
+                            'listadatos'            =>  $listadatos,
+                            'ajax'                  =>  true,
+                            'operacion_id'            =>  $operacion_id,
+                            'funcion'               =>  $funcion
+                         ]);
+    }
+
+    public function actionEntregableModalDetalleFolioDetraccion(Request $request)
+    {
+
+        $idopcion               =   $request['idopcion'];
+        $listadatos             =   FeDocumentoEntregableDetraccion::where('COD_CATEGORIA_ESTADO','=','ETM0000000000001')
+                                    ->where('COD_ESTADO','=','1')
+                                    ->where('USUARIO_CREA','=',Session::get('usuario')->id)
+                                    ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                                    ->get();
+
+        $banco_id               =   'BAM0000000000005';
+        $arraybancos            =   DB::table('CMP.CATEGORIA')->where('COD_CATEGORIA','=','BAM0000000000005')->where('TXT_GRUPO','=','BANCOS_MERGE')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
+        $combobancos            =   $arraybancos;
+
+        $combo_moneda           =   $this->gn_generacion_combo_categoria('MONEDA','Seleccione moneda','');
+        $defecto_moneda         =   'MON0000000000001';
+
+        $lfedocumento           =   array();
+        $array_retencion        =   array();
+        $mensaje                =   "";
+        $funcion                =   $this;
+        return View::make('entregadetraccion/modal/ajax/madetallefoliocreaciondetraccion',
+                         [
+                            'listadatos'        =>  $listadatos,
+                            'lfedocumento'      =>  $lfedocumento,
+                            'array_retencion'   =>  $array_retencion,
+                            'mensaje'           =>  $mensaje,
+                            'funcion'           =>  $funcion,
+                            'idopcion'          =>  $idopcion,
+                            'arraybancos'       =>  $arraybancos,
+                            'combobancos'       =>  $combobancos,
+                            'banco_id'          =>  $banco_id,
+                            'combo_moneda'                  => $combo_moneda,
+                            'defecto_moneda'                => $defecto_moneda, 
+
+
+                            'ajax'              =>  true,
+                         ]);
+    }
+
+    public function actionEntregableCrearFolioEntregableDetraccion($idopcion,Request $request)
+    {
+        try{
+
+            DB::beginTransaction();
+            $banco_id                               =   $request['banco_id'];
+            $moneda_id                              =   $request['moneda_id'];
+
+            $glosa                                  =   $request['glosa'];
+            $empresa_id                             =   Session::get('empresas')->COD_EMPR;
+            $banco                                  =   CMPCategoria::where('COD_CATEGORIA','=',$banco_id)->first();
+            $moneda                                 =   CMPCategoria::where('COD_CATEGORIA','=',$moneda_id)->first();
+
+            $codigo                                 =   $this->funciones->generar_folio('FE_DOCUMENTO_ENTREGABLE_DETRACCION',8);
+            $documento                              =   new FeDocumentoEntregableDetraccion;
+            $documento->FOLIO                       =   $codigo;
+            $documento->CAN_FOLIO                   =   0;
+            $documento->COD_ESTADO                  =   1;
+            $documento->USUARIO_CREA                =   Session::get('usuario')->id;
+            $documento->FECHA_CREA                  =   $this->fechaactual;
+            $documento->OPERACION                   =   '';
+            $documento->COD_EMPRESA                 =   $empresa_id;
+            $documento->COD_CATEGORIA_BANCO         =   $banco->COD_CATEGORIA;
+            $documento->TXT_CATEGORIA_BANCO         =   $banco->NOM_CATEGORIA;
+
+            $documento->COD_CATEGORIA_MONEDA        =   $moneda->COD_CATEGORIA;
+            $documento->TXT_CATEGORIA_MONEDA        =   $moneda->NOM_CATEGORIA;
+
+            $documento->COD_CATEGORIA_ESTADO        =   'ETM0000000000001';
+            $documento->TXT_CATEGORIA_ESTADO        =   'GENERADO';
+            $documento->SELECCION                   =   0;
+            $documento->TXT_GLOSA                   =   $glosa;
+            $documento->save();
+            DB::commit();
+
+            return Redirect::to('gestion-de-pago-detracciones/'.$idopcion)->with('bienhecho', 'Folio '.$codigo.' creado con exito');
+        }catch(\Exception $ex){
+            DB::rollback(); 
+            return Redirect::to('gestion-de-pago-detracciones/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+        }
+
+
+    }
+
+    public function actionEntregableSelectFolioPagoDetraccion(Request $request)
+    {
+
+        $data_folio             =   $request['data_folio'];
+        FeDocumentoEntregableDetraccion::where('COD_CATEGORIA_ESTADO','=','ETM0000000000001')
+                    ->where('COD_ESTADO','=','1')
+                    ->where('USUARIO_CREA','=',Session::get('usuario')->id)
+                    ->where('COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                    ->update(
+                        [
+                            'SELECCION'=>0
+                        ]
+                    );
+
+        $feentregable           =   FeDocumentoEntregableDetraccion::where('FOLIO','=',$data_folio)
+                                    ->first();
+        $feentregable->SELECCION = 1;
+        $feentregable->save();
+    }
+
+    public function actionEntregableCrearFolioDetraccion(Request $request)
+    {
+
+        $check                  =   $request['check'];
+        $id                     =   $request['id'];
+        $folio_sel              =   $request['folio_sel'];
+        $data                   =   array();
+        $mensaje                =   "";
+        $ope_ind                =   "0";
+        $lote_ver               =   "";
+
+        $entregable             =   FeDocumentoEntregableDetraccion::where('FOLIO','=',$folio_sel)
+                                    ->first();
+        $fedocumento_encontro   =   FeDocumento::where('ID_DOCUMENTO',$id)->first();
+
+        if($check==1){
+
+            //validacion si ya esta en otro folio
+                //SI NO ESTA NULL O VACIO TIENE ALGO
+            if (!empty($fedocumento_encontro->FOLIO_DETRACCION_RESERVA)) {
+                $mensaje            =   "Este Documento ya tiene un folio asigando ".$fedocumento_encontro->FOLIO_DETRACCION_RESERVA;
+                $ope_ind            =   "1";
+            }
+
+           //ver que sea del misma moneda
+            $moneda = '';
+            if($fedocumento_encontro->MONEDA == 'PEN'){
+                $moneda = 'MON0000000000001';
+            }
+            if($fedocumento_encontro->MONEDA == 'USD'){
+                $moneda = 'MON0000000000002';
+            }
+            if($moneda == ''){
+                $ordencompra            =   VDetraccionesConPagos::where('ID_DOCUMENTO','=',$fedocumento_encontro->ID_DOCUMENTO)->first();
+                if(count($ordencompra)>0){
+                    $moneda = $ordencompra->COD_CATEGORIA_MONEDA;
+                }
+            }
+
+            
+            if($entregable->COD_CATEGORIA_MONEDA != $moneda){
+                $mensaje            =   "Este Documento esta asiganado a otra MONEDA";
+                $ope_ind            =   "1";
+            }
+
+
+
+        }
+
+
+        if($ope_ind=="0"){
+
+            if($check==1){
+
+                FeDocumento::where('ID_DOCUMENTO','=',$fedocumento_encontro->ID_DOCUMENTO)
+                            ->update(
+                                [
+                                    'FOLIO_DETRACCION_RESERVA'=>$folio_sel
+                                ]
+                            );
+
+                $operaciones =  DB::table('FE_DOCUMENTO')
+                                ->where('FOLIO_DETRACCION_RESERVA','=',$folio_sel)
+                                ->pluck('OPERACION') // Obtiene solo la columna OPERACION como array
+                                ->unique() // Elimina duplicados
+                                ->implode(', ');
+                $fedocumentos =  FeDocumento::where('FOLIO_DETRACCION_RESERVA','=',$folio_sel)->get();
+                FeDocumentoEntregableDetraccion::where('FOLIO','=',$folio_sel)
+                            ->update(
+                                [
+                                    'CAN_FOLIO'=>count($fedocumentos),
+                                    'OPERACION'=>$operaciones
+                                ]
+                            );
+                $lote_ver               =   $entregable->FOLIO . ' ('.count($fedocumentos).')';
+
+            }else{
+
+                FeDocumento::where('ID_DOCUMENTO','=',$fedocumento_encontro->ID_DOCUMENTO)
+                            ->update(
+                                [
+                                    'FOLIO_DETRACCION_RESERVA'=>''
+                                ]
+                            );
+
+                $operaciones =  DB::table('FE_DOCUMENTO')
+                                ->where('FOLIO_DETRACCION_RESERVA','=',$folio_sel)
+                                ->pluck('OPERACION') // Obtiene solo la columna OPERACION como array
+                                ->unique() // Elimina duplicados
+                                ->implode(', ');
+
+                $fedocumentos =  FeDocumento::where('FOLIO_DETRACCION_RESERVA','=',$folio_sel)->get();
+                FeDocumentoEntregableDetraccion::where('FOLIO','=',$folio_sel)
+                            ->update(
+                                [
+                                    'CAN_FOLIO'=>count($fedocumentos),
+                                    'OPERACION'=>$operaciones
+                                ]
+                            );
+                $lote_ver               =   $entregable->FOLIO . ' ('.count($fedocumentos).')';
+
+            }
+
+            $mensaje                =   "Este Documento tiene que ser de un contrato";    
+            $data                   =   [
+                                            'mensaje'   => $mensaje,
+                                            'lote_ver'  => $lote_ver,
+                                            'check'     => $check,
+                                            'ope_ind'   => $ope_ind
+                                        ];
+
+        }else{
+
+            $data                   =   [
+                                            'mensaje'   => $mensaje, 
+                                            'lote_ver'  => $lote_ver,
+                                            'check'     => $check,
+                                            'ope_ind'   => $ope_ind
+                                        ];
+
+
+        }
+
+        return response()->json($data); // Enviar la respuesta como JSON
+
+
+    }
+
+
+    public function actionEntregableDetalleFolioPagoDetraccion(Request $request)
+    {
+        $data_folio             =   $request['data_folio'];
+        //dd($data_folio);
+
+        $lfedocumento           =   FeDocumento::where('FOLIO_DETRACCION_RESERVA','=',$data_folio)->orderby('RZ_PROVEEDOR','asc')->get();
+        $mensaje                =   "No hay ningun cambio en sus documentos";
+        $entregagle_a           =   FeDocumentoEntregableDetraccion::where('FOLIO','=',$data_folio)->first();
+        $funcion                =   $this;
+        return View::make('entregadetraccion/modal/ajax/mdetallefolio',
+                         [
+                            'lfedocumento'      =>  $lfedocumento,
+                            'data_folio'        =>  $data_folio,
+                            'entregagle_a'      =>  $entregagle_a,
+                            'mensaje'           =>  $mensaje,
+                            'funcion'           =>  $funcion
+                         ]);
+    }
+
+    public function actionEntregableGuardarFolioEntregableDetraccion($idopcion,Request $request)
+    {
+        try{
+            DB::beginTransaction();
+            $folio                                  =   $request['folio'];
+            $glosa_g                                =   $request['glosa_g'];
+
+            FeDocumentoEntregableDetraccion::where('FOLIO','=',$folio)
+                        ->update(
+                            [
+                                'SELECCION'=>0,
+                                'FEC_PAGO'=>$this->fecha_sin_hora,
+                                'TXT_GLOSA'=>$glosa_g,
+                                'COD_CATEGORIA_ESTADO'=>'ETM0000000000005',
+                                'TXT_CATEGORIA_ESTADO'=>'APROBADO',
+                                'USUARIO_MOD'=>Session::get('usuario')->id,
+                                'FECHA_MOD'=>$this->fechaactual
+                            ]
+                        );
+            FeDocumento::where('FOLIO_DETRACCION_RESERVA',$folio)
+                        ->update(
+                            [
+                                'FOLIO_DETRACCION'=>$folio
+                            ]
+                        );
+
+            DB::commit();
+            return Redirect::to('gestion-de-pago-detracciones/'.$idopcion)->with('bienhecho', 'Folio '.$folio.' aprobado con exito');
+        }catch(\Exception $ex){
+            DB::rollback(); 
+            return Redirect::to('gestion-de-pago-detracciones/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+        }
+    }
+
+    public function actionEntregableExtornoFolioPagoDetraccion(Request $request)
+    {
+
+        $data_folio             =   $request['data_folio'];
+        FeDocumentoEntregableDetraccion::where('FOLIO','=',$data_folio)
+                    ->update(
+                        [
+                            'COD_ESTADO'=>0,
+                            'COD_CATEGORIA_ESTADO'=>'ETM0000000000006',
+                            'TXT_CATEGORIA_ESTADO'=>'RECHAZADO'
+                        ]
+                    );
+        FeDocumento::where('FOLIO_DETRACCION_RESERVA','=',$data_folio)
+                    ->update(
+                        [
+                            'FOLIO_DETRACCION_RESERVA'=>''
+                        ]
+                    );
+    }
+    
+    public function actionListarEntregaDocumentoFolioDetraccion($idopcion)
+    {
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Ver');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        View::share('titulo','Lista de Folio de Documentos');
+        $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
+        $empresa_id     =   Session::get('empresas')->COD_EMPR;
+        $rol            =   WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
+        $listadatos     =   FeDocumentoEntregableDetraccion::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE_DETRACCION.USUARIO_CREA')
+                            ->where('COD_EMPRESA','=',$empresa_id)
+                            ->where('COD_ESTADO','=','1')
+                            ->where('COD_CATEGORIA_ESTADO','=','ETM0000000000005')
+                            ->orderBy('FE_DOCUMENTO_ENTREGABLE_DETRACCION.FECHA_CREA','DESC')
+                            ->get();
+
+        $funcion        =   $this;
+        return View::make('entregadetraccion/listaentregadocumentofoliodetraccion',
+                         [
+                            'listadatos'        =>  $listadatos,
+                            'funcion'           =>  $funcion,
+                            'idopcion'          =>  $idopcion,
+                         ]);
+    }
+
+
+
+    public function actionDescargarDocumentoFolioDetraccion($folio_codigo)
+    {
+
+        $folio                  =   FeDocumentoEntregableDetraccion::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE_DETRACCION.USUARIO_CREA')
+                                    ->where('FOLIO','=',$folio_codigo)->first();
+
+        $listadatossolesotro    =   array();
+        $listadatosdolarotro    =   array();
+        $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda_detraccion($folio->FOLIO,'MON0000000000001');
+        //COD_CATEGORIA_MONEDA
+        $operacion_id           =   $folio->OPERACION;
+        $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
+        $titulo                 =   'FOLIO('.$folio_codigo.') '.$empresa->NOM_EMPR;
+        $funcion                =   $this;
+
+        Excel::create($titulo, function($excel) use ($listadatossoles,$listadatossolesotro,$listadatosdolarotro,$operacion_id,$funcion,$folio,$empresa) {
+
+            if($folio->COD_CATEGORIA_MONEDA=='MON0000000000001' or $folio->COD_CATEGORIA_MONEDA==''){
+
+
+                $excel->sheet('Soles', function($sheet) use ($listadatossoles,$listadatossolesotro,$operacion_id,$funcion,$folio,$empresa){
+
+                    $sheet->setSelectedCells('C1');
+
+                    $sheet->setWidth('A', 8);
+                    $sheet->setWidth('B', 20);
+                    $sheet->setWidth('C', 20);
+                    $sheet->setWidth('D', 40);
+                    $sheet->setWidth('E', 40);
+                    $sheet->setWidth('F', 30);
+                    $sheet->setWidth('G', 30);
+                    $sheet->setWidth('H', 30);
+                    $sheet->setWidth('I', 20);
+                    $sheet->setWidth('J', 20);
+                    $sheet->setWidth('K', 20);
+                    $sheet->setWidth('L', 30);
+                    $sheet->setWidth('M', 20);
+                    $sheet->setWidth('N', 20);
+                    $sheet->setWidth('O', 20);
+
+
+                    $sheet->mergeCells('B2:C2');
+                    $sheet->mergeCells('B3:C3');
+                    $sheet->mergeCells('B4:C4');
+                    $sheet->mergeCells('B5:C5');
+                    $sheet->mergeCells('B6:C6');
+                    $sheet->mergeCells('B7:C7');
+
+                    $sheet->cell('A1', function($cell) {
+                                $cell->setFontColor('#FFFFFF');   // Texto blanco
+                            });
+
+                    $sheet->loadView('entregadetraccion/excel/eentregabledetraccion')->with('listadatos',$listadatossoles)
+                                                                          ->with('listadatosotro',$listadatossolesotro)
+                                                                          ->with('funcion',$funcion)
+                                                                          ->with('folio',$folio)
+                                                                          ->with('empresa',$empresa)
+                                                                          ->with('simbolo','S/.')
+                                                                          ->with('operacion_id',$operacion_id);         
+                });
+            }
+
+        })->setActiveSheetIndex(0)->export('xls');
+
+
+    }
+
+
+    public function actionDescargarDocumentoFolioDetraccionMacro($folio_codigo)
+    {
+
+        $folio                  =   FeDocumentoEntregableDetraccion::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE_DETRACCION.USUARIO_CREA')
+                                    ->where('FOLIO','=',$folio_codigo)->first();
+
+        $listadatossolesotro    =   array();
+        $listadatosdolarotro    =   array();
+        $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda_detraccion($folio->FOLIO,'MON0000000000001');
+        //COD_CATEGORIA_MONEDA
+        $operacion_id           =   $folio->OPERACION;
+        $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
+        $titulo                 =   'FOLIO MACRO ('.$folio_codigo.') '.$empresa->NOM_EMPR;
+        $funcion                =   $this;
+
+        Excel::create($titulo, function($excel) use ($listadatossoles,$listadatossolesotro,$listadatosdolarotro,$operacion_id,$funcion,$folio,$empresa) {
+
+            if($folio->COD_CATEGORIA_MONEDA=='MON0000000000001' or $folio->COD_CATEGORIA_MONEDA==''){
+
+
+                $excel->sheet('MACRO', function($sheet) use ($listadatossoles,$listadatossolesotro,$operacion_id,$funcion,$folio,$empresa){
+
+                    $sheet->loadView('entregadetraccion/excel/eentregabledetraccionmacro')->with('listadatos',$listadatossoles)
+                                                                          ->with('listadatosotro',$listadatossolesotro)
+                                                                          ->with('funcion',$funcion)
+                                                                          ->with('folio',$folio)
+                                                                          ->with('empresa',$empresa)
+                                                                          ->with('simbolo','S/.')
+                                                                          ->with('operacion_id',$operacion_id);         
+                });
+            }
+
+        })->setActiveSheetIndex(0)->export('xls');
+
+
+    }
 
 
     public function actionListarComprobanteContabilidad($idopcion, Request $request)
@@ -1153,6 +1698,10 @@ class GestionOCContabilidadController extends Controller
                     'tp' => $tp,
                     'idopcion' => $idopcion,
                     'idoc' => $idoc,
+
+                    'funciones' => $funciones,
+                    'funcion' => $funciones,
+
                 ]);
 
 
@@ -2582,6 +3131,8 @@ class GestionOCContabilidadController extends Controller
                     'idopcion' => $idopcion,
                     'idoc' => $idoc,
                     'funciones' => $funciones,
+                    'funcion' => $funciones,
+
                 ]);
 
 
@@ -3834,6 +4385,10 @@ class GestionOCContabilidadController extends Controller
                     //'tp'                    =>  $tp,
                     'idopcion' => $idopcion,
                     'idoc' => $idoc,
+
+                    'funciones' => $funciones,
+                    'funcion' => $funciones,
+
                 ]);
 
 
@@ -4811,6 +5366,10 @@ class GestionOCContabilidadController extends Controller
                     'tp' => $tp,
                     'idopcion' => $idopcion,
                     'idoc' => $idoc,
+
+                    'funciones' => $funciones,
+                    'funcion' => $funciones,
+
                 ]);
 
 
@@ -5653,6 +6212,7 @@ class GestionOCContabilidadController extends Controller
             $combo_activo = array('1' => 'ACTIVO', '0' => 'ELIMINAR');
 
             $combo_tipo_asiento = $this->gn_generacion_combo_categoria('TIPO_ASIENTO', 'Seleccione tipo asiento', '');
+            $funciones = $this;
 
             return View::make('comprobante/aprobarconestiba',
                 [
@@ -5704,6 +6264,9 @@ class GestionOCContabilidadController extends Controller
                     'asiento_deduccion' => $asiento_deduccion,
                     'asiento_percepcion' => $asiento_percepcion,
                     'asiento_reparable' => $asiento_reparable,
+                    'funciones' => $funciones,
+                    'funcion' => $funciones,
+
                 ]);
 
 
@@ -6438,6 +7001,10 @@ class GestionOCContabilidadController extends Controller
                     'asiento_deduccion' => $asiento_deduccion,
                     'asiento_percepcion' => $asiento_percepcion,
                     'asiento_reparable' => $asiento_reparable,
+
+                    'funciones' => $funciones,
+                    'funcion' => $funciones,
+
                     // NUEVO
 
                 ]);
@@ -7334,6 +7901,7 @@ class GestionOCContabilidadController extends Controller
             $combo_activo = array('1' => 'ACTIVO', '0' => 'ELIMINAR');
 
             $combo_tipo_asiento = $this->gn_generacion_combo_categoria('TIPO_ASIENTO', 'Seleccione tipo asiento', '');
+            $funciones = $this;
 
             return View::make('comprobante/aprobarconcontrato',
                 [
@@ -7389,6 +7957,9 @@ class GestionOCContabilidadController extends Controller
                     'tp' => $tp,
                     'idopcion' => $idopcion,
                     'idoc' => $idoc,
+                    'funciones' => $funciones,
+                    'funcion' => $funciones,
+
                 ]);
 
 
@@ -8182,6 +8753,11 @@ class GestionOCContabilidadController extends Controller
                     'tp' => $tp,
                     'idopcion' => $idopcion,
                     'idoc' => $idoc,
+
+
+                    'funciones' => $funciones,
+                    'funcion' => $funciones,
+
                 ]);
 
 
@@ -8978,6 +9554,10 @@ class GestionOCContabilidadController extends Controller
                     'tp' => $tp,
                     'idopcion' => $idopcion,
                     'idoc' => $idoc,
+
+                    'funciones' => $funciones,
+                    'funcion' => $funciones,
+
                 ]);
 
 
@@ -9709,6 +10289,9 @@ class GestionOCContabilidadController extends Controller
                     'tp' => $tp,
                     'idopcion' => $idopcion,
                     'idoc' => $idoc,
+                    'funciones' => $funciones,
+                    'funcion' => $funciones,
+
                 ]);
 
 
@@ -10786,6 +11369,11 @@ class GestionOCContabilidadController extends Controller
                 $reparable = $request['reparable'];
                 $archivofi = $request['archivofi'];
 
+
+                if ($fedocumento->ind_observacion == 1) {
+                    DB::rollback();
+                    return Redirect::back()->with('errorurl', 'El documento ya esta observado no se puede reparar');
+                }
 
                 if ($fedocumento->IND_REPARABLE == 1) {
                     DB::rollback();
@@ -11929,6 +12517,11 @@ class GestionOCContabilidadController extends Controller
                 $archivoob = $request['archivore'];
                 $reparable = $request['reparable'];
 
+                if ($fedocumento->ind_observacion == 1) {
+                    DB::rollback();
+                    return Redirect::back()->with('errorurl', 'El documento ya esta observado no se puede reparar');
+                }
+
                 if ($fedocumento->IND_REPARABLE == 1) {
                     DB::rollback();
                     return Redirect::back()->with('errorurl', 'El documento ya esta reparado no se puede reparar');
@@ -12206,6 +12799,11 @@ class GestionOCContabilidadController extends Controller
                 $archivoob = $request['archivore'];
                 $reparable = $request['reparable'];
                 $archivofi = $request['archivofi'];
+
+                if ($fedocumento->ind_observacion == 1) {
+                    DB::rollback();
+                    return Redirect::back()->with('errorurl', 'El documento ya esta observado no se puede reparar');
+                }
 
                 if ($fedocumento->IND_REPARABLE == 1) {
                     DB::rollback();
@@ -12508,6 +13106,10 @@ class GestionOCContabilidadController extends Controller
                 $reparable = $request['reparable'];
                 $archivofi = $request['archivofi'];
 
+                if ($fedocumento->ind_observacion == 1) {
+                    DB::rollback();
+                    return Redirect::back()->with('errorurl', 'El documento ya esta observado no se puede reparar');
+                }
 
                 if ($fedocumento->IND_REPARABLE == 1) {
                     DB::rollback();
@@ -12805,6 +13407,10 @@ class GestionOCContabilidadController extends Controller
                 $reparable = $request['reparable'];
                 $archivofi = $request['archivofi'];
 
+                if ($fedocumento->ind_observacion == 1) {
+                    DB::rollback();
+                    return Redirect::back()->with('errorurl', 'El documento ya esta observado no se puede reparar');
+                }
 
                 if ($fedocumento->IND_REPARABLE == 1) {
                     DB::rollback();
@@ -13042,6 +13648,11 @@ class GestionOCContabilidadController extends Controller
                 $archivofi = $request['archivofi'];
 
 
+                if ($fedocumento->ind_observacion == 1) {
+                    DB::rollback();
+                    return Redirect::back()->with('errorurl', 'El documento ya esta observado no se puede reparar');
+                }
+
                 if ($fedocumento->IND_REPARABLE == 1) {
                     DB::rollback();
                     return Redirect::back()->with('errorurl', 'El documento ya esta reparado no se puede reparar');
@@ -13277,6 +13888,10 @@ class GestionOCContabilidadController extends Controller
                 $reparable = $request['reparable'];
                 $archivofi = $request['archivofi'];
 
+                if ($fedocumento->ind_observacion == 1) {
+                    DB::rollback();
+                    return Redirect::back()->with('errorurl', 'El documento ya esta observado no se puede reparar');
+                }
 
                 if ($fedocumento->IND_REPARABLE == 1) {
                     DB::rollback();

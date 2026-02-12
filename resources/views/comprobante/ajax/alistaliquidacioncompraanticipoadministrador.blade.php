@@ -9,7 +9,9 @@
       <th>EXTORNO</th>
       <th>FECHA </th>
       <th>MONEDA</th>
+      <th>CUENTA OSIRIS</th>
       <th>PROVEEDOR</th>
+
       <th>TOTAL</th>
       <th>USUARIO CREACION</th>
       <th>ESTADO</th>
@@ -18,6 +20,7 @@
   </thead>
   <tbody>
     @foreach($listadatos as $index => $item)
+      @php $NOMBRE_OSIRIS =  $funcion->funciones->cuenta_osiris_lca($item->COD_AUTORIZACION) @endphp
       <tr data_requerimiento_id = "{{$item->id}}">
         <td><b>LIQUIDACION DE COMPRA ANTICIPO</b></td>
         <td>{{$item->COD_AUTORIZACION}}</td>
@@ -26,6 +29,7 @@
         <td>{{$item->FEC_AUTORIZACION}}</td>
         <td>{{$item->TXT_CATEGORIA_MONEDA}}</td>
         <td>{{$item->TXT_EMPRESA}}</td>
+        <td>{{$NOMBRE_OSIRIS}}</td>        
         <td>{{$item->CAN_TOTAL}}</td>
         <td>{{$item->COD_USUARIO_CREA_AUD}}</td>
         @include('comprobante.ajax.estados')

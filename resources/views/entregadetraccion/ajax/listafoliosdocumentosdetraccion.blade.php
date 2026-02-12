@@ -30,45 +30,16 @@
           <div class="btn-group btn-hspace">
             <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>
             <ul role="menu" class="dropdown-menu pull-right">
-              @if($item->OPERACION=='DOCUMENTO_INTERNO_COMPRA')
                 <li>
-                  <a href="{{ url('/descargar-folio-dic-excel/'.$item->FOLIO) }}">
+                  <a href="{{ url('/descargar-folio-excel-detraccion/'.$item->FOLIO) }}">
                     Descargar Resumen
                   </a>  
                 </li>
-              @else
-                @if($item->OPERACION=='LIQUIDACION_COMPRA_ANTICIPO')
-                  <li>
-                    <a href="{{ url('/descargar-folio-lca-excel/'.$item->FOLIO) }}">
-                      Descargar Resumen
-                    </a>  
-                  </li>
-                @else
-                  <li>
-                    <a href="{{ url('/descargar-folio-excel/'.$item->FOLIO) }}">
-                      Descargar Resumen
-                    </a>  
-                  </li>
-                @endif
-              @endif
-              @if($item->OPERACION=='CONTRATO')
-                @include('entregadocumento.excel.opcionct')
-              @else
-                @if($item->OPERACION=='ORDEN_COMPRA')
-                  @include('entregadocumento.excel.opcionoc')
-                @else
-                  @if($item->OPERACION=='DOCUMENTO_SERVICIO_BALANZA')
-                    @include('entregadocumento.excel.opcionbal')
-                  @else
-                    @if($item->OPERACION=='LIQUIDACION_COMPRA_ANTICIPO')
-                      @include('entregadocumento.excel.opcionlca')
-                    @else
-                      @include('entregadocumento.excel.opcionoc')
-                    @endif
-                  @endif
-                @endif
-              @endif
-
+                <li>
+                  <a href="{{ url('/descargar-folio-excel-detraccion-macro/'.$item->FOLIO) }}">
+                    Macro Banco de la Nacion
+                  </a>  
+                </li>
             </ul>
           </div>
         </td>

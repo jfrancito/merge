@@ -67,7 +67,7 @@
 		            @ENDIF
 		        </td>
 		        <td>{{$item->COD_TABLA_ASOC}}</td>
-		        <td><b>{{$item->CAN_TOTAL}}</b></td>
+		        <td><b>{{number_format($item->CAN_TOTAL, 2, '.', ',')}}</b></td>
 		        <td>
 		          @IF($item->MONTO_DETRACCION_RED>0)
 		            DETRACION
