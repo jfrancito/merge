@@ -2807,7 +2807,7 @@ $(document).ready(function () {
                         if (moneda_id_editar !== 'MON0000000000001') {
                             base_exonerado = base_exonerado + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
                         } else {
-                            base_exonerado = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                            base_exonerado = base_exonerado + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                         }
                         break;
                 }
