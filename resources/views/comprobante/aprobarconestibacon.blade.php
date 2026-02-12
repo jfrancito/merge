@@ -47,9 +47,9 @@
 
         /* Versión pequeña tipo input-sm */
         .ss-main {
-            height: 38px;         /* ajusta la altura */
-            font-size: 12px;      /* tamaño de fuente */
-            padding: 2px 8px;     /* espacio interno */
+            height: 38px; /* ajusta la altura */
+            font-size: 12px; /* tamaño de fuente */
+            padding: 2px 8px; /* espacio interno */
         }
     </style>
 @stop
@@ -105,12 +105,12 @@
                                                   action="{{ url('/agregar-observacion-contabilidad-estiba/'.$idopcion.'/'.$lote) }}"
                                                   style="border-radius: 0px;"
                                                   class="form-horizontal group-border-dashed">
-                                                    {{ csrf_field() }}
-                                                    <input type="hidden" name="device_info" id='device_info'>
+                                                {{ csrf_field() }}
+                                                <input type="hidden" name="device_info" id='device_info'>
 
-                                                    <input type="hidden" name="operacion_id" id="operacion_id"
+                                                <input type="hidden" name="operacion_id" id="operacion_id"
                                                        value="{{$fedocumento->OPERACION}}">
-                                                    @include('comprobante.form.formobservarestiba')
+                                                @include('comprobante.form.formobservarestiba')
                                             </form>
                                         </div>
                                     </div>
@@ -202,41 +202,108 @@
 
     <script type="text/javascript">
 
-      $('#file-otros').fileinput({
-        theme: 'fa5',
-        language: 'es',
-      });
+        document.addEventListener("DOMContentLoaded", function () {
 
-          @foreach($archivospdf as $index => $item)
-            var nombre_archivo = '{{$item->NOMBRE_ARCHIVO}}';
-            $('#file-'+{{$index}}).fileinput({
-              theme: 'fa5',
-              language: 'es',
-              initialPreview: ["{{ route('serve-fileliquidacioncompraanticipo', ['file' => '']) }}" + nombre_archivo],
-              initialPreviewAsData: true,
-              initialPreviewFileType: 'pdf',
-              initialPreviewConfig: [
-                  {type: "pdf", caption: nombre_archivo, downloadUrl: "{{ route('serve-fileliquidacioncompraanticipo', ['file' => '']) }}" + nombre_archivo} // Para mostrar el botón de descarga
-              ]
+            let carpeta = $("#carpeta").val();
+            let _token = $("#token").val();
+            let link = '/buscar-proveedor';
+
+            //siempre que uses nifty modal usar esta libreria para poder abrir los modales
+            $.fn.niftyModal('setDefaults', {
+                overlaySelector: '.modal-overlay',
+                closeSelector: '.modal-close',
+                classAddAfterOpen: 'modal-show',
             });
-          @endforeach
+
+            let select = new TomSelect("#empresa_asiento", {
+                valueField: 'id',
+                labelField: 'text',
+                searchField: 'text',
+                placeholder: "Escriba para buscar...",
+                preload: true, // carga inicial
+                load: function (query, callback) {
+                    let data = {
+                        _token: _token,
+                        busqueda: query
+                    };
+                    fetch(carpeta + link, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(data)
+                    })
+                        //fetch('/buscar-tipo-documento?q=' + encodeURIComponent(query))
+                        .then(response => response.json())
+                        .then(json => {
+                            callback(json);
+                        })
+                        .catch(() => {
+                            callback();
+                        });
+                }
+            });
+
+            // ✅ Si hay valor por defecto, lo insertamos
+            if (defaultId) {
+                select.addOption({id: defaultId, text: defaultText}); // añade la opción
+                select.setValue(defaultId); // la selecciona
+            }
+
+            window.selects = {};
+            document.querySelectorAll("select.slim").forEach(function (el) {
+                window.selects[el.id] = new SlimSelect({
+                    select: el,
+                    placeholder: 'Seleccione...',
+                    allowDeselect: true
+                })
+            })
+
+            $('.pnlasientos').hide();
+
+        });
+
+        $('#file-otros').fileinput({
+            theme: 'fa5',
+            language: 'es',
+        });
+
+        let nombre_archivo = ''
+
+        @foreach($archivospdf as $index => $item)
+            nombre_archivo = '{{$item->NOMBRE_ARCHIVO}}';
+            $('#file-' + {{$index}}).fileinput({
+                theme: 'fa5',
+                language: 'es',
+                initialPreview: ["{{ route('serve-fileliquidacioncompraanticipo', ['file' => '']) }}" + nombre_archivo],
+                initialPreviewAsData: true,
+                initialPreviewFileType: 'pdf',
+                initialPreviewConfig: [
+                    {
+                        type: "pdf",
+                        caption: nombre_archivo,
+                        downloadUrl: "{{ route('serve-fileliquidacioncompraanticipo', ['file' => '']) }}" + nombre_archivo
+                    } // Para mostrar el botón de descarga
+                ]
+            });
+        @endforeach
 
 
-          var initialPreview = {!! $initialPreview !!};
-          var initialPreviewConfig = {!! $initialPreviewConfig !!};
-          $("#input-24").fileinput({
-              initialPreview: initialPreview,
-              initialPreviewAsData: true,
-              initialPreviewConfig: initialPreviewConfig,
-              overwriteInitial: false,
-              maxFileSize: 100,
-              zoomModalHeight: 'auto', // Ajusta el modal automáticamente al contenido
-              zoomModalWidth: 'auto'  // Ajusta el ancho del modal
-          });
+        let initialPreview = {!! $initialPreview !!};
+        let initialPreviewConfig = {!! $initialPreviewConfig !!};
+        $("#input-24").fileinput({
+            initialPreview: initialPreview,
+            initialPreviewAsData: true,
+            initialPreviewConfig: initialPreviewConfig,
+            overwriteInitial: false,
+            maxFileSize: 100,
+            zoomModalHeight: 'auto', // Ajusta el modal automáticamente al contenido
+            zoomModalWidth: 'auto'  // Ajusta el ancho del modal
+        });
 
-        $('#input-24').on('filezoomshown', function(event, params) {
+        $('#input-24').on('filezoomshown', function (event, params) {
             // Ajustar el modal de zoom para que se maximice
-            var modal = params.modal;
+            let modal = params.modal;
             modal.find('.modal-dialog').css({
                 'max-width': '100%',
                 'width': '100%',
@@ -256,7 +323,7 @@
             });
 
             // Activar el modo de pantalla completa
-            setTimeout(function() {
+            setTimeout(function () {
                 modal.find('.btn-kv-fullscreen').trigger('click');
             }, 100); // Retraso para asegurar que el modal está completamente cargado
         });

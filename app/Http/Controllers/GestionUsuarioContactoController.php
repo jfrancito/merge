@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Modelos\WEBAsiento;
 use Illuminate\Http\Request;
 use App\Modelos\Grupoopcion;
 use App\Modelos\Opcion;
@@ -70,8 +71,8 @@ class GestionUsuarioContactoController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
                 $datastring         =   json_decode($request['datastring'], false);
 
@@ -179,7 +180,7 @@ class GestionUsuarioContactoController extends Controller
                 DB::commit();
                 return Redirect::to('/gestion-de-tesoreria-aprobar/'.$idopcion)->with('bienhecho', 'Comprobantes Masivo Aprobado con exito');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 return Redirect::to('gestion-de-tesoreria-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
@@ -202,8 +203,8 @@ class GestionUsuarioContactoController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
 
                 DB::beginTransaction();
                 $pedido_id              =   $idoc;
@@ -307,7 +308,7 @@ class GestionUsuarioContactoController extends Controller
                 DB::commit();
                 return Redirect::to('/gestion-de-comprobantes-observados/'.$idopcion)->with('bienhecho', 'Comprobante : '.$lote.' RESUELTO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 return Redirect::to('gestion-de-comprobantes-observados/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
@@ -354,19 +355,19 @@ class GestionUsuarioContactoController extends Controller
 
             $fereftop1              =   FeRefAsoc::where('lote','=',$idoc)->first();
 
-            $lotes                  =   FeRefAsoc::where('lote','=',$idoc)                                        
+            $lotes                  =   FeRefAsoc::where('lote','=',$idoc)
                                         ->pluck('ID_DOCUMENTO')
                                         ->toArray();
             $documento_asociados    =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->get();
             $documento_top          =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->first();
 
-            $lotes                  =   FeRefAsoc::where('lote','=',$idoc)                                        
+            $lotes                  =   FeRefAsoc::where('lote','=',$idoc)
                                         ->first();
             $idcompra               =   $lotes->ID_DOCUMENTO;
 
 
             //orden de ingreso
-            $orden_f                =   CMPOrden::where('COD_ORDEN','=',$idcompra)->first();   
+            $orden_f                =   CMPOrden::where('COD_ORDEN','=',$idcompra)->first();
             $conexionbd         = 'sqlsrv';
             if($orden_f->COD_CENTRO == 'CEN0000000000004'){ //rioja
                 $conexionbd         = 'sqlsrv_r';
@@ -381,11 +382,11 @@ class GestionUsuarioContactoController extends Controller
             $referencia             =   DB::connection($conexionbd)->table('CMP.REFERENCIA_ASOC')->where('COD_TABLA','=',$ordencompra->COD_ORDEN)
                                         ->orderBy('COD_TABLA_ASOC','desc')
                                         ->where('COD_TABLA_ASOC','like','%OI%')->first();
-                                        
+
             $ordeningreso           =   array();
             if(count($referencia)>0){
-                $ordeningreso       =   DB::connection($conexionbd)->table('CMP.ORDEN')->where('COD_ORDEN','=',$referencia->COD_TABLA_ASOC)->first();   
-            }                 
+                $ordeningreso       =   DB::connection($conexionbd)->table('CMP.ORDEN')->where('COD_ORDEN','=',$referencia->COD_TABLA_ASOC)->first();
+            }
 
 
             $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc_actual($idcompra);
@@ -424,11 +425,11 @@ class GestionUsuarioContactoController extends Controller
 
 
                         if(count($referencia_os)>0){
-                            $ordensalida       =   DB::connection($conexionbd)->table('CMP.ORDEN')->where('COD_ORDEN','=',$referencia_os->COD_TABLA_ASOC)->first(); 
+                            $ordensalida       =   DB::connection($conexionbd)->table('CMP.ORDEN')->where('COD_ORDEN','=',$referencia_os->COD_TABLA_ASOC)->first();
                         }
                     }
                 }
-            }                 
+            }
 
             $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
             $archivospdf            =   $this->lista_archivos_total_pdf($idoc,$fedocumento->DOCUMENTO_ITEM);
@@ -447,7 +448,6 @@ class GestionUsuarioContactoController extends Controller
             }
 
             $funciones = $this;
-
                                 
             return View::make('comprobante/observarucestibamoca', 
                             [
@@ -494,7 +494,7 @@ class GestionUsuarioContactoController extends Controller
 
     public function actionListarAjaxModalReparableMasivo(Request $request)
     {
-        
+
 
         $idopcion               =   $request['idopcion'];
         $datastring_n           =   $request['datastring'];
@@ -506,12 +506,12 @@ class GestionUsuarioContactoController extends Controller
 
 
         return View::make('comprobante/modal/ajax/magregarreparablemasivo',
-                         [          
+                         [
                             'datastring_n'          => $datastring_n,
                             'datastring'            => $datastring,
                             'idopcion'              => $idopcion,
                             'tarchivos'             => $tarchivos,
-                            'ajax'                  => true,                            
+                            'ajax'                  => true,
                          ]);
     }
 
@@ -877,7 +877,7 @@ class GestionUsuarioContactoController extends Controller
         //dd($cod_empresa);
 
         $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_observados_oc_proveedor($cod_empresa);
-  
+
         $funcion        =   $this;
         return View::make('comprobante/listaocobservadosocprovedor',
                          [
@@ -911,8 +911,8 @@ class GestionUsuarioContactoController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
                 $pedido_id              =   $idoc;
                 $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
@@ -1024,7 +1024,7 @@ class GestionUsuarioContactoController extends Controller
                 DB::commit();
                 return Redirect::to('/gestion-observados-oc-provedores/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' RESUELTO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 return Redirect::to('gestion-observados-oc-provedores/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
@@ -1033,7 +1033,7 @@ class GestionUsuarioContactoController extends Controller
 
             $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc_actual($idoc);
             $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
-            //$ordencompra            =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();  
+            //$ordencompra            =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
 
 
             $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
@@ -1044,7 +1044,7 @@ class GestionUsuarioContactoController extends Controller
                                         ->pluck('TIPO_ARCHIVO')
                                         ->toArray();
 
- 
+
             $tiposerie              =   substr($fedocumento->SERIE, 0, 1);
 
             if($tiposerie == 'E'){
@@ -1080,13 +1080,12 @@ class GestionUsuarioContactoController extends Controller
 
             $funciones = $this;
 
-
             return View::make('comprobante/observarucprovedor', 
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'archivosanulados'           =>  $archivosanulados,
                                 'ordencompra_f'           =>  $ordencompra_f,
-                                
+
                                 'ordencompra'           =>  $ordencompra,
                                 'linea'                 =>  $linea,
                                 'detalleordencompra'    =>  $detalleordencompra,
@@ -1124,8 +1123,8 @@ class GestionUsuarioContactoController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
                 $pedido_id              =   $idoc;
                 $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
@@ -1246,7 +1245,7 @@ class GestionUsuarioContactoController extends Controller
                 DB::commit();
                 return Redirect::to('/gestion-de-comprobantes-observados/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' RESUELTO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 return Redirect::to('gestion-de-comprobantes-observados/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
@@ -1255,7 +1254,7 @@ class GestionUsuarioContactoController extends Controller
 
             $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc_actual($idoc);
             $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
-            //$ordencompra            =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();  
+            //$ordencompra            =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
 
 
             $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
@@ -1266,7 +1265,7 @@ class GestionUsuarioContactoController extends Controller
                                         ->pluck('TIPO_ARCHIVO')
                                         ->toArray();
 
- 
+
             $tiposerie              =   substr($fedocumento->SERIE, 0, 1);
 
             if($tiposerie == 'E'){
@@ -1286,7 +1285,7 @@ class GestionUsuarioContactoController extends Controller
                                             ->whereNotIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000009'])
                                             //->where('TXT_ASIGNADO','=','CONTACTO')
                                             ->get();
-            
+
             //dd($tarchivos);
 
 
@@ -1314,7 +1313,7 @@ class GestionUsuarioContactoController extends Controller
 
             $funciones = $this;
 
-            return View::make('comprobante/observaruc', 
+            return View::make('comprobante/observaruc',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
@@ -1356,8 +1355,8 @@ class GestionUsuarioContactoController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
                 $pedido_id              =   $idoc;
                 $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
@@ -1502,7 +1501,7 @@ class GestionUsuarioContactoController extends Controller
                 DB::commit();
                 return Redirect::to('/gestion-de-comprobantes-reparable/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' RESUELTO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 return Redirect::to('gestion-de-comprobantes-reparable/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
@@ -1511,7 +1510,7 @@ class GestionUsuarioContactoController extends Controller
 
             $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc_actual($idoc);
             $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
-            //$ordencompra            =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();  
+            //$ordencompra            =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
 
 
             $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
@@ -1522,7 +1521,7 @@ class GestionUsuarioContactoController extends Controller
                                         ->pluck('TIPO_ARCHIVO')
                                         ->toArray();
 
- 
+
             $tiposerie              =   substr($fedocumento->SERIE, 0, 1);
 
             if($tiposerie == 'E'){
@@ -1546,14 +1545,225 @@ class GestionUsuarioContactoController extends Controller
             $trabajador             =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
             $ordencompra_f          =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
 
+            $combo_moneda = $this->gn_generacion_combo_categoria('MONEDA', 'Seleccione moneda', '');
+            $combo_tipo_documento = $this->gn_generacion_combo_tipo_documento_sunat('STD.TIPO_DOCUMENTO', 'COD_TIPO_DOCUMENTO', 'TXT_TIPO_DOCUMENTO', 'Seleccione tipo documento', '');
 
-            return View::make('comprobante/reparableuc', 
+            $anio_defecto = date('Y', strtotime($fedocumento->FEC_VENTA));
+            $mes_defecto = date('m', strtotime($fedocumento->FEC_VENTA));
+
+            $array_anio_pc = $this->pc_array_anio_cuentas_contable(Session::get('empresas')->COD_EMPR);
+            $combo_anio_pc = $this->gn_generacion_combo_array('Seleccione año', '', $array_anio_pc);
+            $array_periodo_pc = $this->gn_periodo_actual_xanio_xempresa($anio_defecto, $mes_defecto, Session::get('empresas')->COD_EMPR);
+            $combo_periodo = $this->gn_combo_periodo_xanio_xempresa($anio_defecto, Session::get('empresas')->COD_EMPR, '', 'Seleccione periodo');
+            $periodo_defecto = $array_periodo_pc->COD_PERIODO;
+
+            $sel_tipo_descuento = '';
+            $combo_descuento = $this->co_generacion_combo_detraccion('DESCUENTO', 'Seleccione tipo descuento', '');
+
+            $anio = $this->anio;
+            $empresa = Session::get('empresas')->COD_EMPR;
+            $cod_contable = $fedocumento->ID_DOCUMENTO;
+            $ind_anulado = 0;
+            $igv = 0;
+            $ind_recalcular = 0;
+            $centro_costo = '';
+            $ind_igv = 0;
+            $usuario = Session::get('usuario')->id;
+
+            $asiento_compra = $this->ejecutarSP(
+                "EXEC [WEB].[GENERAR_ASIENTO_COMPRAS_FE_DOCUMENTO]
+                @anio = :anio,
+                @empresa = :empresa,
+                @cod_contable = :cod_contable,
+                @ind_anulado = :ind_anulado,
+                @igv = :igv,
+                @ind_recalcular = :ind_recalcular,
+                @centro_costo = :centro_costo,
+                @ind_igv = :ind_igv,
+                @cod_usuario_registra = :usuario",
+                [
+                    ':anio' => $anio,
+                    ':empresa' => $empresa,
+                    ':cod_contable' => $cod_contable,
+                    ':ind_anulado' => $ind_anulado,
+                    ':igv' => $igv,
+                    ':ind_recalcular' => $ind_recalcular,
+                    ':centro_costo' => $centro_costo,
+                    ':ind_igv' => $ind_igv,
+                    ':usuario' => $usuario
+                ]
+            );
+
+            $respuesta = '';
+
+            if (!empty($asiento_compra)) {
+                $respuesta = $asiento_compra[0][0]['RESPUESTA'];
+            }
+
+            if (count($asiento_compra) <= 2) {
+                array_push($asiento_compra, []);
+            }
+
+            //if ($respuesta === 'ASIENTO CORRECTO') {
+            if (!empty($asiento_compra)) {
+
+                $ind_reversion = 'R';
+
+                $asiento_existe_reparable = WEBAsiento::where('COD_ESTADO', '=', 1)
+                    ->where('TXT_REFERENCIA', '=', $cod_contable)
+                    ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', 'TAS0000000000007')
+                    ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
+                    ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
+                    ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', "%NAVASOFT%")
+                    ->first();
+
+                if ($asiento_existe_reparable) {
+                    $asiento_reparable_reversion = $this->ejecutarSP(
+                        "EXEC [WEB].[GENERAR_ASIENTO_REPARABLE_FE_DOCUMENTO]
+                @anio = :anio,
+                @empresa = :empresa,
+                @cod_contable = :cod_contable,
+                @ind_anulado = :ind_anulado,
+                @ind_recalcular = :ind_recalcular,
+                @ind_reversion = :ind_reversion,
+                @cod_usuario_registra = :usuario",
+                        [
+                            ':anio' => $anio,
+                            ':empresa' => $empresa,
+                            ':cod_contable' => $cod_contable,
+                            ':ind_anulado' => $ind_anulado,
+                            ':ind_recalcular' => $ind_recalcular,
+                            ':ind_reversion' => $ind_reversion,
+                            ':usuario' => $usuario
+                        ]
+                    );
+                } else {
+                    $asiento_reparable_reversion = [[], [], []];
+                }
+
+                if ($fedocumento->MONTO_ANTICIPO_DESC > 0.0000) {
+                    $asiento_deduccion = $this->ejecutarSP(
+                        "EXEC [WEB].[GENERAR_ASIENTO_DEDUCCION_FE_DOCUMENTO]
+                @anio = :anio,
+                @empresa = :empresa,
+                @cod_contable = :cod_contable,
+                @ind_anulado = :ind_anulado,
+                @igv = :igv,
+                @ind_recalcular = :ind_recalcular,
+                @centro_costo = :centro_costo,
+                @ind_igv = :ind_igv,
+                @cod_usuario_registra = :usuario",
+                        [
+                            ':anio' => $anio,
+                            ':empresa' => $empresa,
+                            ':cod_contable' => $cod_contable,
+                            ':ind_anulado' => $ind_anulado,
+                            ':igv' => $igv,
+                            ':ind_recalcular' => $ind_recalcular,
+                            ':centro_costo' => $centro_costo,
+                            ':ind_igv' => $ind_igv,
+                            ':usuario' => $usuario
+                        ]
+                    );
+                } else {
+                    $asiento_deduccion = [[], [], []];
+                }
+
+                if ($fedocumento->PERCEPCION > 0.0000) {
+                    $asiento_percepcion = $this->ejecutarSP(
+                        "EXEC [WEB].[GENERAR_ASIENTO_PERCEPCION_FE_DOCUMENTO]
+                @anio = :anio,
+                @empresa = :empresa,
+                @cod_contable = :cod_contable,
+                @ind_anulado = :ind_anulado,
+                @ind_recalcular = :ind_recalcular,
+                @cod_usuario_registra = :usuario",
+                        [
+                            ':anio' => $anio,
+                            ':empresa' => $empresa,
+                            ':cod_contable' => $cod_contable,
+                            ':ind_anulado' => $ind_anulado,
+                            ':ind_recalcular' => $ind_recalcular,
+                            ':usuario' => $usuario
+                        ]
+                    );
+                } else {
+                    $asiento_percepcion = [[], [], []];
+                }
+            }
+
+            $ind_reversion = 'N';
+
+            $asiento_reparable = $this->ejecutarSP(
+                "EXEC [WEB].[GENERAR_ASIENTO_REPARABLE_FE_DOCUMENTO]
+                @anio = :anio,
+                @empresa = :empresa,
+                @cod_contable = :cod_contable,
+                @ind_anulado = :ind_anulado,
+                @ind_recalcular = :ind_recalcular,
+                @ind_reversion = :ind_reversion,
+                @cod_usuario_registra = :usuario",
+                [
+                    ':anio' => $anio,
+                    ':empresa' => $empresa,
+                    ':cod_contable' => $cod_contable,
+                    ':ind_anulado' => $ind_anulado,
+                    ':ind_recalcular' => $ind_recalcular,
+                    ':ind_reversion' => $ind_reversion,
+                    ':usuario' => $usuario
+                ]
+            );
+
+            if (count($asiento_reparable) <= 2) {
+                array_push($asiento_reparable, []);
+            }
+            //dd($asiento_compra, $asiento_reparable, $asiento_percepcion, $asiento_reparable_reversion, $asiento_deduccion);
+
+            $array_nivel_pc = $this->pc_array_nivel_cuentas_contable(Session::get('empresas')->COD_EMPR, $anio);
+            $combo_nivel_pc = $this->gn_generacion_combo_array('Seleccione nivel', '', $array_nivel_pc);
+
+            $array_cuenta = $this->pc_array_nro_cuentas_nombre_xnivel(Session::get('empresas')->COD_EMPR, '6', $anio);
+            $combo_cuenta = $this->gn_generacion_combo_array('Seleccione cuenta contable', '', $array_cuenta);
+
+            $combo_partida = $this->gn_generacion_combo_categoria('CONTABILIDAD_PARTIDA', 'Seleccione partida', '');
+
+            $combo_tipo_igv = $this->gn_generacion_combo_categoria('CONTABILIDAD_IGV', 'Seleccione tipo igv', '');
+
+            $combo_porc_tipo_igv = array('' => 'Seleccione porcentaje', '0' => '0%', '10' => '10%', '18' => '18%');
+
+            $combo_activo = array('1' => 'ACTIVO', '0' => 'ELIMINAR');
+
+            $combo_tipo_asiento = $this->gn_generacion_combo_categoria('TIPO_ASIENTO', 'Seleccione tipo asiento', '');
+            $funciones = $this;
+
+            return View::make('comprobante/reparableuc',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'trabajador'            =>  $trabajador,
                                 'archivospdf'           =>  $archivospdf,
                                 'archivosanulados'      =>  $archivosanulados,
                                 'rol'                   =>  $rol,
+                                //NUEVO
+                                'array_anio' => $combo_anio_pc,
+                                'array_periodo' => $combo_periodo,
+                                'defecto_anio' => $anio_defecto,
+                                'defecto_periodo' => $periodo_defecto,
+                                'combo_tipo_documento' => $combo_tipo_documento,
+                                'combo_moneda_asiento' => $combo_moneda,
+                                'combo_descuento' => $combo_descuento,
+                                'combo_tipo_asiento' => $combo_tipo_asiento,
+                                'combo_nivel_pc' => $combo_nivel_pc,
+                                'combo_cuenta' => $combo_cuenta,
+                                'combo_partida' => $combo_partida,
+                                'combo_tipo_igv' => $combo_tipo_igv,
+                                'combo_porc_tipo_igv' => $combo_porc_tipo_igv,
+                                'combo_activo' => $combo_activo,
+                                'asiento_compra' => $asiento_compra,
+                                'asiento_reparable_reversion' => $asiento_reparable_reversion,
+                                'asiento_deduccion' => $asiento_deduccion,
+                                'asiento_percepcion' => $asiento_percepcion,
+                                'asiento_reparable' => $asiento_reparable,
+                                // NUEVO
                                 'ordencompra'           =>  $ordencompra,
                                 'ordencompra_f'         =>  $ordencompra_f,
                                 'linea'                 =>  $linea,
@@ -1589,8 +1799,8 @@ class GestionUsuarioContactoController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
                 $pedido_id              =   $idoc;
                 $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
@@ -1621,7 +1831,7 @@ class GestionUsuarioContactoController extends Controller
                 DB::commit();
                 return Redirect::to('/gestion-de-reparable-admin/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' RESUELTO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 return Redirect::to('gestion-de-reparable-admin/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
@@ -1661,7 +1871,7 @@ class GestionUsuarioContactoController extends Controller
             $ordencompra_f          =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
 
 
-            return View::make('comprobante/reparableucadmin', 
+            return View::make('comprobante/reparableucadmin',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'trabajador'            =>  $trabajador,
@@ -1701,8 +1911,8 @@ class GestionUsuarioContactoController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
                 $pedido_id              =   $idoc;
                 $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->first();
@@ -1734,7 +1944,7 @@ class GestionUsuarioContactoController extends Controller
                 DB::commit();
                 return Redirect::to('/gestion-de-reparable-admin/'.$idopcion)->with('bienhecho', 'Comprobante : '.$idoc.' RESUELTO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 return Redirect::to('/gestion-de-reparable-admin/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
@@ -1766,7 +1976,7 @@ class GestionUsuarioContactoController extends Controller
             $rol                    =   WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 
 
-            $lotes                  =   FeRefAsoc::where('lote','=',$idoc)                                        
+            $lotes                  =   FeRefAsoc::where('lote','=',$idoc)
                                         ->pluck('ID_DOCUMENTO')
                                         ->toArray();
             $documento_asociados    =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->get();
@@ -1776,7 +1986,7 @@ class GestionUsuarioContactoController extends Controller
 
 
 
-            return View::make('comprobante/repararucestibaadmin', 
+            return View::make('comprobante/repararucestibaadmin',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'rol'                   =>  $rol,
@@ -1814,8 +2024,8 @@ class GestionUsuarioContactoController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
                 $pedido_id              =   $idoc;
                 $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->first();
@@ -1947,7 +2157,7 @@ class GestionUsuarioContactoController extends Controller
                 DB::commit();
                 return Redirect::to('/gestion-de-comprobantes-reparable/'.$idopcion)->with('bienhecho', 'Comprobante : '.$idoc.' RESUELTO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 return Redirect::to('/gestion-de-comprobantes-reparable/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
@@ -1979,7 +2189,7 @@ class GestionUsuarioContactoController extends Controller
             $rol                    =   WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 
 
-            $lotes                  =   FeRefAsoc::where('lote','=',$idoc)                                        
+            $lotes                  =   FeRefAsoc::where('lote','=',$idoc)
                                         ->pluck('ID_DOCUMENTO')
                                         ->toArray();
             $documento_asociados    =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->get();
@@ -1987,7 +2197,7 @@ class GestionUsuarioContactoController extends Controller
 
             $funciones = $this;
 
-            return View::make('comprobante/repararucestiba', 
+            return View::make('comprobante/repararucestiba',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'rol'                   =>  $rol,
@@ -2026,8 +2236,8 @@ class GestionUsuarioContactoController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
                 $pedido_id              =   $idoc;
                 $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
@@ -2061,7 +2271,7 @@ class GestionUsuarioContactoController extends Controller
                 DB::commit();
                 return Redirect::to('/gestion-de-reparable-admin/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_DOCUMENTO_CTBLE.' RESUELTO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 return Redirect::to('/gestion-de-reparable-admin/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
@@ -2070,7 +2280,7 @@ class GestionUsuarioContactoController extends Controller
 
             $detalleordencompra     =   $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
             $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
- 
+
             $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
 
             $arrayarchivos          =   Archivo::where('ID_DOCUMENTO','=',$idoc)
@@ -2079,7 +2289,7 @@ class GestionUsuarioContactoController extends Controller
                                         ->pluck('TIPO_ARCHIVO')
                                         ->toArray();
 
- 
+
             $tiposerie              =   substr($fedocumento->SERIE, 0, 1);
 
             if($tiposerie == 'E'){
@@ -2106,8 +2316,6 @@ class GestionUsuarioContactoController extends Controller
             $rol                    =   WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 
             $funciones = $this;
-
-
 
             return View::make('comprobante/repararuccontratoadmin', 
                             [
@@ -2150,8 +2358,8 @@ class GestionUsuarioContactoController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
                 $pedido_id              =   $idoc;
                 $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
@@ -2225,7 +2433,7 @@ class GestionUsuarioContactoController extends Controller
                             return Redirect::to('reparable-comprobante-uc-contrato'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Seleccione los archivos Correspondientes');
                         }
                     }
- 
+
 
                 }
 
@@ -2282,7 +2490,7 @@ class GestionUsuarioContactoController extends Controller
                 DB::commit();
                 return Redirect::to('/gestion-de-comprobantes-reparable/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_DOCUMENTO_CTBLE.' RESUELTO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 return Redirect::to('/gestion-de-comprobantes-reparable/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
@@ -2291,7 +2499,7 @@ class GestionUsuarioContactoController extends Controller
 
             $detalleordencompra     =   $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
             $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
- 
+
             $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
 
             $arrayarchivos          =   Archivo::where('ID_DOCUMENTO','=',$idoc)
@@ -2300,7 +2508,7 @@ class GestionUsuarioContactoController extends Controller
                                         ->pluck('TIPO_ARCHIVO')
                                         ->toArray();
 
- 
+
             $tiposerie              =   substr($fedocumento->SERIE, 0, 1);
 
             if($tiposerie == 'E'){
@@ -2327,7 +2535,6 @@ class GestionUsuarioContactoController extends Controller
             $rol                    =   WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 
             $funciones = $this;
-
 
             return View::make('comprobante/repararuccontrato', 
                             [
@@ -2367,8 +2574,8 @@ class GestionUsuarioContactoController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
 
                 DB::beginTransaction();
                 $pedido_id              =   $idoc;
@@ -2503,7 +2710,7 @@ class GestionUsuarioContactoController extends Controller
                 DB::commit();
                 return Redirect::to('/gestion-de-comprobantes-observados/'.$idopcion)->with('bienhecho', 'Comprobante : '.$lote.' RESUELTO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 return Redirect::to('gestion-de-comprobantes-observados/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
@@ -2550,7 +2757,7 @@ class GestionUsuarioContactoController extends Controller
 
             $fereftop1              =   FeRefAsoc::where('lote','=',$idoc)->first();
 
-            $lotes                  =   FeRefAsoc::where('lote','=',$idoc)                                        
+            $lotes                  =   FeRefAsoc::where('lote','=',$idoc)
                                         ->pluck('ID_DOCUMENTO')
                                         ->toArray();
             $documento_asociados    =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->get();
@@ -2558,7 +2765,7 @@ class GestionUsuarioContactoController extends Controller
 
             $funciones = $this;
 
-            return View::make('comprobante/observarucestiba', 
+            return View::make('comprobante/observarucestiba',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'fereftop1'             =>  $fereftop1,
@@ -2605,8 +2812,8 @@ class GestionUsuarioContactoController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
 
                 DB::beginTransaction();
                 $pedido_id              =   $idoc;
@@ -2740,7 +2947,7 @@ class GestionUsuarioContactoController extends Controller
                 DB::commit();
                 return Redirect::to('/gestion-de-comprobantes-observados/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_DOCUMENTO_CTBLE.' RESUELTO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 return Redirect::to('gestion-de-comprobantes-observados/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
@@ -2749,7 +2956,7 @@ class GestionUsuarioContactoController extends Controller
 
             $detalleordencompra     =   $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
             $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
- 
+
             $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
 
             $arrayarchivos          =   Archivo::where('ID_DOCUMENTO','=',$idoc)
@@ -2758,7 +2965,7 @@ class GestionUsuarioContactoController extends Controller
                                         ->pluck('TIPO_ARCHIVO')
                                         ->toArray();
 
- 
+
             $tiposerie              =   substr($fedocumento->SERIE, 0, 1);
 
             if($tiposerie == 'E'){
@@ -2796,7 +3003,7 @@ class GestionUsuarioContactoController extends Controller
             $funciones = $this;
 
 
-            return View::make('comprobante/observaruccontrato', 
+            return View::make('comprobante/observaruccontrato',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'empresa'               =>  $empresa,
@@ -2843,8 +3050,8 @@ class GestionUsuarioContactoController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
                 $pedido_id              =   $idoc;
                 $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
@@ -2986,7 +3193,7 @@ class GestionUsuarioContactoController extends Controller
                 DB::commit();
                 return Redirect::to('/gestion-observados-contrato-provedores/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_DOCUMENTO_CTBLE.' RESUELTO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 return Redirect::to('gestion-observados-contrato-provedores/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
@@ -2995,7 +3202,7 @@ class GestionUsuarioContactoController extends Controller
 
             $detalleordencompra     =   $this->con_lista_detalle_contrato_comprobante_idoc($idoc);
             $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
- 
+
             $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
 
             $arrayarchivos          =   Archivo::where('ID_DOCUMENTO','=',$idoc)
@@ -3042,7 +3249,6 @@ class GestionUsuarioContactoController extends Controller
 
             $funciones = $this;
 
-
             return View::make('comprobante/observaruccontratoproveedor', 
                             [
                                 'fedocumento'           =>  $fedocumento,
@@ -3078,12 +3284,12 @@ class GestionUsuarioContactoController extends Controller
         $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
         if($validarurl <> 'true'){return $validarurl;}
         /******************************************************/
-        $idop                   =   $this->funciones->decodificarmaestraprefijo($idordenpago,$prefijo);        
+        $idop                   =   $this->funciones->decodificarmaestraprefijo($idordenpago,$prefijo);
         $ordenpago              =   $this->con_lista_comprobante_orden_pago_idoc_actual($idop);
 
         $idoc                   =   $ordenpago->COD_DOCUMENTO_CTBLE;
         $ordencompra            =   $this->con_lista_cabecera_comprobante_contrato_idoc_actual($idoc);
-        $detalleordencompra     =   $this->con_lista_detalle_liquidacion_compra_comprobante_idoc($idoc);    
+        $detalleordencompra     =   $this->con_lista_detalle_liquidacion_compra_comprobante_idoc($idoc);
 
         $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idop)->where('ind_observacion','=',1)->where('DOCUMENTO_ITEM','=',$linea)->first();
         $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idop)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
@@ -3092,8 +3298,8 @@ class GestionUsuarioContactoController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
 
                 DB::beginTransaction();
                 $pedido_id              =   $idoc;
@@ -3108,7 +3314,7 @@ class GestionUsuarioContactoController extends Controller
 
                 $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$idop)->where('COD_ESTADO','=',1)
                                             ->whereIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
-                                            ->get();                
+                                            ->get();
 
                 foreach($tarchivos as $index => $item){
 
@@ -3118,7 +3324,7 @@ class GestionUsuarioContactoController extends Controller
                         foreach($filescdm as $file){
 
                             $contadorArchivos = Archivo::count();
-                            
+
                             /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
                             $prefijocarperta =      $this->prefijo_empresa($ordenpago->COD_EMPR);
                             $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordenpago->NRO_DOC;
@@ -3155,7 +3361,7 @@ class GestionUsuarioContactoController extends Controller
 
                 FeDocumento::where('ID_DOCUMENTO',$idop)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
-                                [                                    
+                                [
                                     'ind_observacion'=>'0'
                                 ]
                             );
@@ -3169,7 +3375,7 @@ class GestionUsuarioContactoController extends Controller
                 $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
                 $documento->TIPO                        =   'RESOLVIO LAS OBSERVACIONES';
                 $documento->MENSAJE                     =   '';
-                $documento->save();               
+                $documento->save();
 
 
                 //geolocalizacion
@@ -3181,7 +3387,7 @@ class GestionUsuarioContactoController extends Controller
                 DB::commit();
                 return Redirect::to('/gestion-de-comprobantes-observados/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_DOCUMENTO_CTBLE.' RESUELTO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 return Redirect::to('gestion-de-comprobantes-observados/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
@@ -3190,7 +3396,7 @@ class GestionUsuarioContactoController extends Controller
 
             $detalleordencompra     =   $this->con_lista_detalle_liquidacion_compra_comprobante_idoc($idoc);
             $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idop)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
- 
+
             $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
 
             $arrayarchivos          =   Archivo::where('ID_DOCUMENTO','=',$idop)
@@ -3200,10 +3406,10 @@ class GestionUsuarioContactoController extends Controller
                                             ->pluck('TIPO_ARCHIVO')
                                             ->toArray();
 
- 
+
             $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$idop)->where('COD_ESTADO','=',1)
                                             ->whereIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
-                                            ->get();            
+                                            ->get();
 
             $documentohistorial     =   FeDocumentoHistorial::where('ID_DOCUMENTO','=',$idop)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                                         ->orderBy('FECHA','DESC')
@@ -3212,9 +3418,9 @@ class GestionUsuarioContactoController extends Controller
             $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idop)->where('ACTIVO','=','1')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
             $funciones = $this;
 
-            return View::make('comprobante/observarucliquidacioncompraanticipo', 
+            return View::make('comprobante/observarucliquidacioncompraanticipo',
                             [
-                                'fedocumento'           =>  $fedocumento,                                
+                                'fedocumento'           =>  $fedocumento,
                                 'ordenpago'             =>  $ordenpago,
                                 'ordencompra'           =>  $ordencompra,
                                 'linea'                 =>  $linea,
@@ -3252,8 +3458,8 @@ class GestionUsuarioContactoController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
 
                 DB::beginTransaction();
                 $pedido_id              =   $idoc;
@@ -3327,12 +3533,12 @@ class GestionUsuarioContactoController extends Controller
                     }else{
                         return Redirect::to('observacion-comprobante-uc-nota-credito'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Seleccione los archivos Correspondientes');
                     }
-                }               
+                }
 
 
                 FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
-                                [                                    
+                                [
                                     'ind_observacion'=>'0'
                                 ]
                             );
@@ -3358,7 +3564,7 @@ class GestionUsuarioContactoController extends Controller
                 DB::commit();
                 return Redirect::to('/gestion-de-comprobantes-observados/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_DOCUMENTO_CTBLE.' RESUELTO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 return Redirect::to('gestion-de-comprobantes-observados/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
@@ -3367,7 +3573,7 @@ class GestionUsuarioContactoController extends Controller
 
             $detalleordencompra     =   $this->con_lista_detalle_producto_comprobante_idoc($idoc);
             $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
- 
+
             $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
 
             $arrayarchivos          =   Archivo::where('ID_DOCUMENTO','=',$idoc)
@@ -3376,7 +3582,7 @@ class GestionUsuarioContactoController extends Controller
                                         ->pluck('TIPO_ARCHIVO')
                                         ->toArray();
 
- 
+
             $tiposerie              =   substr($fedocumento->SERIE, 0, 1);
 
             if($tiposerie == 'E'){
@@ -3405,17 +3611,17 @@ class GestionUsuarioContactoController extends Controller
             $user_orden             =   User::where('usuarioosiris_id','=',$ordencompra->COD_EMPR_EMISOR)->first();
             $empresa                =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR_EMISOR)->first();
 
-            
 
             $funciones = $this;
 
 
-            return View::make('comprobante/observarucnotacredito', 
+
+            return View::make('comprobante/observarucnotacredito',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'empresa'               =>  $empresa,
 
-                                
+
 
 
                                 'ordencompra'           =>  $ordencompra,
@@ -3454,8 +3660,8 @@ class GestionUsuarioContactoController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
 
                 DB::beginTransaction();
                 $pedido_id              =   $idoc;
@@ -3529,12 +3735,12 @@ class GestionUsuarioContactoController extends Controller
                     }else{
                         return Redirect::to('observacion-comprobante-uc-nota-debito'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Seleccione los archivos Correspondientes');
                     }
-                }               
+                }
 
 
                 FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
-                                [                                    
+                                [
                                     'ind_observacion'=>'0'
                                 ]
                             );
@@ -3561,7 +3767,7 @@ class GestionUsuarioContactoController extends Controller
                 DB::commit();
                 return Redirect::to('/gestion-de-comprobantes-observados/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_DOCUMENTO_CTBLE.' RESUELTO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 return Redirect::to('gestion-de-comprobantes-observados/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
@@ -3570,7 +3776,7 @@ class GestionUsuarioContactoController extends Controller
 
             $detalleordencompra     =   $this->con_lista_detalle_producto_comprobante_idoc($idoc);
             $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
- 
+
             $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
 
             $arrayarchivos          =   Archivo::where('ID_DOCUMENTO','=',$idoc)
@@ -3579,7 +3785,7 @@ class GestionUsuarioContactoController extends Controller
                                         ->pluck('TIPO_ARCHIVO')
                                         ->toArray();
 
- 
+
             $tiposerie              =   substr($fedocumento->SERIE, 0, 1);
 
             if($tiposerie == 'E'){
@@ -3608,18 +3814,18 @@ class GestionUsuarioContactoController extends Controller
             $user_orden             =   User::where('usuarioosiris_id','=',$ordencompra->COD_EMPR_EMISOR)->first();
             $empresa                =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR_EMISOR)->first();
 
-            
 
             $funciones = $this;
 
 
 
-            return View::make('comprobante/observarucnotadebito', 
+
+            return View::make('comprobante/observarucnotadebito',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'empresa'               =>  $empresa,
 
-                                
+
 
 
                                 'ordencompra'           =>  $ordencompra,
@@ -3661,8 +3867,8 @@ class GestionUsuarioContactoController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
 
                 DB::beginTransaction();
                 $pedido_id              =   $idoc;
@@ -3736,12 +3942,12 @@ class GestionUsuarioContactoController extends Controller
                     }else{
                         return Redirect::to('observacion-comprobante-uc-pg'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('errorurl', 'Seleccione los archivos Correspondientes');
                     }
-                }               
+                }
 
 
                 FeDocumento::where('ID_DOCUMENTO',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)
                             ->update(
-                                [                                    
+                                [
                                     'ind_observacion'=>'0'
                                 ]
                             );
@@ -3766,7 +3972,7 @@ class GestionUsuarioContactoController extends Controller
                 DB::commit();
                 return Redirect::to('/gestion-de-comprobantes-observados/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_DOCUMENTO_CTBLE.' RESUELTO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 return Redirect::to('gestion-de-comprobantes-observados/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
@@ -3775,7 +3981,7 @@ class GestionUsuarioContactoController extends Controller
 
             $detalleordencompra     =   $this->con_lista_detalle_producto_comprobante_idoc($idoc);
             $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
- 
+
             $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
 
             $arrayarchivos          =   Archivo::where('ID_DOCUMENTO','=',$idoc)
@@ -3784,7 +3990,7 @@ class GestionUsuarioContactoController extends Controller
                                         ->pluck('TIPO_ARCHIVO')
                                         ->toArray();
 
- 
+
             $tiposerie              =   substr($fedocumento->SERIE, 0, 1);
 
             if($tiposerie == 'E'){
@@ -3812,16 +4018,15 @@ class GestionUsuarioContactoController extends Controller
 
             $user_orden             =   User::where('usuarioosiris_id','=',$ordencompra->COD_EMPR_EMISOR)->first();
             $empresa                =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR_EMISOR)->first();
-
             
             $funciones = $this;
 
-            return View::make('comprobante/observarucpg', 
+            return View::make('comprobante/observarucpg',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'empresa'               =>  $empresa,
 
-                                
+
 
 
                                 'ordencompra'           =>  $ordencompra,
@@ -3889,7 +4094,7 @@ class GestionUsuarioContactoController extends Controller
             $conts              = 0;
             $contw              = 0;
             $contd              = 0;
-        
+
             //dd("hola");
             foreach($respuesta as $obj){
 
@@ -3897,7 +4102,7 @@ class GestionUsuarioContactoController extends Controller
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->first();
 
 
-                if($fedocumento->COD_ESTADO == 'ETM0000000000002'){ 
+                if($fedocumento->COD_ESTADO == 'ETM0000000000002'){
 
 
                     FeDocumento::where('ID_DOCUMENTO',$pedido_id)
@@ -3943,16 +4148,16 @@ class GestionUsuarioContactoController extends Controller
 
 
 
-                    $msjarray[]                             =   array(  "data_0" => $fedocumento->ID_DOCUMENTO, 
-                                                                        "data_1" => 'COMPROBANTE APROBADO POR USUARIO CONTACTO', 
+                    $msjarray[]                             =   array(  "data_0" => $fedocumento->ID_DOCUMENTO,
+                                                                        "data_1" => 'COMPROBANTE APROBADO POR USUARIO CONTACTO',
                                                                         "tipo" => 'S');
                     $conts                                  =   $conts + 1;
                     $codigo                                 =   $fedocumento->ID_DOCUMENTO;
 
                 }else{
                     /**** ERROR DE PROGRMACION O SINTAXIS ****/
-                    $msjarray[] = array("data_0" => $fedocumento->ID_DOCUMENTO, 
-                                        "data_1" => 'ESTE COMPROBANTE YA ESTA APROBADO POR USUARIO CONTACTO', 
+                    $msjarray[] = array("data_0" => $fedocumento->ID_DOCUMENTO,
+                                        "data_1" => 'ESTE COMPROBANTE YA ESTA APROBADO POR USUARIO CONTACTO',
                                         "tipo" => 'D');
                     $contd      =   $contd + 1;
 
@@ -3962,16 +4167,16 @@ class GestionUsuarioContactoController extends Controller
 
 
             /************** MENSAJES DEL DETALLE PEDIDO  ******************/
-            $msjarray[] = array("data_0" => $conts, 
-                                "data_1" => 'COMPROBANTE APROBADO POR USUARIO CONTACTO', 
+            $msjarray[] = array("data_0" => $conts,
+                                "data_1" => 'COMPROBANTE APROBADO POR USUARIO CONTACTO',
                                 "tipo" => 'TS');
 
-            $msjarray[] = array("data_0" => $contw, 
-                                "data_1" => 'COMPROBANTE APROBADO POR USUARIO CONTACTO', 
-                                "tipo" => 'TW');     
+            $msjarray[] = array("data_0" => $contw,
+                                "data_1" => 'COMPROBANTE APROBADO POR USUARIO CONTACTO',
+                                "tipo" => 'TW');
 
-            $msjarray[] = array("data_0" => $contd, 
-                                "data_1" => 'COMPROBANTES ERRADOS', 
+            $msjarray[] = array("data_0" => $contd,
+                                "data_1" => 'COMPROBANTES ERRADOS',
                                 "tipo" => 'TD');
 
             $msjjson = json_encode($msjarray);
@@ -3979,7 +4184,7 @@ class GestionUsuarioContactoController extends Controller
 
             return Redirect::to('/gestion-de-comprobante-us/'.$idopcion)->with('xmlmsj', $msjjson);
 
-        
+
         }
     }
 
@@ -4001,9 +4206,9 @@ class GestionUsuarioContactoController extends Controller
 
         if($_POST)
         {
-                        
+
             $descripcion     =   $request['descripcion'];
-            
+
             FeDocumento::where('ID_DOCUMENTO',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')
                         ->update(
                             [
@@ -4041,12 +4246,12 @@ class GestionUsuarioContactoController extends Controller
             // DB::table('ARCHIVOS')->where('ID_DOCUMENTO','=',$ordencompra->COD_ORDEN)->delete();
 
             return Redirect::to('/gestion-de-comprobante-us/'.$idopcion)->with('bienhecho', 'Comprobantes Lote: '.$ordencompra->COD_ORDEN.' EXTORNADA con EXITO');
-        
+
         }
         else{
 
-                  
-            return View::make('comprobante/extornar', 
+
+            return View::make('comprobante/extornar',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
@@ -4080,8 +4285,8 @@ class GestionUsuarioContactoController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
                 $pedido_id          =   $idoc;
 
@@ -4145,9 +4350,9 @@ class GestionUsuarioContactoController extends Controller
                                                     ->orderBy('NRO_LINEA','ASC')
                                                     ->get();
                     //  INSERTAR ORDEN DE INGRESO
-                    //almacen lote                                
+                    //almacen lote
                     $this->insert_almacen_lote($orden,$detalleproducto);
-                    $orden_id = $this->insert_orden($orden,$detalleproducto);                 
+                    $orden_id = $this->insert_orden($orden,$detalleproducto);
                     $this->insert_referencia_asoc($orden,$detalleproducto,$orden_id[0]);
                     //$this->insert_detalle_producto($orden,$detalleproducto,$orden_id[0]);
 
@@ -4155,7 +4360,7 @@ class GestionUsuarioContactoController extends Controller
                     if (in_array($orden->COD_CATEGORIA_TIPO_ORDEN, ['TOR0000000000026','TOR0000000000022','TOR0000000000021'])) {
                         //dd("LLAMAR AL AREA DE SISTEMAS 979820173 PORFAVOR ESTAMOS REVISANDO ESTOS CASOS");
                         if($orden->COD_CENTRO != 'CEN0000000000002'){
-                            $this->insert_detalle_producto_cascara($orden,$detalleproducto,$orden_id[0]);//crea detalle de la orden de ingresa   
+                            $this->insert_detalle_producto_cascara($orden,$detalleproducto,$orden_id[0]);//crea detalle de la orden de ingresa
                         }else{
                             $this->insert_detalle_producto($orden,$detalleproducto,$orden_id[0]);//crea detalle de la orden de ingresa
                         }
@@ -4388,7 +4593,7 @@ class GestionUsuarioContactoController extends Controller
                                         'COD_ANTICIPO'=>$COD_ANTICIPO,
                                         'SERIE_ANTICIPO'=>$SERIE_ANTICIPO,
                                         'NRO_ANTICIPO'=>$NRO_ANTICIPO,
-                                        
+
                                         'COD_ESTADO'=>'ETM0000000000004',
                                         'TXT_ESTADO'=>'POR APROBAR ADMINISTRACCION',
                                         'ind_email_ap'=>0,
@@ -4421,7 +4626,7 @@ class GestionUsuarioContactoController extends Controller
                 DB::commit();
                 return Redirect::to('/gestion-de-comprobante-us/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' APROBADO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 return Redirect::to('gestion-de-comprobante-us/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
@@ -4485,7 +4690,7 @@ class GestionUsuarioContactoController extends Controller
                         if (!isset($datares['estadoCp'])){
                             return Redirect::back()->with('errorurl', 'Hay fallas en sunat para consultar el XML');
                         }
-                        
+
                         $estadoCp             = $datares['estadoCp'];
 
 
@@ -4613,10 +4818,10 @@ class GestionUsuarioContactoController extends Controller
                 if ($archivoEncontrado) {
                     $rutafila         =   $directorio.'\\'.$nombreArchivoBuscado;
                     $rutaorden           =  $rutafila;
-                } 
+                }
             }
 
-      
+
             $archivospdf            =   Archivo::where('ID_DOCUMENTO','=',$idoc)
                                         ->where('ACTIVO','=','1')
                                         ->where('EXTENSION', 'like', '%'.'pdf'.'%')
@@ -4734,7 +4939,7 @@ class GestionUsuarioContactoController extends Controller
 
             $funciones = $this;
 
-            return View::make('comprobante/aprobaruc', 
+            return View::make('comprobante/aprobaruc',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'monto_anticipo'        =>  $monto_anticipo,
@@ -4791,8 +4996,8 @@ class GestionUsuarioContactoController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
                 $pedido_id          =   $idoc;
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->where('TXT_PROCEDENCIA','<>','SUE')->first();
@@ -4801,12 +5006,12 @@ class GestionUsuarioContactoController extends Controller
 
 
                 if($fedocumento->ind_observacion==1){
-                    DB::rollback(); 
+                    DB::rollback();
                     return Redirect::back()->with('errorurl', 'El documento esta observado no se puede observar');
                 }
 
                 if(count($archivoob)<=0){
-                    DB::rollback(); 
+                    DB::rollback();
                     return Redirect::to('aprobar-comprobante-uc/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', 'Tiene que seleccionar almenos un item');
                 }
 
@@ -4879,11 +5084,11 @@ class GestionUsuarioContactoController extends Controller
                 DB::commit();
                 return Redirect::to('/gestion-de-comprobante-us/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' OBSERVADO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 return Redirect::to('gestion-de-comprobante-us/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
-        
+
         }
         else{
 
@@ -4931,7 +5136,6 @@ class GestionUsuarioContactoController extends Controller
                                     
             $funciones = $this;
 
-
             return View::make('comprobante/observaradministracion', 
                             [
                                 'fedocumento'           =>  $fedocumento,
@@ -4978,8 +5182,8 @@ class GestionUsuarioContactoController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
                 $pedido_id          =   $idoc;
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->where('TXT_PROCEDENCIA','<>','SUE')->first();
@@ -4987,12 +5191,12 @@ class GestionUsuarioContactoController extends Controller
                 $archivoob          =   $request['archivoob'];
 
                 if($fedocumento->ind_observacion==1){
-                    DB::rollback(); 
+                    DB::rollback();
                     return Redirect::back()->with('errorurl', 'El documento esta observado no se puede observar');
                 }
 
                 if(count($archivoob)<=0){
-                    DB::rollback(); 
+                    DB::rollback();
                     return Redirect::to('aprobar-comprobante-administracion/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', 'Tiene que seleccionar almenos un item');
                 }
 
@@ -5061,19 +5265,19 @@ class GestionUsuarioContactoController extends Controller
                                     'area_observacion'=>'UCO'
                                 ]
                             );
- 
+
                 DB::commit();
 
                 Session::flash('operacion_id', 'CONTRATO');
                 return Redirect::to('/gestion-de-comprobante-us/'.$idopcion)->with('bienhecho', 'Comprobante : '.$idoc.' OBSERVADO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
 
                 Session::flash('operacion_id', 'CONTRATO');
                 return Redirect::to('gestion-de-comprobante-us/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
-        
+
         }
         else{
 
@@ -5113,7 +5317,6 @@ class GestionUsuarioContactoController extends Controller
                                         ->toArray();
 
             $funciones = $this;
-
 
             return View::make('comprobante/observaradministracioncontrato', 
                             [
@@ -5162,8 +5365,8 @@ class GestionUsuarioContactoController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
                 $pedido_id          =   $idoc;
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
@@ -5190,7 +5393,7 @@ class GestionUsuarioContactoController extends Controller
                     $this->con_datos_de_la_pc($device_info,$fedocumento,'RECOMENDACION POR USUARIO DE CONTACTO');
                     //geolocalización
 
-                    
+
                 }
 
                 $tarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
@@ -5198,7 +5401,7 @@ class GestionUsuarioContactoController extends Controller
                                         ->where('TXT_ASIGNADO','=','CONTACTO')
                                         ->get();
 
-                $orden              =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$pedido_id)->first();  
+                $orden              =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$pedido_id)->first();
 
 
 
@@ -5297,7 +5500,7 @@ class GestionUsuarioContactoController extends Controller
                 $lista_guias                 =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$arrayreferencia_guia)
                                                 ->where('COD_ESTADO','=',1)
                                                 ->get();
-                $array_guias                 =   array();                               
+                $array_guias                 =   array();
                 $rutaordenguia               =   "";
                 foreach ($lista_guias as $index=>$item) {
                     $rutaordenguia           =  '';
@@ -5355,7 +5558,7 @@ class GestionUsuarioContactoController extends Controller
                     $existelarchivos   =   Archivo::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('TIPO_ARCHIVO','=',$item->COD_DOCUMENTO_CTBLE)->where('ACTIVO','=','1')->first();
 
                     if(count($existelarchivos)<=0){
-                        $array_nuevo            =   array(); 
+                        $array_nuevo            =   array();
                         $directorio = '\\\\10.1.0.201\cpe\Contratos';
                         // Nombre del archivo que estás buscando
                         $nombreArchivoBuscado = $item->COD_DOCUMENTO_CTBLE.'.pdf';
@@ -5412,7 +5615,7 @@ class GestionUsuarioContactoController extends Controller
                                                             "NRO_DOC"                   => $item->NRO_DOC,
                                                             "rutaordenguia"             => $rutaordenguia,
                                                         );
-                            array_push($array_guias,$array_nuevo);           
+                            array_push($array_guias,$array_nuevo);
                         }
                     }
                 }
@@ -5508,7 +5711,7 @@ class GestionUsuarioContactoController extends Controller
                 DB::commit();
                 return Redirect::to('/gestion-de-comprobante-us/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_DOCUMENTO_CTBLE.' APROBADO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 return Redirect::to('gestion-de-comprobante-us/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
@@ -5545,7 +5748,7 @@ class GestionUsuarioContactoController extends Controller
 
 
 
-    
+
 
             //encontrar la orden de compra
             $fileordencompra            =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)
@@ -5610,7 +5813,7 @@ class GestionUsuarioContactoController extends Controller
 
                     $rutafila            =   $directorio.'\\'.$nombreArchivoBuscado;
                     $rutaorden           =   $rutafila;
-                } 
+                }
             }
                 //dd($rutaorden);
             //por ahora que le pida el cotrato
@@ -5626,9 +5829,9 @@ class GestionUsuarioContactoController extends Controller
             $lista_guias                 =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$arrayreferencia_guia)
                                             ->where('COD_ESTADO','=',1)
                                             ->get();
-            $array_guias                 =   array();                               
+            $array_guias                 =   array();
             $rutaordenguia               =   "";
-            $array_guias_no              =   array();  
+            $array_guias_no              =   array();
 
 
             foreach ($lista_guias as $index=>$item) {
@@ -5654,9 +5857,9 @@ class GestionUsuarioContactoController extends Controller
             }
 
 
-            
+
             foreach ($lista_guias as $index=>$item) {
-                $array_nuevo            =   array(); 
+                $array_nuevo            =   array();
 
                 $directorio = '\\\\10.1.0.201\cpe\Contratos';
                 // Nombre del archivo que estás buscando
@@ -5705,7 +5908,7 @@ class GestionUsuarioContactoController extends Controller
 
             $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
-            //dd($archivos);                          
+            //dd($archivos);
 
             $procedencia ='ADM';
 
@@ -5759,7 +5962,7 @@ class GestionUsuarioContactoController extends Controller
                 $existeanticipo          =   FeDocumento::where('COD_ANTICIPO','=',$item['COD_HABILITACION'])
                                              ->whereIn('COD_ESTADO',['ETM0000000000002','ETM0000000000003','ETM0000000000004','ETM0000000000005','ETM0000000000008'])
                                              ->first();
-                                             
+
                 if(count($existeanticipo)<=0){
 
                     $arrayitem               =   $arrayitem + array($item['COD_HABILITACION'] => $item['NRO_SERIE'].'-'.$item['NRO_DOC'].' // '.$item['CAN_SALDO']);
@@ -5771,7 +5974,7 @@ class GestionUsuarioContactoController extends Controller
             $funciones = $this;
 
 
-            return View::make('comprobante/aprobaruccontrato', 
+            return View::make('comprobante/aprobaruccontrato',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
