@@ -3123,7 +3123,7 @@ $(document).ready(function () {
                     arrayDetalle.forEach(item => {
                         if (parseInt(item.COD_ESTADO) === 1) {
                             if (!/^40/.test(item.TXT_CUENTA_CONTABLE) &&
-                                !/^42/.test(item.TXT_CUENTA_CONTABLE) && !/^43/.test(item.TXT_CUENTA_CONTABLE)) {
+                                !/^421/.test(item.TXT_CUENTA_CONTABLE) && !/^431/.test(item.TXT_CUENTA_CONTABLE)) {
                                 if (cadenaNumeroCuenta === '') {
                                     cadenaNumeroCuenta = item.TXT_CUENTA_CONTABLE;
                                 } else {
@@ -3289,7 +3289,7 @@ $(document).ready(function () {
                     arrayDetalle.forEach(item => {
                         if (parseInt(item.COD_ESTADO) === 1) {
                             if (!/^40/.test(item.TXT_CUENTA_CONTABLE) &&
-                                !/^42/.test(item.TXT_CUENTA_CONTABLE) && !/^43/.test(item.TXT_CUENTA_CONTABLE)) {
+                                !/^421/.test(item.TXT_CUENTA_CONTABLE) && !/^431/.test(item.TXT_CUENTA_CONTABLE)) {
                                 if (cadenaNumeroCuenta === '') {
                                     cadenaNumeroCuenta = item.TXT_CUENTA_CONTABLE;
                                 } else {
@@ -3436,7 +3436,7 @@ $(document).ready(function () {
                     arrayDetalle.forEach(item => {
                         if (parseInt(item.COD_ESTADO) === 1) {
                             if (!/^40/.test(item.TXT_CUENTA_CONTABLE) &&
-                                !/^42/.test(item.TXT_CUENTA_CONTABLE) && !/^43/.test(item.TXT_CUENTA_CONTABLE)) {
+                                !/^421/.test(item.TXT_CUENTA_CONTABLE) && !/^431/.test(item.TXT_CUENTA_CONTABLE)) {
                                 if (cadenaNumeroCuenta === '') {
                                     cadenaNumeroCuenta = item.TXT_CUENTA_CONTABLE;
                                 } else {
@@ -3491,7 +3491,7 @@ $(document).ready(function () {
 
             // Array de todos los valores
             let campos = [
-                {nombre: "Cuenta Contable", valor: nro_cuenta_aux},
+                //{nombre: "Cuenta Contable", valor: nro_cuenta_aux},
                 {nombre: "Anio", valor: anio_asiento},
                 {nombre: "Periodo", valor: periodo_asiento},
                 {nombre: "Comprobante", valor: comprobante_asiento},
