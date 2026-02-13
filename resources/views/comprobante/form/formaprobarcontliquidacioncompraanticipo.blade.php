@@ -83,7 +83,9 @@
         </div>
     </div>
 
-    <input type="hidden" name="nro_cuenta_contable" id="nro_cuenta_contable" value="">
+    <div id="div_cuenta_contable">
+        <input type="hidden" name="nro_cuenta_contable" id="nro_cuenta_contable" value="">
+    </div>
 
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
         @include('comprobante.asiento.listaasientotabla')
