@@ -98,7 +98,7 @@ class UserController extends Controller {
 		$defecto_moneda			= 	'';
 
 		return View::make('usuario/modal/ajax/mdatoscuentabancariacontrato',
-						 [		 	
+						 [
 						 	'usuario' 						=> $usuario,
 						 	'idoc' 							=> $idoc,
 						 	'prefijo_id' 					=> $prefijo_id,
@@ -111,8 +111,8 @@ class UserController extends Controller {
 						 	'combo_tipocuenta' 				=> $combo_tipocuenta,
 						 	'defecto_tipocuenta' 			=> $defecto_tipocuenta,
 						 	'combo_moneda' 					=> $combo_moneda,
-						 	'defecto_moneda' 				=> $defecto_moneda,						 	
-						 	'ajax' 							=> true,						 	
+						 	'defecto_moneda' 				=> $defecto_moneda,
+						 	'ajax' 							=> true,
 						 ]);
 	}
 
@@ -136,7 +136,7 @@ class UserController extends Controller {
 		$defecto_moneda			= 	'';
 
 		return View::make('usuario/modal/ajax/mdatoscuentabancariapg',
-						 [		 	
+						 [
 						 	'usuario' 						=> $usuario,
 						 	'idoc' 							=> $idoc,
 						 	'prefijo_id' 					=> $prefijo_id,
@@ -149,8 +149,8 @@ class UserController extends Controller {
 						 	'combo_tipocuenta' 				=> $combo_tipocuenta,
 						 	'defecto_tipocuenta' 			=> $defecto_tipocuenta,
 						 	'combo_moneda' 					=> $combo_moneda,
-						 	'defecto_moneda' 				=> $defecto_moneda,						 	
-						 	'ajax' 							=> true,						 	
+						 	'defecto_moneda' 				=> $defecto_moneda,
+						 	'ajax' 							=> true,
 						 ]);
 	}
 
@@ -172,7 +172,7 @@ class UserController extends Controller {
 		$defecto_moneda			= 	'';
 
 		return View::make('usuario/modal/ajax/mdatoscuentabancariaestiba',
-						 [		 	
+						 [
 						 	'usuario' 						=> $usuario,
 						 	'idoc' 							=> $idoc,
 						 	'empresa_id' 					=> $empresa_id,
@@ -184,8 +184,8 @@ class UserController extends Controller {
 						 	'combo_tipocuenta' 				=> $combo_tipocuenta,
 						 	'defecto_tipocuenta' 			=> $defecto_tipocuenta,
 						 	'combo_moneda' 					=> $combo_moneda,
-						 	'defecto_moneda' 				=> $defecto_moneda,						 	
-						 	'ajax' 							=> true,						 	
+						 	'defecto_moneda' 				=> $defecto_moneda,
+						 	'ajax' 							=> true,
 						 ]);
 	}
 
@@ -207,7 +207,7 @@ class UserController extends Controller {
 		$defecto_moneda			= 	'';
 
 		return View::make('usuario/modal/ajax/mdatoscuentabancarialiqcoman',
-						 [		 	
+						 [
 						 	'usuario' 						=> $usuario,
 						 	'idoc' 							=> $idoc,
 						 	'empresa_id' 					=> $empresa_id,
@@ -219,8 +219,8 @@ class UserController extends Controller {
 						 	'combo_tipocuenta' 				=> $combo_tipocuenta,
 						 	'defecto_tipocuenta' 			=> $defecto_tipocuenta,
 						 	'combo_moneda' 					=> $combo_moneda,
-						 	'defecto_moneda' 				=> $defecto_moneda,						 	
-						 	'ajax' 							=> true,						 	
+						 	'defecto_moneda' 				=> $defecto_moneda,
+						 	'ajax' 							=> true,
 						 ]);
 	}
 
@@ -246,7 +246,7 @@ class UserController extends Controller {
 		$defecto_moneda			= 	'';
 
 		return View::make('usuario/modal/ajax/mdatoscuentabancariaoc',
-						 [		 	
+						 [
 						 	'usuario' 						=> $usuario,
 						 	'idoc' 							=> $idoc,
 						 	'prefijo_id' 					=> $prefijo_id,
@@ -259,8 +259,8 @@ class UserController extends Controller {
 						 	'combo_tipocuenta' 				=> $combo_tipocuenta,
 						 	'defecto_tipocuenta' 			=> $defecto_tipocuenta,
 						 	'combo_moneda' 					=> $combo_moneda,
-						 	'defecto_moneda' 				=> $defecto_moneda,						 	
-						 	'ajax' 							=> true,						 	
+						 	'defecto_moneda' 				=> $defecto_moneda,
+						 	'ajax' 							=> true,
 						 ]);
 	}
 
@@ -285,7 +285,7 @@ class UserController extends Controller {
 		$defecto_moneda			= 	'';
 
 		return View::make('usuario/modal/ajax/mdatoscuentabancarialg',
-						 [		 	
+						 [
 						 	'usuario' 						=> $usuario,
 						 	'idoc' 							=> $idoc,
 						 	'idopcion' 						=> $idopcion,
@@ -294,8 +294,8 @@ class UserController extends Controller {
 						 	'combo_tipocuenta' 				=> $combo_tipocuenta,
 						 	'defecto_tipocuenta' 			=> $defecto_tipocuenta,
 						 	'combo_moneda' 					=> $combo_moneda,
-						 	'defecto_moneda' 				=> $defecto_moneda,						 	
-						 	'ajax' 							=> true,						 	
+						 	'defecto_moneda' 				=> $defecto_moneda,
+						 	'ajax' 							=> true,
 						 ]);
 	}
 
@@ -315,12 +315,12 @@ class UserController extends Controller {
 								  	->get();
 
 		return View::make('usuario/modal/ajax/mvercuentabancaria',
-						 [		 	
+						 [
 
 						 	'cuentabancarias' 				=> $cuentabancarias,
 						 	'idoc' 							=> $idoc,
 						 	'idopcion' 						=> $idopcion,
-						 	'ajax' 							=> true,						 	
+						 	'ajax' 							=> true,
 						 ]);
 	}
 
@@ -344,11 +344,11 @@ class UserController extends Controller {
 								  	->get();
 
 		return View::make('usuario/modal/ajax/mvercuentabancariaindividual',
-						 [		 	
+						 [
 
 						 	'cuentabancarias' 				=> $cuentabancarias,
 						 	'idopcion' 						=> $idopcion,
-						 	'ajax' 							=> true,						 	
+						 	'ajax' 							=> true,
 						 ]);
 	}
 
@@ -363,14 +363,14 @@ class UserController extends Controller {
 		$usuario_id             =   '';
 
 		return View::make('usuario/modal/ajax/mcambiarreparable',
-						 [		 	
+						 [
 
 						 	'fedocumento' 					=> $fedocumento,
 						 	'orden_id' 						=> $orden_id,
 						 	'idopcion' 						=> $idopcion,
 						 	'combo_usuario' 				=> $combo_usuario,
 						 	'usuario_id' 					=> $usuario_id,
-						 	'ajax' 							=> true,						 	
+						 	'ajax' 							=> true,
 						 ]);
 	}
 
@@ -431,12 +431,12 @@ class UserController extends Controller {
 
 
 		return View::make('usuario/modal/ajax/mvercuentabancaria',
-						 [		 	
+						 [
 
 						 	'cuentabancarias' 				=> $cuentabancarias,
 						 	'idoc' 							=> $idoc,
 						 	'idopcion' 						=> $idopcion,
-						 	'ajax' 							=> true,						 	
+						 	'ajax' 							=> true,
 						 ]);
 	}
 
@@ -448,7 +448,7 @@ class UserController extends Controller {
         $idopcion               =   $request['idopcion'];
 
         $idoc                   =   $this->funciones->decodificarmaestraprefijo($orden_id,$prefijo_id);
-        $ordencompra          	=   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$idoc)->first();        
+        $ordencompra          	=   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$idoc)->first();
 
 		$cuentabancarias 		= 	TESCuentaBancaria::where('COD_EMPR_TITULAR','=',$ordencompra->COD_EMPR_EMISOR)
 									->where('COD_ESTADO','=',1)
@@ -458,12 +458,12 @@ class UserController extends Controller {
 
 
 		return View::make('usuario/modal/ajax/mvercuentabancaria',
-						 [		 	
+						 [
 
 						 	'cuentabancarias' 				=> $cuentabancarias,
 						 	'idoc' 							=> $idoc,
 						 	'idopcion' 						=> $idopcion,
-						 	'ajax' 							=> true,						 	
+						 	'ajax' 							=> true,
 						 ]);
 	}
 
@@ -510,7 +510,7 @@ class UserController extends Controller {
                 //geolocalización
 
 
-		}						  	
+		}
 
 
 
@@ -544,10 +544,10 @@ class UserController extends Controller {
 								  	->get();
 
 		return View::make('usuario/modal/ajax/mvercuentabancaria',
-						 [		 	
+						 [
 
-						 	'cuentabancarias' 				=> $cuentabancarias,					 	
-						 	'ajax' 							=> true,						 	
+						 	'cuentabancarias' 				=> $cuentabancarias,
+						 	'ajax' 							=> true,
 						 ]);
 	}
 
@@ -566,10 +566,10 @@ class UserController extends Controller {
 								  	->get();
 
 		return View::make('usuario/modal/ajax/mvercuentabancaria',
-						 [		 	
+						 [
 
-						 	'cuentabancarias' 				=> $cuentabancarias,					 	
-						 	'ajax' 							=> true,						 	
+						 	'cuentabancarias' 				=> $cuentabancarias,
+						 	'ajax' 							=> true,
 						 ]);
 	}
 
@@ -589,10 +589,10 @@ class UserController extends Controller {
 								  	->get();
 
 		return View::make('usuario/modal/ajax/mvercuentabancaria',
-						 [		 	
+						 [
 
-						 	'cuentabancarias' 				=> $cuentabancarias,					 	
-						 	'ajax' 							=> true,						 	
+						 	'cuentabancarias' 				=> $cuentabancarias,
+						 	'ajax' 							=> true,
 						 ]);
 	}
 
@@ -768,8 +768,8 @@ class UserController extends Controller {
 	{
 
 
-        $idoc                   =   $this->funciones->decodificarmaestraprefijo($orden_id,$prefijo_id);        
-        $ordencompra          	=   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$idoc)->first();        
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo($orden_id,$prefijo_id);
+        $ordencompra          	=   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$idoc)->first();
 
 		$banco_id 	 		 	 					= 	$request['banco_id'];
 		$tipocuenta_id 	 		 					= 	$request['tipocuenta_id'];
@@ -1077,9 +1077,9 @@ class UserController extends Controller {
 		$usuario    =   User::where('id','=',Session::get('usuario')->id)->first();
 
 		return View::make('usuario/modal/ajax/mdatospersonales',
-						 [		 	
+						 [
 						 	'usuario' 				=> $usuario,
-						 	'ajax' 					=> true,						 	
+						 	'ajax' 					=> true,
 						 ]);
 	}
 
@@ -1088,9 +1088,9 @@ class UserController extends Controller {
 		$usuario    =   User::where('id','=',Session::get('usuario')->id)->first();
 
 		return View::make('usuario/modal/ajax/mdatoscontacto',
-						 [		 	
+						 [
 						 	'usuario' 				=> $usuario,
-						 	'ajax' 					=> true,						 	
+						 	'ajax' 					=> true,
 						 ]);
 	}
 
@@ -1107,15 +1107,15 @@ class UserController extends Controller {
 		$defecto_moneda			= 	'';
 
 		return View::make('usuario/modal/ajax/mdatoscuentabancaria',
-						 [		 	
+						 [
 						 	'usuario' 						=> $usuario,
 						 	'combo_banco' 					=> $combo_banco,
 						 	'defecto_banco' 				=> $defecto_banco,
 						 	'combo_tipocuenta' 				=> $combo_tipocuenta,
 						 	'defecto_tipocuenta' 			=> $defecto_tipocuenta,
 						 	'combo_moneda' 					=> $combo_moneda,
-						 	'defecto_moneda' 				=> $defecto_moneda,						 	
-						 	'ajax' 							=> true,						 	
+						 	'defecto_moneda' 				=> $defecto_moneda,
+						 	'ajax' 							=> true,
 						 ]);
 	}
 
@@ -1134,7 +1134,7 @@ class UserController extends Controller {
 
 		$mensaje    =   'Cuenta Activada Satisfactoriamente';
 		if(count($usuario)>0){
-			
+
 			$usuario->ind_confirmacion = 1;
 			$usuario->save();
 
@@ -1236,8 +1236,8 @@ class UserController extends Controller {
 		if($_POST)
 		{
 
-            try{    
-                
+            try{
+
 
 
             DB::beginTransaction();
@@ -1278,7 +1278,7 @@ class UserController extends Controller {
 			$cabecera->email_confirmacion	= 	0;
 			$cabecera->ind_confirmacion		= 	0;
 			$cabecera->save();
- 
+
 
 			$id 						= 	$this->funciones->getCreateIdMaestra('WEB.userempresacentros');
 		    $detalle            		=	new WEBUserEmpresaCentro;
@@ -1304,7 +1304,7 @@ class UserController extends Controller {
             DB::commit();
 
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 return Redirect::to('registrate')->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
@@ -1338,7 +1338,7 @@ class UserController extends Controller {
 							 	'mensaje' => $mensaje,
 							 	'idactivo' => $idactivo,
 							 ]);
-		}	
+		}
 
 	}
 
@@ -1350,7 +1350,7 @@ class UserController extends Controller {
     									->where('STD.EMPRESA.COD_ESTADO','=',1)
     									->where('NRO_DOCUMENTO','=',$ruc)
 										->first();
-		$direccion  = '';	
+		$direccion  = '';
 		$mensaje    = 'Proveedor encontrado';
 		$idactivo   = 1;
 
@@ -1361,7 +1361,7 @@ class UserController extends Controller {
 											->first();
 			if(count($tdireccion)>0){
 				$direccion = $tdireccion->NOM_DIRECCION;
-			}	
+			}
 			$usuario    =   User::where('usuarioosiris_id','=',$empresa->COD_EMPR)->first();
 			if(count($usuario)>0){
 				if($usuario->ind_confirmacion==0){
@@ -1388,7 +1388,7 @@ class UserController extends Controller {
 	}
 
 
-		
+
 	public function actionCambiarPerfil()
 	{
 		Session::forget('empresas');
@@ -1408,7 +1408,7 @@ class UserController extends Controller {
 	// 					 	'accesos' => $accesos,
 	// 					 ]);
 	// }
-	
+
 	public function actionLogin(Request $request) {
 
 		if ($_POST) {
@@ -1510,16 +1510,16 @@ class UserController extends Controller {
 
 	public function actionAccesoBienvenido($idempresa)
 	{
-		
+
 		$empresas 	= 	STDEmpresa::where('COD_EMPR','=',$idempresa)
-						->where('COD_ESTADO','=','1')->where('IND_SISTEMA','=','1')->first(); 
+						->where('COD_ESTADO','=','1')->where('IND_SISTEMA','=','1')->first();
 		$color 		=   $this->funciones->color_empresa($empresas->COD_EMPR);
 
 
 		$listanegra = DB::table('LQG_DETLIQUIDACIONGASTO')
 		    ->select([
 		        'COD_USUARIO_AUTORIZA',
-		        'TXT_USUARIO_AUTORIZA', 
+		        'TXT_USUARIO_AUTORIZA',
 		        'LQG_DETLIQUIDACIONGASTO.TXT_EMPRESA_PROVEEDOR'
 		    ])
 		    ->join('LQG_LIQUIDACION_GASTO', 'LQG_DETLIQUIDACIONGASTO.ID_DOCUMENTO', '=', 'LQG_LIQUIDACION_GASTO.ID_DOCUMENTO')
@@ -1553,7 +1553,7 @@ class UserController extends Controller {
 		Session::forget('listamenu');
 		Session::forget('listaopciones');
 		Session::forget('empresas');
-		return Redirect::to('/login');	
+		return Redirect::to('/login');
 	}
 
 	public function actionBienvenido() {
@@ -1601,7 +1601,7 @@ class UserController extends Controller {
 		$count_observadosoc_le 		= 	0;
 		$count_observadosct_le 		= 	0;
 
-       
+
 		$trol 						=	WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 
 		$count_x_aprobar_con 				= 	0;
@@ -1814,7 +1814,8 @@ class UserController extends Controller {
     			$urldip 				=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=DOCUMENTO_INTERNO_PRODUCCION';
     			$urldis 				=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=DOCUMENTO_INTERNO_SECADO';
     			$urldib 				=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=DOCUMENTO_SERVICIO_BALANZA';
-
+                //documento interno compra
+                $urllqa 				=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=LIQUIDACION_COMPRA_ANTICIPO';
 
 
         		$url_rep 		 		=	'/gestion-de-comprobantes-reparable/Elk?operacion_id=ORDEN_COMPRA';
@@ -1839,10 +1840,6 @@ class UserController extends Controller {
 				$urlnoc 					=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=NOTA_CREDITO';
 				$urlnod 					=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=NOTA_DEBITO';
 				$urloca 					=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=ORDEN_COMPRA_ANTICIPO';
-
-
-
-
 
     			$urllg 					=	'/gestion-de-aprobacion-liquidacion-gastos-contabilidad/xvr';
     			$urlrenta				=	'/gestion-de-aprobar-cuarta-categoria/YWp';
@@ -2199,17 +2196,17 @@ class UserController extends Controller {
 
 					//VALE
 					$listadatos             = $this->listaValeRendirAprueba(
-												    'GEN',   
-												    '',      
-												    '',      
-												    '',      
-												    '',      
-												    '',      
-												    '',      
-												    '',      
-												    0,       
-												    0,       
-												    ''       
+												    'GEN',
+												    '',
+												    '',
+												    '',
+												    '',
+												    '',
+												    '',
+												    '',
+												    0,
+												    0,
+												    ''
 												);
 
 												$listadatos = array_filter($listadatos, function ($vale) {
@@ -2234,7 +2231,7 @@ class UserController extends Controller {
 		$listadocestados    =	array();
 		$listaobservados    =	array();
 		$listaocpendientes_con    =	array();
-		$listadocestados_con    =	array();	
+		$listadocestados_con    =	array();
 		if(Session::get('usuario')->rol_id != '1CIX00000024'){
 			$listaocpendientes     	   =   $this->con_lista_cabecera_comprobante_administrativo_total();
 			$listaocpendientes_con     =   $this->con_lista_cabecera_comprobante_administrativo_total_contrato();
@@ -2307,7 +2304,7 @@ class UserController extends Controller {
 						 	'urlvl' 					=> $urlvl,
 						 	'count_x_aprobar_vl' 		=> $count_x_aprobar_vl,
 
-						 	
+
 
 						 	'urldip' 					=> $urldip,
 						 	'count_reparables_dip' 		=> $count_reparables_dip,
@@ -2451,7 +2448,7 @@ class UserController extends Controller {
 
 		if($_POST)
 		{
-			$usuario 	= 	User::where('name', $request['name'])->first();  
+			$usuario 	= 	User::where('name', $request['name'])->first();
 			if(count($usuario)>0){
 				return Redirect::back()->withInput()->with('errorbd', 'Este usuario con ese name ya esta registrado');
 			}
@@ -2461,7 +2458,7 @@ class UserController extends Controller {
 			//dd($personal);
 
 			$idusers 				 	=   $this->funciones->getCreateIdMaestra('users');
-			
+
 			$cabecera            	 	=	new User;
 			$cabecera->id 	     	 	=   $idusers;
 			$cabecera->nombre 	     	=   $personal->nombres;
@@ -2470,12 +2467,12 @@ class UserController extends Controller {
 			$cabecera->fecha_crea 	   	=  	$this->fechaactual;
 			$cabecera->password 	 	= 	Crypt::encrypt($request['password']);
 			$cabecera->ind_confirmacion	= 	1;
-			$cabecera->ind_contacto 	= 	1;	
+			$cabecera->ind_contacto 	= 	1;
 			$cabecera->email_confirmacion 	= 	1;
 			$cabecera->rol_id 	 		= 	$request['rol_id'];
 			$cabecera->usuarioosiris_id	= 	$personal->id;
 			$cabecera->save();
- 
+
  			return Redirect::to('/gestion-de-usuarios/'.$idopcion)->with('bienhecho', 'Usuario '.$personal->COD_EMPR.' registrado con exito');
 
 		}else{
@@ -2505,12 +2502,12 @@ class UserController extends Controller {
 
 			$rol 						= 	DB::table('WEB.Rols')->where('ind_merge','=',1)->where('id','<>',$this->prefijomaestro.'00000001')->pluck('nombre','id')->toArray();
 			$comborol  					= 	array('' => "Seleccione Rol") + $rol;
-		
+
 			return View::make('usuario/agregarusuario',
 						[
 							'comborol'  		=> $comborol,
 							'listapersonal'  	=> $listapersonal,
-							//'combolistaclientes'  	=> $combolistaclientes,				
+							//'combolistaclientes'  	=> $combolistaclientes,
 						  	'idopcion'  		=> $idopcion
 						]);
 		}
@@ -2529,7 +2526,7 @@ class UserController extends Controller {
 
                 DB::beginTransaction();
 
-				$usuario 	= 	User::where('name', $request['name'])->first();  
+				$usuario 	= 	User::where('name', $request['name'])->first();
 				if(count($usuario)>0){
 					return Redirect::back()->withInput()->with('errorbd', 'Este usuario con ese name ya esta registrado');
 				}
@@ -2591,7 +2588,7 @@ class UserController extends Controller {
 				$cabecera->fecha_crea 	   	=  	$this->fechaactual;
 				$cabecera->password 	 	= 	Crypt::encrypt($request['password']);
 				$cabecera->ind_confirmacion	= 	1;
-				$cabecera->ind_contacto 	= 	1;	
+				$cabecera->ind_contacto 	= 	1;
 				$cabecera->email_confirmacion 	= 	1;
 				$cabecera->rol_id 	 		= 	$request['rol_id'];
 				$cabecera->usuarioosiris_id	= 	$personal->id;
@@ -2617,7 +2614,7 @@ class UserController extends Controller {
 				$detalle->save();
 
 
- 
+
                 DB::commit();
             } catch (\Exception $ex) {
                 DB::rollback();
@@ -2702,7 +2699,7 @@ class UserController extends Controller {
 	        $arraybancos    			=   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO','=','BANCOS_MERGE')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
 	        $combobancos    			=   array('' => "Seleccione Entidad Bancaria") + $arraybancos;
 
-		
+
 			return View::make('usuario/agregartercero',
 						[
 							'comborol'  		=> $comborol,
@@ -2715,7 +2712,7 @@ class UserController extends Controller {
 							'centro_id'  		=> $centro_id,
 							'combo_area'  		=> $combo_area,
 							'area_id'  			=> $area_id,
-							'listapersonal'  	=> $listapersonal,			
+							'listapersonal'  	=> $listapersonal,
 						  	'idopcion'  		=> $idopcion
 						]);
 		}
@@ -2733,13 +2730,13 @@ class UserController extends Controller {
 		if($_POST)
 		{
 
-			$cabecera            	 =	User::find($idusuario);			
+			$cabecera            	 =	User::find($idusuario);
 			$cabecera->name  		 =	$request['name'];
 			$cabecera->passwordmobil =	$request['password'];
 			$cabecera->fecha_mod 	 =  $this->fechaactual;
 			$cabecera->password 	 = 	Crypt::encrypt($request['password']);
-			$cabecera->activo 	 	 =  $request['activo'];			
-			$cabecera->rol_id 	 	 = 	$request['rol_id']; 
+			$cabecera->activo 	 	 =  $request['activo'];
+			$cabecera->rol_id 	 	 = 	$request['rol_id'];
 			$cabecera->ind_confirmacion	= 	1;
 			$cabecera->ind_contacto 	= 	1;
 			$cabecera->email_confirmacion 	= 	1;
@@ -2754,14 +2751,14 @@ class UserController extends Controller {
 		}else{
 
 
-				$usuario 	= 	User::where('id', $idusuario)->first();  
+				$usuario 	= 	User::where('id', $idusuario)->first();
 				$rol 		= 	DB::table('WEB.Rols')->where('id','<>',$this->prefijomaestro.'00000001')->pluck('nombre','id')->toArray();
 				$comborol  	= 	array($usuario->rol_id => $usuario->rol->nombre) + $rol;
-				$centros 	= 	ALMCentro::where('COD_ESTADO','=','1')->get(); 
-				$empresas 	= 	STDEmpresa::where('COD_ESTADO','=','1')->where('IND_SISTEMA','=','1')->get(); 
-				$funcion 	= 	$this;	
+				$centros 	= 	ALMCentro::where('COD_ESTADO','=','1')->get();
+				$empresas 	= 	STDEmpresa::where('COD_ESTADO','=','1')->where('IND_SISTEMA','=','1')->get();
+				$funcion 	= 	$this;
 
-		        return View::make('usuario/modificarusuario', 
+		        return View::make('usuario/modificarusuario',
 		        				[
 		        					'usuario'  		=> $usuario,
 		        					'empresas'  	=> $empresas,
@@ -2790,7 +2787,7 @@ class UserController extends Controller {
 
 
 					$tercero 					= 	Tercero::where('DNI', $idusuario)->first();
-					$usuario 					= 	User::where('id', $tercero->USER_ID)->first(); 
+					$usuario 					= 	User::where('id', $tercero->USER_ID)->first();
 
 			        $area              			=   DB::table('CON.CENTRO_COSTO')
 									                ->where('COD_CENTRO_COSTO','=', $request['area_id'])
@@ -2835,13 +2832,13 @@ class UserController extends Controller {
 			                ]
 			            );
 
-					$cabecera            	 =	User::find($usuario->id);			
+					$cabecera            	 =	User::find($usuario->id);
 					$cabecera->name  		 =	$request['name'];
 					$cabecera->passwordmobil =	$request['password'];
 					$cabecera->fecha_mod 	 =  $this->fechaactual;
 					$cabecera->password 	 = 	Crypt::encrypt($request['password']);
-					$cabecera->activo 	 	 =  $request['activo'];			
-					$cabecera->rol_id 	 	 = 	$request['rol_id']; 
+					$cabecera->activo 	 	 =  $request['activo'];
+					$cabecera->rol_id 	 	 = 	$request['rol_id'];
 					$cabecera->ind_confirmacion	= 	1;
 					$cabecera->ind_contacto 	= 	1;
 					$cabecera->email_confirmacion 	= 	1;
@@ -2859,10 +2856,10 @@ class UserController extends Controller {
 
 
 				$tercero 					= 	Tercero::where('DNI', $idusuario)->first();
-				$usuario 					= 	User::where('id', $tercero->USER_ID)->first();  
+				$usuario 					= 	User::where('id', $tercero->USER_ID)->first();
 				$rol 						= 	DB::table('WEB.Rols')->where('id','=','1CIX00000048')->pluck('nombre','id')->toArray();
 				$comborol  					= 	array($usuario->rol_id => $usuario->rol->nombre) + $rol;
-				$funcion 					= 	$this;	
+				$funcion 					= 	$this;
 
 		        $listaempresa              =   DB::table('STD.EMPRESA')
 		                                        ->where('STD.EMPRESA.IND_PROVEEDOR','=',1)
@@ -2913,13 +2910,13 @@ class UserController extends Controller {
 		        $combobancos    			=   array('' => "Seleccione Entidad Bancaria") + $arraybancos;
 
 
-		        return View::make('usuario/modificartercero', 
+		        return View::make('usuario/modificartercero',
 		        				[
 		        					'usuario'  		=> $usuario,
 		        					'tercero'  		=> $tercero,
 									'banco_id'  	=> $banco_id,
 									'combobancos'  		=> $combobancos,
-		        					
+
 									'combo_empresa'  	=> $combo_empresa,
 									'empresa_id'  		=> $empresa_id,
 									'combo_centro'  	=> $combo_centro,
@@ -3105,7 +3102,7 @@ class UserController extends Controller {
 		$idempresa =  $request['idempresa'];
 		$idcentro =  $request['idcentro'];
 		$idusuario =  $request['idusuario'];
-		$check =  $request['check'];	
+		$check =  $request['check'];
 
 		$perfiles = WEBUserEmpresaCentro::where('empresa_id','=',$idempresa)
 										  ->where('centro_id','=',$idcentro)
@@ -3116,9 +3113,9 @@ class UserController extends Controller {
 
 			$cabecera            	 =	WEBUserEmpresaCentro::find($perfiles->id);
 			$cabecera->fecha_mod 	 = 	$this->fechaactual;
-			$cabecera->activo 	     =  $check;	
-			$cabecera->save();	
-			
+			$cabecera->activo 	     =  $check;
+			$cabecera->save();
+
 		}else{
 
 			$id 					= 	$this->funciones->getCreateIdMaestra('WEB.userempresacentros');
