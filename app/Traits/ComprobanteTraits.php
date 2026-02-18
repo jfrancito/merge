@@ -60,7 +60,7 @@ trait ComprobanteTraits
     public function con_array_canjes() {
         $array = ['ESTIBA','DOCUMENTO_INTERNO_PRODUCCION','DOCUMENTO_INTERNO_SECADO','DOCUMENTO_SERVICIO_BALANZA','DOCUMENTO_INTERNO_COMPRA'];
         return $array;
-    }    
+    }
 
     public function con_categoria_canje($valor) {
         $array = [  'ESTIBA'=>'TDO0000000000067',
@@ -72,7 +72,7 @@ trait ComprobanteTraits
         $id = $array[$valor];
 
         return $id;
-    }   
+    }
 
     public function con_usuarios_cambio_cuenta() {
         $sw = 0;
@@ -81,9 +81,9 @@ trait ComprobanteTraits
 
         if (in_array($valor, $array)) {
             $sw = 1;
-        } 
+        }
         return $sw;
-    } 
+    }
 
 
     private function con_datos_de_la_pc_lqg($device,$fedocumento,$accion) {
@@ -114,7 +114,7 @@ trait ComprobanteTraits
             $documento->ES_TACTIL                   =   $deviceInfo['es_tactil'];
             $documento->save();
         }
-        
+
     }
 
 
@@ -147,7 +147,7 @@ trait ComprobanteTraits
             $documento->ES_TACTIL                   =   $deviceInfo['es_tactil'];
             $documento->save();
         }
-        
+
     }
 
     public function con_si_hay_retencion_lista($data_folio) {
@@ -198,7 +198,7 @@ trait ComprobanteTraits
 
         return $array;
 
-    }   
+    }
 
 
 
@@ -209,7 +209,7 @@ trait ComprobanteTraits
 
     public function con_zona($folio) {
 
-        $folio = FeRefAsoc::where('LOTE','=',$folio)->first();  
+        $folio = FeRefAsoc::where('LOTE','=',$folio)->first();
         if (strpos($folio->ID_DOCUMENTO, 'CH') !== false) {
             return 'CHICLAYO';
         } else{
@@ -227,22 +227,22 @@ trait ComprobanteTraits
                 }
             }
         }
-    }    
+    }
 
     public function con_transferencia($id_orden) {
 
-        $ordencompra = CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$id_orden)->first();  
+        $ordencompra = CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$id_orden)->first();
         $resultado = '';
         // Verificar si la cadena contiene 'TPS' o 'TPL'
         if (strpos($ordencompra->NRO_ITT, 'TPS') !== false || strpos($ordencompra->NRO_ITT, 'TPL') !== false) {
             $partes = explode(' / ', $ordencompra->NRO_ITT);
             $resultado = $partes[0];
         }
-        $transferencia        =   CMPOrden::where('COD_ORDEN','=',$resultado)->first();  
+        $transferencia        =   CMPOrden::where('COD_ORDEN','=',$resultado)->first();
 
         return $transferencia;
 
-    }    
+    }
 
     public function con_transferencia_itt($nroitt) {
         $resultado = '';
@@ -251,9 +251,9 @@ trait ComprobanteTraits
             $partes = explode(' / ', $nroitt);
             $resultado = $partes[0];
         }
-        $transferencia        =   CMPOrden::where('COD_ORDEN','=',$resultado)->first();  
+        $transferencia        =   CMPOrden::where('COD_ORDEN','=',$resultado)->first();
         return $transferencia;
-    }    
+    }
 
 
 
@@ -639,7 +639,7 @@ trait ComprobanteTraits
 
                                         ->leftJoin(DB::raw('(SELECT COD_EMPR_CLIENTE, SUM(CAN_SALDO) AS CAN_DEUDA 
                                                              FROM DEUDA_TOTAL_MERGE_SUM 
-                                                             GROUP BY COD_EMPR_CLIENTE) AS deuda'), 
+                                                             GROUP BY COD_EMPR_CLIENTE) AS deuda'),
                                             'CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR', '=', 'deuda.COD_EMPR_CLIENTE')
 
                                         ->whereRaw("CAST(FE_DOCUMENTO.fecha_pa  AS DATE) >= ? and CAST(FE_DOCUMENTO.fecha_pa  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
@@ -674,7 +674,7 @@ trait ComprobanteTraits
 
                                         ->leftJoin(DB::raw('(SELECT COD_EMPR_CLIENTE, SUM(CAN_SALDO) AS CAN_DEUDA 
                                                          FROM DEUDA_TOTAL_MERGE_SUM 
-                                                         GROUP BY COD_EMPR_CLIENTE) AS deuda'), 
+                                                         GROUP BY COD_EMPR_CLIENTE) AS deuda'),
                                         'CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR', '=', 'deuda.COD_EMPR_CLIENTE')
 
                                         ->whereRaw("CAST(FE_DOCUMENTO.fecha_pa  AS DATE) >= ? and CAST(FE_DOCUMENTO.fecha_pa  AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
@@ -1568,7 +1568,7 @@ trait ComprobanteTraits
                     'CMP.ORDEN.COD_USUARIO_MODIF_AUD' => 'MERGE',
                     'CMP.ORDEN.FEC_USUARIO_MODIF_AUD' => DB::raw('GETDATE()')
                 ]);
-            
+
         }
 
 
@@ -1637,7 +1637,7 @@ trait ComprobanteTraits
                     //////////////////////////CONTRATO
 
 
-                    
+
                     DB::table('CMP.DOCUMENTO_CTBLE')
                     ->join('CMP.REFERENCIA_ASOC', function($join) {
                         $join->on('CMP.REFERENCIA_ASOC.COD_TABLA_ASOC', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
@@ -1903,7 +1903,7 @@ trait ComprobanteTraits
                     }
                     // Cerrar el archivo ZIP
                     $zip->close();
-                } 
+                }
                 //dd("hola");
                 // Directorio base de destino (cámbialo a donde deseas guardar el archivo descomprimido)
                 $extractToDir = $rutafile . DIRECTORY_SEPARATOR . $zipFileName;
@@ -1921,7 +1921,7 @@ trait ComprobanteTraits
                     // Extraer todo el contenido al directorio de destino
                     $zip->extractTo($rutafile);
                     $zip->close();
-                } 
+                }
                 $extractedFile = $rutafile.'\\'.$fileInfo['name'];
                 $extension = pathinfo($fileInfo['name'], PATHINFO_EXTENSION);
                 // Verificar si es un archivo XML
@@ -1938,7 +1938,7 @@ trait ComprobanteTraits
                         $namespaces = $xml->getNamespaces(true);
                         foreach ($namespaces as $prefix => $namespace) {
                             if('cbc'==$prefix){
-                                $cbc = 1;  
+                                $cbc = 1;
                             }
                         }
 
@@ -1963,7 +1963,7 @@ trait ComprobanteTraits
                                 if($factura_cdr_id == $nombre_doc || $factura_cdr_id == $nombre_doc_sinceros){
                                     $sw = 1;
                                 }
-                            }  
+                            }
                         }else{
 
                             $xml_ns = simplexml_load_file($extractedFile);
@@ -2006,9 +2006,9 @@ trait ComprobanteTraits
                                             ]
                                         );
 
-                        }                        
-                    } 
-                } 
+                        }
+                    }
+                }
 
             }
         }
@@ -2130,7 +2130,7 @@ trait ComprobanteTraits
             //dd($referenciaasoc->COD_TABLA_ASOC);
             if(count($referenciaasoc)>0){
                 $wsdl = 'http://10.1.0.201/WCF_Orden.svc?wsdl';
-                // URL del WSDL del servicio WCF 
+                // URL del WSDL del servicio WCF
                 if($orden->COD_CENTRO == 'CEN0000000000004'){ //rioja
                      $wsdl = 'http://10.1.7.200:83/WCF_Orden.svc?wsdl';
                 }else{
@@ -2149,10 +2149,10 @@ trait ComprobanteTraits
                     'cache_wsdl'    => WSDL_CACHE_NONE,
                 );
                 $params = [
-                    'ls_Tipo' => 'I', 
+                    'ls_Tipo' => 'I',
                     'codOrdenI' => $referenciaasoc->COD_TABLA_ASOC
                 ];
-                $client     = new SoapClient($wsdl, $mode); 
+                $client     = new SoapClient($wsdl, $mode);
                 $res        = $client->EjecutarOIMerge($params);
                 $json       = response()->json($res);
                 $jsonData   = $json->getContent();
@@ -2219,7 +2219,7 @@ trait ComprobanteTraits
 
                 //whatsaap para contabilidad
                 $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)->where('DOCUMENTO_ITEM','=',$item->DOCUMENTO_ITEM)->first();
-                $ordencompra        =   CMPOrden::where('COD_ORDEN','=',$item->ID_DOCUMENTO)->first();            
+                $ordencompra        =   CMPOrden::where('COD_ORDEN','=',$item->ID_DOCUMENTO)->first();
                 $empresa            =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR)->first();
                 $mensaje            =   'COMPROBANTE : '.$fedocumento_w->ID_DOCUMENTO
                                         .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
@@ -2240,11 +2240,11 @@ trait ComprobanteTraits
                         $this->insertar_whatsaap('51950638955','MIGUEL',$mensaje,'');           //COMERCIAL
                         $this->insertar_whatsaap('51935387084','VASQUEZ',$mensaje,'');          //COMERCIAL
                     }
-                } 
+                }
 
             }
             print_r("EJECUTO ORDEN DE INGRESO");
- 
+
         }
 
     }
@@ -2330,7 +2330,7 @@ trait ComprobanteTraits
                 //             $namespaces = $xml->getNamespaces(true);
                 //             foreach ($namespaces as $prefix => $namespace) {
                 //                 if('cbc'==$prefix){
-                //                     $cbc = 1;  
+                //                     $cbc = 1;
                 //                 }
                 //             }
                 //             if($cbc>=1){
@@ -2348,7 +2348,7 @@ trait ComprobanteTraits
                 //                     if($factura_cdr_id == $nombre_doc || $factura_cdr_id == $nombre_doc_sinceros){
                 //                         $sw = 1;
                 //                     }
-                //                 }  
+                //                 }
                 //             }else{
                 //                 $xml_ns = simplexml_load_file($extractedFile);
 
@@ -2380,7 +2380,7 @@ trait ComprobanteTraits
                 //             }
 
 
-                //         } 
+                //         }
 
                 //     }else{
                 //         $sw = 1;
@@ -2453,7 +2453,7 @@ trait ComprobanteTraits
                             if(isset($datares['condDomiRuc'])){
                                 $tablaestaDomiRuc       = Estado::where('tipo','=','condDomiRuc')->where('codigo','=',$datares['condDomiRuc'])->first();
                                 if($datares['condDomiRuc']=='-'){$datares['condDomiRuc']='00';}
-                                
+
                                 $estadoDomiRuc          = $tablaestaDomiRuc->codigo;
                                 $txtestadoDomiRuc       = $tablaestaDomiRuc->nombre;
                             }
@@ -2577,7 +2577,7 @@ trait ComprobanteTraits
                             $namespaces = $xml->getNamespaces(true);
                             foreach ($namespaces as $prefix => $namespace) {
                                 if('cbc'==$prefix){
-                                    $cbc = 1;  
+                                    $cbc = 1;
                                 }
                             }
                             if($cbc>=1){
@@ -2595,7 +2595,7 @@ trait ComprobanteTraits
                                     if($factura_cdr_id == $nombre_doc || $factura_cdr_id == $nombre_doc_sinceros){
                                         $sw = 1;
                                     }
-                                }  
+                                }
                             }else{
                                 $xml_ns = simplexml_load_file($extractedFile);
 
@@ -2622,7 +2622,7 @@ trait ComprobanteTraits
                                     }
                                 }
                             }
-                        } 
+                        }
 
                     }else{
                         $sw = 1;
@@ -2683,7 +2683,7 @@ trait ComprobanteTraits
                         if (!isset($datares['estadoCp'])){
                             return Redirect::back()->with('errorurl', 'Hay fallas en sunat para consultar el XML');
                         }
-                        
+
                         $estadoCp             = $datares['estadoCp'];
                         $tablaestacp          = Estado::where('tipo','=','estadoCp')->where('codigo','=',$estadoCp)->first();
 
@@ -2780,7 +2780,7 @@ trait ComprobanteTraits
         $array_trabajadores  =      STDTrabajador::where('NRO_DOCUMENTO','=',$trabajador->NRO_DOCUMENTO)
                                     ->pluck('COD_TRAB')
                                     ->toArray();
-    
+
         if(Session::get('usuario')->id== '1CIX00000001'){
 
             $listadatos         =       FeDocumento::leftJoin('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
@@ -2827,7 +2827,7 @@ trait ComprobanteTraits
         $array_trabajadores     =      STDTrabajador::where('NRO_DOCUMENTO','=',$trabajador->NRO_DOCUMENTO)
                                         ->pluck('COD_TRAB')
                                         ->toArray();
-    
+
         $listadatos             =       FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                                         //->whereIn('FE_DOCUMENTO.COD_CONTACTO',$array_trabajadores)
                                         ->where('OPERACION','=','CONTRATO')
@@ -2893,11 +2893,9 @@ trait ComprobanteTraits
                             ->orderBy('ind_observacion','asc')
                             ->orderBy('fecha_pr','asc')
                             ->get();
-        //dd($listadatos);                   
+        //dd($listadatos);
         return  $listadatos;
     }
-
-
 
     private function con_lista_cabecera_comprobante_total_cont_obs_levantadas($cliente_id) {
 
@@ -2938,8 +2936,6 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
-
-
     private function con_lista_cabecera_comprobante_total_cont_obs($cliente_id) {
 
         $listadatos     =   FeDocumento::leftJoin('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
@@ -2977,7 +2973,6 @@ trait ComprobanteTraits
 
         return  $listadatos;
     }
-
 
     private function con_lista_cabecera_comprobante_total_cont_estiba($cliente_id,$operacion_id) {
 
@@ -3084,7 +3079,7 @@ trait ComprobanteTraits
 
         return  $listadatos;
     }
-    
+
 
 
     private function con_lista_cabecera_comprobante_total_cont_pg($cliente_id) {
@@ -3112,7 +3107,7 @@ trait ComprobanteTraits
 
         return  $listadatos;
     }
-    
+
 
 
     private function con_lista_cabecera_comprobante_total_cont_estiba_levantadas($cliente_id,$operacion_id) {
@@ -3290,7 +3285,7 @@ trait ComprobanteTraits
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                             ->leftJoin(DB::raw('(SELECT COD_EMPR_CLIENTE, SUM(CAN_SALDO) AS CAN_DEUDA 
                                                  FROM DEUDA_TOTAL_MERGE_SUM 
-                                                 GROUP BY COD_EMPR_CLIENTE) AS deuda'), 
+                                                 GROUP BY COD_EMPR_CLIENTE) AS deuda'),
                                 'CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR', '=', 'deuda.COD_EMPR_CLIENTE')
                             ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC,deuda.CAN_DEUDA AS CAN_DEUDA'))
                             ->where('OPERACION','=','CONTRATO')
@@ -3307,7 +3302,7 @@ trait ComprobanteTraits
 
     private function con_lista_cabecera_comprobante_total_adm_liquidacion_compra_anticipo_obs_levantadas($cliente_id) {
 
-        $listadatos     =   FeDocumento::leftJoin('TES.AUTORIZACION', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'TES.AUTORIZACION.COD_AUTORIZACION')                            
+        $listadatos     =   FeDocumento::leftJoin('TES.AUTORIZACION', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'TES.AUTORIZACION.COD_AUTORIZACION')
                             ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                             ->where('OPERACION','=','LIQUIDACION_COMPRA_ANTICIPO')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
@@ -3321,7 +3316,7 @@ trait ComprobanteTraits
     }
     private function con_lista_cabecera_comprobante_total_con_liquidacion_compra_anticipo_obs_levantadas($cliente_id) {
 
-        $listadatos     =   FeDocumento::leftJoin('TES.AUTORIZACION', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'TES.AUTORIZACION.COD_AUTORIZACION')                            
+        $listadatos     =   FeDocumento::leftJoin('TES.AUTORIZACION', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'TES.AUTORIZACION.COD_AUTORIZACION')
                             ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                             ->where('OPERACION','=','LIQUIDACION_COMPRA_ANTICIPO')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
@@ -3337,7 +3332,7 @@ trait ComprobanteTraits
 
     private function con_lista_cabecera_comprobante_total_adm_nota_credito_obs_levantadas($cliente_id) {
 
-        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')                            
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                             ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC'))
                             ->where('OPERACION','=','NOTA_CREDITO')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
@@ -3353,7 +3348,7 @@ trait ComprobanteTraits
 
     private function con_lista_cabecera_comprobante_total_adm_pg_obs_levantadas($cliente_id) {
 
-        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')                            
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                             ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC'))
                             ->where('OPERACION','=','PROVISION_GASTO')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
@@ -3368,7 +3363,7 @@ trait ComprobanteTraits
     }
     private function con_lista_cabecera_comprobante_total_adm_nota_debito_obs_levantadas($cliente_id) {
 
-        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')                            
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                             ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC'))
                             ->where('OPERACION','=','NOTA_DEBITO')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
@@ -3388,7 +3383,7 @@ trait ComprobanteTraits
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                             ->leftJoin(DB::raw('(SELECT COD_EMPR_CLIENTE, SUM(CAN_SALDO) AS CAN_DEUDA 
                                                  FROM DEUDA_TOTAL_MERGE_SUM 
-                                                 GROUP BY COD_EMPR_CLIENTE) AS deuda'), 
+                                                 GROUP BY COD_EMPR_CLIENTE) AS deuda'),
                                 'CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR', '=', 'deuda.COD_EMPR_CLIENTE')
                             ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC,deuda.CAN_DEUDA AS CAN_DEUDA'))
                             ->where('OPERACION','=',$operacion_id)
@@ -3682,7 +3677,7 @@ trait ComprobanteTraits
 
                             ->leftJoin(DB::raw('(SELECT COD_EMPR_CLIENTE, SUM(CAN_SALDO) AS CAN_DEUDA 
                                                  FROM DEUDA_TOTAL_MERGE_SUM 
-                                                 GROUP BY COD_EMPR_CLIENTE) AS deuda'), 
+                                                 GROUP BY COD_EMPR_CLIENTE) AS deuda'),
                                 'CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR', '=', 'deuda.COD_EMPR_CLIENTE')
 
                             ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,deuda.CAN_DEUDA AS CAN_DEUDA'))
@@ -3759,7 +3754,7 @@ trait ComprobanteTraits
     private function con_lista_cabecera_comprobante_total_adm_nota_credito($cliente_id) {
 
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
-                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))                            
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                             ->where('OPERACION','=','NOTA_CREDITO')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where(function ($query) {
@@ -3783,7 +3778,7 @@ trait ComprobanteTraits
     private function con_lista_cabecera_comprobante_total_adm_nota_debito($cliente_id) {
 
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
-                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))                            
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                             ->where('OPERACION','=','NOTA_DEBITO')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where(function ($query) {
@@ -3807,7 +3802,7 @@ trait ComprobanteTraits
     private function con_lista_cabecera_comprobante_total_adm_pg($cliente_id) {
 
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
-                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))                            
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                             ->where('OPERACION','=','PROVISION_GASTO')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where(function ($query) {
@@ -3834,7 +3829,7 @@ trait ComprobanteTraits
         $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                             ->leftJoin(DB::raw('(SELECT COD_EMPR_CLIENTE, SUM(CAN_SALDO) AS CAN_DEUDA 
                                                  FROM DEUDA_TOTAL_MERGE_SUM 
-                                                 GROUP BY COD_EMPR_CLIENTE) AS deuda'), 
+                                                 GROUP BY COD_EMPR_CLIENTE) AS deuda'),
                                 'CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR', '=', 'deuda.COD_EMPR_CLIENTE')
                             ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,deuda.CAN_DEUDA AS CAN_DEUDA'))
                             ->where('OPERACION','=',$operacion_id)
@@ -3862,7 +3857,7 @@ trait ComprobanteTraits
 
                             ->leftJoin(DB::raw('(SELECT COD_EMPR_CLIENTE, SUM(CAN_SALDO) AS CAN_DEUDA 
                                                  FROM DEUDA_TOTAL_MERGE_SUM 
-                                                 GROUP BY COD_EMPR_CLIENTE) AS deuda'), 
+                                                 GROUP BY COD_EMPR_CLIENTE) AS deuda'),
                                 'CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR', '=', 'deuda.COD_EMPR_CLIENTE')
 
                             ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,deuda.CAN_DEUDA AS CAN_DEUDA'))
@@ -3953,7 +3948,7 @@ trait ComprobanteTraits
 
                             ->leftJoin(DB::raw('(SELECT COD_EMPR_CLIENTE, SUM(CAN_SALDO) AS CAN_DEUDA 
                                                  FROM DEUDA_TOTAL_MERGE_SUM 
-                                                 GROUP BY COD_EMPR_CLIENTE) AS deuda'), 
+                                                 GROUP BY COD_EMPR_CLIENTE) AS deuda'),
                                 'CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR', '=', 'deuda.COD_EMPR_CLIENTE')
 
                             ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,deuda.CAN_DEUDA AS CAN_DEUDA'))
@@ -5280,7 +5275,7 @@ trait ComprobanteTraits
 
 
     }
-    
+
 
     private function con_lista_cabecera_comprobante_total_gestion_contrato_reparable_excel($cod_empresa,$tipoarchivo_id,$estado_id) {
 
@@ -5566,7 +5561,7 @@ trait ComprobanteTraits
 
         if($rol->ind_uc == 1 && !in_array($usuario_id, $array_jefes)){
             //dd("hola03");
-            $listadatos     =   FeDocumento::join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')                                
+            $listadatos     =   FeDocumento::join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
 
@@ -5574,7 +5569,7 @@ trait ComprobanteTraits
                                 //->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                 ->Fecha($filtrofecha_id,$fecha_inicio,$fecha_fin)
                                 //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
-                                ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)                                
+                                ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 ->where('OPERACION','=','NOTA_CREDITO')
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
@@ -5585,7 +5580,7 @@ trait ComprobanteTraits
 
         }else{
             //dd("hola02");
-            $listadatos     =   FeDocumento::join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')                                
+            $listadatos     =   FeDocumento::join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
 
@@ -5626,7 +5621,7 @@ trait ComprobanteTraits
 
         if($rol->ind_uc == 1 && !in_array($usuario_id, $array_jefes)){
             //dd("hola03");
-            $listadatos     =   FeDocumento::join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')                                
+            $listadatos     =   FeDocumento::join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
 
@@ -5634,7 +5629,7 @@ trait ComprobanteTraits
                                 //->whereRaw("CAST(fecha_pa AS DATE) >= ? and CAST(fecha_pa AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                 ->Fecha($filtrofecha_id,$fecha_inicio,$fecha_fin)
                                 //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
-                                ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)                                
+                                ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 ->where('OPERACION','=','NOTA_DEBITO')
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
@@ -5645,7 +5640,7 @@ trait ComprobanteTraits
 
         }else{
             //dd("hola02");
-            $listadatos     =   FeDocumento::join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')                                
+            $listadatos     =   FeDocumento::join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
 
@@ -5686,11 +5681,11 @@ trait ComprobanteTraits
 
         if($rol->ind_uc == 1 && !in_array($usuario_id, $array_jefes)){
 
-            $listadatos     =   FeDocumento::join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')                                
+            $listadatos     =   FeDocumento::join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
                                 ->Fecha($filtrofecha_id,$fecha_inicio,$fecha_fin)
-                                ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)                                
+                                ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 ->where('OPERACION','=','PROVISION_GASTO')
                                 ->ProveedorFE($proveedor_id)
                                 ->EstadoFE($estado_id)
@@ -5701,7 +5696,7 @@ trait ComprobanteTraits
 
         }else{
 
-            $listadatos     =   FeDocumento::join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')                                
+            $listadatos     =   FeDocumento::join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                                 ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.DOCUMENTO_CTBLE.COD_USUARIO_CREA_AUD')
                                 ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
                                 ->Fecha($filtrofecha_id,$fecha_inicio,$fecha_fin)
@@ -5862,7 +5857,7 @@ trait ComprobanteTraits
 
 
     private function gn_combo_proveedor_fe_documento_xestado($todo,$estado_id) {
-            
+
         $array                      =   FeDocumento::where('FE_DOCUMENTO.COD_ESTADO','<>','')
                                         ->select(DB::raw('RUC_PROVEEDOR,RZ_PROVEEDOR'))
                                         ->groupBy('RUC_PROVEEDOR')
@@ -5875,11 +5870,11 @@ trait ComprobanteTraits
         }else{
             $combo                  =   $array;
         }
-        return  $combo;                             
+        return  $combo;
     }
 
     private function gn_combo_banco_comision() {
-            
+
         $array  =   DB::table('TES.CAJA_BANCO as CBC')
                     ->leftJoin('STD.EMPRESA as EMP', 'CBC.COD_BANCO', '=', 'EMP.COD_EMPR')
                     ->select(
@@ -5898,12 +5893,12 @@ trait ComprobanteTraits
                     ->toArray();
         $combo               =   array('' => 'Seleccione Banco','TODO' => 'TODO') + $array;
 
-        return  $combo;                             
+        return  $combo;
     }
 
 
     private function gn_lista_comision($fecha_inicio,$fecha_fin,$banco_id) {
-            
+
         $estado_no          =       'ETM0000000000006';
 
 
@@ -6153,11 +6148,11 @@ trait ComprobanteTraits
 
         $registros = $consulta1->unionAll($consulta2)->unionAll($consulta3)->get();
 
-        return  $registros;                             
+        return  $registros;
     }
 
     private function gn_lista_comision_todo($fecha_inicio,$fecha_fin,$banco_id) {
-            
+
         $estado_no          =       'ETM0000000000006';
 
         $consulta1 = DB::table('TES.OPERACION_CAJA as TES')
@@ -6370,7 +6365,7 @@ trait ComprobanteTraits
 
         $registros = $consulta1->unionAll($consulta2)->unionAll($consulta3)->get();
 
-        return  $registros;                             
+        return  $registros;
     }
 
     private function gn_lista_comision_asociados_atendidos($array,$lote) {
@@ -6448,12 +6443,12 @@ trait ComprobanteTraits
                     ->get();
 
         //dd($registros);
-        return  $registros;                             
+        return  $registros;
     }
 
 
     private function gn_lista_comision_asociados($array) {
-            
+
 
         $registros = DB::table('TES.OPERACION_CAJA as TES')
                     ->leftJoin('STD.EMPRESA as EMS', 'TES.COD_EMPR', '=', 'EMS.COD_EMPR')
@@ -6513,12 +6508,12 @@ trait ComprobanteTraits
             ->get();
 
 
-        return  $registros;                             
+        return  $registros;
     }
 
 
     private function gn_lista_comision_asociados_top_terminado($array,$lote) {
-            
+
 
         $registros = DB::table('TES.OPERACION_CAJA as TES')
                     ->leftJoin('FE_REF_ASOC', function ($leftJoin) use ($lote){
@@ -6580,11 +6575,11 @@ trait ComprobanteTraits
                     ->first();
 
 
-        return  $registros;                             
+        return  $registros;
     }
 
     private function gn_lista_comision_asociados_top($array) {
-            
+
 
         $registros = DB::table('TES.OPERACION_CAJA as TES')
                     ->leftJoin('STD.EMPRESA as EMS', 'TES.COD_EMPR', '=', 'EMS.COD_EMPR')
@@ -6644,11 +6639,11 @@ trait ComprobanteTraits
                     ->first();
 
 
-        return  $registros;                             
+        return  $registros;
     }
 
     private function gn_lista_comision_asociados_top_get($array) {
-            
+
 
         $registros = DB::table('TES.OPERACION_CAJA as TES')
                     ->leftJoin('STD.EMPRESA as EMS', 'TES.COD_EMPR', '=', 'EMS.COD_EMPR')
@@ -6703,12 +6698,12 @@ trait ComprobanteTraits
                     ->get();
 
 
-        return  $registros;                             
+        return  $registros;
     }
 
 
     private function gn_combo_proveedor_fe_documento($todo) {
-            
+
         $array                      =   FeDocumento::where('FE_DOCUMENTO.COD_ESTADO','<>','')
                                         ->select(DB::raw('RUC_PROVEEDOR,RZ_PROVEEDOR'))
                                         ->groupBy('RUC_PROVEEDOR')
@@ -6722,11 +6717,11 @@ trait ComprobanteTraits
         }else{
             $combo                  =   $array;
         }
-        return  $combo;                             
+        return  $combo;
     }
 
 
-    
+
 
 
     private function gn_combo_estado_fe_documento($todo) {
@@ -6741,7 +6736,7 @@ trait ComprobanteTraits
         }else{
             $combo                  =   $array;
         }
-        return  $combo;                    
+        return  $combo;
     }
 
 
@@ -6757,7 +6752,7 @@ trait ComprobanteTraits
         }else{
             $combo                  =   $array;
         }
-        return  $combo;                    
+        return  $combo;
     }
 
 
@@ -6773,7 +6768,7 @@ trait ComprobanteTraits
         }else{
             $combo                  =   $array;
         }
-        return  $combo;                    
+        return  $combo;
     }
 
 
@@ -6793,7 +6788,7 @@ trait ComprobanteTraits
         }else{
             $combo                  =   $array;
         }
-        return  $combo;                    
+        return  $combo;
     }
 
 
@@ -6808,8 +6803,8 @@ trait ComprobanteTraits
                                             ->toArray();
 
         $combo                  =   $array;
- 
-        return  $combo;                    
+
+        return  $combo;
     }
 
 
@@ -6827,7 +6822,7 @@ trait ComprobanteTraits
         }else{
             $combo                  =   $array;
         }
-        return  $combo;                    
+        return  $combo;
     }
 
     private function con_lista_cabecera_comprobante_total_gestion_observados_oc_proveedor($cliente_id) {
@@ -6865,7 +6860,7 @@ trait ComprobanteTraits
 
     private function con_lista_cabecera_comprobante_total_gestion_reparable_admin($cliente_id,$tipoarchivo_id,$estado_id) {
 
-           
+
         $listadatos     =   FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
                             ->whereNotIn('FE_DOCUMENTO.COD_ESTADO',['','ETM0000000000006'])
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
@@ -6941,7 +6936,7 @@ trait ComprobanteTraits
 
         }else{
 
-           
+
             $listadatos     =   FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
                                 //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
                                 ->whereNotIn('FE_DOCUMENTO.COD_ESTADO',['','ETM0000000000006'])
@@ -7081,7 +7076,7 @@ trait ComprobanteTraits
                                 ->get();
         }
 
-        
+
 
 
         return  $listadatos;
@@ -7114,7 +7109,7 @@ trait ComprobanteTraits
                             ->get();
         }
 
-        
+
 
 
         return  $listadatos;
@@ -7124,7 +7119,7 @@ trait ComprobanteTraits
 
         $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
         $centro_id           =      $trabajador->COD_ZONA_TIPO;
-        
+
 
 
         if(Session::get('usuario')->id== '1CIX00000001'){
@@ -7179,7 +7174,7 @@ trait ComprobanteTraits
     private function con_lista_cabecera_comprobante_total_gestion_observados_liquidacion_compra_anticipo($cliente_id) {
 
         $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
-        $centro_id           =      $trabajador->COD_ZONA_TIPO;        
+        $centro_id           =      $trabajador->COD_ZONA_TIPO;
         $listadatos          =      FeDocumento::Join('TES.AUTORIZACION', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'TES.AUTORIZACION.COD_AUTORIZACION')
                                     ->where('OPERACION','=','LIQUIDACION_COMPRA_ANTICIPO')
                                     ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
@@ -7196,7 +7191,7 @@ trait ComprobanteTraits
     private function con_lista_cabecera_comprobante_total_gestion_observados_nota_credito($cliente_id) {
 
         $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
-        $centro_id           =      $trabajador->COD_ZONA_TIPO;        
+        $centro_id           =      $trabajador->COD_ZONA_TIPO;
         $listadatos          =      FeDocumento::Join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                                     ->where('OPERACION','=','NOTA_CREDITO')
                                     ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
@@ -7213,7 +7208,7 @@ trait ComprobanteTraits
     private function con_lista_cabecera_comprobante_total_gestion_observados_nota_debito($cliente_id) {
 
         $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
-        $centro_id           =      $trabajador->COD_ZONA_TIPO;        
+        $centro_id           =      $trabajador->COD_ZONA_TIPO;
         $listadatos          =      FeDocumento::Join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
                                     ->where('OPERACION','=','NOTA_DEBITO')
                                     ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
@@ -7230,7 +7225,7 @@ trait ComprobanteTraits
     private function con_lista_cabecera_comprobante_total_gestion_observados_pg($cliente_id) {
 
         $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
-        $centro_id           =      $trabajador->COD_ZONA_TIPO;   
+        $centro_id           =      $trabajador->COD_ZONA_TIPO;
 
         //dd($cliente_id);
 
@@ -7288,7 +7283,7 @@ trait ComprobanteTraits
                                 ->orderBy('CMP.Orden.FEC_ORDEN','desc')
                                 ->get();
 
-        } 
+        }
 
 
 
@@ -7331,45 +7326,45 @@ trait ComprobanteTraits
         //ruc
 
         if($empresa_sel->NRO_DOCUMENTO == $fedocumento->RUC_PROVEEDOR){
-            $ind_ruc            =   1;  
+            $ind_ruc            =   1;
         }else{  $ind_errototal      =   0;  }
 
         if(ltrim(rtrim(strtoupper($ordencompra->TXT_EMPR_CLIENTE))) == ltrim(rtrim(strtoupper($fedocumento->RZ_PROVEEDOR)))){
-            $ind_rz             =   1;  
+            $ind_rz             =   1;
         }else{  $ind_errototal      =   0;  }
 
 
         //moneda
         $txtmoneda          =   '';
         if($fedocumento->MONEDA == 'PEN'){
-            $txtmoneda          =   'SOLES';    
+            $txtmoneda          =   'SOLES';
         }else{
             $txtmoneda          =   'DOLARES';
         }
         if($ordencompra->TXT_CATEGORIA_MONEDA == $txtmoneda){
-            $ind_moneda             =   1;  
+            $ind_moneda             =   1;
         }else{  $ind_errototal      =   0;  }
         //total
         if(number_format($fereftop1->TOTAL_MERGE, 4, '.', '') == number_format($fedocumento->TOTAL_VENTA_ORIG, 4, '.', '')){
-            $ind_total          =   1;  
+            $ind_total          =   1;
         }else{  $ind_errototal      =   0;  }
 
 
         $ordencompra_t          =   CMPOrden::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->first();
 
         if($ordencompra_t->IND_MATERIAL_SERVICIO == 'S'){
-            $ind_cantidaditem           =   1;  
+            $ind_cantidaditem           =   1;
         }else{
             //numero_items
             if(count($detalleordencompra) == count($detallefedocumento)){
-                $ind_cantidaditem           =   1;  
+                $ind_cantidaditem           =   1;
             }else{  $ind_errototal      =   0;  }
 
         }
 
         $tp = CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
         if($tp->CODIGO_SUNAT == substr(strtoupper(ltrim(rtrim($fedocumento->FORMA_PAGO))), 0, 3)){
-            $ind_formapago          =   1;  
+            $ind_formapago          =   1;
         }else{  $ind_errototal      =   0;  }
 
 
@@ -7378,7 +7373,7 @@ trait ComprobanteTraits
                             [
                                 'ind_ruc'=>$ind_ruc,
                                 'ind_rz'=>$ind_rz,
-                                
+
                                 'ind_moneda'=>$ind_moneda,
                                 'ind_total'=>$ind_total,
                                 'ind_cantidaditem'=>$ind_cantidaditem,
@@ -7400,38 +7395,38 @@ trait ComprobanteTraits
         $ind_errototal      =   1;
         //ruc
         if($ordencompra->NRO_DOCUMENTO_CLIENTE == $fedocumento->RUC_PROVEEDOR){
-            $ind_ruc            =   1;  
+            $ind_ruc            =   1;
         }else{  $ind_errototal      =   0;  }
 
         if(ltrim(rtrim(strtoupper($ordencompra->TXT_EMPR_CLIENTE))) == ltrim(rtrim(strtoupper($fedocumento->RZ_PROVEEDOR)))){
-            $ind_rz             =   1;  
+            $ind_rz             =   1;
         }else{  $ind_errototal      =   0;  }
 
 
         //moneda
         $txtmoneda          =   '';
         if($fedocumento->MONEDA == 'PEN'){
-            $txtmoneda          =   'SOLES';    
+            $txtmoneda          =   'SOLES';
         }else{
             $txtmoneda          =   'DOLARES';
         }
         if($ordencompra->TXT_CATEGORIA_MONEDA == $txtmoneda){
-            $ind_moneda             =   1;  
+            $ind_moneda             =   1;
         }else{  $ind_errototal      =   0;  }
         //total
         if(number_format($ordencompra->CAN_TOTAL, 4, '.', '') == number_format($fedocumento->TOTAL_VENTA_ORIG, 4, '.', '')){
-            $ind_total          =   1;  
+            $ind_total          =   1;
         }else{  $ind_errototal      =   0;  }
 
 
         $ordencompra_t          =   CMPOrden::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->first();
 
         if($ordencompra_t->IND_MATERIAL_SERVICIO == 'S'){
-            $ind_cantidaditem           =   1;  
+            $ind_cantidaditem           =   1;
         }else{
             //numero_items
             if(count($detalleordencompra) == count($detallefedocumento)){
-                $ind_cantidaditem           =   1;  
+                $ind_cantidaditem           =   1;
             }else{  $ind_errototal      =   0;  }
 
         }
@@ -7441,7 +7436,7 @@ trait ComprobanteTraits
         //dd(substr(strtoupper(ltrim(rtrim($fedocumento->FORMA_PAGO))), 0, 3));
 
         if($tp->CODIGO_SUNAT == substr(strtoupper(ltrim(rtrim($fedocumento->FORMA_PAGO))), 0, 3)){
-            $ind_formapago          =   1;  
+            $ind_formapago          =   1;
         }else{  $ind_errototal      =   0;  }
 
 
@@ -7450,11 +7445,11 @@ trait ComprobanteTraits
         // if($tp->CODIGO_SUNAT == substr(strtoupper($fedocumento->FORMA_PAGO), 0, 3)){
 
         //  if( $tp->CODIGO_SUNAT == 'CRE' ){
-        //      $ind_formapago          =   1;  
+        //      $ind_formapago          =   1;
         //      $diasdeorden = $tp->COD_CTBLE;
         //      if($fedocumento->FORMA_PAGO_DIAS != $diasdeorden){
         //          $ind_formapago          =   0;
-        //          $ind_errototal          =   0; 
+        //          $ind_errototal          =   0;
         //      }
         //  }
         // }else{   $ind_errototal      =   0;  }
@@ -7465,7 +7460,7 @@ trait ComprobanteTraits
                             [
                                 'ind_ruc'=>$ind_ruc,
                                 'ind_rz'=>$ind_rz,
-                                
+
                                 'ind_moneda'=>$ind_moneda,
                                 'ind_total'=>$ind_total,
                                 'ind_cantidaditem'=>$ind_cantidaditem,
@@ -7498,28 +7493,28 @@ trait ComprobanteTraits
         }
 
         if($diferenciaEnDias>=0){
-            $ind_fecha             =   1;  
+            $ind_fecha             =   1;
         }else{  $ind_errototal      =   0;  }
 
         //ruc
         if($ordencompra->NRO_DOCUMENTO_CLIENTE == $fedocumento->RUC_PROVEEDOR){
-            $ind_ruc            =   1;  
+            $ind_ruc            =   1;
         }else{  $ind_errototal      =   0;  }
 
         $fe_rz =str_replace('  ', ' ', $fedocumento->RZ_PROVEEDOR);
         if(ltrim(rtrim(strtoupper($ordencompra->TXT_EMPR_CLIENTE))) == ltrim(rtrim(strtoupper($fe_rz)))){
-            $ind_rz             =   1;  
+            $ind_rz             =   1;
         }//else{    $ind_errototal      =   0;  }
 
         //moneda
         $txtmoneda          =   '';
         if($fedocumento->MONEDA == 'PEN'){
-            $txtmoneda          =   'SOLES';    
+            $txtmoneda          =   'SOLES';
         }else{
             $txtmoneda          =   'DOLARES';
         }
         if($ordencompra->TXT_CATEGORIA_MONEDA == $txtmoneda){
-            $ind_moneda             =   1;  
+            $ind_moneda             =   1;
         }else{  $ind_errototal      =   0;  }
         //total
         $ordencompra_t          =   CMPOrden::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->first();
@@ -7549,21 +7544,21 @@ trait ComprobanteTraits
         //dd($fe_rz);
 
         // if($fedocumento->RUC_PROVEEDOR == '20100007348'){
-        //     $ind_total          =   1; 
+        //     $ind_total          =   1;
         //     $ind_errototal      =   1;
         // }
 
 
         if($ordencompra_t->IND_MATERIAL_SERVICIO == 'S'){
-            $ind_cantidaditem           =   1;  
+            $ind_cantidaditem           =   1;
         }else{
 
             if($ordencompra_t->TXT_CONFORMIDAD != ''){
-                $ind_cantidaditem           =   1;  
+                $ind_cantidaditem           =   1;
             }else{
                 //numero_items
                 if(count($detalleordencompra) == count($detallefedocumento)){
-                    $ind_cantidaditem           =   1;  
+                    $ind_cantidaditem           =   1;
                 }else{  $ind_errototal      =   0;  }
 
             }
@@ -7572,7 +7567,7 @@ trait ComprobanteTraits
 
         $tp = CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
         if($tp->CODIGO_SUNAT == substr(strtoupper(ltrim(rtrim($fedocumento->FORMA_PAGO))), 0, 3)){
-            $ind_formapago          =   1;  
+            $ind_formapago          =   1;
         }else{  $ind_errototal      =   0;  }
 
         //dd($ind_formapago);
@@ -7582,7 +7577,7 @@ trait ComprobanteTraits
                             [
                                 'ind_ruc'=>$ind_ruc,
                                 'ind_rz'=>$ind_rz,
-                                'ind_fecha'=>$ind_fecha,                         
+                                'ind_fecha'=>$ind_fecha,
                                 'ind_moneda'=>$ind_moneda,
                                 'ind_total'=>$ind_total,
                                 'ind_cantidaditem'=>$ind_cantidaditem,
@@ -7605,23 +7600,23 @@ trait ComprobanteTraits
         $ind_errototal      =   1;
         //ruc
         if($ordencompra->NRO_DOCUMENTO_CLIENTE == $fedocumento->RUC_PROVEEDOR){
-            $ind_ruc            =   1;  
+            $ind_ruc            =   1;
         }else{  $ind_errototal      =   0;  }
 
         if(ltrim(rtrim(strtoupper($ordencompra->TXT_EMPR_EMISOR))) == ltrim(rtrim(strtoupper($fedocumento->RZ_PROVEEDOR)))){
-            $ind_rz             =   1;  
+            $ind_rz             =   1;
         }//else{  $ind_errototal      =   0;  }
 
 
         //moneda
         $txtmoneda          =   '';
         if($fedocumento->MONEDA == 'PEN'){
-            $txtmoneda          =   'SOLES';    
+            $txtmoneda          =   'SOLES';
         }else{
             $txtmoneda          =   'DOLARES';
         }
         if($ordencompra->TXT_CATEGORIA_MONEDA == $txtmoneda){
-            $ind_moneda             =   1;  
+            $ind_moneda             =   1;
         }else{  $ind_errototal      =   0;  }
         //total
 
@@ -7635,14 +7630,14 @@ trait ComprobanteTraits
         $diferencia_total = 0;
         //0.02
         if($tt_totales <= 0.09){
-            $ind_total          =   1;  
+            $ind_total          =   1;
             $diferencia_total = round($total_1 - $total_2,2);
 
         }else{  $ind_errototal      =   0;  }
 
 
         // if(number_format($ordencompra->CAN_TOTAL, 4, '.', '') == number_format($fedocumento->TOTAL_VENTA_ORIG, 4, '.', '')){
-        //     $ind_total          =   1;  
+        //     $ind_total          =   1;
         // }else{  $ind_errototal      =   0;  }
 
 
@@ -7651,18 +7646,18 @@ trait ComprobanteTraits
 
 
         if($ordencompra_t->IND_MATERIAL_SERVICIO == 'S'){
-            $ind_cantidaditem           =   1;  
+            $ind_cantidaditem           =   1;
         }else{
             //numero_items
             if(count($detalleordencompra) == count($detallefedocumento)){
-                $ind_cantidaditem           =   1;  
+                $ind_cantidaditem           =   1;
             }else{  $ind_errototal      =   0;  }
 
         }
 
         $tp = CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
         if($tp->CODIGO_SUNAT == substr(strtoupper(ltrim(rtrim($fedocumento->FORMA_PAGO))), 0, 3)){
-            $ind_formapago          =   1;  
+            $ind_formapago          =   1;
         }else{  $ind_errototal      =   0;  }
 
 
@@ -7672,7 +7667,7 @@ trait ComprobanteTraits
                             [
                                 'ind_ruc'=>$ind_ruc,
                                 'ind_rz'=>$ind_rz,
-                                
+
                                 'ind_moneda'=>$ind_moneda,
                                 'ind_total'=>$ind_total,
                                 'ind_cantidaditem'=>$ind_cantidaditem,
@@ -7695,23 +7690,23 @@ trait ComprobanteTraits
         $ind_errototal      =   1;
         //ruc
         if($ordencompra->NRO_DOCUMENTO_CLIENTE == $fedocumento->RUC_PROVEEDOR){
-            $ind_ruc            =   1;  
+            $ind_ruc            =   1;
         }else{  $ind_errototal      =   0;  }
 
         if(ltrim(rtrim(strtoupper($ordencompra->TXT_EMPR_EMISOR))) == ltrim(rtrim(strtoupper($fedocumento->RZ_PROVEEDOR)))){
-            $ind_rz             =   1;  
+            $ind_rz             =   1;
         }//else{  $ind_errototal      =   0;  }
 
 
         //moneda
         $txtmoneda          =   '';
         if($fedocumento->MONEDA == 'PEN'){
-            $txtmoneda          =   'SOLES';    
+            $txtmoneda          =   'SOLES';
         }else{
             $txtmoneda          =   'DOLARES';
         }
         if($ordencompra->TXT_CATEGORIA_MONEDA == $txtmoneda){
-            $ind_moneda             =   1;  
+            $ind_moneda             =   1;
         }else{  $ind_errototal      =   0;  }
         //total
 
@@ -7725,14 +7720,14 @@ trait ComprobanteTraits
         $diferencia_total = 0;
         //0.02
         if($tt_totales <= 0.09){
-            $ind_total          =   1;  
+            $ind_total          =   1;
             $diferencia_total = round($total_1 - $total_2,2);
 
         }else{  $ind_errototal      =   0;  }
 
 
         // if(number_format($ordencompra->CAN_TOTAL, 4, '.', '') == number_format($fedocumento->TOTAL_VENTA_ORIG, 4, '.', '')){
-        //     $ind_total          =   1;  
+        //     $ind_total          =   1;
         // }else{  $ind_errototal      =   0;  }
 
         FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)
@@ -7740,7 +7735,7 @@ trait ComprobanteTraits
                             [
                                 'ind_ruc'=>$ind_ruc,
                                 'ind_rz'=>$ind_rz,
-                                
+
                                 'ind_moneda'=>$ind_moneda,
                                 'ind_total'=>$ind_total,
                                 'ind_cantidaditem'=>$ind_cantidaditem,
@@ -7763,23 +7758,23 @@ trait ComprobanteTraits
         $ind_errototal      =   1;
         //ruc
         if($ordencompra->NRO_DOCUMENTO_CLIENTE == $fedocumento->RUC_PROVEEDOR){
-            $ind_ruc            =   1;  
+            $ind_ruc            =   1;
         }else{  $ind_errototal      =   0;  }
 
         if(ltrim(rtrim(strtoupper($ordencompra->TXT_EMPR_EMISOR))) == ltrim(rtrim(strtoupper($fedocumento->RZ_PROVEEDOR)))){
-            $ind_rz             =   1;  
+            $ind_rz             =   1;
         }//else{  $ind_errototal      =   0;  }
 
 
         //moneda
         $txtmoneda          =   '';
         if($fedocumento->MONEDA == 'PEN'){
-            $txtmoneda          =   'SOLES';    
+            $txtmoneda          =   'SOLES';
         }else{
             $txtmoneda          =   'DOLARES';
         }
         if($ordencompra->TXT_CATEGORIA_MONEDA == $txtmoneda){
-            $ind_moneda             =   1;  
+            $ind_moneda             =   1;
         }else{  $ind_errototal      =   0;  }
         //total
 
@@ -7793,14 +7788,14 @@ trait ComprobanteTraits
         $diferencia_total = 0;
         //0.02
         if($tt_totales <= 0.09){
-            $ind_total          =   1;  
+            $ind_total          =   1;
             $diferencia_total = round($total_1 - $total_2,2);
 
         }else{  $ind_errototal      =   0;  }
 
 
         // if(number_format($ordencompra->CAN_TOTAL, 4, '.', '') == number_format($fedocumento->TOTAL_VENTA_ORIG, 4, '.', '')){
-        //     $ind_total          =   1;  
+        //     $ind_total          =   1;
         // }else{  $ind_errototal      =   0;  }
 
         FeDocumento::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)
@@ -7808,7 +7803,7 @@ trait ComprobanteTraits
                             [
                                 'ind_ruc'=>$ind_ruc,
                                 'ind_rz'=>$ind_rz,
-                                
+
                                 'ind_moneda'=>$ind_moneda,
                                 'ind_total'=>$ind_total,
                                 'ind_cantidaditem'=>$ind_cantidaditem,
@@ -7832,21 +7827,21 @@ trait ComprobanteTraits
         //ruc
         $ind_ruc            =   0;
         if($documento_top->RUC == $fedocumento->RUC_PROVEEDOR){
-            $ind_ruc            =   1;  
+            $ind_ruc            =   1;
         }else{  $ind_errototal      =   0;  }
 
 
 
-        $ind_rz             =   1;  
+        $ind_rz             =   1;
         //moneda
         $txtmoneda          =   '';
         if($fedocumento->MONEDA == 'PEN'){
-            $txtmoneda          =   'SOLES';    
+            $txtmoneda          =   'SOLES';
         }else{
             $txtmoneda          =   'DOLARES';
         }
         if($documento_top->MONEDA == $txtmoneda){
-            $ind_moneda             =   1;  
+            $ind_moneda             =   1;
         }else{  $ind_errototal      =   0;  }
 
 
@@ -7857,13 +7852,13 @@ trait ComprobanteTraits
 
         //0.02
         if($tt_totales <= 0.09){
-            $ind_total          =   1;  
+            $ind_total          =   1;
             $diferencia_total = round($total_1 - $total_2,2);
 
         }else{  $ind_errototal      =   0;  }
 
         $ind_cantidaditem           =   1;
-        $ind_formapago              =   1; 
+        $ind_formapago              =   1;
 
         FeDocumento::where('ID_DOCUMENTO','=',$idoc)
                     ->update(
@@ -7895,17 +7890,17 @@ trait ComprobanteTraits
         $ind_formapago      =   0;
         $ind_errototal      =   1;
         //ruc
-        $ind_ruc            =   1;  
-        $ind_rz             =   1;  
+        $ind_ruc            =   1;
+        $ind_rz             =   1;
         //moneda
         $txtmoneda          =   '';
         if($fedocumento->MONEDA == 'PEN'){
-            $txtmoneda          =   'SOLES';    
+            $txtmoneda          =   'SOLES';
         }else{
             $txtmoneda          =   'DOLARES';
         }
         if($documento_top->TXT_CATEGORIA_MONEDA == $txtmoneda){
-            $ind_moneda             =   1;  
+            $ind_moneda             =   1;
         }else{  $ind_errototal      =   0;  }
         $total_1 = $documento_asociados->sum('CAN_TOTAL');
         $total_2 = $fedocumento->TOTAL_VENTA_ORIG;
@@ -7914,13 +7909,13 @@ trait ComprobanteTraits
 
         //0.02
         if($tt_totales <= 0.09){
-            $ind_total          =   1;  
+            $ind_total          =   1;
             $diferencia_total = round($total_1 - $total_2,2);
 
         }else{  $ind_errototal      =   0;  }
 
         $ind_cantidaditem           =   1;
-        $ind_formapago              =   1; 
+        $ind_formapago              =   1;
 
         FeDocumento::where('ID_DOCUMENTO','=',$idoc)
                     ->update(
@@ -7948,20 +7943,20 @@ trait ComprobanteTraits
         $ind_formapago      =   0;
         $ind_errototal      =   1;
         //ruc
-        $ind_ruc            =   1;  
-        $ind_rz             =   1;  
+        $ind_ruc            =   1;
+        $ind_rz             =   1;
 
         $ferefasoc          =   FeRefAsoc::where('lote','=',$idoc)->first();
 
         //moneda
         $txtmoneda          =   '';
         if($fedocumento->MONEDA == 'PEN'){
-            $txtmoneda          =   'SOLES';    
+            $txtmoneda          =   'SOLES';
         }else{
             $txtmoneda          =   'DOLARES';
         }
         if($documento_top->TXT_CATEGORIA_MONEDA == $txtmoneda){
-            $ind_moneda             =   1;  
+            $ind_moneda             =   1;
         }else{  $ind_errototal      =   0;  }
         $total_1 = $ferefasoc->TOTAL_MERGE;
         $total_2 = $fedocumento->TOTAL_VENTA_ORIG+$fedocumento->MONTO_ANTICIPO_DESC;
@@ -7970,13 +7965,13 @@ trait ComprobanteTraits
 
         //0.02
         if($tt_totales <= 0.09){
-            $ind_total          =   1;  
+            $ind_total          =   1;
             $diferencia_total = round($total_1 - $total_2,2);
 
         }else{  $ind_errototal      =   0;  }
 
         $ind_cantidaditem           =   1;
-        $ind_formapago              =   1; 
+        $ind_formapago              =   1;
 
         FeDocumento::where('ID_DOCUMENTO','=',$idoc)
                     ->update(
@@ -8088,7 +8083,7 @@ trait ComprobanteTraits
 
         $estado_no          =   'ETM0000000000006';
 
-                                    
+
         $estado_no          =       'ETM0000000000006';
         $centro_id          =       'CEN0000000000001';
         $tipodoc_id         =       'TDO0000000000014';
@@ -8401,7 +8396,7 @@ trait ComprobanteTraits
         ");
 
 
-        //DESCONTAR LA RETENCION DE IGV 
+        //DESCONTAR LA RETENCION DE IGV
         $documentosdetraccion = DB::select("
                 SELECT 
                     FE.*,
@@ -8453,7 +8448,7 @@ trait ComprobanteTraits
                 'FE_DOCUMENTO.TOTAL_VENTA_ORIG' => DB::raw('CMP.ORDEN.CAN_TOTAL')
             ]);
 
-        
+
 
         // //dd($documentosdetraccion);
         foreach($documentosdetraccion as $index => $item){
@@ -8689,7 +8684,7 @@ trait ComprobanteTraits
                                     ->select(DB::raw('CMP.DOCUMENTO_CTBLE.*,REFERENCIA_ASOC.COD_TABLA,REFERENCIA_ASOC.COD_TABLA_ASOC'))
                                     ->where('CMP.DOCUMENTO_CTBLE.COD_ESTADO','=','1')
                                     ->where('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_ESTADO_DOC_CTBLE','=','EDC0000000000009')
-                                    
+
                                     ->whereIn('COD_CATEGORIA_TIPO_DOC', [
                                         'TDO0000000000001',
                                         'TDO0000000000003',
@@ -8978,7 +8973,7 @@ trait ComprobanteTraits
                                                     FE_DOCUMENTO.ID_DOCUMENTO,
                                                     FE_DOCUMENTO.COD_ESTADO,
                                                     FE_DOCUMENTO.TXT_ESTADO
-                                                '))                                
+                                                '))
                                 ->get();
 
         }else{
@@ -9006,7 +9001,7 @@ trait ComprobanteTraits
                                                     FE_DOCUMENTO.ID_DOCUMENTO,
                                                     FE_DOCUMENTO.COD_ESTADO,
                                                     FE_DOCUMENTO.TXT_ESTADO
-                                                '))                                
+                                                '))
                                 ->get();
 
         }
@@ -9052,7 +9047,7 @@ trait ComprobanteTraits
                                                     FE_DOCUMENTO.ID_DOCUMENTO,
                                                     FE_DOCUMENTO.COD_ESTADO,
                                                     FE_DOCUMENTO.TXT_ESTADO
-                                                '))                                
+                                                '))
                                 ->get();
 
         }else{
@@ -9080,7 +9075,7 @@ trait ComprobanteTraits
                                                     FE_DOCUMENTO.ID_DOCUMENTO,
                                                     FE_DOCUMENTO.COD_ESTADO,
                                                     FE_DOCUMENTO.TXT_ESTADO
-                                                '))                                
+                                                '))
                                 ->get();
 
         }
@@ -9148,7 +9143,7 @@ trait ComprobanteTraits
         $array_usuarios      =      SGDUsuario::whereIn('COD_TRABAJADOR',$array_trabajadores)
                                     ->pluck('COD_USUARIO')
                                     ->toArray();
-                                    
+
         $estado_no          =       'ETM0000000000006';
 
 
@@ -9333,7 +9328,7 @@ trait ComprobanteTraits
         $array_usuarios      =      SGDUsuario::whereIn('COD_TRABAJADOR',$array_trabajadores)
                                     ->pluck('COD_USUARIO')
                                     ->toArray();
-                                    
+
         $estado_no          =       'ETM0000000000006';
 
 
@@ -9347,13 +9342,13 @@ trait ComprobanteTraits
             $listadatos         =       VMergeOP::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
                                             $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEOP.COD_AUTORIZACION')
                                                 ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
-                                        })                                        
+                                        })
                                         ->where('VMERGEOP.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                         ->where(function ($query) {
                                             $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
                                                   ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
                                                   ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
-                                        })                                        
+                                        })
                                         ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
                                         ->select(DB::raw('  COD_AUTORIZACION,
                                                             FEC_EMISION,
@@ -9374,15 +9369,15 @@ trait ComprobanteTraits
             $listadatos         =       VMergeOP::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
                                             $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEOP.COD_AUTORIZACION')
                                                 ->where('FE_DOCUMENTO.COD_ESTADO', '<>', 'ETM0000000000006');
-                                        })                                        
+                                        })
                                         ->where('VMERGEOP.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                         ->where(function ($query) {
                                             $query->where('FE_DOCUMENTO.COD_ESTADO', '=', 'ETM0000000000001')
                                                   ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
                                                   ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
-                                        })                                        
+                                        })
                                         ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
-                                        ->where('COD_CENTRO','=',$centro_id)   
+                                        ->where('COD_CENTRO','=',$centro_id)
                                         ->select(DB::raw('  COD_AUTORIZACION,
                                                             FEC_EMISION,
                                                             TXT_CATEGORIA_MONEDA,
@@ -9427,7 +9422,7 @@ trait ComprobanteTraits
         if(Session::get('usuario')->name=='MPACHECU'){
             array_push($array_usuarios, 'HPEREZAL');
         }
-   
+
 
         if(Session::get('usuario')->id== '1CIX00000001'){
 
@@ -9534,7 +9529,7 @@ trait ComprobanteTraits
             if(Session::get('usuario')->name=='MPACHECU'){
                 array_push($array_usuarios, 'HPEREZAL');
             }
-       
+
 
             if(Session::get('usuario')->id== '1CIX00000001'){
 
@@ -9615,7 +9610,7 @@ trait ComprobanteTraits
                                                                 FE_DOCUMENTO.TXT_ESTADO,
                                                                 COALESCE(VMERGEDOCUMENTO_INTERNO_COMPRA.TOTAL_MERGE, 0) AS TOTAL_MERGE
                                                             '))
-                                            ->get();           
+                                            ->get();
 
             }
 
@@ -9735,7 +9730,7 @@ trait ComprobanteTraits
         }
 
         $combo                  =   array(''=>'Seleccionar Porveedor') + $listadatos;
-        return  $combo; 
+        return  $combo;
 
     }
 
@@ -9802,7 +9797,7 @@ trait ComprobanteTraits
 
 
 
-                          
+
 
         }else{
 
@@ -9840,7 +9835,7 @@ trait ComprobanteTraits
         }
 
         $combo                  =   array(''=>'Seleccionar Porveedor') + $listadatos;
-        return  $combo; 
+        return  $combo;
 
     }
 
@@ -10118,9 +10113,9 @@ trait ComprobanteTraits
     private function con_lista_detalle_liquidacion_compra_comprobante_idoc($idoc) {
 
         $doc                    =   CMPDetalleProducto::where('COD_TABLA','=',$idoc)
-                                    ->where('COD_ESTADO','=',1)                                    
+                                    ->where('COD_ESTADO','=',1)
                                     ->get();
-        return  $doc;                 
+        return  $doc;
 
     }
 
@@ -10167,9 +10162,9 @@ trait ComprobanteTraits
     private function con_lista_detalle_producto_comprobante_idoc($idoc) {
 
         $doc                    =   CMPDetalleProducto::where('COD_TABLA','=',$idoc)
-                                    ->where('COD_ESTADO','=',1)                                    
+                                    ->where('COD_ESTADO','=',1)
                                     ->get();
-        return  $doc;                 
+        return  $doc;
 
     }
 
@@ -10236,7 +10231,7 @@ trait ComprobanteTraits
 
 
     private function generartoken_is() {
-        
+
         $cliente_id = '1649d1ba-1fc9-45b9-a506-ebe0cc16393f';
         $client_secret = 'WJgOtY9fz91iHv6NZuWeew==';
         $curl = curl_init();
@@ -10303,7 +10298,7 @@ trait ComprobanteTraits
 
         $response = curl_exec($curl);
         curl_close($curl);
-        
+
         return $response;
 
 

@@ -109,7 +109,7 @@ class GestionOCContabilidadController extends Controller
                             'listadatos'        =>  $listadatos,
                             'entregable_sel'    =>  $entregable_sel,
 
-                            
+
                             'funcion'           =>  $funcion,
                             'idopcion'          =>  $idopcion,
                             'fecha_inicio'      =>  $fecha_inicio,
@@ -134,7 +134,7 @@ class GestionOCContabilidadController extends Controller
 
         $fecha_inicio   =   $request['fecha_inicio'];
         $fecha_fin      =   $request['fecha_fin'];
-        $empresa_id     =   $request['empresa_id'];  
+        $empresa_id     =   $request['empresa_id'];
         $idopcion       =   $request['idopcion'];
         $moneda_id      =   $request['moneda_id'];
         $operacion_id   =   $request['operacion_id'];
@@ -199,7 +199,7 @@ class GestionOCContabilidadController extends Controller
                             'combobancos'       =>  $combobancos,
                             'banco_id'          =>  $banco_id,
                             'combo_moneda'                  => $combo_moneda,
-                            'defecto_moneda'                => $defecto_moneda, 
+                            'defecto_moneda'                => $defecto_moneda,
 
 
                             'ajax'              =>  true,
@@ -243,7 +243,7 @@ class GestionOCContabilidadController extends Controller
 
             return Redirect::to('gestion-de-pago-detracciones/'.$idopcion)->with('bienhecho', 'Folio '.$codigo.' creado con exito');
         }catch(\Exception $ex){
-            DB::rollback(); 
+            DB::rollback();
             return Redirect::to('gestion-de-pago-detracciones/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
         }
 
@@ -309,7 +309,7 @@ class GestionOCContabilidadController extends Controller
                 }
             }
 
-            
+
             if($entregable->COD_CATEGORIA_MONEDA != $moneda){
                 $mensaje            =   "Este Documento esta asiganado a otra MONEDA";
                 $ope_ind            =   "1";
@@ -373,7 +373,7 @@ class GestionOCContabilidadController extends Controller
 
             }
 
-            $mensaje                =   "Este Documento tiene que ser de un contrato";    
+            $mensaje                =   "Este Documento tiene que ser de un contrato";
             $data                   =   [
                                             'mensaje'   => $mensaje,
                                             'lote_ver'  => $lote_ver,
@@ -384,7 +384,7 @@ class GestionOCContabilidadController extends Controller
         }else{
 
             $data                   =   [
-                                            'mensaje'   => $mensaje, 
+                                            'mensaje'   => $mensaje,
                                             'lote_ver'  => $lote_ver,
                                             'check'     => $check,
                                             'ope_ind'   => $ope_ind
@@ -447,7 +447,7 @@ class GestionOCContabilidadController extends Controller
             DB::commit();
             return Redirect::to('gestion-de-pago-detracciones/'.$idopcion)->with('bienhecho', 'Folio '.$folio.' aprobado con exito');
         }catch(\Exception $ex){
-            DB::rollback(); 
+            DB::rollback();
             return Redirect::to('gestion-de-pago-detracciones/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
         }
     }
@@ -471,7 +471,7 @@ class GestionOCContabilidadController extends Controller
                         ]
                     );
     }
-    
+
     public function actionListarEntregaDocumentoFolioDetraccion($idopcion)
     {
         /******************* validar url **********************/
@@ -558,7 +558,7 @@ class GestionOCContabilidadController extends Controller
                                                                           ->with('folio',$folio)
                                                                           ->with('empresa',$empresa)
                                                                           ->with('simbolo','S/.')
-                                                                          ->with('operacion_id',$operacion_id);         
+                                                                          ->with('operacion_id',$operacion_id);
                 });
             }
 
@@ -596,7 +596,7 @@ class GestionOCContabilidadController extends Controller
                                                                           ->with('folio',$folio)
                                                                           ->with('empresa',$empresa)
                                                                           ->with('simbolo','S/.')
-                                                                          ->with('operacion_id',$operacion_id);         
+                                                                          ->with('operacion_id',$operacion_id);
                 });
             }
 
@@ -3165,6 +3165,8 @@ class GestionOCContabilidadController extends Controller
                 DB::beginTransaction();
 
                 $detalles = json_decode($request->input('asientosgenerados'), true);
+
+                dd($request);
 
                 foreach ($detalles as $detalle) {
 
