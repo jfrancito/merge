@@ -3166,8 +3166,6 @@ class GestionOCContabilidadController extends Controller
 
                 $detalles = json_decode($request->input('asientosgenerados'), true);
 
-                dd($request);
-
                 foreach ($detalles as $detalle) {
 
                     $cabeceras = json_decode($detalle['cabecera'], true);
@@ -5132,7 +5130,7 @@ class GestionOCContabilidadController extends Controller
             $combo_anio_pc = $this->gn_generacion_combo_array('Seleccione año', '', $array_anio_pc);
             $array_periodo_pc = $this->gn_periodo_actual_xanio_xempresa($anio_defecto, $mes_defecto, Session::get('empresas')->COD_EMPR);
             $combo_periodo = $this->gn_combo_periodo_xanio_xempresa($anio_defecto, Session::get('empresas')->COD_EMPR, '', 'Seleccione periodo');
-            
+
             //dd($anio_defecto);
             $periodo_defecto = $array_periodo_pc->COD_PERIODO;
 
