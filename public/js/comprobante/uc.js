@@ -27,6 +27,7 @@ $(document).ready(function () {
     $('#tipo_documento_asiento').prop('required', false);
     $('#serie_asiento').prop('required', false);
     $('#numero_asiento').prop('required', false);
+    $('#nro_cuenta_contable').prop('required', false);
 
     $(".comboreparable").on('change', function (e) {
 
@@ -3361,6 +3362,59 @@ $(document).ready(function () {
 
             if(detalles.length === 0){
                 $('#nro_cuenta_contable').val("000000");
+                $('.pnlasientos').hide();
+            } else {
+                let nro_cuenta_aux = $('#nro_cuenta_contable').val();
+                let anio_asiento = $("#anio_asiento").val();
+                let periodo_asiento = $("#periodo_asiento").val();
+                let comprobante_asiento = $("#comprobante_asiento").val();
+                let moneda_id_editar = $("#moneda_asiento").val();
+                let tc_editar = $("#tipo_cambio_asiento").val();
+                let proveedor_asiento = $("#empresa_asiento").val();
+                let tipo_asiento = $("#tipo_asiento").val();
+                let fecha_asiento = $("#fecha_asiento").val();
+                let tipo_comprobante = $("#tipo_documento_asiento").val();
+                let serie_comprobante = $("#serie_asiento").val();
+                let numero_comprobante = $("#numero_asiento").val();
+
+                // Array de todos los valores
+                let campos = [
+                    {nombre: "Cuenta Contable", valor: nro_cuenta_aux},
+                    {nombre: "Anio", valor: anio_asiento},
+                    {nombre: "Periodo", valor: periodo_asiento},
+                    {nombre: "Comprobante", valor: comprobante_asiento},
+                    {nombre: "Moneda", valor: moneda_id_editar},
+                    {nombre: "Tipo de Cambio", valor: tc_editar},
+                    {nombre: "Proveedor", valor: proveedor_asiento},
+                    {nombre: "Tipo Asiento", valor: tipo_asiento},
+                    {nombre: "Fecha", valor: fecha_asiento},
+                    {nombre: "Tipo Comprobante", valor: tipo_comprobante},
+                    {nombre: "Serie", valor: serie_comprobante},
+                    {nombre: "Número", valor: numero_comprobante},
+                ];
+
+                // Recorremos y validamos
+                for (let campo of campos) {
+                    if (!campo.valor || campo.valor === "") {
+                        if (campo.nombre.includes('Cuenta')) {
+                            $('#div_cuenta_contable').show().find('#nro_cuenta_contable').focus();
+                        } else {
+                            $('.pnlasientos').show();
+                        }
+                        $.alert({
+                            title: 'Error',
+                            content: 'El campo ' + campo.nombre + ' no puede estar vacío.',
+                            type: 'red',
+                            buttons: {
+                                ok: {
+                                    text: 'OK',
+                                    btnClass: 'btn-red',
+                                }
+                            }
+                        });
+                        return false; // Detiene la ejecución
+                    }
+                }
             }
 
             if (error_tipo_asiento) {
@@ -3380,57 +3434,6 @@ $(document).ready(function () {
 
             $('#asientosgenerados').val(JSON.stringify(detalles));
 
-            let nro_cuenta_aux = $('#nro_cuenta_contable').val();
-            let anio_asiento = $("#anio_asiento").val();
-            let periodo_asiento = $("#periodo_asiento").val();
-            let comprobante_asiento = $("#comprobante_asiento").val();
-            let moneda_id_editar = $("#moneda_asiento").val();
-            let tc_editar = $("#tipo_cambio_asiento").val();
-            let proveedor_asiento = $("#empresa_asiento").val();
-            let tipo_asiento = $("#tipo_asiento").val();
-            let fecha_asiento = $("#fecha_asiento").val();
-            let tipo_comprobante = $("#tipo_documento_asiento").val();
-            let serie_comprobante = $("#serie_asiento").val();
-            let numero_comprobante = $("#numero_asiento").val();
-
-            // Array de todos los valores
-            let campos = [
-                {nombre: "Cuenta Contable", valor: nro_cuenta_aux},
-                {nombre: "Anio", valor: anio_asiento},
-                {nombre: "Periodo", valor: periodo_asiento},
-                {nombre: "Comprobante", valor: comprobante_asiento},
-                {nombre: "Moneda", valor: moneda_id_editar},
-                {nombre: "Tipo de Cambio", valor: tc_editar},
-                {nombre: "Proveedor", valor: proveedor_asiento},
-                {nombre: "Tipo Asiento", valor: tipo_asiento},
-                {nombre: "Fecha", valor: fecha_asiento},
-                {nombre: "Tipo Comprobante", valor: tipo_comprobante},
-                {nombre: "Serie", valor: serie_comprobante},
-                {nombre: "Número", valor: numero_comprobante},
-            ];
-
-            // Recorremos y validamos
-            for (let campo of campos) {
-                if (!campo.valor || campo.valor === "") {
-                    if (campo.nombre.includes('Cuenta')) {
-                        $('#div_cuenta_contable').show().find('#nro_cuenta_contable').focus();
-                    } else {
-                        $('.pnlasientos').show();
-                    }
-                    $.alert({
-                        title: 'Error',
-                        content: 'El campo ' + campo.nombre + ' no puede estar vacío.',
-                        type: 'red',
-                        buttons: {
-                            ok: {
-                                text: 'OK',
-                                btnClass: 'btn-red',
-                            }
-                        }
-                    });
-                    return false; // Detiene la ejecución
-                }
-            }
         }
 
         $.confirm({
@@ -3495,6 +3498,59 @@ $(document).ready(function () {
 
             if(detalles.length === 0){
                 $('#nro_cuenta_contable').val("000000");
+                $('.pnlasientos').hide();
+            } else {
+                let nro_cuenta_aux = $('#nro_cuenta_contable').val();
+                let anio_asiento = $("#anio_asiento").val();
+                let periodo_asiento = $("#periodo_asiento").val();
+                let comprobante_asiento = $("#comprobante_asiento").val();
+                let moneda_id_editar = $("#moneda_asiento").val();
+                let tc_editar = $("#tipo_cambio_asiento").val();
+                let proveedor_asiento = $("#empresa_asiento").val();
+                let tipo_asiento = $("#tipo_asiento").val();
+                let fecha_asiento = $("#fecha_asiento").val();
+                let tipo_comprobante = $("#tipo_documento_asiento").val();
+                let serie_comprobante = $("#serie_asiento").val();
+                let numero_comprobante = $("#numero_asiento").val();
+
+                // Array de todos los valores
+                let campos = [
+                    {nombre: "Cuenta Contable", valor: nro_cuenta_aux},
+                    {nombre: "Anio", valor: anio_asiento},
+                    {nombre: "Periodo", valor: periodo_asiento},
+                    {nombre: "Comprobante", valor: comprobante_asiento},
+                    {nombre: "Moneda", valor: moneda_id_editar},
+                    {nombre: "Tipo de Cambio", valor: tc_editar},
+                    {nombre: "Proveedor", valor: proveedor_asiento},
+                    {nombre: "Tipo Asiento", valor: tipo_asiento},
+                    {nombre: "Fecha", valor: fecha_asiento},
+                    {nombre: "Tipo Comprobante", valor: tipo_comprobante},
+                    {nombre: "Serie", valor: serie_comprobante},
+                    {nombre: "Número", valor: numero_comprobante},
+                ];
+
+                // Recorremos y validamos
+                for (let campo of campos) {
+                    if (!campo.valor || campo.valor === "") {
+                        if (campo.nombre.includes('Cuenta')) {
+                            $('#div_cuenta_contable').show().find('#nro_cuenta_contable').focus();
+                        } else {
+                            $('.pnlasientos').show();
+                        }
+                        $.alert({
+                            title: 'Error',
+                            content: 'El campo ' + campo.nombre + ' no puede estar vacío.',
+                            type: 'red',
+                            buttons: {
+                                ok: {
+                                    text: 'OK',
+                                    btnClass: 'btn-red',
+                                }
+                            }
+                        });
+                        return false; // Detiene la ejecución
+                    }
+                }
             }
 
             if (error_tipo_asiento) {
@@ -3514,59 +3570,6 @@ $(document).ready(function () {
 
             $('#asientosgenerados').val(JSON.stringify(detalles));
 
-            let nro_cuenta_aux = $('#nro_cuenta_contable').val();
-            let anio_asiento = $("#anio_asiento").val();
-            let periodo_asiento = $("#periodo_asiento").val();
-            let comprobante_asiento = $("#comprobante_asiento").val();
-            let moneda_id_editar = $("#moneda_asiento").val();
-            let tc_editar = $("#tipo_cambio_asiento").val();
-            let proveedor_asiento = $("#empresa_asiento").val();
-            let tipo_asiento = $("#tipo_asiento").val();
-            let fecha_asiento = $("#fecha_asiento").val();
-            let tipo_comprobante = $("#tipo_documento_asiento").val();
-            let serie_comprobante = $("#serie_asiento").val();
-            let numero_comprobante = $("#numero_asiento").val();
-
-            debugger;
-
-            // Array de todos los valores
-            let campos = [
-                {nombre: "Cuenta Contable", valor: nro_cuenta_aux},
-                {nombre: "Anio", valor: anio_asiento},
-                {nombre: "Periodo", valor: periodo_asiento},
-                {nombre: "Comprobante", valor: comprobante_asiento},
-                {nombre: "Moneda", valor: moneda_id_editar},
-                {nombre: "Tipo de Cambio", valor: tc_editar},
-                {nombre: "Proveedor", valor: proveedor_asiento},
-                {nombre: "Tipo Asiento", valor: tipo_asiento},
-                {nombre: "Fecha", valor: fecha_asiento},
-                {nombre: "Tipo Comprobante", valor: tipo_comprobante},
-                {nombre: "Serie", valor: serie_comprobante},
-                {nombre: "Número", valor: numero_comprobante},
-            ];
-
-            // Recorremos y validamos
-            for (let campo of campos) {
-                if (!campo.valor || campo.valor === "") {
-                    if (campo.nombre.includes('Cuenta')) {
-                        $('#div_cuenta_contable').show().find('#nro_cuenta_contable').focus();
-                    } else {
-                        $('.pnlasientos').show();
-                    }
-                    $.alert({
-                        title: 'Error',
-                        content: 'El campo ' + campo.nombre + ' no puede estar vacío.',
-                        type: 'red',
-                        buttons: {
-                            ok: {
-                                text: 'OK',
-                                btnClass: 'btn-red',
-                            }
-                        }
-                    });
-                    return false; // Detiene la ejecución
-                }
-            }
         }
 
         $.confirm({
@@ -3632,6 +3635,59 @@ $(document).ready(function () {
 
             if(detalles.length === 0){
                 $('#nro_cuenta_contable').val("000000");
+                $('.pnlasientos').hide();
+            } else {
+                let nro_cuenta_aux = $('#nro_cuenta_contable').val();
+                let anio_asiento = $("#anio_asiento").val();
+                let periodo_asiento = $("#periodo_asiento").val();
+                let comprobante_asiento = $("#comprobante_asiento").val();
+                let moneda_id_editar = $("#moneda_asiento").val();
+                let tc_editar = $("#tipo_cambio_asiento").val();
+                let proveedor_asiento = $("#empresa_asiento").val();
+                let tipo_asiento = $("#tipo_asiento").val();
+                let fecha_asiento = $("#fecha_asiento").val();
+                let tipo_comprobante = $("#tipo_documento_asiento").val();
+                let serie_comprobante = $("#serie_asiento").val();
+                let numero_comprobante = $("#numero_asiento").val();
+
+                // Array de todos los valores
+                let campos = [
+                    {nombre: "Cuenta Contable", valor: nro_cuenta_aux},
+                    {nombre: "Anio", valor: anio_asiento},
+                    {nombre: "Periodo", valor: periodo_asiento},
+                    {nombre: "Comprobante", valor: comprobante_asiento},
+                    {nombre: "Moneda", valor: moneda_id_editar},
+                    {nombre: "Tipo de Cambio", valor: tc_editar},
+                    {nombre: "Proveedor", valor: proveedor_asiento},
+                    {nombre: "Tipo Asiento", valor: tipo_asiento},
+                    {nombre: "Fecha", valor: fecha_asiento},
+                    {nombre: "Tipo Comprobante", valor: tipo_comprobante},
+                    {nombre: "Serie", valor: serie_comprobante},
+                    {nombre: "Número", valor: numero_comprobante},
+                ];
+
+                // Recorremos y validamos
+                for (let campo of campos) {
+                    if (!campo.valor || campo.valor === "") {
+                        if (campo.nombre.includes('Cuenta')) {
+                            $('#div_cuenta_contable').show().find('#nro_cuenta_contable').focus();
+                        } else {
+                            $('.pnlasientos').show();
+                        }
+                        $.alert({
+                            title: 'Error',
+                            content: 'El campo ' + campo.nombre + ' no puede estar vacío.',
+                            type: 'red',
+                            buttons: {
+                                ok: {
+                                    text: 'OK',
+                                    btnClass: 'btn-red',
+                                }
+                            }
+                        });
+                        return false; // Detiene la ejecución
+                    }
+                }
             }
 
             if (error_tipo_asiento) {
@@ -3650,58 +3706,7 @@ $(document).ready(function () {
             }
 
             $('#asientosgenerados').val(JSON.stringify(detalles));
-
-            let nro_cuenta_aux = $('#nro_cuenta_contable').val();
-            let anio_asiento = $("#anio_asiento").val();
-            let periodo_asiento = $("#periodo_asiento").val();
-            let comprobante_asiento = $("#comprobante_asiento").val();
-            let moneda_id_editar = $("#moneda_asiento").val();
-            let tc_editar = $("#tipo_cambio_asiento").val();
-            let proveedor_asiento = $("#empresa_asiento").val();
-            let tipo_asiento = $("#tipo_asiento").val();
-            let fecha_asiento = $("#fecha_asiento").val();
-            let tipo_comprobante = $("#tipo_documento_asiento").val();
-            let serie_comprobante = $("#serie_asiento").val();
-            let numero_comprobante = $("#numero_asiento").val();
-
-            // Array de todos los valores
-            let campos = [
-                {nombre: "Cuenta Contable", valor: nro_cuenta_aux},
-                {nombre: "Anio", valor: anio_asiento},
-                {nombre: "Periodo", valor: periodo_asiento},
-                {nombre: "Comprobante", valor: comprobante_asiento},
-                {nombre: "Moneda", valor: moneda_id_editar},
-                {nombre: "Tipo de Cambio", valor: tc_editar},
-                {nombre: "Proveedor", valor: proveedor_asiento},
-                {nombre: "Tipo Asiento", valor: tipo_asiento},
-                {nombre: "Fecha", valor: fecha_asiento},
-                {nombre: "Tipo Comprobante", valor: tipo_comprobante},
-                {nombre: "Serie", valor: serie_comprobante},
-                {nombre: "Número", valor: numero_comprobante},
-            ];
-
-            // Recorremos y validamos
-            for (let campo of campos) {
-                if (!campo.valor || campo.valor === "") {
-                    if (campo.nombre.includes('Cuenta')) {
-                        $('#div_cuenta_contable').show().find('#nro_cuenta_contable').focus();
-                    } else {
-                        $('.pnlasientos').show();
-                    }
-                    $.alert({
-                        title: 'Error',
-                        content: 'El campo ' + campo.nombre + ' no puede estar vacío.',
-                        type: 'red',
-                        buttons: {
-                            ok: {
-                                text: 'OK',
-                                btnClass: 'btn-red',
-                            }
-                        }
-                    });
-                    return false; // Detiene la ejecución
-                }
-            }
+            
         }
 
         $.confirm({
