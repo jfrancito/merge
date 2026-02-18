@@ -1329,7 +1329,8 @@ class GestionOCContabilidadController extends Controller
                         , 'OPERACION'
                         , 'PERCEPCION'
                         , 'usuario_tes'
-                        , 'LOTE')
+                        , 'LOTE'
+                        , 'TXT_REFERENCIA')
                         ->where('ID_DOCUMENTO', '=', $idop)
                         ->get();
 
@@ -2635,7 +2636,8 @@ class GestionOCContabilidadController extends Controller
                         , 'OPERACION'
                         , 'PERCEPCION'
                         , 'usuario_tes'
-                        , 'LOTE')
+                        , 'LOTE'
+                        , 'TXT_REFERENCIA')
                         ->where('ID_DOCUMENTO', '=', $orden->COD_ORDEN)
                         ->get();
 
@@ -3995,7 +3997,8 @@ class GestionOCContabilidadController extends Controller
                         , 'OPERACION'
                         , 'PERCEPCION'
                         , 'usuario_tes'
-                        , 'LOTE')
+                        , 'LOTE'
+                        , 'TXT_REFERENCIA')
                         ->where('ID_DOCUMENTO', '=', $idoc)
                         ->get();
 
@@ -4021,7 +4024,7 @@ class GestionOCContabilidadController extends Controller
 
 
                     //FE_REFENCIA_DOC
-                    $referenciaAsocQueryr = FeRefAsoc::select('LOTE', 'ID_DOCUMENTO', 'ESTATUS', 'COD_ESTADO', 'OPERACION')
+                    $referenciaAsocQueryr = FeRefAsoc::select('LOTE', 'ID_DOCUMENTO', 'ESTATUS', 'COD_ESTADO', 'OPERACION', 'TOTAL_MERGE')
                         ->where('LOTE', '=', $idoc)
                         ->get();
                     // Convertir el resultado en un array para poder insertarlo más adelante
@@ -4918,7 +4921,8 @@ class GestionOCContabilidadController extends Controller
                         , 'OPERACION'
                         , 'PERCEPCION'
                         , 'usuario_tes'
-                        , 'LOTE')
+                        , 'LOTE'
+                        , 'TXT_REFERENCIA')
                         ->where('ID_DOCUMENTO', '=', $idoc)
                         ->get();
 
@@ -4944,7 +4948,7 @@ class GestionOCContabilidadController extends Controller
 
 
                     //FE_REFENCIA_DOC
-                    $referenciaAsocQueryr = FeRefAsoc::select('LOTE', 'ID_DOCUMENTO', 'ESTATUS', 'COD_ESTADO', 'OPERACION')
+                    $referenciaAsocQueryr = FeRefAsoc::select('LOTE', 'ID_DOCUMENTO', 'ESTATUS', 'COD_ESTADO', 'OPERACION', 'TOTAL_MERGE')
                         ->where('LOTE', '=', $idoc)
                         ->get();
                     // Convertir el resultado en un array para poder insertarlo más adelante
@@ -5886,7 +5890,8 @@ class GestionOCContabilidadController extends Controller
                         , 'OPERACION'
                         , 'PERCEPCION'
                         , 'usuario_tes'
-                        , 'LOTE')
+                        , 'LOTE'
+                        , 'TXT_REFERENCIA')
                         ->where('ID_DOCUMENTO', '=', $idoc)
                         ->get();
 
@@ -5912,7 +5917,7 @@ class GestionOCContabilidadController extends Controller
 
 
                     //FE_REFENCIA_DOC
-                    $referenciaAsocQueryr = FeRefAsoc::select('LOTE', 'ID_DOCUMENTO', 'ESTATUS', 'COD_ESTADO', 'OPERACION')
+                    $referenciaAsocQueryr = FeRefAsoc::select('LOTE', 'ID_DOCUMENTO', 'ESTATUS', 'COD_ESTADO', 'OPERACION', 'TOTAL_MERGE')
                         ->where('LOTE', '=', $idoc)
                         ->get();
                     // Convertir el resultado en un array para poder insertarlo más adelante
@@ -7539,7 +7544,8 @@ class GestionOCContabilidadController extends Controller
                         , 'OPERACION'
                         , 'PERCEPCION'
                         , 'usuario_tes'
-                        , 'LOTE')
+                        , 'LOTE'
+                        , 'TXT_REFERENCIA')
                         ->where('ID_DOCUMENTO', '=', $orden->COD_DOCUMENTO_CTBLE)
                         ->get();
 
