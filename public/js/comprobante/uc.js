@@ -3102,7 +3102,7 @@ $(document).ready(function () {
     $('.btnaprobarcomporbatntereparable').on('click', function (event) {
         event.preventDefault();
 
-        let ruta = window.location.pathname;
+        let ruta = $('#formpedidoreparable').attr('action');
 
         if (ruta.toLowerCase().includes('contabilidad')) {
 
