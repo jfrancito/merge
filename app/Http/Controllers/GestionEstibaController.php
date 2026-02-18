@@ -2240,7 +2240,7 @@ class GestionEstibaController extends Controller
                         $documento->TIPO_CLIENTE            =   '';
                         $documento->ID_CLIENTE              =   $empresa_sel->NRO_DOCUMENTO;
                         $documento->NOMBRE_CLIENTE          =   $ordencompra->TXT_EMPR_CLIENTE;
-                        $documento->DIRECCION_CLIENTE       =   '';
+                        $documento->DIRECCION_CLIENTE       =   $ordencompra->COD_CENTRO;
                         $documento->SERIE                   =   '';
                         $documento->NUMERO                  =   '';
                         $documento->ID_TIPO_DOC             =   '';
