@@ -5101,14 +5101,14 @@ class GestionOCContabilidadController extends Controller
             // Construir el array de URLs
             $initialPreview = [];
             foreach ($archivospdf as $archivo) {
-                $initialPreview[] = route('serve-fileliquidacioncompraanticipo', ['file' => $archivo->NOMBRE_ARCHIVO]);
+                $initialPreview[] = route('serve-fileordencompraanticipo', ['file' => $archivo->NOMBRE_ARCHIVO]);
             }
             $initialPreviewConfig = [];
             foreach ($archivospdf as $key => $archivo) {
                 $initialPreviewConfig[] = [
                     'type' => "pdf",
                     'caption' => $archivo->NOMBRE_ARCHIVO,
-                    'downloadUrl' => route('serve-fileliquidacioncompraanticipo', ['file' => $archivo->NOMBRE_ARCHIVO])
+                    'downloadUrl' => route('serve-fileordencompraanticipo', ['file' => $archivo->NOMBRE_ARCHIVO])
                 ];
             }
 
@@ -5126,6 +5126,8 @@ class GestionOCContabilidadController extends Controller
             $combo_anio_pc = $this->gn_generacion_combo_array('Seleccione año', '', $array_anio_pc);
             $array_periodo_pc = $this->gn_periodo_actual_xanio_xempresa($anio_defecto, $mes_defecto, Session::get('empresas')->COD_EMPR);
             $combo_periodo = $this->gn_combo_periodo_xanio_xempresa($anio_defecto, Session::get('empresas')->COD_EMPR, '', 'Seleccione periodo');
+            
+            //dd($anio_defecto);
             $periodo_defecto = $array_periodo_pc->COD_PERIODO;
 
             $sel_tipo_descuento = '';

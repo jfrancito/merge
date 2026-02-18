@@ -13,6 +13,8 @@ use App\Modelos\CMPDocumentoCtble;
 use App\Modelos\FePlanillaEntregable;
 use App\Modelos\VMergeOPActual;
 use App\Modelos\Firma;
+use App\Modelos\FeRefAsoc;
+
 
 
 
@@ -368,11 +370,8 @@ class FileController extends Controller
         $archivo                =       Archivo::where('NOMBRE_ARCHIVO','=',$newstr)->first();
         $fedocumento            =       FeDocumento::where('ID_DOCUMENTO','=',$archivo->ID_DOCUMENTO)->first();
 
-        $fereftop1              =       FeRefAsoc::where('lote','=',$archivo->ID_DOCUMENTO)->first();
-        $ordencompra            =       CMPOrden::where('COD_ORDEN','=',$archivo->ID_DOCUMENTO)->first();
 
-
-        $prefijocarperta        =       $this->prefijo_empresa($ordencompra->COD_EMPR);
+        $prefijocarperta        =       $this->prefijo_empresa($fedocumento->COD_EMPR);
         $rutafile               =       '\\\\10.1.50.2/comprobantes/'.$prefijocarperta.'/'.$archivo->ID_DOCUMENTO.'/';
 
         $remoteFile             =       $rutafile.$newstr;

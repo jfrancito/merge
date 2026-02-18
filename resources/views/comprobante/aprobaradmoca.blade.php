@@ -135,11 +135,11 @@
             $('#file-'+{{$index}}).fileinput({
               theme: 'fa5',
               language: 'es',
-              initialPreview: ["{{ route('serve-fileliquidacioncompraanticipo', ['file' => '']) }}" + nombre_archivo],
+              initialPreview: ["{{ route('serve-fileordencompraanticipo', ['file' => '']) }}" + nombre_archivo],
               initialPreviewAsData: true,
               initialPreviewFileType: 'pdf',
               initialPreviewConfig: [
-                  {type: "pdf", caption: nombre_archivo, downloadUrl: "{{ route('serve-fileliquidacioncompraanticipo', ['file' => '']) }}" + nombre_archivo} // Para mostrar el botón de descarga
+                  {type: "pdf", caption: nombre_archivo, downloadUrl: "{{ route('serve-fileordencompraanticipo', ['file' => '']) }}" + nombre_archivo} // Para mostrar el botón de descarga
               ]
             });
           @endforeach
