@@ -28,6 +28,7 @@ $(document).ready(function () {
     $('#serie_asiento').prop('required', false);
     $('#numero_asiento').prop('required', false);
     $('#nro_cuenta_contable').prop('required', false);
+    $('#tipo_asiento').prop('required', false);
 
     $(".comboreparable").on('change', function (e) {
 
@@ -3706,7 +3707,7 @@ $(document).ready(function () {
             }
 
             $('#asientosgenerados').val(JSON.stringify(detalles));
-            
+
         }
 
         $.confirm({
