@@ -17,6 +17,17 @@ $(document).ready(function () {
 
     var carpeta = $("#carpeta").val();
 
+    $('#anio_asiento').prop('required', false);
+    $('#periodo_asiento').prop('required', false);
+    $('#comprobante_asiento').prop('required', false);
+    $('#moneda_asiento').prop('required', false);
+    $('#tipo_cambio_asiento').prop('required', false);
+    $('#empresa_asiento').prop('required', false);
+    $('#fecha_asiento').prop('required', false);
+    $('#tipo_documento_asiento').prop('required', false);
+    $('#serie_asiento').prop('required', false);
+    $('#numero_asiento').prop('required', false);
+
     $(".comboreparable").on('change', function (e) {
 
         let reparable = $(this).val();
@@ -3161,6 +3172,10 @@ $(document).ready(function () {
 
             });
 
+            if(detalles.length === 0){
+                $('#nro_cuenta_contable').val("000000");
+            }
+
             if (error_tipo_asiento) {
                 $.alert({
                     title: 'Error',
@@ -3265,6 +3280,9 @@ $(document).ready(function () {
                         // 3. ¡IMPORTANTE! Actualizar el input oculto
                         actualizarInputAsientos();
 
+                        // 4. Ocultamos el panel
+                        $('.pnlasientos').hide();
+
                         $.alert('Asiento eliminado correctamente.');
                     }
                 },
@@ -3340,6 +3358,10 @@ $(document).ready(function () {
                 });
 
             });
+
+            if(detalles.length === 0){
+                $('#nro_cuenta_contable').val("000000");
+            }
 
             if (error_tipo_asiento) {
                 $.alert({
@@ -3471,6 +3493,10 @@ $(document).ready(function () {
 
             });
 
+            if(detalles.length === 0){
+                $('#nro_cuenta_contable').val("000000");
+            }
+
             if (error_tipo_asiento) {
                 $.alert({
                     title: 'Error',
@@ -3505,7 +3531,7 @@ $(document).ready(function () {
 
             // Array de todos los valores
             let campos = [
-                //{nombre: "Cuenta Contable", valor: nro_cuenta_aux},
+                {nombre: "Cuenta Contable", valor: nro_cuenta_aux},
                 {nombre: "Anio", valor: anio_asiento},
                 {nombre: "Periodo", valor: periodo_asiento},
                 {nombre: "Comprobante", valor: comprobante_asiento},
@@ -3603,6 +3629,10 @@ $(document).ready(function () {
                 });
 
             });
+
+            if(detalles.length === 0){
+                $('#nro_cuenta_contable').val("000000");
+            }
 
             if (error_tipo_asiento) {
                 $.alert({
@@ -4299,14 +4329,14 @@ $(document).ready(function () {
 
     // Función para recolectar la data de las filas restantes
     function actualizarInputAsientos() {
-        var listaAsientos = [];
+        let listaAsientos = [];
 
         // Recorremos solo las filas que quedaron en el tbody
         $('#asientolista tbody tr').each(function() {
-            var fila = $(this);
+            let fila = $(this);
 
             // Extraemos la data que guardaste en los atributos
-            var item = {
+            let item = {
                 indicador: fila.attr('data_indicador'),
                 input: fila.attr('data_input'),
                 cabecera: JSON.parse(fila.attr('data_asiento_cabecera')),
