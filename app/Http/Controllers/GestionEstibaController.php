@@ -2215,8 +2215,6 @@ class GestionEstibaController extends Controller
                         $ordencompra                        =   CMPOrden::whereIn('COD_ORDEN',$lotes)->first();
                         $fereftop1                          =   FeRefAsoc::where('lote','=',$idoc)->first();
 
-
-
                         $monto_detraccion                   =   0;
                         $cant_rentencion                    =   0;
                         if($ordencompra->CAN_DETRACCION>0){
