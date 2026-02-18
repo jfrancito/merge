@@ -3247,21 +3247,35 @@ $(document).ready(function () {
     });
 
     $(document).on('click', '.eliminar-fila', function () {
-        if (!confirm('¿Desea eliminar este asiento?')) return;
+        // 1. Guardamos la fila en una variable para no perder la referencia
+        let $fila = $(this).closest('tr');
 
         $.confirm({
             title: '¿Confirmar Eliminación?',
-            content: 'Eliminar Asiento',
+            content: '¿Está seguro de que desea eliminar este asiento de la lista?',
+            type: 'red', // Le da un estilo de alerta/peligro
             buttons: {
-                confirmar: function () {
-                    $(this).closest('tr').remove();
+                confirmar: {
+                    text: 'Eliminar',
+                    btnClass: 'btn-red',
+                    action: function () {
+                        // 2. Usamos la variable $fila que capturamos arriba
+                        $fila.remove();
+
+                        // 3. ¡IMPORTANTE! Actualizar el input oculto
+                        actualizarInputAsientos();
+
+                        $.alert('Asiento eliminado correctamente.');
+                    }
                 },
-                cancelar: function () {
-                    $.alert('Se cancelo Eliminación');
+                cancelar: {
+                    text: 'Cancelar',
+                    action: function () {
+                        $.alert('Se cancelo Eliminación');
+                    }
                 }
             }
         });
-
     });
 
     $('.btnaprobarcomporbatnte').on('click', function (event) {
@@ -4283,6 +4297,29 @@ $(document).ready(function () {
         return parts.join(decimals > 0 ? decimal_separator : "");
     }
 
+    // Función para recolectar la data de las filas restantes
+    function actualizarInputAsientos() {
+        var listaAsientos = [];
 
+        // Recorremos solo las filas que quedaron en el tbody
+        $('#asientolista tbody tr').each(function() {
+            var fila = $(this);
+
+            // Extraemos la data que guardaste en los atributos
+            var item = {
+                indicador: fila.attr('data_indicador'),
+                input: fila.attr('data_input'),
+                cabecera: JSON.parse(fila.attr('data_asiento_cabecera')),
+                detalle: JSON.parse(fila.attr('data_asiento_detalle'))
+            };
+
+            listaAsientos.push(item);
+        });
+
+        // Convertimos el array a JSON y lo metemos en el input oculto
+        $('#asientosgenerados').val(JSON.stringify(listaAsientos));
+
+        console.log("Input actualizado con " + listaAsientos.length + " asientos.");
+    }
 
 });
