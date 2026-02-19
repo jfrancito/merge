@@ -514,18 +514,27 @@ class ValeRendirController extends Controller
                $pendienteCount = count($valesPendientes);
 
 
-                if ($areacomercial == 'MARKETING Y DESARROLLO') {
+                if ($areacomercial === 'MARKETING Y DESARROLLO') {
+
                     if ($pendienteCount >= 3) {
                         return response()->json([
                             'error' => 'Usted tiene 3 o más vales pendientes por rendir. No puede generar un cuarto vale.'
                         ]);
                     }
 
-                } elseif ($areacomercial == 'ADMINISTRACION') {
+                } elseif ($areacomercial === 'ADMINISTRACION') {
 
                     if ($pendienteCount >= 4) {
                         return response()->json([
                             'error' => 'Usted tiene 4 o más vales pendientes por rendir. No puede generar un quinto vale.'
+                        ]);
+                    }
+
+                } elseif ($areacomercial === 'GERENCIA GENERAL') {
+
+                    if ($pendienteCount >= 3) {
+                        return response()->json([
+                            'error' => 'Usted tiene 3 o más vales pendientes por rendir. No puede generar un cuarto vale.'
                         ]);
                     }
 
@@ -537,6 +546,7 @@ class ValeRendirController extends Controller
                         ]);
                     }
                 }
+
 
                 if ($trabajadorespla) {
                         $cod_personal_rendir = 'TPR0000000000001';

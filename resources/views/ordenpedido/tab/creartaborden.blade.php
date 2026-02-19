@@ -305,7 +305,8 @@
                          <option value="{{ $prd->COD_PRODUCTO }}"
                                 data-nombre="{{ $prd->NOM_PRODUCTO }}"
                                 data-unidad="{{ $prd->UNIDAD }}"
-                                data-codcategoria="{{ $prd->COD_UNIDAD }}">
+                                data-codcategoria="{{ $prd->COD_UNIDAD }}"
+                                data-indmaterialservicio="{{ $prd->IND_MATERIAL_SERVICIO }}">
                             {{ $prd->COD_PRODUCTO }} - {{ $prd->NOM_PRODUCTO }}
                         </option>
 

@@ -1,10 +1,14 @@
+@php
+    $cod_usuario_session = Session::get('usuario')->usuarioosiris_id ?? null;
+@endphp
+
 <!-- HEADER -->
 <div class="modal-header text-white border-0"
      style="background: linear-gradient(135deg, #0b1a3d, #1f2a50);">
 <h5 class="modal-title fw-semibold text-center w-100">
     <div class="d-flex justify-content-center align-items-center mb-1">
         <i class="bi bi-receipt me-2 opacity-75"></i>
-        <span>DETALLE DEL PEDIDO</span>
+        <span>DETALLE DEL PEDIDO (AUTORIZACIÓN)</span>
     </div>
 
     <span class="d-block fw-medium pedido-numero">
@@ -13,28 +17,13 @@
 </h5>
 </div>
 
+
 <!-- BODY -->
 <div class="modal-body p-0 bg-light">
 
   <div class="table-responsive detalle-scroll">
-    <table class="table table-hover align-middle mb-0 detalle-table">
-    @php
-        $mostrarJefe = false;
-        $mostrarGer  = false;
-        $mostrarAdm  = false;
 
-        foreach($pedillodetalle as $item){
-            if(!is_null($item->CAN_MODIF_JEF_AUT)){
-                $mostrarJefe = true;
-            }
-            if(!is_null($item->CAN_MODIF_GER)){
-                $mostrarGer = true;
-            }
-            if(!is_null($item->CAN_MODIF_ADM)){
-                $mostrarAdm = true;
-            }
-        }
-    @endphp
+    <table class="table table-hover align-middle mb-0 detalle-table">
 
       <thead class="text-white sticky-top detalle-thead">
         <tr class="text-uppercase small">
@@ -42,12 +31,6 @@
           <th style="width:30%">Producto</th>
           <th style="width:20%">Categoría</th>
           <th style="width:10%" class="text-center">Cant.</th>
-          @if($mostrarJefe)
-          <th style="width:10%" class="text-center">Cant. Jefe</th> @endif
-          @if($mostrarGer)
-          <th style="width:10%" class="text-center">Cant. Gerencia</th>@endif
-          @if($mostrarAdm)
-          <th  style="width:10%" class="text-center">Cant. Admin</th>@endif
           <th style="width:35%">Observación</th>
         </tr>
       </thead>
@@ -69,73 +52,70 @@
             {{ $detalle->NOM_CATEGORIA }}
           </td>
 
-           {{-- CANTIDAD ORIGINAL (SIEMPRE SE MUESTRA) --}}
           <td class="text-center">
+            @php
+            // Determinar la cantidad que se va a mostrar
+            $cantidad_mostrar = $detalle->CAN_MODIF_ADM 
+                                 ?? $detalle->CAN_MODIF_GER 
+                                 ?? $detalle->CAN_MODIF_JEF_AUT 
+                                 ?? $detalle->CANTIDAD;
+            @endphp
+           
+            @if (
+            $pedido->COD_TRABAJADOR_AUTORIZA == $cod_usuario_session &&
+            $pedido->COD_ESTADO == 'ETM0000000000010'
+            )
+
+            <input type="number" 
+                       class="form-control text-center input-cantidad-editar" 
+                       value="{{ (int)$cantidad_mostrar  }}"
+                       min="1"
+                       data-id="{{ $detalle->ID_PEDIDO }}"
+                       data-prod="{{ $detalle->COD_PRODUCTO }}"
+                       style="width: 70px; margin: 0 auto; font-weight: bold;">
+            @else
                 <span class="badge badge-cantidad">
-                    {{ $detalle->CANTIDAD }}
+                  {{ $cantidad_mostrar  }}
                 </span>
+            @endif
           </td>
-        {{-- CANTIDAD JEFE --}}
-        @if($mostrarJefe)
-          <td class="text-center">
-                @if(!is_null($detalle->CAN_MODIF_JEF_AUT))
-                    <span class="badge badge-cantidad">
-                        {{ $detalle->CAN_MODIF_JEF_AUT }}
-                    </span>
-                @else
-                    —
-                @endif
-           </td>
-        @endif
 
-        {{-- CANTIDAD GERENCIA --}}
-        @if($mostrarGer)
-            <td class="text-center">
-                @if(!is_null($detalle->CAN_MODIF_GER))
-                    <span class="badge badge-cantidad">
-                        {{ $detalle->CAN_MODIF_GER }}
-                    </span>
-                @else
-                    —
-                @endif
-            </td>
-        @endif
-
-        {{-- CANTIDAD ADMIN --}}
-        @if($mostrarAdm)
-            <td class="text-center">
-                @if(!is_null($detalle->CAN_MODIF_ADM))
-                    <span class="badge badge-cantidad">
-                        {{ $detalle->CAN_MODIF_ADM }}
-                    </span>
-                @else
-                    —
-                @endif
-            </td>
-        @endif
-
-            <td class="text-truncate observacion"
-                  title="{{ $detalle->TXT_OBSERVACION }}">
-                {{ $detalle->TXT_OBSERVACION ?: '—' }}
-              </td>
-            </tr>
-            @empty
-            <tr>
-              <td colspan="5" class="text-center text-muted fst-italic py-4">
-                No hay productos en este pedido.
-              </td>
-            </tr>
-            @endforelse
+   
+          <td class="text-truncate observacion"
+              title="{{ $detalle->TXT_OBSERVACION }}">
+            {{ $detalle->TXT_OBSERVACION ?: '—' }}
+          </td>
+        </tr>
+        @empty
+        <tr>
+          <td colspan="5" class="text-center text-muted fst-italic py-4">
+            No hay productos en este pedido.
+          </td>
+        </tr>
+        @endforelse
       </tbody>
 
     </table>
   </div>
 </div>
 
- <div class="modal-footer justify-content-center bg-light" 
+ <div class="modal-footer d-flex justify-content-center align-items-center bg-light" 
        style="margin-top:-10px; border-top:1px solid #dee2e6;">
+    @if (
+    $pedido->COD_TRABAJADOR_AUTORIZA == $cod_usuario_session &&
+    $pedido->COD_ESTADO == 'ETM0000000000010'
+    )
+
+    <button type="button" 
+            class="btn btn-success btn-space btn-editar-cantidades-aut"
+            data-id="{{ $pedido->ID_PEDIDO ?? '' }}"
+            style="margin: 5px;">
+      <i class="fa fa-edit"></i> Editar
+    </button>
+    @endif
     <button type="button" data-dismiss="modal" 
-            class="btn btn-primary btn-space modal-close">
+            class="btn btn-primary btn-space modal-close"
+            style="margin: 5px;">
       Cerrar
     </button>
   </div>

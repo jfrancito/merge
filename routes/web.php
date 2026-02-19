@@ -1,15 +1,7 @@
 <?php
 
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
+/* |-------------------------------------------------------------------------- | Web Routes |-------------------------------------------------------------------------- | | Here is where you can register web routes for your application. These | routes are loaded by the RouteServiceProvider within a group which | contains the "web" middleware group. Now create something great! |
  */
 
 /********************** USUARIOS *************************/
@@ -45,10 +37,10 @@ Route::any('/ajax-buscar-proveedor', 'UserController@actionAjaxBuscarProveedor')
 Route::get('/cerrarsession', 'UserController@actionCerrarSesion');
 Route::any('/enviocorreoconfirmaciones', 'UserController@actionCorreoConfirmacion');
 Route::any('/activar-registro/{token}', 'UserController@actionActivarRegistro');
-Route::any('/enviocorreouc', 'UserController@actionCorreoUC');//correo para usuario contacto
-Route::any('/enviocorreoconta', 'UserController@actionCorreoCO');//correo para contabilidad
-Route::any('/enviocorreoadmin', 'UserController@actionCorreoADM');//correo para administracion
-Route::any('/enviocorreoapcli', 'UserController@actionCorreoAPCLI');//correo para cliente cuando se aprueba
+Route::any('/enviocorreouc', 'UserController@actionCorreoUC'); //correo para usuario contacto
+Route::any('/enviocorreoconta', 'UserController@actionCorreoCO'); //correo para contabilidad
+Route::any('/enviocorreoadmin', 'UserController@actionCorreoADM'); //correo para administracion
+Route::any('/enviocorreoapcli', 'UserController@actionCorreoAPCLI'); //correo para cliente cuando se aprueba
 Route::get('/cambiarperfil', 'UserController@actionCambiarPerfil');
 Route::any('/enviocorreobaja', 'UserController@actionCorreoBaja');//correo para cliente cuando se aprueba
 Route::any('/validarsunatcdr', 'GestionOCController@actionSunatCDR');//vALIDAR CDR Y SUNAT
@@ -1006,22 +998,51 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::post('/obtener-meses', 'GestionOrdenPedidoController@obtenerMeses');
 	Route::post('/ver_detalle_orden_pedido', 'GestionOrdenPedidoController@actionDetallePedido');
 
+	Route::get('/reporte-orden-pedido/{idopcion}', 'ReporteOrdenPedidoController@actionReporteOrdenPedido');
+	Route::any('/ajax-buscar-documento-op', 'ReporteOrdenPedidoController@actionListarAjaxBuscarDocumentoOP');
+	Route::any('/comprobante-masivo-excel-op/{fecha_inicio}/{fecha_fin}/{empresa_id}/{centro_pedido}/{idopcion}', 'ReporteOrdenPedidoController@actionComprobanteMasivoExcelOp');
+	Route::any('/pedido-masivo-excel-op/{fecha_inicio}/{fecha_fin}/{empresa_id}/{centro_pedido}/{idopcion}', 'ReporteOrdenPedidoController@actionDiseñoMasivoExcelOp');
+
+	Route::get('/resumen-orden-pedido/{idopcion}', 'ResumenOrdenPedidoController@actionResumenOrdenPedido');
+	Route::any('/ajax-buscar-resumen-op', 'ResumenOrdenPedidoController@actionListarAjaxBuscarResumenOP');
+	Route::any('/resumen-masivo-excel-op/{fecha_inicio}/{fecha_fin}/{empresa_id}/{centro_pedido}/{idopcion}', 'ResumenOrdenPedidoController@actionResumenMasivoExcelOp');
 
 	Route::get('/gestion-de-autorizacion-orden-pedido/{idopcion}', 'GestionOrdenPedidoAutorizaController@actionOrdenPedidoAutoriza');
 	Route::post('/autorizar_orden_pedido', 'GestionOrdenPedidoAutorizaController@insertAutorizaOrdenPedido');
 	Route::post('/rechazar_orden_pedido', 'GestionOrdenPedidoAutorizaController@insertRechazarOrdenPedido');
-	Route::post('/ver_detalle_orden_pedido', 'GestionOrdenPedidoAutorizaController@actionDetallePedido');
+	Route::post('/ver_detalle_orden_pedido_aut', 'GestionOrdenPedidoAutorizaController@actionDetallePedidoAut');
+	Route::post('/guardar_editar_detalle_pedido_aut', 'GestionOrdenPedidoAutorizaController@actionGuardarEditarDetalleAut');
 
 	Route::get('/gestion-de-aprobacion-orden-pedido-ger/{idopcion}', 'GestionOrdenPedidoApruebaGerController@actionOrdenPedidoApruebaGer');
 	Route::post('/ap_ger_orden_pedido', 'GestionOrdenPedidoApruebaGerController@insertApruebaOrdenPedidoGer');
 	Route::post('/rechazar_orden_pedido', 'GestionOrdenPedidoApruebaGerController@insertRechazarOrdenPedidoGer');
-	Route::post('/ver_detalle_orden_pedido', 'GestionOrdenPedidoApruebaGerController@actionDetallePedido');
-
+	Route::post('/ver_detalle_orden_pedido_ger', 'GestionOrdenPedidoApruebaGerController@actionDetallePedidoGer');
+	Route::post('/guardar_editar_detalle_pedido_ger', 'GestionOrdenPedidoApruebaGerController@actionGuardarEditarDetalleGer');
 
 	Route::get('/gestion-de-aprobacion-orden-pedido-adm/{idopcion}', 'GestionOrdenPedidoApruebaAdmController@actionOrdenPedidoApruebaAdm');
 	Route::post('/ap_adm_orden_pedido', 'GestionOrdenPedidoApruebaAdmController@insertApruebaOrdenPedidoAdm');
 	Route::post('/rechazar_orden_pedido', 'GestionOrdenPedidoApruebaAdmController@insertRechazarOrdenPedidoAdm');
-	Route::post('/ver_detalle_orden_pedido', 'GestionOrdenPedidoApruebaAdmController@actionDetallePedido');
+	Route::post('/ver_detalle_orden_pedido_adm', 'GestionOrdenPedidoApruebaAdmController@actionDetallePedidoAdm');
+	Route::post('/guardar_editar_detalle_pedido_adm', 'GestionOrdenPedidoApruebaAdmController@actionGuardarEditarDetalleAdm');
+
+	Route::get('/consolidado-orden-pedido/{idopcion}', 'ConsolidadoOrdenPedidoController@actionConsolidadoOrdenPedido');
+	Route::any('/ajax-buscar-consolidado-op', 'ConsolidadoOrdenPedidoController@actionListarAjaxBuscarConsolidadoOP');
+	Route::post('/guardar_consolidado_pedido', 'ConsolidadoOrdenPedidoController@actionGuardarConsolidado');
+	Route::any('/ajax-listar-detalle-consolidado-op', 'ConsolidadoOrdenPedidoController@actionListarAjaxDetalleConsolidadoOP');
+	Route::any('/ajax-detalle-producto-consolidado-generado', 'ConsolidadoOrdenPedidoController@actionAjaxDetalleProductoConsolidadoGenerado');
+	Route::post('/ajax-aprobar-consolidado-op', 'ConsolidadoOrdenPedidoController@actionAjaxAprobarConsolidado');
+	Route::post('/ajax-guardar-cantidad-comprada-op', 'ConsolidadoOrdenPedidoController@actionAjaxGuardarCantidadComprada');
+
+	Route::get('/consolidado-general-orden-pedido/{idopcion}', 'ConsolidadoGeneralOrdenPedidoController@actionConsolidadoGeneralOrdenPedido');
+	Route::post('/guardar_consolidado_general', 'ConsolidadoGeneralOrdenPedidoController@actionGuardarConsolidadoGeneral');
+	Route::post('/ajax-listar-detalle-consolidado-general-op', 'ConsolidadoGeneralOrdenPedidoController@actionListarAjaxDetalleConsolidadoGeneralOP');
+	Route::any('/ajax-buscar-consolidado-general-op', 'ConsolidadoGeneralOrdenPedidoController@actionAjaxBuscarConsolidadoGeneralOP');
+
+
+
+
+
+
 
 
 
@@ -1176,6 +1197,3 @@ Route::get('buscarclientey', function (Illuminate\Http\Request $request) {
 
 	return \Response::json($valid_tags);
 });
-
-
-
