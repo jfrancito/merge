@@ -187,11 +187,12 @@ class GestionOrdenPedidoController extends Controller
 
 	    // $producto = DB::table('ALM.PRODUCTO')->where('cod_estado', 1)->pluck('NOM_PRODUCTO', 'COD_PRODUCTO')->toArray();
 	    $producto = DB::table('ALM.PRODUCTO as PRD')
-	    				->join('CMP.CATEGORIA as CAT', 'PRD.COD_CATEGORIA_UNIDAD_MEDIDA', '=', 'CAT.COD_CATEGORIA')
+	    				->leftJoin('CMP.CATEGORIA as CAT', 'PRD.COD_CATEGORIA_UNIDAD_MEDIDA', '=', 'CAT.COD_CATEGORIA')
 	    				->where('PRD.COD_ESTADO', 1)
 	   					 ->select(
 	        			'PRD.COD_PRODUCTO',
 	        			'PRD.NOM_PRODUCTO',
+	        			'PRD.IND_MATERIAL_SERVICIO',
 	        			'CAT.COD_CATEGORIA as COD_UNIDAD',
 	        			'CAT.NOM_CATEGORIA as UNIDAD')
 	    				->get();
@@ -419,11 +420,13 @@ class GestionOrdenPedidoController extends Controller
 
 	  public function actionDetallePedido(Request $request)
     { 
+    	 $cod_usuario_session = Session::get('usuario')->usuarioosiris_id;
          $id_buscar = $request->input('orden_pedido_id'); 
 
         
 		$pedido = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $id_buscar)->first(); 
 		$pedillodetalle = DB::table('WEB.ORDEN_PEDIDO_DETALLE')->where('ID_PEDIDO', $id_buscar)->get(); 
+
 
         
         $id_pedido = $pedillodetalle->pluck('ID_PEDIDO');
@@ -441,13 +444,13 @@ class GestionOrdenPedidoController extends Controller
             'cantidad'          => $cantidad,
             'txt_observacion'   => $txt_observacion,
             'pedillodetalle'    => $pedillodetalle
+       
         ]);  
     }
 
 
     public function insertEmitirOrdenPedido(Request $request)
     {
-     
         $id_buscar = $request->input('orden_pedido_id'); 
         $orden_pedido_id = $request->input('orden_pedido_id');
 
@@ -535,6 +538,12 @@ class GestionOrdenPedidoController extends Controller
             true,
             ""
         );
+            
+        DB::table('WEB.ORDEN_PEDIDO_DETALLE')
+        ->where('ID_PEDIDO', $orden_pedido_id)
+        ->update([
+            'ACTIVO' => 0
+        ]);
 
         return response()->json([
             'success' => true

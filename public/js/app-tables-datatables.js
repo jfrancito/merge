@@ -511,6 +511,24 @@ var App = (function () {
             ordering: false,
         });
 
+       $("#tablaconsolidadopedido").dataTable({
+            responsive: true,
+            autoWidth: true,
+            lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+            scrollX: true,
+            scrollY: "300px",
+            ordering: false,
+        });
+
+         $("#tablaconsolidadopedidogeneral").dataTable({
+            responsive: true,
+            autoWidth: true,
+            lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+            scrollX: true,
+            scrollY: "300px",
+            ordering: false,
+        });
+       
         function number_format(num, decimals = 0, decimal_separator = ".", thousands_separator = ",") {
             if (isNaN(num) || num === null) return "0";
 
