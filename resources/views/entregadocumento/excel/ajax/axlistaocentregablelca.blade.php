@@ -25,7 +25,6 @@
 		      <th>PROVEEDOR</th>
 		      <th>BANCO</th>
 		      <th>CUENTA ABONO</th>
-		      <th>COMPROBANTE ASOCIADO</th>
 		      <th>FECHA APROBACION ADMIN</th>
 		      <th>SUBIO VOUCHER</th>
 
@@ -38,11 +37,14 @@
 		      <th>NOTA CREDITO</th>
 		      <th>COMPENSACION</th>
 		      <th>NETO A PAGAR</th>
+		      <th>CUENTA OSIRIS</th>
+
 		    </tr>
 		  </thead>
 		  <tbody>
 		  	@php $monto_total =  0; @endphp
 		    @foreach($listadatos as $index => $item)
+		       @php $NOMBRE_OSIRIS =  $funcion->funciones->cuenta_osiris_lca_folio($item->ID_DOCUMENTO) @endphp
 		      <tr>
 		        <td>{{$index + 1}}</td>
 		        <td>{{$item->OPERACION}}</td>
@@ -61,7 +63,9 @@
 		            @ENDIF
 		        </td>
 
-		        <td><b>{{$item->TOTAL_VENTA_ORIG}}</b></td>
+
+				<td><b>{{number_format($item->TOTAL_VENTA_ORIG, 2, '.', ',')}}</b></td>
+
 		        <td>
 		          @IF($item->MONTO_DETRACCION_RED>0)
 		            DETRACION
@@ -101,6 +105,7 @@
 			        @php $monto_total  = $monto_total + $funcion->funciones->neto_pagar_documento($item->ID_DOCUMENTO); @endphp
 			        </b>
 		        </td>
+		        <td>{{$NOMBRE_OSIRIS}}</td>
 		      </tr>                    
 		    @endforeach
 

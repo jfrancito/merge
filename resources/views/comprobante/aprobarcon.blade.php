@@ -48,9 +48,9 @@
 
         /* Versión pequeña tipo input-sm */
         .ss-main {
-            height: 38px;         /* ajusta la altura */
-            font-size: 12px;      /* tamaño de fuente */
-            padding: 2px 8px;     /* espacio interno */
+            height: 38px; /* ajusta la altura */
+            font-size: 12px; /* tamaño de fuente */
+            padding: 2px 8px; /* espacio interno */
         }
 
     </style>
@@ -90,9 +90,9 @@
                                                   class="form-horizontal group-border-dashed"
                                                   enctype="multipart/form-data">
                                                 {{ csrf_field() }}
-<input type="hidden" name="device_info" id='device_info'>
+                                                <input type="hidden" name="device_info" id='device_info'>
 
-                                                
+
                                                 @include('comprobante.form.formaprobarcont')
                                                 <div class="row xs-pt-15">
                                                     <div class="col-xs-6">
@@ -130,9 +130,9 @@
                                                   style="border-radius: 0px;"
                                                   class="form-horizontal group-border-dashed">
                                                 {{ csrf_field() }}
-<input type="hidden" name="device_info" id='device_info'>
+                                                <input type="hidden" name="device_info" id='device_info'>
 
-                                                
+
                                                 @include('comprobante.form.formobservar')
 
                                                 <div class="row xs-pt-15">
@@ -174,9 +174,9 @@
                                                   style="border-radius: 0px;"
                                                   class="form-horizontal group-border-dashed">
                                                 {{ csrf_field() }}
-<input type="hidden" name="device_info" id='device_info'>
+                                                <input type="hidden" name="device_info" id='device_info'>
 
-                                                
+
                                                 @include('comprobante.form.formreparable')
                                             </form>
                                         </div>
@@ -193,9 +193,9 @@
                                                   style="border-radius: 0px;"
                                                   class="form-horizontal group-border-dashed">
                                                 {{ csrf_field() }}
-<input type="hidden" name="device_info" id='device_info'>
+                                                <input type="hidden" name="device_info" id='device_info'>
 
-                                                
+
                                                 @include('comprobante.form.formrechazo')
                                             </form>
                                         </div>
@@ -270,18 +270,18 @@
 
     <script type="text/javascript">
 
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
 
             let carpeta = $("#carpeta").val();
             let _token = $("#token").val();
             let link = '/buscar-proveedor';
 
             //siempre que uses nifty modal usar esta libreria para poder abrir los modales
-            $.fn.niftyModal('setDefaults',{
+            $.fn.niftyModal('setDefaults', {
                 overlaySelector: '.modal-overlay',
                 closeSelector: '.modal-close',
                 classAddAfterOpen: 'modal-show',
-              });
+            });
 
             let select = new TomSelect("#empresa_asiento", {
                 valueField: 'id',
@@ -289,7 +289,7 @@
                 searchField: 'text',
                 placeholder: "Escriba para buscar...",
                 preload: true, // carga inicial
-                load: function(query, callback) {
+                load: function (query, callback) {
                     let data = {
                         _token: _token,
                         busqueda: query
@@ -301,10 +301,14 @@
                         },
                         body: JSON.stringify(data)
                     })
-                    //fetch('/buscar-tipo-documento?q=' + encodeURIComponent(query))
+                        //fetch('/buscar-tipo-documento?q=' + encodeURIComponent(query))
                         .then(response => response.json())
-                        .then(json => { callback(json); })
-                        .catch(() => { callback(); });
+                        .then(json => {
+                            callback(json);
+                        })
+                        .catch(() => {
+                            callback();
+                        });
                 }
             });
 
@@ -314,7 +318,7 @@
                 searchField: 'text',
                 placeholder: "Escriba para buscar...",
                 preload: true, // carga inicial
-                load: function(query, callback) {
+                load: function (query, callback) {
                     let data = {
                         _token: _token,
                         busqueda: query
@@ -326,10 +330,14 @@
                         },
                         body: JSON.stringify(data)
                     })
-                    //fetch(carpeta + '/buscar-tipo-documento?q=' + encodeURIComponent(query))
+                        //fetch(carpeta + '/buscar-tipo-documento?q=' + encodeURIComponent(query))
                         .then(response => response.json())
-                        .then(json => { callback(json); })
-                        .catch(() => { callback(); });
+                        .then(json => {
+                            callback(json);
+                        })
+                        .catch(() => {
+                            callback();
+                        });
                 }
             });
 
@@ -345,7 +353,7 @@
             }
 
             window.selects = {};
-            document.querySelectorAll("select.slim").forEach(function(el) {
+            document.querySelectorAll("select.slim").forEach(function (el) {
                 window.selects[el.id] = new SlimSelect({
                     select: el,
                     placeholder: 'Seleccione...',

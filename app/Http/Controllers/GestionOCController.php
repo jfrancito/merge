@@ -918,7 +918,16 @@ class GestionOCController extends Controller
         }
 
         $categoria_id   =   $this->con_categoria_canje($operacion_id);
-        $combo_proveedor=   $this->con_combo_cabecera_estibas_administrativo($cod_empresa,$area_id,$categoria_id);
+
+        if($operacion_id == 'DOCUMENTO_INTERNO_COMPRA'){
+            $combo_proveedor=   $this->con_combo_cabecera_estibas_administrativo_dic($cod_empresa,$area_id,$categoria_id);
+        }else{
+
+            $combo_proveedor=   $this->con_combo_cabecera_estibas_administrativo($cod_empresa,$area_id,$categoria_id);
+
+        }
+
+
         $procedencia    =   'ADM';
         $funcion        =   $this;
         return View::make('comprobante/combo/combo_proveedor',
@@ -960,30 +969,35 @@ class GestionOCController extends Controller
 
                     if($operacion_id=='PROVISION_GASTO'){
                         $listadatos         =   $this->con_lista_cabecera_provision_gasto_administrativo($cod_empresa);
-                    }
-                    if ($operacion_id == 'LIQUIDACION_COMPRA_ANTICIPO') {                    
-                        $listadatos = $this->con_lista_cabecera_liquidacion_compra_anticipo_administrativo($cod_empresa);
-                    } else {
-                        if ($operacion_id == 'NOTA_CREDITO') {                    
-                            $listadatos = $this->con_lista_cabecera_nota_credito_administrativo($cod_empresa);
+                    }else{
+
+                        if ($operacion_id == 'LIQUIDACION_COMPRA_ANTICIPO') {                    
+                            $listadatos = $this->con_lista_cabecera_liquidacion_compra_anticipo_administrativo($cod_empresa);
                         } else {
-                            if ($operacion_id == 'NOTA_DEBITO') {                    
-                                $listadatos = $this->con_lista_cabecera_nota_debito_administrativo($cod_empresa);
+                            if ($operacion_id == 'NOTA_CREDITO') {                    
+                                $listadatos = $this->con_lista_cabecera_nota_credito_administrativo($cod_empresa);
                             } else {
-                                if (in_array($operacion_id, $array_canjes)) {
-                                    $categoria_id = $this->con_categoria_canje($operacion_id);
+                                if ($operacion_id == 'NOTA_DEBITO') {                    
+                                    $listadatos = $this->con_lista_cabecera_nota_debito_administrativo($cod_empresa);
+                                } else {
+                                    if (in_array($operacion_id, $array_canjes)) {
+                                        $categoria_id = $this->con_categoria_canje($operacion_id);
 
-                                    if($operacion_id=='DOCUMENTO_INTERNO_COMPRA'){
-                                        $listadatos         =   $this->con_lista_cabecera_estibas_administrativo_doc_int_com($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id);
-                                    }else{
-                                        $listadatos         =   $this->con_lista_cabecera_estibas_administrativo($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id);
-                                    }                        
+                                        if($operacion_id=='DOCUMENTO_INTERNO_COMPRA'){
+                                            $listadatos         =   $this->con_lista_cabecera_estibas_administrativo_doc_int_com($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id);
+                                        }else{
+                                            $listadatos         =   $this->con_lista_cabecera_estibas_administrativo($cod_empresa,$area_id,$fecha_inicio,$fecha_fin,$proveedor_id,$categoria_id);
+                                        }                        
+                                    }
+
                                 }
-
                             }
+                          
                         }
-                      
+
+                        
                     }
+
                 }
             }
         }
@@ -2881,6 +2895,61 @@ class GestionOCController extends Controller
         $cb_id                  =   '';        
         $combocb                =   array('' => "Seleccione Cuenta Bancaria");
 
+
+        //encontrar la orden de compra
+        $fileordencompra            =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordenpago->COD_AUTORIZACION)
+                                        ->where('COD_CATEGORIA_DOCUMENTO','=','DCC0000000000049')
+                                        ->where('COD_ESTADO','=','1')
+                                        ->first();
+
+        $sourceFile = '\\\\10.1.0.201\cpe\Orden_Pago';
+        if($ordenpago->COD_CENTRO == 'CEN0000000000004' or $ordenpago->COD_CENTRO == 'CEN0000000000006'or $ordenpago->COD_CENTRO == 'CEN0000000000002'){
+            if($ordencompra_f->COD_CENTRO == 'CEN0000000000004'){
+                $sourceFile = '\\\\10.1.7.200\\cpe\\Orden_Pago\\'.$ordenpago->COD_AUTORIZACION.'.pdf';
+            }
+            if($ordenpago->COD_CENTRO == 'CEN0000000000006'){
+                $sourceFile = '\\\\10.1.9.43\\cpe\\Orden_Pago\\'.$ordenpago->COD_AUTORIZACION.'.pdf';
+            }
+            if($ordenpago->COD_CENTRO == 'CEN0000000000002'){
+                $sourceFile = '\\\\10.1.4.201\\cpe\\Orden_Pago\\'.$ordenpago->COD_AUTORIZACION.'.pdf';
+            }
+            $destinationFile = '\\\\10.1.0.201\\cpe\\Orden_Pago\\'.$ordenpago->COD_AUTORIZACION.'.pdf';
+            if (file_exists($sourceFile)){
+                copy($sourceFile, $destinationFile);
+            }
+        }
+
+
+        $rutaorden                  =   "";
+        //dd($fileordencompra);
+        if(count($fileordencompra)>0){
+            $directorio = '\\\\10.1.0.201\cpe\Orden_Pago';
+            // Nombre del archivo que estás buscando
+            $nombreArchivoBuscado = $ordenpago->COD_AUTORIZACION.'.pdf';
+            // Escanea el directorio
+            $archivos = scandir($directorio);
+            // Inicializa una variable para almacenar el resultado
+            $archivoEncontrado = false;
+            // Recorre la lista de archivos
+            foreach ($archivos as $archivo) {
+                // Omite los elementos '.' y '..'
+                if ($archivo != '.' && $archivo != '..') {
+                    // Verifica si el nombre del archivo coincide con el archivo buscado
+                    if ($archivo == $nombreArchivoBuscado) {
+                        $archivoEncontrado = true;
+                        break;
+                    }
+                }
+            }
+            // Muestra el resultado
+            if ($archivoEncontrado) {
+                $rutafila         =   $directorio.'\\'.$nombreArchivoBuscado;
+                $rutaorden           =  $rutafila;
+            } 
+        }
+        //dd($rutaorden);
+        //$rutaorden = '';
+
         return View::make('comprobante/registrocomprobanteliquidacioncompraanticipoadministrator',
                          [
                             'ordenpago'             =>  $ordenpago,
@@ -2889,7 +2958,7 @@ class GestionOCController extends Controller
                             'combobancos'           =>  $combobancos,
                             'ordencompra_f'           =>  $ordencompra_f,
                             'detalleordencompra'    =>  $detalleordencompra,
-
+                            'rutaorden'    =>  $rutaorden,
                             'cb_id'                 =>  $cb_id,
                             'combocb'               =>  $combocb,
                             'fedocumento'           =>  $fedocumento,
@@ -3196,6 +3265,44 @@ class GestionOCController extends Controller
 
                 $fedocumento       =   FeDocumento::where('ID_DOCUMENTO','=',$idop)->where('COD_ESTADO','<>','ETM0000000000006')->first();                
                 
+
+                //guardar orden de compra precargada
+                $rutaorden       =   $request['rutaorden'];
+                if($rutaorden!=''){
+
+                    $aoc                            =       CMPDocAsociarCompra::where('COD_ORDEN','=',$ordenpago->COD_AUTORIZACION)->where('COD_ESTADO','=',1)
+                                                            ->whereIn('COD_CATEGORIA_DOCUMENTO', ['DCC0000000000049'])
+                                                            ->first();
+
+
+                    $contadorArchivos = Archivo::count();                            
+                    /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
+                    $prefijocarperta =      $this->prefijo_empresa($ordenpago->COD_EMPR);
+                    $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordenpago->NRO_DOC;                            
+                    $nombrefilecdr   =       $contadorArchivos.'-'.$ordenpago->COD_AUTORIZACION.'.pdf';
+                    $valor           =      $this->versicarpetanoexiste($rutafile);
+                    $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
+                    copy($rutaorden,$rutacompleta);
+                    //copy($file->getRealPath(),$rutacompleta);
+                    $path            =      $rutacompleta;
+
+                    $dcontrol                       =   new Archivo;
+                    $dcontrol->ID_DOCUMENTO         =   $ordenpago->COD_AUTORIZACION;
+                    $dcontrol->DOCUMENTO_ITEM       =   $fedocumento->DOCUMENTO_ITEM;
+                    $dcontrol->TIPO_ARCHIVO         =   $aoc->COD_CATEGORIA_DOCUMENTO;
+                    $dcontrol->NOMBRE_ARCHIVO       =   $nombrefilecdr;
+                    $dcontrol->DESCRIPCION_ARCHIVO  =   $aoc->NOM_CATEGORIA_DOCUMENTO;
+                    $dcontrol->URL_ARCHIVO      =   $path;
+                    $dcontrol->SIZE                 =       100;
+                    $dcontrol->EXTENSION            =       '.pdf';
+                    $dcontrol->ACTIVO               =       1;
+                    $dcontrol->FECHA_CREA       =   $this->fechaactual;
+                    $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
+                    $dcontrol->save();
+
+                }
+                //dd("bien");
+
                 $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$idop)->where('COD_ESTADO','=',1)->get();                
 
                 foreach($tarchivos as $index => $item){

@@ -117,7 +117,7 @@ trait LiquidacionGastoTraits
                             'monto' => $group->sum('monto')
                         ];
                     }
-                    
+
                     // Para los demás conceptos, mantener el primero
                     return $group->first();
                 })->values()->all();
@@ -182,7 +182,7 @@ trait LiquidacionGastoTraits
             ->select('TES.AUTORIZACION.*')
             ->orderBy('LQG_LIQUIDACION_GASTO.FECHA_CREA', 'DESC')
             ->first();
-        
+
         return $valearendir_info;
     }
 
@@ -325,10 +325,10 @@ trait LiquidacionGastoTraits
                                     // Si solo hay uno, devolverlo tal como está
                                     return $items->first();
                                 }
-                                
+
                                 // Si hay varios, agruparlos
                                 $primer_item = $items->first();
-                                
+
                                 return [
                                     'COD_PRODUCTO' => $primer_item['COD_PRODUCTO'],
                                     'TXT_PRODUCTO' => $producto,
@@ -351,19 +351,19 @@ trait LiquidacionGastoTraits
 
                         $array = collect($arrayFiltrado)
                             ->filter(function($item) {
-                                return !empty($item['TOTAL']) && 
-                                       !empty($item['monto']) && 
-                                       is_numeric($item['TOTAL']) && 
+                                return !empty($item['TOTAL']) &&
+                                       !empty($item['monto']) &&
+                                       is_numeric($item['TOTAL']) &&
                                        is_numeric($item['monto']);
                             })
                             ->map(function($item) {
                                 $total = (float) $item['TOTAL'];
                                 $monto = (float) $item['monto'];
-                                
+
                                 $item['TOTAL'] = $total;
                                 $item['monto'] = $monto;
                                 $item['restante'] = round($monto - $total, 2); // Redondear a 2 decimales
-                                
+
                                 return $item;
                             })
                             ->values()
@@ -408,16 +408,16 @@ trait LiquidacionGastoTraits
     private function addBusinessDays($fecha, $dias, $excluirDomingos = true) {
 
         $fecha = Carbon::parse($fecha);
-    
+
         for ($i = 0; $i < $dias; $i++) {
             $fecha->addDay();
-            
+
             // Si excluimos domingos y la fecha cae en domingo, seguir sumando
             while ($excluirDomingos && $fecha->isSunday()) {
                 $fecha->addDay();
             }
         }
-        
+
         return $fecha;
     }
 
@@ -450,7 +450,7 @@ trait LiquidacionGastoTraits
                      ->on('LQG_DETDOCUMENTOLIQUIDACIONGASTO.ITEM', '=', 'LQG_DETLIQUIDACIONGASTO.ITEM');
             })
             ->join('STD.EMPRESA', 'STD.EMPRESA.COD_EMPR', '=', 'LQG_DETLIQUIDACIONGASTO.COD_EMPRESA_PROVEEDOR')
-            
+
             ->ProveedorLG($proveedor_id)
             ->EstadoLG($estado_id)
             ->whereRaw("CAST(FECHA_EMI AS DATE) >= ? and CAST(FECHA_EMI AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
@@ -474,7 +474,8 @@ trait LiquidacionGastoTraits
                 'LQG_LIQUIDACION_GASTO.TXT_USUARIO_AUTORIZA',
                 // Emails por subconsultas
                 DB::raw("(SELECT TOP 1 emailcorp FROM WEB.ListaplatrabajadoresGenereal WHERE COD_TRAB = (SELECT usuarioosiris_id FROM users WHERE id = LQG_LIQUIDACION_GASTO.USUARIO_CREA)) as EMAIL_USUARIO"),
-                DB::raw("(SELECT TOP 1 emailcorp FROM WEB.ListaplatrabajadoresGenereal WHERE COD_TRAB = (SELECT usuarioosiris_id FROM users WHERE id = LQG_LIQUIDACION_GASTO.COD_USUARIO_AUTORIZA)) as EMAIL_JEFE")
+                DB::raw("(SELECT TOP 1 emailcorp FROM WEB.ListaplatrabajadoresGenereal WHERE COD_TRAB = (SELECT usuarioosiris_id FROM users WHERE id = LQG_LIQUIDACION_GASTO.COD_USUARIO_AUTORIZA)) as EMAIL_JEFE"),
+                'LQG_DETLIQUIDACIONGASTO.TXT_CENTRO AS CUENTA'
             ])
             ->distinct()
             ->orderBy('LQG_LIQUIDACION_GASTO.FECHA_EMI', 'desc')
@@ -493,7 +494,7 @@ trait LiquidacionGastoTraits
                                         ->where('ACTIVO', 1)
                                         ->where('USUARIO_ID', Session::get('usuario')->id)
                                         ->get();
-                                        
+
         foreach($listasunattareas as $index => $item){
 
             $primeraLetra               =   substr($item->SERIE, 0, 1);
@@ -516,7 +517,7 @@ trait LiquidacionGastoTraits
             $respuetaxml                =   $this->buscar_archivo_sunat_lg($urlxml,$fetoken,$this->pathFiles,$prefijocarperta,$ID_DOCUMENTO);
             $urlxml                     =   'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/01';
             $respuetapdf                =   $this->buscar_archivo_sunat_lg($urlxml,$fetoken,$this->pathFiles,$prefijocarperta,$ID_DOCUMENTO);
-            
+
             if($primeraLetra == 'F'){
                 $urlxml                     =   'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/03';
                 $respuetacdr                =   $this->buscar_archivo_sunat_lg($urlxml,$fetoken,$this->pathFiles,$prefijocarperta,$ID_DOCUMENTO);
@@ -540,7 +541,7 @@ trait LiquidacionGastoTraits
 
 
 
-                 
+
     }
 
 
@@ -591,8 +592,8 @@ trait LiquidacionGastoTraits
             $stmt->bindParam(12, $ruc ,PDO::PARAM_STR);                                     //@NRO_DOCUMENTO='20608383957',
             $stmt->bindParam(13, $vacio  ,PDO::PARAM_STR);                                  //@TXT_FAX='',
             $stmt->bindParam(14, $vacio  ,PDO::PARAM_STR);                                  //@TXT_EMAIL='',
-            $stmt->bindParam(15, $vacio ,PDO::PARAM_STR);                                   //@TXT_APE_PATERNO='', 
-            $stmt->bindParam(16, $vacio ,PDO::PARAM_STR);                                   //@TXT_APE_MATERNO='', 
+            $stmt->bindParam(15, $vacio ,PDO::PARAM_STR);                                   //@TXT_APE_PATERNO='',
+            $stmt->bindParam(16, $vacio ,PDO::PARAM_STR);                                   //@TXT_APE_MATERNO='',
             $stmt->bindParam(17, $vacio ,PDO::PARAM_STR);                                   //@TXT_NOMBRES='',
             $stmt->bindParam(18, $fecha_ilimitada ,PDO::PARAM_STR);                         //@FEC_NACIMIENTO='1901-01-01 00:00:00',
             $stmt->bindParam(19, $valor_cero ,PDO::PARAM_STR);                              //@IND_CHOFER=0,
@@ -627,7 +628,7 @@ trait LiquidacionGastoTraits
             $stmt->bindParam(43, $valor_cero  ,PDO::PARAM_STR);                             //@IND_GEN_DOC_ELEC=0,
             $stmt->bindParam(44, $valor_cero  ,PDO::PARAM_STR);                             //@IND_COMERCIAL_SERVICIO=0,
             $stmt->bindParam(45, $valor_cero  ,PDO::PARAM_STR);                             //@IND_BOLETEO_INTERES=0,
-            $stmt->bindParam(46, $valor_cero  ,PDO::PARAM_STR);                             //@IND_COSTO=0, 
+            $stmt->bindParam(46, $valor_cero  ,PDO::PARAM_STR);                             //@IND_COSTO=0,
             $stmt->bindParam(47, $valor_cero  ,PDO::PARAM_STR);                             //@IND_GASTO=0,
             $stmt->bindParam(48, $vacio  ,PDO::PARAM_STR);                                  //@COD_CATEGORIA_BANCO='',
             $stmt->bindParam(49, $vacio  ,PDO::PARAM_STR);                                  //@NRO_CUENTA_BANCARIA='',
@@ -680,8 +681,8 @@ trait LiquidacionGastoTraits
 
 
         //CONTRATO
-        $COD_CATEGORIA_TIPO_CONTRATO                =   'TCO0000000000019';  
-        $TXT_CATEGORIA_TIPO_CONTRATO                =   'PROVEEDOR'; 
+        $COD_CATEGORIA_TIPO_CONTRATO                =   'TCO0000000000019';
+        $TXT_CATEGORIA_TIPO_CONTRATO                =   'PROVEEDOR';
         $COD_CATEGORIA_ESTADO_CONTRATO              =   'ECO0000000000001';
         $TXT_CATEGORIA_ESTADO_CONTRATO              =   'GENERADO';
         $COD_CATEGORIA_MONEDA                       =   'MON0000000000001';
@@ -714,7 +715,7 @@ trait LiquidacionGastoTraits
         $stmt->bindParam(12, $vacio ,PDO::PARAM_STR);                                  //@COD_TRABAJADOR_APROBACION='                '
         $stmt->bindParam(13, $COD_CATEGORIA_TIPO_CONTRATO  ,PDO::PARAM_STR);           //@COD_CATEGORIA_TIPO_CONTRATO='TCO0000000000019'
         $stmt->bindParam(14, $TXT_CATEGORIA_TIPO_CONTRATO  ,PDO::PARAM_STR);           //@TXT_CATEGORIA_TIPO_CONTRATO='PROVEEDOR'
-        $stmt->bindParam(15, $COD_CATEGORIA_ESTADO_CONTRATO ,PDO::PARAM_STR);          //@COD_CATEGORIA_ESTADO_CONTRATO='ECO0000000000001' 
+        $stmt->bindParam(15, $COD_CATEGORIA_ESTADO_CONTRATO ,PDO::PARAM_STR);          //@COD_CATEGORIA_ESTADO_CONTRATO='ECO0000000000001'
         $stmt->bindParam(16, $TXT_CATEGORIA_ESTADO_CONTRATO ,PDO::PARAM_STR);          //@TXT_CATEGORIA_ESTADO_CONTRATO='GENERADO'
         $stmt->bindParam(17, $COD_CATEGORIA_MONEDA ,PDO::PARAM_STR);                   //@COD_CATEGORIA_MONEDA='MON0000000000001'
         $stmt->bindParam(18, $TXT_CATEGORIA_MONEDA ,PDO::PARAM_STR);                   //@TXT_CATEGORIA_MONEDA='SOLES'
@@ -763,7 +764,7 @@ trait LiquidacionGastoTraits
         $CAN_LIMITE_CREDITO_INDIVIDUAL = 9999999.0000;
         $COD_CATEGORIA_ESTADO = 'ECO0000000000001';
         $TXT_CATEGORIA_ESTADO = 'GENERADO';
-        $COD_ZONA_COMERCIAL = $zona->COD_ZONA; 
+        $COD_ZONA_COMERCIAL = $zona->COD_ZONA;
         $TXT_ZONA_COMERCIAL = $zona->TXT_NOMBRE;
         $COD_ZONA_CULTIVO = $zona02->COD_ZONA;
         $TXT_ZONA_CULTIVO = $zona02->TXT_NOMBRE;
@@ -854,7 +855,7 @@ trait LiquidacionGastoTraits
                                                                 ->where('FEC_CAMBIO','<=',date('d/m/Y'))
                                                                 ->orderBy('FEC_CAMBIO', 'desc')
                                                                 ->first();
-        $can_tipo_cambio                                =       $tipocambio->CAN_VENTA;  
+        $can_tipo_cambio                                =       $tipocambio->CAN_VENTA;
         $can_impuesto_vta                               =       $valor_cero;
         $can_impuesto_renta                             =       $valor_cero;
         $can_sub_total                                  =       $liquidaciongastos->TOTAL;
@@ -882,8 +883,8 @@ trait LiquidacionGastoTraits
         $stmt->bindParam(12, $vacio ,PDO::PARAM_STR);                                   //@TXT_EMPR_IMPRESION='',
         $stmt->bindParam(13, $vacio  ,PDO::PARAM_STR);                                  //@COD_EMPR_ORIGEN='',
         $stmt->bindParam(14, $vacio  ,PDO::PARAM_STR);                                  //@TXT_EMPR_ORIGEN='',
-        $stmt->bindParam(15, $vacio ,PDO::PARAM_STR);                                   //@COD_EMPR_DESTINO='', 
-        $stmt->bindParam(16, $vacio ,PDO::PARAM_STR);                                   //@TXT_EMPR_DESTINO='', 
+        $stmt->bindParam(15, $vacio ,PDO::PARAM_STR);                                   //@COD_EMPR_DESTINO='',
+        $stmt->bindParam(16, $vacio ,PDO::PARAM_STR);                                   //@TXT_EMPR_DESTINO='',
         $stmt->bindParam(17, $vacio ,PDO::PARAM_STR);                                   //@COD_EMPR_BANCO='',
         $stmt->bindParam(18, $vacio ,PDO::PARAM_STR);                                   //@TXT_EMPR_BANCO='',
         $stmt->bindParam(19, $cod_categoria_tipo_doc ,PDO::PARAM_STR);                  //@COD_CATEGORIA_TIPO_DOC='TDO0000000000007',
@@ -918,13 +919,13 @@ trait LiquidacionGastoTraits
         $stmt->bindParam(43, $fecha_vencimiento  ,PDO::PARAM_STR);                       //@FEC_VENCIMIENTO='2019-09-08 00:00:00',
         $stmt->bindParam(44, $fecha_ilimitada  ,PDO::PARAM_STR);                         //@FEC_ENTRADA_PLANTA='1901-01-01 00:00:00',
         $stmt->bindParam(45, $fecha_ilimitada  ,PDO::PARAM_STR);                         //@FEC_SALIDA_PLANTA='1901-01-01 00:00:00',
-        $stmt->bindParam(46, $fecha_ilimitada  ,PDO::PARAM_STR);                         //@FEC_LLEGADA_PLANTA='1901-01-01 00:00:00', 
+        $stmt->bindParam(46, $fecha_ilimitada  ,PDO::PARAM_STR);                         //@FEC_LLEGADA_PLANTA='1901-01-01 00:00:00',
         $stmt->bindParam(47, $fecha_ilimitada  ,PDO::PARAM_STR);                         //@FEC_SALIDA_DESTINO='1901-01-01 00:00:00',
         $stmt->bindParam(48, $fecha_ilimitada  ,PDO::PARAM_STR);                         //@FEC_LLEGADA_DESTINO='1901-01-01 00:00:00',
         $stmt->bindParam(49, $fecha_ilimitada  ,PDO::PARAM_STR);                         //@FEC_TERMINO='1901-01-01 00:00:00',
         $stmt->bindParam(50, $ind_material_servicio  ,PDO::PARAM_STR);                   //@IND_MATERIAL_SERVICIO='M',
 
-        $stmt->bindParam(51, $ind_compra_venta  ,PDO::PARAM_STR);                       //@IND_COMPRA_VENTA='V', 
+        $stmt->bindParam(51, $ind_compra_venta  ,PDO::PARAM_STR);                       //@IND_COMPRA_VENTA='V',
         $stmt->bindParam(52, $operador  ,PDO::PARAM_STR);                               //@OPERADOR=1,
         $stmt->bindParam(53, $cod_categoria_modulo  ,PDO::PARAM_STR);                   //@COD_CATEGORIA_MODULO='MSI0000000000010',
         $stmt->bindParam(54, $vacio ,PDO::PARAM_STR);                                   //@COD_CATEGORIA_CONDICION_PAGO='',
@@ -936,36 +937,36 @@ trait LiquidacionGastoTraits
         $stmt->bindParam(60, $cod_categoria_tipo_pago  ,PDO::PARAM_STR);                //@COD_CATEGORIA_TIPO_PAGO='TIP0000000000005',
 
 
-        $stmt->bindParam(61, $txt_categoria_tipo_pago  ,PDO::PARAM_STR);                //@TXT_CATEGORIA_TIPO_PAGO='CREDITO A 30 DÍAS', 
+        $stmt->bindParam(61, $txt_categoria_tipo_pago  ,PDO::PARAM_STR);                //@TXT_CATEGORIA_TIPO_PAGO='CREDITO A 30 DÍAS',
         $stmt->bindParam(62, $vacio  ,PDO::PARAM_STR);                                  //@COD_CONCEPTO_CENTRO_COSTO='',
         $stmt->bindParam(63, $vacio  ,PDO::PARAM_STR);                                  //@TXT_CONCEPTO_CENTRO_COSTO='',
         $stmt->bindParam(64, $vacio  ,PDO::PARAM_STR);                                  //@COD_VEHICULO='',
         $stmt->bindParam(65, $vacio  ,PDO::PARAM_STR);                                  //@COD_VEHICULO_NO_MOTRIZ='',
-        $stmt->bindParam(66, $can_tipo_cambio  ,PDO::PARAM_STR);                        //@CAN_TIPO_CAMBIO=3.2970, 
+        $stmt->bindParam(66, $can_tipo_cambio  ,PDO::PARAM_STR);                        //@CAN_TIPO_CAMBIO=3.2970,
         $stmt->bindParam(67, $can_impuesto_vta  ,PDO::PARAM_STR);                       //@CAN_IMPUESTO_VTA='',
         $stmt->bindParam(68, $can_impuesto_renta  ,PDO::PARAM_STR);                     //@CAN_IMPUESTO_RENTA='',
         $stmt->bindParam(69, $can_sub_total  ,PDO::PARAM_STR);                          //@CAN_SUB_TOTAL=35607.3200,
         $stmt->bindParam(70, $can_total ,PDO::PARAM_STR);                               //@CAN_TOTAL=35607.3200,
 
 
-        $stmt->bindParam(71, $valor_cero ,PDO::PARAM_STR);                              //@CAN_COMISION=0, 
+        $stmt->bindParam(71, $valor_cero ,PDO::PARAM_STR);                              //@CAN_COMISION=0,
         $stmt->bindParam(72, $valor_cero ,PDO::PARAM_STR);                              //@CAN_COSTO_FLETE=0,
         $stmt->bindParam(73, $valor_cero ,PDO::PARAM_STR);                              //@CAN_COSTO_ESTIBA=0,
         $stmt->bindParam(74, $valor_cero ,PDO::PARAM_STR);                              //@CAN_ADELANTO_CUENTA=0,
         $stmt->bindParam(75, $valor_cero ,PDO::PARAM_STR);                              //@CAN_RETENCION=0,
-        $stmt->bindParam(76, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PERCEPCION=0, 
+        $stmt->bindParam(76, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PERCEPCION=0,
         $stmt->bindParam(77, $valor_cero ,PDO::PARAM_STR);                              //@CAN_DETRACCION=0,
         $stmt->bindParam(78, $valor_cero ,PDO::PARAM_STR);                              //@CAN_DCTO=0,
         $stmt->bindParam(79, $valor_cero ,PDO::PARAM_STR);                              //@CAN_NETO_PAGAR=0,
         $stmt->bindParam(80, $valor_cero ,PDO::PARAM_STR);                              //@CAN_IMPORTE_DETRAER=0,
 
 
-        $stmt->bindParam(81, $can_total  ,PDO::PARAM_STR);                             //@CAN_SALDO=0, 
+        $stmt->bindParam(81, $can_total  ,PDO::PARAM_STR);                             //@CAN_SALDO=0,
         $stmt->bindParam(82, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_PESO=0,
         $stmt->bindParam(83, $vacio  ,PDO::PARAM_STR);                                  //@NRO_ITT='',
         $stmt->bindParam(84, $vacio ,PDO::PARAM_STR);                                   //@NRO_CPM='',
         $stmt->bindParam(85, $vacio  ,PDO::PARAM_STR);                                  //@TXT_NRO_DETRACCION=' ',
-        $stmt->bindParam(86, $vacio  ,PDO::PARAM_STR);                                  //@COD_PAGO_SEGUN='', 
+        $stmt->bindParam(86, $vacio  ,PDO::PARAM_STR);                                  //@COD_PAGO_SEGUN='',
         $stmt->bindParam(87, $vacio  ,PDO::PARAM_STR);                                  //@COD_CLIENTE_REFERENCIA='',
         $stmt->bindParam(88, $vacio  ,PDO::PARAM_STR);                                  //@TXT_NRO_PEDIDO='228164456',
         $stmt->bindParam(89, $vacio  ,PDO::PARAM_STR);                                  //@COD_ENVIAR_A='',
@@ -976,8 +977,8 @@ trait LiquidacionGastoTraits
         $stmt->bindParam(92, $vacio  ,PDO::PARAM_STR);                                  //@NRO_OPERACIONES_CAJA='',
         $stmt->bindParam(93, $txt_glosa  ,PDO::PARAM_STR);                              //@TXT_GLOSA='// TOTTU TRUJILLO / 3997 / 3998',
         $stmt->bindParam(94, $vacio  ,PDO::PARAM_STR);                                  //@TXT_TIPO_REFERENCIA='',
-        $stmt->bindParam(95, $vacio  ,PDO::PARAM_STR);                                  //@TXT_REFERENCIA='',     
-        $stmt->bindParam(96, $cod_estado  ,PDO::PARAM_STR);                             //@COD_ESTADO=1, 
+        $stmt->bindParam(95, $vacio  ,PDO::PARAM_STR);                                  //@TXT_REFERENCIA='',
+        $stmt->bindParam(96, $cod_estado  ,PDO::PARAM_STR);                             //@COD_ESTADO=1,
         $stmt->bindParam(97, $cod_usuario_registro  ,PDO::PARAM_STR);                   //@COD_USUARIO_REGISTRO='PHORNALL',
         $stmt->bindParam(98, $cod_periodo  ,PDO::PARAM_STR);                            //@COD_PERIODO='',
         $stmt->bindParam(99, $vacio  ,PDO::PARAM_STR);                                  //@COD_CUENTA_CONTABLE='',
@@ -989,47 +990,47 @@ trait LiquidacionGastoTraits
         $stmt->bindParam(103, $valor_cero  ,PDO::PARAM_STR);                            //@IND_ENTREGADO=0,
         $stmt->bindParam(104, $vacio  ,PDO::PARAM_STR);                                 //@TXT_ENTREGADO='',
         $stmt->bindParam(105, $valor_cero  ,PDO::PARAM_STR);                            //@IND_RECP_ALTERNO=0,
-        $stmt->bindParam(106, $valor_cero  ,PDO::PARAM_STR);                            //@IND_EXTORNO=0, 
+        $stmt->bindParam(106, $valor_cero  ,PDO::PARAM_STR);                            //@IND_EXTORNO=0,
         $stmt->bindParam(107, $vacio  ,PDO::PARAM_STR);                                 //@NRO_CTA_CTBLE='',
         $stmt->bindParam(108, $vacio  ,PDO::PARAM_STR);                                 //@TXT_ORIGEN='',
         $stmt->bindParam(109, $vacio ,PDO::PARAM_STR);                                  //@COD_CTA_GASTO_FUNCION='',
         $stmt->bindParam(110, $vacio ,PDO::PARAM_STR);                                  //@NRO_CTA_GASTO_FUNCION='',
 
 
-        $stmt->bindParam(111, $valor_cero  ,PDO::PARAM_STR);                            //@IND_SUSTENTO=0, 
+        $stmt->bindParam(111, $valor_cero  ,PDO::PARAM_STR);                            //@IND_SUSTENTO=0,
         $stmt->bindParam(112, $vacio  ,PDO::PARAM_STR);                                 //@COD_TIPO_DOCUMENTO_ASOC_ELEC='TDO0000000000001',
         $stmt->bindParam(113, $valor_cero ,PDO::PARAM_STR);                             //@IND_ENVIADO_ELEC=0,
         $stmt->bindParam(114, $vacio ,PDO::PARAM_STR);                                  //@NRO_SERIE_ELEC='',
         $stmt->bindParam(115, $valor_cero  ,PDO::PARAM_STR);                            //@IND_ELECTRONICO=1,
-        $stmt->bindParam(116, $valor_cero  ,PDO::PARAM_STR);                            //@IND_AFECTO_IVAP=0, 
+        $stmt->bindParam(116, $valor_cero  ,PDO::PARAM_STR);                            //@IND_AFECTO_IVAP=0,
         $stmt->bindParam(117, $vacio ,PDO::PARAM_STR);                                  //@COD_CATEGORIA_SELLO='',
         $stmt->bindParam(118, $vacio  ,PDO::PARAM_STR);                                 //@TXT_INFO_ADICIONAL='',
         $stmt->bindParam(119, $valor_cero  ,PDO::PARAM_STR);                            //@IND_GEN_AUTO=0,
         $stmt->bindParam(120, $vacio  ,PDO::PARAM_STR);                                 //@COD_CATEGORIA_REG_CTBLE='',
 
-        $stmt->bindParam(121, $vacio  ,PDO::PARAM_STR);                                 //@COD_FLUJO_CAJA='', 
+        $stmt->bindParam(121, $vacio  ,PDO::PARAM_STR);                                 //@COD_FLUJO_CAJA='',
         $stmt->bindParam(122, $vacio  ,PDO::PARAM_STR);                                 //@COD_ITEM_MOVIMIENTO='',
         $stmt->bindParam(123, $vacio ,PDO::PARAM_STR);                                  //@ESTADO_ELEC='',
         $stmt->bindParam(124, $fecha_ilimitada ,PDO::PARAM_STR);                        //@FEC_DETRAC='1901-01-01 00:00:00',
         $stmt->bindParam(125, $cod_trabajador  ,PDO::PARAM_STR);                        //@COD_EMPR_DOC='IACHEM0000000513',
-        $stmt->bindParam(126, $nom_trabajador  ,PDO::PARAM_STR);                        //@TXT_EMPR_DOC='HIPERMERCADOS TOTTUS S.A.', 
+        $stmt->bindParam(126, $nom_trabajador  ,PDO::PARAM_STR);                        //@TXT_EMPR_DOC='HIPERMERCADOS TOTTUS S.A.',
         $stmt->bindParam(127, $cod_contrato_receptor ,PDO::PARAM_STR);                  //@COD_CONTRATO_DOC='IILMRC0000000795',
         $stmt->bindParam(128, $cod_cultivo_origen  ,PDO::PARAM_STR);                    //@COD_CULTIVO_DOC='CCU0000000000001',
         $stmt->bindParam(129, $vacio  ,PDO::PARAM_STR);                                 //@COD_DIRECCION_DOC='IACHDI0000000445',
         $stmt->bindParam(130, $vacio  ,PDO::PARAM_STR);                                 //@COD_DIRECCION_EMPR_SIST='',
 
-        $stmt->bindParam(131, $vacio  ,PDO::PARAM_STR);                                 //@TXT_ORDEN_DEVOLUCION='', 
+        $stmt->bindParam(131, $vacio  ,PDO::PARAM_STR);                                 //@TXT_ORDEN_DEVOLUCION='',
         $stmt->bindParam(132, $vacio  ,PDO::PARAM_STR);                                 //@COD_EMPR_ALTERNATIVA='',
         $stmt->bindParam(133, $vacio ,PDO::PARAM_STR);                                  //@TXT_EMPR_ALTERNATIVA='',
         $stmt->bindParam(134, $vacio ,PDO::PARAM_STR);                                  //@COD_CONTRATO_ALTERNATIVA='',
         $stmt->bindParam(135, $vacio  ,PDO::PARAM_STR);                                 //@COD_CULTIVO_ALTERNATIVA='',
-        $stmt->bindParam(136, $vacio  ,PDO::PARAM_STR);                                 //@COD_DIRECCION_ALTERNATIVA='', 
+        $stmt->bindParam(136, $vacio  ,PDO::PARAM_STR);                                 //@COD_DIRECCION_ALTERNATIVA='',
         $stmt->bindParam(137, $vacio ,PDO::PARAM_STR);                                  //@TXT_DIRECCION_ALTERNATIVA='',
         $stmt->bindParam(138, $vacio  ,PDO::PARAM_STR);                                 //@COD_MOTIVO_EXTORNO='',
         $stmt->bindParam(139, $vacio  ,PDO::PARAM_STR);                                 //@GLOSA_EXTORNO='',
         $stmt->bindParam(140, $vacio  ,PDO::PARAM_STR);                                 //@COD_TIPO_LIQUIDACION='',
 
-        $stmt->bindParam(141, $vacio  ,PDO::PARAM_STR);                                 //@TXT_TIPO_LIQUIDACION='', 
+        $stmt->bindParam(141, $vacio  ,PDO::PARAM_STR);                                 //@TXT_TIPO_LIQUIDACION='',
         $stmt->bindParam(142, $ind_notificacion_cliente  ,PDO::PARAM_STR);              //@IND_NOTIFICACION_CLIENTE='False',
         $stmt->bindParam(143, $valor_cero  ,PDO::PARAM_STR);                            //@IND_GRATUITO=0,
         $stmt->bindParam(144, $valor_cero  ,PDO::PARAM_STR);                            //@IND_EXPORTACION=0,
@@ -1072,7 +1073,7 @@ trait LiquidacionGastoTraits
                                                                         ->where('FEC_CAMBIO','<=',date('d/m/Y'))
                                                                         ->orderBy('FEC_CAMBIO', 'desc')
                                                                         ->first();
-                $can_tipo_cambio                                =       $tipocambio->CAN_VENTA;  
+                $can_tipo_cambio                                =       $tipocambio->CAN_VENTA;
                 $can_impuesto_vta                               =       $item->IGV;;
                 $can_impuesto_renta                             =       $valor_cero;
                 $can_sub_total                                  =       $item->SUBTOTAL;
@@ -1083,12 +1084,12 @@ trait LiquidacionGastoTraits
                 $cod_periodo                                    =       $periodo->COD_PERIODO;
                 $ind_notificacion_cliente                       =       'False';
                 $SERIE                                          =       $item->SERIE;
-                $CORRELATIVO                                    =       $item->NUMERO;    
+                $CORRELATIVO                                    =       $item->NUMERO;
 
                 $COD_CONCEPTO_CENTRO_COSTO                      =       $item->COD_COSTO;
-                $TXT_CONCEPTO_CENTRO_COSTO                      =       $item->TXT_COSTO;    
+                $TXT_CONCEPTO_CENTRO_COSTO                      =       $item->TXT_COSTO;
                 $TXT_TIPO_REFERENCIA                            =       'CMP.DOCUMENTO_CTBLE';
-                $TXT_REFERENCIA                                 =       $coddocumento[0]; 
+                $TXT_REFERENCIA                                 =       $coddocumento[0];
 
                 $gasto                                          =       DB::table('CON.CUENTA_CONTABLE')->where('COD_CUENTA_CONTABLE','=',$item->COD_GASTO)->first();
 
@@ -1119,8 +1120,8 @@ trait LiquidacionGastoTraits
                 $stmt->bindParam(12, $vacio ,PDO::PARAM_STR);                                   //@TXT_EMPR_IMPRESION='',
                 $stmt->bindParam(13, $vacio  ,PDO::PARAM_STR);                                  //@COD_EMPR_ORIGEN='',
                 $stmt->bindParam(14, $vacio  ,PDO::PARAM_STR);                                  //@TXT_EMPR_ORIGEN='',
-                $stmt->bindParam(15, $vacio ,PDO::PARAM_STR);                                   //@COD_EMPR_DESTINO='', 
-                $stmt->bindParam(16, $vacio ,PDO::PARAM_STR);                                   //@TXT_EMPR_DESTINO='', 
+                $stmt->bindParam(15, $vacio ,PDO::PARAM_STR);                                   //@COD_EMPR_DESTINO='',
+                $stmt->bindParam(16, $vacio ,PDO::PARAM_STR);                                   //@TXT_EMPR_DESTINO='',
                 $stmt->bindParam(17, $vacio ,PDO::PARAM_STR);                                   //@COD_EMPR_BANCO='',
                 $stmt->bindParam(18, $vacio ,PDO::PARAM_STR);                                   //@TXT_EMPR_BANCO='',
                 $stmt->bindParam(19, $cod_categoria_tipo_doc ,PDO::PARAM_STR);                  //@COD_CATEGORIA_TIPO_DOC='TDO0000000000007',
@@ -1154,13 +1155,13 @@ trait LiquidacionGastoTraits
                 $stmt->bindParam(43, $fecha_vencimiento  ,PDO::PARAM_STR);                       //@FEC_VENCIMIENTO='2019-09-08 00:00:00',
                 $stmt->bindParam(44, $fecha_ilimitada  ,PDO::PARAM_STR);                         //@FEC_ENTRADA_PLANTA='1901-01-01 00:00:00',
                 $stmt->bindParam(45, $fecha_ilimitada  ,PDO::PARAM_STR);                         //@FEC_SALIDA_PLANTA='1901-01-01 00:00:00',
-                $stmt->bindParam(46, $fecha_ilimitada  ,PDO::PARAM_STR);                         //@FEC_LLEGADA_PLANTA='1901-01-01 00:00:00', 
+                $stmt->bindParam(46, $fecha_ilimitada  ,PDO::PARAM_STR);                         //@FEC_LLEGADA_PLANTA='1901-01-01 00:00:00',
                 $stmt->bindParam(47, $fecha_ilimitada  ,PDO::PARAM_STR);                         //@FEC_SALIDA_DESTINO='1901-01-01 00:00:00',
                 $stmt->bindParam(48, $fecha_ilimitada  ,PDO::PARAM_STR);                         //@FEC_LLEGADA_DESTINO='1901-01-01 00:00:00',
                 $stmt->bindParam(49, $fecha_ilimitada  ,PDO::PARAM_STR);                         //@FEC_TERMINO='1901-01-01 00:00:00',
                 $stmt->bindParam(50, $ind_material_servicio  ,PDO::PARAM_STR);                   //@IND_MATERIAL_SERVICIO='M',
 
-                $stmt->bindParam(51, $ind_compra_venta  ,PDO::PARAM_STR);                       //@IND_COMPRA_VENTA='V', 
+                $stmt->bindParam(51, $ind_compra_venta  ,PDO::PARAM_STR);                       //@IND_COMPRA_VENTA='V',
                 $stmt->bindParam(52, $operador  ,PDO::PARAM_STR);                               //@OPERADOR=1,
                 $stmt->bindParam(53, $cod_categoria_modulo  ,PDO::PARAM_STR);                   //@COD_CATEGORIA_MODULO='MSI0000000000010',
                 $stmt->bindParam(54, $vacio ,PDO::PARAM_STR);                                   //@COD_CATEGORIA_CONDICION_PAGO='',
@@ -1172,7 +1173,7 @@ trait LiquidacionGastoTraits
                 $stmt->bindParam(60, $cod_categoria_tipo_pago  ,PDO::PARAM_STR);                //@COD_CATEGORIA_TIPO_PAGO='TIP0000000000005',
 
 
-                $stmt->bindParam(61, $txt_categoria_tipo_pago  ,PDO::PARAM_STR);                //@TXT_CATEGORIA_TIPO_PAGO='CREDITO A 30 DÍAS', 
+                $stmt->bindParam(61, $txt_categoria_tipo_pago  ,PDO::PARAM_STR);                //@TXT_CATEGORIA_TIPO_PAGO='CREDITO A 30 DÍAS',
                 $stmt->bindParam(62, $COD_CONCEPTO_CENTRO_COSTO  ,PDO::PARAM_STR);              //@COD_CONCEPTO_CENTRO_COSTO='',
                 $stmt->bindParam(63, $TXT_CONCEPTO_CENTRO_COSTO  ,PDO::PARAM_STR);              //@TXT_CONCEPTO_CENTRO_COSTO='',
                 $stmt->bindParam(64, $vacio  ,PDO::PARAM_STR);                                  //@COD_VEHICULO='',
@@ -1184,24 +1185,24 @@ trait LiquidacionGastoTraits
                 $stmt->bindParam(70, $can_total ,PDO::PARAM_STR);                               //@CAN_TOTAL=35607.3200,
 
 
-                $stmt->bindParam(71, $valor_cero ,PDO::PARAM_STR);                              //@CAN_COMISION=0, 
+                $stmt->bindParam(71, $valor_cero ,PDO::PARAM_STR);                              //@CAN_COMISION=0,
                 $stmt->bindParam(72, $valor_cero ,PDO::PARAM_STR);                              //@CAN_COSTO_FLETE=0,
                 $stmt->bindParam(73, $valor_cero ,PDO::PARAM_STR);                              //@CAN_COSTO_ESTIBA=0,
                 $stmt->bindParam(74, $valor_cero ,PDO::PARAM_STR);                              //@CAN_ADELANTO_CUENTA=0,
                 $stmt->bindParam(75, $valor_cero ,PDO::PARAM_STR);                              //@CAN_RETENCION=0,
-                $stmt->bindParam(76, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PERCEPCION=0, 
+                $stmt->bindParam(76, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PERCEPCION=0,
                 $stmt->bindParam(77, $valor_cero ,PDO::PARAM_STR);                              //@CAN_DETRACCION=0,
                 $stmt->bindParam(78, $valor_cero ,PDO::PARAM_STR);                              //@CAN_DCTO=0,
                 $stmt->bindParam(79, $valor_cero ,PDO::PARAM_STR);                              //@CAN_NETO_PAGAR=0,
                 $stmt->bindParam(80, $valor_cero ,PDO::PARAM_STR);                              //@CAN_IMPORTE_DETRAER=0,
 
 
-                $stmt->bindParam(81, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_SALDO=0, 
+                $stmt->bindParam(81, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_SALDO=0,
                 $stmt->bindParam(82, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_PESO=0,
                 $stmt->bindParam(83, $vacio  ,PDO::PARAM_STR);                                  //@NRO_ITT='',
                 $stmt->bindParam(84, $vacio ,PDO::PARAM_STR);                                   //@NRO_CPM='',
                 $stmt->bindParam(85, $vacio  ,PDO::PARAM_STR);                                  //@TXT_NRO_DETRACCION=' ',
-                $stmt->bindParam(86, $vacio  ,PDO::PARAM_STR);                                  //@COD_PAGO_SEGUN='', 
+                $stmt->bindParam(86, $vacio  ,PDO::PARAM_STR);                                  //@COD_PAGO_SEGUN='',
                 $stmt->bindParam(87, $vacio  ,PDO::PARAM_STR);                                  //@COD_CLIENTE_REFERENCIA='',
                 $stmt->bindParam(88, $vacio  ,PDO::PARAM_STR);                                  //@TXT_NRO_PEDIDO='228164456',
                 $stmt->bindParam(89, $vacio  ,PDO::PARAM_STR);                                  //@COD_ENVIAR_A='',
@@ -1213,8 +1214,8 @@ trait LiquidacionGastoTraits
                 $stmt->bindParam(92, $vacio  ,PDO::PARAM_STR);                                  //@NRO_OPERACIONES_CAJA='',
                 $stmt->bindParam(93, $txt_glosa  ,PDO::PARAM_STR);                              //@TXT_GLOSA='// TOTTU TRUJILLO / 3997 / 3998',
                 $stmt->bindParam(94, $TXT_TIPO_REFERENCIA  ,PDO::PARAM_STR);                    //@TXT_TIPO_REFERENCIA='',
-                $stmt->bindParam(95, $TXT_REFERENCIA  ,PDO::PARAM_STR);                         //@TXT_REFERENCIA='',     
-                $stmt->bindParam(96, $cod_estado  ,PDO::PARAM_STR);                             //@COD_ESTADO=1, 
+                $stmt->bindParam(95, $TXT_REFERENCIA  ,PDO::PARAM_STR);                         //@TXT_REFERENCIA='',
+                $stmt->bindParam(96, $cod_estado  ,PDO::PARAM_STR);                             //@COD_ESTADO=1,
                 $stmt->bindParam(97, $cod_usuario_registro  ,PDO::PARAM_STR);                   //@COD_USUARIO_REGISTRO='PHORNALL',
                 $stmt->bindParam(98, $cod_periodo  ,PDO::PARAM_STR);                            //@COD_PERIODO='',
                 $stmt->bindParam(99, $vacio  ,PDO::PARAM_STR);                                  //@COD_CUENTA_CONTABLE='',
@@ -1225,47 +1226,47 @@ trait LiquidacionGastoTraits
                 $stmt->bindParam(103, $valor_cero  ,PDO::PARAM_STR);                            //@IND_ENTREGADO=0,
                 $stmt->bindParam(104, $vacio  ,PDO::PARAM_STR);                                 //@TXT_ENTREGADO='',
                 $stmt->bindParam(105, $valor_cero  ,PDO::PARAM_STR);                            //@IND_RECP_ALTERNO=0,
-                $stmt->bindParam(106, $valor_cero  ,PDO::PARAM_STR);                            //@IND_EXTORNO=0, 
+                $stmt->bindParam(106, $valor_cero  ,PDO::PARAM_STR);                            //@IND_EXTORNO=0,
                 $stmt->bindParam(107, $vacio  ,PDO::PARAM_STR);                                 //@NRO_CTA_CTBLE='',
                 $stmt->bindParam(108, $vacio  ,PDO::PARAM_STR);                                 //@TXT_ORIGEN='',
                 $stmt->bindParam(109, $COD_CTA_GASTO_FUNCION ,PDO::PARAM_STR);                  //@COD_CTA_GASTO_FUNCION='',
                 $stmt->bindParam(110, $NRO_CTA_GASTO_FUNCION ,PDO::PARAM_STR);                  //@NRO_CTA_GASTO_FUNCION='',
 
 
-                $stmt->bindParam(111, $valor_cero  ,PDO::PARAM_STR);                            //@IND_SUSTENTO=0, 
+                $stmt->bindParam(111, $valor_cero  ,PDO::PARAM_STR);                            //@IND_SUSTENTO=0,
                 $stmt->bindParam(112, $vacio  ,PDO::PARAM_STR);                                 //@COD_TIPO_DOCUMENTO_ASOC_ELEC='TDO0000000000001',
                 $stmt->bindParam(113, $valor_cero ,PDO::PARAM_STR);                             //@IND_ENVIADO_ELEC=0,
                 $stmt->bindParam(114, $vacio ,PDO::PARAM_STR);                                  //@NRO_SERIE_ELEC='',
                 $stmt->bindParam(115, $valor_cero  ,PDO::PARAM_STR);                            //@IND_ELECTRONICO=1,
-                $stmt->bindParam(116, $valor_cero  ,PDO::PARAM_STR);                            //@IND_AFECTO_IVAP=0, 
+                $stmt->bindParam(116, $valor_cero  ,PDO::PARAM_STR);                            //@IND_AFECTO_IVAP=0,
                 $stmt->bindParam(117, $vacio ,PDO::PARAM_STR);                                  //@COD_CATEGORIA_SELLO='',
                 $stmt->bindParam(118, $vacio  ,PDO::PARAM_STR);                                 //@TXT_INFO_ADICIONAL='',
                 $stmt->bindParam(119, $valor_cero  ,PDO::PARAM_STR);                            //@IND_GEN_AUTO=0,
                 $stmt->bindParam(120, $vacio  ,PDO::PARAM_STR);                                 //@COD_CATEGORIA_REG_CTBLE='',
 
-                $stmt->bindParam(121, $COD_FLUJO_CAJA  ,PDO::PARAM_STR);                        //@COD_FLUJO_CAJA='', 
+                $stmt->bindParam(121, $COD_FLUJO_CAJA  ,PDO::PARAM_STR);                        //@COD_FLUJO_CAJA='',
                 $stmt->bindParam(122, $COD_ITEM_MOVIMIENTO  ,PDO::PARAM_STR);                   //@COD_ITEM_MOVIMIENTO='',
                 $stmt->bindParam(123, $vacio ,PDO::PARAM_STR);                                  //@ESTADO_ELEC='',
                 $stmt->bindParam(124, $fecha_ilimitada ,PDO::PARAM_STR);                        //@FEC_DETRAC='1901-01-01 00:00:00',
                 $stmt->bindParam(125, $cod_trabajador  ,PDO::PARAM_STR);                        //@COD_EMPR_DOC='IACHEM0000000513',
-                $stmt->bindParam(126, $nom_trabajador  ,PDO::PARAM_STR);                        //@TXT_EMPR_DOC='HIPERMERCADOS TOTTUS S.A.', 
+                $stmt->bindParam(126, $nom_trabajador  ,PDO::PARAM_STR);                        //@TXT_EMPR_DOC='HIPERMERCADOS TOTTUS S.A.',
                 $stmt->bindParam(127, $cod_contrato_receptor ,PDO::PARAM_STR);                  //@COD_CONTRATO_DOC='IILMRC0000000795',
                 $stmt->bindParam(128, $cod_cultivo_origen  ,PDO::PARAM_STR);                    //@COD_CULTIVO_DOC='CCU0000000000001',
                 $stmt->bindParam(129, $vacio  ,PDO::PARAM_STR);                                 //@COD_DIRECCION_DOC='IACHDI0000000445',
                 $stmt->bindParam(130, $vacio  ,PDO::PARAM_STR);                                 //@COD_DIRECCION_EMPR_SIST='',
 
-                $stmt->bindParam(131, $vacio  ,PDO::PARAM_STR);                                 //@TXT_ORDEN_DEVOLUCION='', 
+                $stmt->bindParam(131, $vacio  ,PDO::PARAM_STR);                                 //@TXT_ORDEN_DEVOLUCION='',
                 $stmt->bindParam(132, $vacio  ,PDO::PARAM_STR);                                 //@COD_EMPR_ALTERNATIVA='',
                 $stmt->bindParam(133, $vacio ,PDO::PARAM_STR);                                  //@TXT_EMPR_ALTERNATIVA='',
                 $stmt->bindParam(134, $vacio ,PDO::PARAM_STR);                                  //@COD_CONTRATO_ALTERNATIVA='',
                 $stmt->bindParam(135, $vacio  ,PDO::PARAM_STR);                                 //@COD_CULTIVO_ALTERNATIVA='',
-                $stmt->bindParam(136, $vacio  ,PDO::PARAM_STR);                                 //@COD_DIRECCION_ALTERNATIVA='', 
+                $stmt->bindParam(136, $vacio  ,PDO::PARAM_STR);                                 //@COD_DIRECCION_ALTERNATIVA='',
                 $stmt->bindParam(137, $vacio ,PDO::PARAM_STR);                                  //@TXT_DIRECCION_ALTERNATIVA='',
                 $stmt->bindParam(138, $vacio  ,PDO::PARAM_STR);                                 //@COD_MOTIVO_EXTORNO='',
                 $stmt->bindParam(139, $vacio  ,PDO::PARAM_STR);                                 //@GLOSA_EXTORNO='',
                 $stmt->bindParam(140, $vacio  ,PDO::PARAM_STR);                                 //@COD_TIPO_LIQUIDACION='',
 
-                $stmt->bindParam(141, $vacio  ,PDO::PARAM_STR);                                 //@TXT_TIPO_LIQUIDACION='', 
+                $stmt->bindParam(141, $vacio  ,PDO::PARAM_STR);                                 //@TXT_TIPO_LIQUIDACION='',
                 $stmt->bindParam(142, $ind_notificacion_cliente  ,PDO::PARAM_STR);              //@IND_NOTIFICACION_CLIENTE='False',
                 $stmt->bindParam(143, $valor_cero  ,PDO::PARAM_STR);                            //@IND_GRATUITO=0,
                 $stmt->bindParam(144, $valor_cero  ,PDO::PARAM_STR);                            //@IND_EXPORTACION=0,
@@ -1280,8 +1281,8 @@ trait LiquidacionGastoTraits
                 $stmt->bindParam(1, $accion ,PDO::PARAM_STR);                                   //@IND_TIPO_OPERACION='I',
                 $stmt->bindParam(2, $coddocumentodet[0]  ,PDO::PARAM_STR);                      //@COD_TABLA='IILMNC0000000495',
                 $stmt->bindParam(3, $coddocumento[0] ,PDO::PARAM_STR);                          //@COD_TABLA_ASOC='IILMFC0000005728',
-                $stmt->bindParam(4, $TXT_TABLA ,PDO::PARAM_STR);                                //@TXT_TABLA='CMP.DOCUMENTO_CTBLE', 
-                $stmt->bindParam(5, $TXT_TABLA ,PDO::PARAM_STR);                                //@TXT_TABLA_ASOC='CMP.DOCUMENTO_CTBLE', 
+                $stmt->bindParam(4, $TXT_TABLA ,PDO::PARAM_STR);                                //@TXT_TABLA='CMP.DOCUMENTO_CTBLE',
+                $stmt->bindParam(5, $TXT_TABLA ,PDO::PARAM_STR);                                //@TXT_TABLA_ASOC='CMP.DOCUMENTO_CTBLE',
                 $stmt->bindParam(6, $TXT_GLOSA  ,PDO::PARAM_STR);                               //@TXT_GLOSA='NOTA DE CREDITO F005-00000420 / ',
                 $stmt->bindParam(7, $vacio  ,PDO::PARAM_STR);                                   //@TXT_TIPO_REFERENCIA='',
                 $stmt->bindParam(8, $vacio  ,PDO::PARAM_STR);                                   //@TXT_REFERENCIA='',
@@ -1300,8 +1301,8 @@ trait LiquidacionGastoTraits
                 $stmt->bindParam(1, $accion ,PDO::PARAM_STR);                                   //@IND_TIPO_OPERACION='I',
                 $stmt->bindParam(2, $coddocumento[0]  ,PDO::PARAM_STR);                      //@COD_TABLA='IILMNC0000000495',
                 $stmt->bindParam(3, $coddocumentodet[0] ,PDO::PARAM_STR);                          //@COD_TABLA_ASOC='IILMFC0000005728',
-                $stmt->bindParam(4, $TXT_TABLA ,PDO::PARAM_STR);                                //@TXT_TABLA='CMP.DOCUMENTO_CTBLE', 
-                $stmt->bindParam(5, $TXT_TABLA ,PDO::PARAM_STR);                                //@TXT_TABLA_ASOC='CMP.DOCUMENTO_CTBLE', 
+                $stmt->bindParam(4, $TXT_TABLA ,PDO::PARAM_STR);                                //@TXT_TABLA='CMP.DOCUMENTO_CTBLE',
+                $stmt->bindParam(5, $TXT_TABLA ,PDO::PARAM_STR);                                //@TXT_TABLA_ASOC='CMP.DOCUMENTO_CTBLE',
                 $stmt->bindParam(6, $TXT_GLOSA  ,PDO::PARAM_STR);                               //@TXT_GLOSA='NOTA DE CREDITO F005-00000420 / ',
                 $stmt->bindParam(7, $vacio  ,PDO::PARAM_STR);                                   //@TXT_TIPO_REFERENCIA='',
                 $stmt->bindParam(8, $vacio  ,PDO::PARAM_STR);                                   //@TXT_REFERENCIA='',
@@ -1318,14 +1319,14 @@ trait LiquidacionGastoTraits
                                             ->where('ITEM','=',$item->ITEM)
                                             ->whereRaw("ISNULL(IND_OSIRIS, 0) <> 1")
                                             ->where('ACTIVO','=','1')->get();
-                                            
+
                 foreach($detdocumentolg as $indexdoc => $itemdoc){
 
-                        $IND_MATERIAL_SERVICIO                  =       'S';                  
+                        $IND_MATERIAL_SERVICIO                  =       'S';
                         $COD_PRODUCTO                           =       $itemdoc->COD_PRODUCTO;
                         $TXT_NOMBRE_PRODUCTO                    =       $itemdoc->TXT_PRODUCTO;
                         $NRO_LINEA                              =       (string)($indexdoc+1);
-                        $CAN_PRODUCTO                           =       $itemdoc->CANTIDAD; 
+                        $CAN_PRODUCTO                           =       $itemdoc->CANTIDAD;
                         $CAN_PRECIO_UNIT_IGV                    =       (string)$itemdoc->TOTAL;
                         $CAN_PRECIO_UNIT                        =       (string)$itemdoc->SUBTOTAL;
                         $COD_ESTADO                             =       '1';
@@ -1336,8 +1337,8 @@ trait LiquidacionGastoTraits
                         $stmt->bindParam(1, $accion ,PDO::PARAM_STR);                                   //@IND_TIPO_OPERACION='I',
                         $stmt->bindParam(2, $coddocumentodet[0]  ,PDO::PARAM_STR);                      //@COD_TABLA='IILMVR0000002923',
                         $stmt->bindParam(3, $COD_PRODUCTO ,PDO::PARAM_STR);                             //@COD_PRODUCTO='PRD0000000016186',
-                        $stmt->bindParam(4, $vacio ,PDO::PARAM_STR);                                    //@COD_LOTE='0000000000000000', 
-                        $stmt->bindParam(5, $NRO_LINEA ,PDO::PARAM_STR);                                //@NRO_LINEA=1, 
+                        $stmt->bindParam(4, $vacio ,PDO::PARAM_STR);                                    //@COD_LOTE='0000000000000000',
+                        $stmt->bindParam(5, $NRO_LINEA ,PDO::PARAM_STR);                                //@NRO_LINEA=1,
                         $stmt->bindParam(6, $TXT_NOMBRE_PRODUCTO  ,PDO::PARAM_STR);                     //@TXT_NOMBRE_PRODUCTO='ARROCILLO DE ARROZ AÑEJO X 50 KG',
                         $stmt->bindParam(7, $vacio  ,PDO::PARAM_STR);                                   //@TXT_DETALLE_PRODUCTO='',
                         $stmt->bindParam(8, $CAN_PRODUCTO  ,PDO::PARAM_STR);                            //@CAN_PRODUCTO=1.0000,
@@ -1348,9 +1349,9 @@ trait LiquidacionGastoTraits
 
                         $stmt->bindParam(11, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PESO_PRODUCTO=50.0000,
                         $stmt->bindParam(12, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_PESO_ENVIADO=0,
-                        $stmt->bindParam(13, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PESO_INGRESO=0, 
-                        $stmt->bindParam(14, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PESO_SALIDA=0, 
-                        $stmt->bindParam(15, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PESO_BRUTO=0, 
+                        $stmt->bindParam(13, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PESO_INGRESO=0,
+                        $stmt->bindParam(14, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PESO_SALIDA=0,
+                        $stmt->bindParam(15, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PESO_BRUTO=0,
                         $stmt->bindParam(16, $valor_cero  ,PDO::PARAM_STR);                             //@CAM_PESO_TARA=0,
                         $stmt->bindParam(17, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_PESO_NETO=0,
                         $stmt->bindParam(18, $valor_cero  ,PDO::PARAM_STR);                           //@CAN_TASA_IGV=0.1800,
@@ -1360,10 +1361,10 @@ trait LiquidacionGastoTraits
 
                         $stmt->bindParam(21, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PRECIO_ORIGEN=0,
                         $stmt->bindParam(22, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_PRECIO_COSTO=2.0000,
-                        $stmt->bindParam(23, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PRECIO_BRUTO=0, 
+                        $stmt->bindParam(23, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PRECIO_BRUTO=0,
                         $stmt->bindParam(24, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PRECIO_KILOS=0,
-                        $stmt->bindParam(25, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PRECIO_SACOS=0, 
-                        $stmt->bindParam(26, $CAN_PRECIO_UNIT  ,PDO::PARAM_STR);                        //@CAN_VALOR_VTA=2.0000, 
+                        $stmt->bindParam(25, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PRECIO_SACOS=0,
+                        $stmt->bindParam(26, $CAN_PRECIO_UNIT  ,PDO::PARAM_STR);                        //@CAN_VALOR_VTA=2.0000,
                         $stmt->bindParam(27, $CAN_PRECIO_UNIT_IGV  ,PDO::PARAM_STR);                    //@CAN_VALOR_VENTA_IGV=2.0000,
                         $stmt->bindParam(28, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_KILOS=0,
                         $stmt->bindParam(29, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_SACOS=0,
@@ -1373,10 +1374,10 @@ trait LiquidacionGastoTraits
 
                         $stmt->bindParam(31, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PORCENTAJE_DESCUENTO=0,
                         $stmt->bindParam(32, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_DESCUENTO=0,
-                        $stmt->bindParam(33, $valor_cero ,PDO::PARAM_STR);                              //@CAN_ADELANTO=0, 
-                        $stmt->bindParam(34, $vacio ,PDO::PARAM_STR);                                   //@TXT_DESCRIPCION='', 
-                        $stmt->bindParam(35, $IND_MATERIAL_SERVICIO ,PDO::PARAM_STR);                   //@IND_MATERIAL_SERVICIO='M' 
-                        $stmt->bindParam(36, $valor_cero  ,PDO::PARAM_STR);                             //@IND_IGV=0, 
+                        $stmt->bindParam(33, $valor_cero ,PDO::PARAM_STR);                              //@CAN_ADELANTO=0,
+                        $stmt->bindParam(34, $vacio ,PDO::PARAM_STR);                                   //@TXT_DESCRIPCION='',
+                        $stmt->bindParam(35, $IND_MATERIAL_SERVICIO ,PDO::PARAM_STR);                   //@IND_MATERIAL_SERVICIO='M'
+                        $stmt->bindParam(36, $valor_cero  ,PDO::PARAM_STR);                             //@IND_IGV=0,
                         $stmt->bindParam(37, $vacio  ,PDO::PARAM_STR);                                  //@COD_ALMACEN='',
                         $stmt->bindParam(38, $vacio  ,PDO::PARAM_STR);                                  //@TXT_ALMACEN='',
                         $stmt->bindParam(39, $vacio  ,PDO::PARAM_STR);                                  //@COD_OPERACION='',
@@ -1384,10 +1385,10 @@ trait LiquidacionGastoTraits
 
                         $stmt->bindParam(41, $vacio ,PDO::PARAM_STR);                                   //@COD_EMPR_SERV='',
                         $stmt->bindParam(42, $vacio  ,PDO::PARAM_STR);                                  //@TXT_EMPR_SERV='',
-                        $stmt->bindParam(43, $vacio ,PDO::PARAM_STR);                                   //@NRO_CONTRATO_SERV='', 
-                        $stmt->bindParam(44, $vacio ,PDO::PARAM_STR);                                   //@NRO_CONTRATO_CULTIVO_SERV='', 
-                        $stmt->bindParam(45, $vacio ,PDO::PARAM_STR);                                   //@NRO_HABILITACION_SERV='', 
-                        $stmt->bindParam(46, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_PRECIO_EMPR_SERV=0, 
+                        $stmt->bindParam(43, $vacio ,PDO::PARAM_STR);                                   //@NRO_CONTRATO_SERV='',
+                        $stmt->bindParam(44, $vacio ,PDO::PARAM_STR);                                   //@NRO_CONTRATO_CULTIVO_SERV='',
+                        $stmt->bindParam(45, $vacio ,PDO::PARAM_STR);                                   //@NRO_HABILITACION_SERV='',
+                        $stmt->bindParam(46, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_PRECIO_EMPR_SERV=0,
                         $stmt->bindParam(47, $vacio  ,PDO::PARAM_STR);                                  //@NRO_CONTRATO_GRUPO='',
                         $stmt->bindParam(48, $vacio  ,PDO::PARAM_STR);                                  //@NRO_CONTRATO_CULTIVO_GRUPO='',
                         $stmt->bindParam(49, $vacio  ,PDO::PARAM_STR);                                  //@NRO_HABILITACION_GRUPO='',
@@ -1395,10 +1396,10 @@ trait LiquidacionGastoTraits
 
                         $stmt->bindParam(51, $vacio ,PDO::PARAM_STR);                                   //@COD_USUARIO_INGRESO='',
                         $stmt->bindParam(52, $vacio  ,PDO::PARAM_STR);                                  //@COD_USUARIO_SALIDA='',
-                        $stmt->bindParam(53, $vacio ,PDO::PARAM_STR);                                   //@TXT_GLOSA_PESO_IN='', 
-                        $stmt->bindParam(54, $vacio ,PDO::PARAM_STR);                                   //@TXT_GLOSA_PESO_OUT='', 
-                        $stmt->bindParam(55, $vacio ,PDO::PARAM_STR);                                   //@COD_CONCEPTO_CENTRO_COSTO='IICHCC0000000002', 
-                        $stmt->bindParam(56, $vacio  ,PDO::PARAM_STR);                                  //@TXT_CONCEPTO_CENTRO_COSTO='ACOPIO', 
+                        $stmt->bindParam(53, $vacio ,PDO::PARAM_STR);                                   //@TXT_GLOSA_PESO_IN='',
+                        $stmt->bindParam(54, $vacio ,PDO::PARAM_STR);                                   //@TXT_GLOSA_PESO_OUT='',
+                        $stmt->bindParam(55, $vacio ,PDO::PARAM_STR);                                   //@COD_CONCEPTO_CENTRO_COSTO='IICHCC0000000002',
+                        $stmt->bindParam(56, $vacio  ,PDO::PARAM_STR);                                  //@TXT_CONCEPTO_CENTRO_COSTO='ACOPIO',
                         $stmt->bindParam(57, $TXT_TABLA  ,PDO::PARAM_STR);                                  //@TXT_REFERENCIA='',
                         $stmt->bindParam(58, $coddocumentodet[0]  ,PDO::PARAM_STR);                                  //@TXT_TIPO_REFERENCIA='',
                         $stmt->bindParam(59, $vacio  ,PDO::PARAM_STR);                                  //@IND_COSTO_ARBITRARIO='',
@@ -1406,9 +1407,9 @@ trait LiquidacionGastoTraits
 
                         $stmt->bindParam(61, $COD_USUARIO_REGISTRO ,PDO::PARAM_STR);                     //@COD_USUARIO_REGISTRO='PHORNALL',
                         $stmt->bindParam(62, $vacio  ,PDO::PARAM_STR);                                  //@COD_TIPO_ESTADO='',
-                        $stmt->bindParam(63, $vacio ,PDO::PARAM_STR);                                   //@TXT_TIPO_ESTADO='', 
-                        $stmt->bindParam(64, $vacio ,PDO::PARAM_STR);                                   //@TXT_GLOSA_ASIENTO='', 
-                        $stmt->bindParam(65, $vacio ,PDO::PARAM_STR);                                   //@TXT_CUENTA_CONTABLE='', 
+                        $stmt->bindParam(63, $vacio ,PDO::PARAM_STR);                                   //@TXT_TIPO_ESTADO='',
+                        $stmt->bindParam(64, $vacio ,PDO::PARAM_STR);                                   //@TXT_GLOSA_ASIENTO='',
+                        $stmt->bindParam(65, $vacio ,PDO::PARAM_STR);                                   //@TXT_CUENTA_CONTABLE='',
                         $stmt->bindParam(66, $vacio  ,PDO::PARAM_STR);                                  //@COD_ASIENTO_PROVISION='',
                         $stmt->bindParam(67, $vacio  ,PDO::PARAM_STR);                                  //@COD_ASIENTO_EXTORNO='',
                         $stmt->bindParam(68, $vacio  ,PDO::PARAM_STR);                                  //@COD_ASIENTO_CANJE='',
@@ -1417,10 +1418,10 @@ trait LiquidacionGastoTraits
 
                         $stmt->bindParam(71, $vacio ,PDO::PARAM_STR);                                   //@TXT_SERIE_DOCUMENTO='',
                         $stmt->bindParam(72, $vacio  ,PDO::PARAM_STR);                                  //@TXT_NUMERO_DOCUMENTO='',
-                        $stmt->bindParam(73, $vacio ,PDO::PARAM_STR);                                   //@COD_GASTO_FUNCION='', 
-                        $stmt->bindParam(74, $vacio ,PDO::PARAM_STR);                                   //@COD_CENTRO_COSTO='', 
-                        $stmt->bindParam(75, $vacio ,PDO::PARAM_STR);                                   //@COD_ORDEN_COMPRA='', 
-                        $stmt->bindParam(76, $fecha_ilimitada  ,PDO::PARAM_STR);                        //@FEC_FECHA_SERV='1901-01-01', 
+                        $stmt->bindParam(73, $vacio ,PDO::PARAM_STR);                                   //@COD_GASTO_FUNCION='',
+                        $stmt->bindParam(74, $vacio ,PDO::PARAM_STR);                                   //@COD_CENTRO_COSTO='',
+                        $stmt->bindParam(75, $vacio ,PDO::PARAM_STR);                                   //@COD_ORDEN_COMPRA='',
+                        $stmt->bindParam(76, $fecha_ilimitada  ,PDO::PARAM_STR);                        //@FEC_FECHA_SERV='1901-01-01',
                         $stmt->bindParam(77, $vacio  ,PDO::PARAM_STR);                                  //@COD_CATEGORIA_TIPO_SERV_ORDEN='',
                         $stmt->bindParam(78, $vacio  ,PDO::PARAM_STR);                                  //@IND_GASTO_COSTO=' ',
                         $stmt->bindParam(79, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_PORCENTAJE_PERCEPCION=0,
@@ -1473,7 +1474,7 @@ trait LiquidacionGastoTraits
                                                                 ->where('FEC_CAMBIO','<=',date('d/m/Y'))
                                                                 ->orderBy('FEC_CAMBIO', 'desc')
                                                                 ->first();
-        $can_tipo_cambio                                =       $tipocambio->CAN_VENTA;  
+        $can_tipo_cambio                                =       $tipocambio->CAN_VENTA;
         $can_impuesto_vta                               =       $valor_cero;
         $can_impuesto_renta                             =       $valor_cero;
         $can_sub_total                                  =       $liquidaciongastos->TOTAL;
@@ -1522,7 +1523,7 @@ trait LiquidacionGastoTraits
                                                                         ->where('FEC_CAMBIO','<=',date('d/m/Y'))
                                                                         ->orderBy('FEC_CAMBIO', 'desc')
                                                                         ->first();
-                $can_tipo_cambio                                =       $tipocambio->CAN_VENTA;  
+                $can_tipo_cambio                                =       $tipocambio->CAN_VENTA;
                 $can_impuesto_vta                               =       $item->IGV;;
                 $can_impuesto_renta                             =       $valor_cero;
                 $can_sub_total                                  =       $item->SUBTOTAL;
@@ -1533,12 +1534,12 @@ trait LiquidacionGastoTraits
                 $cod_periodo                                    =       $periodo->COD_PERIODO;
                 $ind_notificacion_cliente                       =       'False';
                 $SERIE                                          =       $item->SERIE;
-                $CORRELATIVO                                    =       $item->NUMERO;    
+                $CORRELATIVO                                    =       $item->NUMERO;
 
                 $COD_CONCEPTO_CENTRO_COSTO                      =       $item->COD_COSTO;
-                $TXT_CONCEPTO_CENTRO_COSTO                      =       $item->TXT_COSTO;    
+                $TXT_CONCEPTO_CENTRO_COSTO                      =       $item->TXT_COSTO;
                 $TXT_TIPO_REFERENCIA                            =       'CMP.DOCUMENTO_CTBLE';
-                $TXT_REFERENCIA                                 =       $coddocumento; 
+                $TXT_REFERENCIA                                 =       $coddocumento;
 
                 $gasto                                          =       DB::table('CON.CUENTA_CONTABLE')->where('COD_CUENTA_CONTABLE','=',$item->COD_GASTO)->first();
 
@@ -1569,8 +1570,8 @@ trait LiquidacionGastoTraits
                 $stmt->bindParam(12, $vacio ,PDO::PARAM_STR);                                   //@TXT_EMPR_IMPRESION='',
                 $stmt->bindParam(13, $vacio  ,PDO::PARAM_STR);                                  //@COD_EMPR_ORIGEN='',
                 $stmt->bindParam(14, $vacio  ,PDO::PARAM_STR);                                  //@TXT_EMPR_ORIGEN='',
-                $stmt->bindParam(15, $vacio ,PDO::PARAM_STR);                                   //@COD_EMPR_DESTINO='', 
-                $stmt->bindParam(16, $vacio ,PDO::PARAM_STR);                                   //@TXT_EMPR_DESTINO='', 
+                $stmt->bindParam(15, $vacio ,PDO::PARAM_STR);                                   //@COD_EMPR_DESTINO='',
+                $stmt->bindParam(16, $vacio ,PDO::PARAM_STR);                                   //@TXT_EMPR_DESTINO='',
                 $stmt->bindParam(17, $vacio ,PDO::PARAM_STR);                                   //@COD_EMPR_BANCO='',
                 $stmt->bindParam(18, $vacio ,PDO::PARAM_STR);                                   //@TXT_EMPR_BANCO='',
                 $stmt->bindParam(19, $cod_categoria_tipo_doc ,PDO::PARAM_STR);                  //@COD_CATEGORIA_TIPO_DOC='TDO0000000000007',
@@ -1604,13 +1605,13 @@ trait LiquidacionGastoTraits
                 $stmt->bindParam(43, $fecha_vencimiento  ,PDO::PARAM_STR);                       //@FEC_VENCIMIENTO='2019-09-08 00:00:00',
                 $stmt->bindParam(44, $fecha_ilimitada  ,PDO::PARAM_STR);                         //@FEC_ENTRADA_PLANTA='1901-01-01 00:00:00',
                 $stmt->bindParam(45, $fecha_ilimitada  ,PDO::PARAM_STR);                         //@FEC_SALIDA_PLANTA='1901-01-01 00:00:00',
-                $stmt->bindParam(46, $fecha_ilimitada  ,PDO::PARAM_STR);                         //@FEC_LLEGADA_PLANTA='1901-01-01 00:00:00', 
+                $stmt->bindParam(46, $fecha_ilimitada  ,PDO::PARAM_STR);                         //@FEC_LLEGADA_PLANTA='1901-01-01 00:00:00',
                 $stmt->bindParam(47, $fecha_ilimitada  ,PDO::PARAM_STR);                         //@FEC_SALIDA_DESTINO='1901-01-01 00:00:00',
                 $stmt->bindParam(48, $fecha_ilimitada  ,PDO::PARAM_STR);                         //@FEC_LLEGADA_DESTINO='1901-01-01 00:00:00',
                 $stmt->bindParam(49, $fecha_ilimitada  ,PDO::PARAM_STR);                         //@FEC_TERMINO='1901-01-01 00:00:00',
                 $stmt->bindParam(50, $ind_material_servicio  ,PDO::PARAM_STR);                   //@IND_MATERIAL_SERVICIO='M',
 
-                $stmt->bindParam(51, $ind_compra_venta  ,PDO::PARAM_STR);                       //@IND_COMPRA_VENTA='V', 
+                $stmt->bindParam(51, $ind_compra_venta  ,PDO::PARAM_STR);                       //@IND_COMPRA_VENTA='V',
                 $stmt->bindParam(52, $operador  ,PDO::PARAM_STR);                               //@OPERADOR=1,
                 $stmt->bindParam(53, $cod_categoria_modulo  ,PDO::PARAM_STR);                   //@COD_CATEGORIA_MODULO='MSI0000000000010',
                 $stmt->bindParam(54, $vacio ,PDO::PARAM_STR);                                   //@COD_CATEGORIA_CONDICION_PAGO='',
@@ -1622,7 +1623,7 @@ trait LiquidacionGastoTraits
                 $stmt->bindParam(60, $cod_categoria_tipo_pago  ,PDO::PARAM_STR);                //@COD_CATEGORIA_TIPO_PAGO='TIP0000000000005',
 
 
-                $stmt->bindParam(61, $txt_categoria_tipo_pago  ,PDO::PARAM_STR);                //@TXT_CATEGORIA_TIPO_PAGO='CREDITO A 30 DÍAS', 
+                $stmt->bindParam(61, $txt_categoria_tipo_pago  ,PDO::PARAM_STR);                //@TXT_CATEGORIA_TIPO_PAGO='CREDITO A 30 DÍAS',
                 $stmt->bindParam(62, $COD_CONCEPTO_CENTRO_COSTO  ,PDO::PARAM_STR);              //@COD_CONCEPTO_CENTRO_COSTO='',
                 $stmt->bindParam(63, $TXT_CONCEPTO_CENTRO_COSTO  ,PDO::PARAM_STR);              //@TXT_CONCEPTO_CENTRO_COSTO='',
                 $stmt->bindParam(64, $vacio  ,PDO::PARAM_STR);                                  //@COD_VEHICULO='',
@@ -1634,24 +1635,24 @@ trait LiquidacionGastoTraits
                 $stmt->bindParam(70, $can_total ,PDO::PARAM_STR);                               //@CAN_TOTAL=35607.3200,
 
 
-                $stmt->bindParam(71, $valor_cero ,PDO::PARAM_STR);                              //@CAN_COMISION=0, 
+                $stmt->bindParam(71, $valor_cero ,PDO::PARAM_STR);                              //@CAN_COMISION=0,
                 $stmt->bindParam(72, $valor_cero ,PDO::PARAM_STR);                              //@CAN_COSTO_FLETE=0,
                 $stmt->bindParam(73, $valor_cero ,PDO::PARAM_STR);                              //@CAN_COSTO_ESTIBA=0,
                 $stmt->bindParam(74, $valor_cero ,PDO::PARAM_STR);                              //@CAN_ADELANTO_CUENTA=0,
                 $stmt->bindParam(75, $valor_cero ,PDO::PARAM_STR);                              //@CAN_RETENCION=0,
-                $stmt->bindParam(76, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PERCEPCION=0, 
+                $stmt->bindParam(76, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PERCEPCION=0,
                 $stmt->bindParam(77, $valor_cero ,PDO::PARAM_STR);                              //@CAN_DETRACCION=0,
                 $stmt->bindParam(78, $valor_cero ,PDO::PARAM_STR);                              //@CAN_DCTO=0,
                 $stmt->bindParam(79, $valor_cero ,PDO::PARAM_STR);                              //@CAN_NETO_PAGAR=0,
                 $stmt->bindParam(80, $valor_cero ,PDO::PARAM_STR);                              //@CAN_IMPORTE_DETRAER=0,
 
 
-                $stmt->bindParam(81, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_SALDO=0, 
+                $stmt->bindParam(81, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_SALDO=0,
                 $stmt->bindParam(82, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_PESO=0,
                 $stmt->bindParam(83, $vacio  ,PDO::PARAM_STR);                                  //@NRO_ITT='',
                 $stmt->bindParam(84, $vacio ,PDO::PARAM_STR);                                   //@NRO_CPM='',
                 $stmt->bindParam(85, $vacio  ,PDO::PARAM_STR);                                  //@TXT_NRO_DETRACCION=' ',
-                $stmt->bindParam(86, $vacio  ,PDO::PARAM_STR);                                  //@COD_PAGO_SEGUN='', 
+                $stmt->bindParam(86, $vacio  ,PDO::PARAM_STR);                                  //@COD_PAGO_SEGUN='',
                 $stmt->bindParam(87, $vacio  ,PDO::PARAM_STR);                                  //@COD_CLIENTE_REFERENCIA='',
                 $stmt->bindParam(88, $vacio  ,PDO::PARAM_STR);                                  //@TXT_NRO_PEDIDO='228164456',
                 $stmt->bindParam(89, $vacio  ,PDO::PARAM_STR);                                  //@COD_ENVIAR_A='',
@@ -1663,8 +1664,8 @@ trait LiquidacionGastoTraits
                 $stmt->bindParam(92, $vacio  ,PDO::PARAM_STR);                                  //@NRO_OPERACIONES_CAJA='',
                 $stmt->bindParam(93, $txt_glosa  ,PDO::PARAM_STR);                              //@TXT_GLOSA='// TOTTU TRUJILLO / 3997 / 3998',
                 $stmt->bindParam(94, $TXT_TIPO_REFERENCIA  ,PDO::PARAM_STR);                    //@TXT_TIPO_REFERENCIA='',
-                $stmt->bindParam(95, $TXT_REFERENCIA  ,PDO::PARAM_STR);                         //@TXT_REFERENCIA='',     
-                $stmt->bindParam(96, $cod_estado  ,PDO::PARAM_STR);                             //@COD_ESTADO=1, 
+                $stmt->bindParam(95, $TXT_REFERENCIA  ,PDO::PARAM_STR);                         //@TXT_REFERENCIA='',
+                $stmt->bindParam(96, $cod_estado  ,PDO::PARAM_STR);                             //@COD_ESTADO=1,
                 $stmt->bindParam(97, $cod_usuario_registro  ,PDO::PARAM_STR);                   //@COD_USUARIO_REGISTRO='PHORNALL',
                 $stmt->bindParam(98, $cod_periodo  ,PDO::PARAM_STR);                            //@COD_PERIODO='',
                 $stmt->bindParam(99, $vacio  ,PDO::PARAM_STR);                                  //@COD_CUENTA_CONTABLE='',
@@ -1675,47 +1676,47 @@ trait LiquidacionGastoTraits
                 $stmt->bindParam(103, $valor_cero  ,PDO::PARAM_STR);                            //@IND_ENTREGADO=0,
                 $stmt->bindParam(104, $vacio  ,PDO::PARAM_STR);                                 //@TXT_ENTREGADO='',
                 $stmt->bindParam(105, $valor_cero  ,PDO::PARAM_STR);                            //@IND_RECP_ALTERNO=0,
-                $stmt->bindParam(106, $valor_cero  ,PDO::PARAM_STR);                            //@IND_EXTORNO=0, 
+                $stmt->bindParam(106, $valor_cero  ,PDO::PARAM_STR);                            //@IND_EXTORNO=0,
                 $stmt->bindParam(107, $vacio  ,PDO::PARAM_STR);                                 //@NRO_CTA_CTBLE='',
                 $stmt->bindParam(108, $vacio  ,PDO::PARAM_STR);                                 //@TXT_ORIGEN='',
                 $stmt->bindParam(109, $COD_CTA_GASTO_FUNCION ,PDO::PARAM_STR);                  //@COD_CTA_GASTO_FUNCION='',
                 $stmt->bindParam(110, $NRO_CTA_GASTO_FUNCION ,PDO::PARAM_STR);                  //@NRO_CTA_GASTO_FUNCION='',
 
 
-                $stmt->bindParam(111, $valor_cero  ,PDO::PARAM_STR);                            //@IND_SUSTENTO=0, 
+                $stmt->bindParam(111, $valor_cero  ,PDO::PARAM_STR);                            //@IND_SUSTENTO=0,
                 $stmt->bindParam(112, $vacio  ,PDO::PARAM_STR);                                 //@COD_TIPO_DOCUMENTO_ASOC_ELEC='TDO0000000000001',
                 $stmt->bindParam(113, $valor_cero ,PDO::PARAM_STR);                             //@IND_ENVIADO_ELEC=0,
                 $stmt->bindParam(114, $vacio ,PDO::PARAM_STR);                                  //@NRO_SERIE_ELEC='',
                 $stmt->bindParam(115, $valor_cero  ,PDO::PARAM_STR);                            //@IND_ELECTRONICO=1,
-                $stmt->bindParam(116, $valor_cero  ,PDO::PARAM_STR);                            //@IND_AFECTO_IVAP=0, 
+                $stmt->bindParam(116, $valor_cero  ,PDO::PARAM_STR);                            //@IND_AFECTO_IVAP=0,
                 $stmt->bindParam(117, $vacio ,PDO::PARAM_STR);                                  //@COD_CATEGORIA_SELLO='',
                 $stmt->bindParam(118, $vacio  ,PDO::PARAM_STR);                                 //@TXT_INFO_ADICIONAL='',
                 $stmt->bindParam(119, $valor_cero  ,PDO::PARAM_STR);                            //@IND_GEN_AUTO=0,
                 $stmt->bindParam(120, $vacio  ,PDO::PARAM_STR);                                 //@COD_CATEGORIA_REG_CTBLE='',
 
-                $stmt->bindParam(121, $COD_FLUJO_CAJA  ,PDO::PARAM_STR);                        //@COD_FLUJO_CAJA='', 
+                $stmt->bindParam(121, $COD_FLUJO_CAJA  ,PDO::PARAM_STR);                        //@COD_FLUJO_CAJA='',
                 $stmt->bindParam(122, $COD_ITEM_MOVIMIENTO  ,PDO::PARAM_STR);                   //@COD_ITEM_MOVIMIENTO='',
                 $stmt->bindParam(123, $vacio ,PDO::PARAM_STR);                                  //@ESTADO_ELEC='',
                 $stmt->bindParam(124, $fecha_ilimitada ,PDO::PARAM_STR);                        //@FEC_DETRAC='1901-01-01 00:00:00',
                 $stmt->bindParam(125, $cod_trabajador  ,PDO::PARAM_STR);                        //@COD_EMPR_DOC='IACHEM0000000513',
-                $stmt->bindParam(126, $nom_trabajador  ,PDO::PARAM_STR);                        //@TXT_EMPR_DOC='HIPERMERCADOS TOTTUS S.A.', 
+                $stmt->bindParam(126, $nom_trabajador  ,PDO::PARAM_STR);                        //@TXT_EMPR_DOC='HIPERMERCADOS TOTTUS S.A.',
                 $stmt->bindParam(127, $cod_contrato_receptor ,PDO::PARAM_STR);                  //@COD_CONTRATO_DOC='IILMRC0000000795',
                 $stmt->bindParam(128, $cod_cultivo_origen  ,PDO::PARAM_STR);                    //@COD_CULTIVO_DOC='CCU0000000000001',
                 $stmt->bindParam(129, $vacio  ,PDO::PARAM_STR);                                 //@COD_DIRECCION_DOC='IACHDI0000000445',
                 $stmt->bindParam(130, $vacio  ,PDO::PARAM_STR);                                 //@COD_DIRECCION_EMPR_SIST='',
 
-                $stmt->bindParam(131, $vacio  ,PDO::PARAM_STR);                                 //@TXT_ORDEN_DEVOLUCION='', 
+                $stmt->bindParam(131, $vacio  ,PDO::PARAM_STR);                                 //@TXT_ORDEN_DEVOLUCION='',
                 $stmt->bindParam(132, $vacio  ,PDO::PARAM_STR);                                 //@COD_EMPR_ALTERNATIVA='',
                 $stmt->bindParam(133, $vacio ,PDO::PARAM_STR);                                  //@TXT_EMPR_ALTERNATIVA='',
                 $stmt->bindParam(134, $vacio ,PDO::PARAM_STR);                                  //@COD_CONTRATO_ALTERNATIVA='',
                 $stmt->bindParam(135, $vacio  ,PDO::PARAM_STR);                                 //@COD_CULTIVO_ALTERNATIVA='',
-                $stmt->bindParam(136, $vacio  ,PDO::PARAM_STR);                                 //@COD_DIRECCION_ALTERNATIVA='', 
+                $stmt->bindParam(136, $vacio  ,PDO::PARAM_STR);                                 //@COD_DIRECCION_ALTERNATIVA='',
                 $stmt->bindParam(137, $vacio ,PDO::PARAM_STR);                                  //@TXT_DIRECCION_ALTERNATIVA='',
                 $stmt->bindParam(138, $vacio  ,PDO::PARAM_STR);                                 //@COD_MOTIVO_EXTORNO='',
                 $stmt->bindParam(139, $vacio  ,PDO::PARAM_STR);                                 //@GLOSA_EXTORNO='',
                 $stmt->bindParam(140, $vacio  ,PDO::PARAM_STR);                                 //@COD_TIPO_LIQUIDACION='',
 
-                $stmt->bindParam(141, $vacio  ,PDO::PARAM_STR);                                 //@TXT_TIPO_LIQUIDACION='', 
+                $stmt->bindParam(141, $vacio  ,PDO::PARAM_STR);                                 //@TXT_TIPO_LIQUIDACION='',
                 $stmt->bindParam(142, $ind_notificacion_cliente  ,PDO::PARAM_STR);              //@IND_NOTIFICACION_CLIENTE='False',
                 $stmt->bindParam(143, $valor_cero  ,PDO::PARAM_STR);                            //@IND_GRATUITO=0,
                 $stmt->bindParam(144, $valor_cero  ,PDO::PARAM_STR);                            //@IND_EXPORTACION=0,
@@ -1730,8 +1731,8 @@ trait LiquidacionGastoTraits
                 $stmt->bindParam(1, $accion ,PDO::PARAM_STR);                                   //@IND_TIPO_OPERACION='I',
                 $stmt->bindParam(2, $coddocumentodet[0]  ,PDO::PARAM_STR);                      //@COD_TABLA='IILMNC0000000495',
                 $stmt->bindParam(3, $coddocumento ,PDO::PARAM_STR);                          //@COD_TABLA_ASOC='IILMFC0000005728',
-                $stmt->bindParam(4, $TXT_TABLA ,PDO::PARAM_STR);                                //@TXT_TABLA='CMP.DOCUMENTO_CTBLE', 
-                $stmt->bindParam(5, $TXT_TABLA ,PDO::PARAM_STR);                                //@TXT_TABLA_ASOC='CMP.DOCUMENTO_CTBLE', 
+                $stmt->bindParam(4, $TXT_TABLA ,PDO::PARAM_STR);                                //@TXT_TABLA='CMP.DOCUMENTO_CTBLE',
+                $stmt->bindParam(5, $TXT_TABLA ,PDO::PARAM_STR);                                //@TXT_TABLA_ASOC='CMP.DOCUMENTO_CTBLE',
                 $stmt->bindParam(6, $TXT_GLOSA  ,PDO::PARAM_STR);                               //@TXT_GLOSA='NOTA DE CREDITO F005-00000420 / ',
                 $stmt->bindParam(7, $vacio  ,PDO::PARAM_STR);                                   //@TXT_TIPO_REFERENCIA='',
                 $stmt->bindParam(8, $vacio  ,PDO::PARAM_STR);                                   //@TXT_REFERENCIA='',
@@ -1750,8 +1751,8 @@ trait LiquidacionGastoTraits
                 $stmt->bindParam(1, $accion ,PDO::PARAM_STR);                                   //@IND_TIPO_OPERACION='I',
                 $stmt->bindParam(2, $coddocumento  ,PDO::PARAM_STR);                      //@COD_TABLA='IILMNC0000000495',
                 $stmt->bindParam(3, $coddocumentodet[0] ,PDO::PARAM_STR);                          //@COD_TABLA_ASOC='IILMFC0000005728',
-                $stmt->bindParam(4, $TXT_TABLA ,PDO::PARAM_STR);                                //@TXT_TABLA='CMP.DOCUMENTO_CTBLE', 
-                $stmt->bindParam(5, $TXT_TABLA ,PDO::PARAM_STR);                                //@TXT_TABLA_ASOC='CMP.DOCUMENTO_CTBLE', 
+                $stmt->bindParam(4, $TXT_TABLA ,PDO::PARAM_STR);                                //@TXT_TABLA='CMP.DOCUMENTO_CTBLE',
+                $stmt->bindParam(5, $TXT_TABLA ,PDO::PARAM_STR);                                //@TXT_TABLA_ASOC='CMP.DOCUMENTO_CTBLE',
                 $stmt->bindParam(6, $TXT_GLOSA  ,PDO::PARAM_STR);                               //@TXT_GLOSA='NOTA DE CREDITO F005-00000420 / ',
                 $stmt->bindParam(7, $vacio  ,PDO::PARAM_STR);                                   //@TXT_TIPO_REFERENCIA='',
                 $stmt->bindParam(8, $vacio  ,PDO::PARAM_STR);                                   //@TXT_REFERENCIA='',
@@ -1768,14 +1769,14 @@ trait LiquidacionGastoTraits
                                             ->where('ITEM','=',$item->ITEM)
                                             ->whereRaw("ISNULL(IND_OSIRIS, 0) <> 1")
                                             ->where('ACTIVO','=','1')->get();
-                                            
+
                 foreach($detdocumentolg as $indexdoc => $itemdoc){
 
-                        $IND_MATERIAL_SERVICIO                  =       'S';                  
+                        $IND_MATERIAL_SERVICIO                  =       'S';
                         $COD_PRODUCTO                           =       $itemdoc->COD_PRODUCTO;
                         $TXT_NOMBRE_PRODUCTO                    =       $itemdoc->TXT_PRODUCTO;
                         $NRO_LINEA                              =       (string)($indexdoc+1);
-                        $CAN_PRODUCTO                           =       $itemdoc->CANTIDAD; 
+                        $CAN_PRODUCTO                           =       $itemdoc->CANTIDAD;
                         $CAN_PRECIO_UNIT_IGV                    =       (string)$itemdoc->TOTAL;
                         $CAN_PRECIO_UNIT                        =       (string)$itemdoc->SUBTOTAL;
                         $COD_ESTADO                             =       '1';
@@ -1786,8 +1787,8 @@ trait LiquidacionGastoTraits
                         $stmt->bindParam(1, $accion ,PDO::PARAM_STR);                                   //@IND_TIPO_OPERACION='I',
                         $stmt->bindParam(2, $coddocumentodet[0]  ,PDO::PARAM_STR);                      //@COD_TABLA='IILMVR0000002923',
                         $stmt->bindParam(3, $COD_PRODUCTO ,PDO::PARAM_STR);                             //@COD_PRODUCTO='PRD0000000016186',
-                        $stmt->bindParam(4, $vacio ,PDO::PARAM_STR);                                    //@COD_LOTE='0000000000000000', 
-                        $stmt->bindParam(5, $NRO_LINEA ,PDO::PARAM_STR);                                //@NRO_LINEA=1, 
+                        $stmt->bindParam(4, $vacio ,PDO::PARAM_STR);                                    //@COD_LOTE='0000000000000000',
+                        $stmt->bindParam(5, $NRO_LINEA ,PDO::PARAM_STR);                                //@NRO_LINEA=1,
                         $stmt->bindParam(6, $TXT_NOMBRE_PRODUCTO  ,PDO::PARAM_STR);                     //@TXT_NOMBRE_PRODUCTO='ARROCILLO DE ARROZ AÑEJO X 50 KG',
                         $stmt->bindParam(7, $vacio  ,PDO::PARAM_STR);                                   //@TXT_DETALLE_PRODUCTO='',
                         $stmt->bindParam(8, $CAN_PRODUCTO  ,PDO::PARAM_STR);                            //@CAN_PRODUCTO=1.0000,
@@ -1798,9 +1799,9 @@ trait LiquidacionGastoTraits
 
                         $stmt->bindParam(11, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PESO_PRODUCTO=50.0000,
                         $stmt->bindParam(12, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_PESO_ENVIADO=0,
-                        $stmt->bindParam(13, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PESO_INGRESO=0, 
-                        $stmt->bindParam(14, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PESO_SALIDA=0, 
-                        $stmt->bindParam(15, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PESO_BRUTO=0, 
+                        $stmt->bindParam(13, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PESO_INGRESO=0,
+                        $stmt->bindParam(14, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PESO_SALIDA=0,
+                        $stmt->bindParam(15, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PESO_BRUTO=0,
                         $stmt->bindParam(16, $valor_cero  ,PDO::PARAM_STR);                             //@CAM_PESO_TARA=0,
                         $stmt->bindParam(17, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_PESO_NETO=0,
                         $stmt->bindParam(18, $valor_cero  ,PDO::PARAM_STR);                           //@CAN_TASA_IGV=0.1800,
@@ -1810,10 +1811,10 @@ trait LiquidacionGastoTraits
 
                         $stmt->bindParam(21, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PRECIO_ORIGEN=0,
                         $stmt->bindParam(22, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_PRECIO_COSTO=2.0000,
-                        $stmt->bindParam(23, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PRECIO_BRUTO=0, 
+                        $stmt->bindParam(23, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PRECIO_BRUTO=0,
                         $stmt->bindParam(24, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PRECIO_KILOS=0,
-                        $stmt->bindParam(25, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PRECIO_SACOS=0, 
-                        $stmt->bindParam(26, $CAN_PRECIO_UNIT  ,PDO::PARAM_STR);                        //@CAN_VALOR_VTA=2.0000, 
+                        $stmt->bindParam(25, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PRECIO_SACOS=0,
+                        $stmt->bindParam(26, $CAN_PRECIO_UNIT  ,PDO::PARAM_STR);                        //@CAN_VALOR_VTA=2.0000,
                         $stmt->bindParam(27, $CAN_PRECIO_UNIT_IGV  ,PDO::PARAM_STR);                    //@CAN_VALOR_VENTA_IGV=2.0000,
                         $stmt->bindParam(28, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_KILOS=0,
                         $stmt->bindParam(29, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_SACOS=0,
@@ -1823,10 +1824,10 @@ trait LiquidacionGastoTraits
 
                         $stmt->bindParam(31, $valor_cero ,PDO::PARAM_STR);                              //@CAN_PORCENTAJE_DESCUENTO=0,
                         $stmt->bindParam(32, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_DESCUENTO=0,
-                        $stmt->bindParam(33, $valor_cero ,PDO::PARAM_STR);                              //@CAN_ADELANTO=0, 
-                        $stmt->bindParam(34, $vacio ,PDO::PARAM_STR);                                   //@TXT_DESCRIPCION='', 
-                        $stmt->bindParam(35, $IND_MATERIAL_SERVICIO ,PDO::PARAM_STR);                   //@IND_MATERIAL_SERVICIO='M' 
-                        $stmt->bindParam(36, $valor_cero  ,PDO::PARAM_STR);                             //@IND_IGV=0, 
+                        $stmt->bindParam(33, $valor_cero ,PDO::PARAM_STR);                              //@CAN_ADELANTO=0,
+                        $stmt->bindParam(34, $vacio ,PDO::PARAM_STR);                                   //@TXT_DESCRIPCION='',
+                        $stmt->bindParam(35, $IND_MATERIAL_SERVICIO ,PDO::PARAM_STR);                   //@IND_MATERIAL_SERVICIO='M'
+                        $stmt->bindParam(36, $valor_cero  ,PDO::PARAM_STR);                             //@IND_IGV=0,
                         $stmt->bindParam(37, $vacio  ,PDO::PARAM_STR);                                  //@COD_ALMACEN='',
                         $stmt->bindParam(38, $vacio  ,PDO::PARAM_STR);                                  //@TXT_ALMACEN='',
                         $stmt->bindParam(39, $vacio  ,PDO::PARAM_STR);                                  //@COD_OPERACION='',
@@ -1834,10 +1835,10 @@ trait LiquidacionGastoTraits
 
                         $stmt->bindParam(41, $vacio ,PDO::PARAM_STR);                                   //@COD_EMPR_SERV='',
                         $stmt->bindParam(42, $vacio  ,PDO::PARAM_STR);                                  //@TXT_EMPR_SERV='',
-                        $stmt->bindParam(43, $vacio ,PDO::PARAM_STR);                                   //@NRO_CONTRATO_SERV='', 
-                        $stmt->bindParam(44, $vacio ,PDO::PARAM_STR);                                   //@NRO_CONTRATO_CULTIVO_SERV='', 
-                        $stmt->bindParam(45, $vacio ,PDO::PARAM_STR);                                   //@NRO_HABILITACION_SERV='', 
-                        $stmt->bindParam(46, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_PRECIO_EMPR_SERV=0, 
+                        $stmt->bindParam(43, $vacio ,PDO::PARAM_STR);                                   //@NRO_CONTRATO_SERV='',
+                        $stmt->bindParam(44, $vacio ,PDO::PARAM_STR);                                   //@NRO_CONTRATO_CULTIVO_SERV='',
+                        $stmt->bindParam(45, $vacio ,PDO::PARAM_STR);                                   //@NRO_HABILITACION_SERV='',
+                        $stmt->bindParam(46, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_PRECIO_EMPR_SERV=0,
                         $stmt->bindParam(47, $vacio  ,PDO::PARAM_STR);                                  //@NRO_CONTRATO_GRUPO='',
                         $stmt->bindParam(48, $vacio  ,PDO::PARAM_STR);                                  //@NRO_CONTRATO_CULTIVO_GRUPO='',
                         $stmt->bindParam(49, $vacio  ,PDO::PARAM_STR);                                  //@NRO_HABILITACION_GRUPO='',
@@ -1845,10 +1846,10 @@ trait LiquidacionGastoTraits
 
                         $stmt->bindParam(51, $vacio ,PDO::PARAM_STR);                                   //@COD_USUARIO_INGRESO='',
                         $stmt->bindParam(52, $vacio  ,PDO::PARAM_STR);                                  //@COD_USUARIO_SALIDA='',
-                        $stmt->bindParam(53, $vacio ,PDO::PARAM_STR);                                   //@TXT_GLOSA_PESO_IN='', 
-                        $stmt->bindParam(54, $vacio ,PDO::PARAM_STR);                                   //@TXT_GLOSA_PESO_OUT='', 
-                        $stmt->bindParam(55, $vacio ,PDO::PARAM_STR);                                   //@COD_CONCEPTO_CENTRO_COSTO='IICHCC0000000002', 
-                        $stmt->bindParam(56, $vacio  ,PDO::PARAM_STR);                                  //@TXT_CONCEPTO_CENTRO_COSTO='ACOPIO', 
+                        $stmt->bindParam(53, $vacio ,PDO::PARAM_STR);                                   //@TXT_GLOSA_PESO_IN='',
+                        $stmt->bindParam(54, $vacio ,PDO::PARAM_STR);                                   //@TXT_GLOSA_PESO_OUT='',
+                        $stmt->bindParam(55, $vacio ,PDO::PARAM_STR);                                   //@COD_CONCEPTO_CENTRO_COSTO='IICHCC0000000002',
+                        $stmt->bindParam(56, $vacio  ,PDO::PARAM_STR);                                  //@TXT_CONCEPTO_CENTRO_COSTO='ACOPIO',
                         $stmt->bindParam(57, $TXT_TABLA  ,PDO::PARAM_STR);                                  //@TXT_REFERENCIA='',
                         $stmt->bindParam(58, $coddocumentodet[0]  ,PDO::PARAM_STR);                                  //@TXT_TIPO_REFERENCIA='',
                         $stmt->bindParam(59, $vacio  ,PDO::PARAM_STR);                                  //@IND_COSTO_ARBITRARIO='',
@@ -1856,9 +1857,9 @@ trait LiquidacionGastoTraits
 
                         $stmt->bindParam(61, $COD_USUARIO_REGISTRO ,PDO::PARAM_STR);                     //@COD_USUARIO_REGISTRO='PHORNALL',
                         $stmt->bindParam(62, $vacio  ,PDO::PARAM_STR);                                  //@COD_TIPO_ESTADO='',
-                        $stmt->bindParam(63, $vacio ,PDO::PARAM_STR);                                   //@TXT_TIPO_ESTADO='', 
-                        $stmt->bindParam(64, $vacio ,PDO::PARAM_STR);                                   //@TXT_GLOSA_ASIENTO='', 
-                        $stmt->bindParam(65, $vacio ,PDO::PARAM_STR);                                   //@TXT_CUENTA_CONTABLE='', 
+                        $stmt->bindParam(63, $vacio ,PDO::PARAM_STR);                                   //@TXT_TIPO_ESTADO='',
+                        $stmt->bindParam(64, $vacio ,PDO::PARAM_STR);                                   //@TXT_GLOSA_ASIENTO='',
+                        $stmt->bindParam(65, $vacio ,PDO::PARAM_STR);                                   //@TXT_CUENTA_CONTABLE='',
                         $stmt->bindParam(66, $vacio  ,PDO::PARAM_STR);                                  //@COD_ASIENTO_PROVISION='',
                         $stmt->bindParam(67, $vacio  ,PDO::PARAM_STR);                                  //@COD_ASIENTO_EXTORNO='',
                         $stmt->bindParam(68, $vacio  ,PDO::PARAM_STR);                                  //@COD_ASIENTO_CANJE='',
@@ -1867,10 +1868,10 @@ trait LiquidacionGastoTraits
 
                         $stmt->bindParam(71, $vacio ,PDO::PARAM_STR);                                   //@TXT_SERIE_DOCUMENTO='',
                         $stmt->bindParam(72, $vacio  ,PDO::PARAM_STR);                                  //@TXT_NUMERO_DOCUMENTO='',
-                        $stmt->bindParam(73, $vacio ,PDO::PARAM_STR);                                   //@COD_GASTO_FUNCION='', 
-                        $stmt->bindParam(74, $vacio ,PDO::PARAM_STR);                                   //@COD_CENTRO_COSTO='', 
-                        $stmt->bindParam(75, $vacio ,PDO::PARAM_STR);                                   //@COD_ORDEN_COMPRA='', 
-                        $stmt->bindParam(76, $fecha_ilimitada  ,PDO::PARAM_STR);                        //@FEC_FECHA_SERV='1901-01-01', 
+                        $stmt->bindParam(73, $vacio ,PDO::PARAM_STR);                                   //@COD_GASTO_FUNCION='',
+                        $stmt->bindParam(74, $vacio ,PDO::PARAM_STR);                                   //@COD_CENTRO_COSTO='',
+                        $stmt->bindParam(75, $vacio ,PDO::PARAM_STR);                                   //@COD_ORDEN_COMPRA='',
+                        $stmt->bindParam(76, $fecha_ilimitada  ,PDO::PARAM_STR);                        //@FEC_FECHA_SERV='1901-01-01',
                         $stmt->bindParam(77, $vacio  ,PDO::PARAM_STR);                                  //@COD_CATEGORIA_TIPO_SERV_ORDEN='',
                         $stmt->bindParam(78, $vacio  ,PDO::PARAM_STR);                                  //@IND_GASTO_COSTO=' ',
                         $stmt->bindParam(79, $valor_cero  ,PDO::PARAM_STR);                             //@CAN_PORCENTAJE_PERCEPCION=0,
@@ -1884,7 +1885,7 @@ trait LiquidacionGastoTraits
 
 
     private function lg_combo_trabajador_fe_documento($todo) {
-            
+
         $array                      =   LqgLiquidacionGasto::select(DB::raw('COD_EMPRESA_TRABAJADOR,TXT_EMPRESA_TRABAJADOR'))
                                         ->groupBy('TXT_EMPRESA_TRABAJADOR')
                                         ->groupBy('COD_EMPRESA_TRABAJADOR')
@@ -1897,7 +1898,7 @@ trait LiquidacionGastoTraits
         }else{
             $combo                  =   $array;
         }
-        return  $combo;                             
+        return  $combo;
     }
 
 
@@ -2193,7 +2194,7 @@ trait LiquidacionGastoTraits
                                 'TOTAL'=> $detdocumentolg->SUM('TOTAL'),
                                 'SUBTOTAL'=> $detdocumentolg->SUM('SUBTOTAL'),
                                 'IGV'=> $detdocumentolg->SUM('IGV')
-                            ]);                   
+                            ]);
     }
 
 
@@ -2211,7 +2212,7 @@ trait LiquidacionGastoTraits
                                 'TOTAL'=> $detdocumentolg->SUM('TOTAL'),
                                 'SUBTOTAL'=> $detdocumentolg->SUM('SUBTOTAL'),
                                 'IGV'=> $detdocumentolg->SUM('IGV')
-                            ]);                   
+                            ]);
     }
 
 
@@ -2243,7 +2244,7 @@ trait LiquidacionGastoTraits
                                 'TOTAL'=> $detdocumentolg->SUM('TOTAL'),
                                 'SUBTOTAL'=> $detdocumentolg->SUM('SUBTOTAL'),
                                 'IGV'=> $detdocumentolg->SUM('IGV')
-                            ]);                   
+                            ]);
     }
 
 
@@ -2260,7 +2261,7 @@ trait LiquidacionGastoTraits
                                 'TOTAL'=> $detdocumentolg->SUM('TOTAL'),
                                 'SUBTOTAL'=> $detdocumentolg->SUM('SUBTOTAL'),
                                 'IGV'=> $detdocumentolg->SUM('IGV')
-                            ]);                   
+                            ]);
     }
 
     private function lg_combo_costo_xtrabajador_tercero($titulo,$txt_referencia) {
@@ -2275,7 +2276,7 @@ trait LiquidacionGastoTraits
                         ->toArray();
 
         $combo      =       array('' => $titulo) + $array;
-        return  $combo;                    
+        return  $combo;
     }
 
     private function lg_combo_costo_xtrabajador_tercero_nombre($titulo,$txt_referencia) {
@@ -2290,7 +2291,7 @@ trait LiquidacionGastoTraits
                         ->toArray();
 
         $combo      =       array('' => $titulo) + $array;
-        return  $combo;                    
+        return  $combo;
     }
 
 
@@ -2307,7 +2308,7 @@ trait LiquidacionGastoTraits
                         ->toArray();
 
         $combo      =       array('' => $titulo) + $array;
-        return  $combo;                    
+        return  $combo;
     }
 
 
@@ -2322,7 +2323,7 @@ trait LiquidacionGastoTraits
                             ->toArray();
 
         $combo      =       array('' => $titulo) + $array;
-        return  $combo;                    
+        return  $combo;
     }
 
     private function lg_combo_gasto($titulo) {
@@ -2337,7 +2338,7 @@ trait LiquidacionGastoTraits
                             ->toArray();
 
         $combo      =       array('' => $titulo) + $array;
-        return  $combo;                    
+        return  $combo;
     }
 
     private function lg_combo_flujo($titulo) {
@@ -2351,7 +2352,7 @@ trait LiquidacionGastoTraits
                             ->toArray();
 
         $combo      =       array('' => $titulo) + $array;
-        return  $combo;                    
+        return  $combo;
     }
 
 
@@ -2361,7 +2362,7 @@ trait LiquidacionGastoTraits
                             ->pluck('TXT_TIPO_DOCUMENTO','COD_TIPO_DOCUMENTO')
                             ->toArray();
         $combo      =       array('' => $titulo) + $array;
-        return  $combo;                    
+        return  $combo;
     }
 
 
@@ -2370,7 +2371,7 @@ trait LiquidacionGastoTraits
                             ->pluck('TXT_TIPO_DOCUMENTO','COD_TIPO_DOCUMENTO')
                             ->toArray();
         $combo      =       array('' => $titulo) + $array;
-        return  $combo;                    
+        return  $combo;
     }
 
 
@@ -2398,7 +2399,7 @@ trait LiquidacionGastoTraits
 
         $combo                  =   array('' => $titulo) + $array;
 
-        return  $combo;                    
+        return  $combo;
     }
 
 
@@ -2425,7 +2426,7 @@ trait LiquidacionGastoTraits
 
         $combo                  =   array('' => $titulo) + $array;
 
-        return  $combo;                    
+        return  $combo;
     }
 
     private function lg_cuenta_top_1($titulo,$todo,$tipocontrato,$centro_id,$empresa_id) {
@@ -2453,7 +2454,7 @@ trait LiquidacionGastoTraits
             $valor                          = $array->COD_CONTRATO;
         }
 
-        return  $valor;                    
+        return  $valor;
     }
 
 
@@ -2476,7 +2477,7 @@ trait LiquidacionGastoTraits
 
         $combo                  =   array('' => $titulo) + $array;
 
-        return  $combo;                    
+        return  $combo;
     }
 
     private function lg_combo_cuenta_lg_nuevo($titulo,$todo,$tipocontrato,$centro_id,$empresa_id) {
@@ -2498,7 +2499,7 @@ trait LiquidacionGastoTraits
 
         $combo                  =   array('' => $titulo) + $array;
 
-        return  $combo;                    
+        return  $combo;
     }
 
 
@@ -2523,7 +2524,7 @@ trait LiquidacionGastoTraits
 
         $combo                  =   array('' => $titulo) + $array;
 
-        return  $combo;                    
+        return  $combo;
     }
 
 
@@ -2542,7 +2543,7 @@ trait LiquidacionGastoTraits
             $valor = $array->COD_CONTRATO;
         }
 
-        return  $valor;                    
+        return  $valor;
     }
 
 
@@ -2561,7 +2562,7 @@ trait LiquidacionGastoTraits
 
         $combo      =   array('' => $titulo) + $array;
 
-        return  $combo;                    
+        return  $combo;
     }
 
 
@@ -2578,7 +2579,7 @@ trait LiquidacionGastoTraits
 
         $combo      =   array('' => $titulo) + $array;
 
-        return  $combo;                    
+        return  $combo;
     }
 
 
@@ -2602,7 +2603,7 @@ trait LiquidacionGastoTraits
                                             ->whereNotIn('TBL.COD_CATEGORIA_ESTADO_CONTRATO', ['ECO0000000000005', 'ECO0000000000006'])
                                             ->first();
 
-        return  $cuenta;                    
+        return  $cuenta;
     }
 
 

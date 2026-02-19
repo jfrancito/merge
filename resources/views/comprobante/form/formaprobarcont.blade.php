@@ -13,7 +13,7 @@
         @include('comprobante.form.ordencompra.ordeningreso')
     </div>
     <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-        @include('comprobante.form.ordencompra.seguimiento')
+        @include('comprobante.form.ordencompra.seguimientocontabilidad')
     </div>
 </div>
 <div class="row">

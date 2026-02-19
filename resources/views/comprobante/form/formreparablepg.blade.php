@@ -4,6 +4,7 @@
         <input type="text" disabled class="form-control control input-sm" value="{{ $ordencompra->TXT_EMPR_EMISOR }}">
     </div>
 </div>
+
 <div class="form-group">
     <label class="col-sm-3 control-label">Codigo Orden:</label>
     <div class="col-sm-6">
@@ -19,7 +20,6 @@
     </div>
 </div>
 
-
 <div class="form-group">
     <label class="col-sm-3 control-label">Usario Contacto:</label>
     <div class="col-sm-6">
@@ -27,7 +27,6 @@
                value="{{$trabajador->TXT_APE_PATERNO}} {{$trabajador->TXT_APE_MATERNO}} {{$trabajador->TXT_NOMBRES}}">
     </div>
 </div>
-
 
 <div class="form-group">
     <label class="col-sm-3 control-label labelleft negrita">Reparable :</label>
@@ -70,7 +69,9 @@
     </div>
 </div>
 
-
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    @include('comprobante.asiento.contenedorasientoreparable')
+</div>
 
 <div class="row xs-pt-15">
     <div class="col-xs-6">

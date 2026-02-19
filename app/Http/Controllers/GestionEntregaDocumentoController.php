@@ -659,7 +659,7 @@ class GestionEntregaDocumentoController extends Controller
             }
         }
 
-        //dd($listadatossoles);
+        //dd($listadatossolesotro);
         //COD_CATEGORIA_MONEDA
 
         $operacion_id           =   $folio->OPERACION;
@@ -795,7 +795,6 @@ class GestionEntregaDocumentoController extends Controller
             }
         }
 
-        //dd($folio->COD_CATEGORIA_MONEDA);
         //COD_CATEGORIA_MONEDA
 
         $operacion_id           =   $folio->OPERACION;
@@ -879,6 +878,143 @@ class GestionEntregaDocumentoController extends Controller
                             });
 
                     $sheet->loadView('entregadocumento/excel/eentregable')->with('listadatos',$listadatosdolar)
+                                                                          ->with('listadatosotro',$listadatosdolarotro)
+                                                                          ->with('funcion',$funcion)
+                                                                           ->with('folio',$folio)
+                                                                           ->with('empresa',$empresa)
+                                                                           ->with('simbolo','$')
+                                                                          ->with('operacion_id',$operacion_id);       
+                });
+            }
+
+        })->setActiveSheetIndex(0)->export('xls');
+
+
+    }
+
+
+    public function actionDescargarDocumentoLCAFolio($folio_codigo)
+    {
+
+        $folio                  =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
+                                    ->where('FOLIO','=',$folio_codigo)->first();
+
+        $listadatossolesotro    =   array();
+        $listadatosdolarotro    =   array();
+
+        if($folio->OPERACION=='ORDEN_COMPRA'){
+            $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda($folio->FOLIO,'MON0000000000001');
+            //dd($listadatossoles);
+            $listadatosdolar    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda($folio->FOLIO,'MON0000000000002');
+            $listadatossolesotro=   $this->con_lista_cabecera_comprobante_entregable_estiba_modal_moneda_union($folio->FOLIO,'MON0000000000001');
+            $listadatosdolarotro=   $this->con_lista_cabecera_comprobante_entregable_estiba_modal_moneda_union($folio->FOLIO,'MON0000000000002');
+
+        }else{
+            if($folio->OPERACION=='CONTRATO'){
+                $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_contrato_modal_moneda($folio->FOLIO,'MON0000000000001');
+                $listadatosdolar    =   $this->con_lista_cabecera_comprobante_entregable_contrato_modal_moneda($folio->FOLIO,'MON0000000000002');
+            }else{
+
+
+                if($folio->OPERACION=='LIQUIDACION_COMPRA_ANTICIPO'){
+                    $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda_lca($folio->FOLIO,'MON0000000000001');
+                    $listadatosdolar    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda_lca($folio->FOLIO,'MON0000000000002');
+                }else{
+                    $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda($folio->FOLIO,'MON0000000000001');
+                    $listadatosdolar    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda($folio->FOLIO,'MON0000000000002');
+                    $listadatossolesotro=   $this->con_lista_cabecera_comprobante_entregable_estiba_modal_moneda_union($folio->FOLIO,'MON0000000000001');
+                    $listadatosdolarotro=   $this->con_lista_cabecera_comprobante_entregable_estiba_modal_moneda_union($folio->FOLIO,'MON0000000000002');
+                }
+
+
+            }
+        }
+
+        //dd($listadatossoles);
+        //dd($folio->COD_CATEGORIA_MONEDA);
+        //COD_CATEGORIA_MONEDA
+
+        $operacion_id           =   $folio->OPERACION;
+        $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
+        $titulo                 =   'FOLIO('.$folio_codigo.') '.$empresa->NOM_EMPR;
+        $funcion                =   $this;
+
+        Excel::create($titulo, function($excel) use ($listadatossoles,$listadatosdolar,$listadatossolesotro,$listadatosdolarotro,$operacion_id,$funcion,$folio,$empresa) {
+
+            if($folio->COD_CATEGORIA_MONEDA=='MON0000000000001' or $folio->COD_CATEGORIA_MONEDA==''){
+
+
+                $excel->sheet('Soles', function($sheet) use ($listadatossoles,$listadatossolesotro,$operacion_id,$funcion,$folio,$empresa){
+
+                    $sheet->setSelectedCells('C1');
+
+                    $sheet->setWidth('A', 8);
+                    $sheet->setWidth('B', 20);
+                    $sheet->setWidth('C', 20);
+                    $sheet->setWidth('D', 40);
+                    $sheet->setWidth('E', 40);
+                    $sheet->setWidth('F', 30);
+                    $sheet->setWidth('G', 30);
+                    $sheet->setWidth('H', 30);
+                    $sheet->setWidth('I', 20);
+                    $sheet->setWidth('J', 20);
+                    $sheet->setWidth('K', 20);
+                    $sheet->setWidth('L', 30);
+                    $sheet->setWidth('M', 20);
+                    $sheet->setWidth('N', 20);
+                    $sheet->setWidth('O', 20);
+
+
+                    $sheet->mergeCells('B2:C2');
+                    $sheet->mergeCells('B3:C3');
+                    $sheet->mergeCells('B4:C4');
+                    $sheet->mergeCells('B5:C5');
+                    $sheet->mergeCells('B6:C6');
+                    $sheet->mergeCells('B7:C7');
+
+                    $sheet->cell('A1', function($cell) {
+                                $cell->setFontColor('#FFFFFF');   // Texto blanco
+                            });
+
+                    $sheet->loadView('entregadocumento/excel/eentregablelca')->with('listadatos',$listadatossoles)
+                                                                          ->with('listadatosotro',$listadatossolesotro)
+                                                                          ->with('funcion',$funcion)
+                                                                          ->with('folio',$folio)
+                                                                          ->with('empresa',$empresa)
+                                                                          ->with('simbolo','S/.')
+                                                                          ->with('operacion_id',$operacion_id);         
+                });
+            }
+            if($folio->COD_CATEGORIA_MONEDA=='MON0000000000002' or $folio->COD_CATEGORIA_MONEDA==''){
+                $excel->sheet('Dolares', function($sheet) use ($listadatosdolar,$listadatosdolarotro,$operacion_id,$funcion,$folio,$empresa){
+
+                    $sheet->setWidth('A', 8);
+                    $sheet->setWidth('B', 20);
+                    $sheet->setWidth('C', 20);
+                    $sheet->setWidth('D', 40);
+                    $sheet->setWidth('E', 40);
+                    $sheet->setWidth('F', 30);
+                    $sheet->setWidth('G', 30);
+                    $sheet->setWidth('H', 30);
+                    $sheet->setWidth('I', 20);
+                    $sheet->setWidth('J', 20);
+                    $sheet->setWidth('K', 20);
+                    $sheet->setWidth('L', 30);
+                    $sheet->setWidth('M', 20);
+                    $sheet->setWidth('N', 20);
+                    $sheet->setWidth('O', 20);
+                    $sheet->mergeCells('B2:C2');
+                    $sheet->mergeCells('B3:C3');
+                    $sheet->mergeCells('B4:C4');
+                    $sheet->mergeCells('B5:C5');
+                    $sheet->mergeCells('B6:C6');
+                    $sheet->mergeCells('B7:C7');
+
+                    $sheet->cell('A1', function($cell) {
+                                $cell->setFontColor('#FFFFFF');   // Texto blanco
+                            });
+
+                    $sheet->loadView('entregadocumento/excel/eentregablelca')->with('listadatos',$listadatosdolar)
                                                                           ->with('listadatosotro',$listadatosdolarotro)
                                                                           ->with('funcion',$funcion)
                                                                            ->with('folio',$folio)

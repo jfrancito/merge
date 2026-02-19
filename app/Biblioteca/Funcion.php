@@ -20,6 +20,41 @@ use table;
 class Funcion {
 
 
+
+	public function ver_virtual_color($id_documento,$tipo_archivo){
+
+		$color = 	'';
+		$lote 	= 	DB::table('CMP.DOC_ASOCIAR_COMPRA')
+					->where('COD_ORDEN', $id_documento)
+					->where('COD_CATEGORIA_DOCUMENTO', $tipo_archivo)
+					->where('TXT_ASIGNADO','like' ,'ARCHIVO_%')
+					->first();
+
+		if(count($lote)>0){
+			$color = 	'color_virtual';
+		}
+		
+		return $color;
+	}
+
+
+	public function cuenta_osiris_lca_folio($id_documento){
+
+		$nombre = 	'';
+
+
+		$lote 	= 	DB::table('TES.AUTORIZACION')
+					->where('COD_AUTORIZACION', $id_documento)
+					->first();
+
+		if(count($lote)>0){
+			$nombre = 	$lote->TXT_EMPRESA;
+		}
+		
+		return $nombre;
+	}
+
+
 	public function cuenta_osiris_lca($id_documento){
 
 		$nombre = 	'';

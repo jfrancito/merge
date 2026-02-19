@@ -25,6 +25,8 @@
         <th>CENTRO COSTO</th>
         <th>GLOSA</th>
         <th>USUARIO REGISTRO</th>
+        <th>AUTORIZA</th>
+
     </tr>
     </thead>
     <tbody>
@@ -57,6 +59,7 @@
             <td>{{ $item['CENTRO_COSTO'] }}</td>
             <td>{{ $item['GLOSA'] }}</td>
             <td>{{ $item['USUARIO_REGISTRO'] }}</td>
+            <td>{{ $item['AUTORIZA'] }}</td>            
         </tr>
         @php
             $total_monto += $item['MONTO_DOCUMENTO_SOLES'];
@@ -67,7 +70,7 @@
     @if($total_monto > 0)
         <tfoot>
         <tr style="background: #4285f4; color: white; text-align: left">
-            <th colspan="15" class="center footerho">TOTAL</th>
+            <th colspan="16" class="center footerho">TOTAL</th>
             <th class="align-right-tb">{{ number_format($total_monto, 2, '.', ',') }}</th>
             <th colspan="3"></th>
         </tr>

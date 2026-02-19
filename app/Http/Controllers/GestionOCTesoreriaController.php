@@ -330,14 +330,13 @@ class GestionOCTesoreriaController extends Controller
                 $documento_asociados = $this->gn_lista_comision_asociados($lotes);
                 $documento_top = $this->gn_lista_comision_asociados_top($lotes);
 
-
                 FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)
                     ->update(
                         [
                             'ARCHIVO_CDR' => '',
                             'ARCHIVO_PDF' => '',
-                            'COD_ESTADO' => 'ETM0000000000008',
-                            'TXT_ESTADO' => 'TERMINADA',
+                            'COD_ESTADO' => 'ETM0000000000003',
+                            'TXT_ESTADO' => 'POR APROBAR CONTABILIDAD',
                             'dni_usuariocontacto' => $trabajador->NRO_DOCUMENTO,
                             'COD_CONTACTO' => $contacto->COD_TRABAJADOR,
                             'CODIGO_CDR' => $codigocdr,
@@ -431,6 +430,7 @@ class GestionOCTesoreriaController extends Controller
                             ->pluck('ID_DOCUMENTO')
                             ->toArray();
                         $documento_asociados = $this->gn_lista_comision_asociados_atendidos($lotes, $lote);
+                        //dd($documento_asociados);
                         $total = 0;
                         foreach ($documento_asociados as $index => $item) {
 
@@ -478,7 +478,7 @@ class GestionOCTesoreriaController extends Controller
                         $documento->PORC_DETRACCION         =   0;
                         $documento->MONTO_DETRACCION        =   0;
                         $documento->MONTO_ANTICIPO          =   0;
-                        $documento->NRO_ORDEN_COMP          =   '';              
+                        $documento->NRO_ORDEN_COMP          =   '';
                         $documento->NUM_GUIA                =   '';
                         $documento->estadoCp                =   0;
                         $documento->ARCHIVO_XML             =   '';
@@ -842,7 +842,7 @@ class GestionOCTesoreriaController extends Controller
                     }
 
 
-
+                    /*
                     $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('COD_ESTADO', '<>', 'ETM0000000000006')->first();
                     $anio = $this->anio;
                     $empresa = Session::get('empresas')->COD_EMPR;
@@ -1090,7 +1090,7 @@ class GestionOCTesoreriaController extends Controller
 
                     } else {
                         $respuesta = 'GENERACIÓN INCORRECTA ASIENTO';
-                    }
+                    }*/
 
                     DB::commit();
                 } catch (\Exception $ex) {
@@ -1387,7 +1387,7 @@ class GestionOCTesoreriaController extends Controller
             $excel->sheet('COMPROBANTE', function($sheet) use ($listadatos,$titulo,$funcion) {
                 $sheet->loadView('reporte/excel/listacomprobantemasivotesoreriacomision')->with('listadatos',$listadatos)
                                                                    ->with('titulo',$titulo)
-                                                                   ->with('funcion',$funcion);                                               
+                                                                   ->with('funcion',$funcion);
             });
         })->export('xls');
 
@@ -1521,7 +1521,7 @@ class GestionOCTesoreriaController extends Controller
             'DOCUMENTO_INTERNO_PRODUCCION' => 'DOCUMENTO INTERNO PRODUCCION',
             'DOCUMENTO_INTERNO_SECADO' => 'DOCUMENTO INTERNO SECADO',
             'DOCUMENTO_SERVICIO_BALANZA' => 'DOCUMENTO POR SERVICIO DE BALANZA',
-            'DOCUMENTO_INTERNO_COMPRA' => 'DOCUMENTO INTERNO COMPRA',                                     
+            'DOCUMENTO_INTERNO_COMPRA' => 'DOCUMENTO INTERNO COMPRA',
             'LIQUIDACION_COMPRA_ANTICIPO' => 'LIQUIDACION DE COMPRA ANTICIPO',
             'PROVISION_GASTO' => 'PROVISION DE GASTO',
             'NOTA_CREDITO' => 'NOTA DE CREDITO',

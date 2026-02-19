@@ -88,11 +88,6 @@ class ReporteLiquidacionesTrabajadorController extends Controller
                         'size' => 9
                     )
                 ));
-                $sheet->setColumnFormat(array(
-                    'O' => '#,##0.00',
-                    'D' => NumberFormat::FORMAT_DATE_YYYYMMDD,
-                    'K' => NumberFormat::FORMAT_DATE_YYYYMMDD
-                ));
                 $sheet->setAutoSize(true);
                 $sheet->loadView('reporte/administracion/excel/listaliquidacionestrabajador')
                     ->with('funcion', $funcion)

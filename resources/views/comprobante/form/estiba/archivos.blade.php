@@ -13,7 +13,8 @@
           </thead>
           <tbody>
               @foreach($archivos as $index => $item)  
-                <tr>
+                @php $color_virtual =  $funcion->funciones->ver_virtual_color($item->ID_DOCUMENTO,$item->TIPO_ARCHIVO) @endphp
+                <tr class="{{$color_virtual}}">
                   <td>{{$index + 1}}</td>
                   <td>{{$item->DESCRIPCION_ARCHIVO}}</td>
                   <td>{{$item->NOMBRE_ARCHIVO}}</td>

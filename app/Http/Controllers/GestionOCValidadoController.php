@@ -1063,14 +1063,14 @@ class GestionOCValidadoController extends Controller
         // Construir el array de URLs
         $initialPreview = [];
         foreach ($archivospdf as $archivo) {
-            $initialPreview[] = route('serve-fileliquidacioncompraanticipo', ['file' => $archivo->NOMBRE_ARCHIVO]);
+            $initialPreview[] = route('serve-fileordencompraanticipo', ['file' => $archivo->NOMBRE_ARCHIVO]);
         }
         $initialPreviewConfig = [];
         foreach ($archivospdf as $key => $archivo) {
             $initialPreviewConfig[] = [
                 'type'          => "pdf",
                 'caption' => $archivo->NOMBRE_ARCHIVO,
-                'downloadUrl' => route('serve-fileliquidacioncompraanticipo', ['file' => $archivo->NOMBRE_ARCHIVO])
+                'downloadUrl' => route('serve-fileordencompraanticipo', ['file' => $archivo->NOMBRE_ARCHIVO])
             ];
         }
 
@@ -1078,6 +1078,7 @@ class GestionOCValidadoController extends Controller
         $empresa_sel          =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR_CLIENTE)->first();
         $fereftop1            =   FeRefAsoc::where('lote','=',$idoc)->first();
 
+        $funcion              =   $this;
 
         return View::make('comprobante/registrocomprobantevalidadoestibaoca',
                          [
@@ -1088,7 +1089,7 @@ class GestionOCValidadoController extends Controller
                                 'ordencompra'           =>  $ordencompra,
                                 'empresa_relacionada'   =>  $empresa_relacionada,
                                 'ordensalida'           =>  $ordensalida,
-
+                                'funcion'               =>  $funcion,
 
                                 'initialPreview'        => json_encode($initialPreview),
                                 'initialPreviewConfig'  => json_encode($initialPreviewConfig),

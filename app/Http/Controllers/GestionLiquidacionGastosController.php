@@ -5617,7 +5617,9 @@ class GestionLiquidacionGastosController extends Controller
                     ->where('COD_ESTADO', 1)
                     ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
                     ->where('TXT_REFERENCIA_PLANILLA', 'LIKE', '%' . $trabajadorespla->cadarea . '%')
-                    ->where('IND_MOVIMIENTO', 1)->first();
+                    ->where('IND_MOVIMIENTO', 1)
+                    ->first();
+                //DD($trabajadorespla->cadarea);
 
             }
 

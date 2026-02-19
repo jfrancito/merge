@@ -674,6 +674,7 @@ class GestionOCAcopioController extends Controller
                                         ->toArray();
             $documento_asociados    =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->get();
             $documento_top          =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->first();
+            $funciones = $this;
 
             return View::make('acopio/aprobaracopioestiba', 
                             [
@@ -696,6 +697,9 @@ class GestionOCAcopioController extends Controller
                                 'lote'                  =>  $idoc,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+                                
                             ]);
 
 

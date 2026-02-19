@@ -1,6 +1,10 @@
-<div class="panel panel-default panel-contrast">
-    <div class="panel-heading" style="background: #1d3a6d;color: #fff;">
+<div class="panel panel-default panel-contrast pnl-asiento-reparable">
+    <div class="panel-heading"
+         style="background:#1d3a6d; color:#fff; display:flex; justify-content:space-between; align-items:center;">
         <span>GENERACIÓN DE ASIENTOS</span>
+        <button type="button" class="btn btn-lg btn-danger btn-eliminar-asiento">
+            Eliminar Asiento
+        </button>
     </div>
 
     <div class="tab-container">

@@ -53,7 +53,7 @@ class GestionOCAdministracionController extends Controller
     use ComprobanteTraits;
     use WhatsappTraits;
     use ComprobanteProvisionTraits;
-    
+
     public function actionListarComprobanteAdministracion($idopcion,Request $request)
     {
         /******************* validar url **********************/
@@ -95,51 +95,58 @@ class GestionOCAdministracionController extends Controller
                                     );
 
        $array_canjes               =   $this->con_array_canjes();
+
         if($operacion_id=='ORDEN_COMPRA'){
             $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm($cod_empresa);
             $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_obs($cod_empresa);
             $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_obs_levantadas($cod_empresa);
         }else{
 
+            if ($operacion_id == 'ORDEN_COMPRA_ANTICIPO') {
+                $listadatos = $this->con_lista_cabecera_comprobante_oca_total_adm($cod_empresa);
+                $listadatos_obs = $this->con_lista_cabecera_comprobante_oca_total_adm_obs($cod_empresa);
+                $listadatos_obs_le = $this->con_lista_cabecera_comprobante_oca_total_adm_obs_levantadas($cod_empresa);
+            } else {
 
-            if($operacion_id=='CONTRATO'){
-                $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_contrato($cod_empresa);
-                $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_contrato_obs($cod_empresa);
-                $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_contrato_obs_levantadas($cod_empresa);
-            }else{
-                
-                if($operacion_id=='LIQUIDACION_COMPRA_ANTICIPO'){
-                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_liquidacion_compra_anticipo($cod_empresa);
-                    $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_liquidacion_compra_anticipo_obs($cod_empresa);
-                    $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_liquidacion_compra_anticipo_obs_levantadas($cod_empresa);
-                }else{
-                    
-                    if($operacion_id=='NOTA_CREDITO'){
-                        $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_nota_credito($cod_empresa);
-                        $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_nota_credito_obs($cod_empresa);
-                        $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_nota_credito_obs_levantadas($cod_empresa);
-                    }else{
-                        
-                        if($operacion_id=='NOTA_DEBITO'){
-                            $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_nota_debito($cod_empresa);
-                            $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_nota_debito_obs($cod_empresa);
-                            $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_nota_debito_obs_levantadas($cod_empresa);
-                        }else{
-                            
+                if ($operacion_id == 'CONTRATO') {
+                    $listadatos = $this->con_lista_cabecera_comprobante_total_adm_contrato($cod_empresa);
+                    $listadatos_obs = $this->con_lista_cabecera_comprobante_total_adm_contrato_obs($cod_empresa);
+                    $listadatos_obs_le = $this->con_lista_cabecera_comprobante_total_adm_contrato_obs_levantadas($cod_empresa);
+                } else {
 
-                            if($operacion_id=='PROVISION_GASTO'){
-                                $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_pg($cod_empresa);
-                                $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_pg_obs($cod_empresa);
-                                $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_pg_obs_levantadas($cod_empresa);
-                            }else{
-                                
-                                
-                                if (in_array($operacion_id, $array_canjes)) {
-                                    $categoria_id       =   $this->con_categoria_canje($operacion_id);
-                                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_estiba($cod_empresa,$operacion_id);
-                                    $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs($cod_empresa,$operacion_id);
-                                    $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas($cod_empresa,$operacion_id);
+                    if ($operacion_id == 'LIQUIDACION_COMPRA_ANTICIPO') {
+                        $listadatos = $this->con_lista_cabecera_comprobante_total_adm_liquidacion_compra_anticipo($cod_empresa);
+                        $listadatos_obs = $this->con_lista_cabecera_comprobante_total_adm_liquidacion_compra_anticipo_obs($cod_empresa);
+                        $listadatos_obs_le = $this->con_lista_cabecera_comprobante_total_adm_liquidacion_compra_anticipo_obs_levantadas($cod_empresa);
+                    } else {
+
+                        if ($operacion_id == 'NOTA_CREDITO') {
+                            $listadatos = $this->con_lista_cabecera_comprobante_total_adm_nota_credito($cod_empresa);
+                            $listadatos_obs = $this->con_lista_cabecera_comprobante_total_adm_nota_credito_obs($cod_empresa);
+                            $listadatos_obs_le = $this->con_lista_cabecera_comprobante_total_adm_nota_credito_obs_levantadas($cod_empresa);
+                        } else {
+
+                            if ($operacion_id == 'NOTA_DEBITO') {
+                                $listadatos = $this->con_lista_cabecera_comprobante_total_adm_nota_debito($cod_empresa);
+                                $listadatos_obs = $this->con_lista_cabecera_comprobante_total_adm_nota_debito_obs($cod_empresa);
+                                $listadatos_obs_le = $this->con_lista_cabecera_comprobante_total_adm_nota_debito_obs_levantadas($cod_empresa);
+                            } else {
+
+                                if ($operacion_id == 'PROVISION_GASTO') {
+                                    $listadatos = $this->con_lista_cabecera_comprobante_total_adm_pg($cod_empresa);
+                                    $listadatos_obs = $this->con_lista_cabecera_comprobante_total_adm_pg_obs($cod_empresa);
+                                    $listadatos_obs_le = $this->con_lista_cabecera_comprobante_total_adm_pg_obs_levantadas($cod_empresa);
+                                } else {
+
+                                    if (in_array($operacion_id, $array_canjes)) {
+                                        $categoria_id = $this->con_categoria_canje($operacion_id);
+                                        $listadatos = $this->con_lista_cabecera_comprobante_total_adm_estiba($cod_empresa, $operacion_id);
+                                        $listadatos_obs = $this->con_lista_cabecera_comprobante_total_adm_estiba_obs($cod_empresa, $operacion_id);
+                                        $listadatos_obs_le = $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas($cod_empresa, $operacion_id);
+                                    }
+
                                 }
+
 
                             }
 
@@ -149,9 +156,7 @@ class GestionOCAdministracionController extends Controller
 
                     }
 
-
                 }
-
             }
 
         }
@@ -194,31 +199,31 @@ class GestionOCAdministracionController extends Controller
                     $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_contrato_obs($cod_empresa);
                     $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_contrato_obs_levantadas($cod_empresa);
                 }else{
-                    
+
                     if($operacion_id=='LIQUIDACION_COMPRA_ANTICIPO'){
-                        $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_liquidacion_compra_anticipo($cod_empresa);                    
+                        $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_liquidacion_compra_anticipo($cod_empresa);
                         $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_liquidacion_compra_anticipo_obs($cod_empresa);
                         $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_liquidacion_compra_anticipo_obs_levantadas($cod_empresa);
                     }else{
-                        
+
                         if($operacion_id=='NOTA_CREDITO'){
                             $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_nota_credito($cod_empresa);
                             $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_nota_credito_obs($cod_empresa);
                             $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_nota_credito_obs_levantadas($cod_empresa);
                         }else{
-                            
+
                             if($operacion_id=='NOTA_DEBITO'){
                                 $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_nota_debito($cod_empresa);
                                 $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_nota_debito_obs($cod_empresa);
                                 $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_nota_debito_obs_levantadas($cod_empresa);
                             }else{
-                                
+
                                 if($operacion_id=='PROVISION_GASTO'){
                                     $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_pg($cod_empresa);
                                     $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_pg_obs($cod_empresa);
                                     $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_pg_obs_levantadas($cod_empresa);
                                 }else{
-                                    
+
                                     $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_estiba($cod_empresa,$operacion_id);
                                     $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs($cod_empresa,$operacion_id);
                                     $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas($cod_empresa,$operacion_id);
@@ -230,7 +235,7 @@ class GestionOCAdministracionController extends Controller
 
                         }
                     }
-                }  
+                }
             }
         }
         //dd($listadatos);
@@ -247,7 +252,7 @@ class GestionOCAdministracionController extends Controller
                             'listadatos'            =>  $listadatos,
                             'listadatos_obs'    =>  $listadatos_obs,
                             'listadatos_obs_le'    =>  $listadatos_obs_le,
-                            
+
                             'procedencia'           =>  $procedencia,
                             'ajax'                  =>  true,
 
@@ -275,8 +280,8 @@ class GestionOCAdministracionController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
                 $pedido_id          =   $idoc;
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->where('TXT_PROCEDENCIA','<>','SUE')->first();
@@ -285,12 +290,12 @@ class GestionOCAdministracionController extends Controller
 
 
                 if($fedocumento->ind_observacion==1){
-                    DB::rollback(); 
+                    DB::rollback();
                     return Redirect::back()->with('errorurl', 'El documento esta observado no se puede observar');
                 }
 
                 if(count($archivoob)<=0){
-                    DB::rollback(); 
+                    DB::rollback();
                     return Redirect::to('aprobar-comprobante-administracion/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', 'Tiene que seleccionar almenos un item');
                 }
 
@@ -362,11 +367,11 @@ class GestionOCAdministracionController extends Controller
                 DB::commit();
                 return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' OBSERVADO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 return Redirect::to('gestion-de-administracion-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
-        
+
         }
         else{
 
@@ -411,8 +416,8 @@ class GestionOCAdministracionController extends Controller
 
             //dd($totalarchivos);
             //dd($documentoscompra);
-                                        
-            return View::make('comprobante/observaradministracion', 
+
+            return View::make('comprobante/observaradministracion',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
@@ -454,8 +459,8 @@ class GestionOCAdministracionController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
                 $pedido_id          =   $idoc;
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->where('TXT_PROCEDENCIA','<>','SUE')->first();
@@ -465,12 +470,12 @@ class GestionOCAdministracionController extends Controller
 
 
                 if($fedocumento->ind_observacion==1){
-                    DB::rollback(); 
+                    DB::rollback();
                     return Redirect::back()->with('errorurl', 'El documento esta observado no se puede observar');
                 }
 
                 if(count($archivoob)<=0){
-                    DB::rollback(); 
+                    DB::rollback();
                     return Redirect::to('aprobar-comprobante-administracion/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', 'Tiene que seleccionar almenos un item');
                 }
 
@@ -546,14 +551,14 @@ class GestionOCAdministracionController extends Controller
 
                 return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' OBSERVADO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
 
                 Session::flash('operacion_id', 'CONTRATO');
 
                 return Redirect::to('gestion-de-administracion-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
-        
+
         }
         else{
 
@@ -593,8 +598,8 @@ class GestionOCAdministracionController extends Controller
                                         ->pluck('COD_CATEGORIA_DOCUMENTO')
                                         ->toArray();
 
-                                        
-            return View::make('comprobante/observaradministracioncontrato', 
+
+            return View::make('comprobante/observaradministracioncontrato',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
@@ -634,8 +639,8 @@ class GestionOCAdministracionController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
                 $pedido_id          =   $idoc;
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->where('TXT_PROCEDENCIA','<>','SUE')->first();
@@ -645,12 +650,12 @@ class GestionOCAdministracionController extends Controller
 
 
                 if($fedocumento->ind_observacion==1){
-                    DB::rollback(); 
+                    DB::rollback();
                     return Redirect::back()->with('errorurl', 'El documento esta observado no se puede observar');
                 }
 
                 if(count($archivoob)<=0){
-                    DB::rollback(); 
+                    DB::rollback();
                     return Redirect::to('aprobar-comprobante-administracion/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', 'Tiene que seleccionar almenos un item');
                 }
 
@@ -726,15 +731,15 @@ class GestionOCAdministracionController extends Controller
                //                          .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
                //                          .'PROVEEDOR : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'
                //                          .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
-               //                          .'MENSAJE : '.$descripcion.'%0D%0A'; 
+               //                          .'MENSAJE : '.$descripcion.'%0D%0A';
 
-                //dd($trabajador);                        
+                //dd($trabajador);
                 // if(1==0){
                 //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
                 // }else{
                 //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                // }  
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                // }
 
                 DB::commit();
 
@@ -742,14 +747,14 @@ class GestionOCAdministracionController extends Controller
 
                 return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_DOCUMENTO_CTBLE.' OBSERVADO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
 
                 Session::flash('operacion_id', 'NOTA_CREDITO');
 
                 return Redirect::to('gestion-de-administracion-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
-        
+
         }
         else{
 
@@ -765,7 +770,7 @@ class GestionOCAdministracionController extends Controller
             $trabajador             =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
 
             $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
-                                        //->where('IND_OBLIGATORIO','=',1)                                        
+                                        //->where('IND_OBLIGATORIO','=',1)
                                         ->get();
 
 
@@ -788,8 +793,8 @@ class GestionOCAdministracionController extends Controller
                                         ->pluck('COD_CATEGORIA_DOCUMENTO')
                                         ->toArray();
 
-                                        
-            return View::make('comprobante/observaradministracioncontrato', 
+
+            return View::make('comprobante/observaradministracioncontrato',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
@@ -833,8 +838,8 @@ class GestionOCAdministracionController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
                 $pedido_id          =   $idoc;
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->where('TXT_PROCEDENCIA','<>','SUE')->first();
@@ -844,12 +849,12 @@ class GestionOCAdministracionController extends Controller
 
 
                 if($fedocumento->ind_observacion==1){
-                    DB::rollback(); 
+                    DB::rollback();
                     return Redirect::back()->with('errorurl', 'El documento esta observado no se puede observar');
                 }
 
                 if(count($archivoob)<=0){
-                    DB::rollback(); 
+                    DB::rollback();
                     return Redirect::to('aprobar-comprobante-administracion-pg/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', 'Tiene que seleccionar almenos un item');
                 }
 
@@ -925,16 +930,16 @@ class GestionOCAdministracionController extends Controller
 
                 return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_DOCUMENTO_CTBLE.' OBSERVADO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
 
                 Session::flash('operacion_id', 'PROVISION_GASTO');
 
                 return Redirect::to('gestion-de-administracion-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
-        
+
         }
-        
+
     }
 
 
@@ -955,8 +960,8 @@ class GestionOCAdministracionController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
                 $pedido_id          =   $idoc;
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->where('TXT_PROCEDENCIA','<>','SUE')->first();
@@ -966,12 +971,12 @@ class GestionOCAdministracionController extends Controller
 
 
                 if($fedocumento->ind_observacion==1){
-                    DB::rollback(); 
+                    DB::rollback();
                     return Redirect::back()->with('errorurl', 'El documento esta observado no se puede observar');
                 }
 
                 if(count($archivoob)<=0){
-                    DB::rollback(); 
+                    DB::rollback();
                     return Redirect::to('aprobar-comprobante-administracion/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', 'Tiene que seleccionar almenos un item');
                 }
 
@@ -1047,14 +1052,14 @@ class GestionOCAdministracionController extends Controller
 
                 return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_DOCUMENTO_CTBLE.' OBSERVADO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
 
                 Session::flash('operacion_id', 'NOTA_DEBITO');
 
                 return Redirect::to('gestion-de-administracion-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
-        
+
         }
         else{
 
@@ -1070,7 +1075,7 @@ class GestionOCAdministracionController extends Controller
             $trabajador             =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
 
             $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
-                                        //->where('IND_OBLIGATORIO','=',1)                                        
+                                        //->where('IND_OBLIGATORIO','=',1)
                                         ->get();
 
 
@@ -1093,8 +1098,8 @@ class GestionOCAdministracionController extends Controller
                                         ->pluck('COD_CATEGORIA_DOCUMENTO')
                                         ->toArray();
 
-                                        
-            return View::make('comprobante/observaradministracioncontrato', 
+
+            return View::make('comprobante/observaradministracioncontrato',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
@@ -1132,8 +1137,8 @@ class GestionOCAdministracionController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
                 $pedido_id          =   $idoc;
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('TXT_PROCEDENCIA','<>','SUE')->first();
@@ -1141,12 +1146,12 @@ class GestionOCAdministracionController extends Controller
                 $archivoob          =   $request['archivoob'];
 
                 if($fedocumento->ind_observacion==1){
-                    DB::rollback(); 
+                    DB::rollback();
                     return Redirect::back()->with('errorurl', 'El documento esta observado no se puede observar');
                 }
 
                 if(count($archivoob)<=0){
-                    DB::rollback(); 
+                    DB::rollback();
                     return Redirect::to('aprobar-comprobante-administracion/'.$idopcion.'/'.$idoc)->with('errorbd', 'Tiene que seleccionar almenos un item');
                 }
 
@@ -1220,14 +1225,14 @@ class GestionOCAdministracionController extends Controller
 
                 return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$idoc.' OBSERVADO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
 
                 Session::flash('operacion_id', $request['operacion_id']);
 
                 return Redirect::to('gestion-de-administracion-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
-        
+
         }
         else{
 
@@ -1267,8 +1272,8 @@ class GestionOCAdministracionController extends Controller
                                         ->pluck('COD_CATEGORIA_DOCUMENTO')
                                         ->toArray();
 
-                                        
-            return View::make('comprobante/observaradministracioncontrato', 
+
+            return View::make('comprobante/observaradministracioncontrato',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
@@ -1295,8 +1300,8 @@ class GestionOCAdministracionController extends Controller
     public function actionModificarContratos($idopcion, $linea, $prefijo, $idordencompra,Request $request)
     {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
                 $idoc                   =   $this->funciones->decodificarmaestraprefijo_contrato($idordencompra,$prefijo);
                 $ordencompra            =   $this->con_lista_cabecera_comprobante_contrato_idoc_actual($idoc);
@@ -1345,12 +1350,12 @@ class GestionOCAdministracionController extends Controller
                 DB::commit();
                 return Redirect::to('/detalle-comprobante-oc-validado-contrato/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('bienhecho', 'PDF ACTUALIZADO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 return Redirect::to('/detalle-comprobante-oc-validado-contrato/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
-        
-        
+
+
 
     }
 
@@ -1375,8 +1380,8 @@ class GestionOCAdministracionController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
                 $pedido_id          =   $idoc;
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->where('TXT_PROCEDENCIA','<>','SUE')->first();
@@ -1403,7 +1408,7 @@ class GestionOCAdministracionController extends Controller
                 DB::commit();
                 return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' RECOMENDACION CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 return Redirect::to('gestion-de-administracion-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
         }
@@ -1434,8 +1439,8 @@ class GestionOCAdministracionController extends Controller
             $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                         ->pluck('COD_CATEGORIA_DOCUMENTO')
                                         ->toArray();
-     
-            return View::make('comprobante/recomendacionadministracion', 
+
+            return View::make('comprobante/recomendacionadministracion',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
@@ -1475,8 +1480,8 @@ class GestionOCAdministracionController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
                 $pedido_id          =   $idoc;
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->where('TXT_PROCEDENCIA','<>','SUE')->first();
@@ -1506,9 +1511,9 @@ class GestionOCAdministracionController extends Controller
 
                 return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' RECOMENDACION CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 Session::flash('operacion_id', 'CONTRATO');
-                
+
                 return Redirect::to('gestion-de-administracion-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
         }
@@ -1530,8 +1535,8 @@ class GestionOCAdministracionController extends Controller
             $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                         ->pluck('COD_CATEGORIA_DOCUMENTO')
                                         ->toArray();
-     
-            return View::make('comprobante/recomendacionadministracioncontrato', 
+
+            return View::make('comprobante/recomendacionadministracioncontrato',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
@@ -1565,13 +1570,13 @@ class GestionOCAdministracionController extends Controller
             $conts              = 0;
             $contw              = 0;
             $contd              = 0;
-        
+
             //dd("hola");
             foreach($respuesta as $obj){
 
                 $pedido_id          =   $obj['id'];
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->first();
-                if($fedocumento->COD_ESTADO == 'ETM0000000000004'){ 
+                if($fedocumento->COD_ESTADO == 'ETM0000000000004'){
 
 
                     $orden                      =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();
@@ -1603,16 +1608,16 @@ class GestionOCAdministracionController extends Controller
                     $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->first();
 
 
-                    $msjarray[]                             =   array(  "data_0" => $fedocumento->ID_DOCUMENTO, 
-                                                                        "data_1" => 'Comprobante Aprobado', 
+                    $msjarray[]                             =   array(  "data_0" => $fedocumento->ID_DOCUMENTO,
+                                                                        "data_1" => 'Comprobante Aprobado',
                                                                         "tipo" => 'S');
                     $conts                                  =   $conts + 1;
                     $codigo                                 =   $fedocumento->ID_DOCUMENTO;
 
                 }else{
                     /**** ERROR DE PROGRMACION O SINTAXIS ****/
-                    $msjarray[] = array("data_0" => $fedocumento->ID_DOCUMENTO, 
-                                        "data_1" => 'este comprobante ya esta Aprobado', 
+                    $msjarray[] = array("data_0" => $fedocumento->ID_DOCUMENTO,
+                                        "data_1" => 'este comprobante ya esta Aprobado',
                                         "tipo" => 'D');
                     $contd      =   $contd + 1;
 
@@ -1622,16 +1627,16 @@ class GestionOCAdministracionController extends Controller
 
 
             /************** MENSAJES DEL DETALLE PEDIDO  ******************/
-            $msjarray[] = array("data_0" => $conts, 
-                                "data_1" => 'Comprobantes Aprobado', 
+            $msjarray[] = array("data_0" => $conts,
+                                "data_1" => 'Comprobantes Aprobado',
                                 "tipo" => 'TS');
 
-            $msjarray[] = array("data_0" => $contw, 
-                                "data_1" => 'Comprobantes Aprobado', 
-                                "tipo" => 'TW');     
+            $msjarray[] = array("data_0" => $contw,
+                                "data_1" => 'Comprobantes Aprobado',
+                                "tipo" => 'TW');
 
-            $msjarray[] = array("data_0" => $contd, 
-                                "data_1" => 'Comprobantes errados', 
+            $msjarray[] = array("data_0" => $contd,
+                                "data_1" => 'Comprobantes errados',
                                 "tipo" => 'TD');
 
             $msjjson = json_encode($msjarray);
@@ -1639,7 +1644,7 @@ class GestionOCAdministracionController extends Controller
 
             return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('xmlmsj', $msjjson);
 
-        
+
         }
     }
 
@@ -1696,12 +1701,12 @@ class GestionOCAdministracionController extends Controller
             //geolocalización
 
             return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobantes Lote: '.$ordencompra->COD_ORDEN.' EXTORNADA con EXITO');
-        
+
         }
         else{
 
-                  
-            return View::make('comprobante/extornaradministracion', 
+
+            return View::make('comprobante/extornaradministracion',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
@@ -1837,7 +1842,7 @@ class GestionOCAdministracionController extends Controller
                             'area_observacion' => 'ADM'
                         ]
                     );
- 
+
                 DB::commit();
                 Session::flash('operacion_id', $request['operacion_id']);
                 return Redirect::to('/gestion-de-administracion-aprobar/' . $idopcion)->with('bienhecho', 'Comprobante : ' . $lote . ' OBSERVADO CON EXITO');
@@ -2199,8 +2204,8 @@ class GestionOCAdministracionController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
 
                 $fedocumento_ap = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)->where('COD_ESTADO','<>','ETM0000000000004')->first();
@@ -2308,12 +2313,12 @@ class GestionOCAdministracionController extends Controller
                 //geolocalización
 
 
-                $ordencompra        =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();            
+                $ordencompra        =   CMPOrden::where('COD_ORDEN','=',$pedido_id)->first();
 
                 DB::commit();
                 return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_ORDEN.' APROBADO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 return Redirect::to('gestion-de-administracion-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
@@ -2339,7 +2344,7 @@ class GestionOCAdministracionController extends Controller
 
 
             //orden de ingreso
-            $orden_f                =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();   
+            $orden_f                =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
             $conexionbd         = 'sqlsrv';
             if($orden_f->COD_CENTRO == 'CEN0000000000004'){ //rioja
                 $conexionbd         = 'sqlsrv_r';
@@ -2351,11 +2356,11 @@ class GestionOCAdministracionController extends Controller
             $referencia             =   DB::connection($conexionbd)->table('CMP.REFERENCIA_ASOC')->where('COD_TABLA','=',$ordencompra->COD_ORDEN)
                                         ->orderBy('COD_TABLA_ASOC','desc')
                                         ->where('COD_TABLA_ASOC','like','%OI%')->first();
-                                        
+
             $ordeningreso           =   array();
             if(count($referencia)>0){
-                $ordeningreso       =   DB::connection($conexionbd)->table('CMP.ORDEN')->where('COD_ORDEN','=',$referencia->COD_TABLA_ASOC)->first();   
-            }                 
+                $ordeningreso       =   DB::connection($conexionbd)->table('CMP.ORDEN')->where('COD_ORDEN','=',$referencia->COD_TABLA_ASOC)->first();
+            }
 
 
 
@@ -2392,11 +2397,11 @@ class GestionOCAdministracionController extends Controller
 
 
                         if(count($referencia_os)>0){
-                            $ordensalida       =   DB::connection($conexionbd)->table('CMP.ORDEN')->where('COD_ORDEN','=',$referencia_os->COD_TABLA_ASOC)->first(); 
+                            $ordensalida       =   DB::connection($conexionbd)->table('CMP.ORDEN')->where('COD_ORDEN','=',$referencia_os->COD_TABLA_ASOC)->first();
                         }
                     }
                 }
-            }                 
+            }
 
 
             $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
@@ -2440,10 +2445,10 @@ class GestionOCAdministracionController extends Controller
             //dd($initialPreviewConfig);
 
 
+            $funciones = $this;
 
 
-
-            return View::make('comprobante/aprobaradm', 
+            return View::make('comprobante/aprobaradm',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
@@ -2476,6 +2481,10 @@ class GestionOCAdministracionController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
+
                             ]);
 
 
@@ -2491,7 +2500,7 @@ class GestionOCAdministracionController extends Controller
         /******************************************************/
         $idoc                   =   $idordencompra;
         $lote                   =   $idordencompra;
-        $lotes                  =   FeRefAsoc::where('lote','=',$idoc)                                        
+        $lotes                  =   FeRefAsoc::where('lote','=',$idoc)
                                     ->first();
         $idcompra               =   $lotes->ID_DOCUMENTO;
 
@@ -2507,8 +2516,8 @@ class GestionOCAdministracionController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
 
                 $fedocumento_ap = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)->where('COD_ESTADO','<>','ETM0000000000004')->first();
@@ -2615,12 +2624,12 @@ class GestionOCAdministracionController extends Controller
                 $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR ADMINISTRACION');
                 //geolocalización
 
-       
+
 
                 DB::commit();
                 return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$pedido_id.' APROBADO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 return Redirect::to('gestion-de-administracion-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
@@ -2645,7 +2654,7 @@ class GestionOCAdministracionController extends Controller
             //DD($archivospdf);
 
             //orden de ingreso
-            $orden_f                =   CMPOrden::where('COD_ORDEN','=',$idcompra)->first();   
+            $orden_f                =   CMPOrden::where('COD_ORDEN','=',$idcompra)->first();
             $conexionbd         = 'sqlsrv';
             if($orden_f->COD_CENTRO == 'CEN0000000000004'){ //rioja
                 $conexionbd         = 'sqlsrv_r';
@@ -2657,11 +2666,11 @@ class GestionOCAdministracionController extends Controller
             $referencia             =   DB::connection($conexionbd)->table('CMP.REFERENCIA_ASOC')->where('COD_TABLA','=',$ordencompra->COD_ORDEN)
                                         ->orderBy('COD_TABLA_ASOC','desc')
                                         ->where('COD_TABLA_ASOC','like','%OI%')->first();
-                                        
+
             $ordeningreso           =   array();
             if(count($referencia)>0){
-                $ordeningreso       =   DB::connection($conexionbd)->table('CMP.ORDEN')->where('COD_ORDEN','=',$referencia->COD_TABLA_ASOC)->first();   
-            }                 
+                $ordeningreso       =   DB::connection($conexionbd)->table('CMP.ORDEN')->where('COD_ORDEN','=',$referencia->COD_TABLA_ASOC)->first();
+            }
 
 
 
@@ -2698,11 +2707,11 @@ class GestionOCAdministracionController extends Controller
 
 
                         if(count($referencia_os)>0){
-                            $ordensalida       =   DB::connection($conexionbd)->table('CMP.ORDEN')->where('COD_ORDEN','=',$referencia_os->COD_TABLA_ASOC)->first(); 
+                            $ordensalida       =   DB::connection($conexionbd)->table('CMP.ORDEN')->where('COD_ORDEN','=',$referencia_os->COD_TABLA_ASOC)->first();
                         }
                     }
                 }
-            }                 
+            }
 
 
             $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
@@ -2732,23 +2741,24 @@ class GestionOCAdministracionController extends Controller
             // Construir el array de URLs
             $initialPreview = [];
             foreach ($archivospdf as $archivo) {
-                $initialPreview[] = route('serve-fileliquidacioncompraanticipo', ['file' => $archivo->NOMBRE_ARCHIVO]);
+                $initialPreview[] = route('serve-fileordencompraanticipo', ['file' => $archivo->NOMBRE_ARCHIVO]);
             }
             $initialPreviewConfig = [];
             foreach ($archivospdf as $key => $archivo) {
                 $initialPreviewConfig[] = [
                     'type'          => "pdf",
                     'caption' => $archivo->NOMBRE_ARCHIVO,
-                    'downloadUrl' => route('serve-fileliquidacioncompraanticipo', ['file' => $archivo->NOMBRE_ARCHIVO])
+                    'downloadUrl' => route('serve-fileordencompraanticipo', ['file' => $archivo->NOMBRE_ARCHIVO])
                 ];
             }
 
-            $ordencompra          =   CMPOrden::where('COD_ORDEN',$idcompra)->first();  
+            $ordencompra          =   CMPOrden::where('COD_ORDEN',$idcompra)->first();
             $empresa_sel          =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR_CLIENTE)->first();
             $fereftop1            =   FeRefAsoc::where('lote','=',$idoc)->first();
+            $funciones = $this;
 
             //dd($initialPreviewConfig);
-            return View::make('comprobante/aprobaradmoca', 
+            return View::make('comprobante/aprobaradmoca',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'empresa_sel'           =>  $empresa_sel,
@@ -2783,6 +2793,8 @@ class GestionOCAdministracionController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
                             ]);
 
 
@@ -2806,8 +2818,8 @@ class GestionOCAdministracionController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
 
 
@@ -2895,7 +2907,7 @@ class GestionOCAdministracionController extends Controller
 
 
 
-                
+
                 $detalleproducto            =   CMPDetalleProducto::where('CMP.DETALLE_PRODUCTO.COD_ESTADO','=',1)
                                                 ->where('CMP.DETALLE_PRODUCTO.COD_TABLA','=',$pedido_id)
                                                 ->orderBy('NRO_LINEA','ASC')
@@ -2929,7 +2941,7 @@ class GestionOCAdministracionController extends Controller
                 Session::flash('operacion_id', 'CONTRATO');
                 return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_DOCUMENTO_CTBLE.' APROBADO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 Session::flash('operacion_id', 'CONTRATO');
                 return Redirect::to('gestion-de-administracion-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
@@ -2971,14 +2983,14 @@ class GestionOCAdministracionController extends Controller
                                         ->toArray();
 
 
-            //transferencia   
+            //transferencia
             $resultado = '';
             // Verificar si la cadena contiene 'TPS' o 'TPL'
             if (strpos($ordencompra->NRO_ITT, 'TPS') !== false || strpos($ordencompra->NRO_ITT, 'TPL') !== false) {
                 $partes = explode(' / ', $ordencompra->NRO_ITT);
                 $resultado = $partes[0];
             }
-            $transferencia        =   CMPOrden::where('COD_ORDEN','=',$resultado)->first();    
+            $transferencia        =   CMPOrden::where('COD_ORDEN','=',$resultado)->first();
 
 
 
@@ -3012,8 +3024,9 @@ class GestionOCAdministracionController extends Controller
 
 
 
+            $funciones = $this;
 
-            return View::make('comprobante/aprobaradmcontrato', 
+            return View::make('comprobante/aprobaradmcontrato',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
@@ -3040,6 +3053,9 @@ class GestionOCAdministracionController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 
@@ -3063,8 +3079,8 @@ class GestionOCAdministracionController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
 
 
@@ -3088,7 +3104,7 @@ class GestionOCAdministracionController extends Controller
                     $documento->TIPO                        =   'RECOMENDACION POR CONTABILIDAD';
                     $documento->MENSAJE                     =   $descripcion;
                     $documento->save();
- 
+
                 }
 
 
@@ -3274,7 +3290,7 @@ class GestionOCAdministracionController extends Controller
                         ->where('ID_DOCUMENTO', '=', $orden->COD_DOCUMENTO_CTBLE)
                         ->get();
 
-                        
+
                     //dd($referenciaAsocQuery);
                     // Convertir el resultado en un array para poder insertarlo más adelante
                     $dataToInsert = $referenciaAsocQuery->toArray();
@@ -3301,11 +3317,11 @@ class GestionOCAdministracionController extends Controller
                     $dataToInserac = $referenciaAsocQueryac->toArray();
                     // Paso 2: Insertar los datos en la segunda base de datos
                     DB::connection($conexionbd)->table('CMP.DOC_ASOCIAR_COMPRA')->insert($dataToInserac);
-                    
+
 
                 }
 
-                
+
                 $detalleproducto            =   CMPDetalleProducto::where('CMP.DETALLE_PRODUCTO.COD_ESTADO','=',1)
                                                 ->where('CMP.DETALLE_PRODUCTO.COD_TABLA','=',$pedido_id)
                                                 ->orderBy('NRO_LINEA','ASC')
@@ -3334,14 +3350,14 @@ class GestionOCAdministracionController extends Controller
                 // $fedocumento_w      =   FeDocumento::where('ID_DOCUMENTO','=',$pedido_id)->where('DOCUMENTO_ITEM','=',$linea)->first();
                 $ordencompra        =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$pedido_id)->first();
 
-  
+
 
                 DB::commit();
 
                 Session::flash('operacion_id', 'NOTA_CREDITO');
                 return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_DOCUMENTO_CTBLE.' APROBADO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 Session::flash('operacion_id', 'NOTA_CREDITO');
                 return Redirect::to('gestion-de-administracion-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
@@ -3354,7 +3370,7 @@ class GestionOCAdministracionController extends Controller
 
             $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
             $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
-                                        //->where('IND_OBLIGATORIO','=',1)                                        
+                                        //->where('IND_OBLIGATORIO','=',1)
                                         ->get();
 
             $documentohistorial     =   FeDocumentoHistorial::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
@@ -3382,7 +3398,7 @@ class GestionOCAdministracionController extends Controller
                                         ->toArray();
 
 
-          
+
 
 
 
@@ -3404,9 +3420,9 @@ class GestionOCAdministracionController extends Controller
             }
 
 
+            $funciones = $this;
 
-
-            return View::make('comprobante/aprobaradmnotacredito', 
+            return View::make('comprobante/aprobaradmnotacredito',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
@@ -3417,7 +3433,7 @@ class GestionOCAdministracionController extends Controller
                                 'linea'                 =>  $linea,
                                 'archivos'              =>  $archivos,
                                 'archivosanulados'      =>  $archivosanulados,
-                                
+
 
                                 'trabajador'            =>  $trabajador,
                                 'documentoscompra'      =>  $documentoscompra,
@@ -3432,6 +3448,9 @@ class GestionOCAdministracionController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 
@@ -3457,8 +3476,8 @@ class GestionOCAdministracionController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
 
 
@@ -3664,7 +3683,7 @@ class GestionOCAdministracionController extends Controller
                         ->where('ID_DOCUMENTO', '=', $orden->COD_DOCUMENTO_CTBLE)
                         ->get();
 
-                        
+
                     //dd($referenciaAsocQuery);
                     // Convertir el resultado en un array para poder insertarlo más adelante
                     $dataToInsert = $referenciaAsocQuery->toArray();
@@ -3691,7 +3710,7 @@ class GestionOCAdministracionController extends Controller
                     $dataToInserac = $referenciaAsocQueryac->toArray();
                     // Paso 2: Insertar los datos en la segunda base de datos
                     DB::connection($conexionbd)->table('CMP.DOC_ASOCIAR_COMPRA')->insert($dataToInserac);
-                    
+
 
                 }
 
@@ -3725,7 +3744,7 @@ class GestionOCAdministracionController extends Controller
                 Session::flash('operacion_id', 'PROVISION_GASTO');
                 return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_DOCUMENTO_CTBLE.' APROBADO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 Session::flash('operacion_id', 'PROVISION_GASTO');
                 return Redirect::to('gestion-de-administracion-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
@@ -3738,7 +3757,7 @@ class GestionOCAdministracionController extends Controller
 
             $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
             $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
-                                        //->where('IND_OBLIGATORIO','=',1)                                        
+                                        //->where('IND_OBLIGATORIO','=',1)
                                         ->get();
 
             $documentohistorial     =   FeDocumentoHistorial::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
@@ -3779,8 +3798,9 @@ class GestionOCAdministracionController extends Controller
                 ];
             }
 
+            $funciones = $this;
 
-            return View::make('comprobante/aprobaradmpg', 
+            return View::make('comprobante/aprobaradmpg',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
@@ -3791,7 +3811,7 @@ class GestionOCAdministracionController extends Controller
                                 'linea'                 =>  $linea,
                                 'archivos'              =>  $archivos,
                                 'archivosanulados'      =>  $archivosanulados,
-                                
+
 
                                 'trabajador'            =>  $trabajador,
                                 'documentoscompra'      =>  $documentoscompra,
@@ -3806,6 +3826,9 @@ class GestionOCAdministracionController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 
@@ -3831,8 +3854,8 @@ class GestionOCAdministracionController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
 
 
@@ -3856,7 +3879,7 @@ class GestionOCAdministracionController extends Controller
                     $documento->TIPO                        =   'RECOMENDACION POR CONTABILIDAD';
                     $documento->MENSAJE                     =   $descripcion;
                     $documento->save();
-  
+
                 }
 
 
@@ -4042,7 +4065,7 @@ class GestionOCAdministracionController extends Controller
                         ->where('ID_DOCUMENTO', '=', $orden->COD_DOCUMENTO_CTBLE)
                         ->get();
 
-                        
+
                     //dd($referenciaAsocQuery);
                     // Convertir el resultado en un array para poder insertarlo más adelante
                     $dataToInsert = $referenciaAsocQuery->toArray();
@@ -4069,11 +4092,11 @@ class GestionOCAdministracionController extends Controller
                     $dataToInserac = $referenciaAsocQueryac->toArray();
                     // Paso 2: Insertar los datos en la segunda base de datos
                     DB::connection($conexionbd)->table('CMP.DOC_ASOCIAR_COMPRA')->insert($dataToInserac);
-                    
+
 
                 }
 
-                
+
                 $detalleproducto            =   CMPDetalleProducto::where('CMP.DETALLE_PRODUCTO.COD_ESTADO','=',1)
                                                 ->where('CMP.DETALLE_PRODUCTO.COD_TABLA','=',$pedido_id)
                                                 ->orderBy('NRO_LINEA','ASC')
@@ -4102,14 +4125,14 @@ class GestionOCAdministracionController extends Controller
 
                 $ordencompra        =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$pedido_id)->first();
 
-  
+
 
                 DB::commit();
 
                 Session::flash('operacion_id', 'NOTA_DEBITO');
                 return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$ordencompra->COD_DOCUMENTO_CTBLE.' APROBADO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 Session::flash('operacion_id', 'NOTA_DEBITO');
                 return Redirect::to('gestion-de-administracion-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
@@ -4122,7 +4145,7 @@ class GestionOCAdministracionController extends Controller
 
             $tp                     =   CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
             $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('COD_ESTADO','=',1)
-                                        //->where('IND_OBLIGATORIO','=',1)                                        
+                                        //->where('IND_OBLIGATORIO','=',1)
                                         ->get();
 
             $documentohistorial     =   FeDocumentoHistorial::where('ID_DOCUMENTO','=',$ordencompra->COD_DOCUMENTO_CTBLE)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
@@ -4150,7 +4173,7 @@ class GestionOCAdministracionController extends Controller
                                         ->toArray();
 
 
-          
+
 
 
 
@@ -4173,8 +4196,9 @@ class GestionOCAdministracionController extends Controller
 
 
 
+            $funciones = $this;
 
-            return View::make('comprobante/aprobaradmnotadebito', 
+            return View::make('comprobante/aprobaradmnotadebito',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
@@ -4185,7 +4209,7 @@ class GestionOCAdministracionController extends Controller
                                 'linea'                 =>  $linea,
                                 'archivos'              =>  $archivos,
                                 'archivosanulados'      =>  $archivosanulados,
-                                
+
 
                                 'trabajador'            =>  $trabajador,
                                 'documentoscompra'      =>  $documentoscompra,
@@ -4200,6 +4224,9 @@ class GestionOCAdministracionController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 
@@ -4213,13 +4240,13 @@ class GestionOCAdministracionController extends Controller
         $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
         if($validarurl <> 'true'){return $validarurl;}
         /******************************************************/
-        $idop                   =   $this->funciones->decodificarmaestraprefijo($idordenpago,$prefijo);        
+        $idop                   =   $this->funciones->decodificarmaestraprefijo($idordenpago,$prefijo);
         $ordenpago              =   $this->con_lista_comprobante_orden_pago_idoc_actual($idop);
 
         $idoc                   =   $ordenpago->COD_DOCUMENTO_CTBLE;
         $ordencompra            =   $this->con_lista_cabecera_comprobante_contrato_idoc_actual($idoc);
         $detalleordencompra     =   $this->con_lista_detalle_liquidacion_compra_comprobante_idoc($idoc);
-        
+
         $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idop)->where('DOCUMENTO_ITEM','=',$linea)->first();
         $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idop)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
         View::share('titulo','Aprobar  Comprobante');
@@ -4227,8 +4254,8 @@ class GestionOCAdministracionController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
 
 
@@ -4271,7 +4298,7 @@ class GestionOCAdministracionController extends Controller
 
                             //
                             $contadorArchivos = Archivo::count();
-                        
+
                         /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
                         $prefijocarperta =      $this->prefijo_empresa($ordenpago->COD_EMPR);
                         $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta.'\\'.$ordenpago->NRO_DOC;
@@ -4298,7 +4325,7 @@ class GestionOCAdministracionController extends Controller
                         $dcontrol->ACTIVO           =   1;
                         $dcontrol->FECHA_CREA       =   $this->fechaactual;
                         $dcontrol->USUARIO_CREA     =   Session::get('usuario')->id;
-                        $dcontrol->save();                        
+                        $dcontrol->save();
                     }
                 }
 
@@ -4314,7 +4341,7 @@ class GestionOCAdministracionController extends Controller
                                     'fecha_ap'=>$this->fechaactual,
                                     'usuario_ap'=>Session::get('usuario')->id
                                 ]
-                            );                
+                            );
 
 
                 //HISTORIAL DE DOCUMENTO APROBADO
@@ -4326,7 +4353,7 @@ class GestionOCAdministracionController extends Controller
                 $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
                 $documento->TIPO                        =   'APROBADO POR ADMINISTRACION';
                 $documento->MENSAJE                     =   '';
-                $documento->save();                
+                $documento->save();
 
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
@@ -4339,7 +4366,7 @@ class GestionOCAdministracionController extends Controller
                 Session::flash('operacion_id', 'LIQUIDACION_COMPRA_ANTICIPO');
                 return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$idoc.' APROBADO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 Session::flash('operacion_id', 'LIQUIDACION_COMPRA_ANTICIPO');
                 return Redirect::to('gestion-de-administracion-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
@@ -4367,31 +4394,31 @@ class GestionOCAdministracionController extends Controller
             $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idop)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
 
-            $trabajador             =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();            
+            $trabajador             =   STDTrabajador::where('NRO_DOCUMENTO','=',$fedocumento->dni_usuariocontacto)->first();
 
             if($fedocumento->TXT_INGRESO_LIQ=='SI'){
                 $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                            ->where('COD_ESTADO','=',1)                                        
+                                            ->where('COD_ESTADO','=',1)
                                             ->whereIn('COD_CATEGORIA', ['DCC0000000000039','DCC0000000000040','DCC0000000000041','DCC0000000000044','DCC0000000000045','DCC0000000000049'])
-                                            ->get();                
+                                            ->get();
             }else{
                 if($ordenpago->COD_CENTRO == 'CEN0000000000004' || $ordenpago->COD_CENTRO == 'CEN0000000000006'){ //rioja o bellavista
                     $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                ->where('COD_ESTADO','=',1)                                        
+                                                ->where('COD_ESTADO','=',1)
                                                 ->whereIn('COD_CATEGORIA', ['DCC0000000000041','DCC0000000000044','DCC0000000000045','DCC0000000000046','DCC0000000000049'])
-                                                ->get();                
+                                                ->get();
                 }else{
                     $documentoscompra       =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                ->where('COD_ESTADO','=',1)                                        
+                                                ->where('COD_ESTADO','=',1)
                                                 ->whereIn('COD_CATEGORIA', ['DCC0000000000041','DCC0000000000044','DCC0000000000045','DCC0000000000049'])
                                                 ->get();
-                }                
-            }            
+                }
+            }
 
             $totalarchivos          =   CMPDocAsociarCompra::where('COD_ORDEN','=',$idop)->where('COD_ESTADO','=',1)
                                         ->pluck('COD_CATEGORIA_DOCUMENTO')
                                         ->toArray();
-            
+
             //Archivo multiple
 
 
@@ -4410,20 +4437,21 @@ class GestionOCAdministracionController extends Controller
             }
 
 
+            $funciones = $this;
 
 
-            return View::make('comprobante/aprobaradmliquidacioncompraanticipo', 
+            return View::make('comprobante/aprobaradmliquidacioncompraanticipo',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordenpago'             =>  $ordenpago,
-                                'ordencompra'           =>  $ordencompra,                                
+                                'ordencompra'           =>  $ordencompra,
                                 'initialPreview'        => json_encode($initialPreview),
                                 'initialPreviewConfig'  => json_encode($initialPreviewConfig),
 
 
                                 'linea'                 =>  $linea,
                                 'archivos'              =>  $archivos,
-                                'archivosanulados'      =>  $archivosanulados,                                
+                                'archivosanulados'      =>  $archivosanulados,
 
                                 'trabajador'            =>  $trabajador,
                                 'documentoscompra'      =>  $documentoscompra,
@@ -4438,6 +4466,9 @@ class GestionOCAdministracionController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 
@@ -4454,13 +4485,13 @@ class GestionOCAdministracionController extends Controller
         $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
         if($validarurl <> 'true'){return $validarurl;}
         /******************************************************/
-        $idop                   =   $this->funciones->decodificarmaestraprefijo($idordenpago,$prefijo);        
+        $idop                   =   $this->funciones->decodificarmaestraprefijo($idordenpago,$prefijo);
         $ordenpago              =   $this->con_lista_comprobante_orden_pago_idoc_actual($idop);
 
         $idoc                   =   $ordenpago->COD_DOCUMENTO_CTBLE;
 
         $ordencompra            =   $this->con_lista_cabecera_comprobante_contrato_idoc_actual($idoc);
-        $detalleordencompra     =   $this->con_lista_detalle_liquidacion_compra_comprobante_idoc($idoc);    
+        $detalleordencompra     =   $this->con_lista_detalle_liquidacion_compra_comprobante_idoc($idoc);
 
         $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idop)->where('DOCUMENTO_ITEM','=',$linea)->where('TXT_PROCEDENCIA','<>','SUE')->first();
         $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idop)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
@@ -4469,8 +4500,8 @@ class GestionOCAdministracionController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
                 $pedido_id          =   $idoc;
                 $fedocumento        =   FeDocumento::where('ID_DOCUMENTO','=',$idop)->where('DOCUMENTO_ITEM','=',$linea)->where('TXT_PROCEDENCIA','<>','SUE')->first();
@@ -4480,12 +4511,12 @@ class GestionOCAdministracionController extends Controller
 
 
                 if($fedocumento->ind_observacion==1){
-                    DB::rollback(); 
+                    DB::rollback();
                     return Redirect::back()->with('errorurl', 'El documento esta observado no se puede observar');
                 }
 
                 if(count($archivoob)<=0){
-                    DB::rollback(); 
+                    DB::rollback();
                     return Redirect::to('aprobar-comprobante-administracion-liquidacion-compra-anticipo/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordenpago)->with('errorbd', 'Tiene que seleccionar almenos un item');
                 }
 
@@ -4561,15 +4592,15 @@ class GestionOCAdministracionController extends Controller
                //                          .'%0D%0A'.'EMPRESA : '.$empresa->NOM_EMPR.'%0D%0A'
                //                          .'PROVEEDOR : '.$ordencompra->TXT_EMPR_EMISOR.'%0D%0A'
                //                          .'ESTADO : '.$fedocumento->TXT_ESTADO.'%0D%0A'
-               //                          .'MENSAJE : '.$descripcion.'%0D%0A'; 
+               //                          .'MENSAJE : '.$descripcion.'%0D%0A';
 
-                //dd($trabajador);                        
+                //dd($trabajador);
                 // if(1==0){
                 //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
                 // }else{
                 //     $this->insertar_whatsaap('51'.$trabajador->TXT_TELEFONO,$trabajador->TXT_NOMBRES,$mensaje,'');
-                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,''); 
-                // }  
+                //     $this->insertar_whatsaap('51979820173','JORGE FRANCELLI',$mensaje,'');
+                // }
 
                 DB::commit();
 
@@ -4577,14 +4608,14 @@ class GestionOCAdministracionController extends Controller
 
                 return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$idop.' OBSERVADO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
 
                 Session::flash('operacion_id', 'LIQUIDACION_COMPRA_ANTICIPO');
 
                 return Redirect::to('gestion-de-administracion-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
 
-        
+
         }
         else{
 
@@ -4624,8 +4655,8 @@ class GestionOCAdministracionController extends Controller
                                         ->pluck('COD_CATEGORIA_DOCUMENTO')
                                         ->toArray();
 
-                                        
-            return View::make('comprobante/observaradministracioncontrato', 
+
+            return View::make('comprobante/observaradministracioncontrato',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'ordencompra'           =>  $ordencompra,
@@ -4664,8 +4695,8 @@ class GestionOCAdministracionController extends Controller
         if($_POST)
         {
 
-            try{    
-                
+            try{
+
                 DB::beginTransaction();
 
 
@@ -4693,7 +4724,7 @@ class GestionOCAdministracionController extends Controller
                     $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
                     $documento->TIPO                        =   'RECOMENDACION POR CONTABILIDAD';
                     $documento->MENSAJE                     =   $descripcion;
-                    $documento->save(); 
+                    $documento->save();
                 }
 
 
@@ -4737,7 +4768,7 @@ class GestionOCAdministracionController extends Controller
                 }
 
 
-                $lotes                  =   FeRefAsoc::where('lote','=',$idoc)                                        
+                $lotes                  =   FeRefAsoc::where('lote','=',$idoc)
                                             ->pluck('ID_DOCUMENTO')
                                             ->toArray();
                 $documento_asociados    =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->get();
@@ -4781,7 +4812,7 @@ class GestionOCAdministracionController extends Controller
                 $documento->TIPO                        =   'APROBADO POR ADMINISTRACION';
                 $documento->MENSAJE                     =   '';
                 $documento->save();
- 
+
                 //geolocalizacion
                 $device_info       =   $request['device_info'];
                 $this->con_datos_de_la_pc($device_info,$fedocumento,'APROBADO POR ADMINISTRACION');
@@ -4793,7 +4824,7 @@ class GestionOCAdministracionController extends Controller
                 Session::flash('operacion_id', $request['operacion_id']);
                 return Redirect::to('/gestion-de-administracion-aprobar/'.$idopcion)->with('bienhecho', 'Comprobante : '.$pedido_id.' APROBADO CON EXITO');
             }catch(\Exception $ex){
-                DB::rollback(); 
+                DB::rollback();
                 Session::flash('operacion_id', $request['operacion_id']);
                 return Redirect::to('gestion-de-administracion-aprobar/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
             }
@@ -4839,13 +4870,15 @@ class GestionOCAdministracionController extends Controller
 
             $fereftop1              =   FeRefAsoc::where('lote','=',$idoc)->first();
 
-            $lotes                  =   FeRefAsoc::where('lote','=',$idoc)                                        
+            $lotes                  =   FeRefAsoc::where('lote','=',$idoc)
                                         ->pluck('ID_DOCUMENTO')
                                         ->toArray();
             $documento_asociados    =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->get();
             $documento_top          =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->first();
 
-            return View::make('comprobante/aprobaradmestiba', 
+            $funciones = $this;
+
+            return View::make('comprobante/aprobaradmestiba',
                             [
                                 'fedocumento'           =>  $fedocumento,
                                 'fereftop1'             =>  $fereftop1,
@@ -4866,6 +4899,9 @@ class GestionOCAdministracionController extends Controller
                                 'lote'                  =>  $idoc,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'funciones' => $funciones,
+                                'funcion' => $funciones,
+
                             ]);
 
 

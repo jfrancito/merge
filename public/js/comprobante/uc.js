@@ -10,18 +10,28 @@ function toggleContent() {
     }
 }
 
-// Inicialmente colapsar el contenido adicional
-document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById('longText').classList.add('collapsed');
-});
+
 
 
 $(document).ready(function () {
 
     var carpeta = $("#carpeta").val();
 
+    $('#anio_asiento').prop('required', false);
+    $('#periodo_asiento').prop('required', false);
+    $('#comprobante_asiento').prop('required', false);
+    $('#moneda_asiento').prop('required', false);
+    $('#tipo_cambio_asiento').prop('required', false);
+    $('#empresa_asiento').prop('required', false);
+    $('#fecha_asiento').prop('required', false);
+    $('#tipo_documento_asiento').prop('required', false);
+    $('#serie_asiento').prop('required', false);
+    $('#numero_asiento').prop('required', false);
+    $('#nro_cuenta_contable').prop('required', false);
+    $('#tipo_asiento').prop('required', false);
+
     $(".comboreparable").on('change', function (e) {
-        
+
         let reparable = $(this).val();
         if(reparable == 'ARCHIVO_FISICO'){
             $('.checkfisico').addClass('ocultar');
@@ -2810,7 +2820,7 @@ $(document).ready(function () {
                         if (moneda_id_editar !== 'MON0000000000001') {
                             base_exonerado = base_exonerado + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
                         } else {
-                            base_exonerado = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                            base_exonerado = base_exonerado + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
                         }
                         break;
                 }
@@ -3105,29 +3115,7 @@ $(document).ready(function () {
     $('.btnaprobarcomporbatntereparable').on('click', function (event) {
         event.preventDefault();
 
-        abrircargando();
-
-        $.confirm({
-            title: '¿Confirma la Aprobacion?',
-            content: 'Aprobar el Comprobante',
-            buttons: {
-                confirmar: function () {
-                    $("#formpedidoreparable").submit();
-                },
-                cancelar: function () {
-                    $.alert('Se cancelo Aprobacion');
-                }
-            }
-        });
-
-    });
-
-
-    $('.btnaprobarcomporbatnte').on('click', function (event) {
-
-        event.preventDefault();
-
-        let ruta = window.location.pathname;
+        let ruta = $('#formpedidoreparable').attr('action');
 
         if (ruta.toLowerCase().includes('contabilidad')) {
 
@@ -3148,7 +3136,7 @@ $(document).ready(function () {
                     arrayDetalle.forEach(item => {
                         if (parseInt(item.COD_ESTADO) === 1) {
                             if (!/^40/.test(item.TXT_CUENTA_CONTABLE) &&
-                                !/^42/.test(item.TXT_CUENTA_CONTABLE) && !/^43/.test(item.TXT_CUENTA_CONTABLE)) {
+                                !/^421/.test(item.TXT_CUENTA_CONTABLE) && !/^431/.test(item.TXT_CUENTA_CONTABLE)) {
                                 if (cadenaNumeroCuenta === '') {
                                     cadenaNumeroCuenta = item.TXT_CUENTA_CONTABLE;
                                 } else {
@@ -3185,6 +3173,10 @@ $(document).ready(function () {
                 });
 
             });
+
+            if(detalles.length === 0){
+                $('#nro_cuenta_contable').val("000000");
+            }
 
             if (error_tipo_asiento) {
                 $.alert({
@@ -3261,6 +3253,195 @@ $(document).ready(function () {
             content: 'Aprobar el Comprobante',
             buttons: {
                 confirmar: function () {
+                    $("#formpedidoreparable").submit();
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo Aprobacion');
+                }
+            }
+        });
+
+    });
+
+    $(document).on('click', '.eliminar-fila', function () {
+        // 1. Guardamos la fila en una variable para no perder la referencia
+        let $fila = $(this).closest('tr');
+
+        $.confirm({
+            title: '¿Confirmar Eliminación?',
+            content: '¿Está seguro de que desea eliminar este asiento de la lista?',
+            type: 'red', // Le da un estilo de alerta/peligro
+            buttons: {
+                confirmar: {
+                    text: 'Eliminar',
+                    btnClass: 'btn-red',
+                    action: function () {
+                        // 2. Usamos la variable $fila que capturamos arriba
+                        $fila.remove();
+
+                        // 3. ¡IMPORTANTE! Actualizar el input oculto
+                        actualizarInputAsientos();
+
+                        // 4. Ocultamos el panel
+                        $('.pnlasientos').hide();
+
+                        $.alert('Asiento eliminado correctamente.');
+                    }
+                },
+                cancelar: {
+                    text: 'Cancelar',
+                    action: function () {
+                        $.alert('Se cancelo Eliminación');
+                    }
+                }
+            }
+        });
+    });
+
+    $('.btnaprobarcomporbatnte').on('click', function (event) {
+
+        event.preventDefault();
+
+        let ruta = window.location.pathname;
+
+        if (ruta.toLowerCase().includes('contabilidad')) {
+
+            let nro_cuenta = $('#nro_cuenta_contable').val();
+
+            let detalles = [];
+            let error_tipo_asiento = false;
+
+            $('#asientolista tbody tr').each(function () {
+
+                let data_input = $(this).attr('data_input');
+                let arrayCabecera = JSON.parse($(this).attr('data_asiento_cabecera'));
+
+                if (nro_cuenta === '' && data_input === 'C') {
+                    let arrayDetalle = JSON.parse($(this).attr('data_asiento_detalle'));
+                    let cadenaNumeroCuenta = '';
+                    // Recorrerlo
+                    arrayDetalle.forEach(item => {
+                        if (parseInt(item.COD_ESTADO) === 1) {
+                            if (!/^40/.test(item.TXT_CUENTA_CONTABLE) &&
+                                !/^421/.test(item.TXT_CUENTA_CONTABLE) && !/^431/.test(item.TXT_CUENTA_CONTABLE)) {
+                                if (cadenaNumeroCuenta === '') {
+                                    cadenaNumeroCuenta = item.TXT_CUENTA_CONTABLE;
+                                } else {
+                                    if (!cadenaNumeroCuenta.includes(item.TXT_CUENTA_CONTABLE)) {
+                                        cadenaNumeroCuenta = cadenaNumeroCuenta + ',' + item.TXT_CUENTA_CONTABLE;
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    $('#nro_cuenta_contable').val(cadenaNumeroCuenta);
+                }
+
+                /*
+                arrayCabecera.forEach(item => {
+
+                    if (item.TXT_GLOSA.includes('REPARABLE') || item.TXT_GLOSA.includes('ANTICIPO')) {
+                        if (item.COD_CATEGORIA_TIPO_ASIENTO !== 'TAS0000000000007') {
+                            error_tipo_asiento = true;
+                        }
+                    }
+
+                    if ((item.TXT_GLOSA.includes('COMPRA') || item.TXT_GLOSA.includes('PERCEPCION')) && (!item.TXT_GLOSA.includes('REPARABLE') || !item.TXT_GLOSA.includes('ANTICIPO'))) {
+                        if (item.COD_CATEGORIA_TIPO_ASIENTO !== 'TAS0000000000004') {
+                            error_tipo_asiento = true;
+                        }
+                    }
+
+                });*/
+
+                detalles.push({
+                    cabecera: $(this).attr('data_asiento_cabecera'),
+                    detalle: $(this).attr('data_asiento_detalle'),
+                });
+
+            });
+
+            if(detalles.length === 0){
+                $('#nro_cuenta_contable').val("000000");
+                $('.pnlasientos').hide();
+            } else {
+                let nro_cuenta_aux = $('#nro_cuenta_contable').val();
+                let anio_asiento = $("#anio_asiento").val();
+                let periodo_asiento = $("#periodo_asiento").val();
+                let comprobante_asiento = $("#comprobante_asiento").val();
+                let moneda_id_editar = $("#moneda_asiento").val();
+                let tc_editar = $("#tipo_cambio_asiento").val();
+                let proveedor_asiento = $("#empresa_asiento").val();
+                let tipo_asiento = $("#tipo_asiento").val();
+                let fecha_asiento = $("#fecha_asiento").val();
+                let tipo_comprobante = $("#tipo_documento_asiento").val();
+                let serie_comprobante = $("#serie_asiento").val();
+                let numero_comprobante = $("#numero_asiento").val();
+
+                // Array de todos los valores
+                let campos = [
+                    {nombre: "Cuenta Contable", valor: nro_cuenta_aux},
+                    {nombre: "Anio", valor: anio_asiento},
+                    {nombre: "Periodo", valor: periodo_asiento},
+                    {nombre: "Comprobante", valor: comprobante_asiento},
+                    {nombre: "Moneda", valor: moneda_id_editar},
+                    {nombre: "Tipo de Cambio", valor: tc_editar},
+                    {nombre: "Proveedor", valor: proveedor_asiento},
+                    {nombre: "Tipo Asiento", valor: tipo_asiento},
+                    {nombre: "Fecha", valor: fecha_asiento},
+                    {nombre: "Tipo Comprobante", valor: tipo_comprobante},
+                    {nombre: "Serie", valor: serie_comprobante},
+                    {nombre: "Número", valor: numero_comprobante},
+                ];
+
+                // Recorremos y validamos
+                for (let campo of campos) {
+                    if (!campo.valor || campo.valor === "") {
+                        if (campo.nombre.includes('Cuenta')) {
+                            $('#div_cuenta_contable').show().find('#nro_cuenta_contable').focus();
+                        } else {
+                            $('.pnlasientos').show();
+                        }
+                        $.alert({
+                            title: 'Error',
+                            content: 'El campo ' + campo.nombre + ' no puede estar vacío.',
+                            type: 'red',
+                            buttons: {
+                                ok: {
+                                    text: 'OK',
+                                    btnClass: 'btn-red',
+                                }
+                            }
+                        });
+                        return false; // Detiene la ejecución
+                    }
+                }
+            }
+
+            if (error_tipo_asiento) {
+                $.alert({
+                    title: 'Error',
+                    content: 'Revise el tipo de asiento.',
+                    type: 'red',
+                    buttons: {
+                        ok: {
+                            text: 'OK',
+                            btnClass: 'btn-red',
+                        }
+                    }
+                });
+                return false; // Detiene la ejecución
+            }
+
+            $('#asientosgenerados').val(JSON.stringify(detalles));
+
+        }
+
+        $.confirm({
+            title: '¿Confirma la Aprobacion?',
+            content: 'Aprobar el Comprobante',
+            buttons: {
+                confirmar: function () {
                     $("#formpedido").submit();
                 },
                 cancelar: function () {
@@ -3271,15 +3452,133 @@ $(document).ready(function () {
 
     });
 
-
-
     $('.btnaprobarcomporbatntenuevo').on('click', function(event){
         event.preventDefault();
+
+        let ruta = window.location.pathname;
+
+        if (ruta.toLowerCase().includes('contabilidad')) {
+
+            let nro_cuenta = $('#nro_cuenta_contable').val();
+
+            let detalles = [];
+            let error_tipo_asiento = false;
+
+            $('#asientolista tbody tr').each(function () {
+
+                let data_input = $(this).attr('data_input');
+                let arrayCabecera = JSON.parse($(this).attr('data_asiento_cabecera'));
+
+                if (nro_cuenta === '' && data_input === 'C') {
+                    let arrayDetalle = JSON.parse($(this).attr('data_asiento_detalle'));
+                    let cadenaNumeroCuenta = '';
+                    // Recorrerlo
+                    arrayDetalle.forEach(item => {
+                        if (parseInt(item.COD_ESTADO) === 1) {
+                            if (!/^40/.test(item.TXT_CUENTA_CONTABLE) &&
+                                !/^421/.test(item.TXT_CUENTA_CONTABLE) && !/^431/.test(item.TXT_CUENTA_CONTABLE)) {
+                                if (cadenaNumeroCuenta === '') {
+                                    cadenaNumeroCuenta = item.TXT_CUENTA_CONTABLE;
+                                } else {
+                                    if (!cadenaNumeroCuenta.includes(item.TXT_CUENTA_CONTABLE)) {
+                                        cadenaNumeroCuenta = cadenaNumeroCuenta + ',' + item.TXT_CUENTA_CONTABLE;
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    $('#nro_cuenta_contable').val(cadenaNumeroCuenta);
+                }
+
+                detalles.push({
+                    cabecera: $(this).attr('data_asiento_cabecera'),
+                    detalle: $(this).attr('data_asiento_detalle'),
+                });
+
+            });
+
+            if(detalles.length === 0){
+                $('#nro_cuenta_contable').val("000000");
+                $('.pnlasientos').hide();
+            } else {
+                let nro_cuenta_aux = $('#nro_cuenta_contable').val();
+                let anio_asiento = $("#anio_asiento").val();
+                let periodo_asiento = $("#periodo_asiento").val();
+                let comprobante_asiento = $("#comprobante_asiento").val();
+                let moneda_id_editar = $("#moneda_asiento").val();
+                let tc_editar = $("#tipo_cambio_asiento").val();
+                let proveedor_asiento = $("#empresa_asiento").val();
+                let tipo_asiento = $("#tipo_asiento").val();
+                let fecha_asiento = $("#fecha_asiento").val();
+                let tipo_comprobante = $("#tipo_documento_asiento").val();
+                let serie_comprobante = $("#serie_asiento").val();
+                let numero_comprobante = $("#numero_asiento").val();
+
+                // Array de todos los valores
+                let campos = [
+                    {nombre: "Cuenta Contable", valor: nro_cuenta_aux},
+                    {nombre: "Anio", valor: anio_asiento},
+                    {nombre: "Periodo", valor: periodo_asiento},
+                    {nombre: "Comprobante", valor: comprobante_asiento},
+                    {nombre: "Moneda", valor: moneda_id_editar},
+                    {nombre: "Tipo de Cambio", valor: tc_editar},
+                    {nombre: "Proveedor", valor: proveedor_asiento},
+                    {nombre: "Tipo Asiento", valor: tipo_asiento},
+                    {nombre: "Fecha", valor: fecha_asiento},
+                    {nombre: "Tipo Comprobante", valor: tipo_comprobante},
+                    {nombre: "Serie", valor: serie_comprobante},
+                    {nombre: "Número", valor: numero_comprobante},
+                ];
+
+                // Recorremos y validamos
+                for (let campo of campos) {
+                    if (!campo.valor || campo.valor === "") {
+                        if (campo.nombre.includes('Cuenta')) {
+                            $('#div_cuenta_contable').show().find('#nro_cuenta_contable').focus();
+                        } else {
+                            $('.pnlasientos').show();
+                        }
+                        $.alert({
+                            title: 'Error',
+                            content: 'El campo ' + campo.nombre + ' no puede estar vacío.',
+                            type: 'red',
+                            buttons: {
+                                ok: {
+                                    text: 'OK',
+                                    btnClass: 'btn-red',
+                                }
+                            }
+                        });
+                        return false; // Detiene la ejecución
+                    }
+                }
+            }
+
+            if (error_tipo_asiento) {
+                $.alert({
+                    title: 'Error',
+                    content: 'Revise el tipo de asiento.',
+                    type: 'red',
+                    buttons: {
+                        ok: {
+                            text: 'OK',
+                            btnClass: 'btn-red',
+                        }
+                    }
+                });
+                return false; // Detiene la ejecución
+            }
+
+            $('#asientosgenerados').val(JSON.stringify(detalles));
+
+        }
+
         $.confirm({
             title: '¿Confirma la Aprobacion?',
             content: 'Aprobar el Comprobante',
             buttons: {
                 confirmar: function () {
+                    debugger;
                     $( "#formpedido" ).submit();
                 },
                 cancelar: function () {
@@ -3290,7 +3589,142 @@ $(document).ready(function () {
 
     });
 
+    $('.btnaprobarcomporbatntenuevocomision').on('click', function(event){
+        event.preventDefault();
 
+        let ruta = window.location.pathname;
+
+        if (ruta.toLowerCase().includes('contabilidad')) {
+
+            let nro_cuenta = $('#nro_cuenta_contable').val();
+
+            let detalles = [];
+            let error_tipo_asiento = false;
+
+            $('#asientolista tbody tr').each(function () {
+
+                let data_input = $(this).attr('data_input');
+                let arrayCabecera = JSON.parse($(this).attr('data_asiento_cabecera'));
+
+                if (nro_cuenta === '' && data_input === 'C') {
+                    let arrayDetalle = JSON.parse($(this).attr('data_asiento_detalle'));
+                    let cadenaNumeroCuenta = '';
+                    // Recorrerlo
+                    arrayDetalle.forEach(item => {
+                        if (parseInt(item.COD_ESTADO) === 1) {
+                            if (!/^40/.test(item.TXT_CUENTA_CONTABLE) &&
+                                !/^42/.test(item.TXT_CUENTA_CONTABLE) && !/^43/.test(item.TXT_CUENTA_CONTABLE)) {
+                                if (cadenaNumeroCuenta === '') {
+                                    cadenaNumeroCuenta = item.TXT_CUENTA_CONTABLE;
+                                } else {
+                                    if (!cadenaNumeroCuenta.includes(item.TXT_CUENTA_CONTABLE)) {
+                                        cadenaNumeroCuenta = cadenaNumeroCuenta + ',' + item.TXT_CUENTA_CONTABLE;
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    $('#nro_cuenta_contable').val(cadenaNumeroCuenta);
+                }
+
+                detalles.push({
+                    cabecera: $(this).attr('data_asiento_cabecera'),
+                    detalle: $(this).attr('data_asiento_detalle'),
+                });
+
+            });
+
+            if(detalles.length === 0){
+                $('#nro_cuenta_contable').val("000000");
+                $('.pnlasientos').hide();
+            } else {
+                let nro_cuenta_aux = $('#nro_cuenta_contable').val();
+                let anio_asiento = $("#anio_asiento").val();
+                let periodo_asiento = $("#periodo_asiento").val();
+                let comprobante_asiento = $("#comprobante_asiento").val();
+                let moneda_id_editar = $("#moneda_asiento").val();
+                let tc_editar = $("#tipo_cambio_asiento").val();
+                let proveedor_asiento = $("#empresa_asiento").val();
+                let tipo_asiento = $("#tipo_asiento").val();
+                let fecha_asiento = $("#fecha_asiento").val();
+                let tipo_comprobante = $("#tipo_documento_asiento").val();
+                let serie_comprobante = $("#serie_asiento").val();
+                let numero_comprobante = $("#numero_asiento").val();
+
+                // Array de todos los valores
+                let campos = [
+                    {nombre: "Cuenta Contable", valor: nro_cuenta_aux},
+                    {nombre: "Anio", valor: anio_asiento},
+                    {nombre: "Periodo", valor: periodo_asiento},
+                    {nombre: "Comprobante", valor: comprobante_asiento},
+                    {nombre: "Moneda", valor: moneda_id_editar},
+                    {nombre: "Tipo de Cambio", valor: tc_editar},
+                    {nombre: "Proveedor", valor: proveedor_asiento},
+                    {nombre: "Tipo Asiento", valor: tipo_asiento},
+                    {nombre: "Fecha", valor: fecha_asiento},
+                    {nombre: "Tipo Comprobante", valor: tipo_comprobante},
+                    {nombre: "Serie", valor: serie_comprobante},
+                    {nombre: "Número", valor: numero_comprobante},
+                ];
+
+                // Recorremos y validamos
+                for (let campo of campos) {
+                    if (!campo.valor || campo.valor === "") {
+                        if (campo.nombre.includes('Cuenta')) {
+                            $('#div_cuenta_contable').show().find('#nro_cuenta_contable').focus();
+                        } else {
+                            $('.pnlasientos').show();
+                        }
+                        $.alert({
+                            title: 'Error',
+                            content: 'El campo ' + campo.nombre + ' no puede estar vacío.',
+                            type: 'red',
+                            buttons: {
+                                ok: {
+                                    text: 'OK',
+                                    btnClass: 'btn-red',
+                                }
+                            }
+                        });
+                        return false; // Detiene la ejecución
+                    }
+                }
+            }
+
+            if (error_tipo_asiento) {
+                $.alert({
+                    title: 'Error',
+                    content: 'Revise el tipo de asiento.',
+                    type: 'red',
+                    buttons: {
+                        ok: {
+                            text: 'OK',
+                            btnClass: 'btn-red',
+                        }
+                    }
+                });
+                return false; // Detiene la ejecución
+            }
+
+            $('#asientosgenerados').val(JSON.stringify(detalles));
+
+        }
+
+        $.confirm({
+            title: '¿Confirma la Aprobacion?',
+            content: 'Aprobar el Comprobante',
+            buttons: {
+                confirmar: function () {
+                    debugger;
+                    $( "#formpedidocomision" ).submit();
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo Aprobacion');
+                }
+            }
+        });
+
+    });
 
     $('.btnobservarcomporbatnte').on('click', function (event) {
         event.preventDefault();
@@ -3303,6 +3737,25 @@ $(document).ready(function () {
                 },
                 cancelar: function () {
                     $.alert('Se cancelo la Observacion');
+                }
+            }
+        });
+
+    });
+
+    $('.btn-eliminar-asiento').on('click', function (event) {
+        event.preventDefault();
+        $.confirm({
+            title: '¿Confirma la Eliminación?',
+            content: 'Eliminar el Asiento',
+            buttons: {
+                confirmar: function () {
+                    $('.pnl-asiento-reparable').hide();
+                    $('#asiento_cabecera_reparable').val(JSON.stringify([]));
+                    $('#asiento_detalle_reparable').val(JSON.stringify([]));
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo la Eliminación');
                 }
             }
         });
@@ -3412,6 +3865,88 @@ $(document).ready(function () {
     $('.btnreparablecomporbatntepg').on('click', function (event) {
         event.preventDefault();
 
+        let table = $('#asientodetallereparable').DataTable();
+
+        let totalDebeMN = $(table.column(3).footer()).text().trim();
+        let totalHaberMN = $(table.column(4).footer()).text().trim();
+        let totalDebeME = $(table.column(5).footer()).text().trim();
+        let totalHaberME = $(table.column(6).footer()).text().trim();
+
+        let periodo_asiento = $("#periodo_asiento_reparable").val();
+        let comprobante_asiento = $("#comprobante_asiento_reparable").val();
+        let moneda_id_editar = $("#moneda_asiento_reparable").val();
+        let tc_editar = $("#tipo_cambio_asiento_reparable").val();
+        let proveedor_asiento = $("#empresa_asiento_reparable").val();
+        let tipo_asiento = $("#tipo_asiento_reparable").val();
+        let fecha_asiento = $("#fecha_asiento_reparable").val();
+        let tipo_comprobante = $("#tipo_documento_asiento_reparable").val();
+        let serie_comprobante = $("#serie_asiento_reparable").val();
+        let numero_comprobante = $("#numero_asiento_reparable").val();
+
+        //if (moneda_id_editar === 'MON0000000000001') {
+        if (totalDebeMN !== totalHaberMN) {
+            $.alert({
+                title: 'Error',
+                content: 'El asiento no cuadra verificar los totales de la moneda nacional en el debe y haber',
+                type: 'red',
+                buttons: {
+                    ok: {
+                        text: 'OK',
+                        btnClass: 'btn-red',
+                    }
+                }
+            });
+            return false; // Detiene la ejecución
+        }
+        //} else {
+        if (totalDebeME !== totalHaberME) {
+            $.alert({
+                title: 'Error',
+                content: 'El asiento no cuadra verificar los totales de la moneda extranjera en el debe y haber',
+                type: 'red',
+                buttons: {
+                    ok: {
+                        text: 'OK',
+                        btnClass: 'btn-red',
+                    }
+                }
+            });
+            return false; // Detiene la ejecución
+        }
+        //}
+
+        // Array de todos los valores
+        let campos = [
+            {nombre: "Periodo", valor: periodo_asiento},
+            {nombre: "Comprobante", valor: comprobante_asiento},
+            {nombre: "Moneda", valor: moneda_id_editar},
+            {nombre: "Tipo de Cambio", valor: tc_editar},
+            {nombre: "Proveedor", valor: proveedor_asiento},
+            {nombre: "Tipo Asiento", valor: tipo_asiento},
+            {nombre: "Fecha", valor: fecha_asiento},
+            {nombre: "Tipo Comprobante", valor: tipo_comprobante},
+            {nombre: "Serie", valor: serie_comprobante},
+            {nombre: "Número", valor: numero_comprobante},
+        ];
+
+        // Recorremos y validamos
+        for (let campo of campos) {
+            if (!campo.valor || campo.valor === "") {
+                $.alert({
+                    title: 'Error',
+                    content: 'El campo ' + campo.nombre + ' no puede estar vacío.',
+                    type: 'red',
+                    buttons: {
+                        ok: {
+                            text: 'OK',
+                            btnClass: 'btn-red',
+                        }
+                    }
+                });
+                return false; // Detiene la ejecución
+            }
+        }
+
         $.confirm({
             title: '¿Confirma la Reparacion?',
             content: 'Reparacion el Comprobante',
@@ -3429,6 +3964,88 @@ $(document).ready(function () {
 
     $('.btnreparablecomporbatntend').on('click', function (event) {
         event.preventDefault();
+
+        let table = $('#asientodetallereparable').DataTable();
+
+        let totalDebeMN = $(table.column(3).footer()).text().trim();
+        let totalHaberMN = $(table.column(4).footer()).text().trim();
+        let totalDebeME = $(table.column(5).footer()).text().trim();
+        let totalHaberME = $(table.column(6).footer()).text().trim();
+
+        let periodo_asiento = $("#periodo_asiento_reparable").val();
+        let comprobante_asiento = $("#comprobante_asiento_reparable").val();
+        let moneda_id_editar = $("#moneda_asiento_reparable").val();
+        let tc_editar = $("#tipo_cambio_asiento_reparable").val();
+        let proveedor_asiento = $("#empresa_asiento_reparable").val();
+        let tipo_asiento = $("#tipo_asiento_reparable").val();
+        let fecha_asiento = $("#fecha_asiento_reparable").val();
+        let tipo_comprobante = $("#tipo_documento_asiento_reparable").val();
+        let serie_comprobante = $("#serie_asiento_reparable").val();
+        let numero_comprobante = $("#numero_asiento_reparable").val();
+
+        //if (moneda_id_editar === 'MON0000000000001') {
+        if (totalDebeMN !== totalHaberMN) {
+            $.alert({
+                title: 'Error',
+                content: 'El asiento no cuadra verificar los totales de la moneda nacional en el debe y haber',
+                type: 'red',
+                buttons: {
+                    ok: {
+                        text: 'OK',
+                        btnClass: 'btn-red',
+                    }
+                }
+            });
+            return false; // Detiene la ejecución
+        }
+        //} else {
+        if (totalDebeME !== totalHaberME) {
+            $.alert({
+                title: 'Error',
+                content: 'El asiento no cuadra verificar los totales de la moneda extranjera en el debe y haber',
+                type: 'red',
+                buttons: {
+                    ok: {
+                        text: 'OK',
+                        btnClass: 'btn-red',
+                    }
+                }
+            });
+            return false; // Detiene la ejecución
+        }
+        //}
+
+        // Array de todos los valores
+        let campos = [
+            {nombre: "Periodo", valor: periodo_asiento},
+            {nombre: "Comprobante", valor: comprobante_asiento},
+            {nombre: "Moneda", valor: moneda_id_editar},
+            {nombre: "Tipo de Cambio", valor: tc_editar},
+            {nombre: "Proveedor", valor: proveedor_asiento},
+            {nombre: "Tipo Asiento", valor: tipo_asiento},
+            {nombre: "Fecha", valor: fecha_asiento},
+            {nombre: "Tipo Comprobante", valor: tipo_comprobante},
+            {nombre: "Serie", valor: serie_comprobante},
+            {nombre: "Número", valor: numero_comprobante},
+        ];
+
+        // Recorremos y validamos
+        for (let campo of campos) {
+            if (!campo.valor || campo.valor === "") {
+                $.alert({
+                    title: 'Error',
+                    content: 'El campo ' + campo.nombre + ' no puede estar vacío.',
+                    type: 'red',
+                    buttons: {
+                        ok: {
+                            text: 'OK',
+                            btnClass: 'btn-red',
+                        }
+                    }
+                });
+                return false; // Detiene la ejecución
+            }
+        }
 
         $.confirm({
             title: '¿Confirma la Reparacion?',
@@ -3448,6 +4065,88 @@ $(document).ready(function () {
     $('.btnreparablecomporbatntenc').on('click', function (event) {
         event.preventDefault();
 
+        let table = $('#asientodetallereparable').DataTable();
+
+        let totalDebeMN = $(table.column(3).footer()).text().trim();
+        let totalHaberMN = $(table.column(4).footer()).text().trim();
+        let totalDebeME = $(table.column(5).footer()).text().trim();
+        let totalHaberME = $(table.column(6).footer()).text().trim();
+
+        let periodo_asiento = $("#periodo_asiento_reparable").val();
+        let comprobante_asiento = $("#comprobante_asiento_reparable").val();
+        let moneda_id_editar = $("#moneda_asiento_reparable").val();
+        let tc_editar = $("#tipo_cambio_asiento_reparable").val();
+        let proveedor_asiento = $("#empresa_asiento_reparable").val();
+        let tipo_asiento = $("#tipo_asiento_reparable").val();
+        let fecha_asiento = $("#fecha_asiento_reparable").val();
+        let tipo_comprobante = $("#tipo_documento_asiento_reparable").val();
+        let serie_comprobante = $("#serie_asiento_reparable").val();
+        let numero_comprobante = $("#numero_asiento_reparable").val();
+
+        //if (moneda_id_editar === 'MON0000000000001') {
+        if (totalDebeMN !== totalHaberMN) {
+            $.alert({
+                title: 'Error',
+                content: 'El asiento no cuadra verificar los totales de la moneda nacional en el debe y haber',
+                type: 'red',
+                buttons: {
+                    ok: {
+                        text: 'OK',
+                        btnClass: 'btn-red',
+                    }
+                }
+            });
+            return false; // Detiene la ejecución
+        }
+        //} else {
+        if (totalDebeME !== totalHaberME) {
+            $.alert({
+                title: 'Error',
+                content: 'El asiento no cuadra verificar los totales de la moneda extranjera en el debe y haber',
+                type: 'red',
+                buttons: {
+                    ok: {
+                        text: 'OK',
+                        btnClass: 'btn-red',
+                    }
+                }
+            });
+            return false; // Detiene la ejecución
+        }
+        //}
+
+        // Array de todos los valores
+        let campos = [
+            {nombre: "Periodo", valor: periodo_asiento},
+            {nombre: "Comprobante", valor: comprobante_asiento},
+            {nombre: "Moneda", valor: moneda_id_editar},
+            {nombre: "Tipo de Cambio", valor: tc_editar},
+            {nombre: "Proveedor", valor: proveedor_asiento},
+            {nombre: "Tipo Asiento", valor: tipo_asiento},
+            {nombre: "Fecha", valor: fecha_asiento},
+            {nombre: "Tipo Comprobante", valor: tipo_comprobante},
+            {nombre: "Serie", valor: serie_comprobante},
+            {nombre: "Número", valor: numero_comprobante},
+        ];
+
+        // Recorremos y validamos
+        for (let campo of campos) {
+            if (!campo.valor || campo.valor === "") {
+                $.alert({
+                    title: 'Error',
+                    content: 'El campo ' + campo.nombre + ' no puede estar vacío.',
+                    type: 'red',
+                    buttons: {
+                        ok: {
+                            text: 'OK',
+                            btnClass: 'btn-red',
+                        }
+                    }
+                });
+                return false; // Detiene la ejecución
+            }
+        }
+
         $.confirm({
             title: '¿Confirma la Reparacion?',
             content: 'Reparacion el Comprobante',
@@ -3462,9 +4161,6 @@ $(document).ready(function () {
         });
 
     });
-
-
-
 
     $('.btnrechazocomporbatnte').on('click', function (event) {
         event.preventDefault();
@@ -3637,6 +4333,29 @@ $(document).ready(function () {
         return parts.join(decimals > 0 ? decimal_separator : "");
     }
 
+    // Función para recolectar la data de las filas restantes
+    function actualizarInputAsientos() {
+        let listaAsientos = [];
 
+        // Recorremos solo las filas que quedaron en el tbody
+        $('#asientolista tbody tr').each(function() {
+            let fila = $(this);
+
+            // Extraemos la data que guardaste en los atributos
+            let item = {
+                indicador: fila.attr('data_indicador'),
+                input: fila.attr('data_input'),
+                cabecera: JSON.parse(fila.attr('data_asiento_cabecera')),
+                detalle: JSON.parse(fila.attr('data_asiento_detalle'))
+            };
+
+            listaAsientos.push(item);
+        });
+
+        // Convertimos el array a JSON y lo metemos en el input oculto
+        $('#asientosgenerados').val(JSON.stringify(listaAsientos));
+
+        console.log("Input actualizado con " + listaAsientos.length + " asientos.");
+    }
 
 });

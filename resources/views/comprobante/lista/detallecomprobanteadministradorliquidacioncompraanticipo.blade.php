@@ -8,7 +8,7 @@
                 <div class="panel-body panel-body-contrast">
                   <form method="POST" action="{{ url('subir-xml-cargar-datos-liquidacion-compra-anticipo-administrator/'.$idopcion.'/'.substr($ordenpago->COD_AUTORIZACION, 0,6).'/'.Hashids::encode(substr($ordenpago->COD_AUTORIZACION, -10))) }}" name="formcargardatos" id="formcargardatos" enctype="multipart/form-data" >
                      {{ csrf_field() }}
-<input type="hidden" name="device_info" id='device_info'>
+                      <input type="hidden" name="device_info" id='device_info'>
 
 
                       <div class="col-xs-12 col-sm-10 col-md-10 col-lg-10 cajareporte">
@@ -42,7 +42,7 @@
           @if(count($fedocumento)>0)          
             <form method="POST" action="{{ url('validar-xml-oc-liquidacion-compra-anticipo-administrator/'.$idopcion.'/'.substr($ordenpago->COD_AUTORIZACION, 0,6).'/'.Hashids::encode(substr($ordenpago->COD_AUTORIZACION, -10))) }}" name="formguardardatos" id="formguardardatos" enctype="multipart/form-data" >
              {{ csrf_field() }}
-<input type="hidden" name="device_info" id='device_info'>
+              <input type="hidden" name="device_info" id='device_info'>
 
               <input type="hidden" name="procedencia" id='procedencia' value = '{{$procedencia}}'>
               
@@ -275,32 +275,69 @@
                     </div>
                     <div class="panel-body panel-body-contrast">
 
-                            <div class="row">                                  
+                            <div class="row">    
+                                  @if($rutaorden != '')
+                                    <div><b>EL PDF DE ANTICIPO AGRARIO SUBIRA AUTOMATICO</b></div><br>
+                                  @endif                              
                                   @foreach($tarchivos as $index => $item)
-                                    <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3" style="margin-top:15px;">
-                                        <label class="col-sm-12 control-label" style="text-align: left;height: 50px;">
-                                          <b>
-                                            {{$item->NOM_CATEGORIA_DOCUMENTO}} ({{$item->TXT_FORMATO}})
-                                            @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000040')
-                                              <span class='msjerror'>(OPCIONAL)</span>
-                                            @endif
-                                          </b> 
-                                          @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000005') <b>(Descargue el pdf de este enlace <a href="https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaWeb.jsp" target="_blank">Sunat</a> y subalo para que pueda aprobar</b>) @else @endif </label>
-                                      <div class="form-group sectioncargarimagen">
 
-                                          <div class="col-sm-12">
-                                              <div class="file-loading">
-                                                  <input 
-                                                  id="file-{{$item->COD_CATEGORIA_DOCUMENTO}}" 
-                                                  name="{{$item->COD_CATEGORIA_DOCUMENTO}}[]" 
-                                                  class="file-es"  
-                                                  type="file" 
-                                                  multiple data-max-file-count="1"
-                                                  @if($item->COD_CATEGORIA_DOCUMENTO != 'DCC0000000000040') required @endif >
+                                    @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000049')
+                                      @if($rutaorden != '')
+    
+                                      @else
+                                        <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3" style="margin-top:15px;">
+                                            <label class="col-sm-12 control-label" style="text-align: left;height: 50px;">
+                                              <b>
+                                                {{$item->NOM_CATEGORIA_DOCUMENTO}} ({{$item->TXT_FORMATO}})
+                                                @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000040')
+                                                  <span class='msjerror'>(OPCIONAL)</span>
+                                                @endif
+                                              </b> 
+                                              @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000005') <b>(Descargue el pdf de este enlace <a href="https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaWeb.jsp" target="_blank">Sunat</a> y subalo para que pueda aprobar</b>) @else @endif </label>
+                                          <div class="form-group sectioncargarimagen">
+
+                                              <div class="col-sm-12">
+                                                  <div class="file-loading">
+                                                      <input 
+                                                      id="file-{{$item->COD_CATEGORIA_DOCUMENTO}}" 
+                                                      name="{{$item->COD_CATEGORIA_DOCUMENTO}}[]" 
+                                                      class="file-es"  
+                                                      type="file" 
+                                                      multiple data-max-file-count="1"
+                                                      @if($item->COD_CATEGORIA_DOCUMENTO != 'DCC0000000000040') required @endif >
+                                                  </div>
                                               </div>
                                           </div>
-                                      </div>
-                                    </div>                                    
+                                        </div>  
+                                      @endif
+                                    @else
+                                        <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3" style="margin-top:15px;">
+                                            <label class="col-sm-12 control-label" style="text-align: left;height: 50px;">
+                                              <b>
+                                                {{$item->NOM_CATEGORIA_DOCUMENTO}} ({{$item->TXT_FORMATO}})
+                                                @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000040')
+                                                  <span class='msjerror'>(OPCIONAL)</span>
+                                                @endif
+                                              </b> 
+                                              @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000005') <b>(Descargue el pdf de este enlace <a href="https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaWeb.jsp" target="_blank">Sunat</a> y subalo para que pueda aprobar</b>) @else @endif </label>
+                                          <div class="form-group sectioncargarimagen">
+
+                                              <div class="col-sm-12">
+                                                  <div class="file-loading">
+                                                      <input 
+                                                      id="file-{{$item->COD_CATEGORIA_DOCUMENTO}}" 
+                                                      name="{{$item->COD_CATEGORIA_DOCUMENTO}}[]" 
+                                                      class="file-es"  
+                                                      type="file" 
+                                                      multiple data-max-file-count="1"
+                                                      @if($item->COD_CATEGORIA_DOCUMENTO != 'DCC0000000000040') required @endif >
+                                                  </div>
+                                              </div>
+                                          </div>
+                                        </div>  
+                                    @endif
+
+
                                   @endforeach                                
                             </div>
                             <div class="row">
@@ -329,6 +366,7 @@
                                           <input type="hidden" name="prefijo_id" id='prefijo_id' value = '{{substr($ordencompra->COD_DOCUMENTO_CTBLE, 0,6)}}'>
                                           <input type="hidden" name="orden_id" id='orden_id' value = '{{Hashids::encode(substr($ordencompra->COD_DOCUMENTO_CTBLE, -10))}}'>
                                           <input type="hidden" name="contacto_id" id='contacto_id' value = '{{$usuario->COD_TRABAJADOR}}'>
+                                                        <input type="hidden" name="rutaorden" id='rutaorden' value = '{{$rutaorden}}'>
                                           <button type="submit" class="btn btn-space btn-success btn-guardar-xml-liquidacion-compra-anticipo">Guardar</button>
                                         </p>
                                       </div>

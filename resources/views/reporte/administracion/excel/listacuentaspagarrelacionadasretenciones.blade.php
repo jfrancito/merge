@@ -3,6 +3,8 @@
     @php
         $total_mn = 0.0000;
         $total_me = 0.0000;
+        $total_interes = 0.0000;
+        $total_saldo = 0.0000;
     @endphp
     <style type="text/css">
         h1{
@@ -42,6 +44,8 @@
             <th class="center tablaho">IMPORTE ORIGINAL</th>
             <th class="center tablaho">SALDO S/.</th>
             <th class="center tablaho">SALDO $</th>
+            <th class="center tablaho">INTERESES</th>
+            <th class="center tablaho">TOTAL SALDO</th>
         </tr>
         </thead>
         <tbody>
@@ -62,12 +66,15 @@
                     <td class="border">{{$item['JEFE_VENTA']}}</td>
                     <td class="border">{{$item['TIPO_CONTRATO']}}</td>
                     <td class="border">{{number_format($item['TOT_DOC'], 2, '.', '')}}</td>
-                    <td class="border">{{number_format($item['CAN_CAPITAL_SALDO'] + $item['CAN_INTERES_SALDO'], 2, '.', '')}}</td>
-                    <td class="border">{{number_format($item['CAN_CAPITAL_SALDO_ME'] + $item['CAN_INTERES_SALDO'], 2, '.', '')}}</td>
-                </tr>
+                    <td class="border">{{ $item['COD_MONEDA'] === 'MON0000000000001' ? number_format($item['CAN_CAPITAL_SALDO'], 2, '.', '') : 0.00 }}</td>
+                    <td class="border">{{ $item['COD_MONEDA'] === 'MON0000000000002' ? number_format($item['CAN_CAPITAL_SALDO_ME'], 2, '.', ''): 0.00 }}</td>
+                    <td class="border">{{ number_format($item['CAN_INTERES_SALDO'], 2, '.', '') }}</td>
+                    <td class="border">{{ $item['COD_MONEDA'] === 'MON0000000000001' ? number_format($item['CAN_CAPITAL_SALDO'] + $item['CAN_INTERES_SALDO'], 2, '.', '') : number_format($item['CAN_CAPITAL_SALDO_ME'] + $item['CAN_INTERES_SALDO'], 2, '.', '') }}</td>
                 @php
-                    $total_mn = $total_mn + ($item['CAN_CAPITAL_SALDO'] + $item['CAN_INTERES_SALDO']);
-                    $total_me = $total_me + ($item['CAN_CAPITAL_SALDO_ME'] + $item['CAN_INTERES_SALDO']);
+                    $total_mn = $total_mn + ($item['COD_MONEDA'] === 'MON0000000000001' ? ($item['CAN_CAPITAL_SALDO'] + $item['CAN_INTERES_SALDO']) : 0.00);
+                    $total_me = $total_me + ($item['COD_MONEDA'] === 'MON0000000000002' ? ($item['CAN_CAPITAL_SALDO_ME'] + $item['CAN_INTERES_SALDO']) : 0.00);
+                    $total_interes = $total_interes + $item['CAN_INTERES_SALDO'];
+                    $total_saldo = $total_saldo + ($item['COD_MONEDA'] === 'MON0000000000001' ? ($item['CAN_CAPITAL_SALDO'] + $item['CAN_INTERES_SALDO']) : ($item['CAN_CAPITAL_SALDO_ME'] + $item['CAN_INTERES_SALDO']));
                 @endphp
             @endif
         @endforeach
@@ -77,6 +84,8 @@
             <th class="center footerho" colspan="13">Total</th>
             <th class="footerho">{{number_format($total_mn, 2, '.', '')}}</th>
             <th class="footerho">{{number_format($total_me, 2, '.', '')}}</th>
+            <th class="footerho">{{number_format($total_interes, 2, '.', '')}}</th>
+            <th class="footerho">{{number_format($total_saldo, 2, '.', '')}}</th>
         </tr>
         </tfoot>
     </table>

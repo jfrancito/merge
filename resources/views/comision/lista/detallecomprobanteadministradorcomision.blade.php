@@ -114,7 +114,7 @@
             <form method="POST" action="{{ url('validar-xml-oc-comision-administrator/'.$idopcion.'/'.$idoc) }}"
                   name="formguardardatos" id="formguardardatos" enctype="multipart/form-data">
                 {{ csrf_field() }}
-<input type="hidden" name="device_info" id='device_info'>
+                <input type="hidden" name="device_info" id='device_info'>
 
                 <input type="hidden" name="rutaorden" id='rutaorden' value='{{$rutaorden}}'>
                 

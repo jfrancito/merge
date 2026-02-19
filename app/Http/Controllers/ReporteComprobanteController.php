@@ -118,22 +118,55 @@ class ReporteComprobanteController extends Controller
 
                 }else{
 
-                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_estiba_excel($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$operacion_id);
-                    Excel::create($titulo.'-('.$fecha_actual.')', function($excel) use ($listadatos,$titulo,$funcion,$operacion_id) {
-                        $excel->sheet($operacion_id, function($sheet) use ($listadatos,$titulo,$funcion,$operacion_id) {
+                    if($operacion_id=='PROVISION_GASTO'){
 
-                            $sheet->loadView('reporte/excel/listacomprobantemasivoestiba')->with('listadatos',$listadatos)
-                                                                               ->with('titulo',$titulo)
-                                                                               ->with('funcion',$funcion);                                               
-                        });
-                    })->export('xls');
+                        $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_provision_excel($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id);
+                        Excel::create($titulo.'-('.$fecha_actual.')', function($excel) use ($listadatos,$titulo,$funcion) {
+                            $excel->sheet('PROVISION_GASTO', function($sheet) use ($listadatos,$titulo,$funcion) {
+                                $sheet->loadView('reporte/excel/listacomprobantemasivoprovisiongasto')->with('listadatos',$listadatos)
+                                                                                   ->with('titulo',$titulo)
+                                                                                   ->with('funcion',$funcion);                                               
+                            });
+                        })->export('xls');
+
+
+                    }else{
+
+
+
+                        if($operacion_id=='NOTA_CREDITO'){
+
+                            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_nc_excel($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id);
+                            Excel::create($titulo.'-('.$fecha_actual.')', function($excel) use ($listadatos,$titulo,$funcion) {
+                                $excel->sheet('NOTA_CREDITO', function($sheet) use ($listadatos,$titulo,$funcion) {
+                                    $sheet->loadView('reporte/excel/listacomprobantemasivoprovisiongasto')->with('listadatos',$listadatos)
+                                                                                       ->with('titulo',$titulo)
+                                                                                       ->with('funcion',$funcion);                                               
+                                });
+                            })->export('xls');
+
+
+                        }else{
+
+                            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_estiba_excel($cod_empresa,$fecha_inicio,$fecha_fin,$proveedor_id,$estado_id,$operacion_id);
+                            Excel::create($titulo.'-('.$fecha_actual.')', function($excel) use ($listadatos,$titulo,$funcion,$operacion_id) {
+                                $excel->sheet($operacion_id, function($sheet) use ($listadatos,$titulo,$funcion,$operacion_id) {
+
+                                    $sheet->loadView('reporte/excel/listacomprobantemasivoestiba')->with('listadatos',$listadatos)
+                                                                                       ->with('titulo',$titulo)
+                                                                                       ->with('funcion',$funcion);                                               
+                                });
+                            })->export('xls');
+                        }
+
+
+
+
+                    }
+
 
 
                 }
-
-
-
-
             } 
 
         }

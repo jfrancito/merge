@@ -1,6 +1,6 @@
 <html>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <style type="text/css">    
+    <style type="text/css">
         h1{
             text-align: center;
         }
@@ -76,18 +76,16 @@
             <th class= 'tabladp'>IGV</th>
             <th class= 'tabladp'>TOTAL</th>
             <th class= 'tabladp'>USUARIO AUTORIZA</th>
-
             <th class= 'tabladp'>USUARIO</th>
             <th class= 'tabladp'>CORREO USUARIO</th>
             <th class= 'tabladp'>JEFE</th>
             <th class= 'tabladp'>CORREO JEFE</th>
-
+            <th class= 'tabladp'>CUENTA CONTABLE</th>
         </tr>
-        @foreach($listadatos as $index => $item) 
+        @foreach($listadatos as $index => $item)
         <tr>
             <td>{{$item->ID_DOCUMENTO}}</td>
             <td>{{$item->TXT_EMPRESA_TRABAJADOR}}</td>
-
             <td>{{date_format(date_create($item->FECHA_EMI), 'd-m-Y')}}</td>
             <td>{{date_format(date_create($item->FECHA_EMISION), 'd-m-Y')}}</td>
             <td>{{$item->TXT_TIPODOCUMENTO}}</td>
@@ -101,14 +99,11 @@
             <td>{{$item->IGV}}</td>
             <td>{{$item->TOTAL}}</td>
             <td>{{$item->TXT_USUARIO_AUTORIZA}}</td>
-
             <td>{{$item->TXT_EMPRESA_TRABAJADOR}}</td>
             <td>{{$item->EMAIL_USUARIO}}</td>
             <td>{{$item->TXT_USUARIO_AUTORIZA}}</td>
             <td>{{$item->EMAIL_JEFE}}</td>
-
-
-
+            <td>{{$item->CUENTA}}</td>
         </tr>
         @endforeach
     </table>
