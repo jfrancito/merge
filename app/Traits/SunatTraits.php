@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Crypt;
 use App\Modelos\FeToken;
 use App\Modelos\DocumentoSunat;
-
+use App\Modelos\DocumentoSunatDetalle;
 
 use View;
 use Session;
@@ -22,6 +22,110 @@ use File;
 trait SunatTraits
 {
 
+	private function sunatarchivos() {
+
+
+		$empresas 					= 	DB::table('FE_TOKEN')
+										//->where('COD_EMPR','=','IACHEM0000010394')
+										->where('TIPO','=','COMPROBANTE_PAGO')
+									    ->select('COD_EMPR', 'TXT_EMPR')
+									    ->groupBy('COD_EMPR', 'TXT_EMPR')
+									    ->get();
+
+		foreach ($empresas as $indexe=>$item2) {
+
+			$documentos 	=   DocumentoSunat::where('RUC_EMPRESA','=',$item2->COD_EMPR)
+								->whereRaw('ISNULL(IND_DETALLE, 0) = 0')
+								->orderby('PERIODO','desc')
+								->take(2000)
+						    	->get();
+
+			$fetoken 		=	FeToken::where('COD_EMPR','=',$item2->COD_EMPR)->where('TIPO','=','COMPROBANTE_PAGO')->first();
+
+			foreach($documentos as $index=>$item){
+
+				$indpdf 		= 	$item->IND_PDF;
+				$indxml 		= 	$item->IND_XML;
+
+				$ruc 			= trim($item->RUC_EMPRESA_PROVEEDOR);
+				$serie 			= trim($item->SERIE);
+				$correlativo 	= trim($item->NUMERO);
+				$td 			= trim($item->COD_TIPODOCUMENTO);
+				//$serie 			= trim('G001');
+
+				if($td == '07'){
+					$td = 'F7';
+				}
+
+				$urlxml 					= 	'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2';
+				$respuetapdf 				=	$this->buscar_archivo_sunat_nuevo_fa($urlxml,$fetoken);
+
+				//dd($respuetapdf);
+
+				if($respuetapdf['cod_error'] == '0'){
+
+	                $items = $respuetapdf['informacionItems']['comprobantes'][0]['informacionItems'];
+
+	                foreach ($items as $itemdet) {
+	                    // Crear nuevo registro en DocumentoSunatDetalle
+	                    $detalle = new DocumentoSunatDetalle();
+	                    
+	                    // Asignar valores del array al modelo
+	                    $detalle->ID = $item->ID; // Implementa tu lógica para generar ID
+	                    $detalle->cntItems = $this->limpiarNumero($itemdet['cntItems'] ?? 0);
+	                    $detalle->codUnidadMedida = $itemdet['codUnidadMedida'] ?? null;
+	                    $detalle->desCodigo = $itemdet['desCodigo'] ?? null;
+	                    $detalle->desItem = $itemdet['desItem'] ?? null;
+	                    $detalle->desUnidadMedida = $itemdet['desUnidadMedida'] ?? null;
+	                    $detalle->mtoDesc = $this->limpiarNumero($itemdet['mtoDesc'] ?? 0);
+	                    $detalle->mtoICBPER = $this->limpiarNumero($itemdet['mtoICBPER'] ?? 0);
+	                    $detalle->mtoImpTotal = $this->limpiarNumero($itemdet['mtoImpTotal'] ?? 0);
+	                    $detalle->mtoValUnitario = $this->limpiarNumero($itemdet['mtoValUnitario'] ?? 0);
+	                    // Guardar en la base de datos
+	                    $detalle->save();
+	                }
+
+
+
+
+					DB::table('DOCUMENTO_SUNAT')
+					    ->where('RUC_EMPRESA_PROVEEDOR', $item->RUC_EMPRESA_PROVEEDOR)
+					    ->where('SERIE', $item->SERIE)
+					    ->where('NUMERO', $item->NUMERO)
+					    ->where('COD_TIPODOCUMENTO', $item->COD_TIPODOCUMENTO)
+					    ->update([
+					        'CONTADOR' => DB::raw('CONTADOR + 1'),
+					        'IND_DETALLE' => 1
+					    ]);
+
+				}else{
+					DB::table('DOCUMENTO_SUNAT')
+					    ->where('RUC_EMPRESA_PROVEEDOR', $item->RUC_EMPRESA_PROVEEDOR)
+					    ->where('SERIE', $item->SERIE)
+					    ->where('NUMERO', $item->NUMERO)
+					    ->where('COD_TIPODOCUMENTO', $item->COD_TIPODOCUMENTO)
+					    ->update([
+					        'CONTADOR' => DB::raw('CONTADOR + 1')
+					    ]);
+					    print_r("x");
+				}
+			}
+		}
+
+
+
+	}
+
+    private function limpiarNumero($valor)
+    {
+        if (is_numeric($valor)) {
+            return (float) $valor;
+        }
+        
+        // Si viene como string con formato, limpiarlo
+        $valorLimpio = str_replace(',', '', (string) $valor);
+        return (float) $valorLimpio;
+    }
 	private function sut_traer_data_sunat($empresa_id)
 	{
 	    $empresas = DB::table('FE_TOKEN')
@@ -53,8 +157,8 @@ trait SunatTraits
 			];
 
 			$periodos = [
-			    '202505', // 202510
-			    '202506'    // 202511
+			    '202601', // 202510
+			    '202602'  // 202511
 			];
 	        
 	        foreach ($periodos as $periodo) {
@@ -326,96 +430,7 @@ trait SunatTraits
 
 
 
-	private function sunatarchivos() {
 
-
-		$empresas 					= 	DB::table('FE_TOKEN')
-									    ->select('COD_EMPR', 'TXT_EMPR')
-									    ->groupBy('COD_EMPR', 'TXT_EMPR')
-									    ->get();
-
-		foreach ($empresas as $indexe=>$item2) {
-
-			$documentos 	=   DocumentoSunat::where('RUC_EMPRESA','=',$item2->COD_EMPR)
-								->where('IND_TOTAL','=',0)
-								->orderby('IND_TOTAL','asc')
-								->orderby('PERIODO','asc')
-								->take(300)
-						    	->get();
-
-			$fetoken 		=	FeToken::where('COD_EMPR','=',$item2->COD_EMPR)->where('TIPO','=','COMPROBANTE_PAGO')->first();
-
-			foreach($documentos as $index=>$item){
-
-				$indpdf 		= 	$item->IND_PDF;
-				$indxml 		= 	$item->IND_XML;
-
-				$ruc 			= trim($item->RUC_EMPRESA_PROVEEDOR);
-				$serie 			= trim($item->SERIE);
-				$correlativo 	= trim($item->NUMERO);
-				$td 			= trim($item->COD_TIPODOCUMENTO);
-				if($td == '07'){
-					$td = 'F7';
-				}
-
-				$urlxml 					= 	'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2/01';
-				$respuetapdf 				=	$this->buscar_archivo_sunat_nuevo($urlxml,$fetoken);
-
-				if($respuetapdf['cod_error'] == '0'){
-
-			        $fileName 			= 	$respuetapdf['nombre_archivo'];
-			        $base64File 		= 	$respuetapdf['valor_archivo'];
-					$rutafile 			= 	"//10.1.50.2/fyg/".$item2->COD_EMPR."/".$item->PERIODO."/";
-					//dd($rutafile);
-                    $valor           	=   $this->versicarpetanoexiste_che($rutafile);
-					$destino 			= 	"//10.1.50.2/fyg/".$item2->COD_EMPR."/".$item->PERIODO."/";
-
-					// Asegúrate que la carpeta destino exista, si no, la creas
-					if (!file_exists($destino)) {
-					    mkdir($destino, 0777, true); // true para crear directorios recursivamente
-					}
-					// Decodificamos el contenido base64
-					$fileData = base64_decode($base64File);
-					// Guardamos el archivo
-					$filePath = $destino . $fileName;
-					file_put_contents($filePath, $fileData);
-					//print_r("pdf");
-
-					//dd($filePath);
-
-					DB::table('DOCUMENTO_SUNAT')
-					    ->where('RUC_EMPRESA_PROVEEDOR', $item->RUC_EMPRESA_PROVEEDOR)
-					    ->where('SERIE', $item->SERIE)
-					    ->where('NUMERO', $item->NUMERO)
-					    ->where('COD_TIPODOCUMENTO', $item->COD_TIPODOCUMENTO)
-					    ->update([
-					        'RUTA_PDF' => $filePath,
-					        'NOMBRE_PDF' => $fileName,
-					        'IND_PDF' => 1,
-					        'CONTADOR' => DB::raw('CONTADOR + 1'),
-					        'IND_TOTAL' => 1
-					    ]);
-				//dd($respuetapdf);
-					    //print_r("guardado");
-
-
-				}else{
-					DB::table('DOCUMENTO_SUNAT')
-					    ->where('RUC_EMPRESA_PROVEEDOR', $item->RUC_EMPRESA_PROVEEDOR)
-					    ->where('SERIE', $item->SERIE)
-					    ->where('NUMERO', $item->NUMERO)
-					    ->where('COD_TIPODOCUMENTO', $item->COD_TIPODOCUMENTO)
-					    ->update([
-					        'CONTADOR' => DB::raw('CONTADOR + 1')
-					    ]);
-					    print_r("x");
-				}
-			}
-		}
-
-
-
-	}
 	private function versicarpetanoexiste_che($ruta) {
 		$valor = false;
 		if (!file_exists($ruta)) {
@@ -428,7 +443,7 @@ trait SunatTraits
 
 
 
-    private function buscar_archivo_sunat_nuevo($urlxml, $fetoken)
+    private function buscar_archivo_sunat_nuevo_fa($urlxml, $fetoken)
     {
 
 
@@ -460,19 +475,17 @@ trait SunatTraits
         curl_close($curl);
         $response_array = json_decode($response, true);
 
-        if (!isset($response_array['nomArchivo'])) {
+
+        if (!isset($response_array['comprobantes'])) {
             $array_nombre_archivo = [
                 'cod_error' => 1,
-                'nombre_archivo' => '',
+                'informacionItems' => '',
                 'mensaje' => 'Hubo un problema de sunat buscar nuevamente'
             ];
         } else {
-            $fileName = $response_array['nomArchivo'];
-            $base64File = $response_array['valArchivo'];
             $array_nombre_archivo = [
                 'cod_error' => 0,
-                'nombre_archivo' => $response_array['nomArchivo'],
-                'valor_archivo' => $response_array['valArchivo'],
+                'informacionItems' => $response_array,
                 'mensaje' => 'encontrado con exito'
             ];
         }
