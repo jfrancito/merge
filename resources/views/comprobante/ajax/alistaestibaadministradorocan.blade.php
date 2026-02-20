@@ -78,7 +78,7 @@
         <td><b>{{$operacion_id}}</b></td>
         <td>{{$item->COD_ORDEN}}</td>
         <td></td>
-        <td>{{$funcion->funciones->estorno_referencia($item->COD_DOCUMENTO_CTBLE)}}</td>
+        <td>{{$funcion->funciones->estorno_referencia($item->COD_ORDEN)}}</td>
         <td>{{$item->FEC_ORDEN}}</td>
         <td>{{$item->TXT_CATEGORIA_MONEDA}}</td>
         <td>{{$item->TXT_EMPR_CLIENTE}}</td>
@@ -100,14 +100,14 @@
         <td class="rigth">
           <div class="text-center be-checkbox be-checkbox-sm has-primary">
             <input  type="checkbox"
-              class="{{$item->COD_DOCUMENTO_CTBLE}}-{{$item->LOTE_DOC}} input_asignar"
+              class="{{$item->COD_ORDEN}}-{{$item->LOTE_DOC}} input_asignar"
               data_total = "{{$item->CAN_TOTAL}}"   
-              id="{{$item->COD_DOCUMENTO_CTBLE}}-{{$item->LOTE_DOC}}" >
-            <label  for="{{$item->COD_DOCUMENTO_CTBLE}}-{{$item->LOTE_DOC}}"
+              id="{{$item->COD_ORDEN}}-{{$item->LOTE_DOC}}" >
+            <label  for="{{$item->COD_ORDEN}}-{{$item->LOTE_DOC}}"
                   data-atr = "ver"
                   class = "checkbox checkbox_asignar"
                   data_total = "{{$item->CAN_TOTAL}}"                
-                  name="{{$item->COD_DOCUMENTO_CTBLE}}-{{$item->LOTE_DOC}}"
+                  name="{{$item->COD_ORDEN}}-{{$item->LOTE_DOC}}"
             ></label>
           </div>
         </td>
