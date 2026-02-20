@@ -17,7 +17,7 @@
             </thead>
             <tbody>
             @foreach($tdetliquidaciongastos as $index => $item)
-                <tr class="filalg {{$item->ID_DOCUMENTO}}{{$item->ITEM}} @if($index == 0) activofl @endif"
+                <tr class="filalgvalidar {{$item->ID_DOCUMENTO}}{{$item->ITEM}} @if($index == 0) activofl @endif"
                     data_valor="{{$item->ID_DOCUMENTO}}{{$item->ITEM}}" data_asiento_cabecera="{{$item->TXT_CENTRO}}"
                     data_asiento_detalle="{{$item->TOKEN}}" data_valor_id="{{$item->BUSQUEDAD}}">
                     <td>{{date_format(date_create($item->FECHA_EMISION), 'd/m/Y')}}</td>
