@@ -53,8 +53,8 @@ trait SunatTraits
 			];
 
 			$periodos = [
-			    '202503', // 202510
-			    '202504'    // 202511
+			    '202505', // 202510
+			    '202506'    // 202511
 			];
 	        
 	        foreach ($periodos as $periodo) {

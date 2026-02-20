@@ -21,7 +21,7 @@ class SunatController extends Controller
 	public function actionComprasSunat(Request $request)
 	{
 		$this->sut_traer_data_sunat('IACHEM0000010394');
-		//$this->sut_traer_data_sunat('IACHEM0000007086');
+		$this->sut_traer_data_sunat('IACHEM0000007086');
 
 	}	
 
