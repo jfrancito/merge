@@ -6211,6 +6211,7 @@ trait ComprobanteTraits
                     )
                     ->whereIn('TES.COD_FLUJO_CAJA', [
                         'IICHFC0000000004',
+                        'ISCHFC0000000004',
                         'IICHFC0000000009',
                         'IICHFC0000000012',
                         'ISCHFC0000000012',
@@ -6418,6 +6419,7 @@ trait ComprobanteTraits
                     ->whereIn('TES.COD_OPERACION_CAJA', $array)
                     ->whereIn('TES.COD_FLUJO_CAJA', [
                         'IICHFC0000000004',
+                        'ISCHFC0000000004',
                         'IICHFC0000000009',
                         'IICHFC0000000012',
                         'ISCHFC0000000012',
@@ -6489,6 +6491,8 @@ trait ComprobanteTraits
             ->whereIn('TES.COD_OPERACION_CAJA', $array)
             ->whereIn('TES.COD_FLUJO_CAJA', [
                 'IICHFC0000000004',
+                'ISCHFC0000000004',
+
                 'IICHFC0000000009',
                 'IICHFC0000000012',
                 'ISCHFC0000000012',
@@ -6555,6 +6559,7 @@ trait ComprobanteTraits
                     ->whereIn('TES.COD_OPERACION_CAJA', $array)
                     ->whereIn('TES.COD_FLUJO_CAJA', [
                         'IICHFC0000000004',
+                        'ISCHFC0000000004',
                         'IICHFC0000000009',
                         'IICHFC0000000012',
                         'ISCHFC0000000012',
@@ -6615,6 +6620,7 @@ trait ComprobanteTraits
                     ->whereIn('TES.COD_OPERACION_CAJA', $array)
                     ->whereIn('TES.COD_FLUJO_CAJA', [
                         'IICHFC0000000004',
+                        'ISCHFC0000000004',
                         'IICHFC0000000009',
                         'IICHFC0000000012',
                         'ISCHFC0000000012',
@@ -6679,6 +6685,7 @@ trait ComprobanteTraits
                     ->whereIn('TES.COD_OPERACION_CAJA', $array)
                     ->whereIn('TES.COD_FLUJO_CAJA', [
                         'IICHFC0000000004',
+                        'ISCHFC0000000004',
                         'IICHFC0000000009',
                         'IICHFC0000000012',
                         'ISCHFC0000000012',
