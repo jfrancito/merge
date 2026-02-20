@@ -306,6 +306,7 @@
                                 data-nombre="{{ $prd->NOM_PRODUCTO }}"
                                 data-unidad="{{ $prd->UNIDAD }}"
                                 data-codcategoria="{{ $prd->COD_UNIDAD }}"
+                                data-precio="{{ number_format($prd->PRECIO, 2, '.', '') }}"
                                 data-indmaterialservicio="{{ $prd->IND_MATERIAL_SERVICIO }}">
                             {{ $prd->COD_PRODUCTO }} - {{ $prd->NOM_PRODUCTO }}
                         </option>
@@ -370,10 +371,19 @@
                         <th class=" text-center">PRODUCTO</th>
                         <th class=" text-center">UNIDAD</th>
                         <th class=" text-center">CANTIDAD</th>
+                        <th class=" text-center">PRECIO</th>
+                        <th class=" text-center">SUBTOTAL</th>
                         <th class=" text-center">OBSERVACIÓN</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="6" class="text-right negrita" style="vertical-align: middle;">TOTAL PEDIDO:</th>
+                        <th class="text-center negrita" id="total_pedido" style="font-size: 16px; color: #1d3a6d;">0.00</th>
+                        <th></th>
+                    </tr>
+                </tfoot>
             </table>
         </div>
 

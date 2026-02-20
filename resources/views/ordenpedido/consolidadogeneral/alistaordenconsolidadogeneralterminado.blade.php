@@ -30,7 +30,7 @@
         <td>{{ $cabecera->TXT_ESTADO }}</td>
     </tr>
 
-@endforeach
+    @endforeach
 
         </tbody>
 
