@@ -816,6 +816,8 @@ class GestionEstibaController extends Controller
                 $ctadetraccion                            =   $request['ctadetraccion'];
                 $tipo_detraccion_id                       =   $request['tipo_detraccion_id'];
                 $monto_detraccion                         =   $request['monto_detraccion'];
+                $monto_detraccion                         =   (float) str_replace(',', '', $monto_detraccion);
+
                 $pago_detraccion                          =   $request['pago_detraccion'];
 
                 $empresa_sel                              =   STDEmpresa::where('COD_EMPR','=',$pago_detraccion)->first();
