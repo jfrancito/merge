@@ -168,6 +168,7 @@ class GestionOrdenPedidoController extends Controller
 
         $combo9 = array('' => 'Seleccione Mes') + $periodo_mes;
 
+
 	
 
 	 	$area = DB::table('WEB.ListaplatrabajadoresGenereal')
@@ -186,7 +187,7 @@ class GestionOrdenPedidoController extends Controller
 	    // DETALLE DEL PEDIDO 
 
 	    // $producto = DB::table('ALM.PRODUCTO')->where('cod_estado', 1)->pluck('NOM_PRODUCTO', 'COD_PRODUCTO')->toArray();
-	    $producto = DB::table('ALM.PRODUCTO as PRD')
+	    /*$producto = DB::table('ALM.PRODUCTO as PRD')
 	    				->leftJoin('CMP.CATEGORIA as CAT', 'PRD.COD_CATEGORIA_UNIDAD_MEDIDA', '=', 'CAT.COD_CATEGORIA')
 	    				->where('PRD.COD_ESTADO', 1)
 	   					 ->select(
@@ -195,7 +196,20 @@ class GestionOrdenPedidoController extends Controller
 	        			'PRD.IND_MATERIAL_SERVICIO',
 	        			'CAT.COD_CATEGORIA as COD_UNIDAD',
 	        			'CAT.NOM_CATEGORIA as UNIDAD')
-	    				->get();
+	    				->get();*/
+
+	    $producto = DB::select(
+							    "EXEC WEB.SP_LISTA_PRODUCTOS_ORDEN ?",
+							    [$empresa]
+							);
+		$registrosMonto = DB::table('WEB.MONTO_ORDEN_PEDIDO')
+					    ->where('COD_ESTADO', 1)
+					    ->where('COD_EMPR', $empresa)
+					    ->orderBy('MONTO', 'asc')
+					    ->get();
+
+
+   
 
 		$listapedido = $this->listaOrdenPedido(
             "GEN",                 
@@ -236,6 +250,7 @@ class GestionOrdenPedidoController extends Controller
     		'listapedido'           => $listapedido,  
     		'nomArea'				=> $nomArea,
     		'area_id'				=> $area_id,
+    		'registrosMonto'        => $registrosMonto,
             'ajax'=>true,    
         ]);
     }

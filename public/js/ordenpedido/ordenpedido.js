@@ -7,6 +7,11 @@ $(document).ready(function () {
     var carpeta = $("#carpeta").val();
     let filaCount = 0;
 
+    // Inicializar totales y visibilidad de campos
+    setTimeout(() => {
+        calcularTotalPedido();
+    }, 500);
+
     /* ===============================
        FUNCIÓN MODAL BONITO (ÚNICA)
        =============================== */
@@ -104,147 +109,137 @@ $(document).ready(function () {
    REGISTRAR ORDEN DE PEDIDO
    =============================== */
 
-    $(".ordenpedidoprincipal").on('click', '#asignarordenpedido', function (e) {
-        e.preventDefault();
-        abrircargando();
+$(".ordenpedidoprincipal").on('click', '#asignarordenpedido', function (e) {
+    e.preventDefault();
 
-        let _token = $('#token').val();
-        let fec_pedido = $('#fec_pedido').val();
-        let cod_periodo = $('#cod_periodo').val();
-        let cod_anio = $('#cod_anio').val();
-        let cod_empr = $('#cod_empr').val();
-        let cod_centro = $('#cod_centro').val();
-        let cod_tipo_pedido = $('#cod_tipo_pedido').val();
-        let cod_trabajador_solicita = $('#cod_trabajador_solicita').val();
-        let cod_trabajador_autoriza = $('#cod_trabajador_autoriza').val();
-        let cod_trabajador_aprueba_ger = $('#cod_trabajador_aprueba_ger').val();
-        let cod_trabajador_aprueba_adm = $('#cod_trabajador_aprueba_adm').val();
-        let txt_glosa = $('#txt_glosa').val();
-        let cod_estado = $('#cod_estado').val();
-        let cod_area = $('#cod_area').val();
-        let orden_pedido_id = $('#orden_pedido_id').val();
+    let _token = $('#token').val();
+    let fec_pedido = $('#fec_pedido').val();
+    let cod_periodo = $('#cod_periodo').val();
+    let cod_anio = $('#cod_anio').val();
+    let cod_empr = $('#cod_empr').val();
+    let cod_centro = $('#cod_centro').val();
+    let cod_tipo_pedido = $('#cod_tipo_pedido').val();
+    let cod_trabajador_solicita = $('#cod_trabajador_solicita').val();
+    let cod_trabajador_autoriza = $('#cod_trabajador_autoriza').val();
+    let cod_trabajador_aprueba_ger = $('#cod_trabajador_aprueba_ger').val();
+    let cod_trabajador_aprueba_adm = $('#cod_trabajador_aprueba_adm').val();
+    let txt_glosa = $('#txt_glosa').val();
+    let cod_estado = $('#cod_estado').val();
+    let cod_area = $('#cod_area').val();
+    let orden_pedido_id = $('#orden_pedido_id').val();
 
-        let opcion = !orden_pedido_id ? 'I' : 'U';
+    let opcion = !orden_pedido_id ? 'I' : 'U';
 
-        /* ========= VALIDACIONES ========= */
+    /* ========= VALIDACIONES ========= */
 
-        function errorCampo(mensaje) {
-            cerrarcargando();
-            modalBonito({
-                tipo: 'error',
-                icono: '❌',
-                titulo: 'Campos obligatorios',
-                mensaje: mensaje
-            });
-        }
-
-        if (!cod_anio) return errorCampo('Debe seleccionar:<br><b>Año</b>');
-        if (!cod_periodo) return errorCampo('Debe seleccionar:<br><b>Mes</b>');
-        if (!cod_tipo_pedido) return errorCampo('Debe seleccionar:<br><b>Tipo Pedido</b>');
-        if (!cod_trabajador_autoriza) return errorCampo('Debe seleccionar:<br><b>Usuario Autoriza</b>');
-        if (!cod_trabajador_aprueba_ger) return errorCampo('Debe seleccionar:<br><b>Usuario Aprueba Gerencia</b>');
-        if (!cod_trabajador_aprueba_adm) return errorCampo('Debe seleccionar:<br><b>Usuario Aprueba Administración</b>');
-        if (!txt_glosa) return errorCampo('Debe completar:<br><b>Observación</b>');
-
-        /* ========= DETALLE ========= */
-
-        let detalles = [];
-        $('#tabla_detalle_pedido tbody tr').each(function () {
-            let tds = $(this).find('td');
-            detalles.push({
-                cod_producto: tds.eq(1).text().trim(),
-                nom_producto: tds.eq(2).text().trim(),
-                cod_categoria: tds.eq(3).text().trim(),
-                nom_categoria: tds.eq(4).text().trim(),
-                cantidad: parseInt(tds.eq(5).text().trim()) || 0,
-                txt_observacion: tds.eq(6).text().trim(),
-                opcion_detalle: 'I',
-                detalle_id: null
-            });
-        });
-
-        if (detalles.length === 0) {
-            cerrarcargando();
-            modalBonito({
-                tipo: 'warn',
-                icono: '🛒',
-                titulo: 'No hay productos',
-                mensaje: 'Debe agregar al menos <b>un producto</b>.'
-            });
-            return;
-        }
-
-        cerrarcargando();
-
-        /* ========= CONFIRMAR ========= */
-
+    function errorCampo(mensaje) {
         modalBonito({
-            tipo: 'info',
-            icono: '📝',
-            titulo: 'Confirmar registro',
-            mensaje: '¿Deseas guardar la <b>Orden de Pedido</b>?',
-            confirmar: true,
-            onConfirm: function () {
+            tipo: 'error',
+            icono: '❌',
+            titulo: 'Campos obligatorios',
+            mensaje: mensaje
+        });
+    }
 
-                abrircargando();
+    if (!cod_anio) return errorCampo('Debe seleccionar:<br><b>Año</b>');
+    if (!cod_periodo) return errorCampo('Debe seleccionar:<br><b>Mes</b>');
+    if (!cod_tipo_pedido) return errorCampo('Debe seleccionar:<br><b>Tipo Pedido</b>');
+    if (!cod_trabajador_autoriza) return errorCampo('Debe seleccionar:<br><b>Usuario Autoriza</b>');
+    if ($('#cod_trabajador_aprueba_ger').is(':visible') && !cod_trabajador_aprueba_ger) return errorCampo('Debe seleccionar:<br><b>Usuario Aprueba Gerencia</b>');
+    if ($('#cod_trabajador_aprueba_adm').is(':visible') && !cod_trabajador_aprueba_adm) return errorCampo('Debe seleccionar:<br><b>Usuario Aprueba Administración</b>');
+    if (!txt_glosa) return errorCampo('Debe completar:<br><b>Observación</b>');
 
-                $.ajax({
-                    type: "POST",
-                    url: carpeta + "/registrar_orden_pedido",
-                    data: {
-                        _token,
-                        fec_pedido,
-                        cod_periodo,
-                        cod_anio,
-                        cod_empr,
-                        cod_centro,
-                        cod_tipo_pedido,
-                        cod_trabajador_solicita,
-                        cod_trabajador_autoriza,
-                        cod_trabajador_aprueba_ger,
-                        cod_trabajador_aprueba_adm,
-                        txt_glosa,
-                        cod_estado,
-                        cod_area,
-                        orden_pedido_id,
-                        opcion,
-                        array_detalle: detalles
-                    },
+    /* ========= DETALLE ========= */
 
-                    /* ===== OK ===== */
-                    success: function (resp) {
-                        modalBonito({
-                            tipo: 'success',
-                            icono: '✔',
-                            titulo: 'Operación exitosa',
-                            mensaje: 'La Orden de Pedido fue registrada correctamente.'
-                        });
-
-                        setTimeout(() => {
-                            location.reload();
-                        }, 1500);
-                    },
-
-                    /* ===== ERROR ===== */
-                    error: function (xhr) {
-                        modalBonito({
-                            tipo: 'error',
-                            icono: '❌',
-                            titulo: 'Error',
-                            mensaje: xhr.responseJSON?.message ||
-                                'Ocurrió un error al guardar la Orden de Pedido.'
-                        });
-                    },
-
-                    /* ===== SIEMPRE ===== */
-                    complete: function () {
-                        cerrarcargando(); // 👈 nunca se queda cargando
-                    }
-                });
-            }
+    let detalles = [];
+    $('#tabla_detalle_pedido tbody tr').each(function () {
+        let tds = $(this).find('td');
+        detalles.push({
+            cod_producto: tds.eq(1).text().trim(),
+            nom_producto: tds.eq(2).text().trim(),
+            cod_categoria: tds.eq(3).text().trim(),
+            nom_categoria: tds.eq(4).text().trim(),
+            cantidad: parseInt(tds.eq(5).text().trim()) || 0,
+            txt_observacion: tds.eq(6).text().trim(),
+            opcion_detalle: 'I',
+            detalle_id: null
         });
     });
 
+    if (detalles.length === 0) {
+        modalBonito({
+            tipo: 'warn',
+            icono: '🛒',
+            titulo: 'No hay productos',
+            mensaje: 'Debe agregar al menos <b>un producto</b>.'
+        });
+        return;
+    }
+
+    /* ========= CONFIRMAR ========= */
+
+    modalBonito({
+        tipo: 'info',
+        icono: '📝',
+        titulo: 'Confirmar registro',
+        mensaje: '¿Deseas guardar la <b>Orden de Pedido</b>?',
+        confirmar: true,
+        onConfirm: function () {
+
+            // Abrimos cargando solo cuando el usuario confirma
+            abrircargando();
+
+            $.ajax({
+                type: "POST",
+                url: carpeta + "/registrar_orden_pedido",
+                data: {
+                    _token,
+                    fec_pedido,
+                    cod_periodo,
+                    cod_anio,
+                    cod_empr,
+                    cod_centro,
+                    cod_tipo_pedido,
+                    cod_trabajador_solicita,
+                    cod_trabajador_autoriza,
+                    cod_trabajador_aprueba_ger,
+                    cod_trabajador_aprueba_adm,
+                    txt_glosa,
+                    cod_estado,
+                    cod_area,
+                    orden_pedido_id,
+                    opcion,
+                    array_detalle: detalles
+                },
+
+                success: function (resp) {
+                    modalBonito({
+                        tipo: 'success',
+                        icono: '✔',
+                        titulo: 'Operación exitosa',
+                        mensaje: 'La Orden de Pedido fue registrada correctamente.'
+                    });
+
+                    // 🔹 Dejamos el cargando activo y recargamos
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                },
+
+                error: function (xhr) {
+                    modalBonito({
+                        tipo: 'error',
+                        icono: '❌',
+                        titulo: 'Error',
+                        mensaje: xhr.responseJSON?.message ||
+                            'Ocurrió un error al guardar la Orden de Pedido.'
+                    });
+                    cerrarcargando(); // Cerramos solo si hay error
+                },
+            });
+        }
+    });
+});
 
     /* ===============================
        AGREGAR PRODUCTO
@@ -259,6 +254,8 @@ $(document).ready(function () {
         let cod_categoria = option.data('codcategoria');
         let nom_categoria = option.data('unidad');
         let cantidad = $('#cantidad').val();
+        let precio = parseFloat(option.data('precio')) || 0;
+        let subtotal = parseFloat(cantidad) * precio;
         let txt_observacion = $('#txt_observacion').val();
 
         if (!cod_producto) {
@@ -281,12 +278,22 @@ $(document).ready(function () {
             return;
         }
 
-         if (!cod_categoria) {
+        if (!cod_categoria) {
             modalBonito({
                 tipo: 'warn',
                 icono: '⚠',
                 titulo: 'Atención',
                 mensaje: 'Coordinar con el área de compras para configurar su unidad.'
+            });
+            return;
+        }
+
+        if (!precio || precio <= 0) {
+            modalBonito({
+                tipo: 'warn',
+                icono: '⚠',
+                titulo: 'Precio no configurado',
+                mensaje: nom_producto + ' - coordinar con el área de compras el precio del producto.'
             });
             return;
         }
@@ -322,9 +329,13 @@ $(document).ready(function () {
                 <td style="display:none">${cod_categoria}</td>
                 <td class="text-center">${nom_categoria}</td>
                 <td class="text-center">${cantidad}</td>
+                <td class="text-center">${precio.toFixed(2)}</td>
+                <td class="text-center subtotal">${subtotal.toFixed(2)}</td>
                 <td>${txt_observacion}</td>
             </tr>
         `);
+
+        calcularTotalPedido();
 
         $('#cod_producto').val('').trigger('change');
         $('#cod_categoria').val('');
@@ -332,6 +343,53 @@ $(document).ready(function () {
         $('#cantidad').val('');
         $('#txt_observacion').val('');
     });
+
+    function calcularTotalPedido() {
+        let totalPedido = 0;
+        $('#tabla_detalle_pedido tbody .subtotal').each(function () {
+            totalPedido += parseFloat($(this).text()) || 0;
+        });
+
+        $('#total_pedido').text(totalPedido.toFixed(2));
+
+        if (typeof registrosMonto !== 'undefined' && Array.isArray(registrosMonto)) {
+
+            // Umbral para Gerencia (Código 01) -> Ejemplo: 30.00
+            let configGerencia = registrosMonto.find(r => r.COD_MONTO === 'IICHMO0000000001');
+            let umbralGerencia = configGerencia ? parseFloat(configGerencia.MONTO) : 0;
+
+            /**
+             * LÓGICA DE VISIBILIDAD REFINADA
+             */
+
+            // GERENCIA: Solo se muestra si el total es ESTRICTAMENTE MAYOR al umbral (ej: > 30)
+            if (totalPedido > umbralGerencia) {
+                // Si el campo estaba oculto y ahora se va a mostrar, lanzamos advertencia
+                if ($('#cod_trabajador_aprueba_ger').closest('.col-md-6').is(':hidden')) {
+                    modalBonito({
+                        tipo: 'warn',
+                        icono: '⚠️',
+                        titulo: 'Atención',
+                        mensaje: 'El monto total <b>superó los ' + umbralGerencia.toFixed(2) + '</b>. Por favor, asegúrese de seleccionar el <b>Aprobador de Gerencia</b>.'
+                    });
+                }
+                $('#cod_trabajador_aprueba_ger').closest('.col-md-6').show();
+            } else {
+                // Si es 30 o menos, se oculta y limpia
+                $('#cod_trabajador_aprueba_ger').closest('.col-md-6').hide();
+                $('#cod_trabajador_aprueba_ger').val('').trigger('change');
+            }
+
+            // ADMINISTRACIÓN: Según tu ejemplo, se visualiza siempre (ej: desde 20 ya se ve)
+            // Se ocultaría solo si el pedido estuviera totalmente vacío (0)
+            if (totalPedido > 0) {
+                $('#cod_trabajador_aprueba_adm').closest('.col-md-6').show();
+            } else {
+                $('#cod_trabajador_aprueba_adm').closest('.col-md-6').hide();
+                $('#cod_trabajador_aprueba_adm').val('').trigger('change');
+            }
+        }
+    }
 
 
     /* $('#cod_anio').on('change', function () {
@@ -399,6 +457,8 @@ $(document).ready(function () {
             filaCount++;
             $(this).find('td:first').text(filaCount);
         });
+
+        calcularTotalPedido();
     });
 
 
