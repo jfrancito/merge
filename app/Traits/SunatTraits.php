@@ -60,7 +60,7 @@ trait SunatTraits
 				$urlxml 					= 	'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2';
 				$respuetapdf 				=	$this->buscar_archivo_sunat_nuevo_fa($urlxml,$fetoken);
 
-				//dd($respuetapdf);
+
 
 				if($respuetapdf['cod_error'] == '0'){
 
@@ -85,35 +85,26 @@ trait SunatTraits
 	                    $detalle->save();
 	                }
 
-
-
-
 					DB::table('DOCUMENTO_SUNAT')
-					    ->where('RUC_EMPRESA_PROVEEDOR', $item->RUC_EMPRESA_PROVEEDOR)
-					    ->where('SERIE', $item->SERIE)
-					    ->where('NUMERO', $item->NUMERO)
-					    ->where('COD_TIPODOCUMENTO', $item->COD_TIPODOCUMENTO)
+					    ->where('ID', $item->ID)
 					    ->update([
-					        'CONTADOR' => DB::raw('CONTADOR + 1'),
 					        'IND_DETALLE' => 1
 					    ]);
 
 				}else{
+
+
 					DB::table('DOCUMENTO_SUNAT')
-					    ->where('RUC_EMPRESA_PROVEEDOR', $item->RUC_EMPRESA_PROVEEDOR)
-					    ->where('SERIE', $item->SERIE)
-					    ->where('NUMERO', $item->NUMERO)
-					    ->where('COD_TIPODOCUMENTO', $item->COD_TIPODOCUMENTO)
+					    ->where('ID', $item->ID)
 					    ->update([
-					        'CONTADOR' => DB::raw('CONTADOR + 1')
+					        'CONTADOR' => DB::raw('ISNULL(CONTADOR,0) + 1')
 					    ]);
-					    print_r("x");
+					//dd($item->ID);
+					print_r("x");
+
 				}
 			}
 		}
-
-
-
 	}
 
     private function limpiarNumero($valor)
