@@ -7355,11 +7355,7 @@ trait ComprobanteTraits
         if($ordencompra_t->IND_MATERIAL_SERVICIO == 'S'){
             $ind_cantidaditem           =   1;
         }else{
-            //numero_items
-            if(count($detalleordencompra) == count($detallefedocumento)){
-                $ind_cantidaditem           =   1;
-            }else{  $ind_errototal      =   0;  }
-
+              $ind_errototal      =   0;
         }
 
         $tp = CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
