@@ -70,10 +70,22 @@ class GestionOrdenPedidoAutorizaController extends Controller
         $pedido = DB::table('WEB.ORDEN_PEDIDO')
             ->where('ID_PEDIDO', $orden_pedido_id)
             ->first();
-        $estado = DB::table('CMP.CATEGORIA')
-            ->where('TXT_GRUPO', 'ESTADO_MERGE')
-            ->where('COD_CATEGORIA', 'ETM0000000000013')
-            ->first();
+
+        if (is_null($pedido->TXT_TRABAJADOR_APRUEBA_GER) || trim($pedido->TXT_TRABAJADOR_APRUEBA_GER) === '') {
+
+            $estado = DB::table('CMP.CATEGORIA')
+                ->where('TXT_GRUPO', 'ESTADO_MERGE')
+                ->where('COD_CATEGORIA', 'ETM0000000000004')
+                ->first();
+
+        } else {
+
+          
+            $estado = DB::table('CMP.CATEGORIA')
+                ->where('TXT_GRUPO', 'ESTADO_MERGE')
+                ->where('COD_CATEGORIA', 'ETM0000000000013')
+                ->first();
+        }
 
 
         $this->insertOrdenPedido(

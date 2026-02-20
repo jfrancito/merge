@@ -15,7 +15,7 @@
 @section('section')
 
   <!-- ================= CONTENEDOR PRINCIPAL ================= -->
-<div class="be-content ordenpedidoprincipal">
+<div class="be-content montoordenpedidoprincipal">
     <div class="main-content container-fluid">
         <div class="row">
             <div class="col-sm-12">
@@ -23,35 +23,24 @@
                 <div class="tab-container">
 
                     <ul class="nav nav-tabs">
-                        <li class="active"><a href="#crearpedido" data-toggle="tab"><b>CREAR PEDIDO</b></a></li>
-                        <li><a href="#ordenpedido" data-toggle="tab"><b>ORDEN PEDIDO</b></a></li>
+                        <li class="active"><a href="#configurarmonto" data-toggle="tab"><b>CONFIGURAR MONTO</b></a></li>
+                       
                     </ul>
-
                     <!-- CONTENIDO TABS -->
                     <div class="tab-content">
-                        <div id="crearpedido" class="tab-pane fade in active cont">
-                            @include('ordenpedido.tab.creartaborden')
-                        </div>
-
-                        <div id="ordenpedido" class="tab-pane fade cont">
-                            @include('ordenpedido.ajax.alistaordenpedido')
+                        <div id="configurarmonto" class="tab-pane fade in active cont">
+                        @include('ordenpedido.monto.tabmontoordenpedido')
                         </div>
                     </div><!-- FIN tab-content -->
                 </div><!-- FIN tab-container -->
             </div>
         </div>
     </div>
-    @include('ordenpedido.modal.modalsolicitud')
 </div>
 
 
 @stop
 @section('script')
-     
-     <script>
-        var registrosMonto = {!! json_encode($registrosMonto, JSON_UNESCAPED_UNICODE) !!};
-        
-    </script>
 
     <script src="{{ asset('public/js/general/inputmask/inputmask.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/js/general/inputmask/inputmask.extensions.js') }}" type="text/javascript"></script>
@@ -115,5 +104,5 @@
     </script>
 
 
-    <script src="{{ asset('public/js/ordenpedido/ordenpedido.js?v='.$version) }}" type="text/javascript"></script>
+    <script src="{{ asset('public/js/ordenpedido/ordenmonto.js?v='.$version) }}" type="text/javascript"></script>
 @stop
