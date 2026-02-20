@@ -385,7 +385,7 @@
                                         </div> 
                                       @endif
                                     @else
-                                      @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000009')
+                                      @if($item->COD_CATEGORIA_DOCUMENTO == 'DCC0000000000009' && $fedocumento->MONTO_DETRACCION_RED > 0)
                                         <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3 autodetraccion">
                                           <div class="form-group sectioncargarimagen">
                                             <label class="col-sm-12 control-label" style="text-align: left;">
@@ -406,6 +406,7 @@
                                           </div>
                                         </div>
                                       @ELSE
+                                        @if($item->COD_CATEGORIA_DOCUMENTO != 'DCC0000000000009' )
                                         <div class="col-xs-12 col-sm-4 col-md-3 col-lg-3">
                                           <div class="form-group sectioncargarimagen">
                                             <label class="col-sm-12 control-label" style="text-align: left;"><b>{{$item->NOM_CATEGORIA_DOCUMENTO}} (@if($item->TXT_FORMATO == 'ZIP') XML @else {{$item->TXT_FORMATO}} @endif)</b> 
@@ -423,6 +424,7 @@
                                               </div>
                                           </div>
                                         </div>
+                                        @ENDIF
                                       @ENDIF
 
 

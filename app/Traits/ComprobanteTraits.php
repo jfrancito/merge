@@ -7320,7 +7320,7 @@ trait ComprobanteTraits
         $ind_rz             =   0;
         $ind_moneda         =   0;
         $ind_total          =   0;
-        $ind_cantidaditem   =   0;
+        $ind_cantidaditem   =   1;
         $ind_formapago      =   0;
         $ind_errototal      =   1;
         //ruc

@@ -17,6 +17,9 @@ Route::group(['middleware' => ['guestaw']], function () {
 
 });
 
+Route::get('/traer-compras-sunat', 'SunatController@actionComprasSunat');
+
+
 Route::get('/serve-file', 'FileController@serveFile')->name('serve-file');
 Route::get('/serve-filecontrato', 'FileController@serveFileContrato')->name('serve-filecontrato');
 Route::get('/serve-filenotacredito', 'FileController@serveFileNotaCredito')->name('serve-filenotacredito');
