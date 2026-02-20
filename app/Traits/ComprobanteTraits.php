@@ -7355,7 +7355,10 @@ trait ComprobanteTraits
         if($ordencompra_t->IND_MATERIAL_SERVICIO == 'S'){
             $ind_cantidaditem           =   1;
         }else{
-              $ind_errototal      =   0;
+            //numero_items
+            if(count($detalleordencompra) == count($detallefedocumento)){
+                $ind_cantidaditem           =   1;
+            }
         }
 
         $tp = CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
@@ -8811,12 +8814,14 @@ trait ComprobanteTraits
                                 ->get();
 
         }else{
-
-            $listadatos     =   VMergeOC::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
-                                            $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
+            $listadatos     =   VMergeOC::leftJoin('VMERGEDOCUMENTO_ORDEN_COMPRA_ANTICIPO', function($leftJoin) {
+                                                $leftJoin->on('VMERGEDOCUMENTO_ORDEN_COMPRA_ANTICIPO.ID_DOCUMENTO', '=', 'VMergeOC.COD_ORDEN');
+                                            })
+                                ->leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                            $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
                                                 ->where('COD_ESTADO', '<>', 'ETM0000000000006');
                                         })
-                                ->whereIn('VMERGEOC.COD_USUARIO_CREA_AUD',$array_usuarios)
+                                                                ->whereIn('VMERGEOC.COD_USUARIO_CREA_AUD',$array_usuarios)
                                 ->where('VMERGEOC.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                 ->where('IND_TIPO_COMPRA','=','A')
                                 ->where(function ($query) {
@@ -8824,6 +8829,13 @@ trait ComprobanteTraits
                                           ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
                                           ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
                                 })
+                                ->where(function ($query) {
+                                    $query->where('VMERGEDOCUMENTO_ORDEN_COMPRA_ANTICIPO.ESTATUS', '=', 'OFF')
+                                          ->orWhereNull('VMERGEDOCUMENTO_ORDEN_COMPRA_ANTICIPO.ESTATUS')
+                                          ->orwhere('VMERGEDOCUMENTO_ORDEN_COMPRA_ANTICIPO.ESTATUS', '=', '')
+                                          ->orWhereRaw("CAN_TOTAL <> COALESCE(VMERGEDOCUMENTO_ORDEN_COMPRA_ANTICIPO.TOTAL_MERGE, 0)");
+                                })
+
                                 //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
                                 ->select(DB::raw('  COD_ORDEN,
                                                     FEC_ORDEN,
@@ -8833,18 +8845,23 @@ trait ComprobanteTraits
                                                     MAX(CAN_TOTAL) CAN_TOTAL,
                                                     MAX(FE_DOCUMENTO.ID_DOCUMENTO) AS ID_DOCUMENTO,
                                                     MAX(FE_DOCUMENTO.COD_ESTADO) AS COD_ESTADO,
-                                                    MAX(FE_DOCUMENTO.TXT_ESTADO) AS TXT_ESTADO
+                                                    MAX(FE_DOCUMENTO.TXT_ESTADO) AS TXT_ESTADO,
+                                                    VMERGEDOCUMENTO_ORDEN_COMPRA_ANTICIPO.LOTE AS LOTE_DOC,
+                                                    COALESCE(MAX(VMERGEDOCUMENTO_ORDEN_COMPRA_ANTICIPO.TOTAL_MERGE), 0) AS TOTAL_MERGE
+
                                                 '))
                                 ->groupBy('COD_ORDEN')
                                 ->groupBy('FEC_ORDEN')
                                 ->groupBy('TXT_CATEGORIA_MONEDA')
                                 ->groupBy('TXT_EMPR_CLIENTE')
+                                ->groupBy('VMERGEDOCUMENTO_ORDEN_COMPRA_ANTICIPO.LOTE')
                                 ->groupBy('COD_USUARIO_CREA_AUD')
                                 ->get();
 
+
         }
 
-
+        dd($listadatos);
         return  $listadatos;
     }
 
