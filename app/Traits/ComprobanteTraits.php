@@ -5945,7 +5945,7 @@ trait ComprobanteTraits
                             END AS MONTO
                         "),
                         DB::raw("ISNULL(TES.ATENDIDO,0) AS MONTOATENDIDO"),
-                        'TES.TXT_GLOSA',
+                        'TES.TXT_GLOSA as TXT_GLOSA',
                         'TES.COD_FLUJO_CAJA',
                         'TES.TXT_FLUJO_CAJA',
                         'TES.COD_ITEM_MOVIMIENTO',
@@ -5968,6 +5968,7 @@ trait ComprobanteTraits
                         'ISCHFC0000000037',
                         'IICHFC0000000037'
                     ])
+
                     ->whereIn('TES.COD_CATEGORIA_OPERACION_CAJA', ['OPC0000000000002', 'OPC0000000000001'])
                     ->where('TES.IND_EXTORNO', 0)
                     ->where('TES.COD_ESTADO', 1)

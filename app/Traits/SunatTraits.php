@@ -36,8 +36,10 @@ trait SunatTraits
 
 			$documentos 	=   DocumentoSunat::where('RUC_EMPRESA','=',$item2->COD_EMPR)
 								->whereRaw('ISNULL(IND_DETALLE, 0) = 0')
+								->whereRaw('ISNULL(CONTADOR,0) < 2')
+								->whereRaw("COD_TIPODOCUMENTO = '01'")
 								->orderby('PERIODO','desc')
-								->take(2000)
+								->take(4000)
 						    	->get();
 
 			$fetoken 		=	FeToken::where('COD_EMPR','=',$item2->COD_EMPR)->where('TIPO','=','COMPROBANTE_PAGO')->first();
@@ -86,7 +88,10 @@ trait SunatTraits
 	                }
 
 					DB::table('DOCUMENTO_SUNAT')
-					    ->where('ID', $item->ID)
+					    ->where('RUC_EMPRESA_PROVEEDOR', $item->RUC_EMPRESA_PROVEEDOR)
+					    ->where('SERIE', $item->SERIE)
+					    ->where('NUMERO', $item->NUMERO)
+					    ->where('COD_TIPODOCUMENTO', $item->COD_TIPODOCUMENTO)
 					    ->update([
 					        'IND_DETALLE' => 1
 					    ]);
@@ -95,7 +100,10 @@ trait SunatTraits
 
 
 					DB::table('DOCUMENTO_SUNAT')
-					    ->where('ID', $item->ID)
+					    ->where('RUC_EMPRESA_PROVEEDOR', $item->RUC_EMPRESA_PROVEEDOR)
+					    ->where('SERIE', $item->SERIE)
+					    ->where('NUMERO', $item->NUMERO)
+					    ->where('COD_TIPODOCUMENTO', $item->COD_TIPODOCUMENTO)
 					    ->update([
 					        'CONTADOR' => DB::raw('ISNULL(CONTADOR,0) + 1')
 					    ]);
@@ -287,6 +295,8 @@ trait SunatTraits
 	            $cabecera->MONEDA = $valorsire['codMoneda'];
 	            $cabecera->ESTADO = $valorsire['desEstadoComprobante'];
 	            $cabecera->TOTAL = $valorsire['montos']['mtoTotalCp'] ?? 0;
+	            $cabecera->IND_REGISTRO = 'SUNAT';
+
 	            $cabecera->save();
 	            
 	            return true;
