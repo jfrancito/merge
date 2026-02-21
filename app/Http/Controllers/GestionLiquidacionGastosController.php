@@ -1032,8 +1032,11 @@ class GestionLiquidacionGastosController extends Controller
         $tdetliquidaciongastos = LqgDetLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
         $detdocumentolg = LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
         $documentohistorial = LqgDocumentoHistorial::where('ID_DOCUMENTO', '=', $iddocumento)->orderby('FECHA', 'DESC')->get();
-        $archivospdf = Archivo::where('ID_DOCUMENTO', '=', $iddocumento)->where('EXTENSION', 'like', '%' . 'pdf' . '%')->get();
+        $archivospdf = Archivo::where('ID_DOCUMENTO', '=', $iddocumento)->where('NOMBRE_ARCHIVO', 'like', '%' . 'pdf' . '%')->get();
         $ocultar = "";
+
+
+
         // Construir el array de URLs
         $initialPreview = [];
         foreach ($archivospdf as $archivo) {
