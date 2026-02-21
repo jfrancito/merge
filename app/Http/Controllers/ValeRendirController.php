@@ -515,7 +515,7 @@ class ValeRendirController extends Controller
                $pendienteCount = count($valesPendientes);
 
 
-                if ($areacomercial === 'MARKETING Y DESARROLLO') {
+                if ($areacomercial === 'MARKETING Y DESARROLLO' && $cod_usuario_registro !== '1CIX00000209') {
 
                     if ($pendienteCount >= 3) {
                         return response()->json([
