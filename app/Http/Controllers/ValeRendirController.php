@@ -286,6 +286,7 @@ class ValeRendirController extends Controller
                
             );
 
+
         return view('valerendir.ajax.modalvalerendir', [
         	'listausuarios' => $combo,
             'listausuarios1' => $combo1,
@@ -522,7 +523,7 @@ class ValeRendirController extends Controller
                         ]);
                     }
 
-                } elseif ($areacomercial === 'ADMINISTRACION') {
+                } elseif ($areacomercial === 'ADMINISTRACION' && $cod_usuario_registro === '1CIX00000209') {
 
                     if ($pendienteCount >= 4) {
                         return response()->json([
