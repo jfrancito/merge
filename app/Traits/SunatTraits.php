@@ -37,7 +37,7 @@ trait SunatTraits
 			$documentos 	=   DocumentoSunat::where('RUC_EMPRESA','=',$item2->COD_EMPR)
 								->whereRaw('ISNULL(IND_DETALLE, 0) = 0')
 								->whereRaw('ISNULL(CONTADOR,0) < 2')
-								->whereRaw("COD_TIPODOCUMENTO = '01'")
+								->whereRaw("COD_TIPODOCUMENTO IN ('01','02')")
 								->orderby('PERIODO','desc')
 								->take(4000)
 						    	->get();
@@ -155,10 +155,7 @@ trait SunatTraits
 			    $fechaActual->format('Ym')    // 202511
 			];
 
-			$periodos = [
-			    '202601', // 202510
-			    '202602'  // 202511
-			];
+			//dd($periodos);
 	        
 	        foreach ($periodos as $periodo) {
 	            $pagina = 1;
