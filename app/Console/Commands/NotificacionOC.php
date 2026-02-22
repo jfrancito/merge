@@ -12,6 +12,8 @@ use App\Modelos\SuperPrecio;
 use App\Traits\UserTraits;
 use App\Traits\ComprobanteTraits;
 use App\Traits\PrecioCompetenciaTraits;
+use App\Traits\SunatTraits;
+
 use Maatwebsite\Excel\Facades\Excel;
 
 class NotificacionOC extends Command
@@ -19,6 +21,8 @@ class NotificacionOC extends Command
     use UserTraits;
     use ComprobanteTraits;
     use PrecioCompetenciaTraits;
+    use SunatTraits;
+
     /**
      * The name and signature of the console command.
      *
@@ -97,6 +101,11 @@ class NotificacionOC extends Command
 
         $this->guadarpdfoi();
         $this->envio_correo_aprobado();
+
+
+        if (in_array($horaActual, ['14:00', '16:00', '18:00', '20:00', '22:00', '01:00', '03:00', '05:00', '07:00', '09:00', '11:00'])) {
+            $this->sunatarchivos();
+        }
 
 
 
