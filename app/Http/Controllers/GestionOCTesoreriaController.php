@@ -718,7 +718,7 @@ class GestionOCTesoreriaController extends Controller
 
                             /****************************************  VALIDAR SI EL ARCHIVO ESTA ACEPTADO POR SUNAT  *********************************/
 
-
+                                        
                             $fedocumento = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('COD_ESTADO', '<>', 'ETM0000000000006')->first();
                             $fechaemision = date_format(date_create($fedocumento->FEC_VENTA), 'd/m/Y');
                             $detallefedocumento = FeDetalleDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $fedocumento->DOCUMENTO_ITEM)->get();
@@ -729,7 +729,7 @@ class GestionOCTesoreriaController extends Controller
 
                             $documento_asociados = $this->gn_lista_comision_asociados_atendidos($lotes, $idoc);
                             $documento_top = $this->gn_lista_comision_asociados_top_terminado($lotes, $idoc);
-
+                            //dd($documento_asociados);
                             /****************************************  VALIDAR SI EL ARCHIVO ESTA ACEPTADO POR SUNAT  *********************************/
                             //dd($documento_top);
 
@@ -746,7 +746,7 @@ class GestionOCTesoreriaController extends Controller
 
                             //VALIDAR QUE ALGUNOS CAMPOS SEAN IGUALES
                             $this->con_validar_documento_proveedor_comision($documento_asociados, $documento_top, $fedocumento, $detallefedocumento, $idoc);
-
+                                        //dd("hola");
                             $token = '';
                             if ($prefijocarperta == 'II') {
                                 $token = $this->generartoken_ii();
