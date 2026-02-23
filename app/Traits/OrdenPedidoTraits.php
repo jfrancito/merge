@@ -265,52 +265,66 @@ trait OrdenPedidoTraits
     }
 
 
-    private function lg_lista_cabecera_pedido_consolidado($empresa_id, $centro_id, $mes_pedido, $anio_pedido)
+ private function lg_lista_cabecera_pedido_consolidado($empresa_id, $centro_id, $mes_pedido, $anio_pedido)
     {
         $empresa_session_id = Session::get('empresas')->COD_EMPR;
 
         $query = DB::table('WEB.ORDEN_PEDIDO as OP')
             ->select(
-            'OP.ID_PEDIDO', 'OP.FEC_PEDIDO', 'OP.COD_CENTRO', 'OP.TXT_AREA', 'OP.TXT_GLOSA', 'OP.TXT_ESTADO',
-            'OP.TXT_TRABAJADOR_SOLICITA', 'OP.TXT_TRABAJADOR_AUTORIZA', 'OP.TXT_TRABAJADOR_APRUEBA_ADM',
-            'OD.COD_PRODUCTO', 'OD.NOM_PRODUCTO',
-            DB::raw("
-              COALESCE(
-                  OD.CAN_MODIF_ADM,
-                  OD.CAN_MODIF_GER,
-                  OD.CAN_MODIF_JEF_AUT,
-                  OD.CANTIDAD
-              ) AS CANTIDAD
-          "),
-            'OD.COD_CATEGORIA AS COD_UNIDAD',
-            'OD.NOM_CATEGORIA',
-            'CAT.COD_CATEGORIA AS COD_FAMILIA',
-            'CAT.NOM_CATEGORIA as NOM_CATEGORIA_FAMILIA',
-            DB::raw('COALESCE(IAP.CAN_FIN_MAT, 0) as STOCK'),
-            'PRD.CAN_STOCK_SEGURIDAD AS CAN_STOCK_RESERVADO'
-        )
+                'OP.ID_PEDIDO',
+                'OP.FEC_PEDIDO',
+                'OP.COD_CENTRO',
+                'OP.TXT_AREA',
+                'OP.TXT_GLOSA',
+                'OP.COD_ESTADO', // 🔥 corregido
+                'OP.TXT_ESTADO',
+                'OP.TXT_TRABAJADOR_SOLICITA',
+                'OP.TXT_TRABAJADOR_AUTORIZA',
+                'OP.TXT_TRABAJADOR_APRUEBA_ADM',
+                'OD.COD_PRODUCTO',
+                'OD.NOM_PRODUCTO',
+                DB::raw("
+                    COALESCE(
+                        OD.CAN_MODIF_ADM,
+                        OD.CAN_MODIF_GER,
+                        OD.CAN_MODIF_JEF_AUT,
+                        OD.CANTIDAD
+                    ) AS CANTIDAD
+                "),
+                'OD.COD_CATEGORIA AS COD_UNIDAD',
+                'OD.NOM_CATEGORIA',
+                'CAT.COD_CATEGORIA AS COD_FAMILIA',
+                'CAT.NOM_CATEGORIA as NOM_CATEGORIA_FAMILIA',
+                DB::raw('COALESCE(IAP.CAN_FIN_MAT, 0) as STOCK'),
+                'PRD.CAN_STOCK_SEGURIDAD AS CAN_STOCK_RESERVADO'
+            )
             ->join('WEB.ORDEN_PEDIDO_DETALLE as OD', 'OP.ID_PEDIDO', '=', 'OD.ID_PEDIDO')
             ->join('STD.EMPRESA as E', 'E.COD_EMPR', '=', 'OP.COD_EMPR')
             ->join('ALM.PRODUCTO as PRD', 'PRD.COD_PRODUCTO', '=', 'OD.COD_PRODUCTO')
             ->join('CMP.CATEGORIA as CAT', 'CAT.COD_CATEGORIA', '=', 'PRD.COD_CATEGORIA_FAMILIA')
             ->leftJoin('ALM.INVENTARIO_ALMACEN as IAP', function ($join) use ($empresa_session_id) {
-            $join->on('IAP.COD_PRODUCTO', '=', 'OD.COD_PRODUCTO')
-                ->on('IAP.COD_CENTRO', '=', 'OP.COD_CENTRO') // 🚀 CORRECCIÓN: 'on' en lugar de 'where'
-                ->where('IAP.COD_EMPR', '=', $empresa_session_id)
-                ->where('IAP.IND_STK_ACTUAL', '=', 1)
-                ->where('IAP.COD_ESTADO', '=', 1);
-        })
+                $join->on('IAP.COD_PRODUCTO', '=', 'OD.COD_PRODUCTO')
+                    ->on('IAP.COD_CENTRO', '=', 'OP.COD_CENTRO')
+                    ->where('IAP.COD_EMPR', '=', $empresa_session_id)
+                    ->where('IAP.IND_STK_ACTUAL', '=', 1)
+                    ->where('IAP.COD_ESTADO', '=', 1);
+            })
             ->where('OP.ACTIVO', 1)
             ->where('OD.ACTIVO', 1)
             ->whereNull('OP.CONSOLIDADO')
             ->where('OP.COD_EMPR', $empresa_session_id)
+
+            // 🔥 FILTRO NUEVO
+            ->where('OP.COD_ESTADO', 'ETM0000000000005')
+
             ->orderBy('OP.ID_PEDIDO', 'ASC');
 
-        // Filtros rápidos
         if ($centro_id && $centro_id != 'TODO')
             $query->where('OP.COD_CENTRO', $centro_id);
+
         if ($mes_pedido && $mes_pedido != 'TODO')
             $query->where('OP.COD_PERIODO', $mes_pedido);
+
         if ($anio_pedido && $anio_pedido != 'TODO')
             $query->where('OP.COD_ANIO', $anio_pedido);
 
@@ -671,13 +685,15 @@ private function lg_lista_cabecera_pedido_consolidado_general($empresa_id, $mes_
                 ON E.COD_EMPR = C.COD_EMPR
             INNER JOIN ALM.CENTRO CEN
                 ON CEN.COD_CENTRO = C.COD_CENTRO
+
             OUTER APPLY (
                 SELECT 
-                    MAX(OP.COD_ANIO) AS COD_ANIO,
-                    MAX(OP.COD_PERIODO) AS COD_PERIODO,
+                    MAX(OP2.COD_ANIO) AS COD_ANIO,
+                    MAX(OP2.COD_PERIODO) AS COD_PERIODO,
+
                     STUFF((
                         SELECT 
-                            ' [SEP] ' 
+                            ' [SEP] '
                             + CONVERT(VARCHAR(10), OP.FEC_PEDIDO, 103)
                             + ' [FLD] ' + OP.ID_PEDIDO
                             + ' [FLD] ' + OP.TXT_AREA
@@ -708,6 +724,14 @@ private function lg_lista_cabecera_pedido_consolidado_general($empresa_id, $mes_
                         ORDER BY OP.FEC_PEDIDO
                         FOR XML PATH(''), TYPE
                     ).value('.', 'NVARCHAR(MAX)'), 1, 7, '') AS DETALLE_POR_AREA
+
+                FROM CMP.REFERENCIA_ASOC RA2
+                INNER JOIN WEB.ORDEN_PEDIDO OP2
+                    ON OP2.ID_PEDIDO = RA2.COD_TABLA
+                WHERE RA2.COD_TABLA_ASOC = C.ID_PEDIDO_CONSOLIDADO
+                  AND RA2.TXT_TIPO_REFERENCIA = 'CONSOLIDADO'
+                  AND RA2.TXT_TABLA = 'WEB.ORDEN_PEDIDO'
+                  AND RA2.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
             ) PED
         "))
 
@@ -754,7 +778,6 @@ private function lg_lista_cabecera_pedido_consolidado_general($empresa_id, $mes_
 
     return $query;
 }
-
 
     private function lg_lista_cabecera_pedido_consolidado_general_terminado()
     {
