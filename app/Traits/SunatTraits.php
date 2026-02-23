@@ -62,30 +62,55 @@ trait SunatTraits
 				$urlxml 					= 	'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2';
 				$respuetapdf 				=	$this->buscar_archivo_sunat_nuevo_fa($urlxml,$fetoken);
 
-
+				//dd($respuetapdf);
 
 				if($respuetapdf['cod_error'] == '0'){
 
-	                $items = $respuetapdf['informacionItems']['comprobantes'][0]['informacionItems'];
+					if($td=='02'){
+						//RECIBO
+		                $items = $respuetapdf['informacionItems']['comprobantes'][0];
 
-	                foreach ($items as $itemdet) {
-	                    // Crear nuevo registro en DocumentoSunatDetalle
-	                    $detalle = new DocumentoSunatDetalle();
-	                    
-	                    // Asignar valores del array al modelo
+		                $detalle = new DocumentoSunatDetalle();
 	                    $detalle->ID = $item->ID; // Implementa tu lógica para generar ID
-	                    $detalle->cntItems = $this->limpiarNumero($itemdet['cntItems'] ?? 0);
-	                    $detalle->codUnidadMedida = $itemdet['codUnidadMedida'] ?? null;
-	                    $detalle->desCodigo = $itemdet['desCodigo'] ?? null;
-	                    $detalle->desItem = $itemdet['desItem'] ?? null;
-	                    $detalle->desUnidadMedida = $itemdet['desUnidadMedida'] ?? null;
-	                    $detalle->mtoDesc = $this->limpiarNumero($itemdet['mtoDesc'] ?? 0);
-	                    $detalle->mtoICBPER = $this->limpiarNumero($itemdet['mtoICBPER'] ?? 0);
-	                    $detalle->mtoImpTotal = $this->limpiarNumero($itemdet['mtoImpTotal'] ?? 0);
-	                    $detalle->mtoValUnitario = $this->limpiarNumero($itemdet['mtoValUnitario'] ?? 0);
+	                    $detalle->cntItems = 1;
+
+	                    $detalle->codUnidadMedida = 'NIU';
+	                    $detalle->desCodigo = '';
+	                    $detalle->desItem = $items['desConcepto'];
+	                    $detalle->desUnidadMedida = 'UNIDAD';
+	                    $detalle->mtoDesc = 0;
+	                    $detalle->mtoICBPER = 0;
+	                    $detalle->mtoImpTotal = $this->limpiarNumero($items['mtoTotalRecibido'] ?? 0);
+	                    $detalle->mtoValUnitario = $this->limpiarNumero($items['mtoTotalRecibido'] ?? 0);
 	                    // Guardar en la base de datos
 	                    $detalle->save();
-	                }
+
+					}else{
+						//FACTURA
+		                $items = $respuetapdf['informacionItems']['comprobantes'][0]['informacionItems'];
+
+		                foreach ($items as $itemdet) {
+		                    // Crear nuevo registro en DocumentoSunatDetalle
+		                    $detalle = new DocumentoSunatDetalle();
+		                    
+		                    // Asignar valores del array al modelo
+		                    $detalle->ID = $item->ID; // Implementa tu lógica para generar ID
+		                    $detalle->cntItems = $this->limpiarNumero($itemdet['cntItems'] ?? 0);
+		                    $detalle->codUnidadMedida = $itemdet['codUnidadMedida'] ?? null;
+		                    $detalle->desCodigo = $itemdet['desCodigo'] ?? null;
+		                    $detalle->desItem = $itemdet['desItem'] ?? null;
+		                    $detalle->desUnidadMedida = $itemdet['desUnidadMedida'] ?? null;
+		                    $detalle->mtoDesc = $this->limpiarNumero($itemdet['mtoDesc'] ?? 0);
+		                    $detalle->mtoICBPER = $this->limpiarNumero($itemdet['mtoICBPER'] ?? 0);
+		                    $detalle->mtoImpTotal = $this->limpiarNumero($itemdet['mtoImpTotal'] ?? 0);
+		                    $detalle->mtoValUnitario = $this->limpiarNumero($itemdet['mtoValUnitario'] ?? 0);
+		                    // Guardar en la base de datos
+		                    $detalle->save();
+		                }
+
+
+					}
+
 
 					DB::table('DOCUMENTO_SUNAT')
 					    ->where('RUC_EMPRESA_PROVEEDOR', $item->RUC_EMPRESA_PROVEEDOR)
