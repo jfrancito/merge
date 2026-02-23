@@ -1876,7 +1876,7 @@ class GestionEstibaController extends Controller
                                                         ->toArray();
                             $ordencompra_f          =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->first();
 
-                            $sourceFile = '\\\\10.1.0.201\cpe\Liquidacion';
+                            $sourceFile = '\\\\10.1.0.201\cpe\Liquidacion\\';
                             if($ordencompra_f->COD_CENTRO == 'CEN0000000000004' or $ordencompra_f->COD_CENTRO == 'CEN0000000000006'){
                                 if($ordencompra_f->COD_CENTRO == 'CEN0000000000004'){
                                     $sourceFile = '\\\\10.1.7.200\\cpe\\Liquidacion\\';
