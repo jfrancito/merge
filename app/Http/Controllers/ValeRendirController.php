@@ -515,32 +515,25 @@ class ValeRendirController extends Controller
                $pendienteCount = count($valesPendientes);
 
 
-                if ($areacomercial === 'MARKETING Y DESARROLLO' && $cod_usuario_registro !== '1CIX00000209') {
-
+               if ($areacomercial === 'MARKETING Y DESARROLLO' && $cod_usuario_registro !== '1CIX00000209') {
                     if ($pendienteCount >= 3) {
                         return response()->json([
                             'error' => 'Usted tiene 3 o más vales pendientes por rendir. No puede generar un cuarto vale.'
                         ]);
                     }
-
                 } elseif ($areacomercial === 'ADMINISTRACION' && $cod_usuario_registro === '1CIX00000209') {
-
                     if ($pendienteCount >= 4) {
                         return response()->json([
                             'error' => 'Usted tiene 4 o más vales pendientes por rendir. No puede generar un quinto vale.'
                         ]);
                     }
-
                 } elseif ($areacomercial === 'GERENCIA GENERAL') {
-
                     if ($pendienteCount >= 3) {
                         return response()->json([
                             'error' => 'Usted tiene 3 o más vales pendientes por rendir. No puede generar un cuarto vale.'
                         ]);
                     }
-
-                } else {
-
+                } elseif ($cod_usuario_registro !== '1CIX00000209') { // Excluimos al usuario especial
                     if ($pendienteCount >= 2) {
                         return response()->json([
                             'error' => 'Usted tiene 2 o más vales pendientes por rendir. No puede generar un tercer vale.'

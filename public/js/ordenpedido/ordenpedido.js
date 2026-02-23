@@ -1450,75 +1450,93 @@ $(document).ready(function () {
         }
     });
     // Botón Guardar Consolidado
-    $(document).on('click', '.btn-guardar-consolidado', function (e) {
-        e.preventDefault();
+  $(document).on('click', '.btn-guardar-consolidado', function (e) {
+    e.preventDefault();
 
-        let pedidos_ids = [];
-        $('.pedido_seleccionado:checked').each(function () {
-            pedidos_ids.push($(this).val());
-        });
+    let $boton = $(this);
+    let pedidos_ids = [];
 
-        if (pedidos_ids.length === 0) {
-            modalBonito({
-                tipo: 'warning',
-                titulo: 'Advertencia',
-                mensaje: 'Debe seleccionar al menos un pedido para guardar el consolidado.'
-            });
-            return;
-        }
+    $('.pedido_seleccionado:checked').each(function () {
+        pedidos_ids.push($(this).val());
+    });
 
+    if (pedidos_ids.length === 0) {
         modalBonito({
-            tipo: 'info',
-            icono: '📝',
-            titulo: 'Confirmar Guardado',
-            mensaje: '¿Está seguro de guardar el consolidado de los pedidos seleccionados?',
-            confirmar: true,
-            onConfirm: function () {
-                abrircargando();
+            tipo: 'warning',
+            titulo: 'Advertencia',
+            mensaje: 'Debe seleccionar al menos un pedido para guardar el consolidado.'
+        });
+        return;
+    }
 
-                $.ajax({
-                    type: 'POST',
-                    url: carpeta + '/guardar_consolidado_pedido',
-                    data: {
-                        _token: $('#token').val(),
-                        pedidos_ids: pedidos_ids,
-                        productos: Object.values(productosConsolidados)
-                    },
-                    success: function (resp) {
-                        cerrarcargando();
-                        if (resp.success) {
-                            modalBonito({
-                                tipo: 'success',
-                                titulo: 'Éxito',
-                                mensaje: resp.mensaje
-                            });
-                            // Limpiar tabla consolidada y selección
-                            $('#tablaConsolidado tbody').empty();
-                            $('.pedido_seleccionado').prop('checked', false);
-                            $('#checkAll').prop('checked', false);
+    modalBonito({
+        tipo: 'info',
+        icono: '📝',
+        titulo: 'Confirmar Guardado',
+        mensaje: '¿Está seguro de guardar el consolidado de los pedidos seleccionados?',
+        confirmar: true,
+        onConfirm: function () {
 
-                            // Refrescar la tabla de pedidos por consolidar
-                            $('.buscarpedidoconsolidado').trigger('click');
-                        } else {
-                            modalBonito({
-                                tipo: 'error',
-                                titulo: 'Error',
-                                mensaje: resp.mensaje
-                            });
-                        }
-                    },
-                    error: function () {
+            // 🔒 Deshabilitamos botón
+            $boton.prop('disabled', true);
+
+            // 🔒 Abrimos loader global
+            abrircargando();
+
+            $.ajax({
+                type: 'POST',
+                url: carpeta + '/guardar_consolidado_pedido',
+                data: {
+                    _token: $('#token').val(),
+                    pedidos_ids: pedidos_ids,
+                    productos: Object.values(productosConsolidados)
+                },
+
+                success: function (resp) {
+
+                    if (resp.success) {
+
+                        modalBonito({
+                            tipo: 'success',
+                            titulo: 'Éxito',
+                            mensaje: resp.mensaje
+                        });
+
+                        // ⏳ Dejamos el loader activo
+                        // 🔄 Recargamos la página
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1200);
+
+                    } else {
+
+                        // ❌ Solo cerramos loader si hay error
                         cerrarcargando();
+                        $boton.prop('disabled', false);
+
                         modalBonito({
                             tipo: 'error',
                             titulo: 'Error',
-                            mensaje: 'Ocurrió un error al intentar guardar el consolidado.'
+                            mensaje: resp.mensaje
                         });
                     }
-                });
-            }
-        });
+                },
+
+                error: function () {
+
+                    cerrarcargando();
+                    $boton.prop('disabled', false);
+
+                    modalBonito({
+                        tipo: 'error',
+                        titulo: 'Error',
+                        mensaje: 'Ocurrió un error al intentar guardar el consolidado.'
+                    });
+                }
+            });
+        }
     });
+});
 
     let id_consolidado_seleccionado = '';
 
@@ -1628,73 +1646,93 @@ $(document).ready(function () {
         });
     });
 
-    // EVENTO PARA APROBAR EL CONSOLIDADO
-    $(document).on('click', '#btn-aprobar-consolidado', function () {
-        let _token = $('#token').val();
+   // EVENTO PARA APROBAR EL CONSOLIDADO
+$(document).on('click', '#btn-aprobar-consolidado', function () {
 
-        if (id_consolidado_seleccionado === '') {
-            modalBonito({
-                tipo: 'error',
-                titulo: 'Error',
-                mensaje: 'No hay un consolidado seleccionado.'
-            });
-            return;
-        }
+    let _token = $('#token').val();
+    let $boton = $(this);
 
+    if (id_consolidado_seleccionado === '') {
         modalBonito({
-            tipo: 'info',
-            icono: '✅',
-            titulo: 'Aprobar Consolidado',
-            mensaje: '¿Está seguro de <b>aprobar</b> este consolidado?',
-            confirmar: true,
-            onConfirm: function () {
-                abrircargando();
+            tipo: 'error',
+            titulo: 'Error',
+            mensaje: 'No hay un consolidado seleccionado.'
+        });
+        return;
+    }
 
-                $.ajax({
-                    type: 'POST',
-                    url: carpeta + '/ajax-aprobar-consolidado-op',
-                    data: {
-                        _token: _token,
-                        id_consolidado: id_consolidado_seleccionado
-                    },
-                    success: function (res) {
+    modalBonito({
+        tipo: 'info',
+        icono: '✅',
+        titulo: 'Aprobar Consolidado',
+        mensaje: '¿Está seguro de <b>aprobar</b> este consolidado?',
+        confirmar: true,
+        onConfirm: function () {
+
+            // 🔒 Deshabilitamos botón para evitar doble click
+            $boton.prop('disabled', true);
+
+            // 🔒 Abrimos loader global (bloquea toda la UI)
+            abrircargando();
+
+            $.ajax({
+                type: 'POST',
+                url: carpeta + '/ajax-aprobar-consolidado-op',
+                data: {
+                    _token: _token,
+                    id_consolidado: id_consolidado_seleccionado
+                },
+
+                success: function (res) {
+
+                    if (res.success) {
+
+                        modalBonito({
+                            tipo: 'success',
+                            icono: '✔',
+                            titulo: 'Éxito',
+                            mensaje: res.mensaje
+                        });
+
+                        // ⏳ Dejamos el loader activo
+                        // 🔄 Recargamos sin cerrar loader
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1200);
+
+                    } else {
+
+                        // ❌ Solo cerramos loader si hubo error
                         cerrarcargando();
-                        if (res.success) {
-                            modalBonito({
-                                tipo: 'success',
-                                icono: '✔',
-                                titulo: 'Éxito',
-                                mensaje: res.mensaje
-                            });
+                        $boton.prop('disabled', false);
 
-                            setTimeout(function () {
-                                location.reload();
-                            }, 1500);
-
-                        } else {
-                            modalBonito({
-                                tipo: 'error',
-                                icono: '❌',
-                                titulo: 'Error',
-                                mensaje: res.mensaje
-                            });
-                        }
-                    },
-                    error: function (e) {
-                        cerrarcargando();
-                        console.error(e);
                         modalBonito({
                             tipo: 'error',
                             icono: '❌',
                             titulo: 'Error',
-                            mensaje: 'Error en la petición al servidor.'
+                            mensaje: res.mensaje
                         });
                     }
-                });
-            }
-        });
-    });
+                },
 
+                error: function (e) {
+
+                    cerrarcargando();
+                    $boton.prop('disabled', false);
+
+                    console.error(e);
+
+                    modalBonito({
+                        tipo: 'error',
+                        icono: '❌',
+                        titulo: 'Error',
+                        mensaje: 'Error en la petición al servidor.'
+                    });
+                }
+            });
+        }
+    });
+});
     // Evento Doble Clic en el DETALLE del Consolidado Generado
     $(document).on('dblclick', '.fila-detalle-consolidado-generado', function () {
         let cod_producto = $(this).data('id');

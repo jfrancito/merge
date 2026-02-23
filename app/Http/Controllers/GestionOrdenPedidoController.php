@@ -59,26 +59,29 @@ class GestionOrdenPedidoController extends Controller
         $combo2 = array('' => 'Seleccione Tipo Orden de Pedido') + $tipoOrden;
 
 	    $usuarioAutoriza = DB::table('WEB.ListaplatrabajadoresGenereal')
-						    ->where('cadcargo', 'LIKE', '%JEFE%')
-						    ->where('situacion_id', 'PRMAECEN000000000002')
-						    ->whereIn('empresa_osiris_id', [
-						        'IACHEM0000010394',
-						        'IACHEM0000007086'
-						    ])
-						     ->orderBy('apellidopaterno')
-						     ->orderBy('apellidomaterno')
-						     ->orderBy('nombres')
-						      ->pluck(
-							        DB::raw("
-							            LTRIM(RTRIM(
-							                ISNULL(apellidopaterno,'') + ' ' +
-							                ISNULL(apellidomaterno,'') + ' ' +
-							                ISNULL(nombres,'')
-							            ))
-							        "),
-							        'COD_TRAB'
-							    )
-							    ->toArray();
+					    ->where(function ($query) {
+					        $query->where('cadcargo', 'LIKE', '%JEFE%')
+					              ->orWhere('cadcargo', 'COORDINADOR DE CONTROL DE CALIDAD');
+					    })
+					    ->where('situacion_id', 'PRMAECEN000000000002')
+					    ->whereIn('empresa_osiris_id', [
+					        'IACHEM0000010394',
+					        'IACHEM0000007086'
+					    ])
+					    ->orderBy('apellidopaterno')
+					    ->orderBy('apellidomaterno')
+					    ->orderBy('nombres')
+					    ->pluck(
+					        DB::raw("
+					            LTRIM(RTRIM(
+					                ISNULL(apellidopaterno,'') + ' ' +
+					                ISNULL(apellidomaterno,'') + ' ' +
+					                ISNULL(nombres,'')
+					            ))
+					        "),
+					        'COD_TRAB'
+					    )
+					    ->toArray();
 		 $combo5 = array('' => 'Seleccione Jefe Autoriza') + $usuarioAutoriza;
 
 		 $usuario_aprueba_ger = DB::table('WEB.ListaplatrabajadoresGenereal')
