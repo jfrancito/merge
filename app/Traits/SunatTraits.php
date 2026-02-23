@@ -36,10 +36,10 @@ trait SunatTraits
 
 			$documentos 	=   DocumentoSunat::where('RUC_EMPRESA','=',$item2->COD_EMPR)
 								->whereRaw('ISNULL(IND_DETALLE, 0) = 0')
-								->whereRaw('ISNULL(CONTADOR,0) < 2')
+								//->whereRaw('ISNULL(CONTADOR,0) < 2')
 								->whereRaw("COD_TIPODOCUMENTO IN ('01','02')")
-								->orderby('PERIODO','desc')
-								->take(4000)
+								->orderby('CONTADOR','asc')
+								->take(1000)
 						    	->get();
 
 			$fetoken 		=	FeToken::where('COD_EMPR','=',$item2->COD_EMPR)->where('TIPO','=','COMPROBANTE_PAGO')->first();
