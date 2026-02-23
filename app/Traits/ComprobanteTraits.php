@@ -6149,6 +6149,9 @@ trait ComprobanteTraits
 
         $registros = $consulta1->unionAll($consulta2)->unionAll($consulta3)->get();
 
+        //dd($registros);
+
+
         return  $registros;
     }
 
@@ -6502,12 +6505,17 @@ trait ComprobanteTraits
                 'ISCHFC0000000033',
                 'IICHFC0000000037'
             ])
-            ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
+            ->whereIn('TES.COD_CATEGORIA_OPERACION_CAJA', [
+                'OPC0000000000002',
+                'OPC0000000000001'
+            ])
             ->where('TES.IND_EXTORNO', 0)
             ->where('TES.COD_ESTADO', 1)
             ->whereIn('TES.COD_CATEGORIA_OPERACION_ORIGEN', [
                 'OOC0000000000008',
-                'OOC0000000000005'
+                'OOC0000000000005',
+                'OOC0000000000009',
+                ''  
             ])
             ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR) // variable pasada desde tu controlador
             ->get();
@@ -6561,6 +6569,7 @@ trait ComprobanteTraits
                     ->whereIn('TES.COD_FLUJO_CAJA', [
                         'IICHFC0000000004',
                         'ISCHFC0000000004',
+
                         'IICHFC0000000009',
                         'IICHFC0000000012',
                         'ISCHFC0000000012',
@@ -6569,12 +6578,16 @@ trait ComprobanteTraits
                         'ISCHFC0000000033',
                         'IICHFC0000000037'
                     ])
-                    ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
+                    ->whereIn('TES.COD_CATEGORIA_OPERACION_CAJA', [
+                        'OPC0000000000002',
+                        'OPC0000000000001'
+                    ])
                     ->where('TES.IND_EXTORNO', 0)
                     ->where('TES.COD_ESTADO', 1)
                     ->whereIn('TES.COD_CATEGORIA_OPERACION_ORIGEN', [
                         'OOC0000000000008',
                         'OOC0000000000005',
+                        'OOC0000000000009',
                         ''
                     ])
                     ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR) // variable pasada desde tu controlador
