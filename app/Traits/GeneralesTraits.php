@@ -1629,6 +1629,242 @@ trait GeneralesTraits
 
     }
 
+    private function ejecutarAsientosMovimientosIUDConSalidaSIC(array $params)
+    {
+        $pdo = DB::connection()->getPdo();
+
+        $PREFIJO = 'MOVMER';
+
+        $sql = "
+    DECLARE @COD_ASIENTO_MOVIMIENTO_OUT CHAR(16) = :asientoMovimiento;
+
+    EXEC [WEB].[ASIENTO_MOVIMIENTOS_IUD_PREFIJO]
+        @IND_TIPO_OPERACION       = :op,
+        @COD_ASIENTO_MOVIMIENTO   = @COD_ASIENTO_MOVIMIENTO_OUT OUTPUT,
+        @COD_EMPR                 = :empresa,
+        @COD_CENTRO               = :centro,
+        @COD_ASIENTO              = :asiento,
+        @COD_CUENTA_CONTABLE      = :cuenta,
+        @TXT_CUENTA_CONTABLE      = :txtCuenta,
+        @TXT_GLOSA                = :glosa,
+        @CAN_DEBE_MN              = :debeMN,
+        @CAN_HABER_MN             = :haberMN,
+        @CAN_DEBE_ME              = :debeME,
+        @CAN_HABER_ME             = :haberME,
+        @NRO_LINEA                = :linea,
+        @COD_CUO                  = :codCuo,
+        @IND_EXTORNO              = :indExtorno,
+        @TXT_TIPO_REFERENCIA      = :txtTipoReferencia,
+        @TXT_REFERENCIA           = :txtReferencia,
+        @COD_ESTADO               = :codEstado,
+        @COD_USUARIO_REGISTRO     = :codUsuario,
+        @COD_DOC_CTBLE_REF        = :codDocCtableRef,
+        @COD_ORDEN_REF            = :codOrdenRef,
+        @IND_PRODUCTO             = :indProducto,
+        @COD_PRODUCTO             = :codProducto,
+        @TXT_NOMBRE_PRODUCTO      = :txtNombreProducto,
+        @COD_LOTE                 = :codLote,
+        @NRO_LINEA_PRODUCTO       = :nroLineaProducto,
+        @COD_EMPR_CLI_REF         = :codEmprCliRef,
+        @TXT_EMPR_CLI_REF         = :txtEmprCliRef,
+        @DOCUMENTO_REF            = :documentoRef,
+        @PREFIJO                  = :prefijo;
+    SELECT @COD_ASIENTO_MOVIMIENTO_OUT AS COD_ASIENTO_MOVIMIENTO;
+    ";
+
+        $stmt = $pdo->prepare($sql);
+
+        // 1. Forzamos el bind del prefijo primero o lo añadimos al array
+        $params['prefijo'] = $PREFIJO;
+
+        // Bind automático usando foreach
+        foreach ($params as $key => $value) {
+            // 2. Bind manual o mediante foreach con validación
+            foreach ($params as $key => $value) {
+                // Importante: PDO necesita saber si el parámetro existe en el string SQL
+                if (strpos($sql, ":$key") !== false) {
+                    $stmt->bindValue(":$key", $value);
+                }
+            }
+        }
+
+        $stmt->execute();
+
+        // Avanzar hasta obtener el SELECT final
+        while ($stmt->columnCount() === 0 && $stmt->nextRowset()) {}
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ? $row['COD_ASIENTO_MOVIMIENTO'] : null;
+
+    }
+
+    private function ejecutarAsientosIUDConSalidaSIC(
+        $IND_TIPO_OPERACION = 'I',
+        $COD_ASIENTO = '',
+        $COD_EMPR = '',
+        $COD_CENTRO = '',
+        $COD_PERIODO = '',
+        $COD_CATEGORIA_TIPO_ASIENTO = '',
+        $TXT_CATEGORIA_TIPO_ASIENTO = '',
+        $NRO_ASIENTO = '',
+        $FEC_ASIENTO = '1901-01-01',
+        $TXT_GLOSA = '',
+        $COD_CATEGORIA_ESTADO_ASIENTO = '',
+        $TXT_CATEGORIA_ESTADO_ASIENTO = '',
+        $COD_CATEGORIA_MONEDA = '',
+        $TXT_CATEGORIA_MONEDA = '',
+        $CAN_TIPO_CAMBIO = 0,
+        $CAN_TOTAL_DEBE = 0,
+        $CAN_TOTAL_HABER = 0,
+        $COD_ASIENTO_EXTORNO = '',
+        $COD_ASIENTO_EXTORNADO = '',
+        $IND_EXTORNO = 0,
+        $COD_ASIENTO_MODELO = '',
+        $TXT_TIPO_REFERENCIA = '',
+        $TXT_REFERENCIA = '',
+        $COD_ESTADO = 0,
+        $COD_USUARIO_REGISTRO = '',
+        $COD_MOTIVO_EXTORNO = '',
+        $GLOSA_EXTORNO = '',
+        $COD_EMPR_CLI = '',
+        $TXT_EMPR_CLI = '',
+        $COD_CATEGORIA_TIPO_DOCUMENTO = '',
+        $TXT_CATEGORIA_TIPO_DOCUMENTO = '',
+        $NRO_SERIE = '',
+        $NRO_DOC = '',
+        $FEC_DETRACCION = '1901-01-01',
+        $NRO_DETRACCION = '',
+        $CAN_DESCUENTO_DETRACCION = 0,
+        $CAN_TOTAL_DETRACCION = 0,
+        $COD_CATEGORIA_TIPO_DOCUMENTO_REF = '',
+        $TXT_CATEGORIA_TIPO_DOCUMENTO_REF = '',
+        $NRO_SERIE_REF = '',
+        $NRO_DOC_REF = '',
+        $FEC_VENCIMIENTO = '1901-01-01',
+        $IND_AFECTO = 0,
+        $COD_CATEGORIA_MONEDA_CONVERSION = '',
+        $TXT_CATEGORIA_MONEDA_CONVERSION = ''
+    ) {
+        $pdo = DB::connection()->getPdo();
+
+        $PREFIJO = 'ASTMER';
+
+        // OJO: ejecutamos el proc y capturamos la salida
+        $sql = "
+        DECLARE @COD_ASIENTO_OUT CHAR(16) = :COD_ASIENTO;
+
+        EXEC [WEB].[ASIENTOS_IUD_PREFIJO]
+            @IND_TIPO_OPERACION = :IND_TIPO_OPERACION,
+            @COD_ASIENTO = @COD_ASIENTO_OUT OUTPUT,
+            @COD_EMPR = :COD_EMPR,
+            @COD_CENTRO = :COD_CENTRO,
+            @COD_PERIODO = :COD_PERIODO,
+            @COD_CATEGORIA_TIPO_ASIENTO = :COD_CATEGORIA_TIPO_ASIENTO,
+            @TXT_CATEGORIA_TIPO_ASIENTO = :TXT_CATEGORIA_TIPO_ASIENTO,
+            @NRO_ASIENTO = :NRO_ASIENTO,
+            @FEC_ASIENTO = :FEC_ASIENTO,
+            @TXT_GLOSA = :TXT_GLOSA,
+            @COD_CATEGORIA_ESTADO_ASIENTO = :COD_CATEGORIA_ESTADO_ASIENTO,
+            @TXT_CATEGORIA_ESTADO_ASIENTO = :TXT_CATEGORIA_ESTADO_ASIENTO,
+            @COD_CATEGORIA_MONEDA = :COD_CATEGORIA_MONEDA,
+            @TXT_CATEGORIA_MONEDA = :TXT_CATEGORIA_MONEDA,
+            @CAN_TIPO_CAMBIO = :CAN_TIPO_CAMBIO,
+            @CAN_TOTAL_DEBE = :CAN_TOTAL_DEBE,
+            @CAN_TOTAL_HABER = :CAN_TOTAL_HABER,
+            @COD_ASIENTO_EXTORNO = :COD_ASIENTO_EXTORNO,
+            @COD_ASIENTO_EXTORNADO = :COD_ASIENTO_EXTORNADO,
+            @IND_EXTORNO = :IND_EXTORNO,
+            @COD_ASIENTO_MODELO = :COD_ASIENTO_MODELO,
+            @TXT_TIPO_REFERENCIA = :TXT_TIPO_REFERENCIA,
+            @TXT_REFERENCIA = :TXT_REFERENCIA,
+            @COD_ESTADO = :COD_ESTADO,
+            @COD_USUARIO_REGISTRO = :COD_USUARIO_REGISTRO,
+            @COD_MOTIVO_EXTORNO = :COD_MOTIVO_EXTORNO,
+            @GLOSA_EXTORNO = :GLOSA_EXTORNO,
+            @COD_EMPR_CLI = :COD_EMPR_CLI,
+            @TXT_EMPR_CLI = :TXT_EMPR_CLI,
+            @COD_CATEGORIA_TIPO_DOCUMENTO = :COD_CATEGORIA_TIPO_DOCUMENTO,
+            @TXT_CATEGORIA_TIPO_DOCUMENTO = :TXT_CATEGORIA_TIPO_DOCUMENTO,
+            @NRO_SERIE = :NRO_SERIE,
+            @NRO_DOC = :NRO_DOC,
+            @FEC_DETRACCION = :FEC_DETRACCION,
+            @NRO_DETRACCION = :NRO_DETRACCION,
+            @CAN_DESCUENTO_DETRACCION = :CAN_DESCUENTO_DETRACCION,
+            @CAN_TOTAL_DETRACCION = :CAN_TOTAL_DETRACCION,
+            @COD_CATEGORIA_TIPO_DOCUMENTO_REF = :COD_CATEGORIA_TIPO_DOCUMENTO_REF,
+            @TXT_CATEGORIA_TIPO_DOCUMENTO_REF = :TXT_CATEGORIA_TIPO_DOCUMENTO_REF,
+            @NRO_SERIE_REF = :NRO_SERIE_REF,
+            @NRO_DOC_REF = :NRO_DOC_REF,
+            @FEC_VENCIMIENTO = :FEC_VENCIMIENTO,
+            @IND_AFECTO = :IND_AFECTO,
+            @COD_CATEGORIA_MONEDA_CONVERSION = :COD_CATEGORIA_MONEDA_CONVERSION,
+            @TXT_CATEGORIA_MONEDA_CONVERSION = :TXT_CATEGORIA_MONEDA_CONVERSION,
+            @PREFIJO = :PREFIJO;
+        SELECT @COD_ASIENTO_OUT AS COD_ASIENTO;
+    ";
+
+        $stmt = $pdo->prepare($sql);
+
+        // BIND DEL NUEVO PARÁMETRO
+        $stmt->bindValue(':COD_ASIENTO', $COD_ASIENTO);
+        // Bind de parámetros (los mismos que ya tienes)
+        $stmt->bindValue(':IND_TIPO_OPERACION', $IND_TIPO_OPERACION);
+        $stmt->bindValue(':COD_EMPR', $COD_EMPR);
+        $stmt->bindValue(':COD_CENTRO', $COD_CENTRO);
+        $stmt->bindValue(':COD_PERIODO', $COD_PERIODO);
+        $stmt->bindValue(':COD_CATEGORIA_TIPO_ASIENTO', $COD_CATEGORIA_TIPO_ASIENTO);
+        $stmt->bindValue(':TXT_CATEGORIA_TIPO_ASIENTO', $TXT_CATEGORIA_TIPO_ASIENTO);
+        $stmt->bindValue(':NRO_ASIENTO', $NRO_ASIENTO);
+        $stmt->bindValue(':FEC_ASIENTO', $FEC_ASIENTO);
+        $stmt->bindValue(':TXT_GLOSA', $TXT_GLOSA);
+        $stmt->bindValue(':COD_CATEGORIA_ESTADO_ASIENTO', $COD_CATEGORIA_ESTADO_ASIENTO);
+        $stmt->bindValue(':TXT_CATEGORIA_ESTADO_ASIENTO', $TXT_CATEGORIA_ESTADO_ASIENTO);
+        $stmt->bindValue(':COD_CATEGORIA_MONEDA', $COD_CATEGORIA_MONEDA);
+        $stmt->bindValue(':TXT_CATEGORIA_MONEDA', $TXT_CATEGORIA_MONEDA);
+        $stmt->bindValue(':CAN_TIPO_CAMBIO', $CAN_TIPO_CAMBIO);
+        $stmt->bindValue(':CAN_TOTAL_DEBE', $CAN_TOTAL_DEBE);
+        $stmt->bindValue(':CAN_TOTAL_HABER', $CAN_TOTAL_HABER);
+        $stmt->bindValue(':COD_ASIENTO_EXTORNO', $COD_ASIENTO_EXTORNO);
+        $stmt->bindValue(':COD_ASIENTO_EXTORNADO', $COD_ASIENTO_EXTORNADO);
+        $stmt->bindValue(':IND_EXTORNO', $IND_EXTORNO);
+        $stmt->bindValue(':COD_ASIENTO_MODELO', $COD_ASIENTO_MODELO);
+        $stmt->bindValue(':TXT_TIPO_REFERENCIA', $TXT_TIPO_REFERENCIA);
+        $stmt->bindValue(':TXT_REFERENCIA', $TXT_REFERENCIA);
+        $stmt->bindValue(':COD_ESTADO', $COD_ESTADO);
+        $stmt->bindValue(':COD_USUARIO_REGISTRO', $COD_USUARIO_REGISTRO);
+        $stmt->bindValue(':COD_MOTIVO_EXTORNO', $COD_MOTIVO_EXTORNO);
+        $stmt->bindValue(':GLOSA_EXTORNO', $GLOSA_EXTORNO);
+        $stmt->bindValue(':COD_EMPR_CLI', $COD_EMPR_CLI);
+        $stmt->bindValue(':TXT_EMPR_CLI', $TXT_EMPR_CLI);
+        $stmt->bindValue(':COD_CATEGORIA_TIPO_DOCUMENTO', $COD_CATEGORIA_TIPO_DOCUMENTO);
+        $stmt->bindValue(':TXT_CATEGORIA_TIPO_DOCUMENTO', $TXT_CATEGORIA_TIPO_DOCUMENTO);
+        $stmt->bindValue(':NRO_SERIE', $NRO_SERIE);
+        $stmt->bindValue(':NRO_DOC', $NRO_DOC);
+        $stmt->bindValue(':FEC_DETRACCION', $FEC_DETRACCION);
+        $stmt->bindValue(':NRO_DETRACCION', $NRO_DETRACCION);
+        $stmt->bindValue(':CAN_DESCUENTO_DETRACCION', $CAN_DESCUENTO_DETRACCION);
+        $stmt->bindValue(':CAN_TOTAL_DETRACCION', $CAN_TOTAL_DETRACCION);
+        $stmt->bindValue(':COD_CATEGORIA_TIPO_DOCUMENTO_REF', $COD_CATEGORIA_TIPO_DOCUMENTO_REF);
+        $stmt->bindValue(':TXT_CATEGORIA_TIPO_DOCUMENTO_REF', $TXT_CATEGORIA_TIPO_DOCUMENTO_REF);
+        $stmt->bindValue(':NRO_SERIE_REF', $NRO_SERIE_REF);
+        $stmt->bindValue(':NRO_DOC_REF', $NRO_DOC_REF);
+        $stmt->bindValue(':FEC_VENCIMIENTO', $FEC_VENCIMIENTO);
+        $stmt->bindValue(':IND_AFECTO', $IND_AFECTO);
+        $stmt->bindValue(':COD_CATEGORIA_MONEDA_CONVERSION', $COD_CATEGORIA_MONEDA_CONVERSION);
+        $stmt->bindValue(':TXT_CATEGORIA_MONEDA_CONVERSION', $TXT_CATEGORIA_MONEDA_CONVERSION);
+        $stmt->bindValue(':PREFIJO', $PREFIJO);
+        // Ejecutamos
+        $stmt->execute();
+
+        while ($stmt->columnCount() === 0 && $stmt->nextRowset()) {}
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Devolvemos el código generado
+        return $row ? $row['COD_ASIENTO'] : null;
+    }
+
     private function ejecutarAsientosIUDConSalida(
         $IND_TIPO_OPERACION = 'I',
         $COD_EMPR = '',

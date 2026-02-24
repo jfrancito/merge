@@ -40,9 +40,46 @@
 
         /* Versión pequeña tipo input-sm */
         .ss-main {
-            height: 38px;         /* ajusta la altura */
-            font-size: 12px;      /* tamaño de fuente */
-            padding: 2px 8px;     /* espacio interno */
+            height: 38px; /* ajusta la altura */
+            font-size: 12px; /* tamaño de fuente */
+            padding: 2px 8px; /* espacio interno */
+        }
+
+        .encabezado-asiento {
+            background: #1d3a6d !important;
+            color: #fff !important;
+
+            display: flex !important;
+            align-items: center;
+            justify-content: space-between;
+
+            width: 100%;
+        }
+
+        .acciones-panel {
+            display: flex;
+            gap: 10px;
+        }
+
+        .titulo-panel {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        /* Color steelblue con un poco de transparencia para que el texto sea legible */
+        .bg-destino {
+            background-color: steelblue !important;
+            color: white; /* Cambiamos el texto a blanco para que resalte */
+        }
+
+        /* Opcional: Si quieres que los textos de las celdas también se vean bien */
+        .bg-destino td {
+            color: white !important;
+        }
+
+        .texto-blanco {
+            color: #ffffff !important;
+            font-weight: bold; /* Opcional, para que se lea mejor sobre el fondo azul */
         }
     </style>
 @stop
@@ -75,7 +112,7 @@
                                                   class="form-horizontal group-border-dashed"
                                                   enctype="multipart/form-data">
                                                 {{ csrf_field() }}
-<input type="hidden" name="device_info" id='device_info'>
+                                                <input type="hidden" name="device_info" id='device_info'>
 
                                                 @include('liquidaciongasto.form.formaprobarcontlg')
                                                 <div class="row xs-pt-15">
@@ -91,7 +128,8 @@
                                                                     Cancelar
                                                                 </button>
                                                             </a>
-                                                            <button type="button" data-url="{{ url('/aprobar-liquidacion-gasto-contabilidad/'.$idopcion.'/'.Hashids::encode(substr($liquidaciongastos->ID_DOCUMENTO, -8))) }}"
+                                                            <button type="button"
+                                                                    data-url="{{ url('/aprobar-liquidacion-gasto-contabilidad/'.$idopcion.'/'.Hashids::encode(substr($liquidaciongastos->ID_DOCUMENTO, -8))) }}"
                                                                     class="btn btn-space btn-primary btnaprobarcomporbatnteconta">
                                                                 Guardar
                                                             </button>
@@ -112,7 +150,7 @@
                                                   style="border-radius: 0px;"
                                                   class="form-horizontal group-border-dashed">
                                                 {{ csrf_field() }}
-<input type="hidden" name="device_info" id='device_info'>
+                                                <input type="hidden" name="device_info" id='device_info'>
 
                                                 <input type="hidden" name="data_observacion" id="data_observacion">
                                                 @include('liquidaciongasto.form.formobservarcont')
@@ -153,7 +191,7 @@
                                                   style="border-radius: 0px;"
                                                   class="form-horizontal group-border-dashed">
                                                 {{ csrf_field() }}
-<input type="hidden" name="device_info" id='device_info'>
+                                                <input type="hidden" name="device_info" id='device_info'>
 
                                                 @include('liquidaciongasto.form.formrechazocont')
 
@@ -256,7 +294,7 @@
 
     <script type="text/javascript">
 
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
 
             let carpeta = $("#carpeta").val();
             let _token = $("#token").val();
@@ -268,7 +306,7 @@
                 searchField: 'text',
                 placeholder: "Escriba para buscar...",
                 preload: true, // carga inicial
-                load: function(query, callback) {
+                load: function (query, callback) {
                     let data = {
                         _token: _token,
                         busqueda: query
@@ -282,8 +320,41 @@
                     })
                         //fetch('/buscar-tipo-documento?q=' + encodeURIComponent(query))
                         .then(response => response.json())
-                        .then(json => { callback(json); })
-                        .catch(() => { callback(); });
+                        .then(json => {
+                            callback(json);
+                        })
+                        .catch(() => {
+                            callback();
+                        });
+                }
+            });
+
+            let select_reparable = new TomSelect("#empresa_asiento_reparable", {
+                valueField: 'id',
+                labelField: 'text',
+                searchField: 'text',
+                placeholder: "Escriba para buscar...",
+                preload: true, // carga inicial
+                load: function (query, callback) {
+                    let data = {
+                        _token: _token,
+                        busqueda: query
+                    };
+                    fetch(carpeta + link, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(data)
+                    })
+                        //fetch(carpeta + '/buscar-tipo-documento?q=' + encodeURIComponent(query))
+                        .then(response => response.json())
+                        .then(json => {
+                            callback(json);
+                        })
+                        .catch(() => {
+                            callback();
+                        });
                 }
             });
 
@@ -293,8 +364,13 @@
                 select.setValue(defaultId); // la selecciona
             }
 
+            if (defaultIdReparable) {
+                select_reparable.addOption({id: defaultIdReparable, text: defaultTextReparable}); // añade la opción
+                select_reparable.setValue(defaultIdReparable); // la selecciona
+            }
+
             window.selects = {};
-            document.querySelectorAll("select.slim").forEach(function(el) {
+            document.querySelectorAll("select.slim").forEach(function (el) {
                 window.selects[el.id] = new SlimSelect({
                     select: el,
                     placeholder: 'Seleccione...',

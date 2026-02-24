@@ -12,14 +12,15 @@
                 <th>CONTRATO</th>
                 <th>MONEDA CONTRATO</th>
                 <th>TOTAL</th>
-                <th>ASIENTO</th>
+                <th>OPCIONES</th>
             </tr>
             </thead>
             <tbody>
             @foreach($tdetliquidaciongastos as $index => $item)
-                <tr class="filalgvalidar {{$item->ID_DOCUMENTO}}{{$item->ITEM}} @if($index == 0) activofl @endif"
-                    data_valor="{{$item->ID_DOCUMENTO}}{{$item->ITEM}}" data_asiento_cabecera="{{$item->TXT_CENTRO}}"
-                    data_asiento_detalle="{{$item->TOKEN}}" data_valor_id="{{$item->BUSQUEDAD}}">
+                <tr class="filalg {{$item->ID_DOCUMENTO}}{{$item->ITEM}} @if($index == 0) activofl @endif"
+                    data_valor="{{$item->ID_DOCUMENTO}}{{$item->ITEM}}" data_asiento_compra="{{$item->TXT_CENTRO}}"
+                    data_asiento_reversion="{{$item->TOKEN}}" data_valor_compra="{{$item->BUSQUEDAD}}"
+                    data_valor_reversion="{{$item->CONTADOR}}">
                     <td>{{date_format(date_create($item->FECHA_EMISION), 'd/m/Y')}}</td>
                     <td>{{$item->SERIE}} - {{$item->NUMERO}} </td>
                     <td>{{$item->TXT_TIPODOCUMENTO}}</td>
@@ -27,12 +28,24 @@
                     <td>{{$item->COD_CONTRATO}}</td>
                     <td>{{$item->TXT_CATEGORIA_MONEDA}}</td>
                     <td>{{$item->TOTAL}}</td>
-                    <td>@if($item->BUSQUEDAD === 1) GENERADO @else NO GENERADO @endif</td>
+                    <td>
+                        @if($item->BUSQUEDAD === 1)
+                            <button type="button" class="btn btn-sm btn-primary asiento-compra">
+                                👁 Asiento Compra
+                            </button>
+                        @endif
+                        @if($item->CONTADOR === 1)
+                            <button type="button" class="btn btn-sm btn-success asiento-reversion">
+                                👁 Asiento Reversion
+                            </button>
+                        @endif
+                    </td>
                 </tr>
             @endforeach
             </tbody>
         </table>
     </div>
-    <input type="hidden" id="total_xml" name="total_xml"
-           value=""/>
+    <input type="hidden" id="total_xml" name="total_xml" value=""/>
+    <input type="hidden" id="tipo_operacion" name="tipo_operacion" value=""/>
+    <input type="hidden" id="operacion" name="operacion" value=""/>
 </div>
