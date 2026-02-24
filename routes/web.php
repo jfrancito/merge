@@ -188,6 +188,8 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/aprobar-liquidacion-gasto-jefe-historial/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionAprobarJefeLGHistorial');
 
+    Route::post('/gestion-asiento', 'GestionLiquidacionGastosController@actionAjaxGestionAsiento');
+    Route::post('/crear-asiento-reparable', 'GestionLiquidacionGastosController@actionAjaxCrearAsientoReparable');
 
 	Route::any('/gestion-de-liquidacion-gastos-adm/{idopcion}', 'GestionLiquidacionGastosController@actionListarLGValidado');
 	Route::any('/ajax-buscar-documento-lg', 'GestionLiquidacionGastosController@actionListarAjaxBuscarDocumentoLG');
@@ -695,7 +697,7 @@ Route::group(['middleware' => ['authaw']], function () {
 
 
 
-	//	PAGOS DETRACCIONES	
+	//	PAGOS DETRACCIONES
 	Route::any('/gestion-de-pago-detracciones/{idopcion}', 'GestionOCContabilidadController@actionListarPagoDetraccion');
 	Route::any('/ajax-buscar-documento-fe-entregable-detraccion', 'GestionOCContabilidadController@actionListarAjaxBuscarDocumentoDetraccion');
 	Route::any('/ajax-modal-detalle-folios-detraccion', 'GestionOCContabilidadController@actionEntregableModalDetalleFolioDetraccion');
@@ -997,7 +999,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::get('/enviar_correo_detalle_dias', 'EnviarCorreoValeRendirDetalleDiasController@actionEnviarCorreoVRDetalleDias');
 	Route::get('/enviar_correo_detalle_importe', 'EnviarCorreoValeRendirDetalleImporteController@actionEnviarCorreoVRDetalleImporte');
 
-	//ORDEN PEDIDO 
+	//ORDEN PEDIDO
 
 	Route::get('/gestion-de-orden-pedido-compras/{idopcion}', 'GestionOrdenPedidoController@actionOrdenPedido');
 	Route::post('/registrar_orden_pedido', 'GestionOrdenPedidoController@insertOrdenPedidoAction');

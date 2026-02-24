@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Modelos\WEBAsiento;
+use App\Modelos\WEBAsientoMovimiento;
 use Illuminate\Http\Request;
 use App\Modelos\Grupoopcion;
 use App\Modelos\Opcion;
@@ -446,14 +447,13 @@ class GestionLiquidacionGastosController extends Controller
                     $centro_id = $trabajadorespla->centro_osiris_id;
                 }
 
-                $terceros   =   DB::table('TERCEROS')
-                                ->where('USER_ID', Session::get('usuario')->id)
-                                ->where('ACTIVO', 1)
-                                ->first();
+                $terceros = DB::table('TERCEROS')
+                    ->where('USER_ID', Session::get('usuario')->id)
+                    ->where('ACTIVO', 1)
+                    ->first();
                 if (count($terceros) > 0) {
                     $centro_id = $terceros->COD_CENTRO;
                 }
-
 
 
                 if ($centro_id == '') {
@@ -539,20 +539,20 @@ class GestionLiquidacionGastosController extends Controller
             $centro_id = $trabajadorespla->centro_osiris_id;
         }
 
-        $terceros   =   DB::table('TERCEROS')
-                        ->where('USER_ID', Session::get('usuario')->id)
-                        ->where('ACTIVO', 1)
-                        ->first();
+        $terceros = DB::table('TERCEROS')
+            ->where('USER_ID', Session::get('usuario')->id)
+            ->where('ACTIVO', 1)
+            ->first();
         if (count($terceros) > 0) {
             $centro_id = $terceros->COD_CENTRO;
         }
 
-        $conexionbd         = 'sqlsrv';
-        if($centro_id == 'CEN0000000000004'){ //rioja
-            $conexionbd         = 'sqlsrv_r';
-        }else{
-            if($centro_id == 'CEN0000000000006'){ //bellavista
-                $conexionbd         = 'sqlsrv_b';
+        $conexionbd = 'sqlsrv';
+        if ($centro_id == 'CEN0000000000004') { //rioja
+            $conexionbd = 'sqlsrv_r';
+        } else {
+            if ($centro_id == 'CEN0000000000006') { //bellavista
+                $conexionbd = 'sqlsrv_b';
             }
         }
 
@@ -568,7 +568,7 @@ class GestionLiquidacionGastosController extends Controller
             ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
             ->where('COD_EMPR_CLIENTE', $empresa_id)
             ->where('COD_ESTADO', 1)
-            ->where('COD_CATEGORIA_ESTADO_CONTRATO','!=','ECO0000000000005')
+            ->where('COD_CATEGORIA_ESTADO_CONTRATO', '!=', 'ECO0000000000005')
             ->where('COD_CENTRO', $centro_id)
             ->get();
 
@@ -1068,10 +1068,10 @@ class GestionLiquidacionGastosController extends Controller
 
 
         $indicador = 0;
-        $listaarendirlg = $this->lg_lista_arendirlg($liquidaciongastos,$indicador);
+        $listaarendirlg = $this->lg_lista_arendirlg($liquidaciongastos, $indicador);
         //dd($listaarendirlg);
-            $valearendir_info = $this->lq_valearendir($liquidaciongastos->ID_DOCUMENTO);
-                    
+        $valearendir_info = $this->lq_valearendir($liquidaciongastos->ID_DOCUMENTO);
+
         return View::make('liquidaciongasto/detallelgvalidado',
             [
                 'liquidaciongastos' => $liquidaciongastos,
@@ -1236,8 +1236,8 @@ class GestionLiquidacionGastosController extends Controller
                 $documento->save();
 
                 //geolocalizacion
-                $device_info       =   $request['device_info'];
-                $this->con_datos_de_la_pc($device_info,$liquidaciongastos,'DOCUMENTO EXTORNADO');
+                $device_info = $request['device_info'];
+                $this->con_datos_de_la_pc($device_info, $liquidaciongastos, 'DOCUMENTO EXTORNADO');
                 //geolocalización
 
 
@@ -1305,8 +1305,8 @@ class GestionLiquidacionGastosController extends Controller
 
 
                 //geolocalizacion
-                $device_info       =   $request['device_info'];
-                $this->con_datos_de_la_pc($device_info,$liquidaciongastos,'DOCUMENTO EXTORNADO');
+                $device_info = $request['device_info'];
+                $this->con_datos_de_la_pc($device_info, $liquidaciongastos, 'DOCUMENTO EXTORNADO');
                 //geolocalización
 
                 //ANULAR TODA LA OPERACION
@@ -1374,8 +1374,8 @@ class GestionLiquidacionGastosController extends Controller
                 $documento->save();
 
                 //geolocalizacion
-                $device_info       =   $request['device_info'];
-                $this->con_datos_de_la_pc($device_info,$liquidaciongastos,'DOCUMENTO EXTORNADO');
+                $device_info = $request['device_info'];
+                $this->con_datos_de_la_pc($device_info, $liquidaciongastos, 'DOCUMENTO EXTORNADO');
                 //geolocalización
 
 
@@ -2178,12 +2178,10 @@ class GestionLiquidacionGastosController extends Controller
                 DB::beginTransaction();
 
 
-
-                $fedocumento_ap = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('COD_ESTADO','<>','ETM0000000000004')->first();
-                if (count($fedocumento_ap)>0) {
+                $fedocumento_ap = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('COD_ESTADO', '<>', 'ETM0000000000004')->first();
+                if (count($fedocumento_ap) > 0) {
                     return Redirect::back()->with('errorurl', 'El documento esta aprobado');
                 }
-
 
 
                 $liquidaciongastos = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->first();
@@ -2248,12 +2246,12 @@ class GestionLiquidacionGastosController extends Controller
                 $SERIE = $resultados_serie->NRO_SERIE;
 
 
-                $conexionbd         = 'sqlsrv';
-                if($liquidaciongastos->COD_CENTRO == 'CEN0000000000004'){ //rioja
-                    $conexionbd         = 'sqlsrv_r';
-                }else{
-                    if($liquidaciongastos->COD_CENTRO == 'CEN0000000000006'){ //bellavista
-                        $conexionbd         = 'sqlsrv_b';
+                $conexionbd = 'sqlsrv';
+                if ($liquidaciongastos->COD_CENTRO == 'CEN0000000000004') { //rioja
+                    $conexionbd = 'sqlsrv_r';
+                } else {
+                    if ($liquidaciongastos->COD_CENTRO == 'CEN0000000000006') { //bellavista
+                        $conexionbd = 'sqlsrv_b';
                     }
                 }
 
@@ -2312,8 +2310,8 @@ class GestionLiquidacionGastosController extends Controller
                 $documento->save();
 
                 //geolocalizacion
-                $device_info       =   $request['device_info'];
-                $this->con_datos_de_la_pc($device_info,$liquidaciongastos,'APROBADO POR ADMINISTRACION');
+                $device_info = $request['device_info'];
+                $this->con_datos_de_la_pc($device_info, $liquidaciongastos, 'APROBADO POR ADMINISTRACION');
                 //geolocalización
 
 
@@ -2387,7 +2385,7 @@ class GestionLiquidacionGastosController extends Controller
 
             $archivos = Archivo::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
             $indicador = 0;
-            $listaarendirlg = $this->lg_lista_arendirlg($liquidaciongastos,$indicador);
+            $listaarendirlg = $this->lg_lista_arendirlg($liquidaciongastos, $indicador);
             //dd($listaarendirlg);
 
             $valearendir_info = $this->lq_valearendir($liquidaciongastos->ID_DOCUMENTO);
@@ -2422,7 +2420,7 @@ class GestionLiquidacionGastosController extends Controller
 
         $iddocumento = 'IILMLG0000006967';
         $liquidaciongastos = LqgLiquidacionGasto::where('COD_OSIRIS', '=', $iddocumento)->first();
-        $iddocumento = $liquidaciongastos->ID_DOCUMENTO;        
+        $iddocumento = $liquidaciongastos->ID_DOCUMENTO;
         $tdetliquidaciongastos = LqgDetLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
         $detdocumentolg = LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
         $documentohistorial = LqgDocumentoHistorial::where('ID_DOCUMENTO', '=', $iddocumento)->orderby('FECHA', 'DESC')->get();
@@ -2432,7 +2430,7 @@ class GestionLiquidacionGastosController extends Controller
             ->where('COD_DOCUMENTO_CTBLE', $liquidaciongastos->COD_OSIRIS)
             ->first();
         $periodo = CONPeriodo::where('COD_PERIODO', '=', $documento->COD_PERIODO)->first();
-        $osiris = $this->lg_enviar_osiris_vacios($liquidaciongastos, $tdetliquidaciongastos_sinaereo, $detdocumentolg,$periodo);
+        $osiris = $this->lg_enviar_osiris_vacios($liquidaciongastos, $tdetliquidaciongastos_sinaereo, $detdocumentolg, $periodo);
 
     }
 
@@ -2457,12 +2455,12 @@ class GestionLiquidacionGastosController extends Controller
                 DB::beginTransaction();
 
 
-                $fedocumento_ap = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('COD_ESTADO','<>','ETM0000000000003')->first();
-                if (count($fedocumento_ap)>0) {
+                $fedocumento_ap = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('COD_ESTADO', '<>', 'ETM0000000000003')->first();
+                if (count($fedocumento_ap) > 0) {
                     return Redirect::back()->with('errorurl', 'El documento esta aprobado');
                 }
 
-
+/*
                 $detalles = $request->input('detalles');
 
                 $liquidaciongastos = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->first();
@@ -2686,6 +2684,7 @@ class GestionLiquidacionGastosController extends Controller
                         $this->calcular_totales_compras($codAsiento);
                     }
                 }
+*/
 
                 $liquidaciongastos = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->first();
                 $tdetliquidaciongastos = LqgDetLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
@@ -2696,7 +2695,6 @@ class GestionLiquidacionGastosController extends Controller
                     DB::rollback();
                     return Redirect::back()->with('errorbd', 'El documento esta observado no se puede observar');
                 }
-
 
                 $descripcion = $request['descripcion'];
                 if (rtrim(ltrim($descripcion)) != '') {
@@ -2735,12 +2733,9 @@ class GestionLiquidacionGastosController extends Controller
                 $documento->save();
 
                 //geolocalizacion
-                $device_info       =   $request['device_info'];
-                $this->con_datos_de_la_pc($device_info,$liquidaciongastos,'APROBADO POR CONTABILIDAD');
+                $device_info = $request['device_info'];
+                $this->con_datos_de_la_pc($device_info, $liquidaciongastos, 'APROBADO POR CONTABILIDAD');
                 //geolocalización
-
-
-
 
                 DB::commit();
                 //DB::rollback();
@@ -2809,6 +2804,8 @@ class GestionLiquidacionGastosController extends Controller
             $usuario = Session::get('usuario')->id;
 
             foreach ($tdetliquidaciongastos as $key => $documentolg) {
+                $asiento_compra = [];
+                $asiento_reversion = [];
                 $cod_contable = $documentolg->ID_DOCUMENTO;
                 $item = $documentolg->ITEM;
                 $asiento = $this->ejecutarSP(
@@ -2841,9 +2838,57 @@ class GestionLiquidacionGastosController extends Controller
                 }
 
                 if ($respuesta === 'ASIENTO CORRECTO') {
-                    $documentolg->TXT_CENTRO = json_encode($asiento[1]);
-                    $documentolg->TOKEN = json_encode($asiento[2]);
+
+                    array_push($asiento_compra, $asiento[1]);
+                    array_push($asiento_compra, $asiento[2]);
+
+                    $ind_reversion = 'R';
+
+                    $asiento_existe_reparable = WEBAsiento::where('COD_ESTADO', '=', 1)
+                        ->where('TXT_REFERENCIA', '=', $cod_contable.'-'.$item)
+                        ->where('COD_CATEGORIA_TIPO_ASIENTO', '=', 'TAS0000000000007')
+                        ->where('TXT_GLOSA', 'NOT LIKE', "%REVERSION%")
+                        ->where('TXT_GLOSA', 'LIKE', "%REPARABLE%")
+                        ->where('TXT_TIPO_REFERENCIA', 'NOT LIKE', "%NAVASOFT%")
+                        ->first();
+
+                    if ($asiento_existe_reparable) {
+                        $asiento_reparable_reversion = $this->ejecutarSP(
+                            "EXEC [WEB].[GENERAR_ASIENTO_COMPRAS_LG_DOCUMENTO_REPARABLE]
+                @anio = :anio,
+                @empresa = :empresa,
+                @cod_contable = :cod_contable,
+                @ind_anulado = :ind_anulado,
+                @igv = :igv,
+                @item = :item,
+                @ind_recalcular = :ind_recalcular,
+                @ind_reversion = :ind_reversion,
+                @ind_igv = :ind_igv,
+                @cod_usuario_registra = :usuario",
+                            [
+                                ':anio' => $anio,
+                                ':empresa' => $empresa,
+                                ':cod_contable' => $cod_contable,
+                                ':ind_anulado' => $ind_anulado,
+                                ':igv' => $igv,
+                                ':item' => $item,
+                                ':ind_recalcular' => $ind_recalcular,
+                                ':ind_reversion' => $ind_reversion,
+                                ':ind_igv' => $ind_igv,
+                                ':usuario' => $usuario
+                            ]
+                        );
+                        $documentolg->CONTADOR = 1;
+                        array_push($asiento_reversion, $asiento_reparable_reversion[1]);
+                        array_push($asiento_reversion, $asiento_reparable_reversion[2]);
+                    } else {
+                        $documentolg->CONTADOR = 0;
+                    }
+
+                    $documentolg->TXT_CENTRO = json_encode($asiento_compra);
+                    $documentolg->TOKEN = json_encode($asiento_reversion);
                     $documentolg->BUSQUEDAD = 1;
+
                 } else {
                     $documentolg->TXT_CENTRO = '[]';
                     $documentolg->TOKEN = '[]';
@@ -2879,7 +2924,7 @@ class GestionLiquidacionGastosController extends Controller
 
 
             $indicador = 0;
-            $listaarendirlg = $this->lg_lista_arendirlg($liquidaciongastos,$indicador);
+            $listaarendirlg = $this->lg_lista_arendirlg($liquidaciongastos, $indicador);
             //dd($listaarendirlg);
 
             $valearendir_info = $this->lq_valearendir($liquidaciongastos->ID_DOCUMENTO);
@@ -2928,6 +2973,368 @@ class GestionLiquidacionGastosController extends Controller
         }
     }
 
+    public function actionAjaxGestionAsiento(Request $request)
+    {
+        $mensaje = '';
+
+        try {
+
+            DB::beginTransaction();
+
+            $operacion = $request['operacion'];
+            $indicador = '';
+
+            switch ($operacion) {
+                case 'insertar':
+                    $mensaje = 'ASIENTO INSERTADO CORRECTAMENTE CONSULTE POR EL SIGUIENTE CÓDIGO: ';
+                    $indicador = 'I';
+                    break;
+                case 'modificar':
+                    $mensaje = 'ASIENTO MODFICADO CORRECTAMENTE CONSULTE POR EL SIGUIENTE CÓDIGO: ';
+                    $indicador = 'U';
+                    break;
+                case 'anular':
+                    $mensaje = 'ASIENTO ANULADO CORRECTAMENTE CONSULTE POR EL SIGUIENTE CÓDIGO: ';
+                    $indicador = 'A';
+                    break;
+                case 'eliminar':
+                    $mensaje = 'ASIENTO ELIMINADO CORRECTAMENTE CONSULTE POR EL SIGUIENTE CÓDIGO: ';
+                    $indicador = 'D';
+                    break;
+            }
+
+            $cabeceras = json_decode($request['cabecera'], true);
+            $detalle_asiento = json_decode($request['detalle'], true);
+            $generar = true;
+
+            foreach ($cabeceras as $cabecera) {
+
+                $COD_ASIENTO = $cabecera['COD_ASIENTO'];
+                $COD_EMPR = $cabecera['COD_EMPR'];
+                $COD_EMPR_CLI = $cabecera['COD_EMPR_CLI'];
+                $TXT_EMPR_CLI = $cabecera['TXT_EMPR_CLI'];
+                $COD_CATEGORIA_TIPO_DOCUMENTO = !empty($cabecera['COD_CATEGORIA_TIPO_DOCUMENTO']) ? $cabecera['COD_CATEGORIA_TIPO_DOCUMENTO'] : 'TDO0000000000066';
+                $TXT_CATEGORIA_TIPO_DOCUMENTO = $cabecera['TXT_CATEGORIA_TIPO_DOCUMENTO'];
+                $NRO_SERIE = $cabecera['NRO_SERIE'];
+                $NRO_DOC = $cabecera['NRO_DOC'];
+                $COD_CENTRO = $cabecera['COD_CENTRO'];
+                $COD_PERIODO = $cabecera['COD_PERIODO'];
+                $COD_CATEGORIA_TIPO_ASIENTO = $cabecera['COD_CATEGORIA_TIPO_ASIENTO'];
+                $TXT_CATEGORIA_TIPO_ASIENTO = $cabecera['TXT_CATEGORIA_TIPO_ASIENTO'];
+                $NRO_ASIENTO = $cabecera['NRO_ASIENTO'];
+                $FEC_ASIENTO = $cabecera['FEC_ASIENTO'];
+                $TXT_GLOSA = $cabecera['TXT_GLOSA'];
+                $COD_CATEGORIA_ESTADO_ASIENTO = $cabecera['COD_CATEGORIA_ESTADO_ASIENTO'];
+                $TXT_CATEGORIA_ESTADO_ASIENTO = $cabecera['TXT_CATEGORIA_ESTADO_ASIENTO'];
+                $COD_CATEGORIA_MONEDA = $cabecera['COD_CATEGORIA_MONEDA'];
+                $TXT_CATEGORIA_MONEDA = $cabecera['TXT_CATEGORIA_MONEDA'];
+                $CAN_TIPO_CAMBIO = $cabecera['CAN_TIPO_CAMBIO'];
+                $CAN_TOTAL_DEBE = $cabecera['CAN_TOTAL_DEBE'];
+                $CAN_TOTAL_HABER = $cabecera['CAN_TOTAL_HABER'];
+                $COD_ASIENTO_EXTORNO = $cabecera['COD_ASIENTO_EXTORNO'];
+                $COD_ASIENTO_EXTORNADO = $cabecera['COD_ASIENTO_EXTORNADO'];
+                $IND_EXTORNO = $cabecera['IND_EXTORNO'];
+                $IND_ANULADO = $cabecera['IND_ANULADO'];
+                $COD_ASIENTO_MODELO = $cabecera['COD_ASIENTO_MODELO'];
+                $COD_OBJETO_ORIGEN = $cabecera['COD_OBJETO_ORIGEN'];
+                $TXT_TIPO_REFERENCIA = $cabecera['TXT_TIPO_REFERENCIA'];
+                $TXT_REFERENCIA = $cabecera['TXT_REFERENCIA'];
+                $COD_USUARIO_CREA_AUD = $cabecera['COD_USUARIO_CREA_AUD'];
+                $FEC_USUARIO_CREA_AUD = $cabecera['FEC_USUARIO_CREA_AUD'];
+                $COD_USUARIO_MODIF_AUD = $cabecera['COD_USUARIO_MODIF_AUD'];
+                $FEC_USUARIO_MODIF_AUD = $cabecera['FEC_USUARIO_MODIF_AUD'];
+                $COD_ESTADO = $cabecera['COD_ESTADO'];
+                $COD_MOTIVO_EXTORNO = $cabecera['COD_MOTIVO_EXTORNO'];
+                $GLOSA_EXTORNO = $cabecera['GLOSA_EXTORNO'];
+                $COD_CATEGORIA_TIPO_DETRACCION = $cabecera['COD_CATEGORIA_TIPO_DETRACCION'];
+                $FEC_DETRACCION = $cabecera['FEC_DETRACCION'];
+                $NRO_DETRACCION = $cabecera['NRO_DETRACCION'];
+                $CAN_DESCUENTO_DETRACCION = $cabecera['CAN_DESCUENTO_DETRACCION'];
+                $CAN_TOTAL_DETRACCION = $cabecera['CAN_TOTAL_DETRACCION'];
+                $COD_CATEGORIA_TIPO_DOCUMENTO_REF = $cabecera['COD_CATEGORIA_TIPO_DOCUMENTO_REF'];
+                $TXT_CATEGORIA_TIPO_DOCUMENTO_REF = $cabecera['TXT_CATEGORIA_TIPO_DOCUMENTO_REF'];
+                $NRO_SERIE_REF = $cabecera['NRO_SERIE_REF'];
+                $NRO_DOC_REF = $cabecera['NRO_DOC_REF'];
+                $FEC_VENCIMIENTO = $cabecera['FEC_VENCIMIENTO'];
+                $IND_AFECTO = $cabecera['IND_AFECTO'];
+                $COD_ASIENTO_PAGO_COBRO = $cabecera['COD_ASIENTO_PAGO_COBRO'];
+                $SALDO = $cabecera['SALDO'];
+                $COD_CATEGORIA_MONEDA_CONVERSION = $cabecera['COD_CATEGORIA_MONEDA_CONVERSION'];
+                $TXT_CATEGORIA_MONEDA_CONVERSION = $cabecera['TXT_CATEGORIA_MONEDA_CONVERSION'];
+                $IND_MIGRACION_NAVASOFT = $cabecera['IND_MIGRACION_NAVASOFT'];
+                $COND_ASIENTO = $cabecera['COND_ASIENTO'];
+                $CODIGO_CONTABLE = $cabecera['CODIGO_CONTABLE'];
+                $TOTAL_BASE_IMPONIBLE = $cabecera['TOTAL_BASE_IMPONIBLE'];
+                $TOTAL_BASE_IMPONIBLE_10 = $cabecera['TOTAL_BASE_IMPONIBLE_10'];
+                $TOTAL_BASE_INAFECTA = $cabecera['TOTAL_BASE_INAFECTA'];
+                $TOTAL_BASE_EXONERADA = $cabecera['TOTAL_BASE_EXONERADA'];
+                $TOTAL_IGV = $cabecera['TOTAL_IGV'];
+                $TOTAL_AFECTO_IVAP = $cabecera['TOTAL_AFECTO_IVAP'];
+                $TOTAL_IVAP = $cabecera['TOTAL_IVAP'];
+                $TOTAL_OTROS_IMPUESTOS = $cabecera['TOTAL_OTROS_IMPUESTOS'];
+
+                $moneda_asiento_aux = CMPCategoria::where('COD_CATEGORIA', '=', $COD_CATEGORIA_MONEDA)->first();
+                $moneda_asiento_conversion_aux = CMPCategoria::where('COD_CATEGORIA', '=', $COD_CATEGORIA_MONEDA)->first();
+
+                if ($moneda_asiento_aux->CODIGO_SUNAT !== 'PEN') {
+                    $moneda_asiento_aux = CMPCategoria::where('TXT_GRUPO', '=', 'MONEDA')->where('COD_ESTADO', '=', 1)->where('CODIGO_SUNAT', '=', 'PEN')->first();
+                    $moneda_asiento_conversion_aux = CMPCategoria::where('TXT_GRUPO', '=', 'MONEDA')->where('COD_ESTADO', '=', 1)->where('CODIGO_SUNAT', '=', 'USD')->first();
+                }
+
+                $empresa_doc_asiento_aux = STDEmpresa::where('COD_ESTADO', '=', 1)->where('COD_EMPR', '=', $COD_EMPR_CLI)->first();
+
+                $tipo_doc_asiento_aux = STDTipoDocumento::where('COD_TIPO_DOCUMENTO', '=', $COD_CATEGORIA_TIPO_DOCUMENTO)->first();
+                $tipo_doc_ref_asiento_aux = STDTipoDocumento::where('COD_TIPO_DOCUMENTO', '=', $COD_CATEGORIA_TIPO_DOCUMENTO_REF)->first();
+                $tipo_asiento = CMPCategoria::where('COD_CATEGORIA', '=', $COD_CATEGORIA_TIPO_ASIENTO)->first();
+
+                $codAsiento = $this->ejecutarAsientosIUDConSalidaSIC(
+                    $indicador,
+                    $COD_ASIENTO,
+                    Session::get('empresas')->COD_EMPR,
+                    'CEN0000000000001',
+                    $COD_PERIODO,
+                    $tipo_asiento->COD_CATEGORIA,
+                    $tipo_asiento->NOM_CATEGORIA,
+                    '',
+                    $FEC_ASIENTO,
+                    $TXT_GLOSA,
+                    $COD_CATEGORIA_ESTADO_ASIENTO,
+                    $TXT_CATEGORIA_ESTADO_ASIENTO,
+                    $moneda_asiento_aux->COD_CATEGORIA,
+                    $moneda_asiento_aux->NOM_CATEGORIA,
+                    $CAN_TIPO_CAMBIO,
+                    0.0000,
+                    0.0000,
+                    '',
+                    '',
+                    0,
+                    $COD_ASIENTO_MODELO,
+                    $TXT_TIPO_REFERENCIA,
+                    $TXT_REFERENCIA,
+                    1,
+                    Session::get('usuario')->id,
+                    '',
+                    '',
+                    $empresa_doc_asiento_aux->COD_EMPR,
+                    $empresa_doc_asiento_aux->NOM_EMPR,
+                    $tipo_doc_asiento_aux->COD_TIPO_DOCUMENTO,
+                    $tipo_doc_asiento_aux->TXT_TIPO_DOCUMENTO,
+                    $NRO_SERIE,
+                    $NRO_DOC,
+                    $FEC_DETRACCION,
+                    $NRO_DETRACCION,
+                    $CAN_DESCUENTO_DETRACCION,
+                    $CAN_TOTAL_DETRACCION,
+                    isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->COD_TIPO_DOCUMENTO : '',
+                    isset($tipo_doc_ref_asiento_aux) ? $tipo_doc_ref_asiento_aux->TXT_TIPO_DOCUMENTO : '',
+                    $NRO_SERIE_REF,
+                    $NRO_DOC_REF,
+                    $FEC_VENCIMIENTO,
+                    0,
+                    $moneda_asiento_conversion_aux->COD_CATEGORIA,
+                    $moneda_asiento_conversion_aux->NOM_CATEGORIA
+                );
+            }
+
+            if (!empty($codAsiento) and $indicador !== 'A') {
+                $contador = 0;
+                $mensaje = $mensaje . $codAsiento;
+                foreach ($detalle_asiento as $movimiento) {
+                    $COD_ASIENTO_MOVIMIENTO = $movimiento['COD_ASIENTO_MOVIMIENTO'];
+                    $COD_EMPR = $movimiento['COD_EMPR'];
+                    $COD_CENTRO = $movimiento['COD_CENTRO'];
+                    $COD_ASIENTO = $movimiento['COD_ASIENTO'];
+                    $COD_CUENTA_CONTABLE = $movimiento['COD_CUENTA_CONTABLE'];
+                    $IND_PRODUCTO = $movimiento['IND_PRODUCTO'];
+                    $TXT_CUENTA_CONTABLE = $movimiento['TXT_CUENTA_CONTABLE'];
+                    $TXT_GLOSA = $movimiento['TXT_GLOSA'];
+                    $CAN_DEBE_MN = $movimiento['CAN_DEBE_MN'];
+                    $CAN_HABER_MN = $movimiento['CAN_HABER_MN'];
+                    $CAN_DEBE_ME = $movimiento['CAN_DEBE_ME'];
+                    $CAN_HABER_ME = $movimiento['CAN_HABER_ME'];
+                    $NRO_LINEA = $movimiento['NRO_LINEA'];
+                    $COD_CUO = $movimiento['COD_CUO'];
+                    $IND_EXTORNO = $movimiento['IND_EXTORNO'];
+                    $TXT_TIPO_REFERENCIA = $movimiento['TXT_TIPO_REFERENCIA'];
+                    $TXT_REFERENCIA = $movimiento['TXT_REFERENCIA'];
+                    $COD_USUARIO_CREA_AUD = $movimiento['COD_USUARIO_CREA_AUD'];
+                    $FEC_USUARIO_CREA_AUD = $movimiento['FEC_USUARIO_CREA_AUD'];
+                    $COD_USUARIO_MODIF_AUD = $movimiento['COD_USUARIO_MODIF_AUD'];
+                    $FEC_USUARIO_MODIF_AUD = $movimiento['FEC_USUARIO_MODIF_AUD'];
+                    $COD_ESTADO = $movimiento['COD_ESTADO'];
+                    $COD_DOC_CTBLE_REF = $movimiento['COD_DOC_CTBLE_REF'];
+                    $COD_ORDEN_REF = $movimiento['COD_ORDEN_REF'];
+                    $COD_PRODUCTO = $movimiento['COD_PRODUCTO'];
+                    $TXT_NOMBRE_PRODUCTO = $movimiento['TXT_NOMBRE_PRODUCTO'];
+                    $COD_LOTE = $movimiento['COD_LOTE'];
+                    $NRO_LINEA_PRODUCTO = $movimiento['NRO_LINEA_PRODUCTO'];
+                    $COD_EMPR_CLI_REF = $movimiento['COD_EMPR_CLI_REF'];
+                    $TXT_EMPR_CLI_REF = $movimiento['TXT_EMPR_CLI_REF'];
+                    $DOCUMENTO_REF = $movimiento['DOCUMENTO_REF'];
+                    $CODIGO_CONTABLE = $movimiento['CODIGO_CONTABLE'];
+                    if (((int)$COD_ESTADO) === 1) {
+                        $contador++;
+
+                        $params = array(
+                            'op' => $indicador,
+                            'asientoMovimiento' => $COD_ASIENTO_MOVIMIENTO,
+                            'empresa' => Session::get('empresas')->COD_EMPR,
+                            'centro' => 'CEN0000000000001',
+                            'asiento' => $codAsiento,
+                            'cuenta' => $COD_CUENTA_CONTABLE,
+                            'txtCuenta' => $TXT_CUENTA_CONTABLE,
+                            'glosa' => $TXT_GLOSA,
+                            'debeMN' => $CAN_DEBE_MN,
+                            'haberMN' => $CAN_HABER_MN,
+                            'debeME' => $CAN_DEBE_ME,
+                            'haberME' => $CAN_HABER_ME,
+                            'linea' => $contador,
+                            'codCuo' => $COD_CUO,
+                            'indExtorno' => $IND_EXTORNO,
+                            'txtTipoReferencia' => $TXT_TIPO_REFERENCIA,
+                            'txtReferencia' => $TXT_REFERENCIA,
+                            'codEstado' => $COD_ESTADO,
+                            'codUsuario' => Session::get('usuario')->id,
+                            'codDocCtableRef' => $COD_DOC_CTBLE_REF,
+                            'codOrdenRef' => $COD_ORDEN_REF,
+                            'indProducto' => $COD_DOC_CTBLE_REF !== '' ? 1 : 0,
+                            'codProducto' => $COD_PRODUCTO,
+                            'txtNombreProducto' => $TXT_NOMBRE_PRODUCTO,
+                            'codLote' => $COD_LOTE,
+                            'nroLineaProducto' => $NRO_LINEA_PRODUCTO,
+                            // --- ESTOS FALTABAN (Causantes del error COUNT) ---
+                            'codEmprCliRef' => $COD_EMPR_CLI_REF ?? '',
+                            'txtEmprCliRef' => $TXT_EMPR_CLI_REF ?? '',
+                            'documentoRef' => $DOCUMENTO_REF ?? ''
+                        );
+
+                    } else {
+                        $params = array(
+                            'op' => 'D',
+                            'asientoMovimiento' => $COD_ASIENTO_MOVIMIENTO,
+                            'empresa' => Session::get('empresas')->COD_EMPR,
+                            'centro' => 'CEN0000000000001',
+                            'asiento' => $codAsiento,
+                            'cuenta' => $COD_CUENTA_CONTABLE,
+                            'txtCuenta' => $TXT_CUENTA_CONTABLE,
+                            'glosa' => $TXT_GLOSA,
+                            'debeMN' => $CAN_DEBE_MN,
+                            'haberMN' => $CAN_HABER_MN,
+                            'debeME' => $CAN_DEBE_ME,
+                            'haberME' => $CAN_HABER_ME,
+                            'linea' => $contador,
+                            'codCuo' => $COD_CUO,
+                            'indExtorno' => $IND_EXTORNO,
+                            'txtTipoReferencia' => $TXT_TIPO_REFERENCIA,
+                            'txtReferencia' => $TXT_REFERENCIA,
+                            'codEstado' => $COD_ESTADO,
+                            'codUsuario' => Session::get('usuario')->id,
+                            'codDocCtableRef' => $COD_DOC_CTBLE_REF,
+                            'codOrdenRef' => $COD_ORDEN_REF,
+                            'indProducto' => $COD_DOC_CTBLE_REF !== '' ? 1 : 0,
+                            'codProducto' => $COD_PRODUCTO,
+                            'txtNombreProducto' => $TXT_NOMBRE_PRODUCTO,
+                            'codLote' => $COD_LOTE,
+                            'nroLineaProducto' => $NRO_LINEA_PRODUCTO,
+                            // --- ESTOS FALTABAN (Causantes del error COUNT) ---
+                            'codEmprCliRef' => $COD_EMPR_CLI_REF ?? '',
+                            'txtEmprCliRef' => $TXT_EMPR_CLI_REF ?? '',
+                            'documentoRef' => $DOCUMENTO_REF ?? ''
+                        );
+
+                    }
+                    $COD_AS_MOV = $this->ejecutarAsientosMovimientosIUDConSalidaSIC($params);
+                }
+                $this->generar_destinos_compras($this->anio, Session::get('empresas')->COD_EMPR, $codAsiento, '', Session::get('usuario')->id);
+                $this->gn_generar_total_asientos($codAsiento);
+                $this->calcular_totales_compras($codAsiento);
+            }
+
+            $asiento_cabecera_nuevo = WEBAsiento::where('COD_ASIENTO', '=', $codAsiento)->where('COD_ESTADO', '=', 1)->get();
+            $asiento_detalle_nuevo = WEBAsientoMovimiento::where('COD_ASIENTO', '=', $codAsiento)->where('COD_ESTADO', '=', 1)->get();
+
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'titulo' => 'ÉXITO',
+                'tipo' => 'green',
+                'boton' => 'btn-green',
+                'mensaje' => $mensaje,
+                'cabecera' => $asiento_cabecera_nuevo,
+                'detalle' => $asiento_detalle_nuevo
+            ]);
+        } catch (\Exception $ex) {
+            DB::rollback();
+            $mensaje = 'ERROR AL INSERTAR A LA BASE DE DATOS: ' . $ex->getMessage();
+            return response()->json([
+                'status' => 'error',
+                'titulo' => 'ERROR',
+                'tipo' => 'red',
+                'boton' => 'btn-red',
+                'mensaje' => $mensaje
+            ]);
+        }
+
+    }
+
+    public function actionAjaxCrearAsientoReparable(Request $request)
+    {
+        $mensaje = '';
+
+        $anio = $this->anio;
+        $empresa = Session::get('empresas')->COD_EMPR;
+        $ind_anulado = 0;
+        $igv = 0;
+        $ind_recalcular = 0;
+        $ind_igv = 0;
+        $usuario = Session::get('usuario')->id;
+
+        $cod_contable = $request->get('cod_contable');
+        $item = $request->get('item');
+
+        $ind_reversion = 'N';
+
+        $asiento_reparable_reversion = $this->ejecutarSP(
+            "EXEC [WEB].[GENERAR_ASIENTO_COMPRAS_LG_DOCUMENTO_REPARABLE]
+                @anio = :anio,
+                @empresa = :empresa,
+                @cod_contable = :cod_contable,
+                @ind_anulado = :ind_anulado,
+                @igv = :igv,
+                @item = :item,
+                @ind_recalcular = :ind_recalcular,
+                @ind_reversion = :ind_reversion,
+                @ind_igv = :ind_igv,
+                @cod_usuario_registra = :usuario",
+            [
+                ':anio' => $anio,
+                ':empresa' => $empresa,
+                ':cod_contable' => $cod_contable,
+                ':ind_anulado' => $ind_anulado,
+                ':igv' => $igv,
+                ':item' => $item,
+                ':ind_recalcular' => $ind_recalcular,
+                ':ind_reversion' => $ind_reversion,
+                ':ind_igv' => $ind_igv,
+                ':usuario' => $usuario
+            ]
+        );
+
+        if(count($asiento_reparable_reversion) <= 0) {
+            $asiento_reparable_reversion = [[],[],[]];
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'titulo' => 'ÉXITO',
+            'tipo' => 'green',
+            'boton' => 'btn-green',
+            'mensaje' => $mensaje,
+            'cabecera' => $asiento_reparable_reversion[1],
+            'detalle' => $asiento_reparable_reversion[2]
+        ]);
+
+    }
 
     public function actionAprobarLiquidacionGastoAdministracion($idopcion, Request $request)
     {
@@ -3033,8 +3440,8 @@ class GestionLiquidacionGastosController extends Controller
                 $this->lg_calcular_total_observar($iddocumento);
 
                 //geolocalizacion
-                $device_info       =   $request['device_info'];
-                $this->con_datos_de_la_pc($device_info,$liquidaciongastos,'OBSERVADO POR JEFE');
+                $device_info = $request['device_info'];
+                $this->con_datos_de_la_pc($device_info, $liquidaciongastos, 'OBSERVADO POR JEFE');
                 //geolocalización
 
 
@@ -3123,10 +3530,9 @@ class GestionLiquidacionGastosController extends Controller
 
 
                 //geolocalizacion
-                $device_info       =   $request['device_info'];
-                $this->con_datos_de_la_pc($device_info,$liquidaciongastos,'OBSERVADO POR ADMINISTRACION');
+                $device_info = $request['device_info'];
+                $this->con_datos_de_la_pc($device_info, $liquidaciongastos, 'OBSERVADO POR ADMINISTRACION');
                 //geolocalización
-
 
 
                 DB::commit();
@@ -3215,8 +3621,8 @@ class GestionLiquidacionGastosController extends Controller
 
 
                 //geolocalizacion
-                $device_info       =   $request['device_info'];
-                $this->con_datos_de_la_pc($device_info,$liquidaciongastos,'OBSERVADO POR CONTABILIDAD');
+                $device_info = $request['device_info'];
+                $this->con_datos_de_la_pc($device_info, $liquidaciongastos, 'OBSERVADO POR CONTABILIDAD');
                 //geolocalización
 
 
@@ -3296,10 +3702,9 @@ class GestionLiquidacionGastosController extends Controller
                 $documento->save();
 
                 //geolocalizacion
-                $device_info       =   $request['device_info'];
-                $this->con_datos_de_la_pc($device_info,$liquidaciongastos,'APROBADO POR EL JEFE');
+                $device_info = $request['device_info'];
+                $this->con_datos_de_la_pc($device_info, $liquidaciongastos, 'APROBADO POR EL JEFE');
                 //geolocalización
-
 
 
                 DB::commit();
@@ -3353,7 +3758,7 @@ class GestionLiquidacionGastosController extends Controller
             $archivos = Archivo::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
 
             $indicador = 0;
-            $listaarendirlg = $this->lg_lista_arendirlg($liquidaciongastos,$indicador);
+            $listaarendirlg = $this->lg_lista_arendirlg($liquidaciongastos, $indicador);
             //dd($listaarendirlg);
 
 
@@ -3436,7 +3841,7 @@ class GestionLiquidacionGastosController extends Controller
         $archivos = Archivo::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
 
         $indicador = 0;
-        $listaarendirlg = $this->lg_lista_arendirlg($liquidaciongastos,$indicador);
+        $listaarendirlg = $this->lg_lista_arendirlg($liquidaciongastos, $indicador);
         //dd($listaarendirlg);
 
 
@@ -3459,7 +3864,6 @@ class GestionLiquidacionGastosController extends Controller
             ]);
 
 
-        
     }
 
 
@@ -3536,29 +3940,29 @@ class GestionLiquidacionGastosController extends Controller
             try {
                 DB::beginTransaction();
 
-                $liquidaciongastos  =   LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->first();
+                $liquidaciongastos = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->first();
 
-                $ldetallearendir    =   DB::table('WEB.VALE_RENDIR_DETALLE')
-                                        ->where('ID', $liquidaciongastos->ARENDIR_ID)
-                                        ->where('COD_ESTADO', 1)
-                                        ->where('IND_AEREO','=',1)
-                                        ->first();
+                $ldetallearendir = DB::table('WEB.VALE_RENDIR_DETALLE')
+                    ->where('ID', $liquidaciongastos->ARENDIR_ID)
+                    ->where('COD_ESTADO', 1)
+                    ->where('IND_AEREO', '=', 1)
+                    ->first();
 
 
                 //VALIDAR QUE LOS DOCUMENTOS QUE ESTAN ASOCIANDO NO SE REPITAN ENTRE SI EN LA MISMA LIQUIDACION
 
-                $mismaliquidacion =     DB::table('LQG_DETLIQUIDACIONGASTO')
-                                        ->select('COD_EMPRESA_PROVEEDOR', 'TXT_EMPRESA_PROVEEDOR', 'SERIE', 'NUMERO', 'COD_TIPODOCUMENTO')
-                                        ->selectRaw('COUNT(COD_EMPRESA_PROVEEDOR) AS REPETIDO')
-                                        ->where('ID_DOCUMENTO', $iddocumento)
-                                        ->where('ACTIVO', 1)
-                                        ->groupBy('COD_EMPRESA_PROVEEDOR', 'TXT_EMPRESA_PROVEEDOR', 'SERIE', 'NUMERO', 'COD_TIPODOCUMENTO')
-                                        ->havingRaw('COUNT(COD_EMPRESA_PROVEEDOR) > 1')
-                                        ->get();
+                $mismaliquidacion = DB::table('LQG_DETLIQUIDACIONGASTO')
+                    ->select('COD_EMPRESA_PROVEEDOR', 'TXT_EMPRESA_PROVEEDOR', 'SERIE', 'NUMERO', 'COD_TIPODOCUMENTO')
+                    ->selectRaw('COUNT(COD_EMPRESA_PROVEEDOR) AS REPETIDO')
+                    ->where('ID_DOCUMENTO', $iddocumento)
+                    ->where('ACTIVO', 1)
+                    ->groupBy('COD_EMPRESA_PROVEEDOR', 'TXT_EMPRESA_PROVEEDOR', 'SERIE', 'NUMERO', 'COD_TIPODOCUMENTO')
+                    ->havingRaw('COUNT(COD_EMPRESA_PROVEEDOR) > 1')
+                    ->get();
 
-               if (count($mismaliquidacion) > 0) {
+                if (count($mismaliquidacion) > 0) {
                     return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/0')
-                    ->with('errorbd', 'HAY DOCUMENTOS QUE ESTAN DUPLICADOS EN TU LIQUIDACION');
+                        ->with('errorbd', 'HAY DOCUMENTOS QUE ESTAN DUPLICADOS EN TU LIQUIDACION');
                 }
 
                 //VALIDAR QUE LOS DOCUMENTOS NO SE REPITAN CON OTROS INGRESADOS
@@ -3566,66 +3970,66 @@ class GestionLiquidacionGastosController extends Controller
                 $existenDuplicados = DB::table('LQG_DETLIQUIDACIONGASTO AS nuevo')
                     ->where('nuevo.ID_DOCUMENTO', $iddocumento)
                     ->where('nuevo.ACTIVO', 1)
-                    ->where('nuevo.COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
+                    ->where('nuevo.COD_EMPRESA', '=', Session::get('empresas')->COD_EMPR)
                     ->whereExists(function ($query) use ($iddocumento) {
                         $query->select(DB::raw(1))
-                              ->from('LQG_DETLIQUIDACIONGASTO AS existente')
-                              ->join('LQG_LIQUIDACION_GASTO', 'existente.ID_DOCUMENTO', '=', 'LQG_LIQUIDACION_GASTO.ID_DOCUMENTO')
-                              ->whereRaw('existente.COD_EMPRESA_PROVEEDOR = nuevo.COD_EMPRESA_PROVEEDOR')
-                              ->whereRaw('existente.SERIE = nuevo.SERIE')
-                              ->whereRaw('existente.NUMERO = nuevo.NUMERO')
-                              ->whereRaw('existente.COD_TIPODOCUMENTO = nuevo.COD_TIPODOCUMENTO')
-                              ->where('LQG_LIQUIDACION_GASTO.ACTIVO', 1)
-                              ->where('existente.ACTIVO', 1)
-                              ->where('LQG_LIQUIDACION_GASTO.COD_ESTADO', '!=', 'ETM0000000000006')
-                              ->where('existente.COD_EMPRESA','=',Session::get('empresas')->COD_EMPR)
-                              ->where('existente.ID_DOCUMENTO', '<>', $iddocumento);
+                            ->from('LQG_DETLIQUIDACIONGASTO AS existente')
+                            ->join('LQG_LIQUIDACION_GASTO', 'existente.ID_DOCUMENTO', '=', 'LQG_LIQUIDACION_GASTO.ID_DOCUMENTO')
+                            ->whereRaw('existente.COD_EMPRESA_PROVEEDOR = nuevo.COD_EMPRESA_PROVEEDOR')
+                            ->whereRaw('existente.SERIE = nuevo.SERIE')
+                            ->whereRaw('existente.NUMERO = nuevo.NUMERO')
+                            ->whereRaw('existente.COD_TIPODOCUMENTO = nuevo.COD_TIPODOCUMENTO')
+                            ->where('LQG_LIQUIDACION_GASTO.ACTIVO', 1)
+                            ->where('existente.ACTIVO', 1)
+                            ->where('LQG_LIQUIDACION_GASTO.COD_ESTADO', '!=', 'ETM0000000000006')
+                            ->where('existente.COD_EMPRESA', '=', Session::get('empresas')->COD_EMPR)
+                            ->where('existente.ID_DOCUMENTO', '<>', $iddocumento);
                     })
                     ->get(); // Esto devuelve true si existe al menos uno
                 //dd($existenDuplicados);
-                if (count($existenDuplicados)>0) {
+                if (count($existenDuplicados) > 0) {
                     return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/0')
-                    ->with('errorbd', 'No se puede registrar el documento. Existen documentos duplicados en la base de datos.');
+                        ->with('errorbd', 'No se puede registrar el documento. Existen documentos duplicados en la base de datos.');
                 }
 
 
-                //VALIDAR QUE LOS VALES NO SE REPITAN ENTRE SI 
+                //VALIDAR QUE LOS VALES NO SE REPITAN ENTRE SI
 
 
-                $arendir    = DB::table('LQG_LIQUIDACION_GASTO')
-                                ->where('ACTIVO', 1)
-                                ->where('COD_ESTADO', '!=', 'ETM0000000000006')
-                                ->where('ARENDIR_ID', $liquidaciongastos->ARENDIR_ID)
-                                ->where('ID_DOCUMENTO', '<>', $iddocumento)
-                                ->get();
+                $arendir = DB::table('LQG_LIQUIDACION_GASTO')
+                    ->where('ACTIVO', 1)
+                    ->where('COD_ESTADO', '!=', 'ETM0000000000006')
+                    ->where('ARENDIR_ID', $liquidaciongastos->ARENDIR_ID)
+                    ->where('ID_DOCUMENTO', '<>', $iddocumento)
+                    ->get();
 
-                if (count($arendir)>0) {
+                if (count($arendir) > 0) {
                     return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/0')
-                    ->with('errorbd', 'YA EXISTE ESTE CODIGO DE ARENDIR EN OTRA LIQUIDACION');
+                        ->with('errorbd', 'YA EXISTE ESTE CODIGO DE ARENDIR EN OTRA LIQUIDACION');
                 }
 
 
                 //VALIDAR QUE TODOS LOS DETALLES TENGAN VALOR MAYOR A CERO
 
-                $detallescero           =   DB::table('LQG_DETLIQUIDACIONGASTO')
-                                        ->where('ID_DOCUMENTO', $iddocumento)
-                                        ->where('ACTIVO','=','1')
-                                        ->where('TOTAL', '<=', 0)
-                                        ->first();
-               if (count($detallescero) > 0) {
+                $detallescero = DB::table('LQG_DETLIQUIDACIONGASTO')
+                    ->where('ID_DOCUMENTO', $iddocumento)
+                    ->where('ACTIVO', '=', '1')
+                    ->where('TOTAL', '<=', 0)
+                    ->first();
+                if (count($detallescero) > 0) {
                     return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/0')
-                    ->with('errorbd', 'Su '.$detallescero->TXT_TIPODOCUMENTO.' : '.$detallescero->SERIE.'-'.$detallescero->NUMERO.' TIENE UN VALOR CERO INGRESE VALOR');
+                        ->with('errorbd', 'Su ' . $detallescero->TXT_TIPODOCUMENTO . ' : ' . $detallescero->SERIE . '-' . $detallescero->NUMERO . ' TIENE UN VALOR CERO INGRESE VALOR');
                 }
 
                 if (count($ldetallearendir) > 0) {
 
-                    $productospasajeaereo  =    DB::table('LQG_DETDOCUMENTOLIQUIDACIONGASTO')
-                                                ->where('ID_DOCUMENTO', $iddocumento)
-                                                ->where('COD_PRODUCTO','=','PRD0000000024431')
-                                                ->where('ACTIVO', 1)
-                                                ->get();
+                    $productospasajeaereo = DB::table('LQG_DETDOCUMENTOLIQUIDACIONGASTO')
+                        ->where('ID_DOCUMENTO', $iddocumento)
+                        ->where('COD_PRODUCTO', '=', 'PRD0000000024431')
+                        ->where('ACTIVO', 1)
+                        ->get();
 
-                    if (count($productospasajeaereo) <= 0) {                       
+                    if (count($productospasajeaereo) <= 0) {
                         return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/0')->with('errorbd', 'Su vale tiene indicador de PASAJE AEREO debe subir tambien en la Liquidacion');
                     }
                 }
@@ -3701,19 +4105,19 @@ class GestionLiquidacionGastosController extends Controller
                     $documento->save();
 
                     //geolocalizacion
-                    $device_info       =   $request['device_info'];
-                    $this->con_datos_de_la_pc($device_info,$liquidaciongastos,'SE LEVANTARON LAS OBSERVACIONES');
+                    $device_info = $request['device_info'];
+                    $this->con_datos_de_la_pc($device_info, $liquidaciongastos, 'SE LEVANTARON LAS OBSERVACIONES');
                     //geolocalización
 
 
                 } else {
 
-                    $arendri            =   DB::table('WEB.VALE_RENDIR')
-                                            ->where('ID', $liquidaciongastos->ARENDIR_ID)
-                                            ->first();
-                    $diasarendir        =   1;                       
-                    if(count($arendri)>0){
-                        $diasarendir    = $arendri->AUMENTO_DIAS ?? 0;;  
+                    $arendri = DB::table('WEB.VALE_RENDIR')
+                        ->where('ID', $liquidaciongastos->ARENDIR_ID)
+                        ->first();
+                    $diasarendir = 1;
+                    if (count($arendri) > 0) {
+                        $diasarendir = $arendri->AUMENTO_DIAS ?? 0;;
                     }
 
                     //solo 2 dias
@@ -3721,7 +4125,7 @@ class GestionLiquidacionGastosController extends Controller
                     $fechaSumada = $this->addBusinessDays($fechaDada, 4 + $diasarendir, true);
                     $fechaActual = Carbon::now();
                     if ($fechaSumada->lessThan($fechaActual)) {
-                        return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/0')->with('errorbd', 'La ultima fecha para emitir esta Liquidacion de Gastos debio ser es hasta '.$fechaSumada);
+                        return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/0')->with('errorbd', 'La ultima fecha para emitir esta Liquidacion de Gastos debio ser es hasta ' . $fechaSumada);
                     }
 
                     //dd($request['ULTIMA_FECHA_RENDICION']);
@@ -3765,11 +4169,9 @@ class GestionLiquidacionGastosController extends Controller
                     $documento->save();
 
                     //geolocalizacion
-                    $device_info       =   $request['device_info'];
-                    $this->con_datos_de_la_pc($device_info,$liquidaciongastos,'CREO LIQUIDACION DE GASTO');
+                    $device_info = $request['device_info'];
+                    $this->con_datos_de_la_pc($device_info, $liquidaciongastos, 'CREO LIQUIDACION DE GASTO');
                     //geolocalización
-
-
 
 
                 }
@@ -3808,32 +4210,32 @@ class GestionLiquidacionGastosController extends Controller
 
             $resta = 0;
             $liquidaciongastos = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->first();
-            $referencia_asoc =  DB::table('CMP.REFERENCIA_ASOC')
-                                ->where('TXT_DESCRIPCION', 'ARENDIR')
-                                ->where('TXT_TABLA_ASOC', $producto_id)
-                                ->first();
+            $referencia_asoc = DB::table('CMP.REFERENCIA_ASOC')
+                ->where('TXT_DESCRIPCION', 'ARENDIR')
+                ->where('TXT_TABLA_ASOC', $producto_id)
+                ->first();
 
             if ($liquidaciongastos->ARENDIR == 'REEMBOLSO') {
                 $ldetallearendir = DB::table('WEB.VALE_RENDIR_DETALLE_REEMBOLSO')
-                                    ->where('ID', $liquidaciongastos->ARENDIR_ID)
-                                    ->where('COD_ESTADO', 1)
-                                    ->get();
+                    ->where('ID', $liquidaciongastos->ARENDIR_ID)
+                    ->where('COD_ESTADO', 1)
+                    ->get();
 
-            }else{
+            } else {
                 $ldetallearendir = DB::table('WEB.VALE_RENDIR_DETALLE')
                     ->where('ID', $liquidaciongastos->ARENDIR_ID)
                     ->where('COD_ESTADO', 1)
                     ->get();
             }
 
-            if(count($ldetallearendir)>0){
+            if (count($ldetallearendir) > 0) {
 
-                if(count($referencia_asoc)>0){
-                    $mensaje_error_vale = $this->validar_reembolso_supere_monto($liquidaciongastos,$liquidaciongastos->ARENDIR,$referencia_asoc->COD_TABLA,$importe,$producto_id,$resta);
-                    if($mensaje_error_vale!=''){
-                        return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/' . $item)->with('errorbd', $mensaje_error_vale); 
+                if (count($referencia_asoc) > 0) {
+                    $mensaje_error_vale = $this->validar_reembolso_supere_monto($liquidaciongastos, $liquidaciongastos->ARENDIR, $referencia_asoc->COD_TABLA, $importe, $producto_id, $resta);
+                    if ($mensaje_error_vale != '') {
+                        return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/' . $item)->with('errorbd', $mensaje_error_vale);
                     }
-                }else{
+                } else {
                     return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/' . $item)->with('errorbd', 'Este producto no esta relacionado en la tabla referencia');
                 }
 
@@ -3960,7 +4362,7 @@ class GestionLiquidacionGastosController extends Controller
             $detliquidaciongasto = LqgDetLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ITEM', '=', $item)->first();
             $detdocumentolg = LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ITEM', '=', $item)->get();
 
-            
+
             $itemdet = count($detdocumentolg) + 1;
             $producto = DB::table('ALM.PRODUCTO')->where('NOM_PRODUCTO', '=', $producto_id)->first();
             $fecha_creacion = $this->hoy;
@@ -3968,82 +4370,77 @@ class GestionLiquidacionGastosController extends Controller
             $subtotal = $importe;
 
             $liquidaciongastos = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->first();
-            $referencia_asoc =  DB::table('CMP.REFERENCIA_ASOC')
-                                ->where('TXT_DESCRIPCION', 'ARENDIR')
-                                ->where('TXT_TABLA_ASOC', $producto_id)
-                                ->first();
+            $referencia_asoc = DB::table('CMP.REFERENCIA_ASOC')
+                ->where('TXT_DESCRIPCION', 'ARENDIR')
+                ->where('TXT_TABLA_ASOC', $producto_id)
+                ->first();
             $resta = 0;
-
 
 
             if ($liquidaciongastos->ARENDIR == 'REEMBOLSO') {
                 $ldetallearendir = DB::table('WEB.VALE_RENDIR_DETALLE_REEMBOLSO')
-                                    ->where('ID', $liquidaciongastos->ARENDIR_ID)
-                                    ->where('COD_ESTADO', 1)
-                                    ->get();
+                    ->where('ID', $liquidaciongastos->ARENDIR_ID)
+                    ->where('COD_ESTADO', 1)
+                    ->get();
 
-            }else{
+            } else {
                 $ldetallearendir = DB::table('WEB.VALE_RENDIR_DETALLE')
                     ->where('ID', $liquidaciongastos->ARENDIR_ID)
                     ->where('COD_ESTADO', 1)
                     ->get();
             }
 
-            if($detliquidaciongasto->COD_TIPODOCUMENTO !='TDO0000000000010'){
-                if($request['producto_id'] == 'SERVICIO DE TRANSPORTE AEREO'){
+            if ($detliquidaciongasto->COD_TIPODOCUMENTO != 'TDO0000000000010') {
+                if ($request['producto_id'] == 'SERVICIO DE TRANSPORTE AEREO') {
                     return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/' . $item)->with('errorbd', 'Este producto solo se puede registrar con ticket');
                 }
             }
 
             $IND_OSIRIS = 0;
-            if($detliquidaciongasto->COD_TIPODOCUMENTO =='TDO0000000000010'){
-                if($request['producto_id'] == 'SERVICIO DE TRANSPORTE AEREO'){
+            if ($detliquidaciongasto->COD_TIPODOCUMENTO == 'TDO0000000000010') {
+                if ($request['producto_id'] == 'SERVICIO DE TRANSPORTE AEREO') {
 
-                    $arendri            =   DB::table('WEB.VALE_RENDIR')
-                                            ->where('ID', $liquidaciongastos->ARENDIR_ID)
-                                            ->first(); 
+                    $arendri = DB::table('WEB.VALE_RENDIR')
+                        ->where('ID', $liquidaciongastos->ARENDIR_ID)
+                        ->first();
 
-                    if(count($arendri)>0){
-                        if($arendri->TIPO_MOTIVO == 'TIP0000000000003'){
+                    if (count($arendri) > 0) {
+                        if ($arendri->TIPO_MOTIVO == 'TIP0000000000003') {
                             $IND_OSIRIS = 1;
-                            LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ITEM', '=', $item)
-                                        ->update(
-                                                [
-                                                    'IND_OSIRIS'=> 1
-                                                ]); 
+                            LqgDetLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ITEM', '=', $item)
+                                ->update(
+                                    [
+                                        'IND_OSIRIS' => 1
+                                    ]);
                         }
                     }
-
 
 
                 }
             }
 
-            if($request['producto_id'] == 'MOVILIDAD AEROPUERTO'){
+            if ($request['producto_id'] == 'MOVILIDAD AEROPUERTO') {
                 return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/' . $item)->with('errorbd', 'Este producto solo se puede registrar con factura');
             }
 
 
-            if($request['producto_id'] != 'SERVICIO DE TRANSPORTE AEREO'){
-                if(count($ldetallearendir)>0){
-                    if(count($referencia_asoc)>0){
-                        $mensaje_error_vale = $this->validar_reembolso_supere_monto($liquidaciongastos,$liquidaciongastos->ARENDIR,$referencia_asoc->COD_TABLA,$importe,$producto_id,0);
-                        if($mensaje_error_vale!=''){
-                            return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/' . $item)->with('errorbd', $mensaje_error_vale); 
+            if ($request['producto_id'] != 'SERVICIO DE TRANSPORTE AEREO') {
+                if (count($ldetallearendir) > 0) {
+                    if (count($referencia_asoc) > 0) {
+                        $mensaje_error_vale = $this->validar_reembolso_supere_monto($liquidaciongastos, $liquidaciongastos->ARENDIR, $referencia_asoc->COD_TABLA, $importe, $producto_id, 0);
+                        if ($mensaje_error_vale != '') {
+                            return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/' . $item)->with('errorbd', $mensaje_error_vale);
                         }
-                    }else{
+                    } else {
                         return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/' . $item)->with('errorbd', 'Este producto no esta relacionado en la tabla referencia');
                     }
                 }
-            }      
+            }
 
             $total = $importe;
             if ($igv_id == '1') {
                 $subtotal = $importe / 1.18;
             }
-
-
-
 
 
             $cabecera = new LqgDetDocumentoLiquidacionGasto;
@@ -4197,8 +4594,8 @@ class GestionLiquidacionGastosController extends Controller
                 }
                 $token = '';
 
-                $PRIMERA_FECHA_RENDICION_DET =     $request['PRIMERA_FECHA_RENDICION_DET'];
-                $ULTIMA_FECHA_RENDICION_DET  =     $request['ULTIMA_FECHA_RENDICION_DET'];
+                $PRIMERA_FECHA_RENDICION_DET = $request['PRIMERA_FECHA_RENDICION_DET'];
+                $ULTIMA_FECHA_RENDICION_DET = $request['ULTIMA_FECHA_RENDICION_DET'];
 
                 $fechaMinima = '';
                 $fechaMaxima = '';
@@ -4217,7 +4614,7 @@ class GestionLiquidacionGastosController extends Controller
                         $fechaMaxima = $detalleplanillam->fecha_maxima;
                     }
 
-                    if($ULTIMA_FECHA_RENDICION_DET!=''){
+                    if ($ULTIMA_FECHA_RENDICION_DET != '') {
 
 
                         $fechaInicio = Carbon::parse($PRIMERA_FECHA_RENDICION_DET)->startOfDay();
@@ -4231,11 +4628,11 @@ class GestionLiquidacionGastosController extends Controller
                         // $fechaMax = Carbon::parse($fechaMaxima);
                         // Validar que estén dentro del rango
 
-                        if($liquidaciongastos->REEMBOLSO != 'REEMBOLSO'){
+                        if ($liquidaciongastos->REEMBOLSO != 'REEMBOLSO') {
                             if (!($fechaMin->between($fechaInicio, $fechaFin) && $fechaMax->between($fechaInicio, $fechaFin))) {
                                 return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/-1')
-                                       ->with('errorbd', 'Las fechas de movilidad no están dentro del rango a rendir (' . $fechaInicio->format('Y-m-d') . ' / ' . $fechaFin->format('Y-m-d') . ')');
-                            }   
+                                    ->with('errorbd', 'Las fechas de movilidad no están dentro del rango a rendir (' . $fechaInicio->format('Y-m-d') . ' / ' . $fechaFin->format('Y-m-d') . ')');
+                            }
                         }
 
 
@@ -4306,33 +4703,32 @@ class GestionLiquidacionGastosController extends Controller
 
                         //MOVILIDAD AEROPUERTO
 
-                        if($request['producto_id_factura'] != 'SERVICIO DE TRANSPORTE AEREO'){
-                            
-                            if($request['producto_id_factura'] != 'SERVICIO DE TRANSPORTE DE PASAJEROS'){
-                            if (!empty($ULTIMA_FECHA_RENDICION_DET)) {
+                        if ($request['producto_id_factura'] != 'SERVICIO DE TRANSPORTE AEREO') {
 
-                                //$fechaInicio = Carbon::parse($PRIMERA_FECHA_RENDICION_DET);
-                                //$fechaFin = Carbon::parse($ULTIMA_FECHA_RENDICION_DET);
-                                $fechaInicio = Carbon::parse($PRIMERA_FECHA_RENDICION_DET)->startOfDay();
-                                $fechaFin = Carbon::parse($ULTIMA_FECHA_RENDICION_DET)->endOfDay();
-                                $fechaMin = Carbon::parse($request['fecha_emision']);
+                            if ($request['producto_id_factura'] != 'SERVICIO DE TRANSPORTE DE PASAJEROS') {
+                                if (!empty($ULTIMA_FECHA_RENDICION_DET)) {
 
-                                if($liquidaciongastos->ARENDIR != 'REEMBOLSO'){
-                                    // Validar si está dentro del rango
-                                    if (!$fechaMin->between($fechaInicio, $fechaFin)) {
+                                    //$fechaInicio = Carbon::parse($PRIMERA_FECHA_RENDICION_DET);
+                                    //$fechaFin = Carbon::parse($ULTIMA_FECHA_RENDICION_DET);
+                                    $fechaInicio = Carbon::parse($PRIMERA_FECHA_RENDICION_DET)->startOfDay();
+                                    $fechaFin = Carbon::parse($ULTIMA_FECHA_RENDICION_DET)->endOfDay();
+                                    $fechaMin = Carbon::parse($request['fecha_emision']);
 
-                                        return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/-1')
-                                               ->with('errorbd', 'La fecha de emisión (' . $fechaMin->format('Y-m-d') . ') no está dentro del rango a rendir (' . 
-                                               $fechaInicio->format('Y-m-d') . ' / ' . $fechaFin->format('Y-m-d') . ')');
+                                    if ($liquidaciongastos->ARENDIR != 'REEMBOLSO') {
+                                        // Validar si está dentro del rango
+                                        if (!$fechaMin->between($fechaInicio, $fechaFin)) {
+
+                                            return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/-1')
+                                                ->with('errorbd', 'La fecha de emisión (' . $fechaMin->format('Y-m-d') . ') no está dentro del rango a rendir (' .
+                                                    $fechaInicio->format('Y-m-d') . ' / ' . $fechaFin->format('Y-m-d') . ')');
+                                        }
                                     }
+
                                 }
 
                             }
 
-                            }
-
                         }
-
 
 
                         $fetoken = FeToken::where('COD_EMPR', '=', Session::get('empresas')->COD_EMPR)->where('TIPO', '=', 'COMPROBANTE_PAGO')->first();
@@ -4374,7 +4770,7 @@ class GestionLiquidacionGastosController extends Controller
                         if (count($partes) > 1) {
                             $nombre = trim($partes[0]);
                         }
-                        $empresa_trab = STDEmpresa::where('NRO_DOCUMENTO', '=', $nombre)->where('COD_TIPO_DOCUMENTO','=','TDI0000000000006')->where('COD_ESTADO', '=', '1')->first();
+                        $empresa_trab = STDEmpresa::where('NRO_DOCUMENTO', '=', $nombre)->where('COD_TIPO_DOCUMENTO', '=', 'TDI0000000000006')->where('COD_ESTADO', '=', '1')->first();
 
 
                     } else {
@@ -4389,12 +4785,12 @@ class GestionLiquidacionGastosController extends Controller
                             $fechaFin = Carbon::parse($ULTIMA_FECHA_RENDICION_DET)->endOfDay();
                             $fechaMin = Carbon::parse($request['fecha_emision']);
 
-                            if($request['producto_id_factura'] != 'SERVICIO DE TRANSPORTE AEREO'){
-                                if($request['producto_id_factura'] != 'SERVICIO DE TRANSPORTE DE PASAJEROS'){
-                                    if($liquidaciongastos->ARENDIR != 'REEMBOLSO'){
+                            if ($request['producto_id_factura'] != 'SERVICIO DE TRANSPORTE AEREO') {
+                                if ($request['producto_id_factura'] != 'SERVICIO DE TRANSPORTE DE PASAJEROS') {
+                                    if ($liquidaciongastos->ARENDIR != 'REEMBOLSO') {
                                         if (!$fechaMin->between($fechaInicio, $fechaFin)) {
                                             return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/-1')
-                                                   ->with('errorbd', 'La fecha de emisión (' . $fechaMin->format('Y-m-d') . ') no está dentro del rango a rendir (' . $fechaInicio->format('Y-m-d') . ' / ' . $fechaFin->format('Y-m-d') . ')');
+                                                ->with('errorbd', 'La fecha de emisión (' . $fechaMin->format('Y-m-d') . ') no está dentro del rango a rendir (' . $fechaInicio->format('Y-m-d') . ' / ' . $fechaFin->format('Y-m-d') . ')');
                                         }
                                     }
                                 }
@@ -4425,7 +4821,7 @@ class GestionLiquidacionGastosController extends Controller
                         if (count($partes) > 1) {
                             $nombre = trim($partes[0]);
                         }
-                        $empresa_trab = STDEmpresa::where('NRO_DOCUMENTO', '=', $nombre)->where('COD_TIPO_DOCUMENTO','=','TDI0000000000006')->where('COD_ESTADO', '=', '1')->first();
+                        $empresa_trab = STDEmpresa::where('NRO_DOCUMENTO', '=', $nombre)->where('COD_TIPO_DOCUMENTO', '=', 'TDI0000000000006')->where('COD_ESTADO', '=', '1')->first();
 
                     }
                 }
@@ -4452,7 +4848,6 @@ class GestionLiquidacionGastosController extends Controller
                     $nombre = trim($partes[0]);
 
                 }
-
 
 
                 $bliquidacion = DB::table('LQG_DETLIQUIDACIONGASTO')
@@ -4588,33 +4983,32 @@ class GestionLiquidacionGastosController extends Controller
 
 
                     $producto = DB::table('ALM.PRODUCTO')->where('NOM_PRODUCTO', '=', $request['producto_id_factura'])->first();
-                                       
-                    if($request['producto_id_factura'] != 'MOVILIDAD AEROPUERTO'){
+
+                    if ($request['producto_id_factura'] != 'MOVILIDAD AEROPUERTO') {
 
                         $importe = $request['totaldetalle'];
                         $resta = 0;
                         $liquidaciongastos = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->first();
 
-                        $referencia_asoc =  DB::table('CMP.REFERENCIA_ASOC')
-                                            ->where('TXT_DESCRIPCION', 'ARENDIR')
-                                            ->where('TXT_TABLA_ASOC', $producto->NOM_PRODUCTO)
-                                            ->first();
+                        $referencia_asoc = DB::table('CMP.REFERENCIA_ASOC')
+                            ->where('TXT_DESCRIPCION', 'ARENDIR')
+                            ->where('TXT_TABLA_ASOC', $producto->NOM_PRODUCTO)
+                            ->first();
 
                         $producto_id = $producto->NOM_PRODUCTO;
                         //DD($referencia_asoc);
                         if (!empty($ULTIMA_FECHA_RENDICION_DET)) {
-                            if(count($referencia_asoc)>0){
-                                
-                                $mensaje_error_vale = $this->validar_reembolso_supere_monto($liquidaciongastos,$liquidaciongastos->ARENDIR,$referencia_asoc->COD_TABLA,$importe,$producto_id,$resta);
-                                if($mensaje_error_vale!=''){
-                                    return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/-1')->with('errorbd', $mensaje_error_vale); 
+                            if (count($referencia_asoc) > 0) {
+
+                                $mensaje_error_vale = $this->validar_reembolso_supere_monto($liquidaciongastos, $liquidaciongastos->ARENDIR, $referencia_asoc->COD_TABLA, $importe, $producto_id, $resta);
+                                if ($mensaje_error_vale != '') {
+                                    return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/-1')->with('errorbd', $mensaje_error_vale);
                                 }
-                            }else{
+                            } else {
                                 return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/-1')->with('errorbd', 'Este producto no esta relacionado en la tabla referencia');
                             }
                         }
                     }
-
 
 
                     //dd($producto);
@@ -4721,7 +5115,7 @@ class GestionLiquidacionGastosController extends Controller
                         $detliquidaciongasto = LqgDetLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ITEM', '=', $item)->first();
                         $detdocumentolg = LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ITEM', '=', $item)->get();
 
-                        
+
                         $itemdet = count($detdocumentolg) + 1;
                         $producto = DB::table('ALM.PRODUCTO')->where('NOM_PRODUCTO', '=', $producto_id)->first();
                         $fecha_creacion = $this->hoy;
@@ -4729,47 +5123,47 @@ class GestionLiquidacionGastosController extends Controller
                         $subtotal = $importe;
 
                         $liquidaciongastos = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->first();
-                        $referencia_asoc =  DB::table('CMP.REFERENCIA_ASOC')
-                                            ->where('TXT_DESCRIPCION', 'ARENDIR')
-                                            ->where('TXT_TABLA_ASOC', $producto_id)
-                                            ->first();
+                        $referencia_asoc = DB::table('CMP.REFERENCIA_ASOC')
+                            ->where('TXT_DESCRIPCION', 'ARENDIR')
+                            ->where('TXT_TABLA_ASOC', $producto_id)
+                            ->first();
                         $resta = 0;
 
                         if ($liquidaciongastos->ARENDIR == 'REEMBOLSO') {
                             $ldetallearendir = DB::table('WEB.VALE_RENDIR_DETALLE_REEMBOLSO')
-                                                ->where('ID', $liquidaciongastos->ARENDIR_ID)
-                                                ->where('COD_ESTADO', 1)
-                                                ->get();
+                                ->where('ID', $liquidaciongastos->ARENDIR_ID)
+                                ->where('COD_ESTADO', 1)
+                                ->get();
 
-                        }else{
+                        } else {
                             $ldetallearendir = DB::table('WEB.VALE_RENDIR_DETALLE')
                                 ->where('ID', $liquidaciongastos->ARENDIR_ID)
                                 ->where('COD_ESTADO', 1)
                                 ->get();
                         }
 
-                        if($detliquidaciongasto->COD_TIPODOCUMENTO !='TDO0000000000010'){
-                            if($request['producto_id_factura'] == 'SERVICIO DE TRANSPORTE AEREO'){
+                        if ($detliquidaciongasto->COD_TIPODOCUMENTO != 'TDO0000000000010') {
+                            if ($request['producto_id_factura'] == 'SERVICIO DE TRANSPORTE AEREO') {
                                 return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/' . $item)->with('errorbd', 'Este producto solo se puede registrar con ticket');
                             }
                         }
 
                         $IND_OSIRIS = 0;
-                        if($detliquidaciongasto->COD_TIPODOCUMENTO =='TDO0000000000010'){
-                            if($request['producto_id_factura'] == 'SERVICIO DE TRANSPORTE AEREO'){
+                        if ($detliquidaciongasto->COD_TIPODOCUMENTO == 'TDO0000000000010') {
+                            if ($request['producto_id_factura'] == 'SERVICIO DE TRANSPORTE AEREO') {
 
-                                $arendri            =   DB::table('WEB.VALE_RENDIR')
-                                                        ->where('ID', $liquidaciongastos->ARENDIR_ID)
-                                                        ->first(); 
+                                $arendri = DB::table('WEB.VALE_RENDIR')
+                                    ->where('ID', $liquidaciongastos->ARENDIR_ID)
+                                    ->first();
 
-                                if(count($arendri)>0){
-                                    if($arendri->TIPO_MOTIVO == 'TIP0000000000003'){
+                                if (count($arendri) > 0) {
+                                    if ($arendri->TIPO_MOTIVO == 'TIP0000000000003') {
                                         $IND_OSIRIS = 1;
-                                        LqgDetLiquidacionGasto::where('ID_DOCUMENTO','=',$iddocumento)->where('ITEM', '=', $item)
-                                                    ->update(
-                                                            [
-                                                                'IND_OSIRIS'=> 1
-                                                            ]); 
+                                        LqgDetLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ITEM', '=', $item)
+                                            ->update(
+                                                [
+                                                    'IND_OSIRIS' => 1
+                                                ]);
                                     }
                                 }
 
@@ -4777,23 +5171,23 @@ class GestionLiquidacionGastosController extends Controller
                             }
                         }
 
-                        if($request['producto_id_factura'] == 'MOVILIDAD AEROPUERTO'){
+                        if ($request['producto_id_factura'] == 'MOVILIDAD AEROPUERTO') {
                             return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/' . $item)->with('errorbd', 'Este producto solo se puede registrar con factura');
                         }
 
 
-                        if($request['producto_id_factura'] != 'SERVICIO DE TRANSPORTE AEREO'){
-                            if(count($ldetallearendir)>0){
-                                if(count($referencia_asoc)>0){
-                                    $mensaje_error_vale = $this->validar_reembolso_supere_monto($liquidaciongastos,$liquidaciongastos->ARENDIR,$referencia_asoc->COD_TABLA,$importe,$producto_id,0);
-                                    if($mensaje_error_vale!=''){
-                                        return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/' . $item)->with('errorbd', $mensaje_error_vale); 
+                        if ($request['producto_id_factura'] != 'SERVICIO DE TRANSPORTE AEREO') {
+                            if (count($ldetallearendir) > 0) {
+                                if (count($referencia_asoc) > 0) {
+                                    $mensaje_error_vale = $this->validar_reembolso_supere_monto($liquidaciongastos, $liquidaciongastos->ARENDIR, $referencia_asoc->COD_TABLA, $importe, $producto_id, 0);
+                                    if ($mensaje_error_vale != '') {
+                                        return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/' . $item)->with('errorbd', $mensaje_error_vale);
                                     }
-                                }else{
+                                } else {
                                     return Redirect::to('modificar-liquidacion-gastos/' . $idopcion . '/' . $idcab . '/' . $item)->with('errorbd', 'Este producto no esta relacionado en la tabla referencia');
                                 }
                             }
-                        }      
+                        }
 
                         $total = $importe;
                         if ($igv_id == '1') {
@@ -4862,7 +5256,7 @@ class GestionLiquidacionGastosController extends Controller
                 if ($tipodoc_id == 'TDO0000000000070' || $tipodoc_id == 'TDO0000000000001') {
                     $itemsel = '0';
                 }
-                                    //dd("entro02");
+                //dd("entro02");
 
                 $this->lg_calcular_total($iddocumento, $item);
                 DB::commit();
@@ -4891,8 +5285,6 @@ class GestionLiquidacionGastosController extends Controller
         if ($liquidaciongastos->COD_ESTADO != 'ETM0000000000001' && $liquidaciongastos->IND_OBSERVACION == 0) {
             return Redirect::to('gestion-de-liquidacion-gastos/' . $idopcion)->with('errorbd', 'Ya no puede extornar esta LIQUIDACION DE GASTOS');
         }
-
-
 
 
         $liquidaciongastos->ACTIVO = 0;
@@ -4980,11 +5372,11 @@ class GestionLiquidacionGastosController extends Controller
             ->where('dni', $dni)
             ->first();
 
-        $terceros   =   DB::table('TERCEROS')
-                        ->where('USER_ID', Session::get('usuario')->id)
-                        ->where('ACTIVO', 1)
-                        ->first();
-     
+        $terceros = DB::table('TERCEROS')
+            ->where('USER_ID', Session::get('usuario')->id)
+            ->where('ACTIVO', 1)
+            ->first();
+
         if (count($terceros) <= 0) {
             if (count($trabajadorespla) <= 0) {
                 return Redirect::to('gestion-de-liquidacion-gastos/' . $idopcion)->with('errorbd', 'No existe registro en planilla');
@@ -4997,73 +5389,72 @@ class GestionLiquidacionGastosController extends Controller
         $cuentaco_id = $liquidaciongastos->CUENTA_BANCARIA;
 
 
+        $doc_arendri = '';
+        $doc_monto = '';
+        $fechasarendir = '';
+        $ultimafechaar = '';
+        $primerafechaar = '';
 
-        $doc_arendri        =   '';
-        $doc_monto          =   '';
-        $fechasarendir      =   '';
-        $ultimafechaar      =   '';
-        $primerafechaar      =   '';
-
-        $arendir        =   WEBValeRendir::where('ID','=',$liquidaciongastos->ARENDIR_ID)->first();
+        $arendir = WEBValeRendir::where('ID', '=', $liquidaciongastos->ARENDIR_ID)->first();
 
         if ($liquidaciongastos->ARENDIR == 'SI' || $liquidaciongastos->ARENDIR == 'NO') {
-            if (count($arendir)>0) {
-                $doc_arendri    =   $arendir->TXT_SERIE.'-'.$arendir->TXT_NUMERO;
-                $doc_monto      =   $arendir->CAN_TOTAL_IMPORTE;
+            if (count($arendir) > 0) {
+                $doc_arendri = $arendir->TXT_SERIE . '-' . $arendir->TXT_NUMERO;
+                $doc_monto = $arendir->CAN_TOTAL_IMPORTE;
 
-                $arendirdetalle =   DB::table('WEB.VALE_RENDIR_DETALLE')
-                                    ->where('ID','=',$liquidaciongastos->ARENDIR_ID)
-                                    ->selectRaw('MIN(FEC_INICIO) as fecha_minima, MAX(FEC_FIN) as fecha_maxima')
-                                    ->first();
+                $arendirdetalle = DB::table('WEB.VALE_RENDIR_DETALLE')
+                    ->where('ID', '=', $liquidaciongastos->ARENDIR_ID)
+                    ->selectRaw('MIN(FEC_INICIO) as fecha_minima, MAX(FEC_FIN) as fecha_maxima')
+                    ->first();
                 if ($arendirdetalle) {
                     $fechasarendir = $arendirdetalle->fecha_minima . ' / ' . $arendirdetalle->fecha_maxima;
 
-                    $primerafechaar= $arendirdetalle->fecha_minima;
-                    $ultimafecha   = $arendirdetalle->fecha_maxima;
-
-                } 
-            }
-        }else{
-            if ($liquidaciongastos->ARENDIR == 'VALE') {
-                $arendir        =   WEBValeRendir::where('ID','=',$liquidaciongastos->ARENDIR_ID)->first();
-                $doc_arendri    =   $arendir->TXT_SERIE.'-'.$arendir->TXT_NUMERO;
-                $doc_monto      =   $arendir->CAN_TOTAL_IMPORTE;
-                $arendirdetalle =   DB::table('WEB.VALE_RENDIR_DETALLE')
-                                    ->where('ID','=',$liquidaciongastos->ARENDIR_ID)
-                                    ->selectRaw('MIN(FEC_INICIO) as fecha_minima, MAX(FEC_FIN) as fecha_maxima')
-                                    ->first();
-                if ($arendirdetalle) {
-                    $fechasarendir = $arendirdetalle->fecha_minima . ' / ' . $arendirdetalle->fecha_maxima;
-                    $primerafechaar= $arendirdetalle->fecha_minima;
-                    $ultimafecha   = $arendirdetalle->fecha_maxima;
+                    $primerafechaar = $arendirdetalle->fecha_minima;
+                    $ultimafecha = $arendirdetalle->fecha_maxima;
 
                 }
-            }else{
+            }
+        } else {
+            if ($liquidaciongastos->ARENDIR == 'VALE') {
+                $arendir = WEBValeRendir::where('ID', '=', $liquidaciongastos->ARENDIR_ID)->first();
+                $doc_arendri = $arendir->TXT_SERIE . '-' . $arendir->TXT_NUMERO;
+                $doc_monto = $arendir->CAN_TOTAL_IMPORTE;
+                $arendirdetalle = DB::table('WEB.VALE_RENDIR_DETALLE')
+                    ->where('ID', '=', $liquidaciongastos->ARENDIR_ID)
+                    ->selectRaw('MIN(FEC_INICIO) as fecha_minima, MAX(FEC_FIN) as fecha_maxima')
+                    ->first();
+                if ($arendirdetalle) {
+                    $fechasarendir = $arendirdetalle->fecha_minima . ' / ' . $arendirdetalle->fecha_maxima;
+                    $primerafechaar = $arendirdetalle->fecha_minima;
+                    $ultimafecha = $arendirdetalle->fecha_maxima;
+
+                }
+            } else {
 
 
                 if ($liquidaciongastos->ARENDIR == 'IMPULSO') {
 
-                    $arendir        =   SemanaImpulso::where('ID_DOCUMENTO','=',$liquidaciongastos->ARENDIR_ID)->first();
-                    $doc_arendri    =   $arendir->ID_DOCUMENTO;
-                    $doc_monto      =   $arendir->MONTO;
+                    $arendir = SemanaImpulso::where('ID_DOCUMENTO', '=', $liquidaciongastos->ARENDIR_ID)->first();
+                    $doc_arendri = $arendir->ID_DOCUMENTO;
+                    $doc_monto = $arendir->MONTO;
 
 
                     $fechasarendir = $arendir->FECHA_INICIO . ' / ' . $arendir->FECHA_FIN;
-                    $primerafechaar= $arendir->FECHA_INICIO;
-                    $ultimafecha   = $arendir->FECHA_FIN;
+                    $primerafechaar = $arendir->FECHA_INICIO;
+                    $ultimafecha = $arendir->FECHA_FIN;
 
-                }else{
-                    $arendir        =   DB::table('WEB.VALE_RENDIR_REEMBOLSO')->where('ID','=',$liquidaciongastos->ARENDIR_ID)->first();
-                    $doc_arendri    =   $arendir->TXT_SERIE.'-'.$arendir->TXT_NUMERO;
-                    $doc_monto      =   $arendir->CAN_TOTAL_IMPORTE;
-                    $arendirdetalle =   DB::table('WEB.VALE_RENDIR_DETALLE_REEMBOLSO')
-                                        ->where('ID','=',$liquidaciongastos->ARENDIR_ID)
-                                        ->selectRaw('MIN(FEC_INICIO) as fecha_minima, MAX(FEC_FIN) as fecha_maxima')
-                                        ->first();
+                } else {
+                    $arendir = DB::table('WEB.VALE_RENDIR_REEMBOLSO')->where('ID', '=', $liquidaciongastos->ARENDIR_ID)->first();
+                    $doc_arendri = $arendir->TXT_SERIE . '-' . $arendir->TXT_NUMERO;
+                    $doc_monto = $arendir->CAN_TOTAL_IMPORTE;
+                    $arendirdetalle = DB::table('WEB.VALE_RENDIR_DETALLE_REEMBOLSO')
+                        ->where('ID', '=', $liquidaciongastos->ARENDIR_ID)
+                        ->selectRaw('MIN(FEC_INICIO) as fecha_minima, MAX(FEC_FIN) as fecha_maxima')
+                        ->first();
                     if ($arendirdetalle) {
                         $fechasarendir = $arendirdetalle->fecha_minima . ' / ' . $arendirdetalle->fecha_maxima;
-                        $primerafechaar= $arendirdetalle->fecha_minima;
-                        $ultimafecha   = $arendirdetalle->fecha_maxima;
+                        $primerafechaar = $arendirdetalle->fecha_minima;
+                        $ultimafecha = $arendirdetalle->fecha_maxima;
                     }
                 }
 
@@ -5075,12 +5466,11 @@ class GestionLiquidacionGastosController extends Controller
 
             $active = "documentos";
             $tipodoc_id = '';
-            if($liquidaciongastos->ARENDIR == 'IMPULSO'){
-                $combo_tipodoc = $this->lg_combo_tipodocumento_impulso("Seleccione Tipo Documento",'TDO0000000000070');
-            }else{
+            if ($liquidaciongastos->ARENDIR == 'IMPULSO') {
+                $combo_tipodoc = $this->lg_combo_tipodocumento_impulso("Seleccione Tipo Documento", 'TDO0000000000070');
+            } else {
                 $combo_tipodoc = $this->lg_combo_tipodocumento("Seleccione Tipo Documento");
             }
-
 
 
             $empresa_id = "";
@@ -5098,11 +5488,11 @@ class GestionLiquidacionGastosController extends Controller
 
 
             //terceros
-            $terceros   =   DB::table('TERCEROS')
-                            ->where('USER_ID', Session::get('usuario')->id)
-                            ->where('ACTIVO', 1)
-                            ->first();
-         
+            $terceros = DB::table('TERCEROS')
+                ->where('USER_ID', Session::get('usuario')->id)
+                ->where('ACTIVO', 1)
+                ->first();
+
             if (count($terceros) > 0) {
                 $area_planilla = $terceros->TXT_AREA;
                 //dd($area_planilla);
@@ -5114,10 +5504,10 @@ class GestionLiquidacionGastosController extends Controller
                     ->where('IND_MOVIMIENTO', 1)
                     ->first();
 
-                    $combo_costo = $this->lg_combo_costo_xtrabajador_tercero_nombre("Seleccione Costo", $area_planilla);
+                $combo_costo = $this->lg_combo_costo_xtrabajador_tercero_nombre("Seleccione Costo", $area_planilla);
 
 
-            }else{
+            } else {
                 $area_planilla = $trabajadorespla->cadarea;
                 $centrocosto = DB::table('CON.CENTRO_COSTO')
                     ->where('COD_ESTADO', 1)
@@ -5153,10 +5543,10 @@ class GestionLiquidacionGastosController extends Controller
             $tdetdocliquidacionitem = LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->where('ITEM', '=', $valor)->get();
 
             //dd($tdetliquidacionitem);
-            if($liquidaciongastos->ARENDIR == 'IMPULSO'){
+            if ($liquidaciongastos->ARENDIR == 'IMPULSO') {
                 $tipodoc_id = $tdetliquidacionitem->COD_TIPODOCUMENTO;
-                $combo_tipodoc = $this->lg_combo_tipodocumento_impulso("Seleccione Tipo Documento",'TDO0000000000070');
-            }else{
+                $combo_tipodoc = $this->lg_combo_tipodocumento_impulso("Seleccione Tipo Documento", 'TDO0000000000070');
+            } else {
                 $tipodoc_id = $tdetliquidacionitem->COD_TIPODOCUMENTO;
                 $combo_tipodoc = $this->lg_combo_tipodocumento("Seleccione Tipo Documento");
             }
@@ -5181,11 +5571,11 @@ class GestionLiquidacionGastosController extends Controller
             $costo_id = $tdetliquidacionitem->COD_COSTO;
 
             //terceros
-            $terceros   =   DB::table('TERCEROS')
-                            ->where('USER_ID', Session::get('usuario')->id)
-                            ->where('ACTIVO', 1)
-                            ->first();
-         
+            $terceros = DB::table('TERCEROS')
+                ->where('USER_ID', Session::get('usuario')->id)
+                ->where('ACTIVO', 1)
+                ->first();
+
             if (count($terceros) > 0) {
                 $area_planilla = $terceros->TXT_AREA;
                 // $centrocosto = DB::table('CON.CENTRO_COSTO')
@@ -5202,11 +5592,10 @@ class GestionLiquidacionGastosController extends Controller
                     ->where('IND_MOVIMIENTO', 1)
                     ->first();
 
-                    $combo_costo = $this->lg_combo_costo_xtrabajador_tercero_nombre("Seleccione Costo", $area_planilla);
+                $combo_costo = $this->lg_combo_costo_xtrabajador_tercero_nombre("Seleccione Costo", $area_planilla);
 
 
-
-            }else{
+            } else {
                 $area_planilla = $trabajadorespla->cadarea;
                 $centrocosto = DB::table('CON.CENTRO_COSTO')
                     ->where('COD_ESTADO', 1)
@@ -5252,23 +5641,22 @@ class GestionLiquidacionGastosController extends Controller
         $arraybancos = DB::table('CMP.CATEGORIA')->where('TXT_GRUPO', '=', 'BANCOS_MERGE')->where('COD_ESTADO', '=', '1')->pluck('NOM_CATEGORIA', 'COD_CATEGORIA')->toArray();
         $combobancos = array('' => "Seleccione Entidad Bancaria") + $arraybancos;
 
-        $numero_cuenta ="";
-        $banco_nombre ="";
-        $banco_e_id ="";
+        $numero_cuenta = "";
+        $banco_nombre = "";
+        $banco_e_id = "";
 
-        $cod_empr               =   Session::get('empresas')->COD_EMPR;
-        $values                 =   [$dni,$cod_empr];
-        $datoscuentasueldo      =   DB::select('exec ListaTrabajadorCuentaSueldo ?,?',$values);
-        $txt_categoria_banco    =   '';
-        $numero_cuenta          =   '';
-        $txt_categoria_banco    =   $datoscuentasueldo[0]->entidad ?? null;
-        $numero_cuenta          =   $datoscuentasueldo[0]->numcuenta ?? null;
-        $banco                  =   DB::table('CMP.CATEGORIA')->where('TXT_GRUPO', 'BANCOS_MERGE')->where('TXT_REFERENCIA', $txt_categoria_banco)->first();
-        if(count($banco)>0){
-            $banco_nombre =$banco->NOM_CATEGORIA;
-            $banco_e_id =$banco->COD_CATEGORIA;
+        $cod_empr = Session::get('empresas')->COD_EMPR;
+        $values = [$dni, $cod_empr];
+        $datoscuentasueldo = DB::select('exec ListaTrabajadorCuentaSueldo ?,?', $values);
+        $txt_categoria_banco = '';
+        $numero_cuenta = '';
+        $txt_categoria_banco = $datoscuentasueldo[0]->entidad ?? null;
+        $numero_cuenta = $datoscuentasueldo[0]->numcuenta ?? null;
+        $banco = DB::table('CMP.CATEGORIA')->where('TXT_GRUPO', 'BANCOS_MERGE')->where('TXT_REFERENCIA', $txt_categoria_banco)->first();
+        if (count($banco) > 0) {
+            $banco_nombre = $banco->NOM_CATEGORIA;
+            $banco_e_id = $banco->COD_CATEGORIA;
         }
-
 
 
         if ($tipopago_id == 'MPC0000000000002') {
@@ -5284,10 +5672,9 @@ class GestionLiquidacionGastosController extends Controller
             $combocb = array('' => "Seleccione Cuenta Bancaria");
         }
 
-        if($liquidaciongastos->ARENDIR != 'REEMBOLSO'){
+        if ($liquidaciongastos->ARENDIR != 'REEMBOLSO') {
             $tipopago_id = 'MPC0000000000001';
         }
-
 
 
         //dd($combo_costo);
@@ -5423,7 +5810,6 @@ class GestionLiquidacionGastosController extends Controller
                     }
 
 
-
                 }
 
                 $codigo = $this->funciones->generar_codigo('LQG_LIQUIDACION_GASTO', 8);
@@ -5464,11 +5850,11 @@ class GestionLiquidacionGastosController extends Controller
                     ->first();
 
                 //terceros
-                $terceros   =   DB::table('TERCEROS')
-                                ->where('USER_ID', Session::get('usuario')->id)
-                                ->where('ACTIVO', 1)
-                                ->first();
-             
+                $terceros = DB::table('TERCEROS')
+                    ->where('USER_ID', Session::get('usuario')->id)
+                    ->where('ACTIVO', 1)
+                    ->first();
+
                 if (count($terceros) > 0) {
                     $area_planilla = $terceros->TXT_AREA;
                     $centrocosto = DB::table('CON.CENTRO_COSTO')
@@ -5476,7 +5862,7 @@ class GestionLiquidacionGastosController extends Controller
                         ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
                         ->where('TXT_NOMBRE', '=', $area_planilla)
                         ->where('IND_MOVIMIENTO', 1)->first();
-                }else{
+                } else {
                     $area_planilla = $trabajadorespla->cadarea;
                     $centrocosto = DB::table('CON.CENTRO_COSTO')
                         ->where('COD_ESTADO', 1)
@@ -5563,20 +5949,20 @@ class GestionLiquidacionGastosController extends Controller
                 $centro_id = $trabajadorespla->centro_osiris_id;
             } else {
                 //terceros
-                $terceros   =   DB::table('TERCEROS')
-                                ->where('USER_ID', Session::get('usuario')->id)
-                                ->where('ACTIVO', 1)
-                                ->first();
+                $terceros = DB::table('TERCEROS')
+                    ->where('USER_ID', Session::get('usuario')->id)
+                    ->where('ACTIVO', 1)
+                    ->first();
                 if (count($terceros) <= 0) {
                     return Redirect::to('gestion-de-liquidacion-gastos/' . $idopcion)->with('errorbd', 'No puede realizar un registro porque no es la empresa a cual pertenece');
                 }
 
             }
 
-            $terceros   =   DB::table('TERCEROS')
-                            ->where('USER_ID', Session::get('usuario')->id)
-                            ->where('ACTIVO', 1)
-                            ->first();
+            $terceros = DB::table('TERCEROS')
+                ->where('USER_ID', Session::get('usuario')->id)
+                ->where('ACTIVO', 1)
+                ->first();
             if (count($terceros) > 0) {
                 $centro_id = $terceros->COD_CENTRO;
             }
@@ -5597,10 +5983,10 @@ class GestionLiquidacionGastosController extends Controller
                 ->first();
 
             //terceros
-            $terceros   =   DB::table('TERCEROS')
-                            ->where('USER_ID', Session::get('usuario')->id)
-                            ->where('ACTIVO', 1)
-                            ->first();
+            $terceros = DB::table('TERCEROS')
+                ->where('USER_ID', Session::get('usuario')->id)
+                ->where('ACTIVO', 1)
+                ->first();
 
             if (count($terceros) > 0) {
                 $area_planilla = $terceros->TXT_AREA;
@@ -5611,7 +5997,7 @@ class GestionLiquidacionGastosController extends Controller
                     ->where('TXT_NOMBRE', '=', $area_planilla)
                     ->where('IND_MOVIMIENTO', 1)->first();
 
-            }else{
+            } else {
                 $area_planilla = $trabajadorespla->cadarea;
                 $centrocosto = DB::table('CON.CENTRO_COSTO')
                     ->where('COD_ESTADO', 1)
@@ -5626,7 +6012,6 @@ class GestionLiquidacionGastosController extends Controller
 
             $anio = $this->anio;
             $mes = $this->mes;
-
 
 
             $area_id = "";
@@ -5756,10 +6141,10 @@ class GestionLiquidacionGastosController extends Controller
             $centro_id = $trabajadorespla->centro_osiris_id;
         }
 
-        $terceros   =   DB::table('TERCEROS')
-                        ->where('USER_ID', Session::get('usuario')->id)
-                        ->where('ACTIVO', 1)
-                        ->first();
+        $terceros = DB::table('TERCEROS')
+            ->where('USER_ID', Session::get('usuario')->id)
+            ->where('ACTIVO', 1)
+            ->first();
         if (count($terceros) > 0) {
             $centro_id = $terceros->COD_CENTRO;
         }
@@ -5811,10 +6196,10 @@ class GestionLiquidacionGastosController extends Controller
             $centro_id = $trabajadorespla->centro_osiris_id;
         }
 
-        $terceros   =   DB::table('TERCEROS')
-                        ->where('USER_ID', Session::get('usuario')->id)
-                        ->where('ACTIVO', 1)
-                        ->first();
+        $terceros = DB::table('TERCEROS')
+            ->where('USER_ID', Session::get('usuario')->id)
+            ->where('ACTIVO', 1)
+            ->first();
         if (count($terceros) > 0) {
             $centro_id = $terceros->COD_CENTRO;
         }
@@ -5824,16 +6209,16 @@ class GestionLiquidacionGastosController extends Controller
         $cadena = $empresa_id;
         $partes = explode(" - ", $cadena);
         $nombre = '';
-        $ruc = '';        
+        $ruc = '';
         if (count($partes) > 1) {
             $ruc = trim($partes[0]);
             $nombre = trim($partes[1]);
         }
 
-        $empresa   =   DB::table('STD.EMPRESA ')
-                        ->where('NRO_DOCUMENTO', $ruc)
-                        ->where('COD_ESTADO', 1)
-                        ->first();
+        $empresa = DB::table('STD.EMPRESA ')
+            ->where('NRO_DOCUMENTO', $ruc)
+            ->where('COD_ESTADO', 1)
+            ->first();
         //DD($empresa->COD_EMPR);
 
         $combo_cuenta = $this->lg_combo_cuenta_lg_nuevo('Seleccione una Cuenta', '', '', $centro_id, $empresa->COD_EMPR);
@@ -5873,7 +6258,7 @@ class GestionLiquidacionGastosController extends Controller
         $id_documento = $request['id_documento'];
         $liquidaciongastos = LqgLiquidacionGasto::where('ID_DOCUMENTO', '=', $id_documento)->first();
         $indicador = 0;
-        $listaarendirlg = $this->lg_lista_arendirlg($liquidaciongastos,$indicador);
+        $listaarendirlg = $this->lg_lista_arendirlg($liquidaciongastos, $indicador);
 
         return View::make('liquidaciongasto/modal/ajax/mlistacomparativa',
             [
@@ -5885,21 +6270,20 @@ class GestionLiquidacionGastosController extends Controller
     }
 
 
-
     public function actionAjaxComboArendir(Request $request)
     {
 
         $arendir_id = $request['arendir_id'];
         $moneda_sel_c_id = $request['moneda_sel_c_id'];
         $arendir_sel_id = '';
-        if($arendir_id=='VALE'){
-            $combo_arendir_sel = $this->gn_combo_arendir_restante_nuevo($moneda_sel_c_id);       
-        }else{
-        if($arendir_id=='IMPULSO'){
-            $combo_arendir_sel = $this->gn_combo_arendir_restante_impulso();       
-        }else{
+        if ($arendir_id == 'VALE') {
+            $combo_arendir_sel = $this->gn_combo_arendir_restante_nuevo($moneda_sel_c_id);
+        } else {
+            if ($arendir_id == 'IMPULSO') {
+                $combo_arendir_sel = $this->gn_combo_arendir_restante_impulso();
+            } else {
                 $combo_arendir_sel = $this->gn_combo_arendir_restante_reembolso();
-            }     
+            }
         }
 
         return View::make('liquidaciongasto/ajax/comboarendir',
@@ -5910,7 +6294,6 @@ class GestionLiquidacionGastosController extends Controller
             ]);
 
     }
-
 
 
     public function actionAjaxComboAutoriza(Request $request)
@@ -5933,14 +6316,14 @@ class GestionLiquidacionGastosController extends Controller
         $autoriza_id = $usuario_id;
         $combo_autoriza = $this->gn_combo_usuarios_id($autoriza_id);
 
-        if($arendir_id=='REEMBOLSO'){
+        if ($arendir_id == 'REEMBOLSO') {
             $combo_autoriza = $this->gn_combo_usuarios();
         }
 
-        if($arendir_id=='IMPULSO'){
-            $vale   =       DB::table('SEMANA_IMPULSO')
-                            ->where('ID_DOCUMENTO', $arendir_sel_id)
-                            ->first();
+        if ($arendir_id == 'IMPULSO') {
+            $vale = DB::table('SEMANA_IMPULSO')
+                ->where('ID_DOCUMENTO', $arendir_sel_id)
+                ->first();
             $usuario_id = '';
             if (count($vale) > 0) {
                 $usuario = DB::table('users')

@@ -2,24 +2,1100 @@ $(document).ready(function () {
     let carpeta = $("#carpeta").val();
 
     $('.pnlasientos').hide();
+    $('.pnl-asiento-reparable').hide();
+
+    $('#anio_asiento').prop('required', false);
+    $('#periodo_asiento').prop('required', false);
+    $('#comprobante_asiento').prop('required', false);
+    $('#moneda_asiento').prop('required', false);
+    $('#tipo_cambio_asiento').prop('required', false);
+    $('#empresa_asiento').prop('required', false);
+    $('#fecha_asiento').prop('required', false);
+    $('#tipo_documento_asiento').prop('required', false);
+    $('#serie_asiento').prop('required', false);
+    $('#numero_asiento').prop('required', false);
+    $('#nro_cuenta_contable').prop('required', false);
+    $('#tipo_asiento').prop('required', false);
+    $('#anio_asiento_reparable').prop('required', false);
+    $('#periodo_asiento_reparable').prop('required', false);
+    $('#comprobante_asiento_reparable').prop('required', false);
+    $('#moneda_asiento_reparable').prop('required', false);
+    $('#tipo_cambio_asiento_reparable').prop('required', false);
+    $('#empresa_asiento_reparable').prop('required', false);
+    $('#fecha_asiento_reparable').prop('required', false);
+    $('#tipo_documento_asiento_reparable').prop('required', false);
+    $('#serie_asiento_reparable').prop('required', false);
+    $('#numero_asiento_reparable').prop('required', false);
+    $('#nro_cuenta_contable_reparable').prop('required', false);
+    $('#tipo_asiento_reparable').prop('required', false);
 
     //nuevo
 
-
-    $(".liquidaciongasto").on('click','.btncuadrocomparativo', function() {
+    $(".liquidaciongasto").on('click', '.btncuadrocomparativo', function () {
         // debugger;
-        var _token                                   =   $('#token').val();
-        let id_documento                             =   $(this).attr("data_id");
-        var idopcion                                 =   $('#idopcion').val();
-        data                                          =   {
-                                                                _token                  : _token,
-                                                                id_documento            : id_documento,
-                                                                idopcion                : idopcion
-                                                            };
-        ajax_modal(data,"/ajax-modal-lista-comparativa",
-                  "modal-detalle-requerimiento","modal-detalle-requerimiento-container");
+        var _token = $('#token').val();
+        let id_documento = $(this).attr("data_id");
+        var idopcion = $('#idopcion').val();
+        data = {
+            _token: _token,
+            id_documento: id_documento,
+            idopcion: idopcion
+        };
+        ajax_modal(data, "/ajax-modal-lista-comparativa",
+            "modal-detalle-requerimiento", "modal-detalle-requerimiento-container");
 
     });
+
+    // REPARABLE
+
+    $("#fecha_asiento_reparable").on('change', function (e) {
+
+        let fecha = $('#fecha_asiento_reparable').val();
+        let _token = $('#token').val();
+
+        if (fecha === null || fecha.trim() === "") {
+            $.alert({
+                title: 'Error',
+                content: 'No hay fecha seleccionada',
+                type: 'red',
+                buttons: {
+                    ok: {
+                        text: 'OK',
+                        btnClass: 'btn-red',
+                    }
+                }
+            })
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: carpeta + "/obtener-periodo-tipo-cambio",
+            data: {_token: _token, fecha: fecha},
+            success: function (res) {
+                $('#tipo_cambio_asiento_reparable').val(res.tipoCambio);
+
+                window.selects['anio_asiento_reparable'].setSelected(res.anio.trim());
+                $('#anio_asiento_reparable').trigger('change');
+
+                setTimeout(function () {
+                    window.selects['periodo_asiento_reparable'].setSelected(res.periodo.trim())
+                    $('#periodo_asiento_reparable').trigger('change');
+                }, 1000);
+
+            },
+            error: function (res) {
+                error500(res);
+            }
+        });
+
+    });
+
+    $("#tipo_cambio_asiento_reparable").on('change', function (e) {
+
+        let moneda = $('#moneda_asiento_reparable').val();
+        let tc = $('#tipo_cambio_asiento_reparable').val();
+        tc.replaceAll(/[\$,]/g, "");
+        let arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_reparable").value);
+
+        if (moneda === null || moneda.trim() === "") {
+            $.alert({
+                title: 'Error',
+                content: 'No hay moneda seleccionada',
+                type: 'red',
+                buttons: {
+                    ok: {
+                        text: 'OK',
+                        btnClass: 'btn-red',
+                    }
+                }
+            });
+            return false;
+        }
+
+        if (!tc || parseFloat(tc) === 0) {
+            $.alert({
+                title: 'Error',
+                content: 'El tipo de cambio no puede ser 0',
+                type: 'red',
+                buttons: {
+                    ok: {
+                        text: 'OK',
+                        btnClass: 'btn-red',
+                    }
+                }
+            });
+            return false;
+        }
+
+        // Recorrerlo
+        arrayDetalle.forEach(item => {
+            if (parseInt(item.COD_ESTADO) === 1) {
+                if (moneda === 'MON0000000000001') {
+                    item.CAN_DEBE_ME = redondear4(parseFloat(item.CAN_DEBE_MN) / parseFloat(tc));
+                    item.CAN_HABER_ME = redondear4(parseFloat(item.CAN_HABER_MN) / parseFloat(tc));
+                } else {
+                    item.CAN_DEBE_MN = redondear4(parseFloat(item.CAN_DEBE_ME) / parseFloat(tc));
+                    item.CAN_HABER_MN = redondear4(parseFloat(item.CAN_HABER_ME) / parseFloat(tc));
+                }
+            }
+        });
+
+        document.getElementById("asiento_detalle_reparable").value = JSON.stringify(arrayDetalle);
+
+        // Después de actualizar arrayDetalle
+        let table = $('#asientodetallereparable').DataTable();
+
+        $("#asientodetallereparable tbody tr").each(function () {
+            let fila = $(this);
+            let codAsiento = fila.attr('data_codigo');
+            arrayDetalle.forEach(item => {
+                let asiento_id_editar = item.COD_ASIENTO_MOVIMIENTO;
+
+                if (codAsiento === asiento_id_editar) {
+                    // obtenemos el índice de la fila
+                    let rowIdx = table.row(fila).index();
+
+                    // actualizamos celdas por columna
+                    table.cell(rowIdx, 1).data(item.TXT_CUENTA_CONTABLE);                       // Cuenta
+                    table.cell(rowIdx, 2).data(item.TXT_GLOSA);                        // Descripción
+                    table.cell(rowIdx, 3).data(number_format(item.CAN_DEBE_MN, 4));       // Debe MN
+                    table.cell(rowIdx, 4).data(number_format(item.CAN_HABER_MN, 4));      // Haber MN
+                    table.cell(rowIdx, 5).data(number_format(item.CAN_DEBE_ME, 4));       // Debe ME
+                    table.cell(rowIdx, 6).data(number_format(item.CAN_HABER_ME, 4));      // Haber ME
+                }
+            });
+        });
+
+        // redibujar la tabla → esto dispara footerCallback y recalcula totales
+        table.columns.adjust().draw();
+
+    });
+
+    $('#tipo_igv_id_reparable').on('change', function () {
+        switch ($(this).val()) {
+            case "CTI0000000000002":
+            case "CTI0000000000003":
+                $('#porc_tipo_igv_id_reparable')
+                    .val('0')
+                    .trigger('change')
+                    .prop('disabled', true);
+                break;
+
+            case "CTI0000000000001":
+                $('#porc_tipo_igv_id_reparable')
+                    .val('18')
+                    .trigger('change')
+                    .prop('disabled', false);
+                break;
+
+            default:
+                $('#porc_tipo_igv_id_reparable')
+                    .val('')
+                    .trigger('change')
+                    .prop('disabled', true);
+                break;
+        }
+    });
+
+    $("#anio_asiento_reparable").on('change', function () {
+
+        event.preventDefault();
+        let anio = $('#anio_asiento_reparable').val();
+        let _token = $('#token').val();
+        //validacioones
+        if (anio == '') {
+            alerterrorajax("Seleccione un anio.");
+            return false;
+        }
+        data = {
+            _token: _token,
+            anio: anio
+        };
+
+        ajax_normal_combo(data, "/ajax-combo-periodo-xanio-xempresareparable", "ajax_anio_asiento_reparable")
+
+    });
+
+    $(".btn-regresar-lista-reparable").on('click', function (e) {
+        $('.tablageneralreparable').toggle("slow");
+        $('.editarcuentasreparable').toggle("slow");
+        setTimeout(function () {
+            $('#asientodetallereparable').DataTable().columns.adjust().draw();
+        }, 3000); // espera medio segundo o el tiempo necesario
+    });
+
+    $(document).on('click', ".editar-cuenta-reparable", function (e) {
+
+        let data_codigo = $(this).parents('.fila').attr('data_codigo');
+        let data_moneda = $(this).parents('.fila').attr('data_moneda');
+        let data_tc = $(this).parents('.fila').attr('data_tc');
+        let arrayDetalle = null;
+        let data_cuenta_id = '';
+        let data_debe_mn = 0.0000;
+        let data_haber_mn = 0.0000;
+        let data_debe_me = 0.0000;
+        let data_haber_me = 0.0000;
+        let data_afecto = '';
+        let data_porc_afecto = '';
+        let afecto = '';
+        let partida = 'COP0000000000001';
+        let monto = 0.0000;
+
+        if (data_moneda === null || data_moneda.trim() === "") {
+            $.alert({
+                title: 'Error',
+                content: 'No hay moneda seleccionada',
+                type: 'red',
+                buttons: {
+                    ok: {
+                        text: 'OK',
+                        btnClass: 'btn-red',
+                    }
+                }
+            });
+            return false;
+        }
+
+        if (!data_tc || parseFloat(data_tc) === 0) {
+            $.alert({
+                title: 'Error',
+                content: 'El tipo de cambio no puede ser 0',
+                type: 'red',
+                buttons: {
+                    ok: {
+                        text: 'OK',
+                        btnClass: 'btn-red',
+                    }
+                }
+            });
+            return false;
+        }
+
+        arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_reparable").value);
+
+        // Recorrerlo
+        arrayDetalle.forEach(item => {
+            if (item.COD_ASIENTO_MOVIMIENTO === data_codigo) {
+                data_cuenta_id = item.COD_CUENTA_CONTABLE;
+                data_debe_mn = item.CAN_DEBE_MN;
+                data_haber_mn = item.CAN_HABER_MN;
+                data_debe_me = item.CAN_DEBE_ME;
+                data_haber_me = item.CAN_HABER_ME;
+                data_afecto = item.COD_DOC_CTBLE_REF;
+                data_porc_afecto = item.COD_ORDEN_REF;
+                return; // saltar esta iteración
+            }
+        });
+
+        switch (data_afecto) {
+            case 'AIGV':
+                afecto = 'CTI0000000000001';
+                break;
+            case 'IIGV':
+                afecto = 'CTI0000000000002';
+                break;
+            case 'EIGV':
+                afecto = 'CTI0000000000003';
+                break;
+            default:
+                afecto = '';
+                break;
+        }
+
+        if (parseFloat(data_haber_mn) > 0) {
+            partida = 'COP0000000000002';
+        }
+
+        monto = parseFloat(data_debe_me) + parseFloat(data_haber_me);
+
+        if (data_moneda === 'MON0000000000001') {
+            monto = parseFloat(data_debe_mn) + parseFloat(data_haber_mn);
+        }
+
+        //$('#cuenta_contable_id_reparable').val(data_cuenta_id.trim()).trigger('change');
+        //$('#partida_id_reparable').val(partida.trim()).trigger('change');
+        //$('#tipo_igv_id_reparable').val(afecto.trim()).trigger('change');
+        //$('#porc_tipo_igv_id_reparable').val(data_porc_afecto.trim()).trigger('change');
+
+        window.selects['cuenta_contable_id_reparable'].setSelected(data_cuenta_id.trim());
+        window.selects['partida_id_reparable'].setSelected(partida.trim());
+        window.selects['tipo_igv_id_reparable'].setSelected(afecto.trim());
+        window.selects['porc_tipo_igv_id_reparable'].setSelected(data_porc_afecto.trim());
+        $('#cuenta_contable_id_reparable').trigger('change');
+        $('#partida_id_reparable').trigger('change');
+        $('#tipo_igv_id_reparable').trigger('change');
+        $('#porc_tipo_igv_id_reparable').trigger('change');
+
+        $('#monto_reparable').val(monto);
+
+        $('#asiento_id_editar_reparable').val(data_codigo);
+        $('#moneda_id_editar_reparable').val(data_moneda);
+        $('#tc_editar_reparable').val(data_tc);
+        $('#titulodetallereparable').text('Modificar Detalle');
+        $('.btn-registrar-movimiento-reparable').hide();
+        $('.btn-editar-movimiento-reparable').show();
+        $('.tablageneralreparable').toggle("slow");
+        $('.editarcuentasreparable').toggle("slow");
+
+    });
+
+    $(document).on('click', ".eliminar-cuenta-reparable", function (e) {
+
+        let data_codigo = $(this).parents('.fila').attr('data_codigo');
+        let arrayDetalle = null;
+
+        arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_reparable").value);
+
+        // Recorrerlo
+        arrayDetalle.forEach(item => {
+            if (item.COD_ASIENTO_MOVIMIENTO === data_codigo) {
+                item.COD_ESTADO = '0';
+                return; // saltar esta iteración
+            }
+        });
+
+        document.getElementById("asiento_detalle_reparable").value = JSON.stringify(arrayDetalle);
+
+        let table = $('#asientodetallereparable').DataTable();
+        let row = $(this).closest('tr');
+        table.row(row).remove().draw();
+
+        //$(this).closest("tr").remove();
+
+    });
+
+    $(".agregar-linea-reparable").on('click', function (e) {
+
+        let data_codigo = 'ASTMOV';
+        let data_moneda = document.getElementById("moneda_asiento_reparable").value;
+        let data_tc = document.getElementById("tipo_cambio_asiento_reparable").value;
+        let arrayDetalle = null;
+        let data_cuenta_id = '';
+        let data_porc_afecto = '';
+        let afecto = '';
+        let partida = '';
+        let monto = 0.0000;
+
+        if (data_moneda === null || data_moneda.trim() === "") {
+            $.alert({
+                title: 'Error',
+                content: 'No hay moneda seleccionada',
+                type: 'red',
+                buttons: {
+                    ok: {
+                        text: 'OK',
+                        btnClass: 'btn-red',
+                    }
+                }
+            });
+            return false;
+        }
+
+        if (!data_tc || parseFloat(data_tc) === 0) {
+            $.alert({
+                title: 'Error',
+                content: 'El tipo de cambio no puede ser 0',
+                type: 'red',
+                buttons: {
+                    ok: {
+                        text: 'OK',
+                        btnClass: 'btn-red',
+                    }
+                }
+            });
+            return false;
+        }
+
+        arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_reparable").value);
+
+        data_codigo = data_codigo + (arrayDetalle.length + 1).toString();
+
+        window.selects['cuenta_contable_id_reparable'].setSelected(data_cuenta_id.trim());
+        window.selects['partida_id_reparable'].setSelected(partida.trim());
+        window.selects['tipo_igv_id_reparable'].setSelected(afecto.trim());
+        window.selects['porc_tipo_igv_id_reparable'].setSelected(data_porc_afecto.trim());
+        $('#cuenta_contable_id_reparable').trigger('change');
+        $('#partida_id_reparable').trigger('change');
+        $('#tipo_igv_id_reparable').trigger('change');
+        $('#porc_tipo_igv_id_reparable').trigger('change');
+        $('#monto_reparable').val(monto);
+
+        $('#asiento_id_editar_reparable').val(data_codigo);
+        $('#moneda_id_editar_reparable').val(data_moneda);
+        $('#tc_editar_reparable').val(data_tc);
+        $('#titulodetallereparable').text('Registrar Detalle');
+        $('.btn-editar-movimiento-reparable').hide();
+        $('.btn-registrar-movimiento-reparable').show();
+        $('.tablageneralreparable').toggle("slow");
+        $('.editarcuentasreparable').toggle("slow");
+
+    });
+
+    $(".btn-editar-movimiento-reparable").on('click', function (e) {
+
+        let cuenta_contable_id = $('#cuenta_contable_id_reparable').val();
+        let afecto_igv = $('#tipo_igv_id_reparable').val();
+        let porc_afecto_igv = $('#porc_tipo_igv_id_reparable').val();
+        let monto = $('#monto_reparable').val();
+        monto = monto.replaceAll(/[\$,]/g, "");
+        let partida_id = $('#partida_id_reparable').val();
+        let activo = $('#activo_reparable').val();
+        let texto = $("#cuenta_contable_id_reparable option:selected").text();
+        let numero_cuenta = texto.split(" - ")[0];
+        let glosa_cuenta = texto.split(" - ")[1];
+
+        let asiento_id_editar = $('#asiento_id_editar_reparable').val();
+        let moneda_id_editar = $('#moneda_id_editar_reparable').val();
+        let tc_editar = $('#tc_editar_reparable').val();
+
+        let arrayDetalle = null;
+        let can_debe_mn = 0.0000;
+        let can_haber_mn = 0.0000;
+        let can_debe_me = 0.0000;
+        let can_haber_me = 0.0000;
+
+        if (monto === '' || monto === '0.0000') {
+            alerterrorajax("Ingrese un monto");
+            return false;
+        }
+        if (cuenta_contable_id === '') {
+            alerterrorajax("Seleccione una cuenta contable.");
+            return false;
+        }
+        if (partida_id === '') {
+            alerterrorajax("Seleccione una partida.");
+            return false;
+        }
+
+        switch (afecto_igv) {
+            case 'CTI0000000000001':
+                afecto_igv = 'AIGV';
+                break;
+            case 'CTI0000000000002':
+                afecto_igv = 'IIGV';
+                break;
+            case 'CTI0000000000003':
+                afecto_igv = 'EIGV';
+                break;
+            default:
+                afecto_igv = '';
+                break;
+        }
+
+        switch (afecto_igv) {
+            case 'AIGV':
+                if (porc_afecto_igv === '' || porc_afecto_igv === '0') {
+                    alerterrorajax("Selecciono Afecto debe tener porcentaje de IGV.");
+                    return false;
+                }
+                break;
+            case 'IIGV':
+                if (porc_afecto_igv === '10' || porc_afecto_igv === '18') {
+                    alerterrorajax("Selecciono Inafecto no puede tener porcentaje de IGV.");
+                    return false;
+                }
+                break;
+            case 'EIGV':
+                if (porc_afecto_igv === '10' || porc_afecto_igv === '18') {
+                    alerterrorajax("Selecciono Exonerado no puede tener porcentaje de IGV.");
+                    return false;
+                }
+                break;
+            default:
+                if (porc_afecto_igv === '10' || porc_afecto_igv === '18' || porc_afecto_igv === '0') {
+                    alerterrorajax("No se selecciono afecto IGV no puede ingresar porcentaje de IGV.");
+                    return false;
+                }
+                break;
+        }
+
+        arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_reparable").value);
+
+        if (moneda_id_editar === 'MON0000000000001') {
+            if (partida_id === 'COP0000000000001') {
+                can_debe_mn = redondear4(parseFloat(monto));
+                can_haber_mn = 0.0000;
+                can_debe_me = redondear4(parseFloat(monto) / tc_editar);
+                can_haber_me = 0.0000;
+            } else {
+                can_debe_mn = 0.0000;
+                can_haber_mn = redondear4(parseFloat(monto));
+                can_debe_me = 0.0000;
+                can_haber_me = redondear4(parseFloat(monto) / tc_editar);
+            }
+        } else {
+            if (partida_id === 'COP0000000000001') {
+                can_debe_mn = redondear4(parseFloat(monto) * tc_editar);
+                can_haber_mn = 0.0000;
+                can_debe_me = redondear4(parseFloat(monto));
+                can_haber_me = 0.0000;
+            } else {
+                can_debe_mn = 0.0000;
+                can_haber_mn = redondear4(parseFloat(monto) * tc_editar);
+                can_debe_me = 0.0000;
+                can_haber_me = redondear4(parseFloat(monto));
+            }
+        }
+
+        // Recorrerlo
+        arrayDetalle.forEach(item => {
+            if (parseInt(item.COD_ESTADO) === 1) {
+                if (item.COD_ASIENTO_MOVIMIENTO === asiento_id_editar) {
+                    item.COD_CUENTA_CONTABLE = cuenta_contable_id;
+                    item.TXT_CUENTA_CONTABLE = numero_cuenta;
+                    item.TXT_GLOSA = glosa_cuenta;
+                    item.COD_PRODUCTO = '';
+                    item.TXT_NOMBRE_PRODUCTO = '';
+                    item.COD_LOTE = '';
+                    item.NRO_LINEA_PRODUCTO = '0';
+                    item.CAN_DEBE_MN = can_debe_mn;
+                    item.CAN_HABER_MN = can_haber_mn;
+                    item.CAN_DEBE_ME = can_debe_me;
+                    item.CAN_HABER_ME = can_haber_me;
+                    item.COD_DOC_CTBLE_REF = afecto_igv;
+                    item.COD_ORDEN_REF = porc_afecto_igv;
+                    item.COD_ESTADO = activo;
+                }
+            }
+        });
+
+        document.getElementById("asiento_detalle_reparable").value = JSON.stringify(arrayDetalle);
+        // Después de actualizar arrayDetalle
+        let table = $('#asientodetallereparable').DataTable();
+
+        $("#asientodetallereparable tbody tr").each(function () {
+            let fila = $(this);
+            let codAsiento = fila.attr('data_codigo');
+
+            if (codAsiento === asiento_id_editar) {
+                // obtenemos el índice de la fila
+                let rowIdx = table.row(fila).index();
+
+                // actualizamos celdas por columna
+                table.cell(rowIdx, 1).data(numero_cuenta);                       // Cuenta
+                table.cell(rowIdx, 2).data(glosa_cuenta);                        // Descripción
+                table.cell(rowIdx, 3).data(number_format(can_debe_mn, 4));       // Debe MN
+                table.cell(rowIdx, 4).data(number_format(can_haber_mn, 4));      // Haber MN
+                table.cell(rowIdx, 5).data(number_format(can_debe_me, 4));       // Debe ME
+                table.cell(rowIdx, 6).data(number_format(can_haber_me, 4));      // Haber ME
+            }
+        });
+
+// redibujar la tabla → esto dispara footerCallback y recalcula totales
+        table.columns.adjust().draw();
+        /*
+        $("#asientodetallereparable tbody tr").each(function () {
+            let fila = $(this);
+
+            // buscamos en la fila el hidden con el id del asiento
+            let codAsiento = fila.attr('data_codigo');
+
+            if (codAsiento === asiento_id_editar) {
+                // Actualizar las celdas visibles de la tabla
+                fila.find(".col-cuenta").text(numero_cuenta);
+                fila.find(".col-glosa").text(glosa_cuenta);
+                fila.find(".col-debe-mn").text(number_format(can_debe_mn, 4));
+                fila.find(".col-haber-mn").text(number_format(can_haber_mn, 4));
+                fila.find(".col-debe-me").text(number_format(can_debe_me, 4));
+                fila.find(".col-haber-me").text(number_format(can_haber_me, 4));
+            }
+        });*/
+
+        $('.tablageneralreparable').toggle("slow");
+        $('.editarcuentasreparable').toggle("slow");
+
+        setTimeout(function () {
+            $('#asientodetallereparable').DataTable().columns.adjust().draw();
+        }, 3000); // espera medio segundo o el tiempo necesario
+    });
+
+    $(".btn-registrar-movimiento-reparable").on('click', function (e) {
+
+        let cuenta_contable_id = $('#cuenta_contable_id_reparable').val();
+        let afecto_igv = $('#tipo_igv_id_reparable').val();
+        let porc_afecto_igv = $('#porc_tipo_igv_id_reparable').val();
+        let monto = $('#monto_reparable').val();
+        monto = monto.replaceAll(/[\$,]/g, "");
+        let partida_id = $('#partida_id_reparable').val();
+        let activo = $('#activo_reparable').val();
+        let texto = $("#cuenta_contable_id_reparable option:selected").text();
+        let numero_cuenta = texto.split(" - ")[0];
+        let glosa_cuenta = texto.split(" - ")[1];
+
+        let asiento_id_editar = $('#asiento_id_editar_reparable').val();
+        let moneda_id_editar = $('#moneda_id_editar_reparable').val();
+        let tc_editar = $('#tc_editar_reparable').val();
+
+        let arrayDetalle = null;
+        let can_debe_mn = 0.0000;
+        let can_haber_mn = 0.0000;
+        let can_debe_me = 0.0000;
+        let can_haber_me = 0.0000;
+        let ind_producto = 0;
+
+        if (monto === '' || monto === '0.0000') {
+            alerterrorajax("Ingrese un monto");
+            return false;
+        }
+        if (cuenta_contable_id === '') {
+            alerterrorajax("Seleccione una cuenta contable.");
+            return false;
+        }
+        if (partida_id === '') {
+            alerterrorajax("Seleccione una partida.");
+            return false;
+        }
+
+        switch (afecto_igv) {
+            case 'CTI0000000000001':
+                afecto_igv = 'AIGV';
+                break;
+            case 'CTI0000000000002':
+                afecto_igv = 'IIGV';
+                break;
+            case 'CTI0000000000003':
+                afecto_igv = 'EIGV';
+                break;
+            default:
+                afecto_igv = '';
+                break;
+        }
+
+        switch (afecto_igv) {
+            case 'AIGV':
+                if (porc_afecto_igv === '' || porc_afecto_igv === '0') {
+                    alerterrorajax("Selecciono Afecto debe tener porcentaje de IGV.");
+                    return false;
+                }
+                break;
+            case 'IIGV':
+                if (porc_afecto_igv === '10' || porc_afecto_igv === '18') {
+                    alerterrorajax("Selecciono Inafecto no puede tener porcentaje de IGV.");
+                    return false;
+                }
+                break;
+            case 'EIGV':
+                if (porc_afecto_igv === '10' || porc_afecto_igv === '18') {
+                    alerterrorajax("Selecciono Exonerado no puede tener porcentaje de IGV.");
+                    return false;
+                }
+                break;
+            default:
+                if (porc_afecto_igv === '10' || porc_afecto_igv === '18' || porc_afecto_igv === '0') {
+                    alerterrorajax("No se selecciono afecto IGV no puede ingresar porcentaje de IGV.");
+                    return false;
+                }
+                break;
+        }
+
+        arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_reparable").value);
+
+        if (moneda_id_editar === 'MON0000000000001') {
+            if (partida_id === 'COP0000000000001') {
+                can_debe_mn = redondear4(parseFloat(monto));
+                can_haber_mn = 0.0000;
+                can_debe_me = redondear4(parseFloat(monto) / tc_editar);
+                can_haber_me = 0.0000;
+            } else {
+                can_debe_mn = 0.0000;
+                can_haber_mn = redondear4(parseFloat(monto));
+                can_debe_me = 0.0000;
+                can_haber_me = redondear4(parseFloat(monto) / tc_editar);
+            }
+        } else {
+            if (partida_id === 'COP0000000000001') {
+                can_debe_mn = redondear4(parseFloat(monto) * tc_editar);
+                can_haber_mn = 0.0000;
+                can_debe_me = redondear4(parseFloat(monto));
+                can_haber_me = 0.0000;
+            } else {
+                can_debe_mn = 0.0000;
+                can_haber_mn = redondear4(parseFloat(monto) * tc_editar);
+                can_debe_me = 0.0000;
+                can_haber_me = redondear4(parseFloat(monto));
+            }
+        }
+
+        if (afecto_igv !== '') {
+            ind_producto = 1;
+        }
+
+        // Nuevo objeto con todos los campos
+        let nuevoMovimiento = {
+            "COD_ASIENTO_MOVIMIENTO": asiento_id_editar,
+            "COD_EMPR": "IACHEM0000010394",
+            "COD_CENTRO": "CEN0000000000002",
+            "COD_ASIENTO": "IIBEAC0000000001",
+            "COD_CUENTA_CONTABLE": cuenta_contable_id,
+            "IND_PRODUCTO": ind_producto,
+            "TXT_CUENTA_CONTABLE": numero_cuenta,
+            "TXT_GLOSA": glosa_cuenta,
+            "CAN_DEBE_MN": can_debe_mn,
+            "CAN_HABER_MN": can_haber_mn,
+            "CAN_DEBE_ME": can_debe_me,
+            "CAN_HABER_ME": can_haber_me,
+            "NRO_LINEA": "4",
+            "COD_CUO": "",
+            "IND_EXTORNO": "0",
+            "TXT_TIPO_REFERENCIA": "",
+            "TXT_REFERENCIA": "",
+            "COD_USUARIO_CREA_AUD": "1CIX00000001",
+            "FEC_USUARIO_CREA_AUD": "2025-08-19 14:30:00",
+            "COD_USUARIO_MODIF_AUD": "",
+            "FEC_USUARIO_MODIF_AUD": "2025-08-19 14:30:00",
+            "COD_ESTADO": activo,
+            "COD_DOC_CTBLE_REF": afecto_igv,
+            "COD_ORDEN_REF": porc_afecto_igv,
+            "COD_PRODUCTO": "",
+            "TXT_NOMBRE_PRODUCTO": "",
+            "COD_LOTE": "",
+            "NRO_LINEA_PRODUCTO": "0",
+            "COD_EMPR_CLI_REF": "",
+            "TXT_EMPR_CLI_REF": "",
+            "DOCUMENTO_REF": "",
+            "CODIGO_CONTABLE": ""
+        };
+
+        arrayDetalle.push(nuevoMovimiento);
+
+        let table = $('#asientodetallereparable').DataTable();
+
+        // Crear la fila con atributos y estilos
+        let nuevaFila = `
+            <tr class="fila" data_codigo="${asiento_id_editar}"
+                data_moneda="${moneda_id_editar}" data_tc="${tc_editar}">
+                <td class="col-codigo">${asiento_id_editar}</td>
+                <td class="col-cuenta">${numero_cuenta}</td>
+                <td class="col-glosa">${glosa_cuenta}</td>
+                <td class="col-debe-mn" style="text-align: right">${number_format(can_debe_mn, 4)}</td>
+                <td class="col-haber-mn" style="text-align: right">${number_format(can_haber_mn, 4)}</td>
+                <td class="col-debe-me" style="text-align: right">${number_format(can_debe_me, 4)}</td>
+                <td class="col-haber-me" style="text-align: right">${number_format(can_haber_me, 4)}</td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-primary editar-cuenta-reparable">
+                        ✏ Editar
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger eliminar-cuenta-reparable">
+                        🗑 Eliminar
+                    </button>
+                </td>
+            </tr>
+        `;
+
+        document.getElementById("asiento_detalle_reparable").value = JSON.stringify(arrayDetalle);
+        // Después de actualizar arrayDetalle
+        table.row.add($(nuevaFila)).draw(false);
+
+        $('.tablageneralreparable').toggle("slow");
+        $('.editarcuentasreparable').toggle("slow");
+
+        setTimeout(function () {
+            table.columns.adjust().draw();
+        }, 3000); // espera medio segundo o el tiempo necesario
+    });
+
+    $(".btn-eliminar-asiento-reparable").on('click', function (e) {
+
+        e.preventDefault();
+        let _token = $('#token').val();
+        let operacion = 'eliminar';
+        let arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_reparable").value);
+        let arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_reparable").value);
+
+        event.preventDefault();
+        $.confirm({
+            title: '¿Confirma la Eliminación del Asiento?',
+            content: 'Eliminación del Asiento',
+            buttons: {
+                confirmar: function () {
+                    $.ajax({
+                        type: "POST",
+                        url: carpeta + "/gestion-asiento",
+                        data: {
+                            _token: _token,
+                            arrayDetalle: arrayDetalle,
+                            arrayCabecera: arrayCabecera,
+                            operacion: operacion
+                        },
+                        success: function (res) {
+
+                            debugger;
+                            crearNotificacion(res.mensaje, 'SUCCESS', 'green', 'btn-green');
+
+                        },
+                        error: function (res) {
+                            debugger;
+                            crearNotificacion(res.mensaje);
+                        }
+                    });
+                },
+                cancelar: function () {
+                    crearNotificacion('Se cancelo la Eliminación');
+                }
+            }
+        });
+
+        $('#listonereparable').addClass('active');
+        $('#listtworeparable').removeClass('active');
+        $('#astcabgeneralreparable').addClass('active');
+        $('#astdetgeneralreparable').removeClass('active');
+
+        $('.pnl-asiento-reparable').hide();
+
+        $('#tblobservacionesreparable').focus();
+
+    });
+
+    $(".btn-anular-asiento-reparable").on('click', function (e) {
+
+        e.preventDefault();
+        let _token = $('#token').val();
+        let operacion = 'anular';
+        let arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_reparable").value);
+        let arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_reparable").value);
+
+        event.preventDefault();
+        $.confirm({
+            title: '¿Confirma la Anulación del Asiento?',
+            content: 'Anulación del Asiento',
+            buttons: {
+                confirmar: function () {
+                    $.ajax({
+                        type: "POST",
+                        url: carpeta + "/gestion-asiento",
+                        data: {
+                            _token: _token,
+                            arrayDetalle: arrayDetalle,
+                            arrayCabecera: arrayCabecera,
+                            operacion: operacion
+                        },
+                        success: function (res) {
+
+                            debugger;
+                            crearNotificacion(res.mensaje, 'SUCCESS', 'green', 'btn-green');
+
+                        },
+                        error: function (res) {
+                            debugger;
+                            crearNotificacion(res.mensaje);
+                        }
+                    });
+                },
+                cancelar: function () {
+                    crearNotificacion('Se cancelo la Anulación');
+                }
+            }
+        });
+
+        $('#listonereparable').addClass('active');
+        $('#listtworeparable').removeClass('active');
+        $('#astcabgeneralreparable').addClass('active');
+        $('#astdetgeneralreparable').removeClass('active');
+
+        $('.pnl-asiento-reparable').hide();
+
+        $('#tblobservacionesreparable').focus();
+
+    });
+
+    $(".btn-guardar-asiento-reparable").on('click', function (e) {
+
+        e.preventDefault();
+        let _token = $('#token').val();
+        let operacion = $('#operacion_reparable').val();
+        let tipo_operacion = $('#tipo_operacion_reparable').val();
+        let arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_reparable").value);
+        let arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_reparable").value);
+        let anio_asiento = $("#anio_asiento_reparable").val();
+        let periodo_asiento = $("#periodo_asiento_reparable").val();
+        let comprobante_asiento = $("#comprobante_asiento_reparable").val();
+        let moneda_id_editar = $("#moneda_asiento_reparable").val();
+        let tc_editar = $("#tipo_cambio_asiento_reparable").val();
+        let proveedor_asiento = $("#empresa_asiento_reparable").val();
+        let tipo_asiento = $("#tipo_asiento_reparable").val();
+        let fecha_asiento = $("#fecha_asiento_reparable").val();
+        let tipo_comprobante = $("#tipo_documento_asiento_reparable").val();
+        let serie_comprobante = $("#serie_asiento_reparable").val();
+        let numero_comprobante = $("#numero_asiento_reparable").val();
+        let tipo_comprobante_ref = $("#tipo_documento_ref_reparable").val();
+        let serie_comprobante_ref = $("#serie_ref_asiento_reparable").val();
+        let numero_comprobante_ref = $("#numero_ref_asiento_reparable").val();
+        let glosa_asiento = $("#glosa_asiento_reparable").val();
+
+        let table = $('#asientodetallereparable').DataTable();
+
+        let totalDebeMN = $(table.column(3).footer()).text().trim();
+        let totalHaberMN = $(table.column(4).footer()).text().trim();
+        let totalDebeME = $(table.column(5).footer()).text().trim();
+        let totalHaberME = $(table.column(6).footer()).text().trim();
+
+        debugger;
+
+        if (totalDebeMN !== totalHaberMN) {
+            crearNotificacion('El asiento no cuadra verificar los totales de la moneda nacional en el debe y haber');
+            return false; // Detiene la ejecución
+        }
+
+        if (totalDebeME !== totalHaberME) {
+            crearNotificacion('El asiento no cuadra verificar los totales de la moneda extranjera en el debe y haber');
+            return false; // Detiene la ejecución
+        }
+
+        // Array de todos los valores
+        let campos = [
+            {nombre: "Anio", valor: anio_asiento},
+            {nombre: "Periodo", valor: periodo_asiento},
+            {nombre: "Comprobante", valor: comprobante_asiento},
+            {nombre: "Moneda", valor: moneda_id_editar},
+            {nombre: "Tipo de Cambio", valor: tc_editar},
+            {nombre: "Proveedor", valor: proveedor_asiento},
+            {nombre: "Tipo Asiento", valor: tipo_asiento},
+            {nombre: "Fecha", valor: fecha_asiento},
+            {nombre: "Tipo Comprobante", valor: tipo_comprobante},
+            {nombre: "Serie", valor: serie_comprobante},
+            {nombre: "Número", valor: numero_comprobante},
+        ];
+
+        // Recorremos y validamos
+        for (let campo of campos) {
+            if (!campo.valor || campo.valor === "") {
+                crearNotificacion('El campo ' + campo.nombre + ' no puede estar vacío.');
+                return false; // Detiene la ejecución
+            }
+        }
+
+        let base_imponible = 0.0000;
+        let base_imponible_10 = 0.0000;
+        let base_ivap = 0.0000;
+        let base_inafecto = 0.0000;
+        let base_exonerado = 0.0000;
+        let total_igv = 0.0000;
+        let total_ivap = 0.0000;
+        let no_existe_cuenta_contable = false;
+
+        // Recorrerlo
+        arrayDetalle.forEach(item => {
+            if (parseInt(item.COD_ESTADO) === 1) {
+                if (
+                    item.COD_CUENTA_CONTABLE === null && item.COD_CUENTA_CONTABLE === '' &&
+                    item.TXT_CUENTA_CONTABLE === null && item.TXT_CUENTA_CONTABLE === ''
+                ) {
+                    no_existe_cuenta_contable = true;
+                }
+                switch (item.COD_DOC_CTBLE_REF) {
+                    case 'AIGV':
+                        if (item.COD_ORDEN_REF === '18') {
+                            if (moneda_id_editar !== 'MON0000000000001') {
+                                base_imponible = base_imponible + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                            } else {
+                                base_imponible = base_imponible + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                            }
+                        } else if (item.COD_ORDEN_REF === '10') {
+                            if (moneda_id_editar !== 'MON0000000000001') {
+                                base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                            } else {
+                                base_imponible_10 = base_imponible_10 + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                            }
+                        }
+                        break;
+                    case 'IIGV':
+                        if (moneda_id_editar !== 'MON0000000000001') {
+                            base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                        } else {
+                            base_inafecto = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                        }
+                        break;
+                    case 'EIGV':
+                        if (moneda_id_editar !== 'MON0000000000001') {
+                            base_exonerado = base_exonerado + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                        } else {
+                            base_exonerado = base_inafecto + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                        }
+                        break;
+                }
+                if (/^4011/.test(item.TXT_CUENTA_CONTABLE)) {
+                    if (moneda_id_editar !== 'MON0000000000001') {
+                        total_igv = total_igv + parseFloat(item.CAN_DEBE_ME) + parseFloat(item.CAN_HABER_ME);
+                    } else {
+                        total_igv = total_igv + parseFloat(item.CAN_DEBE_MN) + parseFloat(item.CAN_HABER_MN);
+                    }
+                }
+            }
+        });
+
+        if (no_existe_cuenta_contable) {
+            crearNotificacion('Revisa el detalle del asiento existe lineas sin cuenta contable');
+            return false; // Detiene la ejecución
+        }
+
+        arrayCabecera.forEach(item => {
+            item.COD_CATEGORIA_MONEDA = moneda_id_editar;
+            item.CAN_TIPO_CAMBIO = Number(tc_editar.replace(/,/g, "")) || 0;
+            item.FEC_ASIENTO = new Date(fecha_asiento);
+            item.COD_PERIODO = periodo_asiento;
+            item.COD_EMPR_CLI = proveedor_asiento;
+            item.COD_CATEGORIA_TIPO_ASIENTO = tipo_asiento;
+            item.COD_CATEGORIA_TIPO_DOCUMENTO = tipo_comprobante;
+            item.NRO_SERIE = serie_comprobante;
+            item.NRO_DOC = numero_comprobante;
+            item.COD_CATEGORIA_TIPO_DOCUMENTO_REF = tipo_comprobante_ref;
+            item.NRO_SERIE_REF = serie_comprobante_ref;
+            item.NRO_DOC_REF = numero_comprobante_ref;
+            item.TXT_GLOSA = glosa_asiento;
+            item.COD_CATEGORIA_TIPO_DETRACCION = '';
+            item.NRO_DETRACCION = '';
+            item.FEC_DETRACCION = new Date();
+            item.CAN_DESCUENTO_DETRACCION = 0;
+            item.CAN_TOTAL_DETRACCION = 0;
+            item.TXT_REFERENCIA = comprobante_asiento;
+            item.CODIGO_CONTABLE = comprobante_asiento;
+            item.TOTAL_BASE_IMPONIBLE = base_imponible;
+            item.TOTAL_BASE_IMPONIBLE_10 = base_imponible_10;
+            item.TOTAL_BASE_INAFECTA = base_inafecto;
+            item.TOTAL_BASE_EXONERADA = base_exonerado;
+            item.TOTAL_IGV = total_igv;
+            item.TOTAL_AFECTO_IVAP = base_ivap;
+            item.TOTAL_IVAP = total_ivap;
+        });
+
+        abrircargando();
+
+        $.ajax({
+            type: "POST",
+            url: carpeta + "/gestion-asiento",
+            data: {
+                _token: _token,
+                cabecera: JSON.stringify(arrayCabecera),
+                detalle: JSON.stringify(arrayDetalle),
+                operacion: operacion
+            },
+            success: function (res) {
+
+                debugger;
+                cerrarcargando();
+                crearNotificacion(res.mensaje, res.titulo, res.tipo, res.boton);
+
+            },
+            error: function (res) {
+                debugger;
+                cerrarcargando();
+                crearNotificacion(res.mensaje);
+            }
+        });
+
+        $('#listonereparable').addClass('active');
+        $('#listtworeparable').removeClass('active');
+        $('#astcabgeneralreparable').addClass('active');
+        $('#astdetgeneralreparable').removeClass('active');
+
+        $('.pnl-asiento-reparable').hide();
+
+        $('#tblobservacionesreparable').focus();
+    })
+
+    // REPARABLE
+
     $("#fecha_asiento").on('change', function (e) {
 
         let fecha = $('#fecha_asiento').val();
@@ -43,7 +1119,7 @@ $(document).ready(function () {
         $.ajax({
             type: "POST",
             url: carpeta + "/obtener-periodo-tipo-cambio",
-            data: { _token: _token, fecha: fecha },
+            data: {_token: _token, fecha: fecha},
             success: function (res) {
                 $('#tipo_cambio_asiento').val(res.tipoCambio);
 
@@ -495,11 +1571,137 @@ $(document).ready(function () {
         }
     });
 
-    $(".btn-guardar_asiento").on('click', function () {
+    $(".btn-cancelar-asiento").on('click', function (e) {
 
+        e.preventDefault();
+        $('#listone').addClass('active');
+        $('#listtwo').removeClass('active');
+        $('#listtree').removeClass('active');
+        $('#astcabgeneral').addClass('active');
+        $('#astcabcomplementario').removeClass('active');
+        $('#astdetgeneral').removeClass('active');
+
+        $('.pnlasientos').hide();
+
+    });
+
+    $(".btn-eliminar-asiento").on('click', function (e) {
+
+        e.preventDefault();
+        let _token = $('#token').val();
+        let operacion = 'eliminar';
         let arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_compra").value);
         let arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
 
+        event.preventDefault();
+        $.confirm({
+            title: '¿Confirma la Eliminación del Asiento?',
+            content: 'Eliminación del Asiento',
+            buttons: {
+                confirmar: function () {
+                    $.ajax({
+                        type: "POST",
+                        url: carpeta + "/gestion-asiento",
+                        data: {
+                            _token: _token,
+                            arrayDetalle: arrayDetalle,
+                            arrayCabecera: arrayCabecera,
+                            operacion: operacion
+                        },
+                        success: function (res) {
+
+                            debugger;
+                            crearNotificacion(res.mensaje, 'SUCCESS', 'green', 'btn-green');
+
+                        },
+                        error: function (res) {
+                            debugger;
+                            crearNotificacion(res.mensaje);
+                        }
+                    });
+                },
+                cancelar: function () {
+                    crearNotificacion('Se cancelo la Eliminación');
+                }
+            }
+        });
+
+        $('#listone').addClass('active');
+        $('#listtwo').removeClass('active');
+        $('#listtree').removeClass('active');
+        $('#astcabgeneral').addClass('active');
+        $('#astcabcomplementario').removeClass('active');
+        $('#astdetgeneral').removeClass('active');
+
+        $('.pnlasientos').hide();
+
+        document.querySelector('.buscarcompras').click();
+
+    });
+
+    $(".btn-anular-asiento").on('click', function (e) {
+
+        e.preventDefault();
+        let _token = $('#token').val();
+        let operacion = 'anular';
+        let arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_compra").value);
+        let arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
+
+        event.preventDefault();
+        $.confirm({
+            title: '¿Confirma la Anulación del Asiento?',
+            content: 'Anulación del Asiento',
+            buttons: {
+                confirmar: function () {
+                    $.ajax({
+                        type: "POST",
+                        url: carpeta + "/gestion-asiento",
+                        data: {
+                            _token: _token,
+                            arrayDetalle: arrayDetalle,
+                            arrayCabecera: arrayCabecera,
+                            operacion: operacion
+                        },
+                        success: function (res) {
+
+                            debugger;
+                            crearNotificacion(res.mensaje, 'SUCCESS', 'green', 'btn-green');
+
+                        },
+                        error: function (res) {
+                            debugger;
+                            crearNotificacion(res.mensaje);
+                        }
+                    });
+                },
+                cancelar: function () {
+                    crearNotificacion('Se cancelo la Anulación');
+                }
+            }
+        });
+
+        $('#listone').addClass('active');
+        $('#listtwo').removeClass('active');
+        $('#listtree').removeClass('active');
+        $('#astcabgeneral').addClass('active');
+        $('#astcabcomplementario').removeClass('active');
+        $('#astdetgeneral').removeClass('active');
+
+        $('.pnlasientos').hide();
+
+        document.querySelector('.buscarcompras').click();
+
+    });
+
+    $(".btn-guardar-asiento").on('click', function (e) {
+
+        e.preventDefault();
+        let _token = $('#token').val();
+        let operacion = $('#operacion').val();
+        let tipo_operacion = $('#tipo_operacion').val();
+        let arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_compra").value);
+        let arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
+        let anio_asiento = $("#anio_asiento").val();
         let periodo_asiento = $("#periodo_asiento").val();
         let comprobante_asiento = $("#comprobante_asiento").val();
         let moneda_id_editar = $("#moneda_asiento").val();
@@ -527,40 +1729,21 @@ $(document).ready(function () {
         let totalDebeME = $(table.column(5).footer()).text().trim();
         let totalHaberME = $(table.column(6).footer()).text().trim();
 
-        //if (moneda_id_editar === 'MON0000000000001') {
-            if (totalDebeMN !== totalHaberMN) {
-                $.alert({
-                    title: 'Error',
-                    content: 'El asiento no cuadra verificar los totales de la moneda nacional en el debe y haber',
-                    type: 'red',
-                    buttons: {
-                        ok: {
-                            text: 'OK',
-                            btnClass: 'btn-red',
-                        }
-                    }
-                });
-                return false; // Detiene la ejecución
-            }
-        //} else {
-            if (totalDebeME !== totalHaberME) {
-                $.alert({
-                    title: 'Error',
-                    content: 'El asiento no cuadra verificar los totales de la moneda extranjera en el debe y haber',
-                    type: 'red',
-                    buttons: {
-                        ok: {
-                            text: 'OK',
-                            btnClass: 'btn-red',
-                        }
-                    }
-                });
-                return false; // Detiene la ejecución
-            }
-       //}
+        debugger;
+
+        if (totalDebeMN !== totalHaberMN) {
+            crearNotificacion('El asiento no cuadra verificar los totales de la moneda nacional en el debe y haber');
+            return false; // Detiene la ejecución
+        }
+
+        if (totalDebeME !== totalHaberME) {
+            crearNotificacion('El asiento no cuadra verificar los totales de la moneda extranjera en el debe y haber');
+            return false; // Detiene la ejecución
+        }
 
         // Array de todos los valores
         let campos = [
+            {nombre: "Anio", valor: anio_asiento},
             {nombre: "Periodo", valor: periodo_asiento},
             {nombre: "Comprobante", valor: comprobante_asiento},
             {nombre: "Moneda", valor: moneda_id_editar},
@@ -576,17 +1759,7 @@ $(document).ready(function () {
         // Recorremos y validamos
         for (let campo of campos) {
             if (!campo.valor || campo.valor === "") {
-                $.alert({
-                    title: 'Error',
-                    content: 'El campo ' + campo.nombre + ' no puede estar vacío.',
-                    type: 'red',
-                    buttons: {
-                        ok: {
-                            text: 'OK',
-                            btnClass: 'btn-red',
-                        }
-                    }
-                });
+                crearNotificacion('El campo ' + campo.nombre + ' no puede estar vacío.');
                 return false; // Detiene la ejecución
             }
         }
@@ -598,10 +1771,17 @@ $(document).ready(function () {
         let base_exonerado = 0.0000;
         let total_igv = 0.0000;
         let total_ivap = 0.0000;
+        let no_existe_cuenta_contable = false;
 
         // Recorrerlo
         arrayDetalle.forEach(item => {
             if (parseInt(item.COD_ESTADO) === 1) {
+                if (
+                    item.COD_CUENTA_CONTABLE === null && item.COD_CUENTA_CONTABLE === '' &&
+                    item.TXT_CUENTA_CONTABLE === null && item.TXT_CUENTA_CONTABLE === ''
+                ) {
+                    no_existe_cuenta_contable = true;
+                }
                 switch (item.COD_DOC_CTBLE_REF) {
                     case 'AIGV':
                         if (item.COD_ORDEN_REF === '18') {
@@ -643,6 +1823,11 @@ $(document).ready(function () {
             }
         });
 
+        if (no_existe_cuenta_contable) {
+            crearNotificacion('Revisa el detalle del asiento existe lineas sin cuenta contable');
+            return false; // Detiene la ejecución
+        }
+
         arrayCabecera.forEach(item => {
             item.COD_CATEGORIA_MONEDA = moneda_id_editar;
             item.CAN_TIPO_CAMBIO = Number(tc_editar.replace(/,/g, "")) || 0;
@@ -662,8 +1847,8 @@ $(document).ready(function () {
             item.FEC_DETRACCION = new Date(fecha_des);
             item.CAN_DESCUENTO_DETRACCION = Number(porcentaje_des) || 0;
             item.CAN_TOTAL_DETRACCION = Number(total_des) || 0;
-            item.TXT_REFERENCIA = comprobante_asiento.split("-")[0];
-            item.CODIGO_CONTABLE = comprobante_asiento.split("-")[1];
+            item.TXT_REFERENCIA = comprobante_asiento;
+            item.CODIGO_CONTABLE = comprobante_asiento;
             item.TOTAL_BASE_IMPONIBLE = base_imponible;
             item.TOTAL_BASE_IMPONIBLE_10 = base_imponible_10;
             item.TOTAL_BASE_INAFECTA = base_inafecto;
@@ -673,11 +1858,39 @@ $(document).ready(function () {
             item.TOTAL_IVAP = total_ivap;
         });
 
-        $('#tblactivos tbody tr').each(function () {
-            if ($(this).hasClass('activofl')) {
-                // Cambiar estilo o atributo de las celdas de esta fila
-                $(this).attr('data_asiento_cabecera', JSON.stringify(arrayCabecera));
-                $(this).attr('data_asiento_detalle', JSON.stringify(arrayDetalle));
+        $.ajax({
+            type: "POST",
+            url: carpeta + "/gestion-asiento",
+            data: {
+                _token: _token,
+                cabecera: JSON.stringify(arrayCabecera),
+                detalle: JSON.stringify(arrayDetalle),
+                operacion: operacion
+            },
+            success: function (res) {
+
+                debugger;
+                // Si res.cabecera y res.detalle ya vienen del controlador:
+                let asientoUnificado = [
+                    res.cabecera,
+                    res.detalle
+                ];
+                $('#tblactivos tbody tr').each(function () {
+                    if ($(this).hasClass('activofl')) {
+                        // Cambiar estilo o atributo de las celdas de esta fila
+                        if(tipo_operacion === 'C'){
+                            $(this).attr('data_asiento_compra', JSON.stringify(asientoUnificado));
+                        } else {
+                            $(this).attr('data_asiento_reversion', JSON.stringify(asientoUnificado));
+                        }
+                    }
+                });
+                crearNotificacion(res.mensaje, res.titulo, res.tipo, res.boton);
+
+            },
+            error: function (res) {
+                debugger;
+                crearNotificacion(res.mensaje);
             }
         });
 
@@ -1892,9 +3105,9 @@ $(document).ready(function () {
             content: 'Extorno de Liquidacion de Gastos',
             buttons: {
                 confirmar: function () {
-                    
+
                     debugger;
-                    $("#forextornar"+data_extorno).submit();
+                    $("#forextornar" + data_extorno).submit();
                 },
                 cancelar: function () {
                     $.alert('Se cancelo el extorno');
@@ -2366,7 +3579,95 @@ $(document).ready(function () {
 
     });
 
+    $(".liquidaciongasto").on('click', '.asiento-compra', function (e) {
+        event.preventDefault();
+        let $fila = $(this).closest('tr');
+        abrircargando();
+        $('.dtlg').hide();
+        $('.file-preview-frame').hide();
+        $('.filalg').removeClass("ocultar");
+        let data_valor = $fila.attr('data_valor');
+        $('.' + data_valor).show();
+        $('.filalg').removeClass("activofl");
+        $fila.addClass("activofl");
+        let data_valor_compra = $fila.attr('data_valor_compra');
+        debugger;
+        let data_asiento_compra = JSON.parse($fila.attr('data_asiento_compra'));
+        $('#tipo_operacion').val('C');
 
+        let data_asiento_cabecera = JSON.stringify(data_asiento_compra[0]);
+        let data_asiento_detalle = JSON.stringify(data_asiento_compra[1]);
+
+        let totallg = $fila.find('td').eq(6).text().trim();
+        $('#total_xml').val(totallg);
+
+        let arrayCabecera = [];
+        let arrayDetalle = [];
+
+        if (data_valor_compra === '1' && data_asiento_cabecera !== '') {
+            $('#asiento_cabecera_compra').val(data_asiento_cabecera);
+            $('#asiento_detalle_compra').val(data_asiento_detalle);
+
+            arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
+            arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_compra").value);
+
+        } else {
+            $('#asiento_cabecera_compra').val('[]');
+            $('#asiento_detalle_compra').val('[]');
+
+            arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
+            arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_compra").value);
+
+        }
+        verAsiento(arrayCabecera, arrayDetalle);
+        cerrarcargando();
+    });
+
+    $(".liquidaciongasto").on('click', '.asiento-reversion', function (e) {
+        event.preventDefault();
+        let $fila = $(this).closest('tr');
+        abrircargando();
+        $('.dtlg').hide();
+        $('.file-preview-frame').hide();
+        $('.filalg').removeClass("ocultar");
+        let data_valor = $fila.attr('data_valor');
+        $('.' + data_valor).show();
+        $('.filalg').removeClass("activofl");
+        $fila.addClass("activofl");
+        let data_valor_reversion = $fila.attr('data_valor_reversion');
+        debugger;
+        let data_asiento_reversion = JSON.parse($fila.attr('data_asiento_reversion'));
+        $('#tipo_operacion').val('R');
+
+        let data_asiento_cabecera = JSON.stringify(data_asiento_reversion[0]);
+        let data_asiento_detalle = JSON.stringify(data_asiento_reversion[1]);
+
+        let totallg = $fila.find('td').eq(6).text().trim();
+        $('#total_xml').val(totallg);
+
+        let arrayCabecera = [];
+        let arrayDetalle = [];
+
+        if (data_valor_reversion === '1' && data_asiento_cabecera !== '') {
+            $('#asiento_cabecera_compra').val(data_asiento_cabecera);
+            $('#asiento_detalle_compra').val(data_asiento_detalle);
+
+            arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
+            arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_compra").value);
+
+        } else {
+            $('#asiento_cabecera_compra').val('[]');
+            $('#asiento_detalle_compra').val('[]');
+
+            arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_compra").value);
+            arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_compra").value);
+
+        }
+        verAsiento(arrayCabecera, arrayDetalle);
+        cerrarcargando();
+    });
+
+    /*
     $(".liquidaciongasto").on('click', '.filalg', function (e) {
         event.preventDefault();
         debugger;
@@ -2553,6 +3854,7 @@ $(document).ready(function () {
             $('#empresa_asiento').val(proveedor_asiento).trigger('change');
             $('#tipo_asiento').val(tipo_asiento).trigger('change');
             */
+    /*
             // Formatear a YYYY-MM-DD
             let fechaFormateada = fecha_asiento.toISOString().split('T')[0];
 
@@ -2590,7 +3892,7 @@ $(document).ready(function () {
 
         cerrarcargando();
 
-    });
+    });*/
 
     $('.btnobservarcomporbatntemv').on('click', function (event) {
         event.preventDefault();
@@ -2607,6 +3909,67 @@ $(document).ready(function () {
             }
         });
 
+    });
+
+    $(document).on('change', '.input_asignar', function() {
+        let $checkbox = $(this);
+        let $fila = $checkbox.closest('tr');
+        let $contenedorForm = $('.pnl-asiento-reparable');
+        let _token = $('#token').val();
+
+        debugger;
+
+        if ($checkbox.is(':checked')) {
+            // Obtenemos los datos de la fila seleccionada
+            let idDocumento = $fila.attr('data_id');
+            let item = $fila.attr('data_item');
+            $.ajax({
+                type: "POST",
+                url: carpeta + "/crear-asiento-reparable",
+                data: {
+                    _token: _token,
+                    cod_contable: idDocumento,
+                    item: item
+                },
+                success: function (res) {
+
+                    debugger;
+                    let data_asiento_cabecera = JSON.stringify(res.cabecera);
+                    let data_asiento_detalle = JSON.stringify(res.detalle);
+
+                    let arrayCabecera = [];
+                    let arrayDetalle = [];
+
+                    if (data_asiento_cabecera !== '') {
+                        $('#asiento_cabecera_reparable').val(data_asiento_cabecera);
+                        $('#asiento_detalle_reparable').val(data_asiento_detalle);
+
+                        arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_reparable").value);
+                        arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_reparable").value);
+
+                    } else {
+                        $('#asiento_cabecera_reparable').val('[]');
+                        $('#asiento_detalle_reparable').val('[]');
+
+                        arrayCabecera = JSON.parse(document.getElementById("asiento_cabecera_reparable").value);
+                        arrayDetalle = JSON.parse(document.getElementById("asiento_detalle_reparable").value);
+
+                    }
+                    verAsientoReparable(arrayCabecera, arrayDetalle);
+                    $contenedorForm.show();
+                    $contenedorForm.focus();
+
+                },
+                error: function (res) {
+                    debugger;
+                    crearNotificacion(res.mensaje);
+                }
+            });
+        } else {
+            // Si se desmarca, ocultamos el formulario
+            $contenedorForm.hide();
+            $('#tblobservacionesreparable').focus();
+        }
     });
 
     $('.btnobservarcomporbatnte').on('click', function (event) {
@@ -2785,15 +4148,15 @@ $(document).ready(function () {
         var idopcion = $('#idopcion').val();
         var _token = $('#token').val();
 
-        var moneda_sel_c_id = $('#moneda_sel_c_id').val(); 
+        var moneda_sel_c_id = $('#moneda_sel_c_id').val();
 
-        if(arendir_id == 'VALE'){
+        if (arendir_id == 'VALE') {
             if (moneda_sel_c_id == '') {
                 $('#arendir_id').val('').trigger('change');
                 alerterrorajax("Selecciona una Moneda");
                 return false;
-            }   
-        }   
+            }
+        }
 
         var link = "/ajax-combo-arendir";
         var contenedor = "ajax_combo_arendir";
@@ -2875,8 +4238,6 @@ $(document).ready(function () {
                 $('.sectorxml').hide();
                 $('.sectorxmlmodal').show();
                 $('.sectorotrotipo').show();
-
-
 
 
                 $('.DCC0000000000036').show();
@@ -3241,9 +4602,9 @@ $(document).ready(function () {
             var producto_id_factura = $('#producto_id_factura').val();
 
             if (producto_id_factura == "SERVICIO DE TRANSPORTE AEREO") {
-                    alerterrorajax("Este Producto solo se debe subir con ticket.");
-                    cerrarcargando();
-                    return false;
+                alerterrorajax("Este Producto solo se debe subir con ticket.");
+                cerrarcargando();
+                return false;
             }
 
 
@@ -3524,6 +4885,538 @@ $(document).ready(function () {
 
     });
 
+    function verAsientoReparable(arrayCabecera, arrayDetalle) {
+        const limpiar = (valor, tipo = 'texto') => {
+            // Si es null o undefined
+            if (valor === null || valor === undefined) {
+                if (tipo === 'fecha') return new Date(); // Fecha actual
+                if (tipo === 'numero') return 0;
+                return '';
+            }
+
+            if (tipo === 'numero') {
+                let n = parseFloat(valor);
+                return isNaN(n) ? 0 : n;
+            }
+
+            if (tipo === 'fecha') {
+                let d = new Date(valor);
+                // Si la fecha es inválida (Invalid Date), devuelve fecha actual
+                return isNaN(d.getTime()) ? new Date() : d;
+            }
+
+            return valor.toString().trim();
+        };
+
+        if ($('.editarcuentasreparable').is(':visible')) {
+            $('.tablageneralreparable').toggle("slow");
+            $('.editarcuentasreparable').toggle("slow");
+        }
+
+        setTimeout(function () {
+            $('#asientodetallereparable').DataTable().columns.adjust().draw();
+        }, 3000); // espera medio segundo o el tiempo necesario
+
+        // Crear la fila con atributos y estilos
+        let nuevaFila = ``;
+
+        let asiento_id_editar = '';
+        let fecha_asiento = new Date();
+        let periodo_asiento = '';
+
+        let moneda_id_editar = '';
+        let tc_editar = 0.0000;
+        let comprobante_asiento = '';
+        let proveedor_asiento = '';
+        let proveedor_asiento_txt = '';
+        let tipo_asiento = '';
+
+        let numero_cuenta = '';
+        let glosa_cuenta = '';
+        let can_debe_mn = 0.0000;
+        let can_haber_mn = 0.0000;
+        let can_debe_me = 0.0000;
+        let can_haber_me = 0.0000;
+
+        let base_imponible = 0.0000;
+        let base_imponible_10 = 0.0000;
+        let base_ivap = 0.0000;
+        let base_inafecto = 0.0000;
+        let base_exonerado = 0.0000;
+        let total_igv = 0.0000;
+        let total_ivap = 0.0000;
+        let total = 0.0000;
+        let tipo_comprobante = '';
+        let serie_comprobante = '';
+        let numero_comprobante = '';
+        let tipo_comprobante_ref = '';
+        let serie_comprobante_ref = '';
+        let numero_comprobante_ref = '';
+        let glosa_asiento = '';
+        let tipo_descuento = '';
+        let constancia_des = '';
+        let fecha_des = '';
+        let porcentaje_des = '';
+        let total_des = '';
+        let asiento_id = '';
+
+        arrayCabecera.forEach(item => {
+            // --- TEXTOS / SELECTS ---
+            asiento_id = limpiar(item.COD_ASIENTO);
+            moneda_id_editar = limpiar(item.COD_CATEGORIA_MONEDA);
+            periodo_asiento = limpiar(item.COD_PERIODO);
+            proveedor_asiento = limpiar(item.COD_EMPR_CLI);
+            proveedor_asiento_txt = limpiar(item.TXT_EMPR_CLI);
+            tipo_asiento = limpiar(item.COD_CATEGORIA_TIPO_ASIENTO);
+            tipo_comprobante = limpiar(item.COD_CATEGORIA_TIPO_DOCUMENTO);
+            serie_comprobante = limpiar(item.NRO_SERIE);
+            numero_comprobante = limpiar(item.NRO_DOC);
+            tipo_comprobante_ref = limpiar(item.COD_CATEGORIA_TIPO_DOCUMENTO_REF);
+            serie_comprobante_ref = limpiar(item.NRO_SERIE_REF);
+            numero_comprobante_ref = limpiar(item.NRO_DOC_REF);
+            glosa_asiento = limpiar(item.TXT_GLOSA);
+            tipo_descuento = limpiar(item.COD_CATEGORIA_TIPO_DETRACCION);
+            constancia_des = limpiar(item.NRO_DETRACCION);
+            comprobante_asiento = limpiar(item.TXT_REFERENCIA);
+
+            // --- FECHAS ---
+            fecha_asiento = limpiar(item.FEC_ASIENTO, 'fecha');
+            fecha_des = limpiar(item.FEC_DETRACCION, 'fecha'); // Detracción
+
+            // --- NÚMEROS / CÁLCULOS ---
+            tc_editar = limpiar(item.CAN_TIPO_CAMBIO, 'numero');
+            porcentaje_des = limpiar(item.CAN_DESCUENTO_DETRACCION, 'numero');
+            total_des = limpiar(item.CAN_TOTAL_DETRACCION, 'numero');
+
+            base_imponible = limpiar(item.TOTAL_BASE_IMPONIBLE, 'numero');
+            base_imponible_10 = limpiar(item.TOTAL_BASE_IMPONIBLE_10, 'numero');
+            base_ivap = limpiar(item.TOTAL_AFECTO_IVAP, 'numero');
+            base_inafecto = limpiar(item.TOTAL_BASE_INAFECTA, 'numero');
+            base_exonerado = limpiar(item.TOTAL_BASE_EXONERADA, 'numero');
+            total_igv = limpiar(item.TOTAL_IGV, 'numero');
+            total_ivap = limpiar(item.TOTAL_IVAP, 'numero');
+
+            // Cálculo final (ahora es 100% seguro contra NaN)
+            if (tipo_asiento === 'TAS0000000000004' || tipo_asiento === 'TAS0000000000003') {
+                total = base_imponible + base_imponible_10 + base_ivap + base_inafecto + base_exonerado + total_igv + total_ivap;
+            } else {
+                total = limpiar(item.CAN_TOTAL_DEBE, 'numero');
+            }
+        });
+
+        if (asiento_id === undefined || asiento_id === null || asiento_id === '') {
+            $('#operacion_reparable').val('insertar');
+            $('.btn-guardar-asiento-reparable').text('Guardar Asiento');
+            $('.btn-anular-asiento-reparable').hide();
+            $('.btn-eliminar-asiento-reparable').hide();
+        } else {
+            $('#operacion_reparable').val('modificar');
+            $('.btn-guardar-asiento-reparable').text('Modificar Asiento');
+            $('.btn-anular-asiento-reparable').show();
+            $('.btn-eliminar-asiento-reparable').show();
+        }
+
+        let table = $('#asientodetallereparable').DataTable();
+
+        table.clear().draw();
+
+        arrayDetalle.forEach(item => {
+            // Validamos el estado, si es null o undefined se asume 0 para no entrar al IF
+            if (parseInt(limpiar(item.COD_ESTADO, 'numero')) === 1) {
+
+                // --- LÓGICA DE BOTONES ---
+                let ind_producto = parseInt(limpiar(item.IND_PRODUCTO, 'numero'));
+                let acciones = '';
+                let claseFila = (ind_producto === 2) ? 'bg-destino' : ''; // Clase condicional
+
+                // Solo si IND_PRODUCTO no es 2, mostramos los botones
+                if (ind_producto !== 2) {
+                    acciones = `
+                <div class="btn-group btn-group-sm" style="display: flex;">
+                    <button type="button" class="btn btn-sm btn-primary editar-cuenta-reparable">
+                        ✏ Editar
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger eliminar-cuenta-reparable">
+                        🗑 Eliminar
+                    </button>
+                </div>
+            `;
+                } else {
+                    acciones = `<span class="texto-blanco">Destino</span>`;
+                }
+
+                // --- TEXTOS ---
+                asiento_id_editar = limpiar(item.COD_ASIENTO_MOVIMIENTO);
+                numero_cuenta = limpiar(item.TXT_CUENTA_CONTABLE);
+                glosa_cuenta = limpiar(item.TXT_GLOSA);
+
+                // --- NÚMEROS (Importante para number_format) ---
+                can_debe_mn = limpiar(item.CAN_DEBE_MN, 'numero');
+                can_haber_mn = limpiar(item.CAN_HABER_MN, 'numero');
+                can_debe_me = limpiar(item.CAN_DEBE_ME, 'numero');
+                can_haber_me = limpiar(item.CAN_HABER_ME, 'numero');
+
+                nuevaFila = `
+            <tr class="fila ${claseFila}" data_codigo="${asiento_id_editar}"
+                data_moneda="${moneda_id_editar}" data_tc="${tc_editar}">
+                <td class="col-codigo">${asiento_id_editar}</td>
+                <td class="col-cuenta">${numero_cuenta}</td>
+                <td class="col-glosa">${glosa_cuenta}</td>
+                <td class="col-debe-mn" style="text-align: right">${number_format(can_debe_mn, 4)}</td>
+                <td class="col-haber-mn" style="text-align: right">${number_format(can_haber_mn, 4)}</td>
+                <td class="col-debe-me" style="text-align: right">${number_format(can_debe_me, 4)}</td>
+                <td class="col-haber-me" style="text-align: right">${number_format(can_haber_me, 4)}</td>
+                <td>${acciones}</td>
+            </tr>
+        `;
+
+                table.row.add($(nuevaFila)).draw(false);
+            }
+        });
+
+        debugger;
+
+        let anio = $('#anio_asiento_reparable').val();
+
+        let anioActual = new Date().getFullYear();
+
+        window.selects['anio_asiento_reparable'].setSelected(anio !== undefined && anio !== null && anio !== '' ? anio.toString() : anioActual.toString());
+        window.selects['moneda_asiento_reparable'].setSelected(moneda_id_editar.trim());
+
+        document.querySelector('#empresa_asiento_reparable').tomselect.addOption({
+            id: proveedor_asiento,
+            text: proveedor_asiento_txt
+        });
+        document.querySelector('#empresa_asiento_reparable').tomselect.setValue(proveedor_asiento.trim());
+
+        window.selects['tipo_asiento_reparable'].setSelected(tipo_asiento.trim());
+        window.selects['tipo_documento_asiento_reparable'].setSelected(tipo_comprobante.trim());
+        window.selects['tipo_documento_ref_reparable'].setSelected(tipo_comprobante_ref.trim());
+        $('#anio_asiento_reparable').trigger('change');
+        $('#moneda_asiento_reparable').trigger('change');
+        $('#tipo_asiento_reparable').trigger('change');
+        $('#tipo_documento_asiento_reparable').trigger('change');
+        $('#tipo_documento_ref_reparable').trigger('change');
+
+        //$('#anio_asiento').val(anio.toString()).trigger('change');
+        $('#comprobante_asiento_reparable').val(comprobante_asiento);
+        //$('#moneda_asiento').val(moneda_id_editar).trigger('change');
+        $('#tipo_cambio_asiento_reparable').val(tc_editar);
+        //$('#empresa_asiento').val(proveedor_asiento).trigger('change');
+        //$('#tipo_asiento').val(tipo_asiento).trigger('change');
+
+        // Formatear a YYYY-MM-DD
+        let fechaFormateada = fecha_asiento.toISOString().split('T')[0];
+
+        // Pasar valor al input con jQuery
+        $('#fecha_asiento_reparable').val(fechaFormateada);
+        //$('#tipo_documento_asiento').val(tipo_comprobante).trigger('change');
+        $('#serie_asiento_reparable').val(serie_comprobante);
+        $('#numero_asiento_reparable').val(numero_comprobante);
+        //$('#tipo_documento_ref').val(tipo_comprobante_ref).trigger('change');
+        $('#serie_ref_asiento_reparable').val(serie_comprobante_ref);
+        $('#numero_ref_asiento_reparable').val(numero_comprobante_ref);
+        $('#glosa_asiento_reparable').val(glosa_asiento);
+
+        // redibujar la tabla → esto dispara footerCallback y recalcula totales
+        $('#asientodetallereparable').DataTable().columns.adjust().draw();
+
+        setTimeout(function () {
+            //$('#periodo_asiento').val(periodo_asiento).trigger('change');
+            window.selects['periodo_asiento_reparable'].setSelected(periodo_asiento.trim())
+        }, 1000); // espera medio segundo o el tiempo necesario
+
+        setTimeout(function () {
+            $('#asientodetallereparable').DataTable().columns.adjust().draw();
+        }, 3000); // espera medio segundo o el tiempo necesario
+
+        cerrarcargando();
+
+    }
+
+    function verAsiento(arrayCabecera, arrayDetalle) {
+        const limpiar = (valor, tipo = 'texto') => {
+            // Si es null o undefined
+            if (valor === null || valor === undefined) {
+                if (tipo === 'fecha') return new Date(); // Fecha actual
+                if (tipo === 'numero') return 0;
+                return '';
+            }
+
+            if (tipo === 'numero') {
+                let n = parseFloat(valor);
+                return isNaN(n) ? 0 : n;
+            }
+
+            if (tipo === 'fecha') {
+                let d = new Date(valor);
+                // Si la fecha es inválida (Invalid Date), devuelve fecha actual
+                return isNaN(d.getTime()) ? new Date() : d;
+            }
+
+            return valor.toString().trim();
+        };
+
+        if ($('.editarcuentas').is(':visible')) {
+            $('.tablageneral').toggle("slow");
+            $('.editarcuentas').toggle("slow");
+        }
+
+        setTimeout(function () {
+            $('#asientodetalle').DataTable().columns.adjust().draw();
+        }, 3000); // espera medio segundo o el tiempo necesario
+
+        // Crear la fila con atributos y estilos
+        let nuevaFila = ``;
+
+        let asiento_id_editar = '';
+        let fecha_asiento = new Date();
+        let periodo_asiento = '';
+
+        let moneda_id_editar = '';
+        let tc_editar = 0.0000;
+        let comprobante_asiento = '';
+        let proveedor_asiento = '';
+        let proveedor_asiento_txt = '';
+        let tipo_asiento = '';
+
+        let numero_cuenta = '';
+        let glosa_cuenta = '';
+        let can_debe_mn = 0.0000;
+        let can_haber_mn = 0.0000;
+        let can_debe_me = 0.0000;
+        let can_haber_me = 0.0000;
+
+        let base_imponible = 0.0000;
+        let base_imponible_10 = 0.0000;
+        let base_ivap = 0.0000;
+        let base_inafecto = 0.0000;
+        let base_exonerado = 0.0000;
+        let total_igv = 0.0000;
+        let total_ivap = 0.0000;
+        let total = 0.0000;
+        let tipo_comprobante = '';
+        let serie_comprobante = '';
+        let numero_comprobante = '';
+        let tipo_comprobante_ref = '';
+        let serie_comprobante_ref = '';
+        let numero_comprobante_ref = '';
+        let glosa_asiento = '';
+        let tipo_descuento = '';
+        let constancia_des = '';
+        let fecha_des = '';
+        let porcentaje_des = '';
+        let total_des = '';
+        let asiento_id = '';
+
+        arrayCabecera.forEach(item => {
+            // --- TEXTOS / SELECTS ---
+            asiento_id = limpiar(item.COD_ASIENTO);
+            moneda_id_editar = limpiar(item.COD_CATEGORIA_MONEDA);
+            periodo_asiento = limpiar(item.COD_PERIODO);
+            proveedor_asiento = limpiar(item.COD_EMPR_CLI);
+            proveedor_asiento_txt = limpiar(item.TXT_EMPR_CLI);
+            tipo_asiento = limpiar(item.COD_CATEGORIA_TIPO_ASIENTO);
+            tipo_comprobante = limpiar(item.COD_CATEGORIA_TIPO_DOCUMENTO);
+            serie_comprobante = limpiar(item.NRO_SERIE);
+            numero_comprobante = limpiar(item.NRO_DOC);
+            tipo_comprobante_ref = limpiar(item.COD_CATEGORIA_TIPO_DOCUMENTO_REF);
+            serie_comprobante_ref = limpiar(item.NRO_SERIE_REF);
+            numero_comprobante_ref = limpiar(item.NRO_DOC_REF);
+            glosa_asiento = limpiar(item.TXT_GLOSA);
+            tipo_descuento = limpiar(item.COD_CATEGORIA_TIPO_DETRACCION);
+            constancia_des = limpiar(item.NRO_DETRACCION);
+            comprobante_asiento = limpiar(item.TXT_REFERENCIA);
+
+            // --- FECHAS ---
+            fecha_asiento = limpiar(item.FEC_ASIENTO, 'fecha');
+            fecha_des = limpiar(item.FEC_DETRACCION, 'fecha'); // Detracción
+
+            // --- NÚMEROS / CÁLCULOS ---
+            tc_editar = limpiar(item.CAN_TIPO_CAMBIO, 'numero');
+            porcentaje_des = limpiar(item.CAN_DESCUENTO_DETRACCION, 'numero');
+            total_des = limpiar(item.CAN_TOTAL_DETRACCION, 'numero');
+
+            base_imponible = limpiar(item.TOTAL_BASE_IMPONIBLE, 'numero');
+            base_imponible_10 = limpiar(item.TOTAL_BASE_IMPONIBLE_10, 'numero');
+            base_ivap = limpiar(item.TOTAL_AFECTO_IVAP, 'numero');
+            base_inafecto = limpiar(item.TOTAL_BASE_INAFECTA, 'numero');
+            base_exonerado = limpiar(item.TOTAL_BASE_EXONERADA, 'numero');
+            total_igv = limpiar(item.TOTAL_IGV, 'numero');
+            total_ivap = limpiar(item.TOTAL_IVAP, 'numero');
+
+            // Cálculo final (ahora es 100% seguro contra NaN)
+            if (tipo_asiento === 'TAS0000000000004' || tipo_asiento === 'TAS0000000000003') {
+                total = base_imponible + base_imponible_10 + base_ivap + base_inafecto + base_exonerado + total_igv + total_ivap;
+            } else {
+                total = limpiar(item.CAN_TOTAL_DEBE, 'numero');
+            }
+        });
+
+        if (asiento_id === undefined || asiento_id === null || asiento_id === '') {
+            $('#operacion').val('insertar');
+            $('.btn-guardar-asiento').text('Guardar Asiento');
+            $('.btn-anular-asiento').hide();
+            $('.btn-eliminar-asiento').hide();
+        } else {
+            $('#operacion').val('modificar');
+            $('.btn-guardar-asiento').text('Modificar Asiento');
+            $('.btn-anular-asiento').show();
+            $('.btn-eliminar-asiento').show();
+        }
+
+        $("#asientototales tbody tr").each(function () {
+            let fila = $(this);
+
+            // Actualizar las celdas visibles de la tabla
+            fila.find(".col-base-imponible").text(number_format(base_imponible, 4));
+            fila.find(".col-base-imponible-10").text(number_format(base_imponible_10, 4));
+            fila.find(".col-base-ivap").text(number_format(base_ivap, 4));
+            fila.find(".col-base-inafecto").text(number_format(base_inafecto, 4));
+            fila.find(".col-base-exonerado").text(number_format(base_exonerado, 4));
+            fila.find(".col-igv").text(number_format(total_igv, 4));
+            fila.find(".col-ivap").text(number_format(total_ivap, 4));
+            fila.find(".col-total").text(number_format(total, 4));
+
+        });
+
+        let table = $('#asientodetalle').DataTable();
+
+        table.clear().draw();
+
+        arrayDetalle.forEach(item => {
+            // Validamos el estado, si es null o undefined se asume 0 para no entrar al IF
+            if (parseInt(limpiar(item.COD_ESTADO, 'numero')) === 1) {
+
+                // --- LÓGICA DE BOTONES ---
+                let ind_producto = parseInt(limpiar(item.IND_PRODUCTO, 'numero'));
+                let acciones = '';
+                let claseFila = (ind_producto === 2) ? 'bg-destino' : ''; // Clase condicional
+
+                // Solo si IND_PRODUCTO no es 2, mostramos los botones
+                if (ind_producto !== 2) {
+                    acciones = `
+                <div class="btn-group btn-group-sm" style="display: flex;">
+                    <button type="button" class="btn btn-sm btn-primary editar-cuenta-reparable">
+                        ✏ Editar
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger eliminar-cuenta-reparable">
+                        🗑 Eliminar
+                    </button>
+                </div>
+            `;
+                } else {
+                    acciones = `<span class="texto-blanco">Destino</span>`;
+                }
+
+                // --- TEXTOS ---
+                asiento_id_editar = limpiar(item.COD_ASIENTO_MOVIMIENTO);
+                numero_cuenta = limpiar(item.TXT_CUENTA_CONTABLE);
+                glosa_cuenta = limpiar(item.TXT_GLOSA);
+
+                // --- NÚMEROS (Importante para number_format) ---
+                can_debe_mn = limpiar(item.CAN_DEBE_MN, 'numero');
+                can_haber_mn = limpiar(item.CAN_HABER_MN, 'numero');
+                can_debe_me = limpiar(item.CAN_DEBE_ME, 'numero');
+                can_haber_me = limpiar(item.CAN_HABER_ME, 'numero');
+
+                nuevaFila = `
+            <tr class="fila ${claseFila}" data_codigo="${asiento_id_editar}" data_asiento="${form_id_editar}"
+                data_moneda="${moneda_id_editar}" data_tc="${tc_editar}">
+                <td class="col-codigo">${asiento_id_editar}</td>
+                <td class="col-cuenta">${numero_cuenta}</td>
+                <td class="col-glosa">${glosa_cuenta}</td>
+                <td class="col-debe-mn" style="text-align: right">${number_format(can_debe_mn, 4)}</td>
+                <td class="col-haber-mn" style="text-align: right">${number_format(can_haber_mn, 4)}</td>
+                <td class="col-debe-me" style="text-align: right">${number_format(can_debe_me, 4)}</td>
+                <td class="col-haber-me" style="text-align: right">${number_format(can_haber_me, 4)}</td>
+                <td>${acciones}</td>
+            </tr>
+        `;
+
+                table.row.add($(nuevaFila)).draw(false);
+            }
+        });
+
+        $('#total_xml').val(total);
+
+        debugger;
+
+        let anio = $('#anio_asiento').val();
+
+        let anioActual = new Date().getFullYear();
+
+        window.selects['anio_asiento'].setSelected(anio !== undefined && anio !== null && anio !== '' ? anio.toString() : anioActual.toString());
+        window.selects['moneda_asiento'].setSelected(moneda_id_editar.trim());
+
+        document.querySelector('#empresa_asiento').tomselect.addOption({
+            id: proveedor_asiento,
+            text: proveedor_asiento_txt
+        });
+        document.querySelector('#empresa_asiento').tomselect.setValue(proveedor_asiento.trim());
+
+        window.selects['tipo_asiento'].setSelected(tipo_asiento.trim());
+        window.selects['tipo_documento_asiento'].setSelected(tipo_comprobante.trim());
+        window.selects['tipo_documento_ref'].setSelected(tipo_comprobante_ref.trim());
+        window.selects['tipo_descuento_asiento'].setSelected(tipo_descuento.trim());
+        $('#anio_asiento').trigger('change');
+        $('#moneda_asiento').trigger('change');
+        $('#tipo_asiento').trigger('change');
+        $('#tipo_documento_asiento').trigger('change');
+        $('#tipo_documento_ref').trigger('change');
+        $('#tipo_descuento_asiento').trigger('change');
+
+        //$('#anio_asiento').val(anio.toString()).trigger('change');
+        $('#comprobante_asiento').val(comprobante_asiento);
+        //$('#moneda_asiento').val(moneda_id_editar).trigger('change');
+        $('#tipo_cambio_asiento').val(tc_editar);
+        //$('#empresa_asiento').val(proveedor_asiento).trigger('change');
+        //$('#tipo_asiento').val(tipo_asiento).trigger('change');
+
+        // Formatear a YYYY-MM-DD
+        let fechaFormateada = fecha_asiento.toISOString().split('T')[0];
+
+        // Pasar valor al input con jQuery
+        $('#fecha_asiento').val(fechaFormateada);
+        //$('#tipo_documento_asiento').val(tipo_comprobante).trigger('change');
+        $('#serie_asiento').val(serie_comprobante);
+        $('#numero_asiento').val(numero_comprobante);
+        //$('#tipo_documento_ref').val(tipo_comprobante_ref).trigger('change');
+        $('#serie_ref_asiento').val(serie_comprobante_ref);
+        $('#numero_ref_asiento').val(numero_comprobante_ref);
+        $('#glosa_asiento').val(glosa_asiento);
+
+        //$('#tipo_descuento_asiento').val(tipo_descuento).trigger('change');
+        $('#const_detraccion_asiento').val(constancia_des);
+        $('#fecha_detraccion_asiento').val(fecha_des);
+        $('#porcentaje_detraccion').val(porcentaje_des);
+        $('#total_detraccion_asiento').val(total_des);
+
+        if (tipo_asiento !== 'TAS0000000000003' && tipo_asiento !== 'TAS0000000000004') {
+            $('#asientototales').hide();
+        } else {
+            $('#asientototales').show();
+        }
+
+        $('.pnlasientos').show();
+        $('.pnlasientos').focus();
+        // redibujar la tabla → esto dispara footerCallback y recalcula totales
+        $('#asientodetalle').DataTable().columns.adjust().draw();
+
+        setTimeout(function () {
+            //$('#periodo_asiento').val(periodo_asiento).trigger('change');
+            window.selects['periodo_asiento'].setSelected(periodo_asiento.trim())
+        }, 1000); // espera medio segundo o el tiempo necesario
+
+        setTimeout(function () {
+            $('#asientodetalle').DataTable().columns.adjust().draw();
+        }, 3000); // espera medio segundo o el tiempo necesario
+
+        cerrarcargando();
+
+        $('.pnlasientos').focus();
+
+    }
 
     function redondear4(num) {
         return Math.round((num + Number.EPSILON) * 10000) / 10000;
@@ -3546,6 +5439,20 @@ $(document).ready(function () {
 
         // Unir con el separador de decimales
         return parts.join(decimals > 0 ? decimal_separator : "");
+    }
+
+    function crearNotificacion(mensaje, titulo = "Error", tipo = "red", boton = "btn-red") {
+        $.alert({
+            title: titulo,
+            content: mensaje,
+            type: tipo,
+            buttons: {
+                ok: {
+                    text: 'OK',
+                    btnClass: boton,
+                }
+            }
+        });
     }
 
     // Ajustar columnas al cambiar de tab
