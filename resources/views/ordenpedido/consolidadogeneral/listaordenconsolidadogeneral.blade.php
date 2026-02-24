@@ -7,7 +7,7 @@
                 <th>COD PRODUCTO</th>
                 <th>PRODUCTO</th>
                 <th>CENTRO</th>
-                <th>UNIDAD MEDIDA</th>
+                <th>UNIDA MEDIDA</th>
                 <th>CANTIDAD</th>
                 <th>STOCK</th>
                 <th>RESERVADO</th>

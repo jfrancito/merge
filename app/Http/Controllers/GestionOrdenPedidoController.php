@@ -61,7 +61,8 @@ class GestionOrdenPedidoController extends Controller
 	    $usuarioAutoriza = DB::table('WEB.ListaplatrabajadoresGenereal')
 					    ->where(function ($query) {
 					        $query->where('cadcargo', 'LIKE', '%JEFE%')
-					              ->orWhere('cadcargo', 'COORDINADOR DE CONTROL DE CALIDAD');
+					              ->orWhere('cadcargo', 'COORDINADOR DE CONTROL DE CALIDAD')
+					               ->orWhere('COD_TRAB', 'IITR000000000391');
 					    })
 					    ->where('situacion_id', 'PRMAECEN000000000002')
 					    ->whereIn('empresa_osiris_id', [
