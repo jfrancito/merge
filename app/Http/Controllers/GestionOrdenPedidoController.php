@@ -59,26 +59,30 @@ class GestionOrdenPedidoController extends Controller
         $combo2 = array('' => 'Seleccione Tipo Orden de Pedido') + $tipoOrden;
 
 	    $usuarioAutoriza = DB::table('WEB.ListaplatrabajadoresGenereal')
-						    ->where('cadcargo', 'LIKE', '%JEFE%')
-						    ->where('situacion_id', 'PRMAECEN000000000002')
-						    ->whereIn('empresa_osiris_id', [
-						        'IACHEM0000010394',
-						        'IACHEM0000007086'
-						    ])
-						     ->orderBy('apellidopaterno')
-						     ->orderBy('apellidomaterno')
-						     ->orderBy('nombres')
-						      ->pluck(
-							        DB::raw("
-							            LTRIM(RTRIM(
-							                ISNULL(apellidopaterno,'') + ' ' +
-							                ISNULL(apellidomaterno,'') + ' ' +
-							                ISNULL(nombres,'')
-							            ))
-							        "),
-							        'COD_TRAB'
-							    )
-							    ->toArray();
+					    ->where(function ($query) {
+					        $query->where('cadcargo', 'LIKE', '%JEFE%')
+					              ->orWhere('cadcargo', 'COORDINADOR DE CONTROL DE CALIDAD')
+					               ->orWhere('COD_TRAB', 'IITR000000000391');
+					    })
+					    ->where('situacion_id', 'PRMAECEN000000000002')
+					    ->whereIn('empresa_osiris_id', [
+					        'IACHEM0000010394',
+					        'IACHEM0000007086'
+					    ])
+					    ->orderBy('apellidopaterno')
+					    ->orderBy('apellidomaterno')
+					    ->orderBy('nombres')
+					    ->pluck(
+					        DB::raw("
+					            LTRIM(RTRIM(
+					                ISNULL(apellidopaterno,'') + ' ' +
+					                ISNULL(apellidomaterno,'') + ' ' +
+					                ISNULL(nombres,'')
+					            ))
+					        "),
+					        'COD_TRAB'
+					    )
+					    ->toArray();
 		 $combo5 = array('' => 'Seleccione Jefe Autoriza') + $usuarioAutoriza;
 
 		 $usuario_aprueba_ger = DB::table('WEB.ListaplatrabajadoresGenereal')
@@ -168,6 +172,7 @@ class GestionOrdenPedidoController extends Controller
 
         $combo9 = array('' => 'Seleccione Mes') + $periodo_mes;
 
+
 	
 
 	 	$area = DB::table('WEB.ListaplatrabajadoresGenereal')
@@ -186,15 +191,29 @@ class GestionOrdenPedidoController extends Controller
 	    // DETALLE DEL PEDIDO 
 
 	    // $producto = DB::table('ALM.PRODUCTO')->where('cod_estado', 1)->pluck('NOM_PRODUCTO', 'COD_PRODUCTO')->toArray();
-	    $producto = DB::table('ALM.PRODUCTO as PRD')
-	    				->join('CMP.CATEGORIA as CAT', 'PRD.COD_CATEGORIA_UNIDAD_MEDIDA', '=', 'CAT.COD_CATEGORIA')
+	    /*$producto = DB::table('ALM.PRODUCTO as PRD')
+	    				->leftJoin('CMP.CATEGORIA as CAT', 'PRD.COD_CATEGORIA_UNIDAD_MEDIDA', '=', 'CAT.COD_CATEGORIA')
 	    				->where('PRD.COD_ESTADO', 1)
 	   					 ->select(
 	        			'PRD.COD_PRODUCTO',
 	        			'PRD.NOM_PRODUCTO',
+	        			'PRD.IND_MATERIAL_SERVICIO',
 	        			'CAT.COD_CATEGORIA as COD_UNIDAD',
 	        			'CAT.NOM_CATEGORIA as UNIDAD')
-	    				->get();
+	    				->get();*/
+
+	    $producto = DB::select(
+							    "EXEC WEB.SP_LISTA_PRODUCTOS_ORDEN ?",
+							    [$empresa]
+							);
+		$registrosMonto = DB::table('WEB.MONTO_ORDEN_PEDIDO')
+					    ->where('COD_ESTADO', 1)
+					    ->where('COD_EMPR', $empresa)
+					    ->orderBy('MONTO', 'asc')
+					    ->get();
+
+
+   
 
 		$listapedido = $this->listaOrdenPedido(
             "GEN",                 
@@ -235,6 +254,7 @@ class GestionOrdenPedidoController extends Controller
     		'listapedido'           => $listapedido,  
     		'nomArea'				=> $nomArea,
     		'area_id'				=> $area_id,
+    		'registrosMonto'        => $registrosMonto,
             'ajax'=>true,    
         ]);
     }
@@ -419,11 +439,13 @@ class GestionOrdenPedidoController extends Controller
 
 	  public function actionDetallePedido(Request $request)
     { 
+    	 $cod_usuario_session = Session::get('usuario')->usuarioosiris_id;
          $id_buscar = $request->input('orden_pedido_id'); 
 
         
 		$pedido = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $id_buscar)->first(); 
 		$pedillodetalle = DB::table('WEB.ORDEN_PEDIDO_DETALLE')->where('ID_PEDIDO', $id_buscar)->get(); 
+
 
         
         $id_pedido = $pedillodetalle->pluck('ID_PEDIDO');
@@ -441,13 +463,13 @@ class GestionOrdenPedidoController extends Controller
             'cantidad'          => $cantidad,
             'txt_observacion'   => $txt_observacion,
             'pedillodetalle'    => $pedillodetalle
+       
         ]);  
     }
 
 
     public function insertEmitirOrdenPedido(Request $request)
     {
-     
         $id_buscar = $request->input('orden_pedido_id'); 
         $orden_pedido_id = $request->input('orden_pedido_id');
 
@@ -535,6 +557,12 @@ class GestionOrdenPedidoController extends Controller
             true,
             ""
         );
+            
+        DB::table('WEB.ORDEN_PEDIDO_DETALLE')
+        ->where('ID_PEDIDO', $orden_pedido_id)
+        ->update([
+            'ACTIVO' => 0
+        ]);
 
         return response()->json([
             'success' => true

@@ -816,6 +816,8 @@ class GestionEstibaController extends Controller
                 $ctadetraccion                            =   $request['ctadetraccion'];
                 $tipo_detraccion_id                       =   $request['tipo_detraccion_id'];
                 $monto_detraccion                         =   $request['monto_detraccion'];
+                $monto_detraccion                         =   (float) str_replace(',', '', $monto_detraccion);
+
                 $pago_detraccion                          =   $request['pago_detraccion'];
 
                 $empresa_sel                              =   STDEmpresa::where('COD_EMPR','=',$pago_detraccion)->first();
@@ -1869,16 +1871,28 @@ class GestionEstibaController extends Controller
                                                     ->whereIn('COD_CATEGORIA', ['DCC0000000000043','DCC0000000000045','DCC0000000000003','DCC0000000000001'])
                                                     ->get();
 
+                            $lotes                  =   FeRefAsoc::where('lote','=',$idoc)                                        
+                                                        ->pluck('ID_DOCUMENTO')
+                                                        ->toArray();
+                            $ordencompra_f          =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->first();
+
+                            $sourceFile = '\\\\10.1.0.201\cpe\Liquidacion\\';
+                            if($ordencompra_f->COD_CENTRO == 'CEN0000000000004' or $ordencompra_f->COD_CENTRO == 'CEN0000000000006'){
+                                if($ordencompra_f->COD_CENTRO == 'CEN0000000000004'){
+                                    $sourceFile = '\\\\10.1.7.200\\cpe\\Liquidacion\\';
+                                }
+                                if($ordencompra_f->COD_CENTRO == 'CEN0000000000006'){
+                                    $sourceFile = '\\\\10.1.9.43\\cpe\\Liquidacion\\';
+                                }
+                            }
 
                             //GUARDAR EL XML
                             $empresa_liqui        =     STDEmpresa::where('NRO_DOCUMENTO','=',$factura->getcompany()->getruc())->where('COD_ESTADO','=','1')->first();
                             $correlativo_completo =     str_pad($factura->getcorrelativo(), 10, '0', STR_PAD_LEFT); 
                             $nombre_xml_liqui     =     $factura->getcompany()->getruc().'-04-'.$factura->getserie().'-'.$correlativo_completo.'.xml';
-                            $destino              =     '\\\\10.1.0.201\\cpe\\Liquidacion\\'.$nombre_xml_liqui;
+                            $destino              =     $sourceFile.$nombre_xml_liqui;
                             $archivo              =     $file->getRealPath();
                             copy($archivo,$destino);
-
-                            //dd("hola");
 
 
                         }else{

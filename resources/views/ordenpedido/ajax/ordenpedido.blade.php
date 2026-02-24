@@ -47,6 +47,11 @@
 
 @stop
 @section('script')
+     
+     <script>
+        var registrosMonto = {!! json_encode($registrosMonto, JSON_UNESCAPED_UNICODE) !!};
+        
+    </script>
 
     <script src="{{ asset('public/js/general/inputmask/inputmask.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/js/general/inputmask/inputmask.extensions.js') }}" type="text/javascript"></script>

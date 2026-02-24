@@ -5945,7 +5945,7 @@ trait ComprobanteTraits
                             END AS MONTO
                         "),
                         DB::raw("ISNULL(TES.ATENDIDO,0) AS MONTOATENDIDO"),
-                        'TES.TXT_GLOSA',
+                        'TES.TXT_GLOSA as TXT_GLOSA',
                         'TES.COD_FLUJO_CAJA',
                         'TES.TXT_FLUJO_CAJA',
                         'TES.COD_ITEM_MOVIMIENTO',
@@ -5968,6 +5968,7 @@ trait ComprobanteTraits
                         'ISCHFC0000000037',
                         'IICHFC0000000037'
                     ])
+
                     ->whereIn('TES.COD_CATEGORIA_OPERACION_CAJA', ['OPC0000000000002', 'OPC0000000000001'])
                     ->where('TES.IND_EXTORNO', 0)
                     ->where('TES.COD_ESTADO', 1)
@@ -6148,6 +6149,9 @@ trait ComprobanteTraits
 
         $registros = $consulta1->unionAll($consulta2)->unionAll($consulta3)->get();
 
+        //dd($registros);
+
+
         return  $registros;
     }
 
@@ -6211,6 +6215,7 @@ trait ComprobanteTraits
                     )
                     ->whereIn('TES.COD_FLUJO_CAJA', [
                         'IICHFC0000000004',
+                        'ISCHFC0000000004',
                         'IICHFC0000000009',
                         'IICHFC0000000012',
                         'ISCHFC0000000012',
@@ -6418,6 +6423,7 @@ trait ComprobanteTraits
                     ->whereIn('TES.COD_OPERACION_CAJA', $array)
                     ->whereIn('TES.COD_FLUJO_CAJA', [
                         'IICHFC0000000004',
+                        'ISCHFC0000000004',
                         'IICHFC0000000009',
                         'IICHFC0000000012',
                         'ISCHFC0000000012',
@@ -6489,6 +6495,8 @@ trait ComprobanteTraits
             ->whereIn('TES.COD_OPERACION_CAJA', $array)
             ->whereIn('TES.COD_FLUJO_CAJA', [
                 'IICHFC0000000004',
+                'ISCHFC0000000004',
+
                 'IICHFC0000000009',
                 'IICHFC0000000012',
                 'ISCHFC0000000012',
@@ -6497,12 +6505,17 @@ trait ComprobanteTraits
                 'ISCHFC0000000033',
                 'IICHFC0000000037'
             ])
-            ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
+            ->whereIn('TES.COD_CATEGORIA_OPERACION_CAJA', [
+                'OPC0000000000002',
+                'OPC0000000000001'
+            ])
             ->where('TES.IND_EXTORNO', 0)
             ->where('TES.COD_ESTADO', 1)
             ->whereIn('TES.COD_CATEGORIA_OPERACION_ORIGEN', [
                 'OOC0000000000008',
-                'OOC0000000000005'
+                'OOC0000000000005',
+                'OOC0000000000009',
+                ''  
             ])
             ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR) // variable pasada desde tu controlador
             ->get();
@@ -6555,6 +6568,8 @@ trait ComprobanteTraits
                     ->whereIn('TES.COD_OPERACION_CAJA', $array)
                     ->whereIn('TES.COD_FLUJO_CAJA', [
                         'IICHFC0000000004',
+                        'ISCHFC0000000004',
+
                         'IICHFC0000000009',
                         'IICHFC0000000012',
                         'ISCHFC0000000012',
@@ -6563,12 +6578,16 @@ trait ComprobanteTraits
                         'ISCHFC0000000033',
                         'IICHFC0000000037'
                     ])
-                    ->where('TES.COD_CATEGORIA_OPERACION_CAJA', 'OPC0000000000002')
+                    ->whereIn('TES.COD_CATEGORIA_OPERACION_CAJA', [
+                        'OPC0000000000002',
+                        'OPC0000000000001'
+                    ])
                     ->where('TES.IND_EXTORNO', 0)
                     ->where('TES.COD_ESTADO', 1)
                     ->whereIn('TES.COD_CATEGORIA_OPERACION_ORIGEN', [
                         'OOC0000000000008',
                         'OOC0000000000005',
+                        'OOC0000000000009',
                         ''
                     ])
                     ->where('TES.COD_EMPR', Session::get('empresas')->COD_EMPR) // variable pasada desde tu controlador
@@ -6615,6 +6634,7 @@ trait ComprobanteTraits
                     ->whereIn('TES.COD_OPERACION_CAJA', $array)
                     ->whereIn('TES.COD_FLUJO_CAJA', [
                         'IICHFC0000000004',
+                        'ISCHFC0000000004',
                         'IICHFC0000000009',
                         'IICHFC0000000012',
                         'ISCHFC0000000012',
@@ -6679,6 +6699,7 @@ trait ComprobanteTraits
                     ->whereIn('TES.COD_OPERACION_CAJA', $array)
                     ->whereIn('TES.COD_FLUJO_CAJA', [
                         'IICHFC0000000004',
+                        'ISCHFC0000000004',
                         'IICHFC0000000009',
                         'IICHFC0000000012',
                         'ISCHFC0000000012',
@@ -7320,7 +7341,7 @@ trait ComprobanteTraits
         $ind_rz             =   0;
         $ind_moneda         =   0;
         $ind_total          =   0;
-        $ind_cantidaditem   =   0;
+        $ind_cantidaditem   =   1;
         $ind_formapago      =   0;
         $ind_errototal      =   1;
         //ruc
@@ -7355,11 +7376,7 @@ trait ComprobanteTraits
         if($ordencompra_t->IND_MATERIAL_SERVICIO == 'S'){
             $ind_cantidaditem           =   1;
         }else{
-            //numero_items
-            if(count($detalleordencompra) == count($detallefedocumento)){
-                $ind_cantidaditem           =   1;
-            }else{  $ind_errototal      =   0;  }
-
+              $ind_errototal      =   0;
         }
 
         $tp = CMPCategoria::where('COD_CATEGORIA','=',$ordencompra->COD_CATEGORIA_TIPO_PAGO)->first();
@@ -8816,8 +8833,11 @@ trait ComprobanteTraits
 
         }else{
 
-            $listadatos     =   VMergeOC::leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
-                                            $leftJoin->on('ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
+            $listadatos     =   VMergeOC::leftJoin('VMERGEDOCUMENTO_ORDEN_COMPRA_ANTICIPO', function($leftJoin) {
+                                                $leftJoin->on('VMERGEDOCUMENTO_ORDEN_COMPRA_ANTICIPO.ID_DOCUMENTO', '=', 'VMergeOC.COD_ORDEN');
+                                            })
+                                ->leftJoin('FE_DOCUMENTO', function ($leftJoin) use ($estado_no){
+                                            $leftJoin->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'VMERGEOC.COD_ORDEN')
                                                 ->where('COD_ESTADO', '<>', 'ETM0000000000006');
                                         })
                                 ->whereIn('VMERGEOC.COD_USUARIO_CREA_AUD',$array_usuarios)
@@ -8828,6 +8848,13 @@ trait ComprobanteTraits
                                           ->orWhereNull('FE_DOCUMENTO.COD_ESTADO')
                                           ->orwhere('FE_DOCUMENTO.COD_ESTADO', '=', '');
                                 })
+                                ->where(function ($query) {
+                                    $query->where('VMERGEDOCUMENTO_ORDEN_COMPRA_ANTICIPO.ESTATUS', '=', 'OFF')
+                                          ->orWhereNull('VMERGEDOCUMENTO_ORDEN_COMPRA_ANTICIPO.ESTATUS')
+                                          ->orwhere('VMERGEDOCUMENTO_ORDEN_COMPRA_ANTICIPO.ESTATUS', '=', '')
+                                          ->orWhereRaw("CAN_TOTAL <> COALESCE(VMERGEDOCUMENTO_ORDEN_COMPRA_ANTICIPO.TOTAL_MERGE, 0)");
+                                })
+
                                 //->where('FE_DOCUMENTO.TXT_PROCEDENCIA','<>','SUE')
                                 ->select(DB::raw('  COD_ORDEN,
                                                     FEC_ORDEN,
@@ -8837,14 +8864,19 @@ trait ComprobanteTraits
                                                     MAX(CAN_TOTAL) CAN_TOTAL,
                                                     MAX(FE_DOCUMENTO.ID_DOCUMENTO) AS ID_DOCUMENTO,
                                                     MAX(FE_DOCUMENTO.COD_ESTADO) AS COD_ESTADO,
-                                                    MAX(FE_DOCUMENTO.TXT_ESTADO) AS TXT_ESTADO
+                                                    MAX(FE_DOCUMENTO.TXT_ESTADO) AS TXT_ESTADO,
+                                                    VMERGEDOCUMENTO_ORDEN_COMPRA_ANTICIPO.LOTE AS LOTE_DOC,
+                                                    COALESCE(MAX(VMERGEDOCUMENTO_ORDEN_COMPRA_ANTICIPO.TOTAL_MERGE), 0) AS TOTAL_MERGE
+
                                                 '))
                                 ->groupBy('COD_ORDEN')
                                 ->groupBy('FEC_ORDEN')
                                 ->groupBy('TXT_CATEGORIA_MONEDA')
                                 ->groupBy('TXT_EMPR_CLIENTE')
+                                ->groupBy('VMERGEDOCUMENTO_ORDEN_COMPRA_ANTICIPO.LOTE')
                                 ->groupBy('COD_USUARIO_CREA_AUD')
                                 ->get();
+
 
         }
 

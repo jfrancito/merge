@@ -17,8 +17,24 @@
 <div class="modal-body p-0 bg-light">
 
   <div class="table-responsive detalle-scroll">
-
     <table class="table table-hover align-middle mb-0 detalle-table">
+    @php
+        $mostrarJefe = false;
+        $mostrarGer  = false;
+        $mostrarAdm  = false;
+
+        foreach($pedillodetalle as $item){
+            if(!is_null($item->CAN_MODIF_JEF_AUT)){
+                $mostrarJefe = true;
+            }
+            if(!is_null($item->CAN_MODIF_GER)){
+                $mostrarGer = true;
+            }
+            if(!is_null($item->CAN_MODIF_ADM)){
+                $mostrarAdm = true;
+            }
+        }
+    @endphp
 
       <thead class="text-white sticky-top detalle-thead">
         <tr class="text-uppercase small">
@@ -26,6 +42,12 @@
           <th style="width:30%">Producto</th>
           <th style="width:20%">Categoría</th>
           <th style="width:10%" class="text-center">Cant.</th>
+          @if($mostrarJefe)
+          <th style="width:10%" class="text-center">Cant. Jefe</th> @endif
+          @if($mostrarGer)
+          <th style="width:10%" class="text-center">Cant. Gerencia</th>@endif
+          @if($mostrarAdm)
+          <th  style="width:10%" class="text-center">Cant. Admin</th>@endif
           <th style="width:35%">Observación</th>
         </tr>
       </thead>
@@ -47,24 +69,63 @@
             {{ $detalle->NOM_CATEGORIA }}
           </td>
 
+           {{-- CANTIDAD ORIGINAL (SIEMPRE SE MUESTRA) --}}
           <td class="text-center">
-            <span class="badge badge-cantidad">
-              {{ $detalle->CANTIDAD }}
-            </span>
+                <span class="badge badge-cantidad">
+                    {{ $detalle->CANTIDAD }}
+                </span>
           </td>
+        {{-- CANTIDAD JEFE --}}
+        @if($mostrarJefe)
+          <td class="text-center">
+                @if(!is_null($detalle->CAN_MODIF_JEF_AUT))
+                    <span class="badge badge-cantidad">
+                        {{ $detalle->CAN_MODIF_JEF_AUT }}
+                    </span>
+                @else
+                    —
+                @endif
+           </td>
+        @endif
 
-          <td class="text-truncate observacion"
-              title="{{ $detalle->TXT_OBSERVACION }}">
-            {{ $detalle->TXT_OBSERVACION ?: '—' }}
-          </td>
-        </tr>
-        @empty
-        <tr>
-          <td colspan="5" class="text-center text-muted fst-italic py-4">
-            No hay productos en este pedido.
-          </td>
-        </tr>
-        @endforelse
+        {{-- CANTIDAD GERENCIA --}}
+        @if($mostrarGer)
+            <td class="text-center">
+                @if(!is_null($detalle->CAN_MODIF_GER))
+                    <span class="badge badge-cantidad">
+                        {{ $detalle->CAN_MODIF_GER }}
+                    </span>
+                @else
+                    —
+                @endif
+            </td>
+        @endif
+
+        {{-- CANTIDAD ADMIN --}}
+        @if($mostrarAdm)
+            <td class="text-center">
+                @if(!is_null($detalle->CAN_MODIF_ADM))
+                    <span class="badge badge-cantidad">
+                        {{ $detalle->CAN_MODIF_ADM }}
+                    </span>
+                @else
+                    —
+                @endif
+            </td>
+        @endif
+
+            <td class="text-truncate observacion"
+                  title="{{ $detalle->TXT_OBSERVACION }}">
+                {{ $detalle->TXT_OBSERVACION ?: '—' }}
+              </td>
+            </tr>
+            @empty
+            <tr>
+              <td colspan="5" class="text-center text-muted fst-italic py-4">
+                No hay productos en este pedido.
+              </td>
+            </tr>
+            @endforelse
       </tbody>
 
     </table>

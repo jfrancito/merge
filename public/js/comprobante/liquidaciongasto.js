@@ -3667,7 +3667,23 @@ $(document).ready(function () {
         cerrarcargando();
     });
 
-    /*
+/*
+
+    $(".liquidaciongasto").on('click','.filalgvalidar', function(e) {
+        event.preventDefault();
+        debugger;
+        abrircargando();
+        $('.dtlg').hide();
+        $('.file-preview-frame').hide();
+        $('.filalgvalidar').removeClass("ocultar");
+        const data_valor = $(this).attr('data_valor');
+        $('.' + data_valor).show();
+        $('.filalgvalidar').removeClass("activofl");
+        $(this).addClass("activofl");
+        cerrarcargando();
+    });
+
+
     $(".liquidaciongasto").on('click', '.filalg', function (e) {
         event.preventDefault();
         debugger;
