@@ -261,7 +261,7 @@ class GestionLiquidacionGastosController extends Controller
         $detdocumentolg = LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
         $documentohistorial = LqgDocumentoHistorial::where('ID_DOCUMENTO', '=', $iddocumento)->orderby('FECHA', 'DESC')->get();
         $tdetliquidaciongastosel = LqgDetLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '0')->get();
-        $archivospdf = Archivo::where('ID_DOCUMENTO', '=', $iddocumento)->where('EXTENSION', 'like', '%' . 'pdf' . '%')->get();
+        $archivospdf = Archivo::where('ID_DOCUMENTO', '=', $iddocumento)->where('URL_ARCHIVO', 'like', '%' . 'pdf' . '%')->get();
         $ocultar = "";
         $codigoosiris = "";
         $documento = CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE', '=', $liquidaciongastos->COD_OSIRIS)->first();
@@ -2355,7 +2355,7 @@ class GestionLiquidacionGastosController extends Controller
             $detdocumentolg = LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
             $documentohistorial = LqgDocumentoHistorial::where('ID_DOCUMENTO', '=', $iddocumento)->orderby('FECHA', 'DESC')->get();
             $tdetliquidaciongastosel = LqgDetLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '0')->get();
-            $archivospdf = Archivo::where('ID_DOCUMENTO', '=', $iddocumento)->where('EXTENSION', 'like', '%' . 'pdf' . '%')->get();
+            $archivospdf = Archivo::where('ID_DOCUMENTO', '=', $iddocumento)->where('URL_ARCHIVO', 'like', '%' . 'pdf' . '%')->get();
             $ocultar = "";
             // Construir el array de URLs
             $initialPreview = [];
@@ -2767,7 +2767,7 @@ class GestionLiquidacionGastosController extends Controller
             $detdocumentolg = LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
             $documentohistorial = LqgDocumentoHistorial::where('ID_DOCUMENTO', '=', $iddocumento)->orderby('FECHA', 'DESC')->get();
             $tdetliquidaciongastosel = LqgDetLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '0')->get();
-            $archivospdf = Archivo::where('ID_DOCUMENTO', '=', $iddocumento)->where('EXTENSION', 'like', '%' . 'pdf' . '%')->get();
+            $archivospdf = Archivo::where('ID_DOCUMENTO', '=', $iddocumento)->where('URL_ARCHIVO', 'like', '%' . 'pdf' . '%')->get();
             $ocultar = "";
             // Construir el array de URLs
             $initialPreview = [];
@@ -3723,7 +3723,7 @@ class GestionLiquidacionGastosController extends Controller
 
             $detdocumentolg = LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
             $documentohistorial = LqgDocumentoHistorial::where('ID_DOCUMENTO', '=', $iddocumento)->orderby('FECHA', 'DESC')->get();
-            $archivospdf = Archivo::where('ID_DOCUMENTO', '=', $iddocumento)->where('EXTENSION', 'like', '%' . 'pdf' . '%')->get();
+            $archivospdf = Archivo::where('ID_DOCUMENTO', '=', $iddocumento)->where('URL_ARCHIVO', 'like', '%' . 'pdf' . '%')->get();
 
             $tdetliquidaciongastosel = LqgDetLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '0')->get();
 
@@ -3806,7 +3806,9 @@ class GestionLiquidacionGastosController extends Controller
 
         $detdocumentolg = LqgDetDocumentoLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '1')->get();
         $documentohistorial = LqgDocumentoHistorial::where('ID_DOCUMENTO', '=', $iddocumento)->orderby('FECHA', 'DESC')->get();
-        $archivospdf = Archivo::where('ID_DOCUMENTO', '=', $iddocumento)->where('EXTENSION', 'like', '%' . 'pdf' . '%')->get();
+        $archivospdf = Archivo::where('ID_DOCUMENTO', '=', $iddocumento)->where('URL_ARCHIVO', 'like', '%' . 'pdf' . '%')->get();
+
+        //DD($archivospdf);
 
         $tdetliquidaciongastosel = LqgDetLiquidacionGasto::where('ID_DOCUMENTO', '=', $iddocumento)->where('ACTIVO', '=', '0')->get();
 
