@@ -2,6 +2,20 @@
     $estado_consolidado = $listadetalle->first()->COD_ESTADO ?? null;
 @endphp
 
+<div class="row" style="margin-bottom: 15px;">
+    <div class="col-xs-12 text-right">
+      
+        <button type="button" class="btn btn-primary btn-detalle-consolidado" id="btn-guardar-detalle-consolidado-editado-general">
+            <i class="mdi mdi-content-save"></i> Guardar 
+        </button>
+
+        <button type="button" class="btn btn-success btn-detalle-consolidado" id="btn-aprobar-consolidado-general">
+            <i class="mdi mdi-content-check"></i> Aprobar pedido
+        </button>
+
+    </div>
+</div>
+
 <style>
     .btn-detalle-consolidado {
         padding: 6px 15px;
@@ -81,6 +95,7 @@
                     <th class="text-center">FECHA</th>
                     <th class="text-center">NRO PEDIDO</th>
                     <th class="text-center">AREA</th>
+                    <th class="text-center">CENTRO</th>
                     <th class="text-center">GLOSA</th>
                     <th class="text-center">CANTIDAD</th>
                 </tr>

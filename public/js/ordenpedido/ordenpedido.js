@@ -1665,7 +1665,7 @@ $(document).on('click', '#btn-aprobar-consolidado', function () {
         tipo: 'info',
         icono: '✅',
         titulo: 'Aprobar Consolidado',
-        mensaje: '¿Está seguro de <b>aprobar</b> este consolidado?',
+        mensaje: '¿Está seguro de <b>cerrar</b> este consolidado?',
         confirmar: true,
         onConfirm: function () {
 
