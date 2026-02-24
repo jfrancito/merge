@@ -3236,26 +3236,28 @@ $(document).ready(function () {
                 {nombre: "Número", valor: numero_comprobante},
             ];
 
-            // Recorremos y validamos
-            for (let campo of campos) {
-                if (!campo.valor || campo.valor === "") {
-                    if (campo.nombre.includes('Cuenta')) {
-                        $('#div_cuenta_contable').show().find('#nro_cuenta_contable').focus();
-                    } else {
-                        $('.pnlasientos').show();
-                    }
-                    $.alert({
-                        title: 'Error',
-                        content: 'El campo ' + campo.nombre + ' no puede estar vacío.',
-                        type: 'red',
-                        buttons: {
-                            ok: {
-                                text: 'OK',
-                                btnClass: 'btn-red',
-                            }
+            if(detalles.length > 0) {
+                // Recorremos y validamos
+                for (let campo of campos) {
+                    if (!campo.valor || campo.valor === "") {
+                        if (campo.nombre.includes('Cuenta')) {
+                            $('#div_cuenta_contable').show().find('#nro_cuenta_contable').focus();
+                        } else {
+                            $('.pnlasientos').show();
                         }
-                    });
-                    return false; // Detiene la ejecución
+                        $.alert({
+                            title: 'Error',
+                            content: 'El campo ' + campo.nombre + ' no puede estar vacío.',
+                            type: 'red',
+                            buttons: {
+                                ok: {
+                                    text: 'OK',
+                                    btnClass: 'btn-red',
+                                }
+                            }
+                        });
+                        return false; // Detiene la ejecución
+                    }
                 }
             }
         }
@@ -4321,26 +4323,28 @@ $(document).ready(function () {
                 {nombre: "Número", valor: numero_comprobante},
             ];
 
-            // Recorremos y validamos
-            for (let campo of campos) {
-                if (!campo.valor || campo.valor === "") {
-                    if (campo.nombre.includes('Cuenta')) {
-                        $('#div_cuenta_contable').show().find('#nro_cuenta_contable').focus();
-                    } else {
-                        $('.pnlasientos').show();
-                    }
-                    $.alert({
-                        title: 'Error',
-                        content: 'El campo ' + campo.nombre + ' no puede estar vacío.',
-                        type: 'red',
-                        buttons: {
-                            ok: {
-                                text: 'OK',
-                                btnClass: 'btn-red',
-                            }
+            if(detalles.length > 0) {
+                // Recorremos y validamos
+                for (let campo of campos) {
+                    if (!campo.valor || campo.valor === "") {
+                        if (campo.nombre.includes('Cuenta')) {
+                            $('#div_cuenta_contable').show().find('#nro_cuenta_contable').focus();
+                        } else {
+                            $('.pnlasientos').show();
                         }
-                    });
-                    return false; // Detiene la ejecución
+                        $.alert({
+                            title: 'Error',
+                            content: 'El campo ' + campo.nombre + ' no puede estar vacío.',
+                            type: 'red',
+                            buttons: {
+                                ok: {
+                                    text: 'OK',
+                                    btnClass: 'btn-red',
+                                }
+                            }
+                        });
+                        return false; // Detiene la ejecución
+                    }
                 }
             }
         }
