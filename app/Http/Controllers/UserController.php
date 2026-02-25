@@ -1713,6 +1713,13 @@ class UserController extends Controller {
 		$count_observados_oca				= 	0;
 		$count_observadosoca_le 			= 	0;
 
+		//orden compra anticipo
+        $url_obs_oca 					    =	'';
+		$urloca 							=	'';
+		$count_x_aprobar_oca 				= 	0;
+		$count_observados_oca				= 	0;
+		$count_observadosoca_le 			= 	0;
+
 
 
 		if($trol->ind_uc == 1){
