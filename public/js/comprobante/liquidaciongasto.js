@@ -3666,7 +3666,7 @@ $(document).ready(function () {
         verAsiento(arrayCabecera, arrayDetalle);
         cerrarcargando();
     });
-    /*
+
     $(".liquidaciongasto").on('click','.filalgvalidar', function(e) {
         event.preventDefault();
         debugger;
@@ -3680,7 +3680,7 @@ $(document).ready(function () {
         $(this).addClass("activofl");
         cerrarcargando();
     });
-    
+/*
     $(".liquidaciongasto").on('click', '.filalg', function (e) {
         event.preventDefault();
         debugger;
