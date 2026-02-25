@@ -277,7 +277,7 @@
             </div>
         </div>
     </div>
-    @if($rol->ind_uc == 1 || $rol->id == '1CIX00000020')
+    @if($rol->ind_uc == 1 || $rol->id == '1CIX00000020' || $rol->id == '1CIX00000015')
         <div class="row xs-pt-15">
             <div class="col-xs-6">
                 <div class="be-checkbox">
