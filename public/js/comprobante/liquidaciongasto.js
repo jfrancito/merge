@@ -2561,6 +2561,8 @@ $(document).ready(function () {
 
     $(document).on('click', ".eliminar-cuenta", function (e) {
 
+        debugger;
+
         let data_codigo = $(this).parents('.fila').attr('data_codigo');
         let data_asiento = $(this).parents('.fila').attr('data_asiento');
         let moneda_id_editar = $(this).parents('.fila').attr('data_moneda');
@@ -2672,7 +2674,7 @@ $(document).ready(function () {
     });
 
     $(document).on('click', ".editar-cuenta", function (e) {
-
+        debugger;
         let data_codigo = $(this).parents('.fila').attr('data_codigo');
         let data_asiento = $(this).parents('.fila').attr('data_asiento');
         let data_moneda = $(this).parents('.fila').attr('data_moneda');
@@ -3680,7 +3682,7 @@ $(document).ready(function () {
         $(this).addClass("activofl");
         cerrarcargando();
     });
-    
+
     $(".liquidaciongasto").on('click', '.filalg', function (e) {
         event.preventDefault();
         debugger;
@@ -4918,7 +4920,7 @@ $(document).ready(function () {
                 return isNaN(d.getTime()) ? new Date() : d;
             }
 
-            return valor.toString().trim();
+            return valor.toString();
         };
 
         if ($('.editarcuentasreparable').is(':visible')) {
@@ -5167,7 +5169,7 @@ $(document).ready(function () {
                 return isNaN(d.getTime()) ? new Date() : d;
             }
 
-            return valor.toString().trim();
+            return valor.toString();
         };
 
         if ($('.editarcuentas').is(':visible')) {
@@ -5192,7 +5194,7 @@ $(document).ready(function () {
         let proveedor_asiento = '';
         let proveedor_asiento_txt = '';
         let tipo_asiento = '';
-
+        let form_id_editar = 'C';
         let numero_cuenta = '';
         let glosa_cuenta = '';
         let can_debe_mn = 0.0000;
@@ -5310,10 +5312,10 @@ $(document).ready(function () {
                 if (ind_producto !== 2) {
                     acciones = `
                 <div class="btn-group btn-group-sm" style="display: flex;">
-                    <button type="button" class="btn btn-sm btn-primary editar-cuenta-reparable">
+                    <button type="button" class="btn btn-sm btn-primary editar-cuenta">
                         ✏ Editar
                     </button>
-                    <button type="button" class="btn btn-sm btn-danger eliminar-cuenta-reparable">
+                    <button type="button" class="btn btn-sm btn-danger eliminar-cuenta">
                         🗑 Eliminar
                     </button>
                 </div>
