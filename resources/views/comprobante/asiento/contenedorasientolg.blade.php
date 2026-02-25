@@ -1,10 +1,23 @@
-<div tabindex="1" class="panel panel-default panel-contrast pnlasientos" style="border-radius: 10px; border: 1px solid #808080;">
-    <div class="panel-heading"
-         style="background:#1d3a6d; color:#fff; display:flex; justify-content:space-between; align-items:center;">
-        <span>GENERACIÓN DE ASIENTOS</span>
-        <button type="button" class="btn btn-lg btn-primary btn-guardar_asiento">
-            Guardar Asiento
-        </button>
+<div tabindex="1" class="panel panel-default panel-contrast pnlasientos"
+     style="border-radius: 10px; border: 1px solid #808080;">
+    <div class="panel-heading encabezado-asiento">
+        <div class="titulo-panel">
+            ASIENTO
+        </div>
+        <div class="acciones-panel">
+            <button type="button" class="btn btn-lg btn-success btn-guardar-asiento">
+                Guardar Asiento
+            </button>
+            <button type="button" class="btn btn-lg btn-warning btn-anular-asiento">
+                Anular Asiento
+            </button>
+            <button type="button" class="btn btn-lg btn-danger btn-eliminar-asiento">
+                Eliminar Asiento
+            </button>
+            <button type="button" class="btn btn-lg btn-primary btn-cancelar-asiento">
+                Cancelar
+            </button>
+        </div>
     </div>
 
     <div class="tab-container">

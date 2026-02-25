@@ -206,6 +206,14 @@
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <input type="hidden" id="nro_cuenta_contable" name="nro_cuenta_contable" value="">
+            @include('comprobante.asiento.listaasientotabla')
+            @include('comprobante.asiento.contenedorasientoorden')
+        </div>
+    </div>
+
     @if($rol->ind_uc != 1)
         <div class="row xs-pt-15">
             <div class="col-xs-6">
@@ -213,6 +221,7 @@
 
                 </div>
             </div>
+            <input type="hidden" id="contabilidadfisico" name="contabilidadfisico" value="1">
             <div class="col-xs-6">
                 <p class="text-right">
                     <a href="{{ url('/gestion-de-comprobantes-reparable/'.$idopcion) }}">
@@ -222,9 +231,12 @@
                 </p>
             </div>
         </div>
+    @else
+        <input type="hidden" id="contabilidadfisico" name="contabilidadfisico" value="0">
     @endif
 
 @else
+    <input type="hidden" id="contabilidadfisico" name="contabilidadfisico" value="0">
     <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <div class="panel panel-default panel-contrast">
@@ -265,7 +277,7 @@
             </div>
         </div>
     </div>
-    @if($rol->ind_uc == 1 || $rol->id == '1CIX00000020')
+    @if($rol->ind_uc == 1 || $rol->id == '1CIX00000020' || $rol->id == '1CIX00000015')
         <div class="row xs-pt-15">
             <div class="col-xs-6">
                 <div class="be-checkbox">

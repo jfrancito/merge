@@ -3,7 +3,7 @@
     <div class="panel-heading"
          style="background:#1d3a6d; color:#fff; display:flex; justify-content:space-between; align-items:center;">
         <span>GENERACIÓN DE ASIENTOS</span>
-        <button type="button" class="btn btn-lg btn-primary btn-guardar_asiento">
+        <button type="button" class="btn btn-lg btn-primary btn-guardar-asiento">
             Guardar Asiento
         </button>
     </div>

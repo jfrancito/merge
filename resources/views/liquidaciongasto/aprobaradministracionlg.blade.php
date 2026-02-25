@@ -28,7 +28,7 @@
                         <div class="panel-body">
                           <form method="POST" id='formpedido' action="{{ url('/aprobar-liquidacion-gasto-administracion/'.$idopcion.'/'.Hashids::encode(substr($liquidaciongastos->ID_DOCUMENTO, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed" enctype="multipart/form-data">
                                 {{ csrf_field() }}
-<input type="hidden" name="device_info" id='device_info'>
+                            <input type="hidden" name="device_info" id='device_info'>
 
                             @include('liquidaciongasto.form.formaprobaradministracionlg')
                             <div class="row xs-pt-15">

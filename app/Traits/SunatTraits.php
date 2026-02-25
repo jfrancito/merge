@@ -36,8 +36,10 @@ trait SunatTraits
 
 			$documentos 	=   DocumentoSunat::where('RUC_EMPRESA','=',$item2->COD_EMPR)
 								->whereRaw('ISNULL(IND_DETALLE, 0) = 0')
-								->orderby('PERIODO','desc')
-								->take(2000)
+								//->whereRaw('ISNULL(CONTADOR,0) < 2')
+								->whereRaw("COD_TIPODOCUMENTO IN ('01','02')")
+								->orderby('CONTADOR','asc')
+								->take(1000)
 						    	->get();
 
 			$fetoken 		=	FeToken::where('COD_EMPR','=',$item2->COD_EMPR)->where('TIPO','=','COMPROBANTE_PAGO')->first();
@@ -60,33 +62,61 @@ trait SunatTraits
 				$urlxml 					= 	'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2';
 				$respuetapdf 				=	$this->buscar_archivo_sunat_nuevo_fa($urlxml,$fetoken);
 
-
+				//dd($respuetapdf);
 
 				if($respuetapdf['cod_error'] == '0'){
 
-	                $items = $respuetapdf['informacionItems']['comprobantes'][0]['informacionItems'];
+					if($td=='02'){
+						//RECIBO
+		                $items = $respuetapdf['informacionItems']['comprobantes'][0];
 
-	                foreach ($items as $itemdet) {
-	                    // Crear nuevo registro en DocumentoSunatDetalle
-	                    $detalle = new DocumentoSunatDetalle();
-	                    
-	                    // Asignar valores del array al modelo
+		                $detalle = new DocumentoSunatDetalle();
 	                    $detalle->ID = $item->ID; // Implementa tu lógica para generar ID
-	                    $detalle->cntItems = $this->limpiarNumero($itemdet['cntItems'] ?? 0);
-	                    $detalle->codUnidadMedida = $itemdet['codUnidadMedida'] ?? null;
-	                    $detalle->desCodigo = $itemdet['desCodigo'] ?? null;
-	                    $detalle->desItem = $itemdet['desItem'] ?? null;
-	                    $detalle->desUnidadMedida = $itemdet['desUnidadMedida'] ?? null;
-	                    $detalle->mtoDesc = $this->limpiarNumero($itemdet['mtoDesc'] ?? 0);
-	                    $detalle->mtoICBPER = $this->limpiarNumero($itemdet['mtoICBPER'] ?? 0);
-	                    $detalle->mtoImpTotal = $this->limpiarNumero($itemdet['mtoImpTotal'] ?? 0);
-	                    $detalle->mtoValUnitario = $this->limpiarNumero($itemdet['mtoValUnitario'] ?? 0);
+	                    $detalle->cntItems = 1;
+
+	                    $detalle->codUnidadMedida = 'NIU';
+	                    $detalle->desCodigo = '';
+	                    $detalle->desItem = $items['desConcepto'];
+	                    $detalle->desUnidadMedida = 'UNIDAD';
+	                    $detalle->mtoDesc = 0;
+	                    $detalle->mtoICBPER = 0;
+	                    $detalle->mtoImpTotal = $this->limpiarNumero($items['mtoTotalRecibido'] ?? 0);
+	                    $detalle->mtoValUnitario = $this->limpiarNumero($items['mtoTotalRecibido'] ?? 0);
 	                    // Guardar en la base de datos
 	                    $detalle->save();
-	                }
+
+					}else{
+						//FACTURA
+		                $items = $respuetapdf['informacionItems']['comprobantes'][0]['informacionItems'];
+
+		                foreach ($items as $itemdet) {
+		                    // Crear nuevo registro en DocumentoSunatDetalle
+		                    $detalle = new DocumentoSunatDetalle();
+		                    
+		                    // Asignar valores del array al modelo
+		                    $detalle->ID = $item->ID; // Implementa tu lógica para generar ID
+		                    $detalle->cntItems = $this->limpiarNumero($itemdet['cntItems'] ?? 0);
+		                    $detalle->codUnidadMedida = $itemdet['codUnidadMedida'] ?? null;
+		                    $detalle->desCodigo = $itemdet['desCodigo'] ?? null;
+		                    $detalle->desItem = $itemdet['desItem'] ?? null;
+		                    $detalle->desUnidadMedida = $itemdet['desUnidadMedida'] ?? null;
+		                    $detalle->mtoDesc = $this->limpiarNumero($itemdet['mtoDesc'] ?? 0);
+		                    $detalle->mtoICBPER = $this->limpiarNumero($itemdet['mtoICBPER'] ?? 0);
+		                    $detalle->mtoImpTotal = $this->limpiarNumero($itemdet['mtoImpTotal'] ?? 0);
+		                    $detalle->mtoValUnitario = $this->limpiarNumero($itemdet['mtoValUnitario'] ?? 0);
+		                    // Guardar en la base de datos
+		                    $detalle->save();
+		                }
+
+
+					}
+
 
 					DB::table('DOCUMENTO_SUNAT')
-					    ->where('ID', $item->ID)
+					    ->where('RUC_EMPRESA_PROVEEDOR', $item->RUC_EMPRESA_PROVEEDOR)
+					    ->where('SERIE', $item->SERIE)
+					    ->where('NUMERO', $item->NUMERO)
+					    ->where('COD_TIPODOCUMENTO', $item->COD_TIPODOCUMENTO)
 					    ->update([
 					        'IND_DETALLE' => 1
 					    ]);
@@ -95,7 +125,10 @@ trait SunatTraits
 
 
 					DB::table('DOCUMENTO_SUNAT')
-					    ->where('ID', $item->ID)
+					    ->where('RUC_EMPRESA_PROVEEDOR', $item->RUC_EMPRESA_PROVEEDOR)
+					    ->where('SERIE', $item->SERIE)
+					    ->where('NUMERO', $item->NUMERO)
+					    ->where('COD_TIPODOCUMENTO', $item->COD_TIPODOCUMENTO)
 					    ->update([
 					        'CONTADOR' => DB::raw('ISNULL(CONTADOR,0) + 1')
 					    ]);
@@ -147,10 +180,7 @@ trait SunatTraits
 			    $fechaActual->format('Ym')    // 202511
 			];
 
-			$periodos = [
-			    '202601', // 202510
-			    '202602'  // 202511
-			];
+			//dd($periodos);
 	        
 	        foreach ($periodos as $periodo) {
 	            $pagina = 1;
@@ -287,6 +317,8 @@ trait SunatTraits
 	            $cabecera->MONEDA = $valorsire['codMoneda'];
 	            $cabecera->ESTADO = $valorsire['desEstadoComprobante'];
 	            $cabecera->TOTAL = $valorsire['montos']['mtoTotalCp'] ?? 0;
+	            $cabecera->IND_REGISTRO = 'SUNAT';
+
 	            $cabecera->save();
 	            
 	            return true;

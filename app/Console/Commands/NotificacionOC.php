@@ -12,6 +12,8 @@ use App\Modelos\SuperPrecio;
 use App\Traits\UserTraits;
 use App\Traits\ComprobanteTraits;
 use App\Traits\PrecioCompetenciaTraits;
+use App\Traits\SunatTraits;
+
 use Maatwebsite\Excel\Facades\Excel;
 
 class NotificacionOC extends Command
@@ -19,6 +21,8 @@ class NotificacionOC extends Command
     use UserTraits;
     use ComprobanteTraits;
     use PrecioCompetenciaTraits;
+    use SunatTraits;
+
     /**
      * The name and signature of the console command.
      *
@@ -98,6 +102,13 @@ class NotificacionOC extends Command
         $this->guadarpdfoi();
         $this->envio_correo_aprobado();
 
+        if (in_array($horaActual, [
+            '00:30', '01:00', '01:30', '02:00', '02:30', '03:00', '03:30', '04:00', '04:30', '05:00', '05:30', '06:00', '06:30', '07:00', '07:30',
+            '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00',
+            '23:00', '23:30'
+        ])) {
+            $this->sunatarchivos();
+        }
 
 
         // //precios de supermercado
