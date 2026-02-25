@@ -28,7 +28,10 @@
                 <tbody>
                 @foreach($listapedido as $item)
                     @if ($item['COD_TRABAJADOR_SOLICITA'] === $usuario_solicita)
-                    <tr>
+                    <tr class="fila-pedido" 
+                        data-id="{{ $item['ID_PEDIDO'] }}" 
+                        data-estado="{{ $item['COD_ESTADO'] }}"
+                        style="cursor: pointer;">
                         <td>{{ $item['ID_PEDIDO'] }}</td>
                         <td>{{ $item['FEC_PEDIDO'] }}</td>
                         <td>{{ $item['TXT_NOMBRE'] }}</td>
