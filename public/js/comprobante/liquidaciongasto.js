@@ -3667,7 +3667,7 @@ $(document).ready(function () {
         cerrarcargando();
     });
 
-/*
+
 
     $(".liquidaciongasto").on('click','.filalgvalidar', function(e) {
         event.preventDefault();
@@ -3683,7 +3683,7 @@ $(document).ready(function () {
         cerrarcargando();
     });
 
-
+/*
     $(".liquidaciongasto").on('click', '.filalg', function (e) {
         event.preventDefault();
         debugger;
