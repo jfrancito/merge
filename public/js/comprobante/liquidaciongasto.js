@@ -276,7 +276,7 @@ $(document).ready(function () {
 
         // Recorrerlo
         arrayDetalle.forEach(item => {
-            if (item.COD_ASIENTO_MOVIMIENTO === data_codigo) {
+            if (item.COD_ASIENTO_MOVIMIENTO.trim() === data_codigo) {
                 data_cuenta_id = item.COD_CUENTA_CONTABLE;
                 data_debe_mn = item.CAN_DEBE_MN;
                 data_haber_mn = item.CAN_HABER_MN;
@@ -349,7 +349,7 @@ $(document).ready(function () {
 
         // Recorrerlo
         arrayDetalle.forEach(item => {
-            if (item.COD_ASIENTO_MOVIMIENTO === data_codigo) {
+            if (item.COD_ASIENTO_MOVIMIENTO.trim() === data_codigo) {
                 item.COD_ESTADO = '0';
                 return; // saltar esta iteración
             }
@@ -2586,7 +2586,7 @@ $(document).ready(function () {
 
         // Recorrerlo
         arrayDetalle.forEach(item => {
-            if (item.COD_ASIENTO_MOVIMIENTO === data_codigo) {
+            if (item.COD_ASIENTO_MOVIMIENTO.trim() === data_codigo) {
                 item.COD_ESTADO = '0';
             }
             if (parseInt(item.COD_ESTADO) === 1) {
@@ -2729,7 +2729,7 @@ $(document).ready(function () {
 
         // Recorrerlo
         arrayDetalle.forEach(item => {
-            if (item.COD_ASIENTO_MOVIMIENTO === data_codigo) {
+            if (item.COD_ASIENTO_MOVIMIENTO.trim() === data_codigo) {
                 data_cuenta_id = item.COD_CUENTA_CONTABLE === null ? '' : item.COD_CUENTA_CONTABLE;
                 data_debe_mn = item.CAN_DEBE_MN;
                 data_haber_mn = item.CAN_HABER_MN;
@@ -4921,7 +4921,7 @@ $(document).ready(function () {
                 return isNaN(d.getTime()) ? new Date() : d;
             }
 
-            return valor.toString();
+            return valor.toString().trim();
         };
 
         if ($('.editarcuentasreparable').is(':visible')) {
@@ -5170,7 +5170,7 @@ $(document).ready(function () {
                 return isNaN(d.getTime()) ? new Date() : d;
             }
 
-            return valor.toString();
+            return valor.toString().trim();
         };
 
         if ($('.editarcuentas').is(':visible')) {
