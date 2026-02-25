@@ -17,7 +17,7 @@
             </thead>
             <tbody>
             @foreach($tdetliquidaciongastos as $index => $item)
-                <tr class="filalg {{$item->ID_DOCUMENTO}}{{$item->ITEM}} @if($index == 0) activofl @endif"
+                <tr class="filalg filalgvalidar {{$item->ID_DOCUMENTO}}{{$item->ITEM}} @if($index == 0) activofl @endif"
                     data_valor="{{$item->ID_DOCUMENTO}}{{$item->ITEM}}" data_asiento_compra="{{$item->TXT_CENTRO}}"
                     data_asiento_reversion="{{$item->TOKEN}}" data_valor_compra="{{$item->BUSQUEDAD}}"
                     data_valor_reversion="{{$item->CONTADOR}}">
