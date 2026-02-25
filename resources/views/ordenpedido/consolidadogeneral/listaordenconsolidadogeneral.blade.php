@@ -6,7 +6,6 @@
             <tr>
                 <th>COD PRODUCTO</th>
                 <th>PRODUCTO</th>
-                <th>CENTRO</th>
                 <th>UNIDA MEDIDA</th>
                 <th>CANTIDAD</th>
                 <th>STOCK</th>
@@ -39,6 +38,7 @@
                     <th class="text-center">FECHA</th>
                     <th class="text-center">NRO PEDIDO</th>
                     <th class="text-center">AREA</th>
+                    <th class="text-center">CENTRO</th>
                     <th class="text-center">GLOSA</th>
                     <th class="text-center">CANTIDAD</th>
                 </tr>

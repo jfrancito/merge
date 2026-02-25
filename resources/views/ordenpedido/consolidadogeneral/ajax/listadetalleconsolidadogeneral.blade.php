@@ -39,7 +39,6 @@
         <tr>
             <th>COD PRODUCTO</th>
             <th>PRODUCTO</th>
-            <th>CENTRO</th>
             <th>UNIDAD MEDIDA</th>
             <th>CANTIDAD</th>
             <th>STOCK</th>
@@ -58,7 +57,6 @@
                 style="cursor: pointer;">
                 <td>{{ $item->COD_PRODUCTO }}</td>
                 <td>{{ $item->NOM_PRODUCTO }}</td>
-                <td>{{ $item->NOM_CENTRO }}</td>
                 <td>{{ $item->NOM_CATEGORIA_MEDIDA }}</td>
                 <td>{{ number_format($item->CANTIDAD, 2) }}</td>
                 <td>{{ number_format($item->STOCK, 2) }}</td>
@@ -68,7 +66,7 @@
             </tr>
         @empty
             <tr>
-                <td colspan="9" class="text-center">No se encontraron productos para este consolidado general / familia.</td>
+                <td colspan="8" class="text-center">No se encontraron productos para este consolidado general / familia.</td>
             </tr>
         @endforelse
     </tbody>

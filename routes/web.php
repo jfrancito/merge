@@ -1000,6 +1000,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::post('/anular_orden_pedido', 'GestionOrdenPedidoController@insertAnularOrdenPedido');
 	Route::post('/obtener-meses', 'GestionOrdenPedidoController@obtenerMeses');
 	Route::post('/ver_detalle_orden_pedido', 'GestionOrdenPedidoController@actionDetallePedido');
+	Route::post('/ajax_editar_orden_pedido', 'GestionOrdenPedidoController@actionAjaxEditarPedido');
+	Route::post('/ajax-pedido-editar', 'GestionOrdenPedidoController@actionAjaxPedidoEditar');
 
 	Route::get('/reporte-orden-pedido/{idopcion}', 'ReporteOrdenPedidoController@actionReporteOrdenPedido');
 	Route::any('/ajax-buscar-documento-op', 'ReporteOrdenPedidoController@actionListarAjaxBuscarDocumentoOP');
@@ -1122,7 +1124,8 @@ Route::get('buscarempresalg', function (Illuminate\Http\Request $request) {
 	    foreach ($tags as $id => $tag) {
 		    $valid_tags[] = ['id' => $id, 'text' => $tag];
 	    }
-	    return \Response::json($valid_tags);    });
+	    return \Response::json($valid_tags);
+    });
 
 Route::get('buscarempresarenta', function (Illuminate\Http\Request $request) {
 	$term = $request->term ?: '';
@@ -1145,7 +1148,8 @@ Route::get('buscarempresarenta', function (Illuminate\Http\Request $request) {
 	    foreach ($tags as $id => $tag) {
 		    $valid_tags[] = ['id' => $id, 'text' => $tag];
 	    }
-	    return \Response::json($valid_tags);    });
+	    return \Response::json($valid_tags);
+    });
 
 
 
