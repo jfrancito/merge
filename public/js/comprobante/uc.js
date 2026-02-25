@@ -3186,8 +3186,12 @@ $(document).ready(function () {
 
             });
 
-            if(detalles.length === 0){
+            if(detalles.length === 0 || $('#nro_cuenta_contable').val() === ''){
                 $('#nro_cuenta_contable').val("000000");
+            } else {
+                if($('#nro_cuenta_contable').val() === ''){
+                    $('#nro_cuenta_contable').val("000000");
+                }
             }
 
             if (error_tipo_asiento) {
@@ -3379,6 +3383,9 @@ $(document).ready(function () {
                 $('#nro_cuenta_contable').val("000000");
                 $('.pnlasientos').hide();
             } else {
+                if($('#nro_cuenta_contable').val() === ''){
+                    $('#nro_cuenta_contable').val("000000");
+                }
                 let nro_cuenta_aux = $('#nro_cuenta_contable').val();
                 let anio_asiento = $("#anio_asiento").val();
                 let periodo_asiento = $("#periodo_asiento").val();
@@ -3515,6 +3522,9 @@ $(document).ready(function () {
                 $('#nro_cuenta_contable').val("000000");
                 $('.pnlasientos').hide();
             } else {
+                if($('#nro_cuenta_contable').val() === ''){
+                    $('#nro_cuenta_contable').val("000000");
+                }
                 let nro_cuenta_aux = $('#nro_cuenta_contable').val();
                 let anio_asiento = $("#anio_asiento").val();
                 let periodo_asiento = $("#periodo_asiento").val();
@@ -3652,6 +3662,9 @@ $(document).ready(function () {
                 $('#nro_cuenta_contable').val("000000");
                 $('.pnlasientos').hide();
             } else {
+                if($('#nro_cuenta_contable').val() === ''){
+                    $('#nro_cuenta_contable').val("000000");
+                }
                 let nro_cuenta_aux = $('#nro_cuenta_contable').val();
                 let anio_asiento = $("#anio_asiento").val();
                 let periodo_asiento = $("#periodo_asiento").val();
@@ -4275,6 +4288,10 @@ $(document).ready(function () {
 
             if(detalles.length === 0){
                 $('#nro_cuenta_contable').val("000000");
+            } else {
+                if($('#nro_cuenta_contable').val() === ''){
+                    $('#nro_cuenta_contable').val("000000");
+                }
             }
 
             if (error_tipo_asiento) {

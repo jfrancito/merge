@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Modelos\STDTipoDocumento;
 use App\Modelos\WEBAsiento;
 use Illuminate\Http\Request;
 use App\Modelos\Grupoopcion;
