@@ -2984,16 +2984,34 @@ class GestionOCController extends Controller
 
         $rutafila               =   "";
         $rutaorden              =   "";
-        $directorio             = $this->pathFilesLiquidacion;
-
 
         $ordenpago              =   $this->con_lista_comprobante_orden_pago_idoc($idop);
-        $idoc                   =   $ordenpago->COD_DOCUMENTO_CTBLE;
-        $liquidacion            =   $this->con_lista_cabecera_comprobante_contrato_idoc_actual($idoc);
+        $idoc                   =   $ordenpago->COD_DOCUMENTO_CTBLE;        
         // Nombre del archivo que estás buscando
-        $nombreArchivoBuscado = $idop.'.xml';
-        $nombreArchivoBuscado = $liquidacion->COD_EMPR_EMISOR.'-04-'.$liquidacion->NRO_SERIE.'-'.$liquidacion->NRO_DOC.'.xml';        
+        $nombreArchivoBuscado   =   $idop.'.xml';
+        $liquidacion            =   $this->con_lista_cabecera_comprobante_contrato_idoc_actual($idoc);
+        $nombreArchivoBuscado = $liquidacion->COD_EMPR_EMISOR.'-04-'.$liquidacion->NRO_SERIE.'-'.$liquidacion->NRO_DOC.'.xml'; 
+        if($ordenpago->COD_CENTRO == 'CEN0000000000004' or $ordenpago->COD_CENTRO == 'CEN0000000000006'){
+            if($ordenpago->COD_CENTRO == 'CEN0000000000006'){
+                $sourceFile = '\\\\10.1.9.43\\cpe\\Liquidacion\\'.$nombreArchivoBuscado;
+            }
+            if($ordenpago->COD_CENTRO == 'CEN0000000000002'){
+                $sourceFile = '\\\\10.1.4.201\\cpe\\Liquidacion\\'.$nombreArchivoBuscado;
+            }
+            $destinationFile = '\\\\10.1.0.201\\cpe\\Liquidacion\\'.$nombreArchivoBuscado;
+            if (file_exists($sourceFile)){
+                copy($sourceFile, $destinationFile);
+            }
+        }
+
+
+
+        $directorio             = $this->pathFilesLiquidacion;
+
         // Escanea el directorio
+
+        //dd($nombreArchivoBuscado);
+
         $archivos = scandir($directorio);
         // Inicializa una variable para almacenar el resultado
         $archivoEncontrado = false;
@@ -3016,6 +3034,7 @@ class GestionOCController extends Controller
             $rutafila            =   $directorio.'\\'.$nombreArchivoBuscado;
             $rutaorden           =   $rutafila;
         } 
+
 
 
         if($_POST)
