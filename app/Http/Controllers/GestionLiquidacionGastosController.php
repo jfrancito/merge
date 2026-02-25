@@ -2392,7 +2392,7 @@ class GestionLiquidacionGastosController extends Controller
             //dd($listaarendirlg);
 
             $valearendir_info = $this->lq_valearendir($liquidaciongastos->ID_DOCUMENTO);
-
+            //dd("hola");
 
             return View::make('liquidaciongasto/aprobaradministracionlg',
                 [

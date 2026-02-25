@@ -178,7 +178,11 @@ class GestionOrdenPedidoAutorizaController extends Controller
 
 
         $pedido = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $id_buscar)->first();
-        $pedillodetalle = DB::table('WEB.ORDEN_PEDIDO_DETALLE')->where('ID_PEDIDO', $id_buscar)->get();
+        $pedillodetalle = DB::table('WEB.ORDEN_PEDIDO_DETALLE')
+            ->where('ID_PEDIDO', $id_buscar)
+            ->where('ACTIVO', 1)
+            ->get();
+
 
 
         $id_pedido = $pedillodetalle->pluck('ID_PEDIDO');

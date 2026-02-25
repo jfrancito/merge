@@ -160,7 +160,7 @@ $(document).ready(function () {
                 cod_categoria: tds.eq(3).text().trim(),
                 nom_categoria: tds.eq(4).text().trim(),
                 cantidad: parseInt(tds.eq(5).text().trim()) || 0,
-                txt_observacion: tds.eq(6).text().trim(),
+                txt_observacion: tds.eq(8).text().trim(),
                 opcion_detalle: 'I',
                 detalle_id: null
             });
@@ -496,6 +496,109 @@ $(document).ready(function () {
             "modal-verdetallepedido-solicitud",
             "modal-verdetallepedido-solicitud-container"
         );
+    });
+
+    /* ===============================
+       DOBLE CLICK EDITAR PEDIDO
+       =============================== */
+    $(".ordenpedidoprincipal").on('dblclick', '.fila-pedido', function () {
+        let id_pedido = $(this).data('id');
+        let estado = $(this).data('estado');
+
+      // SOLO PERMITIR EDITAR CUANDO ESTADO SEA ETM0000000000001
+        if (estado !== 'ETM0000000000001') {
+            modalBonito({
+                tipo: 'warn',
+                icono: '🚫',
+                titulo: 'No se puede editar',
+                mensaje: 'Este pedido no se encuentra en un estado que permita modificaciones.'
+            });
+            return;
+        }
+
+        abrircargando();
+
+        $.ajax({
+            type: "POST",
+            url: carpeta + "/ajax-pedido-editar",
+            data: {
+                _token: $('#token').val(),
+                id_pedido: id_pedido
+            },
+            success: function (resp) {
+                cerrarcargando();
+
+                if (resp.pedido) {
+                    let p = resp.pedido;
+
+                    // Llenar campos cabecera
+                    $('#orden_pedido_id').val(p.ID_PEDIDO);
+                    $('#id_pedido').val(p.ID_PEDIDO);
+                    $('#nro_pedido').val(p.ID_PEDIDO); // O el folio si existe
+                    $('#fec_pedido').val(p.FEC_PEDIDO ? p.FEC_PEDIDO.substring(0, 10) : "");
+                    $('#cod_anio').val(p.COD_ANIO).trigger('change');
+                    $('#cod_periodo').val(p.COD_PERIODO).trigger('change');
+                    $('#cod_trabajador_autoriza').val(p.COD_TRABAJADOR_AUTORIZA).trigger('change');
+                    $('#cod_trabajador_aprueba_ger').val(p.COD_TRABAJADOR_APRUEBA_GER).trigger('change');
+                    $('#cod_trabajador_aprueba_adm').val(p.COD_TRABAJADOR_APRUEBA_ADM).trigger('change');
+                    $('#cod_tipo_pedido').val(p.COD_TIPO_PEDIDO).trigger('change');
+                    $('#txt_glosa').val(p.TXT_GLOSA);
+                    $('#cod_estado').val(p.COD_ESTADO);
+
+                    // Limpiar tabla detalle
+                    let tbody = $('#tabla_detalle_pedido tbody');
+                    tbody.empty();
+                    filaCount = 0; // 👈 Reiniciamos contador para que siga la secuencia
+
+                    // Llenar tabla detalle
+                    if (resp.detalle && resp.detalle.length > 0) {
+                        resp.detalle.forEach((det, index) => {
+                            filaCount++; // 👈 Sincronizamos el contador global
+
+                            let precio = parseFloat(det.PRECIO || 0);
+                            let cantidad = parseFloat(det.CANTIDAD || 0);
+                            let subtotal = (precio * cantidad).toFixed(2);
+
+                            tbody.append(`
+                                <tr class="fila-detalle-pedido-tabla" style="cursor: pointer;">
+                                    <td class="text-center">${filaCount}</td>
+                                    <td class="text-center font-bold">${det.COD_PRODUCTO}</td>
+                                    <td>${det.NOM_PRODUCTO}</td>
+                                    <td class="text-center" style="display:none;">${det.COD_CATEGORIA}</td>
+                                    <td class="text-center">${det.NOM_CATEGORIA}</td>
+                                    <td class="text-center font-bold">${parseInt(det.CANTIDAD)}</td>
+                                    <td class="text-center">${precio.toFixed(2)}</td>
+                                    <td class="text-center font-bold subtotal">${subtotal}</td>
+                                    <td class="text-muted small">${det.TXT_OBSERVACION || '-'}</td>
+                                </tr>
+                            `);
+                        });
+                    }
+
+                    calcularTotalPedido();
+
+                    // Cambiar a la pestaña de registro
+                    $('a[href="#crearpedido"]').tab('show');
+
+                    modalBonito({
+                        tipo: 'success',
+                        icono: '✏️',
+                        titulo: 'Pedido cargado',
+                        mensaje: 'Los datos del pedido <b>' + id_pedido + '</b> han sido cargados para su edición.'
+                    });
+                }
+            },
+            error: function (xhr) {
+                cerrarcargando();
+                let errorMsg = xhr.responseJSON?.message || xhr.responseText || 'Error desconocido';
+                modalBonito({
+                    tipo: 'error',
+                    icono: '❌',
+                    titulo: 'Error al cargar pedido',
+                    mensaje: 'No se pudo cargar la información.<br><small>' + errorMsg + '</small>'
+                });
+            }
+        });
     });
 
     $(".ordenpedidoprincipal").on('click', '.ver-detalle-pedido-aut', function (e) {
@@ -1450,93 +1553,93 @@ $(document).ready(function () {
         }
     });
     // Botón Guardar Consolidado
-  $(document).on('click', '.btn-guardar-consolidado', function (e) {
-    e.preventDefault();
+    $(document).on('click', '.btn-guardar-consolidado', function (e) {
+        e.preventDefault();
 
-    let $boton = $(this);
-    let pedidos_ids = [];
+        let $boton = $(this);
+        let pedidos_ids = [];
 
-    $('.pedido_seleccionado:checked').each(function () {
-        pedidos_ids.push($(this).val());
-    });
-
-    if (pedidos_ids.length === 0) {
-        modalBonito({
-            tipo: 'warning',
-            titulo: 'Advertencia',
-            mensaje: 'Debe seleccionar al menos un pedido para guardar el consolidado.'
+        $('.pedido_seleccionado:checked').each(function () {
+            pedidos_ids.push($(this).val());
         });
-        return;
-    }
 
-    modalBonito({
-        tipo: 'info',
-        icono: '📝',
-        titulo: 'Confirmar Guardado',
-        mensaje: '¿Está seguro de guardar el consolidado de los pedidos seleccionados?',
-        confirmar: true,
-        onConfirm: function () {
+        if (pedidos_ids.length === 0) {
+            modalBonito({
+                tipo: 'warning',
+                titulo: 'Advertencia',
+                mensaje: 'Debe seleccionar al menos un pedido para guardar el consolidado.'
+            });
+            return;
+        }
 
-            // 🔒 Deshabilitamos botón
-            $boton.prop('disabled', true);
+        modalBonito({
+            tipo: 'info',
+            icono: '📝',
+            titulo: 'Confirmar Guardado',
+            mensaje: '¿Está seguro de guardar el consolidado de los pedidos seleccionados?',
+            confirmar: true,
+            onConfirm: function () {
 
-            // 🔒 Abrimos loader global
-            abrircargando();
+                // 🔒 Deshabilitamos botón
+                $boton.prop('disabled', true);
 
-            $.ajax({
-                type: 'POST',
-                url: carpeta + '/guardar_consolidado_pedido',
-                data: {
-                    _token: $('#token').val(),
-                    pedidos_ids: pedidos_ids,
-                    productos: Object.values(productosConsolidados)
-                },
+                // 🔒 Abrimos loader global
+                abrircargando();
 
-                success: function (resp) {
+                $.ajax({
+                    type: 'POST',
+                    url: carpeta + '/guardar_consolidado_pedido',
+                    data: {
+                        _token: $('#token').val(),
+                        pedidos_ids: pedidos_ids,
+                        productos: Object.values(productosConsolidados)
+                    },
 
-                    if (resp.success) {
+                    success: function (resp) {
 
-                        modalBonito({
-                            tipo: 'success',
-                            titulo: 'Éxito',
-                            mensaje: resp.mensaje
-                        });
+                        if (resp.success) {
 
-                        // ⏳ Dejamos el loader activo
-                        // 🔄 Recargamos la página
-                        setTimeout(function () {
-                            location.reload();
-                        }, 1200);
+                            modalBonito({
+                                tipo: 'success',
+                                titulo: 'Éxito',
+                                mensaje: resp.mensaje
+                            });
 
-                    } else {
+                            // ⏳ Dejamos el loader activo
+                            // 🔄 Recargamos la página
+                            setTimeout(function () {
+                                location.reload();
+                            }, 1200);
 
-                        // ❌ Solo cerramos loader si hay error
+                        } else {
+
+                            // ❌ Solo cerramos loader si hay error
+                            cerrarcargando();
+                            $boton.prop('disabled', false);
+
+                            modalBonito({
+                                tipo: 'error',
+                                titulo: 'Error',
+                                mensaje: resp.mensaje
+                            });
+                        }
+                    },
+
+                    error: function () {
+
                         cerrarcargando();
                         $boton.prop('disabled', false);
 
                         modalBonito({
                             tipo: 'error',
                             titulo: 'Error',
-                            mensaje: resp.mensaje
+                            mensaje: 'Ocurrió un error al intentar guardar el consolidado.'
                         });
                     }
-                },
-
-                error: function () {
-
-                    cerrarcargando();
-                    $boton.prop('disabled', false);
-
-                    modalBonito({
-                        tipo: 'error',
-                        titulo: 'Error',
-                        mensaje: 'Ocurrió un error al intentar guardar el consolidado.'
-                    });
-                }
-            });
-        }
+                });
+            }
+        });
     });
-});
 
     let id_consolidado_seleccionado = '';
 
@@ -1646,93 +1749,93 @@ $(document).ready(function () {
         });
     });
 
-   // EVENTO PARA APROBAR EL CONSOLIDADO
-$(document).on('click', '#btn-aprobar-consolidado', function () {
+    // EVENTO PARA APROBAR EL CONSOLIDADO
+    $(document).on('click', '#btn-aprobar-consolidado', function () {
 
-    let _token = $('#token').val();
-    let $boton = $(this);
+        let _token = $('#token').val();
+        let $boton = $(this);
 
-    if (id_consolidado_seleccionado === '') {
+        if (id_consolidado_seleccionado === '') {
+            modalBonito({
+                tipo: 'error',
+                titulo: 'Error',
+                mensaje: 'No hay un consolidado seleccionado.'
+            });
+            return;
+        }
+
         modalBonito({
-            tipo: 'error',
-            titulo: 'Error',
-            mensaje: 'No hay un consolidado seleccionado.'
-        });
-        return;
-    }
+            tipo: 'info',
+            icono: '✅',
+            titulo: 'Aprobar Consolidado',
+            mensaje: '¿Está seguro de <b>cerrar</b> este consolidado?',
+            confirmar: true,
+            onConfirm: function () {
 
-    modalBonito({
-        tipo: 'info',
-        icono: '✅',
-        titulo: 'Aprobar Consolidado',
-        mensaje: '¿Está seguro de <b>cerrar</b> este consolidado?',
-        confirmar: true,
-        onConfirm: function () {
+                // 🔒 Deshabilitamos botón para evitar doble click
+                $boton.prop('disabled', true);
 
-            // 🔒 Deshabilitamos botón para evitar doble click
-            $boton.prop('disabled', true);
+                // 🔒 Abrimos loader global (bloquea toda la UI)
+                abrircargando();
 
-            // 🔒 Abrimos loader global (bloquea toda la UI)
-            abrircargando();
+                $.ajax({
+                    type: 'POST',
+                    url: carpeta + '/ajax-aprobar-consolidado-op',
+                    data: {
+                        _token: _token,
+                        id_consolidado: id_consolidado_seleccionado
+                    },
 
-            $.ajax({
-                type: 'POST',
-                url: carpeta + '/ajax-aprobar-consolidado-op',
-                data: {
-                    _token: _token,
-                    id_consolidado: id_consolidado_seleccionado
-                },
+                    success: function (res) {
 
-                success: function (res) {
+                        if (res.success) {
 
-                    if (res.success) {
+                            modalBonito({
+                                tipo: 'success',
+                                icono: '✔',
+                                titulo: 'Éxito',
+                                mensaje: res.mensaje
+                            });
 
-                        modalBonito({
-                            tipo: 'success',
-                            icono: '✔',
-                            titulo: 'Éxito',
-                            mensaje: res.mensaje
-                        });
+                            // ⏳ Dejamos el loader activo
+                            // 🔄 Recargamos sin cerrar loader
+                            setTimeout(function () {
+                                location.reload();
+                            }, 1200);
 
-                        // ⏳ Dejamos el loader activo
-                        // 🔄 Recargamos sin cerrar loader
-                        setTimeout(function () {
-                            location.reload();
-                        }, 1200);
+                        } else {
 
-                    } else {
+                            // ❌ Solo cerramos loader si hubo error
+                            cerrarcargando();
+                            $boton.prop('disabled', false);
 
-                        // ❌ Solo cerramos loader si hubo error
+                            modalBonito({
+                                tipo: 'error',
+                                icono: '❌',
+                                titulo: 'Error',
+                                mensaje: res.mensaje
+                            });
+                        }
+                    },
+
+                    error: function (e) {
+
                         cerrarcargando();
                         $boton.prop('disabled', false);
+
+                        console.error(e);
 
                         modalBonito({
                             tipo: 'error',
                             icono: '❌',
                             titulo: 'Error',
-                            mensaje: res.mensaje
+                            mensaje: 'Error en la petición al servidor.'
                         });
                     }
-                },
-
-                error: function (e) {
-
-                    cerrarcargando();
-                    $boton.prop('disabled', false);
-
-                    console.error(e);
-
-                    modalBonito({
-                        tipo: 'error',
-                        icono: '❌',
-                        titulo: 'Error',
-                        mensaje: 'Error en la petición al servidor.'
-                    });
-                }
-            });
-        }
+                });
+            }
+        });
     });
-});
     // Evento Doble Clic en el DETALLE del Consolidado Generado
     $(document).on('dblclick', '.fila-detalle-consolidado-generado', function () {
         let cod_producto = $(this).data('id');
@@ -1856,7 +1959,6 @@ $(document).on('click', '#btn-aprobar-consolidado', function () {
         $('#contenedor-detalle-producto-consolidado').hide();
 
         let seleccionados = [];
-
         $('.consolidado_seleccionado:checked').each(function () {
             seleccionados.push($(this));
         });
@@ -1872,63 +1974,71 @@ $(document).on('click', '#btn-aprobar-consolidado', function () {
         }
 
         let totalDetalles = 0;
+        let groupedProducts = {}; // 👈 AGREGADOR POR PRODUCTO
 
         seleccionados.forEach(function (chk) {
-            // Retrieve data
             let info = chk.data('detalle');
 
-            // Check if it's a string or object
             if (typeof info === 'string') {
-                try {
-                    info = JSON.parse(info);
-                } catch (e) {
-                    console.error("Error parsing JSON", e);
-                }
+                try { info = JSON.parse(info); } catch (e) { console.error("Error parsing JSON", e); }
             }
 
-            // Ensure array
             if (!Array.isArray(info)) {
-                if (typeof info === 'object' && info !== null) {
-                    info = Object.values(info);
-                } else {
-                    info = [];
-                }
+                if (typeof info === 'object' && info !== null) info = Object.values(info);
+                else info = [];
             }
 
             if (info && info.length > 0) {
                 info.forEach(item => {
+                    let key = item.COD_PRODUCTO;
+                    if (!groupedProducts[key]) {
+                        groupedProducts[key] = {
+                            COD_PRODUCTO: item.COD_PRODUCTO,
+                            NOM_PRODUCTO: item.NOM_PRODUCTO,
+                            NOM_CATEGORIA_MEDIDA: item.NOM_CATEGORIA_MEDIDA || '',
+                            NOM_CATEGORIA_FAMILIA: item.NOM_CATEGORIA_FAMILIA || '',
+                            CANTIDAD: 0,
+                            STOCK: 0,
+                            RESERVADO: 0,
+                            DIFERENCIA: 0,
+                            DETALLE_POR_AREA: []
+                        };
+                    }
+
+                    groupedProducts[key].CANTIDAD += parseFloat(item.CANTIDAD || 0);
+                    groupedProducts[key].STOCK += parseFloat(item.STOCK || 0);
+                    groupedProducts[key].RESERVADO += parseFloat(item.RESERVADO || 0);
+
+                    if (item.DETALLE_POR_AREA) {
+                        groupedProducts[key].DETALLE_POR_AREA.push(item.DETALLE_POR_AREA);
+                    }
                     totalDetalles++;
-
-                    // Asegurar valores numericos
-                    let cantidad = parseFloat(item.CANTIDAD || 0).toFixed(2);
-                    let stock = parseFloat(item.STOCK || 0).toFixed(2);
-                    let reservado = parseFloat(item.RESERVADO || 0).toFixed(2);
-                    let diferencia = parseFloat(item.DIFERENCIA || 0).toFixed(2);
-                    let detalleArea = item.DETALLE_POR_AREA || '';
-
-                    // Escapar comillas en detalleArea si es necesario para el atributo data
-                    // Pero jquery .data() las maneja bien si no son atributos HTML literales conflictivos.
-                    // Lo mejor es usar single quotes para el atributo HTML y la variable dentro.
-
-                    tbody.append(`
-                        <tr class="fila-detalle-general" data-detalle-area='${detalleArea}' data-nombre='${item.NOM_PRODUCTO}'>
-                            <td>${item.COD_PRODUCTO}</td>
-                            <td>${item.NOM_PRODUCTO}</td>
-                            <td>${item.NOM_CENTRO || ''}</td>
-                            <td>${item.NOM_CATEGORIA_MEDIDA || ''}</td>
-                            <td class="text-center font-bold">${cantidad}</td>
-                            <td class="text-center">${stock}</td>
-                            <td class="text-center">${reservado}</td>
-                            <td class="text-center">${diferencia}</td>
-                            <td>${item.NOM_CATEGORIA_FAMILIA || ''}</td>
-                        </tr>
-                    `);
                 });
             }
         });
 
+        // RENDERIZADO DE LAS FILAS AGRUPADAS
+        Object.values(groupedProducts).forEach(item => {
+
+            let sum_diff = item.CANTIDAD - item.STOCK + item.RESERVADO;
+            let combinedDetalle = item.DETALLE_POR_AREA.join(' [SEP] ');
+
+            tbody.append(`
+                <tr class="fila-detalle-general" data-detalle-area="${combinedDetalle}" data-nombre="${item.NOM_PRODUCTO}">
+                    <td>${item.COD_PRODUCTO}</td>
+                    <td>${item.NOM_PRODUCTO}</td>
+                    <td>${item.NOM_CATEGORIA_MEDIDA}</td>
+                    <td class="text-center font-bold">${item.CANTIDAD.toFixed(2)}</td>
+                    <td class="text-center">${item.STOCK.toFixed(2)}</td>
+                    <td class="text-center">${item.RESERVADO.toFixed(2)}</td>
+                    <td class="text-center">${sum_diff.toFixed(2)}</td>
+                    <td>${item.NOM_CATEGORIA_FAMILIA}</td>
+                </tr>
+            `);
+        });
+
         if (totalDetalles === 0) {
-            tbody.append('<tr><td colspan="9" class="text-center">No se encontraron detalles.</td></tr>');
+            tbody.append('<tr><td colspan="8" class="text-center">No se encontraron detalles.</td></tr>');
         }
     });
 
@@ -1967,6 +2077,7 @@ $(document).on('click', '#btn-aprobar-consolidado', function () {
                         let area = partes[2] ? partes[2].trim() : '';
                         let glosa = partes[3] ? partes[3].trim() : '-';
                         let cantidad = partes[4] ? partes[4].trim() : "0.00";
+                        let centro = partes[5] ? partes[5].trim() : ''; // 🔥 Nuevo: Centro
 
                         // Limpieza de cantidad
                         let cantFloat = parseFloat(cantidad);
@@ -1976,8 +2087,9 @@ $(document).on('click', '#btn-aprobar-consolidado', function () {
                             <tr>
                                 <td class="text-center">${fecha}</td>
                                 <td class="text-center font-bold">${id}</td>
-                                <td>${area}</td>
-                                <td class="text-muted small">${glosa}</td>
+                                <td class="text-center font-bold>${area}</td>
+                                <td class="text-center font-bold">${centro}</td>
+                                <td class="small">${glosa}</td>
                                 <td class="text-center font-bold" style="font-size: 1.1em;">
                                     ${cantFloat.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                 </td>
@@ -2155,6 +2267,7 @@ $(document).on('click', '#btn-aprobar-consolidado', function () {
                         let area = partes[2] ? partes[2].trim() : '';
                         let glosa = partes[3] ? partes[3].trim() : '-';
                         let cantidad = partes[4] ? partes[4].trim() : "0.00";
+                        let centro = partes[5] ? partes[5].trim() : ''; // 🔥 Nuevo: Centro
 
                         // Limpieza de cantidad
                         let cantFloat = parseFloat(cantidad);
@@ -2164,8 +2277,9 @@ $(document).on('click', '#btn-aprobar-consolidado', function () {
                             <tr>
                                 <td class="text-center">${fecha}</td>
                                 <td class="text-center font-bold">${id}</td>
-                                <td>${area}</td>
-                                <td class="text-muted small">${glosa}</td>
+                                <td class="text-center font-bold">${area}</td>
+                                <td class="text-center font-bold">${centro}</td>
+                                <td class="small">${glosa}</td>
                                 <td class="text-center font-bold" style="font-size: 1.1em;">
                                     ${cantFloat.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                 </td>

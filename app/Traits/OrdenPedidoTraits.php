@@ -598,6 +598,8 @@ trait OrdenPedidoTraits
                       AND RA.TXT_TABLA = 'WEB.ORDEN_PEDIDO'
                       AND RA.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
                       AND OPD.COD_PRODUCTO = D.COD_PRODUCTO
+                              AND OPD.ACTIVO = 1
+                      AND OPD.ACTIVO = 1
                     GROUP BY 
                         OP.FEC_PEDIDO,
                         OP.ID_PEDIDO,
@@ -651,6 +653,7 @@ trait OrdenPedidoTraits
                               AND RA.TXT_TABLA = 'WEB.ORDEN_PEDIDO'
                               AND RA.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
                               AND OPD.COD_PRODUCTO = D.COD_PRODUCTO
+                              AND OPD.ACTIVO = 1
                             GROUP BY 
                                 OP.FEC_PEDIDO,
                                 OP.ID_PEDIDO,
@@ -671,7 +674,9 @@ trait OrdenPedidoTraits
             ->get();
 
         return $query;
-    }    private function lg_lista_cabecera_pedido_consolidado_general($empresa_id, $mes_pedido, $anio_pedido)    {
+    }
+    private function lg_lista_cabecera_pedido_consolidado_general($empresa_id, $mes_pedido, $anio_pedido)
+    {
         $empresa_session_id = Session::get('empresas')->COD_EMPR;
 
         $query = DB::connection('sqlsrv')
@@ -704,9 +709,12 @@ trait OrdenPedidoTraits
                                         OPD.CANTIDAD
                                     )
                                 ) AS VARCHAR(20))
+                            + ' [FLD] ' + CEN_ORIG.NOM_CENTRO
                         FROM CMP.REFERENCIA_ASOC RA
                         INNER JOIN WEB.ORDEN_PEDIDO OP
                             ON OP.ID_PEDIDO = RA.COD_TABLA
+                        INNER JOIN ALM.CENTRO CEN_ORIG
+                            ON CEN_ORIG.COD_CENTRO = OP.COD_CENTRO
                         INNER JOIN WEB.ORDEN_PEDIDO_DETALLE OPD
                             ON OP.ID_PEDIDO = OPD.ID_PEDIDO
                         WHERE RA.COD_TABLA_ASOC = C.ID_PEDIDO_CONSOLIDADO
@@ -714,11 +722,14 @@ trait OrdenPedidoTraits
                           AND RA.TXT_TABLA = 'WEB.ORDEN_PEDIDO'
                           AND RA.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
                           AND OPD.COD_PRODUCTO = D.COD_PRODUCTO
+                              AND OPD.ACTIVO = 1
+                          AND OPD.ACTIVO = 1
                         GROUP BY 
                             OP.FEC_PEDIDO,
                             OP.ID_PEDIDO,
                             OP.TXT_AREA,
-                            OP.TXT_GLOSA
+                            OP.TXT_GLOSA,
+                            CEN_ORIG.NOM_CENTRO
                         ORDER BY OP.FEC_PEDIDO
                         FOR XML PATH(''), TYPE
                     ).value('.', 'NVARCHAR(MAX)'), 1, 7, '') AS DETALLE_POR_AREA
@@ -774,7 +785,8 @@ trait OrdenPedidoTraits
             ->get()
             ->groupBy('ID_PEDIDO_CONSOLIDADO');
 
-        return $query;    }
+        return $query;
+    }
 
     private function lg_lista_cabecera_pedido_consolidado_general_terminado()
     {
@@ -836,6 +848,8 @@ trait OrdenPedidoTraits
                               AND RA_OP.TXT_TABLA = 'WEB.ORDEN_PEDIDO'
                               AND RA_OP.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
                               AND OPD.COD_PRODUCTO = D.COD_PRODUCTO
+                              AND OPD.ACTIVO = 1
+                              AND OPD.ACTIVO = 1
                               AND RA_OP.COD_TABLA_ASOC IN (
                                     SELECT RA_CONS.COD_TABLA
                                     FROM CMP.REFERENCIA_ASOC RA_CONS
@@ -910,6 +924,7 @@ trait OrdenPedidoTraits
                               AND RA_OP.TXT_TABLA = 'WEB.ORDEN_PEDIDO'
                               AND RA_OP.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
                               AND OPD.COD_PRODUCTO = D.COD_PRODUCTO
+                              AND OPD.ACTIVO = 1
                             GROUP BY 
                                 OP.FEC_PEDIDO,
                                 OP.ID_PEDIDO,
