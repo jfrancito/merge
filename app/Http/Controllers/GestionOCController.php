@@ -1290,7 +1290,7 @@ class GestionOCController extends Controller
 
 
 
-                        $fedocumento_e          =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->whereNotIn('COD_ESTADO',['','ETM0000000000006'])
+                        $fedocumento_e          =   FeDocumento::whereNotIn('COD_ESTADO',['','ETM0000000000006'])
                                                     ->where('RUC_PROVEEDOR','=',$factura->getcompany()->getruc())
                                                     ->where('SERIE','=',$factura->getserie())
                                                     ->where('NUMERO','=',$factura->getcorrelativo())
@@ -1770,7 +1770,7 @@ class GestionOCController extends Controller
 
 
 
-                        $fedocumento_e          =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->whereNotIn('COD_ESTADO',['','ETM0000000000006'])
+                        $fedocumento_e          =   FeDocumento::whereNotIn('COD_ESTADO',['','ETM0000000000006'])
                                                     ->where('RUC_PROVEEDOR','=',$factura->getcompany()->getruc())
                                                     ->where('SERIE','=',$factura->getserie())
                                                     ->where('NUMERO','=',$factura->getcorrelativo())
@@ -1785,8 +1785,6 @@ class GestionOCController extends Controller
                         if($factura->getClient()->getnumDoc()!= Session::get('empresas')->NRO_DOCUMENTO){
                             return Redirect::back()->with('errorurl', 'El xml no corresponde a la empresa '.Session::get('empresas')->NRO_DOCUMENTO);
                         }
-
-
 
 
                         //dd($factura);
@@ -4268,7 +4266,7 @@ class GestionOCController extends Controller
 
                         //VALIDAR QUE YA EXISTE ESTE XML
 
-                        $fedocumento_e          =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->whereNotIn('COD_ESTADO',['','ETM0000000000006'])
+                        $fedocumento_e          =   FeDocumento::whereNotIn('COD_ESTADO',['','ETM0000000000006'])
                                                     ->where('RUC_PROVEEDOR','=',$factura->getcompany()->getruc())
                                                     ->where('SERIE','=',$factura->getserie())
                                                     ->where('NUMERO','=',$factura->getcorrelativo())
@@ -4741,7 +4739,7 @@ class GestionOCController extends Controller
 
                                 //VALIDAR QUE YA EXISTE ESTE XML
 
-                                $fedocumento_e          =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->whereNotIn('COD_ESTADO',['','ETM0000000000006'])
+                                $fedocumento_e          =   FeDocumento::whereNotIn('COD_ESTADO',['','ETM0000000000006'])
                                                             ->where('RUC_PROVEEDOR','=',$factura->getcompany()->getruc())
                                                             ->where('SERIE','=',$factura->getserie())
                                                             ->where('NUMERO','=',$factura->getcorrelativo())
@@ -5092,7 +5090,7 @@ class GestionOCController extends Controller
 
                         //VALIDAR QUE YA EXISTE ESTE XML
 
-                        $fedocumento_e          =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->whereNotIn('COD_ESTADO',['','ETM0000000000006'])
+                        $fedocumento_e          =   FeDocumento::whereNotIn('COD_ESTADO',['','ETM0000000000006'])
                                                     ->where('RUC_PROVEEDOR','=',$factura->getcompany()->getruc())
                                                     ->where('SERIE','=',$factura->getserie())
                                                     ->where('NUMERO','=',$factura->getcorrelativo())
@@ -5394,7 +5392,6 @@ class GestionOCController extends Controller
                         return Redirect::back()->with('errorurl', 'Existe una Orden de Compra Anticipo que esta en camino de aprobacion '.$ocas->LOTE);
                     }
                 }
-
 
                 //ANTICIPO
                 $ANTIPOC_OC = DB::table('FE_REF_ASOC')

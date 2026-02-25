@@ -1288,7 +1288,7 @@ class GestionEstibaController extends Controller
         $combocb                =   array('' => "Seleccione Cuenta Bancaria");
 
         if($fereftop1->OPERACION == 'DOCUMENTO_INTERNO_COMPRA'){
-            $combodocumento         =   array('DCC0000000000043' => 'LIQUIDACION COMPRA');
+            $combodocumento         =   array('DCC0000000000043' => 'LIQUIDACION COMPRA','DCC0000000000002' => 'FACTURA ELECTRONICA');
             $documento_id           =   'DCC0000000000043';
         }else{
             $combodocumento         =   array('DCC0000000000002' => 'FACTURA ELECTRONICA' , 'DCC0000000000013' => 'RECIBO POR HONORARIO');
