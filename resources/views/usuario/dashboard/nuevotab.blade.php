@@ -18,10 +18,12 @@
                       $countnoc    =   $count_x_aprobar_noc+$count_observados_noc+$count_observadosnoc_le;
                       $countnod    =   $count_x_aprobar_nod+$count_observados_nod+$count_observadosnod_le;
                       $countoca    =   $count_x_aprobar_oca+$count_observados_oca+$count_observadosoca_le;
+                      $countcom    =   $count_x_aprobar_com+$count_observados_com+$count_observadosoca_com;
+
 
                       $countvl    =   $count_x_aprobar_vl;
                       $countrenta =   $count_x_aprobar_renta;
-                      $cantotal   =   $countoc+$countcon+$countest+$countdip+$countdis+$countdib+$countrenta+$countdic+$countlqa+$countpgs+$countnoc+$countnod+$countoca;
+                      $cantotal   =   $countoc+$countcon+$countest+$countdip+$countdis+$countdib+$countrenta+$countdic+$countlqa+$countpgs+$countnoc+$countnod+$countoca+$countcom;
                     @endphp
 
                     @if($trol->ind_uc == 1)
@@ -171,7 +173,14 @@
                             </a>
                         </li>
 
-
+                        <li class="nav-item">
+                            <a class="nav-link category-tab" data-category="com">
+                                <span class="nav-text">COMISION </span>
+                                <div class="notification-container">
+                                    <span class="notification-badge">{{$countcom}}</span>
+                                </div>
+                            </a>
+                        </li>
 
 
 
@@ -255,7 +264,9 @@
                 @include('usuario.dashboard.oca')
             </div>
 
-
+            <div id="com" class="category-content">
+                @include('usuario.dashboard.com')
+            </div>
 
 
         </main>

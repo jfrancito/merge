@@ -1372,6 +1372,26 @@ class GestionUsuarioContactoController extends Controller
                 if($fedocumento->MODO_REPARABLE == 'ARCHIVO_VIRTUAL')
                 {
 
+
+                    $descripcion        =   $request['descripcion'];
+                    if(rtrim(ltrim($descripcion)) != ''){
+                        //HISTORIAL DE DOCUMENTO APROBADO
+                        $documento                              =   new FeDocumentoHistorial;
+                        $documento->ID_DOCUMENTO                =   $fedocumento->ID_DOCUMENTO;
+                        $documento->DOCUMENTO_ITEM              =   $fedocumento->DOCUMENTO_ITEM;
+                        $documento->FECHA                       =   $this->fechaactual;
+                        $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+                        $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+                        $documento->TIPO                        =   'COMENTARIO CONTABILIDAD REPARABLE';
+                        $documento->MENSAJE                     =   $descripcion;
+                        $documento->save();
+                        //geolocalizacion
+                        $device_info       =   $request['device_info'];
+                        $this->con_datos_de_la_pc($device_info,$fedocumento,'RECOMENDACION POR USUARIO CONTACTO');
+                        //geolocalización
+                    }
+
+
                     $tarchivos              =   CMPDocAsociarCompra::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->where('COD_ESTADO','=',1)
                                                 ->whereNotIn('COD_CATEGORIA_DOCUMENTO', $arrayarchivos)
                                                 ->get();
