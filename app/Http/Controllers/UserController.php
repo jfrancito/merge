@@ -1714,11 +1714,11 @@ class UserController extends Controller {
 		$count_observadosoca_le 			= 	0;
 
 		//orden compra anticipo
-        $url_obs_oca 					    =	'';
-		$urloca 							=	'';
-		$count_x_aprobar_oca 				= 	0;
-		$count_observados_oca				= 	0;
-		$count_observadosoca_le 			= 	0;
+        $url_obs_com 					    =	'';
+		$urlcom 							=	'';
+		$count_x_aprobar_com 				= 	0;
+		$count_observados_com				= 	0;
+		$count_observadosoca_com 			= 	0;
 
 
 
@@ -1847,6 +1847,7 @@ class UserController extends Controller {
 				$urlnoc 					=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=NOTA_CREDITO';
 				$urlnod 					=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=NOTA_DEBITO';
 				$urloca 					=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=ORDEN_COMPRA_ANTICIPO';
+				$urlcom 					=	'/gestion-de-contabilidad-aprobar/g56?operacion_id=COMISION';
 
     			$urllg 					=	'/gestion-de-aprobacion-liquidacion-gastos-contabilidad/xvr';
     			$urlrenta				=	'/gestion-de-aprobar-cuarta-categoria/YWp';
@@ -2010,6 +2011,18 @@ class UserController extends Controller {
 
 	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_oca_total_cont_obs_levantadas($cod_empresa,$operacion_id);
 				$count_observadosoca_le 	= 	count($listadatosob);
+
+
+				//COMISION
+				$operacion_id 			=	'COMISION';
+        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_cont_estiba($cod_empresa,$operacion_id);
+				$count_x_aprobar_com 	= 	 count($listadatos);
+
+	        	$lisadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_estiba_obs($cod_empresa,$operacion_id);
+				$count_observados_com 	= 	count($lisadatosob);
+
+	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_estiba_levantadas($cod_empresa,$operacion_id);
+				$count_observadosoca_com 	= 	count($listadatosob);
 
 			}
 			//ADMINISTRACION
@@ -2248,6 +2261,7 @@ class UserController extends Controller {
 		}
 
 
+
 		return View::make('bienvenido',
 						 [
 						 	'usuario' 					=> $usuario,
@@ -2282,12 +2296,15 @@ class UserController extends Controller {
 						 	'count_observadosoca_le' 	=> $count_observadosoca_le,
 						 	'urloca' 					=> $urloca,
 
+						 	'urlcom' 					=> $urlcom,
+						 	'count_x_aprobar_com' 		=> $count_x_aprobar_com,
+						 	'count_observados_com' 		=> $count_observados_com,
+						 	'count_observadosoca_com' 	=> $count_observadosoca_com,
+
 						 	'count_x_aprobar_lqa' 		=> $count_x_aprobar_lqa,
 						 	'count_observados_lqa' 		=> $count_observados_lqa,
 						 	'count_observadoslqa_le' 	=> $count_observadoslqa_le,
 						 	'urllqa' 					=> $urllqa,
-
-
 
 						 	'urlestiba' 				=> $urlestiba,
 						 	'count_reparables_est' 		=> $count_reparables_est,
