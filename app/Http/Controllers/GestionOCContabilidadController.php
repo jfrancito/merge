@@ -4795,8 +4795,8 @@ class GestionOCContabilidadController extends Controller
             $combo_moneda = $this->gn_generacion_combo_categoria('MONEDA', 'Seleccione moneda', '');
             $combo_tipo_documento = $this->gn_generacion_combo_tipo_documento_sunat('STD.TIPO_DOCUMENTO', 'COD_TIPO_DOCUMENTO', 'TXT_TIPO_DOCUMENTO', 'Seleccione tipo documento', '');
 
-            $anio_defecto = date('Y', strtotime($fedocumento->FEC_VENTA));
-            $mes_defecto = date('m', strtotime($fedocumento->FEC_VENTA));
+            $anio_defecto = date('Y', strtotime($fedocumento->FEC_VENTA ?? date('Y-m-d')));
+            $mes_defecto = date('m', strtotime($fedocumento->FEC_VENTA ?? date('Y-m-d')));
 
             $array_anio_pc = $this->pc_array_anio_cuentas_contable(Session::get('empresas')->COD_EMPR);
             $combo_anio_pc = $this->gn_generacion_combo_array('Seleccione año', '', $array_anio_pc);
