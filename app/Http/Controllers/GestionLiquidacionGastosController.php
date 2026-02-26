@@ -3254,7 +3254,7 @@ class GestionLiquidacionGastosController extends Controller
             }
 
             $asiento_cabecera_nuevo = WEBAsiento::where('COD_ASIENTO', '=', $codAsiento)->where('COD_ESTADO', '=', 1)->get();
-            $asiento_detalle_nuevo = WEBAsientoMovimiento::where('COD_ASIENTO', '=', $codAsiento)->where('COD_ESTADO', '=', 1)->get();
+            $asiento_detalle_nuevo = WEBAsientoMovimiento::where('COD_ASIENTO', '=', $codAsiento)->where('COD_ESTADO', '=', 1)->where('IND_PRODUCTO', '<>', 2)->get();
 
             DB::commit();
             return response()->json([
