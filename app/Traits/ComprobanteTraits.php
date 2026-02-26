@@ -2973,6 +2973,32 @@ trait ComprobanteTraits
 
         return  $listadatos;
     }
+    private function con_lista_cabecera_comprobante_total_cont_estiba_dic($cliente_id,$operacion_id) {
+
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC'))
+                            ->where('OPERACION','=',$operacion_id)
+                            //->where('FE_DOCUMENTO.ID_DOCUMENTO','=','00000004')
+                            ->where(function ($query) {
+                                $query->where('ind_observacion', '<>', 1)
+                                      ->orWhereNull('ind_observacion');
+                            })
+                            ->where(function ($query) {
+                                $query->where('area_observacion', '=', '')
+                                      //->orwhere('area_observacion', '=', 'UCO')
+                                      ->orWhereIn('area_observacion',['ADM','UCO'])
+                                      ->orWhereNull('area_observacion');
+                            })
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000005')
+                            ->where('FE_DOCUMENTO.IND_CONTABILIDAD_APRO','=','0')
+                            ->orderBy('ind_observacion','asc')
+                            ->orderBy('fecha_pr','asc')
+                            ->get();
+
+        return  $listadatos;
+    }
+
 
     private function con_lista_cabecera_comprobante_total_cont_estiba($cliente_id,$operacion_id) {
 
@@ -3108,7 +3134,23 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
+    private function con_lista_cabecera_comprobante_total_cont_estiba_levantadas_dic($cliente_id,$operacion_id) {
 
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                            //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC'))
+                            ->where('OPERACION','=',$operacion_id)
+                            ->where('ind_observacion','=',0)
+                            ->where('area_observacion','=','CONT')
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000005')
+                            ->where('FE_DOCUMENTO.IND_CONTABILIDAD_APRO','=','0')
+                            ->orderBy('ind_observacion','asc')
+                            ->orderBy('fecha_uc','asc')
+                            ->get();
+
+        return  $listadatos;
+    }
 
     private function con_lista_cabecera_comprobante_total_cont_estiba_levantadas($cliente_id,$operacion_id) {
 
@@ -3214,6 +3256,23 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
+    private function con_lista_cabecera_comprobante_total_cont_estiba_obs_dic($cliente_id,$operacion_id) {
+
+        $listadatos     =   FeDocumento::leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                            //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC'))
+                            ->where('OPERACION','=',$operacion_id)
+                             ->where('ind_observacion','=',1)
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000005')
+                            ->where('FE_DOCUMENTO.IND_CONTABILIDAD_APRO','=','0')
+                            ->orderBy('ind_observacion','asc')
+                            ->orderBy('fecha_uc','asc')
+
+                            ->get();
+
+        return  $listadatos;
+    }
 
     private function con_lista_cabecera_comprobante_total_cont_contrato_obs($cliente_id) {
 
@@ -3322,7 +3381,8 @@ trait ComprobanteTraits
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('ind_observacion','=',0)
                             ->where('area_observacion','=','CONT')
-                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000005')
+                            ->where('FE_DOCUMENTO.IND_CONTABILIDAD_APRO','=','0')
                             ->orderBy('fecha_uc','asc')
                             ->get();
 
@@ -3743,7 +3803,8 @@ trait ComprobanteTraits
                                       ->orWhereIn('area_observacion',['ADM','UCO']);
                             })
 
-                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000005')
+                            ->where('FE_DOCUMENTO.IND_CONTABILIDAD_APRO','=','0')
                             ->orderBy('fecha_uc','asc')
                             ->get();
 
@@ -3878,7 +3939,8 @@ trait ComprobanteTraits
                             ->where('OPERACION','=','LIQUIDACION_COMPRA_ANTICIPO')
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('ind_observacion','=',1)
-                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000003')
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000005')
+                            ->where('FE_DOCUMENTO.IND_CONTABILIDAD_APRO','=','0')
                             ->orderBy('fecha_uc','asc')
                             ->get();
 
