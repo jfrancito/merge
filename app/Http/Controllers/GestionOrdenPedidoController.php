@@ -206,7 +206,6 @@ class GestionOrdenPedidoController extends Controller
 		);
 		$registrosMonto = DB::table('WEB.MONTO_ORDEN_PEDIDO')
 			->where('COD_ESTADO', 1)
-			->where('COD_EMPR', $empresa)
 			->orderBy('MONTO', 'asc')
 			->get();
 
