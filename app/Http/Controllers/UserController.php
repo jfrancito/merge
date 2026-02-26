@@ -1713,7 +1713,7 @@ class UserController extends Controller {
 		$count_observados_oca				= 	0;
 		$count_observadosoca_le 			= 	0;
 
-		//orden compra anticipo
+		//comision
         $url_obs_com 					    =	'';
 		$urlcom 							=	'';
 		$count_x_aprobar_com 				= 	0;
@@ -1934,13 +1934,13 @@ class UserController extends Controller {
 
 				//DOCUMENTO INTERNO COMPRA
 				$operacion_id 			=	'DOCUMENTO_INTERNO_COMPRA';
-        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_cont_estiba($cod_empresa,$operacion_id);
+        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_cont_estiba_dic($cod_empresa,$operacion_id);
 				$count_x_aprobar_dic 	= 	 count($listadatos);
 
-	        	$lisadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_estiba_obs($cod_empresa,$operacion_id);
+	        	$lisadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_estiba_obs_dic($cod_empresa,$operacion_id);
 				$count_observados_dic 	= 	count($listadatosob);
 
-	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_estiba_levantadas($cod_empresa,$operacion_id);
+	        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_cont_estiba_levantadas_dic($cod_empresa,$operacion_id);
 				$count_observadosdic_le 	= 	count($listadatosob);
 
 
