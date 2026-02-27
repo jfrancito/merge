@@ -7600,8 +7600,16 @@ trait ComprobanteTraits
         //total
         $ordencompra_t          =   CMPOrden::where('COD_ORDEN','=',$ordencompra->COD_ORDEN)->first();
 
+        //tiene orden compra con anticipos
+        $totalanticipo = 0;
+        $totalanticipo = DB::table('FE_REF_ASOC')
+            ->where('ID_DOCUMENTO',$ordencompra->COD_ORDEN)
+            ->where('ESTATUS', 'ON')
+            ->where('COD_ESTADO', '1')
+            ->sum('TOTAL_MERGE');
 
-        $total_1 = $ordencompra->CAN_TOTAL+$ordencompra_t->CAN_PERCEPCION-$ordencompra_t->CAN_IMPUESTO_RENTA-$ordencompra_t->CAN_RETENCION;
+
+        $total_1 = $ordencompra->CAN_TOTAL+$ordencompra_t->CAN_PERCEPCION-$ordencompra_t->CAN_IMPUESTO_RENTA-$ordencompra_t->CAN_RETENCION-$totalanticipo;
         $total_2 = $fedocumento->TOTAL_VENTA_XML+$ordencompra_t->CAN_PERCEPCION-$ordencompra_t->CAN_RETENCION;//-$ordencompra_t->CAN_IMPUESTO_RENTA;
 
 
