@@ -30,16 +30,13 @@
                     <tr data_requerimiento_id = "{{$item->ID_DOCUMENTO}}">
                       <td>{{$index+1}}</td>
                       <td class="cell-detail sorting_1" style="position: relative;">
-                        @php
-                          $zona    =   $funcion->con_zona($item->ID_DOCUMENTO);
-                        @endphp
                         <span><b>LOTE : {{$item->ID_DOCUMENTO}} </b> </span>
                         <span><b>PROVEEDOR : </b> {{$item->RZ_PROVEEDOR}}</span>
                         <span><b>CUENTA OSIRIS : </b> {{$NOMBRE_OSIRIS}}</span>
                         <span><b>SERIE : {{$item->SERIE}} </b> </span>
                         <span><b>NUMERO  : {{$item->NUMERO}}</b></span>
                         <span><b>FECHA : </b> {{$item->FEC_VENTA}}</span>
-                        <span><b>ZONA : </b> {{$zona}}</span>
+                        <span><b>CENTRO : </b> {{$item->NOM_CENTRO}}</span>
                       </td>
                       <td class="cell-detail sorting_1" style="position: relative;">
                         <span><b>FORMA PAGO : </b> {{$item->FORMA_PAGO}}</span>
@@ -85,9 +82,6 @@
                                 Revision Comprobante
                               </a>
                             </li>
-
-
-
                           </ul>
                         </div>
                       </td>
@@ -120,6 +114,7 @@
                         <span><b>SERIE : {{$item->SERIE}} </b> </span>
                         <span><b>NUMERO  : {{$item->NUMERO}}</b></span>
                         <span><b>FECHA : </b> {{$item->FEC_VENTA}}</span>
+                        <span><b>CENTRO : </b> {{$item->NOM_CENTRO}}</span>
                       </td>
                       <td class="cell-detail sorting_1" style="position: relative;">
                         <span><b>FORMA PAGO : </b> {{$item->FORMA_PAGO}}</span>
@@ -145,7 +140,6 @@
                           </b>
                         </span>
                       </td>
-
                       <td class="cell-detail sorting_1" style="position: relative;">
                         <span><b>PROVEEDOR : </b>  {{date_format(date_create($item->fecha_pa), 'd-m-Y h:i:s')}}</span>
                         @IF($item->OPERACION != 'DOCUMENTO_INTERNO_COMPRA')
@@ -155,7 +149,6 @@
                           <span style="font-size: 18px;"><b>U. CONTACTO: </b>{{date_format(date_create($item->fecha_uc), 'd-m-Y h:i:s')}}</span>                          
                         @ENDIF
                       </td>
-
                       @include('comprobante.ajax.estados')
                       <td class="rigth">
                         <div class="btn-group btn-hspace">
@@ -166,9 +159,6 @@
                                 Revision Comprobante
                               </a>
                             </li>
-
-
-
                           </ul>
                         </div>
                       </td>
@@ -176,8 +166,6 @@
                   @endforeach
                 </tbody>
               </table>
-
-
             </div>
 
             <div id="observadole" class="tab-pane @if($tab_id=='observadole') active @endif cont">
@@ -202,6 +190,7 @@
                         <span><b>SERIE : {{$item->SERIE}} </b> </span>
                         <span><b>NUMERO  : {{$item->NUMERO}}</b></span>
                         <span><b>FECHA : </b> {{$item->FEC_VENTA}}</span>
+                        <span><b>CENTRO : </b> {{$item->NOM_CENTRO}}</span>
                       </td>
                       <td class="cell-detail sorting_1" style="position: relative;">
                         <span><b>FORMA PAGO : </b> {{$item->FORMA_PAGO}}</span>

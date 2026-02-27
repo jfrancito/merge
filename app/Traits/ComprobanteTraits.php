@@ -7169,27 +7169,29 @@ trait ComprobanteTraits
     private function con_lista_cabecera_comprobante_total_gestion_observados($cliente_id) {
 
         $rol            =       WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
-        if($rol->ind_uc == 1){
 
-        $listadatos     =   FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
-                            ->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
-                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                            ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                            ->where('FE_DOCUMENTO.ind_observacion','=','1')
-                            ->where('FE_DOCUMENTO.area_observacion','<>','UCO')
-                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
-                            ->get();
+
+        if($rol->ind_uc == 1 ||  Session::get('usuario')->rol_id == '1CIX00000049'){
+
+            $listadatos     =   FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+                                ->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                                ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                ->where('FE_DOCUMENTO.ind_observacion','=','1')
+                                ->where('FE_DOCUMENTO.area_observacion','<>','UCO')
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                ->get();
 
         }else{
 
-        $listadatos     =   FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
-                            //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
-                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                            ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                            ->where('FE_DOCUMENTO.ind_observacion','=','1')
-                            ->where('FE_DOCUMENTO.area_observacion','<>','UCO')
-                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
-                            ->get();
+            $listadatos     =   FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+                                //->where('FE_DOCUMENTO.COD_CONTACTO','=',$cliente_id)
+                                ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                ->where('FE_DOCUMENTO.ind_observacion','=','1')
+                                ->where('FE_DOCUMENTO.area_observacion','<>','UCO')
+                                ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
+                                ->get();
         }
 
 
@@ -7205,7 +7207,7 @@ trait ComprobanteTraits
 
 
 
-        if(Session::get('usuario')->id== '1CIX00000001'){
+        if(Session::get('usuario')->id== '1CIX00000001' || Session::get('usuario')->rol_id == '1CIX00000049'){
 
             $listadatos          =      FeDocumento::where('OPERACION','=',$operacion_id)
                                         ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
