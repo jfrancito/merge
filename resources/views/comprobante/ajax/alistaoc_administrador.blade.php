@@ -77,6 +77,13 @@
               </li>
               @endif
 
+              <li>
+                <a href="{{ url('/cambiar-orden-compra-anticipo/'.$procedencia.'/'.$idopcion.'/'.substr($item->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($item->COD_ORDEN, -10))) }}">
+                  Cambiar OC Anticipo
+                </a>  
+              </li>
+
+
             </ul>
           </div>
         </td>

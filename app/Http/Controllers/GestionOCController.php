@@ -7189,7 +7189,6 @@ class GestionOCController extends Controller
     }
 
 
-
     public function actionQuitarArchivoUC($procedencia,$idopcion, $prefijo, $idordencompra, Request $request)
     {
 
@@ -7287,6 +7286,39 @@ class GestionOCController extends Controller
 
 
         }
+    }
+
+
+
+    public function actionAgregarOCA($procedencia,$idopcion, $prefijo, $idordencompra, Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        $idoc                   =   $this->funciones->decodificarmaestraprefijo($idordencompra,$prefijo);
+        $ordencompra            =   $this->con_lista_cabecera_comprobante_idoc_actual($idoc);
+        $detalleordencompra     =   $this->con_lista_detalle_comprobante_idoc_actual($idoc);
+
+
+        //dd($idoc);
+
+        CMPOrden::where('COD_ORDEN','=',$idoc)
+                    ->update(
+                        [
+                            'IND_TIPO_COMPRA'=>'A',
+                            'FEC_USUARIO_MODIF_AUD'=>$this->fechaactual,
+                            'COD_USUARIO_MODIF_AUD'=>Session::get('usuario')->id
+                        ]
+                    );
+
+
+        return Redirect::to('/gestion-de-orden-compra/'.$idopcion)->with('bienhecho', 'Se realizo el cambio de las orden  : '.$ordencompra->COD_ORDEN.' registrado con exito');
+
+
+
+
     }
 
 
