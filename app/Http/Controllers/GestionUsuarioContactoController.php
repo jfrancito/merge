@@ -437,14 +437,14 @@ class GestionUsuarioContactoController extends Controller
             // Construir el array de URLs
             $initialPreview = [];
             foreach ($archivospdf as $archivo) {
-                $initialPreview[] = route('serve-fileliquidacioncompraanticipo', ['file' => $archivo->NOMBRE_ARCHIVO]);
+                $initialPreview[] = route('serve-fileordencompraanticipo', ['file' => $archivo->NOMBRE_ARCHIVO]);
             }
             $initialPreviewConfig = [];
             foreach ($archivospdf as $key => $archivo) {
                 $initialPreviewConfig[] = [
                     'type'          => "pdf",
                     'caption' => $archivo->NOMBRE_ARCHIVO,
-                    'downloadUrl' => route('serve-fileliquidacioncompraanticipo', ['file' => $archivo->NOMBRE_ARCHIVO])
+                    'downloadUrl' => route('serve-fileordencompraanticipo', ['file' => $archivo->NOMBRE_ARCHIVO])
                 ];
             }
 
