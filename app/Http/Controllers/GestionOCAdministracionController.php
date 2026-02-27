@@ -4978,7 +4978,6 @@ class GestionOCAdministracionController extends Controller
                 }
 
 
-
                 $detalleproducto            =   CMPDetalleProducto::where('CMP.DETALLE_PRODUCTO.COD_ESTADO','=',1)
                                                 ->where('CMP.DETALLE_PRODUCTO.COD_TABLA','=',$pedido_id)
                                                 ->orderBy('NRO_LINEA','ASC')
