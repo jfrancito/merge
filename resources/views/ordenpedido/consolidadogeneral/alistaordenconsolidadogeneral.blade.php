@@ -82,3 +82,33 @@
 @endif
 
 
+
+<script>
+$(document).ready(function () {
+
+    // Marcar / Desmarcar todos
+    $('#checkAll').on('change', function () {
+        let isChecked = $(this).is(':checked');
+
+        $('.consolidado_seleccionado').prop('checked', isChecked);
+
+        // Opcional: resaltar filas seleccionadas
+        $('.consolidado_seleccionado').each(function () {
+            $(this).closest('tr').toggleClass('seleccionado', isChecked);
+        });
+    });
+
+    // Si desmarcan uno manualmente, actualizar cabecera
+    $(document).on('change', '.consolidado_seleccionado', function () {
+
+        let total = $('.consolidado_seleccionado').length;
+        let marcados = $('.consolidado_seleccionado:checked').length;
+
+        $('#checkAll').prop('checked', total === marcados);
+
+        // Resaltar fila individual
+        $(this).closest('tr').toggleClass('seleccionado', $(this).is(':checked'));
+    });
+
+});
+</script>
