@@ -2,6 +2,7 @@
     $estado_consolidado = $listadetalle->first()->COD_ESTADO ?? null;
 @endphp
 
+@if($estado_consolidado != 'ETM0000000000005')
 <div class="row" style="margin-bottom: 15px;">
     <div class="col-xs-12 text-right">
       
@@ -15,6 +16,7 @@
 
     </div>
 </div>
+@endif
 
 <style>
     .btn-detalle-consolidado {
@@ -31,6 +33,13 @@
         margin-right: 6px;
         font-size: 16px;
     }
+    .input-cantidad-pequena {
+    width: 80px;
+    height: 28px;
+    font-size: 12px;
+    padding: 2px 6px;
+    text-align: center;
+}
 </style>
 
 <table class="table table-striped table-bordered table-hover td-color-borde td-padding-7 display nowrap" 
@@ -44,6 +53,7 @@
             <th>STOCK</th>
             <th>RESERVADO</th>
             <th>DIFERENCIA</th>
+            <th>CAN COMPRAR </th>
             <th>FAMILIA</th>
         </tr>
     </thead>
@@ -62,6 +72,16 @@
                 <td>{{ number_format($item->STOCK, 2) }}</td>
                 <td>{{ number_format($item->RESERVADO, 2) }}</td>
                 <td>{{ number_format($item->DIFERENCIA, 2) }}</td>
+       <td style="width:90px;">
+    <input type="number" 
+           class="form-control input-sm can_comprar_cant" 
+           style="height:28px; font-size:12px; padding:2px 6px; text-align:center;"
+           value="{{ (isset($item->CAN_COMPRADA) && !is_null($item->CAN_COMPRADA)) ? intval($item->CAN_COMPRADA) : ($item->DIFERENCIA < 0 ? 0 : intval($item->DIFERENCIA)) }}" 
+           min="0" 
+           oninput="if(this.value<0)this.value=0"
+           step="1"
+           @if($estado_consolidado == 'ETM0000000000005') readonly @endif>
+</td>
                 <td>{{ $item->NOM_CATEGORIA_FAMILIA }}</td>
             </tr>
         @empty

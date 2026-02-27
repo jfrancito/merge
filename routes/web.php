@@ -183,8 +183,8 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/aprobar-liquidacion-gasto-jefe-historial/{idopcion}/{idordencompra}', 'GestionLiquidacionGastosController@actionAprobarJefeLGHistorial');
 
-    Route::post('/gestion-asiento', 'GestionLiquidacionGastosController@actionAjaxGestionAsiento');
-    Route::post('/crear-asiento-reparable', 'GestionLiquidacionGastosController@actionAjaxCrearAsientoReparable');
+	Route::post('/gestion-asiento', 'GestionLiquidacionGastosController@actionAjaxGestionAsiento');
+	Route::post('/crear-asiento-reparable', 'GestionLiquidacionGastosController@actionAjaxCrearAsientoReparable');
 
 	Route::any('/gestion-de-liquidacion-gastos-adm/{idopcion}', 'GestionLiquidacionGastosController@actionListarLGValidado');
 	Route::any('/ajax-buscar-documento-lg', 'GestionLiquidacionGastosController@actionListarAjaxBuscarDocumentoLG');
@@ -1039,11 +1039,13 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-detalle-producto-consolidado-generado', 'ConsolidadoOrdenPedidoController@actionAjaxDetalleProductoConsolidadoGenerado');
 	Route::post('/ajax-aprobar-consolidado-op', 'ConsolidadoOrdenPedidoController@actionAjaxAprobarConsolidado');
 	Route::post('/ajax-guardar-cantidad-comprada-op', 'ConsolidadoOrdenPedidoController@actionAjaxGuardarCantidadComprada');
+	Route::post('/ajax-guardar-cantidad-comprada-general-op', 'ConsolidadoGeneralOrdenPedidoController@actionAjaxGuardarCantidadCompradaGeneral');
 
 	Route::get('/consolidado-general-orden-pedido/{idopcion}', 'ConsolidadoGeneralOrdenPedidoController@actionConsolidadoGeneralOrdenPedido');
 	Route::post('/guardar_consolidado_general', 'ConsolidadoGeneralOrdenPedidoController@actionGuardarConsolidadoGeneral');
 	Route::post('/ajax-listar-detalle-consolidado-general-op', 'ConsolidadoGeneralOrdenPedidoController@actionListarAjaxDetalleConsolidadoGeneralOP');
 	Route::any('/ajax-buscar-consolidado-general-op', 'ConsolidadoGeneralOrdenPedidoController@actionAjaxBuscarConsolidadoGeneralOP');
+	Route::post('/ajax-aprobar-consolidado-general-op', 'ConsolidadoGeneralOrdenPedidoController@actionAjaxAprobarConsolidadoGeneral');
 
 
 	Route::get('/gestion-monto-orden-pedido/{idopcion}', 'MontoOrdenPedidoController@actionMontoOrdenPedido');

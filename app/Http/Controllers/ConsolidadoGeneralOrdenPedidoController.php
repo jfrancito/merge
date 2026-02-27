@@ -264,6 +264,61 @@ class ConsolidadoGeneralOrdenPedidoController extends Controller
         ]);
     }
 
+    public function actionAjaxGuardarCantidadCompradaGeneral(Request $request)
+{
+    $id_consolidado_general = $request->input('id_consolidado_general');
+    $detalles_json           = $request->input('detalles');
+    $detalles                = json_decode($detalles_json, true);
+
+    try {
+        DB::beginTransaction();
+
+        foreach ($detalles as $det) {
+            DB::connection('sqlsrv')->table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE')
+                ->where('ID_PEDIDO_CONSOLIDADO_GENERAL', $id_consolidado_general)
+                ->where('COD_PRODUCTO', $det['cod_producto'])
+                ->update([
+                    'CAN_COMPRADA'          => $det['cantidad'],
+                    'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id
+                ]);
+        }
+
+        DB::commit();
+        return response()->json(['success' => true, 'mensaje' => 'Cantidades actualizadas correctamente.']);
+
+    } catch (\Exception $e) {
+        DB::rollback();
+        return response()->json(['success' => false, 'mensaje' => 'Error: ' . $e->getMessage()]);
+    }
+}
+
+public function actionAjaxAprobarConsolidadoGeneral(Request $request)
+{
+    $id_consolidado_general = $request->input('id_consolidado_general');
+    try {
+        DB::beginTransaction();
+
+        DB::connection('sqlsrv')->table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL')
+            ->where('ID_PEDIDO_CONSOLIDADO_GENERAL', $id_consolidado_general)
+            ->update([
+                'COD_ESTADO'            => 'ETM0000000000005', // APROBADO
+                'TXT_ESTADO'            => 'APROBADO',
+                'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id,
+                'FEC_USUARIO_MODIF_AUD' => date('Y-m-d\TH:i:s')
+
+                   
+            ]);
+
+        DB::commit();
+        return response()->json(['success' => true, 'mensaje' => 'Consolidado general aprobado correctamente.']);
+
+    } catch (\Exception $e) {
+        DB::rollback();
+        return response()->json(['success' => false, 'mensaje' => 'Error al aprobar: ' . $e->getMessage()]);
+    }
+}
+
+
 }
 
    

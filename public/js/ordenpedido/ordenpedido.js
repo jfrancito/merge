@@ -505,7 +505,7 @@ $(document).ready(function () {
         let id_pedido = $(this).data('id');
         let estado = $(this).data('estado');
 
-      // SOLO PERMITIR EDITAR CUANDO ESTADO SEA ETM0000000000001
+        // SOLO PERMITIR EDITAR CUANDO ESTADO SEA ETM0000000000001
         if (estado !== 'ETM0000000000001') {
             modalBonito({
                 tipo: 'warn',
@@ -2232,6 +2232,71 @@ $(document).ready(function () {
         });
     }
 
+    // Evento para GUARDAR las cantidades compradas editadas GENERAL
+    $(document).on('click', '#btn-guardar-detalle-consolidado-editado-general', function () {
+        let detalles = [];
+        let _token = $('#token').val();
+
+        $('.fila-detalle-consolidado-general').each(function () {
+            let cod_producto = $(this).data('id');
+            let cantidad = $(this).find('.can_comprar_cant').val();
+            if (cod_producto) {
+                detalles.push({
+                    cod_producto: cod_producto,
+                    cantidad: cantidad
+                });
+            }
+        });
+
+        if (id_consolidado_general_seleccionado === '' || detalles.length === 0) {
+            modalBonito({
+                tipo: 'error',
+                titulo: 'Error',
+                mensaje: 'No hay datos para guardar.'
+            });
+            return;
+        }
+
+        abrircargando();
+
+        $.ajax({
+            type: 'POST',
+            url: carpeta + '/ajax-guardar-cantidad-comprada-general-op',
+            data: {
+                _token: _token,
+                id_consolidado_general: id_consolidado_general_seleccionado,
+                detalles: JSON.stringify(detalles)
+            },
+            success: function (res) {
+                cerrarcargando();
+                if (res.success) {
+                    modalBonito({
+                        tipo: 'success',
+                        icono: '✔',
+                        titulo: 'Éxito',
+                        mensaje: res.mensaje
+                    });
+                    buscarDetalleConsolidadoGeneral();
+                } else {
+                    modalBonito({
+                        tipo: 'error',
+                        titulo: 'Error',
+                        mensaje: res.mensaje
+                    });
+                }
+            },
+            error: function (e) {
+                cerrarcargando();
+                console.error(e);
+                modalBonito({
+                    tipo: 'error',
+                    titulo: 'Error',
+                    mensaje: 'Error en la petición al servidor.'
+                });
+            }
+        });
+    });
+
     /* ===============================
        DOBLE CLICK DETALLE CONSOLIDADO GENERAL
        =============================== */
@@ -2295,4 +2360,93 @@ $(document).ready(function () {
         }
     });
 
+    // EVENTO PARA APROBAR EL CONSOLIDADO GENERAL
+    $(document).on('click', '#btn-aprobar-consolidado-general', function () {
+
+    let _token = $('#token').val();
+    let $boton = $(this);
+
+    if (id_consolidado_general_seleccionado === '') {
+        modalBonito({
+            tipo: 'error',
+            titulo: 'Error',
+            mensaje: 'No hay un consolidado general seleccionado.'
+        });
+        return;
+    }
+
+    modalBonito({
+        tipo: 'success',
+        icono: '✅',
+        titulo: 'Aprobar Consolidado General',
+        mensaje: '¿Está seguro de <b>aprobar</b> este consolidado general?',
+        confirmar: true,
+        onConfirm: function () {
+
+            // 🔒 Deshabilitamos botón para evitar doble click
+            $boton.prop('disabled', true);
+
+            // 🔒 Abrimos loader global (bloquea toda la UI)
+            abrircargando();
+
+            $.ajax({
+                type: 'POST',
+                url: carpeta + '/ajax-aprobar-consolidado-general-op',
+                data: {
+                    _token: _token,
+                    id_consolidado_general: id_consolidado_general_seleccionado
+                },
+
+                success: function (res) {
+
+                    if (res.success) {
+
+                        modalBonito({
+                            tipo: 'success',
+                            icono: '✔',
+                            titulo: 'Éxito',
+                            mensaje: res.mensaje
+                        });
+
+                        // 🔒 Mantenemos el loader activo
+                        // 🔒 Bloqueamos todos los botones por seguridad
+                        $('button').prop('disabled', true);
+
+                        // 🔄 Recargamos la página
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1000);
+
+                    } else {
+
+                        cerrarcargando();
+                        $boton.prop('disabled', false);
+
+                        modalBonito({
+                            tipo: 'error',
+                            icono: '❌',
+                            titulo: 'Error',
+                            mensaje: res.mensaje
+                        });
+                    }
+                },
+
+                error: function (e) {
+
+                    cerrarcargando();
+                    $boton.prop('disabled', false);
+
+                    console.error(e);
+
+                    modalBonito({
+                        tipo: 'error',
+                        titulo: 'Error',
+                        mensaje: 'Error en la petición al servidor.'
+                    });
+                }
+            });
+        }
+    });
+});
+  
 });
