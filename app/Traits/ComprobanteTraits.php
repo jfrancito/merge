@@ -7603,10 +7603,12 @@ trait ComprobanteTraits
         //tiene orden compra con anticipos
         $totalanticipo = 0;
         $totalanticipo = DB::table('FE_REF_ASOC')
-            ->where('ID_DOCUMENTO',$ordencompra->COD_ORDEN)
-            ->where('ESTATUS', 'ON')
-            ->where('COD_ESTADO', '1')
-            ->sum('TOTAL_MERGE');
+            ->join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.ID_DOCUMENTO')
+            ->where('FE_REF_ASOC.ID_DOCUMENTO', 'ISRJCL0000002902')
+            ->where('FE_REF_ASOC.ESTATUS', 'ON')
+            ->where('FE_REF_ASOC.COD_ESTADO', 1)
+            ->where('FE_DOCUMENTO.OPERACION_DET', '')
+            ->sum('FE_REF_ASOC.TOTAL_MERGE');
 
 
         $total_1 = $ordencompra->CAN_TOTAL+$ordencompra_t->CAN_PERCEPCION-$ordencompra_t->CAN_IMPUESTO_RENTA-$ordencompra_t->CAN_RETENCION-$totalanticipo;
