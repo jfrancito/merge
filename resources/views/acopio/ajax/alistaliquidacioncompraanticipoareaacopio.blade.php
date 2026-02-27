@@ -49,6 +49,7 @@
                               @endif
                             @endif
                         </span>
+                        <span><b>CENTRO : </b> {{$item->NOM_CENTRO}}</span>
                       </td>
                       <td class="cell-detail sorting_1" style="position: relative;">
                         <span><b>SERIE : {{$item->SERIE}} </b> </span>
@@ -121,6 +122,8 @@
                               @endif
                             @endif
                         </span>
+                        <span><b>CENTRO : </b> {{$item->NOM_CENTRO}}</span>
+
                       </td>
                       <td class="cell-detail sorting_1" style="position: relative;">
                         <span><b>SERIE : {{$item->SERIE}} </b> </span>
@@ -192,7 +195,9 @@
                                   <span class="badge badge-default" style="display: inline-block;">SIN OBSERVACIONES</span>
                               @endif
                             @endif
-                        </span>                     
+                        </span>  
+                        <span><b>CENTRO : </b> {{$item->NOM_CENTRO}}</span>
+                                           
 
                       </td>
                       <td class="cell-detail sorting_1" style="position: relative;">

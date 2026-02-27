@@ -65,7 +65,7 @@ class GestionOCAcopioController extends Controller
         View::share('titulo','Lista comprobantes por aprobar acopio');
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
         //falta usuario contacto
-        $operacion_id       =   'LIQUIDACION_COMPRA_ANTICIPO';
+        $operacion_id       =   'DOCUMENTO_INTERNO_COMPRA';
         $tab_id             =   'oc';
         if(isset($request['operacion_id'])){
             $operacion_id       =   $request['operacion_id'];
@@ -76,21 +76,26 @@ class GestionOCAcopioController extends Controller
         if(isset($request['tab_id'])){
             $tab_id             =   $request['tab_id'];
         }
+
         $combo_operacion    =   array(
                                         'DOCUMENTO_INTERNO_COMPRA' => 'DOCUMENTO INTERNO COMPRA',
                                         'LIQUIDACION_COMPRA_ANTICIPO' => 'LIQUIDACION DE COMPRA ANTICIPO'
                                     );
+
+        $centro_id          =   'CEN0000000000001';
+        $combo_centro       =   $this->gn_combo_centro('Seleccione Centro','');
+
        $array_canjes               =   $this->con_array_canjes();     
         if($operacion_id=='LIQUIDACION_COMPRA_ANTICIPO'){
-            $listadatos         =   $this->aco_lista_cabecera_comprobante_total_acopio_liquidacion_compra_anticipo($cod_empresa);
-            $listadatos_obs     =   $this->aco_lista_cabecera_comprobante_total_acopio_liquidacion_compra_anticipo_obs($cod_empresa);
-            $listadatos_obs_le  =   $this->aco_lista_cabecera_comprobante_total_acopio_liquidacion_compra_anticipo_obs_levantadas($cod_empresa);
+            $listadatos         =   $this->aco_lista_cabecera_comprobante_total_acopio_liquidacion_compra_anticipo_cen($cod_empresa,$centro_id);
+            $listadatos_obs     =   $this->aco_lista_cabecera_comprobante_total_acopio_liquidacion_compra_anticipo_obs_cen($cod_empresa,$centro_id);
+            $listadatos_obs_le  =   $this->aco_lista_cabecera_comprobante_total_acopio_liquidacion_compra_anticipo_obs_levantadas_cen($cod_empresa,$centro_id);
         }else{
             if (in_array($operacion_id, $array_canjes)) {
                 $categoria_id       =   $this->con_categoria_canje($operacion_id);
-                $listadatos         =   $this->aco_lista_cabecera_comprobante_total_acopio_estiba($cod_empresa,$operacion_id);
-                $listadatos_obs     =   $this->aco_lista_cabecera_comprobante_total_acopio_estiba_obs($cod_empresa,$operacion_id);
-                $listadatos_obs_le  =   $this->aco_lista_cabecera_comprobante_total_acopio_estiba_obs_levantadas($cod_empresa,$operacion_id);
+                $listadatos         =   $this->aco_lista_cabecera_comprobante_total_acopio_estiba_cen($cod_empresa,$operacion_id,$centro_id);
+                $listadatos_obs     =   $this->aco_lista_cabecera_comprobante_total_acopio_estiba_obs_cen($cod_empresa,$operacion_id,$centro_id);
+                $listadatos_obs_le  =   $this->aco_lista_cabecera_comprobante_total_acopio_estiba_obs_levantadas_cen($cod_empresa,$operacion_id,$centro_id);
             }
         }
 
@@ -104,6 +109,8 @@ class GestionOCAcopioController extends Controller
                             'funcion'           =>  $funcion,
                             'operacion_id'      =>  $operacion_id,
                             'combo_operacion'   =>  $combo_operacion,
+                            'centro_id'         =>  $centro_id,
+                            'combo_centro'      =>  $combo_centro,
                             'idopcion'          =>  $idopcion,
                          ]);
     }
@@ -113,20 +120,21 @@ class GestionOCAcopioController extends Controller
 
         $operacion_id   =   $request['operacion_id'];
         $idopcion       =   $request['idopcion'];
+        $centro_id      =   $request['centro_id'];
+
 
         $tab_id             =   'oc';
 
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
 
         if($operacion_id=='LIQUIDACION_COMPRA_ANTICIPO'){
-            $listadatos         =   $this->aco_lista_cabecera_comprobante_total_acopio_liquidacion_compra_anticipo($cod_empresa);                    
-            $listadatos_obs     =   $this->aco_lista_cabecera_comprobante_total_acopio_liquidacion_compra_anticipo_obs($cod_empresa);
-            $listadatos_obs_le  =   $this->aco_lista_cabecera_comprobante_total_acopio_liquidacion_compra_anticipo_obs_levantadas($cod_empresa);
+            $listadatos         =   $this->aco_lista_cabecera_comprobante_total_acopio_liquidacion_compra_anticipo_cen($cod_empresa,$centro_id);                    
+            $listadatos_obs     =   $this->aco_lista_cabecera_comprobante_total_acopio_liquidacion_compra_anticipo_obs_cen($cod_empresa,$centro_id);
+            $listadatos_obs_le  =   $this->aco_lista_cabecera_comprobante_total_acopio_liquidacion_compra_anticipo_obs_levantadas_cen($cod_empresa,$centro_id);
         }else{
-            
-            $listadatos         =   $this->aco_lista_cabecera_comprobante_total_acopio_estiba($cod_empresa,$operacion_id);
-            $listadatos_obs     =   $this->aco_lista_cabecera_comprobante_total_acopio_estiba_obs($cod_empresa,$operacion_id);
-            $listadatos_obs_le  =   $this->aco_lista_cabecera_comprobante_total_acopio_estiba_obs_levantadas($cod_empresa,$operacion_id);
+            $listadatos         =   $this->aco_lista_cabecera_comprobante_total_acopio_estiba_cen($cod_empresa,$operacion_id,$centro_id);
+            $listadatos_obs     =   $this->aco_lista_cabecera_comprobante_total_acopio_estiba_obs_cen($cod_empresa,$operacion_id,$centro_id);
+            $listadatos_obs_le  =   $this->aco_lista_cabecera_comprobante_total_acopio_estiba_obs_levantadas_cen($cod_empresa,$operacion_id,$centro_id);
         }
    
         $procedencia        =   'CONT';
