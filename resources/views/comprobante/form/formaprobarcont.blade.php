@@ -7,7 +7,7 @@
             @include('comprobante.form.ordencompra.datosfactura')
         @endif
         @if($fedocumento->OPERACION_DET != 'SIN_XML')
-            @include('comprobante.form.ordencompra.sunat')
+            @include('comprobante.form.ordencompra.sunatconta')
         @endif
         @include('comprobante.form.ordencompra.infodetraccion')
         @include('comprobante.form.ordencompra.ordeningreso')
