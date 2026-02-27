@@ -79,7 +79,7 @@ trait AcopioTraits
                                       ->orWhereNull('area_observacion')
                                       ->orWhereIn('area_observacion',['UCO']);
                             })
-                            //->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000012')
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000012')
                             ->get();
 
         return  $listadatos;
