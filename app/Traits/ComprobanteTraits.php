@@ -3776,7 +3776,7 @@ trait ComprobanteTraits
                             ->where(function ($query) {
                                 $query->where('area_observacion', '=', '')
                                       ->orWhereNull('area_observacion')
-                                      ->orWhereIn('area_observacion',['UCO']);
+                                      ->orWhereIn('area_observacion',['UCO','CONT']);
                             })
 
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
