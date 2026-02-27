@@ -1195,7 +1195,6 @@ class GestionOCValidadoController extends Controller
                 $token           =      $this->generartoken_is();
             }
 
-
             $fechaemision        =      date_format(date_create($fedocumento->FEC_VENTA), 'd/m/Y');
             $rvalidar            =      $this->validar_xml( $token,
                                             $fedocumento->ID_CLIENTE,

@@ -8353,137 +8353,158 @@ trait ComprobanteTraits
 
         $fecha_corte            =   date('Ymd');
 
+ 
+        if(Session::get('usuario')->rol_id =='1CIX00000019' || Session::get('usuario')->rol_id =='1CIX00000052' ){
+            $listadatos = array();
+        }else{
+
+            //UPDATE DE CENTIMOS ORDEN DE COMPRAS
+            DB::update("
+                UPDATE CMP.DOCUMENTO_CTBLE
+                SET CMP.DOCUMENTO_CTBLE.CAN_TOTAL = CMP.ORDEN.CAN_TOTAL , CMP.DOCUMENTO_CTBLE.FEC_USUARIO_MODIF_AUD = GETDATE()
+                FROM FE_DOCUMENTO 
+                INNER JOIN CMP.ORDEN ON FE_DOCUMENTO.ID_DOCUMENTO = CMP.ORDEN.COD_ORDEN
+                INNER JOIN CMP.REFERENCIA_ASOC ON COD_TABLA = COD_ORDEN AND REFERENCIA_ASOC.COD_ESTADO = 1
+                INNER JOIN CMP.DOCUMENTO_CTBLE ON COD_TABLA_ASOC = COD_DOCUMENTO_CTBLE AND COD_CATEGORIA_TIPO_DOC IN ('TDO0000000000001','TDO0000000000002')
+                INNER JOIN CMP.HABILITACION ON CMP.HABILITACION.COD_DOCUMENTO_CTBLE = DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE AND NOM_PRODUCTO = 'COMPRA'
+                WHERE FE_DOCUMENTO.OPERACION = 'ORDEN_COMPRA'
+                AND FE_DOCUMENTO.COD_ESTADO NOT IN ('', 'ETM0000000000006')
+                AND CMP.DOCUMENTO_CTBLE.CAN_TOTAL <> CMP.ORDEN.CAN_TOTAL 
+                AND CMP.DOCUMENTO_CTBLE.CAN_SALDO <> 0
+                AND ABS(CMP.DOCUMENTO_CTBLE.CAN_TOTAL - CMP.ORDEN.CAN_TOTAL) <= 0.1
+                AND CMP.HABILITACION.FEC_HABILITACION >= DATEADD(MONTH, -2, GETDATE())
+            ");
+
+            DB::update("
+                UPDATE CMP.HABILITACION
+                SET CMP.HABILITACION.CAN_IMPORTE = CMP.ORDEN.CAN_TOTAL , CMP.HABILITACION.FEC_USUARIO_MODIF_AUD = GETDATE()
+                FROM FE_DOCUMENTO 
+                INNER JOIN CMP.ORDEN ON FE_DOCUMENTO.ID_DOCUMENTO = CMP.ORDEN.COD_ORDEN
+                INNER JOIN CMP.REFERENCIA_ASOC ON COD_TABLA = COD_ORDEN AND REFERENCIA_ASOC.COD_ESTADO = 1
+                INNER JOIN CMP.DOCUMENTO_CTBLE ON COD_TABLA_ASOC = COD_DOCUMENTO_CTBLE 
+                    AND COD_CATEGORIA_TIPO_DOC IN ('TDO0000000000001', 'TDO0000000000002')
+                INNER JOIN CMP.HABILITACION ON CMP.HABILITACION.COD_DOCUMENTO_CTBLE = DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE 
+                    AND NOM_PRODUCTO = 'COMPRA'
+                WHERE FE_DOCUMENTO.OPERACION = 'ORDEN_COMPRA'
+                AND FE_DOCUMENTO.COD_ESTADO NOT IN ('', 'ETM0000000000006')
+                AND CMP.HABILITACION.CAN_IMPORTE <> CMP.ORDEN.CAN_TOTAL
+                AND CMP.DOCUMENTO_CTBLE.CAN_SALDO <> 0
+                AND ABS(CMP.HABILITACION.CAN_IMPORTE - CMP.ORDEN.CAN_TOTAL) <= 0.1
+                AND CMP.HABILITACION.FEC_HABILITACION >= DATEADD(MONTH, -2, GETDATE())
+            ");
+
+            DB::update("
+                UPDATE CMP.HABILITACION
+                SET CMP.HABILITACION.CAN_CAPITAL_SALDO = CMP.ORDEN.CAN_TOTAL , CMP.HABILITACION.FEC_USUARIO_MODIF_AUD = GETDATE()
+                FROM FE_DOCUMENTO 
+                INNER JOIN CMP.ORDEN 
+                    ON FE_DOCUMENTO.ID_DOCUMENTO = CMP.ORDEN.COD_ORDEN
+                INNER JOIN CMP.REFERENCIA_ASOC 
+                    ON COD_TABLA = COD_ORDEN 
+                    AND REFERENCIA_ASOC.COD_ESTADO = 1
+                INNER JOIN CMP.DOCUMENTO_CTBLE 
+                    ON COD_TABLA_ASOC = COD_DOCUMENTO_CTBLE 
+                    AND COD_CATEGORIA_TIPO_DOC IN ('TDO0000000000001','TDO0000000000002')
+                INNER JOIN CMP.HABILITACION 
+                    ON CMP.HABILITACION.COD_DOCUMENTO_CTBLE = DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE 
+                    AND NOM_PRODUCTO = 'COMPRA'
+                WHERE FE_DOCUMENTO.OPERACION = 'ORDEN_COMPRA'
+                AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
+                AND CMP.HABILITACION.CAN_CAPITAL_SALDO <> CMP.ORDEN.CAN_TOTAL
+                AND CMP.DOCUMENTO_CTBLE.CAN_SALDO <> 0
+                AND ABS(CMP.HABILITACION.CAN_CAPITAL_SALDO - CMP.ORDEN.CAN_TOTAL) <= 0.1
+                AND CMP.HABILITACION.FEC_HABILITACION >= DATEADD(MONTH, -2, GETDATE())
+            ");
 
 
-        //UPDATE DE CENTIMOS ORDEN DE COMPRAS
-        DB::update("
-            UPDATE CMP.DOCUMENTO_CTBLE
-            SET CMP.DOCUMENTO_CTBLE.CAN_TOTAL = CMP.ORDEN.CAN_TOTAL , CMP.DOCUMENTO_CTBLE.FEC_USUARIO_MODIF_AUD = GETDATE()
-            FROM FE_DOCUMENTO 
-            INNER JOIN CMP.ORDEN ON FE_DOCUMENTO.ID_DOCUMENTO = CMP.ORDEN.COD_ORDEN
-            INNER JOIN CMP.REFERENCIA_ASOC ON COD_TABLA = COD_ORDEN AND REFERENCIA_ASOC.COD_ESTADO = 1
-            INNER JOIN CMP.DOCUMENTO_CTBLE ON COD_TABLA_ASOC = COD_DOCUMENTO_CTBLE AND COD_CATEGORIA_TIPO_DOC IN ('TDO0000000000001','TDO0000000000002')
-            INNER JOIN CMP.HABILITACION ON CMP.HABILITACION.COD_DOCUMENTO_CTBLE = DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE AND NOM_PRODUCTO = 'COMPRA'
-            WHERE FE_DOCUMENTO.OPERACION = 'ORDEN_COMPRA'
-            AND FE_DOCUMENTO.COD_ESTADO NOT IN ('', 'ETM0000000000006')
-            AND CMP.DOCUMENTO_CTBLE.CAN_TOTAL <> CMP.ORDEN.CAN_TOTAL 
-            AND CMP.DOCUMENTO_CTBLE.CAN_SALDO <> 0
-            AND ABS(CMP.DOCUMENTO_CTBLE.CAN_TOTAL - CMP.ORDEN.CAN_TOTAL) <= 0.1
-            AND CMP.HABILITACION.FEC_HABILITACION >= DATEADD(MONTH, -2, GETDATE())
-        ");
+            //UPDATE PARA EL ANTICIPO
+            $datos = DB::table('CMP.ORDEN as T1')
+                ->join('FE_DOCUMENTO as FE', 'T1.COD_ORDEN', '=', 'FE.ID_DOCUMENTO')
+                ->join('CMP.REFERENCIA_ASOC as T2', function ($join) {
+                    $join->on('T1.COD_ORDEN', '=', 'T2.COD_TABLA')
+                        ->where('T2.TXT_TABLA', 'CMP.ORDEN')
+                        ->where('T2.TXT_TABLA_ASOC', 'CMP.DOCUMENTO_CTBLE');
+                })
+                ->join('CMP.REFERENCIA_ASOC as T3', function ($join) {
+                    $join->on('T2.COD_TABLA_ASOC', '=', 'T3.COD_TABLA')
+                        ->where('T3.TXT_TABLA', 'CMP.DOCUMENTO_CTBLE')
+                        ->where('T3.TXT_TABLA_ASOC', 'CMP.DOCUMENTO_CTBLE');
+                })
+                ->where('T3.TXT_TIPO_REFERENCIA', 'A')
+                ->where('T1.COD_ORDEN', 'like', '%CL%')
+                ->where('T2.COD_ESTADO', 1)
+                ->where('T3.COD_ESTADO', 1)
+                ->select('FE.ID_DOCUMENTO', DB::raw('SUM(T3.CAN_AUX1) as MONTO'))
+                ->groupBy('FE.ID_DOCUMENTO')
+                ->get();
 
-        DB::update("
-            UPDATE CMP.HABILITACION
-            SET CMP.HABILITACION.CAN_IMPORTE = CMP.ORDEN.CAN_TOTAL , CMP.HABILITACION.FEC_USUARIO_MODIF_AUD = GETDATE()
-            FROM FE_DOCUMENTO 
-            INNER JOIN CMP.ORDEN ON FE_DOCUMENTO.ID_DOCUMENTO = CMP.ORDEN.COD_ORDEN
-            INNER JOIN CMP.REFERENCIA_ASOC ON COD_TABLA = COD_ORDEN AND REFERENCIA_ASOC.COD_ESTADO = 1
-            INNER JOIN CMP.DOCUMENTO_CTBLE ON COD_TABLA_ASOC = COD_DOCUMENTO_CTBLE 
-                AND COD_CATEGORIA_TIPO_DOC IN ('TDO0000000000001', 'TDO0000000000002')
-            INNER JOIN CMP.HABILITACION ON CMP.HABILITACION.COD_DOCUMENTO_CTBLE = DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE 
-                AND NOM_PRODUCTO = 'COMPRA'
-            WHERE FE_DOCUMENTO.OPERACION = 'ORDEN_COMPRA'
-            AND FE_DOCUMENTO.COD_ESTADO NOT IN ('', 'ETM0000000000006')
-            AND CMP.HABILITACION.CAN_IMPORTE <> CMP.ORDEN.CAN_TOTAL
-            AND CMP.DOCUMENTO_CTBLE.CAN_SALDO <> 0
-            AND ABS(CMP.HABILITACION.CAN_IMPORTE - CMP.ORDEN.CAN_TOTAL) <= 0.1
-            AND CMP.HABILITACION.FEC_HABILITACION >= DATEADD(MONTH, -2, GETDATE())
-        ");
-
-        DB::update("
-            UPDATE CMP.HABILITACION
-            SET CMP.HABILITACION.CAN_CAPITAL_SALDO = CMP.ORDEN.CAN_TOTAL , CMP.HABILITACION.FEC_USUARIO_MODIF_AUD = GETDATE()
-            FROM FE_DOCUMENTO 
-            INNER JOIN CMP.ORDEN 
-                ON FE_DOCUMENTO.ID_DOCUMENTO = CMP.ORDEN.COD_ORDEN
-            INNER JOIN CMP.REFERENCIA_ASOC 
-                ON COD_TABLA = COD_ORDEN 
-                AND REFERENCIA_ASOC.COD_ESTADO = 1
-            INNER JOIN CMP.DOCUMENTO_CTBLE 
-                ON COD_TABLA_ASOC = COD_DOCUMENTO_CTBLE 
-                AND COD_CATEGORIA_TIPO_DOC IN ('TDO0000000000001','TDO0000000000002')
-            INNER JOIN CMP.HABILITACION 
-                ON CMP.HABILITACION.COD_DOCUMENTO_CTBLE = DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE 
-                AND NOM_PRODUCTO = 'COMPRA'
-            WHERE FE_DOCUMENTO.OPERACION = 'ORDEN_COMPRA'
-            AND FE_DOCUMENTO.COD_ESTADO NOT IN ('','ETM0000000000006')
-            AND CMP.HABILITACION.CAN_CAPITAL_SALDO <> CMP.ORDEN.CAN_TOTAL
-            AND CMP.DOCUMENTO_CTBLE.CAN_SALDO <> 0
-            AND ABS(CMP.HABILITACION.CAN_CAPITAL_SALDO - CMP.ORDEN.CAN_TOTAL) <= 0.1
-            AND CMP.HABILITACION.FEC_HABILITACION >= DATEADD(MONTH, -2, GETDATE())
-        ");
+            foreach ($datos as $item) {
+                DB::table('FE_DOCUMENTO')
+                    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
+                    ->update(['MONTO_ANTICIPO_DESC_OTROS' => $item->MONTO]);
+            }
 
 
-        //UPDATE PARA EL ANTICIPO
-        $datos = DB::table('CMP.ORDEN as T1')
-            ->join('FE_DOCUMENTO as FE', 'T1.COD_ORDEN', '=', 'FE.ID_DOCUMENTO')
-            ->join('CMP.REFERENCIA_ASOC as T2', function ($join) {
-                $join->on('T1.COD_ORDEN', '=', 'T2.COD_TABLA')
-                    ->where('T2.TXT_TABLA', 'CMP.ORDEN')
-                    ->where('T2.TXT_TABLA_ASOC', 'CMP.DOCUMENTO_CTBLE');
-            })
-            ->join('CMP.REFERENCIA_ASOC as T3', function ($join) {
-                $join->on('T2.COD_TABLA_ASOC', '=', 'T3.COD_TABLA')
-                    ->where('T3.TXT_TABLA', 'CMP.DOCUMENTO_CTBLE')
-                    ->where('T3.TXT_TABLA_ASOC', 'CMP.DOCUMENTO_CTBLE');
-            })
-            ->where('T3.TXT_TIPO_REFERENCIA', 'A')
-            ->where('T1.COD_ORDEN', 'like', '%CL%')
-            ->where('T2.COD_ESTADO', 1)
-            ->where('T3.COD_ESTADO', 1)
-            ->select('FE.ID_DOCUMENTO', DB::raw('SUM(T3.CAN_AUX1) as MONTO'))
-            ->groupBy('FE.ID_DOCUMENTO')
-            ->get();
-
-        foreach ($datos as $item) {
-            DB::table('FE_DOCUMENTO')
-                ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
-                ->update(['MONTO_ANTICIPO_DESC_OTROS' => $item->MONTO]);
-        }
-
-
-        //UPDATE SI TIENE NOTA DE CREDITO
-        DB::statement("
-            UPDATE FE_DOCUMENTO
-            SET MONTO_NC = (
-                SELECT SUM(DOC.CAN_TOTAL)
-                FROM CMP.REFERENCIA_ASOC PR
-                INNER JOIN CMP.REFERENCIA_ASOC PR2 ON PR.COD_TABLA_ASOC = PR2.COD_TABLA 
-                    AND PR2.COD_TABLA_ASOC LIKE '%NC%' 
-                    AND PR2.COD_ESTADO = 1
-                INNER JOIN CMP.DOCUMENTO_CTBLE DOC ON PR2.COD_TABLA_ASOC = DOC.COD_DOCUMENTO_CTBLE
-                WHERE PR.COD_TABLA = FE_DOCUMENTO.ID_DOCUMENTO 
-                    AND PR.COD_TABLA_ASOC LIKE '%FC%' 
-                    AND PR.COD_ESTADO = 1
-                    AND OPERACION = 'ORDEN_COMPRA'
-                    AND ISNULL(FOLIO, '') = ''
-                    AND FE_DOCUMENTO.COD_ESTADO = 'ETM0000000000005'
-                    AND DOC.COD_CATEGORIA_ESTADO_DOC_CTBLE = 'EDC0000000000009'
-            )
-            WHERE EXISTS (
-                SELECT 1
-                FROM CMP.REFERENCIA_ASOC PR
-                INNER JOIN CMP.REFERENCIA_ASOC PR2 ON PR.COD_TABLA_ASOC = PR2.COD_TABLA 
-                    AND PR2.COD_TABLA_ASOC LIKE '%NC%' 
-                    AND PR2.COD_ESTADO = 1
-                INNER JOIN CMP.DOCUMENTO_CTBLE DOC ON PR2.COD_TABLA_ASOC = DOC.COD_DOCUMENTO_CTBLE
-                WHERE PR.COD_TABLA = FE_DOCUMENTO.ID_DOCUMENTO 
-                    AND PR.COD_TABLA_ASOC LIKE '%FC%' 
-                    AND PR.COD_ESTADO = 1
-                    AND OPERACION = 'ORDEN_COMPRA'
-                    AND ISNULL(FOLIO, '') = ''
-                    AND FE_DOCUMENTO.COD_ESTADO = 'ETM0000000000005'
-                    AND DOC.COD_CATEGORIA_ESTADO_DOC_CTBLE = 'EDC0000000000009'
-            );
-        ");
+            //UPDATE SI TIENE NOTA DE CREDITO
+            DB::statement("
+                UPDATE FE_DOCUMENTO
+                SET MONTO_NC = (
+                    SELECT SUM(DOC.CAN_TOTAL)
+                    FROM CMP.REFERENCIA_ASOC PR
+                    INNER JOIN CMP.REFERENCIA_ASOC PR2 ON PR.COD_TABLA_ASOC = PR2.COD_TABLA 
+                        AND PR2.COD_TABLA_ASOC LIKE '%NC%' 
+                        AND PR2.COD_ESTADO = 1
+                    INNER JOIN CMP.DOCUMENTO_CTBLE DOC ON PR2.COD_TABLA_ASOC = DOC.COD_DOCUMENTO_CTBLE
+                    WHERE PR.COD_TABLA = FE_DOCUMENTO.ID_DOCUMENTO 
+                        AND PR.COD_TABLA_ASOC LIKE '%FC%' 
+                        AND PR.COD_ESTADO = 1
+                        AND OPERACION = 'ORDEN_COMPRA'
+                        AND ISNULL(FOLIO, '') = ''
+                        AND FE_DOCUMENTO.COD_ESTADO = 'ETM0000000000005'
+                        AND DOC.COD_CATEGORIA_ESTADO_DOC_CTBLE = 'EDC0000000000009'
+                )
+                WHERE EXISTS (
+                    SELECT 1
+                    FROM CMP.REFERENCIA_ASOC PR
+                    INNER JOIN CMP.REFERENCIA_ASOC PR2 ON PR.COD_TABLA_ASOC = PR2.COD_TABLA 
+                        AND PR2.COD_TABLA_ASOC LIKE '%NC%' 
+                        AND PR2.COD_ESTADO = 1
+                    INNER JOIN CMP.DOCUMENTO_CTBLE DOC ON PR2.COD_TABLA_ASOC = DOC.COD_DOCUMENTO_CTBLE
+                    WHERE PR.COD_TABLA = FE_DOCUMENTO.ID_DOCUMENTO 
+                        AND PR.COD_TABLA_ASOC LIKE '%FC%' 
+                        AND PR.COD_ESTADO = 1
+                        AND OPERACION = 'ORDEN_COMPRA'
+                        AND ISNULL(FOLIO, '') = ''
+                        AND FE_DOCUMENTO.COD_ESTADO = 'ETM0000000000005'
+                        AND DOC.COD_CATEGORIA_ESTADO_DOC_CTBLE = 'EDC0000000000009'
+                );
+            ");
 
 
-        //DESCONTAR LA RETENCION DE IGV
-        $documentosdetraccion = DB::select("
-                SELECT 
-                    FE.*,
-                    (
-                        SELECT SUM(DOC.CAN_TOTAL)
+            //DESCONTAR LA RETENCION DE IGV
+            $documentosdetraccion = DB::select("
+                    SELECT 
+                        FE.*,
+                        (
+                            SELECT SUM(DOC.CAN_TOTAL)
+                            FROM CMP.REFERENCIA_ASOC PR
+                            INNER JOIN CMP.REFERENCIA_ASOC PR2 
+                                ON PR.COD_TABLA_ASOC = PR2.COD_TABLA
+                                AND PR2.COD_TABLA_ASOC LIKE '%NC%' 
+                                AND PR2.COD_ESTADO = 1
+                            INNER JOIN CMP.DOCUMENTO_CTBLE DOC 
+                                ON PR2.COD_TABLA_ASOC = DOC.COD_DOCUMENTO_CTBLE
+                            WHERE PR.COD_TABLA = FE.ID_DOCUMENTO 
+                                AND PR.COD_TABLA_ASOC LIKE '%FC%' 
+                                AND PR.COD_ESTADO = 1
+                                AND OPERACION = 'ORDEN_COMPRA'
+                                AND ISNULL(FOLIO, '') = ''
+                                AND FE.COD_ESTADO = 'ETM0000000000005'
+                                AND DOC.COD_CATEGORIA_ESTADO_DOC_CTBLE = 'EDC0000000000009'
+                        ) AS MONTO_NC
+                    FROM FE_DOCUMENTO FE
+                    WHERE EXISTS (
+                        SELECT 1
                         FROM CMP.REFERENCIA_ASOC PR
                         INNER JOIN CMP.REFERENCIA_ASOC PR2 
                             ON PR.COD_TABLA_ASOC = PR2.COD_TABLA
@@ -8498,167 +8519,151 @@ trait ComprobanteTraits
                             AND ISNULL(FOLIO, '') = ''
                             AND FE.COD_ESTADO = 'ETM0000000000005'
                             AND DOC.COD_CATEGORIA_ESTADO_DOC_CTBLE = 'EDC0000000000009'
-                    ) AS MONTO_NC
-                FROM FE_DOCUMENTO FE
-                WHERE EXISTS (
-                    SELECT 1
-                    FROM CMP.REFERENCIA_ASOC PR
-                    INNER JOIN CMP.REFERENCIA_ASOC PR2 
-                        ON PR.COD_TABLA_ASOC = PR2.COD_TABLA
-                        AND PR2.COD_TABLA_ASOC LIKE '%NC%' 
-                        AND PR2.COD_ESTADO = 1
-                    INNER JOIN CMP.DOCUMENTO_CTBLE DOC 
-                        ON PR2.COD_TABLA_ASOC = DOC.COD_DOCUMENTO_CTBLE
-                    WHERE PR.COD_TABLA = FE.ID_DOCUMENTO 
-                        AND PR.COD_TABLA_ASOC LIKE '%FC%' 
-                        AND PR.COD_ESTADO = 1
-                        AND OPERACION = 'ORDEN_COMPRA'
-                        AND ISNULL(FOLIO, '') = ''
-                        AND FE.COD_ESTADO = 'ETM0000000000005'
-                        AND DOC.COD_CATEGORIA_ESTADO_DOC_CTBLE = 'EDC0000000000009'
-                ) AND FE.MONTO_RETENCION > 0;
-            ");
+                    ) AND FE.MONTO_RETENCION > 0;
+                ");
 
 
-        //RENTA DE CUARTA CATEGORIA
+            //RENTA DE CUARTA CATEGORIA
 
-        DB::table('FE_DOCUMENTO')
-            ->join('CMP.ORDEN', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.ORDEN.COD_ORDEN')
-            ->where('CMP.ORDEN.CAN_IMPUESTO_RENTA', '>', 0)
-            ->whereColumn('FE_DOCUMENTO.TOTAL_VENTA_ORIG', '<>', 'CMP.ORDEN.CAN_TOTAL')
-            ->update([
-                'FE_DOCUMENTO.TOTAL_VENTA_ORIG' => DB::raw('CMP.ORDEN.CAN_TOTAL')
-            ]);
+            DB::table('FE_DOCUMENTO')
+                ->join('CMP.ORDEN', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.ORDEN.COD_ORDEN')
+                ->where('CMP.ORDEN.CAN_IMPUESTO_RENTA', '>', 0)
+                ->whereColumn('FE_DOCUMENTO.TOTAL_VENTA_ORIG', '<>', 'CMP.ORDEN.CAN_TOTAL')
+                ->update([
+                    'FE_DOCUMENTO.TOTAL_VENTA_ORIG' => DB::raw('CMP.ORDEN.CAN_TOTAL')
+                ]);
 
 
 
-        // //dd($documentosdetraccion);
-        foreach($documentosdetraccion as $index => $item){
+            // //dd($documentosdetraccion);
+            foreach($documentosdetraccion as $index => $item){
 
-            $retencionigv = (float)($item->TOTAL_VENTA_ORIG-$item->MONTO_NC)*(3/100);
-            //FE_DOCUMENTO
-            FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
-                        ->update(
-                            [
-                                'MONTO_RETENCION'=>$retencionigv
-                            ]
-                        );
-            //OC
-            CMPOrden::where('COD_ORDEN','=',$item->ID_DOCUMENTO)
-                        ->update(
-                            [
-                                'CAN_RETENCION'=>$retencionigv,
-                                'CAN_NETO_PAGAR' => \DB::raw('CAN_TOTAL - ' . $retencionigv)
-                            ]
-                        );
-
-
-            $documento02      =     DB::table('CMP.DOCUMENTO_CTBLE')
-                                    ->join('CMP.REFERENCIA_ASOC', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
-                                    ->select(DB::raw('CMP.DOCUMENTO_CTBLE.*'))
-                                    ->where('CMP.DOCUMENTO_CTBLE.COD_ESTADO','=','1')
-                                    ->where('CMP.REFERENCIA_ASOC.COD_ESTADO','=','1')
-                                    ->where('CMP.REFERENCIA_ASOC.COD_TABLA','=',$item->ID_DOCUMENTO)
-                                    ->whereIn('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_DOC', [
-                                        'TDO0000000000001',
-                                        'TDO0000000000003',
-                                        'TDO0000000000010',
-                                        'TDO0000000000002'
-                                    ])->first();
-
-            if(count($documento02)>0){
-                CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$documento02->COD_DOCUMENTO_CTBLE)
+                $retencionigv = (float)($item->TOTAL_VENTA_ORIG-$item->MONTO_NC)*(3/100);
+                //FE_DOCUMENTO
+                FeDocumento::where('ID_DOCUMENTO','=',$item->ID_DOCUMENTO)
+                            ->update(
+                                [
+                                    'MONTO_RETENCION'=>$retencionigv
+                                ]
+                            );
+                //OC
+                CMPOrden::where('COD_ORDEN','=',$item->ID_DOCUMENTO)
                             ->update(
                                 [
                                     'CAN_RETENCION'=>$retencionigv,
-                                    'CAN_DCTO'=>3
+                                    'CAN_NETO_PAGAR' => \DB::raw('CAN_TOTAL - ' . $retencionigv)
                                 ]
                             );
-                CONRegistroCompras::where('COD_DOCUMENTO_CTBLE','=',$documento02->COD_DOCUMENTO_CTBLE)
-                            ->update(
-                                [
-                                    'CAN_RETENCION_MONTO'=>$retencionigv,
-                                    'CAN_RETENCION_PORCENTAJE'=>3
-                                ]
-                            );
+
+
+                $documento02      =     DB::table('CMP.DOCUMENTO_CTBLE')
+                                        ->join('CMP.REFERENCIA_ASOC', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+                                        ->select(DB::raw('CMP.DOCUMENTO_CTBLE.*'))
+                                        ->where('CMP.DOCUMENTO_CTBLE.COD_ESTADO','=','1')
+                                        ->where('CMP.REFERENCIA_ASOC.COD_ESTADO','=','1')
+                                        ->where('CMP.REFERENCIA_ASOC.COD_TABLA','=',$item->ID_DOCUMENTO)
+                                        ->whereIn('CMP.DOCUMENTO_CTBLE.COD_CATEGORIA_TIPO_DOC', [
+                                            'TDO0000000000001',
+                                            'TDO0000000000003',
+                                            'TDO0000000000010',
+                                            'TDO0000000000002'
+                                        ])->first();
+
+                if(count($documento02)>0){
+                    CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$documento02->COD_DOCUMENTO_CTBLE)
+                                ->update(
+                                    [
+                                        'CAN_RETENCION'=>$retencionigv,
+                                        'CAN_DCTO'=>3
+                                    ]
+                                );
+                    CONRegistroCompras::where('COD_DOCUMENTO_CTBLE','=',$documento02->COD_DOCUMENTO_CTBLE)
+                                ->update(
+                                    [
+                                        'CAN_RETENCION_MONTO'=>$retencionigv,
+                                        'CAN_RETENCION_PORCENTAJE'=>3
+                                    ]
+                                );
+                }
             }
+
+            ////////////////////////////////////
+
+
+            $rol                    =   WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
+
+            $trabajador             =   STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
+            $array_trabajadores     =   STDTrabajador::where('NRO_DOCUMENTO','=',$trabajador->NRO_DOCUMENTO)
+                                        ->pluck('COD_TRAB')
+                                        ->toArray();
+
+            $array_usuarios         =   SGDUsuario::Area($area_id)
+                                        ->whereNotNull('COD_CATEGORIA_AREA')
+                                        ->pluck('COD_USUARIO')
+                                        ->toArray();
+
+            $fecha_corte            =   date('Ymd');
+
+
+            $documento              =   DB::table('CMP.DOCUMENTO_CTBLE')
+                                        ->join('CMP.REFERENCIA_ASOC', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+                                        ->where('CMP.REFERENCIA_ASOC.COD_ESTADO','=','1')
+                                        ->select(DB::raw('CMP.DOCUMENTO_CTBLE.*,REFERENCIA_ASOC.COD_TABLA,REFERENCIA_ASOC.COD_TABLA_ASOC,CMP.DOCUMENTO_CTBLE.FEC_EMISION as FEC_EMISION_DOC'))
+                                        ->whereIn('COD_CATEGORIA_TIPO_DOC', [
+                                            'TDO0000000000001',
+                                            'TDO0000000000003',
+                                            'TDO0000000000034',
+                                            'TDO0000000000002',
+                                            'TDO0000000000010'
+                                        ]);
+
+            //dd($moneda_id);
+
+            $oi                     =   DB::table('CMP.ORDEN')
+                                        ->join('CMP.REFERENCIA_ASOC', 'CMP.ORDEN.COD_ORDEN', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
+                                        ->where('CMP.REFERENCIA_ASOC.COD_ESTADO','=','1')
+                                        ->select(DB::raw('REFERENCIA_ASOC.*'))
+                                        ->whereIn('COD_CATEGORIA_TIPO_ORDEN', ['TOR0000000000002']);
+
+
+            $listadatos             =   CMPOrden::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
+                                        //->Join('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'LISTA_DOCUMENTOS_PAGAR_PROGRAMACION.COD_ORDEN')
+                                        ->leftJoin(DB::raw("({$documento->toSql()}) as documentos"), function ($join) use ($documento) {
+                                                $join->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'documentos.COD_TABLA')
+                                                     ->addBinding($documento->getBindings());
+                                            })
+                                        ->leftJoin(DB::raw("({$oi->toSql()}) as oi"), function ($join) use ($oi) {
+                                                $join->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'oi.COD_TABLA')
+                                                     ->addBinding($oi->getBindings());
+                                            })
+
+                                        ->whereRaw("CAST(CMP.Orden.FEC_ORDEN AS DATE) >= ? and CAST(CMP.Orden.FEC_ORDEN AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
+                                        ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                                        ->where('FE_DOCUMENTO.OPERACION','=','ORDEN_COMPRA')
+                                        ->where('CMP.Orden.COD_ESTADO','=','1')
+                                        ->where(function ($query) {
+                                            $query->where('FOLIO', '=', '');
+                                            $query->orWhereNull('FOLIO');
+                                        })
+                                        //->where('CMP.Orden.COD_ORDEN','=','IIRJCE0000001231')
+                                        ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005'])
+                                        ->where('CMP.Orden.COD_CATEGORIA_ESTADO_ORDEN','=','EOR0000000000003')
+                                        ->where('CMP.Orden.COD_EMPR','=',$empresa_id)
+                                        ->where('CMP.Orden.COD_CATEGORIA_MONEDA','=',$moneda_id)
+                                        //->where('CMP.Orden.COD_CENTRO','=',$centro_id)
+                                        ->whereIn('CMP.Orden.COD_USUARIO_CREA_AUD',$array_usuarios)
+                                        ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
+                                        ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO','=',$banco_id)
+                                        ->select(
+                                            DB::raw('CMP.Orden.*, FE_DOCUMENTO.*, documentos.NRO_SERIE, documentos.FEC_VENCIMIENTO, documentos.NRO_DOC, oi.COD_TABLA_ASOC, FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_VOUCHER, FE_DOCUMENTO.TXT_CATEGORIA_BANCO AS TXT_BANCO'),
+                                            DB::raw("CMP.OBTENER_NC_PROVEEDOR(CMP.Orden.COD_EMPR, '', '{$fecha_corte}', CMP.Orden.COD_CONTRATO, CMP.Orden.COD_CATEGORIA_MONEDA) AS NC_PROVEEDOR")
+                                            //DB::raw("CMP.OBTENER_ADELANTOS_PROVEEDOR(CMP.Orden.COD_EMPR, '', '{$fecha_corte}', CMP.Orden.COD_CONTRATO, CMP.Orden.COD_CATEGORIA_MONEDA) AS ADELANTOS_PROVEEDOR")
+                                        )
+                                        ->orderBy('documentos.FEC_EMISION','asc')
+                                        ->get();
+
+
         }
-
-        ////////////////////////////////////
-
-
-        $rol                    =   WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
-
-        $trabajador             =   STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
-        $array_trabajadores     =   STDTrabajador::where('NRO_DOCUMENTO','=',$trabajador->NRO_DOCUMENTO)
-                                    ->pluck('COD_TRAB')
-                                    ->toArray();
-
-        $array_usuarios         =   SGDUsuario::Area($area_id)
-                                    ->whereNotNull('COD_CATEGORIA_AREA')
-                                    ->pluck('COD_USUARIO')
-                                    ->toArray();
-
-        $fecha_corte            =   date('Ymd');
-
-
-        $documento              =   DB::table('CMP.DOCUMENTO_CTBLE')
-                                    ->join('CMP.REFERENCIA_ASOC', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
-                                    ->where('CMP.REFERENCIA_ASOC.COD_ESTADO','=','1')
-                                    ->select(DB::raw('CMP.DOCUMENTO_CTBLE.*,REFERENCIA_ASOC.COD_TABLA,REFERENCIA_ASOC.COD_TABLA_ASOC,CMP.DOCUMENTO_CTBLE.FEC_EMISION as FEC_EMISION_DOC'))
-                                    ->whereIn('COD_CATEGORIA_TIPO_DOC', [
-                                        'TDO0000000000001',
-                                        'TDO0000000000003',
-                                        'TDO0000000000034',
-                                        'TDO0000000000002',
-                                        'TDO0000000000010'
-                                    ]);
-
-        //dd($moneda_id);
-
-        $oi                     =   DB::table('CMP.ORDEN')
-                                    ->join('CMP.REFERENCIA_ASOC', 'CMP.ORDEN.COD_ORDEN', '=', 'CMP.REFERENCIA_ASOC.COD_TABLA_ASOC')
-                                    ->where('CMP.REFERENCIA_ASOC.COD_ESTADO','=','1')
-                                    ->select(DB::raw('REFERENCIA_ASOC.*'))
-                                    ->whereIn('COD_CATEGORIA_TIPO_ORDEN', ['TOR0000000000002']);
-
-
-        $listadatos             =   CMPOrden::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
-                                    //->Join('LISTA_DOCUMENTOS_PAGAR_PROGRAMACION', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'LISTA_DOCUMENTOS_PAGAR_PROGRAMACION.COD_ORDEN')
-                                    ->leftJoin(DB::raw("({$documento->toSql()}) as documentos"), function ($join) use ($documento) {
-                                            $join->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'documentos.COD_TABLA')
-                                                 ->addBinding($documento->getBindings());
-                                        })
-                                    ->leftJoin(DB::raw("({$oi->toSql()}) as oi"), function ($join) use ($oi) {
-                                            $join->on('FE_DOCUMENTO.ID_DOCUMENTO', '=', 'oi.COD_TABLA')
-                                                 ->addBinding($oi->getBindings());
-                                        })
-
-                                    ->whereRaw("CAST(CMP.Orden.FEC_ORDEN AS DATE) >= ? and CAST(CMP.Orden.FEC_ORDEN AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
-                                    ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
-                                    ->where('FE_DOCUMENTO.OPERACION','=','ORDEN_COMPRA')
-                                    ->where('CMP.Orden.COD_ESTADO','=','1')
-                                    ->where(function ($query) {
-                                        $query->where('FOLIO', '=', '');
-                                        $query->orWhereNull('FOLIO');
-                                    })
-                                    //->where('CMP.Orden.COD_ORDEN','=','IIRJCE0000001231')
-                                    ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005'])
-                                    ->where('CMP.Orden.COD_CATEGORIA_ESTADO_ORDEN','=','EOR0000000000003')
-                                    ->where('CMP.Orden.COD_EMPR','=',$empresa_id)
-                                    ->where('CMP.Orden.COD_CATEGORIA_MONEDA','=',$moneda_id)
-                                    //->where('CMP.Orden.COD_CENTRO','=',$centro_id)
-                                    ->whereIn('CMP.Orden.COD_USUARIO_CREA_AUD',$array_usuarios)
-                                    ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                                    ->where('FE_DOCUMENTO.COD_CATEGORIA_BANCO','=',$banco_id)
-                                    ->select(
-                                        DB::raw('CMP.Orden.*, FE_DOCUMENTO.*, documentos.NRO_SERIE, documentos.FEC_VENCIMIENTO, documentos.NRO_DOC, oi.COD_TABLA_ASOC, FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_VOUCHER, FE_DOCUMENTO.TXT_CATEGORIA_BANCO AS TXT_BANCO'),
-                                        DB::raw("CMP.OBTENER_NC_PROVEEDOR(CMP.Orden.COD_EMPR, '', '{$fecha_corte}', CMP.Orden.COD_CONTRATO, CMP.Orden.COD_CATEGORIA_MONEDA) AS NC_PROVEEDOR")
-                                        //DB::raw("CMP.OBTENER_ADELANTOS_PROVEEDOR(CMP.Orden.COD_EMPR, '', '{$fecha_corte}', CMP.Orden.COD_CONTRATO, CMP.Orden.COD_CATEGORIA_MONEDA) AS ADELANTOS_PROVEEDOR")
-                                    )
-                                    ->orderBy('documentos.FEC_EMISION','asc')
-                                    ->get();
-
         //dd($listadatos);
 
         return  $listadatos;
