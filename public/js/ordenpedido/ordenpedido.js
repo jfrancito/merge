@@ -1767,7 +1767,7 @@ $(document).ready(function () {
         modalBonito({
             tipo: 'info',
             icono: '✅',
-            titulo: 'Aprobar Consolidado',
+            titulo: 'Cerrar Consolidado',
             mensaje: '¿Está seguro de <b>cerrar</b> este consolidado?',
             confirmar: true,
             onConfirm: function () {
@@ -2087,7 +2087,7 @@ $(document).ready(function () {
                             <tr>
                                 <td class="text-center">${fecha}</td>
                                 <td class="text-center font-bold">${id}</td>
-                                <td class="text-center font-bold>${area}</td>
+                                <td class="text-center font-bold">${area}</td>
                                 <td class="text-center font-bold">${centro}</td>
                                 <td class="small">${glosa}</td>
                                 <td class="text-center font-bold" style="font-size: 1.1em;">
@@ -2363,90 +2363,105 @@ $(document).ready(function () {
     // EVENTO PARA APROBAR EL CONSOLIDADO GENERAL
     $(document).on('click', '#btn-aprobar-consolidado-general', function () {
 
-    let _token = $('#token').val();
-    let $boton = $(this);
+        let _token = $('#token').val();
+        let $boton = $(this);
 
-    if (id_consolidado_general_seleccionado === '') {
+        if (id_consolidado_general_seleccionado === '') {
+            modalBonito({
+                tipo: 'error',
+                titulo: 'Error',
+                mensaje: 'No hay un consolidado general seleccionado.'
+            });
+            return;
+        }
+
         modalBonito({
-            tipo: 'error',
-            titulo: 'Error',
-            mensaje: 'No hay un consolidado general seleccionado.'
-        });
-        return;
-    }
+            tipo: 'success',
+            icono: '✅',
+            titulo: 'Aprobar Consolidado General',
+            mensaje: '¿Está seguro de <b>aprobar</b> este consolidado general?',
+            confirmar: true,
+            onConfirm: function () {
 
-    modalBonito({
-        tipo: 'success',
-        icono: '✅',
-        titulo: 'Aprobar Consolidado General',
-        mensaje: '¿Está seguro de <b>aprobar</b> este consolidado general?',
-        confirmar: true,
-        onConfirm: function () {
+                // 🔒 Deshabilitamos botón para evitar doble click
+                $boton.prop('disabled', true);
 
-            // 🔒 Deshabilitamos botón para evitar doble click
-            $boton.prop('disabled', true);
+                // 🔒 Abrimos loader global (bloquea toda la UI)
+                abrircargando();
 
-            // 🔒 Abrimos loader global (bloquea toda la UI)
-            abrircargando();
+                $.ajax({
+                    type: 'POST',
+                    url: carpeta + '/ajax-aprobar-consolidado-general-op',
+                    data: {
+                        _token: _token,
+                        id_consolidado_general: id_consolidado_general_seleccionado
+                    },
 
-            $.ajax({
-                type: 'POST',
-                url: carpeta + '/ajax-aprobar-consolidado-general-op',
-                data: {
-                    _token: _token,
-                    id_consolidado_general: id_consolidado_general_seleccionado
-                },
+                    success: function (res) {
 
-                success: function (res) {
+                        if (res.success) {
 
-                    if (res.success) {
+                            modalBonito({
+                                tipo: 'success',
+                                icono: '✔',
+                                titulo: 'Éxito',
+                                mensaje: res.mensaje
+                            });
 
-                        modalBonito({
-                            tipo: 'success',
-                            icono: '✔',
-                            titulo: 'Éxito',
-                            mensaje: res.mensaje
-                        });
+                            // 🔒 Mantenemos el loader activo
+                            // 🔒 Bloqueamos todos los botones por seguridad
+                            $('button').prop('disabled', true);
 
-                        // 🔒 Mantenemos el loader activo
-                        // 🔒 Bloqueamos todos los botones por seguridad
-                        $('button').prop('disabled', true);
+                            // 🔄 Recargamos la página
+                            setTimeout(function () {
+                                location.reload();
+                            }, 1000);
 
-                        // 🔄 Recargamos la página
-                        setTimeout(function () {
-                            location.reload();
-                        }, 1000);
+                        } else {
 
-                    } else {
+                            cerrarcargando();
+                            $boton.prop('disabled', false);
+
+                            modalBonito({
+                                tipo: 'error',
+                                icono: '❌',
+                                titulo: 'Error',
+                                mensaje: res.mensaje
+                            });
+                        }
+                    },
+
+                    error: function (e) {
 
                         cerrarcargando();
                         $boton.prop('disabled', false);
 
+                        console.error(e);
+
                         modalBonito({
                             tipo: 'error',
-                            icono: '❌',
                             titulo: 'Error',
-                            mensaje: res.mensaje
+                            mensaje: 'Error en la petición al servidor.'
                         });
                     }
-                },
-
-                error: function (e) {
-
-                    cerrarcargando();
-                    $boton.prop('disabled', false);
-
-                    console.error(e);
-
-                    modalBonito({
-                        tipo: 'error',
-                        titulo: 'Error',
-                        mensaje: 'Error en la petición al servidor.'
-                    });
-                }
-            });
-        }
+                });
+            }
+        });
     });
-});
-  
+
+    // EVENTO PARA DESCARGAR EXCEL DEL DETALLE
+    $(document).on('click', '#btn-descargar-excel', function (e) {
+        e.preventDefault();
+        if (typeof id_consolidado_general_seleccionado === 'undefined' || id_consolidado_general_seleccionado === '') {
+            modalBonito({
+                tipo: 'error',
+                titulo: 'Error',
+                mensaje: 'No hay un consolidado seleccionado.'
+            });
+            return;
+        }
+        let familia_id = 'TODO';
+        window.location.href = carpeta + '/descargar-excel-detalle-consolidado-general/' + id_consolidado_general_seleccionado + '/' + familia_id;
+    });
+
 });

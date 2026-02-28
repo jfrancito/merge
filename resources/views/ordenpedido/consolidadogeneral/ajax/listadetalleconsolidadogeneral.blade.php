@@ -6,12 +6,32 @@
 <div class="row" style="margin-bottom: 15px;">
     <div class="col-xs-12 text-right">
       
-        <button type="button" class="btn btn-primary btn-detalle-consolidado" id="btn-guardar-detalle-consolidado-editado-general">
+        <button type="button" 
+                class="btn btn-primary btn-detalle-consolidado" 
+                id="btn-guardar-detalle-consolidado-editado-general">
             <i class="mdi mdi-content-save"></i> Guardar 
         </button>
 
-        <button type="button" class="btn btn-success btn-detalle-consolidado" id="btn-aprobar-consolidado-general">
+        <button type="button" 
+                class="btn btn-success btn-detalle-consolidado" 
+                id="btn-aprobar-consolidado-general">
             <i class="mdi mdi-content-check"></i> Aprobar pedido
+        </button>
+
+    </div>
+</div>
+@endif
+
+
+{{-- SOLO CUANDO ESTÉ APROBADO --}}
+@if($estado_consolidado == 'ETM0000000000005')
+<div class="row" style="margin-bottom: 15px;">
+    <div class="col-xs-12 text-right">
+
+        <button type="button" 
+                class="btn btn-success btn-excel-consolidado-detalle" 
+                id="btn-descargar-excel">
+            <i class="mdi mdi-file-excel"></i> Descargar Excel
         </button>
 
     </div>

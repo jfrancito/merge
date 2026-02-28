@@ -878,7 +878,7 @@ trait OrdenPedidoTraits
         return $query;
     }
 
-    private function lg_lista_detalle_consolidado_general($id_consolidado_general, $familia_id)
+    public function lg_lista_detalle_consolidado_general($id_consolidado_general, $familia_id)
     {
         $query = DB::connection('sqlsrv')->table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE as D')
             ->join('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL as C',
