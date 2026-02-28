@@ -1051,10 +1051,14 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::post('/ajax-listar-detalle-consolidado-general-op', 'ConsolidadoGeneralOrdenPedidoController@actionListarAjaxDetalleConsolidadoGeneralOP');
 	Route::any('/ajax-buscar-consolidado-general-op', 'ConsolidadoGeneralOrdenPedidoController@actionAjaxBuscarConsolidadoGeneralOP');
 	Route::post('/ajax-aprobar-consolidado-general-op', 'ConsolidadoGeneralOrdenPedidoController@actionAjaxAprobarConsolidadoGeneral');
+	Route::get('/descargar-excel-detalle-consolidado-general/{id_consolidado_general}/{familia_id}', 'ConsolidadoGeneralOrdenPedidoController@actionDescargarExcelDetalleConsolidadoGeneral');
 
 
 	Route::get('/gestion-monto-orden-pedido/{idopcion}', 'MontoOrdenPedidoController@actionMontoOrdenPedido');
 	Route::any('/modificar-monto-orden-pedido', 'MontoOrdenPedidoController@actionModificarMontoOrdenPedido');
+
+
+	Route::get('/cotizacion-orden-pedido/{idopcion}', 'CotizacionOrdenPedidoController@actionCotizacionOrdenPedido');
 
 
 

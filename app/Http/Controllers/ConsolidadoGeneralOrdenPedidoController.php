@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
-
 use Illuminate\Http\Request;
 use App\Traits\OrdenPedidoTraits;
 use App\Modelos\ALMCentro;
@@ -13,6 +12,7 @@ use Session;
 use App\WEBRegla, APP\User, App\CMPCategoria;
 use View;
 use Validator;
+use Maatwebsite\Excel\Facades\Excel;
 
 
 class ConsolidadoGeneralOrdenPedidoController extends Controller
@@ -94,140 +94,140 @@ class ConsolidadoGeneralOrdenPedidoController extends Controller
     }
 
     public function actionGuardarConsolidadoGeneral(Request $request)
-{
-    $pedidos_input = $request->input('pedidos_ids');
+    {
+        $pedidos_input = $request->input('pedidos_ids');
 
-    if (empty($pedidos_input)) {
-        return response()->json([
-            'success' => false,
-            'mensaje' => 'No hay consolidados seleccionados.'
-        ]);
-    }
-
-    $pedidos_ids = is_array($pedidos_input)
-        ? $pedidos_input
-        : array_filter(array_map('trim', explode(',', $pedidos_input)));
-
-    try {
-
-        DB::beginTransaction();
-
-        // 1️⃣ Obtener detalles origen
-        $detalles_origen = DB::connection('sqlsrv')
-            ->table('WEB.ORDEN_PEDIDO_CONSOLIDADO as C')
-            ->join(
-                'WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE as D',
-                'C.ID_PEDIDO_CONSOLIDADO',
-                '=',
-                'D.ID_PEDIDO_CONSOLIDADO'
-            )
-            ->whereIn('C.ID_PEDIDO_CONSOLIDADO', $pedidos_ids)
-            ->where('D.ACTIVO', 1)
-            ->select(
-                'D.*',
-                'C.COD_PERIODO',
-                'C.COD_EMPR',
-                'C.COD_CENTRO',
-                'C.TXT_NOMBRE'
-            )
-            ->get();
-
-        // 2️⃣ Agrupar por FAMILIA
-        $agrupado_por_familia = $detalles_origen->groupBy('COD_CATEGORIA_FAMILIA');
-
-        $generated_ids = [];
-
-        foreach ($agrupado_por_familia as $familia_id => $items) {
-
-            $first = $items->first();
-
-            // 3️⃣ Crear CABECERA CONSOLIDADO GENERAL
-            $id_general = $this->insertOrdenPedidoConsolidadoGeneral(
-                'I',
-                '',
-                date('Y-m-d'),
-                $first->COD_PERIODO,
-                $first->TXT_NOMBRE,
-                $first->COD_EMPR,
-                'CEN0000000000001',
-                $familia_id,
-                $first->NOM_CATEGORIA_FAMILIA,
-                'ETM0000000000001',
-                'GENERADO',
-                true,
-                Session::get('usuario')->id
-            );
-
-            $generated_ids[] = $id_general;
-
-            // 4️⃣ Agrupar detalle por PRODUCTO
-            $items_agrupados = $items->groupBy('COD_PRODUCTO');
-
-            foreach ($items_agrupados as $prod_items) {
-
-                $p = $prod_items->first();
-
-                $sum_cantidad   = $prod_items->sum('CANTIDAD');
-                $sum_stock      = $prod_items->sum('STOCK');
-                $sum_reservado  = $prod_items->sum('RESERVADO');
-                $sum_diferencia = $sum_cantidad - $sum_stock + $sum_reservado;
-
-                $this->insertOrdenPedidoConsolidadoGeneralDetalle(
-                    'I',
-                    $id_general,
-                    'CEN0000000000001',
-                    $p->COD_PRODUCTO,
-                    $p->NOM_PRODUCTO,
-                    $p->COD_CATEGORIA_MEDIDA,
-                    $p->NOM_CATEGORIA_MEDIDA,
-                    $sum_cantidad,
-                    $sum_stock,
-                    $sum_reservado,
-                    $sum_diferencia,
-                    $familia_id,
-                    $p->NOM_CATEGORIA_FAMILIA,
-                    true
-                );
-            }
-
-            // 5️⃣ Insertar referencias POR CADA FAMILIA
-            foreach ($items->pluck('ID_PEDIDO_CONSOLIDADO')->unique() as $origen_id) {
-
-                DB::table('CMP.REFERENCIA_ASOC')->insert([
-                    'COD_TABLA'            => $origen_id,
-                    'COD_TABLA_ASOC'       => $id_general,
-                    'TXT_TABLA'            => 'WEB.ORDEN_PEDIDO_CONSOLIDADO',
-                    'TXT_TABLA_ASOC'       => 'WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL',
-                    'TXT_TIPO_REFERENCIA'  => 'CONSOLIDADO_GENERAL',
-                    'COD_USUARIO_CREA_AUD' => Session::get('usuario')->id,
-                    'FEC_USUARIO_CREA_AUD' => date('Y-m-d\TH:i:s'),
-                    'COD_ESTADO'           => 1
-                ]);
-            }
+        if (empty($pedidos_input)) {
+            return response()->json([
+                'success' => false,
+                'mensaje' => 'No hay consolidados seleccionados.'
+            ]);
         }
 
-        // 6️⃣ Actualizar estado origen
-        DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO')
-            ->whereIn('ID_PEDIDO_CONSOLIDADO', $pedidos_ids)
-            ->update(['CONSOLIDADO_GENERAL' => 'SI']);
+        $pedidos_ids = is_array($pedidos_input)
+            ? $pedidos_input
+            : array_filter(array_map('trim', explode(',', $pedidos_input)));
 
-        DB::commit();
+        try {
 
-        return response()->json([
-            'success' => true,
-            'mensaje' => 'Se generaron ' . count($generated_ids) . ' consolidados generales.'
-        ]);
+            DB::beginTransaction();
 
-    } catch (\Exception $e) {
+            // 1️⃣ Obtener detalles origen
+            $detalles_origen = DB::connection('sqlsrv')
+                ->table('WEB.ORDEN_PEDIDO_CONSOLIDADO as C')
+                ->join(
+                    'WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE as D',
+                    'C.ID_PEDIDO_CONSOLIDADO',
+                    '=',
+                    'D.ID_PEDIDO_CONSOLIDADO'
+                )
+                ->whereIn('C.ID_PEDIDO_CONSOLIDADO', $pedidos_ids)
+                ->where('D.ACTIVO', 1)
+                ->select(
+                    'D.*',
+                    'C.COD_PERIODO',
+                    'C.COD_EMPR',
+                    'C.COD_CENTRO',
+                    'C.TXT_NOMBRE'
+                )
+                ->get();
 
-        DB::rollBack();
+            // 2️⃣ Agrupar por FAMILIA
+            $agrupado_por_familia = $detalles_origen->groupBy('COD_CATEGORIA_FAMILIA');
 
-        return response()->json([
-            'success' => false,
-            'mensaje' => 'Error: ' . $e->getMessage()
-        ]);
+            $generated_ids = [];
+
+            foreach ($agrupado_por_familia as $familia_id => $items) {
+
+                $first = $items->first();
+
+                // 3️⃣ Crear CABECERA CONSOLIDADO GENERAL
+                $id_general = $this->insertOrdenPedidoConsolidadoGeneral(
+                    'I',
+                    '',
+                    date('Y-m-d'),
+                    $first->COD_PERIODO,
+                    $first->TXT_NOMBRE,
+                    $first->COD_EMPR,
+                    'CEN0000000000001',
+                    $familia_id,
+                    $first->NOM_CATEGORIA_FAMILIA,
+                    'ETM0000000000001',
+                    'GENERADO',
+                    true,
+                    Session::get('usuario')->id
+                );
+
+                $generated_ids[] = $id_general;
+
+                // 4️⃣ Agrupar detalle por PRODUCTO
+                $items_agrupados = $items->groupBy('COD_PRODUCTO');
+
+                foreach ($items_agrupados as $prod_items) {
+
+                    $p = $prod_items->first();
+
+                    $sum_cantidad   = $prod_items->sum('CANTIDAD');
+                    $sum_stock      = $prod_items->sum('STOCK');
+                    $sum_reservado  = $prod_items->sum('RESERVADO');
+                    $sum_diferencia = $sum_cantidad - $sum_stock + $sum_reservado;
+
+                    $this->insertOrdenPedidoConsolidadoGeneralDetalle(
+                        'I',
+                        $id_general,
+                        'CEN0000000000001',
+                        $p->COD_PRODUCTO,
+                        $p->NOM_PRODUCTO,
+                        $p->COD_CATEGORIA_MEDIDA,
+                        $p->NOM_CATEGORIA_MEDIDA,
+                        $sum_cantidad,
+                        $sum_stock,
+                        $sum_reservado,
+                        $sum_diferencia,
+                        $familia_id,
+                        $p->NOM_CATEGORIA_FAMILIA,
+                        true
+                    );
+                }
+
+                // 5️⃣ Insertar referencias POR CADA FAMILIA
+                foreach ($items->pluck('ID_PEDIDO_CONSOLIDADO')->unique() as $origen_id) {
+
+                    DB::table('CMP.REFERENCIA_ASOC')->insert([
+                        'COD_TABLA'            => $origen_id,
+                        'COD_TABLA_ASOC'       => $id_general,
+                        'TXT_TABLA'            => 'WEB.ORDEN_PEDIDO_CONSOLIDADO',
+                        'TXT_TABLA_ASOC'       => 'WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL',
+                        'TXT_TIPO_REFERENCIA'  => 'CONSOLIDADO_GENERAL',
+                        'COD_USUARIO_CREA_AUD' => Session::get('usuario')->id,
+                        'FEC_USUARIO_CREA_AUD' => date('Y-m-d\TH:i:s'),
+                        'COD_ESTADO'           => 1
+                    ]);
+                }
+            }
+
+            // 6️⃣ Actualizar estado origen
+            DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO')
+                ->whereIn('ID_PEDIDO_CONSOLIDADO', $pedidos_ids)
+                ->update(['CONSOLIDADO_GENERAL' => 'SI']);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'mensaje' => 'Se generaron ' . count($generated_ids) . ' consolidados generales.'
+            ]);
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'mensaje' => 'Error: ' . $e->getMessage()
+            ]);
+        }
     }
-}
 
 
     public function actionListarAjaxDetalleConsolidadoGeneralOP(Request $request)
@@ -265,60 +265,77 @@ class ConsolidadoGeneralOrdenPedidoController extends Controller
     }
 
     public function actionAjaxGuardarCantidadCompradaGeneral(Request $request)
-{
-    $id_consolidado_general = $request->input('id_consolidado_general');
-    $detalles_json           = $request->input('detalles');
-    $detalles                = json_decode($detalles_json, true);
+    {
+        $id_consolidado_general = $request->input('id_consolidado_general');
+        $detalles_json           = $request->input('detalles');
+        $detalles                = json_decode($detalles_json, true);
 
-    try {
-        DB::beginTransaction();
+        try {
+            DB::beginTransaction();
 
-        foreach ($detalles as $det) {
-            DB::connection('sqlsrv')->table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE')
-                ->where('ID_PEDIDO_CONSOLIDADO_GENERAL', $id_consolidado_general)
-                ->where('COD_PRODUCTO', $det['cod_producto'])
-                ->update([
-                    'CAN_COMPRADA'          => $det['cantidad'],
-                    'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id
-                ]);
+            foreach ($detalles as $det) {
+                DB::connection('sqlsrv')->table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE')
+                    ->where('ID_PEDIDO_CONSOLIDADO_GENERAL', $id_consolidado_general)
+                    ->where('COD_PRODUCTO', $det['cod_producto'])
+                    ->update([
+                        'CAN_COMPRADA'          => $det['cantidad'],
+                        'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id
+                    ]);
+            }
+
+            DB::commit();
+            return response()->json(['success' => true, 'mensaje' => 'Cantidades actualizadas correctamente.']);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['success' => false, 'mensaje' => 'Error: ' . $e->getMessage()]);
         }
-
-        DB::commit();
-        return response()->json(['success' => true, 'mensaje' => 'Cantidades actualizadas correctamente.']);
-
-    } catch (\Exception $e) {
-        DB::rollback();
-        return response()->json(['success' => false, 'mensaje' => 'Error: ' . $e->getMessage()]);
     }
-}
 
-public function actionAjaxAprobarConsolidadoGeneral(Request $request)
-{
-    $id_consolidado_general = $request->input('id_consolidado_general');
-    try {
-        DB::beginTransaction();
+    public function actionAjaxAprobarConsolidadoGeneral(Request $request)
+    {
+        $id_consolidado_general = $request->input('id_consolidado_general');
+        try {
+            DB::beginTransaction();
 
-        DB::connection('sqlsrv')->table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL')
-            ->where('ID_PEDIDO_CONSOLIDADO_GENERAL', $id_consolidado_general)
-            ->update([
-                'COD_ESTADO'            => 'ETM0000000000005', // APROBADO
-                'TXT_ESTADO'            => 'APROBADO',
-                'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id,
-                'FEC_USUARIO_MODIF_AUD' => date('Y-m-d\TH:i:s')
+            DB::connection('sqlsrv')->table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL')
+                ->where('ID_PEDIDO_CONSOLIDADO_GENERAL', $id_consolidado_general)
+                ->update([
+                    'COD_ESTADO'            => 'ETM0000000000005', // APROBADO
+                    'TXT_ESTADO'            => 'APROBADO',
+                    'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id,
+                    'FEC_USUARIO_MODIF_AUD' => date('Y-m-d\TH:i:s')
 
-                   
-            ]);
+                       
+                ]);
 
-        DB::commit();
-        return response()->json(['success' => true, 'mensaje' => 'Consolidado general aprobado correctamente.']);
+            DB::commit();
+            return response()->json(['success' => true, 'mensaje' => 'Consolidado general aprobado correctamente.']);
 
-    } catch (\Exception $e) {
-        DB::rollback();
-        return response()->json(['success' => false, 'mensaje' => 'Error al aprobar: ' . $e->getMessage()]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['success' => false, 'mensaje' => 'Error al aprobar: ' . $e->getMessage()]);
+        }
     }
+
+      public function actionDescargarExcelDetalleConsolidadoGeneral($id_consolidado_general, $familia_id)
+    {
+        set_time_limit(0);
+        if($familia_id == 'TODO') $familia_id = '';
+        $listadetalle = $this->lg_lista_detalle_consolidado_general($id_consolidado_general, $familia_id);
+        
+        $titulo = 'Detalle-Consolidado-General-' . $id_consolidado_general;
+        $fecha_actual = date("Y-m-d");
+        Excel::create($titulo . '-(' . $fecha_actual . ')', function ($excel) use ($listadetalle, $titulo) {
+            $excel->sheet('DETALLE', function ($sheet) use ($listadetalle, $titulo) {
+                $sheet->loadView('ordenpedido.excel.listadetalleconsolidadogeneralexcel', [
+                    'listadetalle' => $listadetalle,
+                    'titulo' => $titulo
+                ]);
+            });
+        })->export('xls');
+    }
+
 }
 
 
-}
-
-   
