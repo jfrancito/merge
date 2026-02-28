@@ -480,7 +480,7 @@ class GestionPlanillaMovilidadController extends Controller
                 $initialPreviewConfig[] = [
                     'type'          => "pdf",
                     'caption'       => $archivo->NOMBRE_ARCHIVO,
-                    'downloadUrl'   => route('serve-filelg', ['file' => $archivo->NOMBRE_ARCHIVO]),
+                    'downloadUrl'   => route('serve-filepla', ['file' => $archivo->NOMBRE_ARCHIVO]),
                     'frameClass'    => $archivo->ID_DOCUMENTO.$archivo->DOCUMENTO_ITEM.' '.$valor //
                 ];
             }

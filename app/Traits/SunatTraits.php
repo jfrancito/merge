@@ -36,10 +36,12 @@ trait SunatTraits
 
 			$documentos 	=   DocumentoSunat::where('RUC_EMPRESA','=',$item2->COD_EMPR)
 								->whereRaw('ISNULL(IND_DETALLE, 0) = 0')
+								->whereRaw("PERIODO > '202402'")
+								//->where('COD_TIPODOCUMENTO','=','02')
 								//->whereRaw('ISNULL(CONTADOR,0) < 2')
 								->whereRaw("COD_TIPODOCUMENTO IN ('01','02')")
 								->orderby('CONTADOR','asc')
-								->take(1000)
+								->take(4000)
 						    	->get();
 
 			$fetoken 		=	FeToken::where('COD_EMPR','=',$item2->COD_EMPR)->where('TIPO','=','COMPROBANTE_PAGO')->first();
@@ -51,7 +53,7 @@ trait SunatTraits
 
 				$ruc 			= trim($item->RUC_EMPRESA_PROVEEDOR);
 				$serie 			= trim($item->SERIE);
-				$correlativo 	= trim($item->NUMERO);
+				$correlativo 	= trim(ltrim($item->NUMERO, '0'));
 				$td 			= trim($item->COD_TIPODOCUMENTO);
 				//$serie 			= trim('G001');
 
@@ -60,9 +62,11 @@ trait SunatTraits
 				}
 
 				$urlxml 					= 	'https://api-cpe.sunat.gob.pe/v1/contribuyente/consultacpe/comprobantes/'.$ruc.'-'.$td.'-'.$serie.'-'.$correlativo.'-2';
+				
+				//dd($urlxml);
 				$respuetapdf 				=	$this->buscar_archivo_sunat_nuevo_fa($urlxml,$fetoken);
 
-				//dd($respuetapdf);
+
 
 				if($respuetapdf['cod_error'] == '0'){
 

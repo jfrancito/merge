@@ -16,7 +16,7 @@
                 <div class="panel-heading">{{ $titulo }}
                   <div class="tools tooltiptop">
                     <div class="tools tooltiptop">
-                      <a href="#" class="tooltipcss opciones buscardocumento">
+                      <a href="#" class="tooltipcss opciones buscardocumentolqc">
                         <span class="tooltiptext">Buscar Documento</span>
                         <span class="icon mdi mdi-search"></span>
                       </a>
@@ -40,6 +40,22 @@
                             </div>
                           </div>
                       </div> 
+
+                      <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
+                          <div class="form-group">
+                            <label class="col-sm-12 control-label labelleft" >Centro :</label>
+                            <div class="col-sm-12 abajocaja" >
+                              {!! Form::select( 'centro_id', $combo_centro, array($centro_id),
+                                                [
+                                                  'class'       => 'select2 form-control control input-sm' ,
+                                                  'id'          => 'centro_id',
+                                                  'required'    => '',
+                                                  'data-aw'     => '1',
+                                                ]) !!}
+                            </div>
+                          </div>
+                      </div> 
+
                     <div class="col-xs-12">
                       <input type="hidden" name="idopcion" id='idopcion' value='{{$idopcion}}'>
                     </div>

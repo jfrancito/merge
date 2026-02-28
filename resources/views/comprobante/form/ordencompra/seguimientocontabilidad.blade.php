@@ -1,6 +1,8 @@
     <div class="panel panel-default panel-contrast">
       <div class="panel-heading" style="background: #1d3a6d;color: #fff;">SEGUIMIENTO DE DOCUMENTO
-        <div class="tools eliminiar_observacion select" style="cursor: pointer;padding-left: 12px;"> <span class="label label-danger">Extornar Ult. Obs.</span></div>
+        <div class="tools eliminiar_observacion select" style="cursor: pointer;padding-left: 12px;"> 
+          <span class="label label-danger">Extornar Ult. Obs.</span>
+        </div>
       </div>
       <div class="panel-body panel-body-contrast">
         <div class='long-text' id="longText">
