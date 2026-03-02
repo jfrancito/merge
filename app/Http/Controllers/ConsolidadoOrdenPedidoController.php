@@ -25,6 +25,24 @@ class ConsolidadoOrdenPedidoController extends Controller
 {
     use OrdenPedidoTraits;
 
+    public function actionAjaxPeriodoConsolidado(Request $request)
+    {
+
+        $empresa = $request['empresa_id'];
+
+        $periodo_mes = DB::table('Web.periodos')
+            ->where('COD_EMPR', $empresa)
+            ->pluck('TXT_NOMBRE', 'COD_PERIODO')
+            ->toArray();
+
+        $combo_mes = ['' => 'Seleccione Mes'] + $periodo_mes;
+
+        return view('ordenpedido.consolidado.ajax.alistaperiodo', [
+            'combo_mes' => $combo_mes,
+            'mes_pedido' => ''
+        ]);
+    }
+
     public function actionConsolidadoOrdenPedido($idopcion)
     {
         $validarurl = $this->funciones->getUrl($idopcion, 'Ver');

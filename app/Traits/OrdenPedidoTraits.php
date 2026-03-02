@@ -259,7 +259,9 @@ trait OrdenPedidoTraits
 
     private function lg_lista_cabecera_pedido_consolidado($empresa_id, $centro_id, $mes_pedido, $anio_pedido)
     {
-        $empresa_session_id = Session::get('empresas')->COD_EMPR;
+        //$empresa_session_id = Session::get('empresas')->COD_EMPR;
+
+        $empresa_session_id = $empresa_id;
 
         $query = DB::table('WEB.ORDEN_PEDIDO as OP')
             ->select(
@@ -340,9 +342,8 @@ trait OrdenPedidoTraits
                                                                         @ACTIVO = ?,
                                                                         @COD_USUARIO_REGISTRO = ?');
 
-            $cod_usuario_registro = Session::get('usuario')->id;
-            $cod_empr = Session::get('empresas')->COD_EMPR;
-
+            //$cod_usuario_registro = Session::get('usuario')->id;
+            //$cod_empr = Session::get('empresas')->COD_EMPR;
 
             $stmt->bindParam(1, $ind_tipo_operacion, PDO::PARAM_STR);
             $stmt->bindParam(2, $id_pedido_consolidado, PDO::PARAM_STR);

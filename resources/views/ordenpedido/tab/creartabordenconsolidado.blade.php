@@ -29,10 +29,16 @@
                                 ['class'=>'select2 form-control','id'=>'anio_pedido']) !!}
                         </div>
 
+                        {{--
                         <div class="col-md-3">
                             <label>Periodo</label>
                             {!! Form::select('mes_pedido', $combo_mes, $mes_pedido,
                                 ['class'=>'select2 form-control','id'=>'mes_pedido']) !!}
+                        </div>
+                        --}}
+
+                        <div class="ajax_periodo">
+                            @include('ordenpedido.consolidado.ajax.alistaperiodo')
                         </div>
 
                         <div class="col-md-1 d-flex align-items-end">
@@ -47,7 +53,7 @@
 
             <!-- TABLA -->
             <div class="table-responsive listajax mt-3">
-              
+
             </div>
 
             <div class="text-right mt-1">
@@ -65,7 +71,7 @@
 
                <!-- CONTENEDOR NUEVO: DETALLE DEL PRODUCTO CONSOLIDADO (EN TABLA INFERIOR) -->
                 <div id="contenedor-detalle-producto-consolidado-general" style="display: none; margin-top: 25px;">
-                    
+
                     <div style="position: relative; margin-bottom: 15px;">
                         <h4 class="text-center" style="font-weight: bold; margin: 0; text-transform: uppercase;">
                             <i class="mdi mdi-receipt"></i> DETALLE: <span id="titulo-producto-detalle-general" class="text-primary"></span>
@@ -99,7 +105,7 @@
 
 </div>
 <style>
-    
+
     .btn-accion-consolidado {
         width: 130px;
         border-radius: 6px;
