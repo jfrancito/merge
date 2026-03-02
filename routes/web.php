@@ -1038,7 +1038,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::post('/guardar_editar_detalle_pedido_adm', 'GestionOrdenPedidoApruebaAdmController@actionGuardarEditarDetalleAdm');
 
 	Route::get('/consolidado-orden-pedido/{idopcion}', 'ConsolidadoOrdenPedidoController@actionConsolidadoOrdenPedido');
-	Route::any('/ajax-buscar-consolidado-op', 'ConsolidadoOrdenPedidoController@actionListarAjaxBuscarConsolidadoOP');
+    Route::post('/cargar-periodo-consolidado', 'ConsolidadoOrdenPedidoController@actionAjaxPeriodoConsolidado');
+    Route::any('/ajax-buscar-consolidado-op', 'ConsolidadoOrdenPedidoController@actionListarAjaxBuscarConsolidadoOP');
 	Route::post('/guardar_consolidado_pedido', 'ConsolidadoOrdenPedidoController@actionGuardarConsolidado');
 	Route::any('/ajax-listar-detalle-consolidado-op', 'ConsolidadoOrdenPedidoController@actionListarAjaxDetalleConsolidadoOP');
 	Route::any('/ajax-detalle-producto-consolidado-generado', 'ConsolidadoOrdenPedidoController@actionAjaxDetalleProductoConsolidadoGenerado');
