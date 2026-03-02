@@ -2301,9 +2301,25 @@ class GestionEstibaController extends Controller
                         $documento->save();
 
 
+                        $fedocumento                        =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('COD_ESTADO','<>','ETM0000000000006')->first();
+                        $lotes                              =   FeRefAsoc::where('lote','=',$idoc)                                        
+                                                                ->pluck('ID_DOCUMENTO')
+                                                                ->toArray();
+                        $documento_top                      =   CMPOrden::whereIn('COD_ORDEN',$lotes)->first();
 
-                        $archivosdelfe      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+
+                        if($documento_top->IND_VARIAS_ENTREGAS==1){
+
+                            $archivosdelfe      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                                ->whereIn('COD_CATEGORIA', ['DCC0000000000001','DCC0000000000009','DCC0000000000015'])->get();
+
+                        }else{
+
+                            $archivosdelfe      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                                 ->whereIn('COD_CATEGORIA', ['DCC0000000000001','DCC0000000000009'])->get();
+
+                        }
+
                         //ARCHIVOS
                         DB::table('CMP.DOC_ASOCIAR_COMPRA')->where('COD_ORDEN','=',$idoc)->delete();
                         foreach($archivosdelfe as $index=>$item){
@@ -2663,6 +2679,8 @@ class GestionEstibaController extends Controller
                             //FRANK
                             $archivosdelfe      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                                     ->whereIn('COD_CATEGORIA', ['DCC0000000000001','DCC0000000000002','DCC0000000000003','DCC0000000000004','DCC0000000000009'])->get();
+
+
                             //ARCHIVOS
                             DB::table('CMP.DOC_ASOCIAR_COMPRA')->where('COD_ORDEN','=',$idoc)->delete();
                             foreach($archivosdelfe as $index=>$item){
