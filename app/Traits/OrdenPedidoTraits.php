@@ -201,7 +201,61 @@ trait OrdenPedidoTraits
         return $array_lista_retail;
     }
 
+  private function lg_lista_cabecera_pedido($fecha_inicio, $fecha_fin, $empresa_id, $centro_pedido)
+{
+    $query = DB::table('WEB.ORDEN_PEDIDO as OP')
+        ->select([
+            'OP.ID_PEDIDO',
+            'OP.FEC_PEDIDO',
+            'OP.COD_ANIO',
+            'OP.TXT_NOMBRE',
+            'OP.COD_CENTRO',
+            'OP.COD_EMPR',
+            'E.NOM_EMPR',
+            'C.NOM_CENTRO',
+            'OP.TXT_AREA',
+            'OP.TXT_TIPO_PEDIDO',
+            'OP.TXT_TRABAJADOR_SOLICITA',
+            'OP.TXT_TRABAJADOR_AUTORIZA',
+            'OP.TXT_TRABAJADOR_APRUEBA_GER',
+            'OP.TXT_TRABAJADOR_APRUEBA_ADM',
+            'OP.TXT_GLOSA',
+            'OP.TXT_ESTADO',
 
+            'OD.ID_PEDIDO as ID_PEDIDO_DETALLE',
+            'OD.COD_PRODUCTO',
+            'OD.NOM_PRODUCTO',
+            'OD.NOM_CATEGORIA',
+            'OD.CANTIDAD',
+            'CAT.NOM_CATEGORIA as NOM_CATEGORIA_FAMILIA',
+            'OD.TXT_OBSERVACION'
+        ])
+
+        ->join('WEB.ORDEN_PEDIDO_DETALLE as OD', 'OD.ID_PEDIDO', '=', 'OP.ID_PEDIDO')
+        ->join('STD.EMPRESA as E', 'E.COD_EMPR', '=', 'OP.COD_EMPR')
+        ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'OP.COD_CENTRO')
+        ->leftJoin('ALM.PRODUCTO as P', 'P.COD_PRODUCTO', '=', 'OD.COD_PRODUCTO')
+        ->leftJoin('CMP.CATEGORIA as CAT', 'CAT.COD_CATEGORIA', '=', 'P.COD_CATEGORIA_FAMILIA')
+
+        ->where('OP.ACTIVO', 1)
+
+        ->when($empresa_id && $empresa_id != 'TODO', function ($q) use ($empresa_id) {
+            $q->where('OP.COD_EMPR', $empresa_id);
+        })
+
+        ->when($centro_pedido && $centro_pedido != 'TODO', function ($q) use ($centro_pedido) {
+            $q->where('OP.COD_CENTRO', $centro_pedido);
+        })
+
+        ->when($fecha_inicio && $fecha_fin, function ($q) use ($fecha_inicio, $fecha_fin) {
+            $q->whereBetween(DB::raw('CAST(OP.FEC_PEDIDO AS DATE)'), [$fecha_inicio, $fecha_fin]);
+        })
+
+        ->orderBy('E.NOM_EMPR', 'ASC')
+        ->orderBy('OP.ID_PEDIDO', 'ASC');
+
+    return $query->get();
+}
 
     private function lg_lista_cabecera_pedido_resumen($fecha_inicio, $fecha_fin, $empresa_id, $centro_pedido)
     {

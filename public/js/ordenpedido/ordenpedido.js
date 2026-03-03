@@ -345,7 +345,10 @@ $(document).ready(function () {
     });
 
     function calcularTotalPedido() {
+
         let totalPedido = 0;
+
+        // Sumar subtotales
         $('#tabla_detalle_pedido tbody .subtotal').each(function () {
             totalPedido += parseFloat($(this).text()) || 0;
         });
@@ -354,56 +357,78 @@ $(document).ready(function () {
 
         if (typeof registrosMonto !== 'undefined' && Array.isArray(registrosMonto)) {
 
-            // Umbral para Gerencia (Código 01) -> Ejemplo: 30.00
+            // =========================
+            // OBTENER UMBRALES
+            // =========================
+
+            // Gerencia
             let configGerencia = registrosMonto.find(r => r.COD_MONTO === 'IICHMO0000000001');
             let umbralGerencia = configGerencia ? parseFloat(configGerencia.MONTO) : 0;
 
-            // Umbral para Administración (Código 02) -> Ejemplo: 50.00
+            // Administración
             let configAdminMaestra = registrosMonto.find(r => r.COD_MONTO === 'IICHMO0000000002');
             let umbralAdminMaestra = configAdminMaestra ? parseFloat(configAdminMaestra.MONTO) : 0;
 
-            /**
-             * LÓGICA DE VISIBILIDAD REFINADA
-             */
 
-            // GERENCIA: Solo se muestra si el total es ESTRICTAMENTE MAYOR al umbral (ej: > 30)
-            if (totalPedido > umbralGerencia) {
-                // Si el campo estaba oculto y ahora se va a mostrar, lanzamos advertencia
+            // =========================
+            // LÓGICA GERENCIA
+            // =========================
+            // Se muestra cuando supera el umbral de Administración (ej: 800)
+
+            if (totalPedido > umbralAdminMaestra) {
+
                 if ($('#cod_trabajador_aprueba_ger').closest('.col-md-6').is(':hidden')) {
+
                     modalBonito({
                         tipo: 'warn',
                         icono: '⚠️',
                         titulo: 'Atención',
-                        mensaje: 'El monto total <b>superó los ' + umbralGerencia.toFixed(2) + '</b>. Por favor, asegúrese de seleccionar el <b>Aprobador de Gerencia</b>.'
+                        mensaje: 'El monto total <b>superó los ' +
+                                 umbralAdminMaestra.toFixed(2) +
+                                 '</b>. Debe seleccionar el <b>Aprobador de Gerencia</b>.'
                     });
                 }
+
                 $('#cod_trabajador_aprueba_ger').closest('.col-md-6').show();
+
             } else {
-                // Si es 30 o menos, se oculta y limpia
+
                 $('#cod_trabajador_aprueba_ger').closest('.col-md-6').hide();
                 $('#cod_trabajador_aprueba_ger').val('').trigger('change');
             }
 
-            // ADMINISTRACIÓN: Lógica de selección automática y bloqueo
+
+            // =========================
+            // LÓGICA ADMINISTRACIÓN
+            // =========================
+
             if (totalPedido > 0) {
+
                 $('#cod_trabajador_aprueba_adm').closest('.col-md-6').show();
 
-                // Caso base / Rango bajo (<= 30): IATR000000000199
+                // Valor base (0 – 800)
                 let selectedAdmin = 'IATR000000000199';
 
-                // Si supera el de 30 (Umbral 1): Cambia a IITR000000000391 y se mantiene para montos mayores
-                if (totalPedido > umbralGerencia) {
+                // Si supera 800 → cambia a IITR000000000391
+                if (totalPedido > umbralAdminMaestra) {
                     selectedAdmin = 'IITR000000000391';
                 }
 
-                $('#cod_trabajador_aprueba_adm').val(selectedAdmin).trigger('change').prop('disabled', true);
+                $('#cod_trabajador_aprueba_adm')
+                    .val(selectedAdmin)
+                    .trigger('change')
+                    .prop('disabled', true);
+
             } else {
+
                 $('#cod_trabajador_aprueba_adm').closest('.col-md-6').hide();
-                $('#cod_trabajador_aprueba_adm').val('').trigger('change').prop('disabled', false);
+                $('#cod_trabajador_aprueba_adm')
+                    .val('')
+                    .trigger('change')
+                    .prop('disabled', false);
             }
         }
     }
-
 
     /* $('#cod_anio').on('change', function () {
  
