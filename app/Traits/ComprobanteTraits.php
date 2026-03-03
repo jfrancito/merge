@@ -8436,11 +8436,6 @@ trait ComprobanteTraits
 
         $fecha_corte            =   date('Ymd');
 
- 
-        if(Session::get('usuario')->rol_id =='1CIX00000019' || Session::get('usuario')->rol_id =='1CIX00000052' ){
-            $listadatos = array();
-        }else{
-
             //UPDATE DE CENTIMOS ORDEN DE COMPRAS
             DB::update("
                 UPDATE CMP.DOCUMENTO_CTBLE
@@ -8746,7 +8741,7 @@ trait ComprobanteTraits
                                         ->get();
 
 
-        }
+
         //dd($listadatos);
 
         return  $listadatos;
