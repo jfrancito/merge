@@ -1497,20 +1497,25 @@ $(document).ready(function () {
 
     $(document).on('click', '.btn-consolidar', function () {
         productosConsolidados = {};
-
+        debugger;
+        console.log("hola");
         if (typeof pedidosData === 'undefined' || !pedidosData) {
             console.error("pedidosData no está definido");
             return;
         }
-
+        debugger;
         $('.pedido_seleccionado:checked').each(function () {
             let idPedido = $(this).val();
             let detalles = pedidosData[idPedido];
 
+
+            debugger;
             if (detalles) {
                 detalles.forEach(item => {
-                    let key = item.COD_PRODUCTO + '-' + item.COD_CENTRO;
-
+                    debugger;
+                    let key = item.COD_PRODUCTO + '-' + item.COD_CENTRO+ '-' + item.COD_PERIODO;
+                    console.log(key);
+                    debugger;
                     if (!productosConsolidados[key]) {
                         productosConsolidados[key] = {
                             COD_PRODUCTO: item.COD_PRODUCTO,
@@ -1529,7 +1534,7 @@ $(document).ready(function () {
                 });
             }
         });
-
+        console.log();
         // Pintar tabla consolidada
         let tbody = $('#tablaConsolidado tbody');
         tbody.empty();

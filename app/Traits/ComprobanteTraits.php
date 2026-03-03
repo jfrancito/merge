@@ -9833,7 +9833,7 @@ trait ComprobanteTraits
                                             ->whereRaw("CAST(VMERGEDOCUMENTOS.FEC_EMISION AS DATE) >= ? and CAST(VMERGEDOCUMENTOS.FEC_EMISION AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                             ->where('COD_EMPR_EMISOR','=',$proveedor_id)
                                             ->WHERE('VMERGEDOCUMENTOS.COD_ESTADO','=','1')
-                                            ->whereIn('VMERGEDOCUMENTOS.COD_USUARIO_CREA_AUD',$array_usuarios)
+                                            //->whereIn('VMERGEDOCUMENTOS.COD_USUARIO_CREA_AUD',$array_usuarios)
                                             ->where('COD_CATEGORIA_TIPO_DOC','=',$tipodoc_id)
                                             ->orderBy('VMERGEDOCUMENTOS.FEC_EMISION','ASC')
                                             ->select(DB::raw('  COD_DOCUMENTO_CTBLE,
