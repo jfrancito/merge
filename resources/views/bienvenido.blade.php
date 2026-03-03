@@ -14,7 +14,7 @@
 		<div class="main-content container-fluid">
 			<div class='container'>
 
-                @if(Session::get('usuario')->rol_id == '1CIX00000001' || $centro == 'CEN0000000000004' || $centro == 'CEN0000000000006')
+<!--                 @if(Session::get('usuario')->rol_id == '1CIX00000001' || $centro == 'CEN0000000000004' || $centro == 'CEN0000000000006')
                 <div class="row">
                     <div class="col-md-4">
                         <div class="btn-toolbar">
@@ -29,7 +29,7 @@
                         </div>
                     </div>
                 </div>
-                @endif
+                @endif -->
 
 
               <div class="row">
