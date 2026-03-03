@@ -311,12 +311,91 @@ trait OrdenPedidoTraits
         return $listaordenpedido;
     }
 
-
     private function lg_lista_cabecera_pedido_consolidado($empresa_id, $centro_id, $mes_pedido, $anio_pedido)
     {
-        //$empresa_session_id = Session::get('empresas')->COD_EMPR;
+        $empresa_session_id = Session::get('empresas')->COD_EMPR;
 
-        $empresa_session_id = $empresa_id;
+        //$empresa_session_id = $empresa_id;
+
+        $query = DB::table('WEB.ORDEN_PEDIDO as OP')
+            ->select(
+                'OP.ID_PEDIDO',
+                'OP.FEC_PEDIDO',
+                'OP.COD_CENTRO',
+                'OP.COD_PERIODO',
+                'OP.COD_ANIO',
+                'OP.TXT_AREA',
+                'OP.TXT_GLOSA',
+                'OP.COD_ESTADO',
+                'OP.TXT_ESTADO',
+                'OP.TXT_TRABAJADOR_SOLICITA',
+                'OP.TXT_TRABAJADOR_AUTORIZA',
+                'OP.TXT_TRABAJADOR_APRUEBA_ADM',
+                'OD.COD_PRODUCTO',
+                'OD.NOM_PRODUCTO',
+                DB::raw("
+                COALESCE(
+                    OD.CAN_MODIF_ADM,
+                    OD.CAN_MODIF_GER,
+                    OD.CAN_MODIF_JEF_AUT,
+                    OD.CANTIDAD
+                ) AS CANTIDAD
+            "),
+                'OD.COD_CATEGORIA AS COD_UNIDAD',
+                'OD.NOM_CATEGORIA',
+                'CAT.COD_CATEGORIA AS COD_FAMILIA',
+                'CAT.NOM_CATEGORIA AS NOM_CATEGORIA_FAMILIA',
+                DB::raw("(
+                SELECT ISNULL(SUM(IAP.CAN_FIN_MAT), 0)
+                FROM ALM.INVENTARIO_ALMACEN IAP
+                WHERE IAP.COD_PRODUCTO = OD.COD_PRODUCTO
+                  AND IAP.COD_CENTRO = OP.COD_CENTRO
+                  AND IAP.COD_EMPR = '$empresa_id'
+                  AND IAP.COD_EMPR_PROPIETARIO = '$empresa_id'
+                  AND IAP.COD_EMPR_PROVEEDOR_SERV = '$empresa_id'
+                  AND IAP.IND_STK_ACTUAL = 1
+                  AND IAP.COD_ESTADO = 1
+            ) AS STOCK"),
+                'PRD.CAN_STOCK_SEGURIDAD AS CAN_STOCK_RESERVADO'
+            )
+            ->join('WEB.ORDEN_PEDIDO_DETALLE as OD', 'OP.ID_PEDIDO', '=', 'OD.ID_PEDIDO')
+            ->join('STD.EMPRESA as E', 'E.COD_EMPR', '=', 'OP.COD_EMPR')
+            ->join('ALM.PRODUCTO as PRD', 'PRD.COD_PRODUCTO', '=', 'OD.COD_PRODUCTO')
+            ->join('CMP.CATEGORIA as CAT', 'CAT.COD_CATEGORIA', '=', 'PRD.COD_CATEGORIA_FAMILIA')
+            //->where('OP.ID_PEDIDO', 'IICHOP0000000028')
+            ->where('OP.ACTIVO', 1)
+            ->where('OD.ACTIVO', 1)
+            ->whereNull('OP.CONSOLIDADO')
+            ->where('OP.COD_EMPR', $empresa_session_id)
+            ->where('OP.COD_ESTADO', 'ETM0000000000005');
+
+        // FILTROS CONDICIONALES
+        if ($centro_id && $centro_id != 'TODO') {
+            $query->where('OP.COD_CENTRO', $centro_id);
+        }
+
+        if ($mes_pedido && $mes_pedido != 'TODO') {
+            $query->where('OP.COD_PERIODO', $mes_pedido);
+        }
+
+        if ($anio_pedido && $anio_pedido != 'TODO') {
+            $query->where('OP.COD_ANIO', $anio_pedido);
+        }
+
+        $query->orderBy('OP.ID_PEDIDO', 'ASC');
+
+        // VER SQL GENERADO (para debug)
+        // dd($query->toSql(), $query->getBindings());
+
+        return $query->get()->groupBy('ID_PEDIDO');
+    }
+
+/*
+    private function lg_lista_cabecera_pedido_consolidado($empresa_id, $centro_id, $mes_pedido, $anio_pedido)
+    {
+        $empresa_session_id = Session::get('empresas')->COD_EMPR;
+
+        //$empresa_session_id = $empresa_id;
 
         $query = DB::table('WEB.ORDEN_PEDIDO as OP')
             ->select(
@@ -378,6 +457,7 @@ trait OrdenPedidoTraits
 
         return $query->get()->groupBy('ID_PEDIDO');
     }
+*/
 
     public function insertOrdenPedidoConsolidado($ind_tipo_operacion, $id_pedido_consolidado, $fec_pedido, $cod_periodo, $txt_nombre, $cod_empr, $cod_centro, $cod_categoria_familia, $nom_categoria_familia, $cod_estado, $txt_estado, $activo, $cod_usuario_registro)
     {
@@ -397,8 +477,8 @@ trait OrdenPedidoTraits
                                                                         @ACTIVO = ?,
                                                                         @COD_USUARIO_REGISTRO = ?');
 
-            //$cod_usuario_registro = Session::get('usuario')->id;
-            //$cod_empr = Session::get('empresas')->COD_EMPR;
+            $cod_usuario_registro = Session::get('usuario')->id;
+            $cod_empr = Session::get('empresas')->COD_EMPR;
 
             $stmt->bindParam(1, $ind_tipo_operacion, PDO::PARAM_STR);
             $stmt->bindParam(2, $id_pedido_consolidado, PDO::PARAM_STR);

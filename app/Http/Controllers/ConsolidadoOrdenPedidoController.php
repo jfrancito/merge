@@ -66,11 +66,13 @@ class ConsolidadoOrdenPedidoController extends Controller
         $combo_empresa = [];
         $ind_compras = false;
 
+        /*
         if ($planilla) {
             if ($planilla->cadarea === 'COMPRAS') {
                 $ind_compras = true;
             }
         }
+        */
 
         if ($ind_compras) {
             $combo_empresa = DB::table('STD.EMPRESA')

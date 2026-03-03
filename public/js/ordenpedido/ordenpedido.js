@@ -272,7 +272,7 @@ $(document).ready(function () {
             }
         });*/
 
-        ajax_normal_combo(data, "/cargar-periodo-consolidado", "ajax_periodo")
+        //ajax_normal_combo(data, "/cargar-periodo-consolidado", "ajax_periodo")
 
     });
 
