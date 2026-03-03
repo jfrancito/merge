@@ -29,17 +29,17 @@
                                 ['class'=>'select2 form-control','id'=>'anio_pedido']) !!}
                         </div>
 
-                        {{--
                         <div class="col-md-3">
                             <label>Periodo</label>
                             {!! Form::select('mes_pedido', $combo_mes, $mes_pedido,
                                 ['class'=>'select2 form-control','id'=>'mes_pedido']) !!}
                         </div>
-                        --}}
 
+                        {{--
                         <div class="ajax_periodo">
                             @include('ordenpedido.consolidado.ajax.alistaperiodo')
                         </div>
+                        --}}
 
                         <div class="col-md-1 d-flex align-items-end">
                             <button class="btn btn-primary buscarpedidoconsolidado" style="margin-top:17px;">
