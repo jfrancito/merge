@@ -323,9 +323,11 @@ trait OrdenPedidoTraits
                 'OP.ID_PEDIDO',
                 'OP.FEC_PEDIDO',
                 'OP.COD_CENTRO',
+                'OP.COD_PERIODO',
+                'OP.COD_ANIO',
                 'OP.TXT_AREA',
                 'OP.TXT_GLOSA',
-                'OP.COD_ESTADO', // 🔥 corregido
+                'OP.COD_ESTADO',
                 'OP.TXT_ESTADO',
                 'OP.TXT_TRABAJADOR_SOLICITA',
                 'OP.TXT_TRABAJADOR_AUTORIZA',
@@ -344,37 +346,45 @@ trait OrdenPedidoTraits
                 'OD.NOM_CATEGORIA',
                 'CAT.COD_CATEGORIA AS COD_FAMILIA',
                 'CAT.NOM_CATEGORIA as NOM_CATEGORIA_FAMILIA',
-                DB::raw('COALESCE(IAP.CAN_FIN_MAT, 0) as STOCK'),
+                DB::raw("(
+                    SELECT ISNULL(SUM(COALESCE(IAP.CAN_INI_MAT, 0)),0) 
+                    FROM ALM.INVENTARIO_ALMACEN IAP 
+                    WHERE IAP.COD_PRODUCTO = OD.COD_PRODUCTO 
+                        AND IAP.COD_CENTRO = OP.COD_CENTRO 
+                        AND IAP.COD_EMPR = '$empresa_session_id'  /* 👈 ASÍ CON COMILLAS */
+                        AND IAP.IND_STK_ACTUAL = 1 
+                        AND IAP.COD_ESTADO = 1
+                ) as STOCK"),
                 'PRD.CAN_STOCK_SEGURIDAD AS CAN_STOCK_RESERVADO'
             )
             ->join('WEB.ORDEN_PEDIDO_DETALLE as OD', 'OP.ID_PEDIDO', '=', 'OD.ID_PEDIDO')
             ->join('STD.EMPRESA as E', 'E.COD_EMPR', '=', 'OP.COD_EMPR')
             ->join('ALM.PRODUCTO as PRD', 'PRD.COD_PRODUCTO', '=', 'OD.COD_PRODUCTO')
             ->join('CMP.CATEGORIA as CAT', 'CAT.COD_CATEGORIA', '=', 'PRD.COD_CATEGORIA_FAMILIA')
-            ->leftJoin('ALM.INVENTARIO_ALMACEN as IAP', function ($join) use ($empresa_session_id) {
-                $join->on('IAP.COD_PRODUCTO', '=', 'OD.COD_PRODUCTO')
-                    ->on('IAP.COD_CENTRO', '=', 'OP.COD_CENTRO')
-                    ->where('IAP.COD_EMPR', '=', $empresa_session_id)
-                    ->where('IAP.IND_STK_ACTUAL', '=', 1)
-                    ->where('IAP.COD_ESTADO', '=', 1);
-            })
+            //->where('OP.ID_PEDIDO', 'IICHOP0000000028')
             ->where('OP.ACTIVO', 1)
             ->where('OD.ACTIVO', 1)
             ->whereNull('OP.CONSOLIDADO')
             ->where('OP.COD_EMPR', $empresa_session_id)
+            ->where('OP.COD_ESTADO', 'ETM0000000000005');
 
-            // 🔥 FILTRO NUEVO
-            ->where('OP.COD_ESTADO', 'ETM0000000000005')
-            ->orderBy('OP.ID_PEDIDO', 'ASC');
-
-        if ($centro_id && $centro_id != 'TODO')
+        // FILTROS CONDICIONALES
+        if ($centro_id && $centro_id != 'TODO') {
             $query->where('OP.COD_CENTRO', $centro_id);
+        }
 
-        if ($mes_pedido && $mes_pedido != 'TODO')
+        if ($mes_pedido && $mes_pedido != 'TODO') {
             $query->where('OP.COD_PERIODO', $mes_pedido);
+        }
 
-        if ($anio_pedido && $anio_pedido != 'TODO')
+        if ($anio_pedido && $anio_pedido != 'TODO') {
             $query->where('OP.COD_ANIO', $anio_pedido);
+        }
+
+        $query->orderBy('OP.ID_PEDIDO', 'ASC');
+
+        // VER SQL GENERADO (para debug)
+        // dd($query->toSql(), $query->getBindings());
 
         return $query->get()->groupBy('ID_PEDIDO');
     }
@@ -684,57 +694,68 @@ trait OrdenPedidoTraits
 
     private function lg_lista_detalle_consolidado($id_consolidado, $familia_id)
     {
-        $query = DB::connection('sqlsrv')->table('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE as D')
-            ->join('WEB.ORDEN_PEDIDO_CONSOLIDADO as C',
-                'C.ID_PEDIDO_CONSOLIDADO', '=', 'D.ID_PEDIDO_CONSOLIDADO')
-            ->select(
-                'D.*',
-                'C.COD_ESTADO', // 👈 AGREGAR ESTO
-                DB::raw("
-                        STUFF((
-                            SELECT 
-                                ' [SEP] ' 
-                                + CONVERT(VARCHAR(10), OP.FEC_PEDIDO, 103)
-                                + ' [FLD] ' + OP.ID_PEDIDO
-                                + ' [FLD] ' + OP.TXT_AREA
-                                + ' [FLD] ' + ISNULL(OP.TXT_GLOSA,'')
-                                + ' [FLD] ' + CAST(SUM(
-                                    COALESCE(
-                                        OPD.CAN_MODIF_ADM, 
-                                        OPD.CAN_MODIF_GER, 
-                                        OPD.CAN_MODIF_JEF_AUT, 
-                                        OPD.CANTIDAD
-                                    )
-                                ) AS VARCHAR(20))
-                            FROM CMP.REFERENCIA_ASOC RA
-                            INNER JOIN WEB.ORDEN_PEDIDO OP
-                                ON OP.ID_PEDIDO = RA.COD_TABLA
-                            INNER JOIN WEB.ORDEN_PEDIDO_DETALLE OPD
-                                ON OP.ID_PEDIDO = OPD.ID_PEDIDO
-                            WHERE RA.COD_TABLA_ASOC = D.ID_PEDIDO_CONSOLIDADO
-                              AND RA.TXT_TIPO_REFERENCIA = 'CONSOLIDADO'
-                              AND RA.TXT_TABLA = 'WEB.ORDEN_PEDIDO'
-                              AND RA.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
-                              AND OPD.COD_PRODUCTO = D.COD_PRODUCTO
-                              AND OPD.ACTIVO = 1
-                            GROUP BY 
-                                OP.FEC_PEDIDO,
-                                OP.ID_PEDIDO,
-                                OP.TXT_AREA,
-                                OP.TXT_GLOSA
-                            ORDER BY OP.FEC_PEDIDO
-                            FOR XML PATH(''), TYPE
-                        ).value('.', 'NVARCHAR(MAX)'), 1, 7, '')
-                        AS DETALLE_POR_AREA
-                    ")
-            )
-            ->where('D.ID_PEDIDO_CONSOLIDADO', $id_consolidado)
-            ->where(function ($q) use ($familia_id) {
-                if ($familia_id != '') {
-                    $q->where('D.COD_CATEGORIA_FAMILIA', $familia_id);
-                }
-            })
-            ->get();
+
+$pedido = DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO')
+    ->where('ID_PEDIDO_CONSOLIDADO', $id_consolidado)
+    ->first();
+
+$query = DB::connection('sqlsrv')
+    ->table('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE as D')
+    ->join('WEB.ORDEN_PEDIDO_CONSOLIDADO as C',
+        'C.ID_PEDIDO_CONSOLIDADO', '=', 'D.ID_PEDIDO_CONSOLIDADO')
+    ->select(
+        'D.*',
+        'C.COD_ESTADO',
+        DB::raw("
+            STUFF((
+                SELECT 
+                    ' [SEP] ' 
+                    + CONVERT(VARCHAR(10), OP.FEC_PEDIDO, 103)
+                    + ' [FLD] ' + OP.ID_PEDIDO
+                    + ' [FLD] ' + OP.TXT_AREA
+                    + ' [FLD] ' + ISNULL(OP.TXT_GLOSA,'')
+                    + ' [FLD] ' + CAST(SUM(
+                        COALESCE(
+                            OPD.CAN_MODIF_ADM, 
+                            OPD.CAN_MODIF_GER, 
+                            OPD.CAN_MODIF_JEF_AUT, 
+                            OPD.CANTIDAD
+                        )
+                    ) AS VARCHAR(20))
+                FROM CMP.REFERENCIA_ASOC RA
+                INNER JOIN WEB.ORDEN_PEDIDO OP
+                    ON OP.ID_PEDIDO = RA.COD_TABLA
+                INNER JOIN WEB.ORDEN_PEDIDO_DETALLE OPD
+                    ON OP.ID_PEDIDO = OPD.ID_PEDIDO
+                WHERE RA.COD_TABLA_ASOC = D.ID_PEDIDO_CONSOLIDADO
+                    AND RA.TXT_TIPO_REFERENCIA = 'CONSOLIDADO'
+                    AND RA.TXT_TABLA = 'WEB.ORDEN_PEDIDO'
+                    AND RA.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
+                    AND OPD.COD_PRODUCTO = D.COD_PRODUCTO
+                    AND OPD.ACTIVO = 1
+                    AND OP.ACTIVO = 1
+                    AND OP.COD_PERIODO = '" . $pedido->COD_PERIODO . "'  /* 👈 COMILLAS AGREGADAS */
+                GROUP BY 
+                    OP.FEC_PEDIDO,
+                    OP.ID_PEDIDO,
+                    OP.TXT_AREA,
+                    OP.TXT_GLOSA
+                ORDER BY OP.FEC_PEDIDO
+                FOR XML PATH(''), TYPE
+            ).value('.', 'NVARCHAR(MAX)'), 1, 7, '') AS DETALLE_POR_AREA
+        ")
+    )
+    ->where('D.ID_PEDIDO_CONSOLIDADO', $id_consolidado)
+    //->where('D.COD_PRODUCTO', 'PRD0000000018837')
+    ->where('C.COD_PERIODO', $pedido->COD_PERIODO)
+    ->where(function ($q) use ($familia_id) {
+        if (!empty($familia_id) && $familia_id != 'TODO') {
+            $q->where('D.COD_CATEGORIA_FAMILIA', $familia_id);
+        }
+    })
+    ->get();
+
+        //DD($id_consolidado);
 
         return $query;
     }
