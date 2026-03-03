@@ -1865,7 +1865,7 @@ class GestionEstibaController extends Controller
                             $parser             =   new LiquiParser();
                             $xml                =   file_get_contents($path);
                             $factura            =   $parser->parse($xml);
-                            $tipo_documento_le  =   $factura->gettipoDoc();
+                            $tipo_documento_le  =   '04';
                             $moneda_le          =   $factura->gettipoMoneda();
                             $archivosdelfe      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                                     ->whereIn('COD_CATEGORIA', ['DCC0000000000043','DCC0000000000045','DCC0000000000003','DCC0000000000001'])
