@@ -1659,6 +1659,9 @@ $(document).ready(function () {
 
                     success: function (resp) {
 
+                        debugger;
+                        console.log(resp);
+
                         if (resp.success) {
 
                             modalBonito({
@@ -1687,8 +1690,8 @@ $(document).ready(function () {
                         }
                     },
 
-                    error: function () {
-
+                    error: function (resp) {
+                        debugger;
                         cerrarcargando();
                         $boton.prop('disabled', false);
 

@@ -19,6 +19,8 @@ use Session;
 use App\WEBRegla, APP\User, App\CMPCategoria;
 use View;
 use Validator;
+use Illuminate\Support\Facades\Log;
+
 
 
 class ConsolidadoOrdenPedidoController extends Controller
@@ -221,6 +223,9 @@ class ConsolidadoOrdenPedidoController extends Controller
             ]);
         }
 
+        //print_r($productos);
+        //exit();
+
         // 🔹 Soporta string o array
         $pedidos_ids = is_array($pedidos_input)
             ? $pedidos_input
@@ -311,9 +316,8 @@ class ConsolidadoOrdenPedidoController extends Controller
 
             // 6. Guardar relación N:N en CMP.REFERENCIA_ASOC
             foreach ($pedidos_ids as $pedido_id) {
-
+                DB::table('CMP.REFERENCIA_ASOC')->where('COD_TABLA','=',$pedido_id)->delete();
                 foreach ($consolidated_ids as $consolidado_id) {
-
                     DB::table('CMP.REFERENCIA_ASOC')->insert([
                         'COD_TABLA' => $pedido_id,
                         'COD_TABLA_ASOC' => $consolidado_id,
@@ -347,6 +351,7 @@ class ConsolidadoOrdenPedidoController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            Log::error("Error en actionAjaxPedidoEditar: " . $e->getMessage());
             DB::rollBack();
             return response()->json([
                 'success' => false,
