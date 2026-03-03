@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Support\Facades\DB;
 
 use Illuminate\Http\Request;
@@ -22,9 +23,27 @@ use Validator;
 
 class ConsolidadoOrdenPedidoController extends Controller
 {
-	 use OrdenPedidoTraits;  
+    use OrdenPedidoTraits;
 
-      public function actionConsolidadoOrdenPedido($idopcion)
+    public function actionAjaxPeriodoConsolidado(Request $request)
+    {
+
+        $empresa = $request['empresa_id'];
+
+        $periodo_mes = DB::table('Web.periodos')
+            ->where('COD_EMPR', $empresa)
+            ->pluck('TXT_NOMBRE', 'COD_PERIODO')
+            ->toArray();
+
+        $combo_mes = ['' => 'Seleccione Mes'] + $periodo_mes;
+
+        return view('ordenpedido.consolidado.ajax.alistaperiodo', [
+            'combo_mes' => $combo_mes,
+            'mes_pedido' => ''
+        ]);
+    }
+
+    public function actionConsolidadoOrdenPedido($idopcion)
     {
         $validarurl = $this->funciones->getUrl($idopcion, 'Ver');
         if ($validarurl <> 'true') {
@@ -34,11 +53,34 @@ class ConsolidadoOrdenPedidoController extends Controller
         View::share('titulo', 'Lista Orden Pedido Por Consolidar');
 
         $empresa_sesion = Session::get('empresas');
-        $usuario_id     = Session::get('usuario')->usuarioosiris_id;
+        $usuario_id = Session::get('usuario')->usuarioosiris_id;
 
-        $combo_empresa = [
-            $empresa_sesion->COD_EMPR => $empresa_sesion->NOM_EMPR
-        ];
+        $planilla = DB::table('STD.TRABAJADOR as T')
+            ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
+            ->where('T.COD_TRAB', $usuario_id)
+            ->where('P.situacion_id', 'PRMAECEN000000000002')
+            ->first();
+
+        $combo_empresa = [];
+        $ind_compras = false;
+
+        if ($planilla) {
+            if ($planilla->cadarea === 'COMPRAS') {
+                $ind_compras = true;
+            }
+        }
+
+        if ($ind_compras) {
+            $combo_empresa = DB::table('STD.EMPRESA')
+                ->where('COD_ESTADO', 1)
+                ->where('IND_SISTEMA', 1)
+                ->pluck('NOM_EMPR', 'COD_EMPR')
+                ->toArray();
+        } else {
+            $combo_empresa = [
+                $empresa_sesion->COD_EMPR => $empresa_sesion->NOM_EMPR
+            ];
+        }
 
         /* =========================
            COMBOS GENERALES
@@ -79,7 +121,7 @@ class ConsolidadoOrdenPedidoController extends Controller
         ========================== */
 
         $combo_centro = [];
-        $centro_id    = '';
+        $centro_id = '';
 
         $centro = DB::table('STD.TRABAJADOR as T')
             ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
@@ -91,21 +133,27 @@ class ConsolidadoOrdenPedidoController extends Controller
             ->select('C.COD_CENTRO', 'C.NOM_CENTRO')
             ->first();
 
-        if ($centro) {
+        if (!$ind_compras) {
             $centro_id = $centro->COD_CENTRO;
             $combo_centro = [
                 $centro->COD_CENTRO => $centro->NOM_CENTRO
             ];
+        } else {
+            $centro_id = 'CEN0000000000001';
+            $combo_centro = DB::table('ALM.CENTRO')
+                ->where('COD_ESTADO', 1)
+                ->pluck('NOM_CENTRO', 'COD_CENTRO')
+                ->toArray();
         }
 
         /* =========================
            VARIABLES FILTRO
         ========================== */
 
-        $empresa_id   = '';
-        $mes_pedido   = '';
-        $anio_pedido  = '';
-        $familia_id   = '';
+        $empresa_id = '';
+        $mes_pedido = '';
+        $anio_pedido = '';
+        $familia_id = '';
 
         $listaordenpedido = $this->lg_lista_cabecera_pedido_consolidado(
             $empresa_id,
@@ -117,24 +165,24 @@ class ConsolidadoOrdenPedidoController extends Controller
         $listaordenconsolidado = $this->lg_lista_cabecera_consolidado();
 
         return view('ordenpedido.consolidado.ordenpedidoconsolidado', [
-            'listaordenpedido'        => $listaordenpedido,
-            'listaordenconsolidado'   => $listaordenconsolidado,
-            'funcion'                 => $this,
-            'idopcion'                => $idopcion,
-            'empresa_id'              => $empresa_id,
-            'combo_empresa'           => $combo_empresa,
-            'combo_mes'               => $combo_mes,
-            'mes_pedido'              => $mes_pedido,
-            'combo_anio'              => $combo_anio,
-            'centro_id'               => $centro_id,
-            'combo_centro'            => $combo_centro,
-            'anio_pedido'             => $anio_pedido,
-            'familia_id'              => $familia_id,
-            'combo_familia'           => $combo_familia
+            'listaordenpedido' => $listaordenpedido,
+            'listaordenconsolidado' => $listaordenconsolidado,
+            'funcion' => $this,
+            'idopcion' => $idopcion,
+            'empresa_id' => $empresa_id,
+            'combo_empresa' => $combo_empresa,
+            'combo_mes' => $combo_mes,
+            'mes_pedido' => $mes_pedido,
+            'combo_anio' => $combo_anio,
+            'centro_id' => $centro_id,
+            'combo_centro' => $combo_centro,
+            'anio_pedido' => $anio_pedido,
+            'familia_id' => $familia_id,
+            'combo_familia' => $combo_familia
         ]);
     }
 
-     public function actionListarAjaxBuscarConsolidadoOP(Request $request)
+    public function actionListarAjaxBuscarConsolidadoOP(Request $request)
     {
 
         $empresa_id = $request['empresa_id'];
@@ -144,31 +192,31 @@ class ConsolidadoOrdenPedidoController extends Controller
         $idopcion = $request['idopcion'];
 
 
- 		$listaordenpedido = $this->lg_lista_cabecera_pedido_consolidado($empresa_id, $centro_id, $mes_pedido, $anio_pedido);
+        $listaordenpedido = $this->lg_lista_cabecera_pedido_consolidado($empresa_id, $centro_id, $mes_pedido, $anio_pedido);
 
         $funcion = $this;
 
         return View::make('ordenpedido/consolidado/listaordenpedidoporconsolidar',
             [
                 'listaordenpedido' => $listaordenpedido,
-	            'idopcion' => $idopcion, 
-	            'empresa_id' => $empresa_id,
+                'idopcion' => $idopcion,
+                'empresa_id' => $empresa_id,
                 'centro_id' => $centro_id,
-	            'mes_pedido' => $mes_pedido,
-	            'anio_pedido' => $anio_pedido,
-	            'funcion' => $funcion,
+                'mes_pedido' => $mes_pedido,
+                'anio_pedido' => $anio_pedido,
+                'funcion' => $funcion,
                 'ajax' => true,
             ]);
     }
 
-     public function actionGuardarConsolidado(Request $request)
+    public function actionGuardarConsolidado(Request $request)
     {
         $pedidos_input = $request->input('pedidos_ids');
-        $productos     = $request->input('productos'); 
+        $productos = $request->input('productos');
 
         if (empty($pedidos_input) || empty($productos)) {
             return response()->json([
-                'success' => false, 
+                'success' => false,
                 'mensaje' => 'No hay pedidos o productos seleccionados.'
             ]);
         }
@@ -184,13 +232,13 @@ class ConsolidadoOrdenPedidoController extends Controller
 
             // 2. Obtener pedido base
             $base_order = DB::table('WEB.ORDEN_PEDIDO')
-                            ->where('ID_PEDIDO', $pedidos_ids[0])
-                            ->first();
+                ->where('ID_PEDIDO', $pedidos_ids[0])
+                ->first();
 
             if (!$base_order) {
                 DB::rollBack();
                 return response()->json([
-                    'success' => false, 
+                    'success' => false,
                     'mensaje' => 'No se encontró información del pedido base.'
                 ]);
             }
@@ -198,12 +246,12 @@ class ConsolidadoOrdenPedidoController extends Controller
             $fec_pedido = date('Y-m-d');
 
             $cod_periodo = $base_order->COD_PERIODO;
-            $cod_empr    = $base_order->COD_EMPR;
-            $txt_nombre  = $base_order->TXT_NOMBRE;
-            $cod_estado  = 'ETM0000000000001';  
-            $txt_estado  = 'GENERADO'; 
+            $cod_empr = $base_order->COD_EMPR;
+            $txt_nombre = $base_order->TXT_NOMBRE;
+            $cod_estado = 'ETM0000000000001';
+            $txt_estado = 'GENERADO';
 
-            $productos_agrupados = collect($productos)->groupBy(function($item) {
+            $productos_agrupados = collect($productos)->groupBy(function ($item) {
                 return $item['COD_FAMILIA'] . '|' . $item['COD_CENTRO'];
             });
 
@@ -211,25 +259,25 @@ class ConsolidadoOrdenPedidoController extends Controller
 
             foreach ($productos_agrupados as $items_del_grupo) {
 
-                $primero     = $items_del_grupo->first();
+                $primero = $items_del_grupo->first();
                 $cod_familia = $primero['COD_FAMILIA'];
                 $nom_familia = $primero['FAMILIA'];
-                $cod_centro  = $primero['COD_CENTRO'];
+                $cod_centro = $primero['COD_CENTRO'];
 
                 // 4. Crear cabecera consolidado
                 $id_pedido_consolidado = $this->insertOrdenPedidoConsolidado(
-                    'I', 
-                    '', 
-                    $fec_pedido, 
-                    $cod_periodo, 
-                    $txt_nombre, 
-                    $cod_empr, 
-                    $cod_centro, 
+                    'I',
+                    '',
+                    $fec_pedido,
+                    $cod_periodo,
+                    $txt_nombre,
+                    $cod_empr,
+                    $cod_centro,
                     $cod_familia,
                     $nom_familia,
                     $cod_estado,
                     $txt_estado,
-                    true, 
+                    true,
                     Session::get('usuario')->id
                 );
 
@@ -238,9 +286,9 @@ class ConsolidadoOrdenPedidoController extends Controller
                 // 5. Insertar detalles
                 foreach ($items_del_grupo as $p) {
 
-                    $cantidad   = (float) $p['CANTIDAD'];
-                    $stock      = (float) $p['STOCK'];
-                    $reservado  = (float) $p['CAN_STOCK_RESERVADO'];
+                    $cantidad = (float)$p['CANTIDAD'];
+                    $stock = (float)$p['STOCK'];
+                    $reservado = (float)$p['CAN_STOCK_RESERVADO'];
                     $diferencia = $cantidad - $stock + $reservado;
 
                     $this->insertOrdenPedidoConsolidadoDetalle(
@@ -266,36 +314,36 @@ class ConsolidadoOrdenPedidoController extends Controller
 
                 foreach ($consolidated_ids as $consolidado_id) {
 
-                  DB::table('CMP.REFERENCIA_ASOC')->insert([
-                            'COD_TABLA'            => $pedido_id,
-                            'COD_TABLA_ASOC'       => $consolidado_id,
-                            'TXT_TABLA'            => 'WEB.ORDEN_PEDIDO',
-                            'TXT_TABLA_ASOC'       => 'WEB.ORDEN_PEDIDO_CONSOLIDADO',
-                            'TXT_DESCRIPCION'      => '',
-                            'TXT_GLOSA'            => '',
-                            'CAN_AUX1'             => null,
-                            'CAN_AUX2'             => null,
-                            'CAN_AUX3'             => null,
-                            'TXT_TIPO_REFERENCIA'  => 'CONSOLIDADO',
-                            'TXT_REFERENCIA'       => '',
-                            'COD_USUARIO_CREA_AUD' => Session::get('usuario')->id,
-                            'FEC_USUARIO_CREA_AUD' => date('Y-m-d\TH:i:s'),
-                            'COD_ESTADO'           => 1
-                        ]);
+                    DB::table('CMP.REFERENCIA_ASOC')->insert([
+                        'COD_TABLA' => $pedido_id,
+                        'COD_TABLA_ASOC' => $consolidado_id,
+                        'TXT_TABLA' => 'WEB.ORDEN_PEDIDO',
+                        'TXT_TABLA_ASOC' => 'WEB.ORDEN_PEDIDO_CONSOLIDADO',
+                        'TXT_DESCRIPCION' => '',
+                        'TXT_GLOSA' => '',
+                        'CAN_AUX1' => null,
+                        'CAN_AUX2' => null,
+                        'CAN_AUX3' => null,
+                        'TXT_TIPO_REFERENCIA' => 'CONSOLIDADO',
+                        'TXT_REFERENCIA' => '',
+                        'COD_USUARIO_CREA_AUD' => Session::get('usuario')->id,
+                        'FEC_USUARIO_CREA_AUD' => date('Y-m-d\TH:i:s'),
+                        'COD_ESTADO' => 1
+                    ]);
                 }
             }
 
             DB::table('WEB.ORDEN_PEDIDO')
                 ->whereIn('ID_PEDIDO', $pedidos_ids)
                 ->update([
-                    'CONSOLIDADO' => 'SI' 
+                    'CONSOLIDADO' => 'SI'
                 ]);
             DB::commit();
             return response()->json([
                 'success' => true,
-                'mensaje' => 'Se generaron ' . count($consolidated_ids) . 
-                             ' consolidados correctamente.<br>IDs: ' . 
-                             implode(', ', $consolidated_ids)
+                'mensaje' => 'Se generaron ' . count($consolidated_ids) .
+                    ' consolidados correctamente.<br>IDs: ' .
+                    implode(', ', $consolidated_ids)
             ]);
 
         } catch (\Exception $e) {
@@ -311,7 +359,7 @@ class ConsolidadoOrdenPedidoController extends Controller
     public function actionListarAjaxDetalleConsolidadoOP(Request $request)
     {
         $id_consolidado = $request->input('id_consolidado');
-        $familia_id     = $request->input('familia_id');
+        $familia_id = $request->input('familia_id');
 
         $listadetalle = $this->lg_lista_detalle_consolidado($id_consolidado, $familia_id);
 
@@ -324,8 +372,8 @@ class ConsolidadoOrdenPedidoController extends Controller
     public function actionAjaxGuardarCantidadComprada(Request $request)
     {
         $id_consolidado = $request->input('id_consolidado');
-        $detalles_json  = $request->input('detalles');
-        $detalles       = json_decode($detalles_json, true);
+        $detalles_json = $request->input('detalles');
+        $detalles = json_decode($detalles_json, true);
 
         try {
             DB::beginTransaction();
@@ -337,26 +385,26 @@ class ConsolidadoOrdenPedidoController extends Controller
                     ->where('COD_PRODUCTO', $det['cod_producto'])
                     ->update([
                         'CAN_COMPRADA' => $det['cantidad'],
-                        'COD_USUARIO_MODIF_AUD'  => Session::get('usuario')->id // Guardamos el ID del usuario
+                        'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id // Guardamos el ID del usuario
                     ]);
             }
 
             DB::commit();
             return response()->json([
-                'success' => true, 
+                'success' => true,
                 'mensaje' => 'Cantidades actualizadas correctamente.'
             ]);
 
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json([
-                'success' => false, 
+                'success' => false,
                 'mensaje' => 'Error al actualizar: ' . $e->getMessage()
             ]);
         }
     }
 
-      public function actionAjaxAprobarConsolidado(Request $request)
+    public function actionAjaxAprobarConsolidado(Request $request)
     {
         $id_consolidado = $request->input('id_consolidado');
         try {
@@ -367,21 +415,22 @@ class ConsolidadoOrdenPedidoController extends Controller
                 ->update([
                     'COD_ESTADO' => 'ETM0000000000015', // COD_ESTADO APROBADO
                     'TXT_ESTADO' => 'CERRADO'        // TXT_ESTADO APROBADO
-                    
+
                 ]);
             DB::commit();
             return response()->json([
-                'success' => true, 
+                'success' => true,
                 'mensaje' => 'Consolidado aprobado correctamente.'
             ]);
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json([
-                'success' => false, 
+                'success' => false,
                 'mensaje' => 'Error al aprobar: ' . $e->getMessage()
             ]);
         }
     }
+
     public function actionAjaxBuscarConsolidadoGenerado(Request $request)
     {
         $empresa_id = $request['empresa_id'];
@@ -401,4 +450,3 @@ class ConsolidadoOrdenPedidoController extends Controller
 
 
 
-     

@@ -90,6 +90,9 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/ajax-modal-ver-cuenta-bancaria-contrato', 'UserController@actionAjaxModalVerCuentaBancariaContrato');
 	Route::any('/ajax-modal-ver-cuenta-bancaria-pg', 'UserController@actionAjaxModalVerCuentaBancariaPG');
+	Route::any('/actualizar-data/{zona}', 'UserController@actionActualizarData');
+
+
 
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-contrato', 'UserController@actionAjaxModalConfiguracionCuentaBancariaContrato');
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-oc', 'UserController@actionAjaxModalConfiguracionCuentaBancariaOC');
@@ -587,6 +590,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/descargar-folio-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarDocumentoFolio');
 	Route::any('/descargar-folio-dic-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarDocumentoDICFolio');
 	Route::any('/descargar-folio-lca-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarDocumentoLCAFolio');
+	Route::any('/descargar-folio-dic-consolidado-excel/{folio}', 'GestionEntregaDocumentoController@actionDescargarDocumentoDICConsolidadoFolio');
 
 
 	Route::any('/ajax-modal-detalle-deuda-contrato', 'GestionEntregaDocumentoController@actionModaDetalleDeudaContrato');
@@ -1038,7 +1042,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::post('/guardar_editar_detalle_pedido_adm', 'GestionOrdenPedidoApruebaAdmController@actionGuardarEditarDetalleAdm');
 
 	Route::get('/consolidado-orden-pedido/{idopcion}', 'ConsolidadoOrdenPedidoController@actionConsolidadoOrdenPedido');
-	Route::any('/ajax-buscar-consolidado-op', 'ConsolidadoOrdenPedidoController@actionListarAjaxBuscarConsolidadoOP');
+    Route::post('/cargar-periodo-consolidado', 'ConsolidadoOrdenPedidoController@actionAjaxPeriodoConsolidado');
+    Route::any('/ajax-buscar-consolidado-op', 'ConsolidadoOrdenPedidoController@actionListarAjaxBuscarConsolidadoOP');
 	Route::post('/guardar_consolidado_pedido', 'ConsolidadoOrdenPedidoController@actionGuardarConsolidado');
 	Route::any('/ajax-listar-detalle-consolidado-op', 'ConsolidadoOrdenPedidoController@actionListarAjaxDetalleConsolidadoOP');
 	Route::any('/ajax-detalle-producto-consolidado-generado', 'ConsolidadoOrdenPedidoController@actionAjaxDetalleProductoConsolidadoGenerado');

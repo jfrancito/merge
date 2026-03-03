@@ -57,7 +57,7 @@ use App\Traits\LiquidacionGastoTraits;
 use App\Traits\ValeRendirTraits;
 use App\Traits\CuartaCategoriaTraits;
 
-
+use PDO;
 
 class UserController extends Controller {
 
@@ -68,6 +68,31 @@ class UserController extends Controller {
     use LiquidacionGastoTraits;
     use ValeRendirTraits;
     use CuartaCategoriaTraits;
+
+
+	public function actionActualizarData($zona,Request $request)
+	{
+		if($zona == 'BE'){
+			DB::connection('sqlsrv')->unprepared("
+			    SET NOCOUNT ON;
+			    SET ARITHABORT ON;
+			    SET XACT_ABORT ON;
+			    EXEC dbo.SCS_MERGE_TRANSACCIONALES_BE_MERGE
+			");
+		}
+		if($zona == 'RI'){
+			DB::connection('sqlsrv')->unprepared("
+			    SET NOCOUNT ON;
+			    SET ARITHABORT ON;
+			    SET XACT_ABORT ON;
+			    EXEC dbo.SCS_MERGE_TRANSACCIONALES_RJ_MERGE
+			");
+
+		}
+		return Redirect::to('bienvenido')->with('bienhecho', 'Se realizo la Transaccion de '.$zona);
+	}
+
+
 	public function actionDescargarManual(Request $request)
 	{
 	    $filePath = public_path('manual-proveedor.pdf');
@@ -2204,13 +2229,13 @@ class UserController extends Controller {
 
 					//LIQUIDACION DE OMPRA ANTIPIO
 					$operacion_id 			=	'LIQUIDACION_COMPRA_ANTICIPO';
-	        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_adm_estiba($cod_empresa,$operacion_id);
+	        		$listadatos     		=   $this->con_lista_cabecera_comprobante_total_adm_liquidacion_compra_anticipo($cod_empresa,$operacion_id);
 					$count_x_aprobar_lqa 	= 	 count($listadatos);
 
-		        	$lisadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs($cod_empresa,$operacion_id);
+		        	$lisadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_liquidacion_compra_anticipo_obs($cod_empresa,$operacion_id);
 					$count_observados_lqa 	= 	count($lisadatosob);
 
-		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas($cod_empresa,$operacion_id);
+		        	$listadatosob    		=   $this->con_lista_cabecera_comprobante_total_adm_liquidacion_compra_anticipo_obs_levantadas($cod_empresa,$operacion_id);
 					$count_observadoslqa_le 	= 	count($listadatosob);
 
 
@@ -2261,11 +2286,18 @@ class UserController extends Controller {
 		}
 
 
+		$centro 					=   '';
+		$trabajador 				= 	DB::table('STD.TRABAJADOR')->where('COD_TRAB','=',Session::get('usuario')->usuarioosiris_id)->first();
 
+
+		//dd($trabajador);
+		if(count($trabajador)>0){
+			$centro 					=	$trabajador->COD_ZONA_TIPO;	
+		}
 		return View::make('bienvenido',
 						 [
 						 	'usuario' 					=> $usuario,
-
+						 	'centro' 					=> $centro,
 						 	'count_observados_est' 		=> $count_observados_est,
 						 	'count_x_aprobar_est' 		=> $count_x_aprobar_est,
 						 	'count_x_aprobar_dip' 		=> $count_x_aprobar_dip,

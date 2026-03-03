@@ -183,6 +183,15 @@ class Funcion {
         return $neto_pagar;
 	}
 
+	public function neto_pagar_documento_consolidado($item){
+
+
+		$neto_pagar 	  = (float)$item->TOTAL_VENTA_ORIG - (float)round($item->MONTO_DETRACCION_RED) - 
+								(float)$item->MONTO_RETENCION - (float)$item->CAN_IMPUESTO_RENTA - (float)$item->MONTO_ANTICIPO_DESC - (float)$item->MONTO_ANTICIPO_DESC_OTROS + (float)$item->PERCEPCION - (float)$item->MONTO_NC  + (float)$item->COMPENSACION + (float)$item->CAN_CENTIMO;
+
+        $neto_pagar 	  = ROUND($neto_pagar,2);
+        return $neto_pagar;
+	}
 
 
 	public function se_paga_detraccion_contrato($id_documento){

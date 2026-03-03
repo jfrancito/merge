@@ -241,6 +241,41 @@ $(document).ready(function () {
         });
     });
 
+    $("#empresa_id").on('change', function (e) {
+    //$(".ordenpedidoprincipal").on('change', '#empresa_id', function () {
+
+        e.preventDefault();
+        let empresa_id = $('#empresa_id').val();
+        let _token = $('#token').val();
+
+        debugger;
+
+        data = {
+            _token: _token,
+            empresa_id: empresa_id
+        };
+/*
+        $.ajax({
+            type: "POST",
+            url: carpeta + "/cargar-periodo-consolidado",
+            data: {
+                _token: _token,
+                empresa_id: empresa_id
+            },
+            success: function (res) {
+                debugger;
+
+            },
+            error: function (res) {
+                debugger;
+                error500(res);
+            }
+        });*/
+
+        ajax_normal_combo(data, "/cargar-periodo-consolidado", "ajax_periodo")
+
+    });
+
     /* ===============================
        AGREGAR PRODUCTO
        =============================== */
@@ -431,18 +466,18 @@ $(document).ready(function () {
     }
 
     /* $('#cod_anio').on('change', function () {
- 
+
              let anio    = $(this).val();
              let empresa = $('#cod_empr').val();
              let carpeta = $('#carpeta').val();
- 
+
              $('#cod_periodo').html('<option value="">Cargando...</option>');
- 
+
              if (!anio) {
                  $('#cod_periodo').html('<option value="">Seleccione Mes</option>');
                  return;
              }
- 
+
              $.ajax({
                  type: 'POST',
                  url: carpeta + '/obtener-meses',
@@ -452,13 +487,13 @@ $(document).ready(function () {
                      empresa: empresa
                  },
                  success: function (data) {
- 
+
                      let options = '<option value="">Seleccione Mes</option>';
- 
+
                      $.each(data, function (key, value) {
                          options += `<option value="${key}">${value}</option>`;
                      });
- 
+
                      $('#cod_periodo')
                          .html(options)
                          .prop('disabled', false)
@@ -1305,6 +1340,8 @@ $(document).ready(function () {
         var anio_pedido = $('#anio_pedido').val();
         var idopcion = $('#idopcion').val();
         var _token = $('#token').val();
+
+        debugger;
 
         if ($.trim(centro_id) === '') {
             modalBonito({ tipo: 'warning', icono: '⚠️', titulo: 'Filtro requerido', mensaje: 'Por favor, seleccione un <b>Centro</b>.' });

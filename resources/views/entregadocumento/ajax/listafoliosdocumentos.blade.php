@@ -36,6 +36,13 @@
                     Descargar Resumen
                   </a>  
                 </li>
+
+                <li>
+                  <a href="{{ url('/descargar-folio-dic-consolidado-excel/'.$item->FOLIO) }}">
+                    Descargar Consolidado
+                  </a>  
+                </li>
+
               @else
                 @if($item->OPERACION=='LIQUIDACION_COMPRA_ANTICIPO')
                   <li>

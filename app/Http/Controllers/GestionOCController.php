@@ -4738,23 +4738,38 @@ class GestionOCController extends Controller
 
                                 //FACTURA
                                 /****************************************  LEER EL XML Y GUARDAR   *********************************/
+
                                 $parser             = new NoteParser();
                                 $xml                = file_get_contents($path);
                                 $factura            = $parser->parse($xml);
-                                //dd($factura);
+
                                 $tipo_documento_le  = $factura->gettipoDoc();
                                 $moneda_le          = $factura->gettipoMoneda();
 
-                                if($ordencompra->COD_CATEGORIA_MOTIVO_EMISION=='MEM0000000000004' || $ordencompra->COD_CATEGORIA_MOTIVO_EMISION=='MEM0000000000007'){
-                                    $archivosdelfe          =      CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                                ->whereIn('COD_CATEGORIA', ['DCC0000000000003','DCC0000000000004','DCC0000000000030','DCC0000000000007'])
-                                                                ->get();
-                                }else{                            
-                                    $archivosdelfe          =      CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                                ->whereIn('COD_CATEGORIA', ['DCC0000000000003','DCC0000000000004','DCC0000000000030'])
-                                                                ->get();
-                                }
 
+                                $tiposerie          =   substr($factura->getserie(), 0, 1);
+                                if($ordencompra->COD_CATEGORIA_MOTIVO_EMISION=='MEM0000000000004' || $ordencompra->COD_CATEGORIA_MOTIVO_EMISION=='MEM0000000000007'){
+
+                                    if($tiposerie == 'E'){
+                                        $archivosdelfe          =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000003','DCC0000000000030','DCC0000000000007'])
+                                                                    ->get();
+                                    }else{
+                                        $archivosdelfe          =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000003','DCC0000000000004','DCC0000000000030','DCC0000000000007'])
+                                                                    ->get();
+                                    }
+                                }else{       
+                                    if($tiposerie == 'E'){
+                                        $archivosdelfe          =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000003','DCC0000000000030'])
+                                                                    ->get();
+                                    }else{
+                                        $archivosdelfe          =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000003','DCC0000000000004','DCC0000000000030'])
+                                                                    ->get();
+                                    }                    
+                                }
 
                                 //VALIDAR QUE YA EXISTE ESTE XML
 
