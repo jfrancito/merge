@@ -1,8 +1,6 @@
 @extends('template_lateral')
 
 @section('style')
-
-
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/datatables/css/dataTables.bootstrap.min.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/datatables/css/responsive.dataTables.min.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/datetimepicker/css/bootstrap-datetimepicker.min.css') }} "/>
@@ -15,13 +13,32 @@
 	<div class="be-content  contenido proveedor" style="height: 100vh;">
 		<div class="main-content container-fluid">
 			<div class='container'>
-          <div class="row">
-              @if(Session::get('usuario')->rol_id == '1CIX00000024')
-                @include('usuario.proveedores')
-              @else
-                @include('usuario.administrativo')
-              @endif
-          </div>
+
+                @if(Session::get('usuario')->rol_id == '1CIX00000001' || $centro == 'CEN0000000000004' || $centro == 'CEN0000000000006')
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="btn-toolbar">
+                            <div role="group" class="btn-group btn-group-justified btn-space">
+                                @if(Session::get('usuario')->rol_id == '1CIX00000001' || $centro == 'CEN0000000000006')
+                                <a href="{{ url('/actualizar-data/BE') }}" class="btn btn-primary btn_actualizar_data">DATA BE</a>
+                                @endif
+                                @if(Session::get('usuario')->rol_id == '1CIX00000001' || $centro == 'CEN0000000000004')
+                                <a href="{{ url('/actualizar-data/RI') }}" class="btn btn-primary btn_actualizar_data" >DATA RI</a>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
+
+              <div class="row">
+                  @if(Session::get('usuario')->rol_id == '1CIX00000024')
+                    @include('usuario.proveedores')
+                  @else
+                    @include('usuario.administrativo')
+                  @endif
+              </div>
 			</div>
 		</div>
 

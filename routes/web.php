@@ -90,6 +90,9 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/ajax-modal-ver-cuenta-bancaria-contrato', 'UserController@actionAjaxModalVerCuentaBancariaContrato');
 	Route::any('/ajax-modal-ver-cuenta-bancaria-pg', 'UserController@actionAjaxModalVerCuentaBancariaPG');
+	Route::any('/actualizar-data/{zona}', 'UserController@actionActualizarData');
+
+
 
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-contrato', 'UserController@actionAjaxModalConfiguracionCuentaBancariaContrato');
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-oc', 'UserController@actionAjaxModalConfiguracionCuentaBancariaOC');

@@ -62,6 +62,9 @@ $(document).ready(function(){
 
     });
 
+    $(".proveedor").on('click','.btn_actualizar_data', function() {
+        abrircargando();
+    });
 
     $(".proveedor").on('click','.btn-eliminar-cb', function() {
 
