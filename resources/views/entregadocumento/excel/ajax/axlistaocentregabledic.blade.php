@@ -52,7 +52,7 @@
 		        <td>{{$item->OPERACION}}</td>
 		        <td>{{$item->COD_ORDEN}}</td>
 		        <td>{{$item->RUC_PROVEEDOR}}</td>
-		        <td>{{$item->TXT_EMPR_CLIENTE}}</td>
+		        <td>{{$item->RZ_PROVEEDOR}}</td>
 		        <td>{{$item->TXT_CATEGORIA_BANCO}}</td>
 		        <td><b>{{$item->TXT_NRO_CUENTA_BANCARIA}}</b></td>
 		        <td>{{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</td>
@@ -118,7 +118,7 @@
 			        <td>{{$item->OPERACION}}</td>
 			        <td>{{$item->ID_DOCUMENTO}}</td>
 			        <td>{{$item->RUC_PROVEEDOR}}<</td>
-			        <td>{{$item->TXT_EMPR_EMISOR}}</td>
+			        <td>{{$item->RZ_PROVEEDOR}}</td>
 			        <td>{{$item->TXT_CATEGORIA_BANCO}}</td>
 		        	<td><b>{{$item->TXT_NRO_CUENTA_BANCARIA}}</b></td>
 			        <td>{{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</td>
