@@ -170,7 +170,7 @@ class ConsolidadoGeneralOrdenPedidoController extends Controller
                     $sum_cantidad   = $prod_items->sum('CANTIDAD');
                     $sum_stock      = $prod_items->sum('STOCK');
                     $sum_reservado  = $prod_items->sum('RESERVADO');
-                    $sum_diferencia = $sum_cantidad - $sum_stock + $sum_reservado;
+                    $sum_diferencia = $prod_items->sum('DIFERENCIA');
 
                     $this->insertOrdenPedidoConsolidadoGeneralDetalle(
                         'I',
@@ -191,8 +191,16 @@ class ConsolidadoGeneralOrdenPedidoController extends Controller
                 }
 
                 // 5️⃣ Insertar referencias POR CADA FAMILIA
+               // 5️⃣ Insertar referencias POR CADA FAMILIA
                 foreach ($items->pluck('ID_PEDIDO_CONSOLIDADO')->unique() as $origen_id) {
 
+                    // 🔥 ELIMINAR RELACIONES ANTERIORES
+                    DB::table('CMP.REFERENCIA_ASOC')
+                        ->where('COD_TABLA', $origen_id)
+                        ->where('TXT_TIPO_REFERENCIA', 'CONSOLIDADO_GENERAL')
+                        ->delete();
+
+                    // 🔥 INSERTAR NUEVA RELACIÓN
                     DB::table('CMP.REFERENCIA_ASOC')->insert([
                         'COD_TABLA'            => $origen_id,
                         'COD_TABLA_ASOC'       => $id_general,
@@ -248,11 +256,15 @@ class ConsolidadoGeneralOrdenPedidoController extends Controller
         $anio_pedido = $request['anio_pedido'];
         $idopcion = $request['idopcion'];
 
+        //DD($empresa_id, $mes_pedido, $anio_pedido);
+
         $listaordenpedidogeneral = $this->lg_lista_cabecera_pedido_consolidado_general(
             $empresa_id,
             $mes_pedido,
             $anio_pedido
         );
+
+        //DD($listaordenpedidogeneral);
 
         return view('ordenpedido.consolidadogeneral.alistaordenconsolidadogeneral', [
             'listaordenpedidogeneral' => $listaordenpedidogeneral,
