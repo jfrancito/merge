@@ -3048,6 +3048,139 @@ class GestionOCContabilidadController extends Controller
         return Redirect::to('aprobar-comprobante-contabilidad/' . $idopcion . '/' . $linea . '/' . $prefijo . '/' . $idordencompra)->with('bienhecho', 'Se actualizo Informacion');
     }
 
+    public function actionRefrescarSunatContrato($idopcion, $linea, $prefijo, $idordencompra, Request $request)
+    {
+        $idoc = $this->funciones->decodificarmaestraprefijo_contrato($idordencompra, $prefijo);
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
+        $prefijocarperta        =   $this->prefijo_empresa($fedocumento->COD_EMPR);
+
+        if($fedocumento->estadoCp === null || $fedocumento->estadoCp == 0) {
+
+            $token = '';
+            if($prefijocarperta =='II'){
+                $token           =      $this->generartoken_ii();
+            }else{
+                $token           =      $this->generartoken_is();
+            }
+
+            $fechaemision        =      date_format(date_create($fedocumento->FEC_VENTA), 'd/m/Y');
+            $rvalidar            =      $this->validar_xml( $token,
+                                            $fedocumento->ID_CLIENTE,
+                                            $fedocumento->RUC_PROVEEDOR,
+                                            $fedocumento->ID_TIPO_DOC,
+                                            $fedocumento->SERIE,
+                                            $fedocumento->NUMERO,
+                                            $fechaemision,
+                                            $fedocumento->TOTAL_VENTA_ORIG);
+
+            $arvalidar = json_decode($rvalidar, true);
+
+            if($arvalidar['success'] == 1){
+
+                FeDocumento::where('ID_DOCUMENTO','=',$fedocumento->ID_DOCUMENTO)
+                            ->update(
+                                    [
+                                        'success'=>$arvalidar['success'],
+                                        'message'=>$arvalidar['message'],
+                                        'estadoCp'=>'1',
+                                        'nestadoCp'=>'ACEPTADO',
+                                        'estadoRuc'=>'00',
+                                        'nestadoRuc'=>'ACTIVO',
+                                        'condDomiRuc'=>'00',
+                                        'ncondDomiRuc'=>'HABIDO',
+                                    ]);
+
+            }
+        }
+        return Redirect::to('aprobar-comprobante-contabilidad-contrato/' . $idopcion . '/' . $linea . '/' . $prefijo . '/' . $idordencompra)->with('bienhecho', 'Se actualizo Informacion');
+    }
+
+
+
+    public function actionExtornarObsOc($idopcion, $linea, $prefijo, $idordencompra, Request $request)
+    {
+        $idoc = $this->funciones->decodificarmaestraprefijo($idordencompra, $prefijo);
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
+        $prefijocarperta        =   $this->prefijo_empresa($fedocumento->COD_EMPR);
+
+        FeDocumento::where('ID_DOCUMENTO', $idoc)
+            ->update(
+                [
+                    'ind_observacion' => '0'
+                ]
+            );
+
+        CMPDocAsociarCompra::where('COD_ORDEN', $idoc)
+        ->where('TIP_DOC', 'O')
+        ->where('COD_ESTADO', 1)
+        ->update(
+            [
+                'COD_ESTADO' => '0'
+            ]
+        );
+
+        Archivo::where('ID_DOCUMENTO', $idoc)
+            ->update(
+                [
+                    'ACTIVO' => '1'
+                ]
+            );
+
+        $documento                              =   new FeDocumentoHistorial;
+        $documento->ID_DOCUMENTO                =   $idoc;
+        $documento->DOCUMENTO_ITEM              =   $linea;
+        $documento->FECHA                       =   $this->fechaactual;
+        $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+        $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+        $documento->TIPO                        =   'SE EXTORNO LA ULTIMA OBSERVACION';
+        $documento->MENSAJE                     =   '';
+        $documento->save();
+
+        return Redirect::to('aprobar-comprobante-contabilidad/' . $idopcion . '/' . $linea . '/' . $prefijo . '/' . $idordencompra)->with('bienhecho', 'Se extorno la ultima observacion');
+    }
+
+    public function actionExtornarObsContrato($idopcion, $linea, $prefijo, $idordencompra, Request $request)
+    {
+        $idoc = $this->funciones->decodificarmaestraprefijo_contrato($idordencompra, $prefijo);
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
+        $prefijocarperta        =   $this->prefijo_empresa($fedocumento->COD_EMPR);
+
+        FeDocumento::where('ID_DOCUMENTO', $idoc)
+            ->update(
+                [
+                    'ind_observacion' => '0'
+                ]
+            );
+
+        CMPDocAsociarCompra::where('COD_ORDEN', $idoc)
+        ->where('TIP_DOC', 'O')
+        ->where('COD_ESTADO', 1)
+        ->update(
+            [
+                'COD_ESTADO' => '0'
+            ]
+        );
+
+        Archivo::where('ID_DOCUMENTO', $idoc)
+            ->update(
+                [
+                    'ACTIVO' => '1'
+                ]
+            );
+
+        $documento                              =   new FeDocumentoHistorial;
+        $documento->ID_DOCUMENTO                =   $idoc;
+        $documento->DOCUMENTO_ITEM              =   $linea;
+        $documento->FECHA                       =   $this->fechaactual;
+        $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+        $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+        $documento->TIPO                        =   'SE EXTORNO LA ULTIMA OBSERVACION';
+        $documento->MENSAJE                     =   '';
+        $documento->save();
+
+        return Redirect::to('aprobar-comprobante-contabilidad-contrato/' . $idopcion . '/' . $linea . '/' . $prefijo . '/' . $idordencompra)->with('bienhecho', 'Se extorno la ultima observacion');
+    }
+
     public function actionAprobarContabilidadReparable($idopcion, $linea, $prefijo, $idordencompra, Request $request)
     {
 
