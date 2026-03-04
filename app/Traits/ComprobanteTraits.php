@@ -8503,6 +8503,9 @@ trait ComprobanteTraits
 
         $fecha_corte            =   date('Ymd');
 
+
+        if(Session::get('usuario')->id == '1CIX00000422'){
+
             //UPDATE DE CENTIMOS ORDEN DE COMPRAS
             DB::update("
                 UPDATE CMP.DOCUMENTO_CTBLE
@@ -8562,94 +8565,80 @@ trait ComprobanteTraits
             ");
 
 
-            //UPDATE PARA EL ANTICIPO
-            $datos = DB::table('CMP.ORDEN as T1')
-                ->join('FE_DOCUMENTO as FE', 'T1.COD_ORDEN', '=', 'FE.ID_DOCUMENTO')
-                ->join('CMP.REFERENCIA_ASOC as T2', function ($join) {
-                    $join->on('T1.COD_ORDEN', '=', 'T2.COD_TABLA')
-                        ->where('T2.TXT_TABLA', 'CMP.ORDEN')
-                        ->where('T2.TXT_TABLA_ASOC', 'CMP.DOCUMENTO_CTBLE');
-                })
-                ->join('CMP.REFERENCIA_ASOC as T3', function ($join) {
-                    $join->on('T2.COD_TABLA_ASOC', '=', 'T3.COD_TABLA')
-                        ->where('T3.TXT_TABLA', 'CMP.DOCUMENTO_CTBLE')
-                        ->where('T3.TXT_TABLA_ASOC', 'CMP.DOCUMENTO_CTBLE');
-                })
-                ->where('T3.TXT_TIPO_REFERENCIA', 'A')
-                ->where('T1.COD_ORDEN', 'like', '%CL%')
-                ->where('T2.COD_ESTADO', 1)
-                ->where('T3.COD_ESTADO', 1)
-                ->select('FE.ID_DOCUMENTO', DB::raw('SUM(T3.CAN_AUX1) as MONTO'))
-                ->groupBy('FE.ID_DOCUMENTO')
-                ->get();
-
-            foreach ($datos as $item) {
-                DB::table('FE_DOCUMENTO')
-                    ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
-                    ->update(['MONTO_ANTICIPO_DESC_OTROS' => $item->MONTO]);
-            }
+        }
 
 
-            //UPDATE SI TIENE NOTA DE CREDITO
-            DB::statement("
-                UPDATE FE_DOCUMENTO
-                SET MONTO_NC = (
-                    SELECT SUM(DOC.CAN_TOTAL)
-                    FROM CMP.REFERENCIA_ASOC PR
-                    INNER JOIN CMP.REFERENCIA_ASOC PR2 ON PR.COD_TABLA_ASOC = PR2.COD_TABLA 
-                        AND PR2.COD_TABLA_ASOC LIKE '%NC%' 
-                        AND PR2.COD_ESTADO = 1
-                    INNER JOIN CMP.DOCUMENTO_CTBLE DOC ON PR2.COD_TABLA_ASOC = DOC.COD_DOCUMENTO_CTBLE
-                    WHERE PR.COD_TABLA = FE_DOCUMENTO.ID_DOCUMENTO 
-                        AND PR.COD_TABLA_ASOC LIKE '%FC%' 
-                        AND PR.COD_ESTADO = 1
-                        AND OPERACION = 'ORDEN_COMPRA'
-                        AND ISNULL(FOLIO, '') = ''
-                        AND FE_DOCUMENTO.COD_ESTADO = 'ETM0000000000005'
-                        AND DOC.COD_CATEGORIA_ESTADO_DOC_CTBLE = 'EDC0000000000009'
-                )
-                WHERE EXISTS (
-                    SELECT 1
-                    FROM CMP.REFERENCIA_ASOC PR
-                    INNER JOIN CMP.REFERENCIA_ASOC PR2 ON PR.COD_TABLA_ASOC = PR2.COD_TABLA 
-                        AND PR2.COD_TABLA_ASOC LIKE '%NC%' 
-                        AND PR2.COD_ESTADO = 1
-                    INNER JOIN CMP.DOCUMENTO_CTBLE DOC ON PR2.COD_TABLA_ASOC = DOC.COD_DOCUMENTO_CTBLE
-                    WHERE PR.COD_TABLA = FE_DOCUMENTO.ID_DOCUMENTO 
-                        AND PR.COD_TABLA_ASOC LIKE '%FC%' 
-                        AND PR.COD_ESTADO = 1
-                        AND OPERACION = 'ORDEN_COMPRA'
-                        AND ISNULL(FOLIO, '') = ''
-                        AND FE_DOCUMENTO.COD_ESTADO = 'ETM0000000000005'
-                        AND DOC.COD_CATEGORIA_ESTADO_DOC_CTBLE = 'EDC0000000000009'
-                );
-            ");
+
+        //UPDATE PARA EL ANTICIPO
+        $datos = DB::table('CMP.ORDEN as T1')
+            ->join('FE_DOCUMENTO as FE', 'T1.COD_ORDEN', '=', 'FE.ID_DOCUMENTO')
+            ->join('CMP.REFERENCIA_ASOC as T2', function ($join) {
+                $join->on('T1.COD_ORDEN', '=', 'T2.COD_TABLA')
+                    ->where('T2.TXT_TABLA', 'CMP.ORDEN')
+                    ->where('T2.TXT_TABLA_ASOC', 'CMP.DOCUMENTO_CTBLE');
+            })
+            ->join('CMP.REFERENCIA_ASOC as T3', function ($join) {
+                $join->on('T2.COD_TABLA_ASOC', '=', 'T3.COD_TABLA')
+                    ->where('T3.TXT_TABLA', 'CMP.DOCUMENTO_CTBLE')
+                    ->where('T3.TXT_TABLA_ASOC', 'CMP.DOCUMENTO_CTBLE');
+            })
+            ->where('T3.TXT_TIPO_REFERENCIA', 'A')
+            ->where('T1.COD_ORDEN', 'like', '%CL%')
+            ->where('T2.COD_ESTADO', 1)
+            ->where('T3.COD_ESTADO', 1)
+            ->select('FE.ID_DOCUMENTO', DB::raw('SUM(T3.CAN_AUX1) as MONTO'))
+            ->groupBy('FE.ID_DOCUMENTO')
+            ->get();
+
+        foreach ($datos as $item) {
+            DB::table('FE_DOCUMENTO')
+                ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
+                ->update(['MONTO_ANTICIPO_DESC_OTROS' => $item->MONTO]);
+        }
 
 
-            //DESCONTAR LA RETENCION DE IGV
-            $documentosdetraccion = DB::select("
-                    SELECT 
-                        FE.*,
-                        (
-                            SELECT SUM(DOC.CAN_TOTAL)
-                            FROM CMP.REFERENCIA_ASOC PR
-                            INNER JOIN CMP.REFERENCIA_ASOC PR2 
-                                ON PR.COD_TABLA_ASOC = PR2.COD_TABLA
-                                AND PR2.COD_TABLA_ASOC LIKE '%NC%' 
-                                AND PR2.COD_ESTADO = 1
-                            INNER JOIN CMP.DOCUMENTO_CTBLE DOC 
-                                ON PR2.COD_TABLA_ASOC = DOC.COD_DOCUMENTO_CTBLE
-                            WHERE PR.COD_TABLA = FE.ID_DOCUMENTO 
-                                AND PR.COD_TABLA_ASOC LIKE '%FC%' 
-                                AND PR.COD_ESTADO = 1
-                                AND OPERACION = 'ORDEN_COMPRA'
-                                AND ISNULL(FOLIO, '') = ''
-                                AND FE.COD_ESTADO = 'ETM0000000000005'
-                                AND DOC.COD_CATEGORIA_ESTADO_DOC_CTBLE = 'EDC0000000000009'
-                        ) AS MONTO_NC
-                    FROM FE_DOCUMENTO FE
-                    WHERE EXISTS (
-                        SELECT 1
+        //UPDATE SI TIENE NOTA DE CREDITO
+        DB::statement("
+            UPDATE FE_DOCUMENTO
+            SET MONTO_NC = (
+                SELECT SUM(DOC.CAN_TOTAL)
+                FROM CMP.REFERENCIA_ASOC PR
+                INNER JOIN CMP.REFERENCIA_ASOC PR2 ON PR.COD_TABLA_ASOC = PR2.COD_TABLA 
+                    AND PR2.COD_TABLA_ASOC LIKE '%NC%' 
+                    AND PR2.COD_ESTADO = 1
+                INNER JOIN CMP.DOCUMENTO_CTBLE DOC ON PR2.COD_TABLA_ASOC = DOC.COD_DOCUMENTO_CTBLE
+                WHERE PR.COD_TABLA = FE_DOCUMENTO.ID_DOCUMENTO 
+                    AND PR.COD_TABLA_ASOC LIKE '%FC%' 
+                    AND PR.COD_ESTADO = 1
+                    AND OPERACION = 'ORDEN_COMPRA'
+                    AND ISNULL(FOLIO, '') = ''
+                    AND FE_DOCUMENTO.COD_ESTADO = 'ETM0000000000005'
+                    AND DOC.COD_CATEGORIA_ESTADO_DOC_CTBLE = 'EDC0000000000009'
+            )
+            WHERE EXISTS (
+                SELECT 1
+                FROM CMP.REFERENCIA_ASOC PR
+                INNER JOIN CMP.REFERENCIA_ASOC PR2 ON PR.COD_TABLA_ASOC = PR2.COD_TABLA 
+                    AND PR2.COD_TABLA_ASOC LIKE '%NC%' 
+                    AND PR2.COD_ESTADO = 1
+                INNER JOIN CMP.DOCUMENTO_CTBLE DOC ON PR2.COD_TABLA_ASOC = DOC.COD_DOCUMENTO_CTBLE
+                WHERE PR.COD_TABLA = FE_DOCUMENTO.ID_DOCUMENTO 
+                    AND PR.COD_TABLA_ASOC LIKE '%FC%' 
+                    AND PR.COD_ESTADO = 1
+                    AND OPERACION = 'ORDEN_COMPRA'
+                    AND ISNULL(FOLIO, '') = ''
+                    AND FE_DOCUMENTO.COD_ESTADO = 'ETM0000000000005'
+                    AND DOC.COD_CATEGORIA_ESTADO_DOC_CTBLE = 'EDC0000000000009'
+            );
+        ");
+
+
+        //DESCONTAR LA RETENCION DE IGV
+        $documentosdetraccion = DB::select("
+                SELECT 
+                    FE.*,
+                    (
+                        SELECT SUM(DOC.CAN_TOTAL)
                         FROM CMP.REFERENCIA_ASOC PR
                         INNER JOIN CMP.REFERENCIA_ASOC PR2 
                             ON PR.COD_TABLA_ASOC = PR2.COD_TABLA
@@ -8664,19 +8653,36 @@ trait ComprobanteTraits
                             AND ISNULL(FOLIO, '') = ''
                             AND FE.COD_ESTADO = 'ETM0000000000005'
                             AND DOC.COD_CATEGORIA_ESTADO_DOC_CTBLE = 'EDC0000000000009'
-                    ) AND FE.MONTO_RETENCION > 0;
-                ");
+                    ) AS MONTO_NC
+                FROM FE_DOCUMENTO FE
+                WHERE EXISTS (
+                    SELECT 1
+                    FROM CMP.REFERENCIA_ASOC PR
+                    INNER JOIN CMP.REFERENCIA_ASOC PR2 
+                        ON PR.COD_TABLA_ASOC = PR2.COD_TABLA
+                        AND PR2.COD_TABLA_ASOC LIKE '%NC%' 
+                        AND PR2.COD_ESTADO = 1
+                    INNER JOIN CMP.DOCUMENTO_CTBLE DOC 
+                        ON PR2.COD_TABLA_ASOC = DOC.COD_DOCUMENTO_CTBLE
+                    WHERE PR.COD_TABLA = FE.ID_DOCUMENTO 
+                        AND PR.COD_TABLA_ASOC LIKE '%FC%' 
+                        AND PR.COD_ESTADO = 1
+                        AND OPERACION = 'ORDEN_COMPRA'
+                        AND ISNULL(FOLIO, '') = ''
+                        AND FE.COD_ESTADO = 'ETM0000000000005'
+                        AND DOC.COD_CATEGORIA_ESTADO_DOC_CTBLE = 'EDC0000000000009'
+                ) AND FE.MONTO_RETENCION > 0;
+            ");
 
 
-            //RENTA DE CUARTA CATEGORIA
-
-            DB::table('FE_DOCUMENTO')
-                ->join('CMP.ORDEN', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.ORDEN.COD_ORDEN')
-                ->where('CMP.ORDEN.CAN_IMPUESTO_RENTA', '>', 0)
-                ->whereColumn('FE_DOCUMENTO.TOTAL_VENTA_ORIG', '<>', 'CMP.ORDEN.CAN_TOTAL')
-                ->update([
-                    'FE_DOCUMENTO.TOTAL_VENTA_ORIG' => DB::raw('CMP.ORDEN.CAN_TOTAL')
-                ]);
+        //RENTA DE CUARTA CATEGORIA
+        DB::table('FE_DOCUMENTO')
+            ->join('CMP.ORDEN', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.ORDEN.COD_ORDEN')
+            ->where('CMP.ORDEN.CAN_IMPUESTO_RENTA', '>', 0)
+            ->whereColumn('FE_DOCUMENTO.TOTAL_VENTA_ORIG', '<>', 'CMP.ORDEN.CAN_TOTAL')
+            ->update([
+                'FE_DOCUMENTO.TOTAL_VENTA_ORIG' => DB::raw('CMP.ORDEN.CAN_TOTAL')
+            ]);
 
 
 
