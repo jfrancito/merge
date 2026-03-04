@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Traits\OrdenPedidoTraits;
@@ -17,9 +18,9 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class ConsolidadoGeneralOrdenPedidoController extends Controller
 {
-	 use OrdenPedidoTraits;  
+    use OrdenPedidoTraits;
 
-      public function actionConsolidadoGeneralOrdenPedido($idopcion)
+    public function actionConsolidadoGeneralOrdenPedido($idopcion)
     {
         $validarurl = $this->funciones->getUrl($idopcion, 'Ver');
         if ($validarurl <> 'true') {
@@ -29,10 +30,10 @@ class ConsolidadoGeneralOrdenPedidoController extends Controller
         View::share('titulo', 'Lista Orden Pedido General');
 
         $empresa_sesion = Session::get('empresas');
-        $usuario_id     = Session::get('usuario')->usuarioosiris_id;
+        $usuario_id = Session::get('usuario')->usuarioosiris_id;
 
         $combo_empresa = [
-        $empresa_sesion->COD_EMPR => $empresa_sesion->NOM_EMPR
+            $empresa_sesion->COD_EMPR => $empresa_sesion->NOM_EMPR
         ];
 
         /* =========================
@@ -46,7 +47,7 @@ class ConsolidadoGeneralOrdenPedidoController extends Controller
 
         $combo_mes = ['' => 'Seleccione Mes'] + $periodo_mes;
 
-       
+
         $periodo_anio = DB::table('Web.periodos')
             ->where('activo', 1)
             ->whereIn('COD_EMPR', array_keys($combo_empresa))
@@ -65,12 +66,11 @@ class ConsolidadoGeneralOrdenPedidoController extends Controller
            OBTENER CENTRO DEL LOGUEADO
         ========================== */
 
-        $empresa_id   = '';
-        $mes_pedido   = '';
-        $anio_pedido  = '';
-       
+        $empresa_id = '';
+        $mes_pedido = '';
+        $anio_pedido = '';
 
-      
+
         $listaordenpedidogeneral = $this->lg_lista_cabecera_pedido_consolidado_general($empresa_id,
             $mes_pedido,
             $anio_pedido
@@ -80,16 +80,16 @@ class ConsolidadoGeneralOrdenPedidoController extends Controller
 
 
         return view('ordenpedido.consolidadogeneral.ordenpedidoconsolidadogeneral', [
-            'listaordenpedidogeneral'        => $listaordenpedidogeneral,
+            'listaordenpedidogeneral' => $listaordenpedidogeneral,
             'listaordenpedidogeneralterminado' => $listaordenpedidogeneralterminado,
-            'funcion'                 => $this,
-            'empresa_id'              => $empresa_id,
-            'combo_empresa'           => $combo_empresa,
-            'combo_mes'               => $combo_mes,
-            'mes_pedido'              => $mes_pedido,
-            'combo_anio'              => $combo_anio,
-            'anio_pedido'             => $anio_pedido,
-            'idopcion'                => $idopcion
+            'funcion' => $this,
+            'empresa_id' => $empresa_id,
+            'combo_empresa' => $combo_empresa,
+            'combo_mes' => $combo_mes,
+            'mes_pedido' => $mes_pedido,
+            'combo_anio' => $combo_anio,
+            'anio_pedido' => $anio_pedido,
+            'idopcion' => $idopcion
         ]);
     }
 
@@ -167,9 +167,9 @@ class ConsolidadoGeneralOrdenPedidoController extends Controller
 
                     $p = $prod_items->first();
 
-                    $sum_cantidad   = $prod_items->sum('CANTIDAD');
-                    $sum_stock      = $prod_items->sum('STOCK');
-                    $sum_reservado  = $prod_items->sum('RESERVADO');
+                    $sum_cantidad = $prod_items->sum('CANTIDAD');
+                    $sum_stock = $prod_items->sum('STOCK');
+                    $sum_reservado = $prod_items->sum('RESERVADO');
                     $sum_diferencia = $prod_items->sum('DIFERENCIA');
 
                     $this->insertOrdenPedidoConsolidadoGeneralDetalle(
@@ -191,7 +191,7 @@ class ConsolidadoGeneralOrdenPedidoController extends Controller
                 }
 
                 // 5️⃣ Insertar referencias POR CADA FAMILIA
-               // 5️⃣ Insertar referencias POR CADA FAMILIA
+                // 5️⃣ Insertar referencias POR CADA FAMILIA
                 foreach ($items->pluck('ID_PEDIDO_CONSOLIDADO')->unique() as $origen_id) {
 
                     // 🔥 ELIMINAR RELACIONES ANTERIORES
@@ -202,14 +202,14 @@ class ConsolidadoGeneralOrdenPedidoController extends Controller
 
                     // 🔥 INSERTAR NUEVA RELACIÓN
                     DB::table('CMP.REFERENCIA_ASOC')->insert([
-                        'COD_TABLA'            => $origen_id,
-                        'COD_TABLA_ASOC'       => $id_general,
-                        'TXT_TABLA'            => 'WEB.ORDEN_PEDIDO_CONSOLIDADO',
-                        'TXT_TABLA_ASOC'       => 'WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL',
-                        'TXT_TIPO_REFERENCIA'  => 'CONSOLIDADO_GENERAL',
+                        'COD_TABLA' => $origen_id,
+                        'COD_TABLA_ASOC' => $id_general,
+                        'TXT_TABLA' => 'WEB.ORDEN_PEDIDO_CONSOLIDADO',
+                        'TXT_TABLA_ASOC' => 'WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL',
+                        'TXT_TIPO_REFERENCIA' => 'CONSOLIDADO_GENERAL',
                         'COD_USUARIO_CREA_AUD' => Session::get('usuario')->id,
                         'FEC_USUARIO_CREA_AUD' => date('Y-m-d\TH:i:s'),
-                        'COD_ESTADO'           => 1
+                        'COD_ESTADO' => 1
                     ]);
                 }
             }
@@ -241,7 +241,7 @@ class ConsolidadoGeneralOrdenPedidoController extends Controller
     public function actionListarAjaxDetalleConsolidadoGeneralOP(Request $request)
     {
         $id_consolidado_general = $request->input('id_consolidado_general');
-        $familia_id             = $request->input('familia_id');
+        $familia_id = $request->input('familia_id');
         $listadetalle = $this->lg_lista_detalle_consolidado_general($id_consolidado_general, $familia_id);
         return view('ordenpedido.consolidadogeneral.ajax.listadetalleconsolidadogeneral', [
             'listadetalle' => $listadetalle,
@@ -268,19 +268,19 @@ class ConsolidadoGeneralOrdenPedidoController extends Controller
 
         return view('ordenpedido.consolidadogeneral.alistaordenconsolidadogeneral', [
             'listaordenpedidogeneral' => $listaordenpedidogeneral,
-            'idopcion' => $idopcion, 
+            'idopcion' => $idopcion,
             'empresa_id' => $empresa_id,
             'mes_pedido' => $mes_pedido,
             'anio_pedido' => $anio_pedido,
-            'ajax'   => true,
+            'ajax' => true,
         ]);
     }
 
     public function actionAjaxGuardarCantidadCompradaGeneral(Request $request)
     {
         $id_consolidado_general = $request->input('id_consolidado_general');
-        $detalles_json           = $request->input('detalles');
-        $detalles                = json_decode($detalles_json, true);
+        $detalles_json = $request->input('detalles');
+        $detalles = json_decode($detalles_json, true);
 
         try {
             DB::beginTransaction();
@@ -290,7 +290,7 @@ class ConsolidadoGeneralOrdenPedidoController extends Controller
                     ->where('ID_PEDIDO_CONSOLIDADO_GENERAL', $id_consolidado_general)
                     ->where('COD_PRODUCTO', $det['cod_producto'])
                     ->update([
-                        'CAN_COMPRADA'          => $det['cantidad'],
+                        'CAN_COMPRADA' => $det['cantidad'],
                         'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id
                     ]);
             }
@@ -313,12 +313,12 @@ class ConsolidadoGeneralOrdenPedidoController extends Controller
             DB::connection('sqlsrv')->table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL')
                 ->where('ID_PEDIDO_CONSOLIDADO_GENERAL', $id_consolidado_general)
                 ->update([
-                    'COD_ESTADO'            => 'ETM0000000000005', // APROBADO
-                    'TXT_ESTADO'            => 'APROBADO',
+                    'COD_ESTADO' => 'ETM0000000000005', // APROBADO
+                    'TXT_ESTADO' => 'APROBADO',
                     'COD_USUARIO_MODIF_AUD' => Session::get('usuario')->id,
                     'FEC_USUARIO_MODIF_AUD' => date('Y-m-d\TH:i:s')
 
-                       
+
                 ]);
 
             DB::commit();
@@ -330,12 +330,12 @@ class ConsolidadoGeneralOrdenPedidoController extends Controller
         }
     }
 
-      public function actionDescargarExcelDetalleConsolidadoGeneral($id_consolidado_general, $familia_id)
+    public function actionDescargarExcelDetalleConsolidadoGeneral($id_consolidado_general, $familia_id)
     {
         set_time_limit(0);
-        if($familia_id == 'TODO') $familia_id = '';
+        if ($familia_id == 'TODO') $familia_id = '';
         $listadetalle = $this->lg_lista_detalle_consolidado_general($id_consolidado_general, $familia_id);
-        
+
         $titulo = 'Detalle-Consolidado-General-' . $id_consolidado_general;
         $fecha_actual = date("Y-m-d");
         Excel::create($titulo . '-(' . $fecha_actual . ')', function ($excel) use ($listadetalle, $titulo) {

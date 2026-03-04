@@ -1,6 +1,6 @@
 <html>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <style type="text/css">    
+    <style type="text/css">
         h1{
             text-align: center;
         }
@@ -36,6 +36,7 @@
                 <th class='tabladp'>DIFERENCIA</th>
                 <th class='tabladp'>CAN COMPRAR</th>
                 <th class='tabladp'>FAMILIA</th>
+                <th class='tabladp'>CENTRO</th>
             </tr>
         </thead>
         <tbody>
@@ -49,9 +50,10 @@
                     <td>{{ number_format($item->RESERVADO, 2) }}</td>
                     <td>{{ number_format($item->DIFERENCIA, 2) }}</td>
                     <td>
-                        {{ (isset($item->CAN_COMPRADA) && !is_null($item->CAN_COMPRADA)) ? intval($item->CAN_COMPRADA) : ($item->DIFERENCIA < 0 ? 0 : intval($item->DIFERENCIA)) }}
+                        {{ (isset($item->CAN_COMPRADA_CALCULADA) && !is_null($item->CAN_COMPRADA_CALCULADA)) ? intval($item->CAN_COMPRADA_CALCULADA) : ($item->DIFERENCIA < 0 ? 0 : intval($item->DIFERENCIA)) }}
                     </td>
                     <td>{{ $item->NOM_CATEGORIA_FAMILIA }}</td>
+                    <td>{{ $item->NOM_CENTRO }}</td>
                 </tr>
             @endforeach
         </tbody>
