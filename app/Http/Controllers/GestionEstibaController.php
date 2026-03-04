@@ -969,9 +969,7 @@ class GestionEstibaController extends Controller
                                         'COD_ESTADO'=>'ETM0000000000012',
                                         'TXT_ESTADO'=>'POR APROBAR JEFE ACOPIO',
                                         'IND_EMAIL_JEFE_ACOPIO'=>0,
-                                        'ind_email_ap'=>0,
-                                        'fecha_uc'=>$this->fechaactual,
-                                        'usuario_uc'=>Session::get('usuario')->id
+                                        'ind_email_ap'=>0
                                     ]
                                 );
                 }else{

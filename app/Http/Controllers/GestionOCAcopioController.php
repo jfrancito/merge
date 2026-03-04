@@ -602,8 +602,8 @@ class GestionOCAcopioController extends Controller
                                     'TXT_ESTADO'=>'POR APROBAR ADMINISTRACION',
                                     'IND_EMAIL_ADMINISTRACION_ACOPIO'=>0,
                                     'ind_email_clap'=>0,
-                                    'fecha_ap'=>$this->fechaactual,
-                                    'usuario_ap'=>Session::get('usuario')->id
+                                    'fecha_uc'=>$this->fechaactual,
+                                    'usuario_uc'=>Session::get('usuario')->id
                                 ]
                             );
 

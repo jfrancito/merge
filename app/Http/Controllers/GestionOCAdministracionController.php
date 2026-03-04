@@ -138,12 +138,22 @@ class GestionOCAdministracionController extends Controller
                                     $listadatos_obs_le = $this->con_lista_cabecera_comprobante_total_adm_pg_obs_levantadas($cod_empresa);
                                 } else {
 
-                                    if (in_array($operacion_id, $array_canjes)) {
-                                        $categoria_id = $this->con_categoria_canje($operacion_id);
-                                        $listadatos = $this->con_lista_cabecera_comprobante_total_adm_estiba($cod_empresa, $operacion_id);
-                                        $listadatos_obs = $this->con_lista_cabecera_comprobante_total_adm_estiba_obs($cod_empresa, $operacion_id);
-                                        $listadatos_obs_le = $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas($cod_empresa, $operacion_id);
+
+                                    if($operacion_id=='DOCUMENTO_INTERNO_COMPRA'){
+                                        $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_estiba_dic($cod_empresa,$operacion_id);
+                                        $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_dic($cod_empresa,$operacion_id);
+                                        $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas_dic($cod_empresa,$operacion_id);
+                                    }else{
+
+                                        if (in_array($operacion_id, $array_canjes)) {
+                                            $categoria_id = $this->con_categoria_canje($operacion_id);
+                                            $listadatos = $this->con_lista_cabecera_comprobante_total_adm_estiba($cod_empresa, $operacion_id);
+                                            $listadatos_obs = $this->con_lista_cabecera_comprobante_total_adm_estiba_obs($cod_empresa, $operacion_id);
+                                            $listadatos_obs_le = $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas($cod_empresa, $operacion_id);
+                                        }
                                     }
+
+
 
                                 }
 
@@ -224,9 +234,18 @@ class GestionOCAdministracionController extends Controller
                                     $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_pg_obs_levantadas($cod_empresa);
                                 }else{
 
-                                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_estiba($cod_empresa,$operacion_id);
-                                    $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs($cod_empresa,$operacion_id);
-                                    $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas($cod_empresa,$operacion_id);
+                                    if($operacion_id=='DOCUMENTO_INTERNO_COMPRA'){
+                                        $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_estiba_dic($cod_empresa,$operacion_id);
+                                        $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_dic($cod_empresa,$operacion_id);
+                                        $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas_dic($cod_empresa,$operacion_id);
+                                    }else{
+
+                                        $listadatos         =   $this->con_lista_cabecera_comprobante_total_adm_estiba($cod_empresa,$operacion_id);
+                                        $listadatos_obs     =   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs($cod_empresa,$operacion_id);
+                                        $listadatos_obs_le  =   $this->con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas($cod_empresa,$operacion_id);
+                                    }
+
+
                                 }
                             }
 
