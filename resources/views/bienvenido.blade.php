@@ -14,7 +14,7 @@
 		<div class="main-content container-fluid">
 			<div class='container'>
 
-                @if(Session::get('usuario')->rol_id == '1CIX00000001' || 
+    <!--             @if(Session::get('usuario')->rol_id == '1CIX00000001' || 
                     Session::get('usuario')->id == '1CIX00000173' || 
                     Session::get('usuario')->id == '1CIX00000442')
                 <div class="row">
@@ -34,7 +34,7 @@
                 @endif
 
 
-                <div class="row">
+   -->              <div class="row">
                       @if(Session::get('usuario')->rol_id == '1CIX00000024')
                         @include('usuario.proveedores')
                       @else
