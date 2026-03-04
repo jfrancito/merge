@@ -348,6 +348,8 @@ trait OrdenPedidoTraits
                 DB::raw("(
                 SELECT ISNULL(SUM(IAP.CAN_FIN_MAT), 0)
                 FROM ALM.INVENTARIO_ALMACEN IAP
+                      INNER JOIN ALM.ALMACEN ALC 
+                      ON ALC.COD_ALMACEN = IAP.COD_ALMACEN
                 WHERE IAP.COD_PRODUCTO = OD.COD_PRODUCTO
                   AND IAP.COD_CENTRO = OP.COD_CENTRO
                   AND IAP.COD_EMPR = '$empresa_id'
@@ -355,6 +357,9 @@ trait OrdenPedidoTraits
                   AND IAP.COD_EMPR_PROVEEDOR_SERV = '$empresa_id'
                   AND IAP.IND_STK_ACTUAL = 1
                   AND IAP.COD_ESTADO = 1
+                  AND IAP.CAN_FIN_MAT > 0
+                  AND ALC.COD_CATEGORIA_AREA='AEM0000000000015'
+                  AND ALC.NOM_ALMACEN LIKE '%SUMINISTRO%'
             ) AS STOCK"),
                 'PRD.CAN_STOCK_SEGURIDAD AS CAN_STOCK_RESERVADO'
             )
@@ -604,9 +609,10 @@ trait OrdenPedidoTraits
             ->where('P.situacion_id', 'PRMAECEN000000000002')
             ->where('C.COD_ESTADO', 1)
             ->select('C.COD_CENTRO', 'C.NOM_CENTRO')
-            ->get();
-        //->first();
+            //->get();
+            ->first();
 
+        /*
         $empresas = DB::table('STD.EMPRESA')
             ->where('COD_ESTADO', 1)
             ->where('IND_SISTEMA', 1)
@@ -625,16 +631,17 @@ trait OrdenPedidoTraits
                 ->select('COD_EMPR', 'NOM_EMPR')
                 ->get();
         }
-
+        */
+        
         $query = DB::connection('sqlsrv')->table('WEB.ORDEN_PEDIDO_CONSOLIDADO as C')
             ->join('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE as D',
                 'C.ID_PEDIDO_CONSOLIDADO', '=', 'D.ID_PEDIDO_CONSOLIDADO')
             ->join('STD.EMPRESA as E', 'E.COD_EMPR', '=', 'C.COD_EMPR')
             ->join('ALM.CENTRO as CEN', 'CEN.COD_CENTRO', '=', 'C.COD_CENTRO')
-            //->where('C.COD_EMPR', $empresa_session_id)
-            //->where('C.COD_CENTRO', $centro->COD_CENTRO)
-            ->whereIn('C.COD_EMPR', $empresas->pluck('COD_EMPR')->toArray())
-            ->whereIn('C.COD_CENTRO', $centro->pluck('COD_CENTRO')->toArray())
+            ->where('C.COD_EMPR', $empresa_session_id)
+            ->where('C.COD_CENTRO', $centro->COD_CENTRO)
+            //->whereIn('C.COD_EMPR', $empresas->pluck('COD_EMPR')->toArray())
+            //->whereIn('C.COD_CENTRO', $centro->pluck('COD_CENTRO')->toArray())
             ->select(
                 'C.ID_PEDIDO_CONSOLIDADO',
                 'C.FEC_PEDIDO',
