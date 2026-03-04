@@ -13,7 +13,7 @@
 	<div class="be-content  contenido proveedor" style="height: 100vh;">
 		<div class="main-content container-fluid">
 			<div class='container'>
-
+<!-- 
                 @if(Session::get('usuario')->rol_id == '1CIX00000001' || 
                     Session::get('usuario')->id == '1CIX00000173' || 
                     Session::get('usuario')->id == '1CIX00000442')
@@ -31,7 +31,7 @@
                         </div>
                     </div>
                 </div>
-                @endif
+                @endif -->
 
 
                 <div class="row">
