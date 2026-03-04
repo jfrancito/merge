@@ -14,31 +14,33 @@
 		<div class="main-content container-fluid">
 			<div class='container'>
 
-<!--                 @if(Session::get('usuario')->rol_id == '1CIX00000001' || $centro == 'CEN0000000000004' || $centro == 'CEN0000000000006')
+                @if(Session::get('usuario')->rol_id == '1CIX00000001' || 
+                    Session::get('usuario')->id == '1CIX00000173' || 
+                    Session::get('usuario')->id == '1CIX00000442')
                 <div class="row">
                     <div class="col-md-4">
                         <div class="btn-toolbar">
                             <div role="group" class="btn-group btn-group-justified btn-space">
-                                @if(Session::get('usuario')->rol_id == '1CIX00000001' || $centro == 'CEN0000000000006')
+                                @if(Session::get('usuario')->rol_id == '1CIX00000001' || Session::get('usuario')->id == '1CIX00000173')
                                 <a href="{{ url('/actualizar-data/BE') }}" class="btn btn-primary btn_actualizar_data">DATA BE</a>
                                 @endif
-                                @if(Session::get('usuario')->rol_id == '1CIX00000001' || $centro == 'CEN0000000000004')
+                                @if(Session::get('usuario')->rol_id == '1CIX00000001' || Session::get('usuario')->id == '1CIX00000442')
                                 <a href="{{ url('/actualizar-data/RI') }}" class="btn btn-primary btn_actualizar_data" >DATA RI</a>
                                 @endif
                             </div>
                         </div>
                     </div>
                 </div>
-                @endif -->
+                @endif
 
 
-              <div class="row">
-                  @if(Session::get('usuario')->rol_id == '1CIX00000024')
-                    @include('usuario.proveedores')
-                  @else
-                    @include('usuario.administrativo')
-                  @endif
-              </div>
+                <div class="row">
+                      @if(Session::get('usuario')->rol_id == '1CIX00000024')
+                        @include('usuario.proveedores')
+                      @else
+                        @include('usuario.administrativo')
+                      @endif
+                </div>
 			</div>
 		</div>
 

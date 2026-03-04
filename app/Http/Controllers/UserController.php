@@ -72,24 +72,73 @@ class UserController extends Controller {
 
 	public function actionActualizarData($zona,Request $request)
 	{
-		if($zona == 'BE'){
-			DB::connection('sqlsrv')->unprepared("
-			    SET NOCOUNT ON;
-			    SET ARITHABORT ON;
-			    SET XACT_ABORT ON;
-			    EXEC dbo.SCS_MERGE_TRANSACCIONALES_BE_MERGE
-			");
-		}
-		if($zona == 'RI'){
-			DB::connection('sqlsrv')->unprepared("
-			    SET NOCOUNT ON;
-			    SET ARITHABORT ON;
-			    SET XACT_ABORT ON;
-			    EXEC dbo.SCS_MERGE_TRANSACCIONALES_RJ_MERGE
-			");
 
-		}
-		return Redirect::to('bienvenido')->with('bienhecho', 'Se realizo la Transaccion de '.$zona);
+        try{
+
+
+			$centros = DB::table('ALM.CENTRO')
+			    ->whereIn('TXT_ABREVIATURA', ['RJ', 'BE'])
+			    ->where('COD_USUARIO_CREA_AUD', 'PASANDO')
+			    ->get();
+
+			if(count($centros)>0){
+				 return Redirect::to('bienvenido')->with('errorbd', 'Alguna Zona esta utilizando el batch vuelva a intentar dentro de 5 minutos');
+			}    
+
+			//dd($centros);
+
+			if($zona == 'BE'){
+
+		        DB::table(DB::raw('ALM.CENTRO'))
+		            ->where('TXT_ABREVIATURA', 'BE')
+		            ->update(['COD_USUARIO_CREA_AUD' => 'PASANDO']);
+
+				DB::connection('sqlsrv')->unprepared("
+				    SET NOCOUNT ON;
+				    SET ARITHABORT ON;
+				    SET XACT_ABORT ON;
+				    EXEC dbo.SCS_MERGE_TRANSACCIONALES_BE_MERGE
+				");
+			}
+			if($zona == 'RI'){
+
+		        DB::table(DB::raw('ALM.CENTRO'))
+		            ->where('TXT_ABREVIATURA', 'RJ')
+		            ->update(['COD_USUARIO_CREA_AUD' => 'PASANDO']);
+
+				DB::connection('sqlsrv')->unprepared("
+				    SET NOCOUNT ON;
+				    SET ARITHABORT ON;
+				    SET XACT_ABORT ON;
+				    EXEC dbo.SCS_MERGE_TRANSACCIONALES_RJ_MERGE
+				");
+
+			}
+
+	        DB::table(DB::raw('ALM.CENTRO'))
+	            ->where('TXT_ABREVIATURA', 'BE')
+	            ->update(['COD_USUARIO_CREA_AUD' => 'ADMINISTRADOR']);
+
+	        DB::table(DB::raw('ALM.CENTRO'))
+	            ->where('TXT_ABREVIATURA', 'RJ')
+	            ->update(['COD_USUARIO_CREA_AUD' => 'ADMINISTRADOR']);
+
+			return Redirect::to('bienvenido')->with('bienhecho', 'Se realizo la Transaccion de '.$zona);
+
+        }catch(\Exception $ex){
+
+	        DB::table(DB::raw('ALM.CENTRO'))
+	            ->where('TXT_ABREVIATURA', 'BE')
+	            ->update(['COD_USUARIO_CREA_AUD' => 'ADMINISTRADOR']);
+
+	        DB::table(DB::raw('ALM.CENTRO'))
+	            ->where('TXT_ABREVIATURA', 'RJ')
+	            ->update(['COD_USUARIO_CREA_AUD' => 'ADMINISTRADOR']);
+
+            return Redirect::to('bienvenido')->with('errorbd', $ex.' Ocurrio un error inesperado');
+        }
+
+
 	}
 
 
