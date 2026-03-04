@@ -890,6 +890,8 @@ $query = DB::connection('sqlsrv')
             )
             ->join('STD.EMPRESA as E', 'E.COD_EMPR', '=', 'C.COD_EMPR')
             ->join('ALM.CENTRO as CEN', 'CEN.COD_CENTRO', '=', 'C.COD_CENTRO')
+            ->where('C.COD_EMPR', $empresa_session_id)
+
             ->select(
                 'C.ID_PEDIDO_CONSOLIDADO_GENERAL',
                 'C.FEC_PEDIDO',
@@ -964,71 +966,95 @@ $query = DB::connection('sqlsrv')
         return $query;
     }
 
-    public function lg_lista_detalle_consolidado_general($id_consolidado_general, $familia_id)
+  public function lg_lista_detalle_consolidado_general($id_consolidado_general, $familia_id)
     {
-        $query = DB::connection('sqlsrv')->table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE as D')
+        $query = DB::connection('sqlsrv')
+            ->table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE as D')
+
             ->join('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL as C',
                 'C.ID_PEDIDO_CONSOLIDADO_GENERAL', '=', 'D.ID_PEDIDO_CONSOLIDADO_GENERAL')
+
             ->join('ALM.CENTRO as CEN', 'CEN.COD_CENTRO', '=', 'D.COD_CENTRO')
+
             ->select(
                 'D.*',
                 'C.COD_ESTADO',
                 'CEN.NOM_CENTRO',
+
+                // 🔹 CAN_COMPRADA SIN DUPLICAR
+                DB::raw("(
+                    SELECT ISNULL(SUM(OCD.CAN_COMPRADA),0)
+                    FROM CMP.REFERENCIA_ASOC RA_CONS
+                    INNER JOIN WEB.ORDEN_PEDIDO_CONSOLIDADO OPC
+                        ON OPC.ID_PEDIDO_CONSOLIDADO = RA_CONS.COD_TABLA
+                    INNER JOIN WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE OCD
+                        ON OCD.ID_PEDIDO_CONSOLIDADO = OPC.ID_PEDIDO_CONSOLIDADO
+                    WHERE RA_CONS.COD_TABLA_ASOC = D.ID_PEDIDO_CONSOLIDADO_GENERAL
+                      AND RA_CONS.TXT_TIPO_REFERENCIA = 'CONSOLIDADO_GENERAL'
+                      AND RA_CONS.TXT_TABLA = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
+                      AND RA_CONS.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL'
+                      AND OCD.COD_PRODUCTO = D.COD_PRODUCTO
+                ) AS CAN_COMPRADA_CALCULADA"),
+
+                // 🔹 TU LÓGICA ORIGINAL STUFF (NO TOCADA)
                 DB::raw("
-                        STUFF((
-                            SELECT 
-                                ' [SEP] ' 
-                                + CONVERT(VARCHAR(10), OP.FEC_PEDIDO, 103)
-                                + ' [FLD] ' + OP.ID_PEDIDO
-                                + ' [FLD] ' + OP.TXT_AREA
-                                + ' [FLD] ' + ISNULL(OP.TXT_GLOSA,'')
-                                + ' [FLD] ' + CAST(SUM(
-                                    COALESCE(
-                                        OPD.CAN_MODIF_ADM, 
-                                        OPD.CAN_MODIF_GER, 
-                                        OPD.CAN_MODIF_JEF_AUT, 
-                                        OPD.CANTIDAD
-                                    )
-                                ) AS VARCHAR(20))
-                                + ' [FLD] ' + CEN_ORIG.NOM_CENTRO
-                            FROM CMP.REFERENCIA_ASOC RA_CONS
-                            INNER JOIN WEB.ORDEN_PEDIDO_CONSOLIDADO OPC
-                                ON OPC.ID_PEDIDO_CONSOLIDADO = RA_CONS.COD_TABLA
-                            INNER JOIN ALM.CENTRO CEN_ORIG
-                                ON CEN_ORIG.COD_CENTRO = OPC.COD_CENTRO
-                            INNER JOIN CMP.REFERENCIA_ASOC RA_OP
-                                ON RA_OP.COD_TABLA_ASOC = OPC.ID_PEDIDO_CONSOLIDADO
-                            INNER JOIN WEB.ORDEN_PEDIDO OP
-                                ON OP.ID_PEDIDO = RA_OP.COD_TABLA
-                            INNER JOIN WEB.ORDEN_PEDIDO_DETALLE OPD
-                                ON OP.ID_PEDIDO = OPD.ID_PEDIDO
-                            WHERE RA_CONS.COD_TABLA_ASOC = D.ID_PEDIDO_CONSOLIDADO_GENERAL
-                              AND RA_CONS.TXT_TIPO_REFERENCIA = 'CONSOLIDADO_GENERAL'
-                              AND RA_CONS.TXT_TABLA = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
-                              AND RA_CONS.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL'
-                              AND RA_OP.TXT_TIPO_REFERENCIA = 'CONSOLIDADO'
-                              AND RA_OP.TXT_TABLA = 'WEB.ORDEN_PEDIDO'
-                              AND RA_OP.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
-                              AND OPD.COD_PRODUCTO = D.COD_PRODUCTO
-                              AND OPD.ACTIVO = 1
-                            GROUP BY 
-                                OP.FEC_PEDIDO,
-                                OP.ID_PEDIDO,
-                                OP.TXT_AREA,
-                                OP.TXT_GLOSA,
-                                CEN_ORIG.NOM_CENTRO
-                            ORDER BY OP.FEC_PEDIDO
-                            FOR XML PATH(''), TYPE
-                        ).value('.', 'NVARCHAR(MAX)'), 1, 7, '')
-                        AS DETALLE_POR_AREA
-                    ")
+                    STUFF((
+                        SELECT 
+                            ' [SEP] ' 
+                            + CONVERT(VARCHAR(10), OP.FEC_PEDIDO, 103)
+                            + ' [FLD] ' + OP.ID_PEDIDO
+                            + ' [FLD] ' + OP.TXT_AREA
+                            + ' [FLD] ' + ISNULL(OP.TXT_GLOSA,'')
+                            + ' [FLD] ' + CAST(SUM(
+                                COALESCE(
+                                    OPD.CAN_MODIF_ADM, 
+                                    OPD.CAN_MODIF_GER, 
+                                    OPD.CAN_MODIF_JEF_AUT, 
+                                    OPD.CANTIDAD
+                                )
+                            ) AS VARCHAR(20))
+                            + ' [FLD] ' + CEN_ORIG.NOM_CENTRO
+                        FROM CMP.REFERENCIA_ASOC RA_CONS
+                        INNER JOIN WEB.ORDEN_PEDIDO_CONSOLIDADO OPC
+                            ON OPC.ID_PEDIDO_CONSOLIDADO = RA_CONS.COD_TABLA
+                        INNER JOIN ALM.CENTRO CEN_ORIG
+                            ON CEN_ORIG.COD_CENTRO = OPC.COD_CENTRO
+                        INNER JOIN CMP.REFERENCIA_ASOC RA_OP
+                            ON RA_OP.COD_TABLA_ASOC = OPC.ID_PEDIDO_CONSOLIDADO
+                        INNER JOIN WEB.ORDEN_PEDIDO OP
+                            ON OP.ID_PEDIDO = RA_OP.COD_TABLA
+                        INNER JOIN WEB.ORDEN_PEDIDO_DETALLE OPD
+                            ON OP.ID_PEDIDO = OPD.ID_PEDIDO
+                        WHERE RA_CONS.COD_TABLA_ASOC = D.ID_PEDIDO_CONSOLIDADO_GENERAL
+                          AND RA_CONS.TXT_TIPO_REFERENCIA = 'CONSOLIDADO_GENERAL'
+                          AND RA_CONS.TXT_TABLA = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
+                          AND RA_CONS.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL'
+                          AND RA_OP.TXT_TIPO_REFERENCIA = 'CONSOLIDADO'
+                          AND RA_OP.TXT_TABLA = 'WEB.ORDEN_PEDIDO'
+                          AND RA_OP.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
+                          AND OPD.COD_PRODUCTO = D.COD_PRODUCTO
+                          AND OPD.ACTIVO = 1
+                        GROUP BY 
+                            OP.FEC_PEDIDO,
+                            OP.ID_PEDIDO,
+                            OP.TXT_AREA,
+                            OP.TXT_GLOSA,
+                            CEN_ORIG.NOM_CENTRO
+                        ORDER BY OP.FEC_PEDIDO
+                        FOR XML PATH(''), TYPE
+                    ).value('.', 'NVARCHAR(MAX)'), 1, 7, '')
+                    AS DETALLE_POR_AREA
+                ")
             )
+
             ->where('D.ID_PEDIDO_CONSOLIDADO_GENERAL', $id_consolidado_general)
+
             ->where(function ($q) use ($familia_id) {
                 if ($familia_id != '') {
                     $q->where('D.COD_CATEGORIA_FAMILIA', $familia_id);
                 }
             })
+
             ->get();
 
         return $query;

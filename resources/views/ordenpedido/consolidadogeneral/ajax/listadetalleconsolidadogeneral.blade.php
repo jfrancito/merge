@@ -96,7 +96,7 @@
     <input type="number" 
            class="form-control input-sm can_comprar_cant" 
            style="height:28px; font-size:12px; padding:2px 6px; text-align:center;"
-           value="{{ (isset($item->CAN_COMPRADA) && !is_null($item->CAN_COMPRADA)) ? intval($item->CAN_COMPRADA) : ($item->DIFERENCIA < 0 ? 0 : intval($item->DIFERENCIA)) }}" 
+            value="{{ intval($item->CAN_COMPRADA_CALCULADA ?? 0) }}"
            min="0" 
            oninput="if(this.value<0)this.value=0"
            step="1"
