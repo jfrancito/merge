@@ -361,7 +361,7 @@ trait OrdenPedidoTraits
                   AND ALC.COD_CATEGORIA_AREA='AEM0000000000015'
                   AND ALC.NOM_ALMACEN LIKE '%SUMINISTRO%'
             ) AS STOCK"),
-                'PRD.CAN_STOCK_SEGURIDAD AS CAN_STOCK_RESERVADO'
+                'PRD.CAN_STOCK_REQUERIDO AS CAN_STOCK_RESERVADO'
             )
             ->join('WEB.ORDEN_PEDIDO_DETALLE as OD', 'OP.ID_PEDIDO', '=', 'OD.ID_PEDIDO')
             ->join('STD.EMPRESA as E', 'E.COD_EMPR', '=', 'OP.COD_EMPR')
@@ -605,7 +605,7 @@ trait OrdenPedidoTraits
             ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
             ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
             ->where('T.COD_TRAB', $usuario_id)
-            ->where('P.empresa_osiris_id', $empresa_session_id)
+           // ->where('P.empresa_osiris_id', $empresa_session_id)
             ->where('P.situacion_id', 'PRMAECEN000000000002')
             ->where('C.COD_ESTADO', 1)
             ->select('C.COD_CENTRO', 'C.NOM_CENTRO')

@@ -131,7 +131,6 @@ class ConsolidadoOrdenPedidoController extends Controller
             ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
             ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
             ->where('T.COD_TRAB', $usuario_id)
-            ->where('P.empresa_osiris_id', $empresa_sesion->COD_EMPR)
             ->where('P.situacion_id', 'PRMAECEN000000000002')
             ->where('C.COD_ESTADO', 1)
             ->select('C.COD_CENTRO', 'C.NOM_CENTRO')
