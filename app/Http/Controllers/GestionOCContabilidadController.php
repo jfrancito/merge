@@ -3096,6 +3096,49 @@ class GestionOCContabilidadController extends Controller
     }
 
 
+    public function actionExtornarObsNotaCredito($idopcion, $linea, $prefijo, $idordencompra, Request $request)
+    {
+        $idoc = $this->funciones->decodificarmaestraprefijo_contrato($idordencompra, $prefijo);
+        $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$linea)->first();
+        $prefijocarperta        =   $this->prefijo_empresa($fedocumento->COD_EMPR);
+
+
+        //dd($idoc);
+        FeDocumento::where('ID_DOCUMENTO', $idoc)
+            ->update(
+                [
+                    'ind_observacion' => '0'
+                ]
+            );
+
+        CMPDocAsociarCompra::where('COD_ORDEN', $idoc)
+        ->where('TIP_DOC', 'O')
+        ->where('COD_ESTADO', 1)
+        ->update(
+            [
+                'COD_ESTADO' => '0'
+            ]
+        );
+
+        Archivo::where('ID_DOCUMENTO', $idoc)
+            ->update(
+                [
+                    'ACTIVO' => '1'
+                ]
+            );
+
+        $documento                              =   new FeDocumentoHistorial;
+        $documento->ID_DOCUMENTO                =   $idoc;
+        $documento->DOCUMENTO_ITEM              =   $linea;
+        $documento->FECHA                       =   $this->fechaactual;
+        $documento->USUARIO_ID                  =   Session::get('usuario')->id;
+        $documento->USUARIO_NOMBRE              =   Session::get('usuario')->nombre;
+        $documento->TIPO                        =   'SE EXTORNO LA ULTIMA OBSERVACION';
+        $documento->MENSAJE                     =   '';
+        $documento->save();
+
+        return Redirect::to('aprobar-comprobante-contabilidad-nota-credito/' . $idopcion . '/' . $linea . '/' . $prefijo . '/' . $idordencompra)->with('bienhecho', 'Se extorno la ultima observacion');
+    }
 
     public function actionExtornarObsOc($idopcion, $linea, $prefijo, $idordencompra, Request $request)
     {
