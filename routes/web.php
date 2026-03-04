@@ -750,6 +750,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/extornar-obs-contrato/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionExtornarObsContrato');
 
 
+	Route::any('/extornar-obs-nota-credito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionExtornarObsNotaCredito');
 
 
 
