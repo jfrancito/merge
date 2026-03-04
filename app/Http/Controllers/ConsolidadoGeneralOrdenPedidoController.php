@@ -334,7 +334,7 @@ class ConsolidadoGeneralOrdenPedidoController extends Controller
     {
         set_time_limit(0);
         if ($familia_id == 'TODO') $familia_id = '';
-        $listadetalle = $this->lg_lista_detalle_consolidado_general($id_consolidado_general, $familia_id);
+        $listadetalle = $this->lg_lista_detalle_consolidado_general_excel($id_consolidado_general, $familia_id);
 
         $titulo = 'Detalle-Consolidado-General-' . $id_consolidado_general;
         $fecha_actual = date("Y-m-d");

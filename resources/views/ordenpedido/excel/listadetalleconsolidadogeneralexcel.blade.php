@@ -37,6 +37,7 @@
                 <th class='tabladp'>CAN COMPRAR</th>
                 <th class='tabladp'>FAMILIA</th>
                 <th class='tabladp'>CENTRO</th>
+                <th class='tabladp'>AREA</th>
             </tr>
         </thead>
         <tbody>
@@ -54,6 +55,7 @@
                     </td>
                     <td>{{ $item->NOM_CATEGORIA_FAMILIA }}</td>
                     <td>{{ $item->NOM_CENTRO }}</td>
+                    <td>{{ $item->DETALLE_POR_AREA }}</td>
                 </tr>
             @endforeach
         </tbody>
