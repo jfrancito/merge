@@ -195,61 +195,55 @@ trait OrdenPedidoTraits
         return $array_lista_retail;
     }
 
-  private function lg_lista_cabecera_pedido($fecha_inicio, $fecha_fin, $empresa_id, $centro_pedido)
-{
-    $query = DB::table('WEB.ORDEN_PEDIDO as OP')
-        ->select([
-            'OP.ID_PEDIDO',
-            'OP.FEC_PEDIDO',
-            'OP.COD_ANIO',
-            'OP.TXT_NOMBRE',
-            'OP.COD_CENTRO',
-            'OP.COD_EMPR',
-            'E.NOM_EMPR',
-            'C.NOM_CENTRO',
-            'OP.TXT_AREA',
-            'OP.TXT_TIPO_PEDIDO',
-            'OP.TXT_TRABAJADOR_SOLICITA',
-            'OP.TXT_TRABAJADOR_AUTORIZA',
-            'OP.TXT_TRABAJADOR_APRUEBA_GER',
-            'OP.TXT_TRABAJADOR_APRUEBA_ADM',
-            'OP.TXT_GLOSA',
-            'OP.TXT_ESTADO',
+    private function lg_lista_cabecera_pedido($fecha_inicio, $fecha_fin, $empresa_id, $centro_pedido)
+    {
+        $query = DB::table('WEB.ORDEN_PEDIDO as OP')
+            ->select([
+                'OP.ID_PEDIDO',
+                'OP.FEC_PEDIDO',
+                'OP.COD_ANIO',
+                'OP.TXT_NOMBRE',
+                'OP.COD_CENTRO',
+                'OP.COD_EMPR',
+                'E.NOM_EMPR',
+                'C.NOM_CENTRO',
+                'OP.TXT_AREA',
+                'OP.TXT_TIPO_PEDIDO',
+                'OP.TXT_TRABAJADOR_SOLICITA',
+                'OP.TXT_TRABAJADOR_AUTORIZA',
+                'OP.TXT_TRABAJADOR_APRUEBA_GER',
+                'OP.TXT_TRABAJADOR_APRUEBA_ADM',
+                'OP.TXT_GLOSA',
+                'OP.TXT_ESTADO',
 
-            'OD.ID_PEDIDO as ID_PEDIDO_DETALLE',
-            'OD.COD_PRODUCTO',
-            'OD.NOM_PRODUCTO',
-            'OD.NOM_CATEGORIA',
-            'OD.CANTIDAD',
-            'CAT.NOM_CATEGORIA as NOM_CATEGORIA_FAMILIA',
-            'OD.TXT_OBSERVACION'
-        ])
+                'OD.ID_PEDIDO as ID_PEDIDO_DETALLE',
+                'OD.COD_PRODUCTO',
+                'OD.NOM_PRODUCTO',
+                'OD.NOM_CATEGORIA',
+                'OD.CANTIDAD',
+                'CAT.NOM_CATEGORIA as NOM_CATEGORIA_FAMILIA',
+                'OD.TXT_OBSERVACION'
+            ])
+            ->join('WEB.ORDEN_PEDIDO_DETALLE as OD', 'OD.ID_PEDIDO', '=', 'OP.ID_PEDIDO')
+            ->join('STD.EMPRESA as E', 'E.COD_EMPR', '=', 'OP.COD_EMPR')
+            ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'OP.COD_CENTRO')
+            ->leftJoin('ALM.PRODUCTO as P', 'P.COD_PRODUCTO', '=', 'OD.COD_PRODUCTO')
+            ->leftJoin('CMP.CATEGORIA as CAT', 'CAT.COD_CATEGORIA', '=', 'P.COD_CATEGORIA_FAMILIA')
+            ->where('OP.ACTIVO', 1)
+            ->when($empresa_id && $empresa_id != 'TODO', function ($q) use ($empresa_id) {
+                $q->where('OP.COD_EMPR', $empresa_id);
+            })
+            ->when($centro_pedido && $centro_pedido != 'TODO', function ($q) use ($centro_pedido) {
+                $q->where('OP.COD_CENTRO', $centro_pedido);
+            })
+            ->when($fecha_inicio && $fecha_fin, function ($q) use ($fecha_inicio, $fecha_fin) {
+                $q->whereBetween(DB::raw('CAST(OP.FEC_PEDIDO AS DATE)'), [$fecha_inicio, $fecha_fin]);
+            })
+            ->orderBy('E.NOM_EMPR', 'ASC')
+            ->orderBy('OP.ID_PEDIDO', 'ASC');
 
-        ->join('WEB.ORDEN_PEDIDO_DETALLE as OD', 'OD.ID_PEDIDO', '=', 'OP.ID_PEDIDO')
-        ->join('STD.EMPRESA as E', 'E.COD_EMPR', '=', 'OP.COD_EMPR')
-        ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'OP.COD_CENTRO')
-        ->leftJoin('ALM.PRODUCTO as P', 'P.COD_PRODUCTO', '=', 'OD.COD_PRODUCTO')
-        ->leftJoin('CMP.CATEGORIA as CAT', 'CAT.COD_CATEGORIA', '=', 'P.COD_CATEGORIA_FAMILIA')
-
-        ->where('OP.ACTIVO', 1)
-
-        ->when($empresa_id && $empresa_id != 'TODO', function ($q) use ($empresa_id) {
-            $q->where('OP.COD_EMPR', $empresa_id);
-        })
-
-        ->when($centro_pedido && $centro_pedido != 'TODO', function ($q) use ($centro_pedido) {
-            $q->where('OP.COD_CENTRO', $centro_pedido);
-        })
-
-        ->when($fecha_inicio && $fecha_fin, function ($q) use ($fecha_inicio, $fecha_fin) {
-            $q->whereBetween(DB::raw('CAST(OP.FEC_PEDIDO AS DATE)'), [$fecha_inicio, $fecha_fin]);
-        })
-
-        ->orderBy('E.NOM_EMPR', 'ASC')
-        ->orderBy('OP.ID_PEDIDO', 'ASC');
-
-    return $query->get();
-}
+        return $query->get();
+    }
 
     private function lg_lista_cabecera_pedido_resumen($fecha_inicio, $fecha_fin, $empresa_id, $centro_pedido)
     {
@@ -605,7 +599,7 @@ trait OrdenPedidoTraits
             ->join('WEB.platrabajadores as P', 'P.dni', '=', 'T.NRO_DOCUMENTO')
             ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'P.centro_osiris_id')
             ->where('T.COD_TRAB', $usuario_id)
-           // ->where('P.empresa_osiris_id', $empresa_session_id)
+            // ->where('P.empresa_osiris_id', $empresa_session_id)
             ->where('P.situacion_id', 'PRMAECEN000000000002')
             ->where('C.COD_ESTADO', 1)
             ->select('C.COD_CENTRO', 'C.NOM_CENTRO')
@@ -632,7 +626,7 @@ trait OrdenPedidoTraits
                 ->get();
         }
         */
-        
+
         $query = DB::connection('sqlsrv')->table('WEB.ORDEN_PEDIDO_CONSOLIDADO as C')
             ->join('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE as D',
                 'C.ID_PEDIDO_CONSOLIDADO', '=', 'D.ID_PEDIDO_CONSOLIDADO')
@@ -703,18 +697,18 @@ trait OrdenPedidoTraits
     private function lg_lista_detalle_consolidado($id_consolidado, $familia_id)
     {
 
-$pedido = DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO')
-    ->where('ID_PEDIDO_CONSOLIDADO', $id_consolidado)
-    ->first();
+        $pedido = DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO')
+            ->where('ID_PEDIDO_CONSOLIDADO', $id_consolidado)
+            ->first();
 
-$query = DB::connection('sqlsrv')
-    ->table('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE as D')
-    ->join('WEB.ORDEN_PEDIDO_CONSOLIDADO as C',
-        'C.ID_PEDIDO_CONSOLIDADO', '=', 'D.ID_PEDIDO_CONSOLIDADO')
-    ->select(
-        'D.*',
-        'C.COD_ESTADO',
-        DB::raw("
+        $query = DB::connection('sqlsrv')
+            ->table('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE as D')
+            ->join('WEB.ORDEN_PEDIDO_CONSOLIDADO as C',
+                'C.ID_PEDIDO_CONSOLIDADO', '=', 'D.ID_PEDIDO_CONSOLIDADO')
+            ->select(
+                'D.*',
+                'C.COD_ESTADO',
+                DB::raw("
             STUFF((
                 SELECT 
                     ' [SEP] ' 
@@ -752,16 +746,16 @@ $query = DB::connection('sqlsrv')
                 FOR XML PATH(''), TYPE
             ).value('.', 'NVARCHAR(MAX)'), 1, 7, '') AS DETALLE_POR_AREA
         ")
-    )
-    ->where('D.ID_PEDIDO_CONSOLIDADO', $id_consolidado)
-    //->where('D.COD_PRODUCTO', 'PRD0000000018837')
-    ->where('C.COD_PERIODO', $pedido->COD_PERIODO)
-    ->where(function ($q) use ($familia_id) {
-        if (!empty($familia_id) && $familia_id != 'TODO') {
-            $q->where('D.COD_CATEGORIA_FAMILIA', $familia_id);
-        }
-    })
-    ->get();
+            )
+            ->where('D.ID_PEDIDO_CONSOLIDADO', $id_consolidado)
+            //->where('D.COD_PRODUCTO', 'PRD0000000018837')
+            ->where('C.COD_PERIODO', $pedido->COD_PERIODO)
+            ->where(function ($q) use ($familia_id) {
+                if (!empty($familia_id) && $familia_id != 'TODO') {
+                    $q->where('D.COD_CATEGORIA_FAMILIA', $familia_id);
+                }
+            })
+            ->get();
 
         //DD($id_consolidado);
 
@@ -891,7 +885,6 @@ $query = DB::connection('sqlsrv')
             ->join('STD.EMPRESA as E', 'E.COD_EMPR', '=', 'C.COD_EMPR')
             ->join('ALM.CENTRO as CEN', 'CEN.COD_CENTRO', '=', 'C.COD_CENTRO')
             ->where('C.COD_EMPR', $empresa_session_id)
-
             ->select(
                 'C.ID_PEDIDO_CONSOLIDADO_GENERAL',
                 'C.FEC_PEDIDO',
@@ -966,16 +959,13 @@ $query = DB::connection('sqlsrv')
         return $query;
     }
 
-  public function lg_lista_detalle_consolidado_general($id_consolidado_general, $familia_id)
+    public function lg_lista_detalle_consolidado_general($id_consolidado_general, $familia_id)
     {
         $query = DB::connection('sqlsrv')
             ->table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE as D')
-
             ->join('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL as C',
                 'C.ID_PEDIDO_CONSOLIDADO_GENERAL', '=', 'D.ID_PEDIDO_CONSOLIDADO_GENERAL')
-
             ->join('ALM.CENTRO as CEN', 'CEN.COD_CENTRO', '=', 'D.COD_CENTRO')
-
             ->select(
                 'D.*',
                 'C.COD_ESTADO',
@@ -1046,17 +1036,81 @@ $query = DB::connection('sqlsrv')
                     AS DETALLE_POR_AREA
                 ")
             )
-
             ->where('D.ID_PEDIDO_CONSOLIDADO_GENERAL', $id_consolidado_general)
-
             ->where(function ($q) use ($familia_id) {
                 if ($familia_id != '') {
                     $q->where('D.COD_CATEGORIA_FAMILIA', $familia_id);
                 }
             })
-
             ->get();
 
         return $query;
+    }
+
+    public function lg_lista_detalle_consolidado_general_excel($id_consolidado_general, $familia_id)
+    {
+        $query = DB::connection('sqlsrv')
+            ->table('WEB.ORDEN_PEDIDO_CONSOLIDADO as OPC')
+            ->join('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE AS OPCD',
+                'OPC.ID_PEDIDO_CONSOLIDADO', '=', 'OPCD.ID_PEDIDO_CONSOLIDADO')
+            ->join('CMP.REFERENCIA_ASOC AS RA', function ($join) {
+                $join->on('RA.COD_TABLA', '=', 'OPC.ID_PEDIDO_CONSOLIDADO')
+                    ->where('RA.COD_ESTADO', '=', 1);
+            })
+            ->join('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL AS OPCG', function ($join) use ($id_consolidado_general) {
+                $join->on('OPCG.ID_PEDIDO_CONSOLIDADO_GENERAL', '=', 'RA.COD_TABLA_ASOC')
+                    ->where('OPCG.ACTIVO', '=', 1)
+                    ->where('OPCG.ID_PEDIDO_CONSOLIDADO_GENERAL', '=', $id_consolidado_general);
+            })
+            ->join('ALM.CENTRO AS C', function ($join) {
+                $join->on('C.COD_CENTRO', '=', 'OPC.COD_CENTRO')
+                    ->where('C.COD_ESTADO', '=', 1);
+            })
+            ->join('STD.EMPRESA AS E', function ($join) {
+                $join->on('E.COD_EMPR', '=', 'OPC.COD_EMPR')
+                    ->where('E.COD_ESTADO', '=', 1);
+            })
+            ->select(
+                'OPCD.COD_PRODUCTO',
+                'OPCD.NOM_PRODUCTO',
+                'OPCD.NOM_CATEGORIA_MEDIDA',
+                DB::raw('SUM(OPCD.CANTIDAD) AS CANTIDAD'),
+                DB::raw('SUM(OPCD.STOCK) AS STOCK'),
+                DB::raw('SUM(OPCD.RESERVADO) AS RESERVADO'),
+                DB::raw('SUM(OPCD.DIFERENCIA) AS DIFERENCIA'),
+                DB::raw('SUM(OPCD.CAN_COMPRADA) AS CAN_COMPRADA_CALCULADA'),
+                'OPCD.COD_CATEGORIA_FAMILIA',
+                'OPCD.NOM_CATEGORIA_FAMILIA',
+                'C.COD_CENTRO',
+                'C.NOM_CENTRO',
+                'E.COD_EMPR',
+                'E.NOM_EMPR'
+            )
+            ->where('OPC.CONSOLIDADO_GENERAL', '=', 'SI')
+            ->where('RA.TXT_TIPO_REFERENCIA', '=', 'CONSOLIDADO_GENERAL')
+            ->where('RA.TXT_TABLA', '=', 'WEB.ORDEN_PEDIDO_CONSOLIDADO')
+            ->where('RA.TXT_TABLA_ASOC', '=', 'WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL')
+            ->where('OPC.ACTIVO', '=', 1)
+            ->where('OPCD.ACTIVO', '=', 1)
+            ->groupBy(
+                'OPCD.COD_PRODUCTO',
+                'OPCD.NOM_PRODUCTO',
+                'OPCD.NOM_CATEGORIA_MEDIDA',
+                'OPCD.COD_CATEGORIA_FAMILIA',
+                'OPCD.NOM_CATEGORIA_FAMILIA',
+                'C.COD_CENTRO',
+                'C.NOM_CENTRO',
+                'E.COD_EMPR',
+                'E.NOM_EMPR'
+            );
+
+        // Aplicar filtro por familia_id si se proporciona
+        if (!empty($familia_id)) {
+            $query->where('OPCD.COD_CATEGORIA_FAMILIA', '=', $familia_id);
+        }
+
+        DD($query->toSql());
+
+        return $query->get();
     }
 }
