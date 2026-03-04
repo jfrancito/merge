@@ -43,6 +43,13 @@
                   </a>  
                 </li>
 
+                <li>
+                  <a href="{{ url('/descargar-pago-proveedor-macro-excel-cheque/'.$item->FOLIO) }}">
+                    Macro de Cheque
+                  </a>  
+                </li>
+
+
               @else
                 @if($item->OPERACION=='LIQUIDACION_COMPRA_ANTICIPO')
                   <li>
