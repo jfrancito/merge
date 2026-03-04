@@ -57,7 +57,7 @@
                         <span>
                           <b>DEUDA:
                             @IF($item->CAN_DEUDA > 0)
-                             <span data_id_doc = '{{$item->COD_EMPR_EMISOR}}' class="badge badge-danger btn_detalle_deuda" style="width: 100px;cursor: pointer;">DEUDA</span>
+                             <span data_id_doc = '{{$item->COD_EMPR}}' class="badge badge-danger btn_detalle_deuda" style="width: 100px;cursor: pointer;">DEUDA</span>
                             @ELSE
                               <span class="badge badge-default" style="width: 100px;display: inline-block;">SIN DEUDA</span>
                             @ENDIF
@@ -65,11 +65,11 @@
                         </span>
                       </td>
                       <td class="cell-detail sorting_1" style="position: relative;">
-                        <span><b>PROVEEDOR : </b>  {{date_format(date_create($item->fecha_pa), 'd-m-Y h:i:s')}}</span>
-                        @IF($item->OPERACION != 'DOCUMENTO_INTERNO_COMPRA')
-                          <span style="font-size: 18px;"><b>U. CONTACTO: </b>{{date_format(date_create($item->fecha_uc), 'd-m-Y h:i:s')}}</span>
-                          <!-- <span ><b>CONTABILIDAD : </b> {{date_format(date_create($item->fecha_pr), 'd-m-Y h:i:s')}}</span> -->
+                        @IF($item->OPERACION == 'DOCUMENTO_INTERNO_COMPRA')
+                          <span ><b>U. CONTACTO: </b>{{date_format(date_create($item->fecha_pa), 'd-m-Y h:i:s')}}</span>
+                          <span style="font-size: 18px;"><b>JEFE ACOPIO: </b>{{date_format(date_create($item->fecha_uc), 'd-m-Y h:i:s')}}</span>
                         @ELSE
+                          <span><b>PROVEEDOR : </b>  {{date_format(date_create($item->fecha_pa), 'd-m-Y h:i:s')}}</span>
                           <span style="font-size: 18px;"><b>U. CONTACTO: </b>{{date_format(date_create($item->fecha_uc), 'd-m-Y h:i:s')}}</span>                          
                         @ENDIF
                       </td>

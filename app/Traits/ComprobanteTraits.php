@@ -3458,6 +3458,26 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
+    private function con_lista_cabecera_comprobante_total_adm_estiba_obs_levantadas_dic($cliente_id,$operacion_id) {
+
+        $listadatos     =   FeDocumento::leftJoin('STD.EMPRESA', 'FE_DOCUMENTO.RUC_PROVEEDOR', '=', 'STD.EMPRESA.NRO_DOCUMENTO')
+                            ->leftJoin(DB::raw('(SELECT COD_EMPR_CLIENTE, SUM(CAN_SALDO) AS CAN_DEUDA 
+                                                 FROM DEUDA_TOTAL_MERGE_SUM 
+                                                 GROUP BY COD_EMPR_CLIENTE) AS deuda'),
+                                                'STD.EMPRESA.COD_EMPR', '=', 'deuda.COD_EMPR_CLIENTE')
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,FE_DOCUMENTO.TXT_CONTACTO TXT_CONTACTO_UC,deuda.CAN_DEUDA AS CAN_DEUDA,STD.EMPRESA.COD_EMPR'))
+                            ->where('OPERACION','=',$operacion_id)
+                            ->where('ind_observacion','=',0)
+                            ->where('area_observacion','=','ADM')
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
+                            ->orderBy('ind_observacion','asc')
+                            ->orderBy('fecha_uc','asc')
+                            ->get();
+
+        return  $listadatos;
+    }
+
 
     private function con_lista_cabecera_comprobante_total_tes_contrato($cliente_id,$proveedor_id,$fecha_inicio,$fecha_fin) {
 
@@ -3911,6 +3931,32 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
+    private function con_lista_cabecera_comprobante_total_adm_estiba_dic($cliente_id,$operacion_id) {
+
+        $listadatos     =   FeDocumento::leftJoin('STD.EMPRESA', 'FE_DOCUMENTO.RUC_PROVEEDOR', '=', 'STD.EMPRESA.NRO_DOCUMENTO')
+                            ->leftJoin(DB::raw('(SELECT COD_EMPR_CLIENTE, SUM(CAN_SALDO) AS CAN_DEUDA 
+                                                 FROM DEUDA_TOTAL_MERGE_SUM 
+                                                 GROUP BY COD_EMPR_CLIENTE) AS deuda'),
+                                                'STD.EMPRESA.COD_EMPR', '=', 'deuda.COD_EMPR_CLIENTE')
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,deuda.CAN_DEUDA AS CAN_DEUDA,STD.EMPRESA.COD_EMPR'))
+                            ->where('OPERACION','=',$operacion_id)
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where(function ($query) {
+                                $query->where('ind_observacion', '<>', 1)
+                                      ->orWhereNull('ind_observacion');
+                            })
+                            ->where(function ($query) {
+                                $query->where('area_observacion', '=', '')
+                                      ->orWhereNull('area_observacion')
+                                      ->orWhereIn('area_observacion',['UCO']);
+                            })
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
+                            ->orderBy('fecha_uc','asc')
+                            ->get();
+
+        return  $listadatos;
+    }
+
 
     private function con_lista_cabecera_comprobante_total_adm_contrato_obs($cliente_id) {
 
@@ -4023,6 +4069,27 @@ trait ComprobanteTraits
 
         return  $listadatos;
     }
+
+    private function con_lista_cabecera_comprobante_total_adm_estiba_obs_dic($cliente_id,$operacion_id) {
+
+        $listadatos     =   FeDocumento::leftJoin('STD.EMPRESA', 'FE_DOCUMENTO.RUC_PROVEEDOR', '=', 'STD.EMPRESA.NRO_DOCUMENTO')
+                            ->leftJoin(DB::raw('(SELECT COD_EMPR_CLIENTE, SUM(CAN_SALDO) AS CAN_DEUDA 
+                                                 FROM DEUDA_TOTAL_MERGE_SUM 
+                                                 GROUP BY COD_EMPR_CLIENTE) AS deuda'),
+                                                'STD.EMPRESA.COD_EMPR', '=', 'deuda.COD_EMPR_CLIENTE')
+
+                            ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,deuda.CAN_DEUDA AS CAN_DEUDA,STD.EMPRESA.COD_EMPR'))
+                            ->where('OPERACION','=',$operacion_id)
+                            ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
+                            ->where('ind_observacion','=',1)
+                            ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000004')
+                            ->orderBy('fecha_uc','asc')
+                            ->get();
+
+        return  $listadatos;
+    }
+
+
 
     private function array_usuario_jefes() {
         $array = ['1CIX00000072','1CIX00000075','1CIX00000073','1CIX00000188','1CIX00000422'];
