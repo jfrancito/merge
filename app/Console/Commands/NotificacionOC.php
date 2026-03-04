@@ -88,7 +88,6 @@ class NotificacionOC extends Command
 
             $this->sunat_cdr();
             $this->sunat_cdr_contrato();
-            $this->cambiar_fecha_vencimiento();
             $this->cambiar_parcialmente();
             
         }
@@ -109,6 +108,11 @@ class NotificacionOC extends Command
         ])) {
             $this->sunatarchivos();
         }
+
+        if($horaActual == '01:00' || $horaActual == '03:00' || $horaActual == '05:00'){
+            $this->cambiar_fecha_vencimiento();
+        }
+
 
 
         // //precios de supermercado
