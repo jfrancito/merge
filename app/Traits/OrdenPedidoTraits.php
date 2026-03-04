@@ -1049,68 +1049,92 @@ trait OrdenPedidoTraits
 
     public function lg_lista_detalle_consolidado_general_excel($id_consolidado_general, $familia_id)
     {
-        $query = DB::connection('sqlsrv')
-            ->table('WEB.ORDEN_PEDIDO_CONSOLIDADO as OPC')
-            ->join('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE AS OPCD',
-                'OPC.ID_PEDIDO_CONSOLIDADO', '=', 'OPCD.ID_PEDIDO_CONSOLIDADO')
-            ->join('CMP.REFERENCIA_ASOC AS RA', function ($join) {
-                $join->on('RA.COD_TABLA', '=', 'OPC.ID_PEDIDO_CONSOLIDADO')
-                    ->where('RA.COD_ESTADO', '=', 1);
-            })
-            ->join('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL AS OPCG', function ($join) use ($id_consolidado_general) {
-                $join->on('OPCG.ID_PEDIDO_CONSOLIDADO_GENERAL', '=', 'RA.COD_TABLA_ASOC')
-                    ->where('OPCG.ACTIVO', '=', 1)
-                    ->where('OPCG.ID_PEDIDO_CONSOLIDADO_GENERAL', '=', $id_consolidado_general);
-            })
-            ->join('ALM.CENTRO AS C', function ($join) {
-                $join->on('C.COD_CENTRO', '=', 'OPC.COD_CENTRO')
-                    ->where('C.COD_ESTADO', '=', 1);
-            })
-            ->join('STD.EMPRESA AS E', function ($join) {
-                $join->on('E.COD_EMPR', '=', 'OPC.COD_EMPR')
-                    ->where('E.COD_ESTADO', '=', 1);
-            })
-            ->select(
-                'OPCD.COD_PRODUCTO',
-                'OPCD.NOM_PRODUCTO',
-                'OPCD.NOM_CATEGORIA_MEDIDA',
-                DB::raw('SUM(OPCD.CANTIDAD) AS CANTIDAD'),
-                DB::raw('SUM(OPCD.STOCK) AS STOCK'),
-                DB::raw('SUM(OPCD.RESERVADO) AS RESERVADO'),
-                DB::raw('SUM(OPCD.DIFERENCIA) AS DIFERENCIA'),
-                DB::raw('SUM(OPCD.CAN_COMPRADA) AS CAN_COMPRADA_CALCULADA'),
-                'OPCD.COD_CATEGORIA_FAMILIA',
-                'OPCD.NOM_CATEGORIA_FAMILIA',
-                'C.COD_CENTRO',
-                'C.NOM_CENTRO',
-                'E.COD_EMPR',
-                'E.NOM_EMPR'
-            )
-            ->where('OPC.CONSOLIDADO_GENERAL', '=', 'SI')
-            ->where('RA.TXT_TIPO_REFERENCIA', '=', 'CONSOLIDADO_GENERAL')
-            ->where('RA.TXT_TABLA', '=', 'WEB.ORDEN_PEDIDO_CONSOLIDADO')
-            ->where('RA.TXT_TABLA_ASOC', '=', 'WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL')
-            ->where('OPC.ACTIVO', '=', 1)
-            ->where('OPCD.ACTIVO', '=', 1)
-            ->groupBy(
-                'OPCD.COD_PRODUCTO',
-                'OPCD.NOM_PRODUCTO',
-                'OPCD.NOM_CATEGORIA_MEDIDA',
-                'OPCD.COD_CATEGORIA_FAMILIA',
-                'OPCD.NOM_CATEGORIA_FAMILIA',
-                'C.COD_CENTRO',
-                'C.NOM_CENTRO',
-                'E.COD_EMPR',
-                'E.NOM_EMPR'
-            );
+        $sql = "
+        SELECT OPCD.COD_PRODUCTO,
+               OPCD.NOM_PRODUCTO,
+               OPCD.NOM_CATEGORIA_MEDIDA,
+               SUM(OPCD.CANTIDAD) AS CANTIDAD,
+               SUM(OPCD.STOCK) AS STOCK,
+               SUM(OPCD.RESERVADO) AS RESERVADO,
+               SUM(OPCD.DIFERENCIA) AS DIFERENCIA,
+               SUM(OPCD.CAN_COMPRADA) AS CAN_COMPRADA_CALCULADA,
+               OPCD.COD_CATEGORIA_FAMILIA,
+               OPCD.NOM_CATEGORIA_FAMILIA,
+               C.COD_CENTRO,
+               C.NOM_CENTRO,
+               E.COD_EMPR,
+               E.NOM_EMPR,
+               ISNULL(CA.DETALLE_POR_AREA, '') AS DETALLE_POR_AREA
+        FROM WEB.ORDEN_PEDIDO_CONSOLIDADO AS OPC
+                 INNER JOIN WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE AS OPCD
+                            ON OPC.ID_PEDIDO_CONSOLIDADO = OPCD.ID_PEDIDO_CONSOLIDADO
+                 INNER JOIN CMP.REFERENCIA_ASOC AS RA 
+                            ON RA.COD_TABLA = OPC.ID_PEDIDO_CONSOLIDADO 
+                            AND RA.COD_ESTADO = 1
+                 INNER JOIN WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL AS OPCG
+                            ON OPCG.ID_PEDIDO_CONSOLIDADO_GENERAL = RA.COD_TABLA_ASOC 
+                            AND OPCG.ACTIVO = 1
+                            AND OPCG.ID_PEDIDO_CONSOLIDADO_GENERAL = :id_consolidado
+                 INNER JOIN ALM.CENTRO AS C 
+                            ON C.COD_CENTRO = OPC.COD_CENTRO 
+                            AND C.COD_ESTADO = 1
+                 INNER JOIN STD.EMPRESA AS E 
+                            ON E.COD_EMPR = OPC.COD_EMPR 
+                            AND E.COD_ESTADO = 1
+                 OUTER APPLY (
+                     SELECT STUFF((
+                         SELECT ' [SEP] ' + OP.TXT_AREA
+                         FROM WEB.ORDEN_PEDIDO OP
+                                  INNER JOIN WEB.ORDEN_PEDIDO_DETALLE OPD
+                                             ON OP.ID_PEDIDO = OPD.ID_PEDIDO
+                                  INNER JOIN CMP.REFERENCIA_ASOC AS RAF
+                                             ON RAF.COD_TABLA = OP.ID_PEDIDO
+                                                 AND RAF.COD_ESTADO = 1
+                                  INNER JOIN WEB.ORDEN_PEDIDO_CONSOLIDADO AS OPCF
+                                             ON OPCF.ID_PEDIDO_CONSOLIDADO = RAF.COD_TABLA_ASOC
+                                                 AND OPCF.ACTIVO = 1
+                         WHERE RAF.TXT_TIPO_REFERENCIA = 'CONSOLIDADO'
+                           AND RAF.TXT_TABLA = 'WEB.ORDEN_PEDIDO'
+                           AND RAF.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
+                           AND OPCF.ID_PEDIDO_CONSOLIDADO = OPC.ID_PEDIDO_CONSOLIDADO
+                           AND OPD.COD_PRODUCTO = OPCD.COD_PRODUCTO
+                         FOR XML PATH(''), TYPE
+                     ).value('.', 'NVARCHAR(MAX)'), 1, 7, '') AS DETALLE_POR_AREA
+                 ) CA
+        WHERE OPC.CONSOLIDADO_GENERAL = 'SI'
+          AND RA.TXT_TIPO_REFERENCIA = 'CONSOLIDADO_GENERAL'
+          AND RA.TXT_TABLA = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
+          AND RA.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL'
+          AND OPC.ACTIVO = 1
+          AND OPCD.ACTIVO = 1
+    ";
 
-        // Aplicar filtro por familia_id si se proporciona
+        // Agregar filtro por familia si se proporciona
         if (!empty($familia_id)) {
-            $query->where('OPCD.COD_CATEGORIA_FAMILIA', '=', $familia_id);
+            $sql .= " AND OPCD.COD_CATEGORIA_FAMILIA = :familia_id";
         }
 
-        DD($query->toSql());
+        $sql .= " GROUP BY OPCD.COD_PRODUCTO, 
+                        OPCD.NOM_PRODUCTO, 
+                        OPCD.NOM_CATEGORIA_MEDIDA, 
+                        OPCD.COD_CATEGORIA_FAMILIA,
+                        OPCD.NOM_CATEGORIA_FAMILIA, 
+                        C.COD_CENTRO, 
+                        C.NOM_CENTRO, 
+                        E.COD_EMPR, 
+                        E.NOM_EMPR,
+                        CA.DETALLE_POR_AREA";
 
-        return $query->get();
+        // Preparar parámetros
+        $params = [
+            'id_consolidado' => $id_consolidado_general
+        ];
+
+        if (!empty($familia_id)) {
+            $params['familia_id'] = $familia_id;
+        }
+
+        // Ejecutar consulta raw
+        return DB::connection('sqlsrv')->select($sql, $params);
     }
 }
