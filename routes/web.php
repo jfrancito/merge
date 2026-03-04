@@ -745,9 +745,13 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/refrescar-sunat-oc/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionRefrescarSunatOc');
 	Route::any('/refrescar-sunat-contrato/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionRefrescarSunatContrato');
+	Route::any('/refrescar-sunat-nota-credito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionRefrescarSunatNotaCredito');
+
 
 	Route::any('/extornar-obs-oc/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionExtornarObsOc');
 	Route::any('/extornar-obs-contrato/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionExtornarObsContrato');
+	Route::any('/extornar-obs-nota-credito/{idopcion}/{linea}/{prefijo}/{idordencompra}', 'GestionOCContabilidadController@actionExtornarObsNotaCredito');
+
 
 
 
