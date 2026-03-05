@@ -2256,18 +2256,23 @@ $(document).ready(function () {
        CONSOLIDADO GENERAL - SELECCIÓN Y DETALLE
        =============================== */
     let id_consolidado_general_seleccionado = '';
-
+    let familia_id_seleccionado = '';
     $(document).on('dblclick', '.fila-consolidado-general-terminado', function () {
         $('.fila-consolidado-general-terminado').removeClass('background-fila-activa');
         $(this).addClass('background-fila-activa');
 
         id_consolidado_general_seleccionado = $(this).data('consolidado-general');
+        familia_id_seleccionado = $(this).attr('data-familia-cod'); //$(this).data('data-familia-cod');
+
+        debugger;
 
         buscarDetalleConsolidadoGeneral();
     });
 
     function buscarDetalleConsolidadoGeneral() {
-        let familia_id = '';
+        let familia_id = familia_id_seleccionado;
+        $('#familia_id').val(familia_id);
+
         let _token = $('#token').val();
 
         if (id_consolidado_general_seleccionado === '') {
@@ -2530,7 +2535,9 @@ $(document).ready(function () {
             });
             return;
         }
-        let familia_id = 'TODO';
+
+        let familia_id =  $('#familia_id').val();
+        debugger;
         window.location.href = carpeta + '/descargar-excel-detalle-consolidado-general/' + id_consolidado_general_seleccionado + '/' + familia_id;
     });
 

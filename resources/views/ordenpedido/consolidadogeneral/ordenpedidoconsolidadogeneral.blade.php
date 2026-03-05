@@ -40,6 +40,7 @@
 
                         <div id="consoldadogeneralterminado" class="tab-pane fade cont">
                             @include('ordenpedido.consolidadogeneral.alistaordenconsolidadogeneralterminado')
+                            <input type="hidden" name="familia_id" id = "familia_id">
                         </div>
                     </div><!-- FIN tab-content -->
                 </div><!-- FIN tab-container -->

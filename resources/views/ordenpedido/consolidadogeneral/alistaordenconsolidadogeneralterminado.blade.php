@@ -21,6 +21,7 @@
 
     <tr class="fila-consolidado-general-terminado" 
         data-consolidado-general="{{ $cabecera->ID_PEDIDO_CONSOLIDADO_GENERAL }}"
+        data-familia-cod = '{{ $cabecera->COD_CATEGORIA_FAMILIA }}'
         style="cursor: pointer;">
         <td>{{ $cabecera->ID_PEDIDO_CONSOLIDADO_GENERAL }}</td>
         <td>{{ $cabecera->NOM_EMPR }}</td>
