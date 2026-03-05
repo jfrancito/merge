@@ -422,21 +422,21 @@ class GestionEstibaController extends Controller
                 }
 
 
-                if($fedocumento->OPERACION_DET == 'SIN_XML'){
-                    $serie                  =   $request['serie'];
-                    $numero                 =   $request['numero'];
-                    $fechaventa             =   $request['fechaventa'];
-                    $fechavencimiento       =   $request['fechavencimiento'];
-                    FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
-                        ->update(
-                            [
-                                'SERIE'=>$serie,
-                                'NUMERO'=>$numero,
-                                'FEC_VENTA'=>$fechaventa,
-                                'FEC_VENCI_PAGO'=>$fechavencimiento,
-                            ]
-                        );
-                }
+                // if($fedocumento->OPERACION_DET == 'SIN_XML'){
+                //     $serie                  =   $request['serie'];
+                //     $numero                 =   $request['numero'];
+                //     $fechaventa             =   $request['fechaventa'];
+                //     $fechavencimiento       =   $request['fechavencimiento'];
+                //     FeDocumento::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
+                //         ->update(
+                //             [
+                //                 'SERIE'=>$serie,
+                //                 'NUMERO'=>$numero,
+                //                 'FEC_VENTA'=>$fechaventa,
+                //                 'FEC_VENCI_PAGO'=>$fechavencimiento,
+                //             ]
+                //         );
+                // }
                 $monto_detraccion = (float) str_replace(',', '', $monto_detraccion);
 
                 //dd($documento_top);
@@ -2250,6 +2250,17 @@ class GestionEstibaController extends Controller
                         $empresa_sel          =   STDEmpresa::where('COD_EMPR','=',$ordencompra->COD_EMPR_CLIENTE)->first();
 
                         //dd($ordencompra);
+
+                        $codigo = $ordencompra->COD_ORDEN;
+                        $letras = substr($codigo, 0, 4); // "IICHCL"
+                        $numeros = substr($codigo, 6); // "0000014474"
+                        $numeros_sin_ceros = (int)$numeros; // 14474 (convierte a número)
+                        $moneda = 'USD';
+                        if($ordencompra->COD_CATEGORIA_MONEDA=='MON0000000000001'){
+                            $moneda = 'PEN';
+                        }
+
+
                         $documentolinea                     =   $this->ge_linea_documento($idoc);
                         //REGISTRO DEL XML LEIDO
                         $documento                          =   new FeDocumento;
@@ -2265,14 +2276,14 @@ class GestionEstibaController extends Controller
                         $documento->ID_CLIENTE              =   $empresa_sel->NRO_DOCUMENTO;
                         $documento->NOMBRE_CLIENTE          =   $ordencompra->TXT_EMPR_CLIENTE;
                         $documento->DIRECCION_CLIENTE       =   $ordencompra->COD_CENTRO;
-                        $documento->SERIE                   =   '';
-                        $documento->NUMERO                  =   '';
+                        $documento->SERIE                   =   $letras;
+                        $documento->NUMERO                  =   $numeros_sin_ceros;
                         $documento->ID_TIPO_DOC             =   '';
                         $documento->FEC_VENTA               =   date_format(date_create($ordencompra->FEC_ORDEN), 'Ymd');
                         $documento->FEC_VENCI_PAGO          =   date_format(date_create($ordencompra->FEC_ORDEN), 'Ymd');
                         $documento->FORMA_PAGO              =   '';
                         $documento->FORMA_PAGO_DIAS         =   0;
-                        $documento->MONEDA                  =   '';
+                        $documento->MONEDA                  =   $moneda;
                         $documento->VALOR_IGV_ORIG          =   0;
                         $documento->VALOR_IGV_SOLES         =   0;
                         $documento->SUB_TOTAL_VENTA_ORIG    =   $fereftop1->TOTAL_MERGE;
