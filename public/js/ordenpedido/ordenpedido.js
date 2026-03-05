@@ -2344,6 +2344,7 @@ $(document).ready(function () {
             },
             success: function (res) {
                 cerrarcargando();
+                debugger;
                 if (res.success) {
                     modalBonito({
                         tipo: 'success',
@@ -2539,6 +2540,23 @@ $(document).ready(function () {
         let familia_id =  $('#familia_id').val();
         debugger;
         window.location.href = carpeta + '/descargar-excel-detalle-consolidado-general/' + id_consolidado_general_seleccionado + '/' + familia_id;
+    });
+
+    // EVENTO PARA DESCARGAR EXCEL DEL DETALLE
+    $(document).on('click', '#btn-descargar-excel-area', function (e) {
+        e.preventDefault();
+        if (typeof id_consolidado_general_seleccionado === 'undefined' || id_consolidado_general_seleccionado === '') {
+            modalBonito({
+                tipo: 'error',
+                titulo: 'Error',
+                mensaje: 'No hay un consolidado seleccionado.'
+            });
+            return;
+        }
+
+        let familia_id =  $('#familia_id').val();
+        debugger;
+        window.location.href = carpeta + '/descargar-excel-detalle-consolidado-general-area/' + id_consolidado_general_seleccionado + '/' + familia_id;
     });
 
 });

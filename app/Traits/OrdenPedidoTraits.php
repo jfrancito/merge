@@ -1049,7 +1049,7 @@ trait OrdenPedidoTraits
         return $query;
     }
 
-    public function lg_lista_detalle_consolidado_general_excel_copia($id_consolidado_general, $familia_id)
+    public function lg_lista_detalle_consolidado_general_excel($id_consolidado_general, $familia_id)
     {
         $sql = "
         SELECT OPCD.COD_PRODUCTO,
@@ -1125,7 +1125,8 @@ trait OrdenPedidoTraits
                         C.NOM_CENTRO, 
                         E.COD_EMPR, 
                         E.NOM_EMPR,
-                        CA.DETALLE_POR_AREA";
+                        CA.DETALLE_POR_AREA 
+                  ORDER BY OPCD.NOM_PRODUCTO ASC;";
 
         // Preparar parámetros
         $params = [
@@ -1140,7 +1141,7 @@ trait OrdenPedidoTraits
         return DB::connection('sqlsrv')->select($sql, $params);
     }
 
-    public function lg_lista_detalle_consolidado_general_excel($id_consolidado_general, $familia_id)
+    public function lg_lista_detalle_consolidado_general_excel_area($id_consolidado_general, $familia_id)
     {
         $sql = "
         SELECT OP.COD_AREA,
@@ -1230,6 +1231,48 @@ WHERE OP.CONSOLIDADO = 'SI'
         }
 
         // Ejecutar consulta raw
-        return DB::connection('sqlsrv')->select($sql, $params);
+        $resultados = DB::connection('sqlsrv')->select($sql, $params);
+
+        // Procesar en PHP para descontar cantidades
+        $productos = [];
+        $resultado_final = [];
+
+        foreach ($resultados as $row) {
+            $producto = $row->COD_PRODUCTO;
+            $compra_original = $row->CANT_COMPRADA_CONSOLIDADO_FINAL;
+            $aprobada = $row->CANT_APROBADA;
+
+            // Inicializar si es primera vez que vemos este producto
+            if (!isset($productos[$producto])) {
+                $productos[$producto] = [
+                    'compra_disponible' => $compra_original,
+                    'acumulado_aprobado' => 0,
+                    'compra_asignada' => 0
+                ];
+            }
+
+            // Calcular cuánto se puede comprar en este pedido
+            $disponible_actual = $productos[$producto]['compra_disponible'] - $productos[$producto]['acumulado_aprobado'];
+            $compra_asignada = min($aprobada, max(0, $disponible_actual));
+
+            // Actualizar acumulado
+            $productos[$producto]['acumulado_aprobado'] += $compra_asignada;
+            $productos[$producto]['compra_asignada'] += $compra_asignada;
+
+            // Calcular compra disponible restante
+            $compra_disponible = max(0, $productos[$producto]['compra_disponible'] - $productos[$producto]['acumulado_aprobado']);
+
+            // Agregar campos calculados al resultado
+            $row->CAN_COMPRADA_DISPONIBLE = $compra_disponible;
+            $row->CAN_COMPRADA_ASIGNADA = $compra_asignada; // 👈 Nuevo campo: lo que realmente se compra en este pedido
+            $row->ACUMULADO_APROBADO = $productos[$producto]['acumulado_aprobado'];
+            $row->COMPRA_ORIGINAL = $compra_original;
+            $row->FALTANTE = max(0, $aprobada - $compra_asignada); // 👈 Opcional: lo que no se pudo comprar
+
+            $resultado_final[] = $row;
+        }
+
+        return $resultado_final;
+
     }
 }
