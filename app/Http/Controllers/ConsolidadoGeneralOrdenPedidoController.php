@@ -282,8 +282,6 @@ class ConsolidadoGeneralOrdenPedidoController extends Controller
         $detalles_json = $request->input('detalles');
         $detalles = json_decode($detalles_json, true);
 
-        return response()->json(['success' => true, 'mensaje' => $detalles]);
-
         try {
             DB::beginTransaction();
 
