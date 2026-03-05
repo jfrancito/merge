@@ -16,12 +16,15 @@
 
                  @if(Session::get('usuario')->rol_id == '1CIX00000001' || 
                     Session::get('usuario')->id == '1CIX00000173' || 
-                    Session::get('usuario')->id == '1CIX00000442')
+                    Session::get('usuario')->id == '1CIX00000442' ||
+                    Session::get('usuario')->id == '1CIX00000167'
+
+                    )
                 <div class="row">
                     <div class="col-md-4">
                         <div class="btn-toolbar">
                             <div role="group" class="btn-group btn-group-justified btn-space">
-                                @if(Session::get('usuario')->rol_id == '1CIX00000001' || Session::get('usuario')->id == '1CIX00000173')
+                                @if(Session::get('usuario')->rol_id == '1CIX00000001' || Session::get('usuario')->id == '1CIX00000173' || Session::get('usuario')->id == '1CIX00000167')
                                 <a href="{{ url('/actualizar-data/BE') }}" class="btn btn-primary btn_actualizar_data">DATA BE</a>
                                 @endif
                                 @if(Session::get('usuario')->rol_id == '1CIX00000001' || Session::get('usuario')->id == '1CIX00000442')
