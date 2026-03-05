@@ -1851,14 +1851,26 @@ class GestionEstibaController extends Controller
                             $factura            =   $parser->parse($xml);
                             $tipo_documento_le  =   $factura->gettipoDoc();
                             $moneda_le          =   $factura->gettipoMoneda();
-                            $archivosdelfe      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
-                                                    ->whereIn('COD_CATEGORIA', ['DCC0000000000002','DCC0000000000003','DCC0000000000004','DCC0000000000006'])
-                                                    ->get();
+
+                            if($request['operacion_id'] == 'DOCUMENTO_INTERNO_COMPRA '){
+
+                                $archivosdelfe      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                                        ->whereIn('COD_CATEGORIA', ['DCC0000000000002','DCC0000000000003','DCC0000000000004','DCC0000000000007','DCC0000000000008'])
+                                                        ->get();
+
+                            }else{
+
+                                $archivosdelfe      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
+                                                        ->whereIn('COD_CATEGORIA', ['DCC0000000000002','DCC0000000000003','DCC0000000000004','DCC0000000000006'])
+                                                        ->get();
+
+
+                            }
+
+
 
                         }elseif($documento_id=='DCC0000000000043'){
                             //LIQUIDACION COMPRA
-
-
 
                             $parser             =   new LiquiParser();
                             $xml                =   file_get_contents($path);
