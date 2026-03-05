@@ -188,7 +188,7 @@
                 </div>
               </div>
               @if($fedocumento->OPERACION_DET == 'SIN_XML')
-              <div class="row">
+<!--               <div class="row">
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                   <div class="panel panel-default panel-contrast">
                     <div class="panel-heading" style="background: #1d3a6d;color: #fff;">DATOS DE LA FACTURA
@@ -262,7 +262,7 @@
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> -->
               @endif
               
               @if($fedocumento->MONTO_DETRACCION_RED > 0)
