@@ -46,14 +46,17 @@
                     <td>{{ $item->COD_PRODUCTO }}</td>
                     <td>{{ $item->NOM_PRODUCTO }}</td>
                     <td>{{ $item->NOM_CATEGORIA_MEDIDA }}</td>
-                    <td>{{ number_format($item->CANT_APROBADA, 2) }}</td>
-                    <td>{{ number_format($item->CANT_STOCK_CONSOLIDADO_FINAL, 2) }}</td>
-                    <td>{{ number_format($item->CANT_RESERVADO_CONSOLIDADO_FINAL, 2) }}</td>
-                    <td>{{ number_format($item->CANT_DIFERENCIA_CONSOLIDADO_FINAL, 2) }}</td>
-                    <td>{{ number_format($item->CANT_COMPRADA_CONSOLIDADO_FINAL, 2) }} </td>
+                    <td>{{ number_format($item->CANTIDAD, 2) }}</td>
+                    <td>{{ number_format($item->STOCK, 2) }}</td>
+                    <td>{{ number_format($item->RESERVADO, 2) }}</td>
+                    <td>{{ number_format($item->DIFERENCIA, 2) }}</td>
+                    <td>
+                        {{ (isset($item->CAN_COMPRADA_CALCULADA) && !is_null($item->CAN_COMPRADA_CALCULADA)) ? intval($item->CAN_COMPRADA_CALCULADA) : ($item->DIFERENCIA < 0 ? 0 : intval($item->DIFERENCIA)) }}
+                    </td>
                     <td>{{ $item->NOM_CATEGORIA_FAMILIA }}</td>
                     <td>{{ $item->NOM_CENTRO }}</td>
-                    <td>{{ $item->NOM_AREA }}</td>
+                    <td>{{ $item->DETALLE_POR_AREA }}</td>
+
                 </tr>
             @endforeach
         </tbody>

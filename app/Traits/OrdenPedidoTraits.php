@@ -1023,6 +1023,7 @@ trait OrdenPedidoTraits
                           AND RA_OP.TXT_TABLA = 'WEB.ORDEN_PEDIDO'
                           AND RA_OP.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
                           AND OPD.COD_PRODUCTO = D.COD_PRODUCTO
+                          AND OP.COD_PERIODO = C.COD_PERIODO
                           AND OPD.ACTIVO = 1
                         GROUP BY 
                             OP.FEC_PEDIDO,
@@ -1042,12 +1043,13 @@ trait OrdenPedidoTraits
                     $q->where('D.COD_CATEGORIA_FAMILIA', $familia_id);
                 }
             })
+            ->orderBy('D.NOM_PRODUCTO', 'asc') // 👈 ORDER BY agregado
             ->get();
 
         return $query;
     }
 
-    public function lg_lista_detalle_consolidado_general_excel($id_consolidado_general, $familia_id)
+    public function lg_lista_detalle_consolidado_general_excel_copia($id_consolidado_general, $familia_id)
     {
         $sql = "
         SELECT OPCD.COD_PRODUCTO,
@@ -1124,6 +1126,99 @@ trait OrdenPedidoTraits
                         E.COD_EMPR, 
                         E.NOM_EMPR,
                         CA.DETALLE_POR_AREA";
+
+        // Preparar parámetros
+        $params = [
+            'id_consolidado' => $id_consolidado_general
+        ];
+
+        if (!empty($familia_id)) {
+            $params['familia_id'] = $familia_id;
+        }
+
+        // Ejecutar consulta raw
+        return DB::connection('sqlsrv')->select($sql, $params);
+    }
+
+    public function lg_lista_detalle_consolidado_general_excel($id_consolidado_general, $familia_id)
+    {
+        $sql = "
+        SELECT OP.COD_AREA,
+       OP.TXT_AREA AS NOM_AREA,
+       OP.COD_ANIO,
+       OP.COD_PERIODO,
+       OP.COD_EMPR,
+       OP.COD_CENTRO,
+       C.NOM_CENTRO,
+       OPD.COD_PRODUCTO,
+       OPD.NOM_PRODUCTO,
+       OPD.COD_CATEGORIA AS COD_CATEGORIA_MEDIDA,
+       OPD.NOM_CATEGORIA AS NOM_CATEGORIA_MEDIDA,
+       OPCD.COD_CATEGORIA_FAMILIA,
+       OPCD.NOM_CATEGORIA_FAMILIA,
+       OPD.CANTIDAD       AS CANT_ORIGINAL,
+       COALESCE(
+               OPD.CAN_MODIF_ADM,
+               OPD.CAN_MODIF_GER,
+               OPD.CAN_MODIF_JEF_AUT,
+               OPD.CANTIDAD
+       )                  AS CANT_APROBADA,
+       COALESCE(
+               OPCD.CANTIDAD,
+               OPCDG.CANTIDAD
+       )                  AS CANT_ORIGINAL_CONSOLIDADO_FINAL,
+       COALESCE(
+               OPCD.STOCK,
+               OPCDG.STOCK
+       )                  AS CANT_STOCK_CONSOLIDADO_FINAL,
+       COALESCE(
+               OPCD.RESERVADO,
+               OPCDG.RESERVADO
+       )                  AS CANT_RESERVADO_CONSOLIDADO_FINAL,
+       COALESCE(
+               OPCD.DIFERENCIA,
+               OPCDG.DIFERENCIA
+       )                  AS CANT_DIFERENCIA_CONSOLIDADO_FINAL,
+       COALESCE(
+               OPCD.CAN_COMPRADA,
+               OPCDG.CAN_COMPRADA
+       )                  AS CANT_COMPRADA_CONSOLIDADO_FINAL
+FROM WEB.ORDEN_PEDIDO AS OP
+         INNER JOIN WEB.ORDEN_PEDIDO_DETALLE AS OPD ON OP.ID_PEDIDO = OPD.ID_PEDIDO
+         INNER JOIN ALM.CENTRO AS C ON C.COD_CENTRO = OP.COD_CENTRO AND C.COD_ESTADO = 1
+         INNER JOIN STD.EMPRESA AS E ON E.COD_EMPR = OP.COD_EMPR AND E.COD_ESTADO = 1
+         INNER JOIN CMP.REFERENCIA_ASOC AS RA ON RA.COD_TABLA = OP.ID_PEDIDO AND RA.COD_ESTADO = 1
+         INNER JOIN WEB.ORDEN_PEDIDO_CONSOLIDADO AS OPC
+                    ON OPC.ID_PEDIDO_CONSOLIDADO = RA.COD_TABLA_ASOC AND OPC.ACTIVO = 1
+         INNER JOIN WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE AS OPCD
+                    ON OPCD.ID_PEDIDO_CONSOLIDADO = OPC.ID_PEDIDO_CONSOLIDADO AND
+                       OPCD.COD_PRODUCTO = OPD.COD_PRODUCTO AND OPCD.ACTIVO = 1
+         INNER JOIN CMP.REFERENCIA_ASOC AS RE ON RE.COD_TABLA = OPC.ID_PEDIDO_CONSOLIDADO AND RE.COD_ESTADO = 1
+         INNER JOIN WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL AS OPCG
+                    ON OPCG.ID_PEDIDO_CONSOLIDADO_GENERAL = RE.COD_TABLA_ASOC AND OPCG.ACTIVO = 1 AND
+                       OPCG.COD_CATEGORIA_FAMILIA = OPC.COD_CATEGORIA_FAMILIA
+         INNER JOIN WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE AS OPCDG
+                    ON OPCDG.ID_PEDIDO_CONSOLIDADO_GENERAL = OPCG.ID_PEDIDO_CONSOLIDADO_GENERAL AND
+                       OPCDG.COD_PRODUCTO = OPD.COD_PRODUCTO AND OPCDG.ACTIVO = 1
+WHERE OP.CONSOLIDADO = 'SI'
+  AND OP.COD_ESTADO = 'ETM0000000000005'
+  AND OP.ACTIVO = 1
+  AND OPD.ACTIVO = 1
+  AND RE.TXT_TIPO_REFERENCIA = 'CONSOLIDADO_GENERAL'
+  AND RE.TXT_TABLA = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
+  AND RE.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL'
+  AND RA.TXT_TIPO_REFERENCIA = 'CONSOLIDADO'
+  AND RA.TXT_TABLA = 'WEB.ORDEN_PEDIDO'
+  AND RA.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
+  AND OPCG.ID_PEDIDO_CONSOLIDADO_GENERAL = :id_consolidado
+    ";
+
+        // Agregar filtro por familia si se proporciona
+        if (!empty($familia_id)) {
+            $sql .= " AND OPCD.COD_CATEGORIA_FAMILIA = :familia_id ";
+        }
+
+        $sql .= " ORDER BY OPCDG.NOM_PRODUCTO ASC; "; // 👈 ORDER BY agregado
 
         // Preparar parámetros
         $params = [
