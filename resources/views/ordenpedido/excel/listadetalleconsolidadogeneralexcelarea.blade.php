@@ -30,11 +30,10 @@
         <th class='tabladp'>COD PRODUCTO</th>
         <th class='tabladp'>PRODUCTO</th>
         <th class='tabladp'>UNIDAD MEDIDA</th>
-        <th class='tabladp'>CANTIDAD</th>
-        <th class='tabladp'>STOCK</th>
-        <th class='tabladp'>RESERVADO</th>
-        <th class='tabladp'>DIFERENCIA</th>
-        <th class='tabladp'>CAN COMPRAR</th>
+        <th class='tabladp'>CANTIDAD ORIGINAL</th>
+        <th class='tabladp'>CANTIDAD APROBADO</th>
+        <th class='tabladp'>COMPRA ASIGNADA</th>
+        <th class='tabladp'>COMPRA DISPONIBLE</th>
         <th class='tabladp'>FAMILIA</th>
         <th class='tabladp'>CENTRO</th>
         <th class='tabladp'>AREA</th>
@@ -46,20 +45,15 @@
             <td>{{ $item->COD_PRODUCTO }}</td>
             <td>{{ $item->NOM_PRODUCTO }}</td>
             <td>{{ $item->NOM_CATEGORIA_MEDIDA }}</td>
-            <td>{{ number_format($item->CANTIDAD, 2) }}</td>
-            <td>{{ number_format($item->STOCK, 2) }}</td>
-            <td>{{ number_format($item->RESERVADO, 2) }}</td>
-            <td>{{ number_format($item->DIFERENCIA, 2) }}</td>
-            <td>
-                {{ (isset($item->CAN_COMPRADA_CALCULADA) && !is_null($item->CAN_COMPRADA_CALCULADA)) ? intval($item->CAN_COMPRADA_CALCULADA) : ($item->DIFERENCIA < 0 ? 0 : intval($item->DIFERENCIA)) }}
-            </td>
+            <td>{{ number_format($item->CANT_ORIGINAL, 2) }}</td>
+            <td>{{ number_format($item->CANT_APROBADA, 2) }}</td>
+            <td>{{ number_format($item->CAN_COMPRADA_ASIGNADA, 2) }}</td>
+            <td>{{ number_format($item->CAN_COMPRADA_DISPONIBLE, 2) }} </td>
             <td>{{ $item->NOM_CATEGORIA_FAMILIA }}</td>
             <td>{{ $item->NOM_CENTRO }}</td>
-            <td>{{ $item->DETALLE_POR_AREA }}</td>
-
+            <td>{{ $item->NOM_AREA }}</td>
         </tr>
     @endforeach
     </tbody>
 </table>
 </html>
-

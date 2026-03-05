@@ -5,15 +5,15 @@
 @if($estado_consolidado != 'ETM0000000000005')
 <div class="row" style="margin-bottom: 15px;">
     <div class="col-xs-12 text-right">
-      
-        <button type="button" 
-                class="btn btn-primary btn-detalle-consolidado" 
+
+        <button type="button"
+                class="btn btn-primary btn-detalle-consolidado"
                 id="btn-guardar-detalle-consolidado-editado-general">
-            <i class="mdi mdi-content-save"></i> Guardar 
+            <i class="mdi mdi-content-save"></i> Guardar
         </button>
 
-        <button type="button" 
-                class="btn btn-success btn-detalle-consolidado" 
+        <button type="button"
+                class="btn btn-success btn-detalle-consolidado"
                 id="btn-aprobar-consolidado-general">
             <i class="mdi mdi-content-check"></i> Aprobar pedido
         </button>
@@ -28,8 +28,14 @@
 <div class="row" style="margin-bottom: 15px;">
     <div class="col-xs-12 text-right">
 
-        <button type="button" 
-                class="btn btn-success btn-excel-consolidado-detalle" 
+        <button type="button"
+                class="btn btn-primary btn-excel-consolidado-detalle"
+                id="btn-descargar-excel-area">
+            <i class="mdi mdi-download"></i> Reporte Area
+        </button>
+
+        <button type="button"
+                class="btn btn-success btn-excel-consolidado-detalle"
                 id="btn-descargar-excel">
             <i class="mdi mdi-file-excel"></i> Descargar Excel
         </button>
@@ -53,6 +59,20 @@
         margin-right: 6px;
         font-size: 16px;
     }
+    .btn-excel-consolidado-detalle {
+        padding: 6px 15px;
+        margin-left: 5px;
+        border-radius: 4px;
+        font-weight: 600;
+        min-width: 140px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .btn-excel-consolidado-detalle i {
+        margin-right: 6px;
+        font-size: 16px;
+    }
     .input-cantidad-pequena {
     width: 80px;
     height: 28px;
@@ -62,7 +82,7 @@
 }
 </style>
 
-<table class="table table-striped table-bordered table-hover td-color-borde td-padding-7 display nowrap" 
+<table class="table table-striped table-bordered table-hover td-color-borde td-padding-7 display nowrap"
        cellspacing="0" width="100%">
     <thead class="background-th-azul">
         <tr>
@@ -80,8 +100,8 @@
 
     <tbody>
         @forelse($listadetalle as $item)
-            <tr class="fila-detalle-consolidado-general" 
-                data-id="{{ $item->COD_PRODUCTO }}" 
+            <tr class="fila-detalle-consolidado-general"
+                data-id="{{ $item->COD_PRODUCTO }}"
                 data-nombre="{{ $item->NOM_PRODUCTO }}"
                 data-detalle="{{ $item->DETALLE_POR_AREA }}"
                 style="cursor: pointer;">
@@ -93,11 +113,11 @@
                 <td>{{ number_format($item->RESERVADO, 2) }}</td>
                 <td>{{ number_format($item->DIFERENCIA, 2) }}</td>
        <td style="width:90px;">
-    <input type="number" 
-           class="form-control input-sm can_comprar_cant" 
+    <input type="number"
+           class="form-control input-sm can_comprar_cant"
            style="height:28px; font-size:12px; padding:2px 6px; text-align:center;"
-            value="{{ intval($item->CAN_COMPRADA_CALCULADA ?? 0) }}"
-           min="0" 
+            value="{{ intval($item->CAN_COMPRADA ? $item->CAN_COMPRADA:$item->CAN_COMPRADA_CALCULADA) }}"
+           min="0"
            oninput="if(this.value<0)this.value=0"
            step="1"
            @if($estado_consolidado == 'ETM0000000000005') readonly @endif>
@@ -114,7 +134,7 @@
 
 <!-- CONTENEDOR NUEVO: DETALLE DEL PRODUCTO CONSOLIDADO (EN TABLA INFERIOR) -->
 <div id="contenedor-detalle-producto-consolidado-general" style="display: none; margin-top: 25px;">
-    
+
     <div style="position: relative; margin-bottom: 15px;">
         <h4 class="text-center" style="font-weight: bold; margin: 0; text-transform: uppercase;">
             <i class="mdi mdi-receipt"></i> DETALLE: <span id="titulo-producto-detalle-general" class="text-primary"></span>

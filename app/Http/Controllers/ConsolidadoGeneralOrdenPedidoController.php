@@ -282,6 +282,8 @@ class ConsolidadoGeneralOrdenPedidoController extends Controller
         $detalles_json = $request->input('detalles');
         $detalles = json_decode($detalles_json, true);
 
+        return response()->json(['success' => true, 'mensaje' => $detalles]);
+
         try {
             DB::beginTransaction();
 
@@ -341,6 +343,24 @@ class ConsolidadoGeneralOrdenPedidoController extends Controller
         Excel::create($titulo . '-(' . $fecha_actual . ')', function ($excel) use ($listadetalle, $titulo) {
             $excel->sheet('DETALLE', function ($sheet) use ($listadetalle, $titulo) {
                 $sheet->loadView('ordenpedido.excel.listadetalleconsolidadogeneralexcel', [
+                    'listadetalle' => $listadetalle,
+                    'titulo' => $titulo
+                ]);
+            });
+        })->export('xls');
+    }
+
+    public function actionDescargarExcelDetalleConsolidadoGeneralArea($id_consolidado_general, $familia_id)
+    {
+        set_time_limit(0);
+        if ($familia_id == 'TODO') $familia_id = '';
+        $listadetalle = $this->lg_lista_detalle_consolidado_general_excel_area($id_consolidado_general, $familia_id);
+
+        $titulo = 'Detalle-Consolidado-General-' . $id_consolidado_general;
+        $fecha_actual = date("Y-m-d");
+        Excel::create($titulo . '-(' . $fecha_actual . ')', function ($excel) use ($listadetalle, $titulo) {
+            $excel->sheet('DETALLE', function ($sheet) use ($listadetalle, $titulo) {
+                $sheet->loadView('ordenpedido.excel.listadetalleconsolidadogeneralexcelarea', [
                     'listadetalle' => $listadetalle,
                     'titulo' => $titulo
                 ]);
