@@ -19,6 +19,7 @@
               <ul class="nav nav-tabs">
                 <li class="active"><a href="#aprobar" data-toggle="tab"><b>APROBAR y RECOMENDAR</b></a></li>
                 <li><a href="#observar" data-toggle="tab"><b>OBSERVAR</b></a></li>
+                <li><a href="#rechazar" data-toggle="tab"><b>EXTORNAR</b></a></li>
               </ul>
               <div class="tab-content">
                 <div id="aprobar" class="tab-pane active cont">
@@ -42,7 +43,7 @@
                     <div class="panel-body">
                       <form method="POST" id='formpedidoobservar' action="{{ url('/agregar-observacion-acopio-estiba/'.$idopcion.'/'.$lote) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                             {{ csrf_field() }}
-<input type="hidden" name="device_info" id='device_info'>
+                            <input type="hidden" name="device_info" id='device_info'>
 
                             <input type="hidden" name="operacion_id" id="operacion_id" value = "{{$fedocumento->OPERACION}}">
                             
@@ -51,6 +52,27 @@
                     </div>
                   </div>
                 </div>
+
+                <div id="rechazar" class="tab-pane">
+                    <div class="panel panel-default panel-border-color panel-border-color-primary">
+                        <div class="panel-heading panel-heading-divider">Extornar<span
+                                    class="panel-subtitle">Extornar un Comprobante</span></div>
+                        <div class="panel-body">
+                            <form method="POST" id='formpedidorechazar'
+                                  action="{{ url('/agregar-extorno-estiba-acopio/'.$idopcion.'/'.$lote) }}"
+                                  style="border-radius: 0px;"
+                                  class="form-horizontal group-border-dashed">
+                                {{ csrf_field() }}
+                                <input type="hidden" name="device_info" id='device_info'>
+
+                                <input type="hidden" name="operacion_id" id="operacion_id"
+                                       value="{{$fedocumento->OPERACION}}">
+                                @include('acopio.form.formrechazoacopioestiba')
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
               </div>
             </div>
           </div>
