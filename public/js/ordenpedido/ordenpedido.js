@@ -2373,6 +2373,13 @@ $(document).ready(function () {
         });
     });
 
+    $('a[href="#consoldadogeneralterminado"]').on('shown.bs.tab', function (e) {
+        // Ajuste adicional si es necesario (por ejemplo, por responsive)
+        setTimeout(function() {
+            $('#lista-consolidado-general-terminado').DataTable().columns.adjust();
+        }, 100);
+    });
+
     /* ===============================
        DOBLE CLICK DETALLE CONSOLIDADO GENERAL
        =============================== */
@@ -2380,6 +2387,12 @@ $(document).ready(function () {
         let detalle_string = $(this).data('detalle');
         let nom_producto = $(this).data('nombre');
         let tbodyInferior = $('#tablaDetalleInferiorGeneral tbody');
+        let tableId = "#tablaDetalleInferiorGeneral";
+
+        // ✅ 1. DESTRUIR DATATABLE EXISTENTE (si existe)
+        if ($.fn.DataTable.isDataTable(tableId)) {
+            $(tableId).DataTable().destroy();
+        }
 
         // Limpiar y preparar
         tbodyInferior.empty();
@@ -2428,6 +2441,28 @@ $(document).ready(function () {
                         `);
                     }
                 });
+
+                // ✅ 4. AHORA SÍ, INICIALIZAR DATATABLE (después de tener los datos)
+                let newTable = $(tableId).DataTable({
+                    responsive: true,
+                    autoWidth: true,
+                    lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+                    scrollX: true,
+                    scrollY: "300px",
+                    ordering: false,
+                    pageLength: 5000,
+                    destroy: false, // No es necesario porque ya destruimos manualmente
+                    initComplete: function() {
+                        // Ajustar columnas después de inicializar
+                        this.api().columns.adjust();
+                    }
+                });
+
+                // Ajuste adicional si es necesario (por ejemplo, por responsive)
+                setTimeout(function() {
+                    newTable.columns.adjust();
+                }, 100);
+
             } else {
                 tbodyInferior.html('<tr><td colspan="5" class="text-center">No hay detalles disponibles en la cadena.</td></tr>');
             }

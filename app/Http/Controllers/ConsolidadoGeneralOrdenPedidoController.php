@@ -243,6 +243,7 @@ class ConsolidadoGeneralOrdenPedidoController extends Controller
         $id_consolidado_general = $request->input('id_consolidado_general');
         $familia_id = $request->input('familia_id');
         $listadetalle = $this->lg_lista_detalle_consolidado_general($id_consolidado_general, $familia_id);
+        //dd($listadetalle);
         return view('ordenpedido.consolidadogeneral.ajax.listadetalleconsolidadogeneral', [
             'listadetalle' => $listadetalle,
             'ajax' => true,
