@@ -5916,7 +5916,7 @@ trait ComprobanteTraits
         $centro_id      =       $trabajador->COD_ZONA_TIPO;
         $rol            =       WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 
-        if($rol->ind_uc == 1 && Session::get('usuario')->id != '1CIX00000142'){
+        if($rol->ind_uc == 1 && !in_array(Session::get('usuario')->id, ['1CIX00000142', '1CIX00000422'])){
 
             $listadatos     =   FeDocumento::Fecha($filtrofecha_id,$fecha_inicio,$fecha_fin)
                                 ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
