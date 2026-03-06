@@ -1035,7 +1035,42 @@ trait OrdenPedidoTraits
                         FOR XML PATH(''), TYPE
                     ).value('.', 'NVARCHAR(MAX)'), 1, 7, '')
                     AS DETALLE_POR_AREA
-                ")
+                "),
+
+                DB::raw("
+                        STUFF((
+                            SELECT CHAR(13) + CHAR(10) + '(' + OP.TXT_AREA + ' / ' + ISNULL(OP.TXT_GLOSA, '') + ')'
+                            FROM CMP.REFERENCIA_ASOC RA_CONS
+                            INNER JOIN WEB.ORDEN_PEDIDO_CONSOLIDADO OPC
+                                ON OPC.ID_PEDIDO_CONSOLIDADO = RA_CONS.COD_TABLA
+                            INNER JOIN ALM.CENTRO CEN_ORIG
+                                ON CEN_ORIG.COD_CENTRO = OPC.COD_CENTRO
+                            INNER JOIN CMP.REFERENCIA_ASOC RA_OP
+                                ON RA_OP.COD_TABLA_ASOC = OPC.ID_PEDIDO_CONSOLIDADO
+                            INNER JOIN WEB.ORDEN_PEDIDO OP
+                                ON OP.ID_PEDIDO = RA_OP.COD_TABLA
+                            INNER JOIN WEB.ORDEN_PEDIDO_DETALLE OPD
+                                ON OP.ID_PEDIDO = OPD.ID_PEDIDO
+                            WHERE RA_CONS.COD_TABLA_ASOC = D.ID_PEDIDO_CONSOLIDADO_GENERAL
+                              AND RA_CONS.TXT_TIPO_REFERENCIA = 'CONSOLIDADO_GENERAL'
+                              AND RA_CONS.TXT_TABLA = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
+                              AND RA_CONS.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL'
+                              AND RA_OP.TXT_TIPO_REFERENCIA = 'CONSOLIDADO'
+                              AND RA_OP.TXT_TABLA = 'WEB.ORDEN_PEDIDO'
+                              AND RA_OP.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
+                              AND OPD.COD_PRODUCTO = D.COD_PRODUCTO
+                              AND OP.COD_PERIODO = C.COD_PERIODO
+                              AND OPD.ACTIVO = 1
+                            GROUP BY 
+                                OP.FEC_PEDIDO,
+                                OP.ID_PEDIDO,
+                                OP.TXT_AREA,
+                                OP.TXT_GLOSA,
+                                CEN_ORIG.NOM_CENTRO
+                            ORDER BY OP.FEC_PEDIDO
+                            FOR XML PATH(''), TYPE
+                        ).value('.', 'NVARCHAR(MAX)'), 1, 2, '') AS DETALLE_POR_AREA_GLOSA
+                    ")
             )
             ->where('D.ID_PEDIDO_CONSOLIDADO_GENERAL', $id_consolidado_general)
             ->where(function ($q) use ($familia_id) {

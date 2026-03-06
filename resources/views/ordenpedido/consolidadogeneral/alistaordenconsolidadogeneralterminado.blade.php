@@ -1,13 +1,13 @@
 <div class="table-responsive">
-    <table 
+    <table
         class="table table-striped table-bordered table-hover td-color-borde td-padding-7 display nowrap"
-        cellspacing="0" width="100%">
-        
+        cellspacing="0" width="100%" id="lista-consolidado-general-terminado">
+
         <thead class="background-th-azul">
             <tr>
                 <th>ID CONSOLIDADO GENERAL</th>
                 <th>EMPRESA</th>
-                <th>FEC CONSO GENERALA</th>
+                <th>FECHA CONSOLIDADO GENERAL</th>
                 <th>MES</th>
                 <th>FAMILIA</th>
                 <th>ESTADO</th>
@@ -19,7 +19,7 @@
 
     @php $cabecera = $consolidado->first(); @endphp
 
-    <tr class="fila-consolidado-general-terminado" 
+    <tr class="fila-consolidado-general-terminado"
         data-consolidado-general="{{ $cabecera->ID_PEDIDO_CONSOLIDADO_GENERAL }}"
         data-familia-cod = '{{ $cabecera->COD_CATEGORIA_FAMILIA }}'
         style="cursor: pointer;">
