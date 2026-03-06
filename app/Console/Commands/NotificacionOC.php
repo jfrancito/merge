@@ -111,6 +111,7 @@ class NotificacionOC extends Command
 
         if($horaActual == '01:00' || $horaActual == '03:00' || $horaActual == '05:00'){
             $this->cambiar_fecha_vencimiento();
+            $this->envio_detraccion_sunat();
         }
 
 
