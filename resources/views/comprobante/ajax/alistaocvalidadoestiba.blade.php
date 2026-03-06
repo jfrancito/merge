@@ -27,10 +27,15 @@
 
 
         <td class="cell-detail sorting_1" style="position: relative;">
+
+
+
           <span><b>USUARIO CONTACTO : </b> {{$item->TXT_CONTACTO}}</span>
           <span><b>FOLIO : </b> {{$item->FOLIO}}</span>
           <span><b>H. OBSERVACION : </b> {{$item->TXT_OBSERVADO}}</span>
           <span><b>H. REPARABLE : </b> {{$item->TXT_REPARABLE}}</span>
+
+
         </td>
 
 

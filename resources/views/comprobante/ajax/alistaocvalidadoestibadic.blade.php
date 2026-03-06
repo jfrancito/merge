@@ -29,6 +29,15 @@
 
 
         <td class="cell-detail sorting_1" style="position: relative;">
+
+          <b>REVISION DE CONTABILIDAD : </b> 
+              @if($item->IND_CONTABILIDAD_APRO == '1') 
+                  <span class="badge badge-primary" style="width:70px;">REVISADO</span>
+              @else
+                  <span class="badge badge-warning" style="width:90px;">POR REVISAR</span>
+              @endif
+
+
           <span><b>USUARIO CONTACTO : </b> {{$item->TXT_CONTACTO}}</span>
           <span><b>FOLIO : </b> {{$item->FOLIO}}</span>
           <span><b>H. OBSERVACION : </b> {{$item->TXT_OBSERVADO}}</span>
