@@ -527,7 +527,7 @@ class ValeRendirController extends Controller
                             'error' => 'Usted tiene 4 o más vales pendientes por rendir. No puede generar un quinto vale.'
                         ]);
                     }
-                } elseif ($areacomercial === 'GERENCIA GENERAL') {
+                } elseif ($areacomercial === 'GERENCIA GENERAL' && $cod_usuario_registro !== '1CIX00000209') {
                     if ($pendienteCount >= 3) {
                         return response()->json([
                             'error' => 'Usted tiene 3 o más vales pendientes por rendir. No puede generar un cuarto vale.'
