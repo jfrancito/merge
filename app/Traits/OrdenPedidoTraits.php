@@ -245,6 +245,25 @@ trait OrdenPedidoTraits
         return $query->get();
     }
 
+    public function generar_combo_periodo_web($titulo, $todo, $codigo_empresa, $anio)
+    {
+
+        $array = DB::table('Web.periodos')
+            ->where('anio','=', $anio)
+            ->where('COD_EMPR','=', $codigo_empresa)
+            ->pluck('TXT_NOMBRE', 'COD_PERIODO')
+            ->toArray();
+
+        if ($todo == 'TODO') {
+            $combo = array('' => $titulo, $todo => $todo) + $array;
+        } else {
+            $combo = array('' => $titulo) + $array;
+        }
+
+        return $combo;
+
+    }
+
     private function lg_lista_cabecera_pedido_resumen($fecha_inicio, $fecha_fin, $empresa_id, $centro_pedido)
     {
 
@@ -1039,7 +1058,7 @@ trait OrdenPedidoTraits
 
                 DB::raw("
                         STUFF((
-                            SELECT CHAR(13) + CHAR(10) + '(' + OP.TXT_AREA + ' / ' + ISNULL(OP.TXT_GLOSA, '') + ')'
+                            SELECT CHAR(13) + CHAR(10) + '(' + OP.TXT_AREA + ' / ' + ISNULL(OPD.TXT_OBSERVACION, '') + ')'
                             FROM CMP.REFERENCIA_ASOC RA_CONS
                             INNER JOIN WEB.ORDEN_PEDIDO_CONSOLIDADO OPC
                                 ON OPC.ID_PEDIDO_CONSOLIDADO = RA_CONS.COD_TABLA
@@ -1066,7 +1085,8 @@ trait OrdenPedidoTraits
                                 OP.ID_PEDIDO,
                                 OP.TXT_AREA,
                                 OP.TXT_GLOSA,
-                                CEN_ORIG.NOM_CENTRO
+                                CEN_ORIG.NOM_CENTRO,
+                                OPD.TXT_OBSERVACION
                             ORDER BY OP.FEC_PEDIDO
                             FOR XML PATH(''), TYPE
                         ).value('.', 'NVARCHAR(MAX)'), 1, 2, '') AS DETALLE_POR_AREA_GLOSA
@@ -1309,5 +1329,109 @@ WHERE OP.CONSOLIDADO = 'SI'
 
         return $resultado_final;
 
+    }
+
+    public function reporte_pedidos_estado($periodo, $empresa_id, $centro, $anio)
+    {
+        $sql = "
+        SELECT DISTINCT OP.ID_PEDIDO,
+                OP.COD_AREA,
+                OP.TXT_AREA                          AS NOM_AREA,
+                OP.FEC_PEDIDO,
+                OP.COD_ANIO,
+                OP.COD_PERIODO,
+                PER.TXT_NOMBRE                       AS NOM_PERIODO,
+                OP.COD_EMPR,
+                OP.COD_CENTRO,
+                C.NOM_CENTRO,
+                OP.COD_ESTADO,
+                OP.TXT_ESTADO,
+                COALESCE(CS.CONSOLIDADO_SEDE, '')    AS ID_PEDIDO_CONSOLIDADO,
+                COALESCE(CG.CONSOLIDADO_GENERAL, '') AS ID_PEDIDO_CONSOLIDADO_GENERAL
+FROM WEB.ORDEN_PEDIDO AS OP
+         INNER JOIN ALM.CENTRO AS C ON C.COD_CENTRO = OP.COD_CENTRO AND C.COD_ESTADO = 1
+         INNER JOIN STD.EMPRESA AS E ON E.COD_EMPR = OP.COD_EMPR AND E.COD_ESTADO = 1
+         INNER JOIN WEB.periodos AS PER ON PER.anio = OP.COD_ANIO AND PER.COD_PERIODO = OP.COD_PERIODO
+         OUTER APPLY (SELECT STUFF((SELECT DISTINCT ', ' + CAST(OPC.ID_PEDIDO_CONSOLIDADO AS NVARCHAR)
+                                    FROM WEB.ORDEN_PEDIDO OP2
+                                             INNER JOIN WEB.ORDEN_PEDIDO_DETALLE OPD
+                                                        ON OP2.ID_PEDIDO = OPD.ID_PEDIDO AND OPD.ACTIVO = 1
+                                             INNER JOIN CMP.REFERENCIA_ASOC AS RAF
+                                                        ON RAF.COD_TABLA = OP.ID_PEDIDO
+                                                            AND RAF.COD_ESTADO = 1
+                                             INNER JOIN WEB.ORDEN_PEDIDO_CONSOLIDADO AS OPC
+                                                        ON OPC.ID_PEDIDO_CONSOLIDADO = RAF.COD_TABLA_ASOC
+                                                            AND OPC.ACTIVO = 1
+                                             INNER JOIN WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE AS OPCD
+                                                        ON OPCD.ID_PEDIDO_CONSOLIDADO =
+                                                           OPC.ID_PEDIDO_CONSOLIDADO AND OPCD.ACTIVO = 1 AND
+                                                           OPCD.COD_PRODUCTO = OPD.COD_PRODUCTO
+                                    WHERE RAF.TXT_TIPO_REFERENCIA = 'CONSOLIDADO'
+                                      AND RAF.TXT_TABLA = 'WEB.ORDEN_PEDIDO'
+                                      AND RAF.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
+                                      AND OP2.ID_PEDIDO = OP.ID_PEDIDO
+                                    FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2,
+                                   '') AS CONSOLIDADO_SEDE) CS
+         OUTER APPLY (SELECT STUFF((SELECT DISTINCT ', ' + CAST(OPCG.ID_PEDIDO_CONSOLIDADO_GENERAL AS NVARCHAR)
+                                    FROM WEB.ORDEN_PEDIDO OP2
+                                             INNER JOIN WEB.ORDEN_PEDIDO_DETALLE OPD
+                                                        ON OP2.ID_PEDIDO = OPD.ID_PEDIDO AND OPD.ACTIVO = 1
+                                             INNER JOIN CMP.REFERENCIA_ASOC AS RAF
+                                                        ON RAF.COD_TABLA = OP.ID_PEDIDO
+                                                            AND RAF.COD_ESTADO = 1
+                                             INNER JOIN WEB.ORDEN_PEDIDO_CONSOLIDADO AS OPC
+                                                        ON OPC.ID_PEDIDO_CONSOLIDADO = RAF.COD_TABLA_ASOC
+                                                            AND OPC.ACTIVO = 1
+                                             INNER JOIN WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE AS OPCD
+                                                        ON OPCD.ID_PEDIDO_CONSOLIDADO =
+                                                           OPC.ID_PEDIDO_CONSOLIDADO AND OPCD.ACTIVO = 1 AND
+                                                           OPCD.COD_PRODUCTO = OPD.COD_PRODUCTO
+                                             INNER JOIN CMP.REFERENCIA_ASOC AS RE
+                                                        ON RE.COD_TABLA = OPC.ID_PEDIDO_CONSOLIDADO AND
+                                                           RE.COD_ESTADO = 1
+                                             INNER JOIN WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL AS OPCG
+                                                        ON OPCG.ID_PEDIDO_CONSOLIDADO_GENERAL =
+                                                           RE.COD_TABLA_ASOC AND OPCG.ACTIVO = 1 AND
+                                                           OPCG.COD_CATEGORIA_FAMILIA = OPC.COD_CATEGORIA_FAMILIA
+                                             INNER JOIN WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE AS OPCDG
+                                                        ON OPCDG.ID_PEDIDO_CONSOLIDADO_GENERAL =
+                                                           OPCG.ID_PEDIDO_CONSOLIDADO_GENERAL AND
+                                                           OPCDG.COD_PRODUCTO = OPD.COD_PRODUCTO AND
+                                                           OPCDG.ACTIVO = 1
+                                    WHERE RAF.TXT_TIPO_REFERENCIA = 'CONSOLIDADO'
+                                      AND RAF.TXT_TABLA = 'WEB.ORDEN_PEDIDO'
+                                      AND RAF.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
+                                      AND OP2.ID_PEDIDO = OP.ID_PEDIDO
+                                      AND RE.TXT_TIPO_REFERENCIA = 'CONSOLIDADO_GENERAL'
+                                      AND RE.TXT_TABLA = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
+                                      AND RE.TXT_TABLA_ASOC =
+                                          'WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL'
+                                    FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2,
+                                   '') AS CONSOLIDADO_GENERAL) CG
+WHERE OP.ACTIVO = 1
+  AND OP.COD_ESTADO <> 'ETM0000000000006'
+  AND OP.COD_EMPR = :empresa_id
+  AND OP.COD_PERIODO = :periodo_id
+  AND OP.COD_ANIO = :anio_id
+    ";
+
+        // Agregar filtro por familia si se proporciona
+        if (!empty($centro)) {
+            $sql .= " AND OP.COD_CENTRO = :centro_id ";
+        }
+
+        // Preparar parámetros
+        $params = [
+            'empresa_id' => $empresa_id,
+            'periodo_id' => $periodo,
+            'anio_id' => $anio,
+        ];
+
+        if (!empty($familia_id)) {
+            $params['centro_id'] = $centro;
+        }
+
+        // Ejecutar consulta raw
+        return DB::connection('sqlsrv')->select($sql, $params);
     }
 }

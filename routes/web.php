@@ -1073,15 +1073,10 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::get('/cotizacion-orden-pedido/{idopcion}', 'CotizacionOrdenPedidoController@actionCotizacionOrdenPedido');
 
-
-
-
-
-
-
-
-
-
+    Route::get('/reporte-orden-pedido-estado/{idopcion}', 'ReporteOrdenPedidoController@actionReporteOrdenPedidoEstado');
+    Route::any('/cargar-periodo-orden-pedido', 'ReporteOrdenPedidoController@actionListarPeriodo');
+    Route::any('/listar-reporte-orden-pedido-estado', 'ReporteOrdenPedidoController@actionListarAjaxReporte');
+    Route::any('/descargar-orden-pedido-estado', 'ReporteOrdenPedidoController@actionListarAjaxReporteExcel');
 
 });
 

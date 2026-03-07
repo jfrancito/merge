@@ -16,7 +16,7 @@ $(document).ready(function () {
        FUNCIÓN MODAL BONITO (ÚNICA)
        =============================== */
 
-    function modalBonito({ tipo, icono, titulo, mensaje, ancho = '360px', confirmar = false, onConfirm = null }) {
+    function modalBonito({tipo, icono, titulo, mensaje, ancho = '360px', confirmar = false, onConfirm = null}) {
 
         const colores = {
             error: ['#ff416c', '#ff4b2b'],
@@ -241,8 +241,66 @@ $(document).ready(function () {
         });
     });
 
+    $(".reporteordenpedidoestado").on('click', '#anio', function (e) {
+
+        e.preventDefault();
+        let anio = $('#anio').val();
+        let _token = $('#token').val();
+
+        debugger;
+
+        data = {
+            _token: _token,
+            anio: anio
+        };
+
+        ajax_normal_combo(data, "/cargar-periodo-orden-pedido", "ajax_periodo")
+
+    });
+
+    $(".reporteordenpedidoestado").on('click', '.buscarreporteordenpedidoestado', function (e) {
+
+        e.preventDefault();
+        let anio = $('#anio').val();
+        let periodo = $('#periodo').val();
+        let centro = $('#centro').val();
+        let _token = $('#token').val();
+
+        debugger;
+
+        data = {
+            _token: _token,
+            anio: anio,
+            periodo: periodo,
+            centro: centro
+        };
+
+        ajax_normal(data, "/listar-reporte-orden-pedido-estado")
+
+    });
+
+    $(".reporteordenpedidoestado").on('click', '.descargarreporteordenpedidoestado', function () {
+
+        event.preventDefault();
+        let periodo = $('#periodo').val();
+        let anio = $('#anio').val();
+
+        if (periodo === '') {
+            alerterrorajax("Seleccione un periodo.");
+            return false;
+        }
+
+        if (anio === '') {
+            alerterrorajax("Seleccione un año.");
+            return false;
+        }
+
+        $('#formdescargar').submit();
+
+    });
+
     $("#empresa_id").on('change', function (e) {
-    //$(".ordenpedidoprincipal").on('change', '#empresa_id', function () {
+        //$(".ordenpedidoprincipal").on('change', '#empresa_id', function () {
 
         e.preventDefault();
         let empresa_id = $('#empresa_id').val();
@@ -254,23 +312,23 @@ $(document).ready(function () {
             _token: _token,
             empresa_id: empresa_id
         };
-/*
-        $.ajax({
-            type: "POST",
-            url: carpeta + "/cargar-periodo-consolidado",
-            data: {
-                _token: _token,
-                empresa_id: empresa_id
-            },
-            success: function (res) {
-                debugger;
+        /*
+                $.ajax({
+                    type: "POST",
+                    url: carpeta + "/cargar-periodo-consolidado",
+                    data: {
+                        _token: _token,
+                        empresa_id: empresa_id
+                    },
+                    success: function (res) {
+                        debugger;
 
-            },
-            error: function (res) {
-                debugger;
-                error500(res);
-            }
-        });*/
+                    },
+                    error: function (res) {
+                        debugger;
+                        error500(res);
+                    }
+                });*/
 
         //ajax_normal_combo(data, "/cargar-periodo-consolidado", "ajax_periodo")
 
@@ -332,8 +390,6 @@ $(document).ready(function () {
             });
             return;
         }
-
-
 
 
         let existe = false;
@@ -419,8 +475,8 @@ $(document).ready(function () {
                         icono: '⚠️',
                         titulo: 'Atención',
                         mensaje: 'El monto total <b>superó los ' +
-                                 umbralAdminMaestra.toFixed(2) +
-                                 '</b>. Debe seleccionar el <b>Aprobador de Gerencia</b>.'
+                            umbralAdminMaestra.toFixed(2) +
+                            '</b>. Debe seleccionar el <b>Aprobador de Gerencia</b>.'
                     });
                 }
 
@@ -927,7 +983,6 @@ $(document).ready(function () {
     });
 
 
-
     $('#cod_producto').on('change', function () {
         let option = $(this).find(':selected');
         let unidad = option.data('unidad') || '';
@@ -1344,16 +1399,31 @@ $(document).ready(function () {
         debugger;
 
         if ($.trim(centro_id) === '') {
-            modalBonito({ tipo: 'warning', icono: '⚠️', titulo: 'Filtro requerido', mensaje: 'Por favor, seleccione un <b>Centro</b>.' });
+            modalBonito({
+                tipo: 'warning',
+                icono: '⚠️',
+                titulo: 'Filtro requerido',
+                mensaje: 'Por favor, seleccione un <b>Centro</b>.'
+            });
             return false;
         }
 
         if ($.trim(mes_pedido) === '') {
-            modalBonito({ tipo: 'warning', icono: '⚠️', titulo: 'Filtro requerido', mensaje: 'Por favor, seleccione un <b>Mes</b>.' });
+            modalBonito({
+                tipo: 'warning',
+                icono: '⚠️',
+                titulo: 'Filtro requerido',
+                mensaje: 'Por favor, seleccione un <b>Mes</b>.'
+            });
             return false;
         }
         if ($.trim(anio_pedido) === '') {
-            modalBonito({ tipo: 'warning', icono: '⚠️', titulo: 'Filtro requerido', mensaje: 'Por favor, seleccione un <b>Año</b>.' });
+            modalBonito({
+                tipo: 'warning',
+                icono: '⚠️',
+                titulo: 'Filtro requerido',
+                mensaje: 'Por favor, seleccione un <b>Año</b>.'
+            });
             return false;
         }
 
@@ -1393,11 +1463,21 @@ $(document).ready(function () {
         var _token = $('#token').val();
 
         if ($.trim(mes_pedido) === '') {
-            modalBonito({ tipo: 'warning', icono: '⚠️', titulo: 'Filtro requerido', mensaje: 'Por favor, seleccione un <b>Mes</b>.' });
+            modalBonito({
+                tipo: 'warning',
+                icono: '⚠️',
+                titulo: 'Filtro requerido',
+                mensaje: 'Por favor, seleccione un <b>Mes</b>.'
+            });
             return false;
         }
         if ($.trim(anio_pedido) === '') {
-            modalBonito({ tipo: 'warning', icono: '⚠️', titulo: 'Filtro requerido', mensaje: 'Por favor, seleccione un <b>Año</b>.' });
+            modalBonito({
+                tipo: 'warning',
+                icono: '⚠️',
+                titulo: 'Filtro requerido',
+                mensaje: 'Por favor, seleccione un <b>Año</b>.'
+            });
             return false;
         }
 
@@ -1513,7 +1593,7 @@ $(document).ready(function () {
             if (detalles) {
                 detalles.forEach(item => {
                     debugger;
-                    let key = item.COD_PRODUCTO + '-' + item.COD_CENTRO+ '-' + item.COD_PERIODO;
+                    let key = item.COD_PRODUCTO + '-' + item.COD_CENTRO + '-' + item.COD_PERIODO;
                     console.log(key);
                     debugger;
                     if (!productosConsolidados[key]) {
@@ -1721,7 +1801,6 @@ $(document).ready(function () {
 
         buscarDetalleConsolidado();
     });
-
 
 
     function buscarDetalleConsolidado() {
@@ -1959,7 +2038,10 @@ $(document).ready(function () {
                                 <td>${area}</td>
                                 <td class="text-muted small">${glosa}</td>
                                 <td class="text-center font-bold" style="font-size: 1.1em;">
-                                    ${cantFloat.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    ${cantFloat.toLocaleString('en-US', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        })}
                                 </td>
                             </tr>
                         `);
@@ -2050,7 +2132,11 @@ $(document).ready(function () {
             let info = chk.data('detalle');
 
             if (typeof info === 'string') {
-                try { info = JSON.parse(info); } catch (e) { console.error("Error parsing JSON", e); }
+                try {
+                    info = JSON.parse(info);
+                } catch (e) {
+                    console.error("Error parsing JSON", e);
+                }
             }
 
             if (!Array.isArray(info)) {
@@ -2161,7 +2247,10 @@ $(document).ready(function () {
                                 <td class="text-center font-bold">${centro}</td>
                                 <td class="small">${glosa}</td>
                                 <td class="text-center font-bold" style="font-size: 1.1em;">
-                                    ${cantFloat.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    ${cantFloat.toLocaleString('en-US', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        })}
                                 </td>
                             </tr>
                         `);
@@ -2375,7 +2464,7 @@ $(document).ready(function () {
 
     $('a[href="#consoldadogeneralterminado"]').on('shown.bs.tab', function (e) {
         // Ajuste adicional si es necesario (por ejemplo, por responsive)
-        setTimeout(function() {
+        setTimeout(function () {
             $('#lista-consolidado-general-terminado').DataTable().columns.adjust();
         }, 100);
     });
@@ -2435,7 +2524,10 @@ $(document).ready(function () {
                                 <td class="text-center font-bold">${centro}</td>
                                 <td class="small">${glosa}</td>
                                 <td class="text-center font-bold" style="font-size: 1.1em;">
-                                    ${cantFloat.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    ${cantFloat.toLocaleString('en-US', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        })}
                                 </td>
                             </tr>
                         `);
@@ -2452,14 +2544,14 @@ $(document).ready(function () {
                     ordering: false,
                     pageLength: 5000,
                     destroy: false, // No es necesario porque ya destruimos manualmente
-                    initComplete: function() {
+                    initComplete: function () {
                         // Ajustar columnas después de inicializar
                         this.api().columns.adjust();
                     }
                 });
 
                 // Ajuste adicional si es necesario (por ejemplo, por responsive)
-                setTimeout(function() {
+                setTimeout(function () {
                     newTable.columns.adjust();
                 }, 100);
 
@@ -2572,7 +2664,7 @@ $(document).ready(function () {
             return;
         }
 
-        let familia_id =  $('#familia_id').val();
+        let familia_id = $('#familia_id').val();
         debugger;
         window.location.href = carpeta + '/descargar-excel-detalle-consolidado-general/' + id_consolidado_general_seleccionado + '/' + familia_id;
     });
@@ -2589,7 +2681,7 @@ $(document).ready(function () {
             return;
         }
 
-        let familia_id =  $('#familia_id').val();
+        let familia_id = $('#familia_id').val();
         debugger;
         window.location.href = carpeta + '/descargar-excel-detalle-consolidado-general-area/' + id_consolidado_general_seleccionado + '/' + familia_id;
     });
