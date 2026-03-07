@@ -5514,6 +5514,8 @@ class GestionLiquidacionGastosController extends Controller
 
             } else {
                 $area_planilla = $trabajadorespla->cadarea;
+                //dd($trabajadorespla->cadarea);
+
                 $centrocosto = DB::table('CON.CENTRO_COSTO')
                     ->where('COD_ESTADO', 1)
                     ->where('COD_EMPR', Session::get('empresas')->COD_EMPR)
@@ -5580,6 +5582,8 @@ class GestionLiquidacionGastosController extends Controller
                 ->where('USER_ID', Session::get('usuario')->id)
                 ->where('ACTIVO', 1)
                 ->first();
+
+
 
             if (count($terceros) > 0) {
                 $area_planilla = $terceros->TXT_AREA;
