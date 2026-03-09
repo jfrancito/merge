@@ -25,8 +25,6 @@ class SunatController extends Controller
 
 		$this->sunatarchivos();
 
-
-
 	}	
 
 }

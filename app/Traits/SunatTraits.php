@@ -36,7 +36,7 @@ trait SunatTraits
 
 			$documentos 	=   DocumentoSunat::where('RUC_EMPRESA','=',$item2->COD_EMPR)
 								->whereRaw('ISNULL(IND_DETALLE, 0) = 0')
-								->whereRaw("PERIODO > '202402'")
+								->whereRaw("PERIODO > '202403'")
 								//->where('COD_TIPODOCUMENTO','=','02')
 								//->whereRaw('ISNULL(CONTADOR,0) < 2')
 								->whereRaw("COD_TIPODOCUMENTO IN ('01','02')")

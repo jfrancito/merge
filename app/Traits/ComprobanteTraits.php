@@ -8490,7 +8490,7 @@ trait ComprobanteTraits
                                         $query->orWhereNull('FOLIO_DETRACCION');
                                     })
                                     ->where('COD_CATEGORIA_MONEDA','=',$moneda_id)
-                                    ->where('CREAR_FOLIO','=',$operacion_id)
+                                    //->where('CREAR_FOLIO','=',$operacion_id)
                                     ->orderBy('FEC_EMISION','asc')
                                     ->get();
 
