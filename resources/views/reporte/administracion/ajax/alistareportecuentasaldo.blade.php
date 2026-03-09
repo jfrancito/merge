@@ -4,6 +4,9 @@
             @if($todos === '' or $todos === 'C')
                 <li class="active negrita"><a href="#ccobrar" data-toggle="tab">Cuentas por Cobrar Terceros</a></li>
                 <li class="negrita"><a href="#ccobrarrel" data-toggle="tab">Cuentas por Cobrar Relacionadas</a></li>
+                <li class="negrita"><a href="#ccobrardudosa" data-toggle="tab">Cuentas por Cobrar Terceros Dudosa</a></li>
+                <li class="negrita"><a href="#ccobrarriojaacopio" data-toggle="tab">Cuentas por Cobrar Terceros Rioja Acopio</a></li>
+                <li class="negrita"><a href="#ccobrarbellavistaacopio" data-toggle="tab">Cuentas por Cobrar Terceros Bellavista Acopio</a></li>
             @endif
             @if($todos === '' or $todos === 'P')
                 <li class="negrita"><a href="#cpagar" data-toggle="tab">Cuentas por Pagar Terceros</a></li>
@@ -20,6 +23,15 @@
                 </div>
                 <div id="ccobrarrel" class="tab-pane cont">
                     @include('reporte.administracion.ajax.listacuentascobrarrelacionadas')
+                </div>
+                <div id="ccobrardudosa" class="tab-pane cont">
+                    @include('reporte.administracion.ajax.listacuentascobrartercerosdudosa')
+                </div>
+                <div id="ccobrarriojaacopio" class="tab-pane cont">
+                    @include('reporte.administracion.ajax.listacuentascobrartercerosriojaacopio')
+                </div>
+                <div id="ccobrarbellavistaacopio" class="tab-pane cont">
+                    @include('reporte.administracion.ajax.listacuentascobrartercerosbellavistaacopio')
                 </div>
             @endif
             @if($todos === '' or $todos === 'P')

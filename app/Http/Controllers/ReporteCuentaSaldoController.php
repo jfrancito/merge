@@ -171,6 +171,103 @@ class ReporteCuentaSaldoController extends Controller
                 $sheet->setWidth('P', 25);
                 $sheet->setWidth('Q', 25);
             });
+            $excel->sheet('CxC Dudosa', function ($sheet) use ($cuentas, $funcion) {
+                $sheet->setStyle(array(
+                    'font' => array(
+                        'name'      =>  'Calibri',
+                        'size'      =>  9
+                    )
+                ));
+                $sheet->setColumnFormat(array(
+                    'M:Q' => '#,##0.00',
+                    'D' => '#,##0.00',
+                    'E' => NumberFormat::FORMAT_DATE_YYYYMMDD
+                ));
+                $sheet->loadView('reporte/administracion/excel/listacuentascobrartercerosdudosa')
+                    ->with('funcion', $funcion)
+                    ->with('cuentas', $cuentas);
+                $sheet->setWidth('A', 30);
+                $sheet->setWidth('B', 15);
+                $sheet->setWidth('C', 15);
+                $sheet->setWidth('D', 15);
+                $sheet->setWidth('E', 15);
+                $sheet->setWidth('F', 30);
+                $sheet->setWidth('G', 25);
+                $sheet->setWidth('H', 25);
+                $sheet->setWidth('I', 15);
+                $sheet->setWidth('J', 10);
+                $sheet->setWidth('K', 30);
+                $sheet->setWidth('L', 25);
+                $sheet->setWidth('M', 25);
+                $sheet->setWidth('N', 25);
+                $sheet->setWidth('O', 25);
+                $sheet->setWidth('P', 25);
+                $sheet->setWidth('Q', 25);
+            });
+            $excel->sheet('CxC Contratos Acopio Rioja', function ($sheet) use ($cuentas, $funcion) {
+                $sheet->setStyle(array(
+                    'font' => array(
+                        'name'      =>  'Calibri',
+                        'size'      =>  9
+                    )
+                ));
+                $sheet->setColumnFormat(array(
+                    'L:P' => '#,##0.00',
+                    'D' => '#,##0.00',
+                    'E' => NumberFormat::FORMAT_DATE_YYYYMMDD
+                ));
+                $sheet->loadView('reporte/administracion/excel/listacuentascobrartercerosriojaacopio')
+                    ->with('funcion', $funcion)
+                    ->with('cuentas', $cuentas);
+                $sheet->setWidth('A', 30);
+                $sheet->setWidth('B', 15);
+                $sheet->setWidth('C', 15);
+                $sheet->setWidth('D', 15);
+                $sheet->setWidth('E', 15);
+                $sheet->setWidth('F', 30);
+                $sheet->setWidth('G', 25);
+                $sheet->setWidth('H', 25);
+                $sheet->setWidth('I', 15);
+                $sheet->setWidth('J', 30);
+                $sheet->setWidth('K', 30);
+                $sheet->setWidth('L', 25);
+                $sheet->setWidth('M', 25);
+                $sheet->setWidth('N', 25);
+                $sheet->setWidth('O', 25);
+                $sheet->setWidth('P', 25);
+            });
+            $excel->sheet('CxC Contratos Acopio Bellavista', function ($sheet) use ($cuentas, $funcion) {
+                $sheet->setStyle(array(
+                    'font' => array(
+                        'name'      =>  'Calibri',
+                        'size'      =>  9
+                    )
+                ));
+                $sheet->setColumnFormat(array(
+                    'L:P' => '#,##0.00',
+                    'D' => '#,##0.00',
+                    'E' => NumberFormat::FORMAT_DATE_YYYYMMDD
+                ));
+                $sheet->loadView('reporte/administracion/excel/listacuentascobrartercerosbellavistaacopio')
+                    ->with('funcion', $funcion)
+                    ->with('cuentas', $cuentas);
+                $sheet->setWidth('A', 30);
+                $sheet->setWidth('B', 15);
+                $sheet->setWidth('C', 15);
+                $sheet->setWidth('D', 15);
+                $sheet->setWidth('E', 15);
+                $sheet->setWidth('F', 30);
+                $sheet->setWidth('G', 25);
+                $sheet->setWidth('H', 25);
+                $sheet->setWidth('I', 15);
+                $sheet->setWidth('J', 30);
+                $sheet->setWidth('K', 30);
+                $sheet->setWidth('L', 25);
+                $sheet->setWidth('M', 25);
+                $sheet->setWidth('N', 25);
+                $sheet->setWidth('O', 25);
+                $sheet->setWidth('P', 25);
+            });
             $excel->sheet('CxP Terceros', function ($sheet) use ($cuentas, $funcion) {
                 $sheet->setStyle(array(
                     'font' => array(

@@ -50,7 +50,7 @@
         </thead>
         <tbody>
         @foreach($cuentas as $index=>$item)
-            @if($item['IND_REL'] === 'T' AND $item['IND_CP'] === 'C' AND !in_array($item['TIPO_CONTRATO'], ['CREDITO AGRARIO', 'CREDITO FERTILIZANTES']) AND $item['IND_MOR'] === 'NO')
+            @if($item['IND_REL'] === 'T' AND $item['IND_CP'] === 'C' and !in_array($item['TIPO_CONTRATO'], ['CREDITO AGRARIO', 'CREDITO FERTILIZANTES']) AND $item['IND_MOR'] === 'SI')
                 <tr>
                     <td class="border"> {{$item['NOM_CLIENTE']}}</td>
                     <td class="border">{{substr($item['NRO_CONTRATO'],0,6).'-'.strval(intval(substr($item['NRO_CONTRATO'],6,16)))}}</td>

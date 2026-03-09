@@ -1,4 +1,4 @@
-<table id="cxct" class="table table-striped table-bordered table-hover td-color-borde td-padding-7 display nowrap" style='width: 100%;'>
+<table id="cxcra" class="table table-striped table-bordered table-hover td-color-borde td-padding-7 display nowrap" style='width: 100%;'>
     @php
         $total_mn = 0.0000;
         $total_me = 0.0000;
@@ -12,7 +12,6 @@
         <th>FECHA DOCUMENTO</th>
         <th>TIPO DOCUMENTO</th>
         <th>NUMERO DOCUMENTO</th>
-        <th>FACTURAS</th>
         <th>DIAS TRANSCURRIDOS</th>
         <th>MONEDA</th>
         <th>JEFE VENTA</th>
@@ -24,7 +23,12 @@
     </thead>
     <tbody>
     @foreach($cuentas as $index=>$item)
-        @if($item['IND_REL'] === 'T' AND $item['IND_CP'] === 'C' AND !in_array($item['TIPO_CONTRATO'], ['CREDITO AGRARIO', 'CREDITO FERTILIZANTES']) AND $item['IND_MOR'] === 'NO')
+        @php
+            $esCreditoEspecial = in_array($item['TIPO_CONTRATO'] ?? '', ['CREDITO AGRARIO', 'CREDITO FERTILIZANTES']);
+            $esCentroRioja = ($item['Centro'] ?? '') === 'RIOJA';
+        @endphp
+
+        @if($item['IND_REL'] === 'T' && $item['IND_CP'] === 'C' && $esCreditoEspecial && $esCentroRioja)
             <tr>
                 <td>{{$item['NOM_CLIENTE']}}</td>
                 <td>{{substr($item['NRO_CONTRATO'],0,6).'-'.strval(intval(substr($item['NRO_CONTRATO'],6,16)))}}</td>
@@ -33,7 +37,6 @@
                 <td>{{$item['FecDocumento_Emis']}}</td>
                 <td>{{$item['TipoDocumento']}}</td>
                 <td>{{$item['NroDocumento']}}</td>
-                <td>{{$item["DOCS"]}}</td>
                 <td>{{$item['diasTranscurridos']}}</td>
                 <td>{{$item['SIM_MONEDA']}}</td>
                 <td>{{$item['JEFE_VENTA']}}</td>
