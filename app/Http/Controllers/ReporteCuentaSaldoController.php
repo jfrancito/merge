@@ -276,7 +276,7 @@ class ReporteCuentaSaldoController extends Controller
                     )
                 ));
                 $sheet->setColumnFormat(array(
-                    'M:Q' => '#,##0.00',
+                    'L:P' => '#,##0.00',
                     'D' => '#,##0.00',
                     'E' => NumberFormat::FORMAT_DATE_YYYYMMDD
                 ));
@@ -292,14 +292,13 @@ class ReporteCuentaSaldoController extends Controller
                 $sheet->setWidth('G', 25);
                 $sheet->setWidth('H', 25);
                 $sheet->setWidth('I', 15);
-                $sheet->setWidth('J', 10);
+                $sheet->setWidth('J', 30);
                 $sheet->setWidth('K', 30);
                 $sheet->setWidth('L', 25);
                 $sheet->setWidth('M', 25);
                 $sheet->setWidth('N', 25);
                 $sheet->setWidth('O', 25);
                 $sheet->setWidth('P', 25);
-                $sheet->setWidth('Q', 25);
             });
             $excel->sheet('CxP Relacionadas', function ($sheet) use ($cuentas, $funcion) {
                 $sheet->setStyle(array(
@@ -309,7 +308,7 @@ class ReporteCuentaSaldoController extends Controller
                     )
                 ));
                 $sheet->setColumnFormat(array(
-                    'M:Q' => '#,##0.00',
+                    'L:P' => '#,##0.00',
                     'D' => '#,##0.00',
                     'E' => NumberFormat::FORMAT_DATE_YYYYMMDD
                 ));
@@ -325,14 +324,13 @@ class ReporteCuentaSaldoController extends Controller
                 $sheet->setWidth('G', 25);
                 $sheet->setWidth('H', 25);
                 $sheet->setWidth('I', 15);
-                $sheet->setWidth('J', 10);
+                $sheet->setWidth('J', 30);
                 $sheet->setWidth('K', 30);
                 $sheet->setWidth('L', 25);
                 $sheet->setWidth('M', 25);
                 $sheet->setWidth('N', 25);
                 $sheet->setWidth('O', 25);
                 $sheet->setWidth('P', 25);
-                $sheet->setWidth('Q', 25);
             });
             $excel->sheet('CxP Retenciones', function ($sheet) use ($cuentas, $funcion) {
                 $sheet->setStyle(array(
@@ -342,7 +340,7 @@ class ReporteCuentaSaldoController extends Controller
                     )
                 ));
                 $sheet->setColumnFormat(array(
-                    'M:O' => '#,##0.00',
+                    'L:P' => '#,##0.00',
                     'D' => '#,##0.00',
                     'E' => NumberFormat::FORMAT_DATE_YYYYMMDD
                 ));
@@ -358,14 +356,13 @@ class ReporteCuentaSaldoController extends Controller
                 $sheet->setWidth('G', 25);
                 $sheet->setWidth('H', 25);
                 $sheet->setWidth('I', 15);
-                $sheet->setWidth('J', 10);
+                $sheet->setWidth('J', 30);
                 $sheet->setWidth('K', 30);
                 $sheet->setWidth('L', 25);
                 $sheet->setWidth('M', 25);
                 $sheet->setWidth('N', 25);
                 $sheet->setWidth('O', 25);
                 $sheet->setWidth('P', 25);
-                $sheet->setWidth('Q', 25);
             });
             $excel->sheet('CxP Bancos', function ($sheet) use ($cuentas, $funcion) {
                 $sheet->setStyle(array(
@@ -375,7 +372,7 @@ class ReporteCuentaSaldoController extends Controller
                     )
                 ));
                 $sheet->setColumnFormat(array(
-                    'M:Q' => '#,##0.00',
+                    'L:P' => '#,##0.00',
                     'D' => '#,##0.00',
                     'E' => NumberFormat::FORMAT_DATE_YYYYMMDD
                 ));
@@ -391,14 +388,13 @@ class ReporteCuentaSaldoController extends Controller
                 $sheet->setWidth('G', 25);
                 $sheet->setWidth('H', 25);
                 $sheet->setWidth('I', 15);
-                $sheet->setWidth('J', 10);
+                $sheet->setWidth('J', 30);
                 $sheet->setWidth('K', 30);
                 $sheet->setWidth('L', 25);
                 $sheet->setWidth('M', 25);
                 $sheet->setWidth('N', 25);
                 $sheet->setWidth('O', 25);
                 $sheet->setWidth('P', 25);
-                $sheet->setWidth('Q', 25);
             });
             $excel->sheet('Cuentas General', function ($sheet) use ($cuentas, $funcion) {
                 $sheet->setStyle(array(
@@ -424,14 +420,13 @@ class ReporteCuentaSaldoController extends Controller
                 $sheet->setWidth('G', 25);
                 $sheet->setWidth('H', 25);
                 $sheet->setWidth('I', 15);
-                $sheet->setWidth('J', 10);
+                $sheet->setWidth('J', 30);
                 $sheet->setWidth('K', 30);
                 $sheet->setWidth('L', 25);
                 $sheet->setWidth('M', 25);
                 $sheet->setWidth('N', 25);
                 $sheet->setWidth('O', 25);
                 $sheet->setWidth('P', 25);
-                $sheet->setWidth('Q', 25);
             });
         })->export('xlsx');
     }
