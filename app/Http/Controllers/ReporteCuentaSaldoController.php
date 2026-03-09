@@ -420,13 +420,14 @@ class ReporteCuentaSaldoController extends Controller
                 $sheet->setWidth('G', 25);
                 $sheet->setWidth('H', 25);
                 $sheet->setWidth('I', 15);
-                $sheet->setWidth('J', 30);
+                $sheet->setWidth('J', 10);
                 $sheet->setWidth('K', 30);
                 $sheet->setWidth('L', 25);
                 $sheet->setWidth('M', 25);
                 $sheet->setWidth('N', 25);
                 $sheet->setWidth('O', 25);
                 $sheet->setWidth('P', 25);
+                $sheet->setWidth('Q', 25);
             });
         })->export('xlsx');
     }
