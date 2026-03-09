@@ -12,7 +12,6 @@
         <th>FECHA DOCUMENTO</th>
         <th>TIPO DOCUMENTO</th>
         <th>NUMERO DOCUMENTO</th>
-        <th>FACTURAS RELACIONADAS</th>
         <th>DIAS TRANSCURRIDOS</th>
         <th>MONEDA</th>
         <th>JEFE VENTA</th>
@@ -33,7 +32,6 @@
                 <td>{{$item['FecDocumento_Emis']}}</td>
                 <td>{{$item['TipoDocumento']}}</td>
                 <td>{{$item['NroDocumento']}}</td>
-                <td>{{$item["DOCS"]}}</td>
                 <td>{{$item['diasTranscurridos']}}</td>
                 <td>{{$item['SIM_MONEDA']}}</td>
                 <td>{{$item['JEFE_VENTA']}}</td>
@@ -51,7 +49,7 @@
     </tbody>
     <tfoot>
     <tr style="background: #4285f4; color: white; text-align: center">
-        <th class="center footerho" colspan="13">TOTAL</th>
+        <th class="center footerho" colspan="12">TOTAL</th>
         <th class="center footerho">{{number_format($total_mn, 2, '.', ',')}}</th>
         <th class="center footerho">{{number_format($total_me, 2, '.', ',')}}</th>
     </tr>

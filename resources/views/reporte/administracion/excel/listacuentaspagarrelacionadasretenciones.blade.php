@@ -36,7 +36,6 @@
             <th class="center tablaho">FECHA DOCUMENTO</th>
             <th class="center tablaho">TIPO DOCUMENTO</th>
             <th class="center tablaho">NUMERO DOCUMENTO</th>
-            <th class="center tablaho">FACTURAS</th>
             <th class="center tablaho">DIAS TRANSCURRIDOS</th>
             <th class="center tablaho">MONEDA</th>
             <th class="center tablaho">JEFE VENTA</th>
@@ -60,7 +59,6 @@
                     <td class="border">{{\PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel(new \DateTime($item["FecDocumento"]))}}</td>
                     <td class="border">{{$item['TipoDocumento']}}</td>
                     <td class="border">{{$item['NroDocumento']}}</td>
-                    <td class="border">{{$item["DOCS"]}}</td>
                     <td class="border">{{$item['diasTranscurridos']}}</td>
                     <td class="border">{{$item['SIM_MONEDA']}}</td>
                     <td class="border">{{$item['JEFE_VENTA']}}</td>
@@ -81,7 +79,7 @@
         </tbody>
         <tfoot>
         <tr>
-            <th class="center footerho" colspan="13">Total</th>
+            <th class="center footerho" colspan="12">Total</th>
             <th class="footerho">{{number_format($total_mn, 2, '.', '')}}</th>
             <th class="footerho">{{number_format($total_me, 2, '.', '')}}</th>
             <th class="footerho">{{number_format($total_interes, 2, '.', '')}}</th>
