@@ -63,7 +63,7 @@
         </td>
 
         <td>
-            @IF($item->CREAR_FOLIO=='NO')
+
             <div class="text-center be-checkbox be-checkbox-sm has-primary">
               <input  type="checkbox"
                 class="{{$item->ID_DOCUMENTO}} input_asignar selectfolio"
@@ -76,7 +76,8 @@
                     name="{{$item->ID_DOCUMENTO}}"
               ></label>
             </div>
-            @ENDIF
+            <!-- @IF($item->CREAR_FOLIO=='NO') -->
+            <!-- @ENDIF -->
         </td>
       </tr>                    
     @endforeach
