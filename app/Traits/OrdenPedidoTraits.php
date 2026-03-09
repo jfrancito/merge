@@ -1427,7 +1427,7 @@ WHERE OP.ACTIVO = 1
             'anio_id' => $anio,
         ];
 
-        if (!empty($familia_id)) {
+        if (!empty($centro)) {
             $params['centro_id'] = $centro;
         }
 
