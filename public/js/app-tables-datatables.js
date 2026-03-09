@@ -316,6 +316,33 @@ var App = (function () {
             ordering: false,
         });
 
+        $("#cxcd").dataTable({
+            responsive: true,
+            autoWidth: true,
+            lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+            scrollX: true,
+            scrollY: "300px",
+            ordering: false,
+        });
+
+        $("#cxcba").dataTable({
+            responsive: true,
+            autoWidth: true,
+            lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+            scrollX: true,
+            scrollY: "300px",
+            ordering: false,
+        });
+
+        $("#cxcra").dataTable({
+            responsive: true,
+            autoWidth: true,
+            lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+            scrollX: true,
+            scrollY: "300px",
+            ordering: false,
+        });
+
         $("#reporteordenpedidoestado").dataTable({
             responsive: true,
             autoWidth: true,
