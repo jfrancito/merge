@@ -1,6 +1,6 @@
 var App = (function () {
     'use strict';
-    //console.log("entro");
+
     App.dataTables = function () {
 
         //We use this to apply style to certain elements
@@ -10,7 +10,6 @@ var App = (function () {
                 "<'row be-datatable-body'<'col-sm-12'tr>>" +
                 "<'row be-datatable-footer'<'col-sm-5'i><'col-sm-7'p>>"
         });
-
 
         $("#tdpm").dataTable({
             "lengthMenu": [[500, 1000, -1], [500, 1000, "All"]]
@@ -39,7 +38,6 @@ var App = (function () {
                 sortable: false
             }]
         });
-
 
         $("#nso_check").dataTable({
             dom: 'Bfrtip',
@@ -77,7 +75,6 @@ var App = (function () {
             }]
         });
 
-
         $("#nso_obs").dataTable({
             dom: 'Bfrtip',
             buttons: [
@@ -89,6 +86,7 @@ var App = (function () {
                 sortable: false
             }]
         });
+
         $("#despacholocen").dataTable({
             "lengthMenu": [[50, 100, -1], [50, 100, "All"]],
             order: [[5, "desc"]],
@@ -286,7 +284,6 @@ var App = (function () {
                 "<'row be-datatable-footer'<'col-sm-5'i><'col-sm-7'p>>"
         });
 
-
         $("#estiba").dataTable({
             dom: 'Bfrtip',
             buttons: [
@@ -294,7 +291,6 @@ var App = (function () {
             ],
             "lengthMenu": [[500, 1000, -1], [500, 1000, "All"]]
         });
-
 
         //Enable toolbar button functions
         $("#table3").dataTable({
@@ -313,7 +309,34 @@ var App = (function () {
             lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
             scrollX: true,
             scrollY: "300px",
-            ordering: false,
+            ordering: false
+        });
+
+        $("#reporteordenpedidoestado").dataTable({
+            responsive: true,
+            autoWidth: true,
+            lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+            scrollX: true,
+            scrollY: "300px",
+            ordering: false
+        });
+
+        $("#lista-consolidado-general-terminado").dataTable({
+            responsive: true,
+            autoWidth: true,
+            lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+            scrollX: true,
+            scrollY: "300px",
+            ordering: false
+        });
+
+        $("#cxcr").dataTable({
+            responsive: true,
+            autoWidth: true,
+            lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+            scrollX: true,
+            scrollY: "300px",
+            ordering: false
         });
 
         $("#cxcd").dataTable({
@@ -343,40 +366,13 @@ var App = (function () {
             ordering: false,
         });
 
-        $("#reporteordenpedidoestado").dataTable({
-            responsive: true,
-            autoWidth: true,
-            lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
-            scrollX: true,
-            scrollY: "300px",
-            ordering: false,
-        });
-
-        $("#lista-consolidado-general-terminado").dataTable({
-            responsive: true,
-            autoWidth: true,
-            lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
-            scrollX: true,
-            scrollY: "300px",
-            ordering: false,
-        });
-
-        $("#cxcr").dataTable({
-            responsive: true,
-            autoWidth: true,
-            lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
-            scrollX: true,
-            scrollY: "300px",
-            ordering: false,
-        });
-
         $("#reporteliquidaciones").dataTable({
             responsive: true,
             autoWidth: true,
             lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
             scrollX: true,
             scrollY: "300px",
-            ordering: false,
+            ordering: false
         });
 
         $("#cxpt").dataTable({
@@ -385,7 +381,7 @@ var App = (function () {
             lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
             scrollX: true,
             scrollY: "300px",
-            ordering: false,
+            ordering: false
         });
 
         $("#cxptb").dataTable({
@@ -394,7 +390,7 @@ var App = (function () {
             lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
             scrollX: true,
             scrollY: "300px",
-            ordering: false,
+            ordering: false
         });
 
         $("#cxpr").dataTable({
@@ -403,7 +399,7 @@ var App = (function () {
             lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
             scrollX: true,
             scrollY: "300px",
-            ordering: false,
+            ordering: false
         });
 
         $("#cxprr").dataTable({
@@ -412,7 +408,7 @@ var App = (function () {
             lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
             scrollX: true,
             scrollY: "300px",
-            ordering: false,
+            ordering: false
         });
 
         $("#cesii").dataTable({
@@ -421,7 +417,7 @@ var App = (function () {
             lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
             scrollX: true,
             scrollY: "300px",
-            ordering: false,
+            ordering: false
         });
 
         $("#cesic").dataTable({
@@ -430,7 +426,7 @@ var App = (function () {
             lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
             scrollX: true,
             scrollY: "300px",
-            ordering: false,
+            ordering: false
         });
 
         $("#iscomercial").dataTable({
@@ -439,7 +435,7 @@ var App = (function () {
             lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
             scrollX: true,
             scrollY: "300px",
-            ordering: false,
+            ordering: false
         });
 
         $("#isinternacional").dataTable({
@@ -448,104 +444,91 @@ var App = (function () {
             lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
             scrollX: true,
             scrollY: "300px",
-            ordering: false,
+            ordering: false
         });
 
-      $("#tablavalespendiente").dataTable({
-          responsive: true,
-          autoWidth: true,
-          lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
-          scrollX: true,
-          scrollY: "300px",
-          ordering: false,
-      });
-
-      $("#tablavalespendienteaprueba").dataTable({
-          responsive: true,
-          autoWidth: true,
-          lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
-          scrollX: true,
-          scrollY: "300px",
-          ordering: false,
-      });
-
-        $("#tablaliquidacionespendientes").dataTable({
-          responsive: true,
-          autoWidth: true,
-          lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
-          scrollX: true,
-          scrollY: "300px",
-          ordering: false,
-      });
-
-       $("#tablaDocumentoxml_cdr").dataTable({
-          responsive: true,
-          autoWidth: true,
-          lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
-          scrollX: true,
-          scrollY: "300px",
-          ordering: false,
-      });
-
-      $("#tablalistanegraproveedores").dataTable({
-          responsive: true,
-          autoWidth: true,
-          lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
-          scrollX: true,
-          scrollY: "300px",
-          ordering: false,
-      });
-
-      $("#tablalistafirmavale").dataTable({
-          responsive: true,
-          autoWidth: true,
-          lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
-          scrollX: true,
-          scrollY: "300px",
-          ordering: false,
-      });
-
-      $("#tablalistafirmavaleaprobados").dataTable({
-          responsive: true,
-          autoWidth: true,
-          lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
-          scrollX: true,
-          scrollY: "300px",
-          ordering: false,
-      });
-
-
-      $("#importegastos").dataTable({
-          responsive: true,
-          autoWidth: true,
-          lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
-          scrollX: true,
-          scrollY: "300px",
-          ordering: false,
-      });
-
-      if (!$.fn.DataTable.isDataTable('#vale')) {
-          $('#vale').DataTable({
+        $("#tablavalespendiente").dataTable({
             responsive: true,
             autoWidth: true,
             lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
             scrollX: true,
             scrollY: "300px",
-            ordering: false,
+            ordering: false
         });
-      }
+
+        $("#tablavalespendienteaprueba").dataTable({
+            responsive: true,
+            autoWidth: true,
+            lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+            scrollX: true,
+            scrollY: "300px",
+            ordering: false
+        });
+
+        $("#tablaliquidacionespendientes").dataTable({
+            responsive: true,
+            autoWidth: true,
+            lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+            scrollX: true,
+            scrollY: "300px",
+            ordering: false
+        });
+
+        $("#tablaDocumentoxml_cdr").dataTable({
+            responsive: true,
+            autoWidth: true,
+            lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+            scrollX: true,
+            scrollY: "300px",
+            ordering: false
+        });
+
+        $("#tablalistanegraproveedores").dataTable({
+            responsive: true,
+            autoWidth: true,
+            lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+            scrollX: true,
+            scrollY: "300px",
+            ordering: false
+        });
+
+        $("#tablalistafirmavale").dataTable({
+            responsive: true,
+            autoWidth: true,
+            lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+            scrollX: true,
+            scrollY: "300px",
+            ordering: false
+        });
+
+        $("#tablalistafirmavaleaprobados").dataTable({
+            responsive: true,
+            autoWidth: true,
+            lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+            scrollX: true,
+            scrollY: "300px",
+            ordering: false
+        });
+
+        $("#importegastos").dataTable({
+            responsive: true,
+            autoWidth: true,
+            lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
+            scrollX: true,
+            scrollY: "300px",
+            ordering: false
+        });
 
         if (!$.fn.DataTable.isDataTable('#vale')) {
             $('#vale').DataTable({
                 responsive: true,
                 autoWidth: true,
-                lengthMenu: [[10, 20, 50], [10, 20, 50]],
+                lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
                 scrollX: true,
                 scrollY: "300px",
                 ordering: false
             });
         }
-
 
         $("#valeaprobado").dataTable({
             responsive: true,
@@ -553,25 +536,25 @@ var App = (function () {
             lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
             scrollX: true,
             scrollY: "300px",
-            ordering: false,
+            ordering: false
         });
 
-       $("#tablaconsolidadopedido").dataTable({
+        $("#tablaconsolidadopedido").dataTable({
             responsive: true,
             autoWidth: true,
             lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
             scrollX: true,
             scrollY: "300px",
-            ordering: false,
+            ordering: false
         });
 
-         $("#tablaconsolidadopedidogeneral").dataTable({
+        $("#tablaconsolidadopedidogeneral").dataTable({
             responsive: true,
             autoWidth: true,
             lengthMenu: [[5000, 7500, 10000], [5000, 7500, 10000]],
             scrollX: true,
             scrollY: "300px",
-            ordering: false,
+            ordering: false
         });
 
         function number_format(num, decimals = 0, decimal_separator = ".", thousands_separator = ",") {
@@ -592,8 +575,6 @@ var App = (function () {
             // Unir con el separador de decimales
             return parts.join(decimals > 0 ? decimal_separator : "");
         }
-
-
     };
 
     return App;

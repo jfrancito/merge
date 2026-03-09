@@ -54,7 +54,7 @@
     </tbody>
     <tfoot>
     <tr style="background: #4285f4; color: white; text-align: center">
-        <th class="center footerho" colspan="13">TOTAL</th>
+        <th class="center footerho" colspan="12">TOTAL</th>
         <th class="center footerho">{{number_format($total_mn, 2, '.', ',')}}</th>
         <th class="center footerho">{{number_format($total_me, 2, '.', ',')}}</th>
     </tr>
