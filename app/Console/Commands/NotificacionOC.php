@@ -101,20 +101,25 @@ class NotificacionOC extends Command
         $this->guadarpdfoi();
         $this->envio_correo_aprobado();
 
-        if (in_array($horaActual, [
-            '00:30', '01:00', '01:30', '02:00', '02:30', '03:00', '03:30', '04:00', '04:30', '05:00', '05:30', '06:00', '06:30', '07:00', '07:30',
-            '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00',
-            '23:00', '23:30'
-        ])) {
-            $this->sunatarchivos();
-        }
-
         if($horaActual == '01:00' || $horaActual == '03:00' || $horaActual == '05:00'){
             $this->cambiar_fecha_vencimiento();
             $this->envio_detraccion_sunat();
         }
 
+        if($horaActual == '01:00' || $horaActual == '01:30'){
+            $this->sut_traer_data_sunat('IACHEM0000010394');
+        }
+        if($horaActual == '02:00' || $horaActual == '02:30'){
+            $this->sut_traer_data_sunat('IACHEM0000007086');
+        }
 
+        if($horaActual == '03:00'){
+            $this->ejecutar_query_osiris_compras();
+        }
+
+        if($horaActual == '03:30' || $horaActual == '04:30'|| $horaActual == '05:30'){
+            $this->sunatarchivos();
+        }
 
         // //precios de supermercado
         // try{    

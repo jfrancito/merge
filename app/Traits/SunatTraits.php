@@ -22,6 +22,10 @@ use File;
 trait SunatTraits
 {
 
+	private function ejecutar_query_osiris_compras() {
+		DB::connection('sqlsrv')->statement('EXEC MIGRAR_COMPRAS_ENCONTRAR_DETALLE');
+	}
+
 	private function sunatarchivos() {
 
 
