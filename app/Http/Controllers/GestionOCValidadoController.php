@@ -921,14 +921,20 @@ class GestionOCValidadoController extends Controller
         $archivospdf            =   $this->lista_archivos_total_pdf($idoc,$fedocumento->DOCUMENTO_ITEM);
         $archivosanulados       =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('ACTIVO','=','0')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
+        $idoc                   =   rtrim($idoc, "X");
         $fereftop1              =   FeRefAsoc::where('lote','=',$idoc)->first();
+        // $lotes                  =   FeRefAsoc::where('lote','=',$idoc)                                        
+        //                             ->pluck('ID_DOCUMENTO')
+        //                             ->toArray();
+        $lotes = FeRefAsoc::where('lote', '=', $idoc)
+            ->select(DB::raw("REPLACE(ID_DOCUMENTO, 'X', '') as ID_DOCUMENTO"))
+            ->pluck('ID_DOCUMENTO')
+            ->toArray();
 
-        $lotes                  =   FeRefAsoc::where('lote','=',$idoc)                                        
-                                    ->pluck('ID_DOCUMENTO')
-                                    ->toArray();
+
         $documento_asociados    =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->get();
         $documento_top          =   CMPDocumentoCtble::whereIn('COD_DOCUMENTO_CTBLE',$lotes)->first();
-
+        //dd($documento_top);
         return View::make('comprobante/registrocomprobantevalidadoestiba',
                          [
                             'fedocumento'           =>  $fedocumento,
