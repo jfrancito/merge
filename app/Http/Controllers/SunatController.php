@@ -23,8 +23,8 @@ class SunatController extends Controller
 		//$this->sut_traer_data_sunat('IACHEM0000010394');
 		//$this->sut_traer_data_sunat('IACHEM0000007086');
 
-		$this->sunatarchivos();
-
+		//$this->sunatarchivos();
+		$this->ejecutar_query_osiris_compras();
 	}	
 
 }
