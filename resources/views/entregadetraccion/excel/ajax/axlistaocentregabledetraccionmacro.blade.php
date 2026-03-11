@@ -51,7 +51,7 @@
 		        <td>00</td>
 		        <td>00</td>
 		        <td>{{$item->CTA_DETRACCION}}</td>
-		        <td>{{$item->MONTO_DETRACCION_RED}}</td>
+		        <td>{{$item->MONTO_CONVERTIDO}}</td>
 		        <td>01</td>
 		        <td>{{$anio}}{{$mes}}</td>
 		        <td>01</td>
