@@ -1852,7 +1852,7 @@ class GestionEstibaController extends Controller
                             $tipo_documento_le  =   $factura->gettipoDoc();
                             $moneda_le          =   $factura->gettipoMoneda();
 
-                            if($request['operacion_id'] == 'DOCUMENTO_INTERNO_COMPRA '){
+                            if($request['operacion_id'] == 'DOCUMENTO_INTERNO_COMPRA'){
 
                                 $archivosdelfe      =   CMPCategoria::where('TXT_GRUPO','=','DOCUMENTOS_COMPRA')
                                                         ->whereIn('COD_CATEGORIA', ['DCC0000000000002','DCC0000000000003','DCC0000000000004','DCC0000000000007','DCC0000000000008'])

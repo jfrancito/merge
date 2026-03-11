@@ -8483,7 +8483,7 @@ trait ComprobanteTraits
         $listadatos = VDetraccionesConPagos::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'V_DETRACCIONES_CON_PAGOS.ID_DOCUMENTO')
             ->leftJoin('CMP.TIPO_CAMBIO', function($join) {
                 $join->on(DB::raw('CAST(FE_DOCUMENTO.FEC_VENTA AS DATE)'), '=', 'CMP.TIPO_CAMBIO.FEC_CAMBIO')
-                     ->where('CMP.TIPO_CAMBIO.CAN_COMPRA', '>', 0);
+                     ->where('CMP.TIPO_CAMBIO.CAN_VENTA', '>', 0);
             })
             ->where('FE_DOCUMENTO.FOLIO_DETRACCION_RESERVA','=', $folio)
             ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000005', 'ETM0000000000008'])
@@ -8491,10 +8491,10 @@ trait ComprobanteTraits
                 DB::raw('V_DETRACCIONES_CON_PAGOS.*'),
                 DB::raw('FE_DOCUMENTO.*'),
                 DB::raw('FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_VOUCHER'),
-                DB::raw('CMP.TIPO_CAMBIO.CAN_COMPRA AS TIPO_CAMBIO_COMPRA'),
+                DB::raw('CMP.TIPO_CAMBIO.CAN_VENTA AS TIPO_CAMBIO_COMPRA'),
                 DB::raw("CASE 
                     WHEN FE_DOCUMENTO.MONEDA = 'USD' 
-                    THEN ROUND(V_DETRACCIONES_CON_PAGOS.MONTO_DETRACCION_RED * CMP.TIPO_CAMBIO.CAN_COMPRA, 0)
+                    THEN ROUND(V_DETRACCIONES_CON_PAGOS.MONTO_DETRACCION_RED * CMP.TIPO_CAMBIO.CAN_VENTA, 0)
                     ELSE ROUND(V_DETRACCIONES_CON_PAGOS.MONTO_DETRACCION_RED, 0)
                 END AS MONTO_CONVERTIDO")
             )
