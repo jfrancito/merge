@@ -269,6 +269,76 @@ $(document).ready(function(){
 
     });
 
+    $(".cfedocumento").on('click', '#check_all_folios', function(e) {
+        var isCheckedAll = $(this).is(':checked');
+        var folio_sel = $('#folio_sel').val();
+        
+        if(folio_sel == ''){
+            alerterrorajax("Seleccione un folio primero");
+            e.preventDefault();
+            return false;
+        }
+
+        var checkBoxes = $(".listatabla tbody tr .selectfolio");
+        var checkboxesToProcess = [];
+
+        checkBoxes.each(function() {
+            if ($(this).is(':checked') !== isCheckedAll) {
+                checkboxesToProcess.push(this);
+            }
+        });
+
+        if (checkboxesToProcess.length > 0) {
+            abrircargando("Procesando múltiple selección...");
+            procesarCheckSequentialFolios(checkboxesToProcess, 0, isCheckedAll, folio_sel, function() {
+                cerrarcargando();
+                alertajax("Se finalizó de procesar los registros.");
+            });
+        }
+    });
+
+    function procesarCheckSequentialFolios(checkboxes, index, isCheckedAll, folio_sel, callback) {
+        if (index >= checkboxes.length) {
+            callback();
+            return;
+        }
+
+        var _token = $('#token').val();
+        var currentCheckbox = $(checkboxes[index]);
+        var id = currentCheckbox.attr('id');
+        var check = isCheckedAll ? 1 : 0;
+
+        var data = {
+            _token: _token,
+            check: check,
+            folio_sel: folio_sel,
+            id: id,
+        };
+
+        $.ajax({
+            type: "POST",
+            url: carpeta + '/ajax-crear-folio-pagos-detracion',
+            data: data,
+            success: function(response) {
+                if (response.ope_ind == '0') {
+                    $('.folios_hit').html(response.lote_ver);
+                    currentCheckbox.prop('checked', isCheckedAll);
+                } else {
+                    currentCheckbox.prop('checked', !isCheckedAll);
+                }
+                setTimeout(function() {
+                    procesarCheckSequentialFolios(checkboxes, index + 1, isCheckedAll, folio_sel, callback);
+                }, 100);
+            },
+            error: function(data) {
+                currentCheckbox.prop('checked', !isCheckedAll);
+                setTimeout(function() {
+                    procesarCheckSequentialFolios(checkboxes, index + 1, isCheckedAll, folio_sel, callback);
+                }, 100);
+            }
+        });
+    }
+
 
 
     $(".cfedocumento").on('dblclick','.dobleclickpc', function(e) {

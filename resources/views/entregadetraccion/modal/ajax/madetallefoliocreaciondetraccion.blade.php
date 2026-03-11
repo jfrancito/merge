@@ -45,6 +45,11 @@
                                 <span class="mdi mdi-eye mdidet" data_folio='{{$item->FOLIO}}'></span>
                                 <!-- <span class="mdi mdi-floppy mdisave" data_folio='{{$item->FOLIO}}' data_glosa='{{$item->TXT_GLOSA}}'></span> -->
                                 <span class="mdi mdi-delete mdiex" data_folio='{{$item->FOLIO}}'></span>
+                                <a href="{{ url('/descargar-folio-excel-detraccion-reserva/'.$item->FOLIO) }}">
+                                  <span class="mdi mdi-file mdiexcel" data_folio='{{$item->FOLIO}}'></span>
+                                </a>  
+
+
                               </div>
                           </td>
                         </tr>
@@ -56,7 +61,7 @@
           <div id="crearfolios" class="tab-pane cont">
             <form method="POST" action="{{ url('/crear-folio-entregable-detraccion/'.$idopcion) }}">
                   {{ csrf_field() }}
-<input type="hidden" name="device_info" id='device_info'>
+                  <input type="hidden" name="device_info" id='device_info'>
 
                     <div class="col-md-12">
                         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">

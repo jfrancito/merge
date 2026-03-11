@@ -6,7 +6,12 @@
       <th>DOCUMENTO</th>
       <th>PAGO</th>
       <th>NETO A PAGAR</th>
-      <th></th>
+      <th>
+        <div class="text-center be-checkbox be-checkbox-sm has-primary">
+          <input type="checkbox" id="check_all_folios">
+          <label for="check_all_folios"></label>
+        </div>
+      </th>
     </tr>
   </thead>
   <tbody>

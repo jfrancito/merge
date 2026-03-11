@@ -177,7 +177,10 @@ class GestionOCContabilidadController extends Controller
                                     ->get();
 
         $banco_id               =   'BAM0000000000005';
-        $arraybancos            =   DB::table('CMP.CATEGORIA')->where('COD_CATEGORIA','=','BAM0000000000005')->where('TXT_GRUPO','=','BANCOS_MERGE')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
+        $arraybancos            =   DB::table('CMP.CATEGORIA')
+                                    ->whereIn('COD_CATEGORIA', ['BAM0000000000003', 'BAM0000000000001', 'BAM0000000000005'])
+                                    ->where('TXT_GRUPO','=','BANCOS_MERGE')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
+
         $combobancos            =   $arraybancos;
 
         $combo_moneda           =   $this->gn_generacion_combo_categoria('MONEDA','Seleccione moneda','');
@@ -566,7 +569,72 @@ class GestionOCContabilidadController extends Controller
 
 
     }
+    public function actionDescargarDocumentoFolioDetraccionReserva($folio_codigo)
+    {
 
+        $folio                  =   FeDocumentoEntregableDetraccion::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE_DETRACCION.USUARIO_CREA')
+                                    ->where('FOLIO','=',$folio_codigo)->first();
+
+        $listadatossolesotro    =   array();
+        $listadatosdolarotro    =   array();
+        $listadatossoles    =   $this->con_lista_cabecera_comprobante_entregable_modal_moneda_detraccion_reserva($folio->FOLIO,'MON0000000000001');
+        //COD_CATEGORIA_MONEDA
+        $operacion_id           =   $folio->OPERACION;
+        $empresa                =    STDEmpresa::where('COD_EMPR','=',$folio->COD_EMPRESA)->first();
+        $titulo                 =   'FOLIO('.$folio_codigo.') '.$empresa->NOM_EMPR;
+        $funcion                =   $this;
+
+        Excel::create($titulo, function($excel) use ($listadatossoles,$listadatossolesotro,$listadatosdolarotro,$operacion_id,$funcion,$folio,$empresa) {
+
+            if($folio->COD_CATEGORIA_MONEDA=='MON0000000000001' or $folio->COD_CATEGORIA_MONEDA==''){
+
+
+                $excel->sheet('Soles', function($sheet) use ($listadatossoles,$listadatossolesotro,$operacion_id,$funcion,$folio,$empresa){
+
+                    $sheet->setSelectedCells('C1');
+
+                    $sheet->setWidth('A', 8);
+                    $sheet->setWidth('B', 20);
+                    $sheet->setWidth('C', 20);
+                    $sheet->setWidth('D', 40);
+                    $sheet->setWidth('E', 40);
+                    $sheet->setWidth('F', 30);
+                    $sheet->setWidth('G', 30);
+                    $sheet->setWidth('H', 30);
+                    $sheet->setWidth('I', 20);
+                    $sheet->setWidth('J', 20);
+                    $sheet->setWidth('K', 20);
+                    $sheet->setWidth('L', 30);
+                    $sheet->setWidth('M', 20);
+                    $sheet->setWidth('N', 20);
+                    $sheet->setWidth('O', 20);
+
+
+                    $sheet->mergeCells('B2:C2');
+                    $sheet->mergeCells('B3:C3');
+                    $sheet->mergeCells('B4:C4');
+                    $sheet->mergeCells('B5:C5');
+                    $sheet->mergeCells('B6:C6');
+                    $sheet->mergeCells('B7:C7');
+
+                    $sheet->cell('A1', function($cell) {
+                                $cell->setFontColor('#FFFFFF');   // Texto blanco
+                            });
+
+                    $sheet->loadView('entregadetraccion/excel/eentregabledetraccion')->with('listadatos',$listadatossoles)
+                                                                          ->with('listadatosotro',$listadatossolesotro)
+                                                                          ->with('funcion',$funcion)
+                                                                          ->with('folio',$folio)
+                                                                          ->with('empresa',$empresa)
+                                                                          ->with('simbolo','S/.')
+                                                                          ->with('operacion_id',$operacion_id);
+                });
+            }
+
+        })->setActiveSheetIndex(0)->export('xls');
+
+
+    }
 
     public function actionDescargarDocumentoFolioDetraccionMacro($folio_codigo)
     {

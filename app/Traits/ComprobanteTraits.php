@@ -8478,11 +8478,27 @@ trait ComprobanteTraits
 
 
 
+    private function con_lista_cabecera_comprobante_entregable_modal_moneda_detraccion_reserva($folio,$moneda_id) {
+
+
+        $listadatos             =   VDetraccionesConPagos::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'V_DETRACCIONES_CON_PAGOS.ID_DOCUMENTO')
+                                    ->where('FE_DOCUMENTO.FOLIO_DETRACCION_RESERVA','=',$folio)
+                                    ->where('V_DETRACCIONES_CON_PAGOS.COD_CATEGORIA_MONEDA','=',$moneda_id)
+                                    ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
+                                    ->select(DB::raw('V_DETRACCIONES_CON_PAGOS.* ,FE_DOCUMENTO.*,
+                                        FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_VOUCHER'))
+                                    ->orderBy('V_DETRACCIONES_CON_PAGOS.FEC_EMISION','asc')
+                                    ->get();
+
+
+        return  $listadatos;
+    }
+
 
     private function con_lista_cabecera_comprobante_entregable_detraccion($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$moneda_id,$operacion_id) {
 
         $fecha_corte            =   date('Ymd');
-
+        //dd($operacion_id);
         $listadatos             =   VDetraccionesConPagos::whereRaw("CAST(FEC_EMISION AS DATE) >= ? and CAST(FEC_EMISION AS DATE) <= ?", [$fecha_inicio,$fecha_fin])
                                     ->where('COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                     ->where(function ($query) {

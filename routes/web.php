@@ -243,6 +243,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	);
 
 
+	//SUSPENSION DE 4TA CATEGORIA
+	Route::any('/gestion-de-contrato-acopio/{idopcion}', 'GestionContratoAcopioController@actionListarContratoAcopio');
+	Route::any('/agregar-contrato-acopio/{idopcion}', 'GestionContratoAcopioController@actionAgregarContratoAcopio');
 
 
 
@@ -713,6 +716,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/descargar-folio-excel-detraccion/{folio}', 'GestionOCContabilidadController@actionDescargarDocumentoFolioDetraccion');
 	Route::any('/descargar-folio-excel-detraccion-macro/{folio}', 'GestionOCContabilidadController@actionDescargarDocumentoFolioDetraccionMacro');
 
+	Route::any('/descargar-folio-excel-detraccion-reserva/{folio}', 'GestionOCContabilidadController@actionDescargarDocumentoFolioDetraccionReserva');
 
 
 
@@ -1174,6 +1178,28 @@ Route::get('buscarempresarenta', function (Illuminate\Http\Request $request) {
 	    return \Response::json($valid_tags);
     });
 
+
+	Route::get('buscarempresacontrato', function (Illuminate\Http\Request $request) {
+	$term = $request->term ?: '';
+	$tags = DB::table('STD.EMPRESA')
+		->where(function ($query) use ($term) {
+		    $query->where('STD.EMPRESA.NOM_EMPR', 'like', '%' . $term . '%')
+		    	->orWhere('STD.EMPRESA.NRO_DOCUMENTO', 'like', '%' . $term . '%');
+	    }
+	    )
+	    	->where('STD.EMPRESA.COD_ESTADO', '=', 1)
+	    	->take(100)
+	    	->select(
+	    	DB::raw("
+			  STD.EMPRESA.NRO_DOCUMENTO + ' - '+ STD.EMPRESA.NOM_EMPR AS NOMBRE")
+	    )
+	    	->pluck('NOMBRE', 'NOMBRE');
+	    $valid_tags = [];
+	    foreach ($tags as $id => $tag) {
+		    $valid_tags[] = ['id' => $id, 'text' => $tag];
+	    }
+	    return \Response::json($valid_tags);
+    });
 
 
 Route::get('buscarproducto', function (Illuminate\Http\Request $request) {
