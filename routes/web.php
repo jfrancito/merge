@@ -252,6 +252,13 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-combo-subcuenta-anti', 'GestionContratoAcopioController@actionAjaxComboSubCuentaAnti');
 	Route::any('/gestion-revisar-acopio-contrato/{idopcion}/{idordencompra}', 'GestionContratoAcopioController@actionGestionRevisarAcopioContrato');
 
+	Route::any('/gestion-de-aprobar-contrato-acopio/{idopcion}', 'GestionContratoAcopioController@actionAprobarContratoAcopio');
+	Route::any('/aprobar-contrato-acopio-acopio/{idopcion}/{idordencompra}', 'GestionContratoAcopioController@actionAprobarAcopioCA');
+	Route::any('/agregar-extorno-acopio-ca/{idopcion}/{idordencompra}', 'GestionContratoAcopioController@actionAgregarExtornoAcopioCA');
+
+	Route::any('/gestion-de-listar-contrato-acopio/{idopcion}', 'GestionContratoAcopioController@actionListarGestionContratoAcopio');
+
+
 
 	//SUSPENSION DE 4TA CATEGORIA
 	Route::any('/gestion-de-suspension-ta-categoria/{idopcion}', 'GestionCuartaCategoriaController@actionListarSuspensionCuarta');
