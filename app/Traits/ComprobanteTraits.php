@@ -8463,14 +8463,26 @@ trait ComprobanteTraits
     private function con_lista_cabecera_comprobante_entregable_modal_moneda_detraccion($folio,$moneda_id) {
 
 
-        $listadatos             =   VDetraccionesConPagos::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'V_DETRACCIONES_CON_PAGOS.ID_DOCUMENTO')
-                                    ->where('FE_DOCUMENTO.FOLIO_DETRACCION','=',$folio)
-                                    ->where('V_DETRACCIONES_CON_PAGOS.COD_CATEGORIA_MONEDA','=',$moneda_id)
-                                    ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
-                                    ->select(DB::raw('V_DETRACCIONES_CON_PAGOS.* ,FE_DOCUMENTO.*,
-                                        FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_VOUCHER'))
-                                    ->orderBy('V_DETRACCIONES_CON_PAGOS.FEC_EMISION','asc')
-                                    ->get();
+        $listadatos = VDetraccionesConPagos::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'V_DETRACCIONES_CON_PAGOS.ID_DOCUMENTO')
+            ->leftJoin('CMP.TIPO_CAMBIO', function($join) {
+                $join->on(DB::raw('CAST(FE_DOCUMENTO.FEC_VENTA AS DATE)'), '=', 'CMP.TIPO_CAMBIO.FEC_CAMBIO')
+                     ->where('CMP.TIPO_CAMBIO.CAN_VENTA', '>', 0);
+            })
+            ->where('FE_DOCUMENTO.FOLIO_DETRACCION_RESERVA','=', $folio)
+            ->whereIn('FE_DOCUMENTO.COD_ESTADO', ['ETM0000000000005', 'ETM0000000000008'])
+            ->select(
+                DB::raw('V_DETRACCIONES_CON_PAGOS.*'),
+                DB::raw('FE_DOCUMENTO.*'),
+                DB::raw('FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_VOUCHER'),
+                DB::raw('CMP.TIPO_CAMBIO.CAN_VENTA AS TIPO_CAMBIO_COMPRA'),
+                DB::raw("CASE 
+                    WHEN FE_DOCUMENTO.MONEDA = 'USD' 
+                    THEN ROUND((FE_DOCUMENTO.TOTAL_VENTA_ORIG*FE_DOCUMENTO.PORC_DETRACCION)/100 * CMP.TIPO_CAMBIO.CAN_VENTA, 0)
+                    ELSE ROUND(FE_DOCUMENTO.MONTO_DETRACCION_RED, 0)
+                END AS MONTO_CONVERTIDO")
+            )
+            ->orderBy('V_DETRACCIONES_CON_PAGOS.FEC_EMISION', 'asc')
+            ->get();
 
 
         return  $listadatos;
