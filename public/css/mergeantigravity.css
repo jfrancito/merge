@@ -1,0 +1,181 @@
+/* CSS Generado para el Módulo Contrato Acopio */
+
+.modern-panel {
+    border-radius: 12px !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05) !important;
+    border: none !important;
+    overflow: hidden;
+}
+
+.panel-heading-divider {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to right, #ffffff, #f8f9fa);
+    padding: 20px 25px !important;
+}
+
+.main-title {
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    color: #1a2a3a !important;
+    display: block;
+}
+
+.panel-subtitle {
+    color: #7f8c8d !important;
+    font-size: 0.9rem !important;
+}
+
+.modern-form {
+    padding: 10px 15px;
+}
+
+.form-footer {
+    margin-top: 30px;
+    padding-top: 25px;
+    border-top: 1px solid #edf2f7;
+}
+
+.footer-info {
+    color: #95a5a6;
+    font-size: 0.85rem;
+}
+
+.btn-xl {
+    padding: 10px 24px !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+}
+
+.btn-primary.btn-xl {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%) !important;
+    border: none !important;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3) !important;
+}
+
+.btn-primary.btn-xl:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4) !important;
+}
+
+.badge-primary {
+    background-color: #3498db;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+/* Estilos internos del formulario (facontratoacopio) */
+
+.modern-form-container {
+    padding: 5px 15px;
+}
+
+.form-field {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    font-weight: 600 !important;
+    color: #4a5568 !important;
+    margin-bottom: 8px !important;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    text-align: left !important;
+    display: block !important;
+    padding-top: 0 !important;
+}
+
+.text-danger {
+    color: #e53e3e !important;
+}
+
+.select2-container .select2-selection--single {
+    height: 38px !important;
+    padding: 4px 12px;
+    border: 1px solid #cbd5e0 !important;
+    border-radius: 4px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 36px !important;
+}
+
+.form-control {
+    height: 38px !important;
+    border-radius: 4px !important;
+    border: 1px solid #cbd5e0 !important;
+    box-shadow: none !important;
+    font-size: 13px !important;
+    color: #2d3748 !important;
+}
+
+.input-group-addon {
+    background-color: #f7fafc !important;
+    border: 1px solid #cbd5e0 !important;
+    color: #718096 !important;
+    border-radius: 4px 0 0 4px !important;
+}
+
+.form-control:focus {
+    border-color: #4285f4 !important;
+}
+
+.input-group .form-control {
+    border-radius: 0 4px 4px 0 !important;
+}
+
+.section-title {
+    color: #2b6cb0;
+    font-weight: 600;
+    margin-top: 25px;
+    margin-bottom: 5px;
+    font-size: 16px;
+}
+
+.section-divider {
+    margin-top: 5px;
+    margin-bottom: 25px;
+    border-top: 2px solid #e2e8f0;
+}
+
+.highlight-box {
+    background: #ebf8fa !important;
+    padding: 15px 20px !important;
+    border-radius: 8px !important;
+    border: 1px dashed #4285f4 !important;
+    margin-top: -15px;
+}
+
+.highlight-box .form-control {
+    font-size: 16px !important;
+    font-weight: bold !important;
+    color: #2b6cb0 !important;
+}
+
+.ajax_combo_cuenta .form-group, .ajax_combo_subcuenta .form-group {
+    margin-bottom: 20px;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.ajax_combo_cuenta .col-sm-12, .ajax_combo_subcuenta .col-sm-12 {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.ajax_combo_cuenta label, .ajax_combo_subcuenta label {
+    font-weight: 600 !important;
+    color: #4a5568 !important;
+    margin-bottom: 8px !important;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    text-align: left !important;
+    display: block !important;
+    padding-top: 0 !important;
+}
