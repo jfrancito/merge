@@ -149,7 +149,7 @@
 
             <div class="form-field">
                 <label class="form-label">TERCERO A PAGAR <span class="text-danger">(*)</span></label>
-                {!! Form::select('tercero_id_detalle_input', $combo_empresa, array($empresa_id), ['class' => 'select2 form-control', 'id' => 'tercero_id_detalle_input', 'required' => '']) !!}
+                {!! Form::select('tercero_id_detalle_input', $combo_empresa, array($empresa_id), ['class' => 'select2 form-control', 'id' => 'tercero_id_detalle_input']) !!}
             </div>
 
 

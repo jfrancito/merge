@@ -43,7 +43,7 @@ use PDF;
 use App\Traits\GeneralesTraits;
 use App\Traits\ContratoAcopioTraits;
 use App\Traits\ComprobanteTraits;
-
+use App\Traits\LiquidacionGastoTraits;
 
 use Carbon\Carbon;
 use Hashids;
@@ -55,7 +55,7 @@ class GestionContratoAcopioController  extends Controller
     use GeneralesTraits;
     use ContratoAcopioTraits;
     use ComprobanteTraits;
-
+    use LiquidacionGastoTraits;
     public function actionListarContratoAcopio($idopcion)
     {
         /******************* validar url **********************/
@@ -75,6 +75,87 @@ class GestionContratoAcopioController  extends Controller
                          ]);
     }
 
+
+    public function actionAjaxComboSubCuentaAnti(Request $request)
+    {
+
+        $cuenta_id = $request['cuenta_id'];
+
+        //dd($cuenta_id);
+
+        $subcuenta_id = "";
+        $combo_subcuenta = $this->lg_combo_subcuenta("Seleccione SubCuenta", $cuenta_id);
+
+        return View::make('general/ajax/combosubcuentaanti',
+            [
+                'subcuenta_id' => $subcuenta_id,
+                'combo_subcuenta' => $combo_subcuenta,
+                'ajax' => true,
+            ]);
+
+    }
+
+    public function actionAjaxComboCuentaAnti(Request $request)
+    {
+
+        $empresa_id = $request['empresa_id'];
+        $cuenta_id = "";
+        $trabajador = DB::table('STD.TRABAJADOR')
+            ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+            ->first();
+
+        $dni = '';
+        $centro_id = '';
+        if (count($trabajador) > 0) {
+            $dni = $trabajador->NRO_DOCUMENTO;
+        }
+
+
+        $trabajadorespla = DB::table('WEB.platrabajadores')
+            ->where('situacion_id', 'PRMAECEN000000000002')
+            ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+            ->where('dni', $dni)
+            ->first();
+        if (count($trabajadorespla) > 0) {
+            $centro_id = $trabajadorespla->centro_osiris_id;
+        }
+
+        $terceros = DB::table('TERCEROS')
+            ->where('USER_ID', Session::get('usuario')->id)
+            ->where('ACTIVO', 1)
+            ->first();
+        if (count($terceros) > 0) {
+            $centro_id = $terceros->COD_CENTRO;
+        }
+
+        //dd($empresa_id);
+
+        $cadena = $empresa_id;
+        $partes = explode(" - ", $cadena);
+        $nombre = '';
+        $ruc = '';
+        if (count($partes) > 1) {
+            $ruc = trim($partes[0]);
+            $nombre = trim($partes[1]);
+        }
+
+        $empresa = DB::table('STD.EMPRESA ')
+            ->where('NRO_DOCUMENTO', $ruc)
+            ->where('COD_ESTADO', 1)
+            ->first();
+        //DD($empresa->COD_EMPR);
+
+        $combo_cuenta = $this->lg_combo_cuenta_lg_nuevo('Seleccione una Cuenta', '', '', $centro_id, $empresa->COD_EMPR);
+
+
+        return View::make('general/ajax/combocuentaanti',
+            [
+
+                'cuenta_id' => $cuenta_id,
+                'combo_cuenta' => $combo_cuenta,
+                'ajax' => true,
+            ]);
+    }
 
 
     public function actionAgregarContratoAcopio($idopcion,Request $request)
@@ -102,27 +183,84 @@ class GestionContratoAcopioController  extends Controller
                     $cuenta_id                           =   $request['cuenta_id'];
                     $subcuenta_id                        =   $request['subcuenta_id'];
 
-                    $empresa                             =   STDEmpresa::where('COD_EMPR', '=', $empresa_id)->first();
-                    $idcab                               =   $this->funciones->getCreateIdMaestradocpla('CONTRATO_ANTICIPO','COAN');
+                    $cuenta = CMPContrato::where('COD_CONTRATO', '=', $cuenta_id)->first();
+                    $subcuenta = CMPContratoCultivo::where('COD_CONTRATO', '=', $subcuenta_id)->first();
+                    $cod_contrato = $cuenta->COD_CONTRATO; // Ejemplo de contrato
+                    $cod_categoria_moneda = $cuenta->COD_CATEGORIA_MONEDA; // Ejemplo de moneda
+                    $txt_categoria_tipo_contrato = $cuenta->TXT_CATEGORIA_TIPO_CONTRATO; // Ejemplo de categoría
+                    // Obtener los primeros 6 caracteres
+                    $parte1 = substr($cod_contrato, 0, 6);
+                    // Obtener los últimos 10 caracteres y convertir a entero
+                    $parte2 = intval(substr($cod_contrato, -10));
+                    // Determinar el símbolo de la moneda
+                    $simbolo = ($cod_categoria_moneda === 'MON0000000000001') ? 'S/' : '$';
+                    // Concatenar todo
+                    $contrato = $parte1 . '-0' . $parte2 . ' -- ' . $simbolo . ' ' . $txt_categoria_tipo_contrato;
+                    //dd($empresa_id);
+                    $cadena = $empresa_id;
+                    $partes = explode(" - ", $cadena);
+                    $ruc = '';
+                    if (count($partes) > 1) {
+                        $ruc = trim($partes[0]);
+
+                    }
+                    $empresa_trab = STDEmpresa::where('NRO_DOCUMENTO', '=', $ruc)->first();
+
+
+                    $trabajador = DB::table('STD.TRABAJADOR')
+                        ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                        ->first();
+                    $dni = '';
+                    $centro_id = '';
+                    if (count($trabajador) > 0) {
+                        $dni = $trabajador->NRO_DOCUMENTO;
+                    }
+                    $trabajadorespla = DB::table('WEB.platrabajadores')
+                        ->where('situacion_id', 'PRMAECEN000000000002')
+                        ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+                        ->where('dni', $dni)
+                        ->first();
+
+
+                    if (count($trabajadorespla) > 0) {
+                        $centro_id = $trabajadorespla->centro_osiris_id;
+                    }
+                    
+                    $centro = ALMCentro::where('COD_CENTRO', '=', $centro_id)->first();
+
+
+                    $variedad                           =   DB::table('CMP.CATEGORIA')
+                                                            ->where('COD_CATEGORIA', '=', $variedad_id)
+                                                            ->first();
+
+                    $empresa                            =   STDEmpresa::where('COD_EMPR', '=', $empresa_id)->first();
+                    $idcab                              =   $this->funciones->getCreateIdMaestradocpla('CONTRATO_ANTICIPO','COAN');
 
                     $cabecera                           =   new ContratoAnticipo;
                     $cabecera->ID_DOCUMENTO             =   $idcab;
+                    $cabecera->FECHA_CONTRATO           =   date_format(date_create($this->fechaactual), 'Ymd');
+                    $cabecera->COD_EMPRESA              =   Session::get('empresas')->COD_EMPR;
+                    $cabecera->TXT_EMPRESA              =   Session::get('empresas')->NOM_EMPR;
+                    $cabecera->COD_CENTRO               =   $centro->COD_CENTRO;
+                    $cabecera->TXT_CENTRO               =   $centro->NOM_CENTRO;
+                    $cabecera->NRO_CONTRATO             =   $nro_contrato;
+                    $cabecera->COD_VARIEDAD             =   $variedad->COD_CATEGORIA;
+                    $cabecera->TXT_VARIEDAD             =   $variedad->NOM_CATEGORIA;
+                    $cabecera->COD_PROVEEDOR            =   $empresa_trab->COD_EMPR;
+                    $cabecera->TXT_PROVEEDOR            =   $empresa_trab->NOM_EMPR;
+                    $cabecera->COD_CUENTA               =   $cuenta->COD_CONTRATO;
+                    $cabecera->TXT_CUENTA               =   $contrato;
+                    $cabecera->COD_SUB_CUENTA           =   $subcuenta->COD_CONTRATO;
+                    $cabecera->TXT_SUB_CUENTA           =   $subcuenta->TXT_ZONA_COMERCIAL . '-' . $subcuenta->TXT_ZONA_CULTIVO;
                     $cabecera->FECHA_COSECHA            =   date_format(date_create($fecha_cosecha), 'Ymd');
-                    $cabecera->COD_EMPRESA              =   $empresa->COD_EMPR;
-                    $cabecera->RUC                      =   $empresa->NRO_DOCUMENTO;
-                    $cabecera->RAZON_SOCIAL             =   $empresa->NOM_EMPR;
-                    $cabecera->NUMERO_CONTRATO          =   $nro_contrato;
-                    $cabecera->VARIEDAD_ID              =   $variedad_id;
                     $cabecera->HECTAREAS                =   $hectareas;
                     $cabecera->TOTAL_KG                 =   $total;
                     $cabecera->PRECIO_REFERENCIA        =   $precio_referencia;
                     $cabecera->PROYECCION               =   $proyeccion;
                     $cabecera->IMPORTE_HABILITAR        =   $importe_habilitar;
-                    $cabecera->CUENTA_ID                =   $cuenta_id;
-                    $cabecera->SUBCUENTA_ID             =   $subcuenta_id;
                     $cabecera->GLOSA                    =   $request['glosa'];
-                    $cabecera->COD_ESTADO               =   'ETM0000000000003';
-                    $cabecera->TXT_ESTADO               =   'POR APROBAR CONTABILIDAD';
+                    $cabecera->COD_ESTADO               =   'ETM0000000000012';
+                    $cabecera->TXT_ESTADO               =   'POR APROBAR JEFE ACOPIO';
                     $cabecera->ACTIVO                   =   1;
                     $cabecera->FECHA_CREA               =   $this->fechaactual;
                     $cabecera->USUARIO_CREA             =   Session::get('usuario')->id;
@@ -137,23 +275,27 @@ class GestionContratoAcopioController  extends Controller
                         foreach($fechas as $index => $fechaDte){
                             $tercero_id = $terceros[$index];
                             $importe    = str_replace(',', '', $importes[$index]);
-                            
-                            // Buscar datos de la empresa si es un COD_EMPR, de lo contrario tomar texto
-                            $empresa_tercero = STDEmpresa::where('COD_EMPR', '=', $tercero_id)->first();
-                            $razon_social = $empresa_tercero ? $empresa_tercero->NOM_EMPR : $tercero_id;
-                            $ruc = $empresa_tercero ? $empresa_tercero->NRO_DOCUMENTO : '';
 
+                            $cadena = $tercero_id;
+                            $partes = explode(" - ", $cadena);
+                            $ruc = '';
+                            if (count($partes) > 1) {
+                                $ruc = trim($partes[0]);
+
+                            }
+
+                            $empresa_tercero = STDEmpresa::where('NRO_DOCUMENTO', '=', $ruc)->first();
                             $detalle = new ContratoAnticipoDetalle;
                             $detalle->ID_DOCUMENTO   = $idcab;
-                            $detalle->LINEA          = $index + 1;
                             $detalle->FECHA          = date_format(date_create($fechaDte), 'Ymd');
-                            $detalle->TERCERO_ID     = $tercero_id;
-                            $detalle->TERCERO_NOMBRE = $razon_social;
+                            $detalle->COD_PROVEEDOR  = $empresa_tercero ? $empresa_tercero->COD_EMPR : '';
+                            $detalle->TXT_PROVEEDOR  = $empresa_tercero ? $empresa_tercero->NOM_EMPR : '';
                             $detalle->IMPORTE        = $importe;
                             $detalle->ACTIVO         = 1;
                             $detalle->FECHA_CREA     = $this->fechaactual;
                             $detalle->USUARIO_CREA   = Session::get('usuario')->id;
                             $detalle->save();
+
                         }
                     }
 
@@ -200,6 +342,14 @@ class GestionContratoAcopioController  extends Controller
                             }
                         }
                     }
+
+                $fedocumento       =      ContratoAnticipo::where('ID_DOCUMENTO','=',$idcab)->first();
+                //geolocalizacion
+                $device_info       =   $request['device_info'];
+                $this->con_datos_de_la_pc($device_info,$fedocumento,'GUARDO CONTRATO ACOPIO');
+                //geolocalización
+                      
+
                 DB::commit();
             }catch(\Exception $ex){
                 DB::rollback(); 
