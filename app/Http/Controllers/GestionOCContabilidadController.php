@@ -83,7 +83,7 @@ class GestionOCContabilidadController extends Controller
         $combo_empresa  =   $this->gn_combo_empresa_empresa($empresa_id);
 
         $banco_id       =   'BAM0000000000005';
-        $arraybancos    =   DB::table('CMP.CATEGORIA')->where('COD_CATEGORIA','=','BAM0000000000005')->where('TXT_GRUPO','=','BANCOS_MERGE')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
+        $arraybancos    =   DB::table('CMP.CATEGORIA')->whereIn('COD_CATEGORIA', ['BAM0000000000003', 'BAM0000000000001', 'BAM0000000000005'])->where('TXT_GRUPO','=','BANCOS_MERGE')->pluck('NOM_CATEGORIA','COD_CATEGORIA')->toArray();
         $combobancos    =   $arraybancos;
 
         $combo_moneda   =   $this->gn_generacion_combo_categoria('MONEDA','Seleccione moneda','');
@@ -94,7 +94,7 @@ class GestionOCContabilidadController extends Controller
 
 
         $listadatos     =   $this->con_lista_cabecera_comprobante_entregable_detraccion($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$moneda_id,$operacion_id);
-        //$this->envio_detraccion_sunat();
+        $this->envio_detraccion_sunat();
 
         $entregable_sel =   FeDocumentoEntregableDetraccion::where('COD_CATEGORIA_ESTADO','=','ETM0000000000001')
                             ->where('COD_ESTADO','=','1')
