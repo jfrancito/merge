@@ -445,8 +445,8 @@ class GestionContratoAcopioController  extends Controller
                     $centro = ALMCentro::where('COD_CENTRO', '=', $centro_id)->first();
 
 
-                    $variedad                           =   DB::table('CMP.CATEGORIA')
-                                                            ->where('COD_CATEGORIA', '=', $variedad_id)
+                    $variedad                           =   DB::table('ALM.PRODUCTO')
+                                                            ->where('COD_PRODUCTO', '=', $variedad_id)
                                                             ->first();
 
                     $empresa                            =   STDEmpresa::where('COD_EMPR', '=', $empresa_id)->first();
@@ -460,8 +460,8 @@ class GestionContratoAcopioController  extends Controller
                     $cabecera->COD_CENTRO               =   $centro->COD_CENTRO;
                     $cabecera->TXT_CENTRO               =   $centro->NOM_CENTRO;
                     $cabecera->NRO_CONTRATO             =   $nro_contrato;
-                    $cabecera->COD_VARIEDAD             =   $variedad->COD_CATEGORIA;
-                    $cabecera->TXT_VARIEDAD             =   $variedad->NOM_CATEGORIA;
+                    $cabecera->COD_VARIEDAD             =   $variedad->COD_PRODUCTO;
+                    $cabecera->TXT_VARIEDAD             =   $variedad->NOM_PRODUCTO;
                     $cabecera->COD_PROVEEDOR            =   $empresa_trab->COD_EMPR;
                     $cabecera->TXT_PROVEEDOR            =   $empresa_trab->NOM_EMPR;
                     $cabecera->COD_CUENTA               =   $cuenta->COD_CONTRATO;
@@ -585,7 +585,15 @@ class GestionContratoAcopioController  extends Controller
             $combo_subcuenta= array();
 
             $variedad_id    = "";
-            $combo_variedad = $this->gn_generacion_combo_categoria('VARIEDAD', 'Seleccione Variedad', '');
+            $combo_variedad = DB::table('ALM.PRODUCTO')
+                ->where('COD_CATEGORIA_TIPO_PRODUCTO', 'TPR0000000000003')
+                ->where('COD_CATEGORIA_FAMILIA', 'FAM0000000000046')
+                ->where('COD_CATEGORIA_SUB_FAMILIA', 'SFM0000000000025')
+                ->where('COD_ESTADO', 1)
+                ->where('IND_DISPONIBLE', 1)
+                ->pluck('NOM_PRODUCTO', 'COD_PRODUCTO')
+                ->toArray();
+            $combo_variedad = ['' => 'Seleccione Variedad'] + $combo_variedad;
             $tarchivos      =   CMPCategoria::where('COD_CATEGORIA','=','DCC0000000000046')->where('COD_ESTADO','=',1)
                                 ->get();
 
