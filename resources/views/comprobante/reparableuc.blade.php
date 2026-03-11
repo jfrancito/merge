@@ -247,6 +247,58 @@
                 closeSelector: '.modal-close',
                 classAddAfterOpen: 'modal-show',
             });
+/*
+            // Esperar a que el elemento exista
+            function initTomSelect() {
+                let empresaAsiento = document.getElementById("empresa_asiento");
+                if (empresaAsiento && !empresaAsiento.tomselect) {
+                    let select = new TomSelect(empresaAsiento, {
+                        valueField: 'id',
+                        labelField: 'text',
+                        searchField: 'text',
+                        placeholder: "Escriba para buscar...",
+                        preload: true,
+                        load: function (query, callback) {
+                            let data = {
+                                _token: $("#token").val(),
+                                busqueda: query
+                            };
+                            fetch($("#carpeta").val() + '/buscar-proveedor', {
+                                method: "POST",
+                                headers: {"Content-Type": "application/json"},
+                                body: JSON.stringify(data)
+                            })
+                                .then(response => response.json())
+                                .then(json => callback(json))
+                                .catch(() => callback());
+                        }
+                    });
+
+                    if (typeof defaultId !== 'undefined' && defaultId) {
+                        select.addOption({id: defaultId, text: defaultText || ''});
+                        select.setValue(defaultId);
+                    }
+                }
+            }
+
+            // Intentar inicializar inmediatamente
+            initTomSelect();
+
+            // Si no existe, observar cambios en el DOM
+            if (!document.getElementById("empresa_asiento")) {
+                const observer = new MutationObserver(function(mutations) {
+                    if (document.getElementById("empresa_asiento")) {
+                        initTomSelect();
+                        observer.disconnect();
+                    }
+                });
+
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
+            }
+*/
 
             let select = new TomSelect("#empresa_asiento", {
                 valueField: 'id',
