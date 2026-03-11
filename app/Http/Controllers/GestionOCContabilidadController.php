@@ -94,7 +94,7 @@ class GestionOCContabilidadController extends Controller
 
 
         $listadatos     =   $this->con_lista_cabecera_comprobante_entregable_detraccion($cod_empresa,$fecha_inicio,$fecha_fin,$empresa_id,$moneda_id,$operacion_id);
-        $this->envio_detraccion_sunat();
+        //$this->envio_detraccion_sunat();
 
         $entregable_sel =   FeDocumentoEntregableDetraccion::where('COD_CATEGORIA_ESTADO','=','ETM0000000000001')
                             ->where('COD_ESTADO','=','1')
@@ -313,10 +313,10 @@ class GestionOCContabilidadController extends Controller
             }
 
 
-            if($entregable->COD_CATEGORIA_MONEDA != $moneda){
-                $mensaje            =   "Este Documento esta asiganado a otra MONEDA";
-                $ope_ind            =   "1";
-            }
+            // if($entregable->COD_CATEGORIA_MONEDA != $moneda){
+            //     $mensaje            =   "Este Documento esta asiganado a otra MONEDA";
+            //     $ope_ind            =   "1";
+            // }
 
 
 
@@ -596,18 +596,19 @@ class GestionOCContabilidadController extends Controller
                     $sheet->setWidth('A', 8);
                     $sheet->setWidth('B', 20);
                     $sheet->setWidth('C', 20);
-                    $sheet->setWidth('D', 40);
-                    $sheet->setWidth('E', 40);
-                    $sheet->setWidth('F', 30);
+                    $sheet->setWidth('D', 20);              
+                    $sheet->setWidth('E', 20);
+                    $sheet->setWidth('F', 40);
                     $sheet->setWidth('G', 30);
                     $sheet->setWidth('H', 30);
-                    $sheet->setWidth('I', 20);
+                    $sheet->setWidth('I', 30);
                     $sheet->setWidth('J', 20);
                     $sheet->setWidth('K', 20);
-                    $sheet->setWidth('L', 30);
-                    $sheet->setWidth('M', 20);
+                    $sheet->setWidth('L', 20);
+                    $sheet->setWidth('M', 30);
                     $sheet->setWidth('N', 20);
                     $sheet->setWidth('O', 20);
+                    $sheet->setWidth('P', 20);
 
 
                     $sheet->mergeCells('B2:C2');
@@ -621,7 +622,7 @@ class GestionOCContabilidadController extends Controller
                                 $cell->setFontColor('#FFFFFF');   // Texto blanco
                             });
 
-                    $sheet->loadView('entregadetraccion/excel/eentregabledetraccion')->with('listadatos',$listadatossoles)
+                    $sheet->loadView('entregadetraccion/excel/eentregabledetraccionreserva')->with('listadatos',$listadatossoles)
                                                                           ->with('listadatosotro',$listadatossolesotro)
                                                                           ->with('funcion',$funcion)
                                                                           ->with('folio',$folio)

@@ -7,7 +7,7 @@
         var _token = $('#token').val();
         debugger;
 
-        var link = "/ajax-combo-cuenta";
+        var link = "/ajax-combo-cuenta-anti";
         var contenedor = "ajax_combo_cuenta";
         data = {
             _token: _token,
@@ -21,7 +21,7 @@
         var cuenta_id = $('#cuenta_id').val();
         var _token = $('#token').val();
         debugger;
-        var link = "/ajax-combo-subcuenta";
+        var link = "/ajax-combo-subcuenta-anti";
         var contenedor = "ajax_combo_subcuenta";
         data = {
             _token: _token,
@@ -177,25 +177,34 @@
         validarImporteHabilitar();
     });
 
-    // Inicializar Select2 general
-    $('#tercero_id_detalle_input').select2({
-        width: '100%',
-        placeholder: 'Seleccione o escriba un tercero',
-        language: "es",
-        tags: true,
-        tokenSeparators: [','],
-        ajax: {
-            dataType: 'json',
-            url: carpeta + "/buscarempresacontrato",
-            delay: 100,
-            data: function(params) {
-                return { term: params.term }
-            },
-            processResults: function (data, page) {
-                return { results: data };
-            },
+    // Validación y confirmación antes de guardar
+    $('#frmpm').on('submit', function(e) {
+        e.preventDefault();
+
+        var filas_detalle = $('#tbody-proyeccion tr').length;
+        if (filas_detalle === 0) {
+            alerterrorajax('Debe agregar al menos un anticipo en la Proyección de Anticipos.');
+            return false;
         }
+
+        var form = this;
+
+        $.confirm({
+            title: '¿Confirma el registro?',
+            content: '¿Está seguro de guardar este Contrato de Acopio?',
+            buttons: {
+                confirmar: function () {
+                    abrircargando();
+                    form.submit();
+                },
+                cancelar: function () {
+                    // $.alert('Se canceló el registro');
+                }
+            }
+        });
     });
+
+
 
 });
 

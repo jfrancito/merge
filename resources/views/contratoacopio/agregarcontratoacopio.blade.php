@@ -148,7 +148,25 @@
         // Inicializar Select2 general
 
 
-
+        // Inicializar Select2 general
+        $('#tercero_id_detalle_input').select2({
+            width: '100%',
+            placeholder: 'Seleccione o escriba un tercero',
+            language: "es",
+            tags: true,
+            tokenSeparators: [','],
+            ajax: {
+                dataType: 'json',
+                url: carpeta + "/buscarempresacontrato",
+                delay: 100,
+                data: function(params) {
+                    return { term: params.term }
+                },
+                processResults: function (data, page) {
+                    return { results: data };
+                },
+            }
+        });
 
 
         $('form').parsley();
