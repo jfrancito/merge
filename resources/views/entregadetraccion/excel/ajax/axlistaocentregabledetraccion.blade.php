@@ -21,12 +21,14 @@
 		      <th>ITEM</th>
 		      <th>OPERACION</th>
 		      <th>DOCUMENTO</th>
+		      <th>FECHA</th>
 		      <th>RUC</th>
 		      <th>PROVEEDOR</th>
 		      <th>BANCO</th>
 		      <th>CUENTA ABONO</th>
 		      <th>COMPROBANTE ASOCIADO</th>
 		      <th>NETO A PAGAR</th>
+		      <th>MONEDA</th>
 		    </tr>
 		  </thead>
 		  <tbody>
@@ -38,12 +40,15 @@
 		        <td>{{$index + 1}}</td>
 		        <td>{{$item->OPERACION}}</td>
 		        <td>{{$item->ID_DOCUMENTO}}</td>
+		        <td>{{$item->FEC_VENTA}}</td>
+		        
 		        <td>{{$item->RUC_PROVEEDOR}}</td>
 		        <td>{{$item->RZ_PROVEEDOR}}</td>
 		        <td>BANCO DE LA NACION</td>
 		        <td><b>{{$item->CTA_DETRACCION}}</b></td>
 		        <td>{{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</td>
 		        <td><b>{{number_format($item->MONTO_DETRACCION_RED, 2, '.', ',')}}</b></td>
+		       	<td>{{$item->MONEDA}}</td>
 		      </tr>                    
 		    @endforeach
 		  </tbody>

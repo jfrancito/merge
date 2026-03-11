@@ -530,18 +530,19 @@ class GestionOCContabilidadController extends Controller
                     $sheet->setWidth('A', 8);
                     $sheet->setWidth('B', 20);
                     $sheet->setWidth('C', 20);
-                    $sheet->setWidth('D', 40);
-                    $sheet->setWidth('E', 40);
-                    $sheet->setWidth('F', 30);
+                    $sheet->setWidth('D', 20);              
+                    $sheet->setWidth('E', 20);
+                    $sheet->setWidth('F', 40);
                     $sheet->setWidth('G', 30);
                     $sheet->setWidth('H', 30);
-                    $sheet->setWidth('I', 20);
+                    $sheet->setWidth('I', 30);
                     $sheet->setWidth('J', 20);
                     $sheet->setWidth('K', 20);
-                    $sheet->setWidth('L', 30);
-                    $sheet->setWidth('M', 20);
+                    $sheet->setWidth('L', 20);
+                    $sheet->setWidth('M', 30);
                     $sheet->setWidth('N', 20);
                     $sheet->setWidth('O', 20);
+                    $sheet->setWidth('P', 20);
 
 
                     $sheet->mergeCells('B2:C2');
