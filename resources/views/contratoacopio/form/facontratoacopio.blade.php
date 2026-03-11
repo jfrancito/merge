@@ -28,7 +28,7 @@
                 <label class="form-label">N° CONTRATO <span class="text-danger">(*)</span></label>
                 <div class="input-group">
                     <span class="input-group-addon"><i class="mdi mdi-collection-text"></i></span>
-                    <input type="text" class="form-control" id='nro_contrato' name='nro_contrato' required="" value="" placeholder="Ej: CT-2024-001">
+                    <input type="text" class="form-control" id='nro_contrato' name='nro_contrato' required="" value="" placeholder="Solo caracteres alfanuméricos" data-parsley-pattern="/^[a-zA-Z0-9]+$/" data-parsley-error-message="Solo se permiten letras y números">
                 </div>
             </div>
         </div>

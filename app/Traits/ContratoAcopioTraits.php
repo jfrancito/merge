@@ -51,6 +51,25 @@ use Carbon\Carbon;
 trait ContratoAcopioTraits
 {
 
+    private function pla_lista_contrato_acopio_acopio() {
+
+        if(Session::get('usuario')->id== '1CIX00000001'){
+
+            $lista  =   ContratoAnticipo::where('ACTIVO','=','1')->where('COD_ESTADO','=','ETM0000000000012')
+                                        ->orderby('FECHA_CREA','DESC')->get();
+                                    
+        }else{
+
+            $lista  =   ContratoAnticipo::where('ACTIVO','=','1')->where('COD_ESTADO','=','ETM0000000000012')
+                                        ->where('USUARIO_CREA','=',Session::get('usuario')->id)
+                                        ->orderby('FECHA_CREA','DESC')->get();
+
+
+        }
+
+        return  $lista;
+    }
+
     private function pla_lista_contrato_acopio() {
 
         if(Session::get('usuario')->id== '1CIX00000001'){
@@ -70,7 +89,17 @@ trait ContratoAcopioTraits
         return  $lista;
     }
 
+    private function pla_lista_contrato_acopio_gestion() {
 
+
+
+            $lista  =   ContratoAnticipo::where('ACTIVO','=','1')
+                                        ->orderby('FECHA_CREA','DESC')->get();
+                                    
+
+
+        return  $lista;
+    }
 
 
 }

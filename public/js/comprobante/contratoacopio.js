@@ -2,6 +2,41 @@
 
     var carpeta = $("#carpeta").val();
 
+    $('.btnrechazocomporbatnte').on('click', function (event) {
+        event.preventDefault();
+        $.confirm({
+            title: '¿Confirma el extorno?',
+            content: 'Extornar el Comprobante',
+            buttons: {
+                confirmar: function () {
+                    $("#formpedidorechazar").submit();
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo el Extorno');
+                }
+            }
+        });
+
+    });
+
+    $('.btnaprobarcomporbatnteconta').on('click', function(event){
+        event.preventDefault();
+        $.confirm({
+            title: '¿Confirma la Aprobacion?',
+            content: 'Aprobar el Comprobante',
+            buttons: {
+                confirmar: function () {
+                    $( "#formpedido" ).submit();
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo Aprobacion');
+                }
+            }
+        });
+
+    });
+
+
   $(".contratoacopio").on('change', '#empresa_id', function () {
         var empresa_id = $('#empresa_id').val();
         var _token = $('#token').val();
@@ -204,7 +239,25 @@
         });
     });
 
+    // Restringir Nro Contrato a solo alfanumérico (letras y números)
+    $('#nro_contrato').on('keypress', function(e) {
+        var regex = new RegExp("^[a-zA-Z0-9]+$");
+        var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+        if (regex.test(str)) {
+            return true;
+        }
+        e.preventDefault();
+        return false;
+    });
 
+    // También limpiar en caso de pegar texto
+    $('#nro_contrato').on('blur', function() {
+        var val = $(this).val();
+        var clean = val.replace(/[^a-zA-Z0-9]/g, '');
+        if (val !== clean) {
+            $(this).val(clean);
+        }
+    });
 
 });
 

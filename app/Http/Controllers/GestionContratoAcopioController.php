@@ -56,6 +56,154 @@ class GestionContratoAcopioController  extends Controller
     use ContratoAcopioTraits;
     use ComprobanteTraits;
     use LiquidacionGastoTraits;
+
+    public function actionAgregarExtornoAcopioCA($idopcion, $idordencompra, Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion, 'Modificar');
+        if ($validarurl <> 'true') {
+            return $validarurl;
+        }
+        /******************************************************/
+        $idcab = $idordencompra;
+        $iddocumento = $this->funciones->decodificarmaestrapre($idordencompra, 'COAN');
+        View::share('titulo', 'EXTORNAR CONTRATO ACOPIO');
+
+        if ($_POST) {
+
+            try {
+
+                DB::beginTransaction();
+                $contratoanticipo        =   ContratoAnticipo::where('ID_DOCUMENTO','=',$iddocumento)->first();   
+                $descripcion = $request['descripcionextorno'];
+                //ANULAR TODA LA OPERACION
+                ContratoAnticipo::where('ID_DOCUMENTO', $iddocumento)
+                    ->update(
+                        [
+                            'OBSERVACION' => $descripcion,
+                            'COD_ESTADO' => 'ETM0000000000006',
+                            'TXT_ESTADO' => 'RECHAZADO',
+                            'USUARIO_MOD' => Session::get('usuario')->id,
+                            'FECHA_MOD' => $this->fechaactual
+                        ]
+                    );
+
+                DB::commit();
+                return Redirect::to('gestion-de-aprobar-contrato-acopio/' . $idopcion)->with('bienhecho', 'Comprobante : ' . $contratoanticipo->ID_DOCUMENTO . ' EXTORNADO CON EXITO');
+            } catch (\Exception $ex) {
+                DB::rollback();
+                return Redirect::to('gestion-de-aprobar-contrato-acopio/' . $idopcion)->with('errorbd', $ex . ' Ocurrio un error inesperado');
+            }
+        }
+
+    }
+
+    public function actionAprobarAcopioCA($idopcion, $iddocumento,Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        $idcab                  =   $iddocumento;
+        $iddocumento            =   $this->funciones->decodificarmaestrapre($iddocumento,'COAN');
+        View::share('titulo','Aprobar Contrato Acopio');
+
+        if($_POST)
+        {
+            try{    
+                DB::beginTransaction();
+                $contratoanticipo       =   ContratoAnticipo::where('ID_DOCUMENTO','=',$iddocumento)->first();
+                $descripcion            =   $request['descripcion'];
+                ContratoAnticipo::where('ID_DOCUMENTO',$contratoanticipo->ID_DOCUMENTO)
+                            ->update(
+                                [
+                                    'COD_ESTADO'=>'ETM0000000000005',
+                                    'TXT_ESTADO'=>'APROBADO',
+                                    'OBSERVACION'=>$descripcion,
+                                    'COD_USUARIO_CON_APRUEBA'=>Session::get('usuario')->id,
+                                    'TXT_USUARIO_CON_APRUEBA'=>Session::get('usuario')->nombre,
+                                    'FECHA_MOD'=>$this->fechaactual
+                                ]
+                            );
+
+                DB::commit();
+                return Redirect::to('/gestion-de-aprobar-contrato-acopio/'.$idopcion)->with('bienhecho', 'Contrato Acopio : '.$contratoanticipo->ID_DOCUMENTO.' APROBADO CON EXITO');
+            }catch(\Exception $ex){
+                DB::rollback(); 
+                return Redirect::to('/gestion-de-aprobar-contrato-acopio/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+            }
+        }
+        else{
+
+            $contratoanticipo        =   ContratoAnticipo::where('ID_DOCUMENTO','=',$iddocumento)->first();
+            $contratoanticipodet     =   ContratoAnticipoDetalle::where('ID_DOCUMENTO','=',$iddocumento)->get();
+
+            $archivospdf            =   Archivo::where('ID_DOCUMENTO','=',$iddocumento)->where('EXTENSION', 'like', '%'.'pdf'.'%')->where('ACTIVO','=','1')->get();
+            $ocultar                =   "";
+            // Construir el array de URLs
+            $initialPreview = [];
+            foreach ($archivospdf as $archivo) {
+                $initialPreview[] = route('serve-fileac', ['file' => $archivo->NOMBRE_ARCHIVO]);
+            }
+            $initialPreviewConfig = [];
+            foreach ($archivospdf as $key => $archivo) {
+                $valor                = '';
+                if($key>0){
+                    $valor            = 'ocultar';
+                }
+                $initialPreviewConfig[] = [
+                    'type'          => "pdf",
+                    'caption'       => $archivo->NOMBRE_ARCHIVO,
+                    'downloadUrl'   => route('serve-fileac', ['file' => $archivo->NOMBRE_ARCHIVO]),
+                    'frameClass'    => $archivo->ID_DOCUMENTO.$archivo->DOCUMENTO_ITEM.' '.$valor //
+                ];
+            }
+
+            return View::make('contratoacopio/aprobaracopiocc', 
+                            [
+                                'contratoanticipo'       =>  $contratoanticipo,
+                                'contratoanticipodet'       =>  $contratoanticipodet,
+                                'idopcion'              =>  $idopcion,
+                                'idcab'                 =>  $idcab,
+                                'iddocumento'           =>  $iddocumento,
+                                'initialPreview'        => json_encode($initialPreview),
+                                'initialPreviewConfig'  => json_encode($initialPreviewConfig),      
+                            ]);
+
+
+        }
+    }
+
+
+
+    public function actionAprobarContratoAcopio($idopcion, Request $request)
+    {
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion, 'Ver');
+        if ($validarurl <> 'true') {
+            return $validarurl;
+        }
+        /******************************************************/
+        View::share('titulo', 'Aprobar Contrato Acopio');
+        $tab_id = 'oc';
+        if (isset($request['tab_id'])) {
+            $tab_id = $request['tab_id'];
+        }
+        $lcontratoacopio = $this->pla_lista_contrato_acopio_acopio();
+        $funcion = $this;
+        return View::make('contratoacopio/listacontratoacopioacopio',
+            [
+                'lcontratoacopio' => $lcontratoacopio,
+                'tab_id' => $tab_id,
+                'funcion' => $funcion,
+                'idopcion' => $idopcion,
+            ]);
+    }
+
+
+
     public function actionListarContratoAcopio($idopcion)
     {
         /******************* validar url **********************/
@@ -74,6 +222,26 @@ class GestionContratoAcopioController  extends Controller
                             'lcontratoacopio'       =>  $lcontratoacopio,
                          ]);
     }
+
+    public function actionListarGestionContratoAcopio($idopcion)
+    {
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Ver');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        View::share('titulo','Lista Contrato Acopio');
+        $cod_empresa        =   Session::get('usuario')->usuarioosiris_id;
+        $lcontratoacopio    =   $this->pla_lista_contrato_acopio_gestion();
+        $funcion            =   $this;
+
+        return View::make('contratoacopio/listacontratoacopiogestion',
+                         [
+                            'funcion'               =>  $funcion,
+                            'idopcion'              =>  $idopcion,
+                            'lcontratoacopio'       =>  $lcontratoacopio,
+                         ]);
+    }
+
 
     public function actionGestionRevisarAcopioContrato($idopcion, $iddocumento,Request $request)
     {
