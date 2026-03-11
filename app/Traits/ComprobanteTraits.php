@@ -8483,7 +8483,7 @@ trait ComprobanteTraits
 
         $listadatos             =   VDetraccionesConPagos::join('FE_DOCUMENTO', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'V_DETRACCIONES_CON_PAGOS.ID_DOCUMENTO')
                                     ->where('FE_DOCUMENTO.FOLIO_DETRACCION_RESERVA','=',$folio)
-                                    ->where('V_DETRACCIONES_CON_PAGOS.COD_CATEGORIA_MONEDA','=',$moneda_id)
+                                    //->where('V_DETRACCIONES_CON_PAGOS.COD_CATEGORIA_MONEDA','=',$moneda_id)
                                     ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
                                     ->select(DB::raw('V_DETRACCIONES_CON_PAGOS.* ,FE_DOCUMENTO.*,
                                         FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_VOUCHER'))

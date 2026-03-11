@@ -75,6 +75,54 @@ class GestionContratoAcopioController  extends Controller
                          ]);
     }
 
+    public function actionGestionRevisarAcopioContrato($idopcion, $iddocumento,Request $request)
+    {
+
+        /******************* validar url **********************/
+        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+        if($validarurl <> 'true'){return $validarurl;}
+        /******************************************************/
+        $idcab                  =   $iddocumento;
+        $iddocumento            =   $this->funciones->decodificarmaestrapre($iddocumento,'COAN');
+        View::share('titulo','Gestion Acopio Contrato');
+
+        $contratoanticipo        =   ContratoAnticipo::where('ID_DOCUMENTO','=',$iddocumento)->first();
+        $contratoanticipodet     =   ContratoAnticipoDetalle::where('ID_DOCUMENTO','=',$iddocumento)->get();
+
+        $archivospdf            =   Archivo::where('ID_DOCUMENTO','=',$iddocumento)->where('EXTENSION', 'like', '%'.'pdf'.'%')->where('ACTIVO','=','1')->get();
+        $ocultar                =   "";
+        // Construir el array de URLs
+        $initialPreview = [];
+        foreach ($archivospdf as $archivo) {
+            $initialPreview[] = route('serve-fileac', ['file' => $archivo->NOMBRE_ARCHIVO]);
+        }
+        $initialPreviewConfig = [];
+        foreach ($archivospdf as $key => $archivo) {
+            $valor                = '';
+            if($key>0){
+                $valor            = 'ocultar';
+            }
+            $initialPreviewConfig[] = [
+                'type'          => "pdf",
+                'caption'       => $archivo->NOMBRE_ARCHIVO,
+                'downloadUrl'   => route('serve-fileac', ['file' => $archivo->NOMBRE_ARCHIVO]),
+                'frameClass'    => $archivo->ID_DOCUMENTO.$archivo->DOCUMENTO_ITEM.' '.$valor //
+            ];
+        }
+        return View::make('contratoacopio/gestiondocumentocc', 
+                        [
+                            'contratoanticipo'      =>  $contratoanticipo,
+                            'contratoanticipodet'   =>  $contratoanticipodet,
+                            'idopcion'              =>  $idopcion,
+                            'idcab'                 =>  $idcab,
+                            'iddocumento'           =>  $iddocumento,
+                            'initialPreview'        => json_encode($initialPreview),
+                            'initialPreviewConfig'  => json_encode($initialPreviewConfig),      
+                        ]);
+
+    }
+
+
 
     public function actionAjaxComboSubCuentaAnti(Request $request)
     {
@@ -106,7 +154,7 @@ class GestionContratoAcopioController  extends Controller
 
         $dni = '';
         $centro_id = '';
-        if (count($trabajador) > 0) {
+        if ($trabajador) {
             $dni = $trabajador->NRO_DOCUMENTO;
         }
 
@@ -116,7 +164,7 @@ class GestionContratoAcopioController  extends Controller
             ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
             ->where('dni', $dni)
             ->first();
-        if (count($trabajadorespla) > 0) {
+        if ($trabajadorespla) {
             $centro_id = $trabajadorespla->centro_osiris_id;
         }
 
@@ -124,7 +172,7 @@ class GestionContratoAcopioController  extends Controller
             ->where('USER_ID', Session::get('usuario')->id)
             ->where('ACTIVO', 1)
             ->first();
-        if (count($terceros) > 0) {
+        if ($terceros) {
             $centro_id = $terceros->COD_CENTRO;
         }
 
@@ -212,7 +260,7 @@ class GestionContratoAcopioController  extends Controller
                         ->first();
                     $dni = '';
                     $centro_id = '';
-                    if (count($trabajador) > 0) {
+                    if ($trabajador) {
                         $dni = $trabajador->NRO_DOCUMENTO;
                     }
                     $trabajadorespla = DB::table('WEB.platrabajadores')
@@ -222,7 +270,7 @@ class GestionContratoAcopioController  extends Controller
                         ->first();
 
 
-                    if (count($trabajadorespla) > 0) {
+                    if ($trabajadorespla) {
                         $centro_id = $trabajadorespla->centro_osiris_id;
                     }
                     
@@ -379,7 +427,7 @@ class GestionContratoAcopioController  extends Controller
                 ->first();
             $dni = '';
             $centro_id = '';
-            if (count($trabajador) > 0) {
+            if ($trabajador) {
                 $dni = $trabajador->NRO_DOCUMENTO;
             }
             $trabajadorespla = DB::table('WEB.platrabajadores')
@@ -389,7 +437,7 @@ class GestionContratoAcopioController  extends Controller
                 ->first();
 
 
-            if (count($trabajadorespla) > 0) {
+            if ($trabajadorespla) {
                 $centro_id = $trabajadorespla->centro_osiris_id;
             }
             

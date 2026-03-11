@@ -29,6 +29,8 @@ Route::get('/serve-fileestiba', 'FileController@serveFileEstiba')->name('serve-f
 Route::get('/serve-filelg', 'FileController@serveFileLG')->name('serve-filelg');
 Route::get('/serve-filepla', 'FileController@serveFilePlaC')->name('serve-filepla');
 Route::get('/serve-filerc', 'FileController@serveFileRC')->name('serve-filerc');
+Route::get('/serve-fileac', 'FileController@serveFileAC')->name('serve-fileac');
+
 Route::get('/serve-filefirma', 'FileController@serveFileFirma')->name('serve-filefirma');
 Route::get('/serve-fileordencompraanticipo', 'FileController@serveFileOrdenCompraAnticipo')->name('serve-fileordencompraanticipo');
 
@@ -248,6 +250,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/agregar-contrato-acopio/{idopcion}', 'GestionContratoAcopioController@actionAgregarContratoAcopio');
 	Route::any('/ajax-combo-cuenta-anti', 'GestionContratoAcopioController@actionAjaxComboCuentaAnti');
 	Route::any('/ajax-combo-subcuenta-anti', 'GestionContratoAcopioController@actionAjaxComboSubCuentaAnti');
+	Route::any('/gestion-revisar-acopio-contrato/{idopcion}/{idordencompra}', 'GestionContratoAcopioController@actionGestionRevisarAcopioContrato');
+
 
 	//SUSPENSION DE 4TA CATEGORIA
 	Route::any('/gestion-de-suspension-ta-categoria/{idopcion}', 'GestionCuartaCategoriaController@actionListarSuspensionCuarta');

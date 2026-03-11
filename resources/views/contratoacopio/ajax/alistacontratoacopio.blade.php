@@ -2,58 +2,57 @@
   <thead>
     <tr>
       <th>ITEM</th>
-      <th>ID DOCUMENTO</th>
-      <th>FECHA CONTRATO</th>
-
-      <th>CENTRO</th>
-      <th>NRO CONTRATO</th>
-      <th>PROVEEDOR</th>
-
-      <th>FECHA COSECHA</th>
-      <th>VARIEDAD</th>
-      <th>HECTAREAS</th>
-      <th>TOTAL KG</th>
-      <th>PRECIO REFERENCIA</th>
-      <th>PROYECCION</th>
-      <th>IMPORTE HABILITAR</th>
-
+      <th>DOCUMENTO / CONTRATO</th>
+      <th>PROVEEDOR / SEDE</th>
+      <th>PRODUCTO / COSECHA</th>
+      <th>PRODUCCIÓN</th>
+      <th>FINANZAS</th>
       <th>ESTADO</th>
-      <th>OPCION</th>
-
+      <th class="text-center">ACCIÓN</th>
     </tr>
   </thead>
   <tbody>
-
     @foreach($lcontratoacopio as $index => $item)
-      <tr data_requerimiento_id = "{{$item->ID_DOCUMENTO}}"
-        >
-        <td>{{$index + 1}}</td>
-        <td>{{$item->ID_DOCUMENTO}}</td>
-        <td>{{date_format(date_create($item->FECHA_CONTRATO), 'd-m-Y')}}</td>
-
-        <td>{{$item->TXT_CENTRO}}</td>
-        <td>{{$item->NRO_CONTRATO}}</td>
-        <td>{{$item->TXT_PROVEEDOR}}</td>
-        <td>{{date_format(date_create($item->FECHA_COSECHA), 'd-m-Y')}}</td> 
-        <td>{{$item->TXT_VARIEDAD}}</td>
-        <td>{{$item->HECTAREAS}}</td>
-        <td>{{$item->TOTAL_KG}}</td>
-        <td>{{$item->PRECIO_REFERENCIA}}</td>
-        <td>{{$item->PROYECCION}}</td>
-        <td>{{$item->IMPORTE_HABILITAR}}</td>
+      <tr data_requerimiento_id="{{$item->ID_DOCUMENTO}}">
+        <td class="text-center">{{$index + 1}}</td>
+        <td class="cell-detail">
+          <span><b>ID:</b> {{$item->ID_DOCUMENTO}}</span>
+          <span class="cell-detail-description"><b>NRO:</b> {{$item->NRO_CONTRATO}}</span>
+          <span class="cell-detail-description"><b>REGISTRO:</b> {{date_format(date_create($item->FECHA_CONTRATO), 'd-m-Y')}}</span>
+        </td>
+        <td class="cell-detail">
+          <span><b>PROVEEDOR:</b> {{$item->TXT_PROVEEDOR}}</span>
+          <span class="cell-detail-description"><b>SEDE:</b> {{$item->TXT_CENTRO}}</span>
+        </td>
+        <td class="cell-detail">
+          <span><b>VARIEDAD:</b> {{$item->TXT_VARIEDAD}}</span>
+          <span class="cell-detail-description"><b>COSECHA:</b> {{date_format(date_create($item->FECHA_COSECHA), 'd-m-Y')}}</span>
+        </td>
+        <td class="cell-detail">
+          <span><b>HECTÁREAS:</b> {{number_format($item->HECTAREAS, 2, '.', ',')}}</span>
+          <span class="cell-detail-description"><b>TOTAL KG:</b> {{number_format($item->TOTAL_KG, 2, '.', ',')}}</span>
+          <span class="cell-detail-description"><b>P. REF:</b> {{number_format($item->PRECIO_REFERENCIA, 4, '.', ',')}}</span>
+        </td>
+        <td class="cell-detail">
+          <span><b>PROYECCIÓN:</b> {{number_format($item->PROYECCION, 2, '.', ',')}}</span>
+          <span class="cell-detail-description text-primary-dark text-bold"><b>HABILITAR:</b> {{number_format($item->IMPORTE_HABILITAR, 2, '.', ',')}}</span>
+        </td>
         @include('cuartacategoria.ajax.estados')
+
         <td class="rigth">
           <div class="btn-group btn-hspace">
             <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>
             <ul role="menu" class="dropdown-menu pull-right">
               <li>
-                <a href="{{ url('/descargar-documento-cuarta-categoria/'.$item->ID_DOCUMENTO) }}">
-                  Descargar 4ta Categoria
+                <a href="{{ url('/gestion-revisar-acopio-contrato/'.$idopcion.'/'.Hashids::encode(substr($item->ID_DOCUMENTO, -8))) }}">
+                  Revisar Acopio Contrato
                 </a>  
               </li>
             </ul>
           </div>
         </td>
+
+
       </tr>                    
     @endforeach
   </tbody>
