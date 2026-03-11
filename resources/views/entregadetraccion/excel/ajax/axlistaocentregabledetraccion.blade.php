@@ -36,7 +36,7 @@
 		  <tbody>
 		  	@php $monto_total =  0; @endphp
 		    @foreach($listadatos as $index => $item)
-			  @php $monto_total  = $monto_total + $item->MONTO_DETRACCION_RED; @endphp
+			  @php $monto_total  = $monto_total + $item->MONTO_CONVERTIDO; @endphp
 
 		      <tr>
 		        <td>{{$index + 1}}</td>
@@ -48,7 +48,7 @@
 		        <td>BANCO DE LA NACION</td>
 		        <td><b>{{$item->CTA_DETRACCION}}</b></td>
 		        <td>{{$item->NRO_SERIE}} - {{$item->NRO_DOC}}</td>
-		        <td><b>{{number_format($item->MONTO_DETRACCION_RED, 2, '.', ',')}}</b></td>
+		        <td><b>{{number_format($item->MONTO_CONVERTIDO, 2, '.', ',')}}</b></td>
 		        <td>{{$item->MONEDA}}</td>
 		      </tr>                    
 		    @endforeach
