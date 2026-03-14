@@ -6006,6 +6006,7 @@ class GestionLiquidacionGastosController extends Controller
                     ->where('TXT_NOMBRE', '=', $area_planilla)
                     ->where('IND_MOVIMIENTO', 1)->first();
 
+
             } else {
                 $area_planilla = $trabajadorespla->cadarea;
                 $centrocosto = DB::table('CON.CENTRO_COSTO')
@@ -6014,7 +6015,7 @@ class GestionLiquidacionGastosController extends Controller
                     ->where('TXT_REFERENCIA_PLANILLA', 'LIKE', '%' . $trabajadorespla->cadarea . '%')
                     ->where('IND_MOVIMIENTO', 1)
                     ->first();
-                //DD($trabajadorespla->cadarea);
+                //DD($centrocosto);
 
             }
 
@@ -6030,6 +6031,7 @@ class GestionLiquidacionGastosController extends Controller
                 $area_id = $centrocosto->COD_CENTRO_COSTO;
                 $area_txt = $centrocosto->TXT_NOMBRE;
             }
+
 
             $empresa = DB::table('STD.EMPRESA')
                 ->where('NRO_DOCUMENTO', $dni)

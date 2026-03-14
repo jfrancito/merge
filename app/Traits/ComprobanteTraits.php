@@ -62,6 +62,23 @@ trait ComprobanteTraits
         return $array;
     }
 
+    public function gn_combo_anio_reparable($todo, $titulo)
+    {
+        $array = FeDocumento::select(DB::raw("YEAR(FEC_VENTA) as anio"))
+            ->groupBy(DB::raw("YEAR(FEC_VENTA)"))
+            ->orderBy(DB::raw("YEAR(FEC_VENTA)"), 'DESC')
+            ->pluck('anio', 'anio')
+            ->toArray();
+
+        if ($todo == 'TODO') {
+            $combo = array('TODO' => $todo) + $array;
+        } else {
+            $combo = $array;
+        }
+
+        return $combo;
+    }
+
     public function con_categoria_canje($valor) {
         $array = [  'ESTIBA'=>'TDO0000000000067',
                     'DOCUMENTO_INTERNO_PRODUCCION'=>'TDO0000000000092',
@@ -4543,7 +4560,7 @@ trait ComprobanteTraits
     }
 
 
-    private function con_lista_cabecera_comprobante_total_gestion_reparable_excel($cod_empresa,$tipoarchivo_id,$estado_id) {
+    private function con_lista_cabecera_comprobante_total_gestion_reparable_excel($cod_empresa,$tipoarchivo_id,$estado_id,$anio_id='') {
 
 
 
@@ -4553,6 +4570,7 @@ trait ComprobanteTraits
                                         ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                         ->TipoArchivo($tipoarchivo_id)
                                         ->EstadoReparable($estado_id)
+                                        ->Anio($anio_id)
                                         ->pluck('ID_DOCUMENTO')
                                         ->toArray();
 
@@ -5408,7 +5426,7 @@ trait ComprobanteTraits
     }
 
 
-    private function con_lista_cabecera_comprobante_total_gestion_contrato_reparable_excel($cod_empresa,$tipoarchivo_id,$estado_id) {
+    private function con_lista_cabecera_comprobante_total_gestion_contrato_reparable_excel($cod_empresa,$tipoarchivo_id,$estado_id,$anio_id='') {
 
 
         $listadatos     =       FeDocumento::Join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
@@ -5416,6 +5434,7 @@ trait ComprobanteTraits
                                     ->where('OPERACION','=','CONTRATO')
                                     ->TipoArchivo($tipoarchivo_id)
                                     ->EstadoReparable($estado_id)
+                                    ->Anio($anio_id)
                                     ->whereNotIn('FE_DOCUMENTO.COD_ESTADO',['','ETM0000000000006'])
                                     ->pluck('ID_DOCUMENTO')
                                     ->toArray();
@@ -5480,7 +5499,7 @@ trait ComprobanteTraits
     }
 
 
-    private function con_lista_cabecera_comprobante_total_gestion_estiba_reparable_excel($cod_empresa,$tipoarchivo_id,$estado_id,$operacion_id) {
+    private function con_lista_cabecera_comprobante_total_gestion_estiba_reparable_excel($cod_empresa,$tipoarchivo_id,$estado_id,$operacion_id,$anio_id='') {
 
 
 
@@ -5489,6 +5508,7 @@ trait ComprobanteTraits
             ->where('OPERACION', $operacion_id)
             ->tipoArchivo($tipoarchivo_id) // Si es un scope
             ->estadoReparable($estado_id)   // Si es un scope
+            ->Anio($anio_id)
             ->whereNotIn('FE_DOCUMENTO.COD_ESTADO', ['', 'ETM0000000000006'])
             ->pluck('ID_DOCUMENTO') // En Laravel 5.4 usa lists(), no pluck()
             ->toArray();
@@ -7010,18 +7030,19 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
-    private function con_lista_cabecera_comprobante_total_gestion_reparable_admin($cliente_id,$tipoarchivo_id,$estado_id) {
+    private function con_lista_cabecera_comprobante_total_gestion_reparable_admin($cliente_id,$tipoarchivo_id,$estado_id,$anio_id='') {
 
 
         $listadatos     =   FeDocumento::Join('CMP.Orden', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.Orden.COD_ORDEN')
                             ->whereNotIn('FE_DOCUMENTO.COD_ESTADO',['','ETM0000000000006'])
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
-                            ->where('FEC_ORDEN','>','2025-11-01')
+                            //->where('FEC_ORDEN','>','2025-11-01')
                             ->where('OPERACION','=','ORDEN_COMPRA')
                             ->whereRaw("isnull(MODO_REPARABLE,'') = 'ARCHIVO_VIRTUAL'")
                             ->where('IND_REPARABLE', 0)
                             ->whereRaw("isnull(IND_REPARABLE_ADMIN,-1) <> 0")
+                            ->Anio($anio_id)
                             ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                             ->orderBy('FEC_ORDEN','desc')
                             ->get();
@@ -7029,7 +7050,7 @@ trait ComprobanteTraits
 
         return  $listadatos;
     }
-    private function con_lista_cabecera_comprobante_total_gestion_reparable_estiba_admin($cliente_id,$tipoarchivo_id,$estado_id,$operacion_id) {
+    private function con_lista_cabecera_comprobante_total_gestion_reparable_estiba_admin($cliente_id,$tipoarchivo_id,$estado_id,$operacion_id,$anio_id='') {
 
 
 
@@ -7039,6 +7060,7 @@ trait ComprobanteTraits
                                     ->where('IND_REPARABLE', 0)
                                     ->whereRaw("isnull(IND_REPARABLE_ADMIN,-1) <> 0")
                                     ->whereNotIn('FE_DOCUMENTO.COD_ESTADO',['','ETM0000000000006'])
+                                    ->Anio($anio_id)
                                     ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                                     ->orderBy('IND_OBSERVACION_REPARABLE','asc')
                                     ->get();
@@ -7050,7 +7072,7 @@ trait ComprobanteTraits
 
 
 
-    private function con_lista_cabecera_comprobante_total_gestion_reparable_contrato_admin($cliente_id,$tipoarchivo_id,$estado_id) {
+    private function con_lista_cabecera_comprobante_total_gestion_reparable_contrato_admin($cliente_id,$tipoarchivo_id,$estado_id,$anio_id='') {
 
 
         $listadatos          =      FeDocumento::Join('CMP.DOCUMENTO_CTBLE', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
@@ -7060,6 +7082,7 @@ trait ComprobanteTraits
                                     ->where('IND_REPARABLE', 0)
                                     ->whereRaw("isnull(IND_REPARABLE_ADMIN,-1) <> 0")
                                     ->whereNotIn('FE_DOCUMENTO.COD_ESTADO',['','ETM0000000000006'])
+                                    ->Anio($anio_id)
                                     ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                                     ->orderBy('IND_OBSERVACION_REPARABLE','asc')
                                     ->get();
@@ -7068,7 +7091,7 @@ trait ComprobanteTraits
         return  $listadatos;
     }
 
-    private function con_lista_cabecera_comprobante_total_gestion_reparable($cliente_id,$tipoarchivo_id,$estado_id) {
+    private function con_lista_cabecera_comprobante_total_gestion_reparable($cliente_id,$tipoarchivo_id,$estado_id,$anio_id='') {
 
 
         $rol            =       WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
@@ -7080,6 +7103,7 @@ trait ComprobanteTraits
                                 ->whereNotIn('FE_DOCUMENTO.COD_ESTADO',['','ETM0000000000006'])
                                 ->TipoArchivo($tipoarchivo_id)
                                 ->EstadoReparable($estado_id)
+                                ->Anio($anio_id)
                                 //->where('FE_DOCUMENTO.MODO_REPARABLE','=',$tipoarchivo_id)
                                 //->where('FE_DOCUMENTO.IND_REPARABLE','=','1')
                                 ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
@@ -7097,6 +7121,7 @@ trait ComprobanteTraits
                                 //->where('FE_DOCUMENTO.IND_REPARABLE','=','1')
                                 ->TipoArchivo($tipoarchivo_id)
                                 ->EstadoReparable($estado_id)
+                                ->Anio($anio_id)
                                 //->where('FE_DOCUMENTO.MODO_REPARABLE','=',)
                                 ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                                 ->orderBy('IND_OBSERVACION_REPARABLE','asc')
@@ -7108,7 +7133,7 @@ trait ComprobanteTraits
 
         return  $listadatos;
     }
-    private function con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cliente_id,$tipoarchivo_id,$estado_id) {
+    private function con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cliente_id,$tipoarchivo_id,$estado_id,$anio_id='') {
 
         $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
         $centro_id           =      $trabajador->COD_ZONA_TIPO;
@@ -7124,6 +7149,7 @@ trait ComprobanteTraits
                                         //->where('FE_DOCUMENTO.IND_REPARABLE','=','1')
                                         ->TipoArchivo($tipoarchivo_id)
                                         ->EstadoReparable($estado_id)
+                                        ->Anio($anio_id)
                                         //->where('FE_DOCUMENTO.MODO_REPARABLE','=',$tipoarchivo_id)
                                         ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
                                         ->orderBy('IND_OBSERVACION_REPARABLE','asc')
@@ -7136,6 +7162,7 @@ trait ComprobanteTraits
                                         ->where('OPERACION','=','CONTRATO')
                                         ->TipoArchivo($tipoarchivo_id)
                                         ->EstadoReparable($estado_id)
+                                        ->Anio($anio_id)
                                         //->where('FE_DOCUMENTO.MODO_REPARABLE','=',$tipoarchivo_id)
                                         ->whereNotIn('FE_DOCUMENTO.COD_ESTADO',['','ETM0000000000006'])
                                         //->where('FE_DOCUMENTO.IND_REPARABLE','=','1')
@@ -7148,7 +7175,7 @@ trait ComprobanteTraits
 
         return  $listadatos;
     }
-    private function con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cliente_id,$tipoarchivo_id,$estado_id,$operacion_id) {
+    private function con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cliente_id,$tipoarchivo_id,$estado_id,$operacion_id,$anio_id='') {
 
         $trabajador          =      STDTrabajador::where('COD_TRAB','=',$cliente_id)->first();
         $centro_id           =      $trabajador->COD_ZONA_TIPO;
@@ -7163,6 +7190,7 @@ trait ComprobanteTraits
                                         //->where('FE_DOCUMENTO.IND_REPARABLE','=','1')
                                         ->TipoArchivo($tipoarchivo_id)
                                         ->EstadoReparable($estado_id)
+                                        ->Anio($anio_id)
                                         ->where('usuario_pa','=',Session::get('usuario')->id)
                                         //->where('FE_DOCUMENTO.MODO_REPARABLE','=',$tipoarchivo_id)
                                         ->select(DB::raw('* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE'))
@@ -7175,6 +7203,7 @@ trait ComprobanteTraits
                                         ->where('OPERACION','=',$operacion_id)
                                         ->TipoArchivo($tipoarchivo_id)
                                         ->EstadoReparable($estado_id)
+                                        ->Anio($anio_id)
                                         //->where('FE_DOCUMENTO.MODO_REPARABLE','=',$tipoarchivo_id)
                                         ->whereNotIn('FE_DOCUMENTO.COD_ESTADO',['','ETM0000000000006'])
                                         //->where('FE_DOCUMENTO.IND_REPARABLE','=','1')
@@ -8378,11 +8407,11 @@ trait ComprobanteTraits
                                     ->where('FOLIO','=',$folio)
                                     ->where('CMP.ORDEN.COD_CATEGORIA_MONEDA','=',$moneda_id)
                                     ->whereIn('FE_DOCUMENTO.COD_ESTADO',['ETM0000000000005','ETM0000000000008'])
+                                    //->whereIn('FE_DOCUMENTO.ID_DOCUMENTO',['ISCHCL0000008096'])
                                     ->select(DB::raw('CMP.Orden.* ,FE_DOCUMENTO.*,documentos.NRO_SERIE,documentos.FEC_VENCIMIENTO,documentos.NRO_DOC,oi.COD_TABLA_ASOC,
                                         FE_DOCUMENTO.COD_ESTADO AS COD_ESTADO_VOUCHER'))
                                     ->orderBy('documentos.FEC_VENCIMIENTO','asc')
                                     ->get();
-
 
         return  $listadatos;
     }

@@ -49,5 +49,11 @@ class FeDocumento extends Model
         }
     }
 
+    public function scopeAnio($query,$anio_id){
+        if(trim($anio_id) != 'TODO' && trim($anio_id) != ''){
+            $query->whereYear('FE_DOCUMENTO.FEC_VENTA','=',$anio_id);
+        }
+    }
+
 
 }

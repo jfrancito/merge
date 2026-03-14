@@ -75,7 +75,7 @@ Route::any('/enviocorreoaprobado', 'UserController@actionCorreoAprobado'); //cor
 Route::any('/enviocorreoaprobadoadmin', 'UserController@actionCorreoAprobadoAdmin'); //correo para jefe acopio liuidacion compra
 Route::any('/crearexceladminaprobado', 'UserController@actionCrearExcelAprobadoAdmin'); //correo para jefe acopio liuidacion compra
 
-
+Route::any('/enviocorreoconsolidadoplanilla', 'UserController@actionEnviarCorreoConsolidado'); //correo para jefe acopio liuidacion compra
 
 Route::group(['middleware' => ['authaw']], function () {
 
@@ -426,7 +426,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/comprobante-masivo-tesoreria-excel/{fecha_inicio}/{fecha_fin}/{proveedor_id}/{estado_id}/{operacion_id}/{idopcion}', 'ReporteComprobanteController@actionComprobanteMasivoTesoreriaExcel');
 
 
-	Route::any('/comprobante-masivo-reparable-excel/{tipoarchivo_id}/{estado_id}/{operacion_id}/{idopcion}', 'ReporteComprobanteController@actionComprobanteMasivoReparableExcel');
+	Route::any('/comprobante-masivo-reparable-excel/{tipoarchivo_id}/{estado_id}/{operacion_id}/{idopcion}/{anio_id}', 'ReporteComprobanteController@actionComprobanteMasivoReparableExcel');
 
 	// Route::any('/subir-xml-cargar-datos-documento/{idopcion}/{prefijo}/{idordencompra}', 'GestionDocumentoController@actionCargarXMLDocumento');
 	// Route::any('/validar-xml-documento/{idopcion}/{prefijo}/{idordencompra}', 'GestionDocumentoController@actionValidarXMLDocumento');

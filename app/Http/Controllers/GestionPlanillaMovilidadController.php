@@ -1443,9 +1443,9 @@ class GestionPlanillaMovilidadController extends Controller
         $fecha_fin          =   $this->fecha_sin_hora;
 
         $planillamovilidad  =   $this->pla_lista_planilla_movilidad_personal($fecha_inicio,$fecha_fin);
-        $trabajador =   DB::table('STD.TRABAJADOR')
-                        ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
-                        ->first();
+        $trabajador         =   DB::table('STD.TRABAJADOR')
+                                ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                                ->first();
 
         $ruta = public_path('firmas/'.$trabajador->NRO_DOCUMENTO.'.jpg');
         $mensaje_firma = "SI CUENTA CON FIRMA PUEDE REGISTRAR SU PLANILLA DE MOVILIDAD";

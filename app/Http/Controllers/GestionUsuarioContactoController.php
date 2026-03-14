@@ -660,6 +660,11 @@ class GestionUsuarioContactoController extends Controller
 
         $estado_id          =   'TODO';
         $combo_estdo        =   array('TODO' => 'TODO','1' => 'EN PROCESO','2' => 'EN REVISION');
+
+        $anio_id            =   date("Y");
+        $combo_anio         =   $this->gn_combo_anio_reparable('TODO', 'TODO');
+
+
         $array_contrato     =   $this->array_rol_contrato();
         if (in_array(Session::get('usuario')->rol_id, $array_contrato)) {
             $operacion_id       =   'CONTRATO';
@@ -673,18 +678,21 @@ class GestionUsuarioContactoController extends Controller
         if(isset($request['estado_id'])){
             $estado_id       =   $request['estado_id'];
         }
+        if(isset($request['anio_id'])){
+            $anio_id       =   $request['anio_id'];
+        }
 
         if($operacion_id=='ORDEN_COMPRA'){
-            $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable($cod_empresa,$tipoarchivo_id,$estado_id);
+            $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable($cod_empresa,$tipoarchivo_id,$estado_id,$anio_id);
         }else{
             if($operacion_id=='CONTRATO'){
-                $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cod_empresa,$tipoarchivo_id,$estado_id);
+                $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cod_empresa,$tipoarchivo_id,$estado_id,$anio_id);
             }else{
 
                $array_canjes               =   $this->con_array_canjes();
                 if (in_array($operacion_id, $array_canjes)) {
                     $categoria_id       =   $this->con_categoria_canje($operacion_id);
-                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,$tipoarchivo_id,$estado_id,$operacion_id);
+                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,$tipoarchivo_id,$estado_id,$operacion_id,$anio_id);
                 }
 
 
@@ -703,6 +711,9 @@ class GestionUsuarioContactoController extends Controller
 
                             'estado_id'         =>  $estado_id,
                             'combo_estdo'       =>  $combo_estdo,
+
+                            'anio_id'           =>  $anio_id,
+                            'combo_anio'        =>  $combo_anio,
 
 
                             'funcion'           =>  $funcion,
@@ -734,6 +745,9 @@ class GestionUsuarioContactoController extends Controller
         $estado_id          =   'TODO';
         $combo_estdo        =   array('TODO' => 'TODO','1' => 'EN PROCESO','2' => 'EN REVISION');
 
+        $anio_id            =   date("Y");
+        $combo_anio         =   $this->gn_combo_anio_reparable('TODO', 'TODO');
+
         $array_contrato     =   $this->array_rol_contrato();
         if (in_array(Session::get('usuario')->rol_id, $array_contrato)) {
             $operacion_id       =   'CONTRATO';
@@ -747,18 +761,21 @@ class GestionUsuarioContactoController extends Controller
         if(isset($request['estado_id'])){
             $estado_id       =   $request['estado_id'];
         }
+        if(isset($request['anio_id'])){
+            $anio_id       =   $request['anio_id'];
+        }
 
         if($operacion_id=='ORDEN_COMPRA'){
-            $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_admin($cod_empresa,$tipoarchivo_id,$estado_id);
+            $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_admin($cod_empresa,$tipoarchivo_id,$estado_id,$anio_id);
         }else{
             if($operacion_id=='CONTRATO'){
-                $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cod_empresa,$tipoarchivo_id,$estado_id);
+                $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato_admin($cod_empresa,$tipoarchivo_id,$estado_id,$anio_id);
             }else{
 
                $array_canjes               =   $this->con_array_canjes();
                 if (in_array($operacion_id, $array_canjes)) {
                     $categoria_id       =   $this->con_categoria_canje($operacion_id);
-                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,$tipoarchivo_id,$estado_id,$operacion_id);
+                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba_admin($cod_empresa,$tipoarchivo_id,$estado_id,$operacion_id,$anio_id);
                 }
 
             }
@@ -777,6 +794,8 @@ class GestionUsuarioContactoController extends Controller
                             'estado_id'         =>  $estado_id,
                             'combo_estdo'       =>  $combo_estdo,
 
+                            'anio_id'           =>  $anio_id,
+                            'combo_anio'        =>  $combo_anio,
 
                             'funcion'           =>  $funcion,
                             'idopcion'          =>  $idopcion,
@@ -790,16 +809,17 @@ class GestionUsuarioContactoController extends Controller
         $operacion_id       =   $request['operacion_id'];
         $tipoarchivo_id     =   $request['tipoarchivo_id'];
         $estado_id          =   "";
+        $anio_id            =   $request['anio_id'];
 
         $idopcion           =   $request['idopcion'];
         $cod_empresa        =   Session::get('usuario')->usuarioosiris_id;
         if($operacion_id=='ORDEN_COMPRA'){
-            $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_admin($cod_empresa,$tipoarchivo_id,$estado_id);
+            $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_admin($cod_empresa,$tipoarchivo_id,$estado_id,$anio_id);
         }else{
             if($operacion_id=='CONTRATO'){
-                $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato_admin($cod_empresa,$tipoarchivo_id,$estado_id);
+                $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato_admin($cod_empresa,$tipoarchivo_id,$estado_id,$anio_id);
             }else{
-                $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba_admin($cod_empresa,$tipoarchivo_id,$estado_id,$operacion_id);
+                $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba_admin($cod_empresa,$tipoarchivo_id,$estado_id,$operacion_id,$anio_id);
             }
         }
 
@@ -822,16 +842,17 @@ class GestionUsuarioContactoController extends Controller
         $operacion_id       =   $request['operacion_id'];
         $tipoarchivo_id     =   $request['tipoarchivo_id'];
         $estado_id          =   $request['estado_id'];
+        $anio_id            =   $request['anio_id'];
 
         $idopcion           =   $request['idopcion'];
         $cod_empresa        =   Session::get('usuario')->usuarioosiris_id;
         if($operacion_id=='ORDEN_COMPRA'){
-            $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable($cod_empresa,$tipoarchivo_id,$estado_id);
+            $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable($cod_empresa,$tipoarchivo_id,$estado_id,$anio_id);
         }else{
             if($operacion_id=='CONTRATO'){
-                $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cod_empresa,$tipoarchivo_id,$estado_id);
+                $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_contrato($cod_empresa,$tipoarchivo_id,$estado_id,$anio_id);
             }else{
-                $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,$tipoarchivo_id,$estado_id,$operacion_id);
+                $listadatos     =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_estiba($cod_empresa,$tipoarchivo_id,$estado_id,$operacion_id,$anio_id);
             }
         }
 

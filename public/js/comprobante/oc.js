@@ -386,18 +386,17 @@ $(document).ready(function(){
 
     $(".agestioncomprobante").on('click','#descargarcomprobantemasivoreparableexcel', function() {
 
-
         var tipoarchivo_id       =   $('#tipoarchivo_id').val();
         var estado_id            =   $('#estado_id').val();
         var operacion_id         =   $('#operacion_id').val();
         var idopcion             =   $('#idopcion').val();
         var _token               =   $('#token').val();
+        var anio_id              =   $('#anio_id').val();
 
         debugger;
-        href = $(this).attr('data-href')+'/'+tipoarchivo_id+'/'+estado_id+'/'+operacion_id+'/'+idopcion;
+        href = $(this).attr('data-href')+'/'+tipoarchivo_id+'/'+estado_id+'/'+operacion_id+'/'+idopcion+'/'+anio_id;
         $(this).prop('href', href);
         return true;
-
 
     });
 
@@ -598,6 +597,7 @@ $(document).ready(function(){
         var operacion_id            =   $('#operacion_id').val();
         var tipoarchivo_id          =   $('#tipoarchivo_id').val();
         var estado_id               =   $('#estado_id').val();
+        var anio_id                 =   $('#anio_id').val();
 
         var idopcion                =   $('#idopcion').val();
         var _token                  =   $('#token').val();
@@ -607,6 +607,7 @@ $(document).ready(function(){
                                 operacion_id            : operacion_id,
                                 tipoarchivo_id          : tipoarchivo_id,
                                 estado_id               : estado_id,
+                                anio_id                 : anio_id,
                                 idopcion                : idopcion
                             };
         ajax_normal(data,"/ajax-buscar-documento-gestion-reparable");
@@ -619,6 +620,7 @@ $(document).ready(function(){
 
         var operacion_id            =   $('#operacion_id').val();
         var tipoarchivo_id          =   $('#tipoarchivo_id').val();
+        var anio_id                 =   $('#anio_id').val();
         var idopcion                =   $('#idopcion').val();
         var _token                  =   $('#token').val();
 
@@ -626,6 +628,7 @@ $(document).ready(function(){
                                 _token                  : _token,
                                 operacion_id            : operacion_id,
                                 tipoarchivo_id          : tipoarchivo_id,
+                                anio_id                 : anio_id,
                                 idopcion                : idopcion
                             };
         ajax_normal(data,"/ajax-buscar-documento-gestion-reparable-admin");

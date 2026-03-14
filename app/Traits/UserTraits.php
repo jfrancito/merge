@@ -323,6 +323,38 @@ trait UserTraits
 
 
 
+
+
+    private function envio_correo_placon() {
+
+        $listadocumentos          =   DB::table('vcorreoplaconsolidado')
+                                      //->where('emailcorp','=','alexis.colchado@induamerica.com.pe')
+                                      ->get();
+
+        foreach($listadocumentos as $item){
+
+            $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
+            $correocc               =   $item->emailcorp;
+            //$correocc               =   'jorge.saldana@induamerica.com.pe';
+
+            $array                  =   Array(
+                'item'                =>  $item
+            );
+
+            Mail::send('emails.consolidadoplanilla', $array, function($message) use ($emailfrom,$item,$correocc)
+            {
+                $message->from($emailfrom->correoprincipal, 'Planilla de Movilidad – Pendiente de Consolidación  2026 - '.$item->trabajador );
+                //$message->to($correocc);
+                $message->to($correocc)->cc('alertassys@induamerica.com.pe');
+                $message->subject('Planilla de Movilidad Pendientes consolidar');
+            });
+
+        }
+        print("Se envio correctamente");
+    }
+
+
+
     private function envio_correo_baja() {
 
         $listadocumentos          =   FeDocumento::where('ind_email_ba','=',0)->where('COD_ESTADO','=','ETM0000000000006')
