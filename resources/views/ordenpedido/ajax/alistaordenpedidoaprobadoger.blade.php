@@ -1,5 +1,5 @@
 <div class="card shadow-sm mb-4">
-   
+
   <div class="panel panel-default panel-contrast">
         <div class="panel-heading" style="background:#1d3a6d;color:#fff;">
             LISTA ORDEN DE PEDIDO
@@ -23,18 +23,19 @@
                         <th>GLOSA</th>
                         <th>ESTADO</th>
                         <th>VER DETALLE</th>
+                        <th>ARCHIVO</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($listapedido as $index => $item)
                        @if (
                             (
-                                $item['COD_ESTADO'] === 'ETM0000000000004' || 
+                                $item['COD_ESTADO'] === 'ETM0000000000004' ||
                                 $item['COD_ESTADO'] === 'ETM0000000000005'
-                            ) 
-                            && 
-                            !is_null($item['COD_TRABAJADOR_APRUEBA_GER']) 
-                            && 
+                            )
+                            &&
+                            !is_null($item['COD_TRABAJADOR_APRUEBA_GER'])
+                            &&
                             $item['COD_TRABAJADOR_APRUEBA_GER'] === $usuario_logueado_id
                         )
                         <tr class="align-middle">
@@ -52,7 +53,7 @@
                             <td>@include('comprobante.ajax.estadospedido')</td>
                            <td class="text-center">
                             <div class="grupo-acciones">
-                                 <button 
+                                 <button
                                     class="btn btn-sm btn-primary ver-detalle-pedido"
                                     data-id="{{ $item['ID_PEDIDO'] }}"
                                     title="Ver detalle del pedido">
@@ -61,6 +62,17 @@
                                 </button>
                             </div>
                            </td>
+                            <td class="align-center-tb">
+                                @if(!empty($item['URL_ARCHIVO']))
+                                    <a href="{{ url('descargar-archivo-informe/'.$item['URL_ARCHIVO']) }}"
+                                       class="btn btn-xs btn-success"
+                                       title="Descargar archivo">
+                                        <i class="fa fa-download"></i>
+                                    </a>
+                                @else
+                                    <span class="text-muted">—</span>
+                                @endif
+                            </td>
                         </tr>
                         @endif
                     @endforeach

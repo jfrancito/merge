@@ -100,6 +100,93 @@ $(document).ready(function () {
         }
     }
 
+    $(document).on('click','.subir-archivo',function(){
+
+        var idPedido = $(this).data('id');
+
+        $('#pedidoSeleccionado').val(idPedido);
+
+        $('#filePedido').trigger('click');
+
+    });
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    $('#filePedido').on('change', function () {
+
+        let archivo = this.files[0];
+
+        if(!archivo){
+            alert('No se seleccionó ningún archivo');
+            return;
+        }
+
+        let idPedido = $('#pedidoSeleccionado').val();
+
+        if(!idPedido){
+            alert('No se encontró el pedido');
+            return;
+        }
+
+        let formData = new FormData();
+        formData.append('archivo', archivo);
+        formData.append('id_pedido', idPedido);
+        //formData.append('_token', '{{ csrf_token() }}');
+
+        debugger;
+
+        modalBonito({
+            tipo: 'info',
+            icono: '📝',
+            titulo: 'Confirmar registro',
+            mensaje: '¿Deseas guardar el informe de la <b>Orden de Pedido</b>?',
+            confirmar: true,
+            onConfirm: function () {
+
+                // Abrimos cargando solo cuando el usuario confirma
+                abrircargando();
+
+                $.ajax({
+                    type: "POST",
+                    url: carpeta + "/subir-archivo-pedido",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (resp) {
+                        debugger;
+                        modalBonito({
+                            tipo: 'success',
+                            icono: '✔',
+                            titulo: 'Operación exitosa',
+                            mensaje: 'El archivo fue registrado correctamente.'
+                        });
+
+                        // 🔹 Dejamos el cargando activo y recargamos
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1500);
+                    },
+
+                    error: function (xhr) {
+                        debugger;
+                        modalBonito({
+                            tipo: 'error',
+                            icono: '❌',
+                            titulo: 'Error',
+                            mensaje: xhr.responseJSON?.message ||
+                                'Ocurrió un error al guardar el archivo.'
+                        });
+                        cerrarcargando(); // Cerramos solo si hay error
+                    },
+                });
+            }
+        });
+
+    });
 
     /* ===============================
        REGISTRAR ORDEN DE PEDIDO
@@ -178,6 +265,35 @@ $(document).ready(function () {
 
         /* ========= CONFIRMAR ========= */
 
+        let formData = new FormData();
+
+        formData.append('_token', _token);
+        formData.append('fec_pedido', fec_pedido);
+        formData.append('cod_periodo', cod_periodo);
+        formData.append('cod_anio', cod_anio);
+        formData.append('cod_empr', cod_empr);
+        formData.append('cod_centro', cod_centro);
+        formData.append('cod_tipo_pedido', cod_tipo_pedido);
+        formData.append('cod_trabajador_solicita', cod_trabajador_solicita);
+        formData.append('cod_trabajador_autoriza', cod_trabajador_autoriza);
+        formData.append('cod_trabajador_aprueba_ger', cod_trabajador_aprueba_ger);
+        formData.append('cod_trabajador_aprueba_adm', cod_trabajador_aprueba_adm);
+        formData.append('txt_glosa', txt_glosa);
+        formData.append('cod_estado', cod_estado);
+        formData.append('cod_area', cod_area);
+        formData.append('orden_pedido_id', orden_pedido_id);
+        formData.append('opcion', opcion);
+
+        formData.append('array_detalle', JSON.stringify(detalles));
+
+        let archivo = $('#formFile')[0].files[0];
+
+        if (archivo) {
+            formData.append('select_file', archivo);
+        }
+
+        debugger;
+
         modalBonito({
             tipo: 'info',
             icono: '📝',
@@ -192,7 +308,7 @@ $(document).ready(function () {
                 $.ajax({
                     type: "POST",
                     url: carpeta + "/registrar_orden_pedido",
-                    data: {
+                    data: formData, /*{
                         _token,
                         fec_pedido,
                         cod_periodo,
@@ -210,9 +326,11 @@ $(document).ready(function () {
                         orden_pedido_id,
                         opcion,
                         array_detalle: detalles
-                    },
-
+                    },*/
+                    processData: false,
+                    contentType: false,
                     success: function (resp) {
+                        debugger;
                         modalBonito({
                             tipo: 'success',
                             icono: '✔',
@@ -227,6 +345,7 @@ $(document).ready(function () {
                     },
 
                     error: function (xhr) {
+                        debugger;
                         modalBonito({
                             tipo: 'error',
                             icono: '❌',

@@ -40,7 +40,7 @@
                         ESTADO <span class="obligatorio">(*)</span>
                     </label>
                     <div class="col-md-8">
-                         <input type="text"
+                        <input type="text"
                                class="form-control control text-uppercase"
                                value="{{ $estadosMerge[$estado_merge] ?? '' }}"
                                readonly>
@@ -61,7 +61,7 @@
                         FECHA <span class="obligatorio">(*)</span>
                     </label>
                     <div class="col-md-8">
-                       <input type="date"
+                        <input type="date"
                                id="fec_pedido"
                                name="fec_pedido"
                                class="form-control control"
@@ -106,24 +106,24 @@
                     </div>
                 </div>
             </div>
-                <div class="col-md-6">
-                    <div class="row">
-                        <label class="col-md-4 control-label label-sm text-center negrita">
-                            ÁREA <span class="obligatorio">(*)</span>
-                        </label>
-                        <div class="col-md-8">
-                            <input type="text"
-                                   class="form-control control text-uppercase"
-                                   value="{{ strtoupper($nomArea ?? '') }}"
-                                   readonly>
+            <div class="col-md-6">
+                <div class="row">
+                    <label class="col-md-4 control-label label-sm text-center negrita">
+                        ÁREA <span class="obligatorio">(*)</span>
+                    </label>
+                    <div class="col-md-8">
+                        <input type="text"
+                               class="form-control control text-uppercase"
+                               value="{{ strtoupper($nomArea ?? '') }}"
+                               readonly>
 
-                            <input type="hidden"
-                                   id="cod_area"
-                                   name="cod_area"
-                                   value="{{ $area_id }}">
-                        </div>
+                        <input type="hidden"
+                               id="cod_area"
+                               name="cod_area"
+                               value="{{ $area_id }}">
                     </div>
                 </div>
+            </div>
         </div>
 
         <!-- FILA 4 -->
@@ -134,22 +134,22 @@
                         MES <span class="obligatorio">(*)</span>
                     </label>
                     <div class="col-md-8">
-                     {{--  {!! Form::select('cod_periodo', ['' => 'Seleccione Mes'], '', [
-                                'id' => 'cod_periodo',
-                                'class' => 'form-control control select2'
-                            ]) !!}  --}} 
+                        {{--  {!! Form::select('cod_periodo', ['' => 'Seleccione Mes'], '', [
+                                   'id' => 'cod_periodo',
+                                   'class' => 'form-control control select2'
+                               ]) !!}  --}}
 
-                          {!! Form::select('cod_periodo', $periodo_mes, '', [
-                            'id' => 'cod_periodo',
-                            'class' => 'form-control control select2'
-                        ]) !!}
+                        {!! Form::select('cod_periodo', $periodo_mes, '', [
+                          'id' => 'cod_periodo',
+                          'class' => 'form-control control select2'
+                      ]) !!}
 
                     </div>
                 </div>
             </div>
 
 
-             <div class="col-md-6">
+            <div class="col-md-6">
                 <div class="row">
                     <label class="col-md-4 control-label label-sm text-center negrita">
                         AUTORIZADO POR <span class="obligatorio">(*)</span>
@@ -183,7 +183,6 @@
                     </div>
                 </div>
             </div>
-
 
 
             <div class="col-md-6">
@@ -222,8 +221,6 @@
                 </div>
             </div>
 
-          
-
 
             <div class="col-md-6">
                 <div class="row">
@@ -231,10 +228,10 @@
                         APROBADO ADMIN <span class="obligatorio">(*)</span>
                     </label>
                     <div class="col-md-8">
-                       {!! Form::select('cod_trabajador_aprueba_adm', $usuario_aprueba_adm, '', [
-                            'id' => 'cod_trabajador_aprueba_adm',
-                            'class' => 'form-control control select2'
-                        ]) !!}
+                        {!! Form::select('cod_trabajador_aprueba_adm', $usuario_aprueba_adm, '', [
+                             'id' => 'cod_trabajador_aprueba_adm',
+                             'class' => 'form-control control select2'
+                         ]) !!}
 
                     </div>
                 </div>
@@ -242,47 +239,66 @@
         </div>
 
         <!-- FILA 7 -->
-       <!-- FILA 7 -->
-<div class="row form-row">
+        <!-- FILA 7 -->
+        <div class="row form-row">
 
-    <!-- TIPO -->
-    <div class="col-md-6">
-        <div class="row">
-            <label class="col-md-4 control-label label-sm text-center negrita">
-                TIPO <span class="obligatorio">(*)</span>
-            </label>
-            <div class="col-md-8">
-                {!! Form::select('cod_tipo_pedido', $listatipopedido, '', [
-                    'id' => 'cod_tipo_pedido',
-                    'class' => 'form-control control select2'
-                ]) !!}
+            <!-- TIPO -->
+            <div class="col-md-6">
+                <div class="row">
+                    <label class="col-md-4 control-label label-sm text-center negrita">
+                        TIPO <span class="obligatorio">(*)</span>
+                    </label>
+                    <div class="col-md-8">
+                        {!! Form::select('cod_tipo_pedido', $listatipopedido, '', [
+                            'id' => 'cod_tipo_pedido',
+                            'class' => 'form-control control select2'
+                        ]) !!}
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
 
-    <!-- OBSERVACIÓN -->
-    <div class="col-md-6">
-        <div class="row">
-            <label class="col-md-4 control-label label-sm text-center negrita">
-                OBSERVACIÓN <span class="obligatorio">(*)</span>
-            </label>
-            <div class="col-md-8">
+            <!-- OBSERVACIÓN -->
+            <div class="col-md-6">
+                <div class="row">
+                    <label class="col-md-4 control-label label-sm text-center negrita">
+                        OBSERVACIÓN <span class="obligatorio">(*)</span>
+                    </label>
+                    <div class="col-md-8">
                 <textarea id="txt_glosa"
                           name="txt_glosa"
                           class="form-control"
                           rows="2"
                           required
                           placeholder="Observación"></textarea>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- FILA 7 -->
+        <div class="row form-row">
+            <div class="col-xs-12 cajareporte">
+                <div class="form-group">
+                    <label class="control-label labelleft negrita">
+                        INFORME :
+                    </label>
+
+                    <input
+                            type="file"
+                            class="form-control input-sm"
+                            name="select_file"
+                            id="formFile"
+                            required
+                            accept=".xls,.xlsx,.csv,.pdf,.doc,.docx"
+                            style="cursor:pointer;">
+                </div>
             </div>
         </div>
-    </div>
-
-</div>
-
-
         <!-- FILA 8 -->
-      
-    </div><!-- FIN panel-body ORDEN -->
+
+    </div>
+    <!-- FIN panel-body ORDEN -->
 
     <!-- ================= HEADER DETALLE ================= -->
     <div class="panel panel-default panel-contrast">
@@ -300,9 +316,9 @@
                     PRODUCTO <span class="obligatorio">(*)</span>
                 </label>
                 <select id="cod_producto" class="form-control select2 select2-lg">
-                        <option value="">Buscar producto...</option>
-                        @foreach($producto as $prd)
-                         <option value="{{ $prd->COD_PRODUCTO }}"
+                    <option value="">Buscar producto...</option>
+                    @foreach($producto as $prd)
+                        <option value="{{ $prd->COD_PRODUCTO }}"
                                 data-nombre="{{ $prd->NOM_PRODUCTO }}"
                                 data-unidad="{{ $prd->UNIDAD }}"
                                 data-codcategoria="{{ $prd->COD_UNIDAD }}"
@@ -311,31 +327,31 @@
                             {{ $prd->COD_PRODUCTO }} - {{ $prd->NOM_PRODUCTO }}
                         </option>
 
-                        @endforeach
-                    </select>
+                    @endforeach
+                </select>
             </div>
 
-              <div class="col-md-2">
-                    <label class="label-sm negrita">
-                        MEDIDA <span class="obligatorio">(*)</span>
-                    </label>
-                    <input type="text"
-                           id="unidad"
-                           class="form-control text-center"
-                           readonly>
-             </div>
+            <div class="col-md-2">
+                <label class="label-sm negrita">
+                    MEDIDA <span class="obligatorio">(*)</span>
+                </label>
+                <input type="text"
+                       id="unidad"
+                       class="form-control text-center"
+                       readonly>
+            </div>
 
 
             <div class="col-md-1">
                 <label class="label-sm negrita">
                     CANT. <span class="obligatorio">(*)</span>
                 </label>
-                  <input type="number"
-                   id="cantidad"
-                   class="form-control cantidad-input"
-                   min="0"
-                   step="1"
-                   oninput="this.value = Math.max(0, this.value)">
+                <input type="number"
+                       id="cantidad"
+                       class="form-control cantidad-input"
+                       min="0"
+                       step="1"
+                       oninput="this.value = Math.max(0, this.value)">
             </div>
 
             <div class="col-md-4">
@@ -353,7 +369,7 @@
                 <button id="eliminar_producto" class="btn btn-danger btn-sm">
                     <i class="fa fa-trash"></i> Eliminar Producto
                 </button>
-               <button id="asignarordenpedido" class="btn btn-primary btn-sm">
+                <button id="asignarordenpedido" class="btn btn-primary btn-sm">
                     <i class="fa fa-save"></i> Guardar Pedido
                 </button>
             </div>
@@ -365,24 +381,24 @@
         <div class="table-responsive">
             <table class="table table-bordered table-striped" id="tabla_detalle_pedido">
                 <thead>
-                    <tr>
-                        <th class=" text-center">#</th>
-                        <th class=" text-center">CÓDIGO</th>
-                        <th class=" text-center">PRODUCTO</th>
-                        <th class=" text-center">UNIDAD</th>
-                        <th class=" text-center">CANTIDAD</th>
-                        <th class=" text-center">PRECIO</th>
-                        <th class=" text-center">SUBTOTAL</th>
-                        <th class=" text-center">OBSERVACIÓN</th>
-                    </tr>
+                <tr>
+                    <th class=" text-center">#</th>
+                    <th class=" text-center">CÓDIGO</th>
+                    <th class=" text-center">PRODUCTO</th>
+                    <th class=" text-center">UNIDAD</th>
+                    <th class=" text-center">CANTIDAD</th>
+                    <th class=" text-center">PRECIO</th>
+                    <th class=" text-center">SUBTOTAL</th>
+                    <th class=" text-center">OBSERVACIÓN</th>
+                </tr>
                 </thead>
                 <tbody></tbody>
                 <tfoot>
-                    <tr>
-                        <th colspan="6" class="text-right negrita" style="vertical-align: middle;">TOTAL PEDIDO:</th>
-                        <th class="text-center negrita" id="total_pedido" style="font-size: 16px; color: #1d3a6d;">0.00</th>
-                        <th></th>
-                    </tr>
+                <tr>
+                    <th colspan="6" class="text-right negrita" style="vertical-align: middle;">TOTAL PEDIDO:</th>
+                    <th class="text-center negrita" id="total_pedido" style="font-size: 16px; color: #1d3a6d;">0.00</th>
+                    <th></th>
+                </tr>
                 </tfoot>
             </table>
         </div>
@@ -392,89 +408,89 @@
 </div><!-- FIN panel-table -->
 
 <style>
-.form-row{
-    margin-bottom:4px;
-}
+    .form-row {
+        margin-bottom: 4px;
+    }
 
-.label-sm{
-    font-weight:bold;
-    font-size:12px;
-    position:relative;
-    padding-right:12px;
-    line-height:34px;   
-}
+    .label-sm {
+        font-weight: bold;
+        font-size: 12px;
+        position: relative;
+        padding-right: 12px;
+        line-height: 34px;
+    }
 
-.cantidad-input{
-    text-align:center;
-    font-weight:600;
-    font-size:14px;
-}
+    .cantidad-input {
+        text-align: center;
+        font-weight: 600;
+        font-size: 14px;
+    }
 
-.label-sm::after{
-    content:":";
-    position:absolute;
-    right:0;
-    top:50%;
-    transform:translateY(-50%);
-}
+    .label-sm::after {
+        content: ":";
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+    }
 
-.panel-heading{
-    background:#003366;
-    color:#fff;
-    font-size:14px;
-    padding:6px;
-}
+    .panel-heading {
+        background: #003366;
+        color: #fff;
+        font-size: 14px;
+        padding: 6px;
+    }
 
-.select2-container--default .select2-selection--single{
-    height:38px;
-    border-radius:6px;
-    border:1px solid #dce1e7;
-}
+    .select2-container--default .select2-selection--single {
+        height: 38px;
+        border-radius: 6px;
+        border: 1px solid #dce1e7;
+    }
 
-.select2-selection__rendered{
-    line-height:38px !important;
-}
+    .select2-selection__rendered {
+        line-height: 38px !important;
+    }
 
-.select2-selection__arrow{
-    height:36px !important;
-}
+    .select2-selection__arrow {
+        height: 36px !important;
+    }
 
-.form-control{
-    border-radius:6px;
-    border:1px solid #dce1e7;
-    box-shadow:none;
-    transition:.2s;
-}
+    .form-control {
+        border-radius: 6px;
+        border: 1px solid #dce1e7;
+        box-shadow: none;
+        transition: .2s;
+    }
 
-.form-control:focus{
-    border-color:#4facfe;
-    box-shadow:0 0 0 2px rgba(79,172,254,.15);
-}
+    .form-control:focus {
+        border-color: #4facfe;
+        box-shadow: 0 0 0 2px rgba(79, 172, 254, .15);
+    }
 
-.btn{
-    border-radius:6px;
-    padding:6px 14px;
-    font-weight:500;
-}
+    .btn {
+        border-radius: 6px;
+        padding: 6px 14px;
+        font-weight: 500;
+    }
 
-.table{
-    font-size:13px;
-}
+    .table {
+        font-size: 13px;
+    }
 
-.table thead th{
-    background:#f5f7fa;
-    font-weight:600;
-    color:#2c3e50;
-}
+    .table thead th {
+        background: #f5f7fa;
+        font-weight: 600;
+        color: #2c3e50;
+    }
 
-.table tbody tr:hover{
-    background:#f0f6ff;
-}
+    .table tbody tr:hover {
+        background: #f0f6ff;
+    }
 
-.fila-seleccionada{
-    background:#e3f2fd !important;
-    cursor:pointer;
-}
+    .fila-seleccionada {
+        background: #e3f2fd !important;
+        cursor: pointer;
+    }
 
 
 </style>

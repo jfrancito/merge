@@ -1,5 +1,5 @@
 <div class="card shadow-sm mb-4">
-   
+
   <div class="panel panel-default panel-contrast">
         <div class="panel-heading" style="background:#1d3a6d;color:#fff;">
             LISTA ORDEN DE PEDIDO
@@ -24,6 +24,7 @@
                         <th>GLOSA</th>
                         <th>ESTADO</th>
                         <th>VER DETALLE</th>
+                        <th>ARCHIVO</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -47,12 +48,23 @@
                                 <div class="grupo-acciones">
 
                                     <!-- VER DETALLE (SIEMPRE VISIBLE) -->
-                                    <button 
+                                    <button
                                         class="btn btn-sm btn-primary ver-detalle-pedido"
                                         data-id="{{ $item['ID_PEDIDO'] }}">
                                         <i class="fa fa-eye me-1"></i> Detalle
                                     </button>
                                 </div>
+                            </td>
+                            <td class="align-center-tb">
+                                @if(!empty($item['URL_ARCHIVO']))
+                                    <a href="{{ url('descargar-archivo-informe/'.$item['URL_ARCHIVO']) }}"
+                                       class="btn btn-xs btn-success"
+                                       title="Descargar archivo">
+                                        <i class="fa fa-download"></i>
+                                    </a>
+                                @else
+                                    <span class="text-muted">—</span>
+                                @endif
                             </td>
                         </tr>
                         @endif

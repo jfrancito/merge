@@ -1094,7 +1094,11 @@ Route::group(['middleware' => ['authaw']], function () {
     Route::any('/cargar-periodo-orden-pedido', 'ReporteOrdenPedidoController@actionListarPeriodo');
     Route::any('/listar-reporte-orden-pedido-estado', 'ReporteOrdenPedidoController@actionListarAjaxReporte');
     Route::any('/descargar-orden-pedido-estado', 'ReporteOrdenPedidoController@actionListarAjaxReporteExcel');
-
+    Route::get(
+        '/descargar-archivo-informe/{archivo}',
+        'ReporteOrdenPedidoController@actionDescargarArchivo'
+    )->where('archivo', '.*');
+    Route::post('/subir-archivo-pedido','ReporteOrdenPedidoController@subirArchivo');
 });
 
 Route::get('/pruebaemail/{emailfrom}/{nombreusuario}', 'PruebasController@actionPruebaEmail');
