@@ -1301,6 +1301,11 @@ class UserController extends Controller {
 	{
 		$this->envio_correo_apcli();
 	}
+    public function actionEnviarCorreoConsolidado()
+	{
+		$this->envio_correo_placon();
+	}
+
 
 
     public function actionRegistrate(Request $request)

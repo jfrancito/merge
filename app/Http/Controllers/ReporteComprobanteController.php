@@ -175,7 +175,7 @@ class ReporteComprobanteController extends Controller
 
 
 
-    public function actionComprobanteMasivoReparableExcel($tipoarchivo_id,$estado_id,$operacion_id,$idopcion)
+    public function actionComprobanteMasivoReparableExcel($tipoarchivo_id,$estado_id,$operacion_id,$idopcion,$anio_id='')
     {
         set_time_limit(0);
 
@@ -189,7 +189,7 @@ class ReporteComprobanteController extends Controller
         if($operacion_id=='ORDEN_COMPRA'){
 
 
-            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_excel($cod_empresa,$tipoarchivo_id,$estado_id);
+            $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_reparable_excel($cod_empresa,$tipoarchivo_id,$estado_id,$anio_id);
             Excel::create($titulo.'-('.$fecha_actual.')', function($excel) use ($listadatos,$titulo,$funcion) {
                 $excel->sheet('ORDEN COMPRA REPARABLE', function($sheet) use ($listadatos,$titulo,$funcion) {
 
@@ -203,7 +203,7 @@ class ReporteComprobanteController extends Controller
 
             if($operacion_id=='CONTRATO'){
 
-                $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_contrato_reparable_excel($cod_empresa,$tipoarchivo_id,$estado_id);
+                $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_contrato_reparable_excel($cod_empresa,$tipoarchivo_id,$estado_id,$anio_id);
                 Excel::create($titulo.'-('.$fecha_actual.')', function($excel) use ($listadatos,$titulo,$funcion) {
                     $excel->sheet('CONTRATO REPARABLE', function($sheet) use ($listadatos,$titulo,$funcion) {
                         $sheet->loadView('reporte/excel/listacomprobantemasivocontrato')->with('listadatos',$listadatos)
@@ -216,7 +216,7 @@ class ReporteComprobanteController extends Controller
 
 
 
-                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_estiba_reparable_excel($cod_empresa,$tipoarchivo_id,$estado_id,$operacion_id);
+                    $listadatos         =   $this->con_lista_cabecera_comprobante_total_gestion_estiba_reparable_excel($cod_empresa,$tipoarchivo_id,$estado_id,$operacion_id,$anio_id);
                     
                     Excel::create($titulo.'-('.$fecha_actual.')', function($excel) use ($listadatos,$titulo,$funcion,$operacion_id) {
                         $excel->sheet($operacion_id.' REPARABLE', function($sheet) use ($listadatos,$titulo,$funcion,$operacion_id) {

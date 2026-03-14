@@ -585,7 +585,7 @@ class GestionContratoAcopioController  extends Controller
             $combo_subcuenta= array();
 
             $variedad_id    = "";
-            $combo_variedad = $this->gn_generacion_combo_categoria('VARIEDAD', 'Seleccione Variedad', '');
+            $combo_variedad = $this->gn_generacion_combo_variedad('VARIEDAD', 'Seleccione Variedad', '');
             $tarchivos      =   CMPCategoria::where('COD_CATEGORIA','=','DCC0000000000046')->where('COD_ESTADO','=',1)
                                 ->get();
 

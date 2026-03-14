@@ -1466,6 +1466,27 @@ trait GeneralesTraits
         return $combo;
     }
 
+    private function gn_generacion_combo_variedad($txt_grupo, $titulo, $todo)
+    {
+
+        $array = DB::table('ALM.PRODUCTO')
+            ->where('COD_CATEGORIA_TIPO_PRODUCTO', '=', 'TPR0000000000003')
+            ->where('COD_CATEGORIA_FAMILIA', '=', 'FAM0000000000046')
+            ->where('COD_CATEGORIA_SUB_FAMILIA', '=', 'SFM0000000000025')
+            ->where('COD_ESTADO', '=', '1')
+            ->where('IND_DISPONIBLE', '=', '1')
+            ->pluck('NOM_PRODUCTO', 'COD_PRODUCTO')
+            ->toArray();
+
+        if ($todo == 'TODO') {
+            $combo = array('' => $titulo, $todo => $todo) + $array;
+        } else {
+            $combo = array('' => $titulo) + $array;
+        }
+
+        return $combo;
+    }
+
     private function gn_generacion_combo_usuario_reparable($titulo, $todo)
     {
 

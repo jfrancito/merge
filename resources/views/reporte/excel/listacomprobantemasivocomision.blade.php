@@ -61,10 +61,9 @@
         </style>
     <table>
         <tr>
-            <th class= 'tabladp'>FECHA EMISIÓN DE COMPROBANTE</th>
+            <th class= 'tabladp'>FECHA CARGA DATOS</th>
             <th class= 'tabladp'>FECHA REVISION CONTABILIDAD</th>
 
-            <th class= 'tabladp'>FECHA AUTORIZACION</th>
             <th class= 'tabladp'>TIPO DE DOCUMENTO</th>
             <th class= 'tabladp'>CODIGO DE DOCUMENTO</th>
             <th class= 'tabladp'>N° DOCUMENTO</th>
@@ -91,10 +90,8 @@
         </tr>
         @foreach($listadatos as $index => $item) 
         <tr>
-            <td>{{date_format(date_create($item->FEC_VENTA), 'd-m-Y')}}</td>
-            <td>{{date_format(date_create($item->fecha_pr), 'd-m-Y')}}</td>
-            
-            <td>{{date_format(date_create($item->fecha_ap), 'd-m-Y h:i:s')}}</td>
+            <td>{{date_format(date_create($item->fecha_pa), 'd-m-Y')}}</td>
+            <td>{{ $item->fecha_pr ? date_format(date_create($item->fecha_pr), 'd-m-Y') : '' }}</td>
             <td>
                 @if($item->ID_TIPO_DOC == '01')
                     FACTURA
