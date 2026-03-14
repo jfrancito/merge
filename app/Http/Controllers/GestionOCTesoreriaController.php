@@ -743,7 +743,7 @@ class GestionOCTesoreriaController extends Controller
 
                             $documento_asociados = $this->gn_lista_comision_asociados_atendidos($lotes, $idoc);
                             $documento_top = $this->gn_lista_comision_asociados_top_terminado($lotes, $idoc);
-
+                            //dd($documento_top);
                             //VALIDAR QUE ALGUNOS CAMPOS SEAN IGUALES
                             $this->con_validar_documento_proveedor_comision($documento_asociados, $documento_top, $fedocumento, $detallefedocumento, $idoc);
                                         //dd("hola");

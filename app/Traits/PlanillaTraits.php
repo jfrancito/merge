@@ -349,6 +349,23 @@ trait PlanillaTraits
 
     private function pl_lista_cabecera_comprobante_total_contabilidad_historial($empresa_id) {
 
+        $excluidos = [
+            'BALCAZAR ORITZ CESAR AUGUSTO',
+            'BALLADARES TORO CLAUDIA YOHANA',
+            'CHAPOÑAY PADILLA ROSA MARIA',
+            'ESCOBAR SABOYA DE DELGADO ROSARIO MARISTER',
+            'FALEN LOZANO ERIKA',
+            'LERZANDE CORTEZ DE ITURREGUI MARIA TERESA',
+            'MAGAÑA MORALES AYANICEL',
+            'MALQUI CHUQUIPIONDO JOEL',
+            'PAUCAR AHUANARI LUCERO',
+            'PEDROZO CONDORI JENNIFER LIZBETH',
+            'SOTO ARENAS ANTHONY GABRIEL'
+        ];
+
+
+
+
         $listadatos     =   DB::table('PLA_MOVILIDAD')
                             ->selectRaw(" DISTINCT PLA_MOVILIDAD.SERIE,
                                 PLA_MOVILIDAD.NUMERO,
@@ -397,6 +414,7 @@ trait PlanillaTraits
                             ->where('PLA_MOVILIDAD.ACTIVO', 1)
                             ->where('PLA_MOVILIDAD.COD_EMPRESA','=',$empresa_id)
                             ->where('PLA_MOVILIDAD.COD_ESTADO', '<>', 'ETM0000000000001')
+                            ->whereNotIn('TXT_TRABAJADOR', $excluidos)
                             ->where('LQG_LIQUIDACION_GASTO.COD_ESTADO', '<>', 'ETM0000000000006')
                             ->where('LQG_DETLIQUIDACIONGASTO.ACTIVO', 1)
                             ->orderBy('PLA_MOVILIDAD.FECHA_EMI','DESC')
