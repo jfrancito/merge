@@ -12,6 +12,7 @@
         <th>ESTADO</th>
         <th>CONSOLIDADO SEDE</th>
         <th>CONSOLIDADO GENERAL</th>
+        <th>ARCHIVO</th>
     </tr>
     </thead>
     <tbody>
@@ -26,6 +27,17 @@
             <td>{{$item->TXT_ESTADO}}</td>
             <td>{{$item->ID_PEDIDO_CONSOLIDADO}}</td>
             <td>{{$item->ID_PEDIDO_CONSOLIDADO_GENERAL}}</td>
+            <td class="align-center-tb">
+                @if(!empty($item->URL_ARCHIVO))
+                    <a href="{{ url('descargar-archivo-informe/'.$item->URL_ARCHIVO) }}"
+                       class="btn btn-xs btn-success"
+                       title="Descargar archivo">
+                        <i class="fa fa-download"></i>
+                    </a>
+                @else
+                    <span class="text-muted">—</span>
+                @endif
+            </td>
         </tr>
     @endforeach
     </tbody>

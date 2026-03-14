@@ -1,81 +1,98 @@
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <div class="card shadow-sm pedido-card mb-4">
 
     <div class="pedido-header">
         <i class="fa fa-clipboard-list me-2"></i> LISTA ORDEN DE PEDIDO
     </div>
 
+    <input type="file" id="filePedido" style="display:none">
+    <input type="hidden" id="pedidoSeleccionado">
+
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table table-hover mb-0">
                 <thead>
-                    <tr>
-                        <th>ID PEDIDO</th>
-                        <th>FECHA</th>
-                        <th>MES</th>
-                        <th>AÑO</th>
-                        <th>TIPO PEDIDO</th>
-                        <th>SOLICITA</th>
-                        <th>AREA</th>
-                        <th>AUTORIZA</th>
-                        <th>APRUEBA GER</th>
-                        <th>APRUEBA ADM</th>
-                        <th>GLOSA</th>
-                        <th>ESTADO</th>
-                        <th class="text-center">ACCIONES</th>
-                    </tr>
+                <tr>
+                    <th>ID PEDIDO</th>
+                    <th>FECHA</th>
+                    <th>MES</th>
+                    <th>AÑO</th>
+                    <th>TIPO PEDIDO</th>
+                    <th>SOLICITA</th>
+                    <th>AREA</th>
+                    <th>AUTORIZA</th>
+                    <th>APRUEBA GER</th>
+                    <th>APRUEBA ADM</th>
+                    <th>GLOSA</th>
+                    <th>ESTADO</th>
+                    <th class="text-center">ACCIONES</th>
+                </tr>
                 </thead>
 
                 <tbody>
                 @foreach($listapedido as $item)
                     @if ($item['COD_TRABAJADOR_SOLICITA'] === $usuario_solicita)
-                    <tr class="fila-pedido" 
-                        data-id="{{ $item['ID_PEDIDO'] }}" 
-                        data-estado="{{ $item['COD_ESTADO'] }}"
-                        style="cursor: pointer;">
-                        <td>{{ $item['ID_PEDIDO'] }}</td>
-                        <td>{{ $item['FEC_PEDIDO'] }}</td>
-                        <td>{{ $item['TXT_NOMBRE'] }}</td>
-                        <td>{{ $item['COD_ANIO'] }}</td>
-                        <td class="col-nombre">{{ $item['TXT_TIPO_PEDIDO'] }}</td>
-                        <td class="col-nombre">{{ $item['TXT_TRABAJADOR_SOLICITA'] }}</td>
-                        <td class="col-nombre">{{ $item['TXT_AREA'] }}</td>
-                        <td class="col-nombre">{{ $item['TXT_TRABAJADOR_AUTORIZA'] }}</td>
-                        <td class="col-nombre">{{ $item['TXT_TRABAJADOR_APRUEBA_GER'] }}</td>
-                        <td class="col-nombre">{{ $item['TXT_TRABAJADOR_APRUEBA_ADM'] }}</td>
+                        <tr class="fila-pedido"
+                            data-id="{{ $item['ID_PEDIDO'] }}"
+                            data-estado="{{ $item['COD_ESTADO'] }}"
+                            style="cursor: pointer;">
+                            <td>{{ $item['ID_PEDIDO'] }}</td>
+                            <td>{{ $item['FEC_PEDIDO'] }}</td>
+                            <td>{{ $item['TXT_NOMBRE'] }}</td>
+                            <td>{{ $item['COD_ANIO'] }}</td>
+                            <td class="col-nombre">{{ $item['TXT_TIPO_PEDIDO'] }}</td>
+                            <td class="col-nombre">{{ $item['TXT_TRABAJADOR_SOLICITA'] }}</td>
+                            <td class="col-nombre">{{ $item['TXT_AREA'] }}</td>
+                            <td class="col-nombre">{{ $item['TXT_TRABAJADOR_AUTORIZA'] }}</td>
+                            <td class="col-nombre">{{ $item['TXT_TRABAJADOR_APRUEBA_GER'] }}</td>
+                            <td class="col-nombre">{{ $item['TXT_TRABAJADOR_APRUEBA_ADM'] }}</td>
 
-                        <td class="col-glosa">{{ $item['TXT_GLOSA'] }}</td>
+                            <td class="col-glosa">{{ $item['TXT_GLOSA'] }}</td>
 
-                        <td>@include('comprobante.ajax.estadospedido')</td>
+                            <td>@include('comprobante.ajax.estadospedido')</td>
 
-                        <td class="text-center">
-                            <div class="grupo-acciones">
+                            <td class="text-center">
+                                <div class="grupo-acciones">
 
-                                <!-- VER DETALLE (SIEMPRE VISIBLE) -->
-                                <button 
-                                    class="btn btn-sm btn-primary ver-detalle-pedido"
-                                    data-id="{{ $item['ID_PEDIDO'] }}">
-                                    <i class="fa fa-eye me-1"></i> Detalle
-                                </button>
-
-                                @if ($item['COD_ESTADO'] === 'ETM0000000000001')
-                                    <!-- EMITIR -->
-                                    <button 
-                                        class="btn btn-sm btn-success emitir-pedido"
-                                        data-id="{{ $item['ID_PEDIDO'] }}">
-                                        <i class="fa fa-check-circle me-1"></i> Emitir
+                                    <!-- VER DETALLE (SIEMPRE VISIBLE) -->
+                                    <button
+                                            class="btn btn-sm btn-primary ver-detalle-pedido"
+                                            data-id="{{ $item['ID_PEDIDO'] }}">
+                                        <i class="fa fa-eye me-1"></i> Detalle
                                     </button>
 
-                                    <!-- ANULAR -->
-                                    <button 
-                                        class="btn btn-sm btn-danger anular-pedido"
-                                        data-id="{{ $item['ID_PEDIDO'] }}">
-                                        <i class="fa fa-times-circle me-1"></i> Anular
-                                    </button>
-                                @endif
+                                    @if($item['URL_ARCHIVO'] != '' && file_exists(public_path($item['URL_ARCHIVO'])))
+                                        <a href="{{ url('descargar-archivo-informe/'.$item['URL_ARCHIVO']) }}"
+                                           class="btn btn-xs btn-success"
+                                           title="Descargar archivo">
+                                            <i class="fa fa-download"></i>
+                                        </a>
+                                    @else
+                                        <button class="btn btn-xs btn-primary subir-archivo"
+                                                data-id="{{$item['ID_PEDIDO']}}">
+                                            <i class="fa fa-upload"></i>
+                                        </button>
+                                    @endif
 
-                            </div>
-                        </td>
-                    </tr>
+                                    @if ($item['COD_ESTADO'] === 'ETM0000000000001')
+                                        <!-- EMITIR -->
+                                        <button
+                                                class="btn btn-sm btn-success emitir-pedido"
+                                                data-id="{{ $item['ID_PEDIDO'] }}">
+                                            <i class="fa fa-check-circle me-1"></i> Emitir
+                                        </button>
+
+                                        <!-- ANULAR -->
+                                        <button
+                                                class="btn btn-sm btn-danger anular-pedido"
+                                                data-id="{{ $item['ID_PEDIDO'] }}">
+                                            <i class="fa fa-times-circle me-1"></i> Anular
+                                        </button>
+                                    @endif
+
+                                </div>
+                            </td>
+                        </tr>
                     @endif
                 @endforeach
                 </tbody>

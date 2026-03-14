@@ -1,6 +1,6 @@
 <div class="card shadow-sm mb-4">
-   
-  <div class="panel panel-default panel-contrast">
+
+    <div class="panel panel-default panel-contrast">
         <div class="panel-heading" style="background:#1d3a6d;color:#fff;">
             LISTA ORDEN DE PEDIDO
         </div>
@@ -9,25 +9,26 @@
         <div class="table-responsive">
             <table class="table table-hover table-striped mb-0">
                 <thead class="thead-dark">
-                    <tr>
-                        <th>ID PEDIDO</th>
-                        <th>FECHA</th>
-                        <th>MES</th>
-                        <th>AÑO</th>
-                        <th>TIPO PEDIDO</th>
-                        <th>SOLICITA</th>
-                        <th>AREA</th>
-                        <th>AUTORIZA</th>
-                        <th>APRUEBA GER</th>
-                        <th>APRUEBA ADM</th>
-                        <th>GLOSA</th>
-                        <th>ESTADO</th>
-                        <th>VER DETALLE</th>
-                    </tr>
+                <tr>
+                    <th>ID PEDIDO</th>
+                    <th>FECHA</th>
+                    <th>MES</th>
+                    <th>AÑO</th>
+                    <th>TIPO PEDIDO</th>
+                    <th>SOLICITA</th>
+                    <th>AREA</th>
+                    <th>AUTORIZA</th>
+                    <th>APRUEBA GER</th>
+                    <th>APRUEBA ADM</th>
+                    <th>GLOSA</th>
+                    <th>ESTADO</th>
+                    <th>VER DETALLE</th>
+                    <th>ARCHIVO</th>
+                </tr>
                 </thead>
                 <tbody>
-                    @foreach($listapedido as $index => $item)
-                         @if ($item['COD_ESTADO'] === 'ETM0000000000005' && $item['COD_TRABAJADOR_APRUEBA_ADM'] === $usuario_logueado_id)
+                @foreach($listapedido as $index => $item)
+                    @if ($item['COD_ESTADO'] === 'ETM0000000000005' && $item['COD_TRABAJADOR_APRUEBA_ADM'] === $usuario_logueado_id)
                         <tr class="align-middle">
                             <td>{{ $item['ID_PEDIDO'] }}</td>
                             <td>{{ $item['FEC_PEDIDO'] }}</td>
@@ -41,27 +42,37 @@
                             <td class="col-nombre">{{ $item['TXT_TRABAJADOR_APRUEBA_ADM'] }}</td>
                             <td class="col-glosa">{{ $item['TXT_GLOSA'] }}</td>
                             <td>@include('comprobante.ajax.estadospedido')</td>
-                           <td class="text-center">
-                            <div class="grupo-acciones">
-                                 <!-- VER DETALLE -->
-                                <button 
-                                    class="btn btn-sm btn-primary ver-detalle-pedido"
-                                    data-id="{{ $item['ID_PEDIDO'] }}"
-                                    title="Ver detalle del pedido">
-                                    <i class="fa fa-eye me-1"></i>
-                                    Detalle
-                                </button>
-                            </div>
-                           </td>
+                            <td class="text-center">
+                                <div class="grupo-acciones">
+                                    <!-- VER DETALLE -->
+                                    <button
+                                            class="btn btn-sm btn-primary ver-detalle-pedido"
+                                            data-id="{{ $item['ID_PEDIDO'] }}"
+                                            title="Ver detalle del pedido">
+                                        <i class="fa fa-eye me-1"></i>
+                                        Detalle
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="align-center-tb">
+                                @if(!empty($item['URL_ARCHIVO']))
+                                    <a href="{{ url('descargar-archivo-informe/'.$item['URL_ARCHIVO']) }}"
+                                       class="btn btn-xs btn-success"
+                                       title="Descargar archivo">
+                                        <i class="fa fa-download"></i>
+                                    </a>
+                                @else
+                                    <span class="text-muted">—</span>
+                                @endif
+                            </td>
                         </tr>
-                        @endif
-                    @endforeach
+                    @endif
+                @endforeach
                 </tbody>
             </table>
         </div>
     </div>
 </div>
-
 
 
 <style>

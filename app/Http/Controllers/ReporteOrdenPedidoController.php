@@ -135,6 +135,58 @@ class ReporteOrdenPedidoController extends Controller
             ]);
     }
 
+    public function actionDescargarArchivo($archivo)
+    {
+        $ruta = public_path($archivo);
+
+        if (!file_exists($ruta)) {
+            abort(404, 'Archivo no encontrado');
+        }
+
+        return response()->download($ruta);
+    }
+
+    public function subirArchivo(Request $request)
+    {
+
+        $idPedido = $request->id_pedido;
+
+        if($request->hasFile('archivo')){
+
+            $archivo = $request->file('archivo');
+
+            // Obtener datos ANTES de moverlo
+            $nombre_original = $archivo->getClientOriginalName();
+            $extension = $archivo->getClientOriginalExtension();
+            $nombre_sin_extension = pathinfo($nombre_original, PATHINFO_FILENAME);
+            $size = $archivo->getSize();
+            $mime = $archivo->getMimeType();
+
+            $nombre_guardado = time().'_'.$nombre_original;
+
+            $ruta = 'uploads/orden_pedido/'.$nombre_guardado;
+
+            // mover archivo
+            $archivo->move(public_path('uploads/orden_pedido'), $nombre_guardado);
+
+            DB::table('dbo.ARCHIVOS')->insert([
+                'ID_DOCUMENTO' => $idPedido ?? '',
+                'DOCUMENTO_ITEM' => 1,
+                'TIPO_ARCHIVO' => $mime,
+                'NOMBRE_ARCHIVO' => $nombre_sin_extension,
+                'DESCRIPCION_ARCHIVO' => $nombre_original,
+                'URL_ARCHIVO' => $ruta,
+                'EXTENSION' => $extension,
+                'SIZE' => $size,
+                'ACTIVO' => 1,
+                'FECHA_CREA' => DB::raw('GETDATE()'),
+                'USUARIO_CREA' => Session('usuario')->usuario ?? 'SISTEMA',
+            ]);
+        }
+
+        return response()->json(['ok'=>true]);
+    }
+
     public function actionListarPeriodo(Request $request)
     {
 

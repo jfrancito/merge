@@ -13,13 +13,13 @@ use App\Modelos\WEBRegistroImporteGastos;
 use App\Modelos\ALMCentro;
 use App\Modelos\STDEmpresa;
 use App\Modelos\STDTrabajador;
-use Illuminate\Support\Carbon;
+//use Illuminate\Support\Carbon;
 use Session;
 use App\WEBRegla, APP\User, App\CMPCategoria;
 use View;
 use Validator;
 use Illuminate\Support\Facades\Log;
-
+use Carbon\Carbon;
 
 class GestionOrdenPedidoController extends Controller
 {
@@ -141,7 +141,7 @@ class GestionOrdenPedidoController extends Controller
 		 ->select('anio')
 		 ->whereIn('anio', ['2026'])
 		 ->where('COD_EMPR', $empresa)
-		 ->where('activo', 1) 
+		 ->where('activo', 1)
 		 ->distinct()
 		 ->orderBy('anio')
 		 ->pluck('anio', 'anio')
@@ -155,7 +155,7 @@ class GestionOrdenPedidoController extends Controller
 		/*$periodo_mes = DB::table('Web.periodos')
 		 ->where('anio', $periodo_anio)
 		 ->where('COD_EMPR', $empresa)
-		 ->where('activo', 1) 
+		 ->where('activo', 1)
 		 ->orderBy('anio')
 		 ->orderByRaw("CAST(SUBSTRING(TXT_NOMBRE, 2, CHARINDEX(')', TXT_NOMBRE)-2) AS INT)")
 		 ->pluck('TXT_NOMBRE', 'COD_PERIODO')
@@ -186,7 +186,7 @@ class GestionOrdenPedidoController extends Controller
 		$nro_pedido = $this->obtenerNumeroPedido($empresa, $cod_centro);
 
 
-		// DETALLE DEL PEDIDO 
+		// DETALLE DEL PEDIDO
 
 		// $producto = DB::table('ALM.PRODUCTO')->where('cod_estado', 1)->pluck('NOM_PRODUCTO', 'COD_PRODUCTO')->toArray();
 		/*$producto = DB::table('ALM.PRODUCTO as PRD')
@@ -263,7 +263,7 @@ class GestionOrdenPedidoController extends Controller
 	 $meses = DB::table('Web.periodos')
 	 ->where('anio', $anio)
 	 ->where('COD_EMPR', $empresa)
-	 ->where('activo', 1) 
+	 ->where('activo', 1)
 	 ->orderByRaw("CAST(SUBSTRING(TXT_NOMBRE, 2, CHARINDEX(')', TXT_NOMBRE)-2) AS INT)")
 	 ->pluck('TXT_NOMBRE', 'COD_PERIODO');
 	 return response()->json($meses);
@@ -320,7 +320,34 @@ class GestionOrdenPedidoController extends Controller
 		$cod_area = $request->input('cod_area');
 		$orden_pedido_id = $request->input('orden_pedido_id');
 		$opcion = $request->input('opcion');
-		$array_detalle = $request->input('array_detalle');
+		//$array_detalle = $request->input('array_detalle');
+
+        $array_detalle = json_decode($request->input('array_detalle'), true) ?? [];
+
+        $nombre_guardado = '';
+        $extension = '';
+        $size = 0;
+        $url_archivo = '';
+
+        if ($request->hasFile('select_file')) {
+
+            $archivo = $request->file('select_file');
+
+            // Obtener datos ANTES de moverlo
+            $nombre_original = $archivo->getClientOriginalName();
+            $extension = $archivo->getClientOriginalExtension();
+            $nombre_sin_extension = pathinfo($nombre_original, PATHINFO_FILENAME);
+            $size = $archivo->getSize();
+            $mime = $archivo->getMimeType();
+
+            $nombre_guardado = time().'_'.$nombre_original;
+
+            $ruta = 'uploads/orden_pedido/'.$nombre_guardado;
+
+            // mover archivo
+            $archivo->move(public_path('uploads/orden_pedido'), $nombre_guardado);
+
+        }
 
 		// =======================
 		// Procesar nombres y textos relacionados
@@ -437,6 +464,21 @@ class GestionOrdenPedidoController extends Controller
 				);
 			}
 		}
+
+        DB::table('dbo.ARCHIVOS')->insert([
+            'ID_DOCUMENTO' => $orden_pedido_id ?? '',
+            'DOCUMENTO_ITEM' => 1,
+            'TIPO_ARCHIVO' => $mime,
+            'NOMBRE_ARCHIVO' => $nombre_sin_extension,
+            'DESCRIPCION_ARCHIVO' => $nombre_original,
+            'URL_ARCHIVO' => $ruta,
+            'EXTENSION' => $extension,
+            'SIZE' => $size,
+            'ACTIVO' => 1,
+            'FECHA_CREA' => DB::raw('GETDATE()'),
+            'USUARIO_CREA' => Session('usuario')->usuario ?? 'SISTEMA',
+        ]);
+
 		return response()->json(['success' => true]);
 	}
 
