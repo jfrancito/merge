@@ -110,6 +110,12 @@
           </tr>
           
 
+          <tr>
+            <td><b>Grupo</b></td>
+            <td><p class='subtitulomerge'>{{$fedocumento->COD_NOMBRE_MK}}</p></td>
+          </tr>
+
+
       </tbody>
     </table>
   </div>

@@ -70,6 +70,7 @@
           </div>
     </div>
     @include('entregadocumento.modal.mregistrorequerimiento')
+
     
   </div>
 @stop

@@ -58,16 +58,16 @@ trait AcopioTraits
     private function aco_lista_cabecera_comprobante_total_acopio_estiba_cen($cliente_id,$operacion_id,$centro_id) {
 
 
-        //dd($centro_id);
         $listadatos     =   FeDocumento::join('FE_REF_ASOC', 'FE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_REF_ASOC.LOTE')
                             ->leftJoin('CMP.DOCUMENTO_CTBLE', 'FE_REF_ASOC.ID_DOCUMENTO', '=', 'CMP.DOCUMENTO_CTBLE.COD_DOCUMENTO_CTBLE')
+                            ->leftJoin('STD.EMPRESA', 'FE_DOCUMENTO.RUC_PROVEEDOR', '=', 'STD.EMPRESA.NRO_DOCUMENTO')
                             ->leftJoin(DB::raw('(SELECT COD_EMPR_CLIENTE, SUM(CAN_SALDO) AS CAN_DEUDA 
                                                  FROM DEUDA_TOTAL_MERGE_SUM 
-                                                 GROUP BY COD_EMPR_CLIENTE) AS deuda'), 
-                                'CMP.DOCUMENTO_CTBLE.COD_EMPR_EMISOR', '=', 'deuda.COD_EMPR_CLIENTE')
+                                                 GROUP BY COD_EMPR_CLIENTE) AS deuda'),
+                                                'STD.EMPRESA.COD_EMPR', '=', 'deuda.COD_EMPR_CLIENTE')
                             ->leftJoin('ALM.CENTRO', 'ALM.CENTRO.COD_CENTRO', '=', 'CMP.DOCUMENTO_CTBLE.COD_CENTRO')
-                            ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
                             ->select(DB::raw('FE_DOCUMENTO.*,ALM.CENTRO.* ,FE_DOCUMENTO.COD_ESTADO COD_ESTADO_FE,deuda.CAN_DEUDA AS CAN_DEUDA'))
+                            ->where('CMP.DOCUMENTO_CTBLE.COD_CENTRO','=',$centro_id)
                             ->where('FE_DOCUMENTO.OPERACION','=',$operacion_id)
                             ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                             ->where(function ($query) {
@@ -81,6 +81,8 @@ trait AcopioTraits
                             })
                             ->where('FE_DOCUMENTO.COD_ESTADO','=','ETM0000000000012')
                             ->get();
+
+
 
         return  $listadatos;
     }

@@ -353,6 +353,44 @@ trait UserTraits
         print("Se envio correctamente");
     }
 
+    private function envio_correo_placon_det() {
+
+        $listadocumentos          =     DB::table('vcorreoplaconsolidadodet')->select('emailcorp','TXT_TRABAJADOR')
+                                        //->where('emailcorp','=','jecan@induamerica.com.pe')
+                                        ->groupBy('emailcorp')
+                                        ->groupBy('TXT_TRABAJADOR')
+                                        ->get();
+
+
+
+        foreach($listadocumentos as $item){
+
+            $emailfrom              =   WEBMaestro::where('codigoatributo','=','0001')->where('codigoestado','=','00001')->first();
+            $correocc               =   $item->emailcorp;
+            //$correocc               =   'jorge.saldana@induamerica.com.pe';
+
+            $listadocumentosdet     =   DB::table('vcorreoplaconsolidadodet')->select('*')
+                                        ->where('emailcorp','=',$item->emailcorp)
+                                        ->get();
+
+            $array                  =   Array(
+                'item'                =>  $item,
+                'listadocumentosdet'  =>  $listadocumentosdet
+            );
+
+            Mail::send('emails.consolidadoplanilladet', $array, function($message) use ($emailfrom,$item,$correocc)
+            {
+                $message->from($emailfrom->correoprincipal, 'SU ATENCION INMEDIATA: CARGAR PLANILLAS DE MOVILIDAD A FEBRERO 2026');
+                //$message->to($correocc);
+                $message->to($correocc)->cc('alertassys@induamerica.com.pe');
+                $message->subject('Planilla de Movilidad Pendientes consolidar');
+            });
+
+        }
+        print("Se envio correctamente");
+    }
+
+
 
 
     private function envio_correo_baja() {
