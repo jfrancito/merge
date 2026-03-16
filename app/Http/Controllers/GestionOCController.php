@@ -3746,9 +3746,15 @@ class GestionOCController extends Controller
                     ->where('COD_USUARIO', $ordencompra->COD_USUARIO_CREA_AUD)
                     ->first();
         
-        $area_mkt    = DB::table('CMP.CATEGORIA')
-                    ->where('COD_CATEGORIA', $usuario_mkt->COD_CATEGORIA_AREA)
-                    ->first();
+        if($usuario_mkt->COD_CATEGORIA_AREA == 'AEM0000000000038'){
+            $area_mkt    = DB::table('CMP.CATEGORIA')
+                        ->where('COD_CATEGORIA', $usuario_mkt->COD_CATEGORIA_AREA)
+                        ->first();
+        }else{
+            $area_mkt    = array();
+        }
+
+
 
         $arraygrupo             =   DB::table('FE_GRUPO_DOCUMENTO')->pluck('NOMBRE','ID_DOCUMENTO')->toArray();
         $combogrupo             =   array('' => "Seleccione Grupo") + $arraygrupo;
