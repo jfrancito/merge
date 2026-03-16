@@ -3737,16 +3737,29 @@ class GestionOCController extends Controller
                                                 ->get();
                 }  
             }
-
-
         }
 
+
+        //PARA SABER SI ES MARKETING
+
+        $usuario_mkt    = DB::table('SGD.USUARIO')
+                    ->where('COD_USUARIO', $ordencompra->COD_USUARIO_CREA_AUD)
+                    ->first();
+        
+        $area_mkt    = DB::table('CMP.CATEGORIA')
+                    ->where('COD_CATEGORIA', $usuario_mkt->COD_CATEGORIA_AREA)
+                    ->first();
+
+        $arraygrupo             =   DB::table('FE_GRUPO_DOCUMENTO')->pluck('NOMBRE','ID_DOCUMENTO')->toArray();
+        $combogrupo             =   array('' => "Seleccione Grupo") + $arraygrupo;
 
 
         return View::make('comprobante/registrocomprobanteadministrator',
                          [
                             'ordencompra'           =>  $ordencompra,
                             'banco_id'              =>  $banco_id,
+                            'area_mkt'              =>  $area_mkt,
+                            'combogrupo'            =>  $combogrupo,
                             'monto_anticipo'        =>  $monto_anticipo,
                             'comboant'              =>  $comboant,
 
@@ -3901,7 +3914,7 @@ class GestionOCController extends Controller
                                                     ->first();
 
                         if(count($fedocumento_e)>0){
-                            return Redirect::back()->with('errorurl', 'Este XML ya fue integrado en otra orden de compra');
+                            //return Redirect::back()->with('errorurl', 'Este XML ya fue integrado en otra orden de compra');
                         }
 
 
@@ -5811,6 +5824,23 @@ class GestionOCController extends Controller
 
                                 ]
                             );
+
+
+                //AGREGAR GRUPO A FE_DOCUMENTO
+                $grupo_id              =   $request['grupo_id'];
+                if($grupo_id!=''){
+
+                    $grupomk = DB::table('FE_GRUPO_DOCUMENTO')->where('ID_DOCUMENTO', $grupo_id)->first();
+
+                    FeDocumento::where('ID_DOCUMENTO',$idoc)
+                                ->update(
+                                    [
+                                        'COD_GRUPO_MK'=>$grupomk->ID_DOCUMENTO,
+                                        'COD_NOMBRE_MK'=>$grupomk->NOMBRE
+                                    ]
+                                );
+                }
+
 
                 //HISTORIAL DE DOCUMENTO APROBADO
                 $documento                              =   new FeDocumentoHistorial;

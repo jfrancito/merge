@@ -18,6 +18,7 @@ use App\Modelos\WEBListaPersonal;
 use App\Modelos\LqgLiquidacionGasto;
 
 use App\Modelos\Tercero;
+use App\Modelos\FeGrupoDocumento;
 
 
 
@@ -297,6 +298,32 @@ class UserController extends Controller {
 						 	'ajax' 							=> true,
 						 ]);
 	}
+
+
+	public function actionAjaxModalConfiguracionGrupoOC(Request $request)
+	{
+
+        $prefijo_id             =   $request['prefijo_id'];
+        $orden_id               =   $request['orden_id'];
+        $idopcion               =   $request['idopcion'];
+        $empresa_id             =   $request['empresa_id'];
+        $idoc                   =   $orden_id;
+
+		$usuario    			=   User::where('id','=',Session::get('usuario')->id)->first();
+
+
+		return View::make('usuario/modal/ajax/mdatosgrupocoman',
+						 [
+						 	'usuario' 						=> $usuario,
+						 	'idoc' 							=> $idoc,
+						 	'empresa_id' 					=> $empresa_id,
+						 	'prefijo_id' 					=> $prefijo_id,
+						 	'orden_id' 						=> $orden_id,
+						 	'idopcion' 						=> $idopcion,
+						 	'ajax' 							=> true,
+						 ]);
+	}
+
 
 
 	public function actionAjaxModalConfiguracionCuentaBancariaOC(Request $request)
@@ -890,6 +917,27 @@ class UserController extends Controller {
 		return Redirect::back()->withInput()->with('bienhecho', 'Cuenta Bancaria '.$numerocuenta.' registrada con éxito');
 	}
 
+
+	public function actionConfigurarDatosGrupoMarketing($orden_id,$idopcion,Request $request)
+	{
+
+		$grupo 	 		 	    					= 	$request['grupo'];
+        $idcab                  					=   $this->funciones->getCreateIdMaestradocpla('FE_GRUPO_DOCUMENTO','GRMK');
+
+
+		$cuentabancaria 							=	New FeGrupoDocumento();
+		$cuentabancaria->ID_DOCUMENTO 				=   $idcab;
+		$cuentabancaria->NOMBRE 					=   $grupo;
+		$cuentabancaria->USUARIO_CREA 				=   Session::get('usuario')->id;
+		$cuentabancaria->FECHA_CREA 				=   $this->fechaactual;
+		$cuentabancaria->ACTIVO 					=   1;
+		$cuentabancaria->COD_ESTADO 				=   'ETM0000000000001';
+		$cuentabancaria->TXT_ESTADO 				=   'GENERADO';
+		$cuentabancaria->save();
+
+		return Redirect::back()->withInput()->with('bienhecho', 'Grupo Marketing '.$grupo.' registrada con éxito');
+	}
+
 	public function actionConfigurarDatosCuentaBancariaOC($prefijo_id,$orden_id,$idopcion,Request $request)
 	{
 
@@ -1306,6 +1354,10 @@ class UserController extends Controller {
 		$this->envio_correo_placon();
 	}
 
+    public function actionEnviarCorreoConsolidadoDet()
+	{
+		$this->envio_correo_placon_det();
+	}
 
 
     public function actionRegistrate(Request $request)

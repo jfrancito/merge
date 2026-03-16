@@ -8,8 +8,7 @@
                 <div class="panel-body panel-body-contrast">
                   <form method="POST" action="{{ url('subir-xml-cargar-datos-administrator/'.$idopcion.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" name="formcargardatos" id="formcargardatos" enctype="multipart/form-data" >
                      {{ csrf_field() }}
-<input type="hidden" name="device_info" id='device_info'>
-
+                            <input type="hidden" name="device_info" id='device_info'>
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <div class="col-xs-6 col-sm-6 col-md-6 col-lg-10 negrita" align="left">
@@ -58,7 +57,7 @@
           @if(count($fedocumento)>0)
             <form method="POST" action="{{ url('validar-xml-oc-administrator/'.$idopcion.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}" name="formguardardatos" id="formguardardatos" enctype="multipart/form-data" >
              {{ csrf_field() }}
-<input type="hidden" name="device_info" id='device_info'>
+             <input type="hidden" name="device_info" id='device_info'>
 
               <input type="hidden" name="procedencia" id='procedencia' value = '{{$procedencia}}'>
               <input type="hidden" name="rutaorden" id='rutaorden' value = '{{$rutaorden}}'>
@@ -252,6 +251,37 @@
                 </div>
               </div>
 
+              @if(count($area_mkt)>0)
+                <div class="row">
+                  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="panel panel-default panel-contrast">
+                      <div class="panel-heading" style="background: #1d3a6d;color: #fff;">GRUPO MARKETING
+                        <div class="tools agregar_grupo_marketing_oc select" style="cursor: pointer;"> <span class="label label-success">Agregar Grupo</span></div>
+                      </div>
+                      <div class="panel-body panel-body-contrast">
+                              <div class="row">
+                                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px;">
+                                        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 cajareporte">
+                                            <div class="form-group">
+                                              <label class="col-sm-12 control-label labelleft" ><b>Grupo :</b></label>
+                                              <div class="col-sm-12 abajocaja" >
+                                                  {!! Form::select( 'grupo_id', $combogrupo, array(''),
+                                                                    [
+                                                                      'class'       => 'select2 form-control control input-xs entidadbancooc' ,
+                                                                      'id'          => 'grupo_id',
+                                                                      'data-aw'     => '1',
+                                                                    ]) !!}
+                                              </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                              </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              @endif
+
 
               <div class="row @if((float)$ordencompra_f->CAN_DETRACCION<=0) ocultar @endif" >
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
@@ -316,12 +346,6 @@
                   </div>
                 </div>
               </div>
-
-
-
-
-
-
 
               <div class="row">
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
@@ -453,6 +477,7 @@
                                           <input type="hidden" name="detraccion" id='detraccion' value = '{{(float)$ordencompra_f->CAN_DETRACCION}}'>
                                           <input type="hidden" name="te" id='te' value = '{{$fedocumento->ind_errototal}}'>
                                           <input type="hidden" name="contacto_id" id='contacto_id' value = '{{$usuario->COD_TRABAJADOR}}'>
+                                          <input type="hidden" name="grupo_data" id='grupo_data' value = '{{count($area_mkt)}}'>
                                           <button type="submit" class="btn btn-space btn-success btn-guardar-xml">Guardar</button>
                                         </p>
                                       </div>

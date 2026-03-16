@@ -76,6 +76,9 @@ Route::any('/enviocorreoaprobadoadmin', 'UserController@actionCorreoAprobadoAdmi
 Route::any('/crearexceladminaprobado', 'UserController@actionCrearExcelAprobadoAdmin'); //correo para jefe acopio liuidacion compra
 
 Route::any('/enviocorreoconsolidadoplanilla', 'UserController@actionEnviarCorreoConsolidado'); //correo para jefe acopio liuidacion compra
+Route::any('/enviocorreoconsolidadoplanilladet', 'UserController@actionEnviarCorreoConsolidadoDet'); //correo para jefe acopio liuidacion compra
+
+
 
 Route::group(['middleware' => ['authaw']], function () {
 
@@ -95,9 +98,11 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/actualizar-data/{zona}', 'UserController@actionActualizarData');
 
 
-
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-contrato', 'UserController@actionAjaxModalConfiguracionCuentaBancariaContrato');
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-oc', 'UserController@actionAjaxModalConfiguracionCuentaBancariaOC');
+	Route::any('/ajax-modal-configuracion-grupo-oc', 'UserController@actionAjaxModalConfiguracionGrupoOC');
+
+
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-estiba', 'UserController@actionAjaxModalConfiguracionCuentaBancariaEstiba');
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-liq-com-an', 'UserController@actionAjaxModalConfiguracionCuentaBancariaLiqComAn');
 	Route::any('/configurar-datos-cuenta-bancaria-estiba/{empresa_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaEstiba');
@@ -109,6 +114,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/configurar-datos-cuenta-bancaria-pg/{prefijo_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaPg');
 
 	Route::any('/configurar-datos-cuenta-bancaria-liquidacion-compra-anticipo/{prefijo_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaLiquidacionCompraAnticipo');
+	Route::any('/configurar-grupo-marketing/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosGrupoMarketing');	
+
 	Route::any('/configurar-datos-cuenta-bancaria-oc/{prefijo_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaOC');
 
 	Route::any('/ajax-modal-ver-cuenta-bancaria-oc', 'UserController@actionAjaxModalVerCuentaBancariaOC');

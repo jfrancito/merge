@@ -3316,6 +3316,32 @@ $(document).ready(function () {
         });
     });
 
+    $('.btnaprobarcomporbatnteus').on('click', function (event) {
+
+        event.preventDefault();
+        var grupo                   =   $('#grupo_data').val();
+        var grupo_id           =   $('#grupo_id').val();
+        if(grupo>0){
+            if(grupo_id ==''){ alerterrorajax("Seleeccione un grupo"); return false;}            
+        }
+
+
+        $.confirm({
+            title: '¿Confirma la Aprobacion?',
+            content: 'Aprobar el Comprobante',
+            buttons: {
+                confirmar: function () {
+                    $("#formpedido").submit();
+                },
+                cancelar: function () {
+                    $.alert('Se cancelo Aprobacion');
+                }
+            }
+        });
+
+    });
+
+
     $('.btnaprobarcomporbatnte').on('click', function (event) {
 
         event.preventDefault();
@@ -4396,6 +4422,27 @@ $(document).ready(function () {
                 }
             }
         });
+
+    });
+
+
+    $(".registrocomprobanteuc").on('click','.agregar_grupo_marketing_oc', function() {
+
+        var _token                  =   $('#token').val();
+        var idopcion                =   $('#idopcion').val();
+        var prefijo_id              =   $('#prefijo_id').val();
+        var orden_id                =   $('#orden_id').val();
+
+        data                        =   {
+                                            _token                  : _token,
+                                            prefijo_id              : prefijo_id,
+                                            orden_id                : orden_id,
+                                            idopcion                : idopcion,
+
+                                        };
+
+        ajax_modal(data,"/ajax-modal-configuracion-grupo-oc",
+                  "modal-configuracion-usuario-detalle","modal-configuracion-usuario-detalle-container");
 
     });
 

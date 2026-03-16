@@ -10,10 +10,6 @@ function toggleContent() {
   }
 }
 
-// Inicialmente colapsar el contenido adicional
-document.addEventListener("DOMContentLoaded", function() {
-  document.getElementById('longText').classList.add('collapsed');
-});
 
 
 
@@ -134,6 +130,27 @@ $(document).ready(function(){
                   "modal-configuracion-usuario-detalle","modal-configuracion-usuario-detalle-container");
 
     });
+
+    $(".registrocomprobante").on('click','.agregar_grupo_marketing_oc', function() {
+
+        var _token                  =   $('#token').val();
+        var idopcion                =   $('#idopcion').val();
+        var prefijo_id              =   $('#prefijo_id').val();
+        var orden_id                =   $('#orden_id').val();
+
+        data                        =   {
+                                            _token                  : _token,
+                                            prefijo_id              : prefijo_id,
+                                            orden_id                : orden_id,
+                                            idopcion                : idopcion,
+
+                                        };
+
+        ajax_modal(data,"/ajax-modal-configuracion-grupo-oc",
+                  "modal-configuracion-usuario-detalle","modal-configuracion-usuario-detalle-container");
+
+    });
+
 
     $(".registrocomprobante").on('click','.agregar_cuenta_bancaria', function() {
 
@@ -757,6 +774,8 @@ $(document).ready(function(){
         var entidadbanco_id         =   $('#entidadbanco_id').val();
         var cb_id                   =   $('#cb_id').val();
         var detraccion              =   $('#detraccion').val();
+        var grupo                   =   $('#grupo_data').val();
+
 
         var ctadetraccion           =   $('#ctadetraccion').val();
         var monto_detraccion        =   $('#monto_detraccion').val();
@@ -769,11 +788,15 @@ $(document).ready(function(){
             
             console.log("Datos capturados listos para enviar");
         });
-        debugger;
+
         if(detraccion>0){
             if(ctadetraccion.trim() ==''){ alerterrorajax("Ingrese una Cuenta de Detraccion."); return false;}
             if(monto_detraccion =='0'){ alerterrorajax("Ingrese Monto de Detraccion."); return false;}
             if(pago_detraccion ==''){ alerterrorajax("Seleeccione un pago de detraccion"); return false;}            
+        }
+        var grupo_id           =   $('#grupo_id').val();
+        if(grupo>0){
+            if(grupo_id ==''){ alerterrorajax("Seleeccione un grupo"); return false;}            
         }
 
         var valores = ['BAM0000000000007', 'BAM0000000000008', 'BAM0000000000009','BAM0000000000011', 'BAM0000000000013', 'BAM0000000000014', 'BAM0000000000015'];
