@@ -42,8 +42,8 @@ class ReporteOrdenPedidoController extends Controller
             'TODO' => 'TODO',
             'CEN0000000000001' => 'CHICLAYO',
             'CEN0000000000002' => 'LIMA',
-            'CEN0000000000003' => 'RIOJA',
-            'CEN0000000000004' => 'BELLAVISTA',
+            'CEN0000000000004' => 'RIOJA',
+            'CEN0000000000006' => 'BELLAVISTA',
 
         ];
 

@@ -72,7 +72,7 @@ class GestionOrdenPedidoApruebaGerController extends Controller
             ->first();
         $estado = DB::table('CMP.CATEGORIA')
             ->where('TXT_GRUPO', 'ESTADO_MERGE')
-            ->where('COD_CATEGORIA', 'ETM0000000000004')
+            ->where('COD_CATEGORIA', 'ETM0000000000015')
             ->first();
 
 

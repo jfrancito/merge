@@ -53,11 +53,16 @@
 
                                                     @else
                                                         @if($item['COD_ESTADO'] == 'ETM0000000000014') 
-                                                        <span class="badge badge-danger">{{ $item['TXT_ESTADO'] }}</span>
+                                                            <span class="badge badge-danger">{{ $item['TXT_ESTADO'] }}</span>
 
                                                         @else
-                                                            <span class="badge badge-default">{{ $item['TXT_ESTADO'] ?? 'SIN ESTADO' }}</span>
-                                                            @endif {{-- 13 --}}
+                                                            @if($item['COD_ESTADO'] == 'ETM0000000000015') 
+                                                                <span class="badge badge-warning">{{ $item['TXT_ESTADO'] }}</span>
+
+                                                            @else
+                                                                <span class="badge badge-default">{{ $item['TXT_ESTADO'] ?? 'SIN ESTADO' }}</span>
+                                                            @endif {{-- 15 --}}
+                                                        @endif {{-- 14 --}}
                                                     @endif {{-- 13 --}}
                                                 @endif {{-- 12 --}}
                                             @endif {{-- 10 --}}

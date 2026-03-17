@@ -30,7 +30,7 @@
                     @foreach($listapedido as $index => $item)
                        @if (
                             (
-                                $item['COD_ESTADO'] === 'ETM0000000000004' ||
+                                $item['COD_ESTADO'] === 'ETM0000000000015' ||
                                 $item['COD_ESTADO'] === 'ETM0000000000005'
                             )
                             &&

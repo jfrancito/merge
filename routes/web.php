@@ -1054,6 +1054,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::get('/resumen-orden-pedido/{idopcion}', 'ResumenOrdenPedidoController@actionResumenOrdenPedido');
 	Route::any('/ajax-buscar-resumen-op', 'ResumenOrdenPedidoController@actionListarAjaxBuscarResumenOP');
 	Route::any('/resumen-masivo-excel-op/{fecha_inicio}/{fecha_fin}/{empresa_id}/{centro_pedido}/{idopcion}', 'ResumenOrdenPedidoController@actionResumenMasivoExcelOp');
+    
+    // RUTA PARA TERMINAR PEDIDO EN REPORTE RESUMEN
+    Route::post('/ajax-terminar-resumen-op', 'ResumenOrdenPedidoController@actionTerminarResumenOp');
 
 	Route::get('/gestion-de-autorizacion-orden-pedido/{idopcion}', 'GestionOrdenPedidoAutorizaController@actionOrdenPedidoAutoriza');
 	Route::post('/autorizar_orden_pedido', 'GestionOrdenPedidoAutorizaController@insertAutorizaOrdenPedido');

@@ -247,6 +247,7 @@ $(document).ready(function () {
                 cod_categoria: tds.eq(3).text().trim(),
                 nom_categoria: tds.eq(4).text().trim(),
                 cantidad: parseInt(tds.eq(5).text().trim()) || 0,
+                precio: parseFloat(tds.eq(6).text().trim()) || 0,
                 txt_observacion: tds.eq(8).text().trim(),
                 opcion_detalle: 'I',
                 detalle_id: null
@@ -418,6 +419,79 @@ $(document).ready(function () {
 
     });
 
+    // ============================================
+    // TERMINAR ORDEN DE PEDIDO RESUMEN (ESTADO_TEMP = ETM8)
+    // ============================================
+    $(document).on('click', '#btnTerminarPedido', function (e) {
+        e.preventDefault();
+
+        let idPedido = $('#pedidoSeleccionadoParaTerminar').val();
+
+        if (!idPedido) {
+            modalBonito({
+                tipo: 'warn',
+                icono: '⚠',
+                titulo: 'Sin Seleccionar',
+                mensaje: 'Debe seleccionar un pedido aprobado para cambiar a Terminado.'
+            });
+            return;
+        }
+
+        modalBonito({
+            tipo: 'info',
+            icono: '📝',
+            titulo: 'Confirmar Terminar Pedido',
+            mensaje: '¿Deseas marcar la <b>Orden de Pedido ' + idPedido + '</b> como TERMINADA?',
+            confirmar: true,
+            onConfirm: function () {
+                abrircargando();
+                
+                $.ajax({
+                    type: "POST",
+                    url: carpeta + "/ajax-terminar-resumen-op",
+                    data: {
+                        _token: $('#token').val(),
+                        id_pedido: idPedido
+                    },
+                    success: function (resp) {
+                        cerrarcargando();
+                        if (resp.success) {
+                            modalBonito({
+                                tipo: 'success',
+                                icono: '✔',
+                                titulo: 'Operación exitosa',
+                                mensaje: resp.mensaje || 'El pedido fue marcado como TERMINADO.'
+                            });
+                            
+                            // Recargar solo la tabla en lugar de toda la página para mejorar la navegacion AJAX o recargar full
+                            // Como la vista usa actionListarAjaxBuscarResumenOP en la vista resumen vamos a disparar buscarpedidoresumen
+                            setTimeout(() => {
+                                $('.buscarpedidoresumen').trigger('click');
+                            }, 1500);
+
+                        } else {
+                            modalBonito({
+                                tipo: 'error',
+                                icono: '❌',
+                                titulo: 'Error',
+                                mensaje: resp.mensaje || 'Ocurrió un error al procesar la solicitud.'
+                            });
+                        }
+                    },
+                    error: function (xhr) {
+                        cerrarcargando();
+                        modalBonito({
+                            tipo: 'error',
+                            icono: '❌',
+                            titulo: 'Error',
+                            mensaje: 'Error de servidor: ' + (xhr.responseJSON?.message || xhr.statusText)
+                        });
+                    }
+                });
+            }
+        });
+    });
+
     $("#empresa_id").on('change', function (e) {
         //$(".ordenpedidoprincipal").on('change', '#empresa_id', function () {
 
@@ -451,6 +525,32 @@ $(document).ready(function () {
 
         //ajax_normal_combo(data, "/cargar-periodo-consolidado", "ajax_periodo")
 
+    });
+
+    /* ===============================
+       FILTRO POR TIPO DE PRODUCTO
+       =============================== */
+    var originalProductos = null;
+
+    $('#tipo_material_servicio').on('change', function () {
+        if (!originalProductos) {
+            originalProductos = $('#cod_producto option').clone();
+        }
+        var tipo = $(this).val();
+        
+        $('#cod_producto').empty();
+        
+        originalProductos.each(function () {
+            if ($(this).val() === "") {
+                $('#cod_producto').append($(this).clone());
+                return;
+            }
+            if (tipo === "" || tipo === $(this).data('indmaterialservicio')) {
+                $('#cod_producto').append($(this).clone());
+            }
+        });
+        
+        $('#cod_producto').trigger('change');
     });
 
     /* ===============================

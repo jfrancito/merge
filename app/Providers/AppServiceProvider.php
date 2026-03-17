@@ -30,7 +30,8 @@ class AppServiceProvider extends ServiceProvider
             $count = DB::table($tabla)->where($attribute, '=', $value)->count();
             if ($count > 0) {
                 return false;
-            } else {
+            }
+            else {
                 return true;
             }
         });
@@ -46,7 +47,8 @@ class AppServiceProvider extends ServiceProvider
 
             if ($count > 0) {
                 return false;
-            } else {
+            }
+            else {
                 return true;
             }
 
@@ -62,6 +64,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+    //
     }
 }

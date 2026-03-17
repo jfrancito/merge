@@ -249,10 +249,17 @@
                         TIPO <span class="obligatorio">(*)</span>
                     </label>
                     <div class="col-md-8">
-                        {!! Form::select('cod_tipo_pedido', $listatipopedido, '', [
+                      {{--  {!! Form::select('cod_tipo_pedido', $listatipopedido, '', [
                             'id' => 'cod_tipo_pedido',
                             'class' => 'form-control control select2'
+                        ]) !!} --}}
+
+                            {!! Form::select('cod_tipo_pedido', $listatipopedido, $tipFecoOrden, [
+                            'id' => 'cod_tipo_pedido',
+                            'class' => 'form-control control select2',
+                             'disabled' => 'disabled'
                         ]) !!}
+
                     </div>
                 </div>
             </div>
@@ -311,7 +318,18 @@
     <div class="panel-body" style="padding:10px">
 
         <div class="row mb-3 align-items-end">
-            <div class="col-md-5">
+            <div class="col-md-2">
+                <label class="label-sm negrita">
+                    TIPO PROD. <span class="obligatorio">(*)</span>
+                </label>
+                <select id="tipo_material_servicio" class="form-control select2">
+                    <option value="">TODOS</option>
+                    <option value="M">MATERIAL</option>
+                    <option value="S">SERVICIO</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
                 <label class="label-sm negrita">
                     PRODUCTO <span class="obligatorio">(*)</span>
                 </label>
@@ -354,7 +372,7 @@
                        oninput="this.value = Math.max(0, this.value)">
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label class="label-sm negrita">
                     OBSERVACIÓN
                 </label>
@@ -490,6 +508,10 @@
     .fila-seleccionada {
         background: #e3f2fd !important;
         cursor: pointer;
+    }
+    
+    #cod_tipo_pedido + .select2 .select2-selection__arrow {
+    display: none;
     }
 
 

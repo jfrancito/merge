@@ -92,7 +92,7 @@ trait OrdenPedidoTraits
 
 
     public function insertOrdenPedidoDetalle($ind_tipo_operacion, $id_pedido, $cod_empr, $cod_centro, $cod_producto, $nom_producto, $cod_categoria,
-                                             $nom_categoria, $cantidad, $txt_observacion, $activo, $cod_usuario_registro)
+                                             $nom_categoria, $cantidad, $precio, $txt_observacion, $activo, $cod_usuario_registro)
     {
 
 
@@ -109,6 +109,7 @@ trait OrdenPedidoTraits
                                                                         @COD_CATEGORIA = ?,
                                                                         @NOM_CATEGORIA = ?,
                                                                         @CANTIDAD = ?,
+                                                                        @CAN_PRECIO = ?,
                                                                         @TXT_OBSERVACION = ?,
                                                                         @ACTIVO = ?,
                                                                         @COD_USUARIO_REGISTRO = ?');
@@ -126,9 +127,10 @@ trait OrdenPedidoTraits
             $stmt->bindParam(7, $cod_categoria, PDO::PARAM_STR);
             $stmt->bindParam(8, $nom_categoria, PDO::PARAM_STR);
             $stmt->bindParam(9, $cantidad, PDO::PARAM_STR);
-            $stmt->bindParam(10, $txt_observacion, PDO::PARAM_STR);
-            $stmt->bindParam(11, $activo, PDO::PARAM_BOOL);
-            $stmt->bindParam(12, $cod_usuario_registro, PDO::PARAM_STR);
+            $stmt->bindParam(10, $precio, PDO::PARAM_STR);
+            $stmt->bindParam(11, $txt_observacion, PDO::PARAM_STR);
+            $stmt->bindParam(12, $activo, PDO::PARAM_BOOL);
+            $stmt->bindParam(13, $cod_usuario_registro, PDO::PARAM_STR);
 
 
             $stmt->execute();
@@ -302,7 +304,9 @@ trait OrdenPedidoTraits
                 'OP.TXT_TRABAJADOR_APRUEBA_GER',
                 'OP.TXT_TRABAJADOR_APRUEBA_ADM',
                 'OP.TXT_GLOSA',
-                'OP.TXT_ESTADO'
+                'OP.TXT_ESTADO',
+                'OP.COD_ESTADO_TEMP',
+                'OP.TXT_ESTADO_TEMP'
             ])
             ->join('STD.EMPRESA as E', 'E.COD_EMPR', '=', 'OP.COD_EMPR')
             ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'OP.COD_CENTRO')
