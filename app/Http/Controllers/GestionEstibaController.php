@@ -937,6 +937,8 @@ class GestionEstibaController extends Controller
                     );
                 
 
+
+
                 //HISTORIAL DE DOCUMENTO APROBADO
                 $documento                              =   new FeDocumentoHistorial;
                 $documento->ID_DOCUMENTO                =   $idoc;
@@ -947,6 +949,37 @@ class GestionEstibaController extends Controller
                 $documento->TIPO                        =   'CREO CONTRATO';
                 $documento->MENSAJE                     =   '';
                 $documento->save();
+
+                $descripcion = $request['descripcion'];
+                if (rtrim(ltrim($descripcion)) != '') {
+                    //HISTORIAL DE DOCUMENTO APROBADO
+                    $documento = new FeDocumentoHistorial;
+                    $documento->ID_DOCUMENTO = $fedocumento->ID_DOCUMENTO;
+                    $documento->DOCUMENTO_ITEM = $fedocumento->DOCUMENTO_ITEM;
+                    $documento->FECHA = $this->fechaactual;
+                    $documento->USUARIO_ID = Session::get('usuario')->id;
+                    $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+                    $documento->TIPO = 'OBSERVACION POR USUARIO CONTACTO';
+                    $documento->MENSAJE = $descripcion;
+                    $documento->save();
+
+                }
+
+                $descripcion = $request['descripcion'];
+                if (rtrim(ltrim($descripcion)) != '') {
+                    //HISTORIAL DE DOCUMENTO APROBADO
+                    $documento = new FeDocumentoHistorial;
+                    $documento->ID_DOCUMENTO = $fedocumento->ID_DOCUMENTO;
+                    $documento->DOCUMENTO_ITEM = $fedocumento->DOCUMENTO_ITEM;
+                    $documento->FECHA = $this->fechaactual;
+                    $documento->USUARIO_ID = Session::get('usuario')->id;
+                    $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+                    $documento->TIPO = 'OBSERVACION POR USUARIO CONTACTO';
+                    $documento->MENSAJE = $descripcion;
+                    $documento->save();
+
+                }
+
 
                 //HISTORIAL DE DOCUMENTO APROBADO
                 $documento                              =   new FeDocumentoHistorial;
