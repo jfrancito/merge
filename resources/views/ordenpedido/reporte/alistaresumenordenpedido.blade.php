@@ -1,9 +1,4 @@
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
-
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+{{-- Scripts redundantes eliminados para evitar conflictos con jQuery --}}
 
 <style>
     .fila-seleccionada td {
@@ -45,6 +40,7 @@
             <th>SOLICITA</th>
             <th>AUTORIZA</th>
             <th>APRUEBA ADM</th>
+            <th style="text-align: center;">DETALLE</th>
         </tr>
     </thead>
 
@@ -91,6 +87,12 @@
             <td>{{ $item->TXT_TRABAJADOR_SOLICITA }}</td>
             <td>{{ $item->TXT_TRABAJADOR_AUTORIZA }}</td>
             <td>{{ $item->TXT_TRABAJADOR_APRUEBA_ADM }}</td>
+            <td style="text-align: center;">
+                <button class="btn btn-sm btn-primary ver-detalle-pedido-res" 
+                        data-id="{{ $item->ID_PEDIDO }}">
+                    <i class="fa fa-eye me-1"></i> Detalle
+                </button>
+            </td>
         </tr>
         @endforeach
     </tbody>

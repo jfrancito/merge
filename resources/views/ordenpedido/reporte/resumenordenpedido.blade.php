@@ -73,12 +73,17 @@
                                 {!! Form::select('empresa_id', $combo_empresa, $empresa_id, ['class'=>'select2 form-control input-sm','id'=>'empresa_id']) !!}
                             </div>
 
-                            <div class="col-xs-12 col-md-3 cajareporte">
+                           <div class="col-xs-12 col-md-1 cajareporte">
                                 <label class="control-label">Centro:</label>
                                 {!! Form::select('centro_pedido', $combo_centro, $centro_pedido, ['class'=>'select2 form-control input-sm','id'=>'centro_pedido']) !!}
                             </div>
 
-                            <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
+                            <div class="col-xs-12 col-md-2 cajareporte">
+                                <label class="control-label">Área:</label>
+                                {!! Form::select('area', $combo_area, $area, ['class'=>'select2 form-control input-sm','id'=>'area']) !!}
+                            </div>
+
+                            <div class="col-xs-12 col-md-3 cajareporte">
                                 <div class="form-group ">
                                   <label class="col-sm-12 control-label labelleft" >Fecha Inicio:</label>
                                   <div class="col-sm-12 abajocaja" >
@@ -98,7 +103,7 @@
                                 </div>
                             </div> 
 
-                              <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 cajareporte">
+                              <div class="col-xs-12 col-md-3 cajareporte">
                               <div class="form-group ">
                                 <label class="col-sm-12 control-label labelleft" >Fecha Fin:</label>
                                 <div class="col-sm-12 abajocaja" >
@@ -131,6 +136,27 @@
         </div>
     </div>
 </div>
+
+    <!-- MODAL DETALLE -->
+    <div id="modal-detalle-pedido-resumen" class="modal-container colored-header colored-header-primary modal-effect-8">
+        <div class="modal-content ">
+            <div class='modal-detalle-pedido-container'>
+            </div>
+        </div>
+    </div>
+    <div class="modal-overlay"></div>
+
+    <style>
+        #modal-detalle-pedido-resumen {
+            width: 95%;
+            max-width: 1200px;
+            margin: auto;
+        }
+        #modal-detalle-pedido-resumen .modal-content {
+            border-radius: 14px;
+            overflow: hidden;
+        }
+    </style>
 
 @stop
 

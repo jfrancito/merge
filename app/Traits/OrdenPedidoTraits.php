@@ -266,7 +266,7 @@ trait OrdenPedidoTraits
 
     }
 
-    private function lg_lista_cabecera_pedido_resumen($fecha_inicio, $fecha_fin, $empresa_id, $centro_pedido)
+    private function lg_lista_cabecera_pedido_resumen($fecha_inicio, $fecha_fin, $empresa_id, $centro_pedido, $area = 'TODO')
     {
 
         $query = DB::table('WEB.ORDEN_PEDIDO as OP')
@@ -319,6 +319,9 @@ trait OrdenPedidoTraits
             })
             ->when($fecha_inicio && $fecha_fin, function ($q) use ($fecha_inicio, $fecha_fin) {
                 $q->whereBetween(DB::raw('CAST(OP.FEC_PEDIDO AS DATE)'), [$fecha_inicio, $fecha_fin]);
+            })
+            ->when($area && $area != 'TODO', function ($q) use ($area) {
+                $q->where('OP.TXT_AREA', $area);
             })
             ->orderBy('E.NOM_EMPR', 'ASC') // 1️⃣ Empresa
             ->orderBy('OP.ID_PEDIDO', 'ASC');
