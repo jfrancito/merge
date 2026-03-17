@@ -431,6 +431,11 @@
                                     @endif
                                   @endforeach
                             </div>
+
+
+
+
+
                             <div class="row">
                                   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 20px;">
                                       <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
@@ -439,6 +444,18 @@
                                           <div class="col-sm-12 abajocaja" >
                                               <input type="text" name="contacto_nombre" id='contacto_nombre' class="form-control control input-sm" value = '{{$usuario->NOM_TRABAJADOR}}' readonly>
                                           </div>
+                                        </div>
+                                        <div class="form-group sectioncargarimagen">
+                                            <label class="col-sm-12 control-label" style="text-align: left;margin-top:20px;"><b>REALIZAR UNA OBSERVACION :</b> <br><br></label>
+                                            <div class="col-sm-12">
+                                                <textarea 
+                                                name="descripcion"
+                                                id = "descripcion"
+                                                class="form-control input-sm validarmayusculas"
+                                                rows="12" 
+                                                cols="200"    
+                                                data-aw="2"></textarea>
+                                            </div>
                                         </div>
                                       </div>
 
@@ -483,6 +500,9 @@
                                       </div>
                                   </div>
                             </div>
+
+
+
                     </div>
                   </div>
                 </div>

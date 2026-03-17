@@ -5864,6 +5864,9 @@ class GestionOCController extends Controller
                 $trabajador = DB::table('STD.TRABAJADOR')->where('COD_TRAB', $ordencompra_tt->COD_TRABAJADOR_ENCARGADO)->first();
                 $trabajadorcorreo = DB::table('WEB.ListaplatrabajadoresGenereal')->where('dni','=',$trabajador->NRO_DOCUMENTO)->first();
 
+
+
+
                 if(count($trabajadorcorreo)>0){
                     $documento                              =   new FeDocumentoHistorial;
                     $documento->ID_DOCUMENTO                =   $ordencompra_tt->COD_ORDEN;
@@ -5887,7 +5890,20 @@ class GestionOCController extends Controller
                 $documento->MENSAJE                     =   '';
                 $documento->save();
 
+                $descripcion = $request['descripcion'];
+                if (rtrim(ltrim($descripcion)) != '') {
+                    //HISTORIAL DE DOCUMENTO APROBADO
+                    $documento = new FeDocumentoHistorial;
+                    $documento->ID_DOCUMENTO = $fedocumento->ID_DOCUMENTO;
+                    $documento->DOCUMENTO_ITEM = $fedocumento->DOCUMENTO_ITEM;
+                    $documento->FECHA = $this->fechaactual;
+                    $documento->USUARIO_ID = Session::get('usuario')->id;
+                    $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+                    $documento->TIPO = 'OBSERVACION POR USUARIO CONTACTO';
+                    $documento->MENSAJE = $descripcion;
+                    $documento->save();
 
+                }
 
                 $orden                                  =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
 
@@ -6494,6 +6510,9 @@ class GestionOCController extends Controller
 
                 $ordencompra_t                          =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$ordencompra->COD_DOCUMENTO_CTBLE)->first();
 
+
+
+
                 //HISTORIAL DE DOCUMENTO APROBADO
                 $documento                              =   new FeDocumentoHistorial;
                 $documento->ID_DOCUMENTO                =   $ordencompra->COD_DOCUMENTO_CTBLE;
@@ -6504,6 +6523,22 @@ class GestionOCController extends Controller
                 $documento->TIPO                        =   'CREO CONTRATO';
                 $documento->MENSAJE                     =   '';
                 $documento->save();
+
+
+                $descripcion = $request['descripcion'];
+                if (rtrim(ltrim($descripcion)) != '') {
+                    //HISTORIAL DE DOCUMENTO APROBADO
+                    $documento = new FeDocumentoHistorial;
+                    $documento->ID_DOCUMENTO = $fedocumento->ID_DOCUMENTO;
+                    $documento->DOCUMENTO_ITEM = $fedocumento->DOCUMENTO_ITEM;
+                    $documento->FECHA = $this->fechaactual;
+                    $documento->USUARIO_ID = Session::get('usuario')->id;
+                    $documento->USUARIO_NOMBRE = Session::get('usuario')->nombre;
+                    $documento->TIPO = 'OBSERVACION POR USUARIO CONTACTO';
+                    $documento->MENSAJE = $descripcion;
+                    $documento->save();
+
+                }
 
                 //HISTORIAL DE DOCUMENTO APROBADO
                 $documento                              =   new FeDocumentoHistorial;
