@@ -32,7 +32,7 @@
                         @if (
                             (
                                 $item['COD_ESTADO'] === 'ETM0000000000013'
-                                || $item['COD_ESTADO'] === 'ETM0000000000004'
+                                || $item['COD_ESTADO'] === 'ETM0000000000015'
                                 || $item['COD_ESTADO'] === 'ETM0000000000005'
                             )
                             && $item['COD_TRABAJADOR_AUTORIZA'] === $usuario_logueado_id

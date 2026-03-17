@@ -67,6 +67,9 @@
                     ?? $cant_ger 
                     ?? $cant_jefe 
                     ?? $cant_original;
+
+    // NUEVA CONDICIÓN
+    $sin_modificaciones = is_null($cant_jefe) && is_null($cant_ger);
 @endphp
 
 <tr>
@@ -86,9 +89,29 @@
 
     {{-- CANTIDAD ORIGINAL --}}
     <td class="text-center">
+
+    @if(
+        $sin_modificaciones &&
+        $pedido->COD_TRABAJADOR_APRUEBA_ADM == $cod_usuario_session &&
+        $pedido->COD_ESTADO == 'ETM0000000000015'
+    )
+
+        <input type="number"
+               class="form-control text-center input-cantidad-editar"
+               value="{{ (int)$cant_original }}"
+               min="1"
+               data-id="{{ $detalle->ID_PEDIDO }}"
+               data-prod="{{ $detalle->COD_PRODUCTO }}"
+               style="width: 70px; margin: 0 auto; font-weight: bold;">
+
+    @else
+
         <span class="badge badge-cantidad">
             {{ $cant_original }}
         </span>
+
+    @endif
+
     </td>
 
     {{-- CANTIDAD JEFE --}}
@@ -106,7 +129,7 @@
 
         @if (
             $pedido->COD_TRABAJADOR_APRUEBA_ADM == $cod_usuario_session &&
-            $pedido->COD_ESTADO == 'ETM0000000000004'
+            $pedido->COD_ESTADO == 'ETM0000000000015'
         )
 
             <input type="number"
@@ -147,14 +170,13 @@
 </table>
 </div>
 </div>
-
 <!-- FOOTER -->
 <div class="modal-footer d-flex justify-content-center align-items-center bg-light" 
      style="margin-top:-10px; border-top:1px solid #dee2e6;">
 
 @if (
     $pedido->COD_TRABAJADOR_APRUEBA_ADM == $cod_usuario_session &&
-    $pedido->COD_ESTADO == 'ETM0000000000004'
+    $pedido->COD_ESTADO == 'ETM0000000000015'
 )
 <button type="button" 
         class="btn btn-success btn-space btn-editar-cantidades-adm"

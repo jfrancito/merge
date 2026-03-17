@@ -57,6 +57,8 @@ class GestionOrdenPedidoController extends Controller
         $cod_centro = $centro->COD_CENTRO;
         $nom_centro = $centro->NOM_CENTRO;
 
+
+
         $tipoOrden = DB::table('WEB.TIPO_PEDIDO_ORDEN')->where('cod_estado', 1)->pluck('TXT_TIPO_PEDIDO', 'COD_TIPO_PEDIDO')->toArray();
         $combo2 = array('' => 'Seleccione Tipo Orden de Pedido') + $tipoOrden;
 
@@ -170,6 +172,18 @@ class GestionOrdenPedidoController extends Controller
             ->pluck('TXT_NOMBRE', 'COD_PERIODO')
             ->toArray();
 
+        $mesPeriodo = DB::table('Web.periodos')
+	    ->where('activo', 1)
+	    ->where('COD_EMPR', $empresa)
+	    ->value('mes');
+
+	    $mesActual = date('n'); 
+	    if ($mesActual < $mesPeriodo) {
+		    $tipFecoOrden = 'TOP0000000000002';   
+		} else {
+		    $tipFecoOrden = 'TOP0000000000003';
+		}
+
         $combo9 = array('' => 'Seleccione Mes') + $periodo_mes;
 
 
@@ -236,6 +250,7 @@ class GestionOrdenPedidoController extends Controller
             'nom_centro' => $nom_centro,
             'listatipopedido' => $combo2,
             'listasolicita' => $combo4,
+            'tipFecoOrden' => $tipFecoOrden,
             'usuario_solicita' => $usuario_solicita,
             'usuario_autoriza' => $combo5,
             'usuario_aprueba_ger' => $combo6,
@@ -454,6 +469,7 @@ class GestionOrdenPedidoController extends Controller
                     $item['cod_categoria'] ?? '',
                     $item['nom_categoria'] ?? '',
                     $item['cantidad'],
+                    $item['precio'],
                     $item['txt_observacion'] ?? '',
                     true,
                     ""

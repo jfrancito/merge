@@ -28,7 +28,7 @@
                 </thead>
                 <tbody>
                     @foreach($listapedido as $index => $item)
-                          @if ($item['COD_ESTADO'] === 'ETM0000000000004' && $item['COD_TRABAJADOR_APRUEBA_ADM'] === $usuario_logueado_id)
+                          @if ($item['COD_ESTADO'] === 'ETM0000000000015' && $item['COD_TRABAJADOR_APRUEBA_ADM'] === $usuario_logueado_id)
                             <tr class="align-middle">
                                 <td>{{ $item['ID_PEDIDO'] }}</td>
                                 <td>{{ $item['FEC_PEDIDO'] }}</td>
