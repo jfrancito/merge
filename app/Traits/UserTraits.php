@@ -868,6 +868,7 @@ trait UserTraits
                                         ->where('ID_DOCUMENTO', $item->ID_DOCUMENTO)
                                         ->where('TIPO', 'like', '%APROBADO POR%')
                                         ->where('TIPO','<>','APROBADO POR ADMINISTRACION')
+                                        ->where('TIPO','<>','APROBADO POR CONTABILIDAD')
                                         ->orderBy('FECHA', 'desc')
                                         ->get();
             $subjectcorreo          =   "COMPRA APROBADA ".$item->ID_DOCUMENTO." (".$item->OPERACION.")";
