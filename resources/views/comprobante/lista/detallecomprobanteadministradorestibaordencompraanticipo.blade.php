@@ -440,6 +440,20 @@
                                               <input type="text" name="contacto_nombre" id='contacto_nombre' class="form-control control input-sm" value = '{{$usuario->NOM_TRABAJADOR}}' readonly>
                                           </div>
                                         </div>
+
+                                        <div class="form-group sectioncargarimagen">
+                                            <label class="col-sm-12 control-label" style="text-align: left;margin-top:20px;"><b>REALIZAR UNA OBSERVACION :</b> <br><br></label>
+                                            <div class="col-sm-12">
+                                                <textarea 
+                                                name="descripcion"
+                                                id = "descripcion"
+                                                class="form-control input-sm validarmayusculas"
+                                                rows="12" 
+                                                cols="200"    
+                                                data-aw="2"></textarea>
+                                            </div>
+                                        </div>
+                                        
                                       </div>
 
 
