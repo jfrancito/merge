@@ -57,7 +57,13 @@ class GestionOrdenPedidoController extends Controller
         $cod_centro = $centro->COD_CENTRO;
         $nom_centro = $centro->NOM_CENTRO;
 
-
+        $combo_sede = [];
+        if ($usuario_solicita == 'ISTR000000000205') {
+            $combo_sede = DB::table('ALM.CENTRO')
+                ->whereIn('COD_CENTRO', [$cod_centro, 'CEN0000000000006'])
+                ->pluck('NOM_CENTRO', 'COD_CENTRO')
+                ->toArray();
+        }
 
         $tipoOrden = DB::table('WEB.TIPO_PEDIDO_ORDEN')->where('cod_estado', 1)->pluck('TXT_TIPO_PEDIDO', 'COD_TIPO_PEDIDO')->toArray();
         $combo2 = array('' => 'Seleccione Tipo Orden de Pedido') + $tipoOrden;
@@ -248,6 +254,7 @@ class GestionOrdenPedidoController extends Controller
             'empresa' => $empresa,
             'cod_centro' => $cod_centro,
             'nom_centro' => $nom_centro,
+            'combo_sede' => $combo_sede,
             'listatipopedido' => $combo2,
             'listasolicita' => $combo4,
             'tipFecoOrden' => $tipFecoOrden,
@@ -680,6 +687,14 @@ class GestionOrdenPedidoController extends Controller
         return response()->json([
             'success' => true
         ]);
+    }
+
+    public function actionAjaxObtenerCorrelativoPedido(Request $request)
+    {
+        $cod_empr = $request->input('cod_empr');
+        $cod_centro = $request->input('cod_centro');
+        $nro_pedido = $this->obtenerNumeroPedido($cod_empr, $cod_centro);
+        return response()->json($nro_pedido);
     }
 
 }

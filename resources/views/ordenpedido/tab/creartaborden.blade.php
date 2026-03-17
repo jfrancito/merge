@@ -209,14 +209,21 @@
                         SEDE <span class="obligatorio">(*)</span>
                     </label>
                     <div class="col-md-8">
-                        <input type="text"
-                               class="form-control control"
-                               value="{{ $nom_centro }}"
-                               readonly>
-                        <input type="hidden"
-                               id="cod_centro"
-                               name="cod_centro"
-                               value="{{ $cod_centro }}">
+                        @if(count($combo_sede) > 0)
+                            {!! Form::select('cod_centro', $combo_sede, $cod_centro, [
+                                'id' => 'cod_centro',
+                                'class' => 'form-control control select2'
+                            ]) !!}
+                        @else
+                            <input type="text"
+                                   class="form-control control"
+                                   value="{{ $nom_centro }}"
+                                   readonly>
+                            <input type="hidden"
+                                   id="cod_centro"
+                                   name="cod_centro"
+                                   value="{{ $cod_centro }}">
+                        @endif
                     </div>
                 </div>
             </div>

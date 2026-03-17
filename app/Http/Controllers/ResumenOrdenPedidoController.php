@@ -45,7 +45,18 @@ class ResumenOrdenPedidoController extends Controller
 
          $empresa_id = 'TODO';
          $centro_pedido = 'TODO';
-         $listaordenpedido = $this->lg_lista_cabecera_pedido_resumen($fecha_inicio, $fecha_fin, $empresa_id, $centro_pedido);
+         $area = 'TODO';
+
+         $combo_area = DB::table('WEB.ORDEN_PEDIDO as OP')
+            ->whereNotNull('OP.TXT_AREA')
+            ->where('OP.TXT_AREA', '<>', '')
+            ->distinct()
+            ->orderBy('OP.TXT_AREA', 'asc')
+            ->pluck('OP.TXT_AREA', 'OP.TXT_AREA')
+            ->toArray();
+         $combo_area = array('TODO' => 'TODO') + $combo_area;
+
+         $listaordenpedido = $this->lg_lista_cabecera_pedido_resumen($fecha_inicio, $fecha_fin, $empresa_id, $centro_pedido, $area);
 
 
         $funcion = $this;
@@ -60,7 +71,9 @@ class ResumenOrdenPedidoController extends Controller
             'empresa_id' => $empresa_id,
             'combo_empresa' => $combo_empresa,
             'combo_centro' => $combo_centro,
-            'centro_pedido' => $centro_pedido
+            'centro_pedido' => $centro_pedido,
+            'area' => $area,
+            'combo_area' => $combo_area
         ]);
 
     }
@@ -74,9 +87,10 @@ class ResumenOrdenPedidoController extends Controller
         $empresa_id = $request['empresa_id'];
         $centro_pedido = $request['centro_pedido'];
         $idopcion = $request['idopcion'];
+        $area = $request['area'];
 
 
- 		$listaordenpedido = $this->lg_lista_cabecera_pedido_resumen($fecha_inicio, $fecha_fin, $empresa_id, $centro_pedido);
+ 		$listaordenpedido = $this->lg_lista_cabecera_pedido_resumen($fecha_inicio, $fecha_fin, $empresa_id, $centro_pedido, $area);
         $funcion = $this;
 
         return View::make('ordenpedido/reporte/alistaresumenordenpedido',
@@ -85,6 +99,7 @@ class ResumenOrdenPedidoController extends Controller
                 'fecha_fin' => $fecha_fin,
                 'empresa_id' => $empresa_id,
                 'centro_pedido' => $centro_pedido,
+                'area' => $area,
                 'idopcion' => $idopcion,
                 'listaordenpedido' => $listaordenpedido,
                 'ajax' => true,
@@ -92,7 +107,7 @@ class ResumenOrdenPedidoController extends Controller
             ]);
     }
 
-     public function actionResumenMasivoExcelOp($fecha_inicio, $fecha_fin, $empresa_id, $centro_pedido, $idopcion)
+     public function actionResumenMasivoExcelOp($fecha_inicio, $fecha_fin, $empresa_id, $centro_pedido, $area, $idopcion)
     {
         set_time_limit(0);
 
@@ -102,7 +117,7 @@ class ResumenOrdenPedidoController extends Controller
         $titulo = 'Orden-de-Pedido';
         $funcion = $this;
 
-        $listaordenpedido = $this->lg_lista_cabecera_pedido_resumen($fecha_inicio, $fecha_fin, $empresa_id, $centro_pedido);
+        $listaordenpedido = $this->lg_lista_cabecera_pedido_resumen($fecha_inicio, $fecha_fin, $empresa_id, $centro_pedido, $area);
         Excel::create($titulo . '-(' . $fecha_actual . ')', function ($excel) use ($listaordenpedido, $titulo, $funcion) {
             $excel->sheet('ORDEN PEDIDO', function ($sheet) use ($listaordenpedido, $titulo, $funcion) {
 
@@ -138,6 +153,34 @@ class ResumenOrdenPedidoController extends Controller
                 'mensaje' => 'Ocurrió un error: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function actionDetallePedidoResumen(Request $request)
+    {
+        $id_buscar = $request->input('orden_pedido_id');
+
+        $pedido = DB::table('WEB.ORDEN_PEDIDO')->where('ID_PEDIDO', $id_buscar)->first();
+        $pedillodetalle = DB::table('WEB.ORDEN_PEDIDO_DETALLE')
+            ->where('ID_PEDIDO', $id_buscar)
+            ->where('ACTIVO', 1)
+            ->get();
+
+        $id_pedido = $pedillodetalle->pluck('ID_PEDIDO');
+        $nom_producto = $pedillodetalle->pluck('NOM_PRODUCTO');
+        $nom_categoria = $pedillodetalle->pluck('NOM_CATEGORIA');
+        $cantidad = $pedillodetalle->pluck('CANTIDAD');
+        $txt_observacion = $pedillodetalle->pluck('TXT_OBSERVACION');
+
+        return view('ordenpedido.modal.modaldetallepedidores', [
+            'ajax' => true,
+            'pedido' => $pedido,
+            'id_pedido' => $id_pedido,
+            'nom_producto' => $nom_producto,
+            'nom_categoria' => $nom_categoria,
+            'cantidad' => $cantidad,
+            'txt_observacion' => $txt_observacion,
+            'pedillodetalle' => $pedillodetalle
+        ]);
     }
 
 }

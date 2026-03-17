@@ -553,6 +553,28 @@ $(document).ready(function () {
         $('#cod_producto').trigger('change');
     });
 
+    $(document).on('change', '#cod_centro', function () {
+        let cod_centro = $(this).val();
+        let cod_empr = $('#cod_empr').val();
+        let _token = $('#token').val();
+
+        $.ajax({
+            type: "POST",
+            url: carpeta + "/ajax-obtener-correlativo-pedido",
+            data: {
+                _token: _token,
+                cod_empr: cod_empr,
+                cod_centro: cod_centro
+            },
+            success: function (res) {
+                $('#nro_pedido').val(res);
+            },
+            error: function (xhr) {
+                console.error("Error al obtener correlativo:", xhr);
+            }
+        });
+    });
+
     /* ===============================
        AGREGAR PRODUCTO
        =============================== */
@@ -1581,6 +1603,7 @@ $(document).ready(function () {
         var fecha_fin = $('#fecha_fin').val();
         var empresa_id = $('#empresa_id').val();   // ✅ usar misma variable
         var centro_pedido = $('#centro_pedido').val();
+        var area = $('#area').val();
         var idopcion = $('#idopcion').val();
         var _token = $('#token').val();
 
@@ -1599,10 +1622,37 @@ $(document).ready(function () {
             fecha_fin: fecha_fin,
             empresa_id: empresa_id,       // ✅ corregido
             centro_pedido: centro_pedido,
+            area: area,
             idopcion: idopcion
         };
 
         ajax_normal(data, "/ajax-buscar-resumen-op");
+    });
+
+    $(document).on('click', '.ver-detalle-pedido-res', function (event) {
+        event.preventDefault();
+        var id_pedido = $(this).data('id');
+        var _token = $('#token').val();
+        
+        abrircargando();
+        
+        $.ajax({
+            type: 'POST',
+            url: carpeta + '/ver-detalle-pedido-resumen',
+            data: {
+                _token: _token,
+                orden_pedido_id: id_pedido
+            },
+            success: function (data) {
+                cerrarcargando();
+                $('.modal-detalle-pedido-container').html(data);
+                $('#modal-detalle-pedido-resumen').niftyModal('show');
+            },
+            error: function (data) {
+                cerrarcargando();
+                alerterrorajax("Error al cargar el detalle.");
+            }
+        });
     });
 
     $(document).on('click', '.buscarpedidoconsolidado', function (event) {
@@ -1742,6 +1792,7 @@ $(document).ready(function () {
         var fecha_fin = $('#fecha_fin').val();
         var empresa_id = $('#empresa_id').val();
         var centro_pedido = $('#centro_pedido').val();
+        var area = $('#area').val();
         var idopcion = $('#idopcion').val();
         var _token = $('#token').val();
 
@@ -1755,7 +1806,7 @@ $(document).ready(function () {
             return false;
         }
 
-        href = $(this).attr('data-href') + '/' + fecha_inicio + '/' + fecha_fin + '/' + empresa_id + '/' + centro_pedido + '/' + idopcion;
+        href = $(this).attr('data-href') + '/' + fecha_inicio + '/' + fecha_fin + '/' + empresa_id + '/' + centro_pedido + '/' + area + '/' + idopcion;
         $(this).prop('href', href);
         return true;
     });
