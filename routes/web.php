@@ -615,7 +615,7 @@ Route::group(['middleware' => ['authaw']], function () {
 
 
 	Route::any('/ajax-modal-detalle-deuda-contrato', 'GestionEntregaDocumentoController@actionModaDetalleDeudaContrato');
-	Route::any('/entrega-masivo-excel/{operacion_id}/{idopcion}', 'GestionEntregaDocumentoController@actionEntregableMasivoExcel');
+	Route::any('/entrega-masivo-excel/{operacion_id}/{idopcion}/{fecha_inicio}/{fecha_fin}', 'GestionEntregaDocumentoController@actionEntregableMasivoExcel');
 	Route::any('/ajax-crear-folio-pagos', 'GestionEntregaDocumentoController@actionEntregableCrearFolio');
 	Route::any('/ajax-modal-detalle-folios', 'GestionEntregaDocumentoController@actionEntregableModalDetalleFolio');
 	Route::any('/ajax-detalle-documento-pagos', 'GestionEntregaDocumentoController@actionModalDetalleDocumentoPagos');
