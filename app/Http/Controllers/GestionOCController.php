@@ -3741,10 +3741,10 @@ class GestionOCController extends Controller
 
 
         //PARA SABER SI ES MARKETING
-
-        $usuario_mkt    = DB::table('SGD.USUARIO')
-                    ->where('COD_USUARIO', $ordencompra->COD_USUARIO_CREA_AUD)
-                    ->first();
+        $ordencompra_t          =   CMPOrden::where('COD_ORDEN','=',$idoc)->first();
+        $usuario_mkt                = DB::table('SGD.USUARIO')
+                                    ->where('COD_TRABAJADOR', $ordencompra_t->COD_TRABAJADOR_SOLICITA)
+                                    ->first();
         
         if($usuario_mkt->COD_CATEGORIA_AREA == 'AEM0000000000038'){
             $area_mkt    = DB::table('CMP.CATEGORIA')
