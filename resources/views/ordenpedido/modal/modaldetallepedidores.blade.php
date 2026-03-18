@@ -34,21 +34,22 @@
                 $mostrarAdm = true;
             }
         }
+        $total_general = 0;
     @endphp
 
       <thead class="text-white sticky-top detalle-thead">
         <tr class="text-uppercase small">
-          <th style="width:5%" class="text-center">#</th>
-          <th style="width:30%">Producto</th>
-          <th style="width:20%">Categoría</th>
-          <th style="width:10%" class="text-center">Cant.</th>
+          <th class="text-center">#</th>
+          <th>Producto</th>
+          <th>Categoría</th>
+          <th class="text-center">Cant.</th>
           @if($mostrarJefe)
-          <th style="width:10%" class="text-center">Cant. Jefe</th> @endif
+          <th class="text-center">Cant. Jefe</th> @endif
           @if($mostrarGer)
-          <th style="width:10%" class="text-center">Cant. Gerencia</th>@endif
+          <th class="text-center">Cant. Gerencia</th>@endif
           @if($mostrarAdm)
-          <th  style="width:10%" class="text-center">Cant. Admin</th>@endif
-          <th style="width:35%">Observación</th>
+          <th class="text-center">Cant. Admin</th>@endif
+          <th>Observación</th>
         </tr>
       </thead>
 
@@ -59,12 +60,12 @@
             {{ $index + 1 }}
           </td>
 
-          <td class="fw-semibold text-truncate"
+          <td class="fw-semibold"
               title="{{ $detalle->NOM_PRODUCTO }}">
             {{ $detalle->NOM_PRODUCTO }}
           </td>
 
-          <td class="text-truncate text-secondary"
+          <td class="text-secondary"
               title="{{ $detalle->NOM_CATEGORIA }}">
             {{ $detalle->NOM_CATEGORIA }}
           </td>
@@ -114,7 +115,7 @@
             </td>
         @endif
 
-            <td class="text-truncate observacion"
+            <td class="observacion"
                   title="{{ $detalle->TXT_OBSERVACION }}">
                 {{ $detalle->TXT_OBSERVACION ?: '—' }}
               </td>
@@ -261,5 +262,11 @@ tbody tr td[colspan] {
 .modal-footer {
     backdrop-filter: blur(4px);
     box-shadow: 0 -4px 14px rgba(0,0,0,.08);
+}
+
+/* Forzar ancho similar a otros modales */
+.modal-container {
+    width: 80% !important;
+    max-width: 1000px !important;
 }
 </style>

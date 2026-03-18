@@ -217,6 +217,8 @@ trait OrdenPedidoTraits
                 'OP.TXT_TRABAJADOR_APRUEBA_ADM',
                 'OP.TXT_GLOSA',
                 'OP.TXT_ESTADO',
+                'OP.COD_USUARIO_MODIF_AUD',
+                'U.nombre as USUARIO_MODIF',
 
                 'OD.ID_PEDIDO as ID_PEDIDO_DETALLE',
                 'OD.COD_PRODUCTO',
@@ -231,6 +233,7 @@ trait OrdenPedidoTraits
             ->join('ALM.CENTRO as C', 'C.COD_CENTRO', '=', 'OP.COD_CENTRO')
             ->leftJoin('ALM.PRODUCTO as P', 'P.COD_PRODUCTO', '=', 'OD.COD_PRODUCTO')
             ->leftJoin('CMP.CATEGORIA as CAT', 'CAT.COD_CATEGORIA', '=', 'P.COD_CATEGORIA_FAMILIA')
+            ->leftJoin('users as U', 'U.id', '=', 'OP.COD_USUARIO_MODIF_AUD')
             ->where('OP.ACTIVO', 1)
             ->when($empresa_id && $empresa_id != 'TODO', function ($q) use ($empresa_id) {
                 $q->where('OP.COD_EMPR', $empresa_id);
@@ -1128,7 +1131,8 @@ trait OrdenPedidoTraits
                C.NOM_CENTRO,
                E.COD_EMPR,
                E.NOM_EMPR,
-               ISNULL(CA.DETALLE_POR_AREA, '') AS DETALLE_POR_AREA
+               ISNULL(CA.DETALLE_POR_AREA, '') AS DETALLE_POR_AREA,
+               ISNULL(CO.OBSERVACION_POR_AREA, '') AS OBSERVACION_POR_AREA
         FROM WEB.ORDEN_PEDIDO_CONSOLIDADO AS OPC
                  INNER JOIN WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE AS OPCD
                             ON OPC.ID_PEDIDO_CONSOLIDADO = OPCD.ID_PEDIDO_CONSOLIDADO
@@ -1147,7 +1151,7 @@ trait OrdenPedidoTraits
                             AND E.COD_ESTADO = 1
                  OUTER APPLY (
                      SELECT STUFF((
-                         SELECT ' [SEP] ' + OP.TXT_AREA
+                         SELECT DISTINCT ' [SEP] ' + OP.TXT_AREA
                          FROM WEB.ORDEN_PEDIDO OP
                                   INNER JOIN WEB.ORDEN_PEDIDO_DETALLE OPD
                                              ON OP.ID_PEDIDO = OPD.ID_PEDIDO
@@ -1165,6 +1169,26 @@ trait OrdenPedidoTraits
                          FOR XML PATH(''), TYPE
                      ).value('.', 'NVARCHAR(MAX)'), 1, 7, '') AS DETALLE_POR_AREA
                  ) CA
+                 OUTER APPLY (
+                     SELECT STUFF((
+                         SELECT DISTINCT ' [SEP] ' + (OP.TXT_AREA + ': ' + ISNULL(OPD.TXT_OBSERVACION, ''))
+                         FROM WEB.ORDEN_PEDIDO OP
+                                  INNER JOIN WEB.ORDEN_PEDIDO_DETALLE OPD
+                                             ON OP.ID_PEDIDO = OPD.ID_PEDIDO
+                                  INNER JOIN CMP.REFERENCIA_ASOC AS RAF
+                                             ON RAF.COD_TABLA = OP.ID_PEDIDO
+                                                 AND RAF.COD_ESTADO = 1
+                                  INNER JOIN WEB.ORDEN_PEDIDO_CONSOLIDADO AS OPCF
+                                             ON OPCF.ID_PEDIDO_CONSOLIDADO = RAF.COD_TABLA_ASOC
+                                                 AND OPCF.ACTIVO = 1
+                         WHERE RAF.TXT_TIPO_REFERENCIA = 'CONSOLIDADO'
+                           AND RAF.TXT_TABLA = 'WEB.ORDEN_PEDIDO'
+                           AND RAF.TXT_TABLA_ASOC = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
+                           AND OPCF.ID_PEDIDO_CONSOLIDADO = OPC.ID_PEDIDO_CONSOLIDADO
+                           AND OPD.COD_PRODUCTO = OPCD.COD_PRODUCTO
+                         FOR XML PATH(''), TYPE
+                     ).value('.', 'NVARCHAR(MAX)'), 1, 7, '') AS OBSERVACION_POR_AREA
+                 ) CO
         WHERE OPC.CONSOLIDADO_GENERAL = 'SI'
           AND RA.TXT_TIPO_REFERENCIA = 'CONSOLIDADO_GENERAL'
           AND RA.TXT_TABLA = 'WEB.ORDEN_PEDIDO_CONSOLIDADO'
@@ -1187,7 +1211,8 @@ trait OrdenPedidoTraits
                         C.NOM_CENTRO, 
                         E.COD_EMPR, 
                         E.NOM_EMPR,
-                        CA.DETALLE_POR_AREA 
+                        CA.DETALLE_POR_AREA,
+                        CO.OBSERVACION_POR_AREA
                   ORDER BY OPCD.NOM_PRODUCTO ASC;";
 
         // Preparar parámetros
@@ -1208,6 +1233,7 @@ trait OrdenPedidoTraits
         $sql = "
         SELECT OP.COD_AREA,
        OP.TXT_AREA AS NOM_AREA,
+       OPD.TXT_OBSERVACION,
        OP.COD_ANIO,
        OP.COD_PERIODO,
        OP.COD_EMPR,

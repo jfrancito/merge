@@ -1046,6 +1046,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::post('/ajax_editar_orden_pedido', 'GestionOrdenPedidoController@actionAjaxEditarPedido');
 	Route::post('/ajax-pedido-editar', 'GestionOrdenPedidoController@actionAjaxPedidoEditar');
 	Route::post('/ajax-obtener-correlativo-pedido', 'GestionOrdenPedidoController@actionAjaxObtenerCorrelativoPedido');
+	Route::post('/ajax-buscar-producto', 'GestionOrdenPedidoController@actionAjaxBuscarProducto');
 
 	Route::get('/reporte-orden-pedido/{idopcion}', 'ReporteOrdenPedidoController@actionReporteOrdenPedido');
 	Route::any('/ajax-buscar-documento-op', 'ReporteOrdenPedidoController@actionListarAjaxBuscarDocumentoOP');
@@ -1095,6 +1096,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::post('/ajax-aprobar-consolidado-general-op', 'ConsolidadoGeneralOrdenPedidoController@actionAjaxAprobarConsolidadoGeneral');
 	Route::get('/descargar-excel-detalle-consolidado-general/{id_consolidado_general}/{familia_id}', 'ConsolidadoGeneralOrdenPedidoController@actionDescargarExcelDetalleConsolidadoGeneral');
     Route::get('/descargar-excel-detalle-consolidado-general-area/{id_consolidado_general}/{familia_id}', 'ConsolidadoGeneralOrdenPedidoController@actionDescargarExcelDetalleConsolidadoGeneralArea');
+	Route::post('/ajax-eliminar-consolidado-general-op', 'ConsolidadoGeneralOrdenPedidoController@actionAjaxEliminarConsolidadoGeneral');
 
 	Route::get('/gestion-monto-orden-pedido/{idopcion}', 'MontoOrdenPedidoController@actionMontoOrdenPedido');
 	Route::any('/modificar-monto-orden-pedido', 'MontoOrdenPedidoController@actionModificarMontoOrdenPedido');

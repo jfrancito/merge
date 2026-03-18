@@ -38,6 +38,7 @@
         <th class='tabladp'>FAMILIA</th>
         <th class='tabladp'>CENTRO</th>
         <th class='tabladp'>AREA</th>
+        <th class='tabladp'>OBSERVACION</th>
     </tr>
     </thead>
     <tbody>
@@ -56,7 +57,7 @@
             <td>{{ $item->NOM_CATEGORIA_FAMILIA }}</td>
             <td>{{ $item->NOM_CENTRO }}</td>
             <td>{{ $item->DETALLE_POR_AREA }}</td>
-
+            <td>{{ $item->OBSERVACION_POR_AREA }}</td>
         </tr>
     @endforeach
     </tbody>

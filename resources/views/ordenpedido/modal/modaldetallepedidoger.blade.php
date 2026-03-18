@@ -22,6 +22,7 @@
 
 @php
     $mostrarJefe = false;
+    $total_general = 0;
 
     foreach($pedillodetalle as $item){
         if(!is_null($item->CAN_MODIF_JEF_AUT)){
@@ -39,7 +40,8 @@
     <th style="width:5%" class="text-center">#</th>
     <th style="width:30%">Producto</th>
     <th style="width:20%">Categoría</th>
-    <th style="width:10%" class="text-center">Cant.</th>
+    <th style="width:5%" class="text-center">Cant.</th>
+    <th style="width:5%" class="text-center">Precio.</th>
 
     @if($mostrarJefe)
         <th style="width:10%" class="text-center">Cant. Jefe</th>
@@ -127,6 +129,15 @@
 
     </td>
     @endif
+    
+    <td class="fw-semibold text-truncate text-center"
+        title="{{ $detalle->CAN_PRECIO }}">
+        {{ number_format($detalle->CAN_PRECIO, 2) }}
+    </td>
+
+    @php
+        $total_general += ($detalle->CANTIDAD * $detalle->CAN_PRECIO);
+    @endphp
 
     <td class="text-truncate observacion"
         title="{{ $detalle->TXT_OBSERVACION }}">
@@ -142,6 +153,16 @@
 </tr>
 @endforelse
 </tbody>
+
+<tfoot style="background: #f8f9fa; color: #1f2a50; border-top: 2px solid #dee2e6;">
+    <tr>
+        <td colspan="{{ 6 + ($mostrarJefe ? 1 : 0) }}" class="text-right py-3 px-4" style="border:none;">
+            <span class="fw-bold" style="font-size: 1.4rem; font-weight: 900;">
+                TOTAL: S/ {{ number_format($total_general, 2) }}
+            </span>
+        </td>
+    </tr>
+</tfoot>
 
 </table>
 </div>
@@ -273,17 +294,22 @@
     box-shadow: inset 0 0 0 1px rgba(31,78,216,.15);
 }
 
+.badge-total {
+    background: linear-gradient(135deg, #e6fffa, #b2f5ea);
+    color: #2c7a7b;
+    font-size: 1.1rem;
+    font-weight: 900;
+    padding: 8px 18px;
+    border-radius: 10px;
+    box-shadow: inset 0 0 0 1px rgba(44,122,123,.15);
+    display: inline-block;
+}
+
 
 /* ===== OBSERVACION ===== */
 .observacion {
     font-size: .9rem;
     color: #495057;
-}
-
-/* ===== EMPTY ===== */
-tbody tr td[colspan] {
-    background: transparent !important;
-    box-shadow: none !important;
 }
 
 /* ===== FOOTER ===== */

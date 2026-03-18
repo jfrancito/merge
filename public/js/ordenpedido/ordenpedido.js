@@ -524,7 +524,6 @@ $(document).ready(function () {
                 });*/
 
         //ajax_normal_combo(data, "/cargar-periodo-consolidado", "ajax_periodo")
-
     });
 
     /* ===============================
@@ -532,14 +531,12 @@ $(document).ready(function () {
        =============================== */
     var originalProductos = null;
 
-    $('#tipo_material_servicio').on('change', function () {
+    $(document).on('change', '#tipo_material_servicio', function () {
         if (!originalProductos) {
             originalProductos = $('#cod_producto option').clone();
         }
         var tipo = $(this).val();
-        
         $('#cod_producto').empty();
-        
         originalProductos.each(function () {
             if ($(this).val() === "") {
                 $('#cod_producto').append($(this).clone());
@@ -549,8 +546,16 @@ $(document).ready(function () {
                 $('#cod_producto').append($(this).clone());
             }
         });
-        
         $('#cod_producto').trigger('change');
+    });
+
+    $('#cod_producto').on('change', function () {
+        let option = $('#cod_producto option:selected');
+        let unidad = option.data('unidad');
+        if (unidad) {
+            $('#unidad').val(unidad);
+            $('#cantidad').focus();
+        }
     });
 
     $(document).on('change', '#cod_centro', function () {
@@ -632,7 +637,6 @@ $(document).ready(function () {
             return;
         }
 
-
         let existe = false;
         $('#tabla_detalle_pedido tbody tr').each(function () {
             if ($(this).find('td:eq(1)').text() === cod_producto) {
@@ -643,35 +647,31 @@ $(document).ready(function () {
 
         if (existe) {
             modalBonito({
-                tipo: 'warn',
-                icono: '⚠',
-                titulo: 'Producto duplicado',
-                mensaje: 'Este producto ya fue agregado.'
+                tipo: 'error',
+                icono: '❌',
+                titulo: 'Producto ya agregado',
+                mensaje: 'El producto ya está en el detalle.'
             });
             return;
         }
 
         filaCount++;
+        let fila = `<tr data-id="${cod_producto}">
+            <td class="text-center">${filaCount}</td>
+            <td class="text-center">${cod_producto}</td>
+            <td>${nom_producto}</td>
+            <td class="text-center">${nom_categoria}</td>
+            <td class="text-center">${cantidad}</td>
+            <td class="text-center">${precio.toFixed(2)}</td>
+            <td class="text-center subtotal">${subtotal.toFixed(2)}</td>
+            <td>${txt_observacion}</td>
+            <td style="display:none">${cod_categoria}</td>
+        </tr>`;
 
-        $('#tabla_detalle_pedido tbody').append(`
-            <tr>
-                <td class="text-center">${filaCount}</td>
-                <td class="text-center">${cod_producto}</td>
-                <td>${nom_producto}</td>
-                <td style="display:none">${cod_categoria}</td>
-                <td class="text-center">${nom_categoria}</td>
-                <td class="text-center">${cantidad}</td>
-                <td class="text-center">${precio.toFixed(2)}</td>
-                <td class="text-center subtotal">${subtotal.toFixed(2)}</td>
-                <td>${txt_observacion}</td>
-            </tr>
-        `);
-
+        $('#tabla_detalle_pedido tbody').append(fila);
         calcularTotalPedido();
 
         $('#cod_producto').val('').trigger('change');
-        $('#cod_categoria').val('');
-        $('#nom_categoria').val('');
         $('#cantidad').val('');
         $('#txt_observacion').val('');
     });
@@ -2954,6 +2954,95 @@ $(document).ready(function () {
         let familia_id = $('#familia_id').val();
         debugger;
         window.location.href = carpeta + '/descargar-excel-detalle-consolidado-general-area/' + id_consolidado_general_seleccionado + '/' + familia_id;
+    });
+
+    // ============================================
+    // REPORTE ESTADO: DOBLE CLICK VER DETALLE
+    // ============================================
+    $(document).on('dblclick', '.reporteordenpedidoestado .fila-pedido', function (e) {
+        
+        let idPedido = $(this).data('id');
+        let _token   = $('#token').val() || $('meta[name="csrf-token"]').attr('content');
+
+        if (!idPedido) return;
+
+        // Visual
+        abrircargando();
+
+        $.ajax({
+            type: "POST",
+            url: carpeta + "/ver-detalle-pedido-resumen",
+            data: {
+                _token: _token,
+                orden_pedido_id: idPedido
+            },
+            success: function (resp) {
+                cerrarcargando();
+                $('.modal-detalle-pedido-container').html(resp);
+                $('#modal-detalle-pedido').niftyModal('show'); 
+            },
+            error: function (xhr) {
+                cerrarcargando();
+                modalBonito({
+                    tipo: 'error',
+                    icono: '❌',
+                    titulo: 'Error',
+                    mensaje: 'No se pudo cargar el detalle del pedido.'
+                });
+            }
+        });
+    });
+
+    // ============================================
+    // ELIMINAR CONSOLIDADO GENERAL
+    // ============================================
+    $(document).on('click', '#btn-elimnar-consolidado-general', function (e) {
+        
+        let id_consolidado_general = $(this).data('id');
+        let _token = $('#token').val() || $('meta[name="csrf-token"]').attr('content');
+
+        if (!id_consolidado_general) {
+            modalBonito({ tipo: 'error', titulo: 'Error', mensaje: 'No se pudo identificar el consolidado.' });
+            return;
+        }
+
+        if (confirm("¿Estás seguro de eliminar este consolidado general? Los pedidos volverán a estar disponibles para consolidar.")) {
+            
+            abrircargando();
+
+            $.ajax({
+                type: "POST",
+                url: carpeta + "/ajax-eliminar-consolidado-general-op",
+                data: {
+                    _token: _token,
+                    id_consolidado_general: id_consolidado_general
+                },
+                success: function (resp) {
+                    cerrarcargando();
+                    if (resp.success) {
+                        modalBonito({
+                            tipo: 'success',
+                            icono: '✅',
+                            titulo: 'Eliminado',
+                            mensaje: resp.mensaje
+                        });
+                        // Recargar la página para refrescar las listas y estados
+                        setTimeout(function(){ location.reload(); }, 1500);
+                    } else {
+                        modalBonito({ tipo: 'error', icono: '❌', titulo: 'Error', mensaje: resp.mensaje });
+                    }
+                },
+                error: function (xhr) {
+                    cerrarcargando();
+                    modalBonito({
+                        tipo: 'error',
+                        icono: '❌',
+                        titulo: 'Error',
+                        mensaje: 'Ocurrió un error al intentar eliminar el consolidado.'
+                    });
+                }
+            });
+        }
     });
 
 });

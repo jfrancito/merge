@@ -367,6 +367,51 @@ class ConsolidadoGeneralOrdenPedidoController extends Controller
         })->export('xls');
     }
 
+    public function actionAjaxEliminarConsolidadoGeneral(Request $request)
+    {
+        $id_consolidado_general = $request->input('id_consolidado_general');
+
+        try {
+            DB::beginTransaction();
+
+            // 1. Obtener los IDs de los consolidados de sede (origen) asociados a este general
+            $referencias = DB::table('CMP.REFERENCIA_ASOC')
+                ->where('COD_TABLA_ASOC', $id_consolidado_general)
+                ->where('TXT_TIPO_REFERENCIA', 'CONSOLIDADO_GENERAL')
+                ->get();
+
+            foreach ($referencias as $ref) {
+                // 2. Regresar a NULL la columna CONSOLIDADO_GENERAL en la tabla origen
+                // para que puedan ser consolidados nuevamente
+                DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO')
+                    ->where('ID_PEDIDO_CONSOLIDADO', $ref->COD_TABLA)
+                    ->update(['CONSOLIDADO_GENERAL' => NULL]);
+            }
+
+            // 3. Eliminar las relaciones en la tabla de referencias
+            DB::table('CMP.REFERENCIA_ASOC')
+                ->where('COD_TABLA_ASOC', $id_consolidado_general)
+                ->where('TXT_TIPO_REFERENCIA', 'CONSOLIDADO_GENERAL')
+                ->delete();
+
+            // 4. Eliminar el Consolidado General (Cabecera y Detalle)
+            DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE')
+                ->where('ID_PEDIDO_CONSOLIDADO_GENERAL', $id_consolidado_general)
+                ->delete();
+
+            DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL')
+                ->where('ID_PEDIDO_CONSOLIDADO_GENERAL', $id_consolidado_general)
+                ->delete();
+
+            DB::commit();
+            return response()->json(['success' => true, 'mensaje' => 'Consolidado general eliminado y pedidos revertidos correctamente.']);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['success' => false, 'mensaje' => 'Error al intentar eliminar: ' . $e->getMessage()]);
+        }
+    }
+
 }
 
 

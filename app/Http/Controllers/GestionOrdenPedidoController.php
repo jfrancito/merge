@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 
 use Illuminate\Http\Request;
 use App\Traits\OrdenPedidoTraits;
+use App\Traits\EnviarCorreoOPApruebaGerenciaTraits;
 use App\Modelos\STDTrabajadorVale;
 use App\Modelos\WEBTipoMotivoValeRendir;
 use App\Modelos\WEBValeRendir;
@@ -26,6 +27,7 @@ use Carbon\Carbon;
 class GestionOrdenPedidoController extends Controller
 {
     use OrdenPedidoTraits;
+    use EnviarCorreoOPApruebaGerenciaTraits;
 
     public function actionOrdenPedido(Request $request)
     {
@@ -579,6 +581,8 @@ class GestionOrdenPedidoController extends Controller
             ""
         );
 
+        $this->enviarCorreoOPApruebaGerencia($orden_pedido_id);
+
         return response()->json([
             'success' => true
         ]);
@@ -695,6 +699,40 @@ class GestionOrdenPedidoController extends Controller
         $cod_centro = $request->input('cod_centro');
         $nro_pedido = $this->obtenerNumeroPedido($cod_empr, $cod_centro);
         return response()->json($nro_pedido);
+    }
+
+    public function actionAjaxBuscarProducto(Request $request)
+    {
+        $q = $request->input('q');
+        $tipo = $request->input('tipo'); // Material o Servicio
+        $empresa = Session::get('empresas')->COD_EMPR;
+
+        $productos = DB::table('ALM.PRODUCTO as PRD')
+            ->leftJoin('CMP.CATEGORIA as CAT', 'PRD.COD_CATEGORIA_UNIDAD_MEDIDA', '=', 'CAT.COD_CATEGORIA')
+            ->where('PRD.COD_EMPR', $empresa)
+            ->where('PRD.COD_ESTADO', 1)
+            ->when($q, function ($query) use ($q) {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('PRD.NOM_PRODUCTO', 'LIKE', '%' . $q . '%')
+                        ->orWhere('PRD.COD_PRODUCTO', 'LIKE', '%' . $q . '%');
+                });
+            })
+            ->when($tipo, function ($query) use ($tipo) {
+                $query->where('PRD.IND_MATERIAL_SERVICIO', $tipo);
+            })
+            ->select(
+                'PRD.COD_PRODUCTO as id',
+                DB::raw("PRD.COD_PRODUCTO + ' - ' + PRD.NOM_PRODUCTO as text"),
+                'PRD.NOM_PRODUCTO',
+                'CAT.NOM_CATEGORIA as UNIDAD',
+                'CAT.COD_CATEGORIA as COD_UNIDAD',
+                DB::raw("CAST(PRD.CAN_PRECIO AS FLOAT) as PRECIO"),
+                'PRD.IND_MATERIAL_SERVICIO'
+            )
+            ->limit(30)
+            ->get();
+
+        return response()->json($productos);
     }
 
 }

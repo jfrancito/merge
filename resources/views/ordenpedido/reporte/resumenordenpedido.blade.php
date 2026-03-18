@@ -128,7 +128,9 @@
 
                         {{-- TABLA --}}
                         <div class="table-responsive listajax" style="margin-top: 20px;">
-                            @include('ordenpedido.reporte.alistaresumenordenpedido')
+                            @if(isset($ajax) && $ajax)
+                                @include('ordenpedido.reporte.alistaresumenordenpedido')
+                            @endif
                         </div>
                     </div>
                 </div>

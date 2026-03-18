@@ -102,8 +102,16 @@
             </div>
         </div>
 
-    </div>
+        </div>
 
+        <div id="modal-detalle-pedido" class="modal-container colored-header colored-header-primary modal-effect-8">
+            <div class="modal-content modal-detalle-pedido-container">
+                <!-- Contenido dinámico -->
+            </div>
+        </div>
+        <div class="modal-overlay"></div>
+
+    </div>
 @stop
 
 @section('script')
