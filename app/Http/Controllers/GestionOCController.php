@@ -3746,7 +3746,7 @@ class GestionOCController extends Controller
                                     ->where('COD_TRABAJADOR', $ordencompra_t->COD_TRABAJADOR_SOLICITA)
                                     ->first();
         
-        if($usuario_mkt->COD_CATEGORIA_AREA == 'AEM0000000000038'){
+        if(count($usuario_mkt)>0 && $usuario_mkt->COD_CATEGORIA_AREA == 'AEM0000000000038'){
             $area_mkt    = DB::table('CMP.CATEGORIA')
                         ->where('COD_CATEGORIA', $usuario_mkt->COD_CATEGORIA_AREA)
                         ->first();
