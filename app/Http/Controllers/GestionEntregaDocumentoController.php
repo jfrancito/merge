@@ -430,6 +430,9 @@ class GestionEntregaDocumentoController extends Controller
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
         $empresa_id     =   Session::get('empresas')->COD_EMPR;
 
+        $fechainicio    =   $this->fecha_menos_diez_dias;
+        $fechafin       =   $this->fecha_sin_hora;
+
         $rol            =   WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 
         $operacion_id       =   'ORDEN_COMPRA';
@@ -439,65 +442,42 @@ class GestionEntregaDocumentoController extends Controller
             $operacion_id       =   'CONTRATO';
         }
 
+        $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
+                            ->where('COD_EMPRESA','=',$empresa_id)
+                            ->where('OPERACION','like','%'.$operacion_id.'%')
+                            ->where('FE_DOCUMENTO_ENTREGABLE.COD_ESTADO','=','1')
+                            ->where('COD_CATEGORIA_ESTADO','=','ETM0000000000005')
+                            ->where('FEC_PAGO','>=',date_format(date_create($fechainicio), 'Y-m-d'))
+                            ->where('FEC_PAGO','<=',date_format(date_create($fechafin), 'Y-m-d'));
+
         if($rol->ind_uc == 1){
             //marilu que vea xiomara
             if(Session::get('usuario')->id == '1CIX00000086' || Session::get('usuario')->id == '1CIX00000024'){
 
-                $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
-                                    ->where('COD_EMPRESA','=',$empresa_id)
-                                    ->where('OPERACION','like','%'.$operacion_id.'%')
-                                    ->where('COD_ESTADO','=','1')
-                                    ->where('COD_CATEGORIA_ESTADO','=','ETM0000000000005')
-                                    ->whereIn('USUARIO_CREA',[
+                $listadatos     =   $listadatos->whereIn('USUARIO_CREA',[
                                         Session::get('usuario')->id,
                                         '1CIX00000024',
                                         '1CIX00000268'
-                                    ])
-                                    ->orderBy('FE_DOCUMENTO_ENTREGABLE.FECHA_CREA','DESC')
-                                    ->get();
-
-
+                                    ]);
 
             }else{
 
                 if(Session::get('usuario')->id == '1CIX00000003'){
 
-                    $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
-                                        ->where('COD_EMPRESA','=',$empresa_id)
-                                        ->where('OPERACION','like','%'.$operacion_id.'%')
-                                        ->where('COD_ESTADO','=','1')
-                                        ->where('COD_CATEGORIA_ESTADO','=','ETM0000000000005')
-                                        ->whereIn('USUARIO_CREA',[
+                    $listadatos     =   $listadatos->whereIn('USUARIO_CREA',[
                                             Session::get('usuario')->id,
                                             '1CIX00000086'
-                                        ])
-                                        ->orderBy('FE_DOCUMENTO_ENTREGABLE.FECHA_CREA','DESC')
-                                        ->get();
+                                        ]);
 
                 }else{
-                    $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
-                                        ->where('COD_EMPRESA','=',$empresa_id)
-                                        ->where('OPERACION','like','%'.$operacion_id.'%')
-                                        ->where('COD_ESTADO','=','1')
-                                        ->where('COD_CATEGORIA_ESTADO','=','ETM0000000000005')
-                                        ->where('USUARIO_CREA','=',Session::get('usuario')->id)
-                                        ->orderBy('FE_DOCUMENTO_ENTREGABLE.FECHA_CREA','DESC')
-                                        ->get();
+                    $listadatos     =   $listadatos->where('USUARIO_CREA','=',Session::get('usuario')->id);
                 }
 
             }
 
-
-
-        }else{
-            $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
-                                ->where('COD_EMPRESA','=',$empresa_id)
-                                ->where('OPERACION','like','%'.$operacion_id.'%')
-                                ->where('COD_ESTADO','=','1')
-                                ->where('COD_CATEGORIA_ESTADO','=','ETM0000000000005')
-                                ->orderBy('FE_DOCUMENTO_ENTREGABLE.FECHA_CREA','DESC')
-                                ->get();
         }
+        $listadatos     =   $listadatos->orderBy('FE_DOCUMENTO_ENTREGABLE.FECHA_CREA','DESC')
+                            ->get();
 
         $usuario_id     =   Session::get('usuario')->id;
         $array_jefes    =   $this->array_usuario_jefes_folio();
@@ -508,6 +488,8 @@ class GestionEntregaDocumentoController extends Controller
                                 ->where('COD_ESTADO','=','1')
                                 //->where('USUARIO_CREA','=',Session::get('usuario')->id)
                                 ->where('OPERACION','=','ORDEN_COMPRA')
+                                ->where('FEC_PAGO','>=',date_format(date_create($fechainicio), 'Y-m-d'))
+                                ->where('FEC_PAGO','<=',date_format(date_create($fechafin), 'Y-m-d'))
                                 ->orderBy('FE_DOCUMENTO_ENTREGABLE.FECHA_CREA','DESC')
                                 ->get();
         }
@@ -533,6 +515,8 @@ class GestionEntregaDocumentoController extends Controller
                             'combo_operacion'   =>  $combo_operacion,
                             'funcion'           =>  $funcion,
                             'idopcion'          =>  $idopcion,
+                            'fechainicio'       =>  $fechainicio,
+                            'fechafin'          =>  $fechafin,
                          ]);
     }
 
@@ -542,70 +526,56 @@ class GestionEntregaDocumentoController extends Controller
 
         $idopcion       =   $request['idopcion'];
         $operacion_id   =   $request['operacion_id'];
+        $fecha_inicio   =   $request['fecha_inicio'];
+        $fecha_fin      =   $request['fecha_fin'];
+
         $cod_empresa    =   Session::get('usuario')->usuarioosiris_id;
         $empresa_id     =   Session::get('empresas')->COD_EMPR;
 
         $rol            =   WEBRol::where('id','=',Session::get('usuario')->rol_id)->first();
 
-
+        $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
+                            ->where('COD_EMPRESA','=',$empresa_id)
+                            ->where('OPERACION','like','%'.$operacion_id.'%')
+                            ->where('FE_DOCUMENTO_ENTREGABLE.COD_ESTADO','=','1')
+                            ->where('COD_CATEGORIA_ESTADO','=','ETM0000000000005')
+                            ->where(function($query) use ($fecha_inicio, $fecha_fin){
+                                if($fecha_inicio != ''){
+                                    $query->where('FEC_PAGO','>=',date_format(date_create($fecha_inicio), 'Y-m-d'));
+                                }
+                                if($fecha_fin != ''){
+                                    $query->where('FEC_PAGO','<=',date_format(date_create($fecha_fin), 'Y-m-d'));
+                                }
+                            });
 
         if($rol->ind_uc == 1){
             //marilu que vea xiomara
             if(Session::get('usuario')->id == '1CIX00000086' || Session::get('usuario')->id == '1CIX00000024'){
 
-                $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
-                                    ->where('COD_EMPRESA','=',$empresa_id)
-                                    ->where('OPERACION','like','%'.$operacion_id.'%')
-                                    ->where('COD_ESTADO','=','1')
-                                    ->where('COD_CATEGORIA_ESTADO','=','ETM0000000000005')
-                                    ->whereIn('USUARIO_CREA',[
+                $listadatos     =   $listadatos->whereIn('USUARIO_CREA',[
                                         Session::get('usuario')->id,
                                         '1CIX00000024',
                                         '1CIX00000268'
-                                    ])
-                                    ->orderBy('FE_DOCUMENTO_ENTREGABLE.FECHA_CREA','DESC')
-                                    ->get();
-
-
+                                    ]);
 
             }else{
 
                 if(Session::get('usuario')->id == '1CIX00000003'){
 
-                    $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
-                                        ->where('COD_EMPRESA','=',$empresa_id)
-                                        ->where('OPERACION','like','%'.$operacion_id.'%')
-                                        ->where('COD_ESTADO','=','1')
-                                        ->where('COD_CATEGORIA_ESTADO','=','ETM0000000000005')
-                                        ->whereIn('USUARIO_CREA',[
+                    $listadatos     =   $listadatos->whereIn('USUARIO_CREA',[
                                             Session::get('usuario')->id,
                                             '1CIX00000086'
-                                        ])
-                                        ->orderBy('FE_DOCUMENTO_ENTREGABLE.FECHA_CREA','DESC')
-                                        ->get();
+                                        ]);
 
                 }else{
-                    $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
-                                        ->where('COD_EMPRESA','=',$empresa_id)
-                                        ->where('OPERACION','like','%'.$operacion_id.'%')
-                                        ->where('COD_ESTADO','=','1')
-                                        ->where('COD_CATEGORIA_ESTADO','=','ETM0000000000005')
-                                        ->where('USUARIO_CREA','=',Session::get('usuario')->id)
-                                        ->orderBy('FE_DOCUMENTO_ENTREGABLE.FECHA_CREA','DESC')
-                                        ->get();
+                    $listadatos     =   $listadatos->where('USUARIO_CREA','=',Session::get('usuario')->id);
                 }
 
             }
 
-        }else{
-            $listadatos     =   FeDocumentoEntregable::join('users','users.id','=','FE_DOCUMENTO_ENTREGABLE.USUARIO_CREA')
-                                ->where('COD_EMPRESA','=',$empresa_id)
-                                ->where('OPERACION','like','%'.$operacion_id.'%')
-                                ->where('COD_ESTADO','=','1')
-                                ->where('COD_CATEGORIA_ESTADO','=','ETM0000000000005')
-                                ->orderBy('FE_DOCUMENTO_ENTREGABLE.FECHA_CREA','DESC')
-                                ->get();
         }
+        $listadatos     =   $listadatos->orderBy('FE_DOCUMENTO_ENTREGABLE.FECHA_CREA','DESC')
+                            ->get();
         $funcion        =   $this;
 
         return View::make('entregadocumento/ajax/listafoliosdocumentos',

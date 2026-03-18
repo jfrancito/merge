@@ -10,10 +10,14 @@
       <th>ESTADO</th>
       <th>USUARIO CREA</th>
       <th>FECHA PAGO</th>
+      <th>MONTO TOTAL</th>
+
       <th>OPCION</th>
   </thead>
   <tbody>
     @foreach($listadatos as $index => $item)
+      @php $monto_total  = $funcion->funciones->neto_pagar_documento_lotes($item->FOLIO); @endphp
+
       <tr data_requerimiento_id = "{{$item->FOLIO}}"
         class='dobleclickpc seleccionar'
         >
@@ -26,6 +30,7 @@
         @include('entregadocumento.ajax.estados')
         <td>{{$item->nombre}}</td>
         <td>{{date_format(date_create($item->FEC_PAGO), 'd-m-Y')}}</td>
+        <td>{{$monto_total}}</td>
         <td class="rigth">
           <div class="btn-group btn-hspace">
             <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>
