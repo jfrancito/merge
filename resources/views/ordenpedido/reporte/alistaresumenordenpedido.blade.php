@@ -47,9 +47,8 @@
     <tbody>
         @foreach($listaordenpedido as $item)
         @php
-            $es_aprobado_real = ($item->TXT_ESTADO == 'APROBADO' && empty($item->TXT_ESTADO_TEMP));
-
             $estado = strtoupper(trim($item->TXT_ESTADO));
+            $es_aprobado_real = ($estado == 'APROBADO' && (is_null($item->TXT_ESTADO_TEMP) || trim($item->TXT_ESTADO_TEMP) == ''));
 
             if($estado == 'GENERADO'){
                 $clase = 'badge-default';

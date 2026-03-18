@@ -12,6 +12,7 @@
             $mostrarGer = true;
         }
     }
+    $total_general = 0;
 @endphp
 
 <!-- HEADER -->
@@ -50,7 +51,9 @@
         <th style="width:10%" class="text-center">Cant. Gerencia</th>
     @endif
 
-    <th style="width:35%">Observación</th>
+    <th style="width:10%" class="text-center">Precio.</th>
+
+    <th style="width:25%">Observación</th>
 </tr>
 </thead>
 
@@ -151,6 +154,14 @@
     </td>
     @endif
 
+    <td class="text-center fw-semibold">
+        {{ number_format($detalle->CAN_PRECIO, 2) }}
+    </td>
+
+    @php
+        $total_general += ($detalle->CANTIDAD * $detalle->CAN_PRECIO);
+    @endphp
+
     <td class="text-truncate observacion"
         title="{{ $detalle->TXT_OBSERVACION }}">
         {{ $detalle->TXT_OBSERVACION ?: '—' }}
@@ -166,6 +177,16 @@
 </tr>
 @endforelse
 </tbody>
+
+<tfoot style="background: #f8f9fa; color: #1f2a50; border-top: 2px solid #dee2e6;">
+    <tr>
+        <td colspan="{{ 6 + ($mostrarJefe ? 1 : 0) + ($mostrarGer ? 1 : 0) }}" class="text-right py-3 px-4" style="border:none;">
+            <span class="fw-bold" style="font-size: 1.4rem; font-weight: 900;">
+                TOTAL: S/ {{ number_format($total_general, 2) }}
+            </span>
+        </td>
+    </tr>
+</tfoot>
 
 </table>
 </div>

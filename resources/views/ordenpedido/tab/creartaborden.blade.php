@@ -340,7 +340,7 @@
                 <label class="label-sm negrita">
                     PRODUCTO <span class="obligatorio">(*)</span>
                 </label>
-                <select id="cod_producto" class="form-control select2 select2-lg">
+                <select id="cod_producto" class="form-control select2 select2-lg" style="width: 100%;">
                     <option value="">Buscar producto...</option>
                     @foreach($producto as $prd)
                         <option value="{{ $prd->COD_PRODUCTO }}"
@@ -351,7 +351,6 @@
                                 data-indmaterialservicio="{{ $prd->IND_MATERIAL_SERVICIO }}">
                             {{ $prd->COD_PRODUCTO }} - {{ $prd->NOM_PRODUCTO }}
                         </option>
-
                     @endforeach
                 </select>
             </div>

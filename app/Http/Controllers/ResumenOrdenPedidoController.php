@@ -56,7 +56,8 @@ class ResumenOrdenPedidoController extends Controller
             ->toArray();
          $combo_area = array('TODO' => 'TODO') + $combo_area;
 
-         $listaordenpedido = $this->lg_lista_cabecera_pedido_resumen($fecha_inicio, $fecha_fin, $empresa_id, $centro_pedido, $area);
+         // $listaordenpedido = $this->lg_lista_cabecera_pedido_resumen($fecha_inicio, $fecha_fin, $empresa_id, $centro_pedido, $area);
+         $listaordenpedido = []; // No cargamos datos inicialmente por solicitud del usuario
 
 
         $funcion = $this;

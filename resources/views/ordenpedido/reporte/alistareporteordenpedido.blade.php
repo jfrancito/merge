@@ -23,6 +23,7 @@
             <th>APRUEBA ADM</th>
             <th>GLOSA</th>
             <th>ESTADO</th>
+            <th>USUARIO RECHAZA</th>
             <th>COD PRODUCTO</th>
             <th>PRODUCTO</th>
             <th>CATEGORIA FAMILIA</th>
@@ -34,6 +35,23 @@
 
     <tbody>
         @foreach($listaordenpedido as $item)
+
+   @php
+            $estado = strtoupper(trim($item->TXT_ESTADO));
+           
+
+            if($estado == 'GENERADO'){
+                $clase = 'badge-default';
+            }elseif($estado == 'POR APROBAR AUTORIZACION' || $estado == 'POR APROBAR JEFE DE COMPRAS'){
+                $clase = 'badge-warning';
+            }elseif($estado == 'POR APROBAR GERENCIA' || $estado == 'APROBADO'){
+                $clase = 'badge-info';
+            }elseif($estado == 'ANULADO' || $estado == 'RECHAZADO'){
+                $clase = 'badge-danger';
+            }else{
+                $clase = 'badge-default';
+            }
+        @endphp
         <tr>
             <td>{{ $item->ID_PEDIDO }}</td>
             <td>{{ $item->FEC_PEDIDO }}</td>
@@ -48,7 +66,16 @@
             <td>{{ $item->TXT_TRABAJADOR_APRUEBA_GER }}</td>
             <td>{{ $item->TXT_TRABAJADOR_APRUEBA_ADM }}</td>
             <td>{{ $item->TXT_GLOSA }}</td>
-            <td>{{ $item->TXT_ESTADO }}</td>
+           <td>
+                <span class="badge {{ $clase }}">
+                    {{ $item->TXT_ESTADO }}
+                </span>
+            </td>
+            <td>
+                @if($item->TXT_ESTADO == 'RECHAZADO')
+                    {{ $item->USUARIO_MODIF }}
+                @endif
+            </td>
             <td>{{ $item->COD_PRODUCTO ?? '' }}</td>
             <td>{{ $item->NOM_PRODUCTO }}</td>
             <td>{{ $item->NOM_CATEGORIA_FAMILIA }}</td>

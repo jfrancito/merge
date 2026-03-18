@@ -17,7 +17,10 @@
     </thead>
     <tbody>
     @foreach($resultado as $index => $item)
-        <tr>
+        <tr class="fila-pedido" 
+            data-id="{{$item->ID_PEDIDO}}" 
+            style="cursor: pointer;"
+            title="Doble clic para ver detalle">
             <td>{{$item->ID_PEDIDO}}</td>
             <td>{{$item->NOM_AREA}}</td>
             <td class="align-center-tb">{{$item->FEC_PEDIDO}}</td>

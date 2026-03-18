@@ -176,6 +176,7 @@ class GestionOrdenPedidoApruebaGerController extends Controller
         $nom_categoria = $pedillodetalle->pluck('NOM_CATEGORIA');
         $cantidad = $pedillodetalle->pluck('CANTIDAD');
         $txt_observacion = $pedillodetalle->pluck('TXT_OBSERVACION');
+        $can_precio = $pedillodetalle->pluck('CAN_PRECIO');
 
         $cod_usuario_session = Session::get('usuario')->usuarioosiris_id;
 
@@ -187,6 +188,7 @@ class GestionOrdenPedidoApruebaGerController extends Controller
             'nom_categoria' => $nom_categoria,
             'cantidad' => $cantidad,
             'txt_observacion' => $txt_observacion,
+            'can_precio' => $can_precio,
             'pedillodetalle' => $pedillodetalle,
             'cod_usuario_session' => $cod_usuario_session
         ]);
