@@ -187,7 +187,7 @@
             <td>-</td>
             <td>-</td>
             <td>{{$item->NRO_CUENTA}}</td>
-            <td>{{$item->TXT_CONTACTO_N}}</td>
+            <td>{{$item->TXT_APE_PATERNO}} {{$item->TXT_APE_MATERNO}} {{$item->TXT_NOMBRES}}</td>
             <td>          
                 @IF(count($item->productos_reparable)>0)
                     SI

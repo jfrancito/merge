@@ -4578,6 +4578,7 @@ trait ComprobanteTraits
                                     ->leftjoin('FE_DETALLE_DOCUMENTO', 'FE_DETALLE_DOCUMENTO.ID_DOCUMENTO', '=', 'FE_DOCUMENTO.ID_DOCUMENTO')
                                     ->leftjoin('SGD.USUARIO', 'SGD.USUARIO.COD_USUARIO', '=', 'CMP.Orden.COD_USUARIO_CREA_AUD')
                                     ->leftjoin('CMP.CATEGORIA', 'CMP.CATEGORIA.COD_CATEGORIA', '=', 'SGD.USUARIO.COD_CATEGORIA_AREA')
+                                    ->leftjoin('STD.TRABAJADOR', 'STD.TRABAJADOR.COD_TRAB', '=', 'FE_DOCUMENTO.COD_CONTACTO')
                                     ->where('FE_DOCUMENTO.COD_EMPR','=',Session::get('empresas')->COD_EMPR)
                                     ->where('OPERACION','=','ORDEN_COMPRA')
                                     ->where('FE_DOCUMENTO.COD_ESTADO','<>','')
@@ -4590,6 +4591,9 @@ trait ComprobanteTraits
                                         CMP.Orden.TXT_GLOSA AS TXT_GLOSA_ORDEN,
                                         FE_DOCUMENTO.TXT_REPARABLE AS TXT_REPARABLE_SN, 
                                         FE_DOCUMENTO.TXT_CONTACTO AS TXT_CONTACTO_N,
+                                        STD.TRABAJADOR.TXT_APE_PATERNO,
+                                        STD.TRABAJADOR.TXT_APE_MATERNO,
+                                        STD.TRABAJADOR.TXT_NOMBRES,
                                         CMP.CATEGORIA.NOM_CATEGORIA AS AREA, 
                                         (
                                             SELECT STUFF(
