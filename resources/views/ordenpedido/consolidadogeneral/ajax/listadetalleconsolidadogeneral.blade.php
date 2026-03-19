@@ -18,6 +18,14 @@
                 <i class="mdi mdi-content-check"></i> Aprobar pedido
             </button>
 
+               <button type="button"
+                    class="btn btn-danger btn-excel-consolidado-detalle"
+                    id="btn-elimnar-consolidado-general"
+                    data-id="{{ $listadetalle->first()->ID_PEDIDO_CONSOLIDADO_GENERAL ?? '' }}">
+                <i class="mdi mdi-delete"></i> Eliminar Consolidado
+            </button>
+
+
         </div>
     </div>
 @endif
@@ -40,13 +48,7 @@
                 <i class="mdi mdi-file-excel"></i> Descargar Excel
             </button>
 
-             <button type="button"
-                    class="btn btn-danger btn-excel-consolidado-detalle"
-                    id="btn-elimnar-consolidado-general"
-                    data-id="{{ $listadetalle->first()->ID_PEDIDO_CONSOLIDADO_GENERAL ?? '' }}">
-                <i class="mdi mdi-delete"></i> Eliminar Consolidado
-            </button>
-
+          
         </div>
     </div>
 @endif

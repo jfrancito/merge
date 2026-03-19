@@ -498,7 +498,7 @@ class GestionOrdenPedidoController extends Controller
                 'SIZE' => $size,
                 'ACTIVO' => 1,
                 'FECHA_CREA' => DB::raw('GETDATE()'),
-                'USUARIO_CREA' => Session('usuario')->usuario ?? 'SISTEMA',
+                'USUARIO_CREA' => Session::get('usuario')->usuario ?? 'SISTEMA',
             ]);
         }
 
@@ -734,5 +734,4 @@ class GestionOrdenPedidoController extends Controller
 
         return response()->json($productos);
     }
-
 }
