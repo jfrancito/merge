@@ -322,8 +322,6 @@ $(document).ready(function(){
         var idopcion             =   $('#idopcion').val();
         var _token               =   $('#token').val();
 
-        debugger;
-
         href = $(this).attr('data-href')+'/'+operacion_id+'/'+idopcion;
         $(this).prop('href', href);
         return true;
@@ -351,18 +349,25 @@ $(document).ready(function(){
 
 
 
-    $(".cfedocumento").on('click','.buscardocumentofolio', function() {
+    $(".cfedocumento").on('click','.buscardocumentofolio', function(e) {
 
-        event.preventDefault();
+        e.preventDefault();
 
         var operacion_id         =   $('#operacion_id').val();
-        var idopcion                =   $('#idopcion').val();
-        var _token                  =   $('#token').val();
+        var idopcion             =   $('#idopcion').val();
+        var _token               =   $('#token').val();
+        var fecha_inicio         =   $('#fecha_inicio').val();
+        var fecha_fin            =   $('#fecha_fin').val();
 
+        //validacioones
+        if(fecha_inicio ==''){ alerterrorajax("Seleccione una fecha inicio."); return false;}
+        if(fecha_fin ==''){ alerterrorajax("Seleccione una fecha fin."); return false;}
 
         data            =   {
                                 _token                  : _token,
-                                operacion_id               : operacion_id,
+                                operacion_id            : operacion_id,
+                                fecha_inicio            : fecha_inicio,
+                                fecha_fin               : fecha_fin,
                                 idopcion                : idopcion
                             };
         ajax_normal(data,"/ajax-buscar-documento-fe-entregable-folio");

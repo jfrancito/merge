@@ -21,7 +21,9 @@ class AppServiceProvider extends ServiceProvider
     {
         Schema::defaultStringLength(191);
         View::share('capeta', '/merge');
-        View::share('version', '17.51');
+
+        View::share('version', '17.45');
+
 
         View::share('titulo', '');
 
@@ -30,8 +32,7 @@ class AppServiceProvider extends ServiceProvider
             $count = DB::table($tabla)->where($attribute, '=', $value)->count();
             if ($count > 0) {
                 return false;
-            }
-            else {
+            } else {
                 return true;
             }
         });
@@ -47,8 +48,7 @@ class AppServiceProvider extends ServiceProvider
 
             if ($count > 0) {
                 return false;
-            }
-            else {
+            } else {
                 return true;
             }
 
@@ -64,6 +64,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-    //
+        //
     }
 }
