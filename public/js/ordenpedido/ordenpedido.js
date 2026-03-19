@@ -9,8 +9,14 @@ $(document).ready(function () {
 
     // Inicializar totales y visibilidad de campos
     setTimeout(() => {
-        calcularTotalPedido();
+            calcularTotalPedido();
     }, 500);
+
+    // Activar pestaña por hash en la URL
+    var hash = window.location.hash;
+    if (hash) {
+        $('.nav-tabs a[href="' + hash + '"]').tab('show');
+    }
 
     /* ===============================
        FUNCIÓN MODAL BONITO (ÚNICA)
@@ -244,11 +250,11 @@ $(document).ready(function () {
             detalles.push({
                 cod_producto: tds.eq(1).text().trim(),
                 nom_producto: tds.eq(2).text().trim(),
-                cod_categoria: tds.eq(3).text().trim(),
-                nom_categoria: tds.eq(4).text().trim(),
-                cantidad: parseInt(tds.eq(5).text().trim()) || 0,
-                precio: parseFloat(tds.eq(6).text().trim()) || 0,
-                txt_observacion: tds.eq(8).text().trim(),
+                cod_categoria: tds.eq(8).text().trim(),
+                nom_categoria: tds.eq(3).text().trim(),
+                cantidad: parseInt(tds.eq(4).text().trim()) || 0,
+                precio: parseFloat(tds.eq(5).text().trim()) || 0,
+                txt_observacion: tds.eq(7).text().trim(),
                 opcion_detalle: 'I',
                 detalle_id: null
             });
@@ -921,12 +927,12 @@ $(document).ready(function () {
                                     <td class="text-center">${filaCount}</td>
                                     <td class="text-center font-bold">${det.COD_PRODUCTO}</td>
                                     <td>${det.NOM_PRODUCTO}</td>
-                                    <td class="text-center" style="display:none;">${det.COD_CATEGORIA}</td>
                                     <td class="text-center">${det.NOM_CATEGORIA}</td>
                                     <td class="text-center font-bold">${parseInt(det.CANTIDAD)}</td>
                                     <td class="text-center">${precio.toFixed(2)}</td>
                                     <td class="text-center font-bold subtotal">${subtotal}</td>
                                     <td class="text-muted small">${det.TXT_OBSERVACION || '-'}</td>
+                                    <td style="display:none;">${det.COD_CATEGORIA}</td>
                                 </tr>
                             `);
                         });
@@ -2997,7 +3003,6 @@ $(document).ready(function () {
     // ELIMINAR CONSOLIDADO GENERAL
     // ============================================
     $(document).on('click', '#btn-elimnar-consolidado-general', function (e) {
-        
         let id_consolidado_general = $(this).data('id');
         let _token = $('#token').val() || $('meta[name="csrf-token"]').attr('content');
 
@@ -3006,43 +3011,37 @@ $(document).ready(function () {
             return;
         }
 
-        if (confirm("¿Estás seguro de eliminar este consolidado general? Los pedidos volverán a estar disponibles para consolidar.")) {
-            
-            abrircargando();
-
-            $.ajax({
-                type: "POST",
-                url: carpeta + "/ajax-eliminar-consolidado-general-op",
-                data: {
-                    _token: _token,
-                    id_consolidado_general: id_consolidado_general
-                },
-                success: function (resp) {
-                    cerrarcargando();
-                    if (resp.success) {
-                        modalBonito({
-                            tipo: 'success',
-                            icono: '✅',
-                            titulo: 'Eliminado',
-                            mensaje: resp.mensaje
-                        });
-                        // Recargar la página para refrescar las listas y estados
-                        setTimeout(function(){ location.reload(); }, 1500);
-                    } else {
-                        modalBonito({ tipo: 'error', icono: '❌', titulo: 'Error', mensaje: resp.mensaje });
+        modalBonito({
+            tipo: 'info',
+            icono: '💾',
+            titulo: 'Eliminar consolidado',
+            mensaje: '¿Está seguro de eliminar el consolidado general?',
+            confirmar: true,
+            onConfirm: function () {
+                abrircargando();
+                $.ajax({
+                    type: "POST",
+                    url: carpeta + "/ajax-eliminar-consolidado-general-op",
+                    data: { _token: _token, id_consolidado_general: id_consolidado_general },
+                    success: function (resp) {
+                        cerrarcargando();
+                        if (resp.success) {
+                            modalBonito({ tipo: 'success', icono: '✅', titulo: 'Eliminado', mensaje: resp.mensaje });
+                            setTimeout(function () {
+                                window.location.href = window.location.pathname + window.location.search + "#consoldadogeneralterminado";
+                                location.reload();
+                            }, 1500);
+                        } else {
+                            modalBonito({ tipo: 'error', icono: '❌', titulo: 'Error', mensaje: resp.mensaje });
+                        }
+                    },
+                    error: function (xhr) {
+                        cerrarcargando();
+                        modalBonito({ tipo: 'error', icono: '❌', titulo: 'Error', mensaje: 'Ocurrió un error al intentar eliminar el consolidado.' });
                     }
-                },
-                error: function (xhr) {
-                    cerrarcargando();
-                    modalBonito({
-                        tipo: 'error',
-                        icono: '❌',
-                        titulo: 'Error',
-                        mensaje: 'Ocurrió un error al intentar eliminar el consolidado.'
-                    });
-                }
-            });
-        }
+                });
+            }
+        });
     });
 
 });
