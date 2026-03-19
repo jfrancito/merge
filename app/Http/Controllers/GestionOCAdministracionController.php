@@ -24,6 +24,7 @@ use App\Modelos\CMPCategoria;
 use App\Modelos\CMPDocumentoCtble;
 use App\Modelos\CMPReferecenciaAsoc;
 use App\Modelos\FeRefAsoc;
+use App\Modelos\ContratoAnticipo;
 
 
 
@@ -4377,7 +4378,26 @@ class GestionOCAdministracionController extends Controller
 
         $fedocumento            =   FeDocumento::where('ID_DOCUMENTO','=',$idop)->where('DOCUMENTO_ITEM','=',$linea)->first();
         $detallefedocumento     =   FeDetalleDocumento::where('ID_DOCUMENTO','=',$idop)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
-        View::share('titulo','Aprobar  Comprobante');
+        View::share('titulo', 'Aprobar  Comprobante');
+
+        $id_autorizacion = $ordenpago->COD_AUTORIZACION;
+        $contrato_pago = DB::table('CONTRATO_PAGO')
+            ->where('ID_AUTORIZACION', '=', $id_autorizacion)
+            ->where('ACTIVO', '=', 1)
+            ->first();
+
+        $contrato_anticipo = null;
+        $fecha_entrega_c = '';
+
+        if ($contrato_pago) {
+            if ($contrato_pago->IND_CONTRATO == 'C') {
+                $contrato_anticipo = ContratoAnticipo::where('ID_DOCUMENTO', '=', $contrato_pago->ID_DOCUMENTO)->first();
+            } else {
+                if ($contrato_pago->IND_CONTRATO == 'F') {
+                    $fecha_entrega_c = $contrato_pago->FECHA_ENTREGA;
+                }
+            }
+        }
 
         if($_POST)
         {
@@ -4754,6 +4774,8 @@ class GestionOCAdministracionController extends Controller
                                 'tp'                    =>  $tp,
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
+                                'contrato_anticipo'     =>  $contrato_anticipo,
+                                'fecha_entrega_c'       =>  $fecha_entrega_c,
                                 'funciones' => $funciones,
                                 'funcion' => $funciones,
 

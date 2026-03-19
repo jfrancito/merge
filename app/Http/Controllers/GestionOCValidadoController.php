@@ -22,6 +22,7 @@ use App\Modelos\CMPDocumentoCtble;
 use App\Modelos\CMPDocAsociarCompra;
 use App\Modelos\STDEmpresa;
 use App\Modelos\STDTrabajador;
+use App\Modelos\ContratoAnticipo;
 
 
 use Greenter\Parser\DocumentParserInterface;
@@ -696,6 +697,25 @@ class GestionOCValidadoController extends Controller
         $documentohistorial     =   FeDocumentoHistorial::where('ID_DOCUMENTO','=',$idop)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)
                                     ->orderBy('FECHA','DESC')
                                     ->get();
+
+        $id_autorizacion = $ordenpago->COD_AUTORIZACION;
+        $contrato_pago = DB::table('CONTRATO_PAGO')
+            ->where('ID_AUTORIZACION', '=', $id_autorizacion)
+            ->where('ACTIVO', '=', 1)
+            ->first();
+
+        $contrato_anticipo = null;
+        $fecha_entrega_c = '';
+
+        if ($contrato_pago) {
+            if ($contrato_pago->IND_CONTRATO == 'C') {
+                $contrato_anticipo = ContratoAnticipo::where('ID_DOCUMENTO', '=', $contrato_pago->ID_DOCUMENTO)->first();
+            } else {
+                if ($contrato_pago->IND_CONTRATO == 'F') {
+                    $fecha_entrega_c = $contrato_pago->FECHA_ENTREGA;
+                }
+            }
+        }
         //dd($documentohistorial);
 
         $funcion                =   $this;
@@ -724,6 +744,8 @@ class GestionOCValidadoController extends Controller
                             'tp'                    =>  $tp,
                             'funcion'               =>  $funcion,
                             'idopcion'              =>  $idopcion,
+                            'contrato_anticipo'     =>  $contrato_anticipo,
+                            'fecha_entrega_c'       =>  $fecha_entrega_c,
                          ]);
     }
 
