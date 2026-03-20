@@ -63,6 +63,7 @@ trait EnviarCorreoOPApruebaGerenciaTraits
             Mail::send('emails.notificacion_aprueba_gerencia', $data, function ($message) use ($destinatarios, $subject) {
                 $message->from('alertassys@induamerica.com.pe', 'ORDEN DE PEDIDO')
                     ->to($destinatarios)
+                    ->cc('alertacix@induamerica.com.pe')
                     ->subject($subject);
             });
 
