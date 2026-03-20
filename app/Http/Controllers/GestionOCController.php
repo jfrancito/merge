@@ -3984,7 +3984,7 @@ class GestionOCController extends Controller
                         ->first();
 
                     if (count($fedocumento_e) > 0) {
-                        //return Redirect::back()->with('errorurl', 'Este XML ya fue integrado en otra orden de compra');
+                        return Redirect::back()->with('errorurl', 'Este XML ya fue integrado en otra orden de compra');
                     }
 
 
