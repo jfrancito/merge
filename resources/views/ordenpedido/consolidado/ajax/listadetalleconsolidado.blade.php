@@ -14,6 +14,12 @@
             <i class="mdi mdi-content-check"></i> Cerrar pedido
         </button>
 
+      {{--  <button type="button" class="btn btn-danger btn-detalle-consolidado" 
+                id="btn-eliminar-consolidado-sede"
+                data-id="{{ $listadetalle->first()->ID_PEDIDO_CONSOLIDADO ?? '' }}">
+            <i class="mdi mdi-delete"></i> Eliminar consolidado 
+        </button> --}}
+
     </div>
 </div>
 @endif

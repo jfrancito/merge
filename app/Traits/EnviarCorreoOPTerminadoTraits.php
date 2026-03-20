@@ -52,6 +52,7 @@ trait EnviarCorreoOPTerminadoTraits
                 function ($message) use ($correos, $subject) {
                 $message->from('alertassys@induamerica.com.pe', 'RECOJO ORDEN DE PEDIDO')
                     ->to($correos)
+                    ->cc('alertacix@induamerica.com.pe')
                     ->subject($subject);
             });
 

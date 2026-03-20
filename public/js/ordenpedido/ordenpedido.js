@@ -15,7 +15,13 @@ $(document).ready(function () {
     // Activar pestaña por hash en la URL
     var hash = window.location.hash;
     if (hash) {
-        $('.nav-tabs a[href="' + hash + '"]').tab('show');
+        if (hash === "#consoldadogeneralterminado") {
+            $('.nav-tabs a[href="#consoldadogeneral"]').tab('show');
+        } else if (hash === "#ordenpedidoconsolidadoterminado") {
+            $('.nav-tabs a[href="#ordenpedidoconsolidado"]').tab('show');
+        } else {
+            $('.nav-tabs a[href="' + hash + '"]').tab('show');
+        }
     }
 
     /* ===============================
@@ -3029,6 +3035,47 @@ $(document).ready(function () {
                             modalBonito({ tipo: 'success', icono: '✅', titulo: 'Eliminado', mensaje: resp.mensaje });
                             setTimeout(function () {
                                 window.location.href = window.location.pathname + window.location.search + "#consoldadogeneralterminado";
+                                location.reload();
+                            }, 1500);
+                        } else {
+                            modalBonito({ tipo: 'error', icono: '❌', titulo: 'Error', mensaje: resp.mensaje });
+                        }
+                    },
+                    error: function (xhr) {
+                        cerrarcargando();
+                        modalBonito({ tipo: 'error', icono: '❌', titulo: 'Error', mensaje: 'Ocurrió un error al intentar eliminar el consolidado.' });
+                    }
+                });
+            }
+        });
+    });
+    $(document).on('click', '#btn-eliminar-consolidado-sede', function (e) {
+        let id_consolidado = $(this).data('id');
+        let _token = $('#token').val() || $('meta[name="csrf-token"]').attr('content');
+
+        if (!id_consolidado) {
+            modalBonito({ tipo: 'error', titulo: 'Error', mensaje: 'No se pudo identificar el consolidado.' });
+            return;
+        }
+
+        modalBonito({
+            tipo: 'info',
+            icono: '🗑️',
+            titulo: 'Eliminar consolidado',
+            mensaje: '¿Está seguro de eliminar el consolidado de sede?',
+            confirmar: true,
+            onConfirm: function () {
+                abrircargando();
+                $.ajax({
+                    type: "POST",
+                    url: carpeta + "/ajax-eliminar-consolidado-op",
+                    data: { _token: _token, id_consolidado: id_consolidado },
+                    success: function (resp) {
+                        cerrarcargando();
+                        if (resp.success) {
+                            modalBonito({ tipo: 'success', icono: '✅', titulo: 'Eliminado', mensaje: resp.mensaje });
+                            setTimeout(function () {
+                                window.location.href = window.location.pathname + window.location.search + "#ordenpedidoconsolidadoterminado";
                                 location.reload();
                             }, 1500);
                         } else {
