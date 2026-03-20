@@ -267,7 +267,7 @@
                                               <div class="col-sm-12 abajocaja" >
                                                   {!! Form::select( 'grupo_id', $combogrupo, array(''),
                                                                     [
-                                                                      'class'       => 'select2 form-control control input-xs entidadbancooc' ,
+                                                                      'class'       => 'select2 form-control control input-xs' ,
                                                                       'id'          => 'grupo_id',
                                                                       'data-aw'     => '1',
                                                                     ]) !!}
