@@ -180,17 +180,12 @@ class GestionOrdenPedidoController extends Controller
             ->pluck('TXT_NOMBRE', 'COD_PERIODO')
             ->toArray();
 
-        $mesPeriodo = DB::table('Web.periodos')
-	    ->where('activo', 1)
-	    ->where('COD_EMPR', $empresa)
-	    ->value('mes');
+        $registrosPeriodos = DB::table('Web.periodos')
+            ->where('activo', 1)
+            ->where('COD_EMPR', $empresa)
+            ->get(['COD_PERIODO', 'mes']);
 
-	    $mesActual = date('n'); 
-	    if ($mesActual < $mesPeriodo) {
-		    $tipFecoOrden = 'TOP0000000000002';   
-		} else {
-		    $tipFecoOrden = 'TOP0000000000003';
-		}
+        $tipFecoOrden = '';
 
         $combo9 = array('' => 'Seleccione Mes') + $periodo_mes;
 
@@ -274,6 +269,7 @@ class GestionOrdenPedidoController extends Controller
             'nomArea' => $nomArea,
             'area_id' => $area_id,
             'registrosMonto' => $registrosMonto,
+            'registrosPeriodos' => $registrosPeriodos,
             'ajax' => true,
         ]);
     }

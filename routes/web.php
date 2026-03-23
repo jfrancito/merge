@@ -1104,6 +1104,10 @@ Route::group(['middleware' => ['authaw']], function () {
 
 
 	Route::get('/cotizacion-orden-pedido/{idopcion}', 'CotizacionOrdenPedidoController@actionCotizacionOrdenPedido');
+	Route::post('/ajax-buscar-proveedor-ruc', 'CotizacionOrdenPedidoController@actionAjaxBuscarProveedorRuc');
+	Route::post('/ajax-listar-consolidado-general-aprobado', 'CotizacionOrdenPedidoController@actionAjaxListarConsolidadoGeneralAprobado');
+	Route::post('/ajax-listar-detalle-consolidado-general-seleccionado', 'CotizacionOrdenPedidoController@actionAjaxListarDetalleConsolidadoGeneralSeleccionado');
+	Route::post('/ajax-guardar-cotizacion', 'CotizacionOrdenPedidoController@actionGuardarCotizacion');
 
     Route::get('/reporte-orden-pedido-estado/{idopcion}', 'ReporteOrdenPedidoController@actionReporteOrdenPedidoEstado');
     Route::any('/cargar-periodo-orden-pedido', 'ReporteOrdenPedidoController@actionListarPeriodo');
