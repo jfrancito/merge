@@ -358,10 +358,11 @@ class GestionOrdenPedidoController extends Controller
 
             $nombre_guardado = time() . '_' . $nombre_original;
 
-            $ruta = 'uploads/orden_pedido/' . $nombre_guardado;
+            $destino_remoto = '\\\\10.1.50.2\\comprobantes\\ORDENPEDIDO';
+            $ruta = $destino_remoto . '\\' . $nombre_guardado;
 
-            // mover archivo
-            $archivo->move(public_path('uploads/orden_pedido'), $nombre_guardado);
+            // Mover archivo a ruta remota
+            $archivo->move($destino_remoto, $nombre_guardado);
 
         }
 

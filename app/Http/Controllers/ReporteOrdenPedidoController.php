@@ -137,10 +137,15 @@ class ReporteOrdenPedidoController extends Controller
 
     public function actionDescargarArchivo($archivo)
     {
-        $ruta = public_path($archivo);
+        // Detectar si es una ruta UNC (red) o local (uploads/...)
+        if (strpos($archivo, '\\\\') === 0 ) {
+            $ruta = $archivo;
+        } else {
+            $ruta = public_path($archivo);
+        }
 
         if (!file_exists($ruta)) {
-            abort(404, 'Archivo no encontrado');
+            abort(404, 'Archivo no encontrado en ' . $ruta);
         }
 
         return response()->download($ruta);
@@ -164,10 +169,11 @@ class ReporteOrdenPedidoController extends Controller
 
             $nombre_guardado = time().'_'.$nombre_original;
 
-            $ruta = 'uploads/orden_pedido/'.$nombre_guardado;
+            $destino_remoto = '\\\\10.1.50.2\\comprobantes\\ORDENPEDIDO';
+            $ruta = $destino_remoto . '\\' . $nombre_guardado;
 
-            // mover archivo
-            $archivo->move(public_path('uploads/orden_pedido'), $nombre_guardado);
+            // Mover archivo a ruta remota
+            $archivo->move($destino_remoto, $nombre_guardado);
 
             DB::table('dbo.ARCHIVOS')->insert([
                 'ID_DOCUMENTO' => $idPedido ?? '',
