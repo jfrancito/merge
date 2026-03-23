@@ -29,24 +29,20 @@
 
                     <ul class="nav nav-tabs">
                         <li class="active"><a href="#crearcotizacionpedido" data-toggle="tab"><b>CREAR COTIZACION PEDIDOS</b></a></li>
-                        <li><a href="#consoldadogeneralterminado" data-toggle="tab"><b>ORDEN CONSOLIDADO GENERAL</b></a></li>
+                        
                     </ul>
 
                     <!-- CONTENIDO TABS -->
                     <div class="tab-content">
                         <div id="crearcotizacionpedido" class="tab-pane fade in active cont">
-                            @include('ordenpedido.tab.creartabordenconsolidadogeneral')
-                        </div>
-
-                        <div id="consoldadogeneralterminado" class="tab-pane fade cont">
-                          
+                            @include('ordenpedido.tab.creartabordencotizacion')
                         </div>
                     </div><!-- FIN tab-content -->
                 </div><!-- FIN tab-container -->
             </div>
         </div>
     </div>
-
+    @include('ordenpedido.modal.modal_seleccionar_consolidado_general')
 </div>
 
 
@@ -115,5 +111,5 @@
     </script>
 
 
-    <script src="{{ asset('public/js/ordenpedido/ordenpedido.js?v='.$version) }}" type="text/javascript"></script>
+    <script src="{{ asset('public/js/ordenpedido/cotizacionpedido.js?v='.$version) }}" type="text/javascript"></script>
 @stop

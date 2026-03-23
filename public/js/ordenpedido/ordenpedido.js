@@ -570,6 +570,40 @@ $(document).ready(function () {
         }
     });
 
+    /* ===============================
+       CARGAR TIPO SEGÚN MES
+       =============================== */
+    $(document).on('change', '#cod_periodo', function () {
+        
+        let codPeriodo = $(this).val();
+        let tipoPedidoSelect = $('#cod_tipo_pedido');
+
+        if (!codPeriodo) {
+            tipoPedidoSelect.val('').trigger('change');
+            return;
+        }
+
+        // Obtener mes del periodo seleccionado
+        let periodo = registrosPeriodos.find(p => p.COD_PERIODO === codPeriodo);
+        
+        if (periodo) {
+
+            let mesPeriodo = parseInt(periodo.mes);
+            let mesActual = new Date().getMonth() + 1; // Enero es 0 en JS
+            let codTipo = '';
+
+            if (mesActual < mesPeriodo) {
+                codTipo = 'TOP0000000000002'; // PROGRAMADO
+            } else {
+                codTipo = 'TOP0000000000003'; // NO PROGRAMADO
+            }
+
+            tipoPedidoSelect.val(codTipo).trigger('change');
+            
+            console.log('Tipo de pedido asignado:', codTipo, 'Mes Periodo:', mesPeriodo, 'Mes Actual:', mesActual);
+        }
+    });
+
     $(document).on('change', '#cod_centro', function () {
         let cod_centro = $(this).val();
         let cod_empr = $('#cod_empr').val();

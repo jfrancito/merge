@@ -261,7 +261,7 @@
                             'class' => 'form-control control select2'
                         ]) !!} --}}
 
-                            {!! Form::select('cod_tipo_pedido', $listatipopedido, $tipFecoOrden, [
+                            {!! Form::select('cod_tipo_pedido', $listatipopedido, '', [
                             'id' => 'cod_tipo_pedido',
                             'class' => 'form-control control select2',
                              'disabled' => 'disabled'
