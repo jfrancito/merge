@@ -259,7 +259,7 @@ $(document).ready(function () {
                 cod_categoria: tds.eq(8).text().trim(),
                 nom_categoria: tds.eq(3).text().trim(),
                 cantidad: parseInt(tds.eq(4).text().trim()) || 0,
-                precio: parseFloat(tds.eq(5).text().trim()) || 0,
+                precio: (tds.eq(5).find('input').length > 0) ? (parseFloat(tds.eq(5).find('input').val()) || 0) : (parseFloat(tds.eq(5).text().trim()) || 0),
                 txt_observacion: tds.eq(7).text().trim(),
                 opcion_detalle: 'I',
                 detalle_id: null
@@ -673,14 +673,18 @@ $(document).ready(function () {
             return;
         }
 
+        let isServicio = option.data('indmaterialservicio') === 'S';
+
         if (!precio || precio <= 0) {
-            modalBonito({
-                tipo: 'warn',
-                icono: '⚠',
-                titulo: 'Precio no configurado',
-                mensaje: nom_producto + ' - coordinar con el área de compras el precio del producto.'
-            });
-            return;
+            if (!isServicio) {
+                modalBonito({
+                    tipo: 'warn',
+                    icono: '⚠',
+                    titulo: 'Precio no configurado',
+                    mensaje: nom_producto + ' - coordinar con el área de compras el precio del producto.'
+                });
+                return;
+            }
         }
 
         let existe = false;
@@ -702,13 +706,27 @@ $(document).ready(function () {
         }
 
         filaCount++;
+
+        let precioHtml = '';
+        if (isServicio) {
+            precioHtml = `<input type="number" 
+                                 class="form-control input-sm text-right edit-precio-pedido" 
+                                 value="${precio.toFixed(2)}" 
+                                 step="0.01" 
+                                 min="0"
+                                 data-cantidad="${cantidad}"
+                                 style="width: 100px; display: inline-block;">`;
+        } else {
+            precioHtml = precio.toFixed(2);
+        }
+
         let fila = `<tr data-id="${cod_producto}">
             <td class="text-center">${filaCount}</td>
             <td class="text-center">${cod_producto}</td>
             <td>${nom_producto}</td>
             <td class="text-center">${nom_categoria}</td>
             <td class="text-center">${cantidad}</td>
-            <td class="text-center">${precio.toFixed(2)}</td>
+            <td class="text-center col-precio">${precioHtml}</td>
             <td class="text-center subtotal">${subtotal.toFixed(2)}</td>
             <td>${txt_observacion}</td>
             <td style="display:none">${cod_categoria}</td>
@@ -807,6 +825,16 @@ $(document).ready(function () {
             }
         }
     }
+
+    $(document).on('keyup change', '.edit-precio-pedido', function () {
+        let input = $(this);
+        let tr = input.closest('tr');
+        let precio = parseFloat(input.val()) || 0;
+        let cantidad = parseFloat(input.data('cantidad')) || 0;
+        let subtotal = precio * cantidad;
+        tr.find('.subtotal').text(subtotal.toFixed(2));
+        calcularTotalPedido();
+    });
 
     /* $('#cod_anio').on('change', function () {
 

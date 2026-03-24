@@ -1108,6 +1108,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::post('/ajax-listar-consolidado-general-aprobado', 'CotizacionOrdenPedidoController@actionAjaxListarConsolidadoGeneralAprobado');
 	Route::post('/ajax-listar-detalle-consolidado-general-seleccionado', 'CotizacionOrdenPedidoController@actionAjaxListarDetalleConsolidadoGeneralSeleccionado');
 	Route::post('/ajax-guardar-cotizacion', 'CotizacionOrdenPedidoController@actionGuardarCotizacion');
+	Route::post('/ajax-listar-detalle-cotizacion', 'CotizacionOrdenPedidoController@actionAjaxListarDetalleCotizacion');
+	Route::post('/ajax-subir-archivo-cotizacion', 'CotizacionOrdenPedidoController@actionAjaxSubirArchivoCotizacion');
 
     Route::get('/reporte-orden-pedido-estado/{idopcion}', 'ReporteOrdenPedidoController@actionReporteOrdenPedidoEstado');
     Route::any('/cargar-periodo-orden-pedido', 'ReporteOrdenPedidoController@actionListarPeriodo');

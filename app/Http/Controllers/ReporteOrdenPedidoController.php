@@ -137,10 +137,32 @@ class ReporteOrdenPedidoController extends Controller
 
     public function actionDescargarArchivo($archivo)
     {
-        $ruta = public_path($archivo);
+        // 0. Decodificar si parece Base64 (las rutas UNC suelen tener caracteres no permitidos en URLs)
+        $archivo_decodificado = base64_decode($archivo, true);
+        if ($archivo_decodificado !== false && (substr($archivo_decodificado, 0, 1) === '\\' || strpos($archivo_decodificado, ':') !== false)) {
+            $archivo = $archivo_decodificado;
+        } else {
+             $archivo = urldecode($archivo);
+        }
+
+        // 1. Intentar ruta tal cual llega (útil para UNC o rutas ya completas)
+        $ruta = $archivo;
+
+        // 2. Si no existe, intentar como ruta local del proyecto
+        if (!file_exists($ruta)) {
+            $ruta = public_path($archivo);
+        }
+
+        // 3. Si aún no existe y parece una ruta de red mal formateada (ej: \10.1.50.2...)
+        if (!file_exists($ruta)) {
+            $ruta_posible_unc = '\\\\' . ltrim($archivo, '\\');
+            if (file_exists($ruta_posible_unc)) {
+                $ruta = $ruta_posible_unc;
+            }
+        }
 
         if (!file_exists($ruta)) {
-            abort(404, 'Archivo no encontrado');
+             abort(404, "El archivo no se encuentra en la ubicación registrada: " . $ruta);
         }
 
         return response()->download($ruta);
@@ -164,10 +186,14 @@ class ReporteOrdenPedidoController extends Controller
 
             $nombre_guardado = time().'_'.$nombre_original;
 
-            $ruta = 'uploads/orden_pedido/'.$nombre_guardado;
+            $destino_remoto = '\\\\10.1.50.2\\comprobantes\\ORDENPEDIDO';
+            $ruta = $destino_remoto . '\\' . $nombre_guardado;
 
-            // mover archivo
-            $archivo->move(public_path('uploads/orden_pedido'), $nombre_guardado);
+            // Al ser una ruta de red UNC, copy() es más fiable que move() (rename)
+            if(!copy($archivo->getRealPath(), $ruta)){
+                 // Si falla la copia directa, lanzamos error específico
+                 throw new \Symfony\Component\HttpFoundation\File\Exception\FileException("No se pudo escribir en el directorio de red: " . $destino_remoto);
+            }
 
             DB::table('dbo.ARCHIVOS')->insert([
                 'ID_DOCUMENTO' => $idPedido ?? '',

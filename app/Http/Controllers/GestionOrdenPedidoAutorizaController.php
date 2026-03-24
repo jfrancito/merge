@@ -52,7 +52,6 @@ class GestionOrdenPedidoAutorizaController extends Controller
             ""
         );
 
-
         return view('ordenpedido.ajax.autorizaordenpedido', [
             'listapedido' => $listapedido,
             'usuario_logueado_id' => $usuario_logueado_id,

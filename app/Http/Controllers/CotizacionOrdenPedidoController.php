@@ -17,7 +17,7 @@ use Validator;
 
 class CotizacionOrdenPedidoController extends Controller
 {
-	 use OrdenPedidoCotizacionTraits;  
+    use OrdenPedidoCotizacionTraits;
 
     public function actionCotizacionOrdenPedido($idopcion)
     {
@@ -34,7 +34,7 @@ class CotizacionOrdenPedidoController extends Controller
 
         // Calcular correlativo siguiendo la lógica del SP
         $empresa_sesion = Session::get('empresas');
-        $usuario_id     = Session::get('usuario')->usuarioosiris_id;
+        $usuario_id = Session::get('usuario')->usuarioosiris_id;
 
         // Obtener el centro del trabajador (equivalente a lo que hace el sistema en otros módulos)
         $centro = DB::table('STD.TRABAJADOR as T')
@@ -47,8 +47,8 @@ class CotizacionOrdenPedidoController extends Controller
             ->first();
 
         $abrev_empresa = trim($empresa_sesion->TXT_ABREVIATURA);
-        $abrev_centro  = $centro ? trim($centro->ABREV_CENTRO) : '';
-        $prefijo       = $abrev_empresa . $abrev_centro . 'COT';
+        $abrev_centro = $centro ? trim($centro->ABREV_CENTRO) : '';
+        $prefijo = $abrev_empresa . $abrev_centro . 'COT';
 
         $max_id = DB::table('WEB.ORDEN_COTIZACION')
             ->where('ID_COTIZACION', 'LIKE', $prefijo . '%')
@@ -59,7 +59,8 @@ class CotizacionOrdenPedidoController extends Controller
             $new_number = $number + 1;
             // Asumiendo longitud total de 16 caracteres como en el ejemplo IICOT00000000001
             $nro_cotizacion = $prefijo . str_pad($new_number, 16 - strlen($prefijo), '0', STR_PAD_LEFT);
-        } else {
+        }
+        else {
             $nro_cotizacion = $prefijo . str_pad(1, 11, '0', STR_PAD_LEFT);
         }
 
@@ -68,16 +69,42 @@ class CotizacionOrdenPedidoController extends Controller
             ->whereDate('FEC_CAMBIO', date('Y-m-d'))
             ->where('COD_ESTADO', 1)
             ->first();
-        
+
         $valor_tipo_cambio = $tipo_cambio ? $tipo_cambio->CAN_COMPRA : 0;
 
+        $listacotizaciones = DB::table('WEB.ORDEN_COTIZACION as C')
+            ->leftJoin('dbo.ARCHIVOS as A', function ($join) {
+            $join->on('A.ID_DOCUMENTO', '=', 'C.ID_COTIZACION')
+                ->where('A.ACTIVO', '=', 1);
+        })
+            ->where('C.COD_EMPR', $empresa_sesion->COD_EMR ?? $empresa_sesion->COD_EMPR)
+            ->where('C.ACTIVO', 1)
+            ->select('C.*', 'A.URL_ARCHIVO as RUTA_ARCHIVO')
+            ->orderBy('C.ID_COTIZACION', 'DESC')
+            ->get();
+
         return view('ordenpedido.cotizacion.cotizacionordenpedido', [
-            'combo_tipo_pago'         => $combo_tipo_pago,
-            'combo_moneda'            => $combo_moneda,
-            'nro_cotizacion'          => $nro_cotizacion,
-            'valor_tipo_cambio'       => $valor_tipo_cambio,
-            'funcion'                 => $this,
-            'idopcion'                => $idopcion
+            'combo_tipo_pago' => $combo_tipo_pago,
+            'combo_moneda' => $combo_moneda,
+            'nro_cotizacion' => $nro_cotizacion,
+            'valor_tipo_cambio' => $valor_tipo_cambio,
+            'listacotizaciones' => $listacotizaciones,
+            'funcion' => $this,
+            'idopcion' => $idopcion
+        ]);
+    }
+
+    public function actionAjaxListarDetalleCotizacion(Request $request)
+    {
+        $id_cotizacion = $request->input('id_cotizacion');
+
+        $lista_detalle = DB::table('WEB.ORDEN_COTIZACION_DETALLE')
+            ->where('ID_COTIZACION', $id_cotizacion)
+            ->where('ACTIVO', 1)
+            ->get();
+
+        return view('ordenpedido.cotizacion.ajax.listadetallecotizacion', [
+            'lista_detalle' => $lista_detalle
         ]);
     }
 
@@ -111,7 +138,11 @@ class CotizacionOrdenPedidoController extends Controller
 
     public function actionAjaxListarConsolidadoGeneralAprobado(Request $request)
     {
+        $empresa_sesion = Session::get('empresas');
+        $cod_empr = $empresa_sesion->COD_EMR ?? $empresa_sesion->COD_EMPR;
+
         $lista_consolidado = DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL')
+            ->where('COD_EMPR', $cod_empr)
             ->where('COD_ESTADO', 'ETM0000000000005')
             ->where('ACTIVO', 1)
             ->orderBy('FEC_PEDIDO', 'DESC')
@@ -142,7 +173,7 @@ class CotizacionOrdenPedidoController extends Controller
             DB::beginTransaction();
 
             $empresa_sesion = Session::get('empresas');
-            $usuario_id     = Session::get('usuario')->usuarioosiris_id;
+            $usuario_id = Session::get('usuario')->usuarioosiris_id;
 
             // 1. Obtener el centro actual del usuario
             $centro = DB::table('STD.TRABAJADOR as T')
@@ -161,7 +192,7 @@ class CotizacionOrdenPedidoController extends Controller
                 ->where('NRO_DOCUMENTO', $request->input('nro_ruc'))
                 ->where('COD_ESTADO', 1)
                 ->first();
-            
+
             $cod_empr_proveedor = $empresa_proveedor ? $empresa_proveedor->COD_EMPR : '';
 
             // 3. Obtener el código de la dirección (preferiblemente fiscal)
@@ -175,18 +206,18 @@ class CotizacionOrdenPedidoController extends Controller
 
             // 4. Inserción de cabecera usando el Trait
             $id_cotizacion = $this->insertOrdenCotizacion(
-                'I', 
+                'I',
                 '', // Dejar vacío para que el SP lo genere con su propia lógica de correlativo
                 $request->input('fec_cotizacion'),
                 $request->input('nro_serie'),
                 $request->input('nro_doc'),
-                '', 
-                $cod_centro, 
+                '',
+                $cod_centro,
                 $request->input('nro_ruc'),
-                $cod_empr_proveedor, 
+                $cod_empr_proveedor,
                 $request->input('nom_empr_proveedor'),
                 $request->input('txt_telefono'),
-                $cod_direccion, 
+                $cod_direccion,
                 $request->input('nom_direccion'),
                 $request->input('fec_validez'),
                 $request->input('fec_entrega'),
@@ -196,10 +227,10 @@ class CotizacionOrdenPedidoController extends Controller
                 $request->input('txt_categoria_tipo_pago'),
                 $request->input('txt_observacion'),
                 $request->input('can_total'),
-                'ETM0000000000001', 
-                'GENERADO', 
-                1, 
-                '' 
+                'ETM0000000000001',
+                'GENERADO',
+                1,
+                ''
             );
 
             // 5. Inserción de detalles
@@ -211,7 +242,7 @@ class CotizacionOrdenPedidoController extends Controller
                     $this->insertOrdenCotizacionDetalle(
                         'I',
                         $id_cotizacion,
-                        '', 
+                        '',
                         $cod_centro,
                         $det['cod_producto'],
                         $det['nom_producto'],
@@ -221,18 +252,104 @@ class CotizacionOrdenPedidoController extends Controller
                         $det['precio'],
                         $det['cod_familia'],
                         $det['nom_familia'],
-                        1, 
-                        '' 
+                        1,
+                        ''
                     );
+                }
+            }
+
+            // 6. Manejo de archivo adjunto si existe (Subida inmediata en creación)
+            if ($request->hasFile('archivo')) {
+                $archivo = $request->file('archivo');
+                $nombre_original = $archivo->getClientOriginalName();
+                $extension = $archivo->getClientOriginalExtension();
+                $size = $archivo->getSize();
+                $mime = $archivo->getMimeType();
+                $nombre_guardado = time() . '_' . $nombre_original;
+
+                $destino_remoto = '\\\\10.1.50.2\\comprobantes\\ORDENCOTIZACION';
+                $ruta_final = $destino_remoto . '\\' . $nombre_guardado;
+
+                // Copia al servidor remoto UNC
+                if (copy($archivo->getRealPath(), $ruta_final)) {
+                    DB::table('dbo.ARCHIVOS')->insert([
+                        'ID_DOCUMENTO' => $id_cotizacion,
+                        'DOCUMENTO_ITEM' => 1,
+                        'TIPO_ARCHIVO' => $mime,
+                        'NOMBRE_ARCHIVO' => pathinfo($nombre_original, PATHINFO_FILENAME),
+                        'DESCRIPCION_ARCHIVO' => $nombre_original,
+                        'URL_ARCHIVO' => $ruta_final,
+                        'EXTENSION' => $extension,
+                        'SIZE' => $size,
+                        'ACTIVO' => 1,
+                        'FECHA_CREA' => DB::raw('GETDATE()'),
+                        'USUARIO_CREA' => Session::get('usuario')->usuario ?? 'SISTEMA',
+                    ]);
                 }
             }
 
             DB::commit();
             return response()->json(['success' => true, 'id_cotizacion' => $id_cotizacion, 'mensaje' => 'Cotización guardada correctamente con ID: ' . $id_cotizacion]);
 
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e) {
             DB::rollback();
             return response()->json(['success' => false, 'message' => 'Error al guardar cotización: ' . $e->getMessage()]);
         }
+    }
+
+    public function actionAjaxSubirArchivoCotizacion(Request $request)
+    {
+        $id_cotizacion = $request->input('id_cotizacion');
+
+        if ($request->hasFile('archivo')) {
+
+            $archivo = $request->file('archivo');
+
+            $nombre_original = $archivo->getClientOriginalName();
+            $extension = $archivo->getClientOriginalExtension();
+            $nombre_sin_extension = pathinfo($nombre_original, PATHINFO_FILENAME);
+            $size = $archivo->getSize();
+            $mime = $archivo->getMimeType();
+
+            $nombre_guardado = time() . '_' . $nombre_original;
+
+            // Ruta remota para Cotizaciones
+            $destino_remoto = '\\\\10.1.50.2\\comprobantes\\ORDENCOTIZACION';
+
+            // Verificar si el directorio existe (opcional, path UNC puede dar problemas con is_dir en algunos entornos)
+            // if (!is_dir($destino_remoto)) { mkdir($destino_remoto, 0777, true); }
+
+            $ruta_final = $destino_remoto . '\\' . $nombre_guardado;
+
+            // Copia al servidor remoto UNC
+            try {
+                if (!copy($archivo->getRealPath(), $ruta_final)) {
+                    return response()->json(['ok' => false, 'mensaje' => 'No se pudo copiar el archivo al servidor remoto.']);
+                }
+            }
+            catch (\Exception $e) {
+                return response()->json(['ok' => false, 'mensaje' => 'Error al escribir en la ruta remota: ' . $e->getMessage()]);
+            }
+
+            // Registro en la tabla ARCHIVOS
+            DB::table('dbo.ARCHIVOS')->insert([
+                'ID_DOCUMENTO' => $id_cotizacion,
+                'DOCUMENTO_ITEM' => 1,
+                'TIPO_ARCHIVO' => $mime,
+                'NOMBRE_ARCHIVO' => $nombre_sin_extension,
+                'DESCRIPCION_ARCHIVO' => $nombre_original,
+                'URL_ARCHIVO' => $ruta_final,
+                'EXTENSION' => $extension,
+                'SIZE' => $size,
+                'ACTIVO' => 1,
+                'FECHA_CREA' => DB::raw('GETDATE()'),
+                'USUARIO_CREA' => Session::get('usuario')->usuario ?? 'SISTEMA',
+            ]);
+
+            return response()->json(['ok' => true]);
+        }
+
+        return response()->json(['ok' => false, 'mensaje' => 'No se recibió ningún archivo.']);
     }
 }
