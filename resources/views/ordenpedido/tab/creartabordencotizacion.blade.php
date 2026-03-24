@@ -97,7 +97,6 @@
                                 <input type="text" class="form-control premium-input" id="telefono" placeholder="+51 ...">
                             </div>
                         </div>
-                    <div class="row" style="margin-top: 10px;">
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Tipo de Crédito</label>
@@ -153,11 +152,33 @@
                 </div>
             </div>
 
-            <!-- TABLA DE PRODUCTOS (Opcional o para completar el diseño) -->
+           
+
+            <!-- TABLA DE PRODUCTOS -->
             <div id="lista-productos-cotizacion" class="mt-4">
                 <div class="text-center p-5 message-empty">
                     <i class="mdi mdi-cart-outline icon-large"></i>
                     <p>Seleccione los consolidados para cargar los productos a cotizar.</p>
+                </div>
+            </div>
+
+             <!-- SECCIÓN: ARCHIVO ADJUNTO (PDF) -->
+            <div class="panel panel-default box-seccion shadow-soft" style="border-left: 5px solid #3498db;">
+                <div class="panel-heading subheader-seccion">
+                    <i class="mdi mdi-upload"></i> Archivo
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group mb-0">
+                                <label class="text-primary"><i class="fa fa-file-pdf-o"></i> Seleccionar Cotización Firmada / PDF</label>
+                                <input type="file" id="archivo_cotizacion_crear" class="form-control premium-input" accept=".pdf" style="padding: 7px;">
+                                <p class="help-block" style="font-size: 12px; margin-top: 5px; color: #777;">
+                                    <i class="fa fa-info-circle"></i> El archivo se subirá automáticamente al servidor remoto al momento de "Generar Cotización".
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

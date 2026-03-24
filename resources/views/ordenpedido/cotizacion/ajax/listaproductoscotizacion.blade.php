@@ -66,14 +66,10 @@
                 @endforeach
             </tbody>
         </table>
+<!-- Cerca del botón de SUBIR ARCHIVO en ajax/listaproductoscotizacion.blade.php -->
+<input type="file" class="input-file-general-cotizacion" accept=".pdf" style="display: none;">
 
-        <div class="row" style="margin-top: 20px;">
-            <div class="col-md-12 text-left">
-                <button type="button" class="btn btn-primary btn-subir-archivo shadow-soft" style="margin-left: 10px;">
-                    <i class="mdi mdi-upload" style="font-size: 16px; vertical-align: middle; margin-right: 5px;"></i> SUBIR ARCHIVO
-                </button>
-            </div>
-        </div>
+        <!-- Se eliminó el botón de subir aquí para usar la sección general de la cabecera -->
     </div>
 </div>
 

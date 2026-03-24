@@ -5,7 +5,7 @@ $(document).ready(function () {
     /* ===============================
        FUNCIÓN MODAL BONITO (ÚNICA)
        =============================== */
-    function modalBonito({tipo, icono, titulo, mensaje, ancho = '360px', confirmar = false, onConfirm = null}) {
+    function modalBonito({ tipo, icono, titulo, mensaje, ancho = '360px', confirmar = false, onConfirm = null }) {
 
         const colores = {
             error: ['#ff416c', '#ff4b2b'],
@@ -94,11 +94,11 @@ $(document).ready(function () {
        BUSCAR PROVEEDOR POR RUC
        =============================== */
     $(document).on('click', '.btn-search-premium', function (e) {
-        
+
         var ruc = $('#ruc_proveedor').val();
 
         if (ruc.trim().length === 0) {
-            
+
             modalBonito({
                 tipo: 'warn',
                 icono: '⚠️',
@@ -114,7 +114,7 @@ $(document).ready(function () {
         var btn = $(this);
         var icon = btn.find('i');
         var originalClass = icon.attr('class');
-        
+
         icon.attr('class', 'fa fa-spinner fa-spin');
         btn.prop('disabled', true);
 
@@ -127,16 +127,16 @@ $(document).ready(function () {
             },
             success: function (data) {
                 if (data.success) {
-                    
-                    if(data.nombre) $('#nombre_proveedor').val(data.nombre);
-                    if(data.direccion) $('#direccion').val(data.direccion);
-                    if(data.telefono) $('#telefono').val(data.telefono);
-                    
+
+                    if (data.nombre) $('#nombre_proveedor').val(data.nombre);
+                    if (data.direccion) $('#direccion').val(data.direccion);
+                    if (data.telefono) $('#telefono').val(data.telefono);
+
                     $('.premium-input').addClass('success-pulse');
                     setTimeout(() => $('.premium-input').removeClass('success-pulse'), 1500);
 
                 } else {
-                    
+
                     modalBonito({
                         tipo: 'error',
                         icono: '❌',
@@ -156,7 +156,7 @@ $(document).ready(function () {
                     ancho: '400px'
                 });
             },
-            complete: function() {
+            complete: function () {
                 icon.attr('class', originalClass);
                 btn.prop('disabled', false);
             }
@@ -167,9 +167,9 @@ $(document).ready(function () {
        MODAL SELECCIONAR CONSOLIDADOS
        =============================== */
     $(document).on('click', '.btn-seleccionar-consolidados', function (e) {
-        
+
         abrircargando();
-        
+
         $.ajax({
             type: 'POST',
             url: carpeta + '/ajax-listar-consolidado-general-aprobado',
@@ -196,9 +196,9 @@ $(document).ready(function () {
 
     // Confirmar selección en el modal
     $(document).on('click', '.btn-confirmar-seleccion-consolidado', function (e) {
-        
+
         var selected = [];
-        $('.check-consolidado:checked').each(function() {
+        $('.check-consolidado:checked').each(function () {
             selected.push($(this).val());
         });
 
@@ -226,7 +226,7 @@ $(document).ready(function () {
                 cerrarcargando();
                 $('#lista-productos-cotizacion').html(data);
                 $('#modal-seleccionar-consolidado-general').niftyModal('hide');
-                
+
                 modalBonito({
                     tipo: 'success',
                     icono: '✅',
@@ -260,7 +260,7 @@ $(document).ready(function () {
     function calcularTotal() {
         var totalSoles = 0;
         var moneda = $('#moneda_id').val();
-        
+
         // Manejar posibles comas decimales desde el servidor
         var tc_val = $('#tipo_cambio_actual').val() ? $('#tipo_cambio_actual').val().toString().replace(',', '.') : '0';
         var tipoCambio = parseFloat(tc_val) || 0;
@@ -270,7 +270,7 @@ $(document).ready(function () {
         console.log('Moneda seleccionada: ', moneda);
         console.log('Tipo de Cambio Hoy: ', tipoCambio);
 
-        $('.precio-producto').each(function() {
+        $('.precio-producto').each(function () {
             var cantidad = parseFloat($(this).data('cantidad')) || 0;
             var precio = parseFloat($(this).val()) || 0;
             totalSoles += (cantidad * precio);
@@ -315,7 +315,7 @@ $(document).ready(function () {
     });
 
     $(document).on('click', '.btn-eliminar-seleccionados', function (e) {
-        
+
         var selected = $('.check-producto:checked');
 
         if (selected.length === 0) {
@@ -335,15 +335,15 @@ $(document).ready(function () {
             titulo: 'Confirmar Eliminación',
             mensaje: '¿Está seguro de eliminar ' + selected.length + ' producto(s) de la lista?',
             confirmar: true,
-            onConfirm: function() {
-                
-                selected.each(function() {
+            onConfirm: function () {
+
+                selected.each(function () {
                     $(this).closest('tr').remove();
                 });
 
                 // Disparar recalculado del total
                 $('.precio-producto').first().trigger('change');
-                
+
                 modalBonito({
                     tipo: 'success',
                     icono: '✅',
@@ -364,7 +364,7 @@ $(document).ready(function () {
        GUARDAR COTIZACIÓN (CABECERA)
        =============================== */
     $(document).on('click', '.btn-guardar-cotizacion', function (e) {
-        
+
         // 1. Validaciones básicas
         var ruc = $('#ruc_proveedor').val();
         var nombre = $('#nombre_proveedor').val();
@@ -382,7 +382,7 @@ $(document).ready(function () {
         }
 
         if (numero.trim().length === 0) {
-             modalBonito({
+            modalBonito({
                 tipo: 'warn',
                 icono: '⚠️',
                 titulo: 'Datos Faltantes',
@@ -394,7 +394,7 @@ $(document).ready(function () {
 
         // 2. Recolectar datos de cabecera y detalle
         var detalles = [];
-        $('.precio-producto').each(function() {
+        $('.precio-producto').each(function () {
             var $el = $(this);
             detalles.push({
                 cod_producto: $el.data('cod-producto'),
@@ -418,26 +418,31 @@ $(document).ready(function () {
             });
             return;
         }
-        
-        var data = {
-            _token: _token,
-            fec_cotizacion: $('#fecha_cotizacion').val(),
-            nro_serie: $('#serie').val(),
-            nro_doc: $('#numero').val(),
-            nro_ruc: ruc,
-            nom_empr_proveedor: nombre,
-            txt_telefono: $('#telefono').val(),
-            nom_direccion: $('#direccion').val(),
-            fec_validez: $('#validez').val(),
-            fec_entrega: $('#entrega').val(),
-            cod_categoria_moneda: $('#moneda_id').val(),
-            txt_categoria_moneda: $('#moneda_id option:selected').text(),
-            cod_categoria_tipo_pago: $('#tipo_pago_id').val(),
-            txt_categoria_tipo_pago: $('#tipo_pago_id option:selected').text(),
-            txt_observacion: $('#observacion').val(),
-            can_total: $('#total').val(),
-            detalles: JSON.stringify(detalles)
-        };
+
+        var formData = new FormData();
+        formData.append('_token', _token);
+        formData.append('fec_cotizacion', $('#fecha_cotizacion').val());
+        formData.append('nro_serie', $('#serie').val());
+        formData.append('nro_doc', $('#numero').val());
+        formData.append('nro_ruc', ruc);
+        formData.append('nom_empr_proveedor', nombre);
+        formData.append('txt_telefono', $('#telefono').val());
+        formData.append('nom_direccion', $('#direccion').val());
+        formData.append('fec_validez', $('#validez').val());
+        formData.append('fec_entrega', $('#entrega').val());
+        formData.append('cod_categoria_moneda', $('#moneda_id').val());
+        formData.append('txt_categoria_moneda', $('#moneda_id option:selected').text());
+        formData.append('cod_categoria_tipo_pago', $('#tipo_pago_id').val());
+        formData.append('txt_categoria_tipo_pago', $('#tipo_pago_id option:selected').text());
+        formData.append('txt_observacion', $('#observacion').val());
+        formData.append('can_total', $('#total').val());
+        formData.append('detalles', JSON.stringify(detalles));
+
+        // Adjuntar el archivo si existe
+        var fileInput = $('#archivo_cotizacion_crear')[0];
+        if (fileInput && fileInput.files.length > 0) {
+            formData.append('archivo', fileInput.files[0]);
+        }
 
         // 3. Confirmación
         modalBonito({
@@ -446,18 +451,20 @@ $(document).ready(function () {
             titulo: 'Confirmar Guardado',
             mensaje: '¿Está seguro de que desea generar esta cotización?',
             confirmar: true,
-            onConfirm: function() {
-                
+            onConfirm: function () {
+
                 abrircargando();
-                
+
                 $.ajax({
                     type: 'POST',
                     url: carpeta + '/ajax-guardar-cotizacion',
-                    data: data,
+                    data: formData,
+                    processData: false,
+                    contentType: false,
                     success: function (res) {
                         cerrarcargando();
                         if (res.success) {
-                            
+
                             modalBonito({
                                 tipo: 'success',
                                 icono: '✅',
@@ -465,9 +472,9 @@ $(document).ready(function () {
                                 mensaje: res.mensaje,
                                 ancho: '400px'
                             });
-                            
+
                             // Recargar después de éxito
-                            setTimeout(function() {
+                            setTimeout(function () {
                                 location.reload();
                             }, 2000);
 
@@ -495,6 +502,111 @@ $(document).ready(function () {
             }
         });
 
+    });
+
+    /* ===============================
+    VER DETALLE DE COTIZACIÓN
+    =============================== */
+    $(document).on('click', '.ver-detalle-cotizacion', function (e) {
+
+        var id_cotizacion = $(this).data('id');
+
+        if (!id_cotizacion) return;
+
+        abrircargando();
+
+        $.ajax({
+            type: 'POST',
+            url: carpeta + '/ajax-listar-detalle-cotizacion',
+            data: {
+                _token: _token,
+                id_cotizacion: id_cotizacion
+            },
+            success: function (data) {
+                cerrarcargando();
+                $('#modal-detalle-cotizacion-container').html(data);
+                $('#modal-detalle-cotizacion').niftyModal('show');
+            },
+            error: function () {
+                cerrarcargando();
+                modalBonito({
+                    tipo: 'error',
+                    icono: '❌',
+                    titulo: 'Error',
+                    mensaje: 'No se pudo cargar el detalle de la cotización.',
+                    ancho: '400px'
+                });
+            }
+        });
+    });
+
+    /* =================================
+    GESTIÓN DE ARCHIVOS (COTIZACIÓN)
+    ================================= */
+
+    /* =================================
+ GESTIÓN DE ARCHIVOS (COTIZACIÓN)
+ ================================= */
+    $(document).on('click', '.btn-subir-archivo', function (e) {
+        var id = $(this).data('id');
+        if (id) {
+            $('#file_' + id).click(); // Abre el específico de la fila
+        } else {
+            $('.input-file-general-cotizacion').click(); // Abre un selector general si no hay ID
+        }
+    });
+
+
+    $(document).on('change', '.input-file-cotizacion', function (e) {
+        var id_cotizacion = $(this).data('id');
+        var file = this.files[0];
+        if (!file) return;
+
+        if (file.type !== 'application/pdf') {
+            modalBonito({
+                tipo: 'error', icono: '⚠️', titulo: 'Formato inválido',
+                mensaje: 'Solo se permiten archivos PDF.', ancho: '400px'
+            });
+            $(this).val('');
+            return;
+        }
+
+        var formData = new FormData();
+        formData.append('archivo', file);
+        formData.append('id_cotizacion', id_cotizacion);
+        formData.append('_token', _token);
+
+        abrircargando();
+
+        $.ajax({
+            url: carpeta + '/ajax-subir-archivo-cotizacion',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (res) {
+                cerrarcargando();
+                if (res.ok) {
+                    modalBonito({
+                        tipo: 'success', icono: '✅', titulo: 'Éxito',
+                        mensaje: 'Archivo subido correctamente.', ancho: '400px'
+                    });
+                } else {
+                    modalBonito({
+                        tipo: 'error', icono: '❌', titulo: 'Error',
+                        mensaje: res.mensaje || 'No se pudo subir el archivo.', ancho: '400px'
+                    });
+                }
+            },
+            error: function () {
+                cerrarcargando();
+                modalBonito({
+                    tipo: 'error', icono: '❌', titulo: 'Error de Red',
+                    mensaje: 'Ocurrió un error al intentar subir el archivo.', ancho: '400px'
+                });
+            }
+        });
+        $(this).val('');
     });
 
 });
