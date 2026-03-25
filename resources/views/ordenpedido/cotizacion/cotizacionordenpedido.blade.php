@@ -18,6 +18,10 @@
 @section('section')
 
 <div class="be-content cotizacionordenpedidoprincipal">
+    <!-- VALORES OCULTOS -->
+    <input type="hidden" id="tipo_cambio_actual" value="{{ $valor_tipo_cambio }}">
+    <input type="hidden" id="token" value="{{ csrf_token() }}">
+
     <div class="main-content container-fluid">
         <div class="row">
             <div class="col-sm-12">
