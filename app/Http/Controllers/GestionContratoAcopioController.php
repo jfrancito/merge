@@ -50,7 +50,7 @@ use Hashids;
 use SplFileInfo;
 use Excel;
 
-class GestionContratoAcopioController  extends Controller
+class GestionContratoAcopioController extends Controller
 {
     use GeneralesTraits;
     use ContratoAcopioTraits;
@@ -75,7 +75,7 @@ class GestionContratoAcopioController  extends Controller
             try {
 
                 DB::beginTransaction();
-                $contratoanticipo        =   ContratoAnticipo::where('ID_DOCUMENTO','=',$iddocumento)->first();   
+                $contratoanticipo = ContratoAnticipo::where('ID_DOCUMENTO', '=', $iddocumento)->first();
                 $descripcion = $request['descripcionextorno'];
                 //ANULAR TODA LA OPERACION
                 ContratoAnticipo::where('ID_DOCUMENTO', $iddocumento)
@@ -99,49 +99,89 @@ class GestionContratoAcopioController  extends Controller
 
     }
 
-    public function actionAprobarAcopioCA($idopcion, $iddocumento,Request $request)
+    public function actionAprobarAcopioCA($idopcion, $iddocumento, Request $request)
     {
 
         /******************* validar url **********************/
-        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
-        if($validarurl <> 'true'){return $validarurl;}
+        $validarurl = $this->funciones->getUrl($idopcion, 'Modificar');
+        if ($validarurl <> 'true') {
+            return $validarurl;
+        }
         /******************************************************/
-        $idcab                  =   $iddocumento;
-        $iddocumento            =   $this->funciones->decodificarmaestrapre($iddocumento,'COAN');
-        View::share('titulo','Aprobar Contrato Acopio');
+        $idcab = $iddocumento;
+        $iddocumento = $this->funciones->decodificarmaestrapre($iddocumento, 'COAN');
+        View::share('titulo', 'Aprobar Contrato Acopio');
 
-        if($_POST)
-        {
-            try{    
+        if ($_POST) {
+            try {
                 DB::beginTransaction();
-                $contratoanticipo       =   ContratoAnticipo::where('ID_DOCUMENTO','=',$iddocumento)->first();
-                $descripcion            =   $request['descripcion'];
-                ContratoAnticipo::where('ID_DOCUMENTO',$contratoanticipo->ID_DOCUMENTO)
-                            ->update(
-                                [
-                                    'COD_ESTADO'=>'ETM0000000000005',
-                                    'TXT_ESTADO'=>'APROBADO',
-                                    'OBSERVACION'=>$descripcion,
-                                    'COD_USUARIO_CON_APRUEBA'=>Session::get('usuario')->id,
-                                    'TXT_USUARIO_CON_APRUEBA'=>Session::get('usuario')->nombre,
-                                    'FECHA_MOD'=>$this->fechaactual
-                                ]
-                            );
+                $contratoanticipo = ContratoAnticipo::where('ID_DOCUMENTO', '=', $iddocumento)->first();
+                $contratoanticipodet = ContratoAnticipoDetalle::where('ID_DOCUMENTO', '=', $iddocumento)->get();
+                $descripcion = $request['descripcion'];
+                ContratoAnticipo::where('ID_DOCUMENTO', $contratoanticipo->ID_DOCUMENTO)
+                    ->update(
+                        [
+                            'COD_ESTADO' => 'ETM0000000000005',
+                            'TXT_ESTADO' => 'APROBADO',
+                            'OBSERVACION' => $descripcion,
+                            'COD_USUARIO_CON_APRUEBA' => Session::get('usuario')->id,
+                            'TXT_USUARIO_CON_APRUEBA' => Session::get('usuario')->nombre,
+                            'FECHA_MOD' => $this->fechaactual
+                        ]
+                    );
+                // REPLICAR A sqlsrv_b y sqlsrv_r
+                $conexiones = ['sqlsrv_b', 'sqlsrv_r'];
+                foreach ($conexiones as $con) {
+                    $cabecera = $contratoanticipo->toArray();
+                    
+                    // Formatear fechas para SQL Server (YYYYMMDD o Y-m-d H:i:s)
+                    $cabecera['FECHA_CONTRATO'] = date('Ymd', strtotime($cabecera['FECHA_CONTRATO']));
+                    $cabecera['FECHA_COSECHA']  = date('Ymd', strtotime($cabecera['FECHA_COSECHA']));
+                    $cabecera['FECHA_CREA']     = date('Ymd H:i:s', strtotime($cabecera['FECHA_CREA']));
+                    
+                    $cabecera['COD_ESTADO'] = 'ETM0000000000005';
+                    $cabecera['TXT_ESTADO'] = 'APROBADO';
+                    $cabecera['OBSERVACION'] = $descripcion;
+                    $cabecera['COD_USUARIO_CON_APRUEBA'] = Session::get('usuario')->id;
+                    $cabecera['TXT_USUARIO_CON_APRUEBA'] = Session::get('usuario')->nombre;
+                    $cabecera['FECHA_MOD'] = $this->fechaactual;
+
+                    // Insertar o Actualizar Cabecera
+                    DB::connection($con)->table('CONTRATO_ANTICIPO')->updateOrInsert(
+                        ['ID_DOCUMENTO' => $iddocumento],
+                        $cabecera
+                    );
+
+                    // Detalles
+                    $detalles_arr = $contratoanticipodet->toArray();
+                    foreach ($detalles_arr as $det) {
+                        // Formatear fechas del detalle
+                        $det['FECHA']      = date('Ymd', strtotime($det['FECHA']));
+                        $det['FECHA_CREA'] = date('Ymd H:i:s', strtotime($det['FECHA_CREA']));
+                        if(isset($det['FECHA_MOD']) && $det['FECHA_MOD'] != ''){
+                            $det['FECHA_MOD'] = date('Ymd H:i:s', strtotime($det['FECHA_MOD']));
+                        }
+
+                        DB::connection($con)->table('CONTRATO_ANTICIPO_DETALLE')->updateOrInsert(
+                            ['ID_DOCUMENTO' => $iddocumento, 'ITEM' => $det['ITEM']],
+                            $det
+                        );
+                    }
+                }
 
                 DB::commit();
-                return Redirect::to('/gestion-de-aprobar-contrato-acopio/'.$idopcion)->with('bienhecho', 'Contrato Acopio : '.$contratoanticipo->ID_DOCUMENTO.' APROBADO CON EXITO');
-            }catch(\Exception $ex){
-                DB::rollback(); 
-                return Redirect::to('/gestion-de-aprobar-contrato-acopio/'.$idopcion)->with('errorbd', $ex.' Ocurrio un error inesperado');
+                return Redirect::to('/gestion-de-aprobar-contrato-acopio/' . $idopcion)->with('bienhecho', 'Contrato Acopio : ' . $contratoanticipo->ID_DOCUMENTO . ' APROBADO CON EXITO');
+            } catch (\Exception $ex) {
+                DB::rollback();
+                return Redirect::to('/gestion-de-aprobar-contrato-acopio/' . $idopcion)->with('errorbd', $ex . ' Ocurrio un error inesperado');
             }
-        }
-        else{
+        } else {
 
-            $contratoanticipo        =   ContratoAnticipo::where('ID_DOCUMENTO','=',$iddocumento)->first();
-            $contratoanticipodet     =   ContratoAnticipoDetalle::where('ID_DOCUMENTO','=',$iddocumento)->get();
+            $contratoanticipo = ContratoAnticipo::where('ID_DOCUMENTO', '=', $iddocumento)->first();
+            $contratoanticipodet = ContratoAnticipoDetalle::where('ID_DOCUMENTO', '=', $iddocumento)->get();
 
-            $archivospdf            =   Archivo::where('ID_DOCUMENTO','=',$iddocumento)->where('EXTENSION', 'like', '%'.'pdf'.'%')->where('ACTIVO','=','1')->get();
-            $ocultar                =   "";
+            $archivospdf = Archivo::where('ID_DOCUMENTO', '=', $iddocumento)->where('EXTENSION', 'like', '%' . 'pdf' . '%')->where('ACTIVO', '=', '1')->get();
+            $ocultar = "";
             // Construir el array de URLs
             $initialPreview = [];
             foreach ($archivospdf as $archivo) {
@@ -149,28 +189,30 @@ class GestionContratoAcopioController  extends Controller
             }
             $initialPreviewConfig = [];
             foreach ($archivospdf as $key => $archivo) {
-                $valor                = '';
-                if($key>0){
-                    $valor            = 'ocultar';
+                $valor = '';
+                if ($key > 0) {
+                    $valor = 'ocultar';
                 }
                 $initialPreviewConfig[] = [
-                    'type'          => "pdf",
-                    'caption'       => $archivo->NOMBRE_ARCHIVO,
-                    'downloadUrl'   => route('serve-fileac', ['file' => $archivo->NOMBRE_ARCHIVO]),
-                    'frameClass'    => $archivo->ID_DOCUMENTO.$archivo->DOCUMENTO_ITEM.' '.$valor //
+                    'type' => "pdf",
+                    'caption' => $archivo->NOMBRE_ARCHIVO,
+                    'downloadUrl' => route('serve-fileac', ['file' => $archivo->NOMBRE_ARCHIVO]),
+                    'frameClass' => $archivo->ID_DOCUMENTO . $archivo->DOCUMENTO_ITEM . ' ' . $valor //
                 ];
             }
 
-            return View::make('contratoacopio/aprobaracopiocc', 
-                            [
-                                'contratoanticipo'       =>  $contratoanticipo,
-                                'contratoanticipodet'       =>  $contratoanticipodet,
-                                'idopcion'              =>  $idopcion,
-                                'idcab'                 =>  $idcab,
-                                'iddocumento'           =>  $iddocumento,
-                                'initialPreview'        => json_encode($initialPreview),
-                                'initialPreviewConfig'  => json_encode($initialPreviewConfig),      
-                            ]);
+            return View::make(
+                'contratoacopio/aprobaracopiocc',
+                [
+                    'contratoanticipo' => $contratoanticipo,
+                    'contratoanticipodet' => $contratoanticipodet,
+                    'idopcion' => $idopcion,
+                    'idcab' => $idcab,
+                    'iddocumento' => $iddocumento,
+                    'initialPreview' => json_encode($initialPreview),
+                    'initialPreviewConfig' => json_encode($initialPreviewConfig),
+                ]
+            );
 
 
         }
@@ -193,13 +235,15 @@ class GestionContratoAcopioController  extends Controller
         }
         $lcontratoacopio = $this->pla_lista_contrato_acopio_acopio();
         $funcion = $this;
-        return View::make('contratoacopio/listacontratoacopioacopio',
+        return View::make(
+            'contratoacopio/listacontratoacopioacopio',
             [
                 'lcontratoacopio' => $lcontratoacopio,
                 'tab_id' => $tab_id,
                 'funcion' => $funcion,
                 'idopcion' => $idopcion,
-            ]);
+            ]
+        );
     }
 
 
@@ -207,58 +251,68 @@ class GestionContratoAcopioController  extends Controller
     public function actionListarContratoAcopio($idopcion)
     {
         /******************* validar url **********************/
-        $validarurl = $this->funciones->getUrl($idopcion,'Ver');
-        if($validarurl <> 'true'){return $validarurl;}
+        $validarurl = $this->funciones->getUrl($idopcion, 'Ver');
+        if ($validarurl <> 'true') {
+            return $validarurl;
+        }
         /******************************************************/
-        View::share('titulo','Lista Contrato Acopio');
-        $cod_empresa        =   Session::get('usuario')->usuarioosiris_id;
-        $lcontratoacopio    =   $this->pla_lista_contrato_acopio();
-        $funcion            =   $this;
+        View::share('titulo', 'Lista Contrato Acopio');
+        $cod_empresa = Session::get('usuario')->usuarioosiris_id;
+        $lcontratoacopio = $this->pla_lista_contrato_acopio();
+        $funcion = $this;
 
-        return View::make('contratoacopio/listacontratoacopio',
-                         [
-                            'funcion'               =>  $funcion,
-                            'idopcion'              =>  $idopcion,
-                            'lcontratoacopio'       =>  $lcontratoacopio,
-                         ]);
+        return View::make(
+            'contratoacopio/listacontratoacopio',
+            [
+                'funcion' => $funcion,
+                'idopcion' => $idopcion,
+                'lcontratoacopio' => $lcontratoacopio,
+            ]
+        );
     }
 
     public function actionListarGestionContratoAcopio($idopcion)
     {
         /******************* validar url **********************/
-        $validarurl = $this->funciones->getUrl($idopcion,'Ver');
-        if($validarurl <> 'true'){return $validarurl;}
+        $validarurl = $this->funciones->getUrl($idopcion, 'Ver');
+        if ($validarurl <> 'true') {
+            return $validarurl;
+        }
         /******************************************************/
-        View::share('titulo','Lista Contrato Acopio');
-        $cod_empresa        =   Session::get('usuario')->usuarioosiris_id;
-        $lcontratoacopio    =   $this->pla_lista_contrato_acopio_gestion();
-        $funcion            =   $this;
+        View::share('titulo', 'Lista Contrato Acopio');
+        $cod_empresa = Session::get('usuario')->usuarioosiris_id;
+        $lcontratoacopio = $this->pla_lista_contrato_acopio_gestion();
+        $funcion = $this;
 
-        return View::make('contratoacopio/listacontratoacopiogestion',
-                         [
-                            'funcion'               =>  $funcion,
-                            'idopcion'              =>  $idopcion,
-                            'lcontratoacopio'       =>  $lcontratoacopio,
-                         ]);
+        return View::make(
+            'contratoacopio/listacontratoacopiogestion',
+            [
+                'funcion' => $funcion,
+                'idopcion' => $idopcion,
+                'lcontratoacopio' => $lcontratoacopio,
+            ]
+        );
     }
 
 
-    public function actionGestionRevisarAcopioContrato($idopcion, $iddocumento,Request $request)
+    public function actionGestionRevisarAcopioContrato($idopcion, $iddocumento, Request $request)
     {
 
         /******************* validar url **********************/
-        $validarurl = $this->funciones->getUrl($idopcion,'Modificar');
-        if($validarurl <> 'true'){return $validarurl;}
+        $validarurl = $this->funciones->getUrl($idopcion, 'Modificar');
+        if ($validarurl <> 'true') {
+            return $validarurl;
+        }
         /******************************************************/
-        $idcab                  =   $iddocumento;
-        $iddocumento            =   $this->funciones->decodificarmaestrapre($iddocumento,'COAN');
-        View::share('titulo','Gestion Acopio Contrato');
+        $idcab = $iddocumento;
+        $iddocumento = $this->funciones->decodificarmaestrapre($iddocumento, 'COAN');
+        View::share('titulo', 'Gestion Acopio Contrato');
 
-        $contratoanticipo        =   ContratoAnticipo::where('ID_DOCUMENTO','=',$iddocumento)->first();
-        $contratoanticipodet     =   ContratoAnticipoDetalle::where('ID_DOCUMENTO','=',$iddocumento)->get();
+        $contratoanticipo = ContratoAnticipo::where('ID_DOCUMENTO', '=', $iddocumento)->first();
+        $contratoanticipodet = ContratoAnticipoDetalle::where('ID_DOCUMENTO', '=', $iddocumento)->get();
 
-        $archivospdf            =   Archivo::where('ID_DOCUMENTO','=',$iddocumento)->where('EXTENSION', 'like', '%'.'pdf'.'%')->where('ACTIVO','=','1')->get();
-        $ocultar                =   "";
+        $archivospdf = Archivo::where('ID_DOCUMENTO', '=', $iddocumento)->where('EXTENSION', 'like', '%' . 'pdf' . '%')->where('ACTIVO', '=', '1')->get();
+        $ocultar = "";
         // Construir el array de URLs
         $initialPreview = [];
         foreach ($archivospdf as $archivo) {
@@ -266,27 +320,29 @@ class GestionContratoAcopioController  extends Controller
         }
         $initialPreviewConfig = [];
         foreach ($archivospdf as $key => $archivo) {
-            $valor                = '';
-            if($key>0){
-                $valor            = 'ocultar';
+            $valor = '';
+            if ($key > 0) {
+                $valor = 'ocultar';
             }
             $initialPreviewConfig[] = [
-                'type'          => "pdf",
-                'caption'       => $archivo->NOMBRE_ARCHIVO,
-                'downloadUrl'   => route('serve-fileac', ['file' => $archivo->NOMBRE_ARCHIVO]),
-                'frameClass'    => $archivo->ID_DOCUMENTO.$archivo->DOCUMENTO_ITEM.' '.$valor //
+                'type' => "pdf",
+                'caption' => $archivo->NOMBRE_ARCHIVO,
+                'downloadUrl' => route('serve-fileac', ['file' => $archivo->NOMBRE_ARCHIVO]),
+                'frameClass' => $archivo->ID_DOCUMENTO . $archivo->DOCUMENTO_ITEM . ' ' . $valor //
             ];
         }
-        return View::make('contratoacopio/gestiondocumentocc', 
-                        [
-                            'contratoanticipo'      =>  $contratoanticipo,
-                            'contratoanticipodet'   =>  $contratoanticipodet,
-                            'idopcion'              =>  $idopcion,
-                            'idcab'                 =>  $idcab,
-                            'iddocumento'           =>  $iddocumento,
-                            'initialPreview'        => json_encode($initialPreview),
-                            'initialPreviewConfig'  => json_encode($initialPreviewConfig),      
-                        ]);
+        return View::make(
+            'contratoacopio/gestiondocumentocc',
+            [
+                'contratoanticipo' => $contratoanticipo,
+                'contratoanticipodet' => $contratoanticipodet,
+                'idopcion' => $idopcion,
+                'idcab' => $idcab,
+                'iddocumento' => $iddocumento,
+                'initialPreview' => json_encode($initialPreview),
+                'initialPreviewConfig' => json_encode($initialPreviewConfig),
+            ]
+        );
 
     }
 
@@ -302,12 +358,14 @@ class GestionContratoAcopioController  extends Controller
         $subcuenta_id = "";
         $combo_subcuenta = $this->lg_combo_subcuenta("Seleccione SubCuenta", $cuenta_id);
 
-        return View::make('general/ajax/combosubcuentaanti',
+        return View::make(
+            'general/ajax/combosubcuentaanti',
             [
                 'subcuenta_id' => $subcuenta_id,
                 'combo_subcuenta' => $combo_subcuenta,
                 'ajax' => true,
-            ]);
+            ]
+        );
 
     }
 
@@ -364,230 +422,253 @@ class GestionContratoAcopioController  extends Controller
         $combo_cuenta = $this->lg_combo_cuenta_lg_nuevo('Seleccione una Cuenta', '', '', $centro_id, $empresa->COD_EMPR);
 
 
-        return View::make('general/ajax/combocuentaanti',
+        return View::make(
+            'general/ajax/combocuentaanti',
             [
 
                 'cuenta_id' => $cuenta_id,
                 'combo_cuenta' => $combo_cuenta,
                 'ajax' => true,
-            ]);
+            ]
+        );
     }
 
 
-    public function actionAgregarContratoAcopio($idopcion,Request $request)
+    public function actionAgregarContratoAcopio($idopcion, Request $request)
     {
 
         /******************* validar url **********************/
-        $validarurl = $this->funciones->getUrl($idopcion,'Anadir');
-        if($validarurl <> 'true'){return $validarurl;}
+        $validarurl = $this->funciones->getUrl($idopcion, 'Anadir');
+        if ($validarurl <> 'true') {
+            return $validarurl;
+        }
         /******************************************************/
-        View::share('titulo','Agregar Contrato Acopio');
-        if($_POST)
-        {
-            try{    
+        View::share('titulo', 'Agregar Contrato Acopio');
+        if ($_POST) {
+            try {
                 DB::beginTransaction();
 
-                    $nro_contrato                        =   $request['nro_contrato'];
-                    $empresa_id                          =   $request['empresa_id'];
-                    $fecha_cosecha                       =   $request['fecha_cosecha'];
-                    $variedad_id                         =   $request['variedad_id'];
-                    $hectareas                           =   str_replace(',', '', $request['hectareas']);
-                    $total                               =   str_replace(',', '', $request['total']);
-                    $precio_referencia                   =   str_replace(',', '', $request['precio_referencia']);
-                    $proyeccion                          =   str_replace(',', '', $request['proyeccion']);
-                    $importe_habilitar                   =   str_replace(',', '', $request['importe_habilitar']);
-                    $cuenta_id                           =   $request['cuenta_id'];
-                    $subcuenta_id                        =   $request['subcuenta_id'];
+                $empresa_id = $request['empresa_id'];
+                $fecha_cosecha = $request['fecha_cosecha'];
+                $variedad_id = $request['variedad_id'];
+                $hectareas = str_replace(',', '', $request['hectareas']);
+                $total = str_replace(',', '', $request['total']);
+                $precio_referencia = str_replace(',', '', $request['precio_referencia']);
+                $proyeccion = str_replace(',', '', $request['proyeccion']);
+                $importe_habilitar = str_replace(',', '', $request['importe_habilitar']);
+                $cuenta_id = $request['cuenta_id'];
+                $subcuenta_id = $request['subcuenta_id'];
 
-                    $cuenta = CMPContrato::where('COD_CONTRATO', '=', $cuenta_id)->first();
-                    $subcuenta = CMPContratoCultivo::where('COD_CONTRATO', '=', $subcuenta_id)->first();
-                    $cod_contrato = $cuenta->COD_CONTRATO; // Ejemplo de contrato
-                    $cod_categoria_moneda = $cuenta->COD_CATEGORIA_MONEDA; // Ejemplo de moneda
-                    $txt_categoria_tipo_contrato = $cuenta->TXT_CATEGORIA_TIPO_CONTRATO; // Ejemplo de categoría
-                    // Obtener los primeros 6 caracteres
-                    $parte1 = substr($cod_contrato, 0, 6);
-                    // Obtener los últimos 10 caracteres y convertir a entero
-                    $parte2 = intval(substr($cod_contrato, -10));
-                    // Determinar el símbolo de la moneda
-                    $simbolo = ($cod_categoria_moneda === 'MON0000000000001') ? 'S/' : '$';
-                    // Concatenar todo
-                    $contrato = $parte1 . '-0' . $parte2 . ' -- ' . $simbolo . ' ' . $txt_categoria_tipo_contrato;
-                    //dd($empresa_id);
-                    $cadena = $empresa_id;
-                    $partes = explode(" - ", $cadena);
-                    $ruc = '';
-                    if (count($partes) > 1) {
-                        $ruc = trim($partes[0]);
+                $cuenta = CMPContrato::where('COD_CONTRATO', '=', $cuenta_id)->first();
+                $subcuenta = CMPContratoCultivo::where('COD_CONTRATO', '=', $subcuenta_id)->first();
+                $cod_contrato = $cuenta->COD_CONTRATO; // Ejemplo de contrato
+                $cod_categoria_moneda = $cuenta->COD_CATEGORIA_MONEDA; // Ejemplo de moneda
+                $txt_categoria_tipo_contrato = $cuenta->TXT_CATEGORIA_TIPO_CONTRATO; // Ejemplo de categoría
+                // Obtener los primeros 6 caracteres
+                $parte1 = substr($cod_contrato, 0, 6);
+                // Obtener los últimos 10 caracteres y convertir a entero
+                $parte2 = intval(substr($cod_contrato, -10));
+                // Determinar el símbolo de la moneda
+                $simbolo = ($cod_categoria_moneda === 'MON0000000000001') ? 'S/' : '$';
+                // Concatenar todo
+                $contrato = $parte1 . '-0' . $parte2 . ' -- ' . $simbolo . ' ' . $txt_categoria_tipo_contrato;
+                //dd($empresa_id);
+                $cadena = $empresa_id;
+                $partes = explode(" - ", $cadena);
+                $ruc = '';
+                if (count($partes) > 1) {
+                    $ruc = trim($partes[0]);
 
-                    }
-                    $empresa_trab = STDEmpresa::where('NRO_DOCUMENTO', '=', $ruc)->first();
-
-
-                    $trabajador = DB::table('STD.TRABAJADOR')
-                        ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
-                        ->first();
-                    $dni = '';
-                    $centro_id = '';
-                    if ($trabajador) {
-                        $dni = $trabajador->NRO_DOCUMENTO;
-                    }
-                    $trabajadorespla = DB::table('WEB.platrabajadores')
-                        ->where('situacion_id', 'PRMAECEN000000000002')
-                        ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
-                        ->where('dni', $dni)
-                        ->first();
+                }
+                $empresa_trab = STDEmpresa::where('NRO_DOCUMENTO', '=', $ruc)->first();
 
 
-                    if ($trabajadorespla) {
-                        $centro_id = $trabajadorespla->centro_osiris_id;
-                    }
-                    
-                    $centro = ALMCentro::where('COD_CENTRO', '=', $centro_id)->first();
+                $trabajador = DB::table('STD.TRABAJADOR')
+                    ->where('COD_TRAB', Session::get('usuario')->usuarioosiris_id)
+                    ->first();
+                $dni = '';
+                $centro_id = '';
+                if ($trabajador) {
+                    $dni = $trabajador->NRO_DOCUMENTO;
+                }
+                $trabajadorespla = DB::table('WEB.platrabajadores')
+                    ->where('situacion_id', 'PRMAECEN000000000002')
+                    ->where('empresa_osiris_id', Session::get('empresas')->COD_EMPR)
+                    ->where('dni', $dni)
+                    ->first();
 
 
-                    $variedad                           =   DB::table('CMP.CATEGORIA')
-                                                            ->where('COD_CATEGORIA', '=', $variedad_id)
-                                                            ->first();
+                if ($trabajadorespla) {
+                    $centro_id = $trabajadorespla->centro_osiris_id;
+                }
 
-                    $empresa                            =   STDEmpresa::where('COD_EMPR', '=', $empresa_id)->first();
-                    $idcab                              =   $this->funciones->getCreateIdMaestradocpla('CONTRATO_ANTICIPO','COAN');
+                $centro = ALMCentro::where('COD_CENTRO', '=', $centro_id)->first();
 
-                    $cabecera                           =   new ContratoAnticipo;
-                    $cabecera->ID_DOCUMENTO             =   $idcab;
-                    $cabecera->FECHA_CONTRATO           =   date_format(date_create($this->fechaactual), 'Ymd');
-                    $cabecera->COD_EMPRESA              =   Session::get('empresas')->COD_EMPR;
-                    $cabecera->TXT_EMPRESA              =   Session::get('empresas')->NOM_EMPR;
-                    $cabecera->COD_CENTRO               =   $centro->COD_CENTRO;
-                    $cabecera->TXT_CENTRO               =   $centro->NOM_CENTRO;
-                    $cabecera->NRO_CONTRATO             =   $nro_contrato;
-                    $cabecera->COD_VARIEDAD             =   $variedad->COD_CATEGORIA;
-                    $cabecera->TXT_VARIEDAD             =   $variedad->NOM_CATEGORIA;
-                    $cabecera->COD_PROVEEDOR            =   $empresa_trab->COD_EMPR;
-                    $cabecera->TXT_PROVEEDOR            =   $empresa_trab->NOM_EMPR;
-                    $cabecera->COD_CUENTA               =   $cuenta->COD_CONTRATO;
-                    $cabecera->TXT_CUENTA               =   $contrato;
-                    $cabecera->COD_SUB_CUENTA           =   $subcuenta->COD_CONTRATO;
-                    $cabecera->TXT_SUB_CUENTA           =   $subcuenta->TXT_ZONA_COMERCIAL . '-' . $subcuenta->TXT_ZONA_CULTIVO;
-                    $cabecera->FECHA_COSECHA            =   date_format(date_create($fecha_cosecha), 'Ymd');
-                    $cabecera->HECTAREAS                =   $hectareas;
-                    $cabecera->TOTAL_KG                 =   $total;
-                    $cabecera->PRECIO_REFERENCIA        =   $precio_referencia;
-                    $cabecera->PROYECCION               =   $proyeccion;
-                    $cabecera->IMPORTE_HABILITAR        =   $importe_habilitar;
-                    $cabecera->GLOSA                    =   $request['glosa'];
-                    $cabecera->COD_ESTADO               =   'ETM0000000000012';
-                    $cabecera->TXT_ESTADO               =   'POR APROBAR JEFE ACOPIO';
-                    $cabecera->ACTIVO                   =   1;
-                    $cabecera->FECHA_CREA               =   $this->fechaactual;
-                    $cabecera->USUARIO_CREA             =   Session::get('usuario')->id;
-                    $cabecera->save();
+                // GENERACION DE NRO_CONTRATO (IIRJ000001)
+                $empresa_actual = STDEmpresa::where('COD_EMPR', Session::get('empresas')->COD_EMPR)->first();
+                $prefix_emp = $empresa_actual ? substr($empresa_actual->TXT_ABREVIATURA, 0, 2) : '??';
+                $prefix_sed = $centro ? substr($centro->TXT_ABREVIATURA, 0, 2) : '??';
+                $prefijo = $prefix_emp . $prefix_sed;
 
-                    // GUARDAR DETALLE (PROYECCIÓN DE ANTICIPOS)
-                    if(isset($request['fecha_detalle'])){
-                        $fechas     = $request['fecha_detalle'];
-                        $terceros   = $request['tercero_id_detalle'];
-                        $importes   = $request['importe_detalle'];
+                $ultimo_contrato = ContratoAnticipo::where('NRO_CONTRATO', 'like', $prefijo . '%')
+                    ->orderBy('NRO_CONTRATO', 'desc')
+                    ->first();
+                $correlativo = 1;
+                if ($ultimo_contrato) {
+                    $ultimo_nro = $ultimo_contrato->NRO_CONTRATO;
+                    $ultimo_correlativo = intval(substr($ultimo_nro, 4));
+                    $correlativo = $ultimo_correlativo + 1;
+                }
+                $nro_contrato = $prefijo . str_pad($correlativo, 6, '0', STR_PAD_LEFT);
 
-                        foreach($fechas as $index => $fechaDte){
-                            $tercero_id = $terceros[$index];
-                            $importe    = str_replace(',', '', $importes[$index]);
+                $variedad = DB::table('ALM.PRODUCTO')
+                    ->where('COD_PRODUCTO', '=', $variedad_id)
+                    ->first();
 
-                            $cadena = $tercero_id;
-                            $partes = explode(" - ", $cadena);
-                            $ruc = '';
-                            if (count($partes) > 1) {
-                                $ruc = trim($partes[0]);
+                $empresa = STDEmpresa::where('COD_EMPR', '=', $empresa_id)->first();
+                $idcab = $this->funciones->getCreateIdMaestradocpla('CONTRATO_ANTICIPO', 'COAN');
 
-                            }
+                $cabecera = new ContratoAnticipo;
+                $cabecera->ID_DOCUMENTO = $idcab;
+                $cabecera->FECHA_CONTRATO = date_format(date_create($this->fechaactual), 'Ymd');
+                $cabecera->COD_EMPRESA = Session::get('empresas')->COD_EMPR;
+                $cabecera->TXT_EMPRESA = Session::get('empresas')->NOM_EMPR;
+                $cabecera->COD_CENTRO = $centro->COD_CENTRO;
+                $cabecera->TXT_CENTRO = $centro->NOM_CENTRO;
+                $cabecera->NRO_CONTRATO = $nro_contrato;
+                $cabecera->COD_VARIEDAD = $variedad->COD_PRODUCTO;
+                $cabecera->TXT_VARIEDAD = $variedad->NOM_PRODUCTO;
+                $cabecera->COD_PROVEEDOR = $empresa_trab->COD_EMPR;
+                $cabecera->TXT_PROVEEDOR = $empresa_trab->NOM_EMPR;
+                $cabecera->COD_CUENTA = $cuenta->COD_CONTRATO;
+                $cabecera->TXT_CUENTA = $contrato;
+                $cabecera->COD_SUB_CUENTA = $subcuenta->COD_CONTRATO;
+                $cabecera->TXT_SUB_CUENTA = $subcuenta->TXT_ZONA_COMERCIAL . '-' . $subcuenta->TXT_ZONA_CULTIVO;
+                $cabecera->FECHA_COSECHA = date_format(date_create($fecha_cosecha), 'Ymd');
+                $cabecera->HECTAREAS = $hectareas;
+                $cabecera->TOTAL_KG = $total;
+                $cabecera->PRECIO_REFERENCIA = $precio_referencia;
+                $cabecera->PROYECCION = $proyeccion;
+                $cabecera->IMPORTE_HABILITAR = $importe_habilitar;
+                $cabecera->GLOSA = $request['glosa'];
+                $cabecera->COD_ESTADO = 'ETM0000000000012';
+                $cabecera->TXT_ESTADO = 'POR APROBAR JEFE ACOPIO';
+                $cabecera->ACTIVO = 1;
+                $cabecera->FECHA_CREA = $this->fechaactual;
+                $cabecera->USUARIO_CREA = Session::get('usuario')->id;
+                $cabecera->save();
 
-                            $empresa_tercero = STDEmpresa::where('NRO_DOCUMENTO', '=', $ruc)->first();
-                            $detalle = new ContratoAnticipoDetalle;
-                            $detalle->ID_DOCUMENTO   = $idcab;
-                            $detalle->FECHA          = date_format(date_create($fechaDte), 'Ymd');
-                            $detalle->COD_PROVEEDOR  = $empresa_tercero ? $empresa_tercero->COD_EMPR : '';
-                            $detalle->TXT_PROVEEDOR  = $empresa_tercero ? $empresa_tercero->NOM_EMPR : '';
-                            $detalle->IMPORTE        = $importe;
-                            $detalle->ACTIVO         = 1;
-                            $detalle->FECHA_CREA     = $this->fechaactual;
-                            $detalle->USUARIO_CREA   = Session::get('usuario')->id;
-                            $detalle->save();
+                // GUARDAR DETALLE (PROYECCIÓN DE ANTICIPOS)
+                if (isset($request['fecha_detalle'])) {
+                    $fechas = $request['fecha_detalle'];
+                    $terceros = $request['tercero_id_detalle'];
+                    $importes = $request['importe_detalle'];
+
+                    foreach ($fechas as $index => $fechaDte) {
+                        $tercero_id = $terceros[$index];
+                        $importe = str_replace(',', '', $importes[$index]);
+
+                        $cadena = $tercero_id;
+                        $partes = explode(" - ", $cadena);
+                        $ruc = '';
+                        if (count($partes) > 1) {
+                            $ruc = trim($partes[0]);
 
                         }
+
+                        $empresa_tercero = STDEmpresa::where('NRO_DOCUMENTO', '=', $ruc)->first();
+                        $detalle = new ContratoAnticipoDetalle;
+                        $detalle->ID_DOCUMENTO = $idcab;
+                        $detalle->ITEM = $index + 1;
+                        $detalle->FECHA = date_format(date_create($fechaDte), 'Ymd');
+                        $detalle->COD_PROVEEDOR = $empresa_tercero ? $empresa_tercero->COD_EMPR : '';
+                        $detalle->TXT_PROVEEDOR = $empresa_tercero ? $empresa_tercero->NOM_EMPR : '';
+                        $detalle->IMPORTE = $importe;
+                        $detalle->COD_ESTADO = 'ETM0000000000001';
+                        $detalle->TXT_ESTADO = 'GENERADO';
+                        $detalle->ACTIVO = 1;
+                        $detalle->FECHA_CREA = $this->fechaactual;
+                        $detalle->USUARIO_CREA = Session::get('usuario')->id;
+                        $detalle->save();
+
                     }
+                }
 
-                    $tarchivos                          =   CMPCategoria::where('COD_CATEGORIA','=','DCC0000000000046')->where('COD_ESTADO','=',1)
-                                                            ->get();
+                $tarchivos = CMPCategoria::where('COD_CATEGORIA', '=', 'DCC0000000000046')->where('COD_ESTADO', '=', 1)
+                    ->get();
 
-                    foreach($tarchivos as $index => $item){
+                foreach ($tarchivos as $index => $item) {
 
-                        $filescdm          =   $request[$item->COD_CATEGORIA];
-                        if(!is_null($filescdm)){
-                            foreach($filescdm as $file){
+                    $filescdm = $request[$item->COD_CATEGORIA];
+                    if (!is_null($filescdm)) {
+                        foreach ($filescdm as $file) {
 
-                                $contadorArchivos = Archivo::count();
-                                $nombre           =      $idcab.'-'.$file->getClientOriginalName();
-                                $prefijocarperta =      'CONTRATOACOPIO';
-                                $rutafile        =      $this->pathFiles.'\\comprobantes\\'.$prefijocarperta;
-                                $nombrefilecdr   =      $contadorArchivos.'-'.$file->getClientOriginalName();
-                                $rutacompleta    =      $rutafile.'\\'.$nombrefilecdr;
+                            $contadorArchivos = Archivo::count();
+                            $nombre = $idcab . '-' . $file->getClientOriginalName();
+                            $prefijocarperta = 'CONTRATOACOPIO';
+                            $rutafile = $this->pathFiles . '\\comprobantes\\' . $prefijocarperta;
+                            $nombrefilecdr = $contadorArchivos . '-' . $file->getClientOriginalName();
+                            $rutacompleta = $rutafile . '\\' . $nombrefilecdr;
 
-                                if (!file_exists($rutafile)) {
-                                    mkdir($rutafile, 0777, true);
-                                }
-
-                                copy($file->getRealPath(),$rutacompleta);
-                                $path            =      $rutacompleta;
-
-                                $nombreoriginal                 =   $file->getClientOriginalName();
-                                $info                           =   new SplFileInfo($nombreoriginal);
-                                $extension                      =   $info->getExtension();
-
-                                $dcontrol                       =   new Archivo;
-                                $dcontrol->ID_DOCUMENTO         =   $idcab;
-                                $dcontrol->DOCUMENTO_ITEM       =   1;
-                                $dcontrol->TIPO_ARCHIVO         =   $item->COD_CATEGORIA;
-                                $dcontrol->NOMBRE_ARCHIVO       =   $nombrefilecdr;
-                                $dcontrol->DESCRIPCION_ARCHIVO  =   $item->NOM_CATEGORIA;
-                                $dcontrol->URL_ARCHIVO          =   $path;
-                                $dcontrol->SIZE                 =   filesize($file);
-                                $dcontrol->EXTENSION            =   $extension;
-                                $dcontrol->ACTIVO               =   1;
-                                $dcontrol->FECHA_CREA           =   $this->fechaactual;
-                                $dcontrol->USUARIO_CREA         =   Session::get('usuario')->id;
-                                $dcontrol->save();
+                            if (!file_exists($rutafile)) {
+                                mkdir($rutafile, 0777, true);
                             }
+
+                            copy($file->getRealPath(), $rutacompleta);
+                            $path = $rutacompleta;
+
+                            $nombreoriginal = $file->getClientOriginalName();
+                            $info = new SplFileInfo($nombreoriginal);
+                            $extension = $info->getExtension();
+
+                            $dcontrol = new Archivo;
+                            $dcontrol->ID_DOCUMENTO = $idcab;
+                            $dcontrol->DOCUMENTO_ITEM = 1;
+                            $dcontrol->TIPO_ARCHIVO = $item->COD_CATEGORIA;
+                            $dcontrol->NOMBRE_ARCHIVO = $nombrefilecdr;
+                            $dcontrol->DESCRIPCION_ARCHIVO = $item->NOM_CATEGORIA;
+                            $dcontrol->URL_ARCHIVO = $path;
+                            $dcontrol->SIZE = filesize($file);
+                            $dcontrol->EXTENSION = $extension;
+                            $dcontrol->ACTIVO = 1;
+                            $dcontrol->FECHA_CREA = $this->fechaactual;
+                            $dcontrol->USUARIO_CREA = Session::get('usuario')->id;
+                            $dcontrol->save();
                         }
                     }
+                }
 
-                $fedocumento       =      ContratoAnticipo::where('ID_DOCUMENTO','=',$idcab)->first();
+                $fedocumento = ContratoAnticipo::where('ID_DOCUMENTO', '=', $idcab)->first();
                 //geolocalizacion
-                $device_info       =   $request['device_info'];
-                $this->con_datos_de_la_pc($device_info,$fedocumento,'GUARDO CONTRATO ACOPIO');
+                $device_info = $request['device_info'];
+                $this->con_datos_de_la_pc($device_info, $fedocumento, 'GUARDO CONTRATO ACOPIO');
                 //geolocalización
-                      
+
 
                 DB::commit();
-            }catch(\Exception $ex){
-                DB::rollback(); 
-                return Redirect::to('agregar-contrato-acopio/'.$idopcion)->with('errorbd', 'Ocurrio un error inesperado: ' . $ex->getMessage());
+            } catch (\Exception $ex) {
+
+                DB::rollback();
+                //dd($ex);
+                return Redirect::to('agregar-contrato-acopio/' . $idopcion)->with('errorbd', 'Ocurrio un error inesperado: ' . $ex->getMessage());
             }
-                $iddocumento                            =   Hashids::encode(substr($idcab, -8));
-                return Redirect::to('gestion-de-contrato-acopio/'.$idopcion)->with('bienhecho', 'Contrato Acopio '.$idcab.' registrado con exito');
-        }else{
+            $iddocumento = Hashids::encode(substr($idcab, -8));
+            return Redirect::to('gestion-de-contrato-acopio/' . $idopcion)->with('bienhecho', 'Contrato Acopio ' . $idcab . ' registrado con exito');
+        } else {
 
-            $anio           =   $this->anio;
-            $mes            =   $this->mes;
-            $empresa_id     =   "";
-            $combo_empresa  =   array();
-            $cuenta_id      = "";
-            $combo_cuenta   = array();
-            $subcuenta_id   = "";
-            $combo_subcuenta= array();
+            $anio = $this->anio;
+            $mes = $this->mes;
+            $empresa_id = "";
+            $combo_empresa = array();
+            $cuenta_id = "";
+            $combo_cuenta = array();
+            $subcuenta_id = "";
+            $combo_subcuenta = array();
 
-            $variedad_id    = "";
+            $variedad_id = "";
             $combo_variedad = $this->gn_generacion_combo_variedad('VARIEDAD', 'Seleccione Variedad', '');
-            $tarchivos      =   CMPCategoria::where('COD_CATEGORIA','=','DCC0000000000046')->where('COD_ESTADO','=',1)
-                                ->get();
+            $tarchivos = CMPCategoria::where('COD_CATEGORIA', '=', 'DCC0000000000046')->where('COD_ESTADO', '=', 1)
+                ->get();
 
 
             $trabajador = DB::table('STD.TRABAJADOR')
@@ -608,25 +689,44 @@ class GestionContratoAcopioController  extends Controller
             if ($trabajadorespla) {
                 $centro_id = $trabajadorespla->centro_osiris_id;
             }
-            
+
             $centro = ALMCentro::where('COD_CENTRO', '=', $centro_id)->first();
 
 
-            return View::make('contratoacopio.agregarcontratoacopio',
-                             [
-                                'empresa_id' => $empresa_id,
-                                'combo_empresa' => $combo_empresa,
-                                'cuenta_id' => $cuenta_id,
-                                'combo_cuenta' => $combo_cuenta,
-                                'subcuenta_id' => $subcuenta_id,
-                                'combo_subcuenta' => $combo_subcuenta,
-                                'variedad_id' => $variedad_id,
-                                'combo_variedad' => $combo_variedad,
-                                'centro' => $centro,
-                                'tarchivos' => $tarchivos,
-                                'idopcion' => $idopcion
-                             ]);
-        }   
+            return View::make(
+                'contratoacopio.agregarcontratoacopio',
+                [
+                    'empresa_id' => $empresa_id,
+                    'combo_empresa' => $combo_empresa,
+                    'cuenta_id' => $cuenta_id,
+                    'combo_cuenta' => $combo_cuenta,
+                    'subcuenta_id' => $subcuenta_id,
+                    'combo_subcuenta' => $combo_subcuenta,
+                    'variedad_id' => $variedad_id,
+                    'combo_variedad' => $combo_variedad,
+                    'centro' => $centro,
+                    'tarchivos' => $tarchivos,
+                    'idopcion' => $idopcion
+                ]
+            );
+        }
+    }
+
+    public function actionDetalleContratoAcopio($nrocontrato)
+    {
+        $contrato = ContratoAnticipo::where('NRO_CONTRATO', '=', $nrocontrato)->first();
+        if (!$contrato) {
+            return "No se ha encontrado información para el contrato especificado: " . $nrocontrato;
+        }
+        $detalles = ContratoAnticipoDetalle::where('ID_DOCUMENTO', '=', $contrato->ID_DOCUMENTO)->where('ACTIVO', '=', 1)->get();
+
+        return View::make(
+            'contratoacopio/detallecontratoacopio',
+            [
+                'contrato' => $contrato,
+                'detalles' => $detalles,
+            ]
+        );
     }
 
 }

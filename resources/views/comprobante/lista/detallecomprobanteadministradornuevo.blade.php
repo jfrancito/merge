@@ -287,7 +287,7 @@
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                   <div class="panel panel-default panel-contrast">
                     <div class="panel-heading" style="background: #1d3a6d;color: #fff;">
-                      <div><h4>DETRACION DE LA FACTURACION : {{round($fedocumento->TOTAL_VENTA_ORIG,2)}} x 4% = {{$ordencompra_f->CAN_DETRACCION}}</h4></div>
+                      <!-- <div><h4>DETRACION DE LA FACTURACION : {{round($fedocumento->TOTAL_VENTA_ORIG,2)}} x 4% = {{$ordencompra_f->CAN_DETRACCION}}</h4></div> -->
                     </div>
                     <div class="panel-body panel-body-contrast">
                             <div class="row">
