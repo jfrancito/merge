@@ -392,6 +392,31 @@ $(document).ready(function () {
             return;
         }
 
+        var tipo_pago = $('#tipo_pago_id').val();
+        var moneda = $('#moneda_id').val();
+
+        if (!tipo_pago) {
+            modalBonito({
+                tipo: 'warn',
+                icono: '⚠️',
+                titulo: 'Dato Faltante',
+                mensaje: 'Debe seleccionar un tipo de pago.',
+                ancho: '400px'
+            });
+            return;
+        }
+
+        if (!moneda) {
+            modalBonito({
+                tipo: 'warn',
+                icono: '⚠️',
+                titulo: 'Dato Faltante',
+                mensaje: 'Debe seleccionar una moneda.',
+                ancho: '400px'
+            });
+            return;
+        }
+
         // 2. Recolectar datos de cabecera y detalle
         var detalles = [];
         $('.precio-producto').each(function () {

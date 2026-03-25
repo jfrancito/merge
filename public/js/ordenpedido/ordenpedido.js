@@ -1011,6 +1011,17 @@ $(document).ready(function () {
                     // Cambiar a la pestaña de registro
                     $('a[href="#crearpedido"]').tab('show');
 
+                    if(resp.archivo) {
+                        $('#formFile').removeAttr('required');
+                        $('#enlace_archivo_cargado')
+                            .attr('href', carpeta + '/descargar-archivo-informe/' + resp.archivo.URL_ARCHIVO)
+                            .text(resp.archivo.DESCRIPCION_ARCHIVO || resp.archivo.NOMBRE_ARCHIVO);
+                        $('#contenedor_archivo_cargado').fadeIn();
+                    } else {
+                        $('#formFile').prop('required', true);
+                        $('#contenedor_archivo_cargado').hide();
+                    }
+
                     modalBonito({
                         tipo: 'success',
                         icono: '✏️',
