@@ -17,6 +17,8 @@ Route::group(['middleware' => ['guestaw']], function () {
 
 });
 
+Route::any('/detalle-contrato-acopio/{nrocontrato}', 'GestionContratoAcopioController@actionDetalleContratoAcopio');
+
 Route::get('/traer-compras-sunat', 'SunatController@actionComprasSunat');
 
 
@@ -261,6 +263,8 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/gestion-de-aprobar-contrato-acopio/{idopcion}', 'GestionContratoAcopioController@actionAprobarContratoAcopio');
 	Route::any('/aprobar-contrato-acopio-acopio/{idopcion}/{idordencompra}', 'GestionContratoAcopioController@actionAprobarAcopioCA');
+
+Route::post('/modificar-archivo-pdf/{idopcion}/{linea}/{idoc_prefijo}/{idoc_encoded}', 'ModificarArchivoController@actionModificarArchivoPDF');
 	Route::any('/agregar-extorno-acopio-ca/{idopcion}/{idordencompra}', 'GestionContratoAcopioController@actionAgregarExtornoAcopioCA');
 
 	Route::any('/gestion-de-listar-contrato-acopio/{idopcion}', 'GestionContratoAcopioController@actionListarGestionContratoAcopio');

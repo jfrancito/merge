@@ -25,6 +25,7 @@ use App\Modelos\CMPDocumentoCtble;
 use App\Modelos\CMPReferecenciaAsoc;
 use App\Modelos\FeRefAsoc;
 use App\Modelos\ContratoAnticipo;
+use App\Modelos\ContratoAnticipoDetalle;
 
 
 
@@ -185,14 +186,26 @@ class GestionOCAcopioController extends Controller
             ->first();
 
         $contrato_anticipo = null;
+        $detalles_contrato = array();
+        $pagos_contrato = array();
         $fecha_entrega_c = '';
+        $peso_entrega_c = 0;
 
         if ($contrato_pago) {
             if ($contrato_pago->IND_CONTRATO == 'C') {
-                $contrato_anticipo = ContratoAnticipo::where('ID_DOCUMENTO', '=', $contrato_pago->ID_DOCUMENTO)->first();
+                $contrato_anticipo = ContratoAnticipo::where('ID_DOCUMENTO', '=', trim($contrato_pago->ID_DOCUMENTO))->first();
+                if ($contrato_anticipo) {
+                    $detalles_contrato = ContratoAnticipoDetalle::where('ID_DOCUMENTO', '=', trim($contrato_anticipo->ID_DOCUMENTO))
+                                            ->where('ACTIVO', '=', 1)
+                                            ->get();
+
+                    $doc_id = trim($contrato_anticipo->ID_DOCUMENTO);
+                    $pagos_contrato = DB::select("SELECT * FROM CONTRATO_PAGO WHERE ID_DOCUMENTO = ? OR ID_DOCUMENTO LIKE ?", [$doc_id, "%" . $doc_id . "%"]);
+                }
             } else {
                 if ($contrato_pago->IND_CONTRATO == 'F') {
                     $fecha_entrega_c = $contrato_pago->FECHA_ENTREGA;
+                    $peso_entrega_c = isset($contrato_pago->PESO_ENTREGA) ? $contrato_pago->PESO_ENTREGA : 0;
                 }
             }
         }
@@ -399,7 +412,10 @@ class GestionOCAcopioController extends Controller
                                 'idopcion'              =>  $idopcion,
                                 'idoc'                  =>  $idoc,
                                 'contrato_anticipo'     =>  $contrato_anticipo,
+                                'detalles_contrato'     =>  $detalles_contrato,
+                                'pagos_contrato'        =>  $pagos_contrato,
                                 'fecha_entrega_c'       =>  $fecha_entrega_c,
+                                'peso_entrega_c'        =>  $peso_entrega_c,
                             ]);
 
 

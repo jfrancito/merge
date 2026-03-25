@@ -5113,7 +5113,7 @@ class GestionUsuarioContactoController extends Controller
                                         ->orderBy('FECHA','DESC')
                                         ->get();
 
-            $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
+            $archivos               =   Archivo::where('ID_DOCUMENTO','=',$idoc)->where('activo','=','1')->where('DOCUMENTO_ITEM','=',$fedocumento->DOCUMENTO_ITEM)->get();
 
 
             //encontrar la orden de compra
