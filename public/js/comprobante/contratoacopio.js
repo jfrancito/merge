@@ -124,6 +124,25 @@
             return;
         }
 
+        // VALIDACIÓN: La fecha de la nueva cuota debe ser mayor a la última agregada
+        var ultima_fecha_str = '';
+        $('input[name="fecha_detalle[]"]').each(function() {
+            ultima_fecha_str = $(this).val();
+        });
+
+        if (ultima_fecha_str !== '') {
+            var parts_nueva = fecha.split('-');
+            var parts_ultima = ultima_fecha_str.split('-');
+            
+            // Crear objetos Date (dd-mm-yyyy)
+            var date_nueva = new Date(parts_nueva[2], parts_nueva[1] - 1, parts_nueva[0]);
+            var date_ultima = new Date(parts_ultima[2], parts_ultima[1] - 1, parts_ultima[0]);
+
+            if (date_nueva <= date_ultima) {
+                alerterrorajax('LA FECHA DE LA NUEVA CUOTA (' + fecha + ') DEBE SER MAYOR A LA FECHA DE LA CUOTA ANTERIOR (' + ultima_fecha_str + ').');
+                return;
+            }
+        }
         // VALIDACIÓN: La suma total de detalles no puede superar al importe a habilitar
         var total_actual_detalles = 0;
         $('.importe_detalle_val').each(function() {
@@ -183,6 +202,7 @@
     function validarImporteHabilitar() {
         var proyeccion = parseFloat($('#proyeccion').val().replace(/,/g, '')) || 0;
         var habilitar = parseFloat($('#importe_habilitar').val().replace(/,/g, '')) || 0;
+        var limite70 = proyeccion * 0.70;
 
         // Validar contra la suma de detalles ya agregados
         var total_detalles = 0;
@@ -196,9 +216,9 @@
             return;
         }
 
-        if (habilitar > (proyeccion + 0.01)) {
-            alerterrorajax('El "Importe a Habilitar" no puede ser mayor a la "Proyección" (S/ ' + proyeccion.toLocaleString('en-US', {minimumFractionDigits: 2}) + ').');
-            $('#importe_habilitar').val(proyeccion.toFixed(2)).trigger('input');
+        if (habilitar > (limite70 + 0.01)) {
+            alerterrorajax('El "Importe a Habilitar" no puede ser mayor al 70% de la "Proyección" (Máximo: S/ ' + limite70.toLocaleString('en-US', {minimumFractionDigits: 2}) + ').');
+            $('#importe_habilitar').val(limite70.toFixed(2)).trigger('input');
         }
     }
 
@@ -239,26 +259,7 @@
         });
     });
 
-    // Restringir Nro Contrato a solo alfanumérico (letras y números)
-    $('#nro_contrato').on('keypress', function(e) {
-        var regex = new RegExp("^[a-zA-Z0-9]+$");
-        var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
-        if (regex.test(str)) {
-            return true;
-        }
-        e.preventDefault();
-        return false;
-    });
-
-    // También limpiar en caso de pegar texto
-    $('#nro_contrato').on('blur', function() {
-        var val = $(this).val();
-        var clean = val.replace(/[^a-zA-Z0-9]/g, '');
-        if (val !== clean) {
-            $(this).val(clean);
-        }
-    });
-
+    // Nro Contrato ahora es autogenerado y de solo lectura
 });
 
 

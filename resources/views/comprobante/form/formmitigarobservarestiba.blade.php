@@ -25,7 +25,7 @@
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
       <div class="panel panel-default panel-contrast">
         <div class="panel-heading" style="background: #1d3a6d;color: #fff;">
-          <div><h4>DETRACION DE LA FACTURACION : {{$fedocumento->TOTAL_VENTA_ORIG}} x 4% = {{$fedocumento->TOTAL_VENTA_ORIG * 0.04}}</h4> </div>
+          <!-- <div><h4>DETRACION DE LA FACTURACION : {{$fedocumento->TOTAL_VENTA_ORIG}} x 4% = {{$fedocumento->TOTAL_VENTA_ORIG * 0.04}}</h4> </div> -->
           <div><h6>* Solo llenar para montos mayores a 401</h6> </div>
         </div>
         <div class="panel-body panel-body-contrast">

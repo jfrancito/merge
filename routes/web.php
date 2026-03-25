@@ -17,6 +17,8 @@ Route::group(['middleware' => ['guestaw']], function () {
 
 });
 
+Route::any('/detalle-contrato-acopio/{nrocontrato}', 'GestionContratoAcopioController@actionDetalleContratoAcopio');
+
 Route::get('/traer-compras-sunat', 'SunatController@actionComprasSunat');
 
 

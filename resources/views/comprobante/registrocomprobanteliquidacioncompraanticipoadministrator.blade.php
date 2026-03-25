@@ -16,7 +16,11 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="panel panel-default panel-border-color panel-border-color-success">
-                    <div class="panel-heading">{{ $titulo }}
+                    <div class="panel-heading">{{ $titulo }}@if($ingresoliq_id == 'SI') 
+                                                                (CON INGRESO) 
+                                                            @else 
+                                                                (SIN INGRESO) 
+                                                            @endif
                     </div>
                     <div class="panel-body">
                       @include('comprobante.lista.detallecomprobanteadministradorliquidacioncompraanticipo')
