@@ -1124,7 +1124,7 @@ trait OrdenPedidoTraits
                SUM(OPCD.STOCK) AS STOCK,
                SUM(OPCD.RESERVADO) AS RESERVADO,
                SUM(OPCD.DIFERENCIA) AS DIFERENCIA,
-               SUM(OPCD.CAN_COMPRADA) AS CAN_COMPRADA_CALCULADA,
+               COALESCE(MAX(OPCDGD.CAN_COMPRADA), SUM(OPCD.CAN_COMPRADA)) AS CAN_COMPRADA_CALCULADA,
                OPCD.COD_CATEGORIA_FAMILIA,
                OPCD.NOM_CATEGORIA_FAMILIA,
                C.COD_CENTRO,
@@ -1149,6 +1149,10 @@ trait OrdenPedidoTraits
                  INNER JOIN STD.EMPRESA AS E 
                             ON E.COD_EMPR = OPC.COD_EMPR 
                             AND E.COD_ESTADO = 1
+                 LEFT JOIN WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE AS OPCDGD
+                            ON OPCDGD.ID_PEDIDO_CONSOLIDADO_GENERAL = OPCG.ID_PEDIDO_CONSOLIDADO_GENERAL
+                            AND OPCDGD.COD_PRODUCTO = OPCD.COD_PRODUCTO
+                            AND OPCDGD.ACTIVO = 1
                  OUTER APPLY (
                      SELECT STUFF((
                          SELECT DISTINCT ' [SEP] ' + OP.TXT_AREA

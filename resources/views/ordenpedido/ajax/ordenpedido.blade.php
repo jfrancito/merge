@@ -50,6 +50,7 @@
      
      <script>
         var registrosMonto = {!! json_encode($registrosMonto, JSON_UNESCAPED_UNICODE) !!};
+        var registrosPeriodos = {!! json_encode($registrosPeriodos, JSON_UNESCAPED_UNICODE) !!};
         
     </script>
 

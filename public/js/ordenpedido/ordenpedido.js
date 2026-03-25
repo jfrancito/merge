@@ -15,7 +15,13 @@ $(document).ready(function () {
     // Activar pestaña por hash en la URL
     var hash = window.location.hash;
     if (hash) {
-        $('.nav-tabs a[href="' + hash + '"]').tab('show');
+        if (hash === "#consoldadogeneralterminado") {
+            $('.nav-tabs a[href="#consoldadogeneral"]').tab('show');
+        } else if (hash === "#ordenpedidoconsolidadoterminado") {
+            $('.nav-tabs a[href="#ordenpedidoconsolidado"]').tab('show');
+        } else {
+            $('.nav-tabs a[href="' + hash + '"]').tab('show');
+        }
     }
 
     /* ===============================
@@ -253,7 +259,7 @@ $(document).ready(function () {
                 cod_categoria: tds.eq(8).text().trim(),
                 nom_categoria: tds.eq(3).text().trim(),
                 cantidad: parseInt(tds.eq(4).text().trim()) || 0,
-                precio: parseFloat(tds.eq(5).text().trim()) || 0,
+                precio: (tds.eq(5).find('input').length > 0) ? (parseFloat(tds.eq(5).find('input').val()) || 0) : (parseFloat(tds.eq(5).text().trim()) || 0),
                 txt_observacion: tds.eq(7).text().trim(),
                 opcion_detalle: 'I',
                 detalle_id: null
@@ -564,6 +570,40 @@ $(document).ready(function () {
         }
     });
 
+    /* ===============================
+       CARGAR TIPO SEGÚN MES
+       =============================== */
+    $(document).on('change', '#cod_periodo', function () {
+        
+        let codPeriodo = $(this).val();
+        let tipoPedidoSelect = $('#cod_tipo_pedido');
+
+        if (!codPeriodo) {
+            tipoPedidoSelect.val('').trigger('change');
+            return;
+        }
+
+        // Obtener mes del periodo seleccionado
+        let periodo = registrosPeriodos.find(p => p.COD_PERIODO === codPeriodo);
+        
+        if (periodo) {
+
+            let mesPeriodo = parseInt(periodo.mes);
+            let mesActual = new Date().getMonth() + 1; // Enero es 0 en JS
+            let codTipo = '';
+
+            if (mesActual < mesPeriodo) {
+                codTipo = 'TOP0000000000002'; // PROGRAMADO
+            } else {
+                codTipo = 'TOP0000000000003'; // NO PROGRAMADO
+            }
+
+            tipoPedidoSelect.val(codTipo).trigger('change');
+            
+            console.log('Tipo de pedido asignado:', codTipo, 'Mes Periodo:', mesPeriodo, 'Mes Actual:', mesActual);
+        }
+    });
+
     $(document).on('change', '#cod_centro', function () {
         let cod_centro = $(this).val();
         let cod_empr = $('#cod_empr').val();
@@ -633,14 +673,18 @@ $(document).ready(function () {
             return;
         }
 
+        let isServicio = option.data('indmaterialservicio') === 'S';
+
         if (!precio || precio <= 0) {
-            modalBonito({
-                tipo: 'warn',
-                icono: '⚠',
-                titulo: 'Precio no configurado',
-                mensaje: nom_producto + ' - coordinar con el área de compras el precio del producto.'
-            });
-            return;
+            if (!isServicio) {
+                modalBonito({
+                    tipo: 'warn',
+                    icono: '⚠',
+                    titulo: 'Precio no configurado',
+                    mensaje: nom_producto + ' - coordinar con el área de compras el precio del producto.'
+                });
+                return;
+            }
         }
 
         let existe = false;
@@ -662,13 +706,27 @@ $(document).ready(function () {
         }
 
         filaCount++;
+
+        let precioHtml = '';
+        if (isServicio) {
+            precioHtml = `<input type="number" 
+                                 class="form-control input-sm text-right edit-precio-pedido" 
+                                 value="${precio.toFixed(2)}" 
+                                 step="0.01" 
+                                 min="0"
+                                 data-cantidad="${cantidad}"
+                                 style="width: 100px; display: inline-block;">`;
+        } else {
+            precioHtml = precio.toFixed(2);
+        }
+
         let fila = `<tr data-id="${cod_producto}">
             <td class="text-center">${filaCount}</td>
             <td class="text-center">${cod_producto}</td>
             <td>${nom_producto}</td>
             <td class="text-center">${nom_categoria}</td>
             <td class="text-center">${cantidad}</td>
-            <td class="text-center">${precio.toFixed(2)}</td>
+            <td class="text-center col-precio">${precioHtml}</td>
             <td class="text-center subtotal">${subtotal.toFixed(2)}</td>
             <td>${txt_observacion}</td>
             <td style="display:none">${cod_categoria}</td>
@@ -767,6 +825,16 @@ $(document).ready(function () {
             }
         }
     }
+
+    $(document).on('keyup change', '.edit-precio-pedido', function () {
+        let input = $(this);
+        let tr = input.closest('tr');
+        let precio = parseFloat(input.val()) || 0;
+        let cantidad = parseFloat(input.data('cantidad')) || 0;
+        let subtotal = precio * cantidad;
+        tr.find('.subtotal').text(subtotal.toFixed(2));
+        calcularTotalPedido();
+    });
 
     /* $('#cod_anio').on('change', function () {
 
@@ -3029,6 +3097,47 @@ $(document).ready(function () {
                             modalBonito({ tipo: 'success', icono: '✅', titulo: 'Eliminado', mensaje: resp.mensaje });
                             setTimeout(function () {
                                 window.location.href = window.location.pathname + window.location.search + "#consoldadogeneralterminado";
+                                location.reload();
+                            }, 1500);
+                        } else {
+                            modalBonito({ tipo: 'error', icono: '❌', titulo: 'Error', mensaje: resp.mensaje });
+                        }
+                    },
+                    error: function (xhr) {
+                        cerrarcargando();
+                        modalBonito({ tipo: 'error', icono: '❌', titulo: 'Error', mensaje: 'Ocurrió un error al intentar eliminar el consolidado.' });
+                    }
+                });
+            }
+        });
+    });
+    $(document).on('click', '#btn-eliminar-consolidado-sede', function (e) {
+        let id_consolidado = $(this).data('id');
+        let _token = $('#token').val() || $('meta[name="csrf-token"]').attr('content');
+
+        if (!id_consolidado) {
+            modalBonito({ tipo: 'error', titulo: 'Error', mensaje: 'No se pudo identificar el consolidado.' });
+            return;
+        }
+
+        modalBonito({
+            tipo: 'info',
+            icono: '🗑️',
+            titulo: 'Eliminar consolidado',
+            mensaje: '¿Está seguro de eliminar el consolidado de sede?',
+            confirmar: true,
+            onConfirm: function () {
+                abrircargando();
+                $.ajax({
+                    type: "POST",
+                    url: carpeta + "/ajax-eliminar-consolidado-op",
+                    data: { _token: _token, id_consolidado: id_consolidado },
+                    success: function (resp) {
+                        cerrarcargando();
+                        if (resp.success) {
+                            modalBonito({ tipo: 'success', icono: '✅', titulo: 'Eliminado', mensaje: resp.mensaje });
+                            setTimeout(function () {
+                                window.location.href = window.location.pathname + window.location.search + "#ordenpedidoconsolidadoterminado";
                                 location.reload();
                             }, 1500);
                         } else {

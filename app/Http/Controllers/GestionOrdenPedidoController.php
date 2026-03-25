@@ -180,17 +180,12 @@ class GestionOrdenPedidoController extends Controller
             ->pluck('TXT_NOMBRE', 'COD_PERIODO')
             ->toArray();
 
-        $mesPeriodo = DB::table('Web.periodos')
-	    ->where('activo', 1)
-	    ->where('COD_EMPR', $empresa)
-	    ->value('mes');
+        $registrosPeriodos = DB::table('Web.periodos')
+            ->where('activo', 1)
+            ->where('COD_EMPR', $empresa)
+            ->get(['COD_PERIODO', 'mes']);
 
-	    $mesActual = date('n'); 
-	    if ($mesActual < $mesPeriodo) {
-		    $tipFecoOrden = 'TOP0000000000002';   
-		} else {
-		    $tipFecoOrden = 'TOP0000000000003';
-		}
+        $tipFecoOrden = '';
 
         $combo9 = array('' => 'Seleccione Mes') + $periodo_mes;
 
@@ -274,6 +269,7 @@ class GestionOrdenPedidoController extends Controller
             'nomArea' => $nomArea,
             'area_id' => $area_id,
             'registrosMonto' => $registrosMonto,
+            'registrosPeriodos' => $registrosPeriodos,
             'ajax' => true,
         ]);
     }
@@ -362,10 +358,15 @@ class GestionOrdenPedidoController extends Controller
 
             $nombre_guardado = time() . '_' . $nombre_original;
 
-            $ruta = 'uploads/orden_pedido/' . $nombre_guardado;
+            $destino_remoto = '\\\\10.1.50.2\\comprobantes\\ORDENPEDIDO';
+            $ruta = $destino_remoto . '\\' . $nombre_guardado;
 
-            // mover archivo
-            $archivo->move(public_path('uploads/orden_pedido'), $nombre_guardado);
+            // Al ser una ruta de red UNC, copy() es más fiable que move() (rename)
+            if(!copy($archivo->getRealPath(), $ruta)){
+                 // Si falla la copia directa, lanzamos error específico
+                 throw new \Symfony\Component\HttpFoundation\File\Exception\FileException("No se pudo escribir en el directorio de red: " . $destino_remoto);
+            }
+
 
         }
 

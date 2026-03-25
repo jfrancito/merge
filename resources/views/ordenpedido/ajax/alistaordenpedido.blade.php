@@ -61,7 +61,7 @@
                                         <i class="fa fa-eye me-1"></i> Detalle
                                     </button>
 
-                                    @if($item['URL_ARCHIVO'] != '' && file_exists(public_path($item['URL_ARCHIVO'])))
+                                    @if($item['URL_ARCHIVO'] != '' && (strpos($item['URL_ARCHIVO'], '\\\\') === 0 ? file_exists($item['URL_ARCHIVO']) : file_exists(public_path($item['URL_ARCHIVO']))))
                                         <a href="{{ url('descargar-archivo-informe/'.$item['URL_ARCHIVO']) }}"
                                            class="btn btn-xs btn-success"
                                            title="Descargar archivo">

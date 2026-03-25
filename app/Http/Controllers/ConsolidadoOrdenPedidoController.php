@@ -437,6 +437,59 @@ class ConsolidadoOrdenPedidoController extends Controller
         }
     }
 
+    public function actionAjaxEliminarConsolidado(Request $request)
+    {
+        $id_consolidado = $request->input('id_consolidado');
+
+        try {
+            DB::beginTransaction();
+
+            // 1. Obtener IDs de pedidos asociados antes de borrar la referencia
+            $pedidos_ids = DB::table('CMP.REFERENCIA_ASOC')
+                ->where('COD_TABLA_ASOC', $id_consolidado)
+                ->where('TXT_TABLA_ASOC', 'WEB.ORDEN_PEDIDO_CONSOLIDADO')
+                ->pluck('COD_TABLA')
+                ->toArray();
+
+            // 2. Regresar a NULL la columna CONSOLIDADO en WEB.ORDEN_PEDIDO
+            if (!empty($pedidos_ids)) {
+                DB::table('WEB.ORDEN_PEDIDO')
+                    ->whereIn('ID_PEDIDO', $pedidos_ids)
+                    ->update(['CONSOLIDADO' => null]);
+            }
+
+            // 3. Eliminar detalle del consolidado
+            DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_DETALLE')
+                ->where('ID_PEDIDO_CONSOLIDADO', $id_consolidado)
+                ->delete();
+
+            // 4. Eliminar cabecera del consolidado
+            DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO')
+                ->where('ID_PEDIDO_CONSOLIDADO', $id_consolidado)
+                ->delete();
+
+            // 5. Eliminar asociaciones en CMP.REFERENCIA_ASOC
+            DB::table('CMP.REFERENCIA_ASOC')
+                ->where('COD_TABLA_ASOC', $id_consolidado)
+                ->where('TXT_TABLA_ASOC', 'WEB.ORDEN_PEDIDO_CONSOLIDADO')
+                ->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'mensaje' => 'Consolidado de sede eliminado correctamente.'
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'success' => false,
+                'mensaje' => 'Error al eliminar el consolidado: ' . $e->getMessage()
+            ]);
+        }
+    }
+
     public function actionAjaxBuscarConsolidadoGenerado(Request $request)
     {
         $empresa_id = $request['empresa_id'];
