@@ -19,6 +19,9 @@
                   <td>{{$index + 1}}</td>
                   <td>{{$item->DESCRIPCION_ARCHIVO}}</td>
                   <td>{{$item->NOMBRE_ARCHIVO}}</td>
+                  @php 
+                    $es_pdf = str_contains(strtolower($item->NOMBRE_ARCHIVO), 'pdf');
+                  @endphp
 
                   <td class="rigth">
                     <div class="btn-group btn-hspace">
@@ -30,11 +33,23 @@
                           </a>  
                         </li>
 
-                        @if(Session::get('usuario')->id == '1CIX00000001' or Session::get('usuario')->rol_id == '1CIX00000016' or Session::get('usuario')->rol_id == '1CIX00000015')
+                        @if($es_pdf)
+                          @if(Session::get('usuario')->id == '1CIX00000001' or Session::get('usuario')->rol_id == '1CIX00000016' or Session::get('usuario')->rol_id == '1CIX00000015')
+                            <li>
+                              <a class="elimnaritem" href="{{ url('/eliminar-archivo-item/'.$item->TIPO_ARCHIVO.'/'.$item->NOMBRE_ARCHIVO.'/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}">
+                                Eliminar Item
+                              </a>
+                            </li>
+                          @endif
+                        @endif
+
+                        @if($es_pdf)
                           <li>
-                            <a class="elimnaritem" href="{{ url('/eliminar-archivo-item/'.$item->TIPO_ARCHIVO.'/'.$item->NOMBRE_ARCHIVO.'/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}">
-                              Eliminar Item
-                            </a>
+                              <a href="#" class="modificar-pdf" 
+                                 data-tipo="{{$item->TIPO_ARCHIVO}}" 
+                                 data-nombre="{{$item->DESCRIPCION_ARCHIVO}}">
+                                Modificar
+                              </a>
                           </li>
                         @endif
                         
