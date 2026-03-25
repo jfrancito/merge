@@ -62,6 +62,9 @@
           </thead>
           <tbody>
               @foreach($archivos as $index => $item)  
+                @php 
+                  $es_pdf = str_contains(strtolower($item->NOMBRE_ARCHIVO), 'pdf');
+                @endphp
                 <tr>
                   <td>{{$index + 1}}</td>
                   <td>{{$item->DESCRIPCION_ARCHIVO}}</td>
@@ -76,6 +79,25 @@
                             Descargar
                           </a>  
                         </li>
+
+                          @if($es_pdf)
+                            <li>
+                              <a class="elimnaritem" href="{{ url('/eliminar-archivo-item/'.$item->TIPO_ARCHIVO.'/'.$item->NOMBRE_ARCHIVO.'/'.$idopcion.'/'.$linea.'/'.substr($ordencompra->COD_ORDEN, 0,6).'/'.Hashids::encode(substr($ordencompra->COD_ORDEN, -10))) }}">
+                                Eliminar Item
+                              </a>
+                            </li>
+                          @endif
+
+                          @if($es_pdf)
+                            <li>
+                                <a href="#" class="modificar-pdf" 
+                                   data-tipo="{{$item->TIPO_ARCHIVO}}" 
+                                   data-nombre="{{$item->DESCRIPCION_ARCHIVO}}">
+                                  Modificar
+                                </a>
+                            </li>
+                          @endif
+
                       </ul>
                     </div>
                   </td>

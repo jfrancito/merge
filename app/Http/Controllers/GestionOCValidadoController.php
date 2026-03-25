@@ -269,9 +269,9 @@ class GestionOCValidadoController extends Controller
         $device_info       =   $request['device_info'];
         $this->con_datos_de_la_pc($device_info,$fedocumento,'ELIMINO ITEM '.$archivo->DESCRIPCION_ARCHIVO);
         //geolocalización
+        return Redirect::back()->with('bienhecho', 'Item : '.$archivo->DESCRIPCION_ARCHIVO.' Elimino CON EXITO');
 
-
-        return Redirect::to('aprobar-comprobante-contabilidad/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('bienhecho', 'Item : '.$archivo->DESCRIPCION_ARCHIVO.' Elimino CON EXITO');;
+        //return Redirect::to('aprobar-comprobante-contabilidad/'.$idopcion.'/'.$linea.'/'.$prefijo.'/'.$idordencompra)->with('bienhecho', 'Item : '.$archivo->DESCRIPCION_ARCHIVO.' Elimino CON EXITO');;
 
     }
 
