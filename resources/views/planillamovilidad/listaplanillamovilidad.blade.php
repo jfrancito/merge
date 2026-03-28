@@ -25,11 +25,11 @@
               </a>
 
 
-              <a href="{{ url('/subir-firma/' . $idopcion) }}" class="btn btn-secondary botoncabecera tooltipcss opciones"
+<!--               <a href="{{ url('/subir-firma/' . $idopcion) }}" class="btn btn-secondary botoncabecera tooltipcss opciones"
                 style="width:140px;">
                 <span class="tooltiptext">Subir Firma</span>
                 Subir Firma
-              </a>
+              </a> -->
 
               <a href="{{ url('/tutorial/planillaovilidad_03.mp4') }}"
                 class="btn btn-secondary botoncabecera tooltipcss opciones" style="width:140px;" Target="_blank">
@@ -87,12 +87,12 @@
 
             <div class="row">
 
-              <div role="alert" class="alert alert-primary alert-icon alert-icon-colored alert-dismissible">
+<!--               <div role="alert" class="alert alert-primary alert-icon alert-icon-colored alert-dismissible">
                 <div class="icon"><span class="mdi mdi-info-outline"></span></div>
                 <div class="message">
                   <strong> {{$mensaje_firma}} </strong>
                 </div>
-              </div>
+              </div> -->
 
             </div>
             <div class="col-xs-12">

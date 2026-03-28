@@ -5050,22 +5050,63 @@ class GestionLiquidacionGastosController extends Controller
                 } else {
                     if ($tipodoc_id == 'TDO0000000000070') {
 
-                        $rutacompleta = $request['rutacompleta'];
-                        $nombrearchivo = $request['nombrearchivo'];
-                        $nombrefilecdr = $nombrearchivo;
-                        $dcontrol = new Archivo;
-                        $dcontrol->ID_DOCUMENTO = $iddocumento;
-                        $dcontrol->DOCUMENTO_ITEM = $item;
-                        $dcontrol->TIPO_ARCHIVO = 'DCC0000000000036';
-                        $dcontrol->NOMBRE_ARCHIVO = $nombrefilecdr;
-                        $dcontrol->DESCRIPCION_ARCHIVO = 'COMPROBANTE ELECTRONICO';
-                        $dcontrol->URL_ARCHIVO = $rutacompleta;
-                        $dcontrol->SIZE = 100;
-                        $dcontrol->EXTENSION = 'pdf';
-                        $dcontrol->ACTIVO = 1;
-                        $dcontrol->FECHA_CREA = $this->fechaactual;
-                        $dcontrol->USUARIO_CREA = Session::get('usuario')->id;
-                        $dcontrol->save();
+                        $tarchivos = CMPCategoria::where('TXT_GRUPO', '=', 'DOCUMENTOS_COMPRA')
+                            ->whereIn('COD_CATEGORIA', ['DCC0000000000036'])->get();
+                        foreach ($tarchivos as $index => $itema) {
+                            $filescdm = $request[$itema->COD_CATEGORIA];
+                            if (!is_null($filescdm)) {
+                                //CDR
+                                foreach ($filescdm as $file) {
+                                    //
+                                    $contadorArchivos = Archivo::count();
+
+                                    /****************************************  COPIAR EL XML EN LA CARPETA COMPARTIDA  *********************************/
+                                    $prefijocarperta = $this->prefijo_empresa(Session::get('empresas')->COD_EMPR);
+                                    $rutafile = $this->pathFiles . '\\comprobantes\\' . $prefijocarperta . '\\' . $iddocumento;
+                                    $nombrefilecdr = $contadorArchivos . '-' . $file->getClientOriginalName();
+                                    $valor = $this->versicarpetanoexiste($rutafile);
+                                    $rutacompleta = $rutafile . '\\' . $nombrefilecdr;
+                                    copy($file->getRealPath(), $rutacompleta);
+                                    $path = $rutacompleta;
+                                    $nombreoriginal = $file->getClientOriginalName();
+                                    $info = new SplFileInfo($nombreoriginal);
+                                    $extension = $info->getExtension();
+                                    $dcontrol = new Archivo;
+                                    $dcontrol->ID_DOCUMENTO = $iddocumento;
+                                    $dcontrol->DOCUMENTO_ITEM = $item;
+                                    $dcontrol->TIPO_ARCHIVO = $itema->COD_CATEGORIA;
+                                    $dcontrol->NOMBRE_ARCHIVO = $nombrefilecdr;
+                                    $dcontrol->DESCRIPCION_ARCHIVO = $itema->NOM_CATEGORIA;
+                                    $dcontrol->URL_ARCHIVO = $path;
+                                    $dcontrol->SIZE = filesize($file);
+                                    $dcontrol->EXTENSION = $extension;
+                                    $dcontrol->ACTIVO = 1;
+                                    $dcontrol->FECHA_CREA = $this->fechaactual;
+                                    $dcontrol->USUARIO_CREA = Session::get('usuario')->id;
+                                    $dcontrol->save();
+                                }
+                            }
+                        }
+
+
+
+
+                        // $rutacompleta = $request['rutacompleta'];
+                        // $nombrearchivo = $request['nombrearchivo'];
+                        // $nombrefilecdr = $nombrearchivo;
+                        // $dcontrol = new Archivo;
+                        // $dcontrol->ID_DOCUMENTO = $iddocumento;
+                        // $dcontrol->DOCUMENTO_ITEM = $item;
+                        // $dcontrol->TIPO_ARCHIVO = 'DCC0000000000036';
+                        // $dcontrol->NOMBRE_ARCHIVO = $nombrefilecdr;
+                        // $dcontrol->DESCRIPCION_ARCHIVO = 'COMPROBANTE ELECTRONICO';
+                        // $dcontrol->URL_ARCHIVO = $rutacompleta;
+                        // $dcontrol->SIZE = 100;
+                        // $dcontrol->EXTENSION = 'pdf';
+                        // $dcontrol->ACTIVO = 1;
+                        // $dcontrol->FECHA_CREA = $this->fechaactual;
+                        // $dcontrol->USUARIO_CREA = Session::get('usuario')->id;
+                        // $dcontrol->save();
 
                     } else {
 

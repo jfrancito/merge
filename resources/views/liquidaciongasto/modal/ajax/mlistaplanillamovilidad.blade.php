@@ -20,6 +20,7 @@
                       	<th>TRABAJADOR</th>
                       	<th>FECHA_EMI</th>
                       	<th>TOTAL</th>
+                      	<th>PDF</th>
                       	<th>SEL</th>
                       </tr>
                     </thead>
@@ -32,6 +33,13 @@
 												<td>{{$item->TXT_TRABAJADOR}}</td>
 												<td>{{$item->FECHA_EMI}}</td>
 												<td>{{$item->TOTAL}}</td>
+												<td>
+							            <a href="{{ url('/pdf-planilla-movilidad/'.Hashids::encode(substr($item->ID_DOCUMENTO, -8))) }}" 
+							              style="color:#cb2027;font-size: 35px;"
+							             target="_blank"><i class="mdi mdi-collection-pdf"></i>
+							            </a>
+
+												</td>
                         <td>
                             <div class="icon iconoentregable">
                               <span class="mdi mdi-select-all mdisel" data_documento_planilla='{{$item->ID_DOCUMENTO}}' data_iddocumento='{{$iddocumento}}'></span>

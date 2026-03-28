@@ -74,26 +74,28 @@ class NotificacionOC extends Command
         //$this->envio_correo_reparacion_levantada();
         $horaActual = date("H:i");
 
-        if($horaActual == '06:00' || $horaActual == '07:00' || $horaActual == '08:00'){
+        if ($horaActual == '06:00' || $horaActual == '07:00' || $horaActual == '08:00') {
             $this->crear_excel_aporbado_admin();
         }
 
 
-        if($horaActual == '07:00' || $horaActual == '08:00' || $horaActual == '09:00' ||
-            $horaActual == '10:00' ||  $horaActual == '11:00' ||
-            $horaActual == '12:00' ||  $horaActual == '13:00' || 
-            $horaActual == '14:00' ||  $horaActual == '15:00' ||
-            $horaActual == '16:00' ||  $horaActual == '17:00' ||
-            $horaActual == '20:00'){
+        if (
+            $horaActual == '07:00' || $horaActual == '08:00' || $horaActual == '09:00' ||
+            $horaActual == '10:00' || $horaActual == '11:00' ||
+            $horaActual == '12:00' || $horaActual == '13:00' ||
+            $horaActual == '14:00' || $horaActual == '15:00' ||
+            $horaActual == '16:00' || $horaActual == '17:00' ||
+            $horaActual == '20:00'
+        ) {
 
             $this->sunat_cdr();
             $this->sunat_cdr_contrato();
             $this->cambiar_parcialmente();
-            
+
         }
 
 
-        if($horaActual == '01:00' || $horaActual == '03:00' || $horaActual == '05:00'){
+        if ($horaActual == '01:00' || $horaActual == '03:00' || $horaActual == '05:00') {
             $this->documentolgautomaticonuevo();
             $this->eliminacion_vales_arendir();
         }
@@ -101,23 +103,24 @@ class NotificacionOC extends Command
         $this->guadarpdfoi();
         $this->envio_correo_aprobado();
 
-        if($horaActual == '01:00' || $horaActual == '03:00' || $horaActual == '05:00'){
+        if ($horaActual == '01:00' || $horaActual == '03:00' || $horaActual == '05:00') {
             $this->cambiar_fecha_vencimiento();
             $this->envio_detraccion_sunat();
         }
 
-        if($horaActual == '01:00' || $horaActual == '01:30'){
+        if ($horaActual == '01:00' || $horaActual == '01:30') {
             $this->sut_traer_data_sunat('IACHEM0000010394');
         }
-        if($horaActual == '02:00' || $horaActual == '02:30'){
+        if ($horaActual == '02:00' || $horaActual == '02:30') {
             $this->sut_traer_data_sunat('IACHEM0000007086');
         }
 
-        if($horaActual == '03:00'){
+        if ($horaActual == '03:00') {
             $this->ejecutar_query_osiris_compras();
+            $this->update_serie_correlativo_cpe();
         }
 
-        if($horaActual == '03:30' || $horaActual == '04:30'|| $horaActual == '05:30'){
+        if ($horaActual == '03:30' || $horaActual == '04:30' || $horaActual == '05:30') {
             $this->sunatarchivos();
         }
 
