@@ -488,6 +488,12 @@ class GestionOrdenPedidoController extends Controller
         }
 
         if ($request->hasFile('select_file')) {
+            if ($accion === 'U') {
+                DB::table('dbo.ARCHIVOS')
+                    ->where('ID_DOCUMENTO', $orden_pedido_id)
+                    ->update(['ACTIVO' => 0]);
+            }
+
             DB::table('dbo.ARCHIVOS')->insert([
                 'ID_DOCUMENTO' => $orden_pedido_id ?? '',
                 'DOCUMENTO_ITEM' => 1,
@@ -629,10 +635,18 @@ class GestionOrdenPedidoController extends Controller
                 $d->PRECIO = isset($precios_map[$d->COD_PRODUCTO]) ? $precios_map[$d->COD_PRODUCTO] : 0;
             }
 
+            // 4. Buscar si ya existe un archivo subido para este pedido
+            $archivo = DB::table('dbo.ARCHIVOS')
+                ->where('ID_DOCUMENTO', $id_pedido)
+                ->where('ACTIVO', 1)
+                ->select('ID_DOCUMENTO', 'URL_ARCHIVO', 'NOMBRE_ARCHIVO', 'DESCRIPCION_ARCHIVO')
+                ->first();
+
             return response()->json([
                 'success' => true,
                 'pedido' => $header,
-                'detalle' => $details
+                'detalle' => $details,
+                'archivo' => $archivo
             ]);
         } catch (\Exception $e) {
             Log::error("Error en actionAjaxPedidoEditar: " . $e->getMessage());

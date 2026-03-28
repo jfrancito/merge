@@ -306,6 +306,13 @@
                             required
                             accept=".xls,.xlsx,.csv,.pdf,.doc,.docx"
                             style="cursor:pointer;">
+                    
+                    <div id="contenedor_archivo_cargado" style="display: none; margin-top: 10px;">
+                        <span class="label label-success" style="font-size: 13px;">
+                            <i class="fa fa-file"></i> Archivo cargado: 
+                            <a href="#" id="enlace_archivo_cargado" target="_blank" style="color: white; text-decoration: underline;"></a>
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
