@@ -21,7 +21,7 @@
               </div>
             </li>
             <li><a href="{{ url('/cambiarperfil/') }}"><span class="icon mdi mdi-settings"></span> Cambiar de perfil</a></li>
-            
+            <li><a href="#" id="cambiarclave"><span class="icon mdi mdi-key"></span> Cambiar clave</a></li>
             <li><a href="{{ url('/cerrarsession') }}"><span class="icon mdi mdi-power"></span>Cerrar sesión</a></li>
 
 
@@ -34,3 +34,11 @@
       </div>
   </div>
 </nav>
+
+<div id="modal-cambiar-clave" class="modal-container colored-header colored-header-primary modal-effect-8">
+  <div class="modal-content ">
+	<div class='modal-cambiar-clave-container'>
+	</div>
+  </div>
+</div>
+<div class="modal-overlay"></div>

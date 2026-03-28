@@ -4231,9 +4231,8 @@ $(document).ready(function () {
             $('.sectorplanilla').show();
             $('.sectorxml').hide();
             $('.sectorotrotipo').hide();
-            //$('.sectorxmlmodal').show();
-            //$('.DCC0000000000036').show();
-
+            $('.sectorxmlmodal').show();
+            $('.DCC0000000000036').show();
         } else {
             if (tipodoc_id == 'TDO0000000000001') {
 
@@ -4672,6 +4671,18 @@ $(document).ready(function () {
                     return false;
                 }
 
+            }else{
+
+                if (tipodoc_id == 'TDO0000000000070') {
+
+                    let comprobante = $('#file-DCC0000000000036')[0].files.length > 0;
+                    if (!comprobante) {
+                        alerterrorajax("Debe subir el comprobante electronico.");
+                        cerrarcargando();
+                        return false;
+                    }
+
+                }
             }
 
         }

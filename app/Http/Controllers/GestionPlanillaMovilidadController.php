@@ -1703,9 +1703,9 @@ class GestionPlanillaMovilidadController extends Controller
 
             //DD($dni);
             $rutaImagen             =   public_path('firmas/'.$dni.'.jpg');
-            if (!file_exists($rutaImagen)){
-                return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd','No cuenta con firma suba su firma');
-            }
+            // if (!file_exists($rutaImagen)){
+            //     return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd','No cuenta con firma suba su firma');
+            // }
 
             //dd($dni);
             $trabajadorespla    =   DB::table('WEB.platrabajadores')
