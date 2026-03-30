@@ -1482,7 +1482,7 @@ class GestionPlanillaMovilidadController extends Controller
         $idcab                  =   $iddocumento;
         $iddocumento            =   $this->funciones->decodificarmaestrapre($iddocumento,'PLAM');
         $planillamovilidad      =   PlaMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->first(); 
-        $detplanillamovilidad   =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->orderby('FECHA_GASTO','ASC')->get();
+        $detplanillamovilidad   =   PlaDetMovilidad::where('ID_DOCUMENTO','=',$iddocumento)->where('ACTIVO','=','1')->orderby('ITEM','ASC')->get();
         $trabajador             =   STDTrabajador::where('COD_TRAB','=',$planillamovilidad->COD_TRABAJADOR)->first();
 
         $imgresponsable         =   'firmas/blanco.jpg';
@@ -1703,9 +1703,9 @@ class GestionPlanillaMovilidadController extends Controller
 
             //DD($dni);
             $rutaImagen             =   public_path('firmas/'.$dni.'.jpg');
-            if (!file_exists($rutaImagen)){
-                return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd','No cuenta con firma suba su firma');
-            }
+            // if (!file_exists($rutaImagen)){
+            //     return Redirect::to('gestion-de-planilla-movilidad/'.$idopcion)->with('errorbd','No cuenta con firma suba su firma');
+            // }
 
             //dd($dni);
             $trabajadorespla    =   DB::table('WEB.platrabajadores')

@@ -33,6 +33,7 @@ use App\Modelos\CMPReferecenciaAsoc;
 use App\Modelos\FeRefAsoc;
 use App\Modelos\FeDocumentoEntregableDetraccion;
 use App\Modelos\ContratoAnticipo;
+use App\Modelos\ContratoAnticipoDetalle;
 
 use App\Modelos\WEBRol;
 
@@ -941,15 +942,24 @@ class GestionOCContabilidadController extends Controller
             ->where('ACTIVO', '=', 1)
             ->first();
 
-        $contrato_anticipo = null;
         $fecha_entrega_c = '';
+        $peso_entrega_c = 0;
 
         if ($contrato_pago) {
             if ($contrato_pago->IND_CONTRATO == 'C') {
-                $contrato_anticipo = ContratoAnticipo::where('ID_DOCUMENTO', '=', $contrato_pago->ID_DOCUMENTO)->first();
+                $contrato_anticipo = ContratoAnticipo::where('ID_DOCUMENTO', '=', trim($contrato_pago->ID_DOCUMENTO))->first();
+                if ($contrato_anticipo) {
+                    $detalles_contrato = ContratoAnticipoDetalle::where('ID_DOCUMENTO', '=', trim($contrato_anticipo->ID_DOCUMENTO))
+                                            ->where('ACTIVO', '=', 1)
+                                            ->get();
+
+                    $doc_id = trim($contrato_anticipo->ID_DOCUMENTO);
+                    $pagos_contrato = DB::select("SELECT * FROM CONTRATO_PAGO WHERE ID_DOCUMENTO = ? OR ID_DOCUMENTO LIKE ?", [$doc_id, "%" . $doc_id . "%"]);
+                }
             } else {
                 if ($contrato_pago->IND_CONTRATO == 'F') {
                     $fecha_entrega_c = $contrato_pago->FECHA_ENTREGA;
+                    $peso_entrega_c = isset($contrato_pago->PESO_ENTREGA) ? $contrato_pago->PESO_ENTREGA : 0;
                 }
             }
         }
@@ -1232,7 +1242,7 @@ class GestionOCContabilidadController extends Controller
                 }
 
                 $fedocumento_ap = FeDocumento::where('ID_DOCUMENTO', '=', $idoc)->where('DOCUMENTO_ITEM', '=', $linea)->where('COD_ESTADO', '<>', 'ETM0000000000004')->first();
-                if (count($fedocumento_ap) > 0) {
+                if ($fedocumento_ap) {
                     return Redirect::back()->with('errorurl', 'El documento esta aprobado');
                 }
 
@@ -1648,7 +1658,10 @@ class GestionOCContabilidadController extends Controller
                     'idopcion' => $idopcion,
                     'idoc' => $idoc,
                     'contrato_anticipo' => $contrato_anticipo,
+                    'detalles_contrato' => $detalles_contrato,
+                    'pagos_contrato' => $pagos_contrato,
                     'fecha_entrega_c' => $fecha_entrega_c,
+                    'peso_entrega_c' => $peso_entrega_c,
 
                     'funciones' => $funciones,
                     'funcion' => $funciones,
@@ -9971,6 +9984,170 @@ class GestionOCContabilidadController extends Controller
                     . '%0D%0A' . 'EMPRESA : ' . $empresa->NOM_EMPR . '%0D%0A'
                     . 'PROVEEDOR : ' . $ordencompra->TXT_EMPR_EMISOR . '%0D%0A'
                     . 'ESTADO : ' . $fedocumento_w->TXT_ESTADO . '%0D%0A';
+
+
+
+                $orden                      =   CMPDocumentoCtble::where('COD_DOCUMENTO_CTBLE','=',$pedido_id)->first();
+
+
+                $conexionbd         = 'sqlsrv';
+                if($orden->COD_CENTRO == 'CEN0000000000004'){ //rioja
+                    $conexionbd         = 'sqlsrv_r';
+                }else{
+                    if($orden->COD_CENTRO == 'CEN0000000000006'){ //bellavista
+                        $conexionbd         = 'sqlsrv_b';
+                    }
+                }
+
+                DB::connection($conexionbd)->table('CMP.DOCUMENTO_CTBLE')
+                ->where('COD_DOCUMENTO_CTBLE','=',$pedido_id)
+                            ->update(
+                                    [
+                                        'IND_NOTIFICACION_CLIENTE'=>1
+                                    ]);
+
+                //enviar tablas de fe_documento y fe_detalledocuemto
+                if($orden->COD_CENTRO == 'CEN0000000000004' || $orden->COD_CENTRO == 'CEN0000000000006'){ //rioja
+                    //dd($conexionbd);
+                    //FE_DOCUENTO
+                    $referenciaAsocQuery = FeDocumento::select('ID_DOCUMENTO'
+                                              ,'DOCUMENTO_ITEM'
+                                              ,'RUC_PROVEEDOR'
+                                              ,'RZ_PROVEEDOR'
+                                              ,'TIPO_CLIENTE'
+                                              ,'ID_CLIENTE'
+                                              ,'NOMBRE_CLIENTE'
+                                              ,'DIRECCION_CLIENTE'
+                                              ,'NUM_DOC_VENTA'
+                                              ,'SERIE'
+                                              ,'NUMERO'
+                                              ,'ID_TIPO_DOC'
+                                              ,'FEC_VENTA'
+                                              ,'FEC_VENCI_PAGO'
+                                              ,'FORMA_PAGO'
+                                              ,'FORMA_PAGO_DIAS'
+                                              ,'MONEDA'
+                                              ,'VALOR_TIPO_CAMBIO'
+                                              ,'VALOR_IGV_ORIG'
+                                              ,'VALOR_IGV_SOLES'
+                                              ,'SUB_TOTAL_VENTA_ORIG'
+                                              ,'SUB_TOTAL_VENTA_SOLES'
+                                              ,'TOTAL_VENTA_ORIG'
+                                              ,'TOTAL_VENTA_SOLES'
+                                              ,'V_EXONERADO'
+                                              ,'ESTADO'
+                                              ,'NUM_DOC_ELECT'
+                                              ,'ES_TRANS_GRATUITA'
+                                              ,'DES_COM'
+                                              ,'ES_ANULADO'
+                                              ,'ENVIADO_EMAIL'
+                                              ,'ENVIADO_EXTERNO'
+                                              ,'NRO_ORDEN_COMP'
+                                              ,'NUM_GUIA'
+                                              ,'TIPO_DOC_REL'
+                                              ,'CON_DETRACCION'
+                                              ,'OBSERVACION'
+                                              ,'HORA_EMISION'
+                                              ,'ES_TURISTICO'
+                                              ,'ES_EXONERADO'
+                                              ,'GUIA_CLIENTE'
+                                              ,'GLOSA_DETALE'
+                                              ,'VALIDACION_SUNAT'
+                                              ,'ID_MOTIVO_EMISION'
+                                              ,'MOTIVO_EMISION'
+                                              ,'MONTO_IMP_BOLSA'
+                                              ,'MONTO_DETRACCION'
+                                              ,'MONTO_RETENCION'
+                                              ,'MONTO_NETO_PAGO'
+                                              ,'DESCUENTO_I'
+                                              ,'DESCUENTO'
+                                              ,'IMPUESTO_2'
+                                              ,'TIPO_DETRACCION'
+                                              ,'PORC_DETRACCION'
+                                              ,'MONTO_ANTICIPO'
+                                              ,'COD_ESTADO'
+                                              ,'TXT_ESTADO'
+                                              ,'COD_EMPR'
+                                              ,'TXT_EMPR'
+                                              ,'COD_CONTACTO'
+                                              ,'TXT_CONTACTO'
+                                              ,'TXT_PROCEDENCIA'
+                                              ,'ARCHIVO_XML'
+                                              ,'ARCHIVO_CDR'
+                                              ,'ARCHIVO_PDF'
+                                              ,'success'
+                                              ,'message'
+                                              ,'estadoCp'
+                                              ,'nestadoCp'
+                                              ,'estadoRuc'
+                                              ,'nestadoRuc'
+                                              ,'condDomiRuc'
+                                              ,'ncondDomiRuc'
+                                              ,'CODIGO_CDR'
+                                              ,'RESPUESTA_CDR'
+                                              ,'ind_ruc'
+                                              ,'ind_rz'
+                                              ,'ind_moneda'
+                                              ,'ind_total'
+                                              ,'ind_cantidaditem'
+                                              ,'ind_formapago'
+                                              ,'ind_errototal'
+                                              ,'dni_usuariocontacto'
+                                              ,'usuario_pa'
+                                              ,'usuario_uc'
+                                              ,'usuario_ap'
+                                              ,'usuario_pr'
+                                              ,'usuario_ex'
+                                              ,'mensaje_exuc'
+                                              ,'mensaje_exap'
+                                              ,'mensaje_exadm'
+                                              ,'ind_email_uc'
+                                              ,'ind_email_ap'
+                                              ,'ind_email_adm'
+                                              ,'ind_email_clap'
+                                              ,'ind_email_ba'
+                                              ,'ind_observacion'
+                                              ,'area_observacion'
+                                              ,'OPERACION'
+                                              ,'PERCEPCION'
+                                              ,'usuario_tes'
+                                              ,'LOTE')
+                        ->where('ID_DOCUMENTO', '=', $orden->COD_DOCUMENTO_CTBLE)
+                        ->get();
+
+
+                    //dd($referenciaAsocQuery);
+                    // Convertir el resultado en un array para poder insertarlo más adelante
+                    $dataToInsert = $referenciaAsocQuery->toArray();
+                    //dd($dataToInsert);
+
+                    // Paso 2: Insertar los datos en la segunda base de datos
+                    DB::connection($conexionbd)->table('FE_DOCUMENTO')->insert($dataToInsert);
+
+                    //FE_DETALLE_DOCUENTO
+                    $referenciaAsocQueryd = FeDetalleDocumento::select('*')
+                        ->where('ID_DOCUMENTO', '=', $orden->COD_DOCUMENTO_CTBLE)
+                        ->get();
+                    // Convertir el resultado en un array para poder insertarlo más adelante
+                    $dataToInsertd = $referenciaAsocQueryd->toArray();
+
+                    // Paso 2: Insertar los datos en la segunda base de datos
+                    DB::connection($conexionbd)->table('FE_DETALLE_DOCUMENTO')->insert($dataToInsertd);
+
+                    //CMPDocAsociarCompra
+                    $referenciaAsocQueryac = CMPDocAsociarCompra::select('COD_ORDEN','COD_CATEGORIA_DOCUMENTO','NOM_CATEGORIA_DOCUMENTO','IND_OBLIGATORIO','TXT_FORMATO','TXT_ASIGNADO','COD_USUARIO_CREA_AUD','COD_ESTADO','TIP_DOC')
+                        ->where('COD_ORDEN', '=', $idoc)
+                        ->get();
+                    // Convertir el resultado en un array para poder insertarlo más adelante
+                    $dataToInserac = $referenciaAsocQueryac->toArray();
+                    // Paso 2: Insertar los datos en la segunda base de datos
+                    DB::connection($conexionbd)->table('CMP.DOC_ASOCIAR_COMPRA')->insert($dataToInserac);
+
+
+                }
+
+
+
 
 
                 DB::commit();

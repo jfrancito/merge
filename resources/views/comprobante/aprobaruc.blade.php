@@ -60,6 +60,7 @@
             </div>
           </div>
       </div>
+    @include('comprobante.modal.mmodificararchivo')
     @include('comprobante.modal.mregistrorequerimiento')
 
     @include('usuario.modal.musuario')
@@ -121,6 +122,16 @@
         App.init();
         App.formElements();
         $('form').parsley();
+
+        $(document).on('click', '.modificar-pdf', function(e) {
+            e.preventDefault();
+            var tipo = $(this).data('tipo');
+            var nombre = $(this).data('nombre');
+            $('#modal-tipo-archivo').val(tipo);
+            $('#modal-descripcion-archivo').val(nombre);
+            $('#modal-modificar-archivo').niftyModal('show');
+        });
+
       });
     </script>
 

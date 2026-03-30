@@ -17,6 +17,8 @@ Route::group(['middleware' => ['guestaw']], function () {
 
 });
 
+Route::any('/detalle-contrato-acopio/{nrocontrato}', 'GestionContratoAcopioController@actionDetalleContratoAcopio');
+
 Route::get('/traer-compras-sunat', 'SunatController@actionComprasSunat');
 
 
@@ -78,6 +80,7 @@ Route::any('/crearexceladminaprobado', 'UserController@actionCrearExcelAprobadoA
 Route::any('/enviocorreoconsolidadoplanilla', 'UserController@actionEnviarCorreoConsolidado'); //correo para jefe acopio liuidacion compra
 Route::any('/enviocorreoconsolidadoplanilladet', 'UserController@actionEnviarCorreoConsolidadoDet'); //correo para jefe acopio liuidacion compra
 
+Route::any('/updateseriecorrelativocpe', 'UserController@actionUpdateSerieCorrelativoCpe'); //correo para jefe acopio liuidacion compra
 
 
 Route::group(['middleware' => ['authaw']], function () {
@@ -96,6 +99,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-modal-ver-cuenta-bancaria-contrato', 'UserController@actionAjaxModalVerCuentaBancariaContrato');
 	Route::any('/ajax-modal-ver-cuenta-bancaria-pg', 'UserController@actionAjaxModalVerCuentaBancariaPG');
 	Route::any('/actualizar-data/{zona}', 'UserController@actionActualizarData');
+	Route::any('/ajax-modal-cambiar-clave', 'UserController@actionAjaxModalCambiarClave');
+	Route::any('/ajax-cambiar-clave', 'UserController@actionAjaxCambiarClave');
 
 
 	Route::any('/ajax-modal-configuracion-cuenta-bancaria-contrato', 'UserController@actionAjaxModalConfiguracionCuentaBancariaContrato');
@@ -114,7 +119,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/configurar-datos-cuenta-bancaria-pg/{prefijo_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaPg');
 
 	Route::any('/configurar-datos-cuenta-bancaria-liquidacion-compra-anticipo/{prefijo_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaLiquidacionCompraAnticipo');
-	Route::any('/configurar-grupo-marketing/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosGrupoMarketing');	
+	Route::any('/configurar-grupo-marketing/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosGrupoMarketing');
 
 	Route::any('/configurar-datos-cuenta-bancaria-oc/{prefijo_id}/{orden_id}/{idopcion}', 'UserController@actionConfigurarDatosCuentaBancariaOC');
 
@@ -134,6 +139,7 @@ Route::group(['middleware' => ['authaw']], function () {
 
 
 	Route::any('/cambiar-cuenta-corriente/{empresa_id}/{banco_id}/{nro_cuenta}/{moneda_id}/{idoc}/{idopcion}', 'UserController@actionCambiarCuentaCorriente');
+	Route::any('/cambiar-banco-sin-cuenta/{codbanco}/{idoc}/{idopcion}', 'UserController@actionCambiarBancoSinCuenta');
 	Route::any('/gestion-de-cpe/{idopcion}', 'CpeController@actionGestionCpe');
 	Route::any('/descargar-archivo/{archivonombre}', 'CpeController@actionDescargarArchivo');
 	Route::any('/gestion-de-sunat-cpe-local/{idopcion}', 'CpeController@actionGestionCpeLocal');
@@ -261,6 +267,8 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/gestion-de-aprobar-contrato-acopio/{idopcion}', 'GestionContratoAcopioController@actionAprobarContratoAcopio');
 	Route::any('/aprobar-contrato-acopio-acopio/{idopcion}/{idordencompra}', 'GestionContratoAcopioController@actionAprobarAcopioCA');
+
+	Route::post('/modificar-archivo-pdf/{idopcion}/{linea}/{idoc_prefijo}/{idoc_encoded}', 'ModificarArchivoController@actionModificarArchivoPDF');
 	Route::any('/agregar-extorno-acopio-ca/{idopcion}/{idordencompra}', 'GestionContratoAcopioController@actionAgregarExtornoAcopioCA');
 
 	Route::any('/gestion-de-listar-contrato-acopio/{idopcion}', 'GestionContratoAcopioController@actionListarGestionContratoAcopio');
@@ -1057,10 +1065,10 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::get('/resumen-orden-pedido/{idopcion}', 'ResumenOrdenPedidoController@actionResumenOrdenPedido');
 	Route::any('/ajax-buscar-resumen-op', 'ResumenOrdenPedidoController@actionListarAjaxBuscarResumenOP');
 	Route::any('/resumen-masivo-excel-op/{fecha_inicio}/{fecha_fin}/{empresa_id}/{centro_pedido}/{area}/{idopcion}', 'ResumenOrdenPedidoController@actionResumenMasivoExcelOp');
-    
-    // RUTA PARA TERMINAR PEDIDO EN REPORTE RESUMEN
-    Route::post('/ajax-terminar-resumen-op', 'ResumenOrdenPedidoController@actionTerminarResumenOp');
-    Route::post('/ver-detalle-pedido-resumen', 'ResumenOrdenPedidoController@actionDetallePedidoResumen');
+
+	// RUTA PARA TERMINAR PEDIDO EN REPORTE RESUMEN
+	Route::post('/ajax-terminar-resumen-op', 'ResumenOrdenPedidoController@actionTerminarResumenOp');
+	Route::post('/ver-detalle-pedido-resumen', 'ResumenOrdenPedidoController@actionDetallePedidoResumen');
 
 	Route::get('/gestion-de-autorizacion-orden-pedido/{idopcion}', 'GestionOrdenPedidoAutorizaController@actionOrdenPedidoAutoriza');
 	Route::post('/autorizar_orden_pedido', 'GestionOrdenPedidoAutorizaController@insertAutorizaOrdenPedido');
@@ -1081,8 +1089,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::post('/guardar_editar_detalle_pedido_adm', 'GestionOrdenPedidoApruebaAdmController@actionGuardarEditarDetalleAdm');
 
 	Route::get('/consolidado-orden-pedido/{idopcion}', 'ConsolidadoOrdenPedidoController@actionConsolidadoOrdenPedido');
-    Route::post('/cargar-periodo-consolidado', 'ConsolidadoOrdenPedidoController@actionAjaxPeriodoConsolidado');
-    Route::any('/ajax-buscar-consolidado-op', 'ConsolidadoOrdenPedidoController@actionListarAjaxBuscarConsolidadoOP');
+	Route::post('/cargar-periodo-consolidado', 'ConsolidadoOrdenPedidoController@actionAjaxPeriodoConsolidado');
+	Route::any('/ajax-buscar-consolidado-op', 'ConsolidadoOrdenPedidoController@actionListarAjaxBuscarConsolidadoOP');
 	Route::post('/guardar_consolidado_pedido', 'ConsolidadoOrdenPedidoController@actionGuardarConsolidado');
 	Route::any('/ajax-listar-detalle-consolidado-op', 'ConsolidadoOrdenPedidoController@actionListarAjaxDetalleConsolidadoOP');
 	Route::any('/ajax-detalle-producto-consolidado-generado', 'ConsolidadoOrdenPedidoController@actionAjaxDetalleProductoConsolidadoGenerado');
@@ -1097,7 +1105,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-buscar-consolidado-general-op', 'ConsolidadoGeneralOrdenPedidoController@actionAjaxBuscarConsolidadoGeneralOP');
 	Route::post('/ajax-aprobar-consolidado-general-op', 'ConsolidadoGeneralOrdenPedidoController@actionAjaxAprobarConsolidadoGeneral');
 	Route::get('/descargar-excel-detalle-consolidado-general/{id_consolidado_general}/{familia_id}', 'ConsolidadoGeneralOrdenPedidoController@actionDescargarExcelDetalleConsolidadoGeneral');
-    Route::get('/descargar-excel-detalle-consolidado-general-area/{id_consolidado_general}/{familia_id}', 'ConsolidadoGeneralOrdenPedidoController@actionDescargarExcelDetalleConsolidadoGeneralArea');
+	Route::get('/descargar-excel-detalle-consolidado-general-area/{id_consolidado_general}/{familia_id}', 'ConsolidadoGeneralOrdenPedidoController@actionDescargarExcelDetalleConsolidadoGeneralArea');
 	Route::post('/ajax-eliminar-consolidado-general-op', 'ConsolidadoGeneralOrdenPedidoController@actionAjaxEliminarConsolidadoGeneral');
 
 	Route::get('/gestion-monto-orden-pedido/{idopcion}', 'MontoOrdenPedidoController@actionMontoOrdenPedido');
@@ -1112,15 +1120,15 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::post('/ajax-listar-detalle-cotizacion', 'CotizacionOrdenPedidoController@actionAjaxListarDetalleCotizacion');
 	Route::post('/ajax-subir-archivo-cotizacion', 'CotizacionOrdenPedidoController@actionAjaxSubirArchivoCotizacion');
 
-    Route::get('/reporte-orden-pedido-estado/{idopcion}', 'ReporteOrdenPedidoController@actionReporteOrdenPedidoEstado');
-    Route::any('/cargar-periodo-orden-pedido', 'ReporteOrdenPedidoController@actionListarPeriodo');
-    Route::any('/listar-reporte-orden-pedido-estado', 'ReporteOrdenPedidoController@actionListarAjaxReporte');
-    Route::any('/descargar-orden-pedido-estado', 'ReporteOrdenPedidoController@actionListarAjaxReporteExcel');
-    Route::get(
-        '/descargar-archivo-informe/{archivo}',
-        'ReporteOrdenPedidoController@actionDescargarArchivo'
-    )->where('archivo', '.*');
-    Route::post('/subir-archivo-pedido','ReporteOrdenPedidoController@subirArchivo');
+	Route::get('/reporte-orden-pedido-estado/{idopcion}', 'ReporteOrdenPedidoController@actionReporteOrdenPedidoEstado');
+	Route::any('/cargar-periodo-orden-pedido', 'ReporteOrdenPedidoController@actionListarPeriodo');
+	Route::any('/listar-reporte-orden-pedido-estado', 'ReporteOrdenPedidoController@actionListarAjaxReporte');
+	Route::any('/descargar-orden-pedido-estado', 'ReporteOrdenPedidoController@actionListarAjaxReporteExcel');
+	Route::get(
+		'/descargar-archivo-informe/{archivo}',
+		'ReporteOrdenPedidoController@actionDescargarArchivo'
+	)->where('archivo', '.*');
+	Route::post('/subir-archivo-pedido', 'ReporteOrdenPedidoController@subirArchivo');
 });
 
 Route::get('/pruebaemail/{emailfrom}/{nombreusuario}', 'PruebasController@actionPruebaEmail');
@@ -1136,9 +1144,9 @@ Route::get('buscarcliente', function (Illuminate\Http\Request $request) {
 		->whereNull('users.usuarioosiris_id')
 		->take(100)
 		->select(
-		DB::raw("
+			DB::raw("
 			  STD.EMPRESA.NRO_DOCUMENTO + ' - '+ STD.EMPRESA.NOM_EMPR AS NOMBRE")
-	)
+		)
 		->pluck('NOMBRE', 'NOMBRE');
 	$valid_tags = [];
 	foreach ($tags as $id => $tag) {
@@ -1157,9 +1165,9 @@ Route::get('buscarempresa', function (Illuminate\Http\Request $request) {
 		->where('COD_TIPO_DOCUMENTO', '=', 'TDI0000000000006')
 		->take(100)
 		->select(
-		DB::raw("
+			DB::raw("
 			  STD.EMPRESA.NRO_DOCUMENTO + ' - '+ STD.EMPRESA.NOM_EMPR AS NOMBRE")
-	)
+		)
 		->pluck('NOMBRE', 'NOMBRE');
 	$valid_tags = [];
 	foreach ($tags as $id => $tag) {
@@ -1171,72 +1179,75 @@ Route::get('buscarempresa', function (Illuminate\Http\Request $request) {
 Route::get('buscarempresalg', function (Illuminate\Http\Request $request) {
 	$term = $request->term ?: '';
 	$tags = DB::table('STD.EMPRESA')
-		->where(function ($query) use ($term) {
-		    $query->where('STD.EMPRESA.NOM_EMPR', 'like', '%' . $term . '%')
-		    	->orWhere('STD.EMPRESA.NRO_DOCUMENTO', 'like', '%' . $term . '%');
-	    }
-	    )
-	    	->where('STD.EMPRESA.COD_ESTADO', '=', 1)
-	    	->where('COD_TIPO_DOCUMENTO', '=', 'TDI0000000000006')
-	    	->take(100)
-	    	->select(
-	    	DB::raw("
+		->where(
+			function ($query) use ($term) {
+				$query->where('STD.EMPRESA.NOM_EMPR', 'like', '%' . $term . '%')
+					->orWhere('STD.EMPRESA.NRO_DOCUMENTO', 'like', '%' . $term . '%');
+			}
+		)
+		->where('STD.EMPRESA.COD_ESTADO', '=', 1)
+		->where('COD_TIPO_DOCUMENTO', '=', 'TDI0000000000006')
+		->take(100)
+		->select(
+			DB::raw("
 			  STD.EMPRESA.NRO_DOCUMENTO + ' - '+ STD.EMPRESA.NOM_EMPR AS NOMBRE")
-	    )
-	    	->pluck('NOMBRE', 'NOMBRE');
-	    $valid_tags = [];
-	    foreach ($tags as $id => $tag) {
-		    $valid_tags[] = ['id' => $id, 'text' => $tag];
-	    }
-	    return \Response::json($valid_tags);
-    });
+		)
+		->pluck('NOMBRE', 'NOMBRE');
+	$valid_tags = [];
+	foreach ($tags as $id => $tag) {
+		$valid_tags[] = ['id' => $id, 'text' => $tag];
+	}
+	return \Response::json($valid_tags);
+});
 
 Route::get('buscarempresarenta', function (Illuminate\Http\Request $request) {
 	$term = $request->term ?: '';
 	$tags = DB::table('STD.EMPRESA')
-		->where(function ($query) use ($term) {
-		    $query->where('STD.EMPRESA.NOM_EMPR', 'like', '%' . $term . '%')
-		    	->orWhere('STD.EMPRESA.NRO_DOCUMENTO', 'like', '%' . $term . '%');
-	    }
-	    )
-	    	->where('COD_TIPO_DOCUMENTO', '=', 'TDI0000000000006')
-	    	->where('STD.EMPRESA.COD_ESTADO', '=', 1)
-	    	->where('STD.EMPRESA.NRO_DOCUMENTO', 'like', '1%')
-	    	->take(100)
-	    	->select(
-	    	DB::raw("
+		->where(
+			function ($query) use ($term) {
+				$query->where('STD.EMPRESA.NOM_EMPR', 'like', '%' . $term . '%')
+					->orWhere('STD.EMPRESA.NRO_DOCUMENTO', 'like', '%' . $term . '%');
+			}
+		)
+		->where('COD_TIPO_DOCUMENTO', '=', 'TDI0000000000006')
+		->where('STD.EMPRESA.COD_ESTADO', '=', 1)
+		->where('STD.EMPRESA.NRO_DOCUMENTO', 'like', '1%')
+		->take(100)
+		->select(
+			DB::raw("
 			  STD.EMPRESA.NRO_DOCUMENTO + ' - '+ STD.EMPRESA.NOM_EMPR AS NOMBRE")
-	    )
-	    	->pluck('NOMBRE', 'NOMBRE');
-	    $valid_tags = [];
-	    foreach ($tags as $id => $tag) {
-		    $valid_tags[] = ['id' => $id, 'text' => $tag];
-	    }
-	    return \Response::json($valid_tags);
-    });
+		)
+		->pluck('NOMBRE', 'NOMBRE');
+	$valid_tags = [];
+	foreach ($tags as $id => $tag) {
+		$valid_tags[] = ['id' => $id, 'text' => $tag];
+	}
+	return \Response::json($valid_tags);
+});
 
 
-	Route::get('buscarempresacontrato', function (Illuminate\Http\Request $request) {
+Route::get('buscarempresacontrato', function (Illuminate\Http\Request $request) {
 	$term = $request->term ?: '';
 	$tags = DB::table('STD.EMPRESA')
-		->where(function ($query) use ($term) {
-		    $query->where('STD.EMPRESA.NOM_EMPR', 'like', '%' . $term . '%')
-		    	->orWhere('STD.EMPRESA.NRO_DOCUMENTO', 'like', '%' . $term . '%');
-	    }
-	    )
-	    	->where('STD.EMPRESA.COD_ESTADO', '=', 1)
-	    	->take(100)
-	    	->select(
-	    	DB::raw("
+		->where(
+			function ($query) use ($term) {
+				$query->where('STD.EMPRESA.NOM_EMPR', 'like', '%' . $term . '%')
+					->orWhere('STD.EMPRESA.NRO_DOCUMENTO', 'like', '%' . $term . '%');
+			}
+		)
+		->where('STD.EMPRESA.COD_ESTADO', '=', 1)
+		->take(100)
+		->select(
+			DB::raw("
 			  STD.EMPRESA.NRO_DOCUMENTO + ' - '+ STD.EMPRESA.NOM_EMPR AS NOMBRE")
-	    )
-	    	->pluck('NOMBRE', 'NOMBRE');
-	    $valid_tags = [];
-	    foreach ($tags as $id => $tag) {
-		    $valid_tags[] = ['id' => $id, 'text' => $tag];
-	    }
-	    return \Response::json($valid_tags);
-    });
+		)
+		->pluck('NOMBRE', 'NOMBRE');
+	$valid_tags = [];
+	foreach ($tags as $id => $tag) {
+		$valid_tags[] = ['id' => $id, 'text' => $tag];
+	}
+	return \Response::json($valid_tags);
+});
 
 
 Route::get('buscarproducto', function (Illuminate\Http\Request $request) {
@@ -1249,9 +1260,9 @@ Route::get('buscarproducto', function (Illuminate\Http\Request $request) {
 		->where('COD_CATEGORIA_CLASE', '=', '1')
 		->take(100)
 		->select(
-		DB::raw("
+			DB::raw("
 			  ALM.PRODUCTO.NOM_PRODUCTO")
-	)
+		)
 		->pluck('NOM_PRODUCTO', 'NOM_PRODUCTO');
 	$valid_tags = [];
 	foreach ($tags as $id => $tag) {
@@ -1278,10 +1289,10 @@ Route::get('buscarclientey', function (Illuminate\Http\Request $request) {
 		->where('STD.EMPRESA.COD_ESTADO', '=', 1)
 		->select('STD.EMPRESA.COD_EMPR', 'STD.EMPRESA.NOM_EMPR')
 		->select(
-		DB::raw("
+			DB::raw("
 									  STD.EMPRESA.COD_EMPR,
 									  STD.EMPRESA.NRO_DOCUMENTO + ' - '+ STD.EMPRESA.NOM_EMPR AS NOMBRE")
-	)
+		)
 		->take(10)
 		->pluck('NOMBRE', 'NOMBRE');
 	$valid_tags = [];

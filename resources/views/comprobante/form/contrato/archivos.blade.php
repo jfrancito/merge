@@ -1,3 +1,4 @@
+
     <div class="panel panel-default panel-contrast">
       <div class="panel-heading" style="background: #1d3a6d;color: #fff;">ARCHIVOS
       </div>
@@ -18,6 +19,9 @@
                   <td>{{$index + 1}}</td>
                   <td>{{$item->DESCRIPCION_ARCHIVO}}</td>
                   <td>{{$item->NOMBRE_ARCHIVO}}</td>
+                  @php 
+                    $es_pdf = str_contains(strtolower($item->NOMBRE_ARCHIVO), 'pdf');
+                  @endphp
 
                   <td class="rigth">
                     <div class="btn-group btn-hspace">
@@ -30,8 +34,15 @@
                           </a>  
                         </li>
 
-
-
+                        @if($es_pdf)
+                            <li>
+                                <a href="#" class="modificar-pdf" 
+                                   data-tipo="{{$item->TIPO_ARCHIVO}}" 
+                                   data-nombre="{{$item->DESCRIPCION_ARCHIVO}}">
+                                  Modificar
+                                </a>
+                            </li>
+                        @endif
 
                       </ul>
                     </div>
