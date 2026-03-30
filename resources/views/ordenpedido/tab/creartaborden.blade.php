@@ -301,9 +301,9 @@
                     <input
                             type="file"
                             class="form-control input-sm"
-                            name="select_file"
+                            name="select_file[]"
                             id="formFile"
-                            required
+                            multiple
                             accept=".xls,.xlsx,.csv,.pdf,.doc,.docx"
                             style="cursor:pointer;">
                     
@@ -337,7 +337,7 @@
                     TIPO PROD. <span class="obligatorio">(*)</span>
                 </label>
                 <select id="tipo_material_servicio" class="form-control select2">
-                    <option value="">TODOS</option>
+                    <option value="">Seleccione...</option>
                     <option value="M">MATERIAL</option>
                     <option value="S">SERVICIO</option>
                 </select>
@@ -347,7 +347,7 @@
                 <label class="label-sm negrita">
                     PRODUCTO <span class="obligatorio">(*)</span>
                 </label>
-                <select id="cod_producto" class="form-control select2 select2-lg" style="width: 100%;">
+                <select id="producto_id" class="form-control select2 select2-lg" style="width: 100%;">
                     <option value="">Buscar producto...</option>
                     @foreach($producto as $prd)
                         <option value="{{ $prd->COD_PRODUCTO }}"

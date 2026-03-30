@@ -149,8 +149,6 @@ $(document).ready(function () {
         formData.append('id_pedido', idPedido);
         //formData.append('_token', '{{ csrf_token() }}');
 
-        debugger;
-
         modalBonito({
             tipo: 'info',
             icono: '📝',
@@ -299,13 +297,13 @@ $(document).ready(function () {
 
         formData.append('array_detalle', JSON.stringify(detalles));
 
-        let archivo = $('#formFile')[0].files[0];
+        let archivos = $('#formFile')[0].files;
 
-        if (archivo) {
-            formData.append('select_file', archivo);
+        if (archivos.length > 0) {
+            for (let i = 0; i < archivos.length; i++) {
+                formData.append('select_file[]', archivos[i]);
+            }
         }
-
-        debugger;
 
         modalBonito({
             tipo: 'info',
@@ -343,7 +341,6 @@ $(document).ready(function () {
                     processData: false,
                     contentType: false,
                     success: function (resp) {
-                        debugger;
                         modalBonito({
                             tipo: 'success',
                             icono: '✔',
@@ -379,8 +376,6 @@ $(document).ready(function () {
         let anio = $('#anio').val();
         let _token = $('#token').val();
 
-        debugger;
-
         data = {
             _token: _token,
             anio: anio
@@ -397,8 +392,6 @@ $(document).ready(function () {
         let periodo = $('#periodo').val();
         let centro = $('#centro').val();
         let _token = $('#token').val();
-
-        debugger;
 
         data = {
             _token: _token,
@@ -511,8 +504,6 @@ $(document).ready(function () {
         let empresa_id = $('#empresa_id').val();
         let _token = $('#token').val();
 
-        debugger;
-
         data = {
             _token: _token,
             empresa_id: empresa_id
@@ -543,30 +534,62 @@ $(document).ready(function () {
        =============================== */
     var originalProductos = null;
 
-    $(document).on('change', '#tipo_material_servicio', function () {
+    // Al inicio, vaciar productos para cumplir pedido
+    setTimeout(() => {
         if (!originalProductos) {
-            originalProductos = $('#cod_producto option').clone();
+            originalProductos = $('#producto_id option').clone();
         }
-        var tipo = $(this).val();
-        $('#cod_producto').empty();
-        originalProductos.each(function () {
-            if ($(this).val() === "") {
-                $('#cod_producto').append($(this).clone());
-                return;
-            }
-            if (tipo === "" || tipo === $(this).data('indmaterialservicio')) {
-                $('#cod_producto').append($(this).clone());
-            }
-        });
-        $('#cod_producto').trigger('change');
+        $('#producto_id').empty().append('<option value="">Buscar producto...</option>').trigger('change');
+    }, 1000);
+
+    $(document).on('select2:opening', '#producto_id', function (e) {
+        var tipo = $('#tipo_material_servicio').val();
+        if (!tipo) {
+            modalBonito({
+                tipo: 'warn',
+                icono: '⚠️',
+                titulo: 'Seleccione Tipo',
+                mensaje: 'Debe seleccionar primero el <b>TIPO DE PRODUCTO</b> (Material o Servicio) para poder buscar.'
+            });
+            e.preventDefault();
+        }
     });
 
-    $('#cod_producto').on('change', function () {
-        let option = $('#cod_producto option:selected');
+    $(document).on('change', '#tipo_material_servicio', function () {
+        if (!originalProductos) {
+            originalProductos = $('#producto_id option').clone();
+        }
+        var tipo = $(this).val();
+
+        // VALIDACIÓN: Si es SERVICIO (S), cantidad = 1 y bloqueado
+        if (tipo === 'S') {
+            $('#cantidad').val(1).prop('disabled', true);
+        } else {
+            $('#cantidad').val('').prop('disabled', false);
+        }
+
+        $('#producto_id').empty();
+        $('#producto_id').append('<option value="">Buscar producto...</option>');
+
+        if (tipo !== "") {
+            originalProductos.each(function () {
+                var ind = $(this).data('indmaterialservicio');
+                if (ind == tipo) {
+                    $('#producto_id').append($(this).clone());
+                }
+            });
+        }
+        $('#producto_id').trigger('change');
+    });
+
+    $(document).on('change', '#producto_id', function () {
+        let option = $('#producto_id option:selected');
         let unidad = option.data('unidad');
         if (unidad) {
             $('#unidad').val(unidad);
             $('#cantidad').focus();
+        } else {
+            $('#unidad').val('');
         }
     });
 
@@ -633,8 +656,8 @@ $(document).ready(function () {
     $('#agregar_producto').click(function (e) {
         e.preventDefault();
 
-        let option = $('#cod_producto option:selected');
-        let cod_producto = $('#cod_producto').val();
+        let option = $('#producto_id option:selected');
+        let cod_producto = $('#producto_id').val();
         let nom_producto = option.data('nombre');
         let cod_categoria = option.data('codcategoria');
         let nom_categoria = option.data('unidad');
@@ -735,7 +758,7 @@ $(document).ready(function () {
         $('#tabla_detalle_pedido tbody').append(fila);
         calcularTotalPedido();
 
-        $('#cod_producto').val('').trigger('change');
+        $('#producto_id').val('').trigger('change');
         $('#cantidad').val('');
         $('#txt_observacion').val('');
     });
@@ -1750,8 +1773,6 @@ $(document).ready(function () {
         var idopcion = $('#idopcion').val();
         var _token = $('#token').val();
 
-        debugger;
-
         if ($.trim(centro_id) === '') {
             modalBonito({
                 tipo: 'warning',
@@ -1931,15 +1952,11 @@ $(document).ready(function () {
     let productosConsolidados = {};
 
     $(document).on('click', '.btn-consolidar', function () {
-        productosConsolidados = {};
-        debugger;
-        console.log("hola");
+        productosConsolidados = {};        console.log("hola");
         if (typeof pedidosData === 'undefined' || !pedidosData) {
             console.error("pedidosData no está definido");
             return;
-        }
-        debugger;
-        $('.pedido_seleccionado:checked').each(function () {
+        }        $('.pedido_seleccionado:checked').each(function () {
             let idPedido = $(this).val();
             let detalles = pedidosData[idPedido];
 
@@ -2708,8 +2725,6 @@ $(document).ready(function () {
         id_consolidado_general_seleccionado = $(this).data('consolidado-general');
         familia_id_seleccionado = $(this).attr('data-familia-cod'); //$(this).data('data-familia-cod');
 
-        debugger;
-
         buscarDetalleConsolidadoGeneral();
     });
 
@@ -3019,9 +3034,7 @@ $(document).ready(function () {
             return;
         }
 
-        let familia_id = $('#familia_id').val();
-        debugger;
-        window.location.href = carpeta + '/descargar-excel-detalle-consolidado-general/' + id_consolidado_general_seleccionado + '/' + familia_id;
+        let familia_id = $('#familia_id').val();        window.location.href = carpeta + '/descargar-excel-detalle-consolidado-general/' + id_consolidado_general_seleccionado + '/' + familia_id;
     });
 
     // EVENTO PARA DESCARGAR EXCEL DEL DETALLE
@@ -3036,9 +3049,7 @@ $(document).ready(function () {
             return;
         }
 
-        let familia_id = $('#familia_id').val();
-        debugger;
-        window.location.href = carpeta + '/descargar-excel-detalle-consolidado-general-area/' + id_consolidado_general_seleccionado + '/' + familia_id;
+        let familia_id = $('#familia_id').val();        window.location.href = carpeta + '/descargar-excel-detalle-consolidado-general-area/' + id_consolidado_general_seleccionado + '/' + familia_id;
     });
 
     // ============================================

@@ -227,23 +227,23 @@ class GestionOrdenPedidoController extends Controller
             ->get();
 
 
-        $listapedido = $this->listaOrdenPedido(
-            "GEN",
-            "",
-            "1901-01-01",
-            "",
-            0,
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            ""
-        );
+        $listapedido = DB::connection('sqlsrv')->select("
+            SELECT OP.*,
+            STUFF((
+                SELECT ' [SEP] ' + ARCH.NOMBRE_ARCHIVO + ' [FLD] ' + ARCH.URL_ARCHIVO
+                FROM dbo.ARCHIVOS ARCH
+                WHERE ARCH.ID_DOCUMENTO = OP.ID_PEDIDO
+                AND ARCH.ACTIVO = 1
+                FOR XML PATH(''), TYPE
+            ).value('.', 'NVARCHAR(MAX)'), 1, 7, '') AS MULTI_ARCHIVOS
+            FROM WEB.ORDEN_PEDIDO OP
+            WHERE OP.ACTIVO = 1
+            AND OP.COD_ESTADO <> 'ETM0000000000006'
+            ORDER BY OP.FEC_PEDIDO DESC
+        ");
+
+        // Convertir el resultado a array asociativo para mantener compatibilidad con la vista
+        $listapedido = json_decode(json_encode($listapedido), true);
 
 
         return view('ordenpedido.ajax.ordenpedido', [
@@ -340,34 +340,43 @@ class GestionOrdenPedidoController extends Controller
 
         $array_detalle = json_decode($request->input('array_detalle'), true) ?? [];
 
-        $nombre_guardado = '';
-        $extension = '';
-        $size = 0;
-        $url_archivo = '';
+        $archivos_info = []; // Almacenar info de cada archivo para insertar después
 
         if ($request->hasFile('select_file')) {
 
-            $archivo = $request->file('select_file');
+            $archivos = $request->file('select_file');
 
-            // Obtener datos ANTES de moverlo
-            $nombre_original = $archivo->getClientOriginalName();
-            $extension = $archivo->getClientOriginalExtension();
-            $nombre_sin_extension = pathinfo($nombre_original, PATHINFO_FILENAME);
-            $size = $archivo->getSize();
-            $mime = $archivo->getMimeType();
-
-            $nombre_guardado = time() . '_' . $nombre_original;
-
-            $destino_remoto = '\\\\10.1.50.2\\comprobantes\\ORDENPEDIDO';
-            $ruta = $destino_remoto . '\\' . $nombre_guardado;
-
-            // Al ser una ruta de red UNC, copy() es más fiable que move() (rename)
-            if(!copy($archivo->getRealPath(), $ruta)){
-                 // Si falla la copia directa, lanzamos error específico
-                 throw new \Symfony\Component\HttpFoundation\File\Exception\FileException("No se pudo escribir en el directorio de red: " . $destino_remoto);
+            // Soportar tanto un archivo como múltiples
+            if (!is_array($archivos)) {
+                $archivos = [$archivos];
             }
 
+            foreach ($archivos as $archivo) {
+                $nombre_original = $archivo->getClientOriginalName();
+                $extension_item = $archivo->getClientOriginalExtension();
+                $nombre_sin_extension = pathinfo($nombre_original, PATHINFO_FILENAME);
+                $size_item = $archivo->getSize();
+                $mime_item = $archivo->getMimeType();
+                $nombre_guardado = time() . '_' . $nombre_original;
 
+                $destino_remoto = '\\\\10.1.50.2\\comprobantes\\ORDENPEDIDO';
+                $ruta_item = $destino_remoto . '\\' . $nombre_guardado;
+
+                if (!copy($archivo->getRealPath(), $ruta_item)) {
+                    throw new \Symfony\Component\HttpFoundation\File\Exception\FileException(
+                        "No se pudo escribir en el directorio de red: " . $destino_remoto
+                    );
+                }
+
+                $archivos_info[] = [
+                    'nombre_original'     => $nombre_original,
+                    'nombre_sin_extension'=> $nombre_sin_extension,
+                    'extension'           => $extension_item,
+                    'size'                => $size_item,
+                    'mime'                => $mime_item,
+                    'ruta'                => $ruta_item,
+                ];
+            }
         }
 
         // =======================
@@ -487,26 +496,28 @@ class GestionOrdenPedidoController extends Controller
             }
         }
 
-        if ($request->hasFile('select_file')) {
+        if (count($archivos_info) > 0) {
             if ($accion === 'U') {
                 DB::table('dbo.ARCHIVOS')
                     ->where('ID_DOCUMENTO', $orden_pedido_id)
                     ->update(['ACTIVO' => 0]);
             }
 
-            DB::table('dbo.ARCHIVOS')->insert([
-                'ID_DOCUMENTO' => $orden_pedido_id ?? '',
-                'DOCUMENTO_ITEM' => 1,
-                'TIPO_ARCHIVO' => $mime,
-                'NOMBRE_ARCHIVO' => $nombre_sin_extension,
-                'DESCRIPCION_ARCHIVO' => $nombre_original,
-                'URL_ARCHIVO' => $ruta,
-                'EXTENSION' => $extension,
-                'SIZE' => $size,
-                'ACTIVO' => 1,
-                'FECHA_CREA' => DB::raw('GETDATE()'),
-                'USUARIO_CREA' => Session::get('usuario')->usuario ?? 'SISTEMA',
-            ]);
+            foreach ($archivos_info as $idx => $info) {
+                DB::table('dbo.ARCHIVOS')->insert([
+                    'ID_DOCUMENTO'       => $orden_pedido_id ?? '',
+                    'DOCUMENTO_ITEM'     => $idx + 1,
+                    'TIPO_ARCHIVO'       => $info['mime'],
+                    'NOMBRE_ARCHIVO'     => $info['nombre_sin_extension'],
+                    'DESCRIPCION_ARCHIVO'=> $info['nombre_original'],
+                    'URL_ARCHIVO'        => $info['ruta'],
+                    'EXTENSION'          => $info['extension'],
+                    'SIZE'               => $info['size'],
+                    'ACTIVO'             => 1,
+                    'FECHA_CREA'         => DB::raw('GETDATE()'),
+                    'USUARIO_CREA'       => Session::get('usuario')->usuario ?? 'SISTEMA',
+                ]);
+            }
         }
 
         return response()->json(['success' => true]);
@@ -718,7 +729,7 @@ class GestionOrdenPedidoController extends Controller
 
     public function actionAjaxBuscarProducto(Request $request)
     {
-        $q = $request->input('q');
+        $term = $request->input('term');
         $tipo = $request->input('tipo'); // Material o Servicio
         $empresa = Session::get('empresas')->COD_EMPR;
 
@@ -726,10 +737,10 @@ class GestionOrdenPedidoController extends Controller
             ->leftJoin('CMP.CATEGORIA as CAT', 'PRD.COD_CATEGORIA_UNIDAD_MEDIDA', '=', 'CAT.COD_CATEGORIA')
             ->where('PRD.COD_EMPR', $empresa)
             ->where('PRD.COD_ESTADO', 1)
-            ->when($q, function ($query) use ($q) {
-                $query->where(function ($sub) use ($q) {
-                    $sub->where('PRD.NOM_PRODUCTO', 'LIKE', '%' . $q . '%')
-                        ->orWhere('PRD.COD_PRODUCTO', 'LIKE', '%' . $q . '%');
+            ->when($term, function ($query) use ($term) {
+                $query->where(function ($sub) use ($term) {
+                    $sub->where('PRD.NOM_PRODUCTO', 'LIKE', '%' . $term . '%')
+                        ->orWhere('PRD.COD_PRODUCTO', 'LIKE', '%' . $term . '%');
                 });
             })
             ->when($tipo, function ($query) use ($tipo) {
@@ -744,9 +755,14 @@ class GestionOrdenPedidoController extends Controller
                 DB::raw("CAST(PRD.CAN_PRECIO AS FLOAT) as PRECIO"),
                 'PRD.IND_MATERIAL_SERVICIO'
             )
-            ->limit(30)
+            ->limit(100)
             ->get();
 
         return response()->json($productos);
+    }
+
+    public function actionBuscarProductoCompra(Request $request)
+    {
+        return $this->actionAjaxBuscarProducto($request);
     }
 }
