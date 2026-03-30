@@ -137,36 +137,46 @@ class ReporteOrdenPedidoController extends Controller
 
     public function actionDescargarArchivo($archivo)
     {
-        // 0. Decodificar si parece Base64 (las rutas UNC suelen tener caracteres no permitidos en URLs)
+        // 1. Decodificar Base64 siempre (el frontend ahora siempre envía base64)
         $archivo_decodificado = base64_decode($archivo, true);
-        if ($archivo_decodificado !== false && (substr($archivo_decodificado, 0, 1) === '\\' || strpos($archivo_decodificado, ':') !== false)) {
-            $archivo = $archivo_decodificado;
+        
+        if ($archivo_decodificado !== false) {
+            $ruta_proceso = $archivo_decodificado;
         } else {
-             $archivo = urldecode($archivo);
+            $ruta_proceso = urldecode($archivo);
         }
 
-        // 1. Intentar ruta tal cual llega (útil para UNC o rutas ya completas)
-        $ruta = $archivo;
+        // 2. Determinar la ruta final
+        $final_path = '';
 
-        // 2. Si no existe, intentar como ruta local del proyecto
-        if (!file_exists($ruta)) {
-            $ruta = public_path($archivo);
+        // Si es una ruta absoluta (UNC o Letra de unidad tipo C:\)
+        if (substr($ruta_proceso, 0, 1) === '\\' || (strlen($ruta_proceso) > 1 && $ruta_proceso[1] === ':')) {
+            $final_path = $ruta_proceso;
+        } else {
+            // Es una ruta relativa (ej: 'uploads/file.docx') -> Buscar en public
+            $final_path = public_path($ruta_proceso);
         }
 
-        // 3. Si aún no existe y parece una ruta de red mal formateada (ej: \10.1.50.2...)
-        if (!file_exists($ruta)) {
-            $ruta_posible_unc = '\\\\' . ltrim($archivo, '\\');
-            if (file_exists($ruta_posible_unc)) {
-                $ruta = $ruta_posible_unc;
+        // 3. Fallback: Si no existe, intentar forzar el prefijo UNC \\ si parece IP
+        if (!file_exists($final_path)) {
+            $ruta_ltrim = ltrim($ruta_proceso, '\\');
+            if (preg_match('/^\d{1,3}\.\d{1,3}\./', $ruta_ltrim)) { // Si empieza por algo tipo 10.1...
+                $ruta_unc_auto = '\\\\' . $ruta_ltrim;
+                if (file_exists($ruta_unc_auto)) {
+                    $final_path = $ruta_unc_auto;
+                }
             }
         }
 
-        if (!file_exists($ruta)) {
-             abort(404, "El archivo no se encuentra en la ubicación registrada: " . $ruta);
+        // 4. Verificación final y entrega
+        if (!file_exists($final_path)) {
+            abort(404, "El archivo no existe en el servidor: " . $final_path);
         }
 
-        return response()->download($ruta);
+        return response()->download($final_path);
     }
+
+
 
     public function subirArchivo(Request $request)
     {

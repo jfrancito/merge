@@ -514,26 +514,34 @@ class ValeRendirController extends Controller
                $valesPendientes = $this->valependientesrendir($cod_usuario_registro);
                $pendienteCount = count($valesPendientes);
 
-
-                if ($areacomercial === 'MARKETING Y DESARROLLO' && $cod_usuario_registro !== '1CIX00000209' && $cod_usuario_registro !== '1CIX00000046') {
-                    if ($pendienteCount >= 3) {
-                        return response()->json([
-                            'error' => 'Usted tiene 3 o más vales pendientes por rendir. No puede generar un cuarto vale.'
-                        ]);
-                    }
-                } elseif ($areacomercial === 'ADMINISTRACION' && $cod_usuario_registro === '1CIX00000209' && $cod_usuario_registro === '1CIX00000046') {
+                if (in_array($cod_usuario_registro, ['1CIX00000209', '1CIX00000046'])) {
+                    // Usuarios especiales → hasta 4 vales
                     if ($pendienteCount >= 4) {
                         return response()->json([
                             'error' => 'Usted tiene 4 o más vales pendientes por rendir. No puede generar un quinto vale.'
                         ]);
                     }
-                } elseif ($areacomercial === 'GERENCIA GENERAL' && $cod_usuario_registro !== '1CIX00000209' && $cod_usuario_registro !== '1CIX00000046') {
+
+                } elseif ($areacomercial === 'ADMINISTRACION') {
+                    // ADMINISTRACIÓN → hasta 4 vales
+                    if ($pendienteCount >= 4) {
+                        return response()->json([
+                            'error' => 'Usted tiene 4 o más vales pendientes por rendir. No puede generar un quinto vale.'
+                        ]);
+                    }
+
+                } elseif (
+                    in_array($areacomercial, ['MARKETING Y DESARROLLO', 'GERENCIA GENERAL'])
+                ) {
+                    // MARKETING y GERENCIA → hasta 3 vales
                     if ($pendienteCount >= 3) {
                         return response()->json([
                             'error' => 'Usted tiene 3 o más vales pendientes por rendir. No puede generar un cuarto vale.'
                         ]);
                     }
-                } elseif ($cod_usuario_registro !== '1CIX00000209' && $cod_usuario_registro !== '1CIX00000046') { // Excluimos al usuario especial
+
+                } else {
+                    // RESTO → hasta 2 vales
                     if ($pendienteCount >= 2) {
                         return response()->json([
                             'error' => 'Usted tiene 2 o más vales pendientes por rendir. No puede generar un tercer vale.'

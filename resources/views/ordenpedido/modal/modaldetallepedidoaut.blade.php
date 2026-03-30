@@ -28,15 +28,29 @@
       <thead class="text-white sticky-top detalle-thead">
         <tr class="text-uppercase small">
           <th style="width:5%" class="text-center">#</th>
-          <th style="width:30%">Producto</th>
-          <th style="width:20%">Categoría</th>
+          <th style="width:25%">Producto</th>
+          <th style="width:15%">Categoría</th>
           <th style="width:10%" class="text-center">Cant.</th>
-          <th style="width:35%">Observación</th>
+          <th style="width:15%" class="text-right">Precio</th>
+          <th style="width:15%" class="text-right">Total</th>
+          <th style="width:15%">Observación</th>
         </tr>
       </thead>
 
       <tbody>
+        @php $suma_total_general = 0; @endphp
         @forelse($pedillodetalle as $index => $detalle)
+        @php
+        // Determinar la cantidad que se va a mostrar
+        $cantidad_mostrar = $detalle->CAN_MODIF_ADM 
+                             ?? $detalle->CAN_MODIF_GER 
+                             ?? $detalle->CAN_MODIF_JEF_AUT 
+                             ?? $detalle->CANTIDAD;
+        
+        $precio = $detalle->CAN_PRECIO ?? 0;
+        $subtotal = $cantidad_mostrar * $precio;
+        $suma_total_general += $subtotal;
+        @endphp
         <tr>
           <td class="text-center fw-semibold text-muted">
             {{ $index + 1 }}
@@ -53,14 +67,6 @@
           </td>
 
           <td class="text-center">
-            @php
-            // Determinar la cantidad que se va a mostrar
-            $cantidad_mostrar = $detalle->CAN_MODIF_ADM 
-                                 ?? $detalle->CAN_MODIF_GER 
-                                 ?? $detalle->CAN_MODIF_JEF_AUT 
-                                 ?? $detalle->CANTIDAD;
-            @endphp
-           
             @if (
             $pedido->COD_TRABAJADOR_AUTORIZA == $cod_usuario_session &&
             $pedido->COD_ESTADO == 'ETM0000000000010'
@@ -80,7 +86,14 @@
             @endif
           </td>
 
-   
+          <td class="text-right fw-bold text-success">
+            S/ {{ number_format($precio, 2, '.', ',') }}
+          </td>
+          
+          <td class="text-right fw-bold" style="color:#1f2a50;">
+            S/ {{ number_format($subtotal, 2, '.', ',') }}
+          </td>
+
           <td class="text-truncate observacion"
               title="{{ $detalle->TXT_OBSERVACION }}">
             {{ $detalle->TXT_OBSERVACION ?: '—' }}
@@ -88,12 +101,21 @@
         </tr>
         @empty
         <tr>
-          <td colspan="5" class="text-center text-muted fst-italic py-4">
+          <td colspan="7" class="text-center text-muted fst-italic py-4">
             No hay productos en este pedido.
           </td>
         </tr>
         @endforelse
       </tbody>
+      <tfoot>
+        <tr style="background-color: #f8f9fa;">
+            <td colspan="5" class="text-right fw-bold" style="font-size: 1.1rem; color: #1f2a50;">TOTAL GENERAL:</td>
+            <td class="text-right fw-bold" style="font-size: 1.2rem; color: #d9534f;">
+                S/ {{ number_format($suma_total_general, 2, '.', ',') }}
+            </td>
+            <td></td>
+        </tr>
+      </tfoot>
 
     </table>
   </div>
@@ -141,7 +163,7 @@
 
 /* ===== SCROLL ===== */
 .detalle-scroll {
-    max-height: 60vh;
+    max-height: 45vh;     /* altura controlada: deja espacio al header y footer */
     overflow-y: auto;
     background: linear-gradient(180deg, #f9fafc, #eef1f7);
 }

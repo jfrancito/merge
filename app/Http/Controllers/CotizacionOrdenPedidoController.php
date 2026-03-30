@@ -26,11 +26,13 @@ class CotizacionOrdenPedidoController extends Controller
             ->where('COD_ESTADO', 1)
             ->pluck('NOM_CATEGORIA', 'COD_CATEGORIA')
             ->toArray();
+        $combo_tipo_pago = ['' => 'Seleccione tipo de pago'] + $combo_tipo_pago;
 
         $combo_moneda = DB::table('CMP.CATEGORIA')
             ->whereIn('COD_CATEGORIA', ['MOM0000000000001', 'MOM0000000000002'])
             ->pluck('NOM_CATEGORIA', 'COD_CATEGORIA')
             ->toArray();
+        $combo_moneda = ['' => 'Seleccione moneda'] + $combo_moneda;
 
         // Calcular correlativo siguiendo la lógica del SP
         $empresa_sesion = Session::get('empresas');
@@ -64,13 +66,20 @@ class CotizacionOrdenPedidoController extends Controller
             $nro_cotizacion = $prefijo . str_pad(1, 11, '0', STR_PAD_LEFT);
         }
 
-        // Obtener tipo de cambio actual (específico para la fecha de hoy)
+        // Obtener tipo de cambio actual (específico para la fecha de hoy, usando la lógica nativa SQL Server)
         $tipo_cambio = DB::table('CMP.TIPO_CAMBIO')
-            ->whereDate('FEC_CAMBIO', date('Y-m-d'))
+            ->whereRaw('CAST(FEC_CAMBIO AS DATE) = CAST(GETDATE() AS DATE)')
             ->where('COD_ESTADO', 1)
             ->first();
-
-        $valor_tipo_cambio = $tipo_cambio ? $tipo_cambio->CAN_COMPRA : 0;
+        
+        $valor_tipo_cambio = 0;
+        if ($tipo_cambio) {
+            $valor_tipo_cambio = $tipo_cambio->CAN_COMPRA;
+            // Normalizar si el ERP lo guarda escalado por 10000 (ej: 34480.0000 -> 3.4480)
+            if ($valor_tipo_cambio > 100) {
+                $valor_tipo_cambio = $valor_tipo_cambio / 10000;
+            }
+        }
 
         $listacotizaciones = DB::table('WEB.ORDEN_COTIZACION as C')
             ->leftJoin('dbo.ARCHIVOS as A', function ($join) {

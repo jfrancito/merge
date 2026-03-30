@@ -61,13 +61,44 @@
                                         <i class="fa fa-eye me-1"></i> Detalle
                                     </button>
 
-                                    @if($item['URL_ARCHIVO'] != '' && (strpos($item['URL_ARCHIVO'], '\\\\') === 0 ? file_exists($item['URL_ARCHIVO']) : file_exists(public_path($item['URL_ARCHIVO']))))
-                                        <a href="{{ url('descargar-archivo-informe/'.$item['URL_ARCHIVO']) }}"
-                                           class="btn btn-xs btn-success"
-                                           title="Descargar archivo">
-                                            <i class="fa fa-download"></i>
-                                        </a>
+                                    @if($item['MULTI_ARCHIVOS'] != '')
+                                        @php
+                                            $archivos_raw = explode(' [SEP] ', $item['MULTI_ARCHIVOS']);
+                                            $archivos = [];
+                                            foreach($archivos_raw as $ar) {
+                                                $partes = explode(' [FLD] ', $ar);
+                                                if(count($partes) == 2) {
+                                                    $archivos[] = ['nombre' => $partes[0], 'url' => $partes[1]];
+                                                }
+                                            }
+                                        @endphp
+
+                                        @if(count($archivos) > 1)
+                                            <!-- MÚLTIPLES ARCHIVOS: DROPDOWN -->
+                                            <div class="btn-group">
+                                                <button type="button" class="btn btn-xs btn-success dropdown-toggle" data-toggle="dropdown">
+                                                    <i class="fa fa-download"></i> Archivos <span class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                                    @foreach($archivos as $index => $arch)
+                                                        <li>
+                                                            <a href="{{ url('descargar-archivo-informe/'.base64_encode($arch['url'])) }}" target="_blank">
+                                                                {{ ($index + 1) . '. ' . $arch['nombre'] }}
+                                                            </a>
+                                                        </li>
+                                                    @endforeach
+                                                </ul>
+                                            </div>
+                                        @elseif(count($archivos) == 1)
+                                            <!-- UN SOLO ARCHIVO -->
+                                            <a href="{{ url('descargar-archivo-informe/'.base64_encode($archivos[0]['url'])) }}"
+                                               class="btn btn-xs btn-success"
+                                               title="Descargar: {{ $archivos[0]['nombre'] }}">
+                                                <i class="fa fa-download"></i>
+                                            </a>
+                                        @endif
                                     @else
+                                        <!-- NO HAY ARCHIVOS: BOTÓN DE SUBIR -->
                                         <button class="btn btn-xs btn-primary subir-archivo"
                                                 data-id="{{$item['ID_PEDIDO']}}">
                                             <i class="fa fa-upload"></i>

@@ -34,23 +34,26 @@ class GestionOrdenPedidoAutorizaController extends Controller
         $usuario_logueado_id = Session::get('usuario')->usuarioosiris_id;
 
 
-        $listapedido = $this->listaOrdenPedido(
-            "GEN",
-            "",
-            "1901-01-01",
-            "",
-            0,
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            ""
-        );
+        $empresa_id = Session::get('empresas')->COD_EMPR;
+
+        $listapedido = DB::connection('sqlsrv')->select("
+            SELECT OP.*,
+            STUFF((
+                SELECT ' [SEP] ' + ARCH.NOMBRE_ARCHIVO + ' [FLD] ' + ARCH.URL_ARCHIVO
+                FROM dbo.ARCHIVOS ARCH
+                WHERE ARCH.ID_DOCUMENTO = OP.ID_PEDIDO
+                AND ARCH.ACTIVO = 1
+                FOR XML PATH(''), TYPE
+            ).value('.', 'NVARCHAR(MAX)'), 1, 7, '') AS MULTI_ARCHIVOS
+            FROM WEB.ORDEN_PEDIDO OP
+            WHERE OP.ACTIVO = 1
+            AND OP.COD_EMPR = ?
+            ORDER BY OP.FEC_PEDIDO DESC
+        ", [$empresa_id]);
+
+
+        $listapedido = json_decode(json_encode($listapedido), true);
+
 
         return view('ordenpedido.ajax.autorizaordenpedido', [
             'listapedido' => $listapedido,
