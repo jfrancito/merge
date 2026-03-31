@@ -160,8 +160,8 @@
                             ¿De qué trata esta actualización?
                         </h5>
                         <p class="text-muted text-justify" style="font-size: 15px; line-height: 1.7; color: #475569;">
-                            Hemos implementado una nueva forma de <b>integrar automáticamente la Planilla de Movilidad a tus Liquidaciones de Gastos</b>. 
-                            Este proceso optimizado permite vincular los gastos de transporte de manera directa, asegurando mayor precisión y rapidez en tus registros administrativos.
+                            <b>COMUNICADO:</b> Las planillas de movilidad que se generen desde el 1ero de Abril del 2026 estarán bajo esta nueva forma de <b>integrar automáticamente la Planilla de Movilidad a tus Liquidaciones de Gastos</b>. Este proceso optimizado permite vincular los gastos por movilidad local de manera directa, asegurando mayor precisión y rapidez en tus registros administrativos. 
+                            Tomar en cuenta que las planillas de movilidad generadas al 31 de Marzo del 2026 se mantienen en cargar con la planilla de movilidad consolidada.
                         </p>
                         
                         <div class="mt-4 p-3 rounded" style="background: #f0f4ff; border: 1px solid #d9e2ff; color: #3f51b5; font-size: 13.5px; display: flex; align-items: flex-start;">
