@@ -24,44 +24,75 @@
                     <th class="text-center">U.M.</th>
                     <th class="text-center">CANTIDAD</th>
                     <th class="text-center" width="120">PRECIO</th>
+                    <th class="text-center" width="120">PRECIO IGV</th>
                     <th>FAMILIA</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($lista_detalle as $index => $item)
+                @php
+                    $id_pedido_consolidado = $item->ID_PEDIDO_CONSOLIDADO_GENERAL ?? ($item->ID_PEDIDO_CONSOLIDADO_GENERAL_DETALLE ?? '');
+                    $cod_producto = $item->COD_PRODUCTO;
+                    $nom_producto = $item->NOM_PRODUCTO;
+                    $nom_medida = $item->NOM_CATEGORIA_MEDIDA;
+                    $cod_medida = $item->COD_CATEGORIA_MEDIDA;
+                    $cantidad = $item->CANTIDAD ?? ($item->CAN_COTIZACION ?? 0);
+                    $precio = $item->CAN_PRECIO ?? ($item->CAN_PRECIO_UNITARIO ?? 0);
+                    $precio_igv = $item->CAN_PRECIO_IGV ?? 0;
+                    $cod_familia = $item->COD_CATEGORIA_FAMILIA;
+                    $nom_familia = $item->NOM_CATEGORIA_FAMILIA;
+                @endphp
                 <tr>
                     <td class="text-center">
                         <div class="be-checkbox be-checkbox-sm inline">
-                            <input class="check-producto" type="checkbox" id="check-{{ $item->COD_PRODUCTO }}-{{ $index }}">
-                            <label for="check-{{ $item->COD_PRODUCTO }}-{{ $index }}"></label>
+                            <input class="check-producto" type="checkbox" id="check-{{ $cod_producto }}-{{ $index }}">
+                            <label for="check-{{ $cod_producto }}-{{ $index }}"></label>
                         </div>
                     </td>
                     <td class="text-center">{{ $index + 1 }}</td>
-                    <td class="font-bold">{{ $item->ID_PEDIDO_CONSOLIDADO_GENERAL }}</td>
-                    <td class="text-primary">{{ $item->COD_PRODUCTO }}</td>
-                    <td>{{ $item->NOM_PRODUCTO }}</td>
-                    <td class="text-center">{{ $item->NOM_CATEGORIA_MEDIDA }}</td>
-                    <td class="text-center font-bold" style="font-size: 15px; color: #1d3a6d;">{{ number_format($item->CANTIDAD, 2) }}</td>
+                    <td class="font-bold">{{ $id_pedido_consolidado }}</td>
+                    <td class="text-primary">{{ $cod_producto }}</td>
+                    <td>{{ $nom_producto }}</td>
+                    <td class="text-center">{{ $nom_medida }}</td>
+                    <td class="text-center">
+                        <input type="number" 
+                               class="form-control input-sm text-center cantidad-producto premium-input" 
+                               value="{{ number_format($cantidad, 2, '.', '') }}" 
+                               step="0.01" 
+                               min="0.01"
+                               style="height: 32px !important; font-weight: 700; color: #1d3a6d; width: 100px; margin: 0 auto;">
+                    </td>
                     <td class="text-center">
                         <div class="input-group" style="width: 110px; margin: 0 auto;">
                             <span class="input-group-addon moneda-simbolo" style="padding: 4px 8px; font-size: 12px;">S/</span>
                             <input type="number" 
                                    class="form-control input-sm text-right precio-producto premium-input" 
-                                   value="0.00" 
+                                   value="{{ number_format($precio, 2, '.', '') }}" 
                                    step="0.01" 
                                    min="0"
                                    style="height: 32px !important; font-weight: 700;"
-                                   data-cantidad="{{ $item->CANTIDAD }}"
-                                   data-id-consolidado="{{ $item->ID_PEDIDO_CONSOLIDADO_GENERAL }}"
-                                   data-cod-producto="{{ $item->COD_PRODUCTO }}"
-                                   data-nom-producto="{{ $item->NOM_PRODUCTO }}"
-                                   data-cod-medida="{{ $item->COD_CATEGORIA_MEDIDA }}"
-                                   data-nom-medida="{{ $item->NOM_CATEGORIA_MEDIDA }}"
-                                   data-cod-familia="{{ $item->COD_CATEGORIA_FAMILIA }}"
-                                   data-nom-familia="{{ $item->NOM_CATEGORIA_FAMILIA }}">
+                                   data-cantidad="{{ $cantidad }}"
+                                   data-id-consolidado="{{ $id_pedido_consolidado }}"
+                                   data-cod-producto="{{ $cod_producto }}"
+                                   data-nom-producto="{{ $nom_producto }}"
+                                   data-cod-medida="{{ $cod_medida }}"
+                                   data-nom-medida="{{ $nom_medida }}"
+                                   data-cod-familia="{{ $cod_familia }}"
+                                   data-nom-familia="{{ $nom_familia }}">
                         </div>
                     </td>
-                    <td>{{ $item->NOM_CATEGORIA_FAMILIA }}</td>
+                    <td class="text-center">
+                        <div class="input-group" style="width: 110px; margin: 0 auto;">
+                            <span class="input-group-addon moneda-simbolo" style="padding: 4px 8px; font-size: 12px;">S/</span>
+                            <input type="number" 
+                                   class="form-control input-sm text-right precio-igv-producto premium-input" 
+                                   value="{{ number_format($precio_igv, 2, '.', '') }}" 
+                                   step="0.01" 
+                                   min="0"
+                                   style="height: 32px !important; font-weight: 700; color: #1d3a6d;">
+                        </div>
+                    </td>
+                    <td>{{ $nom_familia }}</td>
                 </tr>
                 @endforeach
             </tbody>

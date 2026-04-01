@@ -235,6 +235,7 @@ trait OrdenPedidoTraits
             ->leftJoin('CMP.CATEGORIA as CAT', 'CAT.COD_CATEGORIA', '=', 'P.COD_CATEGORIA_FAMILIA')
             ->leftJoin('users as U', 'U.id', '=', 'OP.COD_USUARIO_MODIF_AUD')
             ->where('OP.ACTIVO', 1)
+            ->where('OD.ACTIVO', 1)
             ->when($empresa_id && $empresa_id != 'TODO', function ($q) use ($empresa_id) {
                 $q->where('OP.COD_EMPR', $empresa_id);
             })

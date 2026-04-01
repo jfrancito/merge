@@ -1,3 +1,17 @@
+<!-- BARRA DE BÚSQUEDA -->
+<div class="row" style="margin-bottom: 15px; padding: 0 5px;">
+    <div class="col-md-12">
+        <div class="input-group shadow-soft" style="border-radius: 25px; overflow: hidden;">
+            <span class="input-group-addon" style="background: #1d3a6d; color: #fff; border: none;">
+                <i class="mdi mdi-magnify" style="font-size: 20px; vertical-align: middle;"></i>
+            </span>
+            <input type="text" id="buscar_consolidado_modal" class="form-control" 
+                   placeholder="Escribe para buscar por ID o Categoría..." 
+                   style="border: none; height: 45px; font-weight: 500; font-size: 14px;">
+        </div>
+    </div>
+</div>
+
 <div class="table-responsive" style="max-height: 450px; overflow-y: auto;">
     <table id="table-consolidado-aprobado" class="table table-striped table-hover table-fw-widget listatabla">
         <thead>
@@ -48,6 +62,14 @@
         // Seleccionar todos los checkboxes
         $('#check-all-consolidados').on('change', function() {
             $('.check-consolidado').prop('checked', $(this).prop('checked'));
+        });
+
+        // Filtrar consolidados en tiempo real
+        $('#buscar_consolidado_modal').on('keyup', function() {
+            var value = $(this).val().toLowerCase();
+            $("#table-consolidado-aprobado tbody tr").filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
         });
 
         // Al hacer clic en una fila, seleccionar el checkbox (UX mejorada)

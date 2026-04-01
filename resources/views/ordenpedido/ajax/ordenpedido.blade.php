@@ -106,10 +106,10 @@
     
 
     <script type="text/javascript">
-
         $(document).ready(function () {
             App.init();
             App.formElements();
+            
             App.dataTables();
             $('[data-toggle="tooltip"]').tooltip();
         });

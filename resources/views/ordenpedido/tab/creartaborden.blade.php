@@ -301,11 +301,18 @@
                     <input
                             type="file"
                             class="form-control input-sm"
-                            name="select_file"
+                            name="select_file[]"
                             id="formFile"
-                            required
+                            multiple
                             accept=".xls,.xlsx,.csv,.pdf,.doc,.docx"
                             style="cursor:pointer;">
+                    
+                    <div id="contenedor_archivo_cargado" style="display: none; margin-top: 10px;">
+                        <span class="label label-success" style="font-size: 13px;">
+                            <i class="fa fa-file"></i> Archivo cargado: 
+                            <a href="#" id="enlace_archivo_cargado" target="_blank" style="color: white; text-decoration: underline;"></a>
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -330,7 +337,7 @@
                     TIPO PROD. <span class="obligatorio">(*)</span>
                 </label>
                 <select id="tipo_material_servicio" class="form-control select2">
-                    <option value="">TODOS</option>
+                    <option value="">Seleccione...</option>
                     <option value="M">MATERIAL</option>
                     <option value="S">SERVICIO</option>
                 </select>
@@ -340,7 +347,7 @@
                 <label class="label-sm negrita">
                     PRODUCTO <span class="obligatorio">(*)</span>
                 </label>
-                <select id="cod_producto" class="form-control select2 select2-lg" style="width: 100%;">
+                <select id="producto_id" class="form-control select2 select2-lg" style="width: 100%;">
                     <option value="">Buscar producto...</option>
                     @foreach($producto as $prd)
                         <option value="{{ $prd->COD_PRODUCTO }}"

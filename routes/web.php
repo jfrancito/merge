@@ -1047,6 +1047,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::post('/ajax-pedido-editar', 'GestionOrdenPedidoController@actionAjaxPedidoEditar');
 	Route::post('/ajax-obtener-correlativo-pedido', 'GestionOrdenPedidoController@actionAjaxObtenerCorrelativoPedido');
 	Route::post('/ajax-buscar-producto', 'GestionOrdenPedidoController@actionAjaxBuscarProducto');
+	Route::get('/buscarproductocompra', 'GestionOrdenPedidoController@actionBuscarProductoCompra');
 
 	Route::get('/reporte-orden-pedido/{idopcion}', 'ReporteOrdenPedidoController@actionReporteOrdenPedido');
 	Route::any('/ajax-buscar-documento-op', 'ReporteOrdenPedidoController@actionListarAjaxBuscarDocumentoOP');
@@ -1109,6 +1110,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::post('/ajax-listar-detalle-consolidado-general-seleccionado', 'CotizacionOrdenPedidoController@actionAjaxListarDetalleConsolidadoGeneralSeleccionado');
 	Route::post('/ajax-guardar-cotizacion', 'CotizacionOrdenPedidoController@actionGuardarCotizacion');
 	Route::post('/ajax-listar-detalle-cotizacion', 'CotizacionOrdenPedidoController@actionAjaxListarDetalleCotizacion');
+	Route::post('/ajax-editar-cotizacion', 'CotizacionOrdenPedidoController@actionAjaxEditarCotizacion');
 	Route::post('/ajax-subir-archivo-cotizacion', 'CotizacionOrdenPedidoController@actionAjaxSubirArchivoCotizacion');
 
     Route::get('/reporte-orden-pedido-estado/{idopcion}', 'ReporteOrdenPedidoController@actionReporteOrdenPedidoEstado');
@@ -1258,7 +1260,6 @@ Route::get('buscarproducto', function (Illuminate\Http\Request $request) {
 	}
 	return \Response::json($valid_tags);
 });
-
 
 
 

@@ -1,6 +1,7 @@
 
 <div class="container-fluid ordenpedido">
     <input type="hidden" id="tipo_cambio_actual" value="{{ $valor_tipo_cambio }}">
+    <input type="hidden" id="id_cotizacion_edit" value="">
 
     <!-- HEADER PRINCIPAL -->
     <div class="panel panel-default shadow-premium">
@@ -35,7 +36,7 @@
                         <div class="col-md-2">
                             <div class="form-group">
                                 <label>Serie</label>
-                                <input type="text" class="form-control premium-input text-center" id="serie" placeholder="S001">
+                                <input type="text" class="form-control premium-input text-center" id="serie" placeholder="S001" maxlength="4" oninput="this.value = this.value.toUpperCase().replace(/[^0-9A-Z]/g, '')">
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -100,7 +101,7 @@
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Tipo de Crédito</label>
-                                {!! Form::select( 'tipo_pago_id', $combo_tipo_pago, array(),
+                                {!! Form::select( 'tipo_pago_id', $combo_tipo_pago, null,
                                     ['class' => 'form-control select2 premium-input' , 'id' => 'tipo_pago_id', 'required' => 'required']) 
                                 !!}
                             </div>
@@ -123,7 +124,7 @@
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Moneda</label>
-                                {!! Form::select( 'moneda_id', $combo_moneda, array(),
+                                {!! Form::select( 'moneda_id', $combo_moneda, null,
                                     ['class' => 'form-control select2 premium-input' , 'id' => 'moneda_id', 'required' => 'required']) 
                                 !!}
                             </div>
