@@ -1,6 +1,7 @@
 
 <div class="container-fluid ordenpedido">
     <input type="hidden" id="tipo_cambio_actual" value="{{ $valor_tipo_cambio }}">
+    <input type="hidden" id="id_cotizacion_edit" value="">
 
     <!-- HEADER PRINCIPAL -->
     <div class="panel panel-default shadow-premium">

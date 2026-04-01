@@ -117,6 +117,32 @@ class CotizacionOrdenPedidoController extends Controller
         ]);
     }
 
+    public function actionAjaxEditarCotizacion(Request $request)
+    {
+        $id_cotizacion = $request->input('id_cotizacion');
+
+        $cotizacion = DB::table('WEB.ORDEN_COTIZACION')
+            ->where('ID_COTIZACION', $id_cotizacion)
+            ->first();
+
+        $detalles = DB::table('WEB.ORDEN_COTIZACION_DETALLE')
+            ->where('ID_COTIZACION', $id_cotizacion)
+            ->where('ACTIVO', 1)
+            ->get();
+
+        // Obtener el HTML de los productos para refrescar el panel
+        $prouctos_html = view('ordenpedido.cotizacion.ajax.listaproductoscotizacion', [
+            'lista_detalle' => $detalles,
+            'es_edicion' => true
+        ])->render();
+
+        return response()->json([
+            'success' => true,
+            'cotizacion' => $cotizacion,
+            'productos_html' => $prouctos_html
+        ]);
+    }
+
     public function actionAjaxBuscarProveedorRuc(Request $request)
     {
         $ruc = $request->input('ruc');
@@ -150,11 +176,21 @@ class CotizacionOrdenPedidoController extends Controller
         $empresa_sesion = Session::get('empresas');
         $cod_empr = $empresa_sesion->COD_EMR ?? $empresa_sesion->COD_EMPR;
 
-        $lista_consolidado = DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL')
-            ->where('COD_EMPR', $cod_empr)
-            ->where('COD_ESTADO', 'ETM0000000000005')
-            ->where('ACTIVO', 1)
-            ->orderBy('FEC_PEDIDO', 'DESC')
+        $lista_consolidado = DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL as C')
+            ->where('C.COD_EMPR', $cod_empr)
+            ->where('C.COD_ESTADO', 'ETM0000000000005')
+            ->where('C.ACTIVO', 1)
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE as D')
+                    ->whereColumn('D.ID_PEDIDO_CONSOLIDADO_GENERAL', 'C.ID_PEDIDO_CONSOLIDADO_GENERAL')
+                    ->where('D.ACTIVO', 1)
+                    ->where(function($q) {
+                        $q->whereNull('D.TXT_COTIZACION')
+                          ->orWhere('D.TXT_COTIZACION', '<>', 'SI');
+                    });
+            })
+            ->orderBy('C.FEC_PEDIDO', 'DESC')
             ->get();
 
         return view('ordenpedido.modal.ajax.lista_consolidado_general', [
@@ -169,6 +205,10 @@ class CotizacionOrdenPedidoController extends Controller
         $lista_detalle = DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE')
             ->whereIn('ID_PEDIDO_CONSOLIDADO_GENERAL', $id_consolidado_generals)
             ->where('ACTIVO', 1)
+            ->where(function($q) {
+                $q->where('TXT_COTIZACION', '<>', 'SI')
+                  ->orWhereNull('TXT_COTIZACION');
+            })
             ->get();
 
         return view('ordenpedido.cotizacion.ajax.listaproductoscotizacion', [
@@ -213,10 +253,19 @@ class CotizacionOrdenPedidoController extends Controller
 
             $cod_direccion = $direccion ? $direccion->COD_DIRECCION : '';
 
-            // 4. Inserción de cabecera usando el Trait
+            $id_cotizacion_edit = $request->input('id_cotizacion_edit');
+            $accion = 'I';
+            $id_cotizacion = '';
+
+            if(!empty($id_cotizacion_edit)){
+                $accion = 'U';
+                $id_cotizacion = $id_cotizacion_edit;
+            }
+
+            // 4. Inserción/Actualización de cabecera usando el Trait
             $id_cotizacion = $this->insertOrdenCotizacion(
-                'I',
-                '', // Dejar vacío para que el SP lo genere con su propia lógica de correlativo
+                $accion,
+                $id_cotizacion, 
                 $request->input('fec_cotizacion'),
                 $request->input('nro_serie'),
                 $request->input('nro_doc'),
@@ -243,6 +292,26 @@ class CotizacionOrdenPedidoController extends Controller
             );
 
             // 5. Inserción de detalles
+            // Si es edición, primero desactivamos los detalles anteriores y liberamos el estado 'Cotizado'
+            if($accion == 'U'){
+                // Obtener detalles previos para resetear su estado en consolidados
+                $detalles_previos = DB::table('WEB.ORDEN_COTIZACION_DETALLE')
+                    ->where('ID_COTIZACION', $id_cotizacion)
+                    ->where('ACTIVO', 1)
+                    ->get();
+
+                foreach($detalles_previos as $dp){
+                    DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE')
+                        ->where('ID_PEDIDO_CONSOLIDADO_GENERAL', $dp->ID_PEDIDO_CONSOLIDADO_GENERAL)
+                        ->where('COD_PRODUCTO', $dp->COD_PRODUCTO)
+                        ->update(['TXT_COTIZACION' => null]);
+                }
+
+                DB::table('WEB.ORDEN_COTIZACION_DETALLE')
+                    ->where('ID_COTIZACION', $id_cotizacion)
+                    ->update(['ACTIVO' => 0]);
+            }
+
             $detalles_json = $request->input('detalles');
             $detalles = json_decode($detalles_json, true);
 
@@ -251,7 +320,8 @@ class CotizacionOrdenPedidoController extends Controller
                     $this->insertOrdenCotizacionDetalle(
                         'I',
                         $id_cotizacion,
-                        '',
+                        $det['id_consolidado'],
+                        '', 
                         $cod_centro,
                         $det['cod_producto'],
                         $det['nom_producto'],
@@ -259,11 +329,20 @@ class CotizacionOrdenPedidoController extends Controller
                         $det['nom_medida'],
                         $det['cantidad'],
                         $det['precio'],
+                        $det['precio_igv'] ?? 0,
                         $det['cod_familia'],
                         $det['nom_familia'],
                         1,
                         ''
                     );
+
+                    // Marcar como cotizado en el consolidado general
+                    if (isset($det['id_consolidado'])) {
+                        DB::table('WEB.ORDEN_PEDIDO_CONSOLIDADO_GENERAL_DETALLE')
+                            ->where('ID_PEDIDO_CONSOLIDADO_GENERAL', $det['id_consolidado'])
+                            ->where('COD_PRODUCTO', $det['cod_producto'])
+                            ->update(['TXT_COTIZACION' => 'SI']);
+                    }
                 }
             }
 

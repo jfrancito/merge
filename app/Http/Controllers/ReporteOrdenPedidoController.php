@@ -159,11 +159,20 @@ class ReporteOrdenPedidoController extends Controller
 
         // 3. Fallback: Si no existe, intentar forzar el prefijo UNC \\ si parece IP
         if (!file_exists($final_path)) {
-            $ruta_ltrim = ltrim($ruta_proceso, '\\');
-            if (preg_match('/^\d{1,3}\.\d{1,3}\./', $ruta_ltrim)) { // Si empieza por algo tipo 10.1...
-                $ruta_unc_auto = '\\\\' . $ruta_ltrim;
+            // Limpiar barras iniciales (tanto / como \)
+            $ruta_ltrim = ltrim($ruta_proceso, '\\/');
+            
+            // Si empieza por un patrón de IP (UNC)
+            if (preg_match('/^\d{1,3}\.\d{1,3}\./', $ruta_ltrim)) { 
+                $ruta_unc_auto = '\\\\' . str_replace('/', '\\', $ruta_ltrim);
                 if (file_exists($ruta_unc_auto)) {
                     $final_path = $ruta_unc_auto;
+                }
+            } else {
+                // Probar también reemplazando slashes si es ruta de red
+                $ruta_limpia = str_replace(['//', '/'], ['\\', '\\'], $ruta_proceso);
+                if (file_exists($ruta_limpia)) {
+                    $final_path = $ruta_limpia;
                 }
             }
         }

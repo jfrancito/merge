@@ -198,18 +198,45 @@ $(document).ready(function () {
     $(document).on('click', '.btn-confirmar-seleccion-consolidado', function (e) {
 
         var selected = [];
+        var yaImportados = [];
+
         $('.check-consolidado:checked').each(function () {
-            selected.push($(this).val());
+            var id = $(this).val();
+            var existe = false;
+
+            // Buscar el ID del consolidado en la columna 3 (índice 3 en nth-child) de la tabla principal
+            $('#table-productos-seleccionados tbody tr').each(function () {
+                if ($(this).find('td:nth-child(3)').text().trim() === id) {
+                    existe = true;
+                    return false;
+                }
+            });
+
+            if (existe) {
+                yaImportados.push(id);
+            } else {
+                selected.push(id);
+            }
         });
 
         if (selected.length === 0) {
-            modalBonito({
-                tipo: 'warn',
-                icono: '⚠️',
-                titulo: 'Sin Selección',
-                mensaje: 'Debe seleccionar al menos un consolidado para continuar.',
-                ancho: '400px'
-            });
+            if (yaImportados.length > 0) {
+                modalBonito({
+                    tipo: 'warn',
+                    icono: '⚠️',
+                    titulo: 'Ya Importados',
+                    mensaje: 'Los consolidados seleccionados ya se encuentran en la lista de productos.',
+                    ancho: '420px'
+                });
+            } else {
+                modalBonito({
+                    tipo: 'warn',
+                    icono: '⚠️',
+                    titulo: 'Sin Selección',
+                    mensaje: 'Debe seleccionar al menos un consolidado para continuar.',
+                    ancho: '400px'
+                });
+            }
             return;
         }
 
@@ -224,18 +251,44 @@ $(document).ready(function () {
             },
             success: function (data) {
                 cerrarcargando();
-                $('#lista-productos-cotizacion').html(data);
-                $('#modal-seleccionar-consolidado-general').niftyModal('hide');
+                
+                var $container = $('#lista-productos-cotizacion');
+                var $existingTable = $container.find('#table-productos-seleccionados');
 
-                modalBonito({
-                    tipo: 'success',
-                    icono: '✅',
-                    titulo: 'Productos Cargados',
-                    mensaje: 'Se han importado los productos de los consolidados seleccionados correctamente.',
-                    ancho: '400px'
-                });
-                // Aquí podrías disparar otra función para cargar los productos de esos consolidados en el panel inferior
-                console.log('Consolidados vinculados: ', selected.join(', '));
+                if ($existingTable.length > 0 && !$container.find('.message-empty').length) {
+                    
+                    // Si ya existe la tabla, extraemos solo las filas <tr> del tbody
+                    var $newData = $(data);
+                    var $newRows = $newData.find('#table-productos-seleccionados tbody tr');
+                    var table = $('#table-productos-seleccionados').DataTable();
+
+                    $newRows.each(function () {
+                        table.row.add($(this)).draw(false);
+                    });
+
+                    reordenarItems();
+
+                    modalBonito({
+                        tipo: 'success',
+                        icono: '✅',
+                        titulo: 'Productos Agregados',
+                        mensaje: 'Se han añadido ' + $newRows.length + ' productos adicionales a la lista.',
+                        ancho: '400px'
+                    });
+
+                } else {
+                    // Primera carga o estaba vacío
+                    $container.html(data);
+                    modalBonito({
+                        tipo: 'success',
+                        icono: '✅',
+                        titulo: 'Productos Cargados',
+                        mensaje: 'Se han importado los productos seleccionados correctamente.',
+                        ancho: '400px'
+                    });
+                }
+
+                $('#modal-seleccionar-consolidado-general').niftyModal('hide');
                 calcularTotal();
             },
             error: function () {
@@ -271,9 +324,14 @@ $(document).ready(function () {
         console.log('Tipo de Cambio Hoy: ', tipoCambio);
 
         $('.precio-producto').each(function () {
-            var cantidad = parseFloat($(this).data('cantidad')) || 0;
+            var $row = $(this).closest('tr');
+            var cantidad = parseFloat($row.find('.cantidad-producto').val()) || 0;
             var precio = parseFloat($(this).val()) || 0;
-            totalSoles += (cantidad * precio);
+            var precio_igv = parseFloat($row.find('.precio-igv-producto').val()) || 0;
+            
+            // PRECIO se trata como precio sin IGV (exonerado)
+            // PRECIO IGV se trata como base a la que se le suma el 18%
+            totalSoles += (cantidad * precio) + (cantidad * precio_igv * 1.18);
         });
 
         console.log('Total en Soles acumulado: ', totalSoles);
@@ -292,7 +350,7 @@ $(document).ready(function () {
         $('#total').val(totalFinal.toFixed(2));
     }
 
-    $(document).on('change keyup', '.precio-producto', function (e) {
+    $(document).on('change keyup', '.precio-producto, .precio-igv-producto, .cantidad-producto', function (e) {
         calcularTotal();
     });
 
@@ -343,6 +401,7 @@ $(document).ready(function () {
 
                 // Disparar recalculado del total
                 $('.precio-producto').first().trigger('change');
+                reordenarItems();
 
                 modalBonito({
                     tipo: 'success',
@@ -359,6 +418,15 @@ $(document).ready(function () {
             }
         });
     });
+
+    /* ===============================
+       REORDENAR ITEMS (CORRELATIVO)
+       =============================== */
+    function reordenarItems() {
+        $('#table-productos-seleccionados tbody tr').each(function (index) {
+            $(this).find('td:nth-child(2)').text(index + 1);
+        });
+    }
 
     /* ===============================
        GUARDAR COTIZACIÓN (CABECERA)
@@ -421,13 +489,16 @@ $(document).ready(function () {
         var detalles = [];
         $('.precio-producto').each(function () {
             var $el = $(this);
+            var $row = $el.closest('tr');
             detalles.push({
+                id_consolidado: $el.data('id-consolidado'),
                 cod_producto: $el.data('cod-producto'),
                 nom_producto: $el.data('nom-producto'),
                 cod_medida: $el.data('cod-medida'),
                 nom_medida: $el.data('nom-medida'),
-                cantidad: $el.data('cantidad'),
+                cantidad: $row.find('.cantidad-producto').val(),
                 precio: $el.val(),
+                precio_igv: $row.find('.precio-igv-producto').val(),
                 cod_familia: $el.data('cod-familia'),
                 nom_familia: $el.data('nom-familia')
             });
@@ -444,8 +515,38 @@ $(document).ready(function () {
             return;
         }
 
+        // --- NUEVA VALIDACIÓN DE PRECIOS > 0 ---
+        var precioInvalido = false;
+        var nombreProductoInvalido = '';
+
+        $('.precio-producto').each(function () {
+            var $row = $(this).closest('tr');
+            var precio = parseFloat($(this).val()) || 0;
+            var precio_igv = parseFloat($row.find('.precio-igv-producto').val()) || 0;
+            
+            if (precio <= 0 && precio_igv <= 0) {
+                precioInvalido = true;
+                nombreProductoInvalido = $row.find('td:nth-child(5)').text(); // PRODUCTO (índice 1-based para td:nth-child)
+                return false;
+            }
+        });
+
+        if (precioInvalido) {
+            modalBonito({
+                tipo: 'warn',
+                icono: '💰',
+                titulo: 'Precio Requerido',
+                mensaje: 'El producto <b>' + nombreProductoInvalido + '</b> no tiene un precio asignado. Por favor, ingrese un monto mayor a 0 en PRECIO o PRECIO IGV.',
+                ancho: '450px'
+            });
+            return;
+        }
+        // ----------------------------------------
+
+        var id_cotizacion_edit = $('#id_cotizacion_edit').val();
         var formData = new FormData();
         formData.append('_token', _token);
+        formData.append('id_cotizacion_edit', id_cotizacion_edit);
         formData.append('fec_cotizacion', $('#fecha_cotizacion').val());
         formData.append('nro_serie', $('#serie').val());
         formData.append('nro_doc', $('#numero').val());
@@ -470,11 +571,14 @@ $(document).ready(function () {
         }
 
         // 3. Confirmación
+        var mensajeConfirm = id_cotizacion_edit ? '¿Está seguro de que desea <b>ACTUALIZAR</b> esta cotización?' : '¿Está seguro de que desea <b>GENERAR</b> esta cotización?';
+        var tituloConfirm = id_cotizacion_edit ? 'Confirmar Actualización' : 'Confirmar Guardado';
+
         modalBonito({
             tipo: 'info',
             icono: '❓',
-            titulo: 'Confirmar Guardado',
-            mensaje: '¿Está seguro de que desea generar esta cotización?',
+            titulo: tituloConfirm,
+            mensaje: mensajeConfirm,
             confirmar: true,
             onConfirm: function () {
 
@@ -572,15 +676,139 @@ $(document).ready(function () {
     /* =================================
  GESTIÓN DE ARCHIVOS (COTIZACIÓN)
  ================================= */
+    /* =================================
+    EDITAR COTIZACIÓN
+    ================================= */
+    $(document).on('click', '.editar-cotizacion', function (e) {
+        var id_cotizacion = $(this).data('id');
+        if (!id_cotizacion) return;
+
+        abrircargando();
+
+        $.ajax({
+            type: 'POST',
+            url: carpeta + '/ajax-editar-cotizacion',
+            data: {
+                _token: _token,
+                id_cotizacion: id_cotizacion
+            },
+            success: function (res) {
+                cerrarcargando();
+                if (res.success) {
+                    var cot = res.cotizacion;
+
+                    // 1. Llenar campos de cabecera
+                    $('#id_cotizacion_edit').val(cot.ID_COTIZACION);
+                    $('#nro_cotizacion').val(cot.ID_COTIZACION);
+                    $('#fecha_cotizacion').val(cot.FEC_COTIZACION.substring(0, 10));
+                    $('#serie').val(cot.NRO_SERIE);
+                    $('#numero').val(cot.NRO_DOC);
+                    $('#ruc_proveedor').val(cot.NRO_RUC);
+                    $('#nombre_proveedor').val(cot.NOM_EMPR_PROVEEDOR);
+                    $('#direccion').val(cot.NOM_DIRECCION);
+                    $('#telefono').val(cot.TXT_TELEFONO);
+                    $('#validez').val(cot.FEC_VALIDEZ);
+                    $('#entrega').val(cot.FEC_ENTREGA);
+                    $('#observacion').val(cot.TXT_OBSERVACION);
+                    $('#total').val(parseFloat(cot.CAN_TOTAL).toFixed(2));
+
+                    // 2. Llenar Select2
+                    $('#tipo_pago_id').val(cot.COD_CATEGORIA_TIPO_PAGO).trigger('change');
+                    $('#moneda_id').val(cot.COD_CATEGORIA_MONEDA).trigger('change');
+
+                    // 3. Cargar Detalle de Productos
+                    $('#lista-productos-cotizacion').html(res.productos_html);
+
+                    // 4. Cambiar interfaz a modo edición
+                    $('.btn-guardar-cotizacion').html('<i class="mdi mdi-content-save"></i> Actualizar Cotización');
+                    $('.header-principal').html('<i class="mdi mdi-receipt"></i> EDITAR COTIZACIÓN: ' + cot.ID_COTIZACION);
+
+                    // 5. Cambiar de pestaña
+                    $('a[href="#crearcotizacionpedido"]').tab('show');
+
+                    modalBonito({
+                        tipo: 'info',
+                        icono: '📝',
+                        titulo: 'Modo Edición',
+                        mensaje: 'Se han cargado los datos de la cotización <b>' + cot.ID_COTIZACION + '</b> para su modificación.',
+                        ancho: '400px'
+                    });
+
+                } else {
+                    modalBonito({
+                        tipo: 'error',
+                        icono: '❌',
+                        titulo: 'Error',
+                        mensaje: res.message,
+                        ancho: '400px'
+                    });
+                }
+            },
+            error: function () {
+                cerrarcargando();
+                modalBonito({
+                    tipo: 'error',
+                    icono: '❌',
+                    titulo: 'Error',
+                    mensaje: 'No se pudo obtener los datos para editar.',
+                    ancho: '400px'
+                });
+            }
+        });
+    });
+
+    function resetearFormularioCotizacion() {
+        $('#id_cotizacion_edit').val('');
+        $('#serie').val('');
+        $('#numero').val('');
+        $('#ruc_proveedor').val('');
+        $('#nombre_proveedor').val('');
+        $('#direccion').val('');
+        $('#telefono').val('');
+        $('#validez').val('');
+        $('#entrega').val('');
+        $('#observacion').val('');
+        $('#total').val('0.00');
+        $('#lista-productos-cotizacion').html('<div class="text-center p-5 message-empty"><i class="mdi mdi-cart-outline icon-large"></i><p>Seleccione los consolidados para cargar los productos a cotizar.</p></div>');
+        
+        $('.btn-guardar-cotizacion').html('<i class="mdi mdi-content-save"></i> Generar Cotización');
+        $('.header-principal').html('<i class="mdi mdi-receipt"></i> COTIZACIÓN ORDEN PEDIDO');
+    }
+
+    $(document).on('click', '.btn-cancelar', function (e) {
+        resetearFormularioCotizacion();
+        $('a[href="#listacotizacionpedido"]').tab('show');
+    });
+
+    /* =================================
+    APROBAR COTIZACIÓN
+    ================================= */
+    $(document).on('click', '.aprobar-cotizacion', function (e) {
+        var id_cotizacion = $(this).data('id');
+        modalBonito({
+            tipo: 'info',
+            icono: '❓',
+            titulo: 'Confirmar Aprobación',
+            mensaje: '¿Está seguro de que desea aprobar la cotización <b>' + id_cotizacion + '</b>?',
+            confirmar: true,
+            onConfirm: function () {
+                // Aquí iría la lógica de aprobación (AJAX)
+                $.alert('Lógica de aprobación pendiente de implementar.');
+            }
+        });
+    });
+
+    /* =================================
+    GESTIÓN DE ARCHIVOS (COTIZACIÓN)
+    ================================= */
     $(document).on('click', '.btn-subir-archivo', function (e) {
         var id = $(this).data('id');
         if (id) {
-            $('#file_' + id).click(); // Abre el específico de la fila
+            $('#file_' + id).click();
         } else {
-            $('.input-file-general-cotizacion').click(); // Abre un selector general si no hay ID
+            $('.input-file-general-cotizacion').click();
         }
     });
-
 
     $(document).on('change', '.input-file-cotizacion', function (e) {
         var id_cotizacion = $(this).data('id');

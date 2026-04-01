@@ -50,21 +50,35 @@
                                </td>
                                <td class="text-center">
                                    <div style="display: flex; gap: 5px; justify-content: center;">
-                                       <button class="btn btn-sm btn-info ver-detalle-cotizacion"
-                                               data-id="{{ $item->ID_COTIZACION }}"
-                                               style="border-radius: 50%; width: 35px; height: 35px; transition: transform 0.2s;"
-                                               title="Ver Detalle">
-                                           <i class="fa fa-eye"></i>
-                                       </button>
+                                        <button class="btn btn-sm btn-info ver-detalle-cotizacion"
+                                                data-id="{{ $item->ID_COTIZACION }}"
+                                                style="border-radius: 50%; width: 35px; height: 35px; transition: transform 0.2s;"
+                                                title="Ver Detalle">
+                                            <i class="fa fa-eye"></i>
+                                        </button>
 
-                                       @if(isset($item->RUTA_ARCHIVO) && !empty($item->RUTA_ARCHIVO))
-                                           <a href="{{ url('/descargar-archivo-informe/'.base64_encode($item->RUTA_ARCHIVO)) }}" 
-                                              class="btn btn-sm btn-success shadow-soft"
-                                              style="border-radius: 4px; padding: 5px 12px; transition: all 0.2s; height: 35px; line-height: 25px;"
-                                              title="Descargar Cotización">
-                                               <i class="mdi mdi-download" style="font-size: 16px; margin-right: 5px;"></i> DESCARGAR
-                                           </a>
-                                       @endif
+                                        <button class="btn btn-sm btn-warning editar-cotizacion"
+                                                data-id="{{ $item->ID_COTIZACION }}"
+                                                style="border-radius: 50%; width: 35px; height: 35px; transition: transform 0.2s;"
+                                                title="Editar Cotización">
+                                            <i class="fa fa-edit"></i>
+                                        </button>
+
+                                        <button class="btn btn-sm btn-success aprobar-cotizacion"
+                                                data-id="{{ $item->ID_COTIZACION }}"
+                                                style="border-radius: 50%; width: 35px; height: 35px; transition: transform 0.2s;"
+                                                title="Aprobar Cotización">
+                                            <i class="fa fa-check"></i>
+                                        </button>
+
+                                        @if(isset($item->RUTA_ARCHIVO) && !empty($item->RUTA_ARCHIVO))
+                                            <a href="{{ url('/descargar-archivo-informe/'.base64_encode($item->RUTA_ARCHIVO)) }}" 
+                                               class="btn btn-sm btn-default shadow-soft"
+                                               style="border-radius: 4px; padding: 5px 12px; transition: all 0.2s; height: 35px; line-height: 25px;"
+                                               title="Descargar Cotización">
+                                                <i class="mdi mdi-download" style="font-size: 16px; margin-right: 5px;"></i>
+                                            </a>
+                                        @endif
                                    </div>
                                </td>
                            </tr>
